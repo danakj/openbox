@@ -1,5 +1,12 @@
 2003-09-09  Ben Jansens  <xor@zed.orodu.net>
 
+	* openbox/event.c, openbox/keyboard.c, openbox/keyboard.h:
+	save teh client for interactive actions cuz after teh keyboard is grabbed there is no client
+
+	* configure.ac: beta2
+
+	* ChangeLog: recent changes
+
 	* openbox/action.c, openbox/action.h, openbox/event.c, openbox/keyboard.c, openbox/keyboard.h, openbox/mouse.c, openbox/mouse.h, openbox/screen.c:
 	no more interactive mouse actions, they are evil etc. actions now "feel" much more solid. if move/resizing a window while changing workspaces, it will follow.
 

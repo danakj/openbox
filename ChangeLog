@@ -1,3 +1,64 @@
+2003-08-20  Ben Jansens  <xor@zed.orodu.net>
+
+	* keyboard.c:
+	better handling of starting a new interactive grab while one is in progress
+
+	* frame.c, frame.h, mouse.c: rename the 'root' context to 'desktop'
+
+	* action.c, action.h:
+	add the 'raiselower' action for raising obscured windows and lowering fully visible ones
+
+	* event.c, frame.c, frame.h:
+	add an obscured flag that tracks if the frame is at all obscured
+
+	* mouse.c: use the result from XGetGeometry correctly
+
+	* mouse.c: handle the XGetGeomtry failing for button releases
+
+	* mouse.c:
+	dont grab client context stuff on desktop windows. check that clint is non-null
+
+	* frame.c, mouse.c:
+	grab root mouse bindings on desktop windows also, since they are conceptually the desktop.
+
+	* screen.c: reset first to TRUE properly when the desktop popup is off
+
+	* moveresize.c: move the pointer while doing a keyboard move/resize
+
+2003-08-16  Ben Jansens  <xor@zed.orodu.net>
+
+	* keyboard.c: fix whitespace
+
+2003-08-14  Ben Jansens  <xor@zed.orodu.net>
+
+	* focus.c:
+	skip windows in the alt-tabbing which have the SKIP_TASKBAR hint set on them
+
+	* menu.c: fix the offsets used to keep the menus on screen
+
+	* menu_render.c:
+	dont show titles on submenus. kill the extra 1px at the top of titleless menus
+
+	* menu.c: make putting plugin menus in a menu closer to working..
+
+	* plugin.c: add the client_list_menu plugin
+
+	* menu.c, menu.h: add a menu destructor callback.
+	fix a possible crasher where a callback was called with a different menu.
+
+	* stacking.c: 80 cols
+
+	* openbox.c: shutdown the menus before the plugins are unloaded
+
+	* focus.c, event.c, client.c, client.h:
+	make activate take a here parameter
+
+	* action.c: parse <here>true</here> for the activate action
+
+	* action.c, action.h: make the activate action have a 'here' parameter
+
+	* action.c, action.h: add an 'activate' action
+
 2003-08-14  xor@zed.orodu.net  <xor@zed>
 
 	* kernel/menu.c: fix the offsets used to keep the menus on screen

@@ -55,8 +55,7 @@ Config::Config()
   PyObject *obmodule = PyImport_AddModule("config");
   obdict = PyModule_GetDict(obmodule);
 
-  std::vector<otk::ustring> names;
-  python_get_stringlist("DESKTOP_NAMES", &names);
+  python_get_stringlist("DESKTOP_NAMES", &desktop_names);
 
   python_get_string("THEME", &theme);
 

@@ -594,8 +594,7 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
     if (cancel) {
         d = origd;
         goto done_cycle;
-    } else if (done) {
-        screen_set_desktop(d);
+    } else if (done && dialog) {
         goto done_cycle;
     }
     if (first) {

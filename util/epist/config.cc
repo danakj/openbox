@@ -77,7 +77,7 @@ bool Config::getValue(Config::BoolType type, bool &ret) const
   BoolItemList::const_iterator it = bool_items.begin(), end = bool_items.end();
   for (; it != end; ++it) {
     if ((*it)->type == type) {
-      ret = (*it)->type;
+      ret = (*it)->value;
       return true;
     }
   }
@@ -123,7 +123,8 @@ void Config::addOption(const std::string &name, const std::string &value)
 
       item->type = bool_options[i].type;
 
-      if (strcasecmp(tmp, "true") == 0 || strcasecmp(tmp, "1"))
+      if (strcasecmp(tmp, "true") == 0 || strcasecmp(tmp, "1") == 0 ||
+          strcasecmp(tmp, "on") == 0)
         item->value = true;
       else
         item->value = false;

@@ -11,7 +11,7 @@ struct Group;
 
 /* The value in client.transient_for indicating it is a transient for its
    group instead of for a single window */
-#define TRAN_GROUP ((void*)~0l)
+#define TRAN_GROUP ((void*)~0ul)
 
 /*! Holds an icon in ARGB format */
 typedef struct Icon {

@@ -165,7 +165,7 @@ struct _RrTheme {
 
 };
 
-RrTheme *RrThemeNew(const RrInstance *inst, gchar *theme);
+RrTheme* RrThemeNew(const RrInstance *inst, gchar *theme);
 void RrThemeFree(RrTheme *theme);
 
 #endif

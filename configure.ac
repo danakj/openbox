@@ -73,4 +73,3 @@ AC_MSG_RESULT([Building with '$CXXFLAGS' for C++ compiler flags.])
 AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
 AC_MSG_RESULT
 AC_MSG_RESULT([configure complete, now type \"make\"])
-AC_MSG_RESULT

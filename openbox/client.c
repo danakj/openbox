@@ -1336,6 +1336,8 @@ void client_update_icons(Client *self)
 	    w = self->icons[j].width = data[i++];
 	    h = self->icons[j].height = data[i++];
 
+            if (w*h == 0) continue;
+
 	    self->icons[j].data = g_new(pixel32, w * h);
             for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
                 if (x >= w) {

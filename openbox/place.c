@@ -2,6 +2,7 @@
 #include "group.h"
 #include "screen.h"
 #include "frame.h"
+#include "focus.h"
 
 static Rect* pick_head(ObClient *c)
 {
@@ -63,6 +64,120 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     return TRUE;
 }
 
+static GSList* area_add(GSList *list, Rect *a)
+{
+    Rect *r = g_new(Rect, 1);
+    *r = *a;
+    return g_slist_prepend(list, r);
+}
+
+
+static GSList* area_remove(GSList *list, Rect *a)
+{
+    GSList *sit;
+    GSList *result = NULL;
+
+    for (sit = list; sit; sit = g_slist_next(sit)) {
+        Rect *r = sit->data;
+
+        if (!RECT_INTERSECTS_RECT(*r, *a)) {
+            result = g_slist_prepend(result, r);
+            r = NULL; /* dont free it */
+        } else {
+            Rect isect, extra;
+
+            /* Use an intersection of win and curr to determine the space
+               around curr that we can use.
+
+               NOTE: the spaces calculated can overlap.
+            */
+
+            RECT_SET_INTERSECTION(isect, *r, *a);
+
+            if (RECT_LEFT(isect) > RECT_LEFT(*r)) {
+                RECT_SET(extra, r->x, r->y,
+                         RECT_LEFT(isect) - r->x, r->height);
+                result = area_add(result, &extra);
+            }
+
+            if (RECT_TOP(isect) > RECT_TOP(*r)) {
+                RECT_SET(extra, r->x, r->y,
+                         r->width, RECT_TOP(isect) - r->y + 1);
+                result = area_add(result, &extra);
+            }
+
+            if (RECT_RIGHT(isect) < RECT_RIGHT(*r)) {
+                RECT_SET(extra, RECT_RIGHT(isect) + 1, r->y,
+                         RECT_RIGHT(*r) - RECT_RIGHT(isect), r->height);
+                result = area_add(result, &extra);
+            }
+
+            if (RECT_BOTTOM(isect) < RECT_BOTTOM(*r)) {
+                RECT_SET(extra, r->x, RECT_BOTTOM(isect) + 1,
+                         r->width, RECT_BOTTOM(*r) - RECT_BOTTOM(isect));
+                result = area_add(result, &extra);
+            }
+        }
+
+        g_free(r);
+    }
+    g_slist_free(list);
+    return result;
+}
+
+static gint area_cmp(gconstpointer p1, gconstpointer p2)
+{
+    gint ret;
+    const Rect *a1 = p1, *a2 = p2;
+
+    ret = RECT_BOTTOM(*a1) - RECT_BOTTOM(*a2);
+    if (!ret)
+        ret = RECT_LEFT(*a1) - RECT_LEFT(*a2);
+    return ret;
+}
+
+static gboolean place_smart(ObClient *client, gint *x, gint *y)
+{
+    guint i;
+    gboolean ret = FALSE;
+    GSList *spaces, *sit;
+    GList *it, *list;
+
+    list = focus_order[client->desktop == DESKTOP_ALL ?
+                       screen_desktop : client->desktop];
+
+    for (i = 0; i < screen_num_monitors; ++i)
+        spaces = area_add(spaces, screen_area_monitor(client->desktop, i));
+
+    for (it = list; it; it = g_list_next(it)) {
+        ObClient *c = it->data;
+
+        if (c == client || c->shaded)
+            continue;
+        spaces = area_remove(spaces, &c->frame->area);
+    }
+
+    spaces = g_slist_sort(spaces, area_cmp);
+
+    for (sit = spaces; sit; sit = g_slist_next(sit)) {
+        Rect *r = sit->data;
+
+        if (!ret) {
+            if (r->width >= client->frame->area.width &&
+                r->height >= client->frame->area.height) {
+                ret = TRUE;
+                *x = r->x;
+                *y = r->y;
+            }
+        }
+
+        g_free(r);
+    }
+    g_slist_free(spaces);
+
+    return ret;
+}
+
 static gboolean place_transient(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for) {
@@ -82,16 +197,16 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
                 ObClient *m = it->data;
                 if (!(m == client || m->transient_for)) {
                     if (first) {
-                        l = m->frame->area.x;
-                        t = m->frame->area.y;
-                        r = m->frame->area.x + m->frame->area.width - 1;
-                        b = m->frame->area.y + m->frame->area.height - 1;
+                        l = RECT_LEFT(m->frame->area);
+                        t = RECT_TOP(m->frame->area);
+                        r = RECT_RIGHT(m->frame->area);
+                        b = RECT_BOTTOM(m->frame->area);
                         first = FALSE;
                     } else {
-                        l = MIN(l, m->frame->area.x);
-                        t = MIN(t, m->frame->area.y);
-                        r = MAX(r, m->frame->area.x +m->frame->area.width - 1);
-                        b = MAX(b, m->frame->area.y +m->frame->area.height -1);
+                        l = MIN(l, RECT_LEFT(m->frame->area));
+                        t = MIN(t, RECT_TOP(m->frame->area));
+                        r = MAX(r, RECT_RIGHT(m->frame->area));
+                        b = MAX(b, RECT_BOTTOM(m->frame->area));
                     }
                 }
             }
@@ -129,6 +244,8 @@ void place_client(ObClient *client, gint *x, gint *y)
     if (place_transient(client, x, y))
         return;
     if (place_dialog(client, x, y))
+        return;
+    if (place_smart(client, x, y))
         return;
     if (place_random(client, x, y))
         return;

@@ -10,6 +10,7 @@
 	bzflag work now
 	* Reversed the default directions for the mouse wheel desktop
 	switching actions
+	* Don't wrap around in the default keyboard desktop switching bindings
 
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)

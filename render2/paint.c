@@ -69,7 +69,7 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     struct RrInstance *inst;
     struct RrSurface *p;
     int ok, i;
-    int surx, sury;
+    int surx, sury, vx, vy;
     int x, y, w, h, e;
     GSList *it;
 
@@ -84,16 +84,6 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
     assert(ok);
 
-    glViewport(0, 0, RrScreenWidth(inst)-1, RrScreenHeight(inst)-1);
-/*
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(RrSurfaceX(sur), RrSurfaceX(sur) + RrSurfaceWidth(sur)-1,
-            RrSurfaceY(sur), RrSurfaceY(sur) + RrSurfaceHeight(sur)-1,
-            0, 10);
-    glMatrixMode(GL_MODELVIEW);
-    glViewport(0, 0, RrSurfaceWidth(sur)-1, RrSurfaceHeight(sur)-1);
-*/
     glPushMatrix();
     glTranslatef(-RrSurfaceX(sur), -RrSurfaceY(sur), 0);
 
@@ -107,6 +97,12 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
 
     switch (RrSurfaceType(sur)) {
     case RR_SURFACE_PLANAR:
+        if (surx < 0) vx = -surx;
+        else vx = 0;
+        if (sury < 0) vy = -sury;
+        else vy = 0;
+        glViewport(vx, vy, RrScreenWidth(inst)-1, RrScreenHeight(inst)-1);
+        glTranslatef(-vx, -vy, 0);
         RrPlanarPaint(sur, surx, sury);
         e = RrPlanarEdgeWidth(sur);
         x = RrSurfaceX(sur) + e;

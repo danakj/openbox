@@ -1038,8 +1038,17 @@ void client_update_wmhints(Client *self)
         /* did the group state change? */
         if (hints->window_group != (self->group ? self->group->leader : None)){
             /* remove from the old group if there was one */
-            if (self->group != NULL)
+            if (self->group != NULL) {
                 group_remove(self->group, self);
+
+                /* remove transients of the group */
+                for (it = self->group->members; it; it = it->next)
+                    if (it->data != self &&
+                        ((Client*)it->data)->transient_for == TRAN_GROUP) {
+                        self->transients = g_slist_remove(self->transients,
+                                                          it->data);
+                    }
+            }
             if (hints->window_group != None)
                 self->group = group_add(hints->window_group, self);
 

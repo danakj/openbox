@@ -20,6 +20,14 @@ $ #FocusLast
 # Focus Window on Workspace Change
 $ #WindowToWindowSnap
 # Window-To-Window Snapping
+$ #WindowToEdgeSnap
+# Window-To-Edge Snapping
+$ #WindowDoSnapNo
+# No Snapping
+$ #WindowDoSnap
+# Edge Snapping
+$ #WindowDoResistance
+# Edge Resistance
 $ #WindowCornerSnap
 # Window Corner Snapping
 $ #WorkspaceWarping

@@ -61,6 +61,34 @@ private:
     virtual void reconfigure(void);
   };
 
+  class WindowToWindowSnapmenu : public Basemenu {
+  private:
+    WindowToWindowSnapmenu(const WindowToWindowSnapmenu&);
+    WindowToWindowSnapmenu& operator=(const WindowToWindowSnapmenu&);
+
+  protected:
+    virtual void itemSelected(int button, unsigned int index);
+    virtual void setValues(void);
+
+  public:
+    WindowToWindowSnapmenu(Configmenu *cm);
+    virtual void reconfigure(void);
+  };
+
+  class WindowToEdgeSnapmenu : public Basemenu {
+  private:
+    WindowToEdgeSnapmenu(const WindowToEdgeSnapmenu&);
+    WindowToEdgeSnapmenu& operator=(const WindowToEdgeSnapmenu&);
+
+  protected:
+    virtual void itemSelected(int button, unsigned int index);
+    virtual void setValues(void);
+
+  public:
+    WindowToEdgeSnapmenu(Configmenu *cm);
+    virtual void reconfigure(void);
+  };
+
 #ifdef    XINERAMA
   class Xineramamenu : public Basemenu {
   private:
@@ -79,12 +107,14 @@ private:
 
   Focusmenu *focusmenu;
   Placementmenu *placementmenu;
+  WindowToWindowSnapmenu *windowsnapmenu;
+  WindowToEdgeSnapmenu *edgesnapmenu;
 #ifdef    XINERAMA
   Xineramamenu *xineramamenu;
 #endif // XINERAMA
 
-  friend class Focusmenu;
-  friend class Placementmenu;
+//  friend class Focusmenu;
+//  friend class Placementmenu;
 
   Configmenu(const Configmenu&);
   Configmenu& operator=(const Configmenu&);

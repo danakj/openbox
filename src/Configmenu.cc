@@ -38,12 +38,20 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
 
   focusmenu = new Focusmenu(this);
   placementmenu = new Placementmenu(this);
+  windowsnapmenu = new WindowToWindowSnapmenu(this);
+  edgesnapmenu = new WindowToEdgeSnapmenu(this);
 #ifdef    XINERAMA
   xineramamenu = new Xineramamenu(this);
 #endif // XINERAMA
 
   insert(i18n(ConfigmenuSet, ConfigmenuFocusModel,
               "Focus Model"), focusmenu);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowPlacement,
+              "Window Placement"), placementmenu);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowToWindowSnap,
+              "Window-To-Window Snapping"), windowsnapmenu);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowToEdgeSnap,
+              "Window-To-Edge Snapping"), edgesnapmenu);
   insert(i18n(ConfigmenuSet, ConfigmenuWindowPlacement,
               "Window Placement"), placementmenu);
 #ifdef    XINERAMA
@@ -62,21 +70,17 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Focus New Windows"), 5);
   insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
               "Focus Last Window on Workspace"), 6);
-  insert(i18n(ConfigmenuSet, ConfigmenuWindowToWindowSnap,
-              "Window-To-Window Snapping"), 7);
-  insert(i18n(ConfigmenuSet, ConfigmenuWindowCornerSnap,
-              "Window Corner Snapping"), 8);
   insert(i18n(ConfigmenuSet, ConfigmenuDisableBindings,
-              "Disable Mouse with Scroll Lock"), 9);
+              "Disable Mouse with Scroll Lock"), 7);
   insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
-              "Hide Toolbar"), 10);
+              "Hide Toolbar"), 8);
   update();
   setValues();
 }
 
 
 void Configmenu::setValues(void) {
-  int index = 2;
+  int index = 4;
 #ifdef    XINERAMA
   ++index;
 #endif // XINERAMA
@@ -86,11 +90,6 @@ void Configmenu::setValues(void) {
   setItemSelected(index++, getScreen()->doFullMax());
   setItemSelected(index++, getScreen()->doFocusNew());
   setItemSelected(index++, getScreen()->doFocusLast());
-  setItemSelected(index++, getScreen()->getWindowToWindowSnap());
-
-  setItemSelected(index, getScreen()->getWindowCornerSnap());
-  setItemEnabled(index++, getScreen()->getWindowToWindowSnap());
-  
   setItemSelected(index++, getScreen()->allowScrollLock());
   setItemSelected(index++, getScreen()->doHideToolbar());
 }
@@ -99,6 +98,8 @@ void Configmenu::setValues(void) {
 Configmenu::~Configmenu(void) {
   delete focusmenu;
   delete placementmenu;
+  delete windowsnapmenu;
+  delete edgesnapmenu;
 #ifdef    XINERAMA
   delete xineramamenu;
 #endif // XINERAMA
@@ -145,24 +146,13 @@ void Configmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(index, getScreen()->doFocusLast());
     break;
 
-  case 7: // window-to-window snapping
-    getScreen()->saveWindowToWindowSnap(! getScreen()->getWindowToWindowSnap());
-    setItemSelected(index, getScreen()->getWindowToWindowSnap());
-    setItemEnabled(index + 1, getScreen()->getWindowToWindowSnap());
-    break;
-
-  case 8: // window corner snapping
-    getScreen()->saveWindowCornerSnap(! getScreen()->getWindowCornerSnap());
-    setItemSelected(index, getScreen()->getWindowCornerSnap());
-    break;
-
-  case 9: // disable mouse bindings with Scroll Lock
+  case 7: // disable mouse bindings with Scroll Lock
     getScreen()->saveAllowScrollLock(! getScreen()->allowScrollLock());
     setItemSelected(index, getScreen()->allowScrollLock());
     getScreen()->reconfigure();
     break;
 
-  case 10: // hide toolbar
+  case 8: // hide toolbar
     getScreen()->saveHideToolbar(! getScreen()->doHideToolbar());
     setItemSelected(index, getScreen()->doHideToolbar());
     break;
@@ -174,6 +164,8 @@ void Configmenu::reconfigure(void) {
   setValues();
   focusmenu->reconfigure();
   placementmenu->reconfigure();
+  windowsnapmenu->reconfigure();
+  edgesnapmenu->reconfigure();
 #ifdef    XINERAMA
   xineramamenu->reconfigure();
 #endif // XINERAMA
@@ -442,6 +434,131 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
 
     break;
   }
+}
+
+
+Configmenu::WindowToWindowSnapmenu::WindowToWindowSnapmenu(Configmenu *cm) :
+    Basemenu(cm->getScreen()) {
+  setLabel(i18n(ConfigmenuSet, ConfigmenuWindowToWindowSnap,
+                "Window-To-Window Snapping"));
+  setInternalMenu();
+
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowDoSnapNo, "No Snapping"), 1);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowDoSnap, "Edge Snapping"), 2);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowDoResistance,
+              "Edge Resistance"), 3);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowCornerSnap,
+              "Window Corner Snapping"), 4);
+  update();
+  setValues();
+}
+
+
+void Configmenu::WindowToWindowSnapmenu::setValues(void) {
+  setItemSelected(0, (getScreen()->getWindowToWindowSnap() ==
+                      BScreen::WindowNoSnap));
+  setItemSelected(1, (getScreen()->getWindowToWindowSnap() ==
+                      BScreen::WindowSnap));
+  setItemSelected(2, (getScreen()->getWindowToWindowSnap() ==
+                      BScreen::WindowResistance));
+
+  setItemEnabled(3, (getScreen()->getWindowToWindowSnap() ==
+                     BScreen::WindowSnap));
+  setItemSelected(3, getScreen()->getWindowCornerSnap());
+}
+
+
+void Configmenu::WindowToWindowSnapmenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
+}
+
+
+void Configmenu::WindowToWindowSnapmenu::itemSelected(int button, unsigned int index) {
+  if (button != 1)
+    return;
+
+  BasemenuItem *item = find(index);
+
+  if (! item->function())
+    return;
+
+  switch (item->function()) {
+  case 1: // none
+    getScreen()->saveWindowToWindowSnap(BScreen::WindowNoSnap);
+    break;
+
+  case 2: // edge snapping
+    getScreen()->saveWindowToWindowSnap(BScreen::WindowSnap);
+    break;
+
+  case 3: // edge resistance
+    getScreen()->saveWindowToWindowSnap(BScreen::WindowResistance);
+    break;
+
+  case 4: // window corner snapping
+    getScreen()->saveWindowCornerSnap(! getScreen()->getWindowCornerSnap());
+    break;
+
+  }
+  setValues();
+}
+
+
+Configmenu::WindowToEdgeSnapmenu::WindowToEdgeSnapmenu(Configmenu *cm) :
+    Basemenu(cm->getScreen()) {
+  setLabel(i18n(ConfigmenuSet, ConfigmenuWindowToEdgeSnap,
+                "Window-To-Edge Snapping"));
+  setInternalMenu();
+
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowDoSnapNo, "No Snapping"), 1);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowDoSnap, "Edge Snapping"), 2);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowDoResistance,
+              "Edge Resistance"), 3);
+  update();
+  setValues();
+}
+
+
+void Configmenu::WindowToEdgeSnapmenu::setValues(void) {
+  setItemSelected(0, (getScreen()->getWindowToEdgeSnap() ==
+                      BScreen::WindowNoSnap));
+  setItemSelected(1, (getScreen()->getWindowToEdgeSnap() ==
+                      BScreen::WindowSnap));
+  setItemSelected(2, (getScreen()->getWindowToEdgeSnap() ==
+                      BScreen::WindowResistance));
+}
+
+
+void Configmenu::WindowToEdgeSnapmenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
+}
+
+
+void Configmenu::WindowToEdgeSnapmenu::itemSelected(int button, unsigned int index) {
+  if (button != 1)
+    return;
+
+  BasemenuItem *item = find(index);
+
+  if (! item->function())
+    return;
+
+  switch (item->function()) {
+  case 1: // none
+    getScreen()->saveWindowToEdgeSnap(BScreen::WindowNoSnap);
+    break;
+
+  case 2: // edge snapping
+    getScreen()->saveWindowToEdgeSnap(BScreen::WindowSnap);
+    break;
+
+  case 3: // edge resistance
+    getScreen()->saveWindowToEdgeSnap(BScreen::WindowResistance);
+    break;
+  }
+  setValues();
 }
 
 

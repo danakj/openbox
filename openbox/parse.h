@@ -5,11 +5,11 @@
 #include "parse.tab.h"
 
 typedef enum {
-    TOKEN_REAL,
-    TOKEN_INTEGER,
-    TOKEN_STRING,
-    TOKEN_IDENTIFIER,
-    TOKEN_BOOL,
+    TOKEN_REAL       = REAL,
+    TOKEN_INTEGER    = INTEGER,
+    TOKEN_STRING     = STRING,
+    TOKEN_IDENTIFIER = IDENTIFIER,
+    TOKEN_BOOL       = BOOL,
     TOKEN_LBRACKET   = '(',
     TOKEN_RBRACKET   = ')',
     TOKEN_LBRACE     = '{',

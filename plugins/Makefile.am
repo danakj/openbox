@@ -1,6 +1,6 @@
 plugindir=$(libdir)/openbox/plugins
 
-SUBDIRS = keyboard mouse
+SUBDIRS = keyboard mouse placement
 
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\"

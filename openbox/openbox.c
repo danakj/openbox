@@ -150,6 +150,7 @@ int main(int argc, char **argv)
         plugin_open("focus");
         plugin_open("keyboard");
         plugin_open("mouse");
+        plugin_open("placement");
 
 	/* get all the existing windows */
 	client_manage_all();

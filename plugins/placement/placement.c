@@ -1,0 +1,46 @@
+#include "../../kernel/dispatch.h"
+#include "../../kernel/client.h"
+#include "../../kernel/frame.h"
+#include "../../kernel/screen.h"
+#include "../../kernel/openbox.h"
+#include <glib.h>
+
+void place_random(Client *c)
+{
+    int l, r, t, b;
+    int x, y;
+    Rect *area;
+
+    area = screen_area(c->desktop);
+
+    l = area->x;
+    t = area->y;
+    r = area->x + area->width - c->frame->area.width;
+    b = area->y + area->height - c->frame->area.height;
+
+    x = g_random_int_range(l, r + 1);
+    y = g_random_int_range(t, b + 1);
+
+    frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
+    client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
+                     TRUE, TRUE);
+}
+
+void event(ObEvent *e, void *foo)
+{
+    g_assert(e->type == Event_Client_New);
+
+    if (ob_state == State_Starting) return;
+
+    place_random(e->data.c.client);
+}
+
+void plugin_startup()
+{
+    dispatch_register(Event_Client_New, (EventHandler)event, NULL);
+}
+
+void plugin_shutdown()
+{
+    dispatch_register(0, (EventHandler)event, NULL);
+}

@@ -64,6 +64,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 		plugins/Makefile
 		plugins/keyboard/Makefile
 		plugins/mouse/Makefile
+		plugins/placement/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile
 		data/Makefile

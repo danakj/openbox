@@ -30,6 +30,10 @@ extern "C" {
 #  include <unistd.h>
 #endif // HAVE_UNISTD_H
 
+#ifdef    HAVE_STDIO_H
+#  include <stdio.h>
+#endif // HAVE_STDIO_H
+
 #ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
@@ -173,6 +177,7 @@ int main(int argc, char **argv) {
     }
   }
 
+  XSelectInput(_display, _root, None);
   delete _xatom;
   XCloseDisplay(_display);
   return 0;

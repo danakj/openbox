@@ -56,9 +56,6 @@
 #endif // SLIT
 #include "Util.h"
 
-#include <iostream>
-using namespace std;
-
 /*
  * Initializes the class with default values/the window's set initial values.
  */
@@ -2208,7 +2205,6 @@ void OpenboxWindow::redrawCloseButton(Bool pressed) {
 
 
 void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
-  cout << "MAP REQUEST " << client.window << " " << client.title << endl;
   if (re->window == client.window) {
 #ifdef    DEBUG
     fprintf(stderr, i18n->getMessage(WindowSet, WindowMapRequest,
@@ -2797,7 +2793,6 @@ void OpenboxWindow::startMove(int x, int y) {
   }
   frame.grab_x = x - frame.x - frame.border_w;
   frame.grab_y = y - frame.y - frame.border_w;
-  cout << "START MOVE " << client.window << " " << client.title << endl;
 }
 
 
@@ -2891,7 +2886,6 @@ void OpenboxWindow::endMove() {
   // cause problems
   XEvent e;
   while (XCheckTypedWindowEvent(display, frame.window, MotionNotify, &e));
-  cout << "END MOVE " << client.window << " " << client.title << endl;
 }
 
 
@@ -2910,7 +2904,6 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
     Bool left = resize_zone & ZoneLeft;
 
     if (! flags.resizing) {
-      cout << "START RESIZE " << client.window << " " << client.title << endl;
       Cursor cursor;
       if (resize_zone & ZoneTop)
         cursor = (resize_zone & ZoneLeft) ?
@@ -2984,8 +2977,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
       screen->showGeometry(gx, gy);
     }
-  } else
-    cout << "MOTION " << client.window << " " << client.title << endl;
+  }
 }
 
 

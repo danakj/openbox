@@ -43,7 +43,8 @@
 #endif // HAVE_STRING_H
 
 #include <algorithm>
-using namespace std;
+using std::min;
+using std::max;
 
 #include "i18n.h"
 #include "openbox.h"

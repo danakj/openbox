@@ -43,7 +43,7 @@
 
 #include <strstream>
 #include <string>
-using namespace std;
+using std::ends;
 
 Slit::Slit(BScreen &scr, Resource &conf) : screen(scr),
   openbox(scr.getOpenbox()), config(conf)
@@ -212,7 +212,7 @@ void Slit::removeClient(Window w, Bool remap) {
 
 void Slit::setOnTop(bool b) {
   m_ontop = b;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.onTop" << ends;
   config.setValue(s.str(), m_ontop ? "True" : "False");
   s.rdbuf()->freeze(0);
@@ -220,7 +220,7 @@ void Slit::setOnTop(bool b) {
 
 void Slit::setAutoHide(bool b) {
   m_autohide = b;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.autoHide" << ends;
   config.setValue(s.str(), m_autohide ? "True" : "False");
   s.rdbuf()->freeze(0);
@@ -228,7 +228,7 @@ void Slit::setAutoHide(bool b) {
 
 void Slit::setPlacement(int p) {
   m_placement = p;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.placement"
     << ends;
   const char *placement;
@@ -248,7 +248,7 @@ void Slit::setPlacement(int p) {
 
 void Slit::setDirection(int d) {
   m_direction = d;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.direction"
     << ends;
   config.setValue(s.str(),
@@ -264,8 +264,8 @@ void Slit::save() {
 }
 
 void Slit::load() {
-  ostrstream rscreen, rname, rclass;
-  string s;
+  std::ostrstream rscreen, rname, rclass;
+  std::string s;
   bool b;
   rscreen << "session.screen" << screen.getScreenNumber() << '.' << ends;
 

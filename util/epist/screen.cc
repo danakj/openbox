@@ -118,13 +118,6 @@ XWindow *screen::findWindow(const XEvent &e) const {
 
 void screen::processEvent(const XEvent &e) {
   assert(_managed);
-  assert(e.xany.window == _root);
-
-  XWindow *window = 0;
-  if (e.xany.window != _root) {
-    window = findWindow(e);  // find the window
-    assert(window); // we caught an event for a window we don't know about!?
-  }
 
   switch (e.type) {
   case PropertyNotify:

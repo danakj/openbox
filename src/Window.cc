@@ -2739,7 +2739,7 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
           client.window);
 #endif
 
-  if (frame.maximize_button == be->window) {
+  if (frame.maximize_button == be->window && be->button <= 3) {
     redrawMaximizeButton(True);
   } else if (be->button == 1 || (be->button == 3 && be->state == Mod1Mask)) {
     if (! flags.focused)
@@ -2817,13 +2817,19 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
   // mouse wheel up
   } else if (be->button == 4) {
     if ((be->window == frame.label ||
-         be->window == frame.title) &&
+         be->window == frame.title ||
+         be->window == frame.maximize_button ||
+         be->window == frame.iconify_button ||
+         be->window == frame.close_button) &&
         ! flags.shaded)
       shade();
   // mouse wheel down
   } else if (be->button == 5) {
     if ((be->window == frame.label ||
-         be->window == frame.title) &&
+         be->window == frame.title ||
+         be->window == frame.maximize_button ||
+         be->window == frame.iconify_button ||
+         be->window == frame.close_button) &&
         flags.shaded)
       shade();
   }
@@ -2836,21 +2842,22 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
           client.window);
 #endif
 
-  if (re->window == frame.maximize_button) {
+  if (re->window == frame.maximize_button &&
+      re->button >= 1 && re->button <= 3) {
     if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
         (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w))) {
       maximize(re->button);
     } else {
       redrawMaximizeButton(flags.maximized);
     }
-  } else if (re->window == frame.iconify_button) {
+  } else if (re->window == frame.iconify_button && re->button == 1) {
     if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
         (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w))) {
       iconify();
     } else {
       redrawIconifyButton(False);
     }
-  } else if (re->window == frame.close_button) {
+  } else if (re->window == frame.close_button & re->button == 1) {
     if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
         (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w)))
       close();

@@ -710,9 +710,11 @@ void Blackbox::process_event(XEvent *e) {
         if (win) {
           if (win->isIconic())
             win->deiconify(False, True);
+          if (win->isShaded())
+            win->shade();
           if (win->isVisible() && win->setInputFocus()) {
-            //win->getScreen()->getWorkspace(win->getWorkspaceNumber())->
-            //  raiseWindow(win);
+            win->getScreen()->getWorkspace(win->getWorkspaceNumber())->
+              raiseWindow(win);
             win->installColormap(True);
           }
         }

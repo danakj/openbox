@@ -78,6 +78,7 @@ private:
 
   int window_number, workspace_number;
   unsigned long current_state;
+  bool place_window;         // place the window ourselves when mapped
 
   enum FocusMode { F_NoInput = 0, F_Passive,
 		   F_LocallyActive, F_GloballyActive };

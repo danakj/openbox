@@ -216,7 +216,7 @@ OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
   }
   upsize();
 
-  Bool place_window = True;
+  place_window = true;
   if (openbox.isStartup() || flags.transient ||
       client.normal_hint_flags & (PPosition|USPosition)) {
     setGravityOffsets();
@@ -226,7 +226,7 @@ OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
 	 (signed) (frame.y + frame.y_border) >= 0 &&
 	 frame.x <= (signed) screen->size().w() &&
 	 frame.y <= (signed) screen->size().h()))
-      place_window = False;
+      place_window = false;
   }
 
   frame.window = createToplevelWindow(frame.x, frame.y, frame.width,
@@ -1467,8 +1467,8 @@ void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
 
   // if we're using the click to place placement type, then immediately
   // after the window is mapped, we need to start interactively moving it
-  if (!(flags.iconic || reassoc) &&
-      screen->placementPolicy() == BScreen::ClickMousePlacement) {
+  if (screen->placementPolicy() == BScreen::ClickMousePlacement &&
+      place_window && !(flags.iconic || reassoc)) {
     // if the last window wasn't placed yet, or we're just moving a window
     // already, finish off that move cleanly
     OpenboxWindow *w = openbox.getFocusedWindow();

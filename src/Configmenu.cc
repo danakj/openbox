@@ -229,6 +229,11 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm):
          BScreen::TopBottom);
   insert(i18n(ConfigmenuSet, ConfigmenuBottomTop, "Bottom to Top"),
          BScreen::BottomTop);
+  insert(i18n(ConfigmenuSet, ConfigmenuIgnoreShaded, "Ignore shaded windows"),
+         BScreen::IgnoreShaded);
+  insert(i18n(ConfigmenuSet, ConfigmenuIgnoreMax,
+              "Ignore full-maximized windows"),
+         BScreen::IgnoreMaximized);
   update();
   setValues();
 }
@@ -255,6 +260,9 @@ void Configmenu::Placementmenu::setValues(void) {
   setItemSelected(7, ! tb);
   setItemEnabled(6, e);
   setItemEnabled(7, e);
+  
+  setItemSelected(8, getScreen()->getPlaceIgnoreShaded());
+  setItemSelected(9, getScreen()->getPlaceIgnoreMaximized());
 }
 
 
@@ -359,6 +367,21 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
 
     setItemSelected(6, false);
     setItemSelected(7, true);
+
+    break;
+  
+  case BScreen::IgnoreShaded:
+    getScreen()->savePlaceIgnoreShaded(! getScreen()->getPlaceIgnoreShaded());
+
+    setItemSelected(8, getScreen()->getPlaceIgnoreShaded());
+
+    break;
+
+  case BScreen::IgnoreMaximized:
+    getScreen()->
+      savePlaceIgnoreMaximized(! getScreen()->getPlaceIgnoreMaximized());
+
+    setItemSelected(9, getScreen()->getPlaceIgnoreMaximized());
 
     break;
   }

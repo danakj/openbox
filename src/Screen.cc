@@ -490,7 +490,7 @@ void BScreen::saveDateFormat(int f) {
 }
 
 
-void BScreen::saveClock24Hour(Bool c) {
+void BScreen::saveClock24Hour(bool c) {
   resource.clock24hour = c;
   config->setValue(screenstr + "clockFormat", resource.clock24hour ? 24 : 12);
 }
@@ -507,6 +507,20 @@ void BScreen::saveWorkspaceNames() {
   }
 
   config->setValue(screenstr + "workspaceNames", names);
+}
+
+
+void BScreen::savePlaceIgnoreShaded(bool i) {
+  resource.ignore_shaded = i;
+  config->setValue(screenstr + "placementIgnoreShaded",
+                   resource.ignore_shaded);
+}
+
+
+void BScreen::savePlaceIgnoreMaximized(bool i) {
+  resource.ignore_maximized = i;
+  config->setValue(screenstr + "placementIgnoreMaximized",
+                   resource.ignore_maximized);
 }
 
 
@@ -534,6 +548,8 @@ void BScreen::save_rc(void) {
   saveDateFormat(resource.date_format);
   savwClock24Hour(resource.clock24hour);
 #endif // HAVE_STRFTIME
+  savePlaceIgnoreShaded(resource.ignore_shaded);
+  savePlaceIgnoreMaximized(resource.ignore_maximized);
 
   toolbar->save_rc();
   slit->save_rc();
@@ -639,9 +655,8 @@ void BScreen::load_rc(void) {
     resource.placement_policy = RowSmartPlacement;
 
 #ifdef    HAVE_STRFTIME
-  if (config->getValue(screenstr + "strftimeFormat", s))
-    resource.strftime_format = s;
-  else
+  if (! config->getValue(screenstr + "strftimeFormat",
+                         resource.strftime_format))
     resource.strftime_format = "%I:%M %p";
 #else // !HAVE_STRFTIME
   long l;
@@ -655,6 +670,14 @@ void BScreen::load_rc(void) {
     l = 12;
   resource.clock24hour = l == 24;
 #endif // HAVE_STRFTIME
+  
+  if (! config->getValue(screenstr + "placementIgnoreShaded",
+                         resource.ignore_shaded))
+    resource.ignore_shaded = true;
+
+  if (! config->getValue(screenstr + "placementIgnoreMaximized",
+                         resource.ignore_maximized))
+    resource.ignore_maximized = true;
 }
 
 

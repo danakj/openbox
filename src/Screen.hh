@@ -149,7 +149,8 @@ private:
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
-      hide_toolbar, window_to_window_snap, window_corner_snap, aa_fonts;
+      hide_toolbar, window_to_window_snap, window_corner_snap, aa_fonts,
+      ignore_shaded, ignore_maximized;
     BColor border_color;
 
     unsigned int workspaces;
@@ -189,7 +190,8 @@ private:
   void updateWorkArea(void);
 public:
   enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
-         UnderMousePlacement, LeftRight, RightLeft, TopBottom, BottomTop };
+         UnderMousePlacement, LeftRight, RightLeft, TopBottom, BottomTop,
+         IgnoreShaded, IgnoreMaximized };
   enum { RoundBullet = 1, TriangleBullet, SquareBullet, NoBullet };
   enum { Restart = 1, RestartOther, Exit, Shutdown, Execute, Reconfigure,
          WindowShade, WindowIconify, WindowMaximize, WindowClose, WindowRaise,
@@ -244,6 +246,10 @@ public:
   { return resource.border_width; }
   inline unsigned int getResizeZones(void) const
   { return resource.resize_zones; }
+  inline bool getPlaceIgnoreShaded(void) const
+  { return resource.ignore_shaded; }
+  inline bool getPlaceIgnoreMaximized(void) const
+  { return resource.ignore_maximized; }
 
   inline unsigned int getCurrentWorkspaceID(void) const
   { return current_workspace->getID(); }
@@ -280,6 +286,8 @@ public:
   void saveWindowToWindowSnap(bool s);
   void saveWindowCornerSnap(bool s);
   void saveResizeZones(unsigned int z);
+  void savePlaceIgnoreShaded(bool i);
+  void savePlaceIgnoreMaximized(bool i);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

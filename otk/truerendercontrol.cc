@@ -108,8 +108,6 @@ void renderPixel(XImage *im, unsigned char *dp, unsigned long pixel)
 {
   unsigned int bpp = im->bits_per_pixel + (im->byte_order == MSBFirst) ? 1 : 0;
 
-  printf("%lx \n", pixel);
-  
   switch (bpp) {
   case  8: //  8bpp
     *dp++ = pixel;
@@ -147,13 +145,13 @@ void renderPixel(XImage *im, unsigned char *dp, unsigned long pixel)
   }
 }
 
-void TrueRenderControl::render(::Drawable d)
+void TrueRenderControl::render(::Window win)
 {
   XGCValues gcv;
   gcv.cap_style = CapProjecting;
 
   int w = 255, h = 32;
-  Pixmap p = XCreatePixmap(**display, d, w, h, _screen->depth());
+  Pixmap p = XCreatePixmap(**display, win, w, h, _screen->depth());
   XImage *im = XCreateImage(**display, _screen->visual(), _screen->depth(),
 			    ZPixmap, 0, NULL, w, h, 32, 0);
   //GC gc = XCreateGC(**display, _screen->rootWindow(), GCCapStyle, &gcv);
@@ -187,8 +185,8 @@ void TrueRenderControl::render(::Drawable d)
   //image->data = NULL;
   XDestroyImage(im);
 
-  XCopyArea(**display, p, d, DefaultGC(**display, _screen->screen()),
-	    0, 0, w, h,  0, 0);
+  XSetWindowBackgroundPixmap(**display, win, p);
+  XClearWindow(**display, win);
 
   XFreePixmap(**display, p);
 }

@@ -67,7 +67,7 @@ public:
 
   static RenderControl *getRenderControl(int screen);
 
-  virtual void render(::Drawable d) = 0;
+  virtual void render(::Window w) = 0;
 };
 
 }

@@ -64,7 +64,6 @@ int main(void) {
         foo.expose(e.xexpose);
       } else if (e.type == ConfigureNotify) {
         foo.configure(e.xconfigure);
-        label.hide();
       }
     } 
   }

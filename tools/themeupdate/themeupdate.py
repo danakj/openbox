@@ -176,6 +176,7 @@ def pixelsize(data):
                     'specified by pixelsize. It is recommended that you use '
                     'pixelsize instead of pointsize for specifying theme '
                     'fonts. e.g. "sans:pixelsize=12"\n')
+                global valid
                 valid = False
 
 def warn_missing(data):

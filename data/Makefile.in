@@ -303,6 +303,9 @@ install-data-local: menu
 	test -f $(DESTDIR)$(pkgdatadir)/menu || \
 	$(INSTALL_DATA) menu $(DESTDIR)$(pkgdatadir)
 
+uninstall-am:
+	rm -f $(DESTDIR)$(pkgdatadir)/menu
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

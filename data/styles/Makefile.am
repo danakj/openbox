@@ -6,3 +6,5 @@ style_DATA = artwiz bluebox cthulhain deep flux frobozz frobust nyz nyzclone ope
 
 distclean-local:
 	rm -f *\~
+uninstall-am:
+	rmdir $(styledir)

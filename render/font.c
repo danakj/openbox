@@ -23,7 +23,7 @@ static void font_startup(void)
 #endif /* DEBUG */
     if (!XftInit(0)) {
         g_warning(_("Couldn't initialize Xft.\n"));
-        exit(3);
+        exit(EXIT_FAILURE);
     }
 #ifdef DEBUG
     version = XftGetVersion();
@@ -71,9 +71,8 @@ RrFont *RrFontOpen(const RrInstance *inst, char *fontstring)
         return out;
     }
     g_warning(_("Unable to load font: %s\n"), "sans");
-    g_warning(_("Aborting!.\n"));
 
-    exit(3); /* can't continue without a font */
+    return NULL;
 }
 
 void RrFontClose(RrFont *f)

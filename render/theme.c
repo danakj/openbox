@@ -27,7 +27,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     gchar *font_str;
     RrTheme *theme;
 
-    theme = g_new(RrTheme, 1);
+    theme = g_new0(RrTheme, 1);
 
     theme->inst = inst;
 
@@ -125,7 +125,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->winfont_shadow_tint < 100 || theme->winfont_shadow_tint > 100)
         theme->winfont_shadow_tint = 25;
 
-    theme->winfont = RrFontOpen(inst, font_str);
+    if (!(theme->winfont = RrFontOpen(inst, font_str))) {
+        RrThemeFree(theme);
+        return NULL;
+    }
     theme->winfont_height = RrFontHeight(theme->winfont, theme->winfont_shadow,
                                          theme->winfont_shadow_offset);
 
@@ -156,7 +159,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->mtitlefont_shadow_tint > 100)
         theme->mtitlefont_shadow_tint = 25;
 
-    theme->mtitlefont = RrFontOpen(inst, font_str);
+    if (!(theme->mtitlefont = RrFontOpen(inst, font_str))) {
+        RrThemeFree(theme);
+        return NULL;
+    }
     theme->mtitlefont_height = RrFontHeight(theme->mtitlefont,
                                             theme->mtitlefont_shadow,
                                             theme->mtitlefont_shadow_offset);
@@ -188,7 +194,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->mfont_shadow_tint > 100)
         theme->mfont_shadow_tint = 25;
 
-    theme->mfont = RrFontOpen(inst, font_str);
+    if (!(theme->mfont = RrFontOpen(inst, font_str))) {
+        RrThemeFree(theme);
+        return NULL;
+    }
     theme->mfont_height = RrFontHeight(theme->mfont, theme->mfont_shadow,
                                        theme->mfont_shadow_offset);
 

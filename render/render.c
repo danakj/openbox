@@ -80,7 +80,15 @@ void x_paint(Window win, Appearance *l, int w, int h)
         gradient_solid(l, w, h);
     else gradient_render(&l->surface, w, h);
     for (i = 0; i < l->textures; i++) {
-        printf("I AM DOING SOMETHING NOW\n");
+        switch (l->texture[i].type) {
+        case Text:
+            if (l->xftdraw == NULL) {
+                l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
+                                        render_visual, render_colormap);
+            }
+            font_draw(l->xftdraw, l->texture[i].data.text);
+        break;
+        }
     }
 //reduce depth
     if (l->surface.data.planar.grad != Background_Solid) {
@@ -178,6 +186,8 @@ Appearance *appearance_copy(Appearance *orig)
 void appearance_free(Appearance *a)
 {
     PlanarSurface *p;
+    if (a->pixmap != None) XFreePixmap(ob_display, a->pixmap);
+    if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
     if (a->textures)
         g_free(a->texture);
     if (a->surface.type == Surface_Planar) {

@@ -182,17 +182,17 @@ static void frame_free(ObFrame *self)
 void frame_show(ObFrame *self)
 {
     if (!self->visible) {
-	self->visible = TRUE;
-	XMapWindow(ob_display, self->window);
+        self->visible = TRUE;
+        XMapWindow(ob_display, self->window);
     }
 }
 
 void frame_hide(ObFrame *self)
 {
     if (self->visible) {
-	self->visible = FALSE;
-	self->client->ignore_unmaps++;
-	XUnmapWindow(ob_display, self->window);
+        self->visible = FALSE;
+        self->client->ignore_unmaps++;
+        XUnmapWindow(ob_display, self->window);
     }
 }
 

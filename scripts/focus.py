@@ -64,7 +64,8 @@ def _focused(data):
         # pass around focus
         desktop = ob.openbox.screen(data.screen).desktop()
         for c in _clients:
-            if _focusable(c, desktop) and c.focus():
+            if _focusable(c, desktop):
+                c.focus()
                 break
 
 def _newwindow(data):

@@ -50,9 +50,23 @@ Frame *frame_new()
     mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
 
-    self->framedecors = 1;
+    self->framedecors = 2;
     self->framedecor = g_new(FrameDecor, self->framedecors);
     self->framedecor[0].obwin.type = Window_Decoration;
+    self->framedecor[0].window = createWindow(self->window, mask, &attrib);
+    self->framedecor[0].anchor = Decor_Top;
+    RECT_SET(self->framedecor[0].position, 0, 0, 10, 10);
+    self->framedecor[0].type = Decor_Titlebar;
+    XMapWindow(ob_display, self->framedecor[0].window);
+
+    self->framedecor[1].obwin.type = Window_Decoration;
+    self->framedecor[1].window = createWindow(self->window, mask, &attrib);
+    self->framedecor[1].anchor = Decor_Top;
+    RECT_SET(self->framedecor[1].position, 0, 0, 10, 30);
+    self->framedecor[1].type = Decor_Titlebar;
+
+    XMapWindow(ob_display, self->framedecor[1].window);
+
     self->focused = FALSE;
 
     self->max_press = self->close_press = self->desk_press = 
@@ -384,6 +398,21 @@ void frame_frame_gravity(Frame *self, int *x, int *y)
 }
 void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 {
+    FrameDecor *dec;
+    int i, le = 0, re = 0, te = 0, be = 0, temp, center;
+
+    for (i = 0; i < self->framedecors; i++) {
+        dec = &self->framedecor[i];
+        if (dec->type & self->client->decorations)
+            switch (dec->anchor) {
+                case Decor_Top:
+                    temp = dec->position.y + dec->position.height;
+                    printf("extends by %d\n", temp);
+                    if (temp > te) te = temp;
+                break;
+            }
+    }
+
     if (resized) {
         if (self->client->decorations & Decor_Border) {
             self->bwidth = theme_bwidth;
@@ -391,12 +420,21 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
         } else {
             self->bwidth = self->cbwidth = 0;
         }
-        STRUT_SET(self->size, self->cbwidth, 
-                  self->cbwidth,self->cbwidth, self->cbwidth);
+        STRUT_SET(self->size, self->cbwidth + le, 
+                  self->cbwidth + te, self->cbwidth + re, self->cbwidth + be);
 
         self->width = self->client->area.width + self->cbwidth * 2;
         g_assert(self->width > 0);
     }
+    if (resized) {
+        STRUT_SET(self->size,
+                  self->cbwidth + le,
+                  self->cbwidth + te,
+                  self->cbwidth + re,
+                  self->cbwidth + be);
+
+    }
+
     if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->plate,
@@ -407,15 +445,6 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 
         /* when the client has StaticGravity, it likes to move around. */
         XMoveWindow(ob_display, self->client->window, 0, 0);
-    }
-
-    if (resized) {
-        STRUT_SET(self->size,
-                  self->cbwidth,
-                  self->cbwidth,
-                  self->cbwidth,
-                  self->cbwidth);
-
     }
 
     /* shading can change without being moved or resized */

@@ -26,14 +26,28 @@ typedef enum {
     NUM_CONTEXTS
 } Context;
 
+typedef enum {
+    Decor_TopLeft,
+    Decor_Top,
+    Decor_TopRight,
+    Decor_Left,
+    Decor_Right,
+    Decor_BottomLeft,
+    Decor_Bottom,
+    Decor_BottomRight
+} Anchor;
+
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
 		           f->cbwidth)
 
 typedef struct FrameDecor {
     ObWindow obwin;
-
     Window window;
+
     Context context;
+    Anchor anchor;
+    Rect position;
+    Decoration type;
 } FrameDecor;
 
 typedef struct Frame {

@@ -249,6 +249,8 @@ void set_default_appearance(Appearance *a)
 gboolean load()
 {
     XrmDatabase db = NULL;
+    Justify winjust;
+    char *winjuststr;
 
     if (themerc_theme != NULL) {
 	db = loaddb(themerc_theme);
@@ -271,6 +273,15 @@ gboolean load()
     s_winfont = font_open(themerc_font);
     s_winfont_height = font_height(s_winfont, s_winfont_shadow,
                                    s_winfont_shadow_offset);
+
+    winjust = Justify_Left;
+    if (read_string(db, "window.justify", &winjuststr)) {
+        if (!g_ascii_strcasecmp(winjuststr, "right"))
+            winjust = Justify_Right;
+        else if (!g_ascii_strcasecmp(winjuststr, "center"))
+            winjust = Justify_Center;
+        g_free(winjuststr);
+    }
 
     if (!read_int(db, "handleWidth", &s_handle_height) ||
 	s_handle_height < 0 || s_handle_height > 100) s_handle_height = 6;
@@ -368,12 +379,14 @@ gboolean load()
 
     /* set up the textures */
     a_focused_label->texture[0].type = Text;
+    a_focused_label->texture[0].data.text.justify = winjust;
     a_focused_label->texture[0].data.text.font = s_winfont;
     a_focused_label->texture[0].data.text.shadow = s_winfont_shadow;
     a_focused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
     a_focused_label->texture[0].data.text.color = s_title_focused_color;
 
     a_unfocused_label->texture[0].type = Text;
+    a_unfocused_label->texture[0].data.text.justify = winjust;
     a_unfocused_label->texture[0].data.text.font = s_winfont;
     a_unfocused_label->texture[0].data.text.shadow = s_winfont_shadow;
     a_unfocused_label->texture[0].data.text.offset = s_winfont_shadow_offset;

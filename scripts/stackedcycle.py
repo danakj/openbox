@@ -192,6 +192,8 @@ class cycledata:
             # popup disappears, screwing up the focus
             ob.mgrab(self.screen.number())
 
+        if not len(self.clients): return # don't both doing anything
+        
         self.menuwidgets[self.menupos].unfocus()
         if forward:
             self.menupos += 1

@@ -140,12 +140,12 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
 
     RrColorSet(&pri, 0.70, 0.70, 0.68, 1);
     RrColorSet(&sec, 0.75, 0.73, 0.71, 1);
-    RrColorSet(&bor, 0, 0, 0, 1);
+    RrColorSet(&bor, 0.42, 0.41, 0.42, 1);
     RrPlanarSet(theme->label, RR_PLANAR_VERTICAL, RR_BEVEL_NONE,
                 &pri, &sec, 1, &bor);
     RrColorSet(&pri, 0.30, 0.34, 0.65, 1);
     RrColorSet(&sec, 0.35, 0.43, 0.75, 1);
-    RrColorSet(&bor, 0.42, 0.41, 0.42, 1);
+    RrColorSet(&bor, 0, 0, 0, 1);
     RrPlanarSet(theme->label_f, RR_PLANAR_SOLID, RR_BEVEL_NONE,
                 &pri, &sec, 1, &bor);
 
@@ -208,14 +208,14 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     theme->app_label = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);
     theme->app_label_h = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);
 
-    RrColorSet(&pri, 0.30, 0.34, 0.65, 1);
-    RrColorSet(&sec, 0.35, 0.43, 0.75, 1);
-    RrColorSet(&bor, 0, 0, 0, 1);
-    RrPlanarSet(theme->app_label, RR_PLANAR_VERTICAL, RR_BEVEL_NONE,
-                &pri, &sec, 1, &bor);
     RrColorSet(&pri, 0.70, 0.70, 0.68, 1);
     RrColorSet(&sec, 0.75, 0.73, 0.71, 1);
     RrColorSet(&bor, 0.42, 0.41, 0.42, 1);
+    RrPlanarSet(theme->app_label, RR_PLANAR_VERTICAL, RR_BEVEL_NONE,
+                &pri, &sec, 1, &bor); 
+    RrColorSet(&pri, 0.30, 0.34, 0.65, 1);
+    RrColorSet(&sec, 0.35, 0.43, 0.75, 1);
+    RrColorSet(&bor, 0, 0, 0, 1);
     RrPlanarSet(theme->app_label_h, RR_PLANAR_SOLID, RR_BEVEL_NONE,
                 &pri, &sec, 1, &bor);
 

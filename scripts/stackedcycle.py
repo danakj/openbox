@@ -117,6 +117,12 @@ class _cycledata:
 
             if c.iconic(): t = c.iconTitle()
             else: t = c.title()
+
+            if INCLUDE_ALL_DESKTOPS:
+                d = c.desktop()
+                if d == 0xffffffff: d = self.screen.desktop()
+                t = self.screen.desktopName(d) + " - " + t
+            
             if len(t) > TITLE_SIZE_LIMIT: # limit the length of titles
                 t = t[:TITLE_SIZE_LIMIT / 2 - 2] + "..." + \
                     t[0 - TITLE_SIZE_LIMIT / 2 - 2:]

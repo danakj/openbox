@@ -103,30 +103,23 @@ void TrueRenderControl::render(Widget *wi)
 {
   assert(wi);
   
-  XGCValues gcv;
-  gcv.cap_style = CapProjecting;
-
-  int w = 255, h = 31;
+  int w = wi->width(), h = wi->height();
   Pixmap p = XCreatePixmap(**display, wi->window(), w, h, _screen->depth());
   XImage *im = XCreateImage(**display, _screen->visual(), _screen->depth(),
 			    ZPixmap, 0, NULL, w, h, 32, 0);
-  //GC gc = XCreateGC(**display, _screen->rootWindow(), GCCapStyle, &gcv);
 
-  // XXX  + 1?
   unsigned char *data = new unsigned char[im->bytes_per_line * h];
   unsigned char *dp = data;
 
-  for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-    renderPixel(im, dp, 0);
-  for (int y = 0; y < 10; ++y)
+  for (int y = 0; y < h/3; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, _red_color_table[x] << _red_offset);
-  for (int y = 0; y < 10; ++y)
+      renderPixel(im, dp, _red_color_table[255*x/w] << _red_offset);
+  for (int y = 0; y < h/3; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, _green_color_table[x] << _green_offset);
-  for (int y = 0; y < 10; ++y)
+      renderPixel(im, dp, _green_color_table[255*x/w] << _green_offset);
+  for (int y = 0; y < h/3; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, _blue_color_table[x] << _blue_offset);
+      renderPixel(im, dp, _blue_color_table[255*x/w] << _blue_offset);
 
   printf("\nDone %d %d\n", im->bytes_per_line * h, dp - data);
 

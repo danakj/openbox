@@ -26,6 +26,7 @@
 #include "screeninfo.hh"
 #include "strut.hh"
 #include "style.hh"
+#include "surface.hh"
 #include "texture.hh"
 #include "timer.hh"
 #include "util.hh"

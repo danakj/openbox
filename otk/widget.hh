@@ -2,6 +2,7 @@
 #ifndef __widget_hh
 #define __widget_hh
 
+#include "surface.hh"
 #include "rect.hh"
 #include "point.hh"
 #include "texture.hh"
@@ -18,7 +19,7 @@ extern "C" {
 
 namespace otk {
 
-class Widget : public EventHandler {
+class Widget : public Surface, public EventHandler {
 
 public:
 
@@ -42,16 +43,13 @@ public:
   inline const Widget *parent(void) const { return _parent; }
   inline const WidgetList &children(void) const { return _children; }
   inline unsigned int screen(void) const { return _screen; }
-  inline const Rect &rect(void) const { return _rect; }
+  inline Rect rect(void) const { return Rect(_pos, size()); }
 
   void move(const Point &to);
   void move(int x, int y);
 
   virtual void setWidth(int);
   virtual void setHeight(int);
-
-  virtual int width() const { return _rect.width(); }
-  virtual int height() const { return _rect.height(); }
 
   virtual void resize(const Point &to);
   virtual void resize(int x, int y);
@@ -159,7 +157,7 @@ protected:
   const Color *_bcolor;
   unsigned int _bwidth;
 
-  Rect _rect;
+  Point _pos;
   unsigned int _screen;
 
   bool _fixed_width;

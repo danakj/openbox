@@ -27,6 +27,7 @@ public:
   virtual const Point& size() const { return _size; }
   virtual int width() const { return _size.x(); }
   virtual int height() const { return _size.y(); }
+  virtual Pixmap pixmap() const { return _pm; } // TEMP
 
   friend class TrueRenderControl;
 };

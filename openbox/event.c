@@ -223,32 +223,38 @@ static Window event_get_window(XEvent *e)
 
 static void event_set_lasttime(XEvent *e)
 {
+    Time t = 0;
+
     /* grab the lasttime and hack up the state */
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
-	event_lasttime = e->xbutton.time;
+	t = e->xbutton.time;
 	break;
     case KeyPress:
-	event_lasttime = e->xkey.time;
+	t = e->xkey.time;
 	break;
     case KeyRelease:
-	event_lasttime = e->xkey.time;
+	t = e->xkey.time;
 	break;
     case MotionNotify:
-	event_lasttime = e->xmotion.time;
+	t = e->xmotion.time;
 	break;
     case PropertyNotify:
-	event_lasttime = e->xproperty.time;
+	t = e->xproperty.time;
 	break;
     case EnterNotify:
     case LeaveNotify:
-	event_lasttime = e->xcrossing.time;
+	t = e->xcrossing.time;
 	break;
     default:
-        event_lasttime = CurrentTime;
+        /* if more event types are anticipated, get their timestamp
+           explicitly */
         break;
     }
+
+    if (t > event_lasttime)
+        event_lasttime = t;
 }
 
 #define STRIP_MODS(s) \

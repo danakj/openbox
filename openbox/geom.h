@@ -22,6 +22,11 @@ typedef struct _Rect {
     int height;
 } Rect;
 
+#define RECT_LEFT(r) ((r).x)
+#define RECT_TOP(r) ((r).y)
+#define RECT_RIGHT(r) ((r).x + (r).width - 1)
+#define RECT_BOTTOM(r) ((r).y + (r).height - 1)
+
 #define RECT_SET_POINT(r, nx, ny) \
     (r).x = (nx), (r).y = (ny)
 #define RECT_SET_SIZE(r, w, h) \
@@ -42,6 +47,14 @@ typedef struct _Rect {
 #define RECT_INTERSECTS_RECT(r, o) \
     ((o).x < (r).x + (r).width && (o).x + (o).width > (r).x && \
      (o).y < (r).y + (r).height && (o).y + (o).height > (r).y)
+
+#define RECT_SET_INTERSECTION(r, a, b) \
+    ((r).x = MAX((a).x, (b).x), \
+     (r).y = MAX((a).y, (b).y), \
+     (r).width = MIN((a).x + (a).width - 1, \
+                     (b).x + (b).width - 1) - (r).x + 1, \
+     (r).height = MIN((a).y + (a).height - 1, \
+                      (b).y + (b).height - 1) - (r).y + 1)
 
 typedef struct _Strut {
     int left;

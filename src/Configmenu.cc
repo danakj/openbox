@@ -53,6 +53,8 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Focus New Windows"), 4);
   insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
               "Focus Last Window on Workspace"), 5);
+  insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
+              "Hide Toolbar"), 6);
   update();
   setValues();
 }
@@ -64,6 +66,7 @@ void Configmenu::setValues(void) {
   setItemSelected(4, getScreen()->doFullMax());
   setItemSelected(5, getScreen()->doFocusNew());
   setItemSelected(6, getScreen()->doFocusLast());
+  setItemSelected(7, getScreen()->doHideToolbar());
 }
 
 
@@ -108,6 +111,12 @@ void Configmenu::itemSelected(int button, unsigned int index) {
   case 5: { // focus last window on workspace
     getScreen()->saveFocusLast((! getScreen()->doFocusLast()));
     setItemSelected(index, getScreen()->doFocusLast());
+    break;
+  }
+
+  case 6: { // hide toolbar
+    getScreen()->saveHideToolbar((! getScreen()->doHideToolbar()));
+    setItemSelected(index, getScreen()->doHideToolbar());
     break;
   }
   } // switch

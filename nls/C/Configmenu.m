@@ -16,6 +16,8 @@ $ #FocusNew
 # Focus New Windows
 $ #FocusLast
 # Focus Window on Workspace Change
+$ #HideToolbar
+# Hide Toolbar
 $ #ClickToFocus
 # Click to Focus
 $ #SloppyFocus

@@ -155,13 +155,18 @@ public:
   void save_rc(void);
   void load_rc(void);
 
+  void mapToolbar(void);
+  void unmapToolbar(void);
+
   inline Window getWindowID(void) const { return frame.window; }
 
   inline const Rect& getRect(void) const { return frame.rect; }
   inline unsigned int getWidth(void) const { return frame.rect.width(); }
   inline unsigned int getHeight(void) const { return frame.rect.height(); }
   inline unsigned int getExposedHeight(void) const
-  { return ((do_auto_hide) ? frame.bevel_w : frame.rect.height()); }
+  { return (screen->doHideToolbar() ? 0 :
+            ((do_auto_hide) ? frame.bevel_w :
+             frame.rect.height())); }
   inline int getX(void) const
   { return ((hidden) ? frame.x_hidden : frame.rect.x()); }
   inline int getY(void) const

@@ -161,14 +161,12 @@ Toolbar::Toolbar(BScreen *scrn) {
   screen->addStrut(&strut);
 
   reconfigure();
-
-  XMapSubwindows(display, frame.window);
-  XMapWindow(display, frame.window);
+  mapToolbar();
 }
 
 
 Toolbar::~Toolbar(void) {
-  XUnmapWindow(display, frame.window);
+  unmapToolbar();
 
   if (frame.base) screen->getImageControl()->removeImage(frame.base);
   if (frame.label) screen->getImageControl()->removeImage(frame.label);
@@ -195,6 +193,25 @@ Toolbar::~Toolbar(void) {
   delete hide_timer;
   delete clock_timer;
   delete toolbarmenu;
+}
+
+
+void Toolbar::mapToolbar() {
+  if (!screen->doHideToolbar()) {
+    //not hidden, so windows should not maximize over the toolbar
+    XMapSubwindows(display, frame.window);
+    XMapWindow(display, frame.window);
+  }
+  updateStrut();
+}
+
+
+void Toolbar::unmapToolbar() {
+  if (toolbarmenu->isVisible())
+    toolbarmenu->hide();
+  //hidden so we can maximize over the toolbar
+  XUnmapWindow(display, frame.window);
+  updateStrut();
 }
 
 
@@ -511,14 +528,16 @@ void Toolbar::updateStrut(void) {
   // left and right are always 0
   strut.top = strut.bottom = 0;
 
-  switch(placement) {
-  case TopLeft:
-  case TopCenter:
-  case TopRight:
-    strut.top = getExposedHeight() + (screen->getBorderWidth() * 2);
-    break;
-  default:
-    strut.bottom = getExposedHeight() + (screen->getBorderWidth() * 2);
+  if (! screen->doHideToolbar()) {
+    switch(placement) {
+    case TopLeft:
+    case TopCenter:
+    case TopRight:
+      strut.top = getExposedHeight() + (screen->getBorderWidth() * 2);
+      break;
+    default:
+      strut.bottom = getExposedHeight() + (screen->getBorderWidth() * 2);
+    }
   }
 
   screen->updateAvailableArea();

@@ -408,6 +408,16 @@ void BScreen::saveFocusLast(bool f) {
 }
 
 
+void BScreen::saveHideToolbar(bool h) {
+  resource.hide_toolbar = h;
+  if (resource.hide_toolbar)
+    toolbar->unmapToolbar();
+  else
+    toolbar->mapToolbar();
+  config->setValue(screenstr + "hideToolbar", resource.hide_toolbar);
+}
+
+
 void BScreen::saveWorkspaces(unsigned int w) {
   resource.workspaces = w;
   config->setValue(screenstr + "workspaces", resource.workspaces);
@@ -493,6 +503,7 @@ void BScreen::save_rc(void) {
   saveFullMax(resource.full_max);
   saveFocusNew(resource.focus_new);
   saveFocusLast(resource.focus_last);
+  saveHideToolbar(resource.hide_toolbar);
   saveWorkspaces(resource.workspaces);
   savePlacementPolicy(resource.placement_policy);
   saveEdgeSnapThreshold(resource.edge_snap_threshold);
@@ -528,6 +539,9 @@ void BScreen::load_rc(void) {
 
   if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
     resource.opaque_move = false;
+
+  if (! config->getValue(screenstr + "hideToolbar", resource.hide_toolbar))
+    resource.hide_toolbar = false;
 
   if (! config->getValue(screenstr + "imageDither", b))
     b = true;

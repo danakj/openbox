@@ -150,7 +150,8 @@ private:
     MenuStyle mstyle;
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
-         opaque_move, full_max, focus_new, focus_last, click_raise;
+         opaque_move, full_max, focus_new, focus_last, click_raise,
+         hide_toolbar;
     BColor border_color;
 
     unsigned int workspaces;
@@ -212,6 +213,7 @@ public:
   inline bool doFullMax(void) const { return resource.full_max; }
   inline bool doFocusNew(void) const { return resource.focus_new; }
   inline bool doFocusLast(void) const { return resource.focus_last; }
+  inline bool doHideToolbar(void) const { return resource.hide_toolbar; }
 
   inline const GC &getOpGC(void) const { return opGC; }
 
@@ -268,6 +270,7 @@ public:
   void saveFullMax(bool f);
   void saveFocusNew(bool f);
   void saveFocusLast(bool f);
+  void saveHideToolbar(bool h);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

@@ -185,7 +185,7 @@ public:
   //! layer
   void restack(bool raise, OBClient *client);
 
-  //! Sets the name of a desktop
+  //! Sets the name of a desktop by changing the root window property
   /*!
     @param i The index of the desktop to set the name for (starts at 0)
     @param name The name to set for the desktop

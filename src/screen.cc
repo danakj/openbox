@@ -23,6 +23,7 @@ extern "C" {
 #include "openbox.hh"
 #include "frame.hh"
 #include "bindings.hh"
+#include "python.hh"
 #include "otk/display.hh"
 
 static bool running;
@@ -75,7 +76,7 @@ OBScreen::OBScreen(int screen)
   // initialize the screen's style
   _style.setImageControl(_image_control);
   std::string stylepath;
-  Openbox::instance->getConfigString("theme", &stylepath);
+  python_get_string("theme", &stylepath);
   otk::Configuration sconfig(false);
   sconfig.setFile(otk::expandTilde(stylepath));
   if (!sconfig.load()) {

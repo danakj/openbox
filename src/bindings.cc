@@ -111,7 +111,8 @@ static void destroytree(BindingTree *tree)
   }
 }
 
-BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
+BindingTree *OBBindings::buildtree(const StringVect &keylist,
+                                   PyObject *callback) const
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
 
@@ -120,7 +121,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
   StringVect::const_reverse_iterator it, end = keylist.rend();
   for (it = keylist.rbegin(); it != end; ++it) {
     p = ret;
-    ret = new BindingTree(id);
+    ret = new BindingTree(callback);
     if (!p) ret->chain = false; // only the first built node
     ret->first_child = p;
     if (!translate(*it, ret->binding)) {
@@ -148,7 +149,7 @@ OBBindings::OBBindings()
 OBBindings::~OBBindings()
 {
   grabKeys(false);
-  remove_all();
+  removeAll();
 }
 
 
@@ -184,7 +185,8 @@ void OBBindings::assimilate(BindingTree *node)
 }
 
 
-int OBBindings::find(BindingTree *search) const {
+PyObject *OBBindings::find(BindingTree *search, bool *conflict) const {
+  *conflict = false;
   BindingTree *a, *b;
   a = _tree.first_child;
   b = search;
@@ -194,27 +196,30 @@ int OBBindings::find(BindingTree *search) const {
     } else {
       if (a->chain == b->chain) {
 	if (!a->chain) {
-	  return a->id; // found it! (return the actual id, not the search's)
+          // found it! (return the actual id, not the search's)
+	  return a->callback;
         }
       } else {
-        return -2; // the chain status' don't match (conflict!)
+        *conflict = true;
+        return 0; // the chain status' don't match (conflict!)
       }
       b = b->first_child;
       a = a->first_child;
     }
   }
-  return -1; // it just isn't in here
+  return 0; // it just isn't in here
 }
 
 
-bool OBBindings::add(const StringVect &keylist, int id)
+bool OBBindings::add(const StringVect &keylist, PyObject *callback)
 {
   BindingTree *tree;
+  bool conflict;
 
-  if (!(tree = buildtree(keylist, id)))
+  if (!(tree = buildtree(keylist, callback)))
     return false; // invalid binding requested
 
-  if (find(tree) != -1) {
+  if (find(tree, &conflict) || conflict) {
     // conflicts with another binding
     destroytree(tree);
     return false;
@@ -225,40 +230,37 @@ bool OBBindings::add(const StringVect &keylist, int id)
   // assimilate this built tree into the main tree
   assimilate(tree); // assimilation destroys/uses the tree
 
+  Py_INCREF(callback);
+
   grabKeys(true); 
  
   return true;
 }
 
 
-int OBBindings::find(const StringVect &keylist)
+bool OBBindings::remove(const StringVect &keylist)
 {
+  assert(false); // XXX: function not implemented yet
+
   BindingTree *tree;
-  bool ret;
+  bool conflict;
 
   if (!(tree = buildtree(keylist, 0)))
     return false; // invalid binding requested
 
-  ret = find(tree) >= 0;
+  PyObject *func = find(tree, &conflict);
+  if (func) {
+    grabKeys(false);
 
-  destroytree(tree);
-
-  return ret;
-}
-
-
-int OBBindings::remove(const StringVect &keylist)
-{
-  (void)keylist;
-  assert(false); // XXX: function not implemented yet
-
-  grabKeys(false);
-  _curpos = &_tree;
-
-  // do shit here...
-  
-  grabKeys(true);
-
+    _curpos = &_tree;
+    
+    // XXX do shit here ...
+    Py_DECREF(func);
+    
+    grabKeys(true);
+    return true;
+  }
+  return false;
 }
 
 
@@ -282,13 +284,14 @@ static void remove_branch(BindingTree *first)
     if (p->first_child)
       remove_branch(p->first_child);
     BindingTree *s = p->next_sibling;
+    Py_XDECREF(p->callback);
     delete p;
     p = s;
   }
 }
 
 
-void OBBindings::remove_all()
+void OBBindings::removeAll()
 {
   if (_tree.first_child) {
     remove_branch(_tree.first_child);
@@ -326,8 +329,7 @@ void OBBindings::grabKeys(bool grab)
 }
 
 
-void OBBindings::fire(Window window, unsigned int modifiers, unsigned int key,
-                      Time time)
+void OBBindings::fire(unsigned int modifiers, unsigned int key, Time time)
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
     reset(this);
@@ -341,7 +343,10 @@ void OBBindings::fire(Window window, unsigned int modifiers, unsigned int key,
           _curpos = p;
           grabKeys(true);
         } else {
-          python_callback_binding(p->id, window, modifiers, key, time);
+          Window win = None;
+          OBClient *c = Openbox::instance->focusedClient();
+          if (c) win = c->window();
+          python_callback(p->callback, win, modifiers, key, time);
           reset(this);
         }
         break;

@@ -39,9 +39,9 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  python_callback(Action_ButtonPress, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1),
-                  e.state, e.button, e.x_root, e.y_root, e.time);
+  doCallback(Action_ButtonPress, e.window,
+             (OBWidget::WidgetType)(w ? w->type():-1),
+             e.state, e.button, e.x_root, e.y_root, e.time);
     
   if (_button) return; // won't count toward CLICK events
 
@@ -57,9 +57,9 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     (Openbox::instance->findHandler(e.window));
 
   // run the RELEASE python hook
-  python_callback(Action_ButtonRelease, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1),
-                  e.state, e.button, e.x_root, e.y_root, e.time);
+  doCallback(Action_ButtonRelease, e.window,
+             (OBWidget::WidgetType)(w ? w->type():-1),
+             e.state, e.button, e.x_root, e.y_root, e.time);
 
   // not for the button we're watching?
   if (_button != e.button) return;
@@ -76,17 +76,17 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     return;
 
   // run the CLICK python hook
-  python_callback(Action_Click, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1),
-                  e.state, e.button, e.time);
+  doCallback(Action_Click, e.window,
+             (OBWidget::WidgetType)(w ? w->type():-1),
+             e.state, e.button, e.x_root, e.y_root, e.time);
 
   if (e.time - _release.time < DOUBLECLICKDELAY &&
       _release.win == e.window && _release.button == e.button) {
 
     // run the DOUBLECLICK python hook
-    python_callback(Action_DoubleClick, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1),
-                  e.state, e.button, e.time);
+    doCallback(Action_DoubleClick, e.window,
+               (OBWidget::WidgetType)(w ? w->type():-1),
+               e.state, e.button, e.x_root, e.y_root, e.time);
     
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
@@ -109,8 +109,8 @@ void OBActions::enterHandler(const XCrossingEvent &e)
     (Openbox::instance->findHandler(e.window));
 
   // run the ENTER python hook
-  python_callback(Action_EnterWindow, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1), e.state);
+  doCallback(Action_EnterWindow, e.window,
+             (OBWidget::WidgetType)(w ? w->type():-1), e.state, 0, 0, 0, 0);
 }
 
 
@@ -122,8 +122,8 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
     (Openbox::instance->findHandler(e.window));
 
   // run the LEAVE python hook
-  python_callback(Action_LeaveWindow, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1), e.state);
+  doCallback(Action_LeaveWindow, e.window,
+             (OBWidget::WidgetType)(w ? w->type():-1), e.state, 0, 0, 0, 0);
 }
 
 
@@ -132,7 +132,7 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 //  OBWidget *w = dynamic_cast<OBWidget*>
 //    (Openbox::instance->findHandler(e.window));
 
-  Openbox::instance->bindings()->fire(e.window, e.state, e.keycode, e.time);
+  Openbox::instance->bindings()->fire(e.state, e.keycode, e.time);
 }
 
 
@@ -161,21 +161,107 @@ void OBActions::motionHandler(const XMotionEvent &e)
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   //      maybe that should all be done via python tho.. (or radial menus!)
   // run the simple MOTION python hook for now...
-  python_callback(Action_MouseMotion, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1),
-                  e.state, e.x_root, e.y_root, e.time);
+  doCallback(Action_MouseMotion, e.window,
+             (OBWidget::WidgetType)(w ? w->type():-1),
+             e.state, (unsigned)-1, e.x_root, e.y_root, e.time);
 }
 
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)
 {
+  doCallback(Action_NewWindow, e.window, (OBWidget::WidgetType)-1,
+             0, 0, 0, 0, 0);
 }
 
 void OBActions::unmapHandler(const XUnmapEvent &e)
 {
+  (void)e;
+  doCallback(Action_CloseWindow, e.window, (OBWidget::WidgetType)-1,
+             0, 0, 0, 0, 0);
 }
 
 void OBActions::destroyHandler(const XDestroyWindowEvent &e)
 {
+  (void)e;
+  doCallback(Action_CloseWindow, e.window, (OBWidget::WidgetType)-1,
+             0, 0, 0, 0, 0);
+}
+
+void OBActions::doCallback(ActionType action, Window window,
+                           OBWidget::WidgetType type, unsigned int state,
+                           unsigned int button, int xroot, int yroot,
+                           Time time)
+{
+  std::pair<CallbackMap::iterator, CallbackMap::iterator> it_pair =
+    _callbacks.equal_range(action);
+
+  CallbackMap::iterator it;
+  for (it = it_pair.first; it != it_pair.second; ++it)
+    python_callback(it->second, action, window, type, state,
+                    button, xroot, yroot, time);
+}
+
+bool OBActions::registerCallback(ActionType action, PyObject *func,
+                                 bool atfront)
+{
+  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
+      action == OBActions::Action_KeyPress) {
+    return false;
+  }
+  if (!func)
+    return false;
+
+  std::pair<CallbackMap::iterator, CallbackMap::iterator> it_pair =
+    _callbacks.equal_range(action);
+
+  CallbackMap::iterator it;
+  for (it = it_pair.first; it != it_pair.second; ++it)
+    if (it->second == func)
+      break;
+  if (it == it_pair.second) // not already in there
+    if (atfront)
+      _callbacks.insert(_callbacks.begin(), CallbackMapPair(action, func));
+    else
+      _callbacks.insert(CallbackMapPair(action, func));
+  Py_INCREF(func);
+  return true;
+}
+
+bool OBActions::unregisterCallback(ActionType action, PyObject *func)
+{
+  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
+      action == OBActions::Action_KeyPress) {
+    return false;
+  }
+  if (!func)
+    return false;
+  
+  std::pair<CallbackMap::iterator, CallbackMap::iterator> it_pair =
+    _callbacks.equal_range(action);
+  
+  CallbackMap::iterator it;
+  for (it = it_pair.first; it != it_pair.second; ++it)
+    if (it->second == func)
+      break;
+  if (it != it_pair.second) { // its been registered before
+    Py_DECREF(func);
+    _callbacks.erase(it);
+  }
+  return true;
+}
+
+bool OBActions::unregisterAllCallbacks(ActionType action)
+{
+  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
+      action == OBActions::Action_KeyPress) {
+    return false;
+  }
+
+  while (!_callbacks.empty()) {
+    CallbackMap::iterator it = _callbacks.begin();
+    Py_DECREF(it->second);
+    _callbacks.erase(it);
+  }
+  return true;
 }
 
 }

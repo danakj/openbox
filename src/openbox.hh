@@ -6,10 +6,6 @@
   @brief The main class for the Openbox window manager
 */
 
-/*
-  cuz girls look soooo goood.. on the end of my DICK
-*/
-
 extern "C" {
 #include <X11/Xlib.h>
 }
@@ -185,7 +181,10 @@ public:
   //! Returns the otk::OBProperty instance for the window manager
   inline const otk::OBProperty *property() const { return _property; }
 
-  //! Returns the OBBinding instance for the window manager
+  //! Returns the OBActions instance for the window manager
+  inline OBActions *actions() const { return _actions; }
+
+  //! Returns the OBBindings instance for the window manager
   inline OBBindings *bindings() const { return _bindings; }
 
   //! Returns a managed screen
@@ -241,8 +240,6 @@ public:
     manager can be destroyed.
   */
   inline void shutdown() { _doshutdown = true; }
-
-  bool getConfigString(const char *name, std::string *value);
 };
 
 }

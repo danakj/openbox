@@ -128,8 +128,10 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
-  // start up python and load config values
+  // initialize scripting
   python_init(argv[0]);
+  
+  // load config values
   python_exec(SCRIPTDIR"/config.py"); // load openbox config values
 
   // initialize all the screens
@@ -179,6 +181,8 @@ Openbox::~Openbox()
 
   delete _property;
 
+  python_destroy();
+  
   // close the X display
   otk::OBDisplay::destroy();
 }
@@ -323,11 +327,6 @@ void Openbox::setFocusedClient(OBClient *c)
     XSetInputFocus(otk::OBDisplay::display, _focused_screen->focuswindow(),
                    RevertToNone, CurrentTime);
   }
-}
-
-
-bool Openbox::getConfigString(const char *name, std::string *value) {
-  return python_get_string(name, value);
 }
 
 }

@@ -9,7 +9,12 @@
 #include "actions.hh"
 #include "otk/timer.hh"
 
+extern "C" {
+#include <Python.h>
+}
+
 #include <string>
+#include <list>
 #include <vector>
 
 namespace ob {
@@ -29,18 +34,18 @@ typedef struct Binding {
 
 typedef struct BindingTree {
   Binding binding;
-  int id;     // the id given for the binding in add()
-  bool chain; // true if this is a chain to another key (not an action)
+  PyObject *callback; // the callback given for the binding in add()
+  bool chain;     // true if this is a chain to another key (not an action)
 
   struct BindingTree *next_sibling; // the next binding in the tree at the same
                                     // level
   struct BindingTree *first_child;  // the first child of this binding (next
                                     // binding in a chained sequence).
-  BindingTree(int id) : binding(0, 0) {
-    this->id = id; chain = true; next_sibling = first_child = 0;
+  BindingTree(PyObject *callback) : binding(0, 0) {
+    this->callback = callback; chain = true; next_sibling = first_child = 0;
   }
   BindingTree() : binding(0, 0) {
-    this->id = -1; chain = true; next_sibling = first_child = 0;
+    this->callback = 0; chain = true; next_sibling = first_child = 0;
   }
 } BindingTree;
 
@@ -57,12 +62,12 @@ private:
 
   otk::OBTimer _timer;
   
-  int find(BindingTree *search) const;
+  PyObject *find(BindingTree *search, bool *conflict) const;
   bool translate(const std::string &str, Binding &b) const;
-  BindingTree *buildtree(const StringVect &keylist, int id) const;
+  BindingTree *buildtree(const StringVect &keylist, PyObject *callback) const;
   void assimilate(BindingTree *node);
 
-  static void reset(OBBindings *self);
+  static void reset(OBBindings *self); // the timer's timeout function
 
 public:
   //! Initializes an OBBinding object
@@ -76,26 +81,19 @@ public:
     a chain or not), or if any of the strings in the keylist are invalid.    
     @return true if the binding could be added; false if it could not.
   */
-  bool add(const StringVect &keylist, int id);
+  bool add(const StringVect &keylist, PyObject *callback);
 
   //! Removes a key binding
   /*!
-    @return The id of the binding that was removed, or '< 0' if none were
-            removed.
+    @return The callbackid of the binding, or '< 0' if there was no binding to
+            be removed.
   */
-  int remove(const StringVect &keylist);
+  bool remove(const StringVect &keylist);
 
   //! Removes all key bindings
-  void remove_all();
+  void removeAll();
 
-  //! Finds a keybinding and returns its id or '< 0' if it isn't found.
-  /*!
-    @return -1 if the keybinding was not found but does not conflict with
-    any others; -2 if the keybinding conflicts with another.
-  */
-  int find(const StringVect &keylist);
-
-  void fire(Window window, unsigned int modifiers,unsigned int key, Time time);
+  void fire(unsigned int modifiers,unsigned int key, Time time);
 
   void setResetKey(const std::string &key);
 

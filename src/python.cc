@@ -2,14 +2,12 @@
 
 #include "python.hh"
 #include "openbox.hh"
+#include "actions.hh"
+#include "python.hh"
+#include "bindings.hh"
 #include "otk/display.hh"
 
-#include <vector>
-#include <algorithm>
-
 extern "C" {
-#include <Python.h>
-  
 // The initializer in openbox_wrap.cc
 extern void init_openbox(void);
 // The initializer in otk_wrap.cc
@@ -18,12 +16,194 @@ extern void init_otk(void);
 
 namespace ob {
 
-typedef std::vector<PyObject*> FunctionList;
+static PyObject *obdict = NULL;
 
-static FunctionList callbacks[OBActions::NUM_ACTIONS];
-static FunctionList bindfuncs;
+// ************************************************************* //
+// Define some custom types which are passed to python callbacks //
+// ************************************************************* //
 
-static PyObject *obdict;
+typedef struct {
+  PyObject_HEAD;
+  OBActions::ActionType action;
+  Window window;
+  OBWidget::WidgetType type;
+  unsigned int state;
+  unsigned int button;
+  int xroot;
+  int yroot;
+  Time time;
+} ActionData;
+
+typedef struct {
+  PyObject_HEAD;
+  Window window;
+  unsigned int state;
+  unsigned int key;
+  Time time;
+} BindingData;
+
+static void ActionDataDealloc(ActionData *self)
+{
+  PyObject_Del((PyObject*)self);
+}
+
+static void BindingDataDealloc(BindingData *self)
+{
+  PyObject_Del((PyObject*)self);
+}
+
+PyObject *ActionData_action(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":action")) return NULL;
+  return PyLong_FromLong((int)self->action);
+}
+
+PyObject *ActionData_window(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":window")) return NULL;
+  return PyLong_FromLong(self->window);
+}
+
+PyObject *ActionData_target(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":target")) return NULL;
+  return PyLong_FromLong((int)self->type);
+}
+
+PyObject *ActionData_modifiers(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":modifiers")) return NULL;
+  return PyLong_FromUnsignedLong(self->state);
+}
+
+PyObject *ActionData_button(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":button")) return NULL;
+  int b = 0;
+  switch (self->button) {
+  case Button5: b++;
+  case Button4: b++;
+  case Button3: b++;
+  case Button2: b++;
+  case Button1: b++;
+  default: ;
+  }
+  return PyLong_FromLong(b);
+}
+
+PyObject *ActionData_xroot(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":xroot")) return NULL;
+  return PyLong_FromLong(self->xroot);
+}
+
+PyObject *ActionData_yroot(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":yroot")) return NULL;
+  return PyLong_FromLong(self->yroot);
+}
+
+PyObject *ActionData_time(ActionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":time")) return NULL;
+  return PyLong_FromLong(self->time);
+}
+
+static PyMethodDef ActionData_methods[] = {
+  {"action", (PyCFunction)ActionData_action, METH_VARARGS,
+   "Return the action being executed."},
+  {"window", (PyCFunction)ActionData_window, METH_VARARGS,
+   "Return the client window id."},
+  {"target", (PyCFunction)ActionData_target, METH_VARARGS,
+   "Return the target type that the action is occuring on."},
+  {"modifiers", (PyCFunction)ActionData_modifiers, METH_VARARGS,
+   "Return the modifier keys state."},
+  {"button", (PyCFunction)ActionData_button, METH_VARARGS,
+   "Return the number of the pressed button (1-5)."},
+  {"xroot", (PyCFunction)ActionData_xroot, METH_VARARGS,
+   "Return the X-position of the mouse cursor on the root window."},
+  {"yroot", (PyCFunction)ActionData_yroot, METH_VARARGS,
+   "Return the Y-position of the mouse cursor on the root window."},
+  {"time", (PyCFunction)ActionData_time, METH_VARARGS,
+   "Return the time at which the event occured."},
+  {NULL, NULL, 0, NULL}
+};
+
+PyObject *BindingData_window(BindingData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":window")) return NULL;
+  return PyLong_FromLong(self->window);
+}
+
+PyObject *BindingData_modifiers(BindingData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":modifiers")) return NULL;
+  return PyLong_FromUnsignedLong(self->state);
+}
+
+PyObject *BindingData_key(BindingData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":key")) return NULL;
+  return PyString_FromString(
+    XKeysymToString(XKeycodeToKeysym(otk::OBDisplay::display, self->key, 0)));
+
+}
+
+PyObject *BindingData_time(BindingData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":time")) return NULL;
+  return PyLong_FromLong(self->time);
+}
+
+static PyMethodDef BindingData_methods[] = {
+  {"window", (PyCFunction)BindingData_window, METH_VARARGS,
+   "Return the client window id."},
+  {"modifiers", (PyCFunction)BindingData_modifiers, METH_VARARGS,
+   "Return the modifier keys state."},
+  {"key", (PyCFunction)BindingData_key, METH_VARARGS,
+   "Return the name of the pressed key."},
+  {"time", (PyCFunction)BindingData_time, METH_VARARGS,
+   "Return the time at which the event occured."},
+  {NULL, NULL, 0, NULL}
+};
+
+static PyObject *ActionDataGetAttr(PyObject *obj, char *name)
+{
+  return Py_FindMethod(ActionData_methods, obj, name);
+}
+
+static PyObject *BindingDataGetAttr(PyObject *obj, char *name)
+{
+  return Py_FindMethod(BindingData_methods, obj, name);
+}
+
+static PyTypeObject ActionData_Type = {
+  PyObject_HEAD_INIT(NULL)
+  0,
+  "ActionData",
+  sizeof(ActionData),
+  0,
+  (destructor)ActionDataDealloc,
+  0,
+  (getattrfunc)ActionDataGetAttr,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
+static PyTypeObject BindingData_Type = {
+  PyObject_HEAD_INIT(NULL)
+  0,
+  "BindingData",
+  sizeof(BindingData),
+  0,
+  (destructor)BindingDataDealloc,
+  0,
+  (getattrfunc)BindingDataGetAttr,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
+// **************** //
+// End custom types //
+// **************** //
 
 void python_init(char *argv0)
 {
@@ -36,253 +216,91 @@ void python_init(char *argv0)
   // set up access to the python global variables
   PyObject *obmodule = PyImport_AddModule("__main__");
   obdict = PyModule_GetDict(obmodule);
+
+  // set up the custom types
+  ActionData_Type.ob_type = &PyType_Type;
+  BindingData_Type.ob_type = &PyType_Type;
 }
 
-bool python_exec(const char *file) {
-  FILE *rcpyfd = fopen(file, "r");
+void python_destroy()
+{
+  Py_DECREF(obdict);
+}
+
+bool python_exec(const std::string &path)
+{
+  FILE *rcpyfd = fopen(path.c_str(), "r");
   if (!rcpyfd) {
-    printf("failed to load python file %s\n", file);
+    printf("failed to load python file %s\n", path.c_str());
     return false;
   }
-  PyRun_SimpleFile(rcpyfd, const_cast<char*>(file));
+  PyRun_SimpleFile(rcpyfd, const_cast<char*>(path.c_str()));
   fclose(rcpyfd);
   return true;
+}
+
+static void call(PyObject *func, PyObject *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", data);
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, OBActions::ActionType action,
+                     Window window, OBWidget::WidgetType type,
+                     unsigned int state, unsigned int button,
+                     int xroot, int yroot, Time time)
+{
+  assert(func);
+  
+  ActionData *data = PyObject_New(ActionData, &ActionData_Type);
+  data->action = action;
+  data->window = window;
+  data->type   = type;
+  data->state  = state;
+  data->button = button;
+  data->xroot  = xroot;
+  data->yroot  = yroot;
+  data->time   = time;
+
+  call(func, (PyObject*)data);
+  Py_DECREF(data);
+}
+
+void python_callback(PyObject *func, Window window, unsigned int state,
+			 unsigned int key, Time time)
+{
+  if (!func) return;
+
+  BindingData *data = PyObject_New(BindingData, &BindingData_Type);
+  data->window = window;
+  data->state  = state;
+  data->key    = key;
+  data->time   = time;
+
+  call(func, (PyObject*)data);
+  Py_DECREF(data);
 }
 
 bool python_get_string(const char *name, std::string *value)
 {
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
-  if (!val) return false;
+  if (!(val && PyString_Check(val))) return false;
   
   *value = PyString_AsString(val);
   return true;
 }
 
-
-bool python_register(int action, PyObject *callback)
-{
-  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
-      action == OBActions::Action_KeyPress) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
-    return false;
-  }
-  if (!PyCallable_Check(callback)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
-    return false;
-  }
-  
-  FunctionList::iterator it = std::find(callbacks[action].begin(),
-					callbacks[action].end(),
-					callback);
-  if (it == callbacks[action].end()) { // not already in there
-    Py_XINCREF(callback);              // Add a reference to new callback
-    callbacks[action].push_back(callback);
-  }
-  return true;
-}
-
-bool python_preregister(int action, PyObject *callback)
-{
-  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
-      action == OBActions::Action_KeyPress) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
-    return false;
-  }
-  if (!PyCallable_Check(callback)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
-    return false;
-  }
-  
-  FunctionList::iterator it = std::find(callbacks[action].begin(),
-					callbacks[action].end(),
-					callback);
-  if (it == callbacks[action].end()) { // not already in there
-    Py_XINCREF(callback);              // Add a reference to new callback
-    callbacks[action].insert(callbacks[action].begin(), callback);
-  }
-  return true;
-}
-
-bool python_unregister(int action, PyObject *callback)
-{
-  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
-      action == OBActions::Action_KeyPress) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
-    return false;
-  }
-  if (!PyCallable_Check(callback)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
-    return false;
-  }
-
-  FunctionList::iterator it = std::find(callbacks[action].begin(),
-					callbacks[action].end(),
-					callback);
-  if (it != callbacks[action].end()) { // its been registered before
-    Py_XDECREF(*it);                   // Dispose of previous callback
-    callbacks[action].erase(it);
-  }
-  return true;
-}
-
-bool python_unregister_all(int action)
-{
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
-    return false;
-  }
-
-  while (!callbacks[action].empty()) {
-    Py_XDECREF(callbacks[action].back());
-    callbacks[action].pop_back();
-  }
-  return true;
-}
-
-void python_callback(OBActions::ActionType action, Window window,
-                     OBWidget::WidgetType type, unsigned int state,
-                     long d1, long d2, long d3, long d4)
-{
-  PyObject *arglist;
-  PyObject *result;
-
-  assert(action >= 0 && action < OBActions::NUM_ACTIONS);
-
-  if (d4 != LONG_MIN)
-    arglist = Py_BuildValue("iliillll", action, window, type, state,
-                            d1, d2, d3, d4);
-  else if (d3 != LONG_MIN)
-    arglist = Py_BuildValue("iliilll", action, window, type, state,
-                            d1, d2, d3);
-  else if (d2 != LONG_MIN)
-    arglist = Py_BuildValue("iliill", action, window, type, state, d1, d2);
-  else if (d1 != LONG_MIN)
-    arglist = Py_BuildValue("iliil", action, window, type, state, d1);
-  else
-    arglist = Py_BuildValue("ilii", action, window, type, state);
-
-  FunctionList::iterator it, end = callbacks[action].end();
-  for (it = callbacks[action].begin(); it != end; ++it) {
-    // call the callback
-    result = PyEval_CallObject(*it, arglist);
-    if (result) {
-      Py_DECREF(result);
-    } else {
-      // an exception occured in the script, display it
-      PyErr_Print();
-    }
-  }
-
-  Py_DECREF(arglist);
-}
-
-
-
-
-
-
-bool python_bind(PyObject *keylist, PyObject *callback)
-{
-  if (!PyList_Check(keylist)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid keylist. Not a list.");
-    return false;
-  }
-  if (!PyCallable_Check(callback)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
-    return false;
-  }
-
-  OBBindings::StringVect vectkeylist;
-  for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
-    PyObject *str = PyList_GetItem(keylist, i);
-    if (!PyString_Check(str)) {
-      PyErr_SetString(PyExc_AssertionError,
-                      "Invalid keylist. It must contain only strings.");
-      return false;
-    }
-    vectkeylist.push_back(PyString_AsString(str));
-  }
-
-  // the id is what the binding class can call back with so it doesnt have to
-  // worry about the python function pointer
-  int id = bindfuncs.size();
-  if (Openbox::instance->bindings()->add(vectkeylist, id)) {
-    Py_XINCREF(callback);              // Add a reference to new callback
-    bindfuncs.push_back(callback);
-    return true;
-  } else {
-    PyErr_SetString(PyExc_AssertionError,"Unable to create binding. Invalid.");
-    return false;
-  }
-}
-
-bool python_unbind(PyObject *keylist)
-{
-  if (!PyList_Check(keylist)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid keylist. Not a list.");
-    return false;
-  }
-
-  OBBindings::StringVect vectkeylist;
-  for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
-    PyObject *str = PyList_GetItem(keylist, i);
-    if (!PyString_Check(str)) {
-      PyErr_SetString(PyExc_AssertionError,
-                      "Invalid keylist. It must contain only strings.");
-      return false;
-    }
-    vectkeylist.push_back(PyString_AsString(str));
-  }
-
-  int id;
-  if ((id =
-       Openbox::instance->bindings()->remove(vectkeylist)) >= 0) {
-    assert(bindfuncs[id]); // shouldn't be able to remove it twice
-    Py_XDECREF(bindfuncs[id]);  // Dispose of previous callback
-    // important note: we don't erase the item from the list cuz that would
-    // ruin all the id's that are in use. simply nullify it.
-    bindfuncs[id] = 0;
-    return true;
-  }
-  
-  return false;
-}
-
-void python_set_reset_key(const std::string &key)
-{
-  Openbox::instance->bindings()->setResetKey(key);
-}
-
-void python_unbind_all()
-{
-  Openbox::instance->bindings()->remove_all();
-}
-
-
-void python_callback_binding(int id, Window window, unsigned int state,
-                             unsigned int keybutton, Time time)
-{
-  if (!bindfuncs[id]) return; // the key was unbound
-
-  PyObject *arglist;
-  PyObject *result;
-
-  arglist = Py_BuildValue("lisl", window, state,
-                          XKeysymToString(
-                            XKeycodeToKeysym(otk::OBDisplay::display,
-                                             keybutton, 0)),
-                          time);
-
-  // call the callback
-  result = PyEval_CallObject(bindfuncs[id], arglist);
-  if (result) {
-    Py_DECREF(result);
-  } else {
-    // an exception occured in the script, display it
-    PyErr_Print();
-  }
-
-  Py_DECREF(arglist);
-}
 
 }

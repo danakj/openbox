@@ -6,13 +6,17 @@
   @brief The action interface for user-available actions
 */
 
+#include "widget.hh"
 #include "otk/point.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
+#include <Python.h>
 }
+
+#include <map>
 
 namespace ob {
 
@@ -54,6 +58,14 @@ private:
   //! The last button release processed for CLICKs
   ButtonReleaseAction _release;
 
+  typedef std::multimap<ActionType, PyObject*> CallbackMap;
+  typedef std::pair<ActionType, PyObject*> CallbackMapPair;
+  CallbackMap _callbacks;
+
+  void doCallback(ActionType action, Window window, OBWidget::WidgetType type,
+                  unsigned int state, unsigned int button,
+                  int xroot, int yroot, Time time);
+  
 public:
   //! Constructs an OBActions object
   OBActions();
@@ -73,6 +85,20 @@ public:
   virtual void mapRequestHandler(const XMapRequestEvent &e);
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
+
+
+  //! Add a callback funtion to the back of the hook list
+  /*!
+    Registering functions for KeyPress events is pointless. Use
+    OBSCript::bindKey instead to do this.
+  */
+  bool registerCallback(ActionType action, PyObject *func, bool atfront);
+
+  //! Remove a callback function from the hook list
+  bool unregisterCallback(ActionType action, PyObject *func);
+
+  //! Remove all callback functions from the hook list
+  bool unregisterAllCallbacks(ActionType action);
 };
 
 }

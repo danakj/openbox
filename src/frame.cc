@@ -75,11 +75,11 @@ void Frame::setStyle(otk::Style *style)
 {
   assert(style);
 
-  otk::Widget::setStyle(style);
-
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
   bool replace = (_style);
+
+  otk::Widget::setStyle(style);
 
   if (replace) {
     // XXX: do shit here whatever

@@ -673,8 +673,8 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_ob__Screen swig_types[25] 
 #define  SWIGTYPE_p_ob__Frame swig_types[26] 
 #define  SWIGTYPE_p_ob__KeyData swig_types[27] 
-#define  SWIGTYPE_p_XConfigureEvent swig_types[28] 
-#define  SWIGTYPE_p_XCirculateEvent swig_types[29] 
+#define  SWIGTYPE_p_XCirculateEvent swig_types[28] 
+#define  SWIGTYPE_p_XConfigureEvent swig_types[29] 
 #define  SWIGTYPE_p_XRectangle swig_types[30] 
 #define  SWIGTYPE_p_otk__ustring swig_types[31] 
 #define  SWIGTYPE_p_std__string swig_types[32] 
@@ -690,24 +690,26 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_ob__Bindings swig_types[42] 
 #define  SWIGTYPE_p_ob__Openbox swig_types[43] 
 #define  SWIGTYPE_p_ob__Actions swig_types[44] 
-#define  SWIGTYPE_p_XEvent swig_types[45] 
-#define  SWIGTYPE_p_otk__Property swig_types[46] 
-#define  SWIGTYPE_p_PyObject swig_types[47] 
-#define  SWIGTYPE_p_otk__ScreenInfo swig_types[48] 
-#define  SWIGTYPE_p_ob__EventData swig_types[49] 
-#define  SWIGTYPE_p_XCreateWindowEvent swig_types[50] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[51] 
-#define  SWIGTYPE_p_otk__Property__StringVect swig_types[52] 
-#define  SWIGTYPE_p_ob__WidgetBase swig_types[53] 
-#define  SWIGTYPE_p_otk__Atoms swig_types[54] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[55] 
-#define  SWIGTYPE_p_otk__Strut swig_types[56] 
-#define  SWIGTYPE_p_unsigned_long swig_types[57] 
-#define  SWIGTYPE_p_p_unsigned_long swig_types[58] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[59] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[60] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[61] 
-static swig_type_info *swig_types[63];
+#define  SWIGTYPE_p_otk__Widget swig_types[45] 
+#define  SWIGTYPE_p_XEvent swig_types[46] 
+#define  SWIGTYPE_p_otk__Property swig_types[47] 
+#define  SWIGTYPE_p_PyObject swig_types[48] 
+#define  SWIGTYPE_p_otk__ScreenInfo swig_types[49] 
+#define  SWIGTYPE_p_ob__EventData swig_types[50] 
+#define  SWIGTYPE_p_XCreateWindowEvent swig_types[51] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[52] 
+#define  SWIGTYPE_p_otk__Property__StringVect swig_types[53] 
+#define  SWIGTYPE_p_ob__WidgetBase swig_types[54] 
+#define  SWIGTYPE_p_otk__Atoms swig_types[55] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[56] 
+#define  SWIGTYPE_p_int swig_types[57] 
+#define  SWIGTYPE_p_otk__Strut swig_types[58] 
+#define  SWIGTYPE_p_unsigned_long swig_types[59] 
+#define  SWIGTYPE_p_p_unsigned_long swig_types[60] 
+#define  SWIGTYPE_p_XMotionEvent swig_types[61] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[62] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[63] 
+static swig_type_info *swig_types[65];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -723,6 +725,7 @@ static swig_type_info *swig_types[63];
 #  include "../config.h"
 #endif
 
+#include "frame.hh"
 #include "openbox.hh"
 #include "screen.hh"
 #include "client.hh"
@@ -9425,6 +9428,470 @@ static PyObject * Client_swigregister(PyObject *self, PyObject *args) {
     Py_INCREF(obj);
     return Py_BuildValue((char *)"");
 }
+static PyObject *_wrap_new_Frame(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Client *arg1 = (ob::Client *) 0 ;
+    otk::Style *arg2 = (otk::Style *) 0 ;
+    ob::Frame *result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:new_Frame",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::Frame *)new ob::Frame(arg1,arg2);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__Frame, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_delete_Frame(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_Frame",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_area(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    otk::Rect result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_area",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = ((ob::Frame const *)arg1)->area();
+    
+    {
+        otk::Rect * resultptr;
+        resultptr = new otk::Rect((otk::Rect &) result);
+        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_otk__Rect, 1);
+    }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_setStyle(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    otk::Style *arg2 = (otk::Style *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Frame_setStyle",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setStyle(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_adjust(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_adjust",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->adjust();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_focus(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_focus",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->focus();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_unfocus(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_unfocus",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->unfocus();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_setTitle(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    otk::ustring *arg2 = 0 ;
+    otk::ustring temp2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Frame_setTitle",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    {
+        if (PyString_Check(obj1)) {
+            temp2 = otk::ustring(PyString_AsString(obj1));
+            arg2 = &temp2;
+        }else {
+            SWIG_exception(SWIG_TypeError, "ustring expected");
+        }
+    }
+    (arg1)->setTitle((otk::ustring const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_grabClient(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_grabClient",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->grabClient();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_releaseClient(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_releaseClient",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->releaseClient();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_adjustSize(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_adjustSize",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->adjustSize();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_adjustPosition(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_adjustPosition",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->adjustPosition();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_adjustShape(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_adjustShape",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->adjustShape();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_clientGravity(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    int *arg2 = 0 ;
+    int *arg3 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OOO:Frame_clientGravity",&obj0,&obj1,&obj2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_int,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_int,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg3 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->clientGravity(*arg2,*arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_frameGravity(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    int *arg2 = 0 ;
+    int *arg3 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OOO:Frame_frameGravity",&obj0,&obj1,&obj2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_int,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_int,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg3 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->frameGravity(*arg2,*arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_plate(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_plate",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->plate();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_titlebar(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_titlebar",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->titlebar();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_label(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_label",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->label();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_button_close(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_button_close",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->button_close();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_button_iconify(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_button_iconify",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->button_iconify();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_button_max(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_button_max",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->button_max();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_button_stick(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_button_stick",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->button_stick();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_handle(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_handle",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->handle();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_grip_left(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_grip_left",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->grip_left();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Frame_grip_right(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_grip_right",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::Frame const *)arg1)->grip_right();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * Frame_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_ob__Frame, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
 static PyObject *_wrap_MouseData_screen_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::MouseData *arg1 = (ob::MouseData *) 0 ;
@@ -11069,6 +11536,32 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Client_destroyHandler", _wrap_Client_destroyHandler, METH_VARARGS },
 	 { (char *)"Client_reparentHandler", _wrap_Client_reparentHandler, METH_VARARGS },
 	 { (char *)"Client_swigregister", Client_swigregister, METH_VARARGS },
+	 { (char *)"new_Frame", _wrap_new_Frame, METH_VARARGS },
+	 { (char *)"delete_Frame", _wrap_delete_Frame, METH_VARARGS },
+	 { (char *)"Frame_area", _wrap_Frame_area, METH_VARARGS },
+	 { (char *)"Frame_setStyle", _wrap_Frame_setStyle, METH_VARARGS },
+	 { (char *)"Frame_adjust", _wrap_Frame_adjust, METH_VARARGS },
+	 { (char *)"Frame_focus", _wrap_Frame_focus, METH_VARARGS },
+	 { (char *)"Frame_unfocus", _wrap_Frame_unfocus, METH_VARARGS },
+	 { (char *)"Frame_setTitle", _wrap_Frame_setTitle, METH_VARARGS },
+	 { (char *)"Frame_grabClient", _wrap_Frame_grabClient, METH_VARARGS },
+	 { (char *)"Frame_releaseClient", _wrap_Frame_releaseClient, METH_VARARGS },
+	 { (char *)"Frame_adjustSize", _wrap_Frame_adjustSize, METH_VARARGS },
+	 { (char *)"Frame_adjustPosition", _wrap_Frame_adjustPosition, METH_VARARGS },
+	 { (char *)"Frame_adjustShape", _wrap_Frame_adjustShape, METH_VARARGS },
+	 { (char *)"Frame_clientGravity", _wrap_Frame_clientGravity, METH_VARARGS },
+	 { (char *)"Frame_frameGravity", _wrap_Frame_frameGravity, METH_VARARGS },
+	 { (char *)"Frame_plate", _wrap_Frame_plate, METH_VARARGS },
+	 { (char *)"Frame_titlebar", _wrap_Frame_titlebar, METH_VARARGS },
+	 { (char *)"Frame_label", _wrap_Frame_label, METH_VARARGS },
+	 { (char *)"Frame_button_close", _wrap_Frame_button_close, METH_VARARGS },
+	 { (char *)"Frame_button_iconify", _wrap_Frame_button_iconify, METH_VARARGS },
+	 { (char *)"Frame_button_max", _wrap_Frame_button_max, METH_VARARGS },
+	 { (char *)"Frame_button_stick", _wrap_Frame_button_stick, METH_VARARGS },
+	 { (char *)"Frame_handle", _wrap_Frame_handle, METH_VARARGS },
+	 { (char *)"Frame_grip_left", _wrap_Frame_grip_left, METH_VARARGS },
+	 { (char *)"Frame_grip_right", _wrap_Frame_grip_right, METH_VARARGS },
+	 { (char *)"Frame_swigregister", Frame_swigregister, METH_VARARGS },
 	 { (char *)"MouseData_screen_set", _wrap_MouseData_screen_set, METH_VARARGS },
 	 { (char *)"MouseData_screen_get", _wrap_MouseData_screen_get, METH_VARARGS },
 	 { (char *)"MouseData_client_set", _wrap_MouseData_client_set, METH_VARARGS },
@@ -11134,8 +11627,17 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
+static void *_p_ob__FrameTo_p_otk__Widget(void *x) {
+    return (void *)((otk::Widget *)  ((ob::Frame *) x));
+}
 static void *_p_ob__ActionsTo_p_otk__EventHandler(void *x) {
     return (void *)((otk::EventHandler *)  ((ob::Actions *) x));
+}
+static void *_p_ob__FrameTo_p_otk__EventHandler(void *x) {
+    return (void *)((otk::EventHandler *) (otk::Widget *) ((ob::Frame *) x));
+}
+static void *_p_otk__WidgetTo_p_otk__EventHandler(void *x) {
+    return (void *)((otk::EventHandler *)  ((otk::Widget *) x));
 }
 static void *_p_ob__OpenboxTo_p_otk__EventHandler(void *x) {
     return (void *)((otk::EventHandler *)  ((ob::Openbox *) x));
@@ -11148,6 +11650,9 @@ static void *_p_ob__ClientTo_p_otk__EventHandler(void *x) {
 }
 static void *_p_ob__OpenboxTo_p_otk__EventDispatcher(void *x) {
     return (void *)((otk::EventDispatcher *)  ((ob::Openbox *) x));
+}
+static void *_p_ob__FrameTo_p_ob__WidgetBase(void *x) {
+    return (void *)((ob::WidgetBase *)  ((ob::Frame *) x));
 }
 static void *_p_ob__ScreenTo_p_ob__WidgetBase(void *x) {
     return (void *)((ob::WidgetBase *)  ((ob::Screen *) x));
@@ -11183,8 +11688,8 @@ static swig_type_info _swigt__p_ob__MwmHints[] = {{"_p_ob__MwmHints", 0, "ob::Mw
 static swig_type_info _swigt__p_ob__Screen[] = {{"_p_ob__Screen", 0, "ob::Screen *", 0},{"_p_ob__Screen"},{0}};
 static swig_type_info _swigt__p_ob__Frame[] = {{"_p_ob__Frame", 0, "ob::Frame *", 0},{"_p_ob__Frame"},{0}};
 static swig_type_info _swigt__p_ob__KeyData[] = {{"_p_ob__KeyData", 0, "ob::KeyData *", 0},{"_p_ob__KeyData"},{0}};
-static swig_type_info _swigt__p_XConfigureEvent[] = {{"_p_XConfigureEvent", 0, "XConfigureEvent *", 0},{"_p_XConfigureEvent"},{0}};
 static swig_type_info _swigt__p_XCirculateEvent[] = {{"_p_XCirculateEvent", 0, "XCirculateEvent *", 0},{"_p_XCirculateEvent"},{0}};
+static swig_type_info _swigt__p_XConfigureEvent[] = {{"_p_XConfigureEvent", 0, "XConfigureEvent *", 0},{"_p_XConfigureEvent"},{0}};
 static swig_type_info _swigt__p_XRectangle[] = {{"_p_XRectangle", 0, "XRectangle *", 0},{"_p_XRectangle"},{0}};
 static swig_type_info _swigt__p_otk__ustring[] = {{"_p_otk__ustring", 0, "otk::ustring *", 0},{"_p_otk__ustring"},{0}};
 static swig_type_info _swigt__p_std__string[] = {{"_p_std__string", 0, "std::string *", 0},{"_p_std__string"},{0}};
@@ -11193,13 +11698,14 @@ static swig_type_info _swigt__p_otk__Display[] = {{"_p_otk__Display", 0, "otk::D
 static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
 static swig_type_info _swigt__p_XMappingEvent[] = {{"_p_XMappingEvent", 0, "XMappingEvent *", 0},{"_p_XMappingEvent"},{0}};
 static swig_type_info _swigt__p_otk__Style[] = {{"_p_otk__Style", 0, "otk::Style *", 0},{"_p_otk__Style"},{0}};
-static swig_type_info _swigt__p_otk__EventHandler[] = {{"_p_otk__EventHandler", 0, "otk::EventHandler *", 0},{"_p_ob__Client", _p_ob__ClientTo_p_otk__EventHandler},{"_p_ob__Actions", _p_ob__ActionsTo_p_otk__EventHandler},{"_p_otk__EventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventHandler},{"_p_ob__Screen", _p_ob__ScreenTo_p_otk__EventHandler},{0}};
+static swig_type_info _swigt__p_otk__EventHandler[] = {{"_p_otk__EventHandler", 0, "otk::EventHandler *", 0},{"_p_ob__Client", _p_ob__ClientTo_p_otk__EventHandler},{"_p_ob__Actions", _p_ob__ActionsTo_p_otk__EventHandler},{"_p_otk__EventHandler"},{"_p_ob__Frame", _p_ob__FrameTo_p_otk__EventHandler},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventHandler},{"_p_otk__Widget", _p_otk__WidgetTo_p_otk__EventHandler},{"_p_ob__Screen", _p_ob__ScreenTo_p_otk__EventHandler},{0}};
 static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XReparentEvent *", 0},{"_p_XReparentEvent"},{0}};
 static swig_type_info _swigt__p_otk__EventDispatcher[] = {{"_p_otk__EventDispatcher", 0, "otk::EventDispatcher *", 0},{"_p_otk__EventDispatcher"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventDispatcher},{0}};
 static swig_type_info _swigt__p_otk__GCCache[] = {{"_p_otk__GCCache", 0, "otk::GCCache *", 0},{"_p_otk__GCCache"},{0}};
 static swig_type_info _swigt__p_ob__Bindings[] = {{"_p_ob__Bindings", 0, "ob::Bindings *", 0},{"_p_ob__Bindings"},{0}};
 static swig_type_info _swigt__p_ob__Openbox[] = {{"_p_ob__Openbox", 0, "ob::Openbox *", 0},{"_p_ob__Openbox"},{0}};
 static swig_type_info _swigt__p_ob__Actions[] = {{"_p_ob__Actions", 0, "ob::Actions *", 0},{"_p_ob__Actions"},{0}};
+static swig_type_info _swigt__p_otk__Widget[] = {{"_p_otk__Widget", 0, "otk::Widget *", 0},{"_p_ob__Frame", _p_ob__FrameTo_p_otk__Widget},{"_p_otk__Widget"},{0}};
 static swig_type_info _swigt__p_XEvent[] = {{"_p_XEvent", 0, "XEvent *", 0},{"_p_XEvent"},{0}};
 static swig_type_info _swigt__p_otk__Property[] = {{"_p_otk__Property", 0, "otk::Property *", 0},{"_p_otk__Property"},{0}};
 static swig_type_info _swigt__p_PyObject[] = {{"_p_PyObject", 0, "PyObject *", 0},{"_p_PyObject"},{0}};
@@ -11208,9 +11714,10 @@ static swig_type_info _swigt__p_ob__EventData[] = {{"_p_ob__EventData", 0, "ob::
 static swig_type_info _swigt__p_XCreateWindowEvent[] = {{"_p_XCreateWindowEvent", 0, "XCreateWindowEvent *", 0},{"_p_XCreateWindowEvent"},{0}};
 static swig_type_info _swigt__p_XDestroyWindowEvent[] = {{"_p_XDestroyWindowEvent", 0, "XDestroyWindowEvent *", 0},{"_p_XDestroyWindowEvent"},{0}};
 static swig_type_info _swigt__p_otk__Property__StringVect[] = {{"_p_otk__Property__StringVect", 0, "otk::Property::StringVect *", 0},{"_p_otk__Property__StringVect"},{0}};
-static swig_type_info _swigt__p_ob__WidgetBase[] = {{"_p_ob__WidgetBase", 0, "ob::WidgetBase *", 0},{"_p_ob__WidgetBase"},{"_p_ob__Client", _p_ob__ClientTo_p_ob__WidgetBase},{"_p_ob__Screen", _p_ob__ScreenTo_p_ob__WidgetBase},{0}};
+static swig_type_info _swigt__p_ob__WidgetBase[] = {{"_p_ob__WidgetBase", 0, "ob::WidgetBase *", 0},{"_p_ob__WidgetBase"},{"_p_ob__Client", _p_ob__ClientTo_p_ob__WidgetBase},{"_p_ob__Frame", _p_ob__FrameTo_p_ob__WidgetBase},{"_p_ob__Screen", _p_ob__ScreenTo_p_ob__WidgetBase},{0}};
 static swig_type_info _swigt__p_otk__Atoms[] = {{"_p_otk__Atoms", 0, "otk::Atoms *", 0},{"_p_otk__Atoms"},{0}};
 static swig_type_info _swigt__p_XKeyEvent[] = {{"_p_XKeyEvent", 0, "XKeyEvent *", 0},{"_p_XKeyEvent"},{0}};
+static swig_type_info _swigt__p_int[] = {{"_p_int", 0, "int *", 0},{"_p_int"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
 static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_p_unsigned_long[] = {{"_p_p_unsigned_long", 0, "unsigned long **", 0},{"_p_p_unsigned_long"},{0}};
@@ -11247,8 +11754,8 @@ _swigt__p_ob__MwmHints,
 _swigt__p_ob__Screen, 
 _swigt__p_ob__Frame, 
 _swigt__p_ob__KeyData, 
-_swigt__p_XConfigureEvent, 
 _swigt__p_XCirculateEvent, 
+_swigt__p_XConfigureEvent, 
 _swigt__p_XRectangle, 
 _swigt__p_otk__ustring, 
 _swigt__p_std__string, 
@@ -11264,6 +11771,7 @@ _swigt__p_otk__GCCache,
 _swigt__p_ob__Bindings, 
 _swigt__p_ob__Openbox, 
 _swigt__p_ob__Actions, 
+_swigt__p_otk__Widget, 
 _swigt__p_XEvent, 
 _swigt__p_otk__Property, 
 _swigt__p_PyObject, 
@@ -11275,6 +11783,7 @@ _swigt__p_otk__Property__StringVect,
 _swigt__p_ob__WidgetBase, 
 _swigt__p_otk__Atoms, 
 _swigt__p_XKeyEvent, 
+_swigt__p_int, 
 _swigt__p_otk__Strut, 
 _swigt__p_unsigned_long, 
 _swigt__p_p_unsigned_long, 
@@ -11347,6 +11856,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Client_State_Toggle", (long) ob::Client::State_Toggle, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_event_mask", (long) ob::Client::event_mask, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_no_propagate_mask", (long) ob::Client::no_propagate_mask, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Frame_event_mask", (long) ob::Frame::event_mask, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Frame", (long) ob::MC_Frame, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Titlebar", (long) ob::MC_Titlebar, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Handle", (long) ob::MC_Handle, 0, 0, 0},

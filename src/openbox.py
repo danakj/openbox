@@ -823,6 +823,52 @@ class ClientPtr(Client):
         self.__class__ = Client
 _openbox.Client_swigregister(ClientPtr)
 
+class Frame(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Frame, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, Frame, name)
+    event_mask = _openbox.Frame_event_mask
+    def __init__(self,*args):
+        self.this = apply(_openbox.new_Frame,args)
+        self.thisown = 1
+    def __del__(self, destroy= _openbox.delete_Frame):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    def area(*args): return apply(_openbox.Frame_area,args)
+    def setStyle(*args): return apply(_openbox.Frame_setStyle,args)
+    def adjust(*args): return apply(_openbox.Frame_adjust,args)
+    def focus(*args): return apply(_openbox.Frame_focus,args)
+    def unfocus(*args): return apply(_openbox.Frame_unfocus,args)
+    def setTitle(*args): return apply(_openbox.Frame_setTitle,args)
+    def grabClient(*args): return apply(_openbox.Frame_grabClient,args)
+    def releaseClient(*args): return apply(_openbox.Frame_releaseClient,args)
+    def adjustSize(*args): return apply(_openbox.Frame_adjustSize,args)
+    def adjustPosition(*args): return apply(_openbox.Frame_adjustPosition,args)
+    def adjustShape(*args): return apply(_openbox.Frame_adjustShape,args)
+    def clientGravity(*args): return apply(_openbox.Frame_clientGravity,args)
+    def frameGravity(*args): return apply(_openbox.Frame_frameGravity,args)
+    def plate(*args): return apply(_openbox.Frame_plate,args)
+    def titlebar(*args): return apply(_openbox.Frame_titlebar,args)
+    def label(*args): return apply(_openbox.Frame_label,args)
+    def button_close(*args): return apply(_openbox.Frame_button_close,args)
+    def button_iconify(*args): return apply(_openbox.Frame_button_iconify,args)
+    def button_max(*args): return apply(_openbox.Frame_button_max,args)
+    def button_stick(*args): return apply(_openbox.Frame_button_stick,args)
+    def handle(*args): return apply(_openbox.Frame_handle,args)
+    def grip_left(*args): return apply(_openbox.Frame_grip_left,args)
+    def grip_right(*args): return apply(_openbox.Frame_grip_right,args)
+    def __repr__(self):
+        return "<C Frame instance at %s>" % (self.this,)
+
+class FramePtr(Frame):
+    def __init__(self,this):
+        self.this = this
+        if not hasattr(self,"thisown"): self.thisown = 0
+        self.__class__ = Frame
+_openbox.Frame_swigregister(FramePtr)
+
 MC_Frame = _openbox.MC_Frame
 MC_Titlebar = _openbox.MC_Titlebar
 MC_Handle = _openbox.MC_Handle

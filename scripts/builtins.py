@@ -318,6 +318,7 @@ import random
 def placewindows_random(data):
     if not data.client: return
     frame_area = data.client.frame.area()
+    print "AAAAAAAAASA " + str(frame_area.width())
     screen = display.screenInfo(data.screen)
     # XXX - USE THE FRAME'S SIZE!!
     width = screen.width() - frame_area.width()

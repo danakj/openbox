@@ -40,9 +40,6 @@ private:
   Client *_client;
   const otk::ScreenInfo *_screen;
 
-  //! The style to use for size and display the decorations
-  otk::Style *_style;
-
   //! The size of the frame on each side of the client window
   otk::Strut _size;
 
@@ -78,6 +75,14 @@ public:
   //! Destroys the Frame object
   virtual ~Frame();
 
+  otk::Rect area() const {
+    otk::Rect a(_client->area());
+    a.setRect(a.x() - _size.left, a.y() - _size.top,
+              a.width() + _size.left + _size.right,
+              a.height() + _size.top + _size.bottom);
+    return a;
+  }
+  
   //! Set the style to decorate the frame with
   virtual void setStyle(otk::Style *style);
 

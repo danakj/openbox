@@ -267,12 +267,13 @@ void OBScreen::calcArea()
 void OBScreen::setClientList()
 {
   Window *windows;
+  unsigned int size = clients.size();
 
   // create an array of the window ids
-  if (clients.size() > 0) {
+  if (size > 0) {
     Window *win_it;
     
-    windows = new Window[clients.size()];
+    windows = new Window[size];
     win_it = windows;
     ClientList::const_iterator it = clients.begin();
     const ClientList::const_iterator end = clients.end();
@@ -284,9 +285,9 @@ void OBScreen::setClientList()
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_client_list,
                                      otk::OBProperty::Atom_Window,
-                                     windows, clients.size());
+                                     windows, size);
 
-  if (clients.size())
+  if (size)
     delete [] windows;
 
   setStackingList();
@@ -295,19 +296,32 @@ void OBScreen::setClientList()
 
 void OBScreen::setStackingList()
 {
-  // The below comment is wrong now hopefully :> but ill keep it here for
-  // reference anyways
-  /*
-    Get the stacking order from all of the workspaces.
-    We start with the current workspace so that the sticky windows will be
-    in the right order on the current workspace.
-  */
-  /*
-  Openbox::instance->property()->set(_info->getRootWindow(),
+  Window *windows;
+  unsigned int size = _stacking.size();
+
+  assert(size == clients.size()); // just making sure.. :)
+
+  
+  // create an array of the window ids
+  if (size > 0) {
+    Window *win_it;
+    
+    windows = new Window[size];
+    win_it = windows;
+    ClientList::const_iterator it = _stacking.begin();
+    const ClientList::const_iterator end = _stacking.end();
+    for (; it != end; ++it, ++win_it)
+      *win_it = (*it)->window();
+  } else
+    windows = (Window*) 0;
+
+  Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_client_list_stacking,
                                      otk::OBProperty::Atom_Window,
-                                     _stacking, _stacking.size());
-  */
+                                     windows, size);
+
+  if (size)
+    delete [] windows;
 }
 
 
@@ -498,6 +512,7 @@ void OBScreen::restack(bool raise, OBClient *client)
     wins.push_back((*it)->frame->window());
 
   XRestackWindows(otk::OBDisplay::display, &wins[0], wins.size());
+  setStackingList();
 }
 
 }

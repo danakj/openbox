@@ -1,4 +1,6 @@
 #include "font.h"
+#include "color.h"
+#include "mask.h"
 #include "theme.h"
 #include "kernel/geom.h"
 #include "kernel/gettext.h"

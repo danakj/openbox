@@ -43,9 +43,9 @@ void gradient_render(RrSurface *sf, int w, int h)
         r = sf->border_color->r;
         g = sf->border_color->g;
         b = sf->border_color->b;
-        current = (r << default_red_offset)
-            + (g << default_green_offset)
-            + (b << default_blue_offset);
+        current = (r << RrDefaultRedOffset)
+            + (g << RrDefaultGreenOffset)
+            + (b << RrDefaultBlueOffset);
         for (off = 0, x = 0; x < w; ++x, off++) {
             *(data + off) = current;
             *(data + off + ((h-1) * w)) = current;
@@ -104,9 +104,9 @@ void gradient_vertical(RrSurface *sf, int w, int h)
         r = sf->primary->r + (int)(dr * y);
         g = sf->primary->g + (int)(dg * y);
         b = sf->primary->b + (int)(db * y);
-        current = (r << default_red_offset)
-            + (g << default_green_offset)
-            + (b << default_blue_offset);
+        current = (r << RrDefaultRedOffset)
+            + (g << RrDefaultGreenOffset)
+            + (b << RrDefaultBlueOffset);
         for (x = 0; x < w; ++x, ++data)
             *data = current;
     }
@@ -133,9 +133,9 @@ void gradient_horizontal(RrSurface *sf, int w, int h)
         r = sf->primary->r + (int)(dr * x);
         g = sf->primary->g + (int)(dg * x);
         b = sf->primary->b + (int)(db * x);
-        current = (r << default_red_offset)
-            + (g << default_green_offset)
-            + (b << default_blue_offset);
+        current = (r << RrDefaultRedOffset)
+            + (g << RrDefaultGreenOffset)
+            + (b << RrDefaultBlueOffset);
         for (y = 0; y < h; ++y)
             *(data + y*w) = current;
     }
@@ -171,9 +171,9 @@ void gradient_diagonal(RrSurface *sf, int w, int h)
                 ((int)(dgx * x) + (int)(dgy * y))/2;
             b = sf->primary->b +
                 ((int)(dbx * x) + (int)(dby * y))/2;
-            current = (r << default_red_offset)
-                + (g << default_green_offset)
-                + (b << default_blue_offset);
+            current = (r << RrDefaultRedOffset)
+                + (g << RrDefaultGreenOffset)
+                + (b << RrDefaultBlueOffset);
             *data = current;
         }
     }
@@ -209,9 +209,9 @@ void gradient_crossdiagonal(RrSurface *sf, int w, int h)
                 ((int)(dgx * (x-1)) + (int)(dgy * y))/2;
             b = sf->primary->b +
                 ((int)(dbx * (x-1)) + (int)(dby * y))/2;
-            current = (r << default_red_offset)
-                + (g << default_green_offset)
-                + (b << default_blue_offset);
+            current = (r << RrDefaultRedOffset)
+                + (g << RrDefaultGreenOffset)
+                + (b << RrDefaultBlueOffset);
             *data = current;
         }
     }
@@ -229,26 +229,26 @@ void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
         up = y;
         down = x;
     }
-    r = (*up >> default_red_offset) & 0xFF;
+    r = (*up >> RrDefaultRedOffset) & 0xFF;
     r += r >> 1;
-    g = (*up >> default_green_offset) & 0xFF;
+    g = (*up >> RrDefaultGreenOffset) & 0xFF;
     g += g >> 1;
-    b = (*up >> default_blue_offset) & 0xFF;
+    b = (*up >> RrDefaultBlueOffset) & 0xFF;
     b += b >> 1;
     if (r > 0xFF) r = 0xFF;
     if (g > 0xFF) g = 0xFF;
     if (b > 0xFF) b = 0xFF;
-    *up = (r << default_red_offset) + (g << default_green_offset)
-        + (b << default_blue_offset);
+    *up = (r << RrDefaultRedOffset) + (g << RrDefaultGreenOffset)
+        + (b << RrDefaultBlueOffset);
   
-    r = (*down >> default_red_offset) & 0xFF;
+    r = (*down >> RrDefaultRedOffset) & 0xFF;
     r = (r >> 1) + (r >> 2);
-    g = (*down >> default_green_offset) & 0xFF;
+    g = (*down >> RrDefaultGreenOffset) & 0xFF;
     g = (g >> 1) + (g >> 2);
-    b = (*down >> default_blue_offset) & 0xFF;
+    b = (*down >> RrDefaultBlueOffset) & 0xFF;
     b = (b >> 1) + (b >> 2);
-    *down = (r << default_red_offset) + (g << default_green_offset)
-        + (b << default_blue_offset);
+    *down = (r << RrDefaultRedOffset) + (g << RrDefaultGreenOffset)
+        + (b << RrDefaultBlueOffset);
 }
 
 static void create_bevel_colors(RrAppearance *l)
@@ -290,9 +290,9 @@ void gradient_solid(RrAppearance *l, int x, int y, int w, int h)
 
     if (sp->primary->gc == None)
         color_allocate_gc(sp->primary);
-    pix = (sp->primary->r << default_red_offset)
-        + (sp->primary->g << default_green_offset)
-        + (sp->primary->b << default_blue_offset);
+    pix = (sp->primary->r << RrDefaultRedOffset)
+        + (sp->primary->g << RrDefaultGreenOffset)
+        + (sp->primary->b << RrDefaultBlueOffset);
 
     for (a = 0; a < w; a++)
         for (b = 0; b < h; b++)
@@ -422,9 +422,9 @@ void gradient_pyramid(RrSurface *sf, int inw, int inh)
                 ((int)(dgx * x) + (int)(dgy * y))/2;
             b = sf->primary->b +
                 ((int)(dbx * x) + (int)(dby * y))/2;
-            current = (r << default_red_offset)
-                + (g << default_green_offset)
-                + (b << default_blue_offset);
+            current = (r << RrDefaultRedOffset)
+                + (g << RrDefaultGreenOffset)
+                + (b << RrDefaultBlueOffset);
             *(data+x) = current;
             *(data+inw-x) = current;
             *(end-x) = current;
@@ -470,9 +470,9 @@ void gradient_rectangle(RrSurface *sf, int inw, int inh)
                 g = sf->primary->g + (dgy * x);
                 b = sf->primary->b + (dby * x);
             }
-            current = (r << default_red_offset)
-                + (g << default_green_offset)
-                + (b << default_blue_offset);
+            current = (r << RrDefaultRedOffset)
+                + (g << RrDefaultGreenOffset)
+                + (b << RrDefaultBlueOffset);
             *(data+x) = current;
             *(data+inw-x) = current;
             *(end-x) = current;
@@ -518,9 +518,9 @@ void gradient_pipecross(RrSurface *sf, int inw, int inh)
                 g = sf->primary->g + (dgy * x);
                 b = sf->primary->b + (dby * x);
             }
-            current = (r << default_red_offset)
-                + (g << default_green_offset)
-                + (b << default_blue_offset);
+            current = (r << RrDefaultRedOffset)
+                + (g << RrDefaultGreenOffset)
+                + (b << RrDefaultBlueOffset);
             *(data+x) = current;
             *(data+inw-x) = current;
             *(end-x) = current;

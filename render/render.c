@@ -236,7 +236,7 @@ static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
     in = l->surface.RrPixel_data;
     out = l->pixmap;
 
-    im->byte_order = render_endian;
+    im->byte_order = RrEndian;
 /* this malloc is a complete waste of time on normal 32bpp
    as reduce_depth just sets im->data = data and returns
 */
@@ -344,7 +344,7 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
         for (i = 0, y = 0; y < ph; ++y) {
             for (x = 0; x < pw; ++x, ++i) {
                 if (!((((unsigned)xm->data[di + x / 8]) >> (x % 8)) & 0x1))
-                    (*data)[i] &= ~(0xff << default_alpha_offset);
+                    (*data)[i] &= ~(0xff << RrDefaultAlphaOffset);
             }
             di += xm->bytes_per_line;
         }

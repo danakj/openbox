@@ -1,4 +1,4 @@
-#include "../kernel/geom.h"
+#include "kernel/geom.h"
 #include "image.h"
 #include "color.h"
 
@@ -46,10 +46,10 @@ void image_draw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area)
         for (i = 0, c = 0, t = area->x, e = sfw*sfh; i < e; ++i, ++t) {
             guchar alpha, r, g, b, bgr, bgg, bgb;
 
-            alpha = draw[i] >> default_alpha_offset;
-            r = draw[i] >> default_red_offset;
-            g = draw[i] >> default_green_offset;
-            b = draw[i] >> default_blue_offset;
+            alpha = draw[i] >> RrDefaultAlphaOffset;
+            r = draw[i] >> RrDefaultRedOffset;
+            g = draw[i] >> RrDefaultGreenOffset;
+            b = draw[i] >> RrDefaultBlueOffset;
 
             if (c >= sfw) {
                 c = 0;
@@ -57,17 +57,17 @@ void image_draw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area)
             }
 
             /* background color */
-            bgr = target[t] >> default_red_offset;
-            bgg = target[t] >> default_green_offset;
-            bgb = target[t] >> default_blue_offset;
+            bgr = target[t] >> RrDefaultRedOffset;
+            bgg = target[t] >> RrDefaultGreenOffset;
+            bgb = target[t] >> RrDefaultBlueOffset;
 
             r = bgr + (((r - bgr) * alpha) >> 8);
             g = bgg + (((g - bgg) * alpha) >> 8);
             b = bgb + (((b - bgb) * alpha) >> 8);
 
-            target[t] = (r << default_red_offset)
-                      | (g << default_green_offset)
-                      | (b << default_blue_offset);
+            target[t] = (r << RrDefaultRedOffset)
+                      | (g << RrDefaultGreenOffset)
+                      | (b << RrDefaultBlueOffset);
         }
     }
 }

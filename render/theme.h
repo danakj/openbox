@@ -2,8 +2,6 @@
 #define __theme_h
 
 #include "render.h"
-#include "color.h"
-#include "mask.h"
 
 typedef struct _RrTheme RrTheme;
 

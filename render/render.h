@@ -132,6 +132,20 @@ struct _RrAppearance {
     gint w, h;
 };
 
+#if (G_BYTE_ORDER == G_BIG_ENDIAN)
+#define RrDefaultRedOffset 0
+#define RrDefaultGreenOffset 8
+#define RrDefaultBlueOffset 16
+#define RrDefaultAlphaOffset 24
+#define RrEndian MSBFirst  
+#else
+#define RrDefaultAlphaOffset 24
+#define RrDefaultRedOffset 16
+#define RrDefaultGreenOffset 8
+#define RrDefaultBlueOffset 0
+#define RrEndian LSBFirst
+#endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
+
 RrInstance* RrInstanceNew (Display *display, gint screen);
 void        RrInstanceFree (RrInstance *inst);
 

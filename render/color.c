@@ -75,14 +75,14 @@ void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     unsigned char *p8 = (unsigned char *)im->data;
     switch (im->bits_per_pixel) {
     case 32:
-        if ((RrRedOffset(inst) != default_red_offset) ||
-            (RrBlueOffset(inst) != default_blue_offset) ||
-            (RrGreenOffset(inst) != default_green_offset)) {
+        if ((RrRedOffset(inst) != RrDefaultRedOffset) ||
+            (RrBlueOffset(inst) != RrDefaultBlueOffset) ||
+            (RrGreenOffset(inst) != RrDefaultGreenOffset)) {
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
-                    r = (data[x] >> default_red_offset) & 0xFF;
-                    g = (data[x] >> default_green_offset) & 0xFF;
-                    b = (data[x] >> default_blue_offset) & 0xFF;
+                    r = (data[x] >> RrDefaultRedOffset) & 0xFF;
+                    g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
+                    b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
                     p32[x] = (r << RrRedShift(inst))
                            + (g << RrGreenShift(inst))
                            + (b << RrBlueShift(inst));
@@ -95,11 +95,11 @@ void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     case 16:
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                r = (data[x] >> default_red_offset) & 0xFF;
+                r = (data[x] >> RrDefaultRedOffset) & 0xFF;
                 r = r >> RrRedShift(inst);
-                g = (data[x] >> default_green_offset) & 0xFF;
+                g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
                 g = g >> RrGreenShift(inst);
-                b = (data[x] >> default_blue_offset) & 0xFF;
+                b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
                 b = b >> RrBlueShift(inst);
                 p16[x] = (r << RrRedOffset(inst))
                        + (g << RrGreenOffset(inst))
@@ -114,9 +114,9 @@ void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 p8[x] = pickColor(inst,
-                                  data[x] >> default_red_offset,
-                                  data[x] >> default_green_offset,
-                                  data[x] >> default_blue_offset)->pixel;
+                                  data[x] >> RrDefaultRedOffset,
+                                  data[x] >> RrDefaultGreenOffset,
+                                  data[x] >> RrDefaultBlueOffset)->pixel;
         }
         data += im->width;
         p8 += im->bytes_per_line;
@@ -182,7 +182,7 @@ void increase_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     RrPixel16 *p16 = (RrPixel16 *) im->data;
     unsigned char *p8 = (unsigned char *)im->data;
 
-    if (im->byte_order != render_endian)
+    if (im->byte_order != RrEndian)
         swap_byte_order(im);
 
     switch (im->bits_per_pixel) {
@@ -192,10 +192,10 @@ void increase_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
                 r = (p32[x] >> RrRedOffset(inst)) & 0xff;
                 g = (p32[x] >> RrGreenOffset(inst)) & 0xff;
                 b = (p32[x] >> RrBlueOffset(inst)) & 0xff;
-                data[x] = (r << default_red_offset)
-                    + (g << default_green_offset)
-                    + (b << default_blue_offset)
-                    + (0xff << default_alpha_offset);
+                data[x] = (r << RrDefaultRedOffset)
+                    + (g << RrDefaultGreenOffset)
+                    + (b << RrDefaultBlueOffset)
+                    + (0xff << RrDefaultAlphaOffset);
             }
             data += im->width;
             p32 += im->bytes_per_line/4;
@@ -213,10 +213,10 @@ void increase_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
                 b = (p16[x] & RrBlueMask(inst)) >>
                     RrBlueOffset(inst) <<
                     RrBlueShift(inst);
-                data[x] = (r << default_red_offset)
-                    + (g << default_green_offset)
-                    + (b << default_blue_offset)
-                    + (0xff << default_alpha_offset);
+                data[x] = (r << RrDefaultRedOffset)
+                    + (g << RrDefaultGreenOffset)
+                    + (b << RrDefaultBlueOffset)
+                    + (0xff << RrDefaultAlphaOffset);
             }
             data += im->width;
             p16 += im->bytes_per_line/2;
@@ -229,7 +229,7 @@ void increase_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 if (!(((p8[x / 8]) >> (x % 8)) & 0x1))
-                    data[x] = 0xff << default_alpha_offset; /* black */
+                    data[x] = 0xff << RrDefaultAlphaOffset; /* black */
                 else
                     data[x] = 0xffffffff; /* white */
             }

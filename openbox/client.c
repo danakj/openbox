@@ -1340,10 +1340,10 @@ void client_update_icons(Client *self)
                     ++y;
                 }
                 self->icons[j].data[t] =
-                    (((data[i] >> 24) & 0xff) << default_alpha_offset) +
-                    (((data[i] >> 16) & 0xff) << default_red_offset) +
-                    (((data[i] >> 8) & 0xff) << default_green_offset) +
-                    (((data[i] >> 0) & 0xff) << default_blue_offset);
+                    (((data[i] >> 24) & 0xff) << RrDefaultAlphaOffset) +
+                    (((data[i] >> 16) & 0xff) << RrDefaultRedOffset) +
+                    (((data[i] >> 8) & 0xff) << RrDefaultGreenOffset) +
+                    (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
             }
 	    g_assert(i <= num);
 	}

@@ -11,7 +11,7 @@
 #include "focus.h"
 #include "dispatch.h"
 #include "extensions.h"
-#include "../render/render.h"
+#include "render/render.h"
 
 #ifdef USE_LIBSN
 #  define SN_API_NOT_YET_FROZEN

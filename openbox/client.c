@@ -851,15 +851,14 @@ static void client_get_state(ObClient *self)
     }
 
     if (!(self->above || self->below)) {
-        if (client_has_group_siblings(self)) {
+        if (self->group) {
             /* apply stuff from the group */
             GSList *it;
-            gint layer = -1;
+            gint layer = -2;
 
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
-                if (c != self && !client_search_transient(self, c) &&
-                    client_normal(c) == client_normal(self))
+                if (c != self && !client_search_transient(self, c))
                 {
                     layer = MAX(layer,
                                 (c->above ? 1 : (c->below ? -1 : 0)));
@@ -869,6 +868,7 @@ static void client_get_state(ObClient *self)
             case -1:
                 self->below = TRUE;
                 break;
+            case -2:
             case 0:
                 break;
             case 1:
@@ -1096,6 +1096,9 @@ void client_update_normal_hints(ObClient *self)
 
     /* get the hints from the window */
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
+        /* normal windows can't request placement! har har
+        if (!client_normal(self))
+        */
         self->positioned = !!(size.flags & (PPosition|USPosition));
 
         if (size.flags & PWinGravity) {
@@ -1796,12 +1799,31 @@ void client_calc_layer(ObClient *self)
 
 gboolean client_should_show(ObClient *self)
 {
-    if (self->iconic) return FALSE;
-    else if (!(self->desktop == screen_desktop ||
-               self->desktop == DESKTOP_ALL)) return FALSE;
-    else if (client_normal(self) && screen_showing_desktop) return FALSE;
+    if (self->iconic)
+        return FALSE;
+    if (client_normal(self) && screen_showing_desktop)
+        return FALSE;
+    /*
+    if (self->transient_for) {
+        if (self->transient_for != OB_TRAN_GROUP)
+            return client_should_show(self->transient_for);
+        else {
+            GSList *it;
+
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                ObClient *c = it->data;
+                if (c != self && !c->transient_for) {
+                    if (client_should_show(c))
+                        return TRUE;
+                }
+            }
+        }
+    }
+    */
+    if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
+        return TRUE;
     
-    return TRUE;
+    return FALSE;
 }
 
 static void client_showhide(ObClient *self)

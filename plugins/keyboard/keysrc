@@ -70,6 +70,7 @@
 #  * PreviousDesktopRowWrap - Switches to the desktop in the previous row,
 #                             based on the desktop layout set by a pager
 #                             (wrapping around the first and last rows)
+#  * ToggleDecorations - Toggles all decorations around a window on and off
 #  * MoveRelativeHorz - Moves the focused client horizontally
 #      * Takes a number argument which specifies the amount to move the window.
 #	 A positive number moves to the right, negative to the left.

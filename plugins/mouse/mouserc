@@ -98,6 +98,7 @@
 #  * PreviousDesktopRowWrap - Switches to the desktop in the previous row,
 #                             based on the desktop layout set by a pager
 #                             (wrapping around the first and last rows)
+#  * ToggleDecorations - Toggles all decorations around a window on and off
 #  * Restart - Restarts Openbox
 #  * Exit - Exits Openbox
 #

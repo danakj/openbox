@@ -319,15 +319,15 @@ def placewindows_random(data):
     if not data.client: return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
-    screen = display.screenInfo(data.screen)
-    width = screen.width() - (client_area.width() +
-                              frame_size.left + frame_size.right)
-    height = screen.height() - (client_area.height() + 
-                                frame_size.top + frame_size.bottom)
+    screen_area = openbox.screen(data.screen).area()
+    width = screen_area.width() - (client_area.width() +
+                                   frame_size.left + frame_size.right)
+    height = screen_area.height() - (client_area.height() + 
+                                     frame_size.top + frame_size.bottom)
     global ob_rand
     if not ob_rand: ob_rand = random.Random()
-    x = ob_rand.randrange(0, width-1)
-    y = ob_rand.randrange(0, height-1)
+    x = ob_rand.randrange(screen_area.x(), width-1)
+    y = ob_rand.randrange(screen_area.y(), height-1)
     data.client.move(x, y)
 
 

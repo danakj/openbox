@@ -84,38 +84,4 @@ void OBBackgroundWidget::adjust()
   // nothing to adjust here. its done in OBFrame::adjustSize
 }
 
-void OBBackgroundWidget::grabButtons(bool grab)
-{
-  if (grab) {
-    // grab simple button clicks on the client, but pass them through too
-    otk::OBDisplay::grabButton(Button1, 0, _window, true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _window, None, false);
-    otk::OBDisplay::grabButton(Button2, 0, _window, true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _window, None, false);
-    otk::OBDisplay::grabButton(Button3, 0, _window, true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _window, None, false);
-    otk::OBDisplay::grabButton(Button4, 0, _window, true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _window, None, false);
-    otk::OBDisplay::grabButton(Button5, 0, _window, true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _window, None, false);
-  } else {
-    otk::OBDisplay::ungrabButton(Button1, 0, _window);
-    otk::OBDisplay::ungrabButton(Button2, 0, _window);
-    otk::OBDisplay::ungrabButton(Button3, 0, _window);
-    otk::OBDisplay::ungrabButton(Button4, 0, _window);
-    otk::OBDisplay::ungrabButton(Button5, 0, _window);
-  }
-}
-
-void OBBackgroundWidget::buttonPressHandler(const XButtonEvent &e)
-{
-  if (type() == OBWidget::Type_Plate)
-    XAllowEvents(otk::OBDisplay::display, ReplayPointer, e.time);
-}
-
 }

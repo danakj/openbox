@@ -22,9 +22,6 @@ public:
 
   virtual void focus();
   virtual void unfocus();
-
-  void grabButtons(bool grab);
-  virtual void buttonPressHandler(const XButtonEvent &e);
 };
 
 }

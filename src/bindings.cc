@@ -459,6 +459,12 @@ void OBBindings::fireButton(ButtonData *data)
 {
   printf("but.mods %d.%d\n", data->button, data->state);
   
+  if (data->context == MC_Window) {
+    // these are grabbed in Sync mode to allow the press to be normal to the
+    // client
+    XAllowEvents(otk::OBDisplay::display, ReplayPointer, data->time);
+  }
+  
   ButtonBindingList::iterator it, end = _buttons[data->context].end();
   for (it = _buttons[data->context].begin(); it != end; ++it)
     if ((*it)->binding.key == data->button &&

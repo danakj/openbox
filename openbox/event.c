@@ -297,7 +297,7 @@ static void event_handle_root(XEvent *e)
 	msgtype = e->xclient.message_type;
 	if (msgtype == prop_atoms.net_current_desktop) {
 	    unsigned int d = e->xclient.data.l[0];
-	    if (d <= screen_num_desktops)
+	    if (d < screen_num_desktops)
 		screen_set_desktop(d);
 	} else if (msgtype == prop_atoms.net_number_of_desktops) {
 	    unsigned int d = e->xclient.data.l[0];
@@ -482,7 +482,8 @@ static void event_handle_client(Client *client, XEvent *e)
 		}
 		e->xclient = ce.xclient;
 	    }
-            if ((unsigned)e->xclient.data.l[0] < screen_num_desktops)
+            if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
+                (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0]);
 	} else if (msgtype == prop_atoms.net_wm_state) {
 	    /* can't compress these */

@@ -1198,8 +1198,6 @@ void event_ignore_queued_enters()
                 
     XSync(ob_display, FALSE);
 
-    ob_debug("Trying to ignore\n");
-
     /* count the events */
     while (TRUE) {
         e = g_new(XEvent, 1);
@@ -1207,12 +1205,8 @@ void event_ignore_queued_enters()
             ObWindow *win;
             
             win = g_hash_table_lookup(window_map, &e->xany.window);
-            if (win && WINDOW_IS_CLIENT(win)) {
-                ob_debug("skipping enter event on 0x%lx\n", e->xany.window);
+            if (win && WINDOW_IS_CLIENT(win))
                 ++ignore_enter_focus;
-            } else
-                ob_debug("NOT skipping enter event on 0x%lx\n",
-                         e->xany.window);
             
             saved = g_slist_append(saved, e);
         } else {

@@ -110,9 +110,9 @@ Screen::Screen(int screen)
   std::vector<otk::ustring> names;
   python_get_stringlist("desktop_names", &names);
   openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_desktop_names,
-                                     otk::Property::utf8,
-                                     names);
+                           otk::Property::net_desktop_names,
+                           otk::Property::utf8,
+                           names);
   // the above set() will cause the updateDesktopNames to fire right away so
   // we have a list of desktop names
 

@@ -433,11 +433,11 @@ void screen::cycleWindow(const bool forward, const bool alldesktops,
                          const bool sameclass, const string &cn) const {
   assert(_managed);
 
-  WindowList::const_iterator target = _active;
+  string classname(cn);
+  if (sameclass && classname.empty() && _active != _clients.end())
+    classname = (*_active)->appClass();
 
-  string classname = cn;
-  if (sameclass && classname.empty() && target != _clients.end())
-    classname = (*target)->appClass();
+  WindowList::const_iterator target = _active;
 
   if (target == _clients.end())
     target = _clients.begin();

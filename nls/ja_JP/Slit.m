@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Slit
+# スリット
 $ #SlitDirection
-# Slit の方向
+# スリットの方向
 $ #SlitPlacement
-# Slit の配置
+# スリットの配置

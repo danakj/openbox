@@ -7,10 +7,10 @@ $ #SignalCaught
 $ #ShuttingDown
 # 終了\n
 $ #Aborting
-# 中止 ... コアダンプします\n
+# 中止 ... コアダンプ中.\n
 $ #XConnectFail
 # BaseDisplay::BaseDisplay: X サーバへの接続に失敗\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: couldn't mark display connection as close-on-exec\n
+# BaseDisplay::BaseDisplay: ディスプレイ接続に実行時クローズフラグをたてることができませんでした\n
 $ #BadWindowRemove
 # BaseDisplay::eventLoop(): イベントキューから不正なウィンドウを消します\n

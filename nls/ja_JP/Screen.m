@@ -2,13 +2,13 @@ $set 6 #Screen
 
 $ #AnotherWMRunning
 # BScreen::BScreen: X サーバ問合せ中にエラー発生\n  \
-another window manager is already running on display %s.\n
+他のウィンドウマネージャがディスプレイ %s で既に実行中です.\n
 $ #ManagingScreen
-# BScreen::BScreen: スクリーン %d を視覚効果 0x%lx, 深さ %d で制御\n
+# BScreen::BScreen: スクリーン %d を視覚効果 0x%lx, 深度 %d で制御中\n
 $ #FontLoadFail
 # BScreen::LoadStyle(): フォント '%s' を読み込めませんでした\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): デフォルトフォントを読み込めませんでした\n
+# BScreen::LoadStyle(): 標準フォントを読み込めませんでした\n
 $ #EmptyMenuFile
 # %s: 空のメニューファイル\n
 $ #xterm
@@ -18,17 +18,17 @@ $ #Restart
 $ #Exit
 # 終了
 $ #EXECError
-# BScreen::parseMenuFile: [exec] エラー、メニューラベルと(あるいは)コマンド未定義\n
+# BScreen::parseMenuFile: [exec] エラー、メニューラベル(コマンド)未定義\n
 $ #EXITError
 # BScreen::parseMenuFile: [exit] エラー、メニューラベル未定義\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] エラー、メニューラベルと(あるいは)ファイル名未定義\n
+# BScreen::parseMenuFile: [style] エラー、メニューラベル(ファイル名)未定義\n
 $ #CONFIGError
 # BScreen::parseMenuFile: [config] エラー、メニューラベル未定義\n
 $ #INCLUDEError
 # BScreen::parseMenuFile: [include] エラー、ファイル名未定義\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] エラー、'%s' はレギュラーファイルではありません\n
+# BScreen::parseMenuFile: [include] エラー、'%s' は正規ファイルではありません\n
 $ #SUBMENUError
 # BScreen::parseMenuFile: [submenu] エラー、メニューラベル未定義\n
 $ #RESTARTError

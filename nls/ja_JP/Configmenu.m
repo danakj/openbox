@@ -9,19 +9,21 @@ $ #WindowPlacement
 $ #ImageDithering
 # 画像ディザ
 $ #OpaqueMove
-# ウィンドウ不透明移動
+# 不透明にしてウィンドウを移動
 $ #FullMax
 # 完全最大化
 $ #FocusNew
 # 新規ウィンドウにフォーカス
 $ #FocusLast
-# ワークスペース変更時にウィンドウにフォーカス
+# ワークスペース移動時にウィンドウにフォーカス
 $ #ClickToFocus
-# Click to Focus
+# クリックでフォーカス
 $ #SloppyFocus
 # Sloppy Focus
 $ #AutoRaise
-# 自動的に前面に出す
+# 自動的に前面に
+$ #ClickRaise
+# クリックで前面に
 $ #SmartRows
 # 賢く配置 (行)
 $ #SmartCols

@@ -17,6 +17,6 @@ $ #NoStrftimeTimeFormatA
 $ #ToolbarTitle
 # ツールバー
 $ #EditWkspcName
-# 今のワークスペース名を編集
+# 現ワークスペース名を編集
 $ #ToolbarPlacement
-# ツールバーの位置
+# ツールバーの配置

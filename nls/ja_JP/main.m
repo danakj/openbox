@@ -19,8 +19,8 @@ $ #Usage
   -help\t\t\t\tこのヘルプを表示し、終了\n\n
 $ #CompileOptions
 # コンパイル時オプション:\n\
-  Debugging\t\t\t%s\n\
+  デバッグ\t\t\t%s\n\
   Shape:\t\t\t%s\n\
   Xft:\t\t\t\t%s\n\
   Xinerama:\t\t\t%s\n\
-  8bpp Ordered Dithering:\t%s\n\n
+  8bpp ディザ:\t%s\n\n

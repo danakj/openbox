@@ -5,4 +5,4 @@ $ #WorkspacesTitle
 $ #NewWorkspace
 # 新規ワークスペース
 $ #RemoveLast
-# 末尾のワークスペースを消す
+# 末尾ワークスペース消去

@@ -1,7 +1,7 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# 送り先 ...
+# 送り先...
 $ #Shade
 # シェード
 $ #Iconify
@@ -9,9 +9,9 @@ $ #Iconify
 $ #Maximize
 # 最大化
 $ #Raise
-# 前面に出す
+# 前面に
 $ #Lower
-# 背面に下げる
+# 後面に
 $ #Stick
 # 居座り
 $ #KillClient

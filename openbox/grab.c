@@ -32,10 +32,21 @@
 
 /*! A list of all possible combinations of keyboard lock masks */
 static unsigned int mask_list[MASK_LIST_SIZE];
+static guint kgrabs = 0;
+static guint pgrabs = 0;
+
+gboolean grab_on_keyboard()
+{
+    return kgrabs > 0;
+}
+
+gboolean grab_on_pointer()
+{
+    return pgrabs > 0;
+}
 
 gboolean grab_keyboard(gboolean grab)
 {
-    static guint kgrabs = 0;
     gboolean ret = FALSE;
 
     if (grab) {
@@ -56,7 +67,6 @@ gboolean grab_keyboard(gboolean grab)
 
 gboolean grab_pointer(gboolean grab, ObCursor cur)
 {
-    static guint pgrabs = 0;
     gboolean ret = FALSE;
 
     if (grab) {
@@ -77,7 +87,6 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
 
 gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
 {
-    static guint pgrabs = 0;
     gboolean ret = FALSE;
 
     if (grab) {

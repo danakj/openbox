@@ -1,6 +1,6 @@
 # data/Makefile.am for Openbox
 
-SUBDIRS = styles
+SUBDIRS = styles buttons
 CLEANFILES = menu
 MAINTAINERCLEANFILES = Makefile.in
 

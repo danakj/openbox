@@ -91,3 +91,7 @@ bbpager.desktop.focus:		flat interlaced crossdiagonal gradient
 bbpager.desktop.focus.color:	rgb:6/9/c
 bbpager.desktop.focus.colorTo:	rgb:3/48/6
 
+window.button.max.mask: max.xbm
+window.button.icon.mask: icon.xbm
+window.button.stick.mask: stick.xbm
+window.button.close.mask: close.xbm

@@ -15,6 +15,9 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 
+dnl Determine if maintainer portions of the Makefiles should be included.
+AM_MAINTAINER_MODE
+
 AC_LANG(C++)
 
 AC_CHECK_PROGS(regex_cmd, sed)
@@ -294,9 +297,6 @@ fi
 
 dnl Determine the return type of signal handlers
 AC_TYPE_SIGNAL
-
-dnl Determine if maintainer portions of the Makefiles should be included.
-AM_MAINTAINER_MODE
 
 dnl Print results
 AC_MSG_RESULT([])

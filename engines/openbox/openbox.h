@@ -4,6 +4,7 @@
 #include "../../render/render.h"
 #include "../../render/color.h"
 #include "../../render/font.h"
+#include "../../render/mask.h"
 
 extern int s_bevel;
 extern int s_handle_height;
@@ -15,11 +16,18 @@ extern color_rgb *s_cb_focused_color;
 extern color_rgb *s_cb_unfocused_color;
 extern color_rgb *s_title_focused_color;
 extern color_rgb *s_title_unfocused_color;
+extern color_rgb *s_titlebut_focused_color;
+extern color_rgb *s_titlebut_unfocused_color;
 
 extern int s_winfont_height;
 extern int s_winfont_shadow;
 extern int s_winfont_shadow_offset;
 extern ObFont *s_winfont;
+
+extern pixmap_mask *s_max_mask;
+extern pixmap_mask *s_icon_mask;
+extern pixmap_mask *s_desk_mask;
+extern pixmap_mask *s_close_mask;
 
 extern Appearance *a_focused_unpressed_max;
 extern Appearance *a_focused_pressed_max;

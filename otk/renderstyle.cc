@@ -455,7 +455,7 @@ bool RenderStyle::loadStyle(RenderStyle *s, int screen,
   s->_icon_mask = new PixmapMask();
   s->_icon_mask->w = s->_icon_mask->h = 7;
   {
-    char data[] = {0x00, 0x00, 0x00, 0x00, 0x3e, 0x3e, 0x3e };
+    char data[] = { 0x00, 0x00, 0x00, 0x00, 0x3e, 0x3e, 0x3e };
     s->_icon_mask->mask =
       XCreateBitmapFromData(**display,
                             display->screenInfo(screen)->rootWindow(),

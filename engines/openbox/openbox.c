@@ -7,6 +7,7 @@
 #include "../../render/render.h"
 #include "../../render/color.h"
 #include "../../render/font.h"
+#include "../../render/mask.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -33,11 +34,18 @@ color_rgb *s_cb_focused_color;
 color_rgb *s_cb_unfocused_color;
 color_rgb *s_title_focused_color;
 color_rgb *s_title_unfocused_color;
+color_rgb *s_titlebut_focused_color;
+color_rgb *s_titlebut_unfocused_color;
 /* style settings - fonts */
 int s_winfont_height;
 int s_winfont_shadow;
 int s_winfont_shadow_offset;
 ObFont *s_winfont;
+/* style settings - masks */
+pixmap_mask *s_max_mask;
+pixmap_mask *s_icon_mask;
+pixmap_mask *s_desk_mask;
+pixmap_mask *s_close_mask;
 
 /* global appearances */
 Appearance *a_focused_unpressed_max;
@@ -135,13 +143,15 @@ gboolean startup()
     g_quark_from_string("close");
 
     s_b_color = s_cb_unfocused_color = s_cb_focused_color = 
-        s_title_unfocused_color = s_title_focused_color = NULL;
+        s_title_unfocused_color = s_title_focused_color = 
+        s_titlebut_unfocused_color = s_titlebut_focused_color = NULL;
     s_winfont = NULL;
+    s_max_mask = s_icon_mask = s_desk_mask = s_close_mask = NULL;
 
-    a_focused_unpressed_max = appearance_new(Surface_Planar, 0);//1);
-    a_focused_pressed_max = appearance_new(Surface_Planar, 0);//1);
-    a_unfocused_unpressed_max = appearance_new(Surface_Planar, 0);//1);
-    a_unfocused_pressed_max = appearance_new(Surface_Planar, 0);//1);
+    a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
+    a_focused_pressed_max = appearance_new(Surface_Planar, 1);
+    a_unfocused_unpressed_max = appearance_new(Surface_Planar, 1);
+    a_unfocused_pressed_max = appearance_new(Surface_Planar, 1);
     a_focused_unpressed_close = NULL;
     a_focused_pressed_close = NULL;
     a_unfocused_unpressed_close = NULL;
@@ -174,6 +184,15 @@ void shutdown()
     if (s_cb_focused_color != NULL) color_free(s_cb_focused_color);
     if (s_title_unfocused_color != NULL) color_free(s_title_unfocused_color);
     if (s_title_focused_color != NULL) color_free(s_title_focused_color);
+    if (s_titlebut_unfocused_color != NULL)
+        color_free(s_titlebut_unfocused_color);
+    if (s_titlebut_focused_color != NULL)
+        color_free(s_titlebut_focused_color);
+
+    if (s_max_mask != NULL) pixmap_mask_free(s_max_mask);
+    if (s_desk_mask != NULL) pixmap_mask_free(s_desk_mask);
+    if (s_icon_mask != NULL) pixmap_mask_free(s_icon_mask);
+    if (s_close_mask != NULL) pixmap_mask_free(s_close_mask);
 
     if (s_winfont != NULL) font_close(s_winfont);
 

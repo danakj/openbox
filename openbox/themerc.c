@@ -144,7 +144,7 @@ void themerc_startup()
     if (themerc_titlebar_layout == NULL)
 	themerc_titlebar_layout = g_strdup("NDLIMC");
     if (themerc_font == NULL)
-	themerc_font = g_strdup("sans-8");
+	themerc_font = g_strdup("sans-7");
 }
 
 void themerc_shutdown()

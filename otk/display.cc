@@ -197,7 +197,7 @@ Display::~Display()
 }
 
 
-const ScreenInfo* Display::screenInfo(int snum)
+const ScreenInfo* Display::screenInfo(int snum) const
 {
   assert(snum >= 0);
   assert(snum < (signed) ScreenCount(_display));
@@ -205,7 +205,7 @@ const ScreenInfo* Display::screenInfo(int snum)
 }
 
 
-const ScreenInfo* Display::findScreen(Window root)
+const ScreenInfo* Display::findScreen(Window root) const
 {
   for (int i = 0; i < ScreenCount(_display); ++i)
     if (_screeninfo_list[i]->rootWindow() == root)
@@ -214,7 +214,7 @@ const ScreenInfo* Display::findScreen(Window root)
 }
 
 
-const RenderControl *Display::renderControl(int snum)
+const RenderControl *Display::renderControl(int snum) const
 {
   assert(snum >= 0);
   assert(snum < (signed) ScreenCount(_display));

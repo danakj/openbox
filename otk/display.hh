@@ -94,13 +94,13 @@ public:
     @param snum The screen number of the screen to retrieve info on
     @return Info on the requested screen, in a ScreenInfo class
   */
-  const ScreenInfo* screenInfo(int snum);
+  const ScreenInfo* screenInfo(int snum) const;
 
   //! Find a ScreenInfo based on a root window
-  const ScreenInfo* findScreen(Window root);
+  const ScreenInfo* findScreen(Window root) const;
 
   //! Gets the RenderControl for a screen
-  const RenderControl *renderControl(int snum);
+  const RenderControl *renderControl(int snum) const;
 
   //! Returns if the display has the xkb extension available
   inline bool xkb() const { return _xkb; }

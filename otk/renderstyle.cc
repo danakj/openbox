@@ -14,6 +14,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   : _screen(screen),
     _file(stylefile)
 {
+  _root_color = new RenderColor(_screen, 0x272a2f);
+  
   _text_color_focus = new RenderColor(_screen, 0x272a2f);
   _text_color_unfocus = new RenderColor(_screen, 0x676869);
 
@@ -220,6 +222,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
 
 RenderStyle::~RenderStyle()
 {
+  delete _root_color;
+  
   delete _text_color_focus;
   delete _text_color_unfocus;
 

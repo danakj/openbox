@@ -60,6 +60,13 @@ RenderControl::~RenderControl()
 
 }
 
+void RenderControl::drawRoot(const RenderColor &color) const
+{
+  Window root = display->screenInfo(_screen)->rootWindow();
+  XSetWindowBackground(**display, root, color.pixel());
+  XClearWindow(**display, root);
+}
+
 void RenderControl::drawString(Surface& sf, const Font &font, int x, int y,
 			       const RenderColor &color,
                                const ustring &string) const

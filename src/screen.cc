@@ -89,6 +89,7 @@ Screen::Screen(int screen)
   }
   _style.load(sconfig);
   */
+  otk::display->renderControl(_number)->drawRoot(*_style.rootColor());
 
   // set up notification of netwm support
   changeSupportedAtoms();

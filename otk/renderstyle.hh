@@ -27,6 +27,8 @@ public:
 private:
   int _screen;
   std::string _file;
+
+  RenderColor *_root_color;
   
   RenderColor *_text_color_focus;
   RenderColor *_text_color_unfocus;
@@ -74,6 +76,8 @@ public:
   virtual ~RenderStyle();
 
   inline int screen() const { return _screen; }
+  
+  inline RenderColor *rootColor() const { return _root_color; }
   
   inline RenderColor *textFocusColor() const { return _text_color_focus; }
   inline RenderColor *textUnfocusColor() const { return _text_color_unfocus; }

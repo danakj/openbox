@@ -134,8 +134,17 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   if (! rc) rc = "~/.openbox/rc";
   rc_file = expandTilde(rc);
   config.setFile(rc_file);  
-  if (! menu) menu = "~/.openbox/menu";
-  menu_file = expandTilde(menu);
+
+  string rcmenu;
+  if (! menu) {
+    //have to come up with something better than this
+    config.load();
+    if (! config.getValue("session.menuFile", rcmenu))
+      rcmenu = "~/.openbox/menu";
+  } else {
+    rcmenu = menu;
+  }
+  menu_file = expandTilde(rcmenu.c_str());
 
   no_focus = False;
 

@@ -1,5 +1,5 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
-// window.cc for Epistory - a key handler for NETWM/EWMH window managers.
+// window.cc for Epistophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

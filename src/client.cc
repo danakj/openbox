@@ -37,9 +37,7 @@ Client::Client(int screen, Window window)
   // update EVERYTHING the first time!!
 
   // we default to NormalState, visible
-  _wmstate = NormalState; _iconic = false;
-  // no default decors or functions, each has to be enabled
-  _decorations = _functions = 0;
+  _wmstate = NormalState;
   // start unfocused
   _focused = false;
   // not a transient by default of course
@@ -54,8 +52,7 @@ Client::Client(int screen, Window window)
   getType();
   getMwmHints();
 
-  getState(); // gets all the states except for iconic, which is found from
-              // the desktop == ICONIC_DESKTOP
+  getState();
   getShaped();
 
   updateProtocols();
@@ -66,23 +63,19 @@ Client::Client(int screen, Window window)
   
   getGravity();        // get the attribute gravity
   updateNormalHints(); // this may override the attribute gravity
-  updateWMHints(true); // also get the initial_state and set _iconic
+  // also get the initial_state and set _iconic if we aren't "starting"
+  // when we're "starting" that means we should use whatever state was already
+  // on the window over the initial map state, because it was already mapped
+  updateWMHints(openbox->state() != Openbox::State_Starting);
   updateTitle();
   updateIconTitle();
   updateClass();
   updateStrut();
 
-  // this makes sure that these windows:
-  // a) appear on all desktops
-  // b) don't start iconified
-  if (_type == Type_Dock || _type == Type_Desktop) {
+  // this makes sure that these windows appear on all desktops
+  if (_type == Type_Dock || _type == Type_Desktop)
     _desktop = 0xffffffff;
-  }
   
-  // restores iconic state when we restart.
-  // this will override the initial_state if that was set
-  if (_desktop == ICONIC_DESKTOP) _iconic = true;
-
   // set the desktop hint, to make sure that it always exists, and to reflect
   // any changes we've made here
   otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
@@ -307,7 +300,7 @@ void Client::getArea()
 void Client::getState()
 {
   _modal = _shaded = _max_horz = _max_vert = _fullscreen = _above = _below =
-    _skip_taskbar = _skip_pager = false;
+    _iconic = _skip_taskbar = _skip_pager = false;
   
   unsigned long *state;
   unsigned long num = (unsigned) -1;
@@ -319,6 +312,8 @@ void Client::getState()
         _modal = true;
       else if (state[i] == otk::Property::atoms.net_wm_state_shaded)
         _shaded = true;
+      else if (state[i] == otk::Property::atoms.net_wm_state_hidden)
+        _iconic = true;
       else if (state[i] == otk::Property::atoms.net_wm_state_skip_taskbar)
         _skip_taskbar = true;
       else if (state[i] == otk::Property::atoms.net_wm_state_skip_pager)
@@ -676,9 +671,10 @@ void Client::setDesktop(long target)
   
   _desktop = target;
 
-  // set the desktop hint
-  otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
-                     otk::Property::atoms.cardinal, (unsigned)_desktop);
+  // set the desktop hint, but not if we're iconifying
+  if (_desktop != ICONIC_DESKTOP)
+    otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
+                       otk::Property::atoms.cardinal, (unsigned)_desktop);
   
   // 'move' the window to the new desktop
   if (_desktop == openbox->screen(_screen)->desktop() ||
@@ -1166,8 +1162,8 @@ void Client::applyStartupState()
   // these are in a carefully crafted order..
 
   if (_iconic) {
+    printf("MAP ICONIC\n");
     _iconic = false;
-    _desktop = 0;    // set some other source desktop so this goes through
     setDesktop(ICONIC_DESKTOP);
   }
   if (_fullscreen) {

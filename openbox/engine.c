@@ -159,6 +159,10 @@ void engine_load()
         return;
     g_warning("Failed to load the engine '%s'", engine_name);
     g_message("Falling back to the default: '%s'", DEFAULT_ENGINE);
+    if (module != NULL) {
+	g_module_close(module);
+        module = NULL;
+    }
     if (!load(DEFAULT_ENGINE)) {
 	g_critical("Failed to load the engine '%s'. Aborting", DEFAULT_ENGINE);
 	exit(1);

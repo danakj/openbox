@@ -971,11 +971,11 @@ void Blackbox::process_event(XEvent *e) {
 bool Blackbox::handleSignal(int sig) {
   switch (sig) {
   case SIGHUP:
-    restart();
+    reconfigure();
     break;
 
   case SIGUSR1:
-    reconfigure();
+    restart();
     break;
 
   case SIGUSR2:

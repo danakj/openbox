@@ -164,7 +164,7 @@ void session_startup(gint *argc, gchar ***argv)
     sm_sessions_path = g_build_filename(parse_xdg_data_home_path(),
                                         "openbox", "sessions", NULL);
     if (!parse_mkdir_path(sm_sessions_path, 0700))
-        g_warning(_("unable to make directory '%s': %s"),
+        g_warning(_("Unable to make directory '%s': %s"),
                   sm_sessions_path, g_strerror(errno));
 
     if (save_file)

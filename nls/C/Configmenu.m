@@ -22,6 +22,8 @@ $ #WindowToWindowSnap
 # Window-To-Window Snapping
 $ #WindowCornerSnap
 # Window Corner Snapping
+$ #WorkspaceWarping
+# Workspace Warping
 $ #DisableBindings
 # Disable Mouse with Scroll Lock
 $ #HideToolbar

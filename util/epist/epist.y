@@ -24,7 +24,7 @@ void yyerror(const char *c) {
 
 %}
 
-%token OBRACE EBRACE SEMICOLON DASH NUMBER QUOTES WORD BINDING OPTIONS
+%token OBRACE EBRACE SEMICOLON DASH NUMBER QUOTES WORD BINDING OPTIONS TRUE FALSE
 
 %%
 
@@ -86,6 +86,8 @@ parameter:
     | NUMBER      { ((parser*)parser_obj)->setArgumentNum($1); }
     | DASH NUMBER { ((parser*)parser_obj)->setArgumentNegNum($2); }
     | QUOTES      { ((parser*)parser_obj)->setArgumentStr($1); }
+    | TRUE        { ((parser*)parser_obj)->setArgumentTrue($1); }
+    | FALSE       { ((parser*)parser_obj)->setArgumentFalse($1); }
     ;
 
 options_keyword:

@@ -83,8 +83,6 @@ const Action * keytree::getAction(const XEvent &e, unsigned int state,
     act = (*it)->action;
     if (e.xkey.keycode == act->keycode() && state == act->modifierMask()) {
       if ( isLeaf(*it) ) {
-	if (_current != _head)
-	  ungrabChildren(_current, scr);
 	_current = _head;
 	return act;
       }

@@ -3190,7 +3190,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
             snapped = True;
           }
           // snap bottom of other window?
-          else if (dbottom > 0 && dbottom < resistance_size) {
+          else if (dbottom >= 0 && dbottom < resistance_size) {
             dy = winrect.bottom() + 1;
             snapped = True;
           }

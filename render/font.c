@@ -57,7 +57,6 @@ static RrFont *openfont(const RrInstance *inst, char *fontstring)
         return NULL;
 
     match = XftFontMatch(RrDisplay(inst), RrScreen(inst), pat, &res);
-    FcPatternDestroy(pat);
     if (!match)
         return NULL;
 

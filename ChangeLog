@@ -1,54 +1,28 @@
 Changelog for Openbox:
 
-1.1.0:
- * bsetroot supports transparent applications by
-   setting the xrootpmap_id property on the root
-   window                                               (Sean Perry)
-
- * added ClickMouse window placement algorithm/type.    (Ben Jansens)
- 
- * added UnderMouse window placement algorithm/type.    (Ben Jansens)
-
+0.99.2:
  * improved logic for decorating windows when the
    decoration level is changed                          (Ben Jansens)
 
  * fix positioning of the window menu                   (Ben Jansens)
 
-1.0.0:
- * maximizing windows takes the slit into account as
-   well as the toolbar when 'Full Maximization' is off  (Ben Jansens)
-
- * better handling of the rc file and its configuration
-   options. The file is written each time an option in
-   the file is changed, instead of being written at
-   shutdown. This means that you can edit the file by
-   hand while in Openbox, and then choose reconfig or
-   restart to have it use the new rc file.              (Ben Jansens)
-
- * added a runtime option for hiding the toolbar.       (Scott Moynes)
-	
- * made shaded windows edge-snap correctly to the
-   bottom for their size instead for their unshaded
-   size.                                                (Ben Jansens)
-
- * added BestFit window placement algorithm/type.       (Ruhi Bloodworth)
-
+0.99.1:
  * forced a redraw of the close button after pressing
    it. Some applications (eg. acroread) ignore the
    close request and you end up with a funky close
    button.                                              (Scott Moynes)
 
- * fix positioning of the window menu                   (Ben Jansens)
-
 0.99.0:
+
  * renamed header files from *.hh to *.h.               (Ben Jansens)
 
  * fix clipping of the date/time in the toolbar with
    proportional fonts.                                  (Sean Perry, Ben Jansens)
 
  * added a --enable-clobber configuration option to
-   allow users to turn off the event clobbering by
-   hitting the numlock or scroll lock keys.		(Scott  Moynes)
+   allow users to run off the event clobbering taking
+   place so that Openbox wont grab mouse events when
+   num lock or scroll lock are on.                      (Scott Moynes)
 
  * window menu is inconsistant in that other menus
    ignore mouse button 2, but it did not, because of

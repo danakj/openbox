@@ -30,7 +30,8 @@ plugin_LTLIBRARIES = \
 	plugins/keyboard/keyboard.la \
 	plugins/menu/timed_menu.la \
 	plugins/menu/fifo_menu.la \
-	plugins/menu/client_menu.la
+	plugins/menu/client_menu.la \
+	plugins/menu/include_menu.la
 
 if OBCONF
 plugin_LTLIBRARIES += \
@@ -311,6 +312,21 @@ plugins_menu_client_menu_la_LDFLAGS = \
 plugins_menu_client_menu_la_SOURCES = \
 	plugins/menu/client_menu.c \
 	plugins/menu/client_menu.h
+
+plugins_menu_include_menu_la_CPPFLAGS = \
+	$(XFT_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(LIBSN_CFLAGS) \
+	$(XML_CFLAGS) \
+	-DPLUGINDIR=\"$(plugindir)\" \
+	-DG_LOG_DOMAIN=\"Plugin-Include-Menu\"
+plugins_menu_include_menu_la_LDFLAGS = \
+	-module \
+	-avoid-version
+plugins_menu_include_menu_la_SOURCES = \
+	plugins/menu/include_menu.c \
+	plugins/menu/include_menu.h
+
 
 ## themes ##
 

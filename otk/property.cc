@@ -216,13 +216,11 @@ bool Property::get(Window win, Atom atom, Atom type, unsigned long *nelements,
 {
   assert(win != None); assert(atom != None); assert(type != None);
   assert(size == 8 || size == 16 || size == 32);
-  assert(*nelements > 0);
   unsigned char *c_val = 0;        // value alloc'd in Xlib, must be XFree()d
   Atom ret_type;
   int ret_size;
   unsigned long ret_bytes;
   int result;
-  unsigned long maxread = *nelements;
   bool ret = false;
 
   // try get the first element
@@ -232,7 +230,7 @@ bool Property::get(Window win, Atom atom, Atom type, unsigned long *nelements,
   ret = (result == Success && ret_type == type && ret_size == size &&
          *nelements > 0);
   if (ret) {
-    if (ret_bytes == 0 || maxread <= *nelements) {
+    if (ret_bytes == 0) {
       // we got the whole property's value
       *value = new unsigned char[*nelements * size/8 + 1];
       memcpy(*value, c_val, *nelements * size/8 + 1);
@@ -241,9 +239,7 @@ bool Property::get(Window win, Atom atom, Atom type, unsigned long *nelements,
       XFree(c_val);
       // the number of longs that need to be retreived to get the property's
       // entire value. The last + 1 is the first long that we retrieved above.
-      int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
-      if (remain > size * (signed)maxread / 32) // dont get more than the max
-        remain = size * (signed)maxread / 32;
+      long remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
       result = XGetWindowProperty(**display, win, atom, 0l,
                                   remain, false, type, &ret_type, &ret_size,
                                   nelements, &ret_bytes, &c_val);
@@ -253,8 +249,9 @@ bool Property::get(Window win, Atom atom, Atom type, unsigned long *nelements,
         read of it, then stop here and try again. If it shrank, then this will
         still work.
       */
-      if (! ret)
-        return get(win, atom, type, &maxread, value, size);
+      if (! ret) {
+        return get(win, atom, type, nelements, value, size);
+      }
   
       *value = new unsigned char[*nelements * size/8 + 1];
       memcpy(*value, c_val, *nelements * size/8 + 1);
@@ -273,20 +270,23 @@ bool Property::get(Window win, Atom atom, Atom type, unsigned long *nelements,
 bool Property::get(Window win, Atom atom, Atom type, unsigned long *value)
 {
   unsigned long *temp;
-  unsigned long num = 1;
+  unsigned long num;
   if (! get(win, atom, type, &num, (unsigned char **) &temp, 32))
     return false;
-  *value = temp[0];
-  delete [] temp;
-  return true;
+  if (num >= 1) {
+    *value = temp[0];
+    delete [] temp;
+    return true;
+  }
+  return false;
 }
 
 bool Property::get(Window win, Atom atom, StringType type, ustring *value)
 {
-  unsigned long n = 1;
+  unsigned long n;
   StringVect s;
 
-  if (get(win, atom, type, &n, &s)) {
+  if (get(win, atom, type, &n, &s) && n > 0) {
     *value = s[0];
     return true;
   }
@@ -296,8 +296,6 @@ bool Property::get(Window win, Atom atom, StringType type, ustring *value)
 bool Property::get(Window win, Atom atom, StringType type,
                    unsigned long *nelements, StringVect *strings)
 {
-  assert(*nelements > 0);
-
   Atom t;
   bool u; // utf8 encoded?
   switch (type) {
@@ -307,7 +305,7 @@ bool Property::get(Window win, Atom atom, StringType type,
   }
   
   unsigned char *value;
-  unsigned long elements = (unsigned) -1;
+  unsigned long elements;;
   if (!get(win, atom, t, &elements, &value, 8) || elements < 1)
     return false;
 
@@ -316,7 +314,7 @@ bool Property::get(Window win, Atom atom, StringType type,
 
   std::string::const_iterator it = s.begin(), end = s.end();
   unsigned long num = 0;
-  while(num < *nelements) {
+  while(true) {
     std::string::const_iterator tmp = it; // current string.begin()
     it = std::find(tmp, end, '\0');       // look for null between tmp and end
     strings->push_back(std::string(tmp, it));   // s[tmp:it)

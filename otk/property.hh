@@ -230,10 +230,7 @@ public:
                 struct returned by Property::atoms.
     @param type The Atom value of the property type. This can be found in the
                 struct returned by Property::atoms.
-    @param nelements The maximum number of elements to retrieve from the
-                     property (assuming it has more than 1 value in it). To
-                     retrieve all possible elements, use "(unsigned) -1".<br>
-                     When the function returns, if it returns true, this will
+    @param nelements When the function returns, if it returns true, this will
                      contain the actual number of elements retrieved.<br>
     @param value If the function returns true, then this contains an array of
                  retrieved values for the property.<br>
@@ -282,10 +279,7 @@ public:
                 struct returned by Property::atoms.
     @param type A member of the Property::StringType enum that specifies the
                 type of the string property to retrieve
-    @param nelements The maximum number of strings to retrieve from the
-                     property (assuming it has more than 1 string in it). To
-                     retrieve all possible strings, use "(unsigned) -1".<br>
-                     When the function returns, if it returns true, this will
+    @param nelements When the function returns, if it returns true, this will
                      contain the actual number of strings retrieved.<br>
     @param strings If the function returns true, then this contains all of the
                    strings retrieved from the property's value.

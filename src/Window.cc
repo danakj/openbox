@@ -2842,7 +2842,7 @@ void BlackboxWindow::configureRequestEvent(const XConfigureRequestEvent *cr) {
     client.old_bw = cr->border_width;
 
   if (cr->value_mask & (CWX | CWY | CWWidth | CWHeight)) {
-    Rect req = frame.rect;
+    frame.changing = frame.rect;
 
     if (cr->value_mask & (CWX | CWY)) {
       if (cr->value_mask & CWX)
@@ -2850,16 +2850,45 @@ void BlackboxWindow::configureRequestEvent(const XConfigureRequestEvent *cr) {
       if (cr->value_mask & CWY)
         client.rect.setY(cr->y);
 
-      applyGravity(req);
+      applyGravity(frame.changing);
     }
 
-    if (cr->value_mask & CWWidth)
-      req.setWidth(cr->width + frame.margin.left + frame.margin.right);
+    if (cr->value_mask & (CWWidth | CWHeight)) {
+      if (cr->value_mask & CWWidth)
+        frame.changing.setWidth(cr->width +
+                                frame.margin.left + frame.margin.right);
 
-    if (cr->value_mask & CWHeight)
-      req.setHeight(cr->height + frame.margin.top + frame.margin.bottom);
+      if (cr->value_mask & CWHeight)
+        frame.changing.setHeight(cr->height +
+                                 frame.margin.top + frame.margin.bottom);
 
-    configure(req.x(), req.y(), req.width(), req.height());
+      /*
+        if a position change ha been specified, then that position will be used
+        instead of determining a position based on the window's gravity.
+      */
+      if (cr->value_mask & (CWX | CWY)) {
+        Corner corner;
+        switch (client.win_gravity) {
+        case NorthEastGravity:
+        case EastGravity:
+          corner = TopRight;
+          break;
+        case SouthWestGravity:
+        case SouthGravity:
+          corner = BottomLeft;
+          break;
+        case SouthEastGravity:
+          corner = BottomRight;
+          break;
+        default:     // NorthWest, Static, etc
+          corner = TopLeft;
+        }
+        constrain(corner);
+      }
+    }
+
+    configure(frame.changing.x(), frame.changing.y(),
+              frame.changing.width(), frame.changing.height());
   }
 
   if (cr->value_mask & CWStackMode && !isDesktop()) {

@@ -86,25 +86,25 @@ dnl Check for Xft extension support and proper library files.
 XFT=""
 AC_MSG_CHECKING([whether to build support for the Xft extension])
 AC_ARG_ENABLE(
-  xft, [  --enable-xft             enable support of the Xft extension [default=yes]])
-
-: ${enableval="yes"}
-if test x$enableval = "xyes"; then
-  AC_MSG_RESULT([yes])
-  AC_CHECK_LIB(Xft, XftFontOpenXlfd,
-    AC_MSG_CHECKING([for X11/Xft/Xft.h])
-    AC_TRY_LINK(
+  xft, [  --enable-xft             enable support of the Xft extension [default=no]],
+  if test x$enableval = "xyes"; then
+    AC_MSG_RESULT([yes])
+    AC_CHECK_LIB(Xft, XftFontOpenXlfd,
+      AC_MSG_CHECKING([for X11/Xft/Xft.h])
+      AC_TRY_LINK(
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
-, XftFont foo,
-      AC_MSG_RESULT([yes])
-      XFT="yes",
-      AC_MSG_RESULT([no])
+      , XftFont foo,
+        AC_MSG_RESULT([yes])
+        XFT="yes",
+        AC_MSG_RESULT([no])
+      )
     )
-  )
-else
-  AC_MSG_RESULT([no])
-fi
+  else
+    AC_MSG_RESULT([no])
+  fi,
+  	AC_MSG_RESULT([no])
+)
 if test x$XFT = "xyes"; then
   LIBS="$LIBS -lXft"
   AC_DEFINE(XFT,1,Enable support of the Xft extension)
@@ -261,6 +261,7 @@ nls/fr_FR/Makefile
 nls/hu_HU/Makefile
 nls/it_IT/Makefile
 nls/ja_JP/Makefile
+nls/ko_KR/Makefile
 nls/nl_NL/Makefile
 nls/pt_BR/Makefile
 nls/ru_RU/Makefile

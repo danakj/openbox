@@ -4,3 +4,5 @@ Makefile
 Makefile.in
 timed_menu.la
 timed_menu.lo
+fifo_menu.la
+fifo_menu.lo

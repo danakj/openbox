@@ -89,6 +89,8 @@ Display::Display()
   int junk;
   (void)junk;
 
+  display = this;
+  
   // Open the X display
   if (!(_display = XOpenDisplay(NULL))) {
     printf(_("Unable to open connection to the X server. Please set the \n\

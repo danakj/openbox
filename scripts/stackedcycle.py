@@ -217,7 +217,7 @@ class cycledata:
             not self.state & data.state):
             done = 1
         # has Escape been pressed?
-        if data.action == ob.KeyAction.Press and data.key == "Escape":
+        elif data.action == ob.KeyAction.Press and data.key == "Escape":
             done = 1
             # revert
             self.menupos = 0

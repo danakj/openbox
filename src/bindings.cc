@@ -17,9 +17,9 @@ extern "C" {
 namespace ob {
 
 #include <stdio.h>
-static void print_branch(BindingTree *first, std::string str)
+static void print_branch(const BindingTree *first, std::string str)
 {
-  BindingTree *p = first;
+  const BindingTree *p = first;
   
   while (p) {
     if (p->first_child)
@@ -95,7 +95,8 @@ static bool modvalue(const std::string &mod, unsigned int *val)
   return true;
 }
 
-bool OBBindings::translate(const std::string &str, Binding &b, bool askey)
+bool OBBindings::translate(const std::string &str, Binding &b,
+                           bool askey) const
 {
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -138,7 +139,7 @@ static void destroytree(BindingTree *tree)
   }
 }
 
-BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
+BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
 
@@ -240,8 +241,10 @@ void OBBindings::assimilate(BindingTree *node)
 }
 
 
-int OBBindings::find_key(BindingTree *search) {
+int OBBindings::find_key(BindingTree *search) const {
   BindingTree *a, *b;
+  print_branch(&_keytree, " Searching:");
+  print_branch(search, " for...");
   a = _keytree.first_child;
   b = search;
   while (a && b) {
@@ -249,10 +252,14 @@ int OBBindings::find_key(BindingTree *search) {
       a = a->next_sibling;
     } else {
       if (a->chain == b->chain) {
-	if (!a->chain)
+	if (!a->chain) {
+          printf("Match found with %s\n", a->text.c_str());
 	  return a->id; // found it! (return the actual id, not the search's)
-      } else
-	  return -2; // the chain status' don't match (conflict!)
+        }
+      } else {
+        printf("Conflict found with %s\n", a->text.c_str());
+        return -2; // the chain status' don't match (conflict!)
+      }
       b = b->first_child;
       a = a->first_child;
     }
@@ -271,6 +278,7 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
   
   if (find_key(tree) != -1) {
     // conflicts with another binding
+    printf("Conflict\n");
     destroytree(tree);
     return false;
   }

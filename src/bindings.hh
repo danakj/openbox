@@ -51,9 +51,9 @@ private:
 
   BindingTree *_mousetree; // this tree is a list. it has only siblings
   
-  int find_key(BindingTree *search);
-  bool translate(const std::string &str, Binding &b, bool askey);
-  BindingTree *buildtree(const StringVect &keylist, int id);
+  int find_key(BindingTree *search) const;
+  bool translate(const std::string &str, Binding &b, bool askey) const;
+  BindingTree *buildtree(const StringVect &keylist, int id) const;
   void OBBindings::assimilate(BindingTree *node);
  
 public:

@@ -118,6 +118,7 @@ XWindow *screen::findWindow(const XEvent &e) const {
 
 void screen::processEvent(const XEvent &e) {
   assert(_managed);
+  assert(e.xany.window == _root);
 
   switch (e.type) {
   case PropertyNotify:

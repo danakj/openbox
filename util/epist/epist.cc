@@ -253,16 +253,9 @@ bool epist::handleSignal(int sig) {
 
 
 void epist::process_event(XEvent *e) {
-  Window root;
-
-  if (e->xany.type == KeyPress)
-    root = e->xkey.root;
-  else
-    root = e->xany.window;
-  
   ScreenList::const_iterator it, end = _screens.end();
   for (it = _screens.begin(); it != end; ++it) {
-    if ((*it)->rootWindow() == root) {
+    if ((*it)->rootWindow() == e->xany.window) {
       (*it)->processEvent(*e);
       return;
     }

@@ -165,6 +165,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     &theme->title_unfocused_color))
 	theme->title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
+                    "window.button.focus.picColor",
+                    &theme->titlebut_focused_color))
+	theme->titlebut_focused_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "window.button.unfocus.picColor",
+                    &theme->titlebut_unfocused_color))
+	theme->titlebut_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
                     "window.button.disabled.focus.picColor",
                     &theme->titlebut_disabled_focused_color))
 	theme->titlebut_disabled_focused_color =
@@ -173,14 +181,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "window.button.disabled.unfocus.picColor",
                     &theme->titlebut_disabled_unfocused_color))
 	theme->titlebut_disabled_unfocused_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "window.button.focus.picColor",
-                    &theme->titlebut_focused_color))
-	theme->titlebut_focused_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "window.button.unfocus.picColor",
-                    &theme->titlebut_unfocused_color))
-	theme->titlebut_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "menu.title.textColor", &theme->menu_title_color))
         theme->menu_title_color = RrColorNew(inst, 0, 0, 0);

@@ -17,8 +17,10 @@ def random(client):
     cx, cy, cw, ch = client.area()
     sx, sy, sw, sh = ob.Openbox.screenArea(client.desktop())
     global _rand
-    x = Random().randrange(sx, sw - cw - 1)
-    y = Random().randrange(sy, sh - ch - 1)
+    if sw - cw - 1 <= 0: x = 0
+    else: x = Random().randrange(sx, sw - cw - 1)
+    if (sh - ch - 1 <= 0: y = 0
+    else: y = Random().randrange(sy, sh - ch - 1)
     client.setArea((x, y, cw, ch))
 
 def cascade(client):

@@ -4,7 +4,7 @@ scriptdir = $(libdir)/openbox/python
 CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
 -DBUTTONSDIR=\"$(buttonsdir)\" -DSWIG_GLOBAL
 
-INCLUDES= -I../src
+#INCLUDES= -I../src
 
 #noinst_LIBRARIES=libotk.a
 lib_LTLIBRARIES=libotk.la

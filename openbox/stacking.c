@@ -73,8 +73,7 @@ void stacking_raise(Client *client)
 
     stacking_list = g_list_insert_before(stacking_list, it, client);
 
-    if (client->frame->visible)
-        XRestackWindows(ob_display, wins, 2);
+    XRestackWindows(ob_display, wins, 2);
 
     stacking_set_list();
 }
@@ -117,8 +116,7 @@ void stacking_lower(Client *client)
 					     it->next, client);
     }
 
-    if (client->frame->visible)
-        XRestackWindows(ob_display, wins, 2);
+    XRestackWindows(ob_display, wins, 2);
     stacking_set_list();
 }
 

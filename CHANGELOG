@@ -1,7 +1,10 @@
 Changelog for Openbox:
 
 1.0.0:
- * better handling of teh rc file and its configuration
+ * maximizing windows takes the slit into account as
+   well as the toolbar when 'Full Maximization' is off  (Ben Jansens)
+
+ * better handling of the rc file and its configuration
    options. The file is written each time an option in
    the file is changed, instead of being written at
    shutdown. This means that you can edit the file by

@@ -49,6 +49,7 @@
 #include "Window.h"
 #include "Workspace.h"
 #include "Workspacemenu.h"
+#include "Util.h"
 
 #ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
@@ -588,6 +589,108 @@ BScreen::~BScreen(void) {
   XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.tstyle.b_pic_gc);
 }
+
+
+Rect BScreen::availableArea() const {
+  // the following code is temporary and will be taken care of by Screen in the
+  // future (with the NETWM 'strut')
+  Rect space(0, 0, size().w(), size().h());
+  if (!resource.full_max) {
+#ifdef    SLIT
+    int slit_x = slit->autoHide() ? slit->hiddenOrigin().x() : slit->area().x(),
+    slit_y = slit->autoHide() ? slit->hiddenOrigin().y() : slit->area().y();
+    int tbarh = resource.hide_toolbar ? 0 :
+      toolbar->getExposedHeight() + resource.border_width * 2;
+    bool tbartop;
+    switch (toolbar->placement()) {
+    case Toolbar::TopLeft:
+    case Toolbar::TopCenter:
+    case Toolbar::TopRight:
+      tbartop = true;
+      break;
+    case Toolbar::BottomLeft:
+    case Toolbar::BottomCenter:
+    case Toolbar::BottomRight:
+      tbartop = false;
+      break;
+    default:
+      ASSERT(false);      // unhandled placement
+    }
+    if ((slit->direction() == Slit::Horizontal &&
+         (slit->placement() == Slit::TopLeft ||
+          slit->placement() == Slit::TopRight)) ||
+        slit->placement() == Slit::TopCenter) {
+      // exclude top
+      if (tbartop && slit_y + slit->area().h() < tbarh) {
+        space.setY(space.y() + tbarh);
+        space.setH(space.h() - tbarh);
+      } else {
+        space.setY(space.y() + (slit_y + slit->area().h() +
+                                resource.border_width * 2));
+        space.setH(space.h() - (slit_y + slit->area().h() +
+                                resource.border_width * 2));
+        if (!tbartop)
+          space.setH(space.h() - tbarh);
+      }
+    } else if ((slit->direction() == Slit::Vertical &&
+                (slit->placement() == Slit::TopRight ||
+                 slit->placement() == Slit::BottomRight)) ||
+               slit->placement() == Slit::CenterRight) {
+      // exclude right
+      space.setW(space.w() - (size().w() - slit_x));
+      if (tbartop)
+        space.setY(space.y() + tbarh);
+      space.setH(space.h() - tbarh);
+    } else if ((slit->direction() == Slit::Horizontal &&
+                (slit->placement() == Slit::BottomLeft ||
+                 slit->placement() == Slit::BottomRight)) ||
+               slit->placement() == Slit::BottomCenter) {
+      // exclude bottom
+      if (!tbartop && (size().h() - slit_y) < tbarh) {
+        space.setH(space.h() - tbarh);
+      } else {
+        space.setH(space.h() - (size().h() - slit_y));
+        if (tbartop) {
+          space.setY(space.y() + tbarh);
+          space.setH(space.h() - tbarh);
+        }
+      }
+    } else {// if ((slit->direction() == Slit::Vertical &&
+      //      (slit->placement() == Slit::TopLeft ||
+      //       slit->placement() == Slit::BottomLeft)) ||
+      //     slit->placement() == Slit::CenterLeft)
+      // exclude left
+      space.setX(slit_x + slit->area().w() +
+                 resource.border_width * 2);
+      space.setW(space.w() - (slit_x + slit->area().w() +
+                              resource.border_width * 2));
+      if (tbartop)
+        space.setY(space.y() + tbarh);
+      space.setH(space.h() - tbarh);
+    }
+#else // !SLIT
+    int tbarh = resource.hide_toolbar() ? 0 :
+      toolbar->getExposedHeight() + resource.border_width * 2;
+    switch (toolbar->placement()) {
+    case Toolbar::TopLeft:
+    case Toolbar::TopCenter:
+    case Toolbar::TopRight:
+      space.setY(toolbar->getExposedHeight());
+      space.setH(space.h() - toolbar->getExposedHeight());
+      break;
+    case Toolbar::BottomLeft:
+    case Toolbar::BottomCenter:
+    case Toolbar::BottomRight:
+      space.setH(space.h() - tbarh);
+      break;
+    default:
+      ASSERT(false);      // unhandled placement
+    }
+#endif // SLIT
+  }
+  return space;
+}
+
 
 void BScreen::readDatabaseTexture(const char *rname, const char *rclass,
 				  BTexture *texture,

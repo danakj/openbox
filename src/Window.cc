@@ -1533,111 +1533,12 @@ void OpenboxWindow::maximize(unsigned int button) {
     return;
   }
 
-  // the following code is temporary and will be taken care of by Screen in the
-  // future (with the NETWM 'strut')
-  Rect space(0, 0, screen->size().w(), screen->size().h());
-  if (! screen->fullMax()) {
-#ifdef    SLIT
-    Slit *slit = screen->getSlit();
-    int slit_x = slit->autoHide() ? slit->hiddenOrigin().x() : slit->area().x(),
-        slit_y = slit->autoHide() ? slit->hiddenOrigin().y() : slit->area().y();
-    Toolbar *toolbar = screen->getToolbar();
-    int tbarh = screen->hideToolbar() ? 0 :
-      toolbar->getExposedHeight() + screen->getBorderWidth() * 2;
-    bool tbartop;
-    switch (toolbar->placement()) {
-    case Toolbar::TopLeft:
-    case Toolbar::TopCenter:
-    case Toolbar::TopRight:
-      tbartop = true;
-      break;
-    case Toolbar::BottomLeft:
-    case Toolbar::BottomCenter:
-    case Toolbar::BottomRight:
-      tbartop = false;
-      break;
-    default:
-      ASSERT(false);      // unhandled placement
-    }
-    if ((slit->direction() == Slit::Horizontal &&
-         (slit->placement() == Slit::TopLeft ||
-          slit->placement() == Slit::TopRight)) ||
-        slit->placement() == Slit::TopCenter) {
-      // exclude top
-      if (tbartop && slit_y + slit->area().h() < tbarh) {
-        space.setY(space.y() + tbarh);
-        space.setH(space.h() - tbarh);
-      } else {
-        space.setY(space.y() + (slit_y + slit->area().h() +
-                                screen->getBorderWidth() * 2));
-        space.setH(space.h() - (slit_y + slit->area().h() +
-                                screen->getBorderWidth() * 2));
-        if (!tbartop)
-          space.setH(space.h() - tbarh);
-      }
-    } else if ((slit->direction() == Slit::Vertical &&
-              (slit->placement() == Slit::TopRight ||
-               slit->placement() == Slit::BottomRight)) ||
-             slit->placement() == Slit::CenterRight) {
-      // exclude right
-      space.setW(space.w() - (screen->size().w() - slit_x));
-      if (tbartop)
-        space.setY(space.y() + tbarh);
-      space.setH(space.h() - tbarh);
-    } else if ((slit->direction() == Slit::Horizontal &&
-              (slit->placement() == Slit::BottomLeft ||
-               slit->placement() == Slit::BottomRight)) ||
-             slit->placement() == Slit::BottomCenter) {
-      // exclude bottom
-      if (!tbartop && (screen->size().h() - slit_y) < tbarh) {
-        space.setH(space.h() - tbarh);
-      } else {
-        space.setH(space.h() - (screen->size().h() - slit_y));
-        if (tbartop) {
-          space.setY(space.y() + tbarh);
-          space.setH(space.h() - tbarh);
-        }
-      }
-    } else {// if ((slit->direction() == Slit::Vertical &&
-      //      (slit->placement() == Slit::TopLeft ||
-      //       slit->placement() == Slit::BottomLeft)) ||
-      //     slit->placement() == Slit::CenterLeft)
-      // exclude left
-      space.setX(slit_x + slit->area().w() +
-                 screen->getBorderWidth() * 2);
-      space.setW(space.w() - (slit_x + slit->area().w() +
-                              screen->getBorderWidth() * 2));
-      if (tbartop)
-        space.setY(space.y() + tbarh);
-      space.setH(space.h() - tbarh);
-    }
-#else // !SLIT
-    Toolbar *toolbar = screen->getToolbar();
-    int tbarh = screen->hideToolbar() ? 0 :
-      toolbar->getExposedHeight() + screen->getBorderWidth() * 2;
-    switch (toolbar->placement()) {
-    case Toolbar::TopLeft:
-    case Toolbar::TopCenter:
-    case Toolbar::TopRight:
-      space.setY(toolbar->getExposedHeight());
-      space.setH(space.h() - toolbar->getExposedHeight());
-      break;
-    case Toolbar::BottomLeft:
-    case Toolbar::BottomCenter:
-    case Toolbar::BottomRight:
-      space.setH(space.h() - tbarh);
-      break;
-    default:
-      ASSERT(false);      // unhandled placement
-    }
-#endif // SLIT
-  }
-
   openbox_attrib.premax_x = frame.x;
   openbox_attrib.premax_y = frame.y;
   openbox_attrib.premax_w = frame.width;
   openbox_attrib.premax_h = frame.height;
 
+  Rect space = screen->availableArea();
   unsigned int dw = space.w(),
                dh = space.h();
   dw -= frame.border_w * 2;

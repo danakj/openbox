@@ -187,6 +187,8 @@ public:
 
   inline Toolbar *getToolbar() { return toolbar; }
 
+  Rect availableArea() const;
+  
   inline Workspace *getWorkspace(int w) { return workspacesList->find(w); }
   inline Workspace *getCurrentWorkspace() { return current_workspace; }
 

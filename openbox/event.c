@@ -1010,6 +1010,10 @@ static void event_handle_menu(ObClient *client, XEvent *e)
                 }
             }
         }
+
+        /* will call the menu_hide() for each submenu as well */
+        if (!it)
+            menu_hide(menu_visible->data);
 	
         break;
     case MotionNotify:

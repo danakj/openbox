@@ -269,6 +269,10 @@ void client_manage(Window window)
 
     sn_app_started(self->class);
 
+    /* update the focus lists, do this before the call to change_state or
+       it can end up in the list twice! */
+    focus_order_add_new(self);
+
     client_change_state(self);
 
     /* remove the client's border (and adjust re gravity) */
@@ -286,9 +290,6 @@ void client_manage(Window window)
     grab_server(FALSE);
 
     client_apply_startup_state(self);
-
-    /* update the focus lists */
-    focus_order_add_new(self);
 
     stacking_add(CLIENT_AS_WINDOW(self));
     client_restore_session_stacking(self);

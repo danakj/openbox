@@ -264,7 +264,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   XUngrabServer(otk::OBDisplay::display);
 
 #ifdef    SHAPE
-  if (blackbox->hasShapeExtensions() && flags.shaped)
+  if (otk::OBDisplay::shape() && flags.shaped)
     configureShape();
 #endif // SHAPE
 
@@ -511,7 +511,7 @@ void BlackboxWindow::associateClientWindow(void) {
   XMapSubwindows(otk::OBDisplay::display, frame.plate);
 
 #ifdef    SHAPE
-  if (blackbox->hasShapeExtensions()) {
+  if (otk::OBDisplay::shape()) {
     XShapeSelectInput(otk::OBDisplay::display, client.window,
                       ShapeNotifyMask);
 
@@ -1601,7 +1601,7 @@ void BlackboxWindow::configure(int dx, int dy,
                           frame.rect.bottom() - frame.margin.bottom);
 
 #ifdef    SHAPE
-    if (blackbox->hasShapeExtensions() && flags.shaped) {
+    if (otk::OBDisplay::shape() && flags.shaped) {
       configureShape();
     }
 #endif // SHAPE
@@ -3848,7 +3848,7 @@ void BlackboxWindow::leaveNotifyEvent(const XCrossingEvent*) {
 
 #ifdef    SHAPE
 void BlackboxWindow::shapeEvent(XShapeEvent *e) {
-  if (blackbox->hasShapeExtensions()) {
+  if (otk::OBDisplay::shape()) {
     if (! e->shaped && flags.shaped) {
       clearShape();
       flags.shaped = False;

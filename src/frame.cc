@@ -4,6 +4,12 @@
 # include "../config.h"
 #endif
 
+extern "C" {
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif // SHAPE
+}
+
 #include "frame.hh"
 #include "client.hh"
 #include "otk/display.hh"
@@ -76,7 +82,45 @@ void OBFrame::resize()
 
 void OBFrame::shape()
 {
-  // XXX: if shaped, shape the frame to the client..
+#ifdef SHAPE
+  if (!_client->shaped()) {
+    // clear the shape on the frame window
+    XShapeCombineMask(otk::OBDisplay::display, _window, ShapeBounding,
+                      _size.left - 2,//frame.margin.left - frame.border_w,
+                      _size.top - 2,//frame.margin.top - frame.border_w,
+                      None, ShapeSet);
+  } else {
+    // make the frame's shape match the clients
+    XShapeCombineShape(otk::OBDisplay::display, _window, ShapeBounding,
+                       _size.left - 2,
+                       _size.top - 2,
+                       _client->window(), ShapeBounding, ShapeSet);
+
+  int num = 0;
+    XRectangle xrect[2];
+
+    /*
+    if (decorations & Decor_Titlebar) {
+    xrect[0].x = xrect[0].y = -frame.border_w;
+    xrect[0].width = frame.rect.width();
+    xrect[0].height = frame.title_h + (frame.border_w * 2);
+    ++num;
+    }
+
+    if (decorations & Decor_Handle) {
+    xrect[1].x = -frame.border_w;
+    xrect[1].y = frame.rect.height() - frame.margin.bottom +
+    frame.mwm_border_w - frame.border_w;
+    xrect[1].width = frame.rect.width();
+    xrect[1].height = frame.handle_h + (frame.border_w * 2);
+    ++num;
+    }*/
+
+    XShapeCombineRectangles(otk::OBDisplay::display, _window,
+                            ShapeBounding, 0, 0, xrect, num,
+                            ShapeUnion, Unsorted);
+  }
+#endif // SHAPE
 }
 
 

@@ -831,7 +831,7 @@ void Blackbox::process_event(XEvent *e) {
 
   default: {
 #ifdef    SHAPE
-    if (e->type == getShapeEventBase()) {
+    if (e->type == otk::OBDisplay::shapeEventBase()) {
       XShapeEvent *shape_event = (XShapeEvent *) e;
       BlackboxWindow *win = searchWindow(e->xany.window);
 

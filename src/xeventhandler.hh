@@ -9,6 +9,10 @@
 
 extern "C" {
 #include <X11/Xlib.h>
+
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif // SHAPE
 }
 
 namespace ob {

@@ -1,5 +1,9 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
 
+#ifdef HAVE_CONFIG_H
+# include "../config.h"
+#endif
+
 #include "xeventhandler.hh"
 #include "client.hh"
 #include "frame.hh"
@@ -506,11 +510,14 @@ void OBXEventHandler::focusOut(const XFocusChangeEvent &e)
 #ifdef    SHAPE
 void OBXEventHandler::shapeEvent(const XShapeEvent &e)
 {
-  XShapeEvent *shape_event = (XShapeEvent *) e;
-  BlackboxWindow *win = searchWindow(e->xany.window);
+  printf("ShapeEvent\n");
+  if (e.kind != ShapeBounding) return;
 
-  if (win && shape_event->kind == ShapeBounding)
-    win->shapeEvent(shape_event);
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+
+  client->update(e);
+  client->frame->shape();
 }
 #endif // SHAPE
 
@@ -679,7 +686,7 @@ void OBXEventHandler::handle(const XEvent &e)
   default:
 #ifdef    SHAPE
     if (e.type == otk::OBDisplay::shapeEventBase())
-      shapeEvent(e);
+      shapeEvent((*(XShapeEvent*)&e));
 #endif // SHAPE
     break;
     

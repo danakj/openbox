@@ -319,9 +319,13 @@ void OBClient::getShaped()
   if (otk::OBDisplay::shape()) {
     int foo;
     unsigned int ufoo;
+    int s;
 
-    XShapeQueryExtents(otk::OBDisplay::display, client.window, &_shaped, &foo,
+    XShapeSelectInput(otk::OBDisplay::display, _window, ShapeNotifyMask);
+
+    XShapeQueryExtents(otk::OBDisplay::display, _window, &s, &foo,
                        &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo, &ufoo);
+    _shaped = (s != 0);
   }
 #endif // SHAPE
 }
@@ -647,6 +651,14 @@ void OBClient::update(const XClientMessageEvent &e)
   else if (e.message_type == property->atom(otk::OBProperty::net_wm_state))
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
 }
+
+
+#if defined(SHAPE) || defined(DOXYGEN_IGNORE)
+void OBClient::update(const XShapeEvent &e)
+{
+  _shaped = e.shaped;
+}
+#endif
 
 
 void OBClient::setArea(const otk::Rect &area)

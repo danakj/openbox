@@ -11,6 +11,10 @@
 extern "C" {
 #include <X11/keysym.h>
 
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif // SHAPE
+
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H

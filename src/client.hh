@@ -9,6 +9,10 @@
 
 extern "C" {
 #include <X11/Xlib.h>
+
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif // SHAPE
 }
 
 #include <string>
@@ -431,6 +435,10 @@ public:
   //! Processes a client message XEvent for the window and causes an action
   //! or whatever was specified to occur
   void update(const XClientMessageEvent &e);
+#if defined(SHAPE) || defined(DOXYGEN_IGNORE)
+  //! Updates the client's shape status
+  void update(const XShapeEvent &e);
+#endif
 
   //! Changes the stored positions and size of the OBClient window
   /*!

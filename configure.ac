@@ -105,7 +105,7 @@ AC_CHECK_LIB([Xext], [XShapeCombineShape],
     [
       AC_MSG_RESULT([yes])
       SHAPE="yes"
-      AC_DEFINE([HAVE_SHAPE], [1], [Found the XShape extension])
+      AC_DEFINE([SHAPE], [1], [Found the XShape extension])
       LIBS="$LIBS -lXext"
     ],
     [ 

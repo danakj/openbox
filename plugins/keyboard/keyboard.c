@@ -1,4 +1,5 @@
 #include "kernel/focus.h"
+#include "kernel/screen.h"
 #include "kernel/frame.h"
 #include "kernel/dispatch.h"
 #include "kernel/openbox.h"
@@ -103,7 +104,7 @@ static void grab_keys(gboolean grab)
 {
     GList *it;
 
-    grab_for_window(focus_backup, grab);
+    grab_for_window(screen_support_win, grab);
     for (it = client_list; it; it = g_list_next(it))
         grab_for_window(((ObClient*)it->data)->frame->window, grab);
 }

@@ -16,6 +16,8 @@ extern guint screen_num_monitors;
 extern guint screen_desktop;
 /*! Are we in showing-desktop mode? */
 extern gboolean screen_showing_desktop;
+/*! The support window also used for focus and stacking */
+extern Window screen_support_win;
 
 typedef struct DesktopLayout {
     ObOrientation orientation;

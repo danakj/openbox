@@ -21,29 +21,14 @@ ObClient *focus_client = NULL;
 GList **focus_order = NULL; /* these lists are created when screen_startup
                                sets the number of desktops */
 
-Window focus_backup = None;
-
 static ObClient *focus_cycle_target = NULL;
 static Popup *focus_cycle_popup = NULL;
 
 void focus_startup()
 {
-    /* create the window which gets focus when no clients get it. Have to
-       make it override-redirect so we don't try manage it, since it is
-       mapped. */
-    XSetWindowAttributes attrib;
 
     focus_client = NULL;
 
-    attrib.override_redirect = TRUE;
-    focus_backup = XCreateWindow(ob_display, ob_root,
-				 -100, -100, 1, 1, 0,
-                                 CopyFromParent, InputOutput, CopyFromParent,
-                                 CWOverrideRedirect, &attrib);
-    XMapRaised(ob_display, focus_backup);
-
-    /* do this *after* focus_backup is created, since it is used for
-       stacking */
     focus_cycle_popup = popup_new(TRUE);
 
     /* start with nothing focused */
@@ -61,8 +46,6 @@ void focus_shutdown()
 
     popup_free(focus_cycle_popup);
     focus_cycle_popup = NULL;
-
-    XDestroyWindow(ob_display, focus_backup);
 
     /* reset focus to root */
     XSetInputFocus(ob_display, PointerRoot, RevertToPointerRoot,
@@ -94,7 +77,7 @@ void focus_set_client(ObClient *client)
 
     if (client == NULL) {
 	/* when nothing will be focused, send focus to the backup target */
-	XSetInputFocus(ob_display, focus_backup, RevertToPointerRoot,
+	XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,
                        event_lasttime);
         XSync(ob_display, FALSE);
     }

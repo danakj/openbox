@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "prop.h"
+#include "screen.h"
 #include "focus.h"
 #include "client.h"
 #include "group.h"
@@ -53,7 +54,7 @@ static void do_restack(GList *wins, GList *before)
     win = g_new(Window, g_list_length(wins) + 1);
 
     if (before == stacking_list)
-        win[0] = focus_backup;
+        win[0] = screen_support_win;
     else if (!before)
         win[0] = window_top(g_list_last(stacking_list)->data);
     else
@@ -267,7 +268,7 @@ void stacking_add(ObWindow *win)
     ObStackingLayer l;
     GList *wins;
 
-    g_assert(focus_backup != None); /* make sure I dont break this in the
+    g_assert(screen_support_win != None); /* make sure I dont break this in the
                                        future */
 
     l = window_layer(win);

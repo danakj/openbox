@@ -30,23 +30,22 @@
 			SubstructureNotifyMask | SubstructureRedirectMask | \
 			ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
-guint    screen_num_desktops    = 0;
-guint    screen_num_monitors    = 0;
-guint    screen_desktop         = 0;
+guint    screen_num_desktops;
+guint    screen_num_monitors;
+guint    screen_desktop;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
 DesktopLayout screen_desktop_layout;
-char   **screen_desktop_names = NULL;
+char   **screen_desktop_names;
+Window   screen_support_win;
 
-static Rect  **area = NULL; /* array of desktop holding array of
-                               xinerama areas */
-static Rect  *monitor_area = NULL;
-static Window support_window = None;
+static Rect  **area; /* array of desktop holding array of xinerama areas */
+static Rect  *monitor_area;
 
 #ifdef USE_LIBSN
 static SnMonitorContext *sn_context;
 static int sn_busy_cnt;
-static ObTimer *sn_timer = NULL;
+static ObTimer *sn_timer;
 
 static void sn_event_func(SnMonitorEvent *event, void *data);
 #endif
@@ -55,8 +54,9 @@ static void set_root_cursor();
 
 gboolean screen_annex()
 {
+    XSetWindowAttributes attrib;
     pid_t pid;
-    int i, num_support;
+    gint i, num_support;
     guint32 *supported;
 
     xerror_set_ignore(TRUE);
@@ -79,14 +79,21 @@ gboolean screen_annex()
     PROP_SET32(ob_root, openbox_pid, cardinal, pid);
 
     /* create the netwm support window */
-    support_window = XCreateSimpleWindow(ob_display, ob_root, 0,0,1,1,0,0,0);
+    attrib.override_redirect = TRUE;
+    screen_support_win = XCreateWindow(ob_display, ob_root,
+                                       -100, -100, 1, 1, 0,
+                                       CopyFromParent, InputOutput,
+                                       CopyFromParent,
+                                       CWOverrideRedirect, &attrib);
+    XMapRaised(ob_display, screen_support_win);
 
     /* set supporting window */
-    PROP_SET32(ob_root, net_supporting_wm_check, window, support_window);
+    PROP_SET32(ob_root, net_supporting_wm_check, window, screen_support_win);
 
     /* set properties on the supporting window */
-    PROP_SETS(support_window, net_wm_name, "Openbox");
-    PROP_SET32(support_window, net_supporting_wm_check, window,support_window);
+    PROP_SETS(screen_support_win, net_wm_name, "Openbox");
+    PROP_SET32(screen_support_win, net_supporting_wm_check,
+               window, screen_support_win);
 
     /* set the _NET_SUPPORTED_ATOMS hint */
     num_support = 61;
@@ -212,7 +219,7 @@ void screen_shutdown()
     PROP_ERASE(ob_root, net_supported); /* not without us */
     PROP_ERASE(ob_root, net_showing_desktop); /* don't keep this mode */
 
-    XDestroyWindow(ob_display, support_window);
+    XDestroyWindow(ob_display, screen_support_win);
 
     g_strfreev(screen_desktop_names);
     for (r = area; *r; ++r)

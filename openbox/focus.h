@@ -6,9 +6,6 @@
 
 struct _ObClient;
 
-/*! The window which gets focus when nothing else will be focused */
-extern Window focus_backup;
-
 /*! The client which is currently focused */
 extern struct _ObClient *focus_client;
 

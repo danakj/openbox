@@ -97,7 +97,7 @@ private:
   
 public:
   //! Constructs a new OBScreen object
-  OBScreen(int screen);
+  OBScreen(int screen, const otk::Configuration &config);
   //! Destroys the OBScreen object
   virtual ~OBScreen();
 
@@ -107,6 +107,9 @@ public:
   inline const otk::Point &size() const { return _size; }
   //! Returns the area of the screen not reserved by applications' Struts
   inline const otk::Rect &area() const { return _area; }
+  //! Returns the style in use on the screen
+  inline const otk::Style *style() const { return &_style; }
+
 
   //! Adds a window's strut to the screen's list of reserved spaces
   void addStrut(otk::Strut *strut);
@@ -116,7 +119,17 @@ public:
   //! Loads a new style on the screen
   void loadStyle(const otk::Configuration &config);
 
-  inline const otk::Style *style() const { return &_style; }
+  //! Manage a client window
+  /*!
+    This gives the window a frame, reparents it, selects events on it, etc.
+  */
+  void manageWindow(Window window);
+  //! Unmanage a client
+  /*!
+    This removes the window's frame, reparents it to root, unselects events on
+    it, etc.
+  */
+  void unmanageWindow(OBClient *client);
 };
 
 }

@@ -128,8 +128,7 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
   // initialize all the screens
-  _screens.push_back(new OBScreen(0));
-  _screens[0]->loadStyle(_config);
+  _screens.push_back(new OBScreen(0, _config));
   
   _state = State_Normal; // done starting
 }
@@ -138,10 +137,6 @@ Openbox::Openbox(int argc, char **argv)
 Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
-
-  // unmanage all windows
-  while (!_clients.empty())
-    _xeventhandler.unmanageWindow(_clients.begin()->second);
 
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
   

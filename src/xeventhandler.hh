@@ -150,11 +150,6 @@ public:
     @param e The XEvent to handle
   */
   void handle(const XEvent &e);
-
-
-  // XXX: TEMPORARY MOVE TO A SCREEN CLASS OR SOMETHING
-  void manageWindow(int, Window);
-  void unmanageWindow(OBClient*);
 };
 
 }

@@ -155,7 +155,7 @@ public:
   inline const otk::OBProperty *property() const { return _property; }
 
   //! Returns a managed screen
-  inline const OBScreen *screen(int num) const {
+  inline OBScreen *screen(int num) {
     assert(num >= 0); assert(num < (signed)_screens.size());
     return _screens[num];
   }

@@ -6,9 +6,9 @@
 
 #include "xeventhandler.hh"
 #include "client.hh"
-#include "frame.hh"
 #include "openbox.hh"
 #include "screen.hh"
+#include "frame.hh"
 #include "otk/display.hh"
 #include "otk/rect.hh"
 
@@ -124,108 +124,6 @@ void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 }
 
 
-// XXX: put this into the OBScreen or OBClient class!
-void OBXEventHandler::manageWindow(int screen, Window window)
-{
-  OBClient *client = 0;
-  XWMHints *wmhint;
-  XSetWindowAttributes attrib_set;
-
-  // XXX: manage the window, i.e. grab events n shit
-
-  // is the window a docking app
-  if ((wmhint = XGetWMHints(otk::OBDisplay::display, window))) {
-    if ((wmhint->flags & StateHint) &&
-        wmhint->initial_state == WithdrawnState) {
-      //slit->addClient(w); // XXX: make dock apps work!
-      XFree(wmhint);
-      return;
-    }
-    XFree(wmhint);
-  }
-
-  // choose the events we want to receive on the CLIENT window
-  attrib_set.event_mask = OBClient::event_mask;
-  attrib_set.do_not_propagate_mask = ButtonPressMask | ButtonReleaseMask |
-                                     ButtonMotionMask;
-  XChangeWindowAttributes(otk::OBDisplay::display, window,
-                          CWEventMask|CWDontPropagate, &attrib_set);
-
-  // create the OBClient class, which gets all of the hints on the window
-  Openbox::instance->addClient(window, client = new OBClient(screen, window));
-
-  // we dont want a border on the client
-  XSetWindowBorderWidth(otk::OBDisplay::display, window, 0);
-  
-  // specify that if we exit, the window should not be destroyed and should be
-  // reparented back to root automatically
-  XChangeSaveSet(otk::OBDisplay::display, window, SetModeInsert);
-
-  if (!client->positionRequested()) {
-    // XXX: position the window intelligenty
-  }
-
-  // create the decoration frame for the client window
-  client->frame = new OBFrame(client,
-                              Openbox::instance->screen(screen)->style());
-
-  // add all the client's decoration windows as event handlers for the client
-  Openbox::instance->addClient(client->frame->window(), client);
-  Openbox::instance->addClient(client->frame->titlebar(), client);
-  Openbox::instance->addClient(client->frame->buttonIconify(), client);
-  Openbox::instance->addClient(client->frame->buttonMax(), client);
-  Openbox::instance->addClient(client->frame->buttonStick(), client);
-  Openbox::instance->addClient(client->frame->buttonClose(), client);
-  Openbox::instance->addClient(client->frame->label(), client);
-  Openbox::instance->addClient(client->frame->handle(), client);
-  Openbox::instance->addClient(client->frame->gripLeft(), client);
-  Openbox::instance->addClient(client->frame->gripRight(), client);
-  
-  // XXX: if on the current desktop..
-  XMapWindow(otk::OBDisplay::display, client->frame->window());
- 
-  // XXX: handle any requested states such as shaded/maximized
-}
-
-// XXX: move this to the OBScreen or OBClient class!
-void OBXEventHandler::unmanageWindow(OBClient *client)
-{
-  OBFrame *frame = client->frame;
-
-  // XXX: pass around focus if this window was focused
-  
-  // remove the window from our save set
-  XChangeSaveSet(otk::OBDisplay::display, client->window(), SetModeDelete);
-
-  // we dont want events no more
-  XSelectInput(otk::OBDisplay::display, client->window(), NoEventMask);
-
-  XUnmapWindow(otk::OBDisplay::display, frame->window());
-  
-  // we dont want a border on the client
-  XSetWindowBorderWidth(otk::OBDisplay::display, client->window(),
-                        client->borderWidth());
-
-  // remove the client class from the search list
-  Openbox::instance->removeClient(client->window());
-  // remove the frame's decor elements as event handlers for the client
-  Openbox::instance->removeClient(frame->window());
-  Openbox::instance->removeClient(frame->titlebar());
-  Openbox::instance->removeClient(frame->buttonIconify());
-  Openbox::instance->removeClient(frame->buttonMax());
-  Openbox::instance->removeClient(frame->buttonStick());
-  Openbox::instance->removeClient(frame->buttonClose());
-  Openbox::instance->removeClient(frame->label());
-  Openbox::instance->removeClient(frame->handle());
-  Openbox::instance->removeClient(frame->gripLeft());
-  Openbox::instance->removeClient(frame->gripRight());
-
-  delete client->frame;
-  client->frame = 0;
-
-  delete client;
-}
-
 void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
 {
 #ifdef    DEBUG
@@ -274,7 +172,7 @@ void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
 
     assert(screen < ScreenCount(otk::OBDisplay::display));
 
-    manageWindow(screen, e.window);
+    Openbox::instance->screen(screen)->manageWindow(e.window);
   }
   
 /*
@@ -334,7 +232,7 @@ void OBXEventHandler::unmapNotify(const XUnmapEvent &e)
   OBClient *client = Openbox::instance->findClient(e.window);
   if (!client) return;
   
-  unmanageWindow(client);
+  Openbox::instance->screen(client->screen())->unmanageWindow(client);
 }
 
 
@@ -345,7 +243,7 @@ void OBXEventHandler::destroyNotify(const XDestroyWindowEvent &e)
   OBClient *client = Openbox::instance->findClient(e.window);
   if (!client) return;
   
-  unmanageWindow(client);
+  Openbox::instance->screen(client->screen())->unmanageWindow(client);
 }
 
 

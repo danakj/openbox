@@ -3,5 +3,6 @@ Makefile.in
 .deps
 .libs
 openbox.la
-openbox.lo
-theme.lo
+obengine.lo
+obtheme.lo
+obrender.lo

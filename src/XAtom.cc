@@ -359,7 +359,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   assert(win != None); assert(atom != None); assert(type != None);
   assert(size == 8 || size == 16 || size == 32);
   assert(nelements > 0);
-  unsigned char *c_val = 0;        // value alloc'd with c malloc
+  unsigned char *c_val = 0;        // value alloc'd in Xlib, must be XFree()d
   Atom ret_type;
   int ret_size;
   unsigned long ret_bytes;

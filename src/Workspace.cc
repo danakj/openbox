@@ -381,8 +381,8 @@ unsigned int Workspace::getCount(void) const {
 
 
 void Workspace::appendStackOrder(BlackboxWindowList &stack_order) const {
-  BlackboxWindowList::const_iterator it = stackingList.begin();
-  const BlackboxWindowList::const_iterator end = stackingList.end();
+  BlackboxWindowList::const_reverse_iterator it = stackingList.rbegin();
+  const BlackboxWindowList::const_reverse_iterator end = stackingList.rend();
   for (; it != end; ++it)
     stack_order.push_back(*it);
 }

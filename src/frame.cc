@@ -153,7 +153,7 @@ void Frame::adjustSize()
     _titlebar.setGeometry(-bwidth,
                           -bwidth,
                           width,
-                          _style->labelFont()->height() + bevel * 2);
+                          _style->labelFont()->height() + (bevel * 2));
     _innersize.top += _titlebar.height() + bwidth;
 
     // set the label size

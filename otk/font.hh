@@ -57,10 +57,10 @@ public:
 
   inline const std::string &fontstring() const { return _fontstring; }
 
-  unsigned int height() const;
-  unsigned int maxCharWidth() const;
+  int height() const;
+  int maxCharWidth() const;
 
-  unsigned int measureString(const ustring &string) const;
+  int measureString(const ustring &string) const;
 
   // The RenderControl classes use the internal data to render the fonts, but
   // noone else needs it, so its private.

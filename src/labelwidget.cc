@@ -70,6 +70,7 @@ void LabelWidget::unfocus()
 void LabelWidget::update()
 {
   printf("LabelWidget::update()\n");
+  otk::Widget::update();
 }
 
 
@@ -77,6 +78,7 @@ void LabelWidget::renderForeground()
 {
   bool draw = _dirty;
 
+  printf("LabelWidget::renderForeground()\n");
   otk::Widget::renderForeground();
 
   if (draw) {

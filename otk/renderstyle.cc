@@ -168,6 +168,7 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     0x0);
 
   _label_font = new Font(_screen, "Arial,Sans-9:bold", true, 1, 0x40);
+  _label_justify = RightJustify;
 
   _max_mask = new PixmapMask();
   _max_mask->w = _max_mask->h = 8;
@@ -208,6 +209,9 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                             display->screenInfo(_screen)->rootWindow(),
                             data, 8, 8);
   }
+
+  _bevel_width = 1;
+  _handle_width = 4;
 }
 
 RenderStyle::~RenderStyle()

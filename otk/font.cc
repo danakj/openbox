@@ -82,7 +82,7 @@ Font::~Font(void)
 }
 
 
-unsigned int Font::measureString(const ustring &string) const
+int Font::measureString(const ustring &string) const
 {
   XGlyphInfo info;
 
@@ -93,19 +93,19 @@ unsigned int Font::measureString(const ustring &string) const
     XftTextExtents8(**display, _xftfont,
                     (FcChar8*)string.c_str(), string.bytes(), &info);
 
-  return info.xOff + (_shadow ? _offset : 0);
+  return (signed) info.xOff + (_shadow ? _offset : 0);
 }
 
 
-unsigned int Font::height(void) const
+int Font::height(void) const
 {
-  return _xftfont->height + (_shadow ? _offset : 0);
+  return (signed) _xftfont->height + (_shadow ? _offset : 0);
 }
 
 
-unsigned int Font::maxCharWidth(void) const
+int Font::maxCharWidth(void) const
 {
-  return _xftfont->max_advance_width;
+  return (signed) _xftfont->max_advance_width;
 }
 
 }

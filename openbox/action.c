@@ -985,6 +985,7 @@ void action_execute(union ActionData *data)
             if (!g_spawn_command_line_async(cmd, &e)) {
                 g_warning("failed to execute '%s': %s",
                           cmd, e->message);
+                g_error_free(e);
             }
             g_free(cmd);
         } else {

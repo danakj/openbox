@@ -131,13 +131,39 @@ def toggle_maximize(data):
     """Toggles the maximized status of the window on which the event occured"""
     state_maximize(data, StateToggle)
 
+def toggle_maximize_horz(data):
+    """Toggles the horizontal maximized status of the window on which the event
+       occured"""
+    state_maximize_horz(data, StateToggle)
+
+def toggle_maximize_vert(data):
+    """Toggles the vertical maximized status of the window on which the event
+       occured"""
+    state_maximize_vert(data, StateToggle)
+
 def maximize(data):
     """Maximizes the window on which the event occured"""
     state_maximize(data, StateAdd)
 
+def maximize_horz(data):
+    """Horizontally maximizes the window on which the event occured"""
+    state_maximize_horz(data, StateAdd)
+
+def maximize_vert(data):
+    """Vertically maximizes the window on which the event occured"""
+    state_maximize_vert(data, StateAdd)
+
 def unmaximize(data):
     """Unmaximizes the window on which the event occured"""
     state_maximize(data, StateRemove)
+
+def unmaximize_horz(data):
+    """Horizontally unmaximizes the window on which the event occured"""
+    state_maximize_horz(data, StateRemove)
+
+def unmaximize_vert(data):
+    """Vertically unmaximizes the window on which the event occured"""
+    state_maximize_vert(data, StateRemove)
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""

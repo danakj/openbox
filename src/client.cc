@@ -895,7 +895,7 @@ void Client::setState(StateAction action, long data1, long data2)
       if (maxh != _max_horz)
         maximize(maxh, 1, true);
       else
-        maximize(maxv, 1, true);
+        maximize(maxv, 2, true);
     }
   }
   // change fullscreen state before shading, as it will affect if the window
@@ -1361,13 +1361,38 @@ void Client::maximize(bool max, int dir, bool savearea)
   if (max) {
     // when maximizing, put the client where we want, NOT the frame!
     _gravity = StaticGravity;
+    // adjust our idea of position based on StaticGravity, so we stay put
+    // unless asked
+    frame->frameGravity(x, y);
 
     if (savearea) {
       long dimensions[4];
+      long *readdim;
+      unsigned long n = 4;
+
       dimensions[0] = x;
       dimensions[1] = y;
       dimensions[2] = w;
       dimensions[3] = h;
+
+      // get the property off the window and use it for the dimentions we are
+      // already maxed on
+      if (otk::Property::get(_window, otk::Property::atoms.openbox_premax,
+                             otk::Property::atoms.cardinal, &n,
+                             (long unsigned**) &readdim)) {
+        if (n >= 4) {
+          if (_max_horz) {
+            dimensions[0] = readdim[0];
+            dimensions[2] = readdim[2];
+          }
+          if (_max_vert) {
+            dimensions[1] = readdim[1];
+            dimensions[3] = readdim[3];
+          }
+        }
+        delete readdim;
+      }
+      
       otk::Property::set(_window, otk::Property::atoms.openbox_premax,
                          otk::Property::atoms.cardinal,
                          (long unsigned*)dimensions, 4);
@@ -1380,6 +1405,8 @@ void Client::maximize(bool max, int dir, bool savearea)
       y = a.y() + frame->size().top;
       h = a.height() - frame->size().top - frame->size().bottom;
     }
+
+    printf("dir %d x %d y %d w %d h %d\n", dir, x, y, w, h);
   } else {
     long *dimensions;
     long unsigned n = 4;
@@ -1419,7 +1446,6 @@ void Client::maximize(bool max, int dir, bool savearea)
   changeState(); // change the state hints on the client
 
   internal_resize(TopLeft, w, h, true, x, y);
-  printf("before x %d y %d w %d h %d\n", x, y, w, h);
   _gravity = g;
   if (max) {
     // because of my little gravity trick in here, we have to set the position
@@ -1427,7 +1453,6 @@ void Client::maximize(bool max, int dir, bool savearea)
     int x, y;
     frame->frameGravity(x, y);
     _area.setPos(x, y);
-    printf("after x %d y %d w %d h %d\n", x, y, w, h);
   }
 }
 

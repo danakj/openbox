@@ -74,6 +74,10 @@ def setup_window_buttons():
              ob.MouseAction.Click, callbacks.iconify)
     ob.mbind("Left", ob.MouseContext.MaximizeButton,
              ob.MouseAction.Click, callbacks.toggle_maximize)
+    ob.mbind("Middle", ob.MouseContext.MaximizeButton,
+             ob.MouseAction.Click, callbacks.toggle_maximize_vert)
+    ob.mbind("Right", ob.MouseContext.MaximizeButton,
+             ob.MouseAction.Click, callbacks.toggle_maximize_horz)
 
 def setup_scroll():
     """Sets up the default behaviors for the mouse scroll wheel.

@@ -564,7 +564,7 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
-        grab_pointer(TRUE, None);
+        grab_pointer(TRUE, OB_CURSOR_NONE);
         grab_keyboard(TRUE);
     }
 
@@ -605,7 +605,7 @@ void menu_frame_hide(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* last menu shown */
-        grab_pointer(FALSE, None);
+        grab_pointer(FALSE, OB_CURSOR_NONE);
         grab_keyboard(FALSE);
     }
 

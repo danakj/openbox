@@ -111,8 +111,8 @@ void grab_startup()
 void grab_shutdown()
 {
     while (grab_keyboard(FALSE));
-    while (grab_pointer(FALSE, None));
-    while (grab_pointer_window(FALSE, None, None));
+    while (grab_pointer(FALSE, OB_CURSOR_NONE));
+    while (grab_pointer_window(FALSE, OB_CURSOR_NONE, None));
     while (grab_server(FALSE));
 }
 
@@ -133,7 +133,7 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
 
 void grab_button(guint button, guint state, Window win, guint mask)
 {
-    grab_button_full(button, state, win, mask, GrabModeAsync, None);
+    grab_button_full(button, state, win, mask, GrabModeAsync, OB_CURSOR_NONE);
 }
 
 void ungrab_button(guint button, guint state, Window win)

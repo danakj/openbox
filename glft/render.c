@@ -105,3 +105,33 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
 
     glPopMatrix();
 }
+
+void GlftMeasureString(struct GlftFont *font,
+                       const char *str,
+                       int bytes,
+                       int *w,
+                       int *h)
+{
+    const char *c;
+    struct GlftGlyph *g;
+
+    if (!g_utf8_validate(str, bytes, NULL)) {
+        GlftDebug("Invalid UTF-8 in string\n");
+        return;
+    }
+
+    *w = 0;
+    *h = 0;
+
+    c = str;
+    while (c - str < bytes) {
+        g = GlftFontGlyph(font, c);
+        if (g) {
+            *w += g->width;
+            *h = MAX(g->height, *h);
+        } else {
+            *w += font->max_advance_width;
+        }
+        c = g_utf8_next_char(c);
+    }
+}

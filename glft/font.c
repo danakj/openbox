@@ -252,6 +252,7 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         } else {
             /*g->width = TRUNC(ROUND(font->face->glyph->advance.x));*/
             g->width = font->face->glyph->metrics.width >> 6;
+            g_message("Width: %c = %d", *c, g->width);
         }
         g->height = -(font->face->glyph->metrics.height >> 6);
 
@@ -260,34 +261,3 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
 
     return g;
 }
-
-void GlftMeasureString(struct GlftFont *font,
-                       const char *str,
-                       int bytes,
-                       int *w,
-                       int *h)
-{
-    const char *c;
-    struct GlftGlyph *g;
-
-    if (!g_utf8_validate(str, bytes, NULL)) {
-        GlftDebug("Invalid UTF-8 in string\n");
-        return;
-    }
-
-    *w = 0;
-    *h = 0;
-
-    c = str;
-    while (c - str < bytes) {
-        g = GlftFontGlyph(font, c);
-        if (g) {
-            *w += g->width;
-            *h = MAX(g->height, *h);
-        } else {
-            *w += font->max_advance_width;
-        }
-        c = g_utf8_next_char(c);
-    }
-}
-

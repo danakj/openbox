@@ -46,7 +46,7 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
             data.node = node;
             data.parent = menu;
 
-            if (plugin_open_full(plugin, TRUE))
+            if (plugin_open_reopen(plugin))
                 parent = plugin_create(plugin, &data);
             g_free(plugin);
         } else
@@ -67,7 +67,7 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
                 data.doc = doc;
                 data.node = node;
                 data.parent = menu;
-                if (plugin_open_full(plugin, TRUE))
+                if (plugin_open_reopen(plugin))
                     parent = plugin_create(plugin, &data);
                 g_free(plugin);
             } else {

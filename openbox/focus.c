@@ -118,16 +118,16 @@ void focus_fallback(gboolean switching_desks)
 {
     ConfigValue focus_follow;
     GList *it;
-    gboolean fallback = TRUE;
+    gboolean under = TRUE;
 
     if (!switching_desks) {
         if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
             g_assert_not_reached();
         if (focus_follow.bool)
-            fallback = !focus_under_pointer();
+            under = focus_under_pointer();
     }
 
-    if (fallback) {
+    if (!under) {
         for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
             if (it->data != focus_client && client_normal(it->data)) {
                 g_message("fallback trying %lx", ((Client*)it->data)->window);

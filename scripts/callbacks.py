@@ -36,6 +36,34 @@ def state_shaded(data, add=StateAdd):
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_shaded)
 
+def state_maximize(data, add=StateAdd):
+    """Toggles, adds or removes the horizontal and vertical 'maximized' state
+       on a window. The second paramater should one of: StateRemove, StateAdd,
+       or StateToggle."""
+    if not data.client: return
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_state, data.client.window(),
+                       add, otk.Property_atoms().net_wm_state_maximized_horz,
+                       otk.Property_atoms().net_wm_state_maximized_vert)
+
+def state_maximize_horz(data, add=StateAdd):
+    """Toggles, adds or removes the horizontal 'maximized' state on a window.
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
+    if not data.client: return
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_state, data.client.window(),
+                       add, otk.Property_atoms().net_wm_state_maximized_horz)
+
+def state_maximize_vert(data, add=StateAdd):
+    """Toggles, adds or removes the vertical 'maximized' state on a window.
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
+    if not data.client: return
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_state, data.client.window(),
+                       add, otk.Property_atoms().net_wm_state_maximized_vert)
+
 def state_skip_taskbar(data, add=StateAdd):
     """Toggles, adds or removes the 'skip_taskbar' state on a window.
        The second paramater should one of: StateRemove, StateAdd, or
@@ -98,6 +126,18 @@ def lower_win(data):
     """Lowers the window on which the event occured"""
     if not data.client: return
     ob.openbox.screen(data.screen).lowerWindow(data.client)
+
+def toggle_maximize(data):
+    """Toggles the maximized status of the window on which the event occured"""
+    state_maximize(data, StateToggle)
+
+def maximize(data):
+    """Maximizes the window on which the event occured"""
+    state_maximize(data, StateAdd)
+
+def unmaximize(data):
+    """Unmaximizes the window on which the event occured"""
+    state_maximize(data, StateRemove)
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""

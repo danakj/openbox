@@ -123,6 +123,8 @@ struct Atoms {
   Atom kde_net_system_tray_windows;
   Atom kde_net_wm_system_tray_window_for;
   Atom kde_net_wm_window_type_override;
+
+  Atom openbox_premax;
 };
 
 

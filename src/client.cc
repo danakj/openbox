@@ -797,6 +797,8 @@ void Client::setState(StateAction action, long data1, long data2)
 {
   bool shadestate = _shaded;
   bool fsstate = _fullscreen;
+  bool maxh = _max_horz;
+  bool maxv = _max_vert;
 
   if (!(action == State_Add || action == State_Remove ||
         action == State_Toggle))
@@ -835,12 +837,10 @@ void Client::setState(StateAction action, long data1, long data2)
         _modal = true;
         // XXX: give it focus if another window has focus that shouldnt now
       } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
-        if (_max_vert) continue;
-        _max_vert = true;
-        // XXX: resize the window etc
+        maxv = true;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
         if (_max_horz) continue;
-        _max_horz = true;
+        maxh = true;
         // XXX: resize the window etc
       } else if (state == otk::Property::atoms.net_wm_state_shaded) {
         shadestate = true;
@@ -863,13 +863,9 @@ void Client::setState(StateAction action, long data1, long data2)
         if (!_modal) continue;
         _modal = false;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
-        if (!_max_vert) continue;
-        _max_vert = false;
-        // XXX: resize the window etc
+        maxv = false;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
-        if (!_max_horz) continue;
-        _max_horz = false;
-        // XXX: resize the window etc
+        maxh = false;
       } else if (state == otk::Property::atoms.net_wm_state_shaded) {
         shadestate = false;
       } else if (state == otk::Property::atoms.net_wm_state_skip_taskbar) {
@@ -887,10 +883,25 @@ void Client::setState(StateAction action, long data1, long data2)
       }
     }
   }
+  if (maxh != _max_horz || maxv != _max_vert) {
+    if (maxh != _max_horz && maxv != _max_vert) { // toggling both
+      if (maxh == maxv) { // both going the same way
+        maximize(maxh, 0, true);
+      } else {
+        maximize(maxh, 1, true);
+        maximize(maxv, 2, true);
+      }
+    } else { // toggling one
+      if (maxh != _max_horz)
+        maximize(maxh, 1, true);
+      else
+        maximize(maxv, 1, true);
+    }
+  }
   // change fullscreen state before shading, as it will affect if the window
   // can shade or not
   if (fsstate != _fullscreen)
-    fullscreen(fsstate);
+    fullscreen(fsstate, true);
   if (shadestate != _shaded)
     shade(shadestate);
   calcLayer();
@@ -1276,7 +1287,7 @@ void Client::applyStartupState()
   }
   if (_fullscreen) {
     _fullscreen = false;
-    fullscreen(true);
+    fullscreen(true, false);
   }
   if (_shaded) {
     _shaded = false;
@@ -1285,8 +1296,16 @@ void Client::applyStartupState()
   if (_urgent)
     fireUrgent();
   
-  if (_max_vert); // XXX: incomplete
-  if (_max_horz); // XXX: incomplete
+  if (_max_vert && _max_horz) {
+    _max_vert = _max_horz = false;
+    maximize(true, 0, false);
+  } else if (_max_vert) {
+    _max_vert = false;
+    maximize(true, 2, false);
+  } else if (_max_horz) {
+    _max_horz = false;
+    maximize(true, 1, false);
+  }
 
   if (_skip_taskbar); // nothing to do for this
   if (_skip_pager);   // nothing to do for this
@@ -1318,12 +1337,105 @@ void Client::shade(bool shade)
 }
 
 
-void Client::fullscreen(bool fs)
+void Client::maximize(bool max, int dir, bool savearea)
+{
+  assert(dir == 0 || dir == 1 || dir == 2);
+  if (!(_functions & Func_Maximize)) return; // can't
+
+  // check if already done
+  if (max) {
+    if (dir == 0 && _max_horz && _max_vert) return;
+    if (dir == 1 && _max_horz) return;
+    if (dir == 2 && _max_vert) return;
+  } else {
+    if (dir == 0 && !_max_horz && !_max_vert) return;
+    if (dir == 1 && !_max_horz) return;
+    if (dir == 2 && !_max_vert) return;
+  }
+
+  int g = _gravity;
+  
+  const otk::Rect &a = openbox->screen(_screen)->area();
+  int x = _area.x(), y = _area.y(), w = _area.width(), h = _area.height();
+  
+  if (max) {
+    // when maximizing, put the client where we want, NOT the frame!
+    _gravity = StaticGravity;
+
+    if (savearea) {
+      long dimensions[4];
+      dimensions[0] = x;
+      dimensions[1] = y;
+      dimensions[2] = w;
+      dimensions[3] = h;
+      otk::Property::set(_window, otk::Property::atoms.openbox_premax,
+                         otk::Property::atoms.cardinal,
+                         (long unsigned*)dimensions, 4);
+    }
+    if (dir == 0 || dir == 1) { // horz
+      x = a.x();
+      w = a.width();
+    }
+    if (dir == 0 || dir == 2) { // vert
+      y = a.y() + frame->size().top;
+      h = a.height() - frame->size().top - frame->size().bottom;
+    }
+  } else {
+    long *dimensions;
+    long unsigned n = 4;
+      
+    if (otk::Property::get(_window, otk::Property::atoms.openbox_premax,
+                           otk::Property::atoms.cardinal, &n,
+                           (long unsigned**) &dimensions)) {
+      if (n >= 4) {
+        if (dir == 0 || dir == 1) { // horz
+          x = (signed int)dimensions[0];
+          w = (signed int)dimensions[2];
+        }
+        if (dir == 0 || dir == 2) { // vert
+          y = (signed int)dimensions[1];
+          h = (signed int)dimensions[3];
+        }
+      }
+      delete dimensions;
+    } else {
+      // pick some fallbacks...
+      if (dir == 0 || dir == 1) { // horz
+        x = a.x() + a.width() / 4;
+        w = a.width() / 2;
+      }
+      if (dir == 0 || dir == 2) { // vert
+        y = a.y() + a.height() / 4;
+        h = a.height() / 2;
+      }
+    }
+    otk::Property::erase(_window, otk::Property::atoms.openbox_premax);
+  }
+
+  if (dir == 0 || dir == 1) // horz
+    _max_horz = max;
+  if (dir == 0 || dir == 2) // vert
+    _max_vert = max;
+  changeState(); // change the state hints on the client
+
+  internal_resize(TopLeft, w, h, true, x, y);
+  printf("before x %d y %d w %d h %d\n", x, y, w, h);
+  _gravity = g;
+  if (max) {
+    // because of my little gravity trick in here, we have to set the position
+    // of the client to what it really is
+    int x, y;
+    frame->frameGravity(x, y);
+    _area.setPos(x, y);
+    printf("after x %d y %d w %d h %d\n", x, y, w, h);
+  }
+}
+
+
+void Client::fullscreen(bool fs, bool savearea)
 {
   static FunctionFlags saved_func;
   static DecorationFlags saved_decor;
-  static otk::Rect saved_area;
-  static otk::Point saved_logical_size;
 
   if (!(_functions & Func_Fullscreen) || // can't
       _fullscreen == fs) return;         // already done
@@ -1331,6 +1443,8 @@ void Client::fullscreen(bool fs)
   _fullscreen = fs;
   changeState(); // change the state hints on the client
 
+  int x = _area.x(), y = _area.y(), w = _area.width(), h = _area.height();
+  
   if (fs) {
     // save the functions and remove them
     saved_func = _functions;
@@ -1338,25 +1452,52 @@ void Client::fullscreen(bool fs)
     // save the decorations and remove them
     saved_decor = _decorations;
     _decorations = 0;
-    // save the area and adjust it (we don't call internal resize here for
-    // constraints on the size, etc, we just make it fullscreen).
-    saved_area = _area;
+    if (savearea) {
+      long dimensions[4];
+      dimensions[0] = _area.x();
+      dimensions[1] = _area.y();
+      dimensions[2] = _area.width();
+      dimensions[3] = _area.height();
+      otk::Property::set(_window, otk::Property::atoms.openbox_premax,
+                         otk::Property::atoms.cardinal,
+                         (long unsigned*)dimensions, 4);
+    }
     const otk::ScreenInfo *info = otk::display->screenInfo(_screen);
-    _area.setRect(0, 0, info->width(), info->height());
-    saved_logical_size = _logical_size;
-    _logical_size.setPoint((info->width() - _base_size.x()) / _size_inc.x(),
-                           (info->height() - _base_size.y()) / _size_inc.y());
+    x = 0;
+    y = 0;
+    w = info->width();
+    h = info->height();
   } else {
     _functions = saved_func;
     _decorations = saved_decor;
-    _area = saved_area;
-    _logical_size = saved_logical_size;
+
+    long *dimensions;
+    long unsigned n = 4;
+      
+    if (otk::Property::get(_window, otk::Property::atoms.openbox_premax,
+                           otk::Property::atoms.cardinal, &n,
+                           (long unsigned**) &dimensions)) {
+      if (n >= 4) {
+        x = dimensions[0];
+        y = dimensions[1];
+        w = dimensions[2];
+        h = dimensions[3];
+      }
+      delete dimensions;
+    } else {
+      // pick some fallbacks...
+      const otk::Rect &a = openbox->screen(_screen)->area();
+      x = a.x() + a.width() / 4;
+      y = a.y() + a.height() / 4;
+      w = a.width() / 2;
+        h = a.height() / 2;
+    }    
   }
   
   changeAllowedActions();  // based on the new _functions
-  
-  frame->adjustSize();     // drop/replace the decor's and resize
-  frame->adjustPosition(); // get (back) in position!
+
+  // when fullscreening, don't obey things like increments, fill the screen
+  internal_resize(TopLeft, w, h, !fs, x, y);
 
   // raise (back) into our stacking layer
   openbox->screen(_screen)->raiseWindow(this);

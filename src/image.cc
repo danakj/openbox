@@ -87,8 +87,7 @@ Pixmap BImage::render_solid(const BTexture &texture) {
 				control->getDrawable(), width,
 				height, control->getDepth());
   if (pixmap == None) {
-    fprintf(stderr, i18n(ImageSet, ImageErrorCreatingSolidPixmap,
-                         "BImage::render_solid: error creating pixmap\n"));
+    fprintf(stderr, "BImage::render_solid: error creating pixmap\n");
     return None;
   }
 
@@ -454,8 +453,7 @@ XImage *BImage::renderXImage(void) {
                  width, height, 32, 0);
 
   if (! image) {
-    fprintf(stderr, i18n(ImageSet, ImageErrorCreatingXImage,
-                         "BImage::renderXImage: error creating XImage\n"));
+    fprintf(stderr, "BImage::renderXImage: error creating XImage\n");
     return (XImage *) 0;
   }
 
@@ -550,8 +548,7 @@ XImage *BImage::renderXImage(void) {
   }
 
   if (unsupported) {
-    fprintf(stderr, i18n(ImageSet, ImageUnsupVisual,
-                         "BImage::renderXImage: unsupported visual\n"));
+    fprintf(stderr, "BImage::renderXImage: unsupported visual\n");
     delete [] d;
     XDestroyImage(image);
     return (XImage *) 0;
@@ -569,8 +566,7 @@ Pixmap BImage::renderPixmap(void) {
                   control->getDrawable(), width, height, control->getDepth());
 
   if (pixmap == None) {
-    fprintf(stderr, i18n(ImageSet, ImageErrorCreatingPixmap,
-                         "BImage::renderPixmap: error creating pixmap\n"));
+    fprintf(stderr, "BImage::renderPixmap: error creating pixmap\n");
     return None;
   }
 

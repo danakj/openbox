@@ -45,18 +45,13 @@ extern "C" {
 }
 
 #include "blackbox.hh"
-#include "clientmenu.hh"
 #include "font.hh"
 #include "gccache.hh"
-#include "iconmenu.hh"
 #include "image.hh"
 #include "screen.hh"
-#include "toolbar.hh"
 #include "util.hh"
 #include "window.hh"
-#include "windowmenu.hh"
 #include "workspace.hh"
-#include "slit.hh"
 
 using std::string;
 using std::abs;
@@ -148,8 +143,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   client.transient_for = 0;
 
   current_state = NormalState;
-
-  windowmenu = 0;
 
   /*
     set the initial size and location of client window (relative to the
@@ -331,9 +324,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   if (flags.maximized && (functions & Func_Maximize))
     remaximize();
-
-  // create this last so it only needs to be configured once
-  windowmenu = new Windowmenu(this);
 }
 
 
@@ -358,8 +348,6 @@ BlackboxWindow::~BlackboxWindow(void) {
     endMove();
 
   delete timer;
-
-  delete windowmenu;
 
   if (client.window_group) {
     BWindowGroup *group = blackbox->searchGroup(client.window_group);
@@ -974,11 +962,6 @@ void BlackboxWindow::reconfigure(void) {
 
   ungrabButtons();
   grabButtons();
-
-  if (windowmenu) {
-    windowmenu->move(windowmenu->getX(), frame.rect.y() + frame.title_h);
-    windowmenu->reconfigure();
-  }
 }
 
 
@@ -1161,7 +1144,7 @@ void BlackboxWindow::getWMName(void) {
     return;
   }
   // fall back to an internal default
-  client.title = i18n(WindowSet, WindowUnnamed, "Unnamed");
+  client.title = "Unnamed";
   xatom->setValue(client.window, XAtom::net_wm_visible_name, XAtom::utf8,
                   client.title);
 
@@ -1215,8 +1198,6 @@ void BlackboxWindow::getWMProtocols(void) {
         functions |= Func_Close;
       } else if (proto[i] == xatom->getAtom(XAtom::wm_take_focus))
         flags.send_focus_message = True;
-      else if (proto[i] == xatom->getAtom(XAtom::blackbox_structure_messages))
-        screen->addNetizen(new Netizen(screen, client.window));
     }
 
     XFree(proto);
@@ -1669,7 +1650,6 @@ void BlackboxWindow::configure(int dx, int dy,
 
     XSendEvent(blackbox->getXDisplay(), client.window, False,
                StructureNotifyMask, &event);
-    screen->updateNetizenConfigNotify(&event);
     XFlush(blackbox->getXDisplay());
   }
 }
@@ -1783,8 +1763,6 @@ void BlackboxWindow::iconify(void) {
   if (flags.moving)
     endMove();
     
-  if (windowmenu) windowmenu->hide();
-
   /*
    * we don't want this XUnmapWindow call to generate an UnmapNotify event, so
    * we need to clear the event mask on client.window for a split second.
@@ -1921,8 +1899,6 @@ void BlackboxWindow::withdraw(void) {
   XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
 
   XUngrabServer(blackbox->getXDisplay());
-
-  if (windowmenu) windowmenu->hide();
 }
 
 
@@ -1933,9 +1909,6 @@ void BlackboxWindow::maximize(unsigned int button) {
   // server. This should only ever happen if using opaque moving.
   if (flags.moving)
     endMove();
-
-  // handle case where menu is open then the max button is used instead
-  if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
 
   if (flags.maximized) {
     flags.maximized = 0;
@@ -2257,15 +2230,6 @@ void BlackboxWindow::setFocusFlag(bool focus) {
 
   if (flags.focused)
     blackbox->setFocusedWindow(this);
- 
-  if (! flags.iconic) {
-    // iconic windows arent in a workspace menu!
-    if (flags.stuck)
-      screen->getCurrentWorkspace()->setFocused(this, isFocused());
-    else
-      screen->getWorkspace(blackbox_attrib.workspace)->
-        setFocused(this, flags.focused);
-  }
 }
 
 
@@ -2994,7 +2958,6 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
           positionButtons(True);
           XMapSubwindows(blackbox->getXDisplay(), frame.title);
         }
-        if (windowmenu) windowmenu->reconfigure();
       }
     } else if (pe->atom == xatom->getAtom(XAtom::net_wm_strut)) {
       updateStrut();
@@ -3116,8 +3079,6 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
     } else if (frame.stick_button == be->window) {
       redrawStickyButton(True);
     } else if (frame.plate == be->window) {
-      if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
-
       screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
 
       XAllowEvents(blackbox->getXDisplay(), ReplayPointer, be->time);
@@ -3133,58 +3094,12 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
         }
       }
 
-      if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
-
       screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     }
   } else if (be->button == 2 && (be->window != frame.iconify_button) &&
              (be->window != frame.close_button) &&
              (be->window != frame.stick_button)) {
     screen->getWorkspace(blackbox_attrib.workspace)->lowerWindow(this);
-  } else if (windowmenu && be->button == 3 &&
-             (frame.title == be->window || frame.label == be->window ||
-              frame.handle == be->window || frame.window == be->window)) {
-    if (windowmenu->isVisible()) {
-      windowmenu->hide();
-    } else {
-      int mx = be->x_root - windowmenu->getWidth() / 2,
-          my = be->y_root - windowmenu->getHeight() / 2;
-
-      // snap the window menu into a corner/side if necessary
-      int left_edge, right_edge, top_edge, bottom_edge;
-
-      /*
-         the " + (frame.border_w * 2) - 1" bits are to get the proper width
-         and height of the menu, as the sizes returned by it do not include
-         the borders.
-       */
-      left_edge = frame.rect.x();
-      right_edge = frame.rect.right() -
-        (windowmenu->getWidth() + (frame.border_w * 2) - 1);
-      top_edge = client.rect.top() - (frame.border_w + frame.mwm_border_w);
-      bottom_edge = client.rect.bottom() -
-        (windowmenu->getHeight() + (frame.border_w * 2) - 1) +
-        (frame.border_w + frame.mwm_border_w);
-
-      if (mx < left_edge)
-        mx = left_edge;
-      else if (mx > right_edge)
-        mx = right_edge;
-      if (my < top_edge)
-        my = top_edge;
-      else if (my > bottom_edge)
-        my = bottom_edge;
-      
-      if (my + windowmenu->getHeight() > screen->getHeight())
-        my = screen->getHeight() - windowmenu->getHeight() -
-          (screen->getBorderWidth() * 2);
-
-      windowmenu->move(mx, my);
-      windowmenu->show();
-      XRaiseWindow(blackbox->getXDisplay(), windowmenu->getWindowID());
-      XRaiseWindow(blackbox->getXDisplay(),
-                   windowmenu->getSendToMenu()->getWindowID());
-    }
   // mouse wheel up
   } else if (be->button == 4) {
     if ((be->window == frame.label ||
@@ -3275,9 +3190,6 @@ void BlackboxWindow::beginMove(int x_root, int y_root) {
                PointerMotionMask | ButtonReleaseMask,
                GrabModeAsync, GrabModeAsync,
                None, blackbox->getMoveCursor(), CurrentTime);
-
-  if (windowmenu && windowmenu->isVisible())
-    windowmenu->hide();
 
   flags.moving = True;
   blackbox->setChangingWindow(this);
@@ -3430,25 +3342,6 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
     for (st_it = stack_list.begin(); st_it != st_end; ++st_it)
       if (*st_it != this) // don't snap to ourself
         rectlist.push_back( (*st_it)->frameRect() );
-
-    // add the toolbar and the slit to the rect list.
-    // (only if they are not hidden)
-    Toolbar *tbar = screen->getToolbar();
-    Slit *slit = screen->getSlit();
-    Rect tbar_rect, slit_rect;
-    unsigned int bwidth = screen->getBorderWidth() * 2;
-
-    if (! (screen->doHideToolbar() || tbar->isHidden())) {
-      tbar_rect.setRect(tbar->getX(), tbar->getY(), tbar->getWidth() + bwidth,
-                        tbar->getHeight() + bwidth);
-      rectlist.push_back(tbar_rect);
-    }
-
-    if (! slit->isHidden()) {
-      slit_rect.setRect(slit->getX(), slit->getY(), slit->getWidth() + bwidth,
-                        slit->getHeight() + bwidth);
-      rectlist.push_back(slit_rect);
-    }
 
     RectList::const_iterator it, end = rectlist.end();
     for (it = rectlist.begin(); it != end; ++it) {

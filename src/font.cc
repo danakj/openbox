@@ -45,7 +45,6 @@ using std::endl;
 
 string      BFont::_fallback_font   = "fixed";
 
-#ifdef XFT
 BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
              bool bold, bool italic, bool shadow, unsigned char offset, 
              unsigned char tint, bool antialias) :
@@ -60,10 +59,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
                                           _shadow(shadow),
                                           _offset(offset),
                                           _tint(tint),
-                                          _xftfont(0),
-                                          _font(0),
-                                          _fontset(0),
-                                          _fontset_extents(0) {
+                                          _xftfont(0) {
   _valid = False;
 
   _xftfont = XftFontOpen(_display, _screen->getScreenNumber(),
@@ -80,177 +76,13 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
   if (! _xftfont)
     return; // failure
 
-  _font = XLoadQueryFont(_display, buildXlfd().c_str()); 
-  if (! _font)
-    return; // failure
-
   _valid = True;
-}
-#endif
-
-
-BFont::BFont(Display *d, BScreen *screen, const string &xlfd) :
-                                       _display(d),
-                                       _screen(screen),
-#ifdef    XFT
-                                       _antialias(False),
-                                       _shadow(False),
-                                       _xftfont(0),
-#endif // XFT
-                                       _font(0),
-                                       _fontset(0),
-                                       _fontset_extents(0) {
-  string int_xlfd;
-  if (xlfd.empty())
-    int_xlfd = _fallback_font;
-  else
-    int_xlfd = xlfd;
-  
-  if ((_valid = createXFont(int_xlfd)))
-    return; // success
-
-  if (int_xlfd != _fallback_font) {
-    // try the fallback
-    cerr << "BFont::BFont(): couldn't load font '" << _family << "'" << endl <<
-      "Falling back to default '" << _fallback_font << "'" << endl;
-
-    if ((_valid = createXFont(_fallback_font)))
-      return; // success
-  }
-
-  cerr << "BFont::BFont(): couldn't load font '" << _family << "'" << endl <<
-    "Giving up!" << endl;
-  return; // failure
-}
-
-
-bool BFont::createXFont(const std::string &xlfd) {
-  /*
-     Even though this is only used for font sets (multibyte), it is still parsed
-     out so that the bold/italic/etc information is still available from the
-     class when using non-multibyte.
-
-     This is where _simplename, _bold, _italic, and _size are initialized, since
-     they are not initialized in the constructor. This needs to occur before
-     calling any Xlfd-building functions.
-  */
-  if (! parseXlfd(xlfd))
-    return False;
-
-  if (i18n.multibyte()) {
-    char **missing, *def = "-";
-    int nmissing;
- 
-    _fontset = XCreateFontSet(_display, buildMultibyteXlfd().c_str(),
-                              &missing, &nmissing, &def);
-    if (nmissing) XFreeStringList(missing);
-    if (_fontset)
-      _fontset_extents = XExtentsOfFontSet(_fontset);
-    else
-      return False;
-
-    assert(_fontset_extents);
-  }
-    
-  _font = XLoadQueryFont(_display, xlfd.c_str());
-  if (! _font)
-    return False;
-  return True;
 }
 
 
 BFont::~BFont(void) {
-#ifdef    XFT
   if (_xftfont)
     XftFontClose(_display, _xftfont);
-#endif // XFT
-
-  if (i18n.multibyte() && _fontset)
-    XFreeFontSet(_display, _fontset);
-  if (_font)
-    XFreeFont(_display, _font);
-}
-
-
-/*
- * Takes _family, _size, _bold, _italic, etc and builds them into a full XLFD.
- */
-string BFont::buildXlfd(void) const {
-  if (_simplename) 
-    return _family;
-
-  string weight = _bold ? "bold" : "medium";
-  string slant = _italic ? "i" : "r";
-  string sizestr= _size ? itostring(_size * 10) : "*";
-
-  return "-*-" + _family + "-" + weight + "-" + slant + "-*-*-*-" + sizestr +
-      "-*-*-*-*-*-*";
-}
-
-
-/*
- * Takes _family, _size, _bold, _italic, etc and builds them into a full XLFD.
- */
-string BFont::buildMultibyteXlfd(void) const {
-  string weight = _bold ? "bold" : "medium";
-  string slant = _italic ? "i" : "r";
-  string sizestr= _size ? itostring(_size) : "*";
-
-  return _family + ','
-    + "-*-*-" + weight + "-" + slant + "-*-*-*-" + sizestr +
-      "-*-*-*-*-*-*" + ','
-    + "-*-*-*-*-*-*-*-" + sizestr + "-*-*-*-*-*-*" + ',' +
-    + "*";
-}
-
-
-/*
- * Takes a full X font name and parses it out so we know if we're bold, our
- * size, etc.
- */
-bool BFont::parseXlfd(const string &xlfd) {
-  if (xlfd.empty() || xlfd[0] != '-') {
-    _family = xlfd;
-    _simplename = True;
-    _bold = False;
-    _italic = False;
-    _size = 0;
-  } else {
-    _simplename = False;
-    string weight,
-           slant,
-           sizestr;
-    int i = 0;
-
-    string::const_iterator it = xlfd.begin(), end = xlfd.end();
-    while(1) {
-      string::const_iterator tmp = it;   // current string.begin()
-      it = std::find(tmp, end, '-');     // look for comma between tmp and end
-      if (i == 2) _family = string(tmp, it); // s[tmp:it]
-      if (i == 3) weight = string(tmp, it);
-      if (i == 4) slant = string(tmp, it);
-      if (i == 7 && string(tmp, it) != "*") sizestr = string(tmp, it);
-      if (sizestr.empty() &&
-          i == 8 && string(tmp, it) != "*") sizestr = string(tmp, it);
-      if (it == end || i >= 8)
-        break;
-      ++it;
-      ++i;
-    }
-    if (i < 3)  // no name even! can't parse that
-      return False;
-    _bold = weight == "bold" || weight == "demibold";
-    _italic = slant == "i" || slant == "o";
-    _size = atoi(sizestr.c_str()) / 10;
-  }
-  
-  // min/max size restrictions for sanity, but 0 is the font's "default size"
-  if (_size && _size < 3)
-    _size = 3;
-  else if (_size > 97)
-    _size = 97;
-
-  return True;
 }
 
 
@@ -258,117 +90,60 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
                        const string &string) const {
   assert(_valid);
 
-#ifdef    XFT
-  if (_xftfont) {
-    XftDraw *draw = XftDrawCreate(_display, d, _screen->getVisual(),
-                                  _screen->getColormap());
-    assert(draw);
+  XftDraw *draw = XftDrawCreate(_display, d, _screen->getVisual(),
+                                _screen->getColormap());
+  assert(draw);
 
-    if (_shadow) {
-      XftColor c;
-      c.color.red = 0;
-      c.color.green = 0;
-      c.color.blue = 0;
-      c.color.alpha = _tint | _tint << 8; // transparent shadow
-      c.pixel = BlackPixel(_display, _screen->getScreenNumber());
-
-#ifdef XFT_UTF8
-      XftDrawStringUtf8(
-#else
-      XftDrawString8(
-#endif
-                     draw, &c, _xftfont, x + _offset, 
-                     _xftfont->ascent + y + _offset, (XftChar8 *) string.c_str(), 
-                     string.size());
-    }
-    
+  if (_shadow) {
     XftColor c;
-    c.color.red = color.red() | color.red() << 8;
-    c.color.green = color.green() | color.green() << 8;
-    c.color.blue = color.blue() | color.blue() << 8;
-    c.pixel = color.pixel();
-    c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
+    c.color.red = 0;
+    c.color.green = 0;
+    c.color.blue = 0;
+    c.color.alpha = _tint | _tint << 8; // transparent shadow
+    c.pixel = BlackPixel(_display, _screen->getScreenNumber());
 
-#ifdef XFT_UTF8
-    XftDrawStringUtf8(
-#else
-    XftDrawString8(
-#endif
-                   draw, &c, _xftfont, x, _xftfont->ascent + y,
-                   (XftChar8 *) string.c_str(), string.size());
-
-    XftDrawDestroy(draw);
-    return;
+    XftDrawStringUtf8(draw, &c, _xftfont, x + _offset,
+                      _xftfont->ascent + y + _offset,
+                      (XftChar8 *) string.c_str(),
+                      string.size());
   }
-#endif // XFT
+    
+  XftColor c;
+  c.color.red = color.red() | color.red() << 8;
+  c.color.green = color.green() | color.green() << 8;
+  c.color.blue = color.blue() | color.blue() << 8;
+  c.pixel = color.pixel();
+  c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
 
-  BPen pen(color, _font);
+  XftDrawStringUtf8(draw, &c, _xftfont, x, _xftfont->ascent + y,
+                    (XftChar8 *) string.c_str(), string.size());
 
-  if (i18n.multibyte())
-    XmbDrawString(_display, d, _fontset, pen.gc(),
-                  x, y - _fontset_extents->max_ink_extent.y,
-                  string.c_str(), string.size());
-  else
-    XDrawString(_display, d, pen.gc(),
-                x, _font->ascent + y,
-                string.c_str(), string.size());
+  XftDrawDestroy(draw);
+  return;
 }
 
 
 unsigned int BFont::measureString(const string &string) const {
   assert(_valid);
 
-#ifdef    XFT
-  if (_xftfont) {
-    XGlyphInfo info;
+  XGlyphInfo info;
 
-#ifdef XFT_UTF8
-    XftTextExtentsUtf8(
-#else
-    XftTextExtents8(
-#endif
-                    _display, _xftfont, (XftChar8 *) string.c_str(),
-                    string.size(), &info);
+  XftTextExtentsUtf8(_display, _xftfont, (XftChar8 *) string.c_str(),
+                     string.size(), &info);
 
-    return info.xOff + (_shadow ? _offset : 0);
-  }
-#endif // XFT
-
-  if (i18n.multibyte()) {
-    XRectangle ink, logical;
-    XmbTextExtents(_fontset, string.c_str(), string.size(), &ink, &logical);
-    return logical.width;
-  } else {
-    return XTextWidth(_font, string.c_str(), string.size());
-  }
+  return info.xOff + (_shadow ? _offset : 0);
 }
 
 
 unsigned int BFont::height(void) const {
   assert(_valid);
 
-#ifdef    XFT
-  if (_xftfont)
-    return _xftfont->height + (_shadow ? _offset : 0);
-#endif // XFT
-
-  if (i18n.multibyte())
-    return _fontset_extents->max_ink_extent.height;
-  else
-    return _font->ascent + _font->descent;
+  return _xftfont->height + (_shadow ? _offset : 0);
 }
 
 
 unsigned int BFont::maxCharWidth(void) const {
   assert(_valid);
 
-#ifdef    XFT
-  if (_xftfont)
-    return _xftfont->max_advance_width;
-#endif // XFT
-
-  if (i18n.multibyte())
-    return _fontset_extents->max_logical_extent.width;
-  else
-    return _font->max_bounds.rbearing - _font->min_bounds.lbearing;
+  return _xftfont->max_advance_width;
 }

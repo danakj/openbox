@@ -75,21 +75,14 @@ extern "C" {
 #include <string>
 using std::string;
 
-#include "i18n.hh"
 #include "blackbox.hh"
-#include "clientmenu.hh"
 #include "font.hh"
 #include "gccache.hh"
-#include "iconmenu.hh"
 #include "image.hh"
 #include "screen.hh"
-#include "slit.hh"
-#include "rootmenu.hh"
-#include "toolbar.hh"
 #include "util.hh"
 #include "window.hh"
 #include "workspace.hh"
-#include "workspacemenu.hh"
 #include "util.hh"
 #include "xatom.hh"
 
@@ -101,9 +94,9 @@ using std::string;
 static bool running = True;
 
 static int anotherWMRunning(Display *display, XErrorEvent *) {
-  fprintf(stderr, i18n(ScreenSet, ScreenAnotherWMRunning,
+  fprintf(stderr,
           "BScreen::BScreen: an error occured while querying the X server.\n"
-          "  another window manager already running on display %s.\n"),
+          "  another window manager already running on display %s.\n",
           DisplayString(display));
 
   running = False;
@@ -129,16 +122,12 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   managed = running;
   if (! managed) return;
 
-  fprintf(stderr, i18n(ScreenSet, ScreenManagingScreen,
-                       "BScreen::BScreen: managing screen %d "
-                       "using visual 0x%lx, depth %d\n"),
+  fprintf(stderr, "BScreen::BScreen: managing screen %d "
+          "using visual 0x%lx, depth %d\n",
           getScreenNumber(), XVisualIDFromVisual(getVisual()),
           getDepth());
 
-  rootmenu = 0;
-
-  resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
-    resource.wstyle.font = (BFont *) 0;
+  resource.wstyle.font = (BFont *) 0;
 
   geom_pixmap = None;
 
@@ -178,8 +167,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   opGC = XCreateGC(blackbox->getXDisplay(), getRootWindow(),
                    GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
-  const char *s =  i18n(ScreenSet, ScreenPositionLength,
-                        "0: 0000 x 0: 0000");
+  const char *s = "0: 0000 x 0: 0000";
   geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
   geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
 
@@ -208,46 +196,26 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
     XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
                                geom_window, geom_pixmap);
 
-  workspacemenu = new Workspacemenu(this);
-  iconmenu = new Iconmenu(this);
-  configmenu = new Configmenu(this);
-
   if (resource.workspaces > 0) {
     for (unsigned int i = 0; i < resource.workspaces; ++i) {
       Workspace *wkspc = new Workspace(this, workspacesList.size());
       workspacesList.push_back(wkspc);
-      workspacemenu->insertWorkspace(wkspc);
-      workspacemenu->update();
 
     }
   } else {
     Workspace *wkspc = new Workspace(this, workspacesList.size());
     workspacesList.push_back(wkspc);
-    workspacemenu->insertWorkspace(wkspc);
-    workspacemenu->update();
   }
   saveWorkspaceNames();
 
   updateNetizenWorkspaceCount();
-
-  workspacemenu->insert(i18n(IconSet, IconIcons, "Icons"), iconmenu);
-  workspacemenu->update();
 
   current_workspace = workspacesList.front();
   
   xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
                   XAtom::cardinal, 0); //first workspace
 
-  workspacemenu->setItemSelected(2, True);
-
-  toolbar = new Toolbar(this);
-
-  slit = new Slit(this);
-
-  InitMenu();
-
   raiseWindows(0, 0);     // this also initializes the empty stacking list
-  rootmenu->update();
 
   updateClientList();     // initialize the client lists, which will be empty
   updateAvailableArea();
@@ -317,27 +285,13 @@ BScreen::~BScreen(void) {
 
   std::for_each(iconList.begin(), iconList.end(), PointerAssassin());
 
-  std::for_each(netizenList.begin(), netizenList.end(), PointerAssassin());
-
   while (! systrayWindowList.empty())
     removeSystrayWindow(systrayWindowList[0]);
 
-  delete rootmenu;
-  delete workspacemenu;
-  delete iconmenu;
-  delete configmenu;
-  delete slit;
-  delete toolbar;
   delete image_control;
 
   if (resource.wstyle.font)
     delete resource.wstyle.font;
-  if (resource.mstyle.t_font)
-    delete resource.mstyle.t_font;
-  if (resource.mstyle.f_font)
-    delete resource.mstyle.f_font;
-  if (resource.tstyle.font)
-    delete resource.tstyle.font;
 
 #ifdef    BITMAPBUTTONS
   if (resource.wstyle.close_button.mask != None)
@@ -349,21 +303,9 @@ BScreen::~BScreen(void) {
   if (resource.wstyle.stick_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
 
-  if (resource.tstyle.left_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
-  if (resource.tstyle.right_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
-
-  if (resource.mstyle.bullet_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
-  if (resource.mstyle.tick_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
-    
   resource.wstyle.max_button.mask = resource.wstyle.close_button.mask =
     resource.wstyle.icon_button.mask =
     resource.wstyle.stick_button.mask = None;
-  resource.tstyle.left_button.mask = resource.tstyle.right_button.mask = None;
-  resource.mstyle.bullet_image.mask = resource.mstyle.tick_image.mask = None;
 #endif // BITMAPBUTTONS
   
   XFreeGC(blackbox->getXDisplay(), opGC);
@@ -438,16 +380,6 @@ void BScreen::saveShadowFonts(bool f) {
   resource.shadow_fonts = f;
   config->setValue(screenstr + "dropShadowFonts", resource.shadow_fonts);
   reconfigure();
-}
-
-
-void BScreen::saveHideToolbar(bool h) {
-  resource.hide_toolbar = h;
-  if (resource.hide_toolbar)
-    toolbar->unmapToolbar();
-  else
-    toolbar->mapToolbar();
-  config->setValue(screenstr + "hideToolbar", resource.hide_toolbar);
 }
 
 
@@ -547,27 +479,10 @@ void BScreen::saveColPlacementDirection(int d) {
 }
 
 
-#ifdef    HAVE_STRFTIME
 void BScreen::saveStrftimeFormat(const std::string& format) {
   resource.strftime_format = format;
   config->setValue(screenstr + "strftimeFormat", resource.strftime_format);
 }
-
-#else // !HAVE_STRFTIME
-
-void BScreen::saveDateFormat(int f) {
-  resource.date_format = f;
-  config->setValue(screenstr + "dateFormat",
-                   resource.date_format == B_EuropeanDate ?
-                   "European" : "American");
-}
-
-
-void BScreen::saveClock24Hour(bool c) {
-  resource.clock24hour = c;
-  config->setValue(screenstr + "clockFormat", resource.clock24hour ? 24 : 12);
-}
-#endif // HAVE_STRFTIME
 
 
 void BScreen::saveWorkspaceNames() {
@@ -623,32 +538,6 @@ void BScreen::saveRootScrollDirection(int d) {
 }
 
 
-void BScreen::saveRootMenuButton(unsigned int b) {
-  resource.root_menu_button = b;
-  const char *but;
-  switch (resource.root_menu_button) {
-  case 0: but = "None"; break;
-  case 1: but = "Left"; break;
-  case 2: but = "Middle"; break;
-  case 3: default: but = "Right"; break;
-  }
-  config->setValue(screenstr + "rootMenuButton", but);
-}
-
-
-void BScreen::saveWorkspaceMenuButton(unsigned int b) {
-  resource.workspace_menu_button = b;
-  const char *but;
-  switch (resource.workspace_menu_button) {
-  case 0: but = "None"; break;
-  case 1: but = "Left"; break;
-  case 2: default: but = "Middle"; break;
-  case 3: but = "Right"; break;
-  }
-  config->setValue(screenstr + "workspaceMenuButton", but);
-}
-
-
 void BScreen::save_rc(void) {
   saveSloppyFocus(resource.sloppy_focus);
   saveAutoRaise(resource.auto_raise);
@@ -660,7 +549,6 @@ void BScreen::save_rc(void) {
   saveFullMax(resource.full_max);
   saveFocusNew(resource.focus_new);
   saveFocusLast(resource.focus_last);
-  saveHideToolbar(resource.hide_toolbar);
   saveWindowToWindowSnap(resource.snap_to_windows);
   saveWindowToEdgeSnap(resource.snap_to_edges);
   saveWindowCornerSnap(resource.window_corner_snap);
@@ -671,22 +559,12 @@ void BScreen::save_rc(void) {
   saveResistanceSize(resource.resistance_size);
   saveRowPlacementDirection(resource.row_direction);
   saveColPlacementDirection(resource.col_direction);
-#ifdef    HAVE_STRFTIME
   saveStrftimeFormat(resource.strftime_format); 
-#else // !HAVE_STRFTIME
-  saveDateFormat(resource.date_format);
-  savwClock24Hour(resource.clock24hour);
-#endif // HAVE_STRFTIME
   savePlaceIgnoreShaded(resource.ignore_shaded);
   savePlaceIgnoreMaximized(resource.ignore_maximized);
   saveAllowScrollLock(resource.allow_scroll_lock);
   saveWorkspaceWarping(resource.workspace_warping);
   saveRootScrollDirection(resource.root_scroll);
-  saveRootMenuButton(resource.root_menu_button);
-  saveWorkspaceMenuButton(resource.workspace_menu_button);
-
-  toolbar->save_rc();
-  slit->save_rc();
 }
 
 
@@ -720,9 +598,6 @@ void BScreen::load_rc(void) {
       (resource.resize_zones != 1 && resource.resize_zones != 2 &&
        resource.resize_zones != 4))
       resource.resize_zones = 4;
-
-  if (! config->getValue(screenstr + "hideToolbar", resource.hide_toolbar))
-    resource.hide_toolbar = false;
 
   resource.snap_to_windows = WindowResistance;
   if (config->getValue(screenstr + "windowToWindowSnap", s)) {
@@ -820,22 +695,9 @@ void BScreen::load_rc(void) {
   } else
     resource.placement_policy = RowSmartPlacement;
 
-#ifdef    HAVE_STRFTIME
   if (! config->getValue(screenstr + "strftimeFormat",
                          resource.strftime_format))
     resource.strftime_format = "%I:%M %p";
-#else // !HAVE_STRFTIME
-  long l;
-
-  if (config->getValue(screenstr + "dateFormat", s) && s == "European")
-    resource.date_format = B_EuropeanDate;
- else
-    resource.date_format = B_AmericanDate;
-
-  if (! config->getValue(screenstr + "clockFormat", l))
-    l = 12;
-  resource.clock24hour = l == 24;
-#endif // HAVE_STRFTIME
   
   if (! config->getValue(screenstr + "placementIgnoreShaded",
                          resource.ignore_shaded))
@@ -860,29 +722,6 @@ void BScreen::load_rc(void) {
     else if (s == "Reverse")
       resource.root_scroll = ReverseScroll;
   }
-
-  resource.root_menu_button = 3;
-  if (config->getValue(screenstr + "rootMenuButton", s)) {
-    if (s == "None")
-      resource.root_menu_button = 0;
-    else if (s == "Left")
-      resource.root_menu_button = 1;
-    else if (s == "Middle")
-      resource.root_menu_button = 2;
-  }
-
-  resource.workspace_menu_button = 2;
-  if (config->getValue(screenstr + "workspaceMenuButton", s)) {
-    if (s == "None")
-      resource.workspace_menu_button = 0;
-    else if (s == "Left")
-      resource.workspace_menu_button = 1;
-    else if (s == "Right")
-      resource.workspace_menu_button = 3;
-  }
-  // cant both be the same
-  if (resource.workspace_menu_button == resource.root_menu_button)
-    resource.workspace_menu_button = 0;
 }
 
 
@@ -909,8 +748,6 @@ void BScreen::reconfigure(void) {
   if (blackbox->isStartup()) return;
 
   load_rc();
-  toolbar->load_rc();
-  slit->load_rc();
   LoadStyle();
 
   // we need to do this explicitly, because just loading this value from the rc
@@ -925,8 +762,7 @@ void BScreen::reconfigure(void) {
   XChangeGC(blackbox->getXDisplay(), opGC,
             GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
-  const char *s = i18n(ScreenSet, ScreenPositionLength,
-                       "0: 0000 x 0: 0000");
+  const char *s = "0: 0000 x 0: 0000";
 
   geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
   geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
@@ -949,40 +785,10 @@ void BScreen::reconfigure(void) {
   XSetWindowBorder(blackbox->getXDisplay(), geom_window,
                    resource.border_color.pixel());
 
-  workspacemenu->reconfigure();
-  iconmenu->reconfigure();
-
   typedef std::vector<int> SubList;
   SubList remember_subs;
 
-  // save the current open menus
-  Basemenu *menu = rootmenu;
-  int submenu;
-  while ((submenu = menu->getCurrentSubmenu()) >= 0) {
-    remember_subs.push_back(submenu);
-    menu = menu->find(submenu)->submenu();
-    assert(menu);
-  }
-  
-  InitMenu();
   raiseWindows(0, 0);
-  rootmenu->reconfigure();
-
-  // reopen the saved menus
-  menu = rootmenu;
-  const SubList::iterator subs_end = remember_subs.end();
-  for (SubList::iterator it = remember_subs.begin(); it != subs_end; ++it) {
-    menu->drawSubmenu(*it);
-    menu = menu->find(*it)->submenu();
-    if (! menu)
-      break;
-  }
-
-  configmenu->reconfigure();
-
-  toolbar->reconfigure();
-
-  slit->reconfigure();
 
   std::for_each(workspacesList.begin(), workspacesList.end(),
                 std::mem_fun(&Workspace::reconfigure));
@@ -995,14 +801,6 @@ void BScreen::reconfigure(void) {
   }
 
   image_control->timeout();
-}
-
-
-void BScreen::rereadMenu(void) {
-  InitMenu();
-  raiseWindows(0, 0);
-
-  rootmenu->reconfigure();
 }
 
 
@@ -1027,19 +825,8 @@ void BScreen::LoadStyle(void) {
   // load fonts/fontsets
   if (resource.wstyle.font)
     delete resource.wstyle.font;
-  if (resource.tstyle.font)
-    delete resource.tstyle.font;
-  if (resource.mstyle.f_font)
-    delete resource.mstyle.f_font;
-  if (resource.mstyle.t_font)
-    delete resource.mstyle.t_font;
-  resource.wstyle.font = resource.tstyle.font = resource.mstyle.f_font =
-    resource.mstyle.t_font = (BFont *) 0;
 
   resource.wstyle.font = readDatabaseFont("window.", style);
-  resource.tstyle.font = readDatabaseFont("toolbar.", style);
-  resource.mstyle.t_font = readDatabaseFont("menu.title.", style);
-  resource.mstyle.f_font = readDatabaseFont("menu.frame.", style);
 
   // load window config
   resource.wstyle.t_focus =
@@ -1134,126 +921,6 @@ void BScreen::LoadStyle(void) {
   if (resource.wstyle.h_unfocus.texture() == BTexture::Parent_Relative)
     resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
 
-  // load toolbar config
-#ifdef    BITMAPBUTTONS
-  if (resource.tstyle.left_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
-  if (resource.tstyle.right_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
-#endif // BITMAPBUTTONS
-  
-  resource.tstyle.toolbar =
-    readDatabaseTexture("toolbar", "black", style);
-  resource.tstyle.label =
-    readDatabaseTexture("toolbar.label", "black", style);
-  resource.tstyle.window =
-    readDatabaseTexture("toolbar.windowLabel", "black", style);
-  resource.tstyle.button =
-    readDatabaseTexture("toolbar.button", "white", style);
-  resource.tstyle.pressed =
-    readDatabaseTexture("toolbar.button.pressed", "black", style);
-  resource.tstyle.clock =
-    readDatabaseTexture("toolbar.clock", "black", style);
-  resource.tstyle.l_text =
-    readDatabaseColor("toolbar.label.textColor", "white", style);
-  resource.tstyle.w_text =
-    readDatabaseColor("toolbar.windowLabel.textColor", "white", style);
-  resource.tstyle.c_text =
-    readDatabaseColor("toolbar.clock.textColor", "white", style);
-  resource.tstyle.b_pic =
-    readDatabaseColor("toolbar.button.picColor", "black", style);
-
-#ifdef    BITMAPBUTTONS
-  readDatabaseMask("toolbar.button.left.mask", resource.tstyle.left_button,
-                   style);
-  readDatabaseMask("toolbar.button.right.mask", resource.tstyle.right_button,
-                   style);
-#endif // BITMAPBUTTONS
-  
-  resource.tstyle.justify = LeftJustify;
-  if (style.getValue("toolbar.justify", s)) {
-    if (s == "right" || s == "Right")
-      resource.tstyle.justify = RightJustify;
-    else if (s == "center" || s == "Center")
-      resource.tstyle.justify = CenterJustify;
-  }
-
-  // sanity checks
-  if (resource.tstyle.toolbar.texture() == BTexture::Parent_Relative) {
-    resource.tstyle.toolbar = BTexture("solid flat", getBaseDisplay(),
-                                       getScreenNumber(), image_control);
-    resource.tstyle.toolbar.setColor(BColor("black", getBaseDisplay(),
-                                            getScreenNumber()));
-  }
-
-  // load menu config
-#ifdef   BITMAPBUTTONS
-  if (resource.mstyle.bullet_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
-  if (resource.mstyle.tick_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
-#endif // BITMAPBUTTONS
-  
-  resource.mstyle.title =
-    readDatabaseTexture("menu.title", "white", style);
-  resource.mstyle.frame =
-    readDatabaseTexture("menu.frame", "black", style);
-  resource.mstyle.hilite =
-    readDatabaseTexture("menu.hilite", "white", style);
-  resource.mstyle.t_text =
-    readDatabaseColor("menu.title.textColor", "black", style);
-  resource.mstyle.f_text =
-    readDatabaseColor("menu.frame.textColor", "white", style);
-  resource.mstyle.d_text =
-    readDatabaseColor("menu.frame.disableColor", "black", style);
-  resource.mstyle.h_text =
-    readDatabaseColor("menu.hilite.textColor", "black", style);
-
-#ifdef    BITMAPBUTTONS
-  readDatabaseMask("menu.arrow.mask", resource.mstyle.bullet_image, style);
-  readDatabaseMask("menu.selected.mask", resource.mstyle.tick_image, style);
-#endif // BITMAPBUTTONS
-    
-  resource.mstyle.t_justify = LeftJustify;
-  if (style.getValue("menu.title.justify", s)) {
-    if (s == "right" || s == "Right")
-      resource.mstyle.t_justify = RightJustify;
-    else if (s == "center" || s == "Center")
-      resource.mstyle.t_justify = CenterJustify;
-  }
-
-  resource.mstyle.f_justify = LeftJustify;
-  if (style.getValue("menu.frame.justify", s)) {
-    if (s == "right" || s == "Right")
-      resource.mstyle.f_justify = RightJustify;
-    else if (s == "center" || s == "Center")
-      resource.mstyle.f_justify = CenterJustify;
-  }
-
-  resource.mstyle.bullet = Basemenu::Triangle;
-  if (style.getValue("menu.bullet", s)) {
-    if (s == "empty" || s == "Empty")
-      resource.mstyle.bullet = Basemenu::Empty;
-    else if (s == "square" || s == "Square")
-      resource.mstyle.bullet = Basemenu::Square;
-    else if (s == "diamond" || s == "Diamond")
-      resource.mstyle.bullet = Basemenu::Diamond;
-  }
-
-  resource.mstyle.bullet_pos = Basemenu::Left;
-  if (style.getValue("menu.bullet.position", s)) {
-    if (s == "right" || s == "Right")
-      resource.mstyle.bullet_pos = Basemenu::Right;
-  }
-
-  // sanity checks
-  if (resource.mstyle.frame.texture() == BTexture::Parent_Relative) {
-    resource.mstyle.frame = BTexture("solid flat", getBaseDisplay(),
-                                     getScreenNumber(), image_control);
-    resource.mstyle.frame.setColor(BColor("black", getBaseDisplay(),
-                                          getScreenNumber()));
-  }
-
   resource.border_color =
     readDatabaseColor("borderColor", "black", style);
 
@@ -1285,10 +952,6 @@ void BScreen::addIcon(BlackboxWindow *w) {
   w->setWindowNumber(iconList.size());
 
   iconList.push_back(w);
-
-  const char* title = w->getIconTitle();
-  iconmenu->insert(title);
-  iconmenu->update();
 }
 
 
@@ -1296,9 +959,6 @@ void BScreen::removeIcon(BlackboxWindow *w) {
   if (! w) return;
 
   iconList.remove(w);
-
-  iconmenu->remove(w->getWindowNumber());
-  iconmenu->update();
 
   BlackboxWindowList::iterator it = iconList.begin(),
     end = iconList.end();
@@ -1325,13 +985,6 @@ unsigned int BScreen::addWorkspace(void) {
   saveWorkspaces(getWorkspaceCount());
   saveWorkspaceNames();
 
-  workspacemenu->insertWorkspace(wkspc);
-  workspacemenu->update();
-
-  toolbar->reconfigure();
-
-  updateNetizenWorkspaceCount();
-
   return workspacesList.size();
 }
 
@@ -1347,16 +1000,11 @@ unsigned int BScreen::removeLastWorkspace(void) {
 
   wkspc->removeAll();
 
-  workspacemenu->removeWorkspace(wkspc);
-  workspacemenu->update();
-
   workspacesList.pop_back();
   delete wkspc;
 
   saveWorkspaces(getWorkspaceCount());
   saveWorkspaceNames();
-
-  toolbar->reconfigure();
 
   updateNetizenWorkspaceCount();
 
@@ -1384,15 +1032,11 @@ void BScreen::changeWorkspaceID(unsigned int id) {
     blackbox->setFocusedWindow((BlackboxWindow *) 0);
 
   current_workspace->hideAll();
-  workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
 
   current_workspace = getWorkspace(id);
 
   xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
                   XAtom::cardinal, id);
-
-  workspacemenu->setItemSelected(current_workspace->getID() + 2, True);
-  toolbar->redrawWorkspaceLabel(True);
 
   current_workspace->showAll();
 
@@ -1432,8 +1076,6 @@ void BScreen::changeWorkspaceID(unsigned int id) {
     blackbox->setFocusedWindow(win);
   else
     blackbox->setFocusedWindow((BlackboxWindow *) 0);
-
-  updateNetizenCurrentWorkspace();
 }
 
 
@@ -1543,7 +1185,7 @@ void BScreen::manageWindow(Window w) {
   XWMHints *wmhint = XGetWMHints(blackbox->getXDisplay(), w);
   if (wmhint && (wmhint->flags & StateHint) &&
       wmhint->initial_state == WithdrawnState) {
-    slit->addClient(w);
+    //slit->addClient(w);
     return;
   }
 
@@ -1626,8 +1268,6 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   if (blackbox->getFocusedWindow() == w)
     blackbox->setFocusedWindow((BlackboxWindow *) 0);
 
-  removeNetizen(w->getClientWindow());
-
   /*
     some managed windows can also be window group controllers.  when
     unmanaging such windows, we should also delete the window group.
@@ -1636,35 +1276,6 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   delete group;
 
   delete w;
-}
-
-
-void BScreen::addNetizen(Netizen *n) {
-  netizenList.push_back(n);
-
-  n->sendWorkspaceCount();
-  n->sendCurrentWorkspace();
-
-  WorkspaceList::iterator it = workspacesList.begin();
-  const WorkspaceList::iterator end = workspacesList.end();
-  for (; it != end; ++it)
-    (*it)->sendWindowList(*n);
-
-  Window f = ((blackbox->getFocusedWindow()) ?
-              blackbox->getFocusedWindow()->getClientWindow() : None);
-  n->sendWindowFocus(f);
-}
-
-
-void BScreen::removeNetizen(Window w) {
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it) {
-    if ((*it)->getWindowID() == w) {
-      delete *it;
-      netizenList.erase(it);
-      break;
-    }
-  }
 }
 
 
@@ -1688,20 +1299,11 @@ void BScreen::updateWorkArea(void) {
 }
 
 
-void BScreen::updateNetizenCurrentWorkspace(void) {
-  std::for_each(netizenList.begin(), netizenList.end(),
-                std::mem_fun(&Netizen::sendCurrentWorkspace));
-}
-
-
 void BScreen::updateNetizenWorkspaceCount(void) {
   xatom->setValue(getRootWindow(), XAtom::net_number_of_desktops,
                   XAtom::cardinal, workspacesList.size());
 
   updateWorkArea();
-  
-  std::for_each(netizenList.begin(), netizenList.end(),
-                std::mem_fun(&Netizen::sendWorkspaceCount));
 }
 
 
@@ -1711,46 +1313,6 @@ void BScreen::updateNetizenWindowFocus(void) {
 
   xatom->setValue(getRootWindow(), XAtom::net_active_window,
                   XAtom::window, f);
-
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it)
-    (*it)->sendWindowFocus(f);
-}
-
-
-void BScreen::updateNetizenWindowAdd(Window w, unsigned long p) {
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it) {
-    (*it)->sendWindowAdd(w, p);
-  }
-}
-
-
-void BScreen::updateNetizenWindowDel(Window w) {
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it)
-    (*it)->sendWindowDel(w);
-}
-
-
-void BScreen::updateNetizenWindowRaise(Window w) {
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it)
-    (*it)->sendWindowRaise(w);
-}
-
-
-void BScreen::updateNetizenWindowLower(Window w) {
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it)
-    (*it)->sendWindowLower(w);
-}
-
-
-void BScreen::updateNetizenConfigNotify(XEvent *e) {
-  NetizenList::iterator it = netizenList.begin();
-  for (; it != netizenList.end(); ++it)
-    (*it)->sendConfigNotify(e);
 }
 
 
@@ -1760,55 +1322,10 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 #ifdef    XINERAMA
   ++bbwins;
 #endif // XINERAMA
-#ifdef    XFT
-  ++bbwins;
-#endif // XFT
 
   Window *session_stack = new
-    Window[(num + workspacesList.size() + rootmenuList.size() +
-            specialWindowList.size() + bbwins)];
+    Window[(num + specialWindowList.size() + bbwins)];
   unsigned int i = 0, k = num;
-
-  XRaiseWindow(blackbox->getXDisplay(), iconmenu->getWindowID());
-  *(session_stack + i++) = iconmenu->getWindowID();
-
-  WorkspaceList::iterator wit = workspacesList.begin();
-  const WorkspaceList::iterator w_end = workspacesList.end();
-  for (; wit != w_end; ++wit)
-    *(session_stack + i++) = (*wit)->getMenu()->getWindowID();
-
-  *(session_stack + i++) = workspacemenu->getWindowID();
-
-  *(session_stack + i++) = configmenu->getFocusmenu()->getWindowID();
-  *(session_stack + i++) = configmenu->getPlacementmenu()->getWindowID();
-  *(session_stack + i++) = configmenu->getWindowSnapmenu()->getWindowID();
-  *(session_stack + i++) = configmenu->getEdgeSnapmenu()->getWindowID();
-#ifdef    XINERAMA
-  *(session_stack + i++) = configmenu->getXineramamenu()->getWindowID();
-#endif // XINERAMA
-#ifdef    XFT
-  *(session_stack + i++) = configmenu->getXftmenu()->getWindowID();
-#endif // XFT
-  *(session_stack + i++) = configmenu->getWindowID();
-
-  *(session_stack + i++) = slit->getMenu()->getDirectionmenu()->getWindowID();
-  *(session_stack + i++) = slit->getMenu()->getPlacementmenu()->getWindowID();
-  *(session_stack + i++) = slit->getMenu()->getWindowID();
-
-  *(session_stack + i++) =
-    toolbar->getMenu()->getPlacementmenu()->getWindowID();
-  *(session_stack + i++) = toolbar->getMenu()->getWindowID();
-
-  RootmenuList::iterator rit = rootmenuList.begin();
-  for (; rit != rootmenuList.end(); ++rit)
-    *(session_stack + i++) = (*rit)->getWindowID();
-  *(session_stack + i++) = rootmenu->getWindowID();
-
-  if (toolbar->isOnTop())
-    *(session_stack + i++) = toolbar->getWindowID();
-
-  if (slit->isOnTop())
-    *(session_stack + i++) = slit->getWindowID();
 
   WindowList::iterator sit, send = specialWindowList.end();
   for (sit = specialWindowList.begin(); sit != send; ++sit)
@@ -1878,15 +1395,7 @@ void BScreen::reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
 
 void BScreen::propagateWindowName(const BlackboxWindow *bw) {
   if (bw->isIconic()) {
-    iconmenu->changeItemLabel(bw->getWindowNumber(), bw->getIconTitle());
-    iconmenu->update();
   } else {
-    Clientmenu *clientmenu = getWorkspace(bw->getWorkspaceNumber())->getMenu();
-    clientmenu->changeItemLabel(bw->getWindowNumber(), bw->getTitle());
-    clientmenu->update();
-
-    if (blackbox->getFocusedWindow() == bw)
-      toolbar->redrawWindowLabel(True);
   }
 }
 
@@ -1953,409 +1462,6 @@ void BScreen::raiseFocus(void) const {
 }
 
 
-void BScreen::InitMenu(void) {
-  if (rootmenu) {
-    rootmenuList.clear();
-
-    while (rootmenu->getCount())
-      rootmenu->remove(0);
-  } else {
-    rootmenu = new Rootmenu(this);
-  }
-  bool defaultMenu = True;
-
-  FILE *menu_file = (FILE *) 0;
-  const char *menu_filename = blackbox->getMenuFilename();
-
-  if (menu_filename) 
-    if (! (menu_file = fopen(menu_filename, "r")))
-      perror(menu_filename);
-  if (! menu_file) {     // opening the menu file failed, try the default menu
-    menu_filename = DEFAULTMENU;
-    if (! (menu_file = fopen(menu_filename, "r")))
-      perror(menu_filename);
-  } 
-
-  if (menu_file) {
-    if (feof(menu_file)) {
-      fprintf(stderr, i18n(ScreenSet, ScreenEmptyMenuFile,
-                           "%s: Empty menu file"),
-              menu_filename);
-    } else {
-      char line[1024], label[1024];
-      memset(line, 0, 1024);
-      memset(label, 0, 1024);
-
-      while (fgets(line, 1024, menu_file) && ! feof(menu_file)) {
-        if (line[0] == '#')
-          continue;
-
-        int i, key = 0, index = -1, len = strlen(line);
-
-        for (i = 0; i < len; i++) {
-          if (line[i] == '[') index = 0;
-          else if (line[i] == ']') break;
-          else if (line[i] != ' ')
-            if (index++ >= 0)
-              key += tolower(line[i]);
-        }
-
-        if (key == 517) { // [begin]
-          index = -1;
-          for (i = index; i < len; i++) {
-            if (line[i] == '(') index = 0;
-            else if (line[i] == ')') break;
-            else if (index++ >= 0) {
-              if (line[i] == '\\' && i < len - 1) i++;
-              label[index - 1] = line[i];
-            }
-          }
-
-          if (index == -1) index = 0;
-          label[index] = '\0';
-
-          rootmenu->setLabel(label);
-          defaultMenu = parseMenuFile(menu_file, rootmenu);
-          if (! defaultMenu)
-            blackbox->addMenuTimestamp(menu_filename);
-          break;
-        }
-      }
-    }
-    fclose(menu_file);
-  }
-
-  if (defaultMenu) {
-    rootmenu->setInternalMenu();
-    rootmenu->insert(i18n(ScreenSet, Screenxterm, "xterm"),
-                     BScreen::Execute,
-                     i18n(ScreenSet, Screenxterm, "xterm"));
-    rootmenu->insert(i18n(ScreenSet, ScreenRestart, "Restart"),
-                     BScreen::Restart);
-    rootmenu->insert(i18n(ScreenSet, ScreenExit, "Exit"),
-                     BScreen::Exit);
-    rootmenu->setLabel(i18n(BasemenuSet, BasemenuBlackboxMenu,
-                            "Openbox Menu"));
-  }
-}
-
-
-static
-size_t string_within(char begin, char end,
-                     const char *input, size_t start_at, size_t length,
-                     char *output) {
-  bool parse = False;
-  size_t index = 0;
-  size_t i = start_at;
-  for (; i < length; ++i) {
-    if (input[i] == begin) {
-      parse = True;
-    } else if (input[i] == end) {
-      break;
-    } else if (parse) {
-      if (input[i] == '\\' && i < length - 1) i++;
-      output[index++] = input[i];
-    } 
-  }
-
-  if (parse)
-    output[index] = '\0';
-  else
-    output[0] = '\0';
-
-  return i;
-}
-
-
-bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
-  char line[1024], keyword[1024], label[1024], command[1024];
-  bool done = False;
-
-  while (! (done || feof(file))) {
-    memset(line, 0, 1024);
-    memset(label, 0, 1024);
-    memset(command, 0, 1024);
-
-    if (! fgets(line, 1024, file))
-      continue;
-
-    if (line[0] == '#') // comment, skip it
-      continue;
-
-    size_t line_length = strlen(line);
-    unsigned int key = 0;
-
-    // get the keyword enclosed in []'s
-    size_t pos = string_within('[', ']', line, 0, line_length, keyword);
-
-    if (keyword[0] == '\0') {  // no keyword, no menu entry
-      continue;
-    } else {
-      size_t len = strlen(keyword);
-      for (size_t i = 0; i < len; ++i) {
-        if (keyword[i] != ' ')
-          key += tolower(keyword[i]);
-      }
-    }
-
-    // get the label enclosed in ()'s
-    pos = string_within('(', ')', line, pos, line_length, label);
-
-    // get the command enclosed in {}'s
-    pos = string_within('{', '}', line, pos, line_length, command);
-
-    switch (key) {
-    case 311: // end
-      done = True;
-
-      break;
-
-    case 333: // nop
-      if (! *label)
-        label[0] = '\0';
-      menu->insert(label);
-
-      break;
-
-    case 421: // exec
-      if (! (*label && *command)) {
-        fprintf(stderr, i18n(ScreenSet, ScreenEXECError,
-                             "BScreen::parseMenuFile: [exec] error, "
-                             "no menu label and/or command defined\n"));
-        continue;
-      }
-
-      menu->insert(label, BScreen::Execute, command);
-
-      break;
-
-    case 442: // exit
-      if (! *label) {
-        fprintf(stderr, i18n(ScreenSet, ScreenEXITError,
-                             "BScreen::parseMenuFile: [exit] error, "
-                             "no menu label defined\n"));
-        continue;
-      }
-
-      menu->insert(label, BScreen::Exit);
-
-      break;
-
-    case 561: { // style
-      if (! (*label && *command)) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenSTYLEError,
-                     "BScreen::parseMenuFile: [style] error, "
-                     "no menu label and/or filename defined\n"));
-        continue;
-      }
-
-      string style = expandTilde(command);
-
-      menu->insert(label, BScreen::SetStyle, style.c_str());
-    }
-      break;
-
-    case 630: // config
-      if (! *label) {
-        fprintf(stderr, i18n(ScreenSet, ScreenCONFIGError,
-                             "BScreen::parseMenufile: [config] error, "
-                             "no label defined"));
-        continue;
-      }
-
-      menu->insert(label, configmenu);
-
-      break;
-
-    case 740: { // include
-      if (! *label) {
-        fprintf(stderr, i18n(ScreenSet, ScreenINCLUDEError,
-                             "BScreen::parseMenuFile: [include] error, "
-                             "no filename defined\n"));
-        continue;
-      }
-
-      string newfile = expandTilde(label);
-      FILE *submenufile = fopen(newfile.c_str(), "r");
-
-      if (! submenufile) {
-        perror(newfile.c_str());
-        continue;
-      }
-
-      struct stat buf;
-      if (fstat(fileno(submenufile), &buf) ||
-          ! S_ISREG(buf.st_mode)) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenINCLUDEErrorReg,
-                     "BScreen::parseMenuFile: [include] error: "
-                     "'%s' is not a regular file\n"), newfile.c_str());
-        break;
-      }
-
-      if (! feof(submenufile)) {
-        if (! parseMenuFile(submenufile, menu))
-          blackbox->addMenuTimestamp(newfile);
-
-        fclose(submenufile);
-      }
-    }
-
-      break;
-
-    case 767: { // submenu
-      if (! *label) {
-        fprintf(stderr, i18n(ScreenSet, ScreenSUBMENUError,
-                             "BScreen::parseMenuFile: [submenu] error, "
-                             "no menu label defined\n"));
-        continue;
-      }
-
-      Rootmenu *submenu = new Rootmenu(this);
-
-      if (*command)
-        submenu->setLabel(command);
-      else
-        submenu->setLabel(label);
-
-      parseMenuFile(file, submenu);
-      submenu->update();
-      menu->insert(label, submenu);
-      rootmenuList.push_back(submenu);
-    }
-
-      break;
-
-    case 773: { // restart
-      if (! *label) {
-        fprintf(stderr, i18n(ScreenSet, ScreenRESTARTError,
-                             "BScreen::parseMenuFile: [restart] error, "
-                             "no menu label defined\n"));
-        continue;
-      }
-
-      if (*command)
-        menu->insert(label, BScreen::RestartOther, command);
-      else
-        menu->insert(label, BScreen::Restart);
-    }
-
-      break;
-
-    case 845: { // reconfig
-      if (! *label) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenRECONFIGError,
-                     "BScreen::parseMenuFile: [reconfig] error, "
-                     "no menu label defined\n"));
-        continue;
-      }
-
-      menu->insert(label, BScreen::Reconfigure);
-    }
-
-      break;
-
-    case 995:    // stylesdir
-    case 1113: { // stylesmenu
-      bool newmenu = ((key == 1113) ? True : False);
-
-      if (! *label || (! *command && newmenu)) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenSTYLESDIRError,
-                     "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
-                     " error, no directory defined\n"));
-        continue;
-      }
-
-      char *directory = ((newmenu) ? command : label);
-
-      string stylesdir = expandTilde(directory);
-
-      struct stat statbuf;
-
-      if (stat(stylesdir.c_str(), &statbuf) == -1) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenSTYLESDIRErrorNoExist,
-                     "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
-                     " error, %s does not exist\n"), stylesdir.c_str());
-        continue;
-      }
-      if (! S_ISDIR(statbuf.st_mode)) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenSTYLESDIRErrorNotDir,
-                     "BScreen::parseMenuFile:"
-                     " [stylesdir/stylesmenu] error, %s is not a"
-                     " directory\n"), stylesdir.c_str());
-        continue;
-      }
-
-      Rootmenu *stylesmenu;
-
-      if (newmenu)
-        stylesmenu = new Rootmenu(this);
-      else
-        stylesmenu = menu;
-
-      DIR *d = opendir(stylesdir.c_str());
-      struct dirent *p;
-      std::vector<string> ls;
-
-      while((p = readdir(d)))
-        ls.push_back(p->d_name);
-
-      closedir(d);
-
-      std::sort(ls.begin(), ls.end());
-
-      std::vector<string>::iterator it = ls.begin(),
-        end = ls.end();
-      for (; it != end; ++it) {
-        const string& fname = *it;
-
-        if (fname[fname.size()-1] == '~')
-          continue;
-
-        string style = stylesdir;
-        style += '/';
-        style += fname;
-
-        if (! stat(style.c_str(), &statbuf) && S_ISREG(statbuf.st_mode))
-          stylesmenu->insert(fname, BScreen::SetStyle, style);
-      }
-
-      stylesmenu->update();
-
-      if (newmenu) {
-        stylesmenu->setLabel(label);
-        menu->insert(label, stylesmenu);
-        rootmenuList.push_back(stylesmenu);
-      }
-
-      blackbox->addMenuTimestamp(stylesdir);
-    }
-      break;
-
-    case 1090: { // workspaces
-      if (! *label) {
-        fprintf(stderr,
-                i18n(ScreenSet, ScreenWORKSPACESError,
-                     "BScreen:parseMenuFile: [workspaces] error, "
-                     "no menu label defined\n"));
-        continue;
-      }
-
-      menu->insert(label, workspacemenu);
-    }
-      break;
-    }
-  }
-
-  return ((menu->getCount() == 0) ? True : False);
-}
-
-
 void BScreen::shutdown(void) {
   XSelectInput(blackbox->getXDisplay(), getRootWindow(), NoEventMask);
   XSync(blackbox->getXDisplay(), False);
@@ -2368,8 +1474,6 @@ void BScreen::shutdown(void) {
     assert(win);
     unmanageWindow(win, True);
   }
-
-  slit->shutdown();
 }
 
 
@@ -2386,8 +1490,7 @@ void BScreen::showPosition(int x, int y) {
 
   char label[1024];
 
-  sprintf(label, i18n(ScreenSet, ScreenPositionFormat,
-                      "X: %4d x Y: %4d"), x, y);
+  sprintf(label, "X: %4d x Y: %4d", x, y);
 
   XClearWindow(blackbox->getXDisplay(), geom_window);
 
@@ -2411,8 +1514,7 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
 
   char label[1024];
 
-  sprintf(label, i18n(ScreenSet, ScreenGeometryFormat,
-                      "W: %4d x H: %4d"), gx, gy);
+  sprintf(label, "W: %4d x H: %4d", gx, gy);
 
   XClearWindow(blackbox->getXDisplay(), geom_window);
 
@@ -2539,11 +1641,6 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
     if (! isRootColormapInstalled())
       image_control->installRootColormap();
 
-    if (workspacemenu->isVisible())
-      workspacemenu->hide();
-
-    if (rootmenu->isVisible())
-      rootmenu->hide();
   // mouse wheel up
   } else if ((xbutton->button == 4 && resource.root_scroll == NormalScroll) ||
              (xbutton->button == 5 && resource.root_scroll == ReverseScroll)) {
@@ -2559,57 +1656,6 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
     else
       changeWorkspaceID(getCurrentWorkspaceID() - 1);
   }
-
-  if (resource.root_menu_button > 0 &&
-      xbutton->button == resource.root_menu_button)
-    showRootMenu(xbutton->x_root, xbutton->y_root);
-  else if (resource.workspace_menu_button > 0 &&
-           xbutton->button == resource.workspace_menu_button)
-    showWorkspaceMenu(xbutton->x_root, xbutton->y_root);
-}
-
-
-void BScreen::showWorkspaceMenu(int x, int y) {
-  int mx = x - (workspacemenu->getWidth() / 2);
-  int my = y - (workspacemenu->getTitleHeight() / 2);
-
-  if (mx < 0) mx = 0;
-  if (my < 0) my = 0;
-
-  if (mx + workspacemenu->getWidth() > getWidth())
-    mx = getWidth() - workspacemenu->getWidth() - getBorderWidth();
-
-  if (my + workspacemenu->getHeight() > getHeight())
-    my = getHeight() - workspacemenu->getHeight() - getBorderWidth();
-
-  workspacemenu->move(mx, my);
-
-  if (! workspacemenu->isVisible()) {
-    workspacemenu->removeParent();
-    workspacemenu->show();
-  }
-}
-
-
-void BScreen::showRootMenu(int x, int y) {
-  int mx = x - (rootmenu->getWidth() / 2);
-  int my = y - (rootmenu->getTitleHeight() / 2);
-
-  if (mx < 0) mx = 0;
-  if (my < 0) my = 0;
-
-  if (mx + rootmenu->getWidth() > getWidth())
-    mx = getWidth() - rootmenu->getWidth() - getBorderWidth();
-
-  if (my + rootmenu->getHeight() > getHeight())
-    my = getHeight() - rootmenu->getHeight() - getBorderWidth();
-
-  rootmenu->move(mx, my);
-
-  if (! rootmenu->isVisible()) {
-    blackbox->checkMenu();
-    rootmenu->show();
-  }
 }
 
 
@@ -2620,10 +1666,9 @@ void BScreen::propertyNotifyEvent(const XPropertyEvent *pe) {
     const WorkspaceList::iterator end = workspacesList.end();
     for (; it != end; ++it) {
       (*it)->readName(); // re-read its name from the window property
-      workspacemenu->changeWorkspaceLabel((*it)->getID(), (*it)->getName());
+      //workspacemenu->changeWorkspaceLabel((*it)->getID(), (*it)->getName());
     }
-    workspacemenu->update();
-    toolbar->reconfigure();
+    //workspacemenu->update();
     saveWorkspaceNames();
   }
 }
@@ -2725,7 +1770,6 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
 
   string s;
 
-#ifdef    XFT
   int i;
   if (style.getValue(rbasename + "xft.font", s) &&
       style.getValue(rbasename + "xft.size", i)) {
@@ -2761,17 +1805,8 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
                          tint, resource.aa_fonts);
     if (b->valid())
       return b;
-    else
-      delete b; // fall back to the normal X font stuff
+    delete b;
   }
-#endif // XFT
-
-  style.getValue(rbasename + "font", s);
-  // if this fails, a blank string will be used, which will cause the fallback
-  // font to load.
-
-  BFont *b = new BFont(blackbox->getXDisplay(), this, s);
-  if (! b->valid())
-    exit(2);  // can't continue without a font
-  return b;
+    
+  exit(2);  // can't continue without a font
 }

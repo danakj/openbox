@@ -88,11 +88,6 @@ class BScreen;
 class Blackbox;
 class BlackboxWindow;
 class BWindowGroup;
-class Basemenu;
-class Toolbar;
-class Slit;
-
-extern I18n i18n;
 
 class Blackbox : public BaseDisplay, public TimeoutHandler {
 private:
@@ -100,11 +95,6 @@ private:
     Cursor session, move, ll_angle, lr_angle, ul_angle, ur_angle;
   };
   BCursor cursor;
-
-  struct MenuTimestamp {
-    std::string filename;
-    time_t timestamp;
-  };
 
   struct BResource {
     Time double_click_interval;
@@ -134,21 +124,6 @@ private:
   typedef GroupLookup::value_type GroupLookupPair;
   GroupLookup groupSearchList;
 
-  typedef std::map<Window, Basemenu*> MenuLookup;
-  typedef MenuLookup::value_type MenuLookupPair;
-  MenuLookup menuSearchList;
-
-  typedef std::map<Window, Toolbar*> ToolbarLookup;
-  typedef ToolbarLookup::value_type ToolbarLookupPair;
-  ToolbarLookup toolbarSearchList;
-
-  typedef std::map<Window, Slit*> SlitLookup;
-  typedef SlitLookup::value_type SlitLookupPair;
-  SlitLookup slitSearchList;
-
-  typedef std::list<MenuTimestamp*> MenuTimestampList;
-  MenuTimestampList menuTimestamps;
-
   typedef std::list<BScreen*> ScreenList;
   ScreenList screenList;
 
@@ -158,33 +133,29 @@ private:
   Configuration config;
   XAtom *xatom;
 
-  bool no_focus, reconfigure_wait, reread_menu_wait;
+  bool no_focus, reconfigure_wait;
   Time last_time;
   char **argv;
-  std::string menu_file, rc_file;
+  std::string rc_file;
 
   Blackbox(const Blackbox&);
   Blackbox& operator=(const Blackbox&);
 
   void load_rc(void);
   void save_rc(void);
-  void real_rereadMenu(void);
   void real_reconfigure(void);
 
   virtual void process_event(XEvent *);
 
 
 public:
-  Blackbox(char **m_argv, char *dpy_name = 0, char *rc = 0, char *menu = 0);
+  Blackbox(char **m_argv, char *dpy_name = 0, char *rc = 0);
   virtual ~Blackbox(void);
 
-  Basemenu *searchMenu(Window window);
   BWindowGroup *searchGroup(Window window);
   BScreen *searchSystrayWindow(Window window);
   BlackboxWindow *searchWindow(Window window);
   BScreen *searchScreen(Window window);
-  Toolbar *searchToolbar(Window);
-  Slit *searchSlit(Window);
 
 #ifdef    XINERAMA
   inline bool doXineramaPlacement(void) const
@@ -199,18 +170,12 @@ public:
   void saveXineramaSnapping(bool x);
 #endif // XINERAMA
   
-  void saveMenuSearch(Window window, Basemenu *data);
   void saveSystrayWindowSearch(Window window, BScreen *screen);
   void saveWindowSearch(Window window, BlackboxWindow *data);
   void saveGroupSearch(Window window, BWindowGroup *data);
-  void saveToolbarSearch(Window window, Toolbar *data);
-  void saveSlitSearch(Window window, Slit *data);
-  void removeMenuSearch(Window window);
   void removeSystrayWindowSearch(Window window);
   void removeWindowSearch(Window window);
   void removeGroupSearch(Window window);
-  void removeToolbarSearch(Window window);
-  void removeSlitSearch(Window window);
 
   inline XAtom *getXAtom(void) { return xatom; }
 
@@ -224,8 +189,6 @@ public:
 
   inline const char *getStyleFilename(void) const
     { return resource.style_file.c_str(); }
-  inline const char *getMenuFilename(void) const
-    { return menu_file.c_str(); }
 
   inline int getColorsPerChannel(void) const
     { return resource.colors_per_channel; }
@@ -263,11 +226,8 @@ public:
   void setChangingWindow(BlackboxWindow *win);
   void shutdown(void);
   void saveStyleFilename(const std::string& filename);
-  void addMenuTimestamp(const std::string& filename);
   void restart(const char *prog = 0);
   void reconfigure(void);
-  void rereadMenu(void);
-  void checkMenu(void);
 
   bool validateWindow(Window window);
 
@@ -275,9 +235,7 @@ public:
 
   virtual void timeout(void);
 
-#ifndef   HAVE_STRFTIME
   enum { B_AmericanDate = 1, B_EuropeanDate };
-#endif // HAVE_STRFTIME
 };
 
 

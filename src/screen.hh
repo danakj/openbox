@@ -45,13 +45,8 @@ extern "C" {
 #include "color.hh"
 #include "texture.hh"
 #include "image.hh"
-#include "configmenu.hh"
-#include "iconmenu.hh"
-#include "netizen.hh"
-#include "rootmenu.hh"
 #include "timer.hh"
 #include "workspace.hh"
-#include "workspacemenu.hh"
 #include "blackbox.hh"
 
 class Slit; // forward reference
@@ -86,36 +81,6 @@ struct WindowStyle {
                  unsigned int max_length, unsigned int modifier) const;
 };
 
-struct ToolbarStyle {
-  BColor l_text, w_text, c_text, b_pic;
-  BTexture toolbar, label, window, button, pressed, clock;
-
-#ifdef    BITMAPBUTTONS
-  PixmapMask left_button, right_button;
-#endif // BITMAPBUTTONS
-  
-  BFont *font;
-
-  TextJustify justify;
-
-  void doJustify(const std::string &text, int &start_pos,
-                 unsigned int max_length, unsigned int modifier) const;
-};
-
-struct MenuStyle {
-  BColor t_text, f_text, h_text, d_text;
-  BTexture title, frame, hilite;
-  
-#ifdef    BITMAPBUTTONS
-  PixmapMask bullet_image, tick_image;
-#endif // BITMAPBUTTONS
-  
-  BFont *t_font, *f_font;
-
-  TextJustify t_justify, f_justify;
-  int bullet, bullet_pos;
-};
-
 class BScreen : public ScreenInfo {
 private:
   bool root_colormap_installed, managed, geom_visible;
@@ -125,26 +90,15 @@ private:
 
   Blackbox *blackbox;
   BImageControl *image_control;
-  Configmenu *configmenu;
-  Iconmenu *iconmenu;
-  Rootmenu *rootmenu;
   Configuration *config;
   XAtom *xatom;
 
-  typedef std::list<Rootmenu*> RootmenuList;
-  RootmenuList rootmenuList;
-
-  typedef std::list<Netizen*> NetizenList;
-  NetizenList netizenList;
   BlackboxWindowList iconList, windowList;
 
   typedef std::vector<Window> WindowList;
   WindowList specialWindowList, desktopWindowList, systrayWindowList;
 
-  Slit *slit;
-  Toolbar *toolbar;
   Workspace *current_workspace;
-  Workspacemenu *workspacemenu;
 
   unsigned int geom_w, geom_h;
   unsigned long event_mask;
@@ -161,12 +115,10 @@ private:
 
   struct screen_resource {
     WindowStyle wstyle;
-    ToolbarStyle tstyle;
-    MenuStyle mstyle;
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
-      allow_scroll_lock, hide_toolbar, window_corner_snap, aa_fonts,
+      allow_scroll_lock, window_corner_snap, aa_fonts,
       ignore_shaded, ignore_maximized, workspace_warping, shadow_fonts;
 
     int snap_to_windows, snap_to_edges;
@@ -175,29 +127,20 @@ private:
     BColor border_color;
 
     unsigned int workspaces;
-    int toolbar_placement, toolbar_width_percent, placement_policy,
+    int placement_policy,
       snap_threshold, row_direction, col_direction, root_scroll,
       resistance_size;
 
     unsigned int handle_width, bevel_width, frame_width, border_width,
       resize_zones;
 
-    unsigned int root_menu_button, workspace_menu_button;
-
-#ifdef    HAVE_STRFTIME
     std::string strftime_format;
-#else // !HAVE_STRFTIME
-    bool clock24hour;
-    int date_format;
-#endif // HAVE_STRFTIME
 
   } resource;
   std::string screenstr;
 
   BScreen(const BScreen&);
   BScreen& operator=(const BScreen&);
-
-  bool parseMenuFile(FILE *file, Rootmenu *menu);
 
 #ifdef    BITMAPBUTTONS
   void readDatabaseMask(const std::string &rname,
@@ -215,11 +158,16 @@ private:
   BFont *readDatabaseFont(const std::string &rbasename,
                           const Configuration &style);
 
-  void InitMenu(void);
   void LoadStyle(void);
 
   void updateWorkArea(void);
+
 public:
+  // XXX: temporary
+  void updateNetizenWorkspaceCount();
+  void updateNetizenWindowFocus();
+  
+
   enum { WindowNoSnap = 0, WindowSnap, WindowResistance };
   enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
          UnderMousePlacement, ClickMousePlacement, LeftRight, RightLeft,
@@ -248,7 +196,6 @@ public:
   inline bool doFullMax(void) const { return resource.full_max; }
   inline bool doFocusNew(void) const { return resource.focus_new; }
   inline bool doFocusLast(void) const { return resource.focus_last; }
-  inline bool doHideToolbar(void) const { return resource.hide_toolbar; }
   inline int getWindowToWindowSnap(void) const
     { return resource.snap_to_windows; }
   inline int getWindowToEdgeSnap(void) const
@@ -259,26 +206,16 @@ public:
   inline bool doWorkspaceWarping(void) const
     { return resource.workspace_warping; }
   inline int rootScrollDirection(void) const { return resource.root_scroll; }
-  inline unsigned int rootMenuButton(void) const
-    { return resource.root_menu_button; }
-  inline unsigned int workspaceMenuButton(void) const
-    { return resource.workspace_menu_button; }
 
   inline const GC &getOpGC(void) const { return opGC; }
 
   inline Blackbox *getBlackbox(void) { return blackbox; }
   inline BColor *getBorderColor(void) { return &resource.border_color; }
   inline BImageControl *getImageControl(void) { return image_control; }
-  inline Rootmenu *getRootmenu(void) { return rootmenu; }
-
-  inline Slit *getSlit(void) { return slit; }
-  inline Toolbar *getToolbar(void) { return toolbar; }
 
   Workspace *getWorkspace(unsigned int index) const;
 
   inline Workspace *getCurrentWorkspace(void) { return current_workspace; }
-
-  inline Workspacemenu *getWorkspacemenu(void) { return workspacemenu; }
 
   inline unsigned int getHandleWidth(void) const
   { return resource.handle_width; }
@@ -335,7 +272,6 @@ public:
   void saveFullMax(bool f);
   void saveFocusNew(bool f);
   void saveFocusLast(bool f);
-  void saveHideToolbar(bool h);
   void saveWindowToEdgeSnap(int s);
   void saveWindowToWindowSnap(int s);
   void saveWindowCornerSnap(bool s);
@@ -345,24 +281,12 @@ public:
   void saveAllowScrollLock(bool a);
   void saveWorkspaceWarping(bool w);
   void saveRootScrollDirection(int d);
-  void saveRootMenuButton(unsigned int b);
-  void saveWorkspaceMenuButton(unsigned int b);
-  inline void iconUpdate(void) { iconmenu->update(); }
 
-#ifdef    HAVE_STRFTIME
   inline const char *getStrftimeFormat(void)
   { return resource.strftime_format.c_str(); }
   void saveStrftimeFormat(const std::string& format);
-#else // !HAVE_STRFTIME
-  inline int getDateFormat(void) { return resource.date_format; }
-  inline void saveDateFormat(int f);
-  inline bool isClock24Hour(void) { return resource.clock24hour; }
-  inline void saveClock24Hour(bool c);
-#endif // HAVE_STRFTIME
 
   inline WindowStyle *getWindowStyle(void) { return &resource.wstyle; }
-  inline MenuStyle *getMenuStyle(void) { return &resource.mstyle; }
-  inline ToolbarStyle *getToolbarStyle(void) { return &resource.tstyle; }
 
   BlackboxWindow *getIcon(unsigned int index);
 
@@ -380,9 +304,6 @@ public:
   unsigned int removeLastWorkspace(void);
   void changeWorkspaceID(unsigned int id);
   void saveWorkspaceNames(void);
-
-  void addNetizen(Netizen *n);
-  void removeNetizen(Window w);
 
   void addSystrayWindow(Window window);
   void removeSystrayWindow(Window window);
@@ -406,26 +327,13 @@ public:
   void save_rc(void);
   void reconfigure(void);
   void toggleFocusModel(FocusModel model);
-  void rereadMenu(void);
   void shutdown(void);
   void showPosition(int x, int y);
   void showGeometry(unsigned int gx, unsigned int gy);
   void hideGeometry(void);
 
-  void showWorkspaceMenu(int x, int y);
-  void showRootMenu(int x, int y);
-
   void buttonPressEvent(const XButtonEvent *xbutton);
   void propertyNotifyEvent(const XPropertyEvent *pe);
-
-  void updateNetizenCurrentWorkspace(void);
-  void updateNetizenWorkspaceCount(void);
-  void updateNetizenWindowFocus(void);
-  void updateNetizenWindowAdd(Window w, unsigned long p);
-  void updateNetizenWindowDel(Window w);
-  void updateNetizenConfigNotify(XEvent *e);
-  void updateNetizenWindowRaise(Window w);
-  void updateNetizenWindowLower(Window w);
 };
 
 

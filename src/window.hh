@@ -37,7 +37,6 @@ extern "C" {
 #include "basedisplay.hh"
 #include "timer.hh"
 #include "util.hh"
-#include "windowmenu.hh"
 
 #define MwmHintsFunctions     (1l << 0)
 #define MwmHintsDecorations   (1l << 1)
@@ -130,7 +129,6 @@ private:
   BlackboxAttributes blackbox_attrib;
 
   Time lastButtonPressTime;  // used for double clicks, when were we clicked
-  Windowmenu *windowmenu;
 
   unsigned int window_number;
   unsigned long current_state;
@@ -290,11 +288,11 @@ private:
   void redrawWindowFrame(void) const;
   void redrawLabel(void) const;
   void redrawAllButtons(void) const;
-  void BlackboxWindow::redrawButton(bool pressed, Window win,
-                                    Pixmap fppix, unsigned long fppixel,
-                                    Pixmap uppix, unsigned long uppixel,
-                                    Pixmap fpix, unsigned long fpixel,
-                                    Pixmap upix, unsigned long upixel) const;
+  void redrawButton(bool pressed, Window win,
+                    Pixmap fppix, unsigned long fppixel,
+                    Pixmap uppix, unsigned long uppixel,
+                    Pixmap fpix, unsigned long fpixel,
+                    Pixmap upix, unsigned long upixel) const;
   void redrawCloseButton(bool pressed) const;
   void redrawIconifyButton(bool pressed) const;
   void redrawMaximizeButton(bool pressed) const;
@@ -352,8 +350,6 @@ public:
   inline Window getFrameWindow(void) const { return frame.window; }
   inline Window getClientWindow(void) const { return client.window; }
   inline Window getGroupWindow(void) const { return client.window_group; }
-
-  inline Windowmenu * getWindowmenu(void) const { return windowmenu; }
 
   inline const char *getTitle(void) const
   { return client.title.c_str(); }

@@ -1,25 +1,4 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
-// BaseDisplay.cc for Blackbox - an X11 Window manager
-// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
@@ -102,9 +81,7 @@ static int handleXErrors(Display *d, XErrorEvent *e) {
   char errtxt[128];
 
   XGetErrorText(d, e->error_code, errtxt, 128);
-  fprintf(stderr,
-          i18n(BaseDisplaySet, BaseDisplayXError,
-               "%s:  X error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n"),
+  fprintf(stderr, "%s:  X error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n",
           base_display->getApplicationName(), errtxt, e->error_code,
           e->request_code, e->minor_code, e->resourceid);
 #else
@@ -121,11 +98,7 @@ static int handleXErrors(Display *d, XErrorEvent *e) {
 
 // signal handler to allow for proper and gentle shutdown
 
-#ifndef   HAVE_SIGACTION
-static RETSIGTYPE signalhandler(int sig) {
-#else //  HAVE_SIGACTION
 static void signalhandler(int sig) {
-#endif // HAVE_SIGACTION
 
   static int re_enter = 0;
 
@@ -133,41 +106,25 @@ static void signalhandler(int sig) {
   case SIGCHLD:
     int status;
     waitpid(-1, &status, WNOHANG | WUNTRACED);
-
-#ifndef   HAVE_SIGACTION
-    // assume broken, braindead sysv signal semantics
-    signal(SIGCHLD, (RETSIGTYPE (*)(int)) signalhandler);
-#endif // HAVE_SIGACTION
-
     break;
 
   default:
-    if (base_display->handleSignal(sig)) {
-
-#ifndef   HAVE_SIGACTION
-      // assume broken, braindead sysv signal semantics
-      signal(sig, (RETSIGTYPE (*)(int)) signalhandler);
-#endif // HAVE_SIGACTION
-
+    if (base_display->handleSignal(sig))
       return;
-    }
 
-    fprintf(stderr, i18n(BaseDisplaySet, BaseDisplaySignalCaught,
-                         "%s:  signal %d caught\n"),
+    fprintf(stderr, "%s:  signal %d caught\n",
             base_display->getApplicationName(), sig);
 
     if (! base_display->isStartup() && ! re_enter) {
       internal_error = True;
 
       re_enter = 1;
-      fprintf(stderr, i18n(BaseDisplaySet, BaseDisplayShuttingDown,
-                           "shutting down\n"));
+      fprintf(stderr, "shutting down\n");
       base_display->shutdown();
     }
 
     if (sig != SIGTERM && sig != SIGINT) {
-      fprintf(stderr, i18n(BaseDisplaySet, BaseDisplayAborting,
-                           "aborting... dumping core\n"));
+      fprintf(stderr, "aborting... dumping core\n");
       abort();
     }
 
@@ -185,7 +142,6 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
 
   ::base_display = this;
 
-#ifdef    HAVE_SIGACTION
   struct sigaction action;
 
   action.sa_handler = signalhandler;
@@ -201,28 +157,15 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   sigaction(SIGHUP, &action, NULL);
   sigaction(SIGUSR1, &action, NULL);
   sigaction(SIGUSR2, &action, NULL);
-#else // !HAVE_SIGACTION
-  signal(SIGPIPE, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGSEGV, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGFPE, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGTERM, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGINT, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGUSR1, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGUSR2, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGHUP, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGCHLD, (RETSIGTYPE (*)(int)) signalhandler);
-#endif // HAVE_SIGACTION
 
   if (! (display = XOpenDisplay(dpy_name))) {
     fprintf(stderr,
-            i18n(BaseDisplaySet, BaseDisplayXConnectFail,
-               "BaseDisplay::BaseDisplay: connection to X server failed.\n"));
+            "BaseDisplay::BaseDisplay: connection to X server failed.\n");
     ::exit(2);
   } else if (fcntl(ConnectionNumber(display), F_SETFD, 1) == -1) {
     fprintf(stderr,
-            i18n(BaseDisplaySet, BaseDisplayCloseOnExecFail,
-                 "BaseDisplay::BaseDisplay: couldn't mark display connection "
-                 "as close-on-exec\n"));
+            "BaseDisplay::BaseDisplay: couldn't mark display connection "
+            "as close-on-exec\n");
     ::exit(2);
   }
 

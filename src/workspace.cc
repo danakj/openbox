@@ -46,15 +46,11 @@ extern "C" {
 using std::string;
 
 #include "blackbox.hh"
-#include "clientmenu.hh"
 #include "font.hh"
-#include "netizen.hh"
 #include "screen.hh"
-#include "toolbar.hh"
 #include "util.hh"
 #include "window.hh"
 #include "workspace.hh"
-#include "windowmenu.hh"
 #include "xatom.hh"
 
 
@@ -68,8 +64,6 @@ Workspace::Workspace(BScreen *scrn, unsigned int i) {
 #endif // XINERAMA
 
   id = i;
-
-  clientmenu = new Clientmenu(this);
 
   lastfocus = (BlackboxWindow *) 0;
 
@@ -98,12 +92,6 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
       w->setWindowNumber(windowList.size());
 
     windowList.push_back(w);
-
-    clientmenu->insert(w->getTitle());
-    clientmenu->update();
-
-    if (! sticky)
-      screen->updateNetizenWindowAdd(w->getClientWindow(), id);
 
     if (screen->doFocusNew() || (w->isTransient() && w->getTransientFor() &&
                                  w->getTransientFor()->isFocused())) {
@@ -146,12 +134,7 @@ void Workspace::removeWindow(BlackboxWindow *w, bool sticky) {
   assert(it != end);
   
   windowList.erase(it);
-  clientmenu->remove(i);
-  clientmenu->update();
-
   if (! sticky) {
-    screen->updateNetizenWindowDel(w->getClientWindow());
-
     BlackboxWindowList::iterator it = windowList.begin();
     const BlackboxWindowList::iterator end = windowList.end();
     unsigned int i = 0;
@@ -210,19 +193,6 @@ void Workspace::focusFallback(const BlackboxWindow *old_window) {
       setLastFocusedWindow(win);
     }
   }
-}
-
-
-void Workspace::setFocused(const BlackboxWindow *w, bool focused) {
-  BlackboxWindowList::iterator it, end = windowList.end();
-  int i;
-  for (i = 0, it = windowList.begin(); it != end; ++it, ++i)
-    if (*it == w)
-      break;
-  // if its == end, then a window thats not in the windowList
-  // got focused, such as a !isNormal() window.
-  if (it != end)
-    clientmenu->setItemSelected(i, focused);
 }
 
 
@@ -296,7 +266,6 @@ void Workspace::raiseTransients(const BlackboxWindow * const win,
   for (it = win->getTransients().begin(); it != end; ++it) {
     BlackboxWindow *w = *it;
     *stack++ = w->getFrameWindow();
-    screen->updateNetizenWindowRaise(w->getClientWindow());
 
     if (! w->isIconic()) {
       Workspace *wkspc = screen->getWorkspace(w->getWorkspaceNumber());
@@ -325,7 +294,6 @@ void Workspace::lowerTransients(const BlackboxWindow * const win,
   for (it = win->getTransients().rbegin(); it != end; ++it) {
     BlackboxWindow *w = *it;
     *stack++ = w->getFrameWindow();
-    screen->updateNetizenWindowLower(w->getClientWindow());
 
     if (! w->isIconic()) {
       Workspace *wkspc = screen->getWorkspace(w->getWorkspaceNumber());
@@ -353,7 +321,6 @@ void Workspace::raiseWindow(BlackboxWindow *w) {
   StackVector::iterator stack = stack_vector.begin();
 
   *(stack++) = win->getFrameWindow();
-  screen->updateNetizenWindowRaise(win->getClientWindow());
   if (! (win->isIconic() || win->isDesktop())) {
     Workspace *wkspc = screen->getWorkspace(win->getWorkspaceNumber());
     wkspc->stackingList.remove(win);
@@ -383,7 +350,6 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
   lowerTransients(win, stack);
 
   *(stack++) = win->getFrameWindow();
-  screen->updateNetizenWindowLower(win->getClientWindow());
   if (! (win->isIconic() || win->isDesktop())) {
     Workspace *wkspc = screen->getWorkspace(win->getWorkspaceNumber());
     wkspc->stackingList.remove(win);
@@ -395,7 +361,6 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
 
 
 void Workspace::reconfigure(void) {
-  clientmenu->reconfigure();
   std::for_each(windowList.begin(), windowList.end(),
                 std::mem_fun(&BlackboxWindow::reconfigure));
 }
@@ -445,14 +410,6 @@ BlackboxWindow* Workspace::getTopWindowOnStack(void) const {
 }
 
 
-void Workspace::sendWindowList(Netizen &n) {
-  BlackboxWindowList::iterator it = windowList.begin(),
-    end = windowList.end();
-  for(; it != end; ++it)
-    n.sendWindowAdd((*it)->getClientWindow(), getID());
-}
-
-
 unsigned int Workspace::getCount(void) const {
   return windowList.size();
 }
@@ -494,16 +451,13 @@ void Workspace::readName(void) {
       namesList.size() > id) {
     name = namesList[id];
   
-    clientmenu->setLabel(name);
-    clientmenu->update();
   } else {
     /*
        Use a default name. This doesn't actually change the class. That will
        happen after the setName changes the root property, and that change
        makes its way back to this function.
     */
-    string tmp =i18n(WorkspaceSet, WorkspaceDefaultNameFormat,
-                     "Workspace %d");
+    string tmp = "Workspace %d";
     assert(tmp.length() < 32);
     char default_name[32];
     sprintf(default_name, tmp.c_str(), id + 1);

@@ -97,24 +97,18 @@ extern "C" {
 using std::string;
 
 #include "blackbox.hh"
-#include "basemenu.hh"
-#include "clientmenu.hh"
 #include "gccache.hh"
 #include "image.hh"
-#include "rootmenu.hh"
 #include "screen.hh"
-#include "slit.hh"
-#include "toolbar.hh"
 #include "util.hh"
 #include "window.hh"
 #include "workspace.hh"
-#include "workspacemenu.hh"
 #include "xatom.hh"
 
 Blackbox *blackbox;
 
 
-Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
+Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
   : BaseDisplay(m_argv[0], dpy_name) {
   if (! XSupportsLocale())
     fprintf(stderr, "X server does not support locale\n");
@@ -133,17 +127,6 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   if (! rc) rc = "~/.openbox/rc";
   rc_file = expandTilde(rc);
   config.setFile(rc_file);  
-
-  string rcmenu;
-  if (! menu) {
-    //have to come up with something better than this
-    config.load();
-    if (! config.getValue("session.menuFile", rcmenu))
-      rcmenu = "~/.openbox/menu";
-  } else {
-    rcmenu = menu;
-  }
-  menu_file = expandTilde(rcmenu.c_str());
 
   no_focus = False;
 
@@ -176,8 +159,7 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
 
   if (screenList.empty()) {
     fprintf(stderr,
-            i18n(blackboxSet, blackboxNoManagableScreens,
-              "Blackbox::Blackbox: no managable screens found, aborting.\n"));
+            "Blackbox::Blackbox: no managable screens found, aborting.\n");
     ::exit(3);
   }
 
@@ -191,7 +173,7 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   XSynchronize(getXDisplay(), False);
   XSync(getXDisplay(), False);
 
-  reconfigure_wait = reread_menu_wait = False;
+  reconfigure_wait = False;
 
   timer = new BTimer(this, this);
   timer->setTimeout(0l);
@@ -200,9 +182,6 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
 
 Blackbox::~Blackbox(void) {
   std::for_each(screenList.begin(), screenList.end(), PointerAssassin());
-
-  std::for_each(menuTimestamps.begin(), menuTimestamps.end(),
-                PointerAssassin());
 
   delete xatom;
 
@@ -219,9 +198,6 @@ void Blackbox::process_event(XEvent *e) {
     last_time = e->xbutton.time;
 
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Basemenu *menu = (Basemenu *) 0;
-    Slit *slit = (Slit *) 0;
-    Toolbar *tbar = (Toolbar *) 0;
     BScreen *scrn = (BScreen *) 0;
 
     if ((win = searchWindow(e->xbutton.window))) {
@@ -230,12 +206,6 @@ void Blackbox::process_event(XEvent *e) {
       /* XXX: is this sane on low colour desktops? */
       if (e->xbutton.button == 1)
         win->installColormap(True);
-    } else if ((menu = searchMenu(e->xbutton.window))) {
-      menu->buttonPressEvent(&e->xbutton);
-    } else if ((slit = searchSlit(e->xbutton.window))) {
-      slit->buttonPressEvent(&e->xbutton);
-    } else if ((tbar = searchToolbar(e->xbutton.window))) {
-      tbar->buttonPressEvent(&e->xbutton);
     } else if ((scrn = searchScreen(e->xbutton.window))) {
       scrn->buttonPressEvent(&e->xbutton);
       if (active_screen != scrn) {
@@ -256,27 +226,18 @@ void Blackbox::process_event(XEvent *e) {
     last_time = e->xbutton.time;
 
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Basemenu *menu = (Basemenu *) 0;
-    Toolbar *tbar = (Toolbar *) 0;
 
     if ((win = searchWindow(e->xbutton.window)))
       win->buttonReleaseEvent(&e->xbutton);
-    else if ((menu = searchMenu(e->xbutton.window)))
-      menu->buttonReleaseEvent(&e->xbutton);
-    else if ((tbar = searchToolbar(e->xbutton.window)))
-      tbar->buttonReleaseEvent(&e->xbutton);
 
     break;
   }
 
   case ConfigureRequest: {
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Slit *slit = (Slit *) 0;
 
     if ((win = searchWindow(e->xconfigurerequest.window))) {
       win->configureRequestEvent(&e->xconfigurerequest);
-    } else if ((slit = searchSlit(e->xconfigurerequest.window))) {
-      slit->configureRequestEvent(&e->xconfigurerequest);
     } else {
       if (validateWindow(e->xconfigurerequest.window)) {
         XWindowChanges xwc;
@@ -354,13 +315,10 @@ void Blackbox::process_event(XEvent *e) {
 
   case UnmapNotify: {
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Slit *slit = (Slit *) 0;
     BScreen *screen = (BScreen *) 0;
 
     if ((win = searchWindow(e->xunmap.window))) {
       win->unmapNotifyEvent(&e->xunmap);
-    } else if ((slit = searchSlit(e->xunmap.window))) {
-      slit->unmapNotifyEvent(&e->xunmap);
     } else if ((screen = searchSystrayWindow(e->xunmap.window))) {
       screen->removeSystrayWindow(e->xunmap.window);
     }
@@ -370,14 +328,11 @@ void Blackbox::process_event(XEvent *e) {
 
   case DestroyNotify: {
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Slit *slit = (Slit *) 0;
     BScreen *screen = (BScreen *) 0;
     BWindowGroup *group = (BWindowGroup *) 0;
 
     if ((win = searchWindow(e->xdestroywindow.window))) {
       win->destroyNotifyEvent(&e->xdestroywindow);
-    } else if ((slit = searchSlit(e->xdestroywindow.window))) {
-      slit->removeClient(e->xdestroywindow.window, False);
     } else if ((group = searchGroup(e->xdestroywindow.window))) {
       delete group;
     } else if ((screen = searchSystrayWindow(e->xunmap.window))) {
@@ -395,13 +350,8 @@ void Blackbox::process_event(XEvent *e) {
       to an already unmapped window.
     */
     BlackboxWindow *win = searchWindow(e->xreparent.window);
-    if (win) {
+    if (win)
       win->reparentNotifyEvent(&e->xreparent);
-    } else {
-      Slit *slit = searchSlit(e->xreparent.window);
-      if (slit && slit->getWindowID() != e->xreparent.parent)
-        slit->removeClient(e->xreparent.window, True);
-    }
     break;
   }
 
@@ -428,12 +378,9 @@ void Blackbox::process_event(XEvent *e) {
     last_time = e->xmotion.time;
 
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Basemenu *menu = (Basemenu *) 0;
 
     if ((win = searchWindow(e->xmotion.window)))
       win->motionNotifyEvent(&e->xmotion);
-    else if ((menu = searchMenu(e->xmotion.window)))
-      menu->motionNotifyEvent(&e->xmotion);
 
     break;
   }
@@ -456,9 +403,6 @@ void Blackbox::process_event(XEvent *e) {
 
     BScreen *screen = (BScreen *) 0;
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Basemenu *menu = (Basemenu *) 0;
-    Toolbar *tbar = (Toolbar *) 0;
-    Slit *slit = (Slit *) 0;
 
     if (e->xcrossing.mode == NotifyGrab) break;
 
@@ -468,12 +412,6 @@ void Blackbox::process_event(XEvent *e) {
     } else if ((win = searchWindow(e->xcrossing.window))) {
       if (! no_focus)
         win->enterNotifyEvent(&e->xcrossing);
-    } else if ((menu = searchMenu(e->xcrossing.window))) {
-      menu->enterNotifyEvent(&e->xcrossing);
-    } else if ((tbar = searchToolbar(e->xcrossing.window))) {
-      tbar->enterNotifyEvent(&e->xcrossing);
-    } else if ((slit = searchSlit(e->xcrossing.window))) {
-      slit->enterNotifyEvent(&e->xcrossing);
     }
     break;
   }
@@ -482,18 +420,9 @@ void Blackbox::process_event(XEvent *e) {
     last_time = e->xcrossing.time;
 
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Basemenu *menu = (Basemenu *) 0;
-    Toolbar *tbar = (Toolbar *) 0;
-    Slit *slit = (Slit *) 0;
 
-    if ((menu = searchMenu(e->xcrossing.window)))
-      menu->leaveNotifyEvent(&e->xcrossing);
-    else if ((win = searchWindow(e->xcrossing.window)))
+    if ((win = searchWindow(e->xcrossing.window)))
       win->leaveNotifyEvent(&e->xcrossing);
-    else if ((tbar = searchToolbar(e->xcrossing.window)))
-      tbar->leaveNotifyEvent(&e->xcrossing);
-    else if ((slit = searchSlit(e->xcrossing.window)))
-      slit->leaveNotifyEvent(&e->xcrossing);
     break;
   }
 
@@ -526,25 +455,14 @@ void Blackbox::process_event(XEvent *e) {
     e->xexpose.height = ey2 - ey1 + 1;
 
     BlackboxWindow *win = (BlackboxWindow *) 0;
-    Basemenu *menu = (Basemenu *) 0;
-    Toolbar *tbar = (Toolbar *) 0;
 
     if ((win = searchWindow(e->xexpose.window)))
       win->exposeEvent(&e->xexpose);
-    else if ((menu = searchMenu(e->xexpose.window)))
-      menu->exposeEvent(&e->xexpose);
-    else if ((tbar = searchToolbar(e->xexpose.window)))
-      tbar->exposeEvent(&e->xexpose);
 
     break;
   }
 
   case KeyPress: {
-    Toolbar *tbar = searchToolbar(e->xkey.window);
-
-    if (tbar && tbar->isEditing())
-      tbar->keyPressEvent(&e->xkey);
-
     break;
   }
 
@@ -916,28 +834,6 @@ void Blackbox::process_event(XEvent *e) {
             }
           }
         }
-      } else if (e->xclient.message_type ==
-                 xatom->getAtom(XAtom::openbox_show_root_menu) ||
-                 e->xclient.message_type ==
-                 xatom->getAtom(XAtom::openbox_show_workspace_menu)) {
-        // find the screen the mouse is on
-        int x, y;
-        ScreenList::iterator it, end = screenList.end();
-        for (it = screenList.begin(); it != end; ++it) {
-          Window w;
-          int i;
-          unsigned int m;
-          if (XQueryPointer(getXDisplay(), (*it)->getRootWindow(),
-                            &w, &w, &x, &y, &i, &i, &m))
-            break;
-        }
-        if (it != end) {
-          if (e->xclient.message_type ==
-              xatom->getAtom(XAtom::openbox_show_root_menu))
-            (*it)->showRootMenu(x, y);
-          else
-            (*it)->showWorkspaceMenu(x, y);
-        }
       }
     }
 
@@ -975,7 +871,6 @@ bool Blackbox::handleSignal(int sig) {
     break;
 
   case SIGUSR2:
-    rereadMenu();
     break;
 
   case SIGPIPE:
@@ -1045,33 +940,6 @@ BWindowGroup *Blackbox::searchGroup(Window window) {
 }
 
 
-Basemenu *Blackbox::searchMenu(Window window) {
-  MenuLookup::iterator it = menuSearchList.find(window);
-  if (it != menuSearchList.end())
-    return it->second;
-
-  return (Basemenu*) 0;
-}
-
-
-Toolbar *Blackbox::searchToolbar(Window window) {
-  ToolbarLookup::iterator it = toolbarSearchList.find(window);
-  if (it != toolbarSearchList.end())
-    return it->second;
-
-  return (Toolbar*) 0;
-}
-
-
-Slit *Blackbox::searchSlit(Window window) {
-  SlitLookup::iterator it = slitSearchList.find(window);
-  if (it != slitSearchList.end())
-    return it->second;
-
-  return (Slit*) 0;
-}
-
-
 void Blackbox::saveSystrayWindowSearch(Window window, BScreen *screen) {
   systraySearchList.insert(WindowScreenLookupPair(window, screen));
 }
@@ -1087,21 +955,6 @@ void Blackbox::saveGroupSearch(Window window, BWindowGroup *data) {
 }
 
 
-void Blackbox::saveMenuSearch(Window window, Basemenu *data) {
-  menuSearchList.insert(MenuLookupPair(window, data));
-}
-
-
-void Blackbox::saveToolbarSearch(Window window, Toolbar *data) {
-  toolbarSearchList.insert(ToolbarLookupPair(window, data));
-}
-
-
-void Blackbox::saveSlitSearch(Window window, Slit *data) {
-  slitSearchList.insert(SlitLookupPair(window, data));
-}
-
-
 void Blackbox::removeSystrayWindowSearch(Window window) {
   systraySearchList.erase(window);
 }
@@ -1114,21 +967,6 @@ void Blackbox::removeWindowSearch(Window window) {
 
 void Blackbox::removeGroupSearch(Window window) {
   groupSearchList.erase(window);
-}
-
-
-void Blackbox::removeMenuSearch(Window window) {
-  menuSearchList.erase(window);
-}
-
-
-void Blackbox::removeToolbarSearch(Window window) {
-  toolbarSearchList.erase(window);
-}
-
-
-void Blackbox::removeSlitSearch(Window window) {
-  slitSearchList.erase(window);
 }
 
 
@@ -1318,50 +1156,10 @@ void Blackbox::reconfigure(void) {
 void Blackbox::real_reconfigure(void) {
   load_rc();
   
-  std::for_each(menuTimestamps.begin(), menuTimestamps.end(),
-                PointerAssassin());
-  menuTimestamps.clear();
-
   gcCache()->purge();
 
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::reconfigure));
-}
-
-
-void Blackbox::checkMenu(void) {
-  bool reread = False;
-  MenuTimestampList::iterator it = menuTimestamps.begin();
-  for(; it != menuTimestamps.end(); ++it) {
-    MenuTimestamp *tmp = *it;
-    struct stat buf;
-
-    if (! stat(tmp->filename.c_str(), &buf)) {
-      if (tmp->timestamp != buf.st_ctime)
-        reread = True;
-    } else {
-      reread = True;
-    }
-  }
-
-  if (reread) rereadMenu();
-}
-
-
-void Blackbox::rereadMenu(void) {
-  reread_menu_wait = True;
-
-  if (! timer->isTiming()) timer->start();
-}
-
-
-void Blackbox::real_rereadMenu(void) {
-  std::for_each(menuTimestamps.begin(), menuTimestamps.end(),
-                PointerAssassin());
-  menuTimestamps.clear();
-
-  std::for_each(screenList.begin(), screenList.end(),
-                std::mem_fun(&BScreen::rereadMenu));
 }
 
 
@@ -1372,37 +1170,11 @@ void Blackbox::saveStyleFilename(const string& filename) {
 }
 
 
-void Blackbox::addMenuTimestamp(const string& filename) {
-  assert(! filename.empty());
-  bool found = False;
-
-  MenuTimestampList::iterator it = menuTimestamps.begin();
-  for (; it != menuTimestamps.end() && ! found; ++it) {
-    if ((*it)->filename == filename) found = True;
-  }
-  if (! found) {
-    struct stat buf;
-
-    if (! stat(filename.c_str(), &buf)) {
-      MenuTimestamp *ts = new MenuTimestamp;
-
-      ts->filename = filename;
-      ts->timestamp = buf.st_ctime;
-
-      menuTimestamps.push_back(ts);
-    }
-  }
-}
-
-
 void Blackbox::timeout(void) {
   if (reconfigure_wait)
     real_reconfigure();
 
-  if (reread_menu_wait)
-    real_rereadMenu();
-
-  reconfigure_wait = reread_menu_wait = False;
+  reconfigure_wait = False;
 }
 
 
@@ -1453,12 +1225,10 @@ void Blackbox::setFocusedWindow(BlackboxWindow *win) {
   }
 
   if (active_screen && active_screen->isScreenManaged()) {
-    active_screen->getToolbar()->redrawWindowLabel(True);
     active_screen->updateNetizenWindowFocus();
   }
 
   if (old_screen && old_screen != active_screen) {
-    old_screen->getToolbar()->redrawWindowLabel(True);
     old_screen->updateNetizenWindowFocus();
   }
 }

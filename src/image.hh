@@ -138,9 +138,7 @@ private:
   bool dither;
   BaseDisplay *basedisplay;
   const ScreenInfo *screeninfo;
-#ifdef    TIMEDCACHE
   BTimer *timer;
-#endif // TIMEDCACHE
 
   Colormap colormap;
 

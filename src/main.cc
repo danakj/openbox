@@ -55,58 +55,52 @@ using std::string;
 #include "blackbox.hh"
 
 
-I18n i18n; // initialized in main
-
 static void showHelp(int exitval) {
   // print program usage and command line options
-  printf(i18n(mainSet, mainUsage,
-              "Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
-              "                    2001 - 2002 Sean 'Shaleh' Perry\n"
-              "                    1997 - 2000, 2002 Brad Hughes\n\n"
-              "  -display <string>\t\tuse display connection.\n"
-              "  -rc <string>\t\t\tuse alternate resource file.\n"
-              "  -menu <string>\t\tuse alternate menu file.\n"
-              "  -version\t\t\tdisplay version and exit.\n"
-              "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
+  printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
+         "  -display <string>\t\tuse display connection.\n"
+         "  -rc <string>\t\t\tuse alternate resource file.\n"
+         "  -menu <string>\t\tuse alternate menu file.\n"
+         "  -version\t\t\tdisplay version and exit.\n"
+         "  -help\t\t\t\tdisplay this help text and exit.\n\n",
          OPENBOX_VERSION);
 
   // some people have requested that we print out compile options
   // as well
-  printf(i18n(mainSet, mainCompileOptions,
-              "Compile time options:\n"
-              "  Debugging:\t\t\t%s\n"
-              "  Shape:\t\t\t%s\n"
-              "  Xft:\t\t\t\t%s\n"
-              "  Xinerama:\t\t\t%s\n"
-              "  8bpp Ordered Dithering:\t%s\n\n"),
+  printf("Compile time options:\n"
+         "  Debugging:\t\t\t%s\n"
+         "  Shape:\t\t\t%s\n"
+         "  Xft:\t\t\t\t%s\n"
+         "  Xinerama:\t\t\t%s\n"
+         "  8bpp Ordered Dithering:\t%s\n\n",
 #ifdef    DEBUG
-         i18n(CommonSet, CommonYes, "yes"),
+         "yes",
 #else // !DEBUG
-         i18n(CommonSet, CommonNo, "no"),
+         "no",
 #endif // DEBUG
 
 #ifdef    SHAPE
-         i18n(CommonSet, CommonYes, "yes"),
+         "yes",
 #else // !SHAPE
-         i18n(CommonSet, CommonNo, "no"),
+         "no",
 #endif // SHAPE
 
 #ifdef    XFT
-         i18n(CommonSet, CommonYes, "yes"),
+         "yes",
 #else // !XFT
-         i18n(CommonSet, CommonNo, "no"),
+         "no",
 #endif // XFT
 
 #ifdef    XINERAMA
-         i18n(CommonSet, CommonYes, "yes"),
+         "yes",
 #else // !XINERAMA
-         i18n(CommonSet, CommonNo, "no"),
+         "no",
 #endif // XINERAMA
 
 #ifdef    ORDEREDPSEUDO
-         i18n(CommonSet, CommonYes, "yes")
+         "yes"
 #else // !ORDEREDPSEUDO
-         i18n(CommonSet, CommonNo, "no")
+         "no"
 #endif // ORDEREDPSEUDO
           );
 
@@ -118,16 +112,12 @@ int main(int argc, char **argv) {
   char *rc_file = (char *) 0;
   char *menu_file = (char *) 0;
 
-  i18n.openCatalog("openbox.cat");
-
   for (int i = 1; i < argc; ++i) {
     if (! strcmp(argv[i], "-rc")) {
       // look for alternative rc file to use
 
       if ((++i) >= argc) {
-        fprintf(stderr,
-                i18n(mainSet, mainRCRequiresArg,
-                                 "error: '-rc' requires and argument\n"));
+        fprintf(stderr, "error: '-rc' requires and argument\n");
 
         ::exit(1);
       }
@@ -137,9 +127,7 @@ int main(int argc, char **argv) {
       // look for alternative menu file to use
 
       if ((++i) >= argc) {
-        fprintf(stderr,
-                i18n(mainSet, mainMENURequiresArg,
-                     "error: '-menu' requires and argument\n"));
+        fprintf(stderr, "error: '-menu' requires and argument\n");
 
         ::exit(1);
       }
@@ -150,9 +138,7 @@ int main(int argc, char **argv) {
       // set by the environment variable DISPLAY
 
       if ((++i) >= argc) {
-        fprintf(stderr,
-                i18n(mainSet, mainDISPLAYRequiresArg,
-                                 "error: '-display' requires an argument\n"));
+        fprintf(stderr, "error: '-display' requires an argument\n");
 
         ::exit(1);
       }
@@ -162,15 +148,13 @@ int main(int argc, char **argv) {
       dtmp += session_display;
 
       if (putenv(const_cast<char*>(dtmp.c_str()))) {
-        fprintf(stderr, i18n(mainSet, mainWarnDisplaySet,
-                "warning: couldn't set environment variable 'DISPLAY'\n"));
+        fprintf(stderr,
+                "warning: couldn't set environment variable 'DISPLAY'\n");
         perror("putenv()");
       }
     } else if (! strcmp(argv[i], "-version")) {
       // print current version string
-      printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
-             "                    2001 - 2002 Sean 'Shaleh' Perry\n"
-             "                    1997 - 2000, 2002 Brad Hughes\n\n",
+      printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n",
              OPENBOX_VERSION);
 
       ::exit(0);
@@ -185,7 +169,7 @@ int main(int argc, char **argv) {
   _chdir2(getenv("X11ROOT"));
 #endif // __EMX__
 
-  Blackbox blackbox(argv, session_display, rc_file, menu_file);
+  Blackbox blackbox(argv, session_display, rc_file);
   blackbox.eventLoop();
 
   return(0);

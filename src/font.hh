@@ -27,9 +27,7 @@
 extern "C" {
 #include <X11/Xlib.h>
 
-#ifdef XFT
-#  include <X11/Xft/Xft.h>
-#endif
+#include <X11/Xft/Xft.h>
 }
 
 #include <assert.h>
@@ -69,7 +67,6 @@ private:
   bool              _bold;
   bool              _italic;
 
-#ifdef XFT
   bool              _antialias;
   bool              _shadow;
   unsigned char     _offset;
@@ -78,31 +75,14 @@ private:
   XftFont          *_xftfont;
 
   bool createXftFont(void);
-#endif
-  
-  // standard
-  XFontStruct      *_font;
-  // multibyte
-  XFontSet          _fontset;
-  XFontSetExtents  *_fontset_extents;
-
-  std::string buildXlfd(void) const;
-  std::string buildMultibyteXlfd(void) const;
-
-  bool createXFont(const std::string &xlfd);
-  bool parseXlfd(const std::string &xlfd);
   
   bool              _valid;
 
 public:
-#ifdef XFT
   // loads an Xft font
   BFont(Display *d, BScreen *screen, const std::string &family, int size,
         bool bold, bool italic, bool shadow, unsigned char offset, 
         unsigned char tint, bool antialias = True);
-#endif
-  // loads a standard X font
-  BFont(Display *d, BScreen *screen, const std::string &xlfd);
   virtual ~BFont(void);
 
   inline bool valid(void) const { return _valid; }

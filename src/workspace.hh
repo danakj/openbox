@@ -32,11 +32,11 @@ extern "C" {
 #include <string>
 #include <vector>
 
+#include "xatom.hh"
+
 class BScreen;
-class Clientmenu;
 class Workspace;
 class BlackboxWindow;
-class Netizen;
 
 typedef std::list<BlackboxWindow*> BlackboxWindowList;
 typedef std::vector<Window> StackVector;
@@ -45,7 +45,6 @@ class Workspace {
 private:
   BScreen *screen;
   BlackboxWindow *lastfocus;
-  Clientmenu *clientmenu;
   XAtom *xatom;
 
   BlackboxWindowList stackingList, windowList;
@@ -80,8 +79,6 @@ public:
 
   inline BlackboxWindow *getLastFocusedWindow(void) { return lastfocus; }
 
-  inline Clientmenu *getMenu(void) { return clientmenu; }
-
   inline const std::string& getName(void) const { return name; }
 
   inline unsigned int getID(void) const { return id; }
@@ -95,9 +92,7 @@ public:
   BlackboxWindow* getNextWindowInList(BlackboxWindow *w);
   BlackboxWindow* getPrevWindowInList(BlackboxWindow *w);
   BlackboxWindow* getTopWindowOnStack(void) const;
-  void sendWindowList(Netizen &n);
   void focusFallback(const BlackboxWindow *old_window);
-  void setFocused(const BlackboxWindow *w, bool focused);
 
   bool isCurrent(void) const;
   bool isLastWindow(const BlackboxWindow* w) const;

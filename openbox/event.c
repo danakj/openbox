@@ -1147,6 +1147,19 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
     }
 }
 
+ObMenuFrame* find_active_menu()
+{
+    GList *it;
+    ObMenuFrame *f;
+
+    for (it = menu_frame_visible; it; it = g_list_next(it)) {
+        f = it->data;
+        if (f->selected)
+            break;
+    }
+    return it ? it->data : NULL;
+}
+
 static void event_handle_menu(XEvent *ev)
 {
     ObMenuFrame *f;
@@ -1173,5 +1186,30 @@ static void event_handle_menu(XEvent *ev)
                 menu_frame_select(f, e);
         }
         break;
+    case KeyPress:
+        if (ev->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+            menu_frame_hide_all();
+        else if (ev->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
+            ObMenuFrame *f;
+            if ((f = find_active_menu()))
+                menu_entry_frame_execute(f->selected,
+                                         !(ev->xkey.state & ControlMask));
+        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_LEFT)) {
+            ObMenuFrame *f;
+            if ((f = find_active_menu()) && f->parent)
+                menu_frame_select(f, NULL);
+        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) {
+            ObMenuFrame *f;
+            if ((f = find_active_menu()) && f->child && f->child->entries)
+                menu_frame_select(f->child, f->child->entries->data);
+        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_UP)) {
+            ObMenuFrame *f;
+            if ((f = find_active_menu()))
+                menu_frame_select_previous(f);
+        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_DOWN)) {
+            ObMenuFrame *f;
+            if ((f = find_active_menu()))
+                menu_frame_select_next(f);
+        }
     }
 }

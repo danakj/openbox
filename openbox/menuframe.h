@@ -88,6 +88,8 @@ void menu_frame_hide_all();
 void menu_frame_hide_all_client(struct _ObClient *client);
 
 void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry);
+void menu_frame_select_previous(ObMenuFrame *self);
+void menu_frame_select_next(ObMenuFrame *self);
 
 ObMenuFrame* menu_frame_under(gint x, gint y);
 ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y);

@@ -627,3 +627,49 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
         }
     }
 }
+
+void menu_frame_select_previous(ObMenuFrame *self)
+{
+    GList *it = NULL, *start;
+
+    if (self->entries) {
+        start = it = g_list_find(self->entries, self->selected);
+        while (TRUE) {
+            ObMenuEntryFrame *e;
+
+            it = it ? g_list_previous(it) : g_list_last(self->entries);
+            if (it == start)
+                break;
+
+            if (it) {
+                e = it->data;
+                if (e->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR)
+                    break;
+            }
+        }
+    }
+    menu_frame_select(self, it ? it->data : NULL);
+}
+
+void menu_frame_select_next(ObMenuFrame *self)
+{
+    GList *it = NULL, *start;
+
+    if (self->entries) {
+        start = it = g_list_find(self->entries, self->selected);
+        while (TRUE) {
+            ObMenuEntryFrame *e;
+
+            it = it ? g_list_next(it) : self->entries;
+            if (it == start)
+                break;
+
+            if (it) {
+                e = it->data;
+                if (e->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR)
+                    break;
+            }
+        }
+    }
+    menu_frame_select(self, it ? it->data : NULL);
+}

@@ -215,6 +215,8 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     frame = menu_frame_new(self, client);
     menu_frame_move(frame, x, y);
     menu_frame_show(frame, NULL);
+    if (frame->entries)
+        menu_frame_select_next(frame);
 }
 
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)

@@ -249,6 +249,9 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func);
 PyObject *kgrab(int screen, PyObject *func);
 PyObject *kungrab();
 
+PyObject *mgrab(int screen);
+PyObject *mungrab();
+
 PyObject *ebind(ob::EventAction::EA action, PyObject *func);
 
 void set_reset_key(const std::string &key);

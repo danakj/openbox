@@ -123,6 +123,9 @@ public:
   bool grabKeyboard(int screen, PyObject *callback);
   void ungrabKeyboard();
 
+  bool grabPointer(int screen);
+  void ungrabPointer();
+
   bool addButton(const std::string &but, MouseContext::MC context,
                  MouseAction::MA action, PyObject *callback);
 

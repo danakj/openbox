@@ -136,7 +136,8 @@ def _focus_stacked_ungrab(data):
         # have all the modifiers this started with been released?
         if not _cyc_mask & data.state:
             _destroy_popup_list()
-            ob.kungrab() # ungrab ourself
+            ob.kungrab()
+            ob.mungrab()
             _doing_stacked = 0;
             if cycle_raise:
                 client = ob.openbox.findClient(_cyc_w)
@@ -246,6 +247,10 @@ def focus_next_stacked(data, forward=1):
             _create_popup_list(data)
 
         ob.kgrab(data.screen, _focus_stacked_ungrab)
+        # the pointer grab causes pointer events during the keyboard grab to
+        # go away, which means we don't get enter notifies when the popup
+        # disappears, screwing up the focus
+        ob.mgrab(data.screen)
         focus_next_stacked(data, forward) # start with the first press
 
 def focus_prev_stacked(data):

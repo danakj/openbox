@@ -37,7 +37,8 @@ _popwidget = 0
 _poplabel = 0
 
 # motion state
-_inmotion = 0
+_inmove = 0
+_inresize = 0
 
 # last motion data
 _cx = 0
@@ -50,6 +51,21 @@ _dx = 0
 _dy = 0
 _client = 0
 _screen = 0
+
+_motion_mask = 0
+
+def _motion_grab(data):
+    global _motion_mask, _inmove, _inresize;
+
+    if data.action == ob.KeyAction.Release:
+        # have all the modifiers this started with been released?
+        if not _motion_mask & data.state:
+            if _inmove:
+                end_move(data)
+            elif _inresize:
+                end_resize(data)
+            else:
+                raise RuntimeError
 
 def _do_move():
     global _screen, _client, _cx, _cy, _dx, _dy
@@ -105,20 +121,26 @@ def move(data):
     _dx = data.xroot - data.pressx
     _dy = data.yroot - data.pressy
     _do_move()
-    _inmotion = 1
+    global _inmove
+    if not _inmove:
+        ob.kgrab(_screen, _motion_grab)
+        print "GRAB"
+        _inmove = 1
 
 def end_move(data):
     """Complete the interactive move of a window."""
-    global move_rubberband, _inmotion
+    global move_rubberband, _inmove
     global _popwidget, _poplabel
-    if _inmotion:
+    if _inmove:
         r = move_rubberband
         move_rubberband = 0
         _do_move()
         move_rubberband = r
-        _inmotion = 0
+        _inmove = 0
     _poplabel = 0
     _popwidget = 0
+    print "UNGRAB"
+    ob.kungrab()
 
 def _do_resize():
     global _screen, _client, _cx, _cy, _cw, _ch, _px, _py, _dx, _dy
@@ -196,17 +218,21 @@ def resize(data):
     _dx = data.xroot - _px
     _dy = data.yroot - _py
     _do_resize()
-    _inmotion = 1
+    global _inresize
+    if not _inresize:
+        ob.kgrab(_screen, _motion_grab)
+        _inresize = 1
 
 def end_resize(data):
     """Complete the interactive resize of a window."""
-    global resize_rubberband, _inmotion
+    global resize_rubberband, _inresize
     global _popwidget, _poplabel
-    if _inmotion:
+    if _inresize:
         r = resize_rubberband
         resize_rubberband = 0
         _do_resize()
         resize_rubberband = r
-        _inmotion = 0
+        _inresize = 0
     _poplabel = 0
     _popwidget = 0
+    ob.kungrab()

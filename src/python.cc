@@ -144,6 +144,21 @@ PyObject *kungrab()
   Py_INCREF(Py_None); return Py_None;
 }
 
+PyObject *mgrab(int screen)
+{
+  if (!ob::openbox->bindings()->grabPointer(screen)) {
+    PyErr_SetString(PyExc_RuntimeError,"Unable to grab pointer.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
+
+PyObject *mungrab()
+{
+  ob::openbox->bindings()->ungrabPointer();
+  Py_INCREF(Py_None); return Py_None;
+}
+
 PyObject *kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func)
 {
   if (!PyCallable_Check(func)) {

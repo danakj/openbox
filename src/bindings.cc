@@ -385,9 +385,6 @@ bool Bindings::grabKeyboard(int screen, PyObject *callback)
   if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
                     GrabModeAsync, CurrentTime))
     return false;
-  // the pointer grab causes pointer events during the keyboard grab to go away
-  XGrabPointer(**otk::display, root, false, 0, GrabModeAsync,
-               GrabModeAsync, None, None, CurrentTime);
   _keybgrab_callback = callback;
   return true;
 }
@@ -399,6 +396,24 @@ void Bindings::ungrabKeyboard()
 
   _keybgrab_callback = 0;
   XUngrabKeyboard(**otk::display, CurrentTime);
+  XUngrabPointer(**otk::display, CurrentTime);
+}
+
+
+bool Bindings::grabPointer(int screen)
+{
+  if (!openbox->screen(screen))
+    return false; // the screen is not managed
+  
+  Window root = otk::display->screenInfo(screen)->rootWindow();
+  XGrabPointer(**otk::display, root, false, 0, GrabModeAsync,
+               GrabModeAsync, None, None, CurrentTime);
+  return true;
+}
+
+
+void Bindings::ungrabPointer()
+{
   XUngrabPointer(**otk::display, CurrentTime);
 }
 

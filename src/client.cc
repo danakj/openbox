@@ -1082,9 +1082,12 @@ void OBClient::shade(bool shade)
 }
 
 
-bool OBClient::focus()
+bool OBClient::focus() const
 {
-  if (!(_can_focus || _focus_notify)) return false;
+  // won't try focus if the client doesn't want it, or if the window isn't
+  // visible on the screen
+  if (!(frame->isVisible() && (_can_focus || _focus_notify))) return false;
+
   if (_focused) return true;
 
   if (_can_focus)
@@ -1112,7 +1115,7 @@ bool OBClient::focus()
 }
 
 
-void OBClient::unfocus()
+void OBClient::unfocus() const
 {
   if (!_focused) return;
 
@@ -1269,8 +1272,14 @@ void OBClient::reparentHandler(const XReparentEvent &e)
     to an already unmapped window.
   */
 
+  // we don't want the reparent event, put it back on the stack for the X
+  // server to deal with after we unmanage the window
+  XEvent ev;
+  ev.xreparent = e;
+  XPutBackEvent(otk::OBDisplay::display, &ev);
+  
   // this deletes us etc
-  Openbox::instance->screen(_screen)->unmanageWindow(this, true);
+  Openbox::instance->screen(_screen)->unmanageWindow(this);
 }
 
 }

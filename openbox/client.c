@@ -415,6 +415,10 @@ void client_unmanage(ObClient *self)
     keyboard_grab_for_client(self, FALSE);
     mouse_grab_for_client(self, FALSE);
 
+    /* potentially fix focusLast */
+    if (config_focus_last)
+        grab_pointer(TRUE, OB_CURSOR_NONE);
+
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
 
@@ -518,6 +522,9 @@ void client_unmanage(ObClient *self)
      
     /* update the list hints */
     client_set_list();
+
+    if (config_focus_last)
+        grab_pointer(FALSE, OB_CURSOR_NONE);
 }
 
 static void client_urgent_notify(ObClient *self)

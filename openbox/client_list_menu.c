@@ -85,7 +85,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
         act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
         act->data.desktop.desk = d->desktop;
         acts = g_slist_prepend(NULL, act);
-        menu_add_normal(menu, 0, "Activate...", acts);
+        menu_add_normal(menu, 0, _("Activate..."), acts);
     }
 }
 

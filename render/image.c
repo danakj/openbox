@@ -61,16 +61,17 @@ void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
             }
 
             /* background color */
-            bgr = target[t] >> default_red_shift;
-            bgg = target[t] >> default_green_shift;
-            bgb = target[t] >> default_blue_shift;
+            bgr = target[t] >> default_red_offset;
+            bgg = target[t] >> default_green_offset;
+            bgb = target[t] >> default_blue_offset;
 
             r = bgr + (((r - bgr) * alpha) >> 8);
             g = bgg + (((g - bgg) * alpha) >> 8);
             b = bgb + (((b - bgb) * alpha) >> 8);
 
-            target[t] = (r << default_red_shift) | (g << default_green_shift) |
-                (b << default_blue_shift);
+            target[t] = (r << default_red_offset)
+                      | (g << default_green_offset)
+                      | (b << default_blue_offset);
         }
     }
 }

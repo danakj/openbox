@@ -69,7 +69,11 @@ void OtkApplication::exec(void)
 bool OtkApplication::setMainWidget(const OtkWidget *main_widget)
 {
   // ignore it if it has already been set
-  if (_main_widget) return false;
+  if (_main_widget) {
+    std::cerr << "More than one main OtkWidget being created for the " <<
+      "OtkApplication!\n";
+    return false;
+  }
 
   _main_widget = main_widget;
 

@@ -356,16 +356,16 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
   case BScreen::TopBottom:
     configmenu->screen.setColPlacementDirection(BScreen::TopBottom);
 
-    setItemSelected(5, True);
-    setItemSelected(6, False);
+    setItemSelected(6, True);
+    setItemSelected(7, False);
 
     break;
 
   case BScreen::BottomTop:
     configmenu->screen.setColPlacementDirection(BScreen::BottomTop);
 
-    setItemSelected(5, False);
-    setItemSelected(6, True);
+    setItemSelected(6, False);
+    setItemSelected(7, True);
 
     break;
   }

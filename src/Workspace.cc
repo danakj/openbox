@@ -396,9 +396,14 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
       best = siter;
   }
 
-  if (best != NULL)
-    return new Point(best->origin());
-  else
+  if (best != NULL) {
+    Point *pt = new Point(best->origin());
+    if (screen.colPlacementDirection() != BScreen::TopBottom)
+      pt->setY(pt->y() + (best->h() - win_size.h()));
+    if (screen.rowPlacementDirection() != BScreen::LeftRight)
+      pt->setX(pt->x() + (best->w() - win_size.w()));
+    return pt;
+  } else
     return NULL; //fall back to cascade
 }
 

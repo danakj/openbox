@@ -15,7 +15,7 @@
   <followMouse>no</followMouse>
   <focusLast>yes</focusLast>
   <focusLastOnDesktop>yes</focusLastOnDesktop>
-  <focusDelay>150000</focusDelay>
+  <focusDelay>0</focusDelay>
 </focus>
 
 <theme>

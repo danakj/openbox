@@ -361,7 +361,7 @@ void config_startup(ObParseInst *i)
     config_focus_follow = FALSE;
     config_focus_last = TRUE;
     config_focus_last_on_desktop = TRUE;
-    config_focus_delay = 150000;
+    config_focus_delay = 0;
 
     parse_register(i, "focus", parse_focus, NULL);
 

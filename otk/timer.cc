@@ -63,8 +63,9 @@ void Timer::dispatchTimers(bool wait)
 
   while (!_q.empty()) {
     curr = _q.top();
-    /* since we overload the destructor to keep from removing from the middle of 
-       the priority queue, set _del_me, we have to do our real delete in here.
+    /* since we overload the destructor to keep from removing from the middle
+       of the priority queue, set _del_me, we have to do our real delete in
+       here.
     */
     if (curr->_del_me) {
       _q.pop();

@@ -81,7 +81,7 @@ static void save_commands()
     }
 
     file_path = g_build_filename(g_get_home_dir(), ".openbox", "sessions",
-                                 ob_sm_id, NULL);
+                                 save_file, NULL);
 
     prop_res.vals[j].value = "--sm-save-file";
     prop_res.vals[j++].length = strlen("--sm-save-file");

@@ -61,10 +61,8 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(RrPixel32));
         }
-    } else if (l->surface.grad == RR_SURFACE_SOLID)
-        gradient_solid(l, 0, 0, w, h);
-    else
-        gradient_render(&l->surface, w, h);
+    }else
+        RrRender(l, w, h);
 
     RECT_SET(tarea, 0, 0, w, h);
     if (l->surface.grad != RR_SURFACE_PARENTREL) {

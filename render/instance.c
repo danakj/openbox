@@ -3,8 +3,8 @@
 
 static RrInstance *definst = NULL;
 
-void RrTrueColorSetup (RrInstance *inst);
-void RrPseudoColorSetup (RrInstance *inst);
+static void RrTrueColorSetup (RrInstance *inst);
+static void RrPseudoColorSetup (RrInstance *inst);
 
 RrInstance* RrInstanceNew (Display *display, gint screen)
 {

@@ -8,7 +8,6 @@
 
 /*
   cuz girls look soooo goood.. on the end of my DICK
-  -- xOr
 */
 
 extern "C" {

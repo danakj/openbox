@@ -30,6 +30,7 @@ extern "C" {
 }
 
 #include <list>
+#include <string>
 
 #include "Screen.hh"
 #include "Basemenu.hh"
@@ -44,24 +45,30 @@ private:
   private:
     Directionmenu(const Directionmenu&);
     Directionmenu& operator=(const Directionmenu&);
+    Slit *slit;
 
   protected:
     virtual void itemSelected(int button, unsigned int index);
-
+    virtual void setValues(void);
+    
   public:
     Directionmenu(Slitmenu *sm);
+    virtual void reconfigure(void);
   };
 
   class Placementmenu : public Basemenu {
   private:
     Placementmenu(const Placementmenu&);
     Placementmenu& operator=(const Placementmenu&);
+    Slit *slit;
 
   protected:
     virtual void itemSelected(int buton, unsigned int index);
+    virtual void setValues(void);
 
   public:
     Placementmenu(Slitmenu *sm);
+    virtual void reconfigure(void);
   };
 
   Directionmenu *directionmenu;
@@ -103,10 +110,13 @@ private:
   typedef std::list<SlitClient*> SlitClientList;
 
   bool on_top, hidden, do_auto_hide;
+  int direction, placement; 
+  std::string slitstr;
   Display *display;
 
   Blackbox *blackbox;
   BScreen *screen;
+  Configuration *config;
   BTimer *timer;
   Strut strut;
 
@@ -137,6 +147,13 @@ public:
   inline bool isOnTop(void) const { return on_top; }
   inline bool isHidden(void) const { return hidden; }
   inline bool doAutoHide(void) const { return do_auto_hide; }
+  inline int getPlacement(void) const { return placement; }
+  inline int getDirection(void) const { return direction; }
+
+  void saveOnTop(bool);
+  void saveAutoHide(bool);
+  void savePlacement(int);
+  void saveDirection(int);
 
   inline Slitmenu *getMenu(void) { return slitmenu; }
 
@@ -149,13 +166,13 @@ public:
 
   inline unsigned int getWidth(void) const { return frame.rect.width(); }
   inline unsigned int getExposedWidth(void) const {
-    if (screen->getSlitDirection() == Vertical && do_auto_hide)
+    if (direction == Vertical && do_auto_hide)
       return screen->getBevelWidth();
     return frame.rect.width();
   }
   inline unsigned int getHeight(void) const { return frame.rect.height(); }
   inline unsigned int getExposedHeight(void) const {
-    if (screen->getSlitDirection() == Horizontal && do_auto_hide)
+    if (direction == Horizontal && do_auto_hide)
       return screen->getBevelWidth();
     return frame.rect.height();
   }
@@ -163,6 +180,8 @@ public:
   void addClient(Window w);
   void removeClient(SlitClient *client, bool remap = True);
   void removeClient(Window w, bool remap = True);
+  void load_rc(void);
+  void save_rc(void);
   void reconfigure(void);
   void updateSlit(void);
   void reposition(void);

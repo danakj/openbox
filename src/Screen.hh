@@ -45,6 +45,7 @@ extern "C" {
 
 #include "Color.hh"
 #include "Texture.hh"
+#include "Image.hh"
 #include "Configmenu.hh"
 #include "Iconmenu.hh"
 #include "Netizen.hh"
@@ -117,6 +118,7 @@ private:
   Configmenu *configmenu;
   Iconmenu *iconmenu;
   Rootmenu *rootmenu;
+  Configuration *config;
 
   typedef std::list<Rootmenu*> RootmenuList;
   RootmenuList rootmenuList;
@@ -147,18 +149,13 @@ private:
     ToolbarStyle tstyle;
     MenuStyle mstyle;
 
-    bool toolbar_on_top, toolbar_auto_hide, sloppy_focus, auto_raise,
-      auto_edge_balance, image_dither, ordered_dither, opaque_move, full_max,
-      focus_new, focus_last, click_raise;
+    bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
+         opaque_move, full_max, focus_new, focus_last, click_raise;
     BColor border_color;
-    XrmDatabase stylerc;
 
     unsigned int workspaces;
     int toolbar_placement, toolbar_width_percent, placement_policy,
       edge_snap_threshold, row_direction, col_direction;
-
-    bool slit_on_top, slit_auto_hide;
-    int slit_placement, slit_direction;
 
     unsigned int handle_width, bevel_width, frame_width, border_width;
 
@@ -170,6 +167,7 @@ private:
 #endif // HAVE_STRFTIME
 
   } resource;
+  std::string screenstr;
 
   BScreen(const BScreen&);
   BScreen& operator=(const BScreen&);
@@ -177,15 +175,13 @@ private:
   bool parseMenuFile(FILE *file, Rootmenu *menu);
 
   BTexture readDatabaseTexture(const std::string &rname,
-                               const std::string &rclass,
-                               const std::string &default_color);
+                               const std::string &default_color,
+                               Configuration &style);
   BColor readDatabaseColor(const std::string &rname,
-                           const std::string &rclass,
-                           const std::string &default_color);
-  XFontSet readDatabaseFontSet(const std::string &rname,
-                               const std::string &rclass);
-  XFontStruct *readDatabaseFont(const std::string &rname,
-                                const std::string &rclass);
+                           const std::string &default_color,
+                           Configuration &style);
+  XFontSet readDatabaseFontSet(const std::string &rname, Configuration &style);
+  XFontStruct *readDatabaseFont(const std::string &rname, Configuration &style);
   XFontSet createFontSet(const std::string &fontname);
 
   void InitMenu(void);
@@ -204,21 +200,14 @@ public:
   BScreen(Blackbox *bb, unsigned int scrn);
   ~BScreen(void);
 
-  inline bool isToolbarOnTop(void) const
-  { return resource.toolbar_on_top; }
-  inline bool doToolbarAutoHide(void) const
-  { return resource.toolbar_auto_hide; }
-  inline bool isSloppyFocus(void) const
-  { return resource.sloppy_focus; }
+  inline bool isSloppyFocus(void) const { return resource.sloppy_focus; }
   inline bool isRootColormapInstalled(void) const
   { return root_colormap_installed; }
   inline bool doAutoRaise(void) const { return resource.auto_raise; }
   inline bool doClickRaise(void) const { return resource.click_raise; }
   inline bool isScreenManaged(void) const { return managed; }
-  inline bool doImageDither(void) const
-  { return resource.image_dither; }
-  inline bool doOrderedDither(void) const
-  { return resource.ordered_dither; }
+  inline bool doImageDither(void) const { return image_control->doDither(); }
+  inline bool doOrderedDither(void) const { return resource.ordered_dither; }
   inline bool doOpaqueMove(void) const { return resource.opaque_move; }
   inline bool doFullMax(void) const { return resource.full_max; }
   inline bool doFocusNew(void) const { return resource.focus_new; }
@@ -231,19 +220,7 @@ public:
   inline BImageControl *getImageControl(void) { return image_control; }
   inline Rootmenu *getRootmenu(void) { return rootmenu; }
 
-  inline bool isSlitOnTop(void) const { return resource.slit_on_top; }
-  inline bool doSlitAutoHide(void) const
-  { return resource.slit_auto_hide; }
   inline Slit *getSlit(void) { return slit; }
-  inline int getSlitPlacement(void) const
-  { return resource.slit_placement; }
-  inline int getSlitDirection(void) const
-  { return resource.slit_direction; }
-  inline void saveSlitPlacement(int p) { resource.slit_placement = p; }
-  inline void saveSlitDirection(int d) { resource.slit_direction = d; }
-  inline void saveSlitOnTop(bool t)    { resource.slit_on_top = t; }
-  inline void saveSlitAutoHide(bool t) { resource.slit_auto_hide = t; }
-
   inline Toolbar *getToolbar(void) { return toolbar; }
 
   Workspace *getWorkspace(unsigned int index);
@@ -268,10 +245,6 @@ public:
   inline unsigned int getIconCount(void) { return iconList.size(); }
   inline unsigned int getNumberOfWorkspaces(void) const
   { return resource.workspaces; }
-  inline int getToolbarPlacement(void) const
-  { return resource.toolbar_placement; }
-  inline int getToolbarWidthPercent(void) const
-  { return resource.toolbar_width_percent; }
   inline int getPlacementPolicy(void) const
   { return resource.placement_policy; }
   inline int getEdgeSnapThreshold(void) const
@@ -282,25 +255,19 @@ public:
   { return resource.col_direction; }
 
   inline void setRootColormapInstalled(bool r) { root_colormap_installed = r; }
-  inline void saveSloppyFocus(bool s) { resource.sloppy_focus = s; }
-  inline void saveAutoRaise(bool a) { resource.auto_raise = a; }
-  inline void saveClickRaise(bool c) { resource.click_raise = c; }
-  inline void saveWorkspaces(unsigned int w) { resource.workspaces = w; }
-  inline void saveToolbarOnTop(bool r) { resource.toolbar_on_top = r; }
-  inline void saveToolbarAutoHide(bool r) { resource.toolbar_auto_hide = r; }
-  inline void saveToolbarWidthPercent(int w)
-  { resource.toolbar_width_percent = w; }
-  inline void saveToolbarPlacement(int p) { resource.toolbar_placement = p; }
-  inline void savePlacementPolicy(int p) { resource.placement_policy = p; }
-  inline void saveRowPlacementDirection(int d) { resource.row_direction = d; }
-  inline void saveColPlacementDirection(int d) { resource.col_direction = d; }
-  inline void saveEdgeSnapThreshold(int t)
-  { resource.edge_snap_threshold = t; }
-  inline void saveImageDither(bool d) { resource.image_dither = d; }
-  inline void saveOpaqueMove(bool o) { resource.opaque_move = o; }
-  inline void saveFullMax(bool f) { resource.full_max = f; }
-  inline void saveFocusNew(bool f) { resource.focus_new = f; }
-  inline void saveFocusLast(bool f) { resource.focus_last = f; }
+  void saveSloppyFocus(bool s);
+  void saveAutoRaise(bool a);
+  void saveClickRaise(bool c);
+  void saveWorkspaces(unsigned int w);
+  void savePlacementPolicy(int p);
+  void saveRowPlacementDirection(int d);
+  void saveColPlacementDirection(int d);
+  void saveEdgeSnapThreshold(int t);
+  void saveImageDither(bool d);
+  void saveOpaqueMove(bool o);
+  void saveFullMax(bool f);
+  void saveFocusNew(bool f);
+  void saveFocusLast(bool f);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME
@@ -309,9 +276,9 @@ public:
   void saveStrftimeFormat(const std::string& format);
 #else // !HAVE_STRFTIME
   inline int getDateFormat(void) { return resource.date_format; }
-  inline void saveDateFormat(int f) { resource.date_format = f; }
+  inline void saveDateFormat(int f);
   inline bool isClock24Hour(void) { return resource.clock24hour; }
-  inline void saveClock24Hour(bool c) { resource.clock24hour = c; }
+  inline void saveClock24Hour(bool c);
 #endif // HAVE_STRFTIME
 
   inline WindowStyle *getWindowStyle(void) { return &resource.wstyle; }
@@ -331,6 +298,7 @@ public:
   void addWorkspaceName(const std::string& name);
   const std::string getNameOfWorkspace(unsigned int id);
   void changeWorkspaceID(unsigned int id);
+  void saveWorkspaceNames(void);
 
   void addNetizen(Netizen *n);
   void removeNetizen(Window w);
@@ -347,6 +315,8 @@ public:
   void prevFocus(void);
   void nextFocus(void);
   void raiseFocus(void);
+  void load_rc(void);
+  void save_rc(void);
   void reconfigure(void);
   void toggleFocusModel(FocusModel model);
   void updateFocusModel(void);

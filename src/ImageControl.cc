@@ -373,7 +373,7 @@ BImageControl::~BImageControl(void) {
     delete [] colors;
   }
 
-  if (!cache.empty()) {
+  if (! cache.empty()) {
     //#ifdef DEBUG
     fprintf(stderr, i18n(ImageSet, ImagePixmapRelease,
 		         "BImageContol::~BImageControl: pixmap cache - "
@@ -432,7 +432,7 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
   BImage image(this, width, height);
   pixmap = image.render(texture);
 
-  if (!pixmap)
+  if (! pixmap)
     return None;
 
   CachedImage tmp;
@@ -466,7 +466,7 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
 
 
 void BImageControl::removeImage(Pixmap pixmap) {
-  if (!pixmap)
+  if (! pixmap)
     return;
 
   CacheContainer::iterator it = cache.begin();

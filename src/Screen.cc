@@ -108,6 +108,8 @@ static int anotherWMRunning(Display *display, XErrorEvent *) {
 
 BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   blackbox = bb;
+  screenstr = (string)"session.screen" + itostring(scrn) + '.';
+  config = blackbox->getConfig();
 
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
     SubstructureRedirectMask | ButtonPressMask | ButtonReleaseMask;
@@ -127,7 +129,6 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
           getDepth());
 
   rootmenu = 0;
-  resource.stylerc = 0;
 
   resource.mstyle.t_fontset = resource.mstyle.f_fontset =
     resource.tstyle.fontset = resource.wstyle.fontset = (XFontSet) 0;
@@ -155,10 +156,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   image_control->installRootColormap();
   root_colormap_installed = True;
 
-  blackbox->load_rc(this);
-
-  image_control->setDither(resource.image_dither);
-
+  load_rc();
   LoadStyle();
 
   XGCValues gcv;
@@ -351,9 +349,262 @@ BScreen::~BScreen(void) {
 void BScreen::removeWorkspaceNames(void) {
   workspaceNames.clear();
 }
+  
+void BScreen::saveSloppyFocus(bool s) {
+  resource.sloppy_focus = s;
+
+  string fmodel;
+  if (resource.sloppy_focus) {
+    fmodel = "SloppyFocus";
+    if (resource.auto_raise) fmodel += " AutoRaise";
+    if (resource.click_raise) fmodel += " ClickRaise";
+  } else {
+    fmodel = "ClickToFocus";
+  }
+  config->setValue(screenstr + "focusModel", fmodel);
+}
+
+
+void BScreen::saveAutoRaise(bool a) {
+  resource.auto_raise = a;
+  saveSloppyFocus(resource.sloppy_focus);
+}
+
+
+void BScreen::saveClickRaise(bool c) {
+  resource.click_raise = c;
+  saveSloppyFocus(resource.sloppy_focus);
+}
+
+
+void BScreen::saveImageDither(bool d) {
+  image_control->setDither(d);
+  config->setValue(screenstr + "imageDither", doImageDither());
+}
+
+
+void BScreen::saveOpaqueMove(bool o) {
+  resource.opaque_move = o;
+  config->setValue(screenstr + "opaqueMove", resource.opaque_move);
+}
+
+
+void BScreen::saveFullMax(bool f) {
+  resource.full_max = f;
+  config->setValue(screenstr + "fullMaximization", resource.full_max);
+}
+
+
+void BScreen::saveFocusNew(bool f) {
+  resource.focus_new = f;
+  config->setValue(screenstr + "focusNewWindows", resource.focus_new);
+}
+
+
+void BScreen::saveFocusLast(bool f) {
+  resource.focus_last = f;
+  config->setValue(screenstr + "focusLastWindow", resource.focus_last);
+}
+
+
+void BScreen::saveWorkspaces(unsigned int w) {
+  resource.workspaces = w;
+  config->setValue(screenstr + "workspaces", resource.workspaces);
+}
+
+
+void BScreen::savePlacementPolicy(int p) {
+  resource.placement_policy = p; 
+  const char *placement;
+  switch (resource.placement_policy) {
+  case CascadePlacement: placement = "CascadePlacement"; break;
+  case ColSmartPlacement: placement = "ColSmartPlacement"; break;
+  case RowSmartPlacement: default: placement = "RowSmartPlacement"; break;
+  }
+  config->setValue(screenstr + "windowPlacement", placement);
+}
+
+
+void BScreen::saveEdgeSnapThreshold(int t) {
+  resource.edge_snap_threshold = t;
+  config->setValue(screenstr + "edgeSnapThreshold",
+                   resource.edge_snap_threshold);
+}
+
+
+void BScreen::saveRowPlacementDirection(int d) {
+  resource.row_direction = d;
+  config->setValue(screenstr + "rowPlacementDirection",
+                   resource.row_direction == LeftRight ?
+                   "LeftToRight" : "RightToLeft");
+}
+
+
+void BScreen::saveColPlacementDirection(int d) {
+  resource.col_direction = d;
+  config->setValue(screenstr + "colPlacementDirection",
+                   resource.col_direction == TopBottom ?
+                   "TopToBottom" : "BottomToTop");
+}
+
+
+#ifdef    HAVE_STRFTIME
+void BScreen::saveStrftimeFormat(const std::string& format) {
+  resource.strftime_format = format;
+  config->setValue(screenstr + "strftimeFormat", resource.strftime_format);
+}
+
+#else // !HAVE_STRFTIME
+
+void BScreen::saveDateFormat(int f) {
+  resource.date_format = f;
+  config->setValue(screenstr + "dateFormat",
+                   resource.date_format == B_EuropeanDate ?
+                   "European" : "American");
+}
+
+
+void BScreen::saveClock24Hour(Bool c) {
+  resource.clock24hour = c;
+  config->setValue(screenstr + "clockFormat", resource.clock24hour ? 24 : 12);
+}
+#endif // HAVE_STRFTIME
+
+
+void BScreen::saveWorkspaceNames() {
+  string save_string = getWorkspace(0)->getName();
+  for (unsigned int i = 1; i < getWorkspaceCount(); ++i)
+    save_string += ',' + getWorkspace(i)->getName();
+ config->setValue(screenstr + "workspaceNames", save_string);
+}
+
+
+void BScreen::save_rc(void) {
+  saveSloppyFocus(resource.sloppy_focus);
+  saveAutoRaise(resource.auto_raise);
+  saveImageDither(doImageDither());
+  saveOpaqueMove(resource.opaque_move);
+  saveFullMax(resource.full_max);
+  saveFocusNew(resource.focus_new);
+  saveFocusLast(resource.focus_last);
+  saveWorkspaces(resource.workspaces);
+  savePlacementPolicy(resource.placement_policy);
+  saveEdgeSnapThreshold(resource.edge_snap_threshold);
+  saveRowPlacementDirection(resource.row_direction);
+  saveColPlacementDirection(resource.col_direction);
+#ifdef    HAVE_STRFTIME
+  saveStrftimeFormat(resource.strftime_format); 
+#else // !HAVE_STRFTIME
+  saveDateFormat(resource.date_format);
+  savwClock24Hour(resource.clock24hour);
+#endif // HAVE_STRFTIME
+
+  toolbar->save_rc();
+  slit->save_rc();
+}
+
+
+void BScreen::load_rc(void) {
+  std::string s;
+  bool b;
+
+  if (! config->getValue(screenstr + "fullMaximization", resource.full_max))
+    resource.full_max = false;
+
+  if (! config->getValue(screenstr + "focusNewWindows", resource.focus_new))
+    resource.focus_new = false;
+
+  if (! config->getValue(screenstr + "focusLastWindow", resource.focus_last))
+    resource.focus_last = false;
+
+  if (! config->getValue(screenstr + "workspaces", resource.workspaces))
+    resource.workspaces = 1;
+
+  if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
+    resource.opaque_move = false;
+
+  if (! config->getValue(screenstr + "imageDither", b))
+    b = true;
+  image_control->setDither(b);
+
+  if (! config->getValue(screenstr + "edgeSnapThreshold",
+                        resource.edge_snap_threshold))
+    resource.edge_snap_threshold = 4;
+  
+  if (config->getValue(screenstr + "rowPlacementDirection", s) &&
+      s == "RightToLeft")
+    resource.row_direction = RightLeft;
+  else
+    resource.row_direction = LeftRight;
+
+  if (config->getValue(screenstr + "colPlacementDirection", s) &&
+      s == "BottomToTop")
+    resource.col_direction = BottomTop;
+  else
+    resource.col_direction = TopBottom;
+
+  removeWorkspaceNames();
+  if (config->getValue(screenstr + "workspaceNames", s)) {
+    string::const_iterator it = s.begin(), end = s.end();
+    while(1) {
+      string::const_iterator tmp = it;     // current string.begin()
+      it = std::find(tmp, end, ',');       // look for comma between tmp and end
+      addWorkspaceName(string(tmp, it));   // s[tmp:it]
+      if (it == end)
+        break;
+      ++it;
+    }
+  }
+
+  resource.sloppy_focus = true;
+  resource.auto_raise = false;
+  resource.click_raise = false;
+  if (config->getValue(screenstr + "focusModel", s)) {
+    if (s.find("ClickToFocus") != string::npos) {
+      resource.sloppy_focus = false;
+    } else {
+      // must be sloppy
+      if (s.find("AutoRaise") != string::npos)
+        resource.auto_raise = true;
+      if (s.find("ClickRaise") != string::npos)
+        resource.click_raise = true;
+    }
+  }
+
+  if (config->getValue(screenstr + "windowPlacement", s)) {
+    if (s == "CascadePlacement")
+      resource.placement_policy = CascadePlacement;
+    else if (s == "ColSmartPlacement")
+      resource.placement_policy = ColSmartPlacement;
+    else //if (s == "RowSmartPlacement")
+      resource.placement_policy = RowSmartPlacement;
+  } else
+    resource.placement_policy = RowSmartPlacement;
+
+#ifdef    HAVE_STRFTIME
+  if (config->getValue(screenstr + "strftimeFormat", s))
+    resource.strftime_format = s;
+  else
+    resource.strftime_format = "%I:%M %p";
+#else // !HAVE_STRFTIME
+  long l;
+
+  if (config->getValue(screenstr + "dateFormat", s) && s == "European")
+    resource.date_format = B_EuropeanDate;
+ else
+    resource.date_format = B_AmericanDate;
+
+  if (! config->getValue(screenstr + "clockFormat", l))
+    l = 12;
+  resource.clock24hour = l == 24;
+#endif // HAVE_STRFTIME
+}
 
 
 void BScreen::reconfigure(void) {
+  load_rc();
+  toolbar->load_rc();
+  slit->load_rc();
   LoadStyle();
 
   XGCValues gcv;
@@ -442,12 +693,19 @@ void BScreen::rereadMenu(void) {
 
 
 void BScreen::LoadStyle(void) {
-  resource.stylerc = XrmGetFileDatabase(blackbox->getStyleFilename());
-  if (! resource.stylerc)
-    resource.stylerc = XrmGetFileDatabase(DEFAULTSTYLE);
+  Configuration style;
 
-  XrmValue value;
-  char *value_type;
+  const char *sfile = blackbox->getStyleFilename();
+  if (sfile != NULL) {
+    style.setFile(sfile);
+    if (! style.load()) {
+      style.setFile(DEFAULTSTYLE);
+      if (! style.load())
+        style.create();  // hardcoded default values will be used.
+    }
+  }
+
+  string s;
 
   // load fonts/fontsets
   if (resource.wstyle.fontset)
@@ -476,14 +734,10 @@ void BScreen::LoadStyle(void) {
   resource.mstyle.t_font = 0;
 
   if (i18n.multibyte()) {
-    resource.wstyle.fontset =
-      readDatabaseFontSet("window.font", "Window.Font");
-    resource.tstyle.fontset =
-      readDatabaseFontSet("toolbar.font", "Toolbar.Font");
-    resource.mstyle.t_fontset =
-      readDatabaseFontSet("menu.title.font", "Menu.Title.Font");
-    resource.mstyle.f_fontset =
-      readDatabaseFontSet("menu.frame.font", "Menu.Frame.Font");
+    resource.wstyle.fontset = readDatabaseFontSet("window.font", style);
+    resource.tstyle.fontset = readDatabaseFontSet("toolbar.font", style);
+    resource.mstyle.t_fontset = readDatabaseFontSet("menu.title.font", style);
+    resource.mstyle.f_fontset = readDatabaseFontSet("menu.frame.font", style);
 
     resource.mstyle.t_fontset_extents =
       XExtentsOfFontSet(resource.mstyle.t_fontset);
@@ -494,207 +748,155 @@ void BScreen::LoadStyle(void) {
     resource.wstyle.fontset_extents =
       XExtentsOfFontSet(resource.wstyle.fontset);
   } else {
-    resource.wstyle.font =
-      readDatabaseFont("window.font", "Window.Font");
-    resource.tstyle.font =
-      readDatabaseFont("toolbar.font", "Toolbar.Font");
-    resource.mstyle.t_font =
-      readDatabaseFont("menu.title.font", "Menu.Title.Font");
-    resource.mstyle.f_font =
-      readDatabaseFont("menu.frame.font", "Menu.Frame.Font");
+    resource.wstyle.font = readDatabaseFont("window.font", style);
+    resource.tstyle.font = readDatabaseFont("toolbar.font", style);
+    resource.mstyle.t_font = readDatabaseFont("menu.title.font", style);
+    resource.mstyle.f_font = readDatabaseFont("menu.frame.font", style);
   }
 
   // load window config
   resource.wstyle.t_focus =
-    readDatabaseTexture("window.title.focus", "Window.Title.Focus", "white");
+    readDatabaseTexture("window.title.focus", "white", style);
   resource.wstyle.t_unfocus =
-    readDatabaseTexture("window.title.unfocus",
-                        "Window.Title.Unfocus", "black");
+    readDatabaseTexture("window.title.unfocus", "black", style);
   resource.wstyle.l_focus =
-    readDatabaseTexture("window.label.focus", "Window.Label.Focus", "white" );
+    readDatabaseTexture("window.label.focus", "white", style);
   resource.wstyle.l_unfocus =
-    readDatabaseTexture("window.label.unfocus", "Window.Label.Unfocus",
-                        "black");
+    readDatabaseTexture("window.label.unfocus", "black", style);
   resource.wstyle.h_focus =
-    readDatabaseTexture("window.handle.focus", "Window.Handle.Focus", "white");
+    readDatabaseTexture("window.handle.focus", "white", style);
   resource.wstyle.h_unfocus =
-    readDatabaseTexture("window.handle.unfocus",
-                        "Window.Handle.Unfocus", "black");
+    readDatabaseTexture("window.handle.unfocus", "black", style);
   resource.wstyle.g_focus =
-    readDatabaseTexture("window.grip.focus", "Window.Grip.Focus", "white");
+    readDatabaseTexture("window.grip.focus", "white", style);
   resource.wstyle.g_unfocus =
-    readDatabaseTexture("window.grip.unfocus", "Window.Grip.Unfocus", "black");
+    readDatabaseTexture("window.grip.unfocus", "black", style);
   resource.wstyle.b_focus =
-    readDatabaseTexture("window.button.focus", "Window.Button.Focus", "white");
+    readDatabaseTexture("window.button.focus", "white", style);
   resource.wstyle.b_unfocus =
-    readDatabaseTexture("window.button.unfocus",
-                        "Window.Button.Unfocus", "black");
+    readDatabaseTexture("window.button.unfocus", "black", style);
   resource.wstyle.b_pressed =
-    readDatabaseTexture("window.button.pressed",
-                        "Window.Button.Pressed", "black");
+    readDatabaseTexture("window.button.pressed", "black", style);
   resource.wstyle.f_focus =
-    readDatabaseColor("window.frame.focusColor",
-                      "Window.Frame.FocusColor", "white");
+    readDatabaseColor("window.frame.focusColor", "white", style);
   resource.wstyle.f_unfocus =
-    readDatabaseColor("window.frame.unfocusColor",
-                      "Window.Frame.UnfocusColor", "black");
+    readDatabaseColor("window.frame.unfocusColor", "black", style);
   resource.wstyle.l_text_focus =
-    readDatabaseColor("window.label.focus.textColor",
-                      "Window.Label.Focus.TextColor", "black");
+    readDatabaseColor("window.label.focus.textColor", "black", style);
   resource.wstyle.l_text_unfocus =
-    readDatabaseColor("window.label.unfocus.textColor",
-                      "Window.Label.Unfocus.TextColor", "white");
+    readDatabaseColor("window.label.unfocus.textColor", "white", style);
   resource.wstyle.b_pic_focus =
-    readDatabaseColor("window.button.focus.picColor",
-                      "Window.Button.Focus.PicColor", "black");
+    readDatabaseColor("window.button.focus.picColor", "black", style);
   resource.wstyle.b_pic_unfocus =
-    readDatabaseColor("window.button.unfocus.picColor",
-                      "Window.Button.Unfocus.PicColor", "white");
+    readDatabaseColor("window.button.unfocus.picColor", "white", style);
 
   resource.wstyle.justify = LeftJustify;
-  if (XrmGetResource(resource.stylerc, "window.justify", "Window.Justify",
-                     &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (style.getValue("window.justify", s)) {
+    if (s == "right" || s == "Right")
       resource.wstyle.justify = RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (s == "center" || s == "Center")
       resource.wstyle.justify = CenterJustify;
   }
 
   // load toolbar config
   resource.tstyle.toolbar =
-    readDatabaseTexture("toolbar", "Toolbar", "black");
+    readDatabaseTexture("toolbar", "black", style);
   resource.tstyle.label =
-    readDatabaseTexture("toolbar.label", "Toolbar.Label", "black");
+    readDatabaseTexture("toolbar.label", "black", style);
   resource.tstyle.window =
-    readDatabaseTexture("toolbar.windowLabel", "Toolbar.WindowLabel", "black");
+    readDatabaseTexture("toolbar.windowLabel", "black", style);
   resource.tstyle.button =
-    readDatabaseTexture("toolbar.button", "Toolbar.Button", "white");
+    readDatabaseTexture("toolbar.button", "white", style);
   resource.tstyle.pressed =
-    readDatabaseTexture("toolbar.button.pressed",
-                        "Toolbar.Button.Pressed", "black");
+    readDatabaseTexture("toolbar.button.pressed", "black", style);
   resource.tstyle.clock =
-    readDatabaseTexture("toolbar.clock", "Toolbar.Clock", "black");
+    readDatabaseTexture("toolbar.clock", "black", style);
   resource.tstyle.l_text =
-    readDatabaseColor("toolbar.label.textColor",
-                      "Toolbar.Label.TextColor", "white");
+    readDatabaseColor("toolbar.label.textColor", "white", style);
   resource.tstyle.w_text =
-    readDatabaseColor("toolbar.windowLabel.textColor",
-                      "Toolbar.WindowLabel.TextColor", "white");
+    readDatabaseColor("toolbar.windowLabel.textColor", "white", style);
   resource.tstyle.c_text =
-    readDatabaseColor("toolbar.clock.textColor",
-                      "Toolbar.Clock.TextColor", "white");
+    readDatabaseColor("toolbar.clock.textColor", "white", style);
   resource.tstyle.b_pic =
-    readDatabaseColor("toolbar.button.picColor",
-                      "Toolbar.Button.PicColor", "black");
+    readDatabaseColor("toolbar.button.picColor", "black", style);
 
   resource.tstyle.justify = LeftJustify;
-  if (XrmGetResource(resource.stylerc, "toolbar.justify",
-                     "Toolbar.Justify", &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (style.getValue("toolbar.justify", s)) {
+    if (s == "right" || s == "Right")
       resource.tstyle.justify = RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (s == "center" || s == "Center")
       resource.tstyle.justify = CenterJustify;
   }
 
   // load menu config
   resource.mstyle.title =
-    readDatabaseTexture("menu.title", "Menu.Title", "white");
+    readDatabaseTexture("menu.title", "white", style);
   resource.mstyle.frame =
-    readDatabaseTexture("menu.frame", "Menu.Frame", "black");
+    readDatabaseTexture("menu.frame", "black", style);
   resource.mstyle.hilite =
-    readDatabaseTexture("menu.hilite", "Menu.Hilite", "white");
+    readDatabaseTexture("menu.hilite", "white", style);
   resource.mstyle.t_text =
-    readDatabaseColor("menu.title.textColor", "Menu.Title.TextColor", "black");
+    readDatabaseColor("menu.title.textColor", "black", style);
   resource.mstyle.f_text =
-    readDatabaseColor("menu.frame.textColor", "Menu.Frame.TextColor", "white");
+    readDatabaseColor("menu.frame.textColor", "white", style);
   resource.mstyle.d_text =
-    readDatabaseColor("menu.frame.disableColor",
-                      "Menu.Frame.DisableColor", "black");
+    readDatabaseColor("menu.frame.disableColor", "black", style);
   resource.mstyle.h_text =
-    readDatabaseColor("menu.hilite.textColor",
-                      "Menu.Hilite.TextColor", "black");
+    readDatabaseColor("menu.hilite.textColor", "black", style);
 
   resource.mstyle.t_justify = LeftJustify;
-  if (XrmGetResource(resource.stylerc, "menu.title.justify",
-                     "Menu.Title.Justify",
-                     &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (style.getValue("menu.title.justify", s)) {
+    if (s == "right" || s == "Right")
       resource.mstyle.t_justify = RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (s == "center" || s == "Center")
       resource.mstyle.t_justify = CenterJustify;
   }
 
   resource.mstyle.f_justify = LeftJustify;
-  if (XrmGetResource(resource.stylerc, "menu.frame.justify",
-                     "Menu.Frame.Justify",
-                     &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (style.getValue("menu.frame.justify", s)) {
+    if (s == "right" || s == "Right")
       resource.mstyle.f_justify = RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (s == "center" || s == "Center")
       resource.mstyle.f_justify = CenterJustify;
   }
 
   resource.mstyle.bullet = Basemenu::Triangle;
-  if (XrmGetResource(resource.stylerc, "menu.bullet", "Menu.Bullet",
-                     &value_type, &value)) {
-    if (! strncasecmp(value.addr, "empty", value.size))
+  if (style.getValue("menu.bullet", s)) {
+    if (s == "empty" || s == "Empty")
       resource.mstyle.bullet = Basemenu::Empty;
-    else if (! strncasecmp(value.addr, "square", value.size))
+    else if (s == "square" || s == "Square")
       resource.mstyle.bullet = Basemenu::Square;
-    else if (! strncasecmp(value.addr, "diamond", value.size))
+    else if (s == "diamond" || s == "Diamond")
       resource.mstyle.bullet = Basemenu::Diamond;
   }
 
   resource.mstyle.bullet_pos = Basemenu::Left;
-  if (XrmGetResource(resource.stylerc, "menu.bullet.position",
-                     "Menu.Bullet.Position", &value_type, &value)) {
-    if (! strncasecmp(value.addr, "right", value.size))
+  if (style.getValue("menu.bullet.position", s)) {
+    if (s == "right" || s == "Right")
       resource.mstyle.bullet_pos = Basemenu::Right;
   }
 
   resource.border_color =
-    readDatabaseColor("borderColor", "BorderColor", "black");
-
-  unsigned int uint_value;
+    readDatabaseColor("borderColor", "black", style);
 
   // load bevel, border and handle widths
-  resource.handle_width = 6;
-  if (XrmGetResource(resource.stylerc, "handleWidth", "HandleWidth",
-                     &value_type, &value) &&
-      sscanf(value.addr, "%u", &uint_value) == 1 &&
-      uint_value <= (getWidth() / 2) && uint_value != 0) {
-    resource.handle_width = uint_value;
-  }
+  if (! style.getValue("handleWidth", resource.handle_width) ||
+      resource.handle_width > (getWidth() / 2) || resource.handle_width == 0)
+    resource.handle_width = 6;
 
-  resource.border_width = 1;
-  if (XrmGetResource(resource.stylerc, "borderWidth", "BorderWidth",
-                     &value_type, &value) &&
-      sscanf(value.addr, "%u", &uint_value) == 1) {
-    resource.border_width = uint_value;
-  }
+  if (! style.getValue("borderWidth", resource.border_width))
+    resource.border_width = 1;
 
-  resource.bevel_width = 3;
-  if (XrmGetResource(resource.stylerc, "bevelWidth", "BevelWidth",
-                     &value_type, &value) &&
-      sscanf(value.addr, "%u", &uint_value) == 1 &&
-      uint_value <= (getWidth() / 2) && uint_value != 0) {
-    resource.bevel_width = uint_value;
-  }
+  if (! style.getValue("bevelWidth", resource.bevel_width) ||
+      resource.bevel_width > (getWidth() / 2) || resource.bevel_width == 0)
+    resource.bevel_width = 3;
 
-  resource.frame_width = resource.bevel_width;
-  if (XrmGetResource(resource.stylerc, "frameWidth", "FrameWidth",
-                     &value_type, &value) &&
-      sscanf(value.addr, "%u", &uint_value) == 1 &&
-      uint_value <= (getWidth() / 2)) {
-    resource.frame_width = uint_value;
-  }
+  if (! style.getValue("frameWidth", resource.frame_width) ||
+      resource.frame_width > (getWidth() / 2))
+    resource.frame_width = resource.bevel_width;
 
-  if (XrmGetResource(resource.stylerc, "rootCommand", "RootCommand",
-                     &value_type, &value)) {
-    bexec(value.addr, displayString());
-  }
-
-  XrmDestroyDatabase(resource.stylerc);
+  if (style.getValue("rootCommand", s))
+    bexec(s, displayString());
 }
 
 
@@ -741,6 +943,8 @@ BlackboxWindow *BScreen::getIcon(unsigned int index) {
 unsigned int BScreen::addWorkspace(void) {
   Workspace *wkspc = new Workspace(this, workspacesList.size());
   workspacesList.push_back(wkspc);
+  saveWorkspaces(getWorkspaceCount() + 1);
+  saveWorkspaceNames();
 
   workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),
                         wkspc->getID() + 2);
@@ -770,6 +974,9 @@ unsigned int BScreen::removeLastWorkspace(void) {
 
   workspacesList.pop_back();
   delete wkspc;
+
+  saveWorkspaces(getWorkspaceCount() - 1);
+  saveWorkspaceNames();
 
   toolbar->reconfigure();
 
@@ -981,13 +1188,6 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 }
 
 
-#ifdef    HAVE_STRFTIME
-void BScreen::saveStrftimeFormat(const string& format) {
-  resource.strftime_format = format;
-}
-#endif // HAVE_STRFTIME
-
-
 void BScreen::addWorkspaceName(const string& name) {
   workspaceNames.push_back(name);
 }
@@ -1060,7 +1260,7 @@ void BScreen::nextFocus(void) {
     do {
       current = next;
       next = current_workspace->getNextWindowInList(current);
-    } while(!next->setInputFocus() && next != focused);
+    } while(! next->setInputFocus() && next != focused);
 
     if (next != focused)
       current_workspace->raiseWindow(next);
@@ -1089,7 +1289,7 @@ void BScreen::prevFocus(void) {
     do {
       current = next;
       next = current_workspace->getPrevWindowInList(current);
-    } while(!next->setInputFocus() && next != focused);
+    } while(! next->setInputFocus() && next != focused);
 
     if (next != focused)
       current_workspace->raiseWindow(next);
@@ -1130,11 +1330,11 @@ void BScreen::InitMenu(void) {
   const char *menu_filename = blackbox->getMenuFilename();
 
   if (menu_filename) 
-    if (!(menu_file = fopen(menu_filename, "r")))
+    if (! (menu_file = fopen(menu_filename, "r")))
       perror(menu_filename);
-  if (!menu_file) {     // opening the menu file failed, try the default menu
+  if (! menu_file) {     // opening the menu file failed, try the default menu
     menu_filename = DEFAULTMENU;
-    if (!(menu_file = fopen(menu_filename, "r")))
+    if (! (menu_file = fopen(menu_filename, "r")))
       perror(menu_filename);
   } 
 
@@ -1176,7 +1376,7 @@ void BScreen::InitMenu(void) {
 
             rootmenu->setLabel(label);
             defaultMenu = parseMenuFile(menu_file, rootmenu);
-            if (!defaultMenu)
+            if (! defaultMenu)
               blackbox->addMenuTimestamp(menu_filename);
             break;
           }
@@ -1746,15 +1946,13 @@ void BScreen::updateFocusModel()
 
 
 BTexture BScreen::readDatabaseTexture(const string &rname,
-                                      const string &rclass,
-                                      const string &default_color) {
+                                      const string &default_color,
+                                      Configuration &style) {
   BTexture texture;
-  XrmValue value;
-  char *value_type;
+  string s;
 
-  if (XrmGetResource(resource.stylerc, rname.c_str(), rclass.c_str(),
-                     &value_type, &value))
-    texture = BTexture(value.addr);
+  if (style.getValue(rname, s))
+    texture = BTexture(s);
   else
     texture.setTexture(BTexture::Solid | BTexture::Flat);
 
@@ -1764,32 +1962,27 @@ BTexture BScreen::readDatabaseTexture(const string &rname,
 
   if (texture.texture() & BTexture::Solid) {
     texture.setColor(readDatabaseColor(rname + ".color",
-                                       rclass + ".Color",
-                                       default_color));
+                                       default_color, style));
     texture.setColorTo(readDatabaseColor(rname + ".colorTo",
-                                         rclass + ".ColorTo",
-                                         default_color));
+                                         default_color, style));
   } else if (texture.texture() & BTexture::Gradient) {
     texture.setColor(readDatabaseColor(rname + ".color",
-                                       rclass + ".Color",
-                                       default_color));
+                                       default_color, style));
     texture.setColorTo(readDatabaseColor(rname + ".colorTo",
-                                         rclass + ".ColorTo",
-                                         default_color));
+                                         default_color, style));
   }
 
   return texture;
 }
 
 
-BColor BScreen::readDatabaseColor(const string &rname, const string &rclass,
-				  const string &default_color) {
+BColor BScreen::readDatabaseColor(const string &rname,
+				  const string &default_color,
+                                  Configuration &style) {
   BColor color;
-  XrmValue value;
-  char *value_type;
-  if (XrmGetResource(resource.stylerc, rname.c_str(), rclass.c_str(),
-                     &value_type, &value))
-    color = BColor(value.addr, getBaseDisplay(), getScreenNumber());
+  string s;
+  if (style.getValue(rname, s))
+    color = BColor(s, getBaseDisplay(), getScreenNumber());
   else
     color = BColor(default_color, getBaseDisplay(), getScreenNumber());
   return color;
@@ -1797,18 +1990,14 @@ BColor BScreen::readDatabaseColor(const string &rname, const string &rclass,
 
 
 XFontSet BScreen::readDatabaseFontSet(const string &rname,
-                                      const string &rclass) {
+                                      Configuration &style) {
   char *defaultFont = "fixed";
 
   bool load_default = True;
-  XrmValue value;
-  char *value_type;
+  string s;
   XFontSet fontset = 0;
-  if (XrmGetResource(resource.stylerc, rname.c_str(), rclass.c_str(),
-                     &value_type, &value) &&
-      (fontset = createFontSet(value.addr))) {
+  if (style.getValue(rname, s) && (fontset = createFontSet(s)))
     load_default = False;
-  }
 
   if (load_default) {
     fontset = createFontSet(defaultFont);
@@ -1826,20 +2015,18 @@ XFontSet BScreen::readDatabaseFontSet(const string &rname,
 
 
 XFontStruct *BScreen::readDatabaseFont(const string &rname,
-                                       const string &rclass) {
+                                       Configuration &style) {
   char *defaultFont = "fixed";
 
   bool load_default = False;
-  XrmValue value;
-  char *value_type;
+  string s;
   XFontStruct *font = 0;
-  if (XrmGetResource(resource.stylerc, rname.c_str(), rclass.c_str(),
-                     &value_type, &value)) {
-    if ((font = XLoadQueryFont(blackbox->getXDisplay(), value.addr)) == NULL) {
+  if (style.getValue(rname, s)) {
+    if ((font = XLoadQueryFont(blackbox->getXDisplay(), s.c_str())) == NULL) {
       fprintf(stderr,
               i18n(ScreenSet, ScreenFontLoadFail,
                    "BScreen::setCurrentStyle(): couldn't load font '%s'\n"),
-              value.addr);
+              s.c_str());
 
       load_default = True;
     }
@@ -1866,7 +2053,7 @@ static const char * strcasestr(const char *str, const char *ptn) {
   const char *s2, *p2;
   for(; *str; str++) {
     for(s2=str,p2=ptn; ; s2++,p2++) {
-      if (!*p2) return str;
+      if (! *p2) return str;
       if (toupper(*s2) != toupper(*p2)) break;
     }
   }
@@ -1906,7 +2093,7 @@ static const char *getFontSize(const char *pattern, int *size) {
   int n=0;
 
   for (p=pattern; 1; p++) {
-    if (!*p) {
+    if (! *p) {
       if (p2!=NULL && n>1 && n<72) {
         *size = n; return p2+1;
       } else {

@@ -30,7 +30,7 @@ CPPFLAGS= @CPPFLAGS@ @SHAPE@ @ORDEREDPSEUDO@ \
 
 bin_PROGRAMS= openbox
 
-openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc GCCache.cc Iconmenu.cc Image.cc ImageControl.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Texture.cc Timer.cc Toolbar.cc Util.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc blackbox.cc i18n.cc main.cc
+openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc Configuration.cc GCCache.cc Iconmenu.cc Image.cc ImageControl.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Texture.cc Timer.cc Toolbar.cc Util.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc blackbox.cc i18n.cc main.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -39,87 +39,86 @@ distclean-local:
 
 # local dependencies
 
-BaseDisplay.o: BaseDisplay.cc ../config.h i18n.hh \
- ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh GCCache.hh Color.hh \
- Util.hh
-Basemenu.o: Basemenu.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh Basemenu.hh GCCache.hh Color.hh \
- Image.hh Screen.hh Texture.hh Util.hh Configmenu.hh Iconmenu.hh \
- Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh
-Clientmenu.o: Clientmenu.cc ../config.h blackbox.hh i18n.hh \
- ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh Clientmenu.hh \
- Basemenu.hh Screen.hh Color.hh Texture.hh Util.hh Configmenu.hh \
- Iconmenu.hh Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh \
- Window.hh Windowmenu.hh
-Color.o: Color.cc ../config.h Color.hh BaseDisplay.hh Timer.hh
-Configmenu.o: Configmenu.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- Configmenu.hh Basemenu.hh Image.hh Timer.hh BaseDisplay.hh Color.hh \
- Toolbar.hh Screen.hh Texture.hh Util.hh Iconmenu.hh Netizen.hh \
- Rootmenu.hh Workspace.hh Workspacemenu.hh blackbox.hh Window.hh \
- Windowmenu.hh
-GCCache.o: GCCache.cc ../config.h GCCache.hh BaseDisplay.hh Timer.hh \
- Color.hh Util.hh
-Iconmenu.o: Iconmenu.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- Iconmenu.hh Basemenu.hh Screen.hh Color.hh Texture.hh Util.hh \
- Configmenu.hh Netizen.hh Rootmenu.hh Timer.hh Workspace.hh \
- Workspacemenu.hh blackbox.hh BaseDisplay.hh Window.hh Windowmenu.hh
-Image.o: Image.cc ../config.h blackbox.hh i18n.hh \
- ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh GCCache.hh Color.hh \
- Image.hh Texture.hh Util.hh
-ImageControl.o: ImageControl.cc ../config.h blackbox.hh i18n.hh \
- ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh Color.hh Image.hh \
- Texture.hh Util.hh
-Netizen.o: Netizen.cc ../config.h Netizen.hh Screen.hh Color.hh \
- Texture.hh Util.hh Configmenu.hh Basemenu.hh Iconmenu.hh Rootmenu.hh \
- Timer.hh Workspace.hh Workspacemenu.hh blackbox.hh i18n.hh \
- ../nls/blackbox-nls.hh BaseDisplay.hh
-Rootmenu.o: Rootmenu.cc ../config.h blackbox.hh i18n.hh \
- ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh Rootmenu.hh \
- Basemenu.hh Screen.hh Color.hh Texture.hh Util.hh Configmenu.hh \
- Iconmenu.hh Netizen.hh Workspace.hh Workspacemenu.hh
-Screen.o: Screen.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh Clientmenu.hh Basemenu.hh \
- GCCache.hh Color.hh Iconmenu.hh Image.hh Screen.hh Texture.hh Util.hh \
- Configmenu.hh Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh \
- Slit.hh Toolbar.hh Window.hh Windowmenu.hh
-Slit.o: Slit.cc ../config.h i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
- BaseDisplay.hh Timer.hh Image.hh Color.hh Screen.hh Texture.hh \
- Util.hh Configmenu.hh Basemenu.hh Iconmenu.hh Netizen.hh Rootmenu.hh \
- Workspace.hh Workspacemenu.hh Slit.hh Toolbar.hh
-Texture.o: Texture.cc ../config.h Texture.hh Color.hh Util.hh \
- BaseDisplay.hh Timer.hh Image.hh Screen.hh Configmenu.hh Basemenu.hh \
- Iconmenu.hh Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh \
- blackbox.hh i18n.hh ../nls/blackbox-nls.hh
-Timer.o: Timer.cc ../config.h BaseDisplay.hh Timer.hh Util.hh
-Toolbar.o: Toolbar.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh Clientmenu.hh Basemenu.hh \
- GCCache.hh Color.hh Iconmenu.hh Image.hh Rootmenu.hh Screen.hh \
- Texture.hh Util.hh Configmenu.hh Netizen.hh Workspace.hh \
- Workspacemenu.hh Toolbar.hh Window.hh Windowmenu.hh Slit.hh
-Util.o: Util.cc ../config.h Util.hh
-Window.o: Window.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh GCCache.hh Color.hh Iconmenu.hh \
- Basemenu.hh Image.hh Screen.hh Texture.hh Util.hh Configmenu.hh \
- Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh Toolbar.hh \
- Window.hh Windowmenu.hh Slit.hh
-Windowmenu.o: Windowmenu.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh Screen.hh Color.hh Texture.hh \
- Util.hh Configmenu.hh Basemenu.hh Iconmenu.hh Netizen.hh Rootmenu.hh \
- Workspace.hh Workspacemenu.hh Window.hh Windowmenu.hh
-Workspace.o: Workspace.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh Clientmenu.hh Basemenu.hh \
- Netizen.hh Screen.hh Color.hh Texture.hh Util.hh Configmenu.hh \
- Iconmenu.hh Rootmenu.hh Workspace.hh Workspacemenu.hh Toolbar.hh \
- Window.hh Windowmenu.hh
-Workspacemenu.o: Workspacemenu.cc ../config.h i18n.hh \
- ../nls/blackbox-nls.hh blackbox.hh BaseDisplay.hh Timer.hh Screen.hh \
- Color.hh Texture.hh Util.hh Configmenu.hh Basemenu.hh Iconmenu.hh \
- Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh Toolbar.hh
-blackbox.o: blackbox.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
- blackbox.hh BaseDisplay.hh Timer.hh Basemenu.hh Clientmenu.hh \
- GCCache.hh Color.hh Image.hh Rootmenu.hh Screen.hh Texture.hh Util.hh \
- Configmenu.hh Iconmenu.hh Netizen.hh Workspace.hh Workspacemenu.hh \
- Slit.hh Toolbar.hh Window.hh Windowmenu.hh
-i18n.o: i18n.cc ../config.h i18n.hh ../nls/blackbox-nls.hh
-main.o: main.cc ../version.h ../config.h i18n.hh \
- ../nls/blackbox-nls.hh blackbox.hh BaseDisplay.hh Timer.hh
+BaseDisplay.o: BaseDisplay.cc i18n.hh ../nls/blackbox-nls.hh \
+  BaseDisplay.hh Timer.hh Util.hh GCCache.hh Color.hh
+Basemenu.o: Basemenu.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Basemenu.hh GCCache.hh \
+  Color.hh Image.hh Screen.hh Texture.hh Configmenu.hh Iconmenu.hh \
+  Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh
+Clientmenu.o: Clientmenu.cc blackbox.hh i18n.hh ../nls/blackbox-nls.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Clientmenu.hh \
+  Basemenu.hh Screen.hh Color.hh Texture.hh Image.hh Configmenu.hh \
+  Iconmenu.hh Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh \
+  Window.hh Windowmenu.hh
+Color.o: Color.cc Color.hh BaseDisplay.hh Timer.hh Util.hh
+Configmenu.o: Configmenu.cc i18n.hh ../nls/blackbox-nls.hh Configmenu.hh \
+  Basemenu.hh Image.hh Timer.hh BaseDisplay.hh Util.hh Color.hh \
+  Toolbar.hh Screen.hh Texture.hh Iconmenu.hh Netizen.hh Rootmenu.hh \
+  Workspace.hh Workspacemenu.hh blackbox.hh Configuration.hh Window.hh \
+  Windowmenu.hh
+Configuration.o: Configuration.cc ../config.h Configuration.hh Util.hh
+GCCache.o: GCCache.cc GCCache.hh BaseDisplay.hh Timer.hh Util.hh Color.hh
+Iconmenu.o: Iconmenu.cc i18n.hh ../nls/blackbox-nls.hh Iconmenu.hh \
+  Basemenu.hh Screen.hh Color.hh Texture.hh Util.hh Image.hh Timer.hh \
+  BaseDisplay.hh Configmenu.hh Netizen.hh Rootmenu.hh Workspace.hh \
+  Workspacemenu.hh blackbox.hh Configuration.hh Window.hh Windowmenu.hh
+Image.o: Image.cc blackbox.hh i18n.hh ../nls/blackbox-nls.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh GCCache.hh Color.hh \
+  Image.hh Texture.hh
+ImageControl.o: ImageControl.cc blackbox.hh i18n.hh \
+  ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh Util.hh Configuration.hh \
+  Color.hh Image.hh Texture.hh
+Netizen.o: Netizen.cc Netizen.hh Screen.hh Color.hh Texture.hh Util.hh \
+  Image.hh Timer.hh BaseDisplay.hh Configmenu.hh Basemenu.hh Iconmenu.hh \
+  Rootmenu.hh Workspace.hh Workspacemenu.hh blackbox.hh i18n.hh \
+  ../nls/blackbox-nls.hh Configuration.hh
+Rootmenu.o: Rootmenu.cc blackbox.hh i18n.hh ../nls/blackbox-nls.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Rootmenu.hh \
+  Basemenu.hh Screen.hh Color.hh Texture.hh Image.hh Configmenu.hh \
+  Iconmenu.hh Netizen.hh Workspace.hh Workspacemenu.hh
+Screen.o: Screen.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Clientmenu.hh \
+  Basemenu.hh GCCache.hh Color.hh Iconmenu.hh Image.hh Screen.hh \
+  Texture.hh Configmenu.hh Netizen.hh Rootmenu.hh Workspace.hh \
+  Workspacemenu.hh Slit.hh Toolbar.hh Window.hh Windowmenu.hh
+Slit.o: Slit.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh BaseDisplay.hh \
+  Timer.hh Util.hh Configuration.hh Image.hh Color.hh Screen.hh \
+  Texture.hh Configmenu.hh Basemenu.hh Iconmenu.hh Netizen.hh Rootmenu.hh \
+  Workspace.hh Workspacemenu.hh Slit.hh Toolbar.hh
+Texture.o: Texture.cc Texture.hh Color.hh Util.hh BaseDisplay.hh Timer.hh \
+  Image.hh Screen.hh Configmenu.hh Basemenu.hh Iconmenu.hh Netizen.hh \
+  Rootmenu.hh Workspace.hh Workspacemenu.hh blackbox.hh i18n.hh \
+  ../nls/blackbox-nls.hh Configuration.hh
+Timer.o: Timer.cc BaseDisplay.hh Timer.hh Util.hh
+Toolbar.o: Toolbar.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Clientmenu.hh \
+  Basemenu.hh GCCache.hh Color.hh Iconmenu.hh Image.hh Rootmenu.hh \
+  Screen.hh Texture.hh Configmenu.hh Netizen.hh Workspace.hh \
+  Workspacemenu.hh Toolbar.hh Window.hh Windowmenu.hh Slit.hh
+Util.o: Util.cc Util.hh
+Window.o: Window.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh GCCache.hh Color.hh \
+  Iconmenu.hh Basemenu.hh Image.hh Screen.hh Texture.hh Configmenu.hh \
+  Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh Toolbar.hh \
+  Window.hh Windowmenu.hh Slit.hh
+Windowmenu.o: Windowmenu.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Screen.hh Color.hh \
+  Texture.hh Image.hh Configmenu.hh Basemenu.hh Iconmenu.hh Netizen.hh \
+  Rootmenu.hh Workspace.hh Workspacemenu.hh Window.hh Windowmenu.hh
+Workspace.o: Workspace.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Clientmenu.hh \
+  Basemenu.hh Netizen.hh Screen.hh Color.hh Texture.hh Image.hh \
+  Configmenu.hh Iconmenu.hh Rootmenu.hh Workspace.hh Workspacemenu.hh \
+  Toolbar.hh Window.hh Windowmenu.hh
+Workspacemenu.o: Workspacemenu.cc i18n.hh ../nls/blackbox-nls.hh \
+  blackbox.hh BaseDisplay.hh Timer.hh Util.hh Configuration.hh Screen.hh \
+  Color.hh Texture.hh Image.hh Configmenu.hh Basemenu.hh Iconmenu.hh \
+  Netizen.hh Rootmenu.hh Workspace.hh Workspacemenu.hh Toolbar.hh
+blackbox.o: blackbox.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh Basemenu.hh \
+  Clientmenu.hh GCCache.hh Color.hh Image.hh Rootmenu.hh Screen.hh \
+  Texture.hh Configmenu.hh Iconmenu.hh Netizen.hh Workspace.hh \
+  Workspacemenu.hh Slit.hh Toolbar.hh Window.hh Windowmenu.hh
+i18n.o: i18n.cc i18n.hh ../nls/blackbox-nls.hh
+main.o: main.cc ../version.h i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
+  BaseDisplay.hh Timer.hh Util.hh Configuration.hh

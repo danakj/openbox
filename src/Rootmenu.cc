@@ -58,7 +58,7 @@ void Rootmenu::itemSelected(int button, unsigned int index) {
 
   BasemenuItem *item = find(index);
 
-  if (!item->function())
+  if (! item->function())
     return;
 
   switch (item->function()) {

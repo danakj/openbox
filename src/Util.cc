@@ -220,3 +220,24 @@ timeval normalizeTimeval(const timeval &tm) {
 
   return ret;
 }
+
+
+string itostring(unsigned long i) {
+  if (i == 0)
+    return string("0");
+  
+  string tmp;
+  for (; i > 0; i /= 10)
+    tmp.insert(tmp.begin(), "0123456789"[i%10]);
+  return tmp;
+}
+
+
+string itostring(long i) {
+  if (i < 0) {
+    std::string tmp = itostring( (unsigned long) -i);
+    tmp.insert(tmp.begin(), '-');
+    return tmp;
+  } else
+    return itostring( (unsigned long) i);
+}

@@ -41,12 +41,15 @@ private:
   private:
     Placementmenu(const Placementmenu&);
     Placementmenu& operator=(const Placementmenu&);
+    Toolbar *toolbar;
 
   protected:
     virtual void itemSelected(int button, unsigned int index);
+    virtual void setValues(void);
 
   public:
     Placementmenu(Toolbarmenu *tm);
+    virtual void reconfigure(void);
   };
 
   Toolbar *toolbar;
@@ -61,6 +64,7 @@ private:
 protected:
   virtual void itemSelected(int button, unsigned int index);
   virtual void internal_hide(void);
+  virtual void setValues(void);
 
 public:
   Toolbarmenu(Toolbar *tb);
@@ -68,13 +72,16 @@ public:
 
   inline Basemenu *getPlacementmenu(void) { return placementmenu; }
 
-  void reconfigure(void);
+  virtual void reconfigure(void);
 };
 
 
 class Toolbar : public TimeoutHandler {
 private:
   bool on_top, editing, hidden, do_auto_hide;
+  unsigned int width_percent;
+  int placement;
+  std::string toolbarstr;
   Display *display;
 
   struct ToolbarFrame {
@@ -99,6 +106,7 @@ private:
 
   Blackbox *blackbox;
   BScreen *screen;
+  Configuration *config;
   BTimer *clock_timer, *hide_timer;
   Toolbarmenu *toolbarmenu;
   Strut strut;
@@ -136,6 +144,16 @@ public:
   inline bool isOnTop(void) const { return on_top; }
   inline bool isHidden(void) const { return hidden; }
   inline bool doAutoHide(void) const { return do_auto_hide; }
+  inline unsigned int getWidthPercent(void) const { return width_percent; }
+  inline int getPlacement(void) const { return placement; }
+ 
+  void saveOnTop(bool);
+  void saveAutoHide(bool);
+  void saveWidthPercent(unsigned int);
+  void savePlacement(int);
+
+  void save_rc(void);
+  void load_rc(void);
 
   inline Window getWindowID(void) const { return frame.window; }
 

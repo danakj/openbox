@@ -26,7 +26,6 @@
 
 extern "C" {
 #include <X11/Xlib.h>
-#include <X11/Xresource.h>
 
 #ifdef    HAVE_STDIO_H
 # include <stdio.h>
@@ -50,6 +49,7 @@ extern "C" {
 
 #include "i18n.hh"
 #include "BaseDisplay.hh"
+#include "Configuration.hh"
 #include "Timer.hh"
 
 #define AttribShaded      (1l << 0)
@@ -144,6 +144,7 @@ private:
   BScreen *active_screen;
   BlackboxWindow *focused_window;
   BTimer *timer;
+  Configuration config;
 
   bool no_focus, reconfigure_wait, reread_menu_wait;
   Time last_time;
@@ -195,7 +196,6 @@ private:
 
   void load_rc(void);
   void save_rc(void);
-  void reload_rc(void);
   void real_rereadMenu(void);
   void real_reconfigure(void);
 
@@ -228,6 +228,7 @@ public:
 
   inline BlackboxWindow *getFocusedWindow(void) { return focused_window; }
 
+  inline Configuration *getConfig() { return &config; }
   inline const Time &getDoubleClickInterval(void) const
   { return resource.double_click_interval; }
   inline const Time &getLastTime(void) const { return last_time; }
@@ -261,7 +262,6 @@ public:
 
   void setFocusedWindow(BlackboxWindow *w);
   void shutdown(void);
-  void load_rc(BScreen *screen);
   void saveStyleFilename(const std::string& filename);
   void addMenuTimestamp(const std::string& filename);
   void restart(const char *prog = 0);

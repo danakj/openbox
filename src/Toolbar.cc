@@ -76,6 +76,11 @@ static long aMinuteFromNow(void) {
 Toolbar::Toolbar(BScreen *scrn) {
   screen = scrn;
   blackbox = screen->getBlackbox();
+  toolbarstr = (string)"session.screen" + itostring(screen->getScreenNumber())
+    + ".toolbar.";
+  config = blackbox->getConfig();
+
+  load_rc();
 
   // get the clock updating every minute
   clock_timer = new BTimer(blackbox, this);
@@ -87,9 +92,6 @@ Toolbar::Toolbar(BScreen *scrn) {
   hide_handler.toolbar = this;
   hide_timer = new BTimer(blackbox, &hide_handler);
   hide_timer->setTimeout(blackbox->getAutoRaiseDelay());
-
-  on_top = screen->isToolbarOnTop();
-  hidden = do_auto_hide = screen->doToolbarAutoHide();
 
   editing = False;
   new_name_pos = 0;
@@ -196,9 +198,82 @@ Toolbar::~Toolbar(void) {
 }
 
 
+void Toolbar::saveOnTop(bool b) {
+  on_top = b;
+  config->setValue(toolbarstr + "onTop", on_top);
+}
+
+
+void Toolbar::saveAutoHide(bool b) {
+  do_auto_hide = b;
+  config->setValue(toolbarstr + "autoHide", do_auto_hide);
+}
+
+
+void Toolbar::saveWidthPercent(unsigned int w) {
+  width_percent = w;
+  config->setValue(toolbarstr + "widthPercent", width_percent);
+}
+
+
+void Toolbar::savePlacement(int p) {
+  placement = p;
+  const char *pname;
+  switch (placement) {
+  case TopLeft: pname = "TopLeft"; break;
+  case BottomLeft: pname = "BottomLeft"; break;
+  case TopCenter: pname = "TopCenter"; break;
+  case TopRight: pname = "TopRight"; break;
+  case BottomRight: pname = "BottomRight"; break;
+  case BottomCenter: default: pname = "BottomCenter"; break;
+  }
+  config->setValue(toolbarstr + "placement", pname);
+}
+
+
+void Toolbar::save_rc(void) {
+  saveOnTop(on_top);
+  saveAutoHide(do_auto_hide);
+  saveWidthPercent(width_percent);
+  savePlacement(placement);
+}
+
+
+void Toolbar::load_rc(void) {
+  string s;
+  
+  if (! config->getValue(toolbarstr + "onTop", on_top))
+    on_top = false;
+
+  if (! config->getValue(toolbarstr + "autoHide", do_auto_hide))
+    do_auto_hide = false;
+  hidden = do_auto_hide;
+
+  if (! config->getValue(toolbarstr + "widthPercent", width_percent) ||
+      width_percent == 0 || width_percent > 100)
+    width_percent = 66;
+
+  if (config->getValue(toolbarstr + "placement", s)) {
+    if (s == "TopLeft")
+      placement = TopLeft;
+    else if (s == "BottomLeft")
+      placement = BottomLeft;
+    else if (s == "TopCenter")
+      placement = TopCenter;
+    else if (s == "TopRight")
+      placement = TopRight;
+    else if (s == "BottomRight")
+      placement = BottomRight;
+    else //if (s == "BottomCenter")
+      placement = BottomCenter;
+  } else
+    placement = BottomCenter;
+}
+
+
 void Toolbar::reconfigure(void) {
   unsigned int height = 0,
-    width = (screen->getWidth() * screen->getToolbarWidthPercent()) / 100;
+    width = (screen->getWidth() * width_percent) / 100;
 
   if (i18n.multibyte())
     height = screen->getToolbarStyle()->fontset_extents->max_ink_extent.height;
@@ -215,13 +290,13 @@ void Toolbar::reconfigure(void) {
   frame.rect.setSize(width, height);
 
   int x, y;
-  switch (screen->getToolbarPlacement()) {
+  switch (placement) {
   case TopLeft:
   case TopRight:
   case TopCenter:
-    if (screen->getToolbarPlacement() == TopLeft)
+    if (placement == TopLeft)
       x = 0;
-    else if (screen->getToolbarPlacement() == TopRight)
+    else if (placement == TopRight)
       x = screen->getWidth() - frame.rect.width()
         - (screen->getBorderWidth() * 2);
     else
@@ -238,9 +313,9 @@ void Toolbar::reconfigure(void) {
   case BottomRight:
   case BottomCenter:
   default:
-    if (screen->getToolbarPlacement() == BottomLeft)
+    if (placement == BottomLeft)
       x = 0;
-    else if (screen->getToolbarPlacement() == BottomRight)
+    else if (placement == BottomRight)
       x = screen->getWidth() - frame.rect.width()
         - (screen->getBorderWidth() * 2);
     else
@@ -436,7 +511,7 @@ void Toolbar::updateStrut(void) {
   // left and right are always 0
   strut.top = strut.bottom = 0;
 
-  switch(screen->getToolbarPlacement()) {
+  switch(placement) {
   case TopLeft:
   case TopCenter:
   case TopRight:
@@ -973,7 +1048,7 @@ void Toolbar::HideHandler::timeout(void) {
 
 
 void Toolbar::toggleAutoHide(void) {
-  do_auto_hide = (do_auto_hide) ?  False : True;
+  saveAutoHide(! doAutoHide());
 
   updateStrut();
   screen->getSlit()->reposition();
@@ -1002,9 +1077,13 @@ Toolbarmenu::Toolbarmenu(Toolbar *tb) : Basemenu(tb->screen) {
               "Edit current workspace name"), 3);
 
   update();
+  setValues();
+}
 
-  if (toolbar->isOnTop()) setItemSelected(1, True);
-  if (toolbar->doAutoHide()) setItemSelected(2, True);
+
+void Toolbarmenu::setValues() {
+  setItemSelected(1, toolbar->isOnTop());
+  setItemSelected(2, toolbar->doAutoHide());
 }
 
 
@@ -1022,8 +1101,8 @@ void Toolbarmenu::itemSelected(int button, unsigned int index) {
 
   switch (item->function()) {
   case 1: { // always on top
-    toolbar->on_top = ((toolbar->isOnTop()) ? False : True);;
-    setItemSelected(1, toolbar->on_top);
+    toolbar->saveOnTop(! toolbar->isOnTop());
+    setItemSelected(1, toolbar->isOnTop());
 
     if (toolbar->isOnTop()) getScreen()->raiseWindows((Window *) 0, 0);
     break;
@@ -1031,7 +1110,7 @@ void Toolbarmenu::itemSelected(int button, unsigned int index) {
 
   case 2: { // auto hide
     toolbar->toggleAutoHide();
-    setItemSelected(2, toolbar->do_auto_hide);
+    setItemSelected(2, toolbar->doAutoHide());
 
     break;
   }
@@ -1054,6 +1133,7 @@ void Toolbarmenu::internal_hide(void) {
 
 
 void Toolbarmenu::reconfigure(void) {
+  setValues();
   placementmenu->reconfigure();
 
   Basemenu::reconfigure();
@@ -1061,7 +1141,7 @@ void Toolbarmenu::reconfigure(void) {
 
 
 Toolbarmenu::Placementmenu::Placementmenu(Toolbarmenu *tm)
-  : Basemenu(tm->toolbar->screen) {
+  : Basemenu(tm->toolbar->screen), toolbar(tm->toolbar) {
   setLabel(i18n(ToolbarSet, ToolbarToolbarPlacement, "Toolbar Placement"));
   setInternalMenu();
   setMinimumSublevels(3);
@@ -1079,6 +1159,38 @@ Toolbarmenu::Placementmenu::Placementmenu(Toolbarmenu *tm)
   insert(i18n(CommonSet, CommonPlacementBottomRight, "Bottom Right"),
          Toolbar::BottomRight);
   update();
+  setValues();
+}
+
+
+void Toolbarmenu::Placementmenu::setValues(void) {
+  int place = 0;
+  switch (toolbar->getPlacement()) {
+  case Toolbar::BottomRight:
+    place++;
+  case Toolbar::TopRight:
+    place++;
+  case Toolbar::BottomCenter:
+    place++;
+  case Toolbar::TopCenter:
+    place++;
+  case Toolbar::BottomLeft:
+    place++;
+  case Toolbar::TopLeft:
+    break;
+  }
+  setItemSelected(0, 0 == place);
+  setItemSelected(1, 1 == place);
+  setItemSelected(2, 2 == place);
+  setItemSelected(3, 3 == place);
+  setItemSelected(4, 4 == place);
+  setItemSelected(5, 5 == place);
+}
+
+
+void Toolbarmenu::Placementmenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
 }
 
 
@@ -1089,9 +1201,9 @@ void Toolbarmenu::Placementmenu::itemSelected(int button, unsigned int index) {
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  getScreen()->saveToolbarPlacement(item->function());
+  toolbar->savePlacement(item->function());
   hide();
-  getScreen()->getToolbar()->reconfigure();
+  toolbar->reconfigure();
 
   // reposition the slit as well to make sure it doesn't intersect the
   // toolbar

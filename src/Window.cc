@@ -1119,8 +1119,8 @@ void BlackboxWindow::getTransientInfo(void) {
   client.transient_for = 0;
 
   Window trans_for;
-  if (!XGetTransientForHint(blackbox->getXDisplay(), client.window,
-                            &trans_for)) {
+  if (! XGetTransientForHint(blackbox->getXDisplay(), client.window,
+                             &trans_for)) {
     // transient_for hint not set
     return;
   }
@@ -1447,7 +1447,7 @@ void BlackboxWindow::maximize(unsigned int button) {
       flags currently set.  Otherwise it still thinks it is maximized.
       so we do not need to call configure() because resizing will handle it
     */
-    if (!flags.resizing)
+    if (! flags.resizing)
       configure(blackbox_attrib.premax_x, blackbox_attrib.premax_y,
                 blackbox_attrib.premax_w, blackbox_attrib.premax_h);
 
@@ -1770,7 +1770,7 @@ void BlackboxWindow::restoreAttributes(void) {
                                blackbox->getBlackboxAttributesAtom(),
                                &atom_return, &foo, &nitems, &ulfoo,
                                (unsigned char **) &net);
-  if (ret != Success || !net || nitems != PropBlackboxAttributesElements)
+  if (ret != Success || ! net || nitems != PropBlackboxAttributesElements)
     return;
 
   if (net->flags & AttribShaded &&
@@ -2435,7 +2435,7 @@ void BlackboxWindow::buttonReleaseEvent(XButtonEvent *re) {
 
 
 void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
-  if (!flags.resizing && (me->state & Button1Mask) &&
+  if (! flags.resizing && (me->state & Button1Mask) &&
       (functions & Func_Move) &&
       (frame.title == me->window || frame.label == me->window ||
        frame.handle == me->window || frame.window == me->window)) {
@@ -2757,7 +2757,7 @@ void BlackboxWindow::upsize(void) {
 
   if (decorations & Decor_Border) {
     frame.border_w = screen->getBorderWidth();
-    if (!isTransient())
+    if (! isTransient())
       frame.mwm_border_w = screen->getFrameWidth();
     else
       frame.mwm_border_w = 0;

@@ -40,9 +40,11 @@ extern "C" {
 Slit::Slit(BScreen *scr) {
   screen = scr;
   blackbox = screen->getBlackbox();
+  slitstr = (std::string)"session.screen" + itostring(screen->getScreenNumber())
+    + ".slit.";
+  config = blackbox->getConfig();
 
-  on_top = screen->isSlitOnTop();
-  hidden = do_auto_hide = screen->doSlitAutoHide();
+  load_rc();
 
   display = screen->getBaseDisplay()->getXDisplay();
   frame.window = frame.pixmap = None;
@@ -197,6 +199,82 @@ void Slit::removeClient(Window w, bool remap) {
 }
 
 
+void Slit::saveOnTop(bool b) {
+  on_top = b;
+  config->setValue(slitstr + "onTop", on_top);
+}
+
+void Slit::saveAutoHide(bool b) {
+  do_auto_hide = b;
+  config->setValue(slitstr + "autoHide", do_auto_hide);
+}
+
+void Slit::savePlacement(int p) {
+  placement = p;
+  const char *pname;
+  switch (placement) {
+  case TopLeft: pname = "TopLeft"; break;
+  case CenterLeft: pname = "CenterLeft"; break;
+  case BottomLeft: pname = "BottomLeft"; break;
+  case TopCenter: pname = "TopCenter"; break;
+  case BottomCenter: pname = "BottomCenter"; break;
+  case TopRight: pname = "TopRight"; break;
+  case BottomRight: pname = "BottomRight"; break;
+  case CenterRight: default: pname = "CenterRight"; break;
+  }
+  config->setValue(slitstr + "placement", pname);
+}
+
+void Slit::saveDirection(int d) {
+  direction = d;
+  config->setValue(slitstr + "direction", (direction == Horizontal ?
+                                          "Horizontal" : "Vertical"));
+}
+
+void Slit::save_rc(void) {
+  saveOnTop(on_top);
+  saveAutoHide(do_auto_hide);
+  savePlacement(placement);
+  saveDirection(direction);
+}
+
+void Slit::load_rc(void) {
+  std::string s;
+
+  if (! config->getValue(slitstr + "onTop", on_top))
+    on_top = false;
+
+  if (! config->getValue(slitstr + "autoHide", do_auto_hide))
+    do_auto_hide = false;
+  hidden = do_auto_hide;
+
+  if (config->getValue(slitstr + "direction", s) && s == "Horizontal")
+    direction = Horizontal;
+  else
+    direction = Vertical;
+  
+  if (config->getValue(slitstr + "placement", s)) {
+    if (s == "TopLeft")
+      placement = TopLeft;
+    else if (s == "CenterLeft")
+      placement = CenterLeft;
+    else if (s == "BottomLeft")
+      placement = BottomLeft;
+    else if (s == "TopCenter")
+      placement = TopCenter;
+    else if (s == "BottomCenter")
+      placement = BottomCenter;
+    else if (s == "TopRight")
+      placement = TopRight;
+    else if (s == "BottomRight")
+      placement = BottomRight;
+    else //if (s == "CenterRight")
+      placement = CenterRight;
+  } else
+    placement = CenterRight;
+}
+
+
 void Slit::reconfigure(void) {
   SlitClientList::iterator it = clientList.begin();
   const SlitClientList::iterator end = clientList.end();
@@ -204,7 +282,7 @@ void Slit::reconfigure(void) {
 
   unsigned int width = 0, height = 0;
 
-  switch (screen->getSlitDirection()) {
+  switch (direction) {
   case Vertical:
     for (; it != end; ++it) {
       client = *it;
@@ -274,7 +352,7 @@ void Slit::reconfigure(void) {
 
   int x, y;
 
-  switch (screen->getSlitDirection()) {
+  switch (direction) {
   case Vertical:
     x = 0;
     y = screen->getBevelWidth();
@@ -355,9 +433,9 @@ void Slit::updateStrut(void) {
   strut.top = strut.bottom = strut.left = strut.right = 0;
 
   if (! clientList.empty()) {
-    switch (screen->getSlitDirection()) {
+    switch (direction) {
     case Vertical:
-      switch (screen->getSlitPlacement()) {
+      switch (placement) {
       case TopCenter:
         strut.top = getY() + getExposedHeight() +
                     (screen->getBorderWidth() * 2);
@@ -378,7 +456,7 @@ void Slit::updateStrut(void) {
       }
       break;
     case Horizontal:
-      switch (screen->getSlitPlacement()) {
+      switch (placement) {
       case TopCenter:
       case TopLeft:
       case TopRight:
@@ -408,11 +486,11 @@ void Slit::updateStrut(void) {
 
 void Slit::reposition(void) {
   // place the slit in the appropriate place
-  switch (screen->getSlitPlacement()) {
+  switch (placement) {
   case TopLeft:
     frame.rect.setPos(0, 0);
 
-    if (screen->getSlitDirection() == Vertical) {
+    if (direction == Vertical) {
       frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
                        - frame.rect.width();
       frame.y_hidden = 0;
@@ -435,7 +513,7 @@ void Slit::reposition(void) {
     frame.rect.setPos(0, (screen->getHeight() - frame.rect.height()
                           - (screen->getBorderWidth() * 2)));
 
-    if (screen->getSlitDirection() == Vertical) {
+    if (direction == Vertical) {
       frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
                        - frame.rect.width();
       frame.y_hidden = frame.rect.y();
@@ -467,7 +545,7 @@ void Slit::reposition(void) {
     frame.rect.setPos((screen->getWidth() - frame.rect.width()
                        - (screen->getBorderWidth() * 2)), 0);
 
-    if (screen->getSlitDirection() == Vertical) {
+    if (direction == Vertical) {
       frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
                        - screen->getBorderWidth();
       frame.y_hidden = 0;
@@ -495,7 +573,7 @@ void Slit::reposition(void) {
                       (screen->getHeight() - frame.rect.height()
                        - (screen->getBorderWidth() * 2)));
 
-    if (screen->getSlitDirection() == Vertical) {
+    if (direction == Vertical) {
       frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
                        - screen->getBorderWidth();
       frame.y_hidden = frame.rect.y();
@@ -523,7 +601,7 @@ void Slit::reposition(void) {
       delta = -delta;
     }
     frame.rect.setY(frame.rect.y() + delta);
-    if (screen->getSlitDirection() == Vertical)
+    if (direction == Vertical)
       frame.y_hidden += delta;
   }
 
@@ -644,7 +722,7 @@ void Slit::timeout(void) {
 
 
 void Slit::toggleAutoHide(void) {
-  do_auto_hide = (do_auto_hide) ?  False : True;
+  saveAutoHide(do_auto_hide ?  False : True);
 
   updateStrut();
 
@@ -699,8 +777,8 @@ void Slitmenu::itemSelected(int button, unsigned int index) {
 
   switch (item->function()) {
   case 1: { // always on top
-    slit->on_top = ((slit->isOnTop()) ?  False : True);
-    setItemSelected(2, slit->on_top);
+    slit->saveOnTop(! slit->isOnTop());
+    setItemSelected(2, slit->isOnTop());
 
     if (slit->isOnTop()) slit->screen->raiseWindows((Window *) 0, 0);
     break;
@@ -708,7 +786,7 @@ void Slitmenu::itemSelected(int button, unsigned int index) {
 
   case 2: { // auto hide
     slit->toggleAutoHide();
-    setItemSelected(3, slit->do_auto_hide);
+    setItemSelected(3, slit->doAutoHide());
 
     break;
   }
@@ -732,7 +810,7 @@ void Slitmenu::reconfigure(void) {
 
 
 Slitmenu::Directionmenu::Directionmenu(Slitmenu *sm)
-  : Basemenu(sm->slit->screen) {
+  : Basemenu(sm->slit->screen), slit(sm->slit) {
 
   setLabel(i18n(SlitSet, SlitSlitDirection, "Slit Direction"));
   setInternalMenu();
@@ -743,11 +821,20 @@ Slitmenu::Directionmenu::Directionmenu(Slitmenu *sm)
          Slit::Vertical);
 
   update();
+  setValues();
+}
 
-  if (getScreen()->getSlitDirection() == Slit::Horizontal)
-    setItemSelected(0, True);
-  else
-    setItemSelected(1, True);
+
+void Slitmenu::Directionmenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
+}   
+
+
+void Slitmenu::Directionmenu::setValues(void) {
+  const bool horiz = slit->getDirection() == Slit::Horizontal;
+  setItemSelected(0, horiz);
+  setItemSelected(1, ! horiz);
 }
 
 
@@ -758,23 +845,14 @@ void Slitmenu::Directionmenu::itemSelected(int button, unsigned int index) {
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  getScreen()->saveSlitDirection(item->function());
-
-  if (item->function() == Slit::Horizontal) {
-    setItemSelected(0, True);
-    setItemSelected(1, False);
-  } else {
-    setItemSelected(0, False);
-    setItemSelected(1, True);
-  }
-
+  slit->saveDirection(item->function());
   hide();
-  getScreen()->getSlit()->reconfigure();
+  slit->reconfigure();
 }
 
 
 Slitmenu::Placementmenu::Placementmenu(Slitmenu *sm)
-  : Basemenu(sm->slit->screen) {
+  : Basemenu(sm->slit->screen), slit(sm->slit) {
 
   setLabel(i18n(SlitSet, SlitSlitPlacement, "Slit Placement"));
   setMinimumSublevels(3);
@@ -799,6 +877,45 @@ Slitmenu::Placementmenu::Placementmenu(Slitmenu *sm)
          Slit::BottomRight);
 
   update();
+
+  setValues();
+}
+
+
+void Slitmenu::Placementmenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
+}   
+
+
+void Slitmenu::Placementmenu::setValues(void) {
+  int place = 0;
+  switch (slit->getPlacement()) {
+  case Slit::BottomRight:
+    place++;
+  case Slit::CenterRight:
+    place++;
+  case Slit::TopRight:
+    place++;
+  case Slit::BottomCenter:
+    place++;
+  case Slit::TopCenter:
+    place++;
+  case Slit::BottomLeft:
+    place++;
+  case Slit::CenterLeft:
+    place++;
+  case Slit::TopLeft:
+    break;
+  }
+  setItemSelected(0, 0 == place);
+  setItemSelected(1, 1 == place);
+  setItemSelected(2, 2 == place);
+  setItemSelected(3, 3 == place);
+  setItemSelected(5, 4 == place);
+  setItemSelected(6, 5 == place);
+  setItemSelected(7, 6 == place);
+  setItemSelected(8, 7 == place);
 }
 
 
@@ -809,8 +926,8 @@ void Slitmenu::Placementmenu::itemSelected(int button, unsigned int index) {
   BasemenuItem *item = find(index);
   if (! (item && item->function())) return;
 
-  getScreen()->saveSlitPlacement(item->function());
+  slit->savePlacement(item->function());
   hide();
-  getScreen()->getSlit()->reconfigure();
+  slit->reconfigure();
 }
 

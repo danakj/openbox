@@ -133,6 +133,8 @@ Frame		Click		A-Right	Lower
 
 Titlebar	Press		Left	Focus
 Handle		Press		Left	Focus
+BLCorner	Press		Left	Focus
+BRCorner	Press		Left	Focus
 Client		Press		Left	Focus
 Client		Press		Middle	Focus
 

@@ -1,6 +1,6 @@
 AC_INIT([src/main.cc])
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE([openbox], [2.90.0])
+AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
 AC_PREREQ([2.50])
 

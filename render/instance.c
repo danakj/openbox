@@ -33,9 +33,26 @@ dest(gpointer data)
 #ifdef DEBUG
     RrColor *c = data;
     if (c->refcount > 0)
-        g_error("removing color from hash table with references");
+        g_error("color %d (%d,%d,%d) in hash table with %d "
+                "leftover references",
+                c->id, RrColorRed(c), RrColorGreen(c), RrColorBlue(c),
+                c->refcount);
 #endif
 }
+
+#if 0
+static void f(gpointer key, gpointer value, gpointer n)
+{
+    RrColor *c = value;
+    if (c->id == *(int*)n)
+        g_message("color %d has %d references", c->id, c->refcount);
+}
+
+void print_refs(int id)
+{
+    g_hash_table_foreach(RrColorHash(definst), f, &id);
+}
+#endif
 
 RrInstance* RrInstanceNew (Display *display, gint screen)
 {

@@ -360,7 +360,7 @@ void screen::updateClientList() {
         break;
     if (it == end) {  // didn't already exist
       if (doAddWindow(rootclients[i])) {
-        cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
+        //cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
         _clients.insert(insert_point, new XWindow(_epist, this,
                                                   rootclients[i]));
       }
@@ -374,7 +374,7 @@ void screen::updateClientList() {
       if (**it2 == rootclients[i])
         break;
     if (i == num)  { // no longer exists
-      cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
+      //cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
       delete *it2;
       _clients.erase(it2);
     }
@@ -397,9 +397,9 @@ void screen::updateActiveWindow() {
   }
   _active = it;
 
-  cout << "Active window is now: ";
-  if (_active == _clients.end()) cout << "None\n";
-  else cout << "0x" << hex << (*_active)->window() << dec << endl;
+  //cout << "Active window is now: ";
+  //if (_active == _clients.end()) cout << "None\n";
+  //else cout << "0x" << hex << (*_active)->window() << dec << endl;
 }
 
 

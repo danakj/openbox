@@ -1269,9 +1269,14 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   if (w->isModal()) w->setModal(False);
   
   if (w->getWorkspaceNumber() != BSENTINEL &&
-      w->getWindowNumber() != BSENTINEL)
+      w->getWindowNumber() != BSENTINEL) {
     getWorkspace(w->getWorkspaceNumber())->removeWindow(w);
-  else if (w->isIconic())
+    if (w->isStuck()) {
+      for (unsigned int i = 0; i < getNumberOfWorkspaces(); ++i)
+        if (i != w->getWorkspaceNumber())
+          getWorkspace(i)->removeWindow(w, True);
+    }
+  } else if (w->isIconic())
     removeIcon(w);
 
   if (w->isNormal()) {
@@ -1515,6 +1520,10 @@ void BScreen::reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
   if (w->isIconic()) {
     removeIcon(w);
     getWorkspace(wkspc_id)->addWindow(w);
+    if (w->isStuck())
+      for (unsigned int i = 0; i < getNumberOfWorkspaces(); ++i)
+        if (i != w->getWorkspaceNumber())
+          getWorkspace(i)->addWindow(w, True);
   } else if (ignore_sticky || ! w->isStuck()) {
     if (w->isStuck())
       w->stick();

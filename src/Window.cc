@@ -1540,8 +1540,7 @@ void BlackboxWindow::configureShape(void) {
 bool BlackboxWindow::setInputFocus(void) {
   if (flags.focused) return True;
 
-  assert(! flags.iconic &&
-         (flags.stuck ||  // window must be on the current workspace or sticky
+  assert((flags.stuck ||  // window must be on the current workspace or sticky
           blackbox_attrib.workspace == screen->getCurrentWorkspaceID()));
 
   /*
@@ -1631,6 +1630,11 @@ void BlackboxWindow::iconify(void) {
   setState(IconicState);
 
   screen->getWorkspace(blackbox_attrib.workspace)->removeWindow(this);
+  if (flags.stuck) {
+    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
+      if (i != blackbox_attrib.workspace)
+        screen->getWorkspace(i)->removeWindow(this, True);
+  }
 
   if (isTransient()) {
     if (client.transient_for != (BlackboxWindow *) ~0ul &&
@@ -1934,10 +1938,6 @@ void BlackboxWindow::stick(void) {
   if (flags.stuck) {
     blackbox_attrib.flags ^= AttribOmnipresent;
     blackbox_attrib.attrib ^= AttribOmnipresent;
-
-    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
-      if (i != blackbox_attrib.workspace)
-        screen->getWorkspace(i)->removeWindow(this, True);
 
     flags.stuck = False;
 

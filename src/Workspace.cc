@@ -118,14 +118,6 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
     raiseWindow(w);
   else
     lowerWindow(w);
-  
-  // if the window is sticky, then it needs to be added on all other
-  // workspaces too!
-  if (! sticky && w->isStuck()) {
-    for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
-      if (i != id)
-        screen->getWorkspace(i)->addWindow(w, place, True);
-  }
 }
 
 
@@ -140,14 +132,6 @@ void Workspace::removeWindow(BlackboxWindow *w, bool sticky) {
     focusFallback(w);
   }
     
-  // if the window is sticky, then it needs to be removed on all other
-  // workspaces too!
-  if (! sticky && w->isStuck()) {
-    for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
-      if (i != id)
-        screen->getWorkspace(i)->removeWindow(w, True);
-  }
-
   if (! w->isNormal()) return;
 
   BlackboxWindowList::iterator it, end = windowList.end();

@@ -89,7 +89,7 @@ void client_foreach_transient(ObClient *self, ObClientForeachFunc func, void *da
 void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, void *data)
 {
     if (self->transient_for) {
-        if (self->transient_for != TRAN_GROUP) {
+        if (self->transient_for != OB_TRAN_GROUP) {
             if (!func(self->transient_for, data)) return;
             client_foreach_ancestor(self->transient_for, func, data);
         } else {
@@ -350,7 +350,7 @@ void client_unmanage(ObClient *self)
     screen_update_areas();
 
     /* tell our parent(s) that we're gone */
-    if (self->transient_for == TRAN_GROUP) { /* transient of group */
+    if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
         GSList *it;
 
         for (it = self->group->members; it; it = it->next)
@@ -364,7 +364,7 @@ void client_unmanage(ObClient *self)
 
     /* tell our transients that we're gone */
     for (it = self->transients; it != NULL; it = it->next) {
-        if (((ObClient*)it->data)->transient_for != TRAN_GROUP) {
+        if (((ObClient*)it->data)->transient_for != OB_TRAN_GROUP) {
             ((ObClient*)it->data)->transient_for = NULL;
             client_calc_layer(it->data);
         }
@@ -599,7 +599,7 @@ static void client_get_desktop(ObClient *self)
         gboolean trdesk = FALSE;
 
        if (self->transient_for) {
-           if (self->transient_for != TRAN_GROUP) {
+           if (self->transient_for != OB_TRAN_GROUP) {
                 self->desktop = self->transient_for->desktop;
                 trdesk = TRUE;
             } else {
@@ -702,7 +702,7 @@ void client_update_transient_for(ObClient *self)
                     t == None ||
                     t == ob_root) {
                     /* window is a transient for its group! */
-                    c = TRAN_GROUP;
+                    c = OB_TRAN_GROUP;
                 }
             }
         }
@@ -711,7 +711,7 @@ void client_update_transient_for(ObClient *self)
 
     /* if anything has changed... */
     if (c != self->transient_for) {
-	if (self->transient_for == TRAN_GROUP) { /* transient of group */
+	if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
             GSList *it;
 
 	    /* remove from old parents */
@@ -726,7 +726,7 @@ void client_update_transient_for(ObClient *self)
                 g_slist_remove(self->transient_for->transients, self);
         }
 	self->transient_for = c;
-	if (self->transient_for == TRAN_GROUP) { /* transient of group */
+	if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
             GSList *it;
 
 	    /* add to new parents */
@@ -1155,7 +1155,7 @@ void client_update_wmhints(ObClient *self)
                        set up */
                     for (it = self->group->members; it; it = it->next)
                         if (it->data != self &&
-                            ((ObClient*)it->data)->transient_for == TRAN_GROUP)
+                            ((ObClient*)it->data)->transient_for == OB_TRAN_GROUP)
                             self->transients = g_slist_append(self->transients,
                                                               it->data);
                 }
@@ -1460,7 +1460,7 @@ ObClient *client_search_focus_tree(ObClient *self)
 ObClient *client_search_focus_tree_full(ObClient *self)
 {
     if (self->transient_for) {
-        if (self->transient_for != TRAN_GROUP) {
+        if (self->transient_for != OB_TRAN_GROUP) {
             return client_search_focus_tree_full(self->transient_for);
         } else {
             GSList *it;
@@ -2597,7 +2597,7 @@ ObClient *client_search_top_transient(ObClient *self)
 {
     /* move up the transient chain as far as possible */
     if (self->transient_for) {
-        if (self->transient_for != TRAN_GROUP) {
+        if (self->transient_for != OB_TRAN_GROUP) {
             return client_search_top_transient(self->transient_for);
         } else {
             GSList *it;

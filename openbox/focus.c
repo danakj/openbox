@@ -194,7 +194,7 @@ void focus_fallback(FallbackType type)
     if (type == Fallback_Unfocusing && old) {
         /* try for transient relations */
         if (old->transient_for) {
-            if (old->transient_for == TRAN_GROUP) {
+            if (old->transient_for == OB_TRAN_GROUP) {
                 for (it = focus_order[screen_desktop]; it; it = it->next) {
                     GSList *sit;
 
@@ -262,7 +262,7 @@ static void popup_cycle(ObClient *c, gboolean show)
         popup_size(focus_cycle_popup, 320, 48);
 
         /* use the transient's parent's title/icon */
-        while (p->transient_for && p->transient_for != TRAN_GROUP)
+        while (p->transient_for && p->transient_for != OB_TRAN_GROUP)
             p = p->transient_for;
 
         if (p == c)

@@ -292,7 +292,7 @@ void stacking_add_nonintrusive(ObWindow *win)
 
     /* insert above its highest parent */
     if (client->transient_for) {
-        if (client->transient_for != TRAN_GROUP) {
+        if (client->transient_for != OB_TRAN_GROUP) {
             parent = client->transient_for;
         } else {
             GSList *sit;

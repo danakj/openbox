@@ -223,7 +223,7 @@ void session_startup(gint *argc, gchar ***argv)
         val_hint.value = &hint;
         val_hint.length = 1;
 
-        sprintf(pid, "%ld", (glong)getpid());
+        g_snprintf(pid, sizeof(pid), "%ld", (glong) getpid());
         val_pid.value = pid;
         val_pid.length = strlen(pid);
 

@@ -404,6 +404,9 @@ BaseDisplay::~BaseDisplay(void) {
     timerList->remove(0);
 
   delete timerList;
+  
+  if (application_name != NULL)
+    delete [] application_name;
 
   XCloseDisplay(display);
 }

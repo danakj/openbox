@@ -359,19 +359,21 @@ Appearance *appearance_copy(Appearance *orig)
 
 void appearance_free(Appearance *a)
 {
-    PlanarSurface *p;
-    if (a->pixmap != None) XFreePixmap(ob_display, a->pixmap);
-    if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
-    if (a->textures)
-        g_free(a->texture);
-    if (a->surface.type == Surface_Planar) {
-        p = &a->surface.data.planar;
-        if (p->primary != NULL) color_free(p->primary);
-        if (p->secondary != NULL) color_free(p->secondary);
-        if (p->border_color != NULL) color_free(p->border_color);
-        if (p->pixel_data != NULL) g_free(p->pixel_data);
+    if (a) {
+        PlanarSurface *p;
+        if (a->pixmap != None) XFreePixmap(ob_display, a->pixmap);
+        if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
+        if (a->textures)
+            g_free(a->texture);
+        if (a->surface.type == Surface_Planar) {
+            p = &a->surface.data.planar;
+            if (p->primary != NULL) color_free(p->primary);
+            if (p->secondary != NULL) color_free(p->secondary);
+            if (p->border_color != NULL) color_free(p->border_color);
+            if (p->pixel_data != NULL) g_free(p->pixel_data);
+        }
+        g_free(a);
     }
-    g_free(a);
 }
 
 
@@ -387,7 +389,7 @@ void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
    as reduce_depth just sets im->data = data and returns
 */
     scratch = malloc(im->width * im->height * sizeof(pixel32));
-    im->data = scratch;
+    im->data = (char*) scratch;
     reduce_depth(in, im);
     XPutImage(ob_display, out, DefaultGC(ob_display, ob_screen),
               im, 0, 0, x, y, w, h);
@@ -433,5 +435,4 @@ void appearance_minsize(Appearance *l, Size *s)
             }            
         break;
     }
-    return s;
 }

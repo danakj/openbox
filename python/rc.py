@@ -2,6 +2,9 @@ import hooks, ob, keymap, buttonmap, os, sys, input, motion, historyplacement
 import stackedcycle
 from input import Pointer
 
+import config
+print dir(config)
+
 hooks.managed.append(historyplacement.place)
 
 _grab = 0

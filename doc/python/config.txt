@@ -11,3 +11,58 @@ Methods
 
 ----
 
+add(modulename, name, friendlyname, description, type, default, **keywords):
+
+Add a variable to the configuration system for a module.
+
+	modulename: The name of the module, e.g. 'focus'
+	name: The name of the variable, e.g. 'my_variable'
+	friendlyname: The user-friendly name of the variable, e.g.
+		      'My Variable'
+	description: The detailed destription of the variable, e.g.
+		     'Does Things'
+	type: The type of the variable, one of:
+	      * 'boolean'
+	      * 'enum'
+	      * 'integer'
+	      * 'string'
+	      * 'function'
+	      * 'object'
+	default: The default value for the variable, e.g. 300
+	keywords: Extra keyword=value pairs to further define the variable.
+		  These can be:
+		  * For 'enum' types:
+                     * options : A list of possible options for the variable.
+                                 This *must* be set for all enum variables.
+		  * For 'integer' types:
+                     * min : The minimum value for the variable.
+                     * max : The maximum value for the variable.
+
+----
+
+set(modulename, name, value):
+
+Sets the value for a variable of the specified module.
+
+	modulename: The name of the module, e.g. 'focus'
+	name: The name of the variable, e.g. 'my_variable'
+	value: The new value for the variable.
+
+----
+
+reset(modulename, name):
+
+Resets the value for a variable in the specified module back to its original
+(default) value.
+
+	modulename: The name of the module, e.g. 'focus'
+	name: The name of the variable, e.g. 'my_variable'
+
+----
+
+get(modulename, name):
+
+Returns the current value for a variable in the specified module.
+
+	modulename: The name of the module, e.g. 'focus'
+	name: The name of the variable, e.g. 'my variable'

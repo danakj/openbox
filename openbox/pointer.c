@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "openbox.h"
 #include "hooks.h"
+#include "configwrap.h"
 
 #include <glib.h>
 #include <Python.h>
@@ -24,7 +25,6 @@ typedef enum {
 /* GData of GSList*s of PointerBinding*s. */
 static GData *bound_contexts;
 static gboolean grabbed;
-static int double_click_rate, drag_threshold;
 PyObject *grab_func;
 
 struct foreach_grab_temp {
@@ -332,6 +332,9 @@ void pointer_event(XEvent *e, Client *c)
     guint state;
     GSList *it = NULL;
     PointerBinding *b = NULL;
+    guint drag_threshold;
+
+    drag_threshold = configwrap_get_int("input", "drag_threshold");
 
     contextq = engine_get_context(c, e->xany.window);
 
@@ -388,8 +391,8 @@ void pointer_event(XEvent *e, Client *c)
 	if (button == e->xbutton.button) {
 	    /* determine if this is a valid 'click'. Its not if the release is
 	     not over the window, or if a drag occured. */
-	    if (ABS(e->xbutton.x_root - pressx) < (unsigned)drag_threshold &&
-		ABS(e->xbutton.y_root - pressy) < (unsigned)drag_threshold &&
+	    if (ABS(e->xbutton.x_root - pressx) < drag_threshold &&
+		ABS(e->xbutton.y_root - pressy) < drag_threshold &&
 		e->xbutton.x >= 0 && e->xbutton.y >= 0) {
 		int junk;
 		Window wjunk;
@@ -403,7 +406,8 @@ void pointer_event(XEvent *e, Client *c)
 	    /* determine if this is a valid 'double-click' */
 	    if (click) {
 		if (lastbutton == button &&
-		    e->xbutton.time - double_click_rate < time) {
+		    e->xbutton.time -
+                    configwrap_get_int("input", "double_click_rate") < time) {
 		    dblclick = TRUE;
 		    lastbutton = 0;
 		} else
@@ -432,8 +436,8 @@ void pointer_event(XEvent *e, Client *c)
         break;
     case MotionNotify:
         /* watch out for the drag threshold */
-        if (ABS(e->xmotion.x_root - pressx) < (unsigned)drag_threshold &&
-            ABS(e->xmotion.y_root - pressy) < (unsigned)drag_threshold)
+        if (ABS(e->xmotion.x_root - pressx) < drag_threshold &&
+            ABS(e->xmotion.y_root - pressy) < drag_threshold)
             break;
         fire_event(str->str, contextq, Action_Motion,
                    state, button, e->xmotion.x_root,
@@ -690,8 +694,15 @@ void pointer_startup()
     Pointer *ptr;
 
     grabbed = FALSE;
-    double_click_rate = 300;
-    drag_threshold = 3;
+    configwrap_add_int("input", "double_click_rate", "Double-Click Rate",
+                       "An integer containing the number of milliseconds in "
+                       "which 2 clicks must be received to cause a "
+                       "double-click event.", 300);
+    configwrap_add_int("input", "drag_threshold", "Drag Threshold",
+                       "An integer containing the number of pixels a drag "
+                       "must go before motion events start getting generated. "
+                       "Once a drag has begun, the button release will not "
+                       "count as a click event.", 3);
     g_datalist_init(&bound_contexts);
 
     PointerType.ob_type = &PyType_Type;

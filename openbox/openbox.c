@@ -14,6 +14,7 @@
 #include "hooks.h"
 #include "clientwrap.h"
 #include "openboxwrap.h"
+#include "configwrap.h"
 #include "themerc.h"
 #include "timer.h"
 #include "../render/render.h"
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
 	themerc_startup();
 	engine_startup(themerc_engine);
 	python_startup();
+        configwrap_startup();
 	openboxwrap_startup();
 	clientwrap_startup();
 	hooks_startup();
@@ -170,6 +172,7 @@ int main(int argc, char **argv)
 	hooks_shutdown();
 	clientwrap_shutdown();
 	openboxwrap_shutdown();
+        configwrap_shutdown();
 	python_shutdown();
 	engine_shutdown();
 	themerc_shutdown();

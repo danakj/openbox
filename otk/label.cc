@@ -11,14 +11,10 @@ namespace otk {
 Label::Label(Widget *parent)
   : Widget(parent), _text("")
 {
-  const ScreenInfo *info = display->screenInfo(screen());
-  _xftdraw = XftDrawCreate(**display, window(), info->visual(),
-                           info->colormap());
 }
 
 Label::~Label()
 {
-  XftDrawDestroy(_xftdraw);
 }
 
 void Label::setStyle(Style *style)
@@ -66,7 +62,8 @@ void Label::update(void)
 
     Widget::update();
 
-    ft->drawString(_xftdraw, x, 0, *style()->getTextUnfocus(), t);
+    display->renderControl(_screen)->
+      drawString(this, *ft, x, 0, *style()->getTextUnfocus(), t);
   } else
     Widget::update();
 }

@@ -3,6 +3,7 @@
 #define   __font_hh
 
 #include "ustring.hh"
+#include "truerendercontrol.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -15,6 +16,7 @@ extern "C" {
 namespace otk {
 
 class Color;
+class Surface;
 
 class Font {
   /*
@@ -60,13 +62,9 @@ public:
 
   unsigned int measureString(const ustring &string) const;
 
-  //! Draws a string into an XftDraw object
-  /*!
-    Be Warned: If you use an XftDraw object and a color, or a font from
-    different screens, you WILL have unpredictable results! :)
-  */
-  void drawString(XftDraw *d, int x, int y, const Color &color,
-                  const ustring &string) const;
+  // The RenderControl classes use the internal data to render the fonts, but
+  // noone else needs it, so its private.
+  friend class RenderControl;
 };
 
 }

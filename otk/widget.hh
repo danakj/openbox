@@ -42,7 +42,6 @@ public:
   inline Window window(void) const { return _window; }
   inline const Widget *parent(void) const { return _parent; }
   inline const WidgetList &children(void) const { return _children; }
-  inline unsigned int screen(void) const { return _screen; }
   inline Rect rect(void) const { return Rect(_pos, size()); }
 
   void move(const Point &to);

@@ -15,7 +15,8 @@
 namespace otk {
 
 Widget::Widget(Widget *parent, Direction direction)
-  : EventHandler(),
+  : Surface(parent->screen()),
+    EventHandler(),
     _dirty(false), _focused(false),
     _parent(parent), _style(parent->style()), _direction(direction),
     _cursor(parent->cursor()), _bevel_width(parent->bevelWidth()),
@@ -37,7 +38,8 @@ Widget::Widget(Widget *parent, Direction direction)
 Widget::Widget(EventDispatcher *event_dispatcher, Style *style,
                      Direction direction, Cursor cursor, int bevel_width,
                      bool override_redirect)
-  : EventHandler(),
+  : Surface(style->getScreen()),
+    EventHandler(),
     _dirty(false),_focused(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),

@@ -14,9 +14,9 @@ extern "C" {
 #include <algorithm>
 
 #include "font.hh"
+#include "surface.hh"
 #include "util.hh"
 #include "display.hh"
-#include "color.hh"
 #include "screeninfo.hh"
 
 extern "C" {
@@ -79,47 +79,6 @@ Font::~Font(void)
 {
   if (_xftfont)
     XftFontClose(**display, _xftfont);
-}
-
-
-void Font::drawString(XftDraw *d, int x, int y, const Color &color,
-                       const ustring &string) const
-{
-  assert(d);
-
-  if (_shadow) {
-    XftColor c;
-    c.color.red = 0;
-    c.color.green = 0;
-    c.color.blue = 0;
-    c.color.alpha = _tint | _tint << 8; // transparent shadow
-    c.pixel = BlackPixel(**display, _screen_num);
-
-    if (string.utf8())
-      XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
-                        _xftfont->ascent + y + _offset,
-                        (FcChar8*)string.c_str(), string.bytes());
-    else
-      XftDrawString8(d, &c, _xftfont, x + _offset,
-                     _xftfont->ascent + y + _offset,
-                     (FcChar8*)string.c_str(), string.bytes());
-  }
-    
-  XftColor c;
-  c.color.red = color.red() | color.red() << 8;
-  c.color.green = color.green() | color.green() << 8;
-  c.color.blue = color.blue() | color.blue() << 8;
-  c.pixel = color.pixel();
-  c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
-
-  if (string.utf8())
-    XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                      (FcChar8*)string.c_str(), string.bytes());
-  else
-    XftDrawString8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                   (FcChar8*)string.c_str(), string.bytes());
-
-  return;
 }
 
 

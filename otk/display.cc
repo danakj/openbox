@@ -7,6 +7,7 @@
 #include "display.hh"
 #include "screeninfo.hh"
 #include "gccache.hh"
+#include "rendercontrol.hh"
 #include "util.hh"
 
 extern "C" {
@@ -84,6 +85,7 @@ Display::Display()
     _scroll_lock_mask(0),
     _grab_count(0),
     _screenInfoList(),
+    _renderControlList(),
     _gccache((GCCache*) 0)
 {
   int junk;
@@ -168,7 +170,11 @@ DISPLAY environment variable approriately.\n\n"));
   // Get information on all the screens which are available.
   _screenInfoList.reserve(ScreenCount(_display));
   for (int i = 0; i < ScreenCount(_display); ++i)
-    _screenInfoList.push_back(ScreenInfo(i));
+    _screenInfoList.push_back(i);
+
+  _renderControlList.reserve(ScreenCount(_display));
+  for (int i = 0; i < ScreenCount(_display); ++i)
+    _renderControlList.push_back(RenderControl::getRenderControl(i));
 
   _gccache = new GCCache(_screenInfoList.size());
 }
@@ -193,11 +199,19 @@ const ScreenInfo* Display::screenInfo(int snum)
 
 const ScreenInfo* Display::findScreen(Window root)
 {
-  ScreenInfoList::iterator it, end = _screenInfoList.end();
+  std::vector<ScreenInfo>::iterator it, end = _screenInfoList.end();
   for (it = _screenInfoList.begin(); it != end; ++it)
     if (it->rootWindow() == root)
       return &(*it);
   return 0;
+}
+
+
+const RenderControl *Display::renderControl(int snum)
+{
+  assert(snum >= 0);
+  assert(snum < (signed) _renderControlList.size());
+  return _renderControlList[snum];
 }
 
 

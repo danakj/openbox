@@ -20,7 +20,7 @@ extern "C" {
 
 namespace otk {
 
-TrueRenderControl::TrueRenderControl(const ScreenInfo *screen)
+TrueRenderControl::TrueRenderControl(int screen)
   : RenderControl(screen),
     _red_offset(0),
     _green_offset(0),
@@ -28,12 +28,13 @@ TrueRenderControl::TrueRenderControl(const ScreenInfo *screen)
 {
   printf("Initializing TrueColor RenderControl\n");
 
+  Visual *visual = display->screenInfo(_screen)->visual();
   unsigned long red_mask, green_mask, blue_mask;
 
   // find the offsets for each color in the visual's masks
-  red_mask = screen->visual()->red_mask;
-  green_mask = screen->visual()->green_mask;
-  blue_mask = screen->visual()->blue_mask;
+  red_mask = visual->red_mask;
+  green_mask = visual->green_mask;
+  blue_mask = visual->blue_mask;
 
   while (! (red_mask & 1))   { _red_offset++;   red_mask   >>= 1; }
   while (! (green_mask & 1)) { _green_offset++; green_mask >>= 1; }
@@ -51,6 +52,7 @@ TrueRenderControl::~TrueRenderControl()
 
 
 }
+
 
 static inline void renderPixel(XImage *im, unsigned char *dp,
 			       unsigned long pixel)
@@ -102,34 +104,28 @@ void TrueRenderControl::drawBackground(Surface *sf,
   assert(sf);
   
   int w = sf->width(), h = sf->height();
-
-  XImage *im = XCreateImage(**display, _screen->visual(), _screen->depth(),
-			    ZPixmap, 0, NULL, w, h, 32, 0);
+  XImage *im = sf->_im;
+  Pixmap pm = sf->_pm;
+  assert(im); assert(pm != None);
 
   unsigned char *data = new unsigned char[im->bytes_per_line * h];
   unsigned char *dp = data;
+  unsigned int bytes_per_pixel = im->bits_per_pixel/8;
 
   for (int y = 0; y < h/3; ++y)
-    for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, (255*x/w) << _red_offset << _red_shift);
+    for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
+      renderPixel(im, dp, (255*x/w) >> _red_shift << _red_offset);
   for (int y = 0; y < h/3; ++y)
-    for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, (255*x/w) << _green_offset << _green_shift);
+    for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
+      renderPixel(im, dp, (255*x/w) >> _green_shift << _green_offset);
   for (int y = 0; y < h/3; ++y)
-    for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, (255*x/w) << _blue_offset << _blue_shift);
+    for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
+      renderPixel(im, dp, (255*x/w) >> _blue_shift << _blue_offset);
 
   im->data = (char*) data;
   
-  if (!sf->_pm)
-    sf->_pm = XCreatePixmap(**display, _screen->rootWindow(), w, h,
-			    _screen->depth());
-  XPutImage(**display, sf->_pm, DefaultGC(**display, _screen->screen()),
-            im, 0, 0, 0, 0, w, h);
-
-  //delete [] image->data;
-  //image->data = NULL;
-  XDestroyImage(im);
+  XPutImage(**display, pm, DefaultGC(**display, _screen),
+            sf->_im, 0, 0, 0, 0, w, h);
 }
 
 }

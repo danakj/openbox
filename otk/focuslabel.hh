@@ -3,7 +3,6 @@
 #define __label_hh
 
 #include "focuswidget.hh"
-#include "font.hh"
 
 namespace otk {
 
@@ -22,8 +21,6 @@ public:
   virtual void setStyle(Style *style);
   
 private:
-  //! Object used by Xft to render to the drawable
-  XftDraw *_xftdraw;
   //! Text displayed in the label
   ustring _text;
 };

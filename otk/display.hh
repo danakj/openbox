@@ -12,6 +12,7 @@ namespace otk {
 
 class ScreenInfo;
 class GCCache;
+class RenderControl;
 
 class Display;
 
@@ -21,10 +22,6 @@ extern Display *display;
 //! Manages a single X11 display.
 class Display
 {
-public:
-  //! A List of ScreenInfo instances
-  typedef std::vector<ScreenInfo> ScreenInfoList;
-
 private:
   //! The X display
   ::Display *_display;
@@ -57,7 +54,11 @@ private:
   int _grab_count;
 
   //! A list of information for all screens on the display
-  ScreenInfoList _screenInfoList;
+  std::vector<ScreenInfo> _screenInfoList;
+
+  //! A list of RenderControl objects, which are used for all graphics on a
+  //! screen
+  std::vector<RenderControl*> _renderControlList;
 
   //! A cache for re-using GCs, used by the drawing objects
   /*!
@@ -99,6 +100,9 @@ public:
 
   //! Find a ScreenInfo based on a root window
   const ScreenInfo* findScreen(Window root);
+
+  //! Gets the RenderControl for a screen
+  const RenderControl *renderControl(int snum);
 
   //! Returns if the display has the xkb extension available
   inline bool xkb() const { return _xkb; }

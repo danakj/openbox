@@ -13,14 +13,10 @@ namespace otk {
 FocusLabel::FocusLabel(Widget *parent)
   : FocusWidget(parent), _text("")
 {
-  const ScreenInfo *info = display->screenInfo(screen());
-  _xftdraw = XftDrawCreate(**display, window(), info->visual(),
-                           info->colormap());
 }
 
 FocusLabel::~FocusLabel()
 {
-  XftDrawDestroy(_xftdraw);
 }
 
 
@@ -72,7 +68,8 @@ void FocusLabel::update(void)
 
     FocusWidget::update();
 
-    ft->drawString(_xftdraw, x, 0, *text_color, t);
+    display->renderControl(_screen)->
+      drawString(this, *ft, x, 0, *text_color, t);
   } else
     FocusWidget::update();
 }

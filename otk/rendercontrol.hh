@@ -12,10 +12,13 @@ namespace otk {
 class ScreenInfo;
 class Surface;
 class RenderTexture;
+class Font;
+class Color;
+class ustring;
 
 class RenderControl {
 protected:
-  const ScreenInfo *_screen;
+  int _screen;
 
   /*
   // color tables, meaning, 256 (possibly) different shades of each color,
@@ -58,13 +61,18 @@ protected:
   int _ncolors;
 */
 
-  RenderControl(const ScreenInfo *screen);
+  RenderControl(int screen);
 
 public:
   virtual ~RenderControl();
 
   static RenderControl *getRenderControl(int screen);
 
+  //! Draws a string onto a Surface
+  virtual void drawString(Surface *sf, const Font &font, int x, int y,
+			  const Color &color, const ustring &string) const;
+
+  //! Draws a background onto a Surface, as specified by a RenderTexture
   virtual void drawBackground(Surface *sf,
 			      const RenderTexture &texture) const = 0;
 };

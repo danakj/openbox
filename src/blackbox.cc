@@ -134,7 +134,7 @@ static Bool queueScanner(Display *, XEvent *e, char *args) {
 Blackbox *blackbox;
 
 
-Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
+Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   : BaseDisplay(m_argv[0], dpy_name) {
   if (! XSupportsLocale())
     fprintf(stderr, "X server does not support locale\n");
@@ -144,8 +144,10 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
 
   ::blackbox = this;
   argv = m_argv;
-  if (! rc) rc = "~/.blackboxrc";
+  if (! rc) rc = "~/.openbox/rc";
   rc_file = expandTilde(rc);
+  if (! menu) menu = "~/.openbox/menu";
+  menu_file = expandTilde(menu);
 
   no_focus = False;
 
@@ -978,9 +980,6 @@ void Blackbox::save_rc(void) {
 
   load_rc();
 
-  sprintf(rc_string, "session.menuFile:  %s", getMenuFilename());
-  XrmPutLineResource(&new_blackboxrc, rc_string);
-
   sprintf(rc_string, "session.colorsPerChannel:  %d",
           resource.colors_per_channel);
   XrmPutLineResource(&new_blackboxrc, rc_string);
@@ -1185,13 +1184,6 @@ void Blackbox::load_rc(void) {
   char *value_type;
   int int_value;
   unsigned long long_value;
-
-  if (XrmGetResource(database, "session.menuFile", "Session.MenuFile",
-                     &value_type, &value)) {
-    resource.menu_file = expandTilde(value.addr);
-  } else {
-    resource.menu_file = DEFAULTMENU;
-  }
 
   resource.colors_per_channel = 4;
   if (XrmGetResource(database, "session.colorsPerChannel",
@@ -1595,7 +1587,7 @@ void Blackbox::saveStyleFilename(const string& filename) {
 }
 
 
-void Blackbox::saveMenuFilename(const string& filename) {
+void Blackbox::addMenuTimestamp(const string& filename) {
   assert(! filename.empty());
   bool found = False;
 

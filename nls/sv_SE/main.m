@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # fel: '-rc' kräver ett argument\n
+$ #MENURequiresArg
+# fel: '-menu' kräver ett argument\n
 $ #DISPLAYRequiresArg
 # fel: '-display' kräver ett argument\n
 $ #WarnDisplaySet
@@ -11,6 +13,7 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\tanvänd skärmanslutning.\n\
   -rc <string>\t\t\tanvänd alternativ resursfil.\n\
+  -menu <string>\t\t\tanvänd alternativ menufil.\n\
   -version\t\t\tvisa version och avsluta.\n\
   -help\t\t\t\tvisa denna hjälptext och avsluta.\n\n
 $ #CompileOptions

@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # 错误: '-rc' 需要参数\n
+$ #MENURequiresArg
+# 错误: '-menu' 需要参数\n
 $ #DISPLAYRequiresArg
 # 错误: '-display' 需要参数\n
 $ #WarnDisplaySet
@@ -11,6 +13,7 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\t使用显示连接.\n\
   -rc <string>\t\t\t使用其他的资源文件.\n\
+  -menu <string>\t\t\tuse alternate menu file.\n\
   -version\t\t\t显示版本.\n\
   -help\t\t\t\t显示这个帮助.\n\n
 $ #CompileOptions

@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # Hiba: '-rc' kapcsoló paramétere hiányzik\n
+$ #MENURequiresArg
+# Hiba: '-menu' kapcsoló paramétere hiányzik\n
 $ #DISPLAYRequiresArg
 # Hiba: '-display' kapcsoló paramétere hiányzik\n
 $ #WarnDisplaySet
@@ -11,6 +13,7 @@ $ #Usage
   \t\t\t 1997 - 2000 Brad Hughes\n\n\
   -display <string>\t\thasználandó kijelzõ\n\
   -rc <string>\t\t\tválasztható konfigurációs file.\n\
+  -menu <string>\t\t\tválasztható menu file.\n\
   -version\t\t\tverziószám kijelzése és kilépés.\n\
   -help\t\t\t\tsúgóképernyõ mutatása és kilépés.\n\n
 $ #CompileOptions

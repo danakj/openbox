@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # Erreur: '-rc' nécessite un argument\n
+$ #MENURequiresArg
+# Erreur: '-menu' nécessite un argument\n
 $ #DISPLAYRequiresArg
 # Erreur: '-display' nécessite un argument\n
 $ #WarnDisplaySet
@@ -11,6 +13,7 @@ $ #Usage
   \t\t\t 1997 - 2000 Brad Hughes\n\n\
   -display <chaîne>\t\tutilise la connexion à l'affichage.\n\
   -rc <chaîne>\t\t\tutilise un autre fichier de configuration.\n\
+  -menu <chaîne>\t\t\tutilise un autre fichier de menu.\n\
   -version\t\t\taffiche la version et quitte.\n\
   -help\t\t\t\taffiche ce texte d'aide et quitte.\n\n
 $ #CompileOptions

@@ -109,7 +109,7 @@ private:
   struct BResource {
     Time double_click_interval;
 
-    std::string menu_file, style_file;
+    std::string style_file;
     int colors_per_channel;
     timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
@@ -148,7 +148,7 @@ private:
   bool no_focus, reconfigure_wait, reread_menu_wait;
   Time last_time;
   char **argv;
-  std::string rc_file;
+  std::string menu_file, rc_file;
 
   Atom xa_wm_colormap_windows, xa_wm_protocols, xa_wm_state,
     xa_wm_delete_window, xa_wm_take_focus, xa_wm_change_state,
@@ -205,7 +205,7 @@ private:
 
 
 public:
-  Blackbox(char **m_argv, char *dpy_name = 0, char *rc = 0);
+  Blackbox(char **m_argv, char *dpy_name = 0, char *rc = 0, char *menu = 0);
   virtual ~Blackbox(void);
 
   Basemenu *searchMenu(Window window);
@@ -235,7 +235,7 @@ public:
   inline const char *getStyleFilename(void) const
     { return resource.style_file.c_str(); }
   inline const char *getMenuFilename(void) const
-    { return resource.menu_file.c_str(); }
+    { return menu_file.c_str(); }
 
   inline int getColorsPerChannel(void) const
     { return resource.colors_per_channel; }
@@ -263,7 +263,7 @@ public:
   void shutdown(void);
   void load_rc(BScreen *screen);
   void saveStyleFilename(const std::string& filename);
-  void saveMenuFilename(const std::string& filename);
+  void addMenuTimestamp(const std::string& filename);
   void restart(const char *prog = 0);
   void reconfigure(void);
   void rereadMenu(void);

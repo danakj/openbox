@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # erro: '-rc' requer um argumento\n
+$ #MENURequiresArg
+# erro: '-menu' requer um argumento\n
 $ #DISPLAYRequiresArg
 # erro: '-display' requer um argumento\n
 $ #WarnDisplaySet
@@ -11,6 +13,7 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\tusar conexão com o display.\n\
   -rc <string>\t\t\tusar arquivo alternativo de recursos.\n\
+  -menu <string>\t\t\tusar arquivo alternativo de menu.\n\
   -version\t\t\tmostrar versao e sair.\n\
   -help\t\t\t\tmostrar esta ajuda e sair.\n\n
 $ #CompileOptions

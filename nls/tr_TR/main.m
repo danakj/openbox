@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # hata : '-rc' bir argüman bekler\n
+$ #MENURequiresArg
+# hata : '-menu' bir argüman bekler\n
 $ #DISPLAYRequiresArg
 # hata : '-display' bir argüman bekler\n
 $ #WarnDisplaySet
@@ -11,6 +13,7 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <metin>\t\tekraný kullan.\n\
   -rc <metin>\t\t\tbaþka bir ayarlama dosyasýný kullan.\n\
+  -menu <metin>\t\t\tuse alternate menu file.\n\
   -version\t\t\tnesil bilgisini gösterir ve çýkar.\n\
   -help\t\t\t\tbu yardým iletisini gösterir ve çýkar.\n\n
 $ #CompileOptions

@@ -1,0 +1,13 @@
+#! /bin/sh
+
+sh() {
+  /bin/sh -c "set -x; $*"
+}
+
+sh aclocal
+sh automake --foreign --include-deps
+sh autoconf
+
+echo
+echo You are now ready to run ./configure
+echo enjoy!

@@ -69,6 +69,9 @@ void screen_set_desktop(guint num);
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel);
 
+/*! Show/hide the desktop popup (pager) for the given desktop */
+void screen_desktop_popup(guint d, gboolean show);
+
 /*! Shows and focuses the desktop and hides all the client windows, or
   returns to the normal state, showing client windows. */
 void screen_show_desktop(gboolean show);

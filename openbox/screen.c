@@ -568,7 +568,7 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-static void popup_cycle(guint d, gboolean show)
+void screen_desktop_popup(guint d, gboolean show)
 {
     Rect *a;
 
@@ -687,14 +687,14 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
     }
 
     if (dialog) {
-        popup_cycle(d, TRUE);
+        screen_desktop_popup(d, TRUE);
         return d;
     }
 
 done_cycle:
     first = TRUE;
 
-    popup_cycle(0, FALSE);
+    screen_desktop_popup(0, FALSE);
 
     return d;
 }

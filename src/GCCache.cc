@@ -43,12 +43,17 @@ BGCCacheContext::~BGCCacheContext(void) {
 
 void BGCCacheContext::set(const BColor &_color,
                           const XFontStruct * const _font,
-                          const int _function, const int _subwindow) {
+                          const int _function, const int _subwindow,
+                          int _linewidth) {
   XGCValues gcv;
   pixel = gcv.foreground = _color.pixel();
   function = gcv.function = _function;
   subwindow = gcv.subwindow_mode = _subwindow;
-  unsigned long mask = GCForeground | GCFunction | GCSubwindowMode;
+  linewidth = gcv.line_width = _linewidth;
+  gcv.cap_style = CapProjecting;
+
+  unsigned long mask = GCForeground | GCFunction | GCSubwindowMode |
+    GCLineWidth | GCCapStyle;
 
   if (_font) {
     fontid = gcv.font = _font->fid;
@@ -131,7 +136,7 @@ void BGCCache::release(BGCCacheContext *ctx) {
 
 BGCCacheItem *BGCCache::find(const BColor &_color,
                              const XFontStruct * const _font,
-                             int _function, int _subwindow) {
+                             int _function, int _subwindow, int _linewidth) {
   const unsigned long pixel = _color.pixel();
   const unsigned int screen = _color.screen();
   const int key = _color.red() ^ _color.green() ^ _color.blue();
@@ -142,7 +147,8 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
   // this will either loop 8 times then return/abort or it will stop matching
   while (c->ctx &&
          (c->ctx->pixel != pixel || c->ctx->function != _function ||
-          c->ctx->subwindow != _subwindow || c->ctx->screen != screen)) {
+          c->ctx->subwindow != _subwindow || c->ctx->screen != screen ||
+          c->ctx->linewidth != _linewidth)) {
     if (i < 7) {
       prev = c;
       c = cache[ ++k ];
@@ -151,7 +157,7 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
     }
     if (c->count == 0 && c->ctx->screen == screen) {
       // use this cache item
-      c->ctx->set(_color, _font, _function, _subwindow);
+      c->ctx->set(_color, _font, _function, _subwindow, _linewidth);
       c->ctx->used = true;
       c->count = 1;
       c->hits = 1;
@@ -175,7 +181,7 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
     }
   } else {
     c->ctx = nextContext(screen);
-    c->ctx->set(_color, _font, _function, _subwindow);
+    c->ctx->set(_color, _font, _function, _subwindow, _linewidth);
     c->ctx->used = true;
     c->count = 1;
     c->hits = 1;

@@ -36,7 +36,7 @@ class BGCCacheItem;
 class BGCCacheContext {
 public:
   void set(const BColor &_color, const XFontStruct * const _font,
-           const int _function, const int _subwindow);
+           const int _function, const int _subwindow, const int _linewidth);
   void set(const XFontStruct * const _font);
 
   ~BGCCacheContext(void);
@@ -44,7 +44,7 @@ public:
 private:
   BGCCacheContext(const BaseDisplay * const _display)
     : display(_display), gc(0), pixel(0ul), fontid(0ul),
-      function(0), subwindow(0), used(false), screen(~(0u)) {}
+      function(0), subwindow(0), used(false), screen(~(0u)), _linewidth(0) {}
 
   const BaseDisplay *display;
   GC gc;
@@ -54,6 +54,7 @@ private:
   int subwindow;
   bool used;
   unsigned int screen;
+  int linewidth;
 
   BGCCacheContext(const BGCCacheContext &_nocopy);
   BGCCacheContext &operator=(const BGCCacheContext &_nocopy);
@@ -89,7 +90,8 @@ public:
   void purge(void);
 
   BGCCacheItem *find(const BColor &_color, const XFontStruct * const _font = 0,
-                     int _function = GXcopy, int _subwindow = ClipByChildren);
+                     int _function = GXcopy, int _subwindow = ClipByChildren,
+                     int _linewidth = 0);
   void release(BGCCacheItem *_item);
 
 private:
@@ -111,13 +113,16 @@ private:
 class BPen {
 public:
   inline BPen(const BColor &_color,  const XFontStruct * const _font = 0,
-              int _function = GXcopy, int _subwindow = ClipByChildren)
+              int _function = GXcopy, int _subwindow = ClipByChildren,
+              int _linewidth = 0)
     : color(_color), font(_font), function(_function), subwindow(_subwindow),
-      cache(_color.display()->gcCache()), item(0) { }
+      cache(_color.display()->gcCache()), item(0), linewidth(_linewidth) { }
+
   inline ~BPen(void) { if (item) cache->release(item); }
 
   inline const GC &gc(void) const {
-    if (! item) item = cache->find(color, font, function, subwindow);
+    if (! item) item = cache->find(color, font, function, subwindow,
+                                   linewidth);
     return item->gc();
   }
 
@@ -126,6 +131,7 @@ private:
   const XFontStruct *font;
   int function;
   int subwindow;
+  int linewidth;
 
   mutable BGCCache *cache;
   mutable BGCCacheItem *item;

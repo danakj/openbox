@@ -193,15 +193,15 @@ def setup_click_focus(click_raise = 1):
     """Sets up for focusing windows by clicking on or in the window.
        Optionally, clicking on or in a window can raise the window to the
        front of its stacking layer."""
-    mbind("1", MC_Titlebar, MousePress, focus)
-    mbind("1", MC_Handle, MousePress, focus)
-    mbind("1", MC_Grip, MousePress, focus)
-    mbind("1", MC_Window, MousePress, focus)
+    mbind("Left", MC_Titlebar, MousePress, focus)
+    mbind("Left", MC_Handle, MousePress, focus)
+    mbind("Left", MC_Grip, MousePress, focus)
+    mbind("Left", MC_Window, MousePress, focus)
     if click_raise:
-        mbind("1", MC_Titlebar, MousePress, raise_win)
-        mbind("1", MC_Handle, MousePress, raise_win)
-        mbind("1", MC_Grip, MousePress, raise_win)
-        mbind("1", MC_Window, MousePress, raise_win)
+        mbind("Left", MC_Titlebar, MousePress, raise_win)
+        mbind("Left", MC_Handle, MousePress, raise_win)
+        mbind("Left", MC_Grip, MousePress, raise_win)
+        mbind("Left", MC_Window, MousePress, raise_win)
 
 def setup_sloppy_focus(click_focus = 1, click_raise = 0):
     """Sets up for focusing windows when the mouse pointer enters them.
@@ -230,25 +230,25 @@ def setup_window_clicks():
           bottom of its stacking layer.
         * Double-left click on a window's titlebar will toggle shading it
     """
-    mbind("A-1", MC_Frame, MouseMotion, move)
-    mbind("1", MC_Titlebar, MouseMotion, move)
-    mbind("1", MC_Handle, MouseMotion, move)
+    mbind("A-Left", MC_Frame, MouseMotion, move)
+    mbind("Left", MC_Titlebar, MouseMotion, move)
+    mbind("Left", MC_Handle, MouseMotion, move)
 
-    mbind("A-3", MC_Frame, MouseMotion, resize)
-    mbind("1", MC_Grip, MouseMotion, resize)
+    mbind("A-Right", MC_Frame, MouseMotion, resize)
+    mbind("Left", MC_Grip, MouseMotion, resize)
 
-    mbind("1", MC_Titlebar, MousePress, raise_win)
-    mbind("1", MC_Handle, MousePress, raise_win)
-    mbind("A-1", MC_Frame, MousePress, raise_win)
-    mbind("A-2", MC_Frame, MouseClick, lower_win)
-    mbind("2", MC_Titlebar, MouseClick, lower_win)
-    mbind("2", MC_Handle, MouseClick, lower_win)
+    mbind("Left", MC_Titlebar, MousePress, raise_win)
+    mbind("Left", MC_Handle, MousePress, raise_win)
+    mbind("A-Left", MC_Frame, MousePress, raise_win)
+    mbind("A-Middle", MC_Frame, MouseClick, lower_win)
+    mbind("Right", MC_Titlebar, MouseClick, lower_win)
+    mbind("Right", MC_Handle, MouseClick, lower_win)
 
-    mbind("1", MC_Titlebar, MouseDoubleClick, toggle_shade)
+    mbind("Left", MC_Titlebar, MouseDoubleClick, toggle_shade)
 
 def setup_window_buttons():
     """Sets up the default behaviors for the buttons in the window titlebar."""
-    mbind("1", MC_CloseButton, MouseClick, close)
+    mbind("Left", MC_CloseButton, MouseClick, close)
 
 def setup_scroll():
     """Sets up the default behaviors for the mouse scroll wheel.
@@ -258,16 +258,16 @@ def setup_scroll():
         * control-alt-scrolling on a window will send it to the next/previous
           desktop, and switch to the desktop with the window
     """
-    mbind("4", MC_Titlebar, MouseClick, shade)
-    mbind("5", MC_Titlebar, MouseClick, unshade)
+    mbind("Up", MC_Titlebar, MouseClick, shade)
+    mbind("Down", MC_Titlebar, MouseClick, unshade)
 
-    mbind("A-4", MC_Frame, MouseClick, next_desktop)
-    mbind("A-4", MC_Root, MouseClick, next_desktop)
-    mbind("A-5", MC_Frame, MouseClick, prev_desktop)
-    mbind("A-5", MC_Root, MouseClick, prev_desktop)
+    mbind("A-Up", MC_Frame, MouseClick, next_desktop)
+    mbind("A-Up", MC_Root, MouseClick, next_desktop)
+    mbind("A-Down", MC_Frame, MouseClick, prev_desktop)
+    mbind("A-Down", MC_Root, MouseClick, prev_desktop)
 
-    mbind("C-A-4", MC_Frame, MouseClick, send_to_next_desktop)
-    mbind("C-A-5", MC_Frame, MouseClick, send_to_prev_desktop)
+    mbind("C-A-Up", MC_Frame, MouseClick, send_to_next_desktop)
+    mbind("C-A-Down", MC_Frame, MouseClick, send_to_prev_desktop)
 
 def setup_fallback_focus():
     """Sets up a focus fallback routine so that when no windows are focused,

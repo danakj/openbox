@@ -12,8 +12,8 @@ OtkFocusWidget::OtkFocusWidget(OtkWidget *parent, Direction direction)
   : OtkWidget(parent, direction), _unfocus_texture(0), _unfocus_bcolor(0)
 {
   _focused = true;
-  _focus_texture = parent->getTexture();
-  _focus_bcolor = parent->getBorderColor();
+  _focus_texture = parent->texture();
+  _focus_bcolor = parent->borderColor();
 }
 
 OtkFocusWidget::~OtkFocusWidget()
@@ -50,7 +50,7 @@ void OtkFocusWidget::unfocus(void)
   OtkWidget::setTexture(_unfocus_texture);
   OtkWidget::update();
 
-  OtkWidget::OtkWidgetList children = OtkWidget::getChildren();
+  OtkWidget::OtkWidgetList children = OtkWidget::children();
 
   OtkWidget::OtkWidgetList::iterator it = children.begin(),
     end = children.end();

@@ -17,14 +17,14 @@ namespace otk {
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   : OtkEventHandler(),
     _dirty(false), _focused(false),
-    _parent(parent), _style(parent->getStyle()), _direction(direction),
-    _cursor(parent->getCursor()), _bevel_width(parent->getBevelWidth()),
+    _parent(parent), _style(parent->style()), _direction(direction),
+    _cursor(parent->cursor()), _bevel_width(parent->bevelWidth()),
     _ignore_config(0),
     _visible(false), _grabbed_mouse(false),
     _grabbed_keyboard(false), _stretchable_vert(false),
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
-    _bcolor(0), _bwidth(0), _screen(parent->getScreen()), _fixed_width(false),
-    _fixed_height(false), _event_dispatcher(parent->getEventDispatcher())
+    _bcolor(0), _bwidth(0), _screen(parent->screen()), _fixed_width(false),
+    _fixed_height(false), _event_dispatcher(parent->eventDispatcher())
 {
   assert(parent);
   parent->addChild(this);
@@ -70,7 +70,7 @@ OtkWidget::~OtkWidget()
 void OtkWidget::create(void)
 {
   const ScreenInfo *scr_info = otk::OBDisplay::screenInfo(_screen);
-  Window p_window = _parent ? _parent->getWindow() : scr_info->getRootWindow();
+  Window p_window = _parent ? _parent->window() : scr_info->getRootWindow();
 
   _rect.setRect(0, 0, 1, 1); // just some initial values
 

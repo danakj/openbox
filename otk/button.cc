@@ -23,10 +23,10 @@ void OtkButton::setStyle(Style *style)
 {
   OtkFocusLabel::setStyle(style);
   
-  setTexture(getStyle()->getButtonFocus());
-  setUnfocusTexture(getStyle()->getButtonUnfocus());
-  _pressed_focus_tx = getStyle()->getButtonPressedFocus();
-  _pressed_unfocus_tx = getStyle()->getButtonPressedUnfocus();
+  setTexture(style->getButtonFocus());
+  setUnfocusTexture(style->getButtonUnfocus());
+  _pressed_focus_tx = style->getButtonPressedFocus();
+  _pressed_unfocus_tx = style->getButtonPressedUnfocus();
 }
 
 

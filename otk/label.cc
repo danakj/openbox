@@ -11,8 +11,8 @@ namespace otk {
 OtkLabel::OtkLabel(OtkWidget *parent)
   : OtkWidget(parent), _text("")
 {
-  const ScreenInfo *info = OBDisplay::screenInfo(getScreen());
-  _xftdraw = XftDrawCreate(OBDisplay::display, getWindow(), info->getVisual(),
+  const ScreenInfo *info = OBDisplay::screenInfo(screen());
+  _xftdraw = XftDrawCreate(OBDisplay::display, window(), info->getVisual(),
                            info->getColormap());
 }
 
@@ -25,15 +25,15 @@ void OtkLabel::setStyle(Style *style)
 {
   OtkWidget::setStyle(style);
 
-  setTexture(getStyle()->getLabelUnfocus());
+  setTexture(style->getLabelUnfocus());
 }
 
 
 void OtkLabel::update(void)
 {
   if (_dirty) {
-    const BFont &ft = getStyle()->getFont();
-    unsigned int sidemargin = getStyle()->getBevelWidth() * 2;
+    const BFont &ft = style()->getFont();
+    unsigned int sidemargin = style()->getBevelWidth() * 2;
 
     std::string t = _text; // the actual text to draw
     int x = sidemargin;    // x coord for the text
@@ -52,7 +52,7 @@ void OtkLabel::update(void)
       } while (length > max_length && text_len-- > 0);
 
       // justify the text
-      switch (getStyle()->textJustify()) {
+      switch (style()->textJustify()) {
       case Style::RightJustify:
         x += max_length - length;
         break;
@@ -66,7 +66,7 @@ void OtkLabel::update(void)
 
     OtkWidget::update();
 
-    ft.drawString(_xftdraw, x, 0, *getStyle()->getTextUnfocus(), t);
+    ft.drawString(_xftdraw, x, 0, *style()->getTextUnfocus(), t);
   } else
     OtkWidget::update();
 }

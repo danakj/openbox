@@ -27,7 +27,7 @@ OtkAppWidget::OtkAppWidget(OtkApplication *app, Direction direction,
   Atom protocols[2];
   protocols[0] = _wm_protocols;
   protocols[1] = _wm_delete;
-  XSetWMProtocols(OBDisplay::display, getWindow(), protocols, 2);
+  XSetWMProtocols(OBDisplay::display, window(), protocols, 2);
 }
 
 OtkAppWidget::~OtkAppWidget()

@@ -37,11 +37,11 @@ public:
   void exposeHandler(const XExposeEvent &e);
   void configureHandler(const XConfigureEvent &e);
 
-  inline Window getWindow(void) const { return _window; }
-  inline const OtkWidget *getParent(void) const { return _parent; }
-  inline const OtkWidgetList &getChildren(void) const { return _children; }
-  inline unsigned int getScreen(void) const { return _screen; }
-  inline const Rect &getRect(void) const { return _rect; }
+  inline Window window(void) const { return _window; }
+  inline const OtkWidget *parent(void) const { return _parent; }
+  inline const OtkWidgetList &children(void) const { return _children; }
+  inline unsigned int screen(void) const { return _screen; }
+  inline const Rect &rect(void) const { return _rect; }
 
   void move(const Point &to);
   void move(int x, int y);
@@ -75,17 +75,17 @@ public:
   bool grabKeyboard(void);
   void ungrabKeyboard(void);
 
-  inline BTexture *getTexture(void) const { return _texture; }
+  inline BTexture *texture(void) const { return _texture; }
   virtual void setTexture(BTexture *texture)
     { _texture = texture; _dirty = true; }
 
-  inline const BColor *getBorderColor(void) const { return _bcolor; }
+  inline const BColor *borderColor(void) const { return _bcolor; }
   virtual void setBorderColor(const BColor *color) {
     assert(color); _bcolor = color;
     XSetWindowBorder(OBDisplay::display, _window, color->pixel());
   }
 
-  inline int getBorderWidth(void) const { return _bwidth; }
+  inline int borderWidth(void) const { return _bwidth; }
   void setBorderWidth(int width) {
     _bwidth = width;
     XSetWindowBorderWidth(OBDisplay::display, _window, width);
@@ -100,23 +100,23 @@ public:
   inline bool isStretchableVert(void) const { return _stretchable_vert; }
   void setStretchableVert(bool s_vert = true)  { _stretchable_vert = s_vert; }
 
-  inline Cursor getCursor(void) const { return _cursor; }
+  inline Cursor cursor(void) const { return _cursor; }
   void setCursor(Cursor cursor) {
     _cursor = cursor;
     XDefineCursor(OBDisplay::display, _window, _cursor);
   }
 
-  inline int getBevelWidth(void) const { return _bevel_width; }
+  inline int bevelWidth(void) const { return _bevel_width; }
   void setBevelWidth(int bevel_width)
   { assert(bevel_width > 0); _bevel_width = bevel_width; }
 
-  inline Direction getDirection(void) const { return _direction; }
+  inline Direction direction(void) const { return _direction; }
   void setDirection(Direction dir) { _direction = dir; }
 
-  inline Style *getStyle(void) const { return _style; }
+  inline Style *style(void) const { return _style; }
   virtual void setStyle(Style *style);
 
-  inline OtkEventDispatcher *getEventDispatcher(void)
+  inline OtkEventDispatcher *eventDispatcher(void)
   { return _event_dispatcher; }
   void setEventDispatcher(OtkEventDispatcher *disp);
 

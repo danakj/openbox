@@ -78,3 +78,5 @@ def lower_win(data):
     if not client: return
     screen = Openbox_screen(openbox, OBClient_screen(client))
     OBScreen_restack(screen, 0, client)
+
+print "Loaded builtins.py"

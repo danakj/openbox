@@ -43,9 +43,9 @@
 
 #include <X11/keysym.h>
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>

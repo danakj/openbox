@@ -13,6 +13,7 @@ namespace otk {
 Label::Label(Widget *parent)
   : Widget(parent),
     _text(""),
+    _font(0),
     _justify_horz(RenderStyle::LeftTopJustify),
     _justify_vert(RenderStyle::LeftTopJustify),
     _highlight(false)

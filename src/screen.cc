@@ -304,9 +304,7 @@ void OBScreen::setSupportedAtoms()
       otk::OBProperty::net_workarea,
       otk::OBProperty::net_client_list,
       otk::OBProperty::net_client_list_stacking,
-/*
       otk::OBProperty::net_desktop_names,
-*/
       otk::OBProperty::net_close_window,
       otk::OBProperty::net_wm_name,
       otk::OBProperty::net_wm_visible_name,

@@ -271,8 +271,10 @@ void client_manage(Window window)
            rules for focus */
         if ((config_focus_new &&
              (self->type == Type_Normal ||
-              (self->type == Type_Dialog && (group_foc ||
-                                             (!parent && !self->group))))) ||
+              (self->type == Type_Dialog &&
+               (group_foc ||
+                (!parent && (!self->group ||
+                             !self->group->members->next)))))) ||
             (parent && (client_focused(parent) ||
                         search_focus_tree(parent, parent)))) {
             client_focus(self);

@@ -1,11 +1,11 @@
 include build/Makefile.incl
 
-dir = render
+dir = cwmcc
 
-CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Render\"
+CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"CWMCC\"
 
-target = libobrender.la
-sources = color.c font.c gradient.c image.c mask.c render.c test.c
+target = libcwmcc.la
+sources = cwmcc.c
 
 srcdir := $(srcdir)/$(dir)
 target := $(addprefix $(dir)/, $(target))

@@ -39,7 +39,7 @@ uninstall:
 	$(LTRM) $(DESTDIR)$(enginedir)/$(notdir $(target))
 
 clean:
-	$(RM) $(target) $(objects)
+	$(LTCLEAN) $(target) $(objects)
 	$(RM) $(srcdir)/*\~
 
 -include $(deps)

@@ -37,7 +37,7 @@ uninstall:
 	$(LTRM) $(DESTDIR)$(plugindir)/$(notdir $(target))
 
 clean:
-	$(RM) $(target) $(objects)
+	$(LTCLEAN) $(target) $(objects)
 	$(RM) $(srcdir)/*\~
 
 distclean:

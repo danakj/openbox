@@ -8,3 +8,4 @@ image.lo
 mask.lo
 render.lo
 test.lo
+libobrender.la

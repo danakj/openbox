@@ -754,6 +754,7 @@ void OBClient::setState(StateAction action, long data1, long data2)
         _above = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_below)) {
+        printf("Setting below\n");
         if (_below) continue;
         _below = true;
       }
@@ -897,7 +898,11 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
   } else if (e.message_type == property->atom(otk::OBProperty::net_wm_state)) {
     // can't compress these
 #ifdef DEBUG
-    printf("net_wm_state for 0x%lx\n", _window);
+    printf("below=%ld above=%ld\n", property->atom(otk::OBProperty::net_wm_state_below), property->atom(otk::OBProperty::net_wm_state_above));
+    printf("net_wm_state %s %ld %ld for 0x%lx\n",
+           (e.data.l[0] == 0 ? "Remove" : e.data.l[0] == 1 ? "Add" :
+            e.data.l[0] == 2 ? "Toggle" : "INVALID"),
+           e.data.l[1], e.data.l[2], _window);
 #endif
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
   } else if (e.message_type ==

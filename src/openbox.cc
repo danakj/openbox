@@ -144,12 +144,15 @@ Openbox::Openbox(int argc, char **argv)
 
   // initialize all the screens
   OBScreen *screen;
-  screen = new OBScreen(0);
-  if (screen->managed()) {
-    _screens.push_back(screen);
-    // XXX: "change to" the first workspace on the screen to initialize stuff
-  } else
-    delete screen;
+  int i = _single ? DefaultScreen(otk::OBDisplay::display) : 0;
+  int max = _single ? i + 1 : ScreenCount(otk::OBDisplay::display);
+  for (; i < max; ++i) {
+    screen = new OBScreen(i);
+    if (screen->managed())
+      _screens.push_back(screen);
+    else
+      delete screen;
+  }
 
   if (_screens.empty()) {
     printf(_("No screens were found without a window manager. Exiting.\n"));
@@ -240,6 +243,8 @@ void Openbox::parseCommandLine(int argc, char **argv)
         _scriptfilepath = argv[i];
     } else if (arg == "-sync") {
       _sync = true;
+    } else if (arg == "-single") {
+      _single = true;
     } else if (arg == "-version") {
       showVersion();
       ::exit(0);
@@ -272,9 +277,11 @@ void Openbox::showHelp()
   printf(_("Usage: %s [OPTIONS...]\n\
   Options:\n\
   -display <string>  use display connection.\n\
+  -single            run on a single screen (default is to run every one).\n\
   -rc <string>       use alternate resource file.\n\
   -menu <string>     use alternate menu file.\n\
   -script <string>   use alternate startup script file.\n\
+  -sync              run in synchronous mode (for debugging).\n\
   -version           display version and exit.\n\
   -help              display this help text and exit.\n\n"), _argv[0]);
 

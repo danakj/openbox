@@ -93,6 +93,10 @@ private:
   char *_displayreq;
   //! The value of argv, i.e. how this application was executed
   char **_argv;
+  //! Run the application in synchronous mode? (for debugging)
+  bool _sync;
+  //! Should Openbox run on a single screen or on all available screens?
+  bool _single;
 
   //! A list of all managed clients
   ClientMap _clients;
@@ -120,9 +124,6 @@ private:
 
   //! The interface through which keys/buttons are grabbed and handled
   OBBindings *_bindings;
-
-  //! Run the application in synchronous mode? (for debugging)
-  bool _sync;
 
   //! The running state of the window manager
   RunState _state;

@@ -175,6 +175,25 @@ def send_to_prev_desktop(data, no_wrap=0, follow=1):
     send_to_desktop(data, d)
     if follow:
         change_desktop(data, d)
+
+def state_above(data, add=2):
+    """Toggles, adds or removes the 'above' state on a window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    send_client_msg(root, OBProperty_net_wm_state, window, add,
+                    OBProperty_net_wm_state_above)
+    
+def state_below(data, add=2):
+    """Toggles, adds or removes the 'below' state on a window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    print OBProperty_net_wm_state_below
+    send_client_msg(root, OBProperty_net_wm_state, window, add,
+                    OBProperty_net_wm_state_below)
     
 #########################################
 ### Convenience functions for scripts ###

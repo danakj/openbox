@@ -1036,7 +1036,7 @@ void client_update_wmhints(Client *self)
 	if (!(hints->flags & WindowGroupHint))
             hints->window_group = None; /* no group */
         /* did the group state change? */
-        if (hints->window_group != self->group ? self->group->leader : None) {
+        if (hints->window_group != (self->group ? self->group->leader : None)){
             /* remove from the old group if there was one */
             if (self->group != NULL) {
                 /* remove transients of the group */

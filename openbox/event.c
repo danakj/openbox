@@ -554,7 +554,7 @@ static void event_handle_root(XEvent *e)
     switch(e->type) {
     case SelectionClear:
         ob_debug("Another WM has requested to replace us. Exiting.\n");
-        ob_exit();
+        ob_exit(0);
         break;
 
     case ClientMessage:

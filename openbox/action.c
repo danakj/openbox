@@ -1167,7 +1167,7 @@ void action_restart(union ActionData *data)
 
 void action_exit(union ActionData *data)
 {
-    ob_exit();
+    ob_exit(0);
 }
 
 void action_showmenu(union ActionData *data)

@@ -281,7 +281,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
 
 static void sm_die(SmcConn conn, SmPointer data)
 {
-    ob_exit();
+    ob_exit(0);
 }
 
 static void sm_save_complete(SmcConn conn, SmPointer data)

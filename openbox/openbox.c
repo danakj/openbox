@@ -61,6 +61,7 @@ static gboolean  restart;
 static char     *restart_path;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
+static gint      exitcode = 0;
 
 static void signal_handler(int signal, gpointer data);
 static void parse_args(int argc, char **argv);
@@ -297,7 +298,7 @@ int main(int argc, char **argv)
         execlp(argv[0], g_path_get_basename(argv[0])); /* last resort */
     }
      
-    return 0;
+    return exitcode;
 }
 
 static void signal_handler(int signal, gpointer data)
@@ -310,7 +311,8 @@ static void signal_handler(int signal, gpointer data)
         ob_reconfigure();
     } else {
 	fprintf(stderr, "Caught signal %d. Exiting.\n", signal);
-        ob_exit();
+        /* TERM and INT return a 0 code */
+        ob_exit(!(signal == SIGTERM || signal == SIGINT));
     }
 }
 
@@ -386,17 +388,18 @@ void ob_restart_other(const gchar *path)
 void ob_restart()
 {
     restart = TRUE;
-    ob_exit();
+    ob_exit(0);
 }
 
 void ob_reconfigure()
 {
     reconfigure = TRUE;
-    ob_exit();
+    ob_exit(0);
 }
 
-void ob_exit()
+void ob_exit(gint code)
 {
+    exitcode = code;
     ob_main_loop_exit(ob_main_loop);
 }
 

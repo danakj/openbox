@@ -41,227 +41,226 @@ void stacking_set_list()
 	g_free(windows);
 }
 
-static GList *find_lowest_transient(Client *c)
+static void do_restack(GList *wins, GList *before)
 {
-    GList *it;
-    GSList *sit;
+    GList *it, *next;
+    Window *win;
+    int i;
 
-    for (it = g_list_last(stacking_list); it; it = it->prev)
-        for (sit = c->transients; sit; sit = sit->next)
-            if (it->data == sit->data) /* found a transient */
-                return it;
-    return NULL;
+    /* pls only restack stuff in the same layer at a time */
+    for (it = wins; it; it = next) {
+        next = g_list_next(it);
+        if (!next) break;
+        g_assert (window_layer(it->data) == window_layer(next->data));
+    }
+
+
+    win = g_new(Window, g_list_length(wins) + 1);
+
+    if (before == stacking_list)
+        win[0] = focus_backup;
+    else if (!before)
+        win[0] = window_top(g_list_last(stacking_list)->data);
+    else
+        win[0] = window_top(g_list_previous(before)->data);
+
+    for (i = 1, it = wins; it; ++i, it = g_list_next(it)) {
+        win[i] = window_top(it->data);
+        stacking_list = g_list_insert_before(stacking_list, before, it->data);
+    }
+
+    XRestackWindows(ob_display, win, i);
+    g_free(win);
 }
 
-static void raise_recursive(ObWindow *window)
+static void raise(GList *wins)
 {
-    Window wins[2];  /* only ever restack 2 windows. */
-    GList *it, *low;
-    GSList *sit;
+    GList *it;
+    GList *layer[NUM_STACKLAYER] = {NULL};
+    int i;
 
-    g_assert(stacking_list != NULL); /* this would be bad */
+    for (it = wins; it; it = g_list_next(it)) {
+        StackLayer l;
 
-    /* remove the window before looking so we can't run into ourselves and our
-       transients can't either. */
-    stacking_list = g_list_remove(stacking_list, window);
-
-    /* raise transients first */
-    if (WINDOW_IS_CLIENT(window)) {
-        Client *client = WINDOW_AS_CLIENT(window);
-        for (sit = client->transients; sit; sit = sit->next)
-            raise_recursive(sit->data);
+        l = window_layer(it->data);
+        layer[l] = g_list_append(layer[l], it->data);
     }
 
-    /* find 'it' where it is the positiion in the stacking order where
-       'window' will be inserted *before* */
-
-    if (WINDOW_IS_CLIENT(window))
-        low = find_lowest_transient(WINDOW_AS_CLIENT(window));
-    else
-        low = NULL;
-    /* the stacking list is from highest to lowest */
-    for (it = g_list_last(stacking_list); it; it = it->prev) {
-        if (it == low || window_layer(window) < window_layer(it->data)) {
-            it = it->next;
-            break;
+    it = stacking_list;
+    for (i = NUM_STACKLAYER - 1; i >= 0; --i) {
+        if (layer[i]) {
+            for (; it; it = g_list_next(it)) {
+                /* look for the top of the layer */
+                if (window_layer(it->data) <= (StackLayer) i)
+                    break;
+            }
+            do_restack(layer[i], it);
+            g_list_free(layer[i]);
         }
-        if (it == stacking_list)
-            break;
+    }
+}
+
+static void lower(GList *wins)
+{
+    GList *it;
+    GList *layer[NUM_STACKLAYER] = {NULL};
+    int i;
+
+    for (it = wins; it; it = g_list_next(it)) {
+        StackLayer l;
+
+        l = window_layer(it->data);
+        layer[l] = g_list_append(layer[l], it->data);
     }
 
-    /*
-      if our new position is the top, we want to stack under the focus_backup.
-      otherwise, we want to stack under the previous window in the stack.
-    */
-    if (it == stacking_list)
-	wins[0] = focus_backup;
-    else if (it != NULL)
-	wins[0] = window_top(it->prev->data);
-    else
-	wins[0] = window_top(g_list_last(stacking_list)->data);
-    wins[1] = window_top(window);
+    it = stacking_list;
+    for (i = NUM_STACKLAYER - 1; i >= 0; --i) {
+        if (layer[i]) {
+            for (; it; it = g_list_next(it)) {
+                /* look for the top of the next layer down */
+                if (window_layer(it->data) < (StackLayer) i)
+                    break;
+            }
+            do_restack(layer[i], it);
+            g_list_free(layer[i]);
+        }
+    }
+}
 
-    stacking_list = g_list_insert_before(stacking_list, it, window);
+static GList* pick_windows(ObWindow *win)
+{
+    GList *ret = NULL;
+    GList *it, *next;
+    GSList *sit;
+    Client *c;
+    int i, n;
 
-    XRestackWindows(ob_display, wins, 2);
+    if (!WINDOW_IS_CLIENT(win)) {
+        ret = g_list_append(ret, win);
+        stacking_list = g_list_remove(stacking_list, win);
+        return ret;
+    }
+    c = WINDOW_AS_CLIENT(win);
+
+    /* add transient children in their stacking order */
+    i = 0;
+    n = g_slist_length(c->transients);
+    for (it = stacking_list; i < n && it; it = next) {
+        next = g_list_next(it);
+        if ((sit = g_slist_find(c->transients, it->data))) {
+            ++i;
+            ret = g_list_concat(ret, pick_windows(sit->data));
+        }
+    }
+
+    /* add itself */
+    if (g_list_find(stacking_list, win)) {
+        ret = g_list_append(ret, win);
+        stacking_list = g_list_remove(stacking_list, win);
+    }
+
+    /* add group members in their stacking order */
+    if (c->group) {
+        for (it = stacking_list; it; it = next) {
+            next = g_list_next(it);
+            if ((sit = g_slist_find(c->group->members, it->data))) {
+                ret = g_list_append(ret, sit->data);
+                stacking_list = g_list_remove(stacking_list, sit->data);
+            }
+        }
+    }
+
+    if (c->transient_for && c->transient_for != TRAN_GROUP)
+        /* dont add it twice */
+        if (g_list_find(stacking_list, c->transient_for))
+            ret = g_list_concat(ret, pick_windows
+                                (CLIENT_AS_WINDOW(c->transient_for)));
+
+    return ret;
 }
 
 void stacking_raise(ObWindow *window)
 {
-    g_assert(stacking_list != NULL); /* this would be bad */
+    GList *wins;
 
-    if (WINDOW_IS_CLIENT(window)) {
-        Client *client = WINDOW_AS_CLIENT(window);
-
-        /* move up the transient chain as far as possible first */
-        if (client->transient_for) {
-            if (client->transient_for != TRAN_GROUP) {
-                stacking_raise(CLIENT_AS_WINDOW(client->transient_for));
-                return;
-            } else {
-                GSList *it;
-                gboolean raised = FALSE;
-
-                for (it = client->group->members; it; it = it->next) {
-                    Client *c = it->data;
-
-                    /* checking transient_for prevents infinate loops! */
-                    if (c != client && !c->transient_for) {
-                        stacking_raise(it->data);
-                        raised = TRUE;
-                    }
-                }
-                if (raised) return;
-            }
-        }
-    }
-
-    raise_recursive(window);
-
-    stacking_set_list();
-}
-
-static void lower_recursive(ObWindow *window, ObWindow *above)
-{
-    Window wins[2];  /* only ever restack 2 windows. */
-    GList *it;
-    GSList *sit;
-
-    /* find 'it' where 'it' is the position in the stacking_list where the
-       'window' will be placed *after* */
-
-    for (it = g_list_last(stacking_list); it != stacking_list; it = it->prev)
-        if (window_layer(window) <= window_layer(it->data) &&
-            it->data != above)
-            break;
-
-    if (it->data != window) { /* not already the bottom */
-        wins[0] = window_top(it->data);
-        wins[1] = window_top(window);
-
-        stacking_list = g_list_remove(stacking_list, window);
-        stacking_list = g_list_insert_before(stacking_list, it->next, window);
-        XRestackWindows(ob_display, wins, 2);
-    }
-
-    if (WINDOW_IS_CLIENT(window)) {
-        Client *client = WINDOW_AS_CLIENT(window);
-        for (sit = client->transients; sit; sit = sit->next)
-            lower_recursive(CLIENT_AS_WINDOW(sit->data), window);
-    }
+    wins = pick_windows(window);
+    raise(wins);
 }
 
 void stacking_lower(ObWindow *window)
 {
-    g_assert(stacking_list != NULL); /* this would be bad */
+    GList *wins;
 
-    if (WINDOW_IS_CLIENT(window)) {
-        Client *client = WINDOW_AS_CLIENT(window);
-        /* move up the transient chain as far as possible first */
-        while (client->transient_for) {
-            if (client->transient_for != TRAN_GROUP) {
-                stacking_lower(CLIENT_AS_WINDOW(client->transient_for));
-                return;
-            } else {
-                GSList *it;
-
-                for (it = client->group->members; it; it = it->next) {
-                    Client *c = it->data;
-
-                    /* checking transient_for prevents infinate loops! */
-                    if (c != client && !c->transient_for)
-                        stacking_lower(it->data);
-                }
-                if (it == NULL) return;
-            }
-        }
-        window = CLIENT_AS_WINDOW(client);
-    }
-
-    lower_recursive(window, NULL);
-
-    stacking_set_list();
+    wins = pick_windows(window);
+    lower(wins);
 }
 
 void stacking_add(ObWindow *win)
 {
-    stacking_list = g_list_append(stacking_list, win);
+    StackLayer l;
+    GList *wins, *it;
+
+    l = window_layer(win);
+    wins = g_list_append(NULL, win); /* list of 1 element */
+
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (window_layer(it->data) <= l)
+            break;
+    do_restack(wins, it);
+    g_list_free(wins);
+
     stacking_raise(win);
 }
 
 void stacking_add_nonintrusive(ObWindow *win)
 {
-    Window wins[2];  /* only ever restack 2 windows. */
+    Client *client;
+    Client *parent = NULL;
+    GList *it_before = NULL;
 
-    if (!WINDOW_IS_CLIENT(win))
+    if (!WINDOW_IS_CLIENT(win)) {
         stacking_add(win); /* no special rules for others */
-    else {
-        Client *client = WINDOW_AS_CLIENT(win);
-        Client *parent = NULL;
-        GList *it_before = NULL;
+        return;
+    }
 
-        /* insert above its highest parent */
-        if (client->transient_for) {
-            if (client->transient_for != TRAN_GROUP) {
-                parent = client->transient_for;
-            } else {
-                GSList *sit;
-                GList *it;
+    client = WINDOW_AS_CLIENT(win);
 
+    /* insert above its highest parent */
+    if (client->transient_for) {
+        if (client->transient_for != TRAN_GROUP) {
+            parent = client->transient_for;
+        } else {
+            GSList *sit;
+            GList *it;
+
+            if (client->group)
                 for (it = stacking_list; !parent && it; it = it->next) {
-                    for (sit = client->group->members; !parent && sit;
-                         sit = sit->next) {
-                        Client *c = sit->data;
-                        /* checking transient_for prevents infinate loops! */
-                        if (sit->data == it->data && !c->transient_for)
-                            parent = it->data;
-                    }
+                    if ((sit = g_slist_find(client->group->members, it->data)))
+                for (sit = client->group->members; !parent && sit;
+                     sit = sit->next) {
+                    Client *c = sit->data;
+                    /* checking transient_for prevents infinate loops! */
+                    if (sit->data == it->data && !c->transient_for)
+                        parent = it->data;
                 }
             }
         }
+    }
 
-        if (!(it_before = g_list_find(stacking_list, parent))) {
-            /* no parent to put above, try find the focused client to go
-               under */
-            if (focus_client && focus_client->layer == client->layer) {
-                if ((it_before = g_list_find(stacking_list, focus_client)))
-                    it_before = it_before->next;
-            }
+    if (!(it_before = g_list_find(stacking_list, parent))) {
+        /* no parent to put above, try find the focused client to go
+           under */
+        if (focus_client && focus_client->layer == client->layer) {
+            if ((it_before = g_list_find(stacking_list, focus_client)))
+                it_before = it_before->next;
         }
-        if (!it_before) {
-            /* out of ideas, just add it normally... */
-            stacking_add(win);
-        } else {
-            stacking_list = g_list_insert_before(stacking_list, it_before,win);
-
-            it_before = g_list_find(stacking_list, win)->prev;
-            if (!it_before)
-                wins[0] = focus_backup;
-            else
-                wins[0] = window_top(it_before->data);
-            wins[1] = window_top(win);
-
-            XRestackWindows(ob_display, wins, 2);
-        }
+    }
+    if (!it_before) {
+        /* out of ideas, just add it normally... */
+        stacking_add(win);
+    } else {
+        GList *wins = g_list_append(NULL, win);
+        do_restack(wins, it_before);
+        g_list_free(wins);
     }
 }

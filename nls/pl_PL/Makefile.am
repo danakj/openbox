@@ -11,24 +11,27 @@ EXTRA_DIST= BaseDisplay.m Basemenu.m Configmenu.m Icon.m Image.m Screen.m Slit.m
 
 all-local: openbox.cat
 install-data-local: openbox.cat
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		echo "Installing catalog in $(THE_NLS_PATH)"; \
 		$(mkinstalldirs) $(THE_NLS_PATH); \
 		$(INSTALL_DATA) openbox.cat $(THE_NLS_PATH); \
+		rm -f $(DESTDIR)$(pkgdatadir)/nls/pl; \
+                ln -f -s pl_PL $(DESTDIR)$(pkgdatadir)/nls/pl; \
 	fi
 uninstall-local:
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		rm -f $(THE_NLS_PATH)/openbox.cat; \
+		rm -f $(DESTDIR)$(pkgdatadir)/nls/pl; \
 		rmdir $(THE_NLS_PATH); \
 	fi
 
 Translation.m: $(MFILES)
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		awk -f @srcdir@/../convert.awk output=Translation.m $(MFILES); \
 	fi
 
 openbox.cat: Translation.m
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		$(gencat_cmd) openbox.cat Translation.m; \
 	fi
 

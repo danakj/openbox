@@ -46,18 +46,25 @@ static void focus_fallback(gboolean switching_desks)
                 XEvent e;
                 Client *c = it->data;
 
-                /* skip the next enter event from the desktop switch so focus
+                /* XXX... not anymore
+                   skip the next enter event from the desktop switch so focus
                    doesn't skip briefly to what was under the pointer */
-                if (XCheckTypedEvent(ob_display, EnterNotify, &e)) {
-                    XPutBackEvent(ob_display, &e);
+
+                /* kill all enter events from prior to the desktop switch, we
+                   aren't interested in them if we have found our own target
+                   to focus.
+                   XXX this is rude to other plugins...can this be done
+                   better? count the events in the queue? */
+                while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+/*                    XPutBackEvent(ob_display, &e);
+                    g_message("skip");
                     ++skip_enter;
-                }
+                    }*/
 
                 /* I have to do this warp twice! Otherwise windows dont get
                    Enter/Leave events when i warp on a desktop switch! */
                 XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
                              c->area.width / 2, c->area.height / 2);
-                ++skip_enter;
                 XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
                              c->area.width / 2, c->area.height / 2);
             }
@@ -93,10 +100,17 @@ static void events(ObEvent *e, void *foo)
         break;
 
     case Event_X_EnterNotify:
-        if (skip_enter)
+        if (skip_enter) {
+            if (e->data.x.client != NULL)
+                g_message("skipped enter %lx", e->data.x.client->window);
+            else
+                g_message("skipped enter 'root'");
             --skip_enter;
-        else if (e->data.x.client && client_normal(e->data.x.client))
+        }
+        else if (e->data.x.client != NULL && client_normal(e->data.x.client)) {
+            g_message("enter %lx", e->data.x.client->window);
             client_focus(e->data.x.client);
+        }
         break;
 
     default:

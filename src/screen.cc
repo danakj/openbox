@@ -122,6 +122,11 @@ OBScreen::~OBScreen()
 {
   if (! _managed) return;
 
+  XSelectInput(otk::OBDisplay::display, _info->rootWindow(), NoEventMask);
+  XSync(otk::OBDisplay::display, False);
+  
+  XDestroyWindow(otk::OBDisplay::display, _focuswindow);
+
   // unmanage all windows
   while (!clients.empty())
     unmanageWindow(clients.front());

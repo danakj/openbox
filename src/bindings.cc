@@ -142,7 +142,7 @@ OBBindings::OBBindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
     _timer(Openbox::instance->timerManager(),
-           (otk::OBTimeoutHandler)reset, this)
+           (otk::OBTimeoutHandler)resetChains, this)
 {
   _timer.setTimeout(5000); // chains reset after 5 seconds
   
@@ -402,7 +402,14 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
     bind->binding.key = b.key;
     bind->binding.modifiers = b.modifiers;
     _buttons[context].push_back(bind);
-    // XXX GRAB the new button everywhere!
+    // grab the button on all clients
+    for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
+      OBScreen *s = Openbox::instance->screen(sn);
+      OBScreen::ClientList::iterator c_it, c_end = s->clients.end();
+      for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
+        grabButton(true, bind->binding, context, *c_it);
+      }
+    }
   } else
     bind = *it;
   Py_XDECREF(bind->callback[action]); // if it was already bound, unbind it
@@ -413,45 +420,57 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
 
 void OBBindings::removeAllButtons()
 {
-  // XXX: UNGRAB shits
   for (int i = i; i < NUM_MOUSE_CONTEXT; ++i) {
     ButtonBindingList::iterator it, end = _buttons[i].end();
-    for (it = _buttons[i].begin(); it != end; ++it)
+    for (it = _buttons[i].begin(); it != end; ++it) {
       for (int a = 0; a < NUM_MOUSE_ACTION; ++a) {
         Py_XDECREF((*it)->callback[a]);
         (*it)->callback[a] = 0;
       }
+      // ungrab the button on all clients
+      for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
+        OBScreen *s = Openbox::instance->screen(sn);
+        OBScreen::ClientList::iterator c_it, c_end = s->clients.end();
+        for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
+          grabButton(false, (*it)->binding, (MouseContext)i, *c_it);
+        }
+      }
+    }
   }
+}
+
+void OBBindings::grabButton(bool grab, const Binding &b, MouseContext context,
+                            OBClient *client)
+{
+  Window win;
+  int mode = GrabModeAsync;
+  switch(context) {
+  case MC_Frame:
+    win = client->frame->window();
+    break;
+  case MC_Window:
+    win = client->frame->plate();
+    mode = GrabModeSync; // this is handled in fireButton
+    break;
+  default:
+    // any other elements already get button events, don't grab on them
+    return;
+  }
+  if (grab)
+    otk::OBDisplay::grabButton(b.key, b.modifiers, win, false,
+                               ButtonPressMask | ButtonMotionMask |
+                               ButtonReleaseMask, mode, GrabModeAsync,
+                               None, None, false);
+  else
+    otk::OBDisplay::ungrabButton(b.key, b.modifiers, win);
 }
 
 void OBBindings::grabButtons(bool grab, OBClient *client)
 {
   for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
-    Window win;
-    int mode = GrabModeAsync;
-    switch (i) {
-    case MC_Frame:
-      win = client->frame->window();
-      break;
-    case MC_Window:
-      win = client->frame->plate();
-      mode = GrabModeSync; // this is handled in fireButton
-      break;
-    default:
-      // any other elements already get button events, don't grab on them
-      continue;
-    }
     ButtonBindingList::iterator it, end = _buttons[i].end();
     for (it = _buttons[i].begin(); it != end; ++it)
-      if (grab)
-        otk::OBDisplay::grabButton((*it)->binding.key,
-                                   (*it)->binding.modifiers, win, false,
-                                   ButtonPressMask | ButtonMotionMask |
-                                   ButtonReleaseMask, mode, GrabModeAsync,
-                                   None, None, false);
-      else
-        otk::OBDisplay::ungrabButton((*it)->binding.key,
-                                     (*it)->binding.modifiers, win);
+      grabButton(grab, (*it)->binding, (MouseContext)i, client);
   }
 }
 

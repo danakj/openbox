@@ -82,6 +82,9 @@ private:
   typedef std::list <ButtonBinding*> ButtonBindingList;
   ButtonBindingList _buttons[NUM_MOUSE_CONTEXT];
 
+  void grabButton(bool grab, const Binding &b, MouseContext context,
+                  OBClient *client);
+  
 public:
   //! Initializes an OBBindings object
   OBBindings();

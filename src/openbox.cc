@@ -172,6 +172,9 @@ Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
 
+  // return input focus to the root
+  XSetInputFocus(otk::OBDisplay::display, PointerRoot, None, CurrentTime);
+  
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
 
   delete _bindings;
@@ -179,9 +182,12 @@ Openbox::~Openbox()
   delete _property;
 
   python_destroy();
+
+  XSync(otk::OBDisplay::display, False);
   
   // close the X display
   otk::OBDisplay::destroy();
+  printf("Exiting!\n");
 }
 
 

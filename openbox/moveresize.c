@@ -131,6 +131,7 @@ void moveresize_end(gboolean cancel)
     coords = None;
 
     moveresize_in_progress = FALSE;
+    moveresize_client = NULL;
 
     if (moving) {
         client_configure(moveresize_client, Corner_TopLeft,

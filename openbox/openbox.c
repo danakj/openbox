@@ -176,16 +176,20 @@ int main(int argc, char **argv)
     XCloseDisplay(ob_display);
 
     if (ob_restart) {
+        ob_restart_path = "";
         if (ob_restart_path != NULL) {
             int argcp;
             char **argvp;
-            GError *err;
+            GError *err = NULL;
 
             /* run other shit */
-            if (g_shell_parse_argv(ob_restart_path, &argcp, &argvp, &err))
+            if (g_shell_parse_argv(ob_restart_path, &argcp, &argvp, &err)) {
                 execvp(argvp[0], argvp);
-
-            g_strfreev(argvp);
+                g_strfreev(argvp);
+            } else {
+                g_warning("failed to execute '%s': %s", ob_restart_path,
+                          err->message);
+            }
         }
 
         /* re-run me */

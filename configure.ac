@@ -6,9 +6,6 @@ AC_CONFIG_SRCDIR([openbox/openbox.c])
 AC_PREFIX_DEFAULT([/usr/local])
 test "$prefix" = "NONE" && prefix=$ac_default_prefix
 
-AC_PATH_PROG([SED], [sed])
-test "$SED" || AC_MSG_ERROR([sed not found])
-
 # Determine build target
 OB_DEBUG
 # Pick compiler specific/build target flags, and set $CVS

@@ -1214,8 +1214,7 @@ void action_toggle_decorations(union ActionData *data)
     ObClient *c = data->client.any.c;
 
     client_action_start(data);
-    c->decorate = !c->decorate;
-    client_setup_decor_and_functions(c);
+    client_set_undecorated(c, !c->undecorated);
     client_action_end(data);
 }
 

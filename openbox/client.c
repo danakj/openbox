@@ -244,7 +244,6 @@ void client_manage(Window window)
     self->title_count = 1;
     self->wmstate = NormalState;
     self->layer = -1;
-    self->decorate = TRUE;
     self->desktop = screen_num_desktops; /* always an invalid value */
 
     client_get_all(self);
@@ -772,31 +771,33 @@ static void client_get_state(ObClient *self)
     guint num;
   
     if (PROP_GETA32(self->window, net_wm_state, atom, &state, &num)) {
-	gulong i;
-	for (i = 0; i < num; ++i) {
-	    if (state[i] == prop_atoms.net_wm_state_modal)
-		self->modal = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_shaded)
-		self->shaded = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_hidden)
-		self->iconic = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_skip_taskbar)
-		self->skip_taskbar = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_skip_pager)
-		self->skip_pager = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_fullscreen)
-		self->fullscreen = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_maximized_vert)
-		self->max_vert = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_maximized_horz)
-		self->max_horz = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_above)
-		self->above = TRUE;
-	    else if (state[i] == prop_atoms.net_wm_state_below)
-		self->below = TRUE;
-	}
+        gulong i;
+        for (i = 0; i < num; ++i) {
+            if (state[i] == prop_atoms.net_wm_state_modal)
+                self->modal = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_shaded)
+                self->shaded = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_hidden)
+                self->iconic = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_skip_taskbar)
+                self->skip_taskbar = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_skip_pager)
+                self->skip_pager = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_fullscreen)
+                self->fullscreen = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_maximized_vert)
+                self->max_vert = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_maximized_horz)
+                self->max_horz = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_above)
+                self->above = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_below)
+                self->below = TRUE;
+            else if (state[i] == prop_atoms.ob_wm_state_undecorated)
+                self->undecorated = TRUE;
+        }
 
-	g_free(state);
+        g_free(state);
     }
 }
 
@@ -1157,7 +1158,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
     /* finally, the user can have requested no decorations, which overrides
        everything */
-    if (!self->decorate)
+    if (self->undecorated)
         self->decorations = OB_FRAME_DECOR_BORDER;
 
     /* if we don't have a titlebar, then we cannot shade! */
@@ -1585,7 +1586,7 @@ void client_update_icons(ObClient *self)
 static void client_change_state(ObClient *self)
 {
     guint32 state[2];
-    guint32 netstate[10];
+    guint32 netstate[11];
     guint num;
 
     state[0] = self->wmstate;
@@ -1594,31 +1595,33 @@ static void client_change_state(ObClient *self)
 
     num = 0;
     if (self->modal)
-	netstate[num++] = prop_atoms.net_wm_state_modal;
+        netstate[num++] = prop_atoms.net_wm_state_modal;
     if (self->shaded)
-	netstate[num++] = prop_atoms.net_wm_state_shaded;
+        netstate[num++] = prop_atoms.net_wm_state_shaded;
     if (self->iconic)
-	netstate[num++] = prop_atoms.net_wm_state_hidden;
+        netstate[num++] = prop_atoms.net_wm_state_hidden;
     if (self->skip_taskbar)
-	netstate[num++] = prop_atoms.net_wm_state_skip_taskbar;
+        netstate[num++] = prop_atoms.net_wm_state_skip_taskbar;
     if (self->skip_pager)
-	netstate[num++] = prop_atoms.net_wm_state_skip_pager;
+        netstate[num++] = prop_atoms.net_wm_state_skip_pager;
     if (self->fullscreen)
-	netstate[num++] = prop_atoms.net_wm_state_fullscreen;
+        netstate[num++] = prop_atoms.net_wm_state_fullscreen;
     if (self->max_vert)
-	netstate[num++] = prop_atoms.net_wm_state_maximized_vert;
+        netstate[num++] = prop_atoms.net_wm_state_maximized_vert;
     if (self->max_horz)
-	netstate[num++] = prop_atoms.net_wm_state_maximized_horz;
+        netstate[num++] = prop_atoms.net_wm_state_maximized_horz;
     if (self->above)
-	netstate[num++] = prop_atoms.net_wm_state_above;
+        netstate[num++] = prop_atoms.net_wm_state_above;
     if (self->below)
-	netstate[num++] = prop_atoms.net_wm_state_below;
+        netstate[num++] = prop_atoms.net_wm_state_below;
+    if (self->undecorated)
+        netstate[num++] = prop_atoms.ob_wm_state_undecorated;
     PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
 
     client_calc_layer(self);
 
     if (self->frame)
-	frame_adjust_state(self->frame);
+        frame_adjust_state(self->frame);
 }
 
 ObClient *client_search_focus_tree(ObClient *self)
@@ -1746,29 +1749,33 @@ static void client_apply_startup_state(ObClient *self)
     /* these are in a carefully crafted order.. */
 
     if (self->iconic) {
-	self->iconic = FALSE;
-	client_iconify(self, TRUE, FALSE);
+        self->iconic = FALSE;
+        client_iconify(self, TRUE, FALSE);
     }
     if (self->fullscreen) {
-	self->fullscreen = FALSE;
-	client_fullscreen(self, TRUE, FALSE);
+        self->fullscreen = FALSE;
+        client_fullscreen(self, TRUE, FALSE);
+    }
+    if (self->undecorated) {
+        self->undecorated = FALSE;
+        client_set_undecorated(self, TRUE);
     }
     if (self->shaded) {
-	self->shaded = FALSE;
-	client_shade(self, TRUE);
+        self->shaded = FALSE;
+        client_shade(self, TRUE);
     }
     if (self->urgent)
         client_urgent_notify(self);
   
     if (self->max_vert && self->max_horz) {
-	self->max_vert = self->max_horz = FALSE;
-	client_maximize(self, TRUE, 0, FALSE);
+        self->max_vert = self->max_horz = FALSE;
+        client_maximize(self, TRUE, 0, FALSE);
     } else if (self->max_vert) {
-	self->max_vert = FALSE;
-	client_maximize(self, TRUE, 2, FALSE);
+        self->max_vert = FALSE;
+        client_maximize(self, TRUE, 2, FALSE);
     } else if (self->max_horz) {
-	self->max_horz = FALSE;
-	client_maximize(self, TRUE, 1, FALSE);
+        self->max_horz = FALSE;
+        client_maximize(self, TRUE, 1, FALSE);
     }
 
     /* nothing to do for the other states:
@@ -2352,122 +2359,132 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
 {
     gboolean shaded = self->shaded;
     gboolean fullscreen = self->fullscreen;
+    gboolean undecorated = self->undecorated;
     gboolean max_horz = self->max_horz;
     gboolean max_vert = self->max_vert;
     int i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
-	  action == prop_atoms.net_wm_state_remove ||
-	  action == prop_atoms.net_wm_state_toggle))
-	/* an invalid action was passed to the client message, ignore it */
-	return; 
+          action == prop_atoms.net_wm_state_remove ||
+          action == prop_atoms.net_wm_state_toggle))
+        /* an invalid action was passed to the client message, ignore it */
+        return; 
 
     for (i = 0; i < 2; ++i) {
-	Atom state = i == 0 ? data1 : data2;
+        Atom state = i == 0 ? data1 : data2;
     
-	if (!state) continue;
+        if (!state) continue;
 
-	/* if toggling, then pick whether we're adding or removing */
-	if (action == prop_atoms.net_wm_state_toggle) {
-	    if (state == prop_atoms.net_wm_state_modal)
-		action = self->modal ? prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_maximized_vert)
-		action = self->max_vert ? prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_maximized_horz)
-		action = self->max_horz ? prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_shaded)
-		action = self->shaded ? prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_skip_taskbar)
-		action = self->skip_taskbar ?
-		    prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_skip_pager)
-		action = self->skip_pager ?
-		    prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_fullscreen)
-		action = self->fullscreen ?
-		    prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_above)
-		action = self->above ? prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	    else if (state == prop_atoms.net_wm_state_below)
-		action = self->below ? prop_atoms.net_wm_state_remove :
-		    prop_atoms.net_wm_state_add;
-	}
+        /* if toggling, then pick whether we're adding or removing */
+        if (action == prop_atoms.net_wm_state_toggle) {
+            if (state == prop_atoms.net_wm_state_modal)
+                action = self->modal ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_maximized_vert)
+                action = self->max_vert ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_maximized_horz)
+                action = self->max_horz ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_shaded)
+                action = shaded ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_skip_taskbar)
+                action = self->skip_taskbar ?
+                    prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_skip_pager)
+                action = self->skip_pager ?
+                    prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_fullscreen)
+                action = fullscreen ?
+                    prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_above)
+                action = self->above ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_below)
+                action = self->below ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.ob_wm_state_undecorated)
+                action = undecorated ? prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
+        }
     
-	if (action == prop_atoms.net_wm_state_add) {
-	    if (state == prop_atoms.net_wm_state_modal) {
-		/* XXX raise here or something? */
-		self->modal = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_maximized_vert) {
-		max_vert = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_maximized_horz) {
-		max_horz = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_shaded) {
-		shaded = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_skip_taskbar) {
-		self->skip_taskbar = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_skip_pager) {
-		self->skip_pager = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_fullscreen) {
-		fullscreen = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_above) {
-		self->above = TRUE;
-	    } else if (state == prop_atoms.net_wm_state_below) {
-		self->below = TRUE;
-	    }
+        if (action == prop_atoms.net_wm_state_add) {
+            if (state == prop_atoms.net_wm_state_modal) {
+                /* XXX raise here or something? */
+                self->modal = TRUE;
+            } else if (state == prop_atoms.net_wm_state_maximized_vert) {
+                max_vert = TRUE;
+            } else if (state == prop_atoms.net_wm_state_maximized_horz) {
+                max_horz = TRUE;
+            } else if (state == prop_atoms.net_wm_state_shaded) {
+                shaded = TRUE;
+            } else if (state == prop_atoms.net_wm_state_skip_taskbar) {
+                self->skip_taskbar = TRUE;
+            } else if (state == prop_atoms.net_wm_state_skip_pager) {
+                self->skip_pager = TRUE;
+            } else if (state == prop_atoms.net_wm_state_fullscreen) {
+                fullscreen = TRUE;
+            } else if (state == prop_atoms.net_wm_state_above) {
+                self->above = TRUE;
+            } else if (state == prop_atoms.net_wm_state_below) {
+                self->below = TRUE;
+            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+                undecorated = TRUE;
+            }
 
-	} else { /* action == prop_atoms.net_wm_state_remove */
-	    if (state == prop_atoms.net_wm_state_modal) {
-		self->modal = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_maximized_vert) {
-		max_vert = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_maximized_horz) {
-		max_horz = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_shaded) {
-		shaded = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_skip_taskbar) {
-		self->skip_taskbar = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_skip_pager) {
-		self->skip_pager = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_fullscreen) {
-		fullscreen = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_above) {
-		self->above = FALSE;
-	    } else if (state == prop_atoms.net_wm_state_below) {
-		self->below = FALSE;
-	    }
-	}
+        } else { /* action == prop_atoms.net_wm_state_remove */
+            if (state == prop_atoms.net_wm_state_modal) {
+                self->modal = FALSE;
+            } else if (state == prop_atoms.net_wm_state_maximized_vert) {
+                max_vert = FALSE;
+            } else if (state == prop_atoms.net_wm_state_maximized_horz) {
+                max_horz = FALSE;
+            } else if (state == prop_atoms.net_wm_state_shaded) {
+                shaded = FALSE;
+            } else if (state == prop_atoms.net_wm_state_skip_taskbar) {
+                self->skip_taskbar = FALSE;
+            } else if (state == prop_atoms.net_wm_state_skip_pager) {
+                self->skip_pager = FALSE;
+            } else if (state == prop_atoms.net_wm_state_fullscreen) {
+                fullscreen = FALSE;
+            } else if (state == prop_atoms.net_wm_state_above) {
+                self->above = FALSE;
+            } else if (state == prop_atoms.net_wm_state_below) {
+                self->below = FALSE;
+            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+                undecorated = FALSE;
+            }
+        }
     }
     if (max_horz != self->max_horz || max_vert != self->max_vert) {
-	if (max_horz != self->max_horz && max_vert != self->max_vert) {
-	    /* toggling both */
-	    if (max_horz == max_vert) { /* both going the same way */
-		client_maximize(self, max_horz, 0, TRUE);
-	    } else {
-		client_maximize(self, max_horz, 1, TRUE);
-		client_maximize(self, max_vert, 2, TRUE);
-	    }
-	} else {
-	    /* toggling one */
-	    if (max_horz != self->max_horz)
-		client_maximize(self, max_horz, 1, TRUE);
-	    else
-		client_maximize(self, max_vert, 2, TRUE);
-	}
+        if (max_horz != self->max_horz && max_vert != self->max_vert) {
+            /* toggling both */
+            if (max_horz == max_vert) { /* both going the same way */
+                client_maximize(self, max_horz, 0, TRUE);
+            } else {
+                client_maximize(self, max_horz, 1, TRUE);
+                client_maximize(self, max_vert, 2, TRUE);
+            }
+        } else {
+            /* toggling one */
+            if (max_horz != self->max_horz)
+                client_maximize(self, max_horz, 1, TRUE);
+            else
+                client_maximize(self, max_vert, 2, TRUE);
+        }
     }
     /* change fullscreen state before shading, as it will affect if the window
        can shade or not */
     if (fullscreen != self->fullscreen)
-	client_fullscreen(self, fullscreen, TRUE);
+        client_fullscreen(self, fullscreen, TRUE);
     if (shaded != self->shaded)
-	client_shade(self, shaded);
+        client_shade(self, shaded);
+    if (undecorated != self->undecorated)
+        client_set_undecorated(self, undecorated);
     client_calc_layer(self);
     client_change_state(self); /* change the hint to reflect these changes */
 }
@@ -2743,6 +2760,15 @@ void client_set_layer(ObClient *self, int layer)
     }
     client_calc_layer(self);
     client_change_state(self); /* reflect this in the state hints */
+}
+
+void client_set_undecorated(ObClient *self, gboolean undecorated)
+{
+    if (self->undecorated != undecorated) {
+        self->undecorated = undecorated;
+        client_setup_decor_and_functions(self);
+        client_change_state(self); /* reflect this in the state hints */
+    }
 }
 
 guint client_monitor(ObClient *self)

@@ -250,10 +250,10 @@ struct _ObClient
     */
     guint decorations;
 
-    /*! A user option. When this is set to FALSE the client will not ever
+    /*! A user option. When this is set to TRUE the client will not ever
       be decorated.
     */
-    gboolean decorate;
+    gboolean undecorated;
 
     /*! A bitmask of values in the ObFunctions enum
       The values in the variable specify the ways in which the user is allowed
@@ -519,6 +519,9 @@ int client_directional_edge_search(ObClient *c, ObDirection dir);
          > 0 indicates the client should be placed above other clients.
 */
 void client_set_layer(ObClient *self, int layer);
+
+/*! Set a client window to have decorations or not */
+void client_set_undecorated(ObClient *self, gboolean undecorated);
 
 guint client_monitor(ObClient *self);
 

@@ -90,42 +90,6 @@ bool OBBindings::translate(const std::string &str, Binding &b)
   return b.key != 0;
 }
 
-BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
-{
-  if (keylist.empty()) return 0; // nothing in the list.. return 0
-
-  BindingTree *ret = new BindingTree(id), *p = 0;
-
-  StringVect::const_iterator it, end = keylist.end();
-  for (it = keylist.begin(); it != end; ++it) {
-    if (p)
-      p = p->first_child = new BindingTree(id);
-    else
-      p = ret; // the first node
-    
-    if (!translate(*it, p->binding))
-      break;
-    p->text = *it;
-  }
-  if (it != end) {
-    // build failed.. clean up and return 0
-    p = ret;
-    while (p->first_child) {
-      BindingTree *c = p->first_child;
-      delete p;
-      p = c;      
-    }
-    delete p;
-    return 0;
-  } else {
-    // set the proper chain status on the last node
-    p->chain = false;
-  }
-
-  // successfully built a tree
-  return ret;
-}
-
 static void destroytree(BindingTree *tree)
 {
   while (tree) {
@@ -134,6 +98,29 @@ static void destroytree(BindingTree *tree)
     tree = c;
   }
 }
+
+BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
+{
+  if (keylist.empty()) return 0; // nothing in the list.. return 0
+
+  BindingTree *ret = 0, *p;
+
+  StringVect::const_reverse_iterator it, end = keylist.rend();
+  for (it = keylist.rbegin(); it != end; ++it) {
+    p = ret;
+    ret = new BindingTree(id);
+    if (!p) ret->chain = false;
+    ret->first_child = p;
+    if (!translate(*it, ret->binding)) {
+      destroytree(ret);
+      ret = 0;
+      break;
+    }
+    ret->text = *it; // XXX: rm me
+  }
+  return ret;
+}
+
 
 OBBindings::OBBindings()
 {

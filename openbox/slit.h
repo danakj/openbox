@@ -31,7 +31,7 @@ typedef enum {
     SlitPos_Left
 } SlitPosition;
 
-extern GHashTable *slit_map;
+extern GHashTable *slit_app_map;
 
 void slit_startup();
 void slit_shutdown();
@@ -42,5 +42,7 @@ void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib);
 
 void slit_remove_all();
 void slit_remove(SlitApp *app, gboolean reparent);
+
+void slit_app_configure(SlitApp *app, int w, int h);
 
 #endif

@@ -381,7 +381,7 @@ static void event_process(XEvent *e)
 
     window = event_get_window(e);
     if (!(client = g_hash_table_lookup(client_map, &window)))
-        if (!(slitapp = g_hash_table_lookup(slit_map, &window)))
+        if (!(slitapp = g_hash_table_lookup(slit_app_map, &window)))
             menu = g_hash_table_lookup(menu_map, &window);
 
     event_set_lasttime(e);
@@ -924,5 +924,8 @@ static void event_handle_slitapp(SlitApp *app, XEvent *e)
     case ReparentNotify:
 	slit_remove(app, FALSE);
 	break;
+    case ConfigureNotify:
+        slit_app_configure(app, e->xconfigure.width, e->xconfigure.height);
+        break;
     }
 }

@@ -49,13 +49,17 @@ inline void client_action_end(union ActionData *data)
             } else {
                 ObClient *c;
 
+                /* usually this is sorta redundant, but with a press action
+                   the enter event will come as a GrabNotify which is
+                   ignored, so this will handle that case */
                 if ((c = client_under_pointer()))
                     event_enter_client(c);
             }
         }
 }
 
-typedef struct ActionString {
+typedef struct
+{
     const gchar *name;
     void (*func)(union ActionData *);
     void (*setup)(ObAction **, ObUserAction uact);

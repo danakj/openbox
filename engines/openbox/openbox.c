@@ -764,7 +764,7 @@ static void render_label(ObFrame *self)
     if (self->label_x < 0) return;
 
     a = (self->frame.client->focused ?
-         self->a_focused_label : self->a_focused_label);
+         self->a_focused_label : self->a_unfocused_label);
 
     /* set the texture's text! */
     a->texture[0].data.text.string = self->frame.client->title;

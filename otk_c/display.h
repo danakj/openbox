@@ -61,4 +61,7 @@ void OtkDisplay_Grab(OtkDisplay *self);
 //! Ungrabs the display
 void OtkDisplay_Ungrab(OtkDisplay *self);
 
+//! Get the screen info for a specific screen
+struct OtkScreenInfo *OtkDisplay_ScreenInfo(OtkDisplay *self, int num);
+
 #endif // __display_h

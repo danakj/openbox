@@ -143,6 +143,11 @@ void OtkDisplay_Ungrab(OtkDisplay *self)
     XUngrabServer(self->display);
 }
 
+OtkScreenInfo *OtkDisplay_ScreenInfo(OtkDisplay *self, int num)
+{
+  PyObject *py = PyList_GetItem(self->screenInfoList, num);
+  return (OtkScreenInfo*) py;
+}
 
 
 static PyObject *otkdisplay_grab(OtkDisplay* self, PyObject* args)
@@ -174,7 +179,7 @@ static PyMethodDef get_methods[] = {
 static void otkdisplay_dealloc(PyObject* self)
 {
   XCloseDisplay(((OtkDisplay*) self)->display);
-  PyObject_Del(((OtkDisplay*) self)->screenInfoList);
+  Py_DECREF(((OtkDisplay*) self)->screenInfoList);
   PyObject_Del(self);
 }
 

@@ -152,12 +152,6 @@ public:
   //! Holds a bitmask of Client::Decoration values
   typedef unsigned char DecorationFlags;
 
-  //! Possible actions that can be made with the _NET_WM_STATE client message
-  enum StateAction { State_Remove = 0, //!< _NET_WM_STATE_REMOVE
-                     State_Add,        //!< _NET_WM_STATE_ADD
-                     State_Toggle      //!< _NET_WM_STATE_TOGGLE
-  };
-
   //! The event mask to grab on client windows
   static const long event_mask = PropertyChangeMask | FocusChangeMask |
                                  StructureNotifyMask;
@@ -385,7 +379,7 @@ private:
     Client::applyStartupState is used to do the same things during the mapping
     process.
   */
-  void setState(StateAction action, long data1, long data2);
+  void setState(Atom action, long data1, long data2);
 
   //! Sends the window to the specified desktop
   void setDesktop(unsigned int desktop);
@@ -520,16 +514,14 @@ private:
   void applyStartupState();
   
 public:
-#ifndef SWIG
   //! Constructs a new Client object around a specified window id
   /*!
-BB    @param window The window id that the Client class should handle
+    @param window The window id that the Client class should handle
     @param screen The screen on which the window resides
   */
   Client(int screen, Window window);
   //! Destroys the Client object
   virtual ~Client();
-#endif
 
   //! Returns the screen on which the clien resides
   inline int screen() const { return _screen; }
@@ -616,7 +608,7 @@ BB    @param window The window id that the Client class should handle
   inline bool skipPager() const { return _skip_pager; }
   //! The window should not be displayed by taskbars
   inline bool skipTaskbar() const { return _skip_taskbar; } 
- //! Returns if the window is shaded
+  //! Returns if the window is shaded
   /*!
     When the window is shaded, only its titlebar is visible.
   */

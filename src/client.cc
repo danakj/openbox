@@ -881,15 +881,16 @@ void Client::showhide()
   else      frame->hide();
 }
 
-void Client::setState(StateAction action, long data1, long data2)
+void Client::setState(Atom action, long data1, long data2)
 {
   bool shadestate = _shaded;
   bool fsstate = _fullscreen;
   bool maxh = _max_horz;
   bool maxv = _max_vert;
 
-  if (!(action == State_Add || action == State_Remove ||
-        action == State_Toggle))
+  if (!(action == otk::Property::atoms.net_wm_state_add ||
+        action == otk::Property::atoms.net_wm_state_remove ||
+        action == otk::Property::atoms.net_wm_state_toggle))
     return; // an invalid action was passed to the client message, ignore it
 
   for (int i = 0; i < 2; ++i) {
@@ -898,28 +899,37 @@ void Client::setState(StateAction action, long data1, long data2)
     if (! state) continue;
 
     // if toggling, then pick whether we're adding or removing
-    if (action == State_Toggle) {
+    if (action == otk::Property::atoms.net_wm_state_toggle) {
       if (state == otk::Property::atoms.net_wm_state_modal)
-        action = _modal ? State_Remove : State_Add;
+        action = _modal ? otk::Property::atoms.net_wm_state_remove :
+                          otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_maximized_vert)
-        action = _max_vert ? State_Remove : State_Add;
+        action = _max_vert ? otk::Property::atoms.net_wm_state_remove :
+                             otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_maximized_horz)
-        action = _max_horz ? State_Remove : State_Add;
+        action = _max_horz ? otk::Property::atoms.net_wm_state_remove :
+                             otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_shaded)
-        action = _shaded ? State_Remove : State_Add;
+        action = _shaded ? otk::Property::atoms.net_wm_state_remove :
+                           otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_skip_taskbar)
-        action = _skip_taskbar ? State_Remove : State_Add;
+        action = _skip_taskbar ? otk::Property::atoms.net_wm_state_remove :
+                                 otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_skip_pager)
-        action = _skip_pager ? State_Remove : State_Add;
+        action = _skip_pager ? otk::Property::atoms.net_wm_state_remove :
+                               otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_fullscreen)
-        action = _fullscreen ? State_Remove : State_Add;
+        action = _fullscreen ? otk::Property::atoms.net_wm_state_remove :
+                               otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_above)
-        action = _above ? State_Remove : State_Add;
+        action = _above ? otk::Property::atoms.net_wm_state_remove :
+                          otk::Property::atoms.net_wm_state_add;
       else if (state == otk::Property::atoms.net_wm_state_below)
-        action = _below ? State_Remove : State_Add;
+        action = _below ? otk::Property::atoms.net_wm_state_remove :
+                          otk::Property::atoms.net_wm_state_add;
     }
     
-    if (action == State_Add) {
+    if (action == otk::Property::atoms.net_wm_state_add) {
       if (state == otk::Property::atoms.net_wm_state_modal) {
         if (_modal) continue;
         _modal = true;
@@ -944,7 +954,7 @@ void Client::setState(StateAction action, long data1, long data2)
         _below = true;
       }
 
-    } else { // action == State_Remove
+    } else { // action == otk::Property::atoms.net_wm_state_remove
       if (state == otk::Property::atoms.net_wm_state_modal) {
         if (!_modal) continue;
         _modal = false;
@@ -1108,7 +1118,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
             e.data.l[0] == 2 ? "Toggle" : "INVALID"),
            e.data.l[1], e.data.l[2], _window);
 #endif
-    setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
+    setState(e.data.l[0], e.data.l[1], e.data.l[2]);
   } else if (e.message_type == otk::Property::atoms.net_close_window) {
 #ifdef DEBUG
     printf("net_close_window for 0x%lx\n", _window);
@@ -1140,6 +1150,14 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
     focus();
     if (e.data.l[1])
       openbox->screen(_screen)->raiseWindow(this);
+  } else if (e.message_type == otk::Property::atoms.openbox_restack_window) {
+#ifdef DEBUG
+    printf("openbox_restack_window for 0x%lx\n", _window);
+#endif
+    if (e.data.l[0] == 0)
+      openbox->screen(_screen)->raiseWindow(this);
+    else if (e.data.l[0] == 1)
+      openbox->screen(_screen)->lowerWindow(this);
   }
 }
 

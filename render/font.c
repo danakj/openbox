@@ -64,15 +64,9 @@ static void measure_font(RrFont *f)
     XGlyphInfo info;
 
     /* measure an elipses */
-#ifndef USE_PANGO
     XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
                        (FcChar8*)ELIPSES, strlen(ELIPSES), &info);
     f->elipses_length = (signed) info.xOff;
-#else /* USE_PANGO */
-    XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
-                       (FcChar8*)ELIPSES, strlen(ELIPSES), &info);
-    f->elipses_length = (signed) info.xOff;
-#endif /* USE_PANGO */
 }
 
 static RrFont *openfont(const RrInstance *inst, gchar *fontstring)

@@ -2623,16 +2623,7 @@ void client_activate(ObClient *self, gboolean here)
        about raising the window. when a fullscreen window loses focus, we need
        this or else the raise wont be able to raise above the to-lose-focus
        fullscreen window. */
-    {
-        ObAction *a;
-        GSList *l = NULL;
-
-        a = action_from_string("Raise", OB_USER_ACTION_NONE);
-        g_assert(a);
-        l = g_slist_append(NULL, a);
-
-        action_run(l, self, 0);
-    }
+    action_run_string("Raise", self);
 }
 
 gboolean client_focused(ObClient *self)

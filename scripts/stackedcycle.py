@@ -56,10 +56,8 @@ class _cycledata:
         self.cycling = 0
 
     def createpopup(self):
-        self.style = self.screen.style()
-        self.widget = otk.Widget(ob.openbox, self.style, otk.Widget.Vertical,
-                                 0, self.style.bevelWidth(), 1)
-        self.widget.setTexture(self.style.titlebarFocusBackground())
+        self.widget = otk.Widget(self.screen.number(), ob.openbox,
+                                 otk.Widget.Vertical, 0, 1)
 
     def destroypopup(self):
         self.menuwidgets = []
@@ -101,10 +99,6 @@ class _cycledata:
             else: self.clients.append(c)
         self.clients.extend(iconic_clients)
 
-        font = self.style.labelFont()
-        longest = 0
-        height = font.height()
-            
         # make the widgets
         i = 0
         self.menuwidgets = []
@@ -115,12 +109,14 @@ class _cycledata:
                 self.clients.pop(i) 
                 continue
             
-            w = otk.FocusLabel(self.widget)
+            w = otk.Label(self.widget)
             if current and c.window() == current.window():
                 self.menupos = i
-                w.focus()
+                #w.focus() XXX
+                pass
             else:
-                w.unfocus()
+                #w.unfocus() XXX
+                pass
             self.menuwidgets.append(w)
 
             if c.iconic(): t = c.iconTitle()
@@ -128,8 +124,6 @@ class _cycledata:
             if len(t) > TITLE_SIZE_LIMIT: # limit the length of titles
                 t = t[:TITLE_SIZE_LIMIT / 2 - 2] + "..." + \
                     t[0 - TITLE_SIZE_LIMIT / 2 - 2:]
-            length = font.measureString(t)
-            if length > longest: longest = length
             w.setText(t)
 
             i += 1
@@ -142,18 +136,20 @@ class _cycledata:
             else:
                 self.menupos = oldpos
 
-        # fit to the largest item in the menu
+        # find the size for the popup
+        width = 0
+        height = 0
         for w in self.menuwidgets:
-            w.fitSize(longest, height)
-
+            size = w.minSize()
+            if size.width() > width: width = size.width()
+            height += size.height()
+        
         # show or hide the list and its child widgets
         if len(self.clients) > 1:
-            area = self.screeninfo.rect()
-            self.widget.update()
-            self.widget.move(area.x() + (area.width() -
-                                         self.widget.width()) / 2,
-                             area.y() + (area.height() -
-                                         self.widget.height()) / 2)
+            size = self.screeninfo.size()
+            self.widget.resize(otk.Size(width, height))
+            self.widget.move(otk.Point((size.width() - width) / 2,
+                                       (size.height() - height) / 2))
             self.widget.show(1)
 
     def activatetarget(self, final):
@@ -196,7 +192,7 @@ class _cycledata:
 
         if not len(self.clients): return # don't both doing anything
         
-        self.menuwidgets[self.menupos].unfocus()
+        #self.menuwidgets[self.menupos].unfocus() XXX
         if forward:
             self.menupos += 1
         else:
@@ -204,7 +200,7 @@ class _cycledata:
         # wrap around
         if self.menupos < 0: self.menupos = len(self.clients) - 1
         elif self.menupos >= len(self.clients): self.menupos = 0
-        self.menuwidgets[self.menupos].focus()
+        #self.menuwidgets[self.menupos].focus() XXX
         if ACTIVATE_WHILE_CYCLING:
             self.activatetarget(0) # activate, but dont deiconify/unshade/raise
 

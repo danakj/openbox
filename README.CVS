@@ -1,13 +1,13 @@
 To build Openbox from CVS you need:
 
 A C Compiler (GNU GCC 3.2+ suggested)
-GNU Gettext 0.11.5
+GNU Gettext
 GNU Autoconf 2.50+
-GNU Automake 1.7.1+ (1.7.1 has a bug fix for py-compile)
 GNU Libtool
+GNU Bison 1.875+
+GNU Flex
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
-Python library/headers (devel package) (http://www.python.org)
 Pkg-Config
 
 I recommend the latest version of all these packages.
@@ -29,13 +29,11 @@ The installed binary is 'openbox3'.
 Here's the packages from Debian (sid):
   gcc
   gettext
-  automake1.7
   autoconf
   libtool
-  pkg-config
+  bison
+  flex
   libxft2-dev
-  python-dev
+  pkg-config
 
 ----
-Check out the Wiki for how to configure Openbox 3:
-http://icculus.org/openbox/phpwiki/index.php/PythonScripting

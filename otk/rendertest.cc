@@ -14,7 +14,7 @@ int main(int argc, char **argv)
   
   otk::RenderControl *rc = otk::RenderControl::getRenderControl(0);
 
-  rc->render(foo.window());
+  rc->render(&foo);
 
   app.run();
 

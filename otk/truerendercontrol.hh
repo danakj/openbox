@@ -17,7 +17,7 @@ public:
   TrueRenderControl(const ScreenInfo *screen);
   virtual ~TrueRenderControl();
 
-  virtual void render(::Window w);
+  virtual void render(Widget *wi);
 };
 
 }

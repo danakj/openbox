@@ -7,6 +7,7 @@
 #include "truerendercontrol.hh"
 #include "display.hh"
 #include "screeninfo.hh"
+#include "widget.hh"
 
 extern "C" {
 #ifdef    HAVE_STDLIB_H
@@ -145,13 +146,15 @@ void renderPixel(XImage *im, unsigned char *dp, unsigned long pixel)
   }
 }
 
-void TrueRenderControl::render(::Window win)
+void TrueRenderControl::render(Widget *wi)
 {
+  assert(wi);
+  
   XGCValues gcv;
   gcv.cap_style = CapProjecting;
 
-  int w = 255, h = 32;
-  Pixmap p = XCreatePixmap(**display, win, w, h, _screen->depth());
+  int w = 255, h = 31;
+  Pixmap p = XCreatePixmap(**display, wi->window(), w, h, _screen->depth());
   XImage *im = XCreateImage(**display, _screen->visual(), _screen->depth(),
 			    ZPixmap, 0, NULL, w, h, 32, 0);
   //GC gc = XCreateGC(**display, _screen->rootWindow(), GCCapStyle, &gcv);
@@ -171,8 +174,6 @@ void TrueRenderControl::render(::Window win)
   for (int y = 0; y < 10; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
       renderPixel(im, dp, _blue_color_table[x] << _blue_offset);
-  for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-    renderPixel(im, dp, 0);
 
   printf("\nDone\n");
 
@@ -185,8 +186,8 @@ void TrueRenderControl::render(::Window win)
   //image->data = NULL;
   XDestroyImage(im);
 
-  XSetWindowBackgroundPixmap(**display, win, p);
-  XClearWindow(**display, win);
+  XSetWindowBackgroundPixmap(**display, wi->window(), p);
+  XClearWindow(**display, wi->window());
 
   XFreePixmap(**display, p);
 }

@@ -10,6 +10,7 @@ extern "C" {
 namespace otk {
 
 class ScreenInfo;
+class Widget;
 
 class RenderControl {
 protected:
@@ -67,7 +68,7 @@ public:
 
   static RenderControl *getRenderControl(int screen);
 
-  virtual void render(::Window w) = 0;
+  virtual void render(Widget *wi) = 0;
 };
 
 }

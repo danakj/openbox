@@ -1,6 +1,12 @@
 Changelog for Openbox:
 2.2.0
- * Bitmap buttons					(Scott Moynes)
+ * Allow changing the appearance of buttons with xbm	(Scott Moynes)
+   bitmap files
+ 
+ * Fixed window menu placement bug			(Scott Moynes)
+ 
+ * Added style textures for				(Scott Moynes)
+   window.button.pressed.focus/unfocus:
 
 2.1.1:
  * A build fix for xftlsfonts.                          (Scott Moynes)
@@ -23,9 +29,9 @@ Changelog for Openbox:
    and then its ".borderColor" resource will be used
    for a 1 pixel-wide border around the element.
 
- * Add an optional Sticky button for window titlebars.
+ * Add an optional Sticky button for window titlebars.	(Scott Moynes)
    It can be added by putting an 'S' in your
-   titlebarLayout.                                      (Scott Moynes)
+   titlebarLayout.                                      
 
  * Fix SendTo menus. They would keep workspaces that
    had been deleted.                                    (Ben Jansens)

@@ -1264,21 +1264,28 @@ void BScreen::changeWorkspaceID(unsigned int id) {
       XQueryPointer(blackbox->getXDisplay(), getRootWindow(), &r, &c,
                     &rx, &ry, &x, &y, &m) &&
       c != None) {
-    if ( (win = blackbox->searchWindow(c)) ) {
+    if ( (win = blackbox->searchWindow(c)) )
       f = win->setInputFocus();
-      blackbox->setFocusedWindow(win);
-    }        
   }
 
   // If that fails, and we're doing focus_last, try to focus the last window.
   if (! f && resource.focus_last &&
-      (win = current_workspace->getLastFocusedWindow())) {
+      (win = current_workspace->getLastFocusedWindow()))
     f = win->setInputFocus();
-    blackbox->setFocusedWindow(win);
-  }
 
-  // If that fails, then set focus to nothing.
-  if (! f) blackbox->setFocusedWindow((BlackboxWindow *) 0);
+  /*
+    if we found a focus target, then we set the focused window explicitly
+    because it is possible to switch off this workspace before the x server
+    generates the FocusIn event for the window. if that happens, openbox would
+    lose track of what window was the 'LastFocused' window on the workspace.
+
+    if we did not find a focus target, then set the current focused window to
+    nothing.
+  */
+  if (f)
+    blackbox->setFocusedWindow(win);
+  else
+    blackbox->setFocusedWindow((BlackboxWindow *) 0);
 
   updateNetizenCurrentWorkspace();
 }

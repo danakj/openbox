@@ -108,6 +108,8 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         inst->surface_map = g_hash_table_new(g_int_hash, g_int_equal);
 
         assert(inst->glx_context);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         return inst;
     }

@@ -56,7 +56,6 @@ X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
 AC_CONFIG_FILES([Makefile po/Makefile.in
-		c/Makefile
 		kernel/Makefile
 		render/Makefile
 		engines/Makefile

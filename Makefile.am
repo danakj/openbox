@@ -37,7 +37,12 @@ render_rendertest_CPPFLAGS = \
 	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"RenderTest\"
-render_rendertest_LDADD = render/libobrender.la
+render_rendertest_LDADD = \
+	parser/libobparser.la \
+	render/libobrender.la \
+	$(XFT_LIBS) \
+	$(GLIB_LIBS) \
+	$(XML_LIBS)
 render_rendertest_SOURCES = render/test.c
 
 render_libobrender_la_CPPFLAGS = \
@@ -48,10 +53,7 @@ render_libobrender_la_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LIBADD = \
-	$(X_LIBS) \
-	$(XFT_LIBS) \
-	$(GLIB_LIBS) \
-	parser/libobparser.la
+	$(X_LIBS)
 render_libobrender_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 render_libobrender_la_SOURCES = \
@@ -84,9 +86,6 @@ parser_libobparser_la_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DDATADIR=\"$(datadir)\" \
 	-DCONFIGDIR=\"$(configdir)\"
-parser_libobparser_la_LIBADD = \
-	$(GLIB_LIBS) \
-	$(XML_LIBS)
 parser_libobparser_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 parser_libobparser_la_SOURCES = \
@@ -108,6 +107,7 @@ openbox_openbox_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"Openbox\"
 openbox_openbox_LDADD = \
 	$(SM_LIBS) \
+	$(XFT_LIBS) \
 	$(XINERAMA_LIBS) \
 	$(XKB_LIBS) \
 	$(XRANDR_LIBS) \

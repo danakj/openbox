@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: ObParser
 Description: Openbox config file parsing library
 Version: @VERSION@
-Requires: libxml-2.0
+Requires: libxml-2.0 glib-2.0
 Libs: -L${libdir} -lobparser
 Cflags: -I${includedir}/openbox/@OB_VERSION@

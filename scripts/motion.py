@@ -124,7 +124,6 @@ def move(data):
     global _inmove
     if not _inmove:
         ob.kgrab(_screen, _motion_grab)
-        print "GRAB"
         _inmove = 1
 
 def end_move(data):
@@ -139,7 +138,6 @@ def end_move(data):
         _inmove = 0
     _poplabel = 0
     _popwidget = 0
-    print "UNGRAB"
     ob.kungrab()
 
 def _do_resize():

@@ -38,6 +38,7 @@ private:
   OtkEventHandler *_master;
   Window _focus;
   XEvent _focus_e;
+  XEvent _crossing_e;
 
   //! The time at which the last XEvent with a time was received
   Time _lasttime; // XXX: store this! also provide an accessor!

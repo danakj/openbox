@@ -51,7 +51,7 @@ def def_doubleclick_client(action, win, type, modifiers, button, time):
 		print "OBClient_toggleshade(client)"
 
 
-preregister(Action_ButtonPress, def_press_model)
+#preregister(Action_ButtonPress, def_press_model)
 register(Action_Click, def_click_client)
 register(Action_Click, def_click_root)
 register(Action_DoubleClick, def_doubleclick_client)

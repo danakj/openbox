@@ -156,6 +156,6 @@ void truecolor_startup(void);
 void pseudocolor_startup(void);
 void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h);
 
-void appearance_minsize(Appearance *l, Size *s);
+void appearance_minsize(Appearance *l, int *w, int *h);
 
 #endif /*__render_h*/

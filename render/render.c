@@ -416,43 +416,43 @@ void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
     free(scratch);
 }
 
-void appearance_minsize(Appearance *l, Size *s)
+void appearance_minsize(Appearance *l, int *w, int *h)
 {
     int i;
-    SIZE_SET(*s, 0, 0);
+    *w = *h = 1;
 
     switch (l->surface.type) {
     case Surface_Planar:
         if (l->surface.data.planar.relief != Flat) {
             switch (l->surface.data.planar.bevel) {
             case Bevel1:
-                SIZE_SET(*s, 2, 2);
+                *w = *h = 2;
                 break;
             case Bevel2:
-                SIZE_SET(*s, 4, 4);
+                *w = *h = 4;
                 break;
             }
         } else if (l->surface.data.planar.border)
-            SIZE_SET(*s, 2, 2);
+            *w = *h = 2;
 
         for (i = 0; i < l->textures; ++i)
             switch (l->texture[i].type) {
             case Bitmask:
-                s->width += l->texture[i].data.mask.mask->w;
-                s->height += l->texture[i].data.mask.mask->h;
+                *w += l->texture[i].data.mask.mask->w;
+                *h += l->texture[i].data.mask.mask->h;
                 break;
             case Text:
-                s->width +=font_measure_string(l->texture[i].data.text.font,
-                                               l->texture[i].data.text.string,
-                                               l->texture[i].data.text.shadow,
-                                               l->texture[i].data.text.offset);
-                s->height +=  font_height(l->texture[i].data.text.font,
-                                          l->texture[i].data.text.shadow,
-                                          l->texture[i].data.text.offset);
+                *w +=font_measure_string(l->texture[i].data.text.font,
+                                         l->texture[i].data.text.string,
+                                         l->texture[i].data.text.shadow,
+                                         l->texture[i].data.text.offset);
+                *h +=  font_height(l->texture[i].data.text.font,
+                                   l->texture[i].data.text.shadow,
+                                   l->texture[i].data.text.offset);
                 break;
             case RGBA:
-                s->width += l->texture[i].data.rgba.width;
-                s->height += l->texture[i].data.rgba.height;
+                *w += l->texture[i].data.rgba.width;
+                *h += l->texture[i].data.rgba.height;
                 break;
             case NoTexture:
                 break;

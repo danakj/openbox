@@ -112,13 +112,9 @@ void event_loop()
     select(x_fd + 1, &selset, NULL, NULL, wait);
 }
 
-void event_process(XEvent *e)
+static Window event_get_window(XEvent *e)
 {
-    XEvent ce;
-    KeyCode *kp;
     Window window;
-    int i, k;
-    Client *client;
 
     /* pick a window */
     switch (e->type) {
@@ -147,49 +143,60 @@ void event_process(XEvent *e)
 #endif
             window = e->xany.window;
     }
-     
-    client = g_hash_table_lookup(client_map, &window);
+    return window;
+}
 
+static void event_set_lasttime(XEvent *e)
+{
     /* grab the lasttime and hack up the state */
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
 	event_lasttime = e->xbutton.time;
-	e->xbutton.state &= ~(LockMask | NumLockMask | ScrollLockMask);
-	/* kill off the Button1Mask etc, only want the modifiers */
-	e->xbutton.state &= (ControlMask | ShiftMask | Mod1Mask |
-			     Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
 	break;
     case KeyPress:
 	event_lasttime = e->xkey.time;
-	e->xkey.state &= ~(LockMask | NumLockMask | ScrollLockMask);
-	/* kill off the Button1Mask etc, only want the modifiers */
-	e->xkey.state &= (ControlMask | ShiftMask | Mod1Mask |
-			  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-	/* add to the state the mask of the modifier being pressed, if it is
-	   a modifier key being pressed (this is a little ugly..) */
-/* I'm commenting this out cuz i don't want "C-Control_L" being returned. */
-/*	kp = modmap->modifiermap;*/
-/*	for (i = 0; i < mask_table_size; ++i) {*/
-/*	    for (k = 0; k < modmap->max_keypermod; ++k) {*/
-/*		if (*kp == e->xkey.keycode) {*/ /* found the keycode */
-		    /* add the mask for it */
-/*		    e->xkey.state |= mask_table[i];*/
-		    /* cause the first loop to break; */
-/*		    i = mask_table_size;*/
-/*		    break;*/ /* get outta here! */
-/*		}*/
-/*		++kp;*/
-/*	    }*/
-/*	}*/
-
 	break;
     case KeyRelease:
 	event_lasttime = e->xkey.time;
-	e->xkey.state &= ~(LockMask | NumLockMask | ScrollLockMask);
-	/* kill off the Button1Mask etc, only want the modifiers */
-	e->xkey.state &= (ControlMask | ShiftMask | Mod1Mask |
-			  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+	break;
+    case MotionNotify:
+	event_lasttime = e->xmotion.time;
+	break;
+    case PropertyNotify:
+	event_lasttime = e->xproperty.time;
+	break;
+    case EnterNotify:
+    case LeaveNotify:
+	event_lasttime = e->xcrossing.time;
+	break;
+    default:
+        event_lasttime = CurrentTime;
+        break;
+    }
+}
+
+#define STRIP_MODS(s) \
+	s &= ~(LockMask | NumLockMask | ScrollLockMask), \
+	/* kill off the Button1Mask etc, only want the modifiers */ \
+	s &= (ControlMask | ShiftMask | Mod1Mask | \
+              Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask) \
+
+static void event_hack_mods(XEvent *e)
+{
+    KeyCode *kp;
+    int i, k;
+
+    switch (e->type) {
+    case ButtonPress:
+    case ButtonRelease:
+        STRIP_MODS(e->xbutton.state);
+	break;
+    case KeyPress:
+        STRIP_MODS(e->xkey.state);
+	break;
+    case KeyRelease:
+        STRIP_MODS(e->xkey.state);
 	/* remove from the state the mask of the modifier being released, if
 	   it is a modifier key being released (this is a little ugly..) */
 	kp = modmap->modifiermap;
@@ -207,20 +214,23 @@ void event_process(XEvent *e)
 	}
 	break;
     case MotionNotify:
-	event_lasttime = e->xmotion.time;
-	e->xmotion.state &= ~(LockMask | NumLockMask | ScrollLockMask);
-	/* kill off the Button1Mask etc, only want the modifiers */
-	e->xmotion.state &= (ControlMask | ShiftMask | Mod1Mask |
-			     Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+        STRIP_MODS(e->xmotion.state);
 	/* compress events */
-	while (XCheckTypedWindowEvent(ob_display, window, e->type, &ce)) {
-	    e->xmotion.x_root = ce.xmotion.x_root;
-	    e->xmotion.y_root = ce.xmotion.y_root;
+        {
+            XEvent ce;
+            while (XCheckTypedWindowEvent(ob_display, e->xmotion.window,
+                                          e->type, &ce)) {
+                e->xmotion.x_root = ce.xmotion.x_root;
+                e->xmotion.y_root = ce.xmotion.y_root;
+            }
 	}
 	break;
-    case PropertyNotify:
-	event_lasttime = e->xproperty.time;
-	break;
+    }
+}
+
+static gboolean event_ignore(XEvent *e, Client *client)
+{
+    switch(e->type) {
     case FocusIn:
 #ifdef DEBUG_FOCUS
         g_message("FocusIn on %lx mode %d detail %d", window,
@@ -239,7 +249,7 @@ void event_process(XEvent *e)
                event was not found.
             */
             e->xfocus.window = None;
-            return;
+            return TRUE;
         }
 
 #ifdef DEBUG_FOCUS
@@ -254,7 +264,7 @@ void event_process(XEvent *e)
 	if (e->xfocus.mode == NotifyGrab ||
             e->xfocus.detail == NotifyInferior ||
             e->xfocus.detail == NotifyAncestor ||
-            e->xfocus.detail > NotifyNonlinearVirtual) return;
+            e->xfocus.detail > NotifyNonlinearVirtual) return TRUE;
  
 #ifdef DEBUG_FOCUS
        g_message("FocusOut on %lx", window);
@@ -279,24 +289,34 @@ void event_process(XEvent *e)
                 if (!isfo && fi.xfocus.window == None)
                     focus_fallback(Fallback_NoFocus);
                 if (fi.xfocus.window == e->xfocus.window)
-                    return;
+                    return TRUE;
             } else
                 focus_fallback(Fallback_NoFocus);
         }
 	break;
     case EnterNotify:
     case LeaveNotify:
-	event_lasttime = e->xcrossing.time;
         /* NotifyUngrab occurs when a mouse button is released and the event is
            caused, like when lowering a window */
         if (e->xcrossing.mode == NotifyGrab ||
             e->xcrossing.detail == NotifyInferior)
-            return;
+            return TRUE;
 	break;
-    default:
-        event_lasttime = CurrentTime;
-        break;
     }
+    return FALSE;
+}
+
+static void event_process(XEvent *e)
+{
+    Window window;
+    Client *client;
+
+    window = event_get_window(e);
+    client = g_hash_table_lookup(client_map, &window);
+    event_set_lasttime(e);
+    event_hack_mods(e);
+    if (event_ignore(e, client))
+        return;
 
     /* deal with it in the kernel */
     if (client)
@@ -325,6 +345,15 @@ void event_process(XEvent *e)
 			 e->xconfigurerequest.value_mask, &xwc);
 	xerror_set_ignore(FALSE);
     }
+
+    /* user input (action-bound) events */
+    /*
+    if (e->type == ButtonPress || e->type == ButtonRelease ||
+        e->type == MotionNotify)
+        mouse_event(e, client);
+    else if (e->type == KeyPress || e->type == KeyRelease)
+        ;
+    */
 
     /* dispatch the event to registered handlers */
     dispatch_x(e, client);

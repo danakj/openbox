@@ -13,7 +13,7 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-#define LABEL_HEIGHT    (s_winfont_height)
+#define LABEL_HEIGHT    (s_winfont_height + 2)
 #define TITLE_HEIGHT    (LABEL_HEIGHT + s_bevel * 2)
 #define HANDLE_Y(f)     (f->innersize.top + f->frame.client->area.height + \
 		         f->cbwidth)

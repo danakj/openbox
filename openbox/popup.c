@@ -77,9 +77,9 @@ Popup *popup_new(gboolean hasicon)
 
 void popup_free(Popup *self)
 {
-    RrSurfaceFree(self->s_bg);
     RrSurfaceFree(self->s_icon);
     RrSurfaceFree(self->s_text);
+    RrSurfaceFree(self->s_bg);
     XDestroyWindow(ob_display, self->bg);
     stacking_remove(self);
     g_free(self);

@@ -128,6 +128,10 @@ void Property::initialize()
   atoms.net_wm_state_above = create("_NET_WM_STATE_ABOVE");
   atoms.net_wm_state_below = create("_NET_WM_STATE_BELOW");
   
+  atoms.net_wm_state_add = 1;
+  atoms.net_wm_state_remove = 0;
+  atoms.net_wm_state_toggle = 2;
+
   atoms.kde_net_system_tray_windows = create("_KDE_NET_SYSTEM_TRAY_WINDOWS");
   atoms.kde_net_wm_system_tray_window_for =
     create("_KDE_NET_WM_SYSTEM_TRAY_WINDOW_FOR");
@@ -141,6 +145,7 @@ void Property::initialize()
 
   atoms.openbox_premax = create("_OPENBOX_PREMAX");
   atoms.openbox_active_window = create("_OPENBOX_ACTIVE_WINDOW");
+  atoms.openbox_restack_window = create("_OPENBOX_RESTACK_WINDOW");
 }
 
 void Property::set(Window win, Atom atom, Atom type, unsigned char* data,

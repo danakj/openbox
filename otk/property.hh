@@ -121,6 +121,10 @@ struct Atoms {
   Atom net_wm_state_above;
   Atom net_wm_state_below;
 
+  Atom net_wm_state_add;
+  Atom net_wm_state_remove;
+  Atom net_wm_state_toggle;
+
   Atom kde_net_system_tray_windows;
   Atom kde_net_wm_system_tray_window_for;
   Atom kde_net_wm_window_type_override;
@@ -132,6 +136,7 @@ struct Atoms {
 
   Atom openbox_premax;
   Atom openbox_active_window;
+  Atom openbox_restack_window;
 };
 
 

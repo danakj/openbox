@@ -33,9 +33,7 @@ public:
     Atom_String,   //!< The atom which represents ascii strings
     Atom_Utf8,     //!< The atom which represents utf8-encoded strings
     
-#ifdef    HAVE_GETPID
     openbox_pid,
-#endif // HAVE_GETPID
 
     // window hints
     wm_colormap_windows,
@@ -160,7 +158,7 @@ public:
 private:
   //! The value of all atoms on the X server that exist in the
   //! OBProperty::Atoms enum
-  Atom                  _atoms[NUM_ATOMS];
+  Atom _atoms[NUM_ATOMS];
 
   //! Gets the value of an Atom from the X server, creating it if nessesary
   Atom create(const char *name) const;

@@ -29,9 +29,7 @@ OBProperty::OBProperty()
   _atoms[Atom_String] = XA_STRING;
   _atoms[Atom_Utf8] = create("UTF8_STRING");
   
-#ifdef    HAVE_GETPID
   _atoms[openbox_pid] = create("_OPENBOX_PID");
-#endif // HAVE_GETPID
 
   _atoms[wm_colormap_windows] = create("WM_COLORMAP_WINDOWS");
   _atoms[wm_protocols] = create("WM_PROTOCOLS");
@@ -162,7 +160,9 @@ OBProperty::~OBProperty()
  */
 Atom OBProperty::create(const char *name) const
 {
-  return XInternAtom(OBDisplay::display, name, False);
+  Atom a = XInternAtom(OBDisplay::display, name, False);
+  assert(a);
+  return a;
 }
 
 

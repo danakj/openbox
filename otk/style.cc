@@ -14,13 +14,9 @@ Style::Style() : font(NULL)
 {
 }
 
-Style::Style(unsigned int screen)
-  : font(0), screen_number(screen)
-{
-}
-
-Style::Style(unsigned int screen, BImageControl *ctrl)
-  : image_control(ctrl), font(0), screen_number(screen)
+Style::Style(BImageControl *ctrl)
+  : image_control(ctrl), font(0),
+    screen_number(ctrl->getScreenInfo()->getScreenNumber())
 {
 }
 
@@ -43,7 +39,7 @@ Style::~Style() {
   stick_button.mask = None;
 }
 
-void Style::load(Configuration &style) {
+void Style::load(const Configuration &style) {
   std::string s;
 
   // load fonts/fontsets
@@ -302,7 +298,11 @@ BFont *Style::readDatabaseFont(const std::string &rbasename,
       return b;
     delete b;
   }
-    
+
+  if (style.getValue(rbasename + "xft.font", s))
+    printf("Unable to load font \"%s\". Exiting\n", s.c_str());
+  else
+    printf("Font not defined by style. Exiting\n");
   exit(2);  // can't continue without a font
 }
 

@@ -62,8 +62,7 @@ public:
 public:
 
   Style();
-  Style(unsigned int);
-  Style(unsigned int, BImageControl *);
+  Style(BImageControl *);
   ~Style();
 
   void doJustify(const std::string &text, int &start_pos,
@@ -85,7 +84,7 @@ public:
   BFont *readDatabaseFont(const std::string &rbasename,
                           const Configuration &style);
 
-  void load(Configuration &);
+  void load(const Configuration &style);
 
   inline BColor *getBorderColor(void) { return &border_color; }
 
@@ -134,8 +133,10 @@ public:
   inline const BTexture &getFrameFocus() const { return f_focus; }
   inline const BTexture &getFrameUnfocus() const { return f_unfocus; }
 
-  inline void setImageControl(BImageControl *c) { image_control = c; }
-  inline void setScreenNumber(unsigned int scr) { screen_number = scr; }
+  inline void setImageControl(BImageControl *c) {
+    image_control = c;
+    screen_number = c->getScreenInfo()->getScreenNumber();
+  }
   inline unsigned int getScreen(void) { return screen_number; }
 
   // XXX add inline accessors for the rest of the bummy

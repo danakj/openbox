@@ -41,7 +41,6 @@ def simple_replace(data):
     pairs['window.unfocus.font'] = 'window.label.unfocus.font'
     pairs['window.justify'] = 'window.label.justify'
     pairs['menu.frame.disableColor'] = 'menu.disabled.textColor'
-    pairs['style.']  = 'info.'
     pairs['menu.frame'] = 'menu.items'
     pairs['menu.hilite'] = 'menu.selected'
     pairs['.picColor'] = '.imageColor'
@@ -165,6 +164,20 @@ def xft_fonts(data):
             out('Removing ' + key + '\n')
             data.pop(i)
 
+def pixelsize(data):
+    fonts = ('window.label.focus.font',
+             'menu.items.font',
+             'menu.title.font')
+    for f in fonts:
+        i, key, value = find_key(data, f, True)
+        if value:
+            if value.find('pixelsize') == -1:
+                out('*** ERROR *** The ' + key + ' font size is not being '
+                    'specified by pixelsize. It is recommended that you use '
+                    'pixelsize instead of pointsize for specifying theme '
+                    'fonts. e.g. "sans:pixelsize=12"\n')
+                valid = False
+
 def warn_missing(data):
     need = ('window.button.hover.focus',  'window.button.hover.unfocus',
             'menuOverlap')
@@ -209,6 +222,7 @@ remove(data)
 pressed(data)
 x_fonts(data)
 xft_fonts(data)
+pixelsize(data)
 warn_missing(data)
 err_missing(data)
 

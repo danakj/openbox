@@ -597,10 +597,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                  e->xfocus.window, client->window,
                  e->xfocus.mode, e->xfocus.detail);
 #endif
+        focus_out = client;
         if (focus_in == client)
             focus_in = NULL;
-        if (client == focus_client)
-            focus_out = client;
         break;
     case LeaveNotify:
         con = frame_context(client, e->xcrossing.window);

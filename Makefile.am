@@ -8,6 +8,7 @@ desktopfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
+xsddir          = $(datadir)/openbox
 userscriptdir   = $(datadir)/openbox
 
 theme = TheBear
@@ -269,9 +270,17 @@ nodist_pkgconfig_DATA = \
 dist_pixmap_DATA = \
 	data/openbox.png
 
-dist_rc_DATA = \
+nodist_rc_DATA = \
 	data/rc.xml \
 	data/menu.xml
+
+dist_xsd_DATA = \
+	data/rc.xsd
+	data/menu.xsd
+
+%.xml: %.xml.in
+	@echo make: creating $@
+	@$(SED) -e 's!@version@!$(VERSION)!' -e 's!@xsddir@!$(xsddir)!' $^ > $@
 
 dist_userscript_DATA = \
 	tools/themeupdate/themeupdate.py
@@ -283,6 +292,8 @@ dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
+	data/rc.xml.in \
+	data/menu.xml.in \
 	render/obrender-3.0.pc.in \
 	parser/obparser-3.0.pc.in
 

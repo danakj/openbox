@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     xml Schema for the openbox windowmanager configuration file
+
+     Changes:
+     Son Aug 10 15:49:10 CEST 2003 - pch(a)myzel.net
+         restrictions added, up to current format
+     Don Aug 14 21:10:27 CEST 2003 - pch(a)myzel.net
+         up to current (from action.c,config.c)
+     Don Aug 21 23:07:30 CEST 2003 - pch(a)myzel.net
+         new element - follow
+     Mon Sep  1 00:57:55 CEST 2003 - pch(a)myzel.net
+         up to alpha7
+     Mit Sep  3 12:40:10 CEST 2003 - pch(a)myzel.net
+         up to alpha8, a little documentation
+     Mon Sep  8 11:52:07 CEST 2003 - pch(a)myzel.net
+         up to cvs 1.12
+     Mon Sep 15 14:27:42 CEST 2003 - pch(a)myzel.net
+         up to cvs 1.14
+     Die Sep 16 20:56:37 CEST 2003 - pch(a)myzel.net
+         use a namespace
+     Fri Sep 19 14:36:33 EDT 2003 - xor(a)orodu.net
+         use openbox.org for namespace
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openbox.org/"
+    xmlns:ob="http://openbox.org/"
+    elementFormDefault="qualified">
+    <!--
+         root node
+      -->
+    <xs:element name="openbox_config">
+        <xs:annotation>
+            <xs:documentation>all these elements are expected in a openbox config file</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="resistance" type="ob:resistance"/>
+                <xs:element name="focus" type="ob:focus"/>
+                <xs:element name="theme" type="ob:theme"/>
+                <xs:element name="desktops" type="ob:desktops"/>
+                <xs:element name="resize" type="ob:resize"/>
+                <xs:element name="dock" type="ob:dock"/>
+                <xs:element name="keyboard" type="ob:keyboard"/>
+                <xs:element name="mouse" type="ob:mouse"/>
+                <xs:element name="menu" type="ob:menu"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!--
+         complex types
+      -->
+    <xs:complexType name="resistance">
+        <xs:annotation>
+            <xs:documentation>defines behaviour of windows when close to eachother or the screen edge</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="strength" type="xs:integer"/>
+            <xs:element name="screen_edge_strength" type="xs:integer"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="focus">
+        <xs:annotation>
+            <xs:documentation>defines aspects of window focus</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="focusNew" type="ob:yesorno"/>
+            <xs:element name="followMouse" type="ob:yesorno"/>
+            <xs:element name="focusDelay" type="xs:integer"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="theme">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="titlelayout" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="desktops">
+        <xs:sequence>
+            <xs:element name="number" type="xs:integer"/>
+            <xs:element name="names">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="name" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="resize">
+        <xs:sequence>
+            <xs:element name="drawContents" type="ob:yesorno"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dock">
+        <xs:sequence>
+            <xs:element name="position" type="ob:position"/>
+            <xs:element name="stacking" type="ob:stacking"/>
+            <xs:element name="direction" type="ob:direction"/>
+            <xs:element name="floatingX" type="xs:integer"/>
+            <xs:element name="floatingY" type="xs:integer"/>
+            <xs:element name="autoHide" type="ob:yesorno"/>
+            <xs:element name="hideTimeout" type="xs:integer"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="action">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="menu" type="xs:string"/>
+            <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
+            <xs:element minOccurs="0" name="follow" type="ob:yesorno"/>
+            <xs:element minOccurs="0" name="execute" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="ob:actionname" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="keybind">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="action" type="ob:action"/>
+        </xs:sequence>
+        <xs:attribute name="key" type="ob:keyname" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="keyboard">
+        <xs:sequence>
+            <xs:element name="chainQuitKey" type="ob:keyname"/>
+            <xs:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="mousebind">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="action" type="ob:action"/>
+        </xs:sequence>
+        <xs:attribute name="action" type="ob:mouseaction" use="required"/>
+        <xs:attribute name="button" type="ob:button" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="context">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="mousebind" type="ob:mousebind"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="ob:contextname" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="mouse">
+        <xs:sequence>
+            <xs:element name="dragThreshold" type="xs:integer"/>
+            <xs:element name="doubleClickTime" type="xs:integer"/>
+            <xs:element maxOccurs="unbounded" name="context" type="ob:context"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="menu">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="file" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <!--
+         simple types / restrictions
+      -->
+    <xs:simpleType name="yesorno">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="position">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="topleft"/>
+            <xs:enumeration value="top"/>
+            <xs:enumeration value="topright"/>
+            <xs:enumeration value="right"/>
+            <xs:enumeration value="bottomright"/>
+            <xs:enumeration value="bottom"/>
+            <xs:enumeration value="bottomleft"/>
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="floating"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="stacking">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="top"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="bottom"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="direction">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="horizontal"/>
+            <xs:enumeration value="vertical"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="keyname">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(A-)?(S-)?(A-)?(C-)?(A-)?(S-)?(A-)?[a-zA-Z0-9]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="contextname">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="desktop"/>
+            <xs:enumeration value="client"/>
+            <xs:enumeration value="titlebar"/>
+            <xs:enumeration value="handle"/>
+            <xs:enumeration value="frame"/>
+            <xs:enumeration value="tlcorner"/>
+            <xs:enumeration value="trcorner"/>
+            <xs:enumeration value="blcorner"/>
+            <xs:enumeration value="brcorner"/>
+            <xs:enumeration value="maximize"/>
+            <xs:enumeration value="alldesktops"/>
+            <xs:enumeration value="shade"/>
+            <xs:enumeration value="iconify"/>
+            <xs:enumeration value="icon"/>
+            <xs:enumeration value="close"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="button">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Left"/>
+            <xs:enumeration value="Middle"/>
+            <xs:enumeration value="Right"/>
+            <xs:enumeration value="Up"/>
+            <xs:enumeration value="Down"/>
+            <xs:enumeration value="A-Left"/>
+            <xs:enumeration value="A-Middle"/>
+            <xs:enumeration value="A-Right"/>
+            <xs:enumeration value="A-Up"/>
+            <xs:enumeration value="A-Down"/>
+            <xs:enumeration value="C-A-Left"/>
+            <xs:enumeration value="C-A-Middle"/>
+            <xs:enumeration value="C-A-Right"/>
+            <xs:enumeration value="C-A-Up"/>
+            <xs:enumeration value="C-A-Down"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="mouseaction">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Click"/>
+            <xs:enumeration value="DoubleClick"/>
+            <xs:enumeration value="Drag"/>
+            <xs:enumeration value="Press"/>
+            <xs:enumeration value="Release"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="actionname">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Activate"/>
+            <xs:enumeration value="Close"/>
+            <xs:enumeration value="Desktop"/>
+            <xs:enumeration value="DesktopDown"/>
+            <xs:enumeration value="DesktopLast"/>
+            <xs:enumeration value="DesktopLeft"/>
+            <xs:enumeration value="DesktopNext"/>
+            <xs:enumeration value="DesktopPrevious"/>
+            <xs:enumeration value="DesktopRight"/>
+            <xs:enumeration value="DesktopUp"/>
+            <xs:enumeration value="DirectionalFocusEast"/>
+            <xs:enumeration value="DirectionalFocusNorth"/>
+            <xs:enumeration value="DirectionalFocusNortheast"/>
+            <xs:enumeration value="DirectionalFocusNorthwest"/>
+            <xs:enumeration value="DirectionalFocusSouth"/>
+            <xs:enumeration value="DirectionalFocusSoutheast"/>
+            <xs:enumeration value="DirectionalFocusSouthwest"/>
+            <xs:enumeration value="DirectionalFocusWest"/>
+            <xs:enumeration value="Execute"/>
+            <xs:enumeration value="Exit"/>
+            <xs:enumeration value="Focus"/>
+            <xs:enumeration value="GrowToEdgeEast"/>
+            <xs:enumeration value="GrowToEdgeNorth"/>
+            <xs:enumeration value="GrowToEdgeSouth"/>
+            <xs:enumeration value="GrowToEdgeWest"/>
+            <xs:enumeration value="Iconify"/>
+            <xs:enumeration value="Kill"/>
+            <xs:enumeration value="Lower"/>
+            <xs:enumeration value="MaximizeFull"/>
+            <xs:enumeration value="MaximizeHorz"/>
+            <xs:enumeration value="MaximizeVert"/>
+            <xs:enumeration value="Move"/>
+            <xs:enumeration value="MoveRelativeHorz"/>
+            <xs:enumeration value="MoveRelativeVert"/>
+            <xs:enumeration value="MoveToEdgeEast"/>
+            <xs:enumeration value="MoveToEdgeNorth"/>
+            <xs:enumeration value="MoveToEdgeSouth"/>
+            <xs:enumeration value="MoveToEdgeWest"/>
+            <xs:enumeration value="NextWindow"/>
+            <xs:enumeration value="NextWindowLinear"/>
+            <xs:enumeration value="PreviousWindow"/>
+            <xs:enumeration value="PreviousWindowLinear"/>
+            <xs:enumeration value="Raise"/>
+            <xs:enumeration value="RaiseLower"/>
+            <xs:enumeration value="Resize"/>
+            <xs:enumeration value="ResizeRelativeHorz"/>
+            <xs:enumeration value="ResizeRelativeVert"/>
+            <xs:enumeration value="Restart"/>
+            <xs:enumeration value="SendToBottomLayer"/>
+            <xs:enumeration value="SendToDesktop"/>
+            <xs:enumeration value="SendToDesktopDown"/>
+            <xs:enumeration value="SendToDesktopLeft"/>
+            <xs:enumeration value="SendToDesktopNext"/>
+            <xs:enumeration value="SendToDesktopPrevious"/>
+            <xs:enumeration value="SendToDesktopRight"/>
+            <xs:enumeration value="SendToDesktopUp"/>
+            <xs:enumeration value="SendToNormalLayer"/>
+            <xs:enumeration value="SendToTopLayer"/>
+            <xs:enumeration value="Shade"/>
+            <xs:enumeration value="ShadeLower"/>
+            <xs:enumeration value="ShowDesktop"/>
+            <xs:enumeration value="ShowMenu"/>
+            <xs:enumeration value="ToggleAlwaysOnBottom"/>
+            <xs:enumeration value="ToggleAlwaysOnTop"/>
+            <xs:enumeration value="ToggleDecorations"/>
+            <xs:enumeration value="ToggleMaximizeFull"/>
+            <xs:enumeration value="ToggleMaximizeHorz"/>
+            <xs:enumeration value="ToggleMaximizeVert"/>
+            <xs:enumeration value="ToggleOmnipresent"/>
+            <xs:enumeration value="ToggleShade"/>
+            <xs:enumeration value="ToggleShowDesktop"/>
+            <xs:enumeration value="Unfocus"/>
+            <xs:enumeration value="UnmaximizeFull"/>
+            <xs:enumeration value="UnmaximizeHorz"/>
+            <xs:enumeration value="UnmaximizeVert"/>
+            <xs:enumeration value="Unshade"/>
+            <xs:enumeration value="UnshadeRaise"/>
+            <xs:enumeration value="UnShowDesktop"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

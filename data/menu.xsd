@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     xml Schema for the openbox windowmanager menu file
+
+     Changes:
+     Don Aug 14 21:10:27 CEST 2003 - pch(a)myzel.net
+         split from rc3.xsd
+     Mon Sep  8 12:33:57 CEST 2003 - pch(a)myzel.net
+         up to beta1
+     Die Sep 16 21:22:59 CEST 2003 - pch(a)myzel.net
+         use a namespace
+     Fri Sep 19 14:36:33 EDT 2003 - xor(a)orodu.net
+         use openbox.org for namespace
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openbox.org/"
+    xmlns:ob="http://openbox.org/"
+    elementFormDefault="qualified">
+    <!--
+         root node
+      -->
+    <xs:element name="openbox_menu">
+        <xs:complexType mixed="false">
+            <xs:sequence maxOccurs="unbounded" minOccurs="1">
+                <xs:element name="menu" type="ob:menu"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!--
+         complex types
+      -->
+    <xs:complexType name="menu">
+        <xs:choice maxOccurs="unbounded" minOccurs="0">
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="menu" type="ob:menu"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ob:item"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="separator" type="ob:empty"/>
+        </xs:choice>
+        <xs:attribute name="label" type="xs:string" use="optional"/>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="empty">
+        <xs:complexContent>
+            <xs:restriction base="xs:anyType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="item">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="action">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="execute" type="xs:string"/>
+                    </xs:sequence>
+                    <xs:attribute name="name" type="ob:actionname" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="label" type="xs:string" use="required"/>
+    </xs:complexType>
+    <!--
+         simple types / restrictions
+      -->
+    <xs:simpleType name="actionname">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="execute"/>
+            <xs:enumeration value="restart"/>
+            <xs:enumeration value="reconfigure"/>
+            <xs:enumeration value="exit"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

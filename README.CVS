@@ -3,7 +3,7 @@ To build Openbox from CVS you need:
 A C++ Compiler (GNU GCC/G++ 3.2+ suggested)
 GNU Gettext 0.11.5
 GNU Autoconf 2.50+
-GNU Automake
+GNU Automake 1.7+
 GNU Libtool
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)

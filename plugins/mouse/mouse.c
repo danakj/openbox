@@ -259,6 +259,7 @@ static void event(ObEvent *e, void *foo)
 {
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
+    static lwindow = None;
     static int px, py;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
@@ -311,13 +312,18 @@ static void event(ObEvent *e, void *foo)
                 click = TRUE;
                 /* double clicks happen if there were 2 in a row! */
                 if (lbutton == button &&
+                    lwindow == e->data.x.e->xbutton.window &&
                     e->data.x.e->xbutton.time - dclicktime <= ltime) {
                     dclick = TRUE;
                     lbutton = 0;
-                } else
+                } else {
                     lbutton = button;
-            } else
+                    lwindow = e->data.x.e->xbutton.window;
+                }
+            } else {
                 lbutton = 0;
+                lwindow = None;
+            }
 
             button = 0;
             state = 0;

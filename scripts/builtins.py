@@ -247,8 +247,8 @@ def setup_window_clicks():
     mbind("Left", MC_Handle, MousePress, raise_win)
     mbind("A-Left", MC_Frame, MousePress, raise_win)
     mbind("A-Middle", MC_Frame, MouseClick, lower_win)
-    mbind("Right", MC_Titlebar, MouseClick, lower_win)
-    mbind("Right", MC_Handle, MouseClick, lower_win)
+    mbind("Middle", MC_Titlebar, MouseClick, lower_win)
+    mbind("Middle", MC_Handle, MouseClick, lower_win)
 
     mbind("Left", MC_Titlebar, MouseDoubleClick, toggle_shade)
 

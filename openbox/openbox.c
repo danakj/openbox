@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         plugin_startup();
 
         /* XXX load all plugins!! */
-        plugin_open("foo");
+        plugin_open("focus");
 
 	/* get all the existing windows */
 	client_manage_all();
@@ -174,7 +174,10 @@ int main(int argc, char **argv)
 
 void signal_handler(const ObEvent *e, void *data)
 {
-    switch (e->data.signal) {
+    int s;
+
+    s = e->data.s.signal;
+    switch (s) {
     case SIGUSR1:
 	g_message("Caught SIGUSR1 signal. Restarting.");
 	ob_shutdown = ob_restart = TRUE;
@@ -188,12 +191,12 @@ void signal_handler(const ObEvent *e, void *data)
     case SIGINT:
     case SIGTERM:
     case SIGPIPE:
-	g_message("Caught signal %d. Exiting.", e->data.signal);
+	g_message("Caught signal %d. Exiting.", s);
 	ob_shutdown = TRUE;
 	break;
 
     case SIGFPE:
     case SIGSEGV:
-	g_error("Caught signal %d. Aborting and dumping core.",e->data.signal);
+	g_error("Caught signal %d. Aborting and dumping core.", s);
     }
 }

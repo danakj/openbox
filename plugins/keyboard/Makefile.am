@@ -1,7 +1,5 @@
 plugindir=$(libdir)/openbox/plugins
 
-SUBDIRS = keyboard
-
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\" \
 -DG_LOG_DOMAIN=\"Openbox-Plugin\"

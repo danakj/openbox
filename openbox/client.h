@@ -372,7 +372,7 @@ void client_shade(Client *self, gboolean shade);
 void client_close(Client *self);
 
 /*! Sends the window to the specified desktop */
-void client_set_desktop(Client *self, unsigned int target);
+void client_set_desktop(Client *self, guint target);
 
 /*! Return a modal child of the client window
     @return A modal child of the client window, or 0 if none was found.

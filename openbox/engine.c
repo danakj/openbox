@@ -23,13 +23,13 @@ static gboolean load(char *name)
     g_assert(module == NULL);
 
     path = g_build_filename(ENGINEDIR, name, NULL);
-    module = g_module_open(path, G_MODULE_BIND_LAZY);
+    module = g_module_open(path, 0);
     g_free(path);
 
     if (module == NULL) {
 	path = g_build_filename(g_get_home_dir(), ".openbox", "engines", name,
 				NULL);
-	module = g_module_open(path, G_MODULE_BIND_LAZY);
+	module = g_module_open(path, 0);
 	g_free(path);
     }
 

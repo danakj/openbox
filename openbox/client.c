@@ -195,11 +195,11 @@ void client_manage(Window window)
 
     screen_update_struts();
 
-    dispatch_client(Event_Client_New, client);
+    dispatch_client(Event_Client_New, client, 0, 0);
 
     client_showhide(client);
 
-    dispatch_client(Event_Client_Mapped, client);
+    dispatch_client(Event_Client_Mapped, client, 0, 0);
 
     /* grab all mouse bindings */
     /*pointer_grab_all(client, TRUE);XXX*/
@@ -223,7 +223,7 @@ void client_unmanage(Client *client)
 
     g_message("Unmanaging window: %lx", client->window);
 
-    dispatch_client(Event_Client_Destroy, client);
+    dispatch_client(Event_Client_Destroy, client, 0, 0);
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, client->window, SetModeDelete);
@@ -926,7 +926,7 @@ void client_update_wmhints(Client *self)
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
 	if (self->frame)
-            dispatch_client(Event_Client_Urgent, self);
+            dispatch_client(Event_Client_Urgent, self, self->urgent, 0);
     }
 }
 
@@ -1220,8 +1220,6 @@ static void client_showhide(Client *self)
         engine_frame_show(self->frame);
     else
         engine_frame_hide(self->frame);
-
-    dispatch_client(Event_Client_Visible, self);
 }
 
 gboolean client_normal(Client *self) {
@@ -1246,7 +1244,7 @@ static void client_apply_startup_state(Client *self)
 	client_shade(self, TRUE);
     }
     if (self->urgent)
-        dispatch_client(Event_Client_Urgent, self);
+        dispatch_client(Event_Client_Urgent, self, self->urgent, 0);
   
     if (self->max_vert && self->max_horz) {
 	self->max_vert = self->max_horz = FALSE;
@@ -1626,8 +1624,10 @@ void client_close(Client *self)
     XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
 }
 
-void client_set_desktop(Client *self, unsigned int target)
+void client_set_desktop(Client *self, guint target)
 {
+    guint old;
+
     if (target == self->desktop) return;
   
     g_message("Setting desktop %u\n", target);
@@ -1636,6 +1636,7 @@ void client_set_desktop(Client *self, unsigned int target)
 	  target == DESKTOP_ALL))
 	return;
 
+    old = self->desktop;
     self->desktop = target;
     PROP_SET32(self->window, net_wm_desktop, cardinal, target);
     /* the frame can display the current desktop state */
@@ -1643,6 +1644,8 @@ void client_set_desktop(Client *self, unsigned int target)
     /* 'move' the window to the new desktop */
     client_showhide(self);
     screen_update_struts();
+
+    dispatch_client(Event_Client_Desktop, self, target, old);
 }
 
 static Client *search_modal_tree(Client *node, Client *skip)

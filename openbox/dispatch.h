@@ -23,16 +23,15 @@ typedef enum {
     Event_Client_Focus    = 1 << 11, /* focused */
     Event_Client_Unfocus  = 1 << 12, /* unfocused */
     Event_Client_Urgent   = 1 << 13, /* entered/left urgent state */
-    Event_Client_Visible  = 1 << 14, /* shown/hidden (not on a workspace or
-                                        show-the-desktop change though) */
+    Event_Client_Desktop  = 1 << 15, /* moved to a new desktop */
 
-    Event_Ob_Desktop      = 1 << 15, /* changed desktops */
-    Event_Ob_NumDesktops  = 1 << 16, /* changed the number of desktops */
-    Event_Ob_ShowDesktop  = 1 << 17, /* entered/left show-the-desktop mode */
+    Event_Ob_Desktop      = 1 << 16, /* changed desktops */
+    Event_Ob_NumDesktops  = 1 << 17, /* changed the number of desktops */
+    Event_Ob_ShowDesktop  = 1 << 18, /* entered/left show-the-desktop mode */
 
-    Event_Signal          = 1 << 18, /* a signal from the OS */
+    Event_Signal          = 1 << 19, /* a signal from the OS */
 
-    EVENT_RANGE           = 1 << 19
+    EVENT_RANGE           = 1 << 20
 } EventType;
 
 typedef struct {
@@ -40,10 +39,31 @@ typedef struct {
     Client *client;
 } EventData_X;
 
-typedef union {
-    EventData_X x; /* for Event_X_* event types */
-    Client *client; /* for Event_Client_* event types */
+typedef struct {
+    Client *client;
+    int num[2];
+    /* Event_Client_Desktop: num[0] = new number, num[1] = old number
+       Event_Client_Urgent: num[0] = urgent state
+     */
+} EventData_Client;
+
+typedef struct {
+    int num[2];
+    /* Event_Ob_Desktop: num[0] = new number, num[1] = old number
+       Event_Ob_NumDesktops: num[0] = new number, num[1] = old number
+       Event_Ob_ShowDesktop: num[0] = new show-desktop mode
+     */
+} EventData_Ob;
+
+typedef struct {
     int signal;
+} EventData_Signal;
+
+typedef struct {
+    EventData_X x;      /* for Event_X_* event types */
+    EventData_Client c; /* for Event_Client_* event types */
+    EventData_Ob o;     /* for Event_Ob_* event types */
+    EventData_Signal s; /* for Event_Signal */
 } EventData;
 
 typedef struct {
@@ -58,8 +78,8 @@ typedef unsigned int EventMask;
 void dispatch_register(EventMask mask, EventHandler h, void *data);
 
 void dispatch_x(XEvent *e, Client *c);
-void dispatch_client(EventType e, Client *c);
-void dispatch_ob(EventType e);
+void dispatch_client(EventType e, Client *c, int num0, int num1);
+void dispatch_ob(EventType e, int num0, int num1);
 void dispatch_signal(int signal);
 
 #endif

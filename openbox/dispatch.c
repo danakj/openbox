@@ -143,7 +143,7 @@ void dispatch_x(XEvent *xe, Client *c)
     }
 }
 
-void dispatch_client(EventType e, Client *c)
+void dispatch_client(EventType e, Client *c, int num0, int num1)
 {
     guint i;
     GSList *it;
@@ -152,7 +152,9 @@ void dispatch_client(EventType e, Client *c)
     g_assert(c != NULL);
 
     obe.type = e;
-    obe.data.client = c;
+    obe.data.c.client = c;
+    obe.data.c.num[0] = num0;
+    obe.data.c.num[1] = num1;
 
     i = 0;
     while (e > 1) {
@@ -166,13 +168,15 @@ void dispatch_client(EventType e, Client *c)
     }
 }
 
-void dispatch_ob(EventType e)
+void dispatch_ob(EventType e, int num0, int num1)
 {
     guint i;
     GSList *it;
     ObEvent obe;
 
     obe.type = e;
+    obe.data.o.num[0] = num0;
+    obe.data.o.num[1] = num1;
 
     i = 0;
     while (e > 1) {
@@ -194,7 +198,7 @@ void dispatch_signal(int signal)
     ObEvent obe;
 
     obe.type = e;
-    obe.data.signal = signal;
+    obe.data.s.signal = signal;
 
     i = 0;
     while (e > 1) {

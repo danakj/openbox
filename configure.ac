@@ -62,6 +62,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 		engines/Makefile
 		engines/openbox/Makefile
 		plugins/Makefile
+		plugins/keyboard/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile
 		data/Makefile

@@ -48,7 +48,7 @@ void focus_set_client(Client *client)
     }
 
     if (focus_client != NULL)
-        dispatch_client(Event_Client_Unfocus, focus_client);
+        dispatch_client(Event_Client_Unfocus, focus_client, 0, 0);
 
     focus_client = client;
 
@@ -57,5 +57,5 @@ void focus_set_client(Client *client)
     PROP_SET32(ob_root, net_active_window, window, active);
 
     if (focus_client != NULL)
-        dispatch_client(Event_Client_Focus, focus_client);
+        dispatch_client(Event_Client_Focus, focus_client, 0, 0);
 }

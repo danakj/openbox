@@ -195,7 +195,8 @@ void screen_resize()
 
 void screen_set_num_desktops(guint num)
 {
-    unsigned long *viewport;
+    guint old;
+    gulong *viewport;
      
     g_assert(num > 0);
   
@@ -218,11 +219,12 @@ void screen_set_num_desktops(guint num)
        }
     */
 
+    old = screen_num_desktops;
     screen_num_desktops = num;
     PROP_SET32(ob_root, net_number_of_desktops, cardinal, num);
 
     /* set the viewport hint */
-    viewport = g_new0(unsigned long, num * 2);
+    viewport = g_new0(gulong, num * 2);
     PROP_SET32A(ob_root, net_desktop_viewport, cardinal, viewport, num * 2);
     g_free(viewport);
 
@@ -235,7 +237,7 @@ void screen_set_num_desktops(guint num)
     /* may be some unnamed desktops that we need to fill in with names */
     screen_update_desktop_names();
 
-    dispatch_ob(Event_Ob_NumDesktops);
+    dispatch_ob(Event_Ob_NumDesktops, num, old);
 
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
@@ -245,13 +247,13 @@ void screen_set_num_desktops(guint num)
 void screen_set_desktop(guint num)
 {
     GList *it;
-
-    guint old = screen_desktop;
+    guint old;
      
     g_assert(num < screen_num_desktops);
 
     g_message("Moving to desktop %u", num);
   
+    old = screen_desktop;
     screen_desktop = num;
     PROP_SET32(ob_root, net_current_desktop, cardinal, num);
 
@@ -271,7 +273,7 @@ void screen_set_desktop(guint num)
             engine_frame_show(c->frame);
     }
 
-    dispatch_ob(Event_Ob_Desktop);
+    dispatch_ob(Event_Ob_Desktop, num, old);
 }
 
 void screen_update_layout()
@@ -392,10 +394,10 @@ void screen_show_desktop(gboolean show)
 	}
     }
 
-    show = show ? 1 : 0; /* make it boolean */
+    show = !!show; /* make it boolean */
     PROP_SET32(ob_root, net_showing_desktop, cardinal, show);
 
-    dispatch_ob(Event_Ob_ShowDesktop);
+    dispatch_ob(Event_Ob_ShowDesktop, show, 0);
 }
 
 void screen_install_colormap(Client *client, gboolean install)

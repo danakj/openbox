@@ -14,9 +14,12 @@ typedef struct {
 
 static gpointer load_sym(GModule *module, char *name, char *symbol)
 {
-    gpointer var = NULL;
-    if (!g_module_symbol(module, symbol, &var))
-        g_warning("Failed to load symbol '%s' from plugin '%s'", symbol, name);
+    gpointer var;
+    if (!g_module_symbol(module, symbol, &var)) {
+        g_warning("Failed to load symbol '%s' from plugin '%s'",
+                  symbol, name);
+        var = NULL;
+    }
     return var;
 }
 
@@ -28,13 +31,13 @@ static Plugin *plugin_new(char *name)
     p = g_new(Plugin, 1);
 
     path = g_build_filename(PLUGINDIR, name, NULL);
-    p->module = g_module_open(path, G_MODULE_BIND_LAZY);
+    p->module = g_module_open(path, 0);
     g_free(path);
 
     if (p->module == NULL) {
 	path = g_build_filename(g_get_home_dir(), ".openbox", "plugins", name,
 				NULL);
-	p->module = g_module_open(path, G_MODULE_BIND_LAZY);
+	p->module = g_module_open(path, 0);
 	g_free(path);
     }
 
@@ -43,8 +46,8 @@ static Plugin *plugin_new(char *name)
         return NULL;
     }
 
-    p->startup = load_sym(p->module, name, "startup");
-    p->shutdown = load_sym(p->module, name, "shutdown");
+    p->startup = load_sym(p->module, name, "plugin_startup");
+    p->shutdown = load_sym(p->module, name, "plugin_shutdown");
 
     if (p->startup == NULL || p->shutdown == NULL) {
         g_module_close(p->module);

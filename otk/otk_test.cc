@@ -5,6 +5,7 @@
 #include "timerqueuemanager.hh"
 #include "image.hh"
 #include "style.hh"
+#include <iostream>
 
 int main(void) {
   otk::OBDisplay::initialize(NULL);
@@ -59,8 +60,12 @@ int main(void) {
     if (XPending(otk::OBDisplay::display)) {
       XEvent e;
       XNextEvent(otk::OBDisplay::display, &e);
-      if (e.type == Expose)
+      if (e.type == Expose) {
         foo.expose(e.xexpose);
+      } else if (e.type == ConfigureNotify) {
+        std::cout << "configure\n";
+        foo.configure(e.xconfigure);
+      }
     } 
   }
 

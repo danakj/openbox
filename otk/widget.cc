@@ -11,6 +11,7 @@ namespace otk {
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   : _parent(parent), _style(parent->getStyle()), _direction(direction),
     _cursor(parent->getCursor()), _bevel_width(parent->getBevelWidth()),
+    _ignore_config(0),
     _visible(false), _focused(false), _grabbed_mouse(false),
     _grabbed_keyboard(false), _stretchable_vert(false),
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
@@ -24,7 +25,7 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
 OtkWidget::OtkWidget(Style *style, Direction direction,
                      Cursor cursor, int bevel_width)
   : _parent(0), _style(style), _direction(direction), _cursor(cursor),
-    _bevel_width(bevel_width), _visible(false),
+    _bevel_width(bevel_width), _ignore_config(0), _visible(false),
     _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _screen(style->getScreen()),
@@ -124,6 +125,7 @@ void OtkWidget::setGeometry(int x, int y, int width, int height)
 {
   _rect = Rect(x, y, width, height);
   _dirty = true;
+  _ignore_config++;
 
   XMoveResizeWindow(otk::OBDisplay::display, _window, x, y, width, height);
 }
@@ -208,11 +210,9 @@ void OtkWidget::ungrabKeyboard(void)
 
 void OtkWidget::render(void)
 {
-  Pixmap old = _bg_pixmap;
-
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
-  if (_bg_pixmap && _bg_pixmap != old)
+  if (_bg_pixmap)
     XSetWindowBackgroundPixmap(otk::OBDisplay::display, _window, _bg_pixmap);
   else {
     unsigned int pix = _texture->color().pixel();
@@ -400,6 +400,26 @@ bool OtkWidget::expose(const XExposeEvent &e)
     OtkWidgetList::iterator it = _children.begin(), end = _children.end();
     for (; it != end; ++it)
       if ((*it)->expose(e))
+        return true;
+  }
+  return false;
+}
+
+bool OtkWidget::configure(const XConfigureEvent &e)
+{
+  if (e.window == _window) {
+    if (_ignore_config) {
+      _ignore_config--;
+    } else {
+      _dirty = true;
+      _rect.setRect(e.x, e.y, e.width, e.height);
+      update();
+    }
+    return true;
+  } else {
+    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+    for (; it != end; ++it)
+      if ((*it)->configure(e))
         return true;
   }
   return false;

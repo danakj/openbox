@@ -57,7 +57,6 @@ void OtkButton::update(void)
 
     OtkFocusWidget::resize(ft.measureString(_text) + bevel * 2,
                            ft.height() + bevel * 2);
-
     OtkFocusWidget::update();
 
     ft.drawString(getWindow(), bevel, bevel, *text_color, _text);
@@ -71,6 +70,12 @@ bool OtkButton::expose(const XExposeEvent &e)
 {
   _dirty = true;
   return OtkFocusWidget::expose(e);
+}
+
+bool OtkButton::configure(const XConfigureEvent &e)
+{
+  _dirty = true;
+  return OtkFocusWidget::configure(e);
 }
 
 }

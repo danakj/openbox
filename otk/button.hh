@@ -35,6 +35,7 @@ public:
 
   virtual void update(void);
   virtual bool expose(const XExposeEvent &e);
+  virtual bool configure(const XConfigureEvent &e);
 
 private:
 

@@ -28,6 +28,7 @@ public:
   virtual void update(void);
 
   virtual bool expose(const XExposeEvent &e);
+  virtual bool configure(const XConfigureEvent &e);
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }
@@ -40,6 +41,9 @@ public:
 
   virtual void setWidth(int);
   virtual void setHeight(int);
+
+  virtual int width() const { return _rect.width(); }
+  virtual int height() const { return _rect.height(); }
 
   virtual void resize(const Point &to);
   virtual void resize(int x, int y);
@@ -106,6 +110,7 @@ private:
   Direction _direction;
   Cursor _cursor;
   int _bevel_width;
+  int _ignore_config;
 
   bool _visible;
   bool _focused;
@@ -126,7 +131,6 @@ private:
   bool _fixed_width;
   bool _fixed_height;
 
-protected:
   bool _dirty;
 };
 

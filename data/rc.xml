@@ -10,10 +10,6 @@
   <screen_edge_strength>20</screen_edge_strength>
 </resistance>
 
-<placement>
-  <remember>yes</remember>
-</placement>
-
 <focus>
   <focusNew>yes</focusNew>
   <followMouse>no</followMouse>

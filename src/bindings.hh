@@ -77,7 +77,7 @@ private:
                             PyObject *callback) const;
   void assimilate(KeyBindingTree *node);
 
-  static void reset(OBBindings *self); // the timer's timeout function
+  static void resetChains(OBBindings *self); // the timer's timeout function
 
   typedef std::list <ButtonBinding*> ButtonBindingList;
   ButtonBindingList _buttons[NUM_MOUSE_CONTEXT];

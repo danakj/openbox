@@ -339,7 +339,7 @@ void OBBindings::grabKeys(bool grab)
 void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
-    reset(this);
+    resetChains(this);
   } else {
     KeyBindingTree *p = _curpos->first_child;
     while (p) {
@@ -356,7 +356,7 @@ void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
           KeyData *data = new_key_data(win, time, modifiers, key);
           python_callback(p->callback, (PyObject*)data);
           Py_DECREF((PyObject*)data);
-          reset(this);
+          resetChains(this);
         }
         break;
       }
@@ -365,7 +365,7 @@ void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
   }
 }
 
-void OBBindings::reset(OBBindings *self)
+void OBBindings::resetChains(OBBindings *self)
 {
   self->_timer.stop();
   self->grabKeys(false);
@@ -435,7 +435,7 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
       break;
     case MC_Window:
       win = client->frame->plate();
-      mode = GrabModeSync; // this is handled in the plate's buttonPressHandler
+      mode = GrabModeSync; // this is handled in fireButton
       break;
     default:
       // any other elements already get button events, don't grab on them

@@ -259,3 +259,11 @@ gulong RrColorPixel(const RrColor *c)
 {
     return c->pixel;
 }
+
+GC RrColorGC(RrColor *c) /* XXX make this const RrColor* when the GCs are in
+                            a cache.. if possible? */
+{
+    if (!c->gc)
+        RrColorAllocateGC(c);
+    return c->gc;
+}

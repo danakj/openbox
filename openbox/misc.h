@@ -3,6 +3,7 @@
 
 typedef enum
 {
+    OB_CURSOR_NONE,
     OB_CURSOR_POINTER,
     OB_CURSOR_BUSY,
     OB_CURSOR_MOVE,

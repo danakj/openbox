@@ -59,6 +59,8 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
 void RrColorFree(RrColor *c)
 {
     if (c) {
+        if (c->pixel) XFreeColors(RrDisplay(c->inst), RrColormap(c->inst),
+                                  &c->pixel, 1, 0);
         if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);
         g_free(c);
     }

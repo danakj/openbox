@@ -67,6 +67,7 @@ static gboolean replace_wm()
 
     wm_sn = g_strdup_printf("WM_S%d", ob_screen);
     wm_sn_atom = XInternAtom(ob_display, wm_sn, FALSE);
+    g_free(wm_sn);
 
     current_wm_sn_owner = XGetSelectionOwner(ob_display, wm_sn_atom);
     if (current_wm_sn_owner) {

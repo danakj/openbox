@@ -506,14 +506,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.button.toggled.focus",
 			 theme->a_toggled_focused_max,
                          TRUE))
+    {
+        RrAppearanceFree(theme->a_toggled_focused_max);
         theme->a_toggled_focused_max =
             RrAppearanceCopy(theme->a_focused_pressed_max);
+    }
     if (!read_appearance(db, inst,
                          "window.button.toggled.unfocus",
 			 theme->a_toggled_unfocused_max,
                          TRUE))
+    {
+        RrAppearanceFree(theme->a_toggled_unfocused_max);
         theme->a_toggled_unfocused_max =
             RrAppearanceCopy(theme->a_unfocused_pressed_max);
+    }
     if (!read_appearance(db, inst,
                          "window.button.focus",
 			 theme->a_focused_unpressed_max,
@@ -528,14 +534,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.button.hover.focus",
 			 theme->a_hover_focused_max,
                          TRUE))
+    {
+        RrAppearanceFree(theme->a_hover_focused_max);
         theme->a_hover_focused_max =
             RrAppearanceCopy(theme->a_focused_unpressed_max);
+    }
     if (!read_appearance(db, inst,
                          "window.button.hover.unfocus",
 			 theme->a_hover_unfocused_max,
                          TRUE))
+    {
+        RrAppearanceFree(theme->a_hover_unfocused_max);
         theme->a_hover_unfocused_max =
             RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+    }
 
     theme->a_disabled_focused_close =
         RrAppearanceCopy(theme->a_disabled_focused_max);
@@ -877,6 +889,7 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_title_color);
         RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_hilite_color);
+        RrColorFree(theme->menu_bullet_color);
 
         RrPixmapMaskFree(theme->max_mask);
         RrPixmapMaskFree(theme->max_toggled_mask);

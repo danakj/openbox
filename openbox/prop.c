@@ -392,6 +392,7 @@ void prop_set_strings_utf8(Window win, Atom prop, char **strs)
     }
     XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,
                     PropModeReplace, (guchar*)str->str, str->len);
+    g_string_free(str, TRUE);
 }
 
 void prop_erase(Window win, Atom prop)

@@ -190,6 +190,7 @@ void menu_parse()
         parse_register(menu_parse_inst, "separator",
                        parse_menu_separator, &parse_state);
         parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+        xmlFreeDoc(doc);
     }
 }
 

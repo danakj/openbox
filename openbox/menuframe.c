@@ -170,6 +170,8 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
 
         for (f = self; f; f = f->parent)
             menu_frame_move(f, f->area.x + dx, f->area.y + dy);
+        for (f = self->child; f; f = f->child)
+            menu_frame_move(f, f->area.x + dx, f->area.y + dy);
         XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
     }
 }
@@ -424,6 +426,11 @@ static void menu_frame_update(ObMenuFrame *self)
 
 void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
 {
+    GList *it;
+
+    if (g_list_find(menu_frame_visible, self))
+        return;
+
     if (parent) {
         if (parent->child)
             menu_frame_hide(parent->child);
@@ -437,13 +444,19 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
         grab_keyboard(TRUE);
     }
 
-    if (!g_list_find(menu_frame_visible, self)) {
-        menu_frame_visible = g_list_prepend(menu_frame_visible, self);
-
+    /* determine if the underlying menu is already visible */
+    for (it = menu_frame_visible; it; it = g_list_next(it)) {
+        ObMenuFrame *f = it->data;
+        if (f->menu == self->menu)
+            break;
+    }
+    if (!it) {
         if (self->menu->update_func)
             self->menu->update_func(self, self->menu->data);
-        menu_frame_update(self);
     }
+
+    menu_frame_visible = g_list_prepend(menu_frame_visible, self);
+    menu_frame_update(self);
 
     menu_frame_move_on_screen(self);
 
@@ -452,7 +465,12 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
 
 void menu_frame_hide(ObMenuFrame *self)
 {
-    menu_frame_visible = g_list_remove(menu_frame_visible, self);
+    GList *it = g_list_find(menu_frame_visible, self);
+
+    if (!it)
+        return;
+
+    menu_frame_visible = g_list_delete_link(menu_frame_visible, it);
 
     if (self->child)
         menu_frame_hide(self->child);

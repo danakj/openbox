@@ -235,6 +235,7 @@ int main(int argc, char **argv)
         if (parse_load_rc(&doc, &node))
             parse_tree(i, doc, node->xmlChildrenNode);
         /* we're done with parsing now, kill it */
+        xmlFreeDoc(doc);
         parse_shutdown(i);
 
         menu_parse();
@@ -290,6 +291,10 @@ int main(int argc, char **argv)
 
     session_shutdown();
     g_free(ob_sm_id);
+
+#ifdef USE_LIBSN
+    sn_display_unref(ob_sn_display);
+#endif
 
     XCloseDisplay(ob_display);
 

@@ -226,5 +226,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y,
                       (FcChar8*)text->str, l);
+
+    g_string_free(text, TRUE);
     return;
 }

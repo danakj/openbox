@@ -11,9 +11,6 @@ Pkg-Config
 Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
 libxml2 2.0+ library/headers (devel package)
 
-Optionally, if you want to build the configuration tool (this is recommended):
-GTK+ 2.0+ library/headers (devel package) (http://www.gtk.org)
-
 I recommend the latest version of all these packages.
 
 Do the following to build and install Openbox in CVS:
@@ -40,9 +37,6 @@ libxft2-dev
 pkg-config
 libglib2.0-dev
 libxml2-dev
-
-optionally:
-libgtk2.0-dev
 
 tip: run "update-alternatives --config automake" and select automake1.7 before
   running ./configure

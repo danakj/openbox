@@ -150,7 +150,6 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
     ret = new BindingTree(id);
     if (!p) ret->chain = false;
     ret->first_child = p;
-    printf("adding child %lx\n", (long)p);
     if (!translate(*it, ret->binding, true)) {
       destroytree(ret);
       ret = 0;
@@ -211,6 +210,7 @@ void OBBindings::assimilate(BindingTree *node)
 {
   BindingTree *a, *b, *tmp, *last;
 
+  printf("node=%lx\n", (long)node);
   if (!_keytree.first_child) {
     // there are no nodes at this level yet
     _keytree.first_child = node;
@@ -220,16 +220,21 @@ void OBBindings::assimilate(BindingTree *node)
     last = a;
     b = node;
     while (a) {
+  printf("in while.. b=%lx\n", (long)b);
       last = a;
       if (a->binding != b->binding) {
         a = a->next_sibling;
       } else {
+        printf("a: %s %d %d\n", a->text.c_str(), a->binding.key, a->binding.modifiers);
+        printf("b: %s %d %d\n", b->text.c_str(), b->binding.key, b->binding.modifiers);
+        printf("moving up one in b\n");
         tmp = b;
         b = b->first_child;
         delete tmp;
         a = a->first_child;
       }
     }
+  printf("after while.. b=%lx\n", (long)b);
     if (last->binding != b->binding)
       last->next_sibling = b;
     else
@@ -266,7 +271,7 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
-  if (find_key(tree) < -1) {
+  if (find_key(tree) != -1) {
     // conflicts with another binding
     destroytree(tree);
     return false;

@@ -660,6 +660,8 @@ static void client_get_all(ObClient *self)
     client_get_state(self);
     client_get_shaped(self);
 
+    g_message("self->iconic %d", self->iconic);
+
     client_get_mwm_hints(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
 
@@ -749,10 +751,6 @@ static void client_get_state(ObClient *self)
     guint32 *state;
     guint num;
   
-    self->modal = self->shaded = self->max_horz = self->max_vert =
-	self->fullscreen = self->above = self->below = self->iconic =
-	self->skip_taskbar = self->skip_pager = FALSE;
-
     if (PROP_GETA32(self->window, net_wm_state, atom, &state, &num)) {
 	gulong i;
 	for (i = 0; i < num; ++i) {
@@ -1712,6 +1710,7 @@ static void client_apply_startup_state(ObClient *self)
 {
     /* these are in a carefully crafted order.. */
 
+    g_message("self->iconic %d", self->iconic);
     if (self->iconic) {
 	self->iconic = FALSE;
 	client_iconify(self, TRUE, FALSE);

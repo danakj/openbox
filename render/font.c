@@ -68,8 +68,10 @@ ObFont *font_open(char *fontstring)
 
 void font_close(ObFont *f)
 {
-    XftFontClose(ob_display, f->xftfont);
-    g_free(f);
+    if (f) {
+        XftFontClose(ob_display, f->xftfont);
+        g_free(f);
+    }
 }
 
 int font_measure_string(ObFont *f, char *str, int shadow, int offset)

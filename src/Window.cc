@@ -2483,8 +2483,6 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
   // alt + left/right click begins interactively moving/resizing the window
   // when the mouse is moved
   if (be->state == Mod1Mask && (be->button == 1 || be->button == 3)) {
-    frame.grab_x = be->x_root - frame.x - frame.border_w;
-    frame.grab_y = be->y_root - frame.y - frame.border_w;
     if (be->button == 3) {
       if (screen->getWindowZones() == 4 &&
           be->y < (signed) frame.height / 2) {
@@ -2699,21 +2697,7 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
   // when the window is being interactively moved, a button release stops the
   // move where it is
   if (flags.moving) {
-    flags.moving = False;
-
-    openbox.maskWindowEvents(0, (OpenboxWindow *) 0);
-    if (!screen->opaqueMove()) {
-      XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-                     frame.move_x, frame.move_y, frame.resize_w - 1,
-                     frame.resize_h - 1);
-
-      configure(frame.move_x, frame.move_y, frame.width, frame.height);
-      openbox.ungrab();
-    } else {
-      configure(frame.x, frame.y, frame.width, frame.height);
-    }
-    screen->hideGeometry();
-    XUngrabPointer(display, CurrentTime);
+    endMove();
   // when the window is being interactively resized, a button release stops the
   // resizing
   } else if (flags.resizing) {
@@ -2745,101 +2729,137 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
 }
 
 
+void OpenboxWindow::startMove(int x, int y) {
+  ASSERT(!flags.moving);
+
+  XGrabPointer(display, frame.window, False, Button1MotionMask |
+               ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
+               None, openbox.getMoveCursor(), CurrentTime);
+
+  if (windowmenu && windowmenu->isVisible())
+    windowmenu->hide();
+
+  flags.moving = True;
+
+  openbox.maskWindowEvents(client.window, this);
+
+  if (! screen->opaqueMove()) {
+    openbox.grab();
+
+    frame.move_x = frame.x;
+    frame.move_y = frame.y;
+    frame.resize_w = frame.width + (frame.border_w * 2);
+    frame.resize_h = ((flags.shaded) ? frame.title_h : frame.height) +
+      (frame.border_w * 2);
+
+    screen->showPosition(frame.x, frame.y);
+
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y,
+                   frame.resize_w - 1, frame.resize_h - 1);
+  }
+  frame.grab_x = x - frame.x - frame.border_w;
+  frame.grab_y = y - frame.y - frame.border_w;
+}
+
+
+void OpenboxWindow::doMove(int x, int y) {
+  ASSERT(flags.moving);
+
+  int dx = x - frame.grab_x, dy = y - frame.grab_y;
+
+  dx -= frame.border_w;
+  dy -= frame.border_w;
+
+  int snap_distance = screen->edgeSnapThreshold();
+  // width/height of the snapping window
+  unsigned int snap_w = frame.width + (frame.border_w * 2);
+  unsigned int snap_h = area().h() + (frame.border_w * 2);
+  if (snap_distance) {
+    int drx = screen->size().w() - (dx + snap_w);
+
+    if (dx < drx && (dx > 0 && dx < snap_distance) ||
+        (dx < 0 && dx > -snap_distance) )
+      dx = 0;
+    else if ( (drx > 0 && drx < snap_distance) ||
+             (drx < 0 && drx > -snap_distance) )
+      dx = screen->size().w() - snap_w;
+
+    int dtty, dbby, dty, dby;
+    switch (screen->getToolbar()->placement()) {
+    case Toolbar::TopLeft:
+    case Toolbar::TopCenter:
+    case Toolbar::TopRight:
+      dtty = screen->getToolbar()->getExposedHeight() +
+        frame.border_w;
+      dbby = screen->size().h();
+      break;
+
+    default:
+      dtty = 0;
+      dbby = screen->getToolbar()->area().y();
+      break;
+    }
+
+    dty = dy - dtty;
+    dby = dbby - (dy + snap_h);
+
+    if ( (dy > 0 && dty < snap_distance) ||
+        (dy < 0 && dty > -snap_distance) )
+      dy = dtty;
+    else if ( (dby > 0 && dby < snap_distance) ||
+             (dby < 0 && dby > -snap_distance) )
+      dy = dbby - snap_h;
+  }
+
+  if (screen->opaqueMove()) {
+    configure(dx, dy, frame.width, frame.height);
+  } else {
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y, frame.resize_w - 1,
+                   frame.resize_h - 1);
+
+    frame.move_x = dx;
+    frame.move_y = dy;
+
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y, frame.resize_w - 1,
+                   frame.resize_h - 1);
+  }
+
+  screen->showPosition(dx, dy);
+}
+
+
+void OpenboxWindow::endMove() {
+  ASSERT(flags.moving);
+
+  flags.moving = False;
+
+  openbox.maskWindowEvents(0, (OpenboxWindow *) 0);
+  if (!screen->opaqueMove()) {
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y, frame.resize_w - 1,
+                   frame.resize_h - 1);
+
+    configure(frame.move_x, frame.move_y, frame.width, frame.height);
+    openbox.ungrab();
+  } else {
+    configure(frame.x, frame.y, frame.width, frame.height);
+  }
+  screen->hideGeometry();
+  XUngrabPointer(display, CurrentTime);
+}
+
+
 void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
   if (!flags.resizing && (me->state & Button1Mask) && functions.move &&
       (frame.title == me->window || frame.label == me->window ||
        frame.handle == me->window || frame.window == me->window)) {
-    if (! flags.moving) {
-      XGrabPointer(display, me->window, False, Button1MotionMask |
-                   ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
-                   None, openbox.getMoveCursor(), CurrentTime);
-
-      if (windowmenu && windowmenu->isVisible())
-        windowmenu->hide();
-
-      flags.moving = True;
-
-      openbox.maskWindowEvents(client.window, this);
-
-      if (! screen->opaqueMove()) {
-        openbox.grab();
-
-        frame.move_x = frame.x;
-	frame.move_y = frame.y;
-        frame.resize_w = frame.width + (frame.border_w * 2);
-        frame.resize_h = ((flags.shaded) ? frame.title_h : frame.height) +
-          (frame.border_w * 2);
-
-	screen->showPosition(frame.x, frame.y);
-
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y,
-		       frame.resize_w - 1, frame.resize_h - 1);
-      }
-    } else {
-      int dx = me->x_root - frame.grab_x, dy = me->y_root - frame.grab_y;
-
-      dx -= frame.border_w;
-      dy -= frame.border_w;
-
-      int snap_distance = screen->edgeSnapThreshold();
-      // width/height of the snapping window
-      unsigned int snap_w = frame.width + (frame.border_w * 2);
-      unsigned int snap_h = area().h() + (frame.border_w * 2);
-      if (snap_distance) {
-        int drx = screen->size().w() - (dx + snap_w);
-
-        if (dx < drx && (dx > 0 && dx < snap_distance) ||
-                        (dx < 0 && dx > -snap_distance) )
-          dx = 0;
-        else if ( (drx > 0 && drx < snap_distance) ||
-                  (drx < 0 && drx > -snap_distance) )
-          dx = screen->size().w() - snap_w;
-
-        int dtty, dbby, dty, dby;
-        switch (screen->getToolbar()->placement()) {
-        case Toolbar::TopLeft:
-        case Toolbar::TopCenter:
-        case Toolbar::TopRight:
-          dtty = screen->getToolbar()->getExposedHeight() +
-	         frame.border_w;
-          dbby = screen->size().h();
-          break;
-
-        default:
-          dtty = 0;
-	  dbby = screen->getToolbar()->area().y();
-          break;
-        }
-
-        dty = dy - dtty;
-        dby = dbby - (dy + snap_h);
-
-        if ( (dy > 0 && dty < snap_distance) ||
-            (dy < 0 && dty > -snap_distance) )
-          dy = dtty;
-        else if ( (dby > 0 && dby < snap_distance) ||
-                 (dby < 0 && dby > -snap_distance) )
-          dy = dbby - snap_h;
-      }
-
-      if (screen->opaqueMove()) {
-	configure(dx, dy, frame.width, frame.height);
-      } else {
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y, frame.resize_w - 1,
-		       frame.resize_h - 1);
-
-	frame.move_x = dx;
-	frame.move_y = dy;
-
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y, frame.resize_w - 1,
-		       frame.resize_h - 1);
-      }
-
-      screen->showPosition(dx, dy);
-    }
+    if (!flags.moving)
+      startMove(me->x_root, me->y_root);
+    else
+      doMove(me->x_root, me->y_root);
   } else if (functions.resize &&
 	     (((me->state & Button1Mask) && (me->window == frame.right_grip ||
 					     me->window == frame.left_grip)) ||

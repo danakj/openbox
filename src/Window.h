@@ -203,93 +203,94 @@ private:
   } frame;
 
 protected:
-  Bool getState(void);
+  Bool getState();
   Window createToplevelWindow(int x, int y, unsigned int width,
 			      unsigned int height, unsigned int borderwidth);
   Window createChildWindow(Window parent, Cursor = None);
 
-  void getWMName(void);
-  void getWMIconName(void);
-  void getWMNormalHints(void);
-  void getWMProtocols(void);
-  void getWMHints(void);
-  void getMWMHints(void);
-  void getOpenboxHints(void);
-  void setNetWMAttributes(void);
-  void associateClientWindow(void);
-  void decorate(void);
-  void decorateLabel(void);
+  void getWMName();
+  void getWMIconName();
+  void getWMNormalHints();
+  void getWMProtocols();
+  void getWMHints();
+  void getMWMHints();
+  void getOpenboxHints();
+  void setNetWMAttributes();
+  void associateClientWindow();
+  void decorate();
+  void decorateLabel();
   void positionButtons(Bool redecorate_label = False);
-  void positionWindows(void);
-  void createCloseButton(void);
-  void createIconifyButton(void);
-  void createMaximizeButton(void);
-  void redrawLabel(void);
-  void redrawAllButtons(void);
+  void positionWindows();
+  void createCloseButton();
+  void createIconifyButton();
+  void createMaximizeButton();
+  void redrawLabel();
+  void redrawAllButtons();
   void redrawCloseButton(Bool);
   void redrawIconifyButton(Bool);
   void redrawMaximizeButton(Bool);
-  void restoreGravity(void);
-  void setGravityOffsets(void);
+  void restoreGravity();
+  void setGravityOffsets();
   void setState(unsigned long);
-  void upsize(void);
-  void downsize(void);
+  void upsize();
+  void downsize();
   void right_fixsize(int *gx = 0, int *gy = 0);
   void left_fixsize(int *gx = 0, int *gy = 0);
+  void doMove(int x, int y);
 
 
 public:
   OpenboxWindow(Openbox &b, Window w, BScreen *s = (BScreen *) 0);
-  virtual ~OpenboxWindow(void);
+  virtual ~OpenboxWindow();
 
-  inline Bool isTransient(void) const { return flags.transient; }
-  inline Bool isFocused(void) const { return flags.focused; }
-  inline Bool isVisible(void) const { return flags.visible; }
-  inline Bool isIconic(void) const { return flags.iconic; }
-  inline Bool isShaded(void) const { return flags.shaded; }
-  inline Bool isMaximized(void) const { return flags.maximized; }
-  inline Bool isMaximizedFull(void) const { return flags.maximized == 1; }
-  inline Bool isStuck(void) const { return flags.stuck; }
-  inline Bool isIconifiable(void) const { return functions.iconify; }
-  inline Bool isMaximizable(void) const { return functions.maximize; }
-  inline Bool isResizable(void) const { return functions.resize; }
-  inline Bool isClosable(void) const { return functions.close; }
+  inline Bool isTransient() const { return flags.transient; }
+  inline Bool isFocused() const { return flags.focused; }
+  inline Bool isVisible() const { return flags.visible; }
+  inline Bool isIconic() const { return flags.iconic; }
+  inline Bool isShaded() const { return flags.shaded; }
+  inline Bool isMaximized() const { return flags.maximized; }
+  inline Bool isMaximizedFull() const { return flags.maximized == 1; }
+  inline Bool isStuck() const { return flags.stuck; }
+  inline Bool isIconifiable() const { return functions.iconify; }
+  inline Bool isMaximizable() const { return functions.maximize; }
+  inline Bool isResizable() const { return functions.resize; }
+  inline Bool isClosable() const { return functions.close; }
 
-  inline Bool hasTitlebar(void) const { return decorations.titlebar; }
-  inline Bool hasTransient(void) const
+  inline Bool hasTitlebar() const { return decorations.titlebar; }
+  inline Bool hasTransient() const
   { return ((client.transient) ? True : False); }
 
-  inline OpenboxWindow *getTransient(void) { return client.transient; }
-  inline OpenboxWindow *getTransientFor(void) { return client.transient_for; }
+  inline OpenboxWindow *getTransient() { return client.transient; }
+  inline OpenboxWindow *getTransientFor() { return client.transient_for; }
 
-  inline BScreen *getScreen(void) { return screen; }
+  inline BScreen *getScreen() { return screen; }
 
-  inline const Window &getFrameWindow(void) const { return frame.window; }
-  inline const Window &getClientWindow(void) const { return client.window; }
+  inline const Window &getFrameWindow() const { return frame.window; }
+  inline const Window &getClientWindow() const { return client.window; }
 
-  inline Windowmenu * getWindowmenu(void) { return windowmenu; }
+  inline Windowmenu * getWindowmenu() { return windowmenu; }
 
-  inline char **getTitle(void) { return &client.title; }
-  inline char **getIconTitle(void) { return &client.icon_title; }
-  //inline const int &getXFrame(void) const { return frame.x; }
-  //inline const int &getYFrame(void) const { return frame.y; }
-  //inline const int &getXClient(void) const { return client.x; }
-  //inline const int &getYClient(void) const { return client.y; }
-  inline const int &getWorkspaceNumber(void) const { return workspace_number; }
-  inline const int &getWindowNumber(void) const { return window_number; }
+  inline char **getTitle() { return &client.title; }
+  inline char **getIconTitle() { return &client.icon_title; }
+  //inline const int &getXFrame() const { return frame.x; }
+  //inline const int &getYFrame() const { return frame.y; }
+  //inline const int &getXClient() const { return client.x; }
+  //inline const int &getYClient() const { return client.y; }
+  inline const int &getWorkspaceNumber() const { return workspace_number; }
+  inline const int &getWindowNumber() const { return window_number; }
 
-  //inline const unsigned int &getWidth(void) const { return frame.width; }
-  //inline const unsigned int &getHeight(void) const {
+  //inline const unsigned int &getWidth() const { return frame.width; }
+  //inline const unsigned int &getHeight() const {
   //  if (!flags.shaded)
   //    return frame.height;
   //  else
   //    return frame.title_h;
   //}
-  //inline const unsigned int &getClientHeight(void) const
+  //inline const unsigned int &getClientHeight() const
   //{ return client.height; }
-  //inline const unsigned int &getClientWidth(void) const
+  //inline const unsigned int &getClientWidth() const
   //{ return client.width; }
-  inline const unsigned int &getTitleHeight(void) const
+  inline const unsigned int &getTitleHeight() const
   { return frame.title_h; }
 
   //inline const Point origin() const {
@@ -314,26 +315,29 @@ public:
   
   inline void setWindowNumber(int n) { window_number = n; }
   
-  Bool validateClient(void);
-  Bool setInputFocus(void);
+  Bool validateClient();
+  Bool setInputFocus();
 
   void setFocusFlag(Bool);
-  void iconify(void);
+  void iconify();
   void deiconify(Bool reassoc = True, Bool raise = True);
-  void close(void);
-  void withdraw(void);
+  void close();
+  void withdraw();
   void maximize(unsigned int button);
-  void shade(void);
-  void stick(void);
-  void unstick(void);
-  void reconfigure(void);
+  void shade();
+  void stick();
+  void unstick();
+  void reconfigure();
   void installColormap(Bool);
-  void restore(void);
+  void restore();
   void configure(int dx, int dy, unsigned int dw, unsigned int dh);
   void setWorkspace(int n);
   void changeOpenboxHints(OpenboxHints *);
-  void restoreAttributes(void);
+  void restoreAttributes();
 
+  void startMove(int x, int y);
+  void endMove();
+  
   void buttonPressEvent(XButtonEvent *);
   void buttonReleaseEvent(XButtonEvent *);
   void motionNotifyEvent(XMotionEvent *);
@@ -349,7 +353,7 @@ public:
   void shapeEvent(XShapeEvent *);
 #endif // SHAPE
 
-  virtual void timeout(void);
+  virtual void timeout();
 };
 
 

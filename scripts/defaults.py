@@ -53,9 +53,13 @@ ob.kbind(["C-2"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 1))
 ob.kbind(["C-3"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 2))
 ob.kbind(["C-4"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 3))
 ob.kbind(["C-A-Right"], ob.KeyContext.All,
-         lambda(d): callbacks.next_desktop(d))
+         lambda(d): callbacks.right_desktop(d))
 ob.kbind(["C-A-Left"], ob.KeyContext.All,
-         lambda(d): callbacks.prev_desktop(d))
+         lambda(d): callbacks.left_desktop(d))
+ob.kbind(["C-A-Up"], ob.KeyContext.All,
+         lambda(d): callbacks.up_desktop(d))
+ob.kbind(["C-A-Down"], ob.KeyContext.All,
+         lambda(d): callbacks.down_desktop(d))
 
 ob.kbind(["C-S-A-Right"], ob.KeyContext.All,
          lambda(d): callbacks.send_to_next_desktop(d))

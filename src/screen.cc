@@ -123,6 +123,8 @@ Screen::Screen(int screen)
   // the manageExising() function
   changeClientList();  // initialize the client lists, which will be empty
 
+  updateDesktopLayout();
+
   // register this class as the event handler for the root window
   openbox->registerHandler(_info->rootWindow(), this);
 
@@ -198,6 +200,65 @@ void Screen::manageExisting()
   XFree(children);
 }
 
+void Screen::updateDesktopLayout()
+{
+  //const unsigned long _NET_WM_ORIENTATION_HORZ = 0;
+  const unsigned long _NET_WM_ORIENTATION_VERT = 1;
+  //const unsigned long _NET_WM_TOPLEFT = 0;
+  const unsigned long _NET_WM_TOPRIGHT = 1;
+  const unsigned long _NET_WM_BOTTOMRIGHT = 2;
+  const unsigned long _NET_WM_BOTTOMLEFT = 3;
+  
+  // defaults
+  _layout.orientation = DesktopLayout::Horizontal;
+  _layout.start_corner = DesktopLayout::TopLeft;
+  _layout.rows = 1;
+  _layout.columns = _num_desktops;
+
+  unsigned long *data, num = 4;
+  if (otk::Property::get(_info->rootWindow(),
+                         otk::Property::atoms.net_desktop_layout,
+                         otk::Property::atoms.cardinal,
+                         &num, &data)) {
+    if (num >= 4) {
+      if (data[0] == _NET_WM_ORIENTATION_VERT)
+        _layout.orientation = DesktopLayout::Vertical;
+      if (data[3] == _NET_WM_TOPRIGHT)
+        _layout.start_corner = DesktopLayout::TopRight;
+      else if (data[3] == _NET_WM_BOTTOMRIGHT)
+        _layout.start_corner = DesktopLayout::BottomRight;
+      else if (data[3] == _NET_WM_BOTTOMLEFT)
+        _layout.start_corner = DesktopLayout::BottomLeft;
+
+      // fill in a zero rows/columns
+      if (!(data[1] == 0 && data[2] == 0)) { // both 0's is bad data..
+        if (data[1] == 0) {
+          data[1] = (_num_desktops + _num_desktops % data[2]) / data[2];
+        } else if (data[2] == 0) {
+          data[2] = (_num_desktops + _num_desktops % data[1]) / data[1];
+        }
+        _layout.columns = data[1];
+        _layout.rows = data[2];
+      }
+
+      // bounds checking
+      if (_layout.orientation == DesktopLayout::Horizontal) {
+        if (_layout.rows > _num_desktops) _layout.rows = _num_desktops;
+        if (_layout.columns > (_num_desktops + _num_desktops % _layout.rows) /
+            _layout.rows)
+          _layout.columns = (_num_desktops + _num_desktops % _layout.rows) /
+            _layout.rows;
+      } else {
+        if (_layout.columns > _num_desktops) _layout.columns = _num_desktops;
+        if (_layout.rows > (_num_desktops + _num_desktops % _layout.columns) /
+            _layout.columns)
+          _layout.rows = (_num_desktops + _num_desktops % _layout.columns) /
+            _layout.columns;
+      }
+    }
+    delete [] data;
+  }
+}
 
 void Screen::updateStruts()
 {
@@ -770,6 +831,9 @@ void Screen::changeNumDesktops(unsigned int num)
   _struts.resize(_num_desktops + 1);
   updateStruts();
 
+  // the number of rows/columns will differ
+  updateDesktopLayout();
+
   // change our desktop if we're on one that no longer exists!
   if (_desktop >= _num_desktops)
     changeDesktop(_num_desktops - 1);
@@ -836,6 +900,8 @@ void Screen::propertyHandler(const XPropertyEvent &e)
 
   if (e.atom == otk::Property::atoms.net_desktop_names)
     updateDesktopNames();
+  else if (e.atom == otk::Property::atoms.net_desktop_layout)
+    updateDesktopLayout();
 }
 
 

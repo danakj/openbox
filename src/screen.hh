@@ -24,6 +24,16 @@ namespace ob {
 
 class Client;
 
+struct DesktopLayout {
+  enum Corner { TopLeft, TopRight, BottomRight, BottomLeft };
+  enum Direction { Horizontal, Vertical };
+
+  Direction orientation;
+  Corner start_corner;
+  unsigned int rows;
+  unsigned int columns;
+};
+
 //! Manages a single screen
 /*!
 */
@@ -58,9 +68,6 @@ private:
   //! Information about this screen
   const otk::ScreenInfo *_info;
   
-  //! Is the root colormap currently installed?
-  bool _root_cmap_installed;
-
   //! Area usable for placement etc (total - struts), one per desktop,
   //! plus one extra for windows on all desktops
   RectList _area;
@@ -88,6 +95,8 @@ private:
   //! The names of all desktops
   otk::Property::StringVect _desktop_names;
 
+  DesktopLayout _layout;
+
   //! Calculate the Screen::_area member
   void calcArea();
   //! Set the list of supported NETWM atoms on the root window
@@ -111,6 +120,9 @@ private:
 
   //! Get desktop names from the root window property
   void updateDesktopNames();
+
+  //! Gets the layout of the desktops from the root window property
+  void updateDesktopLayout();
 
   //! Changes to the specified desktop, displaying windows on it and hiding
   //! windows on the others.
@@ -157,6 +169,8 @@ public:
                    on all desktops.
   */
   const otk::Rect& area(unsigned int desktop) const;
+
+  const DesktopLayout& desktopLayout() const { return _layout; }
 
   //! Update's the screen's combined strut of all the clients.
   /*!

@@ -209,7 +209,71 @@ def prev_desktop(data, no_wrap=0):
         d = n - 1
     change_desktop(data, d)
 
-def send_to_desktop(data, num):
+def up_desktop(data, num=1):
+    """Switches to the desktop vertically above the current one. This is based
+       on the desktop layout chosen by an EWMH compliant pager. Optionally, num
+       can be specified to move more than one row at a time."""
+    screen = ob.openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
+    l = screen.desktopLayout()
+
+    target = d - num * l.columns
+    if target < 0:
+        target += l.rows * l.columns
+    while target >= n:
+        target -= l.columns
+    change_desktop(data, target)
+
+def down_desktop(data, num=1):
+    """Switches to the desktop vertically below the current one. This is based
+       on the desktop layout chosen by an EWMH compliant pager. Optionally, num
+       can be specified to move more than one row at a time."""
+    screen = ob.openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
+    l = screen.desktopLayout()
+
+    target = d + num * l.columns
+    if target >= n:
+        target -= l.rows * l.columns
+    while target < 0:
+        target += l.columns
+    change_desktop(data, target)
+
+def left_desktop(data, num=1):
+    """Switches to the desktop horizotally left of the current one. This is
+       based on the desktop layout chosen by an EWMH compliant pager.
+       Optionally, num can be specified to move more than one column at a
+       time."""
+    screen = ob.openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
+    l = screen.desktopLayout()
+
+    rowstart = d - d % l.columns
+    target = d - num
+    while target < rowstart:
+        target += l.columns
+    change_desktop(data, target)
+
+def right_desktop(data, num=1):
+    """Switches to the desktop horizotally right of the current one. This is
+       based on the desktop layout chosen by an EWMH compliant pager.
+       Optionally, num can be specified to move more than one column at a
+       time."""
+    screen = ob.openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
+    l = screen.desktopLayout()
+
+    rowstart = d - d % l.columns
+    target = d + num
+    while target >= rowstart + l.columns:
+        target -= l.columns
+    change_desktop(data, target)
+
+def send_to_desktop(data, num=1):
     """Sends a client to a specified desktop"""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),

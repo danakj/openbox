@@ -893,6 +893,7 @@ static void client_change_allowed_actions(Client *self)
 	else self->shaded = FALSE;
     }
     if (!(self->functions & Func_Iconify) && self->iconic) {
+        g_message("UNSETTING ICONIC");
 	if (self->frame) client_iconify(self, FALSE, TRUE);
 	else self->iconic = FALSE;
     }
@@ -934,9 +935,11 @@ void client_update_wmhints(Client *self)
 	if (hints->flags & InputHint)
 	    self->can_focus = hints->input;
 
-	/* only do this when starting! */
-	if (ob_state == State_Starting && (hints->flags & StateHint))
-	    self->iconic = hints->initial_state == IconicState;
+	/* only do this when first managing the window *AND* when we aren't
+           starting up! */
+	if (ob_state != State_Starting && self->frame == NULL)
+            if (hints->flags & StateHint)
+                self->iconic = hints->initial_state == IconicState;
 
 	if (hints->flags & XUrgencyHint)
 	    ur = TRUE;

@@ -22,7 +22,9 @@ openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   buttonwidget.cc python.cc bindings.cc \
                   openbox_wrap.cc
 
-scriptdir_DATA = openbox.py
+script_DATA = openbox.py
+
+EXTRA_DIST = $(script_DATA)
 
 MAINTAINERCLEANFILES= Makefile.in
 

@@ -149,8 +149,8 @@ def _do_move():
                                     otk.Widget.Horizontal, 0,
                                     style.bevelWidth(), 1)
             _popwidget.setTexture(style.titlebarFocusBackground())
-            _poplabel = otk.Label(_popwidget)
-            _poplabel.setTexture(style.labelFocusBackground())
+            _poplabel = otk.FocusLabel(_popwidget)
+            _poplabel.focus()
         _poplabel.fitString(text)
         _poplabel.setText(text)
         _popwidget.update() 
@@ -238,8 +238,8 @@ def _do_resize():
                                     otk.Widget.Horizontal, 0,
                                     style.bevelWidth(), 1)
             _popwidget.setTexture(style.titlebarFocusBackground())
-            _poplabel = otk.Label(_popwidget)
-            _poplabel.setTexture(style.labelFocusBackground())
+            _poplabel = otk.FocusLabel(_popwidget)
+            _poplabel.focus()
         _poplabel.fitString(text)
         _poplabel.setText(text)
         area = otk.display.screenInfo(_screen).rect()

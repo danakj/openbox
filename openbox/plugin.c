@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gmodule.h>
 
+typedef void (*PluginSetupConfig)();
 typedef void (*PluginStartup)();
 typedef void (*PluginShutdown)();
 
@@ -8,6 +9,7 @@ typedef struct {
     GModule *module;
     char *name;
 
+    PluginSetupConfig config;
     PluginStartup startup;
     PluginShutdown shutdown;
 } Plugin;
@@ -30,15 +32,15 @@ static Plugin *plugin_new(char *name)
    
     p = g_new(Plugin, 1);
 
-    path = g_build_filename(PLUGINDIR, name, NULL);
+    path = g_build_filename(g_get_home_dir(), ".openbox", "plugins", name,
+                            NULL);
     p->module = g_module_open(path, 0);
     g_free(path);
 
     if (p->module == NULL) {
-	path = g_build_filename(g_get_home_dir(), ".openbox", "plugins", name,
-				NULL);
-	p->module = g_module_open(path, 0);
-	g_free(path);
+        path = g_build_filename(PLUGINDIR, name, NULL);
+        p->module = g_module_open(path, 0);
+        g_free(path);
     }
 
     if (p->module == NULL) {
@@ -46,10 +48,12 @@ static Plugin *plugin_new(char *name)
         return NULL;
     }
 
+    p->config = (PluginSetupConfig)load_sym(p->module, name,
+                                            "plugin_setup_config");
     p->startup = (PluginStartup)load_sym(p->module, name, "plugin_startup");
     p->shutdown = (PluginShutdown)load_sym(p->module, name, "plugin_shutdown");
 
-    if (p->startup == NULL || p->shutdown == NULL) {
+    if (p->config == NULL || p->startup == NULL || p->shutdown == NULL) {
         g_module_close(p->module);
         g_free(p);
         return NULL;
@@ -94,9 +98,9 @@ gboolean plugin_open(char *name)
         g_warning("failed to load plugin '%s'", name);
         return FALSE;
     }
-    /* XXX p->plugin_set_config(); */
+    p->config();
 
-    g_datalist_set_data_full(&plugins, name, p,  (GDestroyNotify) plugin_free);
+    g_datalist_set_data_full(&plugins, name, p, (GDestroyNotify) plugin_free);
     return TRUE;
 }
 
@@ -144,6 +148,7 @@ void plugin_loadall()
         /* load the plugins in the rc file */
         while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==
                G_IO_STATUS_NORMAL) {
+            g_strstrip(name);
             plugin_open(name);
             g_free(name);
         }

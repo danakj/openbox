@@ -56,13 +56,6 @@ gboolean place_history(Client *c)
             x = hi->x;
             y = hi->y;
 
-            /* make sure the window is on the display */
-            if (x >= screen_physical_size.width ||
-                y >= screen_physical_size.height ||
-                x + c->frame->area.width < 1 ||
-                y + c->frame->area.height < 1)
-                return FALSE;
-
             frame_frame_gravity(c->frame, &x, &y); /* get where the client
                                                       should be */
             client_configure(c, Corner_TopLeft, x, y,

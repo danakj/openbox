@@ -137,15 +137,10 @@ void focus_fallback(gboolean switching_desks)
     }
 
     if (!under) {
-        for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
-            if (it->data != old && client_normal(it->data)) {
-                /* if we're switching desktops, and we get the already focused
-                   window, then we wont get a FocusIn for it, so just restore
-                   the focus_client so that we know it is focused */
+        for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
+            if (it->data != old && client_normal(it->data))
                 if (client_focus(it->data))
                     break;
-            }
-        }
         if (it == NULL) /* nothing to focus */
             focus_set_client(NULL);
     }

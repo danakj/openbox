@@ -140,7 +140,6 @@ void plugin_loadall()
 
     if (io == NULL) {
         /* load the default plugins */
-        plugin_open("focus");
         plugin_open("keyboard");
         plugin_open("mouse");
         plugin_open("placement");

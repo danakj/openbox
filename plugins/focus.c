@@ -48,19 +48,16 @@ static void focus_fallback(gboolean switching_desks)
 
                 /* skip the next enter event from the desktop switch so focus
                    doesn't skip briefly to what was under the pointer */
-                while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-/*
+                if (XCheckTypedEvent(ob_display, EnterNotify, &e)) {
                     XPutBackEvent(ob_display, &e);
-                    /\* XXX WERE NOT SKIPPING THEM ALL@&*)! *\/
-                    g_message("Skip");
                     ++skip_enter;
                 }
-*/
 
                 /* I have to do this warp twice! Otherwise windows dont get
                    Enter/Leave events when i warp on a desktop switch! */
                 XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
                              c->area.width / 2, c->area.height / 2);
+                ++skip_enter;
                 XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
                              c->area.width / 2, c->area.height / 2);
             }

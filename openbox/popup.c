@@ -105,6 +105,10 @@ void popup_show(ObPopup *self, gchar *text)
     gint x, y, w, h;
     gint textw, texth;
     gint iconw;
+    Rect *area; /* won't go outside this */
+
+    area = screen_physical_area_monitor(0); /* XXX i'm guessing this
+                                               is wrong for xinerama? */
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
 
@@ -169,6 +173,9 @@ void popup_show(ObPopup *self, gchar *text)
         y -= h;
         break;
     }
+
+    x=MAX(MIN(x, area->width-w),0);
+    y=MAX(MIN(y, area->height-h),0);
 
     /* set the windows/appearances up */
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);

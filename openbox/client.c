@@ -1134,9 +1134,8 @@ void client_update_class(Client *self)
             if (data[1])
                 self->class = g_strdup(data[1]);
         }
+        g_strfreev(data);     
     }
-
-    g_strfreev(data);     
 
     if (PROP_GETS(self->window, wm_window_role, locale, &s))
 	self->role = g_strdup(s);
@@ -1587,7 +1586,7 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
         x = y = w = h = 0;
     } else {
         guint num;
-	guint32 *dimensions;
+	gint32 *dimensions;
 
         /* pick some fallbacks... */
         x = screen_area(self->desktop)->x +
@@ -1598,7 +1597,7 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
         h = screen_area(self->desktop)->height / 2;
 
 	if (PROP_GETA32(self->window, openbox_premax, cardinal,
-                        &dimensions, &num)) {
+                        (guint32**)&dimensions, &num)) {
             if (num == 4) {
                 x = dimensions[0];
                 y = dimensions[1];

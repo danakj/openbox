@@ -352,11 +352,11 @@ void prop_set_string_utf8(Window win, Atom prop, char *val)
 void prop_set_strings_utf8(Window win, Atom prop, char **strs)
 {
     GString *str;
-    guint i;
+    char **s;
 
     str = g_string_sized_new(0);
-    for (i = 0; strs[i]; ++i) {
-        str = g_string_append(str, strs[i]);
+    for (s = strs; *s; ++s) {
+        str = g_string_append(str, *s);
         str = g_string_append_c(str, '\0');
     }
     XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,

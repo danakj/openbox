@@ -25,7 +25,7 @@ guint    screen_desktop         = 0;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
 DesktopLayout screen_desktop_layout;
-char   **screen_desktop_names;
+char   **screen_desktop_names = NULL;
 
 static Rect  *area = NULL;
 static Strut *strut = NULL;
@@ -155,10 +155,11 @@ void screen_startup()
     screen_resize();
 
     /* set the names */
-    screen_desktop_names = g_new0(char*,
-                                  g_slist_length(config_desktops_names) + 1);
+    screen_desktop_names = g_new(char*,
+                                 g_slist_length(config_desktops_names) + 1);
     for (i = 0, it = config_desktops_names; it; ++i, it = it->next)
         screen_desktop_names[i] = it->data; /* dont strdup */
+    screen_desktop_names[i] = NULL;
     PROP_SETSS(ob_root, net_desktop_names, screen_desktop_names);
     g_free(screen_desktop_names); /* dont free the individual strings */
     screen_desktop_names = NULL;
@@ -377,11 +378,13 @@ void screen_update_desktop_names()
 
     /* empty the array */
     g_strfreev(screen_desktop_names);
+    screen_desktop_names = NULL;
 
     if (PROP_GETSS(ob_root, net_desktop_names, utf8, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i] && i <= screen_num_desktops; ++i);
     else
         i = 0;
+    g_message("I %d", i);
     if (i <= screen_num_desktops) {
         screen_desktop_names = g_renew(char*, screen_desktop_names,
                                        screen_num_desktops + 1);

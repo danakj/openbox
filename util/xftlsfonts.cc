@@ -34,11 +34,15 @@ int main(int argc, char **argv) {
       }
 
   Display *display = XOpenDisplay(NULL);
+  if (! display) {
+    cout << "Failed to open connection to X display\n";
+    return 2;
+  }
 
   XftObjectSet *obj = XftObjectSetCreate();
   if (! obj) {
     cout << "Failed to create an XftObjectSet\n";
-    exit(2);
+    return 2;
   }
 
   XftObjectSetAdd(obj, XFT_FAMILY);

@@ -25,9 +25,6 @@ AC_DEFUN([OB_DEBUG],
 
     TEST=""
     test "${PACKAGE_VERSION%*alpha*}" != "$PACKAGE_VERSION" && TEST="yes"
-    test "$TEST" = "yes" && DEBUG="yes"
-
-    TEST=""
     test "${PACKAGE_VERSION%*beta*}" != "$PACKAGE_VERSION" && TEST="yes"
     test "$TEST" = "yes" && DEBUG="yes"
 

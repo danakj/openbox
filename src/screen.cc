@@ -208,6 +208,7 @@ void Screen::manageExisting()
 
 void Screen::updateStrut()
 {
+  otk::Strut old = _strut;  
   _strut.left = _strut.right = _strut.top = _strut.bottom = 0;
 
   Client::List::iterator it, end = clients.end();
@@ -219,6 +220,12 @@ void Screen::updateStrut()
     _strut.bottom = std::max(_strut.bottom, s.bottom);
   }
   calcArea();
+
+  if (!(old == _strut)) {
+    // the strut has changed, adjust all the maximized windows
+    for (it = clients.begin(); it != end; ++it)
+      (*it)->remaximize();
+  }
 }
 
 

@@ -396,7 +396,7 @@ EXTRA_DIST = \
 distclean-local:
 	for d in . m4 po render; do \
 		for p in core core.* gmon.out *\~ *.orig *.rej .\#*; do \
-			$(RM) "$$d/$$p"; \
+			rm -f "$$d/$$p"; \
 		done \
 	done
 

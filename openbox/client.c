@@ -727,10 +727,6 @@ static void client_get_all(ObClient *self)
         /* this makes sure that these windows appear on all desktops */
         if (self->type == OB_CLIENT_TYPE_DESKTOP)
             self->desktop = DESKTOP_ALL;
-
-        /* dock windows default to ABOVE */
-        if (self->type == OB_CLIENT_TYPE_DOCK && !self->below)
-            self->above = TRUE;
     }
 
     client_update_protocols(self);
@@ -859,7 +855,7 @@ static void client_get_state(ObClient *self)
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
                 if (c != self && !client_search_transient(self, c) &&
-                    client_normal(self) == client_normal(c))
+                    client_normal(self) && client_normal(c))
                 {
                     layer = MAX(layer,
                                 (c->above ? 1 : (c->below ? -1 : 0)));
@@ -1764,7 +1760,7 @@ static ObStackingLayer calc_layer(ObClient *self)
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
         if (self->above) l = OB_STACKING_LAYER_DOCK_ABOVE;
         else if (self->below) l = OB_STACKING_LAYER_DOCK_BELOW;
-        else l = OB_STACKING_LAYER_NORMAL;
+        else l = OB_STACKING_LAYER_DOCK_NORMAL;
     }
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;

@@ -119,8 +119,8 @@ struct TimerLessThan {
   }
 };
 
-#include <deque>
-typedef _timer_queue<BTimer*, std::deque<BTimer*>, TimerLessThan> TimerQueue;
+#include <vector>
+typedef _timer_queue<BTimer*, std::vector<BTimer*>, TimerLessThan> TimerQueue;
 
 class TimerQueueManager {
 public:

@@ -29,18 +29,17 @@ extern "C" {
 }
 
 #include <string>
-#include <deque>
+#include <vector>
 
 class Blackbox;
 class BImageControl;
 class BScreen;
-class Basemenu;
 class BasemenuItem;
 
 
 class Basemenu {
 private:
-  typedef std::deque<BasemenuItem*> MenuItems;
+  typedef std::vector<BasemenuItem*> MenuItems;
   MenuItems menuitems;
   Blackbox *blackbox;
   Basemenu *parent;

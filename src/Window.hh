@@ -255,7 +255,8 @@ private:
 
   bool getState(void);
   Window createToplevelWindow();
-  Window createChildWindow(Window parent, Cursor = None);
+  Window createChildWindow(Window parent, unsigned long event_mask,
+                           Cursor = None);
 
   bool getWindowType(void);
   void updateStrut(void);

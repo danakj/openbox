@@ -1342,7 +1342,7 @@ void BScreen::manageWindow(Window w) {
   // is the window a KDE systray window?
   Window systray;
   if (xatom->getValue(w, XAtom::kde_net_wm_system_tray_window_for,
-                      XAtom::window, systray) && systray) {
+                      XAtom::window, systray) && systray != None) {
     addSystrayWindow(w);
     return;
   }
@@ -1381,6 +1381,15 @@ void BScreen::manageWindow(Window w) {
 
 
 void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
+  // is the window a KDE systray window?
+  Window systray;
+  if (xatom->getValue(w->getClientWindow(),
+                      XAtom::kde_net_wm_system_tray_window_for,
+                      XAtom::window, systray) && systray != None) {
+    removeSystrayWindow(w->getClientWindow());
+    return;
+  }
+
   w->restore(remap);
 
   // Remove the modality so that its parent won't try to re-focus the window

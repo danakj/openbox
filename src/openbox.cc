@@ -9,6 +9,7 @@
 #include "client.hh"
 #include "screen.hh"
 #include "actions.hh"
+#include "python.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -41,6 +42,8 @@ extern "C" {
 #ifdef    HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #endif // HAVE_SYS_SELECT_H
+
+#include <python2.2/Python.h>
 
 #include "gettext.h"
 #define _(str) gettext(str)
@@ -89,9 +92,6 @@ Openbox::Openbox(int argc, char **argv)
   _argv0 = argv[0];
   _doshutdown = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
-
-  _clients = (PyDictObject*) PyDict_New();
-  assert(_clients);
 
   parseCommandLine(argc, argv);
 
@@ -275,25 +275,28 @@ void Openbox::eventLoop()
 
 void Openbox::addClient(Window window, OBClient *client)
 {
-  // maintain the python list here too
-  PyDict_SetItem((PyObject*)_clients, PyLong_FromLong(window),
-                 (PyObject*)client);
+  _clients[window] = client;
 }
 
 
 void Openbox::removeClient(Window window)
 {
-  PyDict_DelItem((PyObject*)_clients, PyLong_FromLong(window));
+  _clients.erase(window);
 }
 
 
 OBClient *Openbox::findClient(Window window)
 {
-  PyClientObject *client = PyDist_GetItem((PyObject*)_clients,
-                                          PyLong_FromLong(window));
-  if (client)
-    return client->client;
-  return 0;
+  /*
+    NOTE: we dont use _clients[] to find the value because that will insert
+    a new null into the hash, which really sucks when we want to clean up the
+    hash at shutdown!
+  */
+  ClientMap::iterator it = _clients.find(window);
+  if (it != _clients.end())
+    return it->second;
+  else
+    return (OBClient*) 0;
 }
 
 }

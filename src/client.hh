@@ -22,13 +22,10 @@ extern "C" {
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
 #include "widget.hh"
-#include "python.hh"
 
 namespace ob {
 
 class OBFrame;
-
-extern PyTypeObject OBClient_Type;
 
 //! Maintains the state of a client window.
 /*!
@@ -43,7 +40,6 @@ extern PyTypeObject OBClient_Type;
   change (such as causing a redraw of the titlebar after the title is changed).
 */
 class OBClient : public otk::OtkEventHandler, public OBWidget {
-  PyObject_HEAD
 public:
 
   //! The frame window which decorates around the client window

@@ -37,8 +37,6 @@ static PyMethodDef OBMethods[] = {
 
 void initopenbox()
 {
-  OBClient_Type.ob_type = &PyType_Type;
-  
   Py_InitModule("openbox", OBMethods);
 }
 }

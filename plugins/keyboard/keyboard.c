@@ -165,6 +165,11 @@ static void binddef()
     a = action_new(action_execute);
     a->data.execute.path = g_strdup("xterm");
     kbind(list, a);
+
+    list->data = "C-A-Escape";
+    a = action_new(action_execute);
+    a->data.execute.path = g_strdup("xlock -nolock -mode puzzle");
+    kbind(list, a);
 }
 
 void plugin_startup()

@@ -11,6 +11,8 @@
          use a namespace
      Fri Sep 19 14:36:33 EDT 2003 - xor(a)orodu.net
          use openbox.org for namespace
+     Mon Sep 22 02:42:10 EDT 2003 - xor(a)orodu.net
+         fix some capitalization
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -48,7 +50,7 @@
             <xs:element minOccurs="0" name="action">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="execute" type="xs:string"/>
+                        <xs:element minOccurs="0" name="Execute" type="xs:string"/>
                     </xs:sequence>
                     <xs:attribute name="name" type="ob:actionname" use="required"/>
                 </xs:complexType>
@@ -61,10 +63,10 @@
       -->
     <xs:simpleType name="actionname">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="execute"/>
-            <xs:enumeration value="restart"/>
-            <xs:enumeration value="reconfigure"/>
-            <xs:enumeration value="exit"/>
+            <xs:enumeration value="Execute"/>
+            <xs:enumeration value="Restart"/>
+            <xs:enumeration value="Reconfigure"/>
+            <xs:enumeration value="Exit"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

@@ -42,9 +42,9 @@
 </resize>
 
 <dock>
-  <position>topleft</position>
-  <stacking>top</stacking>
-  <direction>vertical</direction>
+  <position>TopLeft</position>
+  <stacking>Top</stacking>
+  <direction>Vertical</direction>
   <floatingX>0</floatingX>
   <floatingY>0</floatingY>
   <autoHide>no</autoHide>

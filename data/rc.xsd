@@ -23,6 +23,7 @@
          use openbox.org for namespace
      Mon Sep 22 02:34:53 EDT 2003 - xor(a)orodu.net
          add the focusLast and raiseOnFocus options
+         fix some capitalization
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -164,28 +165,28 @@
     </xs:simpleType>
     <xs:simpleType name="position">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="topleft"/>
-            <xs:enumeration value="top"/>
-            <xs:enumeration value="topright"/>
-            <xs:enumeration value="right"/>
-            <xs:enumeration value="bottomright"/>
-            <xs:enumeration value="bottom"/>
-            <xs:enumeration value="bottomleft"/>
-            <xs:enumeration value="left"/>
-            <xs:enumeration value="floating"/>
+            <xs:enumeration value="TopLeft"/>
+            <xs:enumeration value="Top"/>
+            <xs:enumeration value="TopRight"/>
+            <xs:enumeration value="Right"/>
+            <xs:enumeration value="BottomRight"/>
+            <xs:enumeration value="Bottom"/>
+            <xs:enumeration value="BottomLeft"/>
+            <xs:enumeration value="Left"/>
+            <xs:enumeration value="Floating"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="stacking">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="top"/>
-            <xs:enumeration value="normal"/>
-            <xs:enumeration value="bottom"/>
+            <xs:enumeration value="Top"/>
+            <xs:enumeration value="Normal"/>
+            <xs:enumeration value="Bottom"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="direction">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="horizontal"/>
-            <xs:enumeration value="vertical"/>
+            <xs:enumeration value="Horizontal"/>
+            <xs:enumeration value="Vertical"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="keyname">
@@ -195,21 +196,21 @@
     </xs:simpleType>
     <xs:simpleType name="contextname">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="desktop"/>
-            <xs:enumeration value="client"/>
-            <xs:enumeration value="titlebar"/>
-            <xs:enumeration value="handle"/>
-            <xs:enumeration value="frame"/>
-            <xs:enumeration value="tlcorner"/>
-            <xs:enumeration value="trcorner"/>
-            <xs:enumeration value="blcorner"/>
-            <xs:enumeration value="brcorner"/>
-            <xs:enumeration value="maximize"/>
-            <xs:enumeration value="alldesktops"/>
-            <xs:enumeration value="shade"/>
-            <xs:enumeration value="iconify"/>
-            <xs:enumeration value="icon"/>
-            <xs:enumeration value="close"/>
+            <xs:enumeration value="Desktop"/>
+            <xs:enumeration value="Client"/>
+            <xs:enumeration value="Titlebar"/>
+            <xs:enumeration value="Handle"/>
+            <xs:enumeration value="Frame"/>
+            <xs:enumeration value="TLCorner"/>
+            <xs:enumeration value="TRCorner"/>
+            <xs:enumeration value="BLCorner"/>
+            <xs:enumeration value="BRCorner"/>
+            <xs:enumeration value="Maximize"/>
+            <xs:enumeration value="AllDesktops"/>
+            <xs:enumeration value="Shade"/>
+            <xs:enumeration value="Iconify"/>
+            <xs:enumeration value="Icon"/>
+            <xs:enumeration value="Close"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="button">

@@ -463,8 +463,9 @@ static void event_process(const XEvent *ec, gpointer data)
                     e->type == MotionNotify)
                     mouse_event(client, e);
                 else if (e->type == KeyPress)
-                    keyboard_event((focus_hilite ?
-                                    focus_hilite : client), e);
+                    keyboard_event((focus_cycle_target ? focus_cycle_target :
+                                    (focus_hilite ? focus_hilite : client)),
+                                   e);
             }
         }
     }

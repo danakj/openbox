@@ -1426,7 +1426,7 @@ void BlackboxWindow::getTransientInfo(void) {
   }
 
   // we have no transient_for until we find a new one
-  client.transient_for = 0;
+  client.transient_for = (BlackboxWindow *) 0;
 
   Window trans_for;
   if (! XGetTransientForHint(blackbox->getXDisplay(), client.window,

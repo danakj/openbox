@@ -41,7 +41,7 @@ using std::min;
 #include "Texture.hh"
 
 
-BImage::BImage(BImageControl *c, unsigned int w, unsigned int h) {
+BImage::BImage(BImageControl *c, int w, int h) {
   control = c;
 
   width = (w > 0) ? w : 1;

@@ -77,7 +77,7 @@ private:
 
 
 public:
-  BImage(BImageControl *c, unsigned int w, unsigned int h);
+  BImage(BImageControl *c, int w, int h);
   ~BImage(void);
 
   Pixmap render(const BTexture &texture);

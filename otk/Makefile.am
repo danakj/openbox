@@ -4,11 +4,12 @@ INCLUDES= -I../src
 
 noinst_LIBRARIES=libotk.a
 
-libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc property.cc \
-                  imagecontrol.cc rect.cc screeninfo.cc texture.cc timer.cc \
-                  timerqueuemanager.cc style.cc configuration.cc util.cc \
-                  widget.cc focuswidget.cc button.cc eventhandler.cc \
-                  eventdispatcher.cc application.cc
+libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
+                  property.cc imagecontrol.cc rect.cc screeninfo.cc \
+                  texture.cc timer.cc timerqueuemanager.cc style.cc \
+                  configuration.cc util.cc widget.cc focuswidget.cc \
+                  button.cc eventhandler.cc eventdispatcher.cc \
+                  focuslabel.cc application.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

@@ -156,32 +156,6 @@ void Style::load(const Configuration &style) {
 }
 
 
-void Style::doJustify(const std::string &text, int &start_pos,
-                      unsigned int max_length,
-                      unsigned int modifier) const {
-  size_t text_len = text.size();
-  unsigned int length;
-
-  do {
-    length = font->measureString(std::string(text, 0, text_len)) + modifier;
-  } while (length > max_length && text_len-- > 0);
-
-  switch (justify) {
-  case RightJustify:
-    start_pos += max_length - length;
-    break;
-
-  case CenterJustify:
-    start_pos += (max_length - length) / 2;
-    break;
-
-  case LeftJustify:
-  default:
-    break;
-  }
-}
-
-
 void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
                              const Configuration &style) {
   Window root_window = OBDisplay::screenInfo(screen_number)->getRootWindow();

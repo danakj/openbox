@@ -65,9 +65,6 @@ public:
   Style(BImageControl *);
   ~Style();
 
-  void doJustify(const std::string &text, int &start_pos,
-                 unsigned int max_length, unsigned int modifier) const;
-
   void readDatabaseMask(const std::string &rname,
                         PixmapMask &pixmapMask,
                         const Configuration &style);

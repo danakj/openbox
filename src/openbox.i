@@ -34,7 +34,9 @@
     Action_EnterWindow,
     Action_LeaveWindow,
     Action_KeyPress,
-    Action_MouseMotion
+    Action_MouseMotion,
+    Action_NewWindow,
+    Action_CloseWindow
   };
   enum WidgetType {
     Type_Frame,

@@ -161,6 +161,7 @@ void plugin_loadall(ObParseInst *i)
 
         /* XXX rm me when the parser loads me magically */
         plugin_open("client_menu", i);
+        plugin_open("client_list_menu", i);
     } else {
         /* load the plugins in the rc file */
         while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==

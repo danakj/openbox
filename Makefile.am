@@ -30,7 +30,8 @@ plugin_LTLIBRARIES = \
 	plugins/menu/timed_menu.la \
 	plugins/menu/fifo_menu.la \
 	plugins/menu/client_menu.la \
-	plugins/menu/include_menu.la
+	plugins/menu/include_menu.la \
+	plugins/menu/client_list_menu.la
 
 if OBCONF
 bin_PROGRAMS += \
@@ -264,6 +265,19 @@ plugins_menu_include_menu_la_LDFLAGS = \
 	-avoid-version
 plugins_menu_include_menu_la_SOURCES = \
 	plugins/menu/include_menu.c
+
+plugins_menu_client_list_menu_la_CPPFLAGS = \
+	$(XFT_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(LIBSN_CFLAGS) \
+	$(XML_CFLAGS) \
+	-DPLUGINDIR=\"$(plugindir)\" \
+	-DG_LOG_DOMAIN=\"Plugin-Client-List-Menu\"
+plugins_menu_client_list_menu_la_LDFLAGS = \
+	-module \
+	-avoid-version
+plugins_menu_client_list_menu_la_SOURCES = \
+	plugins/menu/client_list_menu.c
 
 
 ## obconf ##

@@ -584,7 +584,7 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   } // switch
 
   if (! placed) {
-    Point *p = cascade(win);
+    const Point *const p = cascade(win);
     place_x=p->x();
     place_y=p->y();
     delete p;
@@ -598,7 +598,7 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   win->configure(place_x, place_y, win->size().w(), win->size().h());
 }
 
-Point *Workspace::cascade(const OpenboxWindow *const win){
+inline const Point *const Workspace::cascade(const OpenboxWindow *const win){
   if (((unsigned) cascade_x > (screen.size().w() / 2)) ||
       ((unsigned) cascade_y > (screen.size().h() / 2)))
     cascade_x = cascade_y = 32;

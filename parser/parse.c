@@ -348,6 +348,10 @@ void parse_paths_shutdown()
         g_free(it->data);
     g_slist_free(xdg_config_dir_paths);
     xdg_config_dir_paths = NULL;
+    for (it = xdg_data_dir_paths; it; it = g_slist_next(it))
+        g_free(it->data);
+    g_slist_free(xdg_data_dir_paths);
+    xdg_data_dir_paths = NULL;
 }
 
 gchar *parse_expand_tilde(const gchar *f)

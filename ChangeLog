@@ -1,3 +1,279 @@
+2003-09-03  Ben Jansens  <xor@zed.orodu.net>
+
+	* configure.ac: alpha8
+
+	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c:
+	add the focusDelay option
+
+	* openbox/mouse.c:
+	dont grab frame context mouse bindings on desktop windows
+
+	* openbox/client.c, openbox/client.h, openbox/menu.c, openbox/moveresize.c:
+	make the client destructor a GDestroyNotify
+
+	* Makefile.am: add themeupdate.py to the distribution
+
+	* data/rc.xml: add focus the desktop on left click binding
+
+	* openbox/menuframe.c: rm empty line
+
+	* openbox/menuframe.c: limit menus' width to 400px
+
+	* data/rc.xml, openbox/config.c:
+	rename the theme name node from 'theme' to 'name'
+
+	* data/rc.xml: fix capitalization and empty tags. cleanup.
+
+	* data/rc.xml: remove obsolete placement/remember option
+
+	* openbox/moveresize.c:
+	only show resize popups for clients with size increments. no move popup at all. waste of screen space.
+
+	* openbox/popup.c: use the provided margins to layout the popup better
+
+	* render/render.c, render/render.h:
+	provide a function to give the margins for an appearance
+
+	* data/rc.xml, openbox/config.c:
+	make the default screen-edge resistance 20 (double what it is for windows)
+
+	* render/render.c:
+	we use the offsets we get from the server, we should use the byte order too..
+
+	* render/color.c: remove bad comment
+
+2003-09-02  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/moveresize.c:
+	more fixes to keep the pointer stuff aligned when doing keyboard move/resize
+
+	* openbox/moveresize.c:
+	fix flashing when using keyboard move against the edge of the screen
+
+	* render/gradient.c:
+	interlace is drawn first, so bevels n shit cover it
+
+	* openbox/client_menu.c, openbox/menu.h, openbox/menuframe.c, openbox/menuframe.h:
+	use new menu.bullet.selected.imageColor. use the text colors for the menu mask icons instead of teh bullet color, and set it based on selected/disabled/normal like the text.
+
+	* render/theme.c, render/theme.h: add menu.bullet.selected.imageColor
+
+	* openbox/action.c:
+	grab the mouse before any move/resizes in actions, preventing focus from moving when followMouse is on and the window moves/resizes out from under the pointer
+
+	* Makefile.am, data/menu, data/menu.xml, data/rc.xml, openbox/menu.c:
+	move the default menu to menu.xml
+
+	* openbox/session.c: remove debug prints
+
+	* render/render.c: remove debug print
+
+	* render/color.c: remove XXX comment, it was right, now its done :>
+
+	* render/color.c, render/color.h:
+	use the new color hash to cache RrColors
+
+	* render/instance.c, render/instance.h, render/render.h:
+	move some internal functions from render.h to instance.h
+	add a color hash table to the RrInstance
+
+	* openbox/resist.c: remove debug print
+
+	* openbox/mainloop.c: make the segfault swearing more clear
+
+	* openbox/moveresize.c:
+	add comment about the new code in moveresize for size increment windows
+
+	* openbox/client.c, openbox/moveresize.c:
+	stop doing stupid shit for the size increments in client_configure, it belongs in the moveresize code. add it there.
+
+	* openbox/resist.c, openbox/resist.h:
+	separate window and screen snapping so only one or the other can be used
+
+	* openbox/action.c: grow to edge is a move and a resize, oops
+
+2003-09-01  Ben Jansens  <xor@zed.orodu.net>
+
+	* Makefile.am, data/rc.xml, data/rc3, parser/parse.c:
+	move rc3 to rc.xml
+
+	* Makefile.am: update for the new theme selections
+
+	* data/rc3: make thebear the default theme
+
+	* themes/thebear/themerc:
+	add a menu overlap and smaller font size for the menu items
+
+	* themes/allegro/bullet.xbm, themes/allegro/themerc, themes/artwiz/themerc, themes/blah41/themerc, themes/om4ob/themerc, themes/thebear/themerc:
+	add/fix themes for 3.0
+
+	* openbox/menuframe.c, openbox/popup.c, render/theme.c, render/theme.h:
+	rename back the app_selected appearances to app_hilite
+
+	* tools/themeupdate/themeupdate.py: some stuff is exact
+
+	* tools/themeupdate/themeupdate.py: remove menu.bullet from themes
+
+	* tools/themeupdate/themeupdate.py: show errors on stderr
+
+	* tools/themeupdate/themeupdate.py: nicer usage output
+
+	* openbox/moveresize.c: this move is not final
+
+	* openbox/openbox.c:
+	make ob_expand_tilde expand all tildes in the string
+
+	* tools/themeupdate/themeupdate.py: global valid
+
+	* tools/themeupdate/themeupdate.py: more checks, for pixelsize fonts
+
+	* tools/themeupdate/themeupdate.py:
+	add more checks, for fonts, and for missing stuff
+
+	* tools/themeupdate/themeupdate.py:
+	update oldschool .xft.font options from ob2
+
+	* tools/themeupdate/themeupdate.py: enable all the tests
+
+	* tools/themeupdate/themeupdate.py: check for oldschool fonts
+
+	* tools/themeupdate/themeupdate.py: check window.button.pressed
+
+	* tools/themeupdate/themeupdate.py:
+	themeupdate already fixes some recent changes
+
+	* openbox/popup.c: couple more xrdb theme format cleanups:
+	window.focus.font -> window.label.focus.font
+	window.unfocus.font -> window.label.unfocus.font
+	window.justify -> window.label.justify
+	menu.frame.* -> menu.items.*
+	menu.hilite.* -> menu.selected.*
+	*.picColor -> *.imageColor
+
+	* openbox/client_list_menu.c: remove an old plugin call
+
+	* openbox/menuframe.c, render/theme.c, render/theme.h:
+	couple more xrdb theme format cleanups:
+	window.focus.font -> window.label.focus.font
+	window.unfocus.font -> window.label.unfocus.font
+	window.justify -> window.label.justify
+	menu.frame.* -> menu.items.*
+	menu.hilite.* -> menu.selected.*
+	*.picColor -> *.imageColor
+
+	* data/rc3: remove the urgent options
+
+	* openbox/frame.c:
+	dont crash when flashing a window when it goes away, remove the timer when dying
+
+	* openbox/client.c: flash when urgent
+
+	* openbox/action.c, openbox/action.h: remove vibrate and flash actions
+
+	* openbox/frame.c, openbox/frame.h:
+	improved frame flashing code, can start and stop it on command
+
+	* openbox/config.c, openbox/config.h: remove the urgent actions
+
+	* render/render.c: i rul.. at typos..
+
+	* render/render.c: copy/free the new interlaced color
+
+	* render/gradient.c, render/render.h, render/theme.c:
+	add interlaceColor, and support interlaced gradients
+
+	* data/rc3: add flashing urgent windows
+
+	* openbox/action.c, openbox/action.h: add flash action
+
+	* openbox/frame.c, openbox/frame.h: add code to flash the frame
+
+	* openbox/menuframe.c:
+	make separators span the width of the entire menu
+
+	* openbox/action.c, openbox/action.h, openbox/client.c, openbox/client.h, openbox/config.c, openbox/config.h, openbox/moveresize.c:
+	add urgent actions
+	add some macros for moving/resizing clients
+	add 'vibrate' action
+
+	* openbox/action.c: s/expand_tile/ob_expand_tilde/
+
+	* openbox/config.h: missing 'extern' for a bunch of vars
+
+	* openbox/action.c, openbox/config.c, openbox/menu.c, openbox/openbox.c, openbox/openbox.h:
+	move expand_tilde to ob_expand_tilde in openbox.c to make it global.
+	use it on the command read in the menu parsing for pipe menus.
+	use it on the command read for execute/restart actions.
+
+2003-08-31  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/menu.c: parse all the menu files specified
+
+	* openbox/mainloop.c: oops, now is in the loop :>
+
+	* openbox/mainloop.c: get the current time when adding timers
+
+	* configure.ac: i dont use sed for anything, no need to check for it
+
+	* Makefile.am: rm some plugin stuff that i missed
+
+	* configure.ac: alpha7
+
+	* ChangeLog: changes
+
+	* openbox/action.c, openbox/action.h, openbox/screen.c, openbox/screen.h:
+	add the DesktopLast action, props to marius nita for this one
+
+	* openbox/event.c: remove debug print
+
+	* openbox/client_list_menu.c:
+	add a separator in the client-list-menus above iconic windows
+
+	* openbox/menuframe.c:
+	dont lose the menu selection while puttin the mouse over a separator (properly)
+
+	* openbox/event.c: compress events properly
+
+	* openbox/menuframe.c:
+	only hide menus if theyre supposed to when executing
+
+	* openbox/action.c, openbox/action.h:
+	make directional focusing an interactive action
+
+	* data/rc3: the <interactive> tags are no longer needed
+
+	* openbox/screen.c:
+	make desktop cycling work properly when non-interactive
+
+	* openbox/keyboard.c, openbox/mouse.c:
+	when no modifiers are in a binding, then make it non-interactive
+
+	* openbox/focus.c, openbox/focus.h:
+	make focus cycling work when not interactive
+	add focus_directional_cycle
+
+	* AUTHORS: tore did some more actions :)
+
+	* openbox/keyboard.c:
+	ungrab keys before grabbnig keys at the next chain level
+
+	* openbox/grab.c:
+	grab the pointer Async for key grabs, lets key bindings like <execute>xkill</execute> work
+
+	* openbox/menuframe.c, openbox/menuframe.h: draw menu separators
+
+	* render/render.c, render/render.h: add RrColorGC
+	add a LineArt texture type for drawing a line, this is used for drawing the menu separators
+
+	* render/gradient.c, render/mask.c: use RrColorGC
+
+	* render/color.c: add RrColorGC
+
+	* openbox/stacking.c: kill a warning
+
+	* openbox/client.c:
+	move_onscreen was supposed to go away.. :) thanks mikachu
+
 2003-08-31  Ben Jansens  <xor@zed.orodu.net>
 
 	* openbox/action.c, openbox/action.h, openbox/screen.c, openbox/screen.h:

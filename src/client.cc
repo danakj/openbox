@@ -997,7 +997,8 @@ void OBClient::move(int x, int y)
   _area.setPos(x, y);
 
   // move the frame to be in the requested position
-  frame->adjustPosition();
+  if (frame) // this can be called while mapping, before frame exists
+    frame->adjustPosition();
 }
 
 

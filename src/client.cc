@@ -1081,10 +1081,12 @@ void OBClient::shade(bool shade)
 
 bool OBClient::focus()
 {
-  if (!(_can_focus || _focus_notify) || _focused) return false;
+  if (!(_can_focus || _focus_notify)) return false;
+  if (_focused) return true;
 
   if (_can_focus)
-    XSetInputFocus(otk::OBDisplay::display, _window, RevertToNone, CurrentTime);
+    XSetInputFocus(otk::OBDisplay::display, _window,
+                   RevertToNone, CurrentTime);
 
   if (_focus_notify) {
     XEvent ce;

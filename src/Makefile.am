@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 DEFAULT_MENU=$(pkgdatadir)/menu
-DEFAULT_STYLE=$(pkgdatadir)/styles/Results
+DEFAULT_STYLE=$(pkgdatadir)/styles/steelblue
 
 CPPFLAGS= @CPPFLAGS@ @SHAPE@ @ORDEREDPSEUDO@ \
 @DEBUG@ @NLS@ @TIMEDCACHE@ @SLIT@ @CLOBBER@ \

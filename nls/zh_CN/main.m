@@ -13,11 +13,13 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\t使用显示连接.\n\
   -rc <string>\t\t\t使用其他的资源文件.\n\
-  -menu <string>\t\t\tuse alternate menu file.\n\
+  -menu <string>\t\tuse alternate menu file.\n\
   -version\t\t\t显示版本.\n\
   -help\t\t\t\t显示这个帮助.\n\n
 $ #CompileOptions
 # 编译选项:\n\
   Debugging\t\t\t%s\n\
   Shape:\t\t\t%s\n\
+  Slit:\t\t\t\t%s\n\
+  Event Clobbering:\t\t%s\n\
   8bpp Ordered Dithering:\t%s\n\n

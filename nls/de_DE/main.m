@@ -13,11 +13,13 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\tDisplay Verbindung.\n\
   -rc <string>\t\t\talternative Konfigurationsdatei.\n\
-  -menu <string>\t\t\talternate menu file.\n\
+  -menu <string>\t\talternate menu file.\n\
   -version\t\t\tzeige Versionsnummer und Beendung.\n\
   -help\t\t\t\tzeige diesen Hilfstext und Beendung.\n\n
 $ #CompileOptions
 # Optionen zum Kompilationszeitpunkt:\n\
   Debugging\t\t\t%s\n\
   Shape:\t\t\t%s\n\
+  Slit:\t\t\t\t%s\n\
+  Event Clobbering:\t\t%s\n\
   8bpp Ordered Dithering:\t%s\n\n

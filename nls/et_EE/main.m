@@ -13,11 +13,13 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\tkasuta displei ühendust.\n\
   -rc <string>\t\t\tkasuta alternatiivseid resursse.\n\
-  -menu <string>\t\t\tkasuta alternatiivseid menu.\n\
+  -menu <string>\t\tkasuta alternatiivseid menu.\n\
   -version\t\t\tnäita versiooninumber ja välju.\n\
   -help\t\t\t\tnäita seda abiteksti ja välju.\n\n
 $ #CompileOptions
 # Kompileerimisoptsioonid:\n\
   Debuggimine\t\t\t%s\n\
   Kuju:\t\t\t%s\n\
+  Slit:\t\t\t\t%s\n\
+  Event Clobbering:\t\t%s\n\
   8bpp määratud teravustamine:\t%s\n\n

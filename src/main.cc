@@ -61,11 +61,12 @@ I18n i18n; // initialized in main
 static void showHelp(int exitval) {
   // print program usage and command line options
   printf(i18n(mainSet, mainUsage,
-              "Blackbox %s : (c) 2001 - 2002 Sean 'Shaleh' Perry\n"
-              "\t\t\t  1997 - 2000, 2002 Brad Hughes\n\n"
+              "Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
+              "                 2001 - 2002 Sean 'Shaleh' Perry\n"
+              "                 1997 - 2000, 2002 Brad Hughes\n\n"
               "  -display <string>\t\tuse display connection.\n"
               "  -rc <string>\t\t\tuse alternate resource file.\n"
-              "  -menu <string>\t\t\tuse alternate menu file.\n"
+              "  -menu <string>\t\tuse alternate menu file.\n"
               "  -version\t\t\tdisplay version and exit.\n"
               "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
          __openbox_version);
@@ -76,6 +77,8 @@ static void showHelp(int exitval) {
               "Compile time options:\n"
               "  Debugging:\t\t\t%s\n"
               "  Shape:\t\t\t%s\n"
+              "  Slit:\t\t\t\t%s\n"
+              "  Event Clobbering:\t\t%s\n"
               "  8bpp Ordered Dithering:\t%s\n\n"),
 #ifdef    DEBUG
          i18n(CommonSet, CommonYes, "yes"),
@@ -88,6 +91,18 @@ static void showHelp(int exitval) {
 #else // !SHAPE
          i18n(CommonSet, CommonNo, "no"),
 #endif // SHAPE
+
+#ifdef    SLIT
+         i18n(CommonSet, CommonYes, "yes"),
+#else // !SLIT
+         i18n(CommonSet, CommonNo, "no"),
+#endif // SLIT
+
+#ifndef   NOCLOBBER
+         i18n(CommonSet, CommonYes, "yes"),
+#else // !NOCLOBBER
+         i18n(CommonSet, CommonNo, "no"),
+#endif // NOCLOBBER
 
 #ifdef    ORDEREDPSEUDO
          i18n(CommonSet, CommonYes, "yes")

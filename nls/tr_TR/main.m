@@ -13,11 +13,13 @@ $ #Usage
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <metin>\t\tekraný kullan.\n\
   -rc <metin>\t\t\tbaþka bir ayarlama dosyasýný kullan.\n\
-  -menu <metin>\t\t\tuse alternate menu file.\n\
+  -menu <metin>\t\tuse alternate menu file.\n\
   -version\t\t\tnesil bilgisini gösterir ve çýkar.\n\
   -help\t\t\t\tbu yardým iletisini gösterir ve çýkar.\n\n
 $ #CompileOptions
 # Denetleme seçenekleri :\n\
   Bilgilendirme\t\t\t%s\n\
   Gölgeleme:\t\t\t%s\n\
+  Slit:\t\t\t\t%s\n\
+  Event Clobbering:\t\t%s\n\
   R8b'e göre týzla:\t%s\n\n

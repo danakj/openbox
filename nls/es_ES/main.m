@@ -20,4 +20,6 @@ $ #CompileOptions
 # Opciones durante la compilación:\n\
   Información extra para depuración:               %s\n\
   Forma:                                           %s\n\
+  Slit:                                            %s\n\
+  Event Clobbering:                                %s\n\
   8bpp simulación ordenada de colores en imágenes: %s\n\n

@@ -186,7 +186,7 @@ static gboolean get_prealloc(Window win, Atom prop, Atom type, int size,
 		    ((guint16*)data)[i] = ((guint16*)xdata)[i];
 		    break;
 		case 32:
-		    ((guint32*)data)[i] = ((guint32*)xdata)[i];
+		    ((guint32*)data)[i] = ((gulong*)xdata)[i];
 		    break;
 		default:
 		    g_assert_not_reached(); /* unhandled size */
@@ -225,7 +225,7 @@ static gboolean get_all(Window win, Atom prop, Atom type, int size,
 		    ((guint16*)*data)[i] = ((guint16*)xdata)[i];
 		    break;
 		case 32:
-		    ((guint32*)*data)[i] = ((guint32*)xdata)[i];
+		    ((guint32*)*data)[i] = ((gulong*)xdata)[i];
 		    break;
 		default:
 		    g_assert_not_reached(); /* unhandled size */

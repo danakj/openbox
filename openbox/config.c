@@ -38,6 +38,9 @@ gint config_mouse_dclicktime;
 
 gchar *config_menu_path;
 
+gint config_resist_win;
+gint config_resist_edge;
+
 gchar *expand_tilde(const gchar *f)
 {
     if (!f)
@@ -348,6 +351,18 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
     }
 }
    
+static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, 
+                             void *d)
+{
+    xmlNodePtr n;
+
+    node = node->xmlChildrenNode;
+    if ((n = parse_find_node("strength", node)))
+        config_resist_win = parse_int(doc, n);
+    if ((n = parse_find_node("screen_edge_strength", node)))
+        config_resist_edge = parse_int(doc, n);
+}
+
 void config_startup(ObParseInst *i)
 {
     config_focus_new = TRUE;
@@ -394,6 +409,11 @@ void config_startup(ObParseInst *i)
     config_mouse_dclicktime = 200;
 
     parse_register(i, "mouse", parse_mouse, NULL);
+
+    config_resist_win = 10;
+    config_resist_edge = 10;
+
+    parse_register(i, "resistance", parse_resistance, NULL);
 
     config_menu_path = NULL;
 

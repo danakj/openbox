@@ -6,6 +6,7 @@
 #include "frame.h"
 #include "dispatch.h"
 #include "openbox.h"
+#include "resist.h"
 #include "popup.h"
 #include "config.h"
 #include "render/render.h"
@@ -72,12 +73,8 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
     start_ch = c->area.height;
     start_x = x;
     start_y = y;
-    if (corner == prop_atoms.net_wm_moveresize_move_keyboard ||
-        corner == prop_atoms.net_wm_moveresize_size_keyboard)
-        button = 0; /* mouse can't end it without being pressed first */
-    else
-        button = b;
     corner = cnr;
+    button = b;
 
     if (corner == prop_atoms.net_wm_moveresize_move ||
         corner == prop_atoms.net_wm_moveresize_move_keyboard) {
@@ -145,9 +142,12 @@ void moveresize_end(gboolean cancel)
     moveresize_client = NULL;
 }
 
-static void do_move()
+static void do_move(gboolean resist)
 {
     Rect *a;
+
+    if (resist)
+        resist_move(moveresize_client, &cur_x, &cur_y);
 
     dispatch_move(moveresize_client, &cur_x, &cur_y);
 
@@ -164,13 +164,16 @@ static void do_move()
                  moveresize_client->frame->area.y - a->y);
 }
 
-static void do_resize()
+static void do_resize(gboolean resist)
 {
     /* dispatch_resize needs the frame size */
     cur_x += moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
     cur_y += moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
+
+    if (resist)
+        resist_size(moveresize_client, &cur_x, &cur_y, lockcorner);
 
     dispatch_resize(moveresize_client, &cur_x, &cur_y, lockcorner);
 
@@ -207,7 +210,7 @@ void moveresize_event(XEvent *e)
         if (moving) {
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
-            do_move();
+            do_move(TRUE);
         } else {
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
                 cur_x = start_cw - (e->xmotion.x_root - start_x);
@@ -250,7 +253,7 @@ void moveresize_event(XEvent *e)
             } else
                 g_assert_not_reached();
 
-            do_resize();
+            do_resize(TRUE);
         }
     } else if (e->type == KeyPress) {
         if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
@@ -269,7 +272,7 @@ void moveresize_event(XEvent *e)
                     cur_y -= MAX(4, moveresize_client->size_inc.height);
                 else
                     return;
-                do_resize();
+                do_resize(FALSE);
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
                     cur_x += 4;
@@ -281,7 +284,7 @@ void moveresize_event(XEvent *e)
                     cur_y -= 4;
                 else
                     return;
-                do_move();
+                do_move(FALSE);
             }
         }
     }

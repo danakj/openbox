@@ -67,6 +67,11 @@ extern gint config_mouse_threshold;
   double-click */
 extern gint config_mouse_dclicktime;
 
+/*! Number of pixels to resist while crossing another window's edge */
+gint config_resist_win;
+/*! Number of pixels to resist while crossing a screen's edge */
+gint config_resist_edge;
+
 /*! User-specified path to the menu file */
 extern gchar *config_menu_path;
 

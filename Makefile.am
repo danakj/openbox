@@ -26,7 +26,6 @@ bin_PROGRAMS = \
 	tools/kdetrayproxy/kdetrayproxy
 
 plugin_LTLIBRARIES = \
-	plugins/resistance/resistance.la \
 	plugins/placement/placement.la \
 	plugins/menu/timed_menu.la \
 	plugins/menu/fifo_menu.la \
@@ -36,9 +35,6 @@ plugin_LTLIBRARIES = \
 if OBCONF
 bin_PROGRAMS += \
 	tools/obconf/obconf
-
-#plugin_LTLIBRARIES += \
-#	plugins/resistance/resistance-config.la
 endif
 
 ## render ##
@@ -176,6 +172,8 @@ kernel_openbox_SOURCES = \
 	kernel/popup.h \
 	kernel/prop.c \
 	kernel/prop.h \
+	kernel/resist.c \
+	kernel/resist.h \
 	kernel/screen.c \
 	kernel/screen.h \
 	kernel/session.c \
@@ -193,39 +191,6 @@ kernel_openbox_SOURCES = \
 	kernel/xerror.c \
 	kernel/xerror.h \
 	plugins/interface.h
-
-## plugins/resistance ##
-
-plugins_resistance_resistance_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Resistance\"
-plugins_resistance_resistance_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_resistance_resistance_la_SOURCES = \
-	plugins/resistance/resistance.c \
-	plugins/resistance/resistance.h
-
-if OBCONF
-plugins_resistance_resistance_config_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Resistance\" \
-	$(GTK_CFLAGS) \
-	$(GLADE_CFLAGS)
-plugins_resistance_resistance_config_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_resistance_resistance_config_la_SOURCES = \
-	plugins/resistance/resistance_config.c
-endif
 
 ## plugins/placement ##
 

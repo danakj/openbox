@@ -158,7 +158,6 @@ void plugin_loadall(ObParseInst *i)
     if (io == NULL) {
         /* load the default plugins */
         plugin_open("placement", i);
-        plugin_open("resistance", i);
 
         /* XXX rm me when the parser loads me magically */
         plugin_open("client_menu", i);

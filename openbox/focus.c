@@ -15,6 +15,7 @@
 
 #include <X11/Xlib.h>
 #include <glib.h>
+#include <assert.h>
 
 Client *focus_client = NULL;
 GList **focus_order = NULL; /* these lists are created when screen_startup
@@ -213,8 +214,11 @@ void focus_fallback(FallbackType type)
                 for (sit = old->group->members; sit; sit = sit->next)
                     if (sit->data == it->data)
                         if (sit->data != old && client_normal(sit->data))
-                            if (client_focus(sit->data))
+                            if (client_can_focus(sit->data)) {
+                                gboolean r = client_focus(sit->data);
+                                assert(r);
                                 return;
+                            }
         }
     }
 

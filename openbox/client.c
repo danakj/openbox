@@ -2239,9 +2239,29 @@ Client *client_focus_target(Client *self)
     return self;
 }
 
+gboolean client_can_focus(Client *self)
+{
+    /* same code as in client_focus */
+
+    /* choose the correct target */
+    self = client_focus_target(self);
+
+    if (!self->frame->visible)
+        return FALSE;
+
+    if (!((self->can_focus || self->focus_notify) &&
+          (self->desktop == screen_desktop ||
+           self->desktop == DESKTOP_ALL) &&
+          !self->iconic))
+	return FALSE;
+    return TRUE;
+}
+
 gboolean client_focus(Client *self)
 {
     XEvent ev;
+
+    /* same code as in client_can_focus */
 
     /* choose the correct target */
     self = client_focus_target(self);

@@ -267,7 +267,7 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
       c.color.red = 0;
       c.color.green = 0;
       c.color.blue = 0;
-      c.color.alpha = 0x49 | 0x49 << 8; // transparent shadow
+      c.color.alpha = 0x40 | 0x40 << 8; // transparent shadow
       c.pixel = BlackPixel(_display, _screen->getScreenNumber());
 
         

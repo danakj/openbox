@@ -42,4 +42,6 @@ struct RrSurface {
     int parenty;
 };
 
+struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
+
 #endif

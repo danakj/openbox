@@ -15,9 +15,21 @@ rendertest_LDFLAGS=-lobrender2 -L.
 rendertest_SOURCES=test.c
 
 lib_LTLIBRARIES=libobrender2.la
-libobrender2_la_SOURCES=init.c instance.c color.c debug.c font.c surface.c
+libobrender2_la_SOURCES=\
+	init.c \
+	instance.c \
+	color.c \
+	debug.c \
+	font.c \
+	surface.c \
+	texture.h
 
-noinst_HEADERS=render.h instance.h debug.h surface.h
+noinst_HEADERS=\
+	render.h \
+	instance.h \
+	debug.h \
+	surface.h \
+	texture.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

@@ -76,15 +76,10 @@ int RrFontMaxCharWidth(struct RrFont *font);
 /* surfaces */
 
 struct RrSurface;
-struct RrTexture;
 
 enum RrSurfaceType {
     RR_SURFACE_PLANAR,
     RR_SURFACE_NONPLANAR
-};
-
-enum RrTextureType {
-    RR_TEXTURE_FOO
 };
 
 /*! The options available for the background of an RrSurface */
@@ -133,6 +128,38 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *sur,
 void RrSurfaceFree(struct RrSurface *sur);
 
 Window RrSurfaceWindow(struct RrSurface *sur);
-struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
+
+/* textures */
+
+enum RrLayout {
+    RR_TOP_LEFT,
+    RR_TOP,
+    RR_TOP_RIGHT,
+    RR_LEFT,
+    RR_CENTER,
+    RR_RIGHT,
+    RR_BOTTOM_LEFT,
+    RR_BOTTOM,
+    RR_BOTTOM_RIGHT
+};
+
+#ifndef __LONG64
+typedef long RrData32;
+#else
+typedef int RrData32;
+#endif
+
+void RrTextureSetRGBA(struct RrSurface *sur,
+                      int texnum,
+                      RrData32 *data,
+                      int x,
+                      int y,
+                      int w,
+                      int h);
+void RrTextureSetText(struct RrSurface *sur,
+                      int texnum,
+                      struct RrFont *font,
+                      enum RrLayout layout,
+                      const char *text);
 
 #endif

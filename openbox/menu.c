@@ -89,13 +89,13 @@ void menu_startup(gboolean reconfig)
     for (it = config_menu_files; it; it = g_slist_next(it)) {
         if (menu_open(it->data, &doc, &node)) {
             loaded = TRUE;
-            parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+            parse_tree(menu_parse_inst, doc, node->children);
             xmlFreeDoc(doc);
         }
     }
     if (!loaded) {
         if (menu_open("menu.xml", &doc, &node)) {
-            parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+            parse_tree(menu_parse_inst, doc, node->children);
             xmlFreeDoc(doc);
         }
     }
@@ -149,7 +149,7 @@ void menu_pipe_execute(ObMenu *self)
 
         menu_parse_state.pipe_creator = self;
         menu_parse_state.parent = self;
-        parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+        parse_tree(menu_parse_inst, doc, node->children);
         xmlFreeDoc(doc);
     } else {
         g_warning("Invalid output from pipe-menu: %s", self->execute);
@@ -178,7 +178,7 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         if (parse_attr_string("label", node, &label)) {
             GSList *acts = NULL;
 
-            for (node = node->xmlChildrenNode; node; node = node->next)
+            for (node = node->children; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action"))
                     acts = g_slist_append(acts, action_parse
                                           (i, doc, node,
@@ -222,7 +222,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
                 old = state->parent;
                 state->parent = menu;
-                parse_tree(i, doc, node->xmlChildrenNode);
+                parse_tree(i, doc, node->children);
                 state->parent = old;
             }
         }

@@ -71,7 +71,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         if (parse_attr_string("key", n, &key)) {
             keylist = g_list_append(keylist, key);
 
-            parse_key(i, doc, n->xmlChildrenNode, keylist);
+            parse_key(i, doc, n->children, keylist);
 
             it = g_list_last(keylist);
             g_free(it->data);
@@ -93,7 +93,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                            void *d)
 {
-    parse_key(i, doc, node->xmlChildrenNode, NULL);
+    parse_key(i, doc, node->children, NULL);
 }
 
 /*
@@ -116,7 +116,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     ObMouseAction mact;
     ObAction *action;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
     
     if ((n = parse_find_node("dragThreshold", node)))
         config_mouse_threshold = parse_int(doc, n);
@@ -127,7 +127,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     while (n) {
         if (!parse_attr_string("name", n, &contextstr))
             goto next_n;
-        nbut = parse_find_node("mousebind", n->xmlChildrenNode);
+        nbut = parse_find_node("mousebind", n->children);
         while (nbut) {
             if (!parse_attr_string("button", nbut, &buttonstr))
                 goto next_nbut;
@@ -148,7 +148,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 mact = OB_MOUSE_ACTION_MOTION;
             } else
                 goto next_nbut;
-            nact = parse_find_node("action", nbut->xmlChildrenNode);
+            nact = parse_find_node("action", nbut->children);
             while (nact) {
                 if ((action = action_parse(i, doc, nact, uact)))
                     mouse_bind(buttonstr, contextstr, mact, action);
@@ -169,7 +169,7 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 {
     xmlNodePtr n;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
     
     if ((n = parse_find_node("focusNew", node)))
         config_focus_new = parse_bool(doc, n);
@@ -188,7 +188,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 {
     xmlNodePtr n;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
 
     if ((n = parse_find_node("name", node))) {
         gchar *c;
@@ -209,7 +209,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 {
     xmlNodePtr n;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
     
     if ((n = parse_find_node("number", node)))
         config_desktops_num = parse_int(doc, n);
@@ -222,7 +222,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         g_slist_free(config_desktops_names);
         config_desktops_names = NULL;
 
-        nname = parse_find_node("name", n->xmlChildrenNode);
+        nname = parse_find_node("name", n->children);
         while (nname) {
             config_desktops_names = g_slist_append(config_desktops_names,
                                                    parse_string(doc, nname));
@@ -236,7 +236,7 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 {
     xmlNodePtr n;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
     
     if ((n = parse_find_node("drawContents", node)))
         config_redraw_resize = parse_bool(doc, n);
@@ -246,7 +246,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
 
     if ((n = parse_find_node("position", node))) {
         if (parse_contains("TopLeft", doc, n))
@@ -304,7 +304,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    for (node = node->xmlChildrenNode; node; node = node->next) {
+    for (node = node->children; node; node = node->next) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "file")) {
             gchar *c;
 
@@ -321,7 +321,7 @@ static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 {
     xmlNodePtr n;
 
-    node = node->xmlChildrenNode;
+    node = node->children;
     if ((n = parse_find_node("strength", node)))
         config_resist_win = parse_int(doc, n);
     if ((n = parse_find_node("screen_edge_strength", node)))

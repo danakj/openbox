@@ -136,7 +136,7 @@ void parse_tree(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
 char *parse_string(xmlDocPtr doc, xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeListGetString(doc, node->xmlChildrenNode, TRUE);
+    xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
     char *s = g_strdup(c ? (char*)c : "");
     xmlFree(c);
     return s;
@@ -144,7 +144,7 @@ char *parse_string(xmlDocPtr doc, xmlNodePtr node)
 
 int parse_int(xmlDocPtr doc, xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeListGetString(doc, node->xmlChildrenNode, TRUE);
+    xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
     int i = atoi((char*)c);
     xmlFree(c);
     return i;
@@ -152,7 +152,7 @@ int parse_int(xmlDocPtr doc, xmlNodePtr node)
 
 gboolean parse_bool(xmlDocPtr doc, xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeListGetString(doc, node->xmlChildrenNode, TRUE);
+    xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
     gboolean b = FALSE;
     if (!xmlStrcasecmp(c, (const xmlChar*) "true"))
         b = TRUE;
@@ -166,7 +166,7 @@ gboolean parse_bool(xmlDocPtr doc, xmlNodePtr node)
 
 gboolean parse_contains(const char *val, xmlDocPtr doc, xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeListGetString(doc, node->xmlChildrenNode, TRUE);
+    xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
     gboolean r;
     r = !xmlStrcasecmp(c, (const xmlChar*) val);
     xmlFree(c);

@@ -469,7 +469,7 @@ static void session_load(char *path)
     g_free(sm_id);
     sm_id = id;
 
-    node = parse_find_node("window", node->xmlChildrenNode);
+    node = parse_find_node("window", node->children);
     while (node) {
         ObSessionState *state;
 
@@ -477,52 +477,52 @@ static void session_load(char *path)
 
         if (!parse_attr_string("id", node, &state->id))
             goto session_load_bail;
-        if (!(n = parse_find_node("name", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("name", node->children)))
             goto session_load_bail;
         state->name = parse_string(doc, n);
-        if (!(n = parse_find_node("class", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("class", node->children)))
             goto session_load_bail;
         state->class = parse_string(doc, n);
-        if (!(n = parse_find_node("role", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("role", node->children)))
             goto session_load_bail;
         state->role = parse_string(doc, n);
-        if (!(n = parse_find_node("stacking", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("stacking", node->children)))
             goto session_load_bail;
         state->stacking = parse_int(doc, n);
-        if (!(n = parse_find_node("desktop", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("desktop", node->children)))
             goto session_load_bail;
         state->desktop = parse_int(doc, n);
-        if (!(n = parse_find_node("x", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("x", node->children)))
             goto session_load_bail;
         state->x = parse_int(doc, n);
-        if (!(n = parse_find_node("y", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("y", node->children)))
             goto session_load_bail;
         state->y = parse_int(doc, n);
-        if (!(n = parse_find_node("width", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("width", node->children)))
             goto session_load_bail;
         state->w = parse_int(doc, n);
-        if (!(n = parse_find_node("height", node->xmlChildrenNode)))
+        if (!(n = parse_find_node("height", node->children)))
             goto session_load_bail;
         state->h = parse_int(doc, n);
 
         state->shaded =
-            parse_find_node("shaded", node->xmlChildrenNode) != NULL;
+            parse_find_node("shaded", node->children) != NULL;
         state->iconic =
-            parse_find_node("iconic", node->xmlChildrenNode) != NULL;
+            parse_find_node("iconic", node->children) != NULL;
         state->skip_pager =
-            parse_find_node("skip_pager", node->xmlChildrenNode) != NULL;
+            parse_find_node("skip_pager", node->children) != NULL;
         state->skip_taskbar =
-            parse_find_node("skip_taskbar", node->xmlChildrenNode) != NULL;
+            parse_find_node("skip_taskbar", node->children) != NULL;
         state->fullscreen =
-            parse_find_node("fullscreen", node->xmlChildrenNode) != NULL;
+            parse_find_node("fullscreen", node->children) != NULL;
         state->above =
-            parse_find_node("above", node->xmlChildrenNode) != NULL;
+            parse_find_node("above", node->children) != NULL;
         state->below =
-            parse_find_node("below", node->xmlChildrenNode) != NULL;
+            parse_find_node("below", node->children) != NULL;
         state->max_horz =
-            parse_find_node("max_horz", node->xmlChildrenNode) != NULL;
+            parse_find_node("max_horz", node->children) != NULL;
         state->max_vert =
-            parse_find_node("max_vert", node->xmlChildrenNode) != NULL;
+            parse_find_node("max_vert", node->children) != NULL;
         
         /* save this */
         session_saved_state = g_list_prepend(session_saved_state, state);

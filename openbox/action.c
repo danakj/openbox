@@ -798,6 +798,13 @@ ActionString actionstrings[] =
     }
 };
 
+/* only key bindings can be interactive. thus saith the xor.
+   because of how the mouse is grabbed, mouse events dont even get
+   read during interactive events, so no dice! >:) */
+#define INTERACTIVE_LIMIT(a, uact) \
+    if (uact != OB_USER_ACTION_KEYBOARD_KEY) \
+        a->data.any.interactive = FALSE;
+
 ObAction *action_from_string(const gchar *name, ObUserAction uact)
 {
     ObAction *a = NULL;
@@ -810,11 +817,7 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
             a = action_new(actionstrings[i].func);
             if (actionstrings[i].setup)
                 actionstrings[i].setup(&a, uact);
-            /* only key bindings can be interactive. thus saith the xor.
-             because of how the mouse is grabbed, mouse events dont even get
-             read during interactive events, so no dice! >:) */
-            if (uact != OB_USER_ACTION_KEYBOARD_KEY)
-                a->data.any.interactive = FALSE;
+            INTERACTIVE_LIMIT(a, uact);
             break;
         }
     if (!exist)
@@ -889,6 +892,7 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     act->data.cycle.dialog = parse_bool(doc, n);
             }
         }
+        INTERACTIVE_LIMIT(act, uact);
         g_free(actname);
     }
     return act;

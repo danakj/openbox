@@ -61,12 +61,18 @@ AC_DEFUN([OB_COMPILER_FLAGS],
 
     FLAGS=""
 
+    if test "$DEBUG" = "yes"; then
+        FLAGS="-DDEBUG"
+    else
+        FLAGS="-DNDEBUG -DG_DISABLE_ASSERT"
+    fi
+
     # Check what compiler we are using
     AC_MSG_CHECKING([for GNU CC])
     if test "$GCC" = "yes"; then
 	AC_MSG_RESULT([yes])
 	if test "$DEBUG" = "yes"; then
-	    FLAGS="-g -fno-inline"
+	    FLAGS="$FLAGS -g -fno-inline"
 	    FLAGS="$FLAGS -Wall -Wsign-compare -Waggregate-return"
 	    FLAGS="$FLAGS -Wcast-qual -Wbad-function-cast -Wpointer-arith"
             # for Python.h

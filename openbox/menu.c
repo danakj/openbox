@@ -290,7 +290,13 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     menu_frame_hide_all();
 
     frame = menu_frame_new(self, client);
-    menu_frame_move(frame, x - ob_rr_theme->bwidth, y - ob_rr_theme->bwidth);
+    if (client && x < 0 && y < 0)
+        menu_frame_move(frame,
+                        client->frame->area.x + client->frame->size.left,
+                        client->frame->area.y + client->frame->size.top);
+    else
+        menu_frame_move(frame,
+                        x - ob_rr_theme->bwidth, y - ob_rr_theme->bwidth);
     menu_frame_show(frame, NULL);
     if (frame->entries)
         menu_frame_select_next(frame);

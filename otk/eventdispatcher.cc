@@ -52,23 +52,6 @@ void OtkEventDispatcher::dispatchEvents(void)
 
     if (handler)
       handler->handle(e);
-    else {
-      // some events have to be handled anyways!
-      if (e.type == ConfigureRequest) {
-        XWindowChanges xwc;
-
-        xwc.x = e.xconfigurerequest.x;
-        xwc.y = e.xconfigurerequest.y;
-        xwc.width = e.xconfigurerequest.width;
-        xwc.height = e.xconfigurerequest.height;
-        xwc.border_width = e.xconfigurerequest.border_width;
-        xwc.sibling = e.xconfigurerequest.above;
-        xwc.stack_mode = e.xconfigurerequest.detail;
-
-        XConfigureWindow(OBDisplay::display, e.xconfigurerequest.window,
-                         e.xconfigurerequest.value_mask, &xwc);
-      }
-    }
   }
 }
 

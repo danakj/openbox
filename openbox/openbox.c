@@ -283,7 +283,6 @@ int main(int argc, char **argv)
 
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
-        execlp(BINARY, BINARY, NULL); /* try this as a last resort */
     }
      
     return 0;
@@ -372,7 +371,7 @@ static void sm_startup(int argc, char **argv)
         val_prog.value = argv[0];
         val_prog.length = strlen(argv[0]);
 
-        val_uid.value = g_get_user_name();
+        val_uid.value = g_strdup(g_get_user_name());
         val_uid.length = strlen(val_uid.value);
 
         hint = SmRestartImmediately;
@@ -404,6 +403,7 @@ static void sm_startup(int argc, char **argv)
 
         SmcSetProperties(ob_sm_conn, 7, props);
 
+        g_free(val_uid.value);
         g_free(prop_cmd.vals);
         g_free(prop_res.vals);
 
@@ -475,7 +475,7 @@ static void print_version()
 static void print_help()
 {
     print_version();
-    g_print("Syntax: %s [options]\n\n", BINARY);
+    g_print("Syntax: openbox [options]\n\n");
     g_print("Options:\n\n");
     g_print("  --rc PATH          Specify the path to the rc file to use\n");
 #ifdef USE_SM

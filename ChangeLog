@@ -1,3 +1,73 @@
+2003-07-31  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/openbox.c: oops missed one
+
+	* kernel/openbox.c, kernel/openbox.h: expose exit_with_error
+
+	* plugins/placement/history.c: kill warnings
+
+	* kernel/session.c: kill some output
+
+	* kernel/openbox.c:
+	only load the session from file if a file was provided
+
+	* render/font.c: missing a header
+
+	* README.CVS: remove shit i no longer use
+
+	* parser/parse.c: always return a string from parse_string
+
+	* kernel/client.c:
+	set the desktop hint if the desktop is changed by the session code
+
+	* kernel/client.c:
+	set the desktop hint after everything is read/setup even session stuff
+
+	* kernel/client.c:
+	add the window to the lists before setting the client list hint
+
+	* kernel/session.c:
+	declare functions that are needed when built without session support
+
+	* kernel/session.c:
+	use the new sm_client_id function so all windows who should save state do. session save/load seems to be working with gnome-session rather well.
+
+	* kernel/client.c, kernel/client.h:
+	add a function to retrieve the sm_client_id value
+
+	* plugins/placement/history.c:
+	dont save/load history. its slow and its stupid.
+
+2003-07-30  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/client.c, kernel/prop.c, kernel/prop.h, kernel/session.c, kernel/session.h:
+	restore saved session data for applications
+
+	* plugins/placement/placement.c: center transients
+
+	* data/rc3, kernel/config.c, kernel/config.h, kernel/frame.c, render/theme.c, render/theme.h:
+	move the titlebar layout from the theme to the rc file
+
+	* kernel/client.c: attemp #3
+
+	* kernel/client.c: attempt #2 at better logical size values
+
+	* kernel/client.c: include the base size in the logical size
+
+	* ChangeLog: recent changes
+
+	* kernel/client.c: the size can be 0 when there is a base size
+
+	* kernel/client.c, kernel/client.h, kernel/event.c:
+	improved ICCCM compliance!
+	  a) send ConfigureNotify back to the client as required by the ICCCM in all sitatuations.
+	  b) send the corrent coords in the ConfigureNotify, including the border width
+	  c) remove the WM_STATE property when unmanaging a window
+
+	* kernel/frame.c: code cleaning
+
+	* kernel/menu.c: only ignore wheel buttons
+
 2003-07-30  xor@zed.orodu.net  <xor@zed>
 
 	* client.c: the size can be 0 when there is a base size

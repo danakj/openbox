@@ -17,6 +17,8 @@ options {
 	blef 5;
 .br
 }
+.PP
+.B NOTE: options is not yet supported by epist. This will exist in the next release.
 .SS bindings
 Bindings are specified in this format:
 .br

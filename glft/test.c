@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     XSetWMProtocols(display, win, &delete_win, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, W, -100, H-100, 0, 10);
+    glOrtho(-50, W-50, -100, H-100, 0, 10);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_TEXTURE_2D);
     quit = 0;

@@ -397,7 +397,8 @@ void Toolbar::reconfigure() {
     if (tt) {
       char t[1025], *time_string = (char *) 0;
       int len = strftime(t, 1024, screen.strftimeFormat(), tt);
-      t[len++] = ' ';   // add a space to the string for padding
+      t[len++] = 'A';   // add size to the string for padding
+      t[len++] = 'A';   // add size to the string for padding
       t[len] = '\0';
 
       if (i18n->multibyte()) {

@@ -1721,7 +1721,9 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
     /* 'move' the window to the new desktop */
     if (!donthide)
         client_showhide(self);
-    stacking_raise(self);
+    /* raise if it was not already on the desktop */
+    if (old != DESKTOP_ALL)
+        stacking_raise(self);
     screen_update_struts();
 
     /* update the focus lists */

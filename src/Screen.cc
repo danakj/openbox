@@ -66,8 +66,11 @@ extern "C" {
 #endif // HAVE_STDARG_H
 }
 
+#include <assert.h>
+
 #include <algorithm>
 #include <functional>
+#include <string>
 using std::string;
 
 #include "i18n.hh"
@@ -1039,7 +1042,7 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 
     if (blackbox->getFocusedWindow() &&
         blackbox->getFocusedWindow()->getScreen() == this &&
-        (! blackbox->getFocusedWindow()->isStuck())) {
+        ! blackbox->getFocusedWindow()->isStuck()) {
       current_workspace->setLastFocusedWindow(blackbox->getFocusedWindow());
       blackbox->setFocusedWindow((BlackboxWindow *) 0);
     }

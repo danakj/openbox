@@ -25,12 +25,14 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "Color.hh"
-#include "BaseDisplay.hh"
-
 extern "C" {
 #include <stdio.h>
 }
+
+#include <assert.h>
+
+#include "Color.hh"
+#include "BaseDisplay.hh"
 
 
 BColor::ColorCache BColor::colorcache;

@@ -90,6 +90,8 @@ extern "C" {
 #endif // HAVE_LIBGEN_H
 }
 
+#include <assert.h>
+
 #include <algorithm>
 #include <string>
 using std::string;

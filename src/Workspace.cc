@@ -38,6 +38,8 @@ extern "C" {
 #endif // HAVE_STRING_H
 }
 
+#include <assert.h>
+
 #include <functional>
 #include <string>
 
@@ -506,26 +508,26 @@ bool Workspace::smartPlacement(Rect& win, const Rect& availableArea) {
   if (screen->getPlacementPolicy() == BScreen::RowSmartPlacement) {
     if(screen->getRowPlacementDirection() == BScreen::LeftRight) {
       if(screen->getColPlacementDirection() == BScreen::TopBottom)
-        sort(spaces.begin(), spaces.end(), rowLRTB);
+        std::sort(spaces.begin(), spaces.end(), rowLRTB);
       else
-        sort(spaces.begin(), spaces.end(), rowLRBT);
+        std::sort(spaces.begin(), spaces.end(), rowLRBT);
     } else {
       if(screen->getColPlacementDirection() == BScreen::TopBottom)
-        sort(spaces.begin(), spaces.end(), rowRLTB);
+        std::sort(spaces.begin(), spaces.end(), rowRLTB);
       else
-        sort(spaces.begin(), spaces.end(), rowRLBT);
+        std::sort(spaces.begin(), spaces.end(), rowRLBT);
     }
   } else {
     if(screen->getColPlacementDirection() == BScreen::TopBottom) {
       if(screen->getRowPlacementDirection() == BScreen::LeftRight)
-        sort(spaces.begin(), spaces.end(), colLRTB);
+        std::sort(spaces.begin(), spaces.end(), colLRTB);
       else
-        sort(spaces.begin(), spaces.end(), colRLTB);
+        std::sort(spaces.begin(), spaces.end(), colRLTB);
     } else {
       if(screen->getRowPlacementDirection() == BScreen::LeftRight)
-        sort(spaces.begin(), spaces.end(), colLRBT);
+        std::sort(spaces.begin(), spaces.end(), colLRBT);
       else
-        sort(spaces.begin(), spaces.end(), colRLBT);
+        std::sort(spaces.begin(), spaces.end(), colRLBT);
     }
   }
 

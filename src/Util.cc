@@ -52,6 +52,8 @@ extern "C" {
 
 #include <X11/Xatom.h>
 
+#include <assert.h>
+
 #include <algorithm>
 
 #include "Util.hh"

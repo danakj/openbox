@@ -40,6 +40,7 @@ extern "C" {
 }
 
 #include <algorithm>
+#include <assert.h>
 using namespace std;
 
 #include "i18n.hh"

@@ -32,6 +32,8 @@ extern "C" {
 #endif
 }
 
+#include <assert.h>
+
 #include "Texture.hh"
 #include "BaseDisplay.hh"
 #include "Image.hh"

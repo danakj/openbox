@@ -90,8 +90,6 @@ BGCCache::~BGCCache(void) {
   std::for_each(cache, cache + cache_total_size, PointerAssassin());
   delete [] cache;
   delete [] contexts;
-  cache = 0;
-  contexts = 0;
 }
 
 
@@ -116,6 +114,7 @@ BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
 
   fprintf(stderr, "BGCCache: context fault!\n");
   abort();
+  return (BGCCacheContext*) 0; // not reached
 }
 
 

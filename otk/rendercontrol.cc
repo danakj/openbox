@@ -57,14 +57,4 @@ RenderControl::~RenderControl()
 
 }
 
-
-void RenderControl::render(::Drawable d)
-{
-  Pixmap p = XCreatePixmap(**display, d, 255, 30, _screen->depth());
-
-
-
-  XFreePixmap(**display, p);
-}
-
 }

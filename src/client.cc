@@ -33,7 +33,40 @@ OBClient::OBClient(Window window)
   getArea();
   getDesktop();
   getType();
-  getMwmHints();
+
+  // set the decorations and functions
+  switch (_type) {
+  case Type_Normal:
+    // normal windows retain all of the possible decorations and
+    // functionality
+    _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+                   Decor_Iconify | Decor_Maximize;
+    _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
+
+  case Type_Dialog:
+    // dialogs cannot be maximized
+    _decorations &= ~Decor_Maximize;
+    _functions &= ~Func_Maximize;
+    break;
+
+  case Type_Menu:
+  case Type_Toolbar:
+  case Type_Utility:
+    // these windows get less functionality
+    _decorations &= ~(Decor_Iconify | Decor_Handle);
+    _functions &= ~(Func_Iconify | Func_Resize);
+    break;
+
+  case Type_Desktop:
+  case Type_Dock:
+  case Type_Splash:
+    // none of these windows are manipulated by the window manager
+    _decorations = 0;
+    _functions = 0;
+    break;
+  }
+  
+  getMwmHints(); // this fucks (in good ways) with the decors and functions
   getState();
   getShaped();
 
@@ -171,12 +204,10 @@ void OBClient::getType()
     //else
       _type = Type_Normal;
   }
-
-  // set the decorations and functions based on the type of the window
 }
 
 
-void OBClient::getMWMHints()
+void OBClient::getMwmHints()
 {
   const otk::OBProperty *property = Openbox::instance->property();
 
@@ -198,7 +229,7 @@ void OBClient::getMWMHints()
   // Mwm Hints are applied subtractively to what has already been chosen for
   // decor and functionality
 
-  if (hints->flags & MwmDecorations) {
+  if (hints->flags & MwmFlag_Decorations) {
     if (! (hints->decorations & MwmDecor_All)) {
       if (! (hints->decorations & MwmDecor_Border))
         _decorations &= ~Decor_Border;
@@ -213,22 +244,18 @@ void OBClient::getMWMHints()
     }
   }
 
-  _mwm_functions = 0xffffffff; // everything!
-
-  if (hints->flags & MwmFunctions) {
+  if (hints->flags & MwmFlag_Functions) {
     if (! (hints->functions & MwmFunc_All)) {
-      _mwm_functions = hints->functions;
-      
       if (! (hints->functions & MwmFunc_Resize))
-        functions &= ~Func_Resize;
+        _functions &= ~Func_Resize;
       if (! (hints->functions & MwmFunc_Move))
-        functions &= ~Func_Move;
+        _functions &= ~Func_Move;
       if (! (hints->functions & MwmFunc_Iconify))
-        functions &= ~Func_Iconify;
+        _functions &= ~Func_Iconify;
       if (! (hints->functions & MwmFunc_Maximize))
-        functions &= ~Func_Maximize;
-      if (! (hints->functions & MwmFunc_Close))
-        functions &= ~Func_Close;
+        _functions &= ~Func_Maximize;
+      //if (! (hints->functions & MwmFunc_Close))
+      //  _functions &= ~Func_Close;
     }
   }
   delete [] hints;
@@ -305,13 +332,9 @@ void OBClient::updateProtocols()
   if (XGetWMProtocols(otk::OBDisplay::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
       if (proto[i] == property->atom(otk::OBProperty::wm_delete_window)) {
-        // add the close button/functionality only if the mwm hints didnt
-        // exclude it
-        if (_mwm_functions & MwmFunc_Close) {
-          decorations |= Decor_Close;
-          functions |= Func_Close;
-          // XXX: update the decor?
-        }
+        _decorations |= Decor_Close;
+        _functions |= Func_Close;
+        // XXX: update the decor?
       } else if (proto[i] == property->atom(otk::OBProperty::wm_take_focus))
         // if this protocol is requested, then the window will be notified
         // by the window manager whenever it receives focus

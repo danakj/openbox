@@ -29,23 +29,24 @@ public:
                     Type_Dialog,
                     Type_Normal };
 
-  enum MwmFlags { MwmFunctions   = 1 << 0,
-                  MwmDecorations = 1 << 1 };
+  enum MwmFlags { MwmFlag_Functions   = 1 << 0,
+                  MwmFlag_Decorations = 1 << 1 };
 
   enum MwmFunctions { MwmFunc_All      = 1 << 0,
                       MwmFunc_Resize   = 1 << 1,
                       MwmFunc_Move     = 1 << 2,
                       MwmFunc_Iconify  = 1 << 3,
-                      MwmFunc_Maximize = 1 << 4,
-                      MwmFunc_Close    = 1 << 5 };
+                      MwmFunc_Maximize = 1 << 4
+                      //MwmFunc_Close    = 1 << 5
+  };
 
-  enum MemDecorations { MemDecor_All      = 1 << 0,
-                        MemDecor_Border   = 1 << 1,
-                        MemDecor_Handle   = 1 << 2,
-                        MemDecor_Title    = 1 << 3,
-                        //MemDecor_Menu     = 1 << 4,
-                        MemDecor_Iconify  = 1 << 5,
-                        MemDecor_Maximize = 1 << 6 };
+  enum MemDecorations { MwmDecor_All      = 1 << 0,
+                        MwmDecor_Border   = 1 << 1,
+                        MwmDecor_Handle   = 1 << 2,
+                        MwmDecor_Title    = 1 << 3,
+                        //MwmDecor_Menu     = 1 << 4,
+                        MwmDecor_Iconify  = 1 << 5,
+                        MwmDecor_Maximize = 1 << 6 };
 
   // the things the user can do to the client window
   enum Function { Func_Resize   = 1 << 0,
@@ -67,7 +68,7 @@ public:
   // this structure only contains 3 elements... the Motif 2.0 structure
   // contains 5... we only need the first 3... so that is all we will define
   typedef struct MwmHints {
-    static const int elements = 3;
+    static const unsigned int elements = 3;
     unsigned long flags;
     unsigned long functions;
     unsigned long decorations;
@@ -163,9 +164,6 @@ private:
     displayed around it.
   */
   DecorationFlags _decorations;
-
-  //! The functions requested by the Mwm Hints
-  int _mwm_functions;
 
   //! A bitmask of values in the OBClient::Function enum
   /*!

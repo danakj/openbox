@@ -53,6 +53,8 @@ enum EventAction {
   EventLeaveWindow,
   EventNewWindow,
   EventCloseWindow,
+  EventStartup,
+  EventShutdown,
   NUM_EVENTS
 };
 

@@ -138,6 +138,11 @@ OBScreen::OBScreen(int screen)
 
   // register this class as the event handler for the root window
   Openbox::instance->registerHandler(_info->rootWindow(), this);
+
+  // call the python Startup callbacks
+  EventData *data = new_event_data(_number, 0, EventShutdown, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_XDECREF((PyObject*)data);
 }
 
 
@@ -150,6 +155,11 @@ OBScreen::~OBScreen()
   // unmanage all windows
   while (!clients.empty())
     unmanageWindow(clients.front());
+
+  // call the python Shutdown callbacks
+  EventData *data = new_event_data(_number, 0, EventShutdown, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_XDECREF((PyObject*)data);
 
   XDestroyWindow(otk::OBDisplay::display, _focuswindow);
   XDestroyWindow(otk::OBDisplay::display, _supportwindow);

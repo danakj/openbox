@@ -487,7 +487,9 @@ void screen_update_layout()
             if (num < 4)
                 corner = OB_CORNER_TOPLEFT;
             else {
-                if (data[3] == prop_atoms.net_wm_topright)
+                if (data[3] == prop_atoms.net_wm_topleft)
+                    corner = OB_CORNER_TOPLEFT;
+                else if (data[3] == prop_atoms.net_wm_topright)
                     corner = OB_CORNER_TOPRIGHT;
                 else if (data[3] == prop_atoms.net_wm_bottomright)
                     corner = OB_CORNER_BOTTOMRIGHT;

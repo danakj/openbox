@@ -37,6 +37,7 @@ gchar *config_title_layout;
 
 gint    config_desktops_num;
 GSList *config_desktops_names;
+gint    config_screen_firstdesk;
 
 gboolean config_redraw_resize;
 
@@ -247,9 +248,14 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     node = node->children;
     
     if ((n = parse_find_node("number", node))) {
-        guint d = parse_int(doc, n);
+        gint d = parse_int(doc, n);
         if (d > 0)
             config_desktops_num = d;
+    }
+    if ((n = parse_find_node("firstdesk", node))) {
+        gint d = parse_int(doc, n);
+        if (d > 0)
+            config_screen_firstdesk = d;
     }
     if ((n = parse_find_node("names", node))) {
         GSList *it;
@@ -502,6 +508,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "theme", parse_theme, NULL);
 
     config_desktops_num = 4;
+    config_screen_firstdesk = 1;
     config_desktops_names = NULL;
 
     parse_register(i, "desktops", parse_desktops, NULL);

@@ -92,6 +92,8 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
   addAction(Action::nextWindowOnAllWorkspaces, Mod1Mask | ControlMask, "Tab");
   addAction(Action::prevWindowOnAllWorkspaces,
             Mod1Mask | ShiftMask | ControlMask, "Tab");
+  addAction(Action::prevWorkspace, Mod1Mask, "Left");
+  addAction(Action::nextWorkspace, Mod1Mask, "Right");
   addAction(Action::raise, Mod1Mask, "Up");
   addAction(Action::lower, Mod1Mask, "Down");
   addAction(Action::moveWindowUp, Mod1Mask | ControlMask, "Up", 1);

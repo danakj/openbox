@@ -10,6 +10,7 @@ Audun Hove <audun@nlc.no>
  - Actions code, move window to edge actions
 Mikael Magnusson <mikachu@comhem.se>
  - Bug finding expert
+ - focusDelay option
 Marius Nita (marius@cs.pdx.edu)
  - Otk prototype code, design ideas.
 Mike Bacso (smakwel@yahoo.com)

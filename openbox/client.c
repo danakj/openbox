@@ -183,9 +183,6 @@ void client_manage_all()
 	}
     }
     XFree(children);
-
-    if (config_focus_new)
-        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
 }
 
 void client_manage(Window window)

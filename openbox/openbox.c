@@ -248,6 +248,7 @@ int main(int argc, char **argv)
             if (!reconfigure) {
                 /* get all the existing windows */
                 client_manage_all();
+                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
             } else {
                 GList *it;
 

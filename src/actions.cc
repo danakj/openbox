@@ -88,6 +88,17 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   if (_button) return; // won't count toward CLICK events
 
   _button = e.button;
+
+  if (w->mcontext() == MC_Window) {
+    /*
+      Because of how events are grabbed on the client window, we can't get
+      ButtonRelease events, so instead we simply manufacture them here, so that
+      clicks/doubleclicks etc still work.
+    */
+    XButtonEvent ev = e;
+    ev.type = ButtonRelease;
+    buttonReleaseHandler(ev);
+  }
 }
   
 

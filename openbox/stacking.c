@@ -205,7 +205,8 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
     return ret;
 }
 
-static GList *pick_group_windows(ObClient *top, ObClient *selected, gboolean raise)
+static GList *pick_group_windows(ObClient *top, ObClient *selected,
+                                 gboolean raise)
 {
     GList *ret = NULL;
     GList *it, *next, *prev;

@@ -2,6 +2,7 @@
 #include "instance.h"
 #include "font.h"
 #include <stdlib.h>
+#include <string.h>
 
 struct RrFont *RrFontOpen(struct RrInstance *inst, const char *fontstring)
 {
@@ -23,7 +24,9 @@ void RrFontClose(struct RrFont *font)
 
 int RrFontMeasureString(struct RrFont *font, const char *string)
 {
-    return 20;
+    int w, h;
+    GlftMeasureString(font->font, string, strlen(string), &w, &h);
+    return w;
 }
 
 int RrFontHeight(struct RrFont *font)
@@ -33,5 +36,5 @@ int RrFontHeight(struct RrFont *font)
 
 int RrFontMaxCharWidth(struct RrFont *font)
 {
-    return 5;
+    return GlftFontMaxCharWidth(font->font);
 }

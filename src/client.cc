@@ -48,13 +48,13 @@ OBClient::OBClient(int screen, Window window)
   getType();
 
   // set the decorations and functions
+  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+    Decor_Iconify | Decor_Maximize;
+  _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
   switch (_type) {
   case Type_Normal:
     // normal windows retain all of the possible decorations and
     // functionality
-    _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-                   Decor_Iconify | Decor_Maximize;
-    _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
 
   case Type_Dialog:
     // dialogs cannot be maximized

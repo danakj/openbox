@@ -158,7 +158,7 @@ gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
             else {
                 g_free(s);
                 s = g_strdup_printf("%s_buttons/%s", theme.string,
-                                    theme.string);
+                                    g_path_get_basename(theme.string));
                 if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
                     BitmapSuccess) 
                     ret = TRUE;

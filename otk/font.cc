@@ -100,11 +100,11 @@ void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
     if (utf8)
       XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
                         _xftfont->ascent + y + _offset,
-                        (const FcChar8*)string.c_str(), string.size());
+                        (FcChar8*)string.c_str(), string.size());
     else
       XftDrawString8(d, &c, _xftfont, x + _offset,
                      _xftfont->ascent + y + _offset,
-                     (const FcChar8*)string.c_str(), string.size());
+                     (FcChar8*)string.c_str(), string.size());
   }
     
   XftColor c;
@@ -116,10 +116,10 @@ void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
 
   if (utf8)
     XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                      (const FcChar8*)string.c_str(), string.size());
+                      (FcChar8*)string.c_str(), string.size());
   else
     XftDrawString8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                   (const FcChar8*)string.c_str(), string.size());
+                   (FcChar8*)string.c_str(), string.size());
 
   return;
 }
@@ -131,10 +131,10 @@ unsigned int BFont::measureString(const string &string, bool utf8) const
 
   if (utf8)
     XftTextExtentsUtf8(OBDisplay::display, _xftfont,
-                       (const FcChar8*)string.c_str(), string.size(), &info);
+                       (FcChar8*)string.c_str(), string.size(), &info);
   else
     XftTextExtents8(OBDisplay::display, _xftfont,
-                    (const FcChar8*)string.c_str(), string.size(), &info);
+                    (FcChar8*)string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }

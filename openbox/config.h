@@ -5,12 +5,14 @@
 
 typedef enum {
     Config_String,
-    Config_Integer
+    Config_Integer,
+    Config_Bool
 } ConfigValueType;
 
 typedef union {
     char *string;
     int integer;
+    gboolean bool;
 } ConfigValue;
 
 typedef struct {

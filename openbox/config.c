@@ -35,7 +35,7 @@ void config_startup()
                                   "Titlebar Font",
                                   "The fontstring specifying the font to "
                                   "be used in window titlebars."));
-    config_def_set(config_def_new("font.shadow", Config_Integer,
+    config_def_set(config_def_new("font.shadow", Config_Bool,
                                   "Titlebar Font Shadow",
                                   "Whether or not the text in the window "
                                   "titlebars gets a drop shadow."));

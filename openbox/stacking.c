@@ -245,7 +245,7 @@ void stacking_lower(ObWindow *window)
 
     window = top_transient(window);
     wins = pick_windows(window);
-    wins = g_list_concat(wins, pick_group_windows(window));
+    wins = g_list_concat(pick_group_windows(window), wins);
     lower(wins);
     g_list_free(wins);
 }

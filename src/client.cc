@@ -866,10 +866,19 @@ void OBClient::close()
 
 bool OBClient::focus()
 {
-  if (!_can_focus) return false;
+  if (!_can_focus || _focused) return false;
 
   XSetInputFocus(otk::OBDisplay::display, _window, RevertToNone, CurrentTime);
   return true;
+}
+
+
+void OBClient::unfocus()
+{
+  if (!_focused) return;
+
+  assert(Openbox::instance->focusedClient() == this);
+  Openbox::instance->setFocusedClient(0);
 }
 
 
@@ -887,11 +896,8 @@ void OBClient::unfocusHandler(const XFocusChangeEvent &)
   frame->unfocus();
   _focused = false;
 
-  if (Openbox::instance->focusedClient() == this) {
-    printf("UNFOCUSING\n");
+  if (Openbox::instance->focusedClient() == this)
     Openbox::instance->setFocusedClient(0);
-  } else
-    printf("UNFOCUSED ALREADY COULDNT UNFOCUS\n");
 }
 
 

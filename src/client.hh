@@ -436,6 +436,9 @@ public:
 
   //! Attempt to focus the client window
   bool focus();
+
+  //! Remove focus from the client window
+  void unfocus();
   
   virtual void focusHandler(const XFocusChangeEvent &e);
   virtual void unfocusHandler(const XFocusChangeEvent &e);

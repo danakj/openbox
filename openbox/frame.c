@@ -684,16 +684,16 @@ void frame_frame_gravity(ObFrame *self, int *x, int *y)
     switch (self->client->gravity) {
     default:
     case NorthWestGravity:
-    case WestGravity:
-    case SouthWestGravity:
-	break;
     case NorthGravity:
+    case NorthEastGravity:
+	break;
+    case WestGravity:
     case CenterGravity:
-    case SouthGravity:
+    case EastGravity:
 	*y += (self->size.top + self->size.bottom) / 2;
 	break;
-    case NorthEastGravity:
-    case EastGravity:
+    case SouthWestGravity:
+    case SouthGravity:
     case SouthEastGravity:
 	*y += self->size.top + self->size.bottom;
 	break;

@@ -3124,16 +3124,16 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
   const int snap_to_windows = screen->getWindowToWindowSnap();
   const int snap_to_edges = screen->getWindowToEdgeSnap();
   // the amount of space away from the edge to provide resistance/snap
-//  const int snap_offset = screen->getSnapThreshold();
+  const int snap_offset = 0;
 
   // find the geomeetery where the moving window currently is
   const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;
 
   // window corners
-  const int wleft = dx,
-           wright = dx + frame.rect.width() - 1,
-             wtop = dy,
-          wbottom = dy + frame.rect.height() - 1;
+  const int wleft = dx - snap_offset,
+           wright = dx + frame.rect.width() - 1 + snap_offset,
+             wtop = dy - snap_offset,
+          wbottom = dy + frame.rect.height() - 1 + snap_offset;
 
   if (snap_to_windows) {
     RectList rectlist;

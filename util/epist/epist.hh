@@ -67,6 +67,11 @@ public:
   void removeWindow(XWindow *window);
   XWindow *findWindow(Window window) const;
 
+  void getLockModifiers(int &numlockMask, int &scrolllockMask) const {
+    numlockMask = NumLockMask;
+    scrolllockMask = ScrollLockMask;
+  }
+  
   const ActionList &actions(void) { return _actions; }
 };
 

@@ -80,6 +80,8 @@ public:
   void changeWorkspace(const int num) const;
   void toggleShaded(const Window win) const;
   void execCommand(const std::string &cmd) const;
+
+  void grabKey(const KeyCode keyCode, const int modifierMask) const;
 };
 
 #endif // __screen_hh

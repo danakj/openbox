@@ -155,11 +155,18 @@ void screen::processEvent(const XEvent &e) {
 }
 
 void screen::handleKeypress(const XEvent &e) {
+  int scrolllockMask, numlockMask;
+
   ActionList::const_iterator it = _epist->actions().begin();
   ActionList::const_iterator end = _epist->actions().end();
+
+  _epist->getLockModifiers(numlockMask, scrolllockMask);
+  
   for (; it != end; ++it) {
+    unsigned int state = e.xkey.state & ~(LockMask|scrolllockMask|numlockMask);
+    
     if (e.xkey.keycode == it->keycode() &&
-        e.xkey.state == it->modifierMask()) {
+        state == it->modifierMask()) {
       switch (it->type()) {
       case Action::nextWorkspace:
         cycleWorkspace(true);
@@ -490,4 +497,38 @@ void screen::changeWorkspace(const int num) const {
   assert(_managed);
 
   _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root, num);
+}
+
+void screen::grabKey(const KeyCode keyCode, const int modifierMask) const {
+
+  Display *display = _epist->getXDisplay();
+  int numlockMask, scrolllockMask;
+
+  _epist->getLockModifiers(numlockMask, scrolllockMask);
+
+  XGrabKey(display, keyCode, modifierMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(display, keyCode, 
+           modifierMask|LockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(display, keyCode, 
+           modifierMask|scrolllockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(display, keyCode, 
+           modifierMask|numlockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+    
+  XGrabKey(display, keyCode, 
+           modifierMask|LockMask|scrolllockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(display, keyCode, 
+           modifierMask|scrolllockMask|numlockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(display, keyCode, 
+           modifierMask|numlockMask|LockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
+    
+  XGrabKey(display, keyCode, 
+           modifierMask|numlockMask|LockMask|scrolllockMask,
+           _root, True, GrabModeAsync, GrabModeAsync);
 }

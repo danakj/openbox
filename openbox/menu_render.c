@@ -80,7 +80,7 @@ void menu_render_full(Menu *self) {
     items_h = self->item_h * MAX(nitems, 1);
 
     XResizeWindow(ob_display, self->frame, self->size.width,
-		  MAX(self->title_h + items_h, 1));
+		  MAX(self->title_h + items_h + ob_rr_theme->bwidth, 1));
     if (self->label)
 	XMoveResizeWindow(ob_display, self->title, -ob_rr_theme->bwidth,
 			  -ob_rr_theme->bwidth,

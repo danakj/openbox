@@ -150,11 +150,17 @@ void screen::handleKeypress(const XEvent &e) {
         e.xkey.state == it->modifierMask() )
       {
         switch (it->type()) {
-        case Action::nextDesktop:
+        case Action::nextWorkspace:
           cycleWorkspace(true);
           break;
-        case Action::prevDesktop:
+        case Action::prevWorkspace:
           cycleWorkspace(false);
+          break;
+        case Action::changeWorkspace:
+          changeWorkspace(it->number());
+          break;
+        case Action::shade:
+          toggleShaded((*_active)->window());
           break;
         }
         break;
@@ -259,9 +265,7 @@ void screen::updateActiveWindow() {
       }
  */
 
-void screen::cycleWorkspace(const bool forward) {
-  cout << "blef" << endl;
-
+void screen::cycleWorkspace(const bool forward) const {
   unsigned long currentDesktop = 0;
   unsigned long numDesktops = 0;
   
@@ -272,9 +276,6 @@ void screen::cycleWorkspace(const bool forward) {
     else
       --currentDesktop;
 
-    cout << currentDesktop << endl;
-
-    
     _xatom->getValue(_root, XAtom::net_number_of_desktops, XAtom::cardinal,
                      numDesktops);
     
@@ -283,10 +284,15 @@ void screen::cycleWorkspace(const bool forward) {
     else if (currentDesktop >= numDesktops)
       currentDesktop = 0;
 
-    
-    _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root,
-                              currentDesktop);
-    
+    changeWorkspace(currentDesktop);
   }
 }
-                                               
+
+void screen::changeWorkspace(const int num) const {
+  _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root, num);
+}
+
+void screen::toggleShaded(const Window win) const {
+  _xatom->sendClientMessage(_root, XAtom::net_wm_state, win, 2,
+                            XAtom::net_wm_state_shaded);
+}

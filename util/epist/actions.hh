@@ -47,15 +47,15 @@ public:
 
     nextWindow,
     prevWindow,
-    nextWindowOnAllDesktops,
-    prevWindowOnAllDesktops,
+    nextWindowOnAllWorkspaces,
+    prevWindowOnAllWorkspaces,
 
     nextWindowOfClass,
     prevWindowOfClass,
 
-    changeDesktop,
-    nextDesktop,
-    prevDesktop,
+    changeWorkspace, //done
+    nextWorkspace, //done
+    prevWorkspace, //done
 
     // these are openbox extensions
     showRootMenu,
@@ -74,13 +74,16 @@ private:
   enum ActionType _type;
   const KeyCode _keycode;
   const int _modifierMask;
-  
+
+  const int _numberParam;
 public:
   inline enum ActionType type() const { return _type;}
   inline const KeyCode keycode() const { return _keycode; }
   inline const int modifierMask() const { return _modifierMask; }
+  inline const int number() const { return _numberParam; }
 
-  Action(enum ActionType type, KeyCode keycode, int modifierMask);
+  Action(enum ActionType type, KeyCode keycode, int modifierMask,
+         int number = 0);
 };
   
 typedef std::list<Action> ActionList;

@@ -76,14 +76,18 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     ::exit(1);
   }
 
-  _actions.push_back(Action(Action::nextDesktop,
+  _actions.push_back(Action(Action::nextWorkspace,
                             XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Tab")),
                             Mod1Mask));
-  _actions.push_back(Action(Action::prevDesktop,
+  _actions.push_back(Action(Action::prevWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Tab")),
                            ControlMask));
+  _actions.push_back(Action(Action::shade,
+                            XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("F5")),
+                            Mod1Mask));
   activateGrabs();
 }
 
@@ -92,11 +96,6 @@ epist::~epist() {
   delete _xatom;
 }
 
-
-//   XGrabKey(_epist->getXDisplay(), XKeysymToKeycode(_epist->getXDisplay(),
-//                                            XStringToKeysym("F5")),
-//            Mod1Mask, _root, True, GrabModeAsync, GrabModeAsync);
-                  
 void epist::activateGrabs() {
 
   ScreenList::const_iterator scrit, scrend = _screens.end();

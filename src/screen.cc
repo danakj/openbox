@@ -492,7 +492,8 @@ void OBScreen::manageWindow(Window window)
   // reparented back to root automatically
   XChangeSaveSet(otk::OBDisplay::display, window, SetModeInsert);
 
-  if (!client->positionRequested()) {
+  if (!(Openbox::instance->state() == Openbox::State_Starting ||
+        client->positionRequested())) {
     // position the window intelligenty .. hopefully :)
     // call the python PLACEWINDOW binding
     EventData *data = new_event_data(_number, window, EventPlaceWindow, 0);

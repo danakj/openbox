@@ -495,6 +495,10 @@ BB    @param window The window id that the Client class should handle
   inline const otk::Strut &strut() const { return _strut; }
 
   //! Move the client window
+  /*!
+    @param x The X coordinate to move to.
+    @param y The Y coordinate to move to.
+  */
   void move(int x, int y);
   
   //! Resizes the client window, anchoring it in a given corner

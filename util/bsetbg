@@ -51,7 +51,7 @@ error_msg()
      echo; echo "$NAME: error: please specify a valid image."
      ;;
    7)
-     echo; echo "$NAME: error: bsetroot couldn't be found! check your openbox installation."
+     echo; echo "$NAME: error: bsetroot couldn't be found! check your blackbox installation."
      ;;
    8)
      echo; echo "$NAME: error: wrong number of arguments!"
@@ -508,7 +508,7 @@ check_image()
 	    esac
     esac
 
-    if [ ! -e "$IMAGE" ]; then
+    if [ ! -f "$IMAGE" ]; then
 	error_msg $NUM  
     else
 	IMAGE_EXISTS=yes
@@ -596,15 +596,30 @@ debug()
     echo
 }
 
+create_tempfile() {
+    if `type tempfile 2>&1 >/dev/null`; then
+        THETMP=`tempfile --prefix=bsetbg`
+    elif `type mktemp 2>&1 >/dev/null`; then
+        THETMP=`mktemp -t bsetbg`
+    else
+        THETMP=/tmp/.bsetbg.$$
+        if [ -f $THETMP ]; then
+            rm -f $THETMP
+        fi
+	touch $THETMP
+        chmod 600 $THETMP
+    fi
+    TMPFILE=$THETMP
+}
+
 IMAGE_APPS="display Esetroot wmsetbg xv xli qiv"
 CONFIG="$HOME/.bsetbgrc"
 NAME=bsetbg
 VERSION=1.12
 MORE="(C) 2000 by lordzork industries (http://lordzork.com/)"
 PATH=$PATH:/usr/bin:/usr/local/bin:/usr/X11R6/bin:/usr/X11/bin
-TMPFILE=`tempfile --prefix=bsetbg`
 ARGUMENT=$1
-
+create_tempfile
 
 case `which grep 2>&1` in */*grep) : ;;
     *)
@@ -663,9 +678,6 @@ case $1 in
     *-version|-v|v)
 	echo; echo "    $NAME version $VERSION"; echo "    $MORE";  exit 0
 	;;
-    *-help|-h|h)
-	help_msg
-	;;
     -r)
 	case $UID in
 	    0)
@@ -678,6 +690,9 @@ case $1 in
 	    *)
 		exit 1
 	esac
+	;;
+    *-help|-h|h|-?)
+	help_msg
 	;;
     *)
 	if [ -n "$1" ]; then

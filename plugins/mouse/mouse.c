@@ -276,20 +276,26 @@ static void event(ObEvent *e, void *foo)
         if (button) {
             if (ABS(e->data.x.e->xmotion.x_root - px) >= threshold ||
                 ABS(e->data.x.e->xmotion.y_root - py) >= threshold) {
-                guint32 corner = 
-                    pick_corner(e->data.x.e->xmotion.x_root,
-                                e->data.x.e->xmotion.y_root,
-                                e->data.x.client->frame->area.x,
-                                e->data.x.client->frame->area.y,
-                                /* use the client size because the frame can be
-                                   differently sized (shaded windows) and we
-                                   want this based on the clients size */
-                                e->data.x.client->area.width +
-                                e->data.x.client->frame->size.left +
-                                e->data.x.client->frame->size.right,
-                                e->data.x.client->area.height +
-                                e->data.x.client->frame->size.top +
-                                e->data.x.client->frame->size.bottom);
+                guint32 corner;
+
+                if (!client)
+                    corner = prop_atoms.net_am_moveresize_size_bottomright;
+                else
+                    corner =
+                        pick_corner(e->data.x.e->xmotion.x_root,
+                                    e->data.x.e->xmotion.y_root,
+                                    e->data.x.client->frame->area.x,
+                                    e->data.x.client->frame->area.y,
+                                    /* use the client size because the frame
+                                       can be differently sized (shaded
+                                       windows) and we want this based on the
+                                       clients size */
+                                    e->data.x.client->area.width +
+                                    e->data.x.client->frame->size.left +
+                                    e->data.x.client->frame->size.right,
+                                    e->data.x.client->area.height +
+                                    e->data.x.client->frame->size.top +
+                                    e->data.x.client->frame->size.bottom);
                 context = frame_context(e->data.x.client,
                                         e->data.x.e->xmotion.window);
                 fire_motion(MouseAction_Motion, context,

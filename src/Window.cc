@@ -2736,7 +2736,8 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
      Even though the window wants to be shown, if it is not on the current
      workspace, then it isn't going to be shown right now.
   */
-  if (blackbox_attrib.workspace != screen->getCurrentWorkspaceID() &&
+  if (! flags.stuck &&
+      blackbox_attrib.workspace != screen->getCurrentWorkspaceID() &&
       blackbox_attrib.workspace < screen->getWorkspaceCount())
     if (current_state == NormalState) current_state = WithdrawnState;
 

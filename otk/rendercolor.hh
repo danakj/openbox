@@ -11,6 +11,18 @@ extern "C" {
 namespace otk {
 
 class RenderColor {
+  struct RGB {
+    int r;
+    int g;
+    int b;
+    RGB(int red, int green, int blue) : r(red), g(green), b(blue) {}
+    // color is in ARGB format
+    RGB(unsigned long color)
+      : r((color >> 16) & 0xff),
+        g((color >> 8) & 0xff),
+        b((color) & 0xff) {}
+  };
+  
   struct CacheItem {
     GC gc;
     int count;
@@ -25,12 +37,15 @@ class RenderColor {
 
   GC _gc;
 
+  void create();
+  
 public:
   static void initialize();
   static void destroy();
   
   RenderColor(int screen, unsigned char red,
 	      unsigned char green, unsigned char blue);
+  RenderColor(int screen, RGB rgb);
   virtual ~RenderColor();
 
   inline int screen() const { return _screen; }

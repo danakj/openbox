@@ -30,6 +30,32 @@ RenderColor::RenderColor(int screen, unsigned char red,
     _blue(blue),
     _gc(0)
 {
+  create();
+}
+
+RenderColor::RenderColor(int screen, unsigned char red,
+			 unsigned char green, unsigned char blue)
+  : _screen(screen),
+    _red(red),
+    _green(green),
+    _blue(blue),
+    _gc(0)
+{
+  create();
+}
+
+RenderColor::RenderColor(int screen, RGB rgb)
+  : _screen(screen),
+    _red(rgb.r),
+    _green(rgb.g),
+    _blue(rgb.b),
+    _gc(0)
+{
+  create();
+}
+
+void RenderColor::create()
+{
   unsigned long color = _blue | _green << 8 | _red << 16;
   
   // try get a gc from the cache

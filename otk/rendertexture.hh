@@ -67,29 +67,39 @@ private:
 public:
   RenderTexture(bool parent_relative, ReliefType relief, BevelType bevel,
                 bool border, GradientType gradient, bool interlaced,
-                const RenderColor *color, const RenderColor *secondary_color,
-                const RenderColor *bevel_dark_color,
-                const RenderColor *bevel_light_color,
-                const RenderColor *border_color,
-                const RenderColor *interlace_color)
+                const RenderColor::RGB &color,
+                const RenderColor::RGB &secondary_color,
+                const RenderColor::RGB &bevel_dark_color,
+                const RenderColor::RGB &bevel_light_color,
+                const RenderColor::RGB &border_color,
+                const RenderColor::RGB &interlace_color)
     : _parent_relative(parent_relative),
       _relief(relief),
       _bevel(bevel),
       _border(border),
       _gradient(gradient),
       _interlaced(interlaced),
-      _color(color),
-      _secondary_color(secondary_color),
-      _bevel_dark_color(bevel_dark_color),
-      _bevel_light_color(bevel_light_color),
-      _border_color(border_color),
-      _interlace_color(interlace_color)
-    {
-      assert(_relief == Flat || (_bevel_dark_color && _bevel_light_color));
-      assert(!_border || _border_color);
-      assert(!_interlaced || _interlace_color);
-      assert(_color);
-    }
+      _color(new RenderColor(color)),
+      _secondary_color(new RenderColor(secondary_color)),
+      _bevel_dark_color(new RenderColor(bevel_dark_color)),
+      _bevel_light_color(new RenderColor(bevel_light_color)),
+      _border_color(new RenderColor(border_color)),
+      _interlace_color(new RenderColor(interlace_color))
+  {
+    assert(_relief == Flat || (_bevel_dark_color && _bevel_light_color));
+    assert(!_border || _border_color);
+    assert(!_interlaced || _interlace_color);
+    assert(_color);
+  }
+  
+  virtual ~RenderTexture() {
+    delete _color;
+    delete _secondary_color;
+    delete _bevel_dark_color;
+    delete _bevel_light_color;
+    delete _border_color;
+    delete _interlace_color;
+  }
 
   //! If true, the texture is not rendered at all, so all options are ignored
   inline bool parentRelative() const { return _parent_relative; }

@@ -131,23 +131,21 @@ void prop_startup()
     CREATE(openbox_premax, "_OPENBOX_PREMAX");
 }
 
-gboolean prop_get(Window win, Atom prop, Atom type, int size,
-		  guchar **data, gulong num)
+gboolean prop_get32(Window win, Atom prop, Atom type, gulong **data,gulong num)
 {
     gboolean ret = FALSE;
     int res;
-    guchar *xdata = NULL;
+    gulong *xdata = NULL;
     Atom ret_type;
     int ret_size;
     gulong ret_items, bytes_left;
-    long num32 = 32 / size * num; /* num in 32-bit elements */
 
-    res = XGetWindowProperty(ob_display, win, prop, 0l, num32,
+    res = XGetWindowProperty(ob_display, win, prop, 0l, num,
 			     FALSE, type, &ret_type, &ret_size,
-			     &ret_items, &bytes_left, &xdata);
+			     &ret_items, &bytes_left, (guchar**)&xdata);
     if (res == Success && ret_items && xdata) {
-	if (ret_size == size && ret_items >= num) {
-	    *data = g_memdup(xdata, num * (size / 8));
+	if (ret_size == 32 && ret_items >= num) {
+	    *data = g_memdup(xdata, num * sizeof(gulong));
 	    ret = TRUE;
 	}
 	XFree(xdata);

@@ -139,8 +139,8 @@ Atoms prop_atoms;
 
 void prop_startup();
 
-gboolean prop_get(Window win, Atom prop, Atom type, int size,
-			guchar **data, gulong num);
+gboolean prop_get32(Window win, Atom prop, Atom type,
+                    gulong **data, gulong num);
 
 gboolean prop_get_prealloc(Window win, Atom prop, Atom type, int size,
 			   guchar *data, gulong num);
@@ -201,8 +201,7 @@ void prop_message(Window about, Atom messagetype, long data0, long data1,
 
 /* Get an amount of a 32-bit property into an array (which must be freed) */
 #define PROP_GET32A(win, prop, type, value, num) \
-  (prop_get(win, prop_atoms.prop, prop_atoms.type, 32, \
-	    (guchar**)&value, num))
+  (prop_get32(win, prop_atoms.prop, prop_atoms.type, (gulong**)&value, num))
 
 /* Get an entire 32-bit property into an array (which must be freed) */
 #define PROP_GET32U(win, prop, type, value, num) \

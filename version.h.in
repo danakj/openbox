@@ -1,1 +1,1 @@
-#define __openbox_version "@VERSION@"
+#define OPENBOX_VERSION "@VERSION@"

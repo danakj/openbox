@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
       usage();
     } else if (argvi == "-version") {
       fprintf(stderr, "epist - shipped with openbox %s\n",
-              __openbox_version);
+              OPENBOX_VERSION);
       exit(0);
     }
     else

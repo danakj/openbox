@@ -69,7 +69,7 @@ static void showHelp(int exitval) {
               "  -menu <string>\t\tuse alternate menu file.\n"
               "  -version\t\t\tdisplay version and exit.\n"
               "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
-         __openbox_version);
+         OPENBOX_VERSION);
 
   // some people have requested that we print out compile options
   // as well
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
       printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
              "                    2001 - 2002 Sean 'Shaleh' Perry\n"
              "                    1997 - 2000, 2002 Brad Hughes\n\n",
-             __openbox_version);
+             OPENBOX_VERSION);
 
       ::exit(0);
     } else if (! strcmp(argv[i], "-help")) {

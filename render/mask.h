@@ -2,6 +2,7 @@
 #define __mask_h
 
 #include <X11/Xlib.h>
+#include <glib.h>
 
 typedef struct {
   Pixmap mask;

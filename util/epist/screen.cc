@@ -66,7 +66,7 @@ using std::string;
 screen::screen(epist *epist, int number) 
   : _clients(epist->clientsList()), _active(epist->activeWindow()),
     _config(epist->getConfig()), _grabbed(true), _cycling(false),
-    _stacked_cycling(false)
+    _stacked_cycling(false), _stacked_raise(false)
 {
   _epist = epist;
   _xatom = _epist->xatom();
@@ -76,6 +76,8 @@ screen::screen(epist *epist, int number)
   _root = _info->getRootWindow();
 
   _config->getValue(Config::stackedCycling, _stacked_cycling);
+  if (_stacked_cycling)
+    _config->getValue(Config::stackedCyclingRaise, _stacked_raise);
 
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
@@ -656,10 +658,11 @@ void screen::cycleWindow(unsigned int state, const bool forward,
 
     // if the window is on another desktop, we can't use XSetInputFocus, since
     // it doesn't imply a workspace change.
-    if (t->desktop() == _active_desktop || t->desktop() == 0xffffffff)
-      t->focus(false); // focus, but don't raise
+    if (_stacked_raise || (t->desktop() != _active_desktop &&
+                           t->desktop() != 0xffffffff))
+      t->focus(); // raise
     else
-      t->focus(); // change workspace and focus
+      t->focus(false); // don't raise
   }  
   else {
     t->focus();

@@ -59,6 +59,7 @@ class screen {
   bool _grabbed; // used for keygrab toggle function
   bool _cycling; // used for stacked cycling
   bool _stacked_cycling;
+  bool _stacked_raise;
 
   XWindow *findWindow(const XEvent &e) const;
   void updateNumDesktops();

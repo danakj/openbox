@@ -97,6 +97,7 @@ void Config::addOption(const std::string &name, const std::string &value)
   }
   bool_options[] = {
     { "stackedcycling", Config::stackedCycling },
+    { "stackedcyclingraise", Config::stackedCyclingRaise },
     { "", NUM_BOOL_TYPES }
   };
 

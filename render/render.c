@@ -15,7 +15,8 @@
 #  include <stdlib.h>
 #endif
 
-static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h);
+static void RrPixel32_to_pixmap(RrAppearance *l,
+                                gint x, gint y, gint w, gint h);
 
 void RrPaint(RrAppearance *l, Window win, gint w, gint h)
 {

@@ -2,11 +2,6 @@
 ### Functions that can be used as callbacks for mouse/keyboard bindings  ###
 ############################################################################
 
-#############################################################################
-### Options that can be modified to change the default hooks' behaviors.  ###
-###                                                                       ###
-#############################################################################
-
 import ob
 import otk
 

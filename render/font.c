@@ -125,7 +125,9 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
     /* center vertically */
     y = area->y +
         (area->height - RrFontHeight(t->font, t->shadow, t->offset)) / 2;
-    w = area->width;
+    /* the +2 and -4 leave a small blank edge on the sides */
+    x += 2;
+    w = area->width - 4;
     h = area->height;
 
     text = g_string_new(t->string);

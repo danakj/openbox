@@ -24,6 +24,7 @@
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
+static void event_handle_slit(Slit *s, XEvent *e);
 static void event_handle_slitapp(SlitApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, XEvent *e);
@@ -376,13 +377,15 @@ static void event_process(XEvent *e)
 {
     Window window;
     Client *client = NULL;
+    Slit *slit = NULL;
     SlitApp *slitapp = NULL;
     Menu *menu = NULL;
 
     window = event_get_window(e);
     if (!(client = g_hash_table_lookup(client_map, &window)))
         if (!(slitapp = g_hash_table_lookup(slit_app_map, &window)))
-            menu = g_hash_table_lookup(menu_map, &window);
+            if (!(slit = g_hash_table_lookup(slit_map, &window)))
+                menu = g_hash_table_lookup(menu_map, &window);
 
     event_set_lasttime(e);
     event_hack_mods(e);
@@ -397,6 +400,8 @@ static void event_process(XEvent *e)
 	event_handle_client(client, e);
     else if (slitapp)
 	event_handle_slitapp(slitapp, e);
+    else if (slit)
+	event_handle_slit(slit, e);
     else if (window == ob_root)
 	event_handle_root(e);
     else if (e->type == MapRequest)
@@ -905,6 +910,18 @@ static void event_handle_menu(Menu *menu, XEvent *e)
         }
         break;
 	}
+    }
+}
+
+static void event_handle_slit(Slit *s, XEvent *e)
+{
+    switch (e->type) {
+    case EnterNotify:
+        slit_hide(s, FALSE);
+        break;
+    case LeaveNotify:
+        slit_hide(s, TRUE);
+        break;
     }
 }
 

@@ -1,10 +1,11 @@
 #include "slit.h"
 #include "screen.h"
+#include "timer.h"
 #include "openbox.h"
 #include "render/theme.h"
 #include "render/render.h"
 
-#define SLIT_EVENT_MASK (EnterNotifyMask | LeaveNotifyMask)
+#define SLIT_EVENT_MASK (EnterWindowMask | LeaveWindowMask)
 #define SLITAPP_EVENT_MASK (StructureNotifyMask)
 
 struct Slit {
@@ -24,6 +25,8 @@ struct Slit {
     gboolean hidden;
 
     Appearance *a_frame;
+
+    Timer *hide_timer;
 
     GList *slit_apps;
 };
@@ -50,13 +53,15 @@ void slit_startup()
     for (i = 0; i < nslits; ++i) {
         slit[i].horz = FALSE;
         slit[i].hide = TRUE;
-        slit[i].hidden = FALSE;
+        slit[i].hidden = TRUE;
         slit[i].pos = SlitPos_TopRight;
 
+        attrib.event_mask = SLIT_EVENT_MASK;
         attrib.override_redirect = True;
         slit[i].frame = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
                                       render_depth, InputOutput, render_visual,
-                                      CWOverrideRedirect, &attrib);
+                                      CWOverrideRedirect | CWEventMask,
+                                      &attrib);
         slit[i].a_frame = appearance_copy(theme_a_unfocused_title);
         XSetWindowBorder(ob_display, slit[i].frame, theme_b_color->pixel);
         XSetWindowBorderWidth(ob_display, slit[i].frame, theme_bwidth);
@@ -329,4 +334,36 @@ void slit_app_configure(SlitApp *app, int w, int h)
     app->w = w;
     app->h = h;
     slit_configure(app->slit);
+}
+
+static void hide_timeout(Slit *self)
+{
+    /* dont repeat */
+    timer_stop(self->hide_timer);
+    self->hide_timer = NULL;
+
+    /* hide */
+    self->hidden = TRUE;
+    slit_configure(self);
+}
+
+void slit_hide(Slit *self, gboolean hide)
+{
+    if (self->hidden == hide)
+        return;
+    if (!hide) {
+        /* show */
+        self->hidden = FALSE;
+        slit_configure(self);
+
+        /* if was hiding, stop it */
+        if (self->hide_timer) {
+            timer_stop(self->hide_timer);
+            self->hide_timer = NULL;
+        }
+    } else {
+        g_assert(!self->hide_timer);
+        self->hide_timer = timer_start(3000000,
+                                       (TimeoutHandler)hide_timeout, self);
+    }
 }

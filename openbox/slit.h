@@ -31,12 +31,14 @@ typedef enum {
     SlitPos_Left
 } SlitPosition;
 
+extern GHashTable *slit_map;
 extern GHashTable *slit_app_map;
 
 void slit_startup();
 void slit_shutdown();
 
 void slit_configure_all();
+void slit_hide(Slit *self, gboolean hide);
 
 void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib);
 

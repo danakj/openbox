@@ -7,7 +7,7 @@
 typedef void (*TimeoutHandler)(void *data);
 
 typedef struct Timer {
-    /*! Milliseconds between timer firings */
+    /*! Microseconds between timer firings */
     long delay;
     /*! Callback for timer expiry */
     TimeoutHandler action;

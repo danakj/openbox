@@ -39,10 +39,12 @@ Font::Font(int screen_num, const std::string &fontstring,
       printf(_("Couldn't initialize Xft.\n\n"));
       ::exit(3);
     }
+#ifdef DEBUG
     int version = XftGetVersion();
-    printf(_("Using Xft %d.%d.%d (Built against %d.%d.%d).\n"),
+    printf("Using Xft %d.%d.%d (Built against %d.%d.%d).\n",
            version / 10000 % 100, version / 100 % 100, version % 100,
            XFT_MAJOR, XFT_MINOR, XFT_REVISION);
+#endif
     _xft_init = true;
   }
 

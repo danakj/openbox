@@ -497,7 +497,7 @@ void frame_release_client(ObFrame *self, ObClient *client)
     g_hash_table_remove(window_map, &self->tlresize);
     g_hash_table_remove(window_map, &self->trresize);
 
-    ob_main_loop_timeout_remove(ob_main_loop, flash_timeout);
+    ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self);
 
     frame_free(self);
 }

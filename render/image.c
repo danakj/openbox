@@ -2,18 +2,12 @@
 #include "../kernel/geom.h"
 #include "image.h"
 
-void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
-                Rect *surarea)
+void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *area)
 {
     pixel32 *draw = rgba->data;
     guint c, i, e, t, sfw, sfh;
-    sfw = position->width;
-    sfh = position->height;
-
-    /* it would be nice if this worked, but this function is well broken in
-       these circumstances. */
-    g_assert(position->width == surarea->width &&
-             position->height == surarea->height);
+    sfw = area->width;
+    sfh = area->height;
 
     g_assert(rgba->data != NULL);
 
@@ -28,7 +22,7 @@ void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
         /* scale it and cache it */
         if (rgba->cache != NULL)
             g_free(rgba->cache);
-        rgba->cache = g_new(unsigned long, sfw * sfh);
+        rgba->cache = g_new(pixel32, sfw * sfh);
         rgba->cwidth = sfw;
         rgba->cheight = sfh;
         for (i = 0, c = 0, e = sfw*sfh; i < e; ++i) {
@@ -47,7 +41,7 @@ void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
             draw = rgba->cache;
 
         /* apply the alpha channel */
-        for (i = 0, c = 0, t = position->x, e = sfw*sfh; i < e; ++i, ++t) {
+        for (i = 0, c = 0, t = area->x, e = sfw*sfh; i < e; ++i, ++t) {
             guchar alpha, r, g, b, bgr, bgg, bgb;
 
             alpha = draw[i] >> default_alpha_offset;
@@ -57,7 +51,7 @@ void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
 
             if (c >= sfw) {
                 c = 0;
-                t += surarea->width - sfw;
+                t += area->width - sfw;
             }
 
             /* background color */

@@ -295,9 +295,9 @@ void gradient_solid(Appearance *l, int x, int y, int w, int h)
         + (sp->primary->g << default_green_offset)
         + (sp->primary->b << default_blue_offset);
 
-    for (a = 0; a < l->area.width; a++)
-        for (b = 0; b < l->area.height; b++)
-            sp->pixel_data[a + b*l->area.width] = pix;
+    for (a = 0; a < w; a++)
+        for (b = 0; b < h; b++)
+            sp->pixel_data[a + b * w] = pix;
 
     XFillRectangle(ob_display, l->pixmap, sp->primary->gc,
                    x, y, w, h);

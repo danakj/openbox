@@ -76,7 +76,7 @@ void framerender_frame(Frame *self)
               theme_a_unfocused_pressed_close :
               theme_a_unfocused_unpressed_close));
 
-        paint(self->title, t);
+        paint(self->title, t, self->width, theme_title_height);
 
         /* set parents for any parent relative guys */
         l->surface.parent = t;
@@ -121,38 +121,33 @@ void framerender_frame(Frame *self)
 
         h = (self->focused ?
              self->a_focused_handle : self->a_unfocused_handle);
+
+        paint(self->handle, h, self->width, theme_handle_height);
+
         g = (self->focused ?
              theme_a_focused_grip : theme_a_unfocused_grip);
 
-        if (g->surface.grad == Background_ParentRelative) {
+        if (g->surface.grad == Background_ParentRelative)
             g->surface.parent = h;
-            paint(self->handle, h);
-        } else
-            paint(self->handle, h);
 
         g->surface.parentx = 0;
         g->surface.parenty = 0;
 
-        paint(self->lgrip, g);
+        paint(self->lgrip, g, theme_grip_width, theme_handle_height);
 
         g->surface.parentx = self->width - theme_grip_width;
         g->surface.parenty = 0;
 
-        paint(self->rgrip, g);
+        paint(self->rgrip, g, theme_grip_width, theme_handle_height);
     }
 }
 
 static void framerender_label(Frame *self, Appearance *a)
 {
     if (self->label_x < 0) return;
-
-
     /* set the texture's text! */
     a->texture[0].data.text.string = self->client->title;
-    RECT_SET(a->texture[0].position, 0, 0,
-             self->label_width, theme_label_height);
-
-    paint(self->label, a);
+    paint(self->label, a, self->label_width, theme_label_height);
 }
 
 static void framerender_icon(Frame *self, Appearance *a)
@@ -166,55 +161,38 @@ static void framerender_icon(Frame *self, Appearance *a)
         a->texture[0].data.rgba.width = icon->width;
         a->texture[0].data.rgba.height = icon->height;
         a->texture[0].data.rgba.data = icon->data;
-        RECT_SET(self->a_icon->texture[0].position, 0, 0,
-                 theme_button_size + 2, theme_button_size + 2);
     } else
         a->texture[0].type = NoTexture;
 
-    paint(self->icon, a);
+    paint(self->icon, a, theme_button_size + 2, theme_button_size + 2);
 }
 
 static void framerender_max(Frame *self, Appearance *a)
 {
     if (self->max_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0,
-             theme_button_size, theme_button_size);
-    paint(self->max, a);
+    paint(self->max, a, theme_button_size, theme_button_size);
 }
 
 static void framerender_iconify(Frame *self, Appearance *a)
 {
     if (self->iconify_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0,
-             theme_button_size, theme_button_size);
-    paint(self->iconify, a);
+    paint(self->iconify, a, theme_button_size, theme_button_size);
 }
 
 static void framerender_desk(Frame *self, Appearance *a)
 {
     if (self->desk_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0,
-             theme_button_size, theme_button_size);
-    paint(self->desk, a);
+    paint(self->desk, a, theme_button_size, theme_button_size);
 }
 
 static void framerender_shade(Frame *self, Appearance *a)
 {
     if (self->shade_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0,
-             theme_button_size, theme_button_size);
-    paint(self->shade, a);
+    paint(self->shade, a, theme_button_size, theme_button_size);
 }
 
 static void framerender_close(Frame *self, Appearance *a)
 {
     if (self->close_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0,
-             theme_button_size, theme_button_size);
-    paint(self->close, a);
+    paint(self->close, a, theme_button_size, theme_button_size);
 }

@@ -1,4 +1,5 @@
 #include "font.h"
+#include "theme.h"
 #include "kernel/openbox.h"
 #include "kernel/geom.h"
 #include "kernel/gettext.h"
@@ -102,7 +103,7 @@ int font_max_char_width(ObFont *f)
     return (signed) f->xftfont->max_advance_width;
 }
 
-void font_draw(XftDraw *d, TextureText *t, Rect *position)
+void font_draw(XftDraw *d, TextureText *t, Rect *area)
 {
     int x,y,w,h;
     XftColor c;
@@ -111,20 +112,22 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     size_t l;
     gboolean shortened = FALSE;
 
-    y = position->y;
-    w = position->width;
-    h = position->height;
+    /* center vertically */
+    y = area->y +
+        (area->height - font_height(t->font, t->shadow, t->offset)) / 2;
+    w = area->width;
+    h = area->height;
 
     text = g_string_new(t->string);
     l = g_utf8_strlen(text->str, -1);
     font_measure_full(t->font, text->str, t->shadow, t->offset, &mw, &mh);
-    while (l && mw > position->width) {
+    while (l && mw > area->width) {
         shortened = TRUE;
         /* remove a character from the middle */
         text = g_string_erase(text, l-- / 2, 1);
         em = ELIPSES_LENGTH(t->font, t->shadow, t->offset);
         /* if the elipses are too large, don't show them at all */
-        if (em > position->width)
+        if (em > area->width)
             shortened = FALSE;
         font_measure_full(t->font, text->str, t->shadow, t->offset, &mw, &mh);
         mw += em;
@@ -135,18 +138,15 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     }
     if (!l) return;
 
-    /* center vertically */
-    y -= ((t->font->xftfont->ascent + t->font->xftfont->descent) - mh) / 2;
-
     switch (t->justify) {
     case Justify_Left:
-        x = position->x;
+        x = area->x + theme_bevel;
         break;
     case Justify_Right:
-        x = position->x + (w - mw);
+        x = area->x + (w - mw) - theme_bevel;
         break;
     case Justify_Center:
-        x = position->x + (w - mw) / 2;
+        x = area->x + (w - mw) / 2;
         break;
     }
 

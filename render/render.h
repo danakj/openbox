@@ -59,7 +59,6 @@ typedef struct Surface {
 
 typedef struct {
     XftFont *xftfont;
-    int height;
     int elipses_length;
 } ObFont;
 
@@ -107,18 +106,19 @@ typedef union {
 } TextureData;
 
 typedef struct Texture {
-    Rect position;
     TextureType type;
     TextureData data;
 } Texture;
 
 typedef struct Appearance {
     Surface surface;
-    Rect area;
     int textures;
     Texture *texture;
     Pixmap pixmap;
     XftDraw *xftdraw;
+
+    /* cached for internal use */
+    int w, h;
 } Appearance;
 
 extern Visual *render_visual;
@@ -126,12 +126,9 @@ extern XVisualInfo render_visual_info;
 extern int render_depth;
 extern Colormap render_colormap;
 
-void (*paint)(Window win, Appearance *l);
-
 void render_startup(void);
 void init_appearance(Appearance *l);
-void x_paint(Window win, Appearance *l);
-void gl_paint(Window win, Appearance *l);
+void paint(Window win, Appearance *l, int w, int h);
 void render_shutdown(void);
 Appearance *appearance_new(int numtex);
 Appearance *appearance_copy(Appearance *a);

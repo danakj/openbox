@@ -515,7 +515,7 @@ char *theme_load(char *theme)
     }
 
     /* load the font stuff */
-    font_str = "arial:bold:pixelsize=10:minsize";
+    font_str = "arial:bold:pixelsize=10";
 
     theme_winfont_shadow = FALSE;
     if (read_string(db, "window.xft.flags", &str)) {

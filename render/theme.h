@@ -11,7 +11,7 @@ extern int theme_handle_height;
 extern int theme_bwidth;
 extern int theme_cbwidth;
 
-#define theme_label_height (theme_winfont_height + 2)
+#define theme_label_height (theme_winfont_height)
 #define theme_title_height (theme_label_height + theme_bevel * 2)
 #define theme_button_size  (theme_label_height - 2)
 #define theme_grip_width   (theme_button_size * 2)

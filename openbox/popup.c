@@ -189,12 +189,8 @@ void popup_show(Popup *self, char *text, Icon *icon)
     }
 
     /* set the windows/appearances up */
-    RECT_SET(self->a_bg->area, 0, 0, w, h);
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
 
-    RECT_SET(self->a_text->area, 0, 0, textw, texth); 
-    RECT_SET(self->a_text->texture[0].position, theme_bevel, theme_bevel,
-             textw - theme_bevel * 2, texth - theme_bevel * 2);
     self->a_text->surface.parent = self->a_bg;
     self->a_text->surface.parentx = iconw +
         theme_bevel * (self->hasicon ? 2 : 1);
@@ -205,8 +201,6 @@ void popup_show(Popup *self, char *text, Icon *icon)
 
     if (self->hasicon) {
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
-        RECT_SET(self->a_icon->area, 0, 0, iconw, texth);
-        RECT_SET(self->a_icon->texture[0].position, 0, 0, iconw, texth);
         self->a_icon->surface.parent = self->a_bg;
         self->a_icon->surface.parentx = theme_bevel;
         self->a_icon->surface.parenty = theme_bevel;
@@ -214,10 +208,10 @@ void popup_show(Popup *self, char *text, Icon *icon)
                           theme_bevel, theme_bevel, iconw, texth);
     }
 
-    paint(self->bg, self->a_bg);
-    paint(self->text, self->a_text);
+    paint(self->bg, self->a_bg, w, h);
+    paint(self->text, self->a_text, textw, texth);
     if (self->hasicon)
-        paint(self->icon, self->a_icon);
+        paint(self->icon, self->a_icon, iconw, texth);
 
     if (!self->mapped) {
         XMapWindow(ob_display, self->bg);

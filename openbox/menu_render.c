@@ -61,15 +61,6 @@ void menu_render_full(Menu *self) {
     self->item_h += theme_bevel * 2;
     items_h = self->item_h * MAX(nitems, 1);
 
-    if (self->label) {
-	RECT_SET(self->a_title->area, 0, 0, self->size.width, 
-		 self->title_h);
-	RECT_SET(self->a_title->texture[0].position, 0, 0, self->size.width,
-		 self->title_h);
-    }
-
-    RECT_SET(self->a_items->area, 0, 0, self->size.width, items_h);
-
     XResizeWindow(ob_display, self->frame, self->size.width,
 		  MAX(self->title_h + items_h, 1));
     if (self->label)
@@ -81,8 +72,8 @@ void menu_render_full(Menu *self) {
 		      items_h);
 
     if (self->label)
-	paint(self->title, self->a_title);
-    paint(self->items, self->a_items);
+	paint(self->title, self->a_title, self->size.width, self->title_h);
+    paint(self->items, self->a_items, self->size.width, items_h);
 
     item_y = 0;
     for (it = self->entries; it; it = it->next) {
@@ -125,17 +116,12 @@ void menu_entry_render(MenuEntry *self)
 	break;
     }
 
-    RECT_SET(a->area, 0, 0, menu->size.width,
-             menu->item_h);
-    RECT_SET(a->texture[0].position, menu->bullet_w,
-             0, menu->size.width - 2 * menu->bullet_w,
-             menu->item_h);
-
     XMoveResizeWindow(ob_display, self->item, 0, self->y,
                       menu->size.width, menu->item_h);
+
     a->surface.parent = menu->a_items;
     a->surface.parentx = 0;
     a->surface.parenty = self->y;
 
-    paint(self->item, a);
+    paint(self->item, a, menu->size.width, menu->item_h);
 }

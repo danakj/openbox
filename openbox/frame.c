@@ -14,65 +14,6 @@ static void layout_title(Frame *self);
 
 void frame_startup()
 {
-    RECT_SET(theme_a_focused_pressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_set_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_set_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_set_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_set_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_set_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_set_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-
-    RECT_SET(theme_a_focused_grip->area, 0, 0,
-             theme_grip_width, theme_handle_height);
-    RECT_SET(theme_a_unfocused_grip->area, 0, 0,
-             theme_grip_width, theme_handle_height);
 }
 
 void frame_shutdown()
@@ -287,11 +228,6 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
             self->innersize.top += theme_title_height + self->bwidth;
             XMapWindow(ob_display, self->title);
 
-            RECT_SET(self->a_focused_title->area, 0, 0,
-                     self->width, theme_title_height);
-            RECT_SET(self->a_unfocused_title->area, 0, 0,
-                     self->width, theme_title_height);
-
             /* layout the title bar elements */
             layout_title(self);
         } else
@@ -310,25 +246,11 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
                 self->bwidth;
             XMapWindow(ob_display, self->handle);
 
-            if (theme_a_focused_grip->surface.grad ==
-                Background_ParentRelative)
-                RECT_SET(self->a_focused_handle->area, 0, 0,
-                         self->width, theme_handle_height);
-            else
-                RECT_SET(self->a_focused_handle->area,
-                         theme_grip_width + self->bwidth, 0,
-                         self->width - (theme_grip_width + self->bwidth) * 2,
-                         theme_handle_height);
-            if (theme_a_unfocused_grip->surface.grad ==
-                Background_ParentRelative)
-                RECT_SET(self->a_unfocused_handle->area, 0, 0,
-                         self->width, theme_handle_height);
-            else
-                RECT_SET(self->a_unfocused_handle->area,
-                         theme_grip_width + self->bwidth, 0,
-                         self->width - (theme_grip_width + self->bwidth) * 2,
-                         theme_handle_height);
-
+            /* XXX make a subwindow with these dimentions?
+               theme_grip_width + self->bwidth, 0,
+               self->width - (theme_grip_width + self->bwidth) * 2,
+               theme_handle_height);
+            */
         } else
             XUnmapWindow(ob_display, self->handle);
     }
@@ -561,8 +483,6 @@ static void layout_title(Frame *self)
 	case 'N':
 	    if (!n) break;
 	    self->icon_x = x;
-            RECT_SET(self->a_icon->area, 0, 0,
-                     theme_button_size + 2, theme_button_size + 2);
 	    XMapWindow(ob_display, self->icon);
 	    XMoveWindow(ob_display, self->icon, x, theme_bevel);
 	    x += theme_button_size + 2 + theme_bevel + 1;
@@ -611,11 +531,6 @@ static void layout_title(Frame *self)
 	    break;
 	}
     }
-
-    RECT_SET(self->a_focused_label->area, 0, 0,
-             self->label_width, theme_label_height);
-    RECT_SET(self->a_unfocused_label->area, 0, 0,
-             self->label_width, theme_label_height);
 }
 
 Context frame_context_from_string(char *name)

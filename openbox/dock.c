@@ -349,11 +349,10 @@ void dock_configure()
     dock->h -= theme_bwidth * 2;
 
     if (dock->w > 0 && dock->h > 0) {
-        RECT_SET(dock->a_frame->area, 0, 0, dock->w, dock->h);
         XMoveResizeWindow(ob_display, dock->frame,
                           dock->x, dock->y, dock->w, dock->h);
 
-        paint(dock->frame, dock->a_frame);
+        paint(dock->frame, dock->a_frame, dock->w, dock->h);
         XMapWindow(ob_display, dock->frame);
     } else
         XUnmapWindow(ob_display, dock->frame);

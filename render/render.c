@@ -1,10 +1,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#ifdef USE_GL
-# include <GL/glx.h>
-#endif
-
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"
@@ -30,122 +26,26 @@ int render_red_shift, render_green_shift, render_blue_shift;
 int render_red_mask, render_green_mask, render_blue_mask;
 
 
-#ifdef USE_GL
-
-GLXContext render_glx_context;
-
-int render_glx_rating(XVisualInfo *v)
-{
-    int er;
-    int rating = 0;
-    int val;
-    printf("evaluating visual %d\n", v->visualid);
-    glXGetConfig(ob_display, v, GLX_BUFFER_SIZE, &val);
-    printf("buffer size %d\n", val);
-
-    switch (val) {
-    case 32:
-        rating += 300;
-    break;
-    case 24:
-        rating += 200;
-    break;
-    case 16:
-        rating += 100;
-    break;
-    }
-
-    glXGetConfig(ob_display, v, GLX_LEVEL, &val);
-    printf("level %d\n", val);
-    if (val != 0)
-        rating = -10000;
-
-    glXGetConfig(ob_display, v, GLX_DEPTH_SIZE, &val);
-    printf("depth size %d\n", val);
-    switch (val) {
-    case 32:
-        rating += 30;
-    break;
-    case 24:
-        rating += 20;
-    break;
-    case 16:
-        rating += 10;
-    break;
-    case 0:
-        rating -= 10000;
-    }
-
-    glXGetConfig(ob_display, v, GLX_DOUBLEBUFFER, &val);
-    printf("double buffer %d\n", val);
-    if (val)
-        rating++;
-    return rating;
-}
-#endif /* USE_GL */
-
 void render_startup(void)
 {
-    int count, i = 0, val, best = 0, rate = 0, temp;
-    XVisualInfo vimatch, *vilist;
-    paint = x_paint;
-
     render_depth = DefaultDepth(ob_display, ob_screen);
     render_visual = DefaultVisual(ob_display, ob_screen);
     render_colormap = DefaultColormap(ob_display, ob_screen);
 
-#ifdef USE_GL
-    vimatch.screen = ob_screen;
-    vimatch.class = TrueColor;
-    vilist = XGetVisualInfo(ob_display, VisualScreenMask | VisualClassMask,
-                            &vimatch, &count);
-
-    if (vilist) {
-        printf("looking for a GL visualin %d visuals\n", count);
-        for (i = 0; i < count; i++) {
-            glXGetConfig(ob_display, &vilist[i], GLX_USE_GL, &val);
-            if (val) {
-                temp = render_glx_rating(&vilist[i]);
-                if (temp > rate) {
-                    best = i;
-                    rate = temp;
-                }
-            }
-        }
+    switch (render_visual->class) {
+    case TrueColor:
+        truecolor_startup();
+        break;
+    case PseudoColor:
+    case StaticColor:
+    case GrayScale:
+    case StaticGray:
+        pseudocolor_startup();
+        break;
+    default:
+        g_critical("unsupported visual class.\n");
+        exit(EXIT_FAILURE);
     }
-    if (rate > 0) {
-        printf("picked visual %d with rating %d\n", best, rate);
-        render_depth = vilist[best].depth;
-        render_visual = vilist[best].visual;
-        render_colormap = XCreateColormap(ob_display, ob_root, 
-                                          render_visual, AllocNone);
-        render_visual_info = vilist[best];
-        render_glx_context = glXCreateContext(ob_display, &render_visual_info,
-                                              NULL, True);
-        if (render_glx_context == NULL)
-            printf("sadness\n");
-        else {
-            paint = gl_paint;
-        }
-    }
-#endif /*USE_GL*/
-
-
-  switch (render_visual->class) {
-  case TrueColor:
-    truecolor_startup();
-    break;
-  case PseudoColor:
-  case StaticColor:
-  case GrayScale:
-  case StaticGray:
-    pseudocolor_startup();
-    break;
-  default:
-    g_critical("unsupported visual class.\n");
-    exit(EXIT_FAILURE);
-
-  }
 }
 
 void truecolor_startup(void)
@@ -259,22 +159,27 @@ void pseudocolor_startup(void)
   }
 }
 
-void x_paint(Window win, Appearance *l)
+void paint(Window win, Appearance *l, int w, int h)
 {
     int i, transferred = 0, sw;
     pixel32 *source, *dest;
     Pixmap oldp;
-    int x = l->area.x;
-    int y = l->area.y;
-    int w = l->area.width;
-    int h = l->area.height;
     Rect tarea; /* area in which to draw textures */
+    gboolean resized;
 
-    if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
+    if (w <= 0 || h <= 0) return;
 
-    oldp = l->pixmap; /* save to free after changing the visible pixmap */
-    l->pixmap = XCreatePixmap(ob_display, ob_root, x+w, y+h, render_depth);
+    resized = (l->w != w || l->h != h);
+
+    if (resized) {
+        oldp = l->pixmap; /* save to free after changing the visible pixmap */
+        l->pixmap = XCreatePixmap(ob_display, ob_root, w, h, render_depth);
+    } else
+        oldp = None;
+
     g_assert(l->pixmap != None);
+    l->w = w;
+    l->h = h;
 
     if (l->xftdraw != NULL)
         XftDrawDestroy(l->xftdraw);
@@ -285,72 +190,72 @@ void x_paint(Window win, Appearance *l)
     g_free(l->surface.pixel_data);
     l->surface.pixel_data = g_new(pixel32, w * h);
 
-
     if (l->surface.grad == Background_ParentRelative) {
-        sw = l->surface.parent->area.width;
-        source = l->surface.parent->surface.pixel_data
-            + l->surface.parentx
-            + sw * l->surface.parenty;
+        g_assert (l->surface.parent);
+        g_assert (l->surface.parent->w);
+
+        sw = l->surface.parent->w;
+        source = (l->surface.parent->surface.pixel_data + l->surface.parentx +
+                  sw * l->surface.parenty);
         dest = l->surface.pixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(pixel32));
         }
     }
     else if (l->surface.grad == Background_Solid)
-        gradient_solid(l, x, y, w, h);
+        gradient_solid(l, 0, 0, w, h);
     else gradient_render(&l->surface, w, h);
 
-    for (i = 0; i < l->textures; i++) {
-        tarea = l->texture[i].position;
-        if (l->surface.grad != Background_ParentRelative) {
-            if (l->surface.relief != Flat) {
-                switch (l->surface.bevel) {
-                case Bevel1:
-                    tarea.x += 1; tarea.y += 1;
-                    tarea.width -= 2; tarea.height -= 2;
-                    break;
-                case Bevel2:
-                    tarea.x += 2; tarea.y += 2;
-                    tarea.width -= 4; tarea.height -= 4;
-                    break;
-                }
-            } else if (l->surface.border) {
+    RECT_SET(tarea, 0, 0, w, h);
+    if (l->surface.grad != Background_ParentRelative) {
+        if (l->surface.relief != Flat) {
+            switch (l->surface.bevel) {
+            case Bevel1:
                 tarea.x += 1; tarea.y += 1;
                 tarea.width -= 2; tarea.height -= 2;
+                break;
+            case Bevel2:
+                tarea.x += 2; tarea.y += 2;
+                tarea.width -= 4; tarea.height -= 4;
+                break;
             }
+        } else if (l->surface.border) {
+            tarea.x += 1; tarea.y += 1;
+            tarea.width -= 2; tarea.height -= 2;
         }
+    }
 
+    for (i = 0; i < l->textures; i++) {
         switch (l->texture[i].type) {
+        case NoTexture:
+            break;
         case Text:
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != Background_Solid)
                     pixel32_to_pixmap(l->surface.pixel_data, 
-                                      l->pixmap,x,y,w,h);
+                                      l->pixmap, 0, 0, w, h);
             }
             if (l->xftdraw == NULL) {
                 l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
                                         render_visual, render_colormap);
             }
-            font_draw(l->xftdraw, &l->texture[i].data.text, 
-                      &tarea);
+            font_draw(l->xftdraw, &l->texture[i].data.text, &tarea);
         break;
         case Bitmask:
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != Background_Solid)
                     pixel32_to_pixmap(l->surface.pixel_data, 
-                                      l->pixmap,x,y,w,h);
+                                      l->pixmap, 0, 0, w, h);
             }
             if (l->texture[i].data.mask.color->gc == None)
                 color_allocate_gc(l->texture[i].data.mask.color);
-            mask_draw(l->pixmap, &l->texture[i].data.mask,
-                      &tarea);
+            mask_draw(l->pixmap, &l->texture[i].data.mask, &tarea);
         break;
         case RGBA:
-            image_draw(l->surface.pixel_data, 
-                       &l->texture[i].data.rgba,
-                       &tarea, &l->area);
+            image_draw(l->surface.pixel_data,
+                       &l->texture[i].data.rgba, &tarea);
         break;
         }
     }
@@ -358,14 +263,13 @@ void x_paint(Window win, Appearance *l)
     if (!transferred) {
         transferred = 1;
         if (l->surface.grad != Background_Solid)
-            pixel32_to_pixmap(l->surface.pixel_data, l->pixmap
-                              ,x,y,w,h);
+            pixel32_to_pixmap(l->surface.pixel_data, l->pixmap, 0, 0, w, h);
     }
 
 
     XSetWindowBackgroundPixmap(ob_display, win, l->pixmap);
     XClearWindow(ob_display, win);
-    if (oldp != None) XFreePixmap(ob_display, oldp);
+    if (oldp) XFreePixmap(ob_display, oldp);
 }
 
 void render_shutdown(void)
@@ -383,6 +287,7 @@ Appearance *appearance_new(int numtex)
   if (numtex) out->texture = g_new0(Texture, numtex);
   else out->texture = NULL;
   out->pixmap = None;
+  out->w = out->h = 0;
 
   p = &out->surface;
   p->primary = NULL;
@@ -442,6 +347,7 @@ Appearance *appearance_copy(Appearance *orig)
     copy->texture = g_memdup(orig->texture, orig->textures * sizeof(Texture));
     copy->pixmap = None;
     copy->xftdraw = NULL;
+    copy->w = copy->h = 0;
     return copy;
 }
 
@@ -491,45 +397,52 @@ void appearance_minsize(Appearance *l, int *w, int *h)
 {
     int i;
     int m;
-    *w = *h = 1;
-
-    if (l->surface.relief != Flat) {
-        switch (l->surface.bevel) {
-        case Bevel1:
-            *w = *h = 2;
-            break;
-        case Bevel2:
-            *w = *h = 4;
-            break;
-        }
-    } else if (l->surface.border)
-        *w = *h = 2;
+    *w = *h = 0;
 
     for (i = 0; i < l->textures; ++i) {
         switch (l->texture[i].type) {
         case Bitmask:
-            *w += l->texture[i].data.mask.mask->w;
-            *h += l->texture[i].data.mask.mask->h;
+            *w = MAX(*w, l->texture[i].data.mask.mask->w);
+            *h = MAX(*h, l->texture[i].data.mask.mask->h);
             break;
         case Text:
             m = font_measure_string(l->texture[i].data.text.font,
                                     l->texture[i].data.text.string,
                                     l->texture[i].data.text.shadow,
                                     l->texture[i].data.text.offset);
-            *w += m;
+            *w = MAX(*w, m);
             m = font_height(l->texture[i].data.text.font,
                             l->texture[i].data.text.shadow,
                             l->texture[i].data.text.offset);
-            *h += m;
+            *h += MAX(*h, m);
             break;
         case RGBA:
-            *w += l->texture[i].data.rgba.width;
-            *h += l->texture[i].data.rgba.height;
+            *w += MAX(*w, l->texture[i].data.rgba.width);
+            *h += MAX(*h, l->texture[i].data.rgba.height);
             break;
         case NoTexture:
             break;
         }
     }
+
+    if (l->surface.relief != Flat) {
+        switch (l->surface.bevel) {
+        case Bevel1:
+            *w += 2;
+            *h += 2;
+            break;
+        case Bevel2:
+            *w += 4;
+            *h += 4;
+            break;
+        }
+    } else if (l->surface.border) {
+        *w += 2;
+        *h += 2;
+    }
+
+    if (*w < 1) *w = 1;
+    if (*h < 1) *h = 1;
 }
 
 gboolean render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
@@ -579,54 +492,3 @@ gboolean render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
 
     return TRUE;
 }
-
-#ifdef USE_GL
-void gl_paint(Window win, Appearance *l)
-{
-    int err;
-    Window root, child;
-    int i, transferred = 0, sw, b, d;
-    pixel32 *source, *dest;
-    Pixmap oldp;
-    int tempx, tempy, absx, absy, absw, absh;
-    int x = l->area.x;
-    int y = l->area.y;
-    int w = l->area.width;
-    int h = l->area.height;
-    Rect tarea; /* area in which to draw textures */
-    if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
-
-    g_assert(l->surface.type == Surface_Planar);
-
-printf("making %p, %p, %p current\n", ob_display, win, render_glx_context);
-    err = glXMakeCurrent(ob_display, win, render_glx_context);
-g_assert(err != 0);
-
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            glOrtho(0, 1376, 1032, 0, 0, 10);
-    if (XGetGeometry(ob_display, win, &root, &tempx, &tempy,
-                     &absw, &absh,  &b, &d) &&
-        XTranslateCoordinates(ob_display, win, root, tempx, tempy, 
-        &absx, &absy, &child))
-        printf("window at %d, %d (%d,%d)\n", absx, absy, absw, absh);
-    else
-        return;
-
-    glViewport(0, 0, 1376, 1032);
-    glMatrixMode(GL_MODELVIEW);
-    glTranslatef(-absx, 1032-absh-absy, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-    if (l->surface.grad == Background_ParentRelative) {
-        printf("crap\n");
-    } else
-        render_gl_gradient(&l->surface, absx+x, absy+y, absw, absh);
-
-    glXSwapBuffers(ob_display, win);
-}
-
-#endif /* USE_GL */

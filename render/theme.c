@@ -721,7 +721,7 @@ static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
     char *rclass = create_class_name(rname);
     char *rettype;
     char *s;
-    char *button_dir;
+    char *data_dir;
     XrmValue retvalue;
     int hx, hy; /* ignored */
     unsigned int w, h;
@@ -730,16 +730,16 @@ static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
 
-	button_dir = g_strdup_printf("%s_data", theme);
+	data_dir = g_strdup_printf("%s_data", theme);
 
         s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-                             button_dir, retvalue.addr, NULL);
+                             data_dir, retvalue.addr, NULL);
 
         if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess)
             ret = TRUE;
         else {
             g_free(s);
-            s = g_build_filename(THEMEDIR, button_dir, retvalue.addr, NULL);
+            s = g_build_filename(THEMEDIR, data_dir, retvalue.addr, NULL);
 	
             if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
                 ret = TRUE;
@@ -765,7 +765,7 @@ static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
         }
       
         g_free(s);
-        g_free(button_dir);
+        g_free(data_dir);
     }
 
     g_free(rclass);

@@ -765,6 +765,21 @@ server's memory.
 Default value is:
 .IR 5 .
 .TP
+.B session.titleBarLayout:
+The order of the elements of window titlebars. This is a string built
+of the following characters:
+.IP
+.nf I: Iconify button
+L: Label (window title)
+M: Maximize button
+S: Sticky button
+C: Close button 
+.fi
+.IP
+The order in which these character appear in the string is the order they will appear in window titlebars. You can also omit an item to not have it appear in the titlebar at all, except for the label which will always appear.
+Default value is:
+.IR ILMC
+.TP
 .B session.colorsPerChannel:
 This tells Openbox how many colors to take from the X server on pseudocolor
 displays.  A channel would be red, green, or blue.

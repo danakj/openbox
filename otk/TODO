@@ -1,0 +1,29 @@
+* make OtkButton do pixmaps
+
+* OtkWidget
+        see about focus()
+        focus() on widgets means 'highlight', not take Focus. solve this mess
+
+* OtkEventHandler
+        make widget inherit from this
+        let the user override handling functions as needed
+
+* OtkApplication
+        do all derty work init display/screen/style/image control etc
+        event loop
+        do docking
+        close app, clean up crap
+        watch for style properties on the root window, update crap
+                on the fly.
+
+* widget factory for openbox
+        singleton that fetches widgets to openbox so that openbox
+        doesn't need to do useless work in creating/initializing/etc
+
+* cleanup image code
+        less deps on screen and display
+        what's this thing about 8bpp being busticatered
+
+* cleanups
+        name classes OtkBummy instead of OB... or B...
+        make Style hold pointers to colors and textures

@@ -1,8 +1,6 @@
-AC_INIT(src/blackbox.cc)
-AM_INIT_AUTOMAKE(openbox, 2.90.0, no-define)
-
-dnl Check for check
-AM_PATH_CHECK
+AC_INIT([openbox], [2.90.0], [http://icculus.org/openbox])
+AC_CONFIG_SRCDIR([src/blackbox.cc])
+AM_INIT_AUTOMAKE
 
 dnl Determine default prefix
 test "$prefix" = "NONE" && prefix="$ac_default_prefix"
@@ -15,13 +13,13 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
-AC_CHECK_PROGS(regex_cmd, sed)
+AC_CHECK_PROGS([regex_cmd], [sed])
 if test x$regex_cmd = "x"; then
   AC_MSG_ERROR([error. sed is required to build the default menu file.])
 fi
 
 dnl Check what compiler we are using
-AC_MSG_CHECKING(for GCC)
+AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
   CXXFLAGS="$CXXFLAGS -Wall -W -pedantic"
@@ -57,8 +55,8 @@ AC_TYPE_SIGNAL
 dnl Check whether to include debugging code
 DEBUG=""
 AC_MSG_CHECKING([whether to include verbose debugging code])
-AC_ARG_ENABLE(debug,
-  [  --enable-debug          include verbose debugging code [default=no]],
+AC_ARG_ENABLE([debug],
+  [  --enable-debug          include verbose debugging code @<:@default=no@:>@],
   if test "$enableval" = "yes"; then
     AC_MSG_RESULT([yes])
     if test "$GCC" = "yes"; then
@@ -87,27 +85,33 @@ LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS"
 LDFLAGS="$LDFLAGS $X_PRE_LIBS $LIBS $X_EXTRA_LIBS"
 
 dnl Check for required functions in -lX11
-AC_CHECK_LIB(X11, XOpenDisplay,
+AC_CHECK_LIB([X11], [XOpenDisplay],
   ,
   AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])
 )
 
 dnl Check for XShape extension support
-AC_CHECK_LIB(Xext, XShapeCombineShape,
+AC_CHECK_LIB([Xext], [XShapeCombineShape],
   AC_MSG_CHECKING([for X11/extensions/shape.h])
   AC_TRY_LINK(
-    [#include <X11/Xlib.h>
-     #include <X11/Xutil.h>
-     #include <X11/extensions/shape.h>],
-    long foo = ShapeSet,
-
-    AC_MSG_RESULT([yes])
-    SHAPE="yes"
-    AC_DEFINE(HAVE_SHAPE,1,Found the XShape extension)
-    LIBS="$LIBS -lXext",
-  
-    AC_MSG_RESULT([no])
-    SHAPE="no"
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xutil.h>
+      #include <X11/extensions/shape.h>
+    ],
+    [
+      long foo = ShapeSet
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      SHAPE="yes"
+      AC_DEFINE([HAVE_SHAPE], [1], [Found the XShape extension])
+      LIBS="$LIBS -lXext"
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      SHAPE="no"
+    ]
   )
 )
 AC_MSG_CHECKING([for the XShape extension])
@@ -120,25 +124,34 @@ fi
 dnl Check for Xinerama extension support
 AC_MSG_CHECKING([whether to build support for the Xinerama extension])
 XINERAMA="no"
-AC_ARG_ENABLE(xinerama,
-[  --enable-xinerama       enable support of the Xinerama extension [default=no]],
+AC_ARG_ENABLE([xinerama],
+[  --enable-xinerama       enable support of the Xinerama extension @<:@default=no@:>@],
   if test "$enableval" = "yes"; then
 	AC_MSG_RESULT([yes])
 
-	AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
-	  AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
-	  AC_TRY_LINK(
-      [#include <X11/Xlib.h>
-       #include <X11/extensions/Xinerama.h>],
-      XineramaScreenInfo foo,
-	
-      AC_MSG_RESULT([yes])
-  		XINERAMA="yes"
-      AC_DEFINE(XINERAMA,1,Enable support of the Xinerama extension)
-	  	LIBS="$LIBS -lXinerama",
-      
-  		AC_MSG_RESULT([no])
-	  )
+	AC_CHECK_LIB([Xinerama], [XineramaQueryExtension],
+	  [
+	    AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
+	    AC_TRY_LINK(
+	      [
+                #include <X11/Xlib.h>
+                #include <X11/extensions/Xinerama.h>
+	      ],
+	      [
+                XineramaScreenInfo foo
+	      ],
+	      [
+	        AC_MSG_RESULT([yes])
+	        XINERAMA="yes"
+	        AC_DEFINE([XINERAMA], [1],
+	                  [Enable support of the Xinerama extension])
+	        LIBS="$LIBS -lXinerama"
+	      ],
+	      [
+	        AC_MSG_RESULT([no])
+	      ]
+	    )
+	  ]
 	)
 
     AC_MSG_CHECKING([for the Xinerama extension])
@@ -166,8 +179,7 @@ AC_MSG_RESULT([])
 
 dnl Output files
 AM_CONFIG_HEADER(config.h)
-AC_OUTPUT(
-  version.h
+AC_CONFIG_FILES([
   Makefile
   otk/Makefile
   src/Makefile
@@ -176,4 +188,6 @@ AC_OUTPUT(
   doc/Makefile
   data/Makefile
   data/styles/Makefile
-)
+  version.h
+])
+AC_OUTPUT

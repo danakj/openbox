@@ -91,6 +91,8 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         }
 
         inst = malloc(sizeof(struct RrInstance));
+        inst->render_to_pixmap = TRUE; /*XXX parse me from somewhere*/
+        inst->render_to_pixmap = FALSE;
         inst->display = display;
         inst->screen = screen;
         inst->visinfo = vilist[best];
@@ -130,7 +132,6 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
 
         return inst;
     }
-
     RrDebug("unable to find a suitable GL visual\n");
     return NULL;
 }

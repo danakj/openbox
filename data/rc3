@@ -35,6 +35,7 @@
     <name>three</name>
     <name>four</name>
   </names>
+  <cyclingDialog>yes</cyclingDialog>
 </desktops>
 
 <resize>

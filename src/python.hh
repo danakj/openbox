@@ -22,6 +22,9 @@ bool python_preregister(int action, PyObject *callback);
 //! Remove a python callback function from the hook list
 bool python_unregister(int action, PyObject *callback);
 
+//! Removes all python callback functions from the hook list
+bool python_unregister_all(int action);
+
 //! Fire a python callback function
 void python_callback(OBActions::ActionType action, Window window,
                      OBWidget::WidgetType type, unsigned int state,

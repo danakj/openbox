@@ -74,6 +74,20 @@ bool python_unregister(int action, PyObject *callback)
   return true;
 }
 
+bool python_unregister_all(int action)
+{
+  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+    PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
+    return false;
+  }
+
+  while (!callbacks[action].empty()) {
+    Py_XDECREF(callbacks[action].back());
+    callbacks[action].pop_back();
+  }
+  return true;
+}
+
 void python_callback(OBActions::ActionType action, Window window,
                      OBWidget::WidgetType type, unsigned int state,
                      long d1, long d2, long d3, long d4)

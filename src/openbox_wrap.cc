@@ -2513,6 +2513,21 @@ static PyObject *_wrap_unregister(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_unregister_all(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    bool result;
+    
+    if(!PyArg_ParseTuple(args,(char *)"i:unregister_all",&arg1)) goto fail;
+    result = (bool)ob::python_unregister_all(arg1);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
 	 { (char *)"Cursors_session_set", _wrap_Cursors_session_set, METH_VARARGS },
@@ -2609,6 +2624,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"register", _wrap_register, METH_VARARGS },
 	 { (char *)"preregister", _wrap_preregister, METH_VARARGS },
 	 { (char *)"unregister", _wrap_unregister, METH_VARARGS },
+	 { (char *)"unregister_all", _wrap_unregister_all, METH_VARARGS },
 	 { NULL, NULL }
 };
 

@@ -51,6 +51,7 @@ typedef struct FrameDecor {
     Rect position;
     Decoration type;
     struct Frame *frame;
+/*    struct RrSurface *surface;  SOOOOON!*/
 } FrameDecor;
 
 typedef struct Frame {

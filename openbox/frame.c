@@ -563,7 +563,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
 
                     case Decor_TopRight:
                     x = self->size.left + cr->width
-                      + dec->position.x + dec->position.width;
+                      + dec->position.x;
                     y = self->size.top - dec->position.y - dec->position.height;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       dec->position.width,
@@ -581,8 +581,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     break;
 
                     case Decor_Right:
-                    x = self->size.left + cr->width + dec->position.x
-                      + dec->position.width;
+                    x = self->size.left + cr->width + dec->position.x;
                     y = cr->height/2 + self->size.top - dec->position.y
                       - dec->position.height/2;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
@@ -611,7 +610,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
 
                     case Decor_BottomRight:
                     x = self->size.left + cr->width
-                      + dec->position.x + dec->position.width;
+                      + dec->position.x;
                     y = self->size.top + cr->height
                       - dec->position.y - dec->position.height;
                     XMoveResizeWindow(ob_display, dec->window, x, y,

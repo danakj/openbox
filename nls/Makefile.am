@@ -11,4 +11,4 @@ uninstall-local:
 		rmdir $(DESTDIR)$(pkgdatadir)/nls; \
 	fi
 distclean-local:
-	rm -f *\~
+	rm -f *\~ .\#*

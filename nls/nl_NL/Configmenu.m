@@ -3,25 +3,27 @@ $set 3 #Configmenu
 $ #ConfigOptions
 # Instellingen
 $ #FocusModel
-# Toetsenbord focusmodel
+# Focus van vensters
 $ #WindowPlacement
 # Plaatsing van vensters
 $ #ImageDithering
 # Kleurbenadering
 $ #OpaqueMove
-# Inhoud vensters zichtbaar tijdens slepen
+# Vensters slepen met inhoud
 $ #FullMax
 # Volledig maximaliseren
 $ #FocusNew
-# Geef nieuwe vensters direct focus
+# Focus nieuwe vensters
 $ #FocusLast
-# Focus laatste venster bij wisselen van werkblad
+# Focus venster bij werkblad wissel
 $ #ClickToFocus
-# Geef focus na muisklik in venster
+# Focus met muisklik
 $ #SloppyFocus
-# Geef focus zodra muis in venster komt
+# Focus volgt muispijl
 $ #AutoRaise
-# Vensters automatisch naar voorgrond
+# Automatisch naar voorgrond
+$ #ClickRaise
+# Naar voorgrond met muisklik
 $ #SmartRows
 # Optimale plaatsing (rijen)
 $ #SmartCols

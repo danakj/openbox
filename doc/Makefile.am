@@ -8,7 +8,7 @@ SUBDIRS =
 DEFAULT_MENU=$(pkgdatadir)/menu
 
 distclean-local:
-	rm -f *\~
+	rm -f *\~ .\#*
 
 openbox.1: openbox.1.in
 	@regex_cmd@ -e "s,@defaultmenu@,$(DEFAULT_MENU)," \

@@ -12,5 +12,4 @@ $ #Usage
   -from <color>            gradient start farve\n\
   -to <color>              gradient slut farve\n\n\
   -solid <color>           fast farve\n\n\
-  -help                    hvis denne hjælp og afslut\n
-
+  -help                    vis denne hjælp og afslut\n

@@ -7,4 +7,4 @@ uninstall-local:
 	-rmdir $(pkgdatadir)
 
 distclean-local:
-	rm -f *\~ gmon.out
+	rm -f *\~ gmon.out .\#*

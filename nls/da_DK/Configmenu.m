@@ -22,6 +22,8 @@ $ #SloppyFocus
 # Dovent fokus
 $ #AutoRaise
 # Hæv automatisk
+$ #ClickRaise
+# Klik for at hve
 $ #SmartRows
 # Intelligent placering (Rækker)
 $ #SmartCols

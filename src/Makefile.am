@@ -34,7 +34,7 @@ openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc
 MAINTAINERCLEANFILES= Makefile.in
 
 distclean-local:
-	rm -f *\~ *.orig *.rej
+	rm -f *\~ *.orig *.rej .\#*
 
 # local dependencies
 

@@ -24,8 +24,7 @@
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                           ButtonMotionMask | ExposureMask | \
-                           EnterWindowMask | LeaveWindowMask)
+                           ButtonMotionMask | ExposureMask)
 
 /* style settings - geometry */
 int s_bevel;

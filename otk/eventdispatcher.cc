@@ -100,7 +100,11 @@ void EventDispatcher::dispatchEvents(void)
 void EventDispatcher::dispatchFocus(const XEvent &e)
 {
   // ignore focus changes from grabs
-  if (e.xfocus.mode == NotifyGrab)
+  if (e.xfocus.mode == NotifyGrab) // ||
+      // From Metacity, from WindowMaker, ignore all funky pointer root events
+      // its commented out cuz I don't think we need this at all. If problems
+      // arise we can look into it
+      //e.xfocus.detail > NotifyNonlinearVirtual)
     return;
   
   if (e.type == FocusIn) {

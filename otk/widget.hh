@@ -25,7 +25,7 @@ public:
 
   virtual ~OtkWidget();
 
-  void update(void);
+  virtual void update(void);
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }

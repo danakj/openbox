@@ -262,7 +262,7 @@ void OtkWidget::adjustHorz(void)
 
     for (; str_it != str_end; ++str_it) {
       (*str_it)->setWidth(str_width - _bevel_width);
-      (*str_it)->update();
+      //(*str_it)->update();
     }
   }
 
@@ -317,7 +317,7 @@ void OtkWidget::adjustVert(void)
 
     for (; str_it != str_end; ++str_it) {
       (*str_it)->setHeight(str_height - _bevel_width);
-      (*str_it)->update();
+      //(*str_it)->update();
     }
   }
 
@@ -343,11 +343,16 @@ void OtkWidget::adjustVert(void)
 
 void OtkWidget::update(void)
 {
+  OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+  for (; it != end; ++it)
+    (*it)->update();
+
   if (_dirty) {
     adjust();
     render();
     XClearWindow(OBDisplay::display, _window);
   }
+
   _dirty = false;
 }
 

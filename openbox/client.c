@@ -957,10 +957,7 @@ void client_update_normal_hints(ObClient *self)
 
     /* get the hints from the window */
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
-        /* don't let apps tell me where to put transient windows, but only if
-           they have a valid parent */
-        self->positioned = !!(size.flags & (PPosition|USPosition)) &&
-            !self->transient_for;
+        self->positioned = !!(size.flags & (PPosition|USPosition));
 
 	if (size.flags & PWinGravity) {
 	    self->gravity = size.win_gravity;
@@ -1245,15 +1242,15 @@ void client_update_wmhints(ObClient *self)
                 }
             }
 
-            /* the WM_HINTS can contain an icon */
-            client_update_icons(self);
-
             /* because the self->transient flag wont change from this call,
                we don't need to update the window's type and such, only its
                transient_for, and the transients lists of other windows in
                the group may be affected */
             client_update_transient_for(self);
         }
+
+        /* the WM_HINTS can contain an icon */
+        client_update_icons(self);
 
 	XFree(hints);
     }
@@ -1377,16 +1374,34 @@ void client_update_strut(ObClient *self)
 {
     guint num;
     guint32 *data;
+    gboolean got = FALSE;
 
-    if (!PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
-	STRUT_SET(self->strut, 0, 0, 0, 0);
-    } else {
-        if (num == 4)
-            STRUT_SET(self->strut, data[0], data[2], data[1], data[3]);
-        else
-            STRUT_SET(self->strut, 0, 0, 0, 0);
-	g_free(data);
+    if (PROP_GETA32(self->window, net_wm_strut_partial, cardinal,
+                    &data, &num)) {
+        if (num == 12) {
+            got = TRUE;
+            STRUT_PARTIAL_SET(self->strut,
+                              data[0], data[2], data[1], data[3],
+                              data[4], data[5], data[8], data[9],
+                              data[6], data[7], data[10], data[11]);
+        }
+        g_free(data);
     }
+
+    if (!got &&
+        PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
+        if (num == 4) {
+            got = TRUE;
+            STRUT_PARTIAL_SET(self->strut,
+                              data[0], data[2], data[1], data[3],
+                              0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        g_free(data);
+    }
+
+    if (!got)
+        STRUT_PARTIAL_SET(self->strut, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0);
 
     /* updating here is pointless while we're being mapped cuz we're not in
        the client list yet */

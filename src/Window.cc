@@ -1963,6 +1963,10 @@ void BlackboxWindow::stick(void) {
     blackbox_attrib.flags ^= AttribOmnipresent;
     blackbox_attrib.attrib ^= AttribOmnipresent;
 
+    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
+      if (i != blackbox_attrib.workspace)
+        screen->getWorkspace(i)->removeWindow(this, True);
+
     flags.stuck = False;
 
     if (! flags.iconic)
@@ -1971,11 +1975,6 @@ void BlackboxWindow::stick(void) {
     // actually hold in our data.
     xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
                     blackbox_attrib.workspace);
-
-    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
-      if (i != blackbox_attrib.workspace)
-        if (screen->getWorkspace(i)->getLastFocusedWindow() == this)
-          screen->getWorkspace(i)->focusFallback(this);
 
     setState(current_state);
   } else {
@@ -1988,6 +1987,10 @@ void BlackboxWindow::stick(void) {
     // value than that contained in the class' data.
     xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
                     0xffffffff);
+    
+    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
+      if (i != blackbox_attrib.workspace)
+        screen->getWorkspace(i)->addWindow(this, False, True);
 
     setState(current_state);
   }
@@ -2102,9 +2105,11 @@ void BlackboxWindow::setFocusFlag(bool focus) {
  
   if (! flags.iconic) {
     // iconic windows arent in a workspace menu!
-    Clientmenu *menu =
-      screen->getWorkspace(blackbox_attrib.workspace)->getMenu();
-    menu->setItemSelected(window_number, isFocused());
+    if (flags.stuck)
+      screen->getCurrentWorkspace()->setFocused(this, isFocused());
+    else
+      screen->getWorkspace(blackbox_attrib.workspace)->
+        setFocused(this, flags.focused);
   }
 }
 

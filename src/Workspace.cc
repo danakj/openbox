@@ -78,32 +78,47 @@ Workspace::Workspace(BScreen *scrn, unsigned int i) {
 }
 
 
-void Workspace::addWindow(BlackboxWindow *w, bool place) {
+void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
   assert(w != 0);
 
   if (place) placeWindow(w);
 
   stackingList.push_front(w);
     
+  // if the window is sticky, then it needs to be added on all other
+  // workspaces too!
+  if (! sticky && w->isStuck()) {
+    for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
+      if (i != id)
+        screen->getWorkspace(i)->addWindow(w, place, True);
+  }
+
   if (w->isNormal()) {
-    w->setWorkspace(id);
-    w->setWindowNumber(windowList.size());
+    if (! sticky) {
+      w->setWorkspace(id);
+      w->setWindowNumber(windowList.size());
+    }
 
     windowList.push_back(w);
 
     clientmenu->insert(w->getTitle());
     clientmenu->update();
 
-    screen->updateNetizenWindowAdd(w->getClientWindow(), id);
+    if (! sticky)
+      screen->updateNetizenWindowAdd(w->getClientWindow(), id);
 
-    if (id != screen->getCurrentWorkspaceID() &&
-        screen->doFocusNew()) {
-      /*
-         not on the focused workspace, so the window is not going to get focus
-         but if the user wants new windows focused, then it should get focus
-         when this workspace does become focused.
-      */
-      lastfocus = w;
+    if (screen->doFocusNew() || (w->isTransient() && w->getTransientFor() &&
+                                 w->getTransientFor()->isFocused())) {
+      if (id == screen->getCurrentWorkspaceID())
+        w->setInputFocus();
+      else {
+        /*
+           not on the focused workspace, so the window is not going to get focus
+           but if the user wants new windows focused, then it should get focus
+           when this workspace does become focused.
+        */
+        lastfocus = w;
+      }
     }
   }
 
@@ -114,7 +129,7 @@ void Workspace::addWindow(BlackboxWindow *w, bool place) {
 }
 
 
-void Workspace::removeWindow(BlackboxWindow *w) {
+void Workspace::removeWindow(BlackboxWindow *w, bool sticky) {
   assert(w != 0);
 
   stackingList.remove(w);
@@ -123,29 +138,38 @@ void Workspace::removeWindow(BlackboxWindow *w) {
   if ((w->isFocused() || w == lastfocus) &&
       ! screen->getBlackbox()->doShutdown()) {
     focusFallback(w);
-
-    // if the window is sticky, then it needs to be removed on all other
-    // workspaces too!
-    if (w->isStuck()) {
-      for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
-        if (i != id)
-          screen->getWorkspace(i)->focusFallback(w);
-    }
+  }
+    
+  // if the window is sticky, then it needs to be removed on all other
+  // workspaces too!
+  if (! sticky && w->isStuck()) {
+    for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
+      if (i != id)
+        screen->getWorkspace(i)->removeWindow(w, True);
   }
 
   if (! w->isNormal()) return;
 
-  windowList.remove(w);
-  clientmenu->remove(w->getWindowNumber());
+  BlackboxWindowList::iterator it, end = windowList.end();
+  int i;
+  for (i = 0, it = windowList.begin(); it != end; ++it, ++i)
+    if (*it == w)
+      break;
+  assert(it != end);
+  
+  windowList.erase(it);
+  clientmenu->remove(i);
   clientmenu->update();
 
-  screen->updateNetizenWindowDel(w->getClientWindow());
+  if (! sticky) {
+    screen->updateNetizenWindowDel(w->getClientWindow());
 
-  BlackboxWindowList::iterator it = windowList.begin();
-  const BlackboxWindowList::iterator end = windowList.end();
-  unsigned int i = 0;
-  for (; it != end; ++it, ++i)
-    (*it)->setWindowNumber(i);
+    BlackboxWindowList::iterator it = windowList.begin();
+    const BlackboxWindowList::iterator end = windowList.end();
+    unsigned int i = 0;
+    for (; it != end; ++it, ++i)
+      (*it)->setWindowNumber(i);
+  }
 
   if (i == 0) {
     cascade_x = cascade_y = 0;
@@ -201,13 +225,24 @@ void Workspace::focusFallback(const BlackboxWindow *old_window) {
 }
 
 
+void Workspace::setFocused(const BlackboxWindow *w, bool focused) {
+  BlackboxWindowList::iterator it, end = windowList.end();
+  int i;
+  for (i = 0, it = windowList.begin(); it != end; ++it, ++i)
+    if (*it == w)
+      break;
+  assert(it != end);
+  
+  clientmenu->setItemSelected(i, focused);
+}
+
+
 void Workspace::showAll(void) {
   BlackboxWindowList::iterator it = stackingList.begin();
   const BlackboxWindowList::iterator end = stackingList.end();
   for (; it != end; ++it) {
     BlackboxWindow *bw = *it;
-    if (! bw->isStuck())
-      bw->show();
+    bw->show();
   }
 }
 
@@ -220,8 +255,7 @@ void Workspace::hideAll(void) {
     BlackboxWindow *bw = *it;
     ++it; // withdraw removes the current item from the list so we need the next
           // iterator before that happens
-    if (! bw->isStuck())
-      bw->withdraw();
+    bw->withdraw();
   }
 }
 

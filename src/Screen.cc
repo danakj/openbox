@@ -1516,6 +1516,8 @@ void BScreen::reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
     removeIcon(w);
     getWorkspace(wkspc_id)->addWindow(w);
   } else if (ignore_sticky || ! w->isStuck()) {
+    if (w->isStuck())
+      w->stick();
     getWorkspace(w->getWorkspaceNumber())->removeWindow(w);
     getWorkspace(wkspc_id)->addWindow(w);
   }

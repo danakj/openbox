@@ -91,12 +91,13 @@ public:
   BlackboxWindow* getTopWindowOnStack(void) const;
   void sendWindowList(Netizen &n);
   void focusFallback(const BlackboxWindow *old_window);
+  void setFocused(const BlackboxWindow *w, bool focused);
 
   bool isCurrent(void) const;
   bool isLastWindow(const BlackboxWindow* w) const;
 
-  void addWindow(BlackboxWindow *w, bool place = False);
-  void removeWindow(BlackboxWindow *w);
+  void addWindow(BlackboxWindow *w, bool place = False, bool sticky = False);
+  void removeWindow(BlackboxWindow *w, bool sticky = False);
   unsigned int getCount(void) const;
   void appendStackOrder(BlackboxWindowList &stack_order) const;
 

@@ -39,7 +39,7 @@ public:
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }
-  inline OtkWidgetList &getChildren(void) const { return _children; }
+  inline const OtkWidgetList &getChildren(void) const { return _children; }
   inline unsigned int getScreen(void) const { return _screen; }
   inline const Rect &getRect(void) const { return _rect; }
 
@@ -128,14 +128,11 @@ protected:
   bool _focused;
 
   virtual void adjust(void);
-
-private:
-
-  void create(void);
-  void adjustHorz(void);
-  void adjustVert(void);
-  void internalResize(int width, int height);
-  void render(void);
+  virtual void create(void);
+  virtual void adjustHorz(void);
+  virtual void adjustVert(void);
+  virtual void internalResize(int width, int height);
+  virtual void render(void);
 
   Window _window;
 

@@ -178,6 +178,8 @@ if test "$enableval" = "yes"; then
       [
         AC_MSG_RESULT([no])
         XFT2=""
+        XFT_CFLAGS=""
+        XFT_LIBS=""
         AC_MSG_RESULT()
 	AC_MSG_RESULT([** WARNING: Xft support is disabled! **])
         AC_MSG_RESULT()

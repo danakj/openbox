@@ -40,12 +40,12 @@ AC_DEFUN([PYTHON_DEVEL],
   do
     if test -r "$i/libpython$PYTHON_VERSION.so"; then
       PYLIB="$i/libpython$PYTHON_VERSION.so"
-      PYTHON_LIBS="-L$i -l$PYVERSION"
+      PYTHON_LIBS="-L$i -lpython$PYTHON_VERSION"
       break
     else
       if test -r "$i/lib$PYVERSION.a"; then
         PYLIB="$i/lib$PYVERSION.a"
-        PYTHON_LIBS="-L$i -l$PYVERSION -lpthread -ldl -lutil -lm"
+        PYTHON_LIBS="-L$i -lpython$PYTHON_VERSION -lpthread -ldl -lutil -lm"
         break
       else
         # look for really old versions

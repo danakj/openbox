@@ -1085,7 +1085,7 @@ void client_update_strut(Client *self)
     gulong *data;
 
     if (PROP_GET32A(self->window, net_wm_strut, cardinal, data, 4)) {
-	STRUT_SET(self->strut, data[0], data[1], data[2], data[3]);
+	STRUT_SET(self->strut, data[0], data[2], data[1], data[3]);
 	g_free(data);
     } else
 	STRUT_SET(self->strut, 0, 0, 0, 0);

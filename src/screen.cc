@@ -2,6 +2,15 @@
 
 #include "config.h"
 
+#include "screen.hh"
+#include "client.hh"
+#include "openbox.hh"
+#include "frame.hh"
+#include "bindings.hh"
+#include "python.hh"
+#include "otk/display.hh"
+#include "otk/property.hh"
+
 extern "C" {
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
@@ -11,15 +20,6 @@ extern "C" {
 #include "gettext.h"
 #define _(str) gettext(str)
 }
-
-#include "screen.hh"
-#include "client.hh"
-#include "openbox.hh"
-#include "frame.hh"
-#include "bindings.hh"
-#include "python.hh"
-#include "otk/display.hh"
-#include "otk/property.hh"
 
 #include <vector>
 #include <algorithm>

@@ -99,7 +99,6 @@ void RenderControl::drawString(Surface& sf, const Font &font, int x, int y,
   else
     XftDrawString8(d, &c, font._xftfont, x, font._xftfont->ascent + y,
                    (FcChar8*)string.c_str(), string.bytes());
-  printf("DRAW A STRING!: %s\n", string.c_str());
   return;
 }
 

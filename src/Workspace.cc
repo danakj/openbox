@@ -154,6 +154,9 @@ void Workspace::focusFallback(const BlackboxWindow *old_window) {
                                   end = stackingList.end();
       for (; it != end; ++it) {
         BlackboxWindow *tmp = *it;
+        if (! (tmp->windowType() == BlackboxWindow::Type_Dialog ||
+               tmp->windowType() == BlackboxWindow::Type_Normal))
+          continue; // don't fallback to special windows
         if (tmp && tmp->setInputFocus()) {
           // we found our new focus target
           newfocus = tmp;

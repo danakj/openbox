@@ -1189,7 +1189,7 @@ void BScreen::manageWindow(Window w) {
   BlackboxWindow *win = blackbox->searchWindow(w);
   if (! win)
     return;
-  if (win->isDesktop()) {
+  if (win->windowType() == BlackboxWindow::Type_Desktop) {
     // desktop windows cant do anything, so we remove all the normal window
     // stuff from them, they are only kept around so that we can keep them on
     // the bottom of the z-order

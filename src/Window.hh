@@ -321,7 +321,7 @@ public:
   inline bool isMaximizable(void) const { return functions & Func_Maximize; }
   inline bool isResizable(void) const { return functions & Func_Resize; }
   inline bool isClosable(void) const { return functions & Func_Close; }
-  inline bool isDesktop(void) const { return window_type == Type_Desktop; }
+  inline WindowType windowType(void) const { return window_type; }
 
   inline bool hasTitlebar(void) const { return decorations & Decor_Titlebar; }
 

@@ -941,19 +941,19 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
 {
     XrmDatabase db;
 
-    char *s = g_build_filename(name, "themerc", NULL);
+    char *s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
+                               name, "themerc", NULL);
     if ((db = XrmGetFileDatabase(s)))
         theme->path = g_path_get_dirname(s);
     g_free(s);
     if (db == NULL) {
-	char *s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-				   name, "themerc", NULL);
+	char *s = g_build_filename(THEMEDIR, name, "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
 	g_free(s);
     }
     if (db == NULL) {
-	char *s = g_build_filename(THEMEDIR, name, "themerc", NULL);
+    char *s = g_build_filename(name, "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
         g_free(s);

@@ -35,12 +35,12 @@ void python_destroy()
   Py_Finalize();
 }
 
-bool python_exec(const std::string &path)
+int python_exec(const std::string &path)
 {
   FILE *rcpyfd = fopen(path.c_str(), "r");
   if (!rcpyfd) {
     fprintf(stderr, _("Unabled to open python file %s\n"), path.c_str());
-    return false;
+    return 1;
   }
 
   //PyRun_SimpleFile(rcpyfd, const_cast<char*>(path.c_str()));
@@ -51,7 +51,7 @@ bool python_exec(const std::string &path)
   assert(dict);
   PyObject *result = PyRun_File(rcpyfd, const_cast<char*>(path.c_str()),
                                 Py_file_input, dict, dict);
-  bool ret = result != NULL;
+  int ret = result == NULL ? 2 : 0;
   if (result == NULL)
     PyErr_Print();
   

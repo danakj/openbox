@@ -231,7 +231,8 @@ typedef void (*EventCallback)(EventData*, void*);
 
 void python_init(char *argv0);
 void python_destroy();
-bool python_exec(const std::string &path);
+//! Returns 0 for success, 1 for failing to open the file, 2 for an exception
+int python_exec(const std::string &path);
 
 #endif // SWIG
 

@@ -83,7 +83,7 @@ void popup_size_to_string(Popup *self, char *text)
 
     self->h = texth + theme_bevel * 2;
     iconw = (self->hasicon ? texth : 0);
-    self->w = textw + iconw + theme_bevel * 3;
+    self->w = textw + iconw + theme_bevel * (self->hasicon ? 3 : 2);
 }
 
 void popup_show(Popup *self, char *text, Icon *icon)
@@ -149,9 +149,9 @@ void popup_show(Popup *self, char *text, Icon *icon)
     iconw = (self->hasicon ? texth : 0);
     if (self->w) {
         w = self->w;
-        textw = w - (iconw + theme_bevel * 3);
+        textw = w - (iconw + theme_bevel * (self->hasicon ? 3 : 2));
     } else
-        w = textw + iconw + theme_bevel * 3;
+        w = textw + iconw + theme_bevel * (self->hasicon ? 3 : 2);
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
@@ -196,10 +196,12 @@ void popup_show(Popup *self, char *text, Icon *icon)
     RECT_SET(self->a_text->texture[0].position, theme_bevel, theme_bevel,
              textw - theme_bevel * 2, texth - theme_bevel * 2);
     self->a_text->surface.data.planar.parent = self->a_bg;
-    self->a_text->surface.data.planar.parentx = iconw + theme_bevel * 2;
+    self->a_text->surface.data.planar.parentx = iconw +
+        theme_bevel * (self->hasicon ? 2 : 1);
     self->a_text->surface.data.planar.parenty = theme_bevel;
     XMoveResizeWindow(ob_display, self->text,
-                      iconw + theme_bevel * 2, theme_bevel, textw, texth);
+                      iconw + theme_bevel * (self->hasicon ? 2 : 1),
+                      theme_bevel, textw, texth);
 
     if (self->hasicon) {
         if (iconw < 1) iconw = 1; /* sanity check for crashes */

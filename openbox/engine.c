@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "parse.h"
 
 #include <glib.h>
 #include <gmodule.h>
@@ -6,13 +7,13 @@
 #  include <stdlib.h>
 #endif
 
-char *engine_name = NULL;
-char *engine_theme = NULL;
-char *engine_layout = "NDSLIMC";
-char *engine_font = "Sans-7";
-gboolean engine_shadow = FALSE;
-int engine_shadow_offset = 1;
-int engine_shadow_tint = 25;
+char *engine_name;
+char *engine_theme;
+char *engine_layout;
+char *engine_font;
+gboolean engine_shadow;
+int engine_shadow_offset;
+int engine_shadow_tint;
 
 static GModule *module = NULL;
 static EngineStartup *estartup = NULL;
@@ -66,9 +67,73 @@ static gboolean load(char *name)
     return TRUE;
 }
 
+static void parse_assign(char *name, ParseToken *value)
+{
+    if (!g_ascii_strcasecmp(name, "engine")) {
+        if (value->type != TOKEN_STRING)
+            yyerror("invalid value");
+        else {
+            g_free(engine_name);
+            engine_name = g_strdup(value->data.string);
+        }
+    } else if (!g_ascii_strcasecmp(name, "theme")) {
+        if (value->type != TOKEN_STRING)
+            yyerror("invalid value");
+        else {
+            g_free(engine_theme);
+            engine_theme = g_strdup(value->data.string);
+        }
+    } else if (!g_ascii_strcasecmp(name, "titlebarlayout")) {
+        if (value->type != TOKEN_STRING)
+            yyerror("invalid value");
+        else {
+            g_free(engine_layout);
+            engine_layout = g_strdup(value->data.string);
+        }
+    } else if (!g_ascii_strcasecmp(name, "font.title")) {
+        if (value->type != TOKEN_STRING)
+            yyerror("invalid value");
+        else {
+            g_free(engine_font);
+            engine_font = g_strdup(value->data.string);
+        }
+    } else if (!g_ascii_strcasecmp(name, "font.title.shadow")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            engine_shadow = value->data.bool;
+        }
+    } else if (!g_ascii_strcasecmp(name, "font.title.shadow.offset")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            engine_shadow_offset = value->data.integer;
+        }
+    } else if (!g_ascii_strcasecmp(name, "font.title.shadow.tint")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            engine_shadow_tint = value->data.integer;
+            if (engine_shadow_tint < -100) engine_shadow_tint = -100;
+            else if (engine_shadow_tint > 100) engine_shadow_tint = 100;
+        }
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
+
 void engine_startup()
 {
     module = NULL;
+    engine_name = NULL;
+    engine_theme = NULL;
+    engine_layout = g_strdup("NDSLIMC");
+    engine_font = g_strdup("Sans-7");
+    engine_shadow = FALSE;
+    engine_shadow_offset = 1;
+    engine_shadow_tint = 25;
+
+    parse_reg_section("engine", NULL, parse_assign);
 }
 
 void engine_load()

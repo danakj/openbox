@@ -3,48 +3,11 @@
 ###    resize windows.                                                   ###
 ############################################################################
 
-#############################################################################
-###   Options that can be modified to change the functions' behaviors.    ###
-#############################################################################
-EDGE_RESISTANCE = 10
-"""The amount of resistance to provide to moving a window past a screen
-   boundary. Specify a value of 0 to disable edge resistance."""
-POPUP_IN_WINDOW = 0
-"""When this is non-zero, the coordinates popups will be placed relative to
-   the window being moved/resized. When zero, they will appear relative to the
-   entire screen."""
-POPUP_CENTERED = 1
-"""When this is non-zero, the coordinates popups will be centered relative to
-   the window or screen (see POPUP_IN_WINDOW). When zero, they will be placed
-   at based upon POPUP_COORDS."""
-POPUP_COORDS = 0, 0
-"""When POPUP_CENTERED is zero, these coordinates will be used to place the
-   coordinates popup. The popup will be placed relative to the window or the
-   screen (see POPUP_IN_WINDOW). A value of 0, 0 would place it in the top
-   left corner, while a value of -1, -1 would place it in the bottom right.
-   These values behave simmilarly to those passed to the -geometry flag of many
-   applications."""
-MOVE_POPUP = 1
-"""Display a coordinates popup when moving windows."""
-MOVE_RUBBERBAND = 0
-"""NOT IMPLEMENTED (yet?)
-   Display an outline while moving instead of moving the actual window,
-   until the move is completed. Good for slower systems."""
-RESIZE_POPUP = 1
-"""Display a size popup when resizing windows."""
-RESIZE_RUBBERBAND = 0
-"""NOT IMPLEMENTED (yet?)
-   Display an outline while resizing instead of resizing the actual
-   window, until the resize is completed. Good for slower systems."""
-RESIZE_NEAREST = 1
-"""Non-zero to resize from the corner nearest where the mouse is, 0 to
-   resize always from the bottom right corner."""
-#############################################################################
-
 def move(data):
     """Moves the window interactively. This should only be used with
-       MouseAction.Motion events. If MOVE_POPUP or MOVE_RUBBERBAND is enabled,
-       then the end_move function needs to be bound as well."""
+       MouseAction.Motion events. If 'Coords Popup for Moving' or 'Rubberband
+       Mode for Moving' is enabled, then the end_move function needs to be
+       bound as well."""
     _move(data)
 
 def end_move(data):
@@ -53,16 +16,107 @@ def end_move(data):
 
 def resize(data):
     """Resizes the window interactively. This should only be used with
-       MouseMotion events. If RESIZE_POPUP or RESIZE_RUBBERBAND is enabled,
-       then the end_resize function needs to be bound as well."""
+       MouseMotion events. If 'Coords Popup for Resizing' or 'Rubberband Mode
+       for Resizing' is enabled, then the end_resize function needs to be
+       bound as well."""
     _resize(data)
 
 def end_resize(data):
     """Complete the interactive resize of a window."""
     _end_resize(data)
 
-###########################################################################
-###########################################################################
+export_functions = move, end_move, resize, end_resize
+
+#############################################################################
+
+import config
+
+config.add('motion',
+           'edge_resistance',
+           'Edge Resistance',
+           "The amount of resistance to provide to moving a window past a " + \
+           "screen boundary. Specify a value of 0 to disable edge resistance.",
+           'integer',
+           10,
+           min = 0)
+config.add('motion',
+           'popup_in_window',
+           'Coords Popup In Window',
+           "When this is true, the coordinates popups will be placed " + \
+           "relative to the window being moved/resized. When false, they " + \
+           "will appear relative to the entire screen.",
+           'boolean',
+           0)
+config.add('motion',
+           'popup_centered',
+           'Coords Popup Centered',
+           "When this is true, the coordinates popups will be centered " + \
+           "relative to the window or screen (see 'Coords Popup In " + \
+           "Window'). When false, they will be placed based upon the " + \
+           "'Coords Popup Position' options.",
+           'boolean',
+           1)
+config.add('motion',
+           'popup_coords_x',
+           'Coords Popup Position - X',
+           "When 'Coords Popup Centered' is false, this position will be " + \
+           "used to place the coordinates popups. The popups will be " + \
+           "placed relative to the window or the screen (see 'Coords " + \
+           "Popup In Window'). A value of 0 would place it at the left " + \
+           "edge, while a value of -1 would place it at the right edge. " + \
+           "This value behaves similarly to those passed to the -geometry " + \
+           "flag of many applications.",
+           'integer',
+           0)
+config.add('motion',
+           'popup_coords_y',
+           'Coords Popup Position - Y',
+           "When 'Coords Popup Centered' is false, this position will be " + \
+           "used to place the coordinates popups. The popups will be " + \
+           "placed relative to the window or the screen (see 'Coords Popup " +\
+           "In Window'). A value of 0 would place it at the top edge, " + \
+           "while a value of -1 would place it at the bottom edge. This " + \
+           "value behaves similarly to those passed to the -geometry flag " + \
+           "of many applications.",
+           'integer',
+           0)
+config.add('motion',
+           'move_popup',
+           'Coords Popup for Moving',
+           "Option to display a coordinates popup when moving windows.",
+           'boolean',
+           1)
+config.add('motion',
+           'move_rubberband',
+           'Rubberband Mode for Moving',
+           "NOT IMPLEMENTED (yet?)\n"+\
+           "Display an outline while moving instead of moving the actual " + \
+           "window, until the move is completed. Good for slower systems.",
+           'boolean',
+           0)
+config.add('motion',
+           'resize_popup',
+           'Coords Popup for Resizing',
+           "Option to display a coordinates popup when resizing windows.",
+           'boolean',
+           1)
+config.add('motion',
+           'resize_rubberband',
+           'Rubberband Mode for Resizing',
+           "NOT IMPLEMENTED (yet?)\n"+\
+           "Display an outline while resizing instead of resizing the " + \
+           "actual window, until the resize is completed. Good for slower " + \
+           "systems.",
+           'boolean',
+           0)
+config.add('motion',
+           'resize_nearest',
+           'Resize Nearest Corner',
+           "When true, resizing will occur from the corner nearest where " + \
+           "the mouse is. When false resizing will always occur from the " + \
+           "bottom right corner.",
+           'boolean',
+           1)
 
 ###########################################################################
 ###      Internal stuff, should not be accessed outside the module.     ###
@@ -92,19 +146,24 @@ _screen = 0
 _motion_mask = 0
 
 def _place_popup():
-    if POPUP_IN_WINDOW:
+    if config.get('motion', 'popup_in_window'):
+        # use the actual client's area, not the frame's
         area = _client.frame.area()
+        size = _client.frame.size()
+        area = otk.Rect(area.x() + size.left, area.y() + size.top,
+                        area.width() - size.left - size.right,
+                        area.height() - size.top - size.bottom)
     else:
         area = otk.Rect(otk.Point(0, 0), ob.openbox.screen(_screen).size())
     size = _popwidget.minSize()
-    if POPUP_CENTERED:
+    if config.get('motion', 'popup_centered'):
         x = area.position().x() + (area.size().width() - size.width()) / 2
         y = area.position().y() + (area.size().height() - size.height()) / 2
     else:
-        try: x, y = POPUP_COORDS
-        except: x = y = 0
-        if x < 0: x += area.right() - size.width() + 2
-        if y < 0: y += area.bottom() - size.height() + 2
+        x = config.get('motion', 'popup_coords_x')
+        y = config.get('motion', 'popup_coords_y')
+        if x < 0: x += area.width() - size.width() + 1
+        if y < 0: y += area.width() - size.height() + 1
         x += area.position().x()
         y += area.position().y()
     _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
@@ -132,7 +191,8 @@ def _do_move(final):
     y = _cy + _dy + _client.frame.area().y() - _client.area().y()
 
     global _last_x, _last_y
-    if EDGE_RESISTANCE:
+    resist = config.get('motion', 'edge_resistance')
+    if resist:
         fs = _client.frame.size()
         w = _client.area().width() + fs.left + fs.right
         h = _client.area().height() + fs.top + fs.bottom
@@ -143,16 +203,16 @@ def _do_move(final):
         t = area.top()
         b = area.bottom() - h + 1
         # left screen edge
-        if _last_x > x and x < l and x >= l - EDGE_RESISTANCE:
+        if _last_x > x and x < l and x >= l - resist:
             x = l
         # right screen edge
-        if _last_x < x and x > r and x <= r + EDGE_RESISTANCE:
+        if _last_x < x and x > r and x <= r + resist:
             x = r
         # top screen edge
-        if _last_y > y and y < t and y >= t - EDGE_RESISTANCE:
+        if _last_y > y and y < t and y >= t - resist:
             y = t
         # right screen edge
-        if _last_y < y and y > b and y <= b + EDGE_RESISTANCE:
+        if _last_y < y and y > b and y <= b + resist:
             y = b
 
     global _inmove
@@ -163,13 +223,13 @@ def _do_move(final):
         _last_x = x
         _last_y = y
 
-    if MOVE_RUBBERBAND:
-        # draw the outline ...
-        f=0
+    if not final and config.get('motion', 'move_rubberband'):
+        # XXX draw the outline ...
+        pass
     else:
         _client.move(x, y, final)
 
-    if MOVE_POPUP:
+    if config.get('motion', 'move_popup'):
         global _popwidget
         text = "X: " + str(x) + " Y: " + str(y)
         if not _popwidget:
@@ -200,25 +260,22 @@ def _move(data):
         _inmove = 1
 
 def _end_move(data):
-    global MOVE_RUBBERBAND
     global _inmove, _popwidget
     if _inmove:
-        r = MOVE_RUBBERBAND
-        MOVE_RUBBERBAND = 0
         _do_move(1)
-        MOVE_RUBBERBAND = r
         _inmove = 0
     _popwidget = 0
     ob.kungrab()
 
-def _do_resize():
+def _do_resize(final):
     global _screen, _client, _cx, _cy, _cw, _ch, _px, _py, _dx, _dy
 
     dx = _dx
     dy = _dy
     
     # pick a corner to anchor
-    if not (RESIZE_NEAREST or _context == ob.MouseContext.Grip):
+    if not (config.get('motion', 'resize_nearest') or
+            _context == ob.MouseContext.Grip):
         corner = ob.Client.TopLeft
     else:
         x = _px - _cx
@@ -240,13 +297,13 @@ def _do_resize():
     w = _cw + dx
     h = _ch + dy
 
-    if RESIZE_RUBBERBAND:
-        # draw the outline ...
-        f=0
+    if not final and config.get('motion', 'resize_rubberband'):
+        # XXX draw the outline ...
+        pass
     else:
         _client.resize(corner, w, h)
 
-    if RESIZE_POPUP:
+    if config.get('motion', 'resize_popup'):
         global _popwidget
         ls = _client.logicalSize()
         text = "W: " + str(ls.width()) + " H: " + str(ls.height())
@@ -276,20 +333,16 @@ def _resize(data):
     _dx = data.xroot - _px
     _dy = data.yroot - _py
     _motion_mask = data.state
-    _do_resize()
+    _do_resize(0)
     global _inresize
     if not _inresize:
         ob.kgrab(_screen, _motion_grab)
         _inresize = 1
 
 def _end_resize(data):
-    global RESIZE_RUBBERBAND, _inresize
-    global _popwidget
+    global _inresize, _popwidget
     if _inresize:
-        r = RESIZE_RUBBERBAND
-        RESIZE_RUBBERBAND = 0
-        _do_resize()
-        RESIZE_RUBBERBAND = r
+        _do_resize(1)
         _inresize = 0
     _popwidget = 0
     ob.kungrab()

@@ -17,7 +17,11 @@ namespace ob {
 
 %ignore python_init(char*);
 %ignore python_destroy();
-%ignore python_exec(const std::string &);
+%ignore python_exec(const std::string&);
+
+%ignore python_get_long(const char*, long*);
+%ignore python_get_string(const char*, otk::ustring*);
+%ignore python_get_stringlist(const char*, std::vector<otk::ustring>*);
 
 }
 

@@ -7,15 +7,7 @@
 ### these.                                                               ###
 ############################################################################
 
-##############################################################################
-### Options for the windowplacement module:                                ###
-###                                                                        ###
-###                                                                        ###
-##############################################################################
-
-import otk
-import ob
-import random
+import otk, ob, random
 
 _rand = random.Random()
 
@@ -52,5 +44,7 @@ def cascade(data):
     frame_size = data.client.frame.size()
     _cascade_x += frame_size.top
     _cascade_y += frame_size.top
+
+export_functions = random, cascade
 
 print "Loaded windowplacement.py"

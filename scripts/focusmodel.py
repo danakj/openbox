@@ -56,4 +56,6 @@ def setup_sloppy_focus(click_focus = 1, click_raise = 0):
             ob.mbind("Left", ob.MouseContext.Window,
                      ob.MouseAction.Press, callbacks.raise_win)    
 
+export_functions = setup_click_focus, setup_sloppy_focus
+
 print "Loaded focusmodel.py"

@@ -19,6 +19,7 @@ extern "C" {
 #include <string>
 #include <vector>
 
+
 namespace ob {
 
 class Client;
@@ -231,6 +232,10 @@ void python_init(char *argv0);
 void python_destroy();
 //! Returns 0 for success, 1 for failing to open the file, 2 for an exception
 int python_exec(const std::string &path);
+
+bool python_get_long(const char *name, long *value);
+bool python_get_string(const char *name, otk::ustring *value);
+bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value);
 
 }
 

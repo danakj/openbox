@@ -3,39 +3,63 @@
 ### to the ob.EventAction.PlaceWindow event to use it.                     ###
 ##############################################################################
 
-import windowplacement # fallback routines
-
-##############################################################################
-###       Options for the historyplacement module (Options in the          ###
-###                windowplacement module also apply!)                     ###
-##############################################################################
-IGNORE_REQUESTED_POSITIONS = 0
-"""When non-zero, the placement algorithm will attempt to place windows even
-   when they request a position (like XMMS). Note this only applies to normal
-   windows, not to special cases like desktops and docks."""
-DONT_DUPLICATE = 1
-"""When non-zero, if 2 copies of the same match in history are to be placed
-   before one of them is closed (so it would be placed over-top of the last
-   one), this will cause the second window to not be placed via history, and
-   the FALLBACK will be used instead."""
-FALLBACK = windowplacement.random
-"""The window placement algorithm that will be used when history placement
-   does not have a place for the window."""
-CONFIRM_CALLBACK = 0
-"""Set this to a function to have the function called before attempting to
-   place a window via history. If the function returns a non-zero, then an
-   attempt will be made to place the window. If it returns zero, the
-   FALLBACK method will be directly applied instead."""
-FILENAME = 'historydb'
-"""The name of the file where history data will be stored. The number of
-   the screen is appended onto this filename."""
-##############################################################################
+import windowplacement, config
 
 def place(data):
     """Place a window usingthe history placement algorithm."""
     _place(data)
 
-###########################################################################
+export_functions = place
+
+##############################################################################
+
+config.add('historyplacement',
+           'ignore_requested_positions',
+           'Ignore Requested Positions',
+           "When true, the placement algorithm will attempt to place " + \
+           "windows even when they request a position (like XMMS can)." + \
+           "Note this only applies to 'normal' windows, not to special " + \
+           "cases like desktops and docks.",
+           'boolean',
+           0)
+config.add('historyplacement',
+           'dont_duplicate',
+           "Don't Diplicate",
+           "When true, if 2 copies of the same match in history are to be " + \
+           "placed before one of them is closed (so it would be placed " + \
+           "over-top of the last one), this will cause the second window to "+\
+           "not be placed via history, and the 'Fallback Algorithm' will be "+\
+           "used instead.",
+           'boolean',
+           1)
+config.add('historyplacement',
+           'filename',
+           'History Database Filename',
+           "The name of the file where history data will be stored. The " + \
+           "number of the screen is appended onto this name. The file will " +\
+           "be placed in ~/.openbox/.",
+           'string',
+           'historydb')
+config.add('historyplacement',
+           'fallback',
+           'Fallback Algorithm',
+           "The window placement algorithm that will be used when history " + \
+           "placement does not have a place for the window.",
+           'enum',
+           windowplacement.random,
+           options = windowplacement.export_functions)
+config.add('historyplacement',
+           'confirm_callback',
+           'Confirm Placement Callback',
+           "A function which will be called before attempting to place a " + \
+           "window via history. If the function returns true, then an " + \
+           "attempt will be made to place the window. If it returns false, " +\
+           "the 'Fallback Algorithm' will be directly applied instead. The " +\
+           "function must take 1 argument, which will be the callback data " +\
+           "which was passed to invoke the window placement.",
+           'function',
+           None)
+
 ###########################################################################
 
 ###########################################################################
@@ -67,8 +91,9 @@ class _state:
 def _load(data):
     global _data
     try:
-        file = open(os.environ['HOME'] + '/.openbox/' + FILENAME+"." +
-                    str(data.screen), 'r')
+        file = open(os.environ['HOME'] + '/.openbox/' + \
+                    config.get('historyplacement', 'filename') + \
+                    "." + str(data.screen), 'r')
         # read data
         for line in file.readlines():
             line = line[:-1] # drop the '\n'
@@ -88,8 +113,9 @@ def _load(data):
 
 def _save(data):
     global _data
-    file = open(os.environ['HOME']+'/.openbox/'+FILENAME+"."+str(data.screen),
-                'w')
+    file = open(os.environ['HOME']+'/.openbox/'+ \
+                config.get('historyplacement', 'filename') + \
+                "." + str(data.screen), 'w')
     if file:
         while len(_data)-1 < data.screen:
             _data.append([])
@@ -121,11 +147,13 @@ def _find(screen, state):
 def _place(data):
     global _data
     if data.client:
-        if not (IGNORE_REQUESTED_POSITIONS and data.client.normal()):
+        if not (config.get('historyplacement', 'ignore_requested_positions') \
+                and data.client.normal()):
             if data.client.positionRequested(): return
         state = _create_state(data)
         try:
-            if not CONFIRM_CALLBACK or CONFIRM_CALLBACK(data):
+            confirm = config.get('historyplacement', 'confirm_callback')
+            if not confirm or confirm(data):
                 print "looking for : " + state.appname +  " : " + \
                       state.appclass + " : " + state.role
 
@@ -134,7 +162,8 @@ def _place(data):
                     coords = _data[data.screen][i]
                     print "Found in history ("+str(coords.x)+","+\
                           str(coords.y)+")"
-                    if not (DONT_DUPLICATE and coords.placed):
+                    if not (config.get('historyplacement', 'dont_duplicate') \
+                            and coords.placed):
                         data.client.move(coords.x, coords.y)
                         coords.placed = 1
                         return
@@ -144,7 +173,8 @@ def _place(data):
                     print "No match in history"
         except TypeError:
             pass
-    if FALLBACK: FALLBACK(data)
+    fallback = config.get('historyplacement', 'fallback')
+    if fallback: fallback(data)
 
 def _save_window(data):
     global _data

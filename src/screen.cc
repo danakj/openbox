@@ -40,8 +40,7 @@ namespace ob {
 
 
 Screen::Screen(int screen)
-  : _number(screen),
-    _config(screen)
+  : _number(screen)
 {
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);
@@ -80,7 +79,7 @@ Screen::Screen(int screen)
 
   _desktop = 0;
 
-  changeNumDesktops(1); // set the hint
+  changeNumDesktops(4); // set the hint
   changeDesktop(0); // set the hint
 
   // don't start in showing-desktop mode

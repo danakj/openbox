@@ -110,4 +110,6 @@ def setup_scroll():
     ob.mbind("C-A-Down", ob.MouseContext.Frame,
              ob.MouseAction.Click, callbacks.send_to_prev_desktop)
 
+export_functions = setup_window_clicks, setup_window_buttons, setup_scroll
+
 print "Loaded behavior.py"

@@ -270,4 +270,15 @@ def exit(data=0):
     """Exits Openbox."""
     ob.openbox.shutdown()
 
+export_functions = iconify, restore, close, focus, raise_win, lower_win, \
+                   toggle_maximize, toggle_maximize_horz, \
+                   toggle_maximize_vert, maximize, maximize_horz, \
+                   maximize_vert, unmaximize, unmaximize_horz, \
+                   unmaximize_vert, toggle_shade, shade, unshade, \
+                   change_desktop, show_desktop, hide_desktop, \
+                   toggle_show_desktop, next_desktop, prev_desktop, \
+                   up_desktop, down_desktop, left_desktop, right_desktop, \
+                   send_to_desktop, toggle_all_desktops, send_to_all_desktops,\
+                   send_to_next_desktop, send_to_prev_desktop, restart, exit
+
 print "Loaded callbacks.py"

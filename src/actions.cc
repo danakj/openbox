@@ -145,7 +145,8 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   data.action = MouseAction::Click;
   openbox->bindings()->fireButton(&data);
     
-  long dblclick = openbox->screen(screen)->config().double_click_delay;
+  long dblclick = 0;
+  python_get_long("double_click_delay", &dblclick);
   if (e.time - _release.time < (unsigned)dblclick &&
       _release.win == e.window && _release.button == e.button) {
 
@@ -303,7 +304,8 @@ void Actions::motionHandler(const XMotionEvent &e)
   if (!_dragging) {
     int dx = x_root - _press.pos.x();
     int dy = y_root - _press.pos.y();
-    long threshold = openbox->screen(screen)->config().drag_threshold;
+    long threshold = 0;
+    python_get_long("drag_threshold", &threshold);
     if (!(std::abs(dx) >= threshold || std::abs(dy) >= threshold))
       return; // not at the threshold yet
   }

@@ -10,7 +10,6 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include "config.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
@@ -67,9 +66,6 @@ private:
   //! Information about this screen
   const otk::ScreenInfo *_info;
 
-  //! Configuration options from the user scripts
-  Config _config;
-  
   //! Area usable for placement etc (total - struts), one per desktop,
   //! plus one extra for windows on all desktops
   RectList _area;
@@ -159,9 +155,6 @@ public:
     used.
   */
   inline bool managed() const { return _managed; }
-
-  //! Returns the config options set by the user scripts
-  Config& config() { return _config; }
 
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }

@@ -2,26 +2,28 @@
 ###          Functions for helping out with your window focus.          ###
 ###########################################################################
 
-###########################################################################
-###         Options that affect the behavior of the focus module.       ###
-###########################################################################
-AVOID_SKIP_TASKBAR = 1
-"""Don't focus windows which have requested to not be displayed in taskbars.
-   You will still be able to focus the windows, but not through cycling, and
-   they won't be focused as a fallback if 'fallback' is enabled."""
-FALLBACK = 0
-"""Send focus somewhere when nothing is left with the focus, if possible."""
-###########################################################################
+import config, ob
 
-###########################################################################
-###########################################################################
+export_functions = ()
 
-###########################################################################
-###      Internal stuff, should not be accessed outside the module.     ###
-###########################################################################
+config.add('focus',
+           'avoid_skip_taskbar',
+           'Avoid SkipTaskbar Windows',
+           "Don't focus windows which have requested to not be displayed " + \
+           "in taskbars. You will still be able to focus the windows, but " + \
+           "not through cycling, and they won't be focused as a fallback " + \
+           "if 'Focus Fallback' is enabled.",
+           'boolean',
+           1)
 
-import ob
-
+config.add('focus',
+           'fallback',
+           'Focus Fallback',
+           "Send focus somewhere when nothing is left with the focus, if " + \
+           "possible.",
+           'boolean',
+           1)
+                    
 # maintain a list of clients, stacked in focus order
 _clients = []
 _skip = 0
@@ -30,7 +32,8 @@ def _focusable(client, desktop):
     if not client.normal(): return 0
     if not (client.canFocus() or client.focusNotify()): return 0
     if client.iconic(): return 0
-    if AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
+    if config.get('focus', 'avoid_skip_taskbar') and \
+       client.skipTaskbar(): return 0
 
     desk = client.desktop()
     if not (desk == 0xffffffff or desk == desktop): return 0
@@ -60,7 +63,7 @@ def _focused(data):
             _remove(data.client)
         except ValueError: pass # happens if _focused comes before _newwindow
         _clients.insert(0, data.client)
-    elif FALLBACK:
+    elif config.get('focus', 'fallback'):
         # pass around focus
         desktop = ob.openbox.screen(data.screen).desktop()
         for c in _clients:

@@ -88,7 +88,6 @@ namespace ob {
 %ignore Screen::~Screen();
 %ignore Screen::focuswindow() const;
 %ignore Screen::managed() const;
-%ignore Screen::config();
 %rename(ignored_showDesktop) Screen::showDesktop(bool show);
 %ignore Screen::ignored_showDesktop(bool show);
 %ignore Screen::updateStruts();

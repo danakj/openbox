@@ -9,6 +9,7 @@ extern "C" {
 }
 
 #include "frame.hh"
+#include "config.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
 #include "otk/surface.hh"
@@ -99,7 +100,8 @@ Frame::Frame(Client *client)
 
   applyStyle(*otk::RenderStyle::style(_client->screen()));
 
-  _layout = openbox->screen(_client->screen())->config().titlebar_layout;
+  _layout = "ITMC";
+  python_get_string("titlebar_layout", &_layout);
 
   // register all of the windows with the event dispatcher
   Window *w = allWindows();

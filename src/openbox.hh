@@ -102,6 +102,9 @@ private:
 
   //! A list of all the managed screens
   ScreenList _screens;
+
+  //! The number of managed screens
+  int _managed_count;
   
   //! The action interface through which all user-available actions occur
   Actions *_actions;
@@ -175,8 +178,20 @@ public:
   */
   inline Screen *screen(int num) {
     assert(num >= 0); assert(num < (signed)ScreenCount(**otk::display));
-    if (num >= (signed)_screens.size()) return 0;
+    if (num < 0 || num >= (signed)_screens.size()) return 0;
     return _screens[num];
+  }
+
+  inline int managedScreenCount() const { return _managed_count; }
+
+  inline Screen *managedScreen(int num) {
+    assert(num >= 0); assert(num < _managed_count);
+    if (num < 0 || num >= _managed_count) return 0;
+    ScreenList::iterator it, end = _screens.end();
+    int i = -1;
+    for (it = _screens.begin(); it != end; ++it)
+      if (*it && ++i == num)
+        return *it;
   }
 
   //! Returns the mouse cursors used throughout Openbox

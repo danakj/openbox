@@ -4,9 +4,6 @@
 #include "render.h"
 #include "color.h"
 
-XColor *pseudo_colors;
-int pseudo_bpc;
-
 void RrColorAllocateGC(RrColor *in)
 {
     XGCValues gcv;
@@ -130,11 +127,11 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 
 XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b) 
 {
-  r = (r & 0xff) >> (8-pseudo_bpc);
-  g = (g & 0xff) >> (8-pseudo_bpc);
-  b = (b & 0xff) >> (8-pseudo_bpc);
-  return &RrPseudoColors(inst)[(r << (2*pseudo_bpc)) +
-                               (g << (1*pseudo_bpc)) +
+  r = (r & 0xff) >> (8-RrPseudoBPC(inst));
+  g = (g & 0xff) >> (8-RrPseudoBPC(inst));
+  b = (b & 0xff) >> (8-RrPseudoBPC(inst));
+  return &RrPseudoColors(inst)[(r << (2*RrPseudoBPC(inst))) +
+                               (g << (1*RrPseudoBPC(inst))) +
                                b];
 }
 

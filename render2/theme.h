@@ -79,6 +79,9 @@ struct RrTheme {
     struct RrSurface *menu_disabled;
     struct RrSurface *menu_hilite;
 
+    struct RrColor app_label_color;
+    struct RrColor app_label_color_h; /* hilited */
+
     struct RrSurface *app_bg;
     struct RrSurface *app_bg_h; /* hilited */
     struct RrSurface *app_label;
@@ -86,11 +89,10 @@ struct RrTheme {
     struct RrSurface *app_icon;
 };
 
-#define RrThemeLabelHeight(t) (RrFontHeight((t)->title_font) + 2)
+#define RrThemeLabelHeight(t) (RrFontHeight((t)->title_font))
 #define RrThemeTitleHeight(t) (RrThemeLabelHeight(t) + \
                                ((t)->bevel + (t)->bwidth) * 2)
-#define RrThemeButtonSize(t)  (RrThemeLabelHeight(t) - \
-                               ((t)->bevel + (t)->bwidth) * 2)
+#define RrThemeButtonSize(t)  (RrThemeLabelHeight(t) - (t)->bevel * 2)
 #define RrThemeGripWidth(t)   (RrThemeButtonSize(t) * 2)
 
 #endif

@@ -57,12 +57,12 @@ void OtkButton::update(void)
 
     OtkFocusWidget::resize(ft.measureString(_text) + bevel * 2,
                            ft.height() + bevel * 2);
-    ft.drawString(getWindow(), bevel, bevel, *text_color, _text);
 
     OtkFocusWidget::update();
-  }
 
-  _dirty = false;
+    ft.drawString(getWindow(), bevel, bevel, *text_color, _text);
+  } else
+    OtkFocusWidget::update();
 }
 
 }

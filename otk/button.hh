@@ -40,7 +40,7 @@ private:
   std::string _text;
   //OtkPixmap _pixmap;
   bool _pressed;
-  bool _dirty;
+//  bool _dirty;
 
   BTexture *_pressed_focus_tx;
   BTexture *_pressed_unfocus_tx;

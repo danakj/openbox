@@ -390,4 +390,16 @@ void OtkWidget::removeChild(OtkWidget *child)
     _children.erase(it);
 }
 
+void OtkWidget::expose(const XExposeEvent &e)
+{
+  if (e.window == _window) {
+    _dirty = true;
+    update();
+  } else {
+    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+    for (; it != end; ++it)
+      (*it)->expose(e);
+  }
+}
+
 }

@@ -59,6 +59,8 @@ int main(void) {
     if (XPending(otk::OBDisplay::display)) {
       XEvent e;
       XNextEvent(otk::OBDisplay::display, &e);
+      if (e.type == Expose)
+        foo.expose(e.xexpose);
     } 
   }
 

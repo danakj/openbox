@@ -27,6 +27,8 @@ public:
 
   virtual void update(void);
 
+  void expose(const XExposeEvent &e);
+
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }
   inline const OtkWidgetList &getChildren(void) const { return _children; }
@@ -124,6 +126,7 @@ private:
   bool _fixed_width;
   bool _fixed_height;
 
+protected:
   bool _dirty;
 };
 

@@ -1033,55 +1033,58 @@ void client_update_wmhints(Client *self)
 	if (hints->flags & XUrgencyHint)
 	    ur = TRUE;
 
-	if (hints->flags & WindowGroupHint) {
-            /* did the group state change? */
-            if (hints->window_group !=
-                (self->group ? self->group->leader : None)) {
-                /* remove from the old group if there was one */
-                if (self->group != NULL) {
-                    /* remove transients of the group */
-                    for (it = self->group->members; it; it = it->next)
-                        if (it->data != self &&
-                            ((Client*)it->data)->transient_for == TRAN_GROUP) {
-                            self->transients = g_slist_remove(self->transients,
-                                                              it->data);
-                        }
-                    group_remove(self->group, self);
-                    self->group = NULL;
-                }
-                if (hints->window_group != None) {
-                    self->group = group_add(hints->window_group, self);
+	if (!(hints->flags & WindowGroupHint))
+            hints->window_group = None;
 
-                    /* add other transients of the group that are already
-                       set up */
-                    for (it = self->group->members; it; it = it->next)
-                        if (it->data != self &&
-                            ((Client*)it->data)->transient_for == TRAN_GROUP)
-                            self->transients = g_slist_append(self->transients,
-                                                              it->data);
-                }
-
-                /* because the self->transient flag wont change from this call,
-                   we don't need to update the window's type and such, only its
-                   transient_for, and the transients lists of other windows in
-                   the group may be affected */
-                client_update_transient_for(self);
+        /* did the group state change? */
+        if (hints->window_group !=
+            (self->group ? self->group->leader : None)) {
+            /* remove from the old group if there was one */
+            if (self->group != NULL) {
+                /* remove transients of the group */
+                for (it = self->group->members; it; it = it->next)
+                    if (it->data != self &&
+                        ((Client*)it->data)->transient_for == TRAN_GROUP) {
+                        self->transients = g_slist_remove(self->transients,
+                                                          it->data);
+                    }
+                group_remove(self->group, self);
+                self->group = NULL;
             }
+            if (hints->window_group != None) {
+                self->group = group_add(hints->window_group, self);
+
+                /* add other transients of the group that are already
+                   set up */
+                for (it = self->group->members; it; it = it->next)
+                    if (it->data != self &&
+                        ((Client*)it->data)->transient_for == TRAN_GROUP)
+                        self->transients = g_slist_append(self->transients,
+                                                          it->data);
+            }
+
+            /* because the self->transient flag wont change from this call,
+               we don't need to update the window's type and such, only its
+               transient_for, and the transients lists of other windows in
+               the group may be affected */
+            client_update_transient_for(self);
         }
 
-	if (hints->flags & IconPixmapHint) {
-	    client_update_kwm_icon(self);
-	    /* try get the kwm icon first, this is a fallback only */
-	    if (self->pixmap_icon == None) {
-		self->pixmap_icon = hints->icon_pixmap;
-		if (hints->flags & IconMaskHint)
-		    self->pixmap_icon_mask = hints->icon_mask;
-		else
-		    self->pixmap_icon_mask = None;
+        client_update_kwm_icon(self);
+        /* try get the kwm icon first, this is a fallback only */
+        if (self->pixmap_icon == None) {
+            if (hints->flags & IconPixmapHint) {
+                if (self->pixmap_icon == None) {
+                    self->pixmap_icon = hints->icon_pixmap;
+                    if (hints->flags & IconMaskHint)
+                        self->pixmap_icon_mask = hints->icon_mask;
+                    else
+                        self->pixmap_icon_mask = None;
 
-		if (self->frame)
-		    frame_adjust_icon(self->frame);
-	    }
+                    if (self->pixmap_icons != None && self->frame)
+                        frame_adjust_icon(self->frame);
+                }
+            }
 	}
 
 	XFree(hints);

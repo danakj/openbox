@@ -46,7 +46,9 @@ typedef struct {
     int num[2];
     /* Event_Client_Desktop: num[0] = new number, num[1] = old number
        Event_Client_Urgent: num[0] = urgent state
-       Event_Client_Moving: num[0] = dest x coord, num[1] = dest y coord
+       Event_Client_Moving: num[0] = dest x coord, num[1] = dest y coord --
+                            change these in the handler to adjust where the
+                            window will be placed
      */
 } EventData_Client;
 

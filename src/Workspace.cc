@@ -85,14 +85,6 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
 
   stackingList.push_front(w);
     
-  // if the window is sticky, then it needs to be added on all other
-  // workspaces too!
-  if (! sticky && w->isStuck()) {
-    for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
-      if (i != id)
-        screen->getWorkspace(i)->addWindow(w, place, True);
-  }
-
   if (w->isNormal()) {
     if (! sticky) {
       w->setWorkspace(id);
@@ -126,6 +118,14 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
     raiseWindow(w);
   else
     lowerWindow(w);
+  
+  // if the window is sticky, then it needs to be added on all other
+  // workspaces too!
+  if (! sticky && w->isStuck()) {
+    for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
+      if (i != id)
+        screen->getWorkspace(i)->addWindow(w, place, True);
+  }
 }
 
 

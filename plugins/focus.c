@@ -43,7 +43,6 @@ static void events(ObEvent *e, void *foo)
         break;
 
     case Event_Ob_Desktop:
-        g_message("Desktop Switch");
         /* focus the next available target */
         focus_fallback(e->data.o.num[0], TRUE);
         break;
@@ -58,12 +57,7 @@ static void events(ObEvent *e, void *foo)
         */
         break;
 
-    case Event_X_LeaveNotify:
-        g_message("Leave: %lx", e->data.x.client ? e->data.x.client->window : 0);
-        break;
-
     case Event_X_EnterNotify:
-        g_message("Enter: %lx", e->data.x.client ? e->data.x.client->window : 0);
         if (skip_enter)
             --skip_enter;
         else if (e->data.x.client && client_normal(e->data.x.client))
@@ -80,8 +74,7 @@ void plugin_startup()
     dispatch_register(Event_Client_Mapped | 
                       Event_Ob_Desktop | 
                       Event_Client_Unfocus |
-                      Event_X_EnterNotify |
-                      Event_X_LeaveNotify,
+                      Event_X_EnterNotify,
                       (EventHandler)events, NULL);
 }
 

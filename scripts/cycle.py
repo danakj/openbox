@@ -1,4 +1,4 @@
-import ob, otk
+import ob, otk, config
 class _Cycle:
     """
     This is a basic cycling class for anything, from xOr's stackedcycle.py, 
@@ -298,7 +298,8 @@ class _CycleWindows(_Cycle):
 
         if not client.normal(): return 0
         if not (client.canFocus() or client.focusNotify()): return 0
-        if focus.AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
+        if config.get('focus', 'avoid_skip_taskbar') and client.skipTaskbar():
+                      return 0
 
         if client.iconic():
             if self.INCLUDE_ICONS:
@@ -390,7 +391,8 @@ class _CycleWindowsLinear(_CycleWindows):
 
         if not client.normal(): return 0
         if not (client.canFocus() or client.focusNotify()): return 0
-        if focus.AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
+        if config.get('focus', 'avoid_skip_taskbar') and client.skipTaskbar():
+            return 0
 
         if client.iconic(): return 0
         if self.INCLUDE_OMNIPRESENT and desk == 0xffffffff: return 1

@@ -42,8 +42,65 @@
 # Action: The action to be performed then the Event occurs with the Button in
 #         the context.
 #  Value actions are:
-#  * Focus  - Focus the client
-#  
+#  * Focus - Focus the client
+#  * Unfocus - Unfocus the client
+#  * Iconify - Iconify the client
+#  * Raise - Raise the client to the front
+#  * Lower - Lower the client to the back
+#  * FocusRaise - Focus the client and raise the client to the front
+#  * Close - Close the client
+#  * Kill - Kill the client forcefully
+#  * Shade - Shade (roll up) the client
+#  * Unshade - Unshade (roll down) the client
+#  * ToggleShade - Shade and unshade the client
+#  * ToggleOmnipresent - Place the client on all desktops or the current one
+#  * MaximizeFull - Maximize the window horizontally and vertically
+#  * UnmaximizeFull - Restore the window horizontally and vertically
+#  * ToggleMaximizeFull - Maximize or restore the window horizontally and
+#                         vertically
+#  * MaximizeHorz - Maximize the window horizontally
+#  * UnmaximizeHorz - Restore the window horizontally
+#  * ToggleMaximizeHorz - Maximize or restore the window horizontally
+#  * MaximizeVert - Maximize the window vertically
+#  * UnmaximizeVert - Restore the window vertically
+#  * ToggleMaximizeVert - Maximize or restore the window vertically
+#  * SendToNextDesktop - Sends the window to the next desktop
+#  * SendToNextDesktopWrap - Sends the window to the next desktop (wrapping
+#                            around the first and last desktops)
+#  * SendToPreviousDesktop - Sends the window to the previous desktop
+#  * SendToPreviousDesktopWrap - Sends the window to the previous desktop
+#                                (wrapping around the first and last desktops)
+#  * NextDesktop - Switches to the next desktop
+#  * NextDesktopWrap - Switches to the next desktop (wrapping around the first
+#		       and last desktops)
+#  * PreviousDesktop - Switches to the previous desktop
+#  * PreviousDesktopWrap - Switches to the previous desktop (wrapping around
+#			   the first and last desktops)
+#  * NextDesktopColumn - Switches to the desktop in the next column, based on
+#                        the desktop layout set by a pager
+#  * NextDesktopColumnWrap - Switches to the desktop in the next column, based
+#                            on the desktop layout set by a pager (wrapping
+#                            around the first and last columns)
+#  * PreviousDesktopColumn - Switches to the desktop in the previous column,
+#                            based on the desktop layout set by a pager
+#  * PreviousDesktopColumnWrap - Switches to the desktop in the previous
+#                                column, based on the desktop layout set by a
+#                                pager (wrapping around the first and last
+#                                columns)
+#  * NextDesktopRow - Switches to the desktop in the next row, based on the
+#                     desktop layout set by a pager
+#  * NextDesktopRowWrap - Switches to the desktop in the next row, based on the
+#                         desktop layout set by a pager (wrapping around the
+#                         first and last rows)
+#  * PreviousDesktopRow - Switches to the desktop in the previous row, based on
+#                         the desktop layout set by a pager
+#  * PreviousDesktopRowWrap - Switches to the desktop in the previous row,
+#                             based on the desktop layout set by a pager
+#                             (wrapping around the first and last rows)
+#  * Move - Move the client interactively, this can only be bound to the Drag
+#           Event
+#  * Resize - Resize the client interactively, this can only be bound to the
+#             Drag Event
 
 # All options are case insensitive.
 

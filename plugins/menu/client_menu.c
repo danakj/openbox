@@ -47,8 +47,9 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
     g_assert(!self->invalid);
     g_assert(client);
     
-    newy = client->frame->area.y + client->frame->a_focused_title->area.height
-        + theme_bwidth;
+    newy = MAX(client->frame->area.y +
+               client->frame->a_focused_title->area.height + theme_bwidth,
+               y - theme_bwidth);
     
     POINT_SET(self->location, 
 	      MIN(x, screen_physical_size.width - self->size.width -

@@ -5,8 +5,8 @@
 #include "kernel/client.h"
 #include "kernel/prop.h"
 #include "kernel/grab.h"
-#include "kernel/parse.h"
 #include "kernel/frame.h"
+#include "parser/parse.h"
 #include "translate.h"
 #include "mouse.h"
 #include <glib.h>
@@ -59,7 +59,7 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
                 goto next_nbut;
             nact = parse_find_node("action", nbut->xmlChildrenNode);
             while (nact) {
-                if ((action = parse_action(doc, nact))) {
+                if ((action = action_parse(doc, nact))) {
                     /* validate that its okay for a mouse binding*/
                     if (mact == MouseAction_Motion) {
                         if (action->func != action_moveresize ||

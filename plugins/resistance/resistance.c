@@ -1,9 +1,10 @@
 #include "kernel/dispatch.h"
 #include "kernel/client.h"
 #include "kernel/frame.h"
-#include "kernel/parse.h"
 #include "kernel/stacking.h"
 #include "kernel/screen.h"
+#include "parser/parse.h"
+#include "resistance.h"
 #include <glib.h>
 
 static int resistance;
@@ -21,8 +22,8 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 
 void plugin_setup_config()
 {
-    resistance = 10;
-    resist_windows = TRUE;
+    resistance = DEFAULT_RESISTANCE;
+    resist_windows = DEFAULT_RESIST_WINDOWS;
 
     parse_register("resistance", parse_xml, NULL);
 }

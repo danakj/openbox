@@ -3,7 +3,7 @@
 #include "kernel/frame.h"
 #include "kernel/screen.h"
 #include "kernel/openbox.h"
-#include "kernel/parse.h"
+#include "parser/parse.h"
 #include "history.h"
 #include <glib.h>
 

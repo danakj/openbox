@@ -12,13 +12,13 @@
 #include "moveresize.h"
 #include "frame.h"
 #include "extensions.h"
-#include "parse.h"
 #include "grab.h"
 #include "plugin.h"
 #include "timer.h"
 #include "group.h"
 #include "config.h"
 #include "gettext.h"
+#include "parser/parse.h"
 #include "render/render.h"
 #include "render/font.h"
 #include "render/theme.h"
@@ -66,6 +66,8 @@ int main(int argc, char **argv)
     sigset_t sigset;
     char *path;
     char *theme;
+    xmlDocPtr doc;
+    xmlNodePtr node;
 
     ob_state = State_Starting;
 
@@ -180,7 +182,8 @@ int main(int argc, char **argv)
         /* set up the kernel config shit */
         config_startup();
         /* parse/load user options */
-        parse_config();
+        if (parse_load_rc(&doc, &node))
+            parse_tree(doc, node->xmlChildrenNode, NULL);
         /* we're done with parsing now, kill it */
         parse_shutdown();
 

@@ -1,11 +1,7 @@
+#include "plugins/interface.h"
+
 #include <glib.h>
 #include <gmodule.h>
-
-typedef void (*PluginSetupConfig)();
-typedef void (*PluginStartup)();
-typedef void (*PluginShutdown)();
-typedef void *(*PluginCreate)(/* TODO */);
-typedef void (*PluginDestroy)(void *);
 
 typedef struct {
     GModule *module;

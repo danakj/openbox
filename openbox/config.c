@@ -1,5 +1,5 @@
 #include "config.h"
-#include "parse.h"
+#include "parser/parse.h"
 
 gboolean config_focus_new;
 gboolean config_focus_follow;

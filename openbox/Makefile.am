@@ -1,15 +1,15 @@
 localedir=$(datadir)/locale
-plugindir=$(libdir)/openbox/plugins
 rcdir=$(datadir)/openbox
+plugindir=$(libdir)/openbox/plugins
 
 binary=openbox3
-url=http://icculus.org/openbox
+url=http://openbox.org/
 
 CPPFLAGS=$(X_CFLAGS) $(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
          $(LIBSN_CFLAGS) $(GL_CFLAGS) $(XML_CFLAGS) @CPPFLAGS@ \
          -DLOCALEDIR=\"$(localedir)\" \
-         -DRCDIR=\"$(rcdir)\" \
          -DPLUGINDIR=\"$(plugindir)\" \
+         -DRCDIR=\"$(rcdir)\" \
          -DG_LOG_DOMAIN=\"Openbox\" \
          -DBINARY=\"$(binary)\"
 
@@ -20,9 +20,9 @@ LIBS=$(X_LIBS) $(XFT_LIBS) $(XINERAMA_LIBS) $(XKB_LIBS) $(XRANDR_LIBS) \
 
 bin_PROGRAMS=$(binary)
 
-openbox3_LDADD=-lobrender -L../render
+openbox3_LDADD=-lobrender -L../render -lobparser -L../parser
 openbox3_LDFLAGS=-export-dynamic
-openbox3_SOURCES=action.c client.c config.c parse.c \
+openbox3_SOURCES=action.c client.c config.c \
                  extensions.c focus.c frame.c grab.c menu.c menu_render.c \
                  openbox.c framerender.c plugin.c prop.c screen.c \
                  stacking.c dispatch.c event.c group.c timer.c xerror.c \
@@ -32,7 +32,7 @@ noinst_HEADERS=action.h client.h config.h dispatch.h event.h extensions.h \
                focus.h frame.h framerender.h geom.h gettext.h grab.h group.h \
                menu.h openbox.h plugin.h prop.h screen.h \
                stacking.h timer.h xerror.h moveresize.h startup.h popup.h \
-               dock.h window.h parse.h
+               dock.h window.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

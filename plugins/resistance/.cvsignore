@@ -1,0 +1,8 @@
+.deps
+.libs
+Makefile
+Makefile.in
+resistance-config.la
+resistance.la
+resistance_config_la-resistance_config.lo
+resistance_la-resistance.lo

@@ -5,8 +5,8 @@
 #include "kernel/grab.h"
 #include "kernel/action.h"
 #include "kernel/prop.h"
-#include "kernel/parse.h"
 #include "kernel/timer.h"
+#include "parser/parse.h"
 #include "tree.h"
 #include "keyboard.h"
 #include "translate.h"
@@ -45,7 +45,7 @@ static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
     if (keylist) {
         nact = parse_find_node("action", node);
         while (nact) {
-            if ((action = parse_action(doc, nact))) {
+            if ((action = action_parse(doc, nact))) {
                 /* validate that its okay for a key binding */
                 if (action->func == action_moveresize &&
                     action->data.moveresize.corner !=

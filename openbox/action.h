@@ -2,6 +2,7 @@
 #define __action_h
 
 #include "client.h"
+#include "parser/parse.h"
 
 /* These have to all have a Client* at the top even if they don't use it, so
    that I can set it blindly later on. So every function will have a Client*
@@ -120,6 +121,7 @@ Action *action_new(void (*func)(union ActionData *data));
 */
 
 Action *action_from_string(char *name);
+Action *action_parse(xmlDocPtr doc, xmlNodePtr node);
 void action_free(Action *a);
 
 /* Execute */

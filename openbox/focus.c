@@ -10,7 +10,6 @@
 #include "prop.h"
 #include "dispatch.h"
 #include "focus.h"
-#include "parse.h"
 #include "stacking.h"
 #include "popup.h"
 

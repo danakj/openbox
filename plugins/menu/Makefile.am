@@ -1,6 +1,7 @@
 plugindir=$(libdir)/openbox/plugins
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(XML_CFLAGS)
+         \@CPPFLAGS@ \
          -DG_LOG_DOMAIN=\"Plugin-Timed-Menu\"
 
 INCLUDES=-I../..

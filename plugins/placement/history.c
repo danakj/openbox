@@ -3,7 +3,7 @@
 #include "kernel/frame.h"
 #include "kernel/client.h"
 #include "kernel/screen.h"
-#include "kernel/parse.h"
+#include "parser/parse.h"
 #include "history.h"
 #include <glib.h>
 #include <string.h>
@@ -193,18 +193,8 @@ static void load_history()
     char *role;
     struct HistoryItem *hi;
 
-    if (!(doc = xmlParseFile(history_path)))
+    if (!parse_load(history_path, "openbox_history", &doc, &node))
         return;
-    if (!(node = xmlDocGetRootElement(doc))) {
-        xmlFreeDoc(doc);
-        doc = NULL;
-        return;
-    }
-    if (xmlStrcasecmp(node->name, (const xmlChar*)"openbox_history")) {
-        xmlFreeDoc(doc);
-        doc = NULL;
-        return;
-    }
 
     node = parse_find_node("entry", node->xmlChildrenNode);
     while (node) {

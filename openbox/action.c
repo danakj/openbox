@@ -548,6 +548,56 @@ Action *action_from_string(char *name)
     return a;
 }
 
+Action *action_parse(xmlDocPtr doc, xmlNodePtr node)
+{
+    char *actname;
+    Action *act = NULL;
+    xmlNodePtr n;
+
+    if (parse_attr_string("name", node, &actname)) {
+        if ((act = action_from_string(actname))) {
+            if (act->func == action_execute || act->func == action_restart) {
+                if ((n = parse_find_node("execute", node->xmlChildrenNode)))
+                    act->data.execute.path = parse_string(doc, n);
+            } else if (act->func == action_showmenu) {
+                if ((n = parse_find_node("menu", node->xmlChildrenNode)))
+                    act->data.showmenu.name = parse_string(doc, n);
+            } else if (act->func == action_desktop) {
+                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
+                    act->data.desktop.desk = parse_int(doc, n);
+                if (act->data.desktop.desk > 0) act->data.desktop.desk--;
+            } else if (act->func == action_send_to_desktop) {
+                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
+                    act->data.sendto.desk = parse_int(doc, n);
+                if (act->data.sendto.desk > 0) act->data.sendto.desk--;
+            } else if (act->func == action_move_relative_horz ||
+                       act->func == action_move_relative_vert ||
+                       act->func == action_resize_relative_horz ||
+                       act->func == action_resize_relative_vert) {
+                if ((n = parse_find_node("delta", node->xmlChildrenNode)))
+                    act->data.relative.delta = parse_int(doc, n);
+            } else if (act->func == action_desktop_right ||
+                       act->func == action_desktop_left ||
+                       act->func == action_desktop_up ||
+                       act->func == action_desktop_down) {
+                if ((n = parse_find_node("wrap", node->xmlChildrenNode))) {
+                    g_message("WRAP %d", parse_bool(doc, n));
+                    act->data.desktopdir.wrap = parse_bool(doc, n);
+                }
+            } else if (act->func == action_send_to_desktop_right ||
+                       act->func == action_send_to_desktop_left ||
+                       act->func == action_send_to_desktop_up ||
+                       act->func == action_send_to_desktop_down) {
+                if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
+                    act->data.sendtodir.wrap = parse_bool(doc, n);
+                if ((n = parse_find_node("follow", node->xmlChildrenNode)))
+                    act->data.sendtodir.follow = parse_bool(doc, n);
+            }
+        }
+    }
+    return act;
+}
+
 void action_execute(union ActionData *data)
 {
     GError *e = NULL;

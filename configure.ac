@@ -68,6 +68,31 @@ PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0],
   ]
 )
 
+PKG_CHECK_MODULES(GTK, [gtk+-2.0],
+  [
+    AC_SUBST(GTK_CFLAGS)
+    AC_SUBST(GTK_LIBS)
+    use_gtk="yes"
+
+    PKG_CHECK_MODULES(GLADE, [libglade-2.0],
+      [
+        AC_SUBST(GLADE_CFLAGS)
+        AC_SUBST(GLADE_LIBS)
+        use_glade="yes"
+      ],
+      [
+        use_glade="no"
+        AC_MSG_WARN([disabling build of the configuration tool])
+      ]
+    )
+  ],
+  [
+    use_gtk="no"
+    AC_MSG_WARN([disabling build of the configuration tool])
+  ]
+)
+AM_CONDITIONAL(OBCONF, [test "$use_gtk" = "yes" && test "$use_glade" = "yes"])
+
 # Check for X11 extensions
 X11_EXT_XKB
 X11_EXT_XRANDR
@@ -82,12 +107,16 @@ AC_CONFIG_FILES([Makefile
                  themes/Makefile
 		 data/Makefile
                  render/Makefile
+		 parser/Makefile
                  kernel/Makefile
 		 plugins/Makefile
+		 plugins/resistance/Makefile
 		 plugins/placement/Makefile
 		 plugins/mouse/Makefile
 		 plugins/keyboard/Makefile
-		 plugins/menu/Makefile])
+		 plugins/menu/Makefile
+		 tools/Makefile
+		 tools/obconf/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT

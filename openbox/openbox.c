@@ -48,6 +48,7 @@
 #define SM_ERR_LEN 1024
 
 SmcConn     ob_sm_conn;
+gchar      *ob_sm_id = NULL;
 RrInstance *ob_rr_inst = NULL;
 RrTheme    *ob_rr_theme = NULL;
 Display    *ob_display = NULL;
@@ -80,7 +81,6 @@ int main(int argc, char **argv)
     xmlNodePtr node;
     SmcCallbacks cb;
     char sm_err[SM_ERR_LEN];
-    char *sm_id;
 
     ob_state = State_Starting;
 
@@ -145,12 +145,50 @@ int main(int argc, char **argv)
                                    SmcDieProcMask |
                                    SmcSaveCompleteProcMask |
                                    SmcShutdownCancelledProcMask,
-                                   &cb, NULL, &sm_id, SM_ERR_LEN, sm_err);
+                                   &cb, ob_sm_id, &ob_sm_id,
+                                   SM_ERR_LEN, sm_err);
     if (ob_sm_conn == NULL)
         g_warning("Failed to connect to session manager: %s", sm_err);
-    else
-        g_message("Connected to session manager with id %s", sm_id);
-    g_free (sm_id);
+    else {
+        SmPropValue val_cmd;
+        SmPropValue val_res;
+        SmPropValue val_prog;
+        SmPropValue val_uid;
+        SmProp prop_cmd = { SmCloneCommand, "SmLISTofARRAY8", 1, };
+        SmProp prop_res = { SmRestartCommand, "SmLISTofARRAY8", 1, };
+        SmProp prop_prog = { SmProgram, "SmARRAY8", 1, };
+        SmProp prop_uid = { SmUserID, "SmARRAY8", 1, };
+        SmProp *props[4];
+        gchar *user;
+
+        val_cmd.value = argv[0];
+        val_cmd.length = strlen(argv[0]);
+        val_res.value = argv[0];
+        val_res.length = strlen(argv[0]); /* XXX -id foo */
+        val_prog.value = argv[0];
+        val_prog.length = strlen(argv[0]);
+
+        user = g_strdup_printf("%ld", (long)getuid());
+        val_uid.value = user;
+        val_uid.length = strlen(user);
+
+        prop_cmd.vals = &val_cmd;
+        prop_res.vals = &val_res;
+        prop_prog.vals = &val_prog;
+        prop_uid.vals = &val_uid;
+
+        props[0] = &prop_cmd;
+        props[1] = &prop_res;
+        props[2] = &prop_prog;
+        props[3] = &prop_uid;
+
+        SmcSetProperties(ob_sm_conn, 3, props);
+
+        g_free(user);
+
+        g_message("Connected to session manager with id %s", ob_sm_id);
+    }
+    g_free (ob_sm_id);
 
 #ifdef USE_LIBSN
     ob_sn_display = sn_display_new(ob_display, NULL, NULL);

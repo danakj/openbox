@@ -17,6 +17,8 @@ typedef enum {
     OB_FRAME_CONTEXT_FRAME,
     OB_FRAME_CONTEXT_BLCORNER,
     OB_FRAME_CONTEXT_BRCORNER,
+    OB_FRAME_CONTEXT_TLCORNER,
+    OB_FRAME_CONTEXT_TRCORNER,
     OB_FRAME_CONTEXT_MAXIMIZE,
     OB_FRAME_CONTEXT_ALLDESKTOPS,
     OB_FRAME_CONTEXT_SHADE,
@@ -65,6 +67,9 @@ struct _ObFrame
     Window    handle;
     Window    lgrip;
     Window    rgrip;
+
+    Window    tlresize;
+    Window    trresize;
 
     RrAppearance *a_unfocused_title;
     RrAppearance *a_focused_title;

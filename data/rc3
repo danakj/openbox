@@ -202,6 +202,22 @@
       <action name="focus"/>
     </mousebind>
   </context>
+  <context name="tlcorner">
+    <mousebind button="Left" action="drag">
+      <action name="resize"/>
+    </mousebind>
+    <mousebind button="Left" action="press">
+      <action name="focus"/>
+    </mousebind>
+  </context>
+  <context name="trcorner">
+    <mousebind button="Left" action="drag">
+      <action name="resize"/>
+    </mousebind>
+    <mousebind button="Left" action="press">
+      <action name="focus"/>
+    </mousebind>
+  </context>
   <context name="client">
     <mousebind button="Left" action="press">
       <action name="focus"/>

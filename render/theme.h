@@ -138,6 +138,7 @@ struct _RrTheme {
     RrAppearance *a_menu_item;
     RrAppearance *a_menu_disabled;
     RrAppearance *a_menu_hilite;
+    RrAppearance *a_clear;
 
     RrAppearance *app_hilite_bg;
     RrAppearance *app_unhilite_bg;

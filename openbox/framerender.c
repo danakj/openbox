@@ -120,6 +120,20 @@ void framerender_frame(ObFrame *self)
 
         RrPaint(t, self->title, self->width, ob_rr_theme->title_height);
 
+        ob_rr_theme->a_clear->surface.parent = t;
+        ob_rr_theme->a_clear->surface.parentx = 0;
+        ob_rr_theme->a_clear->surface.parenty = 0;
+
+        RrPaint(ob_rr_theme->a_clear, self->tlresize,
+                ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+
+        ob_rr_theme->a_clear->surface.parentx =
+            self->width - ob_rr_theme->grip_width;
+
+        RrPaint(ob_rr_theme->a_clear, self->trresize,
+                ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+
+
         /* set parents for any parent relative guys */
         l->surface.parent = t;
         l->surface.parentx = self->label_x;

@@ -32,7 +32,10 @@ void stacking_add_nonintrusive(ObWindow *win);
 /*! Raises a window above all others in its stacking layer */
 void stacking_raise(ObWindow *window);
 
-/*! Lowers a client window below all others in its stacking layer */
+/*! Lowers a window below all others in its stacking layer */
 void stacking_lower(ObWindow *window);
+
+/*! Moves a window below another if its in the same layer */
+void stacking_below(ObWindow *window, ObWindow *below);
 
 #endif

@@ -42,13 +42,16 @@ static void do_restack(GList *wins, GList *before)
     Window *win;
     int i;
 
+#ifdef DEBUG
     /* pls only restack stuff in the same layer at a time */
     for (it = wins; it; it = next) {
         next = g_list_next(it);
         if (!next) break;
         g_assert (window_layer(it->data) == window_layer(next->data));
     }
-
+    if (before)
+        g_assert(window_layer(it->data) >= window_layer(before->data));
+#endif
 
     win = g_new(Window, g_list_length(wins) + 1);
 
@@ -66,12 +69,14 @@ static void do_restack(GList *wins, GList *before)
         stacking_list = g_list_insert_before(stacking_list, before, it->data);
     }
 
-    /* XXX some debug checking of the stacking list's order */
+#ifdef DEBUG
+    /* some debug checking of the stacking list's order */
     for (it = stacking_list; ; it = next) {
         next = g_list_next(it);
         if (!next) break;
         g_assert(window_layer(it->data) >= window_layer(next->data));
     }
+#endif
 
     XRestackWindows(ob_display, win, i);
     g_free(win);
@@ -269,6 +274,20 @@ void stacking_lower(ObWindow *window)
         stacking_list = g_list_remove(stacking_list, window);
     }
     do_lower(wins);
+    g_list_free(wins);
+}
+
+void stacking_below(ObWindow *window, ObWindow *below)
+{
+    GList *wins, *before;
+
+    if (window_layer(window) != window_layer(below))
+        return;
+
+    wins = g_list_append(NULL, window);
+    stacking_list = g_list_remove(stacking_list, window);
+    before = g_list_next(g_list_find(stacking_list, below));
+    do_restack(wins, before);
     g_list_free(wins);
 }
 

@@ -47,9 +47,9 @@ public:
     moveWindowLeft, //done
     moveWindowRight, //done
 
-    toggleMaximizeFull,
-    toggleMaximizeVertical,
-    toggleMaximizeHorizontal,
+    toggleMaximizeFull, //done
+    toggleMaximizeVertical, //done
+    toggleMaximizeHorizontal, //done
 
     sendToWorkspace, //done
 

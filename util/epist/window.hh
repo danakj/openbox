@@ -38,6 +38,14 @@ class XAtom;
 typedef std::list<XWindow *> WindowList;
 
 class XWindow {
+public:
+  enum Max {
+    Max_None,
+    Max_Horz,
+    Max_Vert,
+    Max_Full
+  };
+
 private:
   epist *_epist;
   screen *_screen;
@@ -90,6 +98,8 @@ public:
   void focus() const;
   void sendTo(unsigned int dest) const;
   void move(int x, int y) const;
+  void toggleMaximize(Max max) const; // i hate toggle functions
+  void maximize(Max max) const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

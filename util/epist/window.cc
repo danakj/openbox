@@ -289,3 +289,69 @@ void XWindow::move(int x, int y) const {
   findFramePosition(fx, fy);
   XMoveWindow(_epist->getXDisplay(), _window, fx + x, fy + y);
 }
+
+
+void XWindow::toggleMaximize(Max max) const {
+  switch (max) {
+  case Max_Full:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, (_max_vert == _max_horz ? 2 : 1),
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_horz),
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_vert));
+    break;
+
+  case Max_Horz:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, 2,
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_horz));
+    break;
+
+  case Max_Vert:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, 2,
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_vert));
+    break;
+    
+  case Max_None:
+    assert(false);  // you should not do this. it is pointless and probly a bug
+    break;
+  }
+}
+
+
+void XWindow::maximize(Max max) const {
+  switch (max) {
+  case Max_None:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, 0,
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_horz),
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_vert));
+    break;
+
+  case Max_Full:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, 1,
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_horz),
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_vert));
+    break;
+
+  case Max_Horz:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, 1,
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_horz));
+    break;
+
+  case Max_Vert:
+    _xatom->
+      sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                        _window, 1,
+                        _xatom->getAtom(XAtom::net_wm_state_maximized_vert));
+    break;
+  }
+}

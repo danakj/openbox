@@ -265,6 +265,18 @@ void screen::handleKeypress(const XEvent &e) {
           window->shade(! window->shaded());
           return;
       
+        case Action::toggleMaximizeHorizontal:
+          window->toggleMaximize(XWindow::Max_Horz);
+          return;
+      
+        case Action::toggleMaximizeVertical:
+          window->toggleMaximize(XWindow::Max_Vert);
+          return;
+      
+        case Action::toggleMaximizeFull:
+          window->toggleMaximize(XWindow::Max_Full);
+          return;
+      
         default:
           assert(false);  // unhandled action type!
           break;

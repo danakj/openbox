@@ -142,6 +142,18 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("O")),
                            Mod1Mask | ControlMask));
+  _actions.push_back(Action(Action::toggleMaximizeHorizontal,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("X")),
+                           ShiftMask | Mod1Mask));
+  _actions.push_back(Action(Action::toggleMaximizeVertical,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("X")),
+                           ShiftMask | ControlMask));
+  _actions.push_back(Action(Action::toggleMaximizeFull,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("X")),
+                           Mod1Mask | ControlMask));
   _actions.push_back(Action(Action::changeWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("1")),

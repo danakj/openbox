@@ -24,7 +24,7 @@ void focus_set_client(struct Client *client);
 
 typedef enum {
     Fallback_Desktop,    /* switching desktops */
-    Fallback_Unfocusing, /* forcefully remove focus from the curernt window */
+    Fallback_Unfocusing, /* forcefully remove focus from the current window */
     Fallback_NoFocus     /* nothing has focus for some reason */
 } FallbackType;
 

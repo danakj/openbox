@@ -6,6 +6,13 @@
 
 #include "eventdispatcher.hh"
 #include "display.hh"
+
+extern "C" {
+#ifdef HAVE_STDIO_H
+#  include <stdio.h>
+#endif
+}
+
 #include <iostream>
 
 namespace otk {

@@ -9,6 +9,8 @@
 #include "mouse.h"
 #include <glib.h>
 
+static int drag_threshold = 3;
+
 /* GData of GSList*s of PointerBinding*s. */
 static GData *bound_contexts;
 
@@ -270,14 +272,17 @@ static void event(ObEvent *e, void *foo)
 
     case Event_X_MotionNotify:
         if (button) {
-            drag = TRUE;
             dx = e->data.x.e->xmotion.x_root - px;
             dy = e->data.x.e->xmotion.y_root - py;
-            context = engine_get_context(e->data.x.client,
-                                         e->data.x.e->xbutton.window);
-            fire_motion(MouseAction_Motion, context,
-                        e->data.x.client, e->data.x.e->xmotion.state,
-                        button, cx, cy, cw, ch, dx, dy, FALSE, corner);
+            if (ABS(dx) >= drag_threshold || ABS(dy) >= drag_threshold)
+                drag = TRUE;
+            if (drag) {
+                context = engine_get_context(e->data.x.client,
+                                             e->data.x.e->xbutton.window);
+                fire_motion(MouseAction_Motion, context,
+                            e->data.x.client, e->data.x.e->xmotion.state,
+                            button, cx, cy, cw, ch, dx, dy, FALSE, corner);
+            }
         }
         break;
 

@@ -42,10 +42,6 @@ extern "C" {
 #  include <sys/select.h>
 #endif // HAVE_SYS_SELECT_H
 
-//#include <guile/gh.h>
-
-//extern void SWIG_init();
-
 #include <Python.h>
   
 // The initializer in openbox_wrap.cc
@@ -100,6 +96,7 @@ Openbox::Openbox(int argc, char **argv)
   _argv0 = argv[0];
   _doshutdown = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
+  _scriptfilepath = otk::expandTilde("~/.openbox/user.py");
 
   parseCommandLine(argc, argv);
 
@@ -146,6 +143,22 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
+  // start up python and run the user's startup script
+  Py_SetProgramName(argv[0]);
+  Py_Initialize();
+  init_otk();
+  init_openbox();
+  // i wish...
+  //PyRun_String("from _otk import *; from _openbox import *;", Py_file_input,
+  //             Py_None, Py_None);
+  FILE *rcpyfd = fopen(_scriptfilepath.c_str(), "r");
+  if (!rcpyfd) {
+    printf("failed to load python file %s\n", _scriptfilepath.c_str());
+  } else {
+    PyRun_SimpleFile(rcpyfd, _scriptfilepath.c_str());
+    fclose(rcpyfd);
+  }
+ 
   // initialize all the screens
   OBScreen *screen;
   screen = new OBScreen(0, _config);
@@ -160,36 +173,6 @@ Openbox::Openbox(int argc, char **argv)
     printf(_("No screens were found without a window manager. Exiting.\n"));
     ::exit(1);
   }
-
-/*  
-  // make our guile interfaces exist
-  SWIG_init();
-  
-  // run the guile of d3th
-  FILE *rcpyfd = fopen("/home/natas/.openbox/user.scm", "r");
-  if (!rcpyfd) {
-    printf("failed to load guile script /home/natas/.openbox/user.scm\n");
-  } else {
-    fclose(rcpyfd);
-    gh_load("/home/natas/.openbox/user.scm");
-  }
-*/
-  
-  Py_SetProgramName(argv[0]);
-  Py_Initialize();
-  init_otk();
-  init_openbox();
-  // i wish...
-  //PyRun_String("from _otk import *; from _openbox import *;", Py_file_input,
-  //             Py_None, Py_None);
-  FILE *rcpyfd = fopen("/home/natas/.openbox/user.py", "r");
-  if (!rcpyfd) {
-    printf("failed to load python file /home/natas/.openbox/user.py\n");
-  } else {
-    PyRun_SimpleFile(rcpyfd, "/home/natas/.openbox/user.py");
-    fclose(rcpyfd);
-  }
-  
 
   _state = State_Normal; // done starting
 }
@@ -228,6 +211,11 @@ void Openbox::parseCommandLine(int argc, char **argv)
         err = true;
       else
         _menufilepath = argv[i];
+    } else if (arg == "-script") {
+      if (++i >= argc)
+        err = true;
+      else
+        _scriptfilepath = argv[i];
     } else if (arg == "-version") {
       showVersion();
       ::exit(0);
@@ -262,6 +250,7 @@ void Openbox::showHelp()
   -display <string>  use display connection.\n\
   -rc <string>       use alternate resource file.\n\
   -menu <string>     use alternate menu file.\n\
+  -script <string>   use alternate startup script file.\n\
   -version           display version and exit.\n\
   -help              display this help text and exit.\n\n"), _argv0);
 

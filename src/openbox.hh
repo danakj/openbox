@@ -87,6 +87,11 @@ private:
     Defaults to $(HOME)/.openbox/menu3
   */
   std::string _menufilepath;
+  //! Path to the script file to execute on startup
+  /*!
+    Defaults to $(HOME)/.openbox/user.py
+  */
+  std::string _scriptfilepath;
   //! The display requested by the user, or null to use the DISPLAY env var
   char *_displayreq;
   //! The value of argv[0], i.e. how this application was executed

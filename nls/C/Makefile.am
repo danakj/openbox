@@ -29,6 +29,7 @@ uninstall-local:
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/C/openbox.cat; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/US_ASCII; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/POSIX; \
+		rm -f $(DESTDIR)$(pkgdatadir)/nls/en_GB; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/en_US; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/en; \
 		rmdir $(DESTDIR)$(pkgdatadir)/nls/C; \

@@ -1,117 +1,117 @@
 ! blah41
 
 ! ***** menu *****
-menu.title:				flat gradient vertical border
-menu.title.color:			#718497
-menu.title.colorTo:			#465a6e
-menu.title.textColor:		#e9e9e9
-menu.title.borderColor:		#a7aaad
+menu.title.bg:				flat gradient vertical border
+menu.title.bg.color:			#718497
+menu.title.bg.colorTo:			#465a6e
+menu.title.text.color:		#e9e9e9
+menu.title.bg.border.color:		#a7aaad
 
-menu.items:				flat gradient horizontal border
-menu.items.color:			#bcbfc3
-menu.items.colorTo:			#a0a3a6
-menu.items.textColor:		#000000
-menu.items.borderColor:		#a7aaad
-menu.disabled.textColor:		#6c757d
+menu.items.bg:				flat gradient horizontal border
+menu.items.bg.color:			#bcbfc3
+menu.items.bg.colorTo:			#a0a3a6
+menu.items.text.color:		#000000
+menu.items.bg.border.color:		#a7aaad
+menu.items.disabled.text.color:		#6c757d
 
-menu.selected:				flat gradient vertical border
-menu.selected.color:			#a7aaad
-menu.selected.colorTo:		#a7aaad
-menu.selected.textColor:		#000000
-menu.selected.borderColor:		#808285
+menu.items.active.bg:				flat gradient vertical border
+menu.items.active.bg.color:			#a7aaad
+menu.items.active.bg.colorTo:		#a7aaad
+menu.items.active.text.color:		#000000
+menu.items.active.bg.border.color:		#808285
 
 menu.bullet.position:		right
 
 
 ! ***** window focused *****
-window.title.focus:			flat gradient vertical
-window.title.focus.color:		#a7aaad
-window.title.focus.colorTo:		#808285
-window.title.focus.borderColor:	#a7aaad
+window.active.title.bg:			flat gradient vertical
+window.active.title.bg.color:		#a7aaad
+window.active.title.bg.colorTo:		#808285
+window.active.title.bg.border.color:	#a7aaad
 
-window.label.focus:			flat gradient vertical border
-window.label.focus.color:		#718497
-window.label.focus.colorTo:		#465a6e
-window.label.focus.textColor:	#e9e9e9
-window.label.focus.borderColor:	#2e3a45
+window.active.label.bg:			flat gradient vertical border
+window.active.label.bg.color:		#718497
+window.active.label.bg.colorTo:		#465a6e
+window.active.label.text.color:	#e9e9e9
+window.active.label.bg.border.color:	#2e3a45
 
-window.button.focus:			parentrelative
-window.button.focus.color:		#a7aaad
-window.button.focus.colorTo:	#808285
-window.button.focus.imageColor:	#555c62
-window.button.focus.borderColor:	#555c62
+window.active.button.unpressed.bg:			parentrelative
+window.active.button.unpressed.bg.color:		#a7aaad
+window.active.button.unpressed.bg.colorTo:	#808285
+window.active.button.unpressed.image.color:	#555c62
+window.active.button.unpressed.bg.border.color:	#555c62
 
-window.button.pressed.focus:		flat gradient vertical border
-window.button.pressed.focus.color:	#bcbfc3
-window.button.pressed.focus.colorTo:#a0a3a6
-window.button.pressed.focus.borderColor:	#45525f
-window.button.pressed.focus.imageColor:	#000000
+window.active.button.pressed.bg:		flat gradient vertical border
+window.active.button.pressed.bg.color:	#bcbfc3
+window.active.button.pressed.bg.colorTo:#a0a3a6
+window.active.button.pressed.bg.border.color:	#45525f
+window.active.button.pressed.image.color:	#000000
 
-window.button.disabled.focus:		parentrelative
-window.button.disabled.focus.imageColor:	#7a7f86
+window.active.button.disabled.bg:		parentrelative
+window.active.button.disabled.image.color:	#7a7f86
 
-window.handle.focus:			flat gradient vertical
-window.handle.focus.color:		#718497
-window.handle.focus.colorTo:	#45525f
+window.active.handle.bg:			flat gradient vertical
+window.active.handle.bg.color:		#718497
+window.active.handle.bg.colorTo:	#45525f
 
-window.grip.focus:			flat gradient vertical
-window.grip.focus.color:		#a7aaad
-window.grip.focus.colorTo:		#808285
-window.grip.focus.borderColor:	#a7aaad
+window.active.grip.bg:			flat gradient vertical
+window.active.grip.bg.color:		#a7aaad
+window.active.grip.bg.colorTo:		#808285
+window.active.grip.bg.border.color:	#a7aaad
 
-window.frame.focusColor:		#a7aaad
+window.active.client.color:		#a7aaad
 
 
 ! ***** window unfocused *****
-window.title.unfocus:			flat gradient vertical
-window.title.unfocus.color:		#a7aaad
-window.title.unfocus.colorTo:	#808285
+window.inactive.title.bg:			flat gradient vertical
+window.inactive.title.bg.color:		#a7aaad
+window.inactive.title.bg.colorTo:	#808285
 
-window.label.unfocus:			flat gradient vertical border
-window.label.unfocus.color:		#bcbfc3
-window.label.unfocus.colorTo:	#a0a3a6
-window.label.unfocus.textColor:	#555c62
-window.label.unfocus.borderColor:	#555c62
+window.inactive.label.bg:			flat gradient vertical border
+window.inactive.label.bg.color:		#bcbfc3
+window.inactive.label.bg.colorTo:	#a0a3a6
+window.inactive.label.text.color:	#555c62
+window.inactive.label.bg.border.color:	#555c62
 
-window.button.unfocus:			parentrelative
-window.button.unfocus.color:	#a7aaad
-window.button.unfocus.colorTo:	#a7aaad
-window.button.unfocus.imageColor:	#555c62
-!    window.button.unfocus.borderColor:	#555c62
+window.inactive.button.unpressed.bg:			parentrelative
+window.inactive.button.unpressed.bg.color:	#a7aaad
+window.inactive.button.unpressed.bg.colorTo:	#a7aaad
+window.inactive.button.unpressed.image.color:	#555c62
+!    window.inactive.button.unpressed.bg.border.color:	#555c62
 
-window.button.pressed.unfocus:		flat gradient vertical border
-window.button.pressed.unfocus.color:	#a7aaad
-window.button.pressed.unfocus.colorTo:	#808285
-window.button.pressed.unfocus.borderColor:#555c62
+window.inactive.button.pressed.bg:		flat gradient vertical border
+window.inactive.button.pressed.bg.color:	#a7aaad
+window.inactive.button.pressed.bg.colorTo:	#808285
+window.inactive.button.pressed.bg.border.color:#555c62
 
-window.button.disabled.unfocus:		parentrelative
-window.button.disabled.unfocus.imageColor:	#7a7f86
+window.inactive.button.disabled.bg:		parentrelative
+window.inactive.button.disabled.image.color:	#7a7f86
 
-window.handle.unfocus:			flat solid
-window.handle.unfocus.color:	#a7aaad
-window.handle.unfocus.colorTo:	#b4b4ae
+window.inactive.handle.bg:			flat solid
+window.inactive.handle.bg.color:	#a7aaad
+window.inactive.handle.bg.colorTo:	#b4b4ae
 
-window.grip.unfocus:			flat gradient vertical
-window.grip.unfocus.color:		#a7aaad
-window.grip.unfocus.colorTo:	#808285
-window.grip.unfocus.borderColor:	#555c62
+window.inactive.grip.bg:			flat gradient vertical
+window.inactive.grip.bg.color:		#a7aaad
+window.inactive.grip.bg.colorTo:	#808285
+window.inactive.grip.bg.border.color:	#555c62
 
-window.frame.unfocusColor:		#a7aaad
+window.inactive.client.color:		#a7aaad
 
 
 ! ***** fonts *****
 
-window.label.focus.font:   trebuchet ms:bold:pixelsize=10:shadow=y:shadowtint=12:shadowoffset=2
-menu.title.font:     trebuchet ms:bold:pixelsize=11:shadow=y:shadowtint=12:shadowoffset=2
+window.active.label.text.font:   trebuchet ms:bold:pixelsize=10:shadow=y:shadowtint=12:shadowoffset=2
+menu.title.text.font:     trebuchet ms:bold:pixelsize=11:shadow=y:shadowtint=12:shadowoffset=2
 menu.items.font:     trebuchet ms:pixelsize=12
 
-window.label.justify:			center
-menu.title.justify:		center
+window.label.text.justify:			center
+menu.title.text.justify:		center
 
 
 ! ***** the rest *****
-borderColor:				#2e3a45
+border.color:				#2e3a45
 borderWidth:				1
-bevelWidth:				1
-handleWidth:				3
-frameWidth:				1
+padding.width:				1
+window.handle.width:				3
+window.client.padding.width:				1

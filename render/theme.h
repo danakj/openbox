@@ -15,7 +15,7 @@ struct _RrTheme {
     gboolean show_handle;
 
     /* style settings - geometry */
-    gint bevel;
+    gint padding;
     gint handle_height;
     gint bwidth;
     gint cbwidth;
@@ -43,8 +43,6 @@ struct _RrTheme {
     RrColor *titlebut_unfocused_unpressed_color;
     RrColor *menu_title_color;
     RrColor *menu_color;
-    RrColor *menu_bullet_normal_color;
-    RrColor *menu_bullet_selected_color;
     RrColor *menu_disabled_color;
     RrColor *menu_selected_color;
 

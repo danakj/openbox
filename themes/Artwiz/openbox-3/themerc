@@ -1,101 +1,101 @@
-menu.title:			raised gradient diagonal
-menu.title.color:		rgb:90/94/98
-menu.title.colorTo:		rgb:20/24/28
-menu.title.textColor:		white
-menu.title.justify:		center
+menu.title.bg:			raised gradient diagonal
+menu.title.bg.color:		rgb:90/94/98
+menu.title.bg.colorTo:		rgb:20/24/28
+menu.title.text.color:		white
+menu.title.text.justify:		center
 
-menu.items:			sunken gradient diagonal
-menu.items.color:		rgb:10/20/30
-menu.items.colorTo:		rgb:70/80/90
-menu.items.textColor:		rgb:90/a0/b0
+menu.items.bg:			sunken gradient diagonal
+menu.items.bg.color:		rgb:10/20/30
+menu.items.bg.colorTo:		rgb:70/80/90
+menu.items.text.color:		rgb:90/a0/b0
 menu.items.justify:		center
 
-menu.selected:			raised gradient diagonal
-menu.selected.color:		rgb:90/94/98
-menu.selected.colorTo:		rgb:20/24/28
-menu.selected.textColor:		white
-menu.bullet.imageColor: rgb:90/a0/b0
+menu.items.active.bg:			raised gradient diagonal
+menu.items.active.bg.color:		rgb:90/94/98
+menu.items.active.bg.colorTo:		rgb:20/24/28
+menu.items.active.text.color:		white
+menu.bullet.image.color: rgb:90/a0/b0
 
-window.title.focus:		raised gradient vertical
-window.title.focus.color:	rgb:80/84/88
-window.title.focus.colorTo:	rgb:30/34/38
-window.title.unfocus:		raised vertical gradient
-window.title.unfocus.color:	rgb:50/54/58
-window.title.unfocus.colorTo:	black
+window.active.title.bg:		raised gradient vertical
+window.active.title.bg.color:	rgb:80/84/88
+window.active.title.bg.colorTo:	rgb:30/34/38
+window.inactive.title.bg:		raised vertical gradient
+window.inactive.title.bg.color:	rgb:50/54/58
+window.inactive.title.bg.colorTo:	black
 
-window.label.focus:		sunken diagonal gradient
-window.label.focus.color:	rgb:10/20/30
-window.label.focus.colorTo:	rgb:70/80/90
-window.label.focus.textColor:	white
-window.label.unfocus:		sunken gradient diagonal
-window.label.unfocus.color:	black
-window.label.unfocus.colorTo:	rgb:40/50/60
-window.label.unfocus.textColor:	rgb:60/64/68
-window.label.justify:			center
+window.active.label.bg:		sunken diagonal gradient
+window.active.label.bg.color:	rgb:10/20/30
+window.active.label.bg.colorTo:	rgb:70/80/90
+window.active.label.text.color:	white
+window.inactive.label.bg:		sunken gradient diagonal
+window.inactive.label.bg.color:	black
+window.inactive.label.bg.colorTo:	rgb:40/50/60
+window.inactive.label.text.color:	rgb:60/64/68
+window.label.text.justify:			center
 
-window.button.focus:		raised gradient diagonal
-window.button.focus.color:	rgb:90/94/98
-window.button.focus.colorTo:	rgb:20/24/28
-window.button.focus.imageColor:	white
+window.active.button.unpressed.bg:		raised gradient diagonal
+window.active.button.unpressed.bg.color:	rgb:90/94/98
+window.active.button.unpressed.bg.colorTo:	rgb:20/24/28
+window.active.button.unpressed.image.color:	white
 
-window.button.unfocus:		raised gradient diagonal
-window.button.unfocus.color:	rgb:50/54/58
-window.button.unfocus.colorTo:	black
-window.button.unfocus.imageColor:	rgb:70/74/78
+window.inactive.button.unpressed.bg:		raised gradient diagonal
+window.inactive.button.unpressed.bg.color:	rgb:50/54/58
+window.inactive.button.unpressed.bg.colorTo:	black
+window.inactive.button.unpressed.image.color:	rgb:70/74/78
 
-window.button.pressed.focus:		sunken gradient diagonal
-window.button.pressed.focus.color:	rgb:20/40/50
-window.button.pressed.focus.colorTo:	rgb:60/70/80
+window.active.button.pressed.bg:		sunken gradient diagonal
+window.active.button.pressed.bg.color:	rgb:20/40/50
+window.active.button.pressed.bg.colorTo:	rgb:60/70/80
 
-window.button.pressed.unfocus:		sunken gradient diagonal
-window.button.pressed.unfocus.color:	rgb:50/54/58
-window.button.pressed.unfocus.colorTo:	black
-window.button.pressed.unfocus.imageColor:	rgb:70/74/78
+window.inactive.button.pressed.bg:		sunken gradient diagonal
+window.inactive.button.pressed.bg.color:	rgb:50/54/58
+window.inactive.button.pressed.bg.colorTo:	black
+window.inactive.button.pressed.image.color:	rgb:70/74/78
 
-window.frame.focusColor:	rgb:40/44/48
-window.frame.unfocusColor:	rgb:20/24/28
+window.active.client.color:	rgb:40/44/48
+window.inactive.client.color:	rgb:20/24/28
 
-window.handle.focus:		raised gradient diagonal
-window.handle.focus.color:	rgb:70/74/78
-window.handle.focus.colorTo:	rgb:40/44/48
+window.active.handle.bg:		raised gradient diagonal
+window.active.handle.bg.color:	rgb:70/74/78
+window.active.handle.bg.colorTo:	rgb:40/44/48
 
-window.handle.unfocus:		raised gradient diagonal
-window.handle.unfocus.color:	rgb:50/54/58
-window.handle.unfocus.colorTo:	black
+window.inactive.handle.bg:		raised gradient diagonal
+window.inactive.handle.bg.color:	rgb:50/54/58
+window.inactive.handle.bg.colorTo:	black
 
-window.grip.focus:		sunken diagonal gradient
-window.grip.focus.color:	rgb:20/30/40
-window.grip.focus.colorTo:	rgb:60/70/80
+window.active.grip.bg:		sunken diagonal gradient
+window.active.grip.bg.color:	rgb:20/30/40
+window.active.grip.bg.colorTo:	rgb:60/70/80
 
-window.grip.unfocus:		sunken diagonal gradient
-window.grip.unfocus.color:	black
-window.grip.unfocus.colorTo:	rgb:30/40/50
+window.inactive.grip.bg:		sunken diagonal gradient
+window.inactive.grip.bg.color:	black
+window.inactive.grip.bg.colorTo:	rgb:30/40/50
 
-window.button.toggled.focus:		raised gradient diagonal
-window.button.toggled.focus.color:	rgb:90/94/98
-window.button.toggled.focus.colorTo:	rgb:20/24/28
-window.button.toggled.focus.imageColor:	white
+window.active.button.toggled.bg:		raised gradient diagonal
+window.active.button.toggled.bg.color:	rgb:90/94/98
+window.active.button.toggled.bg.colorTo:	rgb:20/24/28
+window.active.button.toggled.image.color:	white
 
-window.button.toggled.unfocus:		raised gradient diagonal
-window.button.toggled.unfocus.color:	rgb:50/54/58
-window.button.toggled.unfocus.colorTo:	black
-window.button.toggled.unfocus.imageColor:	rgb:70/74/78
+window.inactive.button.toggled.bg:		raised gradient diagonal
+window.inactive.button.toggled.bg.color:	rgb:50/54/58
+window.inactive.button.toggled.bg.colorTo:	black
+window.inactive.button.toggled.image.color:	rgb:70/74/78
 
-window.button.disabled.focus:		raised gradient diagonal
-window.button.disabled.focus.color:	rgb:90/94/98
-window.button.disabled.focus.colorTo:	rgb:20/24/28
-window.button.disabled.focus.imageColor:	grey
+window.active.button.disabled.bg:		raised gradient diagonal
+window.active.button.disabled.bg.color:	rgb:90/94/98
+window.active.button.disabled.bg.colorTo:	rgb:20/24/28
+window.active.button.disabled.image.color:	grey
 
-window.button.disabled.unfocus:		raised gradient diagonal
-window.button.disabled.unfocus.color:	rgb:50/54/58
-window.button.disabled.unfocus.colorTo:	black
-window.button.disabled.unfocus.imageColor:	rgb:70/74/78
+window.inactive.button.disabled.bg:		raised gradient diagonal
+window.inactive.button.disabled.bg.color:	rgb:50/54/58
+window.inactive.button.disabled.bg.colorTo:	black
+window.inactive.button.disabled.image.color:	rgb:70/74/78
 
-borderColor:			black
-bevelWidth:				1
+border.color:			black
+padding.width:				1
 borderWidth:			1
-handleWidth:			4
+window.handle.width:			4
 
-window.label.focus.font: Bitstream Vera Sans:pixelsize=10
-menu.title.font: Bitstream Vera Sans:pixelsize=10
+window.active.label.text.font: Bitstream Vera Sans:pixelsize=10
+menu.title.text.font: Bitstream Vera Sans:pixelsize=10
 menu.items.font: Bitstream Vera Sans:pixelsize=10

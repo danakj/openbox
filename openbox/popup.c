@@ -102,11 +102,11 @@ void popup_size_to_string(Popup *self, gchar *text)
     self->a_text->texture[0].data.text.string = text;
     RrMinsize(self->a_text, &textw, &texth);
     /*XXX textw += ob_rr_theme->bevel * 2;*/
-    texth += ob_rr_theme->bevel * 2;
+    texth += ob_rr_theme->padding * 2;
 
-    self->h = texth + ob_rr_theme->bevel * 2;
+    self->h = texth + ob_rr_theme->padding * 2;
     iconw = (self->hasicon ? texth : 0);
-    self->w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
+    self->w = textw + iconw + ob_rr_theme->padding * (self->hasicon ? 3 : 2);
 }
 
 void popup_set_text_align(Popup *self, RrJustify align)
@@ -151,23 +151,23 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 
     /* measure the shit out */
     RrMinsize(self->a_text, &textw, &texth);
-    /*XXX textw += ob_rr_theme->bevel * 2;*/
-    texth += ob_rr_theme->bevel * 2;
+    /*XXX textw += ob_rr_theme->padding * 2;*/
+    texth += ob_rr_theme->padding * 2;
 
     /* set the sizes up and reget the text sizes from the calculated
        outer sizes */
     if (self->h) {
         h = self->h;
-        texth = h - (t+b + ob_rr_theme->bevel * 2);
+        texth = h - (t+b + ob_rr_theme->padding * 2);
     } else
-        h = t+b + texth + ob_rr_theme->bevel * 2;
+        h = t+b + texth + ob_rr_theme->padding * 2;
     iconw = (self->hasicon ? texth : 0);
     if (self->w) {
         w = self->w;
-        textw = w - (l+r + iconw + ob_rr_theme->bevel *
+        textw = w - (l+r + iconw + ob_rr_theme->padding *
                      (self->hasicon ? 3 : 2));
     } else
-        w = l+r + textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
+        w = l+r + textw + iconw + ob_rr_theme->padding * (self->hasicon ? 3 : 2);
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
@@ -209,19 +209,19 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 
     self->a_text->surface.parent = self->a_bg;
     self->a_text->surface.parentx = l + iconw +
-        ob_rr_theme->bevel * (self->hasicon ? 2 : 1);
-    self->a_text->surface.parenty = t + ob_rr_theme->bevel;
+        ob_rr_theme->padding * (self->hasicon ? 2 : 1);
+    self->a_text->surface.parenty = t + ob_rr_theme->padding;
     XMoveResizeWindow(ob_display, self->text,
-                      l + iconw + ob_rr_theme->bevel * (self->hasicon ? 2 : 1),
-                      t + ob_rr_theme->bevel, textw, texth);
+                      l + iconw + ob_rr_theme->padding * (self->hasicon ? 2 : 1),
+                      t + ob_rr_theme->padding, textw, texth);
 
     if (self->hasicon) {
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
         self->a_icon->surface.parent = self->a_bg;
-        self->a_icon->surface.parentx = l + ob_rr_theme->bevel;
-        self->a_icon->surface.parenty = t + ob_rr_theme->bevel;
+        self->a_icon->surface.parentx = l + ob_rr_theme->padding;
+        self->a_icon->surface.parenty = t + ob_rr_theme->padding;
         XMoveResizeWindow(ob_display, self->icon,
-                          l + ob_rr_theme->bevel, t + ob_rr_theme->bevel,
+                          l + ob_rr_theme->padding, t + ob_rr_theme->padding,
                           iconw, texth);
     }
 

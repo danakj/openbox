@@ -1,105 +1,105 @@
 style.author:	miklos
 style.date:	Aug 1, 2003
 
-window.label.focus.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
-menu.title.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+window.active.label.text.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+menu.title.text.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
 menu.items.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
 
 
 ! Menu settings...
-menu.items: flat gradient crossdiagonal
-menu.items.colorTo:	#93a1a8
-menu.items.color:	#7c8c93
-menu.items.borderColor: #ffffff
-menu.items.textColor:	#4c595c
+menu.items.bg: flat gradient crossdiagonal
+menu.items.bg.colorTo:	#93a1a8
+menu.items.bg.color:	#7c8c93
+menu.items.bg.border.color: #ffffff
+menu.items.text.color:	#4c595c
 
 menu.items.justify:	center
-menu.title.justify:  right
+menu.title.text.justify:  right
 
-menu.title:	flatborder gradient diagonal
-menu.title.colorTo:	#757575
-menu.title.color:	#f0f0ff
-menu.title.borderColor:	#a9a9a9
-menu.title.textColor:	#565a5c
+menu.title.bg:	flatborder gradient diagonal
+menu.title.bg.colorTo:	#757575
+menu.title.bg.color:	#f0f0ff
+menu.title.bg.border.color:	#a9a9a9
+menu.title.text.color:	#565a5c
 
-menu.selected: flatborder gradient diagonal
-menu.selected.color: #93a1a8
-menu.selected.colorTo: #7c8c93
-menu.selected.borderColor: #a9a9a9
-menu.selected.textColor:	#f0f0ff
+menu.items.active.bg: flatborder gradient diagonal
+menu.items.active.bg.color: #93a1a8
+menu.items.active.bg.colorTo: #7c8c93
+menu.items.active.bg.border.color: #a9a9a9
+menu.items.active.text.color:	#f0f0ff
 
-menu.disabled.textColor:	#757575
+menu.items.disabled.text.color:	#757575
 
 ! Window settings...
-window.button.focus: parentrelative
-window.button.focus.imageColor: #565a5c
+window.active.button.unpressed.bg: parentrelative
+window.active.button.unpressed.image.color: #565a5c
 
-window.label.justify: center
+window.label.text.justify: center
 
-window.button.hover.focus: flatborder gradient diagonal
-window.button.hover.focus.color: #93a1a8
-window.button.hover.focus.colorTo: #7c8c93
-window.button.hover.focus.borderColor: #a9a9a9
-window.button.hover.focus.imageColor: #ffffff
+window.active.button.hover.bg: flatborder gradient diagonal
+window.active.button.hover.bg.color: #93a1a8
+window.active.button.hover.bg.colorTo: #7c8c93
+window.active.button.hover.bg.border.color: #a9a9a9
+window.active.button.hover.image.color: #ffffff
 
-window.button.hover.unfocus: parentrelative
+window.inactive.button.hover.bg: parentrelative
 
-window.button.toggled.focus: flatborder gradient diagonal
-window.button.toggled.focus.color: #93a1a8
-window.button.toggled.focus.colorTo: #7c8c93
-window.button.toggled.focus.borderColor: #a9a9a9
-window.button.toggled.focus.imageColor: #ffffff
+window.active.button.toggled.bg: flatborder gradient diagonal
+window.active.button.toggled.bg.color: #93a1a8
+window.active.button.toggled.bg.colorTo: #7c8c93
+window.active.button.toggled.bg.border.color: #a9a9a9
+window.active.button.toggled.image.color: #ffffff
 
-window.button.toggled.unfocus: parentrelative
+window.inactive.button.toggled.bg: parentrelative
 
-window.button.pressed.focus: sunken gradient diagonal
-window.button.pressed.focus.color: #93a1a8
-window.button.pressed.focus.colorTo: #7c8c93
-window.button.pressed.focus.imageColor: #ffffff
+window.active.button.pressed.bg: sunken gradient diagonal
+window.active.button.pressed.bg.color: #93a1a8
+window.active.button.pressed.bg.colorTo: #7c8c93
+window.active.button.pressed.image.color: #ffffff
 
-window.button.disabled.focus: parentrelative
-window.button.disabled.focus.imageColor: #7c8c93
-window.button.disabled.unfocus: parentrelative
-window.button.disabled.unfocus.imageColor: #7c8c93
+window.active.button.disabled.bg: parentrelative
+window.active.button.disabled.image.color: #7c8c93
+window.inactive.button.disabled.bg: parentrelative
+window.inactive.button.disabled.image.color: #7c8c93
 
-window.button.unfocus: parentrelative
-window.button.unfocus.imageColor: #677b91
+window.inactive.button.unpressed.bg: parentrelative
+window.inactive.button.unpressed.image.color: #677b91
 
-window.grip.focus:	flat gradient diagonal
-window.grip.focus.color:	#93a1a8
-window.grip.focus.colorTo:	#7c8c93
+window.active.grip.bg:	flat gradient diagonal
+window.active.grip.bg.color:	#93a1a8
+window.active.grip.bg.colorTo:	#7c8c93
 
-window.grip.unfocus: flat solid
-window.grip.unfocus.color: #7c8c93
+window.inactive.grip.bg: flat solid
+window.inactive.grip.bg.color: #7c8c93
 
-window.handle.focus:	raised gradient diagonal
-window.handle.focus.colorTo:	#757575
-window.handle.focus.color:	#f0f0ff
+window.active.handle.bg:	raised gradient diagonal
+window.active.handle.bg.colorTo:	#757575
+window.active.handle.bg.color:	#f0f0ff
 
-window.handle.unfocus:	flat solid
-window.handle.unfocus.color:	#7c8c93
+window.inactive.handle.bg:	flat solid
+window.inactive.handle.bg.color:	#7c8c93
 
-window.label.focus:	flatborder gradient diagonal
-window.label.focus.color:  #f0f0ff
-window.label.focus.colorTo:  #757575
-window.label.focus.borderColor: #565a5c
-window.label.focus.textColor:  #262a2c
+window.active.label.bg:	flatborder gradient diagonal
+window.active.label.bg.color:  #f0f0ff
+window.active.label.bg.colorTo:  #757575
+window.active.label.bg.border.color: #565a5c
+window.active.label.text.color:  #262a2c
 
-window.label.unfocus:	parentrelative
-window.label.unfocus.textColor: #565a5c
+window.inactive.label.bg:	parentrelative
+window.inactive.label.text.color: #565a5c
 
-window.title.focus: flat gradient vertical
-window.title.focus.color:     #93a1a8
-window.title.focus.colorTo:       #7c8c93
+window.active.title.bg: flat gradient vertical
+window.active.title.bg.color:     #93a1a8
+window.active.title.bg.colorTo:       #7c8c93
 
-window.title.unfocus:	flat gradient crossdiagonal
-window.title.unfocus.color:	#93a1a8
-window.title.unfocus.colorTo:	#7c8c93
+window.inactive.title.bg:	flat gradient crossdiagonal
+window.inactive.title.bg.color:	#93a1a8
+window.inactive.title.bg.colorTo:	#7c8c93
 
-window.frame.focusColor:	#7c8c93
-window.frame.unfocusColor:	#677b91
-handleWidth:	3
-frameWidth:	1
-bevelWidth:	1
+window.active.client.color:	#7c8c93
+window.inactive.client.color:	#677b91
+window.handle.width:	3
+window.client.padding.width:	1
+padding.width:	1
 borderWidth:	1
-borderColor:	#484848
+border.color:	#484848

@@ -93,7 +93,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     /* load the font stuff */
-    if (!read_string(db, "window.label.focus.font", &font_str))
+    if (!read_string(db, "window.active.label.text.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=10:shadow=y:shadowtint=50";
 
     if (!(theme->winfont_focused = RrFontOpen(inst, font_str))) {
@@ -102,7 +102,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
     theme->winfont_height = RrFontHeight(theme->winfont_focused);
 
-    if (!read_string(db, "window.label.unfocus.font", &font_str))
+    if (!read_string(db, "window.inactive.label.text.font", &font_str))
         /* font_str will already be set to the last one */;
 
     if (!(theme->winfont_unfocused = RrFontOpen(inst, font_str))) {
@@ -113,14 +113,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                                 RrFontHeight(theme->winfont_unfocused));
 
     winjust = RR_JUSTIFY_LEFT;
-    if (read_string(db, "window.label.justify", &str)) {
+    if (read_string(db, "window.label.text.justify", &str)) {
         if (!g_ascii_strcasecmp(str, "right"))
             winjust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
             winjust = RR_JUSTIFY_CENTER;
     }
 
-    if (!read_string(db, "menu.title.font", &font_str))
+    if (!read_string(db, "menu.title.text.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=12:shadow=y";
 
     if (!(theme->mtitlefont = RrFontOpen(inst, font_str))) {
@@ -130,7 +130,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->mtitlefont_height = RrFontHeight(theme->mtitlefont);
 
     mtitlejust = RR_JUSTIFY_LEFT;
-    if (read_string(db, "menu.title.justify", &str)) {
+    if (read_string(db, "menu.title.text.justify", &str)) {
         if (!g_ascii_strcasecmp(str, "right"))
             mtitlejust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
@@ -147,54 +147,56 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->mfont_height = RrFontHeight(theme->mfont);
 
     /* load direct dimensions */
-    if (!read_int(db, "menuOverlap", &theme->menu_overlap) ||
+    if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
 	theme->menu_overlap < 0 || theme->menu_overlap > 20)
         theme->menu_overlap = 0;
-    if (!read_int(db, "handleWidth", &theme->handle_height))
+    if (!read_int(db, "window.handle.width", &theme->handle_height))
         theme->handle_height = 6;
     if (!theme->handle_height)
         theme->show_handle = FALSE;
     if (theme->handle_height <= 0 || theme->handle_height > 100)
         theme->handle_height = 6;
-    if (!read_int(db, "bevelWidth", &theme->bevel) ||
-	theme->bevel <= 0 || theme->bevel > 100)
-        theme->bevel = 3;
-    if (!read_int(db, "borderWidth", &theme->bwidth) ||
+    if (!read_int(db, "padding.width", &theme->padding) ||
+	theme->padding <= 0 || theme->padding > 100)
+        theme->padding = 3;
+    if (!read_int(db, "border.width", &theme->bwidth) ||
 	theme->bwidth < 0 || theme->bwidth > 100)
         theme->bwidth = 1;
-    if (!read_int(db, "frameWidth", &theme->cbwidth) ||
+    if (!read_int(db, "window.client.padding.width", &theme->cbwidth) ||
 	theme->cbwidth < 0 || theme->cbwidth > 100)
-        theme->cbwidth = theme->bevel;
+        theme->cbwidth = theme->padding;
 
     /* load colors */
     if (!read_color(db, inst,
-                    "borderColor", &theme->b_color))
+                    "border.color", &theme->b_color))
 	theme->b_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
-                    "window.frame.focusColor", &theme->cb_focused_color))
+                    "window.active.client.color",
+                    &theme->cb_focused_color))
 	theme->cb_focused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "window.frame.unfocusColor",&theme->cb_unfocused_color))
+                    "window.inactive.client.color",
+                    &theme->cb_unfocused_color))
 	theme->cb_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "window.label.focus.textColor",
+                    "window.active.label.text.color",
                     &theme->title_focused_color))
 	theme->title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
     if (!read_color(db, inst,
-                    "window.label.unfocus.textColor",
+                    "window.inactive.label.text.color",
                     &theme->title_unfocused_color))
 	theme->title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "window.button.focus.imageColor",
+                    "window.active.button.unpressed.image.color",
                     &theme->titlebut_focused_unpressed_color))
 	theme->titlebut_focused_unpressed_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
-                    "window.button.unfocus.imageColor",
+                    "window.inactive.button.unpressed.image.color",
                     &theme->titlebut_unfocused_unpressed_color))
 	theme->titlebut_unfocused_unpressed_color =
             RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "window.button.pressed.focus.imageColor",
+                    "window.active.button.pressed.image.color",
                     &theme->titlebut_focused_pressed_color))
 	theme->titlebut_focused_pressed_color =
             RrColorNew(inst,
@@ -202,7 +204,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                        theme->titlebut_focused_unpressed_color->g,
                        theme->titlebut_focused_unpressed_color->b);
     if (!read_color(db, inst,
-                    "window.button.pressed.unfocus.imageColor",
+                    "window.inactive.button.pressed.image.color",
                     &theme->titlebut_unfocused_pressed_color))
 	theme->titlebut_unfocused_pressed_color =
             RrColorNew(inst,
@@ -210,16 +212,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                        theme->titlebut_unfocused_unpressed_color->g,
                        theme->titlebut_unfocused_unpressed_color->b);
     if (!read_color(db, inst,
-                    "window.button.disabled.focus.imageColor",
+                    "window.active.button.disabled.image.color",
                     &theme->titlebut_disabled_focused_color))
 	theme->titlebut_disabled_focused_color =
             RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "window.button.disabled.unfocus.imageColor",
+                    "window.inactive.button.disabled.image.color",
                     &theme->titlebut_disabled_unfocused_color))
 	theme->titlebut_disabled_unfocused_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
-                    "window.button.hover.focus.imageColor",
+                    "window.active.button.hover.image.color",
                     &theme->titlebut_hover_focused_color))
 	theme->titlebut_hover_focused_color =
             RrColorNew(inst,
@@ -227,7 +229,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                        theme->titlebut_focused_unpressed_color->g,
                        theme->titlebut_focused_unpressed_color->b);
     if (!read_color(db, inst,
-                    "window.button.hover.unfocus.imageColor",
+                    "window.inactive.button.hover.image.color",
                     &theme->titlebut_hover_unfocused_color))
 	theme->titlebut_hover_unfocused_color =
             RrColorNew(inst,
@@ -235,7 +237,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                        theme->titlebut_unfocused_unpressed_color->g,
                        theme->titlebut_unfocused_unpressed_color->b);
     if (!read_color(db, inst,
-                    "window.button.toggled.focus.imageColor",
+                    "window.active.button.toggled.image.color",
                     &theme->titlebut_toggled_focused_color))
 	theme->titlebut_toggled_focused_color =
             RrColorNew(inst,
@@ -243,7 +245,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                        theme->titlebut_focused_pressed_color->g,
                        theme->titlebut_focused_pressed_color->b);
     if (!read_color(db, inst,
-                    "window.button.toggled.unfocus.imageColor",
+                    "window.inactive.button.toggled.image.color",
                     &theme->titlebut_toggled_unfocused_color))
 	theme->titlebut_toggled_unfocused_color =
             RrColorNew(inst,
@@ -251,33 +253,19 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                        theme->titlebut_unfocused_pressed_color->g,
                        theme->titlebut_unfocused_pressed_color->b);
     if (!read_color(db, inst,
-                    "menu.title.textColor", &theme->menu_title_color))
+                    "menu.title.text.color", &theme->menu_title_color))
         theme->menu_title_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
-                    "menu.items.textColor", &theme->menu_color))
+                    "menu.items.text.color", &theme->menu_color))
         theme->menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "menu.disabled.textColor", &theme->menu_disabled_color))
+                    "menu.items.disabled.text.color",
+                    &theme->menu_disabled_color))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
-                    "menu.selected.textColor", &theme->menu_selected_color))
+                    "menu.items.active.text.color",
+                    &theme->menu_selected_color))
         theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "menu.bullet.imageColor",
-                    &theme->menu_bullet_normal_color))
-        theme->menu_bullet_normal_color = RrColorNew(inst,
-                                                     theme->menu_color->r,
-                                                     theme->menu_color->g,
-                                                     theme->menu_color->b);
-    if (!read_color(db, inst,
-                    "menu.bullet.selected.imageColor",
-                    &theme->menu_bullet_selected_color))
-        theme->menu_bullet_selected_color =
-            RrColorNew(inst,
-                       theme->menu_selected_color->r,
-                       theme->menu_selected_color->g,
-                       theme->menu_selected_color->b);
-
     
     if (read_mask(inst, "max.xbm", theme, &theme->max_mask)) {
         if (!read_mask(inst, "max_pressed.xbm", theme,
@@ -431,91 +419,91 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,
-                         "window.title.focus", theme->a_focused_title,
+                         "window.active.title.bg", theme->a_focused_title,
                          FALSE))
 	set_default_appearance(theme->a_focused_title);
     if (!read_appearance(db, inst,
-                         "window.title.unfocus", theme->a_unfocused_title,
+                         "window.inactive.title.bg", theme->a_unfocused_title,
                          FALSE))
 	set_default_appearance(theme->a_unfocused_title);
     if (!read_appearance(db, inst,
-                         "window.label.focus", theme->a_focused_label,
+                         "window.active.label.bg", theme->a_focused_label,
                          TRUE))
 	set_default_appearance(theme->a_focused_label);
     if (!read_appearance(db, inst,
-                         "window.label.unfocus", theme->a_unfocused_label,
+                         "window.inactive.label.bg", theme->a_unfocused_label,
                          TRUE))
 	set_default_appearance(theme->a_unfocused_label);
     if (!read_appearance(db, inst,
-                         "window.handle.focus", theme->a_focused_handle,
+                         "window.active.handle.bg", theme->a_focused_handle,
                          FALSE))
 	set_default_appearance(theme->a_focused_handle);
     if (!read_appearance(db, inst,
-                         "window.handle.unfocus",theme->a_unfocused_handle,
+                         "window.inactive.handle.bg",theme->a_unfocused_handle,
                          FALSE))
 	set_default_appearance(theme->a_unfocused_handle);
     if (!read_appearance(db, inst,
-                         "window.grip.focus", theme->a_focused_grip,
+                         "window.active.grip.bg", theme->a_focused_grip,
                          TRUE))
 	set_default_appearance(theme->a_focused_grip);
     if (!read_appearance(db, inst,
-                         "window.grip.unfocus", theme->a_unfocused_grip,
+                         "window.inactive.grip.bg", theme->a_unfocused_grip,
                          TRUE))
 	set_default_appearance(theme->a_unfocused_grip);
     if (!read_appearance(db, inst,
-                         "menu.items", theme->a_menu,
+                         "menu.items.bg", theme->a_menu,
                          FALSE))
 	set_default_appearance(theme->a_menu);
     if (!read_appearance(db, inst,
-                         "menu.title", theme->a_menu_title,
+                         "menu.title.bg", theme->a_menu_title,
                          FALSE))
 	set_default_appearance(theme->a_menu_title);
     if (!read_appearance(db, inst,
-                         "menu.selected", theme->a_menu_selected,
+                         "menu.items.active.bg", theme->a_menu_selected,
                          TRUE))
 	set_default_appearance(theme->a_menu_selected);
 
     /* read the appearances for rendering non-decorations */
     if (!read_appearance(db, inst,
-                         "window.title.focus", theme->app_hilite_bg,
+                         "window.active.title.bg", theme->app_hilite_bg,
                          FALSE))
         set_default_appearance(theme->app_hilite_bg);
     if (!read_appearance(db, inst,
-                         "window.label.focus", theme->app_hilite_label,
+                         "window.active.label.bg", theme->app_hilite_label,
                          TRUE))
         set_default_appearance(theme->app_hilite_label);
     if (!read_appearance(db, inst,
-                         "window.title.unfocus", theme->app_unhilite_bg,
+                         "window.inactive.title.bg", theme->app_unhilite_bg,
                          FALSE))
         set_default_appearance(theme->app_unhilite_bg);
     if (!read_appearance(db, inst,
-                         "window.label.unfocus", theme->app_unhilite_label,
+                         "window.inactive.label.bg", theme->app_unhilite_label,
                          TRUE))
         set_default_appearance(theme->app_unhilite_label);
 
     /* read buttons textures */
     if (!read_appearance(db, inst,
-                         "window.button.disabled.focus",
+                         "window.active.button.disabled.bg",
 			 theme->a_disabled_focused_max,
                          TRUE))
         set_default_appearance(theme->a_disabled_focused_max);
     if (!read_appearance(db, inst,
-                         "window.button.disabled.unfocus",
+                         "window.inactive.button.disabled.bg",
 			 theme->a_disabled_unfocused_max,
                          TRUE))
         set_default_appearance(theme->a_disabled_unfocused_max);
     if (!read_appearance(db, inst,
-                         "window.button.pressed.focus",
+                         "window.active.button.pressed.bg",
 			 theme->a_focused_pressed_max,
                          TRUE))
         set_default_appearance(theme->a_focused_pressed_max);
     if (!read_appearance(db, inst,
-                         "window.button.pressed.unfocus",
+                         "window.inactive.button.pressed.bg",
 			 theme->a_unfocused_pressed_max,
                          TRUE))
         set_default_appearance(theme->a_unfocused_pressed_max);
     if (!read_appearance(db, inst,
-                         "window.button.toggled.focus",
+                         "window.active.button.toggled.bg",
 			 theme->a_toggled_focused_max,
                          TRUE))
     {
@@ -524,7 +512,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             RrAppearanceCopy(theme->a_focused_pressed_max);
     }
     if (!read_appearance(db, inst,
-                         "window.button.toggled.unfocus",
+                         "window.inactive.button.toggled.bg",
 			 theme->a_toggled_unfocused_max,
                          TRUE))
     {
@@ -533,17 +521,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             RrAppearanceCopy(theme->a_unfocused_pressed_max);
     }
     if (!read_appearance(db, inst,
-                         "window.button.focus",
+                         "window.active.button.unpressed.bg",
 			 theme->a_focused_unpressed_max,
                          TRUE))
 	set_default_appearance(theme->a_focused_unpressed_max);
     if (!read_appearance(db, inst,
-                         "window.button.unfocus",
+                         "window.inactive.button.unpressed.bg",
 			 theme->a_unfocused_unpressed_max,
                          TRUE))
 	set_default_appearance(theme->a_unfocused_unpressed_max);
     if (!read_appearance(db, inst,
-                         "window.button.hover.focus",
+                         "window.active.button.hover.bg",
 			 theme->a_hover_focused_max,
                          TRUE))
     {
@@ -552,7 +540,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             RrAppearanceCopy(theme->a_focused_unpressed_max);
     }
     if (!read_appearance(db, inst,
-                         "window.button.hover.unfocus",
+                         "window.inactive.button.hover.bg",
 			 theme->a_hover_unfocused_max,
                          TRUE))
     {
@@ -689,10 +677,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->menu_disabled_color;
     theme->a_menu_text_selected->texture[0].data.text.color =
         theme->menu_selected_color;
-    theme->a_menu_bullet_normal->texture[0].data.mask.color =
-        theme->menu_bullet_normal_color;
-    theme->a_menu_bullet_selected->texture[0].data.mask.color =
-        theme->menu_bullet_selected_color;
 
     theme->a_disabled_focused_max->texture[0].type = 
         theme->a_disabled_unfocused_max->texture[0].type = 
@@ -872,9 +856,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_unfocused_pressed_iconify->texture[0].data.mask.color =
         theme->titlebut_unfocused_pressed_color;
     theme->a_menu_bullet_normal->texture[0].data.mask.color = 
-        theme->menu_bullet_normal_color;
+        theme->menu_color;
     theme->a_menu_bullet_selected->texture[0].data.mask.color = 
-        theme->menu_bullet_selected_color;
+        theme->menu_selected_color;
 
     XrmDestroyDatabase(db);
 
@@ -887,7 +871,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->label_height = theme->winfont_height
             + MAX(ft + fb, ut + ub);
     }
-    theme->title_height = theme->label_height + theme->bevel * 2;
+    theme->title_height = theme->label_height + theme->padding * 2;
     theme->button_size = theme->label_height - 2;
     theme->grip_width = theme->title_height * 1.5;
 
@@ -918,8 +902,6 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_title_color);
         RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_selected_color);
-        RrColorFree(theme->menu_bullet_normal_color);
-        RrColorFree(theme->menu_bullet_selected_color);
 
         RrPixmapMaskFree(theme->max_mask);
         RrPixmapMaskFree(theme->max_toggled_mask);
@@ -1209,8 +1191,8 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 
     cname = g_strconcat(rname, ".color", NULL);
     ctoname = g_strconcat(rname, ".colorTo", NULL);
-    bcname = g_strconcat(rname, ".borderColor", NULL);
-    icname = g_strconcat(rname, ".interlaceColor", NULL);
+    bcname = g_strconcat(rname, ".border.color", NULL);
+    icname = g_strconcat(rname, ".interlace.color", NULL);
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {

@@ -140,31 +140,31 @@ void framerender_frame(ObFrame *self)
         /* set parents for any parent relative guys */
         l->surface.parent = t;
         l->surface.parentx = self->label_x;
-        l->surface.parenty = ob_rr_theme->bevel;
+        l->surface.parenty = ob_rr_theme->padding;
 
         m->surface.parent = t;
         m->surface.parentx = self->max_x;
-        m->surface.parenty = ob_rr_theme->bevel + 1;
+        m->surface.parenty = ob_rr_theme->padding + 1;
 
         n->surface.parent = t;
         n->surface.parentx = self->icon_x;
-        n->surface.parenty = ob_rr_theme->bevel;
+        n->surface.parenty = ob_rr_theme->padding;
 
         i->surface.parent = t;
         i->surface.parentx = self->iconify_x;
-        i->surface.parenty = ob_rr_theme->bevel + 1;
+        i->surface.parenty = ob_rr_theme->padding + 1;
 
         d->surface.parent = t;
         d->surface.parentx = self->desk_x;
-        d->surface.parenty = ob_rr_theme->bevel + 1;
+        d->surface.parenty = ob_rr_theme->padding + 1;
 
         s->surface.parent = t;
         s->surface.parentx = self->shade_x;
-        s->surface.parenty = ob_rr_theme->bevel + 1;
+        s->surface.parenty = ob_rr_theme->padding + 1;
 
         c->surface.parent = t;
         c->surface.parentx = self->close_x;
-        c->surface.parenty = ob_rr_theme->bevel + 1;
+        c->surface.parenty = ob_rr_theme->padding + 1;
 
         framerender_label(self, l);
         framerender_max(self, m);

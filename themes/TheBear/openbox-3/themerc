@@ -1,111 +1,109 @@
 !! Menu settings
 
-menu.title: flat gradient vertical bevel1
-menu.title.color: #5a6dc5
-menu.title.colorTo: #4a59a5
-menu.title.textColor: #fcfcfe
-menu.title.justify: center
+menu.title.bg: flat gradient vertical bevel1
+menu.title.bg.color: #5a6dc5
+menu.title.bg.colorTo: #4a59a5
+menu.title.text.color: #fcfcfe
+menu.title.text.justify: center
 
-menu.items: raised solid bevel1
-menu.items.color: #e6e6e6
-menu.items.colorTo: #000000
-menu.items.textColor: #000000
+menu.items.bg: raised solid bevel1
+menu.items.bg.color: #e6e6e6
+menu.items.bg.colorTo: #000000
+menu.items.text.color: #000000
 menu.items.justify: left
-menu.disabled.textColor: #737573
+menu.items.disabled.text.color: #737573
 
-menu.selected: flat gradient vertical bevel1
-menu.selected.color: #4a5194
-menu.selected.colorTo: #5a71c5
-menu.selected.textColor: #ffffff
-menu.bullet.imageColor: #000000
-menu.bullet.selected.imageColor: #ffffff
+menu.items.active.bg: flat gradient vertical bevel1
+menu.items.active.bg.color: #4a5194
+menu.items.active.bg.colorTo: #5a71c5
+menu.items.active.text.color: #ffffff
 
-menuOverlap: 5
+menu.overlap: 5
 
-window.label.justify: center
+window.label.text.justify: center
 
-window.title.focus: flat gradient vertical bevel1
-window.title.focus.color: #6375ce
-window.title.focus.colorTo: #4a5194
+window.active.title.bg: flat gradient vertical bevel1
+window.active.title.bg.color: #6375ce
+window.active.title.bg.colorTo: #4a5194
 
-window.handle.focus:  flat gradient vertical bevel1
-window.handle.focus.color: #6375ce
-window.handle.focus.colorTo: #4a5194
+window.active.handle.bg:  flat gradient vertical bevel1
+window.active.handle.bg.color: #6375ce
+window.active.handle.bg.colorTo: #4a5194
 
-window.grip.focus:  flat gradient vertical bevel1
-window.grip.focus.color: #6375ce
-window.grip.focus.colorTo: #4a5194
+window.active.grip.bg:  flat gradient vertical bevel1
+window.active.grip.bg.color: #6375ce
+window.active.grip.bg.colorTo: #4a5194
 
-window.label.focus: parentrelative
-window.label.focus.color: #000000
-window.label.focus.colorTo: #000000
-window.label.focus.textColor: #ffffff
+window.active.label.bg: parentrelative
+window.active.label.bg.color: #000000
+window.active.label.bg.colorTo: #000000
+window.active.label.text.color: #ffffff
 
-window.button.focus: parentrelative
-window.button.focus.color: #000000
-window.button.focus.colorTo: #000000
-window.button.focus.imageColor: #d6d7ef
+window.active.button.unpressed.bg: parentrelative
+window.active.button.unpressed.bg.color: #000000
+window.active.button.unpressed.bg.colorTo: #000000
+window.active.button.unpressed.image.color: #d6d7ef
 
-window.button.pressed.focus: sunken solid bevel1
-window.button.pressed.focus.color: #4c59a6
-window.button.pressed.focus.colorTo: #000000
+window.active.button.pressed.bg: sunken solid bevel1
+window.active.button.pressed.bg.color: #4c59a6
+window.active.button.pressed.bg.colorTo: #000000
 
-window.title.unfocus: flat gradient vertical bevel1
-window.title.unfocus.color: #e1e1e1
-window.title.unfocus.colorTo: #a5a2a5
+window.inactive.title.bg: flat gradient vertical bevel1
+window.inactive.title.bg.color: #e1e1e1
+window.inactive.title.bg.colorTo: #a5a2a5
 
-window.handle.unfocus:  flat gradient vertical bevel1
-window.handle.unfocus.color: #e6e6e6
-window.handle.unfocus.colorTo: #cdcac7
+window.inactive.handle.bg:  flat gradient vertical bevel1
+window.inactive.handle.bg.color: #e6e6e6
+window.inactive.handle.bg.colorTo: #cdcac7
 
-window.grip.unfocus: flat gradient vertical bevel1
-window.grip.unfocus.color: #e6e6e6
-window.grip.unfocus.colorTo: #cdcac7
+window.inactive.grip.bg: flat gradient vertical bevel1
+window.inactive.grip.bg.color: #e6e6e6
+window.inactive.grip.bg.colorTo: #cdcac7
 
-window.label.unfocus: parentrelative
-window.label.unfocus.textColor: #ffffff
+window.inactive.label.bg: parentrelative
+window.inactive.label.text.color: #ffffff
 
-window.button.unfocus: parentrelative
-window.button.unfocus.imageColor: #ffffff
+window.inactive.button.unpressed.bg: parentrelative
+window.inactive.button.unpressed.image.color: #ffffff
 
-window.button.pressed.unfocus: sunken solidbevel1
-window.button.pressed.unfocus.color: #cdcac7
-window.button.pressed.unfocus.colorTo: #000000
+window.inactive.button.pressed.bg: sunken solidbevel1
+window.inactive.button.pressed.bg.color: #cdcac7
+window.inactive.button.pressed.bg.colorTo: #000000
 
-window.button.pressed.unfocus: flat gradient vertical bevel1
-window.button.pressed.unfocus.color: #919191
-window.button.pressed.unfocus.colorTo: #5a5a5a
-window.button.pressed.unfocus.borderColor: #000000
+window.inactive.button.pressed.bg: flat gradient vertical bevel1
+window.inactive.button.pressed.bg.color: #919191
+window.inactive.button.pressed.bg.colorTo: #5a5a5a
+window.inactive.button.pressed.bg.border.color: #000000
 
 !#
-window.button.disabled.focus: parentrelative
-window.button.disabled.focus.imageColor: #dddddd
+window.active.button.disabled.bg: parentrelative
+window.active.button.disabled.image.color: #dddddd
 !#
-window.button.disabled.unfocus: parentrelative
-window.button.disabled.unfocus.imageColor:  #6a716a
+window.inactive.button.disabled.bg: parentrelative
+window.inactive.button.disabled.image.color:  #6a716a
 
 !# toggled
-window.button.toggled.focus: parentrelative
-window.button.toggled.focus.imageColor: #f1f1f1
+window.active.button.toggled.bg: parentrelative
+window.active.button.toggled.image.color: #f1f1f1
 
-window.button.toggled.unfocus: parentrelative
-window.button.toggled.focus.imageColor: #f1f1f1
+window.inactive.button.toggled.bg: parentrelative
+window.active.button.toggled.image.color: #f1f1f1
 
-window.frame.unfocusColor: #e6e6e6
-window.frame.focusColor: #e6e6e6
+window.inactive.client.color: #e6e6e6
+window.active.client.color: #e6e6e6
 
 !! Global width settings
-borderWidth: 1
-bevelWidth: 1
-handleWidth: 3
-frameWidth: 0
+border.width: 1
+padding.width: 1
+window.handle.width: 3
+window.client.padding.width: 0
 
 
 !! Miscellaneous settings
-borderColor: #222222
+border.color: #222222
 
 !! font me!
-window.label.focus.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
-window.label.unfocus.font:Bitstream Vera Sans:bold:pixelsize=9
+window.active.label.text.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
+window.inactive.label.text.font:Bitstream Vera Sans:bold:pixelsize=9
 menu.items.font: Bitstream Vera Sans:pixelsize=10
-menu.title.font: Bitstream Vera Sans:bold:pixelsize=10
+menu.title.text.font: Bitstream Vera Sans:bold:pixelsize=10

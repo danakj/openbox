@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Einstellungen
+# Opciones de configuración
 $ #FocusModel
-# Fokus Model
+# Modelo de enfoque
 $ #WindowPlacement
-# Fenster Plazierung
+# Ubicación de ventanas
 $ #ImageDithering
-# Image Dithering
+# Simulación de colores en imágenes
 $ #OpaqueMove
-# Fenster beim Verschieben durchsichtig
+# Movimiento opaco de ventanas
 $ #FullMax
-# Vollständige Vergrößerung
+# Maximización total
 $ #FocusNew
-# Fokus auf Neue Fenster
+# Enfocar ventanas nuevas
 $ #FocusLast
-# Fokus auf letztes Fenster bei Arbeitsplatz Wechsel
+# Enfocar la última ventana en el escritorio
 $ #ClickToFocus
-# Fokus durch Mausklick
+# Seleccionar para enfocar
 $ #SloppyFocus
-# Fokus folgt Maus
+# Enfocar sin forma estricta
 $ #AutoRaise
-# Fenster automatisch in Vordergrund
+# Elevar automáticamente las ventanas
 $ #SmartRows
-# Optimale Plazierung (Reihen)
+# Ubicación inteligente (filas)
 $ #SmartCols
-# Optimale Plazierung (Spalten)
+# Ubicación inteligente (columnas)
 $ #Cascade
-# Verschobene Plazierung
+# Ubicación en cascada
 $ #LeftRight
-# Von links nach rechts
+# De izquierda a derecha
 $ #RightLeft
-# Von rechts nach links
+# De derecha a izquierda
 $ #TopBottom
-# Von oben nach unten
+# De arriba hacia abajo
 $ #BottomTop
-# Von unten nach oben
+# De abajo hacia arriba

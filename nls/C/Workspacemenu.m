@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Arbeitsplätze
+# Escritorios
 $ #NewWorkspace
-# Neuer Arbeitsplatz
+# Escritorio nuevo
 $ #RemoveLast
-# Letzten Arbeitsplatz löschen
+# Quitar el último escritorio

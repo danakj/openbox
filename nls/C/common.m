@@ -1,38 +1,35 @@
 $set 15 #Common
 
 $ #Yes
-# Ja
+# Sí
 $ #No
-# Nein
+# No
 
 $ #DirectionTitle
-# Ausrichtung
+# Dirección
 $ #DirectionHoriz
 # Horizontal
 $ #DirectionVert
-# Vertikal
+# Vertical
 
 $ #AlwaysOnTop
-# Immer im Vorgrund
+# Siempre encima/arriba
 
 $ #PlacementTitle
-# Platzierung
+# Ubicación 
 $ #PlacementTopLeft
-# Oben Links
+# Arriba a la izquierda
 $ #PlacementCenterLeft
-# Mitte Links
+# Centro a la izquierda
 $ #PlacementBottomLeft
-# Unten Links
+# Abajo a la izquierda
 $ #PlacementTopCenter
-# Oben Mitte
+# Arriba al centro
 $ #PlacementBottomCenter
-# Unten Mitte
+# Abajo al centro
 $ #PlacementTopRight
-# Oben Rechts
+# Arriba a la derecha
 $ #PlacementCenterRight
-# Mitte Rechts
+# Centro a la derecha
 $ #PlacementBottomRight
-# Unten Rechts
-
-$ #AutoHide
-# Automatisch Verbergen
+# Abajo a la derecha

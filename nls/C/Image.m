@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: Fehler bei der Erstellung der Pixmap\n
+# BImage::render_solid: error creando el pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: Fehler bei der Erstellung des XImage\n
+# BImage::renderXImage: error creando el XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: nicht unterstütztes Visual\n
+# BImage::renderXImage: visual no soportado\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: Fehler bei der Erstellung der Pixmap\n
+# BImage::renderPixmap: error creando el pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: Ungültige Colormap Größe %d (%d/%d/%d) - verkleinere\n
+# BImageControl::BImageControl: mapa no válido de colores tamaño %d (%d/%d/%d) - reduciendo\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: Fehler bei der Anlegung der Colormap\n
+# BImageControl::BImageControl: error en la asignación del mapa de colores\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: Fehler bei der Auswertung der Farbe %d/%d/%d\n
+# BImageControl::BImageControl: no se puede asignar el color %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: Pixmap Cache - Freigabe von %d Pixmaps\n
+# BImageControl::~BImageControl: reserva de pixmaps - liberando %d pixmaps\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: Cache zu groß, Ausleerung erfordert\n
+# BImageControl::renderImage: reserva de pixmaps grande, forzando limpieza\n
 $ #ColorParseError
-# BImageControl::getColor: Color Parse Fehler: '%s'\n
+# BImageControl::getColor: error evaluando el color: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: Color Alloc Fehler: '%s'\n
+# BImageControl::getColor: error asignando el color: '%s'\n

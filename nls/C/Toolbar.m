@@ -7,7 +7,7 @@ $ #NoStrftimeDateFormat
 $ #NoStrftimeDateFormatEu
 # %02d.%02d.%02d
 $ #NoStrftimeTimeFormat24
-#  %02d:%02d 
+# %02d:%02d
 $ #NoStrftimeTimeFormat12
 # %02d:%02d %sm
 $ #NoStrftimeTimeFormatP
@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Toolbar
+# Escritorio
 $ #EditWkspcName
-# Arbeitsplatzname ändern
+# Cambiar el nombre del escritorio actual
 $ #ToolbarPlacement
-# Toolbar Platzierung
+# Ubicación de la barra de herramientas

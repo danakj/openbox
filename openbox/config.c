@@ -99,8 +99,6 @@ static void parse_keyboard(xmlDocPtr doc, xmlNodePtr node, void *d)
     parse_key(doc, node->xmlChildrenNode, NULL);
 }
 
-static int threshold;
-static int dclicktime;
 /*
 
 <context name="Titlebar"> 
@@ -122,9 +120,9 @@ static void parse_mouse(xmlDocPtr doc, xmlNodePtr node, void *d)
     node = node->xmlChildrenNode;
     
     if ((n = parse_find_node("dragThreshold", node)))
-        threshold = parse_int(doc, n);
+        config_mouse_threshold = parse_int(doc, n);
     if ((n = parse_find_node("doubleClickTime", node)))
-        dclicktime = parse_int(doc, n);
+        config_mouse_dclicktime = parse_int(doc, n);
 
     n = parse_find_node("context", node);
     while (n) {

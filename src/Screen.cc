@@ -408,6 +408,11 @@ void BScreen::saveOpaqueMove(bool o) {
   config->setValue(screenstr + "opaqueMove", resource.opaque_move);
 }
 
+void BScreen::saveRaiseOnMove(bool r) {
+  resource.raise_on_move = r;
+  config->setValue(screenstr + "raiseOnAltMove", resource.raise_on_move);
+}
+
 
 void BScreen::saveFullMax(bool f) {
   resource.full_max = f;
@@ -657,6 +662,7 @@ void BScreen::save_rc(void) {
   saveAAFonts(resource.aa_fonts);
   saveResizeZones(resource.resize_zones);
   saveOpaqueMove(resource.opaque_move);
+  saveRaiseOnMove(resource.raise_on_move);
   saveFullMax(resource.full_max);
   saveFocusNew(resource.focus_new);
   saveFocusLast(resource.focus_last);
@@ -708,6 +714,9 @@ void BScreen::load_rc(void) {
 
   if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
     resource.opaque_move = false;
+
+  if (! config->getValue(screenstr + "raiseOnAltMove", resource.raise_on_move))
+    resource.raise_on_move = true;
 
   if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
     resource.aa_fonts = true;

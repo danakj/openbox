@@ -67,18 +67,20 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Image Dithering"), 1);
   insert(i18n(ConfigmenuSet, ConfigmenuOpaqueMove,
               "Opaque Window Moving"), 2);
+  insert(i18n(ConfigmenuSet, ConfigmenuModMove,
+              "Raise Window on Alt-Click Move"), 3);
   insert(i18n(ConfigmenuSet, ConfigmenuWorkspaceWarping,
-              "Workspace Warping"), 3);
+              "Workspace Warping"), 4);
   insert(i18n(ConfigmenuSet, ConfigmenuFullMax,
-              "Full Maximization"), 4);
+              "Full Maximization"), 5);
   insert(i18n(ConfigmenuSet, ConfigmenuFocusNew,
-              "Focus New Windows"), 5);
+              "Focus New Windows"), 6);
   insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
-              "Focus Last Window on Workspace"), 6);
+              "Focus Last Window on Workspace"), 7);
   insert(i18n(ConfigmenuSet, ConfigmenuDisableBindings,
-              "Disable Mouse with Scroll Lock"), 7);
+              "Disable Mouse with Scroll Lock"), 8);
   insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
-              "Hide Toolbar"), 8);
+              "Hide Toolbar"), 9);
   update();
   setValues();
 }
@@ -94,6 +96,7 @@ void Configmenu::setValues(void) {
 #endif // XFT
   setItemSelected(index++, getScreen()->doImageDither());
   setItemSelected(index++, getScreen()->doOpaqueMove());
+  setItemSelected(index++, getScreen()->doRaiseOnMove());
   setItemSelected(index++, getScreen()->doWorkspaceWarping());
   setItemSelected(index++, getScreen()->doFullMax());
   setItemSelected(index++, getScreen()->doFocusNew());
@@ -137,33 +140,37 @@ void Configmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(index, getScreen()->doOpaqueMove());
     break;
 
-  case 3: // workspace wrapping
+  case 3: // raise on alt-move
+    getScreen()->saveRaiseOnMove(! getScreen()->doRaiseOnMove());
+    setItemSelected(index, getScreen()->doRaiseOnMove());
+
+  case 4: // workspace wrapping
     getScreen()->saveWorkspaceWarping(! getScreen()->doWorkspaceWarping());
     setItemSelected(index, getScreen()->doWorkspaceWarping());
     break;
 
-  case 4: // full maximization
+  case 5: // full maximization
     getScreen()->saveFullMax(! getScreen()->doFullMax());
     setItemSelected(index, getScreen()->doFullMax());
     break;
 
-  case 5: // focus new windows
+  case 6: // focus new windows
     getScreen()->saveFocusNew(! getScreen()->doFocusNew());
     setItemSelected(index, getScreen()->doFocusNew());
     break;
 
-  case 6: // focus last window on workspace
+  case 7: // focus last window on workspace
     getScreen()->saveFocusLast(! getScreen()->doFocusLast());
     setItemSelected(index, getScreen()->doFocusLast());
     break;
 
-  case 7: // disable mouse bindings with Scroll Lock
+  case 8: // disable mouse bindings with Scroll Lock
     getScreen()->saveAllowScrollLock(! getScreen()->allowScrollLock());
     setItemSelected(index, getScreen()->allowScrollLock());
     getScreen()->reconfigure();
     break;
 
-  case 8: // hide toolbar
+  case 9: // hide toolbar
     getScreen()->saveHideToolbar(! getScreen()->doHideToolbar());
     setItemSelected(index, getScreen()->doHideToolbar());
     break;

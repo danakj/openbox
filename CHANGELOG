@@ -1,5 +1,8 @@
 Changelog for Openbox:
 
+2.2.2:
+ * Add an option to disable the window raise on an 	(Scott Moynes)
+   alt-click
 2.2.1:
  * Make configure look for Xft version 2 libraries and  (Ben Jansens)
    use them if they are available.

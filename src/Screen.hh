@@ -165,7 +165,7 @@ private:
     MenuStyle mstyle;
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
-      opaque_move, full_max, focus_new, focus_last, click_raise,
+      opaque_move, raise_on_move, full_max, focus_new, focus_last, click_raise,
       allow_scroll_lock, hide_toolbar, window_corner_snap, aa_fonts,
       ignore_shaded, ignore_maximized, workspace_warping, shadow_fonts;
 
@@ -245,6 +245,7 @@ public:
   inline bool doImageDither(void) const { return image_control->doDither(); }
   inline bool doOrderedDither(void) const { return resource.ordered_dither; }
   inline bool doOpaqueMove(void) const { return resource.opaque_move; }
+  inline bool doRaiseOnMove(void) const { return resource.raise_on_move; }
   inline bool doFullMax(void) const { return resource.full_max; }
   inline bool doFocusNew(void) const { return resource.focus_new; }
   inline bool doFocusLast(void) const { return resource.focus_last; }
@@ -332,6 +333,7 @@ public:
   void saveShadowFonts(bool f);
   void saveAAFonts(bool f);
   void saveOpaqueMove(bool o);
+  void saveRaiseOnMove(bool r);
   void saveFullMax(bool f);
   void saveFocusNew(bool f);
   void saveFocusLast(bool f);

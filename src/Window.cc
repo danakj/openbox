@@ -3139,8 +3139,9 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
       }
 
       if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
-
-      screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
+      
+      if ( (be->state == mod_mask && getScreen()->doRaiseOnMove()))
+        screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     }
   } else if (be->button == 2 && (be->window != frame.iconify_button) &&
              (be->window != frame.close_button) &&

@@ -66,7 +66,7 @@ int main()
     sur = RrSurfaceNew(inst, RR_SURFACE_PLANAR, win, 0);
     RrSurfaceSetArea(sur, X, Y, W, H);
     RrColorSet(&pri, 0, 0, 0, 0);
-    RrColorSet(&pri, 1, 1, 1, 0);
+    RrColorSet(&sec, 1, 1, 1, 0);
     RrPlanarSet(sur, RR_PLANAR_VERTICAL, &pri, &sec);
 
     quit = 0;

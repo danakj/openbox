@@ -16,7 +16,8 @@ static FunctionList mousefuncs;
 
 bool python_register(int action, PyObject *callback)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
+      action == OBActions::Action_KeyPress) {
     PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
     return false;
   }
@@ -37,7 +38,8 @@ bool python_register(int action, PyObject *callback)
 
 bool python_preregister(int action, PyObject *callback)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
+      action == OBActions::Action_KeyPress) {
     PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
     return false;
   }
@@ -58,7 +60,8 @@ bool python_preregister(int action, PyObject *callback)
 
 bool python_unregister(int action, PyObject *callback)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
+      action == OBActions::Action_KeyPress) {
     PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
     return false;
   }
@@ -242,5 +245,37 @@ bool python_unbind_all()
   return true;
 }
 
+
+void python_callback_binding(int id, OBActions::ActionType action,
+                             Window window, unsigned int state,
+                             unsigned int keybutton, Time time)
+{
+  PyObject *func;
+  
+  assert(action >= 0 && action < OBActions::NUM_ACTIONS);
+
+  if (action == OBActions::Action_KeyPress)
+    func = keyfuncs[id];
+  else
+    func = mousefuncs[id];
+
+  if (!func) return;
+
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("iliil", action, window, state, keybutton, time);
+
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (result) {
+    Py_DECREF(result);
+  } else {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_DECREF(arglist);
+}
 
 }

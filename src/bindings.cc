@@ -5,6 +5,11 @@
 #endif
 
 #include "bindings.hh"
+#include "screen.hh"
+#include "openbox.hh"
+#include "client.hh"
+#include "frame.hh"
+#include "python.hh"
 #include "otk/display.hh"
 
 extern "C" {
@@ -170,6 +175,8 @@ OBBindings::OBBindings()
 
 OBBindings::~OBBindings()
 {
+  grabMouseOnAll(false); // ungrab everything
+  grabKeys(false);
   remove_all();
 }
 
@@ -188,14 +195,17 @@ bool OBBindings::add_mouse(const std::string &button, int id)
     p = p->next_sibling;
     newp = &p->next_sibling;
   }
-  display();
+
+  grabMouseOnAll(false); // ungrab everything
+  
   *newp = new BindingTree(id);
-  display();
   (*newp)->text = button;
   (*newp)->chain = false;
   (*newp)->binding.key = n.binding.key;
   (*newp)->binding.modifiers = n.binding.modifiers;
- 
+
+  grabMouseOnAll(true);
+  
   return true;
 }
 
@@ -204,6 +214,12 @@ int OBBindings::remove_mouse(const std::string &button)
 {
   (void)button;
   assert(false); // XXX: function not implemented yet
+
+  grabMouseOnAll(false); // ungrab everything
+
+  // do shit...
+  
+  grabMouseOnAll(true);
 }
 
 
@@ -261,6 +277,7 @@ int OBBindings::find_key(BindingTree *search) const {
   return -1; // it just isn't in here
 }
 
+
 bool OBBindings::add_key(const StringVect &keylist, int id)
 {
   BindingTree *tree;
@@ -274,9 +291,13 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
     return false;
   }
 
+  grabKeys(false);
+  
   // assimilate this built tree into the main tree
   assimilate(tree); // assimilation destroys/uses the tree
 
+  grabKeys(true); 
+ 
   return true;
 }
 
@@ -301,6 +322,14 @@ int OBBindings::remove_key(const StringVect &keylist)
 {
   (void)keylist;
   assert(false); // XXX: function not implemented yet
+
+  grabKeys(false);
+  _curpos = &_keytree;
+
+  // do shit here...
+  
+  grabKeys(true);
+
 }
 
 
@@ -351,5 +380,90 @@ void OBBindings::process(unsigned int modifiers, unsigned int key)
     }
   }
 }
+
+
+void OBBindings::grabMouse(bool grab, const OBClient *client)
+{
+  BindingTree *p = _mousetree;
+  while (p) {
+    if (grab)
+      otk::OBDisplay::grabButton(p->binding.key, p->binding.modifiers,
+                                 client->frame->window(), false,
+                                 ButtonMotionMask | ButtonPressMask |
+                                 ButtonReleaseMask, GrabModeAsync,
+                                 GrabModeAsync, None, None, false);
+    else
+      otk::OBDisplay::ungrabButton(p->binding.key, p->binding.modifiers,
+                                   client->frame->window());
+    p = p->next_sibling;
+  }
+}
+
+
+void OBBindings::grabMouseOnAll(bool grab)
+{
+  for (int i = 0; i < Openbox::instance->screenCount(); ++i) {
+    OBScreen *s = Openbox::instance->screen(i);
+    assert(s);
+    OBScreen::ClientList::iterator it, end = s->clients.end();
+    for (it = s->clients.begin(); it != end; ++it)
+      grabMouse(grab, *it);
+  }
+}
+
+
+void OBBindings::grabKeys(bool grab)
+{
+  for (int i = 0; i < Openbox::instance->screenCount(); ++i) {
+    Window root = otk::OBDisplay::screenInfo(i)->rootWindow();
+
+    BindingTree *p = _curpos->first_child;
+    while (p) {
+      if (grab)
+        otk::OBDisplay::grabKey(p->binding.key, p->binding.modifiers,
+                                root, false, GrabModeAsync, GrabModeAsync,
+                                false);
+      else
+        otk::OBDisplay::ungrabKey(p->binding.key, p->binding.modifiers,
+                                  root);
+      p = p->next_sibling;
+    }
+  }
+}
+
+
+void OBBindings::fire(OBActions::ActionType type, Window window,
+                      unsigned int modifiers, unsigned int key, Time time)
+{
+  if (type == OBActions::Action_KeyPress) {
+    BindingTree *p = _curpos->first_child;
+    while (p) {
+      if (p->binding.key == key && p->binding.modifiers == modifiers) {
+        if (p->chain) {
+          grabKeys(false);
+          _curpos = p;
+          grabKeys(true);
+        } else {
+          python_callback_binding(p->id, type, window, modifiers, key, time);
+          _curpos = &_keytree;
+        }
+        break;
+      }
+      p = p->next_sibling;
+    }
+    
+    assert(false);
+  } else {
+    BindingTree *p = _mousetree;
+    while (p) {
+      if (p->binding.key == key && p->binding.modifiers == modifiers) {
+        python_callback_binding(p->id, type, window, modifiers, key, time);
+        break;
+      }
+      p = p->next_sibling;
+    }
+  }
+}
+
 
 }

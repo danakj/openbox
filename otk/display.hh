@@ -113,6 +113,11 @@ public:
                   bool allow_scroll_lock);
   static void ungrabButton(unsigned int button, unsigned int modifiers,
                     Window grab_window);
+  static void grabKey(unsigned int keycode, unsigned int modifiers,
+                  Window grab_window, bool owner_events,
+                  int pointer_mode, int keyboard_mode, bool allow_scroll_lock);
+  static void ungrabKey(unsigned int button, unsigned int modifiers,
+                        Window grab_window);
 };
 
 }

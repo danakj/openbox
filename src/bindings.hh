@@ -6,10 +6,14 @@
   @brief I dunno.. some binding stuff?
 */
 
+#include "actions.hh"
+
 #include <string>
 #include <vector>
 
 namespace ob {
+
+class OBClient;
 
 typedef struct Binding {
   unsigned int modifiers;
@@ -54,8 +58,11 @@ private:
   int find_key(BindingTree *search) const;
   bool translate(const std::string &str, Binding &b, bool askey) const;
   BindingTree *buildtree(const StringVect &keylist, int id) const;
-  void OBBindings::assimilate(BindingTree *node);
- 
+  void assimilate(BindingTree *node);
+
+  void grabMouseOnAll(bool grab);
+  void grabKeys(bool grab);
+  
 public:
   //! Initializes an OBBinding object
   OBBindings();
@@ -109,6 +116,11 @@ public:
   //      for reseting too...)
 
   void display();
+
+  void fire(OBActions::ActionType type, Window window, unsigned int modifiers,
+            unsigned int key, Time time);
+
+  void grabMouse(bool grab, const OBClient *client);
 };
 
 }

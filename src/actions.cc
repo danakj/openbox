@@ -9,6 +9,7 @@
 #include "openbox.hh"
 #include "client.hh"
 #include "python.hh"
+#include "bindings.hh"
 #include "otk/display.hh"
 
 #include <stdio.h>
@@ -41,6 +42,9 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   python_callback(Action_ButtonPress, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.x_root, e.y_root, e.time);
+  if (w && w->type() == OBWidget::Type_Frame) // a binding
+    Openbox::instance->bindings()->fire(Action_ButtonPress, e.window,
+                                        e.state, e.button, e.time);
     
   if (_button) return; // won't count toward CLICK events
 
@@ -59,6 +63,9 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   python_callback(Action_ButtonRelease, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.x_root, e.y_root, e.time);
+  if (w && w->type() == OBWidget::Type_Frame) // a binding
+    Openbox::instance->bindings()->fire(Action_ButtonRelease, e.window,
+                                        e.state, e.button, e.time);
 
   // not for the button we're watching?
   if (_button != e.button) return;
@@ -78,6 +85,9 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   python_callback(Action_Click, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.time);
+  if (w && w->type() == OBWidget::Type_Frame) // a binding
+    Openbox::instance->bindings()->fire(Action_Click, e.window,
+                                        e.state, e.button, e.time);
 
   if (e.time - _release.time < DOUBLECLICKDELAY &&
       _release.win == e.window && _release.button == e.button) {
@@ -86,7 +96,10 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     python_callback(Action_DoubleClick, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.time);
-
+    if (w && w->type() == OBWidget::Type_Frame) // a binding
+      Openbox::instance->bindings()->fire(Action_DoubleClick, e.window,
+                                          e.state, e.button, e.time);
+    
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
     _release.button = 0;
@@ -128,13 +141,11 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
 
 void OBActions::keyPressHandler(const XKeyEvent &e)
 {
-  OBWidget *w = dynamic_cast<OBWidget*>
-    (Openbox::instance->findHandler(e.window));
+//  OBWidget *w = dynamic_cast<OBWidget*>
+//    (Openbox::instance->findHandler(e.window));
 
-  // run the KEY guile hook
-  python_callback(Action_KeyPress, e.window,
-                  (OBWidget::WidgetType)(w ? w->type():-1),
-                  e.state, e.keycode);
+  Openbox::instance->bindings()->fire(Action_KeyPress, e.window,
+                                      e.state, e.keycode, e.time);
 }
 
 

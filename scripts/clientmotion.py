@@ -31,47 +31,32 @@ def def_motion_release(action, win, type, modifiers, button, xroot, yroot,
 				delete_Rect(i[3])
 			posqueue.remove(i)
 			break
-	
-	#  ButtonPressAction *a = 0;
-	#  for (int i=0; i<BUTTONS; ++i) {
-	#    if (_posqueue[i]->button == e.button)
-	#      a = _posqueue[i];
-	#    if (a) // found one and removed it
-	#      _posqueue[i] = _posqueue[i+1];
-	#  }
-	#  if (a) { // found one
-	#    _posqueue[BUTTONS-1] = a;
-	#    a->button = 0;
-	#  }
 
+def def_do_motion(client, xroot, yroot):
+	global posqueue
+	dx = xroot - posqueue[0][1]
+	dy = yroot - posqueue[0][2]
+	area = posqueue[0][3] # A Rect
+	OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
+
+def def_do_resize(client, xroot, yroot, archor_corner):
+	global posqueue
+	dx = xroot - posqueue[0][1]
+	dy = yroot - posqueue[0][2]
+	area = posqueue[0][3] # A Rect
+	OBClient_resize(client, anchor_corner,
+			Rect_width(area) - dx, Rect_height(area) + dy)
 
 def def_motion(action, win, type, modifiers, xroot, yroot, time):
 	client = Openbox_findClient(openbox, win)
 	if not client: return
 
-	global posqueue
-	dx = xroot - posqueue[0][1]
-	dy = yroot - posqueue[0][2]
-	#  _dx = x_root - _posqueue[0]->pos.x();
-	#  _dy = y_root - _posqueue[0]->pos.y();
-
-	area = posqueue[0][3] # A Rect
 	if (type == Type_Titlebar) or (type == Type_Label):
-		OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
-		#      c->move(_posqueue[0]->clientarea.x() + _dx,
-		#              _posqueue[0]->clientarea.y() + _dy);
+		def_do_move(client, xroot, yroot)
 	elif type == Type_LeftGrip:
-		OBClient_resize(client, OBClient_TopRight,
-				Rect_width(area) - dx, Rect_height(area) + dy)
-		#      c->resize(OBClient::TopRight,
-		#        _posqueue[0]->clientarea.width() - _dx,
-		#        _posqueue[0]->clientarea.height() + _dy);
+		def_do_resize(client, xroot, yroot, OBClient_TopRight)
 	elif type == Type_RightGrip:
-		OBClient_resize(client, OBClient_TopLeft,
-				Rect_width(area) + dx, Rect_height(area) + dy)
-		#      c->resize(OBClient::TopLeft,
-		#        _posqueue[0]->clientarea.width() + _dx,
-		#        _posqueue[0]->clientarea.height() + _dy);
+		def_do_resize(client, xroot, yroot, OBClient_TopLeft)
 
 def def_enter(action, win, type, modifiers):
 	client = Openbox_findClient(openbox, win)

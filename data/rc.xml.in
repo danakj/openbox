@@ -54,6 +54,7 @@
   <floatingY>0</floatingY>
   <autoHide>no</autoHide>
   <hideDelay>300</hideDelay>
+  <desktopMenuIcons>yes</desktopMenuIcons>
   <moveButton>A-Left</moveButton>
 </dock>
 

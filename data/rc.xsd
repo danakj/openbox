@@ -28,6 +28,9 @@
          update hideTimeout to hideDelay
      Thu Apr 22 12:33:11 UTC 2004 - mikachu(a)openbox.org
          add diffs between 3.1 and 3.2
+     Sun Oct 31 10:08:34 UTC 2004 - mikachu(a)openbox.org
+         we haven't remembered to update this changelog in a while,
+         adding desktopMenuIcons.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -124,6 +127,7 @@
             <xs:element name="floatingY" type="xs:integer"/>
             <xs:element name="autoHide" type="ob:yesorno"/>
             <xs:element name="hideDelay" type="xs:integer"/>
+            <xs:element name="disktopMenuIcons" type="ob:yesorno"/>
             <xs:element name="moveButton" type="ob:button"/>
         </xs:sequence>
     </xs:complexType>

@@ -83,8 +83,8 @@ private:
   //! Area usable for placement etc (total - struts)
   otk::Rect _area;
 
-  //! Areas of the screen reserved by applications
-  StrutList _struts;
+  //! Combined strut from all of the clients' struts
+  otk::Strut _strut;
 
   //!  An offscreen window which gets focus when nothing else has it
   Window _focuswindow;
@@ -142,10 +142,11 @@ public:
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }
 
-  //! Adds a window's strut to the screen's list of reserved spaces
-  void addStrut(otk::Strut *strut);
-  //! Removes a window's strut from the screen's list of reserved spaces
-  void removeStrut(otk::Strut *strut);
+  //! Update's the screen's combined strut of all the clients.
+  /*!
+    Clients should call this whenever they change their strut.
+  */
+  void updateStrut();
 
   //! Manage any pre-existing windows on the screen
   void manageExisting();

@@ -1513,36 +1513,14 @@ static PyObject *_wrap_OBScreen_focuswindow(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_OBScreen_addStrut(PyObject *self, PyObject *args) {
+static PyObject *_wrap_OBScreen_updateStrut(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
-    otk::Strut *arg2 = (otk::Strut *) 0 ;
     PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_addStrut",&obj0,&obj1)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:OBScreen_updateStrut",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Strut,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->addStrut(arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_OBScreen_removeStrut(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
-    otk::Strut *arg2 = (otk::Strut *) 0 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_removeStrut",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Strut,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->removeStrut(arg2);
+    (arg1)->updateStrut();
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -2258,6 +2236,26 @@ static PyObject *_wrap_OBClient_area(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_strut(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    otk::Strut *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_strut",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    {
+        otk::Strut const &_result_ref = ((ob::OBClient const *)arg1)->strut();
+        result = (otk::Strut *) &_result_ref;
+    }
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Strut, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_move(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2683,8 +2681,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBScreen_area", _wrap_OBScreen_area, METH_VARARGS },
 	 { (char *)"OBScreen_style", _wrap_OBScreen_style, METH_VARARGS },
 	 { (char *)"OBScreen_focuswindow", _wrap_OBScreen_focuswindow, METH_VARARGS },
-	 { (char *)"OBScreen_addStrut", _wrap_OBScreen_addStrut, METH_VARARGS },
-	 { (char *)"OBScreen_removeStrut", _wrap_OBScreen_removeStrut, METH_VARARGS },
+	 { (char *)"OBScreen_updateStrut", _wrap_OBScreen_updateStrut, METH_VARARGS },
 	 { (char *)"OBScreen_manageExisting", _wrap_OBScreen_manageExisting, METH_VARARGS },
 	 { (char *)"OBScreen_manageWindow", _wrap_OBScreen_manageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_unmanageWindow", _wrap_OBScreen_unmanageWindow, METH_VARARGS },
@@ -2725,6 +2722,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_layer", _wrap_OBClient_layer, METH_VARARGS },
 	 { (char *)"OBClient_toggleClientBorder", _wrap_OBClient_toggleClientBorder, METH_VARARGS },
 	 { (char *)"OBClient_area", _wrap_OBClient_area, METH_VARARGS },
+	 { (char *)"OBClient_strut", _wrap_OBClient_strut, METH_VARARGS },
 	 { (char *)"OBClient_move", _wrap_OBClient_move, METH_VARARGS },
 	 { (char *)"OBClient_resize", _wrap_OBClient_resize, METH_VARARGS },
 	 { (char *)"OBClient_close", _wrap_OBClient_close, METH_VARARGS },

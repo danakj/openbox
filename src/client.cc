@@ -89,6 +89,7 @@ OBClient::OBClient(int screen, Window window)
   updateTitle();
   updateIconTitle();
   updateClass();
+  updateStrut();
 
   calcLayer();
   changeState();
@@ -487,6 +488,29 @@ void OBClient::updateClass()
 }
 
 
+void OBClient::updateStrut()
+{
+  unsigned long num = 4;
+  unsigned long *data;
+  if (!Openbox::instance->property()->get(_window,
+                                          otk::OBProperty::net_wm_strut,
+                                          otk::OBProperty::Atom_Cardinal,
+                                          &num, &data))
+    return;
+
+  if (num == 4) {
+    _strut.left = data[0];
+    _strut.right = data[1];
+    _strut.top = data[2];
+    _strut.bottom = data[3];
+    
+    Openbox::instance->screen(_screen)->updateStrut();
+  }
+
+  delete [] data;
+}
+
+
 void OBClient::propertyHandler(const XPropertyEvent &e)
 {
   otk::OtkEventHandler::propertyHandler(e);
@@ -519,6 +543,8 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
   else if (e.atom == property->atom(otk::OBProperty::wm_protocols))
     updateProtocols();
   // XXX: transient for hint
+  else if (e.atom == property->atom(otk::OBProperty::net_wm_strut))
+    updateStrut();
   // XXX: strut hint
 }
 

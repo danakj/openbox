@@ -27,6 +27,7 @@ extern "C" {
 #include "otk/display.hh"
 
 #include <vector>
+#include <algorithm>
 
 static bool running;
 static int anotherWMRunning(Display *display, XErrorEvent *) {
@@ -191,17 +192,19 @@ void OBScreen::manageExisting()
 }
 
 
-//! Adds a window's strut to the screen's list of reserved spaces
-void OBScreen::addStrut(otk::Strut *strut)
+void OBScreen::updateStrut()
 {
-  _struts.push_back(strut);
-}
+  _strut.left = _strut.right = _strut.top = _strut.bottom = 0;
 
-
-//! Removes a window's strut from the screen's list of reserved spaces
-void OBScreen::removeStrut(otk::Strut *strut)
-{
-  _struts.remove(strut);
+  ClientList::iterator it, end = clients.end();
+  for (it = clients.begin(); it != end; ++it) {
+    const otk::Strut &s = (*it)->strut();
+    _strut.left = std::max(_strut.left, s.left);
+    _strut.right = std::max(_strut.right, s.right);
+    _strut.top = std::max(_strut.top, s.top);
+    _strut.bottom = std::max(_strut.bottom, s.bottom);
+  }
+  calcArea();
 }
 
 
@@ -217,31 +220,9 @@ void OBScreen::calcArea()
 #endif // XINERAMA
 */
   
-  /* these values represent offsets from the screen edge
-   * we look for the biggest offset on each edge and then apply them
-   * all at once
-   * do not be confused by the similarity to the names of Rect's members
-   */
-  unsigned int current_left = 0, current_right = 0, current_top = 0,
-    current_bottom = 0;
-
-  StrutList::const_iterator it = _struts.begin(), end = _struts.end();
-
-  for(; it != end; ++it) {
-    otk::Strut *strut = *it;
-    if (strut->left > current_left)
-      current_left = strut->left;
-    if (strut->top > current_top)
-      current_top = strut->top;
-    if (strut->right > current_right)
-      current_right = strut->right;
-    if (strut->bottom > current_bottom)
-      current_bottom = strut->bottom;
-  }
-
-  _area.setRect(current_left, current_top,
-                _info->width() - (current_left + current_right),
-                _info->height() - (current_top + current_bottom));
+  _area.setRect(_strut.left, _strut.top,
+                _info->width() - (_strut.left + _strut.right),
+                _info->height() - (_strut.top + _strut.bottom));
 
 /*
 #ifdef    XINERAMA
@@ -318,9 +299,7 @@ void OBScreen::setSupportedAtoms()
 /*
       otk::OBProperty::net_wm_desktop,
 */
-/*
       otk::OBProperty::net_wm_strut,
-*/
       otk::OBProperty::net_wm_window_type,
       otk::OBProperty::net_wm_window_type_desktop,
       otk::OBProperty::net_wm_window_type_dock,

@@ -183,6 +183,13 @@ private:
   */
   otk::Rect    _area;
 
+  //! The window's strut
+  /*!
+    The strut defines areas of the screen that are marked off-bounds for window
+    placement. In theory, where this window exists.
+  */
+  otk::Strut   _strut;
+
   //! The logical size of the window
   /*!
     The "logical" size of the window is refers to the user's perception of the
@@ -319,6 +326,8 @@ private:
   //! Updates the window's application name and class
   void updateClass();
   // XXX: updateTransientFor();
+  //! Updates the strut for the client
+  void updateStrut();
 
   //! Change the client's state hints to match the class' data
   void changeState();
@@ -424,6 +433,9 @@ public:
 
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
+
+  //! Returns the client's strut definition
+  inline const otk::Strut &strut() const { return _strut; }
 
   //! Move the client window
   void move(int x, int y);

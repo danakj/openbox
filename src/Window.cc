@@ -1,6 +1,7 @@
 // Window.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
+// Copyright (c) 2002 - 2002 Ben Jansens (ben at orodu.net)
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry (shaleh at debian.org)
+// Copyright (c) 1997 - 2000 Brad Hughes (bhughes at tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -3202,9 +3203,9 @@ void OpenboxWindow::downsize(void) {
 void OpenboxWindow::right_fixsize(int *gx, int *gy) {
   // calculate the size of the client window and conform it to the
   // size specified by the size hints of the client window...
-  int dx = frame.resize_w - client.base_width - (frame.mwm_border_w * 2) -
+  int dx = 1 + frame.resize_w - client.base_width - (frame.mwm_border_w * 2) -
     (frame.border_w * 2) + (client.width_inc / 2);
-  int dy = frame.resize_h - frame.y_border - client.base_height -
+  int dy = 1 + frame.resize_h - frame.y_border - client.base_height -
     frame.handle_h - (frame.border_w * 3) - (frame.mwm_border_w * 2)
     + (client.height_inc / 2);
 
@@ -3222,9 +3223,9 @@ void OpenboxWindow::right_fixsize(int *gx, int *gy) {
   dx = (dx * client.width_inc) + client.base_width;
   dy = (dy * client.height_inc) + client.base_height;
 
-  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2);
+  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2) - 1;
   frame.resize_h = dy + frame.y_border + frame.handle_h +
-                   (frame.mwm_border_w * 2) +  (frame.border_w * 3);
+                   (frame.mwm_border_w * 2) +  (frame.border_w * 3) - 1;
   if (resize_zone & ZoneTop)
     frame.resize_y = frame.y + frame.height - frame.resize_h +
       screen->getBorderWidth() * 2;
@@ -3234,9 +3235,9 @@ void OpenboxWindow::right_fixsize(int *gx, int *gy) {
 void OpenboxWindow::left_fixsize(int *gx, int *gy) {
   // calculate the size of the client window and conform it to the
   // size specified by the size hints of the client window...
-  int dx = frame.x + frame.width - frame.resize_x - client.base_width -
+  int dx = 1 + frame.x + frame.width - frame.resize_x - client.base_width -
     (frame.mwm_border_w * 2) + (client.width_inc / 2);
-  int dy = frame.resize_h - frame.y_border - client.base_height -
+  int dy = 1 + frame.resize_h - frame.y_border - client.base_height -
     frame.handle_h - (frame.border_w * 3) - (frame.mwm_border_w * 2)
     + (client.height_inc / 2);
 
@@ -3254,11 +3255,11 @@ void OpenboxWindow::left_fixsize(int *gx, int *gy) {
   dx = (dx * client.width_inc) + client.base_width;
   dy = (dy * client.height_inc) + client.base_height;
 
-  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2);
+  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2) - 1;
   frame.resize_x = frame.x + frame.width - frame.resize_w +
                    (frame.border_w * 2);
   frame.resize_h = dy + frame.y_border + frame.handle_h +
-                   (frame.mwm_border_w * 2) + (frame.border_w * 3);
+                   (frame.mwm_border_w * 2) + (frame.border_w * 3) - 1;
   if (resize_zone & ZoneTop)
     frame.resize_y = frame.y + frame.height - frame.resize_h +
       screen->getBorderWidth() * 2;

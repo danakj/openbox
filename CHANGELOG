@@ -1,6 +1,8 @@
 Changelog for Openbox:
 
 1.2.0:
+ * fix off-by-one window resizing bug.                  (Ben Jansens)
+
  * fix for slit menu not using the correct style when
    the style changed.                                   (Ben Jansens)
 

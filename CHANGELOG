@@ -10,6 +10,7 @@
 	with focus (!))
 	* Closed bug #948 (Gets stuck in 'move' mode if mouse is let up while
 	dragged away from title bar)
+	* Closed bug #949 (dock above gnome panel behaviour)
 
 3.0-rc4:
 	* Closed bug #921 (focus rectangle stays on the screen after modifier

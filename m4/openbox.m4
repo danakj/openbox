@@ -9,7 +9,7 @@ AC_DEFUN([OB_DEBUG],
 
     AC_ARG_ENABLE([debug],
     [  --enable-debug          build a debug version default=yes],
-    [DEBUG=$enableval], [DEBUG="yes"])
+    [DEBUG=$enableval], [DEBUG="no"])
 
     AC_ARG_ENABLE([strict-ansi],
     [  --enable-strict-ansi    Enable strict ANSI compliance build default=no],

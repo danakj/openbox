@@ -394,11 +394,14 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
     case LeaveNotify:
         /* NotifyUngrab occurs when a mouse button is released and the event is
            caused, like when lowering a window */
-        /* NotifyVirtual occurs when ungrabbing the pointer */
+        /* NotifyVirtual and NotifyAncestor occurs when ungrabbing the
+           pointer (Ancestor happens when the pointer is on a window border) */
         if (e->xcrossing.mode == NotifyGrab ||
             e->xcrossing.detail == NotifyInferior ||
             (e->xcrossing.mode == NotifyUngrab &&
-             e->xcrossing.detail == NotifyVirtual)) {
+             (e->xcrossing.detail == NotifyAncestor ||
+              e->xcrossing.detail == NotifyNonlinearVirtual ||
+              e->xcrossing.detail == NotifyVirtual))) {
 #ifdef DEBUG_FOCUS
             ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
                      (e->type == EnterNotify ? "Enter" : "Leave"),
@@ -698,15 +701,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             break;
         case OB_FRAME_CONTEXT_FRAME:
             if (client_normal(client)) {
-                if (ob_state() == OB_STATE_STARTING) {
-                    /* move it to the top of the focus order */
-                    guint desktop = client->desktop;
-                    if (desktop == DESKTOP_ALL) desktop = screen_desktop;
-                    focus_order[desktop] = g_list_remove(focus_order[desktop],
-                                                         client);
-                    focus_order[desktop] = g_list_prepend(focus_order[desktop],
-                                                          client);
-                } else if (config_focus_follow) {
+                if (config_focus_follow) {
 #ifdef DEBUG_FOCUS
                     ob_debug("EnterNotify on %lx, focusing window\n",
                              client->window);

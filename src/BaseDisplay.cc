@@ -493,20 +493,22 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
          on a pre-screen basis anyways.
       */
       xinerama_active = XineramaIsActive(d->getXDisplay());
-      /*
-         If Xinerama is being used, there there is only going to be one screen
-         present. We still, of course, want to use the screen class, but that is
-         why no screen number is used in this function call. There should never
-         be more than one screen present with Xinerama active.
-      */
-      int num;
-      XineramaScreenInfo *info = XineramaQueryScreens(d->getXDisplay(), &num);
-      if (num > 0 && info) {
-        for (int i = 0; i < num; ++i) {
-          xinerama_areas.push_back(Rect(info[i].x_org, info[i].y_org,
-                                        info[i].width, info[i].height));
+      if (xinerama_active) {
+        /*
+           If Xinerama is being used, there there is only going to be one screen
+           present. We still, of course, want to use the screen class, but that
+           is why no screen number is used in this function call. There should
+           never be more than one screen present with Xinerama active.
+        */
+        int num;
+        XineramaScreenInfo *info = XineramaQueryScreens(d->getXDisplay(), &num);
+        if (num > 0 && info) {
+          for (int i = 0; i < num; ++i) {
+            xinerama_areas.push_back(Rect(info[i].x_org, info[i].y_org,
+                                          info[i].width, info[i].height));
+          }
+          XFree(info);
         }
-        XFree(info);
       }
     }
   }

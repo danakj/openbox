@@ -2093,7 +2093,7 @@ void BScreen::updateAvailableArea(void) {
 #ifdef    XINERAMA
   // reset to the full areas
   if (isXineramaActive())
-    xineramaUsableArea = allAvailableAreas();
+    xineramaUsableArea = getXineramaAreas();
 #endif // XINERAMA
 
   /* these values represent offsets from the screen edge

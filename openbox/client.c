@@ -794,7 +794,7 @@ void client_setup_decor_and_functions(Client *self)
 
     /* can't maximize without moving/resizing */
     if (!((self->functions & Func_Move) && (self->functions & Func_Resize)))
-	self->functions &= ~Func_Maximize;
+	self->functions &= ~(Func_Maximize | Func_Fullscreen);
 
     /* finally, user specified disabled decorations are applied to subtract
        decorations */
@@ -1304,6 +1304,18 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             h = screen_area(self->desktop)->y +
                 screen_area(self->desktop)->height -
                 self->frame->size.top - self->frame->size.bottom;
+        }
+    }
+
+    /* these override the above states! if you cant move you can't move! */
+    if (user) {
+        if (!(self->functions & Func_Move)) {
+            x = self->area.x;
+            y = self->area.y;
+        }
+        if (!(self->functions & Func_Resize)) {
+            w = self->area.width;
+            h = self->area.height;
         }
     }
 

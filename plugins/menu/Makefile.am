@@ -5,16 +5,16 @@ AM_CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(XML_CFLAGS) \
 
 INCLUDES=-I../..
 
-plugin_LTLIBRARIES=timed_menu.la fifo_menu.la client_menu.la
+#plugin_LTLIBRARIES=timed_menu.la fifo_menu.la client_menu.la
 
-timed_menu_la_LDFLAGS=-module -avoid-version
-timed_menu_la_SOURCES=timed_menu.c timed_menu.h
+#timed_menu_la_LDFLAGS=-module -avoid-version
+#timed_menu_la_SOURCES=timed_menu.c timed_menu.h
 
-fifo_menu_la_LDFLAGS=-module -avoid-version
-fifo_menu_la_SOURCES=fifo_menu.c fifo_menu.h
+#fifo_menu_la_LDFLAGS=-module -avoid-version
+#fifo_menu_la_SOURCES=fifo_menu.c fifo_menu.h
 
-client_menu_la_LDFLAGS=-module -avoid-version
-client_menu_la_SOURCES=client_menu.c
+#client_menu_la_LDFLAGS=-module -avoid-version
+#client_menu_la_SOURCES=client_menu.c
 
 MAINTAINERCLEANFILES=Makefile.in
 

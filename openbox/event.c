@@ -319,8 +319,8 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             gboolean fallback = TRUE;
 
             while (TRUE) {
-                if (!XCheckTypedWindowEvent(ob_display, FocusOut,
-                                            e->xfocus.window,&fe))
+                if (!XCheckTypedWindowEvent(ob_display, e->xfocus.window,
+                                            FocusOut, &fe))
                     if (!XCheckTypedEvent(ob_display, FocusIn, &fe))
                         break;
                 if (fe.type == FocusOut) {
@@ -428,6 +428,8 @@ static void event_process(const XEvent *ec, gpointer data)
     /* make a copy we can mangle */
     ee = *ec;
     e = &ee;
+
+    g_message("Event %d", e->type);
 
     window = event_get_window(e);
     if ((obwin = g_hash_table_lookup(window_map, &window))) {
@@ -845,8 +847,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	msgtype = e->xclient.message_type;
 	if (msgtype == prop_atoms.wm_change_state) {
 	    /* compress changes into a single change */
-	    while (XCheckTypedWindowEvent(ob_display, e->type,
-					  client->window, &ce)) {
+	    while (XCheckTypedWindowEvent(ob_display, client->window,
+					  e->type, &ce)) {
 		/* XXX: it would be nice to compress ALL messages of a
 		   type, not just messages in a row without other
 		   message types between. */
@@ -859,8 +861,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    client_set_wm_state(client, e->xclient.data.l[0]);
 	} else if (msgtype == prop_atoms.net_wm_desktop) {
 	    /* compress changes into a single change */
-	    while (XCheckTypedWindowEvent(ob_display, e->type,
-					  client->window, &ce)) {
+	    while (XCheckTypedWindowEvent(ob_display, client->window,
+					  e->type, &ce)) {
 		/* XXX: it would be nice to compress ALL messages of a
 		   type, not just messages in a row without other
 		   message types between. */
@@ -974,14 +976,38 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	if (!client_validate(client)) break;
   
 	/* compress changes to a single property into a single change */
-	while (XCheckTypedWindowEvent(ob_display, e->type,
-				      client->window, &ce)) {
-	    /* XXX: it would be nice to compress ALL changes to a property,
+	while (XCheckTypedWindowEvent(ob_display, client->window,
+				      e->type, &ce)) {
+            Atom a, b;
+
+            /* XXX: it would be nice to compress ALL changes to a property,
 	       not just changes in a row without other props between. */
-	    if (ce.xproperty.atom != e->xproperty.atom) {
-		XPutBackEvent(ob_display, &ce);
-		break;
-	    }
+
+            a = ce.xproperty.atom;
+            b = e->xproperty.atom;
+
+            if (a == b)
+                continue;
+            if ((a == prop_atoms.net_wm_name ||
+                 a == prop_atoms.wm_name ||
+                 a == prop_atoms.net_wm_icon_name ||
+                 a == prop_atoms.wm_icon_name)
+                &&
+                (b == prop_atoms.net_wm_name ||
+                 b == prop_atoms.wm_name ||
+                 b == prop_atoms.net_wm_icon_name ||
+                 b == prop_atoms.wm_icon_name)) {
+                continue;
+            }
+            if ((a == prop_atoms.net_wm_icon ||
+                 a == prop_atoms.kwm_win_icon)
+                &&
+                (b == prop_atoms.net_wm_icon ||
+                 b == prop_atoms.kwm_win_icon))
+                continue;
+
+            XPutBackEvent(ob_display, &ce);
+            break;
 	}
 
 	msgtype = e->xproperty.atom;
@@ -989,24 +1015,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    client_update_normal_hints(client);
 	    /* normal hints can make a window non-resizable */
 	    client_setup_decor_and_functions(client);
-	}
-	else if (msgtype == XA_WM_HINTS)
+	} else if (msgtype == XA_WM_HINTS) {
 	    client_update_wmhints(client);
-	else if (msgtype == XA_WM_TRANSIENT_FOR) {
+	} else if (msgtype == XA_WM_TRANSIENT_FOR) {
 	    client_update_transient_for(client);
 	    client_get_type(client);
 	    /* type may have changed, so update the layer */
 	    client_calc_layer(client);
 	    client_setup_decor_and_functions(client);
-	}
-	else if (msgtype == prop_atoms.net_wm_name ||
-		 msgtype == prop_atoms.wm_name ||
-                 msgtype == prop_atoms.net_wm_icon_name ||
-		 msgtype == prop_atoms.wm_icon_name)
+	} else if (msgtype == prop_atoms.net_wm_name ||
+                   msgtype == prop_atoms.wm_name ||
+                   msgtype == prop_atoms.net_wm_icon_name ||
+                   msgtype == prop_atoms.wm_icon_name) {
 	    client_update_title(client);
-	else if (msgtype == prop_atoms.wm_class)
+	} else if (msgtype == prop_atoms.wm_class) {
 	    client_update_class(client);
-	else if (msgtype == prop_atoms.wm_protocols) {
+        } else if (msgtype == prop_atoms.wm_protocols) {
 	    client_update_protocols(client);
 	    client_setup_decor_and_functions(client);
 	}
@@ -1014,8 +1038,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    client_update_strut(client);
         }
 	else if (msgtype == prop_atoms.net_wm_icon ||
-                 msgtype == prop_atoms.kwm_win_icon)
+                 msgtype == prop_atoms.kwm_win_icon) {
 	    client_update_icons(client);
+        }
     default:
         ;
 #ifdef SHAPE

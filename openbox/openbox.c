@@ -129,6 +129,7 @@ int main(int argc, char **argv)
     if (screen_annex()) { /* it will be ours! */
 	timer_startup();
 	render_startup();
+	font_startup();
 	themerc_startup();
 	engine_startup(themerc_engine);
 	python_startup();

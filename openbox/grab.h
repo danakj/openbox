@@ -17,8 +17,8 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
                       int pointer_mode, Cursor cursor);
 void ungrab_button(guint button, guint state, Window win);
 
-void grab_key(guint keycode, guint state, int keyboard_mode);
+void grab_key(guint keycode, guint state, Window win, int keyboard_mode);
 
-void ungrab_all_keys();
+void ungrab_all_keys(Window win);
 
 #endif

@@ -119,21 +119,21 @@ void ungrab_button(guint button, guint state, Window win)
         XUngrabButton(ob_display, button, state | mask_list[i], win);
 }
 
-void grab_key(guint keycode, guint state, int keyboard_mode)
+void grab_key(guint keycode, guint state, Window win, int keyboard_mode)
 {
     guint i;
 
     xerror_set_ignore(TRUE); /* can get BadAccess' from these */
     xerror_occured = FALSE;
     for (i = 0; i < MASK_LIST_SIZE; ++i)
-        XGrabKey(ob_display, keycode, state | mask_list[i], ob_root, FALSE,
+        XGrabKey(ob_display, keycode, state | mask_list[i], win, FALSE,
                  GrabModeSync, keyboard_mode);
     xerror_set_ignore(FALSE);
     if (xerror_occured)
         g_warning("failed to grab keycode %d modifiers %d", keycode, state);
 }
 
-void ungrab_all_keys()
+void ungrab_all_keys(Window win)
 {
-    XUngrabKey(ob_display, AnyKey, AnyModifier, ob_root);
+    XUngrabKey(ob_display, AnyKey, AnyModifier, win);
 }

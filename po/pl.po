@@ -1,0 +1,123 @@
+# Polish translation of Openbox 3.
+# Copyright (C) 2004 Mikael Magnusson
+# This file is distributed under the same license as the Openbox 3 package.
+# Madej <madej@afn.no-ip.org>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.2\n"
+"Report-Msgid-Bugs-To: mikachu@comhem.se\n"
+"POT-Creation-Date: 2004-09-07 20:52+0200\n"
+"PO-Revision-Date: 2004-09-07 21:17+0200\n"
+"Last-Translator: Madej <madej@afn.no-ip.org>\n"
+"Language-Team: NONE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/client_list_menu.c:94
+msgid "Go there..."
+msgstr "Przejdź..."
+
+#: openbox/client_list_menu.c:160
+msgid "Desktops"
+msgstr "Pulpit"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Przywróć"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Maksymalizuj"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Rozwiń"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Zwiń"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Wszystkie pulpity"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Warstwa"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Zawsze na wierzchu"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Normalnie"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Zawsze pod spodem"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "Wyślij na pulpit"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Menu klienta"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Minimalizuj"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Wyślij na wierzch"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Wyślij na spód"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Obramówka"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Przesuń"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Zmień rozmiar"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Zamknij"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id wymaga argumentu\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file wymaga argumentu\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Nie mogę utworzyć katalogu '%s': %s"
+
+#: render/font.c:50
+msgid "Couldn't initialize Xft."
+msgstr "Błąd przy inicjalizacji Xft."
+
+#: render/font.c:122 render/font.c:127
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Nie mogę załadować czcionki: %s\n"
+
+#: render/font.c:123
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Próbuję użyć czcionki: %s\n"

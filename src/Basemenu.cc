@@ -86,8 +86,7 @@ Basemenu::Basemenu(BScreen *scrn) {
 
   menu.frame_pixmap =
     menu.title_pixmap =
-    menu.hilite_pixmap =
-    menu.sel_pixmap = None;
+    menu.hilite_pixmap = None;
 
   menu.bevel_w = screen->getBevelWidth();
 
@@ -175,9 +174,6 @@ Basemenu::~Basemenu(void) {
 
   if (menu.hilite_pixmap)
     image_ctrl->removeImage(menu.hilite_pixmap);
-
-  if (menu.sel_pixmap)
-    image_ctrl->removeImage(menu.sel_pixmap);
 
   blackbox->removeMenuSearch(menu.title);
   XDestroyWindow(display, menu.title);
@@ -338,16 +334,6 @@ void Basemenu::update(void) {
   } else {
     menu.hilite_pixmap =
       image_ctrl->renderImage(menu.item_w, menu.item_h, *texture);
-  }
-  if (tmp) image_ctrl->removeImage(tmp);
-
-  tmp = menu.sel_pixmap;
-  if (texture->texture() == (BTexture::Flat | BTexture::Solid)) {
-    menu.sel_pixmap = None;
-  } else {
-    int hw = menu.item_h / 2;
-    menu.sel_pixmap =
-      image_ctrl->renderImage(hw, hw, *texture);
   }
   if (tmp) image_ctrl->removeImage(tmp);
 
@@ -618,13 +604,31 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
     else
       XFillRectangle(display, menu.frame, hipen.gc(),
                      hilite_x, hilite_y, hilite_w, hilite_h);
-  } else if (dosel && item->isSelected() &&
-             (menu.sel_pixmap != ParentRelative)) {
-    if (menu.sel_pixmap)
-      XCopyArea(display, menu.sel_pixmap, menu.frame, hipen.gc(), 0, 0,
-                half_w, half_w, sel_x, sel_y);
-    else
-      XFillRectangle(display, menu.frame, hipen.gc(), sel_x, sel_y, half_w, half_w);
+  }
+  
+  if (dosel && item->isSelected()) {
+      XPoint pts[6];
+
+      pts[0].x = sel_x + 0;
+      pts[0].y = sel_y + 2;
+      
+      pts[1].x = 0;
+      pts[1].y = 3;
+      
+      pts[2].x = 2;
+      pts[2].y = 3;
+      
+      pts[3].x = 5;
+      pts[3].y = -5;
+      
+      pts[4].x = 0;
+      pts[4].y = -3;
+      
+      pts[5].x = -5;
+      pts[5].y = 5;
+
+      XFillPolygon(display, menu.frame, pen.gc(), pts, 6, Complex,
+                   CoordModePrevious);
   }
 
   if (dotext && text) {

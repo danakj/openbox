@@ -53,7 +53,7 @@ private:
   int which_sub, which_press, which_sbl, alignment;
 
   struct _menu {
-    Pixmap frame_pixmap, title_pixmap, hilite_pixmap, sel_pixmap;
+    Pixmap frame_pixmap, title_pixmap, hilite_pixmap;
     Window window, frame, title;
 
     std::string label;

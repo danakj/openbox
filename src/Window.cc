@@ -1420,7 +1420,8 @@ void BlackboxWindow::getTransientInfo(void) {
   // Check for a circular transient state: this can lock up Blackbox
   // when it tries to find the non-transient window for a transient.
   BlackboxWindow *w = this;
-  while(w->client.transient_for) {
+  while(w->client.transient_for &&
+        w->client.transient_for != (BlackboxWindow *) ~0ul) {
     if(w->client.transient_for == this) {
       client.transient_for = (BlackboxWindow*) 0;
       break;
@@ -1428,7 +1429,8 @@ void BlackboxWindow::getTransientInfo(void) {
     w = w->client.transient_for;
   }
 
-  if (client.transient_for) {
+  if (client.transient_for &&
+      client.transient_for != (BlackboxWindow *) ~0ul) {
     // register ourselves with our new transient_for
     client.transient_for->client.transientList.push_back(this);
     flags.stuck = client.transient_for->flags.stuck;

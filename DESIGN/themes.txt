@@ -46,34 +46,21 @@
 </texture>
 
 <button_layout id="funlayout">
-  <enabled>
-    <pressed>
-      <focus style="fun" />
-      <unfocus style="fun" />
-    </pressed>
-    <unpressed>
-      <focus style="fun" />
-      <unfocus style="fun" />
-    </unpressed>
-  </enabled>
+  <pressed>
+    <focus style="fun" />
+    <unfocus style="fun" />
+  </pressed>
+  <unpressed>
+    <focus style="fun" />
+    <unfocus style="fun" />
+  </unpressed>
   <disabled>
-    <pressed>
-      <focus style="fun" />
-      <unfocus style="fun" />
-    </pressed>
-    <unpressed>
-      <focus style="fun" />
-      <unfocus style="fun" />
-    </unpressed>
+    <focus style="fun" />
+    <unfocus style="fun" />
   </disabled>
 </button>
 
 <surface_layout id="titlelayout">
-  <focus   style="blah-flat"   text="vroom" />
-  <unfocus style="blah-sunken" text="vroom" />
-</surface>
-
-<menu_layout id="titlelayout">
   <focus   style="blah-flat"   text="vroom" />
   <unfocus style="blah-sunken" text="vroom" />
 </surface>
@@ -86,8 +73,10 @@
   <button id="icon"     layout="funlayout" />
   <button id="shade"    layout="funlayout" />
 
-  <surface id="title"  layout="titlelayout" />
-  <surface id="handle" layout="titlelayout" />
+  <surface id="title"	  layout="titlelayout" />
+  <surface id="handle"    layout="titlelayout" />
+  <surface id="leftgrip"  layout="titlelayout" />
+  <surface id="rightgrip" layout="titlelayout" />
 </window>
 
 <menu>

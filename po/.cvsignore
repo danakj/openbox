@@ -11,3 +11,5 @@ quot.sed
 remove-potcdate.sin
 Makefile.in
 Makefile
+Makevars.template
+stamp-po

@@ -17,3 +17,5 @@ uintmax_t.m4
 ulonglong.m4
 Makefile
 Makefile.in
+nls.m4
+po.m4

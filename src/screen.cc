@@ -90,6 +90,9 @@ OBScreen::OBScreen(int screen)
   }
   _style.load(sconfig);
 
+  // set up notification of netwm support
+  setSupportedAtoms();
+
   // Set the netwm atoms for geomtery and viewport
   unsigned long geometry[] = { _info->width(),
                                _info->height() };
@@ -129,6 +132,7 @@ OBScreen::~OBScreen()
     unmanageWindow(clients.front());
 
   XDestroyWindow(otk::OBDisplay::display, _focuswindow);
+  XDestroyWindow(otk::OBDisplay::display, _supportwindow);
 
   delete _image_control;
 }
@@ -261,6 +265,108 @@ void OBScreen::calcArea()
     // XXX: re-maximize windows
 
   setWorkArea();
+}
+
+
+void OBScreen::setSupportedAtoms()
+{
+  // create the netwm support window
+  _supportwindow = XCreateSimpleWindow(otk::OBDisplay::display,
+                                       _info->rootWindow(),
+                                       0, 0, 1, 1, 0, 0, 0);
+  assert(_supportwindow != None);
+
+  // set supporting window
+  Openbox::instance->property()->set(_info->rootWindow(),
+                                     otk::OBProperty::net_supporting_wm_check,
+                                     otk::OBProperty::Atom_Window,
+                                     _supportwindow);
+
+  //set properties on the supporting window
+  Openbox::instance->property()->set(_supportwindow,
+                                     otk::OBProperty::net_wm_name,
+                                     otk::OBProperty::utf8,
+                                     "Openbox");
+  Openbox::instance->property()->set(_supportwindow,
+                                     otk::OBProperty::net_supporting_wm_check,
+                                     otk::OBProperty::Atom_Window,
+                                     _supportwindow);
+
+  
+  Atom supported[] = {
+/*
+      otk::OBProperty::net_current_desktop,
+      otk::OBProperty::net_number_of_desktops,
+*/
+      otk::OBProperty::net_desktop_geometry,
+      otk::OBProperty::net_desktop_viewport,
+      otk::OBProperty::net_active_window,
+      otk::OBProperty::net_workarea,
+      otk::OBProperty::net_client_list,
+      otk::OBProperty::net_client_list_stacking,
+/*
+      otk::OBProperty::net_desktop_names,
+*/
+      otk::OBProperty::net_close_window,
+      otk::OBProperty::net_wm_name,
+      otk::OBProperty::net_wm_visible_name,
+      otk::OBProperty::net_wm_icon_name,
+      otk::OBProperty::net_wm_visible_icon_name,
+/*
+      otk::OBProperty::net_wm_desktop,
+*/
+/*
+      otk::OBProperty::net_wm_strut,
+*/
+      otk::OBProperty::net_wm_window_type,
+      otk::OBProperty::net_wm_window_type_desktop,
+      otk::OBProperty::net_wm_window_type_dock,
+      otk::OBProperty::net_wm_window_type_toolbar,
+      otk::OBProperty::net_wm_window_type_menu,
+      otk::OBProperty::net_wm_window_type_utility,
+      otk::OBProperty::net_wm_window_type_splash,
+      otk::OBProperty::net_wm_window_type_dialog,
+      otk::OBProperty::net_wm_window_type_normal,
+/*
+      otk::OBProperty::net_wm_moveresize,
+      otk::OBProperty::net_wm_moveresize_size_topleft,
+      otk::OBProperty::net_wm_moveresize_size_topright,
+      otk::OBProperty::net_wm_moveresize_size_bottomleft,
+      otk::OBProperty::net_wm_moveresize_size_bottomright,
+      otk::OBProperty::net_wm_moveresize_move,
+*/
+/*
+      otk::OBProperty::net_wm_allowed_actions,
+      otk::OBProperty::net_wm_action_move,
+      otk::OBProperty::net_wm_action_resize,
+      otk::OBProperty::net_wm_action_shade,
+      otk::OBProperty::net_wm_action_maximize_horz,
+      otk::OBProperty::net_wm_action_maximize_vert,
+      otk::OBProperty::net_wm_action_change_desktop,
+      otk::OBProperty::net_wm_action_close,
+*/
+      otk::OBProperty::net_wm_state,
+      otk::OBProperty::net_wm_state_modal,
+      otk::OBProperty::net_wm_state_maximized_vert,
+      otk::OBProperty::net_wm_state_maximized_horz,
+      otk::OBProperty::net_wm_state_shaded,
+      otk::OBProperty::net_wm_state_skip_taskbar,
+      otk::OBProperty::net_wm_state_skip_pager,
+      otk::OBProperty::net_wm_state_hidden,
+      otk::OBProperty::net_wm_state_fullscreen,
+      otk::OBProperty::net_wm_state_above,
+      otk::OBProperty::net_wm_state_below,
+    };
+  const int num_supported = sizeof(supported)/sizeof(Atom);
+
+  // convert to the atom values
+  for (int i = 0; i < num_supported; ++i)
+    supported[i] = Openbox::instance->property()->atom(supported[i]);
+  
+  Openbox::instance->property()->set(_info->rootWindow(),
+                                     otk::OBProperty::net_supported,
+                                     otk::OBProperty::Atom_Atom,
+                                     supported, num_supported);
 }
 
 

@@ -1237,9 +1237,9 @@ const Icon *Client::icon(const otk::Size &s) const
       li = i;
     }
   }
-  if (smallest == 0xffffffff) // didnt find one bigger than us...
-    return &_icons[li];
-  return &_icons[si];
+  if (largest == 0) // didnt find one smaller than the requested size
+    return &_icons[si];
+  return &_icons[li];
 }
 
 void Client::move(int x, int y)

@@ -9,11 +9,6 @@
 #include "kernel/geom.h"
 
 typedef enum {
-    Surface_Planar,
-    Surface_Nonplanar
-} SurfaceType;
-
-typedef enum {
     Flat,
     Raised,
     Sunken
@@ -45,7 +40,7 @@ typedef enum {
 
 struct Appearance;
 
-typedef struct PlanarSurface {
+typedef struct Surface {
     SurfaceColorType grad;
     ReliefType relief;
     BevelType bevel;
@@ -60,21 +55,6 @@ typedef struct PlanarSurface {
     int parentx;
     int parenty;
     pixel32 *pixel_data;
-} PlanarSurface;
-
-typedef struct NonplanarSurface {
-    int poo;
-} NonplanarSurface;
-
-typedef union {
-    PlanarSurface planar;
-    NonplanarSurface nonplanar;
-} SurfaceData;
-
-typedef struct Surface {
-    SurfaceType type;
-    SurfaceColorType colortype;
-    SurfaceData data;
 } Surface;
 
 typedef struct {
@@ -153,7 +133,7 @@ void init_appearance(Appearance *l);
 void x_paint(Window win, Appearance *l);
 void gl_paint(Window win, Appearance *l);
 void render_shutdown(void);
-Appearance *appearance_new(SurfaceType type, int numtex);
+Appearance *appearance_new(int numtex);
 Appearance *appearance_copy(Appearance *a);
 void appearance_free(Appearance *a);
 void truecolor_startup(void);

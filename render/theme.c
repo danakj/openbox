@@ -113,12 +113,12 @@ void theme_startup()
     theme_shade_set_mask = theme_shade_unset_mask = NULL;
     theme_iconify_mask = theme_close_mask = NULL;
 
-    theme_a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
-    theme_a_focused_pressed_max = appearance_new(Surface_Planar, 1);
-    theme_a_focused_pressed_set_max = appearance_new(Surface_Planar, 1);
-    theme_a_unfocused_unpressed_max = appearance_new(Surface_Planar, 1);
-    theme_a_unfocused_pressed_max = appearance_new(Surface_Planar, 1);
-    theme_a_unfocused_pressed_set_max = appearance_new(Surface_Planar, 1);
+    theme_a_focused_unpressed_max = appearance_new(1);
+    theme_a_focused_pressed_max = appearance_new(1);
+    theme_a_focused_pressed_set_max = appearance_new(1);
+    theme_a_unfocused_unpressed_max = appearance_new(1);
+    theme_a_unfocused_pressed_max = appearance_new(1);
+    theme_a_unfocused_pressed_set_max = appearance_new(1);
     theme_a_focused_unpressed_close = NULL;
     theme_a_focused_pressed_close = NULL;
     theme_a_unfocused_unpressed_close = NULL;
@@ -139,26 +139,26 @@ void theme_startup()
     theme_a_focused_pressed_iconify = NULL;
     theme_a_unfocused_unpressed_iconify = NULL;
     theme_a_unfocused_pressed_iconify = NULL;
-    theme_a_focused_grip = appearance_new(Surface_Planar, 0);
-    theme_a_unfocused_grip = appearance_new(Surface_Planar, 0);
-    theme_a_focused_title = appearance_new(Surface_Planar, 0);
-    theme_a_unfocused_title = appearance_new(Surface_Planar, 0);
-    theme_a_focused_label = appearance_new(Surface_Planar, 1);
-    theme_a_unfocused_label = appearance_new(Surface_Planar, 1);
-    theme_a_icon = appearance_new(Surface_Planar, 1);
-    theme_a_focused_handle = appearance_new(Surface_Planar, 0);
-    theme_a_unfocused_handle = appearance_new(Surface_Planar, 0);
-    theme_a_menu = appearance_new(Surface_Planar, 0);
-    theme_a_menu_title = appearance_new(Surface_Planar, 1);
-    theme_a_menu_item = appearance_new(Surface_Planar, 1);
-    theme_a_menu_disabled = appearance_new(Surface_Planar, 1);
-    theme_a_menu_hilite = appearance_new(Surface_Planar, 1);
+    theme_a_focused_grip = appearance_new(0);
+    theme_a_unfocused_grip = appearance_new(0);
+    theme_a_focused_title = appearance_new(0);
+    theme_a_unfocused_title = appearance_new(0);
+    theme_a_focused_label = appearance_new(1);
+    theme_a_unfocused_label = appearance_new(1);
+    theme_a_icon = appearance_new(1);
+    theme_a_focused_handle = appearance_new(0);
+    theme_a_unfocused_handle = appearance_new(0);
+    theme_a_menu = appearance_new(0);
+    theme_a_menu_title = appearance_new(1);
+    theme_a_menu_item = appearance_new(1);
+    theme_a_menu_disabled = appearance_new(1);
+    theme_a_menu_hilite = appearance_new(1);
 
-    theme_app_hilite_bg = appearance_new(Surface_Planar, 0);
-    theme_app_unhilite_bg = appearance_new(Surface_Planar, 0);
-    theme_app_hilite_label = appearance_new(Surface_Planar, 1);
-    theme_app_unhilite_label = appearance_new(Surface_Planar, 1);
-    theme_app_icon = appearance_new(Surface_Planar, 1);
+    theme_app_hilite_bg = appearance_new(0);
+    theme_app_unhilite_bg = appearance_new(0);
+    theme_app_hilite_label = appearance_new(1);
+    theme_app_unhilite_label = appearance_new(1);
+    theme_app_icon = appearance_new(1);
 
 }
 
@@ -455,19 +455,19 @@ static gboolean read_appearance(XrmDatabase db, char *rname, Appearance *value)
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {
 	parse_appearance(retvalue.addr,
-			 &value->surface.data.planar.grad,
-			 &value->surface.data.planar.relief,
-			 &value->surface.data.planar.bevel,
-			 &value->surface.data.planar.interlaced,
-			 &value->surface.data.planar.border);
-	if (!read_color(db, cname, &value->surface.data.planar.primary))
-	    value->surface.data.planar.primary = color_new(0, 0, 0);
-	if (!read_color(db, ctoname, &value->surface.data.planar.secondary))
-	    value->surface.data.planar.secondary = color_new(0, 0, 0);
-	if (value->surface.data.planar.border)
+			 &value->surface.grad,
+			 &value->surface.relief,
+			 &value->surface.bevel,
+			 &value->surface.interlaced,
+			 &value->surface.border);
+	if (!read_color(db, cname, &value->surface.primary))
+	    value->surface.primary = color_new(0, 0, 0);
+	if (!read_color(db, ctoname, &value->surface.secondary))
+	    value->surface.secondary = color_new(0, 0, 0);
+	if (value->surface.border)
 	    if (!read_color(db, bcname,
-			    &value->surface.data.planar.border_color))
-		value->surface.data.planar.border_color = color_new(0, 0, 0);
+			    &value->surface.border_color))
+		value->surface.border_color = color_new(0, 0, 0);
 	ret = TRUE;
     }
 
@@ -480,13 +480,13 @@ static gboolean read_appearance(XrmDatabase db, char *rname, Appearance *value)
 
 static void set_default_appearance(Appearance *a)
 {
-    a->surface.data.planar.grad = Background_Solid;
-    a->surface.data.planar.relief = Flat;
-    a->surface.data.planar.bevel = Bevel1;
-    a->surface.data.planar.interlaced = FALSE;
-    a->surface.data.planar.border = FALSE;
-    a->surface.data.planar.primary = color_new(0, 0, 0);
-    a->surface.data.planar.secondary = color_new(0, 0, 0);
+    a->surface.grad = Background_Solid;
+    a->surface.relief = Flat;
+    a->surface.bevel = Bevel1;
+    a->surface.interlaced = FALSE;
+    a->surface.border = FALSE;
+    a->surface.primary = color_new(0, 0, 0);
+    a->surface.secondary = color_new(0, 0, 0);
 }
 
 char *theme_load(char *theme)
@@ -515,7 +515,7 @@ char *theme_load(char *theme)
     }
 
     /* load the font stuff */
-    font_str = "arial-8:bold";
+    font_str = "arial:bold:pixelsize=10:minsize";
 
     theme_winfont_shadow = FALSE;
     if (read_string(db, "window.xft.flags", &str)) {
@@ -810,7 +810,7 @@ char *theme_load(char *theme)
     theme_a_focused_pressed_set_max =
         appearance_copy(theme_a_focused_pressed_max);
 
-    theme_a_icon->surface.data.planar.grad = Background_ParentRelative;
+    theme_a_icon->surface.grad = Background_ParentRelative;
 
     /* set up the textures */
     theme_a_focused_label->texture[0].type = 
@@ -861,10 +861,9 @@ char *theme_load(char *theme)
         theme_mtitlefont_shadow_tint;
     theme_a_menu_title->texture[0].data.text.color = theme_menu_title_color;
 
-    theme_a_menu_item->surface.data.planar.grad = 
-        theme_a_menu_disabled->surface.data.planar.grad =
-        theme_app_icon->surface.data.planar.grad =
-        Background_ParentRelative;
+    theme_a_menu_item->surface.grad = 
+        theme_a_menu_disabled->surface.grad =
+        theme_app_icon->surface.grad = Background_ParentRelative;
 
     theme_a_menu_item->texture[0].type =
         theme_a_menu_disabled->texture[0].type = 

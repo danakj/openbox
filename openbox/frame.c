@@ -310,7 +310,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
                 self->bwidth;
             XMapWindow(ob_display, self->handle);
 
-            if (theme_a_focused_grip->surface.data.planar.grad ==
+            if (theme_a_focused_grip->surface.grad ==
                 Background_ParentRelative)
                 RECT_SET(self->a_focused_handle->area, 0, 0,
                          self->width, theme_handle_height);
@@ -319,7 +319,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
                          theme_grip_width + self->bwidth, 0,
                          self->width - (theme_grip_width + self->bwidth) * 2,
                          theme_handle_height);
-            if (theme_a_unfocused_grip->surface.data.planar.grad ==
+            if (theme_a_unfocused_grip->surface.grad ==
                 Background_ParentRelative)
                 RECT_SET(self->a_unfocused_handle->area, 0, 0,
                          self->width, theme_handle_height);

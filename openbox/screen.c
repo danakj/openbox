@@ -336,7 +336,9 @@ void screen_set_desktop(guint num)
     /* focus the last focused window on the desktop, and ignore enter events
        from the switch so it doesnt mess with the focus */
     while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+    g_message("switch fallback");
     focus_fallback(Fallback_Desktop);
+    g_message("/switch fallback");
 
     dispatch_ob(Event_Ob_Desktop, num, old);
 }

@@ -133,9 +133,9 @@ void menu_entry_render(MenuEntry *self)
 
     XMoveResizeWindow(ob_display, self->item, 0, self->y,
                       menu->size.width, menu->item_h);
-    a->surface.data.planar.parent = menu->a_items;
-    a->surface.data.planar.parentx = 0;
-    a->surface.data.planar.parenty = self->y;
+    a->surface.parent = menu->a_items;
+    a->surface.parentx = 0;
+    a->surface.parenty = self->y;
 
     paint(self->item, a);
 }

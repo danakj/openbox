@@ -272,8 +272,6 @@ void x_paint(Window win, Appearance *l)
 
     if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
 
-    g_assert(l->surface.type == Surface_Planar);
-
     oldp = l->pixmap; /* save to free after changing the visible pixmap */
     l->pixmap = XCreatePixmap(ob_display, ob_root, x+w, y+h, render_depth);
     g_assert(l->pixmap != None);
@@ -284,29 +282,29 @@ void x_paint(Window win, Appearance *l)
                                render_colormap);
     g_assert(l->xftdraw != NULL);
 
-    g_free(l->surface.data.planar.pixel_data);
-    l->surface.data.planar.pixel_data = g_new(pixel32, w * h);
+    g_free(l->surface.pixel_data);
+    l->surface.pixel_data = g_new(pixel32, w * h);
 
 
-    if (l->surface.data.planar.grad == Background_ParentRelative) {
-        sw = l->surface.data.planar.parent->area.width;
-        source = l->surface.data.planar.parent->surface.data.planar.pixel_data
-            + l->surface.data.planar.parentx
-            + sw * l->surface.data.planar.parenty;
-        dest = l->surface.data.planar.pixel_data;
+    if (l->surface.grad == Background_ParentRelative) {
+        sw = l->surface.parent->area.width;
+        source = l->surface.parent->surface.pixel_data
+            + l->surface.parentx
+            + sw * l->surface.parenty;
+        dest = l->surface.pixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(pixel32));
         }
     }
-    else if (l->surface.data.planar.grad == Background_Solid)
+    else if (l->surface.grad == Background_Solid)
         gradient_solid(l, x, y, w, h);
     else gradient_render(&l->surface, w, h);
 
     for (i = 0; i < l->textures; i++) {
         tarea = l->texture[i].position;
-        if (l->surface.data.planar.grad != Background_ParentRelative) {
-            if (l->surface.data.planar.relief != Flat) {
-                switch (l->surface.data.planar.bevel) {
+        if (l->surface.grad != Background_ParentRelative) {
+            if (l->surface.relief != Flat) {
+                switch (l->surface.bevel) {
                 case Bevel1:
                     tarea.x += 1; tarea.y += 1;
                     tarea.width -= 2; tarea.height -= 2;
@@ -316,7 +314,7 @@ void x_paint(Window win, Appearance *l)
                     tarea.width -= 4; tarea.height -= 4;
                     break;
                 }
-            } else if (l->surface.data.planar.border) {
+            } else if (l->surface.border) {
                 tarea.x += 1; tarea.y += 1;
                 tarea.width -= 2; tarea.height -= 2;
             }
@@ -326,8 +324,8 @@ void x_paint(Window win, Appearance *l)
         case Text:
             if (!transferred) {
                 transferred = 1;
-                if (l->surface.data.planar.grad != Background_Solid)
-                    pixel32_to_pixmap(l->surface.data.planar.pixel_data, 
+                if (l->surface.grad != Background_Solid)
+                    pixel32_to_pixmap(l->surface.pixel_data, 
                                       l->pixmap,x,y,w,h);
             }
             if (l->xftdraw == NULL) {
@@ -340,8 +338,8 @@ void x_paint(Window win, Appearance *l)
         case Bitmask:
             if (!transferred) {
                 transferred = 1;
-                if (l->surface.data.planar.grad != Background_Solid)
-                    pixel32_to_pixmap(l->surface.data.planar.pixel_data, 
+                if (l->surface.grad != Background_Solid)
+                    pixel32_to_pixmap(l->surface.pixel_data, 
                                       l->pixmap,x,y,w,h);
             }
             if (l->texture[i].data.mask.color->gc == None)
@@ -350,7 +348,7 @@ void x_paint(Window win, Appearance *l)
                       &tarea);
         break;
         case RGBA:
-            image_draw(l->surface.data.planar.pixel_data, 
+            image_draw(l->surface.pixel_data, 
                        &l->texture[i].data.rgba,
                        &tarea, &l->area);
         break;
@@ -359,8 +357,8 @@ void x_paint(Window win, Appearance *l)
 
     if (!transferred) {
         transferred = 1;
-        if (l->surface.data.planar.grad != Background_Solid)
-            pixel32_to_pixmap(l->surface.data.planar.pixel_data, l->pixmap
+        if (l->surface.grad != Background_Solid)
+            pixel32_to_pixmap(l->surface.pixel_data, l->pixmap
                               ,x,y,w,h);
     }
 
@@ -374,80 +372,72 @@ void render_shutdown(void)
 {
 }
 
-Appearance *appearance_new(SurfaceType type, int numtex)
+Appearance *appearance_new(int numtex)
 {
-  PlanarSurface *p;
+  Surface *p;
   Appearance *out;
 
   out = g_new(Appearance, 1);
-  out->surface.type = type;
   out->textures = numtex;
   out->xftdraw = NULL;
   if (numtex) out->texture = g_new0(Texture, numtex);
   else out->texture = NULL;
   out->pixmap = None;
 
-  switch (type) {
-  case Surface_Planar:
-    p = &out->surface.data.planar;
-    p->primary = NULL;
-    p->secondary = NULL;
-    p->border_color = NULL;
-    p->bevel_dark = NULL;
-    p->bevel_light = NULL;
-    p->pixel_data = NULL;
-    break;
-  }
+  p = &out->surface;
+  p->primary = NULL;
+  p->secondary = NULL;
+  p->border_color = NULL;
+  p->bevel_dark = NULL;
+  p->bevel_light = NULL;
+  p->pixel_data = NULL;
   return out;
 }
 
 Appearance *appearance_copy(Appearance *orig)
 {
-    PlanarSurface *spo, *spc;
+    Surface *spo, *spc;
     Appearance *copy = g_new(Appearance, 1);
-    copy->surface.type = orig->surface.type;
-    switch (orig->surface.type) {
-    case Surface_Planar:
-        spo = &(orig->surface.data.planar);
-        spc = &(copy->surface.data.planar);
-        spc->grad = spo->grad;
-        spc->relief = spo->relief;
-        spc->bevel = spo->bevel;
-        if (spo->primary != NULL)
-            spc->primary = color_new(spo->primary->r,
-                                     spo->primary->g, 
-                                     spo->primary->b);
-        else spc->primary = NULL;
 
-        if (spo->secondary != NULL)
-            spc->secondary = color_new(spo->secondary->r,
-                                       spo->secondary->g,
-                                       spo->secondary->b);
-        else spc->secondary = NULL;
+    spo = &(orig->surface);
+    spc = &(copy->surface);
+    spc->grad = spo->grad;
+    spc->relief = spo->relief;
+    spc->bevel = spo->bevel;
+    if (spo->primary != NULL)
+        spc->primary = color_new(spo->primary->r,
+                                 spo->primary->g, 
+                                 spo->primary->b);
+    else spc->primary = NULL;
 
-        if (spo->border_color != NULL)
-            spc->border_color = color_new(spo->border_color->r,
-                                          spo->border_color->g,
-                                          spo->border_color->b);
-        else spc->border_color = NULL;
+    if (spo->secondary != NULL)
+        spc->secondary = color_new(spo->secondary->r,
+                                   spo->secondary->g,
+                                   spo->secondary->b);
+    else spc->secondary = NULL;
 
-        if (spo->bevel_dark != NULL)
-            spc->bevel_dark = color_new(spo->bevel_dark->r,
-                                        spo->bevel_dark->g,
-                                        spo->bevel_dark->b);
-        else spc->bevel_dark = NULL;
+    if (spo->border_color != NULL)
+        spc->border_color = color_new(spo->border_color->r,
+                                      spo->border_color->g,
+                                      spo->border_color->b);
+    else spc->border_color = NULL;
 
-        if (spo->bevel_light != NULL)
-            spc->bevel_light = color_new(spo->bevel_light->r,
-                                         spo->bevel_light->g,
-                                         spo->bevel_light->b);
-        else spc->bevel_light = NULL;
+    if (spo->bevel_dark != NULL)
+        spc->bevel_dark = color_new(spo->bevel_dark->r,
+                                    spo->bevel_dark->g,
+                                    spo->bevel_dark->b);
+    else spc->bevel_dark = NULL;
 
-        spc->interlaced = spo->interlaced;
-        spc->border = spo->border;
-        spc->pixel_data = NULL;
-    break;
-    }
+    if (spo->bevel_light != NULL)
+        spc->bevel_light = color_new(spo->bevel_light->r,
+                                     spo->bevel_light->g,
+                                     spo->bevel_light->b);
+    else spc->bevel_light = NULL;
+
+    spc->interlaced = spo->interlaced;
+    spc->border = spo->border;
+    spc->pixel_data = NULL;
+
     copy->textures = orig->textures;
     copy->texture = g_memdup(orig->texture, orig->textures * sizeof(Texture));
     copy->pixmap = None;
@@ -458,20 +448,19 @@ Appearance *appearance_copy(Appearance *orig)
 void appearance_free(Appearance *a)
 {
     if (a) {
-        PlanarSurface *p;
+        Surface *p;
         if (a->pixmap != None) XFreePixmap(ob_display, a->pixmap);
         if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
         if (a->textures)
             g_free(a->texture);
-        if (a->surface.type == Surface_Planar) {
-            p = &a->surface.data.planar;
-            color_free(p->primary);
-            color_free(p->secondary);
-            color_free(p->border_color);
-            color_free(p->bevel_dark);
-            color_free(p->bevel_light);
-            g_free(p->pixel_data);
-        }
+        p = &a->surface;
+        color_free(p->primary);
+        color_free(p->secondary);
+        color_free(p->border_color);
+        color_free(p->bevel_dark);
+        color_free(p->bevel_light);
+        g_free(p->pixel_data);
+
         g_free(a);
     }
 }
@@ -504,46 +493,42 @@ void appearance_minsize(Appearance *l, int *w, int *h)
     int m;
     *w = *h = 1;
 
-    switch (l->surface.type) {
-    case Surface_Planar:
-        if (l->surface.data.planar.relief != Flat) {
-            switch (l->surface.data.planar.bevel) {
-            case Bevel1:
-                *w = *h = 2;
-                break;
-            case Bevel2:
-                *w = *h = 4;
-                break;
-            }
-        } else if (l->surface.data.planar.border)
+    if (l->surface.relief != Flat) {
+        switch (l->surface.bevel) {
+        case Bevel1:
             *w = *h = 2;
-
-        for (i = 0; i < l->textures; ++i) {
-            switch (l->texture[i].type) {
-            case Bitmask:
-                *w += l->texture[i].data.mask.mask->w;
-                *h += l->texture[i].data.mask.mask->h;
-                break;
-            case Text:
-                m = font_measure_string(l->texture[i].data.text.font,
-                                        l->texture[i].data.text.string,
-                                        l->texture[i].data.text.shadow,
-                                        l->texture[i].data.text.offset);
-                *w += m;
-                m = font_height(l->texture[i].data.text.font,
-                                l->texture[i].data.text.shadow,
-                                l->texture[i].data.text.offset);
-                *h += m;
-                break;
-            case RGBA:
-                *w += l->texture[i].data.rgba.width;
-                *h += l->texture[i].data.rgba.height;
-                break;
-            case NoTexture:
-                break;
-            }
+            break;
+        case Bevel2:
+            *w = *h = 4;
+            break;
         }
-        break;
+    } else if (l->surface.border)
+        *w = *h = 2;
+
+    for (i = 0; i < l->textures; ++i) {
+        switch (l->texture[i].type) {
+        case Bitmask:
+            *w += l->texture[i].data.mask.mask->w;
+            *h += l->texture[i].data.mask.mask->h;
+            break;
+        case Text:
+            m = font_measure_string(l->texture[i].data.text.font,
+                                    l->texture[i].data.text.string,
+                                    l->texture[i].data.text.shadow,
+                                    l->texture[i].data.text.offset);
+            *w += m;
+            m = font_height(l->texture[i].data.text.font,
+                            l->texture[i].data.text.shadow,
+                            l->texture[i].data.text.offset);
+            *h += m;
+            break;
+        case RGBA:
+            *w += l->texture[i].data.rgba.width;
+            *h += l->texture[i].data.rgba.height;
+            break;
+        case NoTexture:
+            break;
+        }
     }
 }
 
@@ -636,7 +621,7 @@ g_assert(err != 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-    if (l->surface.data.planar.grad == Background_ParentRelative) {
+    if (l->surface.grad == Background_ParentRelative) {
         printf("crap\n");
     } else
         render_gl_gradient(&l->surface, absx+x, absy+y, absw, absh);

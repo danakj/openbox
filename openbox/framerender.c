@@ -79,33 +79,33 @@ void framerender_frame(Frame *self)
         paint(self->title, t);
 
         /* set parents for any parent relative guys */
-        l->surface.data.planar.parent = t;
-        l->surface.data.planar.parentx = self->label_x;
-        l->surface.data.planar.parenty = theme_bevel;
+        l->surface.parent = t;
+        l->surface.parentx = self->label_x;
+        l->surface.parenty = theme_bevel;
 
-        m->surface.data.planar.parent = t;
-        m->surface.data.planar.parentx = self->max_x;
-        m->surface.data.planar.parenty = theme_bevel + 1;
+        m->surface.parent = t;
+        m->surface.parentx = self->max_x;
+        m->surface.parenty = theme_bevel + 1;
 
-        n->surface.data.planar.parent = t;
-        n->surface.data.planar.parentx = self->icon_x;
-        n->surface.data.planar.parenty = theme_bevel;
+        n->surface.parent = t;
+        n->surface.parentx = self->icon_x;
+        n->surface.parenty = theme_bevel;
 
-        i->surface.data.planar.parent = t;
-        i->surface.data.planar.parentx = self->iconify_x;
-        i->surface.data.planar.parenty = theme_bevel + 1;
+        i->surface.parent = t;
+        i->surface.parentx = self->iconify_x;
+        i->surface.parenty = theme_bevel + 1;
 
-        d->surface.data.planar.parent = t;
-        d->surface.data.planar.parentx = self->desk_x;
-        d->surface.data.planar.parenty = theme_bevel + 1;
+        d->surface.parent = t;
+        d->surface.parentx = self->desk_x;
+        d->surface.parenty = theme_bevel + 1;
 
-        s->surface.data.planar.parent = t;
-        s->surface.data.planar.parentx = self->shade_x;
-        s->surface.data.planar.parenty = theme_bevel + 1;
+        s->surface.parent = t;
+        s->surface.parentx = self->shade_x;
+        s->surface.parenty = theme_bevel + 1;
 
-        c->surface.data.planar.parent = t;
-        c->surface.data.planar.parentx = self->close_x;
-        c->surface.data.planar.parenty = theme_bevel + 1;
+        c->surface.parent = t;
+        c->surface.parentx = self->close_x;
+        c->surface.parenty = theme_bevel + 1;
 
         framerender_label(self, l);
         framerender_max(self, m);
@@ -124,19 +124,19 @@ void framerender_frame(Frame *self)
         g = (self->focused ?
              theme_a_focused_grip : theme_a_unfocused_grip);
 
-        if (g->surface.data.planar.grad == Background_ParentRelative) {
-            g->surface.data.planar.parent = h;
+        if (g->surface.grad == Background_ParentRelative) {
+            g->surface.parent = h;
             paint(self->handle, h);
         } else
             paint(self->handle, h);
 
-        g->surface.data.planar.parentx = 0;
-        g->surface.data.planar.parenty = 0;
+        g->surface.parentx = 0;
+        g->surface.parenty = 0;
 
         paint(self->lgrip, g);
 
-        g->surface.data.planar.parentx = self->width - theme_grip_width;
-        g->surface.data.planar.parenty = 0;
+        g->surface.parentx = self->width - theme_grip_width;
+        g->surface.parenty = 0;
 
         paint(self->rgrip, g);
     }

@@ -195,10 +195,10 @@ void popup_show(Popup *self, char *text, Icon *icon)
     RECT_SET(self->a_text->area, 0, 0, textw, texth); 
     RECT_SET(self->a_text->texture[0].position, theme_bevel, theme_bevel,
              textw - theme_bevel * 2, texth - theme_bevel * 2);
-    self->a_text->surface.data.planar.parent = self->a_bg;
-    self->a_text->surface.data.planar.parentx = iconw +
+    self->a_text->surface.parent = self->a_bg;
+    self->a_text->surface.parentx = iconw +
         theme_bevel * (self->hasicon ? 2 : 1);
-    self->a_text->surface.data.planar.parenty = theme_bevel;
+    self->a_text->surface.parenty = theme_bevel;
     XMoveResizeWindow(ob_display, self->text,
                       iconw + theme_bevel * (self->hasicon ? 2 : 1),
                       theme_bevel, textw, texth);
@@ -207,9 +207,9 @@ void popup_show(Popup *self, char *text, Icon *icon)
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
         RECT_SET(self->a_icon->area, 0, 0, iconw, texth);
         RECT_SET(self->a_icon->texture[0].position, 0, 0, iconw, texth);
-        self->a_icon->surface.data.planar.parent = self->a_bg;
-        self->a_icon->surface.data.planar.parentx = theme_bevel;
-        self->a_icon->surface.data.planar.parenty = theme_bevel;
+        self->a_icon->surface.parent = self->a_bg;
+        self->a_icon->surface.parentx = theme_bevel;
+        self->a_icon->surface.parenty = theme_bevel;
         XMoveResizeWindow(ob_display, self->icon,
                           theme_bevel, theme_bevel, iconw, texth);
     }

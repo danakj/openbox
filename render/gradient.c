@@ -9,12 +9,12 @@
 
 void gradient_render(Surface *sf, int w, int h)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 current;
     unsigned int r,g,b;
     int off, x;
 
-    switch (sf->data.planar.grad) {
+    switch (sf->grad) {
     case Background_Solid: /* already handled */
         return;
     case Background_Vertical:
@@ -43,10 +43,10 @@ void gradient_render(Surface *sf, int w, int h)
         return;
     }
   
-    if (sf->data.planar.relief == Flat && sf->data.planar.border) {
-        r = sf->data.planar.border_color->r;
-        g = sf->data.planar.border_color->g;
-        b = sf->data.planar.border_color->b;
+    if (sf->relief == Flat && sf->border) {
+        r = sf->border_color->r;
+        g = sf->border_color->g;
+        b = sf->border_color->b;
         current = (r << default_red_offset)
             + (g << default_green_offset)
             + (b << default_blue_offset);
@@ -60,27 +60,27 @@ void gradient_render(Surface *sf, int w, int h)
         }
     }
 
-    if (sf->data.planar.relief != Flat) {
-        if (sf->data.planar.bevel == Bevel1) {
+    if (sf->relief != Flat) {
+        if (sf->bevel == Bevel1) {
             for (off = 1, x = 1; x < w - 1; ++x, off++)
                 highlight(data + off,
                           data + off + (h-1) * w,
-                          sf->data.planar.relief==Raised);
+                          sf->relief==Raised);
             for (off = 0, x = 0; x < h; ++x, off++)
                 highlight(data + off * w,
                           data + off * w + w - 1,
-                          sf->data.planar.relief==Raised);
+                          sf->relief==Raised);
         }
 
-        if (sf->data.planar.bevel == Bevel2) {
+        if (sf->bevel == Bevel2) {
             for (off = 2, x = 2; x < w - 2; ++x, off++)
                 highlight(data + off + w,
                           data + off + (h-2) * w,
-                          sf->data.planar.relief==Raised);
+                          sf->relief==Raised);
             for (off = 1, x = 1; x < h-1; ++x, off++)
                 highlight(data + off * w + 1,
                           data + off * w + w - 2,
-                          sf->data.planar.relief==Raised);
+                          sf->relief==Raised);
         }
     }
 }
@@ -89,25 +89,25 @@ void gradient_render(Surface *sf, int w, int h)
 
 void gradient_vertical(Surface *sf, int w, int h)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 current;
     float dr, dg, db;
     unsigned int r,g,b;
     int x, y;
 
-    dr = (float)(sf->data.planar.secondary->r - sf->data.planar.primary->r);
+    dr = (float)(sf->secondary->r - sf->primary->r);
     dr/= (float)h;
 
-    dg = (float)(sf->data.planar.secondary->g - sf->data.planar.primary->g);
+    dg = (float)(sf->secondary->g - sf->primary->g);
     dg/= (float)h;
 
-    db = (float)(sf->data.planar.secondary->b - sf->data.planar.primary->b);
+    db = (float)(sf->secondary->b - sf->primary->b);
     db/= (float)h;
 
     for (y = 0; y < h; ++y) {
-        r = sf->data.planar.primary->r + (int)(dr * y);
-        g = sf->data.planar.primary->g + (int)(dg * y);
-        b = sf->data.planar.primary->b + (int)(db * y);
+        r = sf->primary->r + (int)(dr * y);
+        g = sf->primary->g + (int)(dg * y);
+        b = sf->primary->b + (int)(db * y);
         current = (r << default_red_offset)
             + (g << default_green_offset)
             + (b << default_blue_offset);
@@ -118,25 +118,25 @@ void gradient_vertical(Surface *sf, int w, int h)
 
 void gradient_horizontal(Surface *sf, int w, int h)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 current;
     float dr, dg, db;
     unsigned int r,g,b;
     int x, y;
 
-    dr = (float)(sf->data.planar.secondary->r - sf->data.planar.primary->r);
+    dr = (float)(sf->secondary->r - sf->primary->r);
     dr/= (float)w;
 
-    dg = (float)(sf->data.planar.secondary->g - sf->data.planar.primary->g);
+    dg = (float)(sf->secondary->g - sf->primary->g);
     dg/= (float)w;
 
-    db = (float)(sf->data.planar.secondary->b - sf->data.planar.primary->b);
+    db = (float)(sf->secondary->b - sf->primary->b);
     db/= (float)w;
 
     for (x = 0; x < w; ++x, ++data) {
-        r = sf->data.planar.primary->r + (int)(dr * x);
-        g = sf->data.planar.primary->g + (int)(dg * x);
-        b = sf->data.planar.primary->b + (int)(db * x);
+        r = sf->primary->r + (int)(dr * x);
+        g = sf->primary->g + (int)(dg * x);
+        b = sf->primary->b + (int)(db * x);
         current = (r << default_red_offset)
             + (g << default_green_offset)
             + (b << default_blue_offset);
@@ -147,33 +147,33 @@ void gradient_horizontal(Surface *sf, int w, int h)
 
 void gradient_diagonal(Surface *sf, int w, int h)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y;
 
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->data.planar.secondary->r -
-                      sf->data.planar.primary->r);
+        drx = (float)(sf->secondary->r -
+                      sf->primary->r);
         dry = drx/(float)h;
         drx/= (float)w;
 
-        dgx = (float)(sf->data.planar.secondary->g -
-                      sf->data.planar.primary->g);
+        dgx = (float)(sf->secondary->g -
+                      sf->primary->g);
         dgy = dgx/(float)h;
         dgx/= (float)w;
 
-        dbx = (float)(sf->data.planar.secondary->b -
-                      sf->data.planar.primary->b);
+        dbx = (float)(sf->secondary->b -
+                      sf->primary->b);
         dby = dbx/(float)h;
         dbx/= (float)w;
         for (x = 0; x < w; ++x, ++data) {
-            r = sf->data.planar.primary->r +
+            r = sf->primary->r +
                 ((int)(drx * x) + (int)(dry * y))/2;
-            g = sf->data.planar.primary->g +
+            g = sf->primary->g +
                 ((int)(dgx * x) + (int)(dgy * y))/2;
-            b = sf->data.planar.primary->b +
+            b = sf->primary->b +
                 ((int)(dbx * x) + (int)(dby * y))/2;
             current = (r << default_red_offset)
                 + (g << default_green_offset)
@@ -185,33 +185,33 @@ void gradient_diagonal(Surface *sf, int w, int h)
 
 void gradient_crossdiagonal(Surface *sf, int w, int h)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y;
 
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->data.planar.secondary->r -
-                      sf->data.planar.primary->r);
+        drx = (float)(sf->secondary->r -
+                      sf->primary->r);
         dry = drx/(float)h;
         drx/= (float)w;
 
-        dgx = (float)(sf->data.planar.secondary->g -
-                      sf->data.planar.primary->g);
+        dgx = (float)(sf->secondary->g -
+                      sf->primary->g);
         dgy = dgx/(float)h;
         dgx/= (float)w;
 
-        dbx = (float)(sf->data.planar.secondary->b -
-                      sf->data.planar.primary->b);
+        dbx = (float)(sf->secondary->b -
+                      sf->primary->b);
         dby = dbx/(float)h;
         dbx/= (float)w;
         for (x = w; x > 0; --x, ++data) {
-            r = sf->data.planar.primary->r +
+            r = sf->primary->r +
                 ((int)(drx * (x-1)) + (int)(dry * y))/2;
-            g = sf->data.planar.primary->g +
+            g = sf->primary->g +
                 ((int)(dgx * (x-1)) + (int)(dgy * y))/2;
-            b = sf->data.planar.primary->b +
+            b = sf->primary->b +
                 ((int)(dbx * (x-1)) + (int)(dby * y))/2;
             current = (r << default_red_offset)
                 + (g << default_green_offset)
@@ -260,36 +260,36 @@ static void create_bevel_colors(Appearance *l)
     int r, g, b;
 
     /* light color */
-    r = l->surface.data.planar.primary->r;
+    r = l->surface.primary->r;
     r += r >> 1;
-    g = l->surface.data.planar.primary->g;
+    g = l->surface.primary->g;
     g += g >> 1;
-    b = l->surface.data.planar.primary->b;
+    b = l->surface.primary->b;
     b += b >> 1;
     if (r > 0xFF) r = 0xFF;
     if (g > 0xFF) g = 0xFF;
     if (b > 0xFF) b = 0xFF;
-    g_assert(!l->surface.data.planar.bevel_light);
-    l->surface.data.planar.bevel_light = color_new(r, g, b);
-    color_allocate_gc(l->surface.data.planar.bevel_light);
+    g_assert(!l->surface.bevel_light);
+    l->surface.bevel_light = color_new(r, g, b);
+    color_allocate_gc(l->surface.bevel_light);
 
     /* dark color */
-    r = l->surface.data.planar.primary->r;
+    r = l->surface.primary->r;
     r = (r >> 1) + (r >> 2);
-    g = l->surface.data.planar.primary->g;
+    g = l->surface.primary->g;
     g = (g >> 1) + (g >> 2);
-    b = l->surface.data.planar.primary->b;
+    b = l->surface.primary->b;
     b = (b >> 1) + (b >> 2);
-    g_assert(!l->surface.data.planar.bevel_dark);
-    l->surface.data.planar.bevel_dark = color_new(r, g, b);
-    color_allocate_gc(l->surface.data.planar.bevel_dark);
+    g_assert(!l->surface.bevel_dark);
+    l->surface.bevel_dark = color_new(r, g, b);
+    color_allocate_gc(l->surface.bevel_dark);
 }
 
 void gradient_solid(Appearance *l, int x, int y, int w, int h) 
 {
     pixel32 pix;
     int i, a, b;
-    PlanarSurface *sp = &l->surface.data.planar;
+    Surface *sp = &l->surface;
     int left = x, top = y, right = x + w - 1, bottom = y + h - 1;
 
     if (sp->primary->gc == None)
@@ -396,33 +396,33 @@ void gradient_solid(Appearance *l, int x, int y, int w, int h)
 
 void gradient_pyramid(Surface *sf, int inw, int inh)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 *end = data + inw*inh - 1;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->data.planar.secondary->r -
-                      sf->data.planar.primary->r);
+        drx = (float)(sf->secondary->r -
+                      sf->primary->r);
         dry = drx/(float)h;
         drx/= (float)w;
 
-        dgx = (float)(sf->data.planar.secondary->g -
-                      sf->data.planar.primary->g);
+        dgx = (float)(sf->secondary->g -
+                      sf->primary->g);
         dgy = dgx/(float)h;
         dgx/= (float)w;
 
-        dbx = (float)(sf->data.planar.secondary->b -
-                      sf->data.planar.primary->b);
+        dbx = (float)(sf->secondary->b -
+                      sf->primary->b);
         dby = dbx/(float)h;
         dbx/= (float)w;
         for (x = 0; x < w; ++x, data) {
-            r = sf->data.planar.primary->r +
+            r = sf->primary->r +
                 ((int)(drx * x) + (int)(dry * y))/2;
-            g = sf->data.planar.primary->g +
+            g = sf->primary->g +
                 ((int)(dgx * x) + (int)(dgy * y))/2;
-            b = sf->data.planar.primary->b +
+            b = sf->primary->b +
                 ((int)(dbx * x) + (int)(dby * y))/2;
             current = (r << default_red_offset)
                 + (g << default_green_offset)
@@ -439,7 +439,7 @@ void gradient_pyramid(Surface *sf, int inw, int inh)
 
 void gradient_rectangle(Surface *sf, int inw, int inh)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 *end = data + inw*inh - 1;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
@@ -448,27 +448,27 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
     int val;
 
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->data.planar.primary->r -
-                      sf->data.planar.secondary->r);
+        drx = (float)(sf->primary->r -
+                      sf->secondary->r);
         dry = drx/(float)h;
         drx/= (float)w;
 
-        dgx = (float)(sf->data.planar.primary->g -
-                      sf->data.planar.secondary->g);
+        dgx = (float)(sf->primary->g -
+                      sf->secondary->g);
         dgy = dgx/(float)h;
         dgx/= (float)w;
 
-        dbx = (float)(sf->data.planar.primary->b -
-                      sf->data.planar.secondary->b);
+        dbx = (float)(sf->primary->b -
+                      sf->secondary->b);
         dby = dbx/(float)h;
         dbx/= (float)w;
         for (x = 0; x < w; ++x, data) {
             if ((float)x/(float)w < (float)y/(float)h) val = (int)(drx * x);
             else val = (int)(dry * y);
 
-            r = sf->data.planar.secondary->r + val;
-            g = sf->data.planar.secondary->g + val;
-            b = sf->data.planar.secondary->b + val;
+            r = sf->secondary->r + val;
+            g = sf->secondary->g + val;
+            b = sf->secondary->b + val;
             current = (r << default_red_offset)
                 + (g << default_green_offset)
                 + (b << default_blue_offset);
@@ -484,7 +484,7 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
 
 void gradient_pipecross(Surface *sf, int inw, int inh)
 {
-    pixel32 *data = sf->data.planar.pixel_data;
+    pixel32 *data = sf->pixel_data;
     pixel32 *end = data + inw*inh - 1;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
@@ -493,27 +493,27 @@ void gradient_pipecross(Surface *sf, int inw, int inh)
     int val;
 
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->data.planar.secondary->r -
-                      sf->data.planar.primary->r);
+        drx = (float)(sf->secondary->r -
+                      sf->primary->r);
         dry = drx/(float)h;
         drx/= (float)w;
 
-        dgx = (float)(sf->data.planar.secondary->g -
-                      sf->data.planar.primary->g);
+        dgx = (float)(sf->secondary->g -
+                      sf->primary->g);
         dgy = dgx/(float)h;
         dgx/= (float)w;
 
-        dbx = (float)(sf->data.planar.secondary->b -
-                      sf->data.planar.primary->b);
+        dbx = (float)(sf->secondary->b -
+                      sf->primary->b);
         dby = dbx/(float)h;
         dbx/= (float)w;
         for (x = 0; x < w; ++x, data) {
             if ((float)x/(float)w > (float)y/(float)h) val = (int)(drx * x);
             else val = (int)(dry * y);
 
-            r = sf->data.planar.primary->r + val;
-            g = sf->data.planar.primary->g + val;
-            b = sf->data.planar.primary->b + val;
+            r = sf->primary->r + val;
+            g = sf->primary->g + val;
+            b = sf->primary->b + val;
             current = (r << default_red_offset)
                 + (g << default_green_offset)
                 + (b << default_blue_offset);
@@ -533,15 +533,15 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
     float sr, sg, sb;
     float ar, ag, ab;
 
-    pr = (float)sf->data.planar.primary->r/255.0;
-    pg = (float)sf->data.planar.primary->g/255.0;
-    pb = (float)sf->data.planar.primary->b/255.0;
-    if (sf->data.planar.secondary) {
-        sr = (float)sf->data.planar.secondary->r/255.0;
-        sg = (float)sf->data.planar.secondary->g/255.0;
-        sb = (float)sf->data.planar.secondary->b/255.0;
+    pr = (float)sf->primary->r/255.0;
+    pg = (float)sf->primary->g/255.0;
+    pb = (float)sf->primary->b/255.0;
+    if (sf->secondary) {
+        sr = (float)sf->secondary->r/255.0;
+        sg = (float)sf->secondary->g/255.0;
+        sb = (float)sf->secondary->b/255.0;
     }
-    switch (sf->data.planar.grad) {
+    switch (sf->grad) {
     case Background_Solid: /* already handled */
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);

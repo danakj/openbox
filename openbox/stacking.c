@@ -30,7 +30,7 @@ void stacking_set_list()
     } else
 	windows = NULL;
 
-    PROP_SET32A(ob_root, net_client_list_stacking, window, windows, size);
+    PROP_SETA32(ob_root, net_client_list_stacking, window, windows, size);
 
     if (windows)
 	g_free(windows);

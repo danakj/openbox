@@ -8,6 +8,7 @@
 #include "focus.h"
 #include "stacking.h"
 #include "dispatch.h"
+#include "openbox.h"
 #include "group.h"
 #include "config.h"
 
@@ -25,7 +26,7 @@ GList      *client_list      = NULL;
 GHashTable *client_map       = NULL;
 
 static Window *client_startup_stack_order = NULL;
-static gulong  client_startup_stack_size = 0;
+static guint  client_startup_stack_size = 0;
 
 static void client_get_all(Client *self);
 static void client_toggle_border(Client *self, gboolean show);
@@ -52,8 +53,8 @@ void client_startup()
 				  (GEqualFunc)map_key_comp);
 
     /* save the stacking order on startup! */
-    PROP_GET32U(ob_root, net_client_list_stacking, window,
-                client_startup_stack_order, client_startup_stack_size);
+    PROP_GETA32(ob_root, net_client_list_stacking, window,
+                &client_startup_stack_order, &client_startup_stack_size);
 
     client_set_list();
 }
@@ -78,7 +79,7 @@ void client_set_list()
     } else
 	windows = NULL;
 
-    PROP_SET32A(ob_root, net_client_list, window, windows, size);
+    PROP_SETA32(ob_root, net_client_list, window, windows, size);
 
     if (windows)
 	g_free(windows);
@@ -555,14 +556,14 @@ static void client_get_desktop(Client *self)
 
 static void client_get_state(Client *self)
 {
-    gulong *state;
-    gulong num;
+    Atom *state;
+    guint num;
   
     self->modal = self->shaded = self->max_horz = self->max_vert =
 	self->fullscreen = self->above = self->below = self->iconic =
 	self->skip_taskbar = self->skip_pager = FALSE;
 
-    if (PROP_GET32U(self->window, net_wm_state, atom, state, num)) {
+    if (PROP_GETA32(self->window, net_wm_state, atom, &state, &num)) {
 	gulong i;
 	for (i = 0; i < num; ++i) {
 	    if (state[i] == prop_atoms.net_wm_state_modal)
@@ -668,12 +669,13 @@ void client_update_transient_for(Client *self)
 
 static void client_get_mwm_hints(Client *self)
 {
-    unsigned long num;
-    unsigned long *hints;
+    guint num;
+    guint32 *hints;
 
     self->mwmhints.flags = 0; /* default to none */
 
-    if (PROP_GET32U(self->window, motif_wm_hints, motif_wm_hints, hints, num)) {
+    if (PROP_GETA32(self->window, motif_wm_hints, motif_wm_hints,
+                    &hints, &num)) {
 	if (num >= MWM_ELEMENTS) {
 	    self->mwmhints.flags = hints[0];
 	    self->mwmhints.functions = hints[1];
@@ -685,11 +687,12 @@ static void client_get_mwm_hints(Client *self)
 
 void client_get_type(Client *self)
 {
-    gulong *val, num, i;
+    guint num, i;
+    Atom *val;
 
     self->type = -1;
   
-    if (PROP_GET32U(self->window, net_wm_window_type, atom, val, num)) {
+    if (PROP_GETA32(self->window, net_wm_window_type, atom, &val, &num)) {
 	/* use the first value that we know about in the array */
 	for (i = 0; i < num; ++i) {
 	    if (val[i] == prop_atoms.net_wm_window_type_desktop)
@@ -736,12 +739,12 @@ void client_get_type(Client *self)
 void client_update_protocols(Client *self)
 {
     Atom *proto;
-    gulong num_return, i;
+    guint num_return, i;
 
     self->focus_notify = FALSE;
     self->delete_window = FALSE;
 
-    if (PROP_GET32U(self->window, wm_protocols, atom, proto, num_return)) {
+    if (PROP_GETA32(self->window, wm_protocols, atom, &proto, &num_return)) {
 	for (i = 0; i < num_return; ++i) {
 	    if (proto[i] == prop_atoms.wm_delete_window) {
 		/* this means we can request the window to close */
@@ -968,7 +971,7 @@ static void client_change_allowed_actions(Client *self)
 	actions[num++] = prop_atoms.net_wm_action_maximize_vert;
     }
 
-    PROP_SET32A(self->window, net_wm_allowed_actions, atom, actions, num);
+    PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
 
     /* make sure the window isn't breaking any rules now */
 
@@ -1076,31 +1079,19 @@ void client_update_wmhints(Client *self)
 
 void client_update_title(Client *self)
 {
-    gchar *data = NULL;
+    char *data = NULL;
 
     g_free(self->title);
      
     /* try netwm */
-    if (!PROP_GETS(self->window, net_wm_name, utf8, data)) {
+    if (!PROP_GETS(self->window, net_wm_name, utf8, &data))
 	/* try old x stuff */
-	if (PROP_GETS(self->window, wm_name, string, data)) {
-	    /* convert it to UTF-8 */
-	    gsize r, w;
-	    gchar *u;
-
-	    u = g_locale_to_utf8(data, -1, &r, &w, NULL);
-	    if (u == NULL) {
-		g_warning("Unable to convert string to UTF-8");
-	    } else {
-		g_free(data);
-		data = u;
-	    }
-	}
-	if (data == NULL)
+	if (!PROP_GETS(self->window, wm_name, locale, &data))
 	    data = g_strdup("Unnamed Window");
 
-	PROP_SETS(self->window, net_wm_visible_name, utf8, data);
-    }
+    /* look for duplicates and append a number */
+
+    PROP_SETS(self->window, net_wm_visible_name, data);
 
     self->title = data;
 
@@ -1110,40 +1101,25 @@ void client_update_title(Client *self)
 
 void client_update_icon_title(Client *self)
 {
-    gchar *data = NULL;
+    char *data = NULL;
 
     g_free(self->icon_title);
      
     /* try netwm */
-    if (!PROP_GETS(self->window, net_wm_icon_name, utf8, data)) {
+    if (!PROP_GETS(self->window, net_wm_icon_name, utf8, &data))
 	/* try old x stuff */
-	if (PROP_GETS(self->window, wm_icon_name, string, data)) {
-	    /* convert it to UTF-8 */
-	    gsize r, w;
-	    gchar *u;
+	if (!PROP_GETS(self->window, wm_icon_name, locale, &data))
+            data = g_strdup("Unnamed Window");
 
-	    u = g_locale_to_utf8(data, -1, &r, &w, NULL);
-	    if (u == NULL) {
-		g_warning("Unable to convert string to UTF-8");
-	    } else {
-		g_free(data);
-		data = u;
-	    }
-	}
-	if (data == NULL)
-	    data = g_strdup("Unnamed Window");
-
-	PROP_SETS(self->window, net_wm_visible_icon_name, utf8, data);
-    }
+    PROP_SETS(self->window, net_wm_visible_icon_name, data);
 
     self->icon_title = data;
 }
 
 void client_update_class(Client *self)
 {
-    GPtrArray *data;
-    gchar *s;
-    guint i;
+    char **data;
+    char *s;
 
     if (self->name) g_free(self->name);
     if (self->class) g_free(self->class);
@@ -1151,20 +1127,17 @@ void client_update_class(Client *self)
 
     self->name = self->class = self->role = NULL;
 
-    data = g_ptr_array_new();
-     
-    if (PROP_GETSA(self->window, wm_class, string, data)) {
-	if (data->len > 0)
-	    self->name = g_strdup(g_ptr_array_index(data, 0));
-	if (data->len > 1)
-	    self->class = g_strdup(g_ptr_array_index(data, 1));
+    if (PROP_GETSS(self->window, wm_class, locale, &data)) {
+        if (data[0]) {
+	    self->name = g_strdup(data[0]);
+            if (data[1])
+                self->class = g_strdup(data[1]);
+        }
     }
-     
-    for (i = 0; i < data->len; ++i)
-	g_free(g_ptr_array_index(data, i));
-    g_ptr_array_free(data, TRUE);
 
-    if (PROP_GETS(self->window, wm_window_role, string, s))
+    g_strfreev(data);     
+
+    if (PROP_GETS(self->window, wm_window_role, locale, &s))
 	self->role = g_strdup(s);
 
     if (self->name == NULL) self->name = g_strdup("");
@@ -1174,13 +1147,18 @@ void client_update_class(Client *self)
 
 void client_update_strut(Client *self)
 {
-    gulong *data;
+    guint num;
+    guint32 *data;
 
-    if (PROP_GET32A(self->window, net_wm_strut, cardinal, data, 4)) {
-	STRUT_SET(self->strut, data[0], data[2], data[1], data[3]);
-	g_free(data);
-    } else
+    if (!PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
 	STRUT_SET(self->strut, 0, 0, 0, 0);
+    } else {
+        if (num == 4)
+            STRUT_SET(self->strut, data[0], data[2], data[1], data[3]);
+        else
+            STRUT_SET(self->strut, 0, 0, 0, 0);
+	g_free(data);
+    }
 
     /* updating here is pointless while we're being mapped cuz we're not in
        the client list yet */
@@ -1190,9 +1168,9 @@ void client_update_strut(Client *self)
 
 void client_update_icons(Client *self)
 {
-    unsigned long num;
-    unsigned long *data;
-    unsigned long w, h, i;
+    guint num;
+    guint32 *data;
+    guint w, h, i;
     int j;
 
     for (j = 0; j < self->nicons; ++j)
@@ -1201,7 +1179,7 @@ void client_update_icons(Client *self)
 	g_free(self->icons);
     self->nicons = 0;
 
-    if (PROP_GET32U(self->window, net_wm_icon, cardinal, data, num)) {
+    if (PROP_GETA32(self->window, net_wm_icon, cardinal, &data, &num)) {
 	/* figure out how many valid icons are in here */
 	i = 0;
 	while (num - i > 2) {
@@ -1234,14 +1212,18 @@ void client_update_icons(Client *self)
 
 void client_update_kwm_icon(Client *self)
 {
+    guint num;
     Pixmap *data;
 
-    if (PROP_GET32A(self->window, kwm_win_icon, kwm_win_icon, data, 2)) {
-	self->pixmap_icon = data[0];
-	self->pixmap_icon_mask = data[1];
-	g_free(data);
-    } else {
+    if (!PROP_GETA32(self->window, kwm_win_icon, kwm_win_icon, &data, &num)) {
 	self->pixmap_icon = self->pixmap_icon_mask = None;
+    } else {
+        if (num == 2) {
+            self->pixmap_icon = data[0];
+            self->pixmap_icon_mask = data[1];
+        } else
+            self->pixmap_icon = self->pixmap_icon_mask = None;
+	g_free(data);
     }
     if (self->frame)
 	frame_adjust_icon(self->frame);
@@ -1255,7 +1237,7 @@ static void client_change_state(Client *self)
 
     state[0] = self->wmstate;
     state[1] = None;
-    PROP_SET32A(self->window, wm_state, wm_state, state, 2);
+    PROP_SETA32(self->window, wm_state, wm_state, state, 2);
 
     num = 0;
     if (self->modal)
@@ -1278,7 +1260,7 @@ static void client_change_state(Client *self)
 	netstate[num++] = prop_atoms.net_wm_state_above;
     if (self->below)
 	netstate[num++] = prop_atoms.net_wm_state_below;
-    PROP_SET32A(self->window, net_wm_state, atom, netstate, num);
+    PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
 
     client_calc_layer(self);
 
@@ -1589,13 +1571,13 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 
     if (fs) {
 	if (savearea) {
-	    long dimensions[4];
+	    guint32 dimensions[4];
 	    dimensions[0] = self->area.x;
 	    dimensions[1] = self->area.y;
 	    dimensions[2] = self->area.width;
 	    dimensions[3] = self->area.height;
   
-	    PROP_SET32A(self->window, openbox_premax, cardinal,
+	    PROP_SETA32(self->window, openbox_premax, cardinal,
 			dimensions, 4);
 	}
 
@@ -1603,23 +1585,26 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
            as appropriate when the window is fullscreened */
         x = y = w = h = 0;
     } else {
-	long *dimensions;
+        guint num;
+	guint32 *dimensions;
 
-	if (PROP_GET32A(self->window, openbox_premax, cardinal,
-			dimensions, 4)) {
-	    x = dimensions[0];
-	    y = dimensions[1];
-	    w = dimensions[2];
-	    h = dimensions[3];
+        /* pick some fallbacks... */
+        x = screen_area(self->desktop)->x +
+            screen_area(self->desktop)->width / 4;
+        y = screen_area(self->desktop)->y +
+            screen_area(self->desktop)->height / 4;
+        w = screen_area(self->desktop)->width / 2;
+        h = screen_area(self->desktop)->height / 2;
+
+	if (PROP_GETA32(self->window, openbox_premax, cardinal,
+                        dimensions, &num)) {
+            if (num == 4) {
+                x = dimensions[0];
+                y = dimensions[1];
+                w = dimensions[2];
+                h = dimensions[3];
+            }
 	    g_free(dimensions);
-	} else {
-	    /* pick some fallbacks... */
-	    x = screen_area(self->desktop)->x +
-		screen_area(self->desktop)->width / 4;
-	    y = screen_area(self->desktop)->y +
-		screen_area(self->desktop)->height / 4;
-	    w = screen_area(self->desktop)->width / 2;
-	    h = screen_area(self->desktop)->height / 2;
 	}
     }
 
@@ -1718,8 +1703,9 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 
     if (max) {
 	if (savearea) {
-	    long dimensions[4];
-	    long *readdim;
+	    gint32 dimensions[4];
+	    gint32 *readdim;
+            guint num;
 
 	    dimensions[0] = x;
 	    dimensions[1] = y;
@@ -1728,48 +1714,53 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 
 	    /* get the property off the window and use it for the dimensions
 	       we are already maxed on */
-	    if (PROP_GET32A(self->window, openbox_premax, cardinal,
-			    readdim, 4)) {
-		if (self->max_horz) {
-		    dimensions[0] = readdim[0];
-		    dimensions[2] = readdim[2];
-		}
-		if (self->max_vert) {
-		    dimensions[1] = readdim[1];
-		    dimensions[3] = readdim[3];
-		}
+	    if (PROP_GETA32(self->window, openbox_premax, cardinal,
+			    &readdim, &num)) {
+                if (num == 4) {
+                    if (self->max_horz) {
+                        dimensions[0] = readdim[0];
+                        dimensions[2] = readdim[2];
+                    }
+                    if (self->max_vert) {
+                        dimensions[1] = readdim[1];
+                        dimensions[3] = readdim[3];
+                    }
+                }
 		g_free(readdim);
 	    }
 
-	    PROP_SET32A(self->window, openbox_premax, cardinal,
+	    PROP_SETA32(self->window, openbox_premax, cardinal,
 			dimensions, 4);
 	}
     } else {
-	long *dimensions;
+        guint num;
+	gint32 *dimensions;
 
-	if (PROP_GET32A(self->window, openbox_premax, cardinal,
-			dimensions, 4)) {
-	    if (dir == 0 || dir == 1) { /* horz */
-		x = dimensions[0];
-		w = dimensions[2];
-	    }
-	    if (dir == 0 || dir == 2) { /* vert */
-		y = dimensions[1];
-		h = dimensions[3];
-	    }
-	    g_free(dimensions);
-	} else {
-	    /* pick some fallbacks... */
-	    if (dir == 0 || dir == 1) { /* horz */
-		x = screen_area(self->desktop)->x +
-		    screen_area(self->desktop)->width / 4;
-		w = screen_area(self->desktop)->width / 2;
-	    }
-	    if (dir == 0 || dir == 2) { /* vert */
-		y = screen_area(self->desktop)->y +
-		    screen_area(self->desktop)->height / 4;
-		h = screen_area(self->desktop)->height / 2;
-	    }
+        /* pick some fallbacks... */
+        if (dir == 0 || dir == 1) { /* horz */
+            x = screen_area(self->desktop)->x +
+                screen_area(self->desktop)->width / 4;
+            w = screen_area(self->desktop)->width / 2;
+        }
+        if (dir == 0 || dir == 2) { /* vert */
+            y = screen_area(self->desktop)->y +
+                screen_area(self->desktop)->height / 4;
+            h = screen_area(self->desktop)->height / 2;
+        }
+
+	if (PROP_GETA32(self->window, openbox_premax, cardinal,
+			&dimensions, &num)) {
+            if (num == 4) {
+                if (dir == 0 || dir == 1) { /* horz */
+                    x = dimensions[0];
+                    w = dimensions[2];
+                }
+                if (dir == 0 || dir == 2) { /* vert */
+                    y = dimensions[1];
+                    h = dimensions[3];
+                }
+            }
+            g_free(dimensions);
 	}
     }
 

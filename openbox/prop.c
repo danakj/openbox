@@ -1,5 +1,6 @@
 #include "prop.h"
 #include "openbox.h"
+
 #include <X11/Xatom.h>
 
 Atoms prop_atoms;
@@ -9,8 +10,6 @@ Atoms prop_atoms;
 
 void prop_startup()
 {
-    g_assert(ob_display != NULL);
-
     CREATE(cardinal, "CARDINAL");
     CREATE(window, "WINDOW");
     CREATE(pixmap, "PIXMAP");
@@ -41,14 +40,12 @@ void prop_startup()
     CREATE(net_active_window, "_NET_ACTIVE_WINDOW");
     CREATE(net_workarea, "_NET_WORKAREA");
     CREATE(net_supporting_wm_check, "_NET_SUPPORTING_WM_CHECK");
-/*   CREATE(net_virtual_roots, "_NET_VIRTUAL_ROOTS"); */
     CREATE(net_desktop_layout, "_NET_DESKTOP_LAYOUT");
     CREATE(net_showing_desktop, "_NET_SHOWING_DESKTOP");
 
     CREATE(net_close_window, "_NET_CLOSE_WINDOW");
     CREATE(net_wm_moveresize, "_NET_WM_MOVERESIZE");
 
-/*   CREATE(net_properties, "_NET_PROPERTIES"); */
     CREATE(net_wm_name, "_NET_WM_NAME");
     CREATE(net_wm_visible_name, "_NET_WM_VISIBLE_NAME");
     CREATE(net_wm_icon_name, "_NET_WM_ICON_NAME");
@@ -57,10 +54,8 @@ void prop_startup()
     CREATE(net_wm_window_type, "_NET_WM_WINDOW_TYPE");
     CREATE(net_wm_state, "_NET_WM_STATE");
     CREATE(net_wm_strut, "_NET_WM_STRUT");
-/*   CREATE(net_wm_icon_geometry, "_NET_WM_ICON_GEOMETRY"); */
     CREATE(net_wm_icon, "_NET_WM_ICON");
 /*   CREATE(net_wm_pid, "_NET_WM_PID"); */
-/*   CREATE(net_wm_handled_icons, "_NET_WM_HANDLED_ICONS"); */
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");
 
 /*   CREATE(net_wm_ping, "_NET_WM_PING"); */
@@ -131,30 +126,38 @@ void prop_startup()
     CREATE(openbox_premax, "_OPENBOX_PREMAX");
 }
 
-gboolean prop_get32(Window win, Atom prop, Atom type, gulong **data,gulong num)
+#include <X11/Xutil.h>
+#include <glib.h>
+#include <string.h>
+
+/* this just isn't used... and it also breaks on 64bit, watch out
+static gboolean get(Window win, Atom prop, Atom type, int size,
+                    guchar **data, gulong num)
 {
     gboolean ret = FALSE;
     int res;
-    gulong *xdata = NULL;
+    guchar *xdata = NULL;
     Atom ret_type;
     int ret_size;
     gulong ret_items, bytes_left;
+    long num32 = 32 / size * num; /\* num in 32-bit elements *\/
 
-    res = XGetWindowProperty(ob_display, win, prop, 0l, num,
+    res = XGetWindowProperty(display, win, prop, 0l, num32,
 			     FALSE, type, &ret_type, &ret_size,
-			     &ret_items, &bytes_left, (guchar**)&xdata);
+			     &ret_items, &bytes_left, &xdata);
     if (res == Success && ret_items && xdata) {
-	if (ret_size == 32 && ret_items >= num) {
-	    *data = g_memdup(xdata, num * sizeof(gulong));
+	if (ret_size == size && ret_items >= num) {
+	    *data = g_memdup(xdata, num * (size / 8));
 	    ret = TRUE;
 	}
 	XFree(xdata);
     }
     return ret;
 }
+*/
 
-gboolean prop_get_prealloc(Window win, Atom prop, Atom type, int size,
-			   guchar *data, gulong num)
+static gboolean get_prealloc(Window win, Atom prop, Atom type, int size,
+                             guchar *data, gulong num)
 {
     gboolean ret = FALSE;
     int res;
@@ -169,7 +172,7 @@ gboolean prop_get_prealloc(Window win, Atom prop, Atom type, int size,
 			     &ret_items, &bytes_left, &xdata);
     if (res == Success && ret_items && xdata) {
 	if (ret_size == size && ret_items >= num) {
-	    gulong i;
+	    guint i;
 	    for (i = 0; i < num; ++i)
 		switch (size) {
 		case 8:
@@ -191,8 +194,8 @@ gboolean prop_get_prealloc(Window win, Atom prop, Atom type, int size,
     return ret;
 }
 
-gboolean prop_get_all(Window win, Atom prop, Atom type, int size,
-		      guchar **data, gulong *num)
+static gboolean get_all(Window win, Atom prop, Atom type, int size,
+                        guchar **data, guint *num)
 {
     gboolean ret = FALSE;
     int res;
@@ -206,7 +209,23 @@ gboolean prop_get_all(Window win, Atom prop, Atom type, int size,
 			     &ret_items, &bytes_left, &xdata);
     if (res == Success) {
 	if (ret_size == size && ret_items > 0) {
-	    *data = g_memdup(xdata, ret_items * (size / 8));
+	    guint i;
+
+	    *data = g_malloc(ret_items * (size / 8));
+	    for (i = 0; i < ret_items; ++i)
+		switch (size) {
+		case 8:
+		    (*data)[i] = xdata[i];
+		    break;
+		case 16:
+		    ((guint16*)*data)[i] = ((guint16*)xdata)[i];
+		    break;
+		case 32:
+		    ((guint32*)*data)[i] = ((guint32*)xdata)[i];
+		    break;
+		default:
+		    g_assert_not_reached(); /* unhandled size */
+		}
 	    *num = ret_items;
 	    ret = TRUE;
 	}
@@ -215,65 +234,132 @@ gboolean prop_get_all(Window win, Atom prop, Atom type, int size,
     return ret;
 }
 
-gboolean prop_get_string(Window win, Atom prop, Atom type, guchar **data)
+static gboolean get_stringlist(Window win, Atom prop, char ***list, int *nstr)
 {
-    guchar *raw;
-    gulong num;
-    GString *str;
-     
-    if (prop_get_all(win, prop, type, 8, &raw, &num)) {
-	str = g_string_new_len((char*)raw, num);
-	g_assert(str->str[num] == '\0');
+    XTextProperty tprop;
+    gboolean ret = FALSE;
 
+    if (XGetTextProperty(ob_display, win, &tprop, prop) && tprop.nitems) {
+        if (XTextPropertyToStringList(&tprop, list, nstr))
+            ret = TRUE;
+        XFree(tprop.value);
+    }
+    return ret;
+}
+
+gboolean prop_get32(Window win, Atom prop, Atom type, guint32 *ret)
+{
+    return get_prealloc(win, prop, type, 32, (guchar*)ret, 1);
+}
+
+gboolean prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
+                          guint *nret)
+{
+    return get_all(win, prop, type, 32, (guchar**)ret, nret);
+}
+
+gboolean prop_get_string_locale(Window win, Atom prop, char **ret)
+{
+    char **list;
+    int nstr;
+
+    if (get_stringlist(win, prop, &list, &nstr) && nstr) {
+        *ret = g_locale_to_utf8(list[0], -1, NULL, NULL, NULL);
+        XFreeStringList(list);
+        if (ret) return TRUE;
+    }
+    return FALSE;
+}
+
+gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
+{
+    char *raw, *p;
+    guint num, i;
+
+    if (get_all(win, prop, prop_atoms.string, 8, (guchar**)&raw, &num)){
+        *ret = g_new(char*, num + 1);
+        (*ret)[num] = NULL; /* null terminated list */
+
+        p = raw;
+        for (i = 0; i < num; ++i) {
+            (*ret)[i] = g_locale_to_utf8(p, -1, NULL, NULL, NULL);
+            /* make sure translation did not fail */
+            if (!(*ret)[i]) {
+                g_strfreev(*ret); /* free what we did so far */
+                break; /* the force is not strong with us */
+            }
+            p = strchr(p, '\0');
+        }
 	g_free(raw);
+        if (i == num)
+            return TRUE;
+    }
+    return FALSE;
+}
 
-	*data = (guchar*)g_string_free(str, FALSE);
+gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
+{
+    char *raw;
+    guint num;
+     
+    if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
+	*ret = g_strdup(raw); /* grab the first string from the list */
+	g_free(raw);
 	return TRUE;
     }
     return FALSE;
 }
 
-gboolean prop_get_strings(Window win, Atom prop, Atom type,
-			  GPtrArray *data)
+gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
 {
-    guchar *raw;
-    gulong num;
-    GString *str, *str2;
-    guint i, start;
-     
-    if (prop_get_all(win, prop, type, 8, &raw, &num)) {
-	str = g_string_new_len((gchar*)raw, num);
-	g_assert(str->str[num] == '\0'); /* assuming this is always true.. */
+    char *raw, *p;
+    guint num, i;
 
+    if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
+        *ret = g_new(char*, num + 1);
+        (*ret)[num] = NULL; /* null terminated list */
+
+        p = raw;
+        for (i = 0; i < num; ++i) {
+            (*ret)[i] = g_strdup(p);
+            p = strchr(p, '\0');
+        }
 	g_free(raw);
-
-	/* split it into the list */
-	for (start = 0, i = 0; i < str->len; ++i) {
-	    if (str->str[i] == '\0') {
-		str2 = g_string_new_len(&str->str[start], i - start);
-		g_ptr_array_add(data, g_string_free(str2, FALSE));
-		start = i + 1;
-	    }
-	}
-	g_string_free(str, TRUE);
-
-	if (data->len > 0)
-	    return TRUE;
+	return TRUE;
     }
     return FALSE;
 }
 
-void prop_set_strings(Window win, Atom prop, Atom type, GPtrArray *data)
+void prop_set32(Window win, Atom prop, Atom type, guint32 val)
+{
+    XChangeProperty(ob_display, win, prop, type, 32, PropModeReplace,
+                    (guchar*)&val, 1);
+}
+
+void prop_set_array32(Window win, Atom prop, Atom type, guint32 *val,
+                      guint num)
+{
+    XChangeProperty(ob_display, win, prop, type, 32, PropModeReplace,
+                    (guchar*)val, num);
+}
+
+void prop_set_string_utf8(Window win, Atom prop, char *val)
+{
+    XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,
+                    PropModeReplace, (guchar*)val, strlen(val));
+}
+
+void prop_set_strings_utf8(Window win, Atom prop, char **strs)
 {
     GString *str;
     guint i;
 
     str = g_string_sized_new(0);
-    for (i = 0; i < data->len; ++i) {
-        str = g_string_append(str, data->pdata[i]);
+    for (i = 0; strs[i]; ++i) {
+        str = g_string_append(str, strs[i]);
         str = g_string_append_c(str, '\0');
     }
-    XChangeProperty(ob_display, win, prop, type, 8,
+    XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,
                     PropModeReplace, (guchar*)str->str, str->len);
 }
 

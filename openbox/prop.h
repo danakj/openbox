@@ -7,8 +7,6 @@
 #  include <string.h>
 #endif
 
-#include "openbox.h"
-
 /*! The atoms on the X server which this class will cache */
 typedef struct Atoms {
     /* types */
@@ -46,14 +44,12 @@ typedef struct Atoms {
     Atom net_active_window;
     Atom net_workarea;
     Atom net_supporting_wm_check;
-/*  Atom net_virtual_roots; */
     Atom net_desktop_layout;
     Atom net_showing_desktop;
     /* root window messages */
     Atom net_close_window;
     Atom net_wm_moveresize;
     /* application window properties */
-/*  Atom net_properties; */
     Atom net_wm_name;
     Atom net_wm_visible_name;
     Atom net_wm_icon_name;
@@ -62,10 +58,8 @@ typedef struct Atoms {
     Atom net_wm_window_type;
     Atom net_wm_state;
     Atom net_wm_strut;
-/*  Atom net_wm_icon_geometry; */
     Atom net_wm_icon;
 /*  Atom net_wm_pid; */
-/*  Atom net_wm_handled_icons; */
     Atom net_wm_allowed_actions;
     /* application protocols */
 /*  Atom   Atom net_wm_ping; */
@@ -139,75 +133,47 @@ Atoms prop_atoms;
 
 void prop_startup();
 
-gboolean prop_get32(Window win, Atom prop, Atom type,
-                    gulong **data, gulong num);
+gboolean prop_get32(Window win, Atom prop, Atom type, guint32 *ret);
+gboolean prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
+                          guint *nret);
+gboolean prop_get_string_locale(Window win, Atom prop, char **ret);
+gboolean prop_get_string_utf8(Window win, Atom prop, char **ret);
+gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret);
+gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret);
 
-gboolean prop_get_prealloc(Window win, Atom prop, Atom type, int size,
-			   guchar *data, gulong num);
-
-gboolean prop_get_all(Window win, Atom prop, Atom type, int size,
-		      guchar **data, gulong *num);
-
-gboolean prop_get_string(Window win, Atom prop, Atom type, guchar **data);
-gboolean prop_get_strings(Window win, Atom prop, Atom type,
-			  GPtrArray *data);
-
-void prop_set_strings(Window win, Atom prop, Atom type, GPtrArray *data);
+void prop_set32(Window win, Atom prop, Atom type, guint32 val);
+void prop_set_array32(Window win, Atom prop, Atom type, guint32 *val,
+                      guint num);
+void prop_set_string_utf8(Window win, Atom prop, char *val);
+void prop_set_strings_utf8(Window win, Atom prop, char **strs);
 
 void prop_erase(Window win, Atom prop);
 
 void prop_message(Window about, Atom messagetype, long data0, long data1,
 		  long data2, long data3);
 
+#define PROP_GET32(win, prop, type, ret) \
+    (prop_get32(win, prop_atoms.prop, prop_atoms.type, (guint32*)ret))
+#define PROP_GETA32(win, prop, type, ret, nret) \
+    (prop_get_array32(win, prop_atoms.prop, prop_atoms.type, (guint32**)ret, \
+                      nret))
+#define PROP_GETS(win, prop, type, ret) \
+    (prop_get_string_##type(win, prop_atoms.prop, ret))
+#define PROP_GETSS(win, prop, type, ret) \
+    (prop_get_strings_##type(win, prop_atoms.prop, ret))
+
+#define PROP_SET32(win, prop, type, val) \
+    prop_set32(win, prop_atoms.prop, prop_atoms.type, val)
+#define PROP_SETA32(win, prop, type, val, num) \
+    prop_set_array32(win, prop_atoms.prop, prop_atoms.type, (guint32*)val, num)
+#define PROP_SETS(win, prop, val) \
+    prop_set_string_utf8(win, prop_atoms.prop, val)
+#define PROP_SETSS(win, prop, strs) \
+    prop_set_strings_utf8(win, prop_atoms.prop, strs)
+
+#define PROP_ERASE(win, prop) prop_erase(win, prop_atoms.prop)
+
 #define PROP_MSG(about, msgtype, data0, data1, data2, data3) \
   (prop_message(about, prop_atoms.msgtype, data0, data1, data2, data3))
-
-/* Set an 8-bit property from a string */
-#define PROP_SETS(win, prop, type, value) \
-  (XChangeProperty(ob_display, win, prop_atoms.prop, prop_atoms.type, 8, \
-		   PropModeReplace, (guchar*)value, strlen(value)))
-/* Set an 8-bit property array from a GPtrArray of strings */
-#define PROP_SETSA(win, prop, type, value) \
-  (prop_set_strings(win, prop_atoms.prop, prop_atoms.type, value))
-
-/* Set a 32-bit property from a single value */
-#define PROP_SET32(win, prop, type, value) \
-  (XChangeProperty(ob_display, win, prop_atoms.prop, prop_atoms.type, 32, \
-		   PropModeReplace, (guchar*)&value, 1))
-/* Set a 32-bit property from an array */
-#define PROP_SET32A(win, prop, type, value, num) \
-  (XChangeProperty(ob_display, win, prop_atoms.prop, prop_atoms.type, 32, \
-		   PropModeReplace, (guchar*)value, num))
-
-/* Get an 8-bit property into a string */
-#define PROP_GETS(win, prop, type, value) \
-  (prop_get_string(win, prop_atoms.prop, prop_atoms.type, \
-       	           (guchar**)&value))
-/* Get an 8-bit property into a GPtrArray of strings
-   (The strings must be freed, the GPtrArray must already be created.) */
-#define PROP_GETSA(win, prop, type, value) \
-  (prop_get_strings(win, prop_atoms.prop, prop_atoms.type, \
-       	            value))
-
-/* Get an entire 8-bit property into an array (which must be freed) */
-#define PROP_GET8U(win, prop, type, value, num) \
-  (prop_get_all(win, prop_atoms.prop, prop_atoms.type, 8, \
-                (guchar**)&value, &num))
-
-/* Get 1 element of a 32-bit property into a given variable */
-#define PROP_GET32(win, prop, type, value) \
-  (prop_get_prealloc(win, prop_atoms.prop, prop_atoms.type, 32, \
-	             (guchar*)&value, 1))
-
-/* Get an amount of a 32-bit property into an array (which must be freed) */
-#define PROP_GET32A(win, prop, type, value, num) \
-  (prop_get32(win, prop_atoms.prop, prop_atoms.type, (gulong**)&value, num))
-
-/* Get an entire 32-bit property into an array (which must be freed) */
-#define PROP_GET32U(win, prop, type, value, num) \
-  (prop_get_all(win, prop_atoms.prop, prop_atoms.type, 32, \
-	        (guchar**)&value, &num))
-
-#define PROP_ERASE(win, prop) (prop_erase(win, prop_atoms.prop))
 
 #endif

@@ -32,7 +32,7 @@ typedef struct DesktopLayout {
 extern DesktopLayout screen_desktop_layout;
 
 /*! An array of gchar*'s which are desktop names in UTF-8 format */
-extern GPtrArray *screen_desktop_names;
+extern char **screen_desktop_names;
 
 /*! Take over the screen, set the basic hints on it claming it as ours */
 gboolean screen_annex();

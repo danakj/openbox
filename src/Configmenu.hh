@@ -129,6 +129,8 @@ public:
 
   inline Basemenu *getFocusmenu(void) { return focusmenu; }
   inline Basemenu *getPlacementmenu(void) { return placementmenu; }
+  inline Basemenu *getWindowSnapmenu(void) { return windowsnapmenu; }
+  inline Basemenu *getEdgeSnapmenu(void) { return edgesnapmenu; }
 #ifdef    XINERAMA
   inline Basemenu *getXineramamenu(void) { return xineramamenu; }
 #endif // XINERAMA

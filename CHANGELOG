@@ -7,7 +7,9 @@
 	* Closed bug #929 (crash (signal 11) when activating Reconfigure)
 	* Allow focus to be moved around by clients (for WM_TAKE_FOCUS to
 	work as it is meant to). This means fullscreen apps like wine and
-	bzflag work now.
+	bzflag work now
+	* Reversed the default directions for the mouse wheel desktop
+	switching actions
 
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)

@@ -461,8 +461,15 @@ void Workspace::hide(void) {
 
 
 void Workspace::show(void) {
-  std::for_each(stackingList.begin(), stackingList.end(),
-                std::mem_fun(&BlackboxWindow::show));
+  BlackboxWindowList::iterator it = stackingList.begin();
+  const BlackboxWindowList::iterator end = stackingList.end();
+  for (; it != end; ++it) {
+    BlackboxWindow *bw = *it;
+    // not normal windows cant focus from mouse enters anyways, so we dont
+    // need to unmap/remap them on workspace changes
+    if (! bw->isStuck() || bw->isNormal())
+      bw->show();
+  }
 
   XSync(screen->getBlackbox()->getXDisplay(), False);
 

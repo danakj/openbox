@@ -34,8 +34,6 @@ void RrExpose(struct RrInstance *inst, XExposeEvent *e)
     XEvent e2;
     struct RrSurface *sur;
 
-    g_message("Expose on %lx", e->window);
-
     if ((sur = RrInstaceLookupSurface(inst, e->window))) {
         while (1) {
             struct RrSurface *p = NULL;

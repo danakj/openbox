@@ -41,6 +41,16 @@ extern "C" {
 #ifdef    HAVE_LIBGEN_H
 #  include <libgen.h>
 #endif // HAVE_LIBGEN_H
+
+#ifdef    HAVE_UNISTD_H
+#  include <sys/types.h>
+#  include <unistd.h>
+#endif // HAVE_UNISTD_H
+
+#ifdef    HAVE_SYS_STAT_H
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#endif // HAVE_SYS_STAT_H
 }
 
 #include <iostream>
@@ -66,7 +76,12 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
   if (rc_file)
     _rc_file = rc_file;
   else
-    _rc_file = expandTilde("~/.epistrc");
+    _rc_file = expandTilde("~/.openbox/epistrc");
+
+  struct stat buf;
+  if (0 != stat(_rc_file.c_str(), &buf) ||
+      !S_ISREG(buf.st_mode))
+    _rc_file = DEFAULTRC;
 
   _xatom = new XAtom(getXDisplay());
 

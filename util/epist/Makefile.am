@@ -1,6 +1,8 @@
 # util/epist/Makefile.am for Blackbox - an X11 Window manager
 
-CPPFLAGS= @CPPFLAGS@ @DEBUG@
+DEFAULT_RC=$(pkgdatadir)/epistrc
+
+CPPFLAGS= @CPPFLAGS@ @DEBUG@ -DDEFAULTRC=\"$(DEFAULT_RC)\"
 
 #EXTRA_PROGRAMS =		epist
 bin_PROGRAMS =		epist
@@ -16,6 +18,13 @@ MAINTAINERCLEANFILES =	Makefile.in
 
 distclean-local:
 	rm -f *\~ .\#*
+
+install-data-local: epistrc
+	test -f $(DESTDIR)$(pkgdatadir)/epistrc || \
+	$(INSTALL_DATA) epistrc $(DESTDIR)$(pkgdatadir)
+
+uninstall-am:
+	rm -f $(DESTDIR)$(pkgdatadir)/epistrc
 
 # local dependencies
 

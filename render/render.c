@@ -167,9 +167,7 @@ void pseudocolor_startup(void)
         g = (pseudo_colors[i].green - icolors[ii].green) & 0xff;
         b = (pseudo_colors[i].blue - icolors[ii].blue) & 0xff;
         /* find a weighted absolute deviation */
-        dev = (r * r) * (0xff - (icolors[ii].red & 0xff)) +
-            (g * g) * (0xff - (icolors[ii].green & 0xff)) +
-            (b * b) * (0xff - (icolors[ii].blue & 0xff));
+        dev = (r * r) + (g * g) + (b * b);
 
         if (dev < closest) {
           closest = dev;

@@ -234,9 +234,7 @@ void increase_depth(pixel32 *data, XImage *im)
                     g = (pseudo_colors[ii].green - icolor.green) & 0xff;
                     b = (pseudo_colors[ii].blue - icolor.blue) & 0xff;
                     /* find a weighted absolute deviation */
-                    dev = (r * r) * (0xff - (icolor.red & 0xff)) +
-                        (g * g) * (0xff - (icolor.green & 0xff)) +
-                        (b * b) * (0xff - (icolor.blue & 0xff));
+                    dev = (r * r) + (g * g) + (b * b);
 
                     if (dev < closest) {
                         closest = dev;

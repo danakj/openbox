@@ -16,14 +16,18 @@ void pixmap_mask_free(pixmap_mask *m)
     g_free(m);
 }
 
-void mask_draw(Pixmap p, TextureMask *m, int width, int height)
+void mask_draw(Pixmap p, TextureMask *m, Rect *position)
 {
     int x, y;
     if (m->mask == None) return; /* no mask given */
 
     /* set the clip region */
-    x = (width - m->mask->w) / 2;
-    y = (height - m->mask->h) / 2;
+    x = position->x + (position->width - m->mask->w) / 2;
+    y = position->y + (position->height - m->mask->h) / 2;
+
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+
     XSetClipMask(ob_display, m->color->gc, m->mask->mask);
     XSetClipOrigin(ob_display, m->color->gc, x, y);
 

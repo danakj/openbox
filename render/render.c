@@ -136,12 +136,14 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
                 l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
                                         render_visual, render_colormap);
             }
-            font_draw(l->xftdraw, &l->texture[i].data.text, x, y, w, h);
+            font_draw(l->xftdraw, &l->texture[i].data.text, 
+                      &l->texture[i].position);
         break;
         case Bitmask:
             if (l->texture[i].data.mask.color->gc == None)
                 color_allocate_gc(l->texture[i].data.mask.color);
-            mask_draw(l->pixmap, &l->texture[i].data.mask, w, h);
+            mask_draw(l->pixmap, &l->texture[i].data.mask,
+                      &l->texture[i].position);
         break;
         }
     }

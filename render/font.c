@@ -6,6 +6,7 @@
 
 #include <X11/Xft/Xft.h>
 #include <glib.h>
+#include "../kernel/geom.h"
 
 void font_startup(void)
 {
@@ -91,9 +92,15 @@ int font_max_char_width(ObFont *f)
     return (signed) f->xftfont->max_advance_width;
 }
 
-void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
+void font_draw(XftDraw *d, TextureText *t, Rect *position)
 {
+    int x,y,w,h;
     XftColor c;
+
+    x = position->x;
+    y = position->y;
+    w = position->width;
+    h = position->height;
 
     /* accomidate for areas bigger/smaller than Xft thinks the font is tall */
     y -= (2 * (t->font->xftfont->ascent + t->font->xftfont->descent) -

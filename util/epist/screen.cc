@@ -274,11 +274,11 @@ void screen::handleKeypress(const XEvent &e) {
       return;
       
     case Action::resizeWindowWidth:
-      window->resize(it->number(), 0);
+      window->resizeRel(it->number(), 0);
       return;
       
     case Action::resizeWindowHeight:
-      window->resize(0, it->number());
+      window->resizeRel(0, it->number());
       return;
       
     case Action::toggleshade:

@@ -111,7 +111,8 @@ public:
   void focus() const;
   void sendTo(unsigned int dest) const;
   void move(int x, int y) const;
-  void resize(unsigned int width, unsigned int height) const;
+  void resizeRel(int dwidth, int dheight) const;
+  void resizeAbs(unsigned int width, unsigned int height) const;
   void toggleMaximize(Max max) const; // i hate toggle functions
   void maximize(Max max) const;
 

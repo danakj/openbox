@@ -14,6 +14,7 @@ typedef struct _RrTexture          RrTexture;
 typedef struct _RrTextureMask      RrTextureMask;
 typedef struct _RrTextureRGBA      RrTextureRGBA;
 typedef struct _RrTextureText      RrTextureText;
+typedef struct _RrTextureLineArt   RrTextureLineArt;
 typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
 typedef struct _RrColor            RrColor;
@@ -47,6 +48,7 @@ typedef enum {
     RR_TEXTURE_NONE,
     RR_TEXTURE_MASK,
     RR_TEXTURE_TEXT,
+    RR_TEXTURE_LINE_ART,
     RR_TEXTURE_RGBA
 } RrTextureType;
 
@@ -103,10 +105,19 @@ struct _RrTextureRGBA {
     RrPixel32 *cache;
 };
 
+struct _RrTextureLineArt {
+    RrColor *color;
+    gint x1;
+    gint y1;
+    gint x2;
+    gint y2;
+};
+
 union _RrTextureData {
     RrTextureRGBA rgba;
     RrTextureText text;
     RrTextureMask mask;
+    RrTextureLineArt lineart;
 };
 
 struct _RrTexture {
@@ -163,6 +174,7 @@ gint     RrColorRed   (const RrColor *c);
 gint     RrColorGreen (const RrColor *c);
 gint     RrColorBlue  (const RrColor *c);
 gulong   RrColorPixel (const RrColor *c);
+GC       RrColorGC    (RrColor *c);
 
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);

@@ -97,18 +97,35 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
                                            RrColormap(l->inst));
             }
             RrFontDraw(l->xftdraw, &l->texture[i].data.text, &tarea);
-        break;
+            break;
+        case RR_TEXTURE_LINE_ART:
+            if (!transferred) {
+                transferred = 1;
+                if (l->surface.grad != RR_SURFACE_SOLID)
+                    pixel_data_to_pixmap(l, 0, 0, w, h);
+            }
+            g_message("%d %d -> %d %d",
+                      l->texture[i].data.lineart.x1,
+                      l->texture[i].data.lineart.y1,
+                      l->texture[i].data.lineart.x2,
+                      l->texture[i].data.lineart.y2);
+            XDrawLine(RrDisplay(l->inst), l->pixmap,
+                      RrColorGC(l->texture[i].data.lineart.color),
+                      l->texture[i].data.lineart.x1,
+                      l->texture[i].data.lineart.y1,
+                      l->texture[i].data.lineart.x2,
+                      l->texture[i].data.lineart.y2);
+            break;
         case RR_TEXTURE_MASK:
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != RR_SURFACE_SOLID)
                     pixel_data_to_pixmap(l, 0, 0, w, h);
             }
-            if (l->texture[i].data.mask.color->gc == None)
-                RrColorAllocateGC(l->texture[i].data.mask.color);
             RrPixmapMaskDraw(l->pixmap, &l->texture[i].data.mask, &tarea);
-        break;
+            break;
         case RR_TEXTURE_RGBA:
+            g_assert(!transferred);
             RrImageDraw(l->surface.pixel_data,
                         &l->texture[i].data.rgba, &tarea);
         break;
@@ -120,7 +137,6 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
         if (l->surface.grad != RR_SURFACE_SOLID)
             pixel_data_to_pixmap(l, 0, 0, w, h);
     }
-
 
     XSetWindowBackgroundPixmap(RrDisplay(l->inst), win, l->pixmap);
     XClearWindow(RrDisplay(l->inst), win);
@@ -287,6 +303,12 @@ void RrMinsize(RrAppearance *l, gint *w, gint *h)
         case RR_TEXTURE_RGBA:
             *w += MAX(*w, l->texture[i].data.rgba.width);
             *h += MAX(*h, l->texture[i].data.rgba.height);
+            break;
+        case RR_TEXTURE_LINE_ART:
+            *w += MAX(*w, MAX(l->texture[i].data.lineart.x1,
+                              l->texture[i].data.lineart.x2));
+            *h += MAX(*h, MAX(l->texture[i].data.lineart.y1,
+                              l->texture[i].data.lineart.y2));
             break;
         }
     }

@@ -15,18 +15,12 @@ static unsigned int mask_list[MASK_LIST_SIZE];
 void grab_keyboard(gboolean grab)
 {
     if (grab) {
-        if (kgrabs++ == 0) {
-            g_message("GRABBING KEYBOARD %d", kgrabs);
+        if (kgrabs++ == 0)
             XGrabKeyboard(ob_display, ob_root, 0, GrabModeAsync, GrabModeSync,
                           event_lasttime);
-        } else
-            g_message("NOT GRABBING KEYBOARD %d", kgrabs);
     } else if (kgrabs > 0) {
-        if (--kgrabs == 0) {
-            g_message("UNGRABBING KEYBOARD %d", kgrabs);
+        if (--kgrabs == 0)
             XUngrabKeyboard(ob_display, event_lasttime);
-        } else
-            g_message("NOT UNGRABBING KEYBOARD %d", kgrabs);
     }
 }
 

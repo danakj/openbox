@@ -31,12 +31,13 @@ using std::endl;
 using std::hex;
 using std::dec;
 
-#include "window.hh"
 #include "epist.hh"
+#include "screen.hh"
+#include "window.hh"
 #include "../../src/XAtom.hh"
 
-XWindow::XWindow(epist *epist, Window window)
-  : _epist(epist), _xatom(epist->xatom()), _window(window) {
+XWindow::XWindow(epist *epist, screen *screen, Window window)
+  : _epist(epist), _screen(screen), _xatom(epist->xatom()), _window(window) {
 
   _unmapped = false;
 
@@ -139,4 +140,10 @@ void XWindow::processEvent(const XEvent &e) {
     _unmapped = true;
     break;
   }
+}
+  
+
+void XWindow::shade(const bool sh) const {
+  _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
+                            _window, (sh ? 1 : 0), XAtom::net_wm_state_shaded);
 }

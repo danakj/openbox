@@ -143,28 +143,32 @@ void screen::processEvent(const XEvent &e) {
 }
 
 void screen::handleKeypress(const XEvent &e) {
-  list<Action>::const_iterator it = _epist->actions().begin();
-  list<Action>::const_iterator end = _epist->actions().end();
+  ActionList::const_iterator it = _epist->actions().begin();
+  ActionList::const_iterator end = _epist->actions().end();
+  cout << "key press\n";
   for (; it != end; ++it) {
     if (e.xkey.keycode == it->keycode() &&
-        e.xkey.state == it->modifierMask() )
-      {
-        switch (it->type()) {
-        case Action::nextWorkspace:
-          cycleWorkspace(true);
-          break;
-        case Action::prevWorkspace:
-          cycleWorkspace(false);
-          break;
-        case Action::changeWorkspace:
-          changeWorkspace(it->number());
-          break;
-        case Action::shade:
-          toggleShaded((*_active)->window());
-          break;
-        }
+        e.xkey.state == it->modifierMask()) {
+      switch (it->type()) {
+      case Action::nextWorkspace:
+        cycleWorkspace(true);
+        break;
+
+      case Action::prevWorkspace:
+        cycleWorkspace(false);
+        break;
+
+      case Action::changeWorkspace:
+        changeWorkspace(it->number());
+        break;
+
+      case Action::shade:
+        (*_active)->shade(! (*_active)->shaded());
         break;
       }
+
+      break;
+    }
   }
 }
 
@@ -216,7 +220,8 @@ void screen::updateClientList() {
     if (it == end) {  // didn't already exist
       if (doAddWindow(rootclients[i])) {
         cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
-        _clients.insert(insert_point, new XWindow(_epist, rootclients[i]));
+        _clients.insert(insert_point, new XWindow(_epist, this,
+                                                  rootclients[i]));
       }
     }
   }
@@ -290,9 +295,4 @@ void screen::cycleWorkspace(const bool forward) const {
 
 void screen::changeWorkspace(const int num) const {
   _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root, num);
-}
-
-void screen::toggleShaded(const Window win) const {
-  _xatom->sendClientMessage(_root, XAtom::net_wm_state, win, 2,
-                            XAtom::net_wm_state_shaded);
 }

@@ -138,6 +138,7 @@ void epist::process_event(XEvent *e) {
   else
     root = e->xany.window;
   
+  cout << "event\n";
   ScreenList::const_iterator it, end = _screens.end();
   for (it = _screens.begin(); it != end; ++it) {
     if ((*it)->rootWindow() == root) {

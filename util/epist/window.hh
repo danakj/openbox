@@ -31,6 +31,7 @@ extern "C" {
 #include <string>
 
 class epist;
+class screen;
 class XWindow;
 class XAtom;
 
@@ -39,6 +40,7 @@ typedef std::list<XWindow *> WindowList;
 class XWindow {
 private:
   epist *_epist;
+  screen *_screen;
   XAtom *_xatom;
   Window _window;
   
@@ -61,7 +63,7 @@ private:
   void updateClass();
 
 public:
-  XWindow(epist *epist, Window window);
+  XWindow(epist *epist, screen *screen, Window window);
   virtual ~XWindow();
 
   inline Window window() const { return _window; }
@@ -77,6 +79,8 @@ public:
   inline bool maxHorz() const { return _max_horz; }
 
   void processEvent(const XEvent &e);
+
+  void shade(const bool sh) const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

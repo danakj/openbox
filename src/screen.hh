@@ -1,26 +1,4 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-// Screen.hh for Blackbox - an X11 Window manager
-// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-
 #ifndef   __Screen_hh
 #define   __Screen_hh
 
@@ -56,12 +34,10 @@ struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
-#ifdef    BITMAPBUTTONS
 struct PixmapMask {
   Pixmap mask;
   unsigned int w, h;
 };
-#endif // BITMAPBUTTONS
 
 struct WindowStyle {
   BColor l_text_focus, l_text_unfocus, b_pic_focus,
@@ -70,9 +46,7 @@ struct WindowStyle {
     h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, b_pressed_focus,
     b_pressed_unfocus, g_focus, g_unfocus;
 
-#ifdef    BITMAPBUTTONS
   PixmapMask close_button, max_button, icon_button, stick_button;
-#endif // BITMAPBUTTONS
   BFont *font;
 
   TextJustify justify;
@@ -142,11 +116,9 @@ private:
   BScreen(const BScreen&);
   BScreen& operator=(const BScreen&);
 
-#ifdef    BITMAPBUTTONS
   void readDatabaseMask(const std::string &rname,
                         PixmapMask &pixmapMask,
                         const Configuration &style);
-#endif // BITMAPBUTTONS
   
   BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,

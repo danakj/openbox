@@ -1,25 +1,4 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-// Screen.cc for Blackbox - an X11 Window manager
-// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
 
 #ifdef    HAVE_CONFIG_H
 #include "../config.h"
@@ -293,7 +272,6 @@ BScreen::~BScreen(void) {
   if (resource.wstyle.font)
     delete resource.wstyle.font;
 
-#ifdef    BITMAPBUTTONS
   if (resource.wstyle.close_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
   if (resource.wstyle.max_button.mask != None)
@@ -306,7 +284,6 @@ BScreen::~BScreen(void) {
   resource.wstyle.max_button.mask = resource.wstyle.close_button.mask =
     resource.wstyle.icon_button.mask =
     resource.wstyle.stick_button.mask = None;
-#endif // BITMAPBUTTONS
   
   XFreeGC(blackbox->getXDisplay(), opGC);
 }
@@ -858,7 +835,6 @@ void BScreen::LoadStyle(void) {
   resource.wstyle.b_pressed_unfocus =
     readDatabaseTexture("window.button.pressed.unfocus", "black", style, true);
 
-#ifdef    BITMAPBUTTONS
   if (resource.wstyle.close_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
   if (resource.wstyle.max_button.mask != None)
@@ -880,7 +856,6 @@ void BScreen::LoadStyle(void) {
                    style);
   readDatabaseMask("window.button.stick.mask", resource.wstyle.stick_button,
                    style);
-#endif // BITMAPBUTTONS
 
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
@@ -1691,7 +1666,6 @@ void BScreen::toggleFocusModel(FocusModel model) {
                 std::mem_fun(&BlackboxWindow::grabButtons));
 }
 
-#ifdef    BITMAPBUTTONS
 void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
                                const Configuration &style) {
   string s;
@@ -1718,7 +1692,6 @@ void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
   pixmapMask.mask = None;
   pixmapMask.w = pixmapMask.h = 0;
 }
-#endif // BITMAPSUCCESS
 
 BTexture BScreen::readDatabaseTexture(const string &rname,
                                       const string &default_color,

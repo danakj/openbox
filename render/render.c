@@ -222,7 +222,8 @@ void RrAppearanceFree(RrAppearance *a)
 }
 
 
-static void pixel_data_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
+static void pixel_data_to_pixmap(RrAppearance *l,
+                                 gint x, gint y, gint w, gint h)
 {
     RrPixel32 *in, *scratch;
     Pixmap out;

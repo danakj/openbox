@@ -1,6 +1,11 @@
 Changelog for Openbox:
 
 2.1.0:
+ * Redo borders for styles. Any flat textured object    (Ben Jansens)
+   (solid or gradient) can add "border" to its texture
+   and then its ".borderColor" resource will be used
+   for a 1 pixel-wide border around the element.
+
  * Add an optional Sticky button for window titlebars.
    It can be added by putting an 'S' in your
    titlebarLayout.                                      (Scott Moynes)

@@ -41,4 +41,9 @@ void PseudoRenderControl::drawBackground(Surface& sf,
   drawSolidBackground(sf, texture);
 }
 
+void PseudoRenderControl::drawImage(Surface &sf, int w, int h,
+                                    unsigned long *data) const
+{
+}
+
 }

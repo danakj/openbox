@@ -88,7 +88,8 @@ public:
     The image must be specified in 32-bit packed ARGB format. The current
     background will be used for applying the alpha.
   */
-  virtual void drawImage(Surface &sf, int w, int h, unsigned long *data) const;
+  virtual void drawImage(Surface &sf, int w, int h,
+                         unsigned long *data) const = 0;
   
   //! Draws a string onto a Surface
   virtual void drawString(Surface &sf, const Font &font, int x, int y,

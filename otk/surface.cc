@@ -46,14 +46,11 @@ void Surface::setPixmap(const RenderColor &color)
   XFillRectangle(**display, _pixmap, color.gc(), 0, 0,
                  _size.width(), _size.height());
 
-  pixel32 val = 0; // XXX set this from the color and shift amounts!
-  for (unsigned int i = 0, s = _size.width() * _size.height(); i < s; ++i) {
-    unsigned char *p = (unsigned char*)&_pixel_data[i];
-    *p = (unsigned char) (val >> 24);
-    *++p = (unsigned char) (val >> 16);
-    *++p = (unsigned char) (val >> 8);
-    *++p = (unsigned char) val;
-  }
+  pixel32 val = (color.red() << default_red_shift) &
+    (color.green() << default_green_shift) &
+    (color.blue() << default_blue_shift);
+  for (unsigned int i = 0, s = _size.width() * _size.height(); i < s; ++i)
+    _pixel_data[i] = val;
 }
 
 void Surface::setPixmap(XImage *image)

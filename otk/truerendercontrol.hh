@@ -34,6 +34,9 @@ public:
   virtual ~TrueRenderControl();
 
   virtual void drawBackground(Surface& sf, const RenderTexture &texture) const;
+
+  virtual void drawImage(Surface &sf, int w, int h,
+                         unsigned long *data) const;
 };
 
 }

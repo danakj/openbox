@@ -296,16 +296,20 @@ void screen_set_desktop(guint num)
 
     /* show windows from top to bottom */
     for (it = stacking_list; it != NULL; it = it->next) {
-        Client *c = it->data;
-	if (!c->frame->visible && client_should_show(c))
-            frame_show(c->frame);
+        if (WINDOW_IS_CLIENT(it->data)) {
+            Client *c = it->data;
+            if (!c->frame->visible && client_should_show(c))
+                frame_show(c->frame);
+        }
     }
 
     /* hide windows from bottom to top */
     for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
-        Client *c = it->data;
-	if (c->frame->visible && !client_should_show(c))
-            frame_hide(c->frame);
+        if (WINDOW_IS_CLIENT(it->data)) {
+            Client *c = it->data;
+            if (c->frame->visible && !client_should_show(c))
+                frame_hide(c->frame);
+        }
     }
 
     /* focus the last focused window on the desktop, and ignore enter events
@@ -418,16 +422,20 @@ void screen_show_desktop(gboolean show)
     if (show) {
 	/* bottom to top */
 	for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
-	    Client *client = it->data;
-	    if (client->frame->visible && !client_should_show(client))
-                frame_hide(client->frame);
+            if (WINDOW_IS_CLIENT(it->data)) {
+                Client *client = it->data;
+                if (client->frame->visible && !client_should_show(client))
+                    frame_hide(client->frame);
+            }
 	}
     } else {
         /* top to bottom */
 	for (it = stacking_list; it != NULL; it = it->next) {
-	    Client *client = it->data;
-	    if (!client->frame->visible && client_should_show(client))
-                frame_show(client->frame);
+            if (WINDOW_IS_CLIENT(it->data)) {
+                Client *client = it->data;
+                if (!client->frame->visible && client_should_show(client))
+                    frame_show(client->frame);
+            }
 	}
     }
 

@@ -51,7 +51,6 @@ extern "C" {
 #include "BaseDisplay.hh"
 #include "Configuration.hh"
 #include "Timer.hh"
-#include "XAtom.hh"
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -92,6 +91,8 @@ class BWindowGroup;
 class Basemenu;
 class Toolbar;
 class Slit;
+class XAtom;
+class BInput;
 
 extern I18n i18n;
 
@@ -152,6 +153,7 @@ private:
   BTimer *timer;
   Configuration config;
   XAtom *xatom;
+  BInput *input;
 
   bool no_focus, reconfigure_wait, reread_menu_wait;
   Time last_time;
@@ -198,6 +200,7 @@ public:
   void removeSlitSearch(Window window);
 
   inline XAtom *getXAtom(void) { return xatom; }
+  inline BInput *getInput(void) { return input; }
   
   inline BlackboxWindow *getFocusedWindow(void) { return focused_window; }
   inline BlackboxWindow *getChangingWindow(void) { return changing_window; }

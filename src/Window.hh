@@ -38,6 +38,11 @@ extern "C" {
 #include "Timer.hh"
 #include "Util.hh"
 #include "Windowmenu.hh"
+#include "Workspace.hh"
+#include "Screen.hh"
+
+class XAtom;
+class BInput;
 
 #define MwmHintsFunctions     (1l << 0)
 #define MwmHintsDecorations   (1l << 1)
@@ -126,6 +131,7 @@ private:
   Blackbox *blackbox;
   BScreen *screen;
   XAtom *xatom;
+  BInput *input;
   BTimer *timer;
   BlackboxAttributes blackbox_attrib;
 
@@ -317,6 +323,7 @@ public:
   inline bool isIconifiable(void) const { return functions & Func_Iconify; }
   inline bool isMaximizable(void) const { return functions & Func_Maximize; }
   inline bool isResizable(void) const { return functions & Func_Resize; }
+  inline bool isMovable(void) const { return functions & Func_Move; }
   inline bool isClosable(void) const { return functions & Func_Close; }
   inline bool isDesktop(void) const { return window_type == Type_Desktop; }
 
@@ -371,14 +378,18 @@ public:
   void iconify(void);
   void deiconify(bool reassoc = True, bool raise = True);
   void show(void);
+  void showWindowMenu(int root_x, int root_y);
   void close(void);
   void withdraw(void);
   void maximize(unsigned int button);
   void remaximize(void);
   void shade(void);
   void stick(void);
+  void raise(void);
+  void lower(void);
   void reconfigure(void);
-  void updateFocusModel(void);
+  void grabButtons(void);
+  void ungrabButtons(void);
   void installColormap(bool install);
   void restore(bool remap);
   void configure(int dx, int dy, unsigned int dw, unsigned int dh);
@@ -386,16 +397,16 @@ public:
   void changeBlackboxHints(BlackboxHints *net);
   void restoreAttributes(void);
 
-  void buttonPressEvent(XButtonEvent *be);
-  void buttonReleaseEvent(XButtonEvent *re);
-  void motionNotifyEvent(XMotionEvent *me);
-  void destroyNotifyEvent(XDestroyWindowEvent */*unused*/);
-  void mapRequestEvent(XMapRequestEvent *mre);
-  void unmapNotifyEvent(XUnmapEvent */*unused*/);
-  void reparentNotifyEvent(XReparentEvent */*unused*/);
+  void buttonPressEvent(const XButtonEvent *be);
+  void buttonReleaseEvent(const XButtonEvent *re);
+  void motionNotifyEvent(const XMotionEvent *me);
+  void destroyNotifyEvent(const XDestroyWindowEvent */*unused*/);
+  void mapRequestEvent(const XMapRequestEvent *mre);
+  void unmapNotifyEvent(const XUnmapEvent */*unused*/);
+  void reparentNotifyEvent(const XReparentEvent */*unused*/);
   void propertyNotifyEvent(Atom atom);
-  void exposeEvent(XExposeEvent *ee);
-  void configureRequestEvent(XConfigureRequestEvent *cr);
+  void exposeEvent(const XExposeEvent *ee);
+  void configureRequestEvent(const XConfigureRequestEvent *cr);
 
 #ifdef    SHAPE
   void configureShape(void);

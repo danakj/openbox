@@ -111,6 +111,7 @@ using std::string;
 #include "Workspace.hh"
 #include "Workspacemenu.hh"
 #include "XAtom.hh"
+#include "Input.hh"
 
 // X event scanner for enter/leave notifies - adapted from twm
 struct scanargs {
@@ -162,6 +163,7 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   load_rc();
 
   xatom = new XAtom(getXDisplay());
+  input = new BInput(this);
 
   cursor.session = XCreateFontCursor(getXDisplay(), XC_left_ptr);
   cursor.move = XCreateFontCursor(getXDisplay(), XC_fleur);

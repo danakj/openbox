@@ -35,7 +35,10 @@ void stacking_raise(ObWindow *window);
 /*! Lowers a window below all others in its stacking layer */
 void stacking_lower(ObWindow *window);
 
-/*! Moves a window below another if its in the same layer */
+/*! Moves a window below another if its in the same layer.
+  This function does not enforce stacking rules IRT transients n such, and so
+  it should really ONLY be used to restore stacking orders from saved sessions
+*/
 void stacking_below(ObWindow *window, ObWindow *below);
 
 #endif

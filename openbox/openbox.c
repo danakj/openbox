@@ -35,6 +35,10 @@
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
+#ifdef HAVE_SYS_STAT_H
+#  include <sys/stat.h>
+#  include <sys/types.h>
+#endif
 
 #include <X11/cursorfont.h>
 
@@ -57,6 +61,7 @@ int main(int argc, char **argv)
 {
     struct sigaction action;
     sigset_t sigset;
+    char *path;
 
     ob_state = State_Starting;
 
@@ -87,6 +92,12 @@ int main(int argc, char **argv)
 
     /* anything that died while we were restarting won't give us a SIGCHLD */
     while (waitpid(-1, NULL, WNOHANG) > 0);
+
+    /* create the ~/.openbox dir */
+    path = g_build_filename(g_get_home_dir(), ".openbox", NULL);
+    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
+                 S_IROTH | S_IWOTH | S_IXOTH));
+    g_free(path);
      
     /* parse out command line args */
     parse_args(argc, argv);

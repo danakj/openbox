@@ -238,9 +238,6 @@ void screen_set_num_desktops(guint num)
     PROP_SETA32(ob_root, net_desktop_viewport, cardinal, viewport, num * 2);
     g_free(viewport);
 
-    /* change our struts/area to match */
-    screen_update_struts();
-
     /* the number of rows/columns will differ */
     screen_update_layout();
 
@@ -260,9 +257,12 @@ void screen_set_num_desktops(guint num)
     /* move windows on desktops that will no longer exist! */
     for (it = client_list; it != NULL; it = it->next) {
         Client *c = it->data;
-        if (c->desktop >= num)
+        if (c->desktop >= num && c->desktop != DESKTOP_ALL)
             client_set_desktop(c, num - 1, FALSE);
     }
+
+    /* change our struts/area to match (after moving windows) */
+    screen_update_struts();
 
     dispatch_ob(Event_Ob_NumDesktops, num, old);
 

@@ -12,6 +12,8 @@ GHashTable *menu_map = NULL;
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
+void menu_control_show(Menu *self, int x, int y, Client *client);
+
 void menu_destroy_hash_key(gpointer data)
 {
     g_free(data);
@@ -91,7 +93,8 @@ static Window createWindow(Window parent, unsigned long mask,
                        
 }
 
-Menu *menu_new(char *label, char *name, Menu *parent)
+Menu *menu_new_full(char *label, char *name, Menu *parent, 
+                    menu_controller_show show, menu_controller_update update)
 {
     XSetWindowAttributes attrib;
     Menu *self;
@@ -105,6 +108,12 @@ Menu *menu_new(char *label, char *name, Menu *parent)
     self->shown = FALSE;
     self->invalid = FALSE;
     /* default controllers? */
+    
+    self->show = show;
+    self->hide = NULL;
+    self->update = update;
+    self->mouseover = NULL;
+    self->selected = NULL;
 
     attrib.override_redirect = TRUE;
     attrib.event_mask = FRAME_EVENTMASK;
@@ -195,20 +204,21 @@ void menu_show(char *name, int x, int y, Client *client)
                   name);
         return;
     }
-    
-    if(self->invalid) {
-      menu_render(self);
+
+    if (self->invalid) {
+      if (self->update) {
+        self->update(self);
+      } else {
+        menu_render(self);
+      }
     }
-
-    XMoveWindow(ob_display, self->frame, x, y);
-
+    
     self->client = client;
 
-    if (!self->shown) {
-        stacking_raise_internal(self->frame);
-        XMapWindow(ob_display, self->frame);
-/*        grab_pointer_window(TRUE, None, self->frame);*/
-        self->shown = TRUE;
+    if (self->show) {
+      self->show(self, x, y, client);
+    } else {
+      menu_control_show(self, x, y, client);
     }
 }
 
@@ -267,4 +277,18 @@ void menu_entry_fire(MenuEntry *self)
         while (m->parent) m = m->parent;
         menu_hide(m);
     }
+}
+
+/* 
+   Default menu controller action for showing.
+*/
+
+void menu_control_show(Menu *self, int x, int y, Client *client) {
+  XMoveWindow(ob_display, self->frame, x, y);
+
+  if (!self->shown) {
+    stacking_raise_internal(self->frame);
+    XMapWindow(ob_display, self->frame);
+    self->shown = TRUE;
+  }
 }

@@ -1,4 +1,4 @@
-// Functions for default rendering of menus. Might become pluginnable
+/* Functions for default rendering of menus. Might become pluginnable */
 
 #include "menu.h"
 #include "openbox.h"

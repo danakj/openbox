@@ -8,23 +8,28 @@
 
 extern GHashTable *menu_map;
 
+struct Menu;
+
+typedef void(*menu_controller_show)(struct Menu *self, int x, int y, Client *);
+typedef void(*menu_controller_update)(struct Menu *self);
+
 typedef struct Menu {
     char *label;
     char *name;
     
     GList *entries;
-    /* GList *tail; */
 
-    /* ? */
     gboolean shown;
     gboolean invalid;
 
     struct Menu *parent;
 
-    /* waste o' pointers */
-    void (*show)( /* some bummu */);
+    /* place a menu on screen */
+    menu_controller_show show;
     void (*hide)( /* some bummu */);
-    void (*update)( /* some bummu */);
+
+    /* render a menu */
+    menu_controller_update update;
     void (*mouseover)( /* some bummu */);
     void (*selected)( /* some bummu */);
 
@@ -76,7 +81,11 @@ typedef struct {
 void menu_startup();
 void menu_shutdown();
 
-Menu *menu_new(char *label, char *name, Menu *parent);
+#define menu_new(l, n, p) \
+  menu_new_full(l, n, p, NULL, NULL)
+
+Menu *menu_new_full(char *label, char *name, Menu *parent, 
+                    menu_controller_show show, menu_controller_update update);
 void menu_free(char *name);
 
 void menu_show(char *name, int x, int y, Client *client);

@@ -1,10 +1,3 @@
-!! Theme information
-style.name: Cheetah3
-style.author: Me(rry)
-style.date: 
-style.credits: probably stole from some gnome metacity theme or something
-style.comments: made with stylebox
-
 !! Menu settings
 
 menu.title: flat gradient vertical bevel1
@@ -13,29 +6,20 @@ menu.title.colorTo: #4a59a5
 menu.title.textColor: #fcfcfe
 menu.title.justify: center
 
-menu.frame: raised solid bevel1
-menu.frame.color: #e6e6e6
-menu.frame.colorTo: #000000
-menu.frame.textColor: #000000
-menu.frame.justify: left
-menu.frame.disableColor: #ececec
+menu.items: raised solid bevel1
+menu.items.color: #e6e6e6
+menu.items.colorTo: #000000
+menu.items.textColor: #000000
+menu.items.justify: left
+menu.disabled.textColor: #222222
 
-menu.hilite: flat gradient vertical bevel1
-menu.hilite.color: #4a5194
-menu.hilite.colorTo: #5a71c5
-menu.hilite.textColor: #ffffff
+menu.selected: flat gradient vertical bevel1
+menu.selected.color: #4a5194
+menu.selected.colorTo: #5a71c5
+menu.selected.textColor: #ffffff
 
-menu.bullet: triangle
-menu.bullet.position: right
+window.label.justify: center
 
-!! General window settings
-window.button.pressed: flat solid bevel1
-window.button.pressed.color: #000000
-window.button.pressed.colorTo: #000000
-window.justify: center
-
-!! focused window settings
-window.frame.focusColor: #000000
 
 window.title.focus: flat gradient vertical bevel1
 window.title.focus.color: #6375ce
@@ -57,14 +41,11 @@ window.label.focus.textColor: #ffffff
 window.button.focus: parentrelative
 window.button.focus.color: #000000
 window.button.focus.colorTo: #000000
-window.button.focus.picColor: #d6d7ef
+window.button.focus.imageColor: #d6d7ef
 
 window.button.pressed.focus: sunken solid bevel1
 window.button.pressed.focus.color: #4c59a6
 window.button.pressed.focus.colorTo: #000000
-
-!! unfocused window settings
-window.frame.unfocusColor: #000000
 
 window.title.unfocus: flat gradient vertical bevel1
 window.title.unfocus.color: #e1e1e1
@@ -82,25 +63,33 @@ window.label.unfocus: parentrelative
 window.label.unfocus.textColor: #ffffff
 
 window.button.unfocus: parentrelative
-window.button.unfocus.picColor: #ffffff
+window.button.unfocus.imageColor: #ffffff
 
 window.button.pressed.unfocus: sunken solidbevel1
 window.button.pressed.unfocus.color: #cdcac7
 window.button.pressed.unfocus.colorTo: #000000
 
-!##stupid shit
-window.button.disabled.focus: flat
-window.button.disabled.focus.color: #990000
-window.button.disabled.focus.colorTo: #990000
-window.button.disabled.focus.picColor: #ffffff
-#window.button.disabled.focus.borderColor: #83aede
-#
-window.button.disabled.unfocus: flat
-window.button.disabled.unfocus.color: #d5dad5
-window.button.disabled.unfocus.colorTo: #b4b6b4
-window.button.disabled.unfocus.picColor:  #7b7d7b
-#window.button.disabled.unfocus.borderColor: #7b7d7b
+window.button.pressed.unfocus: flat gradient vertical bevel1
+window.button.pressed.unfocus.color: #919191
+window.button.pressed.unfocus.colorTo: #5a5a5a
+window.button.pressed.unfocus.borderColor: #000000
 
+!#
+window.button.disabled.focus: parentrelative
+window.button.disabled.focus.imageColor: #dddddd
+!#
+window.button.disabled.unfocus: parentrelative
+window.button.disabled.unfocus.imageColor:  #6a716a
+
+!# toggled
+window.button.toggled.focus: parentrelative
+window.button.toggled.focus.imageColor: #f1f1f1
+
+window.button.toggled.unfocus: parentrelative
+window.button.toggled.focus.imageColor: #f1f1f1
+
+window.frame.unfocusColor: #f7f7f7
+window.frame.focusColor: #f7f7f7
 
 !! Global width settings
 borderWidth: 1
@@ -113,6 +102,7 @@ frameWidth: 0
 borderColor: #222222
 
 !! font me!
-window.focus.font: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=90
-menu.frame.font: National First Font:pixelsize=15
+window.label.focus.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
+window.label.unfocus.font:Bitstream Vera Sans:bold:pixelsize=9
+menu.items.font: National First Font:pixelsize=15
 menu.title.font: Bitstream Vera Sans:bold:pixelsize=10

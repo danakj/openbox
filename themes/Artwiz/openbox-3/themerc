@@ -1,0 +1,101 @@
+menu.title:			raised gradient diagonal
+menu.title.color:		rgb:90/94/98
+menu.title.colorTo:		rgb:20/24/28
+menu.title.textColor:		white
+menu.title.justify:		center
+
+menu.items:			sunken gradient diagonal
+menu.items.color:		rgb:10/20/30
+menu.items.colorTo:		rgb:70/80/90
+menu.items.textColor:		rgb:90/a0/b0
+menu.items.justify:		center
+
+menu.selected:			raised gradient diagonal
+menu.selected.color:		rgb:90/94/98
+menu.selected.colorTo:		rgb:20/24/28
+menu.selected.textColor:		white
+menu.bullet.imageColor: rgb:90/a0/b0
+
+window.title.focus:		raised gradient vertical
+window.title.focus.color:	rgb:80/84/88
+window.title.focus.colorTo:	rgb:30/34/38
+window.title.unfocus:		raised vertical gradient
+window.title.unfocus.color:	rgb:50/54/58
+window.title.unfocus.colorTo:	black
+
+window.label.focus:		sunken diagonal gradient
+window.label.focus.color:	rgb:10/20/30
+window.label.focus.colorTo:	rgb:70/80/90
+window.label.focus.textColor:	white
+window.label.unfocus:		sunken gradient diagonal
+window.label.unfocus.color:	black
+window.label.unfocus.colorTo:	rgb:40/50/60
+window.label.unfocus.textColor:	rgb:60/64/68
+window.label.justify:			center
+
+window.button.focus:		raised gradient diagonal
+window.button.focus.color:	rgb:90/94/98
+window.button.focus.colorTo:	rgb:20/24/28
+window.button.focus.imageColor:	white
+
+window.button.unfocus:		raised gradient diagonal
+window.button.unfocus.color:	rgb:50/54/58
+window.button.unfocus.colorTo:	black
+window.button.unfocus.imageColor:	rgb:70/74/78
+
+window.button.pressed.focus:		sunken gradient diagonal
+window.button.pressed.focus.color:	rgb:20/40/50
+window.button.pressed.focus.colorTo:	rgb:60/70/80
+
+window.button.pressed.unfocus:		sunken gradient diagonal
+window.button.pressed.unfocus.color:	rgb:50/54/58
+window.button.pressed.unfocus.colorTo:	black
+window.button.pressed.unfocus.imageColor:	rgb:70/74/78
+
+window.frame.focusColor:	rgb:40/44/48
+window.frame.unfocusColor:	rgb:20/24/28
+
+window.handle.focus:		raised gradient diagonal
+window.handle.focus.color:	rgb:70/74/78
+window.handle.focus.colorTo:	rgb:40/44/48
+
+window.handle.unfocus:		raised gradient diagonal
+window.handle.unfocus.color:	rgb:50/54/58
+window.handle.unfocus.colorTo:	black
+
+window.grip.focus:		sunken diagonal gradient
+window.grip.focus.color:	rgb:20/30/40
+window.grip.focus.colorTo:	rgb:60/70/80
+
+window.grip.unfocus:		sunken diagonal gradient
+window.grip.unfocus.color:	black
+window.grip.unfocus.colorTo:	rgb:30/40/50
+
+window.button.toggled.focus:		raised gradient diagonal
+window.button.toggled.focus.color:	rgb:90/94/98
+window.button.toggled.focus.colorTo:	rgb:20/24/28
+window.button.toggled.focus.imageColor:	white
+
+window.button.toggled.unfocus:		raised gradient diagonal
+window.button.toggled.unfocus.color:	rgb:50/54/58
+window.button.toggled.unfocus.colorTo:	black
+window.button.toggled.unfocus.imageColor:	rgb:70/74/78
+
+window.button.disabled.focus:		raised gradient diagonal
+window.button.disabled.focus.color:	rgb:90/94/98
+window.button.disabled.focus.colorTo:	rgb:20/24/28
+window.button.disabled.focus.imageColor:	grey
+
+window.button.disabled.unfocus:		raised gradient diagonal
+window.button.disabled.unfocus.color:	rgb:50/54/58
+window.button.disabled.unfocus.colorTo:	black
+window.button.disabled.unfocus.imageColor:	rgb:70/74/78
+
+borderColor:			black
+bevelWidth:				1
+borderWidth:			1
+handleWidth:			4
+
+window.label.focus.font: Bitstream Vera Sans:pixelsize=10
+menu.title.font: Bitstream Vera Sans:pixelsize=10
+menu.items.font: Bitstream Vera Sans:pixelsize=10

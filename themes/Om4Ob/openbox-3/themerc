@@ -1,19 +1,19 @@
 style.author:	miklos
 style.date:	Aug 1, 2003
 
-window.focus.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+window.label.focus.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
 menu.title.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
-menu.frame.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+menu.items.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
 
 
 ! Menu settings...
-menu.frame: flat gradient crossdiagonal
-menu.frame.colorTo:	#93a1a8
-menu.frame.color:	#7c8c93
-menu.frame.borderColor: #ffffff
-menu.frame.textColor:	#4c595c
+menu.items: flat gradient crossdiagonal
+menu.items.colorTo:	#93a1a8
+menu.items.color:	#7c8c93
+menu.items.borderColor: #ffffff
+menu.items.textColor:	#4c595c
 
-menu.frame.justify:	center
+menu.items.justify:	center
 menu.title.justify:  right
 
 menu.title:	flatborder gradient diagonal
@@ -22,25 +22,25 @@ menu.title.color:	#f0f0ff
 menu.title.borderColor:	#a9a9a9
 menu.title.textColor:	#565a5c
 
-menu.hilite: flatborder gradient diagonal
-menu.hilite.color: #93a1a8
-menu.hilite.colorTo: #7c8c93
-menu.hilite.borderColor: #a9a9a9
-menu.hilite.textColor:	#f0f0ff
+menu.selected: flatborder gradient diagonal
+menu.selected.color: #93a1a8
+menu.selected.colorTo: #7c8c93
+menu.selected.borderColor: #a9a9a9
+menu.selected.textColor:	#f0f0ff
 
-menu.frame.disableColor:	#757575
+menu.disabled.textColor:	#757575
 
 ! Window settings...
 window.button.focus: parentrelative
-window.button.focus.picColor: #565a5c
+window.button.focus.imageColor: #565a5c
 
-window.justify: center
+window.label.justify: center
 
 window.button.hover.focus: flatborder gradient diagonal
 window.button.hover.focus.color: #93a1a8
 window.button.hover.focus.colorTo: #7c8c93
 window.button.hover.focus.borderColor: #a9a9a9
-window.button.hover.focus.picColor: #ffffff
+window.button.hover.focus.imageColor: #ffffff
 
 window.button.hover.unfocus: parentrelative
 
@@ -48,22 +48,22 @@ window.button.toggled.focus: flatborder gradient diagonal
 window.button.toggled.focus.color: #93a1a8
 window.button.toggled.focus.colorTo: #7c8c93
 window.button.toggled.focus.borderColor: #a9a9a9
-window.button.toggled.focus.picColor: #ffffff
+window.button.toggled.focus.imageColor: #ffffff
 
 window.button.toggled.unfocus: parentrelative
 
 window.button.pressed.focus: sunken gradient diagonal
 window.button.pressed.focus.color: #93a1a8
 window.button.pressed.focus.colorTo: #7c8c93
-window.button.pressed.focus.picColor: #ffffff
+window.button.pressed.focus.imageColor: #ffffff
 
 window.button.disabled.focus: parentrelative
-window.button.disabled.focus.picColor: #7c8c93
+window.button.disabled.focus.imageColor: #7c8c93
 window.button.disabled.unfocus: parentrelative
-window.button.disabled.unfocus.picColor: #7c8c93
+window.button.disabled.unfocus.imageColor: #7c8c93
 
 window.button.unfocus: parentrelative
-window.button.unfocus.picColor: #677b91
+window.button.unfocus.imageColor: #677b91
 
 window.grip.focus:	flat gradient diagonal
 window.grip.focus.color:	#93a1a8
@@ -95,10 +95,6 @@ window.title.focus.colorTo:       #7c8c93
 window.title.unfocus:	flat gradient crossdiagonal
 window.title.unfocus.color:	#93a1a8
 window.title.unfocus.colorTo:	#7c8c93
-
-window.button.pressed:	flatborder solid
-window.button.pressed.color:	#576b81
-window.button.pressed.borderColor: #4e6276
 
 window.frame.focusColor:	#7c8c93
 window.frame.unfocusColor:	#677b91

@@ -72,7 +72,7 @@ OBFrame::~OBFrame()
 
 void OBFrame::grabButtons(bool grab)
 {
-  _plate.grabButtons(grab);
+/*  _plate.grabButtons(grab);
 
   // grab any requested buttons on the entire frame
   std::vector<std::string> grabs;
@@ -92,7 +92,7 @@ void OBFrame::grabButtons(bool grab)
         otk::OBDisplay::ungrabButton(b.key, b.modifiers, _window);
       }
     }
-  }
+    }*/
 }
 
   

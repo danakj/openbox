@@ -106,26 +106,26 @@ bool OBBindings::translate(const std::string &str, Binding &b,bool askey) const
   }
 }
 
-static void destroytree(BindingTree *tree)
+static void destroytree(KeyBindingTree *tree)
 {
   while (tree) {
-    BindingTree *c = tree->first_child;
+    KeyBindingTree *c = tree->first_child;
     delete tree;
     tree = c;
   }
 }
 
-BindingTree *OBBindings::buildtree(const StringVect &keylist,
+KeyBindingTree *OBBindings::buildtree(const StringVect &keylist,
                                    PyObject *callback) const
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
 
-  BindingTree *ret = 0, *p;
+  KeyBindingTree *ret = 0, *p;
 
   StringVect::const_reverse_iterator it, end = keylist.rend();
   for (it = keylist.rbegin(); it != end; ++it) {
     p = ret;
-    ret = new BindingTree(callback);
+    ret = new KeyBindingTree(callback);
     if (!p) ret->chain = false; // only the first built node
     ret->first_child = p;
     if (!translate(*it, ret->binding)) {
@@ -139,7 +139,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist,
 
 
 OBBindings::OBBindings()
-  : _curpos(&_tree),
+  : _curpos(&_keytree),
     _resetkey(0,0),
     _timer(Openbox::instance->timerManager(),
            (otk::OBTimeoutHandler)reset, this)
@@ -157,15 +157,15 @@ OBBindings::~OBBindings()
 }
 
 
-void OBBindings::assimilate(BindingTree *node)
+void OBBindings::assimilate(KeyBindingTree *node)
 {
-  BindingTree *a, *b, *tmp, *last;
+  KeyBindingTree *a, *b, *tmp, *last;
 
-  if (!_tree.first_child) {
+  if (!_keytree.first_child) {
     // there are no nodes at this level yet
-    _tree.first_child = node;
+    _keytree.first_child = node;
   } else {
-    a = _tree.first_child;
+    a = _keytree.first_child;
     last = a;
     b = node;
     while (a) {
@@ -189,10 +189,10 @@ void OBBindings::assimilate(BindingTree *node)
 }
 
 
-PyObject *OBBindings::find(BindingTree *search, bool *conflict) const {
+PyObject *OBBindings::find(KeyBindingTree *search, bool *conflict) const {
   *conflict = false;
-  BindingTree *a, *b;
-  a = _tree.first_child;
+  KeyBindingTree *a, *b;
+  a = _keytree.first_child;
   b = search;
   while (a && b) {
     if (a->binding != b->binding) {
@@ -217,7 +217,7 @@ PyObject *OBBindings::find(BindingTree *search, bool *conflict) const {
 
 bool OBBindings::add(const StringVect &keylist, PyObject *callback)
 {
-  BindingTree *tree;
+  KeyBindingTree *tree;
   bool conflict;
 
   if (!(tree = buildtree(keylist, callback)))
@@ -246,7 +246,7 @@ bool OBBindings::remove(const StringVect &keylist)
 {
   assert(false); // XXX: function not implemented yet
 
-  BindingTree *tree;
+  KeyBindingTree *tree;
   bool conflict;
 
   if (!(tree = buildtree(keylist, 0)))
@@ -256,7 +256,7 @@ bool OBBindings::remove(const StringVect &keylist)
   if (func) {
     grabKeys(false);
 
-    _curpos = &_tree;
+    _curpos = &_keytree;
     
     // XXX do shit here ...
     Py_DECREF(func);
@@ -280,14 +280,14 @@ void OBBindings::setResetKey(const std::string &key)
 }
 
 
-static void remove_branch(BindingTree *first)
+static void remove_branch(KeyBindingTree *first)
 {
-  BindingTree *p = first;
+  KeyBindingTree *p = first;
 
   while (p) {
     if (p->first_child)
       remove_branch(p->first_child);
-    BindingTree *s = p->next_sibling;
+    KeyBindingTree *s = p->next_sibling;
     Py_XDECREF(p->callback);
     delete p;
     p = s;
@@ -297,9 +297,9 @@ static void remove_branch(BindingTree *first)
 
 void OBBindings::removeAll()
 {
-  if (_tree.first_child) {
-    remove_branch(_tree.first_child);
-    _tree.first_child = 0;
+  if (_keytree.first_child) {
+    remove_branch(_keytree.first_child);
+    _keytree.first_child = 0;
   }
 }
 
@@ -309,7 +309,7 @@ void OBBindings::grabKeys(bool grab)
   for (int i = 0; i < Openbox::instance->screenCount(); ++i) {
     Window root = otk::OBDisplay::screenInfo(i)->rootWindow();
 
-    BindingTree *p = _curpos->first_child;
+    KeyBindingTree *p = _curpos->first_child;
     while (p) {
       if (grab) {
         otk::OBDisplay::grabKey(p->binding.key, p->binding.modifiers,
@@ -338,7 +338,7 @@ void OBBindings::fire(unsigned int modifiers, unsigned int key, Time time)
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
     reset(this);
   } else {
-    BindingTree *p = _curpos->first_child;
+    KeyBindingTree *p = _curpos->first_child;
     while (p) {
       if (p->binding.key == key && p->binding.modifiers == modifiers) {
         if (p->chain) {
@@ -364,8 +364,160 @@ void OBBindings::reset(OBBindings *self)
 {
   self->_timer.stop();
   self->grabKeys(false);
-  self->_curpos = &self->_tree;
+  self->_curpos = &self->_keytree;
   self->grabKeys(true);
+}
+
+
+bool OBBindings::addButton(const std::string &but, MouseContext context,
+                           MouseAction action, PyObject *callback)
+{
+  assert(context >= 0 && context < NUM_MOUSE_CONTEXT);
+  
+  Binding b(0,0);
+  if (!translate(but, b, false))
+    return false;
+
+  ButtonBindingList::iterator it, end = _buttons[context].end();
+
+  // look for a duplicate binding
+  for (it = _buttons[context].begin(); it != end; ++it)
+    if ((*it)->binding.key == b.key &&
+        (*it)->binding.modifiers == b.modifiers) {
+      ButtonBinding::CallbackList::iterator c_it,
+        c_end = (*it)->callback[action].end();
+      for (c_it = (*it)->callback[action].begin(); c_it != c_end; ++c_it)
+        if (*c_it == callback)
+          return true; // already bound
+      break;
+    }
+
+  ButtonBinding *bind;
+  
+  // the binding didnt exist yet, add it
+  if (it == end) {
+    bind = new ButtonBinding();
+    bind->binding.key = b.key;
+    bind->binding.modifiers = b.modifiers;
+    _buttons[context].push_back(bind);
+    printf("adding %d.%d to %d\n", b.key, b.modifiers, context);
+    // XXX GRAB the new button everywhere!
+  } else
+    bind = *it;
+  bind->callback[action].push_back(callback);
+  Py_INCREF(callback);
+  return true;
+}
+
+void OBBindings::grabButtons(bool grab, OBClient *client)
+{
+  for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
+    Window win[3] = {0, 0, 0}; // at most 2 windows
+    switch (i) {
+    case MC_Frame:
+      win[0] = client->frame->window();
+      break;
+    case MC_Titlebar:
+      win[0] = client->frame->titlebar();
+      win[1] = client->frame->label();
+      break;
+    case MC_Window:
+      win[0] = client->frame->plate();
+      break;
+    case MC_MaximizeButton:
+//      win[0] = client->frame->button_max();
+      break;
+    case MC_CloseButton:
+//      win[0] = client->frame->button_close();
+      break;
+    case MC_IconifyButton:
+//      win[0] = client->frame->button_iconify();
+      break;
+    case MC_StickyButton: 
+//      win[0] = client->frame->button_stick();
+      break;
+    case MC_Grip:
+//      win[0] = client->frame->grip_left();
+//      win[1] = client->frame->grip_right();
+      break;
+    case MC_Root:
+//      win[0] = otk::OBDisplay::screenInfo(client->screen())->rootWindow();
+      break;
+    case MC_MenuItem:
+      break;
+    default:
+      assert(false); // invalid mouse context
+    }
+    ButtonBindingList::iterator it, end = _buttons[i].end();
+    for (it = _buttons[i].begin(); it != end; ++it)
+      for (Window *w = win; *w; ++w) {
+        if (grab) {
+          otk::OBDisplay::grabButton((*it)->binding.key,
+                                     (*it)->binding.modifiers, *w, false,
+                                     ButtonPressMask | ButtonMotionMask |
+                                     ButtonReleaseMask, GrabModeAsync,
+                                     GrabModeAsync, None, None, false);
+        }
+        else
+          otk::OBDisplay::ungrabButton((*it)->binding.key,
+                                       (*it)->binding.modifiers, *w);
+    }
+  }
+}
+
+void OBBindings::fire(MouseAction action, OBWidget::WidgetType type,
+                      Window win, unsigned int modifiers, unsigned int button,
+                      int xroot, int yroot, Time time)
+{
+  assert(action >= 0 && action < NUM_MOUSE_ACTION);
+
+  MouseContext context;
+  switch (type) {
+  case OBWidget::Type_Frame:
+    context = MC_Frame; break;
+  case OBWidget::Type_Titlebar:
+    context = MC_Titlebar; break;
+  case OBWidget::Type_Handle:
+    context = MC_Frame; break;
+  case OBWidget::Type_Plate:
+    context = MC_Window; break;
+  case OBWidget::Type_Label:
+    context = MC_Titlebar; break;
+  case OBWidget::Type_MaximizeButton:
+    context = MC_MaximizeButton; break;
+  case OBWidget::Type_CloseButton:
+    context = MC_CloseButton; break;
+  case OBWidget::Type_IconifyButton:
+    context = MC_IconifyButton; break;
+  case OBWidget::Type_StickyButton:
+    context = MC_StickyButton; break;
+  case OBWidget::Type_LeftGrip:
+    context = MC_Grip; break;
+  case OBWidget::Type_RightGrip:
+    context = MC_Grip; break;
+  case OBWidget::Type_Client:
+    context = MC_Window; break;
+  case OBWidget::Type_Root:
+    context = MC_Root; break;
+  default:
+    assert(false); // unhandled type
+  }
+
+  modifiers &= (ControlMask | ShiftMask | Mod1Mask | Mod2Mask | Mod3Mask |
+                Mod4Mask | Mod5Mask);
+
+  printf("but.mods %d.%d\n", button, modifiers);
+  
+  ButtonBindingList::iterator it, end = _buttons[context].end();
+  for (it = _buttons[context].begin(); it != end; ++it)
+    if ((*it)->binding.key == button &&
+        (*it)->binding.modifiers == modifiers) {
+      ButtonBinding::CallbackList::iterator c_it,
+        c_end = (*it)->callback[action].end();
+      for (c_it = (*it)->callback[action].begin(); c_it != c_end; ++c_it)
+        python_callback(*c_it, action, win, context, modifiers,
+                        button, xroot, yroot, time);
+    }
 }
 
 }

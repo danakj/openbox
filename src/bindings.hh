@@ -7,6 +7,7 @@
 */
 
 #include "actions.hh"
+#include "python.hh"
 #include "otk/timer.hh"
 
 extern "C" {
@@ -32,22 +33,30 @@ typedef struct Binding {
   Binding(unsigned int mod, unsigned int k) { modifiers = mod; key = k; }
 } Binding;
 
-typedef struct BindingTree {
+typedef struct KeyBindingTree {
   Binding binding;
   PyObject *callback; // the callback given for the binding in add()
   bool chain;     // true if this is a chain to another key (not an action)
 
-  struct BindingTree *next_sibling; // the next binding in the tree at the same
+  struct KeyBindingTree *next_sibling; // the next binding in the tree at the same
                                     // level
-  struct BindingTree *first_child;  // the first child of this binding (next
+  struct KeyBindingTree *first_child;  // the first child of this binding (next
                                     // binding in a chained sequence).
-  BindingTree(PyObject *callback) : binding(0, 0) {
+  KeyBindingTree(PyObject *callback) : binding(0, 0) {
     this->callback = callback; chain = true; next_sibling = first_child = 0;
   }
-  BindingTree() : binding(0, 0) {
+  KeyBindingTree() : binding(0, 0) {
     this->callback = 0; chain = true; next_sibling = first_child = 0;
   }
-} BindingTree;
+} KeyBindingTree;
+
+typedef struct ButtonBinding {
+  Binding binding;
+  typedef std::list<PyObject*> CallbackList;
+  CallbackList callback[NUM_MOUSE_ACTION];
+  ButtonBinding() : binding(0, 0) {
+  }
+};
 
 class OBBindings {
 public:
@@ -55,18 +64,23 @@ public:
   typedef std::vector<std::string> StringVect;
 
 private:
-  BindingTree _tree; // root node of the tree (this doesn't have siblings!)
-  BindingTree *_curpos; // position in the keytree
+  // root node of the tree (this doesn't have siblings!)
+  KeyBindingTree _keytree; 
+  KeyBindingTree *_curpos; // position in the keytree
 
   Binding _resetkey; // the key which resets the key chain status
 
   otk::OBTimer _timer;
   
-  PyObject *find(BindingTree *search, bool *conflict) const;
-  BindingTree *buildtree(const StringVect &keylist, PyObject *callback) const;
-  void assimilate(BindingTree *node);
+  PyObject *find(KeyBindingTree *search, bool *conflict) const;
+  KeyBindingTree *buildtree(const StringVect &keylist,
+                            PyObject *callback) const;
+  void assimilate(KeyBindingTree *node);
 
   static void reset(OBBindings *self); // the timer's timeout function
+
+  typedef std::list <ButtonBinding*> ButtonBindingList;
+  ButtonBindingList _buttons[NUM_MOUSE_CONTEXT];
 
 public:
   //! Initializes an OBBindings object
@@ -100,6 +114,15 @@ public:
   void setResetKey(const std::string &key);
 
   void grabKeys(bool grab);
+
+  bool addButton(const std::string &but, MouseContext context,
+                 MouseAction action, PyObject *callback);
+
+  void grabButtons(bool grab, OBClient *client);
+
+  void fire(MouseAction action, OBWidget::WidgetType type, Window win,
+            unsigned int modifiers, unsigned int button,
+            int xroot, int yroot, Time time);
 };
 
 }

@@ -173,11 +173,10 @@ Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
 
-  delete _bindings;
-  delete _actions;
-  
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
 
+  delete _bindings;
+  delete _actions;
   delete _property;
 
   python_destroy();

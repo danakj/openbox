@@ -24,9 +24,9 @@ static PyObject *obdict = NULL;
 
 typedef struct {
   PyObject_HEAD;
-  OBActions::ActionType action;
+  MouseAction action;
   Window window;
-  OBWidget::WidgetType type;
+  MouseContext context;
   unsigned int state;
   unsigned int button;
   int xroot;
@@ -64,10 +64,10 @@ PyObject *ActionData_window(ActionData *self, PyObject *args)
   return PyLong_FromLong(self->window);
 }
 
-PyObject *ActionData_target(ActionData *self, PyObject *args)
+PyObject *ActionData_context(ActionData *self, PyObject *args)
 {
-  if(!PyArg_ParseTuple(args,":target")) return NULL;
-  return PyLong_FromLong((int)self->type);
+  if(!PyArg_ParseTuple(args,":context")) return NULL;
+  return PyLong_FromLong((int)self->context);
 }
 
 PyObject *ActionData_modifiers(ActionData *self, PyObject *args)
@@ -114,8 +114,8 @@ static PyMethodDef ActionData_methods[] = {
    "Return the action being executed."},
   {"window", (PyCFunction)ActionData_window, METH_VARARGS,
    "Return the client window id."},
-  {"target", (PyCFunction)ActionData_target, METH_VARARGS,
-   "Return the target type that the action is occuring on."},
+  {"context", (PyCFunction)ActionData_context, METH_VARARGS,
+   "Return the context that the action is occuring in."},
   {"modifiers", (PyCFunction)ActionData_modifiers, METH_VARARGS,
    "Return the modifier keys state."},
   {"button", (PyCFunction)ActionData_button, METH_VARARGS,
@@ -258,8 +258,8 @@ static void call(PyObject *func, PyObject *data)
   Py_DECREF(arglist);
 }
 
-void python_callback(PyObject *func, OBActions::ActionType action,
-                     Window window, OBWidget::WidgetType type,
+void python_callback(PyObject *func, MouseAction action,
+                     Window window, MouseContext context,
                      unsigned int state, unsigned int button,
                      int xroot, int yroot, Time time)
 {
@@ -268,7 +268,7 @@ void python_callback(PyObject *func, OBActions::ActionType action,
   ActionData *data = PyObject_New(ActionData, &ActionData_Type);
   data->action = action;
   data->window = window;
-  data->type   = type;
+  data->context= context;
   data->state  = state;
   data->button = button;
   data->xroot  = xroot;
@@ -316,4 +316,126 @@ bool python_get_stringlist(const char *name, std::vector<std::string> *value)
   return true;
 }
 
+// ************************************* //
+// Stuff for calling from Python scripts //
+// ************************************* //
+
+/*
+PyObject * python_register(int action, PyObject *func, bool infront = false)
+{
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+
+  if (!ob::Openbox::instance->actions()->registerCallback(
+        (ob::OBActions::ActionType)action, func, infront)) {
+    PyErr_SetString(PyExc_RuntimeError, "Unable to register action callback.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
+
+PyObject *unregister(int action, PyObject *func)
+{
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+
+  if (!ob::Openbox::instance->actions()->unregisterCallback(
+        (ob::OBActions::ActionType)action, func)) {
+    PyErr_SetString(PyExc_RuntimeError, "Unable to unregister action callback.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
+
+PyObject *unregister_all(int action)
+{
+  if (!ob::Openbox::instance->actions()->unregisterAllCallbacks(
+        (ob::OBActions::ActionType)action)) {
+    PyErr_SetString(PyExc_RuntimeError,
+                    "Unable to unregister action callbacks.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
+*/
+PyObject * mbind(const std::string &button, ob::MouseContext context,
+                 ob::MouseAction action, PyObject *func)
+{
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+  
+  if (!ob::Openbox::instance->bindings()->addButton(button, context,
+                                                    action, func)) {
+    PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
+
+PyObject * kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
+{
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+  if (!PyList_Check(keylist)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
+    return NULL;
+  }
+
+  ob::OBBindings::StringVect vectkeylist;
+  for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
+    PyObject *str = PyList_GetItem(keylist, i);
+    if (!PyString_Check(str)) {
+      PyErr_SetString(PyExc_TypeError,
+                     "Invalid keylist. It must contain only strings.");
+      return NULL;
+    }
+    vectkeylist.push_back(PyString_AsString(str));
+  }
+
+  if (!ob::Openbox::instance->bindings()->add(vectkeylist, func)) {
+    PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
+
+PyObject * kunbind(PyObject *keylist)
+{
+  if (!PyList_Check(keylist)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
+    return NULL;
+  }
+
+  ob::OBBindings::StringVect vectkeylist;
+  for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
+    PyObject *str = PyList_GetItem(keylist, i);
+    if (!PyString_Check(str)) {
+      PyErr_SetString(PyExc_TypeError,
+                     "Invalid keylist. It must contain only strings.");
+      return NULL;
+    }
+    vectkeylist.push_back(PyString_AsString(str));
+  }
+
+  ob::Openbox::instance->bindings()->remove(vectkeylist);
+  Py_INCREF(Py_None); return Py_None;
+}
+
+void kunbind_all()
+{
+  ob::Openbox::instance->bindings()->removeAll();
+}
+
+void set_reset_key(const std::string &key)
+{
+  ob::Openbox::instance->bindings()->setResetKey(key);
+}
 }

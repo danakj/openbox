@@ -17,31 +17,69 @@
 namespace ob {
 
 const unsigned int OBActions::DOUBLECLICKDELAY = 300;
+const int OBActions::BUTTONS;
 
 OBActions::OBActions()
   : _button(0)
 {
-  // XXX: load a configuration out of somewhere
-
+  for (int i=0; i<BUTTONS; ++i)
+    _posqueue[i] = new ButtonPressAction();
 }
 
 
 OBActions::~OBActions()
 {
+  for (int i=0; i<BUTTONS; ++i)
+    delete _posqueue[i];
 }
 
+
+void OBActions::insertPress(const XButtonEvent &e)
+{
+  ButtonPressAction *a = _posqueue[BUTTONS - 1];
+  for (int i=BUTTONS-1; i>0;)
+    _posqueue[i] = _posqueue[--i];
+  _posqueue[0] = a;
+  a->button = e.button;
+  a->pos.setPoint(e.x_root, e.y_root);
+
+  OBClient *c = Openbox::instance->findClient(e.window);
+  if (c) a->clientarea = c->area();
+}
+
+void OBActions::removePress(const XButtonEvent &e)
+{
+  ButtonPressAction *a = 0;
+  for (int i=0; i<BUTTONS; ++i) {
+    if (_posqueue[i]->button == e.button)
+      a = _posqueue[i];
+    if (a) // found one and removed it
+      _posqueue[i] = _posqueue[i+1];
+  }
+  if (a) { // found one
+    _posqueue[BUTTONS-1] = a;
+    a->button = 0;
+  }
+}
 
 void OBActions::buttonPressHandler(const XButtonEvent &e)
 {
   OtkEventHandler::buttonPressHandler(e);
+  insertPress(e);
   
   // run the PRESS python hook
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  doCallback(Action_ButtonPress, e.window,
+/*  doCallback(Action_ButtonPress, e.window,
              (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, e.button, e.x_root, e.y_root, e.time);
+             e.state, e.button, e.x_root, e.y_root, e.time);*/
+  if (w) {
+    Openbox::instance->bindings()->fire(MousePress, w->type(), e.window,
+                                        e.state, e.button,
+                                        e.x_root, e.y_root, e.time);
+  } else
+    assert(false); // why isnt there a type?
     
   if (_button) return; // won't count toward CLICK events
 
@@ -52,6 +90,7 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
 void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 {
   OtkEventHandler::buttonReleaseHandler(e);
+  removePress(e);
   
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
@@ -71,17 +110,29 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     return;
 
   // run the CLICK python hook
-  doCallback(Action_Click, e.window,
+/*  doCallback(Action_Click, e.window,
              (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, e.button, e.x_root, e.y_root, e.time);
+             e.state, e.button, e.x_root, e.y_root, e.time);*/
+  if (w) {
+    Openbox::instance->bindings()->fire(MouseClick, w->type(), e.window,
+                                        e.state, e.button,
+                                        e.x_root, e.y_root, e.time);
+  } else
+    assert(false); // why isnt there a type?
 
   if (e.time - _release.time < DOUBLECLICKDELAY &&
       _release.win == e.window && _release.button == e.button) {
 
     // run the DOUBLECLICK python hook
-    doCallback(Action_DoubleClick, e.window,
+/*    doCallback(Action_DoubleClick, e.window,
                (OBWidget::WidgetType)(w ? w->type():-1),
-               e.state, e.button, e.x_root, e.y_root, e.time);
+               e.state, e.button, e.x_root, e.y_root, e.time);*/
+    if (w) {
+      Openbox::instance->bindings()->fire(MouseDoubleClick, w->type(),
+                                          e.window, e.state, e.button,
+                                          e.x_root, e.y_root, e.time);
+    } else
+      assert(false); // why isnt there a type?
     
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
@@ -149,16 +200,24 @@ void OBActions::motionHandler(const XMotionEvent &e)
     }
   }
 
-
+  _dx = x_root - _posqueue[0]->pos.x(); _posqueue[0]->pos.setX(x_root);
+  _dy = y_root - _posqueue[0]->pos.y(); _posqueue[0]->pos.setY(y_root);
+  
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   //      maybe that should all be done via python tho.. (or radial menus!)
   // run the simple MOTION python hook for now...
-  doCallback(Action_MouseMotion, e.window,
+/*  doCallback(Action_MouseMotion, e.window,
              (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, (unsigned)-1, x_root, y_root, e.time);
+             e.state, (unsigned)-1, x_root, y_root, e.time);*/
+  if (w) {
+    Openbox::instance->bindings()->fire(MouseMotion, w->type(), e.window,
+                                        e.state, _posqueue[0]->button,
+                                        _dx, _dy, e.time);
+  } else
+    assert(false); // why isnt there a type?
 }
 
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)
@@ -190,16 +249,16 @@ void OBActions::doCallback(ActionType action, Window window,
     _callbacks.equal_range(action);
 
   CallbackMap::iterator it;
-  for (it = it_pair.first; it != it_pair.second; ++it)
-    python_callback(it->second, action, window, type, state,
-                    button, xroot, yroot, time);
+//  for (it = it_pair.first; it != it_pair.second; ++it)
+//    python_callback(it->second, action, window, type, state,
+//                    button, xroot, yroot, time);
+  // XXX do a callback
 }
 
 bool OBActions::registerCallback(ActionType action, PyObject *func,
                                  bool atfront)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
-      action == OBActions::Action_KeyPress) {
+  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
     return false;
   }
   if (!func)
@@ -222,8 +281,7 @@ bool OBActions::registerCallback(ActionType action, PyObject *func,
 
 bool OBActions::unregisterCallback(ActionType action, PyObject *func)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
-      action == OBActions::Action_KeyPress) {
+  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
     return false;
   }
   if (!func)
@@ -245,8 +303,7 @@ bool OBActions::unregisterCallback(ActionType action, PyObject *func)
 
 bool OBActions::unregisterAllCallbacks(ActionType action)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS ||
-      action == OBActions::Action_KeyPress) {
+  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
     return false;
   }
 

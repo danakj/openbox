@@ -40,14 +40,52 @@ void OBBindings::display()
 
 bool OBBindings::translate(const std::string &str, Binding &b)
 {
+  unsigned int mods = 0;
+  
+  // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
-  std::string key(str, keybegin != std::string::npos ? keybegin + 1 : 0);
+  keybegin = (keybegin == std::string::npos) ? 0 : keybegin + 1;
+  std::string key(str, keybegin);
 
   // XXX: get some modifiers up in the hizzie
+  // parse out the requested modifier keys
+  std::string::size_type begin = 0, end;
+  while (begin != keybegin) {
+    end = str.find_first_of('-', begin);
+
+    std::string mod(str, begin, end-begin);
+
+    if (mod == "C") {           // control
+      mods |= ControlMask;
+    } else if (mod == "S") {    // shift
+      mods |= ShiftMask;
+    } else if (mod == "A" ||    // alt/mod1
+               mod == "M" ||
+               mod == "M1" ||
+               mod == "Mod1") {
+      mods |= Mod1Mask;
+    } else if (mod == "M2" ||   // mod2
+               mod == "Mod2") {
+      mods |= Mod2Mask;
+    } else if (mod == "M3" ||   // mod3
+               mod == "Mod3") {
+      mods |= Mod3Mask;
+    } else if (mod == "W" ||    // windows/mod4
+               mod == "M4" ||
+               mod == "Mod4") {
+      mods |= Mod4Mask;
+    } else if (mod == "M5" ||   // mod5
+               mod == "Mod5") {
+      mods |= Mod5Mask;
+    }
+    printf("got modifier: got modifier: %s\n", mod.c_str());
+    
+    begin = end + 1;
+  }
   
   KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
   if (sym == NoSymbol) return false;
-  b.modifiers = Mod1Mask; // XXX: no way
+  b.modifiers = mods;
   b.key = XKeysymToKeycode(otk::OBDisplay::display, sym);
   return b.key != 0;
 }
@@ -111,7 +149,7 @@ OBBindings::~OBBindings()
 }
 
 
-static void assimilate(BindingTree *parent, BindingTree *node)
+void OBBindings::assimilate(BindingTree *node)
 {
   BindingTree *a, *b, *tmp, *last;
 
@@ -128,9 +166,9 @@ static void assimilate(BindingTree *parent, BindingTree *node)
       if (a->binding != b->binding) {
         a = a->next_sibling;
       } else {
-	tmp = b;
+        tmp = b;
         b = b->first_child;
-	delete tmp;
+        delete tmp;
         a = a->first_child;
       }
     }
@@ -206,7 +244,7 @@ bool OBBindings::add(const StringVect &keylist, int id)
   }
 
   // assimilate this built tree into the main tree
-  assimilate(&_tree, tree); // assimilation destroys/uses the tree
+  assimilate(tree); // assimilation destroys/uses the tree
   return true;
 }
 

@@ -51,6 +51,7 @@ private:
   int find(BindingTree *search);
   bool translate(const std::string &str, Binding &b);
   BindingTree *buildtree(const StringVect &keylist, int id);
+  void OBBindings::assimilate(BindingTree *node);
  
 public:
   //! Initializes an OBBinding object

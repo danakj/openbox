@@ -2526,12 +2526,54 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
       const int snap_distance = screen->getEdgeSnapThreshold();
 
       if (snap_distance) {
-        Rect srect = screen->availableArea();
         // window corners
         const int wleft = dx,
                  wright = dx + frame.rect.width() - 1,
                    wtop = dy,
                 wbottom = dy + frame.rect.height() - 1;
+
+        // Maybe this should be saved in the class, and set in the setWorkspace
+        // function!!
+        Workspace *w = screen->getWorkspace(getWorkspaceNumber());
+        assert(w);
+
+        // try snap to another window
+        for (unsigned int i = 0, c = w->getCount(); i < c; ++i) {
+          BlackboxWindow *snapwin = w->getWindow(i);
+          if (snapwin == this)
+            continue;   // don't snap to self
+
+          const Rect &winrect = snapwin->frameRect();
+          int dleft = std::abs(wright - winrect.left()),
+             dright = std::abs(wleft - winrect.right()),
+               dtop = std::abs(wbottom - winrect.top()),
+            dbottom = std::abs(wtop - winrect.bottom());
+
+          // snap left?
+          if (dleft < snap_distance && dleft <= dright) {
+            dx = winrect.left() - frame.rect.width();
+            break;
+          }
+          // snap right?
+          else if (dright < snap_distance) {
+            dx = winrect.right() + 1;
+            break;
+          }
+
+          // snap top?
+          if (dtop < snap_distance && dtop <= dbottom) {
+            dy = winrect.top() - frame.rect.height();
+            break;
+          }
+          // snap bottom?
+          else if (dbottom < snap_distance) {
+            dy = winrect.bottom() + 1;
+            break;
+          }
+        }
+                
+        // try snap to the screen's available area
+        Rect srect = screen->availableArea();
 
         int dleft = std::abs(wleft - srect.left()),
            dright = std::abs(wright - srect.right()),
@@ -2539,17 +2581,17 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
           dbottom = std::abs(wbottom - srect.bottom());
 
         // snap left?
-        if (dleft < snap_distance && dleft < dright)
+        if (dleft < snap_distance && dleft <= dright)
           dx = srect.left();
         // snap right?
-        else if (dright < snap_distance && dright < dleft)
+        else if (dright < snap_distance)
           dx = srect.right() - frame.rect.width() + 1;
 
         // snap top?
-        if (dtop < snap_distance && dtop < dbottom)
+        if (dtop < snap_distance && dtop <= dbottom)
           dy = srect.top();
         // snap bottom?
-        else if (dbottom < snap_distance && dbottom < dtop)
+        else if (dbottom < snap_distance)
           dy = srect.bottom() - frame.rect.height() + 1;
 
         srect = screen->getRect(); // now get the full screen
@@ -2560,17 +2602,17 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
         dbottom = std::abs(wbottom - srect.bottom());
 
         // snap left?
-        if (dleft < snap_distance && dleft < dright)
+        if (dleft < snap_distance && dleft <= dright)
           dx = srect.left();
         // snap right?
-        else if (dright < snap_distance && dright < dleft)
+        else if (dright < snap_distance)
           dx = srect.right() - frame.rect.width() + 1;
 
         // snap top?
-        if (dtop < snap_distance && dtop < dbottom)
+        if (dtop < snap_distance && dtop <= dbottom)
           dy = srect.top();
         // snap bottom?
-        else if (dbottom < snap_distance && dbottom < dtop)
+        else if (dbottom < snap_distance)
           dy = srect.bottom() - frame.rect.height() + 1;
       }
 

@@ -1,4 +1,5 @@
 #include "cwmcc_internal.h"
+#include "atom.h"
 
 #include <X11/Xutil.h>
 #include <glib.h>
@@ -85,7 +86,9 @@ static gboolean get_all(Window win, Atom prop, Atom type, int size,
 			     &ret_items, &bytes_left, &xdata);
     if (res == Success) {
 	if (ret_size == size && ret_items > 0) {
-	    *data = g_memdup(xdata, ret_items * (size / 8));
+	    *data = g_malloc(ret_items * (size / 8) + sizeof(guchar*));
+            g_memmove(*data, xdata, ret_items * (size / 8));
+            data[ret_items * (size / 8)] = NULL;
 	    *num = ret_items;
 	    ret = TRUE;
 	}
@@ -131,12 +134,12 @@ gboolean prop_get_string_locale(Window win, Atom prop, char **data)
     return FALSE;
 }
 
-gboolean prop_get_string_utf(Window win, Atom prop, Atom type, char **ret)
+gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
 {
     char *raw;
     gulong num;
      
-    if (get_all(win, prop, type, 8, (guchar**)&raw, &num)) {
+    if (get_all(win, prop, CWMCC_ATOM(type, utf8), 8, (guchar**)&raw, &num)) {
 	*ret = g_strdup(raw); /* grab the first string from the list */
 	g_free(raw);
 	return TRUE;
@@ -144,12 +147,12 @@ gboolean prop_get_string_utf(Window win, Atom prop, Atom type, char **ret)
     return FALSE;
 }
 
-gboolean prop_get_strings_utf(Window win, Atom prop, Atom type, char ***ret)
+gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
 {
     char *raw, *p;
     gulong num, i;
 
-    if (get_all(win, prop, type, 8, (guchar**)&raw, &num)) {
+    if (get_all(win, prop, CWMCC_ATOM(type, utf8), 8, (guchar**)&raw, &num)) {
         *ret = g_new(char*, num + 1);
         (*ret)[num] = NULL; /* null terminated list */
 
@@ -164,11 +167,12 @@ gboolean prop_get_strings_utf(Window win, Atom prop, Atom type, char ***ret)
     return FALSE;
 }
 
-gboolean prop_get_strings_locale(Window win, Atom prop, Atom type,char ***ret){
+gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
+{
     char *raw, *p;
     gulong num, i;
 
-    if (get_all(win, prop, type, 8, (guchar**)&raw, &num)) {
+    if (get_all(win, prop, CWMCC_ATOM(type, string), 8, (guchar**)&raw, &num)){
         *ret = g_new(char*, num + 1);
         (*ret)[num] = NULL; /* null terminated list */
 
@@ -189,7 +193,7 @@ gboolean prop_get_strings_locale(Window win, Atom prop, Atom type,char ***ret){
     return FALSE;
 }
 
-void prop_set_strings_utf(Window win, Atom prop, Atom type, char **strs)
+void prop_set_strings_utf8(Window win, Atom prop, char **strs)
 {
     GString *str;
     guint i;
@@ -199,7 +203,7 @@ void prop_set_strings_utf(Window win, Atom prop, Atom type, char **strs)
         str = g_string_append(str, strs[i]);
         str = g_string_append_c(str, '\0');
     }
-    XChangeProperty(cwmcc_display, win, prop, type, 8,
+    XChangeProperty(cwmcc_display, win, prop, CWMCC_ATOM(type, utf8), 8,
                     PropModeReplace, (guchar*)str->str, str->len);
 }
 

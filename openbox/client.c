@@ -2181,7 +2181,7 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
             }
         }
         if ((dir == 0 || dir == 2) && self->max_vert) { /* vert */
-            if (self->pre_max_area.width > 0) {
+            if (self->pre_max_area.height > 0) {
                 y = self->pre_max_area.y;
                 h = self->pre_max_area.height;
 

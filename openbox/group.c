@@ -17,13 +17,13 @@ void group_shutdown()
     g_hash_table_destroy(group_map);
 }
 
-Group *group_add(Window leader, ObClient *client)
+ObGroup *group_add(Window leader, ObClient *client)
 {
-    Group *self;
+    ObGroup *self;
 
     self = g_hash_table_lookup(group_map, &leader);
     if (self == NULL) {
-        self = g_new(Group, 1);
+        self = g_new(ObGroup, 1);
         self->leader = leader;
         self->members = NULL;
         g_hash_table_insert(group_map, &self->leader, self);
@@ -34,7 +34,7 @@ Group *group_add(Window leader, ObClient *client)
     return self;
 }
 
-void group_remove(Group *self, ObClient *client)
+void group_remove(ObGroup *self, ObClient *client)
 {
     self->members = g_slist_remove(self->members, client);
     if (self->members == NULL) {

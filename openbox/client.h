@@ -11,7 +11,7 @@
 #include <X11/Xlib.h>
 
 struct Frame;
-struct Group;
+struct _ObGroup;
 
 typedef struct _ObClient     ObClient;
 typedef struct _ObClientIcon ObClientIcon;
@@ -81,14 +81,14 @@ struct _ObClient
     int ignore_unmaps;
 
     /*! The id of the group the window belongs to */
-    struct Group *group;
+    struct _ObGroup *group;
     /*! Whether or not the client is a transient window. This is guaranteed to 
       be TRUE if transient_for != NULL, but not guaranteed to be FALSE if
       transient_for == NULL. */
     gboolean transient;
     /*! The client which this client is a transient (child) for.
       A value of TRAN_GROUP signifies that the window is a transient for all
-      members of its Group, and is not a valid pointer to be followed in this
+      members of its ObGroup, and is not a valid pointer to be followed in this
       case.
      */
     ObClient *transient_for;

@@ -13,9 +13,9 @@ $ #OpaqueMove
 $ #FullMax
 # Maximisation complète
 $ #FocusNew
-# Clavier à la nouvelle fenêtre
+# Attribuer le clavier à la nouvelle fenêtre
 $ #FocusLast
-# Clavier à la dernière fenêtre
+# Attribuer le clavier en changeant d'espace de travail
 $ #ClickToFocus
 # Cliquer pour obtenir le clavier
 $ #SloppyFocus

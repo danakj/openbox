@@ -847,6 +847,10 @@ void BlackboxWindow::grabButtons(void) {
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
                          GrabModeAsync, frame.window,
                          blackbox->getLowerRightAngleCursor());
+  // alt+middle lowers the window
+  blackbox->grabButton(Button2, Mod1Mask, frame.window, True,
+                       ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
+                       frame.window, None);
 }
 
 
@@ -855,6 +859,7 @@ void BlackboxWindow::ungrabButtons(void) {
     blackbox->ungrabButton(Button1, 0, frame.plate);
 
   blackbox->ungrabButton(Button1, Mod1Mask, frame.window);
+  blackbox->ungrabButton(Button2, Mod1Mask, frame.window);
   blackbox->ungrabButton(Button3, Mod1Mask, frame.window);
 }
 
@@ -2216,7 +2221,7 @@ void BlackboxWindow::applyGravity(Rect &r) {
   case NorthEastGravity:
   case SouthEastGravity:
   case EastGravity:
-    r.setX(client.rect.x() - frame.margin.left - frame.margin.right);
+    r.setX(client.rect.x() - frame.margin.left - frame.margin.right + 2);
     break;
 
   case ForgetGravity:
@@ -2243,7 +2248,7 @@ void BlackboxWindow::applyGravity(Rect &r) {
   case SouthWestGravity:
   case SouthEastGravity:
   case SouthGravity:
-    r.setY(client.rect.y() - frame.margin.top - frame.margin.bottom);
+    r.setY(client.rect.y() - frame.margin.top - frame.margin.bottom + 2);
     break;
 
   case ForgetGravity:
@@ -2279,7 +2284,7 @@ void BlackboxWindow::restoreGravity(Rect &r) {
   case NorthEastGravity:
   case SouthEastGravity:
   case EastGravity:
-    r.setX(frame.rect.x() + frame.margin.left + frame.margin.right);
+    r.setX(frame.rect.x() + frame.margin.left + frame.margin.right - 2);
     break;
 
   case ForgetGravity:
@@ -2306,7 +2311,7 @@ void BlackboxWindow::restoreGravity(Rect &r) {
   case SouthWestGravity:
   case SouthEastGravity:
   case SouthGravity:
-    r.setY(frame.rect.y() + frame.margin.top + frame.margin.bottom);
+    r.setY(frame.rect.y() + frame.margin.top + frame.margin.bottom - 2);
     break;
 
   case ForgetGravity:
@@ -2821,6 +2826,9 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
     endMove();
   } else if (flags.resizing) {
     endResize();
+  } else if (re->window == frame.window) {
+    if (re->button == 2 && re->state == Mod1Mask)
+      XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
   }
 }
 

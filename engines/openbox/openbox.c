@@ -592,18 +592,18 @@ void frame_release_client(ObFrame *self, Client *client)
     }
 
     /* remove all the windows for the frame from the client_map */
-    g_hash_table_remove(client_map, &self->frame.window);
-    g_hash_table_remove(client_map, &self->frame.plate);
-    g_hash_table_remove(client_map, &self->title);
-    g_hash_table_remove(client_map, &self->label);
-    g_hash_table_remove(client_map, &self->max);
-    g_hash_table_remove(client_map, &self->close);
-    g_hash_table_remove(client_map, &self->desk);
-    g_hash_table_remove(client_map, &self->icon);
-    g_hash_table_remove(client_map, &self->iconify);
-    g_hash_table_remove(client_map, &self->handle);
-    g_hash_table_remove(client_map, &self->lgrip);
-    g_hash_table_remove(client_map, &self->rgrip);
+    g_hash_table_remove(client_map, (gpointer)self->frame.window);
+    g_hash_table_remove(client_map, (gpointer)self->frame.plate);
+    g_hash_table_remove(client_map, (gpointer)self->title);
+    g_hash_table_remove(client_map, (gpointer)self->label);
+    g_hash_table_remove(client_map, (gpointer)self->max);
+    g_hash_table_remove(client_map, (gpointer)self->close);
+    g_hash_table_remove(client_map, (gpointer)self->desk);
+    g_hash_table_remove(client_map, (gpointer)self->icon);
+    g_hash_table_remove(client_map, (gpointer)self->iconify);
+    g_hash_table_remove(client_map, (gpointer)self->handle);
+    g_hash_table_remove(client_map, (gpointer)self->lgrip);
+    g_hash_table_remove(client_map, (gpointer)self->rgrip);
 
     frame_free(self);
 }

@@ -61,9 +61,9 @@ void RenderColor::create()
     const ScreenInfo *info = display->screenInfo(_screen);
 
     XColor xcol;    // convert from 0-0xff to 0-0xffff
-    xcol.red = _red; xcol.red |= xcol.red << 8;
-    xcol.green = _green; xcol.green |= xcol.green << 8;
-    xcol.blue = _blue; xcol.blue |= xcol.blue << 8;
+    xcol.red = _red << 8 | _red;
+    xcol.green = _green << 8 | _green;
+    xcol.blue = _blue << 8 | _blue;
     xcol.pixel = 0;
 
     if (! XAllocColor(**display, info->colormap(), &xcol)) {

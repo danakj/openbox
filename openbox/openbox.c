@@ -59,6 +59,10 @@
 #  include <sys/stat.h>
 #  include <sys/types.h>
 #endif
+#ifdef HAVE_SYS_WAIT_H
+#  include <sys/types.h>
+#  include <sys/wait.h>
+#endif
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
@@ -128,6 +132,7 @@ gint main(gint argc, gchar **argv)
     ob_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL, NULL);
+    ob_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL, NULL);
 
     ob_screen = DefaultScreen(ob_display);
 
@@ -328,13 +333,20 @@ gint main(gint argc, gchar **argv)
 
 static void signal_handler(gint signal, gpointer data)
 {
-    if (signal == SIGUSR1) {
+    switch (signal) {
+    case SIGUSR1:
         ob_debug("Caught signal %d. Restarting.\n", signal);
         ob_restart();
-    } else if (signal == SIGUSR2) {
+        break;
+    case SIGUSR2:
         ob_debug("Caught signal %d. Reconfiguring.\n", signal);
-        ob_reconfigure();
-    } else {
+        ob_reconfigure(); 
+        break;
+    case SIGCHLD:
+        /* reap children */
+        while (waitpid(-1, NULL, WNOHANG) > 0);
+        break;
+    default:
         ob_debug("Caught signal %d. Exiting.\n", signal);
         /* TERM and INT return a 0 code */
         ob_exit(!(signal == SIGTERM || signal == SIGINT));

@@ -979,14 +979,23 @@ void action_run_string(const gchar *name, struct _ObClient *c)
 void action_execute(union ActionData *data)
 {
     GError *e = NULL;
-    gchar *cmd;
+    gchar *cmd, **argv = 0;
     if (data->execute.path) {
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
-            if (!g_spawn_command_line_async(cmd, &e)) {
+            if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
                 g_warning("failed to execute '%s': %s",
                           cmd, e->message);
                 g_error_free(e);
+            } else {
+                if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
+                                   G_SPAWN_DO_NOT_REAP_CHILD,
+                                   NULL, NULL, NULL, &e)) {
+                    g_warning("failed to execute '%s': %s",
+                              cmd, e->message);
+                    g_error_free(e);
+                }
+                g_strfreev(argv);
             }
             g_free(cmd);
         } else {

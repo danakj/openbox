@@ -65,6 +65,7 @@
         <xs:sequence>
             <xs:element name="strength" type="xs:integer"/>
             <xs:element name="screen_edge_strength" type="xs:integer"/>
+            <xs:element name="edges_hit_layers_below" type="xs:yesorno"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="focus">

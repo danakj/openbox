@@ -3151,6 +3151,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
                 continue;
             if(cur->iconic)
                 continue;
+            if(cur->layer < c->layer && !config_resist_layers_below)
+                continue;
 
             his_edge_start = cur->frame->area.x;
             his_edge_end = cur->frame->area.x + cur->frame->area.width;
@@ -3191,6 +3193,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
             if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
                 continue;
             if(cur->iconic)
+                continue;
+            if(cur->layer < c->layer && !config_resist_layers_below)
                 continue;
 
             his_edge_start = cur->frame->area.x;
@@ -3234,6 +3238,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
                 continue;
             if(cur->iconic)
                 continue;
+            if(cur->layer < c->layer && !config_resist_layers_below)
+                continue;
 
             his_edge_start = cur->frame->area.y;
             his_edge_end = cur->frame->area.y + cur->frame->area.height;
@@ -3275,6 +3281,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
             if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
                 continue;
             if(cur->iconic)
+                continue;
+            if(cur->layer < c->layer && !config_resist_layers_below)
                 continue;
 
             his_edge_start = cur->frame->area.y;

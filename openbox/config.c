@@ -73,6 +73,8 @@ GSList *config_menu_files;
 gint config_resist_win;
 gint config_resist_edge;
 
+gboolean config_resist_layers_below;
+
 /*
 
 <keybind key="C-x">
@@ -422,6 +424,8 @@ static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_resist_win = parse_int(doc, n);
     if ((n = parse_find_node("screen_edge_strength", node)))
         config_resist_edge = parse_int(doc, n);
+    if ((n = parse_find_node("edges_hit_layers_below", node)))
+        config_resist_layers_below = parse_bool(doc, n);
 }
 
 typedef struct
@@ -589,6 +593,7 @@ void config_startup(ObParseInst *i)
 
     config_resist_win = 10;
     config_resist_edge = 20;
+    config_resist_layers_below = FALSE;
 
     parse_register(i, "resistance", parse_resistance, NULL);
 

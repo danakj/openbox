@@ -3035,48 +3035,45 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       }
     }
 
-    // try snap to the screen's available area
-    Rect srect = screen->availableArea();
+    RectList snaplist; // the list of rects we will try to snap to
 
-    int dleft = std::abs(wleft - srect.left()),
-       dright = std::abs(wright - srect.right()),
-         dtop = std::abs(wtop - srect.top()),
-      dbottom = std::abs(wbottom - srect.bottom());
+    // snap to the strut (and screen boundaries for xinerama)
+#ifdef    XINERAMA
+    if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
+      RectList::iterator it, end = screen->allAvailableAreas().end();
+      for (it = screen->allAvailableAreas().begin(); it != end; ++it)
+        snaplist.push_back(*it);
+    } else
+#endif // XINERAMA
+      if (! screen->doFullMax())
+        snaplist.push_back(screen->availableArea());
+    
+    // always snap to the screen edges
+    snaplist.push_back(screen->getRect());
 
-    // snap left?
-    if (dleft < snap_distance && dleft <= dright)
-      dx = srect.left();
-    // snap right?
-    else if (dright < snap_distance)
-      dx = srect.right() - frame.rect.width() + 1;
+    RectList::iterator it, end = snaplist.end();
+    for (it = snaplist.begin(); it != end; ++it) {
+      Rect &srect = *it;
 
-    // snap top?
-    if (dtop < snap_distance && dtop <= dbottom)
-      dy = srect.top();
-    // snap bottom?
-    else if (dbottom < snap_distance)
-      dy = srect.bottom() - frame.rect.height() + 1;
+      int dleft = std::abs(wleft - srect.left()),
+         dright = std::abs(wright - srect.right()),
+           dtop = std::abs(wtop - srect.top()),
+        dbottom = std::abs(wbottom - srect.bottom());
 
-    srect = screen->getRect(); // now get the full screen
+        // snap left?
+        if (dleft < snap_distance && dleft <= dright)
+          dx = srect.left();
+        // snap right?
+        else if (dright < snap_distance)
+          dx = srect.right() - frame.rect.width() + 1;
 
-    dleft = std::abs(wleft - srect.left()),
-      dright = std::abs(wright - srect.right()),
-      dtop = std::abs(wtop - srect.top()),
-      dbottom = std::abs(wbottom - srect.bottom());
-
-    // snap left?
-    if (dleft < snap_distance && dleft <= dright)
-      dx = srect.left();
-    // snap right?
-    else if (dright < snap_distance)
-      dx = srect.right() - frame.rect.width() + 1;
-
-    // snap top?
-    if (dtop < snap_distance && dtop <= dbottom)
-      dy = srect.top();
-    // snap bottom?
-    else if (dbottom < snap_distance)
-      dy = srect.bottom() - frame.rect.height() + 1;
+        // snap top?
+        if (dtop < snap_distance && dtop <= dbottom)
+          dy = srect.top();
+        // snap bottom?
+        else if (dbottom < snap_distance)
+          dy = srect.bottom() - frame.rect.height() + 1;
+    }
   }
 
   if (screen->doOpaqueMove()) {

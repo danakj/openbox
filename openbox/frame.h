@@ -48,6 +48,7 @@ typedef struct FrameDecor {
     Anchor anchor;
     Rect position;
     Decoration type;
+    Client *client;
 } FrameDecor;
 
 typedef struct Frame {

@@ -59,6 +59,7 @@ XSetWindowBorderWidth(ob_display, self->window, 3);
     RECT_SET(self->framedecor[0].position, 0, 0, 150, 10);
     self->framedecor[0].type = Decor_Titlebar;
     self->framedecor[0].context = Context_Titlebar;
+    self->framedecor[0].client = self->client;
 XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 3);
     XMapWindow(ob_display, self->framedecor[0].window);
 
@@ -68,6 +69,7 @@ XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 3);
     RECT_SET(self->framedecor[1].position, 0, 0, 10, 30);
     self->framedecor[1].type = Decor_Titlebar;
     self->framedecor[1].context = Context_Titlebar;
+    self->framedecor[1].client = self->client;
 XSetWindowBorderWidth(ob_display, self->framedecor[1].window, 3);
     XMapWindow(ob_display, self->framedecor[1].window);
 

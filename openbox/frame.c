@@ -20,6 +20,7 @@
 #include "client.h"
 #include "openbox.h"
 #include "extensions.h"
+#include "prop.h"
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
@@ -59,12 +60,9 @@ ObFrame *frame_new()
     unsigned long mask;
     ObFrame *self;
 
-    self = g_new(ObFrame, 1);
+    self = g_new0(ObFrame, 1);
 
-    self->visible = FALSE;
     self->obscured = TRUE;
-    self->decorations = 0;
-    self->flashing = FALSE;
 
     /* create all of the decor windows */
     mask = CWOverrideRedirect | CWEventMask;
@@ -253,6 +251,10 @@ void frame_adjust_shape(ObFrame *self)
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake)
 {
+    Strut oldsize;
+
+    oldsize = self->size;
+
     if (resized) {
         self->decorations = self->client->decorations;
         self->max_horz = self->client->max_horz;
@@ -407,6 +409,16 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             framerender_frame(self);
 
             frame_adjust_shape(self);
+        }
+
+        if (!STRUT_EQUAL(self->size, oldsize)) {
+            guint32 vals[4];
+            vals[0] = self->size.left;
+            vals[1] = self->size.right;
+            vals[2] = self->size.top;
+            vals[3] = self->size.bottom;
+            PROP_SETA32(self->client->window, kde_net_wm_frame_strut,
+                        cardinal, vals, 4);
         }
     }
 }
@@ -855,12 +867,9 @@ static gboolean flash_timeout(gpointer data)
         return FALSE; /* we are done */
 
     self->flash_on = !self->flash_on;
-    {
-        gboolean focused;
-        
-        focused = self->focused; /* save the focused flag */
+    if (!self->focused) {
         frame_adjust_focus(self, self->flash_on);
-        self->focused = focused;
+        self->focused = FALSE;
     }
 
     return TRUE; /* go again */
@@ -872,7 +881,7 @@ void frame_flash_start(ObFrame *self)
 
     if (!self->flashing)
         ob_main_loop_timeout_add(ob_main_loop,
-                                 G_USEC_PER_SEC * 0.75,
+                                 G_USEC_PER_SEC * 0.6,
                                  flash_timeout,
                                  self,
                                  flash_done);

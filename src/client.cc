@@ -674,8 +674,6 @@ void OBClient::toggleClientBorder(bool addborder)
   case NorthWestGravity:
   case WestGravity:
   case SouthWestGravity:
-    if (addborder) x += _border_width;
-    else           x -= _border_width;
     break;
   case NorthEastGravity:
   case EastGravity:
@@ -688,8 +686,6 @@ void OBClient::toggleClientBorder(bool addborder)
   case NorthWestGravity:
   case NorthGravity:
   case NorthEastGravity:
-    if (addborder) y += _border_width;
-    else           y -= _border_width;
     break;
   case SouthWestGravity:
   case SouthGravity:

@@ -102,39 +102,19 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
   // pass focus to the next appropriate window
   if ((w->isFocused() || w == lastfocus) &&
       ! screen->getBlackbox()->doShutdown()) {
-    BlackboxWindow *newfocus = 0;
-    if (w->isTransient()) {
-      newfocus = w->getTransientFor();
-      if (newfocus &&
-          (newfocus->isIconic() ||                // do not focus icons
-           newfocus->getWorkspaceNumber() != id)) // or other workspaces
-        newfocus = 0;
-    }
-    if (! newfocus && ! stackingList.empty())
-      newfocus = stackingList.front();
-
-    assert(newfocus != w);  // this would be very wrong.
-
     if (id == screen->getCurrentWorkspaceID()) {
-      /*
-        if the window is on the visible workspace, then try focus it, and fall
-        back to the default focus target if the window won't focus.
-      */
-      if (! (newfocus && newfocus->setInputFocus()))
-        screen->getBlackbox()->setFocusedWindow(0);
-    } else if (lastfocus == w) {
-      /*
-        If this workspace is not the current one do not assume that
-        w == lastfocus. If a sticky window is removed on a workspace other
-        than where it originated, it will fire the removeWindow on a
-        non-visible workspace.
-      */
-      
-      /*
-        If the window isn't on the visible workspace, don't focus the new one,
-        just mark it to be focused when the workspace comes into view.
-      */
-      setLastFocusedWindow(newfocus);
+      // The window is on the visible workspace
+      focusFallback(w);
+    } else {
+      // The window is not on the visible workspace.
+      if (lastfocus == w) {
+        // The window was the last-focus target, so we need to replace it.
+        setLastFocusedWindow(stackingList.front());
+      }
+      // if the window focused on the current workspace, then reapply that
+      // workspace's focus too
+      if (w->isFocused())
+        screen->getCurrentWorkspace()->focusFallback(w);
     }
   }
 
@@ -154,6 +134,37 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
     cascade_x = cascade_y = 32;
 
   return i;
+}
+
+
+void Workspace::focusFallback(const BlackboxWindow *old_window) {
+  BlackboxWindow *newfocus = 0;
+
+  // if it's a transient, then try to focus its parent
+  if (old_window && old_window->isTransient()) {
+    newfocus = old_window->getTransientFor();
+
+    if (! newfocus ||
+        newfocus->isIconic() ||                  // do not focus icons
+        newfocus->getWorkspaceNumber() != id ||  // or other workspaces
+        ! newfocus->setInputFocus())
+      newfocus = 0;
+  }
+
+  if (! newfocus) {
+    BlackboxWindowList::iterator it = stackingList.begin(),
+                                end = stackingList.end();
+    for (; it != end; ++it) {
+      BlackboxWindow *tmp = *it;
+      if (tmp && tmp->setInputFocus()) {
+        // we found our new focus target
+        newfocus = tmp;
+        break;
+      }
+    }
+  }
+
+  screen->getBlackbox()->setFocusedWindow(newfocus);
 }
 
 

@@ -328,10 +328,18 @@ void Blackbox::process_event(XEvent *e) {
     BlackboxWindow *win = searchWindow(e->xmaprequest.window);
 
     if (win) {
+      bool focus = False;
       if (win->isIconic()) {
         win->deiconify();
-        win->setInputFocus();
+        focus = True;
       }
+      if (win->isShaded()) {
+        win->shade();
+        focus = True;
+      }
+
+      if (focus && (win->isTransient() || win->getScreen()->doFocusNew()))
+        win->setInputFocus();
     } else {
       BScreen *screen = searchScreen(e->xmaprequest.parent);
 

@@ -87,6 +87,7 @@ public:
   BlackboxWindow* getPrevWindowInList(BlackboxWindow *w);
   BlackboxWindow* getTopWindowOnStack(void) const;
   void sendWindowList(Netizen &n);
+  void focusFallback(const BlackboxWindow *old_window);
 
   bool isCurrent(void) const;
   bool isLastWindow(const BlackboxWindow* w) const;

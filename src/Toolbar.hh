@@ -90,7 +90,7 @@ private:
     Window window, workspace_label, window_label, clock, psbutton, nsbutton,
       pwbutton, nwbutton;
 
-    int x_hidden, y_hidden, hour, minute, grab_x, grab_y;
+    int x_hidden, y_hidden, hour, minute;
     unsigned int window_label_w, workspace_label_w, clock_w,
       button_w, bevel_w, label_h;
 

@@ -49,8 +49,8 @@ extern "C" {
 I18n i18n;
 
 bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
-  : BaseDisplay(argv[0], dpy_name)
-{
+  : BaseDisplay(argv[0], dpy_name) {
+
   grad = fore = back = (char *) 0;
 
   bool mod = False, sol = False, grd = False;
@@ -97,8 +97,9 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
     } else if (! strcmp("-display", argv[i])) {
       // -display passed through tests ealier... we just skip it now
       i++;
-    } else
+    } else {
       usage();
+    }
   }
 
   if ((mod + sol + grd) != True) {

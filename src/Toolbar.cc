@@ -96,7 +96,6 @@ Toolbar::Toolbar(BScreen *scrn) {
 
   editing = False;
   new_name_pos = 0;
-  frame.grab_x = frame.grab_y = 0;
 
   toolbarmenu = new Toolbarmenu(this);
 

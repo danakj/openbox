@@ -61,6 +61,11 @@ void Rootmenu::itemSelected(int button, unsigned int index) {
   if (! item->function())
     return;
 
+  if (! (getScreen()->getRootmenu()->isTorn() || isTorn()) &&
+      item->function() != BScreen::Reconfigure &&
+      item->function() != BScreen::SetStyle)
+    hide();
+
   switch (item->function()) {
   case BScreen::Execute:
     if (item->exec())
@@ -88,9 +93,4 @@ void Rootmenu::itemSelected(int button, unsigned int index) {
     getScreen()->getBlackbox()->reconfigure();
     return;
   }
-
-  if (! (getScreen()->getRootmenu()->isTorn() || isTorn()) &&
-      item->function() != BScreen::Reconfigure &&
-      item->function() != BScreen::SetStyle)
-    hide();
 }

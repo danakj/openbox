@@ -926,6 +926,20 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
     }
 }
 
+void action_run_string(const gchar *name, struct _ObClient *c)
+{
+    ObAction *a;
+    GSList *l;
+
+    a = action_from_string(name, OB_USER_ACTION_NONE);
+    g_assert(a);
+
+    l = g_slist_append(NULL, a);
+
+    action_run(l, c, 0);
+}
+
+void action_execute(union ActionData *data)
 {
     GError *e = NULL;
     char *cmd;
@@ -985,15 +999,7 @@ void action_raiselower(union ActionData *data)
         }
     }
 
-    if (raise) {
-        client_action_start(data);
-        stacking_raise(CLIENT_AS_WINDOW(c));
-        client_action_end(data);
-    } else {
-        client_action_start(data);
-        stacking_lower(CLIENT_AS_WINDOW(c));
-        client_action_end(data);
-    }
+    action_run_string((raise ? "Raise" : "Lower"), c);
 }
 
 void action_raise(union ActionData *data)
@@ -1005,26 +1011,18 @@ void action_raise(union ActionData *data)
 
 void action_unshaderaise(union ActionData *data)
 {
-    if (data->client.any.c->shaded) {
-        client_action_start(data);
-        client_shade(data->client.any.c, FALSE);
-        client_action_end(data);
-    } else {
-        client_action_start(data);
-        stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
-        client_action_end(data);
-    }
+    if (data->client.any.c->shaded)
+        action_run_string("Unshade", data->client.any.c);
+    else
+        action_run_string("Raise", data->client.any.c);
 }
 
 void action_shadelower(union ActionData *data)
 {
     if (data->client.any.c->shaded)
-        stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
-    else {
-        client_action_start(data);
-        client_shade(data->client.any.c, TRUE);
-        client_action_end(data);
-    }
+        action_run_string("Lower", data->client.any.c);
+    else
+        action_run_string("Shade", data->client.any.c);
 }
 
 void action_lower(union ActionData *data)

@@ -13,6 +13,8 @@ fi
 
 AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
+AC_PATH_PROG([awk_cmd], [awk]) # used by swig.m4
+test "$awk_cmd" || AC_MSG_ERROR([awk not found])
 AC_PATH_PROG([regex_cmd], [sed])
 test "$regex_cmd" || AC_MSG_ERROR([sed not found])
 
@@ -23,6 +25,11 @@ OB_DEBUG
 OB_COMPILER_FLAGS
 AC_C_BIGENDIAN
 
+SWIG_PROG(1.3.14)
+SWIG_ENABLE_CXX
+SWIG_MULTI_MODULE_SUPPORT
+SWIG_PYTHON
+	
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
@@ -32,8 +39,6 @@ ALL_LINGUAS=""
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT([external])
 
-PYTHON_DEVEL
-		    
 AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdint.h stdio.h stdlib.h string.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
 AC_HEADER_TIME
 # AC_TYPE_SIGNAL
@@ -70,6 +75,7 @@ else
 fi
 AC_MSG_RESULT([Using '$prefix' for installation.])
 AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
+AC_MSG_RESULT([Building with '$CPPFLAGS' for C++ preprocessor flags.])
 AC_MSG_RESULT([Building with '$CXXFLAGS' for C++ compiler flags.])
 AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
 AC_MSG_RESULT

@@ -1,7 +1,7 @@
 # X11_DEVEL()
 #
 # Check for the presence of the X Window System headers and libraries.
-# Sets the CXXFLAGS and LIBS variables as appropriate.
+# Sets the CPPFLAGS and LIBS variables as appropriate.
 AC_DEFUN([X11_DEVEL],
 [
   AC_PATH_X
@@ -9,7 +9,7 @@ AC_DEFUN([X11_DEVEL],
   test "$no_x" = "yes" && \
     AC_MSG_ERROR([The X Window System could not be found.])
      
-  CXXFLAGS="$CXXFLAGS $X_CFLAGS"
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
 
   # Check for required functions in -lX11
@@ -73,14 +73,14 @@ AC_DEFUN([XFT_DEVEL],
 
   # Store these
   OLDLIBS=$LIBS
-  OLDCXXFLAGS=$CXXFLAGS
+  OLDCPPFLAGS=$CPPFLAGS
 
   XFT_CFLAGS="`pkg-config --cflags xft`"
   XFT_LIBS="`pkg-config --libs xft`"
 
   # Set these for checking with the tests below. They'll be restored after
   LIBS="$LIBS $XFT_LIBS"
-  CXXFLAGS="$XFT_CFLAGS $CXXFLAGS"
+  CPPFLAGS="$XFT_CFLAGS $CPPFLAGS"
 
   AC_CHECK_LIB([Xft], [XftGetVersion], # this was not defined in < 2.0
     if test "$XFT_MIN"; then
@@ -162,7 +162,7 @@ AC_DEFUN([XFT_DEVEL],
 
 # Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
   LIBS=$OLDLIBS
-  CXXFLAGS=$OLDCXXFLAGS
+  CPPFLAGS=$OLDCPPFLAGS
 
   AC_SUBST([XFT_CFLAGS])
   AC_SUBST([XFT_LIBS])

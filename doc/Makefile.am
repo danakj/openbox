@@ -8,7 +8,7 @@ EXTRA_DIST = openbox.1.in
 DEFAULT_MENU=$(pkgdatadir)/menu
 
 distclean-local:
-	rm -f *\~ .\#*
+	$(RM) *\~ .\#*
 
 openbox.1: openbox.1.in
 	@regex_cmd@ -e "s,@defaultmenu@,$(DEFAULT_MENU)," \

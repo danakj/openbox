@@ -5,6 +5,6 @@ script_PYTHON = config.py defaults.py focus.py callbacks.py \
                 historyplacement.py stackedcycle.py focuscycle.py
 
 distclean-local:
-	rm -f *\~ .\#*
-#uninstall-am:
-#	rmdir -p $(scriptdir)
+	$(RM) *\~ .\#*
+uninstall-am:
+	rmdir -p $(scriptdir)

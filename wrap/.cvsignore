@@ -7,3 +7,9 @@ otkpy.la
 otkpy_la-wrap_otk.lo
 otkpy_la-wrap_otk.o
 wrap_otk.cc
+ob.py
+obpy.la
+obpy_la-wrap_ob.lo
+wrap_ob.cc
+wrap_ob.lo
+wrap_otk.lo

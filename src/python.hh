@@ -121,7 +121,7 @@ struct EventAction {
     */
     UrgentWindow
 #if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
-    , NUM_EVENTS
+    , NUM_EVENT_ACTION
 #endif
   };
 };
@@ -222,6 +222,11 @@ public:
   }
 };
 
+// The void*'s will be used to hold the native language's function pointer
+typedef void (*MouseCallback)(MouseData*, void*);
+typedef void (*KeyCallback)(KeyData*, void*);
+typedef void (*EventCallback)(EventData*, void*);
+
 #ifndef SWIG
 
 void python_init(char *argv0);
@@ -232,36 +237,7 @@ bool python_get_long(const char *name, long *value);
 bool python_get_string(const char *name, otk::ustring *value);
 bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value);
 
-/***********************************************
- * These are found in openbox.i, not python.cc *
- ***********************************************/
-void python_callback(PyObject *func, MouseData *data);
-void python_callback(PyObject *func, EventData *data);
-void python_callback(PyObject *func, KeyData *data);
-
 #endif // SWIG
-
-PyObject *mbind(const std::string &button, ob::MouseContext::MC context,
-                ob::MouseAction::MA action, PyObject *func);
-
-PyObject *kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func);
-
-PyObject *kgrab(int screen, PyObject *func);
-PyObject *kungrab();
-
-PyObject *mgrab(int screen);
-PyObject *mungrab();
-
-PyObject *ebind(ob::EventAction::EA action, PyObject *func);
-
-void set_reset_key(const std::string &key);
-
-PyObject *send_client_msg(Window target, Atom type, Window about,
-                          long data, long data1 = 0, long data2 = 0,
-                          long data3 = 0, long data4 = 0);
-
-
-void execute(const std::string &bin, int screen=0);
 
 }
 

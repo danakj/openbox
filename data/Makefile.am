@@ -7,7 +7,7 @@ EXTRA_DIST = README.menu menu.in
 all-local: menu
 
 distclean-local:
-	rm -f *\~ .\#*
+	$(RM) *\~ .\#*
 
 menu: menu.in
 	@regex_cmd@ -e "s,@pkgdatadir@,$(pkgdatadir)," @srcdir@/menu.in > menu
@@ -17,5 +17,4 @@ install-data-local: menu
 	$(INSTALL_DATA) menu $(DESTDIR)$(pkgdatadir)
 
 uninstall-am:
-	rm -f $(DESTDIR)$(pkgdatadir)/menu
-
+	$(RM) $(DESTDIR)$(pkgdatadir)/menu

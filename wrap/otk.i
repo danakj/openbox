@@ -10,15 +10,8 @@
 //%include std_list.i
 %include "ustring.i"
 
-%ignore otk::display;
-%inline %{
-  otk::Display *Display_instance() { return otk::display; }
-%};
-
-%ignore otk::Property::atoms;
-%inline %{
-  const otk::Atoms& Property_atoms() { return otk::Property::atoms; }
-%};
+%immutable otk::display;
+%immutable otk::Property::atoms;
 
 namespace otk {
 /*%rename(setValue_bool) Configuration::setValue(std::string const &,bool);
@@ -77,5 +70,11 @@ namespace otk {
 %include "timer.hh"
 %include "util.hh"
 
-// for Mod1Mask etc
-%include "X11/X.h"
+// for Window etc
+%import "X11/X.h"
+
+// globals
+%pythoncode %{
+display = cvar.display;
+atoms = cvar.Property_atoms;
+%}

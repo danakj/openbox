@@ -2,8 +2,7 @@ buttonsdir = $(pkgdatadir)/buttons
 includeotkdir = $(includedir)/otk
 pkgconfigdir = $(libdir)/pkgconfig
 
-CXXFLAGS=$(XFT_CFLAGS) @CXXFLAGS@ \
--DBUTTONSDIR=\"$(buttonsdir)\"
+CPPFLAGS=$(XFT_CFLAGS) @CPPFLAGS@ -DBUTTONSDIR=\"$(buttonsdir)\"
 
 #noinst_LIBRARIES=libotk.a
 lib_LTLIBRARIES=libotk.la
@@ -35,12 +34,12 @@ otk.pc: otk.pc.in
 		@srcdir@/$^ > $@
 
 distclean-local:
-	rm -f *\~ *.orig *.rej .\#*
+	$(RM) *\~ *.orig *.rej .\#*
 
 otk_test: libotk.la otk_test.cc
-	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) -L. -lotk @LIBS@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) -L. -lotk @LIBS@
 
 rendertest: libotk.la rendertest.cc
-	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o $@ rendertest.cc $(XFT_LIBS) -L. -lotk @LIBS@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o $@ rendertest.cc $(XFT_LIBS) -L. -lotk @LIBS@
 
 # local dependencies

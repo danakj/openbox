@@ -9,7 +9,6 @@
 #include "openbox.hh"
 #include "client.hh"
 #include "frame.hh"
-#include "python.hh"
 #include "otk/display.hh"
 
 extern "C" {
@@ -118,7 +117,7 @@ static void destroytree(KeyBindingTree *tree)
 }
 
 KeyBindingTree *Bindings::buildtree(const StringVect &keylist,
-                                      PyObject *callback) const
+                                    KeyCallback callback, void *data) const
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
 
@@ -131,7 +130,7 @@ KeyBindingTree *Bindings::buildtree(const StringVect &keylist,
     if (!p) {
       // this is the first built node, the bottom node of the tree
       ret->chain = false;
-      ret->callbacks.push_back(callback);
+      ret->callbacks.push_back(KeyCallbackData(callback, data));
     }
     ret->first_child = p;
     if (!translate(*it, ret->binding)) {
@@ -148,7 +147,7 @@ Bindings::Bindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
     _timer((otk::Timer *) 0),
-    _keybgrab_callback(0)
+    _keybgrab_callback(0, 0)
 {
 //  setResetKey("C-g"); // set the default reset key
 }
@@ -224,12 +223,13 @@ KeyBindingTree *Bindings::find(KeyBindingTree *search,
 }
 
 
-bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
+bool Bindings::addKey(const StringVect &keylist, KeyCallback callback,
+                      void *data)
 {
   KeyBindingTree *tree, *t;
   bool conflict;
 
-  if (!(tree = buildtree(keylist, callback)))
+  if (!(tree = buildtree(keylist, callback, data)))
     return false; // invalid binding requested
 
   t = find(tree, &conflict);
@@ -241,7 +241,7 @@ bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
 
   if (t) {
     // already bound to something
-    t->callbacks.push_back(callback);
+    t->callbacks.push_back(KeyCallbackData(callback, data));
     destroytree(tree);
   } else {
     // grab the server here to make sure no key pressed go missed
@@ -255,13 +255,11 @@ bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
     otk::display->ungrab();
   }
  
-  Py_INCREF(callback);
-
   return true;
 }
 
 /*
-bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
+bool Bindings::removeKey(const StringVect &keylist, KeyCallback callback, void *data)
 {
   assert(false); // XXX: function not implemented yet
 
@@ -273,9 +271,9 @@ bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
 
   KeyBindingTree *t = find(tree, &conflict);
   if (t) {
-    CallbackList::iterator it = std::find(t->callbacks.begin(),
-                                          t->callbacks.end(),
-                                          callback);
+    KeyCallbackList::iterator it = std::find(t->callbacks.begin(),
+                                             t->callbacks.end(),
+                                             callback);
     if (it != t->callbacks.end()) {
       // grab the server here to make sure no key pressed go missed
       otk::display->grab();
@@ -320,7 +318,6 @@ static void remove_branch(KeyBindingTree *first)
       remove_branch(p->first_child);
     KeyBindingTree *s = p->next_sibling;
     while(!p->callbacks.empty()) {
-      Py_XDECREF(p->callbacks.front());
       p->callbacks.pop_front();
     }
     delete p;
@@ -372,10 +369,10 @@ void Bindings::grabKeys(bool grab)
 }
 
 
-bool Bindings::grabKeyboard(int screen, PyObject *callback)
+bool Bindings::grabKeyboard(int screen, KeyCallback callback, void *data)
 {
   assert(callback);
-  if (_keybgrab_callback) return false; // already grabbed
+  if (_keybgrab_callback.callback) return false; // already grabbed
 
   if (!openbox->screen(screen))
     return false; // the screen is not managed
@@ -384,16 +381,17 @@ bool Bindings::grabKeyboard(int screen, PyObject *callback)
   if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
                     GrabModeAsync, CurrentTime))
     return false;
-  _keybgrab_callback = callback;
+  _keybgrab_callback.callback = callback;
+  _keybgrab_callback.data = data;
   return true;
 }
 
 
 void Bindings::ungrabKeyboard()
 {
-  if (!_keybgrab_callback) return; // not grabbed
+  if (!_keybgrab_callback.callback) return; // not grabbed
 
-  _keybgrab_callback = 0;
+  _keybgrab_callback = KeyCallbackData(0, 0);
   XUngrabKeyboard(**otk::display, CurrentTime);
   XUngrabPointer(**otk::display, CurrentTime);
 }
@@ -420,10 +418,10 @@ void Bindings::ungrabPointer()
 void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
                        Time time, KeyAction::KA action)
 {
-  if (_keybgrab_callback) {
+  if (_keybgrab_callback.callback) {
     Client *c = openbox->focusedClient();
     KeyData data(screen, c, time, modifiers, key, action);
-    python_callback(_keybgrab_callback, &data);
+    _keybgrab_callback.fire(&data);
   }
   
   // KeyRelease events only occur during keyboard grabs
@@ -450,9 +448,9 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
         } else {
           Client *c = openbox->focusedClient();
           KeyData data(screen, c, time, modifiers, key, action);
-          CallbackList::iterator it, end = p->callbacks.end();
+          KeyCallbackList::iterator it, end = p->callbacks.end();
           for (it = p->callbacks.begin(); it != end; ++it)
-            python_callback(*it, &data);
+            it->fire(&data);
           resetChains(this);
         }
         break;
@@ -478,7 +476,8 @@ void Bindings::resetChains(Bindings *self)
 
 
 bool Bindings::addButton(const std::string &but, MouseContext::MC context,
-                           MouseAction::MA action, PyObject *callback)
+                         MouseAction::MA action, MouseCallback callback,
+                         void *data)
 {
   assert(context >= 0 && context < MouseContext::NUM_MOUSE_CONTEXT);
   assert(action >= 0 && action < MouseAction::NUM_MOUSE_ACTION);
@@ -515,8 +514,7 @@ bool Bindings::addButton(const std::string &but, MouseContext::MC context,
     }
   } else
     bind = *it;
-  bind->callbacks[action].push_back(callback);
-  Py_INCREF(callback);
+  bind->callbacks[action].push_back(MouseCallbackData(callback, data));
   return true;
 }
 
@@ -527,7 +525,6 @@ void Bindings::removeAllButtons()
     for (it = _buttons[i].begin(); it != end; ++it) {
       for (int a = 0; a < MouseAction::NUM_MOUSE_ACTION; ++a) {
         while (!(*it)->callbacks[a].empty()) {
-          Py_XDECREF((*it)->callbacks[a].front());
           (*it)->callbacks[a].pop_front();
         }
       }
@@ -593,17 +590,19 @@ void Bindings::fireButton(MouseData *data)
   for (it = _buttons[data->context].begin(); it != end; ++it)
     if ((*it)->binding.key == data->button &&
         (*it)->binding.modifiers == data->state) {
-      CallbackList::iterator c_it,c_end = (*it)->callbacks[data->action].end();
+      MouseCallbackList::iterator c_it,
+        c_end = (*it)->callbacks[data->action].end();
       for (c_it = (*it)->callbacks[data->action].begin();
            c_it != c_end; ++c_it)
-        python_callback(*c_it, data);
+        c_it->fire(data);
     }
 }
 
 
-bool Bindings::addEvent(EventAction::EA action, PyObject *callback)
+bool Bindings::addEvent(EventAction::EA action, EventCallback callback,
+                        void *data)
 {
-  if (action < 0 || action >= EventAction::NUM_EVENTS) {
+  if (action < 0 || action >= EventAction::NUM_EVENT_ACTION) {
     return false;
   }
 #ifdef    XKB
@@ -611,22 +610,22 @@ bool Bindings::addEvent(EventAction::EA action, PyObject *callback)
     XkbSelectEvents(**otk::display, XkbUseCoreKbd,
                     XkbBellNotifyMask, XkbBellNotifyMask);
 #endif // XKB
-  _eventlist[action].push_back(callback);
-  Py_INCREF(callback);
+  _eventlist[action].push_back(EventCallbackData(callback, data));
   return true;
 }
 
-bool Bindings::removeEvent(EventAction::EA action, PyObject *callback)
+bool Bindings::removeEvent(EventAction::EA action, EventCallback callback,
+                           void *data)
 {
-  if (action < 0 || action >= EventAction::NUM_EVENTS) {
+  if (action < 0 || action >= EventAction::NUM_EVENT_ACTION) {
     return false;
   }
   
-  CallbackList::iterator it = std::find(_eventlist[action].begin(),
-                                        _eventlist[action].end(),
-                                        callback);
+  EventCallbackList::iterator it = std::find(_eventlist[action].begin(),
+                                             _eventlist[action].end(),
+                                             EventCallbackData(callback,
+                                                               data));
   if (it != _eventlist[action].end()) {
-    Py_XDECREF(*it);
     _eventlist[action].erase(it);
 #ifdef    XKB
     if (action == EventAction::Bell && _eventlist[action].empty())
@@ -640,9 +639,8 @@ bool Bindings::removeEvent(EventAction::EA action, PyObject *callback)
 
 void Bindings::removeAllEvents()
 {
-  for (int i = 0; i < EventAction::NUM_EVENTS; ++i) {
+  for (int i = 0; i < EventAction::NUM_EVENT_ACTION; ++i) {
     while (!_eventlist[i].empty()) {
-      Py_XDECREF(_eventlist[i].front());
       _eventlist[i].pop_front();
     }
   }
@@ -650,9 +648,9 @@ void Bindings::removeAllEvents()
 
 void Bindings::fireEvent(EventData *data)
 {
-  CallbackList::iterator c_it, c_end = _eventlist[data->action].end();
+  EventCallbackList::iterator c_it, c_end = _eventlist[data->action].end();
   for (c_it = _eventlist[data->action].begin(); c_it != c_end; ++c_it)
-    python_callback(*c_it, data);
+    c_it->fire(data);
 }
 
 }

@@ -21,8 +21,8 @@ def state_above(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_above)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_above)
     
 def state_below(data, add=StateAdd):
     """Toggles, adds or removes the 'below' state on a window.
@@ -30,8 +30,8 @@ def state_below(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_below)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_below)
     
 def state_shaded(data, add=StateAdd):
     """Toggles, adds or removes the 'shaded' state on a window.
@@ -39,8 +39,8 @@ def state_shaded(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_shaded)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_shaded)
 
 def state_maximize(data, add=StateAdd):
     """Toggles, adds or removes the horizontal and vertical 'maximized' state
@@ -48,9 +48,9 @@ def state_maximize(data, add=StateAdd):
        or StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_maximized_horz,
-                       otk.Property_atoms().net_wm_state_maximized_vert)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_maximized_horz,
+                       otk.atoms.net_wm_state_maximized_vert)
 
 def state_maximize_horz(data, add=StateAdd):
     """Toggles, adds or removes the horizontal 'maximized' state on a window.
@@ -58,8 +58,8 @@ def state_maximize_horz(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_maximized_horz)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_maximized_horz)
 
 def state_maximize_vert(data, add=StateAdd):
     """Toggles, adds or removes the vertical 'maximized' state on a window.
@@ -67,8 +67,8 @@ def state_maximize_vert(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_maximized_vert)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_maximized_vert)
 
 def state_skip_taskbar(data, add=StateAdd):
     """Toggles, adds or removes the 'skip_taskbar' state on a window.
@@ -76,8 +76,8 @@ def state_skip_taskbar(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_skip_taskbar)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_skip_taskbar)
     
 def state_skip_pager(data, add=StateAdd):
     """Toggles, adds or removes the 'skip_pager' state on a window.
@@ -85,14 +85,14 @@ def state_skip_pager(data, add=StateAdd):
        StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_state, data.client.window(),
-                       add, otk.Property_atoms().net_wm_state_skip_pager)
+                       otk.atoms.net_wm_state, data.client.window(),
+                       add, otk.atoms.net_wm_state_skip_pager)
     
 def iconify(data):
     """Iconifies the window on which the event occured"""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().wm_change_state,
+                       otk.atoms.wm_change_state,
                        data.client.window(), 3) # IconicState
     
 def restore(data):
@@ -101,14 +101,14 @@ def restore(data):
        use the activate() function."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().wm_change_state,
+                       otk.atoms.wm_change_state,
                        data.client.window(), 1) # NormalState
     
 def close(data):
     """Closes the window on which the event occured"""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_close_window,
+                       otk.atoms.net_close_window,
                        data.client.window(), 0)
 
 def focus(data):
@@ -182,7 +182,7 @@ def unshade(data):
 def change_desktop(data, num):
     """Switches to a specified desktop"""
     root = otk.display.screenInfo(data.screen).rootWindow()
-    ob.send_client_msg(root, otk.Property_atoms().net_current_desktop,
+    ob.send_client_msg(root, otk.atoms.net_current_desktop,
                        root, num)
 
 def next_desktop(data, no_wrap=0):
@@ -213,7 +213,7 @@ def send_to_desktop(data, num):
     """Sends a client to a specified desktop"""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.Property_atoms().net_wm_desktop,
+                       otk.atoms.net_wm_desktop,
                        data.client.window(),num)
 
 def toggle_all_desktops(data):

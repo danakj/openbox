@@ -3,44 +3,26 @@ scriptdir = $(libdir)/openbox/python
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CPPFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
 -DLOCALEDIR=\"$(localedir)\" \
 -DSCRIPTDIR=\"$(scriptdir)\"
 
-LIBS=$(XFT_LIBS) $(PYTHON_LIBS) @LIBS@
-
-INCLUDES= -I..
+LIBS=$(XFT_LIBS) $(PYTHON_LIBS) @LIBS@ $(SWIG_PYTHON_LIB)
 
 bin_PROGRAMS= openbox3
 
 openbox3_LDADD=-L../otk -lotk @LIBINTL@
-
+openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc backgroundwidget.cc labelwidget.cc \
-                  buttonwidget.cc python.cc bindings.cc \
-                  openbox_wrap.cc
+                  buttonwidget.cc python.cc bindings.cc
 noinst_HEADERS= actions.hh backgroundwidget.hh bindings.hh buttonwidget.hh \
                 client.hh frame.hh labelwidget.hh openbox.hh python.hh \
                 screen.hh widgetbase.hh
-openbox3_LDFLAGS= $(PYTHON_LDFLAGS)
-
-script_DATA = ob.py
-
-EXTRA_DIST = $(script_DATA)
 
 MAINTAINERCLEANFILES= Makefile.in
 
 distclean-local:
-	rm -f *\~ *.orig *.rej .\#*
-
-openbox.i: openbox.hh screen.hh client.hh python.hh frame.hh
-	touch $@
-
-%.py: %_wrap.cc
-
-%_wrap.cc: %.i
-	swig -c -I../otk $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
-
-# local dependencies
+	$(RM) *\~ *.orig *.rej .\#*

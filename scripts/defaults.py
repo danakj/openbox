@@ -1,3 +1,4 @@
+import ob         # base module
 import focus      # add some default focus handling and cycling functions
 import focusmodel # default focus models
 import behavior   # defines default behaviors for interaction with windows

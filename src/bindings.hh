@@ -10,10 +10,6 @@
 #include "python.hh"
 #include "otk/timer.hh"
 
-extern "C" {
-#include <Python.h>
-}
-
 #include <string>
 #include <list>
 #include <vector>
@@ -22,7 +18,42 @@ namespace ob {
 
 class Client;
 
-typedef std::list<PyObject *> CallbackList;
+struct MouseCallbackData {
+  MouseCallback callback;
+  void         *data;
+  MouseCallbackData(MouseCallback c, void *d) : callback(c), data(d) {}
+  void fire(MouseData *d) { callback(d, data); }
+  bool operator==(const MouseCallbackData &other) { return (callback ==
+                                                            other.callback &&
+                                                            data ==
+                                                            other.data); }
+};
+
+struct KeyCallbackData {
+  KeyCallback callback;
+  void       *data;
+  KeyCallbackData(KeyCallback c, void *d) : callback(c), data(d) {}
+  void fire(KeyData *d) { callback(d, data); }
+  bool operator==(const KeyCallbackData &other) { return (callback ==
+                                                          other.callback &&
+                                                          data ==
+                                                          other.data); }
+};
+
+struct EventCallbackData {
+  EventCallback callback;
+  void         *data;
+  EventCallbackData(EventCallback c, void *d) : callback(c), data(d) {}
+  void fire(EventData *d) { callback(d, data); }
+  bool operator==(const EventCallbackData &other) { return (callback ==
+                                                            other.callback &&
+                                                            data ==
+                                                            other.data); }
+};
+
+typedef std::list<MouseCallbackData> MouseCallbackList;
+typedef std::list<KeyCallbackData> KeyCallbackList;
+typedef std::list<EventCallbackData> EventCallbackList;
 
 typedef struct Binding {
   unsigned int modifiers;
@@ -37,7 +68,7 @@ typedef struct Binding {
 
 typedef struct KeyBindingTree {
   Binding binding;
-  CallbackList callbacks; // the callbacks given for the binding in add()
+  KeyCallbackList callbacks; // the callbacks given for the binding in add()
   bool chain;     // true if this is a chain to another key (not an action)
 
   struct KeyBindingTree *next_sibling; // the next binding in the tree at the same
@@ -51,7 +82,7 @@ typedef struct KeyBindingTree {
 
 typedef struct ButtonBinding {
   Binding binding;
-  CallbackList callbacks[MouseAction::NUM_MOUSE_ACTION];
+  MouseCallbackList callbacks[MouseAction::NUM_MOUSE_ACTION];
   ButtonBinding() : binding(0, 0) {}
 };
 
@@ -71,7 +102,7 @@ private:
   
   KeyBindingTree *find(KeyBindingTree *search, bool *conflict) const;
   KeyBindingTree *buildtree(const StringVect &keylist,
-                            PyObject *callback) const;
+                            KeyCallback callback, void *data) const;
   void assimilate(KeyBindingTree *node);
 
   static void resetChains(Bindings *self); // the timer's timeout function
@@ -82,9 +113,9 @@ private:
   void grabButton(bool grab, const Binding &b, MouseContext::MC context,
                   Client *client);
 
-  CallbackList _eventlist[EventAction::NUM_EVENTS];
+  EventCallbackList _eventlist[EventAction::NUM_EVENT_ACTION];
 
-  PyObject *_keybgrab_callback;
+  KeyCallbackData _keybgrab_callback;
   
 public:
   //! Initializes an Bindings object
@@ -101,14 +132,14 @@ public:
     a chain or not), or if any of the strings in the keylist are invalid.    
     @return true if the binding could be added; false if it could not.
   */
-  bool addKey(const StringVect &keylist, PyObject *callback);
+  bool addKey(const StringVect &keylist, KeyCallback callback, void *data);
 
   ////! Removes a key binding
   ///*!
   //  @return The callbackid of the binding, or '< 0' if there was no binding to
   //          be removed.
   //*/
-  //bool removeKey(const StringVect &keylist, PyObject *callback);
+  //bool removeKey(const StringVect &keylist, KeyCallback callback, void *data);
 
   //! Removes all key bindings
   void removeAllKeys();
@@ -120,14 +151,14 @@ public:
 
   void grabKeys(bool grab);
 
-  bool grabKeyboard(int screen, PyObject *callback);
+  bool grabKeyboard(int screen, KeyCallback callback, void *data);
   void ungrabKeyboard();
 
   bool grabPointer(int screen);
   void ungrabPointer();
 
   bool addButton(const std::string &but, MouseContext::MC context,
-                 MouseAction::MA action, PyObject *callback);
+                 MouseAction::MA action, MouseCallback callback, void *data);
 
   void grabButtons(bool grab, Client *client);
 
@@ -137,10 +168,10 @@ public:
   void fireButton(MouseData *data);
 
   //! Bind a callback for an event
-  bool addEvent(EventAction::EA action, PyObject *callback);
+  bool addEvent(EventAction::EA action, EventCallback callback, void *data);
 
   //! Unbind the callback function from an event
-  bool removeEvent(EventAction::EA action, PyObject *callback);
+  bool removeEvent(EventAction::EA action, EventCallback callback, void *data);
 
   //! Remove all callback functions
   void removeAllEvents();

@@ -107,8 +107,9 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 
     self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
     self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
+    self->a_mask = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
+    self->a_mask->texture[0].type = RR_TEXTURE_MASK;
     self->a_bullet = RrAppearanceCopy(ob_rr_theme->a_menu_bullet);
-    self->a_bullet->texture[0].type = RR_TEXTURE_MASK;
 
     self->a_text_normal =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_item);
@@ -133,6 +134,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
         RrAppearanceFree(self->a_selected);
 
         RrAppearanceFree(self->a_icon);
+        RrAppearanceFree(self->a_mask);
         RrAppearanceFree(self->a_text_normal);
         RrAppearanceFree(self->a_text_disabled);
         RrAppearanceFree(self->a_text_selected);
@@ -254,7 +256,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         break;
     }
 
-    if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+    if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
         self->entry->data.normal.icon_data)
     {
         XMoveResizeWindow(ob_display, self->icon, PADDING, 0,
@@ -270,6 +272,22 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         self->a_icon->surface.parentx = PADDING;
         self->a_icon->surface.parenty = 0;
         RrPaint(self->a_icon, self->icon,
+                self->frame->item_h, self->frame->item_h);
+        XMapWindow(ob_display, self->icon);
+    } else if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
+               self->entry->data.normal.mask)
+    {
+        XMoveResizeWindow(ob_display, self->icon, PADDING, 0,
+                          self->frame->item_h,
+                          self->frame->item_h);
+        self->a_mask->texture[0].data.mask.mask =
+            self->entry->data.normal.mask;
+        self->a_mask->texture[0].data.mask.color =
+            self->entry->data.normal.mask_color;
+        self->a_mask->surface.parent = item_a;
+        self->a_mask->surface.parentx = PADDING;
+        self->a_mask->surface.parenty = 0;
+        RrPaint(self->a_mask, self->icon,
                 self->frame->item_h, self->frame->item_h);
         XMapWindow(ob_display, self->icon);
     } else
@@ -353,13 +371,18 @@ static void menu_frame_render(ObMenuFrame *self)
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
             RrMinsize(text_a, &tw, &th);
 
-            if (e->entry->data.normal.icon_data)
+            if (e->entry->data.normal.icon_data ||
+                e->entry->data.normal.mask)
                 has_icon = TRUE;
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             sub = e->entry->data.submenu.submenu;
             text_a->texture[0].data.text.string = sub ? sub->title : "";
             RrMinsize(text_a, &tw, &th);
+
+            if (e->entry->data.normal.icon_data ||
+                e->entry->data.normal.mask)
+                has_icon = TRUE;
 
             tw += self->item_h - PADDING;
             break;

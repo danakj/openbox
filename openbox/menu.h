@@ -64,6 +64,10 @@ struct _ObNormalMenuEntry {
     gint icon_width;
     gint icon_height;
     RrPixel32 *icon_data;
+
+    /* Mask icon */
+    RrPixmapMask *mask;
+    RrColor *mask_color;
 };
 
 struct _ObSubmenuMenuEntry {

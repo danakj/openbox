@@ -56,8 +56,6 @@ Slit::Slit(BScreen &scr, Resource &conf) : screen(scr),
   timer->setTimeout(openbox.getAutoRaiseDelay());
   timer->fireOnce(True);
 
-  clientList = new LinkedList<SlitClient>;
-
   slitmenu = new Slitmenu(*this);
 
   XSetWindowAttributes attrib;
@@ -91,7 +89,8 @@ Slit::~Slit() {
   if (timer->isTiming()) timer->stop();
   delete timer;
 
-  delete clientList;
+  clientList.clear();
+  
   delete slitmenu;
 
   screen.getImageControl()->removeImage(frame.pixmap);
@@ -105,6 +104,7 @@ Slit::~Slit() {
 
 
 void Slit::addClient(Window w) {
+  cout << "ADDCLIENT\n";
   openbox.grab();
 
   if (openbox.validateWindow(w)) {
@@ -156,7 +156,8 @@ void Slit::addClient(Window w) {
                  SubstructureNotifyMask | EnterWindowMask);
     XFlush(display);
 
-    clientList->insert(client);
+    clientList.push_back(client);
+    cout << "SLIT COUNT " << clientList.size() << endl;
 
     openbox.saveSlitSearch(client->client_window, this);
     openbox.saveSlitSearch(client->icon_window, this);
@@ -170,7 +171,8 @@ void Slit::addClient(Window w) {
 void Slit::removeClient(SlitClient *client, Bool remap) {
   openbox.removeSlitSearch(client->client_window);
   openbox.removeSlitSearch(client->icon_window);
-  clientList->remove(client);
+
+  clientList.remove(client);
 
   screen.removeNetizen(client->window);
 
@@ -195,17 +197,16 @@ void Slit::removeClient(Window w, Bool remap) {
 
   Bool reconf = False;
 
-  LinkedListIterator<SlitClient> it(clientList);
-  for (SlitClient *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->window == w) {
-      removeClient(tmp, remap);
+  slitClientList::iterator it;
+  for (it = clientList.begin(); it != clientList.end(); it++)
+    if ((*it)->window == w) {
+      removeClient(*it, remap);
       reconf = True;
-
       break;
     }
-  }
 
-  if (reconf) reconfigure();
+  if (reconf)
+    reconfigure();
 
   openbox.ungrab();
 }
@@ -325,16 +326,15 @@ void Slit::load() {
 
 void Slit::reconfigure(void) {
   frame.area.setSize(0, 0);
-  LinkedListIterator<SlitClient> it(clientList);
-  SlitClient *client;
+  slitClientList::const_iterator it;
 
   switch (m_direction) {
   case Vertical:
-    for (client = it.current(); client; it++, client = it.current()) {
-      frame.area.setH(frame.area.h() + client->height + screen.getBevelWidth());
+    for (it = clientList.begin(); it != clientList.end(); it++) {
+      frame.area.setH(frame.area.h() + (*it)->height + screen.getBevelWidth());
 
-      if (frame.area.w() < client->width)
-        frame.area.setW(client->width);
+      if (frame.area.w() < (*it)->width)
+        frame.area.setW((*it)->width);
     }
 
     if (frame.area.w() < 1)
@@ -350,11 +350,11 @@ void Slit::reconfigure(void) {
     break;
 
   case Horizontal:
-    for (client = it.current(); client; it++, client = it.current()) {
-      frame.area.setW(frame.area.w() + client->width + screen.getBevelWidth());
+    for (it = clientList.begin(); it != clientList.end(); it++) {
+      frame.area.setW(frame.area.w() + (*it)->width + screen.getBevelWidth());
 
-      if (frame.area.h() < client->height)
-        frame.area.setH(client->height);
+      if (frame.area.h() < (*it)->height)
+        frame.area.setH((*it)->height);
     }
 
     if (frame.area.w() < 1)
@@ -369,6 +369,7 @@ void Slit::reconfigure(void) {
 
     break;
   }
+  cout << "SLIT SIZE " << frame.area.w() << "," << frame.area.h() << endl;
 
   reposition();
 
@@ -376,7 +377,7 @@ void Slit::reconfigure(void) {
   XSetWindowBorder(display, frame.window,
                    screen.getBorderColor()->getPixel());
 
-  if (! clientList->count())
+  if (! clientList.size())
     XUnmapWindow(display, frame.window);
   else
     XMapWindow(display, frame.window);
@@ -397,41 +398,40 @@ void Slit::reconfigure(void) {
   XClearWindow(display, frame.window);
 
   int x, y;
-  it.reset();
 
   switch (m_direction) {
   case Vertical:
     x = 0;
     y = screen.getBevelWidth();
 
-    for (client = it.current(); client; it++, client = it.current()) {
-      x = (frame.area.w() - client->width) / 2;
+    for (it = clientList.begin(); it != clientList.end(); it++) {
+      x = (frame.area.w() - (*it)->width) / 2;
 
-      XMoveResizeWindow(display, client->window, x, y,
-                        client->width, client->height);
-      XMapWindow(display, client->window);
+      XMoveResizeWindow(display, (*it)->window, x, y,
+                        (*it)->width, (*it)->height);
+      XMapWindow(display, (*it)->window);
 
       // for ICCCM compliance
-      client->x = x;
-      client->y = y;
+      (*it)->x = x;
+      (*it)->y = y;
 
       XEvent event;
       event.type = ConfigureNotify;
 
       event.xconfigure.display = display;
-      event.xconfigure.event = client->window;
-      event.xconfigure.window = client->window;
+      event.xconfigure.event = (*it)->window;
+      event.xconfigure.window = (*it)->window;
       event.xconfigure.x = x;
       event.xconfigure.y = y;
-      event.xconfigure.width = client->width;
-      event.xconfigure.height = client->height;
+      event.xconfigure.width = (*it)->width;
+      event.xconfigure.height = (*it)->height;
       event.xconfigure.border_width = 0;
       event.xconfigure.above = frame.window;
       event.xconfigure.override_redirect = False;
 
-      XSendEvent(display, client->window, False, StructureNotifyMask, &event);
+      XSendEvent(display, (*it)->window, False, StructureNotifyMask, &event);
 
-      y += client->height + screen.getBevelWidth();
+      y += (*it)->height + screen.getBevelWidth();
     }
 
     break;
@@ -440,34 +440,34 @@ void Slit::reconfigure(void) {
     x = screen.getBevelWidth();
     y = 0;
 
-    for (client = it.current(); client; it++, client = it.current()) {
-      y = (frame.area.h() - client->height) / 2;
+    for (it = clientList.begin(); it != clientList.end(); it++) {
+      y = (frame.area.h() - (*it)->height) / 2;
 
-      XMoveResizeWindow(display, client->window, x, y,
-                        client->width, client->height);
-      XMapWindow(display, client->window);
+      XMoveResizeWindow(display, (*it)->window, x, y,
+                        (*it)->width, (*it)->height);
+      XMapWindow(display, (*it)->window);
 
       // for ICCCM compliance
-      client->x = x;
-      client->y = y;
+      (*it)->x = x;
+      (*it)->y = y;
 
       XEvent event;
       event.type = ConfigureNotify;
 
       event.xconfigure.display = display;
-      event.xconfigure.event = client->window;
-      event.xconfigure.window = client->window;
+      event.xconfigure.event = (*it)->window;
+      event.xconfigure.window = (*it)->window;
       event.xconfigure.x = x;
       event.xconfigure.y = y;
-      event.xconfigure.width = client->width;
-      event.xconfigure.height = client->height;
+      event.xconfigure.width = (*it)->width;
+      event.xconfigure.height = (*it)->height;
       event.xconfigure.border_width = 0;
       event.xconfigure.above = frame.window;
       event.xconfigure.override_redirect = False;
 
-      XSendEvent(display, client->window, False, StructureNotifyMask, &event);
+      XSendEvent(display, (*it)->window, False, StructureNotifyMask, &event);
 
-      x += client->width + screen.getBevelWidth();
+      x += (*it)->width + screen.getBevelWidth();
     }
 
     break;
@@ -591,8 +591,8 @@ void Slit::reposition(void) {
 
 
 void Slit::shutdown(void) {
-  while (clientList->count())
-    removeClient(clientList->first());
+  while (clientList.size())
+    removeClient(clientList.front());
 }
 
 
@@ -671,24 +671,22 @@ void Slit::configureRequestEvent(XConfigureRequestEvent *e) {
 
     XConfigureWindow(display, e->window, e->value_mask, &xwc);
 
-    LinkedListIterator<SlitClient> it(clientList);
-    SlitClient *client = it.current();
-    for (; client; it++, client = it.current())
+    slitClientList::iterator it = clientList.begin();
+    for (; it != clientList.end(); it++) {
+      SlitClient *client = *it;
       if (client->window == e->window)
         if (client->width != ((unsigned) e->width) ||
             client->height != ((unsigned) e->height)) {
           client->width = (unsigned) e->width;
           client->height = (unsigned) e->height;
-
           reconf = True;
-
           break;
         }
+    }
 
-    if (reconf) reconfigure();
-
+    if (reconf)
+      reconfigure();
   }
-
   openbox.ungrab();
 }
 

@@ -31,7 +31,7 @@ class BScreen;
 class Basemenu;
 class BasemenuItem;
 #include <vector>
-typedef vector<BasemenuItem *> menuitemList;
+typedef std::vector<BasemenuItem *> menuitemList;
 
 class Basemenu {
 private:

@@ -27,8 +27,8 @@
 #include <X11/Xutil.h>
 
 #include "Basemenu.h"
-#include "LinkedList.h"
 #include "Geometry.h"
+#include <list>
 
 // forward declaration
 class Slit;
@@ -105,7 +105,8 @@ private:
   Resource &config;
   BTimer *timer;
 
-  LinkedList<SlitClient> *clientList;
+  typedef std::list<SlitClient *> slitClientList;
+  slitClientList clientList;
   Slitmenu *slitmenu;
 
   struct frame {

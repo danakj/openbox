@@ -764,7 +764,7 @@ static void client_get_mwm_hints(Client *self)
 
     if (PROP_GETA32(self->window, motif_wm_hints, motif_wm_hints,
                     &hints, &num)) {
-	if (num >= MWM_ELEMENTS) {
+	if (num >= OB_MWM_ELEMENTS) {
 	    self->mwmhints.flags = hints[0];
 	    self->mwmhints.functions = hints[1];
 	    self->mwmhints.decorations = hints[2];
@@ -802,8 +802,8 @@ void client_get_type(Client *self)
 	    else if (val[i] == prop_atoms.kde_net_wm_window_type_override) {
 		/* prevent this window from getting any decor or
 		   functionality */
-		self->mwmhints.flags &= (MwmFlag_Functions |
-					 MwmFlag_Decorations);
+		self->mwmhints.flags &= (OB_MWM_FLAG_FUNCTIONS |
+					 OB_MWM_FLAG_DECORATIONS);
 		self->mwmhints.decorations = 0;
 		self->mwmhints.functions = 0;
 	    }
@@ -960,30 +960,30 @@ void client_setup_decor_and_functions(Client *self)
 
     /* Mwm Hints are applied subtractively to what has already been chosen for
        decor and functionality */
-    if (self->mwmhints.flags & MwmFlag_Decorations) {
-	if (! (self->mwmhints.decorations & MwmDecor_All)) {
-	    if (! (self->mwmhints.decorations & MwmDecor_Border))
+    if (self->mwmhints.flags & OB_MWM_FLAG_DECORATIONS) {
+	if (! (self->mwmhints.decorations & OB_MWM_DECOR_ALL)) {
+	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_BORDER))
 		self->decorations &= ~Decor_Border;
-	    if (! (self->mwmhints.decorations & MwmDecor_Handle))
+	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_HANDLE))
 		self->decorations &= ~Decor_Handle;
-	    if (! (self->mwmhints.decorations & MwmDecor_Title))
+	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_TITLE))
 		self->decorations &= ~Decor_Titlebar;
-	    if (! (self->mwmhints.decorations & MwmDecor_Iconify))
+	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_ICONIFY))
 		self->decorations &= ~Decor_Iconify;
-	    if (! (self->mwmhints.decorations & MwmDecor_Maximize))
+	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_MAXIMIZE))
 		self->decorations &= ~Decor_Maximize;
 	}
     }
 
-    if (self->mwmhints.flags & MwmFlag_Functions) {
-	if (! (self->mwmhints.functions & MwmFunc_All)) {
-	    if (! (self->mwmhints.functions & MwmFunc_Resize))
+    if (self->mwmhints.flags & OB_MWM_FLAG_FUNCTIONS) {
+	if (! (self->mwmhints.functions & OB_MWM_FUNC_ALL)) {
+	    if (! (self->mwmhints.functions & OB_MWM_FUNC_RESIZE))
 		self->functions &= ~Func_Resize;
-	    if (! (self->mwmhints.functions & MwmFunc_Move))
+	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
 		self->functions &= ~Func_Move;
-	    if (! (self->mwmhints.functions & MwmFunc_Iconify))
+	    if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
 		self->functions &= ~Func_Iconify;
-	    if (! (self->mwmhints.functions & MwmFunc_Maximize))
+	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
 		self->functions &= ~Func_Maximize;
 	    /* dont let mwm hints kill the close button
 	       if (! (self->mwmhints.functions & MwmFunc_Close))

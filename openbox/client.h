@@ -2,6 +2,7 @@
 #define __client_h
 
 #include "misc.h"
+#include "mwm.h"
 #include "geom.h"
 #include "stacking.h"
 #include "render/color.h"
@@ -22,49 +23,6 @@ typedef struct Icon {
     RrPixel32 *data;
 } Icon;
      
-/*! The MWM Hints as retrieved from the window property
-  This structure only contains 3 elements, even though the Motif 2.0
-  structure contains 5. We only use the first 3, so that is all gets
-  defined.
-*/
-typedef struct MwmHints {
-    /*! A bitmask of Client::MwmFlags values */
-    unsigned long flags;
-    /*! A bitmask of Client::MwmFunctions values */
-    unsigned long functions;
-    /*! A bitmask of Client::MwmDecorations values */
-    unsigned long decorations;
-} MwmHints;
-/*! The number of elements in the Client::MwmHints struct */
-#define MWM_ELEMENTS 3
-     
-/*! Possible flags for MWM Hints (defined by Motif 2.0) */
-typedef enum {
-    MwmFlag_Functions   = 1 << 0, /*!< The MMW Hints define funcs */
-    MwmFlag_Decorations = 1 << 1  /*!< The MWM Hints define decor */
-} MwmFlags;
-
-/*! Possible functions for MWM Hints (defined by Motif 2.0) */
-typedef enum {
-    MwmFunc_All      = 1 << 0, /*!< All functions */
-    MwmFunc_Resize   = 1 << 1, /*!< Allow resizing */
-    MwmFunc_Move     = 1 << 2, /*!< Allow moving */
-    MwmFunc_Iconify  = 1 << 3, /*!< Allow to be iconfied */
-    MwmFunc_Maximize = 1 << 4  /*!< Allow to be maximized */
-    /*MwmFunc_Close    = 1 << 5 /!< Allow to be closed */
-} MwmFunctions;
-
-/*! Possible decorations for MWM Hints (defined by Motif 2.0) */
-typedef enum {
-    MwmDecor_All      = 1 << 0, /*!< All decorations */
-    MwmDecor_Border   = 1 << 1, /*!< Show a border */
-    MwmDecor_Handle   = 1 << 2, /*!< Show a handle (bottom) */
-    MwmDecor_Title    = 1 << 3, /*!< Show a titlebar */
-    /*MwmDecor_Menu     = 1 << 4, /!< Show a menu */
-    MwmDecor_Iconify  = 1 << 5, /*!< Show an iconify button */
-    MwmDecor_Maximize = 1 << 6  /*!< Show a maximize button */
-} MemDecorations;
-
 /*! Possible window types */
 typedef enum {
     Type_Desktop, /*!< A desktop (bottom-most window) */
@@ -203,7 +161,7 @@ typedef struct Client {
     Size base_size;
 
     /*! Window decoration and functionality hints */
-    MwmHints mwmhints;
+    ObMwmHints mwmhints;
   
     /*! Where to place the decorated window in relation to the undecorated
       window */

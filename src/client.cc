@@ -19,6 +19,7 @@ extern "C" {
 #define _(str) gettext(str)
 }
 
+#include <cstring> // for memcpy
 #include <climits>
 #include <cassert>
 #include <algorithm>
@@ -46,6 +47,7 @@ Client::Client(int screen, Window window)
   _disabled_decorations = 0;
   _group = None;
   _desktop = 0;
+  _nicons = 0;
   
   getArea();
   getDesktop();
@@ -74,7 +76,8 @@ Client::Client(int screen, Window window)
   updateIconTitle();
   updateClass();
   updateStrut();
-
+  updateIcons();
+  
   // this makes sure that these windows appear on all desktops
   if (/*_type == Type_Dock ||*/ _type == Type_Desktop)
     _desktop = 0xffffffff;
@@ -89,6 +92,11 @@ Client::Client(int screen, Window window)
 
 Client::~Client()
 {
+  assert(_nicons > 0); // there should always be a default..
+  for (int j = 0; j < _nicons; ++j)
+    delete [] _icons[j].data;
+  delete [] _icons;
+  
   // clean up childrens' references
   while (!_transients.empty()) {
     _transients.front()->_transient_for = 0;
@@ -207,7 +215,7 @@ void Client::getType()
 void Client::setupDecorAndFunctions()
 {
   // start with everything (cept fullscreen)
-  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border | Decor_Icon |
     Decor_AllDesktops | Decor_Iconify | Decor_Maximize;
   _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize |
     Func_Shade;
@@ -677,6 +685,62 @@ void Client::updateTransientFor()
 }
 
 
+void Client::updateIcons()
+{
+  unsigned long num = (unsigned) -1;
+  unsigned long *data;
+  unsigned long w, h, i = 0;
+
+  for (int j = 0; j < _nicons; ++j)
+    delete [] _icons[j].data;
+  if (_nicons > 0)
+    delete [] _icons;
+  _nicons = 0;
+
+  if (otk::Property::get(_window, otk::Property::atoms.net_wm_icon,
+                         otk::Property::atoms.cardinal, &num, &data)) {
+    // figure out how man valid icons are in here
+    while (num - i > 2) {
+      w = data[i++];
+      h = data[i++];
+      i += w * h;
+      if (i > num) break;
+      ++_nicons;
+    }
+
+    _icons = new Icon[_nicons];
+
+    // store the icons
+    i = 0;
+    for (int j = 0; j < _nicons; ++j) {
+      w = _icons[j].w = data[i++];
+      h = _icons[j].h = data[i++];
+      _icons[j].data = new unsigned long[w * h];
+      ::memcpy(_icons[j].data, &data[i], w * h * sizeof(unsigned long));
+      i += w * h;
+      assert(i <= num);
+    }
+    printf("i: %lu\n", i);
+    printf("bleffffffff\n");
+    
+    delete [] data;
+  }
+
+  if (_nicons <= 0) {
+    // set the default icon(s) XXX load these from the py
+    _nicons = 1;
+    _icons = new Icon[1];
+    _icons[i].w = 0;
+    _icons[i].h = 0;
+    _icons[i].data = 0;
+  }
+
+  assert(_nicons > 0); // there should always be a default..
+  
+  if (frame) frame->adjustIcon();
+}
+
+
 void Client::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
@@ -720,6 +784,8 @@ void Client::propertyHandler(const XPropertyEvent &e)
   }
   else if (e.atom == otk::Property::atoms.net_wm_strut)
     updateStrut();
+  else if (e.atom == otk::Property::atoms.net_wm_icon)
+    updateIcons();
 }
 
 
@@ -1140,6 +1206,29 @@ void Client::internal_resize(Corner anchor, int w, int h,
   internal_move(x, y);
 }
 
+const Icon *Client::icon(const otk::Size &s) const
+{
+  unsigned long req = s.width() * s.height();
+  // si is the smallest image >= req
+  // li is the largest image < req
+  unsigned long smallest = 0xffffffff, largest = 0, si = 0, li = 0;
+
+  assert(_nicons > 0); // there should always be a default..
+  for (int i = 0; i < _nicons; ++i) {
+    unsigned long size = _icons[i].w * _icons[i].h;
+    if (size < smallest && size >= req) {
+      smallest = size;
+      si = i;
+    }
+    if (size > largest && size <= req) {
+      largest = size;
+      li = i;
+    }
+  }
+  if (smallest == 0xffffffff) // didnt find one bigger than us...
+    return &_icons[li];
+  return &_icons[si];
+}
 
 void Client::move(int x, int y)
 {

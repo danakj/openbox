@@ -141,12 +141,13 @@ public:
   enum Decoration { Decor_Titlebar    = 1 << 0, //!< Display a titlebar
                     Decor_Handle      = 1 << 1, //!< Display a handle (bottom)
                     Decor_Border      = 1 << 2, //!< Display a border
-                    Decor_Iconify     = 1 << 3, //!< Display an iconify button
-                    Decor_Maximize    = 1 << 4, //!< Display a maximize button
+                    Decor_Icon        = 1 << 3, //!< Display the window's icon
+                    Decor_Iconify     = 1 << 4, //!< Display an iconify button
+                    Decor_Maximize    = 1 << 5, //!< Display a maximize button
                     //! Display a button to toggle the window's placement on
                     //! all desktops
-                    Decor_AllDesktops = 1 << 5,
-                    Decor_Close       = 1 << 6  //!< Display a close button
+                    Decor_AllDesktops = 1 << 6,
+                    Decor_Close       = 1 << 7  //!< Display a close button
   };
   //! Holds a bitmask of Client::Decoration values
   typedef unsigned char DecorationFlags;
@@ -342,6 +343,11 @@ private:
   */
   FunctionFlags _functions;
 
+  //! Icons for the client as specified on the client window
+  Icon *_icons;
+  //! The number of icons in _icons
+  int _nicons;
+
   //! Retrieves the window's initial gravity
   void getGravity();
   //! Retrieves the desktop hint's value and sets Client::_desktop
@@ -406,6 +412,8 @@ private:
   void updateStrut();
   //! Updates the window's transient status, and any parents of it
   void updateTransientFor();
+  //! Updates the window's icons
+  void updateIcons();
 
   //! Change the client's state hints to match the class' data
   void changeState();
@@ -639,6 +647,15 @@ BB    @param window The window id that the Client class should handle
   //! Returns the client's strut definition
   inline const otk::Strut &strut() const { return _strut; }
 
+  //! Returns an icon for the window
+  /*!
+    The icon chosen will be the smallest icon available that is still bigger or
+    equal to the specified Size.<br>
+    If none that meet the requirements is found, the largest icon that is
+    smaller than the specified size will be returned.
+  */
+  const Icon *icon(const otk::Size &s) const;
+  
   //! Move the window (actually, its frame) to a position.
   /*!
     This moves the window so that the top-left corner of its frame will be at

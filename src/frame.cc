@@ -9,7 +9,6 @@ extern "C" {
 }
 
 #include "frame.hh"
-#include "client.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
 #include "otk/surface.hh"
@@ -312,10 +311,10 @@ static void render(int screen, const otk::Size &size, Window win,
 
 void Frame::adjustSize()
 {
-  Client::DecorationFlags decorations = _client->decorations();
+  _decorations = _client->decorations();
   const otk::RenderStyle *style = otk::RenderStyle::style(_client->screen());
 
-  if (decorations & Client::Decor_Border) {
+  if (_decorations & Client::Decor_Border) {
     geom.bwidth = style->frameBorderWidth();
     geom.cbwidth = style->clientBorderWidth();
   } else {
@@ -336,7 +335,7 @@ void Frame::adjustSize()
   
   // position/size and map/unmap all the windows
 
-  if (decorations & Client::Decor_Titlebar) {
+  if (_decorations & Client::Decor_Titlebar) {
     XMoveResizeWindow(**otk::display, _title, -geom.bwidth, -geom.bwidth,
                       geom.width, geom.title_height());
     _innersize.top += geom.title_height() + geom.bwidth;
@@ -344,10 +343,15 @@ void Frame::adjustSize()
 
     // layout the title bar elements
     layoutTitle();
-  } else
+  } else {
     XUnmapWindow(**otk::display, _title);
+    // make all the titlebar stuff not render
+    _decorations &= ~(Client::Decor_Icon | Client::Decor_Iconify |
+                      Client::Decor_Maximize | Client::Decor_Close |
+                      Client::Decor_AllDesktops);
+  }
 
-  if (decorations & Client::Decor_Handle) {
+  if (_decorations & Client::Decor_Handle) {
     geom.handle_y = _innersize.top + _client->area().height() + geom.cbwidth;
     XMoveResizeWindow(**otk::display, _handle, -geom.bwidth, geom.handle_y,
                       geom.width, geom.handle_height);
@@ -385,7 +389,7 @@ void Frame::adjustSize()
   // render all the elements
   int screen = _client->screen();
   bool focus = _client->focused();
-  if (decorations & Client::Decor_Titlebar) {
+  if (_decorations & Client::Decor_Titlebar) {
     render(screen, otk::Size(geom.width, geom.title_height()), _title,
            &_title_sur, *(focus ? style->titlebarFocusBackground() :
                           style->titlebarUnfocusBackground()), false);
@@ -398,7 +402,7 @@ void Frame::adjustSize()
     renderClose();
   }
 
-  if (decorations & Client::Decor_Handle) {
+  if (_decorations & Client::Decor_Handle) {
     render(screen, otk::Size(geom.width, geom.handle_height), _handle,
            &_handle_sur, *(focus ? style->handleFocusBackground() :
                            style->handleUnfocusBackground()));
@@ -495,11 +499,13 @@ static void renderButton(int screen, bool focus, bool press, Window win,
   XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
   XClearWindow(**otk::display, win);
   if (*sur) delete *sur;
+  s->freePixelData();
   *sur = s;
 }
 
 void Frame::renderMax()
 {
+  if (!(_decorations & Client::Decor_Maximize)) return;
   bool press = _max_press || _client->maxVert() || _client->maxHorz();
   renderButton(_client->screen(), _client->focused(), press, _max,
                &_max_sur, geom.button_size,
@@ -508,6 +514,7 @@ void Frame::renderMax()
 
 void Frame::renderDesk()
 {
+  if (!(_decorations & Client::Decor_AllDesktops)) return;
   bool press = _desk_press || _client->desktop() == 0xffffffff;
   renderButton(_client->screen(), _client->focused(), press, _desk,
                &_desk_sur, geom.button_size,
@@ -516,6 +523,7 @@ void Frame::renderDesk()
 
 void Frame::renderIconify()
 {
+  if (!(_decorations & Client::Decor_Iconify)) return;
   renderButton(_client->screen(), _client->focused(), _iconify_press, _iconify,
                &_iconify_sur, geom.button_size,
                otk::RenderStyle::style(_client->screen())->iconifyMask());
@@ -523,6 +531,7 @@ void Frame::renderIconify()
 
 void Frame::renderClose()
 {
+  if (!(_decorations & Client::Decor_Close)) return;
   renderButton(_client->screen(), _client->focused(), _close_press, _close,
                &_close_sur, geom.button_size,
                otk::RenderStyle::style(_client->screen())->closeMask());
@@ -530,6 +539,7 @@ void Frame::renderClose()
 
 void Frame::renderIcon()
 {
+  if (!(_decorations & Client::Decor_Icon)) return;
   const int screen = _client->screen();
   const otk::RenderControl *control = otk::display->renderControl(screen);
 
@@ -544,7 +554,10 @@ void Frame::renderIcon()
   for (int y = 0; y < geom.button_size; ++y, src += w - geom.button_size)
     for (int x = 0; x < geom.button_size; ++x, ++dest, ++src)
       *dest = *src;
-  control->drawImage(*s, 0, 0, 0);
+  // draw the icon over it
+  const Icon *icon = _client->icon(otk::Size(geom.button_size,
+                                             geom.button_size));
+  control->drawImage(*s, icon->w, icon->h, icon->data);
 
   XSetWindowBackgroundPixmap(**otk::display, _icon, s->pixmap());
   XClearWindow(**otk::display, _icon);
@@ -554,69 +567,124 @@ void Frame::renderIcon()
 
 void Frame::layoutTitle()
 {
-  geom.label_width = geom.width - geom.bevel * 2 -
-    (geom.button_size + geom.bevel) * (_layout.size() - 1);
+  // figure out whats being shown, and the width of the label
+  geom.label_width = geom.width - geom.bevel * 2;
+  bool n, d, i, t, m ,c;
+  n = d = i = t = m = c = false;
+  for (const char *l = _layout.c_str(); *l; ++l) {
+    switch (*l) {
+    case 'n':
+    case 'N':
+      if (!(_decorations & Client::Decor_Icon)) break;
+      n = true;
+      geom.label_width -= geom.button_size + geom.bevel;
+      break;
+    case 'd':
+    case 'D':
+      if (!(_decorations & Client::Decor_AllDesktops)) break;
+      d = true;
+      geom.label_width -= geom.button_size + geom.bevel;
+      break;
+    case 'i':
+    case 'I':
+      if (!(_decorations & Client::Decor_Iconify)) break;
+      i = true;
+      geom.label_width -= geom.button_size + geom.bevel;
+      break;
+    case 't':
+    case 'T':
+      t = true;
+      break;
+    case 'm':
+    case 'M':
+      if (!(_decorations & Client::Decor_Maximize)) break;
+      m = true;
+      geom.label_width -= geom.button_size + geom.bevel;
+      break;
+    case 'c':
+    case 'C':
+      if (!(_decorations & Client::Decor_Close)) break;
+      c = true;
+      geom.label_width -= geom.button_size + geom.bevel;
+      break;
+    }
+  }
   if (geom.label_width < 1) geom.label_width = 1;
 
   XResizeWindow(**otk::display, _label, geom.label_width, geom.font_height);
   
+  if (!n) {
+    _decorations &= ~Client::Decor_Icon;
+    XUnmapWindow(**otk::display, _icon);
+  }
+  if (!d) {
+    _decorations &= ~Client::Decor_AllDesktops;
+    XUnmapWindow(**otk::display, _desk);
+  }
+  if (!i) {
+    _decorations &= ~Client::Decor_Iconify;
+    XUnmapWindow(**otk::display, _iconify);
+  }
+  if (!t)
+    XUnmapWindow(**otk::display, _label);
+  if (!m) {
+    _decorations &= ~Client::Decor_Maximize;
+    XUnmapWindow(**otk::display, _max);
+  }
+  if (!c) {
+    _decorations &= ~Client::Decor_Close;
+    XUnmapWindow(**otk::display, _close);
+  }
+
   int x = geom.bevel;
-  bool n, d, i, l, m ,c;
-  n = d = i = l = m = c = false;
   for (const char *lc = _layout.c_str(); *lc; ++lc) {
     switch (*lc) {
     case 'n':
     case 'N':
+      if (!n) break;
       geom.icon_x = x;
       XMapWindow(**otk::display, _icon);
       XMoveWindow(**otk::display, _icon, x, geom.bevel + 1);
-      n = true;
       x += geom.button_size;
       break;
     case 'd':
     case 'D':
+      if (!d) break;
       XMapWindow(**otk::display, _desk);
       XMoveWindow(**otk::display, _desk, x, geom.bevel + 1);
-      d = true;
       x += geom.button_size;
       break;
     case 'i':
     case 'I':
+      if (!i) break;
       XMapWindow(**otk::display, _iconify);
       XMoveWindow(**otk::display, _iconify, x, geom.bevel + 1);
-      i = true;
       x += geom.button_size;
       break;
     case 't':
     case 'T':
+      if (!t) break;
       XMapWindow(**otk::display, _label);
       XMoveWindow(**otk::display, _label, x, geom.bevel);
-      l = true;
       x += geom.label_width;
       break;
     case 'm':
     case 'M':
+      if (!m) break;
       XMapWindow(**otk::display, _max);
       XMoveWindow(**otk::display, _max, x, geom.bevel + 1);
-      m = true;
       x += geom.button_size;
       break;
     case 'c':
     case 'C':
+      if (!c) break;
       XMapWindow(**otk::display, _close);
       XMoveWindow(**otk::display, _close, x, geom.bevel + 1);
-      c = true;
       x += geom.button_size;
       break;
     }
     x += geom.bevel;
   }
-  if (!n) XUnmapWindow(**otk::display, _icon);
-  if (!d) XUnmapWindow(**otk::display, _desk);
-  if (!i) XUnmapWindow(**otk::display, _iconify);
-  if (!l) XUnmapWindow(**otk::display, _label);
-  if (!m) XUnmapWindow(**otk::display, _max);
-  if (!c) XUnmapWindow(**otk::display, _close);
 }
 
 void Frame::adjustPosition()
@@ -633,8 +701,6 @@ void Frame::adjustPosition()
 void Frame::adjustShape()
 {
 #ifdef SHAPE
-  Client::DecorationFlags decorations = _client->decorations();
-  
   if (!_client->shaped()) {
     // clear the shape on the frame window
     XShapeCombineMask(**otk::display, _frame, ShapeBounding,
@@ -651,7 +717,7 @@ void Frame::adjustShape()
     int num = 0;
     XRectangle xrect[2];
 
-    if (decorations & Client::Decor_Titlebar) {
+    if (_decorations & Client::Decor_Titlebar) {
       xrect[0].x = -geom.bevel;
       xrect[0].y = -geom.bevel;
       xrect[0].width = geom.width + geom.bwidth * 2;
@@ -659,7 +725,7 @@ void Frame::adjustShape()
       ++num;
     }
 
-    if (decorations & Client::Decor_Handle) {
+    if (_decorations & Client::Decor_Handle) {
       xrect[1].x = -geom.bevel;
       xrect[1].y = geom.handle_y;
       xrect[1].width = geom.width + geom.bwidth * 2;
@@ -674,13 +740,16 @@ void Frame::adjustShape()
 #endif // SHAPE
 }
 
-
 void Frame::adjustState()
 {
   renderDesk();
   renderMax();
 }
 
+void Frame::adjustIcon()
+{
+  renderIcon();
+}
 
 void Frame::grabClient()
 {

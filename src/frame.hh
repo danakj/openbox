@@ -9,6 +9,7 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
+#include "client.hh"
 #include "python.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
@@ -21,8 +22,6 @@ extern "C" {
 #include <vector>
 
 namespace ob {
-
-class Client;
 
 //! Varius geometry settings in the frame decorations
 struct FrameGeometry {
@@ -66,6 +65,9 @@ private:
   otk::Rect _area;
 
   bool _visible;
+
+  //! The decorations that are being displayed in the frame.
+  Client::DecorationFlags _decorations;
   
   // decoration windows
   Window  _frame;   // sits under everything
@@ -144,6 +146,7 @@ public:
   void adjustState();
   void adjustFocus();
   void adjustTitle();
+  void adjustIcon();
 
   //! Applies gravity to the client's position to find where the frame should
   //! be positioned.

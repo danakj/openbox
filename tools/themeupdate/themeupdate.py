@@ -201,8 +201,7 @@ def err_missing(data):
 
 
 def usage():
-    print 'Usage: themupdate.py /path/to/themerc > newthemerc'
-    print
+    out('Usage: themupdate.py /path/to/themerc > newthemerc\n\n')
     sys.exit()
 
 try:
@@ -210,8 +209,7 @@ try:
 except IndexError:
     usage()
 except IOError:
-    print 'Unable to open file "' + sys.argv[1] + '"'
-    print
+    out('Unable to open file "' + sys.argv[1] + '"\n\n')
     usage()
 
 data = file.readlines()

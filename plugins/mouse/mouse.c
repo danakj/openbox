@@ -252,8 +252,11 @@ static void event(ObEvent *e, void *foo)
                     click =TRUE;
                     /* double clicks happen if there were 2 in a row! */
                     if (lbutton == button &&
-                        e->data.x.e->xbutton.time - 300 <= ltime)
+                        e->data.x.e->xbutton.time - 300 <= ltime) {
                         dclick = TRUE;
+                        lbutton = 0;
+                    } else
+                        lbutton = button;
                 } else
                     lbutton = 0;
             }

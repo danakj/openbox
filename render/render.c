@@ -15,7 +15,7 @@
 #  include <stdlib.h>
 #endif
 
-static void RrPixel32_to_pixmap(RrAppearance *l,
+static void pixel_data_to_pixmap(RrAppearance *l,
                                 gint x, gint y, gint w, gint h);
 
 void RrPaint(RrAppearance *l, Window win, gint w, gint h)
@@ -89,7 +89,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != RR_SURFACE_SOLID)
-                    RrPixel32_to_pixmap(l, 0, 0, w, h);
+                    pixel_data_to_pixmap(l, 0, 0, w, h);
             }
             if (l->xftdraw == NULL) {
                 l->xftdraw = XftDrawCreate(RrDisplay(l->inst), l->pixmap, 
@@ -102,7 +102,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != RR_SURFACE_SOLID)
-                    RrPixel32_to_pixmap(l, 0, 0, w, h);
+                    pixel_data_to_pixmap(l, 0, 0, w, h);
             }
             if (l->texture[i].data.mask.color->gc == None)
                 RrColorAllocateGC(l->texture[i].data.mask.color);
@@ -118,7 +118,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
     if (!transferred) {
         transferred = 1;
         if (l->surface.grad != RR_SURFACE_SOLID)
-            RrPixel32_to_pixmap(l, 0, 0, w, h);
+            pixel_data_to_pixmap(l, 0, 0, w, h);
     }
 
 
@@ -222,7 +222,7 @@ void RrAppearanceFree(RrAppearance *a)
 }
 
 
-static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
+static void pixel_data_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
 {
     RrPixel32 *in, *scratch;
     Pixmap out;

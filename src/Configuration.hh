@@ -75,10 +75,10 @@ public:
 
   bool getValue(const std::string &rname, bool &value) const;
   inline bool getValue(const std::string &rname, int &value) const {
-    return getValue(rname, (long) value);
+    return getValue(rname, (long&) value);
   }
   inline bool getValue(const std::string &rname, unsigned int &value) const {
-    return getValue(rname, (unsigned long) value);
+    return getValue(rname, (unsigned long&) value);
   }
   bool getValue(const std::string &rname, long &value) const;
   bool getValue(const std::string &rname, unsigned long &value) const;

@@ -613,10 +613,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
 
 #ifdef    XFT
   if (dotext)
-    XClearArea(display, menu.frame, text_x, text_y , 
-               text_w + style->f_font->offset(), 
-               text_h + style->f_font->offset(),
-               False);
+    XClearArea(display, menu.frame, text_x, text_y , text_w, text_h, False);
 #endif // XFT
 
   if (dohilite && highlight && (menu.hilite_pixmap != ParentRelative)) {

@@ -254,8 +254,8 @@ void event_process(XEvent *e)
             e->xfocus.detail > NotifyNonlinearVirtual) return;
 
         g_message("FocusOut on %lx", window);
-        /* FocusOut events just make us look for FocusIn events. They
-           are mostly ignored otherwise. */
+        /* Try process a FocusIn first, and if a legit one isn't found, then
+           do the fallback shiznit. */
         {
             XEvent fi;
             if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {

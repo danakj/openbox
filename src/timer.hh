@@ -29,20 +29,19 @@ public:
   virtual void timeout(void) = 0;
 };
 
-class BTimer {
+class OBTimer {
 private:
-  OBTimerQueueManager *manager;
   TimeoutHandler *handler;
   bool timing, recur;
 
   timeval _start, _timeout;
 
-  BTimer(const BTimer&);
-  BTimer& operator=(const BTimer&);
+  OBTimer(const OBTimer&);
+  OBTimer& operator=(const OBTimer&);
 
 public:
-  BTimer(OBTimerQueueManager *m, TimeoutHandler *h);
-  virtual ~BTimer(void);
+  OBTimer(TimeoutHandler *h);
+  virtual ~OBTimer(void);
 
   void fireTimeout(void);
 
@@ -65,7 +64,7 @@ public:
   void stop(void);   // manager releases timer
   void halt(void);   // halts the timer
 
-  bool operator<(const BTimer& other) const
+  bool operator<(const OBTimer& other) const
   { return shouldFire(other.endpoint()); }
 };
 
@@ -95,12 +94,13 @@ private:
 };
 
 struct TimerLessThan {
-  bool operator()(const BTimer* const l, const BTimer* const r) const {
+  bool operator()(const OBTimer* const l, const OBTimer* const r) const {
     return *r < *l;
   }
 };
 
-typedef _timer_queue<BTimer*, std::vector<BTimer*>, TimerLessThan> TimerQueue;
+typedef _timer_queue<OBTimer*,
+                     std::vector<OBTimer*>, TimerLessThan> TimerQueue;
 
 class OBTimerQueueManager {
 private:
@@ -108,11 +108,15 @@ private:
 public:
   OBTimerQueueManager() {}
   virtual ~OBTimerQueueManager() {}
+
+  //! Will wait for and fire the next timer in the queue.
+  /*!
+    The function will stop waiting if an event is received from the X server.
+  */
+  virtual void fire();
   
-  virtual void go();
-  
-  virtual void addTimer(BTimer* timer);
-  virtual void removeTimer(BTimer* timer);
+  virtual void addTimer(OBTimer* timer);
+  virtual void removeTimer(OBTimer* timer);
 };
 
 }

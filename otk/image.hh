@@ -116,7 +116,7 @@ public:
 private:
   bool dither;
   const ScreenInfo *screeninfo;
-  ob::BTimer *timer;
+  ob::OBTimer *timer;
 
   Colormap colormap;
 

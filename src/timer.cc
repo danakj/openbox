@@ -5,66 +5,66 @@
 #endif // HAVE_CONFIG_H
 
 #include "otk/display.hh"
+#include "openbox.hh"
 #include "timer.hh"
 #include "util.hh"
 
 namespace ob {
 
-BTimer::BTimer(OBTimerQueueManager *m, TimeoutHandler *h) {
-  manager = m;
+OBTimer::OBTimer(TimeoutHandler *h) {
   handler = h;
 
   recur = timing = False;
 }
 
 
-BTimer::~BTimer(void) {
+OBTimer::~OBTimer(void) {
   if (timing) stop();
 }
 
 
-void BTimer::setTimeout(long t) {
+void OBTimer::setTimeout(long t) {
   _timeout.tv_sec = t / 1000;
   _timeout.tv_usec = t % 1000;
   _timeout.tv_usec *= 1000;
 }
 
 
-void BTimer::setTimeout(const timeval &t) {
+void OBTimer::setTimeout(const timeval &t) {
   _timeout.tv_sec = t.tv_sec;
   _timeout.tv_usec = t.tv_usec;
 }
 
 
-void BTimer::start(void) {
+void OBTimer::start(void) {
   gettimeofday(&_start, 0);
 
   if (! timing) {
     timing = True;
-    manager->addTimer(this);
+    Openbox::instance->timerManager()->addTimer(this);
   }
 }
 
 
-void BTimer::stop(void) {
+void OBTimer::stop(void) {
   timing = False;
 
-  manager->removeTimer(this);
+  Openbox::instance->timerManager()->removeTimer(this);
 }
 
 
-void BTimer::halt(void) {
+void OBTimer::halt(void) {
   timing = False;
 }
 
 
-void BTimer::fireTimeout(void) {
+void OBTimer::fireTimeout(void) {
   if (handler)
     handler->timeout();
 }
 
 
-timeval BTimer::timeRemaining(const timeval &tm) const {
+timeval OBTimer::timeRemaining(const timeval &tm) const {
   timeval ret = endpoint();
 
   ret.tv_sec  -= tm.tv_sec;
@@ -74,7 +74,7 @@ timeval BTimer::timeRemaining(const timeval &tm) const {
 }
 
 
-timeval BTimer::endpoint(void) const {
+timeval OBTimer::endpoint(void) const {
   timeval ret;
 
   ret.tv_sec = _start.tv_sec + _timeout.tv_sec;
@@ -84,7 +84,7 @@ timeval BTimer::endpoint(void) const {
 }
 
 
-bool BTimer::shouldFire(const timeval &tm) const {
+bool OBTimer::shouldFire(const timeval &tm) const {
   timeval end = endpoint();
 
   return ! ((tm.tv_sec < end.tv_sec) ||
@@ -92,7 +92,7 @@ bool BTimer::shouldFire(const timeval &tm) const {
 }
 
 
-void OBTimerQueueManager::go()
+void OBTimerQueueManager::fire()
 {
   fd_set rfds;
   timeval now, tm, *timeout = (timeval *) 0;
@@ -103,7 +103,7 @@ void OBTimerQueueManager::go()
   FD_SET(xfd, &rfds); // break on any x events
 
   if (! timerList.empty()) {
-    const BTimer* const timer = timerList.top();
+    const OBTimer* const timer = timerList.top();
 
     gettimeofday(&now, 0);
     tm = timer->timeRemaining(now);
@@ -121,7 +121,7 @@ void OBTimerQueueManager::go()
   // timer->start() and timer->shouldFire() is within the timer's period
   // then the timer will keep firing.  This should be VERY near impossible.
   while (! timerList.empty()) {
-    BTimer *timer = timerList.top();
+    OBTimer *timer = timerList.top();
     if (! timer->shouldFire(now))
       break;
 
@@ -135,13 +135,13 @@ void OBTimerQueueManager::go()
 }
 
 
-void OBTimerQueueManager::addTimer(BTimer *timer)
+void OBTimerQueueManager::addTimer(OBTimer *timer)
 {
   assert(timer);
   timerList.push(timer);
 }
 
-void OBTimerQueueManager::removeTimer(BTimer* timer)
+void OBTimerQueueManager::removeTimer(OBTimer* timer)
 {
   assert(timer);
   timerList.release(timer);

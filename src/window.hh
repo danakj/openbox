@@ -105,7 +105,7 @@ private:
   Blackbox *blackbox;
   BScreen *screen;
   XAtom *xatom;
-  BTimer *timer;
+  OBTimer *timer;
   BlackboxAttributes blackbox_attrib;
 
   Time lastButtonPressTime;  // used for double clicks, when were we clicked

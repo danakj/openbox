@@ -158,7 +158,7 @@ Blackbox::Blackbox(int argc, char **m_argv, char *rc)
 
   reconfigure_wait = False;
 
-  timer = new BTimer(this, this);
+  timer = new OBTimer(this);
   timer->setTimeout(0l);
 }
 
@@ -1215,14 +1215,4 @@ void Blackbox::setFocusedWindow(BlackboxWindow *win) {
 }
 
 
-void Blackbox::addTimer(BTimer *timer) {
-  (void)timer;
-}
-
-
-void Blackbox::removeTimer(BTimer *timer) {
-  (void)timer;
-}
-
- 
 } 

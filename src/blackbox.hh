@@ -69,7 +69,7 @@ class Blackbox;
 class BlackboxWindow;
 class BWindowGroup;
 
-class Blackbox : public Openbox, public TimeoutHandler, public TimerQueueManager  {
+class Blackbox : public Openbox, public TimeoutHandler {
 private:
   struct BCursor {
     Cursor session, move, ll_angle, lr_angle, ul_angle, ur_angle;
@@ -109,7 +109,7 @@ private:
 
   BScreen *active_screen;
   BlackboxWindow *focused_window, *changing_window;
-  BTimer *timer;
+  OBTimer *timer;
   Configuration config;
   XAtom *xatom;
 
@@ -216,9 +216,6 @@ public:
   virtual void timeout(void);
 
   enum { B_AmericanDate = 1, B_EuropeanDate };
-
-  virtual void addTimer(BTimer *timer);
-  virtual void removeTimer(BTimer *timer);
 };
 
 }

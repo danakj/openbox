@@ -10,6 +10,7 @@ extern "C" {
 #include <vector>
 
 #include "otk/screeninfo.hh"
+#include "timer.hh"
 
 namespace ob {
 
@@ -34,6 +35,9 @@ private:
   char *_displayreq;         // display requested by the user
   char *_argv0;              // argv[0], how the program was called
 
+  OBTimerQueueManager _timermanager; // manages timers, so that they fire when
+                                     // their time elapses
+
   RunState _state;           // the state of the window manager
 
   ScreenInfoList _screenInfoList; // info for all screens on the display
@@ -57,6 +61,8 @@ public:
 
   //! Returns the state of the window manager (starting, exiting, etc).
   inline RunState state() const { return _state; }
+
+  inline OBTimerQueueManager *timerManager() { return &_timermanager; }
 
   void eventLoop();
 

@@ -208,50 +208,13 @@ void Openbox::showHelp()
 
 void Openbox::eventLoop()
 {
-  const int xfd = ConnectionNumber(otk::OBDisplay::display);
-
   while (_state == State_Normal) {
     if (XPending(otk::OBDisplay::display)) {
       XEvent e;
       XNextEvent(otk::OBDisplay::display, &e);
       process_event(&e);
     } else {
-      fd_set rfds;
-      timeval now, tm, *timeout = (timeval *) 0;
-
-      FD_ZERO(&rfds);
-      FD_SET(xfd, &rfds);
-
-/*      if (! timerList.empty()) {
-        const BTimer* const timer = timerList.top();
-
-        gettimeofday(&now, 0);
-        tm = timer->timeRemaining(now);
-
-        timeout = &tm;
-      }
-
-      select(xfd + 1, &rfds, 0, 0, timeout);
-
-      // check for timer timeout
-      gettimeofday(&now, 0);
-
-      // there is a small chance for deadlock here:
-      // *IF* the timer list keeps getting refreshed *AND* the time between
-      // timer->start() and timer->shouldFire() is within the timer's period
-      // then the timer will keep firing.  This should be VERY near impossible.
-      while (! timerList.empty()) {
-        BTimer *timer = timerList.top();
-        if (! timer->shouldFire(now))
-          break;
-
-        timerList.pop();
-
-        timer->fireTimeout();
-        timer->halt();
-        if (timer->isRecurring())
-          timer->start();
-          }*/
+      _timermanager.fire();
     }
   }
 }

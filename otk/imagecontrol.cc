@@ -58,7 +58,7 @@ BImageControl::BImageControl(const ScreenInfo *scrn,
     timer->setTimeout(cache_timeout);
     timer->start();*/
   } else {
-    timer = (ob::BTimer *) 0;
+    timer = (ob::OBTimer *) 0;
   }
 
   colors = (XColor *) 0;

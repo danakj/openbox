@@ -135,7 +135,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   lastButtonPressTime = 0;
 
-  timer = new BTimer(blackbox, this);
+  timer = new OBTimer(this);
   timer->setTimeout(blackbox->getAutoRaiseDelay());
 
   // get size, aspect, minimum/maximum size and other hints set by the

@@ -596,7 +596,7 @@ public:
   inline DecorationFlags disabledDecorations() const
     { return _disabled_decorations; }
   //! Returns the functions that the user can perform on the window
-  inline FunctionFlags funtions() const { return _functions; }
+  inline FunctionFlags functions() const { return _functions; }
 
   //! Return the client this window is transient for
   inline Client *transientFor() const { return _transient_for; }

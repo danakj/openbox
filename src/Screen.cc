@@ -2307,8 +2307,9 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
       for (; it != end; ++it) {
         const string& fname = *it;
 
-        if (fname[fname.size()-1] == '~')
-          continue;
+        //ignore backups and dot files
+        if (fname[fname.size()-1] == '~' || fname[0] == '.')
+            continue;
 
         string style = stylesdir;
         style += '/';
@@ -2743,11 +2744,13 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
         offset = 1;
     }
 
-    unsigned char tint = 0x40;
+    int tint = 25;
     if (style.getValue(rbasename + "xft.shadow.tint", s)) {
       tint = atoi(s.c_str());
     }
 
+    if (tint > 100) tint = 100;
+    else if (tint < -100) tint = -100;
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
                          italic, dropShadow && resource.shadow_fonts, offset, 

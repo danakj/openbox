@@ -35,20 +35,14 @@ TrueRenderControl::TrueRenderControl(const ScreenInfo *screen)
   green_mask = screen->visual()->green_mask;
   blue_mask = screen->visual()->blue_mask;
 
-  while (! (red_mask & 1)) { _red_offset++; red_mask >>= 1; }
+  while (! (red_mask & 1))   { _red_offset++;   red_mask   >>= 1; }
   while (! (green_mask & 1)) { _green_offset++; green_mask >>= 1; }
-  while (! (blue_mask & 1)) { _blue_offset++; blue_mask >>= 1; }
+  while (! (blue_mask & 1))  { _blue_offset++;  blue_mask  >>= 1; }
 
-  // scale available colorspace to match our 256x256x256 cube
-  _red_bits = 255 / red_mask;
-  _green_bits = 255 / green_mask;
-  _blue_bits = 255 / blue_mask;
-
-  for (int i = 0; i < 256; i++) {
-    _red_color_table[i] = i / _red_bits;
-    _green_color_table[i] = i / _green_bits;
-    _blue_color_table[i] = i / _blue_bits;
-  }
+  _red_shift = _green_shift = _blue_shift = 8;
+  while (red_mask)   { red_mask   >>= 1; _red_shift--;   }
+  while (green_mask) { green_mask >>= 1; _green_shift--; }
+  while (blue_mask)  { blue_mask  >>= 1; _blue_shift--;  }
 }
 
 TrueRenderControl::~TrueRenderControl()
@@ -117,15 +111,13 @@ void TrueRenderControl::drawBackground(Surface *sf,
 
   for (int y = 0; y < h/3; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, _red_color_table[255*x/w] << _red_offset);
+      renderPixel(im, dp, (255*x/w) << _red_offset << _red_shift);
   for (int y = 0; y < h/3; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, _green_color_table[255*x/w] << _green_offset);
+      renderPixel(im, dp, (255*x/w) << _green_offset << _green_shift);
   for (int y = 0; y < h/3; ++y)
     for (int x = 0; x < w; ++x, dp += im->bits_per_pixel/8)
-      renderPixel(im, dp, _blue_color_table[255*x/w] << _blue_offset);
-
-  printf("\nDone %d %d\n", im->bytes_per_line * h, dp - data);
+      renderPixel(im, dp, (255*x/w) << _blue_offset << _blue_shift);
 
   im->data = (char*) data;
   

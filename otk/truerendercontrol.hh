@@ -13,6 +13,13 @@ private:
   int _green_offset;
   int _blue_offset;
 
+  // the number of bits to shift a color value (from 0-255) to fit it into the
+  // the color mask
+  int _red_shift;
+  int _green_shift;
+  int _blue_shift;
+
+
 public:
   TrueRenderControl(const ScreenInfo *screen);
   virtual ~TrueRenderControl();

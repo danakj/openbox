@@ -17,16 +17,14 @@ class RenderControl {
 protected:
   const ScreenInfo *_screen;
 
-  int _red_bits;
-  int _green_bits;
-  int _blue_bits;
-
+  /*
   // color tables, meaning, 256 (possibly) different shades of each color,
   // based on the number of bits there are available for each color in the
   // visual
   unsigned char _red_color_table[256];
   unsigned char _green_color_table[256];
   unsigned char _blue_color_table[256];
+  */
 
 /*
   Bool _dither;

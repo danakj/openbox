@@ -17,7 +17,7 @@ openbox3_LDADD=../otk/libotk.a @LIBINTL@
 
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc rootwindow.cc backgroundwidget.cc labelwidget.cc \
-                  buttonwidget.cc python.cc python_client.cc
+                  buttonwidget.cc python.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

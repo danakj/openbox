@@ -9,7 +9,6 @@
 #include "client.hh"
 #include "screen.hh"
 #include "actions.hh"
-#include "python_client.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -91,8 +90,8 @@ Openbox::Openbox(int argc, char **argv)
   _doshutdown = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
 
-  _pyclients = (PyDictObject*) PyDict_New();
-  assert(_pyclients);
+  _clients = (PyDictObject*) PyDict_New();
+  assert(_clients);
 
   parseCommandLine(argc, argv);
 
@@ -276,35 +275,25 @@ void Openbox::eventLoop()
 
 void Openbox::addClient(Window window, OBClient *client)
 {
-  _clients[window] = client;
-
   // maintain the python list here too
-  PyClientObject* pyclient = PyObject_New(PyClientObject, &PyClient_Type);
-  pyclient->window = window;
-  pyclient->client = client;
-  PyDict_SetItem((PyObject*)_pyclients, PyLong_FromLong(window),
-                 (PyObject*)pyclient);
+  PyDict_SetItem((PyObject*)_clients, PyLong_FromLong(window),
+                 (PyObject*)client);
 }
 
 
 void Openbox::removeClient(Window window)
 {
-  _clients.erase(window);
+  PyDict_DelItem((PyObject*)_clients, PyLong_FromLong(window));
 }
 
 
 OBClient *Openbox::findClient(Window window)
 {
-  /*
-    NOTE: we dont use _clients[] to find the value because that will insert
-    a new null into the hash, which really sucks when we want to clean up the
-    hash at shutdown!
-  */
-  ClientMap::iterator it = _clients.find(window);
-  if (it != _clients.end())
-    return it->second;
-  else
-    return (OBClient*) 0;
+  PyClientObject *client = PyDist_GetItem((PyObject*)_clients,
+                                          PyLong_FromLong(window));
+  if (client)
+    return client->client;
+  return 0;
 }
 
 }

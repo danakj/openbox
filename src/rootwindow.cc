@@ -17,7 +17,7 @@ OBRootWindow::OBRootWindow(int screen)
 {
   updateDesktopNames();
 
-  Openbox::instance->registerHandler(_info->getRootWindow(), this);
+  Openbox::instance->registerHandler(_info->rootWindow(), this);
 }
 
 
@@ -34,7 +34,7 @@ void OBRootWindow::updateDesktopNames()
 
   unsigned long num = (unsigned) -1;
   
-  if (!property->get(_info->getRootWindow(),
+  if (!property->get(_info->rootWindow(),
                      otk::OBProperty::net_desktop_names,
                      otk::OBProperty::utf8, &num, &_names))
     _names.clear();
@@ -88,7 +88,7 @@ void OBRootWindow::setDesktopName(int i, const std::string &name)
   
   otk::OBProperty::StringVect newnames = _names;
   newnames[i] = name;
-  property->set(_info->getRootWindow(), otk::OBProperty::net_desktop_names,
+  property->set(_info->rootWindow(), otk::OBProperty::net_desktop_names,
                 otk::OBProperty::utf8, newnames);
 }
 
@@ -104,8 +104,7 @@ void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
   if (client) {
     // XXX: uniconify and/or unshade the window
   } else {
-    Openbox::instance->screen(_info->getScreenNumber())->
-      manageWindow(e.window);
+    Openbox::instance->screen(_info->screen())->manageWindow(e.window);
   }
 }
 

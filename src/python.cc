@@ -5,7 +5,7 @@
 #endif
 
 #include "python.hh"
-#include "python_client.hh"
+#include "client.hh"
 #include "openbox.hh"
 
 namespace ob {
@@ -28,8 +28,8 @@ static PyMethodDef OBMethods[] = {
   {"shit", shit, METH_VARARGS,
    "Do some shit, yo!"},
 
-  {"get_client_dict", get_client_dict, METH_VARARGS,
-   "Get the list of all clients"},
+/*  {"get_client_dict", get_client_dict, METH_VARARGS,
+    "Get the list of all clients"},*/
 
   {NULL, NULL, 0, NULL}
 };

@@ -16,7 +16,6 @@ extern "C" {
 
 #include <string>
 #include <vector>
-#include <map>
 
 #include "python.hh"
 #include "otk/screeninfo.hh"
@@ -69,9 +68,6 @@ public:
     Cursor ur_angle; //!< For resizing the right corner of a window
   };
   
-  //! A map for looking up a specific client class from the window id
-  typedef std::map<Window, OBClient *> ClientMap;
-
   //! A list of OBScreen classes
   typedef std::vector<OBScreen *> ScreenList;
   
@@ -93,8 +89,7 @@ private:
   char *_argv0;
 
   //! A list of all managed clients
-  ClientMap _clients;
-  PyDictObject *_pyclients;
+  PyDictObject *_clients;
 
   //! A list of all the managed screens
   ScreenList _screens;
@@ -171,7 +166,7 @@ public:
   //! Returns the mouse cursors used throughout Openbox
   inline const Cursors &cursors() const { return _cursors; }
 
-  inline PyDictObject *pyclients() const { return _pyclients; }
+  inline PyDictObject *clients() const { return _clients; }
 
   //! The main function of the Openbox class
   /*!

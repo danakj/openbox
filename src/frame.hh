@@ -113,25 +113,25 @@ public:
   void frameGravity(int &x, int &y);
 
   //! Gets the window id of the frame's "plate" subelement
-  inline Window plate() const { return _plate.getWindow(); }
+  inline Window plate() const { return _plate.window(); }
   //! Gets the window id of the frame's "titlebar" subelement
-  inline Window titlebar() const { return _titlebar.getWindow(); }
+  inline Window titlebar() const { return _titlebar.window(); }
   //! Gets the window id of the frame's "label" subelement
-  inline Window label() const { return _label.getWindow(); }
+  inline Window label() const { return _label.window(); }
   //! Gets the window id of the frame's "close button" subelement
-  inline Window button_close() const { return _button_close.getWindow(); }
+  inline Window button_close() const { return _button_close.window(); }
   //! Gets the window id of the frame's "iconify button" subelement
-  inline Window button_iconify() const { return _button_iconify.getWindow(); }
+  inline Window button_iconify() const { return _button_iconify.window(); }
   //! Gets the window id of the frame's "maximize button" subelement
-  inline Window button_max() const { return _button_max.getWindow(); }
+  inline Window button_max() const { return _button_max.window(); }
   //! Gets the window id of the frame's "sticky button" subelement
-  inline Window button_stick() const { return _button_stick.getWindow(); }
+  inline Window button_stick() const { return _button_stick.window(); }
   //! Gets the window id of the frame's "handle" subelement
-  inline Window handle() const { return _handle.getWindow(); }
+  inline Window handle() const { return _handle.window(); }
   //! Gets the window id of the frame's "left grip" subelement
-  inline Window grip_left() const { return _grip_left.getWindow(); }
+  inline Window grip_left() const { return _grip_left.window(); }
   //! Gets the window id of the frame's "right grip" subelement
-  inline Window grip_right() const { return _grip_right.getWindow(); }
+  inline Window grip_right() const { return _grip_right.window(); }
 
 };
 

@@ -41,7 +41,7 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   assert(client);
   assert(style);
 
-  XSelectInput(otk::OBDisplay::display, getWindow(), OBFrame::event_mask);
+  XSelectInput(otk::OBDisplay::display, window(), OBFrame::event_mask);
   
   unmanaged();
   _titlebar.unmanaged();
@@ -98,7 +98,7 @@ void OBFrame::setStyle(otk::Style *style)
   _style = style;
 
   // XXX: change when focus changes!
-  XSetWindowBorder(otk::OBDisplay::display, getWindow(),
+  XSetWindowBorder(otk::OBDisplay::display, window(),
                    _style->getBorderColor()->pixel());
 
   // if !replace, then adjust() will get called after the client is grabbed!
@@ -191,23 +191,23 @@ void OBFrame::adjustSize()
     for (int i = 0, len = layout.size(); i < len; ++i) {
       switch (layout[i]) {
       case 'I':
-        _button_iconify.move(x, _button_iconify.getRect().y());
+        _button_iconify.move(x, _button_iconify.rect().y());
         x += _button_iconify.width();
         break;
       case 'L':
-        _label.move(x, _label.getRect().y());
+        _label.move(x, _label.rect().y());
         x += _label.width();
         break;
       case 'M':
-        _button_max.move(x, _button_max.getRect().y());
+        _button_max.move(x, _button_max.rect().y());
         x += _button_max.width();
         break;
       case 'S':
-        _button_stick.move(x, _button_stick.getRect().y());
+        _button_stick.move(x, _button_stick.rect().y());
         x += _button_stick.width();
         break;
       case 'C':
-        _button_close.move(x, _button_close.getRect().y());
+        _button_close.move(x, _button_close.rect().y());
         x += _button_close.width();
         break;
       default:
@@ -227,7 +227,7 @@ void OBFrame::adjustSize()
                            // the 'buttons size' since theyre all the same
                            _button_iconify.width() * 2,
                            _handle.height());
-    _grip_right.setGeometry(((_handle.getRect().right() + 1) -
+    _grip_right.setGeometry(((_handle.rect().right() + 1) -
                              _button_iconify.width() * 2),
                             -bwidth,
                             // XXX: get a Point class in otk and use that for
@@ -304,13 +304,13 @@ void OBFrame::adjustShape()
   
   if (!_client->shaped()) {
     // clear the shape on the frame window
-    XShapeCombineMask(otk::OBDisplay::display, getWindow(), ShapeBounding,
+    XShapeCombineMask(otk::OBDisplay::display, window(), ShapeBounding,
                       _innersize.left,
                       _innersize.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
-    XShapeCombineShape(otk::OBDisplay::display, getWindow(), ShapeBounding,
+    XShapeCombineShape(otk::OBDisplay::display, window(), ShapeBounding,
                        _innersize.left,
                        _innersize.top,
                        _client->window(), ShapeBounding, ShapeSet);
@@ -319,22 +319,22 @@ void OBFrame::adjustShape()
     XRectangle xrect[2];
 
     if (_decorations & OBClient::Decor_Titlebar) {
-      xrect[0].x = _titlebar.getRect().x();
-      xrect[0].y = _titlebar.getRect().y();
+      xrect[0].x = _titlebar.rect().x();
+      xrect[0].y = _titlebar.rect().y();
       xrect[0].width = _titlebar.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
       xrect[0].height = _titlebar.height() + bwidth * 2;
       ++num;
     }
 
     if (_decorations & OBClient::Decor_Handle) {
-      xrect[1].x = _handle.getRect().x();
-      xrect[1].y = _handle.getRect().y();
+      xrect[1].x = _handle.rect().x();
+      xrect[1].y = _handle.rect().y();
       xrect[1].width = _handle.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
       xrect[1].height = _handle.height() + bwidth * 2;
       ++num;
     }
 
-    XShapeCombineRectangles(otk::OBDisplay::display, getWindow(),
+    XShapeCombineRectangles(otk::OBDisplay::display, window(),
                             ShapeBounding, 0, 0, xrect, num,
                             ShapeUnion, Unsorted);
   }
@@ -347,11 +347,11 @@ void OBFrame::grabClient()
   
   // reparent the client to the frame
   XReparentWindow(otk::OBDisplay::display, _client->window(),
-                  _plate.getWindow(), 0, 0);
+                  _plate.window(), 0, 0);
   _client->ignore_unmaps++;
 
   // select the event mask on the client's parent (to receive config req's)
-  XSelectInput(otk::OBDisplay::display, _plate.getWindow(),
+  XSelectInput(otk::OBDisplay::display, _plate.window(),
                SubstructureRedirectMask);
 
   // map the client so it maps when the frame does
@@ -374,7 +374,7 @@ void OBFrame::releaseClient(bool remap)
     // according to the ICCCM - if the client doesn't reparent to
     // root, then we have to do it for them
     XReparentWindow(otk::OBDisplay::display, _client->window(),
-                    _screen->getRootWindow(),
+                    _screen->rootWindow(),
                     _client->area().x(), _client->area().y());
   }
 
@@ -445,8 +445,8 @@ void OBFrame::clientGravity(int &x, int &y)
 
 void OBFrame::frameGravity(int &x, int &y)
 {
-  x = getRect().x();
-  y = getRect().y();
+  x = rect().x();
+  y = rect().y();
   
   // horizontal
   switch (_client->gravity()) {

@@ -45,7 +45,7 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
 
   ::running = false;
   XErrorHandler old = XSetErrorHandler(::anotherWMRunning);
-  XSelectInput(otk::OBDisplay::display, _info->getRootWindow(),
+  XSelectInput(otk::OBDisplay::display, _info->rootWindow(),
                OBScreen::event_mask);
   XSync(otk::OBDisplay::display, false);
   XSetErrorHandler(old);
@@ -54,15 +54,15 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
   if (! _managed) return; // was unable to manage the screen
 
   printf(_("Managing screen %d: visual 0x%lx, depth %d\n"),
-         _number, XVisualIDFromVisual(_info->getVisual()), _info->getDepth());
+         _number, XVisualIDFromVisual(_info->visual()), _info->depth());
 
-  Openbox::instance->property()->set(_info->getRootWindow(),
+  Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::openbox_pid,
                                      otk::OBProperty::Atom_Cardinal,
                                      (unsigned long) getpid());
 
   // set the mouse cursor for the root window (the default cursor)
-  XDefineCursor(otk::OBDisplay::display, _info->getRootWindow(),
+  XDefineCursor(otk::OBDisplay::display, _info->rootWindow(),
                 Openbox::instance->cursors().session);
 
   // initialize the shit that is used for all drawing on the screen
@@ -77,14 +77,14 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
 
   
   // Set the netwm atoms for geomtery and viewport
-  unsigned long geometry[] = { _info->getWidth(),
-                               _info->getHeight() };
-  Openbox::instance->property()->set(_info->getRootWindow(),
+  unsigned long geometry[] = { _info->width(),
+                               _info->height() };
+  Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_desktop_geometry,
                                      otk::OBProperty::Atom_Cardinal,
                                      geometry, 2);
   unsigned long viewport[] = { 0, 0 };
-  Openbox::instance->property()->set(_info->getRootWindow(),
+  Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_desktop_viewport,
                                      otk::OBProperty::Atom_Cardinal,
                                      viewport, 2);
@@ -112,7 +112,7 @@ void OBScreen::manageExisting()
 {
   unsigned int i, j, nchild;
   Window r, p, *children;
-  XQueryTree(otk::OBDisplay::display, _info->getRootWindow(), &r, &p,
+  XQueryTree(otk::OBDisplay::display, _info->rootWindow(), &r, &p,
              &children, &nchild);
 
   // preen the window list of all icon windows... for better dockapp support
@@ -205,8 +205,8 @@ void OBScreen::calcArea()
   }
 
   _area.setRect(current_left, current_top,
-                _info->getWidth() - (current_left + current_right),
-                _info->getHeight() - (current_top + current_bottom));
+                _info->width() - (current_left + current_right),
+                _info->height() - (current_top + current_bottom));
 
 /*
 #ifdef    XINERAMA
@@ -255,7 +255,7 @@ void OBScreen::setClientList()
   } else
     windows = (Window*) 0;
 
-  Openbox::instance->property()->set(_info->getRootWindow(),
+  Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_client_list,
                                      otk::OBProperty::Atom_Window,
                                      windows, _clients.size());
@@ -288,7 +288,7 @@ void OBScreen::setStackingList()
 void OBScreen::setWorkArea() {
   unsigned long area[] = { _area.x(), _area.y(),
                            _area.width(), _area.height() };
-  Openbox::instance->property()->set(_info->getRootWindow(),
+  Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_workarea,
                                      otk::OBProperty::Atom_Cardinal,
                                      area, 4);
@@ -369,7 +369,7 @@ void OBScreen::manageWindow(Window window)
   client->frame = new OBFrame(client, &_style);
 
   // add to the wm's map
-  Openbox::instance->addClient(client->frame->getWindow(), client);
+  Openbox::instance->addClient(client->frame->window(), client);
   Openbox::instance->addClient(client->frame->plate(), client);
   Openbox::instance->addClient(client->frame->titlebar(), client);
   Openbox::instance->addClient(client->frame->label(), client);
@@ -403,7 +403,7 @@ void OBScreen::unmanageWindow(OBClient *client)
 
   // remove from the wm's map
   Openbox::instance->removeClient(client->window());
-  Openbox::instance->removeClient(frame->getWindow());
+  Openbox::instance->removeClient(frame->window());
   Openbox::instance->removeClient(frame->plate());
   Openbox::instance->removeClient(frame->titlebar());
   Openbox::instance->removeClient(frame->label());

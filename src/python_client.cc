@@ -11,26 +11,17 @@ namespace ob {
 
 extern "C" {
 
-PyObject *get_client_dict(PyObject* self, PyObject* args)
-{
-  if (!PyArg_ParseTuple(args, ":get_client_dict"))
-    return NULL;
-  return PyDictProxy_New((PyObject*)Openbox::instance->pyclients());
-}
-
-
-
 PyObject *getWindow(PyObject* self, PyObject* args)
 {
   if (!PyArg_ParseTuple(args, ":getWindow"))
     return NULL;
-  return PyLong_FromLong(((PyClientObject*)self)->window);
+  return PyLong_FromLong(((PyClientObject*)self)->client->window());
 }
 
 
 
 static PyMethodDef attr_methods[] = {
-  {"getWindow", getWindow, METH_VARARGS,
+  {"getWindow", (PyCFunction)getWindow, METH_VARARGS,
    "Return the window id."},
   {NULL, NULL, 0, NULL}           /* sentinel */
 };

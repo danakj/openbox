@@ -141,11 +141,14 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
     int i, n;
     GList *modals = NULL;
     GList *trans = NULL;
-    GList *modal_sel_it = NULL; /* the selected guy if modal */
-    GList *trans_sel_it = NULL; /* the selected guy if not */
+    GList *modal_sel = NULL; /* the selected guys if modal */
+    GList *trans_sel = NULL; /* the selected guys if not */
 
     /* remove first so we can't run into ourself */
-    stacking_list = g_list_remove(stacking_list, top);
+    if ((it = g_list_find(stacking_list, top)))
+        stacking_list = g_list_delete_link(stacking_list, it);
+    else
+        return NULL;
 
     i = 0;
     n = g_slist_length(top->transients);
@@ -155,26 +158,32 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
 
         if ((sit = g_slist_find(top->transients, it->data))) {
             ObClient *c = sit->data;
+            gboolean sel_child;
 
             ++i;
 
+            if (c == selected)
+                sel_child = TRUE;
+            else
+                sel_child = client_search_transient(c, selected) != NULL;
+
             if (!c->modal) {
-                if (c != selected) {
+                if (!sel_child) {
                     trans = g_list_concat(trans,
-                                           pick_windows(c, selected, raise));
+                                          pick_windows(c, selected, raise));
                 } else {
-                    g_assert(modal_sel_it == NULL);
-                    g_assert(trans_sel_it == NULL);
-                    trans_sel_it = pick_windows(c, selected, raise);
+                    trans_sel = g_list_concat(trans_sel,
+                                                 pick_windows(c, selected,
+                                                              raise));
                 }
             } else {
-                if (c != selected) {
+                if (!sel_child) {
                     modals = g_list_concat(modals,
                                            pick_windows(c, selected, raise));
                 } else {
-                    g_assert(modal_sel_it == NULL);
-                    g_assert(trans_sel_it == NULL);
-                    modal_sel_it = pick_windows(c, selected, raise);
+                    modal_sel = g_list_concat(modal_sel,
+                                                 pick_windows(c, selected,
+                                                              raise));
                 }
             }
             /* if we dont have a prev then start back at the beginning,
@@ -183,11 +192,11 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
         }
     }
 
-    ret = g_list_concat((raise ? modal_sel_it : modals),
-                        (raise ? modals : modal_sel_it));
+    ret = g_list_concat((raise ? modal_sel : modals),
+                        (raise ? modals : modal_sel));
 
-    ret = g_list_concat(ret, (raise ? trans_sel_it : trans));
-    ret = g_list_concat(ret, (raise ? trans : trans_sel_it));
+    ret = g_list_concat(ret, (raise ? trans_sel : trans));
+    ret = g_list_concat(ret, (raise ? trans : trans_sel));
 
 
     /* add itself */

@@ -19,7 +19,6 @@
 		         f->cbwidth)
 #define BUTTON_SIZE     (LABEL_HEIGHT - 2)
 #define GRIP_WIDTH      (BUTTON_SIZE * 2)
-#define HANDLE_WIDTH(f) (f->width - (GRIP_WIDTH + f->bwidth) * 2)
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask)
@@ -804,19 +803,32 @@ static void render(ObFrame *self)
     }
 
     if (self->frame.client->decorations & Decor_Handle) {
-        paint(self->handle, (client_focused(self->frame.client) ?
-                             self->a_focused_handle :
-                             self->a_unfocused_handle),
-              GRIP_WIDTH + self->bwidth, 0,
-              HANDLE_WIDTH(self), s_handle_height);
-        paint(self->lgrip, (client_focused(self->frame.client) ?
-                            a_focused_grip :
-                            a_unfocused_grip),
-              0, 0, GRIP_WIDTH, s_handle_height);
-        paint(self->rgrip, (client_focused(self->frame.client) ?
-                            a_focused_grip :
-                            a_unfocused_grip),
-              0, 0, GRIP_WIDTH, s_handle_height);
+        Appearance *h, *g;
+
+        h = (client_focused(self->frame.client) ?
+             self->a_focused_handle : self->a_unfocused_handle);
+        g = (client_focused(self->frame.client) ?
+             a_focused_grip : a_unfocused_grip);
+
+        if (g->surface.data.planar.grad == Background_ParentRelative) {
+            g->surface.data.planar.parent = h;
+            paint(self->handle, h, 0, 0, self->width, s_handle_height);
+        } else {
+            paint(self->handle, h,
+                  GRIP_WIDTH + self->bwidth, 0,
+                  self->width - (GRIP_WIDTH + self->bwidth) * 2,
+                  s_handle_height);
+        }
+
+        g->surface.data.planar.parentx = 0;
+        g->surface.data.planar.parenty = 0;
+
+        paint(self->lgrip, g, 0, 0, GRIP_WIDTH, s_handle_height);
+
+        g->surface.data.planar.parentx = self->width - GRIP_WIDTH;
+        g->surface.data.planar.parenty = 0;
+
+        paint(self->rgrip, g, 0, 0, GRIP_WIDTH, s_handle_height);
     }
 }
 

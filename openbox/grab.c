@@ -6,6 +6,7 @@
 #include <X11/Xlib.h>
 
 #define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
+#define GRAB_KEY_MASK (KeyPressMask | KeyReleaseMask)
 
 #define MASK_LIST_SIZE 8
 
@@ -17,8 +18,8 @@ int grab_keyboard(gboolean grab)
     static guint kgrabs = 0;
     if (grab) {
         if (kgrabs++ == 0)
-            XGrabKeyboard(ob_display, ob_root, 0, GrabModeAsync, GrabModeSync,
-                          event_lasttime);
+            XGrabKeyboard(ob_display, ob_root, FALSE, GrabModeAsync,
+                          GrabModeAsync, event_lasttime);
     } else if (kgrabs > 0) {
         if (--kgrabs == 0)
             XUngrabKeyboard(ob_display, event_lasttime);

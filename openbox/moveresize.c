@@ -117,8 +117,8 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
     else
         g_assert_not_reached();
 
-    grab_keyboard(TRUE);
     grab_pointer(TRUE, cur);
+    grab_keyboard(TRUE);
 }
 
 static void end_moveresize(gboolean cancel)

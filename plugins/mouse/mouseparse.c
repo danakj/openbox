@@ -69,8 +69,6 @@ void mouseparse(ParseToken *token)
             action = action_from_string(token->data.identifier);
 
             /* check for valid actions for motion events */
-            if (action->func == action_moveresize)
-                g_message("%d", action->data.moveresize.corner);
             if (event == MouseAction_Motion) {
                 if (action && (action->func != action_moveresize ||
                                action->data.moveresize.corner ==

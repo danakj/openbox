@@ -5,7 +5,8 @@
 void sn_startup(gboolean reconfig) {}
 void sn_shutdown(gboolean reconfig) {}
 gboolean sn_app_starting() { return FALSE; }
-void sn_app_started(gchar *wmclass, guint *desktop) {}
+void sn_app_started(gchar *wmclass) {}
+gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
 
 #else
 

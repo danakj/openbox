@@ -44,7 +44,7 @@ int RrFontMeasureString(struct RrFont *font, const char *string)
 
 int RrFontHeight(struct RrFont *font)
 {
-    return font->height;
+    return GlftFontHeight(font->font);
 }
 
 int RrFontMaxCharWidth(struct RrFont *font)

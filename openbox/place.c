@@ -214,9 +214,11 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
     for (it = stacking_list; it; it = g_list_next(it)) {
         ObClient *c;
 
-        if (WINDOW_IS_CLIENT(it->data))
+        if (WINDOW_IS_CLIENT(it->data)) {
             c = it->data;
-        else
+            if (c->fullscreen)
+                continue;
+        } else
             continue;
 
         if (c->layer > client->layer) {
@@ -239,9 +241,11 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
             for (; it && !stop; it = g_list_next(it)) {
                 ObClient *c;
 
-                if (WINDOW_IS_CLIENT(it->data))
+                if (WINDOW_IS_CLIENT(it->data)) {
                     c = it->data;
-                else
+                    if (c->fullscreen)
+                        continue;
+                } else
                     continue;
 
                 if (!SMART_IGNORE(client, c)) {

@@ -14,6 +14,7 @@
 #include "openbox.h"
 #include "group.h"
 #include "config.h"
+#include "render/render.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -94,7 +95,7 @@ void client_foreach_ancestor(Client *self, ClientForeachFunc func, void *data)
 
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    ((Client*)it->data)->transient_for != TRAN_GROUP) {
+                    !((Client*)it->data)->transient_for) {
                     if (!func(it->data, data)) return;
                     client_foreach_ancestor(it->data, func, data);
                 }
@@ -555,7 +556,6 @@ static void client_get_all(Client *self)
     client_update_class(self);
     client_update_strut(self);
     client_update_icons(self);
-    client_update_kwm_icon(self);
 
     client_change_state(self);
 }
@@ -592,7 +592,7 @@ static void client_get_desktop(Client *self)
 
                 for (it = self->group->members; it; it = it->next)
                     if (it->data != self &&
-                        ((Client*)it->data)->transient_for != TRAN_GROUP) {
+                        !((Client*)it->data)->transient_for) {
                         self->desktop = ((Client*)it->data)->desktop;
                         trdesk = TRUE;
                         break;
@@ -700,7 +700,7 @@ void client_update_transient_for(Client *self)
 	    /* remove from old parents */
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    (((Client*)it->data)->transient_for != TRAN_GROUP))
+                    !((Client*)it->data)->transient_for)
                     ((Client*)it->data)->transients =
                         g_slist_remove(((Client*)it->data)->transients, self);
         } else if (self->transient_for != NULL) { /* transient of window */
@@ -715,7 +715,7 @@ void client_update_transient_for(Client *self)
 	    /* add to new parents */
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    (((Client*)it->data)->transient_for != TRAN_GROUP))
+                    !((Client*)it->data)->transient_for)
                     ((Client*)it->data)->transients =
                         g_slist_append(((Client*)it->data)->transients, self);
 
@@ -1123,15 +1123,14 @@ void client_update_wmhints(Client *self)
             if (self->group != NULL) {
                 /* remove transients of the group */
                 for (it = self->group->members; it; it = it->next)
-                    if (it->data != self &&
-                        ((Client*)it->data)->transient_for == TRAN_GROUP) {
-                        self->transients = g_slist_remove(self->transients,
-                                                          it->data);
-                    }
+                    self->transients = g_slist_remove(self->transients,
+                                                      it->data);
                 group_remove(self->group, self);
                 self->group = NULL;
             }
-            if (hints->window_group != None) {
+            /* i can only have transients from the group if i am not transient
+               myself */
+            if (hints->window_group != None && !self->transient_for) {
                 self->group = group_add(hints->window_group, self);
 
                 /* add other transients of the group that are already
@@ -1149,23 +1148,6 @@ void client_update_wmhints(Client *self)
                the group may be affected */
             client_update_transient_for(self);
         }
-
-        client_update_kwm_icon(self);
-        /* try get the kwm icon first, this is a fallback only */
-        if (self->pixmap_icon == None) {
-            if (hints->flags & IconPixmapHint) {
-                if (self->pixmap_icon == None) {
-                    self->pixmap_icon = hints->icon_pixmap;
-                    if (hints->flags & IconMaskHint)
-                        self->pixmap_icon_mask = hints->icon_mask;
-                    else
-                        self->pixmap_icon_mask = None;
-
-                    if (self->frame)
-                        frame_adjust_icon(self->frame);
-                }
-            }
-	}
 
 	XFree(hints);
     }
@@ -1344,27 +1326,20 @@ void client_update_icons(Client *self)
 	}
 
 	g_free(data);
-    }
-
-    if (self->frame)
-	frame_adjust_icon(self->frame);
-}
-
-void client_update_kwm_icon(Client *self)
-{
-    guint num;
-    guint32 *data;
-
-    if (!PROP_GETA32(self->window, kwm_win_icon, kwm_win_icon, &data, &num)) {
-	self->pixmap_icon = self->pixmap_icon_mask = None;
-    } else {
+    } else if (PROP_GETA32(self->window, kwm_win_icon,
+                           kwm_win_icon, &data, &num)) {
         if (num == 2) {
-            self->pixmap_icon = data[0];
-            self->pixmap_icon_mask = data[1];
-        } else
-            self->pixmap_icon = self->pixmap_icon_mask = None;
-	g_free(data);
+            self->nicons++;
+            self->icons = g_new(Icon, self->nicons);
+            /* XXX WHAT IF THIS FAILS YOU TWIT!@!*()@ */
+            render_pixmap_to_rgba(data[0], data[1],
+                                  &self->icons[self->nicons-1].width,
+                                  &self->icons[self->nicons-1].height,
+                                  &self->icons[self->nicons-1].data);
+        }
+        g_free(data);
     }
+
     if (self->frame)
 	frame_adjust_icon(self->frame);
 }
@@ -1429,7 +1404,7 @@ Client *client_search_focus_tree_full(Client *self)
             GSList *it;
         
             for (it = self->group->members; it; it = it->next)
-                if (((Client*)it->data)->transient_for != TRAN_GROUP) {
+                if (!((Client*)it->data)->transient_for) {
                     Client *c;
                     if ((c = client_search_focus_tree_full(it->data)))
                         return c;
@@ -1496,7 +1471,7 @@ void client_calc_layer(Client *self)
 
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    ((Client*)it->data)->transient_for != TRAN_GROUP) {
+                    !((Client*)it->data)->transient_for) {
                     self = it->data;
                     break;
                 }
@@ -1794,13 +1769,10 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
         } else {
             GSList *it;
 
-            /* the check for TRAN_GROUP is to prevent an infinate loop with
-               2 transients of the same group at the head of the group's
-               members list */
             for (it = self->group->members; it; it = it->next) {
                 Client *c = it->data;
                 if (c != self && c->iconic != iconic &&
-                    c->transient_for != TRAN_GROUP) {
+                    !c->transient_for) {
                     client_iconify(it->data, iconic, curdesk);
                     break;
                 }

@@ -159,4 +159,7 @@ void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h);
 
 void appearance_minsize(Appearance *l, int *w, int *h);
 
+void render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
+                           int *w, int *h, gulong **data);
+
 #endif /*__render_h*/

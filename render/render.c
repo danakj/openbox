@@ -467,3 +467,10 @@ void appearance_minsize(Appearance *l, int *w, int *h)
         break;
     }
 }
+
+void render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
+                           int *w, int *h, gulong **data)
+{
+    *w = *h = 0;
+    *data = NULL;
+}

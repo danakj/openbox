@@ -895,10 +895,9 @@ static void event_handle_client(Client *client, XEvent *e)
 	}
 	else if (msgtype == prop_atoms.net_wm_strut)
 	    client_update_strut(client);
-	else if (msgtype == prop_atoms.net_wm_icon)
+	else if (msgtype == prop_atoms.net_wm_icon ||
+                 msgtype == prop_atoms.kwm_win_icon)
 	    client_update_icons(client);
-	else if (msgtype == prop_atoms.kwm_win_icon)
-	    client_update_kwm_icon(client);
     default:
         ;
 #ifdef SHAPE

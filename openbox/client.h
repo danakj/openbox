@@ -15,8 +15,8 @@ struct Group;
 
 /*! Holds an icon in ARGB format */
 typedef struct Icon {
-    unsigned long width, height;
-    unsigned long *data;
+    int width, height;
+    gulong *data;
 } Icon;
      
 /*! The MWM Hints as retrieved from the window property
@@ -286,11 +286,6 @@ typedef struct Client {
     Icon *icons;
     /*! The number of icons in icons */
     int nicons;
-
-    /*! The icon for the client specified in the WMHints or the KWM hints */
-    Pixmap pixmap_icon;
-    /*! The mask for the pixmap_icon, or None if its not masked */
-    Pixmap pixmap_icon_mask;
 } Client;
 
 extern GList *client_list;
@@ -457,8 +452,6 @@ void client_update_class(Client *self);
 void client_update_strut(Client *self);
 /*! Updates the window's icons */
 void client_update_icons(Client *self);
-/*! Updates the window's kwm icon */
-void client_update_kwm_icon(Client *self);
 
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (Client::decorations and Client::functions).

@@ -120,13 +120,11 @@ void stacking_raise(ObWindow *window)
             } else {
                 GSList *it;
 
-                /* the check for TRAN_GROUP is to prevent an infinate loop with
-                   2 transients of the same group at the head of the group's
-                   members list */
                 for (it = client->group->members; it; it = it->next) {
                     Client *c = it->data;
 
-                    if (c != client && c->transient_for != TRAN_GROUP)
+                    /* checking transient_for prevents infinate loops! */
+                    if (c != client && !c->transient_for)
                         stacking_raise(it->data);
                 }
                 if (it == NULL) return;
@@ -183,13 +181,11 @@ void stacking_lower(ObWindow *window)
             } else {
                 GSList *it;
 
-                /* the check for TRAN_GROUP is to prevent an infinate loop with
-                   2 transients of the same group at the head of the group's
-                   members list */
                 for (it = client->group->members; it; it = it->next) {
                     Client *c = it->data;
 
-                    if (c != client && c->transient_for != TRAN_GROUP)
+                    /* checking transient_for prevents infinate loops! */
+                    if (c != client && !c->transient_for)
                         stacking_lower(it->data);
                 }
                 if (it == NULL) return;
@@ -228,15 +224,12 @@ void stacking_add_nonintrusive(ObWindow *win)
                 GSList *sit;
                 GList *it;
 
-                /* the check for TRAN_GROUP is to prevent an infinate loop with
-                   2 transients of the same group at the head of the group's
-                   members list */
                 for (it = stacking_list; !parent && it; it = it->next) {
                     for (sit = client->group->members; !parent && sit;
                          sit = sit->next) {
                         Client *c = sit->data;
-                        if (sit->data == it->data &&
-                            c->transient_for != TRAN_GROUP)
+                        /* checking transient_for prevents infinate loops! */
+                        if (sit->data == it->data && !c->transient_for)
                             parent = it->data;
                     }
                 }

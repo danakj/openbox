@@ -163,7 +163,7 @@ typedef struct Atoms {
     /* Openbox specific atoms */
      
     Atom openbox_pid;
-    Atom openbox_premax;
+    Atom ob_wm_state_undecorated;
 } Atoms;
 Atoms prop_atoms;
 

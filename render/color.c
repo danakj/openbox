@@ -1,5 +1,6 @@
 #include "render.h"
 #include "color.h"
+#include "instance.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -39,17 +40,27 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
     /* this should be replaced with something far cooler */
     RrColor *out = NULL;
     XColor xcol;
-    xcol.red = (r << 8) | r;
-    xcol.green = (g << 8) | g;
-    xcol.blue = (b << 8) | b;
-    if (XAllocColor(RrDisplay(inst), RrColormap(inst), &xcol)) {
-        out = g_new(RrColor, 1);
-        out->inst = inst;
-        out->r = xcol.red >> 8;
-        out->g = xcol.green >> 8;
-        out->b = xcol.blue >> 8;
-        out->gc = None;
-        out->pixel = xcol.pixel;
+    gint key;
+
+    key = (r << 24) + (g << 16) + (b << 8);
+    if ((out = g_hash_table_lookup(RrColorHash(inst), &key))) {
+        out->refcount++;
+    } else {
+        xcol.red = (r << 8) | r;
+        xcol.green = (g << 8) | g;
+        xcol.blue = (b << 8) | b;
+        if (XAllocColor(RrDisplay(inst), RrColormap(inst), &xcol)) {
+            out = g_new(RrColor, 1);
+            out->inst = inst;
+            out->r = xcol.red >> 8;
+            out->g = xcol.green >> 8;
+            out->b = xcol.blue >> 8;
+            out->gc = None;
+            out->pixel = xcol.pixel;
+            out->key = key;
+            out->refcount = 1;
+            g_hash_table_replace(RrColorHash(inst), &out->key, out);
+        }
     }
     return out;
 }
@@ -59,10 +70,13 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
 void RrColorFree(RrColor *c)
 {
     if (c) {
-        if (c->pixel) XFreeColors(RrDisplay(c->inst), RrColormap(c->inst),
-                                  &c->pixel, 1, 0);
-        if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);
-        g_free(c);
+        if (--c->refcount < 1) {
+            g_hash_table_remove(RrColorHash(c->inst), &c->key);
+            if (c->pixel) XFreeColors(RrDisplay(c->inst), RrColormap(c->inst),
+                                      &c->pixel, 1, 0);
+            if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);
+            g_free(c);
+        }
     }
 }
 

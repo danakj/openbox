@@ -15,6 +15,9 @@ struct _RrColor {
     int b;
     unsigned long pixel;
     GC gc;
+
+    gint key;
+    gint refcount;
 };
 
 void RrColorAllocateGC(RrColor *in);

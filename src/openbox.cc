@@ -58,11 +58,12 @@ Openbox *Openbox::instance  = (Openbox *) 0;
 void Openbox::signalHandler(int signal)
 {
   switch (signal) {
-  case SIGHUP:
-    printf("Caught HUP signal. Restarting.\n");
+  case SIGUSR1:
+    printf("Caught SIGUSR1 signal. Restarting.\n");
     instance->restart();
     break;
-    
+
+  case SUGHUP:
   case SIGINT:
   case SIGTERM:
   case SIGPIPE:

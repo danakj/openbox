@@ -26,7 +26,8 @@ lib_LTLIBRARIES = \
 
 bin_PROGRAMS = \
 	openbox/openbox \
-	tools/kdetrayproxy/kdetrayproxy
+	tools/kdetrayproxy/kdetrayproxy \
+	tools/gnomepanelproxy/gnomepanelproxy
 
 ## render ##
 
@@ -199,6 +200,16 @@ tools_kdetrayproxy_kdetrayproxy_LDADD = \
 	$(X_LIBS)
 tools_kdetrayproxy_kdetrayproxy_SOURCES = \
 	tools/kdetrayproxy/kdetrayproxy.c
+
+
+## gnomepanelproxy ##
+
+tools_gnomepanelproxy_gnomepanelproxy_CPPFLAGS = \
+	$(X_CFLAGS)
+tools_gnomepanelproxy_gnomepanelproxy_LDADD = \
+	$(X_LIBS)
+tools_gnomepanelproxy_gnomepanelproxy_SOURCES = \
+	tools/gnomepanelproxy/gnomepanelproxy.c
 
 
 ## themes ##

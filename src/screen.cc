@@ -284,7 +284,6 @@ void OBScreen::changeSupportedAtoms()
   _supportwindow = XCreateSimpleWindow(otk::OBDisplay::display,
                                        _info->rootWindow(),
                                        0, 0, 1, 1, 0, 0, 0);
-  assert(_supportwindow != None);
 
   // set supporting window
   Openbox::instance->property()->set(_info->rootWindow(),
@@ -547,11 +546,13 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->bindings()->fireEvent(data);
   Py_DECREF((PyObject*)data);
 
+#ifdef DEBUG
   printf("Managed window 0x%lx\n", window);
+#endif
 }
 
 
-void OBScreen::unmanageWindow(OBClient *client, bool reparented)
+void OBScreen::unmanageWindow(OBClient *client)
 {
   OBFrame *frame = client->frame;
 
@@ -590,14 +591,9 @@ void OBScreen::unmanageWindow(OBClient *client, bool reparented)
   // give the client its border back
   client->toggleClientBorder(true);
 
-  if (!reparented)
-    // reparent the window out of the frame
-    frame->releaseClient();
-  else
-    // the client is already reparented, so, since we unmapped the window
-    // above, we remap it here. aren't we nice? :)
-    XMapWindow(otk::OBDisplay::display, client->window());
-  
+  // reparent the window out of the frame
+  frame->releaseClient();
+
   delete client->frame;
   client->frame = 0;
 
@@ -610,6 +606,10 @@ void OBScreen::unmanageWindow(OBClient *client, bool reparented)
   // unfocus the client (calls the focus callbacks)
   client->unfocus();
 
+#ifdef DEBUG
+  printf("Unmanaged window 0x%lx\n", client->window());
+#endif
+  
   delete client;
 
   // update the root properties

@@ -107,9 +107,12 @@ void Property::initialize()
  
   atoms.net_wm_action_move = create("_NET_WM_ACTION_MOVE");
   atoms.net_wm_action_resize = create("_NET_WM_ACTION_RESIZE");
+  atoms.net_wm_action_minimize = create("_NET_WM_ACTION_MINIMIZE");
   atoms.net_wm_action_shade = create("_NET_WM_ACTION_SHADE");
+  atoms.net_wm_action_stick = create("_NET_WM_ACTION_STICK");
   atoms.net_wm_action_maximize_horz = create("_NET_WM_ACTION_MAXIMIZE_HORZ");
   atoms.net_wm_action_maximize_vert = create("_NET_WM_ACTION_MAXIMIZE_VERT");
+  atoms.net_wm_action_fullscreen = create("_NET_WM_ACTION_FULLSCREEN");
   atoms.net_wm_action_change_desktop =
     create("_NET_WM_ACTION_CHANGE_DESKTOP");
   atoms.net_wm_action_close = create("_NET_WM_ACTION_CLOSE");

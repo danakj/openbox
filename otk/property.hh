@@ -99,9 +99,12 @@ struct Atoms {
 
   Atom net_wm_action_move;
   Atom net_wm_action_resize;
+  Atom net_wm_action_minimize;
   Atom net_wm_action_shade;
+  Atom net_wm_action_stick;
   Atom net_wm_action_maximize_horz;
   Atom net_wm_action_maximize_vert;
+  Atom net_wm_action_fullscreen;
   Atom net_wm_action_change_desktop;
   Atom net_wm_action_close;
 

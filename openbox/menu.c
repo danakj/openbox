@@ -1,11 +1,13 @@
 #include "menu.h"
 #include "openbox.h"
 #include "stacking.h"
+#include "grab.h"
 #include "render/theme.h"
 
 static GHashTable *menu_hash = NULL;
 GHashTable *menu_map = NULL;
 
+#define FRAME_EVENTMASK (ButtonMotionMask | EnterWindowMask | LeaveWindowMask)
 #define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
@@ -56,6 +58,7 @@ void menu_entry_free(MenuEntry *self)
 void menu_startup()
 {
     Menu *m;
+    Action *a;
 
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
                                       menu_destroy_hash_key,
@@ -63,14 +66,14 @@ void menu_startup()
     menu_map = g_hash_table_new(g_int_hash, g_int_equal);
 
     m = menu_new("sex menu", "root", NULL);
-    menu_add_entry(m, menu_entry_new("foo shit etc bleh",
-                                     action_from_string("restart")));
-    menu_add_entry(m, menu_entry_new("more shit",
-                                     action_from_string("restart")));
-    menu_add_entry(m, menu_entry_new("",
-                                     action_from_string("restart")));
-    menu_add_entry(m, menu_entry_new("and yet more",
-                                     action_from_string("restart")));
+    a = action_from_string("execute");
+    a->data.execute.path = g_strdup("xterm");
+    menu_add_entry(m, menu_entry_new("xterm", a));
+    a = action_from_string("restart");
+    menu_add_entry(m, menu_entry_new("restart", a));
+    menu_add_entry(m, menu_entry_new("--", NULL));
+    a = action_from_string("exit");
+    menu_add_entry(m, menu_entry_new("exit", a));
 }
 
 void menu_shutdown()
@@ -104,7 +107,8 @@ Menu *menu_new(char *label, char *name, Menu *parent)
     /* default controllers? */
 
     attrib.override_redirect = TRUE;
-    self->frame = createWindow(ob_root, CWOverrideRedirect, &attrib);
+    attrib.event_mask = FRAME_EVENTMASK;
+    self->frame = createWindow(ob_root, CWOverrideRedirect|CWEventMask, &attrib);
     attrib.event_mask = TITLE_EVENTMASK;
     self->title = createWindow(self->frame, CWEventMask, &attrib);
     self->items = createWindow(self->frame, 0, &attrib);
@@ -196,6 +200,8 @@ void menu_show(char *name, int x, int y, Client *client)
         return;
     }
 
+    self->client = client;
+
     self->width = 1;
     self->item_h = 0;
 
@@ -254,8 +260,19 @@ void menu_show(char *name, int x, int y, Client *client)
         item_y += self->item_h;
     }
 
-    stacking_raise_internal(self->frame);
-    XMapWindow(ob_display, self->frame);
+    if (!self->shown) {
+        stacking_raise_internal(self->frame);
+        XMapWindow(ob_display, self->frame);
+/*        grab_pointer_window(TRUE, None, self->frame);*/
+        self->shown = TRUE;
+    }
+}
+
+void menu_hide(Menu *self) {
+    if (self->shown) {
+        XUnmapWindow(ob_display, self->frame);
+        self->shown = FALSE;
+    }
 }
 
 MenuEntry *menu_find_entry(Menu *menu, Window win)
@@ -276,7 +293,7 @@ void menu_entry_render(MenuEntry *self)
     Appearance *a;
 
     a = !self->enabled ? self->a_disabled :
-        (self->hilite ? self->a_hilite : self->a_item);
+        (self->hilite && self->action ? self->a_hilite : self->a_item);
 
     RECT_SET(a->area, 0, 0, menu->width,
              menu->item_h);
@@ -291,4 +308,19 @@ void menu_entry_render(MenuEntry *self)
     a->surface.data.planar.parenty = self->y;
 
     paint(self->item, a);
+}
+
+void menu_entry_fire(MenuEntry *self)
+{
+    Menu *m;
+
+    if (self->action) {
+        self->action->data.any.c = self->parent->client;
+        self->action->func(&self->action->data);
+
+        /* hide the whole thing */
+        m = self->parent;
+        while (m->parent) m = m->parent;
+        menu_hide(m);
+    }
 }

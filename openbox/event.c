@@ -79,6 +79,7 @@ void event_loop()
     XEvent e;
     int x_fd;
     struct timeval *wait;
+    gboolean had_event = FALSE;
 
     while (TRUE) {
 	/*
@@ -105,13 +106,16 @@ void event_loop()
 	XNextEvent(ob_display, &e);
 
 	event_process(&e);
+        had_event = TRUE;
     }
-     
-    timer_dispatch((GTimeVal**)&wait);
-    x_fd = ConnectionNumber(ob_display);
-    FD_ZERO(&selset);
-    FD_SET(x_fd, &selset);
-    select(x_fd + 1, &selset, NULL, NULL, wait);
+
+    if (!had_event) {
+        timer_dispatch((GTimeVal**)&wait);
+        x_fd = ConnectionNumber(ob_display);
+        FD_ZERO(&selset);
+        FD_SET(x_fd, &selset);
+        select(x_fd + 1, &selset, NULL, NULL, wait);
+    }
 }
 
 static Window event_get_window(XEvent *e)
@@ -711,7 +715,32 @@ static void event_handle_menu(Menu *menu, XEvent *e)
 {
     MenuEntry *entry;
 
+    g_message("EVENT %d", e->type);
     switch (e->type) {
+    case ButtonPress:
+        if (e->xbutton.button == 3)
+            menu_hide(menu);
+        break;
+    case ButtonRelease:
+        if (!menu->shown) break;
+
+/*        grab_pointer_window(FALSE, None, menu->frame);*/
+
+        entry = menu_find_entry(menu, e->xbutton.window);
+        if (entry) {
+            int junk;
+            Window wjunk;
+            guint ujunk, b, w, h;
+            XGetGeometry(ob_display, e->xbutton.window,
+                         &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
+            if (e->xbutton.x >= (signed)-b &&
+                e->xbutton.y >= (signed)-b &&
+                e->xbutton.x < (signed)(w+b) &&
+                e->xbutton.y < (signed)(h+b)) {
+                menu_entry_fire(entry);
+            }
+        }
+        break;
     case EnterNotify:
     case LeaveNotify:
         g_message("enter/leave");

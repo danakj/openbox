@@ -5,15 +5,16 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-static guint kgrabs, pgrabs, sgrabs;
+#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
 #define MASK_LIST_SIZE 8
 
 /*! A list of all possible combinations of keyboard lock masks */
 static unsigned int mask_list[MASK_LIST_SIZE];
 
-void grab_keyboard(gboolean grab)
+int grab_keyboard(gboolean grab)
 {
+    static guint kgrabs = 0;
     if (grab) {
         if (kgrabs++ == 0)
             XGrabKeyboard(ob_display, ob_root, 0, GrabModeAsync, GrabModeSync,
@@ -22,22 +23,41 @@ void grab_keyboard(gboolean grab)
         if (--kgrabs == 0)
             XUngrabKeyboard(ob_display, event_lasttime);
     }
+    return kgrabs;
 }
 
-void grab_pointer(gboolean grab, Cursor cur)
+int grab_pointer(gboolean grab, Cursor cur)
 {
+    static guint pgrabs = 0;
     if (grab) {
         if (pgrabs++ == 0)
-            XGrabPointer(ob_display, ob_root, False, 0, GrabModeAsync,
-                         GrabModeAsync, FALSE, cur, event_lasttime);
+            XGrabPointer(ob_display, ob_root, False, GRAB_PTR_MASK,
+                         GrabModeAsync, GrabModeAsync, FALSE, cur,
+                         event_lasttime);
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, event_lasttime);
     }
+    return pgrabs;
 }
 
-void grab_server(gboolean grab)
+int grab_pointer_window(gboolean grab, Cursor cur, Window win)
 {
+    static guint pgrabs = 0;
+    if (grab) {
+        if (pgrabs++ == 0)
+            XGrabPointer(ob_display, win, False, GRAB_PTR_MASK, GrabModeAsync,
+                         GrabModeAsync, TRUE, cur, event_lasttime);
+    } else if (pgrabs > 0) {
+        if (--pgrabs == 0)
+            XUngrabPointer(ob_display, event_lasttime);
+    }
+    return pgrabs;
+}
+
+int grab_server(gboolean grab)
+{
+    static guint sgrabs = 0;
     if (grab) {
         if (sgrabs++ == 0) {
             XGrabServer(ob_display);
@@ -49,13 +69,12 @@ void grab_server(gboolean grab)
             XFlush(ob_display);
         }
     }
+    return sgrabs;
 }
 
 void grab_startup()
 {
     guint i = 0;
-
-    kgrabs = pgrabs = sgrabs = 0;
 
     mask_list[i++] = 0;
     mask_list[i++] = LockMask;
@@ -70,9 +89,10 @@ void grab_startup()
 
 void grab_shutdown()
 {
-    while (kgrabs) grab_keyboard(FALSE);
-    while (pgrabs) grab_pointer(FALSE, None);
-    while (sgrabs) grab_server(FALSE);
+    while (grab_keyboard(FALSE));
+    while (grab_pointer(FALSE, None));
+    while (grab_pointer_window(FALSE, None, None));
+    while (grab_server(FALSE));
 }
 
 void grab_button(guint button, guint state, Window win, guint mask,

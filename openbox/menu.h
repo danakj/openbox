@@ -30,6 +30,7 @@ typedef struct Menu {
 
 
     /* render stuff */
+    Client *client;
     Window frame;
     Window title;
     Appearance *a_title;
@@ -79,6 +80,7 @@ Menu *menu_new(char *label, char *name, Menu *parent);
 void menu_free(char *name);
 
 void menu_show(char *name, int x, int y, Client *client);
+void menu_hide(Menu *self);
 
 MenuEntry *menu_entry_new_full(char *label, Action *action,
                                MenuEntryRenderType render_type,
@@ -96,5 +98,7 @@ void menu_add_entry(Menu *menu, MenuEntry *entry);
 MenuEntry *menu_find_entry(Menu *menu, Window win);
 
 void menu_entry_render(MenuEntry *self);
+
+void menu_entry_fire(MenuEntry *self);
 
 #endif

@@ -9,6 +9,7 @@ void grab_shutdown();
 
 void grab_keyboard(gboolean grab);
 void grab_pointer(gboolean grab, Cursor cur);
+void grab_pointer_window(gboolean grab, Cursor cur, Window win);
 void grab_server(gboolean grab);
 
 void grab_button(guint button, guint state, Window win, guint mask,

@@ -245,6 +245,10 @@ void event_process(XEvent *e)
 
                 if (fi.xfocus.window == e->xfocus.window)
                     return;
+                /* secret magic way of event_process telling us that no client
+                   was found for the FocusIn event */
+                if (fi.xfocus.window == None)
+                    focus_set_client(NULL);
             } else
                 focus_set_client(NULL);
         }
@@ -270,6 +274,8 @@ void event_process(XEvent *e)
 	event_handle_root(e);
     else if (e->type == MapRequest)
 	client_manage(window);
+    else if (e->type == FocusIn)
+	e->xfocus.window = None; /* says no client was found for the event */
     else if (e->type == ConfigureRequest) {
 	/* unhandled configure requests must be used to configure the
 	   window directly */

@@ -51,11 +51,6 @@
   <moveButton>A-Left</moveButton>
 </dock>
 
-<dialog>
-  <focus>yes</focus>
-  <desktop>yes</desktop>
-</dialog>
-
 <keyboard>
   <chainQuitKey>C-g</chainQuitKey>
 

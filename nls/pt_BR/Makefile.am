@@ -14,10 +14,13 @@ install-data-local: openbox.cat
 		echo "Installing catalog in $(THE_NLS_PATH)"; \
 		$(mkinstalldirs) $(THE_NLS_PATH); \
 		$(INSTALL_DATA) openbox.cat $(THE_NLS_PATH); \
+		rm -f $(DESTDIR)$(pkgdatadir)/nls/pt; \
+                ln -f -s pt_BR $(DESTDIR)$(pkgdatadir)/nls/pt; \
 	fi
 uninstall-local:
 	@if test x$(NLSTEST) = "xyes"; then \
 		rm -f $(THE_NLS_PATH)/openbox.cat; \
+		rm -f $(DESTDIR)$(pkgdatadir)/nls/pt; \
 		rmdir $(THE_NLS_PATH); \
 	fi
 

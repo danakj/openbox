@@ -328,7 +328,7 @@ void parse_args(int argc, char **argv)
 gboolean ob_pointer_pos(int *x, int *y)
 {
     Window w;
-    int i, x, y;
+    int i;
     guint u;
 
     return !!XQueryPointer(ob_display, ob_root, &w, &w, x, y, &i, &i, &u);

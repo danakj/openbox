@@ -18,6 +18,11 @@ public:
 
   virtual void renderForeground();
 
+  virtual void update();
+
+  void fitString(const std::string &str);
+  void fitSize(int w, int h);
+
   virtual void setStyle(RenderStyle *style);
   
 private:

@@ -25,10 +25,37 @@ void Label::setStyle(RenderStyle *style)
   setTexture(style->labelUnfocusBackground());
 }
 
+void Label::fitString(const std::string &str)
+{
+  const Font *ft = style()->labelFont();
+  fitSize(ft->measureString(str), ft->height());
+}
+
+void Label::fitSize(int w, int h)
+{
+  unsigned int sidemargin = style()->bevelWidth() * 2;
+  resize(w + sidemargin * 2, h);
+}
+
+void Label::update()
+{
+  if (_dirty) {
+    int w = _rect.width(), h = _rect.height();
+    const Font *ft = style()->labelFont();
+    unsigned int sidemargin = style()->bevelWidth() * 2;
+    if (!_fixed_width)
+      w = ft->measureString(_text) + sidemargin * 2;
+    if (!_fixed_height)
+      h = ft->height();
+    internalResize(w, h);
+  }
+  Widget::update();
+}
+
 
 void Label::renderForeground(void)
 {
-  otk::Widget::renderForeground();
+  Widget::renderForeground();
 
   const Font *ft = style()->labelFont();
   unsigned int sidemargin = style()->bevelWidth() * 2;

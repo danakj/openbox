@@ -203,12 +203,12 @@ def _create_popup_list(data):
                 t = t[:24] + "..." + t[-24:]
             titles.append(t)
             _list_windows.append(c)
-            l = font.measureString(t) + 10 # add margin
+            l = font.measureString(t)
             if l > longest: longest = l
     if len(titles) > 1:
         for t in titles:
             w = otk.FocusLabel(_list_widget)
-            w.resize(longest, height)
+            w.fitSize(longest, height)
             w.setText(t)
             w.unfocus()
             _list_labels.append(w)

@@ -29,10 +29,37 @@ void FocusLabel::setStyle(RenderStyle *style)
   setUnfocusTexture(style->labelUnfocusBackground());
 }
 
+void FocusLabel::fitString(const std::string &str)
+{
+  const Font *ft = style()->labelFont();
+  fitSize(ft->measureString(str), ft->height());
+}
+
+void FocusLabel::fitSize(int w, int h)
+{
+  unsigned int sidemargin = style()->bevelWidth() * 2;
+  resize(w + sidemargin * 2, h);
+}
+
+void FocusLabel::update()
+{
+  if (_dirty) {
+    int w = _rect.width(), h = _rect.height();
+    const Font *ft = style()->labelFont();
+    unsigned int sidemargin = style()->bevelWidth() * 2;
+    if (!_fixed_width)
+      w = ft->measureString(_text) + sidemargin * 2;
+    if (!_fixed_height)
+      h = ft->height();
+    internalResize(w, h);
+  }
+  FocusWidget::update();
+}
+
 
 void FocusLabel::renderForeground()
 {
-  otk::Widget::renderForeground();
+  FocusWidget::renderForeground();
 
   const Font *ft = style()->labelFont();
   RenderColor *text_color = (isFocused() ? style()->textFocusColor()

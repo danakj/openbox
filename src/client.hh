@@ -569,6 +569,15 @@ BB    @param window The window id that the Client class should handle
   //! Returns the window's stacking layer
   inline StackLayer layer() const { return _layer; }
 
+  //! Returns the logical size of the window
+  /*!
+    The "logical" size of the window is refers to the user's perception of the
+    size of the window, and is the value that should be displayed to the user.
+    For example, with xterms, this value it the number of characters being
+    displayed in the terminal, instead of the number of pixels.
+  */
+  const otk::Point &logicalSize() const { return _logical_size; }
+
   //! Applies the states requested when the window mapped
   /*!
     This should be called only once, during the window mapping process. It

@@ -29,3 +29,6 @@ xerror.lo
 .deps
 openbox
 .dirstamp
+keyboard.lo
+mouse.lo
+keytree.lo

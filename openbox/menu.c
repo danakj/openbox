@@ -27,7 +27,7 @@ static void parse_menu(xmlDocPtr doc, xmlNodePtr node, void *data)
 void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
                        gboolean newmenu)
 {
-    Action *act;
+    ObAction *act;
     xmlNodePtr nact;
 
     gchar *id = NULL, *title = NULL, *label = NULL, *plugin;
@@ -233,7 +233,7 @@ void menu_free(char *name)
     g_hash_table_remove(menu_hash, name);
 }
 
-ObMenuEntry *menu_entry_new_full(char *label, Action *action,
+ObMenuEntry *menu_entry_new_full(char *label, ObAction *action,
                                ObMenuEntryRenderType render_type,
                                gpointer submenu)
 {

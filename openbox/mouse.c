@@ -1,112 +1,26 @@
-#include "kernel/openbox.h"
-#include "kernel/dispatch.h"
-#include "kernel/action.h"
-#include "kernel/event.h"
-#include "kernel/client.h"
-#include "kernel/prop.h"
-#include "kernel/grab.h"
-#include "kernel/frame.h"
-#include "parser/parse.h"
+#include "openbox.h"
+#include "config.h"
+#include "action.h"
+#include "event.h"
+#include "client.h"
+#include "prop.h"
+#include "grab.h"
+#include "frame.h"
 #include "translate.h"
 #include "mouse.h"
+#include "keyboard.h"
 #include <glib.h>
 
-static int threshold;
-static int dclicktime;
-/*
-
-<context name="Titlebar"> 
-  <mousebind button="Left" action="Press">
-    <action name="Raise"></action>
-  </mousebind>
-</context>
-
-*/
-
-static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
-{
-    xmlNodePtr n, nbut, nact;
-    char *buttonstr;
-    char *contextstr;
-    MouseAction mact;
-    Action *action;
-
-    node = node->xmlChildrenNode;
-    
-    if ((n = parse_find_node("dragThreshold", node)))
-        threshold = parse_int(doc, n);
-    if ((n = parse_find_node("doubleClickTime", node)))
-        dclicktime = parse_int(doc, n);
-
-    n = parse_find_node("context", node);
-    while (n) {
-        if (!parse_attr_string("name", n, &contextstr))
-            goto next_n;
-        nbut = parse_find_node("mousebind", n->xmlChildrenNode);
-        while (nbut) {
-            if (!parse_attr_string("button", nbut, &buttonstr))
-                goto next_nbut;
-            if (parse_attr_contains("press", nbut, "action"))
-                mact = MouseAction_Press;
-            else if (parse_attr_contains("release", nbut, "action"))
-                mact = MouseAction_Release;
-            else if (parse_attr_contains("click", nbut, "action"))
-                mact = MouseAction_Click;
-            else if (parse_attr_contains("doubleclick", nbut,"action"))
-                mact = MouseAction_DClick;
-            else if (parse_attr_contains("drag", nbut, "action"))
-                mact = MouseAction_Motion;
-            else
-                goto next_nbut;
-            nact = parse_find_node("action", nbut->xmlChildrenNode);
-            while (nact) {
-                if ((action = action_parse(doc, nact))) {
-                    /* validate that its okay for a mouse binding*/
-                    if (mact == MouseAction_Motion) {
-                        if (action->func != action_moveresize ||
-                            action->data.moveresize.corner ==
-                            prop_atoms.net_wm_moveresize_move_keyboard ||
-                            action->data.moveresize.corner ==
-                            prop_atoms.net_wm_moveresize_size_keyboard) {
-                            action_free(action);
-                            action = NULL;
-                        }
-                    } else {
-                        if (action->func == action_moveresize &&
-                            action->data.moveresize.corner !=
-                            prop_atoms.net_wm_moveresize_move_keyboard &&
-                            action->data.moveresize.corner !=
-                            prop_atoms.net_wm_moveresize_size_keyboard) {
-                            action_free(action);
-                            action = NULL;
-                        }
-                    }
-                    if (action)
-                        mbind(buttonstr, contextstr, mact, action);
-                }
-                nact = parse_find_node("action", nact->next);
-            }
-            g_free(buttonstr);
-        next_nbut:
-            nbut = parse_find_node("mousebind", nbut->next);
-        }
-        g_free(contextstr);
-    next_n:
-        n = parse_find_node("context", n->next);
-    }
-}
-
-void plugin_setup_config()
-{
-    threshold = 3;
-    dclicktime = 200;
-    parse_register("mouse", parse_xml, NULL);
-}
+typedef struct {
+    guint state;
+    guint button;
+    GSList *actions[NUM_MOUSEACTION]; /* lists of Action pointers */
+} ObMouseBinding;
 
 /* Array of GSList*s of PointerBinding*s. */
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
 
-static void grab_for_client(ObClient *client, gboolean grab)
+void mouse_grab_for_client(ObClient *client, gboolean grab)
 {
     int i;
     GSList *it;
@@ -114,7 +28,7 @@ static void grab_for_client(ObClient *client, gboolean grab)
     for (i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i)
         for (it = bound_contexts[i]; it != NULL; it = it->next) {
             /* grab/ungrab the button */
-            MouseBinding *b = it->data;
+            ObMouseBinding *b = it->data;
             Window win;
             int mode;
             unsigned int mask;
@@ -143,7 +57,7 @@ static void grab_all_clients(gboolean grab)
     GList *it;
 
     for (it = client_list; it != NULL; it = it->next)
-	grab_for_client(it->data, grab);
+	mouse_grab_for_client(it->data, grab);
 }
 
 static void clearall()
@@ -155,7 +69,7 @@ static void clearall()
         for (it = bound_contexts[i]; it != NULL; it = it->next) {
             int j;
 
-            MouseBinding *b = it->data;
+            ObMouseBinding *b = it->data;
             for (j = 0; j < NUM_MOUSEACTION; ++j) {
                 GSList *it;
                 for (it = b->actions[j]; it; it = it->next) {
@@ -169,12 +83,14 @@ static void clearall()
     }
 }
 
-static void fire_button(MouseAction a, ObFrameContext context,
+static void fire_button(ObMouseAction a, ObFrameContext context,
                         ObClient *c, guint state,
                         guint button, int x, int y)
 {
     GSList *it;
-    MouseBinding *b;
+    ObMouseBinding *b;
+
+    g_message("%d %d %d", context, state, button);
 
     for (it = bound_contexts[context]; it != NULL; it = it->next) {
         b = it->data;
@@ -185,7 +101,7 @@ static void fire_button(MouseAction a, ObFrameContext context,
     if (it == NULL) return;
 
     for (it = b->actions[a]; it; it = it->next) {
-        Action *act = it->data;
+        ObAction *act = it->data;
         if (act->func != NULL) {
             act->data.any.c = c;
 
@@ -196,17 +112,35 @@ static void fire_button(MouseAction a, ObFrameContext context,
                 act->data.showmenu.y = y;
             }
 
+            if (act->func == action_desktop_dir)
+            {
+                act->data.desktopdir.final = FALSE;
+                act->data.desktopdir.cancel = FALSE;
+            }
+            if (act->func == action_send_to_desktop_dir)
+            {
+                act->data.sendtodir.final = FALSE;
+                act->data.sendtodir.cancel = FALSE;
+            }
+
+            if ((act->func == action_desktop_dir ||
+                 act->func == action_send_to_desktop_dir)) {
+                keyboard_interactive_grab(state, c, context, act);
+            }
+
+            g_message("acting");
+
             act->func(&act->data);
         }
     }
 }
 
-static void fire_motion(MouseAction a, ObFrameContext context, ObClient *c,
+static void fire_motion(ObMouseAction a, ObFrameContext context, ObClient *c,
                         guint state, guint button, int x_root, int y_root,
                         guint32 corner)
 {
     GSList *it;
-    MouseBinding *b;
+    ObMouseBinding *b;
 
     for (it = bound_contexts[context]; it != NULL; it = it->next) {
         b = it->data;
@@ -217,7 +151,7 @@ static void fire_motion(MouseAction a, ObFrameContext context, ObClient *c,
     if (it == NULL) return;
 
     for (it = b->actions[a]; it; it = it->next) {
-        Action *act = it->data;
+        ObAction *act = it->data;
         if (act->func != NULL) {
             act->data.any.c = c;
 
@@ -255,38 +189,27 @@ static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
     }
 }
 
-static void event(ObEvent *e, void *foo)
+void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
 {
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
+
     static Window lwindow = None;
     static int px, py;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
-    ObFrameContext context;
     
     switch (e->type) {
-    case Event_Client_Mapped:
-        grab_for_client(e->data.c.client, TRUE);
-        break;
-
-    case Event_Client_Destroy:
-        grab_for_client(e->data.c.client, FALSE);
-        break;
-
-    case Event_X_ButtonPress:
-        context = frame_context(e->data.x.client,
-                                e->data.x.e->xbutton.window);
-
-        px = e->data.x.e->xbutton.x_root;
-        py = e->data.x.e->xbutton.y_root;
-        button = e->data.x.e->xbutton.button;
-        state = e->data.x.e->xbutton.state;
+    case ButtonPress:
+        px = e->xbutton.x_root;
+        py = e->xbutton.y_root;
+        button = e->xbutton.button;
+        state = e->xbutton.state;
 
         fire_button(MouseAction_Press, context,
-                    e->data.x.client, e->data.x.e->xbutton.state,
-                    e->data.x.e->xbutton.button,
-                    e->data.x.e->xbutton.x_root, e->data.x.e->xbutton.y_root);
+                    client, e->xbutton.state,
+                    e->xbutton.button,
+                    e->xbutton.x_root, e->xbutton.y_root);
 
         if (context == OB_FRAME_CONTEXT_CLIENT) {
             /* Replay the event, so it goes to the client*/
@@ -295,30 +218,29 @@ static void event(ObEvent *e, void *foo)
         } else
             break;
 
-    case Event_X_ButtonRelease:
-        context = frame_context(e->data.x.client,
-                                e->data.x.e->xbutton.window);
-        if (e->data.x.e->xbutton.button == button) {
+    case ButtonRelease:
+        if (e->xbutton.button == button) {
             /* clicks are only valid if its released over the window */
             int junk1, junk2;
             Window wjunk;
             guint ujunk, b, w, h;
-            XGetGeometry(ob_display, e->data.x.e->xbutton.window,
+            XGetGeometry(ob_display, e->xbutton.window,
                          &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
-            if (e->data.x.e->xbutton.x >= (signed)-b &&
-                e->data.x.e->xbutton.y >= (signed)-b &&
-                e->data.x.e->xbutton.x < (signed)(w+b) &&
-                e->data.x.e->xbutton.y < (signed)(h+b)) {
+            if (e->xbutton.x >= (signed)-b &&
+                e->xbutton.y >= (signed)-b &&
+                e->xbutton.x < (signed)(w+b) &&
+                e->xbutton.y < (signed)(h+b)) {
                 click = TRUE;
                 /* double clicks happen if there were 2 in a row! */
                 if (lbutton == button &&
-                    lwindow == e->data.x.e->xbutton.window &&
-                    e->data.x.e->xbutton.time - dclicktime <= ltime) {
+                    lwindow == e->xbutton.window &&
+                    e->xbutton.time - config_mouse_dclicktime <=
+                    ltime) {
                     dclick = TRUE;
                     lbutton = 0;
                 } else {
                     lbutton = button;
-                    lwindow = e->data.x.e->xbutton.window;
+                    lwindow = e->xbutton.window;
                 }
             } else {
                 lbutton = 0;
@@ -327,34 +249,33 @@ static void event(ObEvent *e, void *foo)
 
             button = 0;
             state = 0;
-            ltime = e->data.x.e->xbutton.time;
+            ltime = e->xbutton.time;
         }
         fire_button(MouseAction_Release, context,
-                    e->data.x.client, e->data.x.e->xbutton.state,
-                    e->data.x.e->xbutton.button,
-                    e->data.x.e->xbutton.x_root, e->data.x.e->xbutton.y_root);
+                    client, e->xbutton.state,
+                    e->xbutton.button,
+                    e->xbutton.x_root, e->xbutton.y_root);
         if (click)
             fire_button(MouseAction_Click, context,
-                        e->data.x.client, e->data.x.e->xbutton.state,
-                        e->data.x.e->xbutton.button,
-                        e->data.x.e->xbutton.x_root,
-                        e->data.x.e->xbutton.y_root);
+                        client, e->xbutton.state,
+                        e->xbutton.button,
+                        e->xbutton.x_root,
+                        e->xbutton.y_root);
         if (dclick)
             fire_button(MouseAction_DClick, context,
-                        e->data.x.client, e->data.x.e->xbutton.state,
-                        e->data.x.e->xbutton.button,
-                        e->data.x.e->xbutton.x_root,
-                        e->data.x.e->xbutton.y_root);
+                        client, e->xbutton.state,
+                        e->xbutton.button,
+                        e->xbutton.x_root,
+                        e->xbutton.y_root);
         break;
 
-    case Event_X_MotionNotify:
+    case MotionNotify:
         if (button) {
-            if (ABS(e->data.x.e->xmotion.x_root - px) >= threshold ||
-                ABS(e->data.x.e->xmotion.y_root - py) >= threshold) {
+            if (ABS(e->xmotion.x_root - px) >=
+                config_mouse_threshold ||
+                ABS(e->xmotion.y_root - py) >=
+                config_mouse_threshold) {
                 guint32 corner;
-
-                context = frame_context(e->data.x.client,
-                                        e->data.x.e->xmotion.window);
 
                 /* You can't drag on buttons */
                 if (context == OB_FRAME_CONTEXT_MAXIMIZE ||
@@ -365,26 +286,26 @@ static void event(ObEvent *e, void *foo)
                     context == OB_FRAME_CONTEXT_CLOSE)
                     break;
 
-                if (!e->data.x.client)
+                if (!client)
                     corner = prop_atoms.net_wm_moveresize_size_bottomright;
                 else
                     corner =
-                        pick_corner(e->data.x.e->xmotion.x_root,
-                                    e->data.x.e->xmotion.y_root,
-                                    e->data.x.client->frame->area.x,
-                                    e->data.x.client->frame->area.y,
+                        pick_corner(e->xmotion.x_root,
+                                    e->xmotion.y_root,
+                                    client->frame->area.x,
+                                    client->frame->area.y,
                                     /* use the client size because the frame
                                        can be differently sized (shaded
                                        windows) and we want this based on the
                                        clients size */
-                                    e->data.x.client->area.width +
-                                    e->data.x.client->frame->size.left +
-                                    e->data.x.client->frame->size.right,
-                                    e->data.x.client->area.height +
-                                    e->data.x.client->frame->size.top +
-                                    e->data.x.client->frame->size.bottom);
+                                    client->area.width +
+                                    client->frame->size.left +
+                                    client->frame->size.right,
+                                    client->area.height +
+                                    client->frame->size.top +
+                                    client->frame->size.bottom);
                 fire_motion(MouseAction_Motion, context,
-                            e->data.x.client, state, button, px, py, corner);
+                            client, state, button, px, py, corner);
                 button = 0;
                 state = 0;
             }
@@ -396,12 +317,12 @@ static void event(ObEvent *e, void *foo)
     }
 }
 
-gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
-               Action *action)
+gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
+                    ObAction *action)
 {
     guint state, button;
     ObFrameContext context;
-    MouseBinding *b;
+    ObMouseBinding *b;
     GSList *it;
 
     if (!translate_button(buttonstr, &state, &button)) {
@@ -429,7 +350,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     grab_all_clients(FALSE);
 
     /* add the binding */
-    b = g_new0(MouseBinding, 1);
+    b = g_new0(ObMouseBinding, 1);
     b->state = state;
     b->button = button;
     b->actions[mact] = g_slist_append(NULL, action);
@@ -440,17 +361,12 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     return TRUE;
 }
 
-void plugin_startup()
+void mouse_startup()
 {
-    dispatch_register(Event_Client_Mapped | Event_Client_Destroy |
-                      Event_X_ButtonPress | Event_X_ButtonRelease |
-                      Event_X_MotionNotify, (EventHandler)event, NULL);
 }
 
-void plugin_shutdown()
+void mouse_shutdown()
 {
-    dispatch_register(0, (EventHandler)event, NULL);
-
     grab_all_clients(FALSE);
     clearall();
 }

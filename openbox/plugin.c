@@ -156,8 +156,6 @@ void plugin_loadall()
 
     if (io == NULL) {
         /* load the default plugins */
-        plugin_open("keyboard");
-        plugin_open("mouse");
         plugin_open("placement");
         plugin_open("resistance");
 

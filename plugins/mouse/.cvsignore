@@ -1,6 +1,0 @@
-mouse.la
-.libs
-.deps
-.dirstamp
-plugins_mouse_mouse_la-mouse.lo
-plugins_mouse_mouse_la-translate.lo

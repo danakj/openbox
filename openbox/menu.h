@@ -103,7 +103,7 @@ struct _ObMenuEntry
     char *label;
     ObMenu *parent;
 
-    Action *action;    
+    ObAction *action;    
     
     ObMenuEntryRenderType render_type;
     gboolean hilite;
@@ -155,7 +155,7 @@ void menu_hide(ObMenu *self);
 
 void menu_clear(ObMenu *self);
 
-ObMenuEntry *menu_entry_new_full(char *label, Action *action,
+ObMenuEntry *menu_entry_new_full(char *label, ObAction *action,
                                ObMenuEntryRenderType render_type,
                                gpointer submenu);
 

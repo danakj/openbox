@@ -1,4 +1,7 @@
 #include "config.h"
+#include "keyboard.h"
+#include "mouse.h"
+#include "prop.h"
 #include "parser/parse.h"
 
 gboolean config_focus_new;
@@ -24,6 +27,151 @@ gint            config_dock_y;
 ObOrientation   config_dock_orient;
 gboolean        config_dock_hide;
 guint           config_dock_hide_timeout;
+
+gint config_mouse_threshold;
+gint config_mouse_dclicktime;
+
+/*
+
+<keybind key="C-x">
+  <action name="ChangeDesktop">
+    <desktop>3</desktop>
+  </action>
+</keybind>
+
+*/
+
+static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
+{
+    char *key;
+    ObAction *action;
+    xmlNodePtr n, nact;
+    GList *it;
+
+    n = parse_find_node("keybind", node);
+    while (n) {
+        if (parse_attr_string("key", n, &key)) {
+            keylist = g_list_append(keylist, key);
+
+            parse_key(doc, n->xmlChildrenNode, keylist);
+
+            it = g_list_last(keylist);
+            g_free(it->data);
+            keylist = g_list_delete_link(keylist, it);
+        }
+        n = parse_find_node("keybind", n->next);
+    }
+    if (keylist) {
+        nact = parse_find_node("action", node);
+        while (nact) {
+            if ((action = action_parse(doc, nact))) {
+                /* validate that its okay for a key binding */
+                if (action->func == action_moveresize &&
+                    action->data.moveresize.corner !=
+                    prop_atoms.net_wm_moveresize_move_keyboard &&
+                    action->data.moveresize.corner !=
+                    prop_atoms.net_wm_moveresize_size_keyboard) {
+                    action_free(action);
+                    action = NULL;
+                }
+
+                if (action)
+                    keyboard_bind(keylist, action);
+            }
+            nact = parse_find_node("action", nact->next);
+        }
+    }
+}
+
+static void parse_keyboard(xmlDocPtr doc, xmlNodePtr node, void *d)
+{
+    parse_key(doc, node->xmlChildrenNode, NULL);
+}
+
+static int threshold;
+static int dclicktime;
+/*
+
+<context name="Titlebar"> 
+  <mousebind button="Left" action="Press">
+    <action name="Raise"></action>
+  </mousebind>
+</context>
+
+*/
+
+static void parse_mouse(xmlDocPtr doc, xmlNodePtr node, void *d)
+{
+    xmlNodePtr n, nbut, nact;
+    char *buttonstr;
+    char *contextstr;
+    ObMouseAction mact;
+    ObAction *action;
+
+    node = node->xmlChildrenNode;
+    
+    if ((n = parse_find_node("dragThreshold", node)))
+        threshold = parse_int(doc, n);
+    if ((n = parse_find_node("doubleClickTime", node)))
+        dclicktime = parse_int(doc, n);
+
+    n = parse_find_node("context", node);
+    while (n) {
+        if (!parse_attr_string("name", n, &contextstr))
+            goto next_n;
+        nbut = parse_find_node("mousebind", n->xmlChildrenNode);
+        while (nbut) {
+            if (!parse_attr_string("button", nbut, &buttonstr))
+                goto next_nbut;
+            if (parse_attr_contains("press", nbut, "action"))
+                mact = MouseAction_Press;
+            else if (parse_attr_contains("release", nbut, "action"))
+                mact = MouseAction_Release;
+            else if (parse_attr_contains("click", nbut, "action"))
+                mact = MouseAction_Click;
+            else if (parse_attr_contains("doubleclick", nbut,"action"))
+                mact = MouseAction_DClick;
+            else if (parse_attr_contains("drag", nbut, "action"))
+                mact = MouseAction_Motion;
+            else
+                goto next_nbut;
+            nact = parse_find_node("action", nbut->xmlChildrenNode);
+            while (nact) {
+                if ((action = action_parse(doc, nact))) {
+                    /* validate that its okay for a mouse binding*/
+                    if (mact == MouseAction_Motion) {
+                        if (action->func != action_moveresize ||
+                            action->data.moveresize.corner ==
+                            prop_atoms.net_wm_moveresize_move_keyboard ||
+                            action->data.moveresize.corner ==
+                            prop_atoms.net_wm_moveresize_size_keyboard) {
+                            action_free(action);
+                            action = NULL;
+                        }
+                    } else {
+                        if (action->func == action_moveresize &&
+                            action->data.moveresize.corner !=
+                            prop_atoms.net_wm_moveresize_move_keyboard &&
+                            action->data.moveresize.corner !=
+                            prop_atoms.net_wm_moveresize_size_keyboard) {
+                            action_free(action);
+                            action = NULL;
+                        }
+                    }
+                    if (action)
+                        mouse_bind(buttonstr, contextstr, mact, action);
+                }
+                nact = parse_find_node("action", nact->next);
+            }
+            g_free(buttonstr);
+        next_nbut:
+            nbut = parse_find_node("mousebind", nbut->next);
+        }
+        g_free(contextstr);
+    next_n:
+        n = parse_find_node("context", n->next);
+    }
+}
 
 static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
@@ -190,6 +338,13 @@ void config_startup()
     config_dock_hide_timeout = 3000;
 
     parse_register("dock", parse_dock, NULL);
+
+    parse_register("keyboard", parse_keyboard, NULL);
+
+    config_mouse_threshold = 3;
+    config_mouse_dclicktime = 200;
+
+    parse_register("mouse", parse_mouse, NULL);
 }
 
 void config_shutdown()

@@ -13,6 +13,8 @@
 #include "focus.h"
 #include "moveresize.h"
 #include "frame.h"
+#include "keyboard.h"
+#include "mouse.h"
 #include "extensions.h"
 #include "grab.h"
 #include "plugin.h"
@@ -243,6 +245,8 @@ int main(int argc, char **argv)
         group_startup();
 	client_startup();
         dock_startup();
+        keyboard_startup();
+        mouse_startup();
 
         /* call startup for all the plugins */
         plugin_startall();
@@ -259,6 +263,8 @@ int main(int argc, char **argv)
 	client_unmanage_all();
 
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
+        mouse_shutdown();
+        keyboard_shutdown();
         dock_shutdown();
 	client_shutdown();
         group_shutdown();

@@ -52,7 +52,7 @@ void client_send_to_update(ObMenu *self)
         ob_debug("update\n");
         for (i = 0; i < screen_num_desktops; ++i) {
             ObMenuEntry *e;
-            Action *a = action_from_string("sendtodesktop");
+            ObAction *a = action_from_string("sendtodesktop");
             a->data.sendto.desk = i;
             a->data.sendto.follow = FALSE;
             e = menu_entry_new(screen_desktop_names[i], a);

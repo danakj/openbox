@@ -1,3 +1,64 @@
+2003-08-12  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/event.c:
+	keep event_lasttime at the last time an event has come in so far, don't regress when events come out of order. props to shrimpx for this patch.
+
+2003-08-11  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, kernel/menu.h, kernel/menu_render.c, plugins/menu/fifo_menu.c, plugins/menu/timed_menu.c, render/theme.c, render/theme.h:
+	Some fixes and new bugs. Someone else can do the menus because it is
+	clear no one gives a fuck what I think and no one else wants a window
+	manager that doesn't suck the same balls as every other window manager.
+
+2003-08-10  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/client.c:
+	save the frame decorations in client_configure_full before causing the fake frame adjust, since that loses its old value.
+
+2003-08-10  xor@zed.orodu.net  <xor@zed>
+
+	* framerender.c:
+	clear the window after setting the background color, this isnt implicit
+
+2003-08-09  xor@zed.orodu.net  <xor@zed>
+
+	* focus.c, popup.c, popup.h, screen.c, timer.c, timer.h:
+	changes to the timer api, pass the timer to the callback function.
+	add a desktop-switch popup with the desktop's name
+
+2003-08-07  woodblock  <woodblock@zed>
+
+	* event.c:
+	Fix lock up when not using a session manager and doing fd management.
+
+2003-08-05  xor@zed.orodu.net  <xor@zed>
+
+	* screen.c: dont ignore topleft layouts
+
+	* frame.c:
+	dont map the tl/tr invisible grips when the grip decors are turned off
+
+	* client.c, frame.c, frame.h, framerender.c:
+	a couple frame layout bugfixes hidden inside all this.. wee
+	fixes for maximizing windows:
+	 - when you toggledecor, it will reconfigure once, but the new constraints from the decor changes would not be in effect when the window was resized to the contranits. fixed by calling frame_adjust_area first thing ni client_configure_fulll with fake=TRUE which will recalc all the frame geometry without resizing/redrawing anything in the frame. this way the decor can take effect in the geometries.
+	 - when maxed horizontally, make the client fill the screen, but dont do this by just making it wider than the screen, fit it to the screen and adjust the titlebar/handle as appropriate to keep it all on the screen.
+	 - when maxed horizontally and vertically, remove the handle from the decorations
+
+	* client.c:
+	when setting up decor on a window, it needs to reconfigure twice if the decor changes, cuz the constraints need the new frame sizes to work right
+
+	* moveresize.c:
+	make the position dislpayed in the moving popup offset by the top/left struts so that 0,0 is inside teh struts not neccessarily at the screen edge
+
+2003-08-03  xor@zed.orodu.net  <xor@zed>
+
+	* client.c, config.c, config.h, moveresize.c:
+	kill non-opaque move/resize
+	add an option for redrawing/resizing the client window while resizing, when disabled the client is not touched until the resize is complete.
+
+	* framerender.c: give the plate the same background color as its border
+
 2003-08-03  xor@zed.orodu.net  <xor@zed>
 
 	* data/rc3, kernel/client.c, kernel/config.c, kernel/config.h, kernel/moveresize.c:

@@ -28,8 +28,6 @@ bin_PROGRAMS = \
 plugin_LTLIBRARIES = \
 	plugins/resistance/resistance.la \
 	plugins/placement/placement.la \
-	plugins/mouse/mouse.la \
-	plugins/keyboard/keyboard.la \
 	plugins/menu/timed_menu.la \
 	plugins/menu/fifo_menu.la \
 	plugins/menu/client_menu.la \
@@ -157,10 +155,16 @@ kernel_openbox_SOURCES = \
 	kernel/grab.h \
 	kernel/group.c \
 	kernel/group.h \
+	kernel/keyboard.c \
+	kernel/keyboard.h \
+	kernel/keytree.c \
+	kernel/keytree.h \
 	kernel/menu.c \
 	kernel/menu.h \
 	kernel/menu_render.c \
 	kernel/misc.h \
+	kernel/mouse.c \
+	kernel/mouse.h \
 	kernel/moveresize.c \
 	kernel/moveresize.h \
 	kernel/mwm.h \
@@ -182,6 +186,8 @@ kernel_openbox_SOURCES = \
 	kernel/startup.h \
 	kernel/timer.c \
 	kernel/timer.h \
+	kernel/translate.c \
+	kernel/translate.h \
 	kernel/window.c \
 	kernel/window.h \
 	kernel/xerror.c \
@@ -237,44 +243,6 @@ plugins_placement_placement_la_SOURCES = \
 	plugins/placement/placement.c \
 	plugins/placement/history.c \
 	plugins/placement/history.h
-
-## plugins/mouse ##
-
-plugins_mouse_mouse_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Mouse\"
-plugins_mouse_mouse_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_mouse_mouse_la_SOURCES = \
-	plugins/mouse/mouse.c \
-	plugins/mouse/mouse.h \
-	plugins/mouse/translate.c \
-	plugins/mouse/translate.h
-
-## plugins/mouse ##
-
-plugins_keyboard_keyboard_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Keyboard\"
-plugins_keyboard_keyboard_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_keyboard_keyboard_la_SOURCES = \
-	plugins/keyboard/keyboard.c \
-	plugins/keyboard/keyboard.h \
-	plugins/keyboard/tree.c \
-	plugins/keyboard/tree.h \
-	plugins/keyboard/translate.c \
-	plugins/keyboard/translate.h
 
 ## plugins/menu ##
 

@@ -52,6 +52,11 @@ extern int config_desktops_num;
 /*! Names for the desktops */
 extern GSList *config_desktops_names;
 
+/*! Number of pixels a drag must go before being considered a drag */
+extern gint config_mouse_threshold;
+/*! Number of milliseconds within which 2 clicks must occur to be a
+  double-click */
+extern gint config_mouse_dclicktime;
 
 void config_startup();
 void config_shutdown();

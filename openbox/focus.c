@@ -262,7 +262,7 @@ static void popup_cycle(ObClient *c, gboolean show)
 }
 
 ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
-                    gboolean cancel)
+                      gboolean cancel)
 {
     static ObClient *first = NULL;
     static ObClient *t = NULL;
@@ -281,8 +281,6 @@ ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             client_activate(focus_cycle_target);
         goto done_cycle;
     }
-    if (!first)
-        grab_pointer(TRUE, None);
 
     if (!first) first = focus_client;
     if (!focus_cycle_target) focus_cycle_target = focus_client;
@@ -331,7 +329,6 @@ done_cycle:
     order = NULL;
 
     popup_cycle(ft, FALSE);
-    grab_pointer(FALSE, None);
 
     return NULL;
 }

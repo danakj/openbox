@@ -4,6 +4,8 @@
 #include "misc.h"
 #include "parser/parse.h"
 
+typedef struct _ObAction ObAction;
+
 /* These have to all have a Client* at the top even if they don't use it, so
    that I can set it blindly later on. So every function will have a Client*
    available (possibly NULL though) if it wants it.
@@ -40,8 +42,11 @@ struct SendToDesktop {
 
 struct SendToDesktopDirection {
     struct _ObClient *c;
+    ObDirection dir;
     gboolean wrap;
-    gboolean follow;
+    gboolean linear;
+    gboolean final;
+    gboolean cancel;
 };
 
 struct Desktop {
@@ -56,7 +61,11 @@ struct Layer {
 
 struct DesktopDirection {
     struct _ObClient *c;
+    ObDirection dir;
     gboolean wrap;
+    gboolean linear;
+    gboolean final;
+    gboolean cancel;
 };
 
 struct MoveResize {
@@ -98,15 +107,15 @@ union ActionData {
     struct Layer layer;
 };
 
-typedef struct {
+struct _ObAction {
     /* The func member acts like an enum to tell which one of the structs in
        the data union are valid.
     */
     void (*func)(union ActionData *data);
     union ActionData data;
-} Action;
+};
 
-Action *action_new(void (*func)(union ActionData *data));
+ObAction *action_new(void (*func)(union ActionData *data));
 
 /* Creates a new Action from the name of the action
    A few action types need data set after making this call still. Check if
@@ -120,9 +129,9 @@ Action *action_new(void (*func)(union ActionData *data));
    action_resize_relative_vert - the delta
 */
 
-Action *action_from_string(char *name);
-Action *action_parse(xmlDocPtr doc, xmlNodePtr node);
-void action_free(Action *a);
+ObAction *action_from_string(char *name);
+ObAction *action_parse(xmlDocPtr doc, xmlNodePtr node);
+void action_free(ObAction *a);
 
 /* Execute */
 void action_execute(union ActionData *data);
@@ -181,23 +190,11 @@ void action_toggle_maximize_vert(union ActionData *data);
 /* SendToDesktop */
 void action_send_to_desktop(union ActionData *data);
 /* SendToDesktopDirection */
-void action_send_to_desktop_right(union ActionData *data);
-/* SendToDesktopDirection */
-void action_send_to_desktop_left(union ActionData *data);
-/* SendToDesktopDirection */
-void action_send_to_desktop_up(union ActionData *data);
-/* SendToDesktopDirection */
-void action_send_to_desktop_down(union ActionData *data);
+void action_send_to_desktop_dir(union ActionData *data);
 /* Desktop */
 void action_desktop(union ActionData *data);
 /* DesktopDirection */
-void action_desktop_right(union ActionData *data);
-/* DesktopDirection */
-void action_desktop_left(union ActionData *data);
-/* DesktopDirection */
-void action_desktop_up(union ActionData *data);
-/* DesktopDirection */
-void action_desktop_down(union ActionData *data);
+void action_desktop_dir(union ActionData *data);
 /* ClientAction */
 void action_toggle_decorations(union ActionData *data);
 /* MoveResize */

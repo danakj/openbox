@@ -16,18 +16,18 @@
 typedef struct ActionString {
     char *name;
     void (*func)(union ActionData *);
-    void (*setup)(Action *);
+    void (*setup)(ObAction *);
 } ActionString;
 
-Action *action_new(void (*func)(union ActionData *data))
+ObAction *action_new(void (*func)(union ActionData *data))
 {
-    Action *a = g_new0(Action, 1);
+    ObAction *a = g_new0(ObAction, 1);
     a->func = func;
 
     return a;
 }
 
-void action_free(Action *a)
+void action_free(ObAction *a)
 {
     if (a == NULL) return;
 
@@ -40,137 +40,209 @@ void action_free(Action *a)
     g_free(a);
 }
 
-void setup_action_directional_focus_north(Action *a)
+void setup_action_directional_focus_north(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_NORTH;
 }
 
-void setup_action_directional_focus_east(Action *a)
+void setup_action_directional_focus_east(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_EAST;
 }
 
-void setup_action_directional_focus_south(Action *a)
+void setup_action_directional_focus_south(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_SOUTH;
 }
 
-void setup_action_directional_focus_west(Action *a)
+void setup_action_directional_focus_west(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
-void setup_action_directional_focus_northeast(Action *a)
+void setup_action_directional_focus_northeast(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_NORTHEAST;
 }
 
-void setup_action_directional_focus_southeast(Action *a)
+void setup_action_directional_focus_southeast(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_SOUTHEAST;
 }
 
-void setup_action_directional_focus_southwest(Action *a)
+void setup_action_directional_focus_southwest(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_SOUTHWEST;
 }
 
-void setup_action_directional_focus_northwest(Action *a)
+void setup_action_directional_focus_northwest(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_NORTHWEST;
 }
 
-void setup_action_send_to_desktop(Action *a)
+void setup_action_send_to_desktop(ObAction *a)
 {
-    a->data.sendto.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_direction(Action *a)
+void setup_action_send_to_desktop_prev(ObAction *a)
 {
+    a->data.sendtodir.dir = OB_DIRECTION_WEST;
+    a->data.sendtodir.linear = TRUE;
     a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_desktop_direction(Action *a)
+void setup_action_send_to_desktop_next(ObAction *a)
 {
+    a->data.sendtodir.dir = OB_DIRECTION_EAST;
+    a->data.sendtodir.linear = TRUE;
+    a->data.sendtodir.wrap = TRUE;
+}
+
+void setup_action_send_to_desktop_left(ObAction *a)
+{
+    a->data.sendtodir.dir = OB_DIRECTION_WEST;
+    a->data.sendtodir.linear = FALSE;
+    a->data.sendtodir.wrap = TRUE;
+}
+
+void setup_action_send_to_desktop_right(ObAction *a)
+{
+    a->data.sendtodir.dir = OB_DIRECTION_EAST;
+    a->data.sendtodir.linear = FALSE;
+    a->data.sendtodir.wrap = TRUE;
+}
+
+void setup_action_send_to_desktop_up(ObAction *a)
+{
+    a->data.sendtodir.dir = OB_DIRECTION_NORTH;
+    a->data.sendtodir.linear = FALSE;
+    a->data.sendtodir.wrap = TRUE;
+}
+
+void setup_action_send_to_desktop_down(ObAction *a)
+{
+    a->data.sendtodir.dir = OB_DIRECTION_SOUTH;
+    a->data.sendtodir.linear = FALSE;
+    a->data.sendtodir.wrap = TRUE;
+}
+
+void setup_action_desktop_prev(ObAction *a)
+{
+    a->data.desktopdir.dir = OB_DIRECTION_WEST;
+    a->data.desktopdir.linear = TRUE;
     a->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_move_keyboard(Action *a)
+void setup_action_desktop_next(ObAction *a)
+{
+    a->data.desktopdir.dir = OB_DIRECTION_EAST;
+    a->data.desktopdir.linear = TRUE;
+    a->data.desktopdir.wrap = TRUE;
+}
+
+void setup_action_desktop_left(ObAction *a)
+{
+    a->data.desktopdir.dir = OB_DIRECTION_WEST;
+    a->data.desktopdir.linear = FALSE;
+    a->data.desktopdir.wrap = TRUE;
+}
+
+void setup_action_desktop_right(ObAction *a)
+{
+    a->data.desktopdir.dir = OB_DIRECTION_EAST;
+    a->data.desktopdir.linear = FALSE;
+    a->data.desktopdir.wrap = TRUE;
+}
+
+void setup_action_desktop_up(ObAction *a)
+{
+    a->data.desktopdir.dir = OB_DIRECTION_NORTH;
+    a->data.desktopdir.linear = FALSE;
+    a->data.desktopdir.wrap = TRUE;
+}
+
+void setup_action_desktop_down(ObAction *a)
+{
+    a->data.desktopdir.dir = OB_DIRECTION_SOUTH;
+    a->data.desktopdir.linear = FALSE;
+    a->data.desktopdir.wrap = TRUE;
+}
+
+void setup_action_move_keyboard(ObAction *a)
 {
     a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move_keyboard;
 }
 
-void setup_action_move(Action *a)
+void setup_action_move(ObAction *a)
 {
     a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move;
 }
 
-void setup_action_resize(Action *a)
+void setup_action_resize(ObAction *a)
 {
     a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_topleft;
 }
 
-void setup_action_resize_keyboard(Action *a)
+void setup_action_resize_keyboard(ObAction *a)
 {
     a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_keyboard;
 }
 
-void setup_action_cycle_windows_linear_next(Action *a)
+void setup_action_cycle_windows_linear_next(ObAction *a)
 {
     a->data.cycle.linear = TRUE;
     a->data.cycle.forward = TRUE;
 }
 
-void setup_action_cycle_windows_linear_previous(Action *a)
+void setup_action_cycle_windows_linear_previous(ObAction *a)
 {
     a->data.cycle.linear = TRUE;
     a->data.cycle.forward = FALSE;
 }
 
-void setup_action_cycle_windows_next(Action *a)
+void setup_action_cycle_windows_next(ObAction *a)
 {
     a->data.cycle.linear = FALSE;
     a->data.cycle.forward = TRUE;
 }
 
-void setup_action_cycle_windows_previous(Action *a)
+void setup_action_cycle_windows_previous(ObAction *a)
 {
     a->data.cycle.linear = FALSE;
     a->data.cycle.forward = FALSE;
 }
 
-void setup_action_movetoedge_north(Action *a)
+void setup_action_movetoedge_north(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_NORTH;
 }
 
-void setup_action_movetoedge_south(Action *a)
+void setup_action_movetoedge_south(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_SOUTH;
 }
 
-void setup_action_movetoedge_east(Action *a)
+void setup_action_movetoedge_east(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_EAST;
 }
 
-void setup_action_movetoedge_west(Action *a)
+void setup_action_movetoedge_west(ObAction *a)
 {
     a->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
-void setup_action_top_layer(Action *a)
+void setup_action_top_layer(ObAction *a)
 {
     a->data.layer.layer = 1;
 }
 
-void setup_action_normal_layer(Action *a)
+void setup_action_normal_layer(ObAction *a)
 {
     a->data.layer.layer = 0;
 }
 
-void setup_action_bottom_layer(Action *a)
+void setup_action_bottom_layer(ObAction *a)
 {
     a->data.layer.layer = -1;
 }
@@ -358,24 +430,34 @@ ActionString actionstrings[] =
         setup_action_send_to_desktop
     },
     {
+        "sendtodesktopnext",
+        action_send_to_desktop_dir,
+        setup_action_send_to_desktop_next
+    },
+    {
+        "sendtodesktopprevious",
+        action_send_to_desktop_dir,
+        setup_action_send_to_desktop_prev
+    },
+    {
         "sendtodesktopright",
-        action_send_to_desktop_right,
-        setup_action_send_to_desktop_direction
+        action_send_to_desktop_dir,
+        setup_action_send_to_desktop_right
     },
     {
         "sendtodesktopleft",
-        action_send_to_desktop_left,
-        setup_action_send_to_desktop_direction
+        action_send_to_desktop_dir,
+        setup_action_send_to_desktop_left
     },
     {
         "sendtodesktopup",
-        action_send_to_desktop_up,
-        setup_action_send_to_desktop_direction
+        action_send_to_desktop_dir,
+        setup_action_send_to_desktop_up
     },
     {
         "sendtodesktopdown",
-        action_send_to_desktop_down,
-        setup_action_send_to_desktop_direction
+        action_send_to_desktop_dir,
+        setup_action_send_to_desktop_down
     },
     {
         "desktop",
@@ -383,24 +465,34 @@ ActionString actionstrings[] =
         NULL
     },
     {
+        "desktopnext",
+        action_desktop_dir,
+        setup_action_desktop_next
+    },
+    {
+        "desktopprevious",
+        action_desktop_dir,
+        setup_action_desktop_prev
+    },
+    {
         "desktopright",
-        action_desktop_right,
-        setup_action_desktop_direction
+        action_desktop_dir,
+        setup_action_desktop_right
     },
     {
         "desktopleft",
-        action_desktop_left,
-        setup_action_desktop_direction
+        action_desktop_dir,
+        setup_action_desktop_left
     },
     {
         "desktopup",
-        action_desktop_up,
-        setup_action_desktop_direction
+        action_desktop_dir,
+        setup_action_desktop_up
     },
     {
         "desktopdown",
-        action_desktop_down,
-        setup_action_desktop_direction
+        action_desktop_dir,
+        setup_action_desktop_down
     },
     {
         "toggledecorations",
@@ -529,9 +621,9 @@ ActionString actionstrings[] =
     }
 };
 
-Action *action_from_string(char *name)
+ObAction *action_from_string(char *name)
 {
-    Action *a = NULL;
+    ObAction *a = NULL;
     int i;
 
     for (i = 0; actionstrings[i].name; i++)
@@ -544,10 +636,10 @@ Action *action_from_string(char *name)
     return a;
 }
 
-Action *action_parse(xmlDocPtr doc, xmlNodePtr node)
+ObAction *action_parse(xmlDocPtr doc, xmlNodePtr node)
 {
     char *actname;
-    Action *act = NULL;
+    ObAction *act = NULL;
     xmlNodePtr n;
 
     if (parse_attr_string("name", node, &actname)) {
@@ -572,21 +664,13 @@ Action *action_parse(xmlDocPtr doc, xmlNodePtr node)
                        act->func == action_resize_relative_vert) {
                 if ((n = parse_find_node("delta", node->xmlChildrenNode)))
                     act->data.relative.delta = parse_int(doc, n);
-            } else if (act->func == action_desktop_right ||
-                       act->func == action_desktop_left ||
-                       act->func == action_desktop_up ||
-                       act->func == action_desktop_down) {
+            } else if (act->func == action_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode))) {
                     act->data.desktopdir.wrap = parse_bool(doc, n);
                 }
-            } else if (act->func == action_send_to_desktop_right ||
-                       act->func == action_send_to_desktop_left ||
-                       act->func == action_send_to_desktop_up ||
-                       act->func == action_send_to_desktop_down) {
+            } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);
-                if ((n = parse_find_node("follow", node->xmlChildrenNode)))
-                    act->data.sendtodir.follow = parse_bool(doc, n);
             }
         }
         g_free(actname);
@@ -802,8 +886,8 @@ void action_send_to_desktop(union ActionData *data)
 
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, data->sendto.follow);
-        if (data->sendto.follow) screen_set_desktop(data->sendto.desk);
+        client_set_desktop(c, data->sendto.desk, TRUE);
+        screen_set_desktop(data->sendto.desk);
     }
 }
 
@@ -814,114 +898,34 @@ void action_desktop(union ActionData *data)
         screen_set_desktop(data->desktop.desk);
 }
 
-static void cur_row_col(guint *r, guint *c)
+void action_desktop_dir(union ActionData *data)
 {
-    switch (screen_desktop_layout.orientation) {
-    case OB_ORIENTATION_HORZ:
-        switch (screen_desktop_layout.start_corner) {
-        case OB_CORNER_TOPLEFT:
-            *r = screen_desktop / screen_desktop_layout.columns;
-            *c = screen_desktop % screen_desktop_layout.columns;
-            break;
-        case OB_CORNER_BOTTOMLEFT:
-            *r = screen_desktop_layout.rows - 1 -
-                screen_desktop / screen_desktop_layout.columns;
-            *c = screen_desktop % screen_desktop_layout.columns;
-            break;
-        case OB_CORNER_TOPRIGHT:
-            *r = screen_desktop / screen_desktop_layout.columns;
-            *c = screen_desktop_layout.columns - 1 -
-                screen_desktop % screen_desktop_layout.columns;
-            break;
-        case OB_CORNER_BOTTOMRIGHT:
-            *r = screen_desktop_layout.rows - 1 -
-                screen_desktop / screen_desktop_layout.columns;
-            *c = screen_desktop_layout.columns - 1 -
-                screen_desktop % screen_desktop_layout.columns;
-            break;
-        }
-        break;
-    case OB_ORIENTATION_VERT:
-        switch (screen_desktop_layout.start_corner) {
-        case OB_CORNER_TOPLEFT:
-            *r = screen_desktop % screen_desktop_layout.rows;
-            *c = screen_desktop / screen_desktop_layout.rows;
-            break;
-        case OB_CORNER_BOTTOMLEFT:
-            *r = screen_desktop_layout.rows - 1 -
-                screen_desktop % screen_desktop_layout.rows;
-            *c = screen_desktop / screen_desktop_layout.rows;
-            break;
-        case OB_CORNER_TOPRIGHT:
-            *r = screen_desktop % screen_desktop_layout.rows;
-            *c = screen_desktop_layout.columns - 1 -
-                screen_desktop / screen_desktop_layout.rows;
-            break;
-        case OB_CORNER_BOTTOMRIGHT:
-            *r = screen_desktop_layout.rows - 1 -
-                screen_desktop % screen_desktop_layout.rows;
-            *c = screen_desktop_layout.columns - 1 -
-                screen_desktop / screen_desktop_layout.rows;
-            break;
-        }
-        break;
-    }
+    guint d;
+
+    d = screen_cycle_desktop(data->desktopdir.dir, data->desktopdir.wrap,
+                             data->sendtodir.linear,
+                             data->desktopdir.final, data->desktopdir.cancel);
+    screen_set_desktop(d);
 }
 
-static guint translate_row_col(guint r, guint c)
+void action_send_to_desktop_dir(union ActionData *data)
 {
-    switch (screen_desktop_layout.orientation) {
-    case OB_ORIENTATION_HORZ:
-        switch (screen_desktop_layout.start_corner) {
-        case OB_CORNER_TOPLEFT:
-            return r % screen_desktop_layout.rows *
-                screen_desktop_layout.columns +
-                c % screen_desktop_layout.columns;
-        case OB_CORNER_BOTTOMLEFT:
-            return (screen_desktop_layout.rows - 1 -
-                    r % screen_desktop_layout.rows) *
-                screen_desktop_layout.columns +
-                c % screen_desktop_layout.columns;
-        case OB_CORNER_TOPRIGHT:
-            return r % screen_desktop_layout.rows *
-                screen_desktop_layout.columns +
-                (screen_desktop_layout.columns - 1 -
-                 c % screen_desktop_layout.columns);
-        case OB_CORNER_BOTTOMRIGHT:
-            return (screen_desktop_layout.rows - 1 -
-                    r % screen_desktop_layout.rows) *
-                screen_desktop_layout.columns +
-                (screen_desktop_layout.columns - 1 -
-                 c % screen_desktop_layout.columns);
-        }
-    case OB_ORIENTATION_VERT:
-        switch (screen_desktop_layout.start_corner) {
-        case OB_CORNER_TOPLEFT:
-            return c % screen_desktop_layout.columns *
-                screen_desktop_layout.rows +
-                r % screen_desktop_layout.rows;
-        case OB_CORNER_BOTTOMLEFT:
-            return c % screen_desktop_layout.columns *
-                screen_desktop_layout.rows +
-                (screen_desktop_layout.rows - 1 -
-                 r % screen_desktop_layout.rows);
-        case OB_CORNER_TOPRIGHT:
-            return (screen_desktop_layout.columns - 1 -
-                    c % screen_desktop_layout.columns) *
-                screen_desktop_layout.rows +
-                r % screen_desktop_layout.rows;
-        case OB_CORNER_BOTTOMRIGHT:
-            return (screen_desktop_layout.columns - 1 -
-                    c % screen_desktop_layout.columns) *
-                screen_desktop_layout.rows +
-                (screen_desktop_layout.rows - 1 -
-                 r % screen_desktop_layout.rows);
-        }
-    }
-    g_assert_not_reached();
-    return 0;
+    ObClient *c = data->sendtodir.c;
+    guint d;
+
+    if (!c || !client_normal(c)) return;
+
+    d = screen_cycle_desktop(data->sendtodir.dir, data->sendtodir.wrap,
+                             data->sendtodir.linear,
+                             data->sendtodir.final, data->sendtodir.cancel);
+
+    g_message("sendto %d", d);
+
+    client_set_desktop(c, d, TRUE);
+    screen_set_desktop(d);
 }
 
+#if 0
 void action_desktop_right(union ActionData *data)
 {
     guint r, c, d;
@@ -939,7 +943,8 @@ void action_desktop_right(union ActionData *data)
     }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
-        screen_set_desktop(d);
+        screen_cycle_desktop(d, data->desktopdir.final,
+                             data->desktopdir.cancel);
 }
 
 void action_send_to_desktop_right(union ActionData *data)
@@ -963,7 +968,9 @@ void action_send_to_desktop_right(union ActionData *data)
     d = translate_row_col(r, c);
     if (d < screen_num_desktops) {
         client_set_desktop(cl, d, data->sendtodir.follow);
-        if (data->sendtodir.follow) screen_set_desktop(d);
+        if (data->sendtodir.follow)
+            screen_cycle_desktop(d, data->desktopdir.final,
+                                 data->desktopdir.cancel);
     }
 }
 
@@ -984,7 +991,8 @@ void action_desktop_left(union ActionData *data)
     }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
-        screen_set_desktop(d);
+        screen_cycle_desktop(d, data->desktopdir.final,
+                             data->desktopdir.cancel);
 }
 
 void action_send_to_desktop_left(union ActionData *data)
@@ -1008,7 +1016,9 @@ void action_send_to_desktop_left(union ActionData *data)
     d = translate_row_col(r, c);
     if (d < screen_num_desktops) {
         client_set_desktop(cl, d, data->sendtodir.follow);
-        if (data->sendtodir.follow) screen_set_desktop(d);
+        if (data->sendtodir.follow)
+            screen_cycle_desktop(d, data->desktopdir.final,
+                                 data->desktopdir.cancel);
     }
 }
 
@@ -1029,7 +1039,8 @@ void action_desktop_down(union ActionData *data)
     }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
-        screen_set_desktop(d);
+        screen_cycle_desktop(d, data->desktopdir.final,
+                             data->desktopdir.cancel);
 }
 
 void action_send_to_desktop_down(union ActionData *data)
@@ -1051,7 +1062,9 @@ void action_send_to_desktop_down(union ActionData *data)
         d = translate_row_col(r, c);
         if (d < screen_num_desktops) {
             client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
-            if (data->sendtodir.follow) screen_set_desktop(d);
+            if (data->sendtodir.follow)
+                screen_cycle_desktop(d, data->desktopdir.final,
+                                     data->desktopdir.cancel);
         }
     }
 }
@@ -1073,7 +1086,8 @@ void action_desktop_up(union ActionData *data)
     }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
-        screen_set_desktop(d);
+        screen_cycle_desktop(d, data->desktopdir.final,
+                             data->desktopdir.cancel);
 }
 
 void action_send_to_desktop_up(union ActionData *data)
@@ -1095,10 +1109,13 @@ void action_send_to_desktop_up(union ActionData *data)
         d = translate_row_col(r, c);
         if (d < screen_num_desktops) {
             client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
-            if (data->sendtodir.follow) screen_set_desktop(d);
+            if (data->sendtodir.follow)
+                screen_cycle_desktop(d, data->desktopdir.final,
+                                     data->desktopdir.cancel);
         }
     }
 }
+#endif
 
 void action_toggle_decorations(union ActionData *data)
 {

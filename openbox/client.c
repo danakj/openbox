@@ -18,6 +18,8 @@
 #include "group.h"
 #include "config.h"
 #include "menu.h"
+#include "keyboard.h"
+#include "mouse.h"
 #include "render/render.h"
 
 #include <glib.h>
@@ -327,6 +329,9 @@ void client_manage(Window window)
     /* update the list hints */
     client_set_list();
 
+    keyboard_grab_for_client(self, TRUE);
+    mouse_grab_for_client(self, TRUE);
+
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 
     ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
@@ -354,6 +359,9 @@ void client_unmanage(ObClient *self)
 
     dispatch_client(Event_Client_Destroy, self, 0, 0);
     g_assert(self != NULL);
+
+    keyboard_grab_for_client(self, FALSE);
+    mouse_grab_for_client(self, FALSE);
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
@@ -1097,7 +1105,7 @@ void client_setup_decor_and_functions(ObClient *self)
     /* finally, the user can have requested no decorations, which overrides
        everything */
     if (!self->decorate)
-        self->decorations = 0;
+        self->decorations = OB_FRAME_DECOR_BORDER;
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
@@ -1705,7 +1713,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                            gboolean force_reply)
 {
     gboolean moved = FALSE, resized = FALSE;
-    gint fdecor = self->frame->decorations;
+    guint fdecor = self->frame->decorations;
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with

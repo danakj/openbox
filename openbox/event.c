@@ -8,6 +8,8 @@
 #include "screen.h"
 #include "frame.h"
 #include "menu.h"
+#include "keyboard.h"
+#include "mouse.h"
 #include "framerender.h"
 #include "focus.h"
 #include "moveresize.h"
@@ -541,13 +543,23 @@ static void event_process(XEvent *e)
         }
 
     /* user input (action-bound) events */
-    /*
     if (e->type == ButtonPress || e->type == ButtonRelease ||
-        e->type == MotionNotify)
-        mouse_event(e, client);
-    else if (e->type == KeyPress || e->type == KeyRelease)
-        ;
-    */
+        e->type == MotionNotify || e->type == KeyPress ||
+        e->type == KeyRelease)
+    {
+        ObFrameContext context;
+
+        context = frame_context(client, e->xany.window);
+
+        if (!keyboard_process_interactive_grab(e, &client, &context)) {
+
+            if (e->type == ButtonPress || e->type == ButtonRelease ||
+                e->type == MotionNotify)
+                mouse_event(client, context, e);
+            else if (e->type == KeyPress)
+                keyboard_event(client, e);
+        }
+    }
 
     /* dispatch the event to registered handlers */
     dispatch_x(e, client);

@@ -4,6 +4,7 @@
 #include "xerror.h"
 #include "prop.h"
 #include "startup.h"
+#include "grab.h"
 #include "timer.h"
 #include "config.h"
 #include "screen.h"
@@ -25,6 +26,7 @@
 #  include <sys/types.h>
 #  include <unistd.h>
 #endif
+#include <assert.h>
 
 /*! The event mask to grab on the root window */
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
@@ -45,7 +47,6 @@ static Rect  **area; /* array of desktop holding array of xinerama areas */
 static Rect  *monitor_area;
 
 static Popup *desktop_cycle_popup;
-static ObTimer *popup_timer = NULL;
 
 #ifdef USE_LIBSN
 static SnMonitorContext *sn_context;
@@ -420,36 +421,6 @@ void screen_set_num_desktops(guint num)
 	screen_set_desktop(num - 1);
 }
 
-static void popup_cycle_hide(ObTimer *t, void *d)
-{
-    timer_stop(t);
-    popup_timer = NULL;
-
-    popup_hide(desktop_cycle_popup);
-}
-
-static void popup_cycle_show()
-{
-    Rect *a;
-
-    a = screen_physical_area_monitor(0);
-    popup_position(desktop_cycle_popup, CenterGravity,
-                   a->x + a->width / 2, a->y + a->height / 2);
-    /* XXX the size and the font extents need to be related on some level
-     */
-    popup_size(desktop_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
-
-    popup_set_text_align(desktop_cycle_popup, RR_JUSTIFY_CENTER);
-
-    popup_show(desktop_cycle_popup,
-               screen_desktop_names[screen_desktop], NULL);
-
-    g_message("%s", screen_desktop_names[screen_desktop]);
-
-    if (popup_timer) timer_stop(popup_timer);
-    popup_timer = timer_start(G_USEC_PER_SEC / 2, popup_cycle_hide, NULL);
-}
-
 void screen_set_desktop(guint num)
 {
     GList *it;
@@ -498,10 +469,248 @@ void screen_set_desktop(guint num)
     ob_debug("/switch fallback\n");
 #endif
 
-    if (ob_state() == OB_STATE_RUNNING)
-        popup_cycle_show();
-
     dispatch_ob(Event_Ob_Desktop, num, old);
+}
+
+static void get_row_col(guint d, guint *r, guint *c)
+{
+    switch (screen_desktop_layout.orientation) {
+    case OB_ORIENTATION_HORZ:
+        switch (screen_desktop_layout.start_corner) {
+        case OB_CORNER_TOPLEFT:
+            *r = d / screen_desktop_layout.columns;
+            *c = d % screen_desktop_layout.columns;
+            break;
+        case OB_CORNER_BOTTOMLEFT:
+            *r = screen_desktop_layout.rows - 1 -
+                d / screen_desktop_layout.columns;
+            *c = d % screen_desktop_layout.columns;
+            break;
+        case OB_CORNER_TOPRIGHT:
+            *r = d / screen_desktop_layout.columns;
+            *c = screen_desktop_layout.columns - 1 -
+                d % screen_desktop_layout.columns;
+            break;
+        case OB_CORNER_BOTTOMRIGHT:
+            *r = screen_desktop_layout.rows - 1 -
+                d / screen_desktop_layout.columns;
+            *c = screen_desktop_layout.columns - 1 -
+                d % screen_desktop_layout.columns;
+            break;
+        }
+        break;
+    case OB_ORIENTATION_VERT:
+        switch (screen_desktop_layout.start_corner) {
+        case OB_CORNER_TOPLEFT:
+            *r = d % screen_desktop_layout.rows;
+            *c = d / screen_desktop_layout.rows;
+            break;
+        case OB_CORNER_BOTTOMLEFT:
+            *r = screen_desktop_layout.rows - 1 -
+                d % screen_desktop_layout.rows;
+            *c = d / screen_desktop_layout.rows;
+            break;
+        case OB_CORNER_TOPRIGHT:
+            *r = d % screen_desktop_layout.rows;
+            *c = screen_desktop_layout.columns - 1 -
+                d / screen_desktop_layout.rows;
+            break;
+        case OB_CORNER_BOTTOMRIGHT:
+            *r = screen_desktop_layout.rows - 1 -
+                d % screen_desktop_layout.rows;
+            *c = screen_desktop_layout.columns - 1 -
+                d / screen_desktop_layout.rows;
+            break;
+        }
+        break;
+    }
+}
+
+static guint translate_row_col(guint r, guint c)
+{
+    switch (screen_desktop_layout.orientation) {
+    case OB_ORIENTATION_HORZ:
+        switch (screen_desktop_layout.start_corner) {
+        case OB_CORNER_TOPLEFT:
+            return r % screen_desktop_layout.rows *
+                screen_desktop_layout.columns +
+                c % screen_desktop_layout.columns;
+        case OB_CORNER_BOTTOMLEFT:
+            return (screen_desktop_layout.rows - 1 -
+                    r % screen_desktop_layout.rows) *
+                screen_desktop_layout.columns +
+                c % screen_desktop_layout.columns;
+        case OB_CORNER_TOPRIGHT:
+            return r % screen_desktop_layout.rows *
+                screen_desktop_layout.columns +
+                (screen_desktop_layout.columns - 1 -
+                 c % screen_desktop_layout.columns);
+        case OB_CORNER_BOTTOMRIGHT:
+            return (screen_desktop_layout.rows - 1 -
+                    r % screen_desktop_layout.rows) *
+                screen_desktop_layout.columns +
+                (screen_desktop_layout.columns - 1 -
+                 c % screen_desktop_layout.columns);
+        }
+    case OB_ORIENTATION_VERT:
+        switch (screen_desktop_layout.start_corner) {
+        case OB_CORNER_TOPLEFT:
+            return c % screen_desktop_layout.columns *
+                screen_desktop_layout.rows +
+                r % screen_desktop_layout.rows;
+        case OB_CORNER_BOTTOMLEFT:
+            return c % screen_desktop_layout.columns *
+                screen_desktop_layout.rows +
+                (screen_desktop_layout.rows - 1 -
+                 r % screen_desktop_layout.rows);
+        case OB_CORNER_TOPRIGHT:
+            return (screen_desktop_layout.columns - 1 -
+                    c % screen_desktop_layout.columns) *
+                screen_desktop_layout.rows +
+                r % screen_desktop_layout.rows;
+        case OB_CORNER_BOTTOMRIGHT:
+            return (screen_desktop_layout.columns - 1 -
+                    c % screen_desktop_layout.columns) *
+                screen_desktop_layout.rows +
+                (screen_desktop_layout.rows - 1 -
+                 r % screen_desktop_layout.rows);
+        }
+    }
+    g_assert_not_reached();
+    return 0;
+}
+
+static void popup_cycle(guint d, gboolean show)
+{
+    Rect *a;
+
+    if (!show) {
+        popup_hide(desktop_cycle_popup);
+    } else {
+        a = screen_physical_area_monitor(0);
+        popup_position(desktop_cycle_popup, CenterGravity,
+                       a->x + a->width / 2, a->y + a->height / 2);
+        /* XXX the size and the font extents need to be related on some level
+         */
+        popup_size(desktop_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
+
+        popup_set_text_align(desktop_cycle_popup, RR_JUSTIFY_CENTER);
+
+        popup_show(desktop_cycle_popup,
+                   screen_desktop_names[d], NULL);
+    }
+}
+
+guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
+                           gboolean done, gboolean cancel)
+{
+    static gboolean first = TRUE;
+    static gboolean lin;
+    static guint origd, d;
+    guint r, c;
+
+    if (cancel) {
+        d = origd;
+        goto done_cycle;
+    } else if (done) {
+        screen_set_desktop(d);
+        goto done_cycle;
+    }
+    if (first) {
+        first = FALSE;
+        lin = linear;
+        d = origd = screen_desktop;
+    }
+
+    get_row_col(d, &r, &c);
+
+    if (lin) {
+        g_message("linear %d", d);
+        switch (dir) {
+        case OB_DIRECTION_EAST:
+            if (d < screen_num_desktops - 1)
+                ++d;
+            else if (wrap)
+                d = 0;
+            break;
+        case OB_DIRECTION_WEST:
+            if (d > 0)
+                --d;
+            else if (wrap)
+                d = screen_num_desktops - 1;
+            break;
+        default:
+            assert(0);
+            return screen_desktop;
+        }
+        g_message("linear %d done", d);
+    } else {
+        switch (dir) {
+        case OB_DIRECTION_EAST:
+            ++c;
+            if (c >= screen_desktop_layout.columns) {
+                if (!wrap) return d = screen_desktop;
+                c = 0;
+            }
+            d = translate_row_col(r, c);
+            if (d >= screen_num_desktops) {
+                if (!wrap) return d = screen_desktop;
+                ++c;
+            }
+            break;
+        case OB_DIRECTION_WEST:
+            --c;
+            if (c >= screen_desktop_layout.columns) {
+                if (!wrap) return d = screen_desktop;
+                c = screen_desktop_layout.columns - 1;
+            }
+            d = translate_row_col(r, c);
+            if (d >= screen_num_desktops) {
+                if (!wrap) return d = screen_desktop;
+                --c;
+            }
+            break;
+        case OB_DIRECTION_SOUTH:
+            ++r;
+            if (r >= screen_desktop_layout.rows) {
+                if (!wrap) return d = screen_desktop;
+                r = 0;
+            }
+            d = translate_row_col(r, c);
+            if (d >= screen_num_desktops) {
+                if (!wrap) return d = screen_desktop;
+                ++r;
+            }
+            break;
+        case OB_DIRECTION_NORTH:
+            --r;
+            if (r >= screen_desktop_layout.rows) {
+                if (!wrap) return d = screen_desktop;
+                r = screen_desktop_layout.rows - 1;
+            }
+            d = translate_row_col(r, c);
+            if (d >= screen_num_desktops) {
+                if (!wrap) return d = screen_desktop;
+                --r;
+            }
+            break;
+        default:
+            assert(0);
+            return d = screen_desktop;
+        }
+
+        d = translate_row_col(r, c);
+    }
+
+    popup_cycle(d, TRUE);
+    return d;
+
+done_cycle:
+    first = TRUE;
+
+    popup_cycle(0, FALSE);
+
+    return d = screen_desktop;
 }
 
 void screen_update_layout()

@@ -1,16 +1,16 @@
 $set 16 #bsetroot
 
 $ #MustSpecify
-# %s : hata : -solid, -mod yada -gradient'den birisini belirlemek zorundasın\n
+# %s: ´íÎó: ±ØĞë´ÓÖĞÖ¸¶¨Ò»¸ö: -solid, -mod, -gradient\n
 $ #Usage
-# %s 2.0 : Tel'if hakkı (c) 1997-2000 Brad Hughes\n\n\
-  -display <metin>         ekran belirlemesi\n\
-  -mod <x> <y>             bölüşüm işlemi\n\
-  -foreground, -fg <renk>  bölüşüm önalanı\n\
-  -background, -bg <renk>  bölüşüm ardalanı\n\n\
-  -gradient <kaplam>       geçişim kaplamı\n\
-  -from <renk>             geçişim başlama rengi\n\
-  -to <renk>               geçişim bitiş rengi\n\n\
-  -solid <renk>            tek renk\n\n\
-  -help                    bu yardım iletisini göster ve çık\n
+# %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+  -display <string>        ÏÔÊ¾Á¬½Ó\n\
+  -mod <x> <y>             Ä£Ê½\n\
+  -foreground, -fg <color> Ç°¾°É«\n\
+  -background, -bg <color> ±³¾°É«\n\n\
+  -gradient <texture>      ½¥½øÎÆÀí\n\
+  -from <color>            ½¥½ø¿ªÊ¼É«\n\
+  -to <color>              ½¥½ø½áÊøÉ«\n\n\
+  -solid <color>           µ¥Ò»É«\n\n\
+  -help                    ÏÔÊ¾Õâ¸ö°ïÖú\n
 

@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid : resmi yaratamadým\n
+# BImage::render_solid: ´´½¨pixmap³ö´í\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage : XImage'i yaratamadým\n
+# BImage::renderXImage: ´´½¨XImage³ö´í\n
 $ #UnsupVisual
-# BImage::renderXImage : desteklenmeyen görünüþ( renk derinliði )\n
+# BImage::renderXImage: unsupported visual\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap : resmi yaratamadým\n
+# BImage::renderPixmap: ´´½¨pixmap³ö´í\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl : geçersiz renk haritasý büyüklüðü %d (%d/%d/%d) - azaltýyorum\n
+# BImageControl::BImageControl: invalid colormap size %d (%d/%d/%d) - reducing\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl : renk haritasý ayrýlanamadý\n
+# BImageControl::BImageControl: error allocating colormap\n
 $ #ColorAllocFail
-# BImageControl::BImageControl : rengi ayrýrken hata oldu : %d/%d/%d\n
+# BImageControl::BImageControl: failed to alloc color %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl : resim arabelleði - %d resim temizlendi\n
+# BImageControl::~BImageControl: pixmap cache - releasing %d pixmaps\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage : arabellek büyük, temizlemeye baþlýyorum\n
+# BImageControl::renderImage: cache is large, forcing cleanout\n
 $ #ColorParseError
-# BImageControl::getColor : renk tarama hatasý : '%s'\n
+# BImageControl::getColor: color parse error: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor : renk ayýrma hatasý : '%s'\n
+# BImageControl::getColor: color alloc error: '%s'\n

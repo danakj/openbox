@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# G鰊der ...
+# 发送到...
 $ #Shade
-# Topla
+# 卷帘
 $ #Iconify
-# Ikonala⺶齬
+# 图标化
 $ #Maximize
-# Azamile⺶ir
+# 最大化
 $ #Raise
-# Al鏰lt
+# 放前
 $ #Lower
-# Y黭selt
+# 放后
 $ #Stick
-# Yap齥
+# 钉住
 $ #KillClient
-# 謑d黵
+# 杀死
 $ #Close
-# Kapat
+# 关闭

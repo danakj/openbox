@@ -3,6 +3,6 @@ $set 7 #Slit
 $ #SlitTitle
 # Slit
 $ #SlitDirection
-# Slit yönü
+# Slit ·½Ïò
 $ #SlitPlacement
-# Slit yerleşimi
+# Slit ·ÅÖÃ

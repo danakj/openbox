@@ -1,23 +1,23 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# fel: '-rc' kräver ett argument\n
+# hata : '-rc' bir argüman bekler\n
 $ #DISPLAYRequiresArg
-# fel: '-display' kräver ett argument\n
+# hata : '-display' bir argüman bekler\n
 $ #WarnDisplaySet
-# varning: kunde inte sätta variabeln 'DISPLAY'\n
+# ikaz : 'DISPLAY' verisini oturtamadým\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
   \t\t\t 2001 - 2002, Sean 'Shaleh' Perry\n\n\
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\tanvänd skärmanslutning.\n\
-  -rc <string>\t\t\tanvänd alternativ resursfil.\n\
-  -version\t\t\tvisa version och avsluta.\n\
-  -help\t\t\t\tvisa denna hjälptext och avsluta.\n\n
+  -display <metin>\t\tekraný kullan.\n\
+  -rc <metin>\t\t\tbaþka bir ayarlama dosyasýný kullan.\n\
+  -version\t\t\tnesil bilgisini gösterir ve çýkar.\n\
+  -help\t\t\t\tbu yardým iletisini gösterir ve çýkar.\n\n
 $ #CompileOptions
-# Kompilerad med:\n\
-  Avlusning\t\t\t%s\n\
-  Form:\t\t\t\t%s\n\
+# Denetleme seçenekleri :\n\
+  Bilgilendirme\t\t\t%s\n\
+  Gölgeleme:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\
   Event Clobbering:\t\t%s\n\
-  8bpp ordnad dithering:\t%s\n\n
+  R8b'e göre týzla:\t%s\n\n

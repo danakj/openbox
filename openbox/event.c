@@ -658,6 +658,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         frame_adjust_focus(client->frame, FALSE);
 	break;
     case EnterNotify:
+        con = frame_context(client, e->xcrossing.subwindow);
         if (client_normal(client)) {
             if (ob_state() == OB_STATE_STARTING) {
                 /* move it to the top of the focus order */
@@ -711,7 +712,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 					       CWX | CWY)) {
 	    int x, y, w, h;
 	    ObCorner corner;
-	       
+            Rect *a;
+
 	    x = (e->xconfigurerequest.value_mask & CWX) ?
 		e->xconfigurerequest.x : client->area.x;
 	    y = (e->xconfigurerequest.value_mask & CWY) ?
@@ -720,6 +722,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
 		e->xconfigurerequest.width : client->area.width;
 	    h = (e->xconfigurerequest.value_mask & CWHeight) ?
 		e->xconfigurerequest.height : client->area.height;
+
+            /* dont let windows move above/left into the strut unless they are
+               bigger than the available area */
+            a = screen_area(client->desktop);
+            if (e->xconfigurerequest.value_mask & CWX &&
+                w <= a->width && x < a->x)
+                x = a->x;
+            if (e->xconfigurerequest.value_mask & CWY &&
+                h <= a->height && y < a->y)
+                y = a->y;
 	       
 	    switch (client->gravity) {
 	    case NorthEastGravity:
@@ -885,6 +897,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         } else if (msgtype == prop_atoms.net_moveresize_window) {
             int oldg = client->gravity;
             int tmpg, x, y, w, h;
+            Rect *a;
 
             if (e->xclient.data.l[0] & 0xff)
                 tmpg = e->xclient.data.l[0] & 0xff;
@@ -908,8 +921,26 @@ static void event_handle_client(ObClient *client, XEvent *e)
             else
                 h = client->area.y;
             client->gravity = tmpg;
+
+            /* get the frame position */
+            frame_client_gravity(client->frame, &x, &y);
+
+            /* dont let windows move above/left into the strut unless they are
+               bigger than the available area */
+            a = screen_area(client->desktop);
+            if (e->xconfigurerequest.value_mask & CWX &&
+                w <= a->width && x < a->x)
+                x = a->x;
+            if (e->xconfigurerequest.value_mask & CWY &&
+                h <= a->height && y < a->y)
+                y = a->y;
+	       
+            /* go back to the client position */
+            frame_frame_gravity(client->frame, &x, &y);
+
             client_configure(client, OB_CORNER_TOPLEFT,
                              x, y, w, h, FALSE, TRUE);
+
             client->gravity = oldg;
         }
 	break;

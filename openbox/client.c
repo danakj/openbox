@@ -891,7 +891,22 @@ void client_update_normal_hints(ObClient *self)
 
     /* get the hints from the window */
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
-	self->positioned = !!(size.flags & (PPosition|USPosition));
+        if (size.flags & (PPosition|USPosition)) {
+            Rect *a;
+            
+            /* this is my MOZILLA BITCHSLAP. oh ya it fucking feels good.
+               Java can suck it too. */
+
+            /* dont let windows map above/left into the strut unless they
+               are bigger than the available area */
+            a = screen_area(self->desktop);
+            if (self->area.width <= a->width && self->area.x < a->x)
+                self->area.x = a->x;
+            if (self->area.height <= a->height && self->area.y < a->y)
+                self->area.y = a->y;
+
+            self->positioned = TRUE;
+        }
 
 	if (size.flags & PWinGravity) {
 	    self->gravity = size.win_gravity;

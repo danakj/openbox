@@ -8,7 +8,7 @@ export WANT_AUTOMAKE=1.7
 
 sh autopoint --force # for GNU gettext
 sh libtoolize --copy --force --automake
-sh aclocal -I m4
+sh aclocal -I m4 $ACLOCAL_FLAGS
 #sh autoheader
 sh autoconf
 sh automake --foreign --include-deps --add-missing --copy

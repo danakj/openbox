@@ -953,7 +953,7 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
 	g_free(s);
     }
     if (db == NULL) {
-    char *s = g_build_filename(name, "themerc", NULL);
+        char *s = g_build_filename(name, "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
         g_free(s);

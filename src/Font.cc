@@ -331,7 +331,7 @@ unsigned int BFont::measureString(const string &string) const {
                     _display, _xftfont, (XftChar8 *) string.c_str(),
                     string.size(), &info);
 
-    return info.xOff + (_shadow ? 1 : 0);
+    return info.xOff + (_shadow ? _offset : 0);
   }
 #endif // XFT
 
@@ -350,7 +350,7 @@ unsigned int BFont::height(void) const {
 
 #ifdef    XFT
   if (_xftfont)
-    return _xftfont->height + (_shadow ? 1 : 0);
+    return _xftfont->height + (_shadow ? _offset : 0);
 #endif // XFT
 
   if (i18n.multibyte())

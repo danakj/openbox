@@ -2757,7 +2757,8 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
 
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
-                         italic, dropShadow, offset, tint, resource.aa_fonts);
+                         italic, dropShadow && resource.shadow_fonts, offset, 
+                         tint, resource.aa_fonts);
     if (b->valid())
       return b;
     else

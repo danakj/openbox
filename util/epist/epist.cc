@@ -83,8 +83,8 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     ::exit(1);
   }
 
-  addAction(Action::nextWorkspace, ControlMask, "Tab");
-  addAction(Action::prevWorkspace, ControlMask | ShiftMask, "Tab");
+  addAction(Action::nextScreen, ControlMask, "Tab");
+  addAction(Action::prevScreen, ControlMask | ShiftMask, "Tab");
   addAction(Action::nextWindow, Mod1Mask, "Tab");
   addAction(Action::prevWindow, Mod1Mask | ShiftMask, "Tab");
   addAction(Action::toggleshade, Mod1Mask, "F5");
@@ -204,6 +204,14 @@ XWindow *epist::findWindow(Window window) const {
 
 
 void epist::cycleScreen(int current, bool forward) const {
+  unsigned int i;
+  for (i = 0; i < _screens.size(); ++i)
+    if (_screens[i]->number() == current) {
+      current = i;
+      break;
+    }
+  assert(i < _screens.size());  // current is for an unmanaged screen
+  
   int dest = current + (forward ? 1 : -1);
 
   if (dest < 0) dest = (signed)_screens.size() - 1;

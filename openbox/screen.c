@@ -2,6 +2,8 @@
 #include "prop.h"
 #include "screen.h"
 #include "client.h"
+#include "frame.h"
+#include "engine.h"
 #include "focus.h"
 
 #include <X11/Xlib.h>
@@ -251,8 +253,19 @@ void screen_set_desktop(guint num)
 
     if (old == num) return;
 
-    for (it = stacking_list; it != NULL; it = it->next)
-	client_showhide(it->data, FALSE);
+    /* hide windows from bottom to top */
+    for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
+        Client *c = it->data;
+	if (c->frame->visible && !client_should_show(c))
+            engine_frame_hide(c->frame);
+    }
+
+    /* show windows from top to bottom */
+    for (it = stacking_list; it != NULL; it = it->next) {
+        Client *c = it->data;
+	if (!c->frame->visible && client_should_show(c))
+            engine_frame_show(c->frame);
+    }
 
     /* force the callbacks to fire */
     if (focus_client == NULL)
@@ -356,15 +369,15 @@ void screen_show_desktop(gboolean show)
 	    Client *client = it->data;
 	    if (client->type == Type_Desktop)
 		client_focus(client);
-	    else
-		client_showhide(client, FALSE);
+	    else if (client->frame->visible && !client_should_show(client))
+                engine_frame_hide(client->frame);
 	}
     } else {
         /* top to bottom */
 	for (it = stacking_list; it != NULL; it = it->next) {
 	    Client *client = it->data;
-	    if (client->type != Type_Desktop)
-		client_showhide(client, FALSE);
+	    if (!client->frame->visible && client_should_show(client))
+                engine_frame_show(client->frame);
 	}
     }
 

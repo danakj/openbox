@@ -204,7 +204,7 @@ void client_manage(Window window)
 
     HOOKFIRECLIENT(managed, client);
 
-    client_showhide(client, TRUE);
+    client_showhide(client);
 
     /* grab all mouse bindings */
     pointer_grab_all(client, TRUE);
@@ -1223,21 +1223,25 @@ void client_calc_layer(Client *self)
     }
 }
 
-void client_showhide(Client *self, gboolean firehook)
+gboolean client_should_show(Client *self)
 {
-    gboolean show;
-
-    if (self->iconic) show = FALSE;
+    if (self->iconic) return FALSE;
     else if (!(self->desktop == screen_desktop ||
-	       self->desktop == DESKTOP_ALL)) show = FALSE;
-    else if (client_normal(self) && screen_showing_desktop) show = FALSE;
-    else show = TRUE;
+	       self->desktop == DESKTOP_ALL)) return FALSE;
+    else if (client_normal(self) && screen_showing_desktop) return FALSE;
+    
+    return TRUE;
+}
 
-    if (show) engine_frame_show(self->frame);
-    else      engine_frame_hide(self->frame);
+void client_showhide(Client *self)
+{
 
-    if (firehook)
-	HOOKFIRECLIENT(visible, self);
+    if (client_should_show(self))
+        engine_frame_show(self->frame);
+    else
+        engine_frame_hide(self->frame);
+
+    HOOKFIRECLIENT(visible, self);
 }
 
 gboolean client_normal(Client *self) {
@@ -1491,7 +1495,7 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 	XMapWindow(ob_display, self->window);
     }
     client_change_state(self);
-    client_showhide(self, TRUE);
+    client_showhide(self);
     screen_update_struts();
 }
 
@@ -1657,7 +1661,7 @@ void client_set_desktop(Client *self, unsigned int target)
     /* the frame can display the current desktop state */
     engine_frame_adjust_state(self->frame);
     /* 'move' the window to the new desktop */
-    client_showhide(self, TRUE);
+    client_showhide(self);
     screen_update_struts();
 }
 

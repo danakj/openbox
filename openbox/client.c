@@ -1714,15 +1714,13 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             event.xconfigure.event = self->window;
             event.xconfigure.window = self->window;
     
-            /* root window coords with border in mind */
-            event.xconfigure.x = x - self->border_width +
-                self->frame->size.left;
-            event.xconfigure.y = y - self->border_width +
-                self->frame->size.top;
+            /* root window real coords */
+            event.xconfigure.x = self->frame->area.x + self->frame->size.left;
+            event.xconfigure.y = self->frame->area.y + self->frame->size.top;
     
-            event.xconfigure.width = self->area.width;
-            event.xconfigure.height = self->area.height;
-            event.xconfigure.border_width = self->border_width;
+            event.xconfigure.width = w;
+            event.xconfigure.height = h;
+            event.xconfigure.border_width = 0;
             event.xconfigure.above = self->frame->plate;
             event.xconfigure.override_redirect = FALSE;
             XSendEvent(event.xconfigure.display, event.xconfigure.window,

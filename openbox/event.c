@@ -636,12 +636,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            /*
-              if (config_focus_follow && config_focus_delay)
-              ob_main_loop_timeout_remove_data(ob_main_loop,
-              focus_delay_func,
-              client);
-            */
+            if (config_focus_follow && config_focus_delay)
+                ob_main_loop_timeout_remove_data(ob_main_loop,
+                                                 focus_delay_func,
+                                                 client);
             break;
         default:
             break;

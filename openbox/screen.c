@@ -166,6 +166,9 @@ void screen_startup()
 void screen_shutdown()
 {
     guint i;
+
+    PROP_ERASE(ob_root, openbox_pid); /* we're not running here no more! */
+
     for (i = 0; i < screen_desktop_names->len; ++i)
 	g_free(g_ptr_array_index(screen_desktop_names, i));
     g_ptr_array_free(screen_desktop_names, TRUE);

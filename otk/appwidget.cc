@@ -36,7 +36,7 @@ OtkAppWidget::~OtkAppWidget()
 
 void OtkAppWidget::show(void)
 {
-  OtkWidget::show();
+  OtkWidget::show(true);
 
   _application->_appwidget_count++;
 }

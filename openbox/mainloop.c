@@ -594,8 +594,8 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 	if (curr->func(curr->data)) {
             g_time_val_add(&curr->timeout, curr->delay);
             insert_timer(loop, curr);
-        } else if (curr->destroy) {
-            curr->destroy(curr->data);
+        } else {
+            curr->del_me = TRUE;
         }
 
 	/* if at least one timer fires, then don't wait on X events, as there

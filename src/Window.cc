@@ -237,6 +237,12 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   enableDecor(True);
   
+  if (decorations & Decor_Titlebar)
+    createTitlebar();
+
+  if (decorations & Decor_Handle)
+    createHandle();
+
   // apply the size and gravity hint to the frame
 
   upsize();
@@ -440,14 +446,6 @@ void BlackboxWindow::enableDecor(bool enable) {
   } else {
     decorations = 0;
   }
-    
-  destroyTitlebar();
-  if (decorations & Decor_Titlebar)
-    createTitlebar();
-
-  destroyHandle();
-  if (decorations & Decor_Handle)
-    createHandle();
 }
 
 /*
@@ -2718,9 +2716,9 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
 
     // adjust the window decorations based on transience
     if (isTransient()) {
-      decorations &= ~(Decor_Maximize | Decor_Handle);
       functions &= ~Func_Maximize;
       setAllowedActions();
+      enableDecor(True);
     }
 
     reconfigure();
@@ -2756,17 +2754,15 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
       ungrabButtons();
       if (client.max_width <= client.min_width &&
           client.max_height <= client.min_height) {
-        decorations &= ~(Decor_Maximize | Decor_Handle);
         functions &= ~(Func_Resize | Func_Maximize);
       } else {
-        if (! isTransient()) {
-          decorations |= Decor_Maximize | Decor_Handle;
+        if (! isTransient())
           functions |= Func_Maximize;
-        }
         functions |= Func_Resize;
       }
       grabButtons();
       setAllowedActions();
+      enableDecor(True);
     }
 
     Rect old_rect = frame.rect;

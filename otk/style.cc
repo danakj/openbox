@@ -179,6 +179,12 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
       ret = XReadBitmapFile(OBDisplay::display, root_window,
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
+      if (ret != BitmapSuccess) {
+        xbmFile = std::string(BUTTONSDIR) + "/" + s;
+        ret = XReadBitmapFile(OBDisplay::display, root_window,
+                              xbmFile.c_str(), &pixmapMask.w,
+                              &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
+      }
     } else
       ret = XReadBitmapFile(OBDisplay::display, root_window,
                             expandTilde(s).c_str(), &pixmapMask.w,

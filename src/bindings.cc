@@ -19,6 +19,8 @@ extern "C" {
 #define _(str) gettext(str)
 }
 
+#include <algorithm>
+
 namespace ob {
 
 static bool buttonvalue(const std::string &button, unsigned int *val)

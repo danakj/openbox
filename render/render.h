@@ -71,10 +71,6 @@ typedef enum {
 } TextureType;
 
 typedef struct PlanarSurface {
-    int x;
-    int y;
-    int width;
-    int height;
     SurfaceColorType grad;
     ReliefType relief;
     BevelType bevel;
@@ -158,7 +154,7 @@ extern Visual *render_visual;
 extern int render_depth;
 extern Colormap render_colormap;
 
-void (*paint)(Window win, Appearance *l, int w, int h);
+void (*paint)(Window win, Appearance *l, int x, int y, int w, int h);
 
 void render_startup(void);
 void init_appearance(Appearance *l);

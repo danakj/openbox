@@ -50,6 +50,8 @@ color_rgb *color_new(int r, int g, int b)
     return NULL;
 }
 
+//XXX same color could be pointed to twice, this might have to be a refcount
+
 void color_free(color_rgb *c)
 {
     if (c->gc != None)

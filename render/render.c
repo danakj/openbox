@@ -54,7 +54,7 @@ void render_startup(void)
     }  
 }
 
-void x_paint(Window win, Appearance *l, int w, int h)
+void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
 {
     int i;
     XImage *im;

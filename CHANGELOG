@@ -1,8 +1,8 @@
 Changelog for Openbox:
 
 2.1.0:
- * Fixed problems with Gnome 2 taskbar. Gnome 2 support (Ben Jansens)
-   should now be complete.
+ * GNOME 2 Support. (Fixed problems with Gnome 2        (Ben Jansens)
+   taskbar.
 
  * Redo borders for styles. Any flat textured object    (Ben Jansens)
    (solid or gradient) can add "border" to its texture

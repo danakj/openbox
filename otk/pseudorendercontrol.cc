@@ -124,18 +124,19 @@ inline const XColor *PseudoRenderControl::pickColor(int r, int g, int b) const
 void PseudoRenderControl::reduceDepth(Surface &sf, XImage *im) const
 {
   pixel32 *data = sf.pixelData();
-  char *p = (char *)data;
+  pixel32 *ret = (pixel32*)malloc(im->width * im->height * 4);
+  char *p = (char *)ret;
   int x, y;
-    for (y = 0; y < im->height; y++) {
-      for (x = 0; x < im->width; x++) {
-        p[x] = pickColor(data[x] >> default_red_shift,
-                         data[x] >> default_green_shift,
-                         data[x] >> default_blue_shift)->pixel;
-      }
-      data += im->width;
-      p += im->bytes_per_line;
+  for (y = 0; y < im->height; y++) {
+    for (x = 0; x < im->width; x++) {
+      p[x] = pickColor(data[x] >> default_red_shift,
+                       data[x] >> default_green_shift,
+                       data[x] >> default_blue_shift)->pixel;
     }
-
+    data += im->width;
+    p += im->bytes_per_line;
+  }
+  im->data = (char*)ret;
 }
 
 void PseudoRenderControl::allocateColor(XColor *color) const

@@ -285,12 +285,7 @@ void RenderControl::drawGradientBackground(
   }
 
   reduceDepth(sf, im);
-
-  im->data = (char*) data;
-
   sf.setPixmap(im);
-
-  im->data = NULL;
   XDestroyImage(im);
 }
 
@@ -451,7 +446,7 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
   if (x < 0) x = 0;
   if (y < 0) y = 0;
 
-  // XXX SCALING!@!&*(@! to make it fit on the surface
+  // Reduce the image size if its too big to make it fit on the surface
   int oldw = w, oldh = h;
   unsigned long *olddata = data;
   if (w > sfw) w = sfw;
@@ -507,12 +502,7 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
   im->byte_order = endian;
 
   reduceDepth(sf, im);
-
-  im->data = (char*) bg;
-
   sf.setPixmap(im);
-
-  im->data = NULL;
   XDestroyImage(im);
 }
 

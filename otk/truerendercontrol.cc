@@ -60,7 +60,8 @@ void TrueRenderControl::reduceDepth(Surface &sf, XImage *im) const
   int r, g, b;
   int x,y;
   pixel32 *data = sf.pixelData();
-  pixel16 *p = (pixel16*) data;
+  pixel32 *ret = (pixel32*)malloc(im->width * im->height * 4);
+  pixel16 *p = (pixel16*) ret;
   switch (im->bits_per_pixel) {
   case 32:
     if ((_red_offset != default_red_shift) ||
@@ -72,13 +73,15 @@ void TrueRenderControl::reduceDepth(Surface &sf, XImage *im) const
           r = (data[x] >> default_red_shift) & 0xFF;
           g = (data[x] >> default_green_shift) & 0xFF;
           b = (data[x] >> default_blue_shift) & 0xFF;
-          data[x] = (r << _red_offset) + (g << _green_offset) +
+          ret[x] = (r << _red_offset) + (g << _green_offset) +
             (b << _blue_offset);
         }
         data += im->width;
       } 
-   }
-   return;
+    } else {
+      memcpy(ret, data, im->width * im->height * 4);
+    }
+    break;
   case 16:
     for (y = 0; y < im->height; y++) {
       for (x = 0; x < im->width; x++) {
@@ -97,6 +100,7 @@ void TrueRenderControl::reduceDepth(Surface &sf, XImage *im) const
   default:
     printf("your bit depth is currently unhandled\n");
   }
+  im->data = (char*)ret;
 }
 
 void TrueRenderControl::allocateColor(XColor *color) const

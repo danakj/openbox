@@ -26,8 +26,6 @@ protected:
 
   RenderControl(int screen);
 
-  virtual void reduceDepth(Surface &sf, XImage *im) const = 0;
-  
   inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
   void verticalGradient(Surface &sf, const RenderTexture &texture) const;
   void diagonalGradient(Surface &sf, const RenderTexture &texture) const;
@@ -37,11 +35,20 @@ protected:
   virtual void drawSolidBackground(Surface& sf,
                                    const RenderTexture& texture) const;
 
+  //! Reduces a Surface's Surface::pixelData so that it will display correctly
+  //! on the screen's depth
+  /*!
+    This function allocates and sets the im->data member. The allocated memory
+    will be freed when XDetroyImage is called on the XImage.
+  */
+  virtual void reduceDepth(Surface &sf, XImage *im) const = 0;
+
 public:
   virtual ~RenderControl();
 
   static RenderControl *getRenderControl(int screen);
 
+  //! Draws onto the root window
   virtual void drawRoot(const RenderColor &color) const;
   
   //! Draws a background onto a Surface, as specified by a RenderTexture

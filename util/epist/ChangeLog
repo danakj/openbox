@@ -1,3 +1,12 @@
+2.2.2
+
+  * Fixed bug which caused an infinate loop when       (Ben)
+    cycling backwards through windows on an empty
+    workspace.
+
+
+2.2.0
+
   * Fixed (hopefully) the ugly bugly that would cause  (Marius)
     epist to hog the keyboard on invalid keys.
 

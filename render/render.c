@@ -16,7 +16,7 @@
 #endif
 
 static void pixel_data_to_pixmap(RrAppearance *l,
-                                gint x, gint y, gint w, gint h);
+                                 gint x, gint y, gint w, gint h);
 
 void RrPaint(RrAppearance *l, Window win, gint w, gint h)
 {

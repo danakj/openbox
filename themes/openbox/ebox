@@ -102,11 +102,11 @@ borderColor:	#222222
 #*xft.flags: shadow
 #*title.xft.flags:	shadow
 
-#pixmap masks
+!pixmap masks
 toolbar.button.left.mask:	bulletl.xbm
 toolbar.button.right.mask:	bulletr.xbm
 window.button.max.mask:		max.xbm
 window.button.icon.mask:	icon.xbm
-window.button.stick.mask:	
+!window.button.stick.mask:	
 window.button.close.mask:	close.xbm
 menu.arrow.mask:	        bulletbc.xbm

@@ -28,9 +28,9 @@ public:
   int x() const { return _x; }
 
   //! Changes the y value to the new value specified
-  void setY(int x) { _x = x; }
+  void setY(int y) { _y = y; }
   //! Returns the y value
-  int y() const { return _x; }
+  int y() const { return _y; }
 
   //! Changes the x and y values
   void setPoint(int x, int y) { _x = x; _y = y; }

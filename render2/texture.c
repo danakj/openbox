@@ -1,7 +1,10 @@
 #include "instance.h"
 #include "texture.h"
 #include "surface.h"
+#include "font.h"
+#include "glft/glft.h"
 #include <stdlib.h>
+#include <assert.h>
 #include <string.h>
 
 void RrTextureFreeContents(struct RrTexture *tex)
@@ -79,4 +82,27 @@ void RrTextureSetNone(struct RrSurface *sur,
 
     if (!tex) return;
     RrTextureFreeContents(tex);
+}
+
+void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex)
+{
+    struct GlftColor col;
+
+    glEnable(GL_TEXTURE_2D);
+    
+    switch (tex->type) {
+    case RR_TEXTURE_NONE:
+        break;
+    case RR_TEXTURE_TEXT:
+        printf("text %s\n", tex->data.text.string);
+        assert(tex->data.text.font);
+        col.r = tex->data.text.color.r;
+        col.g = tex->data.text.color.g;
+        col.b = tex->data.text.color.b;
+        col.a = tex->data.text.color.a;
+        GlftRenderString(tex->data.text.font->font, tex->data.text.string, 
+                         strlen(tex->data.text.string), &col, 0, 0);
+        break;
+    }
+    glDisable(GL_TEXTURE_2D);
 }

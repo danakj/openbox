@@ -1,7 +1,6 @@
 #include "planar.h"
 #include "surface.h"
 #include "texture.h"
-#include "glft/glft.h"
 #include "color.h"
 #include "debug.h"
 #include "font.h"
@@ -80,7 +79,6 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
 {   
     struct RrColor *pri, *sec, avg;
     int x, y, w, h;
-    int i;
 
     copy_parent(sur);
 
@@ -298,26 +296,6 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
         glEnd();
         break;
     }
-    for (i = 0; i < sur->ntextures; i++) {
-        struct RrTextureText *t;
-        glEnable(GL_TEXTURE_2D);
-        switch (sur->texture[i].type) {
-        case RR_TEXTURE_NONE:
-            break;
-        case RR_TEXTURE_TEXT:
-            t = &sur->texture[i].data.text;
-            printf("text %s\n", t->string);
-            glColor3f(1.0, 1.0, 1.0);
-            if (t->font == NULL) {
-                glDisable(GL_TEXTURE_2D);
-                return;
-            }
-            GlftRenderString(t->font->font, t->string, 
-                             strlen(t->string), 0, 0);
-            break;
-        }
-    }
-    glDisable(GL_TEXTURE_2D);
 }
 
 void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h)

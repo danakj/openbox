@@ -43,7 +43,7 @@ void RrPaint(struct RrSurface *sur)
 {
     struct RrInstance *inst;
     struct RrSurface *p;
-    int ok;
+    int ok, i;
     int surx, sury;
     GSList *it;
 
@@ -95,6 +95,9 @@ void RrPaint(struct RrSurface *sur)
     case RR_SURFACE_NONE:
         break;
     }
+
+    for (i = 0; i < sur->ntextures; ++i)
+        RrTexturePaint(sur, &sur->texture[i]);
 
     glXSwapBuffers(RrDisplay(inst), RrSurfaceWindow(sur));
 }

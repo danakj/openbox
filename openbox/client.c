@@ -551,14 +551,16 @@ gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
     /* XXX watch for xinerama dead areas */
 
     a = screen_area(self->desktop);
-    if (!self->strut.right && *x >= a->x + a->width - 1)
-        *x = a->x + a->width - self->frame->area.width;
-    if (!self->strut.bottom && *y >= a->y + a->height - 1)
-        *y = a->y + a->height - self->frame->area.height;
-    if (!self->strut.left && *x + self->frame->area.width - 1 < a->x)
-        *x = a->x;
-    if (!self->strut.top && *y + self->frame->area.height - 1 < a->y)
-        *y = a->y;
+    if (client_normal(self)) {
+        if (!self->strut.right && *x >= a->x + a->width - 1)
+            *x = a->x + a->width - self->frame->area.width;
+        if (!self->strut.bottom && *y >= a->y + a->height - 1)
+            *y = a->y + a->height - self->frame->area.height;
+        if (!self->strut.left && *x + self->frame->area.width - 1 < a->x)
+            *x = a->x;
+        if (!self->strut.top && *y + self->frame->area.height - 1 < a->y)
+            *y = a->y;
+    }
 
     if (rude) {
         /* this is my MOZILLA BITCHSLAP. oh ya it fucking feels good.

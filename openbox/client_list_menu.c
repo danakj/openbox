@@ -17,8 +17,6 @@ typedef struct {
     guint desktop;
 } DesktopData;
 
-void plugin_setup_config() { }
-
 static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;

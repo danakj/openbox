@@ -230,7 +230,7 @@ void focus_fallback(FallbackType type)
                    be fallback targets there. */
                 !((Client*)it->data)->fullscreen &&
                 client_can_focus(it->data)) {
-                gboolean r = client_focus(sit->data);
+                gboolean r = client_focus(it->data);
                 assert(r);
                 return;
             }
@@ -257,10 +257,6 @@ static void popup_cycle(Client *c, gboolean show)
          */
         popup_size(focus_cycle_popup, 320, 48);
 
-        /* use the transient's parent's title/icon */
-        while (c->transient_for && c->transient_for != TRAN_GROUP)
-            c = c->transient_for;
-
         popup_show(focus_cycle_popup, (c->iconic ? c->icon_title : c->title),
                    client_icon(c, 48, 48));
     }
@@ -282,8 +278,22 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             frame_adjust_focus(focus_client->frame, TRUE);
         goto done_cycle;
     } else if (done) {
-        if (focus_cycle_target)
+        if (focus_cycle_target) {
+            Client *t;
+
+            /* actually focus a transient */
+
+            /* fist, try for a modal */
+            t = client_focus_target(focus_cycle_target);
+            if (t != focus_cycle_target)
+                focus_cycle_target = t;
+            else
+                /* just grab the deepest transient you can find */
+                while (focus_cycle_target->transients)
+                    focus_cycle_target = focus_cycle_target->transients->data;
+
             client_activate(focus_cycle_target);
+        }
         goto done_cycle;
     }
     if (!first)
@@ -310,9 +320,8 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         }
         /*ft = client_focus_target(it->data);*/
         ft = it->data;
-        if (ft->transients == NULL && /*ft == it->data &&*/client_normal(ft) &&
-            (ft->can_focus || ft->focus_notify) &&
-            (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)) {
+        if (ft->transient_for == NULL && client_normal(ft) &&
+            client_can_focus(ft)) {
             if (ft != focus_cycle_target) { /* prevents flicker */
                 if (focus_cycle_target)
                     frame_adjust_focus(focus_cycle_target->frame, FALSE);

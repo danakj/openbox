@@ -97,19 +97,19 @@ public:
     a chain or not), or if any of the strings in the keylist are invalid.    
     @return true if the binding could be added; false if it could not.
   */
-  bool add(const StringVect &keylist, PyObject *callback);
+  bool addKey(const StringVect &keylist, PyObject *callback);
 
   //! Removes a key binding
   /*!
     @return The callbackid of the binding, or '< 0' if there was no binding to
             be removed.
   */
-  bool remove(const StringVect &keylist);
+  bool removeKey(const StringVect &keylist);
 
   //! Removes all key bindings
-  void removeAll();
+  void removeAllKeys();
 
-  void fire(unsigned int modifiers,unsigned int key, Time time);
+  void fireKey(unsigned int modifiers,unsigned int key, Time time);
 
   void setResetKey(const std::string &key);
 
@@ -120,7 +120,10 @@ public:
 
   void grabButtons(bool grab, OBClient *client);
 
-  void fire(ButtonData *data);
+  //! Removes all button bindings
+  void removeAllButtons();
+
+  void fireButton(ButtonData *data);
 };
 
 }

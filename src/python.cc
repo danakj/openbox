@@ -454,7 +454,7 @@ PyObject * kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
     vectkeylist.push_back(PyString_AsString(str));
   }
 
-  if (!ob::Openbox::instance->bindings()->add(vectkeylist, func)) {
+  if (!ob::Openbox::instance->bindings()->addKey(vectkeylist, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;
   }
@@ -479,13 +479,13 @@ PyObject * kunbind(PyObject *keylist)
     vectkeylist.push_back(PyString_AsString(str));
   }
 
-  ob::Openbox::instance->bindings()->remove(vectkeylist);
+  ob::Openbox::instance->bindings()->removeKey(vectkeylist);
   Py_INCREF(Py_None); return Py_None;
 }
 
 void kunbind_all()
 {
-  ob::Openbox::instance->bindings()->removeAll();
+  ob::Openbox::instance->bindings()->removeAllKeys();
 }
 
 void set_reset_key(const std::string &key)

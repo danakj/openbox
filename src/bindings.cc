@@ -153,7 +153,8 @@ OBBindings::OBBindings()
 OBBindings::~OBBindings()
 {
   grabKeys(false);
-  removeAll();
+  removeAllKeys();
+  removeAllButtons();
 }
 
 
@@ -215,7 +216,7 @@ PyObject *OBBindings::find(KeyBindingTree *search, bool *conflict) const {
 }
 
 
-bool OBBindings::add(const StringVect &keylist, PyObject *callback)
+bool OBBindings::addKey(const StringVect &keylist, PyObject *callback)
 {
   KeyBindingTree *tree;
   bool conflict;
@@ -242,7 +243,7 @@ bool OBBindings::add(const StringVect &keylist, PyObject *callback)
 }
 
 
-bool OBBindings::remove(const StringVect &keylist)
+bool OBBindings::removeKey(const StringVect &keylist)
 {
   assert(false); // XXX: function not implemented yet
 
@@ -295,12 +296,14 @@ static void remove_branch(KeyBindingTree *first)
 }
 
 
-void OBBindings::removeAll()
+void OBBindings::removeAllKeys()
 {
+  grabKeys(false);
   if (_keytree.first_child) {
     remove_branch(_keytree.first_child);
     _keytree.first_child = 0;
   }
+  grabKeys(true);
 }
 
 
@@ -333,7 +336,7 @@ void OBBindings::grabKeys(bool grab)
 }
 
 
-void OBBindings::fire(unsigned int modifiers, unsigned int key, Time time)
+void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
     reset(this);
@@ -408,6 +411,19 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
   return true;
 }
 
+void OBBindings::removeAllButtons()
+{
+  // XXX: UNGRAB shits
+  for (int i = i; i < NUM_MOUSE_CONTEXT; ++i) {
+    ButtonBindingList::iterator it, end = _buttons[i].end();
+    for (it = _buttons[i].begin(); it != end; ++it)
+      for (int a = 0; a < NUM_MOUSE_ACTION; ++a) {
+        Py_XDECREF((*it)->callback[a]);
+        (*it)->callback[a] = 0;
+      }
+  }
+}
+
 void OBBindings::grabButtons(bool grab, OBClient *client)
 {
   for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
@@ -439,7 +455,7 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
   }
 }
 
-void OBBindings::fire(ButtonData *data)
+void OBBindings::fireButton(ButtonData *data)
 {
   printf("but.mods %d.%d\n", data->button, data->state);
   

@@ -1211,5 +1211,6 @@ static void event_handle_menu(XEvent *ev)
             if ((f = find_active_menu()))
                 menu_frame_select_next(f);
         }
+        break;
     }
 }

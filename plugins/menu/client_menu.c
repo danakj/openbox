@@ -113,6 +113,8 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         guint desk;
 
         if (i >= screen_num_desktops) {
+            menu_add_separator(CLIENT_MENU_NAME, -1);
+
             desk = DESKTOP_ALL;
             name = _("All desktops");
         } else {

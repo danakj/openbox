@@ -91,6 +91,7 @@ OBClient::OBClient(int screen, Window window)
   updateClass();
 
   calcLayer();
+  changeState();
 }
 
 

@@ -113,6 +113,6 @@ frameWidth: 0
 borderColor: #222222
 
 !! font me!
-window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=90
-menu.frame.xftfont: National First Font:pixelsize=15
-menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10
+window.focus.font: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=90
+menu.frame.font: National First Font:pixelsize=15
+menu.title.font: Bitstream Vera Sans:bold:pixelsize=10

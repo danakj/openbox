@@ -87,14 +87,24 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     /* load the font stuff */
-    if (!read_string(db, "window.title.xftfont", &font_str))
+    if (!read_string(db, "window.focus.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=10:shadow=y:shadowtint=50";
 
-    if (!(theme->winfont = RrFontOpen(inst, font_str))) {
+    if (!(theme->winfont_focused = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->winfont_height = RrFontHeight(theme->winfont);
+    theme->winfont_height = RrFontHeight(theme->winfont_focused);
+
+    if (!read_string(db, "window.unfocus.font", &font_str))
+        /* font_str will already be set to the last one */;
+
+    if (!(theme->winfont_unfocused = RrFontOpen(inst, font_str))) {
+        RrThemeFree(theme);
+        return NULL;
+    }
+    theme->winfont_height = MAX(theme->winfont_height,
+                                RrFontHeight(theme->winfont_unfocused));
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.justify", &str)) {
@@ -104,7 +114,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             winjust = RR_JUSTIFY_CENTER;
     }
 
-    if (!read_string(db, "menu.title.xftfont", &font_str))
+    if (!read_string(db, "menu.title.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=12:shadow=y";
 
     if (!(theme->mtitlefont = RrFontOpen(inst, font_str))) {
@@ -121,7 +131,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             mtitlejust = RR_JUSTIFY_CENTER;
     }
 
-    if (!read_string(db, "menu.frame.xftfont", &font_str))
+    if (!read_string(db, "menu.frame.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=11:shadow=y";
 
     if (!(theme->mfont = RrFontOpen(inst, font_str))) {
@@ -606,7 +616,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_label->texture[0].data.text.justify = winjust;
     theme->app_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_focused_label->texture[0].data.text.font =
-        theme->app_hilite_label->texture[0].data.text.font = theme->winfont;
+        theme->app_hilite_label->texture[0].data.text.font =
+        theme->winfont_focused;
     theme->a_focused_label->texture[0].data.text.color =
         theme->app_hilite_label->texture[0].data.text.color =
         theme->title_focused_color;
@@ -616,7 +627,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_unfocused_label->texture[0].data.text.justify = winjust;
     theme->app_unhilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_unfocused_label->texture[0].data.text.font =
-        theme->app_unhilite_label->texture[0].data.text.font = theme->winfont;
+        theme->app_unhilite_label->texture[0].data.text.font =
+        theme->winfont_unfocused;
     theme->a_unfocused_label->texture[0].data.text.color =
         theme->app_unhilite_label->texture[0].data.text.color =
         theme->title_unfocused_color;
@@ -886,7 +898,8 @@ void RrThemeFree(RrTheme *theme)
         RrPixmapMaskFree(theme->close_pressed_mask);
         RrPixmapMaskFree(theme->menu_bullet_mask);
 
-        RrFontClose(theme->winfont);
+        RrFontClose(theme->winfont_focused); 
+        RrFontClose(theme->winfont_unfocused);
         RrFontClose(theme->mtitlefont);
         RrFontClose(theme->mfont);
 

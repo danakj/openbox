@@ -46,7 +46,8 @@ struct _RrTheme {
 
     /* style settings - fonts */
     gint winfont_height;
-    RrFont *winfont;
+    RrFont *winfont_focused;
+    RrFont *winfont_unfocused;
     gint mtitlefont_height;
     RrFont *mtitlefont;
     gint mfont_height;

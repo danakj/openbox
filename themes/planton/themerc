@@ -7,12 +7,6 @@ menu.title.colorTo: #39658b
 menu.title.borderColor: #000000
 menu.title.textColor: #ffffff
 menu.title.justify: center
-menu.title.font: -b&h-lucida-medium-r-normal-sans-10-100-75-75-p-58-iso8859-1
-menu.title.xft.font: Microsoft Sans Serif
-menu.title.xft.size: 6
-menu.title.xft.flags: normal
-menu.title.xft.shadow.offset: 1
-menu.title.xft.shadow.tint: 25
 
 menu.frame: raised solid bevel1
 menu.frame.color: #f6f6f6
@@ -127,8 +121,8 @@ borderColor: #24272f
 #borderColor: #222222
 
 !! font me!
-window.title.xftfont: Borzoi:pixelsize=10
-menu.frame.xftfont: National First Font:pixelsize=15
-menu.title.xftfont: Borzoi:pixelsize=10
+window.focus.font: Borzoi:pixelsize=10
+menu.frame.font: National First Font:pixelsize=15
+menu.title.font: Borzoi:pixelsize=10
 
 

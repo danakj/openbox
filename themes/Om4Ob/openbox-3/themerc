@@ -1,9 +1,9 @@
 style.author:	miklos
 style.date:	Aug 1, 2003
 
-window.title.xftfont: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
-menu.title.xftfont: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
-menu.frame.xftfont: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+window.focus.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+menu.title.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
+menu.frame.font: arial:pixelsize=10:shadow=y:shadowtint=6:shadowoffset=1
 
 
 ! Menu settings...

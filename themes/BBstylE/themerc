@@ -138,9 +138,9 @@ rootCommand: wmsetbg /win/lin/lefm.png
 window.title.layout:	ILMC
 
 !! font me!
-window.title.xftfont: Borzoi:pixelsize=10
-menu.frame.xftfont: National First Font:pixelsize=15
-menu.title.xftfont: Borzoi:pixelsize=10
+window.focus.font: Borzoi:pixelsize=10
+menu.frame.font: National First Font:pixelsize=15
+menu.title.font: Borzoi:pixelsize=10
 
 
 

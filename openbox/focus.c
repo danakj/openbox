@@ -131,15 +131,6 @@ void focus_set_client(ObClient *client)
     }
 }
 
-static gboolean focus_under_pointer()
-{
-    ObClient *c;
-
-    if ((c = client_under_pointer()))
-        return client_normal(c) && client_focus(c);
-    return FALSE;
-}
-
 /* finds the first transient that isn't 'skip' and ensure's that client_normal
  is true for it */
 static ObClient *find_transient_recursive(ObClient *c, ObClient *top, ObClient *skip)
@@ -156,30 +147,28 @@ static ObClient *find_transient_recursive(ObClient *c, ObClient *top, ObClient *
     return NULL;
 }
 
-static gboolean focus_fallback_transient(ObClient *top, ObClient *old)
+static ObClient* focus_fallback_transient(ObClient *top, ObClient *old)
 {
     ObClient *target = find_transient_recursive(top, top, old);
     if (!target) {
         /* make sure client_normal is true always */
         if (!client_normal(top))
-            return FALSE;
+            return NULL;
         target = top; /* no transient, keep the top */
     }
-    return client_focus(target);
+    if (client_can_focus(target))
+        return target;
+    else
+        return NULL;
 }
 
-void focus_fallback(ObFocusFallbackType type)
+ObClient* focus_fallback_target(ObFocusFallbackType type)
 {
     GList *it;
     ObClient *old = NULL;
+    ObClient *target = NULL;
 
     old = focus_client;
-
-    /* unfocus any focused clients.. they can be focused by Pointer events
-       and such, and then when I try focus them, I won't get a FocusIn event
-       at all for them.
-    */
-    focus_set_client(NULL);
 
     if (type == OB_FOCUS_FALLBACK_UNFOCUSING && old) {
         if (old->transient_for) {
@@ -188,12 +177,12 @@ void focus_fallback(ObFocusFallbackType type)
             if (!config_focus_follow)
                 trans = TRUE;
             else {
-                ObClient *c;
-
-                if ((c = client_under_pointer()) &&
-                    client_search_transient(client_search_top_transient(c),
-                                            old))
+                if ((target = client_under_pointer()) &&
+                    client_search_transient
+                    (client_search_top_transient(target), old))
+                {
                     trans = TRUE;
+                }
             }
 
             /* try for transient relations */
@@ -204,20 +193,24 @@ void focus_fallback(ObFocusFallbackType type)
 
                         for (sit = old->group->members; sit; sit = sit->next)
                             if (sit->data == it->data)
-                                if (focus_fallback_transient(sit->data, old))
-                                    return;
+                                if ((target =
+                                     focus_fallback_transient(sit->data, old)))
+                                    return target;
                     }
                 } else {
-                    if (focus_fallback_transient(old->transient_for, old))
-                        return;
+                    if ((target =
+                         focus_fallback_transient(old->transient_for, old)))
+                        return target;
                 }
             }
         }
     }
 
-    if (config_focus_follow)
-        if (focus_under_pointer())
-            return;
+    if (config_focus_follow) {
+        if ((target = client_under_pointer()))
+            if (client_normal(target) && client_can_focus(target))
+                return target;
+    }
 
 #if 0
         /* try for group relations */
@@ -228,23 +221,31 @@ void focus_fallback(ObFocusFallbackType type)
                 for (sit = old->group->members; sit; sit = sit->next)
                     if (sit->data == it->data)
                         if (sit->data != old && client_normal(sit->data))
-                            if (client_can_focus(sit->data)) {
-                                gboolean r = client_focus(sit->data);
-                                assert(r);
-                                return;
-                            }
+                            if (client_can_focus(sit->data))
+                                return sit->data;
         }
 #endif
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
-            if (client_normal(it->data) && client_can_focus(it->data)) {
-                gboolean r = client_focus(it->data);
-                assert(r);
-                return;
-            }
+            if (client_normal(it->data) && client_can_focus(it->data))
+                return it->data;
 
-    /* nothing to focus, and already set it to none above */
+    return NULL;
+}
+
+void focus_fallback(ObFocusFallbackType type)
+{
+    ObClient *new;
+
+    /* unfocus any focused clients.. they can be focused by Pointer events
+       and such, and then when I try focus them, I won't get a FocusIn event
+       at all for them.
+    */
+    focus_set_client(NULL);
+
+    if ((new = focus_fallback_target(type)))
+        client_focus(new);
 }
 
 static void popup_cycle(ObClient *c, gboolean show)

@@ -92,8 +92,7 @@ public:
   */
   inline void recurring(bool b) { recur = b; }
 
-  //! Sets the amount of time for the OBTimer to last before firing in
-  //! milliseconds
+  //! Sets the amount of time for the OBTimer to last in milliseconds
   /*!
     @param t The number of milliseconds the timer should last
   */

@@ -298,7 +298,7 @@ void Openbox::showHelp()
   -rc <string>       use alternate resource file.\n\
   -menu <string>     use alternate menu file.\n\
   -script <string>   use alternate startup script file.\n\
-  -sync              run in synchronous mode (for debugging).\n\
+  -sync              run in synchronous mode (for debugging X errors).\n\
   -version           display version and exit.\n\
   -help              display this help text and exit.\n\n"), _argv[0]);
 

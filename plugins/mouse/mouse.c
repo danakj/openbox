@@ -240,7 +240,7 @@ static void event(ObEvent *e, void *foo)
                             e->data.x.client, e->data.x.e->xbutton.state,
                             e->data.x.e->xbutton.button,
                             cx, cy, cw, ch, dx, dy, TRUE, corner);
-                drag = FALSE;
+                drag = drag_used = FALSE;
                 
                 lbutton = 0;
             } else {

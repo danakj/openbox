@@ -149,6 +149,8 @@ void event_process(XEvent *e)
             window = e->xany.window;
     }
      
+    client = g_hash_table_lookup(client_map, &window);
+
     /* grab the lasttime and hack up the state */
     switch (e->type) {
     case ButtonPress:
@@ -223,6 +225,16 @@ void event_process(XEvent *e)
     case FocusIn:
         g_message("FocusIn on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
+        if (client == NULL) {
+            /* says a client was not found for the event!
+               this is important whether the event is a valid type for us or
+               not! this makes the evil known as mozilla not DESTROY my
+               precious wm!! YES ITS FIVE AM AND I AM NOT SANE RIGHT NOW. FOCUS
+               EVENTS WILL DRIVE YOU MAD.
+             */
+            e->xfocus.window = None;
+        }
+
         /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
            because of RevertToPointerRoot. If the focus ends up reverting to
            pointer root on a workspace change, then the FocusIn event that we
@@ -250,16 +262,7 @@ void event_process(XEvent *e)
 		event_process(&fi);
 
                 /* secret magic way of event_process telling us that no client
-                   was found for the FocusIn event.
-                   
-                   it should be noted!! that focus events of invalud types
-                   (the ones that cause a return in the FocusIn case above)
-                   will not cause this focus_fallback to be called. it will
-                   be assumed that focus is going someplace sane still, or
-                   there are more focus events coming to fix up the situation.
-                   this may not be perfect.. but its working! and focus events
-                   are too much headache to take that for granted. ktnx. ^_^
-                */
+                   was found for the FocusIn event. ^_^ */
                 if (fi.xfocus.window == None)
                     focus_fallback(FALSE);
                 if (fi.xfocus.window == e->xfocus.window)
@@ -280,8 +283,6 @@ void event_process(XEvent *e)
         break;
     }
 
-    client = g_hash_table_lookup(client_map, &window);
-
     /* deal with it in the kernel */
     if (client)
 	event_handle_client(client, e);
@@ -289,8 +290,6 @@ void event_process(XEvent *e)
 	event_handle_root(e);
     else if (e->type == MapRequest)
 	client_manage(window);
-    else if (e->type == FocusIn)
-	e->xfocus.window = None; /* says a client was found for the event! */
     else if (e->type == ConfigureRequest) {
 	/* unhandled configure requests must be used to configure the
 	   window directly */

@@ -154,7 +154,7 @@ void TrueRenderControl::drawGradientBackground(
 
   if (texture.relief() != RenderTexture::Flat) {
     if (texture.bevel() == RenderTexture::Bevel1) {
-      for (off = 0, x = 0; x < w; ++x, off++)
+      for (off = 1, x = 1; x < w - 1; ++x, off++)
         highlight(data + off,
                 data + off + (h-1) * w,
                 texture.relief()==RenderTexture::Raised);
@@ -165,7 +165,7 @@ void TrueRenderControl::drawGradientBackground(
     }
 
     if (texture.bevel() == RenderTexture::Bevel2) {
-      for (off = 1, x = 1; x < w - 1; ++x, off++)
+      for (off = 2, x = 2; x < w - 2; ++x, off++)
         highlight(data + off + w,
                 data + off + (h-2) * w,
                 texture.relief()==RenderTexture::Raised);

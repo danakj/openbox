@@ -131,22 +131,6 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ul_angle = XCreateFontCursor(**otk::display, XC_ul_angle);
   _cursors.ur_angle = XCreateFontCursor(**otk::display, XC_ur_angle);
 
-  // initialize scripting
-  python_init(argv[0]);
-  
-  // run the user's script or the system defaults if that fails
-  bool pyerr = false;
-  if (!python_exec(_scriptfilepath.c_str())) {
-    pyerr = true;
-
-    // reset all the python stuff
-    _bindings->removeAllKeys();
-    _bindings->removeAllButtons();
-    _bindings->removeAllEvents();
-    
-    python_exec(SCRIPTDIR"/defaults.py"); // system default bahaviors
-  }
-
   // initialize all the screens
   _focused_screen = 0;
 
@@ -177,29 +161,71 @@ Openbox::Openbox(int argc, char **argv)
   }
 
   ScreenList::iterator it, end = _screens.end();
+  
+  // run the user's script or the system defaults if that fails
+  bool pyerr, doretry;
+  do {
+    // initialize scripting
+    python_init(argv[0]);
+
+    // load all of the screens' configs here so we have a theme set if
+    // we decide to show the dialog below
+    for (it = _screens.begin(); it != end; ++it)
+      (*it)->config().load(); // load the defaults from config.py
+    
+    pyerr = doretry = false;
+
+    // reset all the python stuff
+    _bindings->removeAllKeys();
+    _bindings->removeAllButtons();
+    _bindings->removeAllEvents();
+
+    int ret = python_exec(_scriptfilepath.c_str());
+    if (ret == 2)
+      pyerr = true;
+
+    if (ret) {
+      // reset all the python stuff
+      _bindings->removeAllKeys();
+      _bindings->removeAllButtons();
+      _bindings->removeAllEvents();
+      
+      if (python_exec(SCRIPTDIR"/defaults.py")) // system default bahaviors
+        pyerr = true;
+    }
+
+    if (pyerr) {
+      std::string msg;
+      msg += _("An error occured while executing the python scripts.");
+      msg += "\n\n";
+      msg += _("See the exact error message in Openbox's output for details.");
+      otk::MessageDialog dia(this, _("Python Error"), msg);
+      otk::DialogButton ok(_("Okay"), true);
+      otk::DialogButton retry(_("Retry"));
+      dia.addButton(ok);
+      dia.addButton(retry);
+      dia.show();
+      dia.focus();
+      const otk::DialogButton &res = dia.run();
+      if (res == retry) {
+        doretry = true;
+        python_destroy(); // kill all the python modules so they reinit right
+      }
+    }
+  } while (pyerr && doretry);
+    
   for (it = _screens.begin(); it != end; ++it) {
+    (*it)->config().load(); // load the config as the scripts may change it
     (*it)->manageExisting();
   }
   
   // grab any keys set up before the screens existed
-  _bindings->grabKeys(true);
+  //_bindings->grabKeys(true);
 
   // set up input focus
   setFocusedClient(0);
   
   _state = State_Normal; // done starting
-
-  if (pyerr) {
-    std::string msg;
-    msg += _("An error occured while executing the python scripts.");
-    msg += "\n\n";
-    msg += _("See the exact error message in Openbox's output for details.");
-    otk::MessageDialog dia(this, _("Python Error"), msg);
-    dia.addButton(otk::DialogButton("OK", true));
-    dia.show();
-    dia.focus();
-    dia.run();
-  }
 }
 
 

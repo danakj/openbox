@@ -123,7 +123,8 @@ numbers begin at 1.
 .SS sendToNextWorkspace
 .SS sendToPrevWorkspace
 Sends the currently focused window to the next/previous workspace. Takes 
-boolean parameter that when true switches to that workspace as well.
+boolean parameter that when true switches to that workspace as well. If none is
+specified a value of false is assumed.
 .SS nextWindow
 .SS prevWindow
 Cycles focus to the next/previous window on the workspace. This can take a

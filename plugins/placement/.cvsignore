@@ -1,7 +1,6 @@
 placement.la
-placement.lo
-history.lo
 .libs
-Makefile.in
 .deps
-Makefile
+.dirstamp
+plugins_placement_placement_la-history.lo
+plugins_placement_placement_la-placement.lo

@@ -1,7 +1,2 @@
-resistance.la
 .libs
-resistance.lo
-Makefile.in
 .deps
-resistance_la-resistance.lo
-Makefile

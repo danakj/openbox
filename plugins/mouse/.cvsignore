@@ -1,8 +1,6 @@
-mouse.lo
 mouse.la
-translate.lo
-mouseparse.lo
 .libs
-Makefile.in
 .deps
-Makefile
+.dirstamp
+plugins_mouse_mouse_la-mouse.lo
+plugins_mouse_mouse_la-translate.lo

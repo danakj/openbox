@@ -1,6 +1,5 @@
 .deps
 .libs
-Makefile
-Makefile.in
 libobparser.la
-parse.lo
+.dirstamp
+parser_libobparser_la-parse.lo

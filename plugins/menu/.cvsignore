@@ -1,10 +1,9 @@
 .deps
 .libs
-Makefile
-Makefile.in
 timed_menu.la
-timed_menu.lo
 fifo_menu.la
-fifo_menu.lo
 client_menu.la
-client_menu.lo
+.dirstamp
+plugins_menu_client_menu_la-client_menu.lo
+plugins_menu_fifo_menu_la-fifo_menu.lo
+plugins_menu_timed_menu_la-timed_menu.lo

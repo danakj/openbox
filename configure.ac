@@ -12,6 +12,7 @@ test "$SED" || AC_MSG_ERROR([sed not found])
 # Determine build target
 OB_DEBUG
 # Pick compiler specific/build target flags, and set $CVS
+AM_PROG_CC_C_O
 OB_COMPILER_FLAGS
 AC_C_CONST
 AC_C_INLINE
@@ -99,25 +100,11 @@ X11_EXT_VIDMODE
 X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
-AC_CONFIG_FILES([Makefile
-                 m4/Makefile
-                 po/Makefile.in
-                 themes/Makefile
-                 themes/ebox_data/Makefile
-                 themes/fieron_data/Makefile
-                 themes/fieron2_data/Makefile
-		 data/Makefile
-                 render/Makefile
-		 parser/Makefile
-                 kernel/Makefile
-		 plugins/Makefile
-		 plugins/resistance/Makefile
-		 plugins/placement/Makefile
-		 plugins/mouse/Makefile
-		 plugins/keyboard/Makefile
-		 plugins/menu/Makefile
-		 tools/Makefile
-		 tools/obconf/Makefile])
+AC_CONFIG_FILES([
+  Makefile
+  m4/Makefile
+  po/Makefile.in
+])
 AC_OUTPUT
 
 AC_MSG_RESULT

@@ -1,10 +1,7 @@
-keyboard.lo
 keyboard.la
-tree.lo
-translate.lo
-keyaction.lo
 .libs
-keyparse.lo
-Makefile.in
 .deps
-Makefile
+.dirstamp
+plugins_keyboard_keyboard_la-keyboard.lo
+plugins_keyboard_keyboard_la-translate.lo
+plugins_keyboard_keyboard_la-tree.lo

@@ -4,12 +4,12 @@ MAINTAINERCLEANFILES = Makefile.in
 
 EXTRA_DIST = README.menu menu.in
 
-pkgdata_DATA = menu
+data_DATA = menu
 
 distclean-local:
 	$(RM) *\~ .\#*
 
-menu: menu.in
+menu: $(srcdir)/menu.in
 	$(SED) -e "s!@pkgdatadir@!$(pkgdatadir)!" $< > $@
 
 uninstall-am:

@@ -847,6 +847,7 @@ XFontSet BScreen::createFontSet(const char *fontname) {
   return fs;
 }
 
+
 void BScreen::setSloppyFocus(bool b) {
   resource.sloppy_focus = b;
   ostrstream s;
@@ -857,6 +858,7 @@ void BScreen::setSloppyFocus(bool b) {
                   : "ClickToFocus"));
   s.rdbuf()->freeze(0);
 }
+
 
 void BScreen::setAutoRaise(bool a) {
   resource.auto_raise = a;
@@ -869,6 +871,7 @@ void BScreen::setAutoRaise(bool a) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setImageDither(bool d) {
   resource.image_dither = d;
   ostrstream s;
@@ -876,6 +879,7 @@ void BScreen::setImageDither(bool d) {
   config.setValue(s.str(), resource.image_dither);
   s.rdbuf()->freeze(0);
 }
+
 
 void BScreen::setOpaqueMove(bool o) {
   resource.opaque_move = o;
@@ -885,6 +889,7 @@ void BScreen::setOpaqueMove(bool o) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setFullMax(bool f) {
   resource.full_max = f;
   ostrstream s;
@@ -892,6 +897,7 @@ void BScreen::setFullMax(bool f) {
   config.setValue(s.str(), resource.full_max);
   s.rdbuf()->freeze(0);
 }
+
 
 void BScreen::setFocusNew(bool f) {
   resource.focus_new = f;
@@ -901,6 +907,7 @@ void BScreen::setFocusNew(bool f) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setFocusLast(bool f) {
   resource.focus_last = f;
   ostrstream s;
@@ -908,6 +915,7 @@ void BScreen::setFocusLast(bool f) {
   config.setValue(s.str(), resource.focus_last);
   s.rdbuf()->freeze(0);
 }
+
 
 void BScreen::setWindowZones(int z) {
   resource.zones = z;
@@ -917,6 +925,7 @@ void BScreen::setWindowZones(int z) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setWorkspaceCount(int w) {
   resource.workspaces = w;
   ostrstream s;
@@ -924,6 +933,7 @@ void BScreen::setWorkspaceCount(int w) {
   config.setValue(s.str(), resource.workspaces);
   s.rdbuf()->freeze(0);
 }
+
 
 void BScreen::setPlacementPolicy(int p) {
   resource.placement_policy = p;
@@ -941,6 +951,7 @@ void BScreen::setPlacementPolicy(int p) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setEdgeSnapThreshold(int t) {
   resource.edge_snap_threshold = t;
   ostrstream s;
@@ -948,6 +959,7 @@ void BScreen::setEdgeSnapThreshold(int t) {
   config.setValue(s.str(), resource.edge_snap_threshold);
   s.rdbuf()->freeze(0);
 }
+
 
 void BScreen::setRowPlacementDirection(int d) {
   resource.row_direction = d;
@@ -960,6 +972,7 @@ void BScreen::setRowPlacementDirection(int d) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setColPlacementDirection(int d) {
   resource.col_direction = d;
   ostrstream s;
@@ -971,6 +984,7 @@ void BScreen::setColPlacementDirection(int d) {
   s.rdbuf()->freeze(0);
 }
 
+
 void BScreen::setRootCommand(const char *cmd) {
 if (resource.root_command != NULL)
     delete [] resource.root_command;
@@ -980,8 +994,10 @@ if (resource.root_command != NULL)
     resource.root_command = NULL;
   // this doesn't save to the Resources config because it can't be changed
   // inside Openbox, and this way we dont add an empty command which would over-
-  // ride the styles commend when none has been specified
+  // ride the styles command when none has been specified
 }
+
+
 #ifdef    HAVE_STRFTIME
 void BScreen::setStrftimeFormat(const char *f) {
   if (resource.strftime_format != NULL)

@@ -4,7 +4,7 @@ CPPFLAGS= @CPPFLAGS@ @DEBUG@
 
 bin_PROGRAMS =		epist
 
-epist_SOURCES =		epist.cc process.cc window.cc screen.cc main.cc
+epist_SOURCES =		epist.cc window.cc screen.cc main.cc
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
 					../../src/Util.o ../../src/i18n.o \
 					../../src/GCCache.o ../../src/Color.o ../../src/Texture.o \

@@ -51,7 +51,6 @@ using std::endl;
 using std::string;
 
 #include "epist.hh"
-#include "process.hh"
 #include "screen.hh"
 #include "window.hh"
 #include "../../src/XAtom.hh"

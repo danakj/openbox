@@ -36,28 +36,46 @@ void stacking_set_list()
 	g_free(windows);
 }
 
+static GList *find_lowest_transient(Client *c)
+{
+    GList *it;
+    GSList *sit;
+
+    for (it = g_list_last(stacking_list); it; it = it->prev)
+        for (sit = c->transients; sit; sit = sit->next)
+            if (it->data == sit->data) /* found a transient */
+                if (((Client*)it->data)->layer == c->layer) /* same layer? */
+                    return it;
+    return NULL;
+}
+
 void stacking_raise(Client *client)
 {
     Window wins[2];  /* only ever restack 2 windows. */
     GList *it;
-    Client *m;
+    GSList *sit;
 
     g_assert(stacking_list != NULL); /* this would be bad */
 
-    m = client_find_modal_child(client);
-    /* if we have a modal child, raise it instead, we'll go along tho later */
-    if (m) stacking_raise(m);
-  
+    /* if we have a transients raise them */
+    for (sit = client->transients; sit; sit = sit->next)
+        stacking_raise(sit->data);
+
     /* remove the client before looking so we can't run into ourselves */
     stacking_list = g_list_remove(stacking_list, client);
   
-    /* the stacking list is from highest to lowest */
-    it = stacking_list;
-    while (it != NULL) {
-	Client *c = it->data;
-	if (client->layer >= c->layer && m != c)
-	    break;
-	it = it->next;
+    /* find 'it' where it is the positiion in the stacking order where
+       'client' will be inserted *after* */
+
+    it = find_lowest_transient(client);
+    if (it) {
+        it = it->next;
+    } else {
+        /* the stacking list is from highest to lowest */
+        for (it = stacking_list; it; it = it->next) {
+            if (client->layer >= ((Client*)it->data)->layer)
+                break;
+        }
     }
 
     /*
@@ -79,64 +97,67 @@ void stacking_raise(Client *client)
     stacking_set_list();
 }
 
-void stacking_lower(Client *client)
+static void lower_recursive(Client *client, Client *above)
 {
     Window wins[2];  /* only ever restack 2 windows. */
     GList *it;
+    GSList *sit;
 
-    g_assert(stacking_list != NULL); /* this would be bad */
+    it = g_list_last(stacking_list);
 
-    if (client->modal && client->transient_for) {
-        if (client->transient_for == TRAN_GROUP) {
-            /* don't let a modal of the group lower below any other windows
-               in the group */
-            for (it = stacking_list; it; it = it->next) {
-                GSList *sit;
-                Client *c = it->data;
+    /* find 'it' where 'it' is the position in the stacking_list where the
+       'client' will be placed *after* */
 
-                if (it->data == client) continue;
-
-                for (sit = c->group->members; sit; sit = sit->next)
-                    if (sit->data == it->data) break;
-                if (sit) break; /* got it */
-            }
-            if (it == NULL)
-                goto lower_no_parent;
-        } else {
-            /* don't let a modal window lower below its transient_for */
-            it = g_list_find(stacking_list, client->transient_for);
-        }
-        g_assert(it != NULL);
-
-	wins[0] = (it == stacking_list ? focus_backup :
-		   ((Client*)it->prev->data)->frame->window);
-	wins[1] = client->frame->window;
-	if (wins[0] == wins[1]) return; /* already right above the window */
-
-	stacking_list = g_list_remove(stacking_list, client);
-	stacking_list = g_list_insert_before(stacking_list, it, client);
-    } else {
-    lower_no_parent:
-
-        it = g_list_last(stacking_list);
-
-	while (it != stacking_list) {
-	    Client *c = it->data;
-	    if (client->layer <= c->layer)
-		break;
-	    it = it->prev;
-	}
-	if (it->data == client) return; /* already the bottom, return */
-
-	wins[0] = ((Client*)it->data)->frame->window;
-	wins[1] = client->frame->window;
-
-	stacking_list = g_list_remove(stacking_list, client);
-	stacking_list = g_list_insert_before(stacking_list,
-					     it->next, client);
+    while (it != stacking_list) {
+        Client *c = it->data;
+        if (client->layer <= c->layer && c != above)
+            break;
+        it = it->prev;
     }
 
-    XRestackWindows(ob_display, wins, 2);
-    stacking_set_list();
+    if (it->data != client) { /* not already the bottom */
+        wins[0] = ((Client*)it->data)->frame->window;
+        wins[1] = client->frame->window;
+
+        stacking_list = g_list_remove(stacking_list, client);
+        stacking_list = g_list_insert_before(stacking_list,
+                                         it->next, client);
+        XRestackWindows(ob_display, wins, 2);
+    }
+
+    for (sit = client->transients; sit; sit = sit->next)
+        lower_recursive(sit->data, client);
+
+    if (!above) /* only need to do this once */
+        stacking_set_list();
+}
+
+void stacking_lower(Client *client)
+{
+    g_assert(stacking_list != NULL); /* this would be bad */
+
+    /* move up the transient chain as far as possible first */
+    while (client->transient_for) {
+        if (client->transient_for != TRAN_GROUP) {
+            client = client->transient_for;
+        } else {
+            GSList *it;
+
+            /* the check for TRAN_GROUP is to prevent an infinate loop with
+               2 transients of the same group at the head of the group's
+               members list */
+            for (it = client->group->members; it; it = it->next) {
+                Client *c = it->data;
+
+                if (c != client && c->transient_for != TRAN_GROUP) {
+                    client = it->data;
+                    break;
+                }
+            }
+            if (it == NULL) break;
+        }
+    }
+
+    lower_recursive(client, NULL);
 }
 

@@ -29,7 +29,7 @@ PseudoRenderControl::PseudoRenderControl(int screen)
   _cpc = 4; // XXX THIS SHOULD BE A USER OPTION
   _ncolors = _cpc * _cpc * _cpc;
 
-  if (_cpc < 2 || ncolors > 1 << depth) {
+  if (_cpc < 2 || _ncolors > 1 << depth) {
     fprintf(stderr,
             _("PseudoRenderControl: Invalid colormap size. Using maximum size
 available.\n"));

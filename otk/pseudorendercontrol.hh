@@ -17,10 +17,9 @@ private:
 
   int _cpc; // colors-per-channel: must be a value between [2,6]
   int _bpp; // bits-per-pixel
+  int _ncolors; // number of allocated colors, size of the XColor array
 
-  // These are only used for !TrueColor visuals
   XColor *_colors;
-  int _ncolors;
   
   virtual void reduceDepth(Surface &sf, XImage *im) const;
   

@@ -66,7 +66,7 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
 //    printf("painting window %ld\n", win);
 
     oldp = l->pixmap; /* save to free after changing the visible pixmap */
-    l->pixmap = XCreatePixmap(ob_display, ob_root, w, h, render_depth);
+    l->pixmap = XCreatePixmap(ob_display, ob_root, x+w, y+h, render_depth);
     g_assert(l->pixmap != None);
 
     if (l->xftdraw != NULL)

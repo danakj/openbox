@@ -15,7 +15,7 @@ cycle_raise = 1                                                         ###
 avoid_skip_taskbar = 1                                                  ###
 # stacked_cycle_raise - raise as you cycle in stacked mode              ###
 stacked_cycle_raise = 0                                                 ###
-# stacked_cycle_popup_list - show a pop-up list of windows while
+# stacked_cycle_popup_list - show a pop-up list of windows while        ###
 ###                          cycling                                    ###
 stacked_cycle_popup_list = 1                                            ###
 # send focus somewhere when nothing is left with the focus, if possible ###

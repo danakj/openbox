@@ -392,7 +392,8 @@ void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
 {
     ObMenu *m;
 
-    if (button > 3) return;
+    /* ignore wheel scrolling */
+    if (button == 4 || button == 5) return;
 
     if (self->action) {
         self->action->data.any.c = self->parent->client;

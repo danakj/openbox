@@ -22,7 +22,7 @@ AC_LANG(C++)
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
-  CXXFLAGS="$CXXFLAGS -Wall -W -pedantic"
+  CXXFLAGS="$CXXFLAGS -Wall -W"# -pedantic"
 else
   AC_MSG_RESULT([no, trying other compilers])
   AC_MSG_CHECKING(for MIPSpro)

@@ -37,7 +37,7 @@ static int anotherWMRunning(Display *display, XErrorEvent *) {
 namespace ob {
 
 
-OBScreen::OBScreen(int screen, const otk::Configuration &config)
+OBScreen::OBScreen(int screen)
   : _number(screen),
     _root(screen)
 {
@@ -74,8 +74,18 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
 
   // initialize the screen's style
   _style.setImageControl(_image_control);
-  _style.load(config);
-
+  std::string stylepath;
+  Openbox::instance->getConfigString("theme", &stylepath);
+  otk::Configuration sconfig(false);
+  sconfig.setFile(otk::expandTilde(stylepath));
+  if (!sconfig.load()) {
+    sconfig.setFile(otk::expandTilde(DEFAULTSTYLE));
+    if (!sconfig.load()) {
+      printf(_("Unable to load default style: %s. Aborting.\n"), DEFAULTSTYLE);
+      ::exit(1);
+    }
+  }
+  _style.load(sconfig);
   
   // Set the netwm atoms for geomtery and viewport
   unsigned long geometry[] = { _info->width(),
@@ -320,14 +330,6 @@ void OBScreen::setWorkArea() {
     xatom->set(getRootWindow(), otk::OBProperty::net_workarea,
                otk::OBProperty::Atom_Cardinal, 0, 0);
   */
-}
-
-
-void OBScreen::loadStyle(const otk::Configuration &config)
-{
-  _style.load(config);
-
-  // XXX: make stuff redraw!
 }
 
 

@@ -56,15 +56,51 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _plate.show(); // the other stuff is shown based on decor settings
   
   grabClient();
+
+  grabButtons(true);
 }
 
 
 OBFrame::~OBFrame()
 {
+  grabButtons(false);
   releaseClient(false);
 }
 
 
+void OBFrame::grabButtons(bool grab)
+{
+  if (grab) {
+    // grab simple button clicks on the client, but pass them through too
+    otk::OBDisplay::grabButton(Button1, 0, _plate.window(), true,
+                               ButtonPressMask, GrabModeSync, GrabModeSync,
+                               _plate.window(), None, false);
+    otk::OBDisplay::grabButton(Button2, 0, _plate.window(), true,
+                               ButtonPressMask, GrabModeSync, GrabModeSync,
+                               _plate.window(), None, false);
+    otk::OBDisplay::grabButton(Button3, 0, _plate.window(), true,
+                               ButtonPressMask, GrabModeSync, GrabModeSync,
+                               _plate.window(), None, false);
+    otk::OBDisplay::grabButton(Button4, 0, _plate.window(), true,
+                               ButtonPressMask, GrabModeSync, GrabModeSync,
+                               _plate.window(), None, false);
+    otk::OBDisplay::grabButton(Button5, 0, _plate.window(), true,
+                               ButtonPressMask, GrabModeSync, GrabModeSync,
+                               _plate.window(), None, false);
+  } else {
+  }
+
+  // grab any requested buttons on the entire frame
+  if (grab) {
+  
+    otk::OBDisplay::grabButton(Button1, 0, _plate.window(), true,
+                               ButtonPressMask, GrabModeSync, GrabModeSync,
+                               _plate.window(), None, false);
+  } else {
+  }
+}
+
+  
 void OBFrame::setTitle(const std::string &text)
 {
   _label.setText(text);

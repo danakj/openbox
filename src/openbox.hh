@@ -137,9 +137,6 @@ private:
   //! When set to true, the Openbox::eventLoop function will stop and return
   bool _doshutdown;
 
-  //! The configuration of the application. TEMPORARY
-  otk::Configuration _config;
-
   //! The client with input focus
   /*!
     Updated by the clients themselves.
@@ -244,6 +241,8 @@ public:
     manager can be destroyed.
   */
   inline void shutdown() { _doshutdown = true; }
+
+  bool getConfigString(const char *name, std::string *value);
 };
 
 }

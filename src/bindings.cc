@@ -134,8 +134,13 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
 
 
 OBBindings::OBBindings()
-  : _curpos(&_tree), _resetkey(0,0)
+  : _curpos(&_tree),
+    _resetkey(0,0),
+    _timer(Openbox::instance->timerManager(),
+           (otk::OBTimeoutHandler)reset, this)
 {
+  _timer.setTimeout(5000); // chains reset after 5 seconds
+  
   setResetKey("C-g"); // set the default reset key
 }
 
@@ -299,10 +304,11 @@ void OBBindings::grabKeys(bool grab)
 
     BindingTree *p = _curpos->first_child;
     while (p) {
-      if (grab)
+      if (grab) {
         otk::OBDisplay::grabKey(p->binding.key, p->binding.modifiers,
                                 root, false, GrabModeAsync, GrabModeAsync,
                                 false);
+      }
       else
         otk::OBDisplay::ungrabKey(p->binding.key, p->binding.modifiers,
                                   root);
@@ -324,28 +330,33 @@ void OBBindings::fire(Window window, unsigned int modifiers, unsigned int key,
                       Time time)
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
-    grabKeys(false);
-    _curpos = &_tree;
-    grabKeys(true);
+    reset(this);
   } else {
     BindingTree *p = _curpos->first_child;
     while (p) {
       if (p->binding.key == key && p->binding.modifiers == modifiers) {
         if (p->chain) {
+          _timer.start(); // start/restart the timer
           grabKeys(false);
           _curpos = p;
           grabKeys(true);
         } else {
           python_callback_binding(p->id, window, modifiers, key, time);
-          grabKeys(false);
-          _curpos = &_tree;
-          grabKeys(true);
+          reset(this);
         }
         break;
       }
       p = p->next_sibling;
     }
   }
+}
+
+void OBBindings::reset(OBBindings *self)
+{
+  self->_timer.stop();
+  self->grabKeys(false);
+  self->_curpos = &self->_tree;
+  self->grabKeys(true);
 }
 
 }

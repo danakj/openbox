@@ -100,7 +100,7 @@ private:
 public:
 #ifndef SWIG
   //! Constructs a new OBScreen object
-  OBScreen(int screen, const otk::Configuration &config);
+  OBScreen(int screen);
   //! Destroys the OBScreen object
   virtual ~OBScreen();
 #endif
@@ -124,9 +124,6 @@ public:
   void addStrut(otk::Strut *strut);
   //! Removes a window's strut from the screen's list of reserved spaces
   void removeStrut(otk::Strut *strut);
-
-  //! Loads a new style on the screen
-  void loadStyle(const otk::Configuration &config);
 
   //! Manage any pre-existing windows on the screen
   void manageExisting();

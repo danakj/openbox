@@ -10,6 +10,7 @@
 #include "screen.hh"
 #include "actions.hh"
 #include "bindings.hh"
+#include "python.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -42,13 +43,6 @@ extern "C" {
 #ifdef    HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #endif // HAVE_SYS_SELECT_H
-
-#include <Python.h>
-  
-// The initializer in openbox_wrap.cc
-extern void init_openbox(void);
-// The initializer in otk_wrap.cc
-extern void init_otk(void);
 
 #include "gettext.h"
 #define _(str) gettext(str)
@@ -83,17 +77,6 @@ void Openbox::signalHandler(int signal)
 }
 
 
-static void runPython(const char *s) {
-  FILE *rcpyfd = fopen(s, "r");
-  if (!rcpyfd) {
-    printf("failed to load python file %s\n", s);
-  } else {
-    PyRun_SimpleFile(rcpyfd, const_cast<char*>(s));
-    fclose(rcpyfd);
-  }
-}
-
-
 Openbox::Openbox(int argc, char **argv)
   : otk::OtkEventDispatcher(),
     otk::OtkEventHandler()
@@ -113,20 +96,6 @@ Openbox::Openbox(int argc, char **argv)
   _sync = false;
 
   parseCommandLine(argc, argv);
-
-  // TEMPORARY: using the xrdb rc3
-  _config.setFile(_rcfilepath);
-  if (!_config.load()) {
-    printf("failed to load rc file %s\n", _config.file().c_str());
-    ::exit(2);
-  }
-  std::string s;
-  _config.getValue("session.styleFile", s);
-  _config.setFile(s);
-  if (!_config.load()) {
-    printf("failed to load style %s\n", _config.file().c_str());
-    ::exit(2);
-  }
 
   // open the X display (and gets some info about it, and its screens)
   otk::OBDisplay::initialize(_displayreq);
@@ -159,9 +128,13 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
+  // start up python and load config values
+  python_init(argv[0]);
+  python_exec(SCRIPTDIR"/config.py"); // load openbox config values
+
   // initialize all the screens
   OBScreen *screen;
-  screen = new OBScreen(0, _config);
+  screen = new OBScreen(0);
   if (screen->managed()) {
     _screens.push_back(screen);
     // XXX: "change to" the first workspace on the screen to initialize stuff
@@ -173,21 +146,16 @@ Openbox::Openbox(int argc, char **argv)
     ::exit(1);
   }
 
-  // start up python and run the user's startup script
-  Py_SetProgramName(argv[0]);
-  Py_Initialize();
-  init_otk();
-  init_openbox();
-  PyRun_SimpleString("from _otk import *; from _openbox import *;");
-
-  runPython(SCRIPTDIR"/globals.py"); // create/set global vars
-  runPython(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
-  runPython(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
-  runPython(_scriptfilepath.c_str());
+  // run all of the python scripts, including the user's
+  python_exec(SCRIPTDIR"/globals.py"); // create/set global vars
+  python_exec(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
+  python_exec(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
+  python_exec(_scriptfilepath.c_str());
 
   ScreenList::iterator it, end = _screens.end();
-  for (it = _screens.begin(); it != end; ++it)
+  for (it = _screens.begin(); it != end; ++it) {
     (*it)->manageExisting();
+  }
  
   // grab any keys set up before the screens existed
   _bindings->grabKeys(true);
@@ -355,6 +323,11 @@ void Openbox::setFocusedClient(OBClient *c)
     XSetInputFocus(otk::OBDisplay::display, _focused_screen->focuswindow(),
                    RevertToNone, CurrentTime);
   }
+}
+
+
+bool Openbox::getConfigString(const char *name, std::string *value) {
+  return python_get_string(name, value);
 }
 
 }

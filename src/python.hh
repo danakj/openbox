@@ -14,7 +14,13 @@ extern "C" {
 #include <Python.h>
 }
 
+#include <string>
+
 namespace ob {
+
+void python_init(char *argv0);
+bool python_exec(const char *file);
+bool python_get_string(const char *name, std::string *value);
 
 //! Add a python callback funtion to the back of the hook list
 /*!

@@ -7,6 +7,7 @@
 */
 
 #include "actions.hh"
+#include "otk/timer.hh"
 
 #include <string>
 #include <vector>
@@ -53,11 +54,15 @@ private:
   BindingTree *_curpos; // position in the keytree
 
   Binding _resetkey; // the key which resets the key chain status
+
+  otk::OBTimer _timer;
   
   int find(BindingTree *search) const;
   bool translate(const std::string &str, Binding &b) const;
   BindingTree *buildtree(const StringVect &keylist, int id) const;
   void assimilate(BindingTree *node);
+
+  static void reset(OBBindings *self);
 
 public:
   //! Initializes an OBBinding object

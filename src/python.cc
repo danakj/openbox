@@ -7,12 +7,57 @@
 #include <vector>
 #include <algorithm>
 
+extern "C" {
+#include <Python.h>
+  
+// The initializer in openbox_wrap.cc
+extern void init_openbox(void);
+// The initializer in otk_wrap.cc
+extern void init_otk(void);
+}
+
 namespace ob {
 
 typedef std::vector<PyObject*> FunctionList;
 
 static FunctionList callbacks[OBActions::NUM_ACTIONS];
 static FunctionList bindfuncs;
+
+static PyObject *obdict;
+
+void python_init(char *argv0)
+{
+  Py_SetProgramName(argv0);
+  Py_Initialize();
+  init_otk();
+  init_openbox();
+  PyRun_SimpleString("from _otk import *; from _openbox import *;");
+
+  // set up access to the python global variables
+  PyObject *obmodule = PyImport_AddModule("__main__");
+  obdict = PyModule_GetDict(obmodule);
+}
+
+bool python_exec(const char *file) {
+  FILE *rcpyfd = fopen(file, "r");
+  if (!rcpyfd) {
+    printf("failed to load python file %s\n", file);
+    return false;
+  }
+  PyRun_SimpleFile(rcpyfd, const_cast<char*>(file));
+  fclose(rcpyfd);
+  return true;
+}
+
+bool python_get_string(const char *name, std::string *value)
+{
+  PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
+  if (!val) return false;
+  
+  *value = PyString_AsString(val);
+  return true;
+}
+
 
 bool python_register(int action, PyObject *callback)
 {

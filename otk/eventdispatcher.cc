@@ -34,11 +34,32 @@ void EventDispatcher::clearHandler(Window id)
   _map.erase(id);
 }
 
-void EventDispatcher::dispatchEvents(void)
+void EventDispatcher::dispatchEvents(bool remote)
 {
   XEvent e;
 
-  while (XPending(**display)) {
+  while (true) {
+    /*
+      There are slightly different event retrieval semantics here for local (or
+      high bandwidth) versus remote (or low bandwidth) connections to the
+      display/Xserver.
+    */
+    if (remote) {
+      if (!XPending(**display))
+        return;
+    } else {
+      /*
+        This XSync allows for far more compression of events, which makes
+        things like Motion events perform far far better. Since it also means
+        network traffic for every event instead of every X events (where X is
+        the number retrieved at a time), it probably should not be used for
+        setups where Openbox is running on a remote/low bandwidth
+        display/Xserver.
+      */
+      XSync(**display, false);
+      if (!XEventsQueued(**display, QueuedAlready))
+        return;
+    }
     XNextEvent(**display, &e);
 
 #if 0//defined(DEBUG)

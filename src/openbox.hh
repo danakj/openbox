@@ -94,6 +94,8 @@ private:
   bool _sync;
   //! Should Openbox run on a single screen or on all available screens?
   bool _single;
+  //! Optimize for a remote/low-bandwidth connection to the display?
+  bool _remote;
 
   //! A list of all managed clients
   ClientMap _clients;

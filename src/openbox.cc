@@ -95,6 +95,7 @@ Openbox::Openbox(int argc, char **argv)
   _focused_client = 0;
   _sync = false;
   _single = false;
+  _remote = false;
 
   parseCommandLine(argc, argv);
 
@@ -274,6 +275,8 @@ void Openbox::parseCommandLine(int argc, char **argv)
       _sync = true;
     } else if (arg == "-single") {
       _single = true;
+    } else if (arg == "-remote") {
+      _remote = true;
     } else if (arg == "-version") {
       showVersion();
       ::exit(0);
@@ -305,7 +308,8 @@ void Openbox::showHelp()
   // print program usage and command line options
   printf(_("Usage: %s [OPTIONS...]\n\
   Options:\n\
-  -display <string>  use display connection.\n\
+  -remote            optimize for a remote (low bandwidth) connection to the\n\
+                     display/Xserver.\n\
   -single            run on a single screen (default is to run every one).\n\
   -rc <string>       use alternate resource file.\n\
   -menu <string>     use alternate menu file.\n\
@@ -349,8 +353,10 @@ void Openbox::showHelp()
 void Openbox::eventLoop()
 {
   while (true) {
-    dispatchEvents(); // from otk::EventDispatcher
-    XFlush(**otk::display); // flush here before we go wait for timers
+    dispatchEvents(false); // from otk::EventDispatcher
+//    XFlush(**otk::display); // flush here before we go wait for timers
+                              // .. the XPending() should have done this last
+                              // already, it does a flush when it returns 0
     // don't wait if we're to shutdown
     if (_shutdown) break;
     otk::Timer::dispatchTimers(!_sync); // wait if not in sync mode

@@ -19,7 +19,17 @@ public:
   virtual void clearAllHandlers(void);
   virtual void registerHandler(Window id, EventHandler *handler);
   virtual void clearHandler(Window id);
-  virtual void dispatchEvents(void);
+  //! Dispatch events from the X server to the appropriate EventHandlers
+  /*!
+    @param remote Is the Xserver on a remote (low bandwidth) connection or on a
+                  local (high bandwidth) connection. This allows you to specify
+                  'false' in which case slightly different semantics are used
+                  for event retrieval.<br>
+                  The default is 'true' since this should generally be used,
+                  only the Openbox window manager should need to specify
+                  'false' here.
+  */
+  virtual void dispatchEvents(bool remote = true);
 
   inline void setFallbackHandler(EventHandler *fallback)
   { _fallback = fallback; }

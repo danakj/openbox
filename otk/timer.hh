@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
-#ifndef   _BLACKBOX_Timer_hh
-#define   _BLACKBOX_Timer_hh
+#ifndef   __timer_hh
+#define   __timer_hh
 
 extern "C" {
 #ifdef    TIME_WITH_SYS_TIME
@@ -15,16 +15,17 @@ extern "C" {
 #endif // TIME_WITH_SYS_TIME
 }
 
-#include <queue>
-#include <algorithm>
-#include <vector>
-
 namespace otk {
 
-// forward declaration
 class OBTimerQueueManager;
 
+//! The data passed to the OBTimeoutHandler function.
+/*!
+  Note: this is a very useful place to put an object instance, and set the
+  event handler to a static function in the same class.
+*/
 typedef void *OBTimeoutData;
+//! The type of function which can be set as the callback for an OBTimer firing
 typedef void (*OBTimeoutHandler)(OBTimeoutData);
 
 class OBTimer {
@@ -68,74 +69,6 @@ public:
   { return shouldFire(other.endpoint()); }
 };
 
-
-template <class _Tp, class _Sequence, class _Compare>
-class _timer_queue: protected std::priority_queue<_Tp, _Sequence, _Compare> {
-public:
-  typedef std::priority_queue<_Tp, _Sequence, _Compare> _Base;
-
-  _timer_queue(): _Base() {}
-  ~_timer_queue() {}
-
-  void release(const _Tp& value) {
-    c.erase(std::remove(c.begin(), c.end(), value), c.end());
-    // after removing the item we need to make the heap again
-    std::make_heap(c.begin(), c.end(), comp);
-  }
-  bool empty() const { return _Base::empty(); }
-  size_t size() const { return _Base::size(); }
-  void push(const _Tp& value) { _Base::push(value); }
-  void pop() { _Base::pop(); }
-  const _Tp& top() const { return _Base::top(); }
-private:
-  // no copying!
-  _timer_queue(const _timer_queue&) {}
-  _timer_queue& operator=(const _timer_queue&) {}
-};
-
-struct TimerLessThan {
-  bool operator()(const OBTimer* const l, const OBTimer* const r) const {
-    return *r < *l;
-  }
-};
-
-typedef _timer_queue<OBTimer*,
-                     std::vector<OBTimer*>, TimerLessThan> TimerQueue;
-
-//! Manages a queue of OBTimer objects
-/*!
-  All OBTimer objects add themself to an OBTimerQueueManager. The manager is
-  what fires the timers when their time has elapsed. This is done by having the
-  application call the OBTimerQueueManager::fire class in its main event loop.
-*/
-class OBTimerQueueManager {
-private:
-  //! A priority queue of all timers being managed by this class.
-  TimerQueue timerList;
-public:
-  //! Constructs a new OBTimerQueueManager
-  OBTimerQueueManager() {}
-  //! Destroys the OBTimerQueueManager
-  virtual ~OBTimerQueueManager() {}
-
-  //! Will wait for and fire the next timer in the queue.
-  /*!
-    The function will stop waiting if an event is received from the X server.
-  */
-  virtual void fire();
-
-  //! Adds a new timer to the queue
-  /*!
-    @param timer An OBTimer to add to the queue
-  */
-  virtual void addTimer(OBTimer* timer);
-  //! Removes a timer from the queue
-  /*!
-    @param timer An OBTimer already in the queue to remove
-  */
-  virtual void removeTimer(OBTimer* timer);
-};
-
 }
 
-#endif // _BLACKBOX_Timer_hh
+#endif // __timer_hh

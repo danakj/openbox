@@ -35,6 +35,12 @@ public:
   inline Rect(const Point &location, const Point &size)
     : _x1(location.x()), _y1(location.y()),
       _x2(size.x() + location.x() - 1), _y2(size.y() + location.y() - 1) { }
+  //! Constructs a Rect from another Rect
+  /*!
+    @param rect The rectangle from which to construct this new one
+  */
+  inline Rect(const Rect &rect)
+    : _x1(rect._x1), _y1(rect._y1), _x2(rect._x2), _y2(rect._y2) { }
   //! Constructs a Rect from an XRectangle
   inline explicit Rect(const XRectangle& xrect)
     : _x1(xrect.x), _y1(xrect.y), _x2(xrect.width + xrect.x - 1),

@@ -82,6 +82,17 @@ void Openbox::signalHandler(int signal)
 }
 
 
+static void runPython(const char *s) {
+  FILE *rcpyfd = fopen(s, "r");
+  if (!rcpyfd) {
+    printf("failed to load python file %s\n", s);
+  } else {
+    PyRun_SimpleFile(rcpyfd, const_cast<char*>(s));
+    fclose(rcpyfd);
+  }
+}
+
+
 Openbox::Openbox(int argc, char **argv)
   : otk::OtkEventDispatcher(),
     otk::OtkEventHandler()
@@ -150,13 +161,9 @@ Openbox::Openbox(int argc, char **argv)
   init_openbox();
   PyRun_SimpleString("from _otk import *; from _openbox import *;");
   PyRun_SimpleString("openbox = Openbox_instance()");
-  FILE *rcpyfd = fopen(_scriptfilepath.c_str(), "r");
-  if (!rcpyfd) {
-    printf("failed to load python file %s\n", _scriptfilepath.c_str());
-  } else {
-    PyRun_SimpleFile(rcpyfd, const_cast<char*>(_scriptfilepath.c_str()));
-    fclose(rcpyfd);
-  }
+
+  runPython(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
+  runPython(_scriptfilepath.c_str());
  
   // initialize all the screens
   OBScreen *screen;

@@ -20,7 +20,8 @@ bool python_unregister(int action, PyObject *callback);
 
 void python_callback(OBActions::ActionType action, Window window,
                      OBWidget::WidgetType type, unsigned int state,
-                     long d1 = 0, long d2 = 0);
+                     long d1 = LONG_MIN, long d2 = LONG_MIN,
+                     long d3 = LONG_MIN, long d4 = LONG_MIN);
 
 }
 

@@ -777,10 +777,27 @@ static std::string SwigString_AsString(PyObject* o) {
   enum ActionType {
     Action_ButtonPress,
     Action_ButtonRelease,
+    Action_Click,
+    Action_DoubleClick,
     Action_EnterWindow,
     Action_LeaveWindow,
     Action_KeyPress,
     Action_MouseMotion
+  };
+  enum WidgetType {
+    Type_Frame,
+    Type_Titlebar,
+    Type_Handle,
+    Type_Plate,
+    Type_Label,
+    Type_MaximizeButton,
+    Type_CloseButton,
+    Type_IconifyButton,
+    Type_StickyButton,
+    Type_LeftGrip,
+    Type_RightGrip,
+    Type_Client,
+    Type_Root
   };
 
 
@@ -2475,10 +2492,25 @@ _swigt__p_XUnmapEvent,
 static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Action_ButtonPress", (long) Action_ButtonPress, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_ButtonRelease", (long) Action_ButtonRelease, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Action_Click", (long) Action_Click, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Action_DoubleClick", (long) Action_DoubleClick, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_EnterWindow", (long) Action_EnterWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_LeaveWindow", (long) Action_LeaveWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_KeyPress", (long) Action_KeyPress, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_MouseMotion", (long) Action_MouseMotion, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Frame", (long) Type_Frame, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Titlebar", (long) Type_Titlebar, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Handle", (long) Type_Handle, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Plate", (long) Type_Plate, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Label", (long) Type_Label, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_MaximizeButton", (long) Type_MaximizeButton, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_CloseButton", (long) Type_CloseButton, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_IconifyButton", (long) Type_IconifyButton, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_StickyButton", (long) Type_StickyButton, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_LeftGrip", (long) Type_LeftGrip, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_RightGrip", (long) Type_RightGrip, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Client", (long) Type_Client, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Root", (long) Type_Root, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Starting", (long) ob::Openbox::State_Starting, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Normal", (long) ob::Openbox::State_Normal, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Exiting", (long) ob::Openbox::State_Exiting, 0, 0, 0},

@@ -23,9 +23,12 @@ namespace ob {
 */
 class OBActions : public otk::OtkEventHandler {
 public:
+  // update the same enum in openbox.i when making changes to this
   enum ActionType {
     Action_ButtonPress,
     Action_ButtonRelease,
+    Action_Click,
+    Action_DoubleClick,
     Action_EnterWindow,
     Action_LeaveWindow,
     Action_KeyPress,
@@ -40,35 +43,15 @@ public:
     ButtonReleaseAction() { win = 0; button = 0; time = 0; }
   };
 
-  struct ButtonPressAction {
-    unsigned int button;
-    otk::Point pos;
-    otk::Rect clientarea;
-    ButtonPressAction() { button = 0; }
-  };
-  
 private:
   // milliseconds XXX: config option
   static const unsigned int DOUBLECLICKDELAY;
-  static const int BUTTONS = 5;
   
   //! The mouse button currently being watched from a press for a CLICK
   unsigned int _button;
   //! The last button release processed for CLICKs
   ButtonReleaseAction _release;
-  //! The point where the mouse was when each mouse button was pressed
-  /*!
-    Used for motion events as the starting position.
-  */
-  ButtonPressAction *_posqueue[BUTTONS];
-  //! The delta x/y of the last motion sequence
-  int _dx, _dy;
 
-  //! Insert a button/position in the _posqueue
-  void insertPress(const XButtonEvent &e);
-  //! Remove a button/position from the _posqueue
-  void removePress(const XButtonEvent &e);
-  
 public:
   //! Constructs an OBActions object
   OBActions();

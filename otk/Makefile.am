@@ -27,7 +27,7 @@ otk.i: $(wildcard *.hh)
 	touch $@
 
 otk_wrap.cc: otk.i
-	swig $(filter -I%,$(CFLAGS)) -python -c++ -nodefault -o $@ $<
+	swig $(filter -I%,$(CFLAGS)) -python -c++ -o $@ $<
 
 # local dependencies
 application.o: application.cc application.hh eventdispatcher.hh \

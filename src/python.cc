@@ -55,14 +55,25 @@ bool python_unregister(int action, PyObject *callback)
 
 void python_callback(OBActions::ActionType action, Window window,
                      OBWidget::WidgetType type, unsigned int state,
-                     long d1, long d2)
+                     long d1, long d2, long d3, long d4)
 {
   PyObject *arglist;
   PyObject *result;
 
   assert(action >= 0 && action < OBActions::NUM_ACTIONS);
 
-  arglist = Py_BuildValue("iliill", action, window, type, state, d1, d2);
+  if (d4 != LONG_MIN)
+    arglist = Py_BuildValue("iliillll", action, window, type, state,
+                            d1, d2, d3, d4);
+  else if (d3 != LONG_MIN)
+    arglist = Py_BuildValue("iliilll", action, window, type, state,
+                            d1, d2, d3);
+  else if (d2 != LONG_MIN)
+    arglist = Py_BuildValue("iliill", action, window, type, state, d1, d2);
+  else if (d1 != LONG_MIN)
+    arglist = Py_BuildValue("iliil", action, window, type, state, d1);
+  else
+    arglist = Py_BuildValue("ilii", action, window, type, state);
 
   FunctionList::iterator it, end = callbacks[action].end();
   for (it = callbacks[action].begin(); it != end; ++it) {

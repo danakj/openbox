@@ -834,19 +834,19 @@ static void _SWIG_exception(int code, const char *msg) {
 
 #include <string>
 
-PyObject* SwigInt_FromBool(bool b) {
+static PyObject* SwigInt_FromBool(bool b) {
     return PyInt_FromLong(b ? 1L : 0L);
 }
-double SwigNumber_Check(PyObject* o) {
+static double SwigNumber_Check(PyObject* o) {
     return PyFloat_Check(o) || PyInt_Check(o);
 }
-double SwigNumber_AsDouble(PyObject* o) {
+static double SwigNumber_AsDouble(PyObject* o) {
     return (PyFloat_Check(o) ? PyFloat_AsDouble(o) : double(PyInt_AsLong(o)));
 }
-PyObject* SwigString_FromString(const std::string& s) {
+static PyObject* SwigString_FromString(const std::string& s) {
     return PyString_FromString(s.c_str());
 }
-std::string SwigString_AsString(PyObject* o) {
+static std::string SwigString_AsString(PyObject* o) {
     return std::string(PyString_AsString(o));
 }
 
@@ -3783,6 +3783,36 @@ static PyObject * OtkApplication_swigregister(PyObject *self, PyObject *args) {
     Py_INCREF(obj);
     return Py_BuildValue((char *)"");
 }
+static PyObject *_wrap_new_PointerAssassin(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::PointerAssassin *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":new_PointerAssassin")) goto fail;
+    result = (otk::PointerAssassin *)new otk::PointerAssassin();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__PointerAssassin, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_delete_PointerAssassin(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::PointerAssassin *arg1 = (otk::PointerAssassin *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_PointerAssassin",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__PointerAssassin,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * PointerAssassin_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -5591,6 +5621,22 @@ static PyObject *_wrap_OBDisplay_ungrabButton(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_delete_OBDisplay(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::OBDisplay *arg1 = (otk::OBDisplay *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_OBDisplay",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OBDisplay,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * OBDisplay_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -6010,6 +6056,22 @@ static PyObject *_wrap_BGCCacheItem_gc(PyObject *self, PyObject *args) {
     }
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_GC, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_delete_BGCCacheItem(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::BGCCacheItem *arg1 = (otk::BGCCacheItem *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_BGCCacheItem",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__BGCCacheItem,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
@@ -6844,6 +6906,22 @@ static PyObject *_wrap_Point_setPoint(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_delete_Point(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = (otk::Point *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_Point",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * Point_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -7644,6 +7722,26 @@ static PyObject *_wrap_new_Rect__SWIG_2(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_new_Rect__SWIG_3(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Rect *arg1 = 0 ;
+    otk::Rect *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:new_Rect",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (otk::Rect *)new otk::Rect((otk::Rect const &)*arg1);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Rect__SWIG_4(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
     XRectangle *arg1 = 0 ;
     otk::Rect *result;
     PyObject * obj0  = 0 ;
@@ -7678,7 +7776,7 @@ static PyObject *_wrap_new_Rect(PyObject *self, PyObject *args) {
         int _v;
         {
             void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_XRectangle, 0) == -1) {
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
                 _v = 0;
                 PyErr_Clear();
             }else {
@@ -7687,6 +7785,21 @@ static PyObject *_wrap_new_Rect(PyObject *self, PyObject *args) {
         }
         if (_v) {
             return _wrap_new_Rect__SWIG_3(self,args);
+        }
+    }
+    if (argc == 1) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_XRectangle, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            return _wrap_new_Rect__SWIG_4(self,args);
         }
     }
     if (argc == 2) {
@@ -8693,6 +8806,22 @@ static PyObject *_wrap_Rect_contains(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_delete_Rect(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_Rect",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * Rect_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -8881,6 +9010,22 @@ static PyObject *_wrap_ScreenInfo_displayString(PyObject *self, PyObject *args) 
     {
         resultobj = PyString_FromString(result->c_str());
     }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_delete_ScreenInfo(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::ScreenInfo *arg1 = (otk::ScreenInfo *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_ScreenInfo",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__ScreenInfo,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
@@ -9116,6 +9261,22 @@ static PyObject *_wrap_new_Strut(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_delete_Strut(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Strut *arg1 = (otk::Strut *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_Strut",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Strut,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * Strut_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -9233,6 +9394,36 @@ static PyObject *_wrap_PixmapMask_h_get(PyObject *self, PyObject *args) {
     result = (unsigned int) ((arg1)->h);
     
     resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_PixmapMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::PixmapMask *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":new_PixmapMask")) goto fail;
+    result = (otk::PixmapMask *)new otk::PixmapMask();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__PixmapMask, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_delete_PixmapMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::PixmapMask *arg1 = (otk::PixmapMask *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_PixmapMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__PixmapMask,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
@@ -11870,6 +12061,22 @@ static PyObject *_wrap_BTexture_render(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_delete_BTexture(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::BTexture *arg1 = (otk::BTexture *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_BTexture",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__BTexture,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * BTexture_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -12663,6 +12870,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OtkApplication_isDockable", _wrap_OtkApplication_isDockable, METH_VARARGS },
 	 { (char *)"OtkApplication_getStyle", _wrap_OtkApplication_getStyle, METH_VARARGS },
 	 { (char *)"OtkApplication_swigregister", OtkApplication_swigregister, METH_VARARGS },
+	 { (char *)"new_PointerAssassin", _wrap_new_PointerAssassin, METH_VARARGS },
+	 { (char *)"delete_PointerAssassin", _wrap_delete_PointerAssassin, METH_VARARGS },
 	 { (char *)"PointerAssassin_swigregister", PointerAssassin_swigregister, METH_VARARGS },
 	 { (char *)"new_OtkButton", _wrap_new_OtkButton, METH_VARARGS },
 	 { (char *)"delete_OtkButton", _wrap_delete_OtkButton, METH_VARARGS },
@@ -12725,6 +12934,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBDisplay_ungrab", _wrap_OBDisplay_ungrab, METH_VARARGS },
 	 { (char *)"OBDisplay_grabButton", _wrap_OBDisplay_grabButton, METH_VARARGS },
 	 { (char *)"OBDisplay_ungrabButton", _wrap_OBDisplay_ungrabButton, METH_VARARGS },
+	 { (char *)"delete_OBDisplay", _wrap_delete_OBDisplay, METH_VARARGS },
 	 { (char *)"OBDisplay_swigregister", OBDisplay_swigregister, METH_VARARGS },
 	 { (char *)"BFont_fallbackFont", _wrap_BFont_fallbackFont, METH_VARARGS },
 	 { (char *)"BFont_setFallbackFont", _wrap_BFont_setFallbackFont, METH_VARARGS },
@@ -12740,6 +12950,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_BGCCacheContext", _wrap_delete_BGCCacheContext, METH_VARARGS },
 	 { (char *)"BGCCacheContext_swigregister", BGCCacheContext_swigregister, METH_VARARGS },
 	 { (char *)"BGCCacheItem_gc", _wrap_BGCCacheItem_gc, METH_VARARGS },
+	 { (char *)"delete_BGCCacheItem", _wrap_delete_BGCCacheItem, METH_VARARGS },
 	 { (char *)"BGCCacheItem_swigregister", BGCCacheItem_swigregister, METH_VARARGS },
 	 { (char *)"new_BGCCache", _wrap_new_BGCCache, METH_VARARGS },
 	 { (char *)"delete_BGCCache", _wrap_delete_BGCCache, METH_VARARGS },
@@ -12781,6 +12992,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Point_setY", _wrap_Point_setY, METH_VARARGS },
 	 { (char *)"Point_y", _wrap_Point_y, METH_VARARGS },
 	 { (char *)"Point_setPoint", _wrap_Point_setPoint, METH_VARARGS },
+	 { (char *)"delete_Point", _wrap_delete_Point, METH_VARARGS },
 	 { (char *)"Point_swigregister", Point_swigregister, METH_VARARGS },
 	 { (char *)"new_OBProperty", _wrap_new_OBProperty, METH_VARARGS },
 	 { (char *)"delete_OBProperty", _wrap_delete_OBProperty, METH_VARARGS },
@@ -12812,6 +13024,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Rect_valid", _wrap_Rect_valid, METH_VARARGS },
 	 { (char *)"Rect_intersects", _wrap_Rect_intersects, METH_VARARGS },
 	 { (char *)"Rect_contains", _wrap_Rect_contains, METH_VARARGS },
+	 { (char *)"delete_Rect", _wrap_delete_Rect, METH_VARARGS },
 	 { (char *)"Rect_swigregister", Rect_swigregister, METH_VARARGS },
 	 { (char *)"new_ScreenInfo", _wrap_new_ScreenInfo, METH_VARARGS },
 	 { (char *)"ScreenInfo_visual", _wrap_ScreenInfo_visual, METH_VARARGS },
@@ -12823,6 +13036,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"ScreenInfo_width", _wrap_ScreenInfo_width, METH_VARARGS },
 	 { (char *)"ScreenInfo_height", _wrap_ScreenInfo_height, METH_VARARGS },
 	 { (char *)"ScreenInfo_displayString", _wrap_ScreenInfo_displayString, METH_VARARGS },
+	 { (char *)"delete_ScreenInfo", _wrap_delete_ScreenInfo, METH_VARARGS },
 	 { (char *)"ScreenInfo_swigregister", ScreenInfo_swigregister, METH_VARARGS },
 	 { (char *)"Strut_top_set", _wrap_Strut_top_set, METH_VARARGS },
 	 { (char *)"Strut_top_get", _wrap_Strut_top_get, METH_VARARGS },
@@ -12833,6 +13047,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Strut_right_set", _wrap_Strut_right_set, METH_VARARGS },
 	 { (char *)"Strut_right_get", _wrap_Strut_right_get, METH_VARARGS },
 	 { (char *)"new_Strut", _wrap_new_Strut, METH_VARARGS },
+	 { (char *)"delete_Strut", _wrap_delete_Strut, METH_VARARGS },
 	 { (char *)"Strut_swigregister", Strut_swigregister, METH_VARARGS },
 	 { (char *)"PixmapMask_mask_set", _wrap_PixmapMask_mask_set, METH_VARARGS },
 	 { (char *)"PixmapMask_mask_get", _wrap_PixmapMask_mask_get, METH_VARARGS },
@@ -12840,6 +13055,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"PixmapMask_w_get", _wrap_PixmapMask_w_get, METH_VARARGS },
 	 { (char *)"PixmapMask_h_set", _wrap_PixmapMask_h_set, METH_VARARGS },
 	 { (char *)"PixmapMask_h_get", _wrap_PixmapMask_h_get, METH_VARARGS },
+	 { (char *)"new_PixmapMask", _wrap_new_PixmapMask, METH_VARARGS },
+	 { (char *)"delete_PixmapMask", _wrap_delete_PixmapMask, METH_VARARGS },
 	 { (char *)"PixmapMask_swigregister", PixmapMask_swigregister, METH_VARARGS },
 	 { (char *)"Style_image_control_set", _wrap_Style_image_control_set, METH_VARARGS },
 	 { (char *)"Style_image_control_get", _wrap_Style_image_control_get, METH_VARARGS },
@@ -12970,6 +13187,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"BTexture_description", _wrap_BTexture_description, METH_VARARGS },
 	 { (char *)"BTexture_setDescription", _wrap_BTexture_setDescription, METH_VARARGS },
 	 { (char *)"BTexture_render", _wrap_BTexture_render, METH_VARARGS },
+	 { (char *)"delete_BTexture", _wrap_delete_BTexture, METH_VARARGS },
 	 { (char *)"BTexture_swigregister", BTexture_swigregister, METH_VARARGS },
 	 { (char *)"new_OBTimer", _wrap_new_OBTimer, METH_VARARGS },
 	 { (char *)"delete_OBTimer", _wrap_delete_OBTimer, METH_VARARGS },

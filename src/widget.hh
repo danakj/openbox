@@ -6,6 +6,7 @@ namespace ob {
 
 class OBWidget {
 public:
+  // update the enum in openbox.i to match this one
   enum WidgetType {
     Type_Frame,
     Type_Titlebar,

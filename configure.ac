@@ -340,6 +340,7 @@ AC_CONFIG_FILES([Makefile
 		intl/Makefile
 		otk/Makefile
 		src/Makefile
+		scripts/Makefile
 		util/Makefile
 		util/epist/Makefile
 		doc/Makefile

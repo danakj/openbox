@@ -23,16 +23,32 @@
   ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
 %};
 
-// stuff for registering callbacks!
-
+// stuff for scripting callbacks!
 %inline %{
   enum ActionType {
     Action_ButtonPress,
     Action_ButtonRelease,
+    Action_Click,
+    Action_DoubleClick,
     Action_EnterWindow,
     Action_LeaveWindow,
     Action_KeyPress,
     Action_MouseMotion
+  };
+  enum WidgetType {
+    Type_Frame,
+    Type_Titlebar,
+    Type_Handle,
+    Type_Plate,
+    Type_Label,
+    Type_MaximizeButton,
+    Type_CloseButton,
+    Type_IconifyButton,
+    Type_StickyButton,
+    Type_LeftGrip,
+    Type_RightGrip,
+    Type_Client,
+    Type_Root
   };
 %}
 %ignore ob::python_callback;

@@ -388,7 +388,7 @@ typedef struct
 {
     const gchar *button;
     const gchar *context;
-    ObMouseAction mact;
+    const ObMouseAction mact;
     const gchar *actname;
 } ObDefMouseBind;
 

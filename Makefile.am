@@ -265,6 +265,9 @@ dist_rc_DATA = \
 dist_userscript_DATA = \
 	tools/themeupdate/themeupdate.py
 
+install-data-hook:
+	chmod +x $(userscriptdir)/themeupdate.py
+
 dist_desktopfiles_DATA = \
 	data/openbox.desktop
 

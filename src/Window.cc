@@ -2732,7 +2732,7 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
 void OpenboxWindow::startMove(int x, int y) {
   ASSERT(!flags.moving);
 
-  XGrabPointer(display, frame.window, False, Button1MotionMask |
+  XGrabPointer(display, frame.window, False, PointerMotionMask |
                ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
                None, openbox.getMoveCursor(), CurrentTime);
 
@@ -2853,14 +2853,13 @@ void OpenboxWindow::endMove() {
 
 
 void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
-  if (!flags.resizing && (me->state & Button1Mask) && functions.move &&
-      (frame.title == me->window || frame.label == me->window ||
-       frame.handle == me->window || frame.window == me->window)) {
-    if (!flags.moving)
-      startMove(me->x_root, me->y_root);
-    else
+  if (flags.moving)
       doMove(me->x_root, me->y_root);
-  } else if (functions.resize &&
+  else if (!flags.resizing && (me->state & Button1Mask) && functions.move &&
+      (frame.title == me->window || frame.label == me->window ||
+       frame.handle == me->window || frame.window == me->window))
+    startMove(me->x_root, me->y_root);
+  else if (functions.resize &&
 	     (((me->state & Button1Mask) && (me->window == frame.right_grip ||
 					     me->window == frame.left_grip)) ||
 	      (me->state & (Mod1Mask | Button3Mask) &&

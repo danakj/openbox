@@ -240,6 +240,9 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuUnderMouse,
                           "Under Mouse Placement"),
          BScreen::UnderMousePlacement);
+  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuClickMouse,
+                          "Click Mouse Placement"),
+         BScreen::ClickMousePlacement);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuLeftRight,
 			  "Left to Right"), BScreen::LeftRight);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuRightLeft,
@@ -260,21 +263,26 @@ void Configmenu::Placementmenu::setValues() {
   setItemSelected(2, p == BScreen::CascadePlacement);
   setItemSelected(3, p == BScreen::BestFitPlacement);
   setItemSelected(4, p == BScreen::UnderMousePlacement);
+  setItemSelected(5, p == BScreen::ClickMousePlacement);
 
   bool rl = (configmenu->screen.rowPlacementDirection() ==
 	     BScreen::LeftRight),
        tb = (configmenu->screen.colPlacementDirection() ==
 	     BScreen::TopBottom);
 
-  setItemSelected(5, rl);
-  setItemEnabled(5, p != BScreen::UnderMousePlacement);
-  setItemSelected(6, !rl);
-  setItemEnabled(6, p != BScreen::UnderMousePlacement);
+  setItemSelected(6, rl);
+  setItemEnabled(6, (p != BScreen::UnderMousePlacement &&
+                     p != BScreen::ClickMousePlacement));
+  setItemSelected(7, !rl);
+  setItemEnabled(7, (p != BScreen::UnderMousePlacement &&
+                     p != BScreen::ClickMousePlacement));
 
-  setItemSelected(7, tb);
-  setItemEnabled(7, p != BScreen::UnderMousePlacement);
-  setItemSelected(8, !tb);
-  setItemEnabled(8, p != BScreen::UnderMousePlacement);
+  setItemSelected(8, tb);
+  setItemEnabled(8, (p != BScreen::UnderMousePlacement &&
+                     p != BScreen::ClickMousePlacement));
+  setItemSelected(9, !tb);
+  setItemEnabled(9, (p != BScreen::UnderMousePlacement &&
+                     p != BScreen::ClickMousePlacement));
 }
 
 void Configmenu::Placementmenu::reconfigure() {
@@ -309,6 +317,10 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::UnderMousePlacement:
+    configmenu->screen.setPlacementPolicy(item->function());
+    break;
+
+  case BScreen::ClickMousePlacement:
     configmenu->screen.setPlacementPolicy(item->function());
     break;
 

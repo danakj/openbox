@@ -1,6 +1,8 @@
 Changelog for Openbox:
 
 1.1.0:
+ * added ClickMouse window placement algorithm/type.    (Ben Jansens)
+ 
  * added UnderMouse window placement algorithm/type.    (Ben Jansens)
 
 1.0.0:

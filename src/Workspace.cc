@@ -606,6 +606,7 @@ void Workspace::placeWindow(OpenboxWindow &win) {
     place = colSmartPlacement(window_size, space);
     break;
   case BScreen::UnderMousePlacement:
+  case BScreen::ClickMousePlacement:
     place = underMousePlacement(window_size, space);
     break;
   } // switch

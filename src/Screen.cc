@@ -1027,6 +1027,7 @@ void BScreen::setPlacementPolicy(int p) {
   case BestFitPlacement: placement = "BestFitPlacement"; break;
   case ColSmartPlacement: placement = "ColSmartPlacement"; break;
   case UnderMousePlacement: placement = "UnderMousePlacement"; break;
+  case ClickMousePlacement: placement = "ClickMousePlacement"; break;
   default:
   case RowSmartPlacement: placement = "RowSmartPlacement"; break;
   }
@@ -1302,6 +1303,8 @@ void BScreen::load() {
       resource.placement_policy = BestFitPlacement;
     else if (0 == strncasecmp(s.c_str(), "UnderMousePlacement", s.length()))
       resource.placement_policy = UnderMousePlacement;
+    else if (0 == strncasecmp(s.c_str(), "ClickMousePlacement", s.length()))
+      resource.placement_policy = ClickMousePlacement;
     else //if (0 == strncasecmp(s.c_str(), "CascadePlacement", s.length()))
       resource.placement_policy = CascadePlacement;
   } else

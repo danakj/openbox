@@ -32,6 +32,8 @@ $ #BestFit
 # Best Fit Placement
 $ #UnderMouse
 # Under Mouse Placement
+$ #ClickMouse
+# Click Mouse Placement
 $ #LeftRight
 # Left to Right
 $ #RightLeft

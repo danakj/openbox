@@ -3,19 +3,7 @@
 
 #include <glib.h>
 
-#include "../../kernel/action.h"
-
-typedef struct KeyBindingTree {
-    guint state;
-    guint key;
-    GList *keylist;
-    Action *action;
-
-    /* the next binding in the tree at the same level */
-    struct KeyBindingTree *next_sibling; 
-    /* the first child of this binding (next binding in a chained sequence).*/
-    struct KeyBindingTree *first_child;
-} KeyBindingTree;
+#include "tree.h"
 
 extern KeyBindingTree *firstnode;
 

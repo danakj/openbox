@@ -3,6 +3,9 @@
 
 #include "render.h"
 
+/*! Returns if an RrColor is non-opaque */
+#define RrColorHasAlpha(c) ((c).a < 0.999999999)
+
 #define RrColor3f(c) glColor3f((c)->r, (c)->g, (c)->b)
 #define RrColor4f(c) glColor4f((c)->r, (c)->g, (c)->b, (c)->a)
 

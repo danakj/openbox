@@ -42,9 +42,6 @@ struct RrColor {
     float a;
 };
 
-/*! Returns if an RrColor is non-opaque */
-#define RrColorHasAlpha(c) ((c).a > 0.0000001)
-
 /*! Sets the values of all components for an RrColor */
 #define RrColorSet(c, w, x, y, z) (c)->r = (w), (c)->g = (x), \
                                   (c)->b = (y), (c)->a = z

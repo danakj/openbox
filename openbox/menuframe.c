@@ -488,13 +488,13 @@ void menu_frame_hide(ObMenuFrame *self)
         self->parent->child = NULL;
     self->parent = NULL;
 
+    menu_frame_visible = g_list_delete_link(menu_frame_visible, it);
+
     if (menu_frame_visible == NULL) {
         /* last menu shown */
         grab_pointer(FALSE, None);
         grab_keyboard(FALSE);
     }
-
-    menu_frame_visible = g_list_delete_link(menu_frame_visible, it);
 
     XUnmapWindow(ob_display, self->window);
 
@@ -623,7 +623,18 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
             {
                 ObAction *act = it->data;
                 act->data.any.c = client;
-                act->func(&act->data);
+
+                if (act->func == action_moveresize)
+                    screen_pointer_pos(&act->data.moveresize.x,
+                                       &act->data.moveresize.y);
+
+                if (!(act->func == action_cycle_windows ||
+                      act->func == action_desktop_dir ||
+                      act->func == action_send_to_desktop_dir ||
+                      act->func == action_showmenu))
+                {
+                    act->func(&act->data);
+                }
             }
         }
     }

@@ -233,20 +233,22 @@ void x_paint(Window win, Appearance *l)
 
     for (i = 0; i < l->textures; i++) {
         tarea = l->texture[i].position;
-        if (l->surface.data.planar.relief != Flat) {
-            switch (l->surface.data.planar.bevel) {
-            case Bevel1:
+        if (l->surface.data.planar.grad != Background_ParentRelative) {
+            if (l->surface.data.planar.relief != Flat) {
+                switch (l->surface.data.planar.bevel) {
+                case Bevel1:
+                    tarea.x += 1; tarea.y += 1;
+                    tarea.width -= 2; tarea.height -= 2;
+                    break;
+                case Bevel2:
+                    tarea.x += 2; tarea.y += 2;
+                    tarea.width -= 4; tarea.height -= 4;
+                    break;
+                }
+            } else if (l->surface.data.planar.border) {
                 tarea.x += 1; tarea.y += 1;
                 tarea.width -= 2; tarea.height -= 2;
-                break;
-            case Bevel2:
-                tarea.x += 2; tarea.y += 2;
-                tarea.width -= 4; tarea.height -= 4;
-                break;
             }
-        } else if (l->surface.data.planar.border) {
-            tarea.x += 1; tarea.y += 1;
-            tarea.width -= 2; tarea.height -= 2;
         }
 
         switch (l->texture[i].type) {
@@ -279,7 +281,7 @@ void x_paint(Window win, Appearance *l)
         case RGBA:
             image_draw(l->surface.data.planar.pixel_data, 
                        &l->texture[i].data.rgba,
-                       &tarea);
+                       &tarea, &l->area);
         break;
         }
     }

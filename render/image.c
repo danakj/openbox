@@ -2,13 +2,19 @@
 #include "../kernel/geom.h"
 #include "image.h"
 
-void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position)
+void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
+                Rect *surarea)
 {
   unsigned long *draw = rgba->data;
   int c, sfw, sfh;
-  unsigned int i, e, bgi;
+  unsigned int i, e;
   sfw = position->width;
   sfh = position->height;
+
+  /* it would be nice if this worked, but this function is well broken in these
+     cercumstances. */
+  g_assert(position->width == surarea->width &&
+           position->height == surarea->height);
 
   g_assert(rgba->data != NULL);
 
@@ -42,7 +48,7 @@ void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position)
         draw = rgba->cache;
 
     /* apply the alpha channel */
-    for (i = 0, c = 0, e = sfw*sfh; i < e; ++i, ++bgi) {
+    for (i = 0, c = 0, e = sfw*sfh; i < e; ++i) {
       unsigned char alpha = draw[i] >> 24;
       unsigned char r = draw[i] >> 16;
       unsigned char g = draw[i] >> 8;

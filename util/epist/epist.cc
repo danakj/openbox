@@ -68,9 +68,11 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
 
   _xatom = new XAtom(getXDisplay());
 
-  screen *s = new screen(this, DefaultScreen(getXDisplay()));
-  if (s->managed())
-    _screens.push_back(s);
+  for (unsigned int i = 0; i < getNumberOfScreens(); ++i) {
+    screen *s = new screen(this, i);
+    if (s->managed())
+      _screens.push_back(s);
+  }
   if (_screens.empty()) {
     cout << "No compatible window manager found on any screens. Aborting.\n";
     ::exit(1);

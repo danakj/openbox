@@ -434,7 +434,7 @@ void OBFrame::releaseClient()
   // check if the app has already reparented its window away
   if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
                              ReparentNotify, &ev)) {
-    XPutBack(otk::OBDisplay::display, &ev);
+    XPutBackEvent(otk::OBDisplay::display, &ev);
   } else {
     // according to the ICCCM - if the client doesn't reparent itself, then we
     // will reparent the window to root for them

@@ -123,8 +123,13 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   blackbox_attrib.flags = blackbox_attrib.attrib = blackbox_attrib.stack = 0l;
   blackbox_attrib.decoration = DecorNormal;
-  blackbox_attrib.premax_x = blackbox_attrib.premax_y = 0;
-  blackbox_attrib.premax_w = blackbox_attrib.premax_h = 0;
+  // default premax taking up the middle 1/4 of the screen sounds fair to me
+  blackbox_attrib.premax_x = screen->getRect().x() +
+    screen->getRect().width() / 4;
+  blackbox_attrib.premax_y = screen->getRect().y() +
+    screen->getRect().height() / 4;
+  blackbox_attrib.premax_w = screen->getRect().width() / 2;
+  blackbox_attrib.premax_h = screen->getRect().height() / 2;
 
   frame.border_w = 1;
   frame.window = frame.plate = frame.title = frame.handle = None;

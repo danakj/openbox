@@ -1,6 +1,10 @@
 Changelog for Openbox:
 
 2.2.1:
+ * Change the default premax values to be larger than 0 (Ben Jansens)
+   for clients that map in a maximized state. (avoid a
+   mozilla crash.)
+
  * Fix for clients changing from a non-resizable window (Ben Jansens)
    to a resizable window.
 

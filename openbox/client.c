@@ -2013,42 +2013,31 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
                                   and adjust out layer/stacking */
 
     if (fs) {
-	if (savearea) {
-	    guint32 dimensions[4];
-	    dimensions[0] = self->area.x;
-	    dimensions[1] = self->area.y;
-	    dimensions[2] = self->area.width;
-	    dimensions[3] = self->area.height;
-  
-	    PROP_SETA32(self->window, openbox_premax, cardinal,
-			dimensions, 4);
-	}
+        if (savearea)
+            self->pre_fullscreen_area = self->area;
 
         /* these are not actually used cuz client_configure will set them
            as appropriate when the window is fullscreened */
         x = y = w = h = 0;
     } else {
-        guint num;
-	gint32 *dimensions;
         Rect *a;
 
-        /* pick some fallbacks... */
-        a = screen_area_monitor(self->desktop, 0);
-        x = a->x + a->width / 4;
-        y = a->y + a->height / 4;
-        w = a->width / 2;
-        h = a->height / 2;
-
-	if (PROP_GETA32(self->window, openbox_premax, cardinal,
-                        (guint32**)&dimensions, &num)) {
-            if (num == 4) {
-                x = dimensions[0];
-                y = dimensions[1];
-                w = dimensions[2];
-                h = dimensions[3];
-            }
-	    g_free(dimensions);
-	}
+        if (self->pre_fullscreen_area.width > 0 &&
+            self->pre_fullscreen_area.height > 0)
+        {
+            x = self->pre_fullscreen_area.x;
+            y = self->pre_fullscreen_area.y;
+            w = self->pre_fullscreen_area.width;
+            h = self->pre_fullscreen_area.height;
+            RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
+        } else {
+            /* pick some fallbacks... */
+            a = screen_area_monitor(self->desktop, 0);
+            x = a->x + a->width / 4;
+            y = a->y + a->height / 4;
+            w = a->width / 2;
+            h = a->height / 2;
+        }
     }
 
     client_setup_decor_and_functions(self);
@@ -2152,98 +2141,66 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
 
     /* check if already done */
     if (max) {
-	if (dir == 0 && self->max_horz && self->max_vert) return;
-	if (dir == 1 && self->max_horz) return;
-	if (dir == 2 && self->max_vert) return;
+        if (dir == 0 && self->max_horz && self->max_vert) return;
+        if (dir == 1 && self->max_horz) return;
+        if (dir == 2 && self->max_vert) return;
     } else {
-	if (dir == 0 && !self->max_horz && !self->max_vert) return;
-	if (dir == 1 && !self->max_horz) return;
-	if (dir == 2 && !self->max_vert) return;
+        if (dir == 0 && !self->max_horz && !self->max_vert) return;
+        if (dir == 1 && !self->max_horz) return;
+        if (dir == 2 && !self->max_vert) return;
     }
 
-    /* work with the frame's coords */
-    x = self->frame->area.x;
-    y = self->frame->area.y;
+    /* we just tell it to configure in the same place and client_configure
+       worries about filling the screen with the window */
+    x = self->area.x;
+    y = self->area.y;
     w = self->area.width;
     h = self->area.height;
 
     if (max) {
-	if (savearea) {
-	    gint32 dimensions[4];
-	    gint32 *readdim;
-            guint num;
-
-	    dimensions[0] = x;
-	    dimensions[1] = y;
-	    dimensions[2] = w;
-	    dimensions[3] = h;
-
-	    /* get the property off the window and use it for the dimensions
-	       we are already maxed on */
-	    if (PROP_GETA32(self->window, openbox_premax, cardinal,
-			    (guint32**)&readdim, &num)) {
-                if (num == 4) {
-                    if (self->max_horz) {
-                        dimensions[0] = readdim[0];
-                        dimensions[2] = readdim[2];
-                    }
-                    if (self->max_vert) {
-                        dimensions[1] = readdim[1];
-                        dimensions[3] = readdim[3];
-                    }
-                }
-		g_free(readdim);
-	    }
-
-	    PROP_SETA32(self->window, openbox_premax, cardinal,
-			(guint32*)dimensions, 4);
-	}
+        if (savearea)
+            self->pre_max_area = self->area;
     } else {
-        guint num;
-	gint32 *dimensions;
         Rect *a;
 
-        /* pick some fallbacks... */
         a = screen_area_monitor(self->desktop, 0);
-        if (dir == 0 || dir == 1) { /* horz */
-            x = a->x + a->width / 4;
-            w = a->width / 2;
-        }
-        if (dir == 0 || dir == 2) { /* vert */
-            y = a->y + a->height / 4;
-            h = a->height / 2;
-        }
+        if ((dir == 0 || dir == 1) && self->max_horz) { /* horz */
+            if (self->pre_max_area.width > 0) {
+                x = self->pre_max_area.x;
+                w = self->pre_max_area.width;
 
-	if (PROP_GETA32(self->window, openbox_premax, cardinal,
-			(guint32**)&dimensions, &num)) {
-            if (num == 4) {
-                if (dir == 0 || dir == 1) { /* horz */
-                    x = dimensions[0];
-                    w = dimensions[2];
-                }
-                if (dir == 0 || dir == 2) { /* vert */
-                    y = dimensions[1];
-                    h = dimensions[3];
-                }
+                RECT_SET(self->pre_max_area, 0, self->pre_max_area.y,
+                         0, self->pre_max_area.height);
+            } else {
+                /* pick some fallbacks... */
+                x = a->x + a->width / 4;
+                w = a->width / 2;
             }
-            g_free(dimensions);
-	}
+        }
+        if ((dir == 0 || dir == 2) && self->max_vert) { /* vert */
+            if (self->pre_max_area.width > 0) {
+                y = self->pre_max_area.y;
+                h = self->pre_max_area.height;
+
+                RECT_SET(self->pre_max_area, self->pre_max_area.x, 0,
+                         self->pre_max_area.width, 0);
+            } else {
+                /* pick some fallbacks... */
+                y = a->y + a->height / 4;
+                h = a->height / 2;
+            }
+        }
     }
 
     if (dir == 0 || dir == 1) /* horz */
-	self->max_horz = max;
+        self->max_horz = max;
     if (dir == 0 || dir == 2) /* vert */
-	self->max_vert = max;
-
-    if (!self->max_horz && !self->max_vert)
-	PROP_ERASE(self->window, openbox_premax);
+        self->max_vert = max;
 
     client_change_state(self); /* change the state hints on the client */
 
     client_setup_decor_and_functions(self);
 
-    /* figure out where the client should be going */
-    frame_frame_gravity(self->frame, &x, &y);
     client_move_resize(self, x, y, w, h);
 }
 

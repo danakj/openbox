@@ -337,8 +337,6 @@ static gboolean session_save()
         fprintf(f, "<openbox_session id=\"%s\">\n\n", sm_id);
 
         for (it = stacking_list; it; it = g_list_next(it)) {
-            guint num;
-            gint32 *dimensions;
             gint prex, prey, prew, preh;
             ObClient *c;
             gchar *t;
@@ -358,15 +356,19 @@ static gboolean session_save()
             prey = c->area.y;
             prew = c->area.width;
             preh = c->area.height;
-            if (PROP_GETA32(c->window, openbox_premax, cardinal,
-                            (guint32**)&dimensions, &num)) {
-                if (num == 4) {
-                    prex = dimensions[0];
-                    prey = dimensions[1];
-                    prew = dimensions[2];
-                    preh = dimensions[3];
-                }
-                g_free(dimensions);
+            if (c->fullscreen) {
+                prex = c->pre_fullscreen_area.x;
+                prey = c->pre_fullscreen_area.x;
+                prew = c->pre_fullscreen_area.width;
+                preh = c->pre_fullscreen_area.height;
+            }
+            if (c->max_horz) {
+                prex = c->pre_max_area.x;
+                prew = c->pre_max_area.width;
+            }
+            if (c->max_vert) {
+                prey = c->pre_max_area.y;
+                preh = c->pre_max_area.height;
             }
 
             fprintf(f, "<window id=\"%s\">\n", c->sm_client_id);

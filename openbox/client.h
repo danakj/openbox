@@ -137,6 +137,11 @@ struct _ObClient
     */
     Rect area;
 
+    /*! Position and size of the window prior to being maximized */
+    Rect pre_max_area;
+    /*! Position and size of the window prior to being fullscreened */
+    Rect pre_fullscreen_area;
+
     /*! The window's strut
       The strut defines areas of the screen that are marked off-bounds for
       window placement. In theory, where this window exists.

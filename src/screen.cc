@@ -406,7 +406,7 @@ void OBScreen::manageWindow(Window window)
   clients.push_back(client);
   // this puts into the stacking order, then raises it
   _stacking.push_back(client);
-  raise(client);
+  restack(true, client);
   // update the root properties
   setClientList();
 
@@ -461,7 +461,7 @@ void OBScreen::unmanageWindow(OBClient *client)
   setClientList();
 }
 
-void OBScreen::raise(OBClient *client)
+void OBScreen::restack(bool raise, OBClient *client)
 {
   const int layer = client->layer();
   std::vector<Window> wins;
@@ -473,33 +473,7 @@ void OBScreen::raise(OBClient *client)
   ClientList::iterator it = _stacking.begin(), end = _stacking.end();
   // insert the windows above this window
   for (; it != end; ++it) {
-    if ((*it)->layer() <= layer)
-      break;
-    wins.push_back((*it)->frame->window());
-  }
-  // insert our client
-  wins.push_back(client->frame->window());
-  _stacking.insert(it, client);
-  // insert the remaining below this window
-  for (; it != end; ++it)
-    wins.push_back((*it)->frame->window());
-
-  XRestackWindows(otk::OBDisplay::display, &wins[0], wins.size());
-}
-
-void OBScreen::lower(OBClient *client)
-{
-  const int layer = client->layer();
-  std::vector<Window> wins;
-
-  _stacking.remove(client);
-
-  // the stacking list is from highest to lowest
-  
-  ClientList::iterator it = _stacking.begin(), end = _stacking.end();
-  // insert the windows above this window
-  for (; it != end; ++it) {
-    if ((*it)->layer() < layer)
+    if ((*it)->layer() < layer || (raise && (*it)->layer() == layer))
       break;
     wins.push_back((*it)->frame->window());
   }

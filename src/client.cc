@@ -649,7 +649,7 @@ void OBClient::setState(StateAction action, long data1, long data2)
     }
   }
   calcLayer();
-  Openbox::instance->screen(_screen)->raise(this);
+  Openbox::instance->screen(_screen)->restack(true, this); // raise
 }
 
 

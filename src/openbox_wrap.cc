@@ -1560,36 +1560,21 @@ static PyObject *_wrap_OBScreen_unmanageWindow(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_OBScreen_raise(PyObject *self, PyObject *args) {
+static PyObject *_wrap_OBScreen_restack(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
-    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    bool arg2 ;
+    ob::OBClient *arg3 = (ob::OBClient *) 0 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_raise",&obj0,&obj1)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOO:OBScreen_restack",&obj0,&obj1,&obj2)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->raise(arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_OBScreen_lower(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
-    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_lower",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->lower(arg2);
+    arg2 = (bool) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->restack(arg2,arg3);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -2667,8 +2652,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBScreen_manageExisting", _wrap_OBScreen_manageExisting, METH_VARARGS },
 	 { (char *)"OBScreen_manageWindow", _wrap_OBScreen_manageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_unmanageWindow", _wrap_OBScreen_unmanageWindow, METH_VARARGS },
-	 { (char *)"OBScreen_raise", _wrap_OBScreen_raise, METH_VARARGS },
-	 { (char *)"OBScreen_lower", _wrap_OBScreen_lower, METH_VARARGS },
+	 { (char *)"OBScreen_restack", _wrap_OBScreen_restack, METH_VARARGS },
 	 { (char *)"OBScreen_swigregister", OBScreen_swigregister, METH_VARARGS },
 	 { (char *)"MwmHints_flags_set", _wrap_MwmHints_flags_set, METH_VARARGS },
 	 { (char *)"MwmHints_flags_get", _wrap_MwmHints_flags_get, METH_VARARGS },

@@ -68,10 +68,10 @@ def raise_win(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     screen = Openbox_screen(openbox, OBClient_screen(client))
-    OBScreen_raise(screen, client)
+    OBScreen_restack(screen, 1, client)
 
 def lower_win(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     screen = Openbox_screen(openbox, OBClient_screen(client))
-    OBScreen_lower(screen, client)
+    OBScreen_restack(screen, 0, client)

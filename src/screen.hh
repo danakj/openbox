@@ -153,11 +153,9 @@ public:
   */
   void unmanageWindow(OBClient *client);
 
-  //! Raises a client window above all others in its stacking layer
-  void raise(OBClient *client);
-
-  //! Lowers a client window below all others in its stacking layer
-  void lower(OBClient *client);
+  //! Raises/Lowers a client window above/below all others in its stacking
+  //! layer
+  void restack(bool raise, OBClient *client);
 };
 
 }

@@ -6,6 +6,7 @@
 
 #include "appwidget.hh"
 #include "application.hh"
+#include "property.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -20,8 +21,8 @@ AppWidget::AppWidget(Application *app, Direction direction,
 {
   assert(app);
 
-  _wm_protocols = XInternAtom(**display, "WM_PROTOCOLS", false);
-  _wm_delete = XInternAtom(**display, "WM_DELETE_WINDOW", false);
+  _wm_protocols = Property::atoms.wm_protocols;
+  _wm_delete = Property::atoms.wm_protocols;
 
   // set WM Protocols on the window
   Atom protocols[2];

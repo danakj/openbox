@@ -8,6 +8,7 @@
 #include "eventhandler.hh"
 #include "widget.hh"
 #include "timer.hh"
+#include "property.hh"
 
 extern "C" {
 #ifdef HAVE_STDLIB_H
@@ -31,6 +32,7 @@ Application::Application(int argc, char **argv)
   const ScreenInfo *s_info = _display.screenInfo(DefaultScreen(*_display));
 
   Timer::initialize();
+  Property::initialize();
   _img_ctrl = new ImageControl(s_info, True, 4, 5, 200);
   _style_conf = new Configuration(False);
   _style = new Style(_img_ctrl);

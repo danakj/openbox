@@ -27,7 +27,7 @@ public:
 
   virtual void update(void);
 
-  virtual void expose(const XExposeEvent &e);
+  virtual bool expose(const XExposeEvent &e);
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }

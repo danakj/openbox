@@ -34,7 +34,7 @@ public:
   void release(void);
 
   virtual void update(void);
-  virtual void expose(const XExposeEvent &e);
+  virtual bool expose(const XExposeEvent &e);
 
 private:
 

@@ -9,6 +9,10 @@
 #include "image.h"
 #include "kernel/openbox.h"
 
+#ifndef HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
+
 int render_depth;
 Visual *render_visual;
 Colormap render_colormap;

@@ -42,6 +42,9 @@ private:
   //! A list of all possible combinations of keyboard lock masks
   static unsigned int _mask_list[8];
 
+  //! The number of requested grabs on the display
+  static int _grab_count;
+
   //! A list of information for all screens on the display
   static ScreenInfoList _screenInfoList;
 
@@ -94,7 +97,11 @@ public:
   //! Returns if the display has the xinerama extention available
   inline static bool xinerama() { return _xinerama; }
 
+  //! Grabs the display
+  static void grab();
 
+  //! Ungrabs the display
+  static void ungrab();
 
 
   

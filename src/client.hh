@@ -119,9 +119,11 @@ public:
   };
 
   //! The event mask to grab on client windows
-  static const long event_mask = PropertyChangeMask | FocusChangeMask |
-                                 StructureNotifyMask;
+  static const long event_mask = PropertyChangeMask | FocusChangeMask;
 
+  //! The number of unmap events to ignore on the window
+  int ignore_unmaps;
+  
 private:
   //! The screen number on which the client resides
   int      _screen;

@@ -27,6 +27,8 @@ OBClient::OBClient(int screen, Window window)
 {
   assert(window);
 
+  ignore_unmaps = 0;
+  
   // update EVERYTHING the first time!!
 
   // the state is kinda assumed to be normal. is this right? XXX

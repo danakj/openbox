@@ -29,7 +29,7 @@ class OBClient;
 class OBScreen {
 public:
   //! Holds a list of OBClient objects
-  typedef std::vector<OBClient*> ClientList;
+  typedef std::list<OBClient*> ClientList;
   //! Holds a list of otk::Strut objects
   typedef std::list<otk::Strut*> StrutList;
 

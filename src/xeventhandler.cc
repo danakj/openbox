@@ -231,8 +231,11 @@ void OBXEventHandler::unmapNotify(const XUnmapEvent &e)
 {
   OBClient *client = Openbox::instance->findClient(e.window);
   if (!client) return;
-  
-  Openbox::instance->screen(client->screen())->unmanageWindow(client);
+
+  if (client->ignore_unmaps == 0)
+    Openbox::instance->screen(client->screen())->unmanageWindow(client);
+  else
+    client->ignore_unmaps--;
 }
 
 

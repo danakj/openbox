@@ -51,6 +51,7 @@ int  OBDisplay::_xinerama_event_basep = 0;
 unsigned int OBDisplay::_mask_list[8];
 OBDisplay::ScreenInfoList OBDisplay::_screenInfoList;
 BGCCache *OBDisplay::_gccache = (BGCCache*) 0;
+int OBDisplay::_grab_count = 0;
 
 
 int OBDisplay::xerrorHandler(Display *d, XErrorEvent *e)
@@ -172,6 +173,21 @@ const ScreenInfo* OBDisplay::screenInfo(int snum) {
 }
 
 
+void OBDisplay::grab()
+{
+  if (_grab_count == 0)
+    XGrabServer(display);
+  _grab_count++;
+}
+
+
+void OBDisplay::ungrab()
+{
+  if (_grab_count == 0) return;
+  _grab_count--;
+  if (_grab_count == 0)
+    XUngrabServer(display);
+}
 
 
 

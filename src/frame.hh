@@ -24,7 +24,7 @@ namespace ob {
 */
 class OBFrame {
 private:
-  const OBClient *_client;
+  OBClient *_client;
   const otk::ScreenInfo *_screen;
 
   //! The style to use for size and display the decorations
@@ -89,7 +89,7 @@ public:
     @param client The client window which will be decorated by the new OBFrame
     @param style The style to use to decorate the frame
   */
-  OBFrame(const OBClient *client, const otk::Style *style);
+  OBFrame(OBClient *client, const otk::Style *style);
   //! Destroys the OBFrame object
   virtual ~OBFrame();
 

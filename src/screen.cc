@@ -101,7 +101,7 @@ OBScreen::~OBScreen()
 
   // unmanage all windows
   while (!_clients.empty())
-    unmanageWindow(_clients[0]);
+    unmanageWindow(_clients.front());
 
   delete _image_control;
 }
@@ -338,6 +338,8 @@ void OBScreen::manageWindow(Window window)
     XFree(wmhint);
   }
 
+  otk::OBDisplay::grab();
+
   // choose the events we want to receive on the CLIENT window
   attrib_set.event_mask = OBClient::event_mask;
   attrib_set.do_not_propagate_mask = ButtonPressMask | ButtonReleaseMask |
@@ -362,7 +364,15 @@ void OBScreen::manageWindow(Window window)
   // create the decoration frame for the client window
   client->frame = new OBFrame(client, &_style);
 
-  // add all the client's decoration windows as event handlers for the client
+  // XXX: if on the current desktop..
+  XMapWindow(otk::OBDisplay::display, client->frame->window());
+ 
+  // XXX: handle any requested states such as shaded/maximized
+
+  otk::OBDisplay::ungrab();
+
+  // add all the client's windows as event handlers for the client
+  Openbox::instance->addClient(window, client);
   Openbox::instance->addClient(client->frame->window(), client);
   Openbox::instance->addClient(client->frame->titlebar(), client);
   Openbox::instance->addClient(client->frame->buttonIconify(), client);
@@ -373,14 +383,10 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->addClient(client->frame->handle(), client);
   Openbox::instance->addClient(client->frame->gripLeft(), client);
   Openbox::instance->addClient(client->frame->gripRight(), client);
-  
-  // XXX: if on the current desktop..
-  XMapWindow(otk::OBDisplay::display, client->frame->window());
- 
-  // XXX: handle any requested states such as shaded/maximized
 
-
+  // add to the screen's list
   _clients.push_back(client);
+  // update the root properties
   setClientList();
 }
 
@@ -420,14 +426,11 @@ void OBScreen::unmanageWindow(OBClient *client)
   delete client->frame;
   client->frame = 0;
 
-  ClientList::iterator it = _clients.begin(), end = _clients.end();
-  for (; it != end; ++it)
-    if (*it == client) {
-      _clients.erase(it);
-      break;
-    }
+  // remove from the screen's list
+  _clients.remove(client);
   delete client;
 
+  // update the root properties
   setClientList();
 }
 

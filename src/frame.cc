@@ -18,7 +18,7 @@ extern "C" {
 
 namespace ob {
 
-OBFrame::OBFrame(const OBClient *client, const otk::Style *style)
+OBFrame::OBFrame(OBClient *client, const otk::Style *style)
   : _client(client),
     _screen(otk::OBDisplay::screenInfo(client->screen()))
 {
@@ -392,28 +392,19 @@ void OBFrame::updateShape()
 void OBFrame::grabClient()
 {
   
-  XGrabServer(otk::OBDisplay::display);
-
   // select the event mask on the frame
-  XSelectInput(otk::OBDisplay::display, _window, SubstructureRedirectMask);
+  //XSelectInput(otk::OBDisplay::display, _window, SubstructureRedirectMask);
 
   // reparent the client to the frame
-  XSelectInput(otk::OBDisplay::display, _client->window(),
-               OBClient::event_mask & ~StructureNotifyMask);
   XReparentWindow(otk::OBDisplay::display, _client->window(), _window, 0, 0);
-  XSelectInput(otk::OBDisplay::display, _client->window(),
-               OBClient::event_mask);
+  _client->ignore_unmaps++;
 
   // raise the client above the frame
   //XRaiseWindow(otk::OBDisplay::display, _client->window());
   // map the client so it maps when the frame does
   XMapWindow(otk::OBDisplay::display, _client->window());
   
-  XUngrabServer(otk::OBDisplay::display);
-
   update();
-
-  XMapWindow(otk::OBDisplay::display, _window);
 }
 
 

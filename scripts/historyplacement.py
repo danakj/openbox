@@ -16,9 +16,11 @@ import windowplacement # fallback routines
 ###                            not to special cases like desktops and      ###
 ###                            docks.                                      ###
 ignore_requested_positions = 0                                             ###
+###                                                                        ###
 # fallback - The window placement algorithm that will be used when history ###
 ###          placement does not have a place for the window.               ###
 fallback = windowplacement.random                                          ###
+###                                                                        ###
 # confirm_callback - set this to a function to have the function called    ###
 ###                  before attempting to place a window via history. If   ###
 ###                  the function returns 'true' then an attempt will be   ###

@@ -353,7 +353,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   assert(win != None); assert(atom != None); assert(type != None);
   assert(size == 8 || size == 16 || size == 32);
   assert(nelements > 0);
-  unsigned char *c_val;        // value alloc'd with c malloc
+  unsigned char *c_val = 0;        // value alloc'd with c malloc
   Atom ret_type;
   int ret_size;
   unsigned long ret_bytes;
@@ -363,12 +363,11 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   result = XGetWindowProperty(_display, win, atom, 0l, 1l, False,
                               AnyPropertyType, &ret_type, &ret_size,
                               &nelements, &ret_bytes, &c_val);
-  if (result != Success || ret_type == None || nelements < 1)
-    // an error occured, the property does not exist on the window, or is empty
-    return false;
-  if (ret_type != type || ret_size != size) {
-    // wrong data in property
-    XFree(c_val);
+  if (result != Success || ret_type != type || ret_size != size ||
+      nelements < 1) {
+    // an error occured, the property does not exist on the window, or is empty,
+    // or the wrong data is in property for the request
+    if (c_val) XFree(c_val);
     return false;
   }
   // the data is correct, now, is there more elements left?

@@ -133,11 +133,12 @@ void MessageDialog::show()
     r = Rect(Point(0, 0), display->screenInfo(screen())->size());
   
   XSizeHints size;
-  size.flags = PMinSize | PPosition;
+  size.flags = PMinSize | PPosition | PWinGravity;
   size.min_width = minSize().width();
   size.min_height = minSize().height();
+  size.win_gravity = CenterGravity;
 
-  Size dest = area().size();
+  Size dest = minSize();
   if (dest.width() < 200 || dest.height() < 100) {
     if (dest.width() < 200 && dest.height() < 100) dest = Size(200, 100);
     else if (dest.width() < 200) dest = Size(200, dest.height());

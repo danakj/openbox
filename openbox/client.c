@@ -3175,7 +3175,7 @@ ObClient* client_under_pointer()
         for (it = stacking_list; it != NULL; it = it->next) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (c->desktop == screen_desktop &&
+                if (c->frame->visible &&
                     RECT_CONTAINS(c->frame->area, x, y)) {
                     ret = c;
                     break;

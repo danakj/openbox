@@ -903,7 +903,8 @@ void Client::toggleClientBorder(bool addborder)
   // different position.
   // when re-adding the border to the client, the same operation needs to be
   // reversed.
-  int x = _area.x(), y = _area.y();
+  int oldx = _area.x(), oldy = _area.y();
+  int x = oldx, y = oldy;
   switch(_gravity) {
   default:
   case NorthWestGravity:
@@ -952,7 +953,8 @@ void Client::toggleClientBorder(bool addborder)
     XSetWindowBorderWidth(**otk::display, _window, _border_width);
 
     // move the client so it is back it the right spot _with_ its border!
-    XMoveWindow(**otk::display, _window, x, y);
+    if (x != oldx || y != oldy)
+      XMoveWindow(**otk::display, _window, x, y);
   } else
     XSetWindowBorderWidth(**otk::display, _window, 0);
 }

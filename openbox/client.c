@@ -255,6 +255,8 @@ void client_manage(Window window)
     /* update the focus lists */
     focus_order_add_new(self);
 
+    stacking_add(CLIENT_AS_WINDOW(self));
+
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING && config_focus_new &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
@@ -263,14 +265,10 @@ void client_manage(Window window)
         (self->type == OB_CLIENT_TYPE_NORMAL ||
          self->type == OB_CLIENT_TYPE_DIALOG))
     {        
-        if (self->desktop != screen_desktop)
-        {
+        if (self->desktop != screen_desktop) {
             /* activate the window */
-            stacking_add(CLIENT_AS_WINDOW(self));
             activate = TRUE;
-        }
-        else
-        {
+        } else {
             gboolean group_foc = FALSE;
 
             if (self->group) {
@@ -293,19 +291,9 @@ void client_manage(Window window)
                 !client_normal(focus_client))
             {
                 /* activate the window */
-                stacking_add(CLIENT_AS_WINDOW(self));
                 activate = TRUE;
             }
-            else
-            {
-                /* try to not get in the way */
-                stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
-            }
         }
-    }
-    else
-    {
-        stacking_add(CLIENT_AS_WINDOW(self));
     }
 
     dispatch_client(Event_Client_New, self, 0, 0);
@@ -323,6 +311,11 @@ void client_manage(Window window)
        clicking a window to activate is. so keep the new window out of the way
        but do focus it. */
     if (activate) client_focus(self);
+
+    /* client_activate does this but we aret using it so we have to do it
+       here as well */
+    if (screen_showing_desktop)
+        screen_show_desktop(FALSE);
 
     /* update the list hints */
     client_set_list();

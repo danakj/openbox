@@ -22,3 +22,16 @@ Don't try running it from the src/ directory without installing, it won't work.
 It needs to be installed before it is run.
 
 The installed binary is 'openbox3'.
+
+
+
+----
+Here's the packages from Debian (sid):
+  g++
+  gettext
+  automake1.7
+  autoconf
+  libtool
+  libxft2-dev
+  python-dev
+  swig1.3

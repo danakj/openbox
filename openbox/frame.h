@@ -59,7 +59,7 @@ typedef struct FrameDecor {
     Decoration type;
     struct Frame *frame;
     int xoff, yoff; /* offsets for shape*/
-/*    struct RrSurface *surface;  SOOOOON!*/
+    struct RrSurface *surface;
 } FrameDecor;
 
 typedef struct Frame {

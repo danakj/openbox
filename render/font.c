@@ -65,7 +65,6 @@ static RrFont *openfont(const RrInstance *inst, char *fontstring)
 
     if (FcPatternGetBool(match, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
         out->shadow = FALSE;
-    g_message("shadow %d", out->shadow);
 
     if (FcPatternGetInteger(match, OB_SHADOW_OFFSET, 0, &out->offset) !=
         FcResultMatch)
@@ -79,6 +78,7 @@ static RrFont *openfont(const RrInstance *inst, char *fontstring)
 
     font = XftFontOpenPattern(RrDisplay(inst), match);
     if (!font) {
+        FcPatternDestroy(match);
         g_free(out);
         return NULL;
     } else

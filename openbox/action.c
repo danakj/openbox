@@ -451,7 +451,6 @@ static void cur_row_col(guint *r, guint *c)
                 screen_desktop / screen_desktop_layout.columns;
             *c = screen_desktop % screen_desktop_layout.columns;
             break;
-        break;
         case Corner_TopRight:
             *r = screen_desktop / screen_desktop_layout.columns;
             *c = screen_desktop_layout.columns - 1 -
@@ -463,8 +462,8 @@ static void cur_row_col(guint *r, guint *c)
             *c = screen_desktop_layout.columns - 1 -
                 screen_desktop % screen_desktop_layout.columns;
             break;
-        break;
         }
+        break;
     case Orientation_Vert:
         switch (screen_desktop_layout.start_corner) {
         case Corner_TopLeft:
@@ -476,7 +475,6 @@ static void cur_row_col(guint *r, guint *c)
                 screen_desktop % screen_desktop_layout.rows;
             *c = screen_desktop / screen_desktop_layout.rows;
             break;
-        break;
         case Corner_TopRight:
             *r = screen_desktop % screen_desktop_layout.rows;
             *c = screen_desktop_layout.columns - 1 -
@@ -488,7 +486,6 @@ static void cur_row_col(guint *r, guint *c)
             *c = screen_desktop_layout.columns - 1 -
                 screen_desktop / screen_desktop_layout.rows;
             break;
-        break;
         }
         break;
     }

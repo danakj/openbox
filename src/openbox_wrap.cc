@@ -8333,21 +8333,36 @@ static PyObject *_wrap_Screen_unmanageWindow(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Screen_restack(PyObject *self, PyObject *args) {
+static PyObject *_wrap_Screen_raiseWindow(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Screen *arg1 = (ob::Screen *) 0 ;
-    bool arg2 ;
-    ob::Client *arg3 = (ob::Client *) 0 ;
+    ob::Client *arg2 = (ob::Client *) 0 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj2  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOO:Screen_restack",&obj0,&obj1,&obj2)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO:Screen_raiseWindow",&obj0,&obj1)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Screen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (bool) PyInt_AsLong(obj1);
-    if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->restack(arg2,arg3);
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->raiseWindow(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Screen_lowerWindow(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Screen *arg1 = (ob::Screen *) 0 ;
+    ob::Client *arg2 = (ob::Client *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Screen_lowerWindow",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Screen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->lowerWindow(arg2);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -10995,7 +11010,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Screen_manageExisting", _wrap_Screen_manageExisting, METH_VARARGS },
 	 { (char *)"Screen_manageWindow", _wrap_Screen_manageWindow, METH_VARARGS },
 	 { (char *)"Screen_unmanageWindow", _wrap_Screen_unmanageWindow, METH_VARARGS },
-	 { (char *)"Screen_restack", _wrap_Screen_restack, METH_VARARGS },
+	 { (char *)"Screen_raiseWindow", _wrap_Screen_raiseWindow, METH_VARARGS },
+	 { (char *)"Screen_lowerWindow", _wrap_Screen_lowerWindow, METH_VARARGS },
 	 { (char *)"Screen_setDesktopName", _wrap_Screen_setDesktopName, METH_VARARGS },
 	 { (char *)"Screen_propertyHandler", _wrap_Screen_propertyHandler, METH_VARARGS },
 	 { (char *)"Screen_clientMessageHandler", _wrap_Screen_clientMessageHandler, METH_VARARGS },

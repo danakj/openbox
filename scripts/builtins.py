@@ -93,12 +93,12 @@ def restart(data, other = ""):
 def raise_win(data):
     """Raises the window on which the event occured"""
     if not data.client: return
-    openbox.screen(data.screen).restack(1, data.client)
+    openbox.screen(data.screen).raiseWindow(data.client)
 
 def lower_win(data):
     """Lowers the window on which the event occured"""
     if not data.client: return
-    openbox.screen(data.screen).restack(0, data.client)
+    openbox.screen(data.screen).lowerWindow(data.client)
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""

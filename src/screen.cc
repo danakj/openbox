@@ -125,7 +125,7 @@ Screen::Screen(int screen)
   _focuswindow = XCreateWindow(**otk::display, _info->rootWindow(),
                                -100, -100, 1, 1, 0, 0, InputOnly,
                                _info->visual(), CWOverrideRedirect, &attr);
-  XMapWindow(**otk::display, _focuswindow);
+  XMapRaised(**otk::display, _focuswindow);
   
   // these may be further updated if any pre-existing windows are found in
   // the manageExising() function
@@ -512,7 +512,7 @@ void Screen::manageWindow(Window window)
   clients.push_back(client);
   // this puts into the stacking order, then raises it
   _stacking.push_back(client);
-  restack(true, client);
+  raiseWindow(client);
   // update the root properties
   changeClientList();
 
@@ -590,30 +590,54 @@ void Screen::unmanageWindow(Client *client)
   changeClientList();
 }
 
-void Screen::restack(bool raise, Client *client)
+void Screen::lowerWindow(Client *client)
 {
-  const int layer = client->layer();
-  std::vector<Window> wins;
+  Window wins[2];  // only ever restack 2 windows.
+
+  assert(!_stacking.empty()); // this would be bad
+
+  Client::List::iterator it = --_stacking.end();
+  Client::List::const_iterator end = _stacking.begin();
+
+  for (; it != end && (*it)->layer() < client->layer(); --it);
+  if (*it == client) return;          // already the bottom, return
+
+  wins[0] = (*it)->frame->window();
+  wins[1] = client->frame->window();
 
   _stacking.remove(client);
+  _stacking.insert(++it, client);
+
+  XRestackWindows(**otk::display, wins, 2);
+  changeStackingList();
+}
+
+void Screen::raiseWindow(Client *client)
+{
+  Window wins[2];  // only ever restack 2 windows.
+
+  assert(!_stacking.empty()); // this would be bad
+
+  // remove the client before looking so we can't run into ourselves
+  _stacking.remove(client);
+  
+  Client::List::iterator it = _stacking.begin();
+  Client::List::const_iterator end = _stacking.end();
 
   // the stacking list is from highest to lowest
-  
-  Client::List::iterator it = _stacking.begin(), end = _stacking.end();
-  // insert the windows above this window
-  for (; it != end; ++it) {
-    if ((*it)->layer() < layer || (raise && (*it)->layer() == layer))
-      break;
-    wins.push_back((*it)->frame->window());
-  }
-  // insert our client
-  wins.push_back(client->frame->window());
-  _stacking.insert(it, client);
-  // insert the remaining below this window
-  for (; it != end; ++it)
-    wins.push_back((*it)->frame->window());
+  for (; it != end && (*it)->layer() > client->layer(); ++it);
 
-  XRestackWindows(**otk::display, &wins[0], wins.size());
+  /*
+    if our new position is the top, we want to stack under the _focuswindow
+    otherwise, we want to stack under the previous window in the stack.
+  */
+  wins[0] = (it == _stacking.begin() ? _focuswindow :
+             ((*(--Client::List::const_iterator(it)))->frame->window()));
+  wins[1] = client->frame->window();
+
+  _stacking.insert(it, client);
+
+  XRestackWindows(**otk::display, wins, 2);
   changeStackingList();
 }
 

@@ -339,7 +339,7 @@ void Client::calcLayer() {
         if we don't have a frame, then we aren't mapped yet (and this would
         SIGSEGV :)
       */
-      openbox->screen(_screen)->restack(true, this); // raise
+      openbox->screen(_screen)->raiseWindow(this);
     }
   }
 }
@@ -856,7 +856,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
       shade(false);
     // XXX: deiconify
     focus();
-    openbox->screen(_screen)->restack(true, this); // raise
+    openbox->screen(_screen)->raiseWindow(this);
   }
 }
 
@@ -1165,13 +1165,13 @@ void Client::configureRequestHandler(const XConfigureRequestEvent &e)
     switch (e.detail) {
     case Below:
     case BottomIf:
-      openbox->screen(_screen)->restack(false, this); // lower
+      openbox->screen(_screen)->lowerWindow(this);
       break;
 
     case Above:
     case TopIf:
     default:
-      openbox->screen(_screen)->restack(true, this); // raise
+      openbox->screen(_screen)->raiseWindow(this);
       break;
     }
   }

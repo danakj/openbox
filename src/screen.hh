@@ -182,9 +182,18 @@ public:
   */
   void unmanageWindow(Client *client);
 
-  //! Raises/Lowers a client window above/below all others in its stacking
-  //! layer
-  void restack(bool raise, Client *client);
+  //! Raises a client window above all others in its stacking layer
+  /*!
+    raiseWindow has a couple of constraints that lowerWindow does not.<br>
+    1) raiseWindow can be called after changing a Client's stack layer, and
+       the list will be reorganized properly.<br>
+    2) raiseWindow guarantees that XRestackWindows() will <i>always</i> be
+       called for the specified client.
+  */
+  void raiseWindow(Client *client);
+
+  //! Lowers a client window below all others in its stacking layer
+  void lowerWindow(Client *client);
 
   //! Sets the name of a desktop by changing the root window property
   /*!

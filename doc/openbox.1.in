@@ -488,7 +488,7 @@ which kind of value they can contain.
 Comments are preceded with an exclamation sign (!), which is also used for
 comments in Openbox style c.q. X resource files.
 .PP
-.ta \w'window.button.unfocus.picColor:\ 'u 
+.ta \w'window.button.unfocus.picColor: \ 'u 
 .nf
 .\"
 .\" The comments also to be translated!
@@ -535,9 +535,11 @@ toolbar.clock.textColor:	Color
 ! How the toolbar's text should be justified.
 toolbar.justify:	\fIcenter\fR, \fIleft\fR, or \fIright\fR
 
+.ta \w'toolbar.font:\ 'u 
 ! Font to be used for all toolbar components.
 toolbar.font:	Font \fI(e.g. -*-helvetica-medium-r-normal-*-*-100-*)\fR
 
+.ta \w'window.button.unfocus.picColor: \ 'u 
 ! The menu titlebar.
 menu.title:	Texture
 menu.title.color:	Color
@@ -619,6 +621,17 @@ window.button.pressed:	Texture (e.g. \fISunken\fR)
 window.button.pressed.color:	Color
 window.button.pressed.colorTo:	Color
 
+.ta \w'window.button.pressed.unfocus.colorTo:\ 'u 
+! If either the focused, or unfocused pressed button isn't
+! defined, it will use the normal pressed: resource
+window.button.pressed.focus:	Texture (eg. \fISunken\fR)
+window.button.pressed.focus.color:	Color
+window.button.pressed.focus.colorTo:	Color
+window.button.pressed.unfocus:	Texture (eg. \fISunken\fR)
+window.button.pressed.unfocus.color:	Color
+window.button.pressed.unfocus.colorTo:	Color
+
+.ta \w'window.button.unfocus.picColor:\ 'u 
 ! Frame around window.
 window.frame.focusColor:	Color
 window.frame.unfocusColor:	Color
@@ -642,7 +655,7 @@ frameWidth:	a number of pixels >= 0
 
 ! This command is executed whenever this style is selected.
 ! Typically it sets the root window to a nice picture.
-rootCommand:	Shell command, e.g. \fIbsetroot -mod 4 4 -fg rgb:	5/6/6 -bg grey20\fR
+rootCommand: Shell command, e.g. \fIbsetroot -mod 4 4 -fg rgb:	5/6/6 -bg grey20\fR
 
 ! Some of the bbtools read these old 0.51 resources.
 menuFont:	Font

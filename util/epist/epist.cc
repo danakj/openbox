@@ -92,6 +92,7 @@ epist::~epist() {
   delete _xatom;
 }
 
+
 //   XGrabKey(_epist->getXDisplay(), XKeysymToKeycode(_epist->getXDisplay(),
 //                                            XStringToKeysym("F5")),
 //            Mod1Mask, _root, True, GrabModeAsync, GrabModeAsync);
@@ -110,6 +111,8 @@ void epist::activateGrabs() {
     }
   }
 }
+
+
 bool epist::handleSignal(int sig) {
   switch (sig) {
   case SIGHUP:

@@ -12,59 +12,6 @@
 static Bool cleancache = False;
 static PyObject *colorcache = NULL;
 
-static void otkcolor_dealloc(OtkColor* self)
-{
-  // when this is called, the color has already been cleaned out of the cache
-  PyObject_Del((PyObject*)self);
-}
-
-static int otkcolor_compare(OtkColor *c1, OtkColor *c2)
-{
-  long result;
-  unsigned long p1, p2;
-
-  p1 = c1->red << 16 | c1->green << 8 | c1->blue;
-  p2 = c2->red << 16 | c2->green << 8 | c2->blue;
-
-  if (p1 < p2)
-    result = -1;
-  else if (p1 > p2)
-    result = 1;
-  else
-    result = 0;
-  return result;
-}
-
-static PyObject *otkcolor_repr(OtkColor *self)
-{
-  return PyString_FromFormat("rgb:%x/%x/%x", self->red, self->green,
-                             self->blue);
-}
-
-static long otkcolor_hash(OtkColor *self)
-{
-  return self->screen << 24 | self->red << 16 | self->green << 8 | self->blue;
-}
-
-PyTypeObject OtkColor_Type = {
-  PyObject_HEAD_INIT(NULL)
-  0,
-  "Color",
-  sizeof(OtkColor),
-  0,
-  (destructor)otkcolor_dealloc, /*tp_dealloc*/
-  0,                            /*tp_print*/
-  0,                            /*tp_getattr*/
-  0,                            /*tp_setattr*/
-  (cmpfunc)otkcolor_compare,    /*tp_compare*/
-  (reprfunc)otkcolor_repr,      /*tp_repr*/
-  0,                            /*tp_as_number*/
-  0,                            /*tp_as_sequence*/
-  0,                            /*tp_as_mapping*/
-  (hashfunc)otkcolor_hash,      /*tp_hash */
-};
-
-
 static void parseColorName(OtkColor *self, const char *name) {
   XColor xcol;
 
@@ -221,3 +168,57 @@ void OtkColor_CleanupColorCache()
 {
   cleancache = True;
 }
+
+
+
+static void otkcolor_dealloc(OtkColor* self)
+{
+  // when this is called, the color has already been cleaned out of the cache
+  PyObject_Del((PyObject*)self);
+}
+
+static int otkcolor_compare(OtkColor *c1, OtkColor *c2)
+{
+  long result;
+  unsigned long p1, p2;
+
+  p1 = c1->red << 16 | c1->green << 8 | c1->blue;
+  p2 = c2->red << 16 | c2->green << 8 | c2->blue;
+
+  if (p1 < p2)
+    result = -1;
+  else if (p1 > p2)
+    result = 1;
+  else
+    result = 0;
+  return result;
+}
+
+static PyObject *otkcolor_repr(OtkColor *self)
+{
+  return PyString_FromFormat("rgb:%x/%x/%x", self->red, self->green,
+                             self->blue);
+}
+
+static long otkcolor_hash(OtkColor *self)
+{
+  return self->screen << 24 | self->red << 16 | self->green << 8 | self->blue;
+}
+
+PyTypeObject OtkColor_Type = {
+  PyObject_HEAD_INIT(NULL)
+  0,
+  "OtkColor",
+  sizeof(OtkColor),
+  0,
+  (destructor)otkcolor_dealloc, /*tp_dealloc*/
+  0,                            /*tp_print*/
+  0,                            /*tp_getattr*/
+  0,                            /*tp_setattr*/
+  (cmpfunc)otkcolor_compare,    /*tp_compare*/
+  (reprfunc)otkcolor_repr,      /*tp_repr*/
+  0,                            /*tp_as_number*/
+  0,                            /*tp_as_sequence*/
+  0,                            /*tp_as_mapping*/
+  (hashfunc)otkcolor_hash,      /*tp_hash */
+};

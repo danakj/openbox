@@ -92,142 +92,6 @@ void RrRender(RrAppearance *a, int w, int h)
     }
 }
 
-
-
-static void gradient_vertical(RrSurface *sf, int w, int h)
-{
-    RrPixel32 *data = sf->RrPixel_data;
-    RrPixel32 current;
-    float dr, dg, db;
-    unsigned int r,g,b;
-    int x, y;
-
-    dr = (float)(sf->secondary->r - sf->primary->r);
-    dr/= (float)h;
-
-    dg = (float)(sf->secondary->g - sf->primary->g);
-    dg/= (float)h;
-
-    db = (float)(sf->secondary->b - sf->primary->b);
-    db/= (float)h;
-
-    for (y = 0; y < h; ++y) {
-        r = sf->primary->r + (int)(dr * y);
-        g = sf->primary->g + (int)(dg * y);
-        b = sf->primary->b + (int)(db * y);
-        current = (r << RrDefaultRedOffset)
-            + (g << RrDefaultGreenOffset)
-            + (b << RrDefaultBlueOffset);
-        for (x = 0; x < w; ++x, ++data)
-            *data = current;
-    }
-}
-
-static void gradient_horizontal(RrSurface *sf, int w, int h)
-{
-    RrPixel32 *data = sf->RrPixel_data;
-    RrPixel32 current;
-    float dr, dg, db;
-    unsigned int r,g,b;
-    int x, y;
-
-    dr = (float)(sf->secondary->r - sf->primary->r);
-    dr/= (float)w;
-
-    dg = (float)(sf->secondary->g - sf->primary->g);
-    dg/= (float)w;
-
-    db = (float)(sf->secondary->b - sf->primary->b);
-    db/= (float)w;
-
-    for (x = 0; x < w; ++x, ++data) {
-        r = sf->primary->r + (int)(dr * x);
-        g = sf->primary->g + (int)(dg * x);
-        b = sf->primary->b + (int)(db * x);
-        current = (r << RrDefaultRedOffset)
-            + (g << RrDefaultGreenOffset)
-            + (b << RrDefaultBlueOffset);
-        for (y = 0; y < h; ++y)
-            *(data + y*w) = current;
-    }
-}
-
-static void gradient_diagonal(RrSurface *sf, int w, int h)
-{
-    RrPixel32 *data = sf->RrPixel_data;
-    RrPixel32 current;
-    float drx, dgx, dbx, dry, dgy, dby;
-    unsigned int r,g,b;
-    int x, y;
-
-    for (y = 0; y < h; ++y) {
-        drx = (float)(sf->secondary->r -
-                      sf->primary->r);
-        dry = drx/(float)h;
-        drx/= (float)w;
-
-        dgx = (float)(sf->secondary->g -
-                      sf->primary->g);
-        dgy = dgx/(float)h;
-        dgx/= (float)w;
-
-        dbx = (float)(sf->secondary->b -
-                      sf->primary->b);
-        dby = dbx/(float)h;
-        dbx/= (float)w;
-        for (x = 0; x < w; ++x, ++data) {
-            r = sf->primary->r +
-                ((int)(drx * x) + (int)(dry * y))/2;
-            g = sf->primary->g +
-                ((int)(dgx * x) + (int)(dgy * y))/2;
-            b = sf->primary->b +
-                ((int)(dbx * x) + (int)(dby * y))/2;
-            current = (r << RrDefaultRedOffset)
-                + (g << RrDefaultGreenOffset)
-                + (b << RrDefaultBlueOffset);
-            *data = current;
-        }
-    }
-}
-
-static void gradient_crossdiagonal(RrSurface *sf, int w, int h)
-{
-    RrPixel32 *data = sf->RrPixel_data;
-    RrPixel32 current;
-    float drx, dgx, dbx, dry, dgy, dby;
-    unsigned int r,g,b;
-    int x, y;
-
-    for (y = 0; y < h; ++y) {
-        drx = (float)(sf->secondary->r -
-                      sf->primary->r);
-        dry = drx/(float)h;
-        drx/= (float)w;
-
-        dgx = (float)(sf->secondary->g -
-                      sf->primary->g);
-        dgy = dgx/(float)h;
-        dgx/= (float)w;
-
-        dbx = (float)(sf->secondary->b -
-                      sf->primary->b);
-        dby = dbx/(float)h;
-        dbx/= (float)w;
-        for (x = w; x > 0; --x, ++data) {
-            r = sf->primary->r +
-                ((int)(drx * (x-1)) + (int)(dry * y))/2;
-            g = sf->primary->g +
-                ((int)(dgx * (x-1)) + (int)(dgy * y))/2;
-            b = sf->primary->b +
-                ((int)(dbx * (x-1)) + (int)(dby * y))/2;
-            current = (r << RrDefaultRedOffset)
-                + (g << RrDefaultGreenOffset)
-                + (b << RrDefaultBlueOffset);
-            *data = current;
-        }
-    }
-}
-
 static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
 {
     int r, g, b;
@@ -401,97 +265,350 @@ static void gradient_solid(RrAppearance *l, int w, int h)
     }
 }
 
+/* * * * * * * * * * * * * * GRADIENT MAGIC WOOT * * * * * * * * * * * * * * */
+
+#define VARS(x)                                                     \
+    unsigned int color##x[3];                                       \
+    int len##x, cdelta##x[3], error##x[3] = { 0, 0, 0 }, inc##x[3]; \
+    gboolean bigslope##x[3] /* color slope > 1 */
+
+#define SETUP(x, from, to, w)         \
+    len##x = w;                       \
+                                      \
+    color##x[0] = from->r;            \
+    color##x[1] = from->g;            \
+    color##x[2] = from->b;            \
+                                      \
+    cdelta##x[0] = to->r - from->r;   \
+    cdelta##x[1] = to->g - from->g;   \
+    cdelta##x[2] = to->b - from->b;   \
+                                      \
+    if (cdelta##x[0] < 0) {           \
+        cdelta##x[0] = -cdelta##x[0]; \
+        inc##x[0] = -1;               \
+    } else                            \
+        inc##x[0] = 1;                \
+    if (cdelta##x[1] < 0) {           \
+        cdelta##x[1] = -cdelta##x[1]; \
+        inc##x[1] = -1;               \
+    } else                            \
+        inc##x[1] = 1;                \
+    if (cdelta##x[2] < 0) {           \
+        cdelta##x[2] = -cdelta##x[2]; \
+        inc##x[2] = -1;               \
+    } else                            \
+        inc##x[2] = 1;                \
+    bigslope##x[0] = cdelta##x[0] > w;\
+    bigslope##x[1] = cdelta##x[1] > w;\
+    bigslope##x[2] = cdelta##x[2] > w
+
+#define COLOR_RR(x, c)                       \
+    c->r = color##x[0];                      \
+    c->g = color##x[1];                      \
+    c->b = color##x[2]
+
+#define COLOR(x)                             \
+    ((color##x[0] << RrDefaultRedOffset) +   \
+     (color##x[1] << RrDefaultGreenOffset) + \
+     (color##x[2] << RrDefaultBlueOffset))
+
+#define NEXT(x)                                           \
+{                                                         \
+    int i;                                                \
+    for (i = 2; i >= 0; --i) {                            \
+        if (!cdelta##x[i]) continue;                      \
+                                                          \
+        if (!bigslope##x[i]) {                            \
+            /* Y (color) is dependant on X */             \
+            error##x[i] += cdelta##x[i];                  \
+            if ((error##x[i] << 1) >= len##x) {           \
+                color##x[i] += inc##x[i];                 \
+                error##x[i] -= len##x;                    \
+            }                                             \
+        } else {                                          \
+            /* X is dependant on Y (color) */             \
+            while (1) {                                   \
+                color##x[i] += inc##x[i];                 \
+                error##x[i] += len##x;                    \
+                if ((error##x[i] << 1) >= cdelta##x[i]) { \
+                    error##x[i] -= cdelta##x[i];          \
+                    break;                                \
+                }                                         \
+            }                                             \
+        }                                                 \
+    }                                                     \
+}
+
+static void gradient_horizontal(RrSurface *sf, int w, int h)
+{
+    int x, y;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
+
+    VARS(x);
+    SETUP(x, sf->primary, sf->secondary, w);
+
+    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+        current = COLOR(x);
+        for (y = h - 1; y >= 0; --y)  /* 0 -> h */
+            *(data + y * w) = current;
+        ++data;
+
+        NEXT(x);
+    }
+    current = COLOR(x);
+    for (y = h - 1; y >= 0; --y)  /* 0 -> h */
+        *(data + y * w) = current;
+}
+
+static void gradient_vertical(RrSurface *sf, int w, int h)
+{
+    int x, y;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
+
+    VARS(y);
+    SETUP(y, sf->primary, sf->secondary, h);
+
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        current = COLOR(y);
+        for (x = w - 1; x >= 0; --x)  /* 0 -> w */
+            *(data++) = current;
+
+        NEXT(y);
+    }
+    current = COLOR(y);
+    for (x = w - 1; x >= 0; --x)  /* 0 -> w */
+        *(data++) = current;
+}
+
+
+static void gradient_diagonal(RrSurface *sf, int w, int h)
+{
+    int x, y;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrColor left, right;
+    RrColor extracorner;
+
+    VARS(lefty);
+    VARS(righty);
+    VARS(x);
+
+    extracorner.r = (sf->primary->r + sf->secondary->r) / 2;
+    extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
+    extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
+
+    SETUP(lefty, sf->primary, (&extracorner), h);
+    SETUP(righty, (&extracorner), sf->secondary, h);
+
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        COLOR_RR(lefty, (&left));
+        COLOR_RR(righty, (&right));
+
+        SETUP(x, (&left), (&right), w);
+
+        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+            *(data++) = COLOR(x);
+
+            NEXT(x);
+        }
+        *(data++) = COLOR(x);
+
+        NEXT(lefty);
+        NEXT(righty);
+    }
+    COLOR_RR(lefty, (&left));
+    COLOR_RR(righty, (&right));
+
+    SETUP(x, (&left), (&right), w);
+
+    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+        *(data++) = COLOR(x);
+        
+        NEXT(x);
+    }
+    *data = COLOR(x);
+}
+
+static void gradient_crossdiagonal(RrSurface *sf, int w, int h)
+{
+    int x, y;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrColor left, right;
+    RrColor extracorner;
+
+    VARS(lefty);
+    VARS(righty);
+    VARS(x);
+
+    extracorner.r = (sf->primary->r + sf->secondary->r) / 2;
+    extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
+    extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
+
+    SETUP(lefty, (&extracorner), sf->secondary, h);
+    SETUP(righty, sf->primary, (&extracorner), h);
+
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        COLOR_RR(lefty, (&left));
+        COLOR_RR(righty, (&right));
+
+        SETUP(x, (&left), (&right), w);
+
+        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+            *(data++) = COLOR(x);
+
+            NEXT(x);
+        }
+        *(data++) = COLOR(x);
+
+        NEXT(lefty);
+        NEXT(righty);
+    }
+    COLOR_RR(lefty, (&left));
+    COLOR_RR(righty, (&right));
+
+    SETUP(x, (&left), (&right), w);
+
+    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+        *(data++) = COLOR(x);
+        
+        NEXT(x);
+    }
+    *data = COLOR(x);
+}
+
 static void gradient_pyramid(RrSurface *sf, int inw, int inh)
 {
+    int x, y, w = (inw >> 1) + 1, h = (inh >> 1) + 1;
     RrPixel32 *data = sf->RrPixel_data;
     RrPixel32 *end = data + inw*inh - 1;
     RrPixel32 current;
-    float drx, dgx, dbx, dry, dgy, dby;
-    unsigned int r,g,b;
-    int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
+    RrColor left, right;
+    RrColor extracorner;
 
-    drx = (float)(sf->secondary->r -
-                  sf->primary->r);
-    dry = drx/(float)h;
-    drx/= (float)w;
+    VARS(lefty);
+    VARS(righty);
+    VARS(x);
 
-    dgx = (float)(sf->secondary->g -
-                  sf->primary->g);
-    dgy = dgx/(float)h;
-    dgx/= (float)w;
+    extracorner.r = (sf->primary->r + sf->secondary->r) / 2;
+    extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
+    extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
 
-    dbx = (float)(sf->secondary->b -
-                  sf->primary->b);
-    dby = dbx/(float)h;
-    dbx/= (float)w;
+    SETUP(lefty, (&extracorner), sf->secondary, h);
+    SETUP(righty, sf->primary, (&extracorner), h);
 
-    for (y = 0; y < h; ++y) {
-        for (x = 0; x < w; ++x, data) {
-            r = sf->primary->r +
-                ((int)(drx * x) + (int)(dry * y))/2;
-            g = sf->primary->g +
-                ((int)(dgx * x) + (int)(dgy * y))/2;
-            b = sf->primary->b +
-                ((int)(dbx * x) + (int)(dby * y))/2;
-            current = (r << RrDefaultRedOffset)
-                + (g << RrDefaultGreenOffset)
-                + (b << RrDefaultBlueOffset);
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        COLOR_RR(lefty, (&left));
+        COLOR_RR(righty, (&right));
+
+        SETUP(x, (&left), (&right), w);
+
+        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+            current = COLOR(x);
             *(data+x) = current;
             *(data+inw-x) = current;
             *(end-x) = current;
             *(end-(inw-x)) = current;
+
+            NEXT(x);
         }
+        current = COLOR(x);
+        *(data+x) = current;
+        *(data+inw-x) = current;
+        *(end-x) = current;
+        *(end-(inw-x)) = current;
+
         data+=inw;
         end-=inw;
+
+        NEXT(lefty);
+        NEXT(righty);
     }
+    COLOR_RR(lefty, (&left));
+    COLOR_RR(righty, (&right));
+
+    SETUP(x, (&left), (&right), w);
+
+    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+        current = COLOR(x);
+        *(data+x) = current;
+        *(data+inw-x) = current;
+        *(end-x) = current;
+        *(end-(inw-x)) = current;
+        
+        NEXT(x);
+    }
+    *(data+x) = current;
+    *(data+inw-x) = current;
+    *(end-x) = current;
+    *(end-(inw-x)) = current;
 }
 
 static void gradient_rectangle(RrSurface *sf, int inw, int inh)
 {
+    int x, y, w = (inw >> 1) + 1, h = (inh >> 1) + 1;
     RrPixel32 *data = sf->RrPixel_data;
     RrPixel32 *end = data + inw*inh - 1;
     RrPixel32 current;
-    float drx, dgx, dbx, dry, dgy, dby;
-    unsigned int r,g,b;
-    int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
+    RrColor left, right;
+    RrColor extracorner;
 
-    drx = (float)(sf->primary->r -
-                  sf->secondary->r);
-    dry = drx/(float)h;
-    drx/= (float)w;
+    VARS(lefty);
+    VARS(righty);
+    VARS(x);
 
-    dgx = (float)(sf->primary->g -
-                  sf->secondary->g);
-    dgy = dgx/(float)h;
-    dgx/= (float)w;
+    extracorner.r = (sf->primary->r + sf->secondary->r) / 2;
+    extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
+    extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
 
-    dbx = (float)(sf->primary->b -
-                  sf->secondary->b);
-    dby = dbx/(float)h;
-    dbx/= (float)w;
+    SETUP(lefty, (&extracorner), sf->secondary, h);
+    SETUP(righty, sf->primary, (&extracorner), h);
 
-    for (y = 0; y < h; ++y) {
-        for (x = 0; x < w; ++x, data) {
-            if ((float)x/(float)w < (float)y/(float)h) {
-                r = sf->primary->r + (drx * x);
-                g = sf->primary->g + (dgx * x);
-                b = sf->primary->b + (dbx * x);
-            } else {
-                r = sf->primary->r + (dry * x);
-                g = sf->primary->g + (dgy * x);
-                b = sf->primary->b + (dby * x);
-            }
-            current = (r << RrDefaultRedOffset)
-                + (g << RrDefaultGreenOffset)
-                + (b << RrDefaultBlueOffset);
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        COLOR_RR(lefty, (&left));
+        COLOR_RR(righty, (&right));
+
+        SETUP(x, (&left), (&right), w);
+
+        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+            current = COLOR(x);
             *(data+x) = current;
             *(data+inw-x) = current;
             *(end-x) = current;
             *(end-(inw-x)) = current;
+
+            NEXT(x);
         }
+        current = COLOR(x);
+        *(data+x) = current;
+        *(data+inw-x) = current;
+        *(end-x) = current;
+        *(end-(inw-x)) = current;
+
         data+=inw;
         end-=inw;
+
+        NEXT(lefty);
+        NEXT(righty);
     }
+    COLOR_RR(lefty, (&left));
+    COLOR_RR(righty, (&right));
+
+    SETUP(x, (&left), (&right), w);
+
+    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+        current = COLOR(x);
+        *(data+x) = current;
+        *(data+inw-x) = current;
+        *(end-x) = current;
+        *(end-(inw-x)) = current;
+        
+        NEXT(x);
+    }
+    *(data+x) = current;
+    *(data+inw-x) = current;
+    *(end-x) = current;
+    *(end-(inw-x)) = current;
 }
 
 static void gradient_pipecross(RrSurface *sf, int inw, int inh)

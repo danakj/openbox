@@ -46,7 +46,7 @@ int main()
         inst = RrInstanceNew(ob_display, ob_screen);
 
 	look = RrAppearanceNew(inst, 0);
-	look->surface.grad = RR_SURFACE_PYRAMID;
+	look->surface.grad = RR_SURFACE_RECTANGLE;
 	look->surface.secondary = RrColorParse(inst, "Yellow");
 	look->surface.primary = RrColorParse(inst, "Blue");
         look->surface.interlaced = FALSE;

@@ -75,13 +75,8 @@ public:
   //! Destroys the Frame object
   virtual ~Frame();
 
-  otk::Rect area() const {
-    otk::Rect a(_client->area());
-    a.setRect(a.x() - _size.left, a.y() - _size.top,
-              a.width() + _size.left + _size.right,
-              a.height() + _size.top + _size.bottom);
-    return a;
-  }
+  //! Returns the size of the frame on each side of the client
+  const otk::Strut& size() const { return _size; }
   
   //! Set the style to decorate the frame with
   virtual void setStyle(otk::Style *style);

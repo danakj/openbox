@@ -14,7 +14,6 @@ menu.items.active.bg:			raised gradient diagonal
 menu.items.active.bg.color:		rgb:90/94/98
 menu.items.active.bg.colorTo:		rgb:20/24/28
 menu.items.active.text.color:		white
-menu.bullet.image.color: rgb:90/a0/b0
 
 window.active.title.bg:		raised gradient vertical
 window.active.title.bg.color:	rgb:80/84/88
@@ -93,7 +92,7 @@ window.inactive.button.disabled.image.color:	rgb:70/74/78
 
 border.color:			black
 padding.width:				1
-borderWidth:			1
+border.width:			1
 window.handle.width:			4
 
 window.active.label.text.font: Bitstream Vera Sans:pixelsize=10

@@ -101,5 +101,5 @@ window.inactive.client.color:	#677b91
 window.handle.width:	3
 window.client.padding.width:	1
 padding.width:	1
-borderWidth:	1
+border.width:	1
 border.color:	#484848

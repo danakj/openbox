@@ -111,7 +111,7 @@ menu.title.text.justify:		center
 
 ! ***** the rest *****
 border.color:				#2e3a45
-borderWidth:				1
+border.width:				1
 padding.width:				1
 window.handle.width:				3
 window.client.padding.width:				1

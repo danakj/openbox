@@ -93,13 +93,23 @@ AC_CHECK_LIB([X11], [XOpenDisplay],
 
 dnl Check for Xft2
 AC_MSG_CHECKING([for Xft version 2])
+dnl Store these
+OLDLIBS=$LIBS
+OLDCPPFLAGS=$CPPFLAGS
 XFT2=""
+XFT_CFLAGS=""
+XFT_LIBS=""
 if pkg-config xft; then
   AC_MSG_RESULT([yes])
-  XFT2="yes"
-  LIBS="$LIBS `pkg-config --libs xft`"
-  CXXFLAGS="`pkg-config --cflags xft` $CXXFLAGS"
+  XFT_CFLAGS="`pkg-config --cflags xft`"
+  XFT_LIBS="`pkg-config --libs xft`"
+
+  dnl Set these for checking with the tests below. They'll be restored after
+  LIBS="$LIBS $XFT_LIBS"
+  CPPFLAGS="$XFT_CFLAGS $CPPFLAGS"
 else
+  dnl This is for Xft version 1
+  XFT_LIBS="-lXft"
   AC_MSG_RESULT([no])
 fi
 
@@ -115,8 +125,6 @@ AC_CHECK_LIB([Xft], [XftFontOpenXlfd],
     ],
     [
       AC_MSG_RESULT([yes])
-      dnl This is for Xft version 1
-      test "$XFT2" = "yes" || LIBS="$LIBS -lXft"
     ],
     [ 
       AC_MSG_RESULT([no])
@@ -126,6 +134,12 @@ See http://www.fontconfig.org/
     ]
   )
 )
+dnl Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
+LIBS=$OLDLIBS
+CPPFLAGS=$OLDCPPFLAGS
+
+AC_SUBST([XFT_CFLAGS])
+AC_SUBST([XFT_LIBS])
 
 dnl Check for XShape extension support
 AC_CHECK_LIB([Xext], [XShapeCombineShape],

@@ -2,12 +2,12 @@ localedir=$(datadir)/locale
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CPPFLAGS=`pkg-config --cflags xft` @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) @CPPFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
 -DLOCALEDIR=\"$(localedir)\"
 
-LDFLAGS=`pkg-config --libs xft`
+LIBS=$(XFT_LIBS) @LIBS@
 
 INCLUDES= -I../otk
 

@@ -621,6 +621,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   if (dooppsel && item->isSelected()) {
+#ifdef    BITMAPBUTTONS
     if ( style->tick_image.mask != None) {
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
                      oppsel_x, item_y + menu.item_h/2 - style->tick_image.h/2);
@@ -637,6 +638,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
                      0, 0);
     } else {
+#endif // BITMAPBUTTONS
       XPoint pts[6];
 
       pts[0].x = oppsel_x + 0;
@@ -660,7 +662,9 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
 
       XFillPolygon(display, menu.frame, pen.gc(), pts, 6, Nonconvex,
                    CoordModePrevious);
+#ifdef    BITMAPBUTTONS
     }
+#endif // BITMAPBUTTONS
   }
 
   if (dotext && text) {
@@ -672,6 +676,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   if (dosel && item->submenu()) {
+#ifdef    BITMAPBUTTONS
     if ( style->bullet_image.mask != None) {
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
                      sel_x, item_y + menu.item_h/2 - style->bullet_image.h/2);
@@ -687,6 +692,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
                      0, 0);
     } else {
+#endif // BITMAPBUTTONS
       const int bullet_size = 3;
 
       switch (screen->getMenuStyle()->bullet) {
@@ -734,7 +740,9 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
                      CoordModePrevious);
         break;
       }
+#ifdef    BITMAPBUTTONS
     }
+#endif // BITMAPBUTTONS
   }
 }
 

@@ -61,10 +61,12 @@ struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
+#ifdef    BITMAPBUTTONS
 struct PixmapMask {
   Pixmap mask;
   unsigned int w, h;
 };
+#endif // BITMAPBUTTONS
 
 struct WindowStyle {
   BColor l_text_focus, l_text_unfocus, b_pic_focus,
@@ -72,8 +74,9 @@ struct WindowStyle {
   BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
     h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
 
+#ifdef    BITMAPBUTTONS
   PixmapMask close_button, max_button, icon_button, stick_button;
-
+#endif // BITMAPBUTTONS
   BFont *font;
 
   TextJustify justify;
@@ -86,7 +89,9 @@ struct ToolbarStyle {
   BColor l_text, w_text, c_text, b_pic;
   BTexture toolbar, label, window, button, pressed, clock;
 
-  PixmapMask left_button, right_button; //these should probably be the same
+#ifdef    BITMAPBUTTONS
+  PixmapMask left_button, right_button;
+#endif // BITMAPBUTTONS
   
   BFont *font;
 
@@ -99,8 +104,10 @@ struct ToolbarStyle {
 struct MenuStyle {
   BColor t_text, f_text, h_text, d_text;
   BTexture title, frame, hilite;
-
+  
+#ifdef    BITMAPBUTTONS
   PixmapMask bullet_image, tick_image;
+#endif // BITMAPBUTTONS
   
   BFont *t_font, *f_font;
 
@@ -191,9 +198,12 @@ private:
 
   bool parseMenuFile(FILE *file, Rootmenu *menu);
 
+#ifdef    BITMAPBUTTONS
   void readDatabaseMask(const string &rname,
                         PixmapMask &pixmapMask,
                         const Configuration &style);
+#endif // BITMAPBUTTONS
+  
   BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
                                const Configuration &style);

@@ -633,16 +633,8 @@ void Toolbar::drawArrow(Drawable surface, bool left) const {
 
 
   if (left) {
-    if (style->left_button.mask == None) {
-      pts[0].x = hw - bullet_size;
-      pts[0].y = hh;
-      pts[1].x = 2 * bullet_size;
-      pts[1].y = bullet_size;
-      pts[2].x = 0;
-      pts[2].y = -(2 * bullet_size);
-      XFillPolygon(display, surface, pen.gc(), pts, 3, Convex,
-                   CoordModePrevious);
-    } else {
+#ifdef    BITMAPBUTTONS
+    if (style->left_button.mask != None) {
       XSetClipMask(blackbox->getXDisplay(), pen.gc(), style->left_button.mask);
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
                      (frame.button_w - style->left_button.w)/2,
@@ -655,18 +647,22 @@ void Toolbar::drawArrow(Drawable surface, bool left) const {
 
       XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
-    }
-  } else {
-    if (style->right_button.mask == None) {
+    } else {
+#endif // BITMAPBUTTONS
       pts[0].x = hw - bullet_size;
-      pts[0].y = hh - bullet_size;
-      pts[1].x = (2 * bullet_size);
-      pts[1].y =  bullet_size;
-      pts[2].x = -(2 * bullet_size);
-      pts[2].y = bullet_size;
+      pts[0].y = hh;
+      pts[1].x = 2 * bullet_size;
+      pts[1].y = bullet_size;
+      pts[2].x = 0;
+      pts[2].y = -(2 * bullet_size);
       XFillPolygon(display, surface, pen.gc(), pts, 3, Convex,
                    CoordModePrevious);
-    } else {
+#ifdef    BITMAPBUTTONS      
+    }
+#endif // BITMAPBUTTONS
+  } else {
+#ifdef    BITMAPBUTTONS
+    if (style->right_button.mask != None) {
       XSetClipMask(blackbox->getXDisplay(), pen.gc(),
                    style->right_button.mask);
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
@@ -681,7 +677,19 @@ void Toolbar::drawArrow(Drawable surface, bool left) const {
 
       XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
+    } else {
+#endif // BITMAPBUTTONS
+      pts[0].x = hw - bullet_size;
+      pts[0].y = hh - bullet_size;
+      pts[1].x = (2 * bullet_size);
+      pts[1].y =  bullet_size;
+      pts[2].x = -(2 * bullet_size);
+      pts[2].y = bullet_size;
+      XFillPolygon(display, surface, pen.gc(), pts, 3, Convex,
+                   CoordModePrevious);
+#ifdef    BITMAPBUTTONS
     }
+#endif
   }
 }
 

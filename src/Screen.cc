@@ -339,6 +339,7 @@ BScreen::~BScreen(void) {
   if (resource.tstyle.font)
     delete resource.tstyle.font;
 
+#ifdef    BITMAPBUTTONS
   if (resource.wstyle.close_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
   if (resource.wstyle.max_button.mask != None)
@@ -363,6 +364,7 @@ BScreen::~BScreen(void) {
     resource.wstyle.stick_button.mask = None;
   resource.tstyle.left_button.mask = resource.tstyle.right_button.mask = None;
   resource.mstyle.bullet_image.mask = resource.mstyle.tick_image.mask = None;
+#endif // BITMAPBUTTONS
   
   XFreeGC(blackbox->getXDisplay(), opGC);
 }
@@ -1062,6 +1064,7 @@ void BScreen::LoadStyle(void) {
   resource.wstyle.b_pressed =
     readDatabaseTexture("window.button.pressed", "black", style);
 
+#ifdef    BITMAPBUTTONS
   if (resource.wstyle.close_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
   if (resource.wstyle.max_button.mask != None)
@@ -1083,6 +1086,7 @@ void BScreen::LoadStyle(void) {
                    style);
   readDatabaseMask("window.button.stick.mask", resource.wstyle.stick_button,
                    style);
+#endif // BITMAPBUTTONS
 
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
@@ -1124,10 +1128,12 @@ void BScreen::LoadStyle(void) {
     resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
 
   // load toolbar config
+#ifdef    BITMAPBUTTONS
   if (resource.tstyle.left_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
   if (resource.tstyle.right_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
+#endif // BITMAPBUTTONS
   
   resource.tstyle.toolbar =
     readDatabaseTexture("toolbar", "black", style);
@@ -1149,10 +1155,13 @@ void BScreen::LoadStyle(void) {
     readDatabaseColor("toolbar.clock.textColor", "white", style);
   resource.tstyle.b_pic =
     readDatabaseColor("toolbar.button.picColor", "black", style);
+
+#ifdef    BITMAPBUTTONS
   readDatabaseMask("toolbar.button.left.mask", resource.tstyle.left_button,
                    style);
   readDatabaseMask("toolbar.button.right.mask", resource.tstyle.right_button,
                    style);
+#endif // BITMAPBUTTONS
   
   resource.tstyle.justify = LeftJustify;
   if (style.getValue("toolbar.justify", s)) {
@@ -1171,10 +1180,12 @@ void BScreen::LoadStyle(void) {
   }
 
   // load menu config
+#ifdef   BITMAPBUTTONS
   if (resource.mstyle.bullet_image.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
   if (resource.mstyle.tick_image.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
+#endif // BITMAPBUTTONS
   
   resource.mstyle.title =
     readDatabaseTexture("menu.title", "white", style);
@@ -1190,8 +1201,11 @@ void BScreen::LoadStyle(void) {
     readDatabaseColor("menu.frame.disableColor", "black", style);
   resource.mstyle.h_text =
     readDatabaseColor("menu.hilite.textColor", "black", style);
+
+#ifdef    BITMAPBUTTONS
   readDatabaseMask("menu.arrow.mask", resource.mstyle.bullet_image, style);
   readDatabaseMask("menu.selected.mask", resource.mstyle.tick_image, style);
+#endif // BITMAPBUTTONS
     
   resource.mstyle.t_justify = LeftJustify;
   if (style.getValue("menu.title.justify", s)) {
@@ -2629,6 +2643,7 @@ void BScreen::toggleFocusModel(FocusModel model) {
                 std::mem_fun(&BlackboxWindow::grabButtons));
 }
 
+#ifdef    BITMAPBUTTONS
 void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
                                const Configuration &style) {
   string s;
@@ -2655,6 +2670,7 @@ void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
   pixmapMask.mask = None;
   pixmapMask.w = pixmapMask.h = 0;
 }
+#endif // BITMAPSUCCESS
 
 BTexture BScreen::readDatabaseTexture(const string &rname,
                                       const string &default_color,

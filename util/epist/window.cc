@@ -336,6 +336,33 @@ void XWindow::move(int x, int y) const {
 }
 
 
+void XWindow::resize(int dwidth, int dheight) const {
+  // resize in increments if requested by the window
+
+  unsigned int wdest = _rect.width() + (dwidth * _inc_x) /
+                       _inc_x * _inc_x + _base_x;
+  unsigned int hdest = _rect.height() + (dheight * _inc_y) /
+                       _inc_y * _inc_y + _base_y;
+
+  if (width > wdest) {
+    while (width > wdest)
+      wdest += _inc_x;
+  } else {
+    while (width < wdest)
+      wdest -= _inc_x;
+  }
+  if (height > hdest) {
+    while (height > hdest)
+      hdest += _inc_y;
+  } else {
+    while (height < hdest)
+      hdest -= _inc_y;
+  }
+  
+  XResizeWindow(_epist->getXDisplay(), _window, wdest, hdest);
+}
+
+
 void XWindow::resize(unsigned int width, unsigned int height) const {
   // resize in increments if requested by the window
 

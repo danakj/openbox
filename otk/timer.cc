@@ -87,6 +87,11 @@ void Timer::dispatchTimers(bool wait)
     curr->_action(curr->_data);
     timevalAdd(curr->_timeout, curr->_delay);
     _q.push(curr);
+
+    /* if at least one timer fires, then don't wait on X events, as there may
+       already be some in the queue from the timer callbacks.
+    */
+    wait = false;
   }
 
   if (wait) {
@@ -94,9 +99,9 @@ void Timer::dispatchTimers(bool wait)
     fd = ConnectionNumber(**display);
     FD_ZERO(&selset);
     FD_SET(fd, &selset);
-    if (nearestTimeout(next))
+    if (nearestTimeout(next)) {
       select(fd + 1, &selset, NULL, NULL, &next);
-    else
+    } else
       select(fd + 1, &selset, NULL, NULL, NULL);
   }
 }

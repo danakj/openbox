@@ -1,6 +1,6 @@
 scriptdir = $(libdir)/openbox/python
 MAINTAINERCLEANFILES = Makefile.in
-script_DATA = clientmotion.py clicks.py globals.py config.py
+script_DATA = clientmotion.py clicks.py config.py
 EXTRA_DIST = $(script_DATA)
 
 distclean-local:

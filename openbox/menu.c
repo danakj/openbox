@@ -376,7 +376,7 @@ void menu_clear_entries(ObMenu *self)
 #endif
 
     while (self->entries) {
-	menu_entry_free(self->entries->data);
+        menu_entry_free(self->entries->data);
         self->entries = g_list_delete_link(self->entries, self->entries);
     }
 }

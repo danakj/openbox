@@ -408,8 +408,8 @@ static void event_process(XEvent *e)
             e->type == KeyPress || e->type == KeyRelease) {
             moveresize_event(e);
 
-            if (!(e->type == ButtonPress || e->type == ButtonRelease))
-                return; /* no dispatch! */
+            return; /* no dispatch! */
+            
         }
 
     /* user input (action-bound) events */

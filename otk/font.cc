@@ -50,11 +50,10 @@ Font::Font(int screen_num, const std::string &fontstring,
       printf(_("Couldn't initialize Xft.\n\n"));
       ::exit(3);
     }
-    int build = XFT_VERSION;
     int version = XftGetVersion();
     printf(_("Using Xft %d.%d.%d (Built against %d.%d.%d).\n"),
            version / 10000 % 100, version / 100 % 100, version % 100,
-           build / 10000 % 100, build / 100 % 100, build % 100);
+           XFT_MAJOR, XFT_MINOR, XFT_REVISION);
     _xft_init = true;
   }
 

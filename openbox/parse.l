@@ -1,11 +1,8 @@
 %{
-#include <glib.h>
-#include "y.tab.h"
+#include "parse.h"
 #ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif
-
-extern void yyerror(char *err);
 
 int yylineno = 1;
 %}

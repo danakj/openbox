@@ -893,6 +893,7 @@ void Client::setState(StateAction action, long data1, long data2)
   if (shadestate != _shaded)
     shade(shadestate);
   calcLayer();
+  changeState(); // change the hint to relect these changes
 }
 
 

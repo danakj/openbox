@@ -21,7 +21,6 @@ static void addbinding();
 %}
 
 field [A-Za-z0-9][-A-Za-z0-9]*
-sep [ \t]+
 white [ \t]*
 
 %%

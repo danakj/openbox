@@ -1,59 +1,69 @@
-#include "kernel/debug.h"
 #include "obconf.h"
 #include "plugins.h"
 #include "parser/parse.h"
+#include "gettext.h"
 
 #include <gtk/gtk.h>
-#include <glade/glade.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 
-/*#include <X11/Xlib.h>
-Display *ob_display;
-int ob_screen;
-Window ob_root;*/
+#define OB_ICON "openbox-icon"
 
-GtkWindow *obconf_win;
-GtkWindow *obconf_about = NULL;
+static GtkWidget *mainwin;
+static GdkPixbuf *ob_icon;
 
-GtkTreeView *obconf_sections;
-GtkListStore *obconf_sections_store;
-static GtkCellRenderer *obconf_sections_renderer;
-static GtkTreeViewColumn *obconf_sections_column;
+static void obconf_error(GError *e)
+{
+    GtkWidget *d;
 
-GtkNotebook *obconf_options;
+    d = gtk_message_dialog_new(mainwin ? GTK_WINDOW(mainwin) : NULL,
+                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_MESSAGE_ERROR,
+                               GTK_BUTTONS_CLOSE,
+                               "%s", e->message);
+    gtk_dialog_run(GTK_DIALOG(d));
+    gtk_widget_destroy(d);
+}
 
-static xmlDocPtr doc;
-static xmlNodePtr root;
+static void load_stock ()
+{
+    GtkIconFactory *factory;
+    GError *e = NULL;
+
+    gtk_icon_factory_add_default (factory = gtk_icon_factory_new ());
+
+    ob_icon = gdk_pixbuf_new_from_file (PIXMAPDIR G_DIR_SEPARATOR_S
+                                        "openbox.png", &e);
+    if (!ob_icon) {
+        gchar *msg = g_strdup_printf 
+            (_("Failed to load the Openbox icon, Openbox is probably not "
+               "installed correctly. The error given was '%s'."),
+             e->message);
+        g_free (e->message);
+        e->message = msg;
+        obconf_error (e);
+    } else {
+        GtkIconSet *set;
+
+        set = gtk_icon_set_new_from_pixbuf (ob_icon);
+        gtk_icon_factory_add (factory, OB_ICON, set);
+        gtk_icon_set_unref (set);
+    }
+}
 
 int main(int argc, char **argv)
 {
-    GladeXML *xml;
-
+    gtk_set_locale();
     gtk_init(&argc, &argv);
 
-    xml = glade_xml_new("obconf.glade", NULL, NULL);
-    glade_xml_signal_autoconnect(xml);
+    load_stock();
 
-    obconf_win = GTK_WINDOW(glade_xml_get_widget(xml, "mainwindow"));
-    gtk_window_set_role(obconf_win, "main");
-    obconf_about = GTK_WINDOW(glade_xml_get_widget(xml, "aboutdialog"));
-    gtk_window_set_role(obconf_about, "about");
-    gtk_window_set_transient_for(obconf_about, obconf_win);
-    obconf_sections = GTK_TREE_VIEW(glade_xml_get_widget(xml, "sectiontree"));
-    obconf_options = GTK_NOTEBOOK(glade_xml_get_widget(xml,"optionsnotebook"));
+    mainwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(mainwin), "Obconf");
+    gtk_window_set_wmclass(GTK_WINDOW(mainwin), "obconf", "Obconf");
+    gtk_window_set_role(GTK_WINDOW(mainwin), "main window");
+    if (ob_icon) gtk_window_set_icon(GTK_WINDOW(mainwin), ob_icon);
 
-    obconf_sections_store = gtk_list_store_new(1, G_TYPE_STRING);
-    gtk_tree_view_set_model(obconf_sections,
-                            GTK_TREE_MODEL(obconf_sections_store));
-    obconf_sections_renderer = gtk_cell_renderer_text_new();
-    obconf_sections_column = gtk_tree_view_column_new_with_attributes
-        ("Section", obconf_sections_renderer, "text", 0, NULL);
-    gtk_tree_view_append_column (obconf_sections, obconf_sections_column);
-
-    parse_load_rc(&doc, &root);
-
-    plugins_load();
-
-    gtk_widget_show(GTK_WIDGET(obconf_win));
+    gtk_widget_show_all(mainwin);
 
     gtk_main();
     return 0;
@@ -72,21 +82,21 @@ void on_quit_activate(GtkMenuItem *item, gpointer d)
 
 void on_applybutton_clicked(GtkButton *but, gpointer d)
 {
-    ob_debug("apply\n");
+    g_message("apply\n");
 }
 
 void on_revertbutton_clicked(GtkButton *but, gpointer d)
 {
-    ob_debug("revert\n");
+    g_message("revert\n");
 }
 
 void on_helpbutton_clicked(GtkButton *but, gpointer d)
 {
-    ob_debug("help\n");
+    g_message("help\n");
 }
 
 void on_sectiontree_row_activated(GtkTreeView *tree, GtkTreePath *path,
                                   GtkTreeViewColumn *col, gpointer p)
 {
-    ob_debug("activated\n");
+    g_message("activated\n");
 }

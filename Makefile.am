@@ -5,6 +5,7 @@ localedir       = $(datadir)/locale
 rcdir           = $(datadir)/openbox
 plugindir       = $(libdir)/openbox/plugins
 desktopfilesdir = $(datadir)/gnome/wm-properties
+pixmapdir       = $(datadir)/pixmaps
 
 theme = operation
 
@@ -34,8 +35,11 @@ plugin_LTLIBRARIES = \
 	plugins/menu/include_menu.la
 
 if OBCONF
-plugin_LTLIBRARIES += \
-	plugins/resistance/resistance-config.la
+bin_PROGRAMS += \
+	tools/obconf/obconf
+
+#plugin_LTLIBRARIES += \
+#	plugins/resistance/resistance-config.la
 endif
 
 ## render ##
@@ -326,6 +330,28 @@ plugins_menu_include_menu_la_LDFLAGS = \
 	-avoid-version
 plugins_menu_include_menu_la_SOURCES = \
 	plugins/menu/include_menu.c
+
+
+## obconf ##
+
+tools_obconf_obconf_CPPFLAGS = \
+	$(GTK_CFLAGS) \
+	$(GDK_PIXBUF_CFLAGS) \
+	$(XML_CFLAGS) \
+	-DLOCALEDIR=\"$(localedir)\" \
+	-DPLUGINDIR=\"$(plugindir)\" \
+	-DRCDIR=\"$(rcdir)\" \
+	-DPIXMAPDIR=\"$(pixmapdir)\" \
+	-DG_LOG_DOMAIN=\"Obconf\"
+tools_obconf_obconf_LDADD = \
+	$(GTK_LIBS) \
+	$(GDK_PIXBUF_LIBS) \
+	$(LIBINTL) \
+	render/libobrender.la \
+	parser/libobparser.la
+tools_obconf_obconf_SOURCES = \
+	gettext.h \
+	tools/obconf/main.c
 
 
 ## themes ##

@@ -67,14 +67,14 @@ PKG_CHECK_MODULES(GTK, [gtk+-2.0],
     AC_SUBST(GTK_LIBS)
     use_gtk="yes"
 
-    PKG_CHECK_MODULES(GLADE, [libglade-2.0],
+    PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0],
       [
-        AC_SUBST(GLADE_CFLAGS)
-        AC_SUBST(GLADE_LIBS)
-        use_glade="yes"
+        AC_SUBST(GDK_PIXBUF_CFLAGS)
+        AC_SUBST(GDK_PIXBUF_LIBS)
+        use_gdk_pixbuf="yes"
       ],
       [
-        use_glade="no"
+        use_gdk_pixbuf="no"
         AC_MSG_WARN([disabling build of the configuration tool])
       ]
     )
@@ -84,8 +84,8 @@ PKG_CHECK_MODULES(GTK, [gtk+-2.0],
     AC_MSG_WARN([disabling build of the configuration tool])
   ]
 )
-#AM_CONDITIONAL(OBCONF, [test "$use_gtk" = "yes" && test "$use_glade" = "yes"])
-AM_CONDITIONAL(OBCONF, [false])
+AM_CONDITIONAL(OBCONF,
+               [test "$use_gtk" = "yes" && test "$use_gdk_pixbuf" = "yes"])
 
 # Check for session management
 X11_SM

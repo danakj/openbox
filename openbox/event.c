@@ -1183,11 +1183,13 @@ static void event_handle_menu(XEvent *ev)
 
     switch (ev->type) {
     case ButtonRelease:
-        if ((e = menu_entry_frame_under(ev->xbutton.x_root,
-                                        ev->xbutton.y_root)))
-            menu_entry_frame_execute(e, ev->xbutton.state);
-        else if (menu_can_hide)
-            menu_frame_hide_all();
+        if (menu_can_hide) {
+            if ((e = menu_entry_frame_under(ev->xbutton.x_root,
+                                            ev->xbutton.y_root)))
+                menu_entry_frame_execute(e, ev->xbutton.state);
+            else
+                menu_frame_hide_all();
+        }
         break;
     case MotionNotify:
         if ((f = menu_frame_under(ev->xmotion.x_root,

@@ -242,3 +242,23 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         g_message("this image bit depth is currently unhandled\n");
     }
 }
+
+int RrColorRed(const RrColor *c)
+{
+    return c->r;
+}
+
+int RrColorGreen(const RrColor *c)
+{
+    return c->g;
+}
+
+int RrColorBlue(const RrColor *c)
+{
+    return c->b;
+}
+
+gulong RrColorPixel(const RrColor *c)
+{
+    return c->pixel;
+}

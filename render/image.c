@@ -1,10 +1,10 @@
-#include "kernel/geom.h"
+#include "geom.h"
 #include "image.h"
 #include "color.h"
 
 #include <glib.h>
 
-void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area)
+void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba, RrRect *area)
 {
     RrPixel32 *draw = rgba->data;
     gint c, i, e, t, sfw, sfh;

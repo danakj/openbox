@@ -2,14 +2,11 @@
 #include "color.h"
 #include "mask.h"
 #include "theme.h"
-#include "kernel/geom.h"
-#include "kernel/gettext.h"
-#define _(str) gettext(str)
+#include "gettext.h"
 
 #include <X11/Xft/Xft.h>
 #include <glib.h>
 #include <string.h>
-#include <stdlib.h>
 
 #define ELIPSES "..."
 #define ELIPSES_LENGTH(font) \
@@ -149,7 +146,7 @@ int RrFontMaxCharWidth(const RrFont *f)
     return (signed) f->xftfont->max_advance_width;
 }
 
-void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
+void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 {
     gint x,y,w,h;
     XftColor c;

@@ -166,6 +166,11 @@ RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
 RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);
 void     RrColorFree  (RrColor *in);
 
+gint     RrColorRed   (const RrColor *c);
+gint     RrColorGreen (const RrColor *c);
+gint     RrColorBlue  (const RrColor *c);
+gulong   RrColorPixel (const RrColor *c);
+
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);

@@ -3,7 +3,7 @@
 #define _XFT_NO_COMPAT_ /* no Xft 1 API */
 #include <X11/Xft/Xft.h>
 #include "render.h"
-#include "kernel/geom.h"
+#include "geom.h"
 
 struct _RrFont {
     const RrInstance *inst;
@@ -16,5 +16,5 @@ struct _RrFont {
 
 RrFont *RrFontOpen(const RrInstance *inst, char *fontstring);
 void RrFontClose(RrFont *f);
-void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *position);
+void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
 #endif /* __font_h */

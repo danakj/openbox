@@ -2,8 +2,8 @@
 #define __image_h
 
 #include "render.h"
-#include "../kernel/geom.h"
+#include "geom.h"
 
-void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area);
+void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba, RrRect *area);
 
 #endif

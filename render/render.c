@@ -23,7 +23,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
     int i, transferred = 0, sw;
     RrPixel32 *source, *dest;
     Pixmap oldp;
-    Rect tarea; /* area in which to draw textures */
+    RrRect tarea; /* area in which to draw textures */
     gboolean resized;
 
     if (w <= 0 || h <= 0) return;

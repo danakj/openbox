@@ -25,7 +25,7 @@ void RrPixmapMaskFree(RrPixmapMask *m)
     }
 }
 
-void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const Rect *area)
+void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const RrRect *area)
 {
     int x, y;
     if (m->mask == None) return; /* no mask given */

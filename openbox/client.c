@@ -310,7 +310,7 @@ void client_manage(Window window)
 
     /* make sure the window is visible */
     if (ob_state() == OB_STATE_RUNNING)
-        client_move_onscreen(self, TRUE);
+        client_move_onscreen(self, client_normal(self));
 
     client_showhide(self);
 

@@ -660,8 +660,6 @@ static void client_get_all(ObClient *self)
     client_get_state(self);
     client_get_shaped(self);
 
-    g_message("self->iconic %d", self->iconic);
-
     client_get_mwm_hints(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
 
@@ -1715,7 +1713,6 @@ static void client_apply_startup_state(ObClient *self)
 {
     /* these are in a carefully crafted order.. */
 
-    g_message("self->iconic %d", self->iconic);
     if (self->iconic) {
 	self->iconic = FALSE;
 	client_iconify(self, TRUE, FALSE);

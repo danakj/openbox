@@ -1075,13 +1075,13 @@ void BScreen::LoadStyle(void) {
     resource.wstyle.icon_button.mask =
     resource.wstyle.icon_button.mask = None;
   
-  readDatabaseMask("window.button.close_mask", resource.wstyle.close_button,
+  readDatabaseMask("window.button.close.mask", resource.wstyle.close_button,
                    style);
-  readDatabaseMask("window.button.max_mask", resource.wstyle.max_button,
+  readDatabaseMask("window.button.max.mask", resource.wstyle.max_button,
                    style);
-  readDatabaseMask("window.button.icon_mask", resource.wstyle.icon_button,
+  readDatabaseMask("window.button.icon.mask", resource.wstyle.icon_button,
                    style);
-  readDatabaseMask("window.button.stick_mask", resource.wstyle.stick_button,
+  readDatabaseMask("window.button.stick.mask", resource.wstyle.stick_button,
                    style);
 
   // we create the window.frame texture by hand because it exists only to
@@ -1149,9 +1149,9 @@ void BScreen::LoadStyle(void) {
     readDatabaseColor("toolbar.clock.textColor", "white", style);
   resource.tstyle.b_pic =
     readDatabaseColor("toolbar.button.picColor", "black", style);
-  readDatabaseMask("toolbar.button.left_mask", resource.tstyle.left_button,
+  readDatabaseMask("toolbar.button.left.mask", resource.tstyle.left_button,
                    style);
-  readDatabaseMask("toolbar.button.right_mask", resource.tstyle.right_button,
+  readDatabaseMask("toolbar.button.right.mask", resource.tstyle.right_button,
                    style);
   
   resource.tstyle.justify = LeftJustify;
@@ -1190,7 +1190,7 @@ void BScreen::LoadStyle(void) {
     readDatabaseColor("menu.frame.disableColor", "black", style);
   resource.mstyle.h_text =
     readDatabaseColor("menu.hilite.textColor", "black", style);
-  readDatabaseMask("menu.bullet.mask", resource.mstyle.bullet_image, style);
+  readDatabaseMask("menu.arrow.mask", resource.mstyle.bullet_image, style);
   readDatabaseMask("menu.selected.mask", resource.mstyle.tick_image, style);
     
   resource.mstyle.t_justify = LeftJustify;

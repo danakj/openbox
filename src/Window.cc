@@ -2628,7 +2628,7 @@ void BlackboxWindow::redrawIconifyButton(bool pressed) const {
 
     XFillRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   pm.w, pm.h);
+                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
 
     XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
     XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
@@ -2679,7 +2679,7 @@ void BlackboxWindow::redrawMaximizeButton(bool pressed) const {
 
     XFillRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   pm.w, pm.h);
+                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
     
     XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
     XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
@@ -2721,12 +2721,28 @@ void BlackboxWindow::redrawCloseButton(bool pressed) const {
 
   BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
            screen->getWindowStyle()->b_pic_unfocus);
-  XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
-            2, 2, (frame.button_w - 3), (frame.button_w - 3));
-  XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
-            2, (frame.button_w - 3), (frame.button_w - 3), 2);
-}
 
+  PixmapMask pm = screen->getWindowStyle()->close_button;
+
+  if (pm.mask != None) {
+    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
+    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
+    
+    XFillRectangle(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
+                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
+
+  
+    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
+    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
+  } else {
+    XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+              2, 2, (frame.button_w - 3), (frame.button_w - 3));
+    XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+              2, (frame.button_w - 3), (frame.button_w - 3), 2);
+  }
+}
 
 void BlackboxWindow::redrawStickyButton(bool pressed) const {
   if (! pressed) {
@@ -2767,7 +2783,7 @@ void BlackboxWindow::redrawStickyButton(bool pressed) const {
     
     XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   pm.w, pm.h);
+                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
 
   
     XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
@@ -3334,7 +3350,7 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root, int &dx) {
   bool focus = flags.focused; // had focus while moving?
 
   int dest_x = x_root;
-  if (x_root <= 0) {
+  if (x_root < 0) {
     dest_x += screen->getRect().width() - 1;
     dx += screen->getRect().width() - 1;
   } else {

@@ -179,7 +179,6 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
     rc_file = bstrdup(rc);
   }
   config.setFile(rc_file);
-  config.load();
 
   no_focus = False;
 
@@ -1039,32 +1038,6 @@ void Openbox::save_rc(void) {
     sprintf(rc_string, "session.screen%d.workspaces", screen_number);
     config.setValue(rc_string, screen->getWorkspaceCount());
 
-    sprintf(rc_string, "session.screen%d.toolbar.onTop", screen_number);
-    config.setValue(rc_string, screen->getToolbar()->isOnTop() ?
-                    "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.toolbar.autoHide", screen_number);
-    config.setValue(rc_string, screen->getToolbar()->doAutoHide() ?
-                    "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.toolbar.hide", screen_number);
-    config.setValue(rc_string, screen->doToolbarHide() ?
-                    "True" : "False");
-
-
-    switch (screen->getToolbarPlacement()) {
-    case Toolbar::TopLeft: placement = "TopLeft"; break;
-    case Toolbar::BottomLeft: placement = "BottomLeft"; break;
-    case Toolbar::TopCenter: placement = "TopCenter"; break;
-    case Toolbar::TopRight: placement = "TopRight"; break;
-    case Toolbar::BottomRight: placement = "BottomRight"; break;
-    default:
-    case Toolbar::BottomCenter: placement = "BottomCenter"; break;
-    }
-
-    sprintf(rc_string, "session.screen%d.toolbar.placement", screen_number);
-    config.setValue(rc_string, placement);
-
 #ifdef    HAVE_STRFTIME
     sprintf(rc_string, "session.screen%d.strftimeFormat", screen_number);
     config.setValue(rc_string, screen->getStrftimeFormat());
@@ -1079,9 +1052,6 @@ void Openbox::save_rc(void) {
 
     sprintf(rc_string, "session.screen%d.edgeSnapThreshold", screen_number);
     config.setValue(rc_string, screen->getEdgeSnapThreshold());
-
-    sprintf(rc_string, "session.screen%d.toolbar.widthPercent", screen_number);
-    config.setValue(rc_string, screen->getToolbarWidthPercent());
 
     // write out the user's workspace names
     int i, len = 0;
@@ -1257,33 +1227,6 @@ void Openbox::load_rc(BScreen *screen) {
   else
     screen->saveWorkspaces(1);
   
-  sprintf(name_lookup,  "session.screen%d.toolbar.widthPercent",
-          screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.WidthPercent",
-          screen_number);
-  if (config.getValue(name_lookup, class_lookup, l) && (l > 0 && l <= 100))
-    screen->saveToolbarWidthPercent(l);
-  else
-    screen->saveToolbarWidthPercent(66);
-
-  sprintf(name_lookup, "session.screen%d.toolbar.placement", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.Placement", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
-      screen->saveToolbarPlacement(Toolbar::TopLeft);
-    else if (0 == strncasecmp(s.c_str(), "BottomLeft", s.length()))
-      screen->saveToolbarPlacement(Toolbar::BottomLeft);
-    else if (0 == strncasecmp(s.c_str(), "TopCenter", s.length()))
-      screen->saveToolbarPlacement(Toolbar::TopCenter);
-    else if (0 == strncasecmp(s.c_str(), "TopRight", s.length()))
-      screen->saveToolbarPlacement(Toolbar::TopRight);
-    else if ( 0 == strncasecmp(s.c_str(), "BottomRight", s.length()))
-      screen->saveToolbarPlacement(Toolbar::BottomRight);
-    else
-      screen->saveToolbarPlacement(Toolbar::BottomCenter);
-  } else
-    screen->saveToolbarPlacement(Toolbar::BottomCenter);
-
   screen->removeWorkspaceNames();
   sprintf(name_lookup,  "session.screen%d.workspaceNames", screen_number);
   sprintf(class_lookup, "Session.Screen%d.WorkspaceNames", screen_number);
@@ -1300,27 +1243,6 @@ void Openbox::load_rc(BScreen *screen) {
       ++it;
     }
   }
-
-  sprintf(name_lookup,  "session.screen%d.toolbar.onTop", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.OnTop", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveToolbarOnTop((Bool)b);
-  else
-    screen->saveToolbarOnTop(False);
-
-  sprintf(name_lookup,  "session.screen%d.toolbar.hide", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.Hide", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveToolbarHide((Bool)b);
-  else
-    screen->saveToolbarHide(False);
-
-  sprintf(name_lookup,  "session.screen%d.toolbar.autoHide", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.autoHide", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveToolbarAutoHide((Bool)b);
-  else
-    screen->saveToolbarAutoHide(False);
 
   sprintf(name_lookup,  "session.screen%d.focusModel", screen_number);
   sprintf(class_lookup, "Session.Screen%d.FocusModel", screen_number);

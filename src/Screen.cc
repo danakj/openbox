@@ -99,6 +99,7 @@
 #define   FONT_ELEMENT_SIZE 50
 #endif // FONT_ELEMENT_SIZE
 
+#include <strstream>
 #include <string>
 #include <algorithm>
 
@@ -418,7 +419,7 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   current_workspace = workspacesList->first();
   workspacemenu->setItemSelected(2, True);
 
-  toolbar = new Toolbar(*this);
+  toolbar = new Toolbar(*this, config);
 
 #ifdef    SLIT
   slit = new Slit(*this, config);
@@ -823,8 +824,22 @@ XFontSet BScreen::createFontSet(const char *fontname) {
   return fs;
 }
 
+void BScreen::load() {
+  std::ostrstream rscreen, rname, rclass;
+  std::string s;
+  bool b;
+  long l;
+  rscreen << "session.screen" << getScreenNumber() << '.' << ends;
+
+  rname << rscreen.str() << "hideToolbar" << ends;
+  rclass << rscreen.str() << "HideToolbar" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    resource.hide_toolbar = b;
+
+}
 
 void BScreen::reconfigure(void) {
+  load();
   LoadStyle();
 
   XGCValues gcv;
@@ -1543,7 +1558,7 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
     *(session_stack + i++) = tmp->getWindowID();
   *(session_stack + i++) = rootmenu->getWindowID();
 
-  if (toolbar->isOnTop())
+  if (toolbar->onTop())
     *(session_stack + i++) = toolbar->getWindowID();
 
 #ifdef    SLIT
@@ -2266,13 +2281,14 @@ void BScreen::hideGeometry(void) {
   }
 }
 
-void BScreen::saveToolbarHide(Bool b){
-  resource.toolbar_total_hide = b;
-  if (toolbar != NULL){
-    if (b)
-      toolbar->unMapToolbar();
-    else
-      toolbar->mapToolbar();
-  }
-
+void BScreen::setHideToolbar(bool b) {
+  resource.hide_toolbar = b;
+  if (resource.hide_toolbar)
+    getToolbar()->unMapToolbar();
+  else
+    getToolbar()->mapToolbar();
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".hideToolbar" << ends;
+  config.setValue(s.str(), resource.hide_toolbar ? "True" : "False");
 }
+

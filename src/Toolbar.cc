@@ -62,8 +62,18 @@
 # endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
 
+#include <strstream>
+#include <string>
 
-Toolbar::Toolbar(BScreen &scrn) : screen(scrn), openbox(scrn.getOpenbox()) {
+Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
+  openbox(scrn.getOpenbox()), config(conf)
+{
+  // default values
+  m_width_percent =66;
+  m_placement = BottomCenter;
+  m_ontop = false;
+  m_hidden = m_autohide = false;
+
   // get the clock updating every minute
   clock_timer = new BTimer(openbox, *this);
   timeval now;
@@ -78,10 +88,7 @@ Toolbar::Toolbar(BScreen &scrn) : screen(scrn), openbox(scrn.getOpenbox()) {
 
   image_ctrl = screen.getImageControl();
 
-  on_top = screen.isToolbarOnTop();
-  hidden = do_auto_hide = screen.doToolbarAutoHide();
-
-  editing = False;
+  m_editing = False;
   new_workspace_name = (char *) 0;
   new_name_pos = 0;
   frame.grab_x = frame.grab_y = 0;
@@ -151,20 +158,36 @@ Toolbar::Toolbar(BScreen &scrn) : screen(scrn), openbox(scrn.getOpenbox()) {
   mapToolbar();
 }
 
-inline void Toolbar::mapToolbar(){
-  if(!screen.doToolbarHide()){
-    do_hide=false;//not hidden, so windows should not maximize over the toolbar
+int Toolbar::getX() const {
+  return ((m_hidden) ? frame.x_hidden : frame.x);
+}
+
+int Toolbar::getY() const {
+  if (screen.hideToolbar()) return screen.size().h();
+  else if (m_hidden) return frame.y_hidden;
+  else return frame.y;
+}
+
+unsigned int Toolbar::getExposedHeight() const {
+  if (screen.hideToolbar()) return 0;
+  else if (m_autohide) return frame.bevel_w;
+  else return frame.height;
+}
+
+void Toolbar::mapToolbar(){
+  if (!screen.hideToolbar()) {
+    //not hidden, so windows should not maximize over the toolbar
     XMapSubwindows(display, frame.window);
     XMapWindow(display, frame.window);
-  }else
-    do_hide=true;
+  }
 }
-inline void Toolbar::unMapToolbar(){
-  do_hide=true; //hidden so we can maximize over the toolbar
+
+void Toolbar::unMapToolbar(){
+  //hidden so we can maximize over the toolbar
   XUnmapWindow(display, frame.window);
 }
 
-Toolbar::~Toolbar(void) {
+Toolbar::~Toolbar() {
   unMapToolbar();
   if (frame.base) image_ctrl->removeImage(frame.base);
   if (frame.label) image_ctrl->removeImage(frame.label);
@@ -194,9 +217,92 @@ Toolbar::~Toolbar(void) {
 }
 
 
-void Toolbar::reconfigure(void) {
+void Toolbar::setOnTop(bool b) {
+  m_ontop = b;
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop" << ends;
+  config.setValue(s.str(), m_ontop ? "True" : "False");
+}
+
+void Toolbar::setAutoHide(bool b) {
+  m_autohide = b;
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide" <<
+    ends;
+  config.setValue(s.str(), m_autohide ? "True" : "False");
+}
+
+void Toolbar::setWidthPercent(int w) {
+  m_width_percent = w;
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.widthPercent"
+    << ends;
+  config.setValue(s.str(), m_width_percent);
+}
+
+void Toolbar::setPlacement(int p) {
+  m_placement = p;
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.placement" <<
+    ends;
+  const char *placement;
+  switch (m_placement) {
+  case TopLeft: placement = "TopLeft"; break;
+  case BottomLeft: placement = "BottomLeft"; break;
+  case TopCenter: placement = "TopCenter"; break;
+  case TopRight: placement = "TopRight"; break;
+  case BottomRight: placement = "BottomRight"; break;
+  case BottomCenter: default: placement = "BottomCenter"; break;
+  }
+  config.setValue(s.str(), placement);
+}
+
+void Toolbar::load() {
+  std::ostrstream rscreen, rname, rclass;
+  std::string s;
+  bool b;
+  long l;
+  rscreen << "session.screen" << screen.getScreenNumber() << '.' << ends;
+
+  rname << rscreen.str() << "toolbar.widthPercent" << ends;
+  rclass << rscreen.str() << "Toolbar.WidthPercent" << ends;
+  if (config.getValue(rname.str(), rclass.str(), l) && (l > 0 && l <= 100))
+    m_width_percent = l;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "toolbar.placement" << ends;
+  rclass << rscreen.str() << "Toolbar.Placement" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
+      m_placement = TopLeft;
+    else if (0 == strncasecmp(s.c_str(), "BottomLeft", s.length()))
+      m_placement = BottomLeft;
+    else if (0 == strncasecmp(s.c_str(), "TopCenter", s.length()))
+      m_placement = TopCenter;
+    else if (0 == strncasecmp(s.c_str(), "TopRight", s.length()))
+      m_placement = TopRight;
+    else if ( 0 == strncasecmp(s.c_str(), "BottomRight", s.length()))
+      m_placement = BottomRight;
+    else if ( 0 == strncasecmp(s.c_str(), "BottomCenter", s.length()))
+      m_placement = BottomCenter;
+  }
+  
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "toolbar.onTop" << ends;
+  rclass << rscreen.str() << "Toolbar.OnTop" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    m_ontop = b;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "toolbar.autoHide" << ends;
+  rclass << rscreen.str() << "Toolbar.AutoHide" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    m_hidden = m_autohide = b;
+}
+
+void Toolbar::reconfigure() {
   frame.bevel_w = screen.getBevelWidth();
-  frame.width = screen.size().w() * screen.getToolbarWidthPercent() / 100;
+  frame.width = screen.size().w() * m_width_percent / 100;
   
   if (i18n->multibyte())
     frame.height =
@@ -209,7 +315,7 @@ void Toolbar::reconfigure(void) {
   frame.label_h = frame.height;
   frame.height += (frame.bevel_w * 2);
   
-  switch (screen.getToolbarPlacement()) {
+  switch (m_placement) {
   case TopLeft:
     frame.x = 0;
     frame.y = 0;
@@ -348,7 +454,7 @@ void Toolbar::reconfigure(void) {
     (frame.width - (frame.clock_w + (frame.button_w * 4) +
                     frame.workspace_label_w + (frame.bevel_w * 8) + 6));
 
-  if (hidden) {
+  if (m_hidden) {
     XMoveResizeWindow(display, frame.window, frame.x_hidden, frame.y_hidden,
 		      frame.width, frame.height);
   } else {
@@ -834,11 +940,11 @@ void Toolbar::redrawNextWindowButton(Bool pressed, Bool redraw) {
 }
 
 
-void Toolbar::edit(void) {
+void Toolbar::edit() {
   Window window;
   int foo;
 
-  editing = True;
+  m_editing = True;
   if (XGetInputFocus(display, &window, &foo) &&
       window == frame.workspace_label)
     return;
@@ -890,11 +996,11 @@ void Toolbar::buttonPressEvent(XButtonEvent *be) {
       checkClock(True, True);
     }
 #endif // HAVE_STRFTIME
-    else if (! on_top) {
+    else if (! m_ontop) {
       Window w[1] = { frame.window };
       screen.raiseWindows(w, 1);
     }
-  } else if (be->button == 2 && (! on_top)) {
+  } else if (be->button == 2 && (! m_ontop)) {
     XLowerWindow(display, frame.window);
   } else if (be->button == 3) {
     if (! toolbarmenu->isVisible()) {
@@ -970,10 +1076,10 @@ void Toolbar::buttonReleaseEvent(XButtonEvent *re) {
 
 
 void Toolbar::enterNotifyEvent(XCrossingEvent *) {
-  if (! do_auto_hide)
+  if (! m_autohide)
     return;
 
-  if (hidden) {
+  if (m_hidden) {
     if (! hide_timer->isTiming()) hide_timer->start();
   } else {
     if (hide_timer->isTiming()) hide_timer->stop();
@@ -981,10 +1087,10 @@ void Toolbar::enterNotifyEvent(XCrossingEvent *) {
 }
 
 void Toolbar::leaveNotifyEvent(XCrossingEvent *) {
-  if (! do_auto_hide)
+  if (! m_autohide)
     return;
 
-  if (hidden) {
+  if (m_hidden) {
     if (hide_timer->isTiming()) hide_timer->stop();
   } else if (! toolbarmenu->isVisible()) {
     if (! hide_timer->isTiming()) hide_timer->start();
@@ -994,7 +1100,7 @@ void Toolbar::leaveNotifyEvent(XCrossingEvent *) {
 
 void Toolbar::exposeEvent(XExposeEvent *ee) {
   if (ee->window == frame.clock) checkClock(True);
-  else if (ee->window == frame.workspace_label && (! editing))
+  else if (ee->window == frame.workspace_label && (! m_editing))
     redrawWorkspaceLabel();
   else if (ee->window == frame.window_label) redrawWindowLabel();
   else if (ee->window == frame.psbutton) redrawPrevWorkspaceButton();
@@ -1005,7 +1111,7 @@ void Toolbar::exposeEvent(XExposeEvent *ee) {
 
 
 void Toolbar::keyPressEvent(XKeyEvent *ke) {
-  if (ke->window == frame.workspace_label && editing) {
+  if (ke->window == frame.workspace_label && m_editing) {
     openbox.grab();
 
     if (! new_workspace_name) {
@@ -1023,7 +1129,7 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
     if (ks == XK_Return || new_name_pos == 127) {
       *(new_workspace_name + new_name_pos) = 0;
 
-      editing = False;
+      m_editing = False;
 
       openbox.setNoFocus(False);
       if (openbox.getFocusedWindow()) {
@@ -1124,7 +1230,7 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
 }
 
 
-void Toolbar::timeout(void) {
+void Toolbar::timeout() {
   checkClock(True);
 
   timeval now;
@@ -1133,9 +1239,9 @@ void Toolbar::timeout(void) {
 }
 
 
-void Toolbar::HideHandler::timeout(void) {
-  toolbar->hidden = ! toolbar->hidden;
-  if (toolbar->hidden)
+void Toolbar::HideHandler::timeout() {
+  toolbar->m_hidden = !toolbar->m_hidden;
+  if (toolbar->m_hidden)
     XMoveWindow(toolbar->display, toolbar->frame.window,
 		toolbar->frame.x_hidden, toolbar->frame.y_hidden);
   else
@@ -1159,12 +1265,12 @@ Toolbarmenu::Toolbarmenu(Toolbar &tb) : Basemenu(tb.screen), toolbar(tb) {
 
   update();
 
-  if (toolbar.isOnTop()) setItemSelected(1, True);
-  if (toolbar.doAutoHide()) setItemSelected(2, True);
+  if (toolbar.onTop()) setItemSelected(1, True);
+  if (toolbar.autoHide()) setItemSelected(2, True);
 }
 
 
-Toolbarmenu::~Toolbarmenu(void) {
+Toolbarmenu::~Toolbarmenu() {
   delete placementmenu;
 }
 
@@ -1178,17 +1284,17 @@ void Toolbarmenu::itemSelected(int button, int index) {
 
   switch (item->function()) {
   case 1: { // always on top
-    Bool change = ((toolbar.isOnTop()) ? False : True);
-    toolbar.on_top = change;
+    Bool change = ((toolbar.onTop()) ? False : True);
+    toolbar.setOnTop(change);
     setItemSelected(1, change);
 
-    if (toolbar.isOnTop()) toolbar.screen.raiseWindows((Window *) 0, 0);
+    if (toolbar.onTop()) toolbar.screen.raiseWindows((Window *) 0, 0);
     break;
   }
 
   case 2: { // auto hide
-    Bool change = ((toolbar.doAutoHide()) ?  False : True);
-    toolbar.do_auto_hide = change;
+    Bool change = ((toolbar.autoHide()) ?  False : True);
+    toolbar.setAutoHide(change);
     setItemSelected(2, change);
 
 #ifdef    SLIT
@@ -1207,14 +1313,14 @@ void Toolbarmenu::itemSelected(int button, int index) {
 }
 
 
-void Toolbarmenu::internal_hide(void) {
+void Toolbarmenu::internal_hide() {
   Basemenu::internal_hide();
-  if (toolbar.doAutoHide() && ! toolbar.isEditing())
+  if (toolbar.autoHide() && ! toolbar.isEditing())
     toolbar.hide_handler.timeout();
 }
 
 
-void Toolbarmenu::reconfigure(void) {
+void Toolbarmenu::reconfigure() {
   placementmenu->reconfigure();
 
   Basemenu::reconfigure();
@@ -1251,7 +1357,7 @@ void Toolbarmenu::Placementmenu::itemSelected(int button, int index) {
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  toolbarmenu.toolbar.screen.saveToolbarPlacement(item->function());
+  toolbarmenu.toolbar.setPlacement(item->function());
   hide();
   toolbarmenu.toolbar.reconfigure();
 

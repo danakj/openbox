@@ -68,7 +68,7 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
   setItemSelected(4, screen.doFullMax());
   setItemSelected(5, screen.doFocusNew());
   setItemSelected(6, screen.doFocusLast());
-  setItemSelected(7, screen.doToolbarHide());
+  setItemSelected(7, screen.hideToolbar());
 }
 
 Configmenu::~Configmenu(void) {
@@ -123,8 +123,8 @@ void Configmenu::itemSelected(int button, int index) {
     break;
   }
   case 6:{ //toggle toolbar hide
-    screen.saveToolbarHide(!(screen.doToolbarHide()));
-    setItemSelected(index, screen.doToolbarHide());
+    screen.setHideToolbar(!screen.hideToolbar());
+    setItemSelected(index, screen.hideToolbar());
     break;
   }
   } // switch

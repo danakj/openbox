@@ -1579,7 +1579,7 @@ void OpenboxWindow::maximize(unsigned int button) {
     dy += (((screen->size().h() - screen->getToolbar()->getExposedHeight())
            - dh) / 2) - frame.border_w;
 
-    switch (screen->getToolbarPlacement()) {
+    switch (screen->getToolbar()->placement()) {
     case Toolbar::TopLeft:
     case Toolbar::TopCenter:
     case Toolbar::TopRight:
@@ -2817,7 +2817,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
           dx = screen->size().w() - snap_w;
 
         int dtty, dbby, dty, dby;
-        switch (screen->getToolbarPlacement()) {
+        switch (screen->getToolbar()->placement()) {
         case Toolbar::TopLeft:
         case Toolbar::TopCenter:
         case Toolbar::TopRight:

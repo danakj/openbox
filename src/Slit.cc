@@ -230,7 +230,6 @@ void Slit::setAutoHide(bool b) {
 
 void Slit::setPlacement(int p) {
   m_placement = p;
-  cout << "setting " << p << " " << m_placement << endl;
   ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.placement" <<
     ends;
@@ -266,7 +265,6 @@ void Slit::load() {
   rname << rscreen.str() << "slit.placement" << ends;
   rclass << rscreen.str() << "Slit.Placement" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
-    cout << "getting " << s.c_str() << endl;
     if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
       m_placement = TopLeft;
     else if (0 == strncasecmp(s.c_str(), "CenterLeft", s.length()))

@@ -27,6 +27,7 @@
 
 #include "Basemenu.h"
 #include "Timer.h"
+#include "Resource.h"
 #include "Screen.h"
 
 // forward declaration
@@ -54,21 +55,22 @@ private:
 
 protected:
   virtual void itemSelected(int, int);
-  virtual void internal_hide(void);
+  virtual void internal_hide();
 
 public:
   Toolbarmenu(Toolbar &);
-  ~Toolbarmenu(void);
+  ~Toolbarmenu();
 
-  inline Basemenu *getPlacementmenu(void) { return placementmenu; }
+  inline Basemenu *getPlacementmenu() { return placementmenu; }
 
-  void reconfigure(void);
+  void reconfigure();
 };
 
 
 class Toolbar : public TimeoutHandler {
 private:
-  Bool on_top, editing, hidden, do_auto_hide, do_hide;
+  bool m_ontop, m_editing, m_hidden, m_autohide;
+  int m_width_percent, m_placement;
   Display *display;
 
   struct frame {
@@ -85,11 +87,11 @@ private:
   class HideHandler : public TimeoutHandler {
   public:
     Toolbar *toolbar;
-
-    virtual void timeout(void);
+    virtual void timeout();
   } hide_handler;
 
   Openbox &openbox;
+  Resource &config;
   BImageControl *image_ctrl;
   BScreen &screen;
   BTimer *clock_timer, *hide_timer;
@@ -104,35 +106,19 @@ private:
 
 
 public:
-  Toolbar(BScreen &);
-  virtual ~Toolbar(void);
+  Toolbar(BScreen &, Resource &);
+  virtual ~Toolbar();
 
-  inline Toolbarmenu *getMenu(void) { return toolbarmenu; }
+  inline Toolbarmenu *getMenu() { return toolbarmenu; }
 
-  inline const Bool &isEditing(void) const { return editing; }
-  inline const Bool &isOnTop(void) const { return on_top; }
-  inline const Bool &isHidden(void) const { return hidden; }
-  inline const Bool &doAutoHide(void) const { return do_auto_hide; }
+  inline const Window &getWindowID() const { return frame.window; }
 
-  inline const Window &getWindowID(void) const { return frame.window; }
-
-  inline const unsigned int &getWidth(void) const { return frame.width; }
-  inline const unsigned int &getHeight(void) const { return frame.height; }
-  inline const unsigned int getExposedHeight(void) const {
-    if (do_hide) return 0;
-    else if (do_auto_hide) return frame.bevel_w;
-    else return frame.height;
-  }
+  inline unsigned int getWidth() const { return frame.width; }
+  inline unsigned int getHeight() const { return frame.height; }
+  unsigned int getExposedHeight() const;
   
-  inline const int &getX(void) const
-  { return ((hidden) ? frame.x_hidden : frame.x); }
-  //  const int getY(void) const;
-  inline const int getY(void) const { 
-    if (do_hide) return screen.size().h();
-    else if (hidden) return frame.y_hidden;
-    else return frame.y;
-  }
-
+  int getX() const;
+  int getY() const;
   
   void buttonPressEvent(XButtonEvent *);
   void buttonReleaseEvent(XButtonEvent *);
@@ -147,18 +133,34 @@ public:
   void redrawNextWorkspaceButton(Bool = False, Bool = False);
   void redrawPrevWindowButton(Bool = False, Bool = False);
   void redrawNextWindowButton(Bool = False, Bool = False);
-  void edit(void);
-  void reconfigure(void);
-  void mapToolbar(void);
-  void unMapToolbar(void);
+  void edit();
+  void reconfigure();
+  void load();
+  void mapToolbar();
+  void unMapToolbar();
 #ifdef    HAVE_STRFTIME
   void checkClock(Bool = False);
 #else //  HAVE_STRFTIME
   void checkClock(Bool = False, Bool = False);
 #endif // HAVE_STRFTIME
 
-  virtual void timeout(void);
+  virtual void timeout();
 
+  inline bool onTop() const { return m_ontop; }
+  void setOnTop(bool);
+
+  inline bool autoHide() const { return m_autohide; }
+  void setAutoHide(bool);
+  
+  inline int widthPercent() const { return m_width_percent; }
+  void setWidthPercent(int);
+  
+  inline int placement() const { return m_placement; }
+  void setPlacement(int);
+
+  inline bool isEditing() const { return m_editing; }
+  inline bool isHidden() const { return m_hidden; }
+  
   enum { TopLeft = 1, BottomLeft, TopCenter,
          BottomCenter, TopRight, BottomRight };
 };

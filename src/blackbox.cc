@@ -574,6 +574,8 @@ void Blackbox::process_event(XEvent *e) {
         has moved to a known window.
       */
       e->xfocus.window = None;
+
+      no_focus = False;   // focusing is back on
     }
 
     break;
@@ -682,8 +684,10 @@ void Blackbox::process_event(XEvent *e) {
           if (win->isIconic())
             win->deiconify(False, False);
           if (! win->isStuck() &&
-              (win->getWorkspaceNumber() != screen->getCurrentWorkspaceID()))
+              (win->getWorkspaceNumber() != screen->getCurrentWorkspaceID())) {
+            no_focus = True;
             screen->changeWorkspaceID(win->getWorkspaceNumber());
+          }
           if (win->isVisible() && win->setInputFocus()) {
             win->getScreen()->getWorkspace(win->getWorkspaceNumber())->
               raiseWindow(win);

@@ -40,6 +40,7 @@ OtkWidget::OtkWidget(OtkApplication *app, Direction direction,
   assert(app);
   create();
   _event_dispatcher->registerHandler(_window, this);
+  app->setMainWidget(this);
 }
 
 OtkWidget::OtkWidget(Style *style, Direction direction,

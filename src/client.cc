@@ -1028,7 +1028,7 @@ void OBClient::close()
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
   ce.xclient.data.l[4] = 0l;
-  XSendEvent(otk::OBDisplay::display, _window, False, NoEventMask, &ce);
+  XSendEvent(otk::OBDisplay::display, _window, false, NoEventMask, &ce);
 }
 
 

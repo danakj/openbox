@@ -1033,20 +1033,22 @@ void client_update_normal_hints(ObClient *self)
 void client_setup_decor_and_functions(ObClient *self)
 {
     /* start with everything (cept fullscreen) */
-    self->decorations = (OB_FRAME_DECOR_TITLEBAR |
-                         OB_FRAME_DECOR_HANDLE |
-                         OB_FRAME_DECOR_GRIPS |
-                         OB_FRAME_DECOR_BORDER |
-                         OB_FRAME_DECOR_ICON |
-                         OB_FRAME_DECOR_ALLDESKTOPS |
-                         OB_FRAME_DECOR_ICONIFY |
-                         OB_FRAME_DECOR_MAXIMIZE |
-                         OB_FRAME_DECOR_SHADE);
-    self->functions = (OB_CLIENT_FUNC_RESIZE |
-                       OB_CLIENT_FUNC_MOVE |
-                       OB_CLIENT_FUNC_ICONIFY |
-                       OB_CLIENT_FUNC_MAXIMIZE |
-                       OB_CLIENT_FUNC_SHADE);
+    self->decorations =
+        (OB_FRAME_DECOR_TITLEBAR |
+         (ob_rr_theme->show_handle ? OB_FRAME_DECOR_HANDLE : 0) |
+         OB_FRAME_DECOR_GRIPS |
+         OB_FRAME_DECOR_BORDER |
+         OB_FRAME_DECOR_ICON |
+         OB_FRAME_DECOR_ALLDESKTOPS |
+         OB_FRAME_DECOR_ICONIFY |
+         OB_FRAME_DECOR_MAXIMIZE |
+         OB_FRAME_DECOR_SHADE);
+    self->functions =
+        (OB_CLIENT_FUNC_RESIZE |
+         OB_CLIENT_FUNC_MOVE |
+         OB_CLIENT_FUNC_ICONIFY |
+         OB_CLIENT_FUNC_MAXIMIZE |
+         OB_CLIENT_FUNC_SHADE);
     if (self->delete_window) {
 	self->functions |= OB_CLIENT_FUNC_CLOSE;
         self->decorations |= OB_FRAME_DECOR_CLOSE;

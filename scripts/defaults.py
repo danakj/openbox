@@ -22,6 +22,10 @@ ob.mbind("Left", ob.MouseContext.Root, ob.MouseAction.Click,
 
 ob.kbind(["A-F4"], ob.KeyContext.All, callbacks.close)
 
+# focus bindings
+ob.kbind(["A-Tab"], ob.KeyContext.All, focus.focus_next_stacked)
+ob.kbind(["A-S-Tab"], ob.KeyContext.All, focus.focus_prev_stacked)
+
 # desktop changing bindings
 ob.kbind(["C-1"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 0))
 ob.kbind(["C-2"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 1))

@@ -38,6 +38,8 @@ otk_test: libotk.la otk_test.cc
 rendertest: libotk.la rendertest.cc
 	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o $@ rendertest.cc $(XFT_LIBS) -L. -lotk @LIBS@
 
+%.py: %_wrap.cc
+
 otk.i: $(wildcard *.hh)
 	touch $@
 

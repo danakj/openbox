@@ -31,6 +31,13 @@ void client_send_to_update(ObMenu *self)
     
     /* check if we have to update. lame */
     while (it != NULL) {
+        if (i == screen_desktop) {
+            if (((ObMenuEntry *)it->data)->enabled)
+                break;
+        } else {
+            if (!((ObMenuEntry *)it->data)->enabled)
+                break;
+        }
         if (i >= screen_num_desktops)
             break;
         if (strcmp(screen_desktop_names[i],
@@ -49,6 +56,8 @@ void client_send_to_update(ObMenu *self)
             a->data.sendto.desk = i;
             a->data.sendto.follow = FALSE;
             e = menu_entry_new(screen_desktop_names[i], a);
+            if (i == screen_desktop)
+                e->enabled = FALSE;
             menu_add_entry(self, e);
         }
         

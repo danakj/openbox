@@ -87,9 +87,9 @@ handleWidth:			3
 frameWidth:			1
 
 *.font:        -schumacher-clean-medium-r-normal-*-*-120-*-*-c-*-iso646.1991-irv
-*.xft.font:	Georgia
-*.xft.size:	9
-menu*xft.size:	11
+*.xft.font: Arial
+*.xft.size:	10
+menu*xft.size:	12
 menu.title.xft.flags: bold
 
 

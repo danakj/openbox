@@ -40,13 +40,13 @@ void OtkFocusLabel::update(void)
     const BFont &ft = getStyle()->getFont();
     BColor *text_color = (isFocused() ? getStyle()->getTextFocus()
                           : getStyle()->getTextUnfocus());
-    unsigned int bevel = getStyle()->getBevelWidth() / 2;
+    unsigned int sidemargin = getStyle()->getBevelWidth() * 2;
 
     std::string t = _text; // the actual text to draw
-    int x = bevel;         // x coord for the text
+    int x = sidemargin;    // x coord for the text
 
     // find a string that will fit inside the area for text
-    int max_length = width() - bevel * 2;
+    int max_length = width() - sidemargin * 2;
     if (max_length <= 0) {
       t = ""; // can't fit anything
     } else {
@@ -73,7 +73,7 @@ void OtkFocusLabel::update(void)
 
     OtkFocusWidget::update();
 
-    ft.drawString(_xftdraw, x, bevel, *text_color, t);
+    ft.drawString(_xftdraw, x, 0, *text_color, t);
   } else
     OtkFocusWidget::update();
 }

@@ -35,13 +35,13 @@ void OtkLabel::update(void)
 {
   if (_dirty) {
     const BFont &ft = getStyle()->getFont();
-    unsigned int bevel = getStyle()->getBevelWidth() / 2;
+    unsigned int sidemargin = getStyle()->getBevelWidth() * 2;
 
     std::string t = _text; // the actual text to draw
-    int x = bevel;         // x coord for the text
+    int x = sidemargin;    // x coord for the text
 
     // find a string that will fit inside the area for text
-    int max_length = width() - bevel * 2;
+    int max_length = width() - sidemargin * 2;
     if (max_length <= 0) {
       t = ""; // can't fit anything
     } else {
@@ -68,7 +68,7 @@ void OtkLabel::update(void)
 
     OtkWidget::update();
 
-    ft.drawString(_xftdraw, x, bevel, *getStyle()->getTextUnfocus(), t);
+    ft.drawString(_xftdraw, x, 0, *getStyle()->getTextUnfocus(), t);
   } else
     OtkWidget::update();
 }

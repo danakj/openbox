@@ -109,12 +109,16 @@ void epist::activateGrabs() {
 
 bool epist::handleSignal(int sig) {
   switch (sig) {
-  case SIGHUP:
+  case SIGHUP: {
     cout << "epist: Restarting on request.\n";
+    
     execvp(_argv[0], _argv);
+
     string base(basename(_argv[0]));
     execvp(base.c_str(), _argv);
+    
     return false;  // this should be unreachable
+  }
 
   case SIGTERM:
   case SIGINT:

@@ -1,4 +1,4 @@
-// -*- mode: C; indent-tabs-mode: nil; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef   __screeninfo_h
 #define   __screeninfo_h
 
@@ -20,7 +20,7 @@ typedef struct OtkScreenInfo {
   PyStringObject *display_string;
   struct OtkRect *rect; // OtkRect
 #ifdef XINERAMA
-  PyObject *xinerama_areas; // PyListObject[OtkRect]
+  PyListObject *xinerama_areas; // holds OtkRect's
   Bool xinerama_active;
 #endif
 } OtkScreenInfo;

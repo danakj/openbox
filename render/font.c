@@ -241,7 +241,7 @@ gint RrFontHeight(const RrFont *f)
      return result;
  */
     return f->xftfont->ascent + f->xftfont->descent +
-        (f->shadow ? f->offset : 0*);
+        (f->shadow ? f->offset : 0);
 
 #endif /* USE_PANGO */
 }

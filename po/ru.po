@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
-"POT-Creation-Date: 2004-04-17 13:45+0200\n"
+"Report-Msgid-Bugs-To: mikachu@openbox.org\n"
+"POT-Creation-Date: 2004-11-07 12:52+0100\n"
 "PO-Revision-Date: 2004-04-23 13:00+0300\n"
 "Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -14,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:94
+#: openbox/client_list_menu.c:95
 msgid "Go there..."
 msgstr "Перейти..."
 
-#: openbox/client_list_menu.c:160
+#: openbox/client_list_menu.c:161
 msgid "Desktops"
 msgstr "Рабочие места"
 
@@ -111,8 +112,7 @@ msgstr "Невозможно создать каталог '%s': %s"
 msgid "Couldn't initialize Xft."
 msgstr "Не удалось инициализировать Xft."
 
-#: render/font.c:122
-#: render/font.c:127
+#: render/font.c:122 render/font.c:127
 #, c-format
 msgid "Unable to load font: %s\n"
 msgstr "Невозможно загрузить шрифт: %s\n"
@@ -121,4 +121,3 @@ msgstr "Невозможно загрузить шрифт: %s\n"
 #, c-format
 msgid "Trying fallback font: %s\n"
 msgstr "Попытка вернуть шрифт: %s\n"
-

@@ -27,10 +27,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.1\n"
+"Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: mikachu@comhem.se\n"
-"POT-Creation-Date: 2004-03-29 18:54+0200\n"
-"PO-Revision-Date: 2004-03-29 18:54+0200\n"
+"POT-Creation-Date: 2004-11-07 12:52+0100\n"
+"PO-Revision-Date: 2004-11-07 12:52+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -38,11 +38,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/client_list_menu.c:94
+#: openbox/client_list_menu.c:95
 msgid "Go there..."
 msgstr "Go there..."
 
-#: openbox/client_list_menu.c:160
+#: openbox/client_list_menu.c:161
 msgid "Desktops"
 msgstr "Desktops"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.0\n"
 "Report-Msgid-Bugs-To: mikachu@comhem.se\n"
-"POT-Creation-Date: 2004-03-29 18:54+0200\n"
+"POT-Creation-Date: 2004-11-07 12:52+0100\n"
 "PO-Revision-Date: 2003-11-20 15:00+0900\n"
 "Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:94
+#: openbox/client_list_menu.c:95
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_menu.c:160
+#: openbox/client_list_menu.c:161
 msgid "Desktops"
 msgstr "デスクトップ"
 

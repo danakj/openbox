@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.2\n"
 "Report-Msgid-Bugs-To: mikachu@comhem.se\n"
-"POT-Creation-Date: 2004-09-07 20:52+0200\n"
+"POT-Creation-Date: 2004-11-07 12:52+0100\n"
 "PO-Revision-Date: 2004-09-07 21:17+0200\n"
 "Last-Translator: Madej <madej@afn.no-ip.org>\n"
 "Language-Team: NONE\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:94
+#: openbox/client_list_menu.c:95
 msgid "Go there..."
 msgstr "Przejdź..."
 
-#: openbox/client_list_menu.c:160
+#: openbox/client_list_menu.c:161
 msgid "Desktops"
 msgstr "Pulpit"
 

@@ -1,25 +1,25 @@
 # Swedish messages for openbox
 # Copyright (C) 2004 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# Mikael Magnusson <mikachu@comhem.se>, 2004.
+# Mikael Magnusson <mikachu@icculus.org>, 2004.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.1\n"
-"Report-Msgid-Bugs-To: mikachu@comhem.se\n"
-"POT-Creation-Date: 2004-03-29 18:54+0200\n"
+"Project-Id-Version: openbox 3.3\n"
+"Report-Msgid-Bugs-To: mikachu@openbox.org\n"
+"POT-Creation-Date: 2004-11-07 12:52+0100\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
-"Last-Translator: Mikael Magnusson <mikachu@comhem.se>\n"
+"Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:94
+#: openbox/client_list_menu.c:95
 msgid "Go there..."
 msgstr "Gå dit"
 
-#: openbox/client_list_menu.c:160
+#: openbox/client_list_menu.c:161
 msgid "Desktops"
 msgstr "Skrivbord"
 

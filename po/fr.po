@@ -7,19 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.2\n"
 "Report-Msgid-Bugs-To: mikachu@comhem.se\n"
-"POT-Creation-Date: 2004-04-17 13:45+0200\n"
+"POT-Creation-Date: 2004-11-07 12:52+0100\n"
 "PO-Revision-Date: 2004-06-11 23:06+0200\n"
 "Last-Translator: Julien Louis <leonptitlouis@wanadoo.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:94
+#: openbox/client_list_menu.c:95
 msgid "Go there..."
 msgstr "Aller à..."
 
-#: openbox/client_list_menu.c:160
+#: openbox/client_list_menu.c:161
 msgid "Desktops"
 msgstr "Bureaux"
 
@@ -121,4 +121,3 @@ msgstr "Impossible de charger la police : %s\n"
 #, c-format
 msgid "Trying fallback font: %s\n"
 msgstr "Tentative de remplacement de la police : %s\n"
-

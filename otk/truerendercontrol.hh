@@ -32,10 +32,12 @@ typedef u_int16_t pixel16;
 const int default_red_shift=0;
 const int default_green_shift=8;
 const int default_blue_shift=16;
+const int endian=MSBFirst;
 #else
 const int default_red_shift=16;
 const int default_green_shift=8;
 const int default_blue_shift=0;
+const int endian=LSBFirst;
 #endif /* WORDS_BIGENDIAN */
 
 class TrueRenderControl : public RenderControl {

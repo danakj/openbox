@@ -111,7 +111,7 @@ void TrueRenderControl::drawGradientBackground(
   const ScreenInfo *info = display->screenInfo(_screen);
   XImage *im = XCreateImage(**display, info->visual(), info->depth(),
                             ZPixmap, 0, NULL, w, h, 32, 0);
-  im->byte_order = LSBFirst;
+  im->byte_order = endian;
   pixel32 *data = new pixel32[sf.height()*sf.width()];
   pixel32 current;
 

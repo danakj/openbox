@@ -1,10 +1,11 @@
-#include <stdlib.h>
-#include <X11/Xft/Xft.h>
 #include "../kernel/openbox.h"
 #include "font.h"
 
 #include "../src/gettext.h"
 #define _(str) gettext(str)
+
+#include <X11/Xft/Xft.h>
+#include <glib.h>
 
 void font_startup(void)
 {
@@ -44,7 +45,7 @@ ObFont *font_open(char *fontstring)
     XftFont *xf;
     
     if ((xf = XftFontOpenName(ob_display, ob_screen, fontstring))) {
-        out = malloc(sizeof(ObFont));
+        out = g_new(ObFont, 1);
         out->xftfont = xf;
         measure_height(out);
         return out;
@@ -53,7 +54,7 @@ ObFont *font_open(char *fontstring)
     g_warning(_("Trying fallback font: %s\n"), "fixed");
 
     if ((xf = XftFontOpenName(ob_display, ob_screen, "fixed"))) {
-        out = malloc(sizeof(ObFont));
+        out = g_new(ObFont, 1);
         out->xftfont = xf;
         measure_height(out);
         return out;
@@ -67,9 +68,10 @@ ObFont *font_open(char *fontstring)
 void font_close(ObFont *f)
 {
     XftFontClose(ob_display, f->xftfont);
+    g_free(f);
 }
 
-int font_measure_string(ObFont *f, const char *str, int shadow, int offset)
+int font_measure_string(ObFont *f, char *str, int shadow, int offset)
 {
     XGlyphInfo info;
 

@@ -81,6 +81,7 @@ public:
   void processEvent(const XEvent &e);
 
   void shade(const bool sh) const;
+  void close() const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

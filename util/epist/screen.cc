@@ -175,6 +175,10 @@ void screen::handleKeypress(const XEvent &e) {
         XWindow *window = *_active;
 
         switch (it->type()) {
+        case Action::close:
+          window->close();
+          return;
+
         case Action::toggleshade:
           window->shade(! window->shaded());
           return;

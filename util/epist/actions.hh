@@ -36,17 +36,17 @@ public:
     noaction = 0,
     execute,
     iconify,
-    raiseWindow,
-    lowerWindow,
-    closeWindow,
-    toggleshade,
+    raise,
+    lower,
+    close, //done
+    toggleshade, //done
     moveWindowUp,
     moveWindowDown,
     moveWindowLeft,
     moveWindowRight,
 
-    nextWindow,
-    prevWindow,
+    nextWindow, //done for now
+    prevWindow, //done for now
     nextWindowOnAllWorkspaces,
     prevWindowOnAllWorkspaces,
 

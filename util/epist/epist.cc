@@ -88,6 +88,10 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                             XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("F5")),
                             Mod1Mask));
+  _actions.push_back(Action(Action::close,
+                            XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("F4")),
+                            Mod1Mask));
   _actions.push_back(Action(Action::nextWindow,
                             XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Tab")),

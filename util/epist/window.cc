@@ -148,3 +148,9 @@ void XWindow::shade(const bool sh) const {
                             _window, (sh ? 1 : 0),
                             _xatom->getAtom(XAtom::net_wm_state_shaded));
 }
+
+
+void XWindow::close() const {
+  _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_close_window,
+                            _window);
+}

@@ -6,6 +6,7 @@
 typedef struct _RrTheme RrTheme;
 
 struct _RrTheme {
+    gchar *path;
     gchar *name;
 
     const RrInstance *inst;

@@ -227,11 +227,12 @@ def setup_click_focus(click_raise = 1):
     mbind("Left", MC_Handle, MousePress, focus)
     mbind("Left", MC_Grip, MousePress, focus)
     mbind("Left", MC_Window, MousePress, focus)
+    mbind("A-Left", MC_Frame, MousePress, focus)
     if click_raise:
         mbind("Left", MC_Titlebar, MousePress, raise_win)
         mbind("Left", MC_Handle, MousePress, raise_win)
         mbind("Left", MC_Grip, MousePress, raise_win)
-        mbind("Left", MC_Window, MousePress, raise_win)
+        mbind("Left", MC_Window, MousePress, raise_win)    
 
 def setup_sloppy_focus(click_focus = 1, click_raise = 0):
     """Sets up for focusing windows when the mouse pointer enters them.
@@ -240,7 +241,15 @@ def setup_sloppy_focus(click_focus = 1, click_raise = 0):
        in a window can raise the window to the front of its stacking layer."""
     ebind(EventEnterWindow, focus)
     if click_focus:
-        setup_click_focus(click_raise)
+        mbind("Left", MC_Titlebar, MousePress, focus)
+        mbind("Left", MC_Handle, MousePress, focus)
+        mbind("Left", MC_Grip, MousePress, focus)
+        mbind("Left", MC_Window, MousePress, focus)
+        if click_raise:
+            mbind("Left", MC_Titlebar, MousePress, raise_win)
+            mbind("Left", MC_Handle, MousePress, raise_win)
+            mbind("Left", MC_Grip, MousePress, raise_win)
+            mbind("Left", MC_Window, MousePress, raise_win)
 
 def setup_window_clicks():
     """Sets up the default bindings for various mouse buttons for various

@@ -26,32 +26,52 @@ typedef struct Popup {
 
 Popup *popup_new(gboolean hasicon)
 {
+    XSetWindowAttributes attrib;
     Popup *self = g_new(Popup, 1);
+
     self->obwin.type = Window_Internal;
     self->hasicon = hasicon;
-    self->bg = None;
     self->a_text = NULL;
     self->gravity = NorthWestGravity;
     self->x = self->y = self->w = self->h = 0;
     self->mapped = FALSE;
+    self->a_bg = self->a_icon = self->a_text = NULL;
+
+    attrib.override_redirect = True;
+    self->bg = XCreateWindow(ob_display, ob_root,
+                             0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
+                             InputOutput, RrVisual(ob_rr_inst),
+                             CWOverrideRedirect, &attrib);
+    
+    self->text = XCreateWindow(ob_display, self->bg,
+                               0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
+                               InputOutput, RrVisual(ob_rr_inst), 0, NULL);
+
+    if (self->hasicon)
+        self->icon = XCreateWindow(ob_display, self->bg,
+                                   0, 0, 1, 1, 0,
+                                   RrDepth(ob_rr_inst), InputOutput,
+                                   RrVisual(ob_rr_inst), 0, NULL);
+
+    XMapWindow(ob_display, self->text);
+    XMapWindow(ob_display, self->icon);
+
     stacking_add(INTERNAL_AS_WINDOW(self));
     return self;
 }
 
 void popup_free(Popup *self)
 {
-    if (self->bg) {
+    if (self) {
         XDestroyWindow(ob_display, self->bg);
         XDestroyWindow(ob_display, self->text);
         XDestroyWindow(ob_display, self->icon);
         RrAppearanceFree(self->a_bg);
-        if (self->hasicon)
-            RrAppearanceFree(self->a_icon);
-    }
-    if (self->a_text)
+        RrAppearanceFree(self->a_icon);
         RrAppearanceFree(self->a_text);
-    stacking_remove(self);
-    g_free(self);
+        stacking_remove(self);
+        g_free(self);
+    }
 }
 
 void popup_position(Popup *self, int gravity, int x, int y)
@@ -87,40 +107,20 @@ void popup_size_to_string(Popup *self, char *text)
 
 void popup_show(Popup *self, char *text, Icon *icon)
 {
-    XSetWindowAttributes attrib;
     int x, y, w, h;
     int textw, texth;
     int iconw;
 
     /* create the shit if needed */
-    if (!self->bg) {
-        attrib.override_redirect = True;
-        self->bg = XCreateWindow(ob_display, ob_root,
-                                 0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
-                                 InputOutput, RrVisual(ob_rr_inst),
-                                 CWOverrideRedirect, &attrib);
-
-        XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->bwidth);
-        XSetWindowBorder(ob_display, self->bg, ob_rr_theme->b_color->pixel);
-
-        self->text = XCreateWindow(ob_display, self->bg,
-                                   0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
-                                   InputOutput, RrVisual(ob_rr_inst), 0, NULL);
-        if (self->hasicon)
-            self->icon = XCreateWindow(ob_display, self->bg,
-                                       0, 0, 1, 1, 0,
-                                       RrDepth(ob_rr_inst), InputOutput,
-                                       RrVisual(ob_rr_inst), 0, NULL);
-
-        XMapWindow(ob_display, self->text);
-        XMapWindow(ob_display, self->icon);
-
+    if (!self->a_bg)
         self->a_bg = RrAppearanceCopy(ob_rr_theme->app_hilite_bg);
-        if (self->hasicon)
-            self->a_icon = RrAppearanceCopy(ob_rr_theme->app_icon);
-    }
+    if (self->hasicon && !self->a_icon)
+        self->a_icon = RrAppearanceCopy(ob_rr_theme->app_icon);
     if (!self->a_text)
         self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+
+    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->bwidth);
+    XSetWindowBorder(ob_display, self->bg, ob_rr_theme->b_color->pixel);
 
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;

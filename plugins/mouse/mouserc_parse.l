@@ -92,6 +92,7 @@ static void addbinding()
         /* the below types cannot be used with !motion events, or at all with
            mouse bindings */
     } else if (a && (a->func == action_move || a->func == action_resize ||
+                     a->func == action_desktop ||
                      a->func == action_move_relative ||
                      a->func == action_resize_relative)) {
         action_free(a);

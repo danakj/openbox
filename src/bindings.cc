@@ -33,10 +33,37 @@ static void print_branch(BindingTree *first, std::string str)
 
 void OBBindings::display()
 {
-  if (_tree.first_child)
-    print_branch(_tree.first_child, "");
+  if (_keytree.first_child) {
+    printf("Key Tree:\n");
+    print_branch(_keytree.first_child, "");
+  }
+  if (_mousetree.next_sibling) {
+    printf("Mouse Tree:\n");
+    BindingTree *p = _mousetree.next_sibling;
+    while (p) {
+      printf("%d %s\n", p->id, p->text.c_str());
+      p = p->next_sibling;
+    }
+  }
 }
 
+
+static bool buttonvalue(const std::string &button, unsigned int *val)
+{
+  if (button == "1" || button == "Button1") {
+    *val |= Button1;
+  } else if (button == "2" || button == "Button2") {
+    *val |= Button2;
+  } else if (button == "3" || button == "Button3") {
+    *val |= Button3;
+  } else if (button == "4" || button == "Button4") {
+    *val |= Button4;
+  } else if (button == "5" || button == "Button5") {
+    *val |= Button5;
+  } else
+    return false;
+  return true;
+}
 
 static bool modvalue(const std::string &mod, unsigned int *val)
 {
@@ -68,7 +95,7 @@ static bool modvalue(const std::string &mod, unsigned int *val)
   return true;
 }
 
-bool OBBindings::translate(const std::string &str, Binding &b)
+bool OBBindings::translate(const std::string &str, Binding &b, bool askey)
 {
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -83,7 +110,7 @@ bool OBBindings::translate(const std::string &str, Binding &b)
 
     std::string mod(str, begin, end-begin);
     if (!modvalue(mod, &modval)) {
-      printf(_("Invalid modifier element in key binding: %s\n"), mod.c_str());
+//      printf(_("Invalid modifier element in key binding: %s\n"), mod.c_str());
       return false;
     }
     
@@ -91,11 +118,15 @@ bool OBBindings::translate(const std::string &str, Binding &b)
   }
 
   // set the binding
-  KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
-  if (sym == NoSymbol) return false;
   b.modifiers = modval;
-  b.key = XKeysymToKeycode(otk::OBDisplay::display, sym);
-  return b.key != 0;
+  if (askey) {
+    KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
+    if (sym == NoSymbol) return false;
+    b.key = XKeysymToKeycode(otk::OBDisplay::display, sym);
+    return b.key != 0;
+  } else {
+    return buttonvalue(key, &b.key);
+  }
 }
 
 static void destroytree(BindingTree *tree)
@@ -119,7 +150,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
     ret = new BindingTree(id);
     if (!p) ret->chain = false;
     ret->first_child = p;
-    if (!translate(*it, ret->binding)) {
+    if (!translate(*it, ret->binding, true)) {
       destroytree(ret);
       ret = 0;
       break;
@@ -131,6 +162,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
 
 
 OBBindings::OBBindings()
+  : _curpos(&_keytree)
 {
 }
 
@@ -141,16 +173,48 @@ OBBindings::~OBBindings()
 }
 
 
+bool OBBindings::add_mouse(const std::string &button, int id)
+{
+  BindingTree n;
+
+  if (!translate(button, n.binding, false))
+    return false;
+
+  BindingTree *p = _mousetree.next_sibling, *last = &_mousetree;
+  while (p) {
+    if (p->binding == n.binding)
+      return false; // conflict
+    last = p;
+    p = p->next_sibling;
+  }
+  display();
+  last->next_sibling = new BindingTree(id);
+  display();
+  last->next_sibling->chain = false;
+  last->next_sibling->binding.key = n.binding.key;
+  last->next_sibling->binding.modifiers = n.binding.modifiers;
+ 
+  return true;
+}
+
+
+int OBBindings::remove_mouse(const std::string &button)
+{
+  (void)button;
+  assert(false); // XXX: function not implemented yet
+}
+
+
 void OBBindings::assimilate(BindingTree *node)
 {
   BindingTree *a, *b, *tmp, *last;
 
-  if (!_tree.first_child) {
+  if (!_keytree.first_child) {
     // there are no nodes at this level yet
-    _tree.first_child = node;
+    _keytree.first_child = node;
     return;
   } else {
-    a = _tree.first_child;
+    a = _keytree.first_child;
     last = a;
     b = node;
     while (a) {
@@ -173,9 +237,9 @@ void OBBindings::assimilate(BindingTree *node)
 }
 
 
-int OBBindings::find(BindingTree *search) {
+int OBBindings::find_key(BindingTree *search) {
   BindingTree *a, *b;
-  a = _tree.first_child;
+  a = _keytree.first_child;
   b = search;
   while (a && b) {
     if (a->binding != b->binding) {
@@ -193,46 +257,14 @@ int OBBindings::find(BindingTree *search) {
   return -1; // it just isn't in here
 }
 
-/*
-static int find(BindingTree *parent, BindingTree *node) {
-  BindingTree *p, *lastsib, *nextparent, *nextnode = node->first_child;
-
-  if (!parent->first_child)
-    return -1;
-
-  p = parent->first_child;
-  while (p) {
-    if (node->binding == p->binding) {
-      if (node->chain == p->chain) {
-	if (!node->chain) {
-	  return p->id; // found it! (return the actual id, not the search's)
-	} else {
-	  break; // go on to the next child in the chain
-	}
-      } else {
-	return -2; // the chain status' don't match (conflict!)
-      }
-    }
-    p = p->next_sibling;
-  }
-  if (!p) return -1; // doesn't exist
-
-  if (node->chain) {
-    assert(node->first_child);
-    return find(p, node->first_child);
-  } else
-    return -1; // it just isnt in here
-}
-*/
-
-bool OBBindings::add(const StringVect &keylist, int id)
+bool OBBindings::add_key(const StringVect &keylist, int id)
 {
   BindingTree *tree;
 
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
-  if (find(tree) < -1) {
+  if (find_key(tree) < -1) {
     // conflicts with another binding
     destroytree(tree);
     return false;
@@ -244,7 +276,7 @@ bool OBBindings::add(const StringVect &keylist, int id)
 }
 
 
-int OBBindings::find(const StringVect &keylist)
+int OBBindings::find_key(const StringVect &keylist)
 {
   BindingTree *tree;
   bool ret;
@@ -252,7 +284,7 @@ int OBBindings::find(const StringVect &keylist)
   if (!(tree = buildtree(keylist, 0)))
     return false; // invalid binding requested
 
-  ret = find(tree) >= 0;
+  ret = find_key(tree) >= 0;
 
   destroytree(tree);
 
@@ -260,7 +292,7 @@ int OBBindings::find(const StringVect &keylist)
 }
 
 
-int OBBindings::remove(const StringVect &keylist)
+int OBBindings::remove_key(const StringVect &keylist)
 {
   (void)keylist;
   assert(false); // XXX: function not implemented yet
@@ -283,8 +315,36 @@ static void remove_branch(BindingTree *first)
 
 void OBBindings::remove_all()
 {
-  if (_tree.first_child)
-    remove_branch(_tree.first_child);
+  if (_keytree.first_child) {
+    remove_branch(_keytree.first_child);
+    _keytree.first_child = 0;
+  }
+  BindingTree *p = _mousetree.next_sibling;
+  while (p) {
+    BindingTree *n = p->next_sibling;
+    delete p;
+    p = n;
+  }
+  _mousetree.next_sibling = 0;
+}
+
+
+void OBBindings::process(unsigned int modifiers, unsigned int key)
+{
+  BindingTree *c = _curpos->first_child;
+
+  while (c) {
+    if (c->binding.key == key && c->binding.modifiers == modifiers) {
+      _curpos = c;
+      break;
+    }
+  }
+  if (c) {
+    if (!_curpos->chain) {
+      // XXX execute command for _curpos->id
+      _curpos = &_keytree; // back to the start
+    }
+  }
 }
 
 }

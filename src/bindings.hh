@@ -46,10 +46,13 @@ public:
   typedef std::vector<std::string> StringVect;
 
 private:
-  BindingTree _tree;// root node of the tree (this doesn't have siblings!)
+  BindingTree _keytree; // root node of the tree (this doesn't have siblings!)
+  BindingTree *_curpos; // position in the keytree
 
-  int find(BindingTree *search);
-  bool translate(const std::string &str, Binding &b);
+  BindingTree _mousetree; // this tree is a list. it has only siblings
+  
+  int find_key(BindingTree *search);
+  bool translate(const std::string &str, Binding &b, bool askey);
   BindingTree *buildtree(const StringVect &keylist, int id);
   void OBBindings::assimilate(BindingTree *node);
  
@@ -59,20 +62,35 @@ public:
   //! Destroys the OBBinding object
   virtual ~OBBindings();
 
-  //! Adds a new binding
+  //! Adds a new mouse binding
+  /*!
+    A binding will fail to be added if the binding already exists, or if the
+    string is invalid.    
+    @return true if the binding could be added; false if it could not.
+  */
+  bool add_mouse(const std::string &button, int id);
+
+  //! Removes a mouse binding
+  /*!
+    @return The id of the binding that was removed, or '< 0' if none were
+            removed.
+  */
+  int remove_mouse(const std::string &button);
+
+  //! Adds a new key binding
   /*!
     A binding will fail to be added if the binding already exists (as part of
     a chain or not), or if any of the strings in the keylist are invalid.    
     @return true if the binding could be added; false if it could not.
   */
-  bool add(const StringVect &keylist, int id);
+  bool add_key(const StringVect &keylist, int id);
 
   //! Removes a key binding
   /*!
     @return The id of the binding that was removed, or '< 0' if none were
             removed.
   */
-  int remove(const StringVect &keylist);
+  int remove_key(const StringVect &keylist);
 
   //! Removes all key bindings
   void remove_all();
@@ -82,7 +100,9 @@ public:
     @return -1 if the keybinding was not found but does not conflict with
     any others; -2 if the keybinding conflicts with another.
   */
-  int find(const StringVect &keylist);
+  int find_key(const StringVect &keylist);
+
+  void process(unsigned int modifiers, unsigned int key);
 
   // XXX: need an exec() function or something that will be used by openbox
   //      and hold state for which chain we're in etc. (it could have a timer

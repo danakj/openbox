@@ -2569,7 +2569,7 @@ static PyObject *_wrap_unregister_all(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_bind(PyObject *self, PyObject *args) {
+static PyObject *_wrap_bind_key(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     PyObject *arg1 = (PyObject *) 0 ;
     PyObject *arg2 = (PyObject *) 0 ;
@@ -2577,10 +2577,10 @@ static PyObject *_wrap_bind(PyObject *self, PyObject *args) {
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:bind",&obj0,&obj1)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO:bind_key",&obj0,&obj1)) goto fail;
     arg1 = obj0;
     arg2 = obj1;
-    result = (bool)ob::python_bind(arg1,arg2);
+    result = (bool)ob::python_bind_key(arg1,arg2);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -2589,15 +2589,68 @@ static PyObject *_wrap_bind(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_unbind(PyObject *self, PyObject *args) {
+static PyObject *_wrap_unbind_key(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     PyObject *arg1 = (PyObject *) 0 ;
     bool result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:unbind",&obj0)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:unbind_key",&obj0)) goto fail;
     arg1 = obj0;
-    result = (bool)ob::python_unbind(arg1);
+    result = (bool)ob::python_unbind_key(arg1);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_bind_mouse(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    std::string *arg1 = 0 ;
+    PyObject *arg2 = (PyObject *) 0 ;
+    bool result;
+    std::string temp1 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:bind_mouse",&obj0,&obj1)) goto fail;
+    {
+        if (PyString_Check(obj0)) {
+            temp1 = std::string(PyString_AsString(obj0));
+            arg1 = &temp1;
+        }else {
+            SWIG_exception(SWIG_TypeError, "string expected");
+        }
+    }
+    arg2 = obj1;
+    result = (bool)ob::python_bind_mouse((std::string const &)*arg1,arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_unbind_mouse(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    std::string *arg1 = 0 ;
+    bool result;
+    std::string temp1 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:unbind_mouse",&obj0)) goto fail;
+    {
+        if (PyString_Check(obj0)) {
+            temp1 = std::string(PyString_AsString(obj0));
+            arg1 = &temp1;
+        }else {
+            SWIG_exception(SWIG_TypeError, "string expected");
+        }
+    }
+    result = (bool)ob::python_unbind_mouse((std::string const &)*arg1);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -2719,8 +2772,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"preregister", _wrap_preregister, METH_VARARGS },
 	 { (char *)"unregister", _wrap_unregister, METH_VARARGS },
 	 { (char *)"unregister_all", _wrap_unregister_all, METH_VARARGS },
-	 { (char *)"bind", _wrap_bind, METH_VARARGS },
-	 { (char *)"unbind", _wrap_unbind, METH_VARARGS },
+	 { (char *)"bind_key", _wrap_bind_key, METH_VARARGS },
+	 { (char *)"unbind_key", _wrap_unbind_key, METH_VARARGS },
+	 { (char *)"bind_mouse", _wrap_bind_mouse, METH_VARARGS },
+	 { (char *)"unbind_mouse", _wrap_unbind_mouse, METH_VARARGS },
 	 { (char *)"unbind_all", _wrap_unbind_all, METH_VARARGS },
 	 { NULL, NULL }
 };

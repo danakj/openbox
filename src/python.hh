@@ -26,15 +26,20 @@ bool python_unregister(int action, PyObject *callback);
 //! Removes all python callback functions from the hook list
 bool python_unregister_all(int action);
 
-//! Add a mouse/keybinding
+//! Add a keybinding
 /*!
   @param keylist A python list of modifier/key/buttons, in the form:
                  "C-A-space" or "A-Button1" etc.
   @param callback A python function to call when the binding is used.
 */
-bool python_bind(PyObject *keylist, PyObject *callback);
+bool python_bind_key(PyObject *keylist, PyObject *callback);
 
-bool python_unbind(PyObject *keylist);
+bool python_unbind_key(PyObject *keylist);
+
+//! Adds a mouse binding
+bool python_bind_mouse(const std::string &button, PyObject *callback);
+
+bool python_unbind_mouse(const std::string &button);
 
 bool python_unbind_all();
 

@@ -153,12 +153,14 @@ Openbox::Openbox(int argc, char **argv)
   v.push_back("C-A-x");
   v.push_back("C-y");
   v.push_back("v");
-  _bindings->add(v, 1);
+  _bindings->add_key(v, 1);
   v.clear();
 //  v.push_back("C-x");
 //  v.push_back("C-z");
   v.push_back("a");
-  _bindings->add(v, 2);
+  _bindings->add_key(v, 2);
+
+  _bindings->add_mouse("A-1", 1);
 
   printf("CHAINS:\n");
   _bindings->display();

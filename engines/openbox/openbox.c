@@ -676,7 +676,7 @@ static void layout_title(ObFrame *self)
 	    if (!n) break;
 	    self->icon_x = x;
 	    XMapWindow(ob_display, self->icon);
-	    XMoveWindow(ob_display, self->icon, x, sep + 1);
+	    XMoveWindow(ob_display, self->icon, x, s_bevel + 1);
 	    x += BUTTON_SIZE + sep;
 	    break;
 	case 'D':

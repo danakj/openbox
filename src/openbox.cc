@@ -153,12 +153,12 @@ Openbox::Openbox(int argc, char **argv)
     }
   }
 
-  assert(_focused_screen);
-
   if (_screens.empty()) {
     printf(_("No screens were found without a window manager. Exiting.\n"));
     ::exit(1);
   }
+
+  assert(_focused_screen);
 
   ScreenList::iterator it, end = _screens.end();
   

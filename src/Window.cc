@@ -2056,7 +2056,7 @@ void BlackboxWindow::setFocusFlag(bool focus) {
     else timer->stop();
   }
 
-  if (isFocused())
+  if (flags.focused)
     blackbox->setFocusedWindow(this);
  
   if (! flags.iconic) {

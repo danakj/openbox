@@ -11,7 +11,6 @@
 #include "config.h"
 #include "grab.h"
 #include "engine.h"
-#include "themerc.h"
 #include "plugin.h"
 #include "timer.h"
 #include "../render/render.h"
@@ -181,7 +180,6 @@ int main(int argc, char **argv)
 	screen_shutdown();
 	event_shutdown();
 	engine_shutdown();
-	themerc_shutdown();
 	render_shutdown();
         config_shutdown();
 	timer_shutdown();

@@ -677,36 +677,37 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XCirculateEvent swig_types[29] 
 #define  SWIGTYPE_p_XRectangle swig_types[30] 
 #define  SWIGTYPE_p_std__string swig_types[31] 
-#define  SWIGTYPE_p_XCrossingEvent swig_types[32] 
-#define  SWIGTYPE_p_Display swig_types[33] 
-#define  SWIGTYPE_p_otk__Display swig_types[34] 
-#define  SWIGTYPE_p_XMappingEvent swig_types[35] 
-#define  SWIGTYPE_p_otk__Style swig_types[36] 
-#define  SWIGTYPE_p_otk__EventHandler swig_types[37] 
-#define  SWIGTYPE_p_XReparentEvent swig_types[38] 
-#define  SWIGTYPE_p_otk__EventDispatcher swig_types[39] 
-#define  SWIGTYPE_p_otk__GCCache swig_types[40] 
-#define  SWIGTYPE_p_ob__Bindings swig_types[41] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[42] 
-#define  SWIGTYPE_p_ob__Actions swig_types[43] 
-#define  SWIGTYPE_p_XEvent swig_types[44] 
-#define  SWIGTYPE_p_otk__Property swig_types[45] 
-#define  SWIGTYPE_p_PyObject swig_types[46] 
-#define  SWIGTYPE_p_otk__ScreenInfo swig_types[47] 
-#define  SWIGTYPE_p_ob__EventData swig_types[48] 
-#define  SWIGTYPE_p_XCreateWindowEvent swig_types[49] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[50] 
-#define  SWIGTYPE_p_otk__Property__StringVect swig_types[51] 
-#define  SWIGTYPE_p_ob__WidgetBase swig_types[52] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[53] 
-#define  SWIGTYPE_p_otk__Strut swig_types[54] 
-#define  SWIGTYPE_p_unsigned_long swig_types[55] 
-#define  SWIGTYPE_p_p_unsigned_long swig_types[56] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[57] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[58] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[59] 
-#define  SWIGTYPE_p_otk__TimerQueueManager swig_types[60] 
-static swig_type_info *swig_types[62];
+#define  SWIGTYPE_p_ustring swig_types[32] 
+#define  SWIGTYPE_p_XCrossingEvent swig_types[33] 
+#define  SWIGTYPE_p_Display swig_types[34] 
+#define  SWIGTYPE_p_otk__Display swig_types[35] 
+#define  SWIGTYPE_p_XMappingEvent swig_types[36] 
+#define  SWIGTYPE_p_otk__Style swig_types[37] 
+#define  SWIGTYPE_p_otk__EventHandler swig_types[38] 
+#define  SWIGTYPE_p_XReparentEvent swig_types[39] 
+#define  SWIGTYPE_p_otk__EventDispatcher swig_types[40] 
+#define  SWIGTYPE_p_otk__GCCache swig_types[41] 
+#define  SWIGTYPE_p_ob__Bindings swig_types[42] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[43] 
+#define  SWIGTYPE_p_ob__Actions swig_types[44] 
+#define  SWIGTYPE_p_XEvent swig_types[45] 
+#define  SWIGTYPE_p_otk__Property swig_types[46] 
+#define  SWIGTYPE_p_PyObject swig_types[47] 
+#define  SWIGTYPE_p_otk__ScreenInfo swig_types[48] 
+#define  SWIGTYPE_p_ob__EventData swig_types[49] 
+#define  SWIGTYPE_p_XCreateWindowEvent swig_types[50] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[51] 
+#define  SWIGTYPE_p_otk__Property__StringVect swig_types[52] 
+#define  SWIGTYPE_p_ob__WidgetBase swig_types[53] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[54] 
+#define  SWIGTYPE_p_otk__Strut swig_types[55] 
+#define  SWIGTYPE_p_unsigned_long swig_types[56] 
+#define  SWIGTYPE_p_p_unsigned_long swig_types[57] 
+#define  SWIGTYPE_p_XMotionEvent swig_types[58] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[59] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[60] 
+#define  SWIGTYPE_p_otk__TimerQueueManager swig_types[61] 
+static swig_type_info *swig_types[63];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -1505,8 +1506,7 @@ static PyObject *_wrap_Property_set__SWIG_2(PyObject *self, PyObject *args) {
     Window arg2 ;
     int arg3 ;
     int arg4 ;
-    std::string *arg5 = 0 ;
-    std::string temp5 ;
+    ustring *arg5 = 0 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj4  = 0 ;
@@ -1515,15 +1515,11 @@ static PyObject *_wrap_Property_set__SWIG_2(PyObject *self, PyObject *args) {
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (Window) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    {
-        if (PyString_Check(obj4)) {
-            temp5 = std::string(PyString_AsString(obj4));
-            arg5 = &temp5;
-        }else {
-            SWIG_exception(SWIG_TypeError, "string expected");
-        }
+    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_ustring,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg5 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
     }
-    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,(std::string const &)*arg5);
+    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,(ustring const &)*arg5);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1595,6 +1591,47 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
                     if (_v) {
                         {
                             void *ptr;
+                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_ustring, 0) == -1) {
+                                _v = 0;
+                                PyErr_Clear();
+                            }else {
+                                _v = 1;
+                            }
+                        }
+                        if (_v) {
+                            return _wrap_Property_set__SWIG_2(self,args);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (argc == 5) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        {
+                            void *ptr;
                             if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_otk__Property__StringVect, 0) == -1) {
                                 _v = 0;
                                 PyErr_Clear();
@@ -1639,41 +1676,6 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
                         }
                         if (_v) {
                             return _wrap_Property_set__SWIG_0(self,args);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (argc == 5) {
-        int _v;
-        {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
-        }
-        if (_v) {
-            {
-                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
-            }
-            if (_v) {
-                {
-                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
-                }
-                if (_v) {
-                    {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
-                    }
-                    if (_v) {
-                        {
-                            _v = PyString_Check(argv[4]) ? 1 : 0;
-                        }
-                        if (_v) {
-                            return _wrap_Property_set__SWIG_2(self,args);
                         }
                     }
                 }
@@ -8251,6 +8253,7 @@ static swig_type_info _swigt__p_XConfigureEvent[] = {{"_p_XConfigureEvent", 0, "
 static swig_type_info _swigt__p_XCirculateEvent[] = {{"_p_XCirculateEvent", 0, "XCirculateEvent *", 0},{"_p_XCirculateEvent"},{0}};
 static swig_type_info _swigt__p_XRectangle[] = {{"_p_XRectangle", 0, "XRectangle *", 0},{"_p_XRectangle"},{0}};
 static swig_type_info _swigt__p_std__string[] = {{"_p_std__string", 0, "std::string *", 0},{"_p_std__string"},{0}};
+static swig_type_info _swigt__p_ustring[] = {{"_p_ustring", 0, "ustring *", 0},{"_p_ustring"},{0}};
 static swig_type_info _swigt__p_XCrossingEvent[] = {{"_p_XCrossingEvent", 0, "XCrossingEvent *", 0},{"_p_XCrossingEvent"},{0}};
 static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
 static swig_type_info _swigt__p_otk__Display[] = {{"_p_otk__Display", 0, "otk::Display *", 0},{"_p_otk__Display"},{0}};
@@ -8314,6 +8317,7 @@ _swigt__p_XConfigureEvent,
 _swigt__p_XCirculateEvent, 
 _swigt__p_XRectangle, 
 _swigt__p_std__string, 
+_swigt__p_ustring, 
 _swigt__p_XCrossingEvent, 
 _swigt__p_Display, 
 _swigt__p_otk__Display, 

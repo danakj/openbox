@@ -217,17 +217,18 @@ void Property::set(Window win, Atoms atom, Atoms type,
  * Set an string property value on a window.
  */
 void Property::set(Window win, Atoms atom, StringType type,
-                          const std::string &value) const
+                          const ustring &value) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
   
   Atom t;
   switch (type) {
-  case ascii: t = _atoms[Atom_String]; break;
-  case utf8:  t = _atoms[Atom_Utf8]; break;
+  case ascii: t = _atoms[Atom_String]; assert(!value.utf8()); break;
+  case utf8:  t = _atoms[Atom_Utf8]; assert(value.utf8()); break;
   default: assert(False); return; // unhandled StringType
   }
+  
   set(win, _atoms[atom], t,
       reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
       8, value.size() + 1, False); // add 1 to the size to include the null
@@ -244,18 +245,22 @@ void Property::set(Window win, Atoms atom, StringType type,
   assert(type >= 0 && type < NUM_STRING_TYPE);
 
   Atom t;
+  bool u; // utf8 encoded?
   switch (type) {
-  case ascii: t = _atoms[Atom_String]; break;
-  case utf8:  t = _atoms[Atom_Utf8]; break;
+  case ascii: t = _atoms[Atom_String]; u = false; break;
+  case utf8:  t = _atoms[Atom_Utf8];   u = true;  break;
   default: assert(False); return; // unhandled StringType
   }
 
-  std::string value;
+  ustring value;
 
   StringVect::const_iterator it = strings.begin();
   const StringVect::const_iterator end = strings.end();
-  for (; it != end; ++it)
-      value += *it + '\0';
+  for (; it != end; ++it) {
+    assert(it->utf8() == u); // the ustring is encoded correctly?
+    value += *it;
+    value += '\0';
+  }
 
   set(win, _atoms[atom], t,
       reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
@@ -363,10 +368,11 @@ bool Property::get(Window win, Atoms atom, Atoms type,
  * Gets an string property's value from a window.
  */
 bool Property::get(Window win, Atoms atom, StringType type,
-                     std::string *value) const
+                   ustring *value) const
 {
   unsigned long n = 1;
   StringVect s;
+
   if (get(win, atom, type, &n, &s)) {
     *value = s[0];
     return True;
@@ -384,9 +390,10 @@ bool Property::get(Window win, Atoms atom, StringType type,
   assert(*nelements > 0);
 
   Atom t;
+  bool u; // utf8 encoded?
   switch (type) {
-  case ascii: t = _atoms[Atom_String]; break;
-  case utf8:  t = _atoms[Atom_Utf8]; break;
+  case ascii: t = _atoms[Atom_String]; u = false; break;
+  case utf8:  t = _atoms[Atom_Utf8];   u = true;  break;
   default: assert(False); return False; // unhandled StringType
   }
   
@@ -404,6 +411,7 @@ bool Property::get(Window win, Atoms atom, StringType type,
     std::string::const_iterator tmp = it; // current string.begin()
     it = std::find(tmp, end, '\0');       // look for null between tmp and end
     strings->push_back(std::string(tmp, it));   // s[tmp:it)
+    if (!u) strings->back().setUtf8(false);
     ++num;
     if (it == end) break;
     ++it;

@@ -94,9 +94,14 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
     c.color.alpha = _tint | _tint << 8; // transparent shadow
     c.pixel = BlackPixel(Display::display, _screen_num);
 
-    XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
-                      _xftfont->ascent + y + _offset,
-                      (FcChar8*)string.c_str(), string.size());
+    if (string.utf8())
+      XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
+                        _xftfont->ascent + y + _offset,
+                        (FcChar8*)string.c_str(), string.size());
+    else
+      XftDrawString8(d, &c, _xftfont, x + _offset,
+                     _xftfont->ascent + y + _offset,
+                     (FcChar8*)string.c_str(), string.size());
   }
     
   XftColor c;
@@ -106,8 +111,12 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
   c.pixel = color.pixel();
   c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
 
-  XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                    (FcChar8*)string.c_str(), string.size());
+  if (string.utf8())
+    XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
+                      (FcChar8*)string.c_str(), string.size());
+  else
+    XftDrawString8(d, &c, _xftfont, x, _xftfont->ascent + y,
+                   (FcChar8*)string.c_str(), string.size());
 
   return;
 }
@@ -117,8 +126,12 @@ unsigned int Font::measureString(const ustring &string) const
 {
   XGlyphInfo info;
 
-  XftTextExtentsUtf8(Display::display, _xftfont,
-                     (FcChar8*)string.c_str(), string.size(), &info);
+  if (string.utf8())
+    XftTextExtentsUtf8(Display::display, _xftfont,
+                       (FcChar8*)string.c_str(), string.size(), &info);
+  else
+    XftTextExtents8(Display::display, _xftfont,
+                    (FcChar8*)string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }

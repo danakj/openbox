@@ -6,6 +6,9 @@
   @brief Provides access to window properties
 */
 
+#include "ustring.hh"
+#include "screeninfo.hh"
+
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -14,9 +17,6 @@ extern "C" {
 }
 
 #include <vector>
-#include <string>
-
-#include "screeninfo.hh"
 
 namespace otk {
 
@@ -176,7 +176,7 @@ private:
 
 public:
   //! A list of strings
-  typedef std::vector<std::string> StringVect;
+  typedef std::vector<ustring> StringVect;
 
   //! Constructs a new Atom object
   /*!
@@ -220,7 +220,7 @@ public:
     @param value The string to set the property to
   */
   void set(Window win, Atoms atom, StringType type,
-           const std::string &value) const;
+           const ustring &value) const;
   //! Sets a string-array property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
@@ -284,7 +284,7 @@ public:
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
-  bool get(Window win, Atoms atom, StringType type, std::string *value) const;
+  bool get(Window win, Atoms atom, StringType type, ustring *value) const;
   //! Gets strings from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from

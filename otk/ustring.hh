@@ -106,8 +106,9 @@ private:
 
 #endif // DOXYGEN_IGNORE
 
-//! This class provides a simple wrapper to a std::string that is encoded as
-//! UTF-8.
+//! This class provides a simple wrapper to a std::string that can be encoded
+//! as UTF-8. The ustring::utf() member specifies if the given string is UTF-8
+//! encoded. ustrings default to specifying UTF-8 encoding.
 /*!
   This class does <b>not</b> handle extended 8-bit ASCII charsets like
   ISO-8859-1.
@@ -120,7 +121,8 @@ private:
 */
 class ustring {
   std::string _string;
-
+  bool _utf8;
+  
 public:
   typedef std::string::size_type                        size_type;
   typedef std::string::difference_type                  difference_type;
@@ -144,10 +146,15 @@ public:
   ustring(const std::string& src);
   ustring::ustring(const char* src);
 
+  // append to the string
+
+  ustring& operator+=(const ustring& src);
+  ustring& operator+=(const char* src);
+  ustring& operator+=(char c);
+
   // sizes
   
   ustring::size_type size() const;
-  ustring::size_type length() const;
   ustring::size_type bytes() const;
   ustring::size_type capacity() const;
   ustring::size_type max_size() const;
@@ -156,7 +163,11 @@ public:
 
   const char* data()  const;
   const char* c_str() const;
+
+  // encoding
   
+  bool utf8() const;
+  void setUtf8(bool utf8);
 };
 
 }

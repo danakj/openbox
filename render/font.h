@@ -9,6 +9,9 @@ struct _RrFont {
     const RrInstance *inst;
     XftFont *xftfont;
     gint elipses_length;
+    gint shadow;
+    gchar tint;
+    gint offset;
 };
 
 RrFont *RrFontOpen(const RrInstance *inst, char *fontstring);

@@ -36,19 +36,10 @@ struct _RrTheme {
     /* style settings - fonts */
     gint winfont_height;
     RrFont *winfont;
-    gboolean winfont_shadow;
-    gint winfont_shadow_offset;
-    gint winfont_shadow_tint;
     gint mtitlefont_height;
     RrFont *mtitlefont;
-    gboolean mtitlefont_shadow;
-    gint mtitlefont_shadow_offset;
-    gint mtitlefont_shadow_tint;
     gint mfont_height;
     RrFont *mfont;
-    gboolean mfont_shadow;
-    gint mfont_shadow_offset;
-    gint mfont_shadow_tint;
 
     /* style settings - title layout */
     gchar *title_layout;

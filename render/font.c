@@ -11,26 +11,28 @@
 #include <string.h>
 
 #define ELIPSES "..."
-#define ELIPSES_LENGTH(font, shadow, offset) \
-    (font->elipses_length + (shadow ? offset : 0))
+#define ELIPSES_LENGTH(font) \
+    (font->elipses_length + (font->shadow ? font->offset : 0))
+
+#define OB_SHADOW "shadow"
+#define OB_SHADOW_OFFSET "shadowoffset"
+#define OB_SHADOW_ALPHA "shadowtint"
+
+FcObjectType objs[] = {
+    { OB_SHADOW,        FcTypeBool    },
+    { OB_SHADOW_OFFSET, FcTypeInteger },
+    { OB_SHADOW_ALPHA,  FcTypeInteger  }
+};
 
 static gboolean started = FALSE;
 
 static void font_startup(void)
 {
-#ifdef DEBUG
-    int version;
-#endif /* DEBUG */
     if (!XftInit(0)) {
         g_warning(_("Couldn't initialize Xft.\n"));
         exit(EXIT_FAILURE);
     }
-#ifdef DEBUG
-    version = XftGetVersion();
-    g_message("Using Xft %d.%d.%d (Built against %d.%d.%d).",
-              version / 10000 % 100, version / 100 % 100, version % 100,
-              XFT_MAJOR, XFT_MINOR, XFT_REVISION);
-#endif
+    FcNameRegisterObjectTypes(objs, (sizeof(objs) / sizeof(objs[0])));
 }
 
 static void measure_font(RrFont *f)
@@ -43,33 +45,68 @@ static void measure_font(RrFont *f)
     f->elipses_length = (signed) info.xOff;
 }
 
+static RrFont *openfont(const RrInstance *inst, char *fontstring)
+{
+    RrFont *out;
+    FcPattern *pat, *match;
+    XftFont *font;
+    FcResult res;
+    gint tint;
+
+    if (!(pat = XftNameParse(fontstring)))
+        return NULL;
+
+    match = XftFontMatch(RrDisplay(inst), RrScreen(inst), pat, &res);
+    FcPatternDestroy(pat);
+    if (!match)
+        return NULL;
+
+    out = g_new(RrFont, 1);
+    out->inst = inst;
+
+    if (FcPatternGetBool(match, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
+        out->shadow = FALSE;
+    g_message("shadow %d", out->shadow);
+
+    if (FcPatternGetInteger(match, OB_SHADOW_OFFSET, 0, &out->offset) !=
+        FcResultMatch)
+        out->offset = 1;
+
+    if (FcPatternGetInteger(match, OB_SHADOW_ALPHA, 0, &tint) != FcResultMatch)
+        tint = 25;
+    if (tint > 100) tint = 100;
+    else if (tint < -100) tint = -100;
+    out->tint = tint;
+
+    font = XftFontOpenPattern(RrDisplay(inst), match);
+    FcPatternDestroy(match);
+    if (!font) {
+        g_free(out);
+        return NULL;
+    } else
+        out->xftfont = font;
+
+    measure_font(out);
+
+    return out;
+}
+
 RrFont *RrFontOpen(const RrInstance *inst, char *fontstring)
 {
     RrFont *out;
-    XftFont *xf;
 
     if (!started) {
         font_startup();
         started = TRUE;
     }
-    
-    if ((xf = XftFontOpenName(RrDisplay(inst), RrScreen(inst), fontstring))) {
-        out = g_new(RrFont, 1);
-        out->inst = inst;
-        out->xftfont = xf;
-        measure_font(out);
+
+    if ((out = openfont(inst, fontstring)))
         return out;
-    }
     g_warning(_("Unable to load font: %s\n"), fontstring);
     g_warning(_("Trying fallback font: %s\n"), "sans");
 
-    if ((xf = XftFontOpenName(RrDisplay(inst), RrScreen(inst), "sans"))) {
-        out = g_new(RrFont, 1);
-        out->inst = inst;
-        out->xftfont = xf;
-        measure_font(out);
+    if ((out = openfont(inst, "sans")))
         return out;
-    }
     g_warning(_("Unable to load font: %s\n"), "sans");
 
     return NULL;
@@ -84,28 +121,28 @@ void RrFontClose(RrFont *f)
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,
-                              gint shadow, gint offset, gint *x, gint *y)
+                              gint *x, gint *y)
 {
     XGlyphInfo info;
 
     XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
                        (const FcChar8*)str, strlen(str), &info);
 
-    *x = (signed) info.xOff + (shadow ? ABS(offset) : 0);
-    *y = info.height + (shadow ? ABS(offset) : 0);
+    *x = (signed) info.xOff + (f->shadow ? ABS(f->offset) : 0);
+    *y = info.height + (f->shadow ? ABS(f->offset) : 0);
 }
 
-int RrFontMeasureString(const RrFont *f, const gchar *str,
-                        gint shadow, gint offset)
+int RrFontMeasureString(const RrFont *f, const gchar *str)
 {
     gint x, y;
-    font_measure_full (f, str, shadow, offset, &x, &y);
+    font_measure_full (f, str, &x, &y);
     return x;
 }
 
-int RrFontHeight(const RrFont *f, gint shadow, gint offset)
+int RrFontHeight(const RrFont *f)
 {
-    return f->xftfont->ascent + f->xftfont->descent + (shadow ? offset : 0);
+    return f->xftfont->ascent + f->xftfont->descent +
+        (f->shadow ? f->offset : 0);
 }
 
 int RrFontMaxCharWidth(const RrFont *f)
@@ -124,7 +161,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
 
     /* center vertically */
     y = area->y +
-        (area->height - RrFontHeight(t->font, t->shadow, t->offset)) / 2;
+        (area->height - RrFontHeight(t->font)) / 2;
     /* the +2 and -4 leave a small blank edge on the sides */
     x = area->x + 2;
     w = area->width - 4;
@@ -132,16 +169,16 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
 
     text = g_string_new(t->string);
     l = g_utf8_strlen(text->str, -1);
-    font_measure_full(t->font, text->str, t->shadow, t->offset, &mw, &mh);
+    font_measure_full(t->font, text->str, &mw, &mh);
     while (l && mw > area->width) {
         shortened = TRUE;
         /* remove a character from the middle */
         text = g_string_erase(text, l-- / 2, 1);
-        em = ELIPSES_LENGTH(t->font, t->shadow, t->offset);
+        em = ELIPSES_LENGTH(t->font);
         /* if the elipses are too large, don't show them at all */
         if (em > area->width)
             shortened = FALSE;
-        font_measure_full(t->font, text->str, t->shadow, t->offset, &mw, &mh);
+        font_measure_full(t->font, text->str, &mw, &mh);
         mw += em;
     }
     if (shortened) {
@@ -163,24 +200,24 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
 
     l = strlen(text->str); /* number of bytes */
 
-    if (t->shadow) {
-        if (t->tint >= 0) {
+    if (t->font->shadow) {
+        if (t->font->tint >= 0) {
             c.color.red = 0;
             c.color.green = 0;
             c.color.blue = 0;
-            c.color.alpha = 0xffff * t->tint / 100; /* transparent shadow */
+            c.color.alpha = 0xffff * t->font->tint / 100;
             c.pixel = BlackPixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
         } else {
-            c.color.red = 0xffff * -t->tint / 100;
-            c.color.green = 0xffff * -t->tint / 100;
-            c.color.blue = 0xffff * -t->tint / 100;
-            c.color.alpha = 0xffff * -t->tint / 100; /* transparent shadow */
+            c.color.red = 0xffff;
+            c.color.green = 0xffff;
+            c.color.blue = 0xffff;
+            c.color.alpha = 0xffff * -t->font->tint / 100;
             c.pixel = WhitePixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
         }  
-        XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
-                          t->font->xftfont->ascent + y + t->offset,
+        XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->font->offset,
+                          t->font->xftfont->ascent + y + t->font->offset,
                           (FcChar8*)text->str, l);
     }  
     c.color.red = t->color->r | t->color->r << 8;
@@ -188,7 +225,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
     c.color.blue = t->color->b | t->color->b << 8;
     c.color.alpha = 0xff | 0xff << 8; /* fully opaque text */
     c.pixel = t->color->pixel;
-                     
+
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y,
                       (FcChar8*)text->str, l);

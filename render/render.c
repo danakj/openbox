@@ -263,13 +263,9 @@ void RrMinsize(RrAppearance *l, gint *w, gint *h)
             break;
         case RR_TEXTURE_TEXT:
             m = RrFontMeasureString(l->texture[i].data.text.font,
-                                    l->texture[i].data.text.string,
-                                    l->texture[i].data.text.shadow,
-                                    l->texture[i].data.text.offset);
+                                    l->texture[i].data.text.string);
             *w = MAX(*w, m);
-            m = RrFontHeight(l->texture[i].data.text.font,
-                             l->texture[i].data.text.shadow,
-                             l->texture[i].data.text.offset);
+            m = RrFontHeight(l->texture[i].data.text.font);
             *h += MAX(*h, m);
             break;
         case RR_TEXTURE_RGBA:

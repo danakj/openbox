@@ -108,29 +108,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     /* load the font stuff */
-    font_str = "arial:bold:pixelsize=10";
-
-    theme->winfont_shadow = FALSE;
-    if (read_string(db, "window.xft.flags", &str)) {
-        if (g_strrstr(str, "shadow"))
-            theme->winfont_shadow = TRUE;
-        g_free(str);
-    }
- 
-    if (!read_int(db, "window.xft.shadow.offset",
-                  &theme->winfont_shadow_offset))
-        theme->winfont_shadow_offset = 1;
-    if (!read_int(db, "window.xft.shadow.tint",
-                  &theme->winfont_shadow_tint) ||
-        theme->winfont_shadow_tint < 100 || theme->winfont_shadow_tint > 100)
-        theme->winfont_shadow_tint = 25;
+    if (!read_string(db, "window.title.xftfont", &font_str))
+        font_str = "arial,sans:bold:pixelsize=10:shadow=y:shadowtint=50";
 
     if (!(theme->winfont = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->winfont_height = RrFontHeight(theme->winfont, theme->winfont_shadow,
-                                         theme->winfont_shadow_offset);
+    theme->winfont_height = RrFontHeight(theme->winfont);
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.justify", &str)) {
@@ -138,34 +123,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             winjust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
             winjust = RR_JUSTIFY_CENTER;
-        g_free(str);
     }
 
-    font_str = "arial-10:bold";
-
-    theme->mtitlefont_shadow = FALSE;
-    if (read_string(db, "menu.title.xft.flags", &str)) {
-        if (g_strrstr(str, "shadow"))
-            theme->mtitlefont_shadow = TRUE;
-        g_free(str);
-    }
- 
-    if (!read_int(db, "menu.title.xft.shadow.offset",
-                  &theme->mtitlefont_shadow_offset))
-        theme->mtitlefont_shadow_offset = 1;
-    if (!read_int(db, "menu.title.xft.shadow.tint",
-                  &theme->mtitlefont_shadow_tint) ||
-        theme->mtitlefont_shadow_tint < 100 ||
-        theme->mtitlefont_shadow_tint > 100)
-        theme->mtitlefont_shadow_tint = 25;
+    if (!read_string(db, "menu.title.xftfont", &font_str))
+        font_str = "arial,sans:bold:pixelsize=12:shadow=y";
 
     if (!(theme->mtitlefont = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->mtitlefont_height = RrFontHeight(theme->mtitlefont,
-                                            theme->mtitlefont_shadow,
-                                            theme->mtitlefont_shadow_offset);
+    theme->mtitlefont_height = RrFontHeight(theme->mtitlefont);
 
     mtitlejust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.title.justify", &str)) {
@@ -173,33 +140,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             mtitlejust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
             mtitlejust = RR_JUSTIFY_CENTER;
-        g_free(str);
     }
 
-    font_str = "arial-8";
-
-    theme->mfont_shadow = FALSE;
-    if (read_string(db, "menu.frame.xft.flags", &str)) {
-        if (g_strrstr(str, "shadow"))
-            theme->mfont_shadow = TRUE;
-        g_free(str);
-    }
- 
-    if (!read_int(db, "menu.frame.xft.shadow.offset",
-                  &theme->mfont_shadow_offset))
-        theme->mfont_shadow_offset = 1;
-    if (!read_int(db, "menu.frame.xft.shadow.tint",
-                  &theme->mfont_shadow_tint) ||
-        theme->mfont_shadow_tint < 100 ||
-        theme->mfont_shadow_tint > 100)
-        theme->mfont_shadow_tint = 25;
+    if (!read_string(db, "menu.frame.xftfont", &font_str))
+        font_str = "arial,sans:bold:pixelsize=11:shadow=y";
 
     if (!(theme->mfont = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->mfont_height = RrFontHeight(theme->mfont, theme->mfont_shadow,
-                                       theme->mfont_shadow_offset);
+    theme->mfont_height = RrFontHeight(theme->mfont);
 
     mjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.frame.justify", &str)) {
@@ -207,11 +157,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             mjust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
             mjust = RR_JUSTIFY_CENTER;
-        g_free(str);
     }
 
     /* load the title layout */
-    theme->title_layout = g_strdup("NLIMC");
+    if (!read_string(db, "window.title.layout", &font_str))
+        font_str = "NLIMC";
+    theme->title_layout = g_strdup(font_str);
 
     if (!read_int(db, "handleWidth", &theme->handle_height) ||
 	theme->handle_height < 0 || theme->handle_height > 100)
@@ -458,15 +409,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->app_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_focused_label->texture[0].data.text.font =
         theme->app_hilite_label->texture[0].data.text.font = theme->winfont;
-    theme->a_focused_label->texture[0].data.text.shadow =
-        theme->app_hilite_label->texture[0].data.text.shadow =
-        theme->winfont_shadow;
-    theme->a_focused_label->texture[0].data.text.offset =
-        theme->app_hilite_label->texture[0].data.text.offset =
-        theme->winfont_shadow_offset;
-    theme->a_focused_label->texture[0].data.text.tint =
-        theme->app_hilite_label->texture[0].data.text.tint =
-        theme->winfont_shadow_tint;
     theme->a_focused_label->texture[0].data.text.color =
         theme->app_hilite_label->texture[0].data.text.color =
         theme->title_focused_color;
@@ -477,15 +419,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->app_unhilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_unfocused_label->texture[0].data.text.font =
         theme->app_unhilite_label->texture[0].data.text.font = theme->winfont;
-    theme->a_unfocused_label->texture[0].data.text.shadow =
-        theme->app_unhilite_label->texture[0].data.text.shadow =
-        theme->winfont_shadow;
-    theme->a_unfocused_label->texture[0].data.text.offset =
-        theme->app_unhilite_label->texture[0].data.text.offset =
-        theme->winfont_shadow_offset;
-    theme->a_unfocused_label->texture[0].data.text.tint =
-        theme->app_unhilite_label->texture[0].data.text.tint =
-        theme->winfont_shadow_tint;
     theme->a_unfocused_label->texture[0].data.text.color =
         theme->app_unhilite_label->texture[0].data.text.color =
         theme->title_unfocused_color;
@@ -493,11 +426,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_title->texture[0].data.text.justify = mtitlejust;
     theme->a_menu_title->texture[0].data.text.font = theme->mtitlefont;
-    theme->a_menu_title->texture[0].data.text.shadow = theme->mtitlefont_shadow;
-    theme->a_menu_title->texture[0].data.text.offset =
-        theme->mtitlefont_shadow_offset;
-    theme->a_menu_title->texture[0].data.text.tint =
-        theme->mtitlefont_shadow_tint;
     theme->a_menu_title->texture[0].data.text.color = theme->menu_title_color;
 
     theme->a_menu_item->surface.grad = 
@@ -513,18 +441,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_item->texture[0].data.text.font =
         theme->a_menu_disabled->texture[0].data.text.font =
         theme->a_menu_hilite->texture[0].data.text.font = theme->mfont;
-    theme->a_menu_item->texture[0].data.text.shadow = 
-        theme->a_menu_disabled->texture[0].data.text.shadow = 
-        theme->a_menu_hilite->texture[0].data.text.shadow =
-        theme->mfont_shadow;
-    theme->a_menu_item->texture[0].data.text.offset =
-        theme->a_menu_disabled->texture[0].data.text.offset = 
-        theme->a_menu_hilite->texture[0].data.text.offset = 
-        theme->mfont_shadow_offset;
-    theme->a_menu_item->texture[0].data.text.tint =
-        theme->a_menu_disabled->texture[0].data.text.tint =
-        theme->a_menu_hilite->texture[0].data.text.tint =
-        theme->mfont_shadow_tint;
     theme->a_menu_item->texture[0].data.text.color = theme->menu_color;
     theme->a_menu_disabled->texture[0].data.text.color =
         theme->menu_disabled_color;
@@ -767,7 +683,7 @@ static gboolean read_string(XrmDatabase db, char *rname, char **value)
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {
-	*value = g_strdup(retvalue.addr);
+	*value = retvalue.addr;
 	ret = TRUE;
     }
 

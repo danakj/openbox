@@ -402,7 +402,6 @@ void Client::getState()
   }
 }
 
-
 void Client::getShaped()
 {
   _shaped = false;
@@ -421,12 +420,40 @@ void Client::getShaped()
 #endif // SHAPE
 }
 
+Client *Client::searchFocusTree(Client *node, Client *skip)
+{
+  List::const_iterator it, end = node->_transients.end();
+  Client *ret;
+
+  for (it = node->_transients.begin(); it != end; ++it) {
+    if (*it == skip) continue; // circular?
+    if ((ret = searchModalTree(*it, skip))) return ret; // got one
+    if ((*it)->_focused) return *it; // got one
+  }
+  return 0;
+}
 
 void Client::calcLayer() {
   StackLayer l;
+  bool fs = false;
 
+  // are we fullscreen, or do we have a fullscreen transient parent?
+  Client *c = this;
+  while (c) {
+    if (c->_fullscreen) {
+      fs =true;
+      break;
+    }
+    c = c->_transient_for;
+  }
+  if (!fs) {
+    // is one of our transients focused?
+    c = searchFocusTree(this, this);
+    if (c) fs = true;
+  }
+  
   if (_iconic) l = Layer_Icon;
-  else if (_fullscreen) l = Layer_Fullscreen;
+  else if (fs) l = Layer_Fullscreen;
   else if (_type == Type_Desktop) l = Layer_Desktop;
   else if (_type == Type_Dock) {
     if (!_below) l = Layer_Top;
@@ -447,7 +474,6 @@ void Client::calcLayer() {
     }
   }
 }
-
 
 void Client::updateProtocols()
 {
@@ -470,7 +496,6 @@ void Client::updateProtocols()
     XFree(proto);
   }
 }
-
 
 void Client::updateNormalHints()
 {
@@ -522,7 +547,6 @@ void Client::updateNormalHints()
   }
 }
 
-
 void Client::updateWMHints(bool initstate)
 {
   XWMHints *hints;
@@ -567,7 +591,6 @@ void Client::updateWMHints(bool initstate)
   }
 }
 
-
 void Client::updateTitle()
 {
   _title = "";
@@ -587,7 +610,6 @@ void Client::updateTitle()
     frame->adjustTitle();
 }
 
-
 void Client::updateIconTitle()
 {
   _icon_title = "";
@@ -603,7 +625,6 @@ void Client::updateIconTitle()
   if (_title.empty())
     _icon_title = _("Unnamed Window");
 }
-
 
 void Client::updateClass()
 {
@@ -627,7 +648,6 @@ void Client::updateClass()
   }
 }
 
-
 void Client::updateStrut()
 {
   unsigned long num = 4;
@@ -650,7 +670,6 @@ void Client::updateStrut()
 
   delete [] data;
 }
-
 
 void Client::updateTransientFor()
 {
@@ -683,7 +702,6 @@ void Client::updateTransientFor()
       _transient_for->_transients.push_back(this); // add to new parent
   }
 }
-
 
 void Client::updateIcons()
 {
@@ -740,7 +758,6 @@ void Client::updateIcons()
   if (frame) frame->adjustIcon();
 }
 
-
 void Client::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
@@ -788,7 +805,6 @@ void Client::propertyHandler(const XPropertyEvent &e)
     updateIcons();
 }
 
-
 void Client::setWMState(long state)
 {
   if (state == _wmstate) return; // no change
@@ -802,7 +818,6 @@ void Client::setWMState(long state)
     break;
   }
 }
-
 
 void Client::setDesktop(unsigned int target)
 {
@@ -824,7 +839,6 @@ void Client::setDesktop(unsigned int target)
   openbox->screen(_screen)->updateStruts();
 }
 
-
 void Client::showhide()
 {
   bool show;
@@ -839,7 +853,6 @@ void Client::showhide()
   if (show) frame->show();
   else      frame->hide();
 }
-
 
 void Client::setState(StateAction action, long data1, long data2)
 {
@@ -954,7 +967,6 @@ void Client::setState(StateAction action, long data1, long data2)
   changeState(); // change the hint to relect these changes
 }
 
-
 void Client::toggleClientBorder(bool addborder)
 {
   // adjust our idea of where the client is, based on its border. When the
@@ -1017,7 +1029,6 @@ void Client::toggleClientBorder(bool addborder)
   } else
     XSetWindowBorderWidth(**otk::display, _window, 0);
 }
-
 
 void Client::clientMessageHandler(const XClientMessageEvent &e)
 {
@@ -1105,7 +1116,6 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
   }
 }
 
-
 #if defined(SHAPE)
 void Client::shapeHandler(const XShapeEvent &e)
 {
@@ -1118,13 +1128,11 @@ void Client::shapeHandler(const XShapeEvent &e)
 }
 #endif
 
-
 void Client::resize(Corner anchor, int w, int h)
 {
   if (!(_functions & Func_Resize)) return;
   internal_resize(anchor, w, h);
 }
-
 
 void Client::internal_resize(Corner anchor, int w, int h,
                              bool user, int x, int y)
@@ -1238,7 +1246,6 @@ void Client::move(int x, int y)
   internal_move(x, y);
 }
 
-
 void Client::internal_move(int x, int y)
 {
   _area = otk::Rect(otk::Point(x, y), _area.size());
@@ -1274,7 +1281,6 @@ void Client::internal_move(int x, int y)
   }
 }
 
-
 void Client::close()
 {
   XEvent ce;
@@ -1299,7 +1305,6 @@ void Client::close()
   ce.xclient.data.l[4] = 0l;
   XSendEvent(**otk::display, _window, false, NoEventMask, &ce);
 }
-
 
 void Client::changeState()
 {
@@ -1339,7 +1344,6 @@ void Client::changeState()
   if (frame)
     frame->adjustState();
 }
-
 
 void Client::changeAllowedActions(void)
 {
@@ -1384,7 +1388,6 @@ void Client::changeAllowedActions(void)
     else _max_vert = _max_horz = false;
 }
 
-
 void Client::remaximize()
 {
   int dir;
@@ -1399,7 +1402,6 @@ void Client::remaximize()
   _max_horz = _max_vert = false;
   maximize(true, dir, false);
 }
-
 
 void Client::applyStartupState()
 {
@@ -1438,14 +1440,12 @@ void Client::applyStartupState()
   if (_below);        // nothing to do for this
 }
 
-
 void Client::fireUrgent()
 {
   // call the python UrgentWindow callbacks
   EventData data(_screen, this, EventAction::UrgentWindow, 0);
   openbox->bindings()->fireEvent(&data);
 }
-
 
 void Client::shade(bool shade)
 {
@@ -1459,7 +1459,6 @@ void Client::shade(bool shade)
   changeState();
   frame->adjustSize();
 }
-
 
 void Client::maximize(bool max, int dir, bool savearea)
 {
@@ -1567,7 +1566,6 @@ void Client::maximize(bool max, int dir, bool savearea)
   internal_resize(TopLeft, w, h, true, x, y);
 }
 
-
 void Client::fullscreen(bool fs, bool savearea)
 {
   static FunctionFlags saved_func;
@@ -1642,7 +1640,6 @@ void Client::fullscreen(bool fs, bool savearea)
   if (fs) focus();
 }
 
-
 void Client::iconify(bool iconic, bool curdesk)
 {
   if (_iconic == iconic) return; // nothing to do
@@ -1670,13 +1667,11 @@ void Client::iconify(bool iconic, bool curdesk)
   openbox->screen(_screen)->updateStruts();
 }
 
-
 void Client::disableDecorations(DecorationFlags flags)
 {
   _disabled_decorations = flags;
   setupDecorAndFunctions();
 }
-
 
 void Client::installColormap(bool install) const
 {
@@ -1689,9 +1684,6 @@ void Client::installColormap(bool install) const
   }
 }
 
-
-// recursively searches the client 'tree' for a modal client, always skips the
-// topmost node (the window you're starting with)
 Client *Client::searchModalTree(Client *node, Client *skip)
 {
   List::const_iterator it, end = node->_transients.end();
@@ -1784,6 +1776,8 @@ void Client::focusHandler(const XFocusChangeEvent &e)
   _focused = true;
   frame->adjustFocus();
 
+  calcLayer(); // focus state can affect the stacking layer
+
   openbox->setFocusedClient(this);
 }
 
@@ -1798,6 +1792,8 @@ void Client::unfocusHandler(const XFocusChangeEvent &e)
 
   _focused = false;
   frame->adjustFocus();
+
+  calcLayer(); // focus state can affect the stacking layer
 
   if (openbox->focusedClient() == this)
     openbox->setFocusedClient(0);

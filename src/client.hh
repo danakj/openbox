@@ -434,6 +434,10 @@ private:
   //! the topmost node (the window you're starting with).
   Client *Client::searchModalTree(Client *node, Client *skip);
 
+  //! Recursively searches the client 'tree' for a focused client, always skips
+  //! the topmost node (the window you're starting with).
+  Client *Client::searchFocusTree(Client *node, Client *skip);
+
   //! Fires the urgent callbacks which lets the user do what they want with
   //! urgent windows
   void fireUrgent();

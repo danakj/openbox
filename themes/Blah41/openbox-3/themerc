@@ -101,9 +101,10 @@ window.inactive.client.color:		#a7aaad
 
 ! ***** fonts *****
 
-window.active.label.text.font:   trebuchet ms:bold:pixelsize=10:shadow=y:shadowtint=12:shadowoffset=2
-menu.title.text.font:     trebuchet ms:bold:pixelsize=11:shadow=y:shadowtint=12:shadowoffset=2
-menu.items.font:     trebuchet ms:pixelsize=12
+window.active.label.text.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y
+window.active.label.text.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=12
+menu.title.text.font: Bitstream Vera Sans:bold:pixelsize=9:shadow=y
+menu.items.font: Bitstream Vera Sans:pixelsize=10
 
 window.label.text.justify:			center
 menu.title.text.justify:		center

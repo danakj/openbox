@@ -4,7 +4,6 @@
 
 ###########################################################################
 ###    Options that affect the behavior of the stackedcycle module.     ###
-###              Also see the options in the focus module.              ###
 ###########################################################################
 include_all_desktops = 0
 """If this is non-zero then windows from all desktops will be included in
@@ -22,6 +21,8 @@ title_size_limit = 80
 activate_while_cycling = 1
 """If this is non-zero then windows will be activated as they are
    highlighted in the cycling list (except iconified windows)."""
+# See focus.avoid_skip_taskbar
+# See focuscycle.raise_window
 ###########################################################################
 
 def next(data):
@@ -48,6 +49,7 @@ def previous(data):
 import otk
 import ob
 import focus
+import focuscycle
 
 class cycledata:
     def __init__(self):
@@ -166,7 +168,7 @@ class cycledata:
         
         # send a net_active_window message for the target
         if final or not client.iconic():
-            if final: r = focus.raise_window
+            if final: r = focuscycle.raise_window
             else: r = 0
             ob.send_client_msg(self.screeninfo.rootWindow(),
                                otk.Property_atoms().openbox_active_window,
@@ -235,3 +237,5 @@ ob.ebind(ob.EventAction.NewWindow, _newwindow)
 ob.ebind(ob.EventAction.CloseWindow, _closewindow)
 
 _o = cycledata()
+
+print "Loaded stackedcycle.py"

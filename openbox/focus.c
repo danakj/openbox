@@ -34,10 +34,6 @@ void focus_set_client(Client *client)
     Window active;
     Client *old;
      
-    /* sometimes this is called with the already-focused window, this is
-       important for the python scripts to work (eg, c = 0 twice). don't just
-       return if _focused_client == c */
-
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);

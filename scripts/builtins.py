@@ -269,4 +269,24 @@ def setup_scroll():
     mbind("C-A-4", MC_Frame, MouseClick, send_to_next_desktop)
     mbind("C-A-5", MC_Frame, MouseClick, send_to_prev_desktop)
 
+############################################################################
+### Window placement algorithms, choose one of these and ebind it to the ###
+### EventPlaceWindow action.                                             ###
+############################################################################
+
+ob_rand = None
+import random
+def placewindows_random(data):
+    if not data.client: return
+    client_area = data.client.area()
+    screen = OBDisplay_screenInfo(data.screen)
+    width = screen.width() - client_area.width()
+    height = screen.height() - client_area.height()
+    global ob_rand
+    if not ob_rand: ob_rand = random.Random()
+    x = ob_rand.randrange(0, width-1)
+    y = ob_rand.randrange(0, height-1)
+    data.client.move(x, y)
+
+
 print "Loaded builtins.py"

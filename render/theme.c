@@ -125,9 +125,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->winfont_shadow_tint < 100 || theme->winfont_shadow_tint > 100)
         theme->winfont_shadow_tint = 25;
 
-    theme->winfont = font_open(inst, font_str);
-    theme->winfont_height = font_height(theme->winfont, theme->winfont_shadow,
-                                       theme->winfont_shadow_offset);
+    theme->winfont = RrFontOpen(inst, font_str);
+    theme->winfont_height = RrFontHeight(theme->winfont, theme->winfont_shadow,
+                                         theme->winfont_shadow_offset);
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.justify", &str)) {
@@ -156,10 +156,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->mtitlefont_shadow_tint > 100)
         theme->mtitlefont_shadow_tint = 25;
 
-    theme->mtitlefont = font_open(inst, font_str);
-    theme->mtitlefont_height = font_height(theme->mtitlefont,
-                                          theme->mtitlefont_shadow,
-                                          theme->mtitlefont_shadow_offset);
+    theme->mtitlefont = RrFontOpen(inst, font_str);
+    theme->mtitlefont_height = RrFontHeight(theme->mtitlefont,
+                                            theme->mtitlefont_shadow,
+                                            theme->mtitlefont_shadow_offset);
 
     mtitlejust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.title.justify", &str)) {
@@ -188,9 +188,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->mfont_shadow_tint > 100)
         theme->mfont_shadow_tint = 25;
 
-    theme->mfont = font_open(inst, font_str);
-    theme->mfont_height = font_height(theme->mfont, theme->mfont_shadow,
-                                     theme->mfont_shadow_offset);
+    theme->mfont = RrFontOpen(inst, font_str);
+    theme->mfont_height = RrFontHeight(theme->mfont, theme->mfont_shadow,
+                                       theme->mfont_shadow_offset);
 
     mjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.frame.justify", &str)) {
@@ -647,9 +647,9 @@ void RrThemeFree(RrTheme *theme)
         RrPixmapMaskFree(theme->iconify_mask);
         RrPixmapMaskFree(theme->close_mask);
 
-        font_close(theme->winfont);
-        font_close(theme->mtitlefont);
-        font_close(theme->mfont);
+        RrFontClose(theme->winfont);
+        RrFontClose(theme->mtitlefont);
+        RrFontClose(theme->mfont);
 
         g_free(theme->title_layout);
 

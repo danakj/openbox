@@ -176,7 +176,6 @@ int main(int argc, char **argv)
         /* anything that is going to read data from the rc file needs to be 
            in this group */
 	timer_startup();
-	font_startup();
 	event_startup();
         grab_startup();
         plugin_startup();

@@ -100,7 +100,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
                                            RrVisual(l->inst),
                                            RrColormap(l->inst));
             }
-            font_draw(l->xftdraw, &l->texture[i].data.text, &tarea);
+            RrFontDraw(l->xftdraw, &l->texture[i].data.text, &tarea);
         break;
         case RR_TEXTURE_MASK:
             if (!transferred) {
@@ -266,14 +266,14 @@ void RrMinsize(RrAppearance *l, gint *w, gint *h)
             *h = MAX(*h, l->texture[i].data.mask.mask->height);
             break;
         case RR_TEXTURE_TEXT:
-            m = font_measure_string(l->texture[i].data.text.font,
+            m = RrFontMeasureString(l->texture[i].data.text.font,
                                     l->texture[i].data.text.string,
                                     l->texture[i].data.text.shadow,
                                     l->texture[i].data.text.offset);
             *w = MAX(*w, m);
-            m = font_height(l->texture[i].data.text.font,
-                            l->texture[i].data.text.shadow,
-                            l->texture[i].data.text.offset);
+            m = RrFontHeight(l->texture[i].data.text.font,
+                             l->texture[i].data.text.shadow,
+                             l->texture[i].data.text.offset);
             *h += MAX(*h, m);
             break;
         case RR_TEXTURE_RGBA:

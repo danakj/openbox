@@ -3,7 +3,6 @@
 
 #include "render.h"
 #include "color.h"
-#include "font.h"
 #include "mask.h"
 
 typedef struct _RrTheme RrTheme;

@@ -12,7 +12,9 @@
 #define ELIPSES_LENGTH(font, shadow, offset) \
     (font->elipses_length + (shadow ? offset : 0))
 
-void font_startup(void)
+static gboolean started = FALSE;
+
+static void font_startup(void)
 {
 #ifdef DEBUG
     int version;
@@ -29,7 +31,7 @@ void font_startup(void)
 #endif
 }
 
-static void measure_height(RrFont *f)
+static void measure_font(RrFont *f)
 {
     XGlyphInfo info;
 
@@ -39,16 +41,21 @@ static void measure_height(RrFont *f)
     f->elipses_length = (signed) info.xOff;
 }
 
-RrFont *font_open(const RrInstance *inst, char *fontstring)
+RrFont *RrFontOpen(const RrInstance *inst, char *fontstring)
 {
     RrFont *out;
     XftFont *xf;
+
+    if (!started) {
+        font_startup();
+        started = TRUE;
+    }
     
     if ((xf = XftFontOpenName(RrDisplay(inst), RrScreen(inst), fontstring))) {
         out = g_new(RrFont, 1);
         out->inst = inst;
         out->xftfont = xf;
-        measure_height(out);
+        measure_font(out);
         return out;
     }
     g_warning(_("Unable to load font: %s\n"), fontstring);
@@ -58,7 +65,7 @@ RrFont *font_open(const RrInstance *inst, char *fontstring)
         out = g_new(RrFont, 1);
         out->inst = inst;
         out->xftfont = xf;
-        measure_height(out);
+        measure_font(out);
         return out;
     }
     g_warning(_("Unable to load font: %s\n"), "sans");
@@ -67,7 +74,7 @@ RrFont *font_open(const RrInstance *inst, char *fontstring)
     exit(3); /* can't continue without a font */
 }
 
-void font_close(RrFont *f)
+void RrFontClose(RrFont *f)
 {
     if (f) {
         XftFontClose(RrDisplay(f->inst), f->xftfont);
@@ -75,47 +82,48 @@ void font_close(RrFont *f)
     }
 }
 
-void font_measure_full(RrFont *f, char *str, int shadow, int offset,
-                       int *x, int *y)
+static void font_measure_full(const RrFont *f, const gchar *str,
+                              gint shadow, gint offset, gint *x, gint *y)
 {
     XGlyphInfo info;
 
     XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
-                       (FcChar8*)str, strlen(str), &info);
+                       (const FcChar8*)str, strlen(str), &info);
 
     *x = (signed) info.xOff + (shadow ? ABS(offset) : 0);
     *y = info.height + (shadow ? ABS(offset) : 0);
 }
 
-int font_measure_string(RrFont *f, char *str, int shadow, int offset)
+int RrFontMeasureString(const RrFont *f, const gchar *str,
+                        gint shadow, gint offset)
 {
-    int x, y;
+    gint x, y;
     font_measure_full (f, str, shadow, offset, &x, &y);
     return x;
 }
 
-int font_height(RrFont *f, int shadow, int offset)
+int RrFontHeight(const RrFont *f, gint shadow, gint offset)
 {
     return f->xftfont->ascent + f->xftfont->descent + (shadow ? offset : 0);
 }
 
-int font_max_char_width(RrFont *f)
+int RrFontMaxCharWidth(const RrFont *f)
 {
     return (signed) f->xftfont->max_advance_width;
 }
 
-void font_draw(XftDraw *d, RrTextureText *t, Rect *area)
+void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
 {
-    int x,y,w,h;
+    gint x,y,w,h;
     XftColor c;
     GString *text;
-    int mw, em, mh;
+    gint mw, em, mh;
     size_t l;
     gboolean shortened = FALSE;
 
     /* center vertically */
     y = area->y +
-        (area->height - font_height(t->font, t->shadow, t->offset)) / 2;
+        (area->height - RrFontHeight(t->font, t->shadow, t->offset)) / 2;
     w = area->width;
     h = area->height;
 

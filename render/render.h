@@ -161,6 +161,11 @@ RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 
+int RrFontMeasureString (const RrFont *f, const gchar *str,
+                         gint shadow, gint offset);
+int RrFontHeight        (const RrFont *f, gint shadow, gint offset);
+int RrFontMaxCharWidth  (const RrFont *f);
+
 void RrPaint   (RrAppearance *l, Window win, gint w, gint h);
 void RrMinsize (RrAppearance *l, gint *w, gint *h);
 

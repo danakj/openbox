@@ -10,6 +10,7 @@
 #  * Icon - A client's icon (in the titlebar)
 #  * AllDesktops - A client's omnipresent button (in the titlebar)
 #  * Iconify - A client's iconify button (in the titlebar)
+#  * Shade - A client's shade button (in the titlebar)
 #  * Maximize - A client's maximize button (in the titlebar)
 #  * Close - A client's close button (in the titlebar)
 #  * Root - The root window (the desktop background, these are often blocked

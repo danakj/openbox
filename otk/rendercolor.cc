@@ -102,9 +102,10 @@ RenderColor::~RenderColor()
 {
   unsigned long color = _blue | _green << 8 | _red << 16;
 
-  CacheItem *item = _cache[_screen][color];
+  if (_allocated) {
+    CacheItem *item = _cache[_screen][color];
+    assert(item); // better be...
 
-  if (item) {
     if (--item->count <= 0) {
       // remove from the cache
       XFreeGC(**display, _gc);

@@ -234,7 +234,7 @@ void setup_action_send_to_desktop_down(ObAction **a, ObUserAction uact)
 
 void setup_action_desktop(ObAction **a, ObUserAction uact)
 {
-    (*a)->data.desktop.inter.any.interactive = TRUE;
+    (*a)->data.desktop.inter.any.interactive = FALSE;
 }
 
 void setup_action_desktop_prev(ObAction **a, ObUserAction uact)

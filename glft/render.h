@@ -4,6 +4,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-void GlftRenderGlyph(FT_Face face, unsigned int tnum);
+#include "font.h"
+
+void GlftRenderGlyph(FT_Face face, struct GlftGlyph *g);
 
 #endif

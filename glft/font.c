@@ -289,7 +289,7 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         g->w = w;
         glGenTextures(1, &g->tnum);
 
-        GlftRenderGlyph(font->face, g->tnum);
+        GlftRenderGlyph(font->face, g);
 
         if (!(font->spacing == FC_PROPORTIONAL)) {
             g->width = font->max_advance_width;

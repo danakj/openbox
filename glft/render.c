@@ -8,35 +8,36 @@
 
 #define TOFLOAT(x) (((x) >> 6) + ((x) & 63)/64.0)
 
-void GlftRenderGlyph(FT_Face face, unsigned int tnum)
+void GlftRenderGlyph(FT_Face face, struct GlftGlyph *g)
 {
     unsigned char *padbuf;
-    int padx = 1, pady = 1, i;
-    int err;
+    int err, i;
     FT_GlyphSlot slot = face->glyph;
 
-    err = FT_Render_Glyph( slot, ft_render_mode_normal );
+    err = FT_Render_Glyph(slot, ft_render_mode_normal);
         g_assert(!err);
-    printf("bitmap with dims %d, %d\n", slot->bitmap.rows, 
-           slot->bitmap.width);
-    while (padx < slot->bitmap.width)
-       padx <<= 1;
-    while (pady < slot->bitmap.rows)
-       pady <<= 1;
-    printf("padding to %d, %d\n", padx, pady);
-    padbuf = g_new(unsigned char, padx * pady);
+
+    g->padx = 1;
+    while (g->padx < slot->bitmap.width)
+       g->padx <<= 1;
+
+    g->pady = 1;
+    while (g->pady < slot->bitmap.rows)
+       g->pady <<= 1;
+
+    padbuf = g_new0(unsigned char, g->padx * g->pady);
     for (i = 0; i < slot->bitmap.rows; i++)
-        memcpy(padbuf + i*padx,
+        memcpy(padbuf + i*g->padx,
                slot->bitmap.buffer + i*slot->bitmap.width,
                slot->bitmap.width);
-    glBindTexture(GL_TEXTURE_2D, tnum);
+    glBindTexture(GL_TEXTURE_2D, g->tnum);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, padx, pady,
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, g->padx, g->pady,
                  0, GL_GREEN, GL_UNSIGNED_BYTE, padbuf);
 
     g_free(padbuf);
@@ -62,19 +63,19 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
             glTranslatef(GlftFontAdvance(font, p, g), 0.0, 0.0);
             glBindTexture(GL_TEXTURE_2D, g->tnum);
             glBegin(GL_QUADS);
-            glColor3f(1.0, 1.0, 1.0);
+            glColor3f(0.0, 0.0, 0.0);
 
-            glTexCoord2i(0, 1);
-            glVertex2i(g->x, g->y);
+            glTexCoord2f(0, g->height/(float)g->pady);
+            glVertex2i(0, 0);
 
-            glTexCoord2i(1, 1);
-            glVertex2i(g->x + g->width, g->y);
+            glTexCoord2f(g->width/(float)g->padx, g->height/(float)g->pady);
+            glVertex2i(0 + g->width, 0);
 
-            glTexCoord2i(1, 0);
-            glVertex2i(g->x + g->width ,g->y + g->height);
+            glTexCoord2f(g->width/(float)g->padx, 0);
+            glVertex2i(0 + g->width, 0 + g->height);
 
-            glTexCoord2i(0, 0);
-            glVertex2i(g->x, g->y + g->height);
+            glTexCoord2f(0, 0);
+            glVertex2i(0, 0 + g->height);
             glEnd();
         } else
             glTranslatef(font->max_advance_width, 0.0, 0.0);

@@ -1,6 +1,7 @@
 #include "../kernel/dispatch.h"
 #include "../kernel/screen.h"
 #include "../kernel/client.h"
+#include "../kernel/focus.h"
 #include "../kernel/stacking.h"
 
 static GSList **focus_order = NULL;
@@ -16,6 +17,11 @@ static void events(ObEvent *e, void *foo)
         /* focus new normal windows */
         if (client_normal(e->data.c.client))
             client_focus(e->data.c.client);
+        break;
+
+    case Event_Client_Destroy:
+        i = e->data.c.client->desktop;
+        focus_order[i] = g_slist_remove(focus_order[i], e->data.c.client);
         break;
 
     case Event_Ob_NumDesktops:
@@ -43,9 +49,20 @@ static void events(ObEvent *e, void *foo)
         break;
 
     case Event_Ob_Desktop:
-        for (it = focus_order[e->data.o.num[0]]; it != NULL; it = it->next)
+        /* focus the next available target */
+        new = e->data.o.num[0];
+        for (it = focus_order[new]; it != NULL; it = it->next)
             if (client_focus(it->data))
                 break;
+        break;
+
+    case Event_Client_Unfocus:
+        if (focus_client == NULL) { /* nothing is left with focus! */
+            /* focus the next available target */
+            for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
+                if (client_focus(it->data))
+                    break;
+        }
         break;
 
     case Event_Client_Focus:
@@ -65,9 +82,11 @@ void plugin_startup()
 {
     guint i;
 
-    dispatch_register(Event_Client_Mapped | Event_Ob_Desktop |
-                      Event_Ob_NumDesktops | Event_Client_Focus |
-                      Event_Client_Desktop, (EventHandler)events, NULL);
+    dispatch_register(Event_Client_Mapped | Event_Client_Destroy |
+                      Event_Ob_Desktop | Event_Ob_NumDesktops |
+                      Event_Client_Focus | Event_Client_Unfocus |
+                      Event_Client_Desktop,
+                      (EventHandler)events, NULL);
 
     focus_order = g_new(GSList*, screen_num_desktops);
     for (i = 0; i < screen_num_desktops; ++i)

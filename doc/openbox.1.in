@@ -640,7 +640,6 @@ handleWidth:	a number of pixels > 0
 ! When not specified, frameWidth defaults to the value of bevelWidth.
 frameWidth:	a number of pixels >= 0
 
-
 ! This command is executed whenever this style is selected.
 ! Typically it sets the root window to a nice picture.
 rootCommand:	Shell command, e.g. \fIbsetroot -mod 4 4 -fg rgb:	5/6/6 -bg grey20\fR
@@ -663,6 +662,28 @@ can easily set lots of keys with a single command, e.g.
 *font:	lucidasans-10
 .EE
 This sets already nice defaults for many components.
+.PP
+Openbox also lets you pick what the small graphics in the buttons and in the manu look like. It uses the X Bitmap file format (.xbm extension). The style resources are as follows:
+.EX
+! Close, maximize, sticky and iconify
+! buttons on a window.
+window.button.close.mask:       xbm file
+window.button.max.mask:         xbm file
+window.button.stick.mask:       xbm file
+window.button.icon.mask:        xbm file
+
+! The icon for submenus in a menu.
+menu.arrow.mask:                xbm file
+
+! The icon for a selected option or workspace
+! in the menus.
+menu.selected.mask:             xbm file
+
+! The left and right buttons in the toolbar
+toolbar.button.left.mask:       xbm file
+toolbar.button.right.mask:      xbm file
+.EE
+If the xbm file value is the path to a .xbm image. If the value is absolute, it uses that file. If the file is just a file name, e.g. `close.xbm', it uses ~/.openbox/buttons/close.xbm.
 .SH THE SLIT
 The slit is a special Openbox window frame that can contain dockable
 applications, e.g. the `bbtools' or WindowMaker's dockapps.

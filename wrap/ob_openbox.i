@@ -31,4 +31,5 @@ namespace ob {
 
 }
 
+%import "../otk/eventdispatcher.hh"
 %include "openbox.hh"

@@ -7,8 +7,8 @@
 #include "client.hh"
 %}
 
-%include "otk.i" // XXX otk_size.i!!!
-%include "ustring.i"
+%include "otk_size.i"
+%include "otk_ustring.i"
 %include "std_string.i"
 
 namespace ob {

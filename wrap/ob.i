@@ -32,7 +32,7 @@ void send_client_msg(Window target, Atom type, Window about,
 %include "ob_client.i"
 %include "ob_frame.i"
 %include "ob_python.i"
-%include "callback.i"
+%include "ob_callback.i"
 
 // for Window etc
 %import "X11/X.h"
@@ -42,6 +42,7 @@ void send_client_msg(Window target, Atom type, Window about,
 #include "bindings.hh"
 #include "otk/display.hh"
 #include "otk/screeninfo.hh"
+#include "otk/util.hh"
 
 void set_reset_key(const std::string &key)
 {

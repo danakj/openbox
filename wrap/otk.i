@@ -2,79 +2,36 @@
 
 %module otk
 
-%{
-#include "otk.hh"
-%}
+%import "eventhandler.hh"
+%import "eventdispatcher.hh"
 
-%include "stl.i"
-%include "typemaps.i"
-//%include std_list.i
-%include "ustring.i"
+%include "otk_strut.i"
+%include "otk_point.i"
+%include "otk_size.i"
+%include "otk_rect.i"
+%include "otk_rendercolor.i"
+%include "otk_rendertexture.i"
+%include "otk_font.i"
+%include "otk_ustring.i"
+%include "otk_renderstyle.i"
+%include "otk_widget.i"
+%include "otk_label.i"
+%include "otk_button.i"
+%include "otk_application.i"
+%include "otk_appwidget.i"
+%include "otk_property.i"
+%include "otk_timer.i"
 
-%immutable otk::display;
 %immutable otk::Property::atoms;
 
-namespace otk {
-/*%rename(setValue_bool) Configuration::setValue(std::string const &,bool);
-%rename(setValue_unsigned) Configuration::setValue(const std::string &, unsigned int);
-%rename(setValue_long) Configuration::setValue(const std::string &, long);
-%rename(setValue_unsignedlong) Configuration::setValue(const std::string &, unsigned long);
-%rename(setValue_string) Configuration::setValue(const std::string &, const std::string &);
-%rename(setValue_charptr) Configuration::setValue(const std::string &, const char *);*/
-
-%rename(itostring_unsigned) itostring(unsigned int);
-%rename(itostring_long) itostring(long);
-%rename(itostring_unsigned_long) itostring(unsigned long);
-
-// these are needed for guile, but not needed for python!
-//%rename(equals) BColor::operator==;
-//%rename(equals) Rect::operator==;
-//%rename(equals) BTexture::operator==;
-//%ignore BColor::operator!=;
-//%ignore BTexture::operator!=;
-%ignore Rect::operator!=;
-%ignore Rect::operator|;
-%ignore Rect::operator|=;
-%ignore Rect::operator&;
-%ignore Rect::operator&=;
-//%ignore OBTimer::operator<;
 %ignore TimerLessThan;
 
-/*
-%rename(set_multi) OtkProperty::set(Window, Atoms, Atoms, unsigned long[], int);
-%rename(set_string) OtkProperty::set(Window, Atoms, StringType, const std::string &);
-%rename(set_string_multi) OtkProperty::set(Window, Atoms, StringType, const StringVect &);
-*/
-}
-
-%include "eventhandler.hh"
-%include "eventdispatcher.hh"
-%include "point.hh"
-%include "size.hh"
-%include "rect.hh"
-%include "rendercolor.hh"
-%include "rendertexture.hh"
-%include "font.hh"
-%include "renderstyle.hh"
-%include "widget.hh"
-%include "label.hh"
-%include "appwidget.hh"
-%include "application.hh"
-%include "button.hh"
-%include "display.hh"
-%include "rendercontrol.hh"
-%include "screeninfo.hh"
-%include "strut.hh"
-
-%apply unsigned long *OUTPUT { unsigned long *value };
-%include "property.hh"
 
 // for Window etc
 %import "X11/X.h"
 
 // globals
 %pythoncode %{
-display = cvar.display;
 atoms = cvar.Property_atoms;
 
 def style(screen):

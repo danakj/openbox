@@ -10,8 +10,23 @@
 %}
 
 %include "ob_client.i"
-%include "otk.i" // XXX otk_rect.i!!!
-%include "ustring.i"
+%include "otk_rect.i"
+%include "otk_ustring.i"
+%include "otk_size.i"
+%include "std_vector.i"
+
+%typemap(python,out) const otk::Property::StringVect& {
+  otk::Property::StringVect *v = $1;
+  unsigned int s = v->size();
+  PyObject *l = PyList_New(s);
+
+  otk::Property::StringVect::const_iterator it = v->begin(), end = v->end();
+  for (unsigned int i = 0; i < s; ++i, ++it) {
+    PyObject *pdata = PyString_FromString(it->c_str());
+    PyList_SET_ITEM(l, i, pdata);
+  }
+  $result = l;
+}
 
 %typemap(python,out) std::list<ob::Client*> {
   unsigned int s = $1.size();
@@ -25,14 +40,14 @@
   $result = l;
 }
 
-%typemap(python,out) const otk::Property::StringVect& {
-  otk::Property::StringVect *v = $1;
+%typemap(python,out) const std::vector<otk::Rect>& {
+  std::vector<otk::Rect> *v = $1;
   unsigned int s = v->size();
   PyObject *l = PyList_New(s);
 
-  otk::Property::StringVect::const_iterator it = v->begin(), end = v->end();
+  std::vector<otk::Rect>::const_iterator it = v->begin(), end = v->end();
   for (unsigned int i = 0; i < s; ++i, ++it) {
-    PyObject *pdata = PyString_FromString(it->c_str());
+    PyObject *pdata = SWIG_NewPointerObj((void*)&(*it),SWIGTYPE_p_otk__Rect,0);
     PyList_SET_ITEM(l, i, pdata);
   }
   $result = l;
@@ -51,6 +66,18 @@ namespace ob {
     Window root = RootWindow(**otk::display, self->number());
     send_client_msg(root, otk::Property::atoms.net_current_desktop,
                     root, desktop);
+  }
+
+  const otk::Size& size() {
+    return otk::display->screenInfo(self->number())->size();
+  }
+
+  const std::vector<otk::Rect> &xineramaAreas() {
+    return otk::display->screenInfo(self->number())->xineramaAreas();
+  }
+
+  Window rootWindow() {
+    return otk::display->screenInfo(self->number())->rootWindow();
   }
 }
 

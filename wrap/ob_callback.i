@@ -1,5 +1,7 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
+%module ob_callback
+
 %include "std_string.i"
 
 %{
@@ -121,7 +123,7 @@ bool mbind(const std::string &button, ob::MouseContext::MC context,
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return false;
   }
-  Py_INCREF(func);
+  Py_INCREF(func); // the func is never decreffed... XXX
   return true;
 }
 
@@ -136,7 +138,7 @@ bool ebind(ob::EventAction::EA action, PyObject *func)
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return false;
   }
-  Py_INCREF(func);
+  Py_INCREF(func); // the func is never decreffed... XXX
   return true;
 }
 
@@ -147,7 +149,7 @@ bool kgrab(int screen, PyObject *func)
     PyErr_SetString(PyExc_RuntimeError,"Unable to grab keybaord.");
     return false;
   }
-  Py_INCREF(func);
+  Py_INCREF(func); // the func is never decreffed... XXX
   return true;
 }
 
@@ -197,7 +199,7 @@ bool kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func)
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return false;
   }
-  Py_INCREF(func);
+  Py_INCREF(func); // the func is never decreffed... XXX
   return true;
 }
 

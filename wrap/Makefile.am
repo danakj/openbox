@@ -41,9 +41,9 @@ otk.i: $(wildcard ../otk/*.hh)
 ob.i: $(addprefix ../src/,openbox.hh screen.hh client.hh python.hh frame.hh)
 	@touch $@
 
-wrap_otk.cc: otk.i
+wrap_otk.cc: otk.i otk_point.i otk_rect.i otk_size.i otk_rendercolor.i otk_rendertexture.i otk_ustring.i otk_font.i otk_renderstyle.i otk_widget.i otk_label.i otk_button.i otk_appwidget.i otk_application.i otk_strut.i otk_property.i otk_timer.i
 	$(SWIG) $(SWIG_PYTHON_OPT) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
 
-wrap_ob.cc: ob.i callback.i ob_client.i ob_screen.i ob_openbox.i ob_frame.i ob_python.i
+wrap_ob.cc: ob.i ob_callback.i ob_client.i ob_screen.i ob_openbox.i ob_frame.i ob_python.i
 	$(SWIG) $(SWIG_PYTHON_OPT) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
 

@@ -1,11 +1,12 @@
-// SWIG typemaps for otk::ustring
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+
+%module otk_rendertexture
 
 %{
 #include "otk/ustring.hh"
 %}
 
 namespace otk {
-
     class ustring;
 
     /* Overloading check */
@@ -36,5 +37,4 @@ namespace otk {
     %typemap(out) const ustring & {
         $result = PyString_FromString($1->c_str());
     }
-
 }

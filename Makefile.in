@@ -4,22 +4,22 @@ targets = render cwmcc obcl kernel plugins themes data
 
 all: libtool
 	@for i in $(targets); do \
-		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@ || break; \
 	done
 
 uninstall:
 	@for i in $(targets); do \
-		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@ || break; \
 	done
 
 install: all
 	@for i in $(targets); do \
-		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@ || break; \
 	done
 
 clean:
 	@for i in $(targets); do \
-		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@ || break; \
 	done
 	$(RM) *\~
 

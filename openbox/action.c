@@ -524,32 +524,48 @@ static guint translate_row_col(guint r, guint c)
     case Orientation_Horz:
         switch (screen_desktop_layout.start_corner) {
         case Corner_TopLeft:
-            return r * screen_desktop_layout.columns + c;
-        case Corner_BottomLeft:
-            return (screen_desktop_layout.rows - 1 - r) *
-                screen_desktop_layout.columns + c;
-        case Corner_TopRight:
-            return r * screen_desktop_layout.columns +
-                (screen_desktop_layout.columns - 1 - c);
-        case Corner_BottomRight:
-            return (screen_desktop_layout.rows - 1 - r) *
+            return r % screen_desktop_layout.rows *
                 screen_desktop_layout.columns +
-                (screen_desktop_layout.columns - 1 - c);
+                c % screen_desktop_layout.columns;
+        case Corner_BottomLeft:
+            return (screen_desktop_layout.rows - 1 -
+                    r % screen_desktop_layout.rows) *
+                screen_desktop_layout.columns +
+                c % screen_desktop_layout.columns;
+        case Corner_TopRight:
+            return r % screen_desktop_layout.rows *
+                screen_desktop_layout.columns +
+                (screen_desktop_layout.columns - 1 -
+                 c % screen_desktop_layout.columns);
+        case Corner_BottomRight:
+            return (screen_desktop_layout.rows - 1 -
+                    r % screen_desktop_layout.rows) *
+                screen_desktop_layout.columns +
+                (screen_desktop_layout.columns - 1 -
+                 c % screen_desktop_layout.columns);
         }
     case Orientation_Vert:
         switch (screen_desktop_layout.start_corner) {
         case Corner_TopLeft:
-            return c * screen_desktop_layout.rows + r;
-        case Corner_BottomLeft:
-            return c * screen_desktop_layout.rows +
-                (screen_desktop_layout.rows - 1 - r);
-        case Corner_TopRight:
-            return (screen_desktop_layout.columns - 1 - c) *
-                screen_desktop_layout.rows + r;
-        case Corner_BottomRight:
-            return (screen_desktop_layout.columns - 1 - c) *
+            return c % screen_desktop_layout.columns *
                 screen_desktop_layout.rows +
-                (screen_desktop_layout.rows - 1 - r);
+                r % screen_desktop_layout.rows;
+        case Corner_BottomLeft:
+            return c % screen_desktop_layout.columns *
+                screen_desktop_layout.rows +
+                (screen_desktop_layout.rows - 1 -
+                 r % screen_desktop_layout.rows);
+        case Corner_TopRight:
+            return (screen_desktop_layout.columns - 1 -
+                    c % screen_desktop_layout.columns) *
+                screen_desktop_layout.rows +
+                r % screen_desktop_layout.rows;
+        case Corner_BottomRight:
+            return (screen_desktop_layout.columns - 1 -
+                    c % screen_desktop_layout.columns) *
+                screen_desktop_layout.rows +
+                (screen_desktop_layout.rows - 1 -
+                 r % screen_desktop_layout.rows);
         }
     }
     g_assert_not_reached();

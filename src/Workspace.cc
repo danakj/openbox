@@ -41,6 +41,7 @@
 #include "Toolbar.h"
 #include "Window.h"
 #include "Workspace.h"
+
 #include "Windowmenu.h"
 #include "Geometry.h"
 #include "Util.h"
@@ -386,17 +387,17 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
      spaces = calcSpace(*cur, spaces);
   
   //Find first space that fits the window
-  best = 0;
+  best = NULL;
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter) {
     if ((siter->w() >= win_size.w()) &&
         (siter->h() >= win_size.h()))
       best = siter;
   }
 
-  if (best != 0)
+  if (best != NULL)
     return new Point(best->origin());
   else
-    return new Point(200, 0);
+    return NULL; //fall back to cascade
 }
 
 inline Point *Workspace::rowSmartPlacement(const Size &win_size,
@@ -501,7 +502,9 @@ void Workspace::placeWindow(OpenboxWindow *win) {
       place_y=spot->y();
       delete spot;
       placed=true;
-    }
+    }else
+      placed=false;
+      
     break;
   }
   case BScreen::RowSmartPlacement: {
@@ -581,15 +584,10 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   } // switch
 
   if (! placed) {
-    if (((unsigned) cascade_x > (screen.size().w() / 2)) ||
-	((unsigned) cascade_y > (screen.size().h() / 2)))
-      cascade_x = cascade_y = 32;
-
-    place_x = cascade_x;
-    place_y = cascade_y;
-
-    cascade_x += win->getTitleHeight();
-    cascade_y += win->getTitleHeight();
+    Point *p = cascade(win);
+    place_x=p->x();
+    place_y=p->y();
+    delete p;
   }
   
   if (place_x + win_w > (signed) screen.size().w())
@@ -598,4 +596,15 @@ void Workspace::placeWindow(OpenboxWindow *win) {
     place_y = (((signed) screen.size().h()) - win_h) / 2;
 
   win->configure(place_x, place_y, win->size().w(), win->size().h());
+}
+
+Point *Workspace::cascade(const OpenboxWindow *const win){
+  if (((unsigned) cascade_x > (screen.size().w() / 2)) ||
+      ((unsigned) cascade_y > (screen.size().h() / 2)))
+    cascade_x = cascade_y = 32;
+
+  cascade_x += win->getTitleHeight();
+  cascade_y += win->getTitleHeight();
+
+  return new Point(cascade_x, cascade_y);
 }

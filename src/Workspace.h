@@ -49,7 +49,7 @@ protected:
   void placeWindow(OpenboxWindow *);
   Point *bestFitPlacement(const Size &win_size, const Rect &space);
   Point *rowSmartPlacement(const Size &win_size, const Rect &space);
-
+  Point *cascade(const OpenboxWindow* window);
 
 public:
   Workspace(BScreen &, int = 0);

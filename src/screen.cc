@@ -806,7 +806,6 @@ void Screen::setDesktopName(long i, const otk::ustring &name)
 
 void Screen::installColormap(bool install) const
 {
-  printf("%snstalling Root Colormap!\n", install ? "I" : "Uni");
   if (install)
     XInstallColormap(**otk::display, _info->colormap());
   else

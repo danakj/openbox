@@ -1614,7 +1614,6 @@ void Client::installColormap(bool install) const
 {
   XWindowAttributes wa;
   if (XGetWindowAttributes(**otk::display, _window, &wa)) {
-    printf("%snstalling Window Colormap 0x%lx!\n", install ? "I" : "Uni", _window);
     if (install)
       XInstallColormap(**otk::display, wa.colormap);
     else

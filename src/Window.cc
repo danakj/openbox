@@ -2628,7 +2628,7 @@ void BlackboxWindow::redrawIconifyButton(bool pressed) const {
 
     XFillRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
+                   pm.w, pm.h);
 
     XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
     XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
@@ -2679,7 +2679,7 @@ void BlackboxWindow::redrawMaximizeButton(bool pressed) const {
 
     XFillRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
+                   pm.w, pm.h);
     
     XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
     XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
@@ -2767,7 +2767,7 @@ void BlackboxWindow::redrawStickyButton(bool pressed) const {
     
     XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
+                   pm.w, pm.h);
 
   
     XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );

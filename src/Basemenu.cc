@@ -627,7 +627,6 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
       XSetClipMask(blackbox->getXDisplay(), pen.gc(),
                    style->tick_image.mask);
 
-      cout << oppsel_x << ' ' << sel_x << endl;
       XFillRectangle(blackbox->getXDisplay(), menu.frame, pen.gc(),
                      oppsel_x, item_y + menu.item_h/2 - style->tick_image.h/2,
                      style->tick_image.w,
@@ -681,8 +680,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
 
       XFillRectangle(blackbox->getXDisplay(), menu.frame, pen.gc(),
                      sel_x, item_y + menu.item_h/2 - style->bullet_image.h/2,
-                     sel_x + style->bullet_image.w,
-                     item_y + menu.item_h/2 + style->bullet_image.h/2);
+                     style->bullet_image.w, style->bullet_image.h);
 
       XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
       

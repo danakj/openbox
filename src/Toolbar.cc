@@ -651,8 +651,7 @@ void Toolbar::drawArrow(Drawable surface, bool left) const {
       XFillRectangle(blackbox->getXDisplay(), surface, pen.gc(),
                      (frame.button_w - style->left_button.w)/2,
                      (frame.button_w - style->left_button.h)/2,
-                     (frame.button_w + style->left_button.w)/2,
-                     (frame.button_w + style->left_button.h)/2);
+                     style->left_button.w, style->left_button.h);
 
       XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
       XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);

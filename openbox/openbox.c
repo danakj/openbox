@@ -326,7 +326,8 @@ gint main(gint argc, gchar **argv)
 
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
-        execlp(argv[0], g_path_get_basename(argv[0])); /* last resort */
+        execlp(argv[0], g_path_get_basename(argv[0]),
+               (char *)NULL); /* last resort */
     }
      
     return exitcode;

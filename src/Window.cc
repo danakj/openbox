@@ -600,21 +600,17 @@ void BlackboxWindow::decorate(void) {
   if (needsPressed) {
     texture = &(screen->getWindowStyle()->b_pressed);
     
-    Pixmap pbutton = texture->render(frame.button_w, frame.button_w,
-                                     pbutton);
-    unsigned long pixel;
-    
-    if (!pbutton) {
-      pixel = texture->color().pixel();
-      if (needsPressed & 0x1)
-        frame.pfbutton_pixel = pixel;
-      if (needsPressed & 0x2)
-        frame.pubutton_pixel = pixel;
-    } else {
-      if (needsPressed & 0x1)
-        frame.pfbutton = pbutton;
-      if (needsPressed & 0x2)
-        frame.pubutton = pbutton;
+    if (needsPressed & 0x1) {
+      frame.pfbutton = texture->render(frame.button_w, frame.button_w,
+                                       frame.pfbutton);
+      if (! frame.pfbutton)
+        frame.pfbutton_pixel = texture->color().pixel();
+    }
+    if (needsPressed & 0x2) {
+      frame.pubutton = texture->render(frame.button_w, frame.button_w,
+                                       frame.pubutton);
+      if (! frame.pubutton)
+        frame.pubutton = texture->color().pixel();
     }
     
   }

@@ -1,6 +1,6 @@
 ############################################################################
-### Functions that provide callbacks for motion events to move and       ###
-### windows.                                                             ###
+###    Functions that provide callbacks for motion events to move and    ###
+###    resize windows.                                                   ###
 ############################################################################
 
 #############################################################################
@@ -27,6 +27,20 @@ resize_rubberband = 0                                                     ###
 # resize_nearest - 1 to resize from the corner nearest where the mouse    ###
 ###                is, 0 to resize always from the bottom right corner.   ###
 resize_nearest = 1                                                        ###
+###                                                                       ###
+###                                                                       ###
+# Provides:                                                               ###
+# def move(data):                                                         ###
+#     """Moves the window interactively. This should only be used with    ###
+#        MouseMotion events. If move_popup or move_rubberband is enabled, ###
+#        then the end_move function needs to be bound as well."""         ###
+# def end_move(data):                                                     ###
+#     """Complete the interactive move of a window."""                    ###
+# def resize(data):                                                       ###
+#     """Resizes the window interactively. This should only be used with  ###
+#        MouseMotion events"""                                            ###
+# def end_resize(data):                                                   ###
+#     """Complete the interactive resize of a window."""                  ###
 ###                                                                       ###
 #############################################################################
 

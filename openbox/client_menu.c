@@ -1,10 +1,10 @@
-#include "kernel/debug.h"
-#include "kernel/menu.h"
-#include "kernel/menuframe.h"
-#include "kernel/screen.h"
-#include "kernel/client.h"
-#include "kernel/openbox.h"
-#include "kernel/frame.h"
+#include "debug.h"
+#include "menu.h"
+#include "menuframe.h"
+#include "screen.h"
+#include "client.h"
+#include "openbox.h"
+#include "frame.h"
 #include "gettext.h"
 
 #include <glib.h>

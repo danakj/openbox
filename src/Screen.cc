@@ -655,7 +655,7 @@ void BScreen::load_rc(void) {
     resource.opaque_move = false;
 
   if (! config->getValue(screenstr + "dropShadowFonts", resource.shadow_fonts))
-    resource.shadow_fonts = true;
+    resource.shadow_fonts = false;
 
   if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
     resource.aa_fonts = true;

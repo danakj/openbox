@@ -99,65 +99,30 @@ void OtkEventDispatcher::dispatchEvents(void)
 
 void OtkEventDispatcher::dispatchFocus(const XEvent &e)
 {
-  Window newfocus = None;
-  
-  // any other types are not ones we're interested in
-  if (e.xfocus.detail != NotifyNonlinear)
-    return;
   
   if (e.type == FocusIn) {
-    printf("---\n");
-    printf("Got FocusIn!\n");
-    printf("Using FocusIn\n");
-    newfocus = e.xfocus.window;
+    //printf("Got FocusIn!\n");
 
-    if (newfocus != _focus) {
-      // send a FocusIn to whatever was just focused
-      dispatch(newfocus, e);
-      printf("Sent FocusIn 0x%lx\n", newfocus);
+    // send a FocusIn to whatever was just focused
+    dispatch(e.xfocus.window, e);
+    //printf("Sent FocusIn 0x%lx\n", e.xfocus.window);
 
-      // send a FocusOut to whatever used to be focused
-      if (_focus) {
-        XEvent ev;
-        ev.xfocus = e.xfocus;
-        ev.xfocus.window = _focus;
-        ev.type = FocusOut;
-        dispatch(_focus, ev);
-        printf("Sent FocusOut 0x%lx\n", _focus);
-      }
-
-      // store the new focused window
-      _focus = newfocus;
-    }
-      
   } else if (e.type == FocusOut) {
-    bool focused = false; // found a new focus target?
-    printf("---\n");
-    printf("Got FocusOut!\n");
+    //printf("Got FocusOut!\n");
 
     // FocusOut events just make us look for FocusIn events. They are ignored
     // otherwise.
     XEvent fi;
-    while (XCheckTypedEvent(OBDisplay::display, FocusIn, &fi)) {
-      if (e.xfocus.detail == NotifyNonlinear) {
-        printf("Found FocusIn\n");
-        dispatchFocus(fi);
-        focused = true;
-        break;
-      }
+    if (XCheckTypedEvent(OBDisplay::display, FocusIn, &fi)) {
+      //printf("Found FocusIn\n");
+      dispatchFocus(fi);
+      // dont unfocus the window we just focused!
+      if (fi.xfocus.window == e.xfocus.window)
+        return;
     }
-    if (!focused) {
-      // send a FocusOut to whatever used to be focused
-      if (_focus) {
-        XEvent ev;
-        ev.xfocus = e.xfocus;
-        ev.xfocus.window = _focus;
-        dispatch(_focus, ev);
-        printf("Sent FocusOut 0x%lx\n", _focus);
-      }
-      // store that no window has focus anymore
-      _focus = None;
-    }
+
+    dispatch(e.xfocus.window, e);
+    //printf("Sent FocusOut 0x%lx\n", e.xfocus.window);
   }
 }
 

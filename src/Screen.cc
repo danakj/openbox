@@ -434,7 +434,7 @@ void BScreen::saveWindowToWindowSnap(int s) {
   resource.snap_to_windows = s;
   
   const char *snap;
-  switch (resource.snap_to_edges) {
+  switch (resource.snap_to_windows) {
   case WindowNoSnap: snap = "NoSnap"; break;
   case WindowResistance: snap = "Resistance"; break;
   case WindowSnap: default: snap = "Snap"; break;

@@ -28,21 +28,21 @@ openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES=client.c event.c extensions.c focus.c frame.c openbox.c \
 	prop.c screen.c stacking.c xerror.c timer.c dispatch.c \
 	engine.c plugin.c action.c grab.c config.c menu.c \
-	y.tab.c lex.yy.c parse.c
+	parse.tab.c lex.yy.c parse.c
 
 noinst_HEADERS=client.h event.h extensions.h focus.h frame.h geom.h gettext.h \
 	openbox.h prop.h screen.h stacking.h xerror.h dispatch.h \
 	timer.h engine.h plugin.h action.h grab.h config.h menu.h parse.h \
-	y.tab.h
+	parse.tab.h
 
 lex.yy.c: parse.l
 	$(FLEX) $^
 
-parse.h: y.tab.h
+parse.h: parse.tab.h
 
-y.tab.h: y.tab.c
+parse.tab.h:parsey.tab.c
 
-y.tab.c: parse.y
+parse.tab.c: parse.y
 	$(YACC) -d $<
 
 MAINTAINERCLEANFILES= Makefile.in

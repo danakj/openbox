@@ -279,7 +279,21 @@ void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
   pixel16 *p = (pixel16 *)data;
   switch (im->bits_per_pixel) {
   case 32:
-    return;
+    if ((_red_offset != default_red_shift) ||
+        (_blue_offset != default_blue_shift) ||
+        (_green_offset != default_green_shift)) {
+      printf("cross endian conversion\n");
+      for (y = 0; y < im->height; y++) {
+        for (x = 0; x < im->width; x++) {
+          r = (data[x] >> default_red_shift) & 0xFF;
+          g = (data[x] >> default_green_shift) & 0xFF;
+          b = (data[x] >> default_blue_shift) & 0xFF;
+          data[x] = (r << _red_offset) + (g << _green_offset) + (b << _blue_offset);
+        }
+        data += im->width;
+      } 
+   }
+   return;
   case 16:
     for (y = 0; y < im->height; y++) {
       for (x = 0; x < im->width; x++) {

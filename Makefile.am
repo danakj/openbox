@@ -421,6 +421,27 @@ dist_bbstyle_theme_DATA = \
 	themes/BBstylE/iconify.xbm \
 	themes/BBstylE/close.xbm
 
+om4ob_themedir = $(themedir)/om4ob
+dist_om4ob_theme_DATA = \
+	themes/om4ob/themerc \
+	themes/om4ob/close_hover.xbm \
+	themes/om4ob/close.xbm \
+	themes/om4ob/desk_hover.xbm \
+	themes/om4ob/desk_toggled.xbm \
+	themes/om4ob/desk.xbm \
+	themes/om4ob/iconify_hover.xbm \
+	themes/om4ob/iconify_pressed.xbm \
+	themes/om4ob/iconify.xbm \
+	themes/om4ob/max_disabled.xbm \
+	themes/om4ob/max_hover.xbm \
+	themes/om4ob/max_pressed.xbm \
+	themes/om4ob/max_toggled.xbm \
+	themes/om4ob/max.xbm \
+	themes/om4ob/shade_disabled.xbm \
+	themes/om4ob/shade_hover.xbm \
+	themes/om4ob/shade_toggled.xbm \
+	themes/om4ob/shade.xbm
+
 
 ## data ##
 

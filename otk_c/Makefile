@@ -17,7 +17,7 @@ install: $(targets)
 	install $^ $(libdir)
 
 clean:
-	$(RM) $(targets) *.o core
+	$(RM) $(targets) *.o core *\~ .\#*
 
 libotk.so: $(sources:.c=.o)
 	$(CC) -shared -o $@ $^ $(LDFLAGS)

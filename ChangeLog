@@ -1,3 +1,90 @@
+2003-07-30  xor@zed.orodu.net  <xor@zed>
+
+	* client.c: the size can be 0 when there is a base size
+
+	* client.c, client.h, event.c: improved ICCCM compliance!
+	  a) send ConfigureNotify back to the client as required by the ICCCM in all sitatuations.
+	  b) send the corrent coords in the ConfigureNotify, including the border width
+	  c) remove the WM_STATE property when unmanaging a window
+
+	* frame.c: code cleaning
+
+	* menu.c: only ignore wheel buttons
+
+2003-07-29  xor@zed.orodu.net  <xor@zed>
+
+	* event.c: i am the king of copy/paste errors
+
+2003-07-29  woodblock  <woodblock@zed>
+
+	* event.c: more menu fixes.
+	I hate menus.
+
+	* menu.c: Clear current_menu when hiding menus.
+
+	* event.c, menu.c: Close menu properly on unbound keys.
+
+	* menu.c: Fix some keyboard control issues.
+
+2003-07-28  xor@zed.orodu.net  <xor@zed>
+
+	* client.c, event.c:
+	base rudeness on if they have a strut even smarter!
+
+	* client.c, event.c: base rudeness on if they have a strut or not
+
+	* client.c, event.c, screen.c:
+	make the new placement restrictions not affect !normal windows like panels
+
+	* menu.c: use plugin_open_reopen not plugin_open_full
+
+	* event.c, frame.c, frame.h, framerender.c:
+	hover theme elements for window titlebar buttons
+
+	* client.c, client.h, event.c, screen.c:
+	make those apps stay/map on screen!! fuck stupid apps. thats right im talking to you mozilla and you too java.
+
+	* event.c: make things compile again. hover does not work yet.
+
+	* client.c: use the macro
+
+	* client.c, event.c:
+	keep apps from moving/maping their titlebar underneath left/top panels
+
+	* session.c: set teh clone comamnd
+
+	* session.c:
+	use char not a long, since we're telling the SM that its 1 byte lone
+
+	* session.c: save the commands on startup
+
+	* session.c: use the path properly for the session file
+
+	* session.c: use teh save file not the session id
+
+2003-07-28  woodblock  <woodblock@zed>
+
+	* menu.c: demand load plugins from the menu
+
+	* event.c, menu.c: Menu stuff.
+	Testing may begin.
+
+2003-07-26  woodblock  <woodblock@zed>
+
+	* event.c: Close menu on click if outside the menu.
+	I think, haven't tested.
+
+	* menu.c: more fixes
+
+2003-07-26  xor@zed.orodu.net  <xor@zed>
+
+	* stacking.c: dont stack groups together
+
+2003-07-26  woodblock  <woodblock@zed>
+
+	* event.c, menu.c, menu.h: Some menu updates.
+	Don't talk to me about menus.
+
 2003-07-26  xor@zed.orodu.net  <xor@zed>
 
 	* stacking.c: dont stack groups together

@@ -23,7 +23,7 @@ typedef struct _Rect {
 } Rect;
 
 #define RECT_SET_POINT(r, nx, ny) \
-    (r).x = (ny), (r).y = (ny)
+    (r).x = (nx), (r).y = (ny)
 #define RECT_SET_SIZE(r, w, h) \
     (r).width = (w), (r).height = (h)
 #define RECT_SET(r, nx, ny, w, h) \

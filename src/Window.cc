@@ -134,11 +134,12 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   frame.ulabel_pixel = frame.flabel_pixel = frame.utitle_pixel =
   frame.ftitle_pixel = frame.uhandle_pixel = frame.fhandle_pixel =
-    frame.ubutton_pixel = frame.fbutton_pixel = frame.uborder_pixel =
-    frame.fborder_pixel = frame.ugrip_pixel = frame.fgrip_pixel = 0;
+    frame.ubutton_pixel = frame.fbutton_pixel = frame.pbutton_pixel =
+    frame.uborder_pixel = frame.fborder_pixel = frame.ugrip_pixel =
+    frame.fgrip_pixel = 0;
   frame.utitle = frame.ftitle = frame.uhandle = frame.fhandle = None;
   frame.ulabel = frame.flabel = frame.ubutton = frame.fbutton = None;
-  frame.ugrip = frame.fgrip = None;
+  frame.pbutton = frame.ugrip = frame.fgrip = None;
 
   functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
   mwm_decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
@@ -570,54 +571,11 @@ void BlackboxWindow::decorate(void) {
   if (! frame.ubutton)
     frame.ubutton_pixel = texture->color().pixel();
 
-  unsigned char needsPressed = 0;
-
-  texture = &(screen->getWindowStyle()->b_pressed_focus);
-  
-  if (texture->texture() != BTexture::NoTexture) {
-    frame.pfbutton = texture->render(frame.button_w, frame.button_w,
-                                     frame.pfbutton);
-    if (! frame.pfbutton)
-      frame.pfbutton_pixel = texture->color().pixel();
-  } else {
-    needsPressed = 0x1;
-  }
-
-  texture = &(screen->getWindowStyle()->b_pressed_unfocus);
-  
-  if (texture->texture() != BTexture::NoTexture) {
-    frame.pubutton = texture->render(frame.button_w, frame.button_w,
-                                     frame.pubutton);
-    if (! frame.pubutton)
-      frame.pubutton = texture->color().pixel();
-  } else {
-    needsPressed |= 0x2;
-  }
-
-  // if we either pressed unfocused, or pressed focused were undefined,
-  // make them inherit from the old resource. It's a hack for sure, but
-  // it allows for some backwards and forwards compatibility.
-  if (needsPressed) {
-    texture = &(screen->getWindowStyle()->b_pressed);
-    
-    Pixmap pbutton = texture->render(frame.button_w, frame.button_w,
-                                     pbutton);
-    unsigned long pixel;
-    
-    if (!pbutton) {
-      pixel = texture->color().pixel();
-      if (needsPressed & 0x1)
-        frame.pfbutton_pixel = pixel;
-      if (needsPressed & 0x2)
-        frame.pubutton_pixel = pixel;
-    } else {
-      if (needsPressed & 0x1)
-        frame.pfbutton = pbutton;
-      if (needsPressed & 0x2)
-        frame.pubutton = pbutton;
-    }
-    
-  }
+  texture = &(screen->getWindowStyle()->b_pressed);
+  frame.pbutton = texture->render(frame.button_w, frame.button_w,
+                                  frame.pbutton);
+  if (! frame.pbutton)
+    frame.pbutton_pixel = texture->color().pixel();
 
   if (decorations & Decor_Titlebar) {
     texture = &(screen->getWindowStyle()->t_focus);
@@ -770,7 +728,7 @@ void BlackboxWindow::destroyTitlebar(void) {
 
   if (frame.stick_button)
     destroyStickyButton();
-
+  
   if (frame.ftitle)
     screen->getImageControl()->removeImage(frame.ftitle);
 
@@ -788,6 +746,9 @@ void BlackboxWindow::destroyTitlebar(void) {
 
   if (frame.ubutton)
     screen->getImageControl()->removeImage(frame.ubutton);
+
+  if (frame.pbutton)
+    screen->getImageControl()->removeImage(frame.pbutton);
 
   blackbox->removeWindowSearch(frame.title);
   blackbox->removeWindowSearch(frame.label);
@@ -2628,184 +2589,144 @@ void BlackboxWindow::redrawAllButtons(void) const {
 }
 
 
-void BlackboxWindow::redrawButton(bool pressed, Window win,
-                                  Pixmap fppix, unsigned long fppixel,
-                                  Pixmap uppix, unsigned long uppixel,
-                                  Pixmap fpix, unsigned long fpixel,
-                                  Pixmap upix, unsigned long upixel) const {
-  Pixmap p;
-  unsigned long pix;
-  
-  if (pressed) {
-    if (flags.focused) {
-      p = fppix;
-      pix = fppixel;
-    } else {
-      p = uppix;
-      pix = uppixel;
-    }
-  } else {
-    if (flags.focused) {
-      p = fpix;
-      pix = fpixel;
-    } else {
-      p = upix;
-      pix = upixel;
-    }
-  }
-  
-  if (p)
-    XSetWindowBackgroundPixmap(blackbox->getXDisplay(), win, p);
-  else
-    XSetWindowBackground(blackbox->getXDisplay(), win, pix);
-
-}
-
 void BlackboxWindow::redrawIconifyButton(bool pressed) const {
-  redrawButton(pressed, frame.iconify_button, 
-               frame.pfbutton, frame.pfbutton_pixel,
-               frame.pubutton, frame.pubutton_pixel,
-               frame.fbutton, frame.fbutton_pixel,
-               frame.ubutton, frame.ubutton_pixel);
-
-  XClearWindow(blackbox->getXDisplay(), frame.iconify_button);
-  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
-             screen->getWindowStyle()->b_pic_unfocus);
-
-#ifdef    BITMAPBUTTONS
-  PixmapMask pm = screen->getWindowStyle()->icon_button;
-  
-  if (screen->getWindowStyle()->icon_button.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
-
-    XFillRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
-
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
+  if (! pressed) {
+    if (flags.focused) {
+      if (frame.fbutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.iconify_button, frame.fbutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(),
+                             frame.iconify_button, frame.fbutton_pixel);
+    } else {
+      if (frame.ubutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.iconify_button, frame.ubutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.iconify_button,
+                             frame.ubutton_pixel);
+    }
   } else {
-#endif // BITMAPBUTTONS
-    XDrawRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
-                   2, (frame.button_w - 5), (frame.button_w - 5), 2);
-#ifdef    BITMAPBUTTONS
+    if (frame.pbutton)
+      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                 frame.iconify_button, frame.pbutton);
+    else
+      XSetWindowBackground(blackbox->getXDisplay(),
+                           frame.iconify_button, frame.pbutton_pixel);
   }
-#endif // BITMAPBUTTONS
+  XClearWindow(blackbox->getXDisplay(), frame.iconify_button);
+
+  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
+           screen->getWindowStyle()->b_pic_unfocus);
+  XDrawRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
+                 2, (frame.button_w - 5), (frame.button_w - 5), 2);
 }
 
 
 void BlackboxWindow::redrawMaximizeButton(bool pressed) const {
-  redrawButton(pressed, frame.maximize_button, 
-               frame.pfbutton, frame.pfbutton_pixel,
-               frame.pubutton, frame.pubutton_pixel,
-               frame.fbutton, frame.fbutton_pixel,
-               frame.ubutton, frame.ubutton_pixel);
-
+  if (! pressed) {
+    if (flags.focused) {
+      if (frame.fbutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.maximize_button, frame.fbutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.maximize_button,
+                             frame.fbutton_pixel);
+    } else {
+      if (frame.ubutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.maximize_button, frame.ubutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.maximize_button,
+                             frame.ubutton_pixel);
+    }
+  } else {
+    if (frame.pbutton)
+      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                 frame.maximize_button, frame.pbutton);
+    else
+      XSetWindowBackground(blackbox->getXDisplay(), frame.maximize_button,
+                           frame.pbutton_pixel);
+  }
   XClearWindow(blackbox->getXDisplay(), frame.maximize_button);
 
   BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
            screen->getWindowStyle()->b_pic_unfocus);
-  
-#ifdef    BITMAPBUTTONS
-  PixmapMask pm = screen->getWindowStyle()->max_button;
-    
-  if (pm.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
-
-    XFillRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
-    
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
-    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
-  } else {
-#endif // BITMAPBUTTONS
-    XDrawRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
-                   2, 2, (frame.button_w - 5), (frame.button_w - 5));
-    XDrawLine(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
-              2, 3, (frame.button_w - 3), 3);
-#ifdef    BITMAPBUTTONS
-  }
-#endif // BITMAPBUTTONS
+  XDrawRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
+                 2, 2, (frame.button_w - 5), (frame.button_w - 5));
+  XDrawLine(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
+            2, 3, (frame.button_w - 3), 3);
 }
 
 
 void BlackboxWindow::redrawCloseButton(bool pressed) const {
-  redrawButton(pressed, frame.close_button, 
-               frame.pfbutton, frame.pfbutton_pixel,
-               frame.pubutton, frame.pubutton_pixel,
-               frame.fbutton, frame.fbutton_pixel,
-               frame.ubutton, frame.ubutton_pixel);
-
+  if (! pressed) {
+    if (flags.focused) {
+      if (frame.fbutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(), frame.close_button,
+                                   frame.fbutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.close_button,
+                             frame.fbutton_pixel);
+    } else {
+      if (frame.ubutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(), frame.close_button,
+                                   frame.ubutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.close_button,
+                             frame.ubutton_pixel);
+    }
+  } else {
+    if (frame.pbutton)
+      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                 frame.close_button, frame.pbutton);
+    else
+      XSetWindowBackground(blackbox->getXDisplay(),
+                           frame.close_button, frame.pbutton_pixel);
+  }
   XClearWindow(blackbox->getXDisplay(), frame.close_button);
 
   BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
            screen->getWindowStyle()->b_pic_unfocus);
-  
-#ifdef    BITMAPBUTTONS
-  PixmapMask pm = screen->getWindowStyle()->close_button;
-
-  if (pm.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
-    
-    XFillRectangle(blackbox->getXDisplay(), frame.close_button, pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
-
-  
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
-    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
-  } else {
-#endif // BITMAPBUTTONS
-    XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
-              2, 2, (frame.button_w - 3), (frame.button_w - 3));
-    XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
-              2, (frame.button_w - 3), (frame.button_w - 3), 2);
-#ifdef    BITMAPBUTTONS
-  }
-#endif // BITMAPBUTTONS
+  XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+            2, 2, (frame.button_w - 3), (frame.button_w - 3));
+  XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+            2, (frame.button_w - 3), (frame.button_w - 3), 2);
 }
 
-void BlackboxWindow::redrawStickyButton(bool pressed) const {
-  redrawButton(pressed, frame.stick_button, 
-               frame.pfbutton, frame.pfbutton_pixel,
-               frame.pubutton, frame.pubutton_pixel,
-               frame.fbutton, frame.fbutton_pixel,
-               frame.ubutton, frame.ubutton_pixel);
 
+void BlackboxWindow::redrawStickyButton(bool pressed) const {
+  if (! pressed) {
+    if (flags.focused) {
+      if (frame.fbutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.stick_button, frame.fbutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.stick_button,
+                             frame.fbutton_pixel);
+    } else {
+      if (frame.ubutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.stick_button, frame.ubutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.stick_button,
+                             frame.ubutton_pixel);
+    }
+  } else {
+    if (frame.pbutton)
+      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                 frame.stick_button, frame.pbutton);
+    else
+      XSetWindowBackground(blackbox->getXDisplay(), frame.stick_button,
+                           frame.pbutton_pixel);
+  }
   XClearWindow(blackbox->getXDisplay(), frame.stick_button);
 
   BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
            screen->getWindowStyle()->b_pic_unfocus);
   
-#ifdef    BITMAPBUTTONS
-  PixmapMask pm = screen->getWindowStyle()->stick_button;
-
-  if (pm.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
-    
-    XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
-                   (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
-                   (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
-
-  
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
-    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
-  } else {
-#endif // BITMAPBUTTONS
-    XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
-                   frame.button_w/2 - 1, frame.button_w/2 -1, 2, 2 );
-#ifdef    BITMAPBUTTONS
-  }
-#endif
+  XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
+                 frame.button_w/2 - 1, frame.button_w/2 -1, 2, 2 );
 }
 
 void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
@@ -3179,11 +3100,11 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
         my = top_edge;
       else if (my > bottom_edge)
         my = bottom_edge;
-      
+
       if (my + windowmenu->getHeight() > screen->getHeight())
         my = screen->getHeight() - windowmenu->getHeight() -
           (screen->getBorderWidth() * 2);
-
+      
       windowmenu->move(mx, my);
       windowmenu->show();
       XRaiseWindow(blackbox->getXDisplay(), windowmenu->getWindowID());

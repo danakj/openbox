@@ -339,33 +339,6 @@ BScreen::~BScreen(void) {
   if (resource.tstyle.font)
     delete resource.tstyle.font;
 
-#ifdef    BITMAPBUTTONS
-  if (resource.wstyle.close_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
-  if (resource.wstyle.max_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.max_button.mask);
-  if (resource.wstyle.icon_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.icon_button.mask);
-  if (resource.wstyle.stick_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
-
-  if (resource.tstyle.left_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
-  if (resource.tstyle.right_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
-
-  if (resource.mstyle.bullet_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
-  if (resource.mstyle.tick_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
-    
-  resource.wstyle.max_button.mask = resource.wstyle.close_button.mask =
-    resource.wstyle.icon_button.mask =
-    resource.wstyle.stick_button.mask = None;
-  resource.tstyle.left_button.mask = resource.tstyle.right_button.mask = None;
-  resource.mstyle.bullet_image.mask = resource.mstyle.tick_image.mask = None;
-#endif // BITMAPBUTTONS
-  
   XFreeGC(blackbox->getXDisplay(), opGC);
 }
 
@@ -1065,36 +1038,6 @@ void BScreen::LoadStyle(void) {
   resource.wstyle.b_pressed =
     readDatabaseTexture("window.button.pressed", "black", style);
 
-  //if neither of these can be found, we will use the previous resource
-  resource.wstyle.b_pressed_focus =
-    readDatabaseTexture("window.button.pressed.focus", "black", style, true);
-  resource.wstyle.b_pressed_unfocus =
-    readDatabaseTexture("window.button.pressed.unfocus", "black", style, true);
-
-#ifdef    BITMAPBUTTONS
-  if (resource.wstyle.close_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
-  if (resource.wstyle.max_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.max_button.mask);
-  if (resource.wstyle.icon_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.icon_button.mask);
-  if (resource.wstyle.stick_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
-
-  resource.wstyle.close_button.mask = resource.wstyle.max_button.mask =
-    resource.wstyle.icon_button.mask =
-    resource.wstyle.icon_button.mask = None;
-  
-  readDatabaseMask("window.button.close.mask", resource.wstyle.close_button,
-                   style);
-  readDatabaseMask("window.button.max.mask", resource.wstyle.max_button,
-                   style);
-  readDatabaseMask("window.button.icon.mask", resource.wstyle.icon_button,
-                   style);
-  readDatabaseMask("window.button.stick.mask", resource.wstyle.stick_button,
-                   style);
-#endif // BITMAPBUTTONS
-
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
   BColor color = readDatabaseColor("window.frame.focusColor", "white", style);
@@ -1134,14 +1077,7 @@ void BScreen::LoadStyle(void) {
   if (resource.wstyle.h_unfocus.texture() == BTexture::Parent_Relative)
     resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
 
-  // load toolbar config
-#ifdef    BITMAPBUTTONS
-  if (resource.tstyle.left_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
-  if (resource.tstyle.right_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
-#endif // BITMAPBUTTONS
-  
+// load toolbar config
   resource.tstyle.toolbar =
     readDatabaseTexture("toolbar", "black", style);
   resource.tstyle.label =
@@ -1163,13 +1099,6 @@ void BScreen::LoadStyle(void) {
   resource.tstyle.b_pic =
     readDatabaseColor("toolbar.button.picColor", "black", style);
 
-#ifdef    BITMAPBUTTONS
-  readDatabaseMask("toolbar.button.left.mask", resource.tstyle.left_button,
-                   style);
-  readDatabaseMask("toolbar.button.right.mask", resource.tstyle.right_button,
-                   style);
-#endif // BITMAPBUTTONS
-  
   resource.tstyle.justify = LeftJustify;
   if (style.getValue("toolbar.justify", s)) {
     if (s == "right" || s == "Right")
@@ -1187,13 +1116,6 @@ void BScreen::LoadStyle(void) {
   }
 
   // load menu config
-#ifdef   BITMAPBUTTONS
-  if (resource.mstyle.bullet_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
-  if (resource.mstyle.tick_image.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
-#endif // BITMAPBUTTONS
-  
   resource.mstyle.title =
     readDatabaseTexture("menu.title", "white", style);
   resource.mstyle.frame =
@@ -1209,11 +1131,6 @@ void BScreen::LoadStyle(void) {
   resource.mstyle.h_text =
     readDatabaseColor("menu.hilite.textColor", "black", style);
 
-#ifdef    BITMAPBUTTONS
-  readDatabaseMask("menu.arrow.mask", resource.mstyle.bullet_image, style);
-  readDatabaseMask("menu.selected.mask", resource.mstyle.tick_image, style);
-#endif // BITMAPBUTTONS
-    
   resource.mstyle.t_justify = LeftJustify;
   if (style.getValue("menu.title.justify", s)) {
     if (s == "right" || s == "Right")
@@ -1916,16 +1833,9 @@ void BScreen::prevFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
-  if (focused) {
-    // if window is not on this screen, ignore it
-    if (focused->getScreen()->getScreenNumber() != getScreenNumber())
-      focused = (BlackboxWindow*) 0;
-  }
-  
   if (focused &&
       focused->getScreen()->getScreenNumber() == getScreenNumber() &&
       current_workspace->getCount() > 1) {
-    // next is the next window to receive focus, current is a place holder
     do {
       next = current_workspace->getPrevWindowInList(next);
     } while (next != focused && ! next->setInputFocus());
@@ -2646,46 +2556,15 @@ void BScreen::toggleFocusModel(FocusModel model) {
                 std::mem_fun(&BlackboxWindow::grabButtons));
 }
 
-#ifdef    BITMAPBUTTONS
-void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
-                               const Configuration &style) {
-  string s;
-  int hx, hy; //ignored
-  int ret = BitmapOpenFailed; //default to failure.
-  
-  if (style.getValue(rname, s))
-  {
-    if (s[0] != '/' && s[0] != '~')
-    {
-      std::string xbmFile = std::string("~/.openbox/buttons/") + s;
-      ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
-                            expandTilde(xbmFile).c_str(), &pixmapMask.w,
-                            &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
-    } else
-      ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
-                            expandTilde(s).c_str(), &pixmapMask.w,
-                            &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
-    
-    if (ret == BitmapSuccess)
-      return;
-  }
-
-  pixmapMask.mask = None;
-  pixmapMask.w = pixmapMask.h = 0;
-}
-#endif // BITMAPSUCCESS
 
 BTexture BScreen::readDatabaseTexture(const string &rname,
                                       const string &default_color,
-                                      const Configuration &style, 
-                                      bool allowNoTexture) {
+                                      const Configuration &style) {
   BTexture texture;
   string s;
 
   if (style.getValue(rname, s))
     texture = BTexture(s);
-  else if (allowNoTexture) //no default
-    texture.setTexture(BTexture::NoTexture);
   else
     texture.setTexture(BTexture::Solid | BTexture::Flat);
 
@@ -2693,15 +2572,12 @@ BTexture BScreen::readDatabaseTexture(const string &rname,
   texture.setDisplay(getBaseDisplay(), getScreenNumber());
   texture.setImageControl(image_control);
 
-  if (texture.texture() != BTexture::NoTexture) {
-    texture.setColor(readDatabaseColor(rname + ".color", default_color,
+  texture.setColor(readDatabaseColor(rname + ".color", default_color, style));
+  texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
                                        style));
-    texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
-                                         style));
-    texture.setBorderColor(readDatabaseColor(rname + ".borderColor",
-                                             default_color, style));
-  }
-
+  texture.setBorderColor(readDatabaseColor(rname + ".borderColor",
+                                           default_color, style));
+  
   return texture;
 }
 

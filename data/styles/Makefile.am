@@ -6,3 +6,5 @@ style_DATA = artwiz bluebox cthulhain flux nyz nyzclone operation outcomes shade
 
 distclean-local:
 	rm -f *\~
+uninstall-am:
+	rmdir $(styledir)

@@ -1,6 +1,7 @@
 // Window.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
+// Copyright (c) 2002 - 2002 Ben Jansens (ben at orodu.net)
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry (shaleh at debian.org)
+// Copyright (c) 1997 - 2000 Brad Hughes (bhughes at tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -539,24 +540,6 @@ void OpenboxWindow::associateClientWindow(void) {
   if (decorations.iconify) createIconifyButton();
   if (decorations.maximize) createMaximizeButton();
   if (decorations.close) createCloseButton();
-
-  if (frame.ubutton) {
-    if (frame.close_button)
-      XSetWindowBackgroundPixmap(display, frame.close_button, frame.ubutton);
-    if (frame.maximize_button)
-      XSetWindowBackgroundPixmap(display, frame.maximize_button,
-				 frame.ubutton);
-    if (frame.iconify_button)
-      XSetWindowBackgroundPixmap(display, frame.iconify_button, frame.ubutton);
-  } else {
-    if (frame.close_button)
-      XSetWindowBackground(display, frame.close_button, frame.ubutton_pixel);
-    if (frame.maximize_button)
-      XSetWindowBackground(display, frame.maximize_button,
-			   frame.ubutton_pixel);
-    if (frame.iconify_button)
-      XSetWindowBackground(display, frame.iconify_button, frame.ubutton_pixel);
-  }
 }
 
 
@@ -761,37 +744,40 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
   for (int i = 0; format[i] != '\0' && i < 4; i++) {
     switch(format[i]) {
     case 'C':
-      if (decorations.close && frame.close_button != None) {
+      if (decorations.close) {
+        if (frame.close_button == None)
+          createCloseButton();
         XMoveResizeWindow(display, frame.close_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.close_button);
         XClearWindow(display, frame.close_button);
         bx += frame.button_w + bw;
         hasclose = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'I':
-      if (decorations.iconify && frame.iconify_button != None) {
+      if (decorations.iconify) {
+        if (frame.iconify_button == None)
+          createIconifyButton();
         XMoveResizeWindow(display, frame.iconify_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.iconify_button);
         XClearWindow(display, frame.iconify_button);
         bx += frame.button_w + bw;
         hasiconify = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'M':
-      if (decorations.maximize && frame.maximize_button != None) {
+      if (decorations.maximize) {
+        if (frame.maximize_button == None)
+          createMaximizeButton();
         XMoveResizeWindow(display, frame.maximize_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.maximize_button);
         XClearWindow(display, frame.maximize_button);
         bx += frame.button_w + bw;
         hasmaximize = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'L':
       XMoveResizeWindow(display, frame.label, bx, by - 1,
@@ -804,14 +790,17 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
   if (!hasclose) {
       openbox->removeWindowSearch(frame.close_button);
       XDestroyWindow(display, frame.close_button);     
+      frame.close_button = None;
   }
   if (!hasiconify) {
       openbox->removeWindowSearch(frame.iconify_button);
       XDestroyWindow(display, frame.iconify_button);
+      frame.iconify_button = None;
   }
   if (!hasmaximize) {
       openbox->removeWindowSearch(frame.maximize_button);
       XDestroyWindow(display, frame.maximize_button);                 
+      frame.maximize_button = None;
   }
   if (redecorate_label)
     decorateLabel();
@@ -1070,8 +1059,8 @@ void OpenboxWindow::getWMNormalHints(void) {
   XSizeHints sizehint;
 
   client.min_width = client.min_height =
-    client.base_width = client.base_height =
     client.width_inc = client.height_inc = 1;
+  client.base_width = client.base_height = 0;
   client.max_width = screen->getWidth();
   client.max_height = screen->getHeight();
   client.min_aspect_x = client.min_aspect_y =
@@ -2594,7 +2583,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
           mx = be->x_root - windowmenu->getWidth() / 2;
           if (be->window == frame.title || be->window == frame.label) {
             my = frame.y + frame.title_h;
-          } else if (be->window = frame.handle) {
+          } else if (be->window == frame.handle) {
             my = frame.y + frame.y_handle - windowmenu->getHeight();
           } else { // (be->window == frame.window)
             if (be->y <= (signed) frame.bevel_w) {
@@ -2688,9 +2677,10 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
           (re->x >= 0) && ((unsigned) re->x <= frame.button_w) &&
           (re->y >= 0) && ((unsigned) re->y <= frame.button_h)) {
           close();
-      } else {
-        redrawCloseButton(False);
       }
+      //we should always redraw the close button. some applications
+      //eg. acroread don't honour the close.
+      redrawCloseButton(False);
     }
   // middle button released
   } else if (re->button == 2) {
@@ -2742,13 +2732,6 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
                    frame.resize_x, frame.resize_y,
                    frame.resize_w - 1, frame.resize_h - 1);
     screen->hideGeometry();
-    if (resize_zone & ZoneLeft) {
-      left_fixsize();
-    } else {  // when resizing with "Alt+Button3", the resize is the same as if
-              // done with the right grip (the right side of the window is what
-              // moves)
-      right_fixsize();
-    }
     // unset maximized state when resized after fully maximized
     if (flags.maximized == 1) {
         maximize(0);
@@ -2825,7 +2808,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
         default:
           dtty = 0;
-	  dbby = screen->getToolbar()->getY();
+          dbby = screen->getToolbar()->getY();
           break;
         }
 
@@ -2841,18 +2824,18 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       }
 
       if (screen->doOpaqueMove()) {
-	configure(dx, dy, frame.width, frame.height);
+        configure(dx, dy, frame.width, frame.height);
       } else {
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+        XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
 		       frame.move_x, frame.move_y, frame.resize_w - 1,
 		       frame.resize_h - 1);
 
-	frame.move_x = dx;
-	frame.move_y = dy;
+        frame.move_x = dx;
+        frame.move_y = dy;
 
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y, frame.resize_w - 1,
-		       frame.resize_h - 1);
+        XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                       frame.move_x, frame.move_y, frame.resize_w - 1,
+                       frame.resize_h - 1);
       }
 
       screen->showPosition(dx, dy);
@@ -2884,13 +2867,13 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
       int gx, gy;
       if (resize_zone & ZoneRight)
-        frame.grab_x = me->x - screen->getBorderWidth();
+        frame.grab_x = me->x - frame.border_w;
       else
-        frame.grab_x = me->x + screen->getBorderWidth();
+        frame.grab_x = me->x + frame.border_w;
       if (resize_zone & ZoneTop)
-        frame.grab_y = me->y + screen->getBorderWidth() * 2;
+        frame.grab_y = me->y + (frame.border_w * 2);
       else
-        frame.grab_y = me->y - screen->getBorderWidth() * 2;
+        frame.grab_y = me->y - (frame.border_w * 2);
       frame.resize_x = frame.x;
       frame.resize_y = frame.y;
       frame.resize_w = frame.width + (frame.border_w * 2);
@@ -2899,7 +2882,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       if (left)
         left_fixsize(&gx, &gy);
       else
-	right_fixsize(&gx, &gy);
+        right_fixsize(&gx, &gy);
 
       screen->showGeometry(gx, gy);
 
@@ -2913,23 +2896,23 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
       int gx, gy;
 
+      frame.resize_w = frame.width + (frame.border_w * 2);
+      frame.resize_h = frame.height + (frame.border_w * 2);
+
       if (resize_zone & ZoneTop)
-        frame.resize_h = frame.height - (me->y - frame.grab_y);
+        frame.resize_h -= me->y - frame.grab_y;
       else
-        frame.resize_h = frame.height + (me->y - frame.grab_y);
+        frame.resize_h += me->y - frame.grab_y;
       if (frame.resize_h < 1) frame.resize_h = 1;
 
       if (left) {
-        frame.resize_x = me->x_root - frame.grab_x;
-        if (frame.resize_x > (signed) (frame.x + frame.width))
-          frame.resize_x = frame.resize_x + frame.width - 1;
-
+        frame.resize_w += (frame.grab_x - me->x);
+        if (frame.resize_w < 1) frame.resize_w = 1;
         left_fixsize(&gx, &gy);
       } else {
-	frame.resize_w = frame.width + (me->x - frame.grab_x);
-	if (frame.resize_w < 1) frame.resize_w = 1;
-
-	right_fixsize(&gx, &gy);
+        frame.resize_w += (me->x - frame.grab_x);
+        if (frame.resize_w < 1) frame.resize_w = 1;
+        right_fixsize(&gx, &gy);
       }
 
       XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
@@ -3064,21 +3047,25 @@ void OpenboxWindow::changeOpenboxHints(OpenboxHints *net) {
 
     default:
     case DecorNormal:
-      decorations.titlebar = decorations.border = decorations.handle =
-       decorations.iconify = decorations.maximize = decorations.menu = True;
+      decorations.titlebar = decorations.iconify = decorations.menu =
+        decorations.border = True;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
 
     case DecorTiny:
       decorations.titlebar = decorations.iconify = decorations.menu = True;
-      decorations.border = decorations.handle = decorations.maximize = False;
- 
+      decorations.border = decorations.border = decorations.handle = False;
+      decorations.maximize = functions.maximize;
+
       break;
 
     case DecorTool:
-      decorations.titlebar = decorations.menu = functions.move = True;
-      decorations.iconify = decorations.border = decorations.handle =
-	decorations.maximize = False;
+      decorations.titlebar = decorations.menu = True;
+      decorations.iconify = decorations.border = False;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
     }
@@ -3180,29 +3167,43 @@ void OpenboxWindow::downsize(void) {
 void OpenboxWindow::right_fixsize(int *gx, int *gy) {
   // calculate the size of the client window and conform it to the
   // size specified by the size hints of the client window...
-  int dx = frame.resize_w - client.base_width - (frame.mwm_border_w * 2) -
-    (frame.border_w * 2) + (client.width_inc / 2);
-  int dy = frame.resize_h - frame.y_border - client.base_height -
-    frame.handle_h - (frame.border_w * 3) - (frame.mwm_border_w * 2)
-    + (client.height_inc / 2);
+  int dx = frame.resize_w;
+  int dy = frame.resize_h;
+  
+  // subtract the borders
+  dx -= (frame.mwm_border_w * 2) + (frame.border_w * 2);
+  dy -= frame.y_border + frame.handle_h + (frame.border_w * 3) +
+    (frame.mwm_border_w * 2);
 
+  dx +=  client.width_inc / 2;
+  dy +=  client.height_inc / 2;
+  
   if (dx < (signed) client.min_width) dx = client.min_width;
   if (dy < (signed) client.min_height) dy = client.min_height;
-  if ((unsigned) dx > client.max_width) dx = client.max_width;
-  if ((unsigned) dy > client.max_height) dy = client.max_height;
+  if (dx > (signed) client.max_width) dx = client.max_width;
+  if (dy > (signed) client.max_height) dy = client.max_height;
 
+  dx -= client.base_width;
   dx /= client.width_inc;
+  dy -= client.base_height;
   dy /= client.height_inc;
 
   if (gx) *gx = dx;
   if (gy) *gy = dy;
 
-  dx = (dx * client.width_inc) + client.base_width;
-  dy = (dy * client.height_inc) + client.base_height;
+  dx *= client.width_inc;
+  dx += client.base_width;
+  dy *= client.height_inc;
+  dy += client.base_height;
 
-  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2);
-  frame.resize_h = dy + frame.y_border + frame.handle_h +
-                   (frame.mwm_border_w * 2) +  (frame.border_w * 3);
+  // add the borders
+  dx += (frame.mwm_border_w * 2) + (frame.border_w * 2);
+  dy += frame.y_border + frame.handle_h + (frame.border_w * 3) +
+    (frame.mwm_border_w * 2);
+  
+  frame.resize_w = dx;
+  frame.resize_h = dy;
+
   if (resize_zone & ZoneTop)
     frame.resize_y = frame.y + frame.height - frame.resize_h +
       screen->getBorderWidth() * 2;
@@ -3210,35 +3211,8 @@ void OpenboxWindow::right_fixsize(int *gx, int *gy) {
 
 
 void OpenboxWindow::left_fixsize(int *gx, int *gy) {
-  // calculate the size of the client window and conform it to the
-  // size specified by the size hints of the client window...
-  int dx = frame.x + frame.width - frame.resize_x - client.base_width -
-    (frame.mwm_border_w * 2) + (client.width_inc / 2);
-  int dy = frame.resize_h - frame.y_border - client.base_height -
-    frame.handle_h - (frame.border_w * 3) - (frame.mwm_border_w * 2)
-    + (client.height_inc / 2);
+  right_fixsize(gx, gy);
 
-  if (dx < (signed) client.min_width) dx = client.min_width;
-  if (dy < (signed) client.min_height) dy = client.min_height;
-  if ((unsigned) dx > client.max_width) dx = client.max_width;
-  if ((unsigned) dy > client.max_height) dy = client.max_height;
-
-  dx /= client.width_inc;
-  dy /= client.height_inc;
-
-  if (gx) *gx = dx;
-  if (gy) *gy = dy;
-
-  dx = (dx * client.width_inc) + client.base_width;
-  dy = (dy * client.height_inc) + client.base_height;
-
-  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2);
-  frame.resize_x = frame.x + frame.width - frame.resize_w +
-                   (frame.border_w * 2);
-  frame.resize_h = dy + frame.y_border + frame.handle_h +
-                   (frame.mwm_border_w * 2) + (frame.border_w * 3);
-  if (resize_zone & ZoneTop)
-    frame.resize_y = frame.y + frame.height - frame.resize_h +
-      screen->getBorderWidth() * 2;
-  
+  frame.resize_x = frame.x + (frame.width + (frame.border_w * 2) -
+    frame.resize_w);
 }

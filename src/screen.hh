@@ -89,11 +89,17 @@ private:
   //!  An offscreen window which gets focus when nothing else has it
   Window _focuswindow;
 
+  //! An offscreen window which shows that a NETWM compliant window manager is
+  //! running
+  Window _supportwindow;
+
   //! A list of all managed clients on the screen, in their stacking order
   ClientList _stacking;
 
   //! Calculate the OBScreen::_area member
   void calcArea();
+  //! Set the list of supported NETWM atoms on the root window
+  void setSupportedAtoms();
   //! Set the client list on the root window
   /*!
     Sets the _NET_CLIENT_LIST root window property.<br>

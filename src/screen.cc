@@ -361,7 +361,8 @@ void OBScreen::setSupportedAtoms()
 
   // convert to the atom values
   for (int i = 0; i < num_supported; ++i)
-    supported[i] = Openbox::instance->property()->atom(supported[i]);
+    supported[i] =
+      Openbox::instance->property()->atom((otk::OBProperty::Atoms)supported[i]);
   
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_supported,

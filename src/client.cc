@@ -934,9 +934,28 @@ void OBClient::shade(bool shade)
 
 bool OBClient::focus()
 {
-  if (!_can_focus || _focused) return false;
+  if (!(_can_focus || _focus_notify) || _focused) return false;
 
-  XSetInputFocus(otk::OBDisplay::display, _window, RevertToNone, CurrentTime);
+  if (_can_focus)
+    XSetInputFocus(otk::OBDisplay::display, _window, RevertToNone, CurrentTime);
+
+  if (_focus_notify) {
+    XEvent ce;
+    const otk::OBProperty *property = Openbox::instance->property();
+    
+    ce.xclient.type = ClientMessage;
+    ce.xclient.message_type =  property->atom(otk::OBProperty::wm_protocols);
+    ce.xclient.display = otk::OBDisplay::display;
+    ce.xclient.window = _window;
+    ce.xclient.format = 32;
+    ce.xclient.data.l[0] = property->atom(otk::OBProperty::wm_take_focus);
+    ce.xclient.data.l[1] = Openbox::instance->lastTime();
+    ce.xclient.data.l[2] = 0l;
+    ce.xclient.data.l[3] = 0l;
+    ce.xclient.data.l[4] = 0l;
+    XSendEvent(otk::OBDisplay::display, _window, False, NoEventMask, &ce);
+  }
+
   return true;
 }
 

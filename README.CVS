@@ -5,18 +5,14 @@ GNU Gettext
 GNU Autoconf 2.50+
 GNU Automake 1.7+
 GNU Libtool
-GNU Bison 1.875+
-GNU Flex
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Pkg-Config
 Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
 libxml2 2.0+ library/headers (devel package)
-libGL library/headers (devel package, mesa or otherwise)
 
 Optionally, if you want to build the configuration tool (this is recommended):
 GTK+ 2.0+ library/headers (devel package) (http://www.gtk.org)
-libglade 2.0+ library/headers (devel package) (http://www.gnome.org)
 
 I recommend the latest version of all these packages.
 
@@ -40,17 +36,13 @@ gettext
 automake1.7
 autoconf
 libtool
-bison
-flex
 libxft2-dev
 pkg-config
 libglib2.0-dev
 libxml2-dev
-xlibmesa-dev
 
 optionally:
 libgtk2.0-dev
-libglade2-dev
 
 tip: run "update-alternatives --config automake" and select automake1.7 before
   running ./configure

@@ -1,23 +1,22 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# hata : '-rc' bir argüman bekler\n
+# ´íÎó: '-rc' ĞèÒª²ÎÊı\n
 $ #DISPLAYRequiresArg
-# hata : '-display' bir argüman bekler\n
+# ´íÎó: '-display' ĞèÒª²ÎÊı\n
 $ #WarnDisplaySet
-# ikaz : 'DISPLAY' verisini oturtamadım\n
+# ¾¯¸æ: ²»ÄÜÉèÖÃ»·¾³±äÁ¿ 'DISPLAY'\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
   \t\t\t 2001 - 2002, Sean 'Shaleh' Perry\n\n\
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <metin>\t\tekranı kullan.\n\
-  -rc <metin>\t\t\tbaşka bir ayarlama dosyasını kullan.\n\
-  -version\t\t\tnesil bilgisini gösterir ve çıkar.\n\
-  -help\t\t\t\tbu yardım iletisini gösterir ve çıkar.\n\n
+  -display <string>\t\tÊ¹ÓÃÏÔÊ¾Á¬½Ó.\n\
+  -rc <string>\t\t\tÊ¹ÓÃÆäËûµÄ×ÊÔ´ÎÄ¼ş.\n\
+  -version\t\t\tÏÔÊ¾°æ±¾.\n\
+  -help\t\t\t\tÏÔÊ¾Õâ¸ö°ïÖú.\n\n
 $ #CompileOptions
-# Denetleme seçenekleri :\n\
-  Bilgilendirme\t\t\t%s\n\
-  Gölgeleme:\t\t\t%s\n\
+# ±àÒëÑ¡Ïî:\n\
+  Debugging\t\t\t%s\n\
+  Shape:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
-  R8b'e göre tızla:\t%s\n\n
+  8bpp Ordered Dithering:\t%s\n\n

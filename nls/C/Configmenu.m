@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Ayarlar
+# ÅäÖÃÑ¡Ïî
 $ #FocusModel
-# Foküsleme
+# ¾Û½¹Ä£Ê½
 $ #WindowPlacement
-# Pencere yerleşimi
+# ´°¿Ú·ÅÖÃ
 $ #ImageDithering
-# Resim oluşturması
+# Í¼Ïñµ÷Ğ³
 $ #OpaqueMove
-# Ekranı içerikli taşı
+# ÏÔÊ¾ÒÆ¶¯´°¿ÚÄÚÈİ
 $ #FullMax
-# Tam ekranla, vallahi
+# ÍêÈ«×î´ó»¯
 $ #FocusNew
-# Yeni pencereleri foküsle
+# ¾Û½¹ĞÂ´°¿Ú
 $ #FocusLast
-# Masaüstündeki son pencereyi foküsle
+# ×ÀÃæ¸Ä±äÊ±¾Û½¹´°¿Ú
 $ #ClickToFocus
-# Tıklayarak foküsle
+# µã»÷¾Û½¹
 $ #SloppyFocus
-# Ağır foküsle
+# ×Ô¶¯¾Û½¹
 $ #AutoRaise
-# Otomatikman yükselt
+# ×Ô¶¯·ÅÇ°
 $ #SmartRows
-# Akıllı yerleşim( Sıralar )
+# ×Ô¶¯·ÅÖÃ(ĞĞ)
 $ #SmartCols
-# Akıllı yerleşim( Sütunlar )
+# ×Ô¶¯·ÅÖÃ(ÁĞ)
 $ #Cascade
-# Cascade Placement
+# ²ãµş·ÅÖÃ
 $ #LeftRight
-# Soldan sağa
+# ´Ó×óµ½ÓÒ
 $ #RightLeft
-# Sağdan sola
+# ´ÓÓÒµ½×ó
 $ #TopBottom
-# Üstten aşağa
+# ´ÓÉÏµ½ÏÂ
 $ #BottomTop
-# Alttan üste
+# ´ÓÏÂµ½ÉÏ

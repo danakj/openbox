@@ -1,7 +1,7 @@
 # Makefile.am for Blackbox - an X11 Window Manager
 
 NLSTEST = @NLS@
-THE_LANG = tr_TR
+THE_LANG = zh_CN
 THE_NLS_PATH = $(DESTDIR)$(pkgdatadir)/nls/$(THE_LANG)
 CLEANFILES = blackbox.cat
 MAINTAINERCLEANFILES = Makefile.in Translation.m

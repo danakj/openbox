@@ -1,52 +1,52 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen : X sunucusunu sorgularken hata oldu.\n  \
-%s ekranında başka bir pencere yöneticisi çalışıyor gibi.\n
+# BScreen::BScreen: ²éÑ¯X·şÎñÆ÷Ê±³ö´í.\n  \
+ÒÑ¾­ÓĞÁíÒ»¸ö´°¿Ú¹ÜÀíÆ÷ÔÚÔËĞĞ %s.\n
 $ #ManagingScreen
-# BScreen::BScreen : %d ekranı, 0x%lx görünümüyle , %d derinliğiyle\n
+# BScreen::BScreen: ¶ÔÆÁÄ» %d Ê¹ÓÃÊÓ 0x%lx, Éî¶È %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle() : '%s' yazı tipi yüklenemedi.\n
+# BScreen::LoadStyle(): ÎŞ·¨ÔØÈë×ÖÌå '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): önayarlı yazı tipi yüklenemedi.\n
+# BScreen::LoadStyle(): ÎŞ·¨ÔØÈëÄ¬ÈÏ×ÖÌå.\n
 $ #EmptyMenuFile
-# %s : boş mönü dosyası\n
+# %s: Çå¿Õ²Ëµ¥ÎÄ¼ş\n
 $ #xterm
-# X komutası
+# xterm
 $ #Restart
-# Yeniden başla
+# ÖØĞÂ¿ªÊ¼
 $ #Exit
-# Çık
+# ÍË³ö
 $ #EXECError
-# BScreen::parseMenuFile : [exec] hatası, mönü yaftası ve/yada komuta belirlenmedi\n
+# BScreen::parseMenuFile: [exec] ´íÎó, Ã»ÓĞ²Ëµ¥µÄ±êÌâ»òÃüÁî\n
 $ #EXITError
-# BScreen::parseMenuFile : [exit] hatası, mönü yaftası belirlenmedi\n
+# BScreen::parseMenuFile: [exit] ´íÎó, Ã»ÓĞ²Ëµ¥µÄ±êÌâ\n
 $ #STYLEError
-# BScreen::parseMenuFile : [style] hatası, mönü yaftası ve/yada dosya adı belirlenmedi\n
+# BScreen::parseMenuFile: [style] ´íÎó, Ã»ÓĞ²Ëµ¥±êÌâ»òÎÄ¼şÃû\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] hatası, mönü yaftası belirlenmedi\n
+# BScreen::parseMenuFile: [config] ´íÎó, Ã»ÓĞ²Ëµ¥±êÌâ\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] hatası, dosya adı belirlenmedi\n
+# BScreen::parseMenuFile: [include] ´íÎó, Ã»ÓĞÎÄ¼şÃû\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] hatası, '%s' vasat bir dosya değil\n
+# BScreen::parseMenuFile: [include] ´íÎó, '%s' ²»ÊÇÒ»¸öÆÕÍ¨ÎÄ¼ş\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] hatası, mönü yaftası belirlenmedi\n
+# BScreen::parseMenuFile: [submenu] ´íÎó, Ã»ÓĞ²Ëµ¥±êÌâ\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] hatası, mönü yaftası belirlenmedi\n
+# BScreen::parseMenuFile: [restart] ´íÎó, Ã»ÓĞ²Ëµ¥±êÌâ\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] hatası, mönü yaftası belirlenmedi\n
+# BScreen::parseMenuFile: [reconfig] ´íÎó, Ã»ÓĞ²Ëµ¥±êÌâ\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] hatası, dizin adı belirlenmedi\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] ´íÎó, Ã»ÓĞÖ¸ÃûÄ¿Â¼\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] hatası, '%s' bir dizin \
-değildir\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] ´íÎó, '%s' ²»ÊÇÄ¿Â¼\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] hatası, '%s' var değil\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] ´íÎó, '%s' ²»´æÔÚ\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] hatası, mönü yaftası belirlenmedi\n
+# BScreen::parseMenuFile: [workspaces] ´íÎó, Ã»ÓĞ²Ëµ¥±êÌâ\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
-# X: %4d x Y: %4d
+# ×ó: %4d x ÉÏ: %4d
 $ #GeometryFormat
-# Y: %4d x E: %4d
+# ¿í: %4d x ¸ß: %4d
+

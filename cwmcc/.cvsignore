@@ -1,7 +1,0 @@
-.libs
-cwmcc.lo
-libcwmcc.la
-atom.lo
-prop.lo
-client_props.lo
-root_props.lo

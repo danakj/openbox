@@ -8,18 +8,12 @@ int kparselineno;
 
 field [A-Za-z0-9][-A-Za-z0-9]*
 number [0-9]+
-desktop [dD][eE][sS][kK][tT][oO][pP]
-execute [eE][xX][eE][cC][uU][tT][eE]
-restart [rR][eE][sS][tT][aA][rR][tT]
 string \"[^"\n]*\"
 
 %%
 
 ^[ \t]*#.*\n kparselineno++;
 {number}     kparselval.integer = atoi(kparsetext);    return INTEGER;
-{execute}    kparselval.string = g_strdup(kparsetext); return EXECUTE;
-{restart}    kparselval.string = g_strdup(kparsetext); return RESTART;
-{desktop}    kparselval.string = g_strdup(kparsetext); return DESKTOP;
 {field}      kparselval.string = g_strdup(kparsetext); return FIELD;
 {string}     {
                  /* drop the quotes */

@@ -136,6 +136,8 @@ void action_free(ObAction *a);
 /* Execute */
 void action_execute(union ActionData *data);
 /* ClientAction */
+void action_activate(union ActionData *data);
+/* ClientAction */
 void action_focus(union ActionData *data);
 /* ClientAction */
 void action_unfocus(union ActionData *data);

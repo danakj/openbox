@@ -315,6 +315,11 @@ ActionString actionstrings[] =
         setup_action_directional_focus_northwest
     },
     {
+        "activate",
+        action_activate,
+        NULL,
+    },
+    {
         "focus",
         action_focus,
         NULL,
@@ -733,6 +738,12 @@ void action_execute(union ActionData *data)
             g_warning("failed to convert '%s' from utf8", data->execute.path);
         }
     }
+}
+
+void action_activate(union ActionData *data)
+{
+    if (data->client.c)
+        client_activate(data->client.c);
 }
 
 void action_focus(union ActionData *data)

@@ -184,7 +184,6 @@ def state_above(data, add=2):
     window = OBClient_window(client)
     above = OBProperty_atom(Openbox_property(openbox),
                             OBProperty_net_wm_state_above)
-    print above
     send_client_msg(root, OBProperty_net_wm_state, window, add,
                     above)
     
@@ -196,9 +195,19 @@ def state_below(data, add=2):
     window = OBClient_window(client)
     below = OBProperty_atom(Openbox_property(openbox),
                             OBProperty_net_wm_state_below)
-    print below
     send_client_msg(root, OBProperty_net_wm_state, window, add,
                     below)
+    
+def state_shaded(data, add=2):
+    """Toggles, adds or removes the 'shaded' state on a window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    shaded = OBProperty_atom(Openbox_property(openbox),
+                            OBProperty_net_wm_state_shaded)
+    send_client_msg(root, OBProperty_net_wm_state, window, add,
+                    shaded)
     
 #########################################
 ### Convenience functions for scripts ###

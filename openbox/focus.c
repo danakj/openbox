@@ -245,6 +245,8 @@ static void popup_cycle(Client *c, gboolean show)
         popup_hide(focus_cycle_popup);
     } else {
         Rect *a;
+        Client *p = c;
+        char *title;
 
         a = screen_area(c->desktop);
         popup_position(focus_cycle_popup, CenterGravity,
@@ -257,8 +259,22 @@ static void popup_cycle(Client *c, gboolean show)
          */
         popup_size(focus_cycle_popup, 320, 48);
 
-        popup_show(focus_cycle_popup, (c->iconic ? c->icon_title : c->title),
-                   client_icon(c, 48, 48));
+        /* use the transient's parent's title/icon */
+        while (p->transient_for && p->transient_for != TRAN_GROUP)
+            p = p->transient_for;
+
+        if (p == c)
+            title = NULL;
+        else
+            title = g_strconcat((p->iconic ? p->icon_title : p->title),
+                                " - ",
+                                (c->iconic ? c->icon_title : c->title),
+                                NULL);
+
+        popup_show(focus_cycle_popup,
+                   (title ? title : (c->iconic ? c->icon_title : c->title)),
+                   client_icon(p, 48, 48));
+        g_free(title);
     }
 }
 
@@ -278,22 +294,8 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             frame_adjust_focus(focus_client->frame, TRUE);
         goto done_cycle;
     } else if (done) {
-        if (focus_cycle_target) {
-            Client *t;
-
-            /* actually focus a transient */
-
-            /* fist, try for a modal */
-            t = client_focus_target(focus_cycle_target);
-            if (t != focus_cycle_target)
-                focus_cycle_target = t;
-            else
-                /* just grab the deepest transient you can find */
-                while (focus_cycle_target->transients)
-                    focus_cycle_target = focus_cycle_target->transients->data;
-
+        if (focus_cycle_target)
             client_activate(focus_cycle_target);
-        }
         goto done_cycle;
     }
     if (!first)
@@ -320,7 +322,7 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         }
         /*ft = client_focus_target(it->data);*/
         ft = it->data;
-        if (ft->transient_for == NULL && client_normal(ft) &&
+        if (ft->transients == NULL && client_normal(ft) &&
             client_can_focus(ft)) {
             if (ft != focus_cycle_target) { /* prevents flicker */
                 if (focus_cycle_target)

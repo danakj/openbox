@@ -493,8 +493,9 @@ Client *client_search_focus_tree(Client *self);
 */
 Client *client_search_focus_tree_full(Client *self);
 
-/*! Return a modal child of the client window
-    @return A modal child of the client window, or 0 if none was found.
+/*! Return a modal child of the client window that can be focused.
+    @return A modal child of the client window that can be focused, or 0 if
+            none was found.
 */
 Client *client_search_modal_child(Client *self);
 

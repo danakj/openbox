@@ -2254,6 +2254,7 @@ gboolean client_can_focus(Client *self)
            self->desktop == DESKTOP_ALL) &&
           !self->iconic))
 	return FALSE;
+
     return TRUE;
 }
 

@@ -291,7 +291,8 @@ static gboolean event_ignore(XEvent *e, Client *client)
             gboolean fallback = TRUE;
 
             while (TRUE) {
-                if (!XCheckTypedEvent(ob_display, FocusOut, &fe))
+                if (!XCheckTypedWindowEvent(ob_display, FocusOut,
+                                            e->xfocus.window,&fe))
                     if (!XCheckTypedEvent(ob_display, FocusIn, &fe))
                         break;
                 if (fe.type == FocusOut) {

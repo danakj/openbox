@@ -122,13 +122,17 @@ static gboolean focus_under_pointer()
 
     if (ob_pointer_pos(&x, &y)) {
         for (it = stacking_list; it != NULL; it = it->next) {
-            Client *c = it->data;
-            if (c->desktop == screen_desktop &&
-                RECT_CONTAINS(c->frame->area, x, y))
-                break;
+            if (WINDOW_IS_CLIENT(it->data)) {
+                Client *c = WINDOW_AS_CLIENT(it->data);
+                if (c->desktop == screen_desktop &&
+                    RECT_CONTAINS(c->frame->area, x, y))
+                    break;
+            }
         }
-        if (it != NULL)
+        if (it != NULL) {
+            g_assert(WINDOW_IS_CLIENT(it->data));
             return client_normal(it->data) && client_focus(it->data);
+        }
     }
     return FALSE;
 }

@@ -338,7 +338,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 		  self->client->area.width +
 		  self->size.left + self->size.right,
 		  (self->client->shaded ?
-                   ob_rr_theme->title_height + self->bwidth*2:
+                   ob_rr_theme->title_height + self->rbwidth * 2:
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 

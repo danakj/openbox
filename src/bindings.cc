@@ -37,9 +37,9 @@ void OBBindings::display()
     printf("Key Tree:\n");
     print_branch(_keytree.first_child, "");
   }
-  if (_mousetree.next_sibling) {
+  if (_mousetree) {
     printf("Mouse Tree:\n");
-    BindingTree *p = _mousetree.next_sibling;
+    BindingTree *p = _mousetree;
     while (p) {
       printf("%d %s\n", p->id, p->text.c_str());
       p = p->next_sibling;
@@ -180,19 +180,20 @@ bool OBBindings::add_mouse(const std::string &button, int id)
   if (!translate(button, n.binding, false))
     return false;
 
-  BindingTree *p = _mousetree.next_sibling, *last = &_mousetree;
+  BindingTree *p = _mousetree, **newp = &_mousetree;
   while (p) {
     if (p->binding == n.binding)
       return false; // conflict
-    last = p;
     p = p->next_sibling;
+    newp = &p->next_sibling;
   }
   display();
-  last->next_sibling = new BindingTree(id);
+  *newp = new BindingTree(id);
   display();
-  last->next_sibling->chain = false;
-  last->next_sibling->binding.key = n.binding.key;
-  last->next_sibling->binding.modifiers = n.binding.modifiers;
+  (*newp)->text = button;
+  (*newp)->chain = false;
+  (*newp)->binding.key = n.binding.key;
+  (*newp)->binding.modifiers = n.binding.modifiers;
  
   return true;
 }
@@ -319,13 +320,13 @@ void OBBindings::remove_all()
     remove_branch(_keytree.first_child);
     _keytree.first_child = 0;
   }
-  BindingTree *p = _mousetree.next_sibling;
+  BindingTree *p = _mousetree;
   while (p) {
     BindingTree *n = p->next_sibling;
     delete p;
     p = n;
   }
-  _mousetree.next_sibling = 0;
+  _mousetree = 0;
 }
 
 

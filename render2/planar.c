@@ -303,3 +303,34 @@ void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h)
     *w = 0;
     *h = 0;
 }
+
+void RrBevel(int x, int y, int w, int h, int bwidth, int inset, int raise)
+{
+    int offset = bwidth + inset;
+    h--; w--;
+
+    if (raise)
+        glColor4f(1.0, 1.0, 1.0, 0.25);
+    else
+        glColor4f(0.0, 0.0, 0.0, 0.25);
+
+    glBegin(GL_LINES);
+    glVertex2i(x + offset, y + offset);
+    glVertex2i(x + offset, y + h - offset);
+
+    glVertex2i(x + offset, y + h - offset);
+    glVertex2i(x + w - offset, y + h - offset);
+
+    if (!raise)
+        glColor4f(1.0, 1.0, 1.0, 0.25);
+    else
+        glColor4f(0.0, 0.0, 0.0, 0.25);
+
+    glVertex2i(x + w - offset, y + h - offset);
+    glVertex2i(x + w - offset,  y + offset);
+               
+    glVertex2i(x + w - offset, y + offset);
+    glVertex2i(x + offset, y + offset);
+    glEnd();
+}
+

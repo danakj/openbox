@@ -102,40 +102,24 @@ void RrPaint(struct RrSurface *sur)
 
     switch (RrPlanarBevelType(sur)) {
     case RR_SUNKEN_OUTER:
-        glBegin(GL_LINES);
-        glEnd();
+        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
+                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
+                0, 0, 0);
     break;
     case RR_SUNKEN_INNER:
-        glBegin(GL_LINES);
-        glEnd();
+        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
+                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
+                0, 1, 0);
     break;
     case RR_RAISED_OUTER:
-        glColor4f(1.0, 1.0, 1.0, 0.25);
-        glBegin(GL_LINES);
-        glVertex2i(RrSurfaceX(sur) + 1, RrSurfaceY(sur) + 1);
-        glVertex2i(RrSurfaceX(sur) + 1,
-                   RrSurfaceY(sur) + RrSurfaceHeight(sur) - 2);
-
-
-        glVertex2i(RrSurfaceX(sur) + 1,
-                   RrSurfaceY(sur) + RrSurfaceHeight(sur) - 2);
-        glVertex2i(RrSurfaceX(sur) + RrSurfaceWidth(sur) - 2,
-                   RrSurfaceY(sur) + RrSurfaceHeight(sur) - 2);
-
-        glColor4f(0.0, 0.0, 0.0, 0.25);
-        glVertex2i(RrSurfaceX(sur) + RrSurfaceWidth(sur) - 2,
-                   RrSurfaceY(sur) + RrSurfaceHeight(sur) - 2);
-        glVertex2i(RrSurfaceX(sur) + RrSurfaceWidth(sur) - 2,
-                   RrSurfaceY(sur) + 1);
-
-        glVertex2i(RrSurfaceX(sur) + RrSurfaceWidth(sur) - 2,
-                   RrSurfaceY(sur) + 1);
-        glVertex2i(RrSurfaceX(sur) + 1, RrSurfaceY(sur) + 1);
-        glEnd();
+        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
+                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
+                0, 0, 1);
     break;
     case RR_RAISED_INNER:
-        glBegin(GL_LINES);
-        glEnd();
+        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
+                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
+                0, 1, 1);
     break;
     case RR_BEVEL_NONE:
     break;

@@ -26,13 +26,13 @@ void python_init(char *argv0)
   // initialize the C python module
   init_otk();
   init_ob();
-  // include the openbox directories for python scripts in the sys path
+  // prepend the openbox directories for python scripts to the sys path
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString(const_cast<char*>(("sys.path.append('" +
+  PyRun_SimpleString("sys.path.insert('0, " SCRIPTDIR "')");
+  PyRun_SimpleString(const_cast<char*>(("sys.path.insert(0, '" +
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
-  PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
-  PyRun_SimpleString("import ob; import otk; import config;");
+  PyRun_SimpleString("import ob; import otk;");// import config;");
   // set up convenience global variables
   PyRun_SimpleString("ob.openbox = ob.Openbox_instance()");
   PyRun_SimpleString("otk.display = otk.Display_instance()");

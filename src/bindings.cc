@@ -32,13 +32,13 @@ static void print_branch(BindingTree *first, std::string str)
 
 void OBBindings::display()
 {
-  if (_bindings.first_child)
-    print_branch(_bindings.first_child, "");
+  if (_tree.first_child)
+    print_branch(_tree.first_child, "");
 }
 
 
 
-static bool translate(const std::string str, Binding &b)
+bool OBBindings::translate(const std::string &str, Binding &b)
 {
   std::string::size_type keybegin = str.find_last_of('-');
   std::string key(str, keybegin != std::string::npos ? keybegin + 1 : 0);
@@ -52,13 +52,13 @@ static bool translate(const std::string str, Binding &b)
   return b.key != 0;
 }
 
-static BindingTree *buildtree(const OBBindings::StringVect &keylist, int id)
+BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
 
   BindingTree *ret = new BindingTree(id), *p = 0;
 
-  OBBindings::StringVect::const_iterator it, end = keylist.end();
+  StringVect::const_iterator it, end = keylist.end();
   for (it = keylist.begin(); it != end; ++it) {
     if (p)
       p = p->first_child = new BindingTree(id);
@@ -129,6 +129,7 @@ static void assimilate(BindingTree *parent, BindingTree *node)
 	// found an identical binding..
 	assert(node->chain && p->chain);
 	delete node; // kill the one we aren't using
+        printf("using existing node\n");
 	break;
       }
     }
@@ -136,6 +137,7 @@ static void assimilate(BindingTree *parent, BindingTree *node)
       // couldn't find an existing binding, use this new one, and insert it
       // into the list
       p = lastsib->next_sibling = node;
+      printf("inserting %s\n", p->text.c_str());
     }
     nextparent = p;
   }
@@ -145,9 +147,9 @@ static void assimilate(BindingTree *parent, BindingTree *node)
 }
 
 
-static int find_bind(BindingTree *tree, BindingTree *search) {
+int OBBindings::find(BindingTree *search) {
   BindingTree *a, *b;
-  a = tree;
+  a = _tree;
   b = search;
   while (a && b) {
     if (a->binding != b->binding) {
@@ -204,14 +206,14 @@ bool OBBindings::add(const StringVect &keylist, int id)
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
-  if (find_bind(_bindings.first_child, tree) < -1) {
+  if (find_bind(_tree.first_child, tree) < -1) {
     // conflicts with another binding
     destroytree(tree);
     return false;
   }
 
   // assimilate this built tree into the main tree
-  assimilate(&_bindings, tree); // assimilation destroys/uses the tree
+  assimilate(&_tree, tree); // assimilation destroys/uses the tree
   return true;
 }
 
@@ -224,7 +226,7 @@ int OBBindings::find(const StringVect &keylist)
   if (!(tree = buildtree(keylist, 0)))
     return false; // invalid binding requested
 
-  ret = find_bind(_bindings.first_child, tree) >= 0;
+  ret = find_bind(_tree.first_child, tree) >= 0;
 
   destroytree(tree);
 
@@ -255,8 +257,8 @@ static void remove_branch(BindingTree *first)
 
 void OBBindings::remove_all()
 {
-  if (_bindings.first_child)
-    remove_branch(_bindings.first_child);
+  if (_tree.first_child)
+    remove_branch(_tree.first_child);
 }
 
 }

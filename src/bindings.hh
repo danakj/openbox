@@ -46,8 +46,12 @@ public:
   typedef std::vector<std::string> StringVect;
 
 private:
-  BindingTree _bindings;// root nodes (these dont have siblings!)
+  BindingTree _tree;// root node of the tree (this doesn't have siblings!)
 
+  int find(BindingTree *search);
+  bool translate(const std::string &str, Binding &b);
+  BindingTree *buildtree(const StringVect &keylist, int id);
+ 
 public:
   //! Initializes an OBBinding object
   OBBindings();

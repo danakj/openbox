@@ -35,7 +35,7 @@ public:
     // xOr: this is crap.
   enum ActionType {
     noaction = 0,
-    execute,
+    execute, //done
     iconify, //done
     raise, //done
     lower, //done
@@ -46,6 +46,10 @@ public:
     moveWindowDown,
     moveWindowLeft,
     moveWindowRight,
+
+    toggleMaximizeFull,
+    toggleMaximizeVertical,
+    toggleMaximizeHorizontal,
 
     sendToWorkspace, //done
 

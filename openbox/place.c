@@ -193,10 +193,10 @@ typedef enum
     SMART_FOCUSED
 } ObSmartType;
 
-#define SMART_IGNORE(placer, c)                             \
-    (placer == c || c->shaded || !client_normal(c) ||       \
-     (c->desktop != DESKTOP_ALL &&                          \
-      c->desktop != (placer->desktop == DESKTOP_ALL ?       \
+#define SMART_IGNORE(placer, c) \
+    (placer == c || !c->visible || c->shaded || !client_normal(c) || \
+     (c->desktop != DESKTOP_ALL && \
+      c->desktop != (placer->desktop == DESKTOP_ALL ? \
                      screen_desktop : placer->desktop)))
 
 static gboolean place_smart(ObClient *client, gint *x, gint *y,

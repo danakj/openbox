@@ -1007,7 +1007,6 @@ static void event_handle_dockapp(DockApp *app, XEvent *e)
         dock_app_drag(app, &e->xmotion);
         break;
     case UnmapNotify:
-        g_message("Unmap");
 	if (app->ignore_unmaps) {
 	    app->ignore_unmaps--;
 	    break;
@@ -1015,7 +1014,6 @@ static void event_handle_dockapp(DockApp *app, XEvent *e)
 	dock_remove(app, TRUE);
 	break;
     case DestroyNotify:
-        g_message("Destroy");
 	dock_remove(app, FALSE);
 	break;
     case ReparentNotify:

@@ -421,7 +421,8 @@ const XWindow *screen::lastActiveWindow() const {
   // find a window if one exists
   WindowList::const_iterator it, end = _clients.end();
   for (it = _clients.begin(); it != end; ++it)
-    if ((*it)->getScreen() == this)
+    if ((*it)->getScreen() == this && ! (*it)->iconic() &&
+        ((*it)->desktop() == 0xffffffff || (*it)->desktop() == _active_desktop))
       return *it;
 
   // no windows on this screen

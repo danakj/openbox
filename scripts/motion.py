@@ -210,7 +210,6 @@ def _do_resize():
             _popwidget.setTexture(style.titlebarFocusBackground())
             _poplabel = otk.Label(_popwidget)
             _poplabel.setTexture(style.labelFocusBackground())
-            _popwidget.show(1)
         _poplabel.fitString(text)
         _poplabel.setText(text)
         area = otk.display.screenInfo(_screen).rect()
@@ -219,6 +218,7 @@ def _do_resize():
                                     _popwidget.width()) / 2,
                         area.y() + (area.height() -
                                     _popwidget.height()) / 2)
+        _popwidget.show(1)
 
 def resize(data):
     """Resizes the window interactively. This should only be used with

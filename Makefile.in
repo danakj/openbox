@@ -24,7 +24,7 @@ clean:
 	$(RM) *\~
 
 distclean: clean
-	$(RM) configure Makefile.incl
+	$(RM) configure Makefile.incl Makefile
 	$(RM) -r .deps/
 
 LIBTOOL_DEPS = @LIBTOOL_DEPS@

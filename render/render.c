@@ -6,6 +6,7 @@
 #include "font.h"
 #include "mask.h"
 #include "color.h"
+#include "image.h"
 #include "../kernel/openbox.h"
 
 int render_depth;
@@ -145,6 +146,11 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
             mask_draw(l->pixmap, &l->texture[i].data.mask,
                       &l->texture[i].position);
         break;
+        case RGBA:
+            image_draw(l->surface.data.planar.pixel_data, 
+                       &l->texture[i].data.rgba,
+                       &l->texture[i].position);
+        break;
         }
     }
     XSetWindowBackgroundPixmap(ob_display, win, l->pixmap);
@@ -172,7 +178,7 @@ Appearance *appearance_new(SurfaceType type, int numtex)
   out->surface.type = type;
   out->textures = numtex;
   out->xftdraw = NULL;
-  if (numtex) out->texture = g_new(Texture, numtex);
+  if (numtex) out->texture = g_new0(Texture, numtex);
   else out->texture = NULL;
   out->pixmap = None;
 

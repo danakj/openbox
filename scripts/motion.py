@@ -100,9 +100,9 @@ def _do_move():
         # use the area based on the struts
         area = ob.openbox.screen(_screen).area()
         l = area.left()
-        r = area.right() - w
+        r = area.right() - w + 1
         t = area.top()
-        b = area.bottom() - h
+        b = area.bottom() - h + 1
         # left screen edge
         if x < l and x >= l - edge_resistance:
             x = l

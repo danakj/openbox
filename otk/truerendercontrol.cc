@@ -130,9 +130,9 @@ void TrueRenderControl::drawGradientBackground(
     r = texture.borderColor().red();
     g = texture.borderColor().green();
     b = texture.borderColor().blue();
-    current = (r << 16)
-            + (g << 8)
-            + b;
+    current = (r << default_red_shift)
+            + (g << default_green_shift)
+            + (b << default_blue_shift);
     for (off = 0, x = 0; x < w; ++x, off++) {
       *(data + off) = current;
       *(data + off + ((h-1) * w)) = current;
@@ -199,9 +199,9 @@ void TrueRenderControl::verticalGradient(Surface &sf,
     r = texture.color().red() + (int)(dr * y);
     g = texture.color().green() + (int)(dg * y);
     b = texture.color().blue() + (int)(db * y);
-    current = (r << 16)
-            + (g << 8)
-            + b;
+    current = (r << default_red_shift)
+            + (g << default_green_shift)
+            + (b << default_blue_shift);
     for (int x = 0; x < sf.width(); ++x, ++data)
       *data = current;
   }
@@ -232,9 +232,9 @@ void TrueRenderControl::diagonalGradient(Surface &sf,
       r = texture.color().red() + ((int)(drx * x) + (int)(dry * y))/2;
       g = texture.color().green() + ((int)(dgx * x) + (int)(dgy * y))/2;
       b = texture.color().blue() + ((int)(dbx * x) + (int)(dby * y))/2;
-      current = (r << 16)
-              + (g << 8)
-              + b;
+      current = (r << default_red_shift)
+              + (g << default_green_shift)
+              + (b << default_blue_shift);
       *data = current;
     }
   }
@@ -264,9 +264,9 @@ void TrueRenderControl::crossDiagonalGradient(Surface &sf,
       r = texture.color().red() + ((int)(drx * (x-1)) + (int)(dry * y))/2;
       g = texture.color().green() + ((int)(dgx * (x-1)) + (int)(dgy * y))/2;
       b = texture.color().blue() + ((int)(dbx * (x-1)) + (int)(dby * y))/2;
-      current = (r << 16)
-              + (g << 8)
-              + b;
+      current = (r << default_red_shift)
+              + (g << default_green_shift)
+              + (b << default_blue_shift);
       *data = current;
     }
   }
@@ -283,11 +283,11 @@ void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
   case 16:
     for (y = 0; y < im->height; y++) {
       for (x = 0; x < im->width; x++) {
-        r = (data[x] >> 16) & 0xFF;
+        r = (data[x] >> default_red_shift) & 0xFF;
         r = r >> _red_shift;
-        g = (data[x] >> 8) & 0xFF;
+        g = (data[x] >> default_green_shift) & 0xFF;
         g = g >> _green_shift;
-        b = data[x] & 0xFF;
+        b = (data[x] >> default_blue_shift) & 0xFF;
         b = b >> _blue_shift;
         p[x] = (r << _red_offset) + (g << _green_offset) + (b << _blue_offset);
       }
@@ -312,24 +312,26 @@ void TrueRenderControl::highlight(pixel32 *x, pixel32 *y, bool raised) const
     up = y;
     down = x;
   }
-  r = (*up >> 16) & 0xFF;
+  r = (*up >> default_red_shift) & 0xFF;
   r += r >> 1;
-  g = (*up >> 8) & 0xFF;
+  g = (*up >> default_green_shift) & 0xFF;
   g += g >> 1;
-  b = *up & 0xFF;
+  b = (*up >> default_blue_shift) & 0xFF;
   b += b >> 1;
   if (r > 255) r = 255;
   if (g > 255) g = 255;
   if (b > 255) b = 255;
-  *up = (r << 16) + (g << 8) + b;
+  *up = (r << default_red_shift) + (g << default_green_shift)
+      + (b << default_blue_shift);
   
-  r = (*down >> 16) & 0xFF;
+  r = (*down >> default_red_shift) & 0xFF;
   r = (r >> 1) + (r >> 2);
-  g = (*down >> 8) & 0xFF;
+  g = (*down >> default_green_shift) & 0xFF;
   g = (g >> 1) + (g >> 2);
-  b = *down & 0xFF;
+  b = (*down >> default_blue_shift) & 0xFF;
   b = (b >> 1) + (b >> 2);
-  *down = (r << 16) + (g << 8) + b;
+  *down = (r << default_red_shift) + (g << default_green_shift)
+        + (b << default_blue_shift);
 }
 void TrueRenderControl::drawBackground(Surface& sf,
 				       const RenderTexture &texture) const

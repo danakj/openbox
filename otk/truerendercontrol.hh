@@ -26,7 +26,17 @@ typedef uint16_t pixel16;
 #else
 typedef u_int32_t pixel32;
 typedef u_int16_t pixel16;
-#endif
+#endif /* HAVE_STDINT_H */
+
+#ifdef WORDS_BIGENDIAN
+const int default_red_shift=0;
+const int default_green_shift=8;
+const int default_blue_shift=16;
+#else
+const int default_red_shift=16;
+const int default_green_shift=8;
+const int default_blue_shift=0;
+#endif /* WORDS_BIGENDIAN */
 
 class TrueRenderControl : public RenderControl {
 private:

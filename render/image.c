@@ -133,10 +133,10 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
 
     /* keep the ratio */
     dw = area->width;
-    dh = (int)(dw * ((double)sh / sw));
+    dh = (gint)(dw * ((gdouble)sh / sw));
     if (dh > area->height) {
         dh = area->height;
-        dw = (int)(dh * ((double)sw / sh));
+        dw = (gint)(dh * ((gdouble)sw / sh));
     }
 
     if (sw != dw || sh != dh) {

@@ -58,7 +58,7 @@ static void do_restack(GList *wins, GList *before)
 {
     GList *it, *next;
     Window *win;
-    int i;
+    gint i;
 
 #ifdef DEBUG
     /* pls only restack stuff in the same layer at a time */
@@ -106,7 +106,7 @@ static void do_raise(GList *wins)
 {
     GList *it;
     GList *layer[OB_NUM_STACKING_LAYERS] = {NULL};
-    int i;
+    gint i;
 
     for (it = wins; it; it = g_list_next(it)) {
         ObStackingLayer l;
@@ -133,7 +133,7 @@ static void do_lower(GList *wins)
 {
     GList *it;
     GList *layer[OB_NUM_STACKING_LAYERS] = {NULL};
-    int i;
+    gint i;
 
     for (it = wins; it; it = g_list_next(it)) {
         ObStackingLayer l;
@@ -161,7 +161,7 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
     GList *ret = NULL;
     GList *it, *next, *prev;
     GSList *sit;
-    int i, n;
+    gint i, n;
     GList *modals = NULL;
     GList *trans = NULL;
     GList *modal_sel = NULL; /* the selected guys if modal */
@@ -234,7 +234,7 @@ static GList *pick_group_windows(ObClient *top, ObClient *selected,
     GList *ret = NULL;
     GList *it, *next, *prev;
     GSList *sit;
-    int i, n;
+    gint i, n;
 
     /* add group members in their stacking order */
     if (top->group) {

@@ -23,6 +23,6 @@
 
 void ob_debug_show_output(gboolean enable);
 
-void ob_debug(char *a, ...);
+void ob_debug(gchar *a, ...);
 
 #endif

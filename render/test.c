@@ -26,19 +26,19 @@
 #include "render.h"
 #include <glib.h>
 
-static int x_error_handler(Display * disp, XErrorEvent * error)
+static gint x_error_handler(Display * disp, XErrorEvent * error)
 {
-	char buf[1024];
+	gchar buf[1024];
 	XGetErrorText(disp, error->error_code, buf, 1024);
 	printf("%s\n", buf);
 	return 0;
 }
 
 Display *ob_display;
-int ob_screen;
+gint ob_screen;
 Window ob_root;
 
-int main()
+gint main()
 {
 	Window win;
 	RrInstance *inst;
@@ -46,7 +46,7 @@ int main()
 
 	Window root;
 	XEvent report;
-	int h = 500, w = 500;
+	gint h = 500, w = 500;
 
 	ob_display = XOpenDisplay(NULL);
 	XSetErrorHandler(x_error_handler);

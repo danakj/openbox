@@ -114,11 +114,11 @@ void RrColorFree(RrColor *c)
 
 void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
-    int r, g, b;
-    int x,y;
+    gint r, g, b;
+    gint x,y;
     RrPixel32 *p32 = (RrPixel32 *) im->data;
     RrPixel16 *p16 = (RrPixel16 *) im->data;
-    unsigned char *p8 = (unsigned char *)im->data;
+    guchar *p8 = (guchar *)im->data;
     switch (im->bits_per_pixel) {
     case 32:
         if ((RrRedOffset(inst) != RrDefaultRedOffset) ||
@@ -136,7 +136,7 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
                 data += im->width;
                 p32 += im->width;
             } 
-        } else im->data = (char*) data;
+        } else im->data = (gchar*) data;
         break;
     case 16:
         for (y = 0; y < im->height; y++) {
@@ -186,13 +186,13 @@ XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b)
 
 static void swap_byte_order(XImage *im)
 {
-    int x, y, di;
+    gint x, y, di;
 
     di = 0;
     for (y = 0; y < im->height; ++y) {
         for (x = 0; x < im->height; ++x) {
-            char *c = &im->data[di + x * im->bits_per_pixel / 8];
-            char t;
+            gchar *c = &im->data[di + x * im->bits_per_pixel / 8];
+            gchar t;
 
             switch (im->bits_per_pixel) {
             case 32:
@@ -220,11 +220,11 @@ static void swap_byte_order(XImage *im)
 
 void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
-    int r, g, b;
-    int x,y;
+    gint r, g, b;
+    gint x,y;
     RrPixel32 *p32 = (RrPixel32 *) im->data;
     RrPixel16 *p16 = (RrPixel16 *) im->data;
-    unsigned char *p8 = (unsigned char *)im->data;
+    guchar *p8 = (guchar *)im->data;
 
     if (im->byte_order != LSBFirst)
         swap_byte_order(im);
@@ -286,17 +286,17 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     }
 }
 
-int RrColorRed(const RrColor *c)
+gint RrColorRed(const RrColor *c)
 {
     return c->r;
 }
 
-int RrColorGreen(const RrColor *c)
+gint RrColorGreen(const RrColor *c)
 {
     return c->g;
 }
 
-int RrColorBlue(const RrColor *c)
+gint RrColorBlue(const RrColor *c)
 {
     return c->b;
 }

@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static guint translate_modifier(char *str)
+static guint translate_modifier(gchar *str)
 {
     if (!g_ascii_strcasecmp("Mod1", str) ||
         !g_ascii_strcasecmp("A", str)) return Mod1Mask;
@@ -41,9 +41,9 @@ static guint translate_modifier(char *str)
 
 gboolean translate_button(const gchar *str, guint *state, guint *button)
 {
-    char **parsed;
-    char *l;
-    int i;
+    gchar **parsed;
+    gchar *l;
+    gint i;
     gboolean ret = FALSE;
 
     parsed = g_strsplit(str, "-", -1);
@@ -84,9 +84,9 @@ translation_fail:
 
 gboolean translate_key(const gchar *str, guint *state, guint *keycode)
 {
-    char **parsed;
-    char *l;
-    int i;
+    gchar **parsed;
+    gchar *l;
+    gint i;
     gboolean ret = FALSE;
     KeySym sym;
 

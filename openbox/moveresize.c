@@ -38,8 +38,8 @@ ObClient *moveresize_client = NULL;
 
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
-static int start_x, start_y, start_cx, start_cy, start_cw, start_ch;
-static int cur_x, cur_y;
+static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
+static gint cur_x, cur_y;
 static guint button;
 static guint32 corner;
 static ObCorner lockcorner;
@@ -72,9 +72,9 @@ void moveresize_shutdown(gboolean reconfig)
     popup = NULL;
 }
 
-static void popup_coords(ObClient *c, char *format, int a, int b)
+static void popup_coords(ObClient *c, gchar *format, gint a, gint b)
 {
-    char *text;
+    gchar *text;
 
     text = g_strdup_printf(format, a, b);
     popup_position(popup, CenterGravity,
@@ -86,7 +86,7 @@ static void popup_coords(ObClient *c, char *format, int a, int b)
     g_free(text);
 }
 
-void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
+void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 {
     ObCursor cur;
 
@@ -297,7 +297,7 @@ void moveresize_event(XEvent *e)
             moveresize_end(FALSE);
         else {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
-                int dx = 0, dy = 0, ox = cur_x, oy = cur_y;
+                gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
 
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
                     dx = MAX(4, moveresize_client->size_inc.width);
@@ -329,8 +329,8 @@ void moveresize_event(XEvent *e)
                 start_x += dx - (cur_x - ox);
                 start_y += dy - (cur_y - oy);
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
-                int dx = 0, dy = 0, ox = cur_x, oy = cur_y;
-                int opx, px, opy, py;
+                gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
+                gint opx, px, opy, py;
 
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
                     dx = 4;

@@ -42,7 +42,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self);
 static void menu_frame_render(ObMenuFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
 
-static Window createWindow(Window parent, unsigned long mask,
+static Window createWindow(Window parent, gulong mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,

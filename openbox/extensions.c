@@ -22,19 +22,19 @@ See the COPYING file for a copy of the GNU General Public License.
 #include "screen.h"
 
 gboolean extensions_xkb       = FALSE;
-int      extensions_xkb_event_basep;
+gint     extensions_xkb_event_basep;
 gboolean extensions_shape     = FALSE;
-int      extensions_shape_event_basep;
+gint     extensions_shape_event_basep;
 gboolean extensions_xinerama  = FALSE;
-int      extensions_xinerama_event_basep;
+gint     extensions_xinerama_event_basep;
 gboolean extensions_randr     = FALSE;
-int      extensions_randr_event_basep;
+gint     extensions_randr_event_basep;
 gboolean extensions_vidmode   = FALSE;
-int      extensions_vidmode_event_basep;
+gint     extensions_vidmode_event_basep;
 
 void extensions_query_all()
 {
-    int junk;
+    gint junk;
     (void)junk;
      
 #ifdef XKB

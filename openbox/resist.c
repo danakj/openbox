@@ -49,7 +49,7 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
     if (config_resist_win)
         for (it = stacking_list; it != NULL; it = it->next) {
             ObClient *target;
-            int tl, tt, tr, tb; /* 1 past the target's edges on each side */
+            gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
             if (!WINDOW_IS_CLIENT(it->data))
                 continue;

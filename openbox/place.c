@@ -59,7 +59,7 @@ static Rect* pick_head(ObClient *c)
 
 static gboolean place_random(ObClient *client, gint *x, gint *y)
 {
-    int l, r, t, b;
+    gint l, r, t, b;
     Rect *area;
 
     area = pick_head(client);
@@ -345,7 +345,7 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
         } else {
             GSList *it;
             gboolean first = TRUE;
-            int l, r, t, b;
+            gint l, r, t, b;
             for (it = client->group->members; it; it = it->next) {
                 ObClient *m = it->data;
                 if (!(m == client || m->transient_for)) {

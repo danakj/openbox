@@ -39,7 +39,7 @@ static void pixel_data_to_pixmap(RrAppearance *l,
 
 void RrPaint(RrAppearance *a, Window win, gint w, gint h)
 {
-    int i, transferred = 0, sw;
+    gint i, transferred = 0, sw;
     RrPixel32 *source, *dest;
     Pixmap oldp;
     RrRect tarea; /* area in which to draw textures */
@@ -278,7 +278,7 @@ static void pixel_data_to_pixmap(RrAppearance *l,
    as reduce_depth just sets im->data = data and returns
 */
     scratch = g_new(RrPixel32, im->width * im->height);
-    im->data = (char*) scratch;
+    im->data = (gchar*) scratch;
     RrReduceDepth(l->inst, in, im);
     XPutImage(RrDisplay(l->inst), out,
               DefaultGC(RrDisplay(l->inst), RrScreen(l->inst)),

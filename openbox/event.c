@@ -73,17 +73,17 @@ static gboolean menu_hide_delay_func(gpointer data);
 Time event_lasttime = 0;
 
 /*! The value of the mask for the NumLock modifier */
-unsigned int NumLockMask;
+guint NumLockMask;
 /*! The value of the mask for the ScrollLock modifier */
-unsigned int ScrollLockMask;
+guint ScrollLockMask;
 /*! The key codes for the modifier keys */
 static XModifierKeymap *modmap;
 /*! Table of the constant modifier masks */
-static const int mask_table[] = {
+static const gint mask_table[] = {
     ShiftMask, LockMask, ControlMask, Mod1Mask,
     Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
 };
-static int mask_table_size;
+static gint mask_table_size;
 
 static guint ignore_enter_focus = 0;
 
@@ -92,7 +92,7 @@ static gboolean menu_can_hide;
 static ObClient *focus_in, *focus_out;
 
 #ifdef USE_SM
-static void ice_handler(int fd, gpointer conn)
+static void ice_handler(gint fd, gpointer conn)
 {
     Bool b;
     IceProcessMessages(conn, NULL, &b);
@@ -249,7 +249,7 @@ static void event_set_lasttime(XEvent *e)
 static void event_hack_mods(XEvent *e)
 {
     KeyCode *kp;
-    int i, k;
+    gint i, k;
 
     switch (e->type) {
     case ButtonPress:
@@ -360,7 +360,7 @@ static void event_done(gpointer data)
     if (focus_client != last) {
         if (!focus_client) {
             Window w;
-            int r;
+            gint r;
 
             /* is focus anywhere valid? */
             XGetInputFocus(ob_display, &w, &r);
@@ -498,11 +498,11 @@ static void event_handle_root(XEvent *e)
 
         msgtype = e->xclient.message_type;
         if (msgtype == prop_atoms.net_current_desktop) {
-            unsigned int d = e->xclient.data.l[0];
+            guint d = e->xclient.data.l[0];
             if (d < screen_num_desktops)
                 screen_set_desktop(d);
         } else if (msgtype == prop_atoms.net_number_of_desktops) {
-            unsigned int d = e->xclient.data.l[0];
+            guint d = e->xclient.data.l[0];
             if (d > 0)
                 screen_set_num_desktops(d);
         } else if (msgtype == prop_atoms.net_showing_desktop) {
@@ -561,7 +561,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
-    int i=0;
+    gint i=0;
     ObFrameContext con;
      
     switch (e->type) {
@@ -746,7 +746,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
                                                CWX | CWY |
                                                CWBorderWidth)) {
-            int x, y, w, h;
+            gint x, y, w, h;
             ObCorner corner;
 
             if (e->xconfigurerequest.value_mask & CWBorderWidth)
@@ -762,12 +762,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 e->xconfigurerequest.height : client->area.height;
 
             {
-                int newx = x;
-                int newy = y;
-                int fw = w +
-                    client->frame->size.left + client->frame->size.right;
-                int fh = h +
-                    client->frame->size.top + client->frame->size.bottom;
+                gint newx = x;
+                gint newy = y;
+                gint fw = w +
+                     client->frame->size.left + client->frame->size.right;
+                gint fh = h +
+                     client->frame->size.top + client->frame->size.bottom;
                 client_find_onscreen(client, &newx, &newy, fw, fh,
                                      client_normal(client));
                 if (e->xconfigurerequest.value_mask & CWX)
@@ -930,8 +930,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                  e->xclient.data.l[2]);
             }
         } else if (msgtype == prop_atoms.net_moveresize_window) {
-            int oldg = client->gravity;
-            int tmpg, x, y, w, h;
+            gint oldg = client->gravity;
+            gint tmpg, x, y, w, h;
 
             if (e->xclient.data.l[0] & 0xff)
                 tmpg = e->xclient.data.l[0] & 0xff;
@@ -957,12 +957,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client->gravity = tmpg;
 
             {
-                int newx = x;
-                int newy = y;
-                int fw = w +
-                    client->frame->size.left + client->frame->size.right;
-                int fh = h +
-                    client->frame->size.top + client->frame->size.bottom;
+                gint newx = x;
+                gint newy = y;
+                gint fw = w +
+                     client->frame->size.left + client->frame->size.right;
+                gint fh = h +
+                     client->frame->size.top + client->frame->size.bottom;
                 client_find_onscreen(client, &newx, &newy, fw, fh,
                                      client_normal(client));
                 if (e->xclient.data.l[0] & 1 << 8)

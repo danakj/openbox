@@ -54,7 +54,7 @@ guint    screen_last_desktop;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
 DesktopLayout screen_desktop_layout;
-char   **screen_desktop_names;
+gchar  **screen_desktop_names;
 Window   screen_support_win;
 
 static Rect  **area; /* array of desktop holding array of xinerama areas */
@@ -64,7 +64,7 @@ static ObPagerPopup *desktop_cycle_popup;
 
 static gboolean replace_wm()
 {
-    char *wm_sn;
+    gchar *wm_sn;
     Atom wm_sn_atom;
     Window current_wm_sn_owner;
     Time timestamp;
@@ -281,7 +281,7 @@ void screen_startup(gboolean reconfig)
         screen_resize();
 
     /* set the names */
-    screen_desktop_names = g_new(char*,
+    screen_desktop_names = g_new(gchar*,
                                  g_slist_length(config_desktops_names) + 1);
     for (i = 0, it = config_desktops_names; it; ++i, it = it->next)
         screen_desktop_names[i] = it->data; /* dont strdup */
@@ -336,8 +336,8 @@ void screen_shutdown(gboolean reconfig)
 
 void screen_resize()
 {
-    static int oldw = 0, oldh = 0;
-    int w, h;
+    static gint oldw = 0, oldh = 0;
+    gint w, h;
     GList *it;
     guint32 geometry[2];
 
@@ -850,7 +850,7 @@ void screen_update_desktop_names()
     else
         i = 0;
     if (i <= screen_num_desktops) {
-        screen_desktop_names = g_renew(char*, screen_desktop_names,
+        screen_desktop_names = g_renew(gchar*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
         for (; i < screen_num_desktops; ++i)
@@ -1190,10 +1190,10 @@ void screen_set_root_cursor()
                       ob_cursor(OB_CURSOR_POINTER));
 }
 
-gboolean screen_pointer_pos(int *x, int *y)
+gboolean screen_pointer_pos(gint *x, gint *y)
 {
     Window w;
-    int i;
+    gint i;
     guint u;
 
     return !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),

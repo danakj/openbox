@@ -163,13 +163,13 @@ ObFrameContext frame_context(struct _ObClient *self, Window win);
   be positioned.
   @return The proper coordinates for the frame, based on the client.
 */
-void frame_client_gravity(ObFrame *self, int *x, int *y);
+void frame_client_gravity(ObFrame *self, gint *x, gint *y);
 
 /*! Reversly applies gravity to the frame's position to find where the client
   should be positioned.
     @return The proper coordinates for the client, based on the frame.
 */
-void frame_frame_gravity(ObFrame *self, int *x, int *y);
+void frame_frame_gravity(ObFrame *self, gint *x, gint *y);
 
 void frame_flash_start(ObFrame *self);
 void frame_flash_stop(ObFrame *self);

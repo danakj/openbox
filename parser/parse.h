@@ -37,34 +37,34 @@ gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */
 gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
 
-void parse_register(ObParseInst *inst, const char *tag,
+void parse_register(ObParseInst *inst, const gchar *tag,
                     ParseCallback func, gpointer data);
 void parse_tree(ObParseInst *inst, xmlDocPtr doc, xmlNodePtr node);
 
 
 /* open/close */
 
-gboolean parse_load(const char *path, const char *rootname,
+gboolean parse_load(const gchar *path, const gchar *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root);
-gboolean parse_load_mem(gpointer data, guint len, const char *rootname,
+gboolean parse_load_mem(gpointer data, guint len, const gchar *rootname,
                         xmlDocPtr *doc, xmlNodePtr *root);
 void parse_close(xmlDocPtr doc);
 
 
 /* helpers */
 
-xmlNodePtr parse_find_node(const char *tag, xmlNodePtr node);
+xmlNodePtr parse_find_node(const gchar *tag, xmlNodePtr node);
 
-char *parse_string(xmlDocPtr doc, xmlNodePtr node);
-int parse_int(xmlDocPtr doc, xmlNodePtr node);
+gchar *parse_string(xmlDocPtr doc, xmlNodePtr node);
+gint parse_int(xmlDocPtr doc, xmlNodePtr node);
 gboolean parse_bool(xmlDocPtr doc, xmlNodePtr node);
 
-gboolean parse_contains(const char *val, xmlDocPtr doc, xmlNodePtr node);
-gboolean parse_attr_contains(const char *val, xmlNodePtr node,
-                             const char *name);
+gboolean parse_contains(const gchar *val, xmlDocPtr doc, xmlNodePtr node);
+gboolean parse_attr_contains(const gchar *val, xmlNodePtr node,
+                             const gchar *name);
 
-gboolean parse_attr_string(const char *name, xmlNodePtr node, char **value);
-gboolean parse_attr_int(const char *name, xmlNodePtr node, int *value);
+gboolean parse_attr_string(const gchar *name, xmlNodePtr node, gchar **value);
+gboolean parse_attr_int(const gchar *name, xmlNodePtr node, gint *value);
 
 /* paths */
 

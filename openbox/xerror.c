@@ -23,12 +23,12 @@
 static gboolean xerror_ignore = FALSE;
 gboolean xerror_occured = FALSE;
 
-int xerror_handler(Display *d, XErrorEvent *e)
+gint xerror_handler(Display *d, XErrorEvent *e)
 {
     xerror_occured = TRUE;
 #ifdef DEBUG
     if (!xerror_ignore) {
-        char errtxt[128];
+        gchar errtxt[128];
 	  
         /*if (e->error_code != BadWindow) */
         {

@@ -46,7 +46,7 @@ static gboolean flash_timeout(gpointer data);
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 
-static Window createWindow(Window parent, unsigned long mask,
+static Window createWindow(Window parent, gulong mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
@@ -58,7 +58,7 @@ static Window createWindow(Window parent, unsigned long mask,
 ObFrame *frame_new()
 {
     XSetWindowAttributes attrib;
-    unsigned long mask;
+    gulong mask;
     ObFrame *self;
 
     self = g_new0(ObFrame, 1);
@@ -215,7 +215,7 @@ void frame_adjust_theme(ObFrame *self)
 void frame_adjust_shape(ObFrame *self)
 {
 #ifdef SHAPE
-    int num;
+    gint num;
     XRectangle xrect[2];
 
     if (!self->client->shaped) {
@@ -552,8 +552,8 @@ void frame_release_client(ObFrame *self, ObClient *client)
 
 static void layout_title(ObFrame *self)
 {
-    char *lc;
-    int x;
+    gchar *lc;
+    gint x;
     gboolean n, d, i, l, m, c, s;
 
     n = d = i = l = m = c = s = FALSE;
@@ -755,7 +755,7 @@ ObFrameContext frame_context(ObClient *client, Window win)
     return OB_FRAME_CONTEXT_NONE;
 }
 
-void frame_client_gravity(ObFrame *self, int *x, int *y)
+void frame_client_gravity(ObFrame *self, gint *x, gint *y)
 {
     /* horizontal */
     switch (self->client->gravity) {
@@ -810,7 +810,7 @@ void frame_client_gravity(ObFrame *self, int *x, int *y)
     }
 }
 
-void frame_frame_gravity(ObFrame *self, int *x, int *y)
+void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
 {
     /* horizontal */
     switch (self->client->gravity) {

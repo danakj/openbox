@@ -565,9 +565,9 @@ void ob_main_loop_fd_remove(ObMainLoop *loop,
 #define NEAREST_TIMEOUT(loop) \
     (((ObMainLoopTimer*)(loop)->timers->data)->timeout)
 
-static long timecompare(GTimeVal *a, GTimeVal *b)
+static glong timecompare(GTimeVal *a, GTimeVal *b)
 {
-    long r;
+    glong r;
 
     if ((r = b->tv_sec - a->tv_sec)) return r;
     return b->tv_usec - a->tv_usec;

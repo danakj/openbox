@@ -82,7 +82,7 @@ struct _ObClient
     struct _ObFrame *frame;
 
     /*! The number of unmap events to ignore on the window */
-    int ignore_unmaps;
+    gint ignore_unmaps;
 
     /*! The id of the group the window belongs to */
     struct _ObGroup *group;
@@ -165,11 +165,11 @@ struct _ObClient
     /*! The minimum aspect ratio the client window can be sized to.
       A value of 0 means this is ignored.
     */
-    float min_ratio;
+    gfloat min_ratio;
     /*! The maximum aspect ratio the client window can be sized to.
       A value of 0 means this is ignored.
     */
-    float max_ratio;
+    gfloat max_ratio;
   
     /*! The minimum size of the client window
       If the min is > the max, then the window is not resizable
@@ -192,11 +192,11 @@ struct _ObClient
   
     /*! Where to place the decorated window in relation to the undecorated
       window */
-    int gravity;
+    gint gravity;
 
     /*! The state of the window, one of WithdrawnState, IconicState, or
       NormalState */
-    long wmstate;
+    glong wmstate;
 
     /*! True if the client supports the delete_window protocol */
     gboolean delete_window;
@@ -333,7 +333,7 @@ gboolean client_focused(ObClient *self);
                      the position changed.
 */
 void client_configure_full(ObClient *self, ObCorner anchor,
-                           int x, int y, int w, int h,
+                           gint x, gint y, gint w, gint h,
                            gboolean user, gboolean final,
                            gboolean force_reply);
 
@@ -350,7 +350,7 @@ void client_reconfigure(ObClient *self);
               struts if possible.
   @return true if the client was moved to be on-screen; false if not.
 */
-gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
+gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
                               gboolean rude);
 
 /*! Moves a client so that it is on screen if it is entirely out of the
@@ -367,8 +367,8 @@ void client_move_onscreen(ObClient *self, gboolean rude);
             be returned to normal state.
   @param savearea true to have the client's current size and position saved;
                   otherwise, they are not. You should not save when mapping a
-		  new window that is set to fullscreen. This has no effect
-		  when restoring a window from fullscreen.
+                  new window that is set to fullscreen. This has no effect
+                  when restoring a window from fullscreen.
 */
 void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea);
 
@@ -377,7 +377,7 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea);
                 restored.
   @param curdesk If iconic is FALSE, then this determines if the window will
                  be uniconified to the current viewable desktop (true) or to
-		 its previous desktop (false)
+                 its previous desktop (false)
 */
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk);
 
@@ -387,11 +387,11 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk);
   @param dir 0 to set both horz and vert, 1 to set horz, 2 to set vert.
   @param savearea true to have the client's current size and position saved;
                   otherwise, they are not. You should not save when mapping a
-		  new window that is set to fullscreen. This has no effect
-		  when unmaximizing a window.
+                  new window that is set to fullscreen. This has no effect
+                  when unmaximizing a window.
 */
-void client_maximize(ObClient *self, gboolean max, int dir,
-		     gboolean savearea);
+void client_maximize(ObClient *self, gboolean max, gint dir,
+                     gboolean savearea);
 
 /*! Shades or unshades the client window
   @param shade true if the window should be shaded; false if it should be
@@ -418,7 +418,7 @@ void client_set_desktop(ObClient *self, guint target, gboolean donthide);
 gboolean client_validate(ObClient *self);
 
 /*! Sets the wm_state to the specified value */
-void client_set_wm_state(ObClient *self, long state);
+void client_set_wm_state(ObClient *self, glong state);
 
 /*! Adjusts the window's net_state
   This should not be called as part of the window mapping process! It is for
@@ -426,7 +426,7 @@ void client_set_wm_state(ObClient *self, long state);
   client_apply_startup_state is used to do the same things during the mapping
   process.
 */
-void client_set_state(ObClient *self, Atom action, long data1, long data2);
+void client_set_state(ObClient *self, Atom action, glong data1, glong data2);
 
 /* Given a ObClient, find the client that focus would actually be sent to if
    you wanted to give focus to the specified ObClient. Will return the same
@@ -505,7 +505,7 @@ void client_setup_decor_and_functions(ObClient *self);
 /*! Retrieves the window's type and sets ObClient->type */
 void client_get_type(ObClient *self);
 
-const ObClientIcon *client_icon(ObClient *self, int w, int h);
+const ObClientIcon *client_icon(ObClient *self, gint w, gint h);
 
 /*! Searches a client's direct parents for a focused window. The function does
   not check for the passed client, only for *ONE LEVEL* of its parents.
@@ -545,14 +545,14 @@ ObClient *client_search_transient(ObClient *self, ObClient *search);
 ObClient *client_find_directional(ObClient *c, ObDirection dir);
 
 /*! Return the closest edge in the given direction */
-int client_directional_edge_search(ObClient *c, ObDirection dir);
+gint client_directional_edge_search(ObClient *c, ObDirection dir);
 
 /*! Set a client window to be above/below other clients.
   @layer < 0 indicates the client should be placed below other clients.<br>
          = 0 indicates the client should be placed with other clients.<br>
          > 0 indicates the client should be placed above other clients.
 */
-void client_set_layer(ObClient *self, int layer);
+void client_set_layer(ObClient *self, gint layer);
 
 /*! Set a client window to have decorations or not */
 void client_set_undecorated(ObClient *self, gboolean undecorated);

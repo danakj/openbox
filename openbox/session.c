@@ -25,7 +25,7 @@
 
 GList *session_saved_state;
 
-void session_startup(int *argc, char ***argv) {}
+void session_startup(gint *argc, gchar ***argv) {}
 void session_shutdown() {}
 GList* session_state_find(ObClient *c) { return NULL; }
 gboolean session_state_cmp(ObSessionState *s, ObClient *c) { return FALSE; }
@@ -62,11 +62,11 @@ static gint        sm_argc;
 static gchar     **sm_argv;
 static gchar      *sm_sessions_path;
 
-static void session_load(char *path);
+static void session_load(gchar *path);
 static gboolean session_save();
 
-static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
-                             Bool shutdown, int interact_style, Bool fast);
+static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
+                             Bool shutdown, gint interact_style, Bool fast);
 static void sm_die(SmcConn conn, SmPointer data);
 static void sm_save_complete(SmcConn conn, SmPointer data);
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data);
@@ -112,18 +112,18 @@ static void save_commands()
     g_free(prop_cmd.vals);
 }
 
-static void remove_args(int *argc, char ***argv, int index, int num)
+static void remove_args(gint *argc, gchar ***argv, gint index, gint num)
 {
-    int i;
+    gint i;
 
     for (i = index; i < index + num; ++i)
         (*argv)[i] = (*argv)[i+num];
     *argc -= num;
 }
 
-static void parse_args(int *argc, char ***argv)
+static void parse_args(gint *argc, gchar ***argv)
 {
-    int i;
+    gint i;
 
     for (i = 1; i < *argc; ++i) {
         if (!strcmp((*argv)[i], "--sm-client-id")) {
@@ -149,12 +149,12 @@ static void parse_args(int *argc, char ***argv)
     }
 }
 
-void session_startup(int *argc, char ***argv)
+void session_startup(gint *argc, gchar ***argv)
 {
 #define SM_ERR_LEN 1024
 
     SmcCallbacks cb;
-    char sm_err[SM_ERR_LEN];
+    gchar sm_err[SM_ERR_LEN];
 
     parse_args(argc, argv);
 
@@ -217,7 +217,7 @@ void session_startup(int *argc, char ***argv)
         val_hint.value = &hint;
         val_hint.length = 1;
 
-        sprintf(pid, "%ld", (long)getpid());
+        sprintf(pid, "%ld", (glong)getpid());
         val_pid.value = pid;
         val_pid.length = strlen(pid);
 
@@ -289,8 +289,8 @@ static void sm_save_yourself_phase2(SmcConn conn, SmPointer data)
     SmcSaveYourselfDone(conn, success);
 }
 
-static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
-                             Bool shutdown, int interact_style, Bool fast)
+static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
+                             Bool shutdown, gint interact_style, Bool fast)
 {
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_phase2, data)) {
         ob_debug("SAVE YOURSELF PHASE 2 failed\n");
@@ -320,8 +320,8 @@ static gboolean session_save()
 
     /* this algo is from metacity */
     filename = g_strdup_printf("%d-%d-%u.obs",
-                               (int) time(NULL),
-                               (int) getpid(),
+                               (gint) time(NULL),
+                               (gint) getpid(),
                                g_random_int());
     save_file = g_build_filename(sm_sessions_path, filename, NULL);
     g_free(filename);
@@ -468,7 +468,7 @@ static gint stack_sort(const ObSessionState *s1, const ObSessionState *s2)
     return s1->stacking - s2->stacking;
 }
 
-static void session_load(char *path)
+static void session_load(gchar *path)
 {
     xmlDocPtr doc;
     xmlNodePtr node, n;

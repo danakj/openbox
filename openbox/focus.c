@@ -60,7 +60,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
-static Window createWindow(Window parent, unsigned long mask,
+static Window createWindow(Window parent, gulong mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
@@ -210,7 +210,8 @@ void focus_set_client(ObClient *client)
 
 /* finds the first transient that isn't 'skip' and ensure's that client_normal
  is true for it */
-static ObClient *find_transient_recursive(ObClient *c, ObClient *top, ObClient *skip)
+static ObClient *find_transient_recursive(ObClient *c, ObClient *top,
+                                          ObClient *skip)
 {
     GSList *it;
     ObClient *ret;
@@ -332,7 +333,7 @@ static void popup_cycle(ObClient *c, gboolean show)
     } else {
         Rect *a;
         ObClient *p = c;
-        char *title;
+        gchar *title;
 
         a = screen_physical_area_monitor(0);
         icon_popup_position(focus_cycle_popup, CenterGravity,
@@ -378,8 +379,8 @@ void focus_cycle_draw_indicator()
               frame_adjust_focus(focus_cycle_target->frame, FALSE);
           frame_adjust_focus(focus_cycle_target->frame, TRUE);
         */
-        int x, y, w, h;
-        int wt, wl, wr, wb;
+        gint x, y, w, h;
+        gint wt, wl, wr, wb;
 
         wt = wl = wr = wb = MAX(3,
                                 ob_rr_theme->handle_height +

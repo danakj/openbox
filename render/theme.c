@@ -30,9 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-static XrmDatabase loaddb(RrTheme *theme, char *name);
-static gboolean read_int(XrmDatabase db, char *rname, int *value);
-static gboolean read_string(XrmDatabase db, char *rname, char **value);
+static XrmDatabase loaddb(RrTheme *theme, gchar *name);
+static gboolean read_int(XrmDatabase db, gchar *rname, gint *value);
+static gboolean read_string(XrmDatabase db, gchar *rname, gchar **value);
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
                            gchar *rname, RrColor **value);
 static gboolean read_mask(const RrInstance *inst,
@@ -303,11 +303,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     } else {
         {
             guchar data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
-            theme->max_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
+            theme->max_mask = RrPixmapMaskNew(inst, 7, 7, (gchar*)data);
         }
         {
             guchar data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f };
-            theme->max_toggled_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
+            theme->max_toggled_mask = RrPixmapMaskNew(inst, 7, 7, (gchar*)data);
         }
         theme->max_pressed_mask = RrPixmapMaskCopy(theme->max_mask);
         theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
@@ -332,7 +332,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     } else {
         {
             guchar data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
-            theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
+            theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, (gchar*)data);
         }
         theme->iconify_pressed_mask = RrPixmapMaskCopy(theme->iconify_mask);
         theme->iconify_disabled_mask = RrPixmapMaskCopy(theme->iconify_mask);
@@ -364,12 +364,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     } else {
         {
             guchar data[] = { 0x63, 0x63, 0x00, 0x00, 0x00, 0x63, 0x63 };
-            theme->desk_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
+            theme->desk_mask = RrPixmapMaskNew(inst, 7, 7, (gchar*)data);
         }
         {
             guchar data[] = { 0x00, 0x36, 0x36, 0x08, 0x36, 0x36, 0x00 };
             theme->desk_toggled_mask = RrPixmapMaskNew(inst, 7, 7,
-                                                       (char*)data);
+                                                       (gchar*)data);
         }
         theme->desk_pressed_mask = RrPixmapMaskCopy(theme->desk_mask);
         theme->desk_disabled_mask = RrPixmapMaskCopy(theme->desk_mask);
@@ -397,12 +397,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     } else {
         {
             guchar data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x00 };
-            theme->shade_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
+            theme->shade_mask = RrPixmapMaskNew(inst, 7, 7, (gchar*)data);
         }
         {
             guchar data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x7f };
             theme->shade_toggled_mask = RrPixmapMaskNew(inst, 7, 7,
-                                                        (char*)data);
+                                                        (gchar*)data);
         }
         theme->shade_pressed_mask = RrPixmapMaskCopy(theme->shade_mask);
         theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_mask);
@@ -425,7 +425,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     } else {
         {
             guchar data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-            theme->close_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
+            theme->close_mask = RrPixmapMaskNew(inst, 7, 7, (gchar*)data);
         }
         theme->close_pressed_mask = RrPixmapMaskCopy(theme->close_mask);
         theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
@@ -434,7 +434,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     if (!read_mask(inst, "bullet.xbm", theme, &theme->menu_bullet_mask)) {
         guchar data[] = { 0x01, 0x03, 0x07, 0x0f, 0x07, 0x03, 0x01 };
-        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 4, 7, (char*)data);
+        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 4, 7, (gchar*)data);
     }
 
     /* read the decoration textures */
@@ -1045,7 +1045,7 @@ void RrThemeFree(RrTheme *theme)
     }
 }
 
-static XrmDatabase loaddb(RrTheme *theme, char *name)
+static XrmDatabase loaddb(RrTheme *theme, gchar *name)
 {
     GSList *it;
     XrmDatabase db = NULL;
@@ -1085,10 +1085,10 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
     return db;
 }
 
-static char *create_class_name(char *rname)
+static gchar *create_class_name(gchar *rname)
 {
-    char *rclass = g_strdup(rname);
-    char *p = rclass;
+    gchar *rclass = g_strdup(rname);
+    gchar *p = rclass;
 
     while (TRUE) {
         *p = toupper(*p);
@@ -1100,16 +1100,16 @@ static char *create_class_name(char *rname)
     return rclass;
 }
 
-static gboolean read_int(XrmDatabase db, char *rname, int *value)
+static gboolean read_int(XrmDatabase db, gchar *rname, gint *value)
 {
     gboolean ret = FALSE;
-    char *rclass = create_class_name(rname);
-    char *rettype, *end;
+    gchar *rclass = create_class_name(rname);
+    gchar *rettype, *end;
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
-        *value = (int)strtol(retvalue.addr, &end, 10);
+        *value = (gint)strtol(retvalue.addr, &end, 10);
         if (end != retvalue.addr)
             ret = TRUE;
     }
@@ -1118,11 +1118,11 @@ static gboolean read_int(XrmDatabase db, char *rname, int *value)
     return ret;
 }
 
-static gboolean read_string(XrmDatabase db, char *rname, char **value)
+static gboolean read_string(XrmDatabase db, gchar *rname, gchar **value)
 {
     gboolean ret = FALSE;
-    char *rclass = create_class_name(rname);
-    char *rettype;
+    gchar *rclass = create_class_name(rname);
+    gchar *rettype;
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
@@ -1139,8 +1139,8 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
                            gchar *rname, RrColor **value)
 {
     gboolean ret = FALSE;
-    char *rclass = create_class_name(rname);
-    char *rettype;
+    gchar *rclass = create_class_name(rname);
+    gchar *rettype;
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
@@ -1161,15 +1161,15 @@ static gboolean read_mask(const RrInstance *inst,
                           RrPixmapMask **value)
 {
     gboolean ret = FALSE;
-    char *s;
-    int hx, hy; /* ignored */
-    unsigned int w, h;
-    unsigned char *b;
+    gchar *s;
+    gint hx, hy; /* ignored */
+    guint w, h;
+    guchar *b;
 
     s = g_build_filename(theme->path, maskname, NULL);
     if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) {
         ret = TRUE;
-        *value = RrPixmapMaskNew(inst, w, h, (char*)b);
+        *value = RrPixmapMaskNew(inst, w, h, (gchar*)b);
         XFree(b);
     }
     g_free(s);
@@ -1182,7 +1182,7 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
                              gboolean *interlaced, gboolean *border,
                              gboolean allow_trans)
 {
-    char *t;
+    gchar *t;
 
     /* convert to all lowercase */
     for (t = tex; *t != '\0'; ++t)
@@ -1237,9 +1237,9 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 gboolean allow_trans)
 {
     gboolean ret = FALSE;
-    char *rclass = create_class_name(rname);
-    char *cname, *ctoname, *bcname, *icname;
-    char *rettype;
+    gchar *rclass = create_class_name(rname);
+    gchar *cname, *ctoname, *bcname, *icname;
+    gchar *rettype;
     XrmValue retvalue;
 
     cname = g_strconcat(rname, ".color", NULL);

@@ -29,10 +29,10 @@
 struct _RrColor {
     const RrInstance *inst;
 
-    int r;
-    int g;
-    int b;
-    unsigned long pixel;
+    gint r;
+    gint g;
+    gint b;
+    gulong pixel;
     GC gc;
 
     gint key;

@@ -89,7 +89,7 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
 
 void mouse_grab_for_client(ObClient *client, gboolean grab)
 {
-    int i;
+    gint i;
     GSList *it;
 
     for (i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i)
@@ -97,8 +97,8 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
             /* grab/ungrab the button */
             ObMouseBinding *b = it->data;
             Window win;
-            int mode;
-            unsigned int mask;
+            gint mode;
+            guint mask;
 
             if (FRAME_CONTEXT(i, client)) {
                 win = client->frame->window;
@@ -130,13 +130,13 @@ static void grab_all_clients(gboolean grab)
 
 void mouse_unbind_all()
 {
-    int i;
+    gint i;
     GSList *it;
     
     for(i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i) {
         for (it = bound_contexts[i]; it != NULL; it = it->next) {
             ObMouseBinding *b = it->data;
-            int j;
+            gint j;
 
             for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j) {
                 GSList *it;
@@ -154,7 +154,7 @@ void mouse_unbind_all()
 
 static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
                              ObClient *c, guint state,
-                             guint button, int x, int y)
+                             guint button, gint x, gint y)
 {
     GSList *it;
     ObMouseBinding *b;
@@ -176,7 +176,7 @@ void mouse_event(ObClient *client, XEvent *e)
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
     static Window lwindow = None;
-    static int px, py;
+    static gint px, py;
 
     ObFrameContext context;
     gboolean click = FALSE;
@@ -210,7 +210,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
         if (e->xbutton.button == button) {
             /* clicks are only valid if its released over the window */
-            int junk1, junk2;
+            gint junk1, junk2;
             Window wjunk;
             guint ujunk, b, w, h;
             /* this can cause errors to occur when the window closes */

@@ -29,7 +29,7 @@ static GSList  *xdg_config_dir_paths;
 static GSList  *xdg_data_dir_paths;
 
 struct Callback {
-    char *tag;
+    gchar *tag;
     ParseCallback func;
     void *data;
 };
@@ -60,7 +60,7 @@ void parse_shutdown(ObParseInst *i)
     }
 }
 
-void parse_register(ObParseInst *i, const char *tag,
+void parse_register(ObParseInst *i, const gchar *tag,
                     ParseCallback func, void *data)
 {
     struct Callback *c;
@@ -113,7 +113,7 @@ gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root)
     return r;
 }
 
-gboolean parse_load(const char *path, const char *rootname,
+gboolean parse_load(const gchar *path, const gchar *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root)
 {
     if ((*doc = xmlParseFile(path))) {
@@ -136,7 +136,7 @@ gboolean parse_load(const char *path, const char *rootname,
     return TRUE;
 }
 
-gboolean parse_load_mem(gpointer data, guint len, const char *rootname,
+gboolean parse_load_mem(gpointer data, guint len, const gchar *rootname,
                         xmlDocPtr *doc, xmlNodePtr *root)
 {
     if ((*doc = xmlParseMemory(data, len))) {
@@ -176,18 +176,18 @@ void parse_tree(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     }
 }
 
-char *parse_string(xmlDocPtr doc, xmlNodePtr node)
+gchar *parse_string(xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
-    char *s = g_strdup(c ? (char*)c : "");
+    gchar *s = g_strdup(c ? (gchar*)c : "");
     xmlFree(c);
     return s;
 }
 
-int parse_int(xmlDocPtr doc, xmlNodePtr node)
+gint parse_int(xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
-    int i = atoi((char*)c);
+    gint i = atoi((gchar*)c);
     xmlFree(c);
     return i;
 }
@@ -206,7 +206,7 @@ gboolean parse_bool(xmlDocPtr doc, xmlNodePtr node)
     return b;
 }
 
-gboolean parse_contains(const char *val, xmlDocPtr doc, xmlNodePtr node)
+gboolean parse_contains(const gchar *val, xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
     gboolean r;
@@ -215,7 +215,7 @@ gboolean parse_contains(const char *val, xmlDocPtr doc, xmlNodePtr node)
     return r;
 }
 
-xmlNodePtr parse_find_node(const char *tag, xmlNodePtr node)
+xmlNodePtr parse_find_node(const gchar *tag, xmlNodePtr node)
 {
     while (node) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) tag))
@@ -225,32 +225,32 @@ xmlNodePtr parse_find_node(const char *tag, xmlNodePtr node)
     return NULL;
 }
 
-gboolean parse_attr_int(const char *name, xmlNodePtr node, int *value)
+gboolean parse_attr_int(const gchar *name, xmlNodePtr node, gint *value)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
     if (c) {
-        *value = atoi((char*)c);
+        *value = atoi((gchar*)c);
         r = TRUE;
     }
     xmlFree(c);
     return r;
 }
 
-gboolean parse_attr_string(const char *name, xmlNodePtr node, char **value)
+gboolean parse_attr_string(const gchar *name, xmlNodePtr node, gchar **value)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
     if (c) {
-        *value = g_strdup((char*)c);
+        *value = g_strdup((gchar*)c);
         r = TRUE;
     }
     xmlFree(c);
     return r;
 }
 
-gboolean parse_attr_contains(const char *val, xmlNodePtr node,
-                             const char *name)
+gboolean parse_attr_contains(const gchar *val, xmlNodePtr node,
+                             const gchar *name)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r;

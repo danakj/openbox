@@ -76,15 +76,15 @@ static ObState   state;
 static gboolean  xsync;
 static gboolean  reconfigure;
 static gboolean  restart;
-static char     *restart_path;
+static gchar    *restart_path;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 
-static void signal_handler(int signal, gpointer data);
-static void parse_args(int argc, char **argv);
+static void signal_handler(gint signal, gpointer data);
+static void parse_args(gint argc, gchar **argv);
 
-int main(int argc, char **argv)
+gint main(gint argc, gchar **argv)
 {
 #ifdef DEBUG
     ob_debug_show_output(TRUE);
@@ -300,8 +300,8 @@ int main(int argc, char **argv)
 
     if (restart) {
         if (restart_path != NULL) {
-            int argcp;
-            char **argvp;
+            gint argcp;
+            gchar **argvp;
             GError *err = NULL;
 
             /* run other shit */
@@ -322,7 +322,7 @@ int main(int argc, char **argv)
     return exitcode;
 }
 
-static void signal_handler(int signal, gpointer data)
+static void signal_handler(gint signal, gpointer data)
 {
     if (signal == SIGUSR1) {
         ob_debug("Caught signal %d. Restarting.\n", signal);
@@ -367,9 +367,9 @@ static void print_help()
     g_print("\nPlease report bugs at %s\n\n", PACKAGE_BUGREPORT);
 }
 
-static void parse_args(int argc, char **argv)
+static void parse_args(gint argc, gchar **argv)
 {
-    int i;
+    gint i;
 
     for (i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--version")) {

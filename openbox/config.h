@@ -67,13 +67,13 @@ extern guint config_dock_app_move_button;
 extern guint config_dock_app_move_modifiers;
 
 /* The name of the theme */
-extern char *config_theme;
+extern gchar *config_theme;
 
 /* Titlebar button layout */
 extern gchar *config_title_layout;
 
 /*! The number of desktops */
-extern int config_desktops_num;
+extern gint config_desktops_num;
 /*! Names for the desktops */
 extern GSList *config_desktops_names;
 

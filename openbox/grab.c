@@ -31,7 +31,7 @@
 #define MASK_LIST_SIZE 8
 
 /*! A list of all possible combinations of keyboard lock masks */
-static unsigned int mask_list[MASK_LIST_SIZE];
+static guint mask_list[MASK_LIST_SIZE];
 static guint kgrabs = 0;
 static guint pgrabs = 0;
 
@@ -158,7 +158,7 @@ void grab_shutdown(gboolean reconfig)
 }
 
 void grab_button_full(guint button, guint state, Window win, guint mask,
-                      int pointer_mode, ObCursor cur)
+                      gint pointer_mode, ObCursor cur)
 {
     guint i;
 
@@ -185,7 +185,7 @@ void ungrab_button(guint button, guint state, Window win)
         XUngrabButton(ob_display, button, state | mask_list[i], win);
 }
 
-void grab_key(guint keycode, guint state, Window win, int keyboard_mode)
+void grab_key(guint keycode, guint state, Window win, gint keyboard_mode)
 {
     guint i;
 

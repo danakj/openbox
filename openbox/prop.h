@@ -172,21 +172,21 @@ void prop_startup();
 gboolean prop_get32(Window win, Atom prop, Atom type, guint32 *ret);
 gboolean prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
                           guint *nret);
-gboolean prop_get_string_locale(Window win, Atom prop, char **ret);
-gboolean prop_get_string_utf8(Window win, Atom prop, char **ret);
-gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret);
-gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret);
+gboolean prop_get_string_locale(Window win, Atom prop, gchar **ret);
+gboolean prop_get_string_utf8(Window win, Atom prop, gchar **ret);
+gboolean prop_get_strings_locale(Window win, Atom prop, gchar ***ret);
+gboolean prop_get_strings_utf8(Window win, Atom prop, gchar ***ret);
 
 void prop_set32(Window win, Atom prop, Atom type, guint32 val);
 void prop_set_array32(Window win, Atom prop, Atom type, guint32 *val,
                       guint num);
-void prop_set_string_utf8(Window win, Atom prop, char *val);
-void prop_set_strings_utf8(Window win, Atom prop, char **strs);
+void prop_set_string_utf8(Window win, Atom prop, gchar *val);
+void prop_set_strings_utf8(Window win, Atom prop, gchar **strs);
 
 void prop_erase(Window win, Atom prop);
 
-void prop_message(Window about, Atom messagetype, long data0, long data1,
-		  long data2, long data3, long mask);
+void prop_message(Window about, Atom messagetype, glong data0, glong data1,
+		  glong data2, glong data3, glong mask);
 
 #define PROP_GET32(win, prop, type, ret) \
     (prop_get32(win, prop_atoms.prop, prop_atoms.type, ret))

@@ -34,7 +34,7 @@ static void framerender_close(ObFrame *self, RrAppearance *a);
 void framerender_frame(ObFrame *self)
 {
     {
-        unsigned long px;
+        gulong px;
 
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->cb_focused_color) :

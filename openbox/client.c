@@ -166,7 +166,7 @@ void client_set_list()
 
 void client_manage_all()
 {
-    unsigned int i, j, nchild;
+    guint i, j, nchild;
     Window w, *children;
     XWMHints *wmhints;
     XWindowAttributes attrib;
@@ -337,8 +337,8 @@ void client_manage(Window window)
     }
 
     if (ob_state() == OB_STATE_RUNNING) {
-        int x = self->area.x, ox = x;
-        int y = self->area.y, oy = y;
+        gint x = self->area.x, ox = x;
+        gint y = self->area.y, oy = y;
 
         place_client(self, &x, &y);
 
@@ -585,8 +585,8 @@ static void client_restore_session_stacking(ObClient *self)
 
 void client_move_onscreen(ObClient *self, gboolean rude)
 {
-    int x = self->area.x;
-    int y = self->area.y;
+    gint x = self->area.x;
+    gint y = self->area.y;
     if (client_find_onscreen(self, &x, &y,
                              self->frame->area.width,
                              self->frame->area.height, rude)) {
@@ -594,11 +594,11 @@ void client_move_onscreen(ObClient *self, gboolean rude)
     }
 }
 
-gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
+gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
                               gboolean rude)
 {
     Rect *a;
-    int ox = *x, oy = *y;
+    gint ox = *x, oy = *y;
 
     frame_client_gravity(self->frame, x, y); /* get where the frame
                                                 would be */
@@ -648,8 +648,8 @@ static void client_toggle_border(ObClient *self, gboolean show)
        different position.
        when re-adding the border to the client, the same operation needs to be
        reversed. */
-    int oldx = self->area.x, oldy = self->area.y;
-    int x = oldx, y = oldy;
+    gint oldx = self->area.x, oldy = self->area.y;
+    gint x = oldx, y = oldy;
     switch(self->gravity) {
     default:
     case NorthWestGravity:
@@ -886,9 +886,9 @@ static void client_get_shaped(ObClient *self)
     self->shaped = FALSE;
 #ifdef   SHAPE
     if (extensions_shape) {
-        int foo;
+        gint foo;
         guint ufoo;
-        int s;
+        gint s;
 
         XShapeSelectInput(ob_display, self->window, ShapeNotifyMask);
 
@@ -1082,8 +1082,8 @@ static void client_get_gravity(ObClient *self)
 void client_update_normal_hints(ObClient *self)
 {
     XSizeHints size;
-    long ret;
-    int oldgravity = self->gravity;
+    glong ret;
+    gint oldgravity = self->gravity;
 
     /* defaults */
     self->min_ratio = 0.0f;
@@ -1116,9 +1116,11 @@ void client_update_normal_hints(ObClient *self)
 
         if (size.flags & PAspect) {
             if (size.min_aspect.y)
-                self->min_ratio = (float)size.min_aspect.x / size.min_aspect.y;
+                self->min_ratio =
+                    (gfloat) size.min_aspect.x / size.min_aspect.y;
             if (size.max_aspect.y)
-                self->max_ratio = (float)size.max_aspect.x / size.max_aspect.y;
+                self->max_ratio =
+                    (gfloat) size.max_aspect.x / size.max_aspect.y;
         }
 
         if (size.flags & PMinSize)
@@ -1266,7 +1268,7 @@ void client_setup_decor_and_functions(ObClient *self)
 static void client_change_allowed_actions(ObClient *self)
 {
     guint32 actions[9];
-    int num = 0;
+    gint num = 0;
 
     /* desktop windows are kept on all desktops */
     if (self->type != OB_CLIENT_TYPE_DESKTOP)
@@ -1447,7 +1449,7 @@ void client_update_title(ObClient *self)
         }
     /* dont display the number for the first window */
     if (self->title_count > 1) {
-        char *ndata;
+        gchar *ndata;
         ndata = g_strdup_printf("%s - [%u]", data, self->title_count);
         g_free(data);
         data = ndata;
@@ -1477,7 +1479,7 @@ void client_update_title(ObClient *self)
 
     /* append the title count, dont display the number for the first window */
     if (read_title && self->title_count > 1) {
-        char *vdata, *ndata;
+        gchar *vdata, *ndata;
         ndata = g_strdup_printf(" - [%u]", self->title_count);
         vdata = g_strconcat(data, ndata, NULL);
         g_free(ndata);
@@ -1492,8 +1494,8 @@ void client_update_title(ObClient *self)
 
 void client_update_class(ObClient *self)
 {
-    char **data;
-    char *s;
+    gchar **data;
+    gchar *s;
 
     if (self->name) g_free(self->name);
     if (self->class) g_free(self->class);
@@ -1893,7 +1895,7 @@ static void client_apply_startup_state(ObClient *self)
 }
 
 void client_configure_full(ObClient *self, ObCorner anchor,
-                           int x, int y, int w, int h,
+                           gint x, gint y, gint w, gint h,
                            gboolean user, gboolean final,
                            gboolean force_reply)
 {
@@ -1916,7 +1918,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     /* set the size and position if fullscreen */
     if (self->fullscreen) {
 #ifdef VIDMODE
-        int dot;
+        gint dot;
         XF86VidModeModeLine mode;
 #endif
         Rect *a;
@@ -1978,7 +1980,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     }
 
     if (!(w == self->area.width && h == self->area.height)) {
-        int basew, baseh, minw, minh;
+        gint basew, baseh, minw, minh;
 
         /* base size is substituted with min size if not specified */
         if (self->base_size.width || self->base_size.height) {
@@ -2035,22 +2037,22 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
         if (self->min_ratio)
             if (h * self->min_ratio > w) {
-                h = (int)(w / self->min_ratio);
+                h = (gint)(w / self->min_ratio);
 
                 /* you cannot resize to nothing */
                 if (h < 1) {
                     h = 1;
-                    w = (int)(h * self->min_ratio);
+                    w = (gint)(h * self->min_ratio);
                 }
             }
         if (self->max_ratio)
             if (h * self->max_ratio < w) {
-                h = (int)(w / self->max_ratio);
+                h = (gint)(w / self->max_ratio);
 
                 /* you cannot resize to nothing */
                 if (h < 1) {
                     h = 1;
-                    w = (int)(h * self->min_ratio);
+                    w = (gint)(h * self->min_ratio);
                 }
             }
 
@@ -2134,7 +2136,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
 void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
 {
-    int x, y, w, h;
+    gint x, y, w, h;
 
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) || /* can't */
         self->fullscreen == fs) return;                   /* already done */
@@ -2194,7 +2196,7 @@ static void client_iconify_recursive(ObClient *self,
 
         if (iconic) {
             if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
-                long old;
+                glong old;
 
                 old = self->wmstate;
                 self->wmstate = IconicState;
@@ -2210,7 +2212,7 @@ static void client_iconify_recursive(ObClient *self,
                 changed = TRUE;
             }
         } else {
-            long old;
+            glong old;
 
             if (curdesk)
                 client_set_desktop(self, screen_desktop, FALSE);
@@ -2256,9 +2258,9 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
                              iconic, curdesk);
 }
 
-void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
+void client_maximize(ObClient *self, gboolean max, gint dir, gboolean savearea)
 {
-    int x, y, w, h;
+    gint x, y, w, h;
      
     g_assert(dir == 0 || dir == 1 || dir == 2);
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
@@ -2346,7 +2348,7 @@ void client_shade(ObClient *self, gboolean shade)
 
     /* when we're iconic, don't change the wmstate */
     if (!self->iconic) {
-        long old;
+        glong old;
 
         old = self->wmstate;
         self->wmstate = shade ? IconicState : NormalState;
@@ -2473,7 +2475,7 @@ gboolean client_validate(ObClient *self)
     return TRUE;
 }
 
-void client_set_wm_state(ObClient *self, long state)
+void client_set_wm_state(ObClient *self, glong state)
 {
     if (state == self->wmstate) return; /* no change */
   
@@ -2487,7 +2489,7 @@ void client_set_wm_state(ObClient *self, long state)
     }
 }
 
-void client_set_state(ObClient *self, Atom action, long data1, long data2)
+void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
 {
     gboolean shaded = self->shaded;
     gboolean fullscreen = self->fullscreen;
@@ -2495,7 +2497,7 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
     gboolean max_horz = self->max_horz;
     gboolean max_vert = self->max_vert;
     gboolean modal = self->modal;
-    int i;
+    gint i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
           action == prop_atoms.net_wm_state_remove ||
@@ -2714,7 +2716,7 @@ gboolean client_focus(ObClient *self)
 #ifdef DEBUG_FOCUS
     ob_debug("%sively focusing %lx at %d\n",
              (self->can_focus ? "act" : "pass"),
-             self->window, (int) event_lasttime);
+             self->window, (gint) event_lasttime);
 #endif
 
     /* Cause the FocusIn to come back to us. Important for desktop switches,
@@ -2778,12 +2780,12 @@ gboolean client_focused(ObClient *self)
     return self == focus_client;
 }
 
-static ObClientIcon* client_icon_recursive(ObClient *self, int w, int h)
+static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
 {
     guint i;
     /* si is the smallest image >= req */
     /* li is the largest image < req */
-    unsigned long size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
+    gulong size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
 
     if (!self->nicons) {
         ObClientIcon *parent = NULL;
@@ -2822,7 +2824,7 @@ static ObClientIcon* client_icon_recursive(ObClient *self, int w, int h)
     return &self->icons[li];
 }
 
-const ObClientIcon* client_icon(ObClient *self, int w, int h)
+const ObClientIcon* client_icon(ObClient *self, gint w, gint h)
 {
     ObClientIcon *ret;
     static ObClientIcon deficon;
@@ -2838,10 +2840,10 @@ const ObClientIcon* client_icon(ObClient *self, int w, int h)
 /* this be mostly ripped from fvwm */
 ObClient *client_find_directional(ObClient *c, ObDirection dir) 
 {
-    int my_cx, my_cy, his_cx, his_cy;
-    int offset = 0;
-    int distance = 0;
-    int score, best_score;
+    gint my_cx, my_cy, his_cx, his_cy;
+    gint offset = 0;
+    gint distance = 0;
+    gint score, best_score;
     ObClient *best_client, *cur;
     GList *it;
 
@@ -2880,7 +2882,7 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
 
         if(dir == OB_DIRECTION_NORTHEAST || dir == OB_DIRECTION_SOUTHEAST ||
            dir == OB_DIRECTION_SOUTHWEST || dir == OB_DIRECTION_NORTHWEST) {
-            int tx;
+            gint tx;
             /* Rotate the diagonals 45 degrees counterclockwise.
              * To do this, multiply the matrix /+h +h\ with the
              * vector (x y).                   \-h +h/
@@ -2933,7 +2935,7 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
     return best_client;
 }
 
-void client_set_layer(ObClient *self, int layer)
+void client_set_layer(ObClient *self, gint layer)
 {
     if (layer < 0) {
         self->below = TRUE;
@@ -3081,10 +3083,10 @@ void client_update_sm_client_id(ObClient *self)
  * note to self: the edge is the -frame- edge (the actual one), not the
  * client edge.
  */
-int client_directional_edge_search(ObClient *c, ObDirection dir)
+gint client_directional_edge_search(ObClient *c, ObDirection dir)
 {
-    int dest;
-    int my_edge_start, my_edge_end, my_offset;
+    gint dest;
+    gint my_edge_start, my_edge_end, my_offset;
     GList *it;
     Rect *a;
     
@@ -3103,7 +3105,7 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         dest = a->y;
 
         for(it = g_list_first(client_list); it; it = it->next) {
-            int his_edge_start, his_edge_end, his_offset;
+            gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
             if(cur == c)
@@ -3144,7 +3146,7 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         dest = a->y + a->height;
 
         for(it = g_list_first(client_list); it; it = it->next) {
-            int his_edge_start, his_edge_end, his_offset;
+            gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
             if(cur == c)
@@ -3186,7 +3188,7 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         dest = a->x;
 
         for(it = g_list_first(client_list); it; it = it->next) {
-            int his_edge_start, his_edge_end, his_offset;
+            gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
             if(cur == c)
@@ -3228,7 +3230,7 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         dest = a->x + a->width;
 
         for(it = g_list_first(client_list); it; it = it->next) {
-            int his_edge_start, his_edge_end, his_offset;
+            gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
             if(cur == c)
@@ -3273,7 +3275,7 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
 
 ObClient* client_under_pointer()
 {
-    int x, y;
+    gint x, y;
     GList *it;
     ObClient *ret = NULL;
 

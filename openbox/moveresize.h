@@ -30,7 +30,7 @@ void moveresize_startup(gboolean reconfig);
 void moveresize_shutdown(gboolean reconfig);
 
 void moveresize_start(struct _ObClient *c,
-                      int x, int y, guint button, guint32 corner);
+                      gint x, gint y, guint button, guint32 corner);
 void moveresize_end(gboolean cancel);
 
 void moveresize_event(XEvent *e);

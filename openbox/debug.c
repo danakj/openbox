@@ -28,7 +28,7 @@ void ob_debug_show_output(gboolean enable)
     show = enable;
 }
 
-void ob_debug(char *a, ...)
+void ob_debug(gchar *a, ...)
 {
     va_list vl;
 

@@ -31,11 +31,11 @@ guint    config_focus_raise;
 
 ObPlacePolicy config_place_policy;
 
-char *config_theme;
+gchar *config_theme;
 
 gchar *config_title_layout;
 
-int     config_desktops_num;
+gint    config_desktops_num;
 GSList *config_desktops_names;
 
 gboolean config_redraw_resize;
@@ -75,7 +75,7 @@ gint config_resist_edge;
 static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                       GList *keylist)
 {
-    char *key;
+    gchar *key;
     ObAction *action;
     xmlNodePtr n, nact;
     GList *it;
@@ -133,8 +133,8 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                         void *d)
 {
     xmlNodePtr n, nbut, nact;
-    char *buttonstr;
-    char *contextstr;
+    gchar *buttonstr;
+    gchar *contextstr;
     ObUserAction uact;
     ObMouseAction mact;
     ObAction *action;

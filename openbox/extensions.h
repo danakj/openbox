@@ -44,27 +44,27 @@
 /*! Does the display have the XKB extension? */
 extern gboolean extensions_xkb;
 /*! Base for events for the XKB extension */
-extern int extensions_xkb_event_basep;
+extern gint extensions_xkb_event_basep;
 
 /*! Does the display have the Shape extension? */
 extern gboolean extensions_shape;
 /*! Base for events for the Shape extension */
-extern int extensions_shape_event_basep;
+extern gint extensions_shape_event_basep;
 
 /*! Does the display have the Xinerama extension? */
 extern gboolean extensions_xinerama;
 /*! Base for events for the Xinerama extension */
-extern int extensions_xinerama_event_basep;
+extern gint extensions_xinerama_event_basep;
 
 /*! Does the display have the RandR extension? */
 extern gboolean extensions_randr;
 /*! Base for events for the Randr extension */
-extern int extensions_randr_event_basep;
+extern gint extensions_randr_event_basep;
 
 /*! Does the display have the VidMode extension? */
 extern gboolean extensions_vidmode;
 /*! Base for events for the VidMode extension */
-extern int extensions_vidmode_event_basep;
+extern gint extensions_vidmode_event_basep;
 
 void extensions_query_all();
 

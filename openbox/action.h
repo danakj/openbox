@@ -68,7 +68,7 @@ struct DirectionalAction{
 
 struct Execute {
     struct AnyAction any;
-    char *path;
+    gchar *path;
 };
 
 struct ClientAction {
@@ -82,7 +82,7 @@ struct Activate {
 
 struct MoveResizeRelative {
     struct AnyAction any;
-    int delta;
+    gint delta;
 };
 
 struct SendToDesktop {
@@ -106,7 +106,7 @@ struct Desktop {
 
 struct Layer {
     struct AnyAction any;
-    int layer; /* < 0 = below, 0 = normal, > 0 = above */
+    gint layer; /* < 0 = below, 0 = normal, > 0 = above */
 };
 
 struct DesktopDirection {
@@ -124,7 +124,7 @@ struct MoveResize {
 
 struct ShowMenu {
     struct AnyAction any;
-    char *name;
+    gchar *name;
 };
 
 struct CycleWindows {

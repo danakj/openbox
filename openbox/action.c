@@ -809,7 +809,7 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
 {
     ObAction *a = NULL;
     gboolean exist = FALSE;
-    int i;
+    gint i;
 
     for (i = 0; actionstrings[i].name; i++)
         if (!g_ascii_strcasecmp(name, actionstrings[i].name)) {
@@ -831,7 +831,7 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
 ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        ObUserAction uact)
 {
-    char *actname;
+    gchar *actname;
     ObAction *act = NULL;
     xmlNodePtr n;
 
@@ -973,7 +973,7 @@ void action_run_string(const gchar *name, struct _ObClient *c)
 void action_execute(union ActionData *data)
 {
     GError *e = NULL;
-    char *cmd;
+    gchar *cmd;
     if (data->execute.path) {
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
@@ -1307,7 +1307,7 @@ void action_toggle_decorations(union ActionData *data)
     client_action_end(data);
 }
 
-static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
+static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 {
     if ((cw / 3 < 1) || (x - cx > cw / 3 * 2)) {
         if ((ch / 3 < 1) || (y - cy > ch / 3 * 2))
@@ -1408,7 +1408,7 @@ void action_directional_focus(union ActionData *data)
 
 void action_movetoedge(union ActionData *data)
 {
-    int x, y;
+    gint x, y;
     ObClient *c = data->diraction.any.c;
 
     x = c->frame->area.x;
@@ -1440,7 +1440,7 @@ void action_movetoedge(union ActionData *data)
 
 void action_growtoedge(union ActionData *data)
 {
-    int x, y, width, height, dest;
+    gint x, y, width, height, dest;
     ObClient *c = data->diraction.any.c;
     Rect *a;
 

@@ -63,7 +63,7 @@ static void measure_font(RrFont *f)
     f->elipses_length = (signed) info.xOff;
 }
 
-static RrFont *openfont(const RrInstance *inst, char *fontstring)
+static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
 {
     RrFont *out;
     FcPattern *pat, *match;
@@ -108,7 +108,7 @@ static RrFont *openfont(const RrInstance *inst, char *fontstring)
     return out;
 }
 
-RrFont *RrFontOpen(const RrInstance *inst, char *fontstring)
+RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring)
 {
     RrFont *out;
 
@@ -149,20 +149,20 @@ static void font_measure_full(const RrFont *f, const gchar *str,
     *y = info.height + (f->shadow ? ABS(f->offset) : 0);
 }
 
-int RrFontMeasureString(const RrFont *f, const gchar *str)
+gint RrFontMeasureString(const RrFont *f, const gchar *str)
 {
     gint x, y;
     font_measure_full (f, str, &x, &y);
     return x + 4;
 }
 
-int RrFontHeight(const RrFont *f)
+gint RrFontHeight(const RrFont *f)
 {
     return f->xftfont->ascent + f->xftfont->descent +
         (f->shadow ? f->offset : 0);
 }
 
-int RrFontMaxCharWidth(const RrFont *f)
+gint RrFontMaxCharWidth(const RrFont *f)
 {
     return (signed) f->xftfont->max_advance_width;
 }

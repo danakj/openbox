@@ -44,11 +44,11 @@ dest(gpointer data)
 static void f(gpointer key, gpointer value, gpointer n)
 {
     RrColor *c = value;
-    if (c->id == *(int*)n)
+    if (c->id == *(gint*)n)
         g_message("color %d has %d references", c->id, c->refcount);
 }
 
-void print_refs(int id)
+void print_refs(gint id)
 {
     g_hash_table_foreach(RrColorHash(definst), f, &id);
 }
@@ -89,7 +89,7 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
 
 void RrTrueColorSetup (RrInstance *inst)
 {
-  unsigned long red_mask, green_mask, blue_mask;
+  gulong red_mask, green_mask, blue_mask;
   XImage *timage = NULL;
 
   timage = XCreateImage(inst->display, inst->visual, inst->depth,
@@ -120,9 +120,9 @@ void RrTrueColorSetup (RrInstance *inst)
 void RrPseudoColorSetup (RrInstance *inst)
 {
     XColor icolors[256];
-    int tr, tg, tb, n, r, g, b, i, incolors, ii;
-    unsigned long dev;
-    int cpc, _ncolors;
+    gint tr, tg, tb, n, r, g, b, i, incolors, ii;
+    gulong dev;
+    gint cpc, _ncolors;
 
     /* determine the number of colors and the bits-per-color */
     inst->pseudo_bpc = 2; /* XXX THIS SHOULD BE A USER OPTION */
@@ -142,9 +142,9 @@ void RrPseudoColorSetup (RrInstance *inst)
     for (n = 0, r = 0; r < cpc; r++)
         for (g = 0; g < cpc; g++)
             for (b = 0; b < cpc; b++, n++) {
-                tr = (int)(((float)(r)/(float)(cpc-1)) * 0xFF);
-                tg = (int)(((float)(g)/(float)(cpc-1)) * 0xFF);
-                tb = (int)(((float)(b)/(float)(cpc-1)) * 0xFF);
+                tr = (gint)(((gfloat)(r)/(gfloat)(cpc-1)) * 0xFF);
+                tg = (gint)(((gfloat)(g)/(gfloat)(cpc-1)) * 0xFF);
+                tb = (gint)(((gfloat)(b)/(gfloat)(cpc-1)) * 0xFF);
                 inst->pseudo_colors[n].red = tr | tr << 8;
                 inst->pseudo_colors[n].green = tg | tg << 8;
                 inst->pseudo_colors[n].blue = tb | tb << 8;
@@ -171,7 +171,7 @@ void RrPseudoColorSetup (RrInstance *inst)
     /* try match unallocated ones */
     for (i = 0; i < _ncolors; i++) {
         if (!inst->pseudo_colors[i].flags) { /* if it wasn't allocated... */
-            unsigned long closest = 0xffffffff, close = 0;
+            gulong closest = 0xffffffff, close = 0;
             for (ii = 0; ii < incolors; ii++) {
                 /* find deviations */
                 r = (inst->pseudo_colors[i].red - icolors[ii].red) & 0xff;

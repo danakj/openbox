@@ -31,7 +31,7 @@ struct _RrFont {
     gint offset;
 };
 
-RrFont *RrFontOpen(const RrInstance *inst, char *fontstring);
+RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring);
 void RrFontClose(RrFont *f);
 void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
 #endif /* __font_h */

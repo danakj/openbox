@@ -48,7 +48,7 @@ typedef struct DesktopLayout {
 extern DesktopLayout screen_desktop_layout;
 
 /*! An array of gchar*'s which are desktop names in UTF-8 format */
-extern char **screen_desktop_names;
+extern gchar **screen_desktop_names;
 
 /*! Take over the screen, set the basic hints on it claming it as ours */
 gboolean screen_annex();
@@ -100,6 +100,6 @@ Rect *screen_area_monitor(guint desktop, guint head);
   gotta call it to let it know it should change. */
 void screen_set_root_cursor();
 
-gboolean screen_pointer_pos(int *x, int *y);
+gboolean screen_pointer_pos(gint *x, gint *y);
 
 #endif

@@ -1,78 +1,61 @@
-[openbox]
+[resistance]
+
+# amount of resistance to provide at edges
+#strength=10
+
+# resistance against other windows
+#windows=true
+
+[placement]
+
+# place windows where they were last
+#remember = yes
+
+[focus]
+
+# focus new windows when they appear
+#focusNew = yes
+
+# does focus follow the mouse pointer
+#followMouse = yes
+
+[engine]
 
 # the theme engine to use
 #engine = "openbox"
 
 # the theme to display with the theme engine
-theme = "ebox"
+#theme = "operation"
 
 # the order of the elements in windows' titlebars
-# n - icon
-# d - alldesktops button
-# s - shade button
-# l - text label
-# i - iconify button
-# m - maximize button
-# c - close button
-#titlebar.layout = "NDSLIMC"
+# N - icon
+# D - alldesktops button
+# S - shade button
+# L - text label
+# I - iconify button
+# M - maximize button
+# C - close button
+#titlebarLayout = "NDSLIMC"
 
 # the font for the window titlebars
-#font = "Sans-7"
+#font.title = "arial-8:bold"
 
 # the drop shadow for the window titlebars
-#font.shadow = no
+#font.title.shadow = no
 
 # the offset of the drop shadow for the window titlebars
-#font.shadow.offset = 1
+#font.title.shadow.offset = 1
 
 # the amount of opacity of the drop shadow for the window titlebars
 # -100 - 0 = white shadow (0 clear, -100 solid)
 # 0 - 100  = black shadow (0 clear, 100 solid)
-#font.shadow.tint = 25
-
-# does focus follow the mouse pointer
-#focusfollowsMouse = yes
-
-# focus new windows when they appear
-#focusNew = yes
-
-# place windows where they were last (for placement module)
-#placement.remember = yes
-
-# amount of resistance to provide at edges (for resistance module)
-#resistance = 10
-
-# resistance against other windows (for resistance module)
-#resistance.windows = yes
-
-# the distance a drag must go before it is recognized
-#mouse.dragThreshold = 3
-
-# the amount of time in milliseconds in which two clicks must occur to cause a
-# doubleclick event
-#mouse.doubleClickTime = 200
+#font.title.shadow.tint = 25
 
 [keyboard]
 
-kbind (C-A-Escape)	execute "xlock -nolock -mode puzzle"
-kbind (F14)		execute "sshot"
+#kbind (Key [Key...])	Action	[Parameter]
 
-# xterm
-kbind (A-space)		execute "xterm"
-kbind (XF86Start)	execute "xterm -geometry 80x30-0-0 -title eris -e ssh xor@eris.orodu.net"
-
-# konqueror
-kbind (W-e)		execute "kfmclient openProfile filemanagement"
-kbind (XF86HomePage)	execute "kfmclient openProfile webbrowsing"
-
-# xmms
-kbind (XF86AudioPlay)	execute "xmms -p"
-kbind (XF86AudioStop)	execute "xmms -u"
-kbind (XF86AudioPrev)	execute "xmms -r"
-kbind (XF86AudioNext)	execute "xmms -f"
-
-# copy current song
-kbind (W-w)		execute "getxmms"
+kbind (F12)		execute "xterm"
 
 kbind (A-Left)		PreviousDesktopWrap
 kbind (A-Right)		NextDesktopWrap
@@ -101,6 +84,13 @@ kbind (A-F4)		Close
 kbind (W-D)		ToggleDecorations
 
 [mouse]
+
+# the distance a drag must go before it is recognized
+#dragThreshold = 3
+
+# the amount of time in milliseconds in which two clicks must occur to cause a
+# doubleclick event
+#doubleClickTime = 200
 
 #mbind Context		Event		Button	Action [Parameter]
 

@@ -22,8 +22,8 @@ noinst_PROGRAMS = \
 	render/rendertest
 
 lib_LTLIBRARIES = \
-	render/libobrender.la \
-	parser/libobparser.la
+	parser/libobparser.la \
+	render/libobrender.la
 
 bin_PROGRAMS = \
 	openbox/openbox \

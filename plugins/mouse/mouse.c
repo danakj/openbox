@@ -385,7 +385,7 @@ static void binddef()
     a = action_new(action_lower);
     mbind("A-3", "frame", MouseAction_Click, a);
 
-    a = action_new(action_focusraise);
+    a = action_new(action_focus);
     mbind("1", "client", MouseAction_Press, a);
 
     a = action_new(action_toggle_shade);

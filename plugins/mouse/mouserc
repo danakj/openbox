@@ -1,0 +1,40 @@
+#Context	Event		Button	Action
+
+Titlebar	Drag		Left	Move
+Handle		Drag		Left	Move
+Frame		Drag		A-Left	Move
+
+BLCorner	Drag		Left	Resize
+BRCorner	Drag		Left	Resize
+Frame		Drag		A-Right	Resize
+
+Titlebar	Click		Left	Raise
+Titlebar	Press		Middle	Lower
+Handle		Click		Left	Raise
+Handle		Press		Middle	Lower
+Frame		Click		A-Left	Raise
+Frame		Click		A-Right	Lower
+
+Titlebar	Press		Left	Focus
+Handle		Press		Left	Focus
+Client		Press		Left	Focus
+
+Titlebar	DoubleClick	Left	ToggleShade
+Titlebar	Click		Up	Shade
+Titlebar	Click		Down	UnShade
+
+Maximize	Click		Left	ToggleMaximizeFull
+Maximize	Click		Middle	ToggleMaximizeVert
+Maximize	Click		Right	ToggleMaximizeHorz
+Iconify		Click		Left	Iconify
+Icon		DoubleClick	Left	Close
+Close		Click		Left	Close
+Close		Click		Middle	Kill
+AllDesktops	Click		Left	ToggleOmnipresent
+
+Root		Click		Up	NextDesktopWrap
+Root		Click		Down	PreviousDesktopWrap
+Root		Click		A-Up	NextDesktopWrap
+Root		Click		A-Down	PreviousDesktopWrap
+Frame		Click		A-Up	NextDesktopWrap
+Frame		Click		A-Down	PreviousDesktopWrap

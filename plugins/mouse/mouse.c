@@ -7,6 +7,7 @@
 #include "../../kernel/engine.h"
 #include "translate.h"
 #include "mouse.h"
+#include "mouserc_parse.h"
 #include <glib.h>
 
 void plugin_setup_config()
@@ -295,27 +296,27 @@ static void event(ObEvent *e, void *foo)
     }
 }
 
-static gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
-                      Action *action)
+gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
+               Action *action)
 {
     guint state, button;
     GQuark context;
     MouseBinding *b;
     GSList *it;
-    guint i;
 
     if (!translate_button(buttonstr, &state, &button)) {
-        g_warning("invalid button");
+        g_warning("invalid button '%s'", buttonstr);
         return FALSE;
     }
 
     contextstr = g_ascii_strdown(contextstr, -1);
     context = g_quark_try_string(contextstr);
-    g_free(contextstr);
     if (!context) {
-        g_warning("invalid context");
+        g_warning("invalid context '%s'", contextstr);
+        g_free(contextstr);
         return FALSE;
     }
+    g_free(contextstr);
 
     for (it = g_datalist_id_get_data(&bound_contexts, context);
 	 it != NULL; it = it->next){
@@ -334,11 +335,9 @@ static gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     grab_all_clients(FALSE);
 
     /* add the binding */
-    b = g_new(MouseBinding, 1);
+    b = g_new0(MouseBinding, 1);
     b->state = state;
     b->button = button;
-    for (i = 0; i < NUM_MOUSEACTION; ++i)
-        b->action[i] = NULL;
     b->action[mact] = action;
     g_datalist_id_set_data(&bound_contexts, context, 
         g_slist_append(g_datalist_id_get_data(&bound_contexts, context), b));
@@ -348,104 +347,13 @@ static gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     return TRUE;
 }
 
-static void binddef()
-{
-    Action *a;
-
-    /* When creating an Action struct, all of the data elements in the
-       appropriate struct need to be set, except the Client*, which will be set
-       at call-time when then action function is used.
-
-       For action_move and action_resize, the 'x', 'y', and 'final' data
-       elements should not be set, as they are set at call-time.       
-    */
-
-    a = action_new(action_move);
-    mbind("1", "titlebar", MouseAction_Motion, a);
-    a = action_new(action_move);
-    mbind("1", "handle", MouseAction_Motion, a);
-    a = action_new(action_move);
-    mbind("A-1", "frame", MouseAction_Motion, a);
-
-    a = action_new(action_resize);
-    mbind("1", "blcorner", MouseAction_Motion, a);
-    a = action_new(action_resize);
-    mbind("1", "brcorner", MouseAction_Motion, a);
-    a = action_new(action_resize);
-    mbind("A-3", "frame", MouseAction_Motion, a);
-
-    a = action_new(action_focus);
-    mbind("1", "titlebar", MouseAction_Press, a);
-    a = action_new(action_focus);
-    mbind("1", "handle", MouseAction_Press, a);
-    a = action_new(action_focusraise);
-    mbind("1", "titlebar", MouseAction_Click, a);
-    a = action_new(action_focusraise);
-    mbind("1", "handle", MouseAction_Click, a);
-    a = action_new(action_lower);
-    mbind("2", "titlebar", MouseAction_Press, a);
-    a = action_new(action_lower);
-    mbind("2", "handle", MouseAction_Press, a);
-    a = action_new(action_focusraise);
-    mbind("A-1", "frame", MouseAction_Click, a);
-    a = action_new(action_lower);
-    mbind("A-3", "frame", MouseAction_Click, a);
-
-    a = action_new(action_focus);
-    mbind("1", "client", MouseAction_Press, a);
-
-    a = action_new(action_toggle_shade);
-    mbind("1", "titlebar", MouseAction_DClick, a);
-    a = action_new(action_shade);
-    mbind("4", "titlebar", MouseAction_Press, a);
-    a = action_new(action_unshade);
-    mbind("5", "titlebar", MouseAction_Press, a);
-
-    a = action_new(action_toggle_maximize_full);
-    mbind("1", "maximize", MouseAction_Click, a);
-    a = action_new(action_toggle_maximize_vert);
-    mbind("2", "maximize", MouseAction_Click, a);
-    a = action_new(action_toggle_maximize_horz);
-    mbind("3", "maximize", MouseAction_Click, a);
-    a = action_new(action_iconify);
-    mbind("1", "iconify", MouseAction_Click, a);
-    a = action_new(action_close);
-    mbind("1", "icon", MouseAction_DClick, a);
-    a = action_new(action_close);
-    mbind("1", "close", MouseAction_Click, a);
-    a = action_new(action_kill);
-    mbind("2", "close", MouseAction_Click, a);
-    a = action_new(action_toggle_omnipresent);
-    mbind("1", "alldesktops", MouseAction_Click, a);
-
-    a = action_new(action_next_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    mbind("4", "root", MouseAction_Click, a);
-    a = action_new(action_previous_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    mbind("5", "root", MouseAction_Click, a);
-    a = action_new(action_next_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    mbind("A-4", "root", MouseAction_Click, a);
-    a = action_new(action_previous_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    mbind("A-5", "root", MouseAction_Click, a);
-    a = action_new(action_next_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    mbind("A-4", "frame", MouseAction_Click, a);
-    a = action_new(action_previous_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    mbind("A-5", "frame", MouseAction_Click, a);
-}
-
 void plugin_startup()
 {
     dispatch_register(Event_Client_Mapped | Event_Client_Destroy |
                       Event_X_ButtonPress | Event_X_ButtonRelease |
                       Event_X_MotionNotify, (EventHandler)event, NULL);
 
-    /* XXX parse a config */
-    binddef();
+    mouserc_parse();
 }
 
 void plugin_shutdown()

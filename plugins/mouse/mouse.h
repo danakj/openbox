@@ -18,4 +18,7 @@ typedef struct {
     Action *action[NUM_MOUSEACTION];
 } MouseBinding;
 
+gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
+               Action *action);
+
 #endif

@@ -22,14 +22,31 @@ void cparse_go(char *filename, FILE *);
 
 void config_startup()
 {
-    /* set up built in variables! and their default values! */
-
-    config_def_set(config_def_new("engine", Config_String));
-    config_def_set(config_def_new("theme", Config_String));
-    config_def_set(config_def_new("font", Config_String));
-    config_def_set(config_def_new("font.shadow", Config_Integer));
-    config_def_set(config_def_new("font.shadow.offset", Config_Integer));
-    config_def_set(config_def_new("titlebar.layout", Config_String));
+    /* set up options exported by the kernel */
+    config_def_set(config_def_new("engine", Config_String,
+                                  "Engine",
+                                  "The name of the theming engine to be used "
+                                  "to decorate windows."));
+    config_def_set(config_def_new("theme", Config_String,
+                                  "Theme",
+                                  "The name of the theme to load with the "
+                                  "chosen engine."));
+    config_def_set(config_def_new("font", Config_String,
+                                  "Titlebar Font",
+                                  "The fontstring specifying the font to "
+                                  "be used in window titlebars."));
+    config_def_set(config_def_new("font.shadow", Config_Integer,
+                                  "Titlebar Font Shadow",
+                                  "Whether or not the text in the window "
+                                  "titlebars gets a drop shadow."));
+    config_def_set(config_def_new("font.shadow.offset", Config_Integer,
+                                  "Titlebar Font Shadow Offset",
+                                  "The offset of the drop shadow for text "
+                                  "in the window titlebars."));
+    config_def_set(config_def_new("titlebar.layout", Config_String,
+                                  "Titlebar Layout",
+                                  "The ordering of the elements in the "
+                                  "window titlebars."));
 
     /*g_datalist_foreach(&config_def, print_config, NULL);*/
 }
@@ -154,12 +171,15 @@ static void config_free_entry(ConfigEntry *entry)
     g_free(entry);
 }
 
-ConfigDefEntry *config_def_new(char *name, ConfigValueType type)
+ConfigDefEntry *config_def_new(char *name, ConfigValueType type,
+                                char *descriptive_name, char *long_description)
 {
     ConfigDefEntry *entry;
 
     entry = g_new(ConfigDefEntry, 1);
     entry->name = g_ascii_strdown(name, -1);
+    entry->descriptive_name = g_strdup(descriptive_name);
+    entry->long_description = g_strdup(long_description);
     entry->hasList = FALSE;
     entry->type = type;
     entry->values = NULL;
@@ -171,6 +191,8 @@ static void config_def_free(ConfigDefEntry *entry)
     GSList *it;
 
     g_free(entry->name);
+    g_free(entry->descriptive_name);
+    g_free(entry->long_description);
     if (entry->hasList) {
         for (it = entry->values; it != NULL; it = it->next)
             g_free(it->data);

@@ -21,6 +21,8 @@ typedef struct {
 
 typedef struct {
     char *name;
+    char *descriptive_name; /* user friendly name */
+    char *long_description; /* text description of option */
     ConfigValueType type;
     /* if it is a string type optionally provide a list of valid strings */
     gboolean hasList;
@@ -39,7 +41,8 @@ gboolean config_set(char *name, ConfigValueType type, ConfigValue value);
 gboolean config_get(char *name, ConfigValueType type, ConfigValue *value);
 
 /* Create a new config definition to add to the config system */
-ConfigDefEntry *config_def_new(char *name, ConfigValueType type);
+ConfigDefEntry *config_def_new(char *name, ConfigValueType type,
+                               char *descriptive_name, char *long_description);
 
 /* Add a value to a String type config definition */
 gboolean config_def_add_value(ConfigDefEntry *entry, char *value);

@@ -377,8 +377,8 @@ dist_planton_theme_DATA = \
 	themes/planton/themerc \
 	themes/planton/max.xbm \
 	themes/planton/max_toggled.xbm \
-	themes/planton/stick.xbm \
-	themes/planton/stick_toggled.xbm \
+	themes/planton/desk.xbm \
+	themes/planton/desk_toggled.xbm \
 	themes/planton/shade.xbm \
 	themes/planton/shade_toggled.xbm \
 	themes/planton/iconify.xbm \
@@ -414,8 +414,8 @@ dist_bbstyle_theme_DATA = \
 	themes/BBstylE/themerc \
 	themes/BBstylE/max.xbm \
 	themes/BBstylE/max_toggled.xbm \
-	themes/BBstylE/stick.xbm \
-	themes/BBstylE/stick_toggled.xbm \
+	themes/BBstylE/desk.xbm \
+	themes/BBstylE/desk_toggled.xbm \
 	themes/BBstylE/shade.xbm \
 	themes/BBstylE/shade_toggled.xbm \
 	themes/BBstylE/iconify.xbm \

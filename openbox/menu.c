@@ -15,6 +15,52 @@ GHashTable *menu_hash = NULL;
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
+static void parse_menu(xmlDocPtr doc, xmlNodePtr node, void *data)
+{
+    Action *act;
+    xmlNodePtr nact;
+    gchar *id = NULL, *title = NULL, *label = NULL;
+    Menu *menu, *parent;
+
+    if (!parse_attr_string("id", node->parent, &id))
+        goto parse_menu_fail;
+    if (!parse_attr_string("label", node->parent, &title))
+        goto parse_menu_fail;
+
+    g_message("menu label %s", title);
+
+    menu = menu_new(title, id, data ? *((Menu**)data) : NULL);
+    if (data)
+        *((Menu**)data) = menu;
+
+    while (node) {
+        if (!xmlStrcasecmp(node->name, (const xmlChar*) "menu")) {
+            parent = menu;
+            parse_menu(doc, node->xmlChildrenNode, &parent);
+            menu_add_entry(menu, menu_entry_new_submenu(parent->label,
+                                                        parent));
+        }
+        else if (!xmlStrcasecmp(node->name, (const xmlChar*) "item")) {
+            if (parse_attr_string("label", node, &label)) {
+                if ((nact = parse_find_node("action", node->xmlChildrenNode)))
+                    act = action_parse(doc, nact);
+                else
+                    act = NULL;
+                if (act)
+                    menu_add_entry(menu, menu_entry_new(label, act));
+                else
+                    menu_add_entry(menu, menu_entry_new_separator(label));
+                g_free(label);
+            }
+        }
+        node = node->next;
+    }
+
+parse_menu_fail:
+    g_free(id);
+    g_free(title);
+}
+
 void menu_control_show(Menu *self, int x, int y, Client *client);
 
 void menu_destroy_hash_key(Menu *menu)
@@ -64,17 +110,20 @@ void menu_entry_free(MenuEntry *self)
     
 void menu_startup()
 {
-    Menu *m;
 /*
+    Menu *m;
     Menu *s;
     Menu *t;
-*/
     Action *a;
+*/
 
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
                                       (GDestroyNotify)menu_destroy_hash_key,
                                       (GDestroyNotify)menu_destroy_hash_value);
 
+    parse_register("menu", parse_menu, NULL);
+
+/*
     m = menu_new("sex menu", "root", NULL);
  
     a = action_from_string("execute");
@@ -85,6 +134,7 @@ void menu_startup()
     menu_add_entry(m, menu_entry_new_separator("--"));
     a = action_from_string("exit");
     menu_add_entry(m, menu_entry_new("exit", a));
+*/
 
     /*
     s = menu_new("subsex menu", "submenu", m);
@@ -161,22 +211,16 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
 
     attrib.override_redirect = TRUE;
     attrib.event_mask = FRAME_EVENTMASK;
-    self->frame = createWindow(ob_root, CWOverrideRedirect|CWEventMask, &attrib);
+    self->frame = createWindow(ob_root,
+                               CWOverrideRedirect|CWEventMask, &attrib);
     attrib.event_mask = TITLE_EVENTMASK;
     self->title = createWindow(self->frame, CWEventMask, &attrib);
     self->items = createWindow(self->frame, 0, &attrib);
 
-    XSetWindowBorderWidth(ob_display, self->frame, ob_rr_theme->bwidth);
-    XSetWindowBackground(ob_display, self->frame, ob_rr_theme->b_color->pixel);
-    XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);
-    XSetWindowBorder(ob_display, self->frame, ob_rr_theme->b_color->pixel);
-    XSetWindowBorder(ob_display, self->title, ob_rr_theme->b_color->pixel);
+    self->a_title = self->a_items = NULL;
 
     XMapWindow(ob_display, self->title);
     XMapWindow(ob_display, self->items);
-
-    self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
-    self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
 
     g_hash_table_insert(window_map, &self->frame, self);
     g_hash_table_insert(window_map, &self->title, self);
@@ -236,9 +280,8 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
     attrib.event_mask = ENTRY_EVENTMASK;
     entry->item = createWindow(menu->items, CWEventMask, &attrib);
     XMapWindow(ob_display, entry->item);
-    entry->a_item = RrAppearanceCopy(ob_rr_theme->a_menu_item);
-    entry->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
-    entry->a_hilite = RrAppearanceCopy(ob_rr_theme->a_menu_hilite);
+
+    entry->a_item = entry->a_disabled = entry->a_hilite = NULL;
 
     menu->invalid = TRUE;
 
@@ -255,7 +298,7 @@ void menu_show(char *name, int x, int y, Client *client)
                   name);
         return;
     }
-    
+
     menu_show_full(self, x, y, client);
 }  
 

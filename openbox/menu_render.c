@@ -26,6 +26,18 @@ void menu_render_full(Menu *self) {
     self->size.width = 1;
     self->item_h = 1;
 
+    if (self->a_title == NULL) {
+        XSetWindowBorderWidth(ob_display, self->frame, ob_rr_theme->bwidth);
+        XSetWindowBackground(ob_display, self->frame,
+                             ob_rr_theme->b_color->pixel);
+        XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);
+        XSetWindowBorder(ob_display, self->frame, ob_rr_theme->b_color->pixel);
+        XSetWindowBorder(ob_display, self->title, ob_rr_theme->b_color->pixel);
+
+        self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
+        self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
+    }
+    
     /* set texture data and size them mofos out */
     if (self->label) {
 	self->a_title->texture[0].data.text.string = self->label;
@@ -38,6 +50,12 @@ void menu_render_full(Menu *self) {
     for (it = self->entries; it; it = it->next) {
         MenuEntry *e = it->data;
         int h;
+
+        if (e->a_item == NULL) {
+            e->a_item = RrAppearanceCopy(ob_rr_theme->a_menu_item);
+            e->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
+            e->a_hilite = RrAppearanceCopy(ob_rr_theme->a_menu_hilite);
+        }
 
         e->a_item->texture[0].data.text.string = e->label;
         RrMinsize(e->a_item, &e->min_w, &self->item_h);

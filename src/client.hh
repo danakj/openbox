@@ -538,6 +538,8 @@ BB    @param window The window id that the Client class should handle
   inline bool urgent() const { return _urgent; }
   //! Returns if the window wants to be notified when it receives focus
   inline bool focusNotify() const { return _focus_notify; }
+  //! Returns if the window is the focused window
+  inline bool focused() const { return _focused; }
   //! Returns if the window uses the Shape extension
   inline bool shaped() const { return _shaped; }
   //! Returns the window's gravity
@@ -680,6 +682,8 @@ BB    @param window The window id that the Client class should handle
   */
   bool validate() const;
 
+  void installColormap(bool install) const;
+  
   virtual void focusHandler(const XFocusChangeEvent &e);
   virtual void unfocusHandler(const XFocusChangeEvent &e);
   virtual void propertyHandler(const XPropertyEvent &e);

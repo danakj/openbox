@@ -77,7 +77,6 @@ int main(int argc, char **argv)
     cur = XCreateFontCursor(d, XC_crosshair);
     XGrabPointer(d, RootWindow(d, s), False, ButtonPressMask, GrabModeAsync,
                  GrabModeAsync, None, cur, CurrentTime);
-    XEvent ev;
     while (1) {
         XNextEvent(d, &ev);
         if (ev.type == ButtonPress) {

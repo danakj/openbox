@@ -6,8 +6,8 @@ sh() {
 
 sh aclocal
 sh autoheader
-sh autoconf
 sh automake --foreign --include-deps --add-missing
+sh autoconf
 
 echo
 echo You are now ready to run ./configure

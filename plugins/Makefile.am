@@ -1,4 +1,4 @@
-XFplugindir=$(libdir)/openbox/plugins
+plugindir=$(libdir)/openbox/plugins
 
 SUBDIRS = keyboard mouse placement menu
 

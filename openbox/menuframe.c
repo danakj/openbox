@@ -7,7 +7,7 @@
 #include "render/theme.h"
 
 #define PADDING 2
-#define SEPARATOR_HEIGHT 5
+#define SEPARATOR_HEIGHT 3
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
 			 LeaveWindowMask)
@@ -105,11 +105,16 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     self->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
     self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_hilite);
 
-    self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
-    self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
-    self->a_mask = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
-    self->a_mask->texture[0].type = RR_TEXTURE_MASK;
-    self->a_bullet = RrAppearanceCopy(ob_rr_theme->a_menu_bullet);
+    if (entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR) {
+        self->a_separator = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
+        self->a_separator->texture[0].type = RR_TEXTURE_LINE_ART;
+    } else {
+        self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
+        self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
+        self->a_mask = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
+        self->a_mask->texture[0].type = RR_TEXTURE_MASK;
+        self->a_bullet = RrAppearanceCopy(ob_rr_theme->a_menu_bullet);
+    }
 
     self->a_text_normal =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_item);
@@ -133,6 +138,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
         RrAppearanceFree(self->a_disabled);
         RrAppearanceFree(self->a_selected);
 
+        RrAppearanceFree(self->a_separator);
         RrAppearanceFree(self->a_icon);
         RrAppearanceFree(self->a_mask);
         RrAppearanceFree(self->a_text_normal);
@@ -197,7 +203,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         th = self->frame->item_h;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        th = SEPARATOR_HEIGHT;
+        th = SEPARATOR_HEIGHT + 2*PADDING;
         break;
     }
     RECT_SET_SIZE(self->area, self->frame->inner_w, th);
@@ -237,7 +243,6 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->surface.parenty = PADDING;
         RrPaint(text_a, self->text, self->frame->text_w,
                 self->frame->item_h - 2*PADDING);
-        XMapWindow(ob_display, self->text);
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         XMoveResizeWindow(ob_display, self->text,
@@ -249,10 +254,24 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->surface.parenty = PADDING;
         RrPaint(text_a, self->text, self->frame->text_w - self->frame->item_h,
                 self->frame->item_h - 2*PADDING);
-        XMapWindow(ob_display, self->text);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        XUnmapWindow(ob_display, self->text);
+        XMoveResizeWindow(ob_display, self->text,
+                          self->frame->text_x, PADDING,
+                          self->frame->text_w - 2*PADDING,
+                          SEPARATOR_HEIGHT);
+        self->a_separator->surface.parent = item_a;
+        self->a_separator->surface.parentx = self->frame->text_x;
+        self->a_separator->surface.parenty = PADDING;
+        self->a_separator->texture[0].data.lineart.color =
+            text_a->texture[0].data.text.color;
+        self->a_separator->texture[0].data.lineart.x1 = 2*PADDING;
+        self->a_separator->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT / 2;
+        self->a_separator->texture[0].data.lineart.x2 =
+            self->frame->text_w - 6*PADDING;
+        self->a_separator->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT / 2;
+        RrPaint(self->a_separator, self->text,
+                self->frame->text_w - 2*PADDING, SEPARATOR_HEIGHT);
         break;
     }
 

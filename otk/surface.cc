@@ -58,17 +58,17 @@ void Surface::destroyObjects()
 {
   assert(_im); assert(_pm != None); assert(_xftdraw);
 
+  XftDrawDestroy(_xftdraw);
+  _xftdraw = 0;
+
+  XFreePixmap(**display, _pm);
+  _pm = None;
+
   // do the delete ourselves cuz we alloc it with new not malloc
   delete [] _im->data;
   _im->data = NULL;
   XDestroyImage(_im);
   _im = 0;
-
-  XFreePixmap(**display, _pm);
-  _pm = None;
-
-  XftDrawDestroy(_xftdraw);
-  _xftdraw = 0;
 }
 
 void Surface::setSize(int w, int h)

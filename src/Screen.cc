@@ -206,6 +206,10 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   BTexture* texture = &(resource.wstyle.l_focus);
   geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
+  if (geom_pixmap == ParentRelative) {
+    texture = &(resource.wstyle.t_focus);
+    geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
+  }
   if (! geom_pixmap)
     XSetWindowBackground(blackbox->getXDisplay(), geom_window,
                          texture->color().pixel());
@@ -384,6 +388,10 @@ void BScreen::reconfigure(void) {
 
   BTexture* texture = &(resource.wstyle.l_focus);
   geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
+  if (geom_pixmap == ParentRelative) {
+    texture = &(resource.wstyle.t_focus);
+    geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
+  }
   if (! geom_pixmap)
     XSetWindowBackground(blackbox->getXDisplay(), geom_window,
                          texture->color().pixel());

@@ -1,4 +1,4 @@
-// -*- mode: C; indent-tabs-mode: nil; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #include "../config.h"
 #include "display.h"
@@ -148,8 +148,7 @@ void OtkDisplay_Ungrab(OtkDisplay *self)
 
 OtkScreenInfo *OtkDisplay_ScreenInfo(OtkDisplay *self, int num)
 {
-  PyObject *py = PyList_GetItem((PyObject*)self->screenInfoList, num);
-  return (OtkScreenInfo*) py;
+  return (OtkScreenInfo*)PyList_GetItem((PyObject*)self->screenInfoList, num);
 }
 
 

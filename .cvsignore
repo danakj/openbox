@@ -24,3 +24,4 @@ config.rpath
 py-compile
 ABOUT-NLS
 compile
+lex.cparse.c

@@ -45,6 +45,8 @@ static void event_handle_client(ObClient *c, XEvent *e);
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(gpointer data);
 
+static gboolean menu_hide_delay_func(gpointer data);
+
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
                             (e)->xfocus.detail == NotifyAncestor || \
                             (e)->xfocus.detail > NotifyNonlinearVirtual)
@@ -69,6 +71,8 @@ static const int mask_table[] = {
 static int mask_table_size;
 
 static ObClient *focus_delay_client;
+
+static gboolean menu_can_hide;
 
 #ifdef USE_SM
 static void ice_handler(int fd, gpointer conn)
@@ -491,6 +495,12 @@ static void event_process(const XEvent *ec, gpointer data)
             if (!keyboard_process_interactive_grab(e, &client)) {
                 if (moveresize_in_progress)
                     moveresize_event(e);
+
+                menu_can_hide = FALSE;
+                ob_main_loop_timeout_add(ob_main_loop,
+                                         G_USEC_PER_SEC / 4,
+                                         menu_hide_delay_func,
+                                         NULL, NULL);
 
                 if (e->type == ButtonPress || e->type == ButtonRelease ||
                     e->type == MotionNotify)
@@ -1122,14 +1132,11 @@ static void event_handle_menu(XEvent *ev)
 
     switch (ev->type) {
     case ButtonRelease:
-        if (!(f = menu_frame_under(ev->xbutton.x_root,
-                                   ev->xbutton.y_root)))
+        if ((e = menu_entry_frame_under(ev->xbutton.x_root,
+                                        ev->xbutton.y_root)))
+            menu_entry_frame_execute(e, ev->xbutton.state);
+        else if (menu_can_hide)
             menu_frame_hide_all();
-        else {
-            if ((e = menu_entry_frame_under(ev->xbutton.x_root,
-                                            ev->xbutton.y_root)))
-                menu_entry_frame_execute(e, ev->xbutton.state);
-        }
         break;
     case MotionNotify:
         if ((f = menu_frame_under(ev->xmotion.x_root,
@@ -1166,6 +1173,12 @@ static void event_handle_menu(XEvent *ev)
         }
         break;
     }
+}
+
+static gboolean menu_hide_delay_func(gpointer data)
+{
+    menu_can_hide = TRUE;
+    return FALSE; /* no repeat */
 }
 
 static gboolean focus_delay_func(gpointer data)

@@ -6,6 +6,7 @@ rcdir           = $(datadir)/openbox
 desktopfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
+pixmapdir       = $(datadir)/pixmaps
 
 theme = thebear
 
@@ -244,6 +245,9 @@ nodist_pkgconfig_DATA = \
 	parser/obparser-3.0.pc
 
 ## data ##
+
+dist_pixmap_DATA = \
+	data/openbox.png
 
 dist_rc_DATA = \
 	data/rc.xml \

@@ -5,3 +5,7 @@ Makefile.in
 .libs
 .deps
 translate.lo
+lex.mparse.c
+lex.mparse.lo
+mouserc_parse.l
+mouserc_parse.lo

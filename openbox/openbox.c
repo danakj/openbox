@@ -63,7 +63,7 @@ Cursor      ob_cursors[OB_NUM_CURSORS];
 KeyCode     ob_keys[OB_NUM_KEYS];
 
 static ObState   state;
-static gboolean  sync;
+static gboolean  xsync;
 static gboolean  shutdown;
 static gboolean  restart;
 static char     *restart_path;
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 
     /* XXX fork self onto other screens */
      
-    XSynchronize(ob_display, sync);
+    XSynchronize(ob_display, xsync);
 
     /* check for locale support */
     if (!XSupportsLocale())
@@ -524,7 +524,7 @@ static void parse_args(int argc, char **argv)
             print_help();
             exit(0);
         } else if (!strcmp(argv[i], "--sync")) {
-            sync = TRUE;
+            xsync = TRUE;
 #ifdef USE_SM
         } else if (!strcmp(argv[i], "--sm-client-id")) {
             if (i == argc - 1) /* no args left */

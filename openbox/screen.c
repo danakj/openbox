@@ -423,13 +423,14 @@ void screen_show_desktop(gboolean show)
 
 void screen_install_colormap(Client *client, gboolean install)
 {
+    XWindowAttributes wa;
+
     if (client == NULL) {
 	if (install)
 	    XInstallColormap(ob_display, render_colormap);
 	else
 	    XUninstallColormap(ob_display, render_colormap);
     } else {
-	XWindowAttributes wa;
 	if (XGetWindowAttributes(ob_display, client->window, &wa) &&
             wa.colormap != None) {
 	    if (install)

@@ -17,4 +17,7 @@ void mouse_event(struct _ObClient *client, XEvent *e);
 
 void mouse_grab_for_client(struct _ObClient *client, gboolean grab);
 
+ObFrameContext mouse_button_frame_context(ObFrameContext context,
+                                          guint button);
+
 #endif

@@ -581,7 +581,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it. */
         if (!(e->xbutton.button == 4 || e->xbutton.button == 5)) {
-            switch (frame_context(client, e->xbutton.window)) {
+            con = frame_context(client, e->xbutton.window);
+            con = mouse_button_frame_context(con, e->xbutton.button);
+            switch (con) {
             case OB_FRAME_CONTEXT_MAXIMIZE:
                 client->frame->max_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);

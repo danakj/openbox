@@ -143,6 +143,9 @@ def end_move(data):
 def _do_resize():
     global _screen, _client, _cx, _cy, _cw, _ch, _px, _py, _dx, _dy
 
+    dx = _dx
+    dy = _dy
+    
     # pick a corner to anchor
     if not (resize_nearest or _context == ob.MouseContext.Grip):
         corner = ob.Client.TopLeft
@@ -152,19 +155,19 @@ def _do_resize():
         if y < _ch / 2:
             if x < _cw / 2:
                 corner = ob.Client.BottomRight
-                _dx *= -1
+                dx *= -1
             else:
                 corner = ob.Client.BottomLeft
-            _dy *= -1
+            dy *= -1
         else:
             if x < _cw / 2:
                 corner = ob.Client.TopRight
-                _dx *= -1
+                dx *= -1
             else:
                 corner = ob.Client.TopLeft
 
-    w = _cw + _dx
-    h = _ch + _dy
+    w = _cw + dx
+    h = _ch + dy
 
     global resize_popup
     if resize_rubberband:

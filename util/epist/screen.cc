@@ -541,16 +541,18 @@ void screen::updateActiveWindow() {
 
   _active = it;
 
-  /* if we're not cycling and a window gets focus, add it to the top of the
-   * cycle stack.
-   */
-  if (_stacked_cycling && !_cycling) {
-    _clients.remove(*_active);
-    _clients.push_front(*_active);
-  }
+  if (_active != end) {
+    /* if we're not cycling and a window gets focus, add it to the top of the
+     * cycle stack.
+     */
+    if (_stacked_cycling && !_cycling) {
+      _clients.remove(*_active);
+      _clients.push_front(*_active);
+      _active = _clients.begin();
+    }
 
-  if (it != end)
-    _last_active = it;
+    _last_active = _active;
+  }
 
   /*  cout << "Active window is now: ";
       if (_active == _clients.end()) cout << "None\n";

@@ -12,8 +12,8 @@ libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   texture.cc timer.cc timerqueuemanager.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc \
-                  label.cc focuslabel.cc application.cc appwidget.cc \
-                  otk_wrap.cc
+                  label.cc focuslabel.cc application.cc appwidget.cc
+#                  otk_wrap.cc
 
 libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS)
 
@@ -29,11 +29,11 @@ distclean-local:
 otk_test: libotk.a otk_test.cc
 	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
 
-otk.i: $(wildcard *.hh)
-	touch $@
+#otk.i: $(wildcard *.hh)
+#	touch $@
 
-otk_wrap.cc: otk.i
-	swig $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -o $@ $<
+#otk_wrap.cc: otk.i
+#	swig $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -o $@ $<
 
 # local dependencies
 application.o: application.cc application.hh eventdispatcher.hh \

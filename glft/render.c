@@ -99,7 +99,6 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
         return;
     }
 
-    drawstring(font, str, bytes, color, x, y);
     if (font->shadow && font->shadow_alpha != 0) {
         struct GlftColor c;
         if (font->shadow_alpha > 0) {
@@ -110,8 +109,10 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
             c.a = -font->shadow_alpha;
         }
         drawstring(font, str, bytes, &c,
-                   x + font->shadow_offset, y + font->shadow_offset);
+                   x + font->shadow_offset, y);
+        y += font->shadow_offset;
     }
+    drawstring(font, str, bytes, color, x, y);
 }
 
 void GlftMeasureString(struct GlftFont *font,

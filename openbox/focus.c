@@ -122,6 +122,23 @@ static gboolean focus_under_pointer()
     return FALSE;
 }
 
+/* finds the first transient that isn't 'skip' */
+static Client *find_transient_recursive(Client *c, Client *top, Client *skip)
+{
+    GSList *it;
+    Client *ret;
+
+    for (it = c->transients; it; it = it->next) {
+        g_message("looking");
+        if (it->data == top) return NULL;
+        ret = find_transient_recursive(it->data, top, skip);
+        if (ret && ret != skip) return ret;
+        if (it->data != skip) return it->data;
+        g_message("not found");
+    }
+    return NULL;
+}
+
 void focus_fallback(FallbackType type)
 {
     GList *it;
@@ -142,18 +159,29 @@ void focus_fallback(FallbackType type)
     }
 
     if (type == Fallback_Unfocusing && old && old->transient_for) {
+        Client *c = NULL;
+
         if (old->transient_for == TRAN_GROUP) {
             for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
                 GSList *sit;
 
                 for (sit = old->group->members; sit; sit = sit->next)
-                    if (sit->data == it->data && client_focus(sit->data))
-                        return;
+                    if (sit->data == it->data && client_normal(sit->data) &&
+                        client_focusable(sit->data)) {
+                        c = sit->data;
+                        break;
+                    }
             }
         } else {
             if (client_normal(old->transient_for))
-                if (client_focus(old->transient_for))
-                    return;
+                c = old->transient_for;
+        }
+
+        if (c) {
+            Client *t = find_transient_recursive(c, c, old);
+            if (!t) t = c; /* no transient, keep the top */
+            if (client_focus(t))
+                return;
         }
     }
 

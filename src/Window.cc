@@ -1792,8 +1792,21 @@ void BlackboxWindow::maximize(unsigned int button) {
   blackbox_attrib.premax_h =
     client.rect.height() + frame.margin.top + frame.margin.bottom;
 
-  const Rect &screen_area = screen->availableArea();
-  frame.changing = screen_area;
+#ifdef    XINERAMA
+  if (screen->isXineramaActive() && blackbox->doXineramaMaximizing()) {
+    // find the area to use
+    RectList availableAreas = screen->allAvailableAreas();
+    RectList::iterator it, end = availableAreas.end();
+
+    for (it = availableAreas.begin(); it != end; ++it)
+      if (it->intersects(frame.rect)) break;
+    if (it == end) // the window isn't inside an area
+      it = availableAreas.begin(); // so just default to the first one
+
+    frame.changing = *it;
+  } else
+#endif
+  frame.changing = screen->availableArea();
 
   switch(button) {
   case 1:

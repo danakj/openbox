@@ -435,6 +435,8 @@ void OBFrame::releaseClient()
   if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
                              ReparentNotify, &ev)) {
     XPutBackEvent(otk::OBDisplay::display, &ev);
+    // re-map the window since the unmanaging process unmaps it
+    XMapWindow(otk::OBDisplay::display, _client->window());  
   } else {
     // according to the ICCCM - if the client doesn't reparent itself, then we
     // will reparent the window to root for them

@@ -472,14 +472,9 @@ void screen::updateClientList() {
     if (it == end) {  // didn't already exist
       if (doAddWindow(rootclients[i])) {
 //        cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
-        if (_stacked_cycling) {
-          // insert new clients after the active window
-          _clients.insert(insert_point, new XWindow(_epist, this,
-                                                    rootclients[i]));
-        } else {
-          // insert new clients at the front of the list
-          _clients.push_front(new XWindow(_epist, this, rootclients[i]));
-        }
+        // insert new clients after the active window
+        _clients.insert(insert_point, new XWindow(_epist, this,
+                                                  rootclients[i]));
       }
     }
   }

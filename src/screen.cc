@@ -717,7 +717,8 @@ void Screen::changeNumDesktops(long num)
   Client::List::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     int d = (*it)->desktop();
-    if (d >= num && !(d == 0xffffffff || d == Client::ICONIC_DESKTOP)) {
+    if (d >= num && !(d == (signed) 0xffffffff ||
+                      d == Client::ICONIC_DESKTOP)) {
       XEvent ce;
       ce.xclient.type = ClientMessage;
       ce.xclient.message_type = otk::Property::atoms.net_wm_desktop;

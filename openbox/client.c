@@ -49,7 +49,7 @@ static void client_change_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
-static void client_act_urgent(ObClient *self);
+static void client_urgent_notify(ObClient *self);
 
 void client_startup()
 {
@@ -482,16 +482,12 @@ void client_unmanage(ObClient *self)
     client_set_list();
 }
 
-static void client_act_urgent(ObClient *self)
+static void client_urgent_notify(ObClient *self)
 {
-    GSList *it;
-
-    for (it = config_urgent_actions; it; it = g_slist_next(it)) {
-        ObAction *a = it->data;
-
-        a->data.any.c = self;
-        a->func(&a->data);
-    }
+    if (self->urgent)
+        frame_flash_start(self->frame);
+    else
+        frame_flash_stop(self->frame);
 }
 
 static void client_restore_session_state(ObClient *self)
@@ -1305,8 +1301,8 @@ void client_update_wmhints(ObClient *self)
                  ur ? "ON" : "OFF");
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
-	if (self->frame && self->urgent)
-            client_act_urgent(self);
+	if (self->frame)
+            client_urgent_notify(self);
     }
 }
 
@@ -1730,7 +1726,7 @@ static void client_apply_startup_state(ObClient *self)
 	client_shade(self, TRUE);
     }
     if (self->urgent)
-        client_act_urgent(self);
+        client_urgent_notify(self);
   
     if (self->max_vert && self->max_horz) {
 	self->max_vert = self->max_horz = FALSE;

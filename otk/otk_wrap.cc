@@ -5539,6 +5539,34 @@ static PyObject *_wrap_OBDisplay_xinerama(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBDisplay_numLockMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    unsigned int result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":OBDisplay_numLockMask")) goto fail;
+    result = (unsigned int)otk::OBDisplay::numLockMask();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBDisplay_scrollLockMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    unsigned int result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":OBDisplay_scrollLockMask")) goto fail;
+    result = (unsigned int)otk::OBDisplay::scrollLockMask();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBDisplay_grab(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     
@@ -13041,6 +13069,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBDisplay_shape", _wrap_OBDisplay_shape, METH_VARARGS },
 	 { (char *)"OBDisplay_shapeEventBase", _wrap_OBDisplay_shapeEventBase, METH_VARARGS },
 	 { (char *)"OBDisplay_xinerama", _wrap_OBDisplay_xinerama, METH_VARARGS },
+	 { (char *)"OBDisplay_numLockMask", _wrap_OBDisplay_numLockMask, METH_VARARGS },
+	 { (char *)"OBDisplay_scrollLockMask", _wrap_OBDisplay_scrollLockMask, METH_VARARGS },
 	 { (char *)"OBDisplay_grab", _wrap_OBDisplay_grab, METH_VARARGS },
 	 { (char *)"OBDisplay_ungrab", _wrap_OBDisplay_ungrab, METH_VARARGS },
 	 { (char *)"OBDisplay_grabButton", _wrap_OBDisplay_grabButton, METH_VARARGS },

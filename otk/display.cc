@@ -49,6 +49,8 @@ int  OBDisplay::_shape_event_basep = 0;
 bool OBDisplay::_xinerama = false;
 int  OBDisplay::_xinerama_event_basep = 0;
 unsigned int OBDisplay::_mask_list[8];
+unsigned int OBDisplay::_scrollLockMask = 0;
+unsigned int OBDisplay::_numLockMask = 0;
 OBDisplay::ScreenInfoList OBDisplay::_screenInfoList;
 BGCCache *OBDisplay::_gccache = (BGCCache*) 0;
 int OBDisplay::_grab_count = 0;
@@ -113,7 +115,6 @@ line argument.\n\n"));
 
   // get lock masks that are defined by the display (not constant)
   XModifierKeymap *modmap;
-  unsigned int NumLockMask = 0, ScrollLockMask = 0;
 
   modmap = XGetModifierMapping(display);
   if (modmap && modmap->max_keypermod > 0) {
@@ -133,9 +134,9 @@ line argument.\n\n"));
       if (! modmap->modifiermap[cnt]) continue;
 
       if (num_lock == modmap->modifiermap[cnt])
-        NumLockMask = mask_table[cnt / modmap->max_keypermod];
+        _numLockMask = mask_table[cnt / modmap->max_keypermod];
       if (scroll_lock == modmap->modifiermap[cnt])
-        ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
+        _scrollLockMask = mask_table[cnt / modmap->max_keypermod];
     }
   }
 
@@ -143,12 +144,12 @@ line argument.\n\n"));
 
   _mask_list[0] = 0;
   _mask_list[1] = LockMask;
-  _mask_list[2] = NumLockMask;
-  _mask_list[3] = LockMask | NumLockMask;
-  _mask_list[4] = ScrollLockMask;
-  _mask_list[5] = ScrollLockMask | LockMask;
-  _mask_list[6] = ScrollLockMask | NumLockMask;
-  _mask_list[7] = ScrollLockMask | LockMask | NumLockMask;
+  _mask_list[2] = _numLockMask;
+  _mask_list[3] = LockMask | _numLockMask;
+  _mask_list[4] = _scrollLockMask;
+  _mask_list[5] = _scrollLockMask | LockMask;
+  _mask_list[6] = _scrollLockMask | _numLockMask;
+  _mask_list[7] = _scrollLockMask | LockMask | _numLockMask;
 
   // Get information on all the screens which are available.
   _screenInfoList.reserve(ScreenCount(display));

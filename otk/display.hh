@@ -42,6 +42,12 @@ private:
   //! A list of all possible combinations of keyboard lock masks
   static unsigned int _mask_list[8];
 
+  //! The value of the mask for the NumLock modifier
+  static unsigned int _numLockMask;
+
+  //! The value of the mask for the ScrollLock modifier
+  static unsigned int _scrollLockMask;
+
   //! The number of requested grabs on the display
   static int _grab_count;
 
@@ -96,6 +102,9 @@ public:
   inline static int shapeEventBase() { return _shape_event_basep; }
   //! Returns if the display has the xinerama extention available
   inline static bool xinerama() { return _xinerama; }
+
+  inline static unsigned int numLockMask() { return _numLockMask; }
+  inline static unsigned int scrollLockMask() { return _scrollLockMask; }
 
   //! Grabs the display
   static void grab();

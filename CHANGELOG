@@ -3,6 +3,10 @@ Changelog for Openbox:
 2.2.1:
  * Fix bug with mutltibyte fonts being really tiny.     (Ben Jansens)
 
+ * Stop using Utf8 drawing routines for Xft. These      (Ben Jansens)
+   don't work at all for high-ascii letters, which are
+   used in the non-english locales.
+
  * Fix menu redraw bug when dragging them off-screen or (Scott Moynes)
    under other menus, with Xft fonts.
 

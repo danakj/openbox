@@ -1805,27 +1805,19 @@ void BScreen::nextFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
-  if (focused) {
-    // if window is not on this screen, ignore it
-    if (focused->getScreen()->getScreenNumber() != getScreenNumber())
-      focused = (BlackboxWindow*) 0;
-  }
-
-  if (focused && current_workspace->getCount() > 1) {
-    // next is the next window to recieve focus, current is a place holder
-    BlackboxWindow *current;
+  if (focused &&
+      focused->getScreen()->getScreenNumber() == getScreenNumber() &&
+      current_workspace->getCount() > 1) {
     do {
-      current = next;
-      next = current_workspace->getNextWindowInList(current);
-    } while(! next->setInputFocus() && next != focused);
+      next = current_workspace->getNextWindowInList(next);
+    } while (next != focused && ! next->setInputFocus());
 
     if (next != focused)
       current_workspace->raiseWindow(next);
-  } else if (current_workspace->getCount() >= 1) {
+  } else if (current_workspace->getCount() > 0) {
     next = current_workspace->getTopWindowOnStack();
-
-    current_workspace->raiseWindow(next);
     next->setInputFocus();
+    current_workspace->raiseWindow(next);
   }
 }
 
@@ -1834,27 +1826,19 @@ void BScreen::prevFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
-  if (focused) {
-    // if window is not on this screen, ignore it
-    if (focused->getScreen()->getScreenNumber() != getScreenNumber())
-      focused = (BlackboxWindow*) 0;
-  }
-
-  if (focused && current_workspace->getCount() > 1) {
-    // next is the next window to recieve focus, current is a place holder
-    BlackboxWindow *current;
+  if (focused &&
+      focused->getScreen()->getScreenNumber() == getScreenNumber() &&
+      current_workspace->getCount() > 1) {
     do {
-      current = next;
-      next = current_workspace->getPrevWindowInList(current);
-    } while(! next->setInputFocus() && next != focused);
+      next = current_workspace->getPrevWindowInList(next);
+    } while (next != focused && ! next->setInputFocus());
 
     if (next != focused)
       current_workspace->raiseWindow(next);
-  } else if (current_workspace->getCount() >= 1) {
+  } else if (current_workspace->getCount() > 0) {
     next = current_workspace->getTopWindowOnStack();
-
-    current_workspace->raiseWindow(next);
     next->setInputFocus();
+    current_workspace->raiseWindow(next);
   }
 }
 

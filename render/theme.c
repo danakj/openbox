@@ -16,7 +16,8 @@ static gboolean read_mask(const RrInstance *inst,
                           gchar *maskname, RrTheme *theme,
                           RrPixmapMask **value);
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
-                                gchar *rname, RrAppearance *value);
+                                gchar *rname, RrAppearance *value,
+                                gboolean allow_trans);
 static void set_default_appearance(RrAppearance *a);
 
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
@@ -257,83 +258,106 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,
-                         "window.title.focus", theme->a_focused_title))
+                         "window.title.focus", theme->a_focused_title,
+                         FALSE))
 	set_default_appearance(theme->a_focused_title);
     if (!read_appearance(db, inst,
-                         "window.title.unfocus", theme->a_unfocused_title))
+                         "window.title.unfocus", theme->a_unfocused_title,
+                         FALSE))
 	set_default_appearance(theme->a_unfocused_title);
     if (!read_appearance(db, inst,
-                         "window.label.focus", theme->a_focused_label))
+                         "window.label.focus", theme->a_focused_label,
+                         TRUE))
 	set_default_appearance(theme->a_focused_label);
     if (!read_appearance(db, inst,
-                         "window.label.unfocus", theme->a_unfocused_label))
+                         "window.label.unfocus", theme->a_unfocused_label,
+                         TRUE))
 	set_default_appearance(theme->a_unfocused_label);
     if (!read_appearance(db, inst,
-                         "window.handle.focus", theme->a_focused_handle))
+                         "window.handle.focus", theme->a_focused_handle,
+                         FALSE))
 	set_default_appearance(theme->a_focused_handle);
     if (!read_appearance(db, inst,
-                         "window.handle.unfocus",theme->a_unfocused_handle))
+                         "window.handle.unfocus",theme->a_unfocused_handle,
+                         FALSE))
 	set_default_appearance(theme->a_unfocused_handle);
     if (!read_appearance(db, inst,
-                         "window.grip.focus", theme->a_focused_grip))
+                         "window.grip.focus", theme->a_focused_grip,
+                         TRUE))
 	set_default_appearance(theme->a_focused_grip);
     if (!read_appearance(db, inst,
-                         "window.grip.unfocus", theme->a_unfocused_grip))
+                         "window.grip.unfocus", theme->a_unfocused_grip,
+                         TRUE))
 	set_default_appearance(theme->a_unfocused_grip);
     if (!read_appearance(db, inst,
-                         "menu.frame", theme->a_menu))
+                         "menu.frame", theme->a_menu,
+                         FALSE))
 	set_default_appearance(theme->a_menu);
     if (!read_appearance(db, inst,
-                         "menu.title", theme->a_menu_title))
+                         "menu.title", theme->a_menu_title,
+                         FALSE))
 	set_default_appearance(theme->a_menu_title);
     if (!read_appearance(db, inst,
-                         "menu.hilite", theme->a_menu_hilite))
+                         "menu.hilite", theme->a_menu_hilite,
+                         TRUE))
 	set_default_appearance(theme->a_menu_hilite);
 
     /* read the appearances for rendering non-decorations */
     if (!read_appearance(db, inst,
-                         "window.title.focus", theme->app_hilite_bg))
+                         "window.title.focus", theme->app_hilite_bg,
+                         FALSE))
         set_default_appearance(theme->app_hilite_bg);
     if (!read_appearance(db, inst,
-                         "window.label.focus", theme->app_hilite_label))
+                         "window.label.focus", theme->app_hilite_label,
+                         TRUE))
         set_default_appearance(theme->app_hilite_label);
     if (!read_appearance(db, inst,
-                         "window.title.unfocus", theme->app_unhilite_bg))
+                         "window.title.unfocus", theme->app_unhilite_bg,
+                         FALSE))
         set_default_appearance(theme->app_unhilite_bg);
     if (!read_appearance(db, inst,
-                         "window.label.unfocus", theme->app_unhilite_label))
+                         "window.label.unfocus", theme->app_unhilite_label,
+                         TRUE))
         set_default_appearance(theme->app_unhilite_label);
 
     /* read buttons textures */
     if (!read_appearance(db, inst,
                          "window.button.disabled.focus",
-			 theme->a_disabled_focused_max))
+			 theme->a_disabled_focused_max,
+                         TRUE))
         set_default_appearance(theme->a_disabled_focused_max);
     if (!read_appearance(db, inst,
                          "window.button.disabled.unfocus",
-			 theme->a_disabled_unfocused_max))
+			 theme->a_disabled_unfocused_max,
+                         TRUE))
         set_default_appearance(theme->a_disabled_unfocused_max);
     if (!read_appearance(db, inst,
                          "window.button.pressed.focus",
-			 theme->a_focused_pressed_max))
+			 theme->a_focused_pressed_max,
+                         TRUE))
 	if (!read_appearance(db, inst,
                              "window.button.pressed",
-                             theme->a_focused_pressed_max))
+                             theme->a_focused_pressed_max,
+                         TRUE))
 	    set_default_appearance(theme->a_focused_pressed_max);
     if (!read_appearance(db, inst,
                          "window.button.pressed.unfocus",
-			 theme->a_unfocused_pressed_max))
+			 theme->a_unfocused_pressed_max,
+                         TRUE))
 	if (!read_appearance(db, inst,
                              "window.button.pressed",
-			     theme->a_unfocused_pressed_max))
+			     theme->a_unfocused_pressed_max,
+                             TRUE))
 	    set_default_appearance(theme->a_unfocused_pressed_max);
     if (!read_appearance(db, inst,
                          "window.button.focus",
-			 theme->a_focused_unpressed_max))
+			 theme->a_focused_unpressed_max,
+                         TRUE))
 	set_default_appearance(theme->a_focused_unpressed_max);
     if (!read_appearance(db, inst,
                          "window.button.unfocus",
-			 theme->a_unfocused_unpressed_max))
+			 theme->a_unfocused_unpressed_max,
+                         TRUE))
 	set_default_appearance(theme->a_unfocused_unpressed_max);
 
     theme->a_disabled_focused_close =
@@ -788,7 +812,8 @@ static gboolean read_mask(const RrInstance *inst,
 
 static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
                              RrReliefType *relief, RrBevelType *bevel,
-                             gboolean *interlaced, gboolean *border)
+                             gboolean *interlaced, gboolean *border,
+                             gboolean allow_trans)
 {
     char *t;
 
@@ -796,7 +821,7 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
     for (t = tex; *t != '\0'; ++t)
 	*t = g_ascii_tolower(*t);
 
-    if (strstr(tex, "parentrelative") != NULL) {
+    if (allow_trans && strstr(tex, "parentrelative") != NULL) {
 	*grad = RR_SURFACE_PARENTREL;
     } else {
 	if (strstr(tex, "gradient") != NULL) {
@@ -841,7 +866,8 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
 
 
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
-                           gchar *rname, RrAppearance *value)
+                                gchar *rname, RrAppearance *value,
+                                gboolean allow_trans)
 {
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname), *cname, *ctoname, *bcname;
@@ -859,7 +885,8 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 			 &value->surface.relief,
 			 &value->surface.bevel,
 			 &value->surface.interlaced,
-			 &value->surface.border);
+			 &value->surface.border,
+                         allow_trans);
 	if (!read_color(db, inst, cname, &value->surface.primary))
 	    value->surface.primary = RrColorNew(inst, 0, 0, 0);
 	if (!read_color(db, inst, ctoname, &value->surface.secondary))

@@ -225,7 +225,6 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
-    case OB_MENU_ENTRY_TYPE_SUBMENU:
         XMoveResizeWindow(ob_display, self->text,
                           self->frame->text_x, 0,
                           self->frame->text_w, self->frame->item_h);
@@ -233,6 +232,18 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->surface.parentx = self->frame->text_x;
         text_a->surface.parenty = 0;
         RrPaint(text_a, self->text, self->frame->text_w, self->frame->item_h);
+        XMapWindow(ob_display, self->text);
+        break;
+    case OB_MENU_ENTRY_TYPE_SUBMENU:
+        XMoveResizeWindow(ob_display, self->text,
+                          self->frame->text_x, 0,
+                          self->frame->text_w - self->frame->item_h,
+                          self->frame->item_h);
+        text_a->surface.parent = item_a;
+        text_a->surface.parentx = self->frame->text_x;
+        text_a->surface.parenty = 0;
+        RrPaint(text_a, self->text, self->frame->text_w - self->frame->item_h,
+                self->frame->item_h);
         XMapWindow(ob_display, self->text);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
@@ -262,11 +273,12 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 
     if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
         XMoveResizeWindow(ob_display, self->bullet,
-                          self->frame->text_x + self->frame->text_w, 0,
+                          self->frame->text_x + self->frame->text_w
+                          - self->frame->item_h, 0,
                           self->frame->item_h, self->frame->item_h);
         self->a_bullet->surface.parent = item_a;
         self->a_bullet->surface.parentx =
-            self->frame->text_x + self->frame->text_w;
+            self->frame->text_x + self->frame->text_w - self->frame->item_h;
         self->a_bullet->surface.parenty = 0;
         RrPaint(self->a_bullet, self->bullet,
                 self->frame->item_h, self->frame->item_h);
@@ -281,7 +293,7 @@ static void menu_frame_render(ObMenuFrame *self)
     gint allitems_h = 0;
     gint tw, th; /* temps */
     GList *it;
-    gboolean has_icon = FALSE, has_bullet = FALSE;
+    gboolean has_icon = FALSE;
     ObMenu *sub;
 
     XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->bwidth);
@@ -338,7 +350,7 @@ static void menu_frame_render(ObMenuFrame *self)
             text_a->texture[0].data.text.string = sub ? sub->title : "";
             RrMinsize(text_a, &tw, &th);
 
-            has_bullet = TRUE;
+            tw += self->item_h;
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
             tw = 0;
@@ -354,8 +366,6 @@ static void menu_frame_render(ObMenuFrame *self)
     self->text_w = w;
 
     if (self->entries) {
-        if (has_bullet)
-            w += self->item_h;
         if (has_icon) {
             w += self->item_h;
             self->text_x += self->item_h;
@@ -581,7 +591,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
                        self->frame->client);
     menu_frame_move(f,
                     self->frame->area.x + self->frame->area.width
-                    - ob_rr_theme->menu_overlap,
+                    - ob_rr_theme->menu_overlap - ob_rr_theme->bwidth,
                     self->frame->area.y + self->frame->title_h +
                     self->area.y + ob_rr_theme->menu_overlap);
     menu_frame_show(f, self->frame);

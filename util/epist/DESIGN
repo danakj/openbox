@@ -16,7 +16,8 @@ Epist design notes, by woodblock
 - send to desktop
 - toggle shade
 - sticky
-- move window (?)
+- move window
+- resize window
 - next/prev window (special orders like stacking, grouping, etc?)
 - maximize/minimize
 - no stupid window

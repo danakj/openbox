@@ -445,12 +445,6 @@ void client_update_icons(Client *self);
 /*! Updates the window's kwm icon */
 void client_update_kwm_icon(Client *self);
 
-/* Disable decorations on the client.
-   @param flags A mask of Decoration enum values which will be disabled on the
-                client if they would normally have been displayed.
-*/
-void client_disable_decorations(Client *self, int flags);
-
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (Client::decorations and Client::functions).
   This also updates the NET_WM_ALLOWED_ACTIONS hint.

@@ -140,6 +140,8 @@ Action *action_from_string(char *name)
     } else if (!g_ascii_strcasecmp(name, "previousdesktoprowwrap")) {
         a = action_new(action_previous_desktop_row);
         a->data.nextprevdesktop.wrap = TRUE;
+    } else if (!g_ascii_strcasecmp(name, "toggledecorations")) {
+        a = action_new(action_toggle_decorations);
     } else if (!g_ascii_strcasecmp(name, "move")) {
         a = action_new(action_move);
     } else if (!g_ascii_strcasecmp(name, "resize")) {

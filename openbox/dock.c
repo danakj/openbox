@@ -150,8 +150,11 @@ void dock_configure()
     GList *it;
     int spot;
     int gravity;
+    int minw, minh;
 
-    dock->w = dock->h = spot = 0;
+    RrMinsize(dock->a_frame, &minw, &minh);
+
+    dock->w = dock->h = 0;
 
     /* get the size */
     for (it = dock->dock_apps; it; it = it->next) {
@@ -164,6 +167,8 @@ void dock_configure()
             dock->h += app->h;
         }
     }
+
+    spot = (config_dock_horz ? minw : minh) / 2;
 
     /* position the apps */
     for (it = dock->dock_apps; it; it = it->next) {
@@ -344,6 +349,9 @@ void dock_configure()
             STRUT_SET(dock_strut, 0, 0, dock->w, 0);
         break;
     }
+
+    dock->w += minw;
+    dock->h += minh;
 
     /* not used for actually sizing shit */
     dock->w -= ob_rr_theme->bwidth * 2;

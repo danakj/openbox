@@ -20,3 +20,5 @@ mkinstalldirs
 missing
 install-sh
 depcomp
+m4
+config.rpath

@@ -164,7 +164,7 @@ gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
         }
 
         if (ret) {
-            *value = pixmap_mask_new(w, h, b);
+            *value = pixmap_mask_new(w, h, (char*)b);
             XFree(b);
         }
       

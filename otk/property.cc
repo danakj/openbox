@@ -30,7 +30,7 @@ OBProperty::OBProperty()
   _atoms[Atom_Utf8] = create("UTF8_STRING");
   
 #ifdef    HAVE_GETPID
-  _atoms[blackbox_pid] = create("_BLACKBOX_PID");
+  _atoms[openbox_pid] = create("_OPENBOX_PID");
 #endif // HAVE_GETPID
 
   _atoms[wm_colormap_windows] = create("WM_COLORMAP_WINDOWS");

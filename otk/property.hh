@@ -34,7 +34,7 @@ public:
     Atom_Utf8,     //!< The atom which represents utf8-encoded strings
     
 #ifdef    HAVE_GETPID
-    blackbox_pid,
+    openbox_pid,
 #endif // HAVE_GETPID
 
     // window hints

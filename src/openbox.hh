@@ -49,6 +49,16 @@ public:
     State_Exiting   //!< The window manager is exiting (being destroyed)
   };
 
+  //! Mouse cursors used throughout Openbox
+  struct Cursors {
+    Cursor session;  //!< The default mouse cursor
+    Cursor move;     //!< For moving a window
+    Cursor ll_angle; //!< For resizing the bottom left corner of a window
+    Cursor lr_angle; //!< For resizing the bottom right corner of a window
+    Cursor ul_angle; //!< For resizing the top left corner of a window
+    Cursor ur_angle; //!< For resizing the right corner of a window
+  };
+  
   //! A map for looking up a specific client class from the window id
   typedef std::map<Window, OBClient *> ClientMap;
   
@@ -93,6 +103,9 @@ private:
   //! The running state of the window manager
   RunState _state;
 
+  //! Mouse cursors used throughout Openbox
+  Cursors _cursors;
+
   //! When set to true, the Openbox::eventLoop function will stop and return
   bool _doshutdown;
 
@@ -127,6 +140,9 @@ public:
   inline otk::OBTimerQueueManager *timerManager() { return &_timermanager; }
 
   inline const otk::OBProperty *property() const { return _property; }
+
+  //! Returns the mouse cursors used throughout Openbox
+  inline const Cursors &cursor() const { return _cursors; }
 
   //! The main function of the Openbox class
   /*!

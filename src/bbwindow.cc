@@ -1583,7 +1583,7 @@ BlackboxWindow *BlackboxWindow::getTransientFor(void) const {
  * move.
  */
 void BlackboxWindow::configure(int dx, int dy,
-                               unsigned int dw, unsigned int dh) {
+                               int dw, int dh) {
   bool send_event = ((frame.rect.x() != dx || frame.rect.y() != dy) &&
                      ! flags.moving);
 

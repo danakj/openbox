@@ -3,3 +3,4 @@
 src/openbox.cc
 src/display.cc
 src/client.cc
+src/screen.cc

@@ -384,7 +384,7 @@ public:
   void ungrabButtons(void);
   void installColormap(bool install);
   void restore(bool remap);
-  void configure(int dx, int dy, unsigned int dw, unsigned int dh);
+  void configure(int dx, int dy, int dw, int dh);
   void setWorkspace(unsigned int n);
   void changeBlackboxHints(const BlackboxHints *net);
   void restoreAttributes(void);

@@ -10,6 +10,8 @@
 #include "otk/display.hh"
 
 extern "C" {
+#include <X11/cursorfont.h>
+
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
@@ -96,7 +98,14 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
   _property = new otk::OBProperty();
-  
+
+  // create the mouse cursors we'll use
+  _cursors.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);
+  _cursors.move = XCreateFontCursor(otk::OBDisplay::display, XC_fleur);
+  _cursors.ll_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ll_angle);
+  _cursors.lr_angle = XCreateFontCursor(otk::OBDisplay::display, XC_lr_angle);
+  _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
+  _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
   
   _state = State_Normal; // done starting
 }

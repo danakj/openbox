@@ -38,9 +38,9 @@ extern "C" {
 #  include <signal.h>
 #endif // HAVE_SIGNAL_H
 
-/*#ifdef    HAVE_LIBGEN_H
+#ifdef    HAVE_LIBGEN_H
 #  include <libgen.h>
-#endif // HAVE_LIBGEN_H*/
+#endif // HAVE_LIBGEN_H
 }
 
 #include <iostream>

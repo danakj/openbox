@@ -318,14 +318,14 @@ void client_manage(Window window)
     if (screen_showing_desktop)
         screen_show_desktop(FALSE);
 
+    /* add to client list/map */
+    client_list = g_list_append(client_list, self);
+    g_hash_table_insert(window_map, &self->window, self);
+
     /* update the list hints */
     client_set_list();
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
-
-    /* add to client list/map */
-    client_list = g_list_append(client_list, self);
-    g_hash_table_insert(window_map, &self->window, self);
 
     ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
 }
@@ -463,19 +463,12 @@ static void client_restore_session_state(ObClient *self)
 {
     ObSessionState *s;
 
-    g_message("looking for %s", self->name);
-
     s = session_state_find(self);
-    g_message("returned %p %d", s, self->positioned);
     if (!(s)) return;
 
-    g_message("restoring state for %s", s->name);
-
-    g_message("%d %d %d %d", s->x, s->y, s->w, s->h);
     RECT_SET(self->area, s->x, s->y, s->w, s->h);
     XResizeWindow(ob_display, self->window, s->w, s->h);
     self->positioned = TRUE;
-    g_message("desktop %d", s->desktop);
     self->desktop = s->desktop == DESKTOP_ALL ? s->desktop :
         MIN(screen_num_desktops - 1, s->desktop);
     self->shaded = s->shaded;

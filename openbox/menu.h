@@ -23,14 +23,15 @@ typedef void (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame, gpointer data);
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry, gpointer data);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
 
-extern ObParseInst *menu_parse_inst;
-
 struct _ObMenu
 {
     /* Name of the menu. Used in the showmenu action. */
     gchar *name;
     /* Displayed title */
     gchar *title;
+
+    /* Command to execute to rebuild the menu */
+    gchar *execute;
 
     /* ObMenuEntry list */
     GList *entries;
@@ -93,6 +94,9 @@ void menu_shutdown();
 
 ObMenu* menu_new(gchar *name, gchar *title, gpointer data);
 void menu_free(ObMenu *menu);
+
+/* Repopulate a pipe-menu by running its command */
+void menu_pipe_execute(ObMenu *self);
 
 void menu_show(gchar *name, gint x, gint y, struct _ObClient *client);
 

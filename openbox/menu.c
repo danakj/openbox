@@ -13,16 +13,16 @@
 #include "client_list_menu.h"
 #include "parser/parse.h"
 
-static GHashTable *menu_hash = NULL;
-
-ObParseInst *menu_parse_inst;
-
 typedef struct _ObMenuParseState ObMenuParseState;
 
 struct _ObMenuParseState
 {
     GSList *menus;
 };
+
+static GHashTable *menu_hash = NULL;
+static ObParseInst *menu_parse_inst;
+static ObMenuParseState menu_parse_state;
 
 static void menu_destroy_hash_value(ObMenu *self);
 static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -57,7 +57,6 @@ static gboolean menu_open(gchar *file, xmlDocPtr *doc, xmlNodePtr *node)
 
 void menu_startup()
 {
-    ObMenuParseState parse_state;
     xmlDocPtr doc;
     xmlNodePtr node;
     gboolean loaded = FALSE;
@@ -80,14 +79,17 @@ void menu_startup()
         loaded = menu_open("menu", &doc, &node);
 
     if (loaded) {
-        parse_state.menus = NULL;
+        menu_parse_state.menus = NULL;
 
-        parse_register(menu_parse_inst, "menu", parse_menu, &parse_state);
-        parse_register(menu_parse_inst, "item", parse_menu_item, &parse_state);
+        parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
+        parse_register(menu_parse_inst, "item", parse_menu_item,
+                       &menu_parse_state);
         parse_register(menu_parse_inst, "separator",
-                       parse_menu_separator, &parse_state);
+                       parse_menu_separator, &menu_parse_state);
         parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
         xmlFreeDoc(doc);
+
+        g_assert(menu_parse_state.menus == NULL);
     }
 }
 
@@ -99,6 +101,37 @@ void menu_shutdown()
     menu_frame_hide_all();
     g_hash_table_destroy(menu_hash);
     menu_hash = NULL;
+}
+
+void menu_pipe_execute(ObMenu *self)
+{
+    xmlDocPtr doc;
+    xmlNodePtr node;
+    gchar *output;
+    GError *err = NULL;
+
+    if (!self->execute)
+        return;
+
+    if (!g_spawn_command_line_sync(self->execute, &output, NULL, NULL, &err))
+    {
+        g_warning("Failed to execute command for pipe-menu: %s", err->message);
+        g_error_free(err);
+        return;
+    }
+
+    if (parse_load_mem(output, strlen(output),
+                       "openbox_pipe_menu", &doc, &node))
+    {
+        menu_clear_entries(self);
+
+        menu_parse_state.menus = g_slist_prepend(NULL, self);
+        parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+        menu_parse_state.menus = g_slist_remove(menu_parse_state.menus, self);
+        xmlFreeDoc(doc);
+
+        g_assert(menu_parse_state.menus == NULL);
+    }
 }
 
 static ObMenu* menu_from_name(gchar *name)
@@ -146,7 +179,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data)
 {
     ObMenuParseState *state = data;
-    gchar *name = NULL, *title = NULL;
+    gchar *name = NULL, *title = NULL, *script = NULL;
     ObMenu *menu;
 
     if (!parse_attr_string("id", node, &name))
@@ -157,9 +190,13 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             goto parse_menu_fail;
 
         if ((menu = menu_new(name, title, NULL))) {
-            state->menus = g_slist_prepend(state->menus, menu);
-            parse_tree(i, doc, node->xmlChildrenNode);
-            state->menus = g_slist_delete_link(state->menus, state->menus);
+            if (parse_attr_string("execute", node, &script)) {
+                menu->execute = g_strdup(script);
+            } else {
+                state->menus = g_slist_prepend(state->menus, menu);
+                parse_tree(i, doc, node->xmlChildrenNode);
+                state->menus = g_slist_delete_link(state->menus, state->menus);
+            }
         }
     }
 
@@ -169,8 +206,22 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 parse_menu_fail:
     g_free(name);
     g_free(title);
+    g_free(script);
 }
 
+ObMenu* menu_new(gchar *name, gchar *title, gpointer data)
+{
+    ObMenu *self;
+
+    self = g_new0(ObMenu, 1);
+    self->name = g_strdup(name);
+    self->title = g_strdup(title);
+    self->data = data;
+
+    g_hash_table_replace(menu_hash, self->name, self);
+
+    return self;
+}
 
 static void menu_destroy_hash_value(ObMenu *self)
 {
@@ -182,22 +233,7 @@ static void menu_destroy_hash_value(ObMenu *self)
     menu_clear_entries(self);
     g_free(self->name);
     g_free(self->title);
-}
-
-ObMenu* menu_new(gchar *name, gchar *title, gpointer data)
-{
-    ObMenu *self;
-
-    /*if (g_hash_table_lookup(menu_hash, name)) return FALSE;*/
-
-    self = g_new0(ObMenu, 1);
-    self->name = g_strdup(name);
-    self->title = g_strdup(title);
-    self->data = data;
-
-    g_hash_table_replace(menu_hash, self->name, self);
-
-    return self;
+    g_free(self->execute);
 }
 
 void menu_free(ObMenu *menu)

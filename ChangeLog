@@ -1,3 +1,37 @@
+2003-07-26  xor@zed.orodu.net  <xor@zed>
+
+	* stacking.c: dont stack groups together
+
+2003-07-26  woodblock  <woodblock@zed>
+
+	* event.c, menu.c, menu.h: Some menu updates.
+	Don't talk to me about menus.
+
+2003-07-25  xor@zed.orodu.net  <xor@zed>
+
+	* client.c, client.h:
+	add client_search_transient which searches the tree from a client down for a client
+
+	* stacking.c: stacking fixes
+
+2003-07-24  xor@zed.orodu.net  <xor@zed>
+
+	* openbox.c, openbox.h, session.c, session.h:
+	save and load the session save file, though its data is not used yet!
+
+2003-07-24  woodblock  <woodblock@zed>
+
+	* event.c, menu.c, menu.h, menu_render.c:
+	I had a commit message but my commit got stepped on so fuck it.
+	No one cares what I think anyway.
+	If the menu navigation isn't EXACTLY FUCKING RIGHT I WILL REMOVE IT
+	AND SOME OTHER POOR FUCK CAN PUT UP WITH ALL THE FUCKING BULLSHIT.
+
+2003-07-24  xor@zed.orodu.net  <xor@zed>
+
+	* action.c, client.c, debug.h, dock.c, event.c, focus.c, menu.c, menu_render.c, openbox.c, screen.c:
+	use ob_debug for any debug printing and only display the output when its a debug build or when --debug is passed to it
+
 2003-07-24  xor@zed.orodu.net  <xor@zed>
 
 	* configure.ac:

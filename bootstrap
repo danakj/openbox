@@ -4,7 +4,7 @@ sh() {
   /bin/sh -c "set -x; $*"
 }
 
-sh gettextize --intl --copy --no-changelog --force
+sh autopoint # for GNU gettext
 sh libtoolize --copy --force --automake
 sh aclocal
 sh autoheader

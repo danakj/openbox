@@ -14,7 +14,8 @@ LIBTOOL="$LIBTOOL --silent"
 AC_PROG_INSTALL
 
 ALL_LINGUAS=""
-AM_GNU_GETTEXT
+AM_GNU_GETTEXT_VERSION(0.11.5)
+AM_GNU_GETTEXT([external])
 
 AC_LANG(C++)
 	
@@ -22,7 +23,8 @@ AC_LANG(C++)
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
-  CXXFLAGS="$CXXFLAGS -Wall -W"# -pedantic"
+  CXXFLAGS="$CXXFLAGS -Wall -W"
+# -pedantic"
 else
   AC_MSG_RESULT([no, trying other compilers])
   AC_MSG_CHECKING(for MIPSpro)
@@ -332,10 +334,7 @@ AC_ARG_ENABLE([xinerama],
   AC_MSG_RESULT([no])
 )
 
-AC_CONFIG_FILES([Makefile
-		m4/Makefile 
-		po/Makefile.in
-		intl/Makefile
+AC_CONFIG_FILES([Makefile po/Makefile.in
 		otk/Makefile
 		src/Makefile
 		scripts/Makefile

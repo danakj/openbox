@@ -1,6 +1,6 @@
 # Makefile.am for Openbox
 
-SUBDIRS = intl po m4 data doc otk src scripts
+SUBDIRS = po data doc otk src scripts
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
 .PHONY: doc

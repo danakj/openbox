@@ -203,13 +203,8 @@ void popup_show(Popup *self, char *text, Icon *icon)
     if (!RrSurfaceVisible(self->s_bg)) {
         RrSurfaceShow(self->s_bg);
         stacking_raise(INTERNAL_AS_WINDOW(self));
-    } else {
-        /* XXX only need to paint top level surface in the future */
+    } else
         RrPaint(self->s_bg);
-        RrPaint(self->s_text);
-        if (self->s_icon)
-            RrPaint(self->s_icon);
-    }
 }
 
 void popup_hide(Popup *self)

@@ -50,10 +50,8 @@ void client_startup()
 				  (GEqualFunc)map_key_comp);
 
     /* save the stacking order on startup! */
-    if (!PROP_GET32U(ob_root, net_client_list_stacking, window,
-                     client_startup_stack_order, client_startup_stack_size))
-        g_message("failed");
-    g_message("%ld", client_startup_stack_size);
+    PROP_GET32U(ob_root, net_client_list_stacking, window,
+                client_startup_stack_order, client_startup_stack_size))
 
     client_set_list();
 }

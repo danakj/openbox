@@ -134,8 +134,7 @@ void focus_fallback(gboolean switching_desks)
                 if (client_focus(it->data))
                     break;
             }
+        if (it == NULL) /* nothing to focus */
+            focus_set_client(NULL);
     }
-
-    if (it == NULL) /* nothing to focus */
-        focus_set_client(NULL);
 }

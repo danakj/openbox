@@ -55,7 +55,7 @@ static void copy_parent(struct RrSurface *sur)
 
         XXX COPY PARENT PLS
         */
-        RrDebug("copy parent here pls\n");
+/*        RrDebug("copy parent here pls\n");*/
     }
 }
 

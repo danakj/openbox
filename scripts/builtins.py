@@ -106,6 +106,8 @@ def unshade(data):
     OBClient_shade(client, 0)
 
 def next_desktop(data, no_wrap=0):
+    """Switches to the next desktop, optionally (by default) cycling around to
+       the first when going past the last."""
     screen = Openbox_screen(openbox, data.screen())
     d = OBScreen_desktop(screen)
     n = OBScreen_numDesktops(screen)
@@ -116,6 +118,8 @@ def next_desktop(data, no_wrap=0):
     OBScreen_changeDesktop(screen, d)
     
 def prev_desktop(data, no_wrap=0):
+    """Switches to the previous desktop, optionally (by default) cycling around
+       to the last when going past the first."""
     screen = Openbox_screen(openbox, data.screen())
     d = OBScreen_desktop(screen)
     n = OBScreen_numDesktops(screen)
@@ -126,6 +130,7 @@ def prev_desktop(data, no_wrap=0):
     OBScreen_changeDesktop(screen, d)
 
 def change_desktop(data, num):
+    """Switches to a specified desktop"""
     screen = Openbox_screen(openbox, data.screen())
     OBScreen_changeDesktop(screen, num)
     

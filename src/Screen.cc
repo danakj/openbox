@@ -310,6 +310,12 @@ BScreen::~BScreen(void) {
 
   std::for_each(netizenList.begin(), netizenList.end(), PointerAssassin());
 
+  while (! desktopWindowList.empty())
+    removeDesktopWindow(desktopWindowList[0]);
+
+  while (! systrayWindowList.empty())
+    removeSystrayWindow(systrayWindowList[0]);
+
   delete rootmenu;
   delete workspacemenu;
   delete iconmenu;

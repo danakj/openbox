@@ -650,28 +650,29 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_ob__Cursors swig_types[2] 
 #define  SWIGTYPE_p_ob__OBScreen swig_types[3] 
 #define  SWIGTYPE_p_otk__Style swig_types[4] 
-#define  SWIGTYPE_p_ob__OBFrame swig_types[5] 
-#define  SWIGTYPE_p_XReparentEvent swig_types[6] 
-#define  SWIGTYPE_p_ob__OBClient swig_types[7] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[8] 
-#define  SWIGTYPE_p_otk__Strut swig_types[9] 
-#define  SWIGTYPE_p_XShapeEvent swig_types[10] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[11] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[12] 
-#define  SWIGTYPE_p_otk__Rect swig_types[13] 
+#define  SWIGTYPE_p_KeyContext swig_types[5] 
+#define  SWIGTYPE_p_ob__OBFrame swig_types[6] 
+#define  SWIGTYPE_p_XReparentEvent swig_types[7] 
+#define  SWIGTYPE_p_ob__OBClient swig_types[8] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[9] 
+#define  SWIGTYPE_p_otk__Strut swig_types[10] 
+#define  SWIGTYPE_p_XShapeEvent swig_types[11] 
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[12] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[13] 
 #define  SWIGTYPE_p_ob__OBWidget swig_types[14] 
-#define  SWIGTYPE_p_XFocusChangeEvent swig_types[15] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[16] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[17] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[18] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[19] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[20] 
-#define  SWIGTYPE_p_PyObject swig_types[21] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[22] 
-#define  SWIGTYPE_p_ob__OBBindings swig_types[23] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[24] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[25] 
-static swig_type_info *swig_types[27];
+#define  SWIGTYPE_p_otk__Rect swig_types[15] 
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[16] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[17] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[18] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[19] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[20] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[21] 
+#define  SWIGTYPE_p_PyObject swig_types[22] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[23] 
+#define  SWIGTYPE_p_ob__OBBindings swig_types[24] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[25] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[26] 
+static swig_type_info *swig_types[28];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -801,12 +802,12 @@ static std::string SwigString_AsString(PyObject* o) {
     Type_StickyButton,
     Type_LeftGrip,
     Type_RightGrip,
-    Type_Client,
+    Type_Window,
     Type_Root
   };
 
 
-PyObject * python_register(int action, PyObject *func, bool infront = false)
+/*PyObject * python_register(int action, PyObject *func, bool infront = false)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -846,8 +847,22 @@ PyObject * unregister_all(int action)
   }
   Py_INCREF(Py_None); return Py_None;
 }
+*/
+PyObject * mbind(const std::string &button, KeyContext context, PyObject *func)
+{
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+  
+  if (!ob::Openbox::instance->bindings()->add(vectkeylist, func)) {
+    PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
 
-PyObject * bind(PyObject *keylist, PyObject *func)
+PyObject * kbind(PyObject *keylist, KeyContext context, PyObject *func)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -876,7 +891,7 @@ PyObject * bind(PyObject *keylist, PyObject *func)
   Py_INCREF(Py_None); return Py_None;
 }
 
-PyObject * unbind(PyObject *keylist)
+PyObject * kunbind(PyObject *keylist)
 {
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
@@ -898,7 +913,7 @@ PyObject * unbind(PyObject *keylist)
   Py_INCREF(Py_None); return Py_None;
 }
 
-void unbind_all()
+void kunbind_all()
 {
   ob::Openbox::instance->bindings()->removeAll();
 }
@@ -938,22 +953,31 @@ static PyObject *_wrap_Openbox_instance(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_register(PyObject *self, PyObject *args) {
+static PyObject *_wrap_mbind(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    int arg1 ;
-    PyObject *arg2 = (PyObject *) 0 ;
-    bool arg3 = (bool) false ;
+    std::string *arg1 = 0 ;
+    KeyContext arg2 ;
+    PyObject *arg3 = (PyObject *) 0 ;
     PyObject *result;
+    std::string temp1 ;
+    KeyContext *argp2 ;
+    PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"iO|O:register",&arg1,&obj1,&obj2)) goto fail;
-    arg2 = obj1;
-    if (obj2) {
-        arg3 = (bool) PyInt_AsLong(obj2);
-        if (PyErr_Occurred()) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOO:mbind",&obj0,&obj1,&obj2)) goto fail;
+    {
+        if (PyString_Check(obj0)) {
+            temp1 = std::string(PyString_AsString(obj0));
+            arg1 = &temp1;
+        }else {
+            SWIG_exception(SWIG_TypeError, "string expected");
+        }
     }
-    result = (PyObject *)python_register(arg1,arg2,arg3);
+    if ((SWIG_ConvertPtr(obj1,(void **) &argp2, SWIGTYPE_p_KeyContext,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
+    arg2 = *argp2; 
+    arg3 = obj2;
+    result = (PyObject *)mbind((std::string const &)*arg1,arg2,arg3);
     
     resultobj = result;
     return resultobj;
@@ -962,51 +986,23 @@ static PyObject *_wrap_register(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_unregister(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    int arg1 ;
-    PyObject *arg2 = (PyObject *) 0 ;
-    PyObject *result;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"iO:unregister",&arg1,&obj1)) goto fail;
-    arg2 = obj1;
-    result = (PyObject *)unregister(arg1,arg2);
-    
-    resultobj = result;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_unregister_all(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    int arg1 ;
-    PyObject *result;
-    
-    if(!PyArg_ParseTuple(args,(char *)"i:unregister_all",&arg1)) goto fail;
-    result = (PyObject *)unregister_all(arg1);
-    
-    resultobj = result;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_bind(PyObject *self, PyObject *args) {
+static PyObject *_wrap_kbind(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     PyObject *arg1 = (PyObject *) 0 ;
-    PyObject *arg2 = (PyObject *) 0 ;
+    KeyContext arg2 ;
+    PyObject *arg3 = (PyObject *) 0 ;
     PyObject *result;
+    KeyContext *argp2 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:bind",&obj0,&obj1)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOO:kbind",&obj0,&obj1,&obj2)) goto fail;
     arg1 = obj0;
-    arg2 = obj1;
-    result = (PyObject *)bind(arg1,arg2);
+    if ((SWIG_ConvertPtr(obj1,(void **) &argp2, SWIGTYPE_p_KeyContext,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
+    arg2 = *argp2; 
+    arg3 = obj2;
+    result = (PyObject *)kbind(arg1,arg2,arg3);
     
     resultobj = result;
     return resultobj;
@@ -1015,15 +1011,15 @@ static PyObject *_wrap_bind(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_unbind(PyObject *self, PyObject *args) {
+static PyObject *_wrap_kunbind(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     PyObject *arg1 = (PyObject *) 0 ;
     PyObject *result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:unbind",&obj0)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:kunbind",&obj0)) goto fail;
     arg1 = obj0;
-    result = (PyObject *)unbind(arg1);
+    result = (PyObject *)kunbind(arg1);
     
     resultobj = result;
     return resultobj;
@@ -1032,11 +1028,11 @@ static PyObject *_wrap_unbind(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_unbind_all(PyObject *self, PyObject *args) {
+static PyObject *_wrap_kunbind_all(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     
-    if(!PyArg_ParseTuple(args,(char *)":unbind_all")) goto fail;
-    unbind_all();
+    if(!PyArg_ParseTuple(args,(char *)":kunbind_all")) goto fail;
+    kunbind_all();
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -2733,12 +2729,10 @@ static PyObject * OBClient_swigregister(PyObject *self, PyObject *args) {
 }
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
-	 { (char *)"register", _wrap_register, METH_VARARGS },
-	 { (char *)"unregister", _wrap_unregister, METH_VARARGS },
-	 { (char *)"unregister_all", _wrap_unregister_all, METH_VARARGS },
-	 { (char *)"bind", _wrap_bind, METH_VARARGS },
-	 { (char *)"unbind", _wrap_unbind, METH_VARARGS },
-	 { (char *)"unbind_all", _wrap_unbind_all, METH_VARARGS },
+	 { (char *)"mbind", _wrap_mbind, METH_VARARGS },
+	 { (char *)"kbind", _wrap_kbind, METH_VARARGS },
+	 { (char *)"kunbind", _wrap_kunbind, METH_VARARGS },
+	 { (char *)"kunbind_all", _wrap_kunbind_all, METH_VARARGS },
 	 { (char *)"set_reset_key", _wrap_set_reset_key, METH_VARARGS },
 	 { (char *)"Cursors_session_set", _wrap_Cursors_session_set, METH_VARARGS },
 	 { (char *)"Cursors_session_get", _wrap_Cursors_session_get, METH_VARARGS },
@@ -2859,6 +2853,7 @@ static swig_type_info _swigt__p_ob__OBActions[] = {{"_p_ob__OBActions", 0, "ob::
 static swig_type_info _swigt__p_ob__Cursors[] = {{"_p_ob__Cursors", 0, "ob::Cursors *", 0},{"_p_ob__Cursors"},{0}};
 static swig_type_info _swigt__p_ob__OBScreen[] = {{"_p_ob__OBScreen", 0, "ob::OBScreen *", 0},{"_p_ob__OBScreen"},{0}};
 static swig_type_info _swigt__p_otk__Style[] = {{"_p_otk__Style", 0, "otk::Style *", 0},{"_p_otk__Style"},{0}};
+static swig_type_info _swigt__p_KeyContext[] = {{"_p_KeyContext", 0, "KeyContext *", 0},{"_p_KeyContext"},{0}};
 static swig_type_info _swigt__p_ob__OBFrame[] = {{"_p_ob__OBFrame", 0, "ob::OBFrame *", 0},{"_p_ob__OBFrame"},{0}};
 static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XReparentEvent *", 0},{"_p_XReparentEvent"},{0}};
 static swig_type_info _swigt__p_ob__OBClient[] = {{"_p_ob__OBClient", 0, "ob::OBClient *", 0},{"_p_ob__OBClient"},{0}};
@@ -2867,8 +2862,8 @@ static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut
 static swig_type_info _swigt__p_XShapeEvent[] = {{"_p_XShapeEvent", 0, "XShapeEvent *", 0},{"_p_XShapeEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureRequestEvent", 0, "XConfigureRequestEvent *", 0},{"_p_XConfigureRequestEvent"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_ob__OBActions", _p_ob__OBActionsTo_p_otk__OtkEventHandler},{"_p_otk__OtkEventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventHandler},{"_p_ob__OBClient", _p_ob__OBClientTo_p_otk__OtkEventHandler},{0}};
-static swig_type_info _swigt__p_otk__Rect[] = {{"_p_otk__Rect", 0, "otk::Rect *", 0},{"_p_otk__Rect"},{0}};
 static swig_type_info _swigt__p_ob__OBWidget[] = {{"_p_ob__OBWidget", 0, "ob::OBWidget *", 0},{"_p_ob__OBWidget"},{"_p_ob__OBClient", _p_ob__OBClientTo_p_ob__OBWidget},{0}};
+static swig_type_info _swigt__p_otk__Rect[] = {{"_p_otk__Rect", 0, "otk::Rect *", 0},{"_p_otk__Rect"},{0}};
 static swig_type_info _swigt__p_XFocusChangeEvent[] = {{"_p_XFocusChangeEvent", 0, "XFocusChangeEvent *", 0},{"_p_XFocusChangeEvent"},{0}};
 static swig_type_info _swigt__p_XClientMessageEvent[] = {{"_p_XClientMessageEvent", 0, "XClientMessageEvent *", 0},{"_p_XClientMessageEvent"},{0}};
 static swig_type_info _swigt__p_otk__OBProperty[] = {{"_p_otk__OBProperty", 0, "otk::OBProperty *", 0},{"_p_otk__OBProperty"},{0}};
@@ -2887,6 +2882,7 @@ _swigt__p_ob__OBActions,
 _swigt__p_ob__Cursors, 
 _swigt__p_ob__OBScreen, 
 _swigt__p_otk__Style, 
+_swigt__p_KeyContext, 
 _swigt__p_ob__OBFrame, 
 _swigt__p_XReparentEvent, 
 _swigt__p_ob__OBClient, 
@@ -2895,8 +2891,8 @@ _swigt__p_otk__Strut,
 _swigt__p_XShapeEvent, 
 _swigt__p_XConfigureRequestEvent, 
 _swigt__p_otk__OtkEventHandler, 
-_swigt__p_otk__Rect, 
 _swigt__p_ob__OBWidget, 
+_swigt__p_otk__Rect, 
 _swigt__p_XFocusChangeEvent, 
 _swigt__p_XClientMessageEvent, 
 _swigt__p_otk__OBProperty, 
@@ -2935,7 +2931,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Type_StickyButton", (long) Type_StickyButton, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Type_LeftGrip", (long) Type_LeftGrip, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Type_RightGrip", (long) Type_RightGrip, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Type_Client", (long) Type_Client, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Type_Window", (long) Type_Window, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Type_Root", (long) Type_Root, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Starting", (long) ob::Openbox::State_Starting, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Normal", (long) ob::Openbox::State_Normal, 0, 0, 0},

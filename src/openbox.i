@@ -14,8 +14,8 @@
 #include "actions.hh"
 %}
 
-%include stl.i
-%include exception.i
+%include "stl.i"
+%include "exception.i"
 //%include std_list.i
 //%template(ClientList) std::list<OBClient*>;
 
@@ -49,13 +49,13 @@
     Type_StickyButton,
     Type_LeftGrip,
     Type_RightGrip,
-    Type_Client,
+    Type_Window,
     Type_Root
   };
 %}
 %rename(register) python_register;
 %inline %{
-PyObject * python_register(int action, PyObject *func, bool infront = false)
+/*PyObject * python_register(int action, PyObject *func, bool infront = false)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -95,8 +95,23 @@ PyObject * unregister_all(int action)
   }
   Py_INCREF(Py_None); return Py_None;
 }
+*/
+PyObject * mbind(const std::string &button, MouseContext context,
+                 PyObject *func)
+{
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+  
+  if (!ob::Openbox::instance->bindings()->add(vectkeylist, func)) {
+    PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
+    return NULL;
+  }
+  Py_INCREF(Py_None); return Py_None;
+}
 
-PyObject * bind(PyObject *keylist, PyObject *func)
+PyObject * kbind(PyObject *keylist, KeyContext context, PyObject *func)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -125,7 +140,7 @@ PyObject * bind(PyObject *keylist, PyObject *func)
   Py_INCREF(Py_None); return Py_None;
 }
 
-PyObject * unbind(PyObject *keylist)
+PyObject * kunbind(PyObject *keylist)
 {
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
@@ -147,7 +162,7 @@ PyObject * unbind(PyObject *keylist)
   Py_INCREF(Py_None); return Py_None;
 }
 
-void unbind_all()
+void kunbind_all()
 {
   ob::Openbox::instance->bindings()->removeAll();
 }
@@ -183,6 +198,7 @@ void set_reset_key(const std::string &key)
 %include "openbox.hh"
 %include "screen.hh"
 %include "client.hh"
+%include "python.hh"
 
 // for Mod1Mask etc
 %include "X11/X.h"

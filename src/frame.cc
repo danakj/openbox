@@ -79,7 +79,7 @@ void OBFrame::grabButtons(bool grab)
   if (python_get_stringlist("client_buttons", &grabs)) {
     std::vector<std::string>::iterator grab_it, grab_end = grabs.end();
     for (grab_it = grabs.begin(); grab_it != grab_end; ++grab_it) {
-      Binding b(0,0);
+      Binding b;
       if (!Openbox::instance->bindings()->translate(*grab_it, b, false))
         continue;
       printf("grabbing %d %d\n", b.key, b.modifiers);

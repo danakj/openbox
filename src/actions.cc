@@ -211,12 +211,11 @@ bool OBActions::registerCallback(ActionType action, PyObject *func,
   CallbackMap::iterator it;
   for (it = it_pair.first; it != it_pair.second; ++it)
     if (it->second == func)
-      break;
-  if (it == it_pair.second) // not already in there
-    if (atfront)
-      _callbacks.insert(_callbacks.begin(), CallbackMapPair(action, func));
-    else
-      _callbacks.insert(CallbackMapPair(action, func));
+      return true; // already in there
+  if (atfront)
+    _callbacks.insert(_callbacks.begin(), CallbackMapPair(action, func));
+  else
+    _callbacks.insert(CallbackMapPair(action, func));
   Py_INCREF(func);
   return true;
 }

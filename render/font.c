@@ -35,7 +35,6 @@ static void measure_height(ObFont *f)
 
     XftTextExtentsUtf8(ob_display, f->xftfont,
                        (FcChar8*)str, strlen(str), &info);
-    g_message("measured: %d", info.height);
     f->height = (signed) info.height;
 }
 

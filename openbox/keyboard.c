@@ -127,47 +127,47 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
     if (interactive_grab) {
         *client = grabbed_client;
         *context = grabbed_context;
-    }
 
-    if ((e->type == KeyRelease && 
-         !(grabbed_state & e->xkey.state)))
-        done = TRUE;
-    else if (e->type == KeyPress) {
-        if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+        if ((e->type == KeyRelease && 
+             !(grabbed_state & e->xkey.state)))
             done = TRUE;
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
+        else if (e->type == KeyPress) {
+            if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+                done = TRUE;
+            else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
+                if (grabbed_action->func == action_cycle_windows) {
+                    grabbed_action->data.cycle.cancel = TRUE;
+                }
+                if (grabbed_action->func == action_desktop_dir) {
+                    grabbed_action->data.desktopdir.cancel = TRUE;
+                }
+                if (grabbed_action->func == action_send_to_desktop_dir)
+                {
+                    grabbed_action->data.sendtodir.cancel = TRUE;
+                }
+                done = TRUE;
+            }
+        }
+        if (done) { 
             if (grabbed_action->func == action_cycle_windows) {
-                grabbed_action->data.cycle.cancel = TRUE;
+                grabbed_action->data.cycle.final = TRUE;
             }
             if (grabbed_action->func == action_desktop_dir) {
-                grabbed_action->data.desktopdir.cancel = TRUE;
+                grabbed_action->data.desktopdir.final = TRUE;
             }
-            if (grabbed_action->func == action_send_to_desktop_dir)
-            {
-                grabbed_action->data.sendtodir.cancel = TRUE;
+            if (grabbed_action->func == action_send_to_desktop_dir) {
+                grabbed_action->data.sendtodir.final = TRUE;
             }
-            done = TRUE;
-        }
-    }
-    if (done) { 
-        if (grabbed_action->func == action_cycle_windows) {
-            grabbed_action->data.cycle.final = TRUE;
-        }
-        if (grabbed_action->func == action_desktop_dir) {
-            grabbed_action->data.desktopdir.final = TRUE;
-        }
-        if (grabbed_action->func == action_send_to_desktop_dir) {
-            grabbed_action->data.sendtodir.final = TRUE;
-        }
 
-        grabbed_action->func(&grabbed_action->data);
+            grabbed_action->func(&grabbed_action->data);
 
-        interactive_grab = FALSE;
-        grab_keyboard(FALSE);
-        grab_pointer(FALSE, None);
-        keyboard_reset_chains();
+            interactive_grab = FALSE;
+            grab_keyboard(FALSE);
+            grab_pointer(FALSE, None);
+            keyboard_reset_chains();
 
-        handled = TRUE;
+            handled = TRUE;
+        }
     }
 
     return handled;

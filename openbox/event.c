@@ -538,30 +538,34 @@ static void event_handle_client(Client *client, XEvent *e)
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
-        switch (frame_context(client, e->xbutton.window)) {
-        case Context_Maximize:
-            client->frame->max_press = (e->type == ButtonPress);
-            framerender_frame(client->frame);
-            break;
-        case Context_Close:
-            client->frame->close_press = (e->type == ButtonPress);
-            framerender_frame(client->frame);
-            break;
-        case Context_Iconify:
-            client->frame->iconify_press = (e->type == ButtonPress);
-            framerender_frame(client->frame);
-            break;
-        case Context_AllDesktops:
-            client->frame->desk_press = (e->type == ButtonPress);
-            framerender_frame(client->frame);
-            break; 
-        case Context_Shade:
-            client->frame->shade_press = (e->type == ButtonPress);
-            framerender_frame(client->frame);
-            break;
-        default:
-            /* nothing changes with clicks for any other contexts */
-            break;
+        /* Wheel buttons don't draw because they are an instant click, so it
+           is a waste of resources to go drawing it. */
+        if (!(e->xbutton.button == 4 || e->xbutton.button == 5)) {
+            switch (frame_context(client, e->xbutton.window)) {
+            case Context_Maximize:
+                client->frame->max_press = (e->type == ButtonPress);
+                framerender_frame(client->frame);
+                break;
+            case Context_Close:
+                client->frame->close_press = (e->type == ButtonPress);
+                framerender_frame(client->frame);
+                break;
+            case Context_Iconify:
+                client->frame->iconify_press = (e->type == ButtonPress);
+                framerender_frame(client->frame);
+                break;
+            case Context_AllDesktops:
+                client->frame->desk_press = (e->type == ButtonPress);
+                framerender_frame(client->frame);
+                break; 
+            case Context_Shade:
+                client->frame->shade_press = (e->type == ButtonPress);
+                framerender_frame(client->frame);
+                break;
+            default:
+                /* nothing changes with clicks for any other contexts */
+                break;
+            }
         }
         break;
     case FocusIn:

@@ -288,6 +288,18 @@ static void event(ObEvent *e, void *foo)
                 ABS(e->data.x.e->xmotion.y_root - py) >= threshold) {
                 guint32 corner;
 
+                context = frame_context(e->data.x.client,
+                                        e->data.x.e->xmotion.window);
+
+                /* You can't drag on buttons */
+                if (context == Context_Maximize ||
+                    context == Context_AllDesktops ||
+                    context == Context_Shade ||
+                    context == Context_Iconify ||
+                    context == Context_Icon ||
+                    context == Context_Close)
+                    break;
+
                 if (!e->data.x.client)
                     corner = prop_atoms.net_wm_moveresize_size_bottomright;
                 else
@@ -306,8 +318,6 @@ static void event(ObEvent *e, void *foo)
                                     e->data.x.client->area.height +
                                     e->data.x.client->frame->size.top +
                                     e->data.x.client->frame->size.bottom);
-                context = frame_context(e->data.x.client,
-                                        e->data.x.e->xmotion.window);
                 fire_motion(MouseAction_Motion, context,
                             e->data.x.client, state, button,
                             e->data.x.e->xmotion.x_root, 

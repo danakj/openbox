@@ -460,8 +460,6 @@ void client_unmanage(ObClient *self)
 
     /* tell our parent(s) that we're gone */
     if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
-        GSList *it;
-
         for (it = self->group->members; it; it = g_slist_next(it))
             if (it->data != self)
                 ((ObClient*)it->data)->transients =
@@ -1446,15 +1444,17 @@ void client_update_title(ObClient *self)
     old_title = self->title;
      
     /* try netwm */
-    if (!PROP_GETS(self->window, net_wm_name, utf8, &data))
+    if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
         /* try old x stuff */
-        if (!PROP_GETS(self->window, wm_name, locale, &data))
+        if (!PROP_GETS(self->window, wm_name, locale, &data)) {
             // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
             if (self->transient) {
                 data = g_strdup("");
                 goto no_number;
             } else
                 data = g_strdup("Unnamed Window");
+        }
+    }
 
     /* did the title change? then reset the title_count */
     if (old_title && 0 != strncmp(old_title, data, strlen(data)))
@@ -2527,6 +2527,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     gboolean max_horz = self->max_horz;
     gboolean max_vert = self->max_vert;
     gboolean modal = self->modal;
+    gboolean iconic = self->iconic;
     gint i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
@@ -2562,6 +2563,10 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 action = self->skip_pager ?
                     prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_hidden)
+                action = self->iconic ?
+                    prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
             else if (state == prop_atoms.net_wm_state_fullscreen)
                 action = fullscreen ?
                     prop_atoms.net_wm_state_remove :
@@ -2590,6 +2595,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->skip_taskbar = TRUE;
             } else if (state == prop_atoms.net_wm_state_skip_pager) {
                 self->skip_pager = TRUE;
+            } else if (state == prop_atoms.net_wm_state_hidden) {
+                iconic = TRUE;
             } else if (state == prop_atoms.net_wm_state_fullscreen) {
                 fullscreen = TRUE;
             } else if (state == prop_atoms.net_wm_state_above) {
@@ -2615,6 +2622,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->skip_taskbar = FALSE;
             } else if (state == prop_atoms.net_wm_state_skip_pager) {
                 self->skip_pager = FALSE;
+            } else if (state == prop_atoms.net_wm_state_hidden) {
+                iconic = FALSE;
             } else if (state == prop_atoms.net_wm_state_fullscreen) {
                 fullscreen = FALSE;
             } else if (state == prop_atoms.net_wm_state_above) {
@@ -2657,6 +2666,9 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
            transients needs to change */
         client_raise(self);
     }
+    if (iconic != self->iconic)
+        client_iconify(self, iconic, FALSE);
+
     client_calc_layer(self);
     client_change_state(self); /* change the hint to reflect these changes */
 }
@@ -3312,6 +3324,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         /* not implemented */
     default:
         g_assert_not_reached();
+	dest = 0; /* suppress warning */
     }
     return dest;
 }

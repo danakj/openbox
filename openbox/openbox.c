@@ -7,8 +7,8 @@
 #include "client.h"
 #include "xerror.h"
 #include "prop.h"
-#include "startup.h"
 #include "screen.h"
+#include "startupnotify.h"
 #include "focus.h"
 #include "moveresize.h"
 #include "frame.h"
@@ -127,10 +127,6 @@ int main(int argc, char **argv)
         session_load(sm_save_file);
     session_startup(argc, argv);
 
-#ifdef USE_LIBSN
-    ob_sn_display = sn_display_new(ob_display, NULL, NULL);
-#endif
-
     ob_screen = DefaultScreen(ob_display);
 
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
@@ -155,6 +151,7 @@ int main(int argc, char **argv)
     putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
 
     /* create available cursors */
+    cursors[OB_CURSOR_NONE] = None;
     cursors[OB_CURSOR_POINTER] =
         XCreateFontCursor(ob_display, XC_left_ptr);
     cursors[OB_CURSOR_BUSY] =
@@ -195,9 +192,6 @@ int main(int argc, char **argv)
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
 
-    /* save stuff that we can use to restore state */
-    startup_save();
-
     if (screen_annex()) { /* it will be ours! */
         do {
             event_startup(reconfigure);
@@ -206,6 +200,7 @@ int main(int argc, char **argv)
                anything that calls stacking_add */
             focus_startup(reconfigure);
             window_startup(reconfigure);
+            sn_startup(reconfigure);
 
             {
                 ObParseInst *i;
@@ -272,6 +267,7 @@ int main(int argc, char **argv)
             screen_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             moveresize_shutdown(reconfigure);
+            sn_shutdown(reconfigure);
             window_shutdown(reconfigure);
             grab_shutdown(reconfigure);
             event_shutdown(reconfigure);
@@ -284,10 +280,6 @@ int main(int argc, char **argv)
 
     session_shutdown();
     g_free(ob_sm_id);
-
-#ifdef USE_LIBSN
-    sn_display_unref(ob_sn_display);
-#endif
 
     XCloseDisplay(ob_display);
 

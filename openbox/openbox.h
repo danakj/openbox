@@ -6,11 +6,6 @@
 #include "render/render.h"
 #include "render/theme.h"
 
-#ifdef USE_LIBSN
-#  define SN_API_NOT_YET_FROZEN
-#  include <libsn/sn.h>
-#endif
-
 #include <glib.h>
 #include <X11/Xlib.h>
 
@@ -23,10 +18,6 @@ extern struct _ObMainLoop *ob_main_loop;
 
 /*! The X display */
 extern Display *ob_display; 
-
-#ifdef USE_LIBSN
-SnDisplay *ob_sn_display;
-#endif
 
 /*! The number of the screen on which we're running */
 extern gint     ob_screen;

@@ -1,5 +1,8 @@
 Changelog for Openbox:
 
+1.0.0:
+ * added BestFit window placement algorithm/type        (Ruhi Bloodworth)
+
 0.99.0:
  * renamed header files from *.hh to *.h.               (Ben Jansens)
 

@@ -355,44 +355,50 @@ gboolean obtheme_load()
                     &ob_s_titlebut_unfocused_color))
 	ob_s_titlebut_unfocused_color = color_new(0xff, 0xff, 0xff);
 
-    if (!read_mask(db, "window.button.max.mask", &ob_s_max_unpressed_mask)) {
-        char data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f  };
-        ob_s_max_unpressed_mask = pixmap_mask_new(7, 7, data);
-    }
-    if (!read_mask(db, "window.button.max.pressed.mask",
-                   &ob_s_max_pressed_mask)) {
-        ob_s_max_pressed_mask = pixmap_mask_copy(ob_s_max_unpressed_mask);
+    if (read_mask(db, "window.button.max.mask", &ob_s_max_unset_mask)) {
+        if (!read_mask(db, "window.button.max.pressed.mask",
+                       &ob_s_max_set_mask)) {
+            ob_s_max_set_mask = pixmap_mask_copy(ob_s_max_unset_mask);
+        }
+    } else {
+        {
+            char data[] = { 0x3f, 0x3f, 0x21, 0x21, 0x21, 0x3f };
+            ob_s_max_unset_mask = pixmap_mask_new(6, 6, data);
+        }
+        {
+            char data[] = { 0x3c, 0x24, 0x27, 0x3f, 0x0f, 0x0f };
+            ob_s_max_set_mask = pixmap_mask_new(6, 6, data);
+        }
     }
 
     if (!read_mask(db, "window.button.icon.mask",
-                   &ob_s_iconify_unpressed_mask)) {
-        char data[] = { 0x00, 0x00, 0x00, 0x00, 0x3e, 0x3e, 0x3e };
-        ob_s_iconify_unpressed_mask = pixmap_mask_new(7, 7, data);
-    }
-    if (!read_mask(db, "window.button.icon.pressed.mask",
-                   &ob_s_iconify_pressed_mask)) {
-        ob_s_iconify_pressed_mask =
-            pixmap_mask_copy(ob_s_iconify_unpressed_mask);
+                   &ob_s_iconify_mask)) {
+        char data[] = { 0x00, 0x00, 0x00, 0x3f, 0x3f, 0x3f };
+        ob_s_iconify_mask = pixmap_mask_new(6, 6, data);
     }
 
-    if (!read_mask(db, "window.button.stick.mask",
-                   &ob_s_desk_unpressed_mask)) {
-        char data[] = { 0x00, 0x36, 0x36, 0x00, 0x36, 0x36, 0x00 };
-        ob_s_desk_unpressed_mask = pixmap_mask_new(7, 7, data);
-    }
-    if (!read_mask(db, "window.button.stick.pressed.mask",
-                   &ob_s_desk_pressed_mask)) {
-        ob_s_desk_pressed_mask = pixmap_mask_copy(ob_s_desk_unpressed_mask);
+    if (read_mask(db, "window.button.stick.mask",
+                   &ob_s_desk_unset_mask)) {
+        if (!read_mask(db, "window.button.stick.pressed.mask",
+                       &ob_s_desk_set_mask)) {
+            ob_s_desk_set_mask =
+                pixmap_mask_copy(ob_s_desk_unset_mask);
+        }
+    } else {
+        {
+            char data[] = { 0x33, 0x33, 0x00, 0x00, 0x33, 0x33 };
+            ob_s_desk_unset_mask = pixmap_mask_new(6, 6, data);
+        }
+        {
+            char data[] = { 0x0c, 0x0c, 0x3f, 0x3f, 0x0c, 0x0c };
+            ob_s_desk_set_mask = pixmap_mask_new(6, 6, data);
+        }
     }
 
     if (!read_mask(db, "window.button.close.mask",
-                   &ob_s_close_unpressed_mask)) {
-        char data[] = { 0x22, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x22 };
-        ob_s_close_unpressed_mask = pixmap_mask_new(7, 7, data);
-    }        
-    if (!read_mask(db, "window.button.close.pressed.mask",
-                   &ob_s_close_pressed_mask)) {
-        ob_s_close_pressed_mask = pixmap_mask_copy(ob_s_close_unpressed_mask);
+                   &ob_s_close_mask)) {
+        char data[] = { 0x33, 0x3f, 0x1e, 0x1e, 0x3f, 0x33 };
+        ob_s_close_mask = pixmap_mask_new(6, 6, data);
     }        
 
     if (!read_appearance(db, "window.title.focus", ob_a_focused_title))
@@ -437,8 +443,11 @@ gboolean obtheme_load()
     ob_a_unfocused_unpressed_desk =
         appearance_copy(ob_a_unfocused_unpressed_max);
     ob_a_unfocused_pressed_desk = appearance_copy(ob_a_unfocused_pressed_max);
+    ob_a_unfocused_pressed_set_desk =
+        appearance_copy(ob_a_unfocused_pressed_max);
     ob_a_focused_unpressed_desk = appearance_copy(ob_a_focused_unpressed_max);
     ob_a_focused_pressed_desk = appearance_copy(ob_a_focused_pressed_max);
+    ob_a_focused_pressed_set_desk = appearance_copy(ob_a_focused_pressed_max);
     ob_a_unfocused_unpressed_iconify =
         appearance_copy(ob_a_unfocused_unpressed_max);
     ob_a_unfocused_pressed_iconify =
@@ -446,6 +455,9 @@ gboolean obtheme_load()
     ob_a_focused_unpressed_iconify =
         appearance_copy(ob_a_focused_unpressed_max);
     ob_a_focused_pressed_iconify = appearance_copy(ob_a_focused_pressed_max);
+    ob_a_unfocused_pressed_set_max =
+        appearance_copy(ob_a_unfocused_pressed_max);
+    ob_a_focused_pressed_set_max = appearance_copy(ob_a_focused_pressed_max);
 
     ob_a_icon->surface.data.planar.grad = Background_ParentRelative;
 
@@ -469,59 +481,69 @@ gboolean obtheme_load()
 
     ob_a_focused_unpressed_max->texture[0].type = 
         ob_a_focused_pressed_max->texture[0].type = 
+        ob_a_focused_pressed_set_max->texture[0].type =  
         ob_a_unfocused_unpressed_max->texture[0].type = 
         ob_a_unfocused_pressed_max->texture[0].type = 
+        ob_a_unfocused_pressed_set_max->texture[0].type = 
         ob_a_focused_unpressed_close->texture[0].type = 
         ob_a_focused_pressed_close->texture[0].type = 
         ob_a_unfocused_unpressed_close->texture[0].type = 
         ob_a_unfocused_pressed_close->texture[0].type = 
         ob_a_focused_unpressed_desk->texture[0].type = 
         ob_a_focused_pressed_desk->texture[0].type = 
+        ob_a_focused_pressed_set_desk->texture[0].type = 
         ob_a_unfocused_unpressed_desk->texture[0].type = 
         ob_a_unfocused_pressed_desk->texture[0].type = 
+        ob_a_unfocused_pressed_set_desk->texture[0].type = 
         ob_a_focused_unpressed_iconify->texture[0].type = 
         ob_a_focused_pressed_iconify->texture[0].type = 
         ob_a_unfocused_unpressed_iconify->texture[0].type = 
         ob_a_unfocused_pressed_iconify->texture[0].type = Bitmask;
     ob_a_focused_unpressed_max->texture[0].data.mask.mask = 
         ob_a_unfocused_unpressed_max->texture[0].data.mask.mask = 
-        ob_s_max_unpressed_mask;
-    ob_a_focused_pressed_max->texture[0].data.mask.mask = 
+        ob_a_focused_pressed_max->texture[0].data.mask.mask = 
         ob_a_unfocused_pressed_max->texture[0].data.mask.mask =
-        ob_s_max_pressed_mask;
-    ob_a_focused_unpressed_close->texture[0].data.mask.mask = 
-        ob_a_unfocused_unpressed_close->texture[0].data.mask.mask =
-        ob_s_close_unpressed_mask;
+        ob_s_max_unset_mask;
+    ob_a_focused_pressed_set_max->texture[0].data.mask.mask = 
+        ob_a_unfocused_pressed_set_max->texture[0].data.mask.mask =
+        ob_s_max_set_mask;
     ob_a_focused_pressed_close->texture[0].data.mask.mask = 
         ob_a_unfocused_pressed_close->texture[0].data.mask.mask =
-        ob_s_close_pressed_mask;
+        ob_a_focused_unpressed_close->texture[0].data.mask.mask = 
+        ob_a_unfocused_unpressed_close->texture[0].data.mask.mask =
+        ob_s_close_mask;
     ob_a_focused_unpressed_desk->texture[0].data.mask.mask = 
         ob_a_unfocused_unpressed_desk->texture[0].data.mask.mask = 
-        ob_s_desk_unpressed_mask;
-    ob_a_focused_pressed_desk->texture[0].data.mask.mask = 
+        ob_a_focused_pressed_desk->texture[0].data.mask.mask = 
         ob_a_unfocused_pressed_desk->texture[0].data.mask.mask =
-        ob_s_desk_pressed_mask;
+        ob_s_desk_unset_mask;
+    ob_a_focused_pressed_set_desk->texture[0].data.mask.mask = 
+        ob_a_unfocused_pressed_set_desk->texture[0].data.mask.mask =
+        ob_s_desk_set_mask;
     ob_a_focused_unpressed_iconify->texture[0].data.mask.mask = 
         ob_a_unfocused_unpressed_iconify->texture[0].data.mask.mask = 
-        ob_s_iconify_unpressed_mask;
-    ob_a_focused_pressed_iconify->texture[0].data.mask.mask = 
+        ob_a_focused_pressed_iconify->texture[0].data.mask.mask = 
         ob_a_unfocused_pressed_iconify->texture[0].data.mask.mask =
-        ob_s_iconify_pressed_mask;
+        ob_s_iconify_mask;
     ob_a_focused_unpressed_max->texture[0].data.mask.color = 
         ob_a_focused_pressed_max->texture[0].data.mask.color = 
+        ob_a_focused_pressed_set_max->texture[0].data.mask.color = 
         ob_a_focused_unpressed_close->texture[0].data.mask.color = 
         ob_a_focused_pressed_close->texture[0].data.mask.color = 
         ob_a_focused_unpressed_desk->texture[0].data.mask.color = 
         ob_a_focused_pressed_desk->texture[0].data.mask.color = 
+        ob_a_focused_pressed_set_desk->texture[0].data.mask.color = 
         ob_a_focused_unpressed_iconify->texture[0].data.mask.color = 
         ob_a_focused_pressed_iconify->texture[0].data.mask.color =
         ob_s_titlebut_focused_color;
     ob_a_unfocused_unpressed_max->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_max->texture[0].data.mask.color = 
+        ob_a_unfocused_pressed_set_max->texture[0].data.mask.color = 
         ob_a_unfocused_unpressed_close->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_close->texture[0].data.mask.color = 
         ob_a_unfocused_unpressed_desk->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_desk->texture[0].data.mask.color = 
+        ob_a_unfocused_pressed_set_desk->texture[0].data.mask.color = 
         ob_a_unfocused_unpressed_iconify->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_iconify->texture[0].data.mask.color =
         ob_s_titlebut_unfocused_color;

@@ -27,12 +27,14 @@ void obrender_frame(ObFrame *self)
         l = (client_focused(self->frame.client) ?
              self->a_focused_label : self->a_unfocused_label);
         m = (client_focused(self->frame.client) ?
-             ((self->max_press ||
-              self->frame.client->max_vert || self->frame.client->max_horz) ?
-              ob_a_focused_pressed_max : ob_a_focused_unpressed_max) :
-             ((self->max_press ||
-              self->frame.client->max_vert || self->frame.client->max_horz) ?
-              ob_a_unfocused_pressed_max : ob_a_unfocused_unpressed_max));
+             (self->frame.client->max_vert || self->frame.client->max_horz ?
+              ob_a_focused_pressed_set_max :
+              (self->max_press ?
+               ob_a_focused_pressed_max : ob_a_focused_unpressed_max)) :
+             (self->frame.client->max_vert || self->frame.client->max_horz ?
+              ob_a_unfocused_pressed_set_max :
+              (self->max_press ?
+               ob_a_unfocused_pressed_max : ob_a_unfocused_unpressed_max)));
         n = self->a_icon;
         i = (client_focused(self->frame.client) ?
              (self->iconify_press ?
@@ -41,10 +43,14 @@ void obrender_frame(ObFrame *self)
               ob_a_unfocused_pressed_iconify :
               ob_a_unfocused_unpressed_iconify));
         d = (client_focused(self->frame.client) ?
-             (self->desk_press || self->frame.client->desktop == DESKTOP_ALL ?
-              ob_a_focused_pressed_desk : ob_a_focused_unpressed_desk) :
-             (self->desk_press || self->frame.client->desktop == DESKTOP_ALL ?
-              ob_a_unfocused_pressed_desk : ob_a_unfocused_unpressed_desk));
+             (self->frame.client->desktop == DESKTOP_ALL ?
+              ob_a_focused_pressed_set_desk :
+              (self->desk_press ?
+               ob_a_focused_pressed_desk : ob_a_focused_unpressed_desk)) :
+             (self->frame.client->desktop == DESKTOP_ALL ?
+              ob_a_unfocused_pressed_set_desk :
+              (self->desk_press ?
+               ob_a_unfocused_pressed_desk : ob_a_unfocused_unpressed_desk)));
         c = (client_focused(self->frame.client) ?
              (self->close_press ?
               ob_a_focused_pressed_close : ob_a_focused_unpressed_close) :

@@ -37,28 +37,30 @@ int ob_s_winfont_shadow;
 int ob_s_winfont_shadow_offset;
 ObFont *ob_s_winfont;
 /* style settings - masks */
-pixmap_mask *ob_s_max_pressed_mask;
-pixmap_mask *ob_s_max_unpressed_mask;
-pixmap_mask *ob_s_iconify_pressed_mask;
-pixmap_mask *ob_s_iconify_unpressed_mask;
-pixmap_mask *ob_s_desk_pressed_mask;
-pixmap_mask *ob_s_desk_unpressed_mask;
-pixmap_mask *ob_s_close_pressed_mask;
-pixmap_mask *ob_s_close_unpressed_mask;
+pixmap_mask *ob_s_max_set_mask;
+pixmap_mask *ob_s_max_unset_mask;
+pixmap_mask *ob_s_iconify_mask;
+pixmap_mask *ob_s_desk_set_mask;
+pixmap_mask *ob_s_desk_unset_mask;
+pixmap_mask *ob_s_close_mask;
 
 /* global appearances */
 Appearance *ob_a_focused_unpressed_max;
 Appearance *ob_a_focused_pressed_max;
+Appearance *ob_a_focused_pressed_set_max;
 Appearance *ob_a_unfocused_unpressed_max;
 Appearance *ob_a_unfocused_pressed_max;
+Appearance *ob_a_unfocused_pressed_set_max;
 Appearance *ob_a_focused_unpressed_close;
 Appearance *ob_a_focused_pressed_close;
 Appearance *ob_a_unfocused_unpressed_close;
 Appearance *ob_a_unfocused_pressed_close;
 Appearance *ob_a_focused_unpressed_desk;
 Appearance *ob_a_focused_pressed_desk;
+Appearance *ob_a_focused_pressed_set_desk;
 Appearance *ob_a_unfocused_unpressed_desk;
 Appearance *ob_a_unfocused_pressed_desk;
+Appearance *ob_a_unfocused_pressed_set_desk;
 Appearance *ob_a_focused_unpressed_iconify;
 Appearance *ob_a_focused_pressed_iconify;
 Appearance *ob_a_unfocused_unpressed_iconify;
@@ -105,23 +107,26 @@ gboolean startup()
         ob_s_title_unfocused_color = ob_s_title_focused_color = 
         ob_s_titlebut_unfocused_color = ob_s_titlebut_focused_color = NULL;
     ob_s_winfont = NULL;
-    ob_s_max_pressed_mask = ob_s_max_unpressed_mask = NULL;
-    ob_s_iconify_pressed_mask = ob_s_iconify_unpressed_mask = NULL;
-    ob_s_desk_pressed_mask = ob_s_desk_unpressed_mask = NULL;
-    ob_s_close_pressed_mask = ob_s_close_unpressed_mask = NULL;
+    ob_s_max_set_mask = ob_s_max_unset_mask = NULL;
+    ob_s_desk_set_mask = ob_s_desk_unset_mask = NULL;
+    ob_s_iconify_mask = ob_s_close_mask = NULL;
 
     ob_a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
     ob_a_focused_pressed_max = appearance_new(Surface_Planar, 1);
+    ob_a_focused_pressed_set_max = appearance_new(Surface_Planar, 1);
     ob_a_unfocused_unpressed_max = appearance_new(Surface_Planar, 1);
     ob_a_unfocused_pressed_max = appearance_new(Surface_Planar, 1);
+    ob_a_unfocused_pressed_set_max = appearance_new(Surface_Planar, 1);
     ob_a_focused_unpressed_close = NULL;
     ob_a_focused_pressed_close = NULL;
     ob_a_unfocused_unpressed_close = NULL;
     ob_a_unfocused_pressed_close = NULL;
     ob_a_focused_unpressed_desk = NULL;
     ob_a_focused_pressed_desk = NULL;
+    ob_a_focused_pressed_set_desk = NULL;
     ob_a_unfocused_unpressed_desk = NULL;
     ob_a_unfocused_pressed_desk = NULL;
+    ob_a_unfocused_pressed_set_desk = NULL;
     ob_a_focused_unpressed_iconify = NULL;
     ob_a_focused_pressed_iconify = NULL;
     ob_a_unfocused_unpressed_iconify = NULL;
@@ -139,9 +144,13 @@ gboolean startup()
     if (obtheme_load()) {
         RECT_SET(ob_a_focused_pressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_focused_pressed_set_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_focused_unpressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_unfocused_pressed_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_unfocused_pressed_set_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_unfocused_unpressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
@@ -157,9 +166,13 @@ gboolean startup()
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_focused_pressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_focused_pressed_set_max->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_focused_unpressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_unfocused_pressed_max->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_unfocused_pressed_set_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_unfocused_unpressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
@@ -193,29 +206,27 @@ void shutdown()
     if (ob_s_titlebut_focused_color != NULL)
         color_free(ob_s_titlebut_focused_color);
 
-    if (ob_s_max_pressed_mask != NULL)
-        pixmap_mask_free(ob_s_max_pressed_mask);
-    if (ob_s_max_unpressed_mask != NULL)
-        pixmap_mask_free(ob_s_max_unpressed_mask);
-    if (ob_s_desk_pressed_mask != NULL)
-        pixmap_mask_free(ob_s_desk_pressed_mask);
-    if (ob_s_desk_unpressed_mask != NULL)
-        pixmap_mask_free(ob_s_desk_unpressed_mask);
-    if (ob_s_iconify_pressed_mask != NULL)
-        pixmap_mask_free(ob_s_iconify_pressed_mask);
-    if (ob_s_iconify_unpressed_mask != NULL)
-        pixmap_mask_free(ob_s_iconify_unpressed_mask);
-    if (ob_s_close_pressed_mask != NULL)
-        pixmap_mask_free(ob_s_close_pressed_mask);
-    if (ob_s_close_unpressed_mask != NULL)
-        pixmap_mask_free(ob_s_close_unpressed_mask);
+    if (ob_s_max_set_mask != NULL)
+        pixmap_mask_free(ob_s_max_set_mask);
+    if (ob_s_max_unset_mask != NULL)
+        pixmap_mask_free(ob_s_max_unset_mask);
+    if (ob_s_desk_set_mask != NULL)
+        pixmap_mask_free(ob_s_desk_set_mask);
+    if (ob_s_desk_unset_mask != NULL)
+        pixmap_mask_free(ob_s_desk_unset_mask);
+    if (ob_s_iconify_mask != NULL)
+        pixmap_mask_free(ob_s_iconify_mask);
+    if (ob_s_close_mask != NULL)
+        pixmap_mask_free(ob_s_close_mask);
 
     if (ob_s_winfont != NULL) font_close(ob_s_winfont);
 
     appearance_free(ob_a_focused_unpressed_max);
     appearance_free(ob_a_focused_pressed_max);
+    appearance_free(ob_a_focused_pressed_set_max);
     appearance_free(ob_a_unfocused_unpressed_max);
     appearance_free(ob_a_unfocused_pressed_max);
+    appearance_free(ob_a_unfocused_pressed_set_max);
     if (ob_a_focused_unpressed_close != NULL)
 	appearance_free(ob_a_focused_unpressed_close);
     if (ob_a_focused_pressed_close != NULL)

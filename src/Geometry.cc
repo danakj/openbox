@@ -102,10 +102,10 @@ void Rect::setH(unsigned int h) {
 
 bool Rect::Intersect(const Rect &r) const {
   return
-    (x() < (r.x()+r.w()) ) &&
-    ( (x()+w()) > r.x()) &&
-    (y() < (r.y()+r.h()) ) &&
-    ( (y()+h()) > r.y());
+    (x() < (r.x()+(signed)r.w()) ) &&
+    ( (x()+(signed)w()) > r.x()) &&
+    (y() < (r.y()+(signed)r.h()) ) &&
+    ( (y()+(signed)h()) > r.y());
 }
 
 Rect Rect::Inflate(const unsigned int i) const {

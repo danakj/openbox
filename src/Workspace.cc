@@ -545,10 +545,7 @@ Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
         sort(spaces.begin(),spaces.end(),colLRBT);
      else
         sort(spaces.begin(),spaces.end(),colRLBT);
-  fprintf(stderr,"Spaces after sorting\n");
-  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
-     fprintf(stderr,"space(%d,%d)(%d,%d)\n",siter->x(),siter->y(),
-             siter->x()+siter->w(),siter->y()+siter->h());
+
   //Find first space that fits the window
   best = NULL;
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter)

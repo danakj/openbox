@@ -221,7 +221,7 @@ void screen::handleKeypress(const XEvent &e) {
           window->lower();
           return;
 
-        case Action::sendTo:
+        case Action::sendToWorkspace:
           window->sendTo(it->number());
           return;
 

@@ -46,7 +46,7 @@ public:
     moveWindowLeft,
     moveWindowRight,
 
-    sendTo, //done
+    sendToWorkspace, //done
 
     nextWindow, //done for now
     prevWindow, //done for now

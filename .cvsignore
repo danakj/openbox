@@ -1,0 +1,9 @@
+ltmain.sh
+libtool
+configure
+config.sub
+config.status
+config.log
+config.guess
+autom4te.cache
+aclocal.m4

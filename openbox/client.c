@@ -2674,8 +2674,6 @@ static ObClientIcon* client_icon_recursive(ObClient *self, int w, int h)
     /* li is the largest image < req */
     unsigned long size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
 
-    g_message("icons %d", self->nicons);
-
     if (!self->nicons) {
         ObClientIcon *parent = NULL;
 
@@ -2718,9 +2716,7 @@ const ObClientIcon* client_icon(ObClient *self, int w, int h)
     ObClientIcon *ret;
     static ObClientIcon deficon;
 
-    g_message("going for broke");
     if (!(ret = client_icon_recursive(self, w, h))) {
-        g_message("using default");
         deficon.width = deficon.height = 48;
         deficon.data = ob_rr_theme->def_win_icon;
         ret = &deficon;

@@ -668,7 +668,7 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XPropertyEvent swig_types[20] 
 #define  SWIGTYPE_p_XSelectionRequestEvent swig_types[21] 
 #define  SWIGTYPE_p_ob__Cursors swig_types[22] 
-#define  SWIGTYPE_p_otk__ImageControl swig_types[23] 
+#define  SWIGTYPE_p_otk__RenderControl swig_types[23] 
 #define  SWIGTYPE_p_ob__MwmHints swig_types[24] 
 #define  SWIGTYPE_p_ob__Screen swig_types[25] 
 #define  SWIGTYPE_p_ob__Frame swig_types[26] 
@@ -682,19 +682,19 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__Display swig_types[34] 
 #define  SWIGTYPE_p_Display swig_types[35] 
 #define  SWIGTYPE_p_XMappingEvent swig_types[36] 
-#define  SWIGTYPE_p_otk__Style swig_types[37] 
-#define  SWIGTYPE_p_otk__EventHandler swig_types[38] 
-#define  SWIGTYPE_p_XReparentEvent swig_types[39] 
-#define  SWIGTYPE_p_otk__EventDispatcher swig_types[40] 
-#define  SWIGTYPE_p_otk__GCCache swig_types[41] 
-#define  SWIGTYPE_p_ob__Bindings swig_types[42] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[43] 
-#define  SWIGTYPE_p_ob__Actions swig_types[44] 
-#define  SWIGTYPE_p_otk__Widget swig_types[45] 
-#define  SWIGTYPE_p_XEvent swig_types[46] 
-#define  SWIGTYPE_p_otk__Property swig_types[47] 
-#define  SWIGTYPE_p_PyObject swig_types[48] 
-#define  SWIGTYPE_p_otk__ScreenInfo swig_types[49] 
+#define  SWIGTYPE_p_otk__EventHandler swig_types[37] 
+#define  SWIGTYPE_p_XReparentEvent swig_types[38] 
+#define  SWIGTYPE_p_otk__EventDispatcher swig_types[39] 
+#define  SWIGTYPE_p_otk__GCCache swig_types[40] 
+#define  SWIGTYPE_p_ob__Bindings swig_types[41] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[42] 
+#define  SWIGTYPE_p_ob__Actions swig_types[43] 
+#define  SWIGTYPE_p_otk__Widget swig_types[44] 
+#define  SWIGTYPE_p_XEvent swig_types[45] 
+#define  SWIGTYPE_p_otk__Property swig_types[46] 
+#define  SWIGTYPE_p_PyObject swig_types[47] 
+#define  SWIGTYPE_p_otk__ScreenInfo swig_types[48] 
+#define  SWIGTYPE_p_otk__RenderStyle swig_types[49] 
 #define  SWIGTYPE_p_ob__EventData swig_types[50] 
 #define  SWIGTYPE_p_XCreateWindowEvent swig_types[51] 
 #define  SWIGTYPE_p_XDestroyWindowEvent swig_types[52] 
@@ -704,8 +704,8 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XKeyEvent swig_types[56] 
 #define  SWIGTYPE_p_int swig_types[57] 
 #define  SWIGTYPE_p_otk__Strut swig_types[58] 
-#define  SWIGTYPE_p_unsigned_long swig_types[59] 
-#define  SWIGTYPE_p_p_unsigned_long swig_types[60] 
+#define  SWIGTYPE_p_p_unsigned_long swig_types[59] 
+#define  SWIGTYPE_p_unsigned_long swig_types[60] 
 #define  SWIGTYPE_p_XMotionEvent swig_types[61] 
 #define  SWIGTYPE_p_XButtonEvent swig_types[62] 
 #define  SWIGTYPE_p_XSelectionEvent swig_types[63] 
@@ -1032,6 +1032,24 @@ static PyObject *_wrap_Display_findScreen(PyObject *self, PyObject *args) {
     result = (otk::ScreenInfo *)(arg1)->findScreen(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ScreenInfo, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Display_renderControl(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    int arg2 ;
+    otk::RenderControl *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Display_renderControl",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::RenderControl *)(arg1)->renderControl(arg2);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__RenderControl, 0);
     return resultobj;
     fail:
     return NULL;
@@ -8271,23 +8289,6 @@ static PyObject *_wrap_Screen_managed(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Screen_imageControl(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::Screen *arg1 = (ob::Screen *) 0 ;
-    otk::ImageControl *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:Screen_imageControl",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Screen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::ImageControl *)(arg1)->imageControl();
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ImageControl, 0);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_Screen_area(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Screen *arg1 = (ob::Screen *) 0 ;
@@ -8311,14 +8312,14 @@ static PyObject *_wrap_Screen_area(PyObject *self, PyObject *args) {
 static PyObject *_wrap_Screen_style(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Screen *arg1 = (ob::Screen *) 0 ;
-    otk::Style *result;
+    otk::RenderStyle *result;
     PyObject * obj0  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"O:Screen_style",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Screen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::Style *)((ob::Screen const *)arg1)->style();
+    result = (otk::RenderStyle *)((ob::Screen const *)arg1)->style();
     
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Style, 0);
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__RenderStyle, 0);
     return resultobj;
     fail:
     return NULL;
@@ -9573,14 +9574,14 @@ static PyObject * Client_swigregister(PyObject *self, PyObject *args) {
 static PyObject *_wrap_new_Frame(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Client *arg1 = (ob::Client *) 0 ;
-    otk::Style *arg2 = (otk::Style *) 0 ;
+    otk::RenderStyle *arg2 = (otk::RenderStyle *) 0 ;
     ob::Frame *result;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"OO:new_Frame",&obj0,&obj1)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__RenderStyle,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (ob::Frame *)new ob::Frame(arg1,arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__Frame, 1);
@@ -9629,13 +9630,13 @@ static PyObject *_wrap_Frame_size(PyObject *self, PyObject *args) {
 static PyObject *_wrap_Frame_setStyle(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Frame *arg1 = (ob::Frame *) 0 ;
-    otk::Style *arg2 = (otk::Style *) 0 ;
+    otk::RenderStyle *arg2 = (otk::RenderStyle *) 0 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"OO:Frame_setStyle",&obj0,&obj1)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__RenderStyle,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     (arg1)->setStyle(arg2);
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -11297,6 +11298,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Display_gcCache", _wrap_Display_gcCache, METH_VARARGS },
 	 { (char *)"Display_screenInfo", _wrap_Display_screenInfo, METH_VARARGS },
 	 { (char *)"Display_findScreen", _wrap_Display_findScreen, METH_VARARGS },
+	 { (char *)"Display_renderControl", _wrap_Display_renderControl, METH_VARARGS },
 	 { (char *)"Display_xkb", _wrap_Display_xkb, METH_VARARGS },
 	 { (char *)"Display_xkbEventBase", _wrap_Display_xkbEventBase, METH_VARARGS },
 	 { (char *)"Display_shape", _wrap_Display_shape, METH_VARARGS },
@@ -11614,7 +11616,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Screen_clientCount", _wrap_Screen_clientCount, METH_VARARGS },
 	 { (char *)"Screen_number", _wrap_Screen_number, METH_VARARGS },
 	 { (char *)"Screen_managed", _wrap_Screen_managed, METH_VARARGS },
-	 { (char *)"Screen_imageControl", _wrap_Screen_imageControl, METH_VARARGS },
 	 { (char *)"Screen_area", _wrap_Screen_area, METH_VARARGS },
 	 { (char *)"Screen_style", _wrap_Screen_style, METH_VARARGS },
 	 { (char *)"Screen_focuswindow", _wrap_Screen_focuswindow, METH_VARARGS },
@@ -11832,7 +11833,7 @@ static swig_type_info _swigt__p_XVisibilityEvent[] = {{"_p_XVisibilityEvent", 0,
 static swig_type_info _swigt__p_XPropertyEvent[] = {{"_p_XPropertyEvent", 0, "XPropertyEvent *", 0},{"_p_XPropertyEvent"},{0}};
 static swig_type_info _swigt__p_XSelectionRequestEvent[] = {{"_p_XSelectionRequestEvent", 0, "XSelectionRequestEvent *", 0},{"_p_XSelectionRequestEvent"},{0}};
 static swig_type_info _swigt__p_ob__Cursors[] = {{"_p_ob__Cursors", 0, "ob::Cursors *", 0},{"_p_ob__Cursors"},{0}};
-static swig_type_info _swigt__p_otk__ImageControl[] = {{"_p_otk__ImageControl", 0, "otk::ImageControl *", 0},{"_p_otk__ImageControl"},{0}};
+static swig_type_info _swigt__p_otk__RenderControl[] = {{"_p_otk__RenderControl", 0, "otk::RenderControl *", 0},{"_p_otk__RenderControl"},{0}};
 static swig_type_info _swigt__p_ob__MwmHints[] = {{"_p_ob__MwmHints", 0, "ob::MwmHints *", 0},{"_p_ob__MwmHints"},{0}};
 static swig_type_info _swigt__p_ob__Screen[] = {{"_p_ob__Screen", 0, "ob::Screen *", 0},{"_p_ob__Screen"},{0}};
 static swig_type_info _swigt__p_ob__Frame[] = {{"_p_ob__Frame", 0, "ob::Frame *", 0},{"_p_ob__Frame"},{0}};
@@ -11846,7 +11847,6 @@ static swig_type_info _swigt__p_XCrossingEvent[] = {{"_p_XCrossingEvent", 0, "XC
 static swig_type_info _swigt__p_otk__Display[] = {{"_p_otk__Display", 0, "otk::Display *", 0},{"_p_otk__Display"},{0}};
 static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
 static swig_type_info _swigt__p_XMappingEvent[] = {{"_p_XMappingEvent", 0, "XMappingEvent *", 0},{"_p_XMappingEvent"},{0}};
-static swig_type_info _swigt__p_otk__Style[] = {{"_p_otk__Style", 0, "otk::Style *", 0},{"_p_otk__Style"},{0}};
 static swig_type_info _swigt__p_otk__EventHandler[] = {{"_p_otk__EventHandler", 0, "otk::EventHandler *", 0},{"_p_ob__Client", _p_ob__ClientTo_p_otk__EventHandler},{"_p_ob__Actions", _p_ob__ActionsTo_p_otk__EventHandler},{"_p_otk__EventHandler"},{"_p_ob__Frame", _p_ob__FrameTo_p_otk__EventHandler},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventHandler},{"_p_otk__Widget", _p_otk__WidgetTo_p_otk__EventHandler},{"_p_ob__Screen", _p_ob__ScreenTo_p_otk__EventHandler},{0}};
 static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XReparentEvent *", 0},{"_p_XReparentEvent"},{0}};
 static swig_type_info _swigt__p_otk__EventDispatcher[] = {{"_p_otk__EventDispatcher", 0, "otk::EventDispatcher *", 0},{"_p_otk__EventDispatcher"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventDispatcher},{0}};
@@ -11859,6 +11859,7 @@ static swig_type_info _swigt__p_XEvent[] = {{"_p_XEvent", 0, "XEvent *", 0},{"_p
 static swig_type_info _swigt__p_otk__Property[] = {{"_p_otk__Property", 0, "otk::Property *", 0},{"_p_otk__Property"},{0}};
 static swig_type_info _swigt__p_PyObject[] = {{"_p_PyObject", 0, "PyObject *", 0},{"_p_PyObject"},{0}};
 static swig_type_info _swigt__p_otk__ScreenInfo[] = {{"_p_otk__ScreenInfo", 0, "otk::ScreenInfo *", 0},{"_p_otk__ScreenInfo"},{0}};
+static swig_type_info _swigt__p_otk__RenderStyle[] = {{"_p_otk__RenderStyle", 0, "otk::RenderStyle *", 0},{"_p_otk__RenderStyle"},{0}};
 static swig_type_info _swigt__p_ob__EventData[] = {{"_p_ob__EventData", 0, "ob::EventData *", 0},{"_p_ob__EventData"},{0}};
 static swig_type_info _swigt__p_XCreateWindowEvent[] = {{"_p_XCreateWindowEvent", 0, "XCreateWindowEvent *", 0},{"_p_XCreateWindowEvent"},{0}};
 static swig_type_info _swigt__p_XDestroyWindowEvent[] = {{"_p_XDestroyWindowEvent", 0, "XDestroyWindowEvent *", 0},{"_p_XDestroyWindowEvent"},{0}};
@@ -11868,8 +11869,8 @@ static swig_type_info _swigt__p_otk__Atoms[] = {{"_p_otk__Atoms", 0, "otk::Atoms
 static swig_type_info _swigt__p_XKeyEvent[] = {{"_p_XKeyEvent", 0, "XKeyEvent *", 0},{"_p_XKeyEvent"},{0}};
 static swig_type_info _swigt__p_int[] = {{"_p_int", 0, "int *", 0},{"_p_int"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
-static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_p_unsigned_long[] = {{"_p_p_unsigned_long", 0, "unsigned long **", 0},{"_p_p_unsigned_long"},{0}};
+static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_XMotionEvent[] = {{"_p_XMotionEvent", 0, "XMotionEvent *", 0},{"_p_XMotionEvent"},{0}};
 static swig_type_info _swigt__p_XButtonEvent[] = {{"_p_XButtonEvent", 0, "XButtonEvent *", 0},{"_p_XButtonEvent"},{0}};
 static swig_type_info _swigt__p_XSelectionEvent[] = {{"_p_XSelectionEvent", 0, "XSelectionEvent *", 0},{"_p_XSelectionEvent"},{0}};
@@ -11898,7 +11899,7 @@ _swigt__p_XVisibilityEvent,
 _swigt__p_XPropertyEvent, 
 _swigt__p_XSelectionRequestEvent, 
 _swigt__p_ob__Cursors, 
-_swigt__p_otk__ImageControl, 
+_swigt__p_otk__RenderControl, 
 _swigt__p_ob__MwmHints, 
 _swigt__p_ob__Screen, 
 _swigt__p_ob__Frame, 
@@ -11912,7 +11913,6 @@ _swigt__p_XCrossingEvent,
 _swigt__p_otk__Display, 
 _swigt__p_Display, 
 _swigt__p_XMappingEvent, 
-_swigt__p_otk__Style, 
 _swigt__p_otk__EventHandler, 
 _swigt__p_XReparentEvent, 
 _swigt__p_otk__EventDispatcher, 
@@ -11925,6 +11925,7 @@ _swigt__p_XEvent,
 _swigt__p_otk__Property, 
 _swigt__p_PyObject, 
 _swigt__p_otk__ScreenInfo, 
+_swigt__p_otk__RenderStyle, 
 _swigt__p_ob__EventData, 
 _swigt__p_XCreateWindowEvent, 
 _swigt__p_XDestroyWindowEvent, 
@@ -11934,8 +11935,8 @@ _swigt__p_otk__Atoms,
 _swigt__p_XKeyEvent, 
 _swigt__p_int, 
 _swigt__p_otk__Strut, 
-_swigt__p_unsigned_long, 
 _swigt__p_p_unsigned_long, 
+_swigt__p_unsigned_long, 
 _swigt__p_XMotionEvent, 
 _swigt__p_XButtonEvent, 
 _swigt__p_XSelectionEvent, 

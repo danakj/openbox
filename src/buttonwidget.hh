@@ -18,11 +18,12 @@ public:
   ButtonWidget(otk::Widget *parent, WidgetBase::WidgetType type);
   virtual ~ButtonWidget();
 
-  virtual void setStyle(otk::Style *style);
+  virtual void setStyle(otk::RenderStyle *style);
 
   virtual void adjust();
 
   virtual void update();
+  virtual void renderForeground();
   
   virtual void focus();
   virtual void unfocus();

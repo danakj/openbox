@@ -23,7 +23,7 @@ namespace ob {
 
 const long Frame::event_mask;
 
-Frame::Frame(Client *client, otk::Style *style)
+Frame::Frame(Client *client, otk::RenderStyle *style)
   : otk::Widget(openbox, style, Horizontal, 0, 1, true),
     WidgetBase(WidgetBase::Type_Frame),
     _client(client),
@@ -71,7 +71,7 @@ void Frame::setTitle(const otk::ustring &text)
 }
 
 
-void Frame::setStyle(otk::Style *style)
+void Frame::setStyle(otk::RenderStyle *style)
 {
   assert(style);
 
@@ -87,7 +87,7 @@ void Frame::setStyle(otk::Style *style)
   
   _style = style;
 
-  setBorderColor(_style->getBorderColor());
+  setBorderColor(_style->frameBorderColor());
 
   // if !replace, then adjust() will get called after the client is grabbed!
   if (replace) {
@@ -129,11 +129,11 @@ void Frame::adjustSize()
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
   int butsize=0; // width and height of the titlebar buttons
-  const int bevel = _style->getBevelWidth();
+  const int bevel = _style->bevelWidth();
   
   if (_decorations & Client::Decor_Border) {
-    bwidth = _style->getBorderWidth();
-    cbwidth = _style->getFrameWidth();
+    bwidth = _style->frameBorderWidth();
+    cbwidth = _style->clientBorderWidth();
   } else
     bwidth = cbwidth = 0;
   _innersize.left = _innersize.top = _innersize.bottom = _innersize.right =
@@ -153,11 +153,11 @@ void Frame::adjustSize()
     _titlebar.setGeometry(-bwidth,
                           -bwidth,
                           width,
-                          _style->getFont()->height() + bevel * 2);
+                          _style->labelFont()->height() + bevel * 2);
     _innersize.top += _titlebar.height() + bwidth;
 
     // set the label size
-    _label.setGeometry(0, bevel, width, _style->getFont()->height());
+    _label.setGeometry(0, bevel, width, _style->labelFont()->height());
     // set the buttons sizes
     butsize = _label.height() - 2;
     if (_decorations & Client::Decor_Iconify)
@@ -275,7 +275,7 @@ void Frame::adjustSize()
   if (_decorations & Client::Decor_Handle) {
     _handle.setGeometry(-bwidth,
                         _innersize.top + _client->area().height() + cbwidth,
-                        width, _style->getHandleWidth());
+                        width, _style->handleWidth());
     _grip_left.setGeometry(-bwidth,
                            -bwidth,
                            // XXX: get a Point class in otk and use that for
@@ -357,7 +357,7 @@ void Frame::adjustShape()
 {
 #ifdef SHAPE
   int bwidth = (_decorations & Client::Decor_Border) ?
-    _style->getBorderWidth() : 0;
+    _style->frameBorderWidth() : 0;
   
   if (!_client->shaped()) {
     // clear the shape on the frame window

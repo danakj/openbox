@@ -12,10 +12,9 @@ extern "C" {
 
 #include "client.hh"
 #include "widgetbase.hh"
-#include "otk/image.hh"
+#include "otk/renderstyle.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
-#include "otk/style.hh"
 #include "otk/screeninfo.hh"
 #include "otk/eventhandler.hh"
 #include "otk/property.hh"
@@ -59,11 +58,8 @@ private:
   //! Information about this screen
   const otk::ScreenInfo *_info;
   
-  //! The Image Control used for rendering on the screen
-  otk::ImageControl *_image_control;
-
   //! The style with which to render on the screen
-  otk::Style _style;
+  otk::RenderStyle _style;
 
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
@@ -148,12 +144,10 @@ public:
     used.
   */
   inline bool managed() const { return _managed; }
-  //! Returns the Image Control used for rendering on the screen
-  inline otk::ImageControl *imageControl() { return _image_control; }
   //! Returns the area of the screen not reserved by applications' Struts
   inline const otk::Rect &area() const { return _area; }
   //! Returns the style in use on the screen
-  inline const otk::Style *style() const { return &_style; }
+  inline const otk::RenderStyle *style() const { return &_style; }
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }
   //! Returns the desktop being displayed

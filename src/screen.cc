@@ -48,7 +48,8 @@ namespace ob {
 
 Screen::Screen(int screen)
   : WidgetBase(WidgetBase::Type_Root),
-    _number(screen)
+    _number(screen),
+    _style(screen, "")
 {
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);
@@ -73,13 +74,8 @@ Screen::Screen(int screen)
   XDefineCursor(**otk::display, _info->rootWindow(),
                 openbox->cursors().session);
 
-  // initialize the shit that is used for all drawing on the screen
-  _image_control = new otk::ImageControl(_info, true);
-  _image_control->installRootColormap();
-  _root_cmap_installed = True;
-
-  // initialize the screen's style
-  _style.setImageControl(_image_control);
+  // XXX: initialize the screen's style
+  /*
   otk::ustring stylepath;
   python_get_string("theme", &stylepath);
   otk::Configuration sconfig(false);
@@ -92,6 +88,7 @@ Screen::Screen(int screen)
     }
   }
   _style.load(sconfig);
+  */
 
   // set up notification of netwm support
   changeSupportedAtoms();
@@ -157,8 +154,6 @@ Screen::~Screen()
 
   XDestroyWindow(**otk::display, _focuswindow);
   XDestroyWindow(**otk::display, _supportwindow);
-
-  delete _image_control;
 }
 
 

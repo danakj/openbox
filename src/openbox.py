@@ -48,6 +48,7 @@ class Display(_object):
     def gcCache(*args): return apply(_openbox.Display_gcCache,args)
     def screenInfo(*args): return apply(_openbox.Display_screenInfo,args)
     def findScreen(*args): return apply(_openbox.Display_findScreen,args)
+    def renderControl(*args): return apply(_openbox.Display_renderControl,args)
     def xkb(*args): return apply(_openbox.Display_xkb,args)
     def xkbEventBase(*args): return apply(_openbox.Display_xkbEventBase,args)
     def shape(*args): return apply(_openbox.Display_shape,args)
@@ -664,7 +665,6 @@ class Screen(EventHandler,):
     event_mask = _openbox.Screen_event_mask
     def number(*args): return apply(_openbox.Screen_number,args)
     def managed(*args): return apply(_openbox.Screen_managed,args)
-    def imageControl(*args): return apply(_openbox.Screen_imageControl,args)
     def area(*args): return apply(_openbox.Screen_area,args)
     def style(*args): return apply(_openbox.Screen_style,args)
     def focuswindow(*args): return apply(_openbox.Screen_focuswindow,args)

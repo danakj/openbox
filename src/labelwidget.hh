@@ -5,7 +5,7 @@
 #include "widgetbase.hh"
 #include "otk/widget.hh"
 #include "otk/font.hh"
-#include "otk/style.hh"
+#include "otk/renderstyle.hh"
 #include "otk/ustring.hh"
 
 namespace ob {
@@ -15,18 +15,16 @@ class LabelWidget : public otk::Widget, public WidgetBase
 private:
   void setTextures();
   const otk::Font *_font;
-  otk::Color *_text_color;
+  otk::RenderColor *_text_color;
   int _sidemargin;
-  otk::Style::TextJustify _justify;
+  otk::RenderStyle::TextJustify _justify;
   otk::ustring _text;
-  //! Object used by Xft to render to the drawable
-  XftDraw *_xftdraw;
   
 public:
   LabelWidget(otk::Widget *parent, WidgetBase::WidgetType type);
   virtual ~LabelWidget();
 
-  virtual void setStyle(otk::Style *style);
+  virtual void setStyle(otk::RenderStyle *style);
 
   virtual void adjust();
 
@@ -34,6 +32,8 @@ public:
   virtual void unfocus();
 
   virtual void update();
+
+  virtual void renderForeground();
 
   inline const otk::ustring &text() const { return _text; }
   void setText(const otk::ustring &text);

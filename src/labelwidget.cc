@@ -14,15 +14,11 @@ LabelWidget::LabelWidget(otk::Widget *parent, WidgetBase::WidgetType type)
   : otk::Widget(parent),
     WidgetBase(type)
 {
-  const otk::ScreenInfo *info = otk::display->screenInfo(_screen);
-  _xftdraw = XftDrawCreate(**otk::display, _window, info->visual(),
-                           info->colormap());
 }
 
 
 LabelWidget::~LabelWidget()
 {
-  XftDrawDestroy(_xftdraw);
 }
 
 
@@ -36,23 +32,24 @@ void LabelWidget::setText(const otk::ustring &text)
 void LabelWidget::setTextures()
 {
   if (_focused) {
-    setTexture(_style->getLabelFocus());
-    _text_color = _style->getTextFocus();
+    setTexture(_style->labelFocusBackground());
+    _text_color = _style->textFocusColor();
   } else {
-    setTexture(_style->getLabelUnfocus());
-    _text_color = _style->getTextUnfocus();
+    setTexture(_style->labelUnfocusBackground());
+    _text_color = _style->textUnfocusColor();
   }
 }
 
 
-void LabelWidget::setStyle(otk::Style *style)
+void LabelWidget::setStyle(otk::RenderStyle *style)
 {
   otk::Widget::setStyle(style);
   setTextures();
-  _font = style->getFont();
+  _font = style->labelFont();
+  _sidemargin = style->bevelWidth() * 2;
+  _justify = style->labelTextJustify();
+
   assert(_font);
-  _sidemargin = style->getBevelWidth() * 2;
-  _justify = style->textJustify();
 }
 
 
@@ -72,9 +69,15 @@ void LabelWidget::unfocus()
 
 void LabelWidget::update()
 {
+  printf("LabelWidget::update()\n");
+}
+
+
+void LabelWidget::renderForeground()
+{
   bool draw = _dirty;
 
-  otk::Widget::update();
+  otk::Widget::renderForeground();
 
   if (draw) {
     otk::ustring t = _text;
@@ -95,18 +98,19 @@ void LabelWidget::update()
 
       // justify the text
       switch (_justify) {
-      case otk::Style::RightJustify:
+      case otk::RenderStyle::RightJustify:
         x += max_length - length;
         break;
-      case otk::Style::CenterJustify:
+      case otk::RenderStyle::CenterJustify:
         x += (max_length - length) / 2;
         break;
-      case otk::Style::LeftJustify:
+      case otk::RenderStyle::LeftJustify:
         break;
       }
     }
 
-    _font->drawString(_xftdraw, x, 0, *_text_color, t);
+    otk::display->renderControl(_screen)->drawString
+      (*_surface, *_font, x, 0, *_text_color, t);
   }
 }
 

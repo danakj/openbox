@@ -16,7 +16,7 @@ public:
   BackgroundWidget(otk::Widget *parent, WidgetBase::WidgetType type);
   virtual ~BackgroundWidget();
 
-  virtual void setStyle(otk::Style *style);
+  virtual void setStyle(otk::RenderStyle *style);
 
   virtual void adjust();
 

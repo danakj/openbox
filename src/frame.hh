@@ -16,7 +16,7 @@ extern "C" {
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
-#include "otk/style.hh"
+#include "otk/renderstyle.hh"
 #include "otk/widget.hh"
 #include "otk/ustring.hh"
 
@@ -71,7 +71,7 @@ public:
     @param client The client window which will be decorated by the new Frame
     @param style The style to use to decorate the frame
   */
-  Frame(Client *client, otk::Style *style);
+  Frame(Client *client, otk::RenderStyle *style);
   //! Destroys the Frame object
   virtual ~Frame();
 
@@ -79,7 +79,7 @@ public:
   const otk::Strut& size() const { return _size; }
   
   //! Set the style to decorate the frame with
-  virtual void setStyle(otk::Style *style);
+  virtual void setStyle(otk::RenderStyle *style);
 
   //! Empty overridden method to prevent automatic alignment of children
   virtual void adjust();

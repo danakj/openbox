@@ -30,9 +30,9 @@ void ButtonWidget::setTextures()
   case Type_LeftGrip:
   case Type_RightGrip:
     if (_focused)
-      setTexture(_style->getGripFocus());
+      setTexture(_style->gripFocusBackground());
     else
-      setTexture(_style->getGripUnfocus());
+      setTexture(_style->gripUnfocusBackground());
     break;
   case Type_StickyButton:
   case Type_CloseButton:
@@ -40,14 +40,14 @@ void ButtonWidget::setTextures()
   case Type_IconifyButton:
     if (_pressed) {
       if (_focused)
-        setTexture(_style->getButtonPressedFocus());
+        setTexture(_style->buttonPressFocusBackground());
       else
-        setTexture(_style->getButtonPressedUnfocus());
+        setTexture(_style->buttonPressUnfocusBackground());
     } else {
       if (_focused)
-        setTexture(_style->getButtonFocus());
+        setTexture(_style->buttonUnpressFocusBackground());
       else
-        setTexture(_style->getButtonUnfocus());
+        setTexture(_style->buttonUnpressUnfocusBackground());
     }
     break;
   default:
@@ -56,7 +56,7 @@ void ButtonWidget::setTextures()
 }
 
 
-void ButtonWidget::setStyle(otk::Style *style)
+void ButtonWidget::setStyle(otk::RenderStyle *style)
 {
   otk::Widget::setStyle(style);
   setTextures();
@@ -64,7 +64,7 @@ void ButtonWidget::setStyle(otk::Style *style)
   switch (type()) {
   case Type_LeftGrip:
   case Type_RightGrip:
-    setBorderColor(_style->getBorderColor());
+    setBorderColor(_style->frameBorderColor());
     break;
   case Type_StickyButton:
   case Type_CloseButton:
@@ -79,25 +79,30 @@ void ButtonWidget::setStyle(otk::Style *style)
 
 void ButtonWidget::update()
 {
+  printf("ButtonWidget::update()\n");
+}
+
+void ButtonWidget::renderForeground()
+{
   otk::PixmapMask *pm;
   int width;
   bool draw = _dirty;
 
-  otk::Widget::update();
+  otk::Widget::renderForeground();
 
   if (draw) {
     switch (type()) {
     case Type_StickyButton:
-      pm = _style->getStickyButtonMask();
+      pm = _style->stickyMask();
       break;
     case Type_CloseButton:
-      pm = _style->getCloseButtonMask();
+      pm = _style->closeMask();
       break;
     case Type_MaximizeButton:
-      pm = _style->getMaximizeButtonMask();
+      pm = _style->maximizeMask();
       break;
     case Type_IconifyButton:
-      pm = _style->getIconifyButtonMask();
+      pm = _style->iconifyMask();
       break;
     case Type_LeftGrip:
     case Type_RightGrip:
@@ -109,23 +114,23 @@ void ButtonWidget::update()
     if (pm->mask == None) return; // no mask for the button, leave it empty
 
     width = _rect.width();
-  
-    otk::Pen pen(_focused ? *_style->getButtonPicFocus() :
-                 *_style->getButtonPicUnfocus());
+
+    otk::RenderColor *color = (_focused ? _style->buttonFocusColor() :
+                               _style->buttonUnfocusColor());
 
     // set the clip region
-    XSetClipMask(**otk::display, pen.gc(), pm->mask);
-    XSetClipOrigin(**otk::display, pen.gc(),
+    XSetClipMask(**otk::display, color->gc(), pm->mask);
+    XSetClipOrigin(**otk::display, color->gc(),
                    (width - pm->w)/2, (width - pm->h)/2);
 
     // fill in the clipped region
-    XFillRectangle(**otk::display, _window, pen.gc(),
+    XFillRectangle(**otk::display, _window, color->gc(),
                    (width - pm->w)/2, (width - pm->h)/2,
                    (width + pm->w)/2, (width + pm->h)/2);
 
     // unset the clip region
-    XSetClipMask(**otk::display, pen.gc(), None);
-    XSetClipOrigin(**otk::display, pen.gc(), 0, 0);
+    XSetClipMask(**otk::display, color->gc(), None);
+    XSetClipOrigin(**otk::display, color->gc(), 0, 0);
   }
 }
 

@@ -26,21 +26,21 @@ void BackgroundWidget::setTextures()
   switch (type()) {
   case Type_Titlebar:
     if (_focused)
-      setTexture(_style->getTitleFocus());
+      setTexture(_style->titlebarFocusBackground());
     else
-      setTexture(_style->getTitleUnfocus());
+      setTexture(_style->titlebarUnfocusBackground());
     break;
   case Type_Handle:
     if (_focused)
-      setTexture(_style->getHandleFocus());
+      setTexture(_style->handleFocusBackground());
     else
-      setTexture(_style->getHandleUnfocus());
+      setTexture(_style->handleUnfocusBackground());
     break;
   case Type_Plate:
     if (_focused)
-      setBorderColor(&_style->getFrameFocus()->color());
+      setBorderColor(_style->clientBorderFocusColor());
     else
-      setBorderColor(&_style->getFrameUnfocus()->color());
+      setBorderColor(_style->clientBorderUnfocusColor());
     break;
   default:
     assert(false); // there's no other background widgets!
@@ -48,14 +48,14 @@ void BackgroundWidget::setTextures()
 }
 
 
-void BackgroundWidget::setStyle(otk::Style *style)
+void BackgroundWidget::setStyle(otk::RenderStyle *style)
 {
   Widget::setStyle(style);
   setTextures();
   switch (type()) {
   case Type_Titlebar:
   case Type_Handle:
-    setBorderColor(_style->getBorderColor());
+    setBorderColor(_style->frameBorderColor());
     break;
   case Type_Plate:
     break;

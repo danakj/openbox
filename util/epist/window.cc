@@ -44,7 +44,8 @@ XWindow::XWindow(epist *epist, screen *screen, Window window)
   XSelectInput(_epist->getXDisplay(), _window,
                PropertyChangeMask | StructureNotifyMask);
 
-  updateHints();
+  updateNormalHints();
+  updateWMHints();
   updateDimentions();
   updateState();
   updateDesktop();
@@ -77,7 +78,7 @@ void XWindow::updateDimentions() {
 }
 
 
-void XWindow::updateHints() {
+void XWindow::updateNormalHints() {
   XSizeHints size;
   long ret;
 
@@ -97,6 +98,19 @@ void XWindow::updateHints() {
       _inc_x = size.width_inc;
       _inc_y = size.height_inc;
     }
+  }
+}
+
+
+void XWindow::updateWMHints() {
+  XWMHints *hints;
+
+  if ((hints = XGetWMHints(_epist->getXDisplay(), _window)) != NULL) {
+    _can_focus = hints->input;
+    XFree(hints);
+  } else {
+    // assume a window takes input if it doesnt specify
+    _can_focus = True;
   }
 }
 
@@ -170,7 +184,9 @@ void XWindow::processEvent(const XEvent &e) {
     break;
   case PropertyNotify:
     if (e.xproperty.atom == XA_WM_NORMAL_HINTS)
-      updateHints();
+      updateNormalHints();
+    if (e.xproperty.atom == XA_WM_HINTS)
+      updateWMHints();
     else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_state))
       updateState();
     else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))
@@ -219,6 +235,7 @@ void XWindow::iconify() const {
 
 
 void XWindow::focus() const {
+  cout << "Focusing window: 0x" << hex << _window << dec << endl;
   // this will cause the window to be uniconified also
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
                             _window);

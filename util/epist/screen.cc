@@ -489,11 +489,10 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
     classname = (*_active)->appClass();
 
   WindowList::const_iterator target = _active,
-                             first = _active,
                              begin = _clients.begin(),
                              end = _clients.end();
  
-  do {
+  while (1) {
     if (forward) {
       if (target == end) {
         target = begin;
@@ -509,18 +508,22 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
     }
 
     // must be no window to focus
-    if (target == first)
+    if (target == _active)
       return;
-  } while ((*target)->iconic() ||
-           (! allscreens && (*target)->getScreen() != this) ||
-           (! alldesktops &&
-            (*target)->desktop() != _active_desktop &&
-            (*target)->desktop() != 0xffffffff) ||
-           (sameclass && ! classname.empty() &&
-            (*target)->appClass() != classname));
-  
-  if (target != _clients.end())
-    (*target)->focus();
+
+    // determine if this window is invalid for cycling to
+    const XWindow *t = *target;
+    if (t->iconic()) continue;
+    if (! allscreens && t->getScreen() != this) continue;
+    if (! alldesktops && ! (t->desktop() == _active_desktop ||
+                            t->desktop() == 0xffffffff)) continue;
+    if (sameclass && ! classname.empty() &&
+        t->appClass() != classname) continue;
+    if (! t->canFocus()) continue;
+
+    // found a good window!
+    t->focus();
+  }
 }
 
 

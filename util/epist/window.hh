@@ -60,6 +60,7 @@ private:
   int _inc_x, _inc_y; // resize increments
   int _base_x, _base_y; // base size
   int _gravity;
+  bool _can_focus;
 
   // states
   bool _shaded;
@@ -70,7 +71,8 @@ private:
   bool _unmapped;
 
   void updateDimentions();
-  void updateHints();
+  void updateNormalHints();
+  void updateWMHints();
   void updateState();
   void updateDesktop();
   void updateTitle();
@@ -87,6 +89,7 @@ public:
   inline const std::string &title() const { return _title; }
   inline const std::string &appName() const { return _app_name; }
   inline const std::string &appClass() const { return _app_class; }
+  inline bool canFocus() const { return _can_focus; }
   
   inline bool shaded() const { return _shaded; }
   inline bool iconic() const { return _iconic; }

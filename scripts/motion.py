@@ -6,6 +6,9 @@
 #############################################################################
 ### Options that can be modified to change the functions' behaviors.      ###
 ###                                                                       ###
+# snap - snap windows to other windows and screen edges while moving them ###
+snap = 1
+###
 # move_popup - display a coordinates popup when moving windows.           ###
 move_popup = 1                                                            ###
 ###                                                                       ###
@@ -86,6 +89,10 @@ def _do_move():
 
     x = _cx + _dx
     y = _cy + _dy
+
+    global snap
+    if snap:
+        pass
 
     global move_rubberband
     if move_rubberband:

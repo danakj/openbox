@@ -8,7 +8,7 @@ GNU Libtool
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Python library/headers (devel package) (http://www.python.org)
-SWIG 1.3.17+ (http://www.swig.org)
+SWIG 1.3.14+ (http://www.swig.org)
 
 I recommend the latest version of all these packages.
 

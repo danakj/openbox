@@ -32,11 +32,25 @@
 
 using std::cout;
 using std::endl;
+using std::hex;
+using std::dec;
 
 #include "../../src/XAtom.hh"
 
 WindowList _clients;
 WindowList::iterator _active = _clients.end();
+
+
+XWindow &findWindow(const XEvent &e) {
+  WindowList::iterator it, end = _clients.end();
+  for (it = _clients.begin(); it != end; ++it)
+    if (**it == e.xany.window)
+      break;
+  assert(it != end);  // this means a client somehow got removed from the
+                      // list!
+  return **it;
+}
+
 
 void processEvent(const XEvent &e) {
   switch (e.type) {
@@ -45,20 +59,47 @@ void processEvent(const XEvent &e) {
       // root window
       if (e.xproperty.atom == _xatom->getAtom(XAtom::net_active_window))
         updateActiveWindow();
-      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list))
+      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list)) {
+        // catch any window unmaps first
+        XEvent ev;
+        if (XCheckTypedWindowEvent(_display, e.xany.window,
+                                   DestroyNotify, &ev) ||
+            XCheckTypedWindowEvent(_display, e.xany.window,
+                                   UnmapNotify, &ev)) {
+          processEvent(ev);
+        }
+        
         updateClientList();
+      }
     } else {
       // a client window
-      WindowList::iterator it, end = _clients.end();
-      for (it = _clients.begin(); it != end; ++it)
-        if (*it == e.xproperty.window)
-          break;
-      assert(it != end);  // this means a client somehow got removed from the
-                          // list!
-      it->updateState();
+      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_state))
+        findWindow(e).updateState();
+      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))
+        findWindow(e).updateDesktop();
     }
     break;
+  case DestroyNotify:
+  case UnmapNotify:
+    cout << "unmap notify\n";
+    findWindow(e).setUnmapped(true);
+    break;
   }
+}
+
+
+// do we want to add this window to our list?
+bool doAddWindow(Window window) {
+  Atom type;
+  if (! _xatom->getValue(window, XAtom::net_wm_window_type, XAtom::atom,
+                         type))
+    return True;
+
+  if (type == _xatom->getAtom(XAtom::net_wm_window_type_dock) ||
+      type == _xatom->getAtom(XAtom::net_wm_window_type_menu))
+    return False;
+
+  return True;
 }
 
 
@@ -72,7 +113,10 @@ void updateClientList() {
   unsigned long num = (unsigned) -1;
   if (! _xatom->getValue(_root, XAtom::net_client_list, XAtom::window, num,
                          &rootclients)) {
-    _clients.clear(); // no clients left
+    while (! _clients.empty()) {
+      delete _clients.front();
+      _clients.erase(_clients.begin());
+    }
     if (rootclients) delete [] rootclients;
     return;
   }
@@ -83,11 +127,13 @@ void updateClientList() {
   // insert new clients after the active window
   for (i = 0; i < num; ++i) {
     for (it = _clients.begin(); it != end; ++it)
-      if (*it == rootclients[i])
+      if (**it == rootclients[i])
         break;
     if (it == end) {  // didn't already exist
-      _clients.insert(insert_point, rootclients[i]);
-      cout << "Added window: " << rootclients[i] << endl;
+      if (doAddWindow(rootclients[i])) {
+        cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
+        _clients.insert(insert_point, new XWindow(rootclients[i]));
+      }
     }
   }
 
@@ -95,11 +141,12 @@ void updateClientList() {
   for (it = _clients.begin(); it != end;) {
     WindowList::iterator it2 = it++;
     for (i = 0; i < num; ++i)
-      if (*it2 == rootclients[i])
+      if (**it2 == rootclients[i])
         break;
     if (i == num)  { // no longer exists
+      cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
+      delete *it2;
       _clients.erase(it2);
-      cout << "Removed window: " << it2->window() << endl;
     }
   }
 
@@ -113,12 +160,12 @@ void updateActiveWindow() {
   
   WindowList::iterator it, end = _clients.end();
   for (it = _clients.begin(); it != end; ++it) {
-    if (*it == a)
+    if (**it == a)
       break;
   }
   _active = it;
 
   cout << "Active window is now: ";
   if (_active == _clients.end()) cout << "None\n";
-  else cout << _active->window() << endl;
+  else cout << "0x" << hex << (*_active)->window() << dec << endl;
 }

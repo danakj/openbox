@@ -31,7 +31,7 @@ extern "C" {
 
 class XWindow;
 
-typedef std::list<XWindow> WindowList;
+typedef std::list<XWindow *> WindowList;
 
 class XWindow {
 private:
@@ -41,6 +41,8 @@ private:
   bool _iconic;
   bool _max_vert;
   bool _max_horz;
+
+  bool _unmapped;
 
 public:
   XWindow(Window window);
@@ -53,7 +55,10 @@ public:
   inline bool maxVert() const { return _max_vert; }
   inline bool maxHorz() const { return _max_horz; }
 
+  inline void setUnmapped(bool u) { _unmapped = u; }
+
   void updateState();
+  void updateDesktop();
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

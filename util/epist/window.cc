@@ -28,15 +28,26 @@
 #include "epist.hh"
 #include "../../src/XAtom.hh"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+using std::hex;
+using std::dec;
+
 
 XWindow::XWindow(Window window) : _window(window) {
-  XSelectInput(_display, _window, PropertyChangeMask);
+  _unmapped = false;
+
+  XSelectInput(_display, _window, PropertyChangeMask | StructureNotifyMask);
   updateState();
+  updateDesktop();
 }
 
 
 XWindow::~XWindow() {
-  XSelectInput(_display, _window, None);
+  if (! _unmapped)
+    XSelectInput(_display, _window, None);
 }
 
 
@@ -61,4 +72,11 @@ void XWindow::updateState() {
   }
 
   delete [] state;
+}
+
+
+void XWindow::updateDesktop() {
+  if (! _xatom->getValue(_window, XAtom::net_wm_desktop, XAtom::cardinal,
+                         static_cast<unsigned long>(_desktop)))
+    _desktop = 0;
 }

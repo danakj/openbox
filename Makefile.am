@@ -146,6 +146,8 @@ openbox_openbox_SOURCES = \
 	openbox/keyboard.h \
 	openbox/keytree.c \
 	openbox/keytree.h \
+	openbox/mainloop.c \
+	openbox/mainloop.h \
 	openbox/menuframe.c \
 	openbox/menuframe.h \
 	openbox/menu.c \
@@ -174,8 +176,6 @@ openbox_openbox_SOURCES = \
 	openbox/stacking.h \
 	openbox/startup.c \
 	openbox/startup.h \
-	openbox/timer.c \
-	openbox/timer.h \
 	openbox/translate.c \
 	openbox/translate.h \
 	openbox/window.c \

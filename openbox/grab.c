@@ -30,6 +30,9 @@ gboolean grab_keyboard(gboolean grab)
             XUngrabKeyboard(ob_display, event_lasttime);
         ret = TRUE;
     }
+
+    g_message("grabs: %d", kgrabs);
+
     return ret;
 }
 

@@ -14,8 +14,12 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
+struct _ObMainLoop;
+
 extern RrInstance *ob_rr_inst;
 extern RrTheme    *ob_rr_theme;
+
+extern struct _ObMainLoop *ob_main_loop;
 
 /*! The X display */
 extern Display *ob_display; 

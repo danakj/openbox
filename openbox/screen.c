@@ -1,11 +1,11 @@
 #include "debug.h"
 #include "openbox.h"
+#include "mainloop.h"
 #include "dock.h"
 #include "xerror.h"
 #include "prop.h"
 #include "startup.h"
 #include "grab.h"
-#include "timer.h"
 #include "config.h"
 #include "screen.h"
 #include "client.h"
@@ -50,7 +50,6 @@ static Popup *desktop_cycle_popup;
 #ifdef USE_LIBSN
 static SnMonitorContext *sn_context;
 static int sn_busy_cnt;
-static ObTimer *sn_timer;
 
 static void sn_event_func(SnMonitorEvent *event, void *data);
 #endif
@@ -1077,13 +1076,13 @@ static void set_root_cursor()
 }
 
 #ifdef USE_LIBSN
-static void sn_timeout(ObTimer *t, void *data)
+static gboolean sn_timeout(gpointer data)
 {
-    timer_stop(sn_timer);
-    sn_timer = NULL;
     sn_busy_cnt = 0;
 
     set_root_cursor();
+
+    return FALSE; /* don't repeat */
 }
 
 static void sn_event_func(SnMonitorEvent *ev, void *data)
@@ -1104,26 +1103,20 @@ static void sn_event_func(SnMonitorEvent *ev, void *data)
     switch (sn_monitor_event_get_type(ev)) {
     case SN_MONITOR_EVENT_INITIATED:
         ++sn_busy_cnt;
-        if (sn_timer)
-            timer_stop(sn_timer);
+        ob_main_loop_timeout_remove(ob_main_loop, sn_timeout);
         /* 30 second timeout for apps to start */
-        sn_timer = timer_start(30 * 1000000, sn_timeout, NULL);
+        ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
+                                 sn_timeout, NULL, NULL);
         break;
     case SN_MONITOR_EVENT_CHANGED:
         break;
     case SN_MONITOR_EVENT_COMPLETED:
         if (sn_busy_cnt) --sn_busy_cnt;
-        if (sn_timer) {
-            timer_stop(sn_timer);
-            sn_timer = NULL;
-        }
+        ob_main_loop_timeout_remove(ob_main_loop, sn_timeout);
         break;
     case SN_MONITOR_EVENT_CANCELED:
         if (sn_busy_cnt) --sn_busy_cnt;
-        if (sn_timer) {
-            timer_stop(sn_timer);
-            sn_timer = NULL;
-        }
+        ob_main_loop_timeout_remove(ob_main_loop, sn_timeout);
     };
 
     if (sn_busy_cnt != cnt)

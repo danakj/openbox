@@ -16,9 +16,9 @@
 #include "mouse.h"
 #include "extensions.h"
 #include "grab.h"
-#include "timer.h"
 #include "group.h"
 #include "config.h"
+#include "mainloop.h"
 #include "gettext.h"
 #include "parser/parse.h"
 #include "render/render.h"
@@ -49,6 +49,7 @@
 
 RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
+ObMainLoop *ob_main_loop;
 Display    *ob_display;
 gint        ob_screen;
 gboolean    ob_sm_use = TRUE;
@@ -57,20 +58,17 @@ gboolean    ob_replace_wm;
 
 static ObState   state;
 static gboolean  xsync;
-static gboolean  shutdown;
 static gboolean  restart;
 static char     *restart_path;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gchar    *sm_save_file;
 
-static void signal_handler(int signal);
+static void signal_handler(int signal, gpointer data);
 static void parse_args(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-    struct sigaction action;
-    sigset_t sigset;
     char *path;
     xmlDocPtr doc;
     xmlNodePtr node;
@@ -87,19 +85,6 @@ int main(int argc, char **argv)
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
-
-    /* set up signal handler */
-    sigemptyset(&sigset);
-    action.sa_handler = signal_handler;
-    action.sa_mask = sigset;
-    action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
-    sigaction(SIGUSR1, &action, (struct sigaction *) NULL);
-    sigaction(SIGPIPE, &action, (struct sigaction *) NULL);
-/*    sigaction(SIGSEGV, &action, (struct sigaction *) NULL);*/
-    sigaction(SIGFPE, &action, (struct sigaction *) NULL);
-    sigaction(SIGTERM, &action, (struct sigaction *) NULL);
-    sigaction(SIGINT, &action, (struct sigaction *) NULL);
-    sigaction(SIGHUP, &action, (struct sigaction *) NULL);
 
     /* create the ~/.openbox dir */
     path = g_build_filename(g_get_home_dir(), ".openbox", NULL);
@@ -127,6 +112,15 @@ int main(int argc, char **argv)
 	ob_exit_with_error("Failed to open the display.");
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec.");
+
+    ob_main_loop = ob_main_loop_new(ob_display);
+
+    /* set up signal handler */
+    ob_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL, NULL);
+    ob_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL, NULL);
+    ob_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler, NULL, NULL);
+    ob_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler, NULL, NULL);
+    ob_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL, NULL);
 
     if (sm_save_file)
         session_load(sm_save_file);
@@ -209,9 +203,6 @@ int main(int argc, char **argv)
         /* startup the parsing so everything can register sections of the rc */
         i = parse_startup();
 
-        /* anything that is going to read data from the rc file needs to be 
-           in this group */
-	timer_startup();
 	event_startup();
         grab_startup();
         /* focus_backup is used for stacking, so this needs to come before
@@ -246,8 +237,7 @@ int main(int argc, char **argv)
 	client_manage_all();
 
 	state = OB_STATE_RUNNING;
-	while (!shutdown)
-	    event_loop();
+        ob_main_loop_run(ob_main_loop);
 	state = OB_STATE_EXITING;
 
         dock_remove_all();
@@ -265,7 +255,6 @@ int main(int argc, char **argv)
         window_shutdown();
         grab_shutdown();
 	event_shutdown();
-	timer_shutdown();
         config_shutdown();
     }
 
@@ -304,26 +293,14 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void signal_handler(int sig)
+static void signal_handler(int signal, gpointer data)
 {
-    switch (sig) {
-    case SIGUSR1:
-	fprintf(stderr, "Caught SIGUSR1 signal. Restarting.");
+    if (signal == SIGUSR1) {
+	fprintf(stderr, "Caught signal %d. Restarting.\n", signal);
         ob_restart();
-	break;
-
-    case SIGHUP:
-    case SIGINT:
-    case SIGTERM:
-    case SIGPIPE:
-	fprintf(stderr, "Caught signal %d. Exiting.", sig);
+    } else {
+	fprintf(stderr, "Caught signal %d. Exiting.\n", signal);
         ob_exit();
-	break;
-
-    case SIGFPE:
-    case SIGSEGV:
-        fprintf(stderr, "Caught signal %d. Aborting and dumping core.", sig);
-        abort();
     }
 }
 
@@ -418,7 +395,7 @@ void ob_restart()
 
 void ob_exit()
 {
-    shutdown = TRUE;
+    ob_main_loop_exit(ob_main_loop);
 }
 
 Cursor ob_cursor(ObCursor cursor)

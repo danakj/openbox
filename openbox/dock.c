@@ -1,5 +1,6 @@
 #include "debug.h"
 #include "dock.h"
+#include "mainloop.h"
 #include "screen.h"
 #include "prop.h"
 #include "config.h"
@@ -522,15 +523,13 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     dock_configure();
 }
 
-static void hide_timeout(void *n)
+static gboolean hide_timeout(gpointer data)
 {
-    /* dont repeat */
-    timer_stop(dock->hide_timer);
-    dock->hide_timer = NULL;
-
     /* hide */
     dock->hidden = TRUE;
     dock_configure();
+
+    return FALSE; /* don't repeat */
 }
 
 void dock_hide(gboolean hide)
@@ -543,14 +542,9 @@ void dock_hide(gboolean hide)
         dock_configure();
 
         /* if was hiding, stop it */
-        if (dock->hide_timer) {
-            timer_stop(dock->hide_timer);
-            dock->hide_timer = NULL;
-        }
+        ob_main_loop_timeout_remove(ob_main_loop, hide_timeout);
     } else {
-        g_assert(!dock->hide_timer);
-        dock->hide_timer = timer_start(config_dock_hide_timeout * 1000,
-                                       (ObTimeoutHandler)hide_timeout,
-                                       NULL);
+        ob_main_loop_timeout_add(ob_main_loop, config_dock_hide_timeout * 1000,
+                                 hide_timeout, NULL, NULL);
     }
 }

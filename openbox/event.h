@@ -14,15 +14,4 @@ extern guint ScrollLockMask;
 void event_startup();
 void event_shutdown();
 
-typedef struct event_fd_handler {
-    gint fd;
-    gpointer data;
-    void (*handler)(gint fd, gpointer data);
-} event_fd_handler;
-
-void event_add_fd_handler(event_fd_handler *handler);
-void event_remove_fd(gint n);
-
-void event_loop();
-
 #endif

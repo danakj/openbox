@@ -11,12 +11,12 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "mainloop.h"
 #include "framerender.h"
 #include "focus.h"
 #include "moveresize.h"
 #include "stacking.h"
 #include "extensions.h"
-#include "timer.h"
 #include "event.h"
 
 #include <X11/Xlib.h>
@@ -39,18 +39,12 @@
 #include <X11/ICE/ICElib.h>
 #endif
 
-static void event_process(XEvent *e);
+static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void fd_event_handle();
-#ifdef USE_SM
-static void ice_watch(IceConn conn, IcePointer data, Bool opening,
-                      IcePointer *watch_data);
-#endif
-static void find_max_fd();
 
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
                             (e)->xfocus.detail == NotifyAncestor || \
@@ -75,31 +69,37 @@ static const int mask_table[] = {
 };
 static int mask_table_size;
 
-static fd_set selset, allset;
 #ifdef USE_SM
-static IceConn ice_conn;
-static int ice_fd;
-#endif
-static int max_fd, x_fd;
-static GData *fd_handler_list;
+static void ice_handler(int fd, gpointer conn)
+{
+    Bool b;
+    IceProcessMessages(conn, NULL, &b);
+}
 
-
-#ifdef USE_SM
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
                       IcePointer *watch_data)
 {
+    static gint fd = -1;
+
     if (opening) {
-        g_assert (ice_fd < 0);
-        ice_conn = conn;
-        ice_fd = IceConnectionNumber(conn);
-        FD_SET(ice_fd, &allset);
+        fd = IceConnectionNumber(conn);
+        ob_main_loop_fd_add(ob_main_loop, fd, ice_handler, conn, NULL);
     } else {
-        FD_CLR(ice_fd, &allset);
-        ice_fd = -1;
+        ob_main_loop_fd_remove(ob_main_loop, fd);
+        fd = -1;
     }
-    find_max_fd();
 }
 #endif
+
+#ifdef USE_LIBSN
+static void sn_handler(const XEvent *e, gpointer display)
+{
+    XEvent ec;
+    ec = *e;
+    sn_display_process_event(display, &ec);
+}
+#endif
+
 
 void event_startup()
 {
@@ -128,59 +128,20 @@ void event_startup()
 	}
     }
 
-    FD_ZERO(&allset);
-    max_fd = x_fd = ConnectionNumber(ob_display);
-    FD_SET(x_fd, &allset);
+    ob_main_loop_x_add(ob_main_loop, event_process, NULL, NULL);
 
 #ifdef USE_SM
-    ice_fd = -1;
     IceAddConnectionWatch(ice_watch, NULL);
 #endif
 
-    g_datalist_init(&fd_handler_list);
+#ifdef USE_LIBSN
+    ob_main_loop_x_add(ob_main_loop, sn_handler, ob_sn_display, NULL);
+#endif
 }
 
 void event_shutdown()
 {
     XFreeModifiermap(modmap);
-    g_datalist_clear(&fd_handler_list);
-}
-
-void event_loop()
-{
-    XEvent e;
-    struct timeval *wait;
-    gboolean had_event = FALSE;
-
-    while (XPending(ob_display)) {
-	XNextEvent(ob_display, &e);
-
-#ifdef USE_LIBSN
-        sn_display_process_event(ob_sn_display, &e);
-#endif
-
-	event_process(&e);
-        had_event = TRUE;
-    }
-
-    if (!had_event) {
-        timer_dispatch((GTimeVal**)&wait);
-        selset = allset;
-        select(max_fd + 1, &selset, NULL, NULL, wait);
-
-        /* handle the X events as soon as possible? */
-        if (FD_ISSET(x_fd, &selset))
-            return;
-
-#ifdef USE_SM
-        if (ice_fd >= 0 && FD_ISSET(ice_fd, &selset)) {
-            Bool b;
-            IceProcessMessages(ice_conn, NULL, &b);
-        }
-#endif
-
-        fd_event_handle();
-    }
 }
 
 static Window event_get_window(XEvent *e)
@@ -399,7 +360,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 #endif
                             return TRUE;
                         } else {
-                            event_process(&fe);
+                            event_process(&fe, NULL);
 #ifdef DEBUG_FOCUS
                             ob_debug("focused window got an Out/In back to "
                                      "itself but focus_client was null "
@@ -411,7 +372,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 
                     /* once all the FocusOut's have been dealt with, if there
                        is a FocusIn still left and it is valid, then use it */
-                    event_process(&fe);
+                    event_process(&fe, NULL);
                     /* secret magic way of event_process telling us that no
                        client was found for the FocusIn event. ^_^ */
                     if (fe.xfocus.window != None) {
@@ -457,13 +418,18 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
     return FALSE;
 }
 
-static void event_process(XEvent *e)
+static void event_process(const XEvent *ec, gpointer data)
 {
     Window window;
     ObClient *client = NULL;
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
+    XEvent ee, *e;
+
+    /* make a copy we can mangle */
+    ee = *ec;
+    e = &ee;
 
     window = event_get_window(e);
     if ((obwin = g_hash_table_lookup(window_map, &window))) {
@@ -1061,50 +1027,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 #endif
     }
-}
-
-void event_add_fd_handler(event_fd_handler *h) {
-    g_datalist_id_set_data(&fd_handler_list, h->fd, h);
-    FD_SET(h->fd, &allset);
-    max_fd = MAX(max_fd, h->fd);
-}
-
-static void find_max_fd_foreach(GQuark n, gpointer data, gpointer max)
-{
-    *((unsigned int *)max) = MAX(*((unsigned int *)max), n);
-}
-
-static void find_max_fd()
-{ 
-    int tmpmax = -1;
-    g_datalist_foreach(&fd_handler_list, find_max_fd_foreach,
-                       (gpointer)&tmpmax);
-    max_fd = MAX(x_fd, tmpmax);
-#ifdef USE_SM
-    max_fd = MAX(ice_fd, max_fd);
-#endif
-}
-
-void event_remove_fd(gint n)
-{
-    FD_CLR(n, &allset);
-    g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
-    find_max_fd();
-}
-
-static void fd_event_handle_foreach(GQuark n,
-                                    gpointer data, gpointer user_data)
-{
-    if (FD_ISSET( (int)n, &selset)) {
-        event_fd_handler *h = (event_fd_handler *)data;
-        g_assert(h->fd == (int)n);
-        h->handler(h->fd, h->data);
-    }
-}
-
-static void fd_event_handle()
-{
-    g_datalist_foreach(&fd_handler_list, fd_event_handle_foreach, NULL);
 }
 
 static void event_handle_dock(ObDock *s, XEvent *e)

@@ -1,7 +1,6 @@
 #ifndef __dock_h
 #define __dock_h
 
-#include "timer.h"
 #include "window.h"
 #include "stacking.h"
 #include "geom.h"
@@ -28,7 +27,6 @@ struct _ObDock
     gint h;
 
     gboolean hidden;
-    ObTimer *hide_timer;
 
     GList *dock_apps;
 };

@@ -1,3 +1,4 @@
+#include "mainloop.h"
 #include "focus.h"
 #include "screen.h"
 #include "frame.h"
@@ -7,7 +8,6 @@
 #include "client.h"
 #include "action.h"
 #include "prop.h"
-#include "timer.h"
 #include "config.h"
 #include "keytree.h"
 #include "keyboard.h"
@@ -27,7 +27,6 @@ typedef struct {
 static GSList *interactive_states;
 
 static KeyBindingTree *curpos;
-static ObTimer *chain_timer;
 
 static void grab_for_window(Window win, gboolean grab)
 {
@@ -62,21 +61,21 @@ static void grab_keys(gboolean grab)
         grab_for_window(((ObClient*)it->data)->frame->window, grab);
 }
 
+static gboolean chain_timeout(gpointer data)
+{
+    keyboard_reset_chains();
+
+    return FALSE; /* don't repeat */
+}
+
 void keyboard_reset_chains()
 {
-    if (chain_timer) {
-        timer_stop(chain_timer);
-        chain_timer = NULL;
-    }
+    ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+
     if (curpos) {
         curpos = NULL;
         grab_keys(TRUE);
     }
-}
-
-static void chain_timeout(ObTimer *t, void *data)
-{
-    keyboard_reset_chains();
 }
 
 gboolean keyboard_bind(GList *keylist, ObAction *action)
@@ -213,10 +212,10 @@ void keyboard_event(ObClient *client, const XEvent *e)
         if (p->key == e->xkey.keycode &&
             p->state == e->xkey.state) {
             if (p->first_child != NULL) { /* part of a chain */
-                if (chain_timer) timer_stop(chain_timer);
+                ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
                 /* 5 second timeout for chains */
-                chain_timer = timer_start(5000*1000, chain_timeout,
-                                          NULL);
+                ob_main_loop_timeout_add(ob_main_loop, 5 * G_USEC_PER_SEC,
+                                         chain_timeout, NULL, NULL);
                 curpos = p;
                 grab_keys(TRUE);
             } else {

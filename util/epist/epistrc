@@ -1,5 +1,13 @@
 # Default epistrophy rc file
 
+options {
+	# default option values
+
+	stackedCycling false;
+	chainTimeout 4000;
+	workspaceColumns 0;
+}
+
 Mod1-F1 changeWorkspace 1;
 Mod1-F2 changeWorkspace 2;
 Mod1-F3 changeWorkspace 3;

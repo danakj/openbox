@@ -10,7 +10,6 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include "widgetbase.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
@@ -28,7 +27,7 @@ class Client;
 //! Manages a single screen
 /*!
 */
-class Screen : public otk::EventHandler, public WidgetBase {
+class Screen : public otk::EventHandler {
 public:
   //! Holds a list of otk::Strut objects
   typedef std::list<otk::Strut*> StrutList;

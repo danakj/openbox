@@ -821,6 +821,7 @@ void Client::setModal(bool modal)
     Client *c = this;
     while (c->_transient_for) {
       c = c->_transient_for;
+      if (c == this) break; // circular?
       if (c->_modal_child) break; // already has a modal child
       c->_modal_child = this;
     }
@@ -836,7 +837,9 @@ void Client::setModal(bool modal)
     c = this;
     while (c->_transient_for) {
       c = c->_transient_for;
+      if (c == this) break; // circular?
       if (c->_modal_child != this) break; // has a different modal child
+      if (c == replacement) break; // found the replacement itself
       c->_modal_child = replacement;
     }
   }

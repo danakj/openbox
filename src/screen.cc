@@ -47,8 +47,7 @@ namespace ob {
 
 
 Screen::Screen(int screen)
-  : WidgetBase(WidgetBase::Type_Root),
-    _number(screen)
+  : _number(screen)
 {
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);

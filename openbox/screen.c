@@ -380,8 +380,8 @@ void screen_update_desktop_names()
 
     PROP_GETSS(ob_root, net_desktop_names, utf8, &screen_desktop_names);
 
-    for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
-    if (i < screen_num_desktops) {
+    for (i = 0; screen_desktop_names[i] && i <= screen_num_desktops; ++i);
+    if (i <= screen_num_desktops) {
         screen_desktop_names = g_renew(char*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;

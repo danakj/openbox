@@ -210,5 +210,22 @@ void Openbox::eventLoop()
 }
 
 
+void Openbox::addClient(Window window, OBClient *client)
+{
+  _clients[window] = client;
+}
+
+
+void Openbox::removeClient(Window window)
+{
+  _clients[window] = (OBClient *) 0;
+}
+
+
+OBClient *Openbox::findClient(Window window)
+{
+  return _clients[window];
+}
+
 }
 

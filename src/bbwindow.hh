@@ -14,6 +14,8 @@ extern "C" {
 
 #include "otk/timer.hh"
 #include "otk/property.hh"
+#include "otk/rect.hh"
+#include "otk/strut.hh"
 #include "blackbox.hh"
 #include "util.hh"
 
@@ -148,7 +150,7 @@ private:
     std::string title, icon_title;
 
     otk::Rect rect;
-    Strut strut;
+    otk::Strut strut;
 
     int old_bw;                       // client's borderwidth
 
@@ -219,7 +221,7 @@ private:
     otk::Rect changing;
 
     otk::Rect rect;                  // frame geometry
-    Strut margin;               // margins between the frame and client
+    otk::Strut margin;               // margins between the frame and client
 
     int grab_x, grab_y;         // where was the window when it was grabbed?
 

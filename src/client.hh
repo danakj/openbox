@@ -13,8 +13,6 @@ extern "C" {
 
 namespace ob {
 
-class BScreen;
-
 class OBClient {
 public:
   enum Max { Max_None,
@@ -64,7 +62,6 @@ public:
   };
 
 private:
-  BScreen *_screen;
   Window   _window;
 
   //! The id of the group the window belongs to
@@ -143,7 +140,7 @@ private:
   void updateClass();
 
 public:
-  OBClient(BScreen *screen, Window window);
+  OBClient(Window window);
   virtual ~OBClient();
 
   inline Window window() const { return _window; }

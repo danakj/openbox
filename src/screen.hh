@@ -24,14 +24,13 @@ extern "C" {
 #include "otk/font.hh"
 #include "otk/texture.hh"
 #include "otk/image.hh"
+#include "otk/strut.hh"
 #include "otk/property.hh"
 #include "timer.hh"
 #include "workspace.hh"
 #include "blackbox.hh"
 
 namespace ob {
-
-struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
@@ -83,7 +82,7 @@ private:
   RectList xineramaUsableArea;
 #endif // XINERAMA
 
-  typedef std::list<Strut*> StrutList;
+  typedef std::list<otk::Strut*> StrutList;
   StrutList strutList;
   typedef std::vector<Workspace*> WorkspaceList;
   WorkspaceList workspacesList;
@@ -270,8 +269,8 @@ public:
   const RectList& allAvailableAreas(void) const;
 #endif // XINERAMA
   void updateAvailableArea(void);
-  void addStrut(Strut *strut);
-  void removeStrut(Strut *strut);
+  void addStrut(otk::Strut *strut);
+  void removeStrut(otk::Strut *strut);
 
   unsigned int addWorkspace(void);
   unsigned int removeLastWorkspace(void);

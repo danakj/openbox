@@ -113,7 +113,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
 
 //  xatom->setSupported(this);    // set-up netwm support
 #ifdef    HAVE_GETPID
-  xatom->setValue(getRootWindow(), otk::OBProperty::blackbox_pid, otk::OBProperty::cardinal,
+  xatom->setValue(getRootWindow(), otk::OBProperty::blackbox_pid,
+                  otk::OBProperty::Atom_Cardinal,
                   (unsigned long) getpid());
 #endif // HAVE_GETPID
   unsigned long geometry[] = { getWidth(),
@@ -1519,12 +1520,12 @@ void BScreen::hideGeometry(void) {
 }
 
 
-void BScreen::addStrut(Strut *strut) {
+void BScreen::addStrut(otk::Strut *strut) {
   strutList.push_back(strut);
 }
 
 
-void BScreen::removeStrut(Strut *strut) {
+void BScreen::removeStrut(otk::Strut *strut) {
   strutList.remove(strut);
 }
 
@@ -1569,7 +1570,7 @@ void BScreen::updateAvailableArea(void) {
   StrutList::const_iterator it = strutList.begin(), end = strutList.end();
 
   for(; it != end; ++it) {
-    Strut *strut = *it;
+    otk::Strut *strut = *it;
     if (strut->left > current_left)
       current_left = strut->left;
     if (strut->top > current_top)

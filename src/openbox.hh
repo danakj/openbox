@@ -12,11 +12,13 @@ extern "C" {
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
 #include "otk/property.hh"
 #include "xeventhandler.hh"
+#include "client.hh"
 
 namespace ob {
 
@@ -46,6 +48,9 @@ public:
     State_Normal,   //!< The window manager is running in its normal state
     State_Exiting   //!< The window manager is exiting (being destroyed)
   };
+
+  //! A map for looking up a specific client class from the window id
+  typedef std::map<Window, OBClient *> ClientMap;
   
 private:
   // stuff that can be passed on the command line
@@ -63,6 +68,9 @@ private:
   char *_displayreq;
   //! The value of argv[0], i.e. how this application was executed
   char *_argv0;
+
+  //! A list of all managed clients
+  ClientMap _clients;
 
   //! Manages all timers for the application
   /*!
@@ -127,6 +135,15 @@ public:
     The Openbox::shutdown method will cause this function to exit.
   */
   void eventLoop();
+
+  //! Adds an OBClient to the client list for lookups
+  void addClient(Window window, OBClient *client);
+
+  //! Removes an OBClient from the client list for lookups
+  void removeClient(Window window);
+
+  //! Finds an OBClient based on its window id
+  OBClient *findClient(Window window);
 
   //! Requests that the window manager exit
   /*!

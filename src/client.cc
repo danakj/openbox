@@ -18,10 +18,9 @@ extern "C" {
 
 namespace ob {
 
-OBClient::OBClient(BScreen *screen, Window window)
-  : _screen(screen), _window(window)
+OBClient::OBClient(Window window)
+  : _window(window)
 {
-  assert(_screen);
   assert(window);
 
   // initialize vars to false/invalid values

@@ -1,6 +1,8 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
 
 #include "xeventhandler.hh"
+#include "client.hh"
+#include "openbox.hh"
 #include "otk/display.hh"
 #include "otk/rect.hh"
 
@@ -45,6 +47,10 @@ void OBXEventHandler::motion(const XMotionEvent &e)
 void OBXEventHandler::enterNotify(const XCrossingEvent &e)
 {
   _lasttime = e.time;
+
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+  
 /*
   BScreen *screen = (BScreen *) 0;
   BlackboxWindow *win = (BlackboxWindow *) 0;
@@ -65,6 +71,10 @@ void OBXEventHandler::enterNotify(const XCrossingEvent &e)
 void OBXEventHandler::leaveNotify(const XCrossingEvent &e)
 {
   _lasttime = e.time;
+
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+  
 /*
   BlackboxWindow *win = (BlackboxWindow *) 0;
 
@@ -76,7 +86,9 @@ void OBXEventHandler::leaveNotify(const XCrossingEvent &e)
 
 void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 {
-  (void)e;
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+  
 /*  BlackboxWindow *win = (BlackboxWindow *) 0;
 
   if ((win = searchWindow(e->xconfigurerequest.window))) {
@@ -106,6 +118,16 @@ void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
 #ifdef    DEBUG
   printf("MapRequest for 0x%lx\n", e.window);
 #endif // DEBUG
+
+  OBClient *client = Openbox::instance->findClient(e.window);
+
+  if (client) {
+    // XXX: uniconify and/or unshade the window
+  } else {
+    // XXX: manage the window, i.e. grab events n shit
+    Openbox::instance->addClient(e.window, new OBClient(e.window));
+  }
+  
 /*
   BlackboxWindow *win = searchWindow(e->xmaprequest.window);
 
@@ -160,48 +182,37 @@ void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
 
 void OBXEventHandler::unmapNotify(const XUnmapEvent &e)
 {
-  (void)e;
-/*
-  BlackboxWindow *win = (BlackboxWindow *) 0;
-  BScreen *screen = (BScreen *) 0;
-
-  if ((win = searchWindow(e->xunmap.window))) {
-    win->unmapNotifyEvent(&e->xunmap);
-  } else if ((screen = searchSystrayWindow(e->xunmap.window))) {
-    screen->removeSystrayWindow(e->xunmap.window);
-  }
-*/
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+  
+  // XXX: unmanage the window, i.e. ungrab events n reparent n shit
+  Openbox::instance->removeClient(e.window);
 }
 
 
 void OBXEventHandler::destroyNotify(const XDestroyWindowEvent &e)
 {
-  (void)e;
-/*
-  BlackboxWindow *win = (BlackboxWindow *) 0;
-  BScreen *screen = (BScreen *) 0;
-  BWindowGroup *group = (BWindowGroup *) 0;
-
-  if ((win = searchWindow(e->xdestroywindow.window))) {
-    win->destroyNotifyEvent(&e->xdestroywindow);
-  } else if ((group = searchGroup(e->xdestroywindow.window))) {
-    delete group;
-  } else if ((screen = searchSystrayWindow(e->xunmap.window))) {
-    screen->removeSystrayWindow(e->xunmap.window);
-  }
-*/
+  // XXX: window group leaders can come through here too!
+  
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+  
+  // XXX: unmanage the window, i.e. ungrab events n reparent n shit
+  Openbox::instance->removeClient(e.window);
 }
 
 
 void OBXEventHandler::reparentNotify(const XReparentEvent &e)
 {
-  (void)e;
   /*
     this event is quite rare and is usually handled in unmapNotify
     however, if the window is unmapped when the reparent event occurs
     the window manager never sees it because an unmap event is not sent
     to an already unmapped window.
   */
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+
 /*
   BlackboxWindow *win = searchWindow(e->xreparent.window);
   if (win)
@@ -213,45 +224,40 @@ void OBXEventHandler::reparentNotify(const XReparentEvent &e)
 void OBXEventHandler::propertyNotify(const XPropertyEvent &e)
 {
   _lasttime = e.time;
-/*
-  BlackboxWindow *win = (BlackboxWindow *) 0;
-  BScreen *screen = (BScreen *) 0;
 
-  if ((win = searchWindow(e->xproperty.window)))
-    win->propertyNotifyEvent(&e->xproperty);
-  else if ((screen = searchScreen(e->xproperty.window)))
-    screen->propertyNotifyEvent(&e->xproperty);
-*/
+  OBClient *client = Openbox::instance->findClient(e.window);
+  if (!client) return;
+
+  client->update(e);
 }
 
 
 void OBXEventHandler::expose(const XExposeEvent &first)
 {
-    // compress expose events
-    XEvent e; e.xexpose = first;
-    unsigned int i = 0;
-    otk::Rect area(e.xexpose.x, e.xexpose.y, e.xexpose.width,
-                   e.xexpose.height);
-    while (XCheckTypedWindowEvent(otk::OBDisplay::display,
-                                  e.xexpose.window, Expose, &e)) {
-      i++;
-      // merge expose area
-      area |= otk::Rect(e.xexpose.x, e.xexpose.y, e.xexpose.width,
-                        e.xexpose.height);
-    }
-    if ( i > 0 ) {
-      // use the merged area
-      e.xexpose.x = area.x();
-      e.xexpose.y = area.y();
-      e.xexpose.width = area.width();
-      e.xexpose.height = area.height();
-    }
-/*
-    BlackboxWindow *win = (BlackboxWindow *) 0;
+  OBClient *client = Openbox::instance->findClient(first.window);
+  if (!client) return;
 
-    if ((win = searchWindow(e->xexpose.window)))
-      win->exposeEvent(&e->xexpose);
-*/
+  // compress expose events
+  XEvent e; e.xexpose = first;
+  unsigned int i = 0;
+  otk::Rect area(e.xexpose.x, e.xexpose.y, e.xexpose.width,
+                 e.xexpose.height);
+  while (XCheckTypedWindowEvent(otk::OBDisplay::display,
+                                e.xexpose.window, Expose, &e)) {
+    i++;
+    // merge expose area
+    area |= otk::Rect(e.xexpose.x, e.xexpose.y, e.xexpose.width,
+                      e.xexpose.height);
+  }
+  if ( i > 0 ) {
+    // use the merged area
+    e.xexpose.x = area.x();
+    e.xexpose.y = area.y();
+    e.xexpose.width = area.width();
+    e.xexpose.height = area.height();
+  }
+
+  // XXX: make the decorations redraw!
 }
 
 

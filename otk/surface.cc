@@ -39,7 +39,6 @@ void Surface::setPixmap(const RenderColor &color)
 
 void Surface::setPixmap(XImage *image)
 {
-  printf("SET PIXMAP\n");
   assert(image->width == _size.x());
   assert(image->height == _size.y());
   

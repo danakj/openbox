@@ -25,7 +25,7 @@ Widget::Widget(Widget *parent, Direction direction)
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
     _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1), _screen(parent->screen()),
     _fixed_width(false), _fixed_height(false),
-    _surface(parent->screen(), _rect.size()),
+    _surface(0),
     _event_dispatcher(parent->eventDispatcher())
 {
   assert(parent);
@@ -46,7 +46,7 @@ Widget::Widget(EventDispatcher *event_dispatcher, Style *style,
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1),
     _screen(style->getScreen()), _fixed_width(false), _fixed_height(false),
-    _surface(style->getScreen(), _rect.size()),
+    _surface(0),
     _event_dispatcher(event_dispatcher)
 {
   assert(event_dispatcher);
@@ -261,12 +261,16 @@ void Widget::render(void)
   if (!_texture) return;
   printf("RENDER\n");
 
-  _surface = Surface(_screen, _rect.size());
-  display->renderControl(_screen)->drawBackground(_surface, *_texture);
+  Surface *s = _surface; // save the current surface
+  
+  _surface = new Surface(_screen, _rect.size());
+  display->renderControl(_screen)->drawBackground(*_surface, *_texture);
 
   renderForeground();
 
-  XSetWindowBackgroundPixmap(**display, _window, _surface.pixmap());
+  XSetWindowBackgroundPixmap(**display, _window, _surface->pixmap());
+
+  delete s; // delete the old surface *after* its pixmap isn't in use anymore
 }
 
 void Widget::adjust(void)

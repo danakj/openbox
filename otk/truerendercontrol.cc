@@ -132,5 +132,7 @@ void TrueRenderControl::drawBackground(Surface& sf,
 
   delete [] im->data;
   im->data = NULL;
-  XDestroyImage(im);}
+  XDestroyImage(im);
+}
+
 }

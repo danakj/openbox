@@ -167,7 +167,7 @@ protected:
   bool _fixed_width;
   bool _fixed_height;
 
-  Surface _surface;
+  Surface *_surface;
 
   EventDispatcher *_event_dispatcher;
 };

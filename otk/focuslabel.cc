@@ -67,7 +67,7 @@ void FocusLabel::renderForeground(void)
   }
 
   display->renderControl(_screen)->
-    drawString(_surface, *ft, x, 0, *text_color, t);
+    drawString(*_surface, *ft, x, 0, *text_color, t);
 }
 
 }

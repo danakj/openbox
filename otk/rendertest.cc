@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   otk::AppWidget foo(&app);
   foo.resize(600, 500);
 
-  otk::RenderColor color(0, 0xff, 0x20, 0x20);
+  otk::RenderColor color(0, 0, 0xff, 0xff);
   otk::RenderTexture tex(false,
 			 otk::RenderTexture::Flat,
 			 false,

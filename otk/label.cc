@@ -61,7 +61,7 @@ void Label::renderForeground(void)
   }
 
   display->renderControl(_screen)->
-    drawString(_surface, *ft, x, 0, *style()->getTextUnfocus(), t);
+    drawString(*_surface, *ft, x, 0, *style()->getTextUnfocus(), t);
 }
 
 }

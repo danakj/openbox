@@ -78,6 +78,9 @@ public:
     blackbox_change_window_focus,
     blackbox_cycle_window_focus,
 
+    openbox_show_root_menu,
+    openbox_show_workspace_menu,
+
     // NETWM atoms
     // root window properties
     net_supported,

@@ -908,6 +908,28 @@ void Blackbox::process_event(XEvent *e) {
             }
           }
         }
+      } else if (e->xclient.message_type ==
+                 xatom->getAtom(XAtom::openbox_show_root_menu) ||
+                 e->xclient.message_type ==
+                 xatom->getAtom(XAtom::openbox_show_workspace_menu)) {
+        // find the screen the mouse is on
+        int x, y;
+        ScreenList::iterator it, end = screenList.end();
+        for (it = screenList.begin(); it != end; ++it) {
+          Window w;
+          int i;
+          unsigned int m;
+          if (XQueryPointer(getXDisplay(), (*it)->getRootWindow(),
+                            &w, &w, &x, &y, &i, &i, &m))
+            break;
+        }
+        if (it != end) {
+          if (e->xclient.message_type ==
+              xatom->getAtom(XAtom::openbox_show_root_menu))
+            (*it)->showRootMenu(x, y);
+          else
+            (*it)->showWorkspaceMenu(x, y);
+        }
       }
     }
 

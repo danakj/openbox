@@ -77,6 +77,9 @@ XAtom::XAtom(Display *d) {
     create("_BLACKBOX_CHANGE_WINDOW_FOCUS");
   _atoms[blackbox_cycle_window_focus] = create("_BLACKBOX_CYCLE_WINDOW_FOCUS");
 
+  _atoms[openbox_show_root_menu] = create("_OPENBOX_SHOW_ROOT_MENU");
+  _atoms[openbox_show_workspace_menu] = create("_OPENBOX_SHOW_WORKSPACE_MENU");
+
   _atoms[net_supported] = create("_NET_SUPPORTED");
   _atoms[net_client_list] = create("_NET_CLIENT_LIST");
   _atoms[net_client_list_stacking] = create("_NET_CLIENT_LIST_STACKING");

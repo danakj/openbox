@@ -376,6 +376,9 @@ public:
   void showGeometry(unsigned int gx, unsigned int gy);
   void hideGeometry(void);
 
+  void showWorkspaceMenu(int x, int y);
+  void showRootMenu(int x, int y);
+
   void buttonPressEvent(const XButtonEvent *xbutton);
   void propertyNotifyEvent(const XPropertyEvent *pe);
 

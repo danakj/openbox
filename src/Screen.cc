@@ -2308,43 +2308,9 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
     if (rootmenu->isVisible())
       rootmenu->hide();
   } else if (xbutton->button == 2) {
-    int mx = xbutton->x_root - (workspacemenu->getWidth() / 2);
-    int my = xbutton->y_root - (workspacemenu->getTitleHeight() / 2);
-
-    if (mx < 0) mx = 0;
-    if (my < 0) my = 0;
-
-    if (mx + workspacemenu->getWidth() > getWidth())
-      mx = getWidth() - workspacemenu->getWidth() - getBorderWidth();
-
-    if (my + workspacemenu->getHeight() > getHeight())
-      my = getHeight() - workspacemenu->getHeight() - getBorderWidth();
-
-    workspacemenu->move(mx, my);
-
-    if (! workspacemenu->isVisible()) {
-      workspacemenu->removeParent();
-      workspacemenu->show();
-    }
+    showWorkspaceMenu(xbutton->x_root, xbutton->y_root);
   } else if (xbutton->button == 3) {
-    int mx = xbutton->x_root - (rootmenu->getWidth() / 2);
-    int my = xbutton->y_root - (rootmenu->getTitleHeight() / 2);
-
-    if (mx < 0) mx = 0;
-    if (my < 0) my = 0;
-
-    if (mx + rootmenu->getWidth() > getWidth())
-      mx = getWidth() - rootmenu->getWidth() - getBorderWidth();
-
-    if (my + rootmenu->getHeight() > getHeight())
-      my = getHeight() - rootmenu->getHeight() - getBorderWidth();
-
-    rootmenu->move(mx, my);
-
-    if (! rootmenu->isVisible()) {
-      blackbox->checkMenu();
-      rootmenu->show();
-    }
+    showRootMenu(xbutton->x_root, xbutton->y_root);
   // mouse wheel up
   } else if ((xbutton->button == 4 && resource.root_scroll == NormalScroll) ||
              (xbutton->button == 5 && resource.root_scroll == ReverseScroll)) {
@@ -2359,6 +2325,50 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
       changeWorkspaceID(getWorkspaceCount() - 1);
     else
       changeWorkspaceID(getCurrentWorkspaceID() - 1);
+  }
+}
+
+
+void BScreen::showWorkspaceMenu(int x, int y) {
+  int mx = x - (workspacemenu->getWidth() / 2);
+  int my = y - (workspacemenu->getTitleHeight() / 2);
+
+  if (mx < 0) mx = 0;
+  if (my < 0) my = 0;
+
+  if (mx + workspacemenu->getWidth() > getWidth())
+    mx = getWidth() - workspacemenu->getWidth() - getBorderWidth();
+
+  if (my + workspacemenu->getHeight() > getHeight())
+    my = getHeight() - workspacemenu->getHeight() - getBorderWidth();
+
+  workspacemenu->move(mx, my);
+
+  if (! workspacemenu->isVisible()) {
+    workspacemenu->removeParent();
+    workspacemenu->show();
+  }
+}
+
+
+void BScreen::showRootMenu(int x, int y) {
+  int mx = x - (rootmenu->getWidth() / 2);
+  int my = y - (rootmenu->getTitleHeight() / 2);
+
+  if (mx < 0) mx = 0;
+  if (my < 0) my = 0;
+
+  if (mx + rootmenu->getWidth() > getWidth())
+    mx = getWidth() - rootmenu->getWidth() - getBorderWidth();
+
+  if (my + rootmenu->getHeight() > getHeight())
+    my = getHeight() - rootmenu->getHeight() - getBorderWidth();
+
+  rootmenu->move(mx, my);
+
+  if (! rootmenu->isVisible()) {
+    blackbox->checkMenu();
+    rootmenu->show();
   }
 }
 

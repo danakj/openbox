@@ -242,6 +242,16 @@ void screen::handleKeypress(const XEvent &e) {
     execCommand(it->string());
     return;
 
+  case Action::showRootMenu:
+    _xatom->sendClientMessage(rootWindow(), XAtom::openbox_show_root_menu,
+                              None);
+    return;
+
+  case Action::showWorkspaceMenu:
+    _xatom->sendClientMessage(rootWindow(), XAtom::openbox_show_workspace_menu,
+                              None);
+    return;
+
   default:
     break;
   }

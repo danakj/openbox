@@ -1118,7 +1118,7 @@ void action_moveresize(union ActionData *data)
 
 void action_restart(union ActionData *data)
 {
-    ob_restart_path = data->execute.path;
+    ob_restart_path = g_strdup(data->execute.path);
     ob_shutdown = ob_restart = TRUE;
 }
 

@@ -1,8 +1,9 @@
 buttonsdir = $(pkgdatadir)/buttons
 scriptdir = $(libdir)/openbox/python
 includeotkdir = $(includedir)/otk
+pkgconfigdir = $(libdir)/pkgconfig
 
-CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
+CXXFLAGS=$(XFT_CFLAGS) @CXXFLAGS@ \
 -DBUTTONSDIR=\"$(buttonsdir)\" -DSWIG_GLOBAL
 # -DSWIG_GLOBAL means we don't have to link libswigpy cuz libotk will export
 # everything it would
@@ -29,13 +30,20 @@ includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
                    rendertexture.hh screeninfo.hh strut.hh surface.hh \
                    timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh \
                    ../config.h
-libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS) @LIBS@
+libotk_la_LDFLAGS = $(XFT_LIBS) @LIBS@
 
 MAINTAINERCLEANFILES= Makefile.in
+
+pkgconfig_DATA = otk.pc
 
 script_DATA = otk.py
 
 EXTRA_DIST = $(script_DATA)
+
+otk.pc: otk.pc.in
+	@regex_cmd@ -e "s,\@prefix\@,$(prefix)," \
+		-e "s,\@version\@,$(VERSION)," \
+		@srcdir@/$^ > $@
 
 distclean-local:
 	rm -f *\~ *.orig *.rej .\#*

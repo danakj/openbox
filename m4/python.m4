@@ -14,7 +14,7 @@ AC_DEFUN([PYTHON_DEVEL],
   for i in "$python_prefix/include/python$PYTHON_VERSION/" \
            "$python_prefix/include/python/" "$python_prefix/"
   do
-    python_path=`find $i -type f -name Python.h -print`
+    python_path=`find $i -type f -name Python.h -print 2> /dev/null`
     test "$python_path" && break
   done
   for i in $python_path

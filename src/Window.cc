@@ -2514,7 +2514,8 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
     if (isNormal()) {
       if (! blackbox->isStartup()) {
         XSync(blackbox->getXDisplay(), False); // make sure the frame is mapped
-        if (isTransient() || screen->doFocusNew()) {
+        if (screen->doFocusNew()|| (isTransient() && getTransientFor() &&
+                                    getTransientFor()->isFocused())) {
           setInputFocus();
         }
         if (screen->getPlacementPolicy() == BScreen::ClickMousePlacement) {

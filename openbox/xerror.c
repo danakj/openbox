@@ -3,9 +3,11 @@
 #include <X11/Xlib.h>
 
 static gboolean xerror_ignore = FALSE;
+gboolean xerror_occured = FALSE;
 
 int xerror_handler(Display *d, XErrorEvent *e)
 {
+    xerror_occured = TRUE;
 #ifdef DEBUG
     if (!xerror_ignore) {
 	char errtxt[128];

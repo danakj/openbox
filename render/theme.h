@@ -21,6 +21,8 @@
 
 #include "render.h"
 
+G_BEGIN_DECLS
+
 typedef struct _RrTheme RrTheme;
 
 struct _RrTheme {
@@ -186,5 +188,7 @@ struct _RrTheme {
 
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *theme);
 void RrThemeFree(RrTheme *theme);
+
+G_END_DECLS
 
 #endif

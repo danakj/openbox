@@ -25,6 +25,8 @@
 #include <X11/Xft/Xft.h>
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 typedef union  _RrTextureData      RrTextureData;
 typedef struct _RrAppearance       RrAppearance;
 typedef struct _RrSurface          RrSurface;
@@ -209,5 +211,7 @@ void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
                         gint *w, gint *h, RrPixel32 **data);
+
+G_END_DECLS
 
 #endif /*__render_h*/

@@ -22,6 +22,8 @@
 #include <libxml/parser.h>
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 typedef struct _ObParseInst ObParseInst;
 
 typedef void (*ParseCallback)(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -79,5 +81,7 @@ GSList* parse_xdg_data_dir_paths();
 gchar *parse_expand_tilde(const gchar *f);
 /*! Makes a directory and all its parents */
 void parse_mkdir_path(const gchar *path, gint mode);
+
+G_END_DECLS
 
 #endif

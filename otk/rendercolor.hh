@@ -41,6 +41,7 @@ private:
   mutable GC _gc;
 
   mutable bool _allocated;
+  mutable bool _created;
 
   void create() const;
   

@@ -17,7 +17,7 @@
 #include <glib.h>
 #include <assert.h>
 
-ObClient *focus_client = NULL;
+ObClient *focus_client;
 GList **focus_order = NULL; /* these lists are created when screen_startup
                                sets the number of desktops */
 
@@ -26,8 +26,6 @@ static Popup *focus_cycle_popup = NULL;
 
 void focus_startup()
 {
-
-    focus_client = NULL;
 
     focus_cycle_popup = popup_new(TRUE);
 
@@ -42,10 +40,8 @@ void focus_shutdown()
     for (i = 0; i < screen_num_desktops; ++i)
         g_list_free(focus_order[i]);
     g_free(focus_order);
-    focus_order = NULL;
 
     popup_free(focus_cycle_popup);
-    focus_cycle_popup = NULL;
 
     /* reset focus to root */
     XSetInputFocus(ob_display, PointerRoot, RevertToPointerRoot,

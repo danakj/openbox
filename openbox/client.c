@@ -300,7 +300,8 @@ void client_manage(Window window)
     dispatch_client(Event_Client_New, self, 0, 0);
 
     /* make sure the window is visible */
-    client_move_onscreen(self, TRUE);
+    if (client_normal(self))
+        client_move_onscreen(self, TRUE);
 
     screen_update_areas();
 
@@ -1346,8 +1347,11 @@ void client_update_strut(ObClient *self)
     if (!PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
 	STRUT_SET(self->strut, 0, 0, 0, 0);
     } else {
-        if (num == 4)
+        if (num == 4) {
+            g_message("new strut: %d %d %d %d",
+                      data[0], data[2], data[1], data[3]);
             STRUT_SET(self->strut, data[0], data[2], data[1], data[3]);
+        }
         else
             STRUT_SET(self->strut, 0, 0, 0, 0);
 	g_free(data);

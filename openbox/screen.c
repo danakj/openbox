@@ -637,8 +637,6 @@ void screen_update_areas()
 {
     guint i, x;
     guint32 *dims;
-    Rect **old_area = area;
-    Rect **rit;
     GList *it;
 
     g_free(monitor_area);
@@ -657,7 +655,6 @@ void screen_update_areas()
      
     dims = g_new(guint32, 4 * screen_num_desktops);
 
-    rit = old_area;
     for (i = 0; i < screen_num_desktops + 1; ++i) {
         Strut s;
         int l, r, t, b;
@@ -800,7 +797,7 @@ void screen_update_areas()
         }
     }
     PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,
-		dims, 4 * screen_num_desktops);
+                dims, 4 * screen_num_desktops);
 
     g_free(dims);
 }

@@ -776,7 +776,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    h = (e->xconfigurerequest.value_mask & CWHeight) ?
 		e->xconfigurerequest.height : client->area.height;
 
-            {
+            if (client_normal(client)) {
                 int newx = x;
                 int newy = y;
                 client_find_onscreen(client, &newx, &newy, w, h, TRUE);
@@ -974,7 +974,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 h = client->area.y;
             client->gravity = tmpg;
 
-            {
+            if (client_normal(client)) {
                 int newx = x;
                 int newy = y;
                 client_find_onscreen(client, &newx, &newy, w, h, TRUE);
@@ -1031,8 +1031,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    client_update_protocols(client);
 	    client_setup_decor_and_functions(client);
 	}
-	else if (msgtype == prop_atoms.net_wm_strut)
+	else if (msgtype == prop_atoms.net_wm_strut) {
+            g_message("strut change");
 	    client_update_strut(client);
+        }
 	else if (msgtype == prop_atoms.net_wm_icon ||
                  msgtype == prop_atoms.kwm_win_icon)
 	    client_update_icons(client);

@@ -32,7 +32,6 @@
 
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
-#include <iostream>
 
 #include "i18n.h"
 #include "openbox.h"
@@ -405,15 +404,14 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
     for (int i = 0; i < resource.workspaces; ++i) {
       wkspc = new Workspace(*this, workspacesList->count());
       workspacesList->insert(wkspc);
-      saveWorkspaceNames();
       workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
     }
   } else {
     wkspc = new Workspace(*this, workspacesList->count());
     workspacesList->insert(wkspc);
-    saveWorkspaceNames();
     workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
   }
+  saveWorkspaceNames();
 
   workspacemenu->insert(i18n->getMessage(IconSet, IconIcons, "Icons"),
 			iconmenu);
@@ -699,7 +697,7 @@ void BScreen::readDatabaseTexture(const char *rname, const char *rclass,
 				  BTexture *texture,
 				  unsigned long default_pixel)
 {
-  string s;
+  std::string s;
   
   if (resource.styleconfig.getValue(rname, rclass, s))
     image_control->parseTexture(texture, s.c_str());
@@ -796,12 +794,12 @@ void BScreen::readDatabaseTexture(const char *rname, const char *rclass,
 void BScreen::readDatabaseColor(const char *rname, const  char *rclass,
                                 BColor *color, unsigned long default_pixel)
 {
-  string s;
+  std::string s;
   
   if (resource.styleconfig.getValue(rname, rclass, s))
     image_control->parseColor(color, s.c_str());
   else {
-    // parsing with no color string just deallocates the color, if it has
+    // parsing with no color std::string just deallocates the color, if it has
     // been previously allocated
     image_control->parseColor(color);
     color->setPixel(default_pixel);
@@ -815,7 +813,7 @@ void BScreen::readDatabaseFontSet(const char *rname, const char *rclass,
 
   static char *defaultFont = "fixed";
   bool load_default = false;
-  string s;
+  std::string s;
 
   if (*fontset)
     XFreeFontSet(getBaseDisplay().getXDisplay(), *fontset);
@@ -844,7 +842,7 @@ void BScreen::readDatabaseFont(const char *rname, const char *rclass,
 
   static char *defaultFont = "fixed";
   bool load_default = false;
-  string s;
+  std::string s;
 
   if (*font)
     XFreeFont(getBaseDisplay().getXDisplay(), *font);
@@ -1134,7 +1132,7 @@ void BScreen::saveWorkspaceNames() {
     if (w != NULL) {
       names << w->getName();
       if (i < resource.workspaces-1)
-        names << ',';
+        names << ",";
     }
   }
   names << ends;
@@ -1163,7 +1161,7 @@ void BScreen::save() {
 #ifdef    HAVE_STRFTIME
   // it deletes the current value before setting the new one, so we have to
   // duplicate the current value.
-  string s = resource.strftime_format;
+  std::string s = resource.strftime_format;
   setStrftimeFormat(s.c_str()); 
 #else // !HAVE_STRFTIME
   setDateFormat(resource.date_format);
@@ -1172,9 +1170,10 @@ void BScreen::save() {
   setHideToolbar(resource.hide_toolbar);
 }
 
+
 void BScreen::load() {
   ostrstream rscreen, rname, rclass;
-  string s;
+  std::string s;
   bool b;
   long l;
   rscreen << "session.screen" << getScreenNumber() << '.' << ends;
@@ -1194,6 +1193,7 @@ void BScreen::load() {
   }
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "fullMaximization" << ends;
   rclass << rscreen.str() << "FullMaximization" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -1202,6 +1202,7 @@ void BScreen::load() {
     resource.full_max = false;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "focusNewWindows" << ends;
   rclass << rscreen.str() << "FocusNewWindows" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -1210,6 +1211,7 @@ void BScreen::load() {
     resource.focus_new = false;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "focusLastWindow" << ends;
   rclass << rscreen.str() << "FocusLastWindow" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -1218,6 +1220,7 @@ void BScreen::load() {
     resource.focus_last = false;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "rowPlacementDirection" << ends;
   rclass << rscreen.str() << "RowPlacementDirection" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -1229,6 +1232,7 @@ void BScreen::load() {
     resource.row_direction = LeftRight;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "colPlacementDirection" << ends;
   rclass << rscreen.str() << "ColPlacementDirection" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -1240,15 +1244,17 @@ void BScreen::load() {
     resource.col_direction = TopBottom;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "workspaces" << ends;
   rclass << rscreen.str() << "Workspaces" << ends;
-  if (config.getValue(rname.str(), rclass.str(), l))
+  if (config.getValue(rname.str(), rclass.str(), l)) {
     resource.workspaces = l;
-  else
+  }  else
     resource.workspaces = 1;
 
   removeWorkspaceNames();
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "workspaceNames" << ends;
   rclass << rscreen.str() << "WorkspaceNames" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -1256,7 +1262,7 @@ void BScreen::load() {
     while(1) {
       string::const_iterator tmp = it;// current string.begin()
       it = std::find(tmp, end, ',');       // look for comma between tmp and end
-      string name(tmp, it);           // name = s[tmp:it]
+      std::string name(tmp, it);           // name = s[tmp:it]
       addWorkspaceName(name.c_str());
       if (it == end)
         break;
@@ -1265,6 +1271,7 @@ void BScreen::load() {
   }
   
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "focusModel" << ends;
   rclass << rscreen.str() << "FocusModel" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -1285,6 +1292,7 @@ void BScreen::load() {
   }
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "windowZones" << ends;
   rclass << rscreen.str() << "WindowZones" << ends;
   if (config.getValue(rname.str(), rclass.str(), l))
@@ -1293,6 +1301,7 @@ void BScreen::load() {
     resource.zones = 4;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "windowPlacement" << ends;
   rclass << rscreen.str() << "WindowPlacement" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -1313,6 +1322,7 @@ void BScreen::load() {
 
 #ifdef    HAVE_STRFTIME
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "strftimeFormat" << ends;
   rclass << rscreen.str() << "StrftimeFormat" << ends;
 
@@ -1325,6 +1335,7 @@ void BScreen::load() {
     resource.strftime_format = bstrdup("%I:%M %p");
 #else // !HAVE_STRFTIME
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "dateFormat" << ends;
   rclass << rscreen.str() << "DateFormat" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -1336,6 +1347,7 @@ void BScreen::load() {
     resource.date_format = B_AmericanDate;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "clockFormat" << ends;
   rclass << rscreen.str() << "ClockFormat" << ends;
   if (config.getValue(rname.str(), rclass.str(), l)) {
@@ -1348,6 +1360,7 @@ void BScreen::load() {
 #endif // HAVE_STRFTIME
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "edgeSnapThreshold" << ends;
   rclass << rscreen.str() << "EdgeSnapThreshold" << ends;
   if (config.getValue(rname.str(), rclass.str(), l))
@@ -1356,6 +1369,7 @@ void BScreen::load() {
     resource.edge_snap_threshold = 4;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "imageDither" << ends;
   rclass << rscreen.str() << "ImageDither" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -1364,6 +1378,7 @@ void BScreen::load() {
     resource.image_dither = true;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "rootCommand" << ends;
   rclass << rscreen.str() << "RootCommand" << ends;
 
@@ -1376,6 +1391,7 @@ void BScreen::load() {
     resource.root_command = NULL;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "opaqueMove" << ends;
   rclass << rscreen.str() << "OpaqueMove" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -1384,8 +1400,7 @@ void BScreen::load() {
     resource.opaque_move = false;
 
   rscreen.rdbuf()->freeze(0);
-  rname.rdbuf()->freeze(0);
-  rclass.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
 }
 
 void BScreen::reconfigure(void) {
@@ -1585,7 +1600,7 @@ void BScreen::LoadStyle(void) {
     }
   }
 
-  string s;
+  std::string s;
   long l;
   
   // load fonts/fontsets
@@ -1921,6 +1936,7 @@ OpenboxWindow *BScreen::getIcon(int index) {
 int BScreen::addWorkspace(void) {
   Workspace *wkspc = new Workspace(*this, workspacesList->count());
   workspacesList->insert(wkspc);
+  setWorkspaceCount(workspaceCount()+1);
   saveWorkspaceNames();
 
   workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),
@@ -1951,6 +1967,8 @@ int BScreen::removeLastWorkspace(void) {
 
   workspacesList->remove(wkspc);
   delete wkspc;
+  setWorkspaceCount(workspaceCount()-1);
+  saveWorkspaceNames();
 
   toolbar->reconfigure();
 

@@ -279,6 +279,7 @@ void Toolbar::load() {
     m_width_percent =66;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "toolbar.placement" << ends;
   rclass << rscreen.str() << "Toolbar.Placement" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -298,6 +299,7 @@ void Toolbar::load() {
     m_placement = BottomCenter;
   
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "toolbar.onTop" << ends;
   rclass << rscreen.str() << "Toolbar.OnTop" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -306,6 +308,7 @@ void Toolbar::load() {
     m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "toolbar.autoHide" << ends;
   rclass << rscreen.str() << "Toolbar.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -314,8 +317,7 @@ void Toolbar::load() {
     m_hidden = m_autohide = false;
 
   rscreen.rdbuf()->freeze(0);
-  rname.rdbuf()->freeze(0);
-  rclass.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
 }
 
 void Toolbar::reconfigure() {

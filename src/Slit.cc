@@ -292,6 +292,7 @@ void Slit::load() {
     m_placement = CenterRight;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "slit.direction" << ends;
   rclass << rscreen.str() << "Slit.Direction" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
@@ -303,6 +304,7 @@ void Slit::load() {
     m_direction = Vertical;
  
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "slit.onTop" << ends;
   rclass << rscreen.str() << "Slit.OnTop" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -311,6 +313,7 @@ void Slit::load() {
     m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
   rname << rscreen.str() << "slit.autoHide" << ends;
   rclass << rscreen.str() << "Slit.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
@@ -319,8 +322,7 @@ void Slit::load() {
     m_hidden = m_autohide = false;
 
   rscreen.rdbuf()->freeze(0);
-  rname.rdbuf()->freeze(0);
-  rclass.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
 }
 
 void Slit::reconfigure(void) {

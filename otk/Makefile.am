@@ -1,5 +1,6 @@
 buttonsdir = $(pkgdatadir)/buttons
 scriptdir = $(libdir)/openbox/python
+includeotkdir = $(includedir)/otk
 
 CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
 -DBUTTONSDIR=\"$(buttonsdir)\" -DSWIG_GLOBAL
@@ -20,7 +21,13 @@ libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
                   button.cc eventhandler.cc eventdispatcher.cc ustring.cc \
                   label.cc focuslabel.cc application.cc appwidget.cc \
                   otk_wrap.cc
-
+includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
+                   display.hh eventdispatcher.hh eventhandler.hh \
+                   focuslabel.hh focuswidget.hh font.hh label.hh otk.hh \
+                   point.hh property.hh pseudorendercontrol.hh rect.hh \
+                   rendercolor.hh rendercontrol.hh renderstyle.hh \
+                   rendertexture.hh screeninfo.hh strut.hh surface.hh \
+                   timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh
 libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS) @LIBS@
 
 MAINTAINERCLEANFILES= Makefile.in

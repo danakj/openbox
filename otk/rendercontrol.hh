@@ -16,6 +16,7 @@ class RenderTexture;
 class Font;
 class RenderColor;
 class ustring;
+class PixmapMask;
 
 class RenderControl {
 protected:
@@ -74,14 +75,21 @@ public:
 
   virtual void drawRoot(const RenderColor &color) const;
   
+  //! Draws a background onto a Surface, as specified by a RenderTexture
+  /*!
+    This function will overwrite the entire surface.
+  */
+  virtual void drawBackground(Surface &sf,
+			      const RenderTexture &texture) const = 0;
+
   //! Draws a string onto a Surface
   virtual void drawString(Surface &sf, const Font &font, int x, int y,
 			  const RenderColor &color,
                           const ustring &string) const;
 
-  //! Draws a background onto a Surface, as specified by a RenderTexture
-  virtual void drawBackground(Surface &sf,
-			      const RenderTexture &texture) const = 0;
+  //! Draws a PixmapMask with a specified color onto a Surface
+  virtual void drawMask(Surface &sf, const RenderColor &color,
+                        const PixmapMask &mask) const;
 };
 
 }

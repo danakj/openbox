@@ -190,4 +190,28 @@ void RenderControl::drawSolidBackground(Surface& sf,
   }
 }
 
+void RenderControl::drawMask(Surface &sf, const RenderColor &color,
+                             const PixmapMask &mask) const
+{
+  assert(_screen == sf._screen);
+  assert(_screen == color.screen());
+
+  if (mask.mask == None) return; // no mask given
+
+  int width = sf.size().width(), height = sf.size().height();
+  
+  // set the clip region
+  int x = (width - mask.w) / 2, y = (height - mask.h) / 2;
+  XSetClipMask(**display, color.gc(), mask.mask);
+  XSetClipOrigin(**display, color.gc(), x, y);
+
+  // fill in the clipped region
+  XFillRectangle(**display, sf.pixmap(), color.gc(), x, y,
+                 x + mask.w, y + mask.h);
+
+  // unset the clip region
+  XSetClipMask(**display, color.gc(), None);
+  XSetClipOrigin(**display, color.gc(), 0, 0);
+}
+
 }

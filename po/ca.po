@@ -1,23 +1,23 @@
-# Catalan messages for openbox.
+# Missatges en català per a openbox.
 # Copyright (C) 2004 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# David Majà Martínez <kavid@iespana.es>, 2004.
+# David Majà Martínez <davidmaja@gmail.com>, 2004.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.1\n"
+"Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
 "POT-Creation-Date: 2004-11-25 10:29+0100\n"
 "PO-Revision-Date: 2004-01-25 20:41+0100\n"
-"Last-Translator: David Majà Martínez <kavid@iespana.es>\n"
-"Language-Team: None\n"
+"Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
+"Language-Team: catalan\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: openbox/client_list_menu.c:95
 msgid "Go there..."
-msgstr "Anar aquí..."
+msgstr "Vés aquí..."
 
 #: openbox/client_list_menu.c:161
 msgid "Desktops"

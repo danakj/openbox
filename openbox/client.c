@@ -344,18 +344,14 @@ void client_manage(Window window)
 
         place_client(self, &x, &y);
 
-        /* make sure the window is visible */
-        client_find_onscreen(self, &x, &y,
-                             self->frame->area.width,
-                             self->frame->area.height,
-                             /* non-normal clients has less rules, and
-                                windows that are being restored from a session
-                                do also. we can assume you want it back where
-                                you saved it */
-                             client_normal(self) && !self->session);
-
-        if (x != ox || y != oy)
-            client_move(self, x, y);
+        /* make sure the window is visible.
+           
+           this is about the rude parameter:
+           non-normal clients has less rules, and
+           windows that are being restored from a session
+           do also. we can assume you want it back where
+           you saved it */
+        client_move_onscreen(self, client_normal(self) && !self->session);
     }
 
     keyboard_grab_for_client(self, TRUE);
@@ -612,7 +608,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 
     /* XXX watch for xinerama dead areas */
 
-    a = screen_area(self->desktop);
+    /* a = screen_area(self->desktop); */
+    a = screen_physical_area_monitor(client_monitor(self));
     if (client_normal(self)) {
         if (!self->strut.right && *x >= a->x + a->width - 1)
             *x = a->x + a->width - self->frame->area.width;
@@ -3006,6 +3003,9 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
     }
 }
 
+/* Determines which physical monitor a client is on by calculating the
+   area of the part of the client on each monitor.  The number of the
+   monitor containing the greatest area of the client is returned.*/
 guint client_monitor(ObClient *self)
 {
     guint i;
@@ -3132,15 +3132,16 @@ void client_update_sm_client_id(ObClient *self)
  */
 gint client_directional_edge_search(ObClient *c, ObDirection dir)
 {
-    gint dest;
+    gint dest, monitor_dest;
     gint my_edge_start, my_edge_end, my_offset;
     GList *it;
-    Rect *a;
+    Rect *a, *monitor;
     
     if(!client_list)
         return -1;
 
     a = screen_area(c->desktop);
+    monitor = screen_area_monitor(c->desktop, client_monitor(c));
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
@@ -3150,8 +3151,13 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         
         /* default: top of screen */
         dest = a->y;
+        monitor_dest = monitor->y;
+        /* if the monitor edge comes before the screen edge, */
+        /* use that as the destination instead. (For xinerama) */
+        if (monitor_dest != dest && my_offset > monitor_dest)
+            dest = monitor_dest; 
 
-        for(it = client_list; it; it = g_list_next(it)) {
+        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3193,8 +3199,13 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
 
         /* default: bottom of screen */
         dest = a->y + a->height;
+        monitor_dest = monitor->y + monitor->height;
+        /* if the monitor edge comes before the screen edge, */
+        /* use that as the destination instead. (For xinerama) */
+        if (monitor_dest != dest && my_offset < monitor_dest)
+            dest = monitor_dest; 
 
-        for(it = client_list; it; it = g_list_next(it)) {
+        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3237,8 +3248,13 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
 
         /* default: leftmost egde of screen */
         dest = a->x;
+        monitor_dest = monitor->x;
+        /* if the monitor edge comes before the screen edge, */
+        /* use that as the destination instead. (For xinerama) */
+        if (monitor_dest != dest && my_offset > monitor_dest)
+            dest = monitor_dest;            
 
-        for(it = client_list; it; it = g_list_next(it)) {
+        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3281,8 +3297,13 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         
         /* default: rightmost edge of screen */
         dest = a->x + a->width;
+        monitor_dest = monitor->x + monitor->width;
+        /* if the monitor edge comes before the screen edge, */
+        /* use that as the destination instead. (For xinerama) */
+        if (monitor_dest != dest && my_offset < monitor_dest)
+            dest = monitor_dest;            
 
-        for(it = client_list; it; it = g_list_next(it)) {
+        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 

@@ -62,10 +62,13 @@ typedef struct _Rect {
 #define RECT_CONTAINS_RECT(r, o) \
     ((o).x >= (r).x && (o).x + (o).width <= (r).x + (r).width && \
      (o).y >= (r).y && (o).y + (o).height <= (r).y + (r).height)
+
+/* Returns true if Rect r and o intersect */
 #define RECT_INTERSECTS_RECT(r, o) \
     ((o).x < (r).x + (r).width && (o).x + (o).width > (r).x && \
      (o).y < (r).y + (r).height && (o).y + (o).height > (r).y)
 
+/* Sets Rect r to be the intersection of Rect a and b. */
 #define RECT_SET_INTERSECTION(r, a, b) \
     ((r).x = MAX((a).x, (b).x), \
      (r).y = MAX((a).y, (b).y), \

@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "../../kernel/themerc.h"
+#include "../../kernel/openbox.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -128,10 +129,47 @@ gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname);
     char *rettype;
+    char *s;
+    char *button_dir;
     XrmValue retvalue;
+    int hx, hy; /* ignored */
+    unsigned int w, h;
+    unsigned char *b;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-	retvalue.addr != NULL) {
+        retvalue.addr != NULL) {
+	button_dir = g_strdup_printf("%s_buttons", themerc_theme);
+
+        s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
+                             "openbox", button_dir, retvalue.addr, NULL);
+
+        if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess)
+            ret = TRUE;
+        else {
+            g_free(s);
+            s = g_build_filename(THEMEDIR, button_dir, retvalue.addr, NULL);
+	
+            if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
+                ret = TRUE;
+            else {
+                g_free(s);
+                s = g_strdup_printf("%s_buttons/%s", themerc_theme, 
+                                    themerc_theme);
+                if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
+                    BitmapSuccess) 
+                    ret = TRUE;
+                else
+                    g_message("Unable to find bitmap '%s'", s);
+            }
+        }
+
+        if (ret) {
+            *value = pixmap_mask_new(w, h, b);
+            XFree(b);
+        }
+      
+        g_free(s);
+        g_free(button_dir);
     }
 
     g_free(rclass);
@@ -139,8 +177,8 @@ gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
 }
 
 static void parse_appearance(char *tex, SurfaceColorType *grad,
-			  ReliefType *relief, BevelType *bevel,
-			  gboolean *interlaced, gboolean *border)
+                             ReliefType *relief, BevelType *bevel,
+                             gboolean *interlaced, gboolean *border)
 {
     char *t;
 
@@ -265,6 +303,9 @@ gboolean load()
 	    g_warning("Failed to load the theme '%s'.", DEFAULT_THEME);
 	    return FALSE;
 	}
+        /* change to reflect what was actually loaded */
+        g_free(themerc_theme);
+        themerc_theme = g_strdup(DEFAULT_THEME);
     }
 
     /* load the font, not from the theme file tho, its in themerc_font */
@@ -348,7 +389,7 @@ gboolean load()
     if (!read_appearance(db, "window.button.pressed.focus",
 			 a_focused_pressed_max))
 	if (!read_appearance(db, "window.button.pressed",
-			     a_focused_pressed_max))
+                             a_focused_pressed_max))
 	    set_default_appearance(a_focused_pressed_max);
     if (!read_appearance(db, "window.button.pressed.unfocus",
 			 a_unfocused_pressed_max))
@@ -357,10 +398,10 @@ gboolean load()
 	    set_default_appearance(a_unfocused_pressed_max);
     if (!read_appearance(db, "window.button.focus",
 			 a_focused_unpressed_max))
-	    set_default_appearance(a_focused_unpressed_max);
+	set_default_appearance(a_focused_unpressed_max);
     if (!read_appearance(db, "window.button.unfocus",
 			 a_unfocused_unpressed_max))
-	    set_default_appearance(a_unfocused_unpressed_max);
+	set_default_appearance(a_unfocused_unpressed_max);
 
     a_unfocused_unpressed_close = appearance_copy(a_unfocused_unpressed_max);
     a_unfocused_pressed_close = appearance_copy(a_unfocused_pressed_max);

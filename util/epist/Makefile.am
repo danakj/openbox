@@ -2,10 +2,14 @@
 
 DEFAULT_RC=$(pkgdatadir)/epistrc
 
+CLEANFILES = epist.1
+
 CPPFLAGS= @CPPFLAGS@ @DEBUG@ -DDEFAULTRC=\"$(DEFAULT_RC)\"
 
 #EXTRA_PROGRAMS =		epist
 bin_PROGRAMS =		epist
+
+man_MANS = epist.1
 
 epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
@@ -18,6 +22,10 @@ MAINTAINERCLEANFILES =	Makefile.in
 
 distclean-local:
 	rm -f *\~ .\#*
+
+epist.1: epist.1.in
+	@regex_cmd@ -e "s,@pkgdatadir@,$(pkgdatadir)," \
+		epist.1.in > epist.1
 
 install-data-local: epistrc
 	test -f $(DESTDIR)$(pkgdatadir)/epistrc || \

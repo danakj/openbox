@@ -1,0 +1,25 @@
+.TH epist 1 "August 2002" "epist" "v0.0"
+.SH NAME
+epist - NetWM keybindings grabber
+.SH SYNOPSIS
+\fBepist\fR [options]
+.SH DESCRIPTION
+\fBepist\fR is intended to provide keygrabbing for the OpenBox window manager
+for the X Windows System. This allows you to control things with keypresses
+rather than the mouse.
+.SH OPTIONS
+.TP
+\fB\-display\fR \fIXdisplay\fR
+\fIX display\fR is connected to by epist instead of $DISPLAY.
+.TP
+\fB\-rc\fR \fIrcfile\fR
+\fIrcfile\fR is used as the keybindings configuration.
+.TP
+.SH CONFIGURATION
+\fBepist\fR will read its configuration from \fI~/.openbox/epistrc\fR otherwise
+a default configuration, installed in \fI@pkgdatadir@/epistrc\fR
+will be used.
+.SH AUTHOR
+The author of epist is openbox-devel <openbox-devel@sunsite.dk>.
+.SH SEE ALSO
+\fIopenbox\fR(1)

@@ -7,6 +7,16 @@
 ### these.                                                               ###
 ############################################################################
 
+##############################################################################
+### Options for the windowplacement module:                                ###
+###                                                                        ###
+# ignore_requested_positions - When true, the placement algorithm will     ###
+###                            attempt to place windows even when they     ###
+###                            request a position (like XMMS).             ###
+ignore_requested_positions = 0                                             ###
+###                                                                        ###
+##############################################################################
+
 import otk
 import ob
 import random
@@ -15,7 +25,8 @@ _rand = random.Random()
 
 def random(data):
     if not data.client: return
-    if data.client.positionRequested(): return
+    if not ignore_requested_positions:
+        if data.client.positionRequested(): return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area()

@@ -20,6 +20,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+/* A few comments about stacked cycling:
+ * When stacked cycling is turned on, the focused window is always at the top
+ * (front) of the list (_clients), EXCEPT for when we are in cycling mode.
+ * (_cycling is true) If we were to add the focused window to the top of the
+ * stack while we were cycling, we would end in a deadlock between 2 windows.
+ * When the modifiers are released, the window that has focus (but it's not
+ * at the top of the stack, since we are cycling) is placed at the top of the
+ * stack and raised.
+ * Hooray and Bummy. - Marius
+ */
+
 #ifdef    HAVE_CONFIG_H
 #  include "../../config.h"
 #endif // HAVE_CONFIG_H
@@ -522,7 +533,17 @@ void screen::updateActiveWindow() {
       break;
     }
   }
+
   _active = it;
+
+  /* if we're not cycling and a window gets focus, add it to the top of the
+   * cycle stack.
+   */
+  if (_stacked_cycling && !_cycling) {
+    _clients.remove(*_active);
+    _clients.push_front(*_active);
+  }
+
   if (it != end)
     _last_active = it;
 
@@ -617,7 +638,7 @@ void screen::cycleWindow(unsigned int state, const bool forward,
     }
 
     // if the window is on another desktop, we can't use XSetInputFocus, since
-    // it doesn't imply a woskpace change.
+    // it doesn't imply a workspace change.
     if (t->desktop() == _active_desktop)
       t->focus(false); // focus, but don't raise
     else

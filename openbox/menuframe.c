@@ -16,6 +16,9 @@
 
 GList *menu_frame_visible;
 
+static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
+                                              ObMenuFrame *frame);
+static void menu_entry_frame_free(ObMenuEntryFrame *self);
 static void menu_frame_render(ObMenuFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
 
@@ -60,6 +63,11 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
 void menu_frame_free(ObMenuFrame *self)
 {
     if (self) {
+        while (self->entries) {
+            menu_entry_frame_free(self->entries->data);
+            self->entries = g_list_delete_link(self->entries, self->entries);
+        }
+
         stacking_remove(MENU_AS_WINDOW(self));
 
         XDestroyWindow(ob_display, self->items);
@@ -73,7 +81,8 @@ void menu_frame_free(ObMenuFrame *self)
     }
 }
 
-ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry, ObMenuFrame *frame)
+static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
+                                              ObMenuFrame *frame)
 {
     ObMenuEntryFrame *self;
     XSetWindowAttributes attr;
@@ -110,7 +119,7 @@ ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry, ObMenuFrame *frame)
     return self;
 }
 
-void menu_entry_frame_free(ObMenuEntryFrame *self)
+static void menu_entry_frame_free(ObMenuEntryFrame *self)
 {
     if (self) {
         XDestroyWindow(ob_display, self->icon);
@@ -170,7 +179,6 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     RrAppearance *item_a, *text_a;
     gint th; /* temp */
     ObMenu *sub;
-    ObClientIcon *icon;
 
     item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                !self->entry->data.normal.enabled) ?

@@ -33,6 +33,8 @@ class BImageControl;
 class BTexture {
 public:
   enum Type {
+    // No texture
+    NoTexture           = (0),    
     // bevel options
     Flat                = (1l<<0),
     Sunken              = (1l<<1),

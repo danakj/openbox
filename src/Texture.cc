@@ -184,6 +184,7 @@ BTexture& BTexture::operator=(const BTexture &tt) {
 Pixmap BTexture::render(const unsigned int width, const unsigned int height,
                         const Pixmap old) {
   assert(display() != 0);
+  assert(texture() != BTexture::NoTexture);
 
   if (texture() == (BTexture::Flat | BTexture::Solid))
     return None;

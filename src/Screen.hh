@@ -72,7 +72,8 @@ struct WindowStyle {
   BColor l_text_focus, l_text_unfocus, b_pic_focus,
     b_pic_unfocus;
   BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
-    h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
+    h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, b_pressed_focus,
+    b_pressed_unfocus, g_focus, g_unfocus;
 
 #ifdef    BITMAPBUTTONS
   PixmapMask close_button, max_button, icon_button, stick_button;
@@ -206,7 +207,8 @@ private:
   
   BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
-                               const Configuration &style);
+                               const Configuration &style, 
+                               bool allowNoTexture = false);
   BColor readDatabaseColor(const std::string &rname,
                            const std::string &default_color,
                            const Configuration &style);

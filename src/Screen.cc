@@ -1065,6 +1065,12 @@ void BScreen::LoadStyle(void) {
   resource.wstyle.b_pressed =
     readDatabaseTexture("window.button.pressed", "black", style);
 
+  //if neither of these can be found, we will use the previous resource
+  resource.wstyle.b_pressed_focus =
+    readDatabaseTexture("window.button.pressed.focus", "black", style, true);
+  resource.wstyle.b_pressed_unfocus =
+    readDatabaseTexture("window.button.pressed.unfocus", "black", style, true);
+
 #ifdef    BITMAPBUTTONS
   if (resource.wstyle.close_button.mask != None)
     XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
@@ -2671,12 +2677,15 @@ void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
 
 BTexture BScreen::readDatabaseTexture(const string &rname,
                                       const string &default_color,
-                                      const Configuration &style) {
+                                      const Configuration &style, 
+                                      bool allowNoTexture) {
   BTexture texture;
   string s;
 
   if (style.getValue(rname, s))
     texture = BTexture(s);
+  else if (allowNoTexture) //no default
+    texture.setTexture(BTexture::NoTexture);
   else
     texture.setTexture(BTexture::Solid | BTexture::Flat);
 
@@ -2684,12 +2693,15 @@ BTexture BScreen::readDatabaseTexture(const string &rname,
   texture.setDisplay(getBaseDisplay(), getScreenNumber());
   texture.setImageControl(image_control);
 
-  texture.setColor(readDatabaseColor(rname + ".color", default_color, style));
-  texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
+  if (texture.texture() != BTexture::NoTexture) {
+    texture.setColor(readDatabaseColor(rname + ".color", default_color,
                                        style));
-  texture.setBorderColor(readDatabaseColor(rname + ".borderColor",
-                                           default_color, style));
-  
+    texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
+                                         style));
+    texture.setBorderColor(readDatabaseColor(rname + ".borderColor",
+                                             default_color, style));
+  }
+
   return texture;
 }
 

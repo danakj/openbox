@@ -217,13 +217,13 @@ private:
    */
 
   struct _frame {
-    // u -> unfocused, f -> has focus
+    // u -> unfocused, f -> has focus, p -> pressed
     unsigned long ulabel_pixel, flabel_pixel, utitle_pixel,
       ftitle_pixel, uhandle_pixel, fhandle_pixel, ubutton_pixel,
-      fbutton_pixel, pbutton_pixel, uborder_pixel, fborder_pixel,
-      ugrip_pixel, fgrip_pixel;
+      fbutton_pixel, pfbutton_pixel, pubutton_pixel,
+      uborder_pixel, fborder_pixel, ugrip_pixel, fgrip_pixel;
     Pixmap ulabel, flabel, utitle, ftitle, uhandle, fhandle,
-      ubutton, fbutton, pbutton, ugrip, fgrip;
+      ubutton, fbutton, pfbutton, pubutton, ugrip, fgrip;
 
     Window window,       // the frame
       plate,             // holds the client
@@ -290,6 +290,11 @@ private:
   void redrawWindowFrame(void) const;
   void redrawLabel(void) const;
   void redrawAllButtons(void) const;
+  void BlackboxWindow::redrawButton(bool pressed, Window win,
+                                    Pixmap fppix, unsigned long fppixel,
+                                    Pixmap uppix, unsigned long uppixel,
+                                    Pixmap fpix, unsigned long fpixel,
+                                    Pixmap upix, unsigned long upixel) const;
   void redrawCloseButton(bool pressed) const;
   void redrawIconifyButton(bool pressed) const;
   void redrawMaximizeButton(bool pressed) const;

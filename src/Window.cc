@@ -2962,55 +2962,57 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   dx -= frame.border_w;
   dy -= frame.border_w;
 
-  // workspace warping
-  bool warp = False;
-  unsigned int dest = screen->getCurrentWorkspaceID();
-  if (x_root <= 0) {
-    warp = True;
-
-    if (dest > 0) dest--;
-    else dest = screen->getNumberOfWorkspaces() - 1;
-
-  } else if (x_root >= screen->getRect().right()) {
-    warp = True;
-
-    if (dest < screen->getNumberOfWorkspaces() - 1) dest++;
-    else dest = 0;
-  }
-  if (warp) {
-    endMove();
-    bool focus = flags.focused; // had focus while moving?
-    if (! flags.stuck)
-      screen->reassociateWindow(this, dest, False);
-    screen->changeWorkspaceID(dest);
-    if (focus)
-      setInputFocus();
- 
-    /*
-       If the XWarpPointer is done after the configure, we can end up
-       grabbing another window, so made sure you do it first.
-    */
-    int dest_x;
+  if (screen->doWorkspaceWarping()) {
+    // workspace warping
+    bool warp = False;
+    unsigned int dest = screen->getCurrentWorkspaceID();
     if (x_root <= 0) {
-      dest_x = screen->getRect().right() - 1;
-      XWarpPointer(blackbox->getXDisplay(), None, 
-                   screen->getRootWindow(), 0, 0, 0, 0,
-                   dest_x, y_root);
+      warp = True;
 
-      configure(dx + (screen->getRect().width() - 1), dy,
-                frame.rect.width(), frame.rect.height());
-    } else {
-      dest_x = 0;
-      XWarpPointer(blackbox->getXDisplay(), None, 
-                   screen->getRootWindow(), 0, 0, 0, 0,
-                   dest_x, y_root);
+      if (dest > 0) dest--;
+      else dest = screen->getNumberOfWorkspaces() - 1;
 
-      configure(dx - (screen->getRect().width() - 1), dy,
-                frame.rect.width(), frame.rect.height());
+    } else if (x_root >= screen->getRect().right()) {
+      warp = True;
+
+      if (dest < screen->getNumberOfWorkspaces() - 1) dest++;
+      else dest = 0;
     }
+    if (warp) {
+      endMove();
+      bool focus = flags.focused; // had focus while moving?
+      if (! flags.stuck)
+        screen->reassociateWindow(this, dest, False);
+      screen->changeWorkspaceID(dest);
+      if (focus)
+        setInputFocus();
 
-    beginMove(dest_x, y_root);
-    return;
+      /*
+         If the XWarpPointer is done after the configure, we can end up
+         grabbing another window, so made sure you do it first.
+         */
+      int dest_x;
+      if (x_root <= 0) {
+        dest_x = screen->getRect().right() - 1;
+        XWarpPointer(blackbox->getXDisplay(), None, 
+                     screen->getRootWindow(), 0, 0, 0, 0,
+                     dest_x, y_root);
+
+        configure(dx + (screen->getRect().width() - 1), dy,
+                  frame.rect.width(), frame.rect.height());
+      } else {
+        dest_x = 0;
+        XWarpPointer(blackbox->getXDisplay(), None, 
+                     screen->getRootWindow(), 0, 0, 0, 0,
+                     dest_x, y_root);
+
+        configure(dx - (screen->getRect().width() - 1), dy,
+                  frame.rect.width(), frame.rect.height());
+      }
+
+      beginMove(dest_x, y_root);
+      return;
+    }
   }
 
   const int snap_distance = screen->getEdgeSnapThreshold();

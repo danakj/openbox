@@ -537,6 +537,13 @@ void BScreen::saveAllowScrollLock(bool a) {
 }
 
 
+void BScreen::saveWorkspaceWarping(bool w) {
+  resource.workspace_warping = w;
+  config->setValue(screenstr + "workspaceWarping",
+                   resource.workspace_warping);
+}
+
+
 void BScreen::save_rc(void) {
   saveSloppyFocus(resource.sloppy_focus);
   saveAutoRaise(resource.auto_raise);
@@ -564,6 +571,7 @@ void BScreen::save_rc(void) {
   savePlaceIgnoreShaded(resource.ignore_shaded);
   savePlaceIgnoreMaximized(resource.ignore_maximized);
   saveAllowScrollLock(resource.allow_scroll_lock);
+  saveWorkspaceWarping(resource.workspace_warping);
 
   toolbar->save_rc();
   slit->save_rc();
@@ -699,9 +707,13 @@ void BScreen::load_rc(void) {
                          resource.ignore_maximized))
     resource.ignore_maximized = true;
 
-  if (! config->getValue(screenstr + "disableBindingsWithScrollLock",
-                         resource.allow_scroll_lock))
-    resource.allow_scroll_lock = false;
+if (! config->getValue(screenstr + "disableBindingsWithScrollLock",
+                       resource.allow_scroll_lock))
+  resource.allow_scroll_lock = false;
+
+  if (! config->getValue(screenstr + "workspaceWarping",
+                         resource.workspace_warping))
+    resource.workspace_warping = false;
 }
 
 

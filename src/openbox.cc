@@ -1509,7 +1509,7 @@ void Openbox::load_rc(BScreen *screen) {
   if (config.getValue(name_lookup, class_lookup, l))
     screen->saveEdgeSnapThreshold(l);
   else
-    screen->saveEdgeSnapThreshold(0);
+    screen->saveEdgeSnapThreshold(4);
 
   sprintf(name_lookup,  "session.screen%d.imageDither", screen_number);
   sprintf(class_lookup, "Session.Screen%d.ImageDither", screen_number);

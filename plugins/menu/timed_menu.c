@@ -96,15 +96,18 @@ void timed_menu_read_pipe(int fd, void *d)
                     TIMED_MENU_DATA(menu)->buf + TIMED_MENU_DATA(menu)->buflen,
                     num_realloc);
     if (num_read == 0) {
-         menu->invalid = TRUE;
+        xmlDocPtr doc;
+        xmlNodePtr node;
+
+        menu->invalid = TRUE;
         menu_clear(menu);
 
         TIMED_MENU_DATA(menu)->buf[TIMED_MENU_DATA(menu)->buflen] = '\0';
 
-        xmlDocPtr doc = xmlParseMemory(TIMED_MENU_DATA(menu)->buf,
+        doc = xmlParseMemory(TIMED_MENU_DATA(menu)->buf,
                                        TIMED_MENU_DATA(menu)->buflen);
 
-        xmlNodePtr node = xmlDocGetRootElement(doc);
+        node = xmlDocGetRootElement(doc);
 
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
             if ((node = parse_find_node("item", node->xmlChildrenNode)))

@@ -32,7 +32,7 @@ void python_init(char *argv0)
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
   PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
-  PyRun_SimpleString("import ob; import otk;");
+  PyRun_SimpleString("import ob; import otk; import config;");
   // set up convenience global variables
   PyRun_SimpleString("ob.openbox = ob.Openbox_instance()");
   PyRun_SimpleString("otk.display = otk.Display_instance()");

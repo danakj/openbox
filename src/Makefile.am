@@ -7,8 +7,7 @@ CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
 -DLOCALEDIR=\"$(localedir)\" \
--DSCRIPTDIR=\"$(scriptdir)\" -DSWIG_GLOBAL 
-# -DSWIG_GLOBAL is for the swigruntime.cc (see swigruntime.i for explanation)
+-DSCRIPTDIR=\"$(scriptdir)\"
 
 LIBS=$(XFT_LIBS) $(PYTHON_LIBS) @LIBS@
 
@@ -21,7 +20,7 @@ openbox3_LDADD=-L../otk -lotk @LIBINTL@
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc backgroundwidget.cc labelwidget.cc \
                   buttonwidget.cc python.cc bindings.cc \
-                  swigruntime.cc openbox_wrap.cc
+                  openbox_wrap.cc
 openbox3_LDFLAGS= $(PYTHON_LDFLAGS)
 
 script_DATA = ob.py
@@ -38,8 +37,5 @@ openbox.i: openbox.hh screen.hh client.hh python.hh frame.hh
 
 %_wrap.cc: %.i
 	swig -c -I../otk $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
-
-swigruntime.cc: swigruntime.i
-	swig -python -c++ -o $@ $<
 
 # local dependencies

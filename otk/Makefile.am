@@ -2,7 +2,7 @@ buttonsdir = $(pkgdatadir)/buttons
 scriptdir = $(libdir)/openbox/python
 
 CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
--DBUTTONSDIR=\"$(buttonsdir)\"
+-DBUTTONSDIR=\"$(buttonsdir)\" -DSWIG_GLOBAL
 
 INCLUDES= -I../src
 
@@ -40,6 +40,6 @@ otk.i: $(wildcard *.hh)
 	touch $@
 
 %_wrap.cc: %.i
-	swig -c $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
+	swig $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
 
 # local dependencies

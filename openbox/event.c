@@ -739,7 +739,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
         case OB_FRAME_CONTEXT_FRAME:
             if (!nofocus && client_normal(client) && config_focus_follow) {
                 if (e->xcrossing.mode == NotifyGrab ||
-                    e->xcrossing.detail == NotifyInferior)
+                    e->xcrossing.detail == NotifyInferior ||
+                    e->xcrossing.mode == NotifyUngrab)
                 {
 #ifdef DEBUG_FOCUS
                     ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",

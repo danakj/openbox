@@ -404,15 +404,15 @@ void Widget::adjustVert(void)
 
 void Widget::update()
 {
+  WidgetList::iterator it = _children.begin(), end = _children.end();
+  for (; it != end; ++it)
+    (*it)->update();
+
   if (_dirty) {
     adjust();
     render();
     XClearWindow(**display, _window);
   }
-
-  WidgetList::iterator it = _children.begin(), end = _children.end();
-  for (; it != end; ++it)
-    (*it)->update();
 
   _dirty = false;
 }

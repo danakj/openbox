@@ -55,6 +55,7 @@
 #include "Window.h"
 #include "Workspace.h"
 #include "Workspacemenu.h"
+#include "Util.h"
 
 #include <string>
 #include <algorithm>
@@ -1209,9 +1210,9 @@ void Openbox::load_rc(void) {
 
 
 void Openbox::load_rc(BScreen *screen) {
-  assert (screen != NULL);
+  ASSERT (screen != NULL);
   const int screen_number = screen->getScreenNumber();
-  assert (screen_number >= 0);
+  ASSERT (screen_number >= 0);
 
   if (!config.load())
     return;

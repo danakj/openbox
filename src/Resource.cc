@@ -20,6 +20,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 #include "Resource.h"
+#include "Util.h"
 
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
@@ -32,8 +33,6 @@
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
-
-#include <assert.h>
 
 bool obResource::m_initialized = false;
 
@@ -72,7 +71,7 @@ void obResource::setAutoSave(bool autosave) {
 }
 
 void obResource::save() {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
   XrmPutFileDatabase(m_database, m_file.c_str());
   m_modified = false;
 }
@@ -87,7 +86,7 @@ bool obResource::load() {
 }
 
 void obResource::setValue(const std::string &rname, bool value) {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
 
   const char *val = (value ? "True" : "False");
   std::string rc_string = rname + ": " + val;
@@ -103,7 +102,7 @@ void obResource::setValue(const std::string &rname, int value) {
 }
 
 void obResource::setValue(const std::string &rname, long value) {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
   
   char val[11];
   sprintf(val, "%ld", value);
@@ -116,7 +115,7 @@ void obResource::setValue(const std::string &rname, long value) {
 }
 
 void obResource::setValue(const std::string &rname, const char *value) {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
   XrmPutLineResource(&m_database, rc_string.c_str());
@@ -127,7 +126,7 @@ void obResource::setValue(const std::string &rname, const char *value) {
 }
 
 void obResource::setValue(const std::string &rname, const std::string &value) {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
   XrmPutLineResource(&m_database, rc_string.c_str());
@@ -139,8 +138,8 @@ void obResource::setValue(const std::string &rname, const std::string &value) {
 
 bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           bool &value) const {
-  assert(rclass.c_str() != NULL);
-  assert(m_database != NULL);
+  ASSERT(rclass.c_str() != NULL);
+  ASSERT(m_database != NULL);
   
   char *rettype;
   XrmValue retvalue;
@@ -157,7 +156,7 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
 
 bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           long &value) const {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
   
   char *rettype;
   XrmValue retvalue;
@@ -173,7 +172,7 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
 
 bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           std::string &value) const {
-  assert(m_database != NULL);
+  ASSERT(m_database != NULL);
   
   char *rettype;
   XrmValue retvalue;

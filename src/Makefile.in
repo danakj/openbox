@@ -390,8 +390,6 @@ distclean-local:
 
 # local dependencies
 
-Geometry.o: Geometry.cc Geometry.h
-Resource.o: Resource.cc Resource.h
 BaseDisplay.o: BaseDisplay.cc i18n.h BaseDisplay.h LinkedList.h \
  Timer.h
 Basemenu.o: Basemenu.cc i18n.h openbox.h BaseDisplay.h \
@@ -406,6 +404,7 @@ Configmenu.o: Configmenu.cc i18n.h Configmenu.h Basemenu.h \
  LinkedList.h Screen.h BaseDisplay.h Timer.h Iconmenu.h Netizen.h \
  Rootmenu.h Workspace.h Workspacemenu.h openbox.h Image.h \
  Window.h Windowmenu.h Slit.h Toolbar.h Resource.h Geometry.h
+Geometry.o: Geometry.cc Geometry.h
 Icon.o: Iconmenu.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
@@ -417,6 +416,7 @@ Netizen.o: Netizen.cc Netizen.h BaseDisplay.h LinkedList.h Timer.h \
  Screen.h Configmenu.h Basemenu.h openbox.h Image.h Window.h \
  Iconmenu.h Windowmenu.h Slit.h Rootmenu.h Workspace.h \
  Workspacemenu.h Resource.h Geometry.h
+Resource.o: Resource.cc Resource.h Util.h
 Rootmenu.o: Rootmenu.cc openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Rootmenu.h Screen.h Configmenu.h Netizen.h Workspace.h \
@@ -446,7 +446,7 @@ Workspace.o: Workspace.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Screen.h \
  Configmenu.h Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h Resource.h \
- Geometry.h Geometry.h
+ Geometry.h Geometry.h Util.h
 Workspacemenu.o: Workspacemenu.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
@@ -454,7 +454,8 @@ Workspacemenu.o: Workspacemenu.cc i18n.h openbox.h BaseDisplay.h \
 openbox.o: openbox.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Rootmenu.h \
- Screen.h Configmenu.h Netizen.h Workspacemenu.h Toolbar.h Resource.h Geometry.h
+ Screen.h Configmenu.h Netizen.h Workspacemenu.h Toolbar.h Resource.h \
+ Geometry.h Util.h
 bsd-snprintf.o: bsd-snprintf.c bsd-snprintf.h
 i18n.o: i18n.cc i18n.h
 main.o: main.cc ../version.h i18n.h openbox.h BaseDisplay.h \

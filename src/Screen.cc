@@ -32,7 +32,6 @@
 
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
-#include <assert.h>
 
 #include "i18n.h"
 #include "openbox.h"

@@ -43,6 +43,7 @@
 #include "Workspace.h"
 #include "Windowmenu.h"
 #include "Geometry.h"
+#include "Util.h"
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
@@ -458,7 +459,7 @@ inline Point *Workspace::rowSmartPlacement(const Size &win_size,
 }
 
 void Workspace::placeWindow(OpenboxWindow *win) {
-  assert(win != NULL);
+  ASSERT(win != NULL);
 
   Bool placed = False;
 

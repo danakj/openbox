@@ -99,6 +99,7 @@ typedef struct Surface {
 
 typedef struct {
     XftFont *xftfont;
+    int height;
 } ObFont;
 
 typedef enum {

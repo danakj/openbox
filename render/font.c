@@ -23,6 +23,22 @@ void font_startup(void)
 #endif
 }
 
+static void measure_height(ObFont *f)
+{
+    XGlyphInfo info;
+    char *str;
+
+    /* XXX add some extended UTF8 characters in here? */
+    str = "12345678900-qwertyuiopasdfghjklzxcvbnm"
+        "!@#$%^&*()_+QWERTYUIOPASDFGHJKLZXCVBNM"
+        "`~[]\\;',./{}|:\"<>?";
+
+    XftTextExtentsUtf8(ob_display, f->xftfont,
+                       (FcChar8*)str, strlen(str), &info);
+    g_message("measured: %d", info.height);
+    f->height = (signed) info.height;
+}
+
 ObFont *font_open(char *fontstring)
 {
     ObFont *out;
@@ -31,6 +47,7 @@ ObFont *font_open(char *fontstring)
     if ((xf = XftFontOpenName(ob_display, ob_screen, fontstring))) {
         out = malloc(sizeof(ObFont));
         out->xftfont = xf;
+        measure_height(out);
         return out;
     }
     g_warning(_("Unable to load font: %s\n"), fontstring);
@@ -39,6 +56,7 @@ ObFont *font_open(char *fontstring)
     if ((xf = XftFontOpenName(ob_display, ob_screen, "fixed"))) {
         out = malloc(sizeof(ObFont));
         out->xftfont = xf;
+        measure_height(out);
         return out;
     }
     g_warning(_("Unable to load font: %s\n"), "fixed");
@@ -64,7 +82,7 @@ int font_measure_string(ObFont *f, const char *str, int shadow, int offset)
 
 int font_height(ObFont *f, int shadow, int offset)
 {
-    return (signed) f->xftfont->height + (shadow ? offset : 0);
+    return f->height + (shadow ? offset : 0);
 }
 
 int font_max_char_width(ObFont *f)
@@ -93,7 +111,9 @@ void font_draw(XftDraw *d, TextureText *t)
     c.pixel = t->color->pixel;
     c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
                      
-    XftDrawStringUtf8(d, &c, t->font->xftfont, x, t->font->xftfont->ascent + y,
+    XftDrawStringUtf8(d, &c, t->font->xftfont, x,
+                      t->font->xftfont->ascent + y -
+                      (t->font->xftfont->height - t->font->height) / 2,
                      (FcChar8*)t->string, strlen(t->string));
     return;
 }

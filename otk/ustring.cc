@@ -111,7 +111,8 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset,
 
 // ustring methods
 
-ustring::ustring()
+ustring::ustring(bool utf8)
+  : _utf8(utf8)
 {
 }
 

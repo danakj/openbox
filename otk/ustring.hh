@@ -117,7 +117,7 @@ public:
 
   static const size_type npos = std::string::npos;
 
-  ustring();
+  ustring(bool utf8 = true);
   ~ustring();
 
   // make new strings

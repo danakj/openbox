@@ -3131,6 +3131,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"NUM_KEY_CONTEXT", (long) ob::NUM_KEY_CONTEXT, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventEnterWindow", (long) ob::EventEnterWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventLeaveWindow", (long) ob::EventLeaveWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventPlaceWindow", (long) ob::EventPlaceWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventNewWindow", (long) ob::EventNewWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventCloseWindow", (long) ob::EventCloseWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventStartup", (long) ob::EventStartup, 0, 0, 0},

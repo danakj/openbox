@@ -52,6 +52,7 @@ enum KeyContext {
 enum EventAction {
   EventEnterWindow,
   EventLeaveWindow,
+  EventPlaceWindow,
   EventNewWindow,
   EventCloseWindow,
   EventStartup,

@@ -493,7 +493,11 @@ void OBScreen::manageWindow(Window window)
   XChangeSaveSet(otk::OBDisplay::display, window, SetModeInsert);
 
   if (!client->positionRequested()) {
-    // XXX: position the window intelligenty
+    // position the window intelligenty .. hopefully :)
+    // call the python PLACEWINDOW binding
+    EventData *data = new_event_data(_number, window, EventPlaceWindow, 0);
+    Openbox::instance->bindings()->fireEvent(data);
+    Py_DECREF((PyObject*)data);
   }
 
   // create the decoration frame for the client window

@@ -44,6 +44,8 @@
 
 #include <algorithm>
 
+I18n i18n("openbox.cat");
+
 bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
   : BaseDisplay(argv[0], dpy_name)
 {
@@ -99,9 +101,8 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
 
   if ((mod + sol + grd) != True) {
     fprintf(stderr,
-      i18n->getMessage(bsetrootSet, bsetrootMustSpecify,
-                       "%s: error: must specify one of: "
-                       "-solid, -mod, -gradient\n"),
+      i18n(bsetrootSet, bsetrootMustSpecify,
+           "%s: error: must specify one of: -solid, -mod, -gradient\n"),
       getApplicationName());
 
     usage(2);
@@ -328,7 +329,7 @@ void bsetroot::gradient(void) {
 
 void bsetroot::usage(int exit_code) {
     fprintf(stderr,
-      i18n->getMessage(bsetrootSet, bsetrootUsage,
+      i18n(bsetrootSet, bsetrootUsage,
      "%s 2.0\n\n"
      "Copyright (c) 1997-2000, 2002 Bradley T Hughes\n"
      "Copyright (c) 2001-2002 Sean 'Shaleh' Perry\n\n"
@@ -349,15 +350,13 @@ void bsetroot::usage(int exit_code) {
 int main(int argc, char **argv) {
   char *display_name = (char *) 0;
 
-  NLSInit("openbox.cat");
-  
   for (int i = 1; i < argc; i++) {
     if (! strcmp(argv[i], "-display")) {
       // check for -display option
 
       if ((++i) >= argc) {
-        fprintf(stderr, i18n->getMessage(mainSet, mainDISPLAYRequiresArg,
-                 "error: '-display' requires an argument\n"));
+        fprintf(stderr, i18n(mainSet, mainDISPLAYRequiresArg,
+                             "error: '-display' requires an argument\n"));
 
         ::exit(1);
       }

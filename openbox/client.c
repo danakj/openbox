@@ -1308,16 +1308,21 @@ void client_update_title(ObClient *self)
     GList *it;
     guint32 nums;
     guint i;
-    char *data = NULL;
+    gchar *data = NULL;
     gboolean read_title;
+    gchar *old_title;
 
-    g_free(self->title);
+    old_title = self->title;
      
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data))
 	/* try old x stuff */
 	if (!PROP_GETS(self->window, wm_name, locale, &data))
 	    data = g_strdup("Unnamed Window");
+
+    /* did the title change? then reset the title_count */
+    if (old_title && 0 != strncmp(old_title, data, strlen(data)))
+        self->title_count = 1;
 
     /* look for duplicates and append a number */
     nums = 0;
@@ -1348,6 +1353,8 @@ void client_update_title(ObClient *self)
 
     if (self->frame)
 	frame_adjust_title(self->frame);
+
+    g_free(old_title);
 
     /* update the icon title */
     data = NULL;

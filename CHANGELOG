@@ -9,7 +9,9 @@ Changelog for Openbox:
 
  * Fixes for workspace warping. Window and mouse would  (Ben Jansens)
    move slightly out of sync, as one motion event would
-   get dropped.
+   get dropped. Other windows could also be selected
+   for moving during the warp. Now everything works as
+   expected.
 
 2.0.0:
  * Add an rc option (modiferMask) to allow changing     (Ben Jansens)

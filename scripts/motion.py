@@ -10,7 +10,7 @@ EDGE_RESISTANCE = 10
 """The amount of resistance to provide to moving a window past a screen
    boundary. Specify a value of 0 to disable edge resistance."""
 MOVE_POPUP = 1
-"""Display a coordinates popup when moving windows."
+"""Display a coordinates popup when moving windows."""
 MOVE_RUBBERBAND = 0
 """NOT IMPLEMENTED (yet?)
    Display an outline while moving instead of moving the actual window,

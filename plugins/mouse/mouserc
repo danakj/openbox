@@ -129,6 +129,7 @@ Frame		Click		A-Right	Lower
 Titlebar	Press		Left	Focus
 Handle		Press		Left	Focus
 Client		Press		Left	Focus
+Client		Press		Middle	Focus
 
 Titlebar	DoubleClick	Left	ToggleShade
 Titlebar	Click		Up	Shade

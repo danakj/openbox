@@ -105,6 +105,12 @@ Openbox::Openbox(int argc, char **argv)
 Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
+
+  // unmanage all windows
+  ClientMap::iterator it, end;
+  for (it = _clients.begin(), end = _clients.end(); it != end; ++it) {
+    _xeventhandler.unmanageWindow(it->second);
+  }
   
   // close the X display
   otk::OBDisplay::destroy();

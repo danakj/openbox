@@ -124,7 +124,7 @@ void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 
 
 // XXX: put this into the OBScreen or OBClient class!
-static void manageWindow(int screen, Window window)
+void OBXEventHandler::manageWindow(int screen, Window window)
 {
   OBClient *client = 0;
   XWMHints *wmhint;
@@ -177,7 +177,7 @@ static void manageWindow(int screen, Window window)
 }
 
 // XXX: move this to the OBScreen or OBClient class!
-static void unmanageWindow(OBClient *client)
+void OBXEventHandler::unmanageWindow(OBClient *client)
 {
   OBFrame *frame = client->frame;
 

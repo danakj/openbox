@@ -65,6 +65,8 @@ void OBFrame::resize()
   XResizeWindow(otk::OBDisplay::display, _window,
                 _size.left + _size.right + _client->area().width(),
                 _size.top + _size.bottom + _client->area().height());
+  XMoveWindow(otk::OBDisplay::display, _client->window(),
+              _size.left, _size.top);
   // XXX: more is gunna have to happen here
 }
 

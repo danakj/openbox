@@ -79,8 +79,8 @@ void menu_render_full(Menu *self) {
     self->item_h += ob_rr_theme->bevel * 2;
     items_h = self->item_h * MAX(nitems, 1);
 
-    XResizeWindow(ob_display, self->frame, self->size.width,
-		  MAX(self->title_h + items_h + ob_rr_theme->bwidth, 1));
+    self->size.height = MAX(self->title_h + items_h + ob_rr_theme->bwidth, 1);
+    XResizeWindow(ob_display, self->frame, self->size.width,self->size.height);
     if (self->label)
 	XMoveResizeWindow(ob_display, self->title, -ob_rr_theme->bwidth,
 			  -ob_rr_theme->bwidth,
@@ -101,7 +101,6 @@ void menu_render_full(Menu *self) {
         item_y += self->item_h;
     }
     
-    self->size.height = item_y;
     self->invalid = FALSE;
 }
 
@@ -134,6 +133,7 @@ void menu_entry_render(MenuEntry *self)
          self->a_hilite : self->a_item);
 	break;
     }
+    g_message ("%s %d", self->label, self->hilite);
 
     XMoveResizeWindow(ob_display, self->item, 0, self->y,
                       menu->size.width, menu->item_h);

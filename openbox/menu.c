@@ -2,12 +2,12 @@
 #include "openbox.h"
 #include "stacking.h"
 #include "grab.h"
-#include "render/theme.h"
 #include "screen.h"
 #include "geom.h"
 #include "plugin.h"
 
 GHashTable *menu_hash = NULL;
+GSList *menu_visible = NULL;
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
 			 LeaveWindowMask)
@@ -310,6 +310,16 @@ void menu_show_full(Menu *self, int x, int y, Client *client)
     
     self->client = client;
 
+    if (!self->shown) {
+        GSList *it;
+
+        if (!self->parent) {
+            grab_pointer(TRUE, None);
+            grab_keyboard(TRUE);
+        }
+        menu_visible = g_slist_append(menu_visible, self);
+    }
+
     if (self->show) {
 	self->show(self, x, y, client);
     } else {
@@ -326,6 +336,11 @@ void menu_hide(Menu *self) {
 	if (self->parent && self->parent->open_submenu == self)
 	    self->parent->open_submenu = NULL;
 
+        if (!self->parent) {
+            grab_keyboard(FALSE);
+            grab_pointer(FALSE, None);
+        }
+        menu_visible = g_slist_remove(menu_visible, self);
     }
 }
 
@@ -353,6 +368,18 @@ MenuEntry *menu_find_entry(Menu *menu, Window win)
     return NULL;
 }
 
+MenuEntry *menu_find_entry_by_pos(Menu *menu, int x, int y)
+{
+    if (x < 0 || x >= menu->size.width || y < 0 || y >= menu->size.height)
+        return NULL;
+
+    y -= menu->title_h + ob_rr_theme->bwidth;
+    if (y < 0) return NULL;
+    
+    g_message ("%d %p", y/menu->item_h, g_list_nth_data(menu->entries, y / menu->item_h));
+    return g_list_nth_data(menu->entries, y / menu->item_h);
+}
+
 void menu_entry_fire(MenuEntry *self)
 {
     Menu *m;
@@ -375,12 +402,10 @@ void menu_entry_fire(MenuEntry *self)
 void menu_control_show(Menu *self, int x, int y, Client *client) {
     g_assert(!self->invalid);
     
-    XMoveWindow(ob_display, self->frame, 
-		MIN(x, screen_physical_size.width - self->size.width), 
-		MIN(y, screen_physical_size.height - self->size.height));
     POINT_SET(self->location, 
 	      MIN(x, screen_physical_size.width - self->size.width), 
 	      MIN(y, screen_physical_size.height - self->size.height));
+    XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
 
     if (!self->shown) {
 	XMapWindow(ob_display, self->frame);
@@ -413,9 +438,9 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);
 
-	    if (self->submenu->size.width + x > screen_physical_size.width)
+	    if (self->submenu->size.width + x >= screen_physical_size.width)
 		x = self->parent->location.x - self->submenu->size.width - 
-		    ob_rr_theme->bevel;
+		    ob_rr_theme->bwidth;
 	    
 	    menu_show_full(self->submenu, x,
 			   self->parent->location.y + self->y,

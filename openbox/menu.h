@@ -16,6 +16,7 @@ typedef void(*menu_controller_mouseover)(struct MenuEntry *self,
                                          gboolean enter);
 
 extern GHashTable *menu_hash;
+extern GSList *menu_visible;
 
 typedef struct Menu {
     ObWindow obwin;
@@ -131,6 +132,7 @@ void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu);
 void menu_add_entry(Menu *menu, MenuEntry *entry);
 
 MenuEntry *menu_find_entry(Menu *menu, Window win);
+MenuEntry *menu_find_entry_by_pos(Menu *menu, int x, int y);
 
 void menu_entry_render(MenuEntry *self);
 

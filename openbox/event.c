@@ -41,7 +41,7 @@ static void event_handle_root(XEvent *e);
 static void event_handle_dock(Dock *s, XEvent *e);
 static void event_handle_dockapp(DockApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
-static void event_handle_menu(Menu *menu, Client *c, XEvent *e);
+static void event_handle_menu(Client *c, XEvent *e);
 static void fd_event_handle();
 #ifdef USE_SM
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
@@ -501,10 +501,7 @@ static void event_process(XEvent *e)
         return;
 
     /* deal with it in the kernel */
-    if (menu) {
-        event_handle_menu(menu, client, e);
-        return;
-    } else if (client)
+    if (client)
 	event_handle_client(client, e);
     else if (dockapp)
 	event_handle_dockapp(dockapp, e);
@@ -534,6 +531,15 @@ static void event_process(XEvent *e)
 			 e->xconfigurerequest.value_mask, &xwc);
 	xerror_set_ignore(FALSE);
     }
+
+    if (menu_visible)
+        if (e->type == MotionNotify || e->type == ButtonRelease ||
+            e->type == ButtonPress ||
+            e->type == KeyPress || e->type == KeyRelease) {
+            event_handle_menu(client, e);
+
+            return; /* no dispatch! */
+        }
 
     if (moveresize_in_progress)
         if (e->type == MotionNotify || e->type == ButtonRelease ||
@@ -977,57 +983,110 @@ static void event_handle_client(Client *client, XEvent *e)
     }
 }
 
-static void event_handle_menu(Menu *menu, Client *client, XEvent *e)
+static void event_handle_menu(Client *client, XEvent *e)
 {
+    static MenuEntry *over = NULL;
     MenuEntry *entry;
+    Menu *top;
+    GSList *it;
+
+    top = g_slist_nth_data(menu_visible, 0);
 
     g_message("EVENT %d", e->type);
     switch (e->type) {
-    case ButtonPress:
-	g_message("BUTTON PRESS");
-        if (e->xbutton.button == 3)
-            menu_hide(menu);
-        else if (e->xbutton.button == 1) {
-            entry = menu_find_entry(menu, e->xbutton.window);
-            if (!entry)
-                stacking_raise(MENU_AS_WINDOW(menu));
+    case KeyPress:
+        if (over) {
+            if (over->parent->mouseover)
+                over->parent->mouseover(over, FALSE);
+            else
+                menu_control_mouseover(over, FALSE);
+            menu_entry_render(over);
         }
+/*
+        if (top->hide)
+            top->hide(top);
+        else
+*/
+            menu_hide(top);
+        break;
+    case ButtonPress:
+        if (e->xbutton.button > 3) break;
+
+	g_message("BUTTON PRESS");
         break;
     case ButtonRelease:
+        if (e->xbutton.button > 3) break;
+
 	g_message("BUTTON RELEASED");
-        if (!menu->shown) break;
 
-/*        grab_pointer_window(FALSE, None, menu->frame);*/
-
-        if (e->xbutton.button == 1) {
-            entry = menu_find_entry(menu, e->xbutton.window);
-            if (entry) {
-                int junk;
-                Window wjunk;
-                guint ujunk, b, w, h;
-                XGetGeometry(ob_display, e->xbutton.window,
-                             &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
-                if (e->xbutton.x >= (signed)-b &&
-                    e->xbutton.y >= (signed)-b &&
-                    e->xbutton.x < (signed)(w+b) &&
-                    e->xbutton.y < (signed)(h+b)) {
+        for (it = menu_visible; it; it = g_slist_next(it)) {
+            Menu *m = it->data;
+            if (e->xbutton.x_root >= m->location.x - ob_rr_theme->bwidth &&
+                e->xbutton.y_root >= m->location.y - ob_rr_theme->bwidth &&
+                e->xbutton.x_root < m->location.x + m->size.width +
+                ob_rr_theme->bwidth &&
+                e->xbutton.y_root < m->location.y + m->size.height +
+                ob_rr_theme->bwidth) {
+                if ((entry = menu_find_entry_by_pos(it->data,
+                                                    e->xbutton.x_root -
+                                                    m->location.x,
+                                                    e->xbutton.y_root -
+                                                    m->location.y))) {
                     menu_entry_fire(entry);
                 }
+                break;
             }
+        }
+        if (!it) {
+            if (over) {
+                if (over->parent->mouseover)
+                    over->parent->mouseover(over, FALSE);
+                else
+                    menu_control_mouseover(over, FALSE);
+            }
+            menu_entry_render(over);
+/*
+            if (top->hide)
+                top->hide(top);
+            else
+*/
+                menu_hide(top);
         }
 	
         break;
-    case EnterNotify:
-    case LeaveNotify:
-        g_message("enter/leave");
-        entry = menu_find_entry(menu, e->xcrossing.window);
-        if (entry) {
-            if (menu->mouseover)
-                menu->mouseover(entry, e->type == EnterNotify);
+    case MotionNotify:
+        g_message("motion");
+        for (it = menu_visible; it; it = g_slist_next(it)) {
+            Menu *m = it->data;
+            if ((entry = menu_find_entry_by_pos(it->data,
+                                                e->xmotion.x_root -
+                                                m->location.x,
+                                                e->xmotion.y_root -
+                                                m->location.y))) {
+                if (over && entry != over) {
+                    if (over->parent->mouseover)
+                        over->parent->mouseover(over, FALSE);
+                    else
+                        menu_control_mouseover(over, FALSE);
+                    menu_entry_render(over);
+                }
+
+                over = entry;
+                if (over->parent->mouseover)
+                    over->parent->mouseover(over, TRUE);
+                else
+                    menu_control_mouseover(over, TRUE);
+                menu_entry_render(over);
+                break;
+            }
+        }
+        if (!it && over) {
+            if (over->parent->mouseover)
+                over->parent->mouseover(over, FALSE);
             else
-                menu_control_mouseover(entry, e->type == EnterNotify);
-	    
-            menu_entry_render(entry);
+                menu_control_mouseover(over, FALSE);
+            menu_entry_render(over);
+            over = NULL;
         }
         break;
     }

@@ -93,9 +93,6 @@ public:
   //! Reparents the client window from the root window onto the frame
   void grabClient();
   //! Reparents the client window back to the root window
-  /*!
-    This is not to be called if the client has already reparented itself.
-  */
   void releaseClient();
 
   //! Update the frame's size to match the client

@@ -109,10 +109,4 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 
 AC_MSG_RESULT
-if test "$DEBUG" = "yes"; then
-  AC_MSG_RESULT([Creating a DEBUG build.])
-else
-  AC_MSG_RESULT([Creating a RELEASE build.])
-fi
-AC_MSG_RESULT
 AC_MSG_RESULT([configure complete, now type \"make\"])

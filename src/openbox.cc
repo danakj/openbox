@@ -197,7 +197,6 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   menuTimestamps = new LinkedList<MenuTimestamp>;
 
-  XrmInitialize();
   load_rc();
 
 #ifdef    HAVE_GETPID
@@ -1491,18 +1490,9 @@ void Openbox::reconfigure(void) {
 void Openbox::real_reconfigure(void) {
   grab();
 
-  XrmDatabase new_openboxrc = (XrmDatabase) 0;
-  char style[MAXPATHLEN + 64];
-
-  sprintf(style, "session.styleFile: %s", resource.style_file);
-  XrmPutLineResource(&new_openboxrc, style);
-
-  XrmDatabase old_openboxrc = XrmGetFileDatabase(rc_file);
-
-  XrmMergeDatabases(new_openboxrc, &old_openboxrc);
-  XrmPutFileDatabase(old_openboxrc, rc_file);
-  if (old_openboxrc) XrmDestroyDatabase(old_openboxrc);
-
+  config.load();
+  config.setValue("session.styleFile", resource.style_file);    // autosave's
+  
   for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
     MenuTimestamp *ts = menuTimestamps->remove(0);
 

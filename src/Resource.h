@@ -65,6 +65,7 @@ public:
                 std::string &value) const;
 
 private:
+  static bool m_initialized;
   std::string m_file;
   bool m_modified;
   bool m_autosave;

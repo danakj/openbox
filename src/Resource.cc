@@ -35,17 +35,27 @@
 
 #include <assert.h>
 
+bool obResource::m_initialized = false;
+
 obResource::obResource(const std::string &file) {
   setFile(file);
   m_modified = false;
   m_database = NULL;
   m_autosave = true;
+  if (!m_initialized) {
+    XrmInitialize();
+    m_initialized = true;
+  }
 }
 
 obResource::obResource() {
   m_modified = false;
   m_database = NULL;
   m_autosave = true;
+  if (!m_initialized) {
+    XrmInitialize();
+    m_initialized = true;
+  }
 }
 
 obResource::~obResource() {

@@ -95,7 +95,8 @@ def _do_move():
     x = _cx + _dx
     y = _cy + _dy
 
-    global edge_resistance, _last_x, _last_y
+    global edge_resistance
+    global _last_x, _last_y
     if edge_resistance:
         fs = _client.frame.size()
         w = _client.area().width() + fs.left + fs.right
@@ -119,8 +120,13 @@ def _do_move():
         if _last_y < y and y > b and y <= b + edge_resistance:
             y = b
 
-    _last_x = x
-    _last_y = y
+    global _inmove
+    if not _inmove:
+        _last_x = 0
+        _last_y = 0
+    else:
+        _last_x = x
+        _last_y = y
 
     global move_rubberband
     if move_rubberband:

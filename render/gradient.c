@@ -621,7 +621,59 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
         glEnd();
         break;
     case Background_Pyramid:
-printf("pyramid\n");
+	ar = (pr + sr) / 2.0;
+	ag = (pg + sg) / 2.0;
+	ab = (pb + sb) / 2.0;
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x, y);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(ar, ag, ab);
+        glVertex2i(x, y+h/2);
+
+        glVertex2i(x, y+h/2);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x, y+h);
+
+        glVertex2i(x, y+h);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(ar, ag, ab);
+        glVertex2i(x+w/2, y+h);
+
+        glVertex2i(x+w/2, y+h);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x+w, y+h);
+
+        glVertex2i(x+w, y+h);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(ar, ag, ab);
+        glVertex2i(x+w, y+h/2);
+
+        glVertex2i(x+w, y+h/2);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x+w, y);
+
+        glVertex2i(x+w, y);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(ar, ag, ab);
+        glVertex2i(x+w/2, y);
+
+        glVertex2i(x+w/2, y);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x, y);
+        glEnd();
         break;
     case Background_PipeCross:
         glBegin(GL_TRIANGLES);

@@ -195,7 +195,7 @@ static void do_move(gboolean resist)
     client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
                      moveresize_client->area.width,
                      moveresize_client->area.height, TRUE, FALSE);
-    if (config_resize_popup_show == 2)
+    if (config_resize_popup_show == 2) /* == "Always" */
         popup_coords(moveresize_client, "%d x %d",
                 moveresize_client->frame->area.x,
                 moveresize_client->frame->area.y);
@@ -224,8 +224,8 @@ static void do_resize(gboolean resist)
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */
-    if (config_resize_popup_show == 2 ||
-            (config_resize_popup_show == 1 &&
+    if (config_resize_popup_show == 2 || /* == "Always" */
+            (config_resize_popup_show == 1 && /* == "Nonpixel" */
                 (moveresize_client->size_inc.width > 1 ||
                  moveresize_client->size_inc.height > 1))
         )

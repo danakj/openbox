@@ -158,10 +158,8 @@ Basemenu::~Basemenu(void) {
   if (shown && shown->getWindowID() == getWindowID())
     shown = (Basemenu *) 0;
 
-  while (!menuitems.empty()) {
-    delete menuitems[0];
-    menuitems.erase(menuitems.begin());
-  }
+  while (!menuitems.empty())
+    remove(0);
 
   if (menu.label)
     delete [] menu.label;

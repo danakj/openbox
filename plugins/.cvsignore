@@ -4,3 +4,4 @@ Makefile
 Makefile.in
 .libs
 .deps
+focus_la-focus.lo

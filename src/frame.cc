@@ -77,12 +77,21 @@ void OBFrame::setStyle(otk::Style *style)
   assert(style);
 
   otk::OtkWidget::setStyle(style);
-  // don't let grips change textures when they are pressed
-  _grip_left.setPressedFocusTexture(_grip_left.getTexture());
-  _grip_left.setPressedUnfocusTexture(_grip_left.getUnfocusTexture());
-  _grip_right.setPressedFocusTexture(_grip_right.getTexture());
-  _grip_right.setPressedUnfocusTexture(_grip_right.getUnfocusTexture());
+  // set the grips' textures
+  _grip_left.setTexture(style->getGripFocus());
+  _grip_left.setUnfocusTexture(style->getGripUnfocus());
+  _grip_left.setPressedFocusTexture(style->getGripFocus());
+  _grip_left.setPressedUnfocusTexture(style->getGripUnfocus());
+  _grip_right.setTexture(style->getGripFocus());
+  _grip_right.setUnfocusTexture(style->getGripUnfocus());
+  _grip_right.setPressedFocusTexture(style->getGripFocus());
+  _grip_right.setPressedUnfocusTexture(style->getGripUnfocus());
 
+  _titlebar.setTexture(style->getTitleFocus());
+  _titlebar.setUnfocusTexture(style->getTitleUnfocus());
+  _handle.setTexture(style->getHandleFocus());
+  _handle.setUnfocusTexture(style->getHandleUnfocus());
+  
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
   bool replace = (_style);
@@ -130,8 +139,8 @@ void OBFrame::adjust()
     cbwidth = _style->getFrameWidth();
   } else
     bwidth = cbwidth = 0;
-  _size.left = _size.top = _size.bottom = _size.right = bwidth + cbwidth;
-  width = _client->area().width() + (bwidth + cbwidth) * 2;
+  _size.left = _size.top = _size.bottom = _size.right = cbwidth;
+  width = _client->area().width() + cbwidth * 2;
 
   XSetWindowBorderWidth(otk::OBDisplay::display, _plate.getWindow(), cbwidth);
 
@@ -186,9 +195,8 @@ void OBFrame::adjust()
     // that the ONE LABEL!!
     // adds an extra sep so that there's a space on either side of the
     // titlebar.. note: x = sep, below.
-    _label.setWidth(_label.width() -
-                    ((_button_iconify.width() + sep) *
-                     (layout.size() - 1) + sep * 2));
+    _label.setWidth(width - sep * 2 - 
+                    (_button_iconify.width() + sep) * (layout.size() - 1));
 
     int x = sep;
     for (int i = 0, len = layout.size(); i < len; ++i) {
@@ -222,8 +230,7 @@ void OBFrame::adjust()
 
   if (_decorations & OBClient::Decor_Handle) {
     _handle.setGeometry(-bwidth,
-                        _size.top + _client->area().height() +
-                        _style->getFrameWidth(),
+                        _size.top + _client->area().height() + cbwidth,
                         width, _style->getHandleWidth());
     _grip_left.setGeometry(-bwidth,
                            -bwidth,

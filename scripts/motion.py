@@ -135,7 +135,7 @@ def _do_move():
         f=0
     else:
         print "moving " + str(x) + " " + str(y)
-        _client.move(x, y, 1) # move the frame to the position
+        _client.move(x, y, 1) # move the *frame*
 
     global move_popup
     if move_popup:

@@ -322,10 +322,7 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
     wkspc->stackingList.push_back(win);
   }
 
-  XLowerWindow(screen->getBaseDisplay()->getXDisplay(), stack_vector.front());
-  XRestackWindows(screen->getBaseDisplay()->getXDisplay(),
-                  &stack_vector[0], stack_vector.size());
-  screen->lowerDesktops();
+  screen->lowerWindows(&stack_vector[0], stack_vector.size());
 }
 
 

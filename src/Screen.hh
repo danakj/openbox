@@ -326,7 +326,7 @@ public:
   void manageWindow(Window w);
   void unmanageWindow(BlackboxWindow *w, bool remap);
   void raiseWindows(Window *workspace_stack, unsigned int num);
-  void lowerDesktops(void);
+  void lowerWindows(Window *workspace_stack, unsigned int num);
   void reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
                          bool ignore_sticky);
   void propagateWindowName(const BlackboxWindow *bw);

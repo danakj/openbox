@@ -1380,13 +1380,27 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 }
 
 
-void BScreen::lowerDesktops(void) {
-  if (desktopWindowList.empty()) return;
+void BScreen::lowerWindows(Window *workspace_stack, unsigned int num) {
+  assert(num > 0);  // this would cause trouble in the XRaiseWindow call
 
-  XLowerWindow(blackbox->getXDisplay(), desktopWindowList[0]);
-  if (desktopWindowList.size() > 1)
-    XRestackWindows(blackbox->getXDisplay(), &desktopWindowList[0],
-                    desktopWindowList.size());
+  Window *session_stack = new Window[(num + desktopWindowList.size())];
+  unsigned int i = 0, k = num;
+
+  XLowerWindow(blackbox->getXDisplay(), workspace_stack[0]);
+
+  while (k--)
+    *(session_stack + i++) = *(workspace_stack + k);
+
+  WindowList::iterator dit = desktopWindowList.begin();
+  const WindowList::iterator d_end = desktopWindowList.end();
+  for (; dit != d_end; ++dit)
+    *(session_stack + i++) = *dit;
+
+  XRestackWindows(blackbox->getXDisplay(), session_stack, i);
+
+  delete [] session_stack;
+
+  updateStackingList();
 }
 
 

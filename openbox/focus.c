@@ -122,7 +122,8 @@ static gboolean focus_under_pointer()
     return FALSE;
 }
 
-/* finds the first transient that isn't 'skip' */
+/* finds the first transient that isn't 'skip' and ensure's that client_normal
+ is true for it */
 static Client *find_transient_recursive(Client *c, Client *top, Client *skip)
 {
     GSList *it;
@@ -132,11 +133,23 @@ static Client *find_transient_recursive(Client *c, Client *top, Client *skip)
         g_message("looking");
         if (it->data == top) return NULL;
         ret = find_transient_recursive(it->data, top, skip);
-        if (ret && ret != skip) return ret;
-        if (it->data != skip) return it->data;
+        if (ret && ret != skip && client_normal(ret)) return ret;
+        if (it->data != skip && client_normal(it->data)) return it->data;
         g_message("not found");
     }
     return NULL;
+}
+
+static gboolean focus_fallback_transient(Client *top, Client *old)
+{
+    Client *target = find_transient_recursive(top, top, old);
+    if (!target) {
+        /* make sure client_normal is true always */
+        if (!client_normal(top))
+            return FALSE;
+        target = top; /* no transient, keep the top */
+    }
+    return client_focus(target);
 }
 
 void focus_fallback(FallbackType type)
@@ -158,30 +171,33 @@ void focus_fallback(FallbackType type)
         return;
     }
 
-    if (type == Fallback_Unfocusing && old && old->transient_for) {
-        Client *c = NULL;
+    if (type == Fallback_Unfocusing && old) {
+        /* try for transient relations */
+        if (old->transient_for) {
+            if (old->transient_for == TRAN_GROUP) {
+                for (it = focus_order[screen_desktop]; it; it = it->next) {
+                    GSList *sit;
 
-        if (old->transient_for == TRAN_GROUP) {
-            for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
-                GSList *sit;
-
-                for (sit = old->group->members; sit; sit = sit->next)
-                    if (sit->data == it->data && client_normal(sit->data) &&
-                        client_focusable(sit->data)) {
-                        c = sit->data;
-                        break;
-                    }
+                    for (sit = old->group->members; sit; sit = sit->next)
+                        if (sit->data == it->data)
+                            if (focus_fallback_transient(sit->data, old))
+                                return;
+                }
+            } else {
+                if (focus_fallback_transient(old->transient_for, old))
+                    return;
             }
-        } else {
-            if (client_normal(old->transient_for))
-                c = old->transient_for;
         }
 
-        if (c) {
-            Client *t = find_transient_recursive(c, c, old);
-            if (!t) t = c; /* no transient, keep the top */
-            if (client_focus(t))
-                return;
+        /* try for group relations */
+        if (old->group) {
+            GSList *sit;
+
+            for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
+                for (sit = old->group->members; sit; sit = sit->next)
+                    if (sit->data == it->data)
+                        if (sit->data != old && client_focus(sit->data))
+                            return;
         }
     }
 

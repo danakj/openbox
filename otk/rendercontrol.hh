@@ -68,6 +68,8 @@ public:
   //! Draws a PixmapMask with a specified color onto a Surface
   virtual void drawMask(Surface &sf, const RenderColor &color,
                         const PixmapMask &mask) const;
+
+  virtual void allocateColor(XColor *color) const = 0;
 };
 
 }

@@ -93,9 +93,8 @@ int tr, tg, tb;
       _colors[i].pixel = icolors[close].pixel;
 
       // try alloc this closest color, it had better succeed!
-      if (XAllocColor(**display, info->colormap(), &_colors[i])) {
+      if (XAllocColor(**display, info->colormap(), &_colors[i]))
         _colors[i].flags = DoRed|DoGreen|DoBlue; // mark as alloced
-      }
       else
         assert(false); // wtf has gone wrong, its already alloced for chissake!
     }
@@ -133,6 +132,46 @@ void PseudoRenderControl::reduceDepth(Surface &sf, XImage *im) const
       p += im->bytes_per_line;
     }
 
+}
+
+void PseudoRenderControl::allocateColor(XColor *color) const
+{
+  const ScreenInfo *info = display->screenInfo(_screen);
+  int depth = info->depth();
+
+  // get the allocated values from the X server (only the first 256 XXX why!?)
+  XColor icolors[256];
+  int incolors = (((1 << depth) > 256) ? 256 : (1 << depth));
+  for (int i = 0; i < incolors; i++)
+    icolors[i].pixel = i;
+  XQueryColors(**display, info->colormap(), icolors, incolors);
+
+  unsigned long closest = 0xffffffff, close = 0;
+  for (int ii = 0; ii < incolors; ii++) {
+    // find deviations
+    int r = (color->red - icolors[ii].red) & 0xff;
+    int g = (color->green - icolors[ii].green) & 0xff;
+    int b = (color->blue - icolors[ii].blue) & 0xff;
+    // find a weighted absolute deviation
+    unsigned long dev = (r * r) + (g * g) + (b * b);
+
+    if (dev < closest) {
+      closest = dev;
+      close = ii;
+    }
+  }
+
+  color->red = icolors[close].red;
+  color->green = icolors[close].green;
+  color->blue = icolors[close].blue;
+  color->pixel = icolors[close].pixel;
+
+  // try alloc this closest color, it had better succeed!
+  if (XAllocColor(**display, info->colormap(), color)) {
+    color->flags = DoRed|DoGreen|DoBlue; // mark as alloced
+  }
+  else
+    assert(false); // wtf has gone wrong, its already alloced for chissake!
 }
 
 }

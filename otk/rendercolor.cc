@@ -5,6 +5,7 @@
 #include "rendercolor.hh"
 #include "display.hh"
 #include "screeninfo.hh"
+#include "rendercontrol.hh"
 
 #include <cstdio>
 
@@ -64,14 +65,9 @@ void RenderColor::create() const
     xcol.red = (_red << 8) | _red;
     xcol.green = (_green << 8) | _green;
     xcol.blue = (_blue << 8) | _blue;
-    xcol.pixel = 0;
 
-    if (!XAllocColor(**display, info->colormap(), &xcol)) {
-      fprintf(stderr, "RenderColor: color alloc error: rgb:%x/%x/%x\n",
-	      _red, _green, _blue);
-      xcol.pixel = 0;
-    } else
-      _allocated = true;
+    display->renderControl(_screen)->allocateColor(&xcol);
+    _allocated = true;
 
     _pixel = xcol.pixel;
     gcv.foreground = _pixel;

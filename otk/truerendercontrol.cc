@@ -99,4 +99,14 @@ void TrueRenderControl::reduceDepth(Surface &sf, XImage *im) const
   }
 }
 
+void TrueRenderControl::allocateColor(XColor *color) const
+{
+  const ScreenInfo *info = display->screenInfo(_screen);
+  if (!XAllocColor(**display, info->colormap(), color)) {
+    fprintf(stderr, "TrueRenderControl: color alloc error: rgb:%x/%x/%x\n",
+            color->red & 0xff, color->green & 0xff, color->blue & 0xff);
+    color->pixel = 0;
+  }
+}
+
 }

@@ -18,6 +18,7 @@ public:
   PseudoRenderControl(int screen);
   virtual ~PseudoRenderControl();
 
+  virtual void allocateColor(XColor *color) const;
 };
 
 }

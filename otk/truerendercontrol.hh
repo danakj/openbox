@@ -26,6 +26,8 @@ private:
 public:
   TrueRenderControl(int screen);
   virtual ~TrueRenderControl();
+
+  virtual void allocateColor(XColor *color) const;
 };
 
 }

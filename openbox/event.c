@@ -250,8 +250,6 @@ void event_process(XEvent *e)
     case EnterNotify:
     case LeaveNotify:
 	event_lasttime = e->xcrossing.time;
-	if (e->xcrossing.mode != NotifyNormal)
-	    return; /* skip me! */
 	break;
     }
 

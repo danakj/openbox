@@ -584,20 +584,20 @@ static void menu_frame_update(ObMenuFrame *self)
     menu_frame_render(self);
 }
 
-void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
+gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
 {
     GList *it;
 
     if (g_list_find(menu_frame_visible, self))
-        return;
+        return TRUE;
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
         if (!grab_pointer(TRUE, OB_CURSOR_NONE))
-            return;
+            return FALSE;
         if (!grab_keyboard(TRUE)) {
             grab_pointer(FALSE, OB_CURSOR_NONE);
-            return;
+            return FALSE;
         }
     }
 
@@ -626,6 +626,8 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
     menu_frame_move_on_screen(self);
 
     XMapWindow(ob_display, self->window);
+
+    return TRUE;
 }
 
 void menu_frame_hide(ObMenuFrame *self)

@@ -103,7 +103,7 @@ void menu_frame_free(ObMenuFrame *self);
 void menu_frame_move(ObMenuFrame *self, gint x, gint y);
 void menu_frame_move_on_screen(ObMenuFrame *self);
 
-void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent);
+gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent);
 void menu_frame_hide(ObMenuFrame *self);
 
 void menu_frame_hide_all();

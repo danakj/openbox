@@ -287,6 +287,14 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
 
     if (!(self = menu_from_name(name))) return;
 
+    /* if the requested menu is already the top visible menu, then don't
+       bother */
+    if (menu_frame_visible) {
+        frame = menu_frame_visible->data;
+        if (frame->menu == self)
+            return;
+    }
+
     menu_frame_hide_all();
 
     frame = menu_frame_new(self, client);
@@ -297,9 +305,12 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     else
         menu_frame_move(frame,
                         x - ob_rr_theme->bwidth, y - ob_rr_theme->bwidth);
-    menu_frame_show(frame, NULL);
-    if (frame->entries)
-        menu_frame_select_next(frame);
+    if (!menu_frame_show(frame, NULL)) {
+        menu_frame_free(frame);
+    } else {
+        if (frame->entries)
+            menu_frame_select_next(frame);
+    }
 }
 
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)

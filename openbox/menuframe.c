@@ -597,8 +597,9 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
             self->menu->update_func(self, self->menu->data);
     }
 
-    menu_frame_visible = g_list_prepend(menu_frame_visible, self);
     menu_frame_update(self);
+
+    menu_frame_visible = g_list_prepend(menu_frame_visible, self);
 
     menu_frame_move_on_screen(self);
 

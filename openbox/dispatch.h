@@ -15,7 +15,7 @@ typedef enum {
     Event_X_ButtonPress   = 1 << 4, /* mouse button pressed */
     Event_X_ButtonRelease = 1 << 5, /* mouse button released */
     Event_X_MotionNotify  = 1 << 6, /* mouse motion */
-    Event_X_Bell          = 1 << 7, /* an XKB bell event
+    Event_X_Bell          = 1 << 7, /* an XKB bell event */
 
     Event_Client_New      = 1 << 8, /* new window, before mapping */
     Event_Client_Mapped   = 1 << 9, /* new window, after mapping */

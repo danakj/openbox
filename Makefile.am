@@ -426,6 +426,9 @@ dist_bbstyle_theme_DATA = \
 dist_rc_DATA = \
 	data/rc3
 
+dist_desktopfiles_DATA = \
+	data/openbox.desktop
+
 EXTRA_DIST = \
 	config.rpath \
 	mkinstalldirs \

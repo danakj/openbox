@@ -2,6 +2,11 @@
 #ifndef   __xeventhandler_hh
 #define   __xeventhandler_hh
 
+/*! @file xeventhandler.hh
+  @brief The class which handles raw XEvents, turning them into high-level
+         user interaction sequences, or processing them as appropriate
+*/
+
 extern "C" {
 #include <X11/Xlib.h>
 }

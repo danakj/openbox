@@ -1,5 +1,9 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
 
+/*! @file main.cc
+  @brief Main entry point for the application
+*/
+
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
 #endif // HAVE_CONFIG_H

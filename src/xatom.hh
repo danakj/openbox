@@ -2,6 +2,10 @@
 #ifndef   __XAtom_h
 #define   __XAtom_h
 
+/*! @file xatom.hh
+  @brief Provides access to atoms on the display
+*/
+
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>

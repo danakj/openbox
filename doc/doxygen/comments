@@ -1,0 +1,14 @@
+// Further comments for doxygen on the src/ directory
+
+/*! @namespace ob
+  @brief The namespace containing the %Openbox window manager application
+*/
+
+/*! @namespace otk
+  @brief The namespace containing the Openbox toolkit
+*/
+/*! @namespace otk
+  The namespace containing a toolkit used by the Openbox window manager,
+  and also for use by external applications that wish to present a similar
+  visual appearance to Openbox.
+*/

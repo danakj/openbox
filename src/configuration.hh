@@ -2,8 +2,16 @@
 #ifndef   __Configuration_hh
 #define   __Configuration_hh
 
+/*! @file configuration.hh
+  @brief Loads, saves, and provides configuration options for the window
+         manager
+*/
+
+extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+}
+
 #include <string>
 
 namespace ob {

@@ -2,6 +2,10 @@
 #ifndef   __openbox_hh
 #define   __openbox_hh
 
+/*! @file openbox.hh
+  @brief The main class for the Openbox window manager
+*/
+
 extern "C" {
 #include <X11/Xlib.h>
 }
@@ -37,12 +41,9 @@ public:
 
   //! The posible running states of the window manager
   enum RunState {
-    //! The window manager is starting up (being created)
-    State_Starting,
-    //! The window manager is running in its normal state
-    State_Normal,
-    //! The window manager is exiting (being destroyed)
-    State_Exiting
+    State_Starting, //!< The window manager is starting up (being created)
+    State_Normal,   //!< The window manager is running in its normal state
+    State_Exiting   //!< The window manager is exiting (being destroyed)
   };
   
 private:

@@ -59,7 +59,7 @@ void sn_startup(gboolean reconfig)
     sn_context = sn_monitor_context_new(sn_display, ob_screen,
                                         sn_event_func, NULL, NULL);
 
-    ob_main_loop_x_add(ob_main_loop, sn_handler, NULL, NULL, NULL);
+    ob_main_loop_x_add(ob_main_loop, sn_handler, NULL, NULL);
 }
 
 void sn_shutdown(gboolean reconfig)

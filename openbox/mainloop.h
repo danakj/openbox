@@ -28,11 +28,9 @@ ObMainLoop *ob_main_loop_new(Display *display);
 void        ob_main_loop_destroy(ObMainLoop *loop);
 
 typedef void (*ObMainLoopXHandler) (const XEvent *e, gpointer data);
-typedef void (*ObMainLoopXDoneHandler) (gpointer data);
 
 void ob_main_loop_x_add(ObMainLoop *loop,
                         ObMainLoopXHandler handler,
-                        ObMainLoopXDoneHandler done_handler,
                         gpointer data,
                         GDestroyNotify notify);
 void ob_main_loop_x_remove(ObMainLoop *loop,

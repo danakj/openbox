@@ -338,7 +338,7 @@ def pixelsize(data):
                 valid = False
 
 def warn_missing(data):
-    need = ('window.button.hover.focus',  'window.button.hover.unfocus',
+    need = ('window.active.button.hover',  'window.inactive.button.hover',
             'menu.overlap')
     for n in need:
         i, nul, nul = find_key(data, n)

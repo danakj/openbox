@@ -3119,12 +3119,8 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
     return;
 
   endMove();
+
   bool focus = flags.focused; // had focus while moving?
-  if (! flags.stuck)
-    screen->reassociateWindow(this, dest, False);
-  screen->changeWorkspaceID(dest);
-  if (focus)
-    setInputFocus();
 
   int dest_x = x_root;
   if (x_root <= 0) {
@@ -3136,19 +3132,25 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
   }
 
   /*
-     We grab the X server here because we are moving the window and then the
-     mouse cursor. When one moves, it could end up putting the mouse cursor
-     over another window for a moment. This can cause the warp to iniate a
-     move on another window.
+     We grab the X server here so that we dont end up magically grabbing
+     a different window dring the warp.
   */
   XGrabServer(blackbox->getXDisplay());
 
+  if (! flags.stuck)
+    screen->reassociateWindow(this, dest, False);
+  screen->changeWorkspaceID(dest);
+
   configure(dx, dy, frame.rect.width(), frame.rect.height());
+
   XWarpPointer(blackbox->getXDisplay(), None, 
                screen->getRootWindow(), 0, 0, 0, 0,
                dest_x, y_root);
 
   XUngrabServer(blackbox->getXDisplay());
+
+  if (focus)
+    setInputFocus();
 
   beginMove(dest_x, y_root);
 }

@@ -85,11 +85,18 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
 
   stackingList.push_front(w);
 
-  if (w->isNormal()) {
+  if (! sticky)
+    w->setWorkspace(id);
+  
+  if (! w->isNormal()) {
     if (! sticky) {
-      w->setWorkspace(id);
-      w->setWindowNumber(windowList.size());
+      // just give it some number, else bad things happen as it is assumed to
+      // not be on a workspace
+      w->setWindowNumber(0);
     }
+  } else {
+    if (! sticky)
+      w->setWindowNumber(windowList.size());
 
     windowList.push_back(w);
 
@@ -110,11 +117,6 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
         lastfocus = w;
       }
     }
-  } else {
-    w->setWorkspace(id);
-    // just give it some number, else bad things happen as it is assumed to not
-    // be on a workspace
-    w->setWindowNumber(0);
   }
 
   if (! w->isDesktop())

@@ -10,7 +10,7 @@ GList *session_saved_state;
 void session_load(char *path) {}
 void session_startup(int argc, char **argv) {}
 void session_shutdown() {}
-ObSessionState* session_state_find(ObClient *c) { return NULL; }
+GList* session_state_find(ObClient *c) { return NULL; }
 gboolean session_state_cmp(ObSessionState *s, struct _ObClient *c)
 { return FALSE; }
 void session_state_free(ObSessionState *state) {}

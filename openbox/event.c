@@ -806,7 +806,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 int fh = h +
                     client->frame->size.top + client->frame->size.bottom;
                 client_find_onscreen(client, &newx, &newy, fw, fh,
-                                     client_normal(self));
+                                     client_normal(client));
                 if (e->xconfigurerequest.value_mask & CWX)
                     x = newx;
                 if (e->xconfigurerequest.value_mask & CWY)
@@ -1010,7 +1010,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 int fh = h +
                     client->frame->size.top + client->frame->size.bottom;
                 client_find_onscreen(client, &newx, &newy, fw, fh,
-                                     client_normal(self));
+                                     client_normal(client));
                 if (e->xclient.data.l[0] & 1 << 8)
                     x = newx;
                 if (e->xclient.data.l[0] & 1 << 9)

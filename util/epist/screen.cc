@@ -554,9 +554,9 @@ void screen::updateActiveWindow() {
       _clients.remove(win);
       _clients.push_front(win);
       _active = _clients.begin();
-    }
 
-    _last_active = _active;
+      _last_active = _active;
+    }
   }
 
   /*  cout << "Active window is now: ";

@@ -8,6 +8,12 @@
 #include "display.hh"
 #include "screeninfo.hh"
 
+extern "C" {
+#ifdef HAVE_STDIO_H
+#  include <stdio.h>
+#endif
+}
+
 namespace otk {
 
 std::map<unsigned long, RenderColor::CacheItem*> *RenderColor::_cache = 0;

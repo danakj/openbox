@@ -8,9 +8,10 @@ import historyplacement # history window placement
 # try focus something when nothing is focused
 focus.fallback = 1
 
-# set up the mouse buttons
+# choose a default focus model
 focusmodel.setup_click_focus() # use focusmodel.setup_sloppy_focus() instead to
                                # make focus follow the cursor
+# set up the mouse buttons
 behavior.setup_window_clicks()
 behavior.setup_window_buttons()
 behavior.setup_scroll()

@@ -32,6 +32,8 @@ $ #SmartCols
 # Smart Placement (Columns)
 $ #Cascade
 # Cascade Placement
+$ #UnderMouse
+# Under Mouse Placement
 $ #LeftRight
 # Left to Right
 $ #RightLeft

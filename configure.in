@@ -179,6 +179,7 @@ fi
 
 if test x$NLS = "xyes"; then
   AC_DEFINE(NLS,1,Include natural language support)
+  AC_SUBST(NLS)
 fi
 
 dnl Check for new timed pixmap cache

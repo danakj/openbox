@@ -340,7 +340,7 @@ void bsetroot::usage(int exit_code) {
 int main(int argc, char **argv) {
   char *display_name = (char *) 0;
 
-  i18n.openCatalog("blackbox.cat");
+  i18n.openCatalog("openbox.cat");
 
   for (int i = 1; i < argc; i++) {
     if (! strcmp(argv[i], "-display")) {

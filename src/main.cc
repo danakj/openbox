@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
   char *rc_file = (char *) 0;
   char *menu_file = (char *) 0;
 
-  i18n.openCatalog("blackbox.cat");
+  i18n.openCatalog("openbox.cat");
 
   for (int i = 1; i < argc; ++i) {
     if (! strcmp(argv[i], "-rc")) {

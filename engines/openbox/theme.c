@@ -95,7 +95,7 @@ gboolean read_string(XrmDatabase db, char *rname, char **value)
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {
-	*value = retvalue.addr;
+	*value = g_strdup(retvalue.addr);
 	ret = TRUE;
     }
 

@@ -862,13 +862,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    switch (e->xconfigurerequest.detail) {
 	    case Below:
 	    case BottomIf:
-            action_run_string("Lower", client);
+            client_lower(client);
             break;
 
 	    case Above:
 	    case TopIf:
 	    default:
-            action_run_string("Raise", client);
+            client_raise(client);
             break;
 	    }
 	}
@@ -904,73 +904,64 @@ static void event_handle_client(ObClient *client, XEvent *e)
         ob_debug("MapRequest for 0x%lx\n", client->window);
         if (!client->iconic) break; /* this normally doesn't happen, but if it
                                        does, we don't want it! */
-        if (screen_showing_desktop)
-            screen_show_desktop(FALSE);
-        client_iconify(client, FALSE, TRUE);
-        if (!client->frame->visible)
-            /* if its not visible still, then don't mess with it */
-            break;
-        if (client->shaded)
-            client_shade(client, FALSE);
-        client_focus(client);
-        stacking_raise(CLIENT_AS_WINDOW(client));
-	break;
+        client_activate(client, FALSE);
+        break;
     case ClientMessage:
-	/* validate cuz we query stuff off the client here */
-	if (!client_validate(client)) break;
-  
-	if (e->xclient.format != 32) return;
+        /* validate cuz we query stuff off the client here */
+        if (!client_validate(client)) break;
 
-	msgtype = e->xclient.message_type;
-	if (msgtype == prop_atoms.wm_change_state) {
-	    /* compress changes into a single change */
-	    while (XCheckTypedWindowEvent(ob_display, client->window,
-					  e->type, &ce)) {
-		/* XXX: it would be nice to compress ALL messages of a
-		   type, not just messages in a row without other
-		   message types between. */
-		if (ce.xclient.message_type != msgtype) {
-		    XPutBackEvent(ob_display, &ce);
-		    break;
-		}
-		e->xclient = ce.xclient;
-	    }
-	    client_set_wm_state(client, e->xclient.data.l[0]);
-	} else if (msgtype == prop_atoms.net_wm_desktop) {
-	    /* compress changes into a single change */
-	    while (XCheckTypedWindowEvent(ob_display, client->window,
-					  e->type, &ce)) {
-		/* XXX: it would be nice to compress ALL messages of a
-		   type, not just messages in a row without other
-		   message types between. */
-		if (ce.xclient.message_type != msgtype) {
-		    XPutBackEvent(ob_display, &ce);
-		    break;
-		}
-		e->xclient = ce.xclient;
-	    }
+        if (e->xclient.format != 32) return;
+
+        msgtype = e->xclient.message_type;
+        if (msgtype == prop_atoms.wm_change_state) {
+            /* compress changes into a single change */
+            while (XCheckTypedWindowEvent(ob_display, client->window,
+                                          e->type, &ce)) {
+                /* XXX: it would be nice to compress ALL messages of a
+                   type, not just messages in a row without other
+                   message types between. */
+                if (ce.xclient.message_type != msgtype) {
+                    XPutBackEvent(ob_display, &ce);
+                    break;
+                }
+                e->xclient = ce.xclient;
+            }
+            client_set_wm_state(client, e->xclient.data.l[0]);
+        } else if (msgtype == prop_atoms.net_wm_desktop) {
+            /* compress changes into a single change */
+            while (XCheckTypedWindowEvent(ob_display, client->window,
+                                          e->type, &ce)) {
+                /* XXX: it would be nice to compress ALL messages of a
+                   type, not just messages in a row without other
+                   message types between. */
+                if (ce.xclient.message_type != msgtype) {
+                    XPutBackEvent(ob_display, &ce);
+                    break;
+                }
+                e->xclient = ce.xclient;
+            }
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
                                    FALSE);
-	} else if (msgtype == prop_atoms.net_wm_state) {
-	    /* can't compress these */
-	    ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",
+        } else if (msgtype == prop_atoms.net_wm_state) {
+            /* can't compress these */
+            ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",
                      (e->xclient.data.l[0] == 0 ? "Remove" :
                       e->xclient.data.l[0] == 1 ? "Add" :
                       e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
                      e->xclient.data.l[1], e->xclient.data.l[2],
                      client->window);
-	    client_set_state(client, e->xclient.data.l[0],
-			     e->xclient.data.l[1], e->xclient.data.l[2]);
-	} else if (msgtype == prop_atoms.net_close_window) {
-	    ob_debug("net_close_window for 0x%lx\n", client->window);
-	    client_close(client);
-	} else if (msgtype == prop_atoms.net_active_window) {
-	    ob_debug("net_active_window for 0x%lx\n", client->window);
+            client_set_state(client, e->xclient.data.l[0],
+                             e->xclient.data.l[1], e->xclient.data.l[2]);
+        } else if (msgtype == prop_atoms.net_close_window) {
+            ob_debug("net_close_window for 0x%lx\n", client->window);
+            client_close(client);
+        } else if (msgtype == prop_atoms.net_active_window) {
+            ob_debug("net_active_window for 0x%lx\n", client->window);
             client_activate(client, FALSE);
-	} else if (msgtype == prop_atoms.net_wm_moveresize) {
-	    ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
+        } else if (msgtype == prop_atoms.net_wm_moveresize) {
+            ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
             if ((Atom)e->xclient.data.l[2] ==
                 prop_atoms.net_wm_moveresize_size_topleft ||
                 (Atom)e->xclient.data.l[2] ==
@@ -1047,18 +1038,18 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client->gravity = oldg;
         }
-	break;
+        break;
     case PropertyNotify:
-	/* validate cuz we query stuff off the client here */
-	if (!client_validate(client)) break;
+        /* validate cuz we query stuff off the client here */
+        if (!client_validate(client)) break;
   
-	/* compress changes to a single property into a single change */
-	while (XCheckTypedWindowEvent(ob_display, client->window,
-				      e->type, &ce)) {
+        /* compress changes to a single property into a single change */
+        while (XCheckTypedWindowEvent(ob_display, client->window,
+                                      e->type, &ce)) {
             Atom a, b;
 
             /* XXX: it would be nice to compress ALL changes to a property,
-	       not just changes in a row without other props between. */
+               not just changes in a row without other props between. */
 
             a = ce.xproperty.atom;
             b = e->xproperty.atom;
@@ -1085,38 +1076,38 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             XPutBackEvent(ob_display, &ce);
             break;
-	}
+        }
 
-	msgtype = e->xproperty.atom;
-	if (msgtype == XA_WM_NORMAL_HINTS) {
-	    client_update_normal_hints(client);
-	    /* normal hints can make a window non-resizable */
-	    client_setup_decor_and_functions(client);
-	} else if (msgtype == XA_WM_HINTS) {
-	    client_update_wmhints(client);
-	} else if (msgtype == XA_WM_TRANSIENT_FOR) {
-	    client_update_transient_for(client);
-	    client_get_type(client);
-	    /* type may have changed, so update the layer */
-	    client_calc_layer(client);
-	    client_setup_decor_and_functions(client);
-	} else if (msgtype == prop_atoms.net_wm_name ||
+        msgtype = e->xproperty.atom;
+        if (msgtype == XA_WM_NORMAL_HINTS) {
+            client_update_normal_hints(client);
+            /* normal hints can make a window non-resizable */
+            client_setup_decor_and_functions(client);
+        } else if (msgtype == XA_WM_HINTS) {
+            client_update_wmhints(client);
+        } else if (msgtype == XA_WM_TRANSIENT_FOR) {
+            client_update_transient_for(client);
+            client_get_type(client);
+            /* type may have changed, so update the layer */
+            client_calc_layer(client);
+            client_setup_decor_and_functions(client);
+        } else if (msgtype == prop_atoms.net_wm_name ||
                    msgtype == prop_atoms.wm_name ||
                    msgtype == prop_atoms.net_wm_icon_name ||
                    msgtype == prop_atoms.wm_icon_name) {
-	    client_update_title(client);
-	} else if (msgtype == prop_atoms.wm_class) {
-	    client_update_class(client);
+            client_update_title(client);
+        } else if (msgtype == prop_atoms.wm_class) {
+            client_update_class(client);
         } else if (msgtype == prop_atoms.wm_protocols) {
-	    client_update_protocols(client);
-	    client_setup_decor_and_functions(client);
-	}
-	else if (msgtype == prop_atoms.net_wm_strut) {
-	    client_update_strut(client);
+            client_update_protocols(client);
+            client_setup_decor_and_functions(client);
         }
-	else if (msgtype == prop_atoms.net_wm_icon ||
+        else if (msgtype == prop_atoms.net_wm_strut) {
+            client_update_strut(client);
+        }
+        else if (msgtype == prop_atoms.net_wm_icon ||
                  msgtype == prop_atoms.kwm_win_icon) {
-	    client_update_icons(client);
+            client_update_icons(client);
         }
         else if (msgtype == prop_atoms.sm_client_id) {
             client_update_sm_client_id(client);
@@ -1154,18 +1145,18 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
         dock_app_drag(app, &e->xmotion);
         break;
     case UnmapNotify:
-	if (app->ignore_unmaps) {
-	    app->ignore_unmaps--;
-	    break;
-	}
-	dock_remove(app, TRUE);
-	break;
+        if (app->ignore_unmaps) {
+            app->ignore_unmaps--;
+            break;
+        }
+        dock_remove(app, TRUE);
+        break;
     case DestroyNotify:
-	dock_remove(app, FALSE);
-	break;
+        dock_remove(app, FALSE);
+        break;
     case ReparentNotify:
-	dock_remove(app, FALSE);
-	break;
+        dock_remove(app, FALSE);
+        break;
     case ConfigureNotify:
         dock_app_configure(app, e->xconfigure.width, e->xconfigure.height);
         break;
@@ -1257,7 +1248,7 @@ static gboolean focus_delay_func(gpointer data)
 
     client_focus(c);
     if (config_focus_raise)
-        stacking_raise(CLIENT_AS_WINDOW(c));
+        client_raise(c);
     return FALSE; /* no repeat */
 }
 

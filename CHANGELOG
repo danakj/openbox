@@ -23,7 +23,7 @@ Changelog for Openbox:
    such as bbkeys.                                      (Sean Perry)
 
  * fix bug when removing and then readding a titlebar
-   button witout restarted (by reconfiguring).          (Ben Jansens)
+   button without restarting (by reconfiguring).        (Ben Jansens)
 
  * more focus code changes. also fixes a segfault from
    last round of focus changes.                         (Ben Jansens)

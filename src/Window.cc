@@ -316,9 +316,8 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   // get sticky state from our parent window if we've got one
   if (isTransient() && client.transient_for != (BlackboxWindow *) ~0ul &&
       client.transient_for->isStuck() != flags.stuck)
-    stick();
+    flags.stuck = True;
 
-  // the following flags are set by blackbox native apps only
   if (flags.shaded) {
     flags.shaded = False;
     initial_state = current_state;
@@ -1941,6 +1940,10 @@ void BlackboxWindow::stick(void) {
     blackbox_attrib.attrib ^= AttribOmnipresent;
 
     flags.stuck = False;
+    
+    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
+      if (i != blackbox_attrib.workspace)
+        screen->getWorkspace(i)->removeWindow(this, True);
 
     if (! flags.iconic)
       screen->reassociateWindow(this, BSENTINEL, True);
@@ -2224,8 +2227,8 @@ void BlackboxWindow::restoreAttributes(void) {
     current_state = NormalState;
   }
 
-  if (net->flags & AttribOmnipresent && net->attrib & AttribOmnipresent) {
-    flags.stuck = False;
+  if (net->flags & AttribOmnipresent && net->attrib & AttribOmnipresent &&
+      ! flags.stuck) {
     stick();
 
     // if the window was on another workspace, it was going to be hidden. this

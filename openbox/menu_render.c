@@ -62,7 +62,8 @@ void menu_render_full(Menu *self) {
     items_h = self->item_h * MAX(nitems, 1);
 
     if (self->label) {
-	RECT_SET(self->a_title->area, 0, 0, self->size.width, self->title_h);
+	RECT_SET(self->a_title->area, 0, 0, self->size.width, 
+		 self->title_h);
 	RECT_SET(self->a_title->texture[0].position, 0, 0, self->size.width,
 		 self->title_h);
     }
@@ -74,8 +75,10 @@ void menu_render_full(Menu *self) {
     if (self->label)
 	XMoveResizeWindow(ob_display, self->title, -theme_bwidth,
 			  -theme_bwidth, self->size.width, self->title_h);
-    XMoveResizeWindow(ob_display, self->items, 0, self->title_h + theme_bwidth,
-                      self->size.width, items_h);
+
+    XMoveResizeWindow(ob_display, self->items, 0, 
+		      self->title_h + theme_bwidth, self->size.width, 
+		      items_h);
 
     if (self->label)
 	paint(self->title, self->a_title);

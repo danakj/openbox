@@ -114,7 +114,7 @@ void event_loop()
 	XNextEvent(ob_display, &e);
 
 	event_process(&e);
-        had_event = TRUE;
+       had_event = TRUE;
     }
 
     if (!had_event) {

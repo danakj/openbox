@@ -33,8 +33,6 @@ extern int extensions_shape_event_basep;
 extern gboolean extensions_xinerama;
 /*! Base for events for the Xinerama extension */
 extern int extensions_xinerama_event_basep;
-/*! Is Xinerama enabled? */
-extern gboolean extensions_xinerama_active;
 
 /*! Does the display have the RandR extension? */
 extern gboolean extensions_randr;
@@ -48,6 +46,6 @@ extern int extensions_vidmode_event_basep;
 
 void extensions_query_all();
 
-void extensions_xinerama_screens(Rect **xin_areas, guint *nxin);
-
+void extensions_xinerama_screens(Rect **areas, guint *nxin);
+  
 #endif

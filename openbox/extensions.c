@@ -9,7 +9,6 @@ gboolean extensions_shape     = FALSE;
 int      extensions_shape_event_basep;
 gboolean extensions_xinerama  = FALSE;
 int      extensions_xinerama_event_basep;
-gboolean extensions_xinerama_active = FALSE;
 gboolean extensions_randr     = FALSE;
 int      extensions_randr_event_basep;
 gboolean extensions_vidmode   = FALSE;
@@ -35,8 +34,7 @@ void extensions_query_all()
 #ifdef XINERAMA
     extensions_xinerama =
 	XineramaQueryExtension(ob_display, &extensions_xinerama_event_basep,
-			       &junk);
-    extensions_xinerama_active = XineramaIsActive(ob_display);
+			       &junk) && XineramaIsActive(ob_display);
 #endif
 
 #ifdef XRANDR
@@ -57,7 +55,7 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
     guint i;
     gint l, r, t, b;
 #ifdef XINERAMA
-    if (extensions_xinerama_active) {
+    if (extensions_xinerama) {
         guint i;
         gint n;
         XineramaScreenInfo *info = XineramaQueryScreens(ob_display, &n);

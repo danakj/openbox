@@ -377,24 +377,16 @@ void screen_update_desktop_names()
 void screen_show_desktop(gboolean show)
 {
     GList *it;
-    static Window saved_focus = 0;
      
     if (show == screen_showing_desktop) return; /* no change */
 
-    /* save the window focus, and restore it when leaving the show-desktop
-       mode */
-    if (show && focus_client)
-	saved_focus = focus_client->window;
-  
     screen_showing_desktop = show;
 
     if (show) {
 	/* bottom to top */
 	for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
 	    Client *client = it->data;
-	    if (client->type == Type_Desktop)
-		client_focus(client);
-	    else if (client->frame->visible && !client_should_show(client))
+	    if (client->frame->visible && !client_should_show(client))
                 engine_frame_hide(client->frame);
 	}
     } else {
@@ -403,15 +395,6 @@ void screen_show_desktop(gboolean show)
 	    Client *client = it->data;
 	    if (!client->frame->visible && client_should_show(client))
                 engine_frame_show(client->frame);
-	}
-    }
-
-    if (!show) {
-	Client *f = focus_client;
-	if (!f || f->type == Type_Desktop) {
-	    Client *c = g_hash_table_lookup(client_map,
-					    (gpointer)saved_focus);
-	    if (c) client_focus(c);
 	}
     }
 

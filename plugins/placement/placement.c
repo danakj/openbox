@@ -28,6 +28,12 @@ void plugin_setup_config()
 
 static Rect* pick_head(ObClient *c)
 {
+    /* try direct parent first */
+    if (c->transient_for && c->transient_for != TRAN_GROUP) {
+        return screen_area_monitor(c->desktop,
+                                   client_monitor(c->transient_for));
+    }
+
     /* more than one guy in his group (more than just him) */
     if (c->group && c->group->members->next) {
         GSList *it;

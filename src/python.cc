@@ -74,6 +74,8 @@ bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value)
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
   if (!(val && PyList_Check(val))) return false;
 
+  value->clear();
+  
   for (int i = 0, end = PyList_Size(val); i < end; ++i) {
     PyObject *str = PyList_GetItem(val, i);
     if (PyString_Check(str))

@@ -23,7 +23,7 @@ Action *action_new(void (*func)(union ActionData *data))
 void action_free(Action *a)
 {
     /* deal with pointers */
-    if (a->func == action_execute)
+    if (a->func == action_execute || a->func == action_restart)
         g_free(a->data.execute.path);
 
     g_free(a);

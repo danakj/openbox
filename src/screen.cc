@@ -889,15 +889,10 @@ void Screen::showDesktop(bool show)
   if (show) {
     Client *c = openbox->focusedClient();
     if (c) saved_focus = c->window();
-  } else {
-    Client *f = openbox->focusedClient();
-    if (!f || f->type() == Client::Type_Desktop) {
-      Client *c = openbox->findClient(saved_focus);
-      if (c) c->focus();
-    }
   }
   
   _showing_desktop = show;
+
   ClientList::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->type() == Client::Type_Desktop) {
@@ -906,6 +901,19 @@ void Screen::showDesktop(bool show)
     } else
       (*it)->showhide();
   }
+
+  if (!show) {
+    Client *f = openbox->focusedClient();
+    if (!f || f->type() == Client::Type_Desktop) {
+      Client *c = openbox->findClient(saved_focus);
+      if (c) c->focus();
+    }
+  }
+
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_showing_desktop,
+                     otk::Property::atoms.cardinal,
+                     show ? 1 : 0);
 }
 
 void Screen::propertyHandler(const XPropertyEvent &e)

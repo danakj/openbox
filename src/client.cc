@@ -1017,15 +1017,23 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
 #ifdef DEBUG
     printf("net_active_window for 0x%lx\n", _window);
 #endif
+    if (openbox->screen(_screen)->showingDesktop())
+      openbox->screen(_screen)->showDesktop(false);
     if (_iconic)
       iconify(false);
+    else if (!frame->visible()) // if its not visible for other reasons, then
+      return;                   // don't mess with it
     if (_shaded)
       shade(false);
     focus();
     openbox->screen(_screen)->raiseWindow(this);
   } else if (e.message_type == otk::Property::atoms.openbox_active_window) {
+    if (openbox->screen(_screen)->showingDesktop())
+      openbox->screen(_screen)->showDesktop(false);
     if (_iconic)
       iconify(false);
+    else if (!frame->visible()) // if its not visible for other reasons, then
+      return;                   // don't mess with it
     if (e.data.l[0] && _shaded)
       shade(false);
     focus();
@@ -1552,6 +1560,10 @@ void Client::fullscreen(bool fs, bool savearea)
 void Client::iconify(bool iconic, bool curdesk)
 {
   if (_iconic == iconic) return; // nothing to do
+
+#ifdef DEBUG
+    printf("%sconifying window: 0x%lx\n", (iconic ? "I" : "Uni"), _window);
+#endif
 
   _iconic = iconic;
 

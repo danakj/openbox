@@ -45,6 +45,9 @@
   }
 };
 
+// do this through events
+%ignore ob::Screen::showDesktop(bool);
+
 %import "otk.i"
 
 %import "actions.hh"

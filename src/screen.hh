@@ -143,10 +143,6 @@ private:
   */
   void changeNumDesktops(unsigned int num);
 
-  //! Shows and focuses the desktop and hides all the client windows, or
-  //! returns to the normal state, showing client windows.
-  void showDesktop(bool show);
-
 public:
 #ifndef SWIG
   //! Constructs a new Screen object
@@ -181,6 +177,10 @@ public:
   const otk::Rect& area(unsigned int desktop) const;
 
   const DesktopLayout& desktopLayout() const { return _layout; }
+
+  //! Shows and focuses the desktop and hides all the client windows, or
+  //! returns to the normal state, showing client windows.
+  void showDesktop(bool show);
 
   //! Update's the screen's combined strut of all the clients.
   /*!

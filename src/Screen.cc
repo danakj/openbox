@@ -1402,8 +1402,13 @@ void BScreen::removeWorkspaceNames(void) {
 void BScreen::LoadStyle(void) {
   Resource &conf = resource.styleconfig;
   
-  conf.setFile(openbox.getStyleFilename());
-  if (!conf.load()) {
+  const char *sfile = openbox.getStyleFilename();
+  bool loaded = false;
+  if (sfile != NULL) {
+    conf.setFile(sfile);
+    loaded = conf.load();
+  }
+  if (!loaded) {
     conf.setFile(DEFAULTSTYLE);
     if (!conf.load()) {
       fprintf(stderr, i18n->getMessage(ScreenSet, ScreenDefaultStyleLoadFail,

@@ -168,9 +168,8 @@ OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
 #ifdef    SLIT
   if (client.initial_state == WithdrawnState) {
     screen->getSlit()->addClient(client.window);
-    delete this;
-
     openbox.ungrab();
+    delete this;
     return;
   }
 #endif // SLIT

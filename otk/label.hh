@@ -31,13 +31,13 @@ public:
   const Font *font() const { return _font; }
   virtual void setFont(const Font *f);
 
-  virtual void calcDefaultSizes();
-
   virtual void styleChanged(const RenderStyle &style);
   
   virtual void renderForeground(Surface &surface);
 
 protected:
+  virtual void calcDefaultSizes();
+
   //! The color the label will use for rendering its text
   RenderColor *_forecolor;
   

@@ -229,8 +229,11 @@ void focus_fallback(FallbackType type)
                    checks for this is in transient/group fallbacks, so they can
                    be fallback targets there. */
                 !((Client*)it->data)->fullscreen &&
-                client_focus(it->data))
+                client_can_focus(it->data)) {
+                gboolean r = client_focus(sit->data);
+                assert(r);
                 return;
+            }
 
     /* nothing to focus */
     focus_set_client(NULL);

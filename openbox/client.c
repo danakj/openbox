@@ -1761,7 +1761,8 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
     RECT_SET(self->area, x, y, w, h);
 
-    if (final || (resized && config_opaque_resize))
+    if ((!user && resized) ||
+        (user && (final || (resized && config_opaque_resize))))
 	XResizeWindow(ob_display, self->window, w, h);
 
     /* move/resize the frame to match the request */

@@ -1769,7 +1769,11 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         if (moved || resized)
             frame_adjust_area(self->frame, moved, resized);
 
-        if (!user || final) {
+        /* If you send this and the client hasn't moved you end up with buggy
+           clients (emacs) freaking out, cuz they send back a configure every
+           time they receive this event, which resends them this event... etc.
+        */
+        if (moved && (!user || final)) {
             XEvent event;
             event.type = ConfigureNotify;
             event.xconfigure.display = ob_display;

@@ -4,9 +4,7 @@
 #include "client_props.h"
 
 #include <X11/Xutil.h>
-#ifdef HAVE_STRING_H
-#  include <string.h>
-#endif
+#include <string.h>
 
 void cwmcc_client_get_protocols(Window win, Atom **protocols)
 {

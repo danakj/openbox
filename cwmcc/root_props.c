@@ -3,9 +3,7 @@
 #include "prop.h"
 #include "root_props.h"
 
-#ifdef HAVE_STRING_H
-#  include <string.h>
-#endif
+#include <string.h>
 
 void cwmcc_root_get_supported(Window win, Atom **atoms)
 {

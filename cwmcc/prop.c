@@ -3,9 +3,7 @@
 
 #include <X11/Xutil.h>
 #include <glib.h>
-#ifdef HAVE_STRING_H
-#  include <string.h>
-#endif
+#include <string.h>
 
 /* this just isn't used...
 static gboolean get(Window win, Atom prop, Atom type, int size,

@@ -54,7 +54,7 @@ void Label::update()
         internalResize(w, h);
       else
         internalResize(w, _rect.height());
-    } else
+    } else if (h > _rect.height())
       internalResize(_rect.width(), h);
   }
   Widget::update();

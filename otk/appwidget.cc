@@ -26,10 +26,19 @@ AppWidget::AppWidget(Application *app, Direction direction,
   protocols[0] = Property::atoms.wm_protocols;
   protocols[1] = Property::atoms.wm_delete_window;
   XSetWMProtocols(**display, window(), protocols, 2);
+
+  setStyle(_style);
 }
 
 AppWidget::~AppWidget()
 {
+}
+
+void AppWidget::setStyle(RenderStyle *style)
+{
+  Widget::setStyle(style);
+
+  setTexture(style->titlebarUnfocusBackground());
 }
 
 void AppWidget::show(void)

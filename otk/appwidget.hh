@@ -15,6 +15,8 @@ public:
             Cursor cursor = 0, int bevel_width = 1);
   virtual ~AppWidget();
 
+  virtual void setStyle(RenderStyle *style);
+  
   virtual void show(void);
   virtual void hide(void);
 

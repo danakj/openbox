@@ -35,10 +35,10 @@ void Button::press(unsigned int mouse_button)
 {
   if (_pressed) return;
 
-  if (_pressed_focus_tx)
-    FocusWidget::setTexture(_pressed_focus_tx);
   if (_pressed_unfocus_tx)
     FocusWidget::setUnfocusTexture(_pressed_unfocus_tx);
+  if (_pressed_focus_tx)
+    FocusWidget::setTexture(_pressed_focus_tx);
   _pressed = true;
   _mouse_button = mouse_button;
 }
@@ -47,8 +47,8 @@ void Button::release(unsigned int mouse_button)
 {
   if (_mouse_button != mouse_button) return; // wrong button
 
-  FocusWidget::setTexture(_unpr_focus_tx);
   FocusWidget::setUnfocusTexture(_unpr_unfocus_tx);
+  FocusWidget::setTexture(_unpr_focus_tx);
   _pressed = false;
 }
 

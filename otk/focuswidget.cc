@@ -53,6 +53,8 @@ void FocusWidget::setTexture(RenderTexture *texture)
 {
   Widget::setTexture(texture);
   _focus_texture = texture;
+  if (!_focused)
+    Widget::setTexture(_unfocus_texture);
 }
 
 void FocusWidget::setBorderColor(const RenderColor *color)

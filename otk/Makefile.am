@@ -27,7 +27,8 @@ includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
                    point.hh property.hh pseudorendercontrol.hh rect.hh \
                    rendercolor.hh rendercontrol.hh renderstyle.hh \
                    rendertexture.hh screeninfo.hh strut.hh surface.hh \
-                   timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh
+                   timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh \
+                   ../config.h
 libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS) @LIBS@
 
 MAINTAINERCLEANFILES= Makefile.in

@@ -22,14 +22,14 @@ typedef u_int16_t pixel16;
 #endif /* HAVE_STDINT_H */  
 
 #if (G_BYTE_ORDER == G_BIG_ENDIAN)
-#define default_red_shift 0
-#define default_green_shift 8
-#define default_blue_shift 16
+#define default_red_offset 0
+#define default_green_offset 8
+#define default_blue_offset 16
 #define endian MSBFirst  
 #else
-#define default_red_shift 16
-#define default_green_shift 8
-#define default_blue_shift 0
+#define default_red_offset 16
+#define default_green_offset 8
+#define default_blue_offset 0
 #define endian LSBFirst
 #endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
 

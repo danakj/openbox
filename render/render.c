@@ -80,7 +80,7 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
     l->surface.data.planar.pixel_data = g_new(pixel32, w * h);
 
     if (l->surface.data.planar.grad == Background_Solid)
-        gradient_solid(l, w, h);
+        gradient_solid(l, x, y, w, h);
     else gradient_render(&l->surface, w, h);
 
 /*reduce depth here...

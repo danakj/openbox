@@ -230,23 +230,23 @@ void highlight(pixel32 *x, pixel32 *y, gboolean raised)
         + (b << default_blue_shift);
 }
 
-void gradient_solid(Appearance *l, int w, int h) 
+void gradient_solid(Appearance *l, int x, int y, int w, int h) 
 {
   int i;
   PlanarSurface *sp = &l->surface.data.planar;
-  int left = 0, top = 0, right = w - 1, bottom = h - 1;
+  int left = x, top = y, right = w - 1, bottom = h - 1;
 
   if (sp->primary->gc == None)
     color_allocate_gc(sp->primary);
   XFillRectangle(ob_display, l->pixmap, sp->primary->gc
-                 , 0, 0, w, h);
+                 , x, y, w, h);
 
   if (l->surface.data.planar.interlaced) {
     if (sp->secondary->gc == None)
       color_allocate_gc(sp->secondary);
-    for (i = 0; i < h; i += 2)
+    for (i = y; i < h; i += 2)
       XDrawLine(ob_display, l->pixmap, sp->secondary->gc,
-                0, i, w, i);
+                x, i, w, i);
   }
 /*
   switch (texture.relief()) {

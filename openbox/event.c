@@ -520,7 +520,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	    else if (!client->frame->visible)
 		/* if its not visible for other reasons, then don't mess
 		   with it */
-		return;
+		break;
             if (client->shaded)
                 client_shade(client, FALSE);
             client_focus(client);

@@ -2023,3 +2023,9 @@ Icon *client_icon(Client *self, int w, int h)
         return &self->icons[si];
     return &self->icons[li];
 }
+
+void client_disable_decorations(Client *self, int flags)
+{
+    self->disabled_decorations = flags;
+    client_setup_decor_and_functions(self);
+}

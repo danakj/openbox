@@ -462,8 +462,7 @@ void Configmenu::WindowToWindowSnapmenu::setValues(void) {
   setItemSelected(2, (getScreen()->getWindowToWindowSnap() ==
                       BScreen::WindowResistance));
 
-  setItemEnabled(3, (getScreen()->getWindowToWindowSnap() ==
-                     BScreen::WindowSnap));
+  setItemEnabled(3, getScreen()->getWindowToWindowSnap());
   setItemSelected(3, getScreen()->getWindowCornerSnap());
 }
 

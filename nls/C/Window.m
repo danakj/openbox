@@ -2,16 +2,16 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: izdelujem 0x%lx\n
+# BlackboxWindow::BlackboxWindow: skapar 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: neuspe¹en XGetWindowAttributres\n
+# BlackboxWindow::BlackboxWindow: XGetWindowAttributes misslyckades\n
 $ #CannotFindScreen
-# BlackboxWindow::BlackboxWindow: zaslona za korensko okno 0x%lx ni moè najti\n
+# BlackboxWindow::BlackboxWindow: kan inte hitta skärm för rootfönster 0x%lx\n
 $ #Unnamed
-# Neimenovano
+# Inget namn
 $ #MapRequest
-# BlackboxWindow::mapRequestEvent() za 0x%lx\n
+# BlackboxWindow::mapRequestEvent() för 0x%lx\n
 $ #UnmapNotify
-# BlackboxWindow::unmapNotifyEvent() za 0x%lx\n
+# BlackboxWindow::unmapNotifyEvent() för 0x%lx\n
 $ #ReparentNotify
-# BlackboxWindow::unmapnotifyEvent: ponovno prikljuèeno 0x%lx korenskemu oknu 0x%lx\n
+# BlackboxWindow::reparentNotifyEvent: återför 0x%lx till 0x%lx\n

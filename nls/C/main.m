@@ -1,23 +1,23 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# napaka: '-rc' zahteva argument\n
+# fel: '-rc' kräver ett argument\n
 $ #DISPLAYRequiresArg
-# napaka: '-display' zahteva argument\n
+# fel: '-display' kräver ett argument\n
 $ #WarnDisplaySet
-# opozorilo: spremenljivke okolja 'DISPLAY' ni moè nastaviti\n
+# varning: kunde inte sätta variabeln 'DISPLAY'\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
   \t\t\t 2001 - 2002, Sean 'Shaleh' Perry\n\n\
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\tuporabi prikazovalnik.\n\
-  -rc <string>\t\t\tuporabi nadomestno datoteko z viri.\n\
-  -version\t\t\tprika¾i oznako razlièice in konèaj.\n\
-  -help\t\t\t\prika¾i ta navodila in konèaj.\n\n
+  -display <string>\t\tanvänd skärmanslutning.\n\
+  -rc <string>\t\t\tanvänd alternativ resursfil.\n\
+  -version\t\t\tvisa version och avsluta.\n\
+  -help\t\t\t\tvisa denna hjälptext och avsluta.\n\n
 $ #CompileOptions
-# Izbire pri prevajanju:\n\
-  Razhro¹èevanje\t\t\t%s\n\
-  Oblika:\t\t\t%s\n\
+# Kompilerad med:\n\
+  Avlusning\t\t\t%s\n\
+  Form:\t\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\
   Event Clobbering:\t\t%s\n\
-  Osembitno stresanje barv:\t%s\n\n
+  8bpp ordnad dithering:\t%s\n\n

@@ -3995,7 +3995,7 @@ void BlackboxWindow::upsize(void) {
   if (decorations & Decor_Border) {
     frame.border_w = screen->getWindowStyle()->getBorderWidth();
     if (! isTransient())
-      frame.mwm_border_w = screen->getWindowSty2le()->getFrameWidth();
+      frame.mwm_border_w = screen->getWindowStyle()->getFrameWidth();
     else
       frame.mwm_border_w = 0;
   } else {

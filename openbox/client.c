@@ -121,6 +121,7 @@ void client_manage(Window window)
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
+    guint i;
 
     grab_server(TRUE);
 
@@ -186,6 +187,15 @@ void client_manage(Window window)
     client_list = g_slist_append(client_list, client);
     stacking_list = g_list_append(stacking_list, client);
     g_hash_table_insert(client_map, (gpointer)window, client);
+
+    /* update the focus lists */
+    if (client->desktop == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            focus_order[i] = g_list_append(focus_order[i], client);
+    } else {
+        i = client->desktop;
+        focus_order[i] = g_list_append(focus_order[i], client);
+    }
 
     stacking_raise(client);
 

@@ -4,7 +4,6 @@ sh() {
   /bin/sh -c "set -x; $*"
 }
 
-sh libtoolize --copy --force --automake
 sh aclocal
 sh autoheader
 sh autoconf

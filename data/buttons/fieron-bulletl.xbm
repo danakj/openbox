@@ -1,0 +1,5 @@
+/* Created with The GIMP */
+#define bulletl_width 8
+#define bulletl_height 8
+static unsigned char bulletl_bits[] = {
+   0x00, 0x18, 0x0c, 0x06, 0x06, 0x0c, 0x18, 0x00 };

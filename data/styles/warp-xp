@@ -103,3 +103,7 @@ menu.title.xft.flags:	bold
 
 rootCommand: bsetbg -solid "#4468b2"
 
+window.button.max.mask: max.xbm
+window.button.icon.mask: icon.xbm
+window.button.stick.mask: stick.xbm
+window.button.close.mask: close.xbm

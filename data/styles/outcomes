@@ -115,3 +115,8 @@ rootCommand:			bsetroot -mod 4 4 -fg rgb:54/6/6 -bg grey20
 ! for the bbtools
 menuFont:			lucidasans-10
 titleFont:			lucidasans-bold-10
+
+window.button.max.mask: max.xbm
+window.button.icon.mask: icon.xbm
+window.button.stick.mask: stick.xbm
+window.button.close.mask: close.xbm

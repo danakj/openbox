@@ -57,8 +57,8 @@ using std::hex;
 using std::dec;
 using std::string;
 
-#include "../../src/basedisplay.hh"
-#include "../../src/xatom.hh"
+#include "../../src/BaseDisplay.hh"
+#include "../../src/XAtom.hh"
 #include "screen.hh"
 #include "epist.hh"
 #include "config.hh"
@@ -589,7 +589,6 @@ void screen::execCommand(const string &cmd) const {
   }
 }
 
-
 void screen::cycleWindow(unsigned int state, const bool forward,
                          const int increment, const bool allscreens,
                          const bool alldesktops, const bool sameclass,
@@ -613,15 +612,15 @@ void screen::cycleWindow(unsigned int state, const bool forward,
   for (int x = 0; x < increment; ++x) {
     while (1) {
       if (forward) {
-        if (target == end) {
+        if (target == end)
           target = begin;
-        } else {
+        else
           ++target;
-        }
       } else {
         if (target == begin)
           target = end;
-        --target;
+        else
+          --target;
       }
 
       // must be no window to focus

@@ -302,21 +302,21 @@ void parse_paths_startup()
         return;
     xdg_start = TRUE;
 
-    path = getenv("XDG_CONFIG_HOME");
+    path = g_getenv("XDG_CONFIG_HOME");
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_config_home_path = g_build_filename(path, NULL);
     else
         xdg_config_home_path = g_build_filename(g_get_home_dir(), ".config",
                                                 NULL);
 
-    path = getenv("XDG_DATA_HOME");
+    path = g_getenv("XDG_DATA_HOME");
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_data_home_path = g_build_filename(path, NULL);
     else
         xdg_data_home_path = g_build_filename(g_get_home_dir(), ".local",
                                               "share", NULL);
 
-    path = getenv("XDG_CONFIG_DIRS");
+    path = g_getenv("XDG_CONFIG_DIRS");
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_config_dir_paths = split_paths(path);
     else {
@@ -333,7 +333,7 @@ void parse_paths_startup()
                                           xdg_config_home_path,
                                           (GSListFunc) g_slist_prepend);
     
-    path = getenv("XDG_DATA_DIRS");
+    path = g_getenv("XDG_DATA_DIRS");
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_data_dir_paths = split_paths(path);
     else {

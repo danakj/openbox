@@ -123,7 +123,11 @@ typedef struct Client {
       be TRUE if transient_for != NULL, but not guaranteed to be FALSE if
       transient_for == NULL. */
     gboolean transient;
-    /*! The client which this client is a transient (child) for */
+    /*! The client which this client is a transient (child) for.
+      A value of TRAN_GROUP signifies that the window is a transient for all
+      members of its Group, and is not a valid pointer to be followed in this
+      case.
+     */
     struct Client *transient_for;
     /*! The clients which are transients (children) of this client */
     GSList *transients;

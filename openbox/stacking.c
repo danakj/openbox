@@ -94,6 +94,8 @@ void stacking_lower(Client *client)
                 GSList *sit;
                 Client *c = it->data;
 
+                if (it->data == client) continue;
+
                 for (sit = c->group->members; sit; sit = sit->next)
                     if (sit->data == it->data) break;
                 if (sit) break; /* got it */

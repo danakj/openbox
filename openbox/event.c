@@ -499,7 +499,11 @@ static void event_process(const XEvent *ec, gpointer data)
                     e->type == MotionNotify)
                     mouse_event(client, context, e);
                 else if (e->type == KeyPress)
-                    keyboard_event(client, e);
+                    /* when in the middle of a focus cycling action, this
+                       causes the window which appears to be focused to be
+                       the one on which the actions will be executed */
+                    keyboard_event((focus_cycle_target ?
+                                    focus_cycle_target : client), e);
             }
         }
     }

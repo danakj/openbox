@@ -3,8 +3,6 @@
 #include "../config.h"
 #include "rect.h"
 
-extern PyTypeObject OtkRect_Type;
-
 PyObject *OtkRect_New(int x, int y, int width, int height)
 {
   OtkRect* self = PyObject_New(OtkRect, &OtkRect_Type);

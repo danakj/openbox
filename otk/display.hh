@@ -13,42 +13,77 @@ namespace otk {
 class ScreenInfo;
 class BGCCache;
 
+//! Manages a single X11 display.
+/*!
+  This class is static, and cannot be instantiated.
+  Use the initialize() method to open the display and ready it for use.
+  Use the destroy() method to close it and clean up the class' data.
+*/
 class OBDisplay
 {
 public:
-  static Display *display;       // the X display
-
-  typedef std::vector<ScreenInfo> ScreenInfoList;
+  //! The X display
+  static Display *display;
   
+  //! A List of ScreenInfo instances
+  typedef std::vector<ScreenInfo> ScreenInfoList;
+
 private:
-  static bool _shape;          // does the display have the shape extention?
-  static int  _shape_event_basep;   // base for shape events
+  //! Does the display have the Shape extention?
+  static bool _shape;
+  //! Base for events for the Shape extention
+  static int  _shape_event_basep;
 
-  static bool _xinerama;       // does the display have the xinerama extention?
-  static int  _xinerama_event_basep;// base for xinerama events
+  //! Does the display have the Xinerama extention?
+  static bool _xinerama;
+  //! Base for events for the Xinerama extention
+  static int  _xinerama_event_basep;
 
-  static unsigned int _mask_list[8];// a list of all combinations of lock masks
+  //! A list of all possible combinations of keyboard lock masks
+  static unsigned int _mask_list[8];
 
-  static ScreenInfoList _screenInfoList; // info for all screens on the display
+  //! A list of information for all screens on the display
+  static ScreenInfoList _screenInfoList;
 
+  //! A cache for re-using GCs, used by the drawing objects
+  /*!
+    @see BPen
+    @see BFont
+    @see BImage
+    @see BImageControl
+    @see BTexture
+  */
   static BGCCache *_gccache;
 
-  static int xerrorHandler(Display *d, XErrorEvent *e); // handles X errors duh
+  //! Handles X errors on the display
+  /*!
+    Displays the error if compiled for debugging.
+  */
+  static int xerrorHandler(Display *d, XErrorEvent *e);
 
-  OBDisplay(); // this class cannot be instantiated
+  //! Prevents instantiation of the class
+  OBDisplay();
 
 public:
+  //! Initializes the class, opens the X display
+  /*!
+    @see OBDisplay::display
+    @param name The name of the X display to open. If it is null, the DISPLAY
+                environment variable is used instead.
+  */
   static void initialize(char *name);
+  //! Destroys the class, closes the X display
   static void destroy();
 
   //! Returns the GC cache for the application
   inline static BGCCache *gcCache() { return _gccache; }
 
+  //! Gets information on a specific screen
   /*!
-    Returns a ScreenInfo class, which gives information on a screen on the
+    Returns a ScreenInfo class, which contains information for a screen on the
     display.
-    \param snum The screen number of the screen to retrieve info on
-    \return Info on the requested screen, in a ScreenInfo class
+    @param snum The screen number of the screen to retrieve info on
+    @return Info on the requested screen, in a ScreenInfo class
   */
   static const ScreenInfo* screenInfo(int snum);
 

@@ -413,7 +413,7 @@ bool Workspace::isCurrent(void) const {
 }
 
 
-bool Workspace::isLastWindow(const BlackboxWindow* const w) const {
+bool Workspace::isLastWindow(const BlackboxWindow *w) const {
   return (w == windowList.back());
 }
 

@@ -130,7 +130,7 @@ public:
   /*!
     The intersection of the rectangles will consist of just the area where the
     two rectangles overlap.
-    @param A second Rect object to form an intersection with.
+    @param a A second Rect object to form an intersection with.
     @return The intersection between this Rect and the one passed to the
             function
   */
@@ -147,7 +147,7 @@ public:
   /*!
     The intersection of the rectangles will consist of just the area where the
     two rectangles overlap.
-    @param A second Rect object to form an intersection with.
+    @param a A second Rect object to form an intersection with.
   */
   inline Rect &operator&=(const Rect &a) { *this = *this & a; return *this; }
 

@@ -44,22 +44,6 @@ namespace ob {
 Openbox *Openbox::instance = (Openbox *) 0;
 
 
-int Openbox::xerrorHandler(Display *d, XErrorEvent *e)
-{
-#ifdef DEBUG
-  char errtxt[128];
-
-  XGetErrorText(d, e->error_code, errtxt, 128);
-  printf("X Error: %s\n", errtxt);
-#else
-  (void)d;
-  (void)e;
-#endif
-
-  return false;
-}
-
-
 void Openbox::signalHandler(int signal)
 {
   switch (signal) {
@@ -86,7 +70,7 @@ Openbox::Openbox(int argc, char **argv)
 {
   struct sigaction action;
 
-  _state = State_Starting;
+  _state = State_Starting; // initializing everything
 
   Openbox::instance = this;
 
@@ -118,6 +102,8 @@ Openbox::Openbox(int argc, char **argv)
 
 Openbox::~Openbox()
 {
+  _state = State_Exiting; // time to kill everything
+  
   // close the X display
   otk::OBDisplay::destroy();
 }
@@ -209,7 +195,7 @@ void Openbox::showHelp()
 
 void Openbox::eventLoop()
 {
-  while (_state == State_Normal) {
+  while (!_doshutdown) {
     if (XPending(otk::OBDisplay::display)) {
       XEvent e;
       XNextEvent(otk::OBDisplay::display, &e);

@@ -224,6 +224,8 @@ public:
   */
   void setDesktopName(unsigned int i, const otk::ustring &name);
 
+  otk::ustring desktopName(unsigned int i) const;
+
   void installColormap(bool install) const;
 
   virtual void propertyHandler(const XPropertyEvent &e);

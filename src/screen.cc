@@ -867,6 +867,11 @@ void Screen::setDesktopName(unsigned int i, const otk::ustring &name)
                      otk::Property::utf8, newnames);
 }
 
+otk::ustring Screen::desktopName(unsigned int i) const
+{
+  if (i >= _num_desktops) return "";
+  return _desktop_names[i];
+}
 
 const otk::Rect& Screen::area(unsigned int desktop) const {
   assert(desktop < _num_desktops || desktop == 0xffffffff);

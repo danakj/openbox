@@ -321,6 +321,8 @@ static void event_client_dest(ObClient *client, gpointer data)
         focus_in = NULL;
     if (client == focus_out)
         focus_out = NULL;
+    if (client == focus_hilite)
+        focus_hilite = NULL;
 }
 
 static void event_done(gpointer data)

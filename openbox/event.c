@@ -210,9 +210,9 @@ static Window event_get_window(XEvent *e)
     default:
 #ifdef XKB
 	if (extensions_xkb && e->type == extensions_xkb_event_basep) {
-	    switch (((XkbAnyEvent*)&e)->xkb_type) {
+	    switch (((XkbAnyEvent*)e)->xkb_type) {
 	    case XkbBellNotify:
-		window = ((XkbBellNotifyEvent*)&e)->window;
+		window = ((XkbBellNotifyEvent*)e)->window;
 	    default:
 		window = None;
 	    }

@@ -173,7 +173,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _max_mask = new PixmapMask();
   _max_mask->w = _max_mask->h = 8;
   {
-    char data[] = { 0x7e, 0xff, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0x7e };
+    //char data[] = { 0x7e, 0xff, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0x7e };
+    char data []  = {0x00, 0x00, 0x18, 0x3c, 0x66, 0x42, 0x00, 0x00 };
     _max_mask->mask =
       XCreateBitmapFromData(**display,
                             display->screenInfo(_screen)->rootWindow(),
@@ -183,17 +184,19 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _icon_mask = new PixmapMask();
   _icon_mask->w = _icon_mask->h = 8;
   {
-    unsigned char data[] = { 0x00, 0x00, 0xc3, 0xe7, 0x7e, 0x3c, 0x18, 0x00 };
+    //char data[] = { 0x00, 0x00, 0xc3, 0xe7, 0x7e, 0x3c, 0x18, 0x00 };
+    char data[] = { 0x00, 0x00, 0x42, 0x66, 0x3c, 0x18, 0x00, 0x00 };
     _icon_mask->mask =
       XCreateBitmapFromData(**display,
                             display->screenInfo(_screen)->rootWindow(),
-                            (char*)data, 8, 8);
+                            data, 8, 8);
   }
   
   _stick_mask = new PixmapMask();
   _stick_mask->w = _stick_mask->h = 8;
   {
-    char data[] = { 0x00, 0x00, 0x18, 0x3c, 0x3c, 0x18, 0x00, 0x00 };
+    //char data[] = { 0x00, 0x00, 0x18, 0x3c, 0x3c, 0x18, 0x00, 0x00 };
+    char data[] = { 0x00, 0x66, 0x66, 0x00, 0x00, 0x66, 0x66, 0x00 };
     _stick_mask->mask =
       XCreateBitmapFromData(**display,
                             display->screenInfo(_screen)->rootWindow(),
@@ -203,7 +206,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _close_mask = new PixmapMask();
   _close_mask->w = _close_mask->h = 8;
   {
-    char data[] = { 0xc3, 0xe7, 0x7e, 0x3c, 0x3c, 0x7e, 0xe7, 0xc3 };
+    //char data[] = { 0xc3, 0xe7, 0x7e, 0x3c, 0x3c, 0x7e, 0xe7, 0xc3 };
+    char data[] = { 0x00, 0xc3, 0x66, 0x3c, 0x3c, 0x66, 0xc3, 0x00 };
     _close_mask->mask =
       XCreateBitmapFromData(**display,
                             display->screenInfo(_screen)->rootWindow(),

@@ -151,12 +151,13 @@ static void do_move()
 {
     dispatch_move(moveresize_client, &cur_x, &cur_y);
 
-    popup_coords("X:  %d  Y:  %d", cur_x, cur_y);
-
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
     client_configure(moveresize_client, Corner_TopLeft, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
+
+    popup_coords("X:  %d  Y:  %d", moveresize_client->frame->area.x,
+                 moveresize_client->frame->area.y);
 }
 
 static void do_resize()

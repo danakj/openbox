@@ -41,9 +41,9 @@ static struct HistoryItem *history_find(const char *name, const char *class,
     /* find the client */
     for (it = history_list; it != NULL; it = it->next) {
         hi = it->data;
-        if (!g_utf8_collate(hi->name, name) &&
-            !g_utf8_collate(hi->class, class) &&
-            !g_utf8_collate(hi->role, role))
+        if (!strcmp(hi->name, name) &&
+            !strcmp(hi->class, class) &&
+            !strcmp(hi->role, role))
             return hi;
     }
     return NULL;

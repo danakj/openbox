@@ -21,8 +21,6 @@ struct RrPlanarSurface {
 
 void RrPlanarPaint(struct RrSurface *sur, int absx, int absy);
 
-void RrBevel(int x, int y, int w, int h, int bwidth, int inset, int raise);
-
 void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h);
 
 #endif

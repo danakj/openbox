@@ -100,31 +100,6 @@ void RrPaint(struct RrSurface *sur)
         break;
     }
 
-    switch (RrPlanarBevelType(sur)) {
-    case RR_SUNKEN_OUTER:
-        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
-                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                0, 0, 0);
-    break;
-    case RR_SUNKEN_INNER:
-        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
-                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                0, 1, 0);
-    break;
-    case RR_RAISED_OUTER:
-        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
-                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                0, 0, 1);
-    break;
-    case RR_RAISED_INNER:
-        RrBevel(RrSurfaceX(sur), RrSurfaceY(sur),
-                RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                0, 1, 1);
-    break;
-    case RR_BEVEL_NONE:
-    break;
-    }
-
     for (i = 0; i < sur->ntextures; ++i)
         RrTexturePaint(sur, &sur->texture[i]);
 

@@ -690,10 +690,6 @@ static void event_handle_client(Client *client, XEvent *e)
                 (Atom)e->xclient.data.l[2] ==
                 prop_atoms.net_wm_moveresize_move_keyboard) {
 
-                g_message("client %lx x %d y %d button %d corner %d",
-                          client, e->xclient.data.l[0],                  
-                          e->xclient.data.l[1], e->xclient.data.l[3],    
-                          e->xclient.data.l[2]);
                 moveresize_start(client, e->xclient.data.l[0],
                                  e->xclient.data.l[1], e->xclient.data.l[3],
                                  e->xclient.data.l[2]);

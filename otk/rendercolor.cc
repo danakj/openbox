@@ -57,7 +57,9 @@ RenderColor::RenderColor(int screen, unsigned char red,
     }
 
     gcv.foreground = xcol.pixel;
-    _gc = XCreateGC(**display, info->rootWindow(), GCForeground, &gcv);
+    gcv.cap_style = CapProjecting;
+    _gc = XCreateGC(**display, info->rootWindow(),
+		    GCForeground | GCCapStyle, &gcv);
     assert(_gc);
 
     // insert into the cache

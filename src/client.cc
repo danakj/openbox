@@ -1071,12 +1071,19 @@ void Client::internal_resize(Corner anchor, int w, int h, bool user,
   w -= _base_size.x(); 
   h -= _base_size.y();
 
-  // for interactive resizing. have to move half an increment in each
-  // direction.
-  w += _size_inc.x() / 2;
-  h += _size_inc.y() / 2;
-
   if (user) {
+    // for interactive resizing. have to move half an increment in each
+    // direction.
+    int mw = w % _size_inc.x(); // how far we are towards the next size inc
+    int mh = h % _size_inc.y();
+    int aw = _size_inc.x() / 2; // amount to add
+    int ah = _size_inc.y() / 2;
+    // don't let us move into a new size increment
+    if (mw + aw >= _size_inc.x()) aw = _size_inc.x() - mw - 1;
+    if (mh + ah >= _size_inc.y()) ah = _size_inc.y() - mh - 1;
+    w += aw;
+    h += ah;
+    
     // if this is a user-requested resize, then check against min/max sizes
     // and aspect ratios
 
@@ -1405,8 +1412,6 @@ void Client::maximize(bool max, int dir, bool savearea)
       y = a.y() + frame->size().top;
       h = a.height() - frame->size().top - frame->size().bottom;
     }
-
-    printf("dir %d x %d y %d w %d h %d\n", dir, x, y, w, h);
   } else {
     long *dimensions;
     long unsigned n = 4;

@@ -57,13 +57,14 @@ void x_paint(Window win, Appearance *l, int w, int h)
 {
     int i;
     XImage *im;
+    Pixmap oldp;
 
     if (w <= 0 || h <= 0) return;
 
     g_assert(l->surface.type == Surface_Planar);
 //    printf("painting window %ld\n", win);
 
-    if (l->pixmap != None) XFreePixmap(ob_display, l->pixmap);
+    oldp = l->pixmap; /* save to free after changing the visible pixmap */
     l->pixmap = XCreatePixmap(ob_display, ob_root, w, h, render_depth);
     g_assert(l->pixmap != None);
 
@@ -105,6 +106,7 @@ void x_paint(Window win, Appearance *l, int w, int h)
     }
     XSetWindowBackgroundPixmap(ob_display, win, l->pixmap);
     XClearWindow(ob_display, win);
+    if (oldp != None) XFreePixmap(ob_display, oldp);
 }
 
 /*

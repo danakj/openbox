@@ -168,7 +168,8 @@ static void do_move(gboolean resist)
 
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
-    client_move(moveresize_client, cur_x, cur_y);
+    client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
+                     start_cw, start_ch, TRUE, FALSE);
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

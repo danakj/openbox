@@ -545,35 +545,63 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 
 #ifdef    SLIT
   Slit *slit = screen.getSlit();
-  int remove;   // 0 - top/2 - right/2 - bottom/3 - left
+  Toolbar *toolbar = screen.getToolbar();
+  int tbarh = screen.hideToolbar() ? 0 :
+    toolbar->getExposedHeight() + screen.getBorderWidth() * 2;
+  bool tbartop;
+  switch (toolbar->placement()) {
+  case Toolbar::TopLeft:
+  case Toolbar::TopCenter:
+  case Toolbar::TopRight:
+    tbartop = true;
+    break;
+  case Toolbar::BottomLeft:
+  case Toolbar::BottomCenter:
+  case Toolbar::BottomRight:
+    tbartop = false;
+    break;
+  default:
+    ASSERT(false);      // unhandled placement
+  }
   if ((slit->direction() == Slit::Horizontal &&
        (slit->placement() == Slit::TopLeft ||
         slit->placement() == Slit::TopRight)) ||
-      slit->placement() == Slit::TopCenter)
+      slit->placement() == Slit::TopCenter) {
     // exclude top
-    space.setY(slit->area().h() + screen.getBorderWidth() * 2);
-  else if ((slit->direction() == Slit::Vertical &&
-            (slit->placement() == Slit::TopRight ||
-             slit->placement() == Slit::BottomRight)) ||
-           slit->placement() == Slit::CenterRight)
+    if (tbartop) {
+      space.setY(slit->area().y());
+      space.setH(space.h() - space.y());
+    } else
+      space.setH(space.h() - tbarh);
+    space.setY(space.y() + slit->area().h() + screen.getBorderWidth() * 2);
+    space.setH(space.h() - (slit->area().h() + screen.getBorderWidth() * 2));
+  } else if ((slit->direction() == Slit::Vertical &&
+              (slit->placement() == Slit::TopRight ||
+               slit->placement() == Slit::BottomRight)) ||
+             slit->placement() == Slit::CenterRight) {
     // exclude right
-    space.setW(screen.size().w() -
-               (slit->area().w() + screen.getBorderWidth() * 2));
-  else if ((slit->direction() == Slit::Horizontal &&
-            (slit->placement() == Slit::BottomLeft ||
-             slit->placement() == Slit::BottomRight)) ||
-           slit->placement() == Slit::TopCenter)
+    space.setW(space.w() - (slit->area().w() + screen.getBorderWidth() * 2));
+    if (tbartop)
+      space.setY(space.y() + tbarh);
+    space.setH(space.h() - tbarh);
+  } else if ((slit->direction() == Slit::Horizontal &&
+              (slit->placement() == Slit::BottomLeft ||
+               slit->placement() == Slit::BottomRight)) ||
+             slit->placement() == Slit::BottomCenter) {
     // exclude bottom
-    space.setH(screen.size().h() -
-               (slit->area().h() + screen.getBorderWidth() * 2));
-  else// if ((slit->direction() == Slit::Vertical &&
-      //      (slit->placement() == Slit::TopLeft ||
-      //       slit->placement() == Slit::BottomLeft)) ||
-      //     slit->placement() == Slit::CenterLeft)
+    space.setH(space.h() - (screen.size().h() - slit->area().y()));
+  } else {// if ((slit->direction() == Slit::Vertical &&
+    //      (slit->placement() == Slit::TopLeft ||
+    //       slit->placement() == Slit::BottomLeft)) ||
+    //     slit->placement() == Slit::CenterLeft)
     // exclude left
     space.setX(slit->area().w() + screen.getBorderWidth() * 2);
-#endif
-
+    space.setW(space.w() - (slit->area().w() + screen.getBorderWidth() * 2));
+    if (tbartop)
+      space.setY(space.y() + tbarh);
+    space.setH(space.h() - tbarh);
+  }
+#else // !SLIT
   Toolbar *toolbar = screen.getToolbar();
   int tbarh = screen.hideToolbar() ? 0 :
     toolbar->getExposedHeight() + screen.getBorderWidth() * 2;
@@ -581,26 +609,26 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   case Toolbar::TopLeft:
   case Toolbar::TopCenter:
   case Toolbar::TopRight:
-    if (tbarh > space.y())
-      space.setY(toolbar->getExposedHeight());
+    space.setY(toolbar->getExposedHeight());
+    space.setH(space.h() - toolbar->getExposedHeight());
     break;
   case Toolbar::BottomLeft:
   case Toolbar::BottomCenter:
   case Toolbar::BottomRight:
-    if (screen.size().h() - tbarh < space.h())
-      space.setH(screen.size().h() - tbarh);
+    space.setH(space.h() - tbarh);
     break;
   default:
     ASSERT(false);      // unhandled placement
   }
+#endif // SLIT
 
   const int win_w = win->size().w() + (screen.getBorderWidth() * 4),
-    win_h = win->size().h() + (screen.getBorderWidth() * 4),
-    start_pos = 0,
-    change_y =
-      ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
-    change_x =
-      ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1),
+  win_h = win->size().h() + (screen.getBorderWidth() * 4),
+  start_pos = 0,
+  change_y =
+    ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
+  change_x =
+    ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1),
     delta_x = 8, delta_y = 8;
 
   LinkedListIterator<OpenboxWindow> it(windowList);

@@ -441,8 +441,6 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
     int val;
 
-    g_message("rectangle");
-
     for (y = 0; y < h; ++y) {
         drx = (float)(sf->data.planar.primary->r -
                       sf->data.planar.secondary->r);
@@ -487,8 +485,6 @@ void gradient_pipecross(Surface *sf, int inw, int inh)
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
     int val;
-
-    g_message("pipecross");
 
     for (y = 0; y < h; ++y) {
         drx = (float)(sf->data.planar.secondary->r -

@@ -182,8 +182,11 @@ def state_above(data, add=2):
     if not client: return
     root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
     window = OBClient_window(client)
+    above = OBProperty_atom(Openbox_property(openbox),
+                            OBProperty_net_wm_state_above)
+    print above
     send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    OBProperty_net_wm_state_above)
+                    above)
     
 def state_below(data, add=2):
     """Toggles, adds or removes the 'below' state on a window."""
@@ -191,9 +194,11 @@ def state_below(data, add=2):
     if not client: return
     root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
     window = OBClient_window(client)
-    print OBProperty_net_wm_state_below
+    below = OBProperty_atom(Openbox_property(openbox),
+                            OBProperty_net_wm_state_below)
+    print below
     send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    OBProperty_net_wm_state_below)
+                    below)
     
 #########################################
 ### Convenience functions for scripts ###

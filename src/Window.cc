@@ -3065,6 +3065,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   assert(flags.moving);
   assert(blackbox->getChangingWindow() == this);
 
+  bool warp = False;
   int dx = x_root - frame.grab_x, dy = y_root - frame.grab_y;
   dx -= frame.border_w;
   dy -= frame.border_w;
@@ -3072,6 +3073,9 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   doWindowSnapping(dx, dy);
 
   if (screen->doOpaqueMove()) {
+    if (screen->doWorkspaceWarping())
+      warp = doWorkspaceWarping(x_root, y_root, dx, dy);
+
     configure(dx, dy, frame.rect.width(), frame.rect.height());
   } else {
     XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
@@ -3080,6 +3084,9 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
                    frame.changing.y(),
                    frame.changing.width() - 1,
                    frame.changing.height() - 1);
+
+    if (screen->doWorkspaceWarping())
+      warp = doWorkspaceWarping(x_root, y_root, dx, dy);
 
     frame.changing.setPos(dx, dy);
 
@@ -3091,14 +3098,11 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
                    frame.changing.height() - 1);
   }
 
-  if (screen->doWorkspaceWarping())
-    doWorkspaceWarping(x_root, y_root, dx, dy);
-
   screen->showPosition(dx, dy);
 }
 
 
-void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
+bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
                                         int &dx, int dy) {
   // workspace warping
   bool warp = False;
@@ -3116,9 +3120,7 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
     else dest = 0;
   }
   if (! warp)
-    return;
-
-  endMove();
+    return False;
 
   bool focus = flags.focused; // had focus while moving?
 
@@ -3135,24 +3137,24 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
      We grab the X server here so that we dont end up magically grabbing
      a different window dring the warp.
   */
-  XGrabServer(blackbox->getXDisplay());
 
   if (! flags.stuck)
     screen->reassociateWindow(this, dest, False);
   screen->changeWorkspaceID(dest);
 
-  configure(dx, dy, frame.rect.width(), frame.rect.height());
-
+  XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
   XWarpPointer(blackbox->getXDisplay(), None, 
                screen->getRootWindow(), 0, 0, 0, 0,
                dest_x, y_root);
-
-  XUngrabServer(blackbox->getXDisplay());
+  XGrabPointer(blackbox->getXDisplay(), frame.window, False,
+               PointerMotionMask | ButtonReleaseMask,
+               GrabModeAsync, GrabModeAsync,
+               None, blackbox->getMoveCursor(), CurrentTime);
 
   if (focus)
     setInputFocus();
 
-  beginMove(dest_x, y_root);
+  return True;
 }
 
 

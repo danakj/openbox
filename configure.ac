@@ -21,6 +21,7 @@ AM_MAINTAINER_MODE
 OB_DEBUG
 # Pick compiler specific/build target flags
 OB_COMPILER_FLAGS
+AC_C_BIGENDIAN
 
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"

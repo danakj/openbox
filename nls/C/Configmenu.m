@@ -30,6 +30,8 @@ $ #Cascade
 # Cascade Placement
 $ #BestFit
 # Best Fit Placement
+$ #UnderMouse
+# Under Mouse Placement
 $ #LeftRight
 # Left to Right
 $ #RightLeft

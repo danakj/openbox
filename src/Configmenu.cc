@@ -237,6 +237,9 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
 			  "Cascade Placement"), BScreen::CascadePlacement);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuBestFit,
                           "Best Fit Placement"), BScreen::BestFitPlacement);
+  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuUnderMouse,
+                          "Under Mouse Placement"),
+         BScreen::UnderMousePlacement);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuLeftRight,
 			  "Left to Right"), BScreen::LeftRight);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuRightLeft,
@@ -251,34 +254,27 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
 }
 
 void Configmenu::Placementmenu::setValues() {
-  switch (configmenu->screen.placementPolicy()) {
-  case BScreen::RowSmartPlacement:
-    setItemSelected(0, True);
-    break;
+  const int p = configmenu->screen.placementPolicy();
+  setItemSelected(0, p == BScreen::RowSmartPlacement);
+  setItemSelected(1, p == BScreen::ColSmartPlacement);
+  setItemSelected(2, p == BScreen::CascadePlacement);
+  setItemSelected(3, p == BScreen::BestFitPlacement);
+  setItemSelected(4, p == BScreen::UnderMousePlacement);
 
-  case BScreen::ColSmartPlacement:
-    setItemSelected(1, True);
-    break;
-
-  case BScreen::CascadePlacement:
-    setItemSelected(2, True);
-    break;
-
-  case BScreen::BestFitPlacement:
-    setItemSelected(3, True);
-    break;
-  }
-
-  Bool rl = (configmenu->screen.rowPlacementDirection() ==
+  bool rl = (configmenu->screen.rowPlacementDirection() ==
 	     BScreen::LeftRight),
        tb = (configmenu->screen.colPlacementDirection() ==
 	     BScreen::TopBottom);
 
-  setItemSelected(4, rl);
-  setItemSelected(5, !rl);
+  setItemSelected(5, rl);
+  setItemEnabled(5, p != BScreen::UnderMousePlacement);
+  setItemSelected(6, !rl);
+  setItemEnabled(6, p != BScreen::UnderMousePlacement);
 
-  setItemSelected(6, tb);
-  setItemSelected(7, !tb);
+  setItemSelected(7, tb);
+  setItemEnabled(7, p != BScreen::UnderMousePlacement);
+  setItemSelected(8, !tb);
+  setItemEnabled(8, p != BScreen::UnderMousePlacement);
 }
 
 void Configmenu::Placementmenu::reconfigure() {
@@ -298,74 +294,39 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
   switch (item->function()) {
   case BScreen::RowSmartPlacement:
     configmenu->screen.setPlacementPolicy(item->function());
-
-    setItemSelected(0, True);
-    setItemSelected(1, False);
-    setItemSelected(2, False);
-    setItemSelected(3, False);
-
     break;
 
   case BScreen::ColSmartPlacement:
     configmenu->screen.setPlacementPolicy(item->function());
-
-    setItemSelected(0, False);
-    setItemSelected(1, True);
-    setItemSelected(2, False);
-    setItemSelected(3, False);
-
     break;
 
   case BScreen::CascadePlacement:
     configmenu->screen.setPlacementPolicy(item->function());
-
-    setItemSelected(0, False);
-    setItemSelected(1, False);
-    setItemSelected(2, True);
-    setItemSelected(3, False);
-
     break;
 
   case BScreen::BestFitPlacement:
     configmenu->screen.setPlacementPolicy(item->function());
+    break;
 
-    setItemSelected(0, False);
-    setItemSelected(1, False);
-    setItemSelected(2, False);
-    setItemSelected(3, True);
-
+  case BScreen::UnderMousePlacement:
+    configmenu->screen.setPlacementPolicy(item->function());
     break;
 
   case BScreen::LeftRight:
     configmenu->screen.setRowPlacementDirection(BScreen::LeftRight);
-
-    setItemSelected(4, True);
-    setItemSelected(5, False);
-
     break;
 
   case BScreen::RightLeft:
     configmenu->screen.setRowPlacementDirection(BScreen::RightLeft);
-
-    setItemSelected(4, False);
-    setItemSelected(5, True);
-
     break;
 
   case BScreen::TopBottom:
     configmenu->screen.setColPlacementDirection(BScreen::TopBottom);
-
-    setItemSelected(6, True);
-    setItemSelected(7, False);
-
     break;
 
   case BScreen::BottomTop:
     configmenu->screen.setColPlacementDirection(BScreen::BottomTop);
-
-    setItemSelected(6, False);
-    setItemSelected(7, True);
-
     break;
   }
+  setValues();
 }

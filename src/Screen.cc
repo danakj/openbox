@@ -1026,6 +1026,7 @@ void BScreen::setPlacementPolicy(int p) {
   case CascadePlacement: placement = "CascadePlacement"; break;
   case BestFitPlacement: placement = "BestFitPlacement"; break;
   case ColSmartPlacement: placement = "ColSmartPlacement"; break;
+  case UnderMousePlacement: placement = "UnderMousePlacement"; break;
   default:
   case RowSmartPlacement: placement = "RowSmartPlacement"; break;
   }
@@ -1220,7 +1221,7 @@ void BScreen::load() {
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (0 == strncasecmp(s.c_str(), "RightToLeft", s.length()))
       resource.row_direction = RightLeft;
-    else if (0 == strncasecmp(s.c_str(), "LeftToRight", s.length()))
+    else //if (0 == strncasecmp(s.c_str(), "LeftToRight", s.length()))
       resource.row_direction = LeftRight;
   } else
     resource.row_direction = LeftRight;
@@ -1231,7 +1232,7 @@ void BScreen::load() {
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (0 == strncasecmp(s.c_str(), "BottomToTop", s.length()))
       resource.col_direction = BottomTop;
-    else if (0 == strncasecmp(s.c_str(), "TopToBottom", s.length()))
+    else //if (0 == strncasecmp(s.c_str(), "TopToBottom", s.length()))
       resource.col_direction = TopBottom;
   } else
     resource.col_direction = TopBottom;
@@ -1272,7 +1273,7 @@ void BScreen::load() {
                                 s.length())) {
       resource.sloppy_focus = true;
       resource.auto_raise = true;
-    } else if (0 == strncasecmp(s.c_str(), "SloppyFocus", s.length())) {
+    } else { //if (0 == strncasecmp(s.c_str(), "SloppyFocus", s.length())) {
       resource.sloppy_focus = true;
       resource.auto_raise = false;
     }
@@ -1299,7 +1300,9 @@ void BScreen::load() {
       resource.placement_policy = ColSmartPlacement;
     else if (0 == strncasecmp(s.c_str(), "BestFitPlacement", s.length()))
       resource.placement_policy = BestFitPlacement;
-    else if (0 == strncasecmp(s.c_str(), "CascadePlacement", s.length()))
+    else if (0 == strncasecmp(s.c_str(), "UnderMousePlacement", s.length()))
+      resource.placement_policy = UnderMousePlacement;
+    else //if (0 == strncasecmp(s.c_str(), "CascadePlacement", s.length()))
       resource.placement_policy = CascadePlacement;
   } else
     resource.placement_policy = CascadePlacement;
@@ -1323,7 +1326,7 @@ void BScreen::load() {
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (strncasecmp(s.c_str(), "European", s.length()))
       resource.date_format = B_EuropeanDate;
-    else if (strncasecmp(s.c_str(), "American", s.length()))
+    else //if (strncasecmp(s.c_str(), "American", s.length()))
       resource.date_format = B_AmericanDate;
   } else
     resource.date_format = B_AmericanDate;

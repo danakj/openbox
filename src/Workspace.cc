@@ -444,6 +444,26 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
     return NULL; //fall back to cascade
 }
 
+Point *Workspace::underMousePlacement(const Size &win_size, const Rect &space) {
+  Point *pt;
+
+  int x, y, rx, ry;
+  Window c, r;
+  unsigned int m;
+  XQueryPointer(screen.getOpenbox().getXDisplay(), screen.getRootWindow(),
+                &r, &c, &rx, &ry, &x, &y, &m);
+  pt = new Point(rx - win_size.w() / 2, ry - win_size.h() / 2);
+
+  if (pt->x() < space.x())
+    pt->setX(space.x());
+  if (pt->y() < space.y())
+    pt->setY(space.y());
+  if (pt->x() + win_size.w() > space.x() + space.w())
+    pt->setX(space.x() + space.w() - win_size.w());
+  if (pt->y() + win_size.h() > space.y() + space.h())
+    pt->setY(space.y() + space.h() - win_size.h());
+  return pt;
+}
 
 Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
   bool placed=false;
@@ -587,8 +607,8 @@ Point *const Workspace::cascadePlacement(const OpenboxWindow &win,
 
 void Workspace::placeWindow(OpenboxWindow &win) {
   Rect space = screen.availableArea();
-  const Size window_size(win.area().w()+screen.getBorderWidth() * 4,
-                         win.area().h()+screen.getBorderWidth() * 4);
+  const Size window_size(win.area().w()+screen.getBorderWidth() * 2,
+                         win.area().h()+screen.getBorderWidth() * 2);
   Point *place = NULL;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
@@ -601,6 +621,9 @@ void Workspace::placeWindow(OpenboxWindow &win) {
     break;
   case BScreen::ColSmartPlacement:
     place = colSmartPlacement(window_size, space);
+    break;
+  case BScreen::UnderMousePlacement:
+    place = underMousePlacement(window_size, space);
     break;
   } // switch
 

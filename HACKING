@@ -1,0 +1,7 @@
+Woop, a HACKING document for openbox at last!
+
+Beware the Client.transient_for. It can be set to a !NULL value of TRAN_GROUP,
+which is not a valid pointer. You must ALWAYS check for TRAN_GROUP before
+following transient_for. When TRAN_GROUP is found, Client.group will always
+be !NULL. Some smart action should be taken using all members of the group in
+this case.

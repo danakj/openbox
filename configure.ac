@@ -1,7 +1,8 @@
 dnl configure.in for Openbox
 dnl Initialize autoconf and automake
-AC_INIT(src/openbox.cc)
+AC_INIT(src/blackbox.cc)
 AM_INIT_AUTOMAKE(openbox,2.0.0,no-define)
+AC_CONFIG_HEADERS(config.h)
 
 dnl Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -98,40 +99,6 @@ AC_ARG_ENABLE(
   SLIT="-DSLIT"
 )
 AC_SUBST(SLIT)
-
-dnl Check for the new WM Spec
-NEWWMSPEC=""
-AC_MSG_CHECKING([whether to include the new WM Spec (DOES NOTHING)])
-AC_ARG_ENABLE(
-  newspec,
-[  --enable-newspec        include code for the new WM Spec (DOES NOTHING)
-                          [default=no]],
-  if test x$enableval = "xyes"; then
-    AC_MSG_RESULT([yes])
-    NEWWMSPEC="-DNEWWMSPEC"   
-  else
-    AC_MSG_RESULT([no])
-  fi,
-  AC_MSG_RESULT([no])
-)
-AC_SUBST(NEWWMSPEC)
-
-
-dnl Check for Interlacing
-INTERLACE=""
-AC_MSG_CHECKING([whether to include interlacing image code])
-AC_ARG_ENABLE(
-  interlace, [  --enable-interlace      include code for image interlacing [default=yes]],
-  if test x$enableval = "xyes"; then
-    AC_MSG_RESULT([yes])
-    INTERLACE="-DINTERLACE"
-  else
-    AC_MSG_RESULT([no])
-  fi,
-  AC_MSG_RESULT([yes])
-  INTERLACE="-DINTERLACE"
-)
-AC_SUBST(INTERLACE)
 
 dnl Check for ordered 8bpp dithering
 ORDEREDPSEUDO=""
@@ -245,9 +212,6 @@ util/Makefile
 data/Makefile
 data/styles/Makefile
 doc/Makefile
-dnl doc/ja_JP/Makefile
-dnl doc/nl_NL/Makefile
-dnl doc/sl_SI/Makefile
 nls/Makefile
 nls/C/Makefile
 nls/da_DK/Makefile
@@ -255,6 +219,7 @@ nls/de_DE/Makefile
 nls/es_ES/Makefile
 nls/et_EE/Makefile
 nls/fr_FR/Makefile
+nls/hu_HU/Makefile
 nls/it_IT/Makefile
 nls/ja_JP/Makefile
 nls/nl_NL/Makefile
@@ -263,5 +228,7 @@ nls/ru_RU/Makefile
 nls/sl_SI/Makefile
 nls/sv_SE/Makefile
 nls/tr_TR/Makefile
+nls/uk_UA/Makefile
 nls/zh_CN/Makefile
+nls/zh_TW/Makefile
 version.h)

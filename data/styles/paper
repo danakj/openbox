@@ -1,0 +1,83 @@
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+!   t h e m e   t i t l e :       paper
+!   a u t h o r :                 Alexandra Walford
+!                                   email:                   chroma@delusion.de
+!   d a t e :                     2001/11/08
+
+!   d e f a u l t s   ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+*color:                           rgb:ac/ab/aa
+*colorTo:                         rgb:df/de/dd
+*textColor:                       rgb:66/66/66
+*picColor:                        rgb:66/66/66
+!*font:                            mints-mild
+*font:                            -adobe-helvetica-medium-r-*-*-*-100-*-*-*-*-*-*
+*justify:                         center
+
+!   t o o l b a r   ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+toolbar:                          raised gradient crossdiagonal
+
+toolbar.button:                   parentrelative
+
+toolbar.button.pressed:           sunken
+
+toolbar.label:                    parentrelative
+
+toolbar.windowLabel:              parentrelative
+toolbar.windowLabel.textColor:    rgb:66/66/66
+
+toolbar.clock:                    parentrelative
+
+!   m e n u   ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+menu.title:                       raised gradient crossdiagonal
+menu.title.textColor:             rgb:66/66/66
+
+menu.frame:                       flat
+menu.frame.disableColor:          rgb:88/88/88
+
+menu.bullet:                      triangle
+menu.bullet.position:             right
+
+menu.hilite:                      raised gradient crossdiagonal
+menu.hilite.textColor:            rgb:66/66/66
+
+!   w i n d o w   ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+window.title.focus:               raised gradient crossdiagonal
+window.title.unfocus:             flat
+
+window.label.focus:               parentrelative
+window.label.focus.textColor:     rgb:66/66/66
+window.label.unfocus:             parentrelative
+
+window.button.focus:              parentrelative
+window.button.focus.picColor:     rgb:66/66/66
+window.button.unfocus:            parentrelative
+window.button.pressed:            sunken
+
+window.handle.focus:              raised gradient crossdiagonal
+window.handle.unfocus:            flat
+window.handle.unfocus.color:      rgb:8a/89/88
+
+window.grip.focus:                parentrelative
+window.grip.unfocus:              parentrelative
+
+window.frame.focusColor:          rgb:79/78/77
+window.frame.unfocusColor:        rgb:46/45/44
+
+!   m i s c   ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+borderWidth:                      1
+borderColor:                      rgb:68/67/66
+
+bevelWidth:                       1 
+handleWidth:                      2
+
+frameWidth:                       0
+
+rootCommand:                      bsetbg -gradient flatinterlacedhorizontalgradient -from rgb:35/34/33 -to rgb:57/56/55
+
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !

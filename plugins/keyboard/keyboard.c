@@ -117,11 +117,11 @@ static void event(ObEvent *e, void *foo)
                 Action *act = it->data;
                 act->data.cycle.final = TRUE;
                 act->func(&act->data);
-                grabbed_key = NULL;
-                grab_keyboard(FALSE);
-                reset_chains();
-                return;
             }
+            grabbed_key = NULL;
+            grab_keyboard(FALSE);
+            reset_chains();
+            return;
         }
     }
     if (e->type == Event_X_KeyRelease)

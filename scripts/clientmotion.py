@@ -45,6 +45,7 @@ def def_motion_release(action, win, type, modifiers, button, xroot, yroot,
 
 def def_motion(action, win, type, modifiers, xroot, yroot, time):
 	client = Openbox_findClient(openbox, win)
+	if not client: return
 
 	global posqueue
 	dx = xroot - posqueue[0][1]
@@ -52,8 +53,6 @@ def def_motion(action, win, type, modifiers, xroot, yroot, time):
 	#  _dx = x_root - _posqueue[0]->pos.x();
 	#  _dy = y_root - _posqueue[0]->pos.y();
 
-	if not client:
-		return
 	area = posqueue[0][3] # A Rect
 	if (type == Type_Titlebar) or (type == Type_Label):
 		OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)

@@ -190,6 +190,7 @@ void focus_fallback(ObFocusFallbackType type)
             }
         }
 
+#if 0
         /* try for group relations */
         if (old->group) {
             GSList *sit;
@@ -204,6 +205,7 @@ void focus_fallback(ObFocusFallbackType type)
                                 return;
                             }
         }
+#endif
     }
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)

@@ -6,7 +6,7 @@
 typedef struct _ObTimer ObTimer;
 
 /*! Data type of Timer callback */
-typedef void (*ObTimeoutHandler)(void *data);
+typedef void (*ObTimeoutHandler)(ObTimer *t, void *data);
 
 struct _ObTimer
 {

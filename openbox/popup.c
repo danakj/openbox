@@ -109,6 +109,14 @@ void popup_size_to_string(Popup *self, gchar *text)
     self->w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
 }
 
+void popup_set_text_align(Popup *self, RrJustify align)
+{
+    if (!self->a_text)
+        self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+
+    self->a_text->texture[0].data.text.justify = align;
+}
+
 void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 {
     gint x, y, w, h;

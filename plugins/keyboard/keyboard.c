@@ -121,7 +121,7 @@ static void reset_chains()
     }
 }
 
-static void chain_timeout(void *data)
+static void chain_timeout(ObTimer *t, void *data)
 {
     reset_chains();
 }

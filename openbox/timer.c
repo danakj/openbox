@@ -56,6 +56,7 @@ ObTimer *timer_start(long delay, ObTimeoutHandler cb, void *data)
     self->action = cb;
     self->data = data;
     self->del_me = FALSE;
+    g_get_current_time(&now);
     self->last = self->timeout = now;
     g_time_val_add(&self->timeout, delay);
 
@@ -117,7 +118,7 @@ void timer_dispatch(GTimeVal **wait)
 	*/
 	timers = g_slist_delete_link(timers, timers);
 	g_time_val_add(&curr->last, curr->delay);
-	curr->action(curr->data);
+	curr->action(curr, curr->data);
 	g_time_val_add(&curr->timeout, curr->delay);
 	insert_timer(curr);
 

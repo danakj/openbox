@@ -19,11 +19,11 @@
 #include <assert.h>
 
 ObClient *focus_client;
-GList **focus_order = NULL; /* these lists are created when screen_startup
-                               sets the number of desktops */
+GList **focus_order; /* these lists are created when screen_startup
+                        sets the number of desktops */
 
-static ObClient *focus_cycle_target = NULL;
-static Popup *focus_cycle_popup = NULL;
+static ObClient *focus_cycle_target;
+static Popup *focus_cycle_popup;
 
 void focus_startup()
 {
@@ -240,7 +240,7 @@ static void popup_cycle(ObClient *c, gboolean show)
 */
         /* XXX the size and the font extents need to be related on some level
          */
-        popup_size(focus_cycle_popup, 320, 48);
+        popup_size(focus_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
 
         /* use the transient's parent's title/icon */
         while (p->transient_for && p->transient_for != OB_TRAN_GROUP)

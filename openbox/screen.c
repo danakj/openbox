@@ -10,6 +10,7 @@
 #include "client.h"
 #include "frame.h"
 #include "focus.h"
+#include "popup.h"
 #include "dispatch.h"
 #include "extensions.h"
 #include "render/render.h"
@@ -42,6 +43,9 @@ Window   screen_support_win;
 
 static Rect  **area; /* array of desktop holding array of xinerama areas */
 static Rect  *monitor_area;
+
+static Popup *desktop_cycle_popup;
+static ObTimer *popup_timer = NULL;
 
 #ifdef USE_LIBSN
 static SnMonitorContext *sn_context;
@@ -274,6 +278,8 @@ void screen_startup()
     GSList *it;
     guint i;
 
+    desktop_cycle_popup = popup_new(FALSE);
+
     /* get the initial size */
     screen_resize();
 
@@ -312,6 +318,8 @@ void screen_startup()
 void screen_shutdown()
 {
     Rect **r;
+
+    popup_free(desktop_cycle_popup);
 
     XSelectInput(ob_display, RootWindow(ob_display, ob_screen), NoEventMask);
 
@@ -412,6 +420,36 @@ void screen_set_num_desktops(guint num)
 	screen_set_desktop(num - 1);
 }
 
+static void popup_cycle_hide(ObTimer *t, void *d)
+{
+    timer_stop(t);
+    popup_timer = NULL;
+
+    popup_hide(desktop_cycle_popup);
+}
+
+static void popup_cycle_show()
+{
+    Rect *a;
+
+    a = screen_physical_area_monitor(0);
+    popup_position(desktop_cycle_popup, CenterGravity,
+                   a->x + a->width / 2, a->y + a->height / 2);
+    /* XXX the size and the font extents need to be related on some level
+     */
+    popup_size(desktop_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
+
+    popup_set_text_align(desktop_cycle_popup, RR_JUSTIFY_CENTER);
+
+    popup_show(desktop_cycle_popup,
+               screen_desktop_names[screen_desktop], NULL);
+
+    g_message("%s", screen_desktop_names[screen_desktop]);
+
+    if (popup_timer) timer_stop(popup_timer);
+    popup_timer = timer_start(G_USEC_PER_SEC / 2, popup_cycle_hide, NULL);
+}
+
 void screen_set_desktop(guint num)
 {
     GList *it;
@@ -459,6 +497,9 @@ void screen_set_desktop(guint num)
 #ifdef DEBUG_FOCUS
     ob_debug("/switch fallback\n");
 #endif
+
+    if (ob_state() == OB_STATE_RUNNING)
+        popup_cycle_show();
 
     dispatch_ob(Event_Ob_Desktop, num, old);
 }
@@ -846,7 +887,7 @@ static void set_root_cursor()
 }
 
 #ifdef USE_LIBSN
-static void sn_timeout(void *data)
+static void sn_timeout(ObTimer *t, void *data)
 {
     timer_stop(sn_timer);
     sn_timer = NULL;

@@ -124,7 +124,7 @@ void timed_menu_read_pipe(int fd, void *d)
     }
 }
 
-void timed_menu_timeout_handler(void *d)
+void timed_menu_timeout_handler(ObTimer *t, void *d)
 {
     ObMenu *data = d;
     if (!data->shown && TIMED_MENU_DATA(data)->fd == -1) {
@@ -231,7 +231,7 @@ void *plugin_create(PluginMenuCreateData *data)
     
     m->plugin_data = (void *)d;
 
-    timed_menu_timeout_handler(m);
+    timed_menu_timeout_handler(NULL, m);
     return (void *)m;
 }
 

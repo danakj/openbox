@@ -8,7 +8,8 @@ INCLUDES= -I../src
 #noinst_LIBRARIES=libotk.a
 noinst_LTLIBRARIES=libotk.la
 
-libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
+libotk_la_SOURCES=rendercontrol.cc \
+                  color.cc display.cc font.cc gccache.cc image.cc \
                   property.cc imagecontrol.cc rect.cc screeninfo.cc \
                   texture.cc timer.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
@@ -16,15 +17,18 @@ libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   label.cc focuslabel.cc application.cc appwidget.cc
 #                  otk_wrap.cc
 
-libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS)
+libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS) @LIBS@
 
 MAINTAINERCLEANFILES= Makefile.in
 
 distclean-local:
 	rm -f *\~ *.orig *.rej .\#*
 
-otk_test: libotk.a otk_test.cc
-	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
+otk_test: libotk.la otk_test.cc
+	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) .libs/libotk.al @LIBS@
+
+rendertest: libotk.la rendertest.cc
+	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o $@ rendertest.cc $(XFT_LIBS) .libs/libotk.al @LIBS@
 
 #otk.i: $(wildcard *.hh)
 #	touch $@

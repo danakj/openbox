@@ -1550,7 +1550,15 @@ void Client::disableDecorations(DecorationFlags flags)
 
 bool Client::focusModalChild()
 {
-  // XXX: find a modal child recursively and try focus it
+  // find a modal child recursively and try focus it
+  List::iterator it, end = _transients.end();
+  for (it = _transients.begin(); it != end; ++it)
+    if ((*it)->focusModalChild())
+      return true; // got one
+  // none of our grand-children are modal, try our direct children
+  for (it = _transients.begin(); it != end; ++it)
+    if ((*it)->modal() && (*it)->focus())
+      return true; // got one
   return false;
 }
 

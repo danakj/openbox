@@ -3,14 +3,17 @@
 
 #include <glib.h>
 
-/*! Data type of Timer callback */
-typedef void (*TimeoutHandler)(void *data);
+typedef struct _ObTimer ObTimer;
 
-typedef struct Timer {
+/*! Data type of Timer callback */
+typedef void (*ObTimeoutHandler)(void *data);
+
+struct _ObTimer
+{
     /*! Microseconds between timer firings */
     long delay;
     /*! Callback for timer expiry */
-    TimeoutHandler action;
+    ObTimeoutHandler action;
     /*! Data sent to callback */
     void *data;
     /*! We overload the delete operator to just set this to true */
@@ -19,7 +22,7 @@ typedef struct Timer {
     GTimeVal last;
     /*! When this timer will next trigger */
     GTimeVal timeout;
-} Timer;
+};
 
 /*! Initializes the timer subsection */
 void timer_startup();
@@ -27,9 +30,9 @@ void timer_startup();
 void timer_shutdown();
 
 /* Creates a new timer with a given delay */
-Timer *timer_start(long delay, TimeoutHandler cb, void *data);
+ObTimer *timer_start(long delay, ObTimeoutHandler cb, void *data);
 /* Stops and frees a timer */
-void timer_stop(Timer *self);
+void timer_stop(ObTimer *self);
 
 /*! Dispatch all pending timers. Sets wait to the amount of time to wait for
   the next timer, or NULL if there are no timers to wait for */

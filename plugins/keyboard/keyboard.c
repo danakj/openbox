@@ -80,7 +80,7 @@ KeyBindingTree *firstnode = NULL;
 
 static KeyBindingTree *curpos;
 static guint reset_key, reset_state;
-static Timer *chain_timer;
+static ObTimer *chain_timer;
 
 static void grab_for_window(Window win, gboolean grab)
 {

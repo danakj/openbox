@@ -26,7 +26,7 @@ typedef enum {
 
 typedef struct {
     Timed_Menu_Type type;
-    Timer *timer;
+    ObTimer *timer;
     char *command; /* for the PIPE */
     char *buf; /* buffer to hold partially read menu */
     unsigned long buflen; /* how many bytes are in the buffer */

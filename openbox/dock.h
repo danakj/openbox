@@ -28,7 +28,7 @@ struct _ObDock
     gint h;
 
     gboolean hidden;
-    Timer *hide_timer;
+    ObTimer *hide_timer;
 
     GList *dock_apps;
 };

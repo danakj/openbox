@@ -518,7 +518,7 @@ void dock_hide(gboolean hide)
     } else {
         g_assert(!dock->hide_timer);
         dock->hide_timer = timer_start(config_dock_hide_timeout * 1000,
-                                       (TimeoutHandler)hide_timeout,
+                                       (ObTimeoutHandler)hide_timeout,
                                        NULL);
     }
 }

@@ -8,7 +8,7 @@ static GTimeVal now;
 static GTimeVal ret_wait;
 static GSList *timers; /* nearest timer is at the top */
 
-#define NEAREST_TIMEOUT (((Timer*)timers->data)->timeout)
+#define NEAREST_TIMEOUT (((ObTimer*)timers->data)->timeout)
 
 static long timecompare(GTimeVal *a, GTimeVal *b)
 {
@@ -19,11 +19,11 @@ static long timecompare(GTimeVal *a, GTimeVal *b)
     
 }
 
-static void insert_timer(Timer *self)
+static void insert_timer(ObTimer *self)
 {
     GSList *it;
     for (it = timers; it != NULL; it = it->next) {
-	Timer *t = it->data;
+	ObTimer *t = it->data;
         if (timecompare(&self->timeout, &t->timeout) <= 0) {
 	    timers = g_slist_insert_before(timers, it, self);
 	    break;
@@ -49,9 +49,9 @@ void timer_shutdown()
     timers = NULL;
 }
 
-Timer *timer_start(long delay, TimeoutHandler cb, void *data)
+ObTimer *timer_start(long delay, ObTimeoutHandler cb, void *data)
 {
-    Timer *self = g_new(Timer, 1);
+    ObTimer *self = g_new(ObTimer, 1);
     self->delay = delay;
     self->action = cb;
     self->data = data;
@@ -64,7 +64,7 @@ Timer *timer_start(long delay, TimeoutHandler cb, void *data)
     return self;
 }
 
-void timer_stop(Timer *self)
+void timer_stop(ObTimer *self)
 {
     self->del_me = TRUE;
 }
@@ -96,7 +96,7 @@ void timer_dispatch(GTimeVal **wait)
     g_get_current_time(&now);
 
     while (timers != NULL) {
-	Timer *curr = timers->data; /* get the top element */
+	ObTimer *curr = timers->data; /* get the top element */
 	/* since timer_stop doesn't actually free the timer, we have to do our
 	   real freeing in here.
 	*/

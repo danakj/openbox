@@ -46,7 +46,7 @@ static Window support_window = None;
 #ifdef USE_LIBSN
 static SnMonitorContext *sn_context;
 static int sn_busy_cnt;
-static Timer *sn_timer = NULL;
+static ObTimer *sn_timer = NULL;
 
 static void sn_event_func(SnMonitorEvent *event, void *data);
 #endif

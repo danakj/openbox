@@ -165,7 +165,7 @@ class _cycledata:
         if not (client.iconic() or client.desktop() == 0xffffffff or \
                 client.desktop() == self.screen.desktop()):
             root = self.screeninfo.rootWindow()
-            ob.send_client_msg(root, otk.Property_atoms().net_current_desktop,
+            ob.send_client_msg(root, otk.atoms.net_current_desktop,
                                root, client.desktop())
         
         # send a net_active_window message for the target
@@ -173,7 +173,7 @@ class _cycledata:
             if final: r = focuscycle.RAISE_WINDOW
             else: r = 0
             ob.send_client_msg(self.screeninfo.rootWindow(),
-                               otk.Property_atoms().openbox_active_window,
+                               otk.atoms.openbox_active_window,
                                client.window(), final, r)
 
     def cycle(self, data, forward):

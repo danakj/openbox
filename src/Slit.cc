@@ -506,7 +506,7 @@ void Slit::reposition(void) {
       y = (screen->getHeight() - frame.rect.height()) / 2;
     else
       y = screen->getHeight() - frame.rect.height()
-  - (screen->getBorderWidth() * 2);
+        - (screen->getBorderWidth() * 2);
 
     break;
 
@@ -519,7 +519,7 @@ void Slit::reposition(void) {
       y = 0;
     else
       y = screen->getHeight() - frame.rect.height()
-  - (screen->getBorderWidth() * 2);
+        - (screen->getBorderWidth() * 2);
 
     break;
 

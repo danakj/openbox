@@ -16,7 +16,6 @@ Strut dock_strut;
 void dock_startup()
 {
     XSetWindowAttributes attrib;
-    int i;
 
     STRUT_SET(dock_strut, 0, 0, 0, 0);
 
@@ -36,8 +35,8 @@ void dock_startup()
     XSetWindowBorderWidth(ob_display, dock->frame, theme_bwidth);
 
     g_hash_table_insert(window_map, &dock->frame, dock);
-    stacking_add(DOCK_AS_WINDOW(&dock[i]));
-    stacking_raise(DOCK_AS_WINDOW(&dock[i]));
+    stacking_add(DOCK_AS_WINDOW(dock));
+    stacking_raise(DOCK_AS_WINDOW(dock));
 }
 
 void dock_shutdown()

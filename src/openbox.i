@@ -10,28 +10,36 @@
 #include "openbox.hh"
 #include "screen.hh"
 #include "client.hh"
+#include "python.hh"
 %}
+
 
 %include stl.i
 //%include std_list.i
 //%template(ClientList) std::list<OBClient*>;
 
-
 %ignore ob::Openbox::instance;
-%ignore ob::OBScreen::clients;
-
-%import "../otk/eventdispatcher.hh"
-%import "../otk/eventhandler.hh"
-%import "widget.hh"
-
-%include "openbox.hh"
-%include "screen.hh"
-%include "client.hh"
-
 %inline %{
   ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
 %};
 
+// stuff for registering callbacks!
+
+%inline %{
+  enum ActionType {
+    Action_ButtonPress,
+    Action_ButtonRelease,
+    Action_EnterWindow,
+    Action_LeaveWindow,
+    Action_KeyPress,
+    Action_MouseMotion
+  };
+%}
+%ignore ob::python_callback;
+%rename(register) ob::python_register;
+%rename(unregister) ob::python_unregister;
+
+%ignore ob::OBScreen::clients;
 %{
   #include <iterator>
 %}
@@ -47,3 +55,15 @@
     return (int) self->clients.size();
   }
 };
+
+%import "../otk/eventdispatcher.hh"
+%import "../otk/eventhandler.hh"
+%import "widget.hh"
+
+%include "openbox.hh"
+%include "screen.hh"
+%include "client.hh"
+%include "python.hh"
+
+// for Mod1Mask etc
+%include "X11/X.h"

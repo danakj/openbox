@@ -8,6 +8,7 @@
 #include "widget.hh"
 #include "openbox.hh"
 #include "client.hh"
+#include "python.hh"
 #include "otk/display.hh"
 
 #include <stdio.h>
@@ -76,6 +77,9 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
 
   printf("GUILE: PRESS: win %lx type %d modifiers %u button %u time %lx\n",
          (long)e.window, (w ? w->type():-1), e.state, e.button, e.time);
+  python_callback(Action_ButtonPress, e.window,
+                  (OBWidget::WidgetType)(w ? w->type():-1),
+                  e.state, e.button, e.time);
     
   if (_button) return; // won't count toward CLICK events
 

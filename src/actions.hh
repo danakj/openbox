@@ -23,6 +23,16 @@ namespace ob {
 */
 class OBActions : public otk::OtkEventHandler {
 public:
+  enum ActionType {
+    Action_ButtonPress,
+    Action_ButtonRelease,
+    Action_EnterWindow,
+    Action_LeaveWindow,
+    Action_KeyPress,
+    Action_MouseMotion,
+    NUM_ACTIONS
+  };
+  
   struct ButtonReleaseAction {
     Window win;
     unsigned int button;

@@ -401,6 +401,15 @@ void client_unmanage(ObClient *self)
        influence */
     screen_update_areas();
 
+    if (focus_client == self) {
+        XEvent e;
+
+        /* focus the last focused window on the desktop, and ignore enter
+           events from the unmap so it doesnt mess with the focus */
+        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+        client_unfocus(self);
+    }
+
     /* tell our parent(s) that we're gone */
     if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
         GSList *it;
@@ -427,15 +436,6 @@ void client_unmanage(ObClient *self)
         func(self);
     }
         
-    if (focus_client == self) {
-        XEvent e;
-
-        /* focus the last focused window on the desktop, and ignore enter
-           events from the unmap so it doesnt mess with the focus */
-        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-        client_unfocus(self);
-    }
-
     /* remove from its group */
     if (self->group) {
         group_remove(self->group, self);

@@ -60,12 +60,12 @@ void client_shutdown()
 {
 }
 
-void client_add_destructor(ObClientDestructorFunc func)
+void client_add_destructor(GDestroyNotify func)
 {
     client_destructors = g_slist_prepend(client_destructors, (gpointer)func);
 }
 
-void client_remove_destructor(ObClientDestructorFunc func)
+void client_remove_destructor(GDestroyNotify func)
 {
     client_destructors = g_slist_remove(client_destructors, (gpointer)func);
 }
@@ -423,7 +423,7 @@ void client_unmanage(ObClient *self)
     }
 
     for (it = client_destructors; it; it = g_slist_next(it)) {
-        ObClientDestructorFunc func = (ObClientDestructorFunc) it->data;
+        GDestroyNotify func = (GDestroyNotify) it->data;
         func(self);
     }
         

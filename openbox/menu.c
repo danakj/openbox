@@ -55,11 +55,11 @@ static gboolean menu_open(gchar *file, xmlDocPtr *doc, xmlNodePtr *node)
     return loaded;
 }
 
-static void client_dest(ObClient *c)
+static void client_dest(gpointer client)
 {
     /* menus can be associated with a client, so close any that are since
        we are disappearing now */
-    menu_frame_hide_all_client(c);
+    menu_frame_hide_all_client(client);
 }
 
 void menu_startup()

@@ -28,9 +28,9 @@ static ObCorner lockcorner;
 
 static Popup *popup = NULL;
 
-static void client_dest(ObClient *c)
+static void client_dest(gpointer client)
 {
-    if (moveresize_client == c)
+    if (moveresize_client == client)
         moveresize_end(TRUE);    
 }
 

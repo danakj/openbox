@@ -450,9 +450,6 @@ void OBFrame::releaseClient()
                     _screen->rootWindow(),
                     _client->area().x(), _client->area().y());
   }
-
-  // do an extra map here .. ? XXX
-//  XMapWindow(otk::OBDisplay::display, _client->window());
 }
 
 

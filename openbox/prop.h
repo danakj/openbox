@@ -151,8 +151,8 @@ typedef struct Atoms {
 
     /* Extra atoms */
 
-    Atom kde_net_system_tray_windows;
-    Atom kde_net_wm_system_tray_window_for;
+    Atom kde_net_wm_frame_strut;
+    Atom kde_wm_change_state;
     Atom kde_net_wm_window_type_override;
 
     Atom kwm_win_icon;

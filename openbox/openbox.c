@@ -218,6 +218,15 @@ int main(int argc, char **argv)
                     ob_exit_with_error("Unable to load a theme.");
             }
 
+            if (reconfigure) {
+                GList *it;
+
+                /* update all existing windows for the new theme */
+                for (it = client_list; it; it = g_list_next(it)) {
+                    ObClient *c = it->data;
+                    frame_adjust_theme(c->frame);
+                }
+            }
             event_startup(reconfigure);
             grab_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
@@ -243,7 +252,7 @@ int main(int argc, char **argv)
                 /* redecorate all existing windows */
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
-                    frame_adjust_theme(c->frame);
+                    frame_adjust_area(c->frame, TRUE, TRUE, FALSE);
                 }
             }
 

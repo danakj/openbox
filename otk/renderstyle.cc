@@ -15,8 +15,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
     _file(stylefile)
 {
 // pick one..
-//#define FIERON
-#define MERRY
+#define FIERON
+//#define MERRY
 
 #ifdef FIERON
   _root_color = new RenderColor(_screen, 0x272a2f);
@@ -382,7 +382,7 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     0x0,
                                     0x0);
 
-  _label_font = new Font(_screen, "Arial,Sans-9", true, 1, 0x3e);
+  _label_font = new Font(_screen, "Arial,Sans-8", true, 1, 0x3e);
   _label_justify = CenterJustify;
 
   _max_mask = new PixmapMask();

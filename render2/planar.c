@@ -107,6 +107,31 @@ static void RrBevelPaint(int x, int y, int w, int h, int bwidth,
     glEnd();
 }
 
+static void RrBorderPaint(int x, int y, int w, int h, int bwidth,
+                          struct RrColor *color)
+{
+    int offset = bwidth / 2;
+    h--; w--;
+
+    RrColor4f(color);
+
+    glBegin(GL_LINES);
+    glLineWidth(bwidth);
+    glVertex2i(x + offset, y + offset);
+    glVertex2i(x + offset, y + h - offset);
+
+    glVertex2i(x + offset, y + h - offset);
+    glVertex2i(x + w - offset, y + h - offset);
+
+    glVertex2i(x + w - offset, y + h - offset);
+    glVertex2i(x + w - offset,  y + offset);
+               
+    glVertex2i(x + w - offset, y + offset);
+    glVertex2i(x + offset, y + offset);
+    glLineWidth(1.0); /* XXX is this needed? */
+    glEnd();
+}
+
 void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
 {   
     struct RrColor *pri, *sec, avg;
@@ -352,11 +377,35 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
         break;
     case RR_BEVEL_NONE:
         break;
-    }    
+    }
+
+    if (RrPlanarBorderWidth(sur))
+        RrBorderPaint(RrSurfaceX(sur), RrSurfaceY(sur),
+                      RrSurfaceWidth(sur), RrSurfaceHeight(sur),
+                      RrPlanarBorderWidth(sur), &RrPlanarBorderColor(sur));
 }
 
 void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h)
 {
-    *w = 0;
-    *h = 0;
+    *w = *h = RrPlanarBorderWidth(sur);
+    switch (RrPlanarBevelType(sur)) {
+    case RR_SUNKEN_OUTER:
+        (*w)++;
+        (*h)++;
+        break;
+    case RR_SUNKEN_INNER:
+        (*w)+=2;
+        (*h)+=2;
+        break;
+    case RR_RAISED_OUTER:
+        (*w)++;
+        (*h)++;
+        break;
+    case RR_RAISED_INNER:
+        (*w)+=2;
+        (*h)+=2;
+        break;
+    case RR_BEVEL_NONE:
+        break;
+    }
 }

@@ -2,8 +2,8 @@
 Default Keybindings for Epistrophy-NG
 -------------------------------------
 
-NextScreen			ctrl-Tab
-PrevScreen			ctrl-shift-Tab
+nextScreen			ctrl-Tab
+prevScreen			ctrl-shift-Tab
 
 nextWindow			alt-Tab
 prevWindow			shift-alt-Tab

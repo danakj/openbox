@@ -49,7 +49,6 @@ void moveresize_startup()
 
     popup = popup_new(FALSE);
     popup_size_to_string(popup, "W:  0000  W:  0000");
-    popup_position(popup, NorthWestGravity, POPUP_X, POPUP_Y);
 
     attrib.save_under = True;
     opaque_window.win = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
@@ -80,8 +79,12 @@ void moveresize_shutdown()
 static void popup_coords(char *format, int a, int b)
 {
     char *text;
+    Rect *area;
 
     text = g_strdup_printf(format, a, b);
+    area = screen_physical_area_xinerama(0);
+    popup_position(popup, NorthWestGravity,
+                   POPUP_X + area->x, POPUP_Y + area->y);
     popup_show(popup, text, NULL);
     g_free(text);
 }
@@ -89,6 +92,7 @@ static void popup_coords(char *format, int a, int b)
 void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
 {
     Cursor cur;
+    Rect *a;
 
     g_assert(!moveresize_in_progress);
 
@@ -147,8 +151,10 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
     grab_pointer(TRUE, cur);
     grab_keyboard(TRUE);
 
-    XResizeWindow(ob_display, opaque_window.win, screen_physical_size.width,
-                  screen_physical_size.height);
+    a = screen_physical_area();
+
+    XMoveResizeWindow(ob_display, opaque_window.win,
+                      a->x, a->y, a->width, a->height);
     stacking_raise(INTERNAL_AS_WINDOW(&opaque_window));
     if (corner == prop_atoms.net_wm_moveresize_move ||
         corner == prop_atoms.net_wm_moveresize_move_keyboard) {

@@ -50,6 +50,8 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
     newy = MAX(client->frame->area.y + client->frame->size.top, y);
     newy -= ob_rr_theme->bwidth;
     
+    /* XXX do xinerama shit like in menu.c! im not coding it now because
+       this function isnt even being used right now... */
     POINT_SET(self->location, 
 	      MIN(x, screen_physical_size.width - self->size.width -
                   ob_rr_theme->bwidth * 2), 

@@ -34,8 +34,14 @@ typedef struct Rect {
                             (r1).height == (r2).height)
 
 #define RECT_CONTAINS(r, x, y) \
-    (x >= (r).x && x < (r).x + (r).width && \
-     y >= (r).y && y < (r).y + (r).height)
+    ((x) >= (r).x && (x) < (r).x + (r).width && \
+     (y) >= (r).y && (y) < (r).y + (r).height)
+#define RECT_CONTAINS_RECT(r, o) \
+    ((o).x >= (r).x && (o).x + (o).width <= (r).x + (r).width && \
+     (o).y >= (r).y && (o).y + (o).height <= (r).y + (r).height)
+#define RECT_INTERSECTS_RECT(r, o) \
+    ((o).x < (r).x + (r).width && (o).x + (o).width > (r).x && \
+     (o).y < (r).y + (r).height && (o).y + (o).height > (r).y)
 
 typedef struct Strut {
     int left;

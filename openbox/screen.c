@@ -31,14 +31,16 @@
 			ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
 guint    screen_num_desktops    = 0;
+guint    screen_num_xin_areas   = 0;
 guint    screen_desktop         = 0;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
 DesktopLayout screen_desktop_layout;
 char   **screen_desktop_names = NULL;
 
-static Rect  *area = NULL;
-static Strut *strut = NULL;
+static Rect  **area = NULL; /* array of desktop holding array of
+                               xinerama areas */
+static Rect  *xin_areas = NULL;
 static Window support_window = None;
 
 #ifdef USE_LIBSN
@@ -49,7 +51,6 @@ static Timer *sn_timer = NULL;
 static void sn_event_func(SnMonitorEvent *event, void *data);
 #endif
 
-static void screen_update_area();
 static void set_root_cursor();
 
 static gboolean running;
@@ -212,6 +213,8 @@ void screen_startup()
 
 void screen_shutdown()
 {
+    Rect **r;
+
     XSelectInput(ob_display, ob_root, NoEventMask);
 
     PROP_ERASE(ob_root, openbox_pid); /* we're not running here no more! */
@@ -221,7 +224,8 @@ void screen_shutdown()
     XDestroyWindow(ob_display, support_window);
 
     g_strfreev(screen_desktop_names);
-    g_free(strut);
+    for (r = area; *r; ++r)
+        g_free(*r);
     g_free(area);
 }
 
@@ -231,17 +235,15 @@ void screen_resize(int w, int h)
     guint32 geometry[2];
 
     /* Set the _NET_DESKTOP_GEOMETRY hint */
-    geometry[0] = w;
-    geometry[1] = h;
+    screen_physical_size.width = geometry[0] = w;
+    screen_physical_size.height = geometry[1] = h;
     PROP_SETA32(ob_root, net_desktop_geometry, cardinal, geometry, 2);
-    screen_physical_size.width = geometry[0];
-    screen_physical_size.height = geometry[1];
 
     if (ob_state == State_Starting)
 	return;
 
     dock_configure();
-    screen_update_struts();
+    screen_update_areas();
 
     for (it = client_list; it; it = it->next)
         client_move_onscreen(it->data);
@@ -288,7 +290,7 @@ void screen_set_num_desktops(guint num)
     }
 
     /* change our struts/area to match (after moving windows) */
-    screen_update_struts();
+    screen_update_areas();
 
     dispatch_ob(Event_Ob_NumDesktops, num, old);
 
@@ -500,129 +502,205 @@ void screen_install_colormap(Client *client, gboolean install)
     }
 }
 
-void screen_update_struts()
+void screen_update_areas()
 {
+    guint i, x;
+    guint32 *dims;
+    Rect **old_area = area;
+    Rect **rit;
     GList *it;
-    guint i;
-     
-    g_free(strut);
-    strut = g_new0(Strut, screen_num_desktops + 1);
 
-    for (it = client_list; it != NULL; it = it->next) {
-	Client *c = it->data;
-	if (c->iconic) continue; /* these dont count in the strut */
-    
-	if (c->desktop == 0xffffffff) {
-	    for (i = 0; i < screen_num_desktops; ++i)
-		STRUT_ADD(strut[i], c->strut);
-	} else {
-	    g_assert(c->desktop < screen_num_desktops);
-	    STRUT_ADD(strut[c->desktop], c->strut);
-	}
-	/* apply to the 'all desktops' strut */
-	STRUT_ADD(strut[screen_num_desktops], c->strut);
+    g_free(xin_areas);
+    extensions_xinerama_screens(&xin_areas, &screen_num_xin_areas);
+
+    if (area) {
+        for (i = 0; area[i]; ++i)
+            g_free(area[i]);
+        g_free(area);
     }
 
-    for (i = 0; i < screen_num_desktops; ++i)
-        STRUT_ADD(strut[i], dock_strut);
-
-    screen_update_area();
-}
-
-static void screen_update_area()
-{
-    guint i;
-    guint32 *dims;
-
-    g_free(area);
-    area = g_new0(Rect, screen_num_desktops + 1);
+    area = g_new(Rect*, screen_num_desktops + 2);
+    for (i = 0; i < screen_num_desktops + 1; ++i)
+        area[i] = g_new(Rect, screen_num_xin_areas + 1);
+    area[i] = NULL;
      
     dims = g_new(guint32, 4 * screen_num_desktops);
+
+    rit = old_area;
     for (i = 0; i < screen_num_desktops + 1; ++i) {
-	Rect old_area = area[i];
-/*
-  #ifdef    XINERAMA
-  // reset to the full areas
-  if (isXineramaActive())
-  xineramaUsableArea = getXineramaAreas();
-  #endif // XINERAMA
-*/
+        Strut s;
+        int l, r, t, b;
 
-	RECT_SET(area[i], strut[i].left, strut[i].top,
-		 screen_physical_size.width - (strut[i].left +
-					       strut[i].right),
-		 screen_physical_size.height - (strut[i].top +
-						strut[i].bottom));
-    
-/*
-  #ifdef    XINERAMA
-  if (isXineramaActive()) {
-  // keep each of the ximerama-defined areas inside the strut
-  RectList::iterator xit, xend = xineramaUsableArea.end();
-  for (xit = xineramaUsableArea.begin(); xit != xend; ++xit) {
-  if (xit->x() < usableArea.x()) {
-  xit->setX(usableArea.x());
-  xit->setWidth(xit->width() - usableArea.x());
-  }
-  if (xit->y() < usableArea.y()) {
-  xit->setY(usableArea.y());
-  xit->setHeight(xit->height() - usableArea.y());
-  }
-  if (xit->x() + xit->width() > usableArea.width())
-  xit->setWidth(usableArea.width() - xit->x());
-  if (xit->y() + xit->height() > usableArea.height())
-  xit->setHeight(usableArea.height() - xit->y());
-  }
-  }
-  #endif // XINERAMA
-*/
-	if (!RECT_EQUAL(old_area, area[i])) {
-	    /* the area has changed, adjust all the maximized windows */
+        /* calc the xinerama areas */
+        for (x = 0; x < screen_num_xin_areas; ++x) {
+            area[i][x] = xin_areas[x];
+            if (x == 0) {
+                l = xin_areas[x].x;
+                t = xin_areas[x].y;
+                r = xin_areas[x].x + xin_areas[x].width - 1;
+                b = xin_areas[x].y + xin_areas[x].height - 1;
+            } else {
+                l = MIN(l, xin_areas[x].x);
+                t = MIN(t, xin_areas[x].y);
+                r = MAX(r, xin_areas[x].x + xin_areas[x].width - 1);
+                b = MAX(b, xin_areas[x].y + xin_areas[x].height - 1);
+            }
+        }
+        RECT_SET(area[i][x], l, t, r - l + 1, b - t + 1);
+
+        /* apply struts */
+        STRUT_SET(s, 0, 0, 0, 0);
+        for (it = client_list; it; it = it->next)
+            STRUT_ADD(s, ((Client*)it->data)->strut);
+        STRUT_ADD(s, dock_strut);
+
+        if (s.left) {
+            int o;
+
+            /* find the left-most xin heads, i do this in 2 loops :| */
+            o = area[i][0].x;
+            for (x = 1; x < screen_num_xin_areas; ++x)
+                o = MIN(o, area[i][x].x);
+
+            for (x = 0; x < screen_num_xin_areas; ++x) {
+                int edge = o + s.left - area[i][x].x;
+                if (edge > 0) {
+                    area[i][x].x += edge;
+                    area[i][x].width -= edge;
+                }
+            }
+
+            area[i][screen_num_xin_areas].x += s.left;
+            area[i][screen_num_xin_areas].width -= s.left;
+        }
+        if (s.top) {
+            int o;
+
+            /* find the left-most xin heads, i do this in 2 loops :| */
+            o = area[i][0].y;
+            for (x = 1; x < screen_num_xin_areas; ++x)
+                o = MIN(o, area[i][x].y);
+
+            for (x = 0; x < screen_num_xin_areas; ++x) {
+                int edge = o + s.top - area[i][x].y;
+                if (edge > 0) {
+                    area[i][x].y += edge;
+                    area[i][x].height -= edge;
+                }
+            }
+
+            area[i][screen_num_xin_areas].y += s.top;
+            area[i][screen_num_xin_areas].height -= s.top;
+        }
+        if (s.right) {
+            int o;
+
+            /* find the bottom-most xin heads, i do this in 2 loops :| */
+            o = area[i][0].x + area[i][0].width - 1;
+            for (x = 1; x < screen_num_xin_areas; ++x)
+                o = MAX(o, area[i][x].x + area[i][x].width - 1);
+
+            for (x = 0; x < screen_num_xin_areas; ++x) {
+                int edge = (area[i][x].x + area[i][x].width - 1) -
+                    (o - s.right);
+                if (edge > 0)
+                    area[i][x].width -= edge;
+            }
+
+            area[i][screen_num_xin_areas].width -= s.right;
+        }
+        if (s.bottom) {
+            int o;
+
+            /* find the bottom-most xin heads, i do this in 2 loops :| */
+            o = area[i][0].y + area[i][0].height - 1;
+            for (x = 1; x < screen_num_xin_areas; ++x)
+                o = MAX(o, area[i][x].y + area[i][x].height - 1);
+
+            for (x = 0; x < screen_num_xin_areas; ++x) {
+                int edge = (area[i][x].y + area[i][x].height - 1) -
+                    (o - s.bottom);
+                if (edge > 0)
+                    area[i][x].height -= edge;
+            }
+
+            area[i][screen_num_xin_areas].height -= s.bottom;
+        }
+
+        /* XXX when dealing with partial struts, if its in a single
+           xinerama area, then only subtract it from that area's space
+        for (x = 0; x < screen_num_xin_areas; ++x) {
 	    GList *it;
-	    for (it = client_list; it; it = it->next) {
-		Client *c = it->data;
-		if (i < screen_num_desktops) {
-		    if (c->desktop == i)
-                        client_reconfigure(c);
-		} else {
-		    /* the 'all desktops' size */
-		    if (c->desktop == DESKTOP_ALL)
-                        client_reconfigure(c);
-		}
-	    }
-	}
 
-	/* don't set these for the 'all desktops' area */
-	if (i < screen_num_desktops) {
-	    dims[(i * 4) + 0] = area[i].x;
-	    dims[(i * 4) + 1] = area[i].y;
-	    dims[(i * 4) + 2] = area[i].width;
-	    dims[(i * 4) + 3] = area[i].height;
-	}
+
+               do something smart with it for the 'all xinerama areas' one...
+
+	    for (it = client_list; it; it = it->next) {
+
+                XXX if gunna test this shit, then gotta worry about when
+                the client moves between xinerama heads..
+
+                if (RECT_CONTAINS_RECT(((Client*)it->data)->frame->area,
+                                       area[i][x])) {
+
+                }            
+            }
+        }
+        */
+
+        /* XXX optimize when this is run? */
+
+        /* the area has changed, adjust all the maximized 
+           windows */
+        for (it = client_list; it; it = it->next) {
+            Client *c = it->data; 
+            if (i < screen_num_desktops) {
+                if (c->desktop == i)
+                    client_reconfigure(c);
+            } else if (c->desktop == DESKTOP_ALL)
+                client_reconfigure(c);
+        }
+        if (i < screen_num_desktops) {
+            /* don't set these for the 'all desktops' area */
+            dims[(i * 4) + 0] = area[i][screen_num_xin_areas].x;
+            dims[(i * 4) + 1] = area[i][screen_num_xin_areas].y;
+            dims[(i * 4) + 2] = area[i][screen_num_xin_areas].width;
+            dims[(i * 4) + 3] = area[i][screen_num_xin_areas].height;
+        }
     }
     PROP_SETA32(ob_root, net_workarea, cardinal,
 		dims, 4 * screen_num_desktops);
+
     g_free(dims);
 }
 
 Rect *screen_area(guint desktop)
 {
-    if (desktop >= screen_num_desktops) {
-	if (desktop == DESKTOP_ALL)
-	    return &area[screen_num_desktops];
-	return NULL;
-    }
-    return &area[desktop];
+    return screen_area_xinerama(desktop, screen_num_xin_areas);
 }
 
-Strut *screen_strut(guint desktop)
+Rect *screen_area_xinerama(guint desktop, guint head)
 {
+    if (head > screen_num_xin_areas)
+        return NULL;
     if (desktop >= screen_num_desktops) {
 	if (desktop == DESKTOP_ALL)
-	    return &strut[screen_num_desktops];
+	    return &area[screen_num_desktops][head];
 	return NULL;
     }
-    return &strut[desktop];
+    return &area[desktop][head];
+}
+
+Rect *screen_physical_area()
+{
+    return screen_physical_area_xinerama(screen_num_xin_areas);
+}
+
+Rect *screen_physical_area_xinerama(guint head)
+{
+    if (head > screen_num_xin_areas)
+        return NULL;
+    return &xin_areas[head];
 }
 
 static void set_root_cursor()

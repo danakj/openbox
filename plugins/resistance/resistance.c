@@ -32,6 +32,7 @@ static void resist_move(Client *c, int *x, int *y)
 {
     GList *it;
     Rect *area;
+    guint i;
     int l, t, r, b; /* requested edges */
     int al, at, ar, ab; /* screen area edges */
     int cl, ct, cr, cb; /* current edges */
@@ -107,7 +108,8 @@ static void resist_move(Client *c, int *x, int *y)
         }
 
     /* get the screen boundaries */
-    area = screen_area(c->desktop);
+    area = screen_area_xinerama(c->desktop, client_xinerama_area(c));
+
     al = area->x;
     at = area->y;
     ar = al + area->width - 1;
@@ -117,7 +119,7 @@ static void resist_move(Client *c, int *x, int *y)
     if (cl >= al && l < al && l >= al - resistance)
         *x = al;
     else if (cr <= ar && r > ar && r <= ar + resistance)
-            *x = ar - w + 1;
+        *x = ar - w + 1;
     if (ct >= at && t < at && t >= at - resistance)
         *y = at;
     else if (cb <= ab && b > ab && b < ab + resistance)

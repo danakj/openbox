@@ -398,11 +398,22 @@ void menu_entry_fire(MenuEntry *self)
 */
 
 void menu_control_show(Menu *self, int x, int y, Client *client) {
+    guint i;
+    Rect *a = NULL;
+
     g_assert(!self->invalid);
     
-    POINT_SET(self->location, 
-	      MIN(x, screen_physical_size.width - self->size.width), 
-	      MIN(y, screen_physical_size.height - self->size.height));
+    for (i = 0; i < screen_num_xin_areas; ++i) {
+        a = screen_physical_area_xinerama(i);
+        if (RECT_CONTAINS(*a, x, y))
+            break;
+    }
+    g_assert(a != NULL);
+    self->xin_area = i;
+
+    POINT_SET(self->location,
+	      MIN(x, a->x + a->width - 1 - self->size.width), 
+	      MIN(y, a->y + a->height - 1 - self->size.height));
     XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
 
     if (!self->shown) {
@@ -416,6 +427,8 @@ void menu_control_show(Menu *self, int x, int y, Client *client) {
 
 void menu_control_mouseover(MenuEntry *self, gboolean enter) {
     int x;
+    Rect *a;
+
     self->hilite = enter;
   
     if (enter) {
@@ -436,7 +449,9 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);
 
-	    if (self->submenu->size.width + x >= screen_physical_size.width)
+            a = screen_physical_area_xinerama(self->parent->xin_area);
+
+	    if (self->submenu->size.width + x >= a->x + a->width)
 		x = self->parent->location.x - self->submenu->size.width - 
 		    ob_rr_theme->bwidth;
 	    

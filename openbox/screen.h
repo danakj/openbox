@@ -10,6 +10,8 @@ struct Client;
 
 /*! The number of available desktops */
 extern guint screen_num_desktops;
+/*! The number of virtual "xinerama" screens/heads */
+extern guint screen_num_xin_areas;
 /*! The current desktop */
 extern guint screen_desktop;
 /*! The size of the screen */
@@ -64,10 +66,14 @@ void screen_update_desktop_names();
   it handles the root colormap. */
 void screen_install_colormap(struct Client *client, gboolean install);
 
-void screen_update_struts();
+void screen_update_areas();
+
+Rect *screen_physical_area();
+
+Rect *screen_physical_area_xinerama(guint head);
 
 Rect *screen_area(guint desktop);
 
-Strut *screen_strut(guint desktop);
+Rect *screen_area_xinerama(guint desktop, guint head);
 
 #endif

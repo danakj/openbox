@@ -288,12 +288,12 @@ void client_manage(Window window)
         stacking_add(CLIENT_AS_WINDOW(self));
     }
 
-    screen_update_struts();
-
     dispatch_client(Event_Client_New, self, 0, 0);
 
     /* make sure the window is visible */
     client_move_onscreen(self);
+
+    screen_update_areas();
 
     client_showhide(self);
 
@@ -347,7 +347,7 @@ void client_unmanage(Client *self)
 
     /* once the client is out of the list, update the struts to remove it's
        influence */
-    screen_update_struts();
+    screen_update_areas();
 
     /* tell our parent(s) that we're gone */
     if (self->transient_for == TRAN_GROUP) { /* transient of group */
@@ -440,6 +440,7 @@ void client_move_onscreen(Client *self)
     Rect *a;
     int x = self->frame->area.x, y = self->frame->area.y;
 
+    /* XXX watch for xinerama dead areas */
     a = screen_area(self->desktop);
     if (x >= a->x + a->width - 1)
         x = a->x + a->width - self->frame->area.width;
@@ -1297,7 +1298,7 @@ void client_update_strut(Client *self)
     /* updating here is pointless while we're being mapped cuz we're not in
        the client list yet */
     if (self->frame)
-	screen_update_struts();
+	screen_update_areas();
 }
 
 void client_update_icons(Client *self)
@@ -1620,35 +1621,47 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 #ifdef VIDMODE
         int dot;
         XF86VidModeModeLine mode;
+#endif
+        Rect *a;
+        guint i;
 
-        if (extensions_vidmode &&
+        i = client_xinerama_area(self);
+        a = screen_physical_area_xinerama(i);
+
+#ifdef VIDMODE
+        if (i == 0 && /* primary head */
+            extensions_vidmode &&
+            XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y) &&
+            /* get the mode last so the mode.privsize isnt freed incorrectly */
             XF86VidModeGetModeLine(ob_display, ob_screen, &dot, &mode)) {
+            x += a->x;
+            y += a->y;
             w = mode.hdisplay;
             h = mode.vdisplay;
             if (mode.privsize) XFree(mode.private);
-        } else {
-#else
-            w = screen_physical_size.width;
-            h = screen_physical_size.height;
+        } else
 #endif
-#ifdef VIDMODE
+        {
+            x = a->x;
+            y = a->y;
+            w = a->width;
+            h = a->height;
         }
-        if (!(extensions_vidmode &&
-              XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y))) {
-            x = y = 0;
-#endif
-        }
+
         user = FALSE; /* ignore that increment etc shit when in fullscreen */
     } else {
+        Rect *a;
+
+        a = screen_area_xinerama(self->desktop, client_xinerama_area(self));
+
         /* set the size and position if maximized */
         if (self->max_horz) {
-            x = screen_area(self->desktop)->x - self->frame->size.left;
-            w = screen_area(self->desktop)->width;
+            x = a->x - self->frame->size.left;
+            w = a->width;
         }
         if (self->max_vert) {
-            y = screen_area(self->desktop)->y;
-            h = screen_area(self->desktop)->height -
-                self->frame->size.top - self->frame->size.bottom;
+            y = a->y;
+            h = a->height - self->frame->size.top - self->frame->size.bottom;
         }
     }
 
@@ -1841,14 +1854,14 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     } else {
         guint num;
 	gint32 *dimensions;
+        Rect *a;
 
         /* pick some fallbacks... */
-        x = screen_area(self->desktop)->x +
-            screen_area(self->desktop)->width / 4;
-        y = screen_area(self->desktop)->y +
-            screen_area(self->desktop)->height / 4;
-        w = screen_area(self->desktop)->width / 2;
-        h = screen_area(self->desktop)->height / 2;
+        a = screen_area_xinerama(self->desktop, 0);
+        x = a->x + a->width / 4;
+        y = a->y + a->height / 4;
+        w = a->width / 2;
+        h = a->height / 2;
 
 	if (PROP_GETA32(self->window, openbox_premax, cardinal,
                         (guint32**)&dimensions, &num)) {
@@ -1930,7 +1943,7 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
     }
     client_change_state(self);
     client_showhide(self);
-    screen_update_struts();
+    screen_update_areas();
 
     dispatch_client(iconic ? Event_Client_Unmapped : Event_Client_Mapped,
                     self, 0, 0);
@@ -1998,17 +2011,17 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
     } else {
         guint num;
 	gint32 *dimensions;
+        Rect *a;
 
         /* pick some fallbacks... */
+        a = screen_area_xinerama(self->desktop, 0);
         if (dir == 0 || dir == 1) { /* horz */
-            x = screen_area(self->desktop)->x +
-                screen_area(self->desktop)->width / 4;
-            w = screen_area(self->desktop)->width / 2;
+            x = a->x + a->width / 4;
+            w = a->width / 2;
         }
         if (dir == 0 || dir == 2) { /* vert */
-            y = screen_area(self->desktop)->y +
-                screen_area(self->desktop)->height / 4;
-            h = screen_area(self->desktop)->height / 2;
+            y = a->y + a->height / 4;
+            h = a->height / 2;
         }
 
 	if (PROP_GETA32(self->window, openbox_premax, cardinal,
@@ -2112,7 +2125,7 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
     /* raise if it was not already on the desktop */
     if (old != DESKTOP_ALL)
         stacking_raise(CLIENT_AS_WINDOW(self));
-    screen_update_struts();
+    screen_update_areas();
 
     /* add to the new desktop(s) */
     if (config_focus_new)
@@ -2547,4 +2560,18 @@ void client_set_layer(Client *self, int layer)
     }
     client_calc_layer(self);
     client_change_state(self); /* reflect this in the state hints */
+}
+
+guint client_xinerama_area(Client *self)
+{
+    guint i;
+
+    for (i = 0; i < screen_num_xin_areas; ++i) {
+        Rect *area = screen_physical_area_xinerama(i);
+        if (RECT_INTERSECTS_RECT(*area, self->frame->area))
+            break;
+    }
+    if (i == screen_num_xin_areas) i = 0;
+    g_assert(i < screen_num_xin_areas);
+    return i;
 }

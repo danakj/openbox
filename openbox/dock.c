@@ -151,6 +151,7 @@ void dock_configure()
     int spot;
     int gravity;
     int minw, minh;
+    Rect *a;
 
     RrMinsize(dock->a_frame, &minw, &minh);
 
@@ -190,6 +191,8 @@ void dock_configure()
     dock->w += ob_rr_theme->bwidth * 2;
     dock->h += ob_rr_theme->bwidth * 2;
 
+    a = screen_physical_area();
+
     /* calculate position */
     switch (config_dock_pos) {
     case DockPos_Floating:
@@ -203,38 +206,38 @@ void dock_configure()
         gravity = NorthWestGravity;
         break;
     case DockPos_Top:
-        dock->x = screen_physical_size.width / 2;
+        dock->x = a->width / 2;
         dock->y = 0;
         gravity = NorthGravity;
         break;
     case DockPos_TopRight:
-        dock->x = screen_physical_size.width;
+        dock->x = a->width;
         dock->y = 0;
         gravity = NorthEastGravity;
         break;
     case DockPos_Left:
         dock->x = 0;
-        dock->y = screen_physical_size.height / 2;
+        dock->y = a->height / 2;
         gravity = WestGravity;
         break;
     case DockPos_Right:
-        dock->x = screen_physical_size.width;
-        dock->y = screen_physical_size.height / 2;
+        dock->x = a->width;
+        dock->y = a->height / 2;
         gravity = EastGravity;
         break;
     case DockPos_BottomLeft:
         dock->x = 0;
-        dock->y = screen_physical_size.height;
+        dock->y = a->height;
         gravity = SouthWestGravity;
         break;
     case DockPos_Bottom:
-        dock->x = screen_physical_size.width / 2;
-        dock->y = screen_physical_size.height;
+        dock->x = a->width / 2;
+        dock->y = a->height;
         gravity = SouthGravity;
         break;
     case DockPos_BottomRight:
-        dock->x = screen_physical_size.width;
-        dock->y = screen_physical_size.height;
+        dock->x = a->width;
+        dock->y = a->height;
         gravity = SouthEastGravity;
         break;
     }
@@ -370,7 +373,7 @@ void dock_configure()
     dock->w += ob_rr_theme->bwidth * 2;
     dock->h += ob_rr_theme->bwidth * 2;
 
-    screen_update_struts();
+    screen_update_areas();
 }
 
 void dock_app_configure(DockApp *app, int w, int h)

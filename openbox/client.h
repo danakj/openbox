@@ -506,4 +506,6 @@ Client *client_find_directional(Client *c, Direction dir);
 */
 void client_set_layer(Client *self, int layer);
 
+guint client_xinerama_area(Client *self);
+
 #endif

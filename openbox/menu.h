@@ -55,6 +55,7 @@ typedef struct Menu {
     int item_h;
     Point location;
     Size size;
+    guint xin_area; /* index of the xinerama head/area */
 
     /* plugin stuff */
     char *plugin;

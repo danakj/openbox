@@ -247,7 +247,7 @@ static void popup_cycle(Client *c, gboolean show)
         Client *p = c;
         char *title;
 
-        a = screen_area(c->desktop);
+        a = screen_physical_area_xinerama(0);
         popup_position(focus_cycle_popup, CenterGravity,
                        a->x + a->width / 2, a->y + a->height / 2);
 /*        popup_size(focus_cycle_popup, a->height/2, a->height/16);

@@ -5,6 +5,8 @@
 	* Closed bug #888 (some random coredump)
 	* Closed bug #889 (focus follow mouse not following)
 	* Closed bug #892 (client_under_pointer() doesn't check DESKTOP_ALL)
+	* Avoid the focus flicker when switching desktops
+	* Free the XML DOM trees properly, fixes mem leak
 
 3.0-rc1:
 	* Closed bug #875 (RaiseLower fails to funtion on windows with dialogs)

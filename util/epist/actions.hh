@@ -50,8 +50,8 @@ public:
     nextWindowOnAllWorkspaces, //done
     prevWindowOnAllWorkspaces, //done
 
-    nextWindowOfClass,
-    prevWindowOfClass,
+    nextWindowOfClass, //done
+    prevWindowOfClass, //done
 
     changeWorkspace, //done
     nextWorkspace, //done

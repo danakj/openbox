@@ -164,11 +164,11 @@ void screen::handleKeypress(const XEvent &e) {
         return;
 
       case Action::nextWindow:
-        cycleWindow(true, false);
+        cycleWindow(true);
         return;
 
       case Action::prevWindow:
-        cycleWindow(false, false);
+        cycleWindow(false);
         return;
 
       case Action::nextWindowOnAllWorkspaces:
@@ -177,6 +177,14 @@ void screen::handleKeypress(const XEvent &e) {
 
       case Action::prevWindowOnAllWorkspaces:
         cycleWindow(false, true);
+        return;
+
+      case Action::nextWindowOfClass:
+        cycleWindow(true, false, true);
+        return;
+
+      case Action::prevWindowOfClass:
+        cycleWindow(false, false, true);
         return;
 
       case Action::changeWorkspace:
@@ -332,7 +340,8 @@ void screen::updateActiveWindow() {
  */
 
 
-void screen::cycleWindow(const bool forward, const bool alldesktops) const {
+void screen::cycleWindow(const bool forward, const bool alldesktops,
+                         const bool sameclass) const {
   assert(_managed);
 
   if (_clients.empty()) return;
@@ -354,7 +363,9 @@ void screen::cycleWindow(const bool forward, const bool alldesktops) const {
     }
   } while (target == _clients.end() ||
            (*target)->iconic() ||
-           (! alldesktops && (*target)->desktop() != _active_desktop));
+           (! alldesktops && (*target)->desktop() != _active_desktop) ||
+           (sameclass && _active != _clients.end() &&
+            (*target)->appClass() != (*_active)->appClass()));
   
   if (target != _clients.end())
     (*target)->focus();

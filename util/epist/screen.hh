@@ -70,7 +70,8 @@ public:
 
   void handleKeypress(const XEvent &e);
 
-  void cycleWindow(const bool forward, const bool alldesktops) const;
+  void cycleWindow(const bool forward, const bool alldesktops = false,
+                   const bool sameclass = false) const;
   void cycleWorkspace(const bool forward, const bool loop = true) const;
   void changeWorkspace(const int num) const;
   void toggleShaded(const Window win) const;

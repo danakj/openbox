@@ -50,7 +50,7 @@ typedef void EngineFrameHide(Frame *self);
 /* get_context */
 typedef Context EngineGetContext(Client *client, Window win);
 
-typedef void EngineRenderLabel(Window win, Rect *area, char *text,
+typedef void EngineRenderLabel(Window win, Size *sz, char *text,
                                gboolean hilight, gboolean toplevel);
 
 typedef void EngineSizeLabel(char *text, gboolean hilight, gboolean toplevel,

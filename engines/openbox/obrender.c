@@ -203,14 +203,14 @@ static void obrender_close(ObFrame *self, Appearance *a)
     paint(self->close, a);
 }
 
-void render_label(Window win, Rect *area, char *text,
+void render_label(Window win, Size *sz, char *text,
                   gboolean hilight, gboolean toplevel)
 {
     Appearance *a;
 
     a = hilight ? ob_app_hilite_label : ob_app_unhilite_label;
     a->texture[0].data.text.string = text;
-    RECT_SET(a->area, 0, 0, area->width, area->height);
+    RECT_SET(a->area, 0, 0, sz->width, sz->height);
     a->texture[0].position = a->area;
 
     if (toplevel) {

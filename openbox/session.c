@@ -319,7 +319,7 @@ static gboolean session_save()
     gboolean success = TRUE;
 
     if (save_file)
-        unlink(save_file)
+        unlink(save_file);
 
     /* this algo is from metacity */
     filename = g_strdup_printf("%d-%d-%u.obs",

@@ -661,12 +661,14 @@ void focus_order_add_new(ObClient *c)
         d = c->desktop;
         if (d == DESKTOP_ALL) {
             for (i = 0; i < screen_num_desktops; ++i) {
+                g_assert(!g_list_find(focus_order[i], c));
                 if (focus_order[i] && ((ObClient*)focus_order[i]->data)->iconic)
                     focus_order[i] = g_list_insert(focus_order[i], c, 0);
                 else
                     focus_order[i] = g_list_insert(focus_order[i], c, 1);
             }
         } else {
+            g_assert(!g_list_find(focus_order[d], c));
             if (focus_order[d] && ((ObClient*)focus_order[d]->data)->iconic)
                 focus_order[d] = g_list_insert(focus_order[d], c, 0);
             else

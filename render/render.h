@@ -142,6 +142,7 @@ typedef struct Appearance {
 } Appearance;
 
 extern Visual *render_visual;
+extern XVisualInfo render_visual_info;
 extern int render_depth;
 extern Colormap render_colormap;
 

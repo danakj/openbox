@@ -15,6 +15,8 @@
 #endif
 
 int render_depth;
+XVisualInfo render_visual_info;
+
 Visual *render_visual;
 Colormap render_colormap;
 int render_red_offset = 0, render_green_offset = 0, render_blue_offset = 0;
@@ -59,6 +61,7 @@ void render_startup(void)
         render_visual = vinfo_return[best].visual;
         render_colormap = XCreateColormap(ob_display, ob_root, render_visual,
                                           AllocNone);
+        render_visual_info = vinfo_return[best];
       }
       XFree(vinfo_return);
     }  

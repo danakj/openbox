@@ -22,7 +22,7 @@
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CPPFLAGS=@CPPFLAGS@ @DEBUG@ \
+CPPFLAGS=@CPPFLAGS@ @DEBUG@ @XFT_CFLAGS@ \
 -DLOCALEPATH=\"$(pkgdatadir)/nls\" \
 -DBUTTONSDIR=\"$(pkgdatadir)/buttons\" \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
@@ -30,7 +30,9 @@ CPPFLAGS=@CPPFLAGS@ @DEBUG@ \
 
 bin_PROGRAMS= openbox
 
-openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc Configuration.cc Font.cc GCCache.cc Iconmenu.cc Image.cc ImageControl.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Texture.cc Timer.cc Toolbar.cc Util.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc XAtom.cc blackbox.cc i18n.cc main.cc
+openbox_SOURCES=BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc Configuration.cc Font.cc GCCache.cc Iconmenu.cc Image.cc ImageControl.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Texture.cc Timer.cc Toolbar.cc Util.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc XAtom.cc blackbox.cc i18n.cc main.cc
+
+openbox_LDFLAGS=@XFT_LIBS@
 
 EXTRA_DIST = BaseDisplay.hh Basemenu.hh Clientmenu.hh Color.hh Configmenu.hh Configuration.hh Font.hh GCCache.hh Iconmenu.hh Image.hh Netizen.hh Rootmenu.hh Screen.hh Slit.hh Texture.hh Timer.hh Toolbar.hh Util.hh Window.hh Windowmenu.hh Workspace.hh Workspacemenu.hh XAtom.hh blackbox.hh i18n.hh
 

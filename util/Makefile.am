@@ -8,8 +8,10 @@ bin_SCRIPTS = 		bsetbg
 if XFT
 if XFT2
 else
-TMP_PROGS =	xftlsfonts
+TMP_PROGS =		xftlsfonts
 xftlsfonts_SOURCES =	xftlsfonts.cc
+xftlsfonts_CPPFLAGS=	@CPPFLAGS@ @DEBUG@ @XFT_CFLAGS@
+xftlsfonts_LDFLAGS =	@XFT_LIBS@
 endif
 endif
 

@@ -143,6 +143,8 @@ fi
 dnl Check for Xft extension support and proper library files.
 XFT=""
 XFT2=""
+XFT_CFLAGS=""
+XFT_LIBS=""
 AC_MSG_CHECKING([whether to build support for the Xft extension])
 AC_ARG_ENABLE(
   xft, [  --enable-xft            enable support of the Xft extension @<:@default=yes@:>@])

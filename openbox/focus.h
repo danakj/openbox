@@ -12,6 +12,10 @@ extern Window focus_backup;
 /*! The client which is currently focused */
 extern struct Client *focus_client;
 
+/* The number of FocusIn events which should be ignored for tracking the focus
+   order */
+extern int focus_ignore_in;
+
 /*! The recent focus order on each desktop */
 extern GList **focus_order;
 

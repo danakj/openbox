@@ -18,6 +18,7 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
 Window focus_backup = None;
 gboolean focus_new = TRUE;
 gboolean focus_follow = TRUE;
+int focus_ignore_in = 0;
 
 static void parse_assign(char *name, ParseToken *value)
 {
@@ -99,7 +100,10 @@ void focus_set_client(Client *client)
     focus_client = client;
 
     /* move to the top of the list */
-    if (client != NULL) {
+    if (focus_ignore_in) {
+        g_assert(focus_ignore_in > 0);
+        --focus_ignore_in;
+    } else if (client != NULL) {
         desktop = client->desktop;
         if (desktop == DESKTOP_ALL) desktop = screen_desktop;
         focus_order[desktop] = g_list_remove(focus_order[desktop], client);

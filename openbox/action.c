@@ -709,6 +709,7 @@ void action_cycle_windows(union ActionData *data)
             }
             if (client_focus(it->data)) {
                 t = it->data;
+                focus_ignore_in++;
                 break;
             }
         } while (it != start);

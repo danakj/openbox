@@ -517,7 +517,7 @@ void OBXEventHandler::shapeEvent(const XShapeEvent &e)
   if (!client) return;
 
   client->update(e);
-  client->frame->shape();
+  client->frame->update();
 }
 #endif // SHAPE
 
@@ -618,6 +618,7 @@ void OBXEventHandler::handle(const XEvent &e)
 
     // These types of XEvent's can be bound to actions by the user, and so end
     // up getting passed off to the OBBindingMapper class at some point
+    // IOW: THESE WILL HAVE GUILE HOOKS
   case ButtonPress:
     buttonPress(e.xbutton);
     break;

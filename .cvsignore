@@ -13,3 +13,6 @@ version.h
 stamp-h1
 autom4te.cache
 libtool
+config.sub
+config.guess
+ltmain.sh

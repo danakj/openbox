@@ -186,19 +186,19 @@ void screen::handleKeypress(const XEvent &e) {
         return;
 
       case Action::nextWindowOfClass:
-        cycleWindow(true, false, true);
+        cycleWindow(true, false, true, it->string());
         return;
 
       case Action::prevWindowOfClass:
-        cycleWindow(false, false, true);
+        cycleWindow(false, false, true, it->string());
         return;
 
       case Action::nextWindowOfClassOnAllWorkspaces:
-        cycleWindow(true, true, true);
+        cycleWindow(true, true, true, it->string());
         return;
 
       case Action::prevWindowOfClassOnAllWorkspaces:
-        cycleWindow(false, true, true);
+        cycleWindow(false, true, true, it->string());
         return;
 
       case Action::changeWorkspace:
@@ -393,15 +393,15 @@ void screen::execCommand(const std::string &cmd) const {
 
 
 void screen::cycleWindow(const bool forward, const bool alldesktops,
-                         const bool sameclass) const {
+                         const bool sameclass, const string &cn) const {
   assert(_managed);
 
   if (_clients.empty()) return;
     
   WindowList::const_iterator target = _active;
 
-  string classname;
-  if (sameclass && target != _clients.end())
+  string classname = cn;
+  if (sameclass && classname.empty() && target != _clients.end())
     classname = (*target)->appClass();
 
   if (target == _clients.end())

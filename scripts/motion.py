@@ -149,13 +149,13 @@ def _do_move(final):
             _poplabel = otk.Label(_popwidget)
             _poplabel.setHighlighted(1)
         _poplabel.setText(text)
+        size = _poplabel.minSize()
         if POPUP_CENTERED:
             scsize = ob.openbox.screen(_screen).size()
             x = (scsize.width() - size.width()) / 2
             y = (scsize.height() - size.height()) / 2
         else:
             x = y = 0
-        size = _poplabel.minSize()
         _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
         _popwidget.show(1)
 
@@ -237,13 +237,13 @@ def _do_resize():
             _poplabel = otk.Label(_popwidget)
             _poplabel.setHighlighted(1)
         _poplabel.setText(text)
+        size = _poplabel.minSize()
         if POPUP_CENTERED:
             scsize = ob.openbox.screen(_screen).size()
             x = (scsize.width() - size.width()) / 2
             y = (scsize.height() - size.height()) / 2
         else:
             x = y = 0
-        size = _poplabel.minSize()
         _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
         _popwidget.show(1)
 

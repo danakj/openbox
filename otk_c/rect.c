@@ -19,28 +19,28 @@ PyObject *OtkRect_New(int x, int y, int width, int height)
 
 
 
-static PyObject *otkrect_getx(OtkRect* self, PyObject* args)
+static PyObject *otkrect_getx(OtkRect *self, PyObject *args)
 {
   if (!PyArg_ParseTuple(args, ":getX"))
     return NULL;
   return PyInt_FromLong(self->x);
 }
 
-static PyObject *otkrect_gety(OtkRect* self, PyObject* args)
+static PyObject *otkrect_gety(OtkRect *self, PyObject *args)
 {
   if (!PyArg_ParseTuple(args, ":getY"))
     return NULL;
   return PyInt_FromLong(self->y);
 }
 
-static PyObject *otkrect_getwidth(OtkRect* self, PyObject* args)
+static PyObject *otkrect_getwidth(OtkRect *self, PyObject *args)
 {
   if (!PyArg_ParseTuple(args, ":getWidth"))
     return NULL;
   return PyInt_FromLong(self->width);
 }
 
-static PyObject *otkrect_getheight(OtkRect* self, PyObject* args)
+static PyObject *otkrect_getheight(OtkRect *self, PyObject *args)
 {
   if (!PyArg_ParseTuple(args, ":getHeight"))
     return NULL;
@@ -62,7 +62,7 @@ static PyMethodDef get_methods[] = {
 
 
 
-static void otkrect_dealloc(PyObject* self)
+static void otkrect_dealloc(PyObject *self)
 {
   PyObject_Del(self);
 }

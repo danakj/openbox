@@ -324,10 +324,10 @@
        just don't make menu ids clash or, well, it'll be kind of pointless -->
 
   <!-- debian menu file -->
-  <file>/etc/X11/openbox/openbox-menu</file>
+  <file>/etc/X11/openbox/openbox-menu.xml</file>
 
   <!-- default menu file (or custom one in $HOME/.openbox/) -->
-  <file>menu</file>
+  <file>menu.xml</file>
 </menu>
 
 </openbox_config>

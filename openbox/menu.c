@@ -92,7 +92,7 @@ void menu_startup()
         }
     }
     if (!loaded) {
-        if (menu_open("menu", &doc, &node)) {
+        if (menu_open("menu.xml", &doc, &node)) {
             parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
             xmlFreeDoc(doc);
         }

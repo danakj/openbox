@@ -259,7 +259,7 @@ dist_thebear_theme_DATA = \
 
 dist_rc_DATA = \
 	data/rc.xml \
-	data/menu
+	data/menu.xml
 
 dist_desktopfiles_DATA = \
 	data/openbox.desktop

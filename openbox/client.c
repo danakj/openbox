@@ -1901,8 +1901,6 @@ gboolean client_focus(Client *self)
     if (client_focused(self))
         return TRUE;
 
-    g_print("Focusing: %lx\n", self->window);
-     
     if (self->can_focus)
 	XSetInputFocus(ob_display, self->window, RevertToNone, CurrentTime);
 
@@ -1928,7 +1926,6 @@ gboolean client_focus(Client *self)
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
-    g_print("UNFocusing: %lx\n", self->window);
     focus_set_client(NULL);
 }
 

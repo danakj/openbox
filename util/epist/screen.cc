@@ -65,7 +65,7 @@ screen::screen(epist *epist, int number)
   _managed = false;
   while (! (_epist->doShutdown() || _managed || count <= 0)) {
     if (! (_managed = findSupportingWM()))
-      usleep(1000);
+      sleep(1);
     --count;
   }
   if (_managed)

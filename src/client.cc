@@ -882,6 +882,9 @@ void OBClient::close()
 
   // XXX: itd be cool to do timeouts and shit here for killing the client's
   //      process off
+  // like... if the window is around after 5 seconds, then the close button
+  // turns a nice red, and if this function is called again, the client is
+  // explicitly killed.
 
   ce.xclient.type = ClientMessage;
   ce.xclient.message_type =  property->atom(otk::OBProperty::wm_protocols);

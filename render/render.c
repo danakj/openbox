@@ -15,12 +15,12 @@
 #  include <stdlib.h>
 #endif
 
-static void pixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h);
+static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h);
 
 void RrPaint(RrAppearance *l, Window win, gint w, gint h)
 {
     int i, transferred = 0, sw;
-    pixel32 *source, *dest;
+    RrPixel32 *source, *dest;
     Pixmap oldp;
     Rect tarea; /* area in which to draw textures */
     gboolean resized;
@@ -47,19 +47,19 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
                                RrVisual(l->inst), RrColormap(l->inst));
     g_assert(l->xftdraw != NULL);
 
-    g_free(l->surface.pixel_data);
-    l->surface.pixel_data = g_new(pixel32, w * h);
+    g_free(l->surface.RrPixel_data);
+    l->surface.RrPixel_data = g_new(RrPixel32, w * h);
 
     if (l->surface.grad == RR_SURFACE_PARENTREL) {
         g_assert (l->surface.parent);
         g_assert (l->surface.parent->w);
 
         sw = l->surface.parent->w;
-        source = (l->surface.parent->surface.pixel_data + l->surface.parentx +
+        source = (l->surface.parent->surface.RrPixel_data + l->surface.parentx +
                   sw * l->surface.parenty);
-        dest = l->surface.pixel_data;
+        dest = l->surface.RrPixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
-            memcpy(dest, source, w * sizeof(pixel32));
+            memcpy(dest, source, w * sizeof(RrPixel32));
         }
     } else if (l->surface.grad == RR_SURFACE_SOLID)
         gradient_solid(l, 0, 0, w, h);
@@ -93,7 +93,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != RR_SURFACE_SOLID)
-                    pixel32_to_pixmap(l, 0, 0, w, h);
+                    RrPixel32_to_pixmap(l, 0, 0, w, h);
             }
             if (l->xftdraw == NULL) {
                 l->xftdraw = XftDrawCreate(RrDisplay(l->inst), l->pixmap, 
@@ -106,14 +106,14 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
             if (!transferred) {
                 transferred = 1;
                 if (l->surface.grad != RR_SURFACE_SOLID)
-                    pixel32_to_pixmap(l, 0, 0, w, h);
+                    RrPixel32_to_pixmap(l, 0, 0, w, h);
             }
             if (l->texture[i].data.mask.color->gc == None)
                 color_allocate_gc(l->texture[i].data.mask.color);
             RrPixmapMaskDraw(l->pixmap, &l->texture[i].data.mask, &tarea);
         break;
         case RR_TEXTURE_RGBA:
-            image_draw(l->surface.pixel_data,
+            image_draw(l->surface.RrPixel_data,
                        &l->texture[i].data.rgba, &tarea);
         break;
         }
@@ -122,7 +122,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
     if (!transferred) {
         transferred = 1;
         if (l->surface.grad != RR_SURFACE_SOLID)
-            pixel32_to_pixmap(l, 0, 0, w, h);
+            RrPixel32_to_pixmap(l, 0, 0, w, h);
     }
 
 
@@ -192,7 +192,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 
     spc->interlaced = spo->interlaced;
     spc->border = spo->border;
-    spc->pixel_data = NULL;
+    spc->RrPixel_data = NULL;
 
     copy->textures = orig->textures;
     copy->texture = g_memdup(orig->texture,
@@ -217,30 +217,30 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->border_color);
         RrColorFree(p->bevel_dark);
         RrColorFree(p->bevel_light);
-        g_free(p->pixel_data);
+        g_free(p->RrPixel_data);
 
         g_free(a);
     }
 }
 
 
-static void pixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
+static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
 {
-    pixel32 *in, *scratch;
+    RrPixel32 *in, *scratch;
     Pixmap out;
     XImage *im = NULL;
     im = XCreateImage(RrDisplay(l->inst), RrVisual(l->inst), RrDepth(l->inst),
                       ZPixmap, 0, NULL, w, h, 32, 0);
     g_assert(im != NULL);
 
-    in = l->surface.pixel_data;
+    in = l->surface.RrPixel_data;
     out = l->pixmap;
 
     im->byte_order = render_endian;
 /* this malloc is a complete waste of time on normal 32bpp
    as reduce_depth just sets im->data = data and returns
 */
-    scratch = g_new(pixel32, im->width * im->height);
+    scratch = g_new(RrPixel32, im->width * im->height);
     im->data = (char*) scratch;
     reduce_depth(l->inst, in, im);
     XPutImage(RrDisplay(l->inst), out,
@@ -305,7 +305,7 @@ void RrMinsize(RrAppearance *l, gint *w, gint *h)
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
-                        gint *w, gint *h, pixel32 **data)
+                        gint *w, gint *h, RrPixel32 **data)
 {
     Window xr;
     gint xx, xy;
@@ -335,7 +335,7 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
             return FALSE;
     }
 
-    *data = g_new(pixel32, pw * ph);
+    *data = g_new(RrPixel32, pw * ph);
     increase_depth(inst, *data, xi);
 
     if (mask) {

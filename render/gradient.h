@@ -12,7 +12,7 @@ void gradient_pyramid(RrSurface *sf, int w, int h);
 void gradient_pipecross(RrSurface *sf, int w, int h);
 void gradient_rectangle(RrSurface *sf, int w, int h);
 void gradient_solid(RrAppearance *l, int x, int y, int w, int h);
-void highlight(pixel32 *x, pixel32 *y, gboolean raised);
+void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised);
 
 void render_gl_gradient(RrSurface *sf, int x, int y, int w, int h);
 

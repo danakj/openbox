@@ -4,9 +4,9 @@
 
 #include <glib.h>
 
-void image_draw(pixel32 *target, RrTextureRGBA *rgba, Rect *area)
+void image_draw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area)
 {
-    pixel32 *draw = rgba->data;
+    RrPixel32 *draw = rgba->data;
     gint c, i, e, t, sfw, sfh;
     sfw = area->width;
     sfh = area->height;
@@ -24,7 +24,7 @@ void image_draw(pixel32 *target, RrTextureRGBA *rgba, Rect *area)
         /* scale it and cache it */
         if (rgba->cache != NULL)
             g_free(rgba->cache);
-        rgba->cache = g_new(pixel32, sfw * sfh);
+        rgba->cache = g_new(RrPixel32, sfw * sfh);
         rgba->cwidth = sfw;
         rgba->cheight = sfh;
         for (i = 0, c = 0, e = sfw*sfh; i < e; ++i) {

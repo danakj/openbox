@@ -18,7 +18,7 @@ struct Group;
 /*! Holds an icon in ARGB format */
 typedef struct Icon {
     int width, height;
-    pixel32 *data;
+    RrPixel32 *data;
 } Icon;
      
 /*! The MWM Hints as retrieved from the window property

@@ -5,8 +5,8 @@
 
 void gradient_render(RrSurface *sf, int w, int h)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
     unsigned int r,g,b;
     int off, x;
 
@@ -85,8 +85,8 @@ void gradient_render(RrSurface *sf, int w, int h)
 
 void gradient_vertical(RrSurface *sf, int w, int h)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
     float dr, dg, db;
     unsigned int r,g,b;
     int x, y;
@@ -114,8 +114,8 @@ void gradient_vertical(RrSurface *sf, int w, int h)
 
 void gradient_horizontal(RrSurface *sf, int w, int h)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
     float dr, dg, db;
     unsigned int r,g,b;
     int x, y;
@@ -143,8 +143,8 @@ void gradient_horizontal(RrSurface *sf, int w, int h)
 
 void gradient_diagonal(RrSurface *sf, int w, int h)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y;
@@ -181,8 +181,8 @@ void gradient_diagonal(RrSurface *sf, int w, int h)
 
 void gradient_crossdiagonal(RrSurface *sf, int w, int h)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y;
@@ -217,11 +217,11 @@ void gradient_crossdiagonal(RrSurface *sf, int w, int h)
     }
 }
 
-void highlight(pixel32 *x, pixel32 *y, gboolean raised)
+void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
 {
     int r, g, b;
 
-    pixel32 *up, *down;
+    RrPixel32 *up, *down;
     if (raised) {
         up = x;
         down = y;
@@ -283,7 +283,7 @@ static void create_bevel_colors(RrAppearance *l)
 
 void gradient_solid(RrAppearance *l, int x, int y, int w, int h) 
 {
-    pixel32 pix;
+    RrPixel32 pix;
     int i, a, b;
     RrSurface *sp = &l->surface;
     int left = x, top = y, right = x + w - 1, bottom = y + h - 1;
@@ -296,7 +296,7 @@ void gradient_solid(RrAppearance *l, int x, int y, int w, int h)
 
     for (a = 0; a < w; a++)
         for (b = 0; b < h; b++)
-            sp->pixel_data[a + b * w] = pix;
+            sp->RrPixel_data[a + b * w] = pix;
 
     XFillRectangle(RrDisplay(l->inst), l->pixmap, sp->primary->gc,
                    x, y, w, h);
@@ -392,9 +392,9 @@ void gradient_solid(RrAppearance *l, int x, int y, int w, int h)
 
 void gradient_pyramid(RrSurface *sf, int inw, int inh)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 *end = data + inw*inh - 1;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *end = data + inw*inh - 1;
+    RrPixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
@@ -437,9 +437,9 @@ void gradient_pyramid(RrSurface *sf, int inw, int inh)
 
 void gradient_rectangle(RrSurface *sf, int inw, int inh)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 *end = data + inw*inh - 1;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *end = data + inw*inh - 1;
+    RrPixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
@@ -485,9 +485,9 @@ void gradient_rectangle(RrSurface *sf, int inw, int inh)
 
 void gradient_pipecross(RrSurface *sf, int inw, int inh)
 {
-    pixel32 *data = sf->pixel_data;
-    pixel32 *end = data + inw*inh - 1;
-    pixel32 current;
+    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *end = data + inw*inh - 1;
+    RrPixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;

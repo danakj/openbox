@@ -66,12 +66,12 @@ void RrColorFree(RrColor *c)
     }
 }
 
-void reduce_depth(const RrInstance *inst, pixel32 *data, XImage *im)
+void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
     int r, g, b;
     int x,y;
-    pixel32 *p32 = (pixel32 *) im->data;
-    pixel16 *p16 = (pixel16 *) im->data;
+    RrPixel32 *p32 = (RrPixel32 *) im->data;
+    RrPixel16 *p16 = (RrPixel16 *) im->data;
     unsigned char *p8 = (unsigned char *)im->data;
     switch (im->bits_per_pixel) {
     case 32:
@@ -174,12 +174,12 @@ static void swap_byte_order(XImage *im)
         im->byte_order = LSBFirst;
 }
 
-void increase_depth(const RrInstance *inst, pixel32 *data, XImage *im)
+void increase_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
     int r, g, b;
     int x,y;
-    pixel32 *p32 = (pixel32 *) im->data;
-    pixel16 *p16 = (pixel16 *) im->data;
+    RrPixel32 *p32 = (RrPixel32 *) im->data;
+    RrPixel16 *p16 = (RrPixel16 *) im->data;
     unsigned char *p8 = (unsigned char *)im->data;
 
     if (im->byte_order != render_endian)

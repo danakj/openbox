@@ -18,8 +18,8 @@ typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
 typedef struct _RrColor            RrColor;
 
-typedef guint32 pixel32; /* XXX prefix */
-typedef guint16 pixel16;
+typedef guint32 RrPixel32;
+typedef guint16 RrPixel16;
 
 typedef enum {
     RR_RELIEF_FLAT,
@@ -72,7 +72,7 @@ struct _RrSurface {
     RrAppearance *parent;
     gint parentx;
     gint parenty;
-    pixel32 *pixel_data;
+    RrPixel32 *RrPixel_data;
 };
 
 struct _RrTextureText {
@@ -101,11 +101,11 @@ struct _RrTextureMask {
 struct _RrTextureRGBA {
     gint width;
     gint height;
-    pixel32 *data;
+    RrPixel32 *data;
 /* cached scaled so we don't have to scale often */
     gint cwidth;
     gint cheight;
-    pixel32 *cache;
+    RrPixel32 *cache;
 };
 
 union _RrTextureData {
@@ -166,6 +166,6 @@ void RrMinsize (RrAppearance *l, gint *w, gint *h);
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
-                        gint *w, gint *h, pixel32 **data);
+                        gint *w, gint *h, RrPixel32 **data);
 
 #endif /*__render_h*/

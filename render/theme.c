@@ -59,6 +59,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_item = RrAppearanceNew(inst, 1);
     theme->a_menu_disabled = RrAppearanceNew(inst, 1);
     theme->a_menu_hilite = RrAppearanceNew(inst, 1);
+    theme->a_clear = RrAppearanceNew(inst, 0);
 
     theme->app_hilite_bg = RrAppearanceNew(inst, 0);
     theme->app_unhilite_bg = RrAppearanceNew(inst, 0);
@@ -585,6 +586,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RrAppearanceCopy(theme->a_focused_pressed_max);
 
     theme->a_icon->surface.grad = RR_SURFACE_PARENTREL;
+    theme->a_clear->surface.grad = RR_SURFACE_PARENTREL;
 
     /* set up the textures */
     theme->a_focused_label->texture[0].type = 
@@ -718,7 +720,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->desk_mask;
     theme->a_toggled_focused_desk->texture[0].data.mask.mask = 
         theme->a_toggled_unfocused_desk->texture[0].data.mask.mask =
-        theme->desk_mask;
+        theme->desk_toggled_mask;
     theme->a_disabled_focused_shade->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_shade->texture[0].data.mask.mask = 
         theme->shade_disabled_mask;
@@ -733,7 +735,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->shade_mask;
     theme->a_toggled_focused_shade->texture[0].data.mask.mask = 
         theme->a_toggled_unfocused_shade->texture[0].data.mask.mask =
-        theme->shade_mask;
+        theme->shade_toggled_mask;
     theme->a_disabled_focused_iconify->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_iconify->texture[0].data.mask.mask = 
         theme->iconify_disabled_mask;
@@ -926,6 +928,7 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_menu_item);
         RrAppearanceFree(theme->a_menu_disabled);
         RrAppearanceFree(theme->a_menu_hilite);
+        RrAppearanceFree(theme->a_clear);
         RrAppearanceFree(theme->app_hilite_bg);
         RrAppearanceFree(theme->app_unhilite_bg);
         RrAppearanceFree(theme->app_hilite_label);

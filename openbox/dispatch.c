@@ -1,4 +1,5 @@
 #include "dispatch.h"
+#include "extensions.h"
 
 #include <glib.h>
 
@@ -26,8 +27,10 @@ void dispatch_shutdown()
     guint i;
     EventType j;
 
-    for (i = 0, j = 1; j < EVENT_RANGE; ++i, j <<= 1)
+    for (i = 0, j = 1; j < EVENT_RANGE; ++i, j <<= 1) {
         g_slist_free(funcs[i]);
+        funcs[i] = NULL;
+    }
 
     g_free(funcs);
 }
@@ -47,7 +50,7 @@ void dispatch_register(EventHandler h, EventMask mask)
     }
 }
 
-void dispatch_x(XEvent *xe)
+void dispatch_x(XEvent *xe, Client *c)
 {
     EventType e;
     guint i;
@@ -77,11 +80,20 @@ void dispatch_x(XEvent *xe)
         e = Event_X_MotionNotify;
         break;
     default:
+	/* XKB events */
+	if (xe->type == extensions_xkb_event_basep) {
+	    switch (((XkbAnyEvent*)&e)->xkb_type) {
+	    case XkbBellNotify:
+		e = Event_X_Bell;
+		break;
+	    }
+	}
         return;
     }
 
     obe.type = e;
-    obe.data.x = xe;
+    obe.data.x.e = xe;
+    obe.data.x.client = c;
 
     i = 0;
     while (e > 1) {

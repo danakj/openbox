@@ -2,6 +2,7 @@
 #include "client.h"
 #include "screen.h"
 #include "prop.h"
+#include "dispatch.h"
 
 #include <X11/Xlib.h>
 
@@ -46,11 +47,15 @@ void focus_set_client(Client *client)
 	XSetInputFocus(ob_display, focus_backup, RevertToNone, CurrentTime);
     }
 
+    if (focus_client != NULL)
+        dispatch_client(Event_Client_Unfocus, focus_client);
+
     focus_client = client;
 
     /* set the NET_ACTIVE_WINDOW hint */
     active = client ? client->window : None;
     PROP_SET32(ob_root, net_active_window, window, active);
 
-    /*HOOKFIRECLIENT(focused, client);XXX*/
+    if (focus_client != NULL)
+        dispatch_client(Event_Client_Focus, focus_client);
 }

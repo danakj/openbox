@@ -5,6 +5,8 @@
 #include "frame.h"
 #include "engine.h"
 #include "focus.h"
+#include "dispatch.h"
+#include "../render/render.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -233,6 +235,8 @@ void screen_set_num_desktops(guint num)
     /* may be some unnamed desktops that we need to fill in with names */
     screen_update_desktop_names();
 
+    dispatch_ob(Event_Ob_NumDesktops);
+
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
 	screen_set_desktop(num - 1);
@@ -267,9 +271,7 @@ void screen_set_desktop(guint num)
             engine_frame_show(c->frame);
     }
 
-    /* force the callbacks to fire */
-    if (focus_client == NULL)
-	focus_set_client(NULL);
+    dispatch_ob(Event_Ob_Desktop);
 }
 
 void screen_update_layout()
@@ -392,18 +394,17 @@ void screen_show_desktop(gboolean show)
 
     show = show ? 1 : 0; /* make it boolean */
     PROP_SET32(ob_root, net_showing_desktop, cardinal, show);
+
+    dispatch_ob(Event_Ob_ShowDesktop);
 }
 
 void screen_install_colormap(Client *client, gboolean install)
 {
     if (client == NULL) {
-	/* XXX DONT USE THE DEFAULT SHIT HERE */
 	if (install)
-	    XInstallColormap(ob_display,
-			     DefaultColormap(ob_display, ob_screen));
+	    XInstallColormap(ob_display, render_colormap);
 	else
-	    XUninstallColormap(ob_display,
-			       DefaultColormap(ob_display, ob_screen));
+	    XUninstallColormap(ob_display, render_colormap);
     } else {
 	XWindowAttributes wa;
 	if (XGetWindowAttributes(ob_display, client->window, &wa)) {

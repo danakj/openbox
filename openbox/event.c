@@ -10,6 +10,7 @@
 #include "extensions.h"
 #include "timer.h"
 #include "engine.h"
+#include "dispatch.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -252,6 +253,7 @@ void event_process(XEvent *e)
 
     client = g_hash_table_lookup(client_map, (gpointer)window);
 
+    /* deal with it in the kernel */
     if (client) {
 	event_handle_client(client, e);
     } else if (window == ob_root)
@@ -279,45 +281,8 @@ void event_process(XEvent *e)
 	xerror_set_ignore(FALSE);
     }
 
-    /* dispatch Crossing, Pointer and Key events to the hooks */
-    switch(e->type) {
-    case EnterNotify:
-        if (client != NULL) engine_mouse_enter(client->frame, window);
-	/*HOOKFIRECLIENT(pointerenter, client);XXX*/
-	break;
-    case LeaveNotify:
-        if (client != NULL) engine_mouse_leave(client->frame, window);
-	/*HOOKFIRECLIENT(pointerleave, client);XXX*/
-	break;
-    case ButtonPress:
-        if (client != NULL) 
-            engine_mouse_press(client->frame, window,
-                               e->xbutton.x, e->xbutton.y);
-	/*pointer_event(e, client);XXX*/
-        break;
-    case ButtonRelease:
-        if (client != NULL)
-            engine_mouse_release(client->frame, window,
-                                 e->xbutton.x, e->xbutton.y);
-	/*pointer_event(e, client);XXX*/
-        break;
-    case MotionNotify:
-	/*pointer_event(e, client);XXX*/
-	break;
-    case KeyPress:	
-    case KeyRelease:
-	/*keyboard_event(&e->xkey);XXX*/
-	break;
-    default:
-	/* XKB events */
-	if (e->type == extensions_xkb_event_basep) {
-	    switch (((XkbAnyEvent*)&e)->xkb_type) {
-	    case XkbBellNotify:
-		/*HOOKFIRECLIENT(bell, client);XXX*/
-		break;
-	    }
-	}
-    }
+    /* dispatch the event to registered handlers */
+    dispatch_x(e, client);
 }
 
 static void event_handle_root(XEvent *e)

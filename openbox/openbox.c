@@ -47,7 +47,7 @@ gboolean ob_remote   = FALSE;
 gboolean ob_sync     = TRUE;
 Cursors  ob_cursors;
 
-void signal_handler(int signal);
+void signal_handler(const ObEvent *e);
 
 int main(int argc, char **argv)
 {
@@ -63,9 +63,13 @@ int main(int argc, char **argv)
     bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
 
+    /* start our event dispatcher and register for signals */
+    dispatch_startup();
+    dispatch_register(signal_handler, Event_Signal);
+
     /* set up signal handler */
     sigemptyset(&sigset);
-    action.sa_handler = signal_handler;
+    action.sa_handler = dispatch_signal;
     action.sa_mask = sigset;
     action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
     sigaction(SIGUSR1, &action, (struct sigaction *) NULL);
@@ -124,7 +128,6 @@ int main(int argc, char **argv)
      
     if (screen_annex()) { /* it will be ours! */
 	timer_startup();
-        dispatch_startup();
 	render_startup();
 	font_startup();
 	themerc_startup();
@@ -133,8 +136,8 @@ int main(int argc, char **argv)
 	screen_startup();
 	focus_startup();
 	client_startup();
-	  
-	/*HOOKFIRE(startup, "()");XXX*/
+
+        dispatch_ob(Event_Ob_Startup);
 
 	/* get all the existing windows */
 	client_manage_all();
@@ -147,7 +150,7 @@ int main(int argc, char **argv)
 
 	client_unmanage_all();
 
-	/*HOOKFIRE(shutdown, "()");XXX*/
+        dispatch_ob(Event_Ob_Shutdown);
 
 	client_shutdown();
 	screen_shutdown();
@@ -155,20 +158,21 @@ int main(int argc, char **argv)
 	engine_shutdown();
 	themerc_shutdown();
 	render_shutdown();
-        dispatch_shutdown();
 	timer_shutdown();
     }
 	  
     XCloseDisplay(ob_display);
+
+    dispatch_shutdown();
 
     /* XXX if (ob_restart) */
      
     return 0;
 }
 
-void signal_handler(int signal)
+void signal_handler(const ObEvent *e)
 {
-    switch (signal) {
+    switch (e->data.signal) {
     case SIGUSR1:
 	g_message("Caught SIGUSR1 signal. Restarting.");
 	ob_shutdown = ob_restart = TRUE;
@@ -182,12 +186,12 @@ void signal_handler(int signal)
     case SIGINT:
     case SIGTERM:
     case SIGPIPE:
-	g_message("Caught signal %d. Exiting.", signal);
+	g_message("Caught signal %d. Exiting.", e->data.signal);
 	ob_shutdown = TRUE;
 	break;
 
     case SIGFPE:
     case SIGSEGV:
-	g_error("Caught signal %d. Aborting and dumping core.", signal);
+	g_error("Caught signal %d. Aborting and dumping core.",e->data.signal);
     }
 }

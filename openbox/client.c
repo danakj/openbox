@@ -7,6 +7,7 @@
 #include "event.h"
 #include "focus.h"
 #include "stacking.h"
+#include "dispatch.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -194,9 +195,11 @@ void client_manage(Window window)
 
     screen_update_struts();
 
-    /*HOOKFIRECLIENT(managed, client);XXX*/
+    dispatch_client(Event_Client_New, client);
 
     client_showhide(client);
+
+    dispatch_client(Event_Client_Mapped, client);
 
     /* grab all mouse bindings */
     /*pointer_grab_all(client, TRUE);XXX*/
@@ -220,7 +223,7 @@ void client_unmanage(Client *client)
 
     g_message("Unmanaging window: %lx", client->window);
 
-    /*HOOKFIRECLIENT(closed, client);XXX*/
+    dispatch_client(Event_Client_Destroy, client);
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, client->window, SetModeDelete);
@@ -923,7 +926,7 @@ void client_update_wmhints(Client *self)
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
 	if (self->frame)
-	    /*HOOKFIRECLIENT(urgent, self)XXX*/;
+            dispatch_client(Event_Client_Urgent, self);
     }
 }
 
@@ -1218,7 +1221,7 @@ static void client_showhide(Client *self)
     else
         engine_frame_hide(self->frame);
 
-    /*HOOKFIRECLIENT(visible, self);XXX*/
+    dispatch_client(Event_Client_Visible, self);
 }
 
 gboolean client_normal(Client *self) {
@@ -1243,7 +1246,7 @@ static void client_apply_startup_state(Client *self)
 	client_shade(self, TRUE);
     }
     if (self->urgent)
-	/*HOOKFIRECLIENT(urgent, self)XXX*/;
+        dispatch_client(Event_Client_Urgent, self);
   
     if (self->max_vert && self->max_horz) {
 	self->max_vert = self->max_horz = FALSE;

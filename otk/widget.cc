@@ -277,7 +277,8 @@ void Widget::render(void)
 
   XSetWindowBackgroundPixmap(**display, _window, _surface->pixmap());
 
-  delete s; // delete the old surface *after* its pixmap isn't in use anymore
+  if (s)
+    delete s; // delete the old surface *after* its pixmap isn't in use anymore
 }
 
 void Widget::adjust(void)

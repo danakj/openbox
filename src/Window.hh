@@ -379,7 +379,8 @@ public:
   void shade(void);
   void stick(void);
   void reconfigure(void);
-  void updateFocusModel(void);
+  void grabButtons(void);
+  void ungrabButtons(void);
   void installColormap(bool install);
   void restore(bool remap);
   void configure(int dx, int dy, unsigned int dw, unsigned int dh);
@@ -394,7 +395,7 @@ public:
   void mapRequestEvent(const XMapRequestEvent *mre);
   void unmapNotifyEvent(const XUnmapEvent */*unused*/);
   void reparentNotifyEvent(const XReparentEvent */*unused*/);
-  void propertyNotifyEvent(Atom atom);
+  void propertyNotifyEvent(const XPropertyEvent *pe);
   void exposeEvent(const XExposeEvent *ee);
   void configureRequestEvent(const XConfigureRequestEvent *cr);
 

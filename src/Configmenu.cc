@@ -200,7 +200,8 @@ void Configmenu::Focusmenu::itemSelected(int button, unsigned int index) {
 
   case 4: // click raise with sloppy focus
     getScreen()->saveClickRaise(! getScreen()->doClickRaise());
-    getScreen()->updateFocusModel();
+    // make sure the appropriate mouse buttons are grabbed on the windows
+    getScreen()->toggleFocusModel(BScreen::SloppyFocus);
     break;
   }
   setValues();

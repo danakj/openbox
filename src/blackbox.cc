@@ -322,7 +322,12 @@ void Blackbox::process_event(XEvent *e) {
 
     BlackboxWindow *win = searchWindow(e->xmaprequest.window);
 
-    if (! win) {
+    if (win) {
+      if (win->isIconic()) {
+        win->deiconify();
+        win->setInputFocus();
+      }
+    } else {
       BScreen *screen = searchScreen(e->xmaprequest.parent);
 
       if (! screen) {
@@ -444,13 +449,9 @@ void Blackbox::process_event(XEvent *e) {
   case PropertyNotify: {
     last_time = e->xproperty.time;
 
-    if (e->xproperty.state != PropertyDelete) {
-      BlackboxWindow *win = searchWindow(e->xproperty.window);
-
-      if (win)
-        win->propertyNotifyEvent(e->xproperty.atom);
-    }
-
+    BlackboxWindow *win = searchWindow(e->xproperty.window);
+    if (win)
+      win->propertyNotifyEvent(&e->xproperty);
     break;
   }
 

@@ -172,12 +172,12 @@ public:
   inline int getY(void) const
   { return ((hidden) ? frame.y_hidden : frame.rect.y()); }
 
-  void buttonPressEvent(XButtonEvent *be);
-  void buttonReleaseEvent(XButtonEvent *re);
-  void enterNotifyEvent(XCrossingEvent * /*unused*/);
-  void leaveNotifyEvent(XCrossingEvent * /*unused*/);
-  void exposeEvent(XExposeEvent *ee);
-  void keyPressEvent(XKeyEvent *ke);
+  void buttonPressEvent(const XButtonEvent *be);
+  void buttonReleaseEvent(const XButtonEvent *re);
+  void enterNotifyEvent(const XCrossingEvent * /*unused*/);
+  void leaveNotifyEvent(const XCrossingEvent * /*unused*/);
+  void exposeEvent(const XExposeEvent *ee);
+  void keyPressEvent(const XKeyEvent *ke);
 
   void edit(void);
   void reconfigure(void);

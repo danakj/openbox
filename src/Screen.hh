@@ -331,14 +331,13 @@ public:
   void save_rc(void);
   void reconfigure(void);
   void toggleFocusModel(FocusModel model);
-  void updateFocusModel(void);
   void rereadMenu(void);
   void shutdown(void);
   void showPosition(int x, int y);
   void showGeometry(unsigned int gx, unsigned int gy);
   void hideGeometry(void);
 
-  void buttonPressEvent(XButtonEvent *xbutton);
+  void buttonPressEvent(const XButtonEvent *xbutton);
 
   void updateNetizenCurrentWorkspace(void);
   void updateNetizenWorkspaceCount(void);

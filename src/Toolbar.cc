@@ -777,7 +777,7 @@ void Toolbar::edit(void) {
 }
 
 
-void Toolbar::buttonPressEvent(XButtonEvent *be) {
+void Toolbar::buttonPressEvent(const XButtonEvent *be) {
   if (be->button == 1) {
     if (be->window == frame.psbutton)
       redrawPrevWorkspaceButton(True, True);
@@ -826,7 +826,7 @@ void Toolbar::buttonPressEvent(XButtonEvent *be) {
 
 
 
-void Toolbar::buttonReleaseEvent(XButtonEvent *re) {
+void Toolbar::buttonReleaseEvent(const XButtonEvent *re) {
   if (re->button == 1) {
     if (re->window == frame.psbutton) {
       redrawPrevWorkspaceButton(False, True);
@@ -873,7 +873,7 @@ void Toolbar::buttonReleaseEvent(XButtonEvent *re) {
 }
 
 
-void Toolbar::enterNotifyEvent(XCrossingEvent *) {
+void Toolbar::enterNotifyEvent(const XCrossingEvent *) {
   if (! do_auto_hide)
     return;
 
@@ -884,7 +884,7 @@ void Toolbar::enterNotifyEvent(XCrossingEvent *) {
   }
 }
 
-void Toolbar::leaveNotifyEvent(XCrossingEvent *) {
+void Toolbar::leaveNotifyEvent(const XCrossingEvent *) {
   if (! do_auto_hide)
     return;
 
@@ -896,7 +896,7 @@ void Toolbar::leaveNotifyEvent(XCrossingEvent *) {
 }
 
 
-void Toolbar::exposeEvent(XExposeEvent *ee) {
+void Toolbar::exposeEvent(const XExposeEvent *ee) {
   if (ee->window == frame.clock) checkClock(True);
   else if (ee->window == frame.workspace_label && (! editing))
     redrawWorkspaceLabel();
@@ -908,7 +908,7 @@ void Toolbar::exposeEvent(XExposeEvent *ee) {
 }
 
 
-void Toolbar::keyPressEvent(XKeyEvent *ke) {
+void Toolbar::keyPressEvent(const XKeyEvent *ke) {
   if (ke->window == frame.workspace_label && editing) {
     if (new_workspace_name.empty()) {
       new_name_pos = 0;
@@ -916,7 +916,7 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
 
     KeySym ks;
     char keychar[1];
-    XLookupString(ke, keychar, 1, &ks, 0);
+    XLookupString(const_cast<XKeyEvent*>(ke), keychar, 1, &ks, 0);
 
     // either we are told to end with a return or we hit 127 chars
     if (ks == XK_Return || new_name_pos == 127) {

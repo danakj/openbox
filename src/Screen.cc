@@ -132,6 +132,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
     resource.wstyle.font = (BFont *) 0;
 
+  geom_pixmap = None;
+
   xatom->setSupported(this);    // set-up netwm support
 #ifdef    HAVE_GETPID
   xatom->setValue(getRootWindow(), XAtom::blackbox_pid, XAtom::cardinal,
@@ -2006,7 +2008,7 @@ Workspace* BScreen::getWorkspace(unsigned int index) {
 }
 
 
-void BScreen::buttonPressEvent(XButtonEvent *xbutton) {
+void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
   if (xbutton->button == 1) {
     if (! isRootColormapInstalled())
       image_control->installRootColormap();
@@ -2071,6 +2073,9 @@ void BScreen::buttonPressEvent(XButtonEvent *xbutton) {
 
 
 void BScreen::toggleFocusModel(FocusModel model) {
+  std::for_each(windowList.begin(), windowList.end(),
+                std::mem_fun(&BlackboxWindow::ungrabButtons));
+
   if (model == SloppyFocus) {
     saveSloppyFocus(True);
   } else {
@@ -2080,14 +2085,8 @@ void BScreen::toggleFocusModel(FocusModel model) {
     saveSloppyFocus(False);
   }
 
-  updateFocusModel();
-}
-
-
-void BScreen::updateFocusModel()
-{
-  std::for_each(workspacesList.begin(), workspacesList.end(),
-                std::mem_fun(&Workspace::updateFocusModel));
+  std::for_each(windowList.begin(), windowList.end(),
+                std::mem_fun(&BlackboxWindow::grabButtons));
 }
 
 

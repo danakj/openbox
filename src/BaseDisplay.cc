@@ -78,7 +78,7 @@ extern "C" {
 #endif // HAVE_SYS_WAIT_H
 }
 
-#include <sstream>
+#include <string>
 using std::string;
 
 #include "i18n.hh"
@@ -468,7 +468,6 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
   if (pos != string::npos)
     default_string.resize(pos);
 
-  std::ostringstream formatter;
-  formatter << "DISPLAY=" << default_string << '.' << screen_number;
-  display_string = formatter.str();
+  display_string = string("DISPLAY=") + default_string + '.' +
+    itostring(static_cast<unsigned long>(screen_number));
 }

@@ -188,11 +188,11 @@ public:
   void shutdown(void);
   void toggleAutoHide(void);
 
-  void buttonPressEvent(XButtonEvent *e);
-  void enterNotifyEvent(XCrossingEvent * /*unused*/);
-  void leaveNotifyEvent(XCrossingEvent * /*unused*/);
-  void configureRequestEvent(XConfigureRequestEvent *e);
-  void unmapNotifyEvent(XUnmapEvent *e);
+  void buttonPressEvent(const XButtonEvent *e);
+  void enterNotifyEvent(const XCrossingEvent * /*unused*/);
+  void leaveNotifyEvent(const XCrossingEvent * /*unused*/);
+  void configureRequestEvent(const XConfigureRequestEvent *e);
+  void unmapNotifyEvent(const XUnmapEvent *e);
 
   virtual void timeout(void);
 

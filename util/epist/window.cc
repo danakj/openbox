@@ -130,12 +130,13 @@ void XWindow::updateNormalHints() {
 void XWindow::updateWMHints() {
   XWMHints *hints;
 
+  // assume a window takes input if it doesnt specify
+  _can_focus = True;
+  
   if ((hints = XGetWMHints(_epist->getXDisplay(), _window)) != NULL) {
-    _can_focus = hints->input;
+    if (hints->flags & InputHint)
+      _can_focus = hints->input;
     XFree(hints);
-  } else {
-    // assume a window takes input if it doesnt specify
-    _can_focus = True;
   }
 }
 

@@ -55,6 +55,9 @@ struct _RrTheme {
     gint mfont_height;
     RrFont *mfont;
 
+    /* style settings - pics */
+    RrPixel32 *def_win_icon; /* 48x48 RGBA */
+
     /* style settings - masks */
     RrPixmapMask *max_mask;
     RrPixmapMask *max_toggled_mask;

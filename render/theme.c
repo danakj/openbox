@@ -3,6 +3,7 @@
 #include "font.h"
 #include "mask.h"
 #include "theme.h"
+#include "icon.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
@@ -21,6 +22,7 @@ static gboolean read_mask(const RrInstance *inst,
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 gchar *rname, RrAppearance *value,
                                 gboolean allow_trans);
+static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
@@ -322,6 +324,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->iconify_disabled_mask = RrPixmapMaskCopy(theme->iconify_mask);
         theme->iconify_hover_mask = RrPixmapMaskCopy(theme->iconify_mask);
     }
+
+    theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
+                                       OB_DEFAULT_ICON_HEIGHT,
+                                       OB_DEFAULT_ICON_pixel_data);
 
     if (read_mask(inst, "desk.xbm", theme, &theme->desk_mask)) {
         if (!read_mask(inst, "desk_pressed.xbm", theme,
@@ -915,6 +921,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_selected_color);
 
+        g_free(theme->def_win_icon);
+
         RrPixmapMaskFree(theme->max_mask);
         RrPixmapMaskFree(theme->max_toggled_mask);
         RrPixmapMaskFree(theme->max_disabled_mask);
@@ -1247,4 +1255,30 @@ static void set_default_appearance(RrAppearance *a)
     a->surface.border = FALSE;
     a->surface.primary = RrColorNew(a->inst, 0, 0, 0);
     a->surface.secondary = RrColorNew(a->inst, 0, 0, 0);
+}
+
+/* Reads the output from gimp's C-Source file format into valid RGBA data for
+   an RrTextureRGBA. */
+static RrPixel32* read_c_image(gint width, gint height, const guint8 *data)
+{
+    RrPixel32 *im, *p;
+    gint i;
+
+    p = im = g_memdup(OB_DEFAULT_ICON_pixel_data,
+                      OB_DEFAULT_ICON_WIDTH * OB_DEFAULT_ICON_HEIGHT *
+                      sizeof(RrPixel32));
+
+    for (i = 0; i < OB_DEFAULT_ICON_WIDTH*OB_DEFAULT_ICON_HEIGHT; ++i) {
+        guchar a = ((*p >> 24) & 0xff);
+        guchar b = ((*p >> 16) & 0xff);
+        guchar g = ((*p >>  8) & 0xff);
+        guchar r = ((*p >>  0) & 0xff);
+
+        *p++ = ((r << RrDefaultRedOffset) +
+                (g << RrDefaultGreenOffset) +
+                (b << RrDefaultBlueOffset) +
+                (a << RrDefaultAlphaOffset));
+    }
+
+    return im;
 }

@@ -1546,6 +1546,16 @@ void client_update_icons(ObClient *self)
         }
     }
 
+    if (!self->nicons) {
+        self->nicons++;
+        self->icons = g_new(ObClientIcon, self->nicons);
+        self->icons[self->nicons-1].width = 48;
+        self->icons[self->nicons-1].height = 48;
+        self->icons[self->nicons-1].data = g_memdup(ob_rr_theme->def_win_icon,
+                                                    sizeof(RrPixel32)
+                                                    * 48 * 48);
+    }
+
     if (self->frame)
 	frame_adjust_icon(self->frame);
 }
@@ -2602,8 +2612,6 @@ ObClientIcon *client_icon(ObClient *self, int w, int h)
     /* si is the smallest image >= req */
     /* li is the largest image < req */
     unsigned long size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
-
-    if (!self->nicons) return NULL;
 
     for (i = 0; i < self->nicons; ++i) {
         size = self->icons[i].width * self->icons[i].height;

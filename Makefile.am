@@ -54,6 +54,7 @@ render_libobrender_la_SOURCES = \
 	render/geom.h \
 	render/gradient.h \
 	render/gradient.c \
+	render/icon.h \
 	render/image.h \
 	render/image.c \
 	render/instance.h \

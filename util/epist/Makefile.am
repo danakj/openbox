@@ -18,10 +18,9 @@ distclean-local:
 # local dependencies
 
 epist.o: epist.cc epist.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
-  ../../src/Util.hh process.hh screen.hh window.hh ../../src/XAtom.hh
+  ../../src/Util.hh screen.hh window.hh ../../src/XAtom.hh
 main.o: main.cc epist.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
   ../../src/Util.hh ../../src/i18n.hh ../../nls/blackbox-nls.hh
-process.o: process.cc
 screen.o: screen.cc ../../src/XAtom.hh screen.hh window.hh epist.hh \
   ../../src/BaseDisplay.hh ../../src/Timer.hh ../../src/Util.hh
 window.o: window.cc window.hh epist.hh ../../src/BaseDisplay.hh \

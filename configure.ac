@@ -66,6 +66,11 @@ AC_CHECK_HEADERS(unistd.h sys/stat.h sys/select.h sys/time.h sys/wait.h)
 # AC_HEADER_TIME
 # AC_TYPE_SIGNAL
 
+AC_PATH_PROG([SED], [sed], [no])
+if test "$SED" = "no"; then
+  AC_MSG_ERROR([The program "sed" is not avaiable. This program is required to build Openbox.])
+fi
+
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)

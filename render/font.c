@@ -1,7 +1,7 @@
 #include "../kernel/openbox.h"
 #include "font.h"
 
-#include "../src/gettext.h"
+#include "../kernel/gettext.h"
 #define _(str) gettext(str)
 
 #include <X11/Xft/Xft.h>

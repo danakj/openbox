@@ -2624,7 +2624,8 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
         his_cy = (cur->frame->area.y - my_cy)
             + cur->frame->area.height / 2;
 
-        if(dir > 3) { 
+        if(dir == OB_DIRECTION_NORTHEAST || dir == OB_DIRECTION_SOUTHEAST ||
+           dir == OB_DIRECTION_SOUTHWEST || dir == OB_DIRECTION_NORTHWEST) {
             int tx;
             /* Rotate the diagonals 45 degrees counterclockwise.
              * To do this, multiply the matrix /+h +h\ with the
@@ -2751,4 +2752,195 @@ gchar* client_get_sm_client_id(ObClient *self)
     if (!PROP_GETS(self->window, sm_client_id, locale, &id) && self->group)
         PROP_GETS(self->group->leader, sm_client_id, locale, &id);
     return id;
+}
+
+/* finds the nearest edge in the given direction from the current client
+ * note to self: the edge is the -frame- edge (the actual one), not the
+ * client edge.
+ */
+int client_directional_edge_search(ObClient *c, ObDirection dir)
+{
+    int dest;
+    int my_edge_start, my_edge_end, my_offset;
+    GList *it;
+    Rect *a;
+    
+    if(!client_list)
+        return -1;
+
+    a = screen_area(c->desktop);
+
+    switch(dir) {
+    case OB_DIRECTION_NORTH:
+        my_edge_start = c->frame->area.x;
+        my_edge_end = c->frame->area.x + c->frame->area.width;
+        my_offset = c->frame->area.y;
+        
+        dest = a->y; /* default: top of screen */
+
+        for(it = g_list_first(client_list); it; it = it->next) {
+            int his_edge_start, his_edge_end, his_offset;
+            ObClient *cur = it->data;
+
+            if(cur == c)
+                continue;
+            if(!client_normal(cur))
+                continue;
+            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+                continue;
+            if(cur->iconic)
+                continue;
+
+            his_edge_start = cur->frame->area.x;
+            his_edge_end = cur->frame->area.x + cur->frame->area.width;
+            his_offset = cur->frame->area.y + cur->frame->area.height;
+
+            if(his_offset + c->size_inc.height > my_offset)
+                continue;
+
+            if(his_offset < dest)
+                    continue;
+            
+            if(his_edge_start >= my_edge_start &&
+               his_edge_start <= my_edge_end)
+                dest = his_offset;
+
+            if(my_edge_start >= his_edge_start &&
+               my_edge_start <= his_edge_end)
+                dest = his_offset;
+
+        }
+        break;
+    case OB_DIRECTION_SOUTH:
+        my_edge_start = c->frame->area.x;
+        my_edge_end = c->frame->area.x + c->frame->area.width;
+        my_offset = c->frame->area.y + c->frame->area.height;
+        
+        dest = a->y + a->height; /* default: bottom of screen */
+
+        for(it = g_list_first(client_list); it; it = it->next) {
+            int his_edge_start, his_edge_end, his_offset;
+            ObClient *cur = it->data;
+
+            if(cur == c)
+                continue;
+            if(!client_normal(cur))
+                continue;
+            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+                continue;
+            if(cur->iconic)
+                continue;
+
+            his_edge_start = cur->frame->area.x;
+            his_edge_end = cur->frame->area.x + cur->frame->area.width;
+            his_offset = cur->frame->area.y;
+
+
+            if(his_offset - c->size_inc.height < my_offset)
+                continue;
+            
+            if(his_offset > dest)
+                    continue;
+            
+            if(his_edge_start >= my_edge_start &&
+               his_edge_start <= my_edge_end)
+                dest = his_offset;
+
+            if(my_edge_start >= his_edge_start &&
+               my_edge_start <= his_edge_end)
+                dest = his_offset;
+
+        }
+        break;
+    case OB_DIRECTION_WEST:
+        my_edge_start = c->frame->area.y;
+        my_edge_end = c->frame->area.y + c->frame->area.height;
+        my_offset = c->frame->area.x;
+
+        dest = a->x; /* default: leftmost egde of screen */
+
+        for(it = g_list_first(client_list); it; it = it->next) {
+            int his_edge_start, his_edge_end, his_offset;
+            ObClient *cur = it->data;
+
+            if(cur == c)
+                continue;
+            if(!client_normal(cur))
+                continue;
+            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+                continue;
+            if(cur->iconic)
+                continue;
+
+            his_edge_start = cur->frame->area.y;
+            his_edge_end = cur->frame->area.y + cur->frame->area.height;
+            his_offset = cur->frame->area.x + cur->frame->area.width;
+
+            if(his_offset + c->size_inc.width > my_offset)
+                continue;
+            
+            if(his_offset < dest)
+                    continue;
+            
+            if(his_edge_start >= my_edge_start &&
+               his_edge_start <= my_edge_end)
+                dest = his_offset;
+
+            if(my_edge_start >= his_edge_start &&
+               my_edge_start <= his_edge_end)
+                dest = his_offset;
+                
+
+        }
+        break;
+    case OB_DIRECTION_EAST:
+        my_edge_start = c->frame->area.y;
+        my_edge_end = c->frame->area.y + c->frame->area.height;
+        my_offset = c->frame->area.x + c->frame->area.width;
+        
+        dest = a->x + a->width; /* default: rightmost edge of screen */
+
+        for(it = g_list_first(client_list); it; it = it->next) {
+            int his_edge_start, his_edge_end, his_offset;
+            ObClient *cur = it->data;
+
+            if(cur == c)
+                continue;
+            if(!client_normal(cur))
+                continue;
+            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+                continue;
+            if(cur->iconic)
+                continue;
+
+            his_edge_start = cur->frame->area.y;
+            his_edge_end = cur->frame->area.y + cur->frame->area.height;
+            his_offset = cur->frame->area.x;
+
+            if(his_offset - c->size_inc.width < my_offset)
+                continue;
+            
+            if(his_offset > dest)
+                    continue;
+            
+            if(his_edge_start >= my_edge_start &&
+               his_edge_start <= my_edge_end)
+                dest = his_offset;
+
+            if(my_edge_start >= his_edge_start &&
+               my_edge_start <= his_edge_end)
+                dest = his_offset;
+
+        }
+        break;
+    case OB_DIRECTION_NORTHEAST:
+    case OB_DIRECTION_SOUTHEAST:
+    case OB_DIRECTION_NORTHWEST:
+    case OB_DIRECTION_SOUTHWEST:
+        /* not implemented */
+        break;
+    default:
+            g_assert_not_reached();
+    }
+    return dest;
 }

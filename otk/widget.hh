@@ -39,7 +39,7 @@ public:
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }
-  inline const OtkWidgetList &getChildren(void) const { return _children; }
+  inline OtkWidgetList &getChildren(void) const { return _children; }
   inline unsigned int getScreen(void) const { return _screen; }
   inline const Rect &getRect(void) const { return _rect; }
 

@@ -257,12 +257,11 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         if (!(font->spacing == FC_PROPORTIONAL)) {
             g->width = font->max_advance_width;
         } else {
-            g->width = font->face->glyph->advance.x >> 6;
+            g->width = TRUNC(ROUND(font->face->glyph->metrics.horiAdvance));
         }
-        g->x = font->face->glyph->metrics.horiBearingX >> 6;
-        g->y = font->face->glyph->metrics.horiBearingY >> 6;
-        g->height = TRUNC(ROUND(font->face->glyph->metrics.height));/* >> 6;*/
-        g_message("%c = X %d Y %d Width: %d Height: %d", *c, g->x, g->y, g->width, g->height);
+        g->x = TRUNC(FLOOR(font->face->glyph->metrics.horiBearingX));
+        g->y = TRUNC(CEIL(font->face->glyph->metrics.horiBearingY));
+        g->height = TRUNC(ROUND(font->face->glyph->metrics.height));
 
         g_hash_table_insert(font->glyph_map, &g->w, g);
     }

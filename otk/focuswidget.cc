@@ -29,11 +29,7 @@ void OtkFocusWidget::focus(void)
   OtkWidget::setTexture(_focus_texture);
   OtkWidget::update();
 
-  OtkWidget::OtkWidgetList children = OtkWidget::getChildren();
-
-  OtkWidget::OtkWidgetList::iterator it = children.begin(),
-    end = children.end();
-
+  OtkBaseWidgetList::iterator it = _children.begin(), end = _children.end();
   OtkFocusWidget *tmp = 0;
   for (; it != end; ++it) {
     tmp = dynamic_cast<OtkFocusWidget*>(*it);
@@ -50,11 +46,7 @@ void OtkFocusWidget::unfocus(void)
   OtkWidget::setTexture(_unfocus_texture);
   OtkWidget::update();
 
-  OtkWidget::OtkWidgetList children = OtkWidget::getChildren();
-
-  OtkWidget::OtkWidgetList::iterator it = children.begin(),
-    end = children.end();
-
+  OtkBaseWidgetList::iterator it = _children.begin(), end = _children.end();
   OtkFocusWidget *tmp = 0;
   for (; it != end; ++it) {
     tmp = dynamic_cast<OtkFocusWidget*>(*it);

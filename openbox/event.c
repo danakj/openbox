@@ -26,6 +26,13 @@ static void event_handle_root(XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, XEvent *e);
 
+#define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
+                            (e)->xfocus.detail > NotifyNonlinearVirtual)
+#define INVALID_FOCUSOUT(e) ((e)->xfocus.mode == NotifyGrab || \
+                             (e)->xfocus.detail == NotifyInferior || \
+                             (e)->xfocus.detail == NotifyAncestor || \
+                             (e)->xfocus.detail > NotifyNonlinearVirtual)
+
 Time event_lasttime = 0;
 
 /*! The value of the mask for the NumLock modifier */
@@ -239,19 +246,18 @@ static gboolean event_ignore(XEvent *e, Client *client)
 {
     switch(e->type) {
     case FocusIn:
-#ifdef DEBUG_FOCUS
-        g_message("FocusIn on %lx mode %d detail %d", window,
-                  e->xfocus.mode, e->xfocus.detail);
-#endif
         /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
            because of RevertToPointerRoot. If the focus ends up reverting to
            pointer root on a workspace change, then the FocusIn event that we
            want will be of type NotifyAncestor. This situation does not occur
            for FocusOut, so it is safely ignored there.
         */
-	if (e->xfocus.detail == NotifyInferior ||
-            e->xfocus.detail > NotifyNonlinearVirtual ||
+	if (INVALID_FOCUSIN(e) ||
             client == NULL) {
+#ifdef DEBUG_FOCUS
+        g_message("FocusIn on %lx mode %d detail %d IGNORED", e->xfocus.window,
+                  e->xfocus.mode, e->xfocus.detail);
+#endif
             /* says a client was not found for the event (or a valid FocusIn
                event was not found.
             */
@@ -260,45 +266,67 @@ static gboolean event_ignore(XEvent *e, Client *client)
         }
 
 #ifdef DEBUG_FOCUS
-        g_message("FocusIn on %lx", window);
+        g_message("FocusIn on %lx mode %d detail %d", e->xfocus.window,
+                  e->xfocus.mode, e->xfocus.detail);
 #endif
         break;
     case FocusOut:
+	if (INVALID_FOCUSOUT(e)) {
 #ifdef DEBUG_FOCUS
-        g_message("FocusOut on %lx mode %d detail %d", window,
-                  e->xfocus.mode, e->xfocus.detail);
+        g_message("FocusOut on %lx mode %d detail %d IGNORED",
+                  e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
-	if (e->xfocus.mode == NotifyGrab ||
-            e->xfocus.detail == NotifyInferior ||
-            e->xfocus.detail == NotifyAncestor ||
-            e->xfocus.detail > NotifyNonlinearVirtual) return TRUE;
- 
+            return TRUE;
+        }
+
 #ifdef DEBUG_FOCUS
-       g_message("FocusOut on %lx", window);
+        g_message("FocusOut on %lx mode %d detail %d",
+                  e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
+
         /* Try process a FocusIn first, and if a legit one isn't found, then
            do the fallback shiznit. */
         {
-            XEvent fi, fo;
-            gboolean isfo = FALSE;
+            XEvent fe;
+            gboolean fallback = TRUE;
 
-            if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {
-		event_process(&fi);
-
-                /* when we have gotten a fi/fo pair, then see if there are any
-                   more fo's coming. if there are, then don't fallback just yet
-                */
-                if ((isfo = XCheckTypedEvent(ob_display, FocusOut, &fo)))
-                    XPutBackEvent(ob_display, &fo);
-
-                /* secret magic way of event_process telling us that no client
-                   was found for the FocusIn event. ^_^ */
-                if (!isfo && fi.xfocus.window == None)
-                    focus_fallback(Fallback_NoFocus);
-                if (fi.xfocus.window == e->xfocus.window)
-                    return TRUE;
-            } else
+            while (TRUE) {
+                if (!XCheckTypedEvent(ob_display, FocusOut, &fe))
+                    if (!XCheckTypedEvent(ob_display, FocusIn, &fe))
+                        break;
+                if (fe.type == FocusOut) {
+#ifdef DEBUG_FOCUS
+                    g_message("found pending FocusOut");
+#endif
+                    if (!INVALID_FOCUSOUT(&fe)) {
+                        /* if there is a VALID FocusOut still coming, don't
+                           fallback focus yet, we'll deal with it then */
+                        XPutBackEvent(ob_display, &fe);
+                        fallback = FALSE;
+                        break;
+                    }
+                } else {
+#ifdef DEBUG_FOCUS
+                    g_message("found pending FocusIn");
+#endif
+                    /* once all the FocusOut's have been dealt with, if there
+                       is a FocusIn still left and it is valid, then use it */
+                    event_process(&fe);
+                    /* secret magic way of event_process telling us that no
+                       client was found for the FocusIn event. ^_^ */
+                    if (fe.xfocus.window != None) {
+                        fallback = FALSE;
+                        break;
+                    }
+                }
+            }
+            if (fallback) {
+#ifdef DEBUG_FOCUS
+                g_message("no valid FocusIn and no FocusOut events found, "
+                          "falling back");
+#endif
                 focus_fallback(Fallback_NoFocus);
+            }
         }
 	break;
     case EnterNotify:

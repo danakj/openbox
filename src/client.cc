@@ -27,10 +27,13 @@ OBClient::OBClient(Window window)
 
   // the state is kinda assumed to be normal. is this right? XXX
   _wmstate = NormalState;
+  // no default decors or functions, each has to be enabled
+  _decorations = _functions = 0;
   
   getArea();
   getDesktop();
   getType();
+  getMwmHints();
   getState();
   getShaped();
 
@@ -168,6 +171,67 @@ void OBClient::getType()
     //else
       _type = Type_Normal;
   }
+
+  // set the decorations and functions based on the type of the window
+}
+
+
+void OBClient::getMWMHints()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  unsigned long num;
+  MwmHints *hints;
+
+  num = MwmHints::elements;
+  if (!property->get(_window, otk::OBProperty::motif_wm_hints,
+                     otk::OBProperty::motif_wm_hints, &num,
+                     (unsigned long **)&hints))
+    return;
+  
+  if (num < MwmHints::elements) {
+    delete [] hints;
+    return;
+  }
+
+  // retrieved the hints
+  // Mwm Hints are applied subtractively to what has already been chosen for
+  // decor and functionality
+
+  if (hints->flags & MwmDecorations) {
+    if (! (hints->decorations & MwmDecor_All)) {
+      if (! (hints->decorations & MwmDecor_Border))
+        _decorations &= ~Decor_Border;
+      if (! (hints->decorations & MwmDecor_Handle))
+        _decorations &= ~Decor_Handle;
+      if (! (hints->decorations & MwmDecor_Title))
+        _decorations &= ~Decor_Titlebar;
+      if (! (hints->decorations & MwmDecor_Iconify))
+        _decorations &= ~Decor_Iconify;
+      if (! (hints->decorations & MwmDecor_Maximize))
+        _decorations &= ~Decor_Maximize;
+    }
+  }
+
+  _mwm_functions = 0xffffffff; // everything!
+
+  if (hints->flags & MwmFunctions) {
+    if (! (hints->functions & MwmFunc_All)) {
+      _mwm_functions = hints->functions;
+      
+      if (! (hints->functions & MwmFunc_Resize))
+        functions &= ~Func_Resize;
+      if (! (hints->functions & MwmFunc_Move))
+        functions &= ~Func_Move;
+      if (! (hints->functions & MwmFunc_Iconify))
+        functions &= ~Func_Iconify;
+      if (! (hints->functions & MwmFunc_Maximize))
+        functions &= ~Func_Maximize;
+      if (! (hints->functions & MwmFunc_Close))
+        functions &= ~Func_Close;
+    }
+  }
+  delete [] hints;
 }
 
 
@@ -229,7 +293,8 @@ void OBClient::getShaped()
 }
 
 
-void OBClient::updateProtocols() {
+void OBClient::updateProtocols()
+{
   const otk::OBProperty *property = Openbox::instance->property();
 
   Atom *proto;
@@ -240,8 +305,13 @@ void OBClient::updateProtocols() {
   if (XGetWMProtocols(otk::OBDisplay::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
       if (proto[i] == property->atom(otk::OBProperty::wm_delete_window)) {
-        // XXX: do shit with this! let the window close, and show a close
-        // button
+        // add the close button/functionality only if the mwm hints didnt
+        // exclude it
+        if (_mwm_functions & MwmFunc_Close) {
+          decorations |= Decor_Close;
+          functions |= Func_Close;
+          // XXX: update the decor?
+        }
       } else if (proto[i] == property->atom(otk::OBProperty::wm_take_focus))
         // if this protocol is requested, then the window will be notified
         // by the window manager whenever it receives focus
@@ -263,6 +333,9 @@ void OBClient::updateNormalHints()
   _base_x = _base_y = 0;
   _min_x = _min_y = 0;
   _max_x = _max_y = INT_MAX;
+
+  // XXX: might want to cancel any interactive resizing of the window at this
+  // point..
 
   // get the hints from the window
   if (XGetWMNormalHints(otk::OBDisplay::display, _window, &size, &ret)) {

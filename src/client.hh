@@ -29,8 +29,8 @@ public:
                     Type_Dialog,
                     Type_Normal };
 
-  enum MwmFlags { Functions   = 1 << 0,
-                  Decorations = 1 << 1 };
+  enum MwmFlags { MwmFunctions   = 1 << 0,
+                  MwmDecorations = 1 << 1 };
 
   enum MwmFunctions { MwmFunc_All      = 1 << 0,
                       MwmFunc_Resize   = 1 << 1,
@@ -46,6 +46,23 @@ public:
                         //MemDecor_Menu     = 1 << 4,
                         MemDecor_Iconify  = 1 << 5,
                         MemDecor_Maximize = 1 << 6 };
+
+  // the things the user can do to the client window
+  enum Function { Func_Resize   = 1 << 0,
+                  Func_Move     = 1 << 1,
+                  Func_Iconify  = 1 << 2,
+                  Func_Maximize = 1 << 3,
+                  Func_Close    = 1 << 4 };
+  typedef unsigned char FunctionFlags;
+
+  // the decorations the client window wants to be displayed on it
+  enum Decoration { Decor_Titlebar = 1 << 0,
+                    Decor_Handle   = 1 << 1,
+                    Decor_Border   = 1 << 2,
+                    Decor_Iconify  = 1 << 3,
+                    Decor_Maximize = 1 << 4,
+                    Decor_Close    = 1 << 5 };
+  typedef unsigned char DecorationFlags;
 
   // this structure only contains 3 elements... the Motif 2.0 structure
   // contains 5... we only need the first 3... so that is all we will define
@@ -140,10 +157,26 @@ private:
   //! The window should be on top of other windows of the same type
   bool _floating;
 
-  // XXX: motif decoration hints!
+  //! A bitmask of values in the OBClient::Decoration enum
+  /*!
+    The values in the variable are the decorations that the client wants to be
+    displayed around it.
+  */
+  DecorationFlags _decorations;
+
+  //! The functions requested by the Mwm Hints
+  int _mwm_functions;
+
+  //! A bitmask of values in the OBClient::Function enum
+  /*!
+    The values in the variable specify the ways in which the user is allowed to
+    modify this window.
+  */
+  FunctionFlags _functions;
 
   void getDesktop();
   void getType();
+  void getMwmHints();
   void getArea();
   void getState();
   void getShaped();
@@ -177,6 +210,8 @@ public:
   inline bool shaped() const { return _shaped; }
   inline int gravity() const { return _gravity; }
   inline bool positionRequested() const { return _positioned; }
+  inline DecorationFlags decorations() const { return _decorations; }
+  inline FunctionFlags funtions() const { return _functions; }
 
   // states
   inline bool modal() const { return _modal; }

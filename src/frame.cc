@@ -429,8 +429,9 @@ void OBFrame::grabClient()
 
 void OBFrame::releaseClient()
 {
-  // check if the app has already reparented its window away
   XEvent ev;
+
+  // check if the app has already reparented its window away
   if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
                              ReparentNotify, &ev)) {
     XPutBack(otk::OBDisplay::display, &ev);

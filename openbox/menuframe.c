@@ -8,6 +8,7 @@
 
 #define PADDING 2
 #define SEPARATOR_HEIGHT 3
+#define MAX_MENU_WIDTH 400
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
 			 LeaveWindowMask)
@@ -369,6 +370,7 @@ static void menu_frame_render(ObMenuFrame *self)
 
         self->a_title->texture[0].data.text.string = self->menu->title;
         RrMinsize(self->a_title, &tw, &th);
+        tw = MIN(tw, MAX_MENU_WIDTH);
         tw += 2*PADDING;
         th += 2*PADDING;
         w = MAX(w, tw);
@@ -408,6 +410,7 @@ static void menu_frame_render(ObMenuFrame *self)
         case OB_MENU_ENTRY_TYPE_NORMAL:
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
             RrMinsize(text_a, &tw, &th);
+            tw = MIN(tw, MAX_MENU_WIDTH);
 
             if (e->entry->data.normal.icon_data ||
                 e->entry->data.normal.mask)
@@ -417,6 +420,7 @@ static void menu_frame_render(ObMenuFrame *self)
             sub = e->entry->data.submenu.submenu;
             text_a->texture[0].data.text.string = sub ? sub->title : "";
             RrMinsize(text_a, &tw, &th);
+            tw = MIN(tw, MAX_MENU_WIDTH);
 
             if (e->entry->data.normal.icon_data ||
                 e->entry->data.normal.mask)

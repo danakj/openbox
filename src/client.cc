@@ -99,10 +99,10 @@ void Client::getGravity()
   long junk;
 
   if (XGetWMNormalHints(**otk::display, _window, &size, &junk) &&
-      size.flags & PWinGravity)
+      size.flags & PWinGravity) {
     // first try the normal hints
     _gravity = size.win_gravity;
-  else {
+  } else {
     // then fall back to the attribute
     ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
     assert(ret != BadWindow);

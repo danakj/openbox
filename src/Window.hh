@@ -295,6 +295,8 @@ private:
   void setState(unsigned long new_state);
   void upsize(void);
   void doMove(int x_root, int y_root);
+  bool doWorkspaceWarping(int x_root, int y_root, int dx, int dy);
+  void doWindowSnapping(int &dx, int &dy);
   void endMove(void);
   void doResize(int x_root, int y_root);
   void endResize(void);

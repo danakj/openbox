@@ -188,6 +188,7 @@ private:
 
   void updateWorkArea(void);
 public:
+  enum { WindowNoSnap = 0, WindowSnap, WindowResistance };
   enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
          UnderMousePlacement, ClickMousePlacement, LeftRight, RightLeft,
          TopBottom, BottomTop, IgnoreShaded, IgnoreMaximized };
@@ -196,7 +197,7 @@ public:
          WindowShade, WindowIconify, WindowMaximize, WindowClose, WindowRaise,
          WindowLower, WindowStick, WindowKill, SetStyle };
   enum FocusModel { SloppyFocus, ClickToFocus };
-  enum RootScrollDirection { NoScroll, NormalScroll, ReverseScroll };
+  enum RootScrollDirection { NoScroll = 0, NormalScroll, ReverseScroll };
 
   BScreen(Blackbox *bb, unsigned int scrn);
   ~BScreen(void);

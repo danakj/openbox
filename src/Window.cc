@@ -3027,238 +3027,11 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   dx -= frame.border_w;
   dy -= frame.border_w;
 
-  if (screen->doWorkspaceWarping()) {
-    // workspace warping
-    bool warp = False;
-    unsigned int dest = screen->getCurrentWorkspaceID();
-    if (x_root <= 0) {
-      warp = True;
-
-      if (dest > 0) dest--;
-      else dest = screen->getNumberOfWorkspaces() - 1;
-
-    } else if (x_root >= screen->getRect().right()) {
-      warp = True;
-
-      if (dest < screen->getNumberOfWorkspaces() - 1) dest++;
-      else dest = 0;
-    }
-    if (warp) {
-      endMove();
-      bool focus = flags.focused; // had focus while moving?
-      if (! flags.stuck)
-        screen->reassociateWindow(this, dest, False);
-      screen->changeWorkspaceID(dest);
-      if (focus)
-        setInputFocus();
-
-      /*
-         If the XWarpPointer is done after the configure, we can end up
-         grabbing another window, so made sure you do it first.
-      */
-      int dest_x;
-      if (x_root <= 0) {
-        dest_x = screen->getRect().right() - 1;
-        XWarpPointer(blackbox->getXDisplay(), None, 
-                     screen->getRootWindow(), 0, 0, 0, 0,
-                     dest_x, y_root);
-
-        configure(dx + (screen->getRect().width() - 1), dy,
-                  frame.rect.width(), frame.rect.height());
-      } else {
-        dest_x = 0;
-        XWarpPointer(blackbox->getXDisplay(), None, 
-                     screen->getRootWindow(), 0, 0, 0, 0,
-                     dest_x, y_root);
-
-        configure(dx - (screen->getRect().width() - 1), dy,
-                  frame.rect.width(), frame.rect.height());
-      }
-
-      beginMove(dest_x, y_root);
+  if (screen->doWorkspaceWarping())
+    if (doWorkspaceWarping(x_root, y_root, dx, dy))
       return;
-    }
-  }
 
-  // how much resistance to edges to provide
-  const int resistance_size = screen->getEdgeSnapThreshold();
-
-  if (resistance_size > 0) {
-    RectList rectlist;
-
-    // the amount of space away from the edge to provide resistance
-    const int resistance_offset = screen->getEdgeSnapThreshold();
-  
-    // find the geomeetery where the moving window currently is
-    const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;
-
-    // window corners
-    const int wleft = dx,
-              wright = dx + frame.rect.width() - 1,
-              wtop = dy,
-              wbottom = dy + frame.rect.height() - 1;
-
-    if (screen->getWindowToWindowSnap()) {
-      Workspace *w = screen->getWorkspace(getWorkspaceNumber());
-      assert(w);
-
-      // add windows on the workspace to the rect list
-      const BlackboxWindowList& stack_list = w->getStackingList();
-      BlackboxWindowList::const_iterator st_it, st_end = stack_list.end();
-      for (st_it = stack_list.begin(); st_it != st_end; ++st_it)
-        rectlist.push_back( (*st_it)->frameRect() );
-
-      // add the toolbar and the slit to the rect list.
-      // (only if they are not hidden)
-      Toolbar *tbar = screen->getToolbar();
-      Slit *slit = screen->getSlit();
-      Rect tbar_rect, slit_rect;
-      unsigned int bwidth = screen->getBorderWidth() * 2;
-
-      if (! (screen->doHideToolbar() || tbar->isHidden())) {
-        tbar_rect.setRect(tbar->getX(), tbar->getY(), tbar->getWidth() + bwidth,
-                          tbar->getHeight() + bwidth);
-        rectlist.push_back(tbar_rect);
-      }
-
-      if (! slit->isHidden()) {
-        slit_rect.setRect(slit->getX(), slit->getY(), slit->getWidth() + bwidth,
-                          slit->getHeight() + bwidth);
-        rectlist.push_back(slit_rect);
-      }
-
-      RectList::const_iterator it, end = rectlist.end();
-      for (it = rectlist.begin(); it != end; ++it) {
-        bool snapped = False;
-        
-        const Rect &winrect = *it;
-        
-        // if the window is already over top of this snap target, then
-        // resistance is futile, so just ignore it
-        if (winrect.intersects(moving))
-          continue;
-        
-        int dleft = wright - winrect.left(),
-           dright = winrect.right() - wleft,
-             dtop = wbottom - winrect.top(),
-          dbottom = winrect.bottom() - wtop;
-
-        // if the windows are in the same plane vertically
-        if (wtop >= (signed)(winrect.y() - frame.rect.height() + 1) &&
-            wtop < (signed)(winrect.y() + winrect.height() - 1)) {
-
-          // snap left of other window?
-          if (dleft >= 0 && dleft < resistance_size) {
-            dx = winrect.left() - frame.rect.width();
-            snapped = True;
-          }
-          // snap right of other window?
-          else if (dright >= 0 && dright < resistance_size) {
-            dx = winrect.right() + 1;
-            snapped = True;
-          }
-
-          if (snapped) {
-            if (screen->getWindowCornerSnap()) {
-              // try corner-snap to its other sides
-              dtop = winrect.top() - wtop;
-              dbottom = wbottom - winrect.bottom();
-              if (dtop > 0 && dtop < resistance_size) {
-                // if we're already past the top edge, then don't provide
-                // resistance
-                if (moving.top() >= winrect.top())
-                  dy = winrect.top();
-              } else if (dbottom > 0 && dbottom < resistance_size) {
-                // if we're already past the bottom edge, then don't provide
-                // resistance
-                if (moving.bottom() <= winrect.bottom())
-                  dy = winrect.bottom() - frame.rect.height() + 1;
-              }
-            }
-
-            continue;
-          }
-        }
-
-        // if the windows are on the same plane horizontally
-        if (wleft >= (signed)(winrect.x() - frame.rect.width() + 1) &&
-            wleft < (signed)(winrect.x() + winrect.width() - 1)) {
-
-          // snap top of other window?
-          if (dtop >= 0 && dtop < resistance_size) {
-            dy = winrect.top() - frame.rect.height();
-            snapped = True;
-          }
-          // snap bottom of other window?
-          else if (dbottom >= 0 && dbottom < resistance_size) {
-            dy = winrect.bottom() + 1;
-            snapped = True;
-          }
-
-          if (snapped) {
-            if (screen->getWindowCornerSnap()) {
-              // try corner-snap to its other sides
-              dleft = winrect.left() - wleft;
-              dright = wright - winrect.right();
-              if (dleft > 0 && dleft < resistance_size) {
-                // if we're already past the left edge, then don't provide
-                // resistance
-                if (moving.left() >= winrect.left())
-                  dx = winrect.left();
-              } else if (dright > 0 && dright < resistance_size) {
-                // if we're already past the right edge, then don't provide
-                // resistance
-                if (moving.right() <= winrect.right())
-                  dx = winrect.right() - frame.rect.width() + 1;
-              }
-            }
-
-            continue;
-          }
-        }
-      }
-    }
-
-    // snap to the screen edges (and screen boundaries for xinerama)
-    rectlist.clear();
-
-#ifdef    XINERAMA
-    if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
-      rectlist.insert(rectlist.begin(),
-                      screen->getXineramaAreas().begin(),
-                      screen->getXineramaAreas().end());
-    } else
-#endif // XINERAMA
-      rectlist.push_back(screen->getRect());
-
-    RectList::const_iterator it, end = rectlist.end();
-    for (it = rectlist.begin(); it != end; ++it) {
-      const Rect &srect = *it;
-
-      // if we're not in the rectangle then don't snap to it.
-      if (! srect.contains(moving))
-        continue;
-
-      int dleft = srect.left() - wleft,
-         dright = wright - srect.right(),
-           dtop = srect.top() - wtop,
-        dbottom = wbottom - srect.bottom();
-
-        // snap left?
-        if (dleft > 0 && dleft < resistance_size)
-          dx = srect.left();
-        // snap right?
-        else if (dright > 0 && dright < resistance_size)
-          dx = srect.right() - frame.rect.width() + 1;
-
-        // snap top?
-        if (dtop > 0 && dtop < resistance_size)
-          dy = srect.top();
-        // snap bottom?
-        else if (dbottom > 0 && dbottom < resistance_size)
-          dy = srect.bottom() - frame.rect.height() + 1;
-    }
-  }
+  doWindowSnapping(dx, dy);
 
   if (screen->doOpaqueMove()) {
     configure(dx, dy, frame.rect.width(), frame.rect.height());
@@ -3281,6 +3054,333 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   }
 
   screen->showPosition(dx, dy);
+}
+
+
+bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
+                                        int dx, int dy) {
+  // workspace warping
+  bool warp = False;
+  unsigned int dest = screen->getCurrentWorkspaceID();
+  if (x_root <= 0) {
+    warp = True;
+
+    if (dest > 0) dest--;
+    else dest = screen->getNumberOfWorkspaces() - 1;
+
+  } else if (x_root >= screen->getRect().right()) {
+    warp = True;
+
+    if (dest < screen->getNumberOfWorkspaces() - 1) dest++;
+    else dest = 0;
+  }
+  if (! warp)
+    return false;
+
+  endMove();
+  bool focus = flags.focused; // had focus while moving?
+  if (! flags.stuck)
+    screen->reassociateWindow(this, dest, False);
+  screen->changeWorkspaceID(dest);
+  if (focus)
+    setInputFocus();
+
+  /*
+     If the XWarpPointer is done after the configure, we can end up
+     grabbing another window, so made sure you do it first.
+     */
+  int dest_x;
+  if (x_root <= 0) {
+    dest_x = screen->getRect().right() - 1;
+    XWarpPointer(blackbox->getXDisplay(), None, 
+                 screen->getRootWindow(), 0, 0, 0, 0,
+                 dest_x, y_root);
+
+    configure(dx + (screen->getRect().width() - 1), dy,
+              frame.rect.width(), frame.rect.height());
+  } else {
+    dest_x = 0;
+    XWarpPointer(blackbox->getXDisplay(), None, 
+                 screen->getRootWindow(), 0, 0, 0, 0,
+                 dest_x, y_root);
+
+    configure(dx - (screen->getRect().width() - 1), dy,
+              frame.rect.width(), frame.rect.height());
+  }
+
+  beginMove(dest_x, y_root);
+  return true;
+}
+
+
+void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
+  // how much resistance to edges to provide
+  const int resistance_size = screen->getEdgeSnapThreshold();
+
+  // how far away to snap
+  const int snap_distance = screen->getEdgeSnapThreshold();
+
+  // how to snap windows
+  const int snap_to_windows = BScreen::WindowResistance;
+  const int snap_to_edges = BScreen::WindowResistance;
+  // the amount of space away from the edge to provide resistance/snap
+  const int snap_offset = screen->getEdgeSnapThreshold();
+
+  // find the geomeetery where the moving window currently is
+  const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;
+
+  // window corners
+  const int wleft = dx,
+           wright = dx + frame.rect.width() - 1,
+             wtop = dy,
+          wbottom = dy + frame.rect.height() - 1;
+
+  if (snap_to_windows) {
+    RectList rectlist;
+
+    Workspace *w = screen->getWorkspace(getWorkspaceNumber());
+    assert(w);
+
+    // add windows on the workspace to the rect list
+    const BlackboxWindowList& stack_list = w->getStackingList();
+    BlackboxWindowList::const_iterator st_it, st_end = stack_list.end();
+    for (st_it = stack_list.begin(); st_it != st_end; ++st_it)
+      rectlist.push_back( (*st_it)->frameRect() );
+
+    // add the toolbar and the slit to the rect list.
+    // (only if they are not hidden)
+    Toolbar *tbar = screen->getToolbar();
+    Slit *slit = screen->getSlit();
+    Rect tbar_rect, slit_rect;
+    unsigned int bwidth = screen->getBorderWidth() * 2;
+
+    if (! (screen->doHideToolbar() || tbar->isHidden())) {
+      tbar_rect.setRect(tbar->getX(), tbar->getY(), tbar->getWidth() + bwidth,
+                        tbar->getHeight() + bwidth);
+      rectlist.push_back(tbar_rect);
+    }
+
+    if (! slit->isHidden()) {
+      slit_rect.setRect(slit->getX(), slit->getY(), slit->getWidth() + bwidth,
+                        slit->getHeight() + bwidth);
+      rectlist.push_back(slit_rect);
+    }
+
+    RectList::const_iterator it, end = rectlist.end();
+    for (it = rectlist.begin(); it != end; ++it) {
+      bool snapped = False;
+      const Rect &winrect = *it;
+
+      if (snap_to_windows == BScreen::WindowResistance)
+        // if the window is already over top of this snap target, then
+        // resistance is futile, so just ignore it
+        if (winrect.intersects(moving))
+          continue;
+
+      int dleft, dright, dtop, dbottom;
+
+      // if the windows are in the same plane vertically
+      if (wtop >= (signed)(winrect.y() - frame.rect.height() + 1) &&
+          wtop < (signed)(winrect.y() + winrect.height() - 1)) {
+
+        if (snap_to_windows == BScreen::WindowResistance) {
+          dleft = wright - winrect.left();
+          dright = winrect.right() - wleft;
+
+          // snap left of other window?
+          if (dleft >= 0 && dleft < resistance_size) {
+            dx = winrect.left() - frame.rect.width();
+            snapped = True;
+          }
+          // snap right of other window?
+          else if (dright >= 0 && dright < resistance_size) {
+            dx = winrect.right() + 1;
+            snapped = True;
+          }
+        } else { // BScreen::WindowSnap
+          dleft = abs(wright - winrect.left());
+          dright = abs(wleft - winrect.right());
+
+          // snap left of other window?
+          if (dleft < snap_distance && dleft <= dright) {
+            dx = winrect.left() - frame.rect.width();
+            snapped = True;
+          }
+          // snap right of other window?
+          else if (dright < snap_distance) {
+            dx = winrect.right() + 1;
+            snapped = True;
+          }            
+        }
+
+        if (snapped) {
+          if (screen->getWindowCornerSnap()) {
+            // try corner-snap to its other sides
+            if (snap_to_windows == BScreen::WindowResistance) {
+              dtop = winrect.top() - wtop;
+              dbottom = wbottom - winrect.bottom();
+              if (dtop > 0 && dtop < resistance_size) {
+                // if we're already past the top edge, then don't provide
+                // resistance
+                if (moving.top() >= winrect.top())
+                  dy = winrect.top();
+              } else if (dbottom > 0 && dbottom < resistance_size) {
+                // if we're already past the bottom edge, then don't provide
+                // resistance
+                if (moving.bottom() <= winrect.bottom())
+                  dy = winrect.bottom() - frame.rect.height() + 1;
+              }
+            } else { // BScreen::WindowSnap
+              dtop = abs(wtop - winrect.top());
+              dbottom = abs(wbottom - winrect.bottom());
+              if (dtop < snap_distance && dtop <= dbottom)
+                dy = winrect.top();
+              else if (dbottom < snap_distance)
+                dy = winrect.bottom() - frame.rect.height() + 1;
+            }
+          }
+
+          continue;
+        }
+      }
+
+      // if the windows are on the same plane horizontally
+      if (wleft >= (signed)(winrect.x() - frame.rect.width() + 1) &&
+          wleft < (signed)(winrect.x() + winrect.width() - 1)) {
+
+        if (snap_to_windows == BScreen::WindowResistance) {
+          dtop = wbottom - winrect.top();
+          dbottom = winrect.bottom() - wtop;
+
+          // snap top of other window?
+          if (dtop >= 0 && dtop < resistance_size) {
+            dy = winrect.top() - frame.rect.height();
+            snapped = True;
+          }
+          // snap bottom of other window?
+          else if (dbottom >= 0 && dbottom < resistance_size) {
+            dy = winrect.bottom() + 1;
+            snapped = True;
+          }
+        } else { // BScreen::WindowSnap
+          dtop = abs(wbottom - winrect.top());
+          dbottom = abs(wtop - winrect.bottom());
+
+          // snap top of other window?
+          if (dtop < snap_distance && dtop <= dbottom) {
+            dy = winrect.top() - frame.rect.height();
+            snapped = True;
+          }
+          // snap bottom of other window?
+          else if (dbottom < snap_distance) {
+            dy = winrect.bottom() + 1;
+            snapped = True;
+          }
+
+        }
+
+        if (snapped) {
+          if (screen->getWindowCornerSnap()) {
+            // try corner-snap to its other sides
+            if (snap_to_windows == BScreen::WindowResistance) {
+              dleft = winrect.left() - wleft;
+              dright = wright - winrect.right();
+              if (dleft > 0 && dleft < resistance_size) {
+                // if we're already past the left edge, then don't provide
+                // resistance
+                if (moving.left() >= winrect.left())
+                  dx = winrect.left();
+              } else if (dright > 0 && dright < resistance_size) {
+                // if we're already past the right edge, then don't provide
+                // resistance
+                if (moving.right() <= winrect.right())
+                  dx = winrect.right() - frame.rect.width() + 1;
+              }
+            } else { // BScreen::WindowSnap
+              dleft = abs(wleft - winrect.left());
+              dright = abs(wright - winrect.right());
+              if (dleft < snap_distance && dleft <= dright)
+                dx = winrect.left();
+              else if (dright < snap_distance)
+                dx = winrect.right() - frame.rect.width() + 1;
+            }
+          }
+
+          continue;
+        }
+      }
+    }
+  }
+
+  if (snap_to_edges) {
+    RectList rectlist;
+
+    // snap to the screen edges (and screen boundaries for xinerama)
+#ifdef    XINERAMA
+    if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
+      rectlist.insert(rectlist.begin(),
+                      screen->getXineramaAreas().begin(),
+                      screen->getXineramaAreas().end());
+    } else
+#endif // XINERAMA
+      rectlist.push_back(screen->getRect());
+
+    RectList::const_iterator it, end = rectlist.end();
+    for (it = rectlist.begin(); it != end; ++it) {
+      const Rect &srect = *it;
+
+      if (snap_to_edges == BScreen::WindowResistance) {
+        // if we're not in the rectangle then don't snap to it.
+        if (! srect.contains(moving))
+          continue;
+      } else { // BScreen::WindowSnap
+        // if we're not in the rectangle then don't snap to it.
+        if (! srect.intersects(Rect(wleft, wtop, frame.rect.width(),
+                                    frame.rect.height())))
+          continue;
+      }
+
+      if (snap_to_edges == BScreen::WindowResistance) {
+      int dleft = srect.left() - wleft,
+         dright = wright - srect.right(),
+           dtop = srect.top() - wtop,
+        dbottom = wbottom - srect.bottom();
+
+        // snap left?
+        if (dleft > 0 && dleft < resistance_size)
+          dx = srect.left();
+        // snap right?
+        else if (dright > 0 && dright < resistance_size)
+          dx = srect.right() - frame.rect.width() + 1;
+
+        // snap top?
+        if (dtop > 0 && dtop < resistance_size)
+          dy = srect.top();
+        // snap bottom?
+        else if (dbottom > 0 && dbottom < resistance_size)
+          dy = srect.bottom() - frame.rect.height() + 1;
+      } else { // BScreen::WindowSnap
+        int dleft = abs(wleft - srect.left()),
+           dright = abs(wright - srect.right()),
+             dtop = abs(wtop - srect.top()),
+          dbottom = abs(wbottom - srect.bottom());
+
+        // snap left?
+        if (dleft < snap_distance && dleft <= dright)
+          dx = srect.left();
+        // snap right?
+        else if (dright < snap_distance)
+          dx = srect.right() - frame.rect.width() + 1;
+
+        // snap top?
+        if (dtop < snap_distance && dtop <= dbottom)
+          dy = srect.top();
+        // snap bottom?
+        else if (dbottom < snap_distance)
+          dy = srect.bottom() - frame.rect.height() + 1;
+      }
+    }
+  }
 }
 
 

@@ -433,9 +433,9 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
             //this point
             XGrabKeyboard(**otk::display, root, 0, GrabModeAsync, 
                           GrabModeSync, CurrentTime);
-            _grabbed = true;
-            _curpos = p;
           }
+          _grabbed = true;
+          _curpos = p;
           XAllowEvents(**otk::display, AsyncKeyboard, CurrentTime);
         } else {
           Client *c = openbox->focusedClient();

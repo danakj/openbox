@@ -54,8 +54,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
     _file(stylefile)
 {
 // pick one..
-#define FIERON
-//#define MERRY
+//#define FIERON
+#define MERRY
 
 #ifdef FIERON
   _root_color = new RenderColor(_screen, 0x272a2f);
@@ -295,7 +295,7 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                         RenderTexture::Flat,
                                         RenderTexture::Bevel1,
                                         false,
-                                        RenderTexture::Vertical,
+                                        RenderTexture::Solid,
                                         false,
                                         0xe6e6e6,
                                         0xd9d9d9,

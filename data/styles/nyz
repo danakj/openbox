@@ -99,5 +99,7 @@ handleWidth:			4
 
 *textColor:			grey85
 *Font:				lucidasans-10
+*xft.font:			arial
+*xft.size:			10
 
 rootCommand:			bsetroot -solid grey20

@@ -128,4 +128,9 @@ frameWidth:	1
 bevelWidth:	1
 borderWidth:	1
 borderColor:	#000000
-*Font: lime
+
+!*Font:			lime
+*Font: 			lucidasans-10
+*xft.font:		Arial
+*xft.size:		9
+menu.title.xft.size:	10

@@ -6,7 +6,12 @@ style.credits:	nyz's moving_targets.png
 style.comments:			(kyle) miklos, clone nyz's theme for me.\
 		\
 		
-		
+!*font:		lime
+*font:		-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+
+*xft.font:	Arial
+*xft.size:	9
+menu*xft.size:	10
 
 rootCommand:	bsetbg -solid '#385070'
 
@@ -33,8 +38,6 @@ toolbar.clock.textColor:	#000000
 toolbar:	Raised Bevel1 Solid
 toolbar.color:	#c8c8c8
 toolbar.textColor:	#ffffff
-!toolbar.font:	lime
-toolbar.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 toolbar.justify:	Center
 
 
@@ -42,15 +45,11 @@ toolbar.justify:	Center
 menu.frame:	Raised Bevel1 Solid
 menu.frame.color:	#c8c8c8
 menu.frame.textColor:	#000000
-!menu.frame.font:	lime
-menu.frame.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 menu.frame.justify:	Center
 
 menu.title:	Raised Bevel1 Solid
 menu.title.color:	#506c90
 menu.title.textColor:	#ffffff
-!menu.title.font:	lime
-menu.title.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 menu.title.justify:	Center
 
 menu.hilite:	Flat Solid
@@ -85,12 +84,8 @@ window.handle.unfocus.color:	#c8c8c8
 window.label.focus:	Flat Solid
 window.label.focus.color:	#506890
 window.label.focus.textColor:	#ffffff
-!window.label.focus.font:	lime
-window.label.focus.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 window.label.focus.justify:	Center
 
-!window.font:	lime
-window.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 window.justify:	Center
 window.label.unfocus:	Flat Solid
 window.label.unfocus.color:	#c8c8c8

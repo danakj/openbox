@@ -125,5 +125,11 @@ bevelWidth:	1
 borderWidth:	1
 borderColor:	#000000
 
-!*font:		mints-strong
-*font:		-b&h-lucidatypewriter-medium-r-*-*-*-100-*-*-*-*-*-*
+!*font:			mints-strong
+*font:			-b&h-lucidatypewriter-medium-r-*-*-*-100-*-*-*-*-*-*
+
+*xft.font:		Arial
+*xft.size:		9
+menu*xft.font:		Trebuchet MS
+menu*xft.size:		11
+menu.title.xft.flags:	bold

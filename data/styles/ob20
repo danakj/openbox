@@ -93,7 +93,13 @@ window.button.pressed:	Sunken gradient diagonal
 window.button.pressed.color:	#666666
 window.button.pressed.colorTo:	#444444
 
-*.font: lime
+!*font: lime
+*font:		-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+
+*xft.font:	Arial
+*xft.size:	9
+menu*xft.size:	10
+
 window.frame.focusColor:	#686868
 window.frame.unfocusColor:	#555555
 handleWidth:	2

@@ -107,3 +107,8 @@ handleWidth:			5
 rootCommand:	bsetroot -mod 4 4 -bg rgb:10/18/20 -fg rgb:30/38/40
 
 *Font:	-*-lucidatypewriter-medium-r-*-*-*-100-*-*-*-*-*-*
+
+*xft.font:		Verdana
+*xft.size:		8
+
+menu.*.xft.size:	10

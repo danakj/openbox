@@ -83,6 +83,9 @@ window.grip.unfocus:			flat solid
 borderColor:	black
 !*font:		gelly
 *font:		lucidasans-10
+*xft.font:	arial
+*xft.size:	9
+menu*xft*size:	10
 *justify:	left
 
 borderWidth:	1

@@ -21,13 +21,11 @@ toolbar.clock.color:		grey40
 toolbar.clock.colorTo:		grey20
 toolbar.clock.textColor:	grey85
 toolbar.justify:		right
-toolbar.font:			lucidasans-10
 
 menu.title:			flat crossdiagonal gradient
 menu.title.color:		rgb:c/6/6
 menu.title.colorTo:		rgb:6/3/3
 menu.title.textColor:		white
-menu.title.font:		lucidasans-10
 menu.title.justify:		right
 
 menu.frame:			flat crossdiagonal gradient
@@ -35,7 +33,6 @@ menu.frame.color:		grey40
 menu.frame.colorTo:		grey20
 menu.frame.textColor:		grey85
 menu.frame.disableColor:	rgb:4/2/2
-menu.frame.font:		lucidasans-10
 menu.frame.justify:		center
 
 menu.bullet.position:		right
@@ -88,7 +85,6 @@ window.grip.unfocus.colorTo:	grey20
 window.frame.focusColor:	rgb:c/6/6
 window.frame.unfocusColor:	grey30
 
-window.font:			lucidasans-10
 window.justify:			right
 
 borderColor:			grey10
@@ -99,5 +95,7 @@ handleWidth:			4
 
 *textColor:			grey85
 *Font:				lucidasans-10
+*xft.font:			arial
+*xft.size:			10
 
 rootCommand:			bsetroot -solid grey20

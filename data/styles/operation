@@ -82,6 +82,8 @@ handleWidth:			4
 
 *textColor:			grey85
 *Font:				lucidasans-10
+*xft.font:			arial
+*xft.size:			10
 
 rootCommand:			bsetroot -gradient flatcrossdiagonalgradient -from rgb:4/6/8 -to rgb:3/48/6
 

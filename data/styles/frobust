@@ -5,6 +5,11 @@ style.date:	Tue, 03.05.02
 style.credits:	
 style.comments:			frobust!
 		
+!*font: 	creep
+*font:		-adobe-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*
+*xft.font:	Trebuchet MS
+*xft.size:	9
+menu*xft.size:	11
 
 rootCommand:	bsetroot -mod 4 4 -bg "#4c4c4c" -fg "#3c3c3c"
 
@@ -37,25 +42,18 @@ toolbar:	Raised Bevel1 Gradient Vertical
 toolbar.color:	#4c4c4c
 toolbar.colorTo:	#414141
 toolbar.textColor:	#d7e0ee
-!toolbar.font: creep
-toolbar.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
 toolbar.justify:	Center
-
 
 ! Menu settings...
 menu.frame:	Raised Solid
 menu.frame.color:	#4c4c4c
 menu.frame.textColor:	#d7e0ee
-!menu.frame.font: creep
-menu.frame.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
 menu.frame.justify:	Right
 
 menu.title:	Raised Bevel1 Solid PipeCross
 menu.title.color:	#8d929a
 menu.title.colorTo:	#73787e
 menu.title.textColor:	#000000
-!menu.title.font: creep
-menu.title.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
 menu.title.justify:	Center
 
 menu.hilite:	Sunken Solid 
@@ -98,8 +96,6 @@ window.label.focus.colorTo:	#73787e
 window.label.focus.textColor:	#000000
 window.label.focus.justify:	Center
 
-!window.font: creep
-window.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
 window.justify:	Center
 window.label.unfocus:	Flat Gradient Vertical
 window.label.unfocus.color:	#4c4c4c

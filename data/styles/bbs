@@ -107,3 +107,20 @@ frameWidth:	0
 bevelWidth:	1
 borderWidth:	0
 borderColor:	#8f8d7d
+
+window.xft.font:        Trebuchet MS
+window.xft.size:        10
+window.font:            lucidasans-10
+
+menu.frame.xft.font:	Trebuchet MS
+menu.frame.xft.size:	12
+menu.frame.font:	lucidasans-10
+
+menu.title.xft.font:	Trebuchet MS
+menu.title.xft.size:	12
+menu.title.xft.flags:	bold
+menu.title.font:	lucidasans-10
+
+toolbar.xft.font:	Trebuchet MS
+toolbar.xft.size:	10
+toolbar.font:		lucidasans-10

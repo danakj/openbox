@@ -26,13 +26,11 @@ toolbar.clock.colorTo:		rgb:7/8/8
 toolbar.clock.textColor:	grey85
 
 toolbar.justify:		center
-toolbar.font:			lucidasans-bold-10
 
 menu.title:			raised diagonal interlaced gradient bevel1
 menu.title.color:               grey20
 menu.title.colorTo:             rgb:7/8/8
 menu.title.textColor:           grey85
-menu.title.font:		lucidasans-bold-10
 menu.title.justify:		center
 
 menu.frame:			raised diagonal gradient bevel1
@@ -40,7 +38,6 @@ menu.frame.color:		rgb:7/8/8
 menu.frame.colorTo:		grey10
 menu.frame.textColor:		white
 menu.frame.disableColor:	rgb:38/4/4
-menu.frame.font:		lucidasans-10
 menu.frame.justify:		center
 
 menu.bullet:			triangle
@@ -97,8 +94,14 @@ window.button.pressed.colorTo:  rgb:d/f/f
 window.frame.focusColor:	grey85
 window.frame.unfocusColor:	rgb:54/6/6
 
-window.font:			lucidasans-bold-10
 window.justify:			center
+
+! fonts
+*font:			lucidasans-bold-10
+
+*xft.font:		arial
+*xft.size:		10
+*xft.flags:		bold
 
 ! misc...
 borderColor:			rgb:1c/2/2

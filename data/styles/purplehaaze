@@ -94,6 +94,12 @@ window.button.pressed.color:	#666666
 window.button.pressed.colorTo:	#444444
 
 *.font:        -schumacher-clean-medium-r-normal-*-*-120-*-*-c-*-iso646.1991-irv
+
+*xft.font:	Arial
+*xft.size:	9
+menu*xft.size:	11
+menu.title.xft.flags: bold
+
 window.frame.focusColor:	#687085
 window.frame.unfocusColor:	#bcbdbf
 handleWidth:	1

@@ -101,6 +101,9 @@ window.frame.unfocus.color:		#5e6166
 
 ! ***** fonts *****
 *.font:					-*-lucida-medium-r-*-*-*-100-*-*-*-*-*
+*.xft.font:				arial
+*.xft.size:				10
+menu.*.xft.size:			11
     toolbar.justify:			center
     window.justify:			right
     menu.title.justify:			center

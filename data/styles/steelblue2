@@ -5,6 +5,12 @@ style.credits:
 style.comments:			The return of \
 		steelblue
 		
+!window.font:	lime
+window.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+
+*xft.font:      Arial
+*xft.size:      9
+menu*xft.size:  10
 
 rootCommand:	bsetbg -solid "#6e7a8a"
 
@@ -37,8 +43,6 @@ toolbar:	Raised Bevel1 Gradient Vertical
 toolbar.color:	#6e7b8b
 toolbar.colorTo:	#555f6b
 toolbar.textColor:	#ffffff
-!toolbar.font:	lime
-toolbar.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 toolbar.justify:	Left
 
 
@@ -47,16 +51,12 @@ menu.frame:	Sunken Bevel2 Gradient Diagonal
 menu.frame.color:	#8fa0b5
 menu.frame.colorTo:	#6e7b8b
 menu.frame.textColor:	#ffffff
-!menu.frame.font:	lime
-menu.frame.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 menu.frame.justify:	Right
 
 menu.title:	Raised Bevel1 Gradient Diagonal
 menu.title.color:	#6e7b8b
 menu.title.colorTo:	#555f6b
 menu.title.textColor:	#d7e0ee
-!menu.title.font:	lime
-menu.title.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 menu.title.justify:	Center
 
 menu.hilite:	Raised Bevel1 Gradient Diagonal
@@ -99,12 +99,8 @@ window.label.focus:	Sunken Bevel1 Gradient Diagonal
 window.label.focus.color:	#8fa0b5
 window.label.focus.colorTo:	#555f6b
 window.label.focus.textColor:	#e6f0ff
-!window.label.focus.font:	lime
-window.label.focus.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 window.label.focus.justify:	Left
 
-!window.font:	lime
-window.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
 window.justify:	Left
 window.label.unfocus:	Sunken Bevel1 Gradient Diagonal
 window.label.unfocus.color:	#6e7b8b

@@ -84,25 +84,23 @@ window.frame.unfocusColor:	#5e6166
 	window.frame.unfocus.color:	#5e6166
 
 ! ***** Xft fonts *****
-toolbar.xft.font:	tahoma
-toolbar.xft.size:	8
+*xft.font:		Arial
+toolbar.xft.size:	10
 toolbar.justify:	center
 
-window.xft.font:	tahoma
-window.xft.size:	7
-window.xft.flags:	bold
+window.xft.size:	9
+!window.xft.flags:	bold
 window.justify:		left
 
-menu.title.xft.font:	tahoma
-menu.title.xft.size:	8
+menu.title.xft.size:	10
 menu.title.xft.flags:	bold
 menu.title.justify:	center
 
-menu.frame.xft.font:	tahoma
-menu.frame.xft.size:	8
+menu.frame.xft.size:	10
 menu.frame.justify:	right
 
 ! ***** fonts *****
+*Font:			lucidasans-10
 !toolbar.font: lime
 !toolbar.justify:	center
 

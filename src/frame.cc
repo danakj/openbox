@@ -131,6 +131,7 @@ void OBFrame::adjustSize()
   int width;   // the width of the client and its border
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
+  int butsize=0; // width and height of the titlebar buttons
   const int bevel = _style->getBevelWidth();
   
   if (_decorations & OBClient::Decor_Border) {
@@ -161,22 +162,15 @@ void OBFrame::adjustSize()
     // set the label size
     _label.setGeometry(0, bevel, width, _style->getFont()->height());
     // set the buttons sizes
+    butsize = _label.height() - 2;
     if (_decorations & OBClient::Decor_Iconify)
-      _button_iconify.setGeometry(0, bevel + 1,
-                                  _label.height() - 2,
-                                  _label.height() - 2);
+      _button_iconify.setGeometry(0, bevel + 1, butsize, butsize);
     if (_decorations & OBClient::Decor_Maximize)
-      _button_max.setGeometry(0, bevel + 1,
-                              _label.height() - 2,
-                              _label.height() - 2);
+      _button_max.setGeometry(0, bevel + 1, butsize, butsize);
     if (_decorations & OBClient::Decor_Sticky)
-      _button_stick.setGeometry(0, bevel + 1,
-                                _label.height() - 2,
-                                _label.height() - 2);
+      _button_stick.setGeometry(0, bevel + 1, butsize, butsize);
     if (_decorations & OBClient::Decor_Close)
-      _button_close.setGeometry(0, bevel + 1,
-                                _label.height() - 2,
-                                _label.height() - 2);
+      _button_close.setGeometry(0, bevel + 1, butsize, butsize);
 
     // separation between titlebar elements
     const int sep = bevel + 1;
@@ -191,50 +185,55 @@ void OBFrame::adjustSize()
     bool tit_l = false;
   
     for (std::string::size_type i = 0; i < layout.size(); ++i) {
-      switch(layout[i]) {
+      switch (layout[i]) {
       case 'i':
       case 'I':
         if (!tit_i && (_decorations & OBClient::Decor_Iconify)) {
           tit_i = true;
           continue;
         }
+        break;
       case 'l':
       case 'L':
         if (!tit_l) {
           tit_l = true;
           continue;
         }
+        break;
       case 'm':
       case 'M':
         if (!tit_m && (_decorations & OBClient::Decor_Maximize)) {
           tit_m = true;
           continue;
         }
+        break;
       case 's':
       case 'S':
         if (!tit_s && (_decorations & OBClient::Decor_Sticky)) {
           tit_s = true;
           continue;
         }
+        break;
       case 'c':
       case 'C':
         if (!tit_c && (_decorations & OBClient::Decor_Close)) {
           tit_c = true;
           continue;
         }
+        break;
       }
       // if we get here then we don't want the letter, kill it
       layout.erase(i--, 1);
     }
     if (!tit_l)
-      layout += 'L';
+      layout.append(1, 'L');
     
     // the size of the label. this ASSUMES the layout has only buttons other
     // that the ONE LABEL!!
     // adds an extra sep so that there's a space on either side of the
     // titlebar.. note: x = sep, below.
     int lwidth = width - sep * 2 -
-      (_button_iconify.width() + sep) * (layout.size() - 1);
+      (butsize + sep) * (layout.size() - 1);
     // quick sanity check for really small windows. if this is needed, its
     // obviously not going to be displayed right...
     // XXX: maybe we should make this look better somehow? constraints?
@@ -242,24 +241,29 @@ void OBFrame::adjustSize()
     _label.setWidth(lwidth);
 
     int x = sep;
-    for (int i = 0, len = layout.size(); i < len; ++i) {
+    for (std::string::size_type i = 0, len = layout.size(); i < len; ++i) {
       switch (layout[i]) {
+      case 'i':
       case 'I':
         _button_iconify.move(x, _button_iconify.rect().y());
         x += _button_iconify.width();
         break;
+      case 'l':
       case 'L':
         _label.move(x, _label.rect().y());
         x += _label.width();
         break;
+      case 'm':
       case 'M':
         _button_max.move(x, _button_max.rect().y());
         x += _button_max.width();
         break;
+      case 's':
       case 'S':
         _button_stick.move(x, _button_stick.rect().y());
         x += _button_stick.width();
         break;
+      case 'c':
       case 'C':
         _button_close.move(x, _button_close.rect().y());
         x += _button_close.width();
@@ -279,14 +283,14 @@ void OBFrame::adjustSize()
                            -bwidth,
                            // XXX: get a Point class in otk and use that for
                            // the 'buttons size' since theyre all the same
-                           _button_iconify.width() * 2,
+                           butsize * 2,
                            _handle.height());
     _grip_right.setGeometry(((_handle.rect().right() + 1) -
-                             _button_iconify.width() * 2),
+                             butsize * 2),
                             -bwidth,
                             // XXX: get a Point class in otk and use that for
                             // the 'buttons size' since theyre all the same
-                            _button_iconify.width() * 2,
+                            butsize * 2,
                             _handle.height());
     _innersize.bottom += _handle.height() + bwidth;
   }

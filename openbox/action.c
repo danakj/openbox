@@ -1035,7 +1035,9 @@ void action_unfocus (union ActionData *data)
 
 void action_iconify(union ActionData *data)
 {
+    client_action_start(data);
     client_iconify(data->client.any.c, TRUE, TRUE);
+    client_action_end(data);
 }
 
 void action_raiselower(union ActionData *data)

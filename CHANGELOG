@@ -5,6 +5,7 @@
   * Fixed focus actions when bound to the mouse, normal focus cycle is always
     linear and directional focus is totally disabled, it makes no sense
     anyway, just move the mouse.
+  * Various bug fixes. (I always wanted to write this in a changelog)
 
 3.2:
   * Added spanish and swedish translations

@@ -6,7 +6,6 @@
 #include <X11/Xft/Xft.h>
 #include <glib.h>
 #include "color.h"
-#include "mask.h"
 
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
@@ -110,6 +109,11 @@ typedef struct TextureText {
     color_rgb *color;
     char *string;
 } TextureText;   
+
+typedef struct {
+    Pixmap mask;
+    guint w, h;
+} pixmap_mask;
 
 typedef struct TextureMask {
     color_rgb *color;

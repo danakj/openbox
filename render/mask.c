@@ -16,5 +16,6 @@ void pixmap_mask_free(pixmap_mask *m)
     g_free(m);
 }
 
-
-/* DO YOUR MAGIC MANNY WOOT \m/ */
+void mask_draw(pixmap_mask *p, TextureMask *m)
+{
+}

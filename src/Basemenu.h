@@ -30,12 +30,12 @@ class BImageControl;
 class BScreen;
 class Basemenu;
 class BasemenuItem;
-#include "LinkedList.h"
-
+#include <vector>
+typedef vector<BasemenuItem *> menuitemList;
 
 class Basemenu {
 private:
-  LinkedList<BasemenuItem> *menuitems;
+  menuitemList menuitems;
   Openbox &openbox;
   Basemenu *parent;
   BImageControl *image_ctrl;
@@ -59,7 +59,7 @@ private:
 
 
 protected:
-  inline BasemenuItem *find(int index) { return menuitems->find(index); }
+  inline BasemenuItem *find(int index) { return menuitems[index]; }
   inline void setTitleVisibility(Bool b) { title_vis = b; }
   inline void setMovable(Bool b) { movable = b; }
   inline void setHideTree(Bool h) { hide_tree = h; }
@@ -93,7 +93,7 @@ public:
 
   inline const int &getX(void) const { return menu.x; }
   inline const int &getY(void) const { return menu.y; }
-  inline int getCount(void) { return menuitems->count(); }
+  inline int getCount(void) { return menuitems.size(); }
   inline const int &getCurrentSubmenu(void) const { return which_sub; }
 
   inline const unsigned int &getWidth(void) const { return menu.width; }

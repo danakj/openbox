@@ -147,8 +147,6 @@ Basemenu::Basemenu(BScreen &scrn) : openbox(scrn.getOpenbox()), screen(scrn) {
 			     screen.getVisual(), attrib_mask, &attrib);
   openbox.saveMenuSearch(menu.frame, this);
 
-  menuitems = new LinkedList<BasemenuItem>;
-
   // even though this is the end of the constructor the menu is still not
   // completely created.  items must be inserted and it must be update()'d
 }
@@ -160,11 +158,10 @@ Basemenu::~Basemenu(void) {
   if (shown && shown->getWindowID() == getWindowID())
     shown = (Basemenu *) 0;
 
-  int n = menuitems->count();
-  for (int i = 0; i < n; ++i)
-    remove(0);
-
-  delete menuitems;
+  while (!menuitems.empty()) {
+    delete menuitems[0];
+    menuitems.erase(menuitems.begin());
+  }
 
   if (menu.label)
     delete [] menu.label;
@@ -199,9 +196,12 @@ int Basemenu::insert(const char *l, int function, const char *e, int pos) {
   if (e) exec = bstrdup(e);
 
   BasemenuItem *item = new BasemenuItem(label, function, exec);
-  menuitems->insert(item, pos);
+  if (pos == -1)
+    menuitems.push_back(item);
+  else
+    menuitems.insert(menuitems.begin() + pos, item);
 
-  return menuitems->count();
+  return menuitems.size();
 }
 
 
@@ -211,29 +211,36 @@ int Basemenu::insert(const char *l, Basemenu *submenu, int pos) {
   if (l) label = bstrdup(l);
 
   BasemenuItem *item = new BasemenuItem(label, submenu);
-  menuitems->insert(item, pos);
+  if (pos == -1)
+    menuitems.push_back(item);
+  else
+    menuitems.insert(menuitems.begin() + pos, item);
 
   submenu->parent = this;
 
-  return menuitems->count();
+  return menuitems.size();
 }
 
 
 int Basemenu::insert(const char **ulabel, int pos, int function) {
   BasemenuItem *item = new BasemenuItem(ulabel, function);
-  menuitems->insert(item, pos);
+  if (pos == -1)
+    menuitems.push_back(item);
+  else
+    menuitems.insert(menuitems.begin() + pos, item);
 
-  return menuitems->count();
+  return menuitems.size();
 }
 
 
 int Basemenu::remove(int index) {
-  if (index < 0 || index > menuitems->count()) return -1;
+  if (index < 0 || index > menuitems.size()) return -1;
 
-  BasemenuItem *item = menuitems->remove(index);
+  BasemenuItem *item = menuitems[index];
+  menuitems.erase(menuitems.begin() + index);
 
   if (item) {
-    if ((! internal_menu) && (item->submenu())) {
+    if ((!internal_menu) && (item->submenu())) {
       Basemenu *tmp = (Basemenu *) item->submenu();
 
       if (! tmp->internal_menu) {
@@ -257,7 +264,7 @@ int Basemenu::remove(int index) {
   else if (which_sub > index)
     which_sub--;
 
-  return menuitems->count();
+  return menuitems.size();
 }
 
 
@@ -296,10 +303,10 @@ void Basemenu::update(void) {
   }
 
   int ii = 0;
-  LinkedListIterator<BasemenuItem> it(menuitems);
-  for (BasemenuItem *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    const char *s = ((tmp->u && *tmp->u) ? *tmp->u :
-		     ((tmp->l) ? tmp->l : (const char *) 0));
+  menuitemList::const_iterator it = menuitems.begin();
+  for (; it != menuitems.end(); it++) {
+    const char *s = (((*it)->u && *(*it)->u) ? *(*it)->u :
+		     (((*it)->l) ? (*it)->l : (const char *) 0));
     int l = strlen(s);
 
     if (i18n->multibyte()) {
@@ -314,18 +321,18 @@ void Basemenu::update(void) {
     menu.item_w = ((menu.item_w < (unsigned int) ii) ? ii : menu.item_w);
   }
 
-  if (menuitems->count()) {
+  if (menuitems.size()) {
     menu.sublevels = 1;
 
-    while (((menu.item_h * (menuitems->count() + 1) / menu.sublevels)
+    while (((menu.item_h * (menuitems.size() + 1) / menu.sublevels)
 	    + menu.title_h + screen.getBorderWidth()) >
 	   screen.size().h())
       menu.sublevels++;
 
     if (menu.sublevels < menu.minsub) menu.sublevels = menu.minsub;
 
-    menu.persub = menuitems->count() / menu.sublevels;
-    if (menuitems->count() % menu.sublevels) menu.persub++;
+    menu.persub = menuitems.size() / menu.sublevels;
+    if (menuitems.size() % menu.sublevels) menu.persub++;
   } else {
     menu.sublevels = 0;
     menu.persub = 0;
@@ -407,7 +414,7 @@ void Basemenu::update(void) {
 
   if (title_vis && visible) redrawTitle();
 
-  for (int i = 0; visible && i < menuitems->count(); i++) {
+  for (int i = 0; visible && i < menuitems.size(); i++) {
     if (i == which_sub) {
       drawItem(i, True, 0);
       drawSubmenu(i);
@@ -451,7 +458,7 @@ void Basemenu::hide(void) {
 
 void Basemenu::internal_hide(void) {
   if (which_sub != -1) {
-    BasemenuItem *tmp = menuitems->find(which_sub);
+    BasemenuItem *tmp = menuitems[which_sub];
     tmp->submenu()->internal_hide();
   }
 
@@ -519,14 +526,14 @@ void Basemenu::redrawTitle(void) {
 
 void Basemenu::drawSubmenu(int index) {
   if (which_sub != -1 && which_sub != index) {
-    BasemenuItem *itmp = menuitems->find(which_sub);
+    BasemenuItem *itmp = menuitems[which_sub];
 
     if (! itmp->submenu()->isTorn())
       itmp->submenu()->internal_hide();
   }
 
-  if (index >= 0 && index < menuitems->count()) {
-    BasemenuItem *item = menuitems->find(index);
+  if (index >= 0 && index < menuitems.size()) {
+    BasemenuItem *item = menuitems[index];
     if (item->submenu() && visible && (! item->submenu()->isTorn()) &&
 	item->isEnabled()) {
       if (item->submenu()->parent != this) item->submenu()->parent = this;
@@ -579,8 +586,8 @@ void Basemenu::drawSubmenu(int index) {
 
 
 Bool Basemenu::hasSubmenu(int index) {
-  if ((index >= 0) && (index < menuitems->count()))
-    if (menuitems->find(index)->submenu())
+  if ((index >= 0) && (index < menuitems.size()))
+    if (menuitems[index]->submenu())
       return True;
 
   return False;
@@ -590,9 +597,9 @@ Bool Basemenu::hasSubmenu(int index) {
 void Basemenu::drawItem(int index, Bool highlight, Bool clear,
 			int x, int y, unsigned int w, unsigned int h)
 {
-  if (index < 0 || index > menuitems->count()) return;
+  if (index < 0 || index > menuitems.size()) return;
 
-  BasemenuItem *item = menuitems->find(index);
+  BasemenuItem *item = menuitems[index];
   if (! item) return;
   
   Bool dotext = True, dohilite = True, dosel = True;
@@ -768,7 +775,7 @@ void Basemenu::setLabel(const char *l) {
 
 
 void Basemenu::setItemSelected(int index, Bool sel) {
-  if (index < 0 || index >= menuitems->count()) return;
+  if (index < 0 || index >= menuitems.size()) return;
 
   BasemenuItem *item = find(index);
   if (! item) return;
@@ -779,7 +786,7 @@ void Basemenu::setItemSelected(int index, Bool sel) {
 
 
 Bool Basemenu::isItemSelected(int index) {
-  if (index < 0 || index >= menuitems->count()) return False;
+  if (index < 0 || index >= menuitems.size()) return False;
 
   BasemenuItem *item = find(index);
   if (! item) return False;
@@ -789,7 +796,7 @@ Bool Basemenu::isItemSelected(int index) {
 
 
 void Basemenu::setItemEnabled(int index, Bool enable) {
-  if (index < 0 || index >= menuitems->count()) return;
+  if (index < 0 || index >= menuitems.size()) return;
 
   BasemenuItem *item = find(index);
   if (! item) return;
@@ -800,7 +807,7 @@ void Basemenu::setItemEnabled(int index, Bool enable) {
 
 
 Bool Basemenu::isItemEnabled(int index) {
-  if (index < 0 || index >= menuitems->count()) return False;
+  if (index < 0 || index >= menuitems.size()) return False;
 
   BasemenuItem *item = find(index);
   if (! item) return False;
@@ -814,11 +821,11 @@ void Basemenu::buttonPressEvent(XButtonEvent *be) {
     int sbl = (be->x / menu.item_w), i = (be->y / menu.item_h);
     int w = (sbl * menu.persub) + i;
 
-    if (w < menuitems->count() && w >= 0) {
+    if (w < menuitems.size() && w >= 0) {
       which_press = i;
       which_sbl = sbl;
 
-      BasemenuItem *item = menuitems->find(w);
+      BasemenuItem *item = menuitems[w];
 
       if (item->submenu())
 	drawSubmenu(w);
@@ -856,7 +863,7 @@ void Basemenu::buttonReleaseEvent(XButtonEvent *re) {
 	    w = (sbl * menu.persub) + i,
 	    p = (which_sbl * menu.persub) + which_press;
 
-      if (w < menuitems->count() && w >= 0) {
+      if (w < menuitems.size() && w >= 0) {
 	drawItem(p, (p == which_sub), True);
 
         if  (p == w && isItemEnabled(w)) {
@@ -902,10 +909,10 @@ void Basemenu::motionNotifyEvent(XMotionEvent *me) {
 	  w = (sbl * menu.persub) + i;
 
     if ((i != which_press || sbl != which_sbl) &&
-	(w < menuitems->count() && w >= 0)) {
+	(w < menuitems.size() && w >= 0)) {
       if (which_press != -1 && which_sbl != -1) {
 	int p = (which_sbl * menu.persub) + which_press;
-	BasemenuItem *item = menuitems->find(p);
+	BasemenuItem *item = menuitems[p];
 
 	drawItem(p, False, True);
 	if (item->submenu())
@@ -919,7 +926,7 @@ void Basemenu::motionNotifyEvent(XMotionEvent *me) {
       which_press = i;
       which_sbl = sbl;
 
-      BasemenuItem *itmp = menuitems->find(w);
+      BasemenuItem *itmp = menuitems[w];
 
       if (itmp->submenu())
 	drawSubmenu(w);
@@ -947,12 +954,12 @@ void Basemenu::exposeEvent(XExposeEvent *ee) {
     if (id_d > menu.persub) id_d = menu.persub;
 
     // draw the sublevels and the number of items the exposure spans
-    LinkedListIterator<BasemenuItem> it(menuitems);
+    menuitemList::const_iterator it = menuitems.begin();
     int i, ii;
     for (i = sbl; i <= sbl_d; i++) {
       // set the iterator to the first item in the sublevel needing redrawing
-      it.set(id + (i * menu.persub));
-      for (ii = id; ii <= id_d && it.current(); it++, ii++) {
+      it = menuitems.begin() + (id + (i * menu.persub));
+      for (ii = id; ii <= id_d && it != menuitems.end(); it++, ii++) {
 	int index = ii + (i * menu.persub);
 	// redraw the item
 	drawItem(index, (which_sub == index), False,
@@ -988,7 +995,7 @@ void Basemenu::enterNotifyEvent(XCrossingEvent *ce) {
       XMoveWindow(display, menu.window, menu.x_shift, menu.y_shift);
 
     if (which_sub != -1) {
-      BasemenuItem *tmp = menuitems->find(which_sub);
+      BasemenuItem *tmp = menuitems[which_sub];
       if (tmp->submenu()->isVisible()) {
 	int sbl = (ce->x / menu.item_w), i = (ce->y / menu.item_h),
 	  w = (sbl * menu.persub) + i;
@@ -1007,7 +1014,7 @@ void Basemenu::enterNotifyEvent(XCrossingEvent *ce) {
 
 void Basemenu::leaveNotifyEvent(XCrossingEvent *ce) {
   if (ce->window == menu.frame) {
-    if (which_press != -1 && which_sbl != -1 && menuitems->count() > 0) {
+    if (which_press != -1 && which_sbl != -1 && menuitems.size() > 0) {
       int p = (which_sbl * menu.persub) + which_press;
 
       drawItem(p, (p == which_sub), True);

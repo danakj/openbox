@@ -52,6 +52,7 @@ Action::Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
   
   _numberParam = atoi( str.c_str() );
 
-  if (type == changeWorkspace)  // workspace 1 to the user is workspace 0 to us
+  // workspace 1 to the user is workspace 0 to us
+  if (type == changeWorkspace || type == sendToWorkspace)
     _numberParam--;
 }

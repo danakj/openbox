@@ -1,12 +1,12 @@
 include build/Makefile.incl
 
-dir = plugins/keyboard
+dir = plugins/mouse
 
-CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Keyboard\"
+CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Mouse\"
 LDFLAGS = -module -avoid-version
 
-target = keyboard.la
-sources = keyboard.c tree.c translate.c keyparse.c
+target = mouse.la
+sources = mouse.c translate.c mouseparse.c
 
 srcdir := $(srcdir)/$(dir)
 target := $(addprefix $(dir)/,$(target))

@@ -1956,9 +1956,10 @@ gboolean client_focus(Client *self)
     }
 
     if (self->can_focus)
-        /* RevertToNone is used so that windows dont get focused inadvertantly
-           by having the pointer in them, and then FocusIn events go missing */
-	XSetInputFocus(ob_display, self->window, RevertToNone,
+        /* RevertToPointerRoot causes much more headache than TevertToNone, so
+           I choose to use it always, hopefully to find errors quicker, if any
+           are left. (I hate X. I hate focus events.) */
+	XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
                        event_lasttime);
 
     if (self->focus_notify) {

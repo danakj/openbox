@@ -1,0 +1,28 @@
+Mod1-F1 changeWorkspace 1;
+Mod1-F2 changeWorkspace 2;
+Mod1-F3 changeWorkspace 3;
+Mod1-F4 changeWorkspace 4;
+
+Control-F1 execute "xterm";
+
+Control-Mod1-Right nextWindow;
+Control-Mod1-Shift-Right nextwindowonallworkspaces;
+Control-Mod1-Left prevWindow;
+Control-Mod1-Shift-Left prevwindowonallworkspaces;
+Control-Mod1-Up nextWorkspace;
+Control-Mod1-Down prevWorkspace;
+
+Mod1-Up moveWindowUp;
+Mod1-Down moveWindowDown;
+Mod1-Left moveWindowLeft;
+Mod1-Right moveWindowRight;
+
+Control-Mod1-x {
+    i iconify;
+    r raise;
+    l lower;
+    k close;
+    s shade;
+    o toggleomnipresent;
+}
+

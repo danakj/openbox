@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 DEFAULT_MENU=$(pkgdatadir)/menu
-DEFAULT_STYLE=$(pkgdatadir)/styles/steelblue
+DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
 CPPFLAGS=@CPPFLAGS@ @DEBUG@ \
 -DLOCALEPATH=\"$(pkgdatadir)/nls\" \

@@ -109,7 +109,7 @@ void parse_tree(xmlDocPtr doc, xmlNodePtr node, void *nothing)
 char *parse_string(xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *c = xmlNodeListGetString(doc, node->xmlChildrenNode, TRUE);
-    char *s = g_strdup((char*)c);
+    char *s = g_strdup(c ? (char*)c : "");
     xmlFree(c);
     return s;
 }

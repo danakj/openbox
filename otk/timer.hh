@@ -103,10 +103,10 @@ public:
   static bool nearestTimeout(struct timeval &tm);
 
   //! Initializes internal data before use
-  static void initialize(void);
+  static void initialize();
 
   //! Deletes all waiting timers
-  static void destroy(void);
+  static void destroy();
 };
 
 }

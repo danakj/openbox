@@ -918,9 +918,6 @@ void action_send_to_desktop_dir(union ActionData *data)
     d = screen_cycle_desktop(data->sendtodir.dir, data->sendtodir.wrap,
                              data->sendtodir.linear,
                              data->sendtodir.final, data->sendtodir.cancel);
-
-    g_message("sendto %d", d);
-
     client_set_desktop(c, d, TRUE);
     screen_set_desktop(d);
 }

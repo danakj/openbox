@@ -90,8 +90,6 @@ static void fire_button(ObMouseAction a, ObFrameContext context,
     GSList *it;
     ObMouseBinding *b;
 
-    g_message("%d %d %d", context, state, button);
-
     for (it = bound_contexts[context]; it != NULL; it = it->next) {
         b = it->data;
         if (b->state == state && b->button == button)
@@ -127,8 +125,6 @@ static void fire_button(ObMouseAction a, ObFrameContext context,
                  act->func == action_send_to_desktop_dir)) {
                 keyboard_interactive_grab(state, c, context, act);
             }
-
-            g_message("acting");
 
             act->func(&act->data);
         }

@@ -1,50 +1,49 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: an error occured while querying the X server.\n  \
-another window manager is already running on display %s.\n
+# BScreen::BScreen: fejl ved forespørgsel til X server.\n  \
+en anden window manager er allerede kørende på display %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: managing screen %d using visual 0x%lx, depth %d\n
+# BScreen::BScreen: håndterer skærm %d med visuel 0x%lx, farvedybde %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): couldn't load font '%s'\n
+# BScreen::LoadStyle(): kunne ikke hente font '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): couldn't load default font.\n
+# BScreen::LoadStyle(): kunne ikke hente standardfonten.\n
 $ #EmptyMenuFile
-# %s: empty menu file\n
+# %s: tom menu fil\n
 $ #xterm
 # xterm
 $ #Restart
-# Restart
+# Genstart
 $ #Exit
-# Exit
+# Afslut
 $ #EXECError
-# BScreen::parseMenuFile: [exec] error, no menu label and/or command defined\n
+# BScreen::parseMenuFile: [exec] fejl, ingen menu etikette og/eller kommando defineret\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] error, no menu label defined\n
+# BScreen::parseMenuFile: [exit] fejl, ingen menu etikette defineret\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] error, no menu label and/or filename \
-defined\n
+# BScreen::parseMenuFile: [style] fejl, ingen menu etikette og/eller filnavn \
+defineret\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] error, no menu label defined\n
+# BScreen::parseMenuFile: [config] fejl, ingen menu etikette defineret\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] error, no filename defined\n
+# BScreen::parseMenuFile: [include] fejl, intet filnavn defineret\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] error, '%s' is not a regular file\n
+# BScreen::parseMenuFile: [include] fejl, '%s' er ikke en normal fil\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] error, no menu label defined\n
+# BScreen::parseMenuFile: [submenu] fejl, ingen menu etikette defineret\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] error, no menu label defined\n
+# BScreen::parseMenuFile: [restart] fejl, ingen menu etikette defineret\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] error, no menu label defined\n
+# BScreen::parseMenuFile: [reconfig] fejl, ingen menu etikette defineret\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, no directory defined\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fejl, intet katalog defineret\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' is not a \
-directory\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fejl, '%s' er ikke et katalog\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' does not exist\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fejl, '%s' eksisterer ikke\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] error, no menu label defined\n
+# BScreen::parseMenuFile: [workspaces] fejl, ingen menu etikette defineret\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat

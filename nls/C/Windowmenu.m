@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Send To ...
+# Send til ...
 $ #Shade
-# Shade
+# Skygge
 $ #Iconify
-# Iconify
+# Iconificeret
 $ #Maximize
-# Maximize
+# Maksimer
 $ #Raise
-# Raise
+# Hæv
 $ #Lower
-# Lower
+# Sænk
 $ #Stick
-# Stick
+# Klæbrig
 $ #KillClient
-# Kill Client
+# Dræb klient
 $ #Close
-# Close
+# Luk

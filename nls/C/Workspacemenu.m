@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Workspaces
+# Skriveborde
 $ #NewWorkspace
-# New Workspace
+# Nyt skrivebord
 $ #RemoveLast
-# Remove Last
+# Fjern sidste

@@ -368,8 +368,10 @@ static void event_handle_client(Client *client, XEvent *e)
     case FocusIn:
         focus_set_client(client);
     case FocusOut:
+#ifdef DEBUG_FOCUS
         g_message("Focus%s on client for %lx", (e->type==FocusIn?"In":"Out"),
                   client->window);
+#endif
         /* focus state can affect the stacking layer */
         client_calc_layer(client);
         engine_frame_adjust_focus(client->frame);

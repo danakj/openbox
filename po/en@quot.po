@@ -1,7 +1,7 @@
 # English translations for openbox package.
-# Copyright (C) 2003 Ben Jansens
+# Copyright (C) 2004 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# Automatically generated, 2003.
+# Automatically generated, 2004.
 #
 # All this catalog "translates" are quotation characters.
 # The msgids must be ASCII and therefore cannot contain real quotation
@@ -27,10 +27,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.0\n"
-"Report-Msgid-Bugs-To: ben@openbox.org\n"
-"POT-Creation-Date: 2003-12-22 12:48-0500\n"
-"PO-Revision-Date: 2003-12-22 12:48-0500\n"
+"Project-Id-Version: openbox 3.1\n"
+"Report-Msgid-Bugs-To: mikachu@comhem.se\n"
+"POT-Creation-Date: 2004-03-29 18:54+0200\n"
+"PO-Revision-Date: 2004-03-29 18:54+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -130,3 +130,17 @@ msgstr "--sm-save-file requires an argument\n"
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Unable to make directory '%s': %s"
+
+#: render/font.c:50
+msgid "Couldn't initialize Xft."
+msgstr "Couldn't initialize Xft."
+
+#: render/font.c:122 render/font.c:127
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Unable to load font: %s\n"
+
+#: render/font.c:123
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Trying fallback font: %s\n"

@@ -79,6 +79,11 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
     moveresize_client = c;
     start_cx = c->frame->area.x;
     start_cy = c->frame->area.y;
+    /* these adjustments for the size_inc make resizing a terminal more
+       friendly. you essentially start the resize in the middle of the
+       increment instead of at 0, so you have to move half an increment
+       either way instead of a full increment one and 1 px the other. and this
+       is one large mother fucking comment. */
     start_cw = c->area.width + (c->size_inc.width + 1) / 2;
     start_ch = c->area.height + (c->size_inc.height + 1) / 2;
     start_x = x;

@@ -2,6 +2,11 @@
 #ifndef   __client_hh
 #define   __client_hh
 
+/*! @file client.hh
+  @brief The OBClient class maintains the state of a client window by handling
+  property changes on the window and some client messages
+*/
+
 extern "C" {
 #include <X11/Xlib.h>
 }
@@ -264,50 +269,157 @@ private:
   // XXX: updateTransientFor();
 
 public:
+  //! Constructs a new OBClient object around a specified window id
+  /*!
+    @param window The window id that the OBClient class should handle
+  */
   OBClient(Window window);
+  //! Destroys the OBClient object
   virtual ~OBClient();
 
+  //! Returns the window id that the OBClient object is handling
   inline Window window() const { return _window; }
 
+  //! Returns the type of the window, one of the OBClient::WindowType values
   inline WindowType type() const { return _type; }
+  //! Returns the desktop on which the window resides
+  /*!
+    This value is a 0-based index.<br>
+    A value of 0xffffffff indicates that the window exists on all desktops.
+  */
   inline unsigned long desktop() const { return _desktop; }
+  //! Returns the window's title
   inline const std::string &title() const { return _title; }
+  //! Returns the window's title when it is iconified
   inline const std::string &iconTitle() const { return _title; }
+  //! Returns the application's name to whom the window belongs
   inline const std::string &appName() const { return _app_name; }
+  //! Returns the class of the window
   inline const std::string &appClass() const { return _app_class; }
+  //! Returns if the window can be focused
+  /*!
+    @return true if the window can receive focusl otherwise, false
+  */
   inline bool canFocus() const { return _can_focus; }
+  //! Returns if the window has indicated that it needs urgent attention
   inline bool urgent() const { return _urgent; }
+  //! Returns if the window wants to be notified when it receives focus
   inline bool focusNotify() const { return _focus_notify; }
+  //! Returns if the window uses the Shape extension
   inline bool shaped() const { return _shaped; }
+  //! Returns the window's gravity
+  /*!
+    This value determines where to place the decorated window in relation to
+    its position without decorations.<br>
+    One of: NorthWestGravity, SouthWestGravity, EastGravity, ...,
+    SouthGravity, StaticGravity, ForgetGravity
+  */
   inline int gravity() const { return _gravity; }
+  //! Returns if the application requested the initial position for the window
+  /*!
+    If the application did not request a position (this function returns false)
+    then the window should be placed intelligently by the window manager
+    initially
+  */
   inline bool positionRequested() const { return _positioned; }
+  //! Returns the decorations that the client window wishes to be displayed on
+  //! it
   inline DecorationFlags decorations() const { return _decorations; }
+  //! Returns the functions that the user can perform on the window
   inline FunctionFlags funtions() const { return _functions; }
 
-  // states
+  //! Returns if the window is modal
+  /*!
+    If the window is modal, then no other windows that it is related to can get
+    focus while it exists/remains modal.
+  */
   inline bool modal() const { return _modal; }
+  //! Returns if the window is shaded
+  /*!
+    When the window is shaded, only its titlebar is visible, the client itself
+    is not mapped
+  */
   inline bool shaded() const { return _shaded; }
+  //! Returns if the window is iconified
+  /*!
+    When the window is iconified, it is not visible at all (except in iconbars/
+    panels/etc that want to show lists of iconified windows
+  */
   inline bool iconic() const { return _iconic; }
+  //! Returns if the window is maximized vertically
   inline bool maxVert() const { return _max_vert; }
+  //! Returns if the window is maximized horizontally
   inline bool maxHorz() const { return _max_horz; }
+  //! Returns if the window is fullscreen
+  /*!
+    When the window is fullscreen, it is kept above all others
+  */
   inline bool fullscreen() const { return _fullscreen; }
+  //! Returns if the window is floating
+  /*!
+    When the window is floating, it is kept above all others in the same
+    stacking layer as it
+  */
   inline bool floating() const { return _floating; }
 
+  //! Returns the window's border width
+  /*!
+    The border width is set to 0 when the client becomes managed, but the
+    border width is stored here so that it can be restored to the client window
+    when it is unmanaged later.
+  */
   inline int borderWidth() const { return _border_width; }
+  //! Returns the minimum width of the client window
+  /*!
+    If the min is > the max, then the window is not resizable
+  */
   inline int minX() const { return _min_x; }
+  //! Returns the minimum height of the client window
+  /*!
+    If the min is > the max, then the window is not resizable
+  */
   inline int minY() const { return _min_y; }
+  //! Returns the maximum width of the client window
+  /*!
+    If the min is > the max, then the window is not resizable
+  */
   inline int maxX() const { return _max_x; }
+  //! Returns the maximum height of the client window
+  /*!
+    If the min is > the max, then the window is not resizable
+  */
   inline int maxY() const { return _max_y; }
+  //! Returns the increment size for resizing the window (for the width)
   inline int incrementX() const { return _inc_x; }
+  //! Returns the increment size for resizing the window (for the height)
   inline int incrementY() const { return _inc_y; }
+  //! Returns the base width of the window
+  /*!
+    This value should be subtracted from the window's actual width when
+    displaying its size to the user, or working with its min/max width
+  */
   inline int baseX() const { return _base_x; }
+  //! Returns the base height of the window
+  /*!
+    This value should be subtracted from the window's actual height when
+    displaying its size to the user, or working with its min/max height
+  */
   inline int baseY() const { return _base_y; }
 
+  //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
 
+  //! Updates the OBClient class from a property change XEvent
   void update(const XPropertyEvent &e);
+  //! Processes a client message XEvent for the window and causes an action
+  //! or whatever was specified to occur
   void update(const XClientMessageEvent &e);
 
+  //! Changes the stored positions and size of the OBClient window
+  /*!
+    This does not actually change the physical geometry, that needs to be done
+    before/after setting this value to keep it in sync
+  */
   void setArea(const otk::Rect &area);
 };
 

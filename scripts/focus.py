@@ -36,31 +36,37 @@ def _focusable(client, desktop):
 
     return 1
 
+def _remove(client):
+    """This function exists because Swig pointers don't define a __eq__
+       function, so list.remove(ptr) does not work."""
+    win = client.window()
+    for i in range(len(_clients)):
+        if _clients[i].window() == win:
+            _clients.pop(i)
+            return
+    raise ValueError("_remove(x): x not in _clients list.")
+
 def _focused(data):
     global _clients
 
     if _disable: return
 
     if data.client:
-        win = data.client.window()
         # move it to the top
-        _clients.remove(win)
-        _clients.insert(0, win)
+        _remove(data.client)
+        _clients.insert(0, data.client)
     elif FALLBACK:
         # pass around focus
         desktop = ob.openbox.screen(data.screen).desktop()
-        for w in _clients:
-            client = ob.openbox.findClient(w)
-            if client and _focusable(client, desktop) and client.focus():
+        for c in _clients:
+            if _focusable(c, desktop) and c.focus():
                 break
 
 def _newwindow(data):
-    _clients.append(data.client.window())
+    _clients.append(data.client)
         
 def _closewindow(data):
-    try:
-        _clients.remove(data.client.window())
-    except ValueError: pass
+    _remove(data.client)
 
 ob.ebind(ob.EventAction.NewWindow, _newwindow)
 ob.ebind(ob.EventAction.CloseWindow, _closewindow)

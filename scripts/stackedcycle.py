@@ -96,11 +96,9 @@ class _cycledata:
         # get the list of clients, keeping iconic windows at the bottom
         self.clients = []
         iconic_clients = []
-        for i in focus._clients:
-            c = ob.openbox.findClient(i)
-            if c:
-                if c.iconic(): iconic_clients.append(c)
-                else: self.clients.append(c)
+        for c in focus._clients:
+            if c.iconic(): iconic_clients.append(c)
+            else: self.clients.append(c)
         self.clients.extend(iconic_clients)
 
         font = self.style.labelFont()

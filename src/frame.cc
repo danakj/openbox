@@ -455,7 +455,6 @@ void Frame::renderLabel()
     control->drawImage(*s, 0, 0, 0); // no image but draw the new background
   } else
     control->drawBackground(*s, *tx);
-  control->drawBackground(*s, *tx);
 
   otk::ustring t = _client->title(); // the actual text to draw
   int x = geom.bevel;                // x coord for the text

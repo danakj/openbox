@@ -35,37 +35,10 @@
 # A list of names for the desktops
 names = ("one" "two" "three" "four")
 
-[engine]
+[theme]
 
-# the theme engine to use
-#engine = "openbox"
-
-# the theme to display with the theme engine
+# the theme to display
 #theme = "operation"
-
-# the order of the elements in windows' titlebars
-# N - icon
-# D - alldesktops button
-# S - shade button
-# L - text label
-# I - iconify button
-# M - maximize button
-# C - close button
-#titlebarLayout = "NLIMC"
-
-# the font for the window titlebars
-#font.title = "arial-8:bold"
-
-# the drop shadow for the window titlebars
-#font.title.shadow = no
-
-# the offset of the drop shadow for the window titlebars
-#font.title.shadow.offset = 1
-
-# the amount of opacity of the drop shadow for the window titlebars
-# -100 - 0 = white shadow (0 clear, -100 solid)
-# 0 - 100  = black shadow (0 clear, 100 solid)
-#font.title.shadow.tint = 25
 
 [keyboard]
 

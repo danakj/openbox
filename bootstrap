@@ -6,7 +6,7 @@ sh() {
 
 #sh autopoint --force # for GNU gettext
 sh libtoolize --copy --force --automake
-sh aclocal -I m4 -I /usr/local/share/aclocal
+sh aclocal -I m4
 #sh autoheader
 sh autoconf
 #sh automake --foreign --include-deps --add-missing --copy

@@ -139,9 +139,8 @@ void OBFrame::adjust()
     cbwidth = _style->getFrameWidth();
   } else
     bwidth = cbwidth = 0;
-  // inside this function _size is the size EXCLUDING the outer border
-  // at the end of this function it becomes the size INCLUDING the outer border
-  _size.left = _size.top = _size.bottom = _size.right = cbwidth;
+  _innersize.left = _innersize.top = _innersize.bottom = _innersize.right =
+    cbwidth;
   width = _client->area().width() + cbwidth * 2;
 
   XSetWindowBorderWidth(otk::OBDisplay::display, _plate.getWindow(), cbwidth);
@@ -162,7 +161,7 @@ void OBFrame::adjust()
                           width,
                           (_style->getFont().height() +
                            _style->getBevelWidth() * 2));
-    _size.top += _titlebar.height() + bwidth;
+    _innersize.top += _titlebar.height() + bwidth;
 
     // set the label size
     _label.setGeometry(0, _style->getBevelWidth(),
@@ -232,7 +231,7 @@ void OBFrame::adjust()
 
   if (_decorations & OBClient::Decor_Handle) {
     _handle.setGeometry(-bwidth,
-                        _size.top + _client->area().height() + cbwidth,
+                        _innersize.top + _client->area().height() + cbwidth,
                         width, _style->getHandleWidth());
     _grip_left.setGeometry(-bwidth,
                            -bwidth,
@@ -247,16 +246,16 @@ void OBFrame::adjust()
                             // the 'buttons size' since theyre all the same
                             _button_iconify.width() * 2,
                             _handle.height());
-    _size.bottom += _handle.height() + bwidth;
+    _innersize.bottom += _handle.height() + bwidth;
   }
   
 
   // position/size all the windows
 
-  resize(_size.left + _size.right + _client->area().width(),
-         _size.top + _size.bottom + _client->area().height());
+  resize(_innersize.left + _innersize.right + _client->area().width(),
+         _innersize.top + _innersize.bottom + _client->area().height());
 
-  _plate.setGeometry(_size.left - cbwidth, _size.top - cbwidth,
+  _plate.setGeometry(_innersize.left - cbwidth, _innersize.top - cbwidth,
                      _client->area().width(), _client->area().height());
 
   // map/unmap all the windows
@@ -288,14 +287,12 @@ void OBFrame::adjust()
   else
     _handle.hide(true);
   
-  // inside this function _size is the size EXCLUDING the outer border
-  // at the end of this function it becomes the size INCLUDING the outer border
-  _size.left += bwidth;
-  _size.right += bwidth;
-  _size.top += bwidth;
-  _size.bottom += bwidth;
-
   // XXX: more is gunna have to happen here
+
+  _size.left   = _innersize.left + bwidth;
+  _size.right  = _innersize.right + bwidth;
+  _size.top    = _innersize.top + bwidth;
+  _size.bottom = _innersize.bottom + bwidth;
 
   adjustShape();
 
@@ -306,38 +303,40 @@ void OBFrame::adjust()
 void OBFrame::adjustShape()
 {
 #ifdef SHAPE
+  int bwidth = (_decorations & OBClient::Decor_Border) ?
+    _style->getBorderWidth() : 0;
+  
   if (!_client->shaped()) {
     // clear the shape on the frame window
     XShapeCombineMask(otk::OBDisplay::display, getWindow(), ShapeBounding,
-                      _size.left,
-                      _size.top,
+                      _innersize.left,
+                      _innersize.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
     XShapeCombineShape(otk::OBDisplay::display, getWindow(), ShapeBounding,
-                       _size.left,
-                       _size.top,
+                       _innersize.left,
+                       _innersize.top,
                        _client->window(), ShapeBounding, ShapeSet);
 
-  int num = 0;
+    int num = 0;
     XRectangle xrect[2];
 
-    /*
-    if (decorations & Decor_Titlebar) {
-    xrect[0].x = xrect[0].y = -frame.border_w;
-    xrect[0].width = frame.rect.width();
-    xrect[0].height = frame.title_h + (frame.border_w * 2);
-    ++num;
+    if (_decorations & OBClient::Decor_Titlebar) {
+      xrect[0].x = _titlebar.getRect().x();
+      xrect[0].y = _titlebar.getRect().y();
+      xrect[0].width = _titlebar.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
+      xrect[0].height = _titlebar.height() + bwidth * 2;
+      ++num;
     }
 
-    if (decorations & Decor_Handle) {
-    xrect[1].x = -frame.border_w;
-    xrect[1].y = frame.rect.height() - frame.margin.bottom +
-    frame.mwm_border_w - frame.border_w;
-    xrect[1].width = frame.rect.width();
-    xrect[1].height = frame.handle_h + (frame.border_w * 2);
-    ++num;
-    }*/
+    if (_decorations & OBClient::Decor_Handle) {
+      xrect[1].x = _handle.getRect().x();
+      xrect[1].y = _handle.getRect().y();
+      xrect[1].width = _handle.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
+      xrect[1].height = _handle.height() + bwidth * 2;
+      ++num;
+    }
 
     XShapeCombineRectangles(otk::OBDisplay::display, getWindow(),
                             ShapeBounding, 0, 0, xrect, num,

@@ -37,6 +37,9 @@ private:
   //! The size of the frame on each side of the client window
   otk::Strut _size;
 
+  //! The size of the frame on each side of the client window inside the border
+  otk::Strut _innersize;
+
   // decoration windows
   otk::OtkFocusWidget _plate;   // sits entirely under the client window
   otk::OtkFocusWidget _titlebar;
@@ -85,6 +88,10 @@ public:
   //! Applies gravity for the client's gravity, moving the frame to the
   //! appropriate place
   void applyGravity();
+
+  //! Reversely applies gravity for the client's gravity, moving the frame so
+  //! that the client is in its pre-gravity position
+  void restoreGravity();
 };
 
 }

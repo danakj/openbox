@@ -134,6 +134,7 @@ mbind	BLCorner	Press		Left	Focus
 mbind	BRCorner	Press		Left	Focus
 mbind	Client		Press		Left	FocusRaise
 mbind	Client		Press		Middle	Focus
+mbind	Client		Press		Right	Focus
 mbind	Frame		Press		A-Left	Focus
 
 mbind	Titlebar	DoubleClick	Left	ToggleShade

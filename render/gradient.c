@@ -233,12 +233,25 @@ void highlight(pixel32 *x, pixel32 *y, gboolean raised)
 
 void gradient_solid(Appearance *l, int x, int y, int w, int h) 
 {
-  int i;
+  pixel32 pix;
+  int i, a, b;
   PlanarSurface *sp = &l->surface.data.planar;
   int left = x, top = y, right = w - 1, bottom = h - 1;
 
+assert(x+w < l->area.width);
+assert(y+h < l->area.height);
+
   if (sp->primary->gc == None)
     color_allocate_gc(sp->primary);
+  pix = (sp->primary->r << default_red_shift)
+      + (sp->primary->g << default_green_shift)
+      + (sp->primary->b << default_blue_shift);
+printf("x = %d : y = %d : w = %d : h = %d (%d:%d\n", x,y,w,h, 
+l->area.width, l->area.height);
+  for (a = 0; a < l->area.width; a++)
+    for (b = 0; b < l->area.height; b++)
+      sp->pixel_data[a + b*l->area.width] = pix;
+
   XFillRectangle(ob_display, l->pixmap, sp->primary->gc
                  , x, y, w, h);
 

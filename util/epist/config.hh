@@ -45,7 +45,7 @@ public:
   Config();
   ~Config();
 
-  const std::string &getStringValue(Config::ItemType) const;
+  bool getStringValue(Config::ItemType, std::string &) const;
   int getNumberValue(Config::ItemType) const;
   void addOption(ConfigItem *);
   void addOption(const std::string &, const std::string &);

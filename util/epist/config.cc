@@ -35,13 +35,16 @@ Config::~Config()
 }
 
 
-const string &Config::getStringValue(Config::ItemType type) const
+bool Config::getStringValue(Config::ItemType type, string &ret) const
 {
   ItemList::const_iterator it = items.begin(), end = items.end();
   for (; it != end; ++it) {
-    if ((*it)->getType() == type)
-      return (*it)->getStringValue();
+    if ((*it)->getType() == type) {
+      ret = (*it)->getStringValue();
+      return true;
+    }
   }
+  return false;
 }
 
 
@@ -52,7 +55,6 @@ int Config::getNumberValue(Config::ItemType type) const
     if ((*it)->getType() == type)
       return (*it)->getNumberValue();
   }
-
   return 0;
 }
 

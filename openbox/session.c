@@ -335,7 +335,7 @@ static gboolean session_save()
     if (!f) {
         success = FALSE;
         g_warning("unable to save the session to %s: %s",
-                  save_file, strerror(errno));
+                  save_file, g_strerror(errno));
     } else {
         guint stack_pos = 0;
 
@@ -425,7 +425,7 @@ static gboolean session_save()
         if (fflush(f)) {
             success = FALSE;
             g_warning("error while saving the session to %s: %s",
-                      save_file, strerror(errno));
+                      save_file, g_strerror(errno));
         }
         fclose(f);
     }

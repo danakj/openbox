@@ -874,6 +874,11 @@ static void event_handle_menu(Menu *menu, XEvent *e)
 	g_message("BUTTON PRESS");
         if (e->xbutton.button == 3)
             menu_hide(menu);
+        else if (e->xbutton.button == 1) {
+            entry = menu_find_entry(menu, e->xbutton.window);
+            if (!entry)
+                stacking_raise(MENU_AS_WINDOW(menu));
+        }
         break;
     case ButtonRelease:
 	g_message("BUTTON RELEASED");
@@ -894,6 +899,7 @@ static void event_handle_menu(Menu *menu, XEvent *e)
                 e->xbutton.y < (signed)(h+b)) {
                 menu_entry_fire(entry);
             }
+        }
 	
         break;
     case EnterNotify:
@@ -909,7 +915,6 @@ static void event_handle_menu(Menu *menu, XEvent *e)
             menu_entry_render(entry);
         }
         break;
-	}
     }
 }
 

@@ -38,6 +38,8 @@ void menu_destroy_hash_value(Menu *self)
     g_hash_table_remove(menu_map, &self->frame);
     g_hash_table_remove(menu_map, &self->items);
 
+    stacking_remove(self);
+
     appearance_free(self->a_title);
     XDestroyWindow(ob_display, self->title);
     XDestroyWindow(ob_display, self->frame);
@@ -197,6 +199,9 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     g_hash_table_insert(menu_map, &self->title, self);
     g_hash_table_insert(menu_map, &self->items, self);
     g_hash_table_insert(menu_hash, g_strdup(name), self);
+
+    stacking_add(self);
+
     return self;
 }
 
@@ -355,6 +360,7 @@ void menu_control_show(Menu *self, int x, int y, Client *client) {
            stacking_raise(MENU_AS_WINDOW(self));
         */
 	XMapWindow(ob_display, self->frame);
+        stacking_raise(MENU_AS_WINDOW(self));
 	self->shown = TRUE;
     } else if (self->shown && self->open_submenu) {
 	menu_hide(self->open_submenu);

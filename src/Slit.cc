@@ -104,7 +104,6 @@ Slit::~Slit() {
 
 
 void Slit::addClient(Window w) {
-  cout << "ADDCLIENT\n";
   openbox.grab();
 
   if (openbox.validateWindow(w)) {
@@ -157,7 +156,6 @@ void Slit::addClient(Window w) {
     XFlush(display);
 
     clientList.push_back(client);
-    cout << "SLIT COUNT " << clientList.size() << endl;
 
     openbox.saveSlitSearch(client->client_window, this);
     openbox.saveSlitSearch(client->icon_window, this);
@@ -369,7 +367,6 @@ void Slit::reconfigure(void) {
 
     break;
   }
-  cout << "SLIT SIZE " << frame.area.w() << "," << frame.area.h() << endl;
 
   reposition();
 

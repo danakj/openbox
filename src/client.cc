@@ -581,7 +581,7 @@ void Client::updateWMHints(bool initstate)
   if (ur != _urgent) {
     _urgent = ur;
 #ifdef DEBUG
-    printf("DEBUG: Urgent Hint for 0x%lx: %s\n",
+    printf("Urgent Hint for 0x%lx: %s\n",
            (long)_window, _urgent ? "ON" : "OFF");
 #endif
     // fire the urgent callback if we're mapped, otherwise, wait until after

@@ -31,6 +31,8 @@ Changelog for Openbox:
 
  * Fix support for the Shape extension.                 (Ben Jansens)
 
+ * Fix for recognizing kde systray windows unmapping.   (Ben Jansens)
+
 2.0.0:
  * Add an rc option (modiferMask) to allow changing     (Ben Jansens)
    which modifier combo Openbox uses for mouse

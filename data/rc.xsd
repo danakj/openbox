@@ -108,6 +108,7 @@
             <xs:element name="floatingY" type="xs:integer"/>
             <xs:element name="autoHide" type="ob:yesorno"/>
             <xs:element name="hideDelay" type="xs:integer"/>
+            <xs:element name="moveButton" type="ob:button"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="action">

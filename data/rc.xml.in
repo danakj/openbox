@@ -48,6 +48,7 @@
   <floatingY>0</floatingY>
   <autoHide>no</autoHide>
   <hideDelay>300</hideDelay>
+  <moveButton>A-Left</moveButton>
 </dock>
 
 <keyboard>

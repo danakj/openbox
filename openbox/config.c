@@ -47,6 +47,8 @@ gint            config_dock_y;
 ObOrientation   config_dock_orient;
 gboolean        config_dock_hide;
 guint           config_dock_hide_delay;
+guint           config_dock_app_move_button;
+guint           config_dock_app_move_modifiers;
 
 guint config_keyboard_reset_keycode;
 guint config_keyboard_reset_state;
@@ -325,6 +327,17 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
         config_dock_hide = parse_bool(doc, n);
     if ((n = parse_find_node("hideDelay", node)))
         config_dock_hide_delay = parse_int(doc, n) * 1000;
+    if ((n = parse_find_node("moveButton", node))) {
+        gchar *str = parse_string(doc, n);
+        guint b, s;
+        if (translate_button(str, &s, &b)) {
+            config_dock_app_move_button = b;
+            config_dock_app_move_modifiers = s;
+        } else {
+            g_warning("invalid button '%s'", str);
+        }
+        g_free(str);
+    }
 }
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
@@ -489,6 +502,8 @@ void config_startup(ObParseInst *i)
     config_dock_orient = OB_ORIENTATION_VERT;
     config_dock_hide = FALSE;
     config_dock_hide_delay = 300;
+    config_dock_app_move_button = 2; /* middle */
+    config_dock_app_move_modifiers = 0;
 
     parse_register(i, "dock", parse_dock, NULL);
 

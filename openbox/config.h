@@ -61,6 +61,10 @@ extern ObOrientation config_dock_orient;
 extern gboolean config_dock_hide;
 /*! The number of microseconds to wait before hiding the dock */
 extern guint config_dock_hide_delay;
+/*! The mouse button to be used to move dock apps */
+extern guint config_dock_app_move_button;
+/*! The modifiers to be used with the button to move dock apps */
+extern guint config_dock_app_move_modifiers;
 
 /* The name of the theme */
 extern char *config_theme;

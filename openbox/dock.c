@@ -34,11 +34,27 @@ static ObDock *dock;
 
 StrutPartial dock_strut;
 
+static void dock_app_grab_button(ObDockApp *app, gboolean grab)
+{
+    if (grab) {
+        grab_button_full(config_dock_app_move_button,
+                         config_dock_app_move_modifiers, app->icon_win,
+                         ButtonPressMask | ButtonReleaseMask |
+                         ButtonMotionMask,
+                         GrabModeAsync, OB_CURSOR_MOVE);
+    } else {
+        ungrab_button(config_dock_app_move_button,
+                      config_dock_app_move_modifiers, app->icon_win);
+    }
+}
+
 void dock_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
 
     if (reconfig) {
+        GList *it;
+
         XSetWindowBorder(ob_display, dock->frame,
                          RrColorPixel(ob_rr_theme->b_color));
         XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->bwidth);
@@ -50,6 +66,9 @@ void dock_startup(gboolean reconfig)
 
         dock_configure();
         dock_hide(TRUE);
+
+        for (it = dock->dock_apps; it; it = g_list_next(it))
+            dock_app_grab_button(it->data, TRUE);
         return;
     }
 
@@ -81,7 +100,12 @@ void dock_startup(gboolean reconfig)
 void dock_shutdown(gboolean reconfig)
 {
     if (reconfig) {
+        GList *it;
+
         stacking_remove(DOCK_AS_WINDOW(dock));
+
+        for (it = dock->dock_apps; it; it = g_list_next(it))
+            dock_app_grab_button(it->data, FALSE);
         return;
     }
 
@@ -149,9 +173,7 @@ void dock_add(Window win, XWMHints *wmhints)
     XChangeSaveSet(ob_display, app->icon_win, SetModeInsert);
     XSelectInput(ob_display, app->icon_win, DOCKAPP_EVENT_MASK);
 
-    grab_button_full(2, 0, app->icon_win,
-                     ButtonPressMask | ButtonReleaseMask | ButtonMotionMask,
-                     GrabModeAsync, OB_CURSOR_MOVE);
+    dock_app_grab_button(app, TRUE);
 
     g_hash_table_insert(window_map, &app->icon_win, app);
 
@@ -166,7 +188,7 @@ void dock_remove_all()
 
 void dock_remove(ObDockApp *app, gboolean reparent)
 {
-    ungrab_button(2, 0, app->icon_win);
+    dock_app_grab_button(app, FALSE);
     XSelectInput(ob_display, app->icon_win, NoEventMask);
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, app->icon_win, SetModeDelete);

@@ -8,6 +8,10 @@
 #include "otk/display.hh"
 #include "otk/util.hh"
 
+extern "C" {
+#include <Python.h>
+}
+
 namespace ob {
 
 static PyObject *obdict = NULL;

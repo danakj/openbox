@@ -14,7 +14,6 @@
 
 extern "C" {
 #include <X11/Xlib.h>
-#include <Python.h>
 }
 
 #include <string>

@@ -42,17 +42,9 @@ void OtkApplication::loadStyle(void)
 
 void OtkApplication::exec(void)
 {
-  const int xfd = ConnectionNumber(OBDisplay::display);
-  fd_set rfds;
-  timeval *timeout = 0;
-
   while (1) {
     dispatchEvents();
-
-    FD_ZERO(&rfds);
-    FD_SET(xfd, &rfds);
-
-    select(xfd + 1, &rfds, 0, 0, timeout);
+    _timer_manager->fire(); // fire pending events
   }
 }
 

@@ -294,7 +294,7 @@ gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
                 g_strfreev(*ret); /* free what we did so far */
                 break; /* the force is not strong with us */
             }
-            p = strchr(p, '\0');
+            p += strlen(p) + 1;
         }
 	g_free(raw);
         if (i == num)
@@ -328,7 +328,7 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
         p = raw;
         for (i = 0; i < num; ++i) {
             (*ret)[i] = g_strdup(p);
-            p = strchr(p, '\0');
+            p += strlen(p) + 1;
         }
 	g_free(raw);
 	return TRUE;

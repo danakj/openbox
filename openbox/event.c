@@ -986,24 +986,16 @@ static void event_handle_menu(ObClient *client, XEvent *e)
             over = menu_control_keyboard_nav(over, OB_KEY_DOWN);
         else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
             over = menu_control_keyboard_nav(over, OB_KEY_UP);
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
-            over = menu_control_keyboard_nav(over, OB_KEY_RETURN);
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
-            over = menu_control_keyboard_nav(over, OB_KEY_ESCAPE);
+        else if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) /* fuck */
+            over = menu_control_keyboard_nav(over, OB_KEY_RIGHT);
+        else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT)) /* users */
+            over = menu_control_keyboard_nav(over, OB_KEY_LEFT);
         else {
             if (over) {
-                if (over->parent->mouseover)
-                    over->parent->mouseover(over, FALSE);
-                else
-                    menu_control_mouseover(over, FALSE);
-                menu_entry_render(over);
+                over->parent->mouseover(over, FALSE);
                 over = NULL;
             }
-/*
-  if (top->hide)
-  top->hide(top);
-  else
-*/
+
             menu_hide(top);
         }
         break;
@@ -1013,8 +1005,6 @@ static void event_handle_menu(ObClient *client, XEvent *e)
 	ob_debug("BUTTON PRESS\n");
         break;
     case ButtonRelease:
-        if (e->xbutton.button > 3) break;
-
 	ob_debug("BUTTON RELEASED\n");
 
         for (it = menu_visible; it; it = g_list_next(it)) {
@@ -1031,14 +1021,13 @@ static void event_handle_menu(ObClient *client, XEvent *e)
                                                     e->xbutton.y_root -
                                                     m->location.y))) {
                     if (over) {
-                        if (over->parent->mouseover)
-                            over->parent->mouseover(over, FALSE);
-                        else
-                            menu_control_mouseover(over, FALSE); 
-                        menu_entry_render(over);
-                        over = NULL;
+                        over->parent->mouseover(over, FALSE);
                         /* this hides the menu */
-                        menu_entry_fire(entry);
+
+                        over->parent->selected(entry, e->xbutton.button,
+                                               e->xbutton.x_root,
+                                               e->xbutton.y_root);
+                        over = NULL;
                     }
                 }
                 break;
@@ -1046,11 +1035,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
         }
         if (!it) {
             if (over) {
-                if (over->parent->mouseover)
-                    over->parent->mouseover(over, FALSE);
-                else
-                    menu_control_mouseover(over, FALSE); 
-                menu_entry_render(over);
+                over->parent->mouseover(over, FALSE);
                 over = NULL;
             }
 /*
@@ -1072,28 +1057,16 @@ static void event_handle_menu(ObClient *client, XEvent *e)
                                                 e->xmotion.y_root -
                                                 m->location.y))) {
                 if (over && entry != over) {
-                    if (over->parent->mouseover)
-                        over->parent->mouseover(over, FALSE);
-                    else
-                        menu_control_mouseover(over, FALSE);
-                    menu_entry_render(over);
+                    over->parent->mouseover(over, FALSE);
                 }
 
                 over = entry;
-                if (over->parent->mouseover)
-                    over->parent->mouseover(over, TRUE);
-                else
-                    menu_control_mouseover(over, TRUE);
-                menu_entry_render(over);
+                over->parent->mouseover(over, TRUE);
                 break;
             }
         }
         if (!it && over) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
+            over->parent->mouseover(over, FALSE);
             over = NULL;
         }
         break;

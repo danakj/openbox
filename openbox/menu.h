@@ -17,6 +17,10 @@ typedef void(*menu_controller_show)(ObMenu *self, int x, int y,
                                     struct _ObClient *);
 typedef void(*menu_controller_update)(ObMenu *self);
 typedef void(*menu_controller_mouseover)(ObMenuEntry *self, gboolean enter);
+typedef void(*menu_controller_selected)(ObMenuEntry *self, unsigned int button,
+                                        unsigned int x, unsigned int y);
+typedef void(*menu_controller_hide)(ObMenu *self);
+
 
 extern GHashTable *menu_hash;
 extern GList *menu_visible;
@@ -39,12 +43,12 @@ struct _ObMenu
 
     /* place a menu on screen */
     menu_controller_show show;
-    void (*hide)( /* some bummu */);
+    menu_controller_hide hide;
 
     /* render a menu */
     menu_controller_update update;
     menu_controller_mouseover mouseover;
-    void (*selected)( /* some bummu */);
+    menu_controller_selected selected;
 
 
     /* render stuff */
@@ -108,11 +112,18 @@ typedef struct PluginMenuCreateData{
 void menu_startup();
 void menu_shutdown();
 
+void menu_noop();
+
 #define menu_new(l, n, p) \
-  menu_new_full(l, n, p, NULL, NULL)
+  menu_new_full(l, n, p, menu_show_full, menu_render, menu_entry_fire, \
+                menu_hide, menu_control_mouseover)
 
 ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
-                    menu_controller_show show, menu_controller_update update);
+                      menu_controller_show show, menu_controller_update update,
+                      menu_controller_selected selected,
+                      menu_controller_hide hide,
+                      menu_controller_mouseover mouseover);
+
 void menu_free(char *name);
 
 void menu_show(char *name, int x, int y, struct _ObClient *client);
@@ -150,7 +161,8 @@ ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y);
 
 void menu_entry_render(ObMenuEntry *self);
 
-void menu_entry_fire(ObMenuEntry *self);
+void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
+                     unsigned int y);
 
 void menu_render(ObMenu *self);
 void menu_render_full(ObMenu *self);

@@ -146,62 +146,12 @@ void menu_entry_free(ObMenuEntry *self)
     
 void menu_startup()
 {
-/*
-    ObMenu *m;
-    ObMenu *s;
-    ObMenu *t;
-    Action *a;
-*/
-
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
                                       (GDestroyNotify)menu_destroy_hash_key,
                                       (GDestroyNotify)menu_destroy_hash_value);
 
     parse_register("menu", parse_menu, NULL);
 
-/*
-    m = menu_new("sex menu", "root", NULL);
- 
-    a = action_from_string("execute");
-    a->data.execute.path = g_strdup("xterm");
-    menu_add_entry(m, menu_entry_new("xterm", a));
-    a = action_from_string("restart");
-    menu_add_entry(m, menu_entry_new("restart", a));
-    menu_add_entry(m, menu_entry_new_separator("--"));
-    a = action_from_string("exit");
-    menu_add_entry(m, menu_entry_new("exit", a));
-*/
-
-    /*
-    s = menu_new("subsex menu", "submenu", m);
-    a = action_from_string("execute");
-    a->data.execute.path = g_strdup("xclock");
-    menu_add_entry(s, menu_entry_new("xclock", a));
-
-    menu_add_entry(m, menu_entry_new_submenu("subz", s));
-
-    s = menu_new("empty", "chub", m);
-    menu_add_entry(m, menu_entry_new_submenu("empty", s));
-
-    s = menu_new("", "s-club", m);
-    menu_add_entry(m, menu_entry_new_submenu("empty", s));
-
-    s = menu_new(NULL, "h-club", m);
-    menu_add_entry(m, menu_entry_new_submenu("empty", s));
-
-    s = menu_new(NULL, "g-club", m);
-
-    a = action_from_string("execute");
-    a->data.execute.path = g_strdup("xterm");
-    menu_add_entry(s, menu_entry_new("xterm", a));
-    a = action_from_string("restart");
-    menu_add_entry(s, menu_entry_new("restart", a));
-    menu_add_entry(s, menu_entry_new_separator("--"));
-    a = action_from_string("exit");
-    menu_add_entry(s, menu_entry_new("exit", a));
-
-    menu_add_entry(m, menu_entry_new_submenu("long", s));
-    */
 }
 
 void menu_shutdown()
@@ -219,7 +169,10 @@ static Window createWindow(Window parent, unsigned long mask,
 }
 
 ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
-                    menu_controller_show show, menu_controller_update update)
+                      menu_controller_show show, menu_controller_update update,
+                      menu_controller_selected selected,
+                      menu_controller_hide hide,
+                      menu_controller_mouseover mouseover)
 {
     XSetWindowAttributes attrib;
     ObMenu *self;
@@ -236,11 +189,12 @@ ObMenu *menu_new_full(char *label, char *name, ObMenu *parent,
     self->invalid = TRUE;
 
     /* default controllers */
-    self->show = show;
-    self->hide = NULL;
-    self->update = update;
-    self->mouseover = NULL;
-    self->selected = NULL;
+    self->show = (show != NULL ? show : menu_show_full);
+    self->hide = (hide != NULL ? hide : menu_hide);
+    self->update = (update != NULL ? update : menu_render);
+    self->mouseover = (mouseover != NULL ? mouseover :
+                       menu_control_mouseover);
+    self->selected = (selected != NULL ? selected : menu_entry_fire);
 
     self->plugin = NULL;
     self->plugin_data = NULL;
@@ -354,11 +308,7 @@ void menu_show_full(ObMenu *self, int x, int y, ObClient *client)
         menu_visible = g_list_append(menu_visible, self);
     }
 
-    if (self->show) {
-	self->show(self, x, y, client);
-    } else {
-      menu_control_show(self, x, y, client);
-    }
+    menu_control_show(self, x, y, client);
 }
 
 void menu_hide(ObMenu *self) {
@@ -373,11 +323,7 @@ void menu_hide(ObMenu *self) {
 	    self->parent->open_submenu = NULL;
 
             e = menu_find_entry_by_submenu(self->parent, self);
-            if (self->parent->mouseover)
-                self->parent->mouseover(e, FALSE);
-            else
-                menu_control_mouseover(e, FALSE);
-            menu_entry_render(e);
+            self->parent->mouseover(e, FALSE);
         }
 
         if (!(self->parent && self->parent->shown)) {
@@ -437,9 +383,12 @@ ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y)
     return g_list_nth_data(menu->entries, y / menu->item_h);
 }
 
-void menu_entry_fire(ObMenuEntry *self)
+void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
+                     unsigned int y)
 {
     ObMenu *m;
+
+    if (button > 3) return;
 
     if (self->action) {
         self->action->data.any.c = self->parent->client;
@@ -531,6 +480,8 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
         menu_find_entry_by_submenu(self->parent,
                                    self->parent->open_submenu) != self)
         self->hilite = enter;
+
+    menu_entry_render(self);
 }
 
 ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)
@@ -540,11 +491,7 @@ ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)
     switch (key) {
     case OB_KEY_DOWN: {
         if (over != NULL) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
+            over->parent->mouseover(over, FALSE);
                 
             it = over->parent->entries;
             while (it != NULL && it->data != over)
@@ -564,23 +511,14 @@ ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)
                     over->parent->entries->data : NULL);
         }
 
-        if (over) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, TRUE);
-            else
-                menu_control_mouseover(over, TRUE);
-            menu_entry_render(over);
-        }
+        if (over)
+            over->parent->mouseover(over, TRUE);
         
         break;
     }
     case OB_KEY_UP: {
         if (over != NULL) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
+            over->parent->mouseover(over, FALSE);
                 
             it = g_list_last(over->parent->entries);
             while (it != NULL && it->data != over)
@@ -600,52 +538,32 @@ ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)
                     g_list_last(over->parent->entries)->data :
                     NULL);
 
-        if (over->parent->mouseover)
-            over->parent->mouseover(over, TRUE);
-        else
-            menu_control_mouseover(over, TRUE);
-        menu_entry_render(over);
+        over->parent->mouseover(over, TRUE);
         break;
     }
-    case OB_KEY_RETURN: {
+    case OB_KEY_RIGHT: {
         if (over == NULL)
             return over;
 
         if (over->submenu) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
+            over->parent->mouseover(over, FALSE);
 
             if (over->submenu->entries)
                 over = over->submenu->entries->data;
 
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, TRUE);
-            else
-                menu_control_mouseover(over, TRUE);
-            menu_entry_render(over);
+            over->parent->mouseover(over, TRUE);
         }
         else {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
+            over->parent->mouseover(over, FALSE);
 
-            menu_entry_fire(over);
+            /* zero is enter */
+            menu_entry_fire(over, 0, 0, 0);
         }
         break;
     }
-    case OB_KEY_ESCAPE: {
+    case OB_KEY_LEFT: {
         if (over != NULL) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
-
+            over->parent->mouseover(over, FALSE);
             menu_hide(over->parent);
         } else {
             it  = g_list_last(menu_visible);
@@ -662,4 +580,9 @@ ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)
     }
 
     return over;
+}
+
+void menu_noop()
+{
+    /* This noop brought to you by OLS 2003 Email Garden. */
 }

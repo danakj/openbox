@@ -5,17 +5,7 @@
 #include "openbox.h"
 #include "render/theme.h"
 
-void menu_render_full(ObMenu *self);
-
 void menu_render(ObMenu *self) {
-    if (self->update) {
-        self->update(self);
-    } else if (self->invalid) {
-        menu_render_full(self);
-    }
-}
-
-void menu_render_full(ObMenu *self) {
     GList *it;
     int items_h = 0;
     int nitems = 0; /* each item, only one is used */

@@ -52,7 +52,7 @@ void client_send_to_update(ObMenu *self)
             menu_add_entry(self, e);
         }
         
-        menu_render_full(self);
+        self->update(self);
     }
 }
 
@@ -102,7 +102,7 @@ void plugin_destroy (ObMenu *m)
 void *plugin_create() /* TODO: need config */
 {
     ObMenu *m = menu_new_full(NULL, "client-menu", NULL,
-                            client_menu_show, NULL);
+                            client_menu_show, NULL, NULL, NULL, NULL);
     m->plugin = PLUGIN_NAME;
     menu_add_entry(m, menu_entry_new_submenu("Send To Workspace",
                                              send_to_menu));
@@ -144,7 +144,7 @@ void plugin_startup()
     ObMenu *t;
     /* create a Send To Workspace ObMenu */
     send_to_menu = menu_new_full(NULL, "send-to-workspace",
-                          NULL, NULL, client_send_to_update);
+                          NULL, NULL, client_send_to_update, NULL, NULL, NULL);
     
     layer_menu = menu_new(NULL, "layer", NULL);
     menu_add_entry(layer_menu, menu_entry_new("Top Layer",

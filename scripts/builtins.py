@@ -124,6 +124,10 @@ def prev_desktop(data, no_wrap=0):
     elif not no_wrap:
         d = n - 1
     OBScreen_changeDesktop(screen, d)
+
+def change_desktop(data, num):
+    screen = Openbox_screen(openbox, data.screen())
+    OBScreen_changeDesktop(screen, num)
     
 #########################################
 ### Convenience functions for scripts ###

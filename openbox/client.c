@@ -300,9 +300,7 @@ void client_manage(Window window)
     dispatch_client(Event_Client_New, self, 0, 0);
 
     /* make sure the window is visible */
-    if (!(self->strut.left || self->strut.right ||
-          self->strut.top || self->strut.bottom))
-        client_move_onscreen(self, TRUE);
+    client_move_onscreen(self, TRUE);
 
     screen_update_areas();
 
@@ -480,13 +478,13 @@ gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
     /* XXX watch for xinerama dead areas */
 
     a = screen_area(self->desktop);
-    if (*x >= a->x + a->width - 1)
+    if (!self->strut.right && *x >= a->x + a->width - 1)
         *x = a->x + a->width - self->frame->area.width;
-    if (*y >= a->y + a->height - 1)
+    if (!self->strut.bottom && *y >= a->y + a->height - 1)
         *y = a->y + a->height - self->frame->area.height;
-    if (*x + self->frame->area.width - 1 < a->x)
+    if (!self->strut.left && *x + self->frame->area.width - 1 < a->x)
         *x = a->x;
-    if (*y + self->frame->area.height - 1 < a->y)
+    if (!self->strut.top && *y + self->frame->area.height - 1 < a->y)
         *y = a->y;
 
     if (rude) {
@@ -496,13 +494,13 @@ gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
         /* dont let windows map/move into the strut unless they
            are bigger than the available area */
         if (w <= a->width) {
-            if (*x < a->x) *x = a->x;
-            if (*x + w > a->x + a->width)
+            if (!self->strut.left && *x < a->x) *x = a->x;
+            if (!self->strut.right && *x + w > a->x + a->width)
                 *x = a->x + a->width - w;
         }
         if (h <= a->height) {
-            if (*y < a->y) *y = a->y;
-            if (*y + h > a->y + a->height)
+            if (!self->strut.top && *y < a->y) *y = a->y;
+            if (!self->strut.bottom && *y + h > a->y + a->height)
                 *y = a->y + a->height - h;
         }
     }

@@ -31,6 +31,9 @@ public:
   void setY(int x) { _x = x; }
   //! Returns the y value
   int y() const { return _x; }
+
+  //! Changes the x and y values
+  void setPoint(int x, int y) { _x = x; _y = y; }
 };
 
 }

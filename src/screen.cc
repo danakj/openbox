@@ -76,8 +76,8 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
 
   
   // Set the netwm atoms for geomtery and viewport
-  unsigned long geometry[] = { _size.x(),
-                               _size.y() };
+  unsigned long geometry[] = { _info->getWidth(),
+                               _info->getHeight() };
   Openbox::instance->property()->set(_info->getRootWindow(),
                                      otk::OBProperty::net_desktop_geometry,
                                      otk::OBProperty::Atom_Cardinal,

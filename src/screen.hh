@@ -13,7 +13,6 @@ extern "C" {
 #include "otk/image.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
-#include "otk/point.hh"
 #include "otk/style.hh"
 #include "otk/configuration.hh" // TEMPORARY
 
@@ -61,9 +60,6 @@ private:
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
 
-  //! The dimentions of the screen
-  otk::Point _size;
-
   //! All managed clients on the screen
   ClientList _clients;
 
@@ -107,8 +103,6 @@ public:
   inline bool managed() const { return _managed; }
   //! Returns the Image Control used for rendering on the screen
   inline otk::BImageControl *imageControl() { return _image_control; }
-  //! Returns the dimentions of the screen
-  inline const otk::Point &size() const { return _size; }
   //! Returns the area of the screen not reserved by applications' Struts
   inline const otk::Rect &area() const { return _area; }
   //! Returns the style in use on the screen

@@ -25,10 +25,11 @@ TrueRenderControl::TrueRenderControl(int screen)
     _green_offset(0),
     _blue_offset(0)
 {
+  printf("Initializing TrueColor RenderControl\n");
+
   const ScreenInfo *info = display->screenInfo(_screen);
   XImage *timage = XCreateImage(**display, info->visual(), info->depth(),
                                 ZPixmap, 0, NULL, 1, 1, 32, 0);
-  printf("Initializing TrueColor RenderControl\n");
 
   unsigned long red_mask, green_mask, blue_mask;
 

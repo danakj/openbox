@@ -23,6 +23,8 @@ PseudoRenderControl::PseudoRenderControl(int screen)
   : RenderControl(screen)
 {
   printf("Initializing PseudoColor RenderControl\n");
+
+  const ScreenInfo *info = display->screenInfo(_screen);
 }
 
 PseudoRenderControl::~PseudoRenderControl()

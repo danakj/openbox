@@ -168,6 +168,14 @@ Action *action_from_string(char *name)
         a = action_new(action_cycle_windows);
         a->data.cycle.linear = TRUE;
         a->data.cycle.forward = FALSE;
+    } else if (!g_ascii_strcasecmp(name, "nextwindow")) {
+        a = action_new(action_cycle_windows);
+        a->data.cycle.linear = FALSE;
+        a->data.cycle.forward = TRUE;
+    } else if (!g_ascii_strcasecmp(name, "previouswindow")) {
+        a = action_new(action_cycle_windows);
+        a->data.cycle.linear = FALSE;
+        a->data.cycle.forward = FALSE;
     }
     
     return a;
@@ -666,35 +674,53 @@ void action_showmenu(union ActionData *data)
 
 void action_cycle_windows(union ActionData *data)
 {
-    if (data->cycle.linear) {
-        static Client *first = NULL;
-        static Client *t = NULL;
+    static Client *first = NULL;
+    static Client *t = NULL;
+    static GList *order = NULL;
+    GList *it, *start, *list;
 
-        if (data->cycle.cancel) {
-            if (first) client_focus(first);
-        } else if (!data->cycle.final) {
-            GList *it, *start;
-
-            t = NULL;
-            first = focus_client;
-            start = it = g_list_find(client_list, data->cycle.c);
-            do {
-                if (data->cycle.forward) {
-                    it = it->next;
-                    if (it == NULL) it = client_list;
-                } else {
-                    it = it->prev;
-                    if (it == NULL) it = g_list_last(client_list);
-                }
-                if (client_focus(it->data)) {
-                    t = it->data;
-                    break;
-                }
-            } while (it != start);
-        } else {
-            if (t) stacking_raise(t);
-        }
-    } else {
+    if (data->cycle.cancel) {
+        if (first) client_focus(first);
+        goto done_cycle;
     }
+    if (!first) first = focus_client;
+
+    if (data->cycle.linear)
+        list = client_list;
+    else {
+        if (!order) order = g_list_copy(focus_order[screen_desktop]);
+        list = order;
+    }
+    start = it = g_list_find(list, data->cycle.c);
+    if (!start) goto done_cycle;
+
+    if (!data->cycle.final) {
+        t = NULL;
+        if (!start) /* switched desktops or something? */
+            goto done_cycle;
+
+        do {
+            if (data->cycle.forward) {
+                it = it->next;
+                if (it == NULL) it = list;
+            } else {
+                it = it->prev;
+                if (it == NULL) it = g_list_last(list);
+            }
+            if (client_focus(it->data)) {
+                t = it->data;
+                break;
+            }
+        } while (it != start);
+    } else {
+        if (t) stacking_raise(t);
+        goto done_cycle;
+    }
+    return;
+
+    done_cycle:
+        first = NULL;
+        g_list_free(order);
+        order = NULL;
 }
 

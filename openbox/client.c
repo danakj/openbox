@@ -132,7 +132,6 @@ void client_manage_all()
 
         w = client_startup_stack_order[i-1];
         c = g_hash_table_lookup(client_map, &w);
-        g_message("0x%lx %d %d", c->window, c->iconic, c->shaded);
         if (c) stacking_lower(c);
     }
     g_free(client_startup_stack_order);

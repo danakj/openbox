@@ -220,7 +220,7 @@ void Client::setupDecorAndFunctions()
     _functions |= Func_Close;
   }
 
-  if (_min_size.x() > _max_size.x() || _min_size.y() > _max_size.y()) {
+  if (!(_min_size.x() < _max_size.x() || _min_size.y() < _max_size.y())) {
     _decorations &= ~(Decor_Maximize | Decor_Handle);
     _functions &= ~(Func_Resize | Func_Maximize);
   }

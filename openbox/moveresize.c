@@ -28,9 +28,6 @@ static ObCorner lockcorner;
 
 static Popup *popup = NULL;
 
-#define POPUP_X (10)
-#define POPUP_Y (10)
-
 static void client_dest(ObClient *c)
 {
     if (moveresize_client == c)
@@ -39,12 +36,7 @@ static void client_dest(ObClient *c)
 
 void moveresize_startup()
 {
-    XSetWindowAttributes attrib;
-
     popup = popup_new(FALSE);
-    popup_size_to_string(popup, "W:  0000  W:  0000");
-
-    attrib.save_under = True;
 
     client_add_destructor(client_dest);
 }
@@ -57,15 +49,16 @@ void moveresize_shutdown()
     popup = NULL;
 }
 
-static void popup_coords(char *format, int a, int b)
+static void popup_coords(ObClient *c, char *format, int a, int b)
 {
     char *text;
-    Rect *area;
 
     text = g_strdup_printf(format, a, b);
-    area = screen_physical_area_monitor(0);
-    popup_position(popup, NorthWestGravity,
-                   POPUP_X + area->x, POPUP_Y + area->y);
+    popup_position(popup, CenterGravity,
+                   c->frame->area.x + c->frame->size.left +
+                   c->area.width / 2,
+                   c->frame->area.y + c->frame->size.top +
+                   c->area.height / 2);
     popup_show(popup, text, NULL);
     g_free(text);
 }
@@ -166,24 +159,14 @@ void moveresize_end(gboolean cancel)
 
 static void do_move(gboolean resist)
 {
-    Rect *a;
-
     if (resist)
         resist_move_windows(moveresize_client, &cur_x, &cur_y);
     resist_move_monitors(moveresize_client, &cur_x, &cur_y);
 
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
-    g_message("%d %d", cur_x, cur_y);
     client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
-
-    /* this would be better with a fixed width font ... XXX can do it better
-       if there are 2 text boxes */
-    a = screen_area(screen_desktop);
-    popup_coords("X:  %4d  Y:  %4d",
-                 moveresize_client->frame->area.x - a->x,
-                 moveresize_client->frame->area.y - a->y);
 }
 
 static void do_resize(gboolean resist)
@@ -209,8 +192,11 @@ static void do_resize(gboolean resist)
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */
-    popup_coords("W:  %4d  H:  %4d", moveresize_client->logical_size.width,
-                 moveresize_client->logical_size.height);
+    if (moveresize_client->size_inc.width > 1 ||
+        moveresize_client->size_inc.height > 1)
+        popup_coords(moveresize_client, "%d x %d",
+                     moveresize_client->logical_size.width,
+                     moveresize_client->logical_size.height);
 }
 
 void moveresize_event(XEvent *e)
@@ -229,7 +215,6 @@ void moveresize_event(XEvent *e)
         }
     } else if (e->type == MotionNotify) {
         if (moving) {
-            g_message("root %d start %d", e->xmotion.x_root, start_x);
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
             do_move(TRUE);

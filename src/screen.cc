@@ -502,8 +502,9 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->addClient(client->frame->grip_left(), client);
   Openbox::instance->addClient(client->frame->grip_right(), client);
 
-  // XXX: if on the current desktop..
-  client->frame->show();
+  // if on the current desktop.. (or all desktops)
+  if (client->desktop() == _desktop || client->desktop() == (signed)0xffffffff)
+    client->frame->show();
  
   // XXX: handle any requested states such as maximized
 
@@ -641,9 +642,9 @@ void OBScreen::changeDesktop(long desktop)
   OBClient::List::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->desktop() == old) {
-      // XXX hide
+      (*it)->frame->hide();
     } else if ((*it)->desktop() == _desktop) {
-      // XXX show
+      (*it)->frame->show();
     }
   }
 }

@@ -1,3 +1,9 @@
+* Implement borders and border overlapping in widget
+        the widget has a outer geometry(that of the border) and a inner one
+        (the current geometry)
+        if the overlap flag is true, the inner widgets' borders are overlapped
+        as much as possible while the widgets are still entirely visible.
+
 * make OtkButton do pixmaps
 
 * OtkMenu
@@ -10,10 +16,6 @@
 * OtkTextWidget
         widget that holds text that can be justified and whatnot
         the button should prolly be modified to subclass this
-
-* OtkEventHandler
-        make widget inherit from this
-        let the user override handling functions as needed
 
 * OtkApplication
         do all derty work init display/screen/style/image control etc

@@ -1,19 +1,19 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   extensions.c for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+extensions.c for the Openbox window manager
+Copyright (c) 2003        Ben Jansens
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-   See the COPYING file for a copy of the GNU General Public License.
+See the COPYING file for a copy of the GNU General Public License.
 */
 
 #include "openbox.h"
@@ -39,25 +39,25 @@ void extensions_query_all()
      
 #ifdef XKB
     extensions_xkb =
-	XkbQueryExtension(ob_display, &junk, &extensions_xkb_event_basep,
-			  &junk, NULL, NULL);
+        XkbQueryExtension(ob_display, &junk, &extensions_xkb_event_basep,
+                          &junk, NULL, NULL);
 #endif
 
 #ifdef SHAPE
     extensions_shape =
-	XShapeQueryExtension(ob_display, &extensions_shape_event_basep,
-			     &junk);
+        XShapeQueryExtension(ob_display, &extensions_shape_event_basep,
+                             &junk);
 #endif
 
 #ifdef XINERAMA
     extensions_xinerama =
-	XineramaQueryExtension(ob_display, &extensions_xinerama_event_basep,
-			       &junk) && XineramaIsActive(ob_display);
+        XineramaQueryExtension(ob_display, &extensions_xinerama_event_basep,
+                               &junk) && XineramaIsActive(ob_display);
 #endif
 
 #ifdef XRANDR
     extensions_randr =
-	XRRQueryExtension(ob_display, &extensions_randr_event_basep,
+        XRRQueryExtension(ob_display, &extensions_randr_event_basep,
                           &junk);
 #endif
 

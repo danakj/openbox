@@ -107,6 +107,11 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
+%ignore otk::OBDisplay::display;
+%inline %{
+  Display *OBDisplay_display() { return otk::OBDisplay::display; }
+%};
+
 %include "../otk/display.hh"
 %include "../otk/point.hh"
 %include "../otk/property.hh"

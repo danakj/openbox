@@ -490,8 +490,6 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
         target = begin;
       } else {
         ++target;
-        if (target == end)
-          target = begin;
       }
     } else {
       if (target == begin)
@@ -502,6 +500,10 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
     // must be no window to focus
     if (target == _active)
       return;
+
+    // start back at the beginning of the loop
+    if (target == end)
+      continue;
 
     // determine if this window is invalid for cycling to
     const XWindow *t = *target;

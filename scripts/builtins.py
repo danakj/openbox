@@ -5,28 +5,28 @@
 def state_above(data, add=2):
     """Toggles, adds or removes the 'above' state on a window."""
     if not data.client: return
-    send_client_msg(Display_screenInfo(data.screen).rootWindow(),
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property.net_wm_state, data.client.window(), add,
                     openbox.property().atom(Property.net_wm_state_above))
     
 def state_below(data, add=2):
     """Toggles, adds or removes the 'below' state on a window."""
     if not data.client: return
-    send_client_msg(Display_screenInfo(data.screen).rootWindow(),
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property.net_wm_state, data.client.window(), add,
                     openbox.property().atom(Property.net_wm_state_below))
     
 def state_shaded(data, add=2):
     """Toggles, adds or removes the 'shaded' state on a window."""
     if not data.client: return
-    send_client_msg(Display_screenInfo(data.screen).rootWindow(),
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property.net_wm_state, data.client.window(), add,
                     openbox.property().atom(Property.net_wm_state_shaded))
     
 def close(data):
     """Closes the window on which the event occured"""
     if not data.client: return
-    send_client_msg(Display_screenInfo(data.screen).rootWindow(),
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property.net_close_window, data.client.window(), 0)
 
 def focus(data):
@@ -114,7 +114,7 @@ def unshade(data):
 
 def change_desktop(data, num):
     """Switches to a specified desktop"""
-    root = Display_screenInfo(data.screen).rootWindow()
+    root = display.screenInfo(data.screen).rootWindow()
     send_client_msg(root, Property.net_current_desktop, root, num)
 
 def next_desktop(data, no_wrap=0):
@@ -144,13 +144,13 @@ def prev_desktop(data, no_wrap=0):
 def send_to_all_desktops(data):
     """Sends a client to all desktops"""
     if not data.client: return
-    send_client_msg(Display_screenInfo(data.screen).rootWindow(),
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property.net_wm_desktop, data.client.window(), 0xffffffff)
     
 def send_to_desktop(data, num):
     """Sends a client to a specified desktop"""
     if not data.client: return
-    send_client_msg(Display_screenInfo(data.screen).rootWindow(),
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property.net_wm_desktop, data.client.window(), num)
 
 def send_to_next_desktop(data, no_wrap=0, follow=1):
@@ -317,7 +317,7 @@ import random
 def placewindows_random(data):
     if not data.client: return
     client_area = data.client.area()
-    screen = Display_screenInfo(data.screen)
+    screen = display.screenInfo(data.screen)
     width = screen.width() - client_area.width()
     height = screen.height() - client_area.height()
     global ob_rand

@@ -1790,7 +1790,9 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         if (baseh + h < 1) h = 1 - baseh;
   
         /* store the logical size */
-        SIZE_SET(self->logical_size, w, h);
+        SIZE_SET(self->logical_size,
+                 w + basew / self->size_inc.width,
+                 h + baseh / self->size_inc.height);
 
         w *= self->size_inc.width;
         h *= self->size_inc.height;

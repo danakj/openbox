@@ -333,22 +333,22 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
     case RR_SUNKEN_OUTER:
         RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
                      RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     0, 0, 0);
+                     RrPlanarBorderWidth(sur), 0, 0);
         break;
     case RR_SUNKEN_INNER:
         RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
                      RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     0, 1, 0);
+                     RrPlanarBorderWidth(sur), 1, 0);
         break;
     case RR_RAISED_OUTER:
         RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
                      RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     0, 0, 1);
+                     RrPlanarBorderWidth(sur), 0, 1);
         break;
     case RR_RAISED_INNER:
         RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
                      RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     0, 1, 1);
+                     RrPlanarBorderWidth(sur), 1, 1);
         break;
     case RR_BEVEL_NONE:
         break;

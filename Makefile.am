@@ -258,7 +258,7 @@ dist_thebear_theme_DATA = \
 ## data ##
 
 dist_rc_DATA = \
-	data/rc3 \
+	data/rc.xml \
 	data/menu
 
 dist_desktopfiles_DATA = \

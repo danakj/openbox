@@ -55,12 +55,12 @@ gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
     char *path;
     gboolean r = FALSE;
 
-    path = g_build_filename(g_get_home_dir(), ".openbox", "rc3", NULL);
+    path = g_build_filename(g_get_home_dir(), ".openbox", "rc.xml", NULL);
     if (parse_load(path, "openbox_config", doc, root)) {
         r = TRUE;
     } else {
         g_free(path);
-        path = g_build_filename(RCDIR, "rc3", NULL);
+        path = g_build_filename(RCDIR, "rc.xml", NULL);
         if (parse_load(path, "openbox_config", doc, root)) {
             r = TRUE;
         }

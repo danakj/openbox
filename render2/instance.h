@@ -28,6 +28,8 @@ struct RrInstance {
     int green_shift;
     int blue_shift;
 
+    gboolean render_to_pixmap;
+
     GHashTable *surface_map;
 };
 
@@ -39,8 +41,11 @@ struct RrInstance {
                                                           (i)->screen)))
 #define RrDepth(i)    ((i)->visinfo.depth)
 #define RrVisual(i)   ((i)->visinfo.visual)
+#define RrVisualInfo(i) (&(i)->visinfo)
 #define RrColormap(i) ((i)->cmap)
 #define RrContext(i)  ((i)->glx_context)
+
+#define RrRenderToPixmap(i) ((i)->render_to_pixmap)
 
 #define RrShapeWindow(i) ((i)->shape_window)
 

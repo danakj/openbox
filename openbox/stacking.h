@@ -24,7 +24,8 @@ extern GList  *stacking_list;
   stacking_list */
 void stacking_set_list();
 
-#define stacking_add(win) stacking_list = g_list_append(stacking_list, win);
+void stacking_add(ObWindow *win);
+void stacking_add_nonintrusive(ObWindow *win);
 #define stacking_remove(win) stacking_list = g_list_remove(stacking_list, win);
 
 /*! Raises a window above all others in its stacking layer

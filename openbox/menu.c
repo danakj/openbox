@@ -200,7 +200,7 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     g_hash_table_insert(menu_map, &self->items, self);
     g_hash_table_insert(menu_hash, g_strdup(name), self);
 
-    stacking_add(self);
+    stacking_add(MENU_AS_WINDOW(self));
     stacking_raise(MENU_AS_WINDOW(self));
 
     return self;

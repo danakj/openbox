@@ -48,7 +48,7 @@ void slit_startup()
         XSetWindowBorderWidth(ob_display, slit[i].frame, theme_bwidth);
 
         g_hash_table_insert(slit_map, &slit[i].frame, &slit[i]);
-        stacking_add(&slit[i]);
+        stacking_add(SLIT_AS_WINDOW(&slit[i]));
         stacking_raise(SLIT_AS_WINDOW(&slit[i]));
     }
 }

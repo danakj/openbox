@@ -55,7 +55,7 @@ void moveresize_startup()
     opaque_window.win = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
                                       render_depth, InputOutput, render_visual,
                                       CWSaveUnder, &attrib);
-    stacking_add(&opaque_window);
+    stacking_add(INTERNAL_AS_WINDOW(&opaque_window));
     stacking_raise(INTERNAL_AS_WINDOW(&opaque_window));
 
     /* a GC to invert stuff */

@@ -178,6 +178,7 @@ void client_manage(Window window)
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
     XWMHints *wmhint;
+    gboolean activate = FALSE;
 
     grab_server(TRUE);
 
@@ -241,30 +242,18 @@ void client_manage(Window window)
     client_apply_startup_state(self);
 
     grab_server(FALSE);
-     
+
+    /* add to client list/map */
     client_list = g_list_append(client_list, self);
-    stacking_add(self);
-    g_assert(!g_hash_table_lookup(client_map, &self->window));
     g_hash_table_insert(client_map, &self->window, self);
 
     /* update the focus lists */
     focus_order_add_new(self);
 
-    stacking_raise(CLIENT_AS_WINDOW(self));
-
-    screen_update_struts();
-
-    dispatch_client(Event_Client_New, self, 0, 0);
-
-    client_showhide(self);
-
     /* focus the new window? */
-    if (ob_state != State_Starting) {
-        Client *parent;
+    if (ob_state != State_Starting && config_focus_new) {
         gboolean group_foc = FALSE;
         
-        parent = NULL;
-
         if (self->group) {
             GSList *it;
 
@@ -274,38 +263,41 @@ void client_manage(Window window)
                     break;
                 }
         }
-        if (!group_foc && self->transient_for) {
-            if (self->transient_for != TRAN_GROUP) {/* transient of a window */
-                parent = self->transient_for;
-            } else { /* transient of a group */
-                GSList *it;
-
-                for (it = self->group->members; it; it = it->next)
-                    if (it->data != self &&
-                        ((Client*)it->data)->transient_for != TRAN_GROUP)
-                        parent = it->data;
-            }
-        }
-        /* note the check against Type_Normal, not client_normal(self), which
-           would also include dialog types. in this case we want more strict
-           rules for focus */
-        if ((config_focus_new &&
-             (self->type == Type_Normal ||
+        /* note the check against Type_Normal/Dialog, not client_normal(self),
+           which would also include other types. in this case we want more
+           strict rules for focus */
+        if (((self->type == Type_Normal ||
               (self->type == Type_Dialog &&
                (group_foc ||
-                (!parent && (!self->group ||
-                             !self->group->members->next)))))) ||
-            (parent && (client_focused(parent) ||
-                        client_search_focus_tree(parent)))) {
-            client_focus(self);
+                (!self->transient_for && (!self->group ||
+                                          !self->group->members->next)))))) ||
+            client_search_focus_tree_full(self) ||
+            !focus_client ||
+            !client_normal(focus_client)) {
+            /* activate the window */
+            stacking_add(CLIENT_AS_WINDOW(self));
+            activate = TRUE;
+        } else {
+            /* try to not get in the way */
+            stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
         }
+    } else {
+        stacking_add(CLIENT_AS_WINDOW(self));
     }
 
-    /* update the list hints */
-    client_set_list();
+    screen_update_struts();
 
     /* make sure the window is visible */
     client_move_onscreen(self);
+
+    dispatch_client(Event_Client_New, self, 0, 0);
+
+    client_showhide(self);
+
+    if (activate) client_activate(self);
+
+    /* update the list hints */
+    client_set_list();
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 

@@ -34,7 +34,7 @@ Popup *popup_new(gboolean hasicon)
     self->gravity = NorthWestGravity;
     self->x = self->y = self->w = self->h = 0;
     self->mapped = FALSE;
-    stacking_add(self);
+    stacking_add(INTERNAL_AS_WINDOW(self));
     stacking_raise(INTERNAL_AS_WINDOW(self));
     return self;
 }

@@ -7,6 +7,15 @@
 #include "timer.hh"
 #include "display.hh"
 
+#ifdef    HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+#else
+#  ifdef    HAVE_UNISTD_H
+#    include <sys/types.h>
+#    include <unistd.h>
+#  endif // HAVE_UNISTD_H
+#endif // HAVE_SYS_SELECT_H
+
 namespace otk {
 
 timeval Timer::_nearest_timeout, Timer::_now;

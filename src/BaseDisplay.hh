@@ -77,8 +77,10 @@ private:
   };
   BShape shape;
 
+#ifndef   NOCLOBBER
   unsigned int MaskList[8];
   size_t MaskListLength;
+#endif // NOCLOBBER
 
   enum RunState { STARTUP, RUNNING, SHUTDOWN };
   RunState run_state;

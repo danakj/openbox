@@ -239,6 +239,7 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   for (int i = 0; i < ScreenCount(display); ++i)
     screenInfoList.push_back(ScreenInfo(this, i));
 
+#ifndef   NOCLOBBER
   NumLockMask = ScrollLockMask = 0;
 
   const XModifierKeymap* const modmap = XGetModifierMapping(display);
@@ -276,6 +277,10 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   MaskListLength = sizeof(MaskList) / sizeof(MaskList[0]);
 
   if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
+#else  // NOCLOBBER
+  NumLockMask = 0;
+  ScrollLockMask = 0;
+#endif // NOCLOBBER
 
   gccache = 0;
 }
@@ -366,11 +371,16 @@ void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
                              unsigned int event_mask, int pointer_mode,
                              int keyboard_mode, Window confine_to,
                              Cursor cursor) const {
-  for (size_t cnt = 0; cnt < MaskListLength; ++cnt) {
+#ifndef   NOCLOBBER
+  for (size_t cnt = 0; cnt < MaskListLength; ++cnt)
     XGrabButton(display, button, modifiers | MaskList[cnt], grab_window,
                 owner_events, event_mask, pointer_mode, keyboard_mode,
                 confine_to, cursor);
-  }
+#else  // NOCLOBBER
+  XGrabButton(display, button, modifiers, grab_window,
+              owner_events, event_mask, pointer_mode, keyboard_mode,
+              confine_to, cursor);
+#endif // NOCLOBBER
 }
 
 /*
@@ -379,9 +389,12 @@ void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
  */
 void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
                                Window grab_window) const {
-  for (size_t cnt = 0; cnt < MaskListLength; ++cnt) {
+#ifndef   NOCLOBBER
+  for (size_t cnt = 0; cnt < MaskListLength; ++cnt)
     XUngrabButton(display, button, modifiers | MaskList[cnt], grab_window);
-  }
+#else  // NOCLOBBER
+  XUngrabButton(display, button, modifiers, grab_window);
+#endif // NOCLOBBER
 }
 
 

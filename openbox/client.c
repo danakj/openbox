@@ -1306,24 +1306,9 @@ void client_calc_layer(Client *self)
     gboolean fs;
     Client *c;
 
-    /* are we fullscreen, or do we have a fullscreen transient parent? */
-    c = self;
-    fs = FALSE;
-    while (c && c != TRAN_GROUP) { /* XXX do smthng with the TRAN_GROUP case?*/
-	if (c->fullscreen) {
-	    fs = TRUE;
-	    break;
-	}
-	c = c->transient_for;
-    }
-    if (!fs && self->fullscreen) {
-	/* is one of our transients focused? */
-	c = search_focus_tree(self, self);
-	if (c != NULL) fs = TRUE;
-    }
-  
     if (self->iconic) l = Layer_Icon;
-    else if (fs) l = Layer_Fullscreen;
+    /* fullscreen windows are only in the fullscreen layer while focused */
+    else if (self->fullscreen && focus_client == self) l = Layer_Fullscreen;
     else if (self->type == Type_Desktop) l = Layer_Desktop;
     else if (self->type == Type_Dock) {
 	if (!self->below) l = Layer_Top;

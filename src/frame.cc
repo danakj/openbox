@@ -73,6 +73,11 @@ void OBFrame::setStyle(otk::Style *style)
   assert(style);
 
   otk::OtkWidget::setStyle(style);
+  // don't let grips change textures when they are pressed
+  _grip_left.setPressedFocusTexture(_grip_left.getTexture());
+  _grip_left.setPressedUnfocusTexture(_grip_left.getUnfocusTexture());
+  _grip_right.setPressedFocusTexture(_grip_right.getTexture());
+  _grip_right.setPressedUnfocusTexture(_grip_right.getUnfocusTexture());
 
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
@@ -96,13 +101,6 @@ void OBFrame::setStyle(otk::Style *style)
   XSetWindowBorder(otk::OBDisplay::display, _handle.getWindow(),
                    _style->getBorderColor()->pixel());
   
-  // XXX: if (focused)
-    XSetWindowBackground(otk::OBDisplay::display, getWindow(),
-                         _style->getFrameFocus()->color().pixel());
-  // XXX: else  
-  // XXX:  XSetWindowBackground(otk::OBDisplay::display, _window,
-  // XXX:                       _style->getFrameUnfocus().color().pixel());
-
   // if !replace, then adjust() will get called after the client is grabbed!
   if (replace)
     adjust(); // size/position everything

@@ -111,7 +111,7 @@
   <dragThreshold>3</dragThreshold>
   <doubleClickTime>200</doubleClickTime>
 
-  <context name="frame">
+  <context name="Frame">
     <mousebind button="A-Left" action="Drag">
       <action name="Move"/>
     </mousebind>
@@ -143,7 +143,7 @@
       <action name="SendToDesktopPrevious"/>
     </mousebind>
   </context>
-  <context name="titlebar">
+  <context name="Titlebar">
     <mousebind button="Left" action="Drag">
       <action name="Move"/>
     </mousebind>
@@ -169,7 +169,7 @@
       <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
-  <context name="handle">
+  <context name="Handle">
     <mousebind button="Left" action="Drag">
       <action name="Move"/>
     </mousebind>
@@ -183,7 +183,7 @@
       <action name="Lower"/>
     </mousebind>
   </context>
-  <context name="blcorner">
+  <context name="BLCorner">
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
     </mousebind>
@@ -191,7 +191,7 @@
       <action name="Focus"/>
     </mousebind>
   </context>
-  <context name="brcorner">
+  <context name="BRCorner">
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
     </mousebind>
@@ -199,7 +199,7 @@
       <action name="Focus"/>
     </mousebind>
   </context>
-  <context name="tlcorner">
+  <context name="TLCorner">
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
     </mousebind>
@@ -207,7 +207,7 @@
       <action name="Focus"/>
     </mousebind>
   </context>
-  <context name="trcorner">
+  <context name="TRCorner">
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
     </mousebind>
@@ -215,7 +215,7 @@
       <action name="Focus"/>
     </mousebind>
   </context>
-  <context name="client">
+  <context name="Client">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
       <action name="Raise"/>
@@ -227,7 +227,7 @@
       <action name="Focus"/>
     </mousebind>
   </context>
-  <context name="icon">
+  <context name="Icon">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
@@ -241,7 +241,7 @@
       <action name="Close"/>
     </mousebind>
   </context>
-  <context name="alldesktops">
+  <context name="AllDesktops">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
@@ -249,7 +249,7 @@
       <action name="ToggleOmnipresent"/>
     </mousebind>
   </context>
-  <context name="shade">
+  <context name="Shade">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
@@ -257,7 +257,7 @@
       <action name="ToggleShade"/>
     </mousebind>
   </context>
-  <context name="iconify">
+  <context name="Iconify">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
@@ -265,7 +265,7 @@
       <action name="Iconify"/>
     </mousebind>
   </context>
-  <context name="maximize">
+  <context name="Maximize">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
@@ -285,7 +285,7 @@
       <action name="ToggleMaximizeHorz"/>
     </mousebind>
   </context>
-  <context name="close">
+  <context name="Close">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
@@ -293,17 +293,17 @@
       <action name="Close"/>
     </mousebind>
   </context>
-  <context name="desktop">
-    <mousebind button="Up" action="Click">
+  <context name="Desktop">
+    <mousebind button="Up" action="Press">
       <action name="DesktopNext"/>
     </mousebind>
-    <mousebind button="Down" action="Click">
+    <mousebind button="Down" action="Press">
       <action name="DesktopPrevious"/>
     </mousebind>
-    <mousebind button="A-Up" action="Click">
+    <mousebind button="A-Up" action="Press">
       <action name="DesktopNext"/>
     </mousebind>
-    <mousebind button="A-Down" action="Click">
+    <mousebind button="A-Down" action="Press">
       <action name="DesktopPrevious"/>
     </mousebind>
     <mousebind button="Left" action="Press">
@@ -314,6 +314,20 @@
     </mousebind> 
     <mousebind button="Right" action="Press">
       <action name="ShowMenu"><menu>root-menu</menu></action>
+    </mousebind>
+  </context>
+  <context name="MoveResize">
+    <mousebind button="Up" action="Press">
+      <action name="DesktopNext"/>
+    </mousebind>
+    <mousebind button="Down" action="Press">
+      <action name="DesktopPrevious"/>
+    </mousebind>
+    <mousebind button="A-Up" action="Press">
+      <action name="DesktopNext"/>
+    </mousebind>
+    <mousebind button="A-Down" action="Press">
+      <action name="DesktopPrevious"/>
     </mousebind>
   </context>
 </mouse>

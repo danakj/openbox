@@ -46,6 +46,7 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
     case OB_FRAME_CONTEXT_TITLEBAR:
     case OB_FRAME_CONTEXT_HANDLE:
     case OB_FRAME_CONTEXT_FRAME:
+    case OB_FRAME_CONTEXT_MOVE_RESIZE:
         break;
     case OB_FRAME_CONTEXT_BLCORNER:
     case OB_FRAME_CONTEXT_BRCORNER:
@@ -289,14 +290,11 @@ gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
         return FALSE;
     }
 
-    contextstr = g_ascii_strdown(contextstr, -1);
     context = frame_context_from_string(contextstr);
     if (!context) {
         g_warning("invalid context '%s'", contextstr);
-        g_free(contextstr);
         return FALSE;
     }
-    g_free(contextstr);
 
     for (it = bound_contexts[context]; it != NULL; it = it->next){
 	b = it->data;

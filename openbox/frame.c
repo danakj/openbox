@@ -5,6 +5,7 @@
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
+#include "moveresize.h"
 #include "render/theme.h"
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
@@ -629,42 +630,47 @@ static void layout_title(ObFrame *self)
 
 ObFrameContext frame_context_from_string(char *name)
 {
-    if (!g_ascii_strcasecmp("desktop", name))
+    if (!g_ascii_strcasecmp("Desktop", name))
         return OB_FRAME_CONTEXT_DESKTOP;
-    else if (!g_ascii_strcasecmp("client", name))
+    else if (!g_ascii_strcasecmp("Client", name))
         return OB_FRAME_CONTEXT_CLIENT;
-    else if (!g_ascii_strcasecmp("titlebar", name))
+    else if (!g_ascii_strcasecmp("Titlebar", name))
         return OB_FRAME_CONTEXT_TITLEBAR;
-    else if (!g_ascii_strcasecmp("handle", name))
+    else if (!g_ascii_strcasecmp("Handle", name))
         return OB_FRAME_CONTEXT_HANDLE;
-    else if (!g_ascii_strcasecmp("frame", name))
+    else if (!g_ascii_strcasecmp("Frame", name))
         return OB_FRAME_CONTEXT_FRAME;
-    else if (!g_ascii_strcasecmp("tlcorner", name))
+    else if (!g_ascii_strcasecmp("TLCorner", name))
         return OB_FRAME_CONTEXT_TLCORNER;
-    else if (!g_ascii_strcasecmp("trcorner", name))
+    else if (!g_ascii_strcasecmp("TRCorner", name))
         return OB_FRAME_CONTEXT_TRCORNER;
-    else if (!g_ascii_strcasecmp("blcorner", name))
+    else if (!g_ascii_strcasecmp("BLCorner", name))
         return OB_FRAME_CONTEXT_BLCORNER;
-    else if (!g_ascii_strcasecmp("brcorner", name))
+    else if (!g_ascii_strcasecmp("BRCorner", name))
         return OB_FRAME_CONTEXT_BRCORNER;
-    else if (!g_ascii_strcasecmp("maximize", name))
+    else if (!g_ascii_strcasecmp("Maximize", name))
         return OB_FRAME_CONTEXT_MAXIMIZE;
-    else if (!g_ascii_strcasecmp("alldesktops", name))
+    else if (!g_ascii_strcasecmp("AllDesktops", name))
         return OB_FRAME_CONTEXT_ALLDESKTOPS;
-    else if (!g_ascii_strcasecmp("shade", name))
+    else if (!g_ascii_strcasecmp("Shade", name))
         return OB_FRAME_CONTEXT_SHADE;
-    else if (!g_ascii_strcasecmp("iconify", name))
+    else if (!g_ascii_strcasecmp("Iconify", name))
         return OB_FRAME_CONTEXT_ICONIFY;
-    else if (!g_ascii_strcasecmp("icon", name))
+    else if (!g_ascii_strcasecmp("Icon", name))
         return OB_FRAME_CONTEXT_ICON;
-    else if (!g_ascii_strcasecmp("close", name))
+    else if (!g_ascii_strcasecmp("Close", name))
         return OB_FRAME_CONTEXT_CLOSE;
+    else if (!g_ascii_strcasecmp("MoveResize", name))
+        return OB_FRAME_CONTEXT_MOVE_RESIZE;
     return OB_FRAME_CONTEXT_NONE;
 }
 
 ObFrameContext frame_context(ObClient *client, Window win)
 {
     ObFrame *self;
+
+    if (moveresize_in_progress)
+        return OB_FRAME_CONTEXT_MOVE_RESIZE;
 
     if (win == RootWindow(ob_display, ob_screen))
         return OB_FRAME_CONTEXT_DESKTOP;

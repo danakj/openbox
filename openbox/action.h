@@ -29,6 +29,11 @@ struct ClientAction {
     struct _ObClient *c;
 };
 
+struct Activate {
+    struct _ObClient *c;
+    gboolean here; /* bring it to the current desktop */
+};
+
 struct MoveResizeRelative {
     struct _ObClient *c;
     int delta;
@@ -96,6 +101,7 @@ union ActionData {
     struct DirectionalAction diraction;
     struct Execute execute;
     struct ClientAction client;
+    struct Activate activate;
     struct MoveResizeRelative relative;
     struct SendToDesktop sendto;
     struct SendToDesktopDirection sendtodir;
@@ -135,7 +141,7 @@ void action_free(ObAction *a);
 
 /* Execute */
 void action_execute(union ActionData *data);
-/* ClientAction */
+/* ActivateAction */
 void action_activate(union ActionData *data);
 /* ClientAction */
 void action_focus(union ActionData *data);

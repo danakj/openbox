@@ -742,8 +742,8 @@ void action_execute(union ActionData *data)
 
 void action_activate(union ActionData *data)
 {
-    if (data->client.c)
-        client_activate(data->client.c);
+    if (data->activate.c)
+        client_activate(data->activate.c, data->activate.here);
 }
 
 void action_focus(union ActionData *data)
@@ -1219,7 +1219,7 @@ void action_directional_focus(union ActionData *data)
         return;
     if ((nf = client_find_directional(data->diraction.c,
                                       data->diraction.direction)))
-        client_activate(nf);
+        client_activate(nf, FALSE);
 }
 
 void action_movetoedge(union ActionData *data)

@@ -242,10 +242,8 @@ void shutdown()
 static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
-    /* XXX DONT USE THE DEFAULT SHIT */
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 DefaultDepth(ob_display, ob_screen), InputOutput,
-			 DefaultVisual(ob_display, ob_screen),
+			 render_depth, InputOutput, render_visual,
 			 mask, attrib);
                        
 }

@@ -7,6 +7,8 @@
 
 #include "kernel/frame.h"
 
+#include "render/theme.h"
+
 static char *PLUGIN_NAME = "client_menu";
 
 static Menu *send_to_menu;
@@ -45,14 +47,15 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
     g_assert(!self->invalid);
     g_assert(client);
     
-    newy = client->frame->area.y + client->frame->a_focused_title->area.height;
+    newy = client->frame->area.y + client->frame->a_focused_title->area.height
+        + theme_bwidth;
     
-    XMoveWindow(ob_display, self->frame, 
-		MIN(x, screen_physical_size.width - self->size.width), 
-		MIN(newy, screen_physical_size.height - self->size.height));
     POINT_SET(self->location, 
-	      MIN(x, screen_physical_size.width - self->size.width), 
-	      MIN(newy, screen_physical_size.height - self->size.height));
+	      MIN(x, screen_physical_size.width - self->size.width -
+                  theme_bwidth * 2), 
+	      MIN(newy, screen_physical_size.height - self->size.height -
+                  theme_bwidth * 2));
+    XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
 
     if (!self->shown) {
 	XMapWindow(ob_display, self->frame);

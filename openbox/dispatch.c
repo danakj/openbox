@@ -212,3 +212,30 @@ void dispatch_signal(int signal)
         f->h(&obe, f->data);
     }
 }
+
+void dispatch_move(Client *c, int *x, int *y)
+{
+    guint i;
+    EventType e = Event_Client_Moving;
+    GSList *it;
+    ObEvent obe;
+
+    obe.type = e;
+    obe.data.c.client = c;
+    obe.data.c.num[0] = *x;
+    obe.data.c.num[1] = *y;
+
+    i = 0;
+    while (e > 1) {
+        e >>= 1;
+        ++i;
+    }
+
+    for (it = funcs[i]; it != NULL; it = it->next) {
+        Func *f = it->data;
+        f->h(&obe, f->data);
+    }
+
+    *x = obe.data.c.num[0];
+    *y = obe.data.c.num[1];
+}

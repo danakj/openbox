@@ -25,14 +25,15 @@ typedef enum {
     Event_Client_Unfocus  = 1 << 13, /* unfocused */
     Event_Client_Urgent   = 1 << 14, /* entered/left urgent state */
     Event_Client_Desktop  = 1 << 15, /* moved to a new desktop */
+    Event_Client_Moving   = 1 << 16, /* being interactively moved */
 
-    Event_Ob_Desktop      = 1 << 16, /* changed desktops */
-    Event_Ob_NumDesktops  = 1 << 17, /* changed the number of desktops */
-    Event_Ob_ShowDesktop  = 1 << 18, /* entered/left show-the-desktop mode */
+    Event_Ob_Desktop      = 1 << 17, /* changed desktops */
+    Event_Ob_NumDesktops  = 1 << 18, /* changed the number of desktops */
+    Event_Ob_ShowDesktop  = 1 << 19, /* entered/left show-the-desktop mode */
 
-    Event_Signal          = 1 << 19, /* a signal from the OS */
+    Event_Signal          = 1 << 20, /* a signal from the OS */
 
-    EVENT_RANGE           = 1 << 20
+    EVENT_RANGE           = 1 << 21
 } EventType;
 
 typedef struct {
@@ -45,6 +46,7 @@ typedef struct {
     int num[2];
     /* Event_Client_Desktop: num[0] = new number, num[1] = old number
        Event_Client_Urgent: num[0] = urgent state
+       Event_Client_Moving: num[0] = dest x coord, num[1] = dest y coord
      */
 } EventData_Client;
 
@@ -82,5 +84,8 @@ void dispatch_x(XEvent *e, Client *c);
 void dispatch_client(EventType e, Client *c, int num0, int num1);
 void dispatch_ob(EventType e, int num0, int num1);
 void dispatch_signal(int signal);
+/* *x and *y should be set with the destination of the window, they may be
+   changed by the event handlers */
+void dispatch_move(Client *c, int *x, int *y);
 
 #endif

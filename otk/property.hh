@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef   __property_hh
-#define   __property_hh
+#ifndef   __atom_hh
+#define   __atom_hh
 
 /*! @file property.hh
   @brief Provides access to window properties
@@ -327,4 +327,4 @@ public:
 
 }
 
-#endif // __property_hh
+#endif // __atom_hh

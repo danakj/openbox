@@ -12,7 +12,7 @@ libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   property.cc imagecontrol.cc rect.cc screeninfo.cc \
                   texture.cc timer.cc timerqueuemanager.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
-                  button.cc eventhandler.cc eventdispatcher.cc \
+                  button.cc eventhandler.cc eventdispatcher.cc ustring.cc \
                   label.cc focuslabel.cc application.cc appwidget.cc
 #                  otk_wrap.cc
 

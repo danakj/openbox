@@ -4,7 +4,6 @@
 
 #include "focuswidget.hh"
 #include "font.hh"
-#include "userstring.hh"
 
 namespace otk {
 
@@ -15,8 +14,8 @@ public:
   FocusLabel(Widget *parent);
   ~FocusLabel();
 
-  inline const userstring &getText(void) const { return _text; }
-  void setText(const userstring &text) { _text = text; _dirty = true; }
+  inline const std::string &getText(void) const { return _text; }
+  void setText(const std::string &text) { _text = text; _dirty = true; }
 
   void update(void);
 
@@ -26,7 +25,7 @@ private:
   //! Object used by Xft to render to the drawable
   XftDraw *_xftdraw;
   //! Text displayed in the label
-  userstring _text;
+  std::string _text;
 };
 
 }

@@ -264,9 +264,10 @@ void OBClient::getState()
       if (state[i] == property->atom(otk::OBProperty::net_wm_state_modal))
         _modal = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_shaded))
+               property->atom(otk::OBProperty::net_wm_state_shaded)) {
         _shaded = true;
-      else if (state[i] ==
+        _wmstate = IconicState;
+      } else if (state[i] ==
                property->atom(otk::OBProperty::net_wm_state_skip_taskbar))
         _skip_taskbar = true;
       else if (state[i] ==
@@ -1120,13 +1121,13 @@ void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
     switch (e.detail) {
     case Below:
     case BottomIf:
-      // XXX: lower the window
+      Openbox::instance->screen(_screen)->restack(false, this); // lower
       break;
 
     case Above:
     case TopIf:
     default:
-      // XXX: raise the window
+      Openbox::instance->screen(_screen)->restack(true, this); // raise
       break;
     }
   }
@@ -1184,6 +1185,19 @@ void OBClient::reparentHandler(const XReparentEvent &e)
 
   // this deletes us etc
   Openbox::instance->screen(_screen)->unmanageWindow(this);
+}
+
+
+void OBClient::mapRequestHandler(const XMapRequestEvent &e)
+{
+  printf("\nMAP REQUEST\n\n");
+  
+  otk::OtkEventHandler::mapRequestHandler(e);
+
+  if (_shaded)
+    shade(false);
+  // XXX: uniconify the window
+  focus();
 }
 
 }

@@ -498,6 +498,7 @@ public:
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
   virtual void reparentHandler(const XReparentEvent &e);
+  virtual void mapRequestHandler(const XMapRequestEvent &e);
 #if defined(SHAPE)
   virtual void shapeHandler(const XShapeEvent &e);
 #endif // SHAPE 

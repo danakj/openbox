@@ -56,9 +56,8 @@ void Application::run(void)
 
   while (_appwidget_count > 0) {
     dispatchEvents();
-    if (_appwidget_count <= 0)
-      break;
-    Timer::dispatchTimers(); // fire pending events
+    if (_appwidget_count > 0)
+      Timer::dispatchTimers(); // fire pending events
   }
 }
 

@@ -3,10 +3,6 @@
 %module otk
 
 %{
-#ifdef HAVE_CONFIG_H
-#  include "../config.h"
-#endif
-
 #include "otk.hh"
 %}
 
@@ -73,7 +69,6 @@ namespace otk {
 %include "application.hh"
 %include "assassin.hh"
 %include "button.hh"
-//%include "configuration.hh"
 %include "display.hh"
 %include "rendercontrol.hh"
 %include "property.hh"

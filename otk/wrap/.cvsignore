@@ -1,0 +1,9 @@
+Makefile
+Makefile.in
+otk.py
+.deps
+.libs
+otkpy.la
+otkpy_la-wrap_otk.lo
+otkpy_la-wrap_otk.o
+wrap_otk.cc

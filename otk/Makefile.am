@@ -1,14 +1,11 @@
+SUBDIRS = wrap
+
 buttonsdir = $(pkgdatadir)/buttons
-scriptdir = $(libdir)/openbox/python
 includeotkdir = $(includedir)/otk
 pkgconfigdir = $(libdir)/pkgconfig
 
 CXXFLAGS=$(XFT_CFLAGS) @CXXFLAGS@ \
--DBUTTONSDIR=\"$(buttonsdir)\" -DSWIG_GLOBAL
-# -DSWIG_GLOBAL means we don't have to link libswigpy cuz libotk will export
-# everything it would
-
-#INCLUDES= -I../src
+-DBUTTONSDIR=\"$(buttonsdir)\"
 
 #noinst_LIBRARIES=libotk.a
 lib_LTLIBRARIES=libotk.la
@@ -20,8 +17,7 @@ libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
                   timer.cc \
                   util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc ustring.cc \
-                  label.cc focuslabel.cc application.cc appwidget.cc \
-                  otk_wrap.cc
+                  label.cc focuslabel.cc application.cc appwidget.cc
 includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
                    display.hh eventdispatcher.hh eventhandler.hh \
                    focuslabel.hh focuswidget.hh font.hh label.hh otk.hh \
@@ -30,15 +26,10 @@ includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
                    rendertexture.hh screeninfo.hh strut.hh surface.hh \
                    timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh \
                    ../config.h
-libotk_la_LDFLAGS = $(XFT_LIBS) @LIBS@
 
 MAINTAINERCLEANFILES= Makefile.in
 
 pkgconfig_DATA = otk.pc
-
-script_DATA = otk.py
-
-EXTRA_DIST = $(script_DATA)
 
 otk.pc: otk.pc.in
 	@regex_cmd@ -e "s,\@prefix\@,$(prefix)," \
@@ -53,13 +44,5 @@ otk_test: libotk.la otk_test.cc
 
 rendertest: libotk.la rendertest.cc
 	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o $@ rendertest.cc $(XFT_LIBS) -L. -lotk @LIBS@
-
-%.py: %_wrap.cc
-
-otk.i: $(wildcard *.hh)
-	touch $@
-
-%_wrap.cc: %.i
-	swig $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
 
 # local dependencies

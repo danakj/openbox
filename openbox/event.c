@@ -531,7 +531,6 @@ void event_enter_client(ObClient *client)
                                      config_focus_delay,
                                      focus_delay_func,
                                      client, NULL);
-            ob_debug("added focus timeout\n");
         } else
             focus_delay_func(client);
     }
@@ -1177,7 +1176,6 @@ static gboolean focus_delay_func(gpointer data)
 {
     ObClient *c = data;
 
-    ob_debug("focus timeout %d\n", focus_client != c);
     if (focus_client != c) {
         client_focus(c);
         if (config_focus_raise)

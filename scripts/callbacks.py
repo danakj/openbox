@@ -11,35 +11,45 @@ import ob
 import otk
 
 def state_above(data, add=2):
-    """Toggles, adds or removes the 'above' state on a window."""
+    """Toggles, adds or removes the 'above' state on a window.
+       The second paramater should one of: 0 - removes the state, 1 - adds the
+       state, 2 - toggles the state."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_above)
     
 def state_below(data, add=2):
-    """Toggles, adds or removes the 'below' state on a window."""
+    """Toggles, adds or removes the 'below' state on a window.
+       The second paramater should one of: 0 - removes the state, 1 - adds the
+       state, 2 - toggles the state."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_below)
     
 def state_shaded(data, add=2):
-    """Toggles, adds or removes the 'shaded' state on a window."""
+    """Toggles, adds or removes the 'shaded' state on a window.
+       The second paramater should one of: 0 - removes the state, 1 - adds the
+       state, 2 - toggles the state."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_shaded)
 
 def state_skip_taskbar(data, add=2):
-    """Toggles, adds or removes the 'skip_taskbar' state on a window."""
+    """Toggles, adds or removes the 'skip_taskbar' state on a window.
+       The second paramater should one of: 0 - removes the state, 1 - adds the
+       state, 2 - toggles the state."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_skip_taskbar)
     
 def state_skip_pager(data, add=2):
-    """Toggles, adds or removes the 'skip_pager' state on a window."""
+    """Toggles, adds or removes the 'skip_pager' state on a window.
+       The second paramater should one of: 0 - removes the state, 1 - adds the
+       state, 2 - toggles the state."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),

@@ -617,12 +617,12 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
     ObMenuEntryFrame *old = self->selected;
     ObMenuFrame *oldchild = self->child;
 
+    if (entry && entry->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
+        entry = old;
+
     if (old == entry) return;
 
-    if (entry && entry->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR)
-        self->selected = entry;
-    else
-        self->selected = NULL;
+    self->selected = entry;
 
     if (old)
         menu_entry_frame_render(old);

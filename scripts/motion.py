@@ -9,6 +9,9 @@
 EDGE_RESISTANCE = 10
 """The amount of resistance to provide to moving a window past a screen
    boundary. Specify a value of 0 to disable edge resistance."""
+POPUP_CENTERED = 1
+"""When this is non-zero, the coordinates popups will be centered on the
+   screen. When zero, they will appear in the upper-left corner."""
 MOVE_POPUP = 1
 """Display a coordinates popup when moving windows."""
 MOVE_RUBBERBAND = 0
@@ -146,11 +149,14 @@ def _do_move(final):
             _poplabel = otk.Label(_popwidget)
             _poplabel.setHighlighted(1)
         _poplabel.setText(text)
-        scsize = ob.openbox.screen(_screen).size()
+        if POPUP_CENTERED:
+            scsize = ob.openbox.screen(_screen).size()
+            x = (scsize.width() - size.width()) / 2
+            y = (scsize.height() - size.height()) / 2
+        else:
+            x = y = 0
         size = _poplabel.minSize()
-        _popwidget.moveresize(otk.Rect((scsize.width() - size.width()) / 2,
-                                       (scsize.height() - size.height()) / 2,
-                                       size.width(), size.height()))
+        _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
         _popwidget.show(1)
 
 def _move(data):
@@ -231,11 +237,14 @@ def _do_resize():
             _poplabel = otk.Label(_popwidget)
             _poplabel.setHighlighted(1)
         _poplabel.setText(text)
-        scsize = ob.openbox.screen(_screen).size()
+        if POPUP_CENTERED:
+            scsize = ob.openbox.screen(_screen).size()
+            x = (scsize.width() - size.width()) / 2
+            y = (scsize.height() - size.height()) / 2
+        else:
+            x = y = 0
         size = _poplabel.minSize()
-        _popwidget.moveresize(otk.Rect((scsize.width() - size.width()) / 2,
-                                       (scsize.height() - size.height()) / 2,
-                                       size.width(), size.height()))
+        _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
         _popwidget.show(1)
 
 def _resize(data):

@@ -857,7 +857,8 @@ static void client_get_state(ObClient *self)
 
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
-                if (c != self && !client_search_transient(self, c))
+                if (c != self && !client_search_transient(self, c) &&
+                    client_normal(self) == client_normal(c))
                 {
                     layer = MAX(layer,
                                 (c->above ? 1 : (c->below ? -1 : 0)));

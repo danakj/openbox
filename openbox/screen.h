@@ -70,4 +70,6 @@ Rect *screen_area(guint desktop);
 
 Rect *screen_area_monitor(guint desktop, guint head);
 
+gboolean screen_pointer_pos(int *x, int *y);
+
 #endif

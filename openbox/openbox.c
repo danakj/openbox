@@ -542,16 +542,6 @@ static void parse_args(int argc, char **argv)
     }
 }
 
-gboolean ob_pointer_pos(int *x, int *y)
-{
-    Window w;
-    int i;
-    guint u;
-
-    return !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
-                           &w, &w, x, y, &i, &i, &u);
-}
-
 #ifdef USE_SM
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast)

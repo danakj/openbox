@@ -38,7 +38,4 @@ Cursor ob_cursor(ObCursor cursor);
 
 KeyCode ob_keycode(ObKey key);
 
-/* cuz i have nowhere better to put it right now... */
-gboolean ob_pointer_pos(int *x, int *y);
-
 #endif

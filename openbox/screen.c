@@ -807,3 +807,13 @@ static void sn_event_func(SnMonitorEvent *ev, void *data)
         set_root_cursor();
 }
 #endif
+
+gboolean screen_pointer_pos(int *x, int *y)
+{
+    Window w;
+    int i;
+    guint u;
+
+    return !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
+                           &w, &w, x, y, &i, &i, &u);
+}

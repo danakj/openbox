@@ -111,7 +111,7 @@ static gboolean focus_under_pointer()
     int x, y;
     GList *it;
 
-    if (ob_pointer_pos(&x, &y)) {
+    if (screen_pointer_pos(&x, &y)) {
         for (it = stacking_list; it != NULL; it = it->next) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);

@@ -269,7 +269,7 @@ gboolean load()
 
     /* load the font, not from the theme file tho, its in themerc_font */
     s_winfont_shadow = 1; /* XXX read from themrc */
-    s_winfont_shadow_offset = 2; /* XXX read from themerc */
+    s_winfont_shadow_offset = 1; /* XXX read from themerc */
     s_winfont = font_open(themerc_font);
     s_winfont_height = font_height(s_winfont, s_winfont_shadow,
                                    s_winfont_shadow_offset);

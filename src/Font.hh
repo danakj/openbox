@@ -115,10 +115,10 @@ public:
   unsigned int height(void) const;
   unsigned int maxCharWidth(void) const;
 
-  unsigned int measureString(const std::string &string) const;
+  unsigned int measureString(const std::string &string, bool utf) const;
 
   void drawString(Drawable d, int x, int y, const BColor &color,
-                  const std::string &string) const;
+                  const std::string &string, bool utf) const;
 };
 
 #endif // __Font_hh

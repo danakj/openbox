@@ -83,7 +83,8 @@ struct WindowStyle {
   TextJustify justify;
 
   void doJustify(const std::string &text, int &start_pos,
-                 unsigned int max_length, unsigned int modifier) const;
+                 unsigned int max_length, unsigned int modifier,
+                 bool utf) const;
 };
 
 struct ToolbarStyle {
@@ -99,7 +100,8 @@ struct ToolbarStyle {
   TextJustify justify;
 
   void doJustify(const std::string &text, int &start_pos,
-                 unsigned int max_length, unsigned int modifier) const;
+                 unsigned int max_length, unsigned int modifier,
+                 bool utf) const;
 };
 
 struct MenuStyle {

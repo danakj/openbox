@@ -257,7 +257,8 @@ void Basemenu::update(void) {
   menu.title_h = style->t_font->height() + menu.bevel_w * 2;
 
   if (title_vis) {
-    menu.item_w = screen->getMenuStyle()->t_font->measureString(menu.label) +
+    menu.item_w = screen->getMenuStyle()->t_font->measureString(menu.label,
+                                                                false) +
       menu.bevel_w * 2;
   }  else {
     menu.item_w = 1;
@@ -266,7 +267,7 @@ void Basemenu::update(void) {
   unsigned int ii = 0;
   MenuItems::iterator it = menuitems.begin(), end = menuitems.end();
   for (; it != end; ++it) {
-    ii = screen->getMenuStyle()->f_font->measureString((*it)->l) +
+    ii = screen->getMenuStyle()->f_font->measureString((*it)->l, false) +
       (menu.bevel_w * 2) + (menu.item_h * 2);
 
     menu.item_w = ((menu.item_w < ii) ? ii : menu.item_w);
@@ -436,7 +437,7 @@ void Basemenu::redrawTitle(void) {
   unsigned int l;
   const MenuStyle* const style = screen->getMenuStyle();
 
-  l = style->t_font->measureString(text) + menu.bevel_w * 2;
+  l = style->t_font->measureString(text, false) + menu.bevel_w * 2;
 
   switch (screen->getMenuStyle()->t_justify) {
   case RightJustify:
@@ -454,7 +455,7 @@ void Basemenu::redrawTitle(void) {
 
   XClearWindow(display, menu.title);
   style->t_font->drawString(menu.title, dx, menu.bevel_w,
-                            style->t_text, text);
+                            style->t_text, text, false);
 }
 
 void Basemenu::drawSubmenu(int index) {
@@ -541,7 +542,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
     text_h = 0;
 
   if (text) {
-    text_w = screen->getMenuStyle()->f_font->measureString(text);
+    text_w = screen->getMenuStyle()->f_font->measureString(text, false);
     text_y = item_y + menu.bevel_w / 2;
 
     switch(screen->getMenuStyle()->f_justify) {
@@ -677,7 +678,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
                               (highlight ? style->h_text :
                                (item->isEnabled() ? style->f_text :
                                 style->d_text)),
-                              text);
+                              text, false);
   }
 
   if (dosel && item->submenu()) {

@@ -1158,18 +1158,21 @@ void BlackboxWindow::getWMName(void) {
                       XAtom::utf8, client.title) &&
       !client.title.empty()) {
     xatom->eraseValue(client.window, XAtom::net_wm_visible_name);
+    client.title_utf = true;
     return;
   }
   //fall through to using WM_NAME
   if (xatom->getValue(client.window, XAtom::wm_name, XAtom::ansi, client.title)
       && !client.title.empty()) {
     xatom->eraseValue(client.window, XAtom::net_wm_visible_name);
+    client.title_utf = false;
     return;
   }
   // fall back to an internal default
   client.title = i18n(WindowSet, WindowUnnamed, "Unnamed");
   xatom->setValue(client.window, XAtom::net_wm_visible_name, XAtom::utf8,
                   client.title);
+  client.title_utf = false;
 
 #ifdef DEBUG_WITH_ID
   // the 16 is the 8 chars of the debug text plus the number
@@ -1186,6 +1189,7 @@ void BlackboxWindow::getWMIconName(void) {
                       XAtom::utf8, client.icon_title) && 
       !client.icon_title.empty()) {
     xatom->eraseValue(client.window, XAtom::net_wm_visible_icon_name);
+    client.icon_title_utf = true;
     return;
   }
   //fall through to using WM_ICON_NAME
@@ -1193,12 +1197,14 @@ void BlackboxWindow::getWMIconName(void) {
                       client.icon_title) && 
       !client.icon_title.empty()) {
     xatom->eraseValue(client.window, XAtom::net_wm_visible_icon_name);
+    client.icon_title_utf = false;
     return;
   }
   // fall back to using the main name
   client.icon_title = client.title;
   xatom->setValue(client.window, XAtom::net_wm_visible_icon_name, XAtom::utf8,
                   client.icon_title);
+  client.icon_title_utf = client.title_utf;
 }
 
 
@@ -2613,11 +2619,12 @@ void BlackboxWindow::redrawLabel(void) const {
   WindowStyle *style = screen->getWindowStyle();
 
   int pos = frame.bevel_w * 2;
-  style->doJustify(client.title.c_str(), pos, frame.label_w, frame.bevel_w * 4);
+  style->doJustify(client.title.c_str(), pos, frame.label_w, frame.bevel_w * 4,
+                   client.title_utf);
   style->font->drawString(frame.label, pos, 1,
                           (flags.focused ? style->l_text_focus :
                            style->l_text_unfocus),
-                          client.title);
+                          client.title, client.title_utf);
 }
 
 
@@ -4292,12 +4299,12 @@ void BlackboxWindow::constrain(Corner anchor,
 
 void WindowStyle::doJustify(const std::string &text, int &start_pos,
                             unsigned int max_length,
-                            unsigned int modifier) const {
+                            unsigned int modifier, bool utf) const {
   size_t text_len = text.size();
   unsigned int length;
 
   do {
-    length = font->measureString(string(text, 0, text_len)) + modifier;
+    length = font->measureString(string(text, 0, text_len), utf) + modifier;
   } while (length > max_length && text_len-- > 0);
 
   switch (justify) {

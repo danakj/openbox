@@ -181,7 +181,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   const char *s =  i18n(ScreenSet, ScreenPositionLength,
                         "0: 0000 x 0: 0000");
-  geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
+  geom_w = resource.wstyle.font->measureString(s, false) +
+    resource.bevel_width * 2;
   geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
 
   XSetWindowAttributes attrib;
@@ -939,7 +940,8 @@ void BScreen::reconfigure(void) {
   const char *s = i18n(ScreenSet, ScreenPositionLength,
                        "0: 0000 x 0: 0000");
 
-  geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
+  geom_w = resource.wstyle.font->measureString(s, false) +
+    resource.bevel_width * 2;
   geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
 
   BTexture* texture = &(resource.wstyle.l_focus);
@@ -2433,7 +2435,7 @@ void BScreen::showPosition(int x, int y) {
   resource.wstyle.font->drawString(geom_window,
                                    resource.bevel_width, resource.bevel_width,
                                    resource.wstyle.l_text_focus,
-                                   label);
+                                   label, false);
 }
 
 
@@ -2458,7 +2460,7 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   resource.wstyle.font->drawString(geom_window,
                                    resource.bevel_width, resource.bevel_width,
                                    resource.wstyle.l_text_focus,
-                                   label);
+                                   label, false);
 }
 
 

@@ -363,7 +363,7 @@ void Toolbar::reconfigure(void) {
       // find the length of the rendered string and add room for two extra
       // characters to it.  This allows for variable width output of the fonts
       BFont *font = screen->getToolbarStyle()->font;
-      frame.clock_w = font->measureString(t) + font->maxCharWidth() * 2;
+      frame.clock_w = font->measureString(t, false) + font->maxCharWidth() * 2;
     }
   }
 #else // !HAVE_STRFTIME
@@ -377,7 +377,8 @@ void Toolbar::reconfigure(void) {
 
   for (unsigned int i = 0; i < screen->getWorkspaceCount(); i++) {
     const string& workspace_name = screen->getWorkspace(i)->getName();
-    width = screen->getToolbarStyle()->font->measureString(workspace_name);
+    width = screen->getToolbarStyle()->font->measureString(workspace_name,
+                                                           false);
     if (width > frame.workspace_label_w) frame.workspace_label_w = width;
   }
 
@@ -580,13 +581,13 @@ void Toolbar::checkClock(bool redraw, bool date) {
     ToolbarStyle *style = screen->getToolbarStyle();
 
     int pos = frame.bevel_w * 2; // this is modified by doJustify()
-    style->doJustify(t, pos, frame.clock_w, frame.bevel_w * 4);
+    style->doJustify(t, pos, frame.clock_w, frame.bevel_w * 4, false);
 
 #ifdef    XFT
     XClearWindow(display, frame.clock);
 #endif // XFT
 
-    style->font->drawString(frame.clock, pos, 1, style->c_text, t);
+    style->font->drawString(frame.clock, pos, 1, style->c_text, t, false);
   }
 }
 
@@ -608,11 +609,13 @@ void Toolbar::redrawWindowLabel(bool redraw) {
   if (foc->getScreen() != screen) return;
 
   const char *title = foc->getTitle();
+  bool utf = foc->getTitleUtf();
   ToolbarStyle *style = screen->getToolbarStyle();
 
   int pos = frame.bevel_w * 2; // modified by doJustify()
-  style->doJustify(title, pos, frame.window_label_w, frame.bevel_w * 4);
-  style->font->drawString(frame.window_label, pos, 1, style->w_text, title);
+  style->doJustify(title, pos, frame.window_label_w, frame.bevel_w * 4, utf);
+  style->font->drawString(frame.window_label, pos, 1, style->w_text, title,
+                          utf);
 }
 
 
@@ -630,8 +633,9 @@ void Toolbar::redrawWorkspaceLabel(bool redraw) {
 
   int pos = frame.bevel_w * 2;
   style->doJustify(name.c_str(), pos, frame.workspace_label_w,
-                   frame.bevel_w * 4);
-  style->font->drawString(frame.workspace_label, pos, 1, style->l_text, name);
+                   frame.bevel_w * 4, false);
+  style->font->drawString(frame.workspace_label, pos, 1, style->l_text, name,
+                          false);
 }
 
 
@@ -1012,14 +1016,15 @@ void Toolbar::keyPressEvent(const XKeyEvent *ke) {
       XClearWindow(display, frame.workspace_label);
       unsigned int tw, x;
 
-      tw = screen->getToolbarStyle()->font->measureString(new_workspace_name);
+      tw = screen->getToolbarStyle()->font->measureString(new_workspace_name,
+                                                          false);
       x = (frame.workspace_label_w - tw) / 2;
 
       if (x < frame.bevel_w) x = frame.bevel_w;
 
       ToolbarStyle *style = screen->getToolbarStyle();
       style->font->drawString(frame.workspace_label, x, 1, style->l_text,
-                              new_workspace_name);
+                              new_workspace_name, false);
       BPen pen(style->l_text);
       XDrawRectangle(display, frame.workspace_label, pen.gc(), x + tw, 0, 1,
                      frame.label_h - 1);
@@ -1212,12 +1217,13 @@ void Toolbarmenu::Placementmenu::itemSelected(int button, unsigned int index) {
 
 void ToolbarStyle::doJustify(const std::string &text, int &start_pos,
                              unsigned int max_length,
-                             unsigned int modifier) const {
+                             unsigned int modifier, bool utf) const {
   size_t text_len = text.size();
   unsigned int length;
 
   do {
-    length = font->measureString(string(text, 0, text_len)) + modifier;
+    length = font->measureString(string(text, 0, text_len), utf) +
+      modifier;
   } while (length > max_length && text_len-- > 0);
 
   switch (justify) {

@@ -253,7 +253,7 @@ bool BFont::parseXlfd(const string &xlfd) {
 
 
 void BFont::drawString(Drawable d, int x, int y, const BColor &color,
-                       const string &string) const {
+                       const string &string, bool utf) const {
   assert(_valid);
 
 #ifdef    XFT
@@ -278,15 +278,18 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
         c.pixel = WhitePixel(_display, _screen->getScreenNumber());
       }
 
-#ifdef XFT_UTF8
-      XftDrawStringUtf8(
-#else
-      XftDrawString8(
-#endif
-                     draw, &c, _xftfont, x + _offset, 
-                     _xftfont->ascent + y + _offset,
-                     (XftChar8 *) string.c_str(), 
-                     string.size());
+//#ifdef XFT_UTF8
+      if (utf)
+        XftDrawStringUtf8(draw, &c, _xftfont, x + _offset, 
+                          _xftfont->ascent + y + _offset,
+                          (XftChar8 *) string.c_str(), 
+                          string.size());
+      else
+//#endif
+        XftDrawString8(draw, &c, _xftfont, x + _offset, 
+                       _xftfont->ascent + y + _offset,
+                       (XftChar8 *) string.c_str(), 
+                       string.size());
     }
     
     XftColor c;
@@ -296,13 +299,14 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
     c.pixel = color.pixel();
     c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
 
-#ifdef XFT_UTF8
-    XftDrawStringUtf8(
-#else
-    XftDrawString8(
-#endif
-                   draw, &c, _xftfont, x, _xftfont->ascent + y,
-                   (XftChar8 *) string.c_str(), string.size());
+//#ifdef XFT_UTF8
+    if (utf)
+      XftDrawStringUtf8(draw, &c, _xftfont, x, _xftfont->ascent + y,
+                        (XftChar8 *) string.c_str(), string.size());
+    else
+//#endif
+      XftDrawString8(draw, &c, _xftfont, x, _xftfont->ascent + y,
+                     (XftChar8 *) string.c_str(), string.size());
 
     XftDrawDestroy(draw);
     return;
@@ -322,20 +326,21 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
 }
 
 
-unsigned int BFont::measureString(const string &string) const {
+unsigned int BFont::measureString(const string &string, bool utf) const {
   assert(_valid);
 
 #ifdef    XFT
   if (_xftfont) {
     XGlyphInfo info;
 
-#ifdef XFT_UTF8
-    XftTextExtentsUtf8(
-#else
-    XftTextExtents8(
-#endif
-                    _display, _xftfont, (XftChar8 *) string.c_str(),
-                    string.size(), &info);
+//#ifdef XFT_UTF8
+    if (utf)
+      XftTextExtentsUtf8(_display, _xftfont, (XftChar8 *) string.c_str(),
+                         string.size(), &info);
+    else
+//#endif
+      XftTextExtents8(_display, _xftfont, (XftChar8 *) string.c_str(),
+                      string.size(), &info);
 
     return info.xOff + (_shadow ? std::abs(_offset) : 0);
   }

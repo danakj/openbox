@@ -167,6 +167,7 @@ private:
     BlackboxWindowList transientList; // which windows are our transients?
 
     std::string title, icon_title;
+    bool title_utf, icon_title_utf;
 
     Rect rect;
     Strut strut;
@@ -355,10 +356,11 @@ public:
 
   inline Windowmenu * getWindowmenu(void) const { return windowmenu; }
 
-  inline const char *getTitle(void) const
-  { return client.title.c_str(); }
+  inline const char *getTitle(void) const { return client.title.c_str(); }
+  inline bool getTitleUtf(void) const { return client.title_utf; }
   inline const char *getIconTitle(void) const
-  { return client.icon_title.c_str(); }
+    { return client.icon_title.c_str(); }
+  inline bool getIconTitleUtf(void) const { return client.icon_title_utf; }
 
   inline unsigned int getWorkspaceNumber(void) const
   { return blackbox_attrib.workspace; }

@@ -51,6 +51,9 @@
 #ifdef HAVE_SIGNAL_H
 #  include <signal.h>
 #endif
+#ifdef XKB
+#  include <X11/XKBlib.h>
+#endif
 
 #ifdef USE_SM
 #include <X11/ICE/ICElib.h>
@@ -259,6 +262,9 @@ static void event_set_lasttime(XEvent *e)
 
 static void event_hack_mods(XEvent *e)
 {
+#ifdef XKB
+    XkbStateRec xkb_state;
+#endif
     KeyCode *kp;
     gint i, k;
 
@@ -274,6 +280,12 @@ static void event_hack_mods(XEvent *e)
         STRIP_MODS(e->xkey.state);
         /* remove from the state the mask of the modifier being released, if
            it is a modifier key being released (this is a little ugly..) */
+#ifdef XKB
+        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success) {
+            e->xkey.state = xkb_state.compat_state;
+            break;
+        }
+#endif
         kp = modmap->modifiermap;
         for (i = 0; i < mask_table_size; ++i) {
             for (k = 0; k < modmap->max_keypermod; ++k) {

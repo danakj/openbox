@@ -27,6 +27,7 @@
 #include <vector>
 
 class XDisplay;
+class XScreen;
 
 class XAtom {
   typedef std::vector<Window> SupportWindows;
@@ -46,7 +47,7 @@ class XAtom {
     motif_wm_hints,
     openbox_attributes,
     openbox_change_attributes,
-    openbox_hints;
+    openbox_hints,
 
     // blackbox-protocol atoms (wm -> client)
     openbox_structure_messages,
@@ -57,7 +58,7 @@ class XAtom {
     openbox_notify_current_workspace,
     openbox_notify_workspace_count,
     openbox_notify_window_raise,
-    openbox_notify_window_lower;
+    openbox_notify_window_lower,
     // blackbox-protocol atoms (client -> wm)
     openbox_change_workspace,
     openbox_change_window_focus,
@@ -95,10 +96,10 @@ class XAtom {
     net_wm_ping;
 
   Atom getAtom(const char *name) const;
-  void setSupported(const XScreen *screen) const;
+  void setSupported(const XScreen *screen);
 
-  void setValue(Window win, Atom atom, Atom type, unsigned char *data, int size,
-                int nelements, bool append);
+  void setValue(Window win, Atom atom, Atom type, unsigned char *data,
+                int size, int nelements, bool append) const;
   bool getValue(Window win, Atom atom, Atom type, unsigned long *nelements,
                 unsigned char **value, int size) const;
 
@@ -107,34 +108,34 @@ class XAtom {
   XAtom& operator=(const XAtom&);
 
 public:
-  XAtom(XDisplay *display);
+  XAtom(const XDisplay *display);
   virtual ~XAtom();
 
-  void setValue(Window win, Atom atom, long value) const; // a 32-bit CARDINAL
-  void setValue(Window win, Atom atom, Atom value) const;
-  void setValue(Window win, Atom atom, Window value) const;
-  void setValue(Window win, Atom atom, Pixmap value) const;
-  void setValue(Window win, Atom atom, std::string &value) const;
+  void setCardValue(Window win, Atom atom, long value) const; // 32-bit CARDINAL
+  void setAtomValue(Window win, Atom atom, Atom value) const;
+  void setWindowValue(Window win, Atom atom, Window value) const;
+  void setPixmapValue(Window win, Atom atom, Pixmap value) const;
+  void setStringValue(Window win, Atom atom, std::string &value) const;
   
-  void addValue(Window win, Atom atom, long value) const; // a 32-bit CARDINAL
-  void addValue(Window win, Atom atom, Atom value) const;
-  void addValue(Window win, Atom atom, Window value) const;
-  void addValue(Window win, Atom atom, Pixmap value) const;
-  void addValue(Window win, Atom atom, std::string &value) const;
+  void addCardValue(Window win, Atom atom, long value) const; // 32-bit CARDINAL
+  void addAtomValue(Window win, Atom atom, Atom value) const;
+  void addWindowValue(Window win, Atom atom, Window value) const;
+  void addPixmapValue(Window win, Atom atom, Pixmap value) const;
+  void addStringValue(Window win, Atom atom, std::string &value) const;
 
   // the 'value' is allocated inside the function and
   // delete [] value needs to be called when you are done with it.
   // teh 'value' array returned is null terminated, and has 'nelements'
   // elements in it plus the null.
-  bool getValue(Window win, Atom atom, unsigned long *nelements,
-                long **value) const; // a 32-bit CARDINAL
-  bool getValue(Window win, Atom atom, unsigned long *nelements,
+  bool getCardValue(Window win, Atom atom, unsigned long *nelements,
+                long **value) const; // 32-bit CARDINAL
+  bool getAtomValue(Window win, Atom atom, unsigned long *nelements,
                 Atom **value) const;
-  bool getValue(Window win, Atom atom, unsigned long *nelements,
+  bool getWindowValue(Window win, Atom atom, unsigned long *nelements,
                 Window **value) const;
-  bool getValue(Window win, Atom atom, unsigned long *nelements,
+  bool getPixmapValue(Window win, Atom atom, unsigned long *nelements,
                 Pixmap **value) const;
-  bool getValue(Window win, Atom atom, unsigned long *nelements,
+  bool getStringValue(Window win, Atom atom, unsigned long *nelements,
                 std::string &value) const; 
   
   void eraseValue(Window win, Atom atom) const;

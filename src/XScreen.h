@@ -23,8 +23,9 @@
 #define   __XScreen_h
 
 #include <X11/Xlib.h>
+#include "Geometry.h"
 
-class Size;
+class XDisplay;
 
 class XScreen {
 private:
@@ -33,7 +34,7 @@ private:
   Visual         *_visual;
   Window          _root;
   Colormap        _colormap;
-  unsigned int    _depth;
+  int             _depth;
   Size            _size;
 
   void setColorData();
@@ -43,7 +44,8 @@ private:
   XScreen& operator=(const XScreen&);
 
 public:
-  XScreen(const Display *display, const unsigned int number);
+  XScreen(const XDisplay *display, const unsigned int number);
+  virtual ~XScreen();
 
   inline Visual *visual() const { return _visual; }
   inline Window rootWindow() const { return _root; }

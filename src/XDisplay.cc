@@ -19,7 +19,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#include "Xdisplay.h"
+#ifdef HAVE_CONFIG_H
+# include "../config.h"
+#endif
+
+#ifdef HAVE_UNNISTD_H
+# include <unistd.h>
+#endif
+
+#ifdef HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
+#ifdef SHAPE
+# include <X11/extensions/shape.h>
+#endif
+
+#include "XDisplay.h"
 #include "XScreen.h"
 #include "Util.h"
 #include <iostream>
@@ -27,16 +43,22 @@
 
 using std::cerr;
 
-Xdisplay::Xdisplay(const char *dpyname) {
+int XDisplay::XErrorHandler(Display *d, XErrorEvent *e) {
+  d=d;e=e;
+  return 0;
+}
+
+
+XDisplay::XDisplay(const char *dpyname) {
   _grabs = 0;
   _hasshape = false;
   
-  _display = XOpenDisplay(dpy_name);
+  _display = XOpenDisplay(dpyname);
   if (_display == NULL) {
     cerr << "Could not open display. Connection to X server failed.\n";
     ::exit(2);
   }
-  if (-1 == fcntl(ConnectionNumber(display), F_SETFD, 1)) {
+  if (-1 == fcntl(ConnectionNumber(_display), F_SETFD, 1)) {
     cerr << "Could not mark display connection as close-on-exec.\n";
     ::exit(2);
   }
@@ -52,11 +74,11 @@ Xdisplay::Xdisplay(const char *dpyname) {
   const unsigned int scount = ScreenCount(_display);
   _screens.reserve(scount);
   for (unsigned int s = 0; s < scount; s++)
-    _screens.push_back(new XScreen(_display, s));
+    _screens.push_back(new XScreen(this, s));
 }
 
 
-Xdisplay::~Xdisplay() {
+XDisplay::~XDisplay() {
   std::for_each(_screens.begin(), _screens.end(), PointerAssassin());
   XCloseDisplay(_display);
 }
@@ -65,7 +87,7 @@ Xdisplay::~Xdisplay() {
 /*
  * Return information about a screen.
  */
-XScreen *Xdisplay::screen(unsigned int s) const {
+XScreen *XDisplay::screen(unsigned int s) const {
   ASSERT(s < _screens.size());
   return _screens[s];
 }

@@ -25,10 +25,12 @@
 #include <X11/Xlib.h>
 #include <string>
 #include <vector>
+#include "XAtom.h"
+#include "XScreen.h"
 
-class Xdisplay {
-  friend XAtom::XAtom();
-  //friend class XAtom;
+class XDisplay {
+  friend XAtom::XAtom(const XDisplay *);
+  friend XScreen::XScreen(const XDisplay *, const unsigned int);
 
 private:
   Display       *_display;
@@ -40,7 +42,7 @@ private:
   typedef std::vector<XScreen*> XScreenList;
   XScreenList    _screens;
  
-  int XErrorHandler(Display *d, XErrorEvent *e);
+  static int XErrorHandler(Display *d, XErrorEvent *e);
 
   // no copying!!
   XDisplay(const XDisplay &);
@@ -50,18 +52,18 @@ protected:
   virtual void process_event(XEvent *) = 0;
 
 public:
-  Xdisplay(const char *dpyname = 0);
-  virtual ~Xdisplay();
+  XDisplay(const char *dpyname = 0);
+  virtual ~XDisplay();
 
   XScreen *screen(unsigned int s) const;
   inline unsigned int screenCount() const { return _screens.size(); }
   
   inline bool hasShape() const { return _hasshape; }
-  inline int shapeEventBase() const { return shape.event_basep; }
+  inline int shapeEventBase() const { return _shape_event_base; }
 
   //inline Display *display() const { return _display; }
 
-  inline std::string name() const { return name; }
+  inline std::string name() const { return _name; }
 
   // these belong in Xwindow
   //const bool validateWindow(Window);

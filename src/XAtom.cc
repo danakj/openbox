@@ -21,8 +21,10 @@
 
 #include "XAtom.h"
 #include "XDisplay.h"
+#include "XScreen.h"
+#include "Util.h"
 
-XAtom::XAtom(XDisplay *display) {
+XAtom::XAtom(const XDisplay *display) {
   _display = display->_display;
 
   wm_colormap_windows = getAtom("WM_COLORMAP_WINDOWS");
@@ -30,7 +32,7 @@ XAtom::XAtom(XDisplay *display) {
   wm_state = getAtom("WM_STATE");
   wm_change_state = getAtom("WM_CHANGE_STATE");
   wm_delete_window = getAtom("WM_DELETE_WINDOW");
-  wm_take_focus = getAtom("WM_TAKE_FOCUS")
+  wm_take_focus = getAtom("WM_TAKE_FOCUS");
   motif_wm_hints = getAtom("_MOTIF_WM_HINTS");
   openbox_hints = getAtom("_BLACKBOX_HINTS");
   openbox_attributes = getAtom("_BLACKBOX_ATTRIBUTES");
@@ -90,9 +92,10 @@ XAtom::XAtom(XDisplay *display) {
  */
 XAtom::~XAtom() {
   while (!_support_windows.empty()) {
-    Window w = _support_windows.pop_back();
-    ASSERT(w != None);  // make sure we aren't fucking with this somewhere
-    XDestroyWindow(_display, w);
+    // make sure we aren't fucking with this somewhere
+    ASSERT(_support_windows.back() != None);
+    XDestroyWindow(_display, _support_windows.back());
+    _support_windows.pop_back();
   }
 }
 
@@ -111,7 +114,7 @@ Atom XAtom::getAtom(const char *name) const {
 void XAtom::setSupported(const XScreen *screen) {
   // create the netwm support window
   Window w = XCreateSimpleWindow(_display, screen->rootWindow(),
-                                 0, 0, 1, 1, 0, 0, 0)
+                                 0, 0, 1, 1, 0, 0, 0);
   ASSERT(w != None);
   _support_windows.push_back(w);
   
@@ -125,7 +128,7 @@ void XAtom::setSupported(const XScreen *screen) {
  * value.
  */
 void XAtom::setValue(Window win, Atom atom, Atom type, unsigned char* data,
-                     int size, int nelements, bool append) {
+                     int size, int nelements, bool append) const {
   ASSERT(win != None); ASSERT(atom != None); ASSERT(type != None);
   ASSERT(data != (unsigned char *) 0);
   ASSERT(size == 8 || size == 16 || size == 32);
@@ -139,44 +142,46 @@ void XAtom::setValue(Window win, Atom atom, Atom type, unsigned char* data,
 /*
  * Set a 32-bit CARDINAL property value on a window.
  */
-void XAtom::setValue(Window win, Atom atom, long value) const {
-  setValue(win, atom, XA_CARDINAL, static_cast<unsigned char*>(&value),
-           sizeof(long), 1, false);
+void XAtom::setCardValue(Window win, Atom atom, long value) const {
+  setValue(win, atom, XA_CARDINAL, reinterpret_cast<unsigned char*>(&value),
+           32, 1, false);
 }
 
 
 /*
  * Set an Atom property value on a window.
  */
-void XAtom::setValue(Window win, Atom atom, Atom value) {
-  setValue(win, atom, XA_ATOM, static_cast<unsigned char*>(&value),
-           sizeof(Atom), 1, false);
+void XAtom::setAtomValue(Window win, Atom atom, Atom value) const {
+  setValue(win, atom, XA_ATOM, reinterpret_cast<unsigned char*>(&value),
+           32, 1, false);
 }
 
 
 /*
  * Set a Window property value on a window.
  */
-void XAtom::setValue(Window win, Atom atom, Window value) {
-  setValue(win, atom, XA_WINDOW, static_cast<unsigned char*>(&value),
-           sizeof(Window), 1, false);
+void XAtom::setWindowValue(Window win, Atom atom, Window value) const {
+  setValue(win, atom, XA_WINDOW, reinterpret_cast<unsigned char*>(&value),
+           32, 1, false);
 }
 
 
 /*
  * Set a Pixmap property value on a window.
  */
-void XAtom::setValue(Window win, Atom atom, Pixmap value) {
-  setValue(win, atom, XA_PIXMAP, static_cast<unsigned char*>(&value),
-           sizeof(Pixmap), 1, false);
+void XAtom::setPixmapValue(Window win, Atom atom, Pixmap value) const {
+  setValue(win, atom, XA_PIXMAP, reinterpret_cast<unsigned char*>(&value),
+           32, 1, false);
 }
 
 
 /*
  * Set a string property value on a window.
  */
-void XAtom::setValue(Window win, Atom atom, std::string &value) {
-  setValue(win, atom, XA_STRING, static_cast<unsigned char*>(value.c_str()),
+void XAtom::setStringValue(Window win, Atom atom, std::string &value) const {
+  setValue(win, atom, XA_STRING,
+           const_cast<unsigned char*>
+           (reinterpret_cast<const unsigned char*>(value.c_str())),
            8, value.size(), false);
 }
 
@@ -184,44 +189,47 @@ void XAtom::setValue(Window win, Atom atom, std::string &value) {
 /*
  * Add elements to a 32-bit CARDINAL property value on a window.
  */
-void XAtom::addValue(Window win, Atom atom, long value) const {
-  setValue(win, atom, XA_CARDINAL, static_cast<unsigned char*>(&value),
-           sizeof(long), 1, true);
+void XAtom::addCardValue(Window win, Atom atom, long value) const {
+  setValue(win, atom, XA_CARDINAL, reinterpret_cast<unsigned char*>(&value),
+           32, 1, true);
 }
 
 
 /*
  * Add elements to an Atom property value on a window.
  */
-void XAtom::addValue(Window win, Atom atom, Atom value) const {
-  setValue(win, atom, XA_ATOM, static_cast<unsigned char*>(&value),
-           sizeof(Atom), 1, true);
+void XAtom::addAtomValue(Window win, Atom atom, Atom value) const {
+  setValue(win, atom, XA_ATOM, reinterpret_cast<unsigned char*>(&value),
+           32, 1, true);
 }
 
 
 /*
  * Add elements to a Window property value on a window.
  */
-void XAtom::addValue(Window win, Atom atom, Window value) const {
-  setValue(win, atom, XA_WINDOW, static_cast<unsigned char*>(&value),
-           sizeof(Window), 1, true);
+void XAtom::addWindowValue(Window win, Atom atom, Window value) const {
+  setValue(win, atom, XA_WINDOW, reinterpret_cast<unsigned char*>(&value),
+           32, 1, true);
 }
 
 
 /*
  * Add elements to a Pixmap property value on a window.
  */
-void XAtom::addValue(Window win, Atom atom, Pixmap value) const {
-  setValue(win, atom, XA_PIXMAP, static_cast<unsigned char*>(&value),
-           sizeof(Pixmap), 1, true);
+void XAtom::addPixmapValue(Window win, Atom atom, Pixmap value) const {
+  setValue(win, atom, XA_PIXMAP, reinterpret_cast<unsigned char*>(&value),
+           32, 1, true);
 }
 
 
 /*
  * Add characters to a string property value on a window.
  */
-void XAtom::addValue(Window win, Atom atom, std::string &value) const {
-  setValue(win, atom, XA_STRING, static_cast<unsigned char*>(value.c_str()),
+void XAtom::addStringValue(Window win, Atom atom, std::string &value) const {
+  setValue(win, atom, XA_STRING,
+           const_cast<unsigned char*>
+           (reinterpret_cast<const unsigned char *>
+            (value.c_str())),
            8, value.size(), true);
 } 
 
@@ -276,52 +284,52 @@ bool XAtom::getValue(Window win, Atom atom, Atom type, unsigned long *nelements,
 /*
  * Gets a 32-bit Cardinal property's value from a window.
  */
-bool XAtom::getValue(Window win, Atom atom, unsigned long *nelements,
+bool XAtom::getCardValue(Window win, Atom atom, unsigned long *nelements,
                      long **value) const {
   return XAtom::getValue(win, atom, XA_CARDINAL, nelements,
-                  static_cast<unsigned char **>(value), sizeof(long));
+                  reinterpret_cast<unsigned char **>(value), 32);
 }
 
 
 /*
  * Gets an Atom property's value from a window.
  */
-bool XAtom::getValue(Window win, Atom atom, unsigned long *nelements,
+bool XAtom::getAtomValue(Window win, Atom atom, unsigned long *nelements,
                      Atom **value) const {
   return XAtom::getValue(win, atom, XA_ATOM, nelements,
-                  static_cast<unsigned char **>(value), sizeof(Atom));
+                  reinterpret_cast<unsigned char **>(value), 32);
 }
 
 
 /*
  * Gets an Window property's value from a window.
  */
-bool XAtom::getValue(Window win, Atom atom, unsigned long *nelements,
+bool XAtom::getWindowValue(Window win, Atom atom, unsigned long *nelements,
                      Window **value) const {
   return XAtom::getValue(win, atom, XA_WINDOW, nelements,
-                  static_cast<unsigned char **>(value), sizeof(Window));
+                  reinterpret_cast<unsigned char **>(value), 32);
 }
 
 
 /*
  * Gets an Pixmap property's value from a window.
  */
-bool XAtom::getValue(Window win, Atom atom, unsigned long *nelements,
+bool XAtom::getPixmapValue(Window win, Atom atom, unsigned long *nelements,
                      Pixmap **value) const {
   return XAtom::getValue(win, atom, XA_PIXMAP, nelements,
-                  static_cast<unsigned char **>(value), sizeof(Pixmap));
+                  reinterpret_cast<unsigned char **>(value), 32);
 }
 
 
 /*
  * Gets an string property's value from a window.
  */
-bool XAtom::getValue(Window win, Atom atom, unsigned long *nelements,
+bool XAtom::getStringValue(Window win, Atom atom, unsigned long *nelements,
                      std::string &value) const {
   unsigned char *data;
   bool ret = XAtom::getValue(win, atom, XA_STRING, nelements, &data, 8);
   if (ret)
-    value = data;
+    value = reinterpret_cast<char*>(data);
   return ret;
 }
 

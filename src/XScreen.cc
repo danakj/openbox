@@ -19,11 +19,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#include <X11/Xutil.h>
 #include "XScreen.h"
+#include "XDisplay.h"
 #include "Geometry.h"
 
-XScreen::XScreen(const Display *display, const unsigned int number) {
-  _display = display;
+XScreen::XScreen(const XDisplay *display, const unsigned int number) {
+  _display = display->_display;
   _number = number;
 
   _root = RootWindow(_display, _number);
@@ -33,6 +35,10 @@ XScreen::XScreen(const Display *display, const unsigned int number) {
 }
 
 
+XScreen::~XScreen() {
+}
+
+  
 /*
  * This sets up the _depth, _visual, and _colormap properties.
  */
@@ -58,7 +64,7 @@ void XScreen::setColorData() {
       }
     XFree(vinfo_return);
   }
-  if (visual)
+  if (_visual)
     _colormap = XCreateColormap(_display, _root, _visual, AllocNone);
   else {
     _visual = DefaultVisual(_display, _number);

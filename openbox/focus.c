@@ -196,8 +196,6 @@ void focus_fallback(ObFocusFallbackType type)
                     trans = TRUE;
             }
 
-            g_message("trans %d", trans);
-
             /* try for transient relations */
             if (trans) {
                 if (old->transient_for == OB_TRAN_GROUP) {

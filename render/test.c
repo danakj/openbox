@@ -57,7 +57,7 @@ int main()
 	look->surface.data.planar.primary = color_parse("Black");
         look->surface.data.planar.interlaced = FALSE;
         look->area.x = 0;
-        look->area.x = 0;
+        look->area.y = 0;
         look->area.width = 500;
         look->area.height = 500;
 	if (ob_display == NULL) {

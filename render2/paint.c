@@ -3,55 +3,75 @@
 #include "instance.h"
 #include "debug.h"
 #include <assert.h>
+#include <stdlib.h>
 #include <GL/glx.h>
+
+struct ExposeArea {
+    struct RrSurface *sur;
+    int x;
+    int y;
+    int w;
+    int h;
+};
+
+#define MERGE_AREA(a, x, y, w, h) \
+            a->w = MAX(a->x + a->w - 1, x + w - 1) - MIN(a->x, x), \
+            a->h = MAX(a->y + a->h - 1, y + h - 1) - MIN(a->x, x), \
+            a->x = MIN(a->x, x), \
+            a->y = MIN(a->y, y)
+
 
 void RrExpose(struct RrInstance *inst, XEvent *e)
 {
     XEvent e2;
-    GSList *tops = NULL, *it;
+    GSList *tops = NULL, *it, *n;
     struct RrSurface *sur;
+    int x, y, w, h;
 
     XPutBackEvent(RrDisplay(inst), e);
     while (XCheckTypedEvent(RrDisplay(inst), Expose, &e2)) {
         if ((sur = RrInstaceLookupSurface(inst, e2.xexpose.window))) {
-            while (sur->parent) sur = sur->parent;
-            if (!g_slist_find(tops, sur))
-                tops = g_slist_append(tops, sur);
+            x = e->xexpose.x;
+            y = e->xexpose.y;
+            w = e->xexpose.width;
+            h = e->xexpose.height;
+            x = 0;
+            y = 0;
+            w = RrSurfaceWidth(sur);
+            h = RrSurfaceHeight(sur);
+
+            while (sur->parent) {
+                x += RrSurfaceX(sur);
+                y += RrSurfaceY(sur);
+                sur = sur->parent;
+            }
+            for (it = tops; it; it = g_slist_next(it)) {
+                struct ExposeArea *a = it->data;
+                if (a->sur == sur) {
+                    MERGE_AREA(a, x, y, w, h);
+                    break;
+                }
+            }
+            if (!it) {
+                struct ExposeArea *a = malloc(sizeof(struct ExposeArea));
+                a->sur = sur;
+                a->x = x;
+                a->y = y;
+                a->w = w;
+                a->h = h;
+                tops = g_slist_append(tops, a);
+            }
+        } else {
+            RrDebug("Unable to find surface for window 0x%lx\n",
+                    e2.xexpose.window);
         }
     }
-
-    for (it = tops; it; it = g_slist_next(it))
-        RrPaint(it->data);
-
-/*
-    XEvent e2;
-    struct RrSurface *sur;
-
-    assert(e->type == Expose);
-    if (!(e->type == Expose)) return;
-
-    if ((sur = RrInstaceLookupSurface(inst, e->xexpose.window))) {
-        int l, r, t, b;
-
-        l = e->xexpose.x;
-        t = e->xexpose.y;
-        r = e->xexpose.width + e->xexpose.x - 1;
-        b = e->xexpose.height + e->xexpose.y - 1;
-
-        while (XCheckTypedWindowEvent(RrDisplay(inst), e->xexpose.window,
-                                      Expose, &e2)) {
-            l = MIN(l, e2.xexpose.x);
-            t = MIN(t, e2.xexpose.y);
-            r = MAX(r, e2.xexpose.width + e2.xexpose.x - 1);
-            b = MAX(b, e2.xexpose.height + e2.xexpose.y - 1);
-        }
-        RrPaintArea(sur, l, t,
-                    MIN(r - l + 1, RrSurfaceWidth(sur) - l),
-                    MIN(b - t + 1, RrSurfaceHeight(sur) - t));
-    } else {
-        RrDebug("Unable to find surface for window 0x%lx\n",e->xexpose.window);
+    for (it = tops; it; it = n) {
+        struct ExposeArea *a = it->data;
+        n = g_slist_next(it);
+        RrPaintArea(sur, a->x, a->y, a->w, a->h);
+        tops = g_slist_delete_link(tops, it);
     }
-*/
 }
 
 /*! Paints the surface, and all its children */
@@ -75,12 +95,7 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
     assert(inst);
     if (!inst) return;
 
-    /* bounds checking */
-    assert(x >= 0 && y >= 0);
-    if (!(x >= 0 && y >= 0)) return;
-    assert(x + w <= RrSurfaceWidth(sur) && y + h <= RrSurfaceHeight(sur));
-    if (!(x + w <= RrSurfaceWidth(sur) && y + h <= RrSurfaceHeight(sur)))
-        return;
+    if (!RrSurfaceVisible(sur)) return;
 
     /* recurse and paint children */
     for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it)) {
@@ -98,8 +113,6 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
                         MIN(RrSurfaceHeight(child),
                             h - MAX(0, (RrSurfaceY(child)-y))));
     }
-
-    if (!RrSurfaceVisible(sur)) return;
 
     RrDebug("making %p, %p, %p current\n",
             RrDisplay(inst), RrSurfaceWindow(sur), RrContext(inst));

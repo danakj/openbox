@@ -50,7 +50,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     for (it = focus_order[d->desktop], i = 0; it; it = g_list_next(it), ++i) {
         ObClient *c = it->data;
         if (client_normal(c)) {
-            GSList *acts;
+            GSList *acts = NULL;
             ObAction* act;
             ObMenuEntry *e;
             const ObClientIcon *icon;
@@ -65,7 +65,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             act = action_from_string("Activate",
                                      OB_USER_ACTION_MENU_SELECTION);
             act->data.activate.any.c = c;
-            acts = g_slist_prepend(NULL, act);
+            acts = g_slist_append(acts, act);
+            act = action_from_string("Desktop",
+                                     OB_USER_ACTION_MENU_SELECTION);
+            act->data.desktop.desk = d->desktop;
+            acts = g_slist_append(acts, act);
             e = menu_add_normal(menu, i,
                                 (c->iconic ? c->icon_title : c->title), acts);
 
@@ -80,11 +84,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     if (empty) {
         /* no entries */
 
-        GSList *acts;
+        GSList *acts = NULL;
         ObAction* act;
         act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
         act->data.desktop.desk = d->desktop;
-        acts = g_slist_prepend(NULL, act);
+        acts = g_slist_append(acts, act);
         menu_add_normal(menu, 0, _("Go there..."), acts);
     }
 }

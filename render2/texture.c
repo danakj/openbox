@@ -100,8 +100,10 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex)
         col.g = tex->data.text.color.g;
         col.b = tex->data.text.color.b;
         col.a = tex->data.text.color.a;
+
         GlftRenderString(tex->data.text.font->font, tex->data.text.string, 
-                         strlen(tex->data.text.string), &col, 0, 0);
+                         strlen(tex->data.text.string), &col,
+                         RrSurfaceX(sur) + 2, RrSurfaceY(sur) + 4);
         break;
     }
     glDisable(GL_TEXTURE_2D);

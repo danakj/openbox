@@ -2516,24 +2516,24 @@ gboolean client_can_focus(ObClient *self)
           (self->desktop == screen_desktop ||
            self->desktop == DESKTOP_ALL) &&
           !self->iconic))
-	return FALSE;
+        return FALSE;
 
     /* do a check to see if the window has already been unmapped or destroyed
        do this intelligently while watching out for unmaps we've generated
        (ignore_unmaps > 0) */
     if (XCheckTypedWindowEvent(ob_display, self->window,
-			       DestroyNotify, &ev)) {
-	XPutBackEvent(ob_display, &ev);
-	return FALSE;
+                               DestroyNotify, &ev)) {
+        XPutBackEvent(ob_display, &ev);
+        return FALSE;
     }
     while (XCheckTypedWindowEvent(ob_display, self->window,
-				  UnmapNotify, &ev)) {
-	if (self->ignore_unmaps) {
-	    self->ignore_unmaps--;
-	} else {
-	    XPutBackEvent(ob_display, &ev);
-	    return FALSE;
-	}
+                                  UnmapNotify, &ev)) {
+        if (self->ignore_unmaps) {
+            self->ignore_unmaps--;
+        } else {
+            XPutBackEvent(ob_display, &ev);
+            return FALSE;
+        }
     }
 
     return TRUE;

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -104,7 +104,7 @@ CPPFLAGS = @CPPFLAGS@ @SHAPE@ @SLIT@ @INTERLACE@ @ORDEREDPSEUDO@ @DEBUG@ @NEWWMS
 
 bin_PROGRAMS = openbox
 
-openbox_SOURCES = BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
+openbox_SOURCES = BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Geometry.cc Iconmenu.cc Image.cc Netizen.cc Resource.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
 
 MAINTAINERCLEANFILES = Makefile.in
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -121,9 +121,9 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 openbox_OBJECTS =  BaseDisplay.o Basemenu.o Clientmenu.o Configmenu.o \
-Iconmenu.o Image.o LinkedList.o Netizen.o Rootmenu.o Screen.o Slit.o \
-Timer.o Toolbar.o Window.o Windowmenu.o Workspace.o Workspacemenu.o \
-openbox.o bsd-snprintf.o i18n.o main.o
+Geometry.o Iconmenu.o Image.o Netizen.o Resource.o Rootmenu.o Screen.o \
+Slit.o Timer.o Toolbar.o Window.o Windowmenu.o Workspace.o \
+Workspacemenu.o openbox.o bsd-snprintf.o i18n.o main.o
 openbox_LDADD = $(LDADD)
 openbox_DEPENDENCIES = 
 openbox_LDFLAGS = 
@@ -142,12 +142,6 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/BaseDisplay.P .deps/Basemenu.P .deps/Clientmenu.P \
-.deps/Configmenu.P .deps/Iconmenu.P .deps/Image.P .deps/LinkedList.P \
-.deps/Netizen.P .deps/Rootmenu.P .deps/Screen.P .deps/Slit.P \
-.deps/Timer.P .deps/Toolbar.P .deps/Window.P .deps/Windowmenu.P \
-.deps/Workspace.P .deps/Workspacemenu.P .deps/bsd-snprintf.P \
-.deps/i18n.P .deps/main.P .deps/openbox.P
 SOURCES = $(openbox_SOURCES)
 OBJECTS = $(openbox_OBJECTS)
 
@@ -155,9 +149,9 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .cc .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign --include-deps src/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -186,6 +180,9 @@ uninstall-binPROGRAMS:
 	list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	done
+
+.c.o:
+	$(COMPILE) -c $<
 
 .s.o:
 	$(COMPILE) -c $<
@@ -243,11 +240,6 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = src
 
 distdir: $(DISTFILES)
-	here=`cd $(top_builddir) && pwd`; \
-	top_distdir=`cd $(top_distdir) && pwd`; \
-	distdir=`cd $(distdir) && pwd`; \
-	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -258,57 +250,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-
-DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
-
--include $(DEP_FILES)
-
-mostlyclean-depend:
-
-clean-depend:
-
-distclean-depend:
-	-rm -rf .deps
-
-maintainer-clean-depend:
-
-%.o: %.c
-	@echo '$(COMPILE) -c $<'; \
-	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-cp .deps/$(*F).pp .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm .deps/$(*F).pp
-
-%.lo: %.c
-	@echo '$(LTCOMPILE) -c $<'; \
-	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
-	  < .deps/$(*F).pp > .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm -f .deps/$(*F).pp
-
-%.o: %.cc
-	@echo '$(CXXCOMPILE) -c $<'; \
-	$(CXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-cp .deps/$(*F).pp .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm .deps/$(*F).pp
-
-%.lo: %.cc
-	@echo '$(LTCXXCOMPILE) -c $<'; \
-	$(LTCXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
-	  < .deps/$(*F).pp > .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm -f .deps/$(*F).pp
 info-am:
 info: info-am
 dvi-am:
@@ -347,25 +288,23 @@ distclean-generic:
 maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-compile \
-		mostlyclean-tags mostlyclean-depend mostlyclean-generic
+		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-binPROGRAMS clean-compile clean-tags clean-depend \
-		clean-generic mostlyclean-am
+clean-am:  clean-binPROGRAMS clean-compile clean-tags clean-generic \
+		mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-binPROGRAMS distclean-compile distclean-tags \
-		distclean-depend distclean-generic clean-am \
-		distclean-local
+		distclean-generic clean-am distclean-local
 
 distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-binPROGRAMS \
 		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-depend maintainer-clean-generic \
-		distclean-am
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -375,13 +314,12 @@ maintainer-clean: maintainer-clean-am
 maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
 mostlyclean-compile distclean-compile clean-compile \
 maintainer-clean-compile tags mostlyclean-tags distclean-tags \
-clean-tags maintainer-clean-tags distdir mostlyclean-depend \
-distclean-depend clean-depend maintainer-clean-depend info-am info \
-dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
-install-exec install-data-am install-data install-am install \
-uninstall-am uninstall all-redirect all-am all installdirs \
-mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
 
 
 distclean-local:
@@ -389,73 +327,76 @@ distclean-local:
 
 # local dependencies
 
-BaseDisplay.o: BaseDisplay.cc i18n.h BaseDisplay.h LinkedList.h \
+BaseDisplay.o: BaseDisplay.cc i18n.h BaseDisplay.h \
  Timer.h
 Basemenu.o: Basemenu.cc i18n.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Timer.h Image.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
- Workspace.h Workspacemenu.h
-Clientmenu.o: Clientmenu.cc openbox.h BaseDisplay.h LinkedList.h \
+ Workspace.h Workspacemenu.h Resource.h
+Clientmenu.o: Clientmenu.cc openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Clientmenu.h Workspace.h Screen.h Configmenu.h Netizen.h \
- Rootmenu.h Workspacemenu.h
+ Rootmenu.h Workspacemenu.h Resource.h Geometry.h
 Configmenu.o: Configmenu.cc i18n.h Configmenu.h Basemenu.h \
- LinkedList.h Screen.h BaseDisplay.h Timer.h Iconmenu.h Netizen.h \
+ Screen.h BaseDisplay.h Timer.h Iconmenu.h Netizen.h \
  Rootmenu.h Workspace.h Workspacemenu.h openbox.h Image.h \
- Window.h Windowmenu.h Slit.h Toolbar.h
-Icon.o: Iconmenu.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
+ Window.h Windowmenu.h Slit.h Toolbar.h Resource.h Geometry.h
+Geometry.o: Geometry.cc Geometry.h
+Icon.o: Iconmenu.cc i18n.h openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
- Workspacemenu.h Toolbar.h
-Image.o: Image.cc i18n.h BaseDisplay.h LinkedList.h Timer.h \
+ Workspacemenu.h Toolbar.h Resource.h Geometry.h
+Image.o: Image.cc i18n.h BaseDisplay.h Timer.h \
  Image.h
-LinkedList.o: LinkedList.cc LinkedList.h
-Netizen.o: Netizen.cc Netizen.h BaseDisplay.h LinkedList.h Timer.h \
+Netizen.o: Netizen.cc Netizen.h BaseDisplay.h Timer.h \
  Screen.h Configmenu.h Basemenu.h openbox.h Image.h Window.h \
  Iconmenu.h Windowmenu.h Slit.h Rootmenu.h Workspace.h \
- Workspacemenu.h
-Rootmenu.o: Rootmenu.cc openbox.h BaseDisplay.h LinkedList.h \
+ Workspacemenu.h Resource.h Geometry.h
+Resource.o: Resource.cc Resource.h Util.h
+Rootmenu.o: Rootmenu.cc openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Rootmenu.h Screen.h Configmenu.h Netizen.h Workspace.h \
- Workspacemenu.h
+ Workspacemenu.h Resource.h Geometry.h
 Screen.o: Screen.cc i18n.h bsd-snprintf.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Screen.h Configmenu.h \
- Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h
-Slit.o: Slit.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
+ Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h Resource.h Geometry.h
+Slit.o: Slit.cc i18n.h openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
- Workspacemenu.h Toolbar.h
-Timer.o: Timer.cc BaseDisplay.h LinkedList.h Timer.h
-Toolbar.o: Toolbar.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
+ Workspacemenu.h Toolbar.h Resource.h Geometry.h
+Timer.o: Timer.cc BaseDisplay.h Timer.h
+Toolbar.o: Toolbar.cc i18n.h openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Clientmenu.h Workspace.h Rootmenu.h Screen.h Configmenu.h \
- Netizen.h Workspacemenu.h Toolbar.h
-Window.o: Window.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
+ Netizen.h Workspacemenu.h Toolbar.h Resource.h Geometry.h
+Window.o: Window.cc i18n.h openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
- Workspacemenu.h Toolbar.h
+ Workspacemenu.h Toolbar.h Resource.h Geometry.h
 Windowmenu.o: Windowmenu.cc i18n.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
- Workspace.h Workspacemenu.h
+ Workspace.h Workspacemenu.h Resource.h Geometry.h
 Workspace.o: Workspace.cc i18n.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Screen.h \
- Configmenu.h Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h
+ Configmenu.h Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h Resource.h \
+ Geometry.h Geometry.h Util.h
 Workspacemenu.o: Workspacemenu.cc i18n.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
- Workspace.h Workspacemenu.h Toolbar.h
+ Workspace.h Workspacemenu.h Toolbar.h Resource.h Geometry.h
 openbox.o: openbox.cc i18n.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Rootmenu.h \
- Screen.h Configmenu.h Netizen.h Workspacemenu.h Toolbar.h
+ Screen.h Configmenu.h Netizen.h Workspacemenu.h Toolbar.h Resource.h \
+ Geometry.h Util.h
 bsd-snprintf.o: bsd-snprintf.c bsd-snprintf.h
 i18n.o: i18n.cc i18n.h
 main.o: main.cc ../version.h i18n.h openbox.h BaseDisplay.h \
- LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
- Windowmenu.h Slit.h
+ Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
+ Windowmenu.h Slit.h Resource.h Geometry.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

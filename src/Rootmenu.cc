@@ -38,10 +38,13 @@
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_SYS_PARAM_H
 #  include <sys/param.h>
@@ -52,9 +55,9 @@
 #endif // MAXPATHLEN
 
 
-Rootmenu::Rootmenu(BScreen *scrn) : Basemenu(scrn) {
-  screen = scrn;
-  openbox = screen->getOpenbox();
+Rootmenu::Rootmenu(BScreen &scrn) : Basemenu(scrn), openbox(scrn.getOpenbox()),
+  screen(scrn)  
+{
 }
 
 
@@ -73,9 +76,9 @@ void Rootmenu::itemSelected(int button, int index) {
 #ifndef    __EMX__
       char displaystring[MAXPATHLEN];
       sprintf(displaystring, "DISPLAY=%s",
-	      DisplayString(screen->getBaseDisplay()->getXDisplay()));
+	      DisplayString(screen.getBaseDisplay().getXDisplay()));
       sprintf(displaystring + strlen(displaystring) - 1, "%d",
-	      screen->getScreenNumber());
+	      screen.getScreenNumber());
 
       bexec(item->exec(), displaystring);
 #else //   __EMX__
@@ -85,28 +88,28 @@ void Rootmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::Restart:
-    openbox->restart();
+    openbox.restart();
     break;
 
   case BScreen::RestartOther:
     if (item->exec())
-      openbox->restart(item->exec());
+      openbox.restart(item->exec());
     break;
 
   case BScreen::Exit:
-    openbox->shutdown();
+    openbox.shutdown();
     break;
 
   case BScreen::SetStyle:
     if (item->exec())
-      openbox->saveStyleFilename(item->exec());
+      openbox.setStyleFilename(item->exec());
 
   case BScreen::Reconfigure:
-    openbox->reconfigure();
+    openbox.reconfigure();
     return;
   }
 
-  if (! (screen->getRootmenu()->isTorn() || isTorn()) &&
+  if (! (screen.getRootmenu()->isTorn() || isTorn()) &&
       item->function() != BScreen::Reconfigure &&
       item->function() != BScreen::SetStyle)
     hide();

@@ -41,10 +41,12 @@
 #  endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
 
-
-#include "LinkedList.h"
+#include "Resource.h"
 #include "BaseDisplay.h"
 #include "Timer.h"
+
+#include <map>
+#include <list>
 
 //forward declaration
 class BScreen;
@@ -66,14 +68,18 @@ private:
 public:
   DataSearch(Window w, Z *d): window(w), data(d) {}
 
-  inline const Window &getWindow(void) const { return window; }
-  inline Z *getData(void) { return data; }
+  inline const Window &getWindow() const { return window; }
+  inline Z *getData() { return data; }
 };
 
 
 class Openbox : public BaseDisplay, public TimeoutHandler {
 private:
   typedef struct MenuTimestamp {
+    virtual ~MenuTimestamp() {
+      if (filename != (char *) 0)
+        delete [] filename;
+    }
     char *filename;
     time_t timestamp;
   } MenuTimestamp;
@@ -81,29 +87,39 @@ private:
   struct resource {
     Time double_click_interval;
 
-    char *menu_file, *style_file;
+    char *style_file;
     char *titlebar_layout;
     int colors_per_channel;
     timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
   } resource;
 
-  typedef DataSearch<OpenboxWindow> WindowSearch;
-  LinkedList<WindowSearch> *windowSearchList, *groupSearchList;
-  typedef DataSearch<Basemenu> MenuSearch;
-  LinkedList<MenuSearch> *menuSearchList;
-  typedef DataSearch<Toolbar> ToolbarSearch;
-  LinkedList<ToolbarSearch> *toolbarSearchList;
+  typedef std::map<Window, OpenboxWindow*> WindowLookup;
+  typedef WindowLookup::value_type WindowLookupPair;
+  WindowLookup windowSearchList, groupSearchList;
+  
+  typedef std::map<Window, Basemenu*> MenuLookup;
+  typedef MenuLookup::value_type MenuLookupPair;
+  MenuLookup menuSearchList;
+
+  typedef std::map<Window, Toolbar*> ToolbarLookup;
+  typedef ToolbarLookup::value_type ToolbarLookupPair;
+  ToolbarLookup toolbarSearchList;
 
 #ifdef    SLIT
-  typedef DataSearch<Slit> SlitSearch;
-  LinkedList<SlitSearch> *slitSearchList;
+  typedef std::map<Window, Slit*> SlitLookup;
+  typedef SlitLookup::value_type SlitLookupPair;
+  SlitLookup slitSearchList; 
 #endif // SLIT
 
-  LinkedList<MenuTimestamp> *menuTimestamps;
-  LinkedList<BScreen> *screenList;
+  typedef std::list<MenuTimestamp*> MenuTimestampList;
+  MenuTimestampList menuTimestamps;
 
-  OpenboxWindow *focused_window, *masked_window;
+  typedef std::list<BScreen*> ScreenList;
+  ScreenList screenList;
+
+  BScreen *current_screen;
+  OpenboxWindow *masked_window;
   BTimer *timer;
 
 #ifdef    HAVE_GETPID
@@ -113,71 +129,74 @@ private:
   Bool no_focus, reconfigure_wait, reread_menu_wait;
   Time last_time;
   Window masked;
-  char *rc_file, **argv;
+  char *menu_file, *rc_file, **argv;
   int argc;
+  Resource config;
 
 
 protected:
-  void load_rc(void);
-  void save_rc(void);
-  void reload_rc(void);
-  void real_rereadMenu(void);
-  void real_reconfigure(void);
+  void load();
+  void save();
+  void real_rereadMenu();
+  void real_reconfigure();
 
   virtual void process_event(XEvent *);
 
 
 public:
-  Openbox(int, char **, char * = 0, char * = 0);
-  virtual ~Openbox(void);
+  Openbox(int, char **, char * = 0, char * = 0, char * = 0);
+  virtual ~Openbox();
 
 #ifdef    HAVE_GETPID
-  inline const Atom &getOpenboxPidAtom(void) const { return openbox_pid; }
+  inline const Atom &getOpenboxPidAtom() const { return openbox_pid; }
 #endif // HAVE_GETPID
 
   Basemenu *searchMenu(Window);
 
   OpenboxWindow *searchGroup(Window, OpenboxWindow *);
   OpenboxWindow *searchWindow(Window);
-  inline OpenboxWindow *getFocusedWindow(void) { return focused_window; }
+  OpenboxWindow *focusedWindow();
+  void focusWindow(OpenboxWindow *w);
 
-  BScreen *getScreen(int);
   BScreen *searchScreen(Window);
-
-  inline const Time &getDoubleClickInterval(void) const
+  
+  inline Resource &getConfig() {
+    return config;
+  }
+  inline const Time &getDoubleClickInterval() const
     { return resource.double_click_interval; }
-  inline const Time &getLastTime(void) const { return last_time; }
+  inline const Time &getLastTime() const { return last_time; }
 
   Toolbar *searchToolbar(Window);
 
-  inline const char *getStyleFilename(void) const
+  inline const char *getStyleFilename() const
     { return resource.style_file; }
-  inline const char *getMenuFilename(void) const
-    { return resource.menu_file; }
+  inline const char *getMenuFilename() const
+    { return menu_file; }
+  void addMenuTimestamp(const char *filename);
 
-  inline const int &getColorsPerChannel(void) const
+  inline const int &getColorsPerChannel() const
     { return resource.colors_per_channel; }
 
-  inline const timeval &getAutoRaiseDelay(void) const
+  inline const timeval &getAutoRaiseDelay() const
     { return resource.auto_raise_delay; }
 
-  inline const char *getTitleBarLayout(void) const
+  inline const char *getTitleBarLayout() const
     { return resource.titlebar_layout; }
 
-  inline const unsigned long &getCacheLife(void) const
+  inline const unsigned long &getCacheLife() const
     { return resource.cache_life; }
-  inline const unsigned long &getCacheMax(void) const
+  inline const unsigned long &getCacheMax() const
     { return resource.cache_max; }
 
+  inline OpenboxWindow *getMaskedWindow() const
+    { return masked_window; }
   inline void maskWindowEvents(Window w, OpenboxWindow *bw)
     { masked = w; masked_window = bw; }
   inline void setNoFocus(Bool f) { no_focus = f; }
 
-  void setFocusedWindow(OpenboxWindow *w);
-  void shutdown(void);
-  void load_rc(BScreen *);
-  void saveStyleFilename(const char *);
-  void saveMenuFilename(const char *);
+  void shutdown();
+  void setStyleFilename(const char *);
   void saveMenuSearch(Window, Basemenu *);
   void saveWindowSearch(Window, OpenboxWindow *);
   void saveToolbarSearch(Window, Toolbar *);
@@ -187,13 +206,13 @@ public:
   void removeToolbarSearch(Window);
   void removeGroupSearch(Window);
   void restart(const char * = 0);
-  void reconfigure(void);
-  void rereadMenu(void);
-  void checkMenu(void);
+  void reconfigure();
+  void rereadMenu();
+  void checkMenu();
 
   virtual Bool handleSignal(int);
 
-  virtual void timeout(void);
+  virtual void timeout();
 
 #ifdef    SLIT
   Slit *searchSlit(Window);

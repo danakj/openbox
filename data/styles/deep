@@ -1,0 +1,117 @@
+! deep - by safari_al
+! tr@rebel.net.au
+!
+! the scent of deep heat is wafting through the air.  inhale.
+
+toolbar:				flat gradient vertical
+  toolbar.color:			#d3d3d3
+  toolbar.colorTo:			#a3a3a3
+
+toolbar.clock:				parentrelative
+  toolbar.clock.textColor:		black
+
+toolbar.label:				parentrelative
+  toolbar.label.textColor:		black
+
+toolbar.windowLabel:			flat gradient horizontal
+  toolbar.windowLabel.color:		#223256
+  toolbar.windowLabel.colorTo:		#3f5881
+  toolbar.windowLabel.textColor:	#d3d3d3
+
+toolbar.button:				parentrelative
+  toolbar.button.picColor:		black
+
+toolbar.button.pressed:			flat gradient vertical
+  toolbar.button.pressed.color:		#d3d3d3
+  toolbar.button.pressed.colorTo:	#3f5881
+
+menu.title:				flat gradient horizontal 
+  menu.title.color:			#223256
+  menu.title.colorTo:			#3f5881
+  menu.title.textColor:			#d3d3d3
+
+menu.frame:				flat gradient horizontal
+  menu.frame.color:			#a3a3a3
+  menu.frame.colorTo:			#d3d3d3
+  menu.frame.textColor:			black
+
+menu.hilite:				flat gradient horizontal
+  menu.hilite.color:			#a3a3a3
+  menu.hilite.colorTo:			#3f5881
+  menu.hilite.textColor:		black
+
+menu.bullet: 				empty
+  menu.bullet.position:			left
+
+window.title.focus:			flat gradient vertical
+  window.title.focus.color:		#d3d3d3
+  window.title.focus.colorTo:		#a3a3a3
+window.title.unfocus:			flat gradient vertical
+  window.title.unfocus.color:		#d3d3d3
+  window.title.unfocus.colorTo:		#a3a3a3
+
+window.label.focus:			flat gradient horizontal
+  window.label.focus.color:		#223256
+  window.label.focus.colorTo:		#3f5881
+  window.label.focus.textColor:		#d3d3d3
+window.label.unfocus:			flat solid
+  window.label.unfocus.color:		#223256
+  window.label.unfocus.textColor:	#d3d3d3
+
+window.button.focus:			parentrelative
+  window.button.focus.picColor:		black
+window.button.unfocus:			parentrelative
+  window.button.unfocus.picColor:	black
+
+window.button.pressed:			flat gradient vertical
+  window.button.pressed.color:		#d3d3d3
+  window.button.pressed.colorTo:	#3f5881
+
+window.frame.focusColor:		#d3d3d3
+window.frame.unfocusColor:		#a3a3a3
+
+window.handle.focus:			flat solid
+  window.handle.focus.color:		#d3d3d3
+window.handle.unfocus:			flat solid
+  window.handle.unfocus.color:		#a3a3a3
+
+window.grip.focus:			flat solid
+  window.grip.focus.color:		#3f5881
+window.grip.unfocus:			flat solid
+  window.grip.unfocus.color:		#223526
+
+borderColor:	black
+!*font:		gelly
+*font:		lucidasans-10
+*justify:	left
+
+borderWidth:	1
+bevelWidth:	1
+frameWidth:	1
+handleWidth:	3
+
+rootCommand:	bsetbg -mod 2 2 -bg rgb:22/35/26 -fg rgb:3f/58/81
+
+
+bbpager.frame:				flat gradient vertical
+  bbpager.frame.color:			#3f5881
+  bbpager.frame.colorTo:		#223256
+
+bbpager.desktop:			parentrelative
+bbpager.desktop.focus:			parentrelative
+
+bbpager.window:				flat gradient vertical
+  bbpager.window.color:			#d3d3d3
+  bbpager.window.colorTo:		#a3a3a3
+bbpager.window.focus:			flat gradient vertical
+  bbpager.window.focus.color:		#d3d3d3
+  bbpager.window.focus.colorTo:		#3f5881
+
+bbpager.desktop.focusStyle:		border
+bbpager.window.focusStyle:		texture
+
+bbpager.active.desktop.borderColor:	#d3d3d3
+bbpager.active.window.borderColor:	black
+bbpager.inactive.window.borderColor:	black
+
+bbpager.bevelWidth:			1

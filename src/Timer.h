@@ -47,8 +47,8 @@ public:
 class BTimer {
   friend class BaseDisplay;
 private:
-  BaseDisplay *display;
-  TimeoutHandler *handler;
+  BaseDisplay &display;
+  TimeoutHandler &handler;
   int timing, once;
 
   timeval _start, _timeout;
@@ -57,7 +57,7 @@ protected:
   void fireTimeout(void);
 
 public:
-  BTimer(BaseDisplay *, TimeoutHandler *);
+  BTimer(BaseDisplay &, TimeoutHandler &);
   virtual ~BTimer(void);
 
   inline const int &isTiming(void) const { return timing; } 

@@ -28,6 +28,12 @@ $ #SmartCols
 # Smart Placement (Columns)
 $ #Cascade
 # Cascade Placement
+$ #BestFit
+# Best Fit Placement
+$ #UnderMouse
+# Under Mouse Placement
+$ #ClickMouse
+# Click Mouse Placement
 $ #LeftRight
 # Left to Right
 $ #RightLeft
@@ -36,3 +42,5 @@ $ #TopBottom
 # Top to Bottom
 $ #BottomTop
 # Bottom to Top
+$ #HideToolbar
+# Hide Toolbar

@@ -30,16 +30,16 @@ class BImageControl;
 class BScreen;
 class Basemenu;
 class BasemenuItem;
-#include "LinkedList.h"
-
+#include <vector>
+typedef std::vector<BasemenuItem *> menuitemList;
 
 class Basemenu {
 private:
-  LinkedList<BasemenuItem> *menuitems;
-  Openbox *openbox;
+  menuitemList menuitems;
+  Openbox &openbox;
   Basemenu *parent;
   BImageControl *image_ctrl;
-  BScreen *screen;
+  BScreen &screen;
 
   Bool moving, visible, movable, torn, internal_menu, title_vis, shifted,
     hide_tree;
@@ -59,7 +59,7 @@ private:
 
 
 protected:
-  inline BasemenuItem *find(int index) { return menuitems->find(index); }
+  inline BasemenuItem *find(int index) { return menuitems[index]; }
   inline void setTitleVisibility(Bool b) { title_vis = b; }
   inline void setMovable(Bool b) { movable = b; }
   inline void setHideTree(Bool h) { hide_tree = h; }
@@ -74,13 +74,13 @@ protected:
 
 
 public:
-  Basemenu(BScreen *);
+  Basemenu(BScreen &);
   virtual ~Basemenu(void);
 
   inline const Bool &isTorn(void) const { return torn; }
   inline const Bool &isVisible(void) const { return visible; }
 
-  inline BScreen *getScreen(void) { return screen; }
+  inline BScreen &getScreen(void) { return screen; }
 
   inline const Window &getWindowID(void) const { return menu.window; }
 
@@ -91,15 +91,14 @@ public:
   int insert(const char *, Basemenu *, int = -1);
   int remove(int);
 
-  inline const int &getX(void) const { return menu.x; }
-  inline const int &getY(void) const { return menu.y; }
-  inline int getCount(void) { return menuitems->count(); }
-  inline const int &getCurrentSubmenu(void) const { return which_sub; }
+  inline int getX(void) const { return menu.x; }
+  inline int getY(void) const { return menu.y; }
+  inline unsigned int getCount(void) { return menuitems.size(); }
+  inline int getCurrentSubmenu(void) const { return which_sub; }
 
-  inline const unsigned int &getWidth(void) const { return menu.width; }
-  inline const unsigned int &getHeight(void) const { return menu.height; }
-  inline const unsigned int &getTitleHeight(void) const
-  { return menu.title_h; }
+  inline unsigned int getWidth(void) const { return menu.width; }
+  inline unsigned int getHeight(void) const { return menu.height; }
+  inline unsigned int getTitleHeight(void) const { return menu.title_h; }
 
   inline void setInternalMenu(void) { internal_menu = True; }
   inline void setAlignment(int a) { alignment = a; }
@@ -107,9 +106,9 @@ public:
   inline void removeParent(void)
     { if (internal_menu) parent = (Basemenu *) 0; }
 
-  Bool hasSubmenu(int);
-  Bool isItemSelected(int);
-  Bool isItemEnabled(int);
+  bool hasSubmenu(int);
+  bool isItemSelected(int);
+  bool isItemEnabled(int);
 
   void buttonPressEvent(XButtonEvent *);
   void buttonReleaseEvent(XButtonEvent *);
@@ -121,8 +120,8 @@ public:
   void setLabel(const char *n);
   void move(int, int);
   void update(void);
-  void setItemSelected(int, Bool);
-  void setItemEnabled(int, Bool);
+  void setItemSelected(int, bool);
+  void setItemEnabled(int, bool);
 
   virtual void drawSubmenu(int);
   virtual void show(void);

@@ -262,7 +262,7 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
                                   _screen->getColormap());
     assert(draw);
 
-    if (_shadow) {
+/*    if (_shadow) {
       XftColor c;
       c.color.red = 0;
       c.color.green = 0;
@@ -274,14 +274,21 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
       XftDrawStringUtf8(draw, &c, _xftfont, x + 1, _xftfont->ascent + y + 1,
                         (XftChar8 *) string.c_str(), string.size());
     }
+*/
 
     XftColor c;
     c.color.red = color.red() | color.red() << 8;
     c.color.green = color.green() | color.green() << 8;
     c.color.blue = color.blue() | color.blue() << 8;
-    c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
     c.pixel = color.pixel();
+
+    if (_shadow) {
+      c.color.alpha = 0x66 | 0x66 << 8; // transparent shadow
+      XftDrawStringUtf8(draw, &c, _xftfont, x + 1, _xftfont->ascent + y + 1,
+                        (XftChar8 *) string.c_str(), string.size());
+    }
     
+    c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
     XftDrawStringUtf8(draw, &c, _xftfont, x, _xftfont->ascent + y,
                       (XftChar8 *) string.c_str(), string.size());
 

@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: fejl ved skabelse af pixmap\n
+# BImage::render_solid: Fehler bei der Erstellung der Pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: fejl ved skabelse af XImage\n
+# BImage::renderXImage: Fehler bei der Erstellung des XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: ikke support for farvedybden\n
+# BImage::renderXImage: nicht unterstütztes Visual\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: fejl ved skabelse af pixmap\n
+# BImage::renderPixmap: Fehler bei der Erstellung der Pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: ugyldigt farvekort størrelse %d (%d/%d/%d) - reducing\n
+# BImageControl::BImageControl: Ungültige Colormap Größe %d (%d/%d/%d) - verkleinere\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: fejl ved allokering af farvekort\n
+# BImageControl::BImageControl: Fehler bei der Anlegung der Colormap\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: fejl ved allokering af farve %d/%d/%d\n
+# BImageControl::BImageControl: Fehler bei der Auswertung der Farbe %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: pixmap cache - sletter %d pixmaps\n
+# BImageControl::~BImageControl: Pixmap Cache - Freigabe von %d Pixmaps\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: cache er for stor, gennemtvinger rensning\n
+# BImageControl::renderImage: Cache zu groß, Ausleerung erfordert\n
 $ #ColorParseError
-# BImageControl::getColor: farvefejl: '%s'\n
+# BImageControl::getColor: Color Parse Fehler: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: farveallokeringsfejl: '%s'\n
+# BImageControl::getColor: Color Alloc Fehler: '%s'\n

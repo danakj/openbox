@@ -2,16 +2,16 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: creating 0x%lx\n
+# BlackboxWindow::BlackboxWindow: skaber 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: XGetWindowAttributres failed\n
+# BlackboxWindow::BlackboxWindow: XGetWindowAttributres fejlede\n
 $ #CannotFindScreen
-# BlackboxWindow::BlackboxWindow: cannot find screen for root window 0x%lx\n
+# BlackboxWindow::BlackboxWindow: kunne ikke finde skærm til hovedvinduet 0x%lx\n
 $ #Unnamed
-# Unnamed
+# Intet navn
 $ #MapRequest
 # BlackboxWindow::mapRequestEvent() for 0x%lx\n
 $ #UnmapNotify
 # BlackboxWindow::unmapNotifyEvent() for 0x%lx\n
 $ #ReparentNotify
-# BlackboxWindow::reparentNotifyEvent: reparent 0x%lx to 0x%lx\n
+# BlackboxWindow::reparentNotifyEvent: sætter 0x%lx til 0x%lx\n

@@ -1,40 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Config Options
+# Indstillinger
 $ #FocusModel
-# Focus Model
+# Fokus Model
 $ #WindowPlacement
-# Window Placement
+# Vindueplacering
 $ #ImageDithering
-# Image Dithering
+# Billede Dithering
 $ #OpaqueMove
-# Opaque Window Moving
+# Uklar vinduesflytning
 $ #FullMax
-# Full Maximization
+# Fuld maximering
 $ #FocusNew
-# Focus New Windows
+# Fokus nyt vindue
 $ #FocusLast
-# Focus Window on Workspace Change
+# Fokus vindue ved skrivebords ændring
 $ #ClickToFocus
-# Click to Focus
+# Klik for fokus
 $ #SloppyFocus
-# Sloppy Focus
+# Dovent fokus
 $ #AutoRaise
-# Auto Raise
-$ #ClickRaise
-# Click Raise
+# Hæv automatisk
 $ #SmartRows
-# Smart Placement (Rows)
+# Intelligent placering (Rækker)
 $ #SmartCols
-# Smart Placement (Columns)
+# Intelligent placering (Søjler)
 $ #Cascade
-# Cascade Placement
+# Kaskade placering
 $ #LeftRight
-# Left to Right
+# Fra venstre mod højre
 $ #RightLeft
-# Right to Left
+# Fra højre mod venstre
 $ #TopBottom
-# Top to Bottom
+# Oppefra
 $ #BottomTop
-# Bottom to Top
+# Nedefra

@@ -3,36 +3,36 @@ $set 15 #Common
 $ #Yes
 # Ja
 $ #No
-# Nej
+# Nein
 
 $ #DirectionTitle
-# Retning
+# Ausrichtung
 $ #DirectionHoriz
-# Horisontal
+# Horizontal
 $ #DirectionVert
 # Vertikal
 
 $ #AlwaysOnTop
-# Altid øverst
+# Immer im Vorgrund
 
 $ #PlacementTitle
-# Placering
+# Platzierung
 $ #PlacementTopLeft
-# Øverste venstre hjørne
+# Oben Links
 $ #PlacementCenterLeft
-# Venstre i midten
+# Mitte Links
 $ #PlacementBottomLeft
-# Bunden til venstre
+# Unten Links
 $ #PlacementTopCenter
-# Toppen i midten
+# Oben Mitte
 $ #PlacementBottomCenter
-# Bunden i midten
+# Unten Mitte
 $ #PlacementTopRight
-# Øverst til højre
+# Oben Rechts
 $ #PlacementCenterRight
-# Til højre i midten
+# Mitte Rechts
 $ #PlacementBottomRight
-# Til højre i bunden
+# Unten Rechts
 
 $ #AutoHide
-# Gem automatisk
+# Automatisch Verbergen

@@ -17,11 +17,6 @@ extern "C" {
 #    include <time.h>
 #  endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
-
-#ifdef    HAVE_UNISTD_H
-#  include <sys/types.h>
-#  include <unistd.h>
-#endif // HAVE_UNISTD_H
 }
 
 #include <queue>

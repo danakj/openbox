@@ -1,6 +1,7 @@
 #include "../../kernel/openbox.h"
 #include "../../kernel/dispatch.h"
 #include "../../kernel/action.h"
+#include "../../kernel/event.h"
 #include "../../kernel/client.h"
 #include "../../kernel/frame.h"
 #include "../../kernel/grab.h"
@@ -219,7 +220,7 @@ static void event(ObEvent *e, void *foo)
 
         if (context == g_quark_try_string("client")) {
             /* Replay the event, so it goes to the client*/
-            XAllowEvents(ob_display, ReplayPointer, CurrentTime);
+            XAllowEvents(ob_display, ReplayPointer, event_lasttime);
             /* Fall through to the release case! */
         } else
             break;

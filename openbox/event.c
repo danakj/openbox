@@ -24,6 +24,7 @@ static void event_handle_root(XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 
 Time event_lasttime = 0;
+Time event_unfocustime = 0;
 
 /*! The value of the mask for the NumLock modifier */
 unsigned int NumLockMask;

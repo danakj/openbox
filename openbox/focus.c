@@ -62,7 +62,8 @@ void focus_set_client(Client *client)
 
     if (client == NULL) {
 	/* when nothing will be focused, send focus to the backup target */
-	XSetInputFocus(ob_display, focus_backup, RevertToNone, event_lasttime);
+	XSetInputFocus(ob_display, focus_backup, RevertToNone,
+                       event_unfocustime);
     }
 
     old = focus_client;

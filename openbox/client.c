@@ -1934,7 +1934,7 @@ gboolean client_focus(Client *self)
 
     if (self->can_focus)
 	XSetInputFocus(ob_display, self->window, RevertToNone,
-                       CurrentTime);
+                       event_lasttime);
 
     if (self->focus_notify) {
 	XEvent ce;
@@ -1944,7 +1944,7 @@ gboolean client_focus(Client *self)
 	ce.xclient.window = self->window;
 	ce.xclient.format = 32;
 	ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
-	ce.xclient.data.l[1] = CurrentTime;
+	ce.xclient.data.l[1] = event_lasttime;
 	ce.xclient.data.l[2] = 0l;
 	ce.xclient.data.l[3] = 0l;
 	ce.xclient.data.l[4] = 0l;
@@ -1972,6 +1972,7 @@ void client_set_focused(Client *self, gboolean focused)
         if (focus_client != self)
             focus_set_client(self);
     } else {
+        event_unfocustime = event_lasttime;
 	if (focus_client == self)
 	    focus_set_client(NULL);
     }

@@ -1,6 +1,7 @@
 #include "../../kernel/focus.h"
 #include "../../kernel/dispatch.h"
 #include "../../kernel/openbox.h"
+#include "../../kernel/event.h"
 #include "../../kernel/grab.h"
 #include "../../kernel/action.h"
 #include "tree.h"
@@ -40,7 +41,7 @@ static void reset_chains()
 	grabbed = FALSE;
         grab_keyboard(FALSE);
     } else
-        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
+        XAllowEvents(ob_display, AsyncKeyboard, event_lasttime);
 }
 
 gboolean kbind(GList *keylist, Action *action)
@@ -102,7 +103,8 @@ static void press(ObEvent *e, void *foo)
                     if (!grabbed) {
                         grab_keyboard(TRUE);
                         grabbed = TRUE;
-                        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
+                        XAllowEvents(ob_display, AsyncKeyboard,
+                                     event_lasttime);
                     }
                     curpos = p;
                 } else {

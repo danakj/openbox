@@ -1790,8 +1790,7 @@ void BScreen::propagateWindowName(const BlackboxWindow *bw) {
   if (bw->isIconic()) {
     iconmenu->changeItemLabel(bw->getWindowNumber(), bw->getIconTitle());
     iconmenu->update();
-  }
-  else {
+  } else {
     Clientmenu *clientmenu = getWorkspace(bw->getWorkspaceNumber())->getMenu();
     clientmenu->changeItemLabel(bw->getWindowNumber(), bw->getTitle());
     clientmenu->update();
@@ -1802,7 +1801,7 @@ void BScreen::propagateWindowName(const BlackboxWindow *bw) {
 }
 
 
-void BScreen::nextFocus(void) {
+void BScreen::nextFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
@@ -1831,7 +1830,7 @@ void BScreen::nextFocus(void) {
 }
 
 
-void BScreen::prevFocus(void) {
+void BScreen::prevFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
@@ -1860,7 +1859,7 @@ void BScreen::prevFocus(void) {
 }
 
 
-void BScreen::raiseFocus(void) {
+void BScreen::raiseFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow();
   if (! focused)
     return;
@@ -2448,7 +2447,7 @@ void BScreen::updateAvailableArea(void) {
 }
 
 
-Workspace* BScreen::getWorkspace(unsigned int index) {
+Workspace* BScreen::getWorkspace(unsigned int index) const {
   assert(index < workspacesList.size());
   return workspacesList[index];
 }

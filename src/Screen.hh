@@ -248,7 +248,7 @@ public:
   inline Slit *getSlit(void) { return slit; }
   inline Toolbar *getToolbar(void) { return toolbar; }
 
-  Workspace *getWorkspace(unsigned int index);
+  Workspace *getWorkspace(unsigned int index) const;
 
   inline Workspace *getCurrentWorkspace(void) { return current_workspace; }
 
@@ -373,9 +373,9 @@ public:
   void reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
                          bool ignore_sticky);
   void propagateWindowName(const BlackboxWindow *bw);
-  void prevFocus(void);
-  void nextFocus(void);
-  void raiseFocus(void);
+  void prevFocus(void) const;
+  void nextFocus(void) const;
+  void raiseFocus(void) const;
   void load_rc(void);
   void save_rc(void);
   void reconfigure(void);

@@ -286,6 +286,7 @@ nls/hu_HU/Makefile
 nls/it_IT/Makefile
 nls/ja_JP/Makefile
 nls/ko_KR/Makefile
+nls/lv_LV/Makefile
 nls/no_NO/Makefile
 nls/pl_PL/Makefile
 nls/nl_NL/Makefile

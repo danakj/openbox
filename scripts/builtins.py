@@ -69,35 +69,43 @@ def resize(data):
                     data.press_clientheight() + dy);
 
 def restart(data):
+    """Restarts openbox"""
     Openbox_restart(openbox, "")
 
-def toggle_shade(data):
-    print "toggle_shade"
-
 def raise_win(data):
+    """Raises the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     screen = Openbox_screen(openbox, OBClient_screen(client))
     OBScreen_restack(screen, 1, client)
 
 def lower_win(data):
+    """Lowers the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     screen = Openbox_screen(openbox, OBClient_screen(client))
     OBScreen_restack(screen, 0, client)
 
+def focusraise(data):
+    """Focuses and raises the window on which the event occured"""
+    focus(data)
+    raise_win(data)
+
 def toggle_shade(data):
+    """Toggles the shade status of the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     print "toggle_shade"
     OBClient_shade(client, not OBClient_shaded(client))
 
 def shade(data):
+    """Shades the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     OBClient_shade(client, 1)
 
 def unshade(data):
+    """Unshades the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     OBClient_shade(client, 0)
@@ -107,6 +115,9 @@ def unshade(data):
 #########################################
 
 def execute(bin, screen = 0):
+    """Executes a command on the specified screen. It is recommended that you
+       use this call instead of a python system call. If the specified screen
+       is beyond your range of screens, the default is used instead."""
     Openbox_execute(openbox, screen, bin)
 
 print "Loaded builtins.py"

@@ -1,19 +1,19 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   client.c for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+client.c for the Openbox window manager
+Copyright (c) 2003        Ben Jansens
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-   See the COPYING file for a copy of the GNU General Public License.
+See the COPYING file for a copy of the GNU General Public License.
 */
 
 #include "client.h"
@@ -117,51 +117,51 @@ void client_set_list()
 
     /* create an array of the window ids */
     if (size > 0) {
-	windows = g_new(Window, size);
-	win_it = windows;
-	for (it = client_list; it != NULL; it = it->next, ++win_it)
-	    *win_it = ((ObClient*)it->data)->window;
+        windows = g_new(Window, size);
+        win_it = windows;
+        for (it = client_list; it != NULL; it = it->next, ++win_it)
+            *win_it = ((ObClient*)it->data)->window;
     } else
-	windows = NULL;
+        windows = NULL;
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
                 net_client_list, window, (guint32*)windows, size);
 
     if (windows)
-	g_free(windows);
+        g_free(windows);
 
     stacking_set_list();
 }
 
 /*
-void client_foreach_transient(ObClient *self, ObClientForeachFunc func, void *data)
-{
-    GSList *it;
+  void client_foreach_transient(ObClient *self, ObClientForeachFunc func, void *data)
+  {
+  GSList *it;
 
-    for (it = self->transients; it; it = it->next) {
-        if (!func(it->data, data)) return;
-        client_foreach_transient(it->data, func, data);
-    }
-}
+  for (it = self->transients; it; it = it->next) {
+  if (!func(it->data, data)) return;
+  client_foreach_transient(it->data, func, data);
+  }
+  }
 
-void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, void *data)
-{
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            if (!func(self->transient_for, data)) return;
-            client_foreach_ancestor(self->transient_for, func, data);
-        } else {
-            GSList *it;
+  void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, void *data)
+  {
+  if (self->transient_for) {
+  if (self->transient_for != OB_TRAN_GROUP) {
+  if (!func(self->transient_for, data)) return;
+  client_foreach_ancestor(self->transient_for, func, data);
+  } else {
+  GSList *it;
 
-            for (it = self->group->members; it; it = it->next)
-                if (it->data != self &&
-                    !((ObClient*)it->data)->transient_for) {
-                    if (!func(it->data, data)) return;
-                    client_foreach_ancestor(it->data, func, data);
-                }
-        }
-    }
-}
+  for (it = self->group->members; it; it = it->next)
+  if (it->data != self &&
+  !((ObClient*)it->data)->transient_for) {
+  if (!func(it->data, data)) return;
+  client_foreach_ancestor(it->data, func, data);
+  }
+  }
+  }
+  }
 */
 
 void client_manage_all()
@@ -176,29 +176,29 @@ void client_manage_all()
 
     /* remove all icon windows from the list */
     for (i = 0; i < nchild; i++) {
-	if (children[i] == None) continue;
-	wmhints = XGetWMHints(ob_display, children[i]);
-	if (wmhints) {
-	    if ((wmhints->flags & IconWindowHint) &&
-		(wmhints->icon_window != children[i]))
-		for (j = 0; j < nchild; j++)
-		    if (children[j] == wmhints->icon_window) {
-			children[j] = None;
-			break;
-		    }
-	    XFree(wmhints);
-	}
+        if (children[i] == None) continue;
+        wmhints = XGetWMHints(ob_display, children[i]);
+        if (wmhints) {
+            if ((wmhints->flags & IconWindowHint) &&
+                (wmhints->icon_window != children[i]))
+                for (j = 0; j < nchild; j++)
+                    if (children[j] == wmhints->icon_window) {
+                        children[j] = None;
+                        break;
+                    }
+            XFree(wmhints);
+        }
     }
 
     for (i = 0; i < nchild; ++i) {
-	if (children[i] == None)
-	    continue;
-	if (XGetWindowAttributes(ob_display, children[i], &attrib)) {
-	    if (attrib.override_redirect) continue;
+        if (children[i] == None)
+            continue;
+        if (XGetWindowAttributes(ob_display, children[i], &attrib)) {
+            if (attrib.override_redirect) continue;
 
-	    if (attrib.map_state != IsUnmapped)
-		client_manage(children[i]);
-	}
+            if (attrib.map_state != IsUnmapped)
+                client_manage(children[i]);
+        }
     }
     XFree(children);
 }
@@ -217,30 +217,30 @@ void client_manage(Window window)
     /* check if it has already been unmapped by the time we started mapping
        the grab does a sync so we don't have to here */
     if (XCheckTypedWindowEvent(ob_display, window, DestroyNotify, &e) ||
-	XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e)) {
-	XPutBackEvent(ob_display, &e);
+        XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e)) {
+        XPutBackEvent(ob_display, &e);
 
         grab_server(FALSE);
-	return; /* don't manage it */
+        return; /* don't manage it */
     }
 
     /* make sure it isn't an override-redirect window */
     if (!XGetWindowAttributes(ob_display, window, &attrib) ||
-	attrib.override_redirect) {
+        attrib.override_redirect) {
         grab_server(FALSE);
-	return; /* don't manage it */
+        return; /* don't manage it */
     }
   
     /* is the window a docking app */
     if ((wmhint = XGetWMHints(ob_display, window))) {
-	if ((wmhint->flags & StateHint) &&
-	    wmhint->initial_state == WithdrawnState) {
+        if ((wmhint->flags & StateHint) &&
+            wmhint->initial_state == WithdrawnState) {
             dock_add(window, wmhint);
             grab_server(FALSE);
-	    XFree(wmhint);
-	    return;
-	}
-	XFree(wmhint);
+            XFree(wmhint);
+            return;
+        }
+        XFree(wmhint);
     }
 
     ob_debug("Managing window: %lx\n", window);
@@ -249,7 +249,7 @@ void client_manage(Window window)
     attrib_set.event_mask = CLIENT_EVENTMASK;
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
     XChangeWindowAttributes(ob_display, window,
-			    CWEventMask|CWDontPropagate, &attrib_set);
+                            CWEventMask|CWDontPropagate, &attrib_set);
 
 
     /* create the ObClient struct, and populate it from the hints on the
@@ -395,7 +395,7 @@ void client_manage(Window window)
 void client_unmanage_all()
 {
     while (client_list != NULL)
-	client_unmanage(client_list->data);
+        client_unmanage(client_list->data);
 }
 
 void client_unmanage(ObClient *self)
@@ -483,16 +483,16 @@ void client_unmanage(ObClient *self)
     self->frame = NULL;
      
     if (ob_state() != OB_STATE_EXITING) {
-	/* these values should not be persisted across a window
-	   unmapping/mapping */
-	PROP_ERASE(self->window, net_wm_desktop);
-	PROP_ERASE(self->window, net_wm_state);
-	PROP_ERASE(self->window, wm_state);
+        /* these values should not be persisted across a window
+           unmapping/mapping */
+        PROP_ERASE(self->window, net_wm_desktop);
+        PROP_ERASE(self->window, net_wm_state);
+        PROP_ERASE(self->window, wm_state);
     } else {
-	/* if we're left in an iconic state, the client wont be mapped. this is
-	   bad, since we will no longer be managing the window on restart */
-	if (self->iconic)
-	    XMapWindow(ob_display, self->window);
+        /* if we're left in an iconic state, the client wont be mapped. this is
+           bad, since we will no longer be managing the window on restart */
+        if (self->iconic)
+            XMapWindow(ob_display, self->window);
     }
 
 
@@ -650,55 +650,55 @@ static void client_toggle_border(ObClient *self, gboolean show)
     case NorthWestGravity:
     case WestGravity:
     case SouthWestGravity:
-	break;
+        break;
     case NorthEastGravity:
     case EastGravity:
     case SouthEastGravity:
-	if (show) x -= self->border_width * 2;
-	else      x += self->border_width * 2;
-	break;
+        if (show) x -= self->border_width * 2;
+        else      x += self->border_width * 2;
+        break;
     case NorthGravity:
     case SouthGravity:
     case CenterGravity:
     case ForgetGravity:
     case StaticGravity:
-	if (show) x -= self->border_width;
-	else      x += self->border_width;
-	break;
+        if (show) x -= self->border_width;
+        else      x += self->border_width;
+        break;
     }
     switch(self->gravity) {
     default:
     case NorthWestGravity:
     case NorthGravity:
     case NorthEastGravity:
-	break;
+        break;
     case SouthWestGravity:
     case SouthGravity:
     case SouthEastGravity:
-	if (show) y -= self->border_width * 2;
-	else      y += self->border_width * 2;
-	break;
+        if (show) y -= self->border_width * 2;
+        else      y += self->border_width * 2;
+        break;
     case WestGravity:
     case EastGravity:
     case CenterGravity:
     case ForgetGravity:
     case StaticGravity:
-	if (show) y -= self->border_width;
-	else      y += self->border_width;
-	break;
+        if (show) y -= self->border_width;
+        else      y += self->border_width;
+        break;
     }
     self->area.x = x;
     self->area.y = y;
 
     if (show) {
-	XSetWindowBorderWidth(ob_display, self->window, self->border_width);
+        XSetWindowBorderWidth(ob_display, self->window, self->border_width);
 
-	/* move the client so it is back it the right spot _with_ its
-	   border! */
-	if (x != oldx || y != oldy)
-	    XMoveWindow(ob_display, self->window, x, y);
+        /* move the client so it is back it the right spot _with_ its
+           border! */
+        if (x != oldx || y != oldy)
+            XMoveWindow(ob_display, self->window, x, y);
     } else
-	XSetWindowBorderWidth(ob_display, self->window, 0);
+        XSetWindowBorderWidth(ob_display, self->window, 0);
 }
 
 
@@ -731,7 +731,7 @@ static void client_get_all(ObClient *self)
 
     client_get_gravity(self); /* get the attribute gravity */
     client_update_normal_hints(self); /* this may override the attribute
-					 gravity */
+                                         gravity */
 
     /* got the type, the mwmhints, the protocols, and the normal hints
        (min/max sizes), so we're ready to set up the decorations/functions */
@@ -769,15 +769,15 @@ static void client_get_desktop(ObClient *self)
     guint32 d = screen_num_desktops; /* an always-invalid value */
 
     if (PROP_GET32(self->window, net_wm_desktop, cardinal, &d)) {
-	if (d >= screen_num_desktops && d != DESKTOP_ALL)
-	    self->desktop = screen_num_desktops - 1;
+        if (d >= screen_num_desktops && d != DESKTOP_ALL)
+            self->desktop = screen_num_desktops - 1;
         else
             self->desktop = d;
     } else {
         gboolean trdesk = FALSE;
 
-       if (self->transient_for) {
-           if (self->transient_for != OB_TRAN_GROUP) {
+        if (self->transient_for) {
+            if (self->transient_for != OB_TRAN_GROUP) {
                 self->desktop = self->transient_for->desktop;
                 trdesk = TRUE;
             } else {
@@ -791,17 +791,17 @@ static void client_get_desktop(ObClient *self)
                         break;
                     }
             }
-       }
-       if (!trdesk) {
-           /* try get from the startup-notification protocol */
-           if (sn_get_desktop(self->startup_id, &self->desktop)) {
-               if (self->desktop >= screen_num_desktops &&
-                   self->desktop != DESKTOP_ALL)
-                   self->desktop = screen_num_desktops - 1;
-           } else
-               /* defaults to the current desktop */
-               self->desktop = screen_desktop;
-       }
+        }
+        if (!trdesk) {
+            /* try get from the startup-notification protocol */
+            if (sn_get_desktop(self->startup_id, &self->desktop)) {
+                if (self->desktop >= screen_num_desktops &&
+                    self->desktop != DESKTOP_ALL)
+                    self->desktop = screen_num_desktops - 1;
+            } else
+                /* defaults to the current desktop */
+                self->desktop = screen_desktop;
+        }
     }
     if (self->desktop != d) {
         /* set the desktop hint, to make sure that it always exists */
@@ -850,16 +850,16 @@ static void client_get_shaped(ObClient *self)
     self->shaped = FALSE;
 #ifdef   SHAPE
     if (extensions_shape) {
-	int foo;
-	guint ufoo;
-	int s;
+        int foo;
+        guint ufoo;
+        int s;
 
-	XShapeSelectInput(ob_display, self->window, ShapeNotifyMask);
+        XShapeSelectInput(ob_display, self->window, ShapeNotifyMask);
 
-	XShapeQueryExtents(ob_display, self->window, &s, &foo,
-			   &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
-			   &ufoo);
-	self->shaped = (s != 0);
+        XShapeQueryExtents(ob_display, self->window, &s, &foo,
+                           &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
+                           &ufoo);
+        self->shaped = (s != 0);
     }
 #endif
 }
@@ -898,25 +898,25 @@ void client_update_transient_for(ObClient *self)
 
     /* if anything has changed... */
     if (target != self->transient_for) {
-	if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
+        if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
             GSList *it;
 
-	    /* remove from old parents */
+            /* remove from old parents */
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
                 if (c != self && !c->transient_for)
                     c->transients = g_slist_remove(c->transients, self);
             }
         } else if (self->transient_for != NULL) { /* transient of window */
-	    /* remove from old parent */
-	    self->transient_for->transients =
+            /* remove from old parent */
+            self->transient_for->transients =
                 g_slist_remove(self->transient_for->transients, self);
         }
-	self->transient_for = target;
-	if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
+        self->transient_for = target;
+        if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
             GSList *it;
 
-	    /* add to new parents */
+            /* add to new parents */
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
                 if (c != self && !c->transient_for)
@@ -935,8 +935,8 @@ void client_update_transient_for(ObClient *self)
                 }
             }
         } else if (self->transient_for != NULL) { /* transient of window */
-	    /* add to new parent */
-	    self->transient_for->transients =
+            /* add to new parent */
+            self->transient_for->transients =
                 g_slist_append(self->transient_for->transients, self);
         }
     }
@@ -951,12 +951,12 @@ static void client_get_mwm_hints(ObClient *self)
 
     if (PROP_GETA32(self->window, motif_wm_hints, motif_wm_hints,
                     &hints, &num)) {
-	if (num >= OB_MWM_ELEMENTS) {
-	    self->mwmhints.flags = hints[0];
-	    self->mwmhints.functions = hints[1];
-	    self->mwmhints.decorations = hints[2];
-	}
-	g_free(hints);
+        if (num >= OB_MWM_ELEMENTS) {
+            self->mwmhints.flags = hints[0];
+            self->mwmhints.functions = hints[1];
+            self->mwmhints.decorations = hints[2];
+        }
+        g_free(hints);
     }
 }
 
@@ -1001,13 +1001,13 @@ void client_get_type(ObClient *self)
     }
     
     if (self->type == (ObClientType) -1) {
-	/*the window type hint was not set, which means we either classify
-	  ourself as a normal window or a dialog, depending on if we are a
-	  transient. */
-	if (self->transient)
-	    self->type = OB_CLIENT_TYPE_DIALOG;
-	else
-	    self->type = OB_CLIENT_TYPE_NORMAL;
+        /*the window type hint was not set, which means we either classify
+          ourself as a normal window or a dialog, depending on if we are a
+          transient. */
+        if (self->transient)
+            self->type = OB_CLIENT_TYPE_DIALOG;
+        else
+            self->type = OB_CLIENT_TYPE_NORMAL;
     }
 }
 
@@ -1020,16 +1020,16 @@ void client_update_protocols(ObClient *self)
     self->delete_window = FALSE;
 
     if (PROP_GETA32(self->window, wm_protocols, atom, &proto, &num_return)) {
-	for (i = 0; i < num_return; ++i) {
-	    if (proto[i] == prop_atoms.wm_delete_window) {
-		/* this means we can request the window to close */
-		self->delete_window = TRUE;
-	    } else if (proto[i] == prop_atoms.wm_take_focus)
-		/* if this protocol is requested, then the window will be
-		   notified whenever we want it to receive focus */
-		self->focus_notify = TRUE;
-	}
-	g_free(proto);
+        for (i = 0; i < num_return; ++i) {
+            if (proto[i] == prop_atoms.wm_delete_window) {
+                /* this means we can request the window to close */
+                self->delete_window = TRUE;
+            } else if (proto[i] == prop_atoms.wm_take_focus)
+                /* if this protocol is requested, then the window will be
+                   notified whenever we want it to receive focus */
+                self->focus_notify = TRUE;
+        }
+        g_free(proto);
     }
 }
 
@@ -1061,38 +1061,38 @@ void client_update_normal_hints(ObClient *self)
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
         self->positioned = !!(size.flags & (PPosition|USPosition));
 
-	if (size.flags & PWinGravity) {
-	    self->gravity = size.win_gravity;
+        if (size.flags & PWinGravity) {
+            self->gravity = size.win_gravity;
       
-	    /* if the client has a frame, i.e. has already been mapped and
-	       is changing its gravity */
-	    if (self->frame && self->gravity != oldgravity) {
-		/* move our idea of the client's position based on its new
-		   gravity */
-		self->area.x = self->frame->area.x;
-		self->area.y = self->frame->area.y;
-		frame_frame_gravity(self->frame, &self->area.x, &self->area.y);
-	    }
-	}
+            /* if the client has a frame, i.e. has already been mapped and
+               is changing its gravity */
+            if (self->frame && self->gravity != oldgravity) {
+                /* move our idea of the client's position based on its new
+                   gravity */
+                self->area.x = self->frame->area.x;
+                self->area.y = self->frame->area.y;
+                frame_frame_gravity(self->frame, &self->area.x, &self->area.y);
+            }
+        }
 
-	if (size.flags & PAspect) {
-	    if (size.min_aspect.y)
-		self->min_ratio = (float)size.min_aspect.x / size.min_aspect.y;
-	    if (size.max_aspect.y)
-		self->max_ratio = (float)size.max_aspect.x / size.max_aspect.y;
-	}
+        if (size.flags & PAspect) {
+            if (size.min_aspect.y)
+                self->min_ratio = (float)size.min_aspect.x / size.min_aspect.y;
+            if (size.max_aspect.y)
+                self->max_ratio = (float)size.max_aspect.x / size.max_aspect.y;
+        }
 
-	if (size.flags & PMinSize)
-	    SIZE_SET(self->min_size, size.min_width, size.min_height);
+        if (size.flags & PMinSize)
+            SIZE_SET(self->min_size, size.min_width, size.min_height);
     
-	if (size.flags & PMaxSize)
-	    SIZE_SET(self->max_size, size.max_width, size.max_height);
+        if (size.flags & PMaxSize)
+            SIZE_SET(self->max_size, size.max_width, size.max_height);
     
-	if (size.flags & PBaseSize)
-	    SIZE_SET(self->base_size, size.base_width, size.base_height);
+        if (size.flags & PBaseSize)
+            SIZE_SET(self->base_size, size.base_width, size.base_height);
     
-	if (size.flags & PResizeInc)
-	    SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
+        if (size.flags & PResizeInc)
+            SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
     }
 }
 
@@ -1191,7 +1191,7 @@ void client_setup_decor_and_functions(ObClient *self)
     if (!((self->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
           (self->functions & OB_CLIENT_FUNC_MOVE) &&
           (self->functions & OB_CLIENT_FUNC_RESIZE))) {
-	self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+        self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
 
@@ -1292,19 +1292,19 @@ void client_update_wmhints(ObClient *self)
     self->can_focus = TRUE;
   
     if ((hints = XGetWMHints(ob_display, self->window)) != NULL) {
-	if (hints->flags & InputHint)
-	    self->can_focus = hints->input;
+        if (hints->flags & InputHint)
+            self->can_focus = hints->input;
 
-	/* only do this when first managing the window *AND* when we aren't
+        /* only do this when first managing the window *AND* when we aren't
            starting up! */
-	if (ob_state() != OB_STATE_STARTING && self->frame == NULL)
+        if (ob_state() != OB_STATE_STARTING && self->frame == NULL)
             if (hints->flags & StateHint)
                 self->iconic = hints->initial_state == IconicState;
 
-	if (hints->flags & XUrgencyHint)
-	    ur = TRUE;
+        if (hints->flags & XUrgencyHint)
+            ur = TRUE;
 
-	if (!(hints->flags & WindowGroupHint))
+        if (!(hints->flags & WindowGroupHint))
             hints->window_group = None;
 
         /* did the group state change? */
@@ -1430,8 +1430,8 @@ void client_update_title(ObClient *self)
     read_title = TRUE;
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_icon_name, utf8, &data))
-	/* try old x stuff */
-	if (!PROP_GETS(self->window, wm_icon_name, locale, &data)) {
+        /* try old x stuff */
+        if (!PROP_GETS(self->window, wm_icon_name, locale, &data)) {
             data = g_strdup(self->title);
             read_title = FALSE;
         }
@@ -1464,7 +1464,7 @@ void client_update_class(ObClient *self)
 
     if (PROP_GETSS(self->window, wm_class, locale, &data)) {
         if (data[0]) {
-	    self->name = g_strdup(data[0]);
+            self->name = g_strdup(data[0]);
             if (data[1])
                 self->class = g_strdup(data[1]);
         }
@@ -1472,7 +1472,7 @@ void client_update_class(ObClient *self)
     }
 
     if (PROP_GETS(self->window, wm_window_role, locale, &s))
-	self->role = s;
+        self->role = s;
 
     if (self->name == NULL) self->name = g_strdup("");
     if (self->class == NULL) self->class = g_strdup("");
@@ -1666,8 +1666,8 @@ ObClient *client_search_focus_tree(ObClient *self)
     ObClient *ret;
 
     for (it = self->transients; it != NULL; it = it->next) {
-	if (client_focused(it->data)) return it->data;
-	if ((ret = client_search_focus_tree(it->data))) return ret;
+        if (client_focused(it->data)) return it->data;
+        if ((ret = client_search_focus_tree(it->data))) return ret;
     }
     return NULL;
 }
@@ -1689,14 +1689,14 @@ ObClient *client_search_focus_tree_full(ObClient *self)
                     recursed = TRUE;
                 }
             if (recursed)
-              return NULL;
+                return NULL;
         }
     }
 
     /* this function checks the whole tree, the client_search_focus_tree~
        does not, so we need to check this window */
     if (client_focused(self))
-      return self;
+        return self;
     return client_search_focus_tree(self);
 }
 
@@ -1736,7 +1736,7 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
                                     l, raised ? raised : l != old);
 
     if (!raised && l != old)
-	if (orig->frame) { /* only restack if the original window is managed */
+        if (orig->frame) { /* only restack if the original window is managed */
             /* XXX add_non_intrusive ever? */
             stacking_remove(CLIENT_AS_WINDOW(self));
             stacking_add(CLIENT_AS_WINDOW(self));
@@ -2071,7 +2071,7 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
     int x, y, w, h;
 
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) || /* can't */
-	self->fullscreen == fs) return;                   /* already done */
+        self->fullscreen == fs) return;                   /* already done */
 
     self->fullscreen = fs;
     client_change_state(self); /* change the state hints on the client,
@@ -2283,7 +2283,7 @@ void client_shade(ObClient *self, gboolean shade)
 {
     if ((!(self->functions & OB_CLIENT_FUNC_SHADE) &&
          shade) ||                         /* can't shade */
-	self->shaded == shade) return;     /* already done */
+        self->shaded == shade) return;     /* already done */
 
     /* when we're iconic, don't change the wmstate */
     if (!self->iconic) {
@@ -2392,9 +2392,9 @@ ObClient *client_search_modal_child(ObClient *self)
     ObClient *ret;
   
     for (it = self->transients; it != NULL; it = it->next) {
-	ObClient *c = it->data;
-	if ((ret = client_search_modal_child(c))) return ret;
-	if (c->modal) return c;
+        ObClient *c = it->data;
+        if ((ret = client_search_modal_child(c))) return ret;
+        if (c->modal) return c;
     }
     return NULL;
 }
@@ -2406,9 +2406,9 @@ gboolean client_validate(ObClient *self)
     XSync(ob_display, FALSE); /* get all events on the server */
 
     if (XCheckTypedWindowEvent(ob_display, self->window, DestroyNotify, &e) ||
-	XCheckTypedWindowEvent(ob_display, self->window, UnmapNotify, &e)) {
-	XPutBackEvent(ob_display, &e);
-	return FALSE;
+        XCheckTypedWindowEvent(ob_display, self->window, UnmapNotify, &e)) {
+        XPutBackEvent(ob_display, &e);
+        return FALSE;
     }
 
     return TRUE;
@@ -2420,11 +2420,11 @@ void client_set_wm_state(ObClient *self, long state)
   
     switch (state) {
     case IconicState:
-	client_iconify(self, TRUE, TRUE);
-	break;
+        client_iconify(self, TRUE, TRUE);
+        break;
     case NormalState:
-	client_iconify(self, FALSE, TRUE);
-	break;
+        client_iconify(self, FALSE, TRUE);
+        break;
     }
 }
 
@@ -2627,23 +2627,23 @@ gboolean client_focus(ObClient *self)
            Update: Changing this to RevertToNone fixed a bug with mozilla (bug
            #799. So now it is RevertToNone again.
         */
-	XSetInputFocus(ob_display, self->window, RevertToNone,
+        XSetInputFocus(ob_display, self->window, RevertToNone,
                        event_lasttime);
     }
 
     if (self->focus_notify) {
-	XEvent ce;
-	ce.xclient.type = ClientMessage;
-	ce.xclient.message_type = prop_atoms.wm_protocols;
-	ce.xclient.display = ob_display;
-	ce.xclient.window = self->window;
-	ce.xclient.format = 32;
-	ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
-	ce.xclient.data.l[1] = event_lasttime;
-	ce.xclient.data.l[2] = 0l;
-	ce.xclient.data.l[3] = 0l;
-	ce.xclient.data.l[4] = 0l;
-	XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
+        XEvent ce;
+        ce.xclient.type = ClientMessage;
+        ce.xclient.message_type = prop_atoms.wm_protocols;
+        ce.xclient.display = ob_display;
+        ce.xclient.window = self->window;
+        ce.xclient.format = 32;
+        ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
+        ce.xclient.data.l[1] = event_lasttime;
+        ce.xclient.data.l[2] = 0l;
+        ce.xclient.data.l[3] = 0l;
+        ce.xclient.data.l[4] = 0l;
+        XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
 #ifdef DEBUG_FOCUS
@@ -2802,7 +2802,7 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
             continue;
         if(cur->iconic)
             continue;
-	if(client_focus_target(cur) == cur &&
+        if(client_focus_target(cur) == cur &&
            !(cur->can_focus || cur->focus_notify))
             continue;
 
@@ -2833,7 +2833,7 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
         case OB_DIRECTION_SOUTHWEST:
             offset = (his_cx < 0) ? -his_cx : his_cx;
             distance = ((dir == OB_DIRECTION_NORTH ||
-                        dir == OB_DIRECTION_NORTHEAST) ?
+                         dir == OB_DIRECTION_NORTHEAST) ?
                         -his_cy : his_cy);
             break;
         case OB_DIRECTION_EAST:
@@ -2842,7 +2842,7 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
         case OB_DIRECTION_NORTHWEST:
             offset = (his_cy < 0) ? -his_cy : his_cy;
             distance = ((dir == OB_DIRECTION_WEST ||
-                        dir == OB_DIRECTION_NORTHWEST) ?
+                         dir == OB_DIRECTION_NORTHWEST) ?
                         -his_cx : his_cx);
             break;
         }
@@ -3024,7 +3024,8 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         my_edge_end = c->frame->area.x + c->frame->area.width;
         my_offset = c->frame->area.y;
         
-        dest = a->y; /* default: top of screen */
+        /* default: top of screen */
+        dest = a->y;
 
         for(it = g_list_first(client_list); it; it = it->next) {
             int his_edge_start, his_edge_end, his_offset;
@@ -3063,8 +3064,9 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         my_edge_start = c->frame->area.x;
         my_edge_end = c->frame->area.x + c->frame->area.width;
         my_offset = c->frame->area.y + c->frame->area.height;
-        
-        dest = a->y + a->height; /* default: bottom of screen */
+
+        /* default: bottom of screen */
+        dest = a->y + a->height;
 
         for(it = g_list_first(client_list); it; it = it->next) {
             int his_edge_start, his_edge_end, his_offset;
@@ -3105,7 +3107,8 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         my_edge_end = c->frame->area.y + c->frame->area.height;
         my_offset = c->frame->area.x;
 
-        dest = a->x; /* default: leftmost egde of screen */
+        /* default: leftmost egde of screen */
+        dest = a->x;
 
         for(it = g_list_first(client_list); it; it = it->next) {
             int his_edge_start, his_edge_end, his_offset;
@@ -3146,7 +3149,8 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
         my_edge_end = c->frame->area.y + c->frame->area.height;
         my_offset = c->frame->area.x + c->frame->area.width;
         
-        dest = a->x + a->width; /* default: rightmost edge of screen */
+        /* default: rightmost edge of screen */
+        dest = a->x + a->width;
 
         for(it = g_list_first(client_list); it; it = it->next) {
             int his_edge_start, his_edge_end, his_offset;

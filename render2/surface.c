@@ -21,6 +21,13 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
     return sur;
 }
 
+static Window create_window(struct RrInstance *inst, Window parent)
+{
+    return XCreateWindow(RrDisplay(inst), parent, 0, 0, 1, 1, 0,
+                         RrDepth(inst), InputOutput, RrVisual(inst),
+                         0, NULL);
+}
+
 struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
                                     int numtex)
 {
@@ -59,7 +66,7 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
 
     sur = surface_new(type, numtex);
     sur->inst = parent->inst;
-    sur->win = None; /* XXX XCreateWindow? */
+    sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
     sur->parentx = 0;
     sur->parenty = 0;
@@ -112,7 +119,7 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *orig,
 
     sur = surface_copy(orig);
     sur->inst = parent->inst;
-    sur->win = None; /* XXX XCreateWindow? */
+    sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
     return sur;
 }

@@ -595,6 +595,11 @@ ActionString actionstrings[] =
         NULL
     },
     {
+        "desktoplast",
+        action_desktop_last,
+        NULL
+    },
+    {
         "restart",
         action_restart,
         NULL
@@ -1050,6 +1055,11 @@ void action_send_to_desktop_dir(union ActionData *data)
     client_set_desktop(c, d, data->sendtodir.follow);
     if (data->sendtodir.follow)
         screen_set_desktop(d);
+}
+
+void action_desktop_last(union ActionData *data)
+{
+    screen_set_desktop(screen_last_desktop);
 }
 
 void action_toggle_decorations(union ActionData *data)

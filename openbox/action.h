@@ -214,6 +214,8 @@ void action_send_to_desktop_dir(union ActionData *data);
 void action_desktop(union ActionData *data);
 /* DesktopDirection */
 void action_desktop_dir(union ActionData *data);
+/* Any */
+void action_desktop_last(union ActionData *data);
 /* ClientAction */
 void action_toggle_decorations(union ActionData *data);
 /* MoveResize */

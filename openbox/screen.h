@@ -14,6 +14,8 @@ extern guint screen_num_desktops;
 extern guint screen_num_monitors;
 /*! The current desktop */
 extern guint screen_desktop;
+/*! The desktop which was last visible */
+extern guint screen_last_desktop;
 /*! Are we in showing-desktop mode? */
 extern gboolean screen_showing_desktop;
 /*! The support window also used for focus and stacking */

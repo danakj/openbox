@@ -36,6 +36,7 @@
 guint    screen_num_desktops;
 guint    screen_num_monitors;
 guint    screen_desktop;
+guint    screen_last_desktop;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
 DesktopLayout screen_desktop_layout;
@@ -419,6 +420,8 @@ void screen_set_desktop(guint num)
                net_current_desktop, cardinal, num);
 
     if (old == num) return;
+
+    screen_last_desktop = old;
 
     ob_debug("Moving to desktop %d\n", num+1);
 

@@ -127,6 +127,9 @@ int main(int argc, char **argv) {
         case XftTypeBool:
           cout << val.u.b;
           break;
+
+        default:
+          break;
         }
       } while ((vallist = vallist->next));
       cout << endl;

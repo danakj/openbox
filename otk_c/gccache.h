@@ -51,8 +51,8 @@ typedef struct OtkGCCache {
   OtkGCCacheItem **cache;
 } OtkGCCache;
 
-void OtkGCCache_Initialize(int screen_count);
-void OtkGCCache_Destroy();
+void OtkGCCache_Initialize();
+//void OtkGCCache_Destroy();
 
 // cleans up the cache
 void OtkGCCache_Purge();

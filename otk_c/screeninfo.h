@@ -5,6 +5,8 @@
 #include <X11/Xlib.h>
 #include <Python.h>
 
+extern PyTypeObject OtkScreenInfo_Type;
+
 typedef struct OtkScreenInfo {
   int screen;
   Window root_window;

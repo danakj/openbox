@@ -10,6 +10,8 @@ struct OtkDisplay;
 
 extern struct OtkDisplay *OBDisplay; // the global display XXX: move this to app.h and ob.h?
 
+extern PyTypeObject OtkDisplay_Type;
+
 typedef struct OtkDisplay {
   PyObject_HEAD
   

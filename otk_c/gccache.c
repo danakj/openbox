@@ -86,7 +86,7 @@ OtkGCCacheItem *OtkGCCacheItem_New()
 }
 
 
-void OtkGCCache_Initialize(int screen_count)
+void OtkGCCache_Initialize()
 {
   unsigned int i;
 
@@ -94,7 +94,7 @@ void OtkGCCache_Initialize(int screen_count)
 
   gccache->context_count = 128;
   gccache->cache_size = 16;
-  gccache->cache_buckets = 8 * screen_count;
+  gccache->cache_buckets = 8 * ScreenCount(OBDisplay->display);
   gccache->cache_total_size = gccache->cache_size * gccache->cache_buckets;
 
   gccache->contexts = malloc(sizeof(OtkGCCacheContext*) *
@@ -108,7 +108,7 @@ void OtkGCCache_Initialize(int screen_count)
 }
 
 
-void OtkGCCache_Destroy()
+/*void OtkGCCache_Destroy()
 {
   unsigned int i;
 
@@ -122,9 +122,9 @@ void OtkGCCache_Destroy()
   free(gccache->cache);
   free(gccache);
   gccache = NULL;
-}
+}*/
 
-OtkGCCacheContext *OtkGCCache_NextContext(int screen)
+static OtkGCCacheContext *nextContext(int screen)
 {
   Window hd = OtkDisplay_ScreenInfo(OBDisplay, screen)->root_window;
   OtkGCCacheContext *c;
@@ -202,7 +202,7 @@ OtkGCCacheItem *OtkGCCache_Find(OtkColor *color, XFontStruct *font,
       gccache->cache[k-1] = c;
     }
   } else {
-    c->ctx = OtkGCCache_NextContext(screen);
+    c->ctx = nextContext(screen);
     OtkGCCacheContext_Set(c->ctx, color, font, function, subwindow, linewidth);
     c->ctx->used = True;
     c->count = 1;

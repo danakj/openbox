@@ -3,8 +3,8 @@ exec_prefix=$(prefix)
 libdir=$(exec_prefix)/lib
 
 targets = libotk.so libotk.a
-sources = display.c screeninfo.c rect.c gccache.c color.c
-headers = display.h screeninfo.h rect.h gccache.h color.h
+sources = init.c display.c screeninfo.c rect.c gccache.c color.c
+headers = init.h display.h screeninfo.h rect.h gccache.h color.h
 
 CFLAGS+=-g -I/usr/gwar/include/python2.2 -W -Wall
 

@@ -1,9 +1,11 @@
-// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __color_h
 #define __color_h
 
 #include <X11/Xlib.h>
 #include <Python.h>
+
+extern PyTypeObject OtkColor_Type;
 
 //!  OtkColor objects are immutable. DONT CHANGE THEM.
 typedef struct OtkColor {

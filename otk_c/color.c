@@ -46,7 +46,7 @@ static long otkcolor_hash(OtkColor *self)
   return self->screen << 24 | self->red << 16 | self->green << 8 | self->blue;
 }
 
-static PyTypeObject OtkColor_Type = {
+PyTypeObject OtkColor_Type = {
   PyObject_HEAD_INIT(NULL)
   0,
   "Color",

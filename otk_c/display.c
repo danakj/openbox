@@ -126,6 +126,8 @@ line argument.\n\n"));
   self->screenInfoList = PyList_New(ScreenCount(self->display));
   for (i = 0; i < ScreenCount(self->display); ++i)
     PyList_SetItem(self->screenInfoList, i, OtkScreenInfo_New(i));
+
+  Py_INCREF(OBDisplay); // make sure it stays around!!
 }
 
 void OtkDisplay_Grab(OtkDisplay *self)

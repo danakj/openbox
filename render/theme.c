@@ -273,12 +273,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
    } else {
         {
-            char data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
-            theme->max_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
+            theme->max_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
         }
         {
-            char data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f };
-            theme->max_toggled_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f };
+            theme->max_toggled_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
         }
         theme->max_pressed_mask = RrPixmapMaskCopy(theme->max_mask);
         theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
@@ -302,8 +302,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     } else {
         {
-            char data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
-            theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
+            theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
         }
         theme->iconify_pressed_mask = RrPixmapMaskCopy(theme->iconify_mask);
         theme->iconify_disabled_mask = RrPixmapMaskCopy(theme->iconify_mask);
@@ -330,12 +330,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     } else {
         {
-            char data[] = { 0x63, 0x63, 0x00, 0x00, 0x00, 0x63, 0x63 };
-            theme->desk_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x63, 0x63, 0x00, 0x00, 0x00, 0x63, 0x63 };
+            theme->desk_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
         }
         {
-            char data[] = { 0x00, 0x36, 0x36, 0x08, 0x36, 0x36, 0x00 };
-            theme->desk_toggled_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x00, 0x36, 0x36, 0x08, 0x36, 0x36, 0x00 };
+            theme->desk_toggled_mask = RrPixmapMaskNew(inst, 7, 7,
+                                                       (char*)data);
         }
         theme->desk_pressed_mask = RrPixmapMaskCopy(theme->desk_mask);
         theme->desk_disabled_mask = RrPixmapMaskCopy(theme->desk_mask);
@@ -362,12 +363,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     } else {
         {
-            char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x00 };
-            theme->shade_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x00 };
+            theme->shade_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
         }
         {
-            char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x7f };
-            theme->shade_toggled_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x7f };
+            theme->shade_toggled_mask = RrPixmapMaskNew(inst, 7, 7,
+                                                        (char*)data);
         }
         theme->shade_pressed_mask = RrPixmapMaskCopy(theme->shade_mask);
         theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_mask);
@@ -389,8 +391,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     } else {
         {
-            char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-            theme->close_mask = RrPixmapMaskNew(inst, 7, 7, data);
+            guchar data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
+            theme->close_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
         }
         theme->close_pressed_mask = RrPixmapMaskCopy(theme->close_mask);
         theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);

@@ -25,7 +25,8 @@
 
 #include <X11/Xlib.h>
 
-#include "LinkedList.h"
+#include <vector>
+#include <list>
 
 class BScreen;
 class Clientmenu;
@@ -34,13 +35,17 @@ class OpenboxWindow;
 class Size;
 class Rect;
 
+typedef std::vector<OpenboxWindow *> winVect;
+typedef std::list<OpenboxWindow *> winList;
+
 class Workspace {
 private:
   BScreen &screen;
   OpenboxWindow *lastfocus;
   Clientmenu *clientmenu;
 
-  LinkedList<OpenboxWindow> *stackingList, *windowList;
+  winVect _windows;
+  winList _zorder;
 
   char *name;
   int id, cascade_x, cascade_y;
@@ -69,7 +74,6 @@ public:
   void focusWindow(OpenboxWindow *win);
   OpenboxWindow *getWindow(int);
   Bool isCurrent(void);
-  Bool isLastWindow(OpenboxWindow *);
   const int addWindow(OpenboxWindow *, Bool = False);
   const int removeWindow(OpenboxWindow *);
   const int getCount(void);

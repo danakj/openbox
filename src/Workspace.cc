@@ -31,21 +31,6 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-
-#include "i18n.h"
-#include "openbox.h"
-#include "Clientmenu.h"
-#include "Screen.h"
-#include "Toolbar.h"
-#include "Window.h"
-#include "Workspace.h"
-
-#include "Windowmenu.h"
-#include "Geometry.h"
-#include "Util.h"
-
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
@@ -58,6 +43,20 @@
 #  include <string.h>
 #endif // HAVE_STRING_H
 
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+
+#include "i18n.h"
+#include "openbox.h"
+#include "Clientmenu.h"
+#include "Screen.h"
+#include "Toolbar.h"
+#include "Window.h"
+#include "Workspace.h"
+#include "Windowmenu.h"
+#include "Geometry.h"
+#include "Util.h"
+
 #include <algorithm>
 #include <vector>
 typedef std::vector<Rect> rectList;
@@ -67,8 +66,6 @@ Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
   _focused = (OpenboxWindow *) 0;
   id = i;
 
-  stackingList = new LinkedList<OpenboxWindow>;
-  windowList = new LinkedList<OpenboxWindow>;
   clientmenu = new Clientmenu(*this);
 
   lastfocus = (OpenboxWindow *) 0;
@@ -80,8 +77,6 @@ Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
 
 
 Workspace::~Workspace(void) {
-  delete stackingList;
-  delete windowList;
   delete clientmenu;
 
   if (name)
@@ -95,10 +90,10 @@ const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
   if (place) placeWindow(*w);
 
   w->setWorkspace(id);
-  w->setWindowNumber(windowList->count());
+  w->setWindowNumber(_windows.size());
 
-  stackingList->insert(w, 0);
-  windowList->insert(w);
+  _zorder.push_front(w);
+  _windows.push_back(w);
 
   clientmenu->insert((const char **) w->getTitle());
   clientmenu->update();
@@ -114,7 +109,7 @@ const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
 const int Workspace::removeWindow(OpenboxWindow *w) {
   if (! w) return -1;
 
-  stackingList->remove(w);
+  _zorder.remove(w);
 
   if (w->isFocused()) {
     if (w->isTransient() && w->getTransientFor() &&
@@ -123,8 +118,7 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
     } else if (screen.sloppyFocus()) {
       screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
     } else {
-      OpenboxWindow *top = stackingList->first();
-      if (! top || ! top->setInputFocus()) {
+      if (_zorder.empty() || !_zorder.front()->setInputFocus()) {
 	screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
 	XSetInputFocus(screen.getOpenbox().getXDisplay(),
 		       screen.getToolbar()->getWindowID(),
@@ -136,18 +130,17 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
   if (lastfocus == w)
     lastfocus = (OpenboxWindow *) 0;
 
-  windowList->remove(w->getWindowNumber());
+  _windows.erase(_windows.begin() + w->getWindowNumber());
   clientmenu->remove(w->getWindowNumber());
   clientmenu->update();
 
   screen.updateNetizenWindowDel(w->getClientWindow());
 
-  LinkedListIterator<OpenboxWindow> it(windowList);
-  OpenboxWindow *bw = it.current();
-  for (int i = 0; bw; it++, i++, bw = it.current())
-    bw->setWindowNumber(i);
+  winVect::iterator it = _windows.begin();
+  for (int i=0; it != _windows.end(); ++it, ++i)
+    (*it)->setWindowNumber(i);
 
-  return windowList->count();
+  return _windows.size();
 }
 
 
@@ -161,30 +154,24 @@ void Workspace::focusWindow(OpenboxWindow *win) {
 
 
 void Workspace::showAll(void) {
-  LinkedListIterator<OpenboxWindow> it(stackingList);
-  for (OpenboxWindow *bw = it.current(); bw; it++, bw = it.current())
-    bw->deiconify(False, False);
+  winList::iterator it;
+  for (it = _zorder.begin(); it != _zorder.end(); ++it)
+    (*it)->deiconify(false, false);
 }
 
 
 void Workspace::hideAll(void) {
-  LinkedList<OpenboxWindow> lst;
-
-  LinkedListIterator<OpenboxWindow> it(stackingList);
-  for (OpenboxWindow *bw = it.current(); bw; it++, bw = it.current())
-    lst.insert(bw, 0);
-
-  LinkedListIterator<OpenboxWindow> it2(&lst);
-  for (OpenboxWindow *bw = it2.current(); bw; it2++, bw = it2.current())
-    if (! bw->isStuck())
-      bw->withdraw();
+  winList::reverse_iterator it;
+  for (it = _zorder.rbegin(); it != _zorder.rend(); ++it)
+    if (!(*it)->isStuck())
+      (*it)->withdraw();
 }
 
 
 void Workspace::removeAll(void) {
-  LinkedListIterator<OpenboxWindow> it(windowList);
-  for (OpenboxWindow *bw = it.current(); bw; it++, bw = it.current())
-    bw->iconify();
+  winVect::iterator it;
+  for (it = _windows.begin(); it != _windows.end(); ++it)
+    (*it)->iconify();
 }
 
 
@@ -212,8 +199,8 @@ void Workspace::raiseWindow(OpenboxWindow *w) {
 
     if (! win->isIconic()) {
       wkspc = screen.getWorkspace(win->getWorkspaceNumber());
-      wkspc->stackingList->remove(win);
-      wkspc->stackingList->insert(win, 0);
+      wkspc->_zorder.remove(win);
+      wkspc->_zorder.push_front(win);
     }
 
     if (! win->hasTransient() || ! win->getTransient())
@@ -251,8 +238,8 @@ void Workspace::lowerWindow(OpenboxWindow *w) {
 
     if (! win->isIconic()) {
       wkspc = screen.getWorkspace(win->getWorkspaceNumber());
-      wkspc->stackingList->remove(win);
-      wkspc->stackingList->insert(win);
+      wkspc->_zorder.remove(win);
+      wkspc->_zorder.push_back(win);
     }
 
     if (! win->getTransientFor())
@@ -275,24 +262,23 @@ void Workspace::lowerWindow(OpenboxWindow *w) {
 void Workspace::reconfigure(void) {
   clientmenu->reconfigure();
 
-  LinkedListIterator<OpenboxWindow> it(windowList);
-  for (OpenboxWindow *bw = it.current(); bw; it++, bw = it.current()) {
-    if (bw->validateClient())
-      bw->reconfigure();
-  }
+  winVect::iterator it;
+  for (it = _windows.begin(); it != _windows.end(); ++it)
+    if ((*it)->validateClient())
+      (*it)->reconfigure();
 }
 
 
 OpenboxWindow *Workspace::getWindow(int index) {
-  if ((index >= 0) && (index < windowList->count()))
-    return windowList->find(index);
+  if ((index >= 0) && (index < _windows.size()))
+    return _windows[index];
   else
-    return 0;
+    return (OpenboxWindow *) 0;
 }
 
 
 const int Workspace::getCount(void) {
-  return windowList->count();
+  return _windows.size();
 }
 
 
@@ -306,10 +292,6 @@ Bool Workspace::isCurrent(void) {
   return (id == screen.getCurrentWorkspaceID());
 }
 
-
-Bool Workspace::isLastWindow(OpenboxWindow *w) {
-  return (w == windowList->last());
-}
 
 void Workspace::setCurrent(void) {
   screen.changeWorkspaceID(id);
@@ -335,9 +317,9 @@ void Workspace::setName(char *new_name) {
 
 
 void Workspace::shutdown(void) {
-  while (windowList->count()) {
-    windowList->first()->restore();
-    delete windowList->first();
+  while (!_windows.empty()) {
+    _windows[0]->restore();
+    _windows.erase(_windows.begin());
   }
 }
 
@@ -435,14 +417,12 @@ bool colRLBT(const Rect &first, const Rect &second){
 Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
   const Rect *best;
   rectList spaces;
-  LinkedListIterator<OpenboxWindow> it(windowList);
   rectList::const_iterator siter;
   spaces.push_back(space); //initially the entire screen is free
-  it.reset();
   
   //Find Free Spaces
-  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
-     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+  for (winVect::iterator it = _windows.begin(); it != _windows.end(); ++it)
+     spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   
   //Find first space that fits the window
@@ -490,15 +470,13 @@ Point *Workspace::underMousePlacement(const Size &win_size, const Rect &space) {
 Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
   const Rect *best;
   rectList spaces;
-  LinkedListIterator<OpenboxWindow> it(windowList);
 
   rectList::const_iterator siter;
   spaces.push_back(space); //initially the entire screen is free
-  it.reset();
   
   //Find Free Spaces
-  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
-     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+  for (winVect::iterator it = _windows.begin(); it != _windows.end(); ++it)
+     spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   //Sort spaces by preference
   if(screen.rowPlacementDirection() == BScreen::RightLeft)
@@ -532,15 +510,13 @@ Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
 Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
   const Rect *best;
   rectList spaces;
-  LinkedListIterator<OpenboxWindow> it(windowList);
 
   rectList::const_iterator siter;
   spaces.push_back(space); //initially the entire screen is free
-  it.reset();
   
   //Find Free Spaces
-  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
-     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+  for (winVect::iterator it = _windows.begin(); it != _windows.end(); ++it)
+     spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   //Sort spaces by user preference
   if(screen.colPlacementDirection() == BScreen::TopBottom)
@@ -598,7 +574,6 @@ void Workspace::placeWindow(OpenboxWindow &win) {
   const Size window_size(win.area().w()+screen.getBorderWidth() * 2,
                          win.area().h()+screen.getBorderWidth() * 2);
   Point *place = NULL;
-  LinkedListIterator<OpenboxWindow> it(windowList);
 
   switch (screen.placementPolicy()) {
   case BScreen::BestFitPlacement:

@@ -21,6 +21,7 @@ openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc backgroundwidget.cc labelwidget.cc \
                   buttonwidget.cc python.cc bindings.cc \
                   openbox_wrap.cc
+openbox3_LDFLAGS= $(PYTHON_LDFLAGS)
 
 script_DATA = openbox.py
 

@@ -2,7 +2,8 @@
 #
 # Checks for Python and tries to get the include path to 'Python.h', and
 # the libpython library.
-# It provides the $(PYTHON_CFLAGS) $(PYTHON_LIBS) output variables.
+# It provides the $(PYTHON_CFLAGS) $(PYTHON_LIBS) $(PYTHON_LDFLAGS) output
+# variables.
 AC_DEFUN([PYTHON_DEVEL],
 [
   AC_REQUIRE([AM_PATH_PYTHON])
@@ -41,17 +42,20 @@ AC_DEFUN([PYTHON_DEVEL],
     if test -r "$i/libpython$PYTHON_VERSION.so"; then
       PYLIB="$i/libpython$PYTHON_VERSION.so"
       PYTHON_LIBS="-L$i -lpython$PYTHON_VERSION"
+      PYTHON_LDFLAGS=""
       break
     else
       if test -r "$i/libpython$PYTHON_VERSION.a"; then
         PYLIB="$i/libpython$PYTHON_VERSION.a"
         PYTHON_LIBS="-L$i -lpython$PYTHON_VERSION -lpthread -ldl -lutil -lm"
+        PYTHON_LDFLAGS="-export-dynamic"
         break
       else
         # look for really old versions
         if test -r "$i/libPython.a"; then
           PYLIB="$i/libPython.a"
           PYTHON_LIBS="-L$i -lModules -lPython -lObjects -lParser"
+          PYTHON_LDFLAGS="-export-dynamic"
           break
         fi
       fi
@@ -64,4 +68,5 @@ AC_DEFUN([PYTHON_DEVEL],
     AC_MSG_ERROR([cannot find python library])
   fi
   AC_SUBST([PYTHON_LIBS])
+  AC_SUBST([PYTHON_LDFLAGS])
 ])

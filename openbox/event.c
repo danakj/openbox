@@ -618,7 +618,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                  e->xfocus.window, client->window,
                  e->xfocus.mode, e->xfocus.detail);
 #endif
-        g_message("hilite %x client %x", focus_hilite, client);
         if (focus_hilite == client)
             focus_out = client;
         if (focus_in == client)

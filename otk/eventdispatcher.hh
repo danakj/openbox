@@ -29,6 +29,8 @@ public:
   inline void setMasterHandler(OtkEventHandler *master)
   { _master = master; }
   OtkEventHandler *getMasterHandler(void) const { return _master; }
+
+  OtkEventHandler *findHandler(Window win);
   
 private:
   OtkEventMap _map;

@@ -5,6 +5,8 @@
 #endif
 
 #include "actions.hh"
+#include "widget.hh"
+#include "openbox.hh"
 #include "otk/display.hh"
 
 #include <stdio.h>
@@ -63,8 +65,11 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   insertPress(e);
   
   // XXX: run the PRESS guile hook
-  printf("GUILE: PRESS: win %lx modifiers %u button %u time %lx\n",
-         (long)e.window, e.state, e.button, e.time);
+  OBWidget *w = dynamic_cast<OBWidget*>
+    (Openbox::instance->findHandler(e.window));
+
+  printf("GUILE: PRESS: win %lx type %d modifiers %u button %u time %lx\n",
+         (long)e.window, (w ? w->type():-1), e.state, e.button, e.time);
     
   if (_button) return; // won't count toward CLICK events
 
@@ -78,8 +83,11 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   removePress(e);
   
   // XXX: run the RELEASE guile hook
-  printf("GUILE: RELEASE: win %lx modifiers %u button %u time %lx\n",
-         (long)e.window, e.state, e.button, e.time);
+  OBWidget *w = dynamic_cast<OBWidget*>
+    (Openbox::instance->findHandler(e.window));
+
+  printf("GUILE: RELEASE: win %lx type %d, modifiers %u button %u time %lx\n",
+         (long)e.window, (w ? w->type():-1), e.state, e.button, e.time);
 
   // not for the button we're watching?
   if (_button != e.button) return;
@@ -96,15 +104,15 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     return;
 
   // XXX: run the CLICK guile hook
-  printf("GUILE: CLICK: win %lx modifiers %u button %u time %lx\n",
-         (long)e.window, e.state, e.button, e.time);
+  printf("GUILE: CLICK: win %lx type %d modifiers %u button %u time %lx\n",
+         (long)e.window, (w ? w->type():-1), e.state, e.button, e.time);
 
   if (e.time - _release.time < DOUBLECLICKDELAY &&
       _release.win == e.window && _release.button == e.button) {
 
     // XXX: run the DOUBLECLICK guile hook
-    printf("GUILE: DOUBLECLICK: win %lx modifiers %u button %u time %lx\n",
-           (long)e.window, e.state, e.button, e.time);
+    printf("GUILE: DOUBLECLICK: win %lx type %d modifiers %u button %u time %lx\n",
+           (long)e.window, (w ? w->type():-1), e.state, e.button, e.time);
 
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
@@ -124,7 +132,11 @@ void OBActions::enterHandler(const XCrossingEvent &e)
   OtkEventHandler::enterHandler(e);
   
   // XXX: run the ENTER guile hook
-  printf("GUILE: ENTER: win %lx modifiers %u\n", (long)e.window, e.state);
+  OBWidget *w = dynamic_cast<OBWidget*>
+    (Openbox::instance->findHandler(e.window));
+
+  printf("GUILE: ENTER: win %lx type %d modifiers %u\n",
+         (long)e.window, (w ? w->type():-1), e.state);
 }
 
 
@@ -133,15 +145,22 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
   OtkEventHandler::leaveHandler(e);
 
   // XXX: run the LEAVE guile hook
-  printf("GUILE: LEAVE: win %lx modifiers %u\n", (long)e.window, e.state);
+  OBWidget *w = dynamic_cast<OBWidget*>
+    (Openbox::instance->findHandler(e.window));
+
+  printf("GUILE: LEAVE: win %lx type %d modifiers %u\n",
+         (long)e.window, (w ? w->type():-1), e.state);
 }
 
 
 void OBActions::keyPressHandler(const XKeyEvent &e)
 {
   // XXX: run the KEY guile hook
-  printf("GUILE: KEY: win %lx modifiers %u keycode %u\n",
-         (long)e.window, e.state, e.keycode);
+  OBWidget *w = dynamic_cast<OBWidget*>
+    (Openbox::instance->findHandler(e.window));
+
+  printf("GUILE: KEY: win %lx type %d modifiers %u keycode %u\n",
+         (long)e.window, (w ? w->type():-1), e.state, e.keycode);
 }
 
 
@@ -149,12 +168,15 @@ void OBActions::motionHandler(const XMotionEvent &e)
 {
   if (!e.same_screen) return; // this just gets stupid
 
+  OBWidget *w = dynamic_cast<OBWidget*>
+    (Openbox::instance->findHandler(e.window));
+
   _dx = e.x - _posqueue[0]->pos.x();
   _dy = e.y - _posqueue[0]->pos.y();
   
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
-  printf("GUILE: MOTION: win %lx modifiers %u x %d y %d\n",
-         (long)e.window, e.state, _dx, _dy);
+  printf("GUILE: MOTION: win %lx type %d  modifiers %u x %d y %d\n",
+         (long)e.window, (w ? w->type():-1), e.state, _dx, _dy);
 }
 
 

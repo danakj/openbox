@@ -7,6 +7,7 @@ namespace ob {
 class OBWidget {
 public:
   enum WidgetType {
+    Type_Frame,
     Type_Titlebar,
     Type_Handle,
     Type_Plate,
@@ -16,7 +17,8 @@ public:
     Type_IconifyButton,
     Type_StickyButton,
     Type_LeftGrip,
-    Type_RightGrip
+    Type_RightGrip,
+    Type_Client
   };
 
 private:

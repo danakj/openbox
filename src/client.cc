@@ -26,6 +26,7 @@ namespace ob {
 
 OBClient::OBClient(int screen, Window window)
   : otk::OtkEventHandler(),
+    OBWidget(OBWidget::Type_Client),
     frame(0), _screen(screen), _window(window)
 {
   assert(screen >= 0);

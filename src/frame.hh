@@ -29,11 +29,13 @@ namespace ob {
   parent with the SubstructureRedirectMask so that structure events for the
   client are sent to the window manager.
 */
-class OBFrame : public otk::OtkWidget {
+class OBFrame : public otk::OtkWidget, public OBWidget {
 public:
 
   //! The event mask to grab on frame windows
-  static const long event_mask = EnterWindowMask | LeaveWindowMask;
+  static const long event_mask = EnterWindowMask | LeaveWindowMask |
+                                 ButtonPressMask | ButtonReleaseMask |
+                                 ButtonMotionMask;
 
 private:
   OBClient *_client;

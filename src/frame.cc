@@ -23,6 +23,7 @@ const long OBFrame::event_mask;
 
 OBFrame::OBFrame(OBClient *client, otk::Style *style)
   : otk::OtkWidget(Openbox::instance, style),
+    OBWidget(Type_Frame),
     _client(client),
     _screen(otk::OBDisplay::screenInfo(client->screen())),
     _plate(this, OBWidget::Type_Plate),

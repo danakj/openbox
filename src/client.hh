@@ -21,6 +21,7 @@ extern "C" {
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
+#include "widget.hh"
 
 namespace ob {
 
@@ -38,7 +39,7 @@ class OBFrame;
   class' member variables and call whatever is nessary to complete the
   change (such as causing a redraw of the titlebar after the title is changed).
 */
-class OBClient : public otk::OtkEventHandler {
+class OBClient : public otk::OtkEventHandler, public OBWidget {
 public:
 
   //! The frame window which decorates around the client window

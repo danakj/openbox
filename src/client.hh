@@ -34,11 +34,11 @@ class OBFrame;
   structure contains 5. We only use the first 3, so that is all gets defined.
 */
 struct MwmHints {
-  //! The number of elements in the OBClient::MwmHints struct
-  static const unsigned int elements = 3;
   unsigned long flags;      //!< A bitmask of OBClient::MwmFlags values
   unsigned long functions;  //!< A bitmask of OBClient::MwmFunctions values
   unsigned long decorations;//!< A bitmask of OBClient::MwmDecorations values
+  //! The number of elements in the OBClient::MwmHints struct
+  static const unsigned int elements = 3;
 };
 
 //! Maintains the state of a client window.
@@ -246,6 +246,9 @@ private:
   */
   otk::Point _base_size;
 
+  //! Window decoration and functionality hints
+  MwmHints _mwmhints;
+  
   //! Where to place the decorated window in relation to the undecorated window
   int _gravity;
 
@@ -323,6 +326,13 @@ private:
   //! OBClient::_shaped
   void getShaped();
 
+  //! Set up what decor should be shown on the window and what functions should
+  //! be allowed (OBClient::_decorations and OBClient::_functions).
+  /*!
+    This also updates the NET_WM_ALLOWED_ACTIONS hint.
+  */
+  void setupDecorAndFunctions();
+  
   //! Sets the wm_state to the specified value
   void setWMState(long state);
   //! Sends the window to the specified desktop

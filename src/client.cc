@@ -46,44 +46,13 @@ OBClient::OBClient(int screen, Window window)
   
   getArea();
   getDesktop();
+
   updateTransientFor();
   getType();
+  getMwmHints();
 
-  // XXX: changeAllowedActions();
-
-  // set the decorations and functions
-  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-    Decor_Iconify | Decor_Maximize;
-  _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
-  switch (_type) {
-  case Type_Normal:
-    // normal windows retain all of the possible decorations and
-    // functionality
-
-  case Type_Dialog:
-    // dialogs cannot be maximized
-    _decorations &= ~Decor_Maximize;
-    _functions &= ~Func_Maximize;
-    break;
-
-  case Type_Menu:
-  case Type_Toolbar:
-  case Type_Utility:
-    // these windows get less functionality
-    _decorations &= ~(Decor_Iconify | Decor_Handle);
-    _functions &= ~(Func_Iconify | Func_Resize);
-    break;
-
-  case Type_Desktop:
-  case Type_Dock:
-  case Type_Splash:
-    // none of these windows are manipulated by the window manager
-    _decorations = 0;
-    _functions = 0;
-    break;
-  }
+  setupDecorAndFunctions();
   
-  getMwmHints(); // this fucks (in good ways) with the decors and functions
   getState();
   getShaped();
 
@@ -95,7 +64,6 @@ OBClient::OBClient(int screen, Window window)
   updateClass();
   updateStrut();
 
-  calcLayer();
   changeState();
 }
 
@@ -183,57 +151,99 @@ void OBClient::getType()
 }
 
 
+void OBClient::setupDecorAndFunctions()
+{
+  // start with everything
+  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+    Decor_Iconify | Decor_Maximize;
+  _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
+  
+  switch (_type) {
+  case Type_Normal:
+    // normal windows retain all of the possible decorations and
+    // functionality
+
+  case Type_Dialog:
+    // dialogs cannot be maximized
+    _decorations &= ~Decor_Maximize;
+    _functions &= ~Func_Maximize;
+    break;
+
+  case Type_Menu:
+  case Type_Toolbar:
+  case Type_Utility:
+    // these windows get less functionality
+    _decorations &= ~(Decor_Iconify | Decor_Handle);
+    _functions &= ~(Func_Iconify | Func_Resize);
+    break;
+
+  case Type_Desktop:
+  case Type_Dock:
+  case Type_Splash:
+    // none of these windows are manipulated by the window manager
+    _decorations = 0;
+    _functions = 0;
+    break;
+  }
+
+  // Mwm Hints are applied subtractively to what has already been chosen for
+  // decor and functionality
+  if (_mwmhints.flags & MwmFlag_Decorations) {
+    if (! (_mwmhints.decorations & MwmDecor_All)) {
+      if (! (_mwmhints.decorations & MwmDecor_Border))
+        _decorations &= ~Decor_Border;
+      if (! (_mwmhints.decorations & MwmDecor_Handle))
+        _decorations &= ~Decor_Handle;
+      if (! (_mwmhints.decorations & MwmDecor_Title))
+        _decorations &= ~Decor_Titlebar;
+      if (! (_mwmhints.decorations & MwmDecor_Iconify))
+        _decorations &= ~Decor_Iconify;
+      if (! (_mwmhints.decorations & MwmDecor_Maximize))
+        _decorations &= ~Decor_Maximize;
+    }
+  }
+
+  if (_mwmhints.flags & MwmFlag_Functions) {
+    if (! (_mwmhints.functions & MwmFunc_All)) {
+      if (! (_mwmhints.functions & MwmFunc_Resize))
+        _functions &= ~Func_Resize;
+      if (! (_mwmhints.functions & MwmFunc_Move))
+        _functions &= ~Func_Move;
+      if (! (_mwmhints.functions & MwmFunc_Iconify))
+        _functions &= ~Func_Iconify;
+      if (! (_mwmhints.functions & MwmFunc_Maximize))
+        _functions &= ~Func_Maximize;
+      // dont let mwm hints kill the close button
+      //if (! (_mwmhints.functions & MwmFunc_Close))
+      //  _functions &= ~Func_Close;
+    }
+  }
+
+  // XXX: changeAllowedActions();
+}
+
+
 void OBClient::getMwmHints()
 {
   const otk::OBProperty *property = Openbox::instance->property();
 
-  unsigned long num;
-  MwmHints *hints;
+  unsigned long num = MwmHints::elements;
+  unsigned long *hints;
 
-  num = MwmHints::elements;
+  _mwmhints.flags = 0; // default to none
+  
   if (!property->get(_window, otk::OBProperty::motif_wm_hints,
                      otk::OBProperty::motif_wm_hints, &num,
                      (unsigned long **)&hints))
     return;
   
-  if (num < MwmHints::elements) {
-    delete [] hints;
-    return;
+  if (num == MwmHints::elements) {
+    // retrieved the hints
+    _mwmhints.flags = hints[0];
+    _mwmhints.functions = hints[1];
+    _mwmhints.decorations = hints[2];
   }
 
-  // retrieved the hints
-  // Mwm Hints are applied subtractively to what has already been chosen for
-  // decor and functionality
-
-  if (hints->flags & MwmFlag_Decorations) {
-    if (! (hints->decorations & MwmDecor_All)) {
-      if (! (hints->decorations & MwmDecor_Border))
-        _decorations &= ~Decor_Border;
-      if (! (hints->decorations & MwmDecor_Handle))
-        _decorations &= ~Decor_Handle;
-      if (! (hints->decorations & MwmDecor_Title))
-        _decorations &= ~Decor_Titlebar;
-      if (! (hints->decorations & MwmDecor_Iconify))
-        _decorations &= ~Decor_Iconify;
-      if (! (hints->decorations & MwmDecor_Maximize))
-        _decorations &= ~Decor_Maximize;
-    }
-  }
-
-  if (hints->flags & MwmFlag_Functions) {
-    if (! (hints->functions & MwmFunc_All)) {
-      if (! (hints->functions & MwmFunc_Resize))
-        _functions &= ~Func_Resize;
-      if (! (hints->functions & MwmFunc_Move))
-        _functions &= ~Func_Move;
-      if (! (hints->functions & MwmFunc_Iconify))
-        _functions &= ~Func_Iconify;
-      if (! (hints->functions & MwmFunc_Maximize))
-        _functions &= ~Func_Maximize;
-      //if (! (hints->functions & MwmFunc_Close))
-      //  _functions &= ~Func_Close;
-    }
-  }
   delete [] hints;
 }
 
@@ -318,16 +328,29 @@ void OBClient::getShaped()
 
 
 void OBClient::calcLayer() {
-  if (_iconic) _layer = Layer_Icon;
-  else if (_fullscreen) _layer = Layer_Fullscreen;
-  else if (_type == Type_Desktop) _layer = Layer_Desktop;
+  StackLayer l;
+
+  if (_iconic) l = Layer_Icon;
+  else if (_fullscreen) l = Layer_Fullscreen;
+  else if (_type == Type_Desktop) l = Layer_Desktop;
   else if (_type == Type_Dock) {
-    if (!_below) _layer = Layer_Top;
-    else _layer = Layer_Normal;
+    if (!_below) l = Layer_Top;
+    else l = Layer_Normal;
   }
-  else if (_above) _layer = Layer_Above;
-  else if (_below) _layer = Layer_Below;
-  else _layer = Layer_Normal;
+  else if (_above) l = Layer_Above;
+  else if (_below) l = Layer_Below;
+  else l = Layer_Normal;
+
+  if (l != _layer) {
+    _layer = l;
+    if (frame) {
+      /*
+        if we don't have a frame, then we aren't mapped yet (and this would
+        SIGSEGV :)
+      */
+      Openbox::instance->screen(_screen)->restack(true, this); // raise
+    }
+  }
 }
 
 
@@ -580,8 +603,12 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
     updateNormalHints();
   else if (e.atom == XA_WM_HINTS)
     updateWMHints();
-  else if (e.atom == XA_WM_TRANSIENT_FOR)
+  else if (e.atom == XA_WM_TRANSIENT_FOR) {
     updateTransientFor();
+    getType();
+    calcLayer(); // type may have changed, so update the layer
+    setupDecorAndFunctions();
+  }
   else if (e.atom == property->atom(otk::OBProperty::net_wm_name) ||
            e.atom == property->atom(otk::OBProperty::wm_name))
     updateTitle();
@@ -627,7 +654,7 @@ void OBClient::setDesktop(long target)
 void OBClient::setState(StateAction action, long data1, long data2)
 {
   const otk::OBProperty *property = Openbox::instance->property();
-  bool restack = false, shadestate = _shaded;
+  bool shadestate = _shaded;
 
   if (!(action == State_Add || action == State_Remove ||
         action == State_Toggle))
@@ -695,17 +722,14 @@ void OBClient::setState(StateAction action, long data1, long data2)
                  property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
         if (_fullscreen) continue;
         _fullscreen = true;
-        restack = false;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_above)) {
         if (_above) continue;
         _above = true;
-        restack = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_below)) {
         if (_below) continue;
         _below = true;
-        restack = true;
       }
 
     } else { // action == State_Remove
@@ -737,26 +761,20 @@ void OBClient::setState(StateAction action, long data1, long data2)
                  property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
         if (!_fullscreen) continue;
         _fullscreen = false;
-        restack = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_above)) {
         if (!_above) continue;
         _above = false;
-        restack = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_below)) {
         if (!_below) continue;
         _below = false;
-        restack = true;
       }
     }
   }
   if (shadestate != _shaded)
     shade(shadestate);
-  if (restack) {
-    calcLayer();
-    Openbox::instance->screen(_screen)->restack(true, this); // raise
-  }
+  calcLayer();
 }
 
 
@@ -1011,7 +1029,8 @@ void OBClient::changeState()
     netstate[num++] = property->atom(otk::OBProperty::net_wm_state_below);
   property->set(_window, otk::OBProperty::net_wm_state,
                 otk::OBProperty::Atom_Atom, netstate, num);
-  
+
+  calcLayer();
 }
 
 
@@ -1027,8 +1046,6 @@ void OBClient::setStackLayer(int l)
     _below = true;  // below
   }
   changeState();
-  calcLayer();
-  Openbox::instance->screen(_screen)->restack(true, this); // raise
 }
 
 

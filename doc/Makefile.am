@@ -1,8 +1,15 @@
 # doc/Makefile.am for Openbox
 
+if XFT
+if XFT2
+else
+XFTMAN =		xftlsfonts.1
+endif
+endif
+
 CLEANFILES = openbox.1
 MAINTAINERCLEANFILES = Makefile.in
-man_MANS = openbox.1 bsetroot.1 bsetbg.1 xftlsfonts.1
+man_MANS = openbox.1 bsetroot.1 bsetbg.1 $(XFTMAN)
 SUBDIRS = 
 
 DEFAULT_MENU=$(pkgdatadir)/menu

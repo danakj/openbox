@@ -860,10 +860,10 @@ void screen_install_colormap(ObClient *client, gboolean install)
     XWindowAttributes wa;
 
     if (client == NULL) {
-	if (install)
-	    XInstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
-	else
-	    XUninstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
+        if (install)
+            XInstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
+        else
+            XUninstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
     } else {
         if (XGetWindowAttributes(ob_display, client->window, &wa) &&
             wa.colormap != None) {

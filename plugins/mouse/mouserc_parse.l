@@ -7,7 +7,6 @@
 
 static int lineno;
 static char *path;
-static gboolean comment;
 static gboolean error;
 
 static char *context;
@@ -21,13 +20,13 @@ static void gotfield();
 static void addbinding();
 %}
 
-field [A-Za-z0-9][-A-Za-z0-9]*[^-]
+field [A-Za-z0-9][-A-Za-z0-9]*
 sep [ \t]+
 white [ \t]*
 
 %%
 
-^{white}# comment = TRUE;
+^{white}\#.+\n lineno++;
 {field} gotfield();
 \n endofline();
 [ \t]
@@ -37,30 +36,26 @@ white [ \t]*
 
 static void gotfield()
 {
-    if (!comment) {
-        if (context == NULL)
-            context = g_strdup(mparsetext);
-        else if (event == NULL)
-            event = g_strdup(mparsetext);
-        else if (button == NULL)
-            button = g_strdup(mparsetext);
-        else if (action == NULL)
-            action = g_strdup(mparsetext);
-        else
-            error = TRUE;
-    }
+    if (context == NULL)
+        context = g_strdup(mparsetext);
+    else if (event == NULL)
+        event = g_strdup(mparsetext);
+    else if (button == NULL)
+        button = g_strdup(mparsetext);
+    else if (action == NULL)
+        action = g_strdup(mparsetext);
+    else
+        error = TRUE;
 }
 
 static void endofline()
 {
-    if (!comment) {
-        if (!error && context && event && button && action)
-            addbinding();
-        else if (error || context || event || button || action)
-            g_warning("Parser error in '%s' on line %d", path, lineno);
-    }
+    if (!error && context && event && button && action)
+        addbinding();
+    else if (error || context || event || button || action)
+        g_warning("Parser error in '%s' on line %d", path, lineno);
 
-    comment = error = FALSE;
+    error = FALSE;
     g_free(context); g_free(event); g_free(button); g_free(action);
     context = event = button = action = NULL;
 
@@ -222,7 +217,6 @@ void mouserc_parse()
     }
 
     lineno = 1;
-    comment = FALSE;
     error = FALSE;
     context = event = button = action = NULL;
 

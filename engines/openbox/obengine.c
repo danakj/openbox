@@ -15,59 +15,58 @@
                            ButtonMotionMask | ExposureMask)
 
 /* style settings - geometry */
-int s_bevel;
-int s_handle_height;
-int s_bwidth;
-int s_cbwidth;
+int ob_s_bevel;
+int ob_s_handle_height;
+int ob_s_bwidth;
+int ob_s_cbwidth;
 /* style settings - colors */
-color_rgb *s_b_color;
-color_rgb *s_cb_focused_color;
-color_rgb *s_cb_unfocused_color;
-color_rgb *s_title_focused_color;
-color_rgb *s_title_unfocused_color;
-color_rgb *s_titlebut_focused_color;
-color_rgb *s_titlebut_unfocused_color;
+color_rgb *ob_s_b_color;
+color_rgb *ob_s_cb_focused_color;
+color_rgb *ob_s_cb_unfocused_color;
+color_rgb *ob_s_title_focused_color;
+color_rgb *ob_s_title_unfocused_color;
+color_rgb *ob_s_titlebut_focused_color;
+color_rgb *ob_s_titlebut_unfocused_color;
 /* style settings - fonts */
-int s_winfont_height;
-int s_winfont_shadow;
-int s_winfont_shadow_offset;
-ObFont *s_winfont;
+int ob_s_winfont_height;
+int ob_s_winfont_shadow;
+int ob_s_winfont_shadow_offset;
+ObFont *ob_s_winfont;
 /* style settings - masks */
-pixmap_mask *s_max_mask;
-pixmap_mask *s_icon_mask;
-pixmap_mask *s_desk_mask;
-pixmap_mask *s_close_mask;
+pixmap_mask *ob_s_max_mask;
+pixmap_mask *ob_s_icon_mask;
+pixmap_mask *ob_s_desk_mask;
+pixmap_mask *ob_s_close_mask;
 
 /* global appearances */
-Appearance *a_focused_unpressed_max;
-Appearance *a_focused_pressed_max;
-Appearance *a_unfocused_unpressed_max;
-Appearance *a_unfocused_pressed_max;
-Appearance *a_focused_unpressed_close;
-Appearance *a_focused_pressed_close;
-Appearance *a_unfocused_unpressed_close;
-Appearance *a_unfocused_pressed_close;
-Appearance *a_focused_unpressed_desk;
-Appearance *a_focused_pressed_desk;
-Appearance *a_unfocused_unpressed_desk;
-Appearance *a_unfocused_pressed_desk;
-Appearance *a_focused_unpressed_iconify;
-Appearance *a_focused_pressed_iconify;
-Appearance *a_unfocused_unpressed_iconify;
-Appearance *a_unfocused_pressed_iconify;
-Appearance *a_focused_grip;
-Appearance *a_unfocused_grip;
-Appearance *a_focused_title;
-Appearance *a_unfocused_title;
-Appearance *a_focused_label;
-Appearance *a_unfocused_label;
-Appearance *a_icon; /* always parentrelative, so no focused/unfocused */
-Appearance *a_focused_handle;
-Appearance *a_unfocused_handle;
+Appearance *ob_a_focused_unpressed_max;
+Appearance *ob_a_focused_pressed_max;
+Appearance *ob_a_unfocused_unpressed_max;
+Appearance *ob_a_unfocused_pressed_max;
+Appearance *ob_a_focused_unpressed_close;
+Appearance *ob_a_focused_pressed_close;
+Appearance *ob_a_unfocused_unpressed_close;
+Appearance *ob_a_unfocused_pressed_close;
+Appearance *ob_a_focused_unpressed_desk;
+Appearance *ob_a_focused_pressed_desk;
+Appearance *ob_a_unfocused_unpressed_desk;
+Appearance *ob_a_unfocused_pressed_desk;
+Appearance *ob_a_focused_unpressed_iconify;
+Appearance *ob_a_focused_pressed_iconify;
+Appearance *ob_a_unfocused_unpressed_iconify;
+Appearance *ob_a_unfocused_pressed_iconify;
+Appearance *ob_a_focused_grip;
+Appearance *ob_a_unfocused_grip;
+Appearance *ob_a_focused_title;
+Appearance *ob_a_unfocused_title;
+Appearance *ob_a_focused_label;
+Appearance *ob_a_unfocused_label;
+Appearance *ob_a_icon; /* always parentrelative, so no focused/unfocused */
+Appearance *ob_a_focused_handle;
+Appearance *ob_a_unfocused_handle;
 
 static void layout_title(ObFrame *self);
-static void frame_mouse_press(const ObEvent *e, ObFrame *self);
-static void frame_mouse_release(const ObEvent *e, ObFrame *self);
+static void mouse_event(const ObEvent *e, ObFrame *self);
 
 gboolean startup()
 {
@@ -85,76 +84,78 @@ gboolean startup()
     g_quark_from_string("icon");
     g_quark_from_string("close");
 
-    s_b_color = s_cb_unfocused_color = s_cb_focused_color = 
-        s_title_unfocused_color = s_title_focused_color = 
-        s_titlebut_unfocused_color = s_titlebut_focused_color = NULL;
-    s_winfont = NULL;
-    s_max_mask = s_icon_mask = s_desk_mask = s_close_mask = NULL;
+    ob_s_b_color = ob_s_cb_unfocused_color = ob_s_cb_focused_color = 
+        ob_s_title_unfocused_color = ob_s_title_focused_color = 
+        ob_s_titlebut_unfocused_color = ob_s_titlebut_focused_color = NULL;
+    ob_s_winfont = NULL;
+    ob_s_max_mask = ob_s_icon_mask = ob_s_desk_mask = ob_s_close_mask = NULL;
 
-    a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
-    a_focused_pressed_max = appearance_new(Surface_Planar, 1);
-    a_unfocused_unpressed_max = appearance_new(Surface_Planar, 1);
-    a_unfocused_pressed_max = appearance_new(Surface_Planar, 1);
-    a_focused_unpressed_close = NULL;
-    a_focused_pressed_close = NULL;
-    a_unfocused_unpressed_close = NULL;
-    a_unfocused_pressed_close = NULL;
-    a_focused_unpressed_desk = NULL;
-    a_focused_pressed_desk = NULL;
-    a_unfocused_unpressed_desk = NULL;
-    a_unfocused_pressed_desk = NULL;
-    a_focused_unpressed_iconify = NULL;
-    a_focused_pressed_iconify = NULL;
-    a_unfocused_unpressed_iconify = NULL;
-    a_unfocused_pressed_iconify = NULL;
-    a_focused_grip = appearance_new(Surface_Planar, 0);
-    a_unfocused_grip = appearance_new(Surface_Planar, 0);
-    a_focused_title = appearance_new(Surface_Planar, 0);
-    a_unfocused_title = appearance_new(Surface_Planar, 0);
-    a_focused_label = appearance_new(Surface_Planar, 1);
-    a_unfocused_label = appearance_new(Surface_Planar, 1);
-    a_icon = appearance_new(Surface_Planar, 1);
-    a_focused_handle = appearance_new(Surface_Planar, 0);
-    a_unfocused_handle = appearance_new(Surface_Planar, 0);
+    ob_a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
+    ob_a_focused_pressed_max = appearance_new(Surface_Planar, 1);
+    ob_a_unfocused_unpressed_max = appearance_new(Surface_Planar, 1);
+    ob_a_unfocused_pressed_max = appearance_new(Surface_Planar, 1);
+    ob_a_focused_unpressed_close = NULL;
+    ob_a_focused_pressed_close = NULL;
+    ob_a_unfocused_unpressed_close = NULL;
+    ob_a_unfocused_pressed_close = NULL;
+    ob_a_focused_unpressed_desk = NULL;
+    ob_a_focused_pressed_desk = NULL;
+    ob_a_unfocused_unpressed_desk = NULL;
+    ob_a_unfocused_pressed_desk = NULL;
+    ob_a_focused_unpressed_iconify = NULL;
+    ob_a_focused_pressed_iconify = NULL;
+    ob_a_unfocused_unpressed_iconify = NULL;
+    ob_a_unfocused_pressed_iconify = NULL;
+    ob_a_focused_grip = appearance_new(Surface_Planar, 0);
+    ob_a_unfocused_grip = appearance_new(Surface_Planar, 0);
+    ob_a_focused_title = appearance_new(Surface_Planar, 0);
+    ob_a_unfocused_title = appearance_new(Surface_Planar, 0);
+    ob_a_focused_label = appearance_new(Surface_Planar, 1);
+    ob_a_unfocused_label = appearance_new(Surface_Planar, 1);
+    ob_a_icon = appearance_new(Surface_Planar, 1);
+    ob_a_focused_handle = appearance_new(Surface_Planar, 0);
+    ob_a_unfocused_handle = appearance_new(Surface_Planar, 0);
 
-    if (load()) {
-        RECT_SET(a_focused_pressed_desk->area, 0, 0,
+    if (obtheme_load()) {
+        RECT_SET(ob_a_focused_pressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_unpressed_desk->area, 0, 0,
+        RECT_SET(ob_a_focused_unpressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_pressed_desk->area, 0, 0,
+        RECT_SET(ob_a_unfocused_pressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_unpressed_desk->area, 0, 0,
+        RECT_SET(ob_a_unfocused_unpressed_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_pressed_iconify->area, 0, 0,
+        RECT_SET(ob_a_focused_pressed_iconify->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_unpressed_iconify->area, 0, 0,
+        RECT_SET(ob_a_focused_unpressed_iconify->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_pressed_iconify->area, 0, 0,
+        RECT_SET(ob_a_unfocused_pressed_iconify->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_unpressed_iconify->area, 0, 0,
+        RECT_SET(ob_a_unfocused_unpressed_iconify->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_unpressed_iconify->area, 0, 0,
+        RECT_SET(ob_a_unfocused_unpressed_iconify->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_pressed_max->area, 0, 0,
+        RECT_SET(ob_a_focused_pressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_unpressed_max->area, 0, 0,
+        RECT_SET(ob_a_focused_unpressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_pressed_max->area, 0, 0,
+        RECT_SET(ob_a_unfocused_pressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_unpressed_max->area, 0, 0,
+        RECT_SET(ob_a_unfocused_unpressed_max->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_pressed_close->area, 0, 0,
+        RECT_SET(ob_a_focused_pressed_close->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_focused_unpressed_close->area, 0, 0,
+        RECT_SET(ob_a_focused_unpressed_close->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_pressed_close->area, 0, 0,
+        RECT_SET(ob_a_unfocused_pressed_close->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
-        RECT_SET(a_unfocused_unpressed_close->area, 0, 0,
+        RECT_SET(ob_a_unfocused_unpressed_close->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
 
-        RECT_SET(a_focused_grip->area, 0, 0, GRIP_WIDTH, s_handle_height);
-        RECT_SET(a_unfocused_grip->area, 0, 0, GRIP_WIDTH, s_handle_height);
+        RECT_SET(ob_a_focused_grip->area, 0, 0,
+                 GRIP_WIDTH, ob_s_handle_height);
+        RECT_SET(ob_a_unfocused_grip->area, 0, 0,
+                 GRIP_WIDTH, ob_s_handle_height);
         return TRUE;
     } else
         return FALSE;
@@ -162,60 +163,60 @@ gboolean startup()
 
 void shutdown()
 {
-    if (s_b_color != NULL) color_free(s_b_color);
-    if (s_cb_unfocused_color != NULL) color_free(s_cb_unfocused_color);
-    if (s_cb_focused_color != NULL) color_free(s_cb_focused_color);
-    if (s_title_unfocused_color != NULL) color_free(s_title_unfocused_color);
-    if (s_title_focused_color != NULL) color_free(s_title_focused_color);
-    if (s_titlebut_unfocused_color != NULL)
-        color_free(s_titlebut_unfocused_color);
-    if (s_titlebut_focused_color != NULL)
-        color_free(s_titlebut_focused_color);
+    if (ob_s_b_color != NULL) color_free(ob_s_b_color);
+    if (ob_s_cb_unfocused_color != NULL) color_free(ob_s_cb_unfocused_color);
+    if (ob_s_cb_focused_color != NULL) color_free(ob_s_cb_focused_color);
+    if (ob_s_title_unfocused_color != NULL) color_free(ob_s_title_unfocused_color);
+    if (ob_s_title_focused_color != NULL) color_free(ob_s_title_focused_color);
+    if (ob_s_titlebut_unfocused_color != NULL)
+        color_free(ob_s_titlebut_unfocused_color);
+    if (ob_s_titlebut_focused_color != NULL)
+        color_free(ob_s_titlebut_focused_color);
 
-    if (s_max_mask != NULL) pixmap_mask_free(s_max_mask);
-    if (s_desk_mask != NULL) pixmap_mask_free(s_desk_mask);
-    if (s_icon_mask != NULL) pixmap_mask_free(s_icon_mask);
-    if (s_close_mask != NULL) pixmap_mask_free(s_close_mask);
+    if (ob_s_max_mask != NULL) pixmap_mask_free(ob_s_max_mask);
+    if (ob_s_desk_mask != NULL) pixmap_mask_free(ob_s_desk_mask);
+    if (ob_s_icon_mask != NULL) pixmap_mask_free(ob_s_icon_mask);
+    if (ob_s_close_mask != NULL) pixmap_mask_free(ob_s_close_mask);
 
-    if (s_winfont != NULL) font_close(s_winfont);
+    if (ob_s_winfont != NULL) font_close(ob_s_winfont);
 
-    appearance_free(a_focused_unpressed_max);
-    appearance_free(a_focused_pressed_max);
-    appearance_free(a_unfocused_unpressed_max);
-    appearance_free(a_unfocused_pressed_max);
-    if (a_focused_unpressed_close != NULL)
-	appearance_free(a_focused_unpressed_close);
-    if (a_focused_pressed_close != NULL)
-	appearance_free(a_focused_pressed_close);
-    if (a_unfocused_unpressed_close != NULL)
-	appearance_free(a_unfocused_unpressed_close);
-    if (a_unfocused_pressed_close != NULL)
-	appearance_free(a_unfocused_pressed_close);
-    if (a_focused_unpressed_desk != NULL)
-	appearance_free(a_focused_unpressed_desk);
-    if (a_focused_pressed_desk != NULL)
-	appearance_free(a_focused_pressed_desk);
-    if (a_unfocused_unpressed_desk != NULL)
-	appearance_free(a_unfocused_unpressed_desk);
-    if (a_unfocused_pressed_desk != NULL)
-	appearance_free(a_unfocused_pressed_desk);
-    if (a_focused_unpressed_iconify != NULL)
-	appearance_free(a_focused_unpressed_iconify);
-    if (a_focused_pressed_iconify != NULL)
-	appearance_free(a_focused_pressed_iconify);
-    if (a_unfocused_unpressed_iconify != NULL)
-	appearance_free(a_unfocused_unpressed_iconify);
-    if (a_unfocused_pressed_iconify != NULL)
-	appearance_free(a_unfocused_pressed_iconify);
-    appearance_free(a_focused_grip);
-    appearance_free(a_unfocused_grip);
-    appearance_free(a_focused_title);
-    appearance_free(a_unfocused_title);
-    appearance_free(a_focused_label);
-    appearance_free(a_unfocused_label);
-    appearance_free(a_icon);
-    appearance_free(a_focused_handle);
-    appearance_free(a_unfocused_handle);
+    appearance_free(ob_a_focused_unpressed_max);
+    appearance_free(ob_a_focused_pressed_max);
+    appearance_free(ob_a_unfocused_unpressed_max);
+    appearance_free(ob_a_unfocused_pressed_max);
+    if (ob_a_focused_unpressed_close != NULL)
+	appearance_free(ob_a_focused_unpressed_close);
+    if (ob_a_focused_pressed_close != NULL)
+	appearance_free(ob_a_focused_pressed_close);
+    if (ob_a_unfocused_unpressed_close != NULL)
+	appearance_free(ob_a_unfocused_unpressed_close);
+    if (ob_a_unfocused_pressed_close != NULL)
+	appearance_free(ob_a_unfocused_pressed_close);
+    if (ob_a_focused_unpressed_desk != NULL)
+	appearance_free(ob_a_focused_unpressed_desk);
+    if (ob_a_focused_pressed_desk != NULL)
+	appearance_free(ob_a_focused_pressed_desk);
+    if (ob_a_unfocused_unpressed_desk != NULL)
+	appearance_free(ob_a_unfocused_unpressed_desk);
+    if (ob_a_unfocused_pressed_desk != NULL)
+	appearance_free(ob_a_unfocused_pressed_desk);
+    if (ob_a_focused_unpressed_iconify != NULL)
+	appearance_free(ob_a_focused_unpressed_iconify);
+    if (ob_a_focused_pressed_iconify != NULL)
+	appearance_free(ob_a_focused_pressed_iconify);
+    if (ob_a_unfocused_unpressed_iconify != NULL)
+	appearance_free(ob_a_unfocused_unpressed_iconify);
+    if (ob_a_unfocused_pressed_iconify != NULL)
+	appearance_free(ob_a_unfocused_pressed_iconify);
+    appearance_free(ob_a_focused_grip);
+    appearance_free(ob_a_unfocused_grip);
+    appearance_free(ob_a_focused_title);
+    appearance_free(ob_a_unfocused_title);
+    appearance_free(ob_a_focused_label);
+    appearance_free(ob_a_unfocused_label);
+    appearance_free(ob_a_icon);
+    appearance_free(ob_a_focused_handle);
+    appearance_free(ob_a_unfocused_handle);
 }
 
 static Window createWindow(Window parent, unsigned long mask,
@@ -269,35 +270,33 @@ Frame *frame_new()
     XMapWindow(ob_display, self->label);
 
     /* set colors/appearance/sizes for stuff that doesn't change */
-    XSetWindowBorder(ob_display, self->frame.window, s_b_color->pixel);
-    XSetWindowBorder(ob_display, self->label, s_b_color->pixel);
-    XSetWindowBorder(ob_display, self->rgrip, s_b_color->pixel);
-    XSetWindowBorder(ob_display, self->lgrip, s_b_color->pixel);
+    XSetWindowBorder(ob_display, self->frame.window, ob_s_b_color->pixel);
+    XSetWindowBorder(ob_display, self->label, ob_s_b_color->pixel);
+    XSetWindowBorder(ob_display, self->rgrip, ob_s_b_color->pixel);
+    XSetWindowBorder(ob_display, self->lgrip, ob_s_b_color->pixel);
 
     XResizeWindow(ob_display, self->max, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->iconify, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->icon, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->close, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->desk, BUTTON_SIZE, BUTTON_SIZE);
-    XResizeWindow(ob_display, self->lgrip, GRIP_WIDTH, s_handle_height);
-    XResizeWindow(ob_display, self->rgrip, GRIP_WIDTH, s_handle_height);
+    XResizeWindow(ob_display, self->lgrip, GRIP_WIDTH, ob_s_handle_height);
+    XResizeWindow(ob_display, self->rgrip, GRIP_WIDTH, ob_s_handle_height);
 
     /* set up the dynamic appearances */
-    self->a_unfocused_title = appearance_copy(a_unfocused_title);
-    self->a_focused_title = appearance_copy(a_focused_title);
-    self->a_unfocused_label = appearance_copy(a_unfocused_label);
-    self->a_focused_label = appearance_copy(a_focused_label);
-    self->a_unfocused_handle = appearance_copy(a_unfocused_handle);
-    self->a_focused_handle = appearance_copy(a_focused_handle);
-    self->a_icon = appearance_copy(a_icon);
+    self->a_unfocused_title = appearance_copy(ob_a_unfocused_title);
+    self->a_focused_title = appearance_copy(ob_a_focused_title);
+    self->a_unfocused_label = appearance_copy(ob_a_unfocused_label);
+    self->a_focused_label = appearance_copy(ob_a_focused_label);
+    self->a_unfocused_handle = appearance_copy(ob_a_unfocused_handle);
+    self->a_focused_handle = appearance_copy(ob_a_focused_handle);
+    self->a_icon = appearance_copy(ob_a_icon);
 
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = FALSE;
 
-    dispatch_register(Event_X_ButtonPress, (EventHandler)frame_mouse_press,
-                      self);
-    dispatch_register(Event_X_ButtonRelease, (EventHandler)frame_mouse_release,
-                      self);
+    dispatch_register(Event_X_ButtonPress | Event_X_ButtonRelease,
+                      (EventHandler)mouse_event, self);
 
     return (Frame*)self;
 }
@@ -314,8 +313,7 @@ static void frame_free(ObFrame *self)
 
     XDestroyWindow(ob_display, self->frame.window);
 
-    dispatch_register(0, (EventHandler)frame_mouse_press, self);
-    dispatch_register(0, (EventHandler)frame_mouse_release, self);
+    dispatch_register(0, (EventHandler)mouse_event, self);
 
     g_free(self);
 }
@@ -359,8 +357,8 @@ void frame_adjust_shape(ObFrame *self)
 
 	num = 0;
 	if (self->frame.client->decorations & Decor_Titlebar) {
-	    xrect[0].x = -s_bevel;
-	    xrect[0].y = -s_bevel;
+	    xrect[0].x = -ob_s_bevel;
+	    xrect[0].y = -ob_s_bevel;
 	    xrect[0].width = self->width + self->bwidth * 2;
 	    xrect[0].height = TITLE_HEIGHT +
 		self->bwidth * 2;
@@ -368,10 +366,10 @@ void frame_adjust_shape(ObFrame *self)
 	}
 
 	if (self->frame.client->decorations & Decor_Handle) {
-	    xrect[1].x = -s_bevel;
+	    xrect[1].x = -ob_s_bevel;
 	    xrect[1].y = HANDLE_Y(self);
 	    xrect[1].width = self->width + self->bwidth * 2;
-	    xrect[1].height = s_handle_height +
+	    xrect[1].height = ob_s_handle_height +
 		self->bwidth * 2;
 	    ++num;
 	}
@@ -387,8 +385,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 {
     if (resized) {
         if (self->frame.client->decorations & Decor_Border) {
-            self->bwidth = s_bwidth;
-            self->cbwidth = s_cbwidth;
+            self->bwidth = ob_s_bwidth;
+            self->cbwidth = ob_s_cbwidth;
         } else {
             self->bwidth = self->cbwidth = 0;
         }
@@ -440,34 +438,34 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
         if (self->frame.client->decorations & Decor_Handle) {
             XMoveResizeWindow(ob_display, self->handle,
                               -self->bwidth, HANDLE_Y(self),
-                              self->width, s_handle_height);
+                              self->width, ob_s_handle_height);
             XMoveWindow(ob_display, self->lgrip,
                         -self->bwidth, -self->bwidth);
             XMoveWindow(ob_display, self->rgrip,
                         -self->bwidth + self->width -
                         GRIP_WIDTH, -self->bwidth);
-            self->innersize.bottom += s_handle_height +
+            self->innersize.bottom += ob_s_handle_height +
                 self->bwidth;
             XMapWindow(ob_display, self->handle);
 
             if (self->a_focused_handle->surface.data.planar.grad ==
                 Background_ParentRelative)
                 RECT_SET(self->a_focused_handle->area, 0, 0,
-                         self->width, s_handle_height);
+                         self->width, ob_s_handle_height);
             else
                 RECT_SET(self->a_focused_handle->area,
                          GRIP_WIDTH + self->bwidth, 0,
                          self->width - (GRIP_WIDTH + self->bwidth) * 2,
-                         s_handle_height);
+                         ob_s_handle_height);
             if (self->a_unfocused_handle->surface.data.planar.grad ==
                 Background_ParentRelative)
                 RECT_SET(self->a_unfocused_handle->area, 0, 0,
-                         self->width, s_handle_height);
+                         self->width, ob_s_handle_height);
             else
                 RECT_SET(self->a_unfocused_handle->area,
                          GRIP_WIDTH + self->bwidth, 0,
                          self->width - (GRIP_WIDTH + self->bwidth) * 2,
-                         s_handle_height);
+                         ob_s_handle_height);
 
         } else
             XUnmapWindow(ob_display, self->handle);
@@ -517,7 +515,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
                       self->frame.area.height - self->bwidth * 2);
 
     if (resized) {
-        render_frame(self);
+        obrender_frame(self);
 
         frame_adjust_shape(self);
     }
@@ -525,22 +523,22 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 
 void frame_adjust_state(ObFrame *self)
 {
-    render_frame(self);
+    obrender_frame(self);
 }
 
 void frame_adjust_focus(ObFrame *self)
 {
-    render_frame(self);
+    obrender_frame(self);
 }
 
 void frame_adjust_title(ObFrame *self)
 {
-    render_frame(self);
+    obrender_frame(self);
 }
 
 void frame_adjust_icon(ObFrame *self)
 {
-    render_frame(self);
+    obrender_frame(self);
 }
 
 void frame_grab_client(ObFrame *self, Client *client)
@@ -636,26 +634,26 @@ static void layout_title(ObFrame *self)
     }
 
     /* figure out whats being shown, and the width of the label */
-    self->label_width = self->width - (s_bevel + 1) * 2;
+    self->label_width = self->width - (ob_s_bevel + 1) * 2;
     for (lc = layout.string; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!(self->frame.client->decorations & Decor_Icon)) break;
             if (n) { *lc = ' '; break; } /* rm duplicates */
 	    n = TRUE;
-	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
+	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'D':
 	    if (!(self->frame.client->decorations & Decor_AllDesktops)) break;
             if (d) { *lc = ' '; break; } /* rm duplicates */
 	    d = TRUE;
-	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
+	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'I':
 	    if (!(self->frame.client->decorations & Decor_Iconify)) break;
             if (i) { *lc = ' '; break; } /* rm duplicates */
 	    i = TRUE;
-	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
+	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'L':
             if (l) { *lc = ' '; break; } /* rm duplicates */
@@ -665,13 +663,13 @@ static void layout_title(ObFrame *self)
 	    if (!(self->frame.client->decorations & Decor_Maximize)) break;
             if (m) { *lc = ' '; break; } /* rm duplicates */
 	    m = TRUE;
-	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
+	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'C':
 	    if (!(self->frame.client->decorations & Decor_Close)) break;
             if (c) { *lc = ' '; break; } /* rm duplicates */
 	    c = TRUE;
-	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
+	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	}
     }
@@ -687,7 +685,7 @@ static void layout_title(ObFrame *self)
     if (!m) XUnmapWindow(ob_display, self->max);
     if (!c) XUnmapWindow(ob_display, self->close);
 
-    x = s_bevel + 1;
+    x = ob_s_bevel + 1;
     for (lc = layout.string; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
@@ -695,43 +693,43 @@ static void layout_title(ObFrame *self)
 	    self->icon_x = x;
             RECT_SET(self->a_icon->area, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 	    XMapWindow(ob_display, self->icon);
-	    XMoveWindow(ob_display, self->icon, x, s_bevel + 1);
-	    x += BUTTON_SIZE + s_bevel + 1;
+	    XMoveWindow(ob_display, self->icon, x, ob_s_bevel + 1);
+	    x += BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'D':
 	    if (!d) break;
 	    self->desk_x = x;
 	    XMapWindow(ob_display, self->desk);
-	    XMoveWindow(ob_display, self->desk, x, s_bevel + 1);
-	    x += BUTTON_SIZE + s_bevel + 1;
+	    XMoveWindow(ob_display, self->desk, x, ob_s_bevel + 1);
+	    x += BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'I':
 	    if (!i) break;
 	    self->iconify_x = x;
 	    XMapWindow(ob_display, self->iconify);
-	    XMoveWindow(ob_display, self->iconify, x, s_bevel + 1);
-	    x += BUTTON_SIZE + s_bevel + 1;
+	    XMoveWindow(ob_display, self->iconify, x, ob_s_bevel + 1);
+	    x += BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'L':
 	    if (!l) break;
 	    self->label_x = x;
 	    XMapWindow(ob_display, self->label);
-	    XMoveWindow(ob_display, self->label, x, s_bevel);
-	    x += self->label_width + s_bevel + 1;
+	    XMoveWindow(ob_display, self->label, x, ob_s_bevel);
+	    x += self->label_width + ob_s_bevel + 1;
 	    break;
 	case 'M':
 	    if (!m) break;
 	    self->max_x = x;
 	    XMapWindow(ob_display, self->max);
-	    XMoveWindow(ob_display, self->max, x, s_bevel + 1);
-	    x += BUTTON_SIZE + s_bevel + 1;
+	    XMoveWindow(ob_display, self->max, x, ob_s_bevel + 1);
+	    x += BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'C':
 	    if (!c) break;
 	    self->close_x = x;
 	    XMapWindow(ob_display, self->close);
-	    XMoveWindow(ob_display, self->close, x, s_bevel + 1);
-	    x += BUTTON_SIZE + s_bevel + 1;
+	    XMoveWindow(ob_display, self->close, x, ob_s_bevel + 1);
+	    x += BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	}
     }
@@ -742,38 +740,48 @@ static void layout_title(ObFrame *self)
              self->label_width, LABEL_HEIGHT);
 }
 
-static void frame_mouse_press(const ObEvent *e, ObFrame *self)
+static void mouse_event(const ObEvent *e, ObFrame *self)
 {
-    Window win = e->data.x.e->xbutton.window;
+    Window win;
+    gboolean press = e->type == Event_X_ButtonPress;
+
+    win = e->data.x.e->xbutton.window;
     if (win == self->max) {
-        self->max_press = TRUE;
-        render_frame(self);
+        self->max_press = press;
+        obrender_frame(self);
     } else if (win == self->close) {
-        self->close_press = TRUE;
-        render_frame(self);
+        self->close_press = press;
+        obrender_frame(self);
     } else if (win == self->iconify) {
-        self->iconify_press = TRUE;
-        render_frame(self);
+        self->iconify_press = press;
+        obrender_frame(self);
     } else if (win == self->desk) { 
-        self->desk_press = TRUE;
-        render_frame(self);
+        self->desk_press = press;
+        obrender_frame(self);
     }
 }
 
-static void frame_mouse_release(const ObEvent *e, ObFrame *self)
+GQuark get_context(Client *client, Window win)
 {
-    Window win = e->data.x.e->xbutton.window;
-    if (win == self->max) {
-        self->max_press = FALSE;
-        render_frame(self);
-    } else if (win == self->close) {
-        self->close_press = FALSE; 
-        render_frame(self);
-    } else if (win == self->iconify) {
-        self->iconify_press = FALSE;
-        render_frame(self);
-    } else if (win == self->desk) {
-        self->desk_press = FALSE;
-        render_frame(self);
-    }
+    ObFrame *self;
+
+    if (win == ob_root) return g_quark_try_string("root");
+    if (client == NULL) return g_quark_try_string("none");
+    if (win == client->window) return g_quark_try_string("client");
+
+    self = (ObFrame*) client->frame;
+    if (win == self->frame.window) return g_quark_try_string("frame");
+    if (win == self->frame.plate)  return g_quark_try_string("client");
+    if (win == self->title)  return g_quark_try_string("titlebar");
+    if (win == self->label)  return g_quark_try_string("titlebar");
+    if (win == self->handle) return g_quark_try_string("handle");
+    if (win == self->lgrip)  return g_quark_try_string("blcorner");
+    if (win == self->rgrip)  return g_quark_try_string("brcorner");
+    if (win == self->max)  return g_quark_try_string("maximize");
+    if (win == self->iconify)  return g_quark_try_string("iconify");
+    if (win == self->close)  return g_quark_try_string("close");
+    if (win == self->icon)  return g_quark_try_string("icon");
+    if (win == self->desk)  return g_quark_try_string("alldesktops");
+
+    return g_quark_try_string("none");
 }

@@ -7,61 +7,61 @@
 #include "../../render/font.h"
 #include "../../render/mask.h"
 
-#define LABEL_HEIGHT    (s_winfont_height + 2)
-#define TITLE_HEIGHT    (LABEL_HEIGHT + s_bevel * 2)
+#define LABEL_HEIGHT    (ob_s_winfont_height + 2)
+#define TITLE_HEIGHT    (LABEL_HEIGHT + ob_s_bevel * 2)
 #define HANDLE_Y(f)     (f->innersize.top + f->frame.client->area.height + \
 		         f->cbwidth)
 #define BUTTON_SIZE     (LABEL_HEIGHT - 2)
 #define GRIP_WIDTH      (BUTTON_SIZE * 2)
 
-extern int s_bevel;
-extern int s_handle_height;
-extern int s_bwidth;
-extern int s_cbwidth;
+extern int ob_s_bevel;
+extern int ob_s_handle_height;
+extern int ob_s_bwidth;
+extern int ob_s_cbwidth;
 
-extern color_rgb *s_b_color;
-extern color_rgb *s_cb_focused_color;
-extern color_rgb *s_cb_unfocused_color;
-extern color_rgb *s_title_focused_color;
-extern color_rgb *s_title_unfocused_color;
-extern color_rgb *s_titlebut_focused_color;
-extern color_rgb *s_titlebut_unfocused_color;
+extern color_rgb *ob_s_b_color;
+extern color_rgb *ob_s_cb_focused_color;
+extern color_rgb *ob_s_cb_unfocused_color;
+extern color_rgb *ob_s_title_focused_color;
+extern color_rgb *ob_s_title_unfocused_color;
+extern color_rgb *ob_s_titlebut_focused_color;
+extern color_rgb *ob_s_titlebut_unfocused_color;
 
-extern int s_winfont_height;
-extern int s_winfont_shadow;
-extern int s_winfont_shadow_offset;
-extern ObFont *s_winfont;
+extern int ob_s_winfont_height;
+extern int ob_s_winfont_shadow;
+extern int ob_s_winfont_shadow_offset;
+extern ObFont *ob_s_winfont;
 
-extern pixmap_mask *s_max_mask;
-extern pixmap_mask *s_icon_mask;
-extern pixmap_mask *s_desk_mask;
-extern pixmap_mask *s_close_mask;
+extern pixmap_mask *ob_s_max_mask;
+extern pixmap_mask *ob_s_icon_mask;
+extern pixmap_mask *ob_s_desk_mask;
+extern pixmap_mask *ob_s_close_mask;
 
-extern Appearance *a_focused_unpressed_max;
-extern Appearance *a_focused_pressed_max;
-extern Appearance *a_unfocused_unpressed_max;
-extern Appearance *a_unfocused_pressed_max;
-extern Appearance *a_focused_unpressed_close;
-extern Appearance *a_focused_pressed_close;
-extern Appearance *a_unfocused_unpressed_close;
-extern Appearance *a_unfocused_pressed_close;
-extern Appearance *a_focused_unpressed_desk;
-extern Appearance *a_focused_pressed_desk;
-extern Appearance *a_unfocused_unpressed_desk;
-extern Appearance *a_unfocused_pressed_desk;
-extern Appearance *a_focused_unpressed_iconify;
-extern Appearance *a_focused_pressed_iconify;
-extern Appearance *a_unfocused_unpressed_iconify;
-extern Appearance *a_unfocused_pressed_iconify;
-extern Appearance *a_focused_grip;
-extern Appearance *a_unfocused_grip;
-extern Appearance *a_focused_title;
-extern Appearance *a_unfocused_title;
-extern Appearance *a_focused_label;
-extern Appearance *a_unfocused_label;
-extern Appearance *a_icon;
-extern Appearance *a_focused_handle;
-extern Appearance *a_unfocused_handle;
+extern Appearance *ob_a_focused_unpressed_max;
+extern Appearance *ob_a_focused_pressed_max;
+extern Appearance *ob_a_unfocused_unpressed_max;
+extern Appearance *ob_a_unfocused_pressed_max;
+extern Appearance *ob_a_focused_unpressed_close;
+extern Appearance *ob_a_focused_pressed_close;
+extern Appearance *ob_a_unfocused_unpressed_close;
+extern Appearance *ob_a_unfocused_pressed_close;
+extern Appearance *ob_a_focused_unpressed_desk;
+extern Appearance *ob_a_focused_pressed_desk;
+extern Appearance *ob_a_unfocused_unpressed_desk;
+extern Appearance *ob_a_unfocused_pressed_desk;
+extern Appearance *ob_a_focused_unpressed_iconify;
+extern Appearance *ob_a_focused_pressed_iconify;
+extern Appearance *ob_a_unfocused_unpressed_iconify;
+extern Appearance *ob_a_unfocused_pressed_iconify;
+extern Appearance *ob_a_focused_grip;
+extern Appearance *ob_a_unfocused_grip;
+extern Appearance *ob_a_focused_title;
+extern Appearance *ob_a_unfocused_title;
+extern Appearance *ob_a_focused_label;
+extern Appearance *ob_a_unfocused_label;
+extern Appearance *ob_a_icon;
+extern Appearance *ob_a_focused_handle;
+extern Appearance *ob_a_unfocused_handle;
 
 typedef struct ObFrame {
     Frame frame;

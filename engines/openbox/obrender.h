@@ -3,6 +3,6 @@
 
 #include "obengine.h"
 
-void render_frame(ObFrame *self);
+void obrender_frame(ObFrame *self);
 
 #endif

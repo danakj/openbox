@@ -3,6 +3,6 @@
 
 #include <glib.h>
 
-gboolean load();
+gboolean obtheme_load();
 
 #endif

@@ -3,7 +3,10 @@
 
 #include "glft/glft.h"
 
+struct RrInstance;
+
 struct RrFont {
+    struct RrInstance *inst;
     struct GlftFont *font;
 };
 

@@ -9,3 +9,4 @@ instance.lo
 init.lo
 debug.lo
 color.lo
+font.lo

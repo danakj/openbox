@@ -66,4 +66,11 @@ int RrColorParse(struct RrInstance *inst, const char *colorname,
 
 struct RrFont;
 
+struct RrFont *RrFontOpen(struct RrInstance *inst, const char *fontstring);
+void RrFontClose(struct RrFont *font);
+
+int RrFontMeasureString(struct RrFont *font, const char *string);
+int RrFontHeight(struct RrFont *font);
+int RrFontMaxCharWidth(struct RrFont *font);
+
 #endif

@@ -88,7 +88,6 @@
 
 #include "i18n.h"
 #include "BaseDisplay.h"
-#include "LinkedList.h"
 #include "Timer.h"
 
 #include <algorithm>

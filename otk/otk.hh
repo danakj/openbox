@@ -15,7 +15,6 @@
 #include "label.hh"
 #include "button.hh"
 #include "rendercolor.hh"
-#include "configuration.hh"
 #include "display.hh"
 #include "font.hh"
 //#include "gccache.hh"

@@ -63,7 +63,7 @@ GCCache *Display::_gccache = (GCCache*) 0;
 int Display::_grab_count = 0;
 
 
-int Display::xerrorHandler(::Display *d, XErrorEvent *e)
+static int xerrorHandler(::Display *d, XErrorEvent *e)
 {
 #ifdef DEBUG
   char errtxt[128];

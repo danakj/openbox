@@ -69,11 +69,11 @@ private:
   */
   static GCCache *_gccache;
 
-  //! Handles X errors on the display
-  /*!
+  // Handles X errors on the display
+  /*
     Displays the error if compiled for debugging.
   */
-  static int xerrorHandler(::Display *d, XErrorEvent *e);
+  //static int xerrorHandler(::Display *d, XErrorEvent *e);
 
   //! Prevents instantiation of the class
   Display();

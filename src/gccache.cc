@@ -29,10 +29,10 @@ extern "C" {
 #include <stdio.h>
 }
 
-#include "GCCache.hh"
-#include "BaseDisplay.hh"
-#include "Color.hh"
-#include "Util.hh"
+#include "gccache.hh"
+#include "basedisplay.hh"
+#include "color.hh"
+#include "util.hh"
 
 
 BGCCacheContext::~BGCCacheContext(void) {

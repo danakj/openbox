@@ -24,8 +24,8 @@
 #ifndef TEXTURE_HH
 #define TEXTURE_HH
 
-#include "Color.hh"
-#include "Util.hh"
+#include "color.hh"
+#include "util.hh"
 class BImageControl;
 
 #include <string>

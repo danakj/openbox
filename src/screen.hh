@@ -42,16 +42,16 @@ extern "C" {
 #include <list>
 #include <vector>
 
-#include "Color.hh"
-#include "Texture.hh"
-#include "Image.hh"
-#include "Configmenu.hh"
-#include "Iconmenu.hh"
-#include "Netizen.hh"
-#include "Rootmenu.hh"
-#include "Timer.hh"
-#include "Workspace.hh"
-#include "Workspacemenu.hh"
+#include "color.hh"
+#include "texture.hh"
+#include "image.hh"
+#include "configmenu.hh"
+#include "iconmenu.hh"
+#include "netizen.hh"
+#include "rootmenu.hh"
+#include "timer.hh"
+#include "workspace.hh"
+#include "workspacemenu.hh"
 #include "blackbox.hh"
 
 class Slit; // forward reference

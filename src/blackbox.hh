@@ -47,11 +47,10 @@ extern "C" {
 #include <map>
 #include <string>
 
-#include "i18n.hh"
-#include "BaseDisplay.hh"
-#include "Configuration.hh"
-#include "Timer.hh"
-#include "XAtom.hh"
+#include "basedisplay.hh"
+#include "configuration.hh"
+#include "timer.hh"
+#include "xatom.hh"
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)

@@ -85,11 +85,10 @@ extern "C" {
 #include <string>
 using std::string;
 
-#include "i18n.hh"
-#include "BaseDisplay.hh"
-#include "GCCache.hh"
-#include "Timer.hh"
-#include "Util.hh"
+#include "basedisplay.hh"
+#include "gccache.hh"
+#include "timer.hh"
+#include "util.hh"
 
 
 // X error handler to handle any and all X errors while the application is

@@ -34,10 +34,10 @@ extern "C" {
 
 #include <assert.h>
 
-#include "Texture.hh"
-#include "BaseDisplay.hh"
-#include "Image.hh"
-#include "Screen.hh"
+#include "texture.hh"
+#include "basedisplay.hh"
+#include "image.hh"
+#include "screen.hh"
 #include "blackbox.hh"
 
 using std::string;

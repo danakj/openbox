@@ -34,10 +34,10 @@ extern "C" {
 
 #include <string>
 
-#include "BaseDisplay.hh"
-#include "Timer.hh"
-#include "Util.hh"
-#include "Windowmenu.hh"
+#include "basedisplay.hh"
+#include "timer.hh"
+#include "util.hh"
+#include "windowmenu.hh"
 
 #define MwmHintsFunctions     (1l << 0)
 #define MwmHintsDecorations   (1l << 1)

@@ -45,18 +45,17 @@ extern "C" {
 
 using std::string;
 
-#include "i18n.hh"
 #include "blackbox.hh"
-#include "Clientmenu.hh"
-#include "Font.hh"
-#include "Netizen.hh"
-#include "Screen.hh"
-#include "Toolbar.hh"
-#include "Util.hh"
-#include "Window.hh"
-#include "Workspace.hh"
-#include "Windowmenu.hh"
-#include "XAtom.hh"
+#include "clientmenu.hh"
+#include "font.hh"
+#include "netizen.hh"
+#include "screen.hh"
+#include "toolbar.hh"
+#include "util.hh"
+#include "window.hh"
+#include "workspace.hh"
+#include "windowmenu.hh"
+#include "xatom.hh"
 
 
 Workspace::Workspace(BScreen *scrn, unsigned int i) {

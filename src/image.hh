@@ -31,9 +31,9 @@ extern "C" {
 
 #include <list>
 
-#include "Timer.hh"
-#include "BaseDisplay.hh"
-#include "Color.hh"
+#include "timer.hh"
+#include "basedisplay.hh"
+#include "color.hh"
 
 class BImageControl;
 class BTexture;

@@ -36,8 +36,8 @@ extern "C" {
 class BaseDisplay;
 class BGCCache;
 
-#include "Timer.hh"
-#include "Util.hh"
+#include "timer.hh"
+#include "util.hh"
 
 class ScreenInfo {
 private:

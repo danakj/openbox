@@ -40,11 +40,10 @@ extern "C" {
 #include <algorithm>
 
 #include "blackbox.hh"
-#include "i18n.hh"
-#include "BaseDisplay.hh"
-#include "Color.hh"
-#include "Image.hh"
-#include "Texture.hh"
+#include "basedisplay.hh"
+#include "color.hh"
+#include "image.hh"
+#include "texture.hh"
 
 static unsigned long bsqrt(unsigned long x) {
   if (x <= 0) return 0;

@@ -52,7 +52,6 @@ extern "C" {
 #include <string>
 using std::string;
 
-#include "i18n.hh"
 #include "blackbox.hh"
 
 

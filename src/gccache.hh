@@ -28,8 +28,8 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include "BaseDisplay.hh"
-#include "Color.hh"
+#include "basedisplay.hh"
+#include "color.hh"
 
 class BGCCacheItem;
 

@@ -40,7 +40,7 @@ class BGCCache;
 class BGCCacheItem;
 class BColor;
 
-#include "Screen.hh"
+#include "screen.hh"
 
 class BFont {
   /*
@@ -73,7 +73,7 @@ private:
   bool              _antialias;
   bool              _shadow;
   unsigned char     _offset;
-  int               _tint;
+  unsigned char     _tint;
 
   XftFont          *_xftfont;
 
@@ -99,7 +99,7 @@ public:
   // loads an Xft font
   BFont(Display *d, BScreen *screen, const std::string &family, int size,
         bool bold, bool italic, bool shadow, unsigned char offset, 
-        int tint, bool antialias = True);
+        unsigned char tint, bool antialias = True);
 #endif
   // loads a standard X font
   BFont(Display *d, BScreen *screen, const std::string &xlfd);

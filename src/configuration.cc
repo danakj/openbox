@@ -30,8 +30,8 @@ extern "C" {
 #endif // HAVE_STDLIB_H
 }
 
-#include "Configuration.hh"
-#include "Util.hh"
+#include "configuration.hh"
+#include "util.hh"
 
 #include <algorithm>
 

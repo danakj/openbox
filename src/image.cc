@@ -34,11 +34,10 @@ using std::max;
 using std::min;
 
 #include "blackbox.hh"
-#include "i18n.hh"
-#include "BaseDisplay.hh"
-#include "GCCache.hh"
-#include "Image.hh"
-#include "Texture.hh"
+#include "basedisplay.hh"
+#include "gccache.hh"
+#include "image.hh"
+#include "texture.hh"
 
 
 BImage::BImage(BImageControl *c, int w, int h) {

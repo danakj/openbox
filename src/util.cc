@@ -56,7 +56,7 @@ extern "C" {
 
 #include <algorithm>
 
-#include "Util.hh"
+#include "util.hh"
 
 using std::string;
 

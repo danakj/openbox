@@ -31,8 +31,8 @@ extern "C" {
 
 #include <assert.h>
 
-#include "Color.hh"
-#include "BaseDisplay.hh"
+#include "color.hh"
+#include "basedisplay.hh"
 
 
 BColor::ColorCache BColor::colorcache;

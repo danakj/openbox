@@ -77,21 +77,21 @@ using std::string;
 
 #include "i18n.hh"
 #include "blackbox.hh"
-#include "Clientmenu.hh"
-#include "Font.hh"
-#include "GCCache.hh"
-#include "Iconmenu.hh"
-#include "Image.hh"
-#include "Screen.hh"
-#include "Slit.hh"
-#include "Rootmenu.hh"
-#include "Toolbar.hh"
-#include "Util.hh"
-#include "Window.hh"
-#include "Workspace.hh"
-#include "Workspacemenu.hh"
-#include "Util.hh"
-#include "XAtom.hh"
+#include "clientmenu.hh"
+#include "font.hh"
+#include "gccache.hh"
+#include "iconmenu.hh"
+#include "image.hh"
+#include "screen.hh"
+#include "slit.hh"
+#include "rootmenu.hh"
+#include "toolbar.hh"
+#include "util.hh"
+#include "window.hh"
+#include "workspace.hh"
+#include "workspacemenu.hh"
+#include "util.hh"
+#include "xatom.hh"
 
 #ifndef   FONT_ELEMENT_SIZE
 #define   FONT_ELEMENT_SIZE 50
@@ -2314,8 +2314,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
       for (; it != end; ++it) {
         const string& fname = *it;
 
-        //ignore backups and dot files
-        if (fname[fname.size()-1] == '~' || fname[0] == '.')
+        if (fname[fname.size()-1] == '~')
           continue;
 
         string style = stylesdir;
@@ -2751,13 +2750,11 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
         offset = 1;
     }
 
-    int tint = 25;
+    unsigned char tint = 0x40;
     if (style.getValue(rbasename + "xft.shadow.tint", s)) {
       tint = atoi(s.c_str());
     }
 
-    if (tint > 100) tint = 100;
-    if (tint < -100) tint = -100;
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
                          italic, dropShadow && resource.shadow_fonts, offset, 

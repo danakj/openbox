@@ -23,9 +23,9 @@
 
 #include <assert.h>
 
-#include "XAtom.hh"
-#include "Screen.hh"
-#include "Util.hh"
+#include "xatom.hh"
+#include "screen.hh"
+#include "util.hh"
 
 XAtom::XAtom(Display *d) {
   _display = d;

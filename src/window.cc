@@ -44,20 +44,19 @@ extern "C" {
 #endif // HAVE_STDLIB_H
 }
 
-#include "i18n.hh"
 #include "blackbox.hh"
-#include "Clientmenu.hh"
-#include "Font.hh"
-#include "GCCache.hh"
-#include "Iconmenu.hh"
-#include "Image.hh"
-#include "Screen.hh"
-#include "Toolbar.hh"
-#include "Util.hh"
-#include "Window.hh"
-#include "Windowmenu.hh"
-#include "Workspace.hh"
-#include "Slit.hh"
+#include "clientmenu.hh"
+#include "font.hh"
+#include "gccache.hh"
+#include "iconmenu.hh"
+#include "image.hh"
+#include "screen.hh"
+#include "toolbar.hh"
+#include "util.hh"
+#include "window.hh"
+#include "windowmenu.hh"
+#include "workspace.hh"
+#include "slit.hh"
 
 using std::string;
 using std::abs;

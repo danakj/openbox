@@ -5,7 +5,7 @@ sh() {
 }
 
 sh aclocal
-sh automake --foreign --include-deps
+sh automake --foreign --include-deps --add-missing
 sh autoconf
 
 echo

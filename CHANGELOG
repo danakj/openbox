@@ -1,4 +1,4 @@
-3.0-rc5:
+3.0:
 	* Closed bug #908 (sometimes some weird grab is left)
 	* Closed bug #945 (xawtv overlay visible on every desktop)
 	* Closed bug #944 (remove restarting/reconfiguring messages from
@@ -11,6 +11,38 @@
 	* Closed bug #948 (Gets stuck in 'move' mode if mouse is let up while
 	dragged away from title bar)
 	* Closed bug #949 (dock above gnome panel behaviour)
+	* Closed bug #902 (Openbox raises gDesklets when clicked)
+	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)
+	* Closed bug #907 (window focus is not properly indicated)
+	* Closed bug #919 (Temporary raise window when alt tabbing)
+	* Closed bug #921 (focus rectangle stays on the screen after modifier
+	release)
+	* Closed bug #925 (Invalid option: '--sm-save' & '--sm-disable')
+	* Closed bug #926 (problem with client-list-menu, destkop switching,
+	and sticky client)
+	* Closed bug #927 (disappearing windows, crash with I-merry theme)
+	* Closed bug #929 (crash (signal 11) when activating Reconfigure)
+	* Closed bug #940 (actions dont work on desktops with no client
+	windows)
+	* Closed bug #943 (consistent glib type (gint, gchar, etc.) usage)
+	* Closed bug #957 (openbox crashes when exiting out of OpenOffice
+	Impress)
+	* Closed bug #960 (look for dupes in xdg paths when setting up slists?)
+	* Closed bug #961 (Menu causes core dump)
+	* Closed bug #963 (wrapper for mkdir() in parse.c)
+	* Closed bug #964 (free GErrors in action.c, openbox.c)
+	* Closed bug #965 (add message for chdir() failure in openbox.c)
+	* Closed bug #966 (list->next/prev to g_[s]list_next/previous, list !=
+	NULL to list
+	* Closed bug #971 (typo in code)
+	* Closed bug #974 (use g_getenv() in parser/parse.c)
+	* Closed bug #975 (void * -> gpointer)
+	* Closed bug #976 (use g_strerror() in openbox/session.c)
+	* Closed bug #978 (disable entry to go to desktop if it is the current)
+	* Closed bug #979 (request for version check in ob libraries)
+	* Closed bug #944 (remove restarting/reconfiguring messages from
+	openbox.c)
+	* Closed bug #968 (rc.xml refers to a non-existant "debian" menu file)
 
 3.0-rc4:
 	* Closed bug #921 (focus rectangle stays on the screen after modifier

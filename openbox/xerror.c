@@ -28,16 +28,16 @@ int xerror_handler(Display *d, XErrorEvent *e)
     xerror_occured = TRUE;
 #ifdef DEBUG
     if (!xerror_ignore) {
-	char errtxt[128];
+        char errtxt[128];
 	  
-	/*if (e->error_code != BadWindow) */
-	{
-	    XGetErrorText(d, e->error_code, errtxt, 127);
-	    if (e->error_code == BadWindow)
-		/*g_warning("X Error: %s", errtxt)*/;
-	    else
-		g_error("X Error: %s", errtxt);
-	}
+        /*if (e->error_code != BadWindow) */
+        {
+            XGetErrorText(d, e->error_code, errtxt, 127);
+            if (e->error_code == BadWindow)
+                /*g_warning("X Error: %s", errtxt)*/;
+            else
+                g_error("X Error: %s", errtxt);
+        }
     }
 #else
     (void)d; (void)e;

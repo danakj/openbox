@@ -98,6 +98,7 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
         break;
     case RR_TEXTURE_RGBA:
         glColor3f(1.0, 1.0, 1.0);
+        glBindTexture(GL_TEXTURE_2D, tex->data.rgba.texid);
         glBegin(GL_TRIANGLES);
         glVertex2i(x, y);
         glVertex2i(x+w, y); 

@@ -425,6 +425,7 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
       mode = GrabModeSync; // this is handled in the plate's buttonPressHandler
       break;
     default:
+      // any other elements already get button events, don't grab on them
       continue;
     }
     ButtonBindingList::iterator it, end = _buttons[i].end();

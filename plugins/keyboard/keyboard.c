@@ -34,7 +34,7 @@ static void reset_chains()
     curpos = NULL;
     if (grabbed) {
 	grabbed = FALSE;
-        grab_server(FALSE);
+        grab_keyboard(FALSE);
     }
 }
 
@@ -111,7 +111,7 @@ static void press(ObEvent *e, void *foo)
                 if (p->first_child != NULL) { /* part of a chain */
                     /* XXX TIMER */
                     if (!grabbed) {
-                        grab_server(TRUE);
+                        grab_keyboard(TRUE);
                         grabbed = TRUE;
                         XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                     }

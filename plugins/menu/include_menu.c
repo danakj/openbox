@@ -29,7 +29,8 @@ void *plugin_create(PluginMenuCreateData *data)
     char *label;
     char *filename;
     ObMenu *m;
-    
+    xmlDocPtr doc;
+
     parse_attr_string("id", data->node, &id);
     parse_attr_string("label", data->node, &label);
     
@@ -41,7 +42,7 @@ void *plugin_create(PluginMenuCreateData *data)
 
     parse_attr_string("filename", data->node, &filename);
 
-    xmlDocPtr doc = xmlParseFile(filename);
+    doc = xmlParseFile(filename);
     if (doc) {
         xmlNodePtr node = xmlDocGetRootElement(doc);
         if (node) {

@@ -727,7 +727,7 @@ void BScreen::rereadMenu(void) {
 
 
 void BScreen::LoadStyle(void) {
-  Configuration style;
+  Configuration style(False);
 
   const char *sfile = blackbox->getStyleFilename();
   if (sfile != NULL) {
@@ -740,6 +740,23 @@ void BScreen::LoadStyle(void) {
   }
 
   string s;
+
+  if (config->getValue("rootCommand", s))
+    printf("config.rootCommand: %s\n", s.c_str());
+  
+  if (style.getValue("rootCommand", s))
+    printf("style.rootCommand: %s\n", s.c_str());
+
+  // merge in the rc file
+  style.merge(config, True);
+
+  printf("merged databases\n");
+
+  if (style.getValue("rootCommand", s))
+    printf("style.rootCommand: %s\n", s.c_str());
+
+  if (style.getValue("session.cacheMax", s))
+    printf("session.cacheMax: %s\n", s.c_str());
 
   // load fonts/fontsets
   if (resource.wstyle.font)

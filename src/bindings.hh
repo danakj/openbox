@@ -69,9 +69,9 @@ private:
   static void reset(OBBindings *self); // the timer's timeout function
 
 public:
-  //! Initializes an OBBinding object
+  //! Initializes an OBBindings object
   OBBindings();
-  //! Destroys the OBBinding object
+  //! Destroys the OBBindings object
   virtual ~OBBindings();
 
   //! Translates a binding string into the actual Binding

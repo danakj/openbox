@@ -230,7 +230,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
             RrSurfaceSetArea(self->s_lgrip, 0, 0,
                              RrThemeGripWidth(ob_theme),
                              ob_theme->handle_height);
-            RrSurfaceSetArea(self->s_lgrip,
+            RrSurfaceSetArea(self->s_rgrip,
                              self->width - RrThemeGripWidth(ob_theme), 0,
                              RrThemeGripWidth(ob_theme),
                              ob_theme->handle_height);

@@ -34,8 +34,10 @@ static void GlftDefaultSubstitute(Display *d, int s, FcPattern *pat)
         dpi = DisplayHeight(d, s) * 25.4 / (double)DisplayHeightMM(d, s);
         FcPatternAddDouble(pat, FC_DPI, dpi);
     }
-    if (FcPatternGet(pat, FC_ANTIALIAS, 0, &v) == FcResultNoMatch)
-        FcPatternAddBool(pat, FC_ANTIALIAS, FcTrue);
+    if (FcPatternGet(pat, FC_ANTIALIAS, 0, &v) == FcResultNoMatch) {
+        FcPatternAddBool(pat, FC_ANTIALIAS, FcFalse);
+        g_message("SETTING ANTIALIAS TRUE");
+    }
     if (FcPatternGet(pat, FC_HINTING, 0, &v) == FcResultNoMatch)
         FcPatternAddBool(pat, FC_HINTING, FcTrue);
     if (FcPatternGet(pat, FC_AUTOHINT, 0, &v) == FcResultNoMatch)
@@ -77,10 +79,6 @@ struct GlftFont *GlftFontOpen(Display *d, int screen, const char *name)
     GlftDefaultSubstitute(d, screen, pat);
 
     match = FcFontMatch(NULL, pat, &res);
-    printf("Pattern ");
-    FcPatternPrint(pat);
-    printf("Match ");
-    FcPatternPrint(match);
     FcPatternDestroy(pat);
     if (!match) {
         GlftDebug("failed to find matching font\n");

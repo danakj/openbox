@@ -2425,7 +2425,10 @@ void client_activate(ObClient *self)
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE);
     if (self->iconic)
-        client_iconify(self, FALSE, TRUE);
+        client_iconify(self, FALSE, FALSE);
+    if (self->desktop != DESKTOP_ALL &&
+        self->desktop != screen_desktop)
+        screen_set_desktop(self->desktop);
     else if (!self->frame->visible)
         /* if its not visible for other reasons, then don't mess
            with it */

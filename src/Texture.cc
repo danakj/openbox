@@ -128,12 +128,14 @@ void BTexture::setDescription(const string &d) {
 
     if (descr.find("sunken") != string::npos)
       addTexture(BTexture::Sunken);
+    else if (descr.find("flatborder") != string::npos)
+      addTexture(BTexture::FlatBorder);
     else if (descr.find("flat") != string::npos)
       addTexture(BTexture::Flat);
     else
       addTexture(BTexture::Raised);
 
-    if (! (texture() & BTexture::Flat)) {
+    if (! (texture() & (BTexture::Flat | BTexture::FlatBorder))) {
       if (descr.find("bevel2") != string::npos)
         addTexture(BTexture::Bevel2);
       else

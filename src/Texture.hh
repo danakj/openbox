@@ -35,29 +35,30 @@ public:
   enum Type {
     // bevel options
     Flat                = (1l<<0),
-    Sunken              = (1l<<1),
-    Raised              = (1l<<2),
+    FlatBorder          = (1l<<1),
+    Sunken              = (1l<<2),
+    Raised              = (1l<<3),
     // textures
-    Solid               = (1l<<3),
-    Gradient            = (1l<<4),
+    Solid               = (1l<<4),
+    Gradient            = (1l<<5),
     // gradients
-    Horizontal          = (1l<<5),
-    Vertical            = (1l<<6),
-    Diagonal            = (1l<<7),
-    CrossDiagonal       = (1l<<8),
-    Rectangle           = (1l<<9),
-    Pyramid             = (1l<<10),
-    PipeCross           = (1l<<11),
-    Elliptic            = (1l<<12),
+    Horizontal          = (1l<<6),
+    Vertical            = (1l<<7),
+    Diagonal            = (1l<<8),
+    CrossDiagonal       = (1l<<9),
+    Rectangle           = (1l<<10),
+    Pyramid             = (1l<<11),
+    PipeCross           = (1l<<12),
+    Elliptic            = (1l<<13),
     // bevel types
-    Bevel1              = (1l<<13),
-    Bevel2              = (1l<<14),
+    Bevel1              = (1l<<14),
+    Bevel2              = (1l<<15),
     // inverted image
-    Invert              = (1l<<15),
+    Invert              = (1l<<16),
     // parent relative image
-    Parent_Relative     = (1l<<16),
+    Parent_Relative     = (1l<<17),
     // fake interlaced image
-    Interlaced          = (1l<<17)
+    Interlaced          = (1l<<18)
   };
 
   BTexture(const BaseDisplay * const _display = 0,

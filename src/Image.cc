@@ -107,6 +107,11 @@ Pixmap BImage::render_solid(const BTexture &texture) {
       XDrawLine(display, pixmap, peninterlace.gc(), 0, i, width, i);
   }
 
+  if (texture.texture() & BTexture::FlatBorder) {
+    BPen penborder(texture.colorTo());
+    XDrawRectangle(display, pixmap, penborder.gc(), 0, 0, width-1, height-1);
+  }
+
   if (texture.texture() & BTexture::Bevel1) {
     if (texture.texture() & BTexture::Raised) {
       XDrawLine(display, pixmap, penshadow.gc(),

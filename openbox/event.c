@@ -238,7 +238,11 @@ void event_process(XEvent *e)
 		if (fi.xfocus.window == e->xfocus.window)
 		    return;
 	    }
-	}
+	} else if (window == focus_backup && focus_client != NULL)
+            /* Something's focused but we got a focus event for the backup
+               window. this means that something unfocused before we received
+               the new FocusIn. Just ignore it. */
+               return;
 	break;
     case EnterNotify:
     case LeaveNotify:
@@ -323,10 +327,22 @@ static void event_handle_client(Client *client, XEvent *e)
      
     switch (e->type) {
     case FocusIn:
-        client_set_focused(client, TRUE);
+        if (focus_client != client)
+            focus_set_client(client);
+
+        /* focus state can affect the stacking layer */
+        client_calc_layer(client);
+
+        engine_frame_adjust_focus(client->frame);
 	break;
     case FocusOut:
-        client_set_focused(client, FALSE);
+	if (focus_client == client)
+	    focus_set_client(NULL);
+
+        /* focus state can affect the stacking layer */
+        client_calc_layer(client);
+
+        engine_frame_adjust_focus(client->frame);
 	break;
     case ConfigureRequest:
 	g_message("ConfigureRequest for window %lx", client->window);

@@ -1923,8 +1923,6 @@ gboolean client_focus(Client *self)
 	XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    client_set_focused(self, TRUE);
-
     /* XSync(ob_display, FALSE); XXX Why sync? */
     return TRUE;
 }
@@ -1932,30 +1930,6 @@ gboolean client_focus(Client *self)
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
-    client_set_focused(self, FALSE);
-}
-
-void client_set_focused(Client *self, gboolean focused)
-{
-    if (focused) {
-        if (focus_client != self) {
-            focus_set_client(self);
-
-            /* focus state can affect the stacking layer */
-            client_calc_layer(self);
-
-            engine_frame_adjust_focus(self->frame);
-        }
-    } else {
-	if (focus_client == self)
-	    focus_set_client(NULL);
-
-        /* focus state can affect the stacking layer */
-        client_calc_layer(self);
-
-        if (self->frame != NULL) /* unfocus can happen while being unmanaged */
-            engine_frame_adjust_focus(self->frame);
-    }
 }
 
 gboolean client_focused(Client *self)

@@ -252,7 +252,7 @@ BFont *Style::readDatabaseFont(const std::string &rbasename,
     tint = atoi(s.c_str());
   }
 
-  fontstring = "Arial,Sans-8:bold";
+  fontstring = "Arial,Sans-9:bold";
 
   // if this fails, it ::exit()'s
   return new BFont(screen_number, fontstring, dropShadow, offset, tint);

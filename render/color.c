@@ -65,8 +65,6 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
     return out;
 }
 
-/*XXX same color could be pointed to twice, this might have to be a refcount*/
-
 void RrColorFree(RrColor *c)
 {
     if (c) {

@@ -102,7 +102,7 @@ void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
         c.color.red = 0;
         c.color.green = 0;
         c.color.blue = 0;
-        c.color.alpha = t->tint | t->tint << 8; // transparent shadow
+        c.color.alpha = t->tint | t->tint << 8; /* transparent shadow */
         c.pixel = BlackPixel(ob_display, ob_screen);
   
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
@@ -112,8 +112,8 @@ void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
     c.color.blue = t->color->b | t->color->b << 8;
+    c.color.alpha = 0xff | 0xff << 8; /* fully opaque text */
     c.pixel = t->color->pixel;
-    c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
                      
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y -

@@ -45,7 +45,7 @@ Client::Client(int screen, Window window)
   _positioned = false;
   _disabled_decorations = 0;
   _group = None;
-  _desktop = 0;
+  _desktop = _old_desktop = 0;
   
   getArea();
   getDesktop();
@@ -638,7 +638,7 @@ void Client::updateStrut()
     // updating here is pointless while we're being mapped cuz we're not in
     // the screen's client list yet
     if (frame)
-      openbox->screen(_screen)->updateStrut();
+      openbox->screen(_screen)->updateStruts();
   }
 
   delete [] data;
@@ -748,7 +748,8 @@ void Client::setDesktop(long target)
   if (!(target >= 0 || target == (signed)0xffffffff ||
         target == ICONIC_DESKTOP))
     return;
-  
+
+  _old_desktop = _desktop;
   _desktop = target;
 
   // set the desktop hint, but not if we're iconifying
@@ -781,8 +782,10 @@ void Client::setDesktop(long target)
     }
     changeState();
   }
-  
+
+  changeAllowedActions();
   frame->adjustState();
+  openbox->screen(_screen)->updateStruts();
 }
 
 
@@ -1301,6 +1304,7 @@ void Client::changeAllowedActions(void)
 
 void Client::remaximize()
 {
+  printf("REMAXIMIZE!!!!!!!!!!!!!!!!!!!\n");
   int dir;
   if (_max_horz && _max_vert)
     dir = 0;
@@ -1391,7 +1395,8 @@ void Client::maximize(bool max, int dir, bool savearea)
     if (dir == 2 && !_max_vert) return;
   }
 
-  const otk::Rect &a = openbox->screen(_screen)->area();
+  const otk::Rect &a = openbox->screen(_screen)->area(_iconic ?
+                                                      _old_desktop : _desktop);
   int x = frame->area().x(), y = frame->area().y(),
     w = _area.width(), h = _area.height();
   
@@ -1536,7 +1541,9 @@ void Client::fullscreen(bool fs, bool savearea)
       delete dimensions;
     } else {
       // pick some fallbacks...
-      const otk::Rect &a = openbox->screen(_screen)->area();
+      const otk::Rect &a = openbox->screen(_screen)->area(_iconic ?
+                                                          _old_desktop :
+                                                          _desktop);
       x = a.x() + a.width() / 4;
       y = a.y() + a.height() / 4;
       w = a.width() / 2;

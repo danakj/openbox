@@ -190,6 +190,10 @@ private:
   //! The desktop on which the window resides (0xffffffff for all desktops)
   long _desktop;
 
+  //! The last desktop to which the window belonged, mostly useful when the
+  //! window is iconified, to see where it used to be.
+  long _old_desktop;
+
   //! Normal window title
   otk::ustring  _title;
   //! Window title when iconifiged

@@ -30,7 +30,9 @@ class Client;
 class Screen : public otk::EventHandler {
 public:
   //! Holds a list of otk::Strut objects
-  typedef std::list<otk::Strut*> StrutList;
+  typedef std::vector<otk::Strut> StrutList;
+  //! Holds a list of otk::Rect objects
+  typedef std::vector<otk::Rect> RectList;
 
   static const unsigned long event_mask = ColormapChangeMask |
                                           EnterWindowMask |
@@ -59,11 +61,13 @@ private:
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
 
-  //! Area usable for placement etc (total - struts)
-  otk::Rect _area;
+  //! Area usable for placement etc (total - struts), one per desktop,
+  //! plus one extra for windows on all desktops
+  RectList _area;
 
-  //! Combined strut from all of the clients' struts
-  otk::Strut _strut;
+  //! Combined strut from all of the clients' struts, one per desktop,
+  //! plus one extra for windows on all desktops
+  StrutList _struts;
 
   //!  An offscreen window which gets focus when nothing else has it
   Window _focuswindow;
@@ -139,8 +143,6 @@ public:
     used.
   */
   inline bool managed() const { return _managed; }
-  //! Returns the area of the screen not reserved by applications' Struts
-  inline const otk::Rect &area() const { return _area; }
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }
   //! Returns the desktop being displayed
@@ -148,11 +150,19 @@ public:
   //! Returns the number of desktops
   inline long numDesktops() const { return _num_desktops; }
 
+  //! Returns the area of the screen not reserved by applications' Struts
+  /*!
+    @param desktop The desktop number of the area to retrieve for. A value of
+                   0xffffffff will return an area that combines all struts
+                   on all desktops.
+  */
+  const otk::Rect& area(long desktop) const;
+
   //! Update's the screen's combined strut of all the clients.
   /*!
     Clients should call this whenever they change their strut.
   */
-  void updateStrut();
+  void updateStruts();
 
   //! Manage any pre-existing windows on the screen
   void manageExisting();

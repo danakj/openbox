@@ -106,7 +106,7 @@ def _do_move():
         w = _client.area().width() + fs.left + fs.right
         h = _client.area().height() + fs.top + fs.bottom
         # use the area based on the struts
-        area = ob.openbox.screen(_screen).area()
+        area = ob.openbox.screen(_screen).area(_client.desktop())
         l = area.left()
         r = area.right() - w + 1
         t = area.top()

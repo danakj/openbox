@@ -25,7 +25,7 @@ def random(data):
     if data.client.positionRequested(): return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
-    screen_area = ob.openbox.screen(data.screen).area()
+    screen_area = ob.openbox.screen(data.screen).area(data.client.desktop())
     width = screen_area.width() - (client_area.width() +
                                    frame_size.left + frame_size.right)
     height = screen_area.height() - (client_area.height() + 
@@ -44,7 +44,7 @@ def cascade(data):
     if data.client.positionRequested(): return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
-    screen_area = ob.openbox.screen(data.screen).area()
+    screen_area = ob.openbox.screen(data.screen).area(data.client.desktop())
     width = screen_area.width() - (client_area.width() +
                                    frame_size.left + frame_size.right)
     height = screen_area.height() - (client_area.height() + 

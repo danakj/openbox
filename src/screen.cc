@@ -122,7 +122,6 @@ Screen::Screen(int screen)
   // these may be further updated if any pre-existing windows are found in
   // the manageExising() function
   changeClientList();  // initialize the client lists, which will be empty
-  calcArea();          // initialize the available working area
 
   // register this class as the event handler for the root window
   openbox->registerHandler(_info->rootWindow(), this);
@@ -200,26 +199,48 @@ void Screen::manageExisting()
 }
 
 
-void Screen::updateStrut()
+void Screen::updateStruts()
 {
-  _strut.left = _strut.right = _strut.top = _strut.bottom = 0;
+  struct ApplyStrut {
+    void operator()(otk::Strut &self, const otk::Strut &other) {
+      self.left = std::max(self.left, other.left);
+      self.right = std::max(self.right, other.right);
+      self.top = std::max(self.top, other.top);
+      self.bottom = std::max(self.bottom, other.bottom);
+    }
+  } apply;
 
-  ClientList::iterator it, end = clients.end();
+  StrutList::iterator sit, send = _struts.end();
+  // reset them all
+  for (sit = _struts.begin(); sit != send; ++sit)
+    sit->left = sit->right = sit->top = sit->bottom = 0;
+
+  ClientList::const_iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
+    long desk = (*it)->desktop();
     const otk::Strut &s = (*it)->strut();
-    _strut.left = std::max(_strut.left, s.left);
-    _strut.right = std::max(_strut.right, s.right);
-    _strut.top = std::max(_strut.top, s.top);
-    _strut.bottom = std::max(_strut.bottom, s.bottom);
+
+    if (desk == (signed) 0xffffffff)
+      for (unsigned int i = 0, e = _struts.size(); i < e; ++i)
+        apply(_struts[i], s);
+    else if ((unsigned)desk < _struts.size())
+      apply(_struts[desk], s);
+    else if (desk == Client::ICONIC_DESKTOP)
+      continue; // skip for the 'all desktops' strut
+    else
+      assert(false); // invalid desktop otherwise..
+    // apply to the 'all desktops' strut
+    apply(_struts.back(), s);
   }
-  calcArea();
+  changeWorkArea();
 }
 
 
-void Screen::calcArea()
+void Screen::changeWorkArea()
 {
-  otk::Rect old_area = _area;
-
+  unsigned long *dims = new unsigned long[4 * _num_desktops];
+  for (long i = 0; i < _num_desktops + 1; ++i) {
+    otk::Rect old_area = _area[i];
 /*
 #ifdef    XINERAMA
   // reset to the full areas
@@ -228,10 +249,12 @@ void Screen::calcArea()
 #endif // XINERAMA
 */
   
-  _area = otk::Rect(_strut.left, _strut.top,
-                    _info->size().width() - (_strut.left + _strut.right),
-                    _info->size().height() - (_strut.top + _strut.bottom));
-
+    _area[i] = otk::Rect(_struts[i].left, _struts[i].top,
+                         _info->size().width() - (_struts[i].left +
+                                                  _struts[i].right),
+                         _info->size().height() - (_struts[i].top +
+                                                   _struts[i].bottom));
+    
 /*
 #ifdef    XINERAMA
   if (isXineramaActive()) {
@@ -254,15 +277,31 @@ void Screen::calcArea()
   }
 #endif // XINERAMA
 */
- 
-  if (old_area != _area) {
-    // the area has changed, adjust all the maximized windows
-    ClientList::iterator it, end = clients.end();
-    for (it = clients.begin(); it != end; ++it)
-      (*it)->remaximize();
-  }
+    if (old_area != _area[i]) {
+      // the area has changed, adjust all the maximized windows
+      ClientList::iterator it, end = clients.end();
+      for (it = clients.begin(); it != end; ++it)
+        if (i < _num_desktops) {
+          if ((*it)->desktop() == i)
+            (*it)->remaximize();
+        } else {
+          // the 'all desktops' size
+          if ((*it)->desktop() == (signed) 0xffffffff)
+            (*it)->remaximize();
+        }
+    }
 
-  changeWorkArea();
+    // don't set these for the 'all desktops' area
+    if (i < _num_desktops) {
+      dims[(i * 4) + 0] = _area[i].x();
+      dims[(i * 4) + 1] = _area[i].y();
+      dims[(i * 4) + 2] = _area[i].width();
+      dims[(i * 4) + 3] = _area[i].height();
+    }
+  }
+  otk::Property::set(_info->rootWindow(), otk::Property::atoms.net_workarea,
+                     otk::Property::atoms.cardinal, dims, 4 * _num_desktops);
+  delete [] dims;
 }
 
 
@@ -411,20 +450,6 @@ void Screen::changeStackingList()
 }
 
 
-void Screen::changeWorkArea() {
-  unsigned long *dims = new unsigned long[4 * _num_desktops];
-  for (long i = 0; i < _num_desktops; ++i) {
-    dims[(i * 4) + 0] = _area.x();
-    dims[(i * 4) + 1] = _area.y();
-    dims[(i * 4) + 2] = _area.width();
-    dims[(i * 4) + 3] = _area.height();
-  }
-  otk::Property::set(_info->rootWindow(), otk::Property::atoms.net_workarea,
-                     otk::Property::atoms.cardinal, dims, 4 * _num_desktops);
-  delete [] dims;
-}
-
-
 void Screen::manageWindow(Window window)
 {
   Client *client = 0;
@@ -526,7 +551,7 @@ void Screen::manageWindow(Window window)
   clients.push_back(client);
   // once the client is in the list, update our strut to include the new
   // client's (it is good that this happens after window placement!)
-  updateStrut();
+  updateStruts();
   // this puts into the stacking order, then raises it
   _stacking.push_back(client);
   raiseWindow(client);
@@ -592,7 +617,7 @@ void Screen::unmanageWindow(Client *client)
 
   // once the client is out of the list, update our strut to remove it's
   // influence
-  updateStrut();
+  updateStruts();
 
   // unset modal before dropping our focus
   client->_modal = false;
@@ -750,12 +775,14 @@ void Screen::changeNumDesktops(long num)
                      viewport, _num_desktops * 2);
   delete [] viewport;
 
-  // update the work area hint
-  changeWorkArea();
+  // change our struts/area to match
+  _area.resize(_num_desktops + 1);
+  _struts.resize(_num_desktops + 1);
+  updateStruts();
 
   // change our desktop if we're on one that no longer exists!
-  if (_desktop >= num)
-    changeDesktop(num - 1);
+  if (_desktop >= _num_desktops)
+    changeDesktop(_num_desktops - 1);
 }
 
 
@@ -785,6 +812,15 @@ void Screen::setDesktopName(long i, const otk::ustring &name)
                      otk::Property::utf8, newnames);
 }
 
+
+const otk::Rect& Screen::area(long desktop) const {
+  assert(desktop >= 0 || desktop == (signed) 0xffffffff);
+  assert(desktop < _num_desktops || desktop == (signed) 0xffffffff);
+  if (desktop >= 0 && desktop < _num_desktops)
+    return _area[desktop];
+  else
+    return _area[_num_desktops];
+}
 
 void Screen::installColormap(bool install) const
 {

@@ -35,6 +35,7 @@ public:
   };
   
   struct ButtonPressAction {
+    Window win;
     unsigned int button;
     otk::Point pos;
     otk::Rect clientarea;

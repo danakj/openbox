@@ -42,6 +42,7 @@ void Actions::insertPress(const XButtonEvent &e)
     _posqueue[i] = _posqueue[i-1];
   }
   _posqueue[0] = a;
+  a->win = e.window;
   a->button = e.button;
   a->pos = otk::Point(e.x_root, e.y_root);
 
@@ -274,6 +275,8 @@ void Actions::motionHandler(const XMotionEvent &e)
 
   if (!e.same_screen) return; // this just gets stupid
 
+  if (e.window != _posqueue[0]->win) return;
+  
   MouseContext::MC context;
   EventHandler *h = openbox->findHandler(e.window);
   Frame *f = dynamic_cast<Frame*>(h);
@@ -287,7 +290,7 @@ void Actions::motionHandler(const XMotionEvent &e)
     return; // not a valid mouse context
 
   int x_root = e.x_root, y_root = e.y_root;
-  
+
   // compress changes to a window into a single change
   XEvent ce;
   while (XCheckTypedWindowEvent(**otk::display, e.window, e.type, &ce)) {

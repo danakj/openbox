@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3\n"
-"Report-Msgid-Bugs-To: mikachu@openbox.org\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
 "POT-Creation-Date: 2004-11-07 12:52+0100\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"

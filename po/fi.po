@@ -1,0 +1,125 @@
+# openbox Finnish translation.
+# Copyright (C) 2005  Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# Pauli Virtanen <pauli.virtanen@hut.fi>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openbox 3.3\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2005-04-11 23:11+0300\n"
+"PO-Revision-Date: 2005-03-15 21:29+0200\n"
+"Last-Translator: Pauli Virtanen <pauli.virtanen@hut.fi>\n"
+"Language-Team: Finnish <fi@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../openbox/client_list_menu.c:95
+msgid "Go there..."
+msgstr "Näytä tämä..."
+
+#: ../openbox/client_list_menu.c:161
+msgid "Desktops"
+msgstr "Työtilat"
+
+#: ../openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Palauta"
+
+#: ../openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Suurenna"
+
+#: ../openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Rullaa auki"
+
+#: ../openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Rullaa"
+
+#: ../openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Kaikkiin työtiloihin"
+
+#: ../openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Kerros"
+
+#: ../openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Aina päällimmäinen"
+
+#: ../openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Tavallinen"
+
+#: ../openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Aina alimmainen"
+
+#: ../openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "Siirrä työtilaan"
+
+#: ../openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Ikkunan valikko"
+
+#: ../openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Pienennä"
+
+#: ../openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Nosta päällimmäiseksi"
+
+#: ../openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Laske alimmaiseksi"
+
+#: ../openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Piirrä/poista kehykset"
+
+#: ../openbox/client_menu.c:245
+msgid "Move"
+msgstr "Siirrä"
+
+#: ../openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Muuta kokoa"
+
+#: ../openbox/client_menu.c:255
+msgid "Close"
+msgstr "Sulje"
+
+#. no args left
+#: ../openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id tarvitsee parametrin\n"
+
+#. no args left
+#: ../openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file tarvitsee parametrin\n"
+
+#: ../openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
+
+#: ../render/font.c:50
+msgid "Couldn't initialize Xft."
+msgstr "Xft:n käynnistys epäonnistui."
+
+#: ../render/font.c:164 ../render/font.c:169
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Kirjasinlajin lataaminen epäonnistui: %s\n"
+
+#: ../render/font.c:165
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Kokeillaan varakirjasinlajia: %s\n"

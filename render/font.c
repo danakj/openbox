@@ -217,36 +217,8 @@ gint RrFontMeasureString(const RrFont *f, const gchar *str)
 
 gint RrFontHeight(const RrFont *f)
 {
-#ifndef USE_PANGO
     return f->xftfont->ascent + f->xftfont->descent +
         (f->shadow ? f->offset : 0);
-#else /* USE_PANGO */
-     /*
-     PangoContext *context = pango_context_new ();
- 
-     PangoFontMetrics *metrics = pango_context_get_metrics(context, f->pango_font, NULL);
- 
-     gint result =  pango_font_metrics_get_ascent (metrics) +
-         pango_font_metrics_get_descent(metrics) +
-         (f->shadow ? f->offset : 0);
- 
-     pango_font_metrics_unref(metrics);
-     g_object_unref(context);
-     return result;
- */
-#ifndef ANNOYING_QUESTION
-// Obviously you either remove this or pass -DANNOYING_QUESTION to actually
-// compile the code.
-#error XXX Does anyone have any idea how the above is supposed to work?
-#else
-#warning XXX Using very ugly workaround in the meantime.
-#endif
-
-    gint x, y;
-    font_measure_full(f, " ", &x, &y);
-    return y;
-
-#endif /* USE_PANGO */
 }
 
 gint RrFontMaxCharWidth(const RrFont *f)
@@ -266,14 +238,17 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 #else
     PangoLayout *pl;
     PangoContext *context;
+    PangoRectangle rect;
 
     context = pango_xft_get_context (RrDisplay(t->font->inst), RrScreen(t->font->inst));
     pl = pango_layout_new (context);
 #endif /* USE_PANGO */
 
     /* center vertically */
+#ifndef USE_PANGO /* We have to wait for the text string with pango */
     y = area->y +
         (area->height - RrFontHeight(t->font)) / 2;
+#endif
     /* the +2 and -4 leave a small blank edge on the sides */
     x = area->x + 2;
     w = area->width - 4;
@@ -319,6 +294,10 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     pango_layout_set_width(pl, w * PANGO_SCALE);
     pango_layout_set_ellipsize(pl, PANGO_ELLIPSIZE_MIDDLE);
     pango_layout_set_alignment(pl, (PangoAlignment)(t->justify));
+    pango_layout_get_pixel_extents(pl, NULL, &rect);
+    y = area->y +
+        (area->height - rect.height) / 2;
+
 #endif /* USE_PANGO */
 
     if (t->font->shadow) {
@@ -336,18 +315,16 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
             c.color.alpha = 0xffff * -t->font->tint / 100;
             c.pixel = WhitePixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
-#ifndef USE_PANGO
         }
+#ifndef USE_PANGO
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->font->offset,
                           t->font->xftfont->ascent + y + t->font->offset,
                           (FcChar8*)text->str, l);
-    }
 #else /* USE_PANGO */
-        }
-    pango_xft_render_layout(d, &c, pl, (x + t->font->offset) * PANGO_SCALE,
-                            (y + t->font->offset) * PANGO_SCALE);
-    }
+        pango_xft_render_layout(d, &c, pl, (x + t->font->offset) * PANGO_SCALE,
+                                (y + t->font->offset) * PANGO_SCALE);
 #endif /* USE_PANGO */
+    }
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
     c.color.blue = t->color->b | t->color->b << 8;

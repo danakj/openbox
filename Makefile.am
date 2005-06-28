@@ -60,6 +60,7 @@ render_libobrender_la_LDFLAGS = \
 render_libobrender_la_LIBADD = \
 	$(X_LIBS) \
 	$(XFT_LIBS) \
+	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS) 
 render_libobrender_la_SOURCES = \
@@ -116,14 +117,12 @@ openbox_openbox_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"Openbox\"
 openbox_openbox_LDADD = \
 	$(SM_LIBS) \
-	$(XFT_LIBS) \
 	$(XINERAMA_LIBS) \
 	$(XKB_LIBS) \
 	$(XRANDR_LIBS) \
 	$(VIDMODE_LIBS) \
 	$(XSHAPE_LIBS) \
 	$(GLIB_LIBS) \
-	$(PANGO_LIBS) \
 	$(X_LIBS) \
 	$(LIBSN_LIBS) \
 	$(XML_LIBS) \

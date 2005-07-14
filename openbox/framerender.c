@@ -91,7 +91,9 @@ void framerender_frame(ObFrame *self)
               ob_rr_theme->a_disabled_unfocused_desk) :
              (self->focused ?
               (self->client->desktop == DESKTOP_ALL ?
-               ob_rr_theme->a_toggled_focused_desk :
+               (self->desk_press ?
+                ob_rr_theme->a_toggled_focused_pressed_desk :
+                ob_rr_theme->a_toggled_focused_desk) :
                (self->desk_press ?
                 ob_rr_theme->a_focused_pressed_desk :
                 (self->desk_hover ?
@@ -110,7 +112,9 @@ void framerender_frame(ObFrame *self)
               ob_rr_theme->a_disabled_unfocused_shade) :
              (self->focused ?
               (self->client->shaded ?
-               ob_rr_theme->a_toggled_focused_shade :
+               (self->shade_press ?
+                ob_rr_theme->a_toggled_focused_pressed_shade :
+                ob_rr_theme->a_toggled_focused_shade) :
                (self->shade_press ?
                 ob_rr_theme->a_focused_pressed_shade :
                 (self->shade_hover ?

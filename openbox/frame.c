@@ -578,35 +578,35 @@ static void layout_title(ObFrame *self)
                                   ob_rr_theme->padding + 1);
             break;
         case 'D':
-            if (d) { *lc = ' '; break; } /* rm duplicates */
+            if (d) { *lc = ' '; break; }
             d = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
             break;
         case 'S':
-            if (s) { *lc = ' '; break; } /* rm duplicates */
+            if (s) { *lc = ' '; break; }
             s = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
             break;
         case 'I':
-            if (i) { *lc = ' '; break; } /* rm duplicates */
+            if (i) { *lc = ' '; break; }
             i = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
             break;
         case 'L':
-            if (l) { *lc = ' '; break; } /* rm duplicates */
+            if (l) { *lc = ' '; break; }
             l = TRUE;
             break;
         case 'M':
-            if (m) { *lc = ' '; break; } /* rm duplicates */
+            if (m) { *lc = ' '; break; }
             m = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
             break;
         case 'C':
-            if (c) { *lc = ' '; break; } /* rm duplicates */
+            if (c) { *lc = ' '; break; }
             c = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);

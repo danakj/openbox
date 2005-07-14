@@ -84,6 +84,8 @@ extern gchar *config_theme;
 
 /* Show the onepixel border after toggleDecor */
 extern gboolean config_theme_keepborder;
+/* Hide window frame buttons that the window doesn't allow */
+extern gboolean config_theme_hidedisabled;
 /* Titlebar button layout */
 extern gchar *config_title_layout;
 

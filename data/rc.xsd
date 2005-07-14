@@ -100,6 +100,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:element name="titlelayout" type="xs:string"/>
             <xs:element name="keepBorder" type="ob:yesorno"/>
+            <xs:element name="hideDisabled" type="ob:yesorno"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="desktops">

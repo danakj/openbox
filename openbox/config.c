@@ -35,6 +35,7 @@ ObPlacePolicy config_place_policy;
 
 gchar   *config_theme;
 gboolean config_theme_keepborder;
+gboolean config_theme_hidedisabled;
 
 gchar *config_title_layout;
 
@@ -256,6 +257,8 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
     if ((n = parse_find_node("keepBorder", node)))
         config_theme_keepborder = parse_bool(doc, n);
+    if ((n = parse_find_node("hideDisabled", node)))
+        config_theme_hidedisabled = parse_bool(doc, n);
 }
 
 static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -556,6 +559,7 @@ void config_startup(ObParseInst *i)
 
     config_title_layout = g_strdup("NLIMC");
     config_theme_keepborder = TRUE;
+    config_theme_hidedisabled = FALSE;
 
     parse_register(i, "theme", parse_theme, NULL);
 

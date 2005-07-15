@@ -311,7 +311,7 @@ void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b)
 void RrMinsize(RrAppearance *a, gint *w, gint *h)
 {
     gint i;
-    gint m;
+    RrSize *m;
     gint l, t, r, b;
     *w = *h = 0;
 
@@ -326,9 +326,9 @@ void RrMinsize(RrAppearance *a, gint *w, gint *h)
         case RR_TEXTURE_TEXT:
             m = RrFontMeasureString(a->texture[i].data.text.font,
                                     a->texture[i].data.text.string);
-            *w = MAX(*w, m);
-            m = RrFontHeight(a->texture[i].data.text.font);
-            *h += MAX(*h, m);
+            *w = MAX(*w, m->width + 4);
+            m->height = RrFontHeight(a->texture[i].data.text.font);
+            *h += MAX(*h, m->height);
             break;
         case RR_TEXTURE_RGBA:
             *w += MAX(*w, a->texture[i].data.rgba.width);

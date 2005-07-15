@@ -20,6 +20,7 @@
 #ifndef __render_h
 #define __render_h
 
+#include "geom.h"
 #include "version.h"
 
 #include <X11/Xlib.h> /* some platforms dont include this as needed for Xft */
@@ -202,7 +203,7 @@ RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 
-gint RrFontMeasureString (const RrFont *f, const gchar *str);
+RrSize *RrFontMeasureString (const RrFont *f, const gchar *str);
 gint RrFontHeight        (const RrFont *f);
 gint RrFontMaxCharWidth  (const RrFont *f);
 

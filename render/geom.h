@@ -16,8 +16,8 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __geom_h
-#define __geom_h
+#ifndef __render_geom_h
+#define __render_geom_h
 
 typedef struct {
     int width;

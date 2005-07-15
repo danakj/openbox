@@ -29,6 +29,7 @@ struct _RrFont {
     const RrInstance *inst;
 #ifdef USE_PANGO
     PangoFontDescription *pango_font_description;
+    PangoFontMetrics *pango_font_metrics;
 #endif /* USE_PANGO */
     XftFont *xftfont;
     gint elipses_length;

@@ -21,6 +21,7 @@
 #include "color.h"
 #include "mask.h"
 #include "theme.h"
+#include "geom.h"
 #include "gettext.h"
 
 #include <X11/Xft/Xft.h>
@@ -42,6 +43,9 @@ FcObjectType objs[] = {
     { OB_SHADOW_ALPHA,  FcTypeInteger  }
 };
 
+PangoFontMap *pfm;
+PangoContext *context;
+
 static gboolean started = FALSE;
 
 static void font_startup(void)
@@ -53,6 +57,9 @@ static void font_startup(void)
 
 #ifdef USE_PANGO
     g_type_init();
+    /* these will never be freed, but we will need them until we shut down anyway */
+    pfm = pango_xft_get_font_map(RrDisplay(NULL), RrScreen(NULL));
+    context = pango_xft_get_context(RrDisplay(NULL), RrScreen(NULL));
 #endif /* USE_PANGO */
     /* Here we are teaching xft about the shadow, shadowoffset & shadowtint */
     FcNameRegisterObjectTypes(objs, (sizeof(objs) / sizeof(objs[0])));
@@ -119,6 +126,9 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
         /* TODO: is PANGO_SCALE correct ?? */
         pango_font_description_set_size(out->pango_font_description, tmp_int*PANGO_SCALE);
     }
+
+    PangoFontset *pfs = pango_font_map_load_fontset(pfm, context, out->pango_font_description, NULL);
+    out->pango_font_metrics = pango_fontset_get_metrics(pfs);
 #endif /* USE_PANGO */
 
     if (FcPatternGetBool(match, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
@@ -177,16 +187,18 @@ void RrFontClose(RrFont *f)
         XftFontClose(RrDisplay(f->inst), f->xftfont);
         g_free(f);
     }
+#ifdef USE_PANGO
+    pango_font_metrics_unref(f->pango_font_metrics);
+    pango_font_description_free(f->pango_font_description);
+#endif
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,
                               gint *x, gint *y)
 {
 #ifdef USE_PANGO
-    PangoContext *context;
     PangoLayout *pl;
     PangoRectangle rect;
-    context = pango_xft_get_context (RrDisplay(f->inst), RrScreen(f->inst));
     pl = pango_layout_new (context);
     pango_layout_set_text(pl, str, -1);
     pango_layout_set_font_description(pl, f->pango_font_description);
@@ -195,7 +207,6 @@ static void font_measure_full(const RrFont *f, const gchar *str,
     *x = rect.width + (f->shadow ? ABS(f->offset) : 0);
     *y = rect.height + (f->shadow ? ABS(f->offset) : 0);
     g_object_unref(pl);
-    g_object_unref(context);
 
 #else
     XGlyphInfo info;
@@ -208,17 +219,25 @@ static void font_measure_full(const RrFont *f, const gchar *str,
 #endif /* USE_PANGO */
 }
 
-gint RrFontMeasureString(const RrFont *f, const gchar *str)
+RrSize *RrFontMeasureString(const RrFont *f, const gchar *str)
 {
-    gint x, y;
-    font_measure_full (f, str, &x, &y);
-    return x + 4;
+    RrSize *size;
+    size = g_new(RrSize, 1);
+    font_measure_full (f, str, &size->width, &size->height);
+    return size;
 }
 
 gint RrFontHeight(const RrFont *f)
 {
+#ifdef USE_PANGO
+    int ascent, descent;
+    ascent = pango_font_metrics_get_ascent(f->pango_font_metrics);
+    descent = pango_font_metrics_get_descent(f->pango_font_metrics);
+    return (ascent + descent) / PANGO_SCALE;
+#else
     return f->xftfont->ascent + f->xftfont->descent +
         (f->shadow ? f->offset : 0);
+#endif
 }
 
 gint RrFontMaxCharWidth(const RrFont *f)
@@ -237,10 +256,8 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     gboolean shortened = FALSE;
 #else
     PangoLayout *pl;
-    PangoContext *context;
     PangoRectangle rect;
 
-    context = pango_xft_get_context (RrDisplay(t->font->inst), RrScreen(t->font->inst));
     pl = pango_layout_new (context);
 #endif /* USE_PANGO */
 
@@ -338,7 +355,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 #else /* USE_PANGO */
     pango_xft_render_layout(d, &c, pl, x * PANGO_SCALE, y * PANGO_SCALE);
     g_object_unref(pl);
-    g_object_unref(context);
 #endif
 
     g_string_free(text, TRUE);

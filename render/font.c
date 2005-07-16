@@ -43,9 +43,7 @@ FcObjectType objs[] = {
     { OB_SHADOW_ALPHA,  FcTypeInteger  }
 };
 
-PangoFontMap *pfm;
-PangoContext *context;
-
+static PangoContext *context;
 static gboolean started = FALSE;
 
 static void font_startup(void)
@@ -58,7 +56,6 @@ static void font_startup(void)
 #ifdef USE_PANGO
     g_type_init();
     /* these will never be freed, but we will need them until we shut down anyway */
-    pfm = pango_xft_get_font_map(RrDisplay(NULL), RrScreen(NULL));
     context = pango_xft_get_context(RrDisplay(NULL), RrScreen(NULL));
 #endif /* USE_PANGO */
     /* Here we are teaching xft about the shadow, shadowoffset & shadowtint */
@@ -127,8 +124,8 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
         pango_font_description_set_size(out->pango_font_description, tmp_int*PANGO_SCALE);
     }
 
-    PangoFontset *pfs = pango_font_map_load_fontset(pfm, context, out->pango_font_description, NULL);
-    PangoFontMetrics *metrics = pango_fontset_get_metrics(pfs);
+    PangoLanguage *ln;
+    PangoFontMetrics *metrics = pango_context_get_metrics(context, out->pango_font_description, ln = pango_language_from_string("en_US"));
     out->pango_ascent = pango_font_metrics_get_ascent(metrics);
     out->pango_descent = pango_font_metrics_get_descent(metrics);
     pango_font_metrics_unref(metrics);
@@ -234,10 +231,11 @@ gint RrFontHeight(const RrFont *f)
 #ifdef USE_PANGO
     return (f->pango_ascent
             + f->pango_descent
-           ) / PANGO_SCALE;
+           ) / PANGO_SCALE +
+           (f->shadow ? f->offset : 0);
 #else
     return f->xftfont->ascent + f->xftfont->descent +
-        (f->shadow ? f->offset : 0);
+           (f->shadow ? f->offset : 0);
 #endif
 }
 
@@ -245,6 +243,30 @@ gint RrFontMaxCharWidth(const RrFont *f)
 {
     return (signed) f->xftfont->max_advance_width;
 }
+
+#ifdef USE_PANGO
+static inline int font_calculate_baseline(RrFont *f, gint height)
+{
+/* For my own reference:
+ *   _________
+ *  ^space/2  ^height     ^baseline
+ *  v_________|_          |
+ *            | ^ascent   |   _           _
+ *            | |         |  | |_ _____ _| |_ _  _
+ *            | |         |  |  _/ -_) \ /  _| || |
+ *            | v_________v   \__\___/_\_\\__|\_, |
+ *            | ^descent                      |__/
+ *  __________|_v
+ *  ^space/2  |
+ *  V_________v
+ */
+    int asc = f->pango_ascent;
+    int ascdesc = asc + f->pango_descent;
+    int space = height * PANGO_SCALE - ascdesc;
+    int baseline = space / 2 + asc;
+    return baseline / PANGO_SCALE;
+}
+#endif
 
 void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 {
@@ -262,16 +284,18 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     pl = pango_layout_new (context);
 #endif /* USE_PANGO */
 
-    /* center vertically */
+    /* center vertically
+     * for xft we pass the top edge of the text for positioning... */
 #ifndef USE_PANGO
     y = area->y +
         (area->height - RrFontHeight(t->font)) / 2;
 #else
+    /* but for pango we pass the baseline, since different fonts have
+     * different top edges. It looks stupid when the baseline of "normal"
+     * text jumps up and down when a "strange" character is just added
+     * to the end of the text */
     y = area->y +
-        area->height / 2 +
-        /* go to great lengths to center the text while keeping the baseline in
-         * the same place */
-        t->font->pango_descent / PANGO_SCALE;
+        font_calculate_baseline(t->font, area->height);
 #endif
     /* the +2 and -4 leave a small blank edge on the sides */
     x = area->x + 2;

@@ -55,7 +55,8 @@ static void font_startup(void)
 
 #ifdef USE_PANGO
     g_type_init();
-    /* these will never be freed, but we will need them until we shut down anyway */
+    /* these will never be freed, but we will need
+     * them until we shut down anyway */
     context = pango_xft_get_context(RrDisplay(NULL), RrScreen(NULL));
 #endif /* USE_PANGO */
     /* Here we are teaching xft about the shadow, shadowoffset & shadowtint */
@@ -103,25 +104,32 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
 
     out->pango_font_description = pango_font_description_new();
 
-    if (FcPatternGetString(match, "family", 0, &tmp_string) != FcResultTypeMismatch) {
-        pango_font_description_set_family(out->pango_font_description, (gchar *)tmp_string);
+    if (FcPatternGetString(match, "family", 0, &tmp_string) !=
+            FcResultTypeMismatch) {
+        pango_font_description_set_family(out->pango_font_description,
+                                          (gchar *)tmp_string);
         tmp_string = NULL;
     }
-    if (FcPatternGetString(match, "style", 0, &tmp_string) != FcResultTypeMismatch) {
+    if (FcPatternGetString(match, "style", 0, &tmp_string) !=
+            FcResultTypeMismatch) {
         /* Bold ? */
         if (!strcasecmp("bold", (gchar *)tmp_string)) {
-            pango_font_description_set_weight(out->pango_font_description, PANGO_WEIGHT_BOLD);
+            pango_font_description_set_weight(out->pango_font_description,
+                                              PANGO_WEIGHT_BOLD);
         }
         /* Italic ? */
         else if (!strcasecmp("italic", (gchar *)tmp_string)) {
-            pango_font_description_set_style(out->pango_font_description, PANGO_STYLE_ITALIC);
+            pango_font_description_set_style(out->pango_font_description,
+                                             PANGO_STYLE_ITALIC);
         }
         tmp_string = NULL;
     }
 
-    if (FcPatternGetInteger(match, "pixelsize", 0, &tmp_int) != FcResultTypeMismatch) {
+    if (FcPatternGetInteger(match, "pixelsize", 0, &tmp_int) !=
+            FcResultTypeMismatch) {
         /* TODO: is PANGO_SCALE correct ?? */
-        pango_font_description_set_size(out->pango_font_description, tmp_int*PANGO_SCALE);
+        pango_font_description_set_size(out->pango_font_description,
+                                        tmp_int*PANGO_SCALE);
     }
 
     /* based on gtkmain.c gtk_get_default_language() */
@@ -133,7 +141,9 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     if ((p = strchr(locale, '@')))
         *p = '\0';
     printf("%s\n", locale);
-    PangoFontMetrics *metrics = pango_context_get_metrics(context, out->pango_font_description, ln = pango_language_from_string(locale));
+    PangoFontMetrics *metrics = 
+        pango_context_get_metrics(context, out->pango_font_description,
+                                  ln = pango_language_from_string(locale));
     out->pango_ascent = pango_font_metrics_get_ascent(metrics);
     out->pango_descent = pango_font_metrics_get_descent(metrics);
     g_free(locale);

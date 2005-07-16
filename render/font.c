@@ -128,7 +128,10 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     }
 
     PangoFontset *pfs = pango_font_map_load_fontset(pfm, context, out->pango_font_description, NULL);
-    out->pango_font_metrics = pango_fontset_get_metrics(pfs);
+    PangoFontMetrics *metrics = pango_fontset_get_metrics(pfs);
+    out->pango_ascent = pango_font_metrics_get_ascent(metrics);
+    out->pango_descent = pango_font_metrics_get_descent(metrics);
+    pango_font_metrics_unref(metrics);
 #endif /* USE_PANGO */
 
     if (FcPatternGetBool(match, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
@@ -188,7 +191,6 @@ void RrFontClose(RrFont *f)
         g_free(f);
     }
 #ifdef USE_PANGO
-    pango_font_metrics_unref(f->pango_font_metrics);
     pango_font_description_free(f->pango_font_description);
 #endif
 }
@@ -230,10 +232,9 @@ RrSize *RrFontMeasureString(const RrFont *f, const gchar *str)
 gint RrFontHeight(const RrFont *f)
 {
 #ifdef USE_PANGO
-    int ascent, descent;
-    ascent = pango_font_metrics_get_ascent(f->pango_font_metrics);
-    descent = pango_font_metrics_get_descent(f->pango_font_metrics);
-    return (ascent + descent) / PANGO_SCALE;
+    return (f->pango_ascent
+            + f->pango_descent
+           ) / PANGO_SCALE;
 #else
     return f->xftfont->ascent + f->xftfont->descent +
         (f->shadow ? f->offset : 0);
@@ -256,6 +257,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     gboolean shortened = FALSE;
 #else
     PangoLayout *pl;
+    PangoLayoutLine *pll;
     PangoRectangle rect;
 
     pl = pango_layout_new (context);
@@ -291,6 +293,26 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     }
     if (!l) return;
 
+    l = strlen(text->str); /* number of bytes */
+
+#else
+    pango_layout_set_text(pl, text->str, -1);
+    pango_layout_set_font_description(pl, t->font->pango_font_description);
+    pango_layout_set_single_paragraph_mode(pl, TRUE);
+    pango_layout_set_width(pl, w * PANGO_SCALE);
+    pango_layout_set_ellipsize(pl, PANGO_ELLIPSIZE_MIDDLE);
+    /* This doesn't work with layout_line() of course */
+/*    pango_layout_set_alignment(pl, (PangoAlignment)(t->justify)); */
+    pango_layout_get_pixel_extents(pl, NULL, &rect);
+    mw = rect.width;
+    y = area->y +
+        area->height / 2 +
+        /* go to great lengths to center the text while keeping the baseline in
+         * the same place */
+        t->font->pango_descent / PANGO_SCALE;
+
+#endif /* USE_PANGO */
+
     switch (t->justify) {
     case RR_JUSTIFY_LEFT:
         break;
@@ -301,21 +323,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         x += (w - mw) / 2;
         break;
     }
-
-    l = strlen(text->str); /* number of bytes */
-
-#else
-    pango_layout_set_text(pl, text->str, -1);
-    pango_layout_set_font_description(pl, t->font->pango_font_description);
-    pango_layout_set_single_paragraph_mode(pl, TRUE);
-    pango_layout_set_width(pl, w * PANGO_SCALE);
-    pango_layout_set_ellipsize(pl, PANGO_ELLIPSIZE_MIDDLE);
-    pango_layout_set_alignment(pl, (PangoAlignment)(t->justify));
-    pango_layout_get_pixel_extents(pl, NULL, &rect);
-    y = area->y +
-        (area->height - rect.height) / 2;
-
-#endif /* USE_PANGO */
 
     if (t->font->shadow) {
         if (t->font->tint >= 0) {
@@ -338,8 +345,10 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                           t->font->xftfont->ascent + y + t->font->offset,
                           (FcChar8*)text->str, l);
 #else /* USE_PANGO */
-        pango_xft_render_layout(d, &c, pl, (x + t->font->offset) * PANGO_SCALE,
-                                (y + t->font->offset) * PANGO_SCALE);
+        /* see below... */
+        pango_xft_render_layout_line(d, &c, pll = pango_layout_get_line(pl, 0),
+                                     (x + t->font->offset) * PANGO_SCALE,
+                                     (y + t->font->offset) * PANGO_SCALE);
 #endif /* USE_PANGO */
     }
     c.color.red = t->color->r | t->color->r << 8;
@@ -353,7 +362,13 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                       t->font->xftfont->ascent + y,
                       (FcChar8*)text->str, l);
 #else /* USE_PANGO */
-    pango_xft_render_layout(d, &c, pl, x * PANGO_SCALE, y * PANGO_SCALE);
+    /* This looks retarded, but layout_line() bases y on the baseline, while
+     * layout() bases y on the top of the ink layout shit ass fucking crap.
+     * We want the baseline to always be in the same place, thusly, we use
+     * layout_line()
+     * The actual line doesn't need to be freed */
+    pango_xft_render_layout_line(d, &c, pll = pango_layout_get_line(pl, 0),
+                                 x * PANGO_SCALE, y * PANGO_SCALE);
     g_object_unref(pl);
 #endif
 

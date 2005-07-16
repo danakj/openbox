@@ -27,15 +27,16 @@
 
 struct _RrFont {
     const RrInstance *inst;
-#ifdef USE_PANGO
-    PangoFontDescription *pango_font_description;
-    PangoFontMetrics *pango_font_metrics;
-#endif /* USE_PANGO */
     XftFont *xftfont;
     gint elipses_length;
     gint shadow;
     gchar tint;
     gint offset;
+#ifdef USE_PANGO
+    PangoFontDescription *pango_font_description;
+    gint pango_ascent;
+    gint pango_descent;
+#endif /* USE_PANGO */
 };
 
 RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring);

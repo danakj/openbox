@@ -99,9 +99,6 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     out = g_new(RrFont, 1);
     out->inst = inst;
 #ifdef USE_PANGO
-    /*    printf("\n\n%s\n\n",fontstring);
-          FcPatternPrint(match); */
-
     out->pango_font_description = pango_font_description_new();
 
     if (FcPatternGetString(match, "family", 0, &tmp_string) !=
@@ -140,7 +137,6 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
         *p = '\0';
     if ((p = strchr(locale, '@')))
         *p = '\0';
-    printf("%s\n", locale);
     PangoFontMetrics *metrics = 
         pango_context_get_metrics(context, out->pango_font_description,
                                   ln = pango_language_from_string(locale));

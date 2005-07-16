@@ -257,7 +257,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     gboolean shortened = FALSE;
 #else
     PangoLayout *pl;
-    PangoLayoutLine *pll;
     PangoRectangle rect;
 
     pl = pango_layout_new (context);
@@ -347,7 +346,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                           (FcChar8*)text->str, l);
 #else /* USE_PANGO */
         /* see below... */
-        pango_xft_render_layout_line(d, &c, pll = pango_layout_get_line(pl, 0),
+        pango_xft_render_layout_line(d, &c, pango_layout_get_line(pl, 0),
                                      (x + t->font->offset) * PANGO_SCALE,
                                      (y + t->font->offset) * PANGO_SCALE);
 #endif /* USE_PANGO */
@@ -368,7 +367,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
      * We want the baseline to always be in the same place, thusly, we use
      * layout_line()
      * The actual line doesn't need to be freed */
-    pango_xft_render_layout_line(d, &c, pll = pango_layout_get_line(pl, 0),
+    pango_xft_render_layout_line(d, &c, pango_layout_get_line(pl, 0),
                                  x * PANGO_SCALE, y * PANGO_SCALE);
     g_object_unref(pl);
 #endif

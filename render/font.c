@@ -124,10 +124,19 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
         pango_font_description_set_size(out->pango_font_description, tmp_int*PANGO_SCALE);
     }
 
+    /* based on gtkmain.c gtk_get_default_language() */
     PangoLanguage *ln;
-    PangoFontMetrics *metrics = pango_context_get_metrics(context, out->pango_font_description, ln = pango_language_from_string("en_US"));
+    gchar *locale, *p;
+    locale = g_strdup(setlocale(LC_CTYPE, NULL));
+    if ((p = strchr(locale, '.')))
+        *p = '\0';
+    if ((p = strchr(locale, '@')))
+        *p = '\0';
+    printf("%s\n", locale);
+    PangoFontMetrics *metrics = pango_context_get_metrics(context, out->pango_font_description, ln = pango_language_from_string(locale));
     out->pango_ascent = pango_font_metrics_get_ascent(metrics);
     out->pango_descent = pango_font_metrics_get_descent(metrics);
+    g_free(locale);
     pango_font_metrics_unref(metrics);
 #endif /* USE_PANGO */
 

@@ -264,9 +264,15 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 #endif /* USE_PANGO */
 
     /* center vertically */
-#ifndef USE_PANGO /* We have to wait for the text string with pango */
+#ifndef USE_PANGO
     y = area->y +
         (area->height - RrFontHeight(t->font)) / 2;
+#else
+    y = area->y +
+        area->height / 2 +
+        /* go to great lengths to center the text while keeping the baseline in
+         * the same place */
+        t->font->pango_descent / PANGO_SCALE;
 #endif
     /* the +2 and -4 leave a small blank edge on the sides */
     x = area->x + 2;
@@ -305,11 +311,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 /*    pango_layout_set_alignment(pl, (PangoAlignment)(t->justify)); */
     pango_layout_get_pixel_extents(pl, NULL, &rect);
     mw = rect.width;
-    y = area->y +
-        area->height / 2 +
-        /* go to great lengths to center the text while keeping the baseline in
-         * the same place */
-        t->font->pango_descent / PANGO_SCALE;
 
 #endif /* USE_PANGO */
 

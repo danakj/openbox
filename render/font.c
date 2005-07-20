@@ -28,6 +28,9 @@
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
+#if USE_PANGO && !ENABLE_NLS
+#include <locale.h>
+#endif
 
 #define ELIPSES "..."
 #define ELIPSES_LENGTH(font) \

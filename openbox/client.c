@@ -2788,6 +2788,9 @@ void client_unfocus(ObClient *self)
 
 void client_activate(ObClient *self, gboolean here)
 {
+    /* This check is for the client_list_menu trying to activate
+     * a closed client. */
+    if (!g_list_find(client_list, self)) return;
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE);
     if (self->iconic)

@@ -46,7 +46,9 @@ FcObjectType objs[] = {
     { OB_SHADOW_ALPHA,  FcTypeInteger  }
 };
 
+#ifdef USE_PANGO
 static PangoContext *context;
+#endif
 static gboolean started = FALSE;
 
 static void font_startup(void)

@@ -351,8 +351,11 @@ void client_manage(Window window)
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a session
                                 do also. we can assume you want it back where
-                                you saved it */
-                             client_normal(self) && !self->session);
+                                you saved it. Clients saying the user placed
+                                them are also spared from the evil rules */
+                             !(self->positioned & USPosition) &&
+                             client_normal(self) &&
+                             !self->session);
         if (x != ox || y != oy) 	 
             client_move(self, x, y);
     }
@@ -543,7 +546,7 @@ static void client_restore_session_state(ObClient *self)
     self->session = it->data;
 
     RECT_SET_POINT(self->area, self->session->x, self->session->y);
-    self->positioned = TRUE;
+    self->positioned = PPosition;
     if (self->session->w > 0)
         self->area.width = self->session->w;
     if (self->session->h > 0)
@@ -625,9 +628,12 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     }
 
     /* This here doesn't let windows even a pixel outside the screen,
-     * not applied to all windows. Not sure if it's going to stay at all.
-     * I wonder if disabling this will break struts somehow? Let's find out. */
-    if (0 && rude) {
+     * when called from client_manage, programs placing themselves are
+     * forced completely onscreen, while things like
+     * xterm -geometry resolution-width/2 will work fine. Trying to
+     * place it completely offscreen will be handled in the above code.
+     * Sorry for this confused comment, i am tired. */
+    if (rude) {
         /* avoid the xinerama monitor divide while we're at it,
          * remember to fix the placement stuff to avoid it also and
          * then remove this XXX */
@@ -1118,7 +1124,7 @@ void client_update_normal_hints(ObClient *self)
         /* normal windows can't request placement! har har
         if (!client_normal(self))
         */
-        self->positioned = !!(size.flags & (PPosition|USPosition));
+        self->positioned = (size.flags & (PPosition|USPosition));
 
         if (size.flags & PWinGravity) {
             self->gravity = size.win_gravity;

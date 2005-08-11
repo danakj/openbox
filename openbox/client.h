@@ -201,9 +201,11 @@ struct _ObClient
     /*! True if the client supports the delete_window protocol */
     gboolean delete_window;
   
-    /*! Was the window's position requested by the application? if not, we
+    /*! Was the window's position requested by the application or the user?
+      if by the application, we force it completely onscreen, if by the user
+      we only force it if it tries to go completely offscreen, if neither, we
       should place the window ourselves when it first appears */
-    gboolean positioned;
+    guint positioned;
   
     /*! Can the window receive input focus? */
     gboolean can_focus;

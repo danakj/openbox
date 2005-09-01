@@ -406,8 +406,8 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                       t->font->xftfont->ascent + y,
                       (FcChar8*)text->str, l);
 #else /* USE_PANGO */
-    /* This looks retarded, but layout_line() bases y on the baseline, while
-     * layout() bases y on the top of the ink layout shit ass fucking crap.
+    /* layout_line() bases y on the baseline, while
+     * layout() bases y on the top of the ink layout.
      * We want the baseline to always be in the same place, thusly, we use
      * layout_line()
      * The actual line doesn't need to be freed */

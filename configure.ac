@@ -77,7 +77,7 @@ AC_SUBST(GLIB_LIBS)
 AC_ARG_ENABLE(pango,
   AC_HELP_STRING(
     [--disable-pango],
-    [disable the pango library for better display of international fonts. [[default=yes]]]
+    [disable the pango library [[default=yes]]]
   ),
   [enable_pango=$enableval],
   [enable_pango=yes]

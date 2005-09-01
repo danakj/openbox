@@ -406,11 +406,10 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                       t->font->xftfont->ascent + y,
                       (FcChar8*)text->str, l);
 #else /* USE_PANGO */
-    /* layout_line() bases y on the baseline, while
-     * layout() bases y on the top of the ink layout.
-     * We want the baseline to always be in the same place, thusly, we use
-     * layout_line()
-     * The actual line doesn't need to be freed */
+    /* layout_line() bases y on the baseline, while layout() bases y on the
+     * top of the ink layout. We want the baseline to always be in the same
+     * place, thusly, we use layout_line()
+     * The actual line doesn't need to be freed (per the pango docs) */
     pango_xft_render_layout_line(d, &c, pango_layout_get_line(pl, 0),
                                  x * PANGO_SCALE, y * PANGO_SCALE);
     g_object_unref(pl);

@@ -3,6 +3,13 @@
   * Add the noStrut option to the dock (to allow maximizing windows over it),
     useful when it is not in the above layer.
   * Fix transparent terminals not updating when using ToggleDecor.
+  * Yet more poking at the onscreen-keeping code, should now do the right
+    thing always.
+  * Add an option to hide disabled buttons instead of showing them as disabled.
+  * Hopefully fixed all the remaining pango issues. The new 1.10 release also
+    fixes shadows again.
+  * I think the lib linking in Makefile.am is right now, please tell me if it
+    isn't.
 
 3.3-rc1:
   * Poked around a bit in the code that keeps windows onscreen, if you

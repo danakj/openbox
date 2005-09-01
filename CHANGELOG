@@ -11,6 +11,8 @@
   * I think the lib linking in Makefile.am is right now, please tell me if it
     isn't.
   * Added a finnish translation and some minor updates to others.
+  * Fixed configure.ac so --enable-pango doesn't disable pango support or the
+    other way around, make enabled be default to get some extra testing.
 
 3.3-rc1:
   * Poked around a bit in the code that keeps windows onscreen, if you

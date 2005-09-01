@@ -10,6 +10,7 @@
     fixes shadows again.
   * I think the lib linking in Makefile.am is right now, please tell me if it
     isn't.
+  * Added a finnish translation and some minor updates to others.
 
 3.3-rc1:
   * Poked around a bit in the code that keeps windows onscreen, if you

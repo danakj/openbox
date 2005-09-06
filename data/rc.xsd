@@ -337,6 +337,7 @@
             <xs:enumeration value="MoveToEdgeNorth"/>
             <xs:enumeration value="MoveToEdgeSouth"/>
             <xs:enumeration value="MoveToEdgeWest"/>
+            <xs:enumeration value="MoveToCenter"/>
             <xs:enumeration value="NextWindow"/>
             <xs:enumeration value="NextWindowLinear"/>
             <xs:enumeration value="PreviousWindow"/>

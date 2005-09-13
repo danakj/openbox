@@ -349,11 +349,17 @@ void client_manage(Window window)
                              self->frame->area.width,
                              self->frame->area.height,
                              /* non-normal clients has less rules, and
-                                windows that are being restored from a session
-                                do also. we can assume you want it back where
-                                you saved it. Clients saying the user placed
-                                them are also spared from the evil rules */
-                             !(self->positioned & USPosition) &&
+                                windows that are being restored from a
+                                session do also. we can assume you want
+                                it back where you saved it. Clients saying
+                                they placed themselves are subjected to
+                                harder rules, ones that are placed by
+                                place.c or by the user are allowed partially
+                                off-screen and on xinerama divides (ie,
+                                it is up to the placement routines to avoid
+                                the xinerama divides) */
+                             ((self->positioned & PPosition) &&
+                              !(self->positioned & USPosition)) &&
                              client_normal(self) &&
                              !self->session);
         if (x != ox || y != oy) 	 
@@ -615,8 +621,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     /* XXX watch for xinerama dead areas */
     /* This makes sure windows aren't entirely outside of the screen so you
      * can't see them at all */
-    a = screen_area(self->desktop);
     if (client_normal(self)) {
+        a = screen_area(self->desktop);
         if (!self->strut.right && *x >= a->x + a->width - 1)
             *x = a->x + a->width - self->frame->area.width;
         if (!self->strut.bottom && *y >= a->y + a->height - 1)
@@ -638,9 +644,6 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
          * remember to fix the placement stuff to avoid it also and
          * then remove this XXX */
         a = screen_physical_area_monitor(client_monitor(self));
-        /* this is ben's MOZILLA BITCHSLAP. "oh ya it fucking feels good.
-           Java can suck it too." */
-
         /* dont let windows map/move into the strut unless they
            are bigger than the available area */
         if (w <= a->width) {

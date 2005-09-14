@@ -605,6 +605,7 @@ gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
     }
 
     if (parent) {
+        self->monitor = parent->monitor;
         if (parent->child)
             menu_frame_hide(parent->child);
         parent->child = self;

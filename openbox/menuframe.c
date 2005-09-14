@@ -191,12 +191,7 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
     gint dx = 0, dy = 0;
     gint pos, half;
 
-    for (i = 0; i < screen_num_monitors; ++i) {
-        a = screen_physical_area_monitor(i);
-        if (RECT_INTERSECTS_RECT(*a, self->area))
-            break;
-    }
-    if (!a) a = screen_physical_area_monitor(0);
+    a = screen_physical_area_monitor(self->monitor);
 
     half = g_list_length(self->entries) / 2;
     pos = g_list_index(self->entries, self->selected);

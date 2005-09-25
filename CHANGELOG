@@ -1,3 +1,6 @@
+3.3:
+  * Add a showDelay option for the dock.
+
 3.3-rc2:
   * Fixed some typos and errors in rc.xsd
   * Add the noStrut option to the dock (to allow maximizing windows over it),

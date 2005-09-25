@@ -597,17 +597,30 @@ static gboolean hide_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
+static gboolean show_timeout(gpointer data)
+{
+    /* hide */
+    dock->hidden = FALSE;
+    dock_configure();
+
+    return FALSE; /* don't repeat */
+}
+
 void dock_hide(gboolean hide)
 {
     if (!hide) {
-        /* show */
-        dock->hidden = FALSE;
-        dock_configure();
-
-        /* if was hiding, stop it */
-        ob_main_loop_timeout_remove(ob_main_loop, hide_timeout);
-    } else if (!dock->hidden && config_dock_hide) {
-        ob_main_loop_timeout_add(ob_main_loop, config_dock_hide_delay,
+        if (dock->hidden && config_dock_hide) {
+            ob_main_loop_timeout_add(ob_main_loop, config_dock_show_delay,
+                                 show_timeout, NULL, NULL);
+        } else if (!dock->hidden && config_dock_hide) {
+            ob_main_loop_timeout_remove(ob_main_loop, hide_timeout);
+        }
+    } else {
+        if (!dock->hidden && config_dock_hide) {
+            ob_main_loop_timeout_add(ob_main_loop, config_dock_hide_delay,
                                  hide_timeout, NULL, NULL);
+        } else if (dock->hidden && config_dock_hide) {
+            ob_main_loop_timeout_remove(ob_main_loop, show_timeout);
+        }
     }
 }

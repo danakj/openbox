@@ -57,6 +57,7 @@ gint            config_dock_y;
 ObOrientation   config_dock_orient;
 gboolean        config_dock_hide;
 guint           config_dock_hide_delay;
+guint           config_dock_show_delay;
 guint           config_dock_app_move_button;
 guint           config_dock_app_move_modifiers;
 
@@ -387,6 +388,8 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_dock_hide = parse_bool(doc, n);
     if ((n = parse_find_node("hideDelay", node)))
         config_dock_hide_delay = parse_int(doc, n) * 1000;
+    if ((n = parse_find_node("showDelay", node)))
+        config_dock_show_delay = parse_int(doc, n) * 1000;
     if ((n = parse_find_node("moveButton", node))) {
         gchar *str = parse_string(doc, n);
         guint b, s;
@@ -585,6 +588,7 @@ void config_startup(ObParseInst *i)
     config_dock_orient = OB_ORIENTATION_VERT;
     config_dock_hide = FALSE;
     config_dock_hide_delay = 300;
+    config_dock_show_delay = 300;
     config_dock_app_move_button = 2; /* middle */
     config_dock_app_move_modifiers = 0;
 

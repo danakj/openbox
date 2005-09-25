@@ -35,6 +35,8 @@
          Add fourCorners to resize context.
      Sat Feb 12 01:57:16 UTC 2005 - mikachu(a)openbox.org
          Add the group option to raise/lower stuff.
+     Sun Sep 25 14:44:21 UTC 2005 - mikachu(a)openbox.org
+         Add showDelay for the dock
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -133,6 +135,7 @@
             <xs:element name="floatingY" type="xs:integer"/>
             <xs:element name="autoHide" type="ob:yesorno"/>
             <xs:element name="hideDelay" type="xs:integer"/>
+            <xs:element name="showDelay" type="xs:integer"/>
             <xs:element name="moveButton" type="ob:button"/>
             <xs:element name="noStrut" type="ob:yesorno"/>
         </xs:sequence>

@@ -969,7 +969,7 @@ screen_area_add_strut_bottom(const StrutPartial *s, const Rect *monitor_area,
 void screen_update_areas()
 {
     guint i, x;
-    guint32 *dims;
+    long *dims;
     GList *it;
     gint o;
 
@@ -987,7 +987,7 @@ void screen_update_areas()
         area[i] = g_new0(Rect, screen_num_monitors + 1);
     area[i] = NULL;
      
-    dims = g_new(guint32, 4 * screen_num_desktops);
+    dims = g_new(long, 4 * screen_num_desktops);
 
     for (i = 0; i < screen_num_desktops + 1; ++i) {
         Strut *struts;

@@ -156,7 +156,7 @@ gboolean screen_annex()
     XSetWindowAttributes attrib;
     pid_t pid;
     gint i, num_support;
-    guint32 *supported;
+    gulong *supported;
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
@@ -206,7 +206,7 @@ gboolean screen_annex()
     /* set the _NET_SUPPORTED_ATOMS hint */
     num_support = 51;
     i = 0;
-    supported = g_new(guint32, num_support);
+    supported = g_new(gulong, num_support);
     supported[i++] = prop_atoms.net_current_desktop;
     supported[i++] = prop_atoms.net_number_of_desktops;
     supported[i++] = prop_atoms.net_desktop_geometry;
@@ -340,7 +340,7 @@ void screen_resize()
     static gint oldw = 0, oldh = 0;
     gint w, h;
     GList *it;
-    guint32 geometry[2];
+    gulong geometry[2];
 
     w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
     h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
@@ -368,7 +368,7 @@ void screen_resize()
 void screen_set_num_desktops(guint num)
 {
     guint i, old;
-    guint32 *viewport;
+    gulong *viewport;
     GList *it;
 
     g_assert(num > 0);
@@ -381,7 +381,7 @@ void screen_set_num_desktops(guint num)
                net_number_of_desktops, cardinal, num);
 
     /* set the viewport hint */
-    viewport = g_new0(guint32, num * 2);
+    viewport = g_new0(gulong, num * 2);
     PROP_SETA32(RootWindow(ob_display, ob_screen),
                 net_desktop_viewport, cardinal, viewport, num * 2);
     g_free(viewport);
@@ -969,7 +969,7 @@ screen_area_add_strut_bottom(const StrutPartial *s, const Rect *monitor_area,
 void screen_update_areas()
 {
     guint i, x;
-    long *dims;
+    gulong *dims;
     GList *it;
     gint o;
 
@@ -987,7 +987,7 @@ void screen_update_areas()
         area[i] = g_new0(Rect, screen_num_monitors + 1);
     area[i] = NULL;
      
-    dims = g_new(long, 4 * screen_num_desktops);
+    dims = g_new(gulong, 4 * screen_num_desktops);
 
     for (i = 0; i < screen_num_desktops + 1; ++i) {
         Strut *struts;

@@ -126,7 +126,7 @@ void client_set_list()
         windows = NULL;
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
-                net_client_list, window, (guint32*)windows, size);
+                net_client_list, window, (gulong*)windows, size);
 
     if (windows)
         g_free(windows);
@@ -1300,7 +1300,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
 static void client_change_allowed_actions(ObClient *self)
 {
-    guint32 actions[9];
+    gulong actions[9];
     gint num = 0;
 
     /* desktop windows are kept on all desktops */
@@ -1715,8 +1715,8 @@ void client_update_icons(ObClient *self)
 
 static void client_change_state(ObClient *self)
 {
-    guint32 state[2];
-    guint32 netstate[11];
+    gulong state[2];
+    gulong netstate[11];
     guint num;
 
     state[0] = self->wmstate;

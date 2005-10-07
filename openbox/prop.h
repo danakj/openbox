@@ -177,8 +177,8 @@ gboolean prop_get_string_utf8(Window win, Atom prop, gchar **ret);
 gboolean prop_get_strings_locale(Window win, Atom prop, gchar ***ret);
 gboolean prop_get_strings_utf8(Window win, Atom prop, gchar ***ret);
 
-void prop_set32(Window win, Atom prop, Atom type, guint32 val);
-void prop_set_array32(Window win, Atom prop, Atom type, guint32 *val,
+void prop_set32(Window win, Atom prop, Atom type, gulong val);
+void prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                       guint num);
 void prop_set_string_utf8(Window win, Atom prop, gchar *val);
 void prop_set_strings_utf8(Window win, Atom prop, gchar **strs);

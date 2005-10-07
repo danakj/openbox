@@ -422,7 +422,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         }
 
         if (!STRUT_EQUAL(self->size, oldsize)) {
-            guint32 vals[4];
+            gulong vals[4];
             vals[0] = self->size.left;
             vals[1] = self->size.right;
             vals[2] = self->size.top;

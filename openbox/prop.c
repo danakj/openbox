@@ -206,7 +206,7 @@ static gboolean get_prealloc(Window win, Atom prop, Atom type, gint size,
                     data[i] = xdata[i];
                     break;
                 case 16:
-                    ((guint16*)data)[i] = ((guint16*)xdata)[i];
+                    ((gushort*)data)[i] = ((gushort*)xdata)[i];
                     break;
                 case 32:
                     ((guint32*)data)[i] = ((gulong*)xdata)[i];
@@ -245,7 +245,7 @@ static gboolean get_all(Window win, Atom prop, Atom type, gint size,
                     (*data)[i] = xdata[i];
                     break;
                 case 16:
-                    ((guint16*)*data)[i] = ((guint16*)xdata)[i];
+                    ((gushort*)*data)[i] = ((gushort*)xdata)[i];
                     break;
                 case 32:
                     ((guint32*)*data)[i] = ((gulong*)xdata)[i];
@@ -383,13 +383,13 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, gchar ***ret)
     return FALSE;
 }
 
-void prop_set32(Window win, Atom prop, Atom type, guint32 val)
+void prop_set32(Window win, Atom prop, Atom type, gulong val)
 {
     XChangeProperty(ob_display, win, prop, type, 32, PropModeReplace,
                     (guchar*)&val, 1);
 }
 
-void prop_set_array32(Window win, Atom prop, Atom type, guint32 *val,
+void prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                       guint num)
 {
     XChangeProperty(ob_display, win, prop, type, 32, PropModeReplace,

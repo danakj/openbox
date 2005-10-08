@@ -206,7 +206,7 @@ static gboolean get_prealloc(Window win, Atom prop, Atom type, gint size,
                     data[i] = xdata[i];
                     break;
                 case 16:
-                    ((gushort*)data)[i] = ((gushort*)xdata)[i];
+                    ((guint16*)data)[i] = ((gushort*)xdata)[i];
                     break;
                 case 32:
                     ((guint32*)data)[i] = ((gulong*)xdata)[i];
@@ -245,7 +245,7 @@ static gboolean get_all(Window win, Atom prop, Atom type, gint size,
                     (*data)[i] = xdata[i];
                     break;
                 case 16:
-                    ((gushort*)*data)[i] = ((gushort*)xdata)[i];
+                    ((guint16*)*data)[i] = ((gushort*)xdata)[i];
                     break;
                 case 32:
                     ((guint32*)*data)[i] = ((gulong*)xdata)[i];

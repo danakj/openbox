@@ -62,7 +62,6 @@ render_libobrender_la_LIBADD = \
 	$(XFT_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
-	$(PANGO_LIBS) \
 	$(XML_LIBS) 
 render_libobrender_la_SOURCES = \
 	gettext.h \
@@ -131,8 +130,6 @@ openbox_openbox_LDADD = \
 	$(LIBINTL) \
 	render/libobrender.la \
 	parser/libobparser.la
-#	$(XFT_LIBS) \
-#	$(PANGO_LIBS) \
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
 	gettext.h \

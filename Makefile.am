@@ -62,7 +62,8 @@ render_libobrender_la_LIBADD = \
 	$(XFT_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
-	$(XML_LIBS) 
+	$(XML_LIBS) \
+	parser/libobparser.la
 render_libobrender_la_SOURCES = \
 	gettext.h \
 	render/color.h \

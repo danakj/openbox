@@ -130,7 +130,7 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     if (FcPatternGetInteger(match, "pixelsize", 0, &tmp_int) !=
             FcResultTypeMismatch) {
         /* TODO: is PANGO_SCALE correct ?? */
-        pango_font_description_set_size(out->pango_font_description,
+        pango_font_description_set_absolute_size(out->pango_font_description,
                                         tmp_int*PANGO_SCALE);
     }
 

@@ -1,0 +1,124 @@
+# Traditional Chinese Messages for openbox
+# Copyright (C) 2006 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# Wei-Lun Chao <william.chao@ossii.com.tw>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openbox 3.3rc2\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2005-09-01 18:05+0200\n"
+"PO-Revision-Date: 2006-03-01 12:00+0800\n"
+"Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
+"Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: openbox/client_list_menu.c:95
+msgid "Go there..."
+msgstr "到那裡去..."
+
+#: openbox/client_list_menu.c:161
+msgid "Desktops"
+msgstr "桌面"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "還原"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "最大化"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "向下捲動"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "向上捲動"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "所有桌面"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "圖層"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "最上層"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "一般"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "最下層"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "傳送到桌面"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "客戶端選單"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "最小化"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "提到最上層"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "降到最下層"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "裝飾"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "移動"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "重新調整大小"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "關閉"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id 要求引數\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file 要求引數\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "無法製作目錄 '%s': %s"
+
+#: render/font.c:57
+msgid "Couldn't initialize Xft."
+msgstr "無法初始化 Xft。"
+
+#: render/font.c:194 render/font.c:199
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "無法載入字型：%s\n"
+
+#: render/font.c:195
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "正在嘗試權宜字型：%s\n"

@@ -2,6 +2,8 @@
   * Add a showDelay option for the dock.
   * Fixed onscreen-keeping code which broke a bit in -rc2.
   * Fix incorrect handling of window properties on 64 bit arches.
+  * Fix pixelsize being the same as size for pango, now it is correct.
+  * Fix drawing of icons taller than wide, eg gimp.
 
 3.3-rc2:
   * Fixed some typos and errors in rc.xsd

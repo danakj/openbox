@@ -182,7 +182,7 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
         dest++;
         source++;
 
-        if (col++ >= dw) {
+        if (++col >= dw) {
             col = 0;
             dest += target_w - dw;
         }

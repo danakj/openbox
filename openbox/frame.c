@@ -417,7 +417,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         if (resized) {
             framerender_frame(self);
-
             frame_adjust_shape(self);
         }
 
@@ -436,6 +435,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (focus_cycle_target == self->client)
             focus_cycle_draw_indicator();
     }
+    if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
+        XResizeWindow(ob_display, self->label, self->label_width,
+                      ob_rr_theme->label_height);
 }
 
 void frame_adjust_state(ObFrame *self)
@@ -625,9 +627,6 @@ static void layout_title(ObFrame *self)
     }
     if (self->label_width < 1) self->label_width = 1;
 
-    XResizeWindow(ob_display, self->label, self->label_width,
-                  ob_rr_theme->label_height);
-  
     if (!n) XUnmapWindow(ob_display, self->icon);
     if (!d) XUnmapWindow(ob_display, self->desk);
     if (!s) XUnmapWindow(ob_display, self->shade);

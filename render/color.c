@@ -154,7 +154,7 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
             data += im->width;
             p16 += im->bytes_per_line/2;
         }
-    break;
+        break;
     case 8:
         g_assert(RrVisual(inst)->class != TrueColor);
         for (y = 0; y < im->height; y++) {
@@ -163,12 +163,11 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
                                     data[x] >> RrDefaultRedOffset,
                                     data[x] >> RrDefaultGreenOffset,
                                     data[x] >> RrDefaultBlueOffset)->pixel;
+            }
+            data += im->width;
+            p8 += im->bytes_per_line;
         }
-        data += im->width;
-        p8 += im->bytes_per_line;
-  }
-
-    break;
+        break;
     default:
         g_warning("your bit depth is currently unhandled\n");
     }
@@ -204,9 +203,10 @@ static void swap_byte_order(XImage *im)
                 c[0] = c[1];
                 c[1] = t;
             case 8:
+            case 1:
                 break;
             default:
-                g_warning("your bit depth is currently unhandled");
+                g_warning("Your bit depth is currently unhandled");
             }
         }
         di += im->bytes_per_line;

@@ -352,6 +352,14 @@ void RrMinsize(RrAppearance *a, gint *w, gint *h)
     if (*h < 1) *h = 1;
 }
 
+void reverse_bits(gchar *c, gint n)
+{
+    gint i;
+    for (i = 0; i < n; i++)
+        *c++ = (((*c * 0x0802UL & 0x22110UL) |
+                 (*c * 0x8020UL & 0x88440UL)) * 0x10101UL) >> 16;
+}
+
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
                         gint *w, gint *h, RrPixel32 **data)
@@ -361,9 +369,10 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
     guint pw, ph, mw, mh, xb, xd, i, x, y, di;
     XImage *xi, *xm = NULL;
 
-    if (!XGetGeometry(RrDisplay(inst),
-                      pmap, &xr, &xx, &xy, &pw, &ph, &xb, &xd))
+    if (!XGetGeometry(RrDisplay(inst), pmap,
+                      &xr, &xx, &xy, &pw, &ph, &xb, &xd))
         return FALSE;
+
     if (mask) {
         if (!XGetGeometry(RrDisplay(inst), mask,
                           &xr, &xx, &xy, &mw, &mh, &xb, &xd))
@@ -384,7 +393,12 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
             XDestroyImage(xi);
             return FALSE;
         }
+        if ((xm->bits_per_pixel == 1) && (xm->bitmap_bit_order != LSBFirst))
+            reverse_bits(xm->data, xm->bytes_per_line * xm->height);
     }
+
+    if ((xi->bits_per_pixel == 1) && (xi->bitmap_bit_order != LSBFirst))
+        reverse_bits(xi->data, xi->bytes_per_line * xi->height);
 
     *data = g_new(RrPixel32, pw * ph);
     RrIncreaseDepth(inst, *data, xi);

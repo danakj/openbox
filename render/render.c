@@ -352,7 +352,7 @@ void RrMinsize(RrAppearance *a, gint *w, gint *h)
     if (*h < 1) *h = 1;
 }
 
-void reverse_bits(gchar *c, gint n)
+static void reverse_bits(gchar *c, gint n)
 {
     gint i;
     for (i = 0; i < n; i++)

@@ -22,25 +22,9 @@
 
 #include <glib.h>
 
-#define AVERAGE(a, b)   ( ((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)) )
-
-static void scale_line(RrPixel32 *dest, RrPixel32 *source, gint w, gint dw)
-{
-    gint num_pixels = dw;
-    gint int_part = w / dw;
-    gint fract_part = w % dw;
-    gint err = 0;
-
-    while (num_pixels-- > 0) {
-        *dest++ = *source;
-        source += int_part;
-        err += fract_part;
-        if (err >= dw) {
-            err -= dw;
-            source++;
-        }
-    }
-}
+#define FRACTION        12
+#define FLOOR(i)        ((i) & (~0UL << FRACTION))
+#define AVERAGE(a, b)   (((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)))
 
 static RrPixel32* scale_half(RrPixel32 *source, gint w, gint h)
 {
@@ -73,50 +57,78 @@ static RrPixel32* scale_half(RrPixel32 *source, gint w, gint h)
     return out;
 }
 
-static RrPixel32* scale_rect(RrPixel32 *fullsource,
-                             gint w, gint h, gint dw, gint dh)
+static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
+                               gulong dstW, gulong dstH,
+                               gulong srcW, gulong srcH)
 {
-    RrPixel32 *out, *dest;
-    RrPixel32 *source = fullsource;
-    RrPixel32 *oldsource = NULL;
-    RrPixel32 *prev_source = NULL;
-    gint num_pixels;
-    gint int_part;
-    gint fract_part;
-    gint err = 0;
-
-    while (dw <= (w >> 1) && dh <= (h >> 1)) {
-        source = scale_half(source, w, h);
-        w >>= 1; h >>= 1;
-        g_free(oldsource);
-        oldsource = source;
-    }
-
-    num_pixels = dh;
-    int_part = (h / dh) * w;
-    fract_part = h % dh;
-
-    out = dest = g_new(RrPixel32, dw * dh);
-
-    while (num_pixels-- > 0) {
-        if (source == prev_source) {
-            memcpy(dest, dest - dw, dw * sizeof(RrPixel32));
-        } else {
-            scale_line(dest, source, w, dw);
-            prev_source = source;
+    gulong dstX, dstY, srcX, srcY;
+    gulong srcX1, srcX2, srcY1, srcY2;
+    gulong ratioX, ratioY;
+    
+    ratioX = (srcW << FRACTION) / dstW;
+    ratioY = (srcH << FRACTION) / dstH;
+    
+    srcY2 = 0;
+    for (dstY = 0; dstY < dstH; dstY++) {
+        srcY1 = srcY2;
+        srcY2 += ratioY;
+        
+        srcX2 = 0;
+        for (dstX = 0; dstX < dstW; dstX++) {
+            gulong red = 0, green = 0, blue = 0, alpha = 0;
+            gulong portionX, portionY, portionXY, sumXY = 0;
+            RrPixel32 pixel;
+            
+            srcX1 = srcX2;
+            srcX2 += ratioX;
+            
+            for (srcY = srcY1; srcY < srcY2; srcY += (1UL << FRACTION)) {
+                if (srcY == srcY1) {
+                    srcY = FLOOR(srcY);
+                    portionY = (1UL << FRACTION) - (srcY1 - srcY);
+                    if (portionY > srcY2 - srcY1)
+                        portionY = srcY2 - srcY1;
+                }
+                else if (srcY == FLOOR(srcY2))
+                    portionY = srcY2 - srcY;
+                else
+                    portionY = (1UL << FRACTION);
+                
+                for (srcX = srcX1; srcX < srcX2; srcX += (1UL << FRACTION)) {
+                    if (srcX == srcX1) {
+                        srcX = FLOOR(srcX);
+                        portionX = (1UL << FRACTION) - (srcX1 - srcX);
+                        if (portionX > srcX2 - srcX1)
+                            portionX = srcX2 - srcX1;
+                    }
+                    else if (srcX == FLOOR(srcX2))
+                        portionX = srcX2 - srcX;
+                    else
+                        portionX = (1UL << FRACTION);
+                    
+                    portionXY = (portionX * portionY) >> FRACTION;
+                    sumXY += portionXY;
+                    
+                    pixel = *(src + (srcY >> FRACTION) * srcW + (srcX >> FRACTION));
+                    red   += ((pixel >> RrDefaultRedOffset)   & 0xFF) * portionXY;
+                    green += ((pixel >> RrDefaultGreenOffset) & 0xFF) * portionXY;
+                    blue  += ((pixel >> RrDefaultBlueOffset)  & 0xFF) * portionXY;
+                    alpha += ((pixel >> RrDefaultAlphaOffset) & 0xFF) * portionXY;
+                }
+            }
+            
+            g_assert(sumXY != 0);
+            red   /= sumXY;
+            green /= sumXY;
+            blue  /= sumXY;
+            alpha /= sumXY;
+            
+            *dst++ = (red   << RrDefaultRedOffset)   |
+                     (green << RrDefaultGreenOffset) |
+                     (blue  << RrDefaultBlueOffset)  |
+                     (alpha << RrDefaultAlphaOffset);
         }
-        dest += dw;
-        source += int_part;
-        err += fract_part;
-        if (err >= dh) {
-            err -= dh;
-            source += w;
-        }
     }
-
-    g_free(oldsource);
-
-    return out;
 }
 
 void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
@@ -145,7 +157,8 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
     if (sw != dw || sh != dh) {
         /*if (!(rgba->cache && dw == rgba->cwidth && dh == rgba->cheight))*/ {
             g_free(rgba->cache);
-            rgba->cache = scale_rect(rgba->data, sw, sh, dw, dh);
+            rgba->cache = g_new(RrPixel32, dw * dh);
+            ImageCopyResampled(rgba->cache, rgba->data, dw, dh, sw, sh);
             rgba->cwidth = dw;
             rgba->cheight = dh;
         }
@@ -165,7 +178,7 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
         r = *source >> RrDefaultRedOffset;
         g = *source >> RrDefaultGreenOffset;
         b = *source >> RrDefaultBlueOffset;
-        
+
         /* background color */
         bgr = *dest >> RrDefaultRedOffset;
         bgg = *dest >> RrDefaultGreenOffset;

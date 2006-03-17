@@ -276,7 +276,6 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
 {
     ObPagerPopup *self = data;
     gint x, y;
-    guint i;
     guint rown, n;
     guint horz_inc;
     guint vert_inc;
@@ -301,64 +300,64 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
     if (eachw <= 0 || eachh <= 0)
         return;
 
-    switch (screen_desktop_layout.start_corner) {
-    case OB_CORNER_TOPLEFT:
-        n = 0;
-        switch (screen_desktop_layout.orientation) {
-        case OB_ORIENTATION_HORZ:
+    switch (screen_desktop_layout.orientation) {
+    case OB_ORIENTATION_HORZ:
+        switch (screen_desktop_layout.start_corner) {
+        case OB_CORNER_TOPLEFT:
+            n = 0;
             horz_inc = 1;
             vert_inc = screen_desktop_layout.columns;
             break;
-        case OB_ORIENTATION_VERT:
-            horz_inc = screen_desktop_layout.rows;
-            vert_inc = 1;
-            break;
-        }
-        break;
-    case OB_CORNER_TOPRIGHT:
-        n = screen_desktop_layout.columns;
-        switch (screen_desktop_layout.orientation) {
-        case OB_ORIENTATION_HORZ:
+        case OB_CORNER_TOPRIGHT:
+            n = screen_desktop_layout.columns - 1;
             horz_inc = -1;
             vert_inc = screen_desktop_layout.columns;
             break;
-        case OB_ORIENTATION_VERT:
-            horz_inc = -screen_desktop_layout.rows;
-            vert_inc = 1;
-            break;
-        }
-        break;
-    case OB_CORNER_BOTTOMLEFT:
-        n = screen_desktop_layout.rows;
-        switch (screen_desktop_layout.orientation) {
-        case OB_ORIENTATION_HORZ:
-            horz_inc = 1;
-            vert_inc = -screen_desktop_layout.columns;
-            break;
-        case OB_ORIENTATION_VERT:
-            horz_inc = screen_desktop_layout.rows;
-            vert_inc = -1;
-            break;
-        }
-        break;
-    case OB_CORNER_BOTTOMRIGHT:
-        n = MAX(self->desks,
-                screen_desktop_layout.rows * screen_desktop_layout.columns);
-        switch (screen_desktop_layout.orientation) {
-        case OB_ORIENTATION_HORZ:
+        case OB_CORNER_BOTTOMRIGHT:
+            n = screen_desktop_layout.rows * screen_desktop_layout.columns - 1;
             horz_inc = -1;
             vert_inc = -screen_desktop_layout.columns;
             break;
-        case OB_ORIENTATION_VERT:
+        case OB_CORNER_BOTTOMLEFT:
+            n = (screen_desktop_layout.rows - 1) * screen_desktop_layout.columns;
+            horz_inc = 1;
+            vert_inc = -screen_desktop_layout.columns;
+            break;
+        default:
+            g_assert_not_reached();
+        }
+        break;
+    case OB_ORIENTATION_VERT:
+        switch (screen_desktop_layout.start_corner) {
+        case OB_CORNER_TOPLEFT:
+            n = 0;
+            horz_inc = screen_desktop_layout.rows;
+            vert_inc = 1;
+            break;
+        case OB_CORNER_TOPRIGHT:
+            n = screen_desktop_layout.rows * (screen_desktop_layout.columns - 1);
+            horz_inc = -screen_desktop_layout.rows;
+            vert_inc = 1;
+            break;
+        case OB_CORNER_BOTTOMRIGHT:
+            n = screen_desktop_layout.rows * screen_desktop_layout.columns - 1;
             horz_inc = -screen_desktop_layout.rows;
             vert_inc = -1;
             break;
+        case OB_CORNER_BOTTOMLEFT:
+            n = screen_desktop_layout.rows - 1;
+            horz_inc = screen_desktop_layout.rows;
+            vert_inc = -1;
+            break;
+        default:
+            g_assert_not_reached();
         }
         break;
+    default:
+        g_assert_not_reached();
     }
 
     rown = n;
-    i = 0;
     for (r = 0, y = 0; r < screen_desktop_layout.rows;
          ++r, y += eachh + ob_rr_theme->bwidth)
     {
@@ -367,21 +366,17 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
         {
             RrAppearance *a;
 
-            if (i >= self->desks)
-                break;
+            if (n < self->desks) {
+                a = (n == self->curdesk ? self->hilight : self->unhilight);
 
-            a = (n == self->curdesk ? self->hilight : self->unhilight);
-
-            a->surface.parent = self->popup->a_bg;
-            a->surface.parentx = x + px;
-            a->surface.parenty = y + py;
-            XMoveResizeWindow(ob_display, self->wins[i],
-                              x + px, y + py, eachw, eachh);
-            RrPaint(a, self->wins[i], eachw, eachh);
-
+                a->surface.parent = self->popup->a_bg;
+                a->surface.parentx = x + px;
+                a->surface.parenty = y + py;
+                XMoveResizeWindow(ob_display, self->wins[n],
+                                  x + px, y + py, eachw, eachh);
+                RrPaint(a, self->wins[n], eachw, eachh);
+            }
             n += horz_inc;
-
-            ++i;
         }
         n = rown += vert_inc;
     }

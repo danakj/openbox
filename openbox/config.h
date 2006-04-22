@@ -122,6 +122,8 @@ extern gboolean config_menu_warppointer;
 extern gboolean config_menu_xorstyle;
 /*! delay for hiding menu when opening */
 extern guint    config_menu_hide_delay;
+/*! delay before opening a submenu */
+extern guint    config_submenu_show_delay;
 /*! show icons in client_list_menu */
 extern gboolean config_menu_client_list_icons;
 /*! User-specified menu files */

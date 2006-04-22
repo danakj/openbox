@@ -70,6 +70,7 @@ gint config_mouse_dclicktime;
 gboolean config_menu_warppointer;
 gboolean config_menu_xorstyle;
 guint    config_menu_hide_delay;
+guint    config_submenu_show_delay;
 gboolean config_menu_client_list_icons;
 
 GSList *config_menu_files;
@@ -422,6 +423,8 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_menu_xorstyle = parse_bool(doc, n);
         if ((n = parse_find_node("hideDelay", node)))
             config_menu_hide_delay = parse_int(doc, n);
+        if ((n = parse_find_node("submenuShowDelay", node)))
+            config_submenu_show_delay = parse_int(doc, n);
         if ((n = parse_find_node("desktopMenuIcons", node)))
             config_menu_client_list_icons = parse_bool(doc, n);
     }
@@ -617,6 +620,7 @@ void config_startup(ObParseInst *i)
     config_menu_warppointer = TRUE;
     config_menu_xorstyle = TRUE;
     config_menu_hide_delay = 250;
+    config_submenu_show_delay = 0;
     config_menu_client_list_icons = TRUE;
     config_menu_files = NULL;
 

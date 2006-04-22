@@ -43,6 +43,7 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 static void menu_entry_frame_free(ObMenuEntryFrame *self);
 static void menu_frame_render(ObMenuFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
+static gboolean menu_entry_frame_submenu_timeout(gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -663,6 +664,11 @@ void menu_frame_hide(ObMenuFrame *self)
 
 void menu_frame_hide_all()
 {
+    if (config_submenu_show_delay) {
+        /* remove any submenu open requests */
+        ob_main_loop_timeout_remove(ob_main_loop,
+                                    menu_entry_frame_submenu_timeout);
+    }
     GList *it = g_list_last(menu_frame_visible);
     if (it) 
         menu_frame_hide(it->data);
@@ -717,6 +723,12 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
     return ret;
 }
 
+static gboolean menu_entry_frame_submenu_timeout(gpointer data)
+{
+    menu_entry_frame_show_submenu((ObMenuEntryFrame*)data);
+    return FALSE;
+}
+
 void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
 {
     ObMenuEntryFrame *old = self->selected;
@@ -726,6 +738,12 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
         entry = old;
 
     if (old == entry) return;
+   
+    if (config_submenu_show_delay) { 
+        /* remove any submenu open requests */
+        ob_main_loop_timeout_remove(ob_main_loop,
+                                    menu_entry_frame_submenu_timeout);
+    }
 
     self->selected = entry;
 
@@ -737,8 +755,18 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
-            menu_entry_frame_show_submenu(self->selected);
+        if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+            if (config_submenu_show_delay) {
+                /* initiate a new submenu open request */
+                ob_main_loop_timeout_add(ob_main_loop,
+                                         config_submenu_show_delay * 1000,
+                                         menu_entry_frame_submenu_timeout,
+                                         self->selected,
+                                         NULL);
+            } else {
+                menu_entry_frame_show_submenu(self->selected);
+            }
+        }
     }
 }
 

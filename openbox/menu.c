@@ -315,8 +315,12 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     }
     if (!menu_frame_show(frame, NULL))
         menu_frame_free(frame);
-    else if (frame->entries)
-        menu_frame_select_next(frame);
+    else if (frame->entries) {
+        ObMenuEntryFrame *e = frame->entries->data;
+        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+            e->entry->data.normal.enabled)
+                menu_frame_select(frame, e);
+    }
 }
 
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)

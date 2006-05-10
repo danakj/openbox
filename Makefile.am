@@ -58,12 +58,12 @@ render_libobrender_la_CPPFLAGS = \
 render_libobrender_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 render_libobrender_la_LIBADD = \
+	parser/libobparser.la
 	$(X_LIBS) \
 	$(XFT_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS) \
-	parser/libobparser.la
 render_libobrender_la_SOURCES = \
 	gettext.h \
 	render/color.h \

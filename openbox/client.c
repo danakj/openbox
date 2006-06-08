@@ -206,17 +206,17 @@ void client_manage_all()
 
 /* This should possibly do something more interesting than just match
  * against WM_CLASS literally. */
-static ObAppSetting *get_settings(ObClient *client)
+static ObAppSettings *get_settings(ObClient *client)
 {
     GSList *a = config_per_app_settings;
 
     while (a) {
-        ObAppSetting *app = (ObAppSetting *) a->data;
+        ObAppSettings *app = (ObAppSettings *) a->data;
         
         if (!strcmp(app->name, client->name)) {
             ob_debug("Window matching: %s\n", app->name);
 
-            return (ObAppSetting *) a->data;
+            return app;
         }
 
         a = a->next;
@@ -232,7 +232,7 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
     XWMHints *wmhint;
     gboolean activate = FALSE;
-    ObAppSetting *settings;
+    ObAppSettings *settings;
 
     grab_server(TRUE);
 

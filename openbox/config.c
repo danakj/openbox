@@ -122,7 +122,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
         gboolean x_pos_given = FALSE;
         if (parse_attr_string("name", app, &name)) {
             xmlNodePtr n, c;
-            ObAppSettings *settings = g_new0(ObAppSetting, 1);
+            ObAppSettings *settings = g_new0(ObAppSettings, 1);
             settings->name = name;
 
             settings->decor = TRUE;

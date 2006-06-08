@@ -22,6 +22,7 @@
 #include <glib.h>
 
 struct _ObClient;
+struct _ObAppSettings;
 
 typedef enum
 {
@@ -29,6 +30,6 @@ typedef enum
     OB_PLACE_POLICY_MOUSE
 } ObPlacePolicy;
 
-void place_client(struct _ObClient *client, gint *x, gint *y, ObAppSettings *settings);
+void place_client(struct _ObClient *client, gint *x, gint *y, struct _ObAppSettings *settings);
 
 #endif

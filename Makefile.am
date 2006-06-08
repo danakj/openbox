@@ -202,9 +202,7 @@ openbox_openbox_SOURCES = \
 	openbox/window.c \
 	openbox/window.h \
 	openbox/xerror.c \
-	openbox/xerror.h \
-	openbox/per_app_settings.c \
-	openbox/per_app_settings.h
+	openbox/xerror.h
 
 
 ## kdetrayproxy ##

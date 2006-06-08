@@ -23,6 +23,7 @@
 #include "misc.h"
 #include "stacking.h"
 #include "place.h"
+#include "per_app_settings.h"
 
 #include <glib.h>
 

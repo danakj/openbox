@@ -61,6 +61,7 @@
                 <xs:element name="keyboard" type="ob:keyboard"/>
                 <xs:element name="mouse" type="ob:mouse"/>
                 <xs:element name="menu" type="ob:menu"/>
+                <xs:element name="applications" type="ob:applications"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -190,6 +191,28 @@
             <xs:element name="xorStyle" type="ob:yesorno"/>
             <xs:element name="hideDelay" type="xs:integer"/>
             <xs:element name="desktopMenuIcons" type="ob:yesorno"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="position">
+        <xs:sequence>
+            <xs:element name="x" type="xs:string"/>
+            <xs:element name="y" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="application">
+        <xs:sequence>
+            <xs:element name="decor" type="xs:string"/>
+            <xs:element name="focus" type="xs:string"/>
+            <xs:element name="position" type="ob:position"/>
+            <xs:element name="head" type="xs:string"/>
+            <xs:element name="layer" type="xs:string"/>
+            <xs:element name="desktop" type="xs:integer"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="applications">
+        <xs:sequence>
+            <xs:element maxOccurs="unboundd" name="application" type="ob:application"/>
         </xs:sequence>
     </xs:complexType>
     <!--

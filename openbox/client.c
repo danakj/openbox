@@ -40,6 +40,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "render/render.h"
+#include "per_app_settings.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -212,6 +213,7 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
     XWMHints *wmhint;
     gboolean activate = FALSE;
+    ObAppSetting *settings;
 
     grab_server(TRUE);
 
@@ -292,12 +294,29 @@ void client_manage(Window window)
 
     client_apply_startup_state(self);
 
+    /* get and set application level settings */
+    settings = (ObAppSetting *) get_client_settings(self);
+
+    if (settings) {
+        if (settings->shade && !settings->decor)
+            settings->decor = TRUE;
+        
+        client_shade(self, settings->shade);
+        client_set_undecorated(self, !settings->decor);
+        
+        if (settings->desktop != -1)
+            client_set_desktop(self, settings->desktop, FALSE);
+
+        client_set_layer(self, settings->layer);
+    }
+
     stacking_add(CLIENT_AS_WINDOW(self));
     client_restore_session_stacking(self);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
-        (config_focus_new || client_search_focus_parent(self)) &&
+        (config_focus_new || client_search_focus_parent(self)) ||
+        (settings && settings->focus) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
@@ -343,6 +362,9 @@ void client_manage(Window window)
         gint y = self->area.y, oy = y;
 
         place_client(self, &x, &y);
+
+        if (settings)
+            place_window_from_settings(settings, self, &x, &y);
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &x, &y,

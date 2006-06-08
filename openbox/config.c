@@ -80,6 +80,108 @@ gint config_resist_edge;
 
 gboolean config_resist_layers_below;
 
+GSList *per_app_settings;
+
+/*
+  <applications>
+    <application name="aterm">
+      <decor>false</decor>
+    </application>
+    <application name="Rhythmbox">
+      <layer>above</layer>
+      <position>
+        <x>700</x>
+        <y>0</y>
+      </position>
+      <head>1</head>
+    </application>
+  </applications>
+*/
+
+/* Manages settings for individual applications.
+   Some notes: head is the screen number in a multi monitor
+   (Xinerama) setup (starting from 0) or mouse, meaning the
+   head the pointer is on. Default: mouse.
+   If decor is false and shade is true, the decor will be
+   set to true (otherwise we will have an invisible window).
+   Layer can be three values, above (Always on top), below
+   (Always on bottom) and everything else (normal behaviour).
+   Positions can be an integer value or center, which will
+   center the window in the specified axis. Position is relative
+   from head, so <position><x>center</x></position><head>1</head>
+   will center the window on the second head.
+*/
+static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
+                                   xmlNodePtr node, gpointer d)
+{
+    xmlNodePtr app = parse_find_node("application", node->children);
+    gchar *name;
+
+
+    while (app) {
+        if (parse_attr_string("name", app, &name)) {
+            xmlNodePtr n, c;
+            ObAppSetting *setting = g_new0(ObAppSetting, 1);
+            setting->name = name;
+
+            setting->decor = TRUE;
+            if ((n = parse_find_node("decor", app->children)))
+                setting->decor = parse_bool(doc, n);
+
+            if ((n = parse_find_node("shade", app->children)))
+                setting->shade = parse_bool(doc, n);
+
+            setting->position.x = setting->position.y = -1;
+            if ((n = parse_find_node("position", app->children))) {
+                if ((c = parse_find_node("x", n->children))) {
+                    if (!strcmp(parse_string(doc, c), "center")) {
+                        setting->center_x = TRUE;
+                    }
+                    else
+                        setting->position.x = parse_int(doc, c);
+                }
+
+                if ((c = parse_find_node("y", n->children))) {
+                    if (!strcmp(parse_string(doc, c), "center")) {
+                        setting->center_y = TRUE;
+                    }
+                    else
+                        setting->position.y = parse_int(doc, c);
+                }
+            }
+
+            if ((n = parse_find_node("focus", app->children)))
+                setting->focus = parse_bool(doc, n);
+
+            if ((n = parse_find_node("desktop", app->children)))
+                setting->desktop = parse_int(doc, n);
+            else
+                setting->desktop = -1;
+
+            if ((n = parse_find_node("head", app->children))) {
+                if (!strcmp(parse_string(doc, n), "mouse"))
+                    setting->head = -1;
+                else
+                    setting->head = parse_int(doc, n);
+            }
+
+            if ((n = parse_find_node("layer", app->children))) {
+                if (!strcmp(parse_string(doc, n), "above"))
+                    setting->layer = 1;
+                else if (!strcmp(parse_string(doc, n), "below"))
+                    setting->layer = -1;
+                else
+                    setting->layer = 0;
+            }
+
+            per_app_settings = g_slist_append(per_app_settings,
+                                              (gpointer) setting);
+        }
+        
+        app = parse_find_node("application", app->next);
+    }
+}
+
 /*
 
 <keybind key="C-x">
@@ -625,6 +727,10 @@ void config_startup(ObParseInst *i)
     config_menu_files = NULL;
 
     parse_register(i, "menu", parse_menu, NULL);
+
+    per_app_settings = NULL;
+
+    parse_register(i, "applications", parse_per_app_settings, NULL);
 }
 
 void config_shutdown()

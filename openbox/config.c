@@ -22,6 +22,7 @@
 #include "mouse.h"
 #include "prop.h"
 #include "translate.h"
+#include "client.h"
 #include "parser/parse.h"
 #include "openbox.h"
 
@@ -180,7 +181,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             }
 
             config_per_app_settings = g_slist_append(config_per_app_settings,
-                                              (gpointer) setting);
+                                              (gpointer) settings);
         }
         
         app = parse_find_node("application", app->next);

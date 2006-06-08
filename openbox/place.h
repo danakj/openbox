@@ -29,6 +29,6 @@ typedef enum
     OB_PLACE_POLICY_MOUSE
 } ObPlacePolicy;
 
-void place_client(struct _ObClient *client, gint *x, gint *y);
+void place_client(struct _ObClient *client, gint *x, gint *y, ObAppSettings *settings);
 
 #endif

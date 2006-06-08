@@ -410,7 +410,7 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
     return FALSE;
 }
 
-void place_client(ObClient *client, gint *x, gint *y, ObAppSetting *settings)
+void place_client(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
 {
     if (client->positioned)
         return;

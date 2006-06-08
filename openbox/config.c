@@ -148,10 +148,10 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                 if (x_pos_given && (c = parse_find_node("y", n->children))) {
                     if (!strcmp(parse_string(doc, c), "center")) {
                         settings->center_y = TRUE;
-                        settings->pos_given;
+                        settings->pos_given = TRUE;
                     } else {
                         settings->position.y = parse_int(doc, c);
-                        settings->pos_given;
+                        settings->pos_given = TRUE;
                     }
                 }
             }

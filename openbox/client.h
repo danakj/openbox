@@ -32,8 +32,9 @@ struct _ObFrame;
 struct _ObGroup;
 struct _ObSessionState;
 
-typedef struct _ObClient     ObClient;
-typedef struct _ObClientIcon ObClientIcon;
+typedef struct _ObClient      ObClient;
+typedef struct _ObClientIcon  ObClientIcon;
+typedef struct _ObAppSettings ObAppSettings;
 
 /* The value in client.transient_for indicating it is a transient for its
    group instead of for a single window */
@@ -267,6 +268,24 @@ struct _ObClient
     ObClientIcon *icons;
     /*! The number of icons in icons */
     guint nicons;
+};
+
+struct _ObAppSettings
+{
+    gchar *name;
+    gboolean decor;
+    gboolean shade;
+    gboolean focus;
+
+    Point position;
+    gboolean center_x;
+    gboolean center_y;
+    gboolean pos_given;
+
+    guint desktop;
+    guint head;
+
+    guint layer;
 };
 
 extern GList *client_list;

@@ -40,7 +40,6 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "render/render.h"
-#include "per_app_settings.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -205,6 +204,26 @@ void client_manage_all()
     XFree(children);
 }
 
+/* This should possibly do something more interesting than just match
+ * against WM_CLASS literally. */
+static ObAppSetting *get_settings(ObClient *client)
+{
+    GSList *a = config_per_app_settings;
+
+    while (a) {
+        ObAppSetting *app = (ObAppSetting *) a->data;
+        
+        if (!strcmp(app->name, client->name)) {
+            ob_debug("Window matching: %s\n", app->name);
+
+            return (ObAppSetting *) a->data;
+        }
+
+        a = a->next;
+    }
+    return NULL;
+}
+
 void client_manage(Window window)
 {
     ObClient *self;
@@ -295,8 +314,7 @@ void client_manage(Window window)
     client_apply_startup_state(self);
 
     /* get and set application level settings */
-    /* XXX move that function here */
-    settings = (ObAppSetting *) get_client_settings(self);
+    settings = get_settings(self);
 
     if (settings) {
         if (settings->shade && !settings->decor)
@@ -362,11 +380,7 @@ void client_manage(Window window)
         gint x = self->area.x, ox = x;
         gint y = self->area.y, oy = y;
 
-        if (settings)
-            /* XXX put this in place.c */
-            place_window_from_settings(settings, self, &x, &y);
-        else
-            place_client(self, &x, &y);
+        place_client(self, &x, &y, settings);
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &x, &y,

@@ -22,7 +22,6 @@
 #include "mouse.h"
 #include "prop.h"
 #include "translate.h"
-#include "per_app_settings.h"
 #include "parser/parse.h"
 #include "openbox.h"
 
@@ -119,59 +118,65 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
     gchar *name;
 
     while (app) {
+        gboolean x_pos_given = FALSE;
         if (parse_attr_string("name", app, &name)) {
             xmlNodePtr n, c;
-            ObAppSetting *setting = g_new0(ObAppSetting, 1);
-            setting->name = name;
+            ObAppSettings *settings = g_new0(ObAppSetting, 1);
+            settings->name = name;
 
-            setting->decor = TRUE;
+            settings->decor = TRUE;
             if ((n = parse_find_node("decor", app->children)))
-                setting->decor = parse_bool(doc, n);
+                settings->decor = parse_bool(doc, n);
 
             if ((n = parse_find_node("shade", app->children)))
-                setting->shade = parse_bool(doc, n);
+                settings->shade = parse_bool(doc, n);
 
-            setting->position.x = setting->position.y = -1;
+            settings->position.x = settings->position.y = 0;
+            settings->pos_given = FALSE;
             if ((n = parse_find_node("position", app->children))) {
                 if ((c = parse_find_node("x", n->children))) {
                     if (!strcmp(parse_string(doc, c), "center")) {
-                        setting->center_x = TRUE;
+                        settings->center_x = TRUE;
+                        x_pos_given = TRUE;
+                    } else {
+                        settings->position.x = parse_int(doc, c);
+                        x_pos_given = TRUE;
                     }
-                    else
-                        setting->position.x = parse_int(doc, c);
                 }
 
-                if ((c = parse_find_node("y", n->children))) {
+                if (x_pos_given && (c = parse_find_node("y", n->children))) {
                     if (!strcmp(parse_string(doc, c), "center")) {
-                        setting->center_y = TRUE;
+                        settings->center_y = TRUE;
+                        settings->pos_given;
+                    } else {
+                        settings->position.y = parse_int(doc, c);
+                        settings->pos_given;
                     }
-                    else
-                        setting->position.y = parse_int(doc, c);
                 }
             }
 
             if ((n = parse_find_node("focus", app->children)))
-                setting->focus = parse_bool(doc, n);
+                settings->focus = parse_bool(doc, n);
 
             if ((n = parse_find_node("desktop", app->children)))
-                setting->desktop = parse_int(doc, n);
+                settings->desktop = parse_int(doc, n);
             else
-                setting->desktop = -1;
+                settings->desktop = -1;
 
             if ((n = parse_find_node("head", app->children))) {
                 if (!strcmp(parse_string(doc, n), "mouse"))
-                    setting->head = -1;
+                    settings->head = -1;
                 else
-                    setting->head = parse_int(doc, n);
+                    settings->head = parse_int(doc, n);
             }
 
             if ((n = parse_find_node("layer", app->children))) {
                 if (!strcmp(parse_string(doc, n), "above"))
-                    setting->layer = 1;
+                    settings->layer = 1;
                 else if (!strcmp(parse_string(doc, n), "below"))
-                    setting->layer = -1;
+                    settings->layer = -1;
                 else
-                    setting->layer = 0;
+                    settings->layer = 0;
             }
 
             config_per_app_settings = g_slist_append(config_per_app_settings,

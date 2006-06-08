@@ -331,6 +331,43 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     return TRUE;
 }
 
+void place_window_from_settings(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
+{
+    gint px, py, i;
+    Rect *screen;
+
+    if (!settings || (settings && !settings->pos_given))
+        return FALSE;
+
+    /* Find which head the pointer is on */
+    if (settings->head == -1 && screen_num_monitors > 1) {
+        screen_pointer_pos(&px, &py);
+
+        for (i = 0; i < screen_num_monitors; i++) {
+            screen = screen_area_monitor(client->desktop, i);
+            if (RECT_CONTAINS(*screen, px, py))
+                break;
+        }
+
+        if (i == screen_num_monitors)
+            screen = screen_area_monitor(client->desktop, 0);
+    }
+    else
+        screen = screen_area_monitor(client->desktop, settings->head);
+
+    if (settings->center_x)
+        *x = screen->x + screen->width / 2 - client->area.width / 2;
+    else
+        *x = screen->x + settings->position.x;
+
+    if (settings->center_y)
+        *y = screen->y + screen->height / 2 - client->area.height / 2;
+    else
+        *y = screen->y + settings->position.y;
+
+    return TRUE;
+}
+
 static gboolean place_transient(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for) {
@@ -373,11 +410,12 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
     return FALSE;
 }
 
-void place_client(ObClient *client, gint *x, gint *y)
+void place_client(ObClient *client, gint *x, gint *y, ObAppSetting *settings)
 {
     if (client->positioned)
         return;
     if (place_transient(client, x, y)             ||
+        place_per_app_setting(client, x, y, settings) ||
         ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
          place_under_mouse(client, x, y) :
          place_smart(client, x, y, SMART_FULL)    ||

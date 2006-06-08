@@ -20,6 +20,9 @@
 #include "screen.h"
 #include "config.h"
 
+/* XXX put in client.c */
+/* This should possibly do something more interesting than just match
+ * against WM_CLASS literally. */
 ObAppSetting *get_client_settings(ObClient *client)
 {
     GSList *a = config_per_app_settings;
@@ -38,6 +41,7 @@ ObAppSetting *get_client_settings(ObClient *client)
     return NULL;
 }
 
+/* XXX put in place.c */
 void place_window_from_settings(ObAppSetting *setting, ObClient *client, gint *x, gint *y)
 {
     gint px, py, i;

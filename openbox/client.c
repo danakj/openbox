@@ -295,6 +295,7 @@ void client_manage(Window window)
     client_apply_startup_state(self);
 
     /* get and set application level settings */
+    /* XXX move that function here */
     settings = (ObAppSetting *) get_client_settings(self);
 
     if (settings) {
@@ -361,10 +362,11 @@ void client_manage(Window window)
         gint x = self->area.x, ox = x;
         gint y = self->area.y, oy = y;
 
-        place_client(self, &x, &y);
-
         if (settings)
+            /* XXX put this in place.c */
             place_window_from_settings(settings, self, &x, &y);
+        else
+            place_client(self, &x, &y);
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &x, &y,

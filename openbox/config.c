@@ -118,7 +118,6 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
     xmlNodePtr app = parse_find_node("application", node->children);
     gchar *name;
 
-
     while (app) {
         if (parse_attr_string("name", app, &name)) {
             xmlNodePtr n, c;

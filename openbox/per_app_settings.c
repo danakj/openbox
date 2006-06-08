@@ -20,11 +20,9 @@
 #include "screen.h"
 #include "config.h"
 
-GSList *per_app_settings;
-
 ObAppSetting *get_client_settings(ObClient *client)
 {
-    GSList *a = per_app_settings;
+    GSList *a = config_per_app_settings;
 
     while (a) {
         ObAppSetting *app = (ObAppSetting *) a->data;

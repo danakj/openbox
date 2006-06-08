@@ -80,7 +80,7 @@ gint config_resist_edge;
 
 gboolean config_resist_layers_below;
 
-GSList *per_app_settings;
+GSList *config_per_app_settings;
 
 /*
   <applications>
@@ -174,7 +174,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                     setting->layer = 0;
             }
 
-            per_app_settings = g_slist_append(per_app_settings,
+            config_per_app_settings = g_slist_append(config_per_app_settings,
                                               (gpointer) setting);
         }
         
@@ -728,7 +728,7 @@ void config_startup(ObParseInst *i)
 
     parse_register(i, "menu", parse_menu, NULL);
 
-    per_app_settings = NULL;
+    config_per_app_settings = NULL;
 
     parse_register(i, "applications", parse_per_app_settings, NULL);
 }
@@ -748,4 +748,8 @@ void config_shutdown()
     for (it = config_menu_files; it; it = g_slist_next(it))
         g_free(it->data);
     g_slist_free(config_menu_files);
+
+    for (it = config_per_app_settings; it; it = g_slist_next(it))
+        g_free(it->data);
+    g_slist_free(config_per_app_settings);
 }

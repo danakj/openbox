@@ -40,8 +40,6 @@ struct _ObAppSetting
     guint layer;
 };
 
-extern GSList *per_app_settings;
-
 ObAppSetting *get_client_settings(ObClient *client);
 void place_window_from_settings(ObAppSetting *setting, ObClient *client, gint *x, gint *y);
 

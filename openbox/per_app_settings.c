@@ -18,6 +18,7 @@
 
 #include "per_app_settings.h"
 #include "screen.h"
+#include "config.h"
 
 GSList *per_app_settings;
 

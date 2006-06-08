@@ -23,7 +23,6 @@
 #include "misc.h"
 #include "stacking.h"
 #include "place.h"
-#include "per_app_settings.h"
 
 #include <glib.h>
 
@@ -129,6 +128,8 @@ extern guint    config_submenu_show_delay;
 extern gboolean config_menu_client_list_icons;
 /*! User-specified menu files */
 extern GSList *config_menu_files;
+/*! Per app settings */
+extern GSList *config_per_app_settings;
 
 void config_startup(struct _ObParseInst *i);
 void config_shutdown();

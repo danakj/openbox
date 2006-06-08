@@ -331,7 +331,7 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     return TRUE;
 }
 
-void place_window_from_settings(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
+static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
 {
     gint px, py, i;
     Rect *screen;

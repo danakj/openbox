@@ -22,6 +22,7 @@
 #include "mouse.h"
 #include "prop.h"
 #include "translate.h"
+#include "per_app_settings.h"
 #include "parser/parse.h"
 #include "openbox.h"
 

@@ -327,7 +327,7 @@ void client_manage(Window window)
         if (settings->decor != -1)
             client_set_undecorated(self, !settings->decor);
         if (settings->iconic != -1)
-            client_iconify(self, settings->iconic);
+            client_iconify(self, settings->iconic, FALSE);
         if (settings->skip_pager != -1)
             client->skip_pager = !!settings->skip_pager;
         if (settings->skip_taskbar != -1)

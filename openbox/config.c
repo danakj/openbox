@@ -137,7 +137,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             settings->pos_given = FALSE;
             if ((n = parse_find_node("position", app->children))) {
                 if ((c = parse_find_node("x", n->children))) {
-                    str *s = parse_string(doc, c);
+                    gchar *s = parse_string(doc, c);
                     if (!strcmp(s, "center")) {
                         settings->center_x = TRUE;
                         x_pos_given = TRUE;
@@ -149,7 +149,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                 }
 
                 if (x_pos_given && (c = parse_find_node("y", n->children))) {
-                    str *s = parse_string(doc, c);
+                    gchar *s = parse_string(doc, c);
                     if (!strcmp(s, "center")) {
                         settings->center_y = TRUE;
                         settings->pos_given = TRUE;
@@ -166,7 +166,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                 settings->focus = parse_bool(doc, n);
 
             if ((n = parse_find_node("desktop", app->children))) {
-                str *s = parse_string(doc, n);
+                gchar *s = parse_string(doc, n);
                 if (!strcmp(s, "all"))
                     settings->desktop = DESKTOP_ALL;
                 else
@@ -178,7 +178,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                                                       * desktops */
 
             if ((n = parse_find_node("head", app->children))) {
-                str *s = parse_string(doc, n);
+                gchar *s = parse_string(doc, n);
                 if (!strcmp(s, "mouse"))
                     settings->head = -1;
                 else
@@ -188,7 +188,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
 
             settings->layer = -2;
             if ((n = parse_find_node("layer", app->children))) {
-                str *s = parse_string(doc, n);
+                gchar *s = parse_string(doc, n);
                 if (!strcmp(s, "above"))
                     settings->layer = 1;
                 else if (!strcmp(s, "below"))
@@ -217,7 +217,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             settings->max_horz = -1;
             settings->max_vert = -1;
             if ((n = parse_find_node("maximized", app->children))) {
-                str *s = parse_string(doc, n);
+                gchar *s = parse_string(doc, n);
                 if (!strcmp(s, "horizontal")) {
                     settings->max_horz = TRUE;
                     settings->max_vert = FALSE;

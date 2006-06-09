@@ -175,6 +175,8 @@ static gint area_cmp(gconstpointer p1, gconstpointer p2, gpointer data)
             if (num[i] > num[most])
                 most = i;
 
+        g_free(num);
+
         a = screen_physical_area_monitor(most);
         if (RECT_CONTAINS(*a, a1->x, a1->y))
             return -1;

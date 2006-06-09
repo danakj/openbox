@@ -215,7 +215,10 @@ static ObAppSettings *get_settings(ObClient *client)
         
         if (!strcmp(app->name, client->name)) {
             ob_debug("Window matching: %s\n", app->name);
-            if (!app->role || !strcmp(app->role, client->role))
+            /* Match if no role was specified in the per app setting, or if the string
+             * matches the beginning of the role, since apps like to set the role to
+             * things like browser-window-23c4b2f */
+            if (!app->role || !strncmp(app->role, client->role, strlen(app->role)))
                 return app;
         }
 
@@ -317,16 +320,41 @@ void client_manage(Window window)
     settings = get_settings(self);
 
     if (settings) {
-        if (settings->shade && !settings->decor)
-            settings->decor = TRUE;
-        
-        client_shade(self, settings->shade);
-        client_set_undecorated(self, !settings->decor);
-        
-        if (settings->desktop != -1)
+        /* Don't worry, we won't actually both shade and undecorate the
+         * window when push comes to shove. */
+        if (settings->shade != -1)
+            client_shade(self, settings->shade);
+        if (settings->decor != -1)
+            client_set_undecorated(self, !settings->decor);
+        if (settings->iconic != -1)
+            client_iconify(self, settings->iconic);
+        if (settings->skip_pager != -1)
+            client->skip_pager = !!settings->skip_pager;
+        if (settings->skip_taskbar != -1)
+            client->skip_taskbar = !!settings->skip_taskbar;
+
+        /* 1 && -1 shouldn't be possible by the code in config.c */
+        if (settings->max_vert == 1 && self->max_horz == 1)
+            client_maximize(self, TRUE, 0, TRUE);
+        else if (settings->max_vert == 0 && self->max_horz == 0)
+            client_maximize(self, FALSE, 0, TRUE);
+        else if (settings->max_vert == 1 && self->max_horz == 0) {
+            client_maximize(self, TRUE, 2, TRUE);
+            client_maximize(self, FALSE, 1, TRUE);
+        } else if (settings->max_vert == 0 && self->max_horz == 1) {
+            client_maximize(self, TRUE, 1, TRUE);
+            client_maximize(self, FALSE, 2, TRUE);
+        }
+
+        if (settings->fullscreen != -1)
+            client_fullscreen(self, !!settings->fullscreen, TRUE);
+
+        if (settings->desktop < screen_num_desktops)
             client_set_desktop(self, settings->desktop, FALSE);
 
-        client_set_layer(self, settings->layer);
+        if (settings->layer > -2 && settings->layer < 2)
+            client_set_layer(self, settings->layer);
+
     }
 
     stacking_add(CLIENT_AS_WINDOW(self));
@@ -335,7 +363,7 @@ void client_manage(Window window)
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
         (config_focus_new || client_search_focus_parent(self)) ||
-        (settings && settings->focus) &&
+        (settings && settings->focus == TRUE) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */

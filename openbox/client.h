@@ -274,9 +274,6 @@ struct _ObAppSettings
 {
     gchar *name;
     gchar *role;
-    gboolean decor;
-    gboolean shade;
-    gboolean focus;
 
     Point position;
     gboolean center_x;
@@ -284,9 +281,18 @@ struct _ObAppSettings
     gboolean pos_given;
 
     guint desktop;
-    guint head;
+    gint shade;
+    gint decor;
+    gint focus;
+    gint head;
+    gint iconic;
+    gint skip_pager;
+    gint skip_taskbar;
+    gint max_horz;
+    gint max_vert;
+    gint fullscreen;
 
-    guint layer;
+    gint layer;
 };
 
 extern GList *client_list;

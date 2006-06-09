@@ -273,6 +273,7 @@ struct _ObClient
 struct _ObAppSettings
 {
     gchar *name;
+    gchar *role;
     gboolean decor;
     gboolean shade;
     gboolean focus;

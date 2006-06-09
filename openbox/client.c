@@ -215,8 +215,8 @@ static ObAppSettings *get_settings(ObClient *client)
         
         if (!strcmp(app->name, client->name)) {
             ob_debug("Window matching: %s\n", app->name);
-
-            return app;
+            if (!app->role || !strcmp(app->role, client->role))
+                return app;
         }
 
         a = a->next;

@@ -124,6 +124,8 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             xmlNodePtr n, c;
             ObAppSettings *settings = g_new0(ObAppSettings, 1);
             settings->name = name;
+            if (!parse_attr_string("role", app, &settings->role))
+                settings->role = NULL;
 
             settings->decor = TRUE;
             if ((n = parse_find_node("decor", app->children)))
@@ -755,7 +757,11 @@ void config_shutdown()
         g_free(it->data);
     g_slist_free(config_menu_files);
 
-    for (it = config_per_app_settings; it; it = g_slist_next(it))
+    for (it = config_per_app_settings; it; it = g_slist_next(it)) {
+        ObAppSettings *itd = (ObAppSettings *)it->data;
+        g_free(itd->name);
+        g_free(itd->role);
         g_free(it->data);
+    }
     g_slist_free(config_per_app_settings);
 }

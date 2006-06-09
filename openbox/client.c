@@ -328,10 +328,14 @@ void client_manage(Window window)
             client_set_undecorated(self, !settings->decor);
         if (settings->iconic != -1)
             client_iconify(self, settings->iconic, FALSE);
-        if (settings->skip_pager != -1)
+        if (settings->skip_pager != -1) {
             self->skip_pager = !!settings->skip_pager;
-        if (settings->skip_taskbar != -1)
+            client_change_state(self);
+        }
+        if (settings->skip_taskbar != -1) {
             self->skip_taskbar = !!settings->skip_taskbar;
+            client_change_state(self);
+        }
 
         /* 1 && -1 shouldn't be possible by the code in config.c */
         if (settings->max_vert == 1 && self->max_horz == 1)

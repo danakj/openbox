@@ -23,6 +23,7 @@
 #include "prop.h"
 #include "translate.h"
 #include "client.h"
+#include "screen.h"
 #include "parser/parse.h"
 #include "openbox.h"
 

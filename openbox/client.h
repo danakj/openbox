@@ -272,6 +272,7 @@ struct _ObClient
 
 struct _ObAppSettings
 {
+    gchar *class;
     gchar *name;
     gchar *role;
 

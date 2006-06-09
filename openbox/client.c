@@ -213,7 +213,12 @@ static ObAppSettings *get_settings(ObClient *client)
     while (a) {
         ObAppSettings *app = (ObAppSettings *) a->data;
         
-        if (!strcmp(app->name, client->name)) {
+        if (
+            (app->name && && !app->class && !strcmp(app->name, client->name))
+            || (app->class && !app->name && !strcmp(app->class, client->class))
+            || (app->class && app->name && !strcmp(app->class, client->class)
+                && !strcmp(app->name, client->name))
+            ) {
             ob_debug("Window matching: %s\n", app->name);
             /* Match if no role was specified in the per app setting, or if the string
              * matches the beginning of the role, since apps like to set the role to

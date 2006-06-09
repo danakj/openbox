@@ -115,14 +115,28 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                                    xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = parse_find_node("application", node->children);
-    gchar *name;
+    gchar *name, *class;
+    gboolean name_set, class_set;
+    gboolean x_pos_given;
 
     while (app) {
-        gboolean x_pos_given = FALSE;
-        if (parse_attr_string("name", app, &name)) {
+        name_set = class_set = x_pos_given = FALSE;
+
+        class_set = parse_attr_string("class", app, &class);
+        name_set = parse_attr_string("name", app, &name);
+        if (class_set || name_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = g_new0(ObAppSettings, 1);
-            settings->name = name;
+            
+            if (name_set)
+                settings->name = name;
+            else
+                settings->name = NULL;
+            if (class_set)
+                settings->class = class;
+            else
+                settings->class = NULL;
+
             if (!parse_attr_string("role", app, &settings->role))
                 settings->role = NULL;
 
@@ -810,6 +824,7 @@ void config_shutdown()
         ObAppSettings *itd = (ObAppSettings *)it->data;
         g_free(itd->name);
         g_free(itd->role);
+        g_free(itd->class);
         g_free(it->data);
     }
     g_slist_free(config_per_app_settings);

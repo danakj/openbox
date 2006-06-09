@@ -214,7 +214,7 @@ static ObAppSettings *get_settings(ObClient *client)
         ObAppSettings *app = (ObAppSettings *) a->data;
         
         if (
-            (app->name && && !app->class && !strcmp(app->name, client->name))
+            (app->name && !app->class && !strcmp(app->name, client->name))
             || (app->class && !app->name && !strcmp(app->class, client->class))
             || (app->class && app->name && !strcmp(app->class, client->class)
                 && !strcmp(app->name, client->name))

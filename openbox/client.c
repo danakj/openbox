@@ -329,9 +329,9 @@ void client_manage(Window window)
         if (settings->iconic != -1)
             client_iconify(self, settings->iconic, FALSE);
         if (settings->skip_pager != -1)
-            client->skip_pager = !!settings->skip_pager;
+            self->skip_pager = !!settings->skip_pager;
         if (settings->skip_taskbar != -1)
-            client->skip_taskbar = !!settings->skip_taskbar;
+            self->skip_taskbar = !!settings->skip_taskbar;
 
         /* 1 && -1 shouldn't be possible by the code in config.c */
         if (settings->max_vert == 1 && self->max_horz == 1)

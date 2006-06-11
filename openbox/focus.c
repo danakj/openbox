@@ -749,7 +749,7 @@ static void to_bottom(ObClient *c, guint d)
         /* insert before first iconic window */
         for (it = focus_order[d];
              it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
-        g_list_insert_before(focus_order[d], it, c);
+        focus_order[d] = g_list_insert_before(focus_order[d], it, c);
     }
 }
 

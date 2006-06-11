@@ -329,6 +329,7 @@ void RrMinsize(RrAppearance *a, gint *w, gint *h)
             *w = MAX(*w, m->width + 4);
             m->height = RrFontHeight(a->texture[i].data.text.font);
             *h += MAX(*h, m->height);
+            g_free(m);
             break;
         case RR_TEXTURE_RGBA:
             *w += MAX(*w, a->texture[i].data.rgba.width);

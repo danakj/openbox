@@ -203,12 +203,12 @@ RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring)
 void RrFontClose(RrFont *f)
 {
     if (f) {
+#ifdef USE_PANGO
+        pango_font_description_free(f->pango_font_description);
+#endif
         XftFontClose(RrDisplay(f->inst), f->xftfont);
         g_free(f);
     }
-#ifdef USE_PANGO
-    pango_font_description_free(f->pango_font_description);
-#endif
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,

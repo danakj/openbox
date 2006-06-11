@@ -29,8 +29,6 @@ gboolean extensions_xinerama  = FALSE;
 gint     extensions_xinerama_event_basep;
 gboolean extensions_randr     = FALSE;
 gint     extensions_randr_event_basep;
-gboolean extensions_vidmode   = FALSE;
-gint     extensions_vidmode_event_basep;
 
 void extensions_query_all()
 {
@@ -59,12 +57,6 @@ void extensions_query_all()
     extensions_randr =
         XRRQueryExtension(ob_display, &extensions_randr_event_basep,
                           &junk);
-#endif
-
-#ifdef VIDMODE
-    extensions_vidmode =
-        XF86VidModeQueryExtension(ob_display, &extensions_vidmode_event_basep,
-                                  &junk);
 #endif
 }
 

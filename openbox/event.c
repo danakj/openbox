@@ -600,11 +600,6 @@ static void event_handle_root(XEvent *e)
         break;
     default:
         ;
-#ifdef VIDMODE
-        if (extensions_vidmode && e->type == extensions_vidmode_event_basep) {
-            ob_debug("VIDMODE EVENT\n");
-        }
-#endif
     }
 }
 

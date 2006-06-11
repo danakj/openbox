@@ -397,62 +397,6 @@ AC_DEFUN([X11_EXT_XINERAMA],
   fi
 ])
 
-# VIDMODE()
-#
-# Check for the presence of the "VidMode" X Window System extension.
-# Defines "VIDMODE" and sets the $(VIDMODE) variable to "yes" if the extension
-# is present.
-AC_DEFUN([X11_EXT_VIDMODE],
-[
-  AC_REQUIRE([X11_DEVEL])
-
-  # Store these
-  OLDLIBS=$LIBS
-  OLDCPPFLAGS=$CPPFLAGS
-     
-  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_LIBS -lXext -lXxf86vm"
-
-  AC_CHECK_LIB([Xxf86vm], [XF86VidModeGetViewPort],
-    AC_MSG_CHECKING([for X11/extensions/xf86vmode.h])
-    AC_TRY_LINK(
-    [
-      #include <X11/Xlib.h>
-      #include <X11/extensions/xf86vmode.h>
-    ],
-    [
-      Display *d;
-      int i;
-      XF86VidModeQueryExtension(d, &i, &i);
-      XF86VidModeGetViewPort(d, i, &i, &i);
-    ],
-    [
-      AC_MSG_RESULT([yes])
-      VIDMODE="yes"
-      AC_DEFINE([VIDMODE], [1], [Found the VidMode extension])
-
-      VIDMODE_CFLAGS=""
-      VIDMODE_LIBS="-lXext -lXxf86vm"
-      AC_SUBST(VIDMODE_CFLAGS)
-      AC_SUBST(VIDMODE_LIBS)
-    ],
-    [ 
-      AC_MSG_RESULT([no])
-      VIDMODE="no"
-    ])
-  )
-
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
-
-  AC_MSG_CHECKING([for the VidMode extension])
-  if test "$VIDMODE" = "yes"; then
-    AC_MSG_RESULT([yes])
-  else
-    AC_MSG_RESULT([no])
-  fi
-])
-
 # X11_SM()
 #
 # Check for the presence of SMlib for session management.

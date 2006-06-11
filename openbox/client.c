@@ -2035,35 +2035,16 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
     /* set the size and position if fullscreen */
     if (self->fullscreen) {
-#ifdef VIDMODE
-        gint dot;
-        XF86VidModeModeLine mode;
-#endif
         Rect *a;
         guint i;
 
         i = client_monitor(self);
         a = screen_physical_area_monitor(i);
 
-#ifdef VIDMODE
-        if (i == 0 && /* primary head */
-            extensions_vidmode &&
-            XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y) &&
-            /* get the mode last so the mode.privsize isnt freed incorrectly */
-            XF86VidModeGetModeLine(ob_display, ob_screen, &dot, &mode)) {
-            x += a->x;
-            y += a->y;
-            w = mode.hdisplay;
-            h = mode.vdisplay;
-            if (mode.privsize) XFree(mode.private);
-        } else
-#endif
-        {
-            x = a->x;
-            y = a->y;
-            w = a->width;
-            h = a->height;
-        }
+        x = a->x;
+        y = a->y;
+        w = a->width;
+        h = a->height;
 
         user = FALSE; /* ignore that increment etc shit when in fullscreen */
     } else {
@@ -2346,12 +2327,6 @@ static void client_iconify_recursive(ObClient *self,
             /* this puts it after the current focused window */
             focus_order_remove(self);
             focus_order_add_new(self);
-
-            /* this is here cuz with the VIDMODE extension, the viewport can
-               change while a fullscreen window is iconic, and when it
-               uniconifies, it would be nice if it did so to the new position
-               of the viewport */
-            client_reconfigure(self);
 
             changed = TRUE;
         }

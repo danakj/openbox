@@ -121,7 +121,6 @@ openbox_openbox_LDADD = \
 	$(XINERAMA_LIBS) \
 	$(XKB_LIBS) \
 	$(XRANDR_LIBS) \
-	$(VIDMODE_LIBS) \
 	$(XSHAPE_LIBS) \
 	$(GLIB_LIBS) \
 	$(X_LIBS) \

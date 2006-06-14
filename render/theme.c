@@ -1200,6 +1200,8 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
                 *grad = RR_SURFACE_HORIZONTAL;
             else if (strstr(tex, "vertical") != NULL)
                 *grad = RR_SURFACE_VERTICAL;
+            else if (strstr(tex, "split") != NULL)
+                *grad = RR_SURFACE_SPLIT;
             else
                 *grad = RR_SURFACE_DIAGONAL;
         } else {

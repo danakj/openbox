@@ -419,6 +419,9 @@ static void gradient_split(RrAppearance *a, gint w, gint h)
     current = COLOR(y3);
     for (x = w - 1; x >= 0; --x)  /* 0 -> w */
         *(data++) = current;
+
+    RrColorFree(primary_light);
+    RrColorFree(secondary_light);
 }
 
 static void gradient_horizontal(RrSurface *sf, gint w, gint h)

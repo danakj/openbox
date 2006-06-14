@@ -189,7 +189,7 @@ static void gradient_solid(RrSurface *sf, gint w, gint h)
 {
     RrPixel32 pix;
     gint i, a, b;
-    RrAppearance *l = &sf->parent;
+    RrAppearance *l = sf->parent;
     gint left = 0, top = 0, right = w - 1, bottom = h - 1;
 
     pix = (sf->primary->r << RrDefaultRedOffset)
@@ -366,7 +366,7 @@ static void gradient_solid(RrSurface *sf, gint w, gint h)
 static void gradient_split(RrSurface *sf, gint w, gint h)
 {
     gint x, y1, y3, r, g, b;
-    RrAppearance *a = &a->parent;
+    RrAppearance *a = sf->parent;
     RrPixel32 *data = sf->pixel_data;
     RrPixel32 current;
     RrColor *primary_light, *secondary_light;

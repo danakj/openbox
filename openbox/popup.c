@@ -40,10 +40,11 @@ ObPopup *popup_new(gboolean hasicon)
     self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
 
     attrib.override_redirect = True;
+    attrib.save_under = True;
     self->bg = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
                              0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                              InputOutput, RrVisual(ob_rr_inst),
-                             CWOverrideRedirect, &attrib);
+                             CWOverrideRedirect | CWSaveUnder, &attrib);
     
     self->text = XCreateWindow(ob_display, self->bg,
                                0, 0, 1, 1, 0, RrDepth(ob_rr_inst),

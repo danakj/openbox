@@ -1,0 +1,123 @@
+# Croatian messages for openbox.
+# Copyright (C) 2006 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# Daniel Radetic <drade@boobah.info>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.3\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2005-09-01 18:05+0200\n"
+"PO-Revision-Date: 2006-06-28 09:31+0100\n"
+"Last-Translator: Daniel Radetic <drade@boobah.info>\n"
+"Language-Team: None\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/client_list_menu.c:95
+msgid "Go there..."
+msgstr "Odi tamo..."
+
+#: openbox/client_list_menu.c:161
+msgid "Desktops"
+msgstr "Radne površine"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Ponovno uspostavi"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Maksimiziraj"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Spusti dolje"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Povuci gore"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Sve radne površine"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Razina"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Uvijek na vrhu"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Normalno"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Uvijek na dnu"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "Pošalji na desktop"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Meni klijenta"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Ikonificiraj"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Podigni na vrh"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Spusti na dno"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Decoriraj"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Pomakni"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Promjeni veli?inu"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Zatvori"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id zahtjeva argument\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file zahtjeva argument\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Nemogu napraviti direktorij '%s': %s"
+
+#: render/font.c:57
+msgid "Couldn't initialize Xft."
+msgstr "Nemogu pokrenuti Xft."
+
+#: render/font.c:194 render/font.c:199
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Nemogu u?itati slova: %s\n"
+
+#: render/font.c:195
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Isprobavam osnovni tip slova: %s\n"

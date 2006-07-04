@@ -1,0 +1,123 @@
+# German messages for openbox.
+# Copyright (C) 2006 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# Sebastian Vahl <svahl@web.de>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.3\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2005-09-01 18:05+0200\n"
+"PO-Revision-Date: 2006-06-11 10:41+0200\n"
+"Last-Translator: Sebastian Vahl <svahl@web.de>\n"
+"Language-Team:  <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/client_list_menu.c:95
+msgid "Go there..."
+msgstr "Gehe zu..."
+
+#: openbox/client_list_menu.c:161
+msgid "Desktops"
+msgstr ""
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Maximieren"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Abrollen"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Aufrollen"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Alle Desktops"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Fenster"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Immer im Vordergrund"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr ""
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Immer im Hintergrund"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "An Desktop senden"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr ""
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Minimieren"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "In den Vordergrund"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "In den Hintergrund"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Dekoriere"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Verschieben"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Größe ändern "
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Schließen"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr ""
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr ""
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr ""
+
+#: render/font.c:57
+msgid "Couldn't initialize Xft."
+msgstr "Konnte Xft nicht initializieren"
+
+#: render/font.c:194 render/font.c:199
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Font konnte nicht geladen werden: %s\n"
+
+#: render/font.c:195
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr ""
+

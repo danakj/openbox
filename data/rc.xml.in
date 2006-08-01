@@ -16,20 +16,33 @@
 
 <focus>
   <focusNew>yes</focusNew>
-  <followMouse>no</followMouse>
   <focusLast>no</focusLast>
+  <followMouse>no</followMouse>
   <focusDelay>0</focusDelay>
   <raiseOnFocus>no</raiseOnFocus>
 </focus>
 
+<placement>
+  <policy>Smart</policy>
+  <!-- 'Smart' or 'UnderMouse' -->
+</placement>
+
 <theme>
   <name>TheBear</name>
   <titlelayout>NLIMC</titlelayout>
+  <!--
+      avaible characters are NDSLIMC, each can occur at most once.
+      N: client menu
+      L: window label (AKA title).
+      I: iconify
+      M: maximize
+      C: close
+      S: shade
+      D: omnipresent (on all desktops).
+  -->
+  <keepBorder>yes</keepBorder>
+  <hideDisabled>no</hideDisabled>
 </theme>
-
-<placement>
-  <policy>Smart</policy>
-</placement>
 
 <desktops>
   <number>4</number>
@@ -45,18 +58,25 @@
 <resize>
   <drawContents>yes</drawContents>
   <fourCorners>no</fourCorners>
+  <popupShow>Nonpixel</popupShow>
+  <!-- 'Always', 'Never', or 'Nonpixel' (xterms and such) -->
+  <popupPosition>Center</popupPosition>
+  <!-- 'Center' or 'Top' -->
 </resize>
 
 <dock>
   <position>TopLeft</position>
-  <stacking>Top</stacking>
-  <direction>Vertical</direction>
+  <!-- (Top|Bottom)(Left|Right|)|Left|Right|Floating -->
   <floatingX>0</floatingX>
   <floatingY>0</floatingY>
+  <noStrut>no</noStrut>
+  <stacking>Top</stacking>
+  <direction>Vertical</direction>
+  <!-- 'Vertical' or 'Horizontal' -->
   <autoHide>no</autoHide>
   <hideDelay>300</hideDelay>
-  <desktopMenuIcons>yes</desktopMenuIcons>
-  <moveButton>A-Left</moveButton>
+  <showDelay>300</showDelay>
+  <moveButton>Middle</moveButton>
 </dock>
 
 <keyboard>
@@ -350,6 +370,37 @@
 
   <!-- default menu file (or custom one in $HOME/.config/openbox/) -->
   <file>menu.xml</file>
+  <warpPointer>yes</warpPointer>
+  <xorStyle>yes</xorStyle>
+  <hideDelay>250</hideDelay>
+  <submenuShowDelay>0</submenuShowDelay>
+  <desktopMenuIcons>yes</desktopMenuIcons>
+  <!-- -->
 </menu>
+
+<applications>
+<!--
+  <application name="this application does not exist">
+    <decor>yes</decor>
+    <shade>no</shade>
+    <position>
+      <x>center</x>
+      <y>200</y>
+    </position>
+    <focus>yes</focus>
+    <desktop>1</desktop>
+    <head>0</head>
+    # specifies xinerama head
+    <layer>normal</layer>
+    # 'above', 'normal', or 'below'
+    <iconic>no</iconic>
+    <skip_pager>no</skip_pager>
+    <skip_taskbar>no</skip_taskbar>
+    <fullscreen>yes</fullscreen>
+    <maximized>true</maximized>
+    # 'Horizontal', 'Vertical' or boolean (yes/no/on/off/true/false)
+  </application>
+ -->
+</applications>
 
 </openbox_config>

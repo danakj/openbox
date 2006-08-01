@@ -204,8 +204,6 @@ void client_manage_all()
     XFree(children);
 }
 
-/* This should possibly do something more interesting than just match
- * against WM_CLASS literally. */
 static ObAppSettings *get_settings(ObClient *client)
 {
     GSList *a = config_per_app_settings;

@@ -66,7 +66,8 @@ typedef enum {
     RR_SURFACE_VERTICAL,
     RR_SURFACE_DIAGONAL,
     RR_SURFACE_CROSS_DIAGONAL,
-    RR_SURFACE_PYRAMID
+    RR_SURFACE_PYRAMID,
+    RR_SURFACE_OSX
 } RrSurfaceColorType;
 
 typedef enum {

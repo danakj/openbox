@@ -1196,6 +1196,8 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
                 *grad = RR_SURFACE_CROSS_DIAGONAL;
             else if (strstr(tex, "pyramid") != NULL)
                 *grad = RR_SURFACE_PYRAMID;
+            else if (strstr(tex, "osx") != NULL)
+                *grad = RR_SURFACE_OSX;
             else if (strstr(tex, "horizontal") != NULL)
                 *grad = RR_SURFACE_HORIZONTAL;
             else if (strstr(tex, "vertical") != NULL)

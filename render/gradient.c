@@ -27,6 +27,7 @@ static void gradient_solid(RrAppearance *l, gint w, gint h);
 static void gradient_split(RrAppearance *a, gint w, gint h);
 static void gradient_vertical(RrSurface *sf, gint w, gint h);
 static void gradient_horizontal(RrSurface *sf, gint w, gint h);
+static void gradient_osx(RrSurface *sf, gint w, gint h);
 static void gradient_diagonal(RrSurface *sf, gint w, gint h);
 static void gradient_crossdiagonal(RrSurface *sf, gint w, gint h);
 static void gradient_pyramid(RrSurface *sf, gint inw, gint inh);
@@ -50,6 +51,9 @@ void RrRender(RrAppearance *a, gint w, gint h)
         break;
     case RR_SURFACE_HORIZONTAL:
         gradient_horizontal(&a->surface, w, h);
+        break;
+    case RR_SURFACE_OSX:
+        gradient_osx(&a->surface, w, h);
         break;
     case RR_SURFACE_DIAGONAL:
         gradient_diagonal(&a->surface, w, h);
@@ -434,6 +438,43 @@ static void gradient_horizontal(RrSurface *sf, gint w, gint h)
     SETUP(x, sf->primary, sf->secondary, w);
 
     for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
+        current = COLOR(x);
+        datav = data;
+        for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
+            *datav = current;
+            datav += w;
+        }
+        ++data;
+
+        NEXT(x);
+    }
+    current = COLOR(x);
+    for (y = h - 1; y >= 0; --y)  /* 0 -> h */
+        *(data + y * w) = current;
+}
+
+static void gradient_osx(RrSurface *sf, gint w, gint h)
+{
+    gint x, y;
+    RrPixel32 *data = sf->pixel_data, *datav;
+    RrPixel32 current;
+
+    VARS(x);
+    SETUP(x, sf->primary, sf->secondary, w/2);
+
+    for (x = w - 1; x > w/2-1; --x) {  /* 0 -> w-1 */
+        current = COLOR(x);
+        datav = data;
+        for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
+            *datav = current;
+            datav += w;
+        }
+        ++data;
+
+        NEXT(x);
+    }
+    SETUP(x, sf->secondary, sf->primary, w/2);
+    for (x = w/2 - 1; x > 0; --x) {  /* 0 -> w-1 */
         current = COLOR(x);
         datav = data;
         for (y = h - 1; y >= 0; --y) {  /* 0 -> h */

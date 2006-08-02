@@ -183,6 +183,8 @@ struct _ObAction {
    action_move_relative_vert - the delta
    action_resize_relative_horz - the delta
    action_resize_relative_vert - the delta
+   action_move_relative - the deltas
+   action_resize_relative - the deltas
 */
 
 ObAction* action_from_string(const gchar *name, ObUserAction uact);
@@ -260,6 +262,10 @@ void action_toggle_omnipresent(union ActionData *data);
 void action_move_relative_horz(union ActionData *data);
 /* MoveResizeRelative */
 void action_move_relative_vert(union ActionData *data);
+/* MoveResizeRelative */
+void action_move_relative(union ActionData *data);
+/* MoveResizeRelative */
+void action_resize_relative(union ActionData *data);
 /* ClientAction */
 void action_move_to_center(union ActionData *data);
 /* MoveResizeRelative */

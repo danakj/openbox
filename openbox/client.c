@@ -341,14 +341,14 @@ void client_manage(Window window)
         }
 
         /* 1 && -1 shouldn't be possible by the code in config.c */
-        if (settings->max_vert == 1 && self->max_horz == 1)
+        if (settings->max_vert == 1 && settings->max_horz == 1)
             client_maximize(self, TRUE, 0, TRUE);
-        else if (settings->max_vert == 0 && self->max_horz == 0)
+        else if (settings->max_vert == 0 && settings->max_horz == 0)
             client_maximize(self, FALSE, 0, TRUE);
-        else if (settings->max_vert == 1 && self->max_horz == 0) {
+        else if (settings->max_vert == 1 && settings->max_horz == 0) {
             client_maximize(self, TRUE, 2, TRUE);
             client_maximize(self, FALSE, 1, TRUE);
-        } else if (settings->max_vert == 0 && self->max_horz == 1) {
+        } else if (settings->max_vert == 0 && settings->max_horz == 1) {
             client_maximize(self, TRUE, 1, TRUE);
             client_maximize(self, FALSE, 2, TRUE);
         }

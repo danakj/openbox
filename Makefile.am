@@ -19,7 +19,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 INCLUDES = -I.
 
-noinst_PROGRAMS = \
+check_PROGRAMS = \
 	render/rendertest
 
 lib_LTLIBRARIES = \

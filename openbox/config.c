@@ -795,7 +795,7 @@ void config_startup(ObParseInst *i)
     config_menu_warppointer = TRUE;
     config_menu_xorstyle = TRUE;
     config_menu_hide_delay = 250;
-    config_menu_middle = TRUE;
+    config_menu_middle = FALSE;
     config_submenu_show_delay = 0;
     config_menu_client_list_icons = TRUE;
     config_menu_files = NULL;

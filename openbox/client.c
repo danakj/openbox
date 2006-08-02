@@ -1234,7 +1234,7 @@ void client_update_normal_hints(ObClient *self)
         if (size.flags & PBaseSize)
             SIZE_SET(self->base_size, size.base_width, size.base_height);
     
-        if (size.flags & PResizeInc && size.width_inc && size_height_inc)
+        if (size.flags & PResizeInc && size.width_inc && size.height_inc)
             SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
     }
 }

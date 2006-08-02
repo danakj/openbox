@@ -193,9 +193,10 @@ void moveresize_end(gboolean cancel)
 
 static void do_move(gboolean resist)
 {
-    if (resist)
+    if (resist) {
         resist_move_windows(moveresize_client, &cur_x, &cur_y);
-    resist_move_monitors(moveresize_client, &cur_x, &cur_y);
+        resist_move_monitors(moveresize_client, &cur_x, &cur_y);
+    }
 
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
@@ -216,9 +217,10 @@ static void do_resize(gboolean resist)
     cur_y += moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
 
-    if (resist)
+    if (resist) {
         resist_size_windows(moveresize_client, &cur_x, &cur_y, lockcorner);
-    resist_size_monitors(moveresize_client, &cur_x, &cur_y, lockcorner);
+        resist_size_monitors(moveresize_client, &cur_x, &cur_y, lockcorner);
+    }
 
     cur_x -= moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;

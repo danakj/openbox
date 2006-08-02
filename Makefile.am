@@ -268,6 +268,13 @@ dist_thebear_theme_DATA = \
 ## public headers ##
 
 pubinclude_HEADERS = \
+	render/color.h \
+	render/font.h \
+	render/geom.h \
+	render/gradient.h \
+	render/image.h \
+	render/instance.h \
+	render/mask.h \
 	render/render.h \
 	render/theme.h \
 	parser/parse.h

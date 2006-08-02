@@ -290,7 +290,9 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         }
     }
 
-    if (config_focus_follow && !config_focus_last) {
+    if (config_focus_follow &&
+        (type == OB_FOCUS_FALLBACK_UNFOCUSING || !config_focus_last))
+    {
         if ((target = client_under_pointer()))
             if (client_normal(target) && client_can_focus(target))
                 return target;

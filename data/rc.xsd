@@ -205,6 +205,7 @@
             <xs:element minOccurs="0" name="warpPointer" type="ob:bool"/>
             <xs:element minOccurs="0" name="xorStyle" type="ob:bool"/>
             <xs:element minOccurs="0" name="hideDelay" type="xs:integer"/>
+            <xs:element minOccurs="0" name="middle" type="ob:bool"/>
             <xs:element minOccurs="0" name="submenuShowDelay" type="xs:integer"/>
             <xs:element minOccurs="0" name="desktopMenuIcons" type="ob:bool"/>
         </xs:sequence>

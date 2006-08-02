@@ -628,6 +628,16 @@ gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
     menu_frame_update(self);
 
     menu_frame_visible = g_list_prepend(menu_frame_visible, self);
+    
+    if (config_menu_middle) {
+        if (self->parent)
+            menu_frame_move(self, self->area.x, self->area.y
+                                                - self->area.height/2
+                                                + self->item_h/2);
+        else if (self->show_title)
+            menu_frame_move(self, self->area.x - self->area.width/2,
+                            self->area.y - self->title_h*3/4);
+    }
 
     menu_frame_move_on_screen(self);
 
@@ -780,10 +790,14 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     f = menu_frame_new(self->entry->data.submenu.submenu,
                        self->frame->client);
     menu_frame_move(f,
-                    self->frame->area.x + self->frame->area.width
-                    - ob_rr_theme->menu_overlap - ob_rr_theme->bwidth,
-                    self->frame->area.y + self->frame->title_h +
-                    self->area.y + ob_rr_theme->menu_overlap);
+                    self->frame->area.x
+                  + self->frame->area.width
+                  - ob_rr_theme->menu_overlap
+                  - ob_rr_theme->bwidth,
+                    self->frame->area.y
+                  + self->frame->title_h
+                  + self->area.y
+                  + (config_menu_middle ? 1 : ob_rr_theme->menu_overlap));
     menu_frame_show(f, self->frame);
 }
 

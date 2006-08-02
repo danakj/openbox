@@ -122,6 +122,8 @@ extern gboolean config_menu_warppointer;
 extern gboolean config_menu_xorstyle;
 /*! delay for hiding menu when opening */
 extern guint    config_menu_hide_delay;
+/*! Center menus vertically about the parent entry */
+extern gboolean config_menu_middle;
 /*! delay before opening a submenu */
 extern guint    config_submenu_show_delay;
 /*! show icons in client_list_menu */

@@ -557,6 +557,16 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
+        "moverelative",
+        action_move_relative,
+        setup_client_action
+    },
+    {
+        "resizerelative",
+        action_resize_relative,
+        setup_client_action
+    },
+    {
         "maximizefull",
         action_maximize_full,
         setup_client_action
@@ -872,7 +882,21 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        act->func == action_resize_relative_horz ||
                        act->func == action_resize_relative_vert) {
                 if ((n = parse_find_node("delta", node->xmlChildrenNode)))
-                    act->data.relative.delta = parse_int(doc, n);
+                    act->data.relative.deltax = parse_int(doc, n);
+            } else if (act->func == action_move_relative) {
+                if ((n = parse_find_node("x", node->xmlChildrenNode)))
+                    act->data.relative.deltax = parse_int(doc, n);
+                if ((n = parse_find_node("y", node->xmlChildrenNode)))
+                    act->data.relative.deltay = parse_int(doc, n);
+            } else if (act->func == action_resize_relative) {
+                if ((n = parse_find_node("left", node->xmlChildrenNode)))
+                    act->data.relative.deltaxl = parse_int(doc, n);
+                if ((n = parse_find_node("up", node->xmlChildrenNode)))
+                    act->data.relative.deltayu = parse_int(doc, n);
+                if ((n = parse_find_node("right", node->xmlChildrenNode)))
+                    act->data.relative.deltax = parse_int(doc, n);
+                if ((n = parse_find_node("down", node->xmlChildrenNode)))
+                    act->data.relative.deltay = parse_int(doc, n);
             } else if (act->func == action_desktop) {
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.desktop.desk = parse_int(doc, n);
@@ -1162,7 +1186,7 @@ void action_move_relative_horz(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
     client_action_start(data);
-    client_move(c, c->area.x + data->relative.delta, c->area.y);
+    client_move(c, c->area.x + data->relative.deltax, c->area.y);
     client_action_end(data);
 }
 
@@ -1170,7 +1194,7 @@ void action_move_relative_vert(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
     client_action_start(data);
-    client_move(c, c->area.x, c->area.y + data->relative.delta);
+    client_move(c, c->area.x, c->area.y + data->relative.deltax);
     client_action_end(data);
 }
 
@@ -1190,7 +1214,7 @@ void action_resize_relative_horz(union ActionData *data)
     ObClient *c = data->relative.any.c;
     client_action_start(data);
     client_resize(c,
-                  c->area.width + data->relative.delta * c->size_inc.width,
+                  c->area.width + data->relative.deltax * c->size_inc.width,
                   c->area.height);
     client_action_end(data);
 }
@@ -1201,9 +1225,32 @@ void action_resize_relative_vert(union ActionData *data)
     if (!c->shaded) {
         client_action_start(data);
         client_resize(c, c->area.width, c->area.height +
-                      data->relative.delta * c->size_inc.height);
+                      data->relative.deltax * c->size_inc.height);
         client_action_end(data);
     }
+}
+
+void action_move_relative(union ActionData *data)
+{
+    ObClient *c = data->relative.any.c;
+    client_action_start(data);
+    client_move(c, c->area.x + data->relative.deltax, c->area.y +
+                data->relative.deltay);
+    client_action_end(data);
+}
+
+void action_resize_relative(union ActionData *data)
+{
+    ObClient *c = data->relative.any.c;
+    client_action_start(data);
+    client_move_resize(c,
+                  c->area.x - data->relative.deltaxl * c->size_inc.width,
+                  c->area.y - data->relative.deltayu * c->size_inc.height,
+                  c->area.width + data->relative.deltax  * c->size_inc.width
+                                + data->relative.deltaxl * c->size_inc.width,
+                  c->area.height + data->relative.deltay  * c->size_inc.height
+                                 + data->relative.deltayu * c->size_inc.height);
+    client_action_end(data);
 }
 
 void action_maximize_full(union ActionData *data)

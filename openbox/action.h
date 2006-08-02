@@ -82,7 +82,10 @@ struct Activate {
 
 struct MoveResizeRelative {
     struct AnyAction any;
-    gint delta;
+    gint deltax;
+    gint deltay;
+    gint deltaxl;
+    gint deltayu;
 };
 
 struct SendToDesktop {

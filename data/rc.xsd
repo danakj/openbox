@@ -151,6 +151,12 @@
             <xs:element minOccurs="0" name="execute" type="xs:string"/>
             <xs:element minOccurs="0" name="menu" type="xs:string"/>
             <xs:element minOccurs="0" name="delta" type="xs:integer"/>
+            <xs:element minOccurs="0" name="x" type="xs:integer"/>
+            <xs:element minOccurs="0" name="y" type="xs:integer"/>
+            <xs:element minOccurs="0" name="left" type="xs:integer"/>
+            <xs:element minOccurs="0" name="right" type="xs:integer"/>
+            <xs:element minOccurs="0" name="up" type="xs:integer"/>
+            <xs:element minOccurs="0" name="down" type="xs:integer"/>
             <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
             <xs:element minOccurs="0" name="wrap" type="ob:bool"/>
             <xs:element minOccurs="0" name="follow" type="ob:bool"/>
@@ -272,6 +278,7 @@
             <xs:enumeration value="MaximizeHorz"/>
             <xs:enumeration value="MaximizeVert"/>
             <xs:enumeration value="Move"/>
+            <xs:enumeration value="MoveRelative"/>
             <xs:enumeration value="MoveRelativeHorz"/>
             <xs:enumeration value="MoveRelativeVert"/>
             <xs:enumeration value="MoveToCenter"/>
@@ -285,6 +292,7 @@
             <xs:enumeration value="RaiseLower"/>
             <xs:enumeration value="Reconfigure"/>
             <xs:enumeration value="Resize"/>
+            <xs:enumeration value="ResizeRelative"/>
             <xs:enumeration value="ResizeRelativeHorz"/>
             <xs:enumeration value="ResizeRelativeVert"/>
             <xs:enumeration value="Restart"/>

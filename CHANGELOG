@@ -4,6 +4,15 @@
   * Fix incorrect handling of window properties on 64 bit arches.
   * Fix pixelsize being the same as size for pango, now it is correct.
   * Fix drawing of icons taller than wide, eg gimp.
+  * Add a 'osx' gradient, like horizontal but mirrored in the center and
+    'split' which is like vertical but nonlinear in a fancy way.
+  * Translations for de, hr and zh_TW added.
+  * Add initial per-app settings support.
+  * Fix some outstanding issues with 64-bit support.
+  * Add an optional delay for displaying submenus so you can move the mouse
+    over some entries without flashing each submenu.
+  * Plug some minor memleaks and fix minor bugs.
+  * Changed algorithm for downscaling window icons.
 
 3.3-rc2:
   * Fixed some typos and errors in rc.xsd

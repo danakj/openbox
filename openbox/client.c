@@ -1244,7 +1244,7 @@ void client_setup_decor_and_functions(ObClient *self)
     /* start with everything (cept fullscreen) */
     self->decorations =
         (OB_FRAME_DECOR_TITLEBAR |
-         (ob_rr_theme->show_handle ? OB_FRAME_DECOR_HANDLE : 0) |
+         OB_FRAME_DECOR_HANDLE |
          OB_FRAME_DECOR_GRIPS |
          OB_FRAME_DECOR_BORDER |
          OB_FRAME_DECOR_ICON |

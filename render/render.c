@@ -48,7 +48,7 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
     if (w <= 0 || h <= 0) return;
 
     if (a->surface.parentx < 0 || a->surface.parenty < 0) {
-        ob_debug("Invalid parent co-ordinates\n");
+        /* ob_debug("Invalid parent co-ordinates\n"); */
         return;
     }
     resized = (a->w != w || a->h != h);

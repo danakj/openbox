@@ -39,7 +39,7 @@ static void pixel_data_to_pixmap(RrAppearance *l,
 
 void RrPaint(RrAppearance *a, Window win, gint w, gint h)
 {
-    gint i, transferred = 0, sw;
+    gint i, transferred = 0, sw, sh, partial_w, partial_h;
     RrPixel32 *source, *dest;
     Pixmap oldp;
     RrRect tarea; /* area in which to draw textures */
@@ -47,6 +47,10 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
 
     if (w <= 0 || h <= 0) return;
 
+    if (a->surface.parentx < 0 || a->surface.parenty < 0) {
+        ob_debug("Invalid parent co-ordinates\n");
+        return;
+    }
     resized = (a->w != w || a->h != h);
 
     oldp = a->pixmap; /* save to free after changing the visible pixmap */
@@ -72,11 +76,26 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
         g_assert (a->surface.parent->w);
 
         sw = a->surface.parent->w;
+        sh = a->surface.parent->h;
+
+        if (a->surface.parentx >= sw || a->surface.parenty >= sh) {
+            return;
+        }
+
         source = (a->surface.parent->surface.pixel_data +
                   a->surface.parentx + sw * a->surface.parenty);
         dest = a->surface.pixel_data;
-        for (i = 0; i < h; i++, source += sw, dest += w) {
-            memcpy(dest, source, w * sizeof(RrPixel32));
+
+        if (a->surface.parentx + w > sw) {
+            partial_w = sw - a->surface.parentx;
+        } else partial_w = w;
+
+        if (a->surface.parenty + h > sh) {
+            partial_h = sh - a->surface.parenty;
+        } else partial_h = h;
+
+        for (i = 0; i < partial_h; i++, source += sw, dest += w) {
+            memcpy(dest, source, partial_w * sizeof(RrPixel32));
         }
     } else
         RrRender(a, w, h);
@@ -255,7 +274,7 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->bevel_dark);
         RrColorFree(p->bevel_light);
         g_free(p->pixel_data);
-
+        p->pixel_data = NULL;
         g_free(a);
     }
 }

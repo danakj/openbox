@@ -249,7 +249,8 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
 
     old = focus_client;
 
-    if (type == OB_FOCUS_FALLBACK_UNFOCUSING && old) {
+    if ((type == OB_FOCUS_FALLBACK_UNFOCUSING
+         || type == OB_FOCUS_FALLBACK_CLOSED) && old) {
         if (old->transient_for) {
             gboolean trans = FALSE;
 

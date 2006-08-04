@@ -1071,7 +1071,8 @@ void action_focus(union ActionData *data)
 
 void action_unfocus (union ActionData *data)
 {
-    client_unfocus(data->client.any.c);
+    if (data->client.any.c == focus_client);
+        focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
 }
 
 void action_iconify(union ActionData *data)

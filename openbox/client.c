@@ -2833,13 +2833,15 @@ gboolean client_focus(ObClient *self)
     return TRUE;
 }
 
+/* Used when the current client is closed, focus_last will then prevent
+ * focus from going to the mouse pointer */
 void client_unfocus(ObClient *self)
 {
     if (focus_client == self) {
 #ifdef DEBUG_FOCUS
         ob_debug("client_unfocus for %lx\n", self->window);
 #endif
-        focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
+        focus_fallback(OB_FOCUS_FALLBACK_CLOSED);
     }
 }
 

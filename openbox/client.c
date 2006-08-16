@@ -1535,8 +1535,8 @@ void client_update_title(ObClient *self)
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
         /* try old x stuff */
-        if (!PROP_GETS(self->window, wm_name, locale, &data)
-            && !PROP_GETS(self->window, wm_name, utf8, &data)) {
+        if (!(PROP_GETS(self->window, wm_name, locale, &data)
+              || PROP_GETS(self->window, wm_name, utf8, &data))) {
             // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
             if (self->transient) {
                 data = g_strdup("");
@@ -1573,8 +1573,8 @@ void client_update_title(ObClient *self)
         data = ndata;
     }
 
-    PROP_SETS(self->window, net_wm_visible_name, data);
 no_number:
+    PROP_SETS(self->window, net_wm_visible_name, data);
     self->title = data;
 
     if (self->frame)
@@ -1590,7 +1590,8 @@ no_number:
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_icon_name, utf8, &data))
         /* try old x stuff */
-        if (!PROP_GETS(self->window, wm_icon_name, locale, &data)) {
+        if (!(PROP_GETS(self->window, wm_icon_name, locale, &data)
+              || PROP_GETS(self->window, wm_icon_name, utf8, &data))) {
             data = g_strdup(self->title);
             read_title = FALSE;
         }

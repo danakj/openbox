@@ -45,7 +45,7 @@ int main (int argc, char **argv) {
   if (argc > 3)
     nameenc = XInternAtom(display,argv[3],False);
   else
-    nameenc = XInternAtom(display,argv[3],False);
+    nameenc = XInternAtom(display,"STRING",False);
 
   win = XCreateWindow(display, RootWindow(display, 0),
 		      x, y, w, h, 10, CopyFromParent, CopyFromParent,

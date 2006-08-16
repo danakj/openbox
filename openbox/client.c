@@ -1535,7 +1535,8 @@ void client_update_title(ObClient *self)
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
         /* try old x stuff */
-        if (!PROP_GETS(self->window, wm_name, locale, &data)) {
+        if (!PROP_GETS(self->window, wm_name, locale, &data)
+            && !PROP_GETS(self->window, wm_name, utf8, &data)) {
             // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
             if (self->transient) {
                 data = g_strdup("");

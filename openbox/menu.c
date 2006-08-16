@@ -24,6 +24,7 @@
 #include "config.h"
 #include "screen.h"
 #include "menuframe.h"
+#include "keyboard.h"
 #include "geom.h"
 #include "misc.h"
 #include "client_menu.h"
@@ -286,7 +287,8 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     ObMenuFrame *frame;
     guint i;
 
-    if (!(self = menu_from_name(name))) return;
+    if (!(self = menu_from_name(name))
+        || keyboard_interactively_grabbed()) return;
 
     /* if the requested menu is already the top visible menu, then don't
        bother */

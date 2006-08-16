@@ -288,6 +288,11 @@ void keyboard_event(ObClient *client, const XEvent *e)
     }
 }
 
+gboolean keyboard_interactively_grabbed()
+{
+    return !!interactive_states;
+}
+
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);

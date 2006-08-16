@@ -103,7 +103,8 @@
     <xs:complexType name="theme">
         <xs:sequence>
             <xs:element minOccurs="0" name="name" type="xs:string"/>
-            <xs:element minOccurs="0" name="titlelayout" type="xs:string"/>
+            <xs:element minOccurs="0" name="titleLayout" type="xs:string"/>
+            <xs:element minOccurs="0" name="titleNumber" type="ob:bool"/>
             <xs:element minOccurs="0" name="keepBorder" type="ob:bool"/>
             <xs:element minOccurs="0" name="hideDisabled" type="ob:bool"/>
         </xs:sequence>

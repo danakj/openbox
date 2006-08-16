@@ -1550,27 +1550,29 @@ void client_update_title(ObClient *self)
     if (old_title && 0 != strncmp(old_title, data, strlen(data)))
         self->title_count = 1;
 
-    /* look for duplicates and append a number */
-    nums = 0;
-    for (it = client_list; it; it = g_list_next(it))
-        if (it->data != self) {
-            ObClient *c = it->data;
-            if (0 == strncmp(c->title, data, strlen(data)))
-                nums |= 1 << c->title_count;
+    if (config_title_number) {
+        /* look for duplicates and append a number */
+        nums = 0;
+        for (it = client_list; it; it = g_list_next(it))
+            if (it->data != self) {
+                ObClient *c = it->data;
+                if (0 == strncmp(c->title, data, strlen(data)))
+                    nums |= 1 << c->title_count;
+            }
+        /* find first free number */
+        for (i = 1; i <= 32; ++i)
+            if (!(nums & (1 << i))) {
+                if (self->title_count == 1 || i == 1)
+                    self->title_count = i;
+                break;
+            }
+        /* dont display the number for the first window */
+        if (self->title_count > 1) {
+            gchar *ndata;
+            ndata = g_strdup_printf("%s - [%u]", data, self->title_count);
+            g_free(data);
+            data = ndata;
         }
-    /* find first free number */
-    for (i = 1; i <= 32; ++i)
-        if (!(nums & (1 << i))) {
-            if (self->title_count == 1 || i == 1)
-                self->title_count = i;
-            break;
-        }
-    /* dont display the number for the first window */
-    if (self->title_count > 1) {
-        gchar *ndata;
-        ndata = g_strdup_printf("%s - [%u]", data, self->title_count);
-        g_free(data);
-        data = ndata;
     }
 
 no_number:
@@ -1596,7 +1598,9 @@ no_number:
             read_title = FALSE;
         }
 
-    /* append the title count, dont display the number for the first window */
+    /* append the title count, dont display the number for the first window.
+     * We don't need to check for config_title_number here since title_count
+     * is not set above 1 then. */
     if (read_title && self->title_count > 1) {
         gchar *vdata, *ndata;
         ndata = g_strdup_printf(" - [%u]", self->title_count);

@@ -29,7 +29,8 @@
 
 <theme>
   <name>TheBear</name>
-  <titlelayout>NLIMC</titlelayout>
+  <titleLayout>NLIMC</titlelayout>
+  <titleNumber>yes</titlenumber>
   <!--
       avaible characters are NDSLIMC, each can occur at most once.
       N: client menu

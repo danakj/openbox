@@ -81,15 +81,17 @@ extern guint config_dock_app_move_button;
 /*! The modifiers to be used with the button to move dock apps */
 extern guint config_dock_app_move_modifiers;
 
-/* The name of the theme */
+/*! The name of the theme */
 extern gchar *config_theme;
 
-/* Show the onepixel border after toggleDecor */
+/*! Show the one-pixel border after toggleDecor */
 extern gboolean config_theme_keepborder;
-/* Hide window frame buttons that the window doesn't allow */
+/*! Hide window frame buttons that the window doesn't allow */
 extern gboolean config_theme_hidedisabled;
-/* Titlebar button layout */
+/*! Titlebar button layout */
 extern gchar *config_title_layout;
+/*! Append a unique number to windows with same titles */
+extern gboolean config_title_number;
 
 /*! The number of desktops */
 extern gint config_desktops_num;

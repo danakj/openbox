@@ -65,7 +65,8 @@ void ob_main_loop_timeout_remove(ObMainLoop *loop,
                                  GSourceFunc handler);
 void ob_main_loop_timeout_remove_data(ObMainLoop *loop,
                                       GSourceFunc handler,
-                                      gpointer data);
+                                      gpointer data,
+                                      gboolean cancel_dest);
 
 struct _ObAction;
 

@@ -176,7 +176,7 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
     case SN_MONITOR_EVENT_CANCELED:
         if ((d = wait_find(sn_startup_sequence_get_id(seq)))) {
             d->feedback = FALSE;
-            ob_main_loop_timeout_remove_data(ob_main_loop, sn_wait_timeout, d);
+            ob_main_loop_timeout_remove_data(ob_main_loop, sn_wait_timeout, d, FALSE);
             change = TRUE;
         }
         break;

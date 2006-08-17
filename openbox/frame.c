@@ -43,6 +43,7 @@
 static void layout_title(ObFrame *self);
 static void flash_done(gpointer data);
 static gboolean flash_timeout(gpointer data);
+static void flash_client_dest(ObClient *client, gpointer data);
 
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
@@ -54,6 +55,18 @@ static Window createWindow(Window parent, gulong mask,
                          RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
                        
+}
+
+void frame_startup(gboolean reconfig)
+{
+    if (reconfig) return;
+    client_add_destructor(flash_client_dest, NULL);
+}
+
+void frame_shutdown(gboolean reconfig)
+{
+    if (reconfig) return;
+    client_remove_destructor(flash_client_dest);
 }
 
 ObFrame *frame_new()
@@ -906,6 +919,11 @@ static gboolean flash_timeout(gpointer data)
     }
 
     return TRUE; /* go again */
+}
+
+static void flash_client_dest(ObClient *client, gpointer data)
+{
+    ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, client);
 }
 
 void frame_flash_start(ObFrame *self)

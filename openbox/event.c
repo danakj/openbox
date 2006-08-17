@@ -175,6 +175,7 @@ void event_shutdown(gboolean reconfig)
 #endif
 
     client_remove_destructor(focus_delay_client_dest);
+    client_remove_destructor(event_client_dest);
     XFreeModifiermap(modmap);
 }
 

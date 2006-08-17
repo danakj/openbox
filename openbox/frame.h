@@ -141,6 +141,8 @@ struct _ObFrame
     GTimeVal  flash_end;
 };
 
+void frame_startup(gboolean reconfig);
+void frame_shutdown(gboolean reconfig);
 ObFrame *frame_new();
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);

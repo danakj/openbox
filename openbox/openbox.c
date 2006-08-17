@@ -248,7 +248,6 @@ gint main(gint argc, gchar **argv)
             grab_startup(reconfigure);
             group_startup(reconfigure);
             client_startup(reconfigure);
-            frame_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
             keyboard_startup(reconfigure);
@@ -285,7 +284,6 @@ gint main(gint argc, gchar **argv)
             keyboard_shutdown(reconfigure);
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
-            frame_shutdown(reconfigure);
             client_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);

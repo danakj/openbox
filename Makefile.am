@@ -286,26 +286,17 @@ dist_orang_theme_DATA= \
 
 syscrash_themedir = $(themedir)/syscrash/openbox-3
 dist_syscrash_theme_DATA= \
-	themes/syscrash/openbox-3/bullet-small.xbm \
 	themes/syscrash/openbox-3/bullet.xbm \
-	themes/syscrash/openbox-3/close-cross.xbm \
 	themes/syscrash/openbox-3/close_disabled.xbm \
-	themes/syscrash/openbox-3/close_hover.xbm \
-	themes/syscrash/openbox-3/close_pressed.xbm \
 	themes/syscrash/openbox-3/close.xbm \
 	themes/syscrash/openbox-3/desk_toggled.xbm \
-	themes/syscrash/openbox-3/desk_toggle.xbm \
 	themes/syscrash/openbox-3/desk.xbm \
-	themes/syscrash/openbox-3/iconify_hover.xbm \
-	themes/syscrash/openbox-3/iconify_pressed.xbm \
 	themes/syscrash/openbox-3/iconify.xbm \
 	themes/syscrash/openbox-3/max_disabled.xbm \
-	themes/syscrash/openbox-3/max_hover.xbm \
 	themes/syscrash/openbox-3/max_pressed.xbm \
 	themes/syscrash/openbox-3/max_toggled.xbm \
 	themes/syscrash/openbox-3/max.xbm \
-	themes/syscrash/openbox-3/shade.xbm \
-	themes/syscrash/openbox-3/themerc
+	themes/syscrash/openbox-3/shade.xbm
 
 ## public headers ##
 

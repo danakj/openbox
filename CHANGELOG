@@ -13,6 +13,14 @@
     over some entries without flashing each submenu.
   * Plug some minor memleaks and fix minor bugs.
   * Changed algorithm for downscaling window icons.
+  * New themes!
+  * Disable support for libstartup-notification by default, it doesn't seem
+    to work well.
+  * Allow disabling of duplicate window numbering by option titleNumber in
+    theme section.
+  * Add moverelative and resizerelative actions.
+  * Option middle for menus that make submenus be centered instead of aligned
+    by the top edge to the parent entry.
 
 3.3-rc2:
   * Fixed some typos and errors in rc.xsd

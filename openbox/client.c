@@ -1546,11 +1546,12 @@ void client_update_title(ObClient *self)
         }
     }
 
-    /* did the title change? then reset the title_count */
-    if (old_title && 0 != strncmp(old_title, data, strlen(data)))
-        self->title_count = 1;
-
     if (config_title_number) {
+
+        /* did the title change? then reset the title_count */
+        if (old_title && 0 != strncmp(old_title, data, strlen(data)))
+            self->title_count = 1;
+
         /* look for duplicates and append a number */
         nums = 0;
         for (it = client_list; it; it = g_list_next(it))
@@ -1573,7 +1574,8 @@ void client_update_title(ObClient *self)
             g_free(data);
             data = ndata;
         }
-    }
+    } else
+        self->title_count = 1;
 
 no_number:
     PROP_SETS(self->window, net_wm_visible_name, data);

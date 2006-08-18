@@ -432,7 +432,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_title_layout = parse_string(doc, n);
     }
     if ((n = parse_find_node("titleNumber", node)))
-        config_theme_titlenumber = parse_bool(doc, n);
+        config_title_number = parse_bool(doc, n);
     if ((n = parse_find_node("keepBorder", node)))
         config_theme_keepborder = parse_bool(doc, n);
     if ((n = parse_find_node("hideDisabled", node)))

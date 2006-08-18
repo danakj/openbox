@@ -11,7 +11,7 @@ pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 userscriptdir   = $(datadir)/openbox
 
-theme = TheBear
+theme = bear2
 
 AUTOMAKE_OPTIONS = subdir-objects foreign
 
@@ -226,44 +226,86 @@ tools_gnome_panel_control_gnome_panel_control_SOURCES = \
 
 ## themes ##
 
-allegro_themedir = $(themedir)/Allegro/openbox-3
-dist_allegro_theme_DATA = \
-	themes/Allegro/openbox-3/themerc \
-	themes/Allegro/openbox-3/bullet.xbm
+mikachu_themedir = $(themedir)/Mikachu/openbox-3
+dist_mikachu_theme_DATA= \
+	themes/Mikachu/openbox-3/bullet.xbm \
+	themes/Mikachu/openbox-3/close.xbm \
+	themes/Mikachu/openbox-3/desk.xbm \
+	themes/Mikachu/openbox-3/iconify.xbm \
+	themes/Mikachu/openbox-3/max.xbm \
+	themes/Mikachu/openbox-3/themerc
 
-artwiz_themedir = $(themedir)/Artwiz/openbox-3
-dist_artwiz_theme_DATA = \
-	themes/Artwiz/openbox-3/themerc
 
-blah41_themedir = $(themedir)/Blah41/openbox-3
-dist_blah41_theme_DATA = \
-	themes/Blah41/openbox-3/themerc
+natura_themedir = $(themedir)/Natura/openbox-3
+dist_natura_theme_DATA= \
+	themes/Natura/openbox-3/close_hover.xbm \
+	themes/Natura/openbox-3/close.xbm \
+	themes/Natura/openbox-3/desk_toggled.xbm \
+	themes/Natura/openbox-3/desk.xbm \
+	themes/Natura/openbox-3/iconify_disabled.xbm \
+	themes/Natura/openbox-3/iconify_hover.xbm \
+	themes/Natura/openbox-3/iconify.xbm \
+	themes/Natura/openbox-3/max_disabled.xbm \
+	themes/Natura/openbox-3/max_hover.xbm \
+	themes/Natura/openbox-3/max_toggled.xbm \
+	themes/Natura/openbox-3/max.xbm \
+	themes/Natura/openbox-3/shade.xbm \
+	themes/Natura/openbox-3/themerc
 
-om4ob_themedir = $(themedir)/Om4Ob/openbox-3
-dist_om4ob_theme_DATA = \
-	themes/Om4Ob/openbox-3/themerc \
-	themes/Om4Ob/openbox-3/close_hover.xbm \
-	themes/Om4Ob/openbox-3/close.xbm \
-	themes/Om4Ob/openbox-3/desk_hover.xbm \
-	themes/Om4Ob/openbox-3/desk_toggled.xbm \
-	themes/Om4Ob/openbox-3/desk.xbm \
-	themes/Om4Ob/openbox-3/iconify_hover.xbm \
-	themes/Om4Ob/openbox-3/iconify_pressed.xbm \
-	themes/Om4Ob/openbox-3/iconify.xbm \
-	themes/Om4Ob/openbox-3/max_disabled.xbm \
-	themes/Om4Ob/openbox-3/max_hover.xbm \
-	themes/Om4Ob/openbox-3/max_pressed.xbm \
-	themes/Om4Ob/openbox-3/max_toggled.xbm \
-	themes/Om4Ob/openbox-3/max.xbm \
-	themes/Om4Ob/openbox-3/shade_disabled.xbm \
-	themes/Om4Ob/openbox-3/shade_hover.xbm \
-	themes/Om4Ob/openbox-3/shade_toggled.xbm \
-	themes/Om4Ob/openbox-3/shade.xbm
+artwizboxed_themedir = $(themedir)/artwiz-boxed/openbox-3
+dist_artwizboxed_theme_DATA= \
+	themes/artwiz-boxed/openbox-3/bullet.xbm \
+	themes/artwiz-boxed/openbox-3/close.xbm \
+	themes/artwiz-boxed/openbox-3/desk_toggled.xbm \
+	themes/artwiz-boxed/openbox-3/desk.xbm \
+	themes/artwiz-boxed/openbox-3/iconify.xbm \
+	themes/artwiz-boxed/openbox-3/max_toggled.xbm \
+	themes/artwiz-boxed/openbox-3/max.xbm \
+	themes/artwiz-boxed/openbox-3/themerc
+ 
+bear2_themedir = $(themedir)/bear2/openbox-3
+dist_bear2_theme_DATA= \
+	themes/bear2/openbox-3/close_pressed.xbm \
+	themes/bear2/openbox-3/close.xbm \
+	themes/bear2/openbox-3/desk_toggled.xbm \
+	themes/bear2/openbox-3/desk.xbm \
+	themes/bear2/openbox-3/iconify_disabled.xbm \
+	themes/bear2/openbox-3/iconify_pressed.xbm \
+	themes/bear2/openbox-3/iconify.xbm \
+	themes/bear2/openbox-3/max_disabled.xbm \
+	themes/bear2/openbox-3/max_pressed.xbm \
+	themes/bear2/openbox-3/max_toggled.xbm \
+	themes/bear2/openbox-3/max.xbm \
+	themes/bear2/openbox-3/shade_pressed.xbm \
+	themes/bear2/openbox-3/shade.xbm \
+	themes/bear2/openbox-3/themerc
+ 
+orang_themedir = $(themedir)/orang/openbox-3
+dist_orang_theme_DATA= \
+	themes/orang/openbox-3/themerc
 
-thebear_themedir = $(themedir)/TheBear/openbox-3
-dist_thebear_theme_DATA = \
-	themes/TheBear/openbox-3/themerc
-
+syscrash_themedir = $(themedir)/syscrash/openbox-3
+dist_syscrash_theme_DATA= \
+	themes/syscrash/openbox-3/bullet-small.xbm \
+	themes/syscrash/openbox-3/bullet.xbm \
+	themes/syscrash/openbox-3/close-cross.xbm \
+	themes/syscrash/openbox-3/close_disabled.xbm \
+	themes/syscrash/openbox-3/close_hover.xbm \
+	themes/syscrash/openbox-3/close_pressed.xbm \
+	themes/syscrash/openbox-3/close.xbm \
+	themes/syscrash/openbox-3/desk_toggled.xbm \
+	themes/syscrash/openbox-3/desk_toggle.xbm \
+	themes/syscrash/openbox-3/desk.xbm \
+	themes/syscrash/openbox-3/iconify_hover.xbm \
+	themes/syscrash/openbox-3/iconify_pressed.xbm \
+	themes/syscrash/openbox-3/iconify.xbm \
+	themes/syscrash/openbox-3/max_disabled.xbm \
+	themes/syscrash/openbox-3/max_hover.xbm \
+	themes/syscrash/openbox-3/max_pressed.xbm \
+	themes/syscrash/openbox-3/max_toggled.xbm \
+	themes/syscrash/openbox-3/max.xbm \
+	themes/syscrash/openbox-3/shade.xbm \
+	themes/syscrash/openbox-3/themerc
 
 ## public headers ##
 

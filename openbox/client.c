@@ -361,7 +361,7 @@ void client_manage(Window window)
 
         if (settings->desktop < screen_num_desktops
             || settings->desktop == DESKTOP_ALL)
-            client_set_desktop(self, settings->desktop, FALSE);
+            client_set_desktop(self, settings->desktop, TRUE);
 
         if (settings->layer > -2 && settings->layer < 2)
             client_set_layer(self, settings->layer);

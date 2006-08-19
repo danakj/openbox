@@ -69,7 +69,7 @@ void menu_startup(gboolean reconfig)
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
                                       (GDestroyNotify)menu_destroy_hash_value);
 
-    client_list_menu_startup();
+    client_list_menu_startup(reconfig);
     client_menu_startup();
 
     menu_parse_inst = parse_startup();
@@ -109,6 +109,8 @@ void menu_shutdown(gboolean reconfig)
 
     parse_shutdown(menu_parse_inst);
     menu_parse_inst = NULL;
+
+    client_list_menu_shutdown(reconfig);
 
     menu_frame_hide_all();
     g_hash_table_destroy(menu_hash);

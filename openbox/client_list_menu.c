@@ -154,10 +154,40 @@ static void self_update(ObMenuFrame *frame, gpointer data)
     }
 }
 
-void client_list_menu_startup()
+static void client_dest(ObClient *client, gpointer data)
+{
+    /* This concise function removes all references to a closed
+     * client in the client_list_menu, so we don't have to check
+     * in client.c */
+    GSList *it;
+    for (it = desktop_menus; it; it = g_slist_next(it)) {
+        ObMenu *mit = it->data;
+        GList *eit;
+        for (eit = mit->entries; eit; eit = g_list_next(eit)) {
+            ObMenuEntry *meit = eit->data;
+            if (meit->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+                ObAction *a = meit->data.normal.actions->data;
+                ObClient *c = a->data.any.c;
+                if (c == client)
+                    a->data.any.c = NULL;
+            }
+        }
+    }
+}
+
+void client_list_menu_startup(gboolean reconfig)
 {
     ObMenu *menu;
 
+    if (!reconfig)
+        client_add_destructor(client_dest, NULL);
+
     menu = menu_new(MENU_NAME, _("Desktops"), NULL);
     menu_set_update_func(menu, self_update);
+}
+
+void client_list_menu_shutdown(gboolean reconfig)
+{
+    if (!reconfig)
+        client_remove_destructor(client_dest);
 }

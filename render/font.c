@@ -28,7 +28,7 @@
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
-#if USE_PANGO && !ENABLE_NLS
+#if USE_PANGO
 #include <locale.h>
 #endif
 

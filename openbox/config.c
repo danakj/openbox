@@ -133,6 +133,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                 settings->name = name;
             else
                 settings->name = NULL;
+
             if (class_set)
                 settings->class = class;
             else

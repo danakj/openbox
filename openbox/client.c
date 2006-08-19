@@ -359,7 +359,8 @@ void client_manage(Window window)
         if (settings->fullscreen != -1)
             client_fullscreen(self, !!settings->fullscreen, TRUE);
 
-        if (settings->desktop < screen_num_desktops)
+        if (settings->desktop < screen_num_desktops
+            || settings->desktop == DESKTOP_ALL)
             client_set_desktop(self, settings->desktop, FALSE);
 
         if (settings->layer > -2 && settings->layer < 2)

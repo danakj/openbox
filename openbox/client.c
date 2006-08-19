@@ -322,6 +322,9 @@ void client_manage(Window window)
     /* get and set application level settings */
     settings = get_settings(self);
 
+    stacking_add(CLIENT_AS_WINDOW(self));
+    client_restore_session_stacking(self);
+
     if (settings) {
         /* Don't worry, we won't actually both shade and undecorate the
          * window when push comes to shove. */
@@ -363,9 +366,6 @@ void client_manage(Window window)
             client_set_layer(self, settings->layer);
 
     }
-
-    stacking_add(CLIENT_AS_WINDOW(self));
-    client_restore_session_stacking(self);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&

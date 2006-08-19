@@ -134,7 +134,6 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     }
 
     /* based on gtkmain.c gtk_get_default_language() */
-    PangoLanguage *ln;
     gchar *locale, *p;
     locale = g_strdup(setlocale(LC_CTYPE, NULL));
     if ((p = strchr(locale, '.')))
@@ -143,7 +142,7 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
         *p = '\0';
     PangoFontMetrics *metrics = 
         pango_context_get_metrics(context, out->pango_font_description,
-                                  ln = pango_language_from_string(locale));
+                                  pango_language_from_string(locale));
     out->pango_ascent = pango_font_metrics_get_ascent(metrics);
     out->pango_descent = pango_font_metrics_get_descent(metrics);
     g_free(locale);

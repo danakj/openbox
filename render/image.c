@@ -26,37 +26,6 @@
 #define FLOOR(i)        ((i) & (~0UL << FRACTION))
 #define AVERAGE(a, b)   (((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)))
 
-static RrPixel32* scale_half(RrPixel32 *source, gint w, gint h)
-{
-    RrPixel32 *out, *dest, *sourceline, *sourceline2;
-    gint dw, dh, x, y;
-
-    sourceline = source;
-    sourceline2 = source + w;
-
-    dw = w >> 1;
-    dh = h >> 1;
-
-    out = dest = g_new(RrPixel32, dw * dh);
-
-    for (y = 0; y < dh; ++y) {
-        RrPixel32 *s, *s2;
-
-        s = sourceline;
-        s2 = sourceline2;
-
-        for (x = 0; x < dw; ++x) {
-            *dest++ = AVERAGE(AVERAGE(*s, *(s+1)),
-                              AVERAGE(*s2, *(s2+1)));
-            s += 2;
-            s2 += 2;
-        }
-        sourceline += w << 1;
-        sourceline2 += w << 1;
-    }
-    return out;
-}
-
 static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
                                gulong dstW, gulong dstH,
                                gulong srcW, gulong srcH)

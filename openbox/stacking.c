@@ -56,11 +56,12 @@ void stacking_set_list()
 
 static void do_restack(GList *wins, GList *before)
 {
-    GList *it, *next;
+    GList *it;
     Window *win;
     gint i;
 
 #ifdef DEBUG
+    GList *next;
     /* pls only restack stuff in the same layer at a time */
     for (it = wins; it; it = next) {
         next = g_list_next(it);

@@ -29,6 +29,7 @@
 #include "grab.h"
 #include "keyboard.h"
 #include "event.h"
+#include "dock.h"
 #include "config.h"
 #include "mainloop.h"
 

@@ -23,6 +23,7 @@
 #include "geom.h"
 #ifdef USE_PANGO
 #include <pango/pango.h>
+#include <pango/pangoxft.h>
 #endif /* USE_PANGO */
 
 struct _RrFont {

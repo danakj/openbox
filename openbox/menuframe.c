@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "grab.h"
 #include "openbox.h"
+#include "mainloop.h"
 #include "config.h"
 #include "render/theme.h"
 
@@ -189,7 +190,6 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
 void menu_frame_move_on_screen(ObMenuFrame *self)
 {
     Rect *a = NULL;
-    guint i;
     gint dx = 0, dy = 0;
     gint pos, half;
 

@@ -291,8 +291,9 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     gint x,y,w,h;
     XftColor c;
     GString *text;
-    gint mw, mh;
+    gint mw;
 #ifndef USE_PANGO
+    gint mh;
     size_t l;
     gboolean shortened = FALSE;
 #else

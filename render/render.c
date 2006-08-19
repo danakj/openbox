@@ -375,9 +375,9 @@ void RrMinsize(RrAppearance *a, gint *w, gint *h)
 static void reverse_bits(gchar *c, gint n)
 {
     gint i;
-    for (i = 0; i < n; i++)
-        *c++ = (((*c * 0x0802UL & 0x22110UL) |
-                 (*c * 0x8020UL & 0x88440UL)) * 0x10101UL) >> 16;
+    for (i = 0; i < n; i++, *c++)
+        *c = (((*c * 0x0802UL & 0x22110UL) |
+               (*c * 0x8020UL & 0x88440UL)) * 0x10101UL) >> 16;
 }
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,

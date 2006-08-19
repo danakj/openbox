@@ -327,14 +327,8 @@ void stacking_below(ObWindow *window, ObWindow *below)
 
 void stacking_add(ObWindow *win)
 {
-    ObStackingLayer l;
-    GList *wins;
-
     g_assert(screen_support_win != None); /* make sure I dont break this in the
                                              future */
-
-    l = window_layer(win);
-    wins = g_list_append(NULL, win); /* list of 1 element */
 
     stacking_list = g_list_append(stacking_list, win);
     stacking_raise(win, FALSE);

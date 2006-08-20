@@ -296,7 +296,8 @@ dist_syscrash_theme_DATA= \
 	themes/syscrash/openbox-3/max_pressed.xbm \
 	themes/syscrash/openbox-3/max_toggled.xbm \
 	themes/syscrash/openbox-3/max.xbm \
-	themes/syscrash/openbox-3/shade.xbm
+	themes/syscrash/openbox-3/shade.xbm \
+	themes/syscrash/openbox-3/themerc
 
 ## public headers ##
 

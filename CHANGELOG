@@ -21,6 +21,8 @@
   * Add moverelative and resizerelative actions.
   * Option middle for menus that make submenus be centered instead of aligned
     by the top edge to the parent entry.
+  * Fix transient (ie dialog) windows being placed offscreen if the parent
+    is close to the edge of the screen.
 
 3.3-rc2:
   * Fixed some typos and errors in rc.xsd

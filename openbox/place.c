@@ -412,21 +412,24 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
     return FALSE;
 }
 
-void place_client(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
+/* Return TRUE if we want client.c to enforce on-screen-keeping */
+gboolean place_client(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
 {
+    gboolean ret = FALSE;
     if (client->positioned)
-        return;
-    if (place_transient(client, x, y)             ||
+        return FALSE;
+    if (place_transient(client, x, y))
+        ret = TRUE;;
+    else if (!(
         place_per_app_setting(client, x, y, settings) ||
         ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
          place_under_mouse(client, x, y) :
          place_smart(client, x, y, SMART_FULL)    ||
          place_smart(client, x, y, SMART_GROUP)   ||
          place_smart(client, x, y, SMART_FOCUSED) ||
-         place_random(client, x, y)))
-    {
-        /* get where the client should be */
-        frame_frame_gravity(client->frame, x, y);
-    } else
+         place_random(client, x, y))))
         g_assert_not_reached(); /* the last one better succeed */
+    /* get where the client should be */
+    frame_frame_gravity(client->frame, x, y);
+    return ret;
 }

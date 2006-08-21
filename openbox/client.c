@@ -415,8 +415,9 @@ void client_manage(Window window)
     if (ob_state() == OB_STATE_RUNNING) {
         gint x = self->area.x, ox = x;
         gint y = self->area.y, oy = y;
+        gboolean transient;
 
-        place_client(self, &x, &y, settings);
+        transient = place_client(self, &x, &y, settings);
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &x, &y,
@@ -432,10 +433,11 @@ void client_manage(Window window)
                                 off-screen and on xinerama divides (ie,
                                 it is up to the placement routines to avoid
                                 the xinerama divides) */
-                             ((self->positioned & PPosition) &&
-                              !(self->positioned & USPosition)) &&
-                             client_normal(self) &&
-                             !self->session);
+                             transient ||
+                             (((self->positioned & PPosition) &&
+                               !(self->positioned & USPosition)) &&
+                              client_normal(self) &&
+                              !self->session));
         if (x != ox || y != oy) 	 
             client_move(self, x, y);
     }

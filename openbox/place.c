@@ -419,7 +419,7 @@ gboolean place_client(ObClient *client, gint *x, gint *y, ObAppSettings *setting
     if (client->positioned)
         return FALSE;
     if (place_transient(client, x, y))
-        ret = TRUE;;
+        ret = TRUE;
     else if (!(
         place_per_app_setting(client, x, y, settings) ||
         ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?

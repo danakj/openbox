@@ -1,6 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    render.c for the Openbox window manager
+   Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003        Ben Jansens
    Copyright (c) 2003        Derek Foreman
 

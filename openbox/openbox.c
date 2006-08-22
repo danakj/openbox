@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    openbox.c for the Openbox window manager
-   Copyright (c) 2004        Mikael Magnusson
+   Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003        Ben Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -358,7 +358,7 @@ static void signal_handler(gint signal, gpointer data)
 static void print_version()
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
-    g_print("Copyright (c) 2004 Mikael Magnusson\n");
+    g_print("Copyright (c) 2006 Mikael Magnusson\n");
     g_print("Copyright (c) 2003 Ben Jansens\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");

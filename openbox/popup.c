@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    popup.c for the Openbox window manager
-   Copyright (c) 2004        Mikael Magnusson
+   Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003        Ben Jansens
 
    This program is free software; you can redistribute it and/or modify

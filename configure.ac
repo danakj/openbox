@@ -77,7 +77,7 @@ AC_SUBST(GLIB_LIBS)
 AC_ARG_ENABLE(pango,
   AC_HELP_STRING(
     [--disable-pango],
-    [disable the pango library [[default=yes]]]
+    [disable the pango library [[default=enabled]]]
   ),
   [enable_pango=$enableval],
   [enable_pango=yes]
@@ -108,7 +108,7 @@ AC_SUBST(XML_LIBS)
 AC_ARG_ENABLE(startup-notification,
   AC_HELP_STRING(
     [--enable-startup-notification],
-    [enable the startup notification library. [[default=no]]]
+    [enable the startup notification library. [[default=disabled]]]
   ),
   [enable_sn=$enableval],
   [enable_sn=no]

@@ -25,10 +25,10 @@
 
 static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised);
 static void gradient_solid(RrAppearance *l, gint w, gint h);
-static void gradient_split(RrAppearance *a, gint w, gint h);
+static void gradient_splitvertical(RrAppearance *a, gint w, gint h);
 static void gradient_vertical(RrSurface *sf, gint w, gint h);
 static void gradient_horizontal(RrSurface *sf, gint w, gint h);
-static void gradient_osx(RrSurface *sf, gint w, gint h);
+static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h);
 static void gradient_diagonal(RrSurface *sf, gint w, gint h);
 static void gradient_crossdiagonal(RrSurface *sf, gint w, gint h);
 static void gradient_pyramid(RrSurface *sf, gint inw, gint inh);
@@ -44,8 +44,8 @@ void RrRender(RrAppearance *a, gint w, gint h)
     case RR_SURFACE_SOLID:
         gradient_solid(a, w, h);
         break;
-    case RR_SURFACE_SPLIT:
-        gradient_split(a, w, h);
+    case RR_SURFACE_SPLIT_VERTICAL:
+        gradient_splitvertical(a, w, h);
         break;
     case RR_SURFACE_VERTICAL:
         gradient_vertical(&a->surface, w, h);
@@ -53,8 +53,8 @@ void RrRender(RrAppearance *a, gint w, gint h)
     case RR_SURFACE_HORIZONTAL:
         gradient_horizontal(&a->surface, w, h);
         break;
-    case RR_SURFACE_OSX:
-        gradient_osx(&a->surface, w, h);
+    case RR_SURFACE_MIRROR_HORIZONTAL:
+        gradient_mirrorhorizontal(&a->surface, w, h);
         break;
     case RR_SURFACE_DIAGONAL:
         gradient_diagonal(&a->surface, w, h);
@@ -363,7 +363,7 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
     }                                                     \
 }
 
-static void gradient_split(RrAppearance *a, gint w, gint h)
+static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 {
     gint x, y1, y3, r, g, b;
     RrSurface *sf = &a->surface;
@@ -449,7 +449,7 @@ static void gradient_horizontal(RrSurface *sf, gint w, gint h)
         *(data + y * w) = current;
 }
 
-static void gradient_osx(RrSurface *sf, gint w, gint h)
+static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
 {
     gint x, y;
     RrPixel32 *data = sf->pixel_data, *datav;

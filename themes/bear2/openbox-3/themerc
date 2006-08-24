@@ -40,7 +40,7 @@ menu.items.active.bg.border.color: #416c98
 
 !!Active
 
-window.active.title.bg: flat border gradient osx
+window.active.title.bg: flat border gradient mirrorhorizontal
 window.active.title.bg.color: #3465A4
 window.active.title.bg.colorTo: #407CCA
 window.active.title.bg.border.color: #699acd
@@ -61,7 +61,7 @@ window.*.grip.bg: parentrelative
 
 !!Inactive
 
-window.inactive.title.bg: flat border gradient osx
+window.inactive.title.bg: flat border gradient mirrorhorizontal
 window.inactive.title.bg.color: #dcdcdc
 window.inactive.title.bg.colorTo: #eeeeec
 window.inactive.title.bg.border.color: #efefef

@@ -14,7 +14,7 @@ window.*.client.color: #eeeeee
 *.text.justify: left
 
 !! Menu
-menu.title.bg: flat gradient split
+menu.title.bg: flat gradient splitvertical
 menu.title.bg.color: #5c4e45
 menu.title.bg.colorTo: #51443e
 menu.title.text.color: #ffffff
@@ -25,13 +25,13 @@ menu.items.bg.color: #f9f2ee
 menu.items.text.color: #000000
 menu.items.disabled.text.color: #737573
 
-menu.items.active.bg: flat gradient split
+menu.items.active.bg: flat gradient splitvertical
 menu.items.active.bg.color:  #5c4e45
 menu.items.active.bg.colorTo:#51443e
 menu.items.active.text.color: #f9f2ee
 
 !! Active Windows
-window.active.title.bg: flat gradient split
+window.active.title.bg: flat gradient splitvertical
 window.active.title.bg.color: #5c4e45
 window.active.title.bg.colorTo: #51443e
 window.active.*.bg.border.color: #000000

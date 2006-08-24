@@ -4,8 +4,9 @@
   * Fix incorrect handling of window properties on 64 bit arches.
   * Fix pixelsize being the same as size for pango, now it is correct.
   * Fix drawing of icons taller than wide, eg gimp.
-  * Add a 'osx' gradient, like horizontal but mirrored in the center and
-    'split' which is like vertical but nonlinear in a fancy way.
+  * Add a 'mirrorhorizontal' gradient, like horizontal but mirrored in the
+    center and 'splitvertical' which is like vertical but nonlinear in a fancy
+    way.
   * Translations for de, hr and zh_TW added.
   * Add initial per-app settings support.
   * Fix some outstanding issues with 64-bit support.

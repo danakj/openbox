@@ -26,7 +26,7 @@ menu.frame.justify: left
 window.label.text.justify: left
 
 !! focused window settings
-window.active.client.color: #00FF00
+window.active.client.color: #8080A0
 
 window.active.title.bg: raised gradient crossdiagonal bevel1
 window.active.title.bg.color: #6699CC

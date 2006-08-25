@@ -89,7 +89,7 @@ msgstr "Pomakni"
 
 #: openbox/client_menu.c:249
 msgid "Resize"
-msgstr "Promjeni veli?inu"
+msgstr "Promjeni veličinu"
 
 #: openbox/client_menu.c:255
 msgid "Close"

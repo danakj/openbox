@@ -1,0 +1,123 @@
+# Translation of openbox.pot to Slovak.
+# Copyright (C) 2006 Mikael Magnusson
+# This file is distributed under the same license as the Openbox 3 package.
+# Jozef Říha <jose1711@gmail.com>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox-3.3rc2\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2005-09-01 18:05+0200\n"
+"PO-Revision-Date: 2006-08-25 00:52+0200\n"
+"Last-Translator: Jozef Riha <jose1711@gmail.com\n"
+"Language-Team: Slovak <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/client_list_menu.c:95
+msgid "Go there..."
+msgstr "Prejsť na..."
+
+#: openbox/client_list_menu.c:161
+msgid "Desktops"
+msgstr "Plochy"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Obnoviť"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Maximalizovať"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Rozvinúť"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Zvinúť"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Všetky plochy"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Vrstva"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Vždy navrchu"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Normálna"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Vždy dole"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "Poslať na plochu"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Menu klienta"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Do ikony"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Presunúť navrch"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Presunúť naspodok"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Dekorácia"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Presunúť"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Zmena veľkosti"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Zavrieť"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id vyžaduje parameter\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file vyžaduje parameter\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Nebolo možné vytvoriť adresár '%s': %s"
+
+#: render/font.c:57
+msgid "Couldn't initialize Xft."
+msgstr "Nepodarilo sa inicializovať Xft."
+
+#: render/font.c:194 render/font.c:199
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Nepodarilo sa načítať font: %s\n"
+
+#: render/font.c:195
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Pokus o návrat k fontu: %s\n"

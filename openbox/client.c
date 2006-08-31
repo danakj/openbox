@@ -1304,7 +1304,8 @@ void client_setup_decor_and_functions(ObClient *self)
                    (self->mwmhints.decorations & OB_MWM_DECOR_TITLE)))
                 /* if the mwm hints request no handle or title, then all
                    decorations are disabled */
-                self->decorations = config_theme_keepborder ? OB_FRAME_DECOR_BORDER : 0;
+                self->decorations = config_theme_keepborder ?
+                    self->decorations & OB_FRAME_DECOR_BORDER : 0;
         }
     }
 

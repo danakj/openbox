@@ -1,3 +1,6 @@
+3.4:
+  * Fix panels getting a border with keepBorder turned on.
+
 3.3:
   * Add a showDelay option for the dock.
   * Fixed onscreen-keeping code which broke a bit in -rc2.

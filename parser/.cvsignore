@@ -1,7 +1,0 @@
-.deps
-.libs
-libobparser.la
-.dirstamp
-parser_libobparser_la-parse.l
-obparser-3.0.pc
-parser_libobparser_la-parse.lo

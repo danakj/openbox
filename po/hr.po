@@ -7,19 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2005-09-01 18:05+0200\n"
-"PO-Revision-Date: 2006-06-28 09:31+0100\n"
+"POT-Creation-Date: 2006-08-27 00:26+0200\n"
+"PO-Revision-Date: 2006-09-05 16:45+0100\n"
 "Last-Translator: Daniel Radetic <drade@boobah.info>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:95
+#: openbox/client_list_menu.c:96
 msgid "Go there..."
-msgstr "Odi tamo..."
+msgstr "Odi na..."
 
-#: openbox/client_list_menu.c:161
+#: openbox/client_list_menu.c:186
 msgid "Desktops"
 msgstr "Radne površine"
 
@@ -61,7 +61,7 @@ msgstr "Uvijek na dnu"
 
 #: openbox/client_menu.c:188
 msgid "Send to desktop"
-msgstr "Pošalji na desktop"
+msgstr "Pošalji na radnu površinu"
 
 #: openbox/client_menu.c:192
 msgid "Client menu"
@@ -81,7 +81,7 @@ msgstr "Spusti na dno"
 
 #: openbox/client_menu.c:239
 msgid "Decorate"
-msgstr "Decoriraj"
+msgstr "Dekoriraj"
 
 #: openbox/client_menu.c:245
 msgid "Move"
@@ -108,16 +108,18 @@ msgstr "--sm-save-file zahtjeva argument\n"
 msgid "Unable to make directory '%s': %s"
 msgstr "Nemogu napraviti direktorij '%s': %s"
 
-#: render/font.c:57
+#: render/font.c:58
 msgid "Couldn't initialize Xft."
 msgstr "Nemogu pokrenuti Xft."
 
-#: render/font.c:194 render/font.c:199
+#: render/font.c:193
+#: render/font.c:198
 #, c-format
 msgid "Unable to load font: %s\n"
-msgstr "Nemogu u?itati slova: %s\n"
+msgstr "Nemogu učitati slova: %s\n"
 
-#: render/font.c:195
+#: render/font.c:194
 #, c-format
 msgid "Trying fallback font: %s\n"
 msgstr "Isprobavam osnovni tip slova: %s\n"
+

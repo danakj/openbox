@@ -374,7 +374,7 @@
   <warpPointer>yes</warpPointer>
   <xorStyle>yes</xorStyle>
   <hideDelay>250</hideDelay>
-  <middle>yes</middle>
+  <middle>no</middle>
   <submenuShowDelay>0</submenuShowDelay>
   <desktopMenuIcons>yes</desktopMenuIcons>
   <!-- -->

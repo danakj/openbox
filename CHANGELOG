@@ -1,5 +1,6 @@
-3.4:
+3.3.1:
   * Fix panels getting a border with keepBorder turned on.
+  * Fix a crash in mirrorhorizontal when drawing a surface with width 1.
 
 3.3:
   * Add a showDelay option for the dock.

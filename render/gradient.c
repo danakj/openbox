@@ -458,28 +458,30 @@ static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
     VARS(x);
     SETUP(x, sf->primary, sf->secondary, w/2);
 
-    for (x = w - 1; x > w/2-1; --x) {  /* 0 -> w-1 */
-        current = COLOR(x);
-        datav = data;
-        for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
-            *datav = current;
-            datav += w;
-        }
-        ++data;
+    if (w > 1) {
+        for (x = w - 1; x > w/2-1; --x) {  /* 0 -> w-1 */
+            current = COLOR(x);
+            datav = data;
+            for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
+                *datav = current;
+                datav += w;
+            }
+            ++data;
 
-        NEXT(x);
-    }
-    SETUP(x, sf->secondary, sf->primary, w/2);
-    for (x = w/2 - 1; x > 0; --x) {  /* 0 -> w-1 */
-        current = COLOR(x);
-        datav = data;
-        for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
-            *datav = current;
-            datav += w;
+            NEXT(x);
         }
-        ++data;
+        SETUP(x, sf->secondary, sf->primary, w/2);
+        for (x = w/2 - 1; x > 0; --x) {  /* 0 -> w-1 */
+            current = COLOR(x);
+            datav = data;
+            for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
+                *datav = current;
+                datav += w;
+            }
+            ++data;
 
-        NEXT(x);
+            NEXT(x);
+        }
     }
     current = COLOR(x);
     for (y = h - 1; y >= 0; --y)  /* 0 -> h */

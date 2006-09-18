@@ -51,7 +51,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 
     for (it = focus_order[d->desktop], i = 0; it; it = g_list_next(it), ++i) {
         ObClient *c = it->data;
-        if (client_normal(c) && !c->skip_taskbar) {
+        if (client_normal(c) && (!c->skip_taskbar || c->iconic)) {
             GSList *acts = NULL;
             ObAction* act;
             ObMenuEntry *e;

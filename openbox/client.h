@@ -575,7 +575,7 @@ ObClient *client_search_transient(ObClient *self, ObClient *search);
 ObClient *client_find_directional(ObClient *c, ObDirection dir);
 
 /*! Return the closest edge in the given direction */
-gint client_directional_edge_search(ObClient *c, ObDirection dir);
+gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);
 
 /*! Set a client window to be above/below other clients.
   @layer < 0 indicates the client should be placed below other clients.<br>

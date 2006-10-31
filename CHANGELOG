@@ -1,3 +1,8 @@
+3.4:
+  * Add MoveFromEdge* actions corresponding to MoveToEdge* but aligns far
+    edges instead of near edges, so if you have two overlapping windows you
+    can easily put them side by side.
+
 3.3.1:
   * Fix panels getting a border with keepBorder turned on.
   * Fix a crash in mirrorhorizontal when drawing a surface with width 1.

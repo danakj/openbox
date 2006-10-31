@@ -303,28 +303,60 @@ void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.dialog = TRUE;
 }
 
+void setup_action_movefromedge_north(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
+    (*a)->data.diraction.direction = OB_DIRECTION_NORTH;
+    (*a)->data.diraction.hang = TRUE;
+}
+
+void setup_action_movefromedge_south(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
+    (*a)->data.diraction.direction = OB_DIRECTION_SOUTH;
+    (*a)->data.diraction.hang = TRUE;
+}
+
+void setup_action_movefromedge_east(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
+    (*a)->data.diraction.direction = OB_DIRECTION_EAST;
+    (*a)->data.diraction.hang = TRUE;
+}
+
+void setup_action_movefromedge_west(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
+    (*a)->data.diraction.direction = OB_DIRECTION_WEST;
+    (*a)->data.diraction.hang = TRUE;
+}
+
 void setup_action_movetoedge_north(ObAction **a, ObUserAction uact)
 {
     (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
     (*a)->data.diraction.direction = OB_DIRECTION_NORTH;
+    (*a)->data.diraction.hang = FALSE;
 }
 
 void setup_action_movetoedge_south(ObAction **a, ObUserAction uact)
 {
     (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
     (*a)->data.diraction.direction = OB_DIRECTION_SOUTH;
+    (*a)->data.diraction.hang = FALSE;
 }
 
 void setup_action_movetoedge_east(ObAction **a, ObUserAction uact)
 {
     (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
     (*a)->data.diraction.direction = OB_DIRECTION_EAST;
+    (*a)->data.diraction.hang = FALSE;
 }
 
 void setup_action_movetoedge_west(ObAction **a, ObUserAction uact)
 {
     (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
     (*a)->data.diraction.direction = OB_DIRECTION_WEST;
+    (*a)->data.diraction.hang = FALSE;
 }
 
 void setup_action_growtoedge_north(ObAction **a, ObUserAction uact)
@@ -782,6 +814,26 @@ ActionString actionstrings[] =
         "previouswindow",
         action_cycle_windows,
         setup_action_cycle_windows_previous
+    },
+    {
+        "movefromedgenorth",
+        action_movetoedge,
+        setup_action_movefromedge_north
+    },
+    {
+        "movefromedgesouth",
+        action_movetoedge,
+        setup_action_movefromedge_south
+    },
+    {
+        "movefromedgewest",
+        action_movetoedge,
+        setup_action_movefromedge_west
+    },
+    {
+        "movefromedgeeast",
+        action_movetoedge,
+        setup_action_movefromedge_east
     },
     {
         "movetoedgenorth",
@@ -1554,18 +1606,20 @@ void action_movetoedge(union ActionData *data)
     
     switch(data->diraction.direction) {
     case OB_DIRECTION_NORTH:
-        y = client_directional_edge_search(c, OB_DIRECTION_NORTH);
+        y = client_directional_edge_search(c, OB_DIRECTION_NORTH, data->diraction.hang)
+            - (data->diraction.hang ? c->frame->area.height : 0);
         break;
     case OB_DIRECTION_WEST:
-        x = client_directional_edge_search(c, OB_DIRECTION_WEST);
+        x = client_directional_edge_search(c, OB_DIRECTION_WEST, data->diraction.hang)
+            - (data->diraction.hang ? c->frame->area.width : 0);
         break;
     case OB_DIRECTION_SOUTH:
-        y = client_directional_edge_search(c, OB_DIRECTION_SOUTH) -
-            c->frame->area.height;
+        y = client_directional_edge_search(c, OB_DIRECTION_SOUTH, data->diraction.hang)
+            - (data->diraction.hang ? 0 : c->frame->area.height);
         break;
     case OB_DIRECTION_EAST:
-        x = client_directional_edge_search(c, OB_DIRECTION_EAST) -
-            c->frame->area.width;
+        x = client_directional_edge_search(c, OB_DIRECTION_EAST, data->diraction.hang)
+            - (data->diraction.hang ? 0 : c->frame->area.width);
         break;
     default:
         g_assert_not_reached();
@@ -1594,7 +1648,7 @@ void action_growtoedge(union ActionData *data)
 
     switch(data->diraction.direction) {
     case OB_DIRECTION_NORTH:
-        dest = client_directional_edge_search(c, OB_DIRECTION_NORTH);
+        dest = client_directional_edge_search(c, OB_DIRECTION_NORTH, FALSE);
         if (a->y == y)
             height = c->frame->area.height / 2;
         else {
@@ -1603,7 +1657,7 @@ void action_growtoedge(union ActionData *data)
         }
         break;
     case OB_DIRECTION_WEST:
-        dest = client_directional_edge_search(c, OB_DIRECTION_WEST);
+        dest = client_directional_edge_search(c, OB_DIRECTION_WEST, FALSE);
         if (a->x == x)
             width = c->frame->area.width / 2;
         else {
@@ -1612,7 +1666,7 @@ void action_growtoedge(union ActionData *data)
         }
         break;
     case OB_DIRECTION_SOUTH:
-        dest = client_directional_edge_search(c, OB_DIRECTION_SOUTH);
+        dest = client_directional_edge_search(c, OB_DIRECTION_SOUTH, FALSE);
         if (a->y + a->height == y + c->frame->area.height) {
             height = c->frame->area.height / 2;
             y = a->y + a->height - height;
@@ -1622,7 +1676,7 @@ void action_growtoedge(union ActionData *data)
         height -= (height - c->frame->area.height) % c->size_inc.height;
         break;
     case OB_DIRECTION_EAST:
-        dest = client_directional_edge_search(c, OB_DIRECTION_EAST);
+        dest = client_directional_edge_search(c, OB_DIRECTION_EAST, FALSE);
         if (a->x + a->width == x + c->frame->area.width) {
             width = c->frame->area.width / 2;
             x = a->x + a->width - width;

@@ -39,6 +39,8 @@
          Add showDelay for the dock
      Tue Jul 18 23:43:15 CEST 2006 - jonaskoelker(a)gnu.org
          hack code for great justice
+     Tue Oct 31 03:30:26 UTC 2006 - mikachu(a)openbox.org
+         Add movefromedge* actions
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -284,6 +286,10 @@
             <xs:enumeration value="MoveRelativeHorz"/>
             <xs:enumeration value="MoveRelativeVert"/>
             <xs:enumeration value="MoveToCenter"/>
+            <xs:enumeration value="MoveFromEdgeEast"/>
+            <xs:enumeration value="MoveFromEdgeNorth"/>
+            <xs:enumeration value="MoveFromEdgeSouth"/>
+            <xs:enumeration value="MoveFromEdgeWest"/>
             <xs:enumeration value="MoveToEdgeEast"/>
             <xs:enumeration value="MoveToEdgeNorth"/>
             <xs:enumeration value="MoveToEdgeSouth"/>

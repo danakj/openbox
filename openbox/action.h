@@ -65,6 +65,7 @@ struct InterDirectionalAction{
 struct DirectionalAction{
     struct AnyAction any;
     ObDirection direction;
+    gboolean hang;
 };
 
 struct Execute {

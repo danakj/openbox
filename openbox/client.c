@@ -218,10 +218,11 @@ static ObAppSettings *get_settings(ObClient *client)
                 && !strcmp(app->name, client->name))
             ) {
             ob_debug("Window matching: %s\n", app->name);
-            /* Match if no role was specified in the per app setting, or if the string
-             * matches the beginning of the role, since apps like to set the role to
-             * things like browser-window-23c4b2f */
-            if (!app->role || !strncmp(app->role, client->role, strlen(app->role)))
+            /* Match if no role was specified in the per app setting, or if the
+             * string matches the beginning of the role, since apps like to set
+             * the role to things like browser-window-23c4b2f */
+            if (!app->role
+                || !strncmp(app->role, client->role, strlen(app->role)))
                 return app;
         }
 
@@ -3274,7 +3275,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
             his_edge_start = cur->frame->area.x;
             his_edge_end = cur->frame->area.x + cur->frame->area.width;
-            his_offset = cur->frame->area.y + (hang ? 0 : cur->frame->area.height);
+            his_offset = cur->frame->area.y + 
+                         (hang ? 0 : cur->frame->area.height);
 
             if(his_offset + 1 > my_offset)
                 continue;
@@ -3292,7 +3294,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
         /* default: bottom of screen */
         dest = a->y + a->height - (hang ? c->frame->area.height : 0);
-        monitor_dest = monitor->y + monitor->height - (hang ? c->frame->area.height : 0);
+        monitor_dest = monitor->y + monitor->height -
+                       (hang ? c->frame->area.height : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
         if (monitor_dest != dest && my_offset < monitor_dest)
@@ -3306,7 +3309,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
             his_edge_start = cur->frame->area.x;
             his_edge_end = cur->frame->area.x + cur->frame->area.width;
-            his_offset = cur->frame->area.y + (hang ? cur->frame->area.height : 0);
+            his_offset = cur->frame->area.y +
+                         (hang ? cur->frame->area.height : 0);
 
 
             if(his_offset - 1 < my_offset)
@@ -3339,7 +3343,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
             his_edge_start = cur->frame->area.y;
             his_edge_end = cur->frame->area.y + cur->frame->area.height;
-            his_offset = cur->frame->area.x + (hang ? 0 : cur->frame->area.width);
+            his_offset = cur->frame->area.x +
+                         (hang ? 0 : cur->frame->area.width);
 
             if(his_offset + 1 > my_offset)
                 continue;
@@ -3357,7 +3362,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         
         /* default: rightmost edge of screen */
         dest = a->x + a->width - (hang ? c->frame->area.width : 0);
-        monitor_dest = monitor->x + monitor->width - (hang ? c->frame->area.width : 0);
+        monitor_dest = monitor->x + monitor->width -
+                       (hang ? c->frame->area.width : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
         if (monitor_dest != dest && my_offset < monitor_dest)
@@ -3371,7 +3377,8 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
             his_edge_start = cur->frame->area.y;
             his_edge_end = cur->frame->area.y + cur->frame->area.height;
-            his_offset = cur->frame->area.x + (hang ? cur->frame->area.width : 0);
+            his_offset = cur->frame->area.x +
+                         (hang ? cur->frame->area.width : 0);
 
             if(his_offset - 1 < my_offset)
                 continue;

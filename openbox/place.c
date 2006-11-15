@@ -334,7 +334,8 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     return TRUE;
 }
 
-static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
+static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
+                                      ObAppSettings *settings)
 {
     gint px, py, i;
     Rect *screen;
@@ -414,7 +415,8 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
 }
 
 /* Return TRUE if we want client.c to enforce on-screen-keeping */
-gboolean place_client(ObClient *client, gint *x, gint *y, ObAppSettings *settings)
+gboolean place_client(ObClient *client, gint *x, gint *y,
+                      ObAppSettings *settings)
 {
     gboolean ret = FALSE;
     if (client->positioned)

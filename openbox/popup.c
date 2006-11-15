@@ -319,7 +319,8 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
             vert_inc = -screen_desktop_layout.columns;
             break;
         case OB_CORNER_BOTTOMLEFT:
-            n = (screen_desktop_layout.rows - 1) * screen_desktop_layout.columns;
+            n = (screen_desktop_layout.rows - 1)
+                * screen_desktop_layout.columns;
             horz_inc = 1;
             vert_inc = -screen_desktop_layout.columns;
             break;
@@ -335,7 +336,8 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
             vert_inc = 1;
             break;
         case OB_CORNER_TOPRIGHT:
-            n = screen_desktop_layout.rows * (screen_desktop_layout.columns - 1);
+            n = screen_desktop_layout.rows
+                * (screen_desktop_layout.columns - 1);
             horz_inc = -screen_desktop_layout.rows;
             vert_inc = 1;
             break;

@@ -1287,7 +1287,8 @@ static gboolean focus_delay_func(gpointer data)
 
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func, client, TRUE);
+    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
+                                     client, TRUE);
 }
 
 static void event_client_dest(ObClient *client, gpointer data)

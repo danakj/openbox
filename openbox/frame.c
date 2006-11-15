@@ -581,7 +581,8 @@ static void layout_title(ObFrame *self)
             break;
         case 'D':
             if (d) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) && config_theme_hidedisabled)
+            if (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS)
+                && config_theme_hidedisabled)
                 break;
             d = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
@@ -589,7 +590,8 @@ static void layout_title(ObFrame *self)
             break;
         case 'S':
             if (s) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_SHADE) && config_theme_hidedisabled)
+            if (!(self->decorations & OB_FRAME_DECOR_SHADE)
+                && config_theme_hidedisabled)
                 break;
             s = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
@@ -597,7 +599,8 @@ static void layout_title(ObFrame *self)
             break;
         case 'I':
             if (i) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_ICONIFY) && config_theme_hidedisabled)
+            if (!(self->decorations & OB_FRAME_DECOR_ICONIFY)
+                && config_theme_hidedisabled)
                 break;
             i = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
@@ -609,7 +612,8 @@ static void layout_title(ObFrame *self)
             break;
         case 'M':
             if (m) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) && config_theme_hidedisabled)
+            if (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE)
+                && config_theme_hidedisabled)
                 break;
             m = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
@@ -617,7 +621,8 @@ static void layout_title(ObFrame *self)
             break;
         case 'C':
             if (c) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_CLOSE) && config_theme_hidedisabled)
+            if (!(self->decorations & OB_FRAME_DECOR_CLOSE)
+                && config_theme_hidedisabled)
                 break;
             c = TRUE;
             self->label_width -= (ob_rr_theme->button_size +

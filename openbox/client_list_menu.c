@@ -75,7 +75,8 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             e = menu_add_normal(menu, i,
                                 (c->iconic ? c->icon_title : c->title), acts);
 
-            if (config_menu_client_list_icons && (icon = client_icon(c, 32, 32))) {
+            if (config_menu_client_list_icons
+                && (icon = client_icon(c, 32, 32))) {
                 e->data.normal.icon_width = icon->width;
                 e->data.normal.icon_height = icon->height;
                 e->data.normal.icon_data = icon->data;

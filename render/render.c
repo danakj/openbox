@@ -114,7 +114,8 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
         case RR_TEXTURE_TEXT:
             if (!transferred) {
                 transferred = 1;
-                if ((a->surface.grad != RR_SURFACE_SOLID) || (a->surface.interlaced))
+                if ((a->surface.grad != RR_SURFACE_SOLID)
+                    || (a->surface.interlaced))
                     pixel_data_to_pixmap(a, 0, 0, w, h);
             }
             if (a->xftdraw == NULL) {
@@ -127,7 +128,8 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
         case RR_TEXTURE_LINE_ART:
             if (!transferred) {
                 transferred = 1;
-                if ((a->surface.grad != RR_SURFACE_SOLID) || (a->surface.interlaced))
+                if ((a->surface.grad != RR_SURFACE_SOLID)
+                    || (a->surface.interlaced))
                     pixel_data_to_pixmap(a, 0, 0, w, h);
             }
             XDrawLine(RrDisplay(a->inst), a->pixmap,
@@ -140,7 +142,8 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
         case RR_TEXTURE_MASK:
             if (!transferred) {
                 transferred = 1;
-                if ((a->surface.grad != RR_SURFACE_SOLID) || (a->surface.interlaced))
+                if ((a->surface.grad != RR_SURFACE_SOLID)
+                    || (a->surface.interlaced))
                     pixel_data_to_pixmap(a, 0, 0, w, h);
             }
             RrPixmapMaskDraw(a->pixmap, &a->texture[i].data.mask, &tarea);

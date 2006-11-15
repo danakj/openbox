@@ -1606,19 +1606,23 @@ void action_movetoedge(union ActionData *data)
     
     switch(data->diraction.direction) {
     case OB_DIRECTION_NORTH:
-        y = client_directional_edge_search(c, OB_DIRECTION_NORTH, data->diraction.hang)
+        y = client_directional_edge_search(c, OB_DIRECTION_NORTH,
+                                           data->diraction.hang)
             - (data->diraction.hang ? c->frame->area.height : 0);
         break;
     case OB_DIRECTION_WEST:
-        x = client_directional_edge_search(c, OB_DIRECTION_WEST, data->diraction.hang)
+        x = client_directional_edge_search(c, OB_DIRECTION_WEST,
+                                           data->diraction.hang)
             - (data->diraction.hang ? c->frame->area.width : 0);
         break;
     case OB_DIRECTION_SOUTH:
-        y = client_directional_edge_search(c, OB_DIRECTION_SOUTH, data->diraction.hang)
+        y = client_directional_edge_search(c, OB_DIRECTION_SOUTH,
+                                           data->diraction.hang)
             - (data->diraction.hang ? 0 : c->frame->area.height);
         break;
     case OB_DIRECTION_EAST:
-        x = client_directional_edge_search(c, OB_DIRECTION_EAST, data->diraction.hang)
+        x = client_directional_edge_search(c, OB_DIRECTION_EAST,
+                                           data->diraction.hang)
             - (data->diraction.hang ? 0 : c->frame->area.width);
         break;
     default:

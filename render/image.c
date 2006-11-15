@@ -79,11 +79,16 @@ static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
                     portionXY = (portionX * portionY) >> FRACTION;
                     sumXY += portionXY;
                     
-                    pixel = *(src + (srcY >> FRACTION) * srcW + (srcX >> FRACTION));
-                    red   += ((pixel >> RrDefaultRedOffset)   & 0xFF) * portionXY;
-                    green += ((pixel >> RrDefaultGreenOffset) & 0xFF) * portionXY;
-                    blue  += ((pixel >> RrDefaultBlueOffset)  & 0xFF) * portionXY;
-                    alpha += ((pixel >> RrDefaultAlphaOffset) & 0xFF) * portionXY;
+                    pixel = *(src + (srcY >> FRACTION) * srcW
+                            + (srcX >> FRACTION));
+                    red   += ((pixel >> RrDefaultRedOffset)   & 0xFF)
+                             * portionXY;
+                    green += ((pixel >> RrDefaultGreenOffset) & 0xFF)
+                             * portionXY;
+                    blue  += ((pixel >> RrDefaultBlueOffset)  & 0xFF)
+                             * portionXY;
+                    alpha += ((pixel >> RrDefaultAlphaOffset) & 0xFF)
+                             * portionXY;
                 }
             }
             

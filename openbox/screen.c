@@ -296,7 +296,8 @@ void screen_startup(gboolean reconfig)
         screen_num_desktops = 0;
     screen_set_num_desktops(config_desktops_num);
     if (!reconfig) {
-        screen_set_desktop(MIN(config_screen_firstdesk, screen_num_desktops) - 1);
+        screen_set_desktop(MIN(config_screen_firstdesk, screen_num_desktops)
+                           - 1);
 
         /* don't start in showing-desktop mode */
         screen_showing_desktop = FALSE;

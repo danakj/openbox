@@ -30,6 +30,7 @@
 #include "misc.h"
 #include "client_menu.h"
 #include "client_list_menu.h"
+#include "client_list_combined_menu.h"
 #include "parser/parse.h"
 
 typedef struct _ObMenuParseState ObMenuParseState;
@@ -71,6 +72,7 @@ void menu_startup(gboolean reconfig)
                                       (GDestroyNotify)menu_destroy_hash_value);
 
     client_list_menu_startup(reconfig);
+    client_list_combined_menu_startup(reconfig);
     client_menu_startup();
 
     menu_parse_inst = parse_startup();
@@ -112,6 +114,7 @@ void menu_shutdown(gboolean reconfig)
     menu_parse_inst = NULL;
 
     client_list_menu_shutdown(reconfig);
+    client_list_combined_menu_shutdown(reconfig);
 
     menu_frame_hide_all();
     g_hash_table_destroy(menu_hash);

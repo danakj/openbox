@@ -138,7 +138,8 @@ openbox_openbox_SOURCES = \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \
-	openbox/client_list_menu.h \
+	openbox/client_list_combined_menu.c \
+	openbox/client_list_combined_menu.h \
 	openbox/client_menu.c \
 	openbox/client_menu.h \
 	openbox/config.c \

@@ -58,15 +58,15 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                 }
 
                 act = action_from_string("Activate",
-                        OB_USER_ACTION_MENU_SELECTION);
+                                         OB_USER_ACTION_MENU_SELECTION);
                 act->data.activate.any.c = c;
                 acts = g_slist_append(acts, act);
                 act = action_from_string("Desktop",
-                        OB_USER_ACTION_MENU_SELECTION);
+                                         OB_USER_ACTION_MENU_SELECTION);
                 act->data.desktop.desk = desktop;
                 acts = g_slist_append(acts, act);
-                e = menu_add_normal(menu, i,
-                        (c->iconic ? c->icon_title : c->title), acts);
+                e = menu_add_normal(menu, i, (c->iconic ?
+                                              c->icon_title : c->title), acts);
 
                 if (config_menu_client_list_icons
                         && (icon = client_icon(c, 32, 32))) {
@@ -84,7 +84,7 @@ static void self_update(ObMenuFrame *frame, gpointer data)
 
 /* executes it using the client in the actions, since we set that
    when we make the actions! */
-static void desk_menu_execute(ObMenuEntry *self, guint state, gpointer data)
+static void menu_execute(ObMenuEntry *self, guint state, gpointer data)
 {
     ObAction *a;
 
@@ -118,6 +118,7 @@ void client_list_combined_menu_startup(gboolean reconfig)
 
     combined_menu = menu_new(MENU_NAME, _("Windows"), NULL);
     menu_set_update_func(combined_menu, self_update);
+    menu_set_execute_func(submenu, desk_menu_execute);
 }
 
 void client_list_combined_menu_shutdown(gboolean reconfig)

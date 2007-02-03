@@ -118,7 +118,7 @@ void client_list_combined_menu_startup(gboolean reconfig)
 
     combined_menu = menu_new(MENU_NAME, _("Windows"), NULL);
     menu_set_update_func(combined_menu, self_update);
-    menu_set_execute_func(submenu, desk_menu_execute);
+    menu_set_execute_func(combined_menu, menu_execute);
 }
 
 void client_list_combined_menu_shutdown(gboolean reconfig)

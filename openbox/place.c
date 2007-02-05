@@ -61,16 +61,16 @@ static Rect *pick_head(ObClient *c)
     screen_pointer_pos(&px, &py);
 
     for (i = 0; i < screen_num_monitors; i++) {
-        area = screen_area_monitor(client->desktop, i);
+        area = screen_area_monitor(c->desktop, i);
         if (RECT_CONTAINS(*area, px, py))
             break;
     }
     if (i == screen_num_monitors)
-        area = screen_area_monitor(client->desktop, 0);    
+        area = screen_area_monitor(c->desktop, 0);    
 
     /* Last resort */
     if (!area)
-        area = screen_area_monitor(client->desktop,
+        area = screen_area_monitor(c->desktop,
                                    g_random_int_range(0, screen_num_monitors));
 
     return area;

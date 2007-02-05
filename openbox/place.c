@@ -27,7 +27,7 @@
 static Rect *pick_head(ObClient *c)
 {
     Rect *area = NULL;
-    gint i;
+    gint i, px, py;
 
     /* try direct parent first */
     if (c->transient_for && c->transient_for != OB_TRAN_GROUP) {
@@ -326,6 +326,7 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     Rect *area;
 
     area = pick_head(client);
+    screen_pointer_pos(&px, &py);
 
     l = area->x;
     t = area->y;
@@ -343,7 +344,6 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
                                       ObAppSettings *settings)
 {
-    gint px, py, i;
     Rect *screen;
 
     if (!settings || (settings && !settings->pos_given))

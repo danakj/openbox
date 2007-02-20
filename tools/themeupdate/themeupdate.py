@@ -271,7 +271,7 @@ def x_fonts(data):
             return
     else: return
     while 1:
-        i, key = find_key(data, '.font')
+        i, key, nul = find_key(data, '.font')
         if i < 0:
             break
         out('Removing "' + key + '"\n')

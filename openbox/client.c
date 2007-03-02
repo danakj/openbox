@@ -312,7 +312,7 @@ void client_manage(Window window)
     XChangeSaveSet(ob_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
-    self->frame = frame_new();
+    self->frame = frame_new(self);
 
     frame_grab_client(self->frame, self);
 

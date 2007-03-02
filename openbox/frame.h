@@ -98,6 +98,8 @@ struct _ObFrame
     Window    tlresize;
     Window    trresize;
 
+    Colormap  colormap;
+
     RrAppearance *a_unfocused_title;
     RrAppearance *a_focused_title;
     RrAppearance *a_unfocused_label;
@@ -142,7 +144,7 @@ struct _ObFrame
     GTimeVal  flash_end;
 };
 
-ObFrame *frame_new();
+ObFrame *frame_new(struct _ObClient *c);
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);
 void frame_adjust_theme(ObFrame *self);

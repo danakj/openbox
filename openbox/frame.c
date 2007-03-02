@@ -47,59 +47,95 @@ static gboolean flash_timeout(gpointer data);
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 
-static Window createWindow(Window parent, gulong mask,
-                           XSetWindowAttributes *attrib)
+static Window createWindow(Window parent, Visual *visual,
+                           gulong mask, XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-                         RrDepth(ob_rr_inst), InputOutput,
-                         RrVisual(ob_rr_inst), mask, attrib);
+                         (visual ? 32 : RrDepth(ob_rr_inst)), InputOutput,
+                         (visual ? visual : RrVisual(ob_rr_inst)),
+                         mask, attrib);
                        
 }
 
-ObFrame *frame_new()
+static Visual *check_32bit_client(ObClient *c)
+{
+    XWindowAttributes wattrib;
+    Status ret;
+
+    ret = XGetWindowAttributes(ob_display, c->window, &wattrib);
+    g_assert(ret != BadDrawable);
+    g_assert(ret != BadWindow);
+
+    if (wattrib.depth == 32)
+        return wattrib.visual;
+    return NULL;
+}
+
+ObFrame *frame_new(ObClient *client)
 {
     XSetWindowAttributes attrib;
     gulong mask;
     ObFrame *self;
+    Visual *visual;
 
     self = g_new0(ObFrame, 1);
 
     self->obscured = TRUE;
 
-    /* create all of the decor windows */
+    visual = check_32bit_client(client);
+
+    /* create the non-visible decor windows */
+
     mask = CWEventMask;
+    if (visual) {
+        /* client has a 32-bit visual */
+        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        /* create a colormap with the visual */
+        self->colormap = attrib.colormap =
+            XCreateColormap(ob_display,
+                            RootWindow(ob_display, ob_screen),
+                            visual, AllocNone);
+        attrib.background_pixel = BlackPixel(ob_display, 0);
+        attrib.border_pixel = BlackPixel(ob_display, 0);
+    }
     attrib.event_mask = FRAME_EVENTMASK;
-    self->window = createWindow(RootWindow(ob_display, ob_screen),
+    self->window = createWindow(RootWindow(ob_display, ob_screen), visual,
                                 mask, &attrib);
+    mask &= ~CWEventMask;
+    self->plate = createWindow(self->window, visual, mask, &attrib);
 
-    mask = 0;
-    self->plate = createWindow(self->window, mask, &attrib);
+    /* create the visible decor windows */
 
     mask = CWEventMask;
+    if (visual) {
+        /* client has a 32-bit visual */
+        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        attrib.colormap = RrColormap(ob_rr_inst);
+    }
     attrib.event_mask = ELEMENT_EVENTMASK;
-    self->title = createWindow(self->window, mask, &attrib);
+    self->title = createWindow(self->window, NULL, mask, &attrib);
 
     mask |= CWCursor;
     attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
-    self->tlresize = createWindow(self->title, mask, &attrib);
+    self->tlresize = createWindow(self->title, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_NORTHEAST);
-    self->trresize = createWindow(self->title, mask, &attrib);
+    self->trresize = createWindow(self->title, NULL, mask, &attrib);
 
     mask &= ~CWCursor;
-    self->label = createWindow(self->title, mask, &attrib);
-    self->max = createWindow(self->title, mask, &attrib);
-    self->close = createWindow(self->title, mask, &attrib);
-    self->desk = createWindow(self->title, mask, &attrib);
-    self->shade = createWindow(self->title, mask, &attrib);
-    self->icon = createWindow(self->title, mask, &attrib);
-    self->iconify = createWindow(self->title, mask, &attrib);
-    self->handle = createWindow(self->window, mask, &attrib);
+    self->label = createWindow(self->title, NULL, mask, &attrib);
+    self->max = createWindow(self->title, NULL, mask, &attrib);
+    self->close = createWindow(self->title, NULL, mask, &attrib);
+    self->desk = createWindow(self->title, NULL, mask, &attrib);
+    self->shade = createWindow(self->title, NULL, mask, &attrib);
+    self->icon = createWindow(self->title, NULL, mask, &attrib);
+    self->iconify = createWindow(self->title, NULL, mask, &attrib);
+    self->handle = createWindow(self->window, NULL, mask, &attrib);
 
     mask |= CWCursor;
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
-    self->lgrip = createWindow(self->handle, mask, &attrib);
+    self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
-    self->rgrip = createWindow(self->handle, mask, &attrib); 
+    self->rgrip = createWindow(self->handle, NULL, mask, &attrib); 
 
     self->focused = FALSE;
 
@@ -181,6 +217,8 @@ static void frame_free(ObFrame *self)
     free_theme_statics(self);
 
     XDestroyWindow(ob_display, self->window);
+    if (self->colormap)
+        XFreeColormap(ob_display, self->colormap);
 
     g_free(self);
 }

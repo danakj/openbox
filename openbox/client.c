@@ -330,11 +330,11 @@ void client_manage(Window window)
         /* Don't worry, we won't actually both shade and undecorate the
          * window when push comes to shove. */
         if (settings->shade != -1)
-            client_shade(self, settings->shade);
+            client_shade(self, !!settings->shade);
         if (settings->decor != -1)
             client_set_undecorated(self, !settings->decor);
         if (settings->iconic != -1)
-            client_iconify(self, settings->iconic, FALSE);
+            client_iconify(self, !!settings->iconic, FALSE);
         if (settings->skip_pager != -1) {
             self->skip_pager = !!settings->skip_pager;
             client_change_state(self);
@@ -371,15 +371,17 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
-        ((settings && settings->focus == TRUE) ||
-         (!settings && (config_focus_new ||
-                        client_search_focus_parent(self)))) &&
+        /* this means focus=true for window is same as config_focus_new=true */
+        ((config_focus_new || (settings && settings->focus == 1)) ||
+         client_search_focus_parent(self)) &&
+        /* this checks for focus=false for the window */
+        (!settings || settings->focus != 0) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
         (self->type == OB_CLIENT_TYPE_NORMAL ||
          self->type == OB_CLIENT_TYPE_DIALOG))
-    {        
+    {
         activate = TRUE;
 #if 0
         if (self->desktop != screen_desktop) {

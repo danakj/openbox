@@ -476,7 +476,8 @@ void client_manage(Window window)
     g_hash_table_insert(window_map, &self->window, self);
 
     /* this has to happen after we're in the client_list */
-    screen_update_areas();
+    if (STRUT_EXISTS(self->strut))
+        screen_update_areas();
 
     /* update the list hints */
     client_set_list();
@@ -523,7 +524,8 @@ void client_unmanage(ObClient *self)
 
     /* once the client is out of the list, update the struts to remove it's
        influence */
-    screen_update_areas();
+    if (STRUT_EXISTS(self->strut))
+        screen_update_areas();
 
     for (it = client_destructors; it; it = g_slist_next(it)) {
         Destructor *d = it->data;
@@ -2354,7 +2356,8 @@ static void client_iconify_recursive(ObClient *self,
     if (changed) {
         client_change_state(self);
         client_showhide(self);
-        screen_update_areas();
+        if (STRUT_EXISTS(self->strut))
+            screen_update_areas();
     }
 
     /* iconify all transients */
@@ -2540,7 +2543,8 @@ void client_set_desktop_recursive(ObClient *self,
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL)
             client_raise(self);
-        screen_update_areas();
+        if (STRUT_EXISTS(self->strut))
+            screen_update_areas();
 
         /* add to the new desktop(s) */
         if (config_focus_new)

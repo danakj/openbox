@@ -113,6 +113,9 @@ typedef struct _StrutPartial {
     (s1).top = MAX((s1).top, (s2).top), \
     (s1).bottom = MAX((s1).bottom, (s2).bottom)
 
+#define STRUT_EXISTS(s1) \
+    ((s1).left || (s1).top || (s1).right || (s1).bottom)
+
 #define STRUT_EQUAL(s1, s2) \
     ((s1).left == (s2).left && \
      (s1).top == (s2).top && \

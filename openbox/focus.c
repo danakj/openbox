@@ -87,25 +87,20 @@ void focus_startup(gboolean reconfig)
         focus_indicator.right.obwin.type = Window_Internal;
         focus_indicator.bottom.obwin.type = Window_Internal;
 
-        attr.save_under = True;
         attr.override_redirect = True;
         attr.background_pixel = BlackPixel(ob_display, ob_screen);
         focus_indicator.top.win =
             createWindow(RootWindow(ob_display, ob_screen),
-                         CWOverrideRedirect | CWBackPixel | CWSaveUnder,
-                         &attr);
+                         CWOverrideRedirect | CWBackPixel, &attr);
         focus_indicator.left.win =
             createWindow(RootWindow(ob_display, ob_screen),
-                         CWOverrideRedirect | CWBackPixel | CWSaveUnder,
-                         &attr);
+                         CWOverrideRedirect | CWBackPixel, &attr);
         focus_indicator.right.win =
             createWindow(RootWindow(ob_display, ob_screen),
-                         CWOverrideRedirect | CWBackPixel | CWSaveUnder,
-                         &attr);
+                         CWOverrideRedirect | CWBackPixel, &attr);
         focus_indicator.bottom.win =
             createWindow(RootWindow(ob_display, ob_screen),
-                         CWOverrideRedirect | CWBackPixel | CWSaveUnder,
-                         &attr);
+                         CWOverrideRedirect | CWBackPixel, &attr);
 
         stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.top));
         stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.left));

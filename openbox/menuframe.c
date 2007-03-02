@@ -67,9 +67,8 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
     self->client = client;
 
     attr.event_mask = FRAME_EVENTMASK;
-    attr.save_under = True;
     self->window = createWindow(RootWindow(ob_display, ob_screen),
-                                   CWEventMask | CWSaveUnder, &attr);
+                                CWEventMask, &attr);
     attr.event_mask = TITLE_EVENTMASK;
     self->title = createWindow(self->window, CWEventMask, &attr);
     self->items = createWindow(self->window, 0, NULL);

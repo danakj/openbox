@@ -371,6 +371,9 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     RrPixel32 current;
     RrColor *primary_light, *secondary_light;
 
+    VARS(y1);
+    VARS(y3);
+
     r = sf->primary->r;
     r += r >> 2;
     g = sf->primary->g;
@@ -393,10 +396,7 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     if (b > 0xFF) b = 0xFF;
     secondary_light = RrColorNew(a->inst, r, g, b);
 
-    VARS(y1);
     SETUP(y1, primary_light, sf->primary, (h / 2) -1);
-  
-    VARS(y3);
     SETUP(y3, sf->secondary, secondary_light,  (h / 2) -1);
 
     for (y1 = h - 1; y1 > (h / 2) -1; --y1) {  /* 0 -> h-1 */

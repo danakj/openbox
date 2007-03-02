@@ -676,13 +676,14 @@ void menu_frame_hide(ObMenuFrame *self)
 
 void menu_frame_hide_all()
 {
+    GList *it;
+
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
         ob_main_loop_timeout_remove(ob_main_loop,
                                     menu_entry_frame_submenu_timeout);
     }
-    GList *it = g_list_last(menu_frame_visible);
-    if (it) 
+    if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
 }
 

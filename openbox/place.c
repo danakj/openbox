@@ -27,7 +27,8 @@
 static Rect *pick_head(ObClient *c)
 {
     Rect *area = NULL;
-    gint i, px, py;
+    guint i;
+    gint px, py;
 
     /* try direct parent first */
     if (c->transient_for && c->transient_for != OB_TRAN_GROUP) {
@@ -220,7 +221,6 @@ typedef enum
 static gboolean place_smart(ObClient *client, gint *x, gint *y,
                             ObSmartType type)
 {
-    guint i;
     gboolean ret = FALSE;
     GSList *spaces = NULL, *sit;
     GList *it;
@@ -320,7 +320,6 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
 
 static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 {
-    guint i;
     gint l, r, t, b;
     gint px, py;
     Rect *area;

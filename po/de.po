@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2005-09-01 18:05+0200\n"
+"POT-Creation-Date: 2007-02-28 12:50-0500\n"
 "PO-Revision-Date: 2006-06-11 10:41+0200\n"
 "Last-Translator: Sebastian Vahl <svahl@web.de>\n"
 "Language-Team:  <de@li.org>\n"
@@ -14,11 +14,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:95
+#: openbox/client_list_menu.c:97
 msgid "Go there..."
 msgstr "Gehe zu..."
 
-#: openbox/client_list_menu.c:161
+#: openbox/client_list_menu.c:187
 msgid "Desktops"
 msgstr ""
 
@@ -107,17 +107,16 @@ msgstr ""
 msgid "Unable to make directory '%s': %s"
 msgstr ""
 
-#: render/font.c:57
+#: render/font.c:58
 msgid "Couldn't initialize Xft."
 msgstr "Konnte Xft nicht initializieren"
 
-#: render/font.c:194 render/font.c:199
+#: render/font.c:193 render/font.c:198
 #, c-format
 msgid "Unable to load font: %s\n"
 msgstr "Font konnte nicht geladen werden: %s\n"
 
-#: render/font.c:195
+#: render/font.c:194
 #, c-format
 msgid "Trying fallback font: %s\n"
 msgstr ""
-

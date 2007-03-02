@@ -28,8 +28,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
-"Report-Msgid-Bugs-To: mikachu@comhem.se\n"
-"POT-Creation-Date: 2004-11-07 12:52+0100\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2007-02-28 12:50-0500\n"
 "PO-Revision-Date: 2004-11-07 12:52+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -38,11 +38,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/client_list_menu.c:95
+#: openbox/client_list_menu.c:97
 msgid "Go there..."
 msgstr "Go there..."
 
-#: openbox/client_list_menu.c:161
+#: openbox/client_list_menu.c:187
 msgid "Desktops"
 msgstr "Desktops"
 
@@ -131,16 +131,16 @@ msgstr "--sm-save-file requires an argument\n"
 msgid "Unable to make directory '%s': %s"
 msgstr "Unable to make directory '%s': %s"
 
-#: render/font.c:50
+#: render/font.c:58
 msgid "Couldn't initialize Xft."
 msgstr "Couldn't initialize Xft."
 
-#: render/font.c:122 render/font.c:127
+#: render/font.c:193 render/font.c:198
 #, c-format
 msgid "Unable to load font: %s\n"
 msgstr "Unable to load font: %s\n"
 
-#: render/font.c:123
+#: render/font.c:194
 #, c-format
 msgid "Trying fallback font: %s\n"
 msgstr "Trying fallback font: %s\n"

@@ -25,7 +25,7 @@
 struct _ObClient;
 
 /*! Time at which the last event with a timestamp occured. */
-extern Time event_lasttime;
+extern Time event_curtime;
 
 /*! The value of the mask for the NumLock modifier */
 extern guint NumLockMask;

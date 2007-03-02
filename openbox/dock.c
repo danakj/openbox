@@ -313,6 +313,8 @@ void dock_configure()
             dock->y = a->height;
             gravity = SouthEastGravity;
             break;
+        default:
+            g_assert_not_reached();
         }
     }
 
@@ -578,6 +580,8 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     case OB_ORIENTATION_VERT:
         after = (y > over->h / 2);
         break;
+    default:
+        g_assert_not_reached();
     }
 
     /* remove before doing the it->next! */

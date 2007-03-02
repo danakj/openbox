@@ -20,7 +20,7 @@
 #ifndef ob__client_list_combined_menu_h
 #define ob__client_list_combined_menu_h
 
-void client_list_menu_combined_startup(gboolean reconfig);
-void client_list_menu_combined_shutdown(gboolean reconfig);
+void client_list_combined_menu_startup(gboolean reconfig);
+void client_list_combined_menu_shutdown(gboolean reconfig);
 
 #endif

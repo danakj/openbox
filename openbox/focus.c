@@ -144,7 +144,7 @@ void focus_shutdown(gboolean reconfig)
         g_free(focus_order);
 
         /* reset focus to root */
-        XSetInputFocus(ob_display, PointerRoot, RevertToNone, event_lasttime);
+        XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
 
         RrColorFree(color_white);
 
@@ -186,7 +186,7 @@ void focus_set_client(ObClient *client)
 #endif
         /* when nothing will be focused, send focus to the backup target */
         XSetInputFocus(ob_display, screen_support_win, RevertToNone,
-                       event_lasttime);
+                       event_curtime);
         XSync(ob_display, FALSE);
     }
 
@@ -317,6 +317,11 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
             if (client_normal(it->data) && client_can_focus(it->data))
                 return it->data;
+
+    /* XXX fallback to the "desktop window" if one exists ?
+       could store it while going through all the windows in the loop right
+       above this..
+    */
 
     return NULL;
 }
@@ -603,7 +608,7 @@ void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
 
 done_cycle:
     if (done && focus_cycle_target)
-        client_activate(focus_cycle_target, FALSE);
+        client_activate(focus_cycle_target, FALSE, TRUE);
 
     t = NULL;
     first = NULL;
@@ -665,7 +670,7 @@ void focus_directional_cycle(ObDirection dir, gboolean interactive,
 
 done_cycle:
     if (done && focus_cycle_target)
-        client_activate(focus_cycle_target, FALSE);
+        client_activate(focus_cycle_target, FALSE, TRUE);
 
     first = NULL;
     focus_cycle_target = NULL;

@@ -96,7 +96,7 @@ extern gboolean config_title_number;
 /*! The number of desktops */
 extern gint config_desktops_num;
 /*! Desktop to start on, put 5 to start in the center of a 3x3 grid */
-extern gint config_screen_firstdesk;
+extern guint config_screen_firstdesk;
 /*! Names for the desktops */
 extern GSList *config_desktops_names;
 

@@ -1034,7 +1034,7 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
            it won't work right unless we XUngrabKeyboard first,
            even though we grabbed the key/button Asychronously.
            e.g. "gnome-panel-control --main-menu" */
-        XUngrabKeyboard(ob_display, event_lasttime);
+        XUngrabKeyboard(ob_display, event_curtime);
     }
 
     for (it = acts; it; it = g_slist_next(it)) {
@@ -1111,16 +1111,30 @@ void action_execute(union ActionData *data)
 
 void action_activate(union ActionData *data)
 {
-    client_activate(data->activate.any.c, data->activate.here);
+    /* similar to the openbox dock for dockapps, don't let user actions give
+       focus to 3rd-party docks (panels) either (unless they ask for it
+       themselves). */
+    if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+        /* if using focus_delay, stop the timer now so that focus doesn't go
+           moving on us */
+        event_halt_focus_delay();
+
+        client_activate(data->activate.any.c, data->activate.here, TRUE);
+    }
 }
 
 void action_focus(union ActionData *data)
 {
-    /* if using focus_delay, stop the timer now so that focus doesn't go moving
-       on us */
-    event_halt_focus_delay();
+    /* similar to the openbox dock for dockapps, don't let user actions give
+       focus to 3rd-party docks (panels) either (unless they ask for it
+       themselves). */
+    if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+        /* if using focus_delay, stop the timer now so that focus doesn't go
+           moving on us */
+        event_halt_focus_delay();
 
-    client_focus(data->client.any.c);
+        client_focus(data->client.any.c);
+    }
 }
 
 void action_unfocus (union ActionData *data)

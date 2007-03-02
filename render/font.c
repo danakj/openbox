@@ -116,12 +116,12 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     if (FcPatternGetString(match, "style", 0, &tmp_string) !=
             FcResultTypeMismatch) {
         /* Bold ? */
-        if (!strcasecmp("bold", (gchar *)tmp_string)) {
+        if (!g_ascii_strcasecmp("bold", (gchar *)tmp_string)) {
             pango_font_description_set_weight(out->pango_font_description,
                                               PANGO_WEIGHT_BOLD);
         }
         /* Italic ? */
-        else if (!strcasecmp("italic", (gchar *)tmp_string)) {
+        else if (!g_ascii_strcasecmp("italic", (gchar *)tmp_string)) {
             pango_font_description_set_style(out->pango_font_description,
                                              PANGO_STYLE_ITALIC);
         }
@@ -135,19 +135,23 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     }
 
     /* based on gtkmain.c gtk_get_default_language() */
-    gchar *locale, *p;
-    locale = g_strdup(setlocale(LC_CTYPE, NULL));
-    if ((p = strchr(locale, '.')))
-        *p = '\0';
-    if ((p = strchr(locale, '@')))
-        *p = '\0';
-    PangoFontMetrics *metrics = 
-        pango_context_get_metrics(context, out->pango_font_description,
-                                  pango_language_from_string(locale));
-    out->pango_ascent = pango_font_metrics_get_ascent(metrics);
-    out->pango_descent = pango_font_metrics_get_descent(metrics);
-    g_free(locale);
-    pango_font_metrics_unref(metrics);
+    {
+        gchar *locale, *p;
+        PangoFontMetrics *metrics;
+
+        locale = g_strdup(setlocale(LC_CTYPE, NULL));
+        if ((p = strchr(locale, '.')))
+            *p = '\0';
+        if ((p = strchr(locale, '@')))
+            *p = '\0';
+        metrics = 
+            pango_context_get_metrics(context, out->pango_font_description,
+                                      pango_language_from_string(locale));
+        out->pango_ascent = pango_font_metrics_get_ascent(metrics);
+        out->pango_descent = pango_font_metrics_get_descent(metrics);
+        g_free(locale);
+        pango_font_metrics_unref(metrics);
+    }
 #endif /* USE_PANGO */
 
     if (FcPatternGetBool(match, OB_SHADOW, 0, &out->shadow) != FcResultMatch)

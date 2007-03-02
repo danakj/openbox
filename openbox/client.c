@@ -371,8 +371,9 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
-        (config_focus_new || client_search_focus_parent(self)) ||
-        (settings && settings->focus == TRUE) &&
+        ((settings && settings->focus == TRUE) ||
+         (!settings && (config_focus_new ||
+                        client_search_focus_parent(self)))) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
@@ -810,19 +811,21 @@ static void client_toggle_border(ObClient *self, gboolean show)
 static void client_get_all(ObClient *self)
 {
     client_get_area(self);
-    client_update_transient_for(self);
-    client_update_wmhints(self);
-    client_get_startup_id(self);
-    client_get_desktop(self);
-    client_get_shaped(self);
-
     client_get_mwm_hints(self);
-    client_get_type(self);/* this can change the mwmhints for special cases */
 
     /* The transient hint is used to pick a type, but the type can also affect
-       transiency (dialogs are always made transients). This is Havoc's idea,
-       but it is needed to make some apps work right (eg tsclient). */
+       transiency (dialogs are always made transients of their group if they
+       have one). This is Havoc's idea, but it is needed to make some apps
+       work right (eg tsclient). */
     client_update_transient_for(self);
+    client_get_type(self);/* this can change the mwmhints for special cases */
+    client_update_transient_for(self);
+
+    client_update_wmhints(self);
+    client_get_startup_id(self);
+    client_get_desktop(self);/* uses transient data/group/startup id if a
+                                desktop is not specified */
+    client_get_shaped(self);
 
     client_get_state(self);
 
@@ -1303,6 +1306,7 @@ void client_setup_decor_and_functions(ObClient *self)
         if (! (self->mwmhints.decorations & OB_MWM_DECOR_ALL)) {
             if (! ((self->mwmhints.decorations & OB_MWM_DECOR_HANDLE) ||
                    (self->mwmhints.decorations & OB_MWM_DECOR_TITLE)))
+            {
                 /* if the mwm hints request no handle or title, then all
                    decorations are disabled, but keep the border if that's
                    specified */
@@ -1310,6 +1314,7 @@ void client_setup_decor_and_functions(ObClient *self)
                     self->decorations = OB_FRAME_DECOR_BORDER;
                 else
                     self->decorations = 0;
+            }
         }
     }
 
@@ -2497,7 +2502,7 @@ void client_close(ObClient *self)
     ce.xclient.window = self->window;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = prop_atoms.wm_delete_window;
-    ce.xclient.data.l[1] = event_lasttime;
+    ce.xclient.data.l[1] = event_curtime;
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
@@ -2818,7 +2823,7 @@ gboolean client_focus(ObClient *self)
            #799. So now it is RevertToNone again.
         */
         XSetInputFocus(ob_display, self->window, RevertToNone,
-                       event_lasttime);
+                       event_curtime);
     }
 
     if (self->focus_notify) {
@@ -2829,7 +2834,7 @@ gboolean client_focus(ObClient *self)
         ce.xclient.window = self->window;
         ce.xclient.format = 32;
         ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
-        ce.xclient.data.l[1] = event_lasttime;
+        ce.xclient.data.l[1] = event_curtime;
         ce.xclient.data.l[2] = 0l;
         ce.xclient.data.l[3] = 0l;
         ce.xclient.data.l[4] = 0l;
@@ -2839,7 +2844,7 @@ gboolean client_focus(ObClient *self)
 #ifdef DEBUG_FOCUS
     ob_debug("%sively focusing %lx at %d\n",
              (self->can_focus ? "act" : "pass"),
-             self->window, (gint) event_lasttime);
+             self->window, (gint) event_curtime);
 #endif
 
     /* Cause the FocusIn to come back to us. Important for desktop switches,
@@ -2861,8 +2866,11 @@ void client_unfocus(ObClient *self)
     }
 }
 
-void client_activate(ObClient *self, gboolean here)
+void client_activate(ObClient *self, gboolean here, gboolean user)
 {
+    /* XXX do some stuff here if user is false to determine if we really want
+       to activate it or not (a parent or group member is currently active) */
+
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE);
     if (self->iconic)
@@ -2997,8 +3005,8 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
             continue;
         if(cur->iconic)
             continue;
-        if(client_focus_target(cur) == cur &&
-           !(cur->can_focus || cur->focus_notify))
+        if(!(client_focus_target(cur) == cur &&
+             client_can_focus(cur)))
             continue;
 
         /* find the centre coords of this window, from the

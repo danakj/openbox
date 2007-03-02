@@ -44,7 +44,7 @@ gboolean config_title_number;
 
 gint    config_desktops_num;
 GSList *config_desktops_names;
-gint    config_screen_firstdesk;
+guint    config_screen_firstdesk;
 
 gboolean config_resize_redraw;
 gboolean config_resize_four_corners;
@@ -455,7 +455,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("firstdesk", node))) {
         gint d = parse_int(doc, n);
         if (d > 0)
-            config_screen_firstdesk = d;
+            config_screen_firstdesk = (unsigned) d;
     }
     if ((n = parse_find_node("names", node))) {
         GSList *it;
@@ -718,7 +718,7 @@ static void bind_default_mouse()
             uact = OB_USER_ACTION_MOUSE_DOUBLE_CLICK; break;
         case OB_MOUSE_ACTION_MOTION:
             uact = OB_USER_ACTION_MOUSE_MOTION; break;
-        case OB_NUM_MOUSE_ACTIONS:
+        default:
             g_assert_not_reached();
         }
         mouse_bind(it->button, it->context, it->mact,

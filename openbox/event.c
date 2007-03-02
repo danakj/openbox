@@ -86,7 +86,12 @@ static gboolean menu_hide_delay_func(gpointer data);
                              (e)->xfocus.detail == NotifyAncestor || \
                              (e)->xfocus.detail > NotifyNonlinearVirtual)
 
-Time event_lasttime = 0;
+/* The most recent time at which an event with a timestamp occured. */
+static Time event_lasttime = 0;
+/* The time for the current event being processed
+   (it's the event_lasttime for events without times, if this is a bug then
+   use CurrentTime instead, but it seems ok) */
+Time event_curtime = CurrentTime;
 
 /*! The value of the mask for the NumLock modifier */
 guint NumLockMask;
@@ -251,8 +256,14 @@ static void event_set_lasttime(XEvent *e)
         break;
     }
 
-    if (t > event_lasttime)
+    if (t > event_lasttime) {
         event_lasttime = t;
+        event_curtime = event_lasttime;
+    } else if (t == 0) {
+        event_curtime = event_lasttime;
+    } else {
+        event_curtime = t;
+    }
 }
 
 #define STRIP_MODS(s) \
@@ -919,7 +930,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                        it can happen now when the window is on
                                        another desktop, but we still don't
                                        want it! */
-        client_activate(client, FALSE);
+        client_activate(client, FALSE, TRUE);
         break;
     case ClientMessage:
         /* validate cuz we query stuff off the client here */
@@ -973,8 +984,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
         } else if (msgtype == prop_atoms.net_active_window) {
-            ob_debug("net_active_window for 0x%lx\n", client->window);
-            client_activate(client, FALSE);
+            ob_debug("net_active_window for 0x%lx source=%s\n",
+                     client->window,
+                     (e->xclient.data.l[0] == 0 ? "unknown" :
+                      (e->xclient.data.l[0] == 1 ? "application" :
+                       (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
+            /* XXX make use of data.l[1] and [2] ! */
+            client_activate(client, FALSE,
+                            (e->xclient.data.l[0] == 0 ||
+                             e->xclient.data.l[0] == 2));
         } else if (msgtype == prop_atoms.net_wm_moveresize) {
             ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
             if ((Atom)e->xclient.data.l[2] ==

@@ -251,6 +251,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         th = SEPARATOR_HEIGHT + 2*PADDING;
         break;
+    default:
+        g_assert_not_reached();
     }
     RECT_SET_SIZE(self->area, self->frame->inner_w, th);
     XResizeWindow(ob_display, self->window,

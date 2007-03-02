@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2005-03-25 00:39+0100\n"
+"POT-Creation-Date: 2007-02-28 12:50-0500\n"
 "PO-Revision-Date: 2005-03-25 09:31+0100\n"
 "Last-Translator: Miguel Calleja Gómez <mcg79@lycos.es>\n"
 "Language-Team: None\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:95
+#: openbox/client_list_menu.c:97
 msgid "Go there..."
 msgstr "Ir ahí..."
 
-#: openbox/client_list_menu.c:161
+#: openbox/client_list_menu.c:187
 msgid "Desktops"
 msgstr "Escritorios"
 
@@ -108,16 +108,16 @@ msgstr "--sm-save-file necesita un argumento\n"
 msgid "Unable to make directory '%s': %s"
 msgstr "No se puede crear el directorio '%s': %s"
 
-#: render/font.c:50
+#: render/font.c:58
 msgid "Couldn't initialize Xft."
 msgstr "No se pudo iniciar Xft."
 
-#: render/font.c:164 render/font.c:169
+#: render/font.c:193 render/font.c:198
 #, c-format
 msgid "Unable to load font: %s\n"
 msgstr "No se puede cargar la fuente: %s\n"
 
-#: render/font.c:165
+#: render/font.c:194
 #, c-format
 msgid "Trying fallback font: %s\n"
 msgstr "Intentando recurrir a la fuente: %s\n"

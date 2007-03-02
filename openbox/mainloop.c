@@ -418,7 +418,8 @@ static void sighandler(gint sig)
             /* XXX special case for signals that default to core dump.
                but throw some helpful output here... */
 
-            fprintf(stderr, "Fuck yah. Core dump. (Signal=%d)\n", sig);
+            fprintf(stderr, "How are you gentlemen? All your base are"
+                    " belong to us. (Signal=%d)\n", sig);
 
             /* die with a core dump */
             abort();

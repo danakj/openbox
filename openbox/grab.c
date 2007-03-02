@@ -54,14 +54,14 @@ gboolean grab_keyboard(gboolean grab)
         if (kgrabs++ == 0) {
             ret = XGrabKeyboard(ob_display, RootWindow(ob_display, ob_screen),
                                 FALSE, GrabModeAsync, GrabModeAsync,
-                                event_lasttime) == Success;
+                                event_curtime) == Success;
             if (!ret)
                 --kgrabs;
         } else
             ret = TRUE;
     } else if (kgrabs > 0) {
         if (--kgrabs == 0)
-            XUngrabKeyboard(ob_display, event_lasttime);
+            XUngrabKeyboard(ob_display, event_curtime);
         ret = TRUE;
     }
 
@@ -77,14 +77,14 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
             ret = XGrabPointer(ob_display, screen_support_win,
                                False, GRAB_PTR_MASK, GrabModeAsync,
                                GrabModeAsync, None,
-                               ob_cursor(cur), event_lasttime) == Success;
+                               ob_cursor(cur), event_curtime) == Success;
             if (!ret)
                 --pgrabs;
         } else
             ret = TRUE;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0) {
-            XUngrabPointer(ob_display, event_lasttime);
+            XUngrabPointer(ob_display, event_curtime);
         }
         ret = TRUE;
     }
@@ -100,14 +100,14 @@ gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
             ret = XGrabPointer(ob_display, win, False, GRAB_PTR_MASK,
                                GrabModeAsync, GrabModeAsync, None,
                                ob_cursor(cur),
-                               event_lasttime) == Success;
+                               event_curtime) == Success;
             if (!ret)
                 --pgrabs;
         } else
             ret = TRUE;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0) {
-            XUngrabPointer(ob_display, event_lasttime);
+            XUngrabPointer(ob_display, event_curtime);
         }
         ret = TRUE;
     }

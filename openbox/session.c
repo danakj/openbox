@@ -25,7 +25,7 @@
 
 GList *session_saved_state;
 
-void session_startup(gint *argc, gchar ***argv) {}
+void session_startup(gint argc, gchar **argv) {}
 void session_shutdown() {}
 GList* session_state_find(ObClient *c) { return NULL; }
 gboolean session_state_cmp(ObSessionState *s, ObClient *c) { return FALSE; }
@@ -142,17 +142,25 @@ static void parse_args(gint *argc, gchar ***argv)
     }
 }
 
-void session_startup(gint *argc, gchar ***argv)
+void session_startup(gint argc, gchar **argv)
 {
 #define SM_ERR_LEN 1024
 
     SmcCallbacks cb;
     gchar sm_err[SM_ERR_LEN];
+    gint i;
 
-    parse_args(argc, argv);
+    sm_argc = argc;
+    sm_argv = g_new(gchar*, argc);
+    for (i = 0; i < argc; ++i)
+        sm_argv[i] = argv[i];
 
-    if (sm_disable)
+    parse_args(&sm_argc, &sm_argv);
+
+    if (sm_disable) {
+        g_free(sm_argv);
         return;
+    }
 
     sm_sessions_path = g_build_filename(parse_xdg_data_home_path(),
                                         "openbox", "sessions", NULL);
@@ -173,9 +181,6 @@ void session_startup(gint *argc, gchar ***argv)
         save_file = g_build_filename(sm_sessions_path, filename, NULL);
         g_free(filename);
     }
-
-    sm_argc = *argc;
-    sm_argv = *argv;
 
     cb.save_yourself.callback = sm_save_yourself;
     cb.save_yourself.client_data = NULL;
@@ -257,6 +262,7 @@ void session_shutdown()
     g_free(sm_sessions_path);
     g_free(save_file);
     g_free(sm_id);
+    g_free(sm_argv);
 
     if (sm_conn) {
         SmPropValue val_hint;

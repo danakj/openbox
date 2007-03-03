@@ -259,6 +259,9 @@ void session_startup(gint argc, gchar **argv)
 
 void session_shutdown()
 {
+    if (sm_disable)
+        return;
+
     g_free(sm_sessions_path);
     g_free(save_file);
     g_free(sm_id);

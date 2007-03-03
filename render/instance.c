@@ -57,6 +57,8 @@ void print_refs(gint id)
 
 RrInstance* RrInstanceNew (Display *display, gint screen)
 {
+    g_type_init(); /* supposedly needed for pango but seems to work without */
+
     definst = g_new (RrInstance, 1);
     definst->display = display;
     definst->screen = screen;
@@ -64,6 +66,7 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
     definst->depth = DefaultDepth(display, screen);
     definst->visual = DefaultVisual(display, screen);
     definst->colormap = DefaultColormap(display, screen);
+    definst->pango = pango_xft_get_context(display, screen);
 
     definst->pseudo_colors = NULL;
 
@@ -210,6 +213,7 @@ void RrInstanceFree (RrInstance *inst)
         if (inst == definst) definst = NULL;
         g_free(inst->pseudo_colors);
         g_hash_table_destroy(inst->color_hash);
+        g_object_unref(inst->pango);
     }
 }
 

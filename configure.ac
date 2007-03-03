@@ -74,32 +74,9 @@ PKG_CHECK_MODULES([GLIB], [glib-2.0])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
-AC_ARG_ENABLE(pango,
-  AC_HELP_STRING(
-    [--disable-pango],
-    [disable the pango library [[default=enabled]]]
-  ),
-  [enable_pango=$enableval],
-  [enable_pango=yes]
-)
-
-if test "$enable_pango" = yes; then
-PKG_CHECK_MODULES([PANGO], [pango pangoxft],
-  [
-    AC_DEFINE(USE_PANGO, [1], [Use Pango])
-    AC_SUBST(PANGO_CFLAGS)
-    AC_SUBST(PANGO_LIBS)
-    pango_found=yes
-  ],
-    pango_found=no
-)
-else
-  pango_found=no
-fi
-
-PKG_CHECK_MODULES(XFT, [xft])
-AC_SUBST(XFT_CFLAGS)
-AC_SUBST(XFT_LIBS)
+PKG_CHECK_MODULES(PANGO, [pango pangoxft])
+AC_SUBST(PANGO_CFLAGS)
+AC_SUBST(PANGO_LIBS)
 
 PKG_CHECK_MODULES(XML, [libxml-2.0])
 AC_SUBST(XML_CFLAGS)
@@ -155,7 +132,6 @@ AC_OUTPUT
 
 AC_MSG_RESULT
 AC_MSG_RESULT([Compiling with these options:
-               Pango... $pango_found
                Startup Notification... $sn_found
                Session Management... $SM
                ])

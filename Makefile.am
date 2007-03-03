@@ -34,13 +34,12 @@ bin_PROGRAMS = \
 ## render ##
 
 render_rendertest_CPPFLAGS = \
-	$(XFT_CFLAGS) \
+	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"RenderTest\"
 render_rendertest_LDADD = \
 	parser/libobparser.la \
 	render/libobrender.la \
-	$(XFT_LIBS) \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
 	$(XML_LIBS) \
@@ -49,7 +48,6 @@ render_rendertest_SOURCES = render/test.c
 
 render_libobrender_la_CPPFLAGS = \
 	$(X_CFLAGS) \
-	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
@@ -60,7 +58,6 @@ render_libobrender_la_LDFLAGS = \
 render_libobrender_la_LIBADD = \
 	parser/libobparser.la \
 	$(X_LIBS) \
-	$(XFT_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
@@ -108,7 +105,7 @@ parser_libobparser_la_SOURCES = \
 openbox_openbox_CPPFLAGS = \
 	$(X_CFLAGS) \
 	$(SM_CFLAGS) \
-	$(XFT_CFLAGS) \
+	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(LIBSN_CFLAGS) \
 	$(XML_CFLAGS) \

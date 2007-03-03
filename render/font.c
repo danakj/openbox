@@ -23,19 +23,13 @@
 #include "mask.h"
 #include "theme.h"
 #include "geom.h"
+#include "instance.h"
 #include "gettext.h"
 
-#include <X11/Xft/Xft.h>
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
-#ifdef USE_PANGO
 #include <locale.h>
-#endif
-
-#define ELIPSES "..."
-#define ELIPSES_LENGTH(font) \
-    (font->elipses_length + (font->shadow ? font->offset : 0))
 
 #define OB_SHADOW "shadow"
 #define OB_SHADOW_OFFSET "shadowoffset"
@@ -47,9 +41,6 @@ FcObjectType objs[] = {
     { OB_SHADOW_ALPHA,  FcTypeInteger  }
 };
 
-#ifdef USE_PANGO
-static PangoContext *context;
-#endif
 static gboolean started = FALSE;
 
 static void font_startup(void)
@@ -59,25 +50,29 @@ static void font_startup(void)
         exit(EXIT_FAILURE);
     }
 
-#ifdef USE_PANGO
-    g_type_init();
-    /* these will never be freed, but we will need
-     * them until we shut down anyway */
-    context = pango_xft_get_context(RrDisplay(NULL), RrScreen(NULL));
-#endif /* USE_PANGO */
     /* Here we are teaching xft about the shadow, shadowoffset & shadowtint */
     FcNameRegisterObjectTypes(objs, (sizeof(objs) / sizeof(objs[0])));
 }
 
-static void measure_font(RrFont *f)
+static void measure_font(const RrInstance *inst, RrFont *f)
 {
-    /* xOff, yOff is the normal spacing to the next glyph. */
-    XGlyphInfo info;
+    PangoFontMetrics *metrics;
+    gchar *locale, *p;
 
-    /* measure an elipses */
-    XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
-                       (FcChar8*)ELIPSES, strlen(ELIPSES), &info);
-    f->elipses_length = (signed) info.xOff;
+    /* get the default language from the locale
+       (based on gtk_get_default_language in gtkmain.c) */
+    locale = g_strdup(setlocale(LC_CTYPE, NULL));
+    if ((p = strchr(locale, '.'))) *p = '\0'; /* strip off the . */
+    if ((p = strchr(locale, '@'))) *p = '\0'; /* strip off the @ */
+
+    /* measure the ascent and descent */
+    metrics = pango_context_get_metrics(inst->pango, f->font_desc,
+                                        pango_language_from_string(locale));
+    f->ascent = pango_font_metrics_get_ascent(metrics);
+    f->descent = pango_font_metrics_get_descent(metrics);
+    pango_font_metrics_unref(metrics);
+
+    g_free(locale);
 }
 
 static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
@@ -85,100 +80,78 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     /* This function is called for each font in the theme file. */
     /* It returns a pointer to a RrFont struct after filling it. */
     RrFont *out;
-    FcPattern *pat, *match;
-    XftFont *font;
-    FcResult res;
+    FcPattern *pat;
     gint tint;
-#ifdef USE_PANGO
-    guchar *tmp_string = NULL;
-    gint tmp_int;
-#endif /* USE_PANGO */
+    gchar *sval;
+    gint ival;
 
     if (!(pat = XftNameParse(fontstring)))
         return NULL;
 
-    match = XftFontMatch(RrDisplay(inst), RrScreen(inst), pat, &res);
-    FcPatternDestroy(pat);
-    if (!match)
-        return NULL;
-
     out = g_new(RrFont, 1);
     out->inst = inst;
-#ifdef USE_PANGO
-    out->pango_font_description = pango_font_description_new();
+    out->font_desc = pango_font_description_new();
+    out->layout = pango_layout_new(inst->pango);
 
-    if (FcPatternGetString(match, "family", 0, &tmp_string) !=
-            FcResultTypeMismatch) {
-        pango_font_description_set_family(out->pango_font_description,
-                                          (gchar *)tmp_string);
-        tmp_string = NULL;
-    }
-    if (FcPatternGetString(match, "style", 0, &tmp_string) !=
-            FcResultTypeMismatch) {
-        /* Bold ? */
-        if (!g_ascii_strcasecmp("bold", (gchar *)tmp_string)) {
-            pango_font_description_set_weight(out->pango_font_description,
+    /* get the data from the parsed xft string */
+
+    /* get the family */
+    if (FcPatternGetString(pat, "family", 0,
+                           (FcChar8**)&sval) == FcResultMatch)
+        pango_font_description_set_family(out->font_desc, sval);
+    
+    /* get the weight */
+    if (FcPatternGetInteger(pat, "weight", 0, &ival) == FcResultMatch) {
+        if (ival == FC_WEIGHT_LIGHT)
+            pango_font_description_set_weight(out->font_desc,
+                                              PANGO_WEIGHT_LIGHT);
+        else if (ival == FC_WEIGHT_DEMIBOLD)
+            pango_font_description_set_weight(out->font_desc,
+                                              PANGO_WEIGHT_SEMIBOLD);
+        else if (ival == FC_WEIGHT_BOLD)
+            pango_font_description_set_weight(out->font_desc,
                                               PANGO_WEIGHT_BOLD);
-        }
-        /* Italic ? */
-        else if (!g_ascii_strcasecmp("italic", (gchar *)tmp_string)) {
-            pango_font_description_set_style(out->pango_font_description,
+        else if (ival == FC_WEIGHT_BLACK)
+            pango_font_description_set_weight(out->font_desc,
+                                              PANGO_WEIGHT_ULTRABOLD);
+    }
+
+    if (FcPatternGetInteger(pat, "slant", 0, &ival) == FcResultMatch) {
+        if (ival == FC_SLANT_ITALIC)
+            pango_font_description_set_style(out->font_desc,
                                              PANGO_STYLE_ITALIC);
-        }
-        tmp_string = NULL;
+        else if (ival == FC_SLANT_OBLIQUE)
+            pango_font_description_set_style(out->font_desc,
+                                             PANGO_STYLE_OBLIQUE);
     }
 
-    if (FcPatternGetInteger(match, "pixelsize", 0, &tmp_int) !=
-            FcResultTypeMismatch) {
-        pango_font_description_set_absolute_size(out->pango_font_description,
-                                        tmp_int*PANGO_SCALE);
-    }
+    /* get the size */
+    if (FcPatternGetInteger(pat, "size", 0, &ival) == FcResultMatch)
+        pango_font_description_set_size(out->font_desc, ival * PANGO_SCALE);
+    else if (FcPatternGetInteger(pat, "pixelsize", 0, &ival) == FcResultMatch)
+        pango_font_description_set_absolute_size(out->font_desc,
+                                                 ival * PANGO_SCALE);
 
-    /* based on gtkmain.c gtk_get_default_language() */
-    {
-        gchar *locale, *p;
-        PangoFontMetrics *metrics;
-
-        locale = g_strdup(setlocale(LC_CTYPE, NULL));
-        if ((p = strchr(locale, '.')))
-            *p = '\0';
-        if ((p = strchr(locale, '@')))
-            *p = '\0';
-        metrics = 
-            pango_context_get_metrics(context, out->pango_font_description,
-                                      pango_language_from_string(locale));
-        out->pango_ascent = pango_font_metrics_get_ascent(metrics);
-        out->pango_descent = pango_font_metrics_get_descent(metrics);
-        g_free(locale);
-        pango_font_metrics_unref(metrics);
-    }
-#endif /* USE_PANGO */
-
-    if (FcPatternGetBool(match, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
+    if (FcPatternGetBool(pat, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
         out->shadow = FALSE;
 
-    if (FcPatternGetInteger(match, OB_SHADOW_OFFSET, 0, &out->offset) !=
+    if (FcPatternGetInteger(pat, OB_SHADOW_OFFSET, 0, &out->offset) !=
         FcResultMatch)
         out->offset = 1;
 
-    if (FcPatternGetInteger(match, OB_SHADOW_ALPHA, 0, &tint) != FcResultMatch)
+    if (FcPatternGetInteger(pat, OB_SHADOW_ALPHA, 0, &tint) != FcResultMatch)
         tint = 25;
     if (tint > 100) tint = 100;
     else if (tint < -100) tint = -100;
     out->tint = tint;
 
-    font = XftFontOpenPattern(RrDisplay(inst), match);
-    if (!font) {
-        FcPatternDestroy(match);
-        g_free(out);
-        return NULL;
-    } else
-        out->xftfont = font;
+    /* setup the layout */
+    pango_layout_set_font_description(out->layout, out->font_desc);
+    pango_layout_set_single_paragraph_mode(out->layout, TRUE);
+    pango_layout_set_ellipsize(out->layout, PANGO_ELLIPSIZE_MIDDLE);
 
-#ifdef USE_PANGO
-    /*        FcPatternDestroy(match); */
-#endif /* USE_PANGO */
-    measure_font(out);
+    /* get the ascent and descent */
+    measure_font(inst, out);
 
     return out;
 }
@@ -207,10 +180,8 @@ RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring)
 void RrFontClose(RrFont *f)
 {
     if (f) {
-#ifdef USE_PANGO
-        pango_font_description_free(f->pango_font_description);
-#endif
-        XftFontClose(RrDisplay(f->inst), f->xftfont);
+        g_object_unref(f->layout);
+        pango_font_description_free(f->font_desc);
         g_free(f);
     }
 }
@@ -218,56 +189,29 @@ void RrFontClose(RrFont *f)
 static void font_measure_full(const RrFont *f, const gchar *str,
                               gint *x, gint *y)
 {
-#ifdef USE_PANGO
-    PangoLayout *pl;
     PangoRectangle rect;
-    pl = pango_layout_new (context);
-    pango_layout_set_text(pl, str, -1);
-    pango_layout_set_font_description(pl, f->pango_font_description);
-    pango_layout_set_single_paragraph_mode(pl, TRUE);
-    pango_layout_get_pixel_extents(pl, NULL, &rect);
+
+    pango_layout_set_text(f->layout, str, -1);
+    pango_layout_set_width(f->layout, -1);
+    pango_layout_get_pixel_extents(f->layout, NULL, &rect);
     *x = rect.width + (f->shadow ? ABS(f->offset) : 0);
     *y = rect.height + (f->shadow ? ABS(f->offset) : 0);
-    g_object_unref(pl);
-
-#else
-    XGlyphInfo info;
-
-    XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
-                       (const FcChar8*)str, strlen(str), &info);
-
-    *x = (signed) info.xOff + (f->shadow ? ABS(f->offset) : 0);
-    *y = info.height + (f->shadow ? ABS(f->offset) : 0);
-#endif /* USE_PANGO */
 }
 
 RrSize *RrFontMeasureString(const RrFont *f, const gchar *str)
 {
     RrSize *size;
     size = g_new(RrSize, 1);
-    font_measure_full (f, str, &size->width, &size->height);
+    font_measure_full(f, str, &size->width, &size->height);
     return size;
 }
 
 gint RrFontHeight(const RrFont *f)
 {
-#ifdef USE_PANGO
-    return (f->pango_ascent
-            + f->pango_descent
-           ) / PANGO_SCALE +
-           (f->shadow ? f->offset : 0);
-#else
-    return f->xftfont->ascent + f->xftfont->descent +
-           (f->shadow ? f->offset : 0);
-#endif
+    return (f->ascent + f->descent) / PANGO_SCALE +
+        (f->shadow ? f->offset : 0);
 }
 
-gint RrFontMaxCharWidth(const RrFont *f)
-{
-    return (signed) f->xftfont->max_advance_width;
-}
-
-#ifdef USE_PANGO
 static inline int font_calculate_baseline(RrFont *f, gint height)
 {
 /* For my own reference:
@@ -283,84 +227,41 @@ static inline int font_calculate_baseline(RrFont *f, gint height)
  *  ^space/2  |
  *  V_________v
  */
-    int asc = f->pango_ascent;
-    int ascdesc = asc + f->pango_descent;
-    int space = height * PANGO_SCALE - ascdesc;
-    int baseline = space / 2 + asc;
-    return baseline / PANGO_SCALE;
+    return (((height * PANGO_SCALE) /* height of the space in pango units */
+             - (f->ascent + f->descent)) /* minus space taken up by text */
+            / 2 /* divided by two -> half of the empty space (this is the top
+                   of the text) */
+            + f->ascent) /* now move down to the baseline */
+        / PANGO_SCALE; /* back to pixels */
 }
-#endif
 
 void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 {
     gint x,y,w,h;
     XftColor c;
-    GString *text;
     gint mw;
-#ifndef USE_PANGO
-    gint mh;
-    size_t l;
-    gboolean shortened = FALSE;
-#else
-    PangoLayout *pl;
     PangoRectangle rect;
 
-    pl = pango_layout_new (context);
-#endif /* USE_PANGO */
-
-    /* center vertically
-     * for xft we pass the top edge of the text for positioning... */
-#ifndef USE_PANGO
-    y = area->y +
-        (area->height - RrFontHeight(t->font)) / 2;
-#else
-    /* but for pango we pass the baseline, since different fonts have
-     * different top edges. It looks stupid when the baseline of "normal"
-     * text jumps up and down when a "strange" character is just added
-     * to the end of the text */
+    /* center the text vertically
+       We do this centering based on the 'baseline' since different fonts have
+       different top edges. It looks bad when the whole string is moved when 1
+       character from a non-default language is included in the string */
     y = area->y +
         font_calculate_baseline(t->font, area->height);
-#endif
+
     /* the +2 and -4 leave a small blank edge on the sides */
     x = area->x + 2;
     w = area->width - 4;
     h = area->height;
 
-    text = g_string_new(t->string);
-#ifndef USE_PANGO
-    l = g_utf8_strlen(text->str, -1);
-    font_measure_full(t->font, text->str, &mw, &mh);
-    while (l && mw > area->width) {
-        shortened = TRUE;
-        /* remove a character from the middle */
-        text = g_string_erase(text, l-- / 2, 1);
-        /* if the elipses are too large, don't show them at all */
-        if (ELIPSES_LENGTH(t->font) > area->width)
-            shortened = FALSE;
-        font_measure_full(t->font, text->str, &mw, &mh);
-        mw += ELIPSES_LENGTH(t->font);
-    }
-    if (shortened) {
-        text = g_string_insert(text, (l + 1) / 2, ELIPSES);
-        l += 3;
-    }
-    if (!l) return;
+    pango_layout_set_text(t->font->layout, t->string, -1);
+    pango_layout_set_width(t->font->layout, w * PANGO_SCALE);
 
-    l = strlen(text->str); /* number of bytes */
-
-#else
-    pango_layout_set_text(pl, text->str, -1);
-    pango_layout_set_font_description(pl, t->font->pango_font_description);
-    pango_layout_set_single_paragraph_mode(pl, TRUE);
-    pango_layout_set_width(pl, w * PANGO_SCALE);
-    pango_layout_set_ellipsize(pl, PANGO_ELLIPSIZE_MIDDLE);
-    /* This doesn't work with layout_line() of course */
-/*    pango_layout_set_alignment(pl, (PangoAlignment)(t->justify)); */
-    pango_layout_get_pixel_extents(pl, NULL, &rect);
+    pango_layout_get_pixel_extents(t->font->layout, NULL, &rect);
     mw = rect.width;
 
-#endif /* USE_PANGO */
-
+    /* pango_layout_set_alignment doesn't work with 
+       pango_xft_render_layout_line */
     switch (t->justify) {
     case RR_JUSTIFY_LEFT:
         break;
@@ -388,37 +289,22 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
             c.pixel = WhitePixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
         }
-#ifndef USE_PANGO
-        XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->font->offset,
-                          t->font->xftfont->ascent + y + t->font->offset,
-                          (FcChar8*)text->str, l);
-#else /* USE_PANGO */
         /* see below... */
-        pango_xft_render_layout_line(d, &c, pango_layout_get_line(pl, 0),
-                                     (x + t->font->offset) * PANGO_SCALE,
-                                     (y + t->font->offset) * PANGO_SCALE);
-#endif /* USE_PANGO */
+        pango_xft_render_layout_line
+            (d, &c, pango_layout_get_line(t->font->layout, 0),
+             (x + t->font->offset) * PANGO_SCALE,
+             (y + t->font->offset) * PANGO_SCALE);
     }
+
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
     c.color.blue = t->color->b | t->color->b << 8;
     c.color.alpha = 0xff | 0xff << 8; /* fully opaque text */
     c.pixel = t->color->pixel;
 
-#ifndef USE_PANGO
-    XftDrawStringUtf8(d, &c, t->font->xftfont, x,
-                      t->font->xftfont->ascent + y,
-                      (FcChar8*)text->str, l);
-#else /* USE_PANGO */
-    /* layout_line() bases y on the baseline, while layout() bases y on the
-     * top of the ink layout. We want the baseline to always be in the same
-     * place, thusly, we use layout_line()
-     * The actual line doesn't need to be freed (per the pango docs) */
-    pango_xft_render_layout_line(d, &c, pango_layout_get_line(pl, 0),
-                                 x * PANGO_SCALE, y * PANGO_SCALE);
-    g_object_unref(pl);
-#endif
-
-    g_string_free(text, TRUE);
-    return;
+    /* layout_line() uses y to specify the baseline
+       The line doesn't need to be freed, it's a part of the layout */
+    pango_xft_render_layout_line
+        (d, &c, pango_layout_get_line(t->font->layout, 0),
+         x * PANGO_SCALE, y * PANGO_SCALE);
 }

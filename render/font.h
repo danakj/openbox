@@ -21,26 +21,22 @@
 #define __font_h
 #include "render.h"
 #include "geom.h"
-#ifdef USE_PANGO
 #include <pango/pango.h>
-#include <pango/pangoxft.h>
-#endif /* USE_PANGO */
 
 struct _RrFont {
     const RrInstance *inst;
-    XftFont *xftfont;
-    gint elipses_length;
+    PangoFontDescription *font_desc; 
+    PangoLayout *layout; /*!< Used for measuring and rendering strings */
+    gint ascent; /*!< The font's ascent in pango-units */
+    gint descent; /*!< The font's descent in pango-units */
+    gint elipses_length; /*!< This one is in pixels, yay */
     gint shadow;
     gchar tint;
     gint offset;
-#ifdef USE_PANGO
-    PangoFontDescription *pango_font_description;
-    gint pango_ascent;
-    gint pango_descent;
-#endif /* USE_PANGO */
 };
 
 RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring);
 void RrFontClose(RrFont *f);
 void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
+
 #endif /* __font_h */

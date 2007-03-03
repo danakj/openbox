@@ -25,8 +25,7 @@
 #include "version.h"
 
 #include <X11/Xlib.h> /* some platforms dont include this as needed for Xft */
-#define _XFT_NO_COMPAT_ /* no Xft 1 API */
-#include <X11/Xft/Xft.h>
+#include <pango/pangoxft.h>
 #include <glib.h>
 
 G_BEGIN_DECLS

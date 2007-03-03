@@ -105,44 +105,32 @@ static void save_commands()
     g_free(prop_cmd.vals);
 }
 
-static void remove_args(gint *argc, gchar ***argv, gint index, gint num)
+static void parse_args(gint argc, gchar **argv)
 {
     gint i;
 
-    for (i = index; i < index + num; ++i)
-        (*argv)[i] = (*argv)[i+num];
-    *argc -= num;
-}
-
-static void parse_args(gint *argc, gchar ***argv)
-{
-    gint i;
-
-    for (i = 1; i < *argc; ++i) {
-        if (!strcmp((*argv)[i], "--sm-client-id")) {
-            if (i == *argc - 1) /* no args left */
+    for (i = 1; i < argc; ++i) {
+        if (!strcmp((argv)[i], "--sm-client-id")) {
+            if (i == argc - 1) /* no args left */
                 g_printerr(_("--sm-client-id requires an argument\n"));
             else {
-                sm_id = g_strdup((*argv)[i+1]);
-                remove_args(argc, argv, i, 2);
+                sm_id = g_strdup((argv)[i+1]);
                 ++i;
             }
-        } else if (!strcmp((*argv)[i], "--sm-save-file")) {
-            if (i == *argc - 1) /* no args left */
+        } else if (!strcmp((argv)[i], "--sm-save-file")) {
+            if (i == argc - 1) /* no args left */
                 g_printerr(_("--sm-save-file requires an argument\n"));
             else {
-                save_file = g_strdup((*argv)[i+1]);
-                remove_args(argc, argv, i, 2);
+                save_file = g_strdup((argv)[i+1]);
                 ++i;
             }
-        } else if (!strcmp((*argv)[i], "--sm-disable")) {
+        } else if (!strcmp((argv)[i], "--sm-disable")) {
             sm_disable = TRUE;
-            remove_args(argc, argv, i, 1);
         }
     }
 }
 
-void session_startup(gint *argc, gchar ***argv)
+void session_startup(gint argc, gchar **argv)
 {
 #define SM_ERR_LEN 1024
 
@@ -174,8 +162,8 @@ void session_startup(gint *argc, gchar ***argv)
         g_free(filename);
     }
 
-    sm_argc = *argc;
-    sm_argv = *argv;
+    sm_argc = argc;
+    sm_argv = argv;
 
     cb.save_yourself.callback = sm_save_yourself;
     cb.save_yourself.client_data = NULL;

@@ -112,18 +112,40 @@ gint main(gint argc, gchar **argv)
         g_warning("Unable to change to home directory (%s): %s",
                   g_get_home_dir(), g_strerror(errno));
      
-    parse_paths_startup();
-
-    session_startup(&argc, &argv);
-
     /* parse out command line args */
     parse_args(argc, argv);
+
+    if (!reconfigure_and_exit) {
+        parse_paths_startup();
+
+        session_startup(argc, argv);
+    }
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
         ob_exit_with_error("Failed to open the display.");
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec.");
+
+    if (reconfigure_and_exit) {
+        guint32 pid;
+        gboolean ret;
+
+        prop_startup(); /* get atoms values for the display */
+        ret = PROP_GET32(RootWindow(ob_display, DefaultScreen(ob_display)),
+                                    openbox_pid, cardinal, &pid);
+        XCloseDisplay(ob_display);
+        if (!ret) {
+            g_print("Openbox does not appear to be running on this "
+                    "display.\n");
+        } else {
+            g_print("Telling the Openbox process # %u to reconfigure.\n", pid);
+            ret = (kill(pid, SIGUSR2) == 0);
+            if (!ret)
+                g_print("Error: %s.\n", strerror(errno));
+        }
+        exit(ret ? EXIT_SUCCESS : EXIT_FAILURE);
+    }
 
     ob_main_loop = ob_main_loop_new(ob_display);
 
@@ -370,6 +392,9 @@ static void print_help()
 {
     g_print("Syntax: openbox [options]\n\n");
     g_print("Options:\n\n");
+    g_print("  --reconfigure       Tell the currently running instance of "
+            "Openbox to\n"
+            "                      reconfigure (and then exit immediately)\n");
 #ifdef USE_SM
     g_print("  --sm-disable        Disable connection to session manager\n");
     g_print("  --sm-client-id ID   Specify session management ID\n");
@@ -406,10 +431,8 @@ static void parse_args(gint argc, gchar **argv)
             xsync = TRUE;
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
-        } else {
-            g_printerr("Invalid option: '%s'\n\n", argv[i]);
-            print_help();
-            exit(1);
+        } else if (!strcmp(argv[i], "--reconfigure")) {
+            reconfigure_and_exit = TRUE;
         }
     }
 }

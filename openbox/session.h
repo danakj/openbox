@@ -38,7 +38,7 @@ struct _ObSessionState {
 
 extern GList *session_saved_state;
 
-void session_startup(gint argc, gchar **argv);
+void session_startup(gint *argc, gchar ***argv);
 void session_shutdown();
 
 GList* session_state_find(struct _ObClient *c);

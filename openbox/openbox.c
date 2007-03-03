@@ -76,16 +76,17 @@ RrTheme    *ob_rr_theme;
 ObMainLoop *ob_main_loop;
 Display    *ob_display;
 gint        ob_screen;
-gboolean    ob_replace_wm;
+gboolean    ob_replace_wm = FALSE;
 
 static ObState   state;
-static gboolean  xsync;
-static gboolean  reconfigure;
-static gboolean  restart;
-static gchar    *restart_path;
+static gboolean  xsync = FALSE;
+static gboolean  reconfigure = FALSE;
+static gboolean  restart = FALSE;
+static gchar    *restart_path = NULL;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
+static gboolean  reconfigure_and_exit = FALSE;
 
 static void signal_handler(gint signal, gpointer data);
 static void parse_args(gint argc, gchar **argv);

@@ -246,7 +246,8 @@ void client_manage(Window window)
     /* check if it has already been unmapped by the time we started mapping
        the grab does a sync so we don't have to here */
     if (XCheckTypedWindowEvent(ob_display, window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e)) {
+        XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e))
+    {
         XPutBackEvent(ob_display, &e);
 
         grab_server(FALSE);
@@ -255,7 +256,8 @@ void client_manage(Window window)
 
     /* make sure it isn't an override-redirect window */
     if (!XGetWindowAttributes(ob_display, window, &attrib) ||
-        attrib.override_redirect) {
+        attrib.override_redirect)
+    {
         grab_server(FALSE);
         return; /* don't manage it */
     }
@@ -263,7 +265,8 @@ void client_manage(Window window)
     /* is the window a docking app */
     if ((wmhint = XGetWMHints(ob_display, window))) {
         if ((wmhint->flags & StateHint) &&
-            wmhint->initial_state == WithdrawnState) {
+            wmhint->initial_state == WithdrawnState)
+        {
             dock_add(window, wmhint);
             grab_server(FALSE);
             XFree(wmhint);

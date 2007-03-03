@@ -214,6 +214,7 @@ void RrInstanceFree (RrInstance *inst)
         g_free(inst->pseudo_colors);
         g_hash_table_destroy(inst->color_hash);
         g_object_unref(inst->pango);
+        g_free(inst);
     }
 }
 

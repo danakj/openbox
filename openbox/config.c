@@ -489,14 +489,20 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 slant = RR_FONTSLANT_OBLIQUE;
             g_free(s);
         }
-        if ((fnode = parse_find_node("shadow", n->children)))
-            shadow = parse_bool(doc, fnode);
-        if ((fnode = parse_find_node("shadowoffset", n->children)))
-            offset = parse_int(doc, fnode);
-        if ((fnode = parse_find_node("shadowtint", n->children))) {
-            tint = parse_int(doc, fnode);
-            if (tint > 100) tint = 100;
-            else if (tint < -100) tint = -100;
+        if ((fnode = parse_find_node("shadow", n->children))) {
+            xmlNodePtr snode;
+            gboolean   s;
+
+            if (parse_attr_bool("enabled", fnode, &s))
+                shadow = s;
+            
+            if ((snode = parse_find_node("offset", fnode->children)))
+                offset = parse_int(doc, snode);
+            if ((snode = parse_find_node("tint", fnode->children))) {
+                tint = parse_int(doc, snode);
+                if (tint > 100) tint = 100;
+                else if (tint < -100) tint = -100;
+            }
         }
 
         *font = RrFontOpen(ob_rr_inst, name, size, weight, slant,

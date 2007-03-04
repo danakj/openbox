@@ -192,7 +192,7 @@ struct _RrAppearance {
 #define RrDefaultFontSlant        RR_FONTSLANT_NORMAL
 #define RrDefaultFontShadow       FALSE
 #define RrDefaultFontShadowOffset 1
-#define RrDefaultFontShadowTint   25
+#define RrDefaultFontShadowTint   50
 
 RrInstance* RrInstanceNew (Display *display, gint screen);
 void        RrInstanceFree (RrInstance *inst);

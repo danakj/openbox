@@ -227,7 +227,6 @@ RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 
-RrFont *RrFontOpenByString  (const RrInstance *inst, gchar *fontstring);
 RrFont *RrFontOpen          (const RrInstance *inst, gchar *name, gint size,
                              RrFontWeight weight, RrFontSlant slant,
                              gboolean shadow, gint shadowoffset,

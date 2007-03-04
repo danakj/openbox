@@ -87,7 +87,7 @@ static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static gboolean  message_and_exit = FALSE;
-static Atom     *message;
+static guint     message = 0;
 static gboolean  being_replaced = FALSE;
 
 static void signal_handler(gint signal, gpointer data);
@@ -132,9 +132,11 @@ gint main(gint argc, gchar **argv)
     if (message_and_exit) {
         prop_startup();
 
-        /* Send client message telling the OB process to reconfigure */
-        prop_message(RootWindow(ob_display, ob_screen), prop_atoms.ob_control,
-                     *message, 0, 0, 0, SubstructureNotifyMask);
+        /* Send client message telling the OB process to:
+         * message = 1 -> reconfigure 
+         * message = 2 -> restart */
+        PROP_MSG(RootWindow(ob_display, ob_screen),
+                 ob_control, message, 0, 0, 0);
         XCloseDisplay(ob_display);
         exit(0);
     }
@@ -433,10 +435,10 @@ static void parse_args(gint argc, gchar **argv)
             ob_debug_show_output(TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
             message_and_exit = TRUE;
-            message = &prop_atoms.ob_reconfigure;
+            message = 1;
         } else if (!strcmp(argv[i], "--restart")) {
             message_and_exit = TRUE;
-            message = &prop_atoms.ob_restart;
+            message = 2;
         }
     }
 }

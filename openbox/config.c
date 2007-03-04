@@ -452,9 +452,6 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         gint         size = RrDefaultFontSize;
         RrFontWeight weight = RrDefaultFontWeight;
         RrFontSlant  slant = RrDefaultFontSlant;
-        gboolean     shadow = RrDefaultFontShadow;
-        gint         offset = RrDefaultFontShadowOffset;
-        gchar        tint = RrDefaultFontShadowTint;
 
         if (parse_attr_contains("ActiveWindow", n, "place"))
             font = &config_font_activewindow;
@@ -489,24 +486,8 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 slant = RR_FONTSLANT_OBLIQUE;
             g_free(s);
         }
-        if ((fnode = parse_find_node("shadow", n->children))) {
-            xmlNodePtr snode;
-            gboolean   s;
 
-            if (parse_attr_bool("enabled", fnode, &s))
-                shadow = s;
-            
-            if ((snode = parse_find_node("offset", fnode->children)))
-                offset = parse_int(doc, snode);
-            if ((snode = parse_find_node("tint", fnode->children))) {
-                tint = parse_int(doc, snode);
-                if (tint > 100) tint = 100;
-                else if (tint < -100) tint = -100;
-            }
-        }
-
-        *font = RrFontOpen(ob_rr_inst, name, size, weight, slant,
-                           shadow, offset, tint);
+        *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
         g_free(name);
     next_font:
         n = parse_find_node("font", n->next);

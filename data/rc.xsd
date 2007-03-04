@@ -43,6 +43,8 @@
          Add movefromedge* actions
      Sun Mar  4 12:12:19 EST 2007 - danakj(a)orodu.net
          Add font section to theme section
+     Sun Mar  4 13:49:37 EST 2007 - danakj(a)orodu.net
+         Removing font shadows - they are going back into the themerc
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -120,15 +122,7 @@
             <xs:element minOccurs="0" name="size" type="xs:integer"/>
             <xs:element minOccurs="0" name="weight" type="ob:fontweight"/>
             <xs:element minOccurs="0" name="slant" type="ob:fontslant"/>
-            <xs:element minOccurs="0" name="shadow" type="ob:fontshadow"/>
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="fontshadow">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="offset" type="xs:integer"/>
-            <xs:element minOccurs="0" name="tint" type="xs:integer"/>
-        </xs:sequence>
-        <xs:attribute name="enabled" type="ob:bool" use="required"/>
     </xs:complexType>
     <xs:complexType name="desktops">
         <xs:annotation>

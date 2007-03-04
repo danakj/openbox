@@ -48,40 +48,24 @@
     <size>7</size>
     <weight>bold</weight>
     <slant>normal</slant>
-    <shadow enabled="yes">
-      <offset>1</offset>
-      <tint>30</tint>
-    </shadow>
   </font>
   <font place="InactiveWindow">
     <name>arial,sans</name>
     <size>7</size>
     <weight>bold</weight>
     <slant>normal</slant>
-    <shadow enabled="yes">
-      <offset>1</offset>
-      <tint>30</tint>
-    </shadow>
   </font>
   <font place="MenuTitle">
     <name>arial,sans</name>
     <size>8</size>
     <weight>bold</weight>
     <slant>normal</slant>
-    <shadow enabled="yes">
-      <offset>1</offset>
-      <tint>30</tint>
-    </shadow>
   </font>
   <font place="MenuItem">
     <name>arial,sans</name>
     <size>8</size>
     <weight>bold</weight>
     <slant>normal</slant>
-    <shadow enabled="yes">
-      <offset>1</offset>
-      <tint>30</tint>
-    </shadow>
   </font>
 </theme>
 

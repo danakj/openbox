@@ -67,6 +67,7 @@ gboolean parse_attr_contains(const gchar *val, xmlNodePtr node,
 
 gboolean parse_attr_string(const gchar *name, xmlNodePtr node, gchar **value);
 gboolean parse_attr_int(const gchar *name, xmlNodePtr node, gint *value);
+gboolean parse_attr_bool(const gchar *name, xmlNodePtr node, gboolean *value);
 
 /* paths */
 

@@ -226,6 +226,28 @@ xmlNodePtr parse_find_node(const gchar *tag, xmlNodePtr node)
     return NULL;
 }
 
+gboolean parse_attr_bool(const gchar *name, xmlNodePtr node, gboolean *value)
+{
+    xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
+    gboolean r = FALSE;
+    if (c) {
+        if (!xmlStrcasecmp(c, (const xmlChar*) "true"))
+            *value = TRUE, r = TRUE;
+        else if (!xmlStrcasecmp(c, (const xmlChar*) "yes"))
+            *value = TRUE, r = TRUE;
+        else if (!xmlStrcasecmp(c, (const xmlChar*) "on"))
+            *value = TRUE, r = TRUE;
+        else if (!xmlStrcasecmp(c, (const xmlChar*) "false"))
+            *value = FALSE, r = TRUE;
+        else if (!xmlStrcasecmp(c, (const xmlChar*) "no"))
+            *value = FALSE, r = TRUE;
+        else if (!xmlStrcasecmp(c, (const xmlChar*) "off"))
+            *value = FALSE, r = TRUE;
+    }
+    xmlFree(c);
+    return r;
+}
+
 gboolean parse_attr_int(const gchar *name, xmlNodePtr node, gint *value)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
@@ -254,8 +276,9 @@ gboolean parse_attr_contains(const gchar *val, xmlNodePtr node,
                              const gchar *name)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
-    gboolean r;
-    r = !xmlStrcasecmp(c, (const xmlChar*) val);
+    gboolean r = FALSE;
+    if (c)
+        r = !xmlStrcasecmp(c, (const xmlChar*) val);
     xmlFree(c);
     return r;
 }

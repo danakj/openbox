@@ -84,6 +84,20 @@ typedef enum {
     RR_JUSTIFY_RIGHT
 } RrJustify;
 
+typedef enum {
+    RR_FONTWEIGHT_LIGHT,
+    RR_FONTWEIGHT_NORMAL,
+    RR_FONTWEIGHT_SEMIBOLD,
+    RR_FONTWEIGHT_BOLD,
+    RR_FONTWEIGHT_ULTRABOLD
+} RrFontWeight;
+
+typedef enum {
+    RR_FONTSLANT_NORMAL,
+    RR_FONTSLANT_ITALIC,
+    RR_FONTSLANT_OBLIQUE
+} RrFontSlant;
+
 struct _RrSurface {
     RrSurfaceColorType grad;
     RrReliefType relief;

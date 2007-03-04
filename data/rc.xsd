@@ -41,6 +41,8 @@
          hack code for great justice
      Tue Oct 31 03:30:26 UTC 2006 - mikachu(a)openbox.org
          Add movefromedge* actions
+     Sun Mar  4 12:12:19 EST 2007 - danakj(a)orodu.net
+         Add font section to theme section
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -109,7 +111,24 @@
             <xs:element minOccurs="0" name="titleNumber" type="ob:bool"/>
             <xs:element minOccurs="0" name="keepBorder" type="ob:bool"/>
             <xs:element minOccurs="0" name="hideDisabled" type="ob:bool"/>
+            <xs:element minOccurs="0" name="font" type="ob:font"/>
         </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="font">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="name" type="xs:string"/>
+            <xs:element minOccurs="0" name="size" type="xs:integer"/>
+            <xs:element minOccurs="0" name="weight" type="ob:fontweight"/>
+            <xs:element minOccurs="0" name="slant" type="ob:fontslant"/>
+            <xs:element minOccurs="0" name="shadow" type="ob:fontshadow"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="fontshadow">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="offset" type="xs:integer"/>
+            <xs:element minOccurs="0" name="tint" type="xs:integer"/>
+        </xs:sequence>
+        <xs:attribute name="enabled" type="ob:bool" use="required"/>
     </xs:complexType>
     <xs:complexType name="desktops">
         <xs:annotation>
@@ -347,6 +366,19 @@
             <xs:enumeration value="false"/>
             <xs:enumeration value="on"/>
             <xs:enumeration value="off"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="fontweight">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="bold"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="fontslant">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="italic"/>
+            <xs:enumeration value="opaque"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="button">

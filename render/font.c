@@ -132,6 +132,8 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     else if (FcPatternGetInteger(pat, "pixelsize", 0, &ival) == FcResultMatch)
         pango_font_description_set_absolute_size(out->font_desc,
                                                  ival * PANGO_SCALE);
+    else
+        pango_font_description_set_size(out->font_desc, 8 * PANGO_SCALE);
 
     if (FcPatternGetBool(pat, OB_SHADOW, 0, &out->shadow) != FcResultMatch)
         out->shadow = FALSE;

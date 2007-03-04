@@ -137,7 +137,7 @@ gint main(gint argc, gchar **argv)
         PROP_MSG(RootWindow(ob_display, ob_screen),
                  ob_control, remote_control, 0, 0, 0);
         XCloseDisplay(ob_display);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     ob_main_loop = ob_main_loop_new(ob_display);

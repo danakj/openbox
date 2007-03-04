@@ -50,6 +50,7 @@ ObState ob_state();
 void ob_restart_other(const gchar *path);
 void ob_restart();
 void ob_exit(gint code);
+void ob_exit_replace();
 
 void ob_reconfigure();
 

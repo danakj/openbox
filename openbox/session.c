@@ -257,7 +257,7 @@ void session_startup(gint argc, gchar **argv)
     }
 }
 
-void session_shutdown()
+void session_shutdown(gboolean permanent)
 {
     if (sm_disable)
         return;
@@ -268,6 +268,26 @@ void session_shutdown()
     g_free(sm_argv);
 
     if (sm_conn) {
+        /* if permanent is true then we will change our session state so that
+           the SM won't run us again */
+        if (permanent) {
+            SmPropValue val_hint;
+            SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
+            SmProp *props[1];
+            gulong hint;
+
+            /* when we exit, we want to reset this to a more friendly state */
+            hint = SmRestartIfRunning;
+            val_hint.value = &hint;
+            val_hint.length = 1;
+
+            prop_hint.vals = &val_hint;
+
+            props[0] = &prop_hint;
+
+            SmcSetProperties(sm_conn, 1, props);
+        }
+
         SmcCloseConnection(sm_conn, 0, NULL);
 
         while (session_saved_state) {

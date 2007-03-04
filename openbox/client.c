@@ -705,16 +705,23 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 
     /* XXX watch for xinerama dead areas */
     /* This makes sure windows aren't entirely outside of the screen so you
-     * can't see them at all */
+       can't see them at all.
+       It makes sure 10% of the window is on the screen at least. At don't let
+       it move itself off the top of the screen, which would hide the titlebar
+       on you. (The user can still do this if they want too, it's only limiting
+       the application.
+    */
     if (client_normal(self)) {
         a = screen_area(self->desktop);
-        if (!self->strut.right && *x >= a->x + a->width - 1)
-            *x = a->x + a->width - self->frame->area.width;
-        if (!self->strut.bottom && *y >= a->y + a->height - 1)
-            *y = a->y + a->height - self->frame->area.height;
-        if (!self->strut.left && *x + self->frame->area.width - 1 < a->x)
-            *x = a->x;
-        if (!self->strut.top && *y + self->frame->area.height - 1 < a->y)
+        if (!self->strut.right &&
+            *x + self->frame->area.width/10 >= a->x + a->width - 1)
+            *x = a->x + a->width - self->frame->area.width/10;
+        if (!self->strut.bottom &&
+            *y + self->frame->area.height/10 >= a->y + a->height - 1)
+            *y = a->y + a->height - self->frame->area.height/10;
+        if (!self->strut.left && *x + self->frame->area.width*9/10 - 1 < a->x)
+            *x = a->x - self->frame->area.width*9/10;
+        if (!self->strut.top && *y < a->y)
             *y = a->y;
     }
 
@@ -729,7 +736,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
          * remember to fix the placement stuff to avoid it also and
          * then remove this XXX */
         a = screen_physical_area_monitor(client_monitor(self));
-        /* dont let windows map/move into the strut unless they
+        /* dont let windows map into the strut unless they
            are bigger than the available area */
         if (w <= a->width) {
             if (!self->strut.left && *x < a->x) *x = a->x;

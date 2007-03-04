@@ -579,7 +579,7 @@ static void event_handle_root(XEvent *e)
     switch(e->type) {
     case SelectionClear:
         ob_debug("Another WM has requested to replace us. Exiting.\n");
-        ob_exit(0);
+        ob_exit_replace();
         break;
 
     case ClientMessage:
@@ -854,7 +854,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 gint fh = h +
                      client->frame->size.top + client->frame->size.bottom;
                 client_find_onscreen(client, &newx, &newy, fw, fh,
-                                     client_normal(client));
+                                     FALSE);
                 if (e->xconfigurerequest.value_mask & CWX)
                     x = newx;
                 if (e->xconfigurerequest.value_mask & CWY)

@@ -87,6 +87,7 @@ static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static gboolean  reconfigure_and_exit = FALSE;
+static gboolean  being_replaced = FALSE;
 
 static void signal_handler(gint signal, gpointer data);
 static void parse_args(gint argc, gchar **argv);
@@ -332,7 +333,7 @@ gint main(gint argc, gchar **argv)
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
-    session_shutdown();
+    session_shutdown(being_replaced);
 
     XCloseDisplay(ob_display);
 
@@ -448,7 +449,7 @@ static void parse_args(gint argc, gchar **argv)
 void ob_exit_with_error(gchar *msg)
 {
     g_critical(msg);
-    session_shutdown();
+    session_shutdown(TRUE);
     exit(EXIT_FAILURE);
 }
 
@@ -473,6 +474,13 @@ void ob_reconfigure()
 void ob_exit(gint code)
 {
     exitcode = code;
+    ob_main_loop_exit(ob_main_loop);
+}
+
+void ob_exit_replace()
+{
+    exitcode = 0;
+    being_replaced = TRUE;
     ob_main_loop_exit(ob_main_loop);
 }
 

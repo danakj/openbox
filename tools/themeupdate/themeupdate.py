@@ -1,7 +1,10 @@
 #! /usr/bin/python
 
 # themeupdate.py for the Openbox window manager
-# Copyright (c) 2003        Ben Jansens
+# This utility is for updating old themes from Blackbox, Fluxbox, and Openbox2
+# to Openbox3
+#
+# Copyright (c) 2003-2007        Dana Jansens
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1577,8 +1577,21 @@ void client_update_title(ObClient *self)
         for (it = client_list; it; it = g_list_next(it))
             if (it->data != self) {
                 ObClient *c = it->data;
-                if (0 == strncmp(c->title, data, strlen(data)))
-                    nums |= 1 << c->title_count;
+
+                if (c->title_count == 1) {
+                    if (!strcmp(c->title, data))
+                        nums |= 1 << c->title_count;
+                } else {
+                    size_t len;
+                    gchar *end;
+
+                    /* find the beginning of our " - [%u]", this relies on
+                     that syntax being used */
+                    end = strrchr(c->title, '-') - 1; 
+                    len = end - c->title;
+                    if (!strncmp(c->title, data, len))
+                        nums |= 1 << c->title_count;
+                }
             }
         /* find first free number */
         for (i = 1; i <= 32; ++i)
@@ -1624,12 +1637,10 @@ no_number:
      * We don't need to check for config_title_number here since title_count
      * is not set above 1 then. */
     if (read_title && self->title_count > 1) {
-        gchar *vdata, *ndata;
-        ndata = g_strdup_printf(" - [%u]", self->title_count);
-        vdata = g_strconcat(data, ndata, NULL);
-        g_free(ndata);
+        gchar *newdata;
+        newdata = g_strdup_printf("%s - [%u]", data, self->title_count);
         g_free(data);
-        data = vdata;
+        data = newdata;
     }
 
     PROP_SETS(self->window, net_wm_visible_icon_name, data);

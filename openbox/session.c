@@ -26,7 +26,7 @@
 GList *session_saved_state;
 
 void session_startup(gint argc, gchar **argv) {}
-void session_shutdown() {}
+void session_shutdown(gboolean permanent) {}
 GList* session_state_find(ObClient *c) { return NULL; }
 gboolean session_state_cmp(ObSessionState *s, ObClient *c) { return FALSE; }
 void session_state_free(ObSessionState *state) {}

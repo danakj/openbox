@@ -419,7 +419,7 @@ static void sighandler(gint sig)
                but throw some helpful output here... */
 
             fprintf(stderr, "How are you gentlemen? All your base are"
-                    " belong to us. (Signal=%d)\n", sig);
+                    " belong to us. (Openbox received signal %d)\n", sig);
 
             /* die with a core dump */
             abort();

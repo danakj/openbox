@@ -116,6 +116,7 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
                                               PANGO_WEIGHT_ULTRABOLD);
     }
 
+    /* get the style/slant */
     if (FcPatternGetInteger(pat, "slant", 0, &ival) == FcResultMatch) {
         if (ival == FC_SLANT_ITALIC)
             pango_font_description_set_style(out->font_desc,

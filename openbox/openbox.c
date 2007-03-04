@@ -86,8 +86,7 @@ static gchar    *restart_path = NULL;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
-static gboolean  message_and_exit = FALSE;
-static guint     message = 0;
+static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
 
 static void signal_handler(gint signal, gpointer data);
@@ -117,7 +116,7 @@ gint main(gint argc, gchar **argv)
     /* parse out command line args */
     parse_args(argc, argv);
 
-    if (!message_and_exit) {
+    if (!remote_control) {
         parse_paths_startup();
 
         session_startup(argc, argv);
@@ -129,14 +128,14 @@ gint main(gint argc, gchar **argv)
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec.");
 
-    if (message_and_exit) {
+    if (remote_control) {
         prop_startup();
 
         /* Send client message telling the OB process to:
-         * message = 1 -> reconfigure 
-         * message = 2 -> restart */
+         * remote_control = 1 -> reconfigure 
+         * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
-                 ob_control, message, 0, 0, 0);
+                 ob_control, remote_control, 0, 0, 0);
         XCloseDisplay(ob_display);
         exit(0);
     }
@@ -434,11 +433,9 @@ static void parse_args(gint argc, gchar **argv)
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
-            message_and_exit = TRUE;
-            message = 1;
+            remote_control = 1;
         } else if (!strcmp(argv[i], "--restart")) {
-            message_and_exit = TRUE;
-            message = 2;
+            remote_control = 2;
         }
     }
 }

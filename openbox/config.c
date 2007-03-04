@@ -42,9 +42,14 @@ gboolean config_theme_hidedisabled;
 gchar   *config_title_layout;
 gboolean config_title_number;
 
+RrFont *config_font_activewindow;
+RrFont *config_font_inactivewindow;
+RrFont *config_font_menuitem;
+RrFont *config_font_menutitle;
+
 gint    config_desktops_num;
 GSList *config_desktops_names;
-guint    config_screen_firstdesk;
+guint   config_screen_firstdesk;
 
 gboolean config_resize_redraw;
 gboolean config_resize_four_corners;
@@ -438,6 +443,68 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_theme_keepborder = parse_bool(doc, n);
     if ((n = parse_find_node("hideDisabled", node)))
         config_theme_hidedisabled = parse_bool(doc, n);
+
+    n = parse_find_node("font", node);
+    while (n) {
+        xmlNodePtr   fnode;
+        RrFont     **font;
+        gchar       *name = g_strdup(RrDefaultFontFamily);
+        gint         size = RrDefaultFontSize;
+        RrFontWeight weight = RrDefaultFontWeight;
+        RrFontSlant  slant = RrDefaultFontSlant;
+        gboolean     shadow = RrDefaultFontShadow;
+        gint         offset = RrDefaultFontShadowOffset;
+        gchar        tint = RrDefaultFontShadowTint;
+
+        if (parse_attr_contains("ActiveWindow", n, "place"))
+            font = &config_font_activewindow;
+        else if (parse_attr_contains("InactiveWindow", n, "place"))
+            font = &config_font_inactivewindow;
+        else if (parse_attr_contains("MenuTitle", n, "place"))
+            font = &config_font_menutitle;
+        else if (parse_attr_contains("MenuItem", n, "place"))
+            font = &config_font_menuitem;
+        else
+            goto next_font;
+
+        if ((fnode = parse_find_node("name", n->children))) {
+            g_free(name);
+            name = parse_string(doc, fnode);
+        }
+        if ((fnode = parse_find_node("size", n->children))) {
+            int s = parse_int(doc, fnode);
+            if (s > 0) size = s;
+        }
+        if ((fnode = parse_find_node("weight", n->children))) {
+            gchar *w = parse_string(doc, fnode);
+            if (!g_ascii_strcasecmp(w, "Bold"))
+                weight = RR_FONTWEIGHT_BOLD;
+            g_free(w);
+        }
+        if ((fnode = parse_find_node("slant", n->children))) {
+            gchar *s = parse_string(doc, fnode);
+            if (!g_ascii_strcasecmp(s, "Italic"))
+                slant = RR_FONTSLANT_ITALIC;
+            if (!g_ascii_strcasecmp(s, "Oblique"))
+                slant = RR_FONTSLANT_OBLIQUE;
+            g_free(s);
+        }
+        if ((fnode = parse_find_node("shadow", n->children)))
+            shadow = parse_bool(doc, fnode);
+        if ((fnode = parse_find_node("shadowoffset", n->children)))
+            offset = parse_int(doc, fnode);
+        if ((fnode = parse_find_node("shadowtint", n->children))) {
+            tint = parse_int(doc, fnode);
+            if (tint > 100) tint = 100;
+            else if (tint < -100) tint = -100;
+        }
+
+        *font = RrFontOpen(ob_rr_inst, name, size, weight, slant,
+                           shadow, offset, tint);
+        g_free(name);
+    next_font:
+        n = parse_find_node("font", n->next);
+    }
 }
 
 static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -747,6 +814,11 @@ void config_startup(ObParseInst *i)
     config_theme_keepborder = TRUE;
     config_theme_hidedisabled = FALSE;
 
+    config_font_activewindow = NULL;
+    config_font_inactivewindow = NULL;
+    config_font_menuitem = NULL;
+    config_font_menutitle = NULL;
+
     parse_register(i, "theme", parse_theme, NULL);
 
     config_desktops_num = 4;
@@ -819,6 +891,11 @@ void config_shutdown()
     g_free(config_theme);
 
     g_free(config_title_layout);
+
+    RrFontClose(config_font_activewindow);
+    RrFontClose(config_font_inactivewindow);
+    RrFontClose(config_font_menuitem);
+    RrFontClose(config_font_menutitle);
 
     for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);

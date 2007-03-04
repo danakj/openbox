@@ -23,6 +23,7 @@
 #include "misc.h"
 #include "stacking.h"
 #include "place.h"
+#include "render/render.h"
 
 #include <glib.h>
 
@@ -92,6 +93,15 @@ extern gboolean config_theme_hidedisabled;
 extern gchar *config_title_layout;
 /*! Append a unique number to windows with same titles */
 extern gboolean config_title_number;
+
+/*! The font for the active window's title */
+extern RrFont *config_font_activewindow;
+/*! The font for inactive windows' titles */
+extern RrFont *config_font_inactivewindow;
+/*! The font for menu titles */
+extern RrFont *config_font_menutitle;
+/*! The font for menu items */
+extern RrFont *config_font_menuitem;
 
 /*! The number of desktops */
 extern gint config_desktops_num;

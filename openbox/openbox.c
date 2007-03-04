@@ -244,7 +244,12 @@ gint main(gint argc, gchar **argv)
             /* load the theme specified in the rc file */
             {
                 RrTheme *theme;
-                if ((theme = RrThemeNew(ob_rr_inst, config_theme))) {
+                if ((theme = RrThemeNew(ob_rr_inst, config_theme,
+                                        config_font_activewindow,
+                                        config_font_inactivewindow,
+                                        config_font_menutitle,
+                                        config_font_menuitem)))
+                {
                     RrThemeFree(ob_rr_theme);
                     ob_rr_theme = theme;
                 }

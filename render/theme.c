@@ -45,12 +45,13 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
-RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
+RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
+                    RrFont *active_window_font, RrFont *inactive_window_font,
+                    RrFont *menu_title_font, RrFont *menu_item_font)
 {
     XrmDatabase db = NULL;
     RrJustify winjust, mtitlejust;
     gchar *str;
-    gchar *font_str;
     RrTheme *theme;
 
     theme = g_new0(RrTheme, 1);
@@ -110,22 +111,18 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     /* load the font stuff */
-    if (!read_string(db, "window.active.label.text.font", &font_str))
-        font_str = "arial,sans:bold:pixelsize=10:shadow=y:shadowtint=50";
-
-    if (!(theme->win_font_focused = RrFontOpen(inst, font_str))) {
-        RrThemeFree(theme);
-        return NULL;
-    }
+    if (active_window_font) {
+        theme->win_font_focused = active_window_font;
+        RrFontRef(active_window_font);
+    } else
+        theme->win_font_focused = RrFontOpenDefault(inst);
     theme->win_font_height = RrFontHeight(theme->win_font_focused);
 
-    if (!read_string(db, "window.inactive.label.text.font", &font_str))
-        /* font_str will already be set to the last one */;
-
-    if (!(theme->win_font_unfocused = RrFontOpen(inst, font_str))) {
-        RrThemeFree(theme);
-        return NULL;
-    }
+    if (inactive_window_font) {
+        theme->win_font_unfocused = inactive_window_font;
+        RrFontRef(inactive_window_font);
+    } else
+        theme->win_font_unfocused = RrFontOpenDefault(inst);
     theme->win_font_height = MAX(theme->win_font_height,
                                  RrFontHeight(theme->win_font_unfocused));
 
@@ -137,13 +134,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             winjust = RR_JUSTIFY_CENTER;
     }
 
-    if (!read_string(db, "menu.title.text.font", &font_str))
-        font_str = "arial,sans:bold:pixelsize=12:shadow=y";
-
-    if (!(theme->menu_title_font = RrFontOpen(inst, font_str))) {
-        RrThemeFree(theme);
-        return NULL;
-    }
+    if (menu_title_font) {
+        theme->menu_title_font = menu_title_font;
+        RrFontRef(menu_title_font);
+    } else
+        theme->menu_title_font = RrFontOpenDefault(inst);
     theme->menu_title_font_height = RrFontHeight(theme->menu_title_font);
 
     mtitlejust = RR_JUSTIFY_LEFT;
@@ -154,13 +149,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             mtitlejust = RR_JUSTIFY_CENTER;
     }
 
-    if (!read_string(db, "menu.items.font", &font_str))
-        font_str = "arial,sans:bold:pixelsize=11:shadow=y";
-
-    if (!(theme->menu_font = RrFontOpen(inst, font_str))) {
-        RrThemeFree(theme);
-        return NULL;
-    }
+    if (menu_item_font) {
+        theme->menu_font = menu_item_font;
+        RrFontRef(menu_item_font);
+    } else
+        theme->menu_font = RrFontOpenDefault(inst);
     theme->menu_font_height = RrFontHeight(theme->menu_font);
 
     /* load direct dimensions */

@@ -25,18 +25,20 @@
 
 struct _RrFont {
     const RrInstance *inst;
+    gint ref;
     PangoFontDescription *font_desc; 
     PangoLayout *layout; /*!< Used for measuring and rendering strings */
     gint ascent; /*!< The font's ascent in pango-units */
     gint descent; /*!< The font's descent in pango-units */
-    gint elipses_length; /*!< This one is in pixels, yay */
     gint shadow;
     gchar tint;
     gint offset;
 };
 
-RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring);
-void RrFontClose(RrFont *f);
 void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
+
+/*! Increment the references for this font, RrFontClose will decrement until 0
+  and then really close it */
+void RrFontRef(RrFont *f);
 
 #endif /* __font_h */

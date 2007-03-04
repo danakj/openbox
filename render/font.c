@@ -75,10 +75,8 @@ static void measure_font(const RrInstance *inst, RrFont *f)
     g_free(locale);
 }
 
-static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
+static RrFont *openfontstring(const RrInstance *inst, gchar *fontstring)
 {
-    /* This function is called for each font in the theme file. */
-    /* It returns a pointer to a RrFont struct after filling it. */
     RrFont *out;
     FcPattern *pat;
     gint tint;
@@ -90,6 +88,7 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
 
     out = g_new(RrFont, 1);
     out->inst = inst;
+    out->ref = 1;
     out->font_desc = pango_font_description_new();
     out->layout = pango_layout_new(inst->pango);
 
@@ -156,10 +155,12 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     /* get the ascent and descent */
     measure_font(inst, out);
 
+    FcPatternDestroy(pat);
+
     return out;
 }
 
-RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring)
+RrFont *RrFontOpenByString(const RrInstance *inst, gchar *fontstring)
 {
     RrFont *out;
 
@@ -168,24 +169,98 @@ RrFont *RrFontOpen(const RrInstance *inst, gchar *fontstring)
         started = TRUE;
     }
 
-    if ((out = openfont(inst, fontstring)))
+    if ((out = openfontstring(inst, fontstring)))
         return out;
     g_warning(_("Unable to load font: %s\n"), fontstring);
     g_warning(_("Trying fallback font: %s\n"), "sans");
 
-    if ((out = openfont(inst, "sans")))
+    if ((out = openfontstring(inst, "sans")))
         return out;
     g_warning(_("Unable to load font: %s\n"), "sans");
 
     return NULL;
 }
 
+RrFont *RrFontOpen(const RrInstance *inst, gchar *name, gint size,
+                   RrFontWeight weight, RrFontSlant slant, gboolean shadow,
+                   gint shadowoffset, gchar shadowtint)
+{
+    RrFont *out;
+    PangoWeight pweight;
+    PangoStyle pstyle;
+
+    if (!started) {
+        font_startup();
+        started = TRUE;
+    }
+
+    g_assert(shadowtint <= 100 && shadowtint >= -100);
+
+    out = g_new(RrFont, 1);
+    out->inst = inst;
+    out->ref = 1;
+    out->font_desc = pango_font_description_new();
+    out->layout = pango_layout_new(inst->pango);
+
+    switch (weight) {
+    case RR_FONTWEIGHT_LIGHT:     pweight = PANGO_WEIGHT_LIGHT;     break;
+    case RR_FONTWEIGHT_NORMAL:    pweight = PANGO_WEIGHT_NORMAL;    break;
+    case RR_FONTWEIGHT_SEMIBOLD:  pweight = PANGO_WEIGHT_SEMIBOLD;  break;
+    case RR_FONTWEIGHT_BOLD:      pweight = PANGO_WEIGHT_BOLD;      break;
+    case RR_FONTWEIGHT_ULTRABOLD: pweight = PANGO_WEIGHT_ULTRABOLD; break;
+    default: g_assert_not_reached();
+    }
+
+    switch (slant) {
+    case RR_FONTSLANT_NORMAL:  pstyle = PANGO_STYLE_NORMAL;    break;
+    case RR_FONTSLANT_ITALIC:  pstyle = PANGO_STYLE_ITALIC;    break;
+    case RR_FONTSLANT_OBLIQUE: pstyle = PANGO_STYLE_OBLIQUE;   break;
+    default: g_assert_not_reached();
+    }
+
+    /* setup the font */
+    pango_font_description_set_family(out->font_desc, name);
+    pango_font_description_set_weight(out->font_desc, pweight);
+    pango_font_description_set_style(out->font_desc, pstyle);
+    pango_font_description_set_size(out->font_desc, size * PANGO_SCALE);
+
+    /* setup the shadow */
+    out->shadow = shadow;
+    out->offset = shadowoffset;
+    out->tint = shadowtint;
+
+    /* setup the layout */
+    pango_layout_set_font_description(out->layout, out->font_desc);
+    pango_layout_set_single_paragraph_mode(out->layout, TRUE);
+    pango_layout_set_ellipsize(out->layout, PANGO_ELLIPSIZE_MIDDLE);
+
+    /* get the ascent and descent */
+    measure_font(inst, out);
+
+    return out;
+}
+
+RrFont *RrFontOpenDefault(const RrInstance *inst)
+{
+    return RrFontOpen(inst, RrDefaultFontFamily, RrDefaultFontSize,
+                      RrDefaultFontWeight, RrDefaultFontSlant,
+                      RrDefaultFontShadow, RrDefaultFontShadowOffset,
+                      RrDefaultFontShadowTint);
+}
+
+void RrFontRef(RrFont *f)
+{
+    ++f->ref;
+}
+
 void RrFontClose(RrFont *f)
 {
     if (f) {
-        g_object_unref(f->layout);
-        pango_font_description_free(f->font_desc);
-        g_free(f);
+        if (--f->ref < 1) {
+            g_object_unref(f->layout);
+            pango_font_description_free(f->font_desc);
+            g_free(f);
+        }
     }
 }
 

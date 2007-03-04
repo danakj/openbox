@@ -187,7 +187,11 @@ struct _RrTheme {
 
 };
 
-RrTheme* RrThemeNew(const RrInstance *inst, gchar *theme);
+/*! The font values are all optional. If a NULL is used for any of them, then
+  the default font will be used. */
+RrTheme* RrThemeNew(const RrInstance *inst, gchar *theme,
+                    RrFont *active_window_font, RrFont *inactive_window_font,
+                    RrFont *menu_title_font, RrFont *menu_item_font);
 void RrThemeFree(RrTheme *theme);
 
 G_END_DECLS

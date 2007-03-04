@@ -186,6 +186,14 @@ struct _RrAppearance {
 #define RrDefaultGreenOffset 8
 #define RrDefaultBlueOffset 0
 
+#define RrDefaultFontFamily       "arial,sans"
+#define RrDefaultFontSize         8
+#define RrDefaultFontWeight       RR_FONTWEIGHT_NORMAL
+#define RrDefaultFontSlant        RR_FONTSLANT_NORMAL
+#define RrDefaultFontShadow       FALSE
+#define RrDefaultFontShadowOffset 1
+#define RrDefaultFontShadowTint   50
+
 RrInstance* RrInstanceNew (Display *display, gint screen);
 void        RrInstanceFree (RrInstance *inst);
 
@@ -219,9 +227,16 @@ RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 
+RrFont *RrFontOpenByString  (const RrInstance *inst, gchar *fontstring);
+RrFont *RrFontOpen          (const RrInstance *inst, gchar *name, gint size,
+                             RrFontWeight weight, RrFontSlant slant,
+                             gboolean shadow, gint shadowoffset,
+                             gchar shadowtint);
+RrFont *RrFontOpenDefault   (const RrInstance *inst);
+void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str);
-gint RrFontHeight        (const RrFont *f);
-gint RrFontMaxCharWidth  (const RrFont *f);
+gint    RrFontHeight        (const RrFont *f);
+gint    RrFontMaxCharWidth  (const RrFont *f);
 
 void RrPaint   (RrAppearance *a, Window win, gint w, gint h);
 void RrMinsize (RrAppearance *a, gint *w, gint *h);

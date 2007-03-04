@@ -165,6 +165,9 @@ typedef struct Atoms {
      
     Atom openbox_pid;
     Atom ob_wm_state_undecorated;
+    Atom ob_control;
+    Atom ob_reconfigure;
+    Atom ob_restart;
 } Atoms;
 Atoms prop_atoms;
 

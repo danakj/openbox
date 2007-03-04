@@ -86,7 +86,8 @@ static gchar    *restart_path = NULL;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
-static gboolean  reconfigure_and_exit = FALSE;
+static gboolean  message_and_exit = FALSE;
+static Atom     *message;
 static gboolean  being_replaced = FALSE;
 
 static void signal_handler(gint signal, gpointer data);
@@ -116,7 +117,7 @@ gint main(gint argc, gchar **argv)
     /* parse out command line args */
     parse_args(argc, argv);
 
-    if (!reconfigure_and_exit) {
+    if (!message_and_exit) {
         parse_paths_startup();
 
         session_startup(argc, argv);
@@ -128,24 +129,14 @@ gint main(gint argc, gchar **argv)
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec.");
 
-    if (reconfigure_and_exit) {
-        guint32 pid;
-        gboolean ret;
+    if (message_and_exit) {
+        prop_startup();
 
-        prop_startup(); /* get atoms values for the display */
-        ret = PROP_GET32(RootWindow(ob_display, DefaultScreen(ob_display)),
-                                    openbox_pid, cardinal, &pid);
+        /* Send client message telling the OB process to reconfigure */
+        prop_message(RootWindow(ob_display, ob_screen), prop_atoms.ob_control,
+                     *message, 0, 0, 0, SubstructureNotifyMask);
         XCloseDisplay(ob_display);
-        if (!ret) {
-            g_print("Openbox does not appear to be running on this "
-                    "display.\n");
-        } else {
-            g_print("Telling the Openbox process # %u to reconfigure.\n", pid);
-            ret = (kill(pid, SIGUSR2) == 0);
-            if (!ret)
-                g_print("Error: %s.\n", strerror(errno));
-        }
-        exit(ret ? EXIT_SUCCESS : EXIT_FAILURE);
+        exit(0);
     }
 
     ob_main_loop = ob_main_loop_new(ob_display);
@@ -441,7 +432,11 @@ static void parse_args(gint argc, gchar **argv)
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
-            reconfigure_and_exit = TRUE;
+            message_and_exit = TRUE;
+            message = &prop_atoms.ob_reconfigure;
+        } else if (!strcmp(argv[i], "--restart")) {
+            message_and_exit = TRUE;
+            message = &prop_atoms.ob_restart;
         }
     }
 }

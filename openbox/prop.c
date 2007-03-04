@@ -153,8 +153,6 @@ void prop_startup()
     CREATE(openbox_pid, "_OPENBOX_PID");
     CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(ob_control, "_OB_CONTROL");
-    CREATE(ob_reconfigure, "_OB_RECONFIGURE");
-    CREATE(ob_restart, "_OB_RESTART");
 }
 
 #include <X11/Xutil.h>

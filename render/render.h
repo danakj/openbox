@@ -121,6 +121,8 @@ struct _RrTextureText {
     RrJustify justify;
     RrColor *color;
     gchar *string;
+    gint shadow_offset;
+    gchar shadow_tint;
 };
 
 struct _RrPixmapMask {
@@ -190,9 +192,6 @@ struct _RrAppearance {
 #define RrDefaultFontSize         8
 #define RrDefaultFontWeight       RR_FONTWEIGHT_NORMAL
 #define RrDefaultFontSlant        RR_FONTSLANT_NORMAL
-#define RrDefaultFontShadow       FALSE
-#define RrDefaultFontShadowOffset 1
-#define RrDefaultFontShadowTint   50
 
 RrInstance* RrInstanceNew (Display *display, gint screen);
 void        RrInstanceFree (RrInstance *inst);
@@ -228,13 +227,12 @@ RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 
 RrFont *RrFontOpen          (const RrInstance *inst, gchar *name, gint size,
-                             RrFontWeight weight, RrFontSlant slant,
-                             gboolean shadow, gint shadowoffset,
-                             gchar shadowtint);
+                             RrFontWeight weight, RrFontSlant slant);
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
-RrSize *RrFontMeasureString (const RrFont *f, const gchar *str);
-gint    RrFontHeight        (const RrFont *f);
+RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
+                             gint shadow_offset);
+gint    RrFontHeight        (const RrFont *f, gint shadow_offset);
 gint    RrFontMaxCharWidth  (const RrFont *f);
 
 void RrPaint   (RrAppearance *a, Window win, gint w, gint h);

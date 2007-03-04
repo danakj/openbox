@@ -30,9 +30,6 @@ struct _RrFont {
     PangoLayout *layout; /*!< Used for measuring and rendering strings */
     gint ascent; /*!< The font's ascent in pango-units */
     gint descent; /*!< The font's descent in pango-units */
-    gint shadow;
-    gchar tint;
-    gint offset;
 };
 
 void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);

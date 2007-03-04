@@ -32,6 +32,7 @@
 #include <string.h>
 
 static XrmDatabase loaddb(RrTheme *theme, gchar *name);
+static gboolean read_bool(XrmDatabase db, gchar *rname, gboolean *value);
 static gboolean read_int(XrmDatabase db, gchar *rname, gint *value);
 static gboolean read_string(XrmDatabase db, gchar *rname, gchar **value);
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
@@ -51,8 +52,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 {
     XrmDatabase db = NULL;
     RrJustify winjust, mtitlejust;
+    gboolean b;
     gchar *str;
     RrTheme *theme;
+    gint offset;
+    gint tint;
 
     theme = g_new0(RrTheme, 1);
 
@@ -116,15 +120,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         RrFontRef(active_window_font);
     } else
         theme->win_font_focused = RrFontOpenDefault(inst);
-    theme->win_font_height = RrFontHeight(theme->win_font_focused);
 
     if (inactive_window_font) {
         theme->win_font_unfocused = inactive_window_font;
         RrFontRef(inactive_window_font);
     } else
         theme->win_font_unfocused = RrFontOpenDefault(inst);
-    theme->win_font_height = MAX(theme->win_font_height,
-                                 RrFontHeight(theme->win_font_unfocused));
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.label.text.justify", &str)) {
@@ -139,7 +140,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         RrFontRef(menu_title_font);
     } else
         theme->menu_title_font = RrFontOpenDefault(inst);
-    theme->menu_title_font_height = RrFontHeight(theme->menu_title_font);
 
     mtitlejust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.title.text.justify", &str)) {
@@ -154,7 +154,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         RrFontRef(menu_item_font);
     } else
         theme->menu_font = RrFontOpenDefault(inst);
-    theme->menu_font_height = RrFontHeight(theme->menu_font);
 
     /* load direct dimensions */
     if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
@@ -655,6 +654,22 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->app_hilite_label->texture[0].data.text.color =
         theme->title_focused_color;
 
+    if (read_bool(db, "window.active.label.text.shadow", &b) && b) {
+        if (!read_int(db, "window.active.label.text.shadow.offset", &offset))
+            offset = 1;
+
+        if (!read_int(db, "window.active.label.text.shadow.tint", &tint))
+            tint = 50;
+        tint = (tint > 100 ? 100 : (tint < -100 ? -100 : tint));
+    } else {
+        offset = 0;
+        tint = 50;
+    }
+    theme->a_focused_label->texture[0].data.text.shadow_offset =
+        theme->app_hilite_label->texture[0].data.text.shadow_offset = offset;
+    theme->a_focused_label->texture[0].data.text.shadow_tint =
+        theme->app_hilite_label->texture[0].data.text.shadow_tint = tint;
+
     theme->a_unfocused_label->texture[0].type =
         theme->app_unhilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_unfocused_label->texture[0].data.text.justify = winjust;
@@ -667,10 +682,41 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->app_unhilite_label->texture[0].data.text.color =
         theme->title_unfocused_color;
 
+    if (read_bool(db, "window.inactive.label.text.shadow", &b) && b) {
+        if (!read_int(db, "window.inactive.label.text.shadow.offset", &offset))
+            offset = 1;
+
+        if (!read_int(db, "window.inactive.label.text.shadow.tint", &tint))
+            tint = 50;
+        tint = (tint > 100 ? 100 : (tint < -100 ? -100 : tint));
+    } else {
+        offset = 0;
+        tint = 50;
+    }
+    theme->a_unfocused_label->texture[0].data.text.shadow_offset =
+        theme->app_unhilite_label->texture[0].data.text.shadow_offset =
+        offset;
+    theme->a_unfocused_label->texture[0].data.text.shadow_tint =
+        theme->app_unhilite_label->texture[0].data.text.shadow_tint = tint;
+
     theme->a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_title->texture[0].data.text.justify = mtitlejust;
     theme->a_menu_title->texture[0].data.text.font = theme->menu_title_font;
     theme->a_menu_title->texture[0].data.text.color = theme->menu_title_color;
+
+    if (read_bool(db, "menu.title.text.shadow", &b) && b) {
+        if (!read_int(db, "menu.title.text.shadow.offset", &offset))
+            offset = 1;
+
+        if (!read_int(db, "menu.title.text.shadow.tint", &tint))
+            tint = 50;
+        tint = (tint > 100 ? 100 : (tint < -100 ? -100 : tint));
+    } else {
+        offset = 0;
+        tint = 50;
+    }
+    theme->a_menu_title->texture[0].data.text.shadow_offset = offset;
+    theme->a_menu_title->texture[0].data.text.shadow_tint = tint;
 
     theme->a_menu_text_normal->texture[0].type =
         theme->a_menu_text_disabled->texture[0].type = 
@@ -688,6 +734,25 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->menu_disabled_color;
     theme->a_menu_text_selected->texture[0].data.text.color =
         theme->menu_selected_color;
+
+    if (read_bool(db, "menu.items.text.shadow", &b) && b) {
+        if (!read_int(db, "menu.items.text.shadow.offset", &offset))
+            offset = 1;
+
+        if (!read_int(db, "menu.items.text.shadow.tint", &tint))
+            tint = 50;
+        tint = (tint > 100 ? 100 : (tint < -100 ? -100 : tint));
+    } else {
+        offset = 0;
+        tint = 50;
+    }
+    theme->a_menu_text_normal->texture[0].data.text.shadow_offset =
+        theme->a_menu_text_disabled->texture[0].data.text.shadow_offset =
+        theme->a_menu_text_selected->texture[0].data.text.shadow_offset =
+        offset;
+    theme->a_menu_text_normal->texture[0].data.text.shadow_tint =
+        theme->a_menu_text_disabled->texture[0].data.text.shadow_tint =
+        theme->a_menu_text_selected->texture[0].data.text.shadow_tint = tint;
 
     theme->a_disabled_focused_max->texture[0].type = 
         theme->a_disabled_unfocused_max->texture[0].type = 
@@ -873,6 +938,23 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 
     XrmDestroyDatabase(db);
 
+    /* set the font heights */
+    theme->win_font_height = RrFontHeight
+        (theme->win_font_focused,
+         theme->a_focused_label->texture[0].data.text.shadow_offset);
+    theme->win_font_height =
+        MAX(theme->win_font_height,
+            RrFontHeight
+            (theme->win_font_focused,
+             theme->a_unfocused_label->texture[0].data.text.shadow_offset));
+    theme->menu_title_font_height = RrFontHeight
+        (theme->menu_title_font,
+         theme->a_menu_title->texture[0].data.text.shadow_offset);
+    theme->menu_font_height = RrFontHeight
+        (theme->menu_font,
+         theme->a_menu_text_normal->texture[0].data.text.shadow_offset);
+
+    /* calculate some last extents */
     {
         gint ft, fb, fl, fr, ut, ub, ul, ur;
 
@@ -1092,6 +1174,28 @@ static gchar *create_class_name(gchar *rname)
         if (*p == '\0') break;
     }
     return rclass;
+}
+
+static gboolean read_bool(XrmDatabase db, gchar *rname, gint *value)
+{
+    gboolean ret = FALSE;
+    gchar *rclass = create_class_name(rname);
+    gchar *rettype;
+    XrmValue retvalue;
+  
+    if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
+        retvalue.addr != NULL) {
+        if (!g_ascii_strcasecmp(retvalue.addr, "true")) {
+            *value = TRUE;
+            ret = TRUE;
+        } else if (!g_ascii_strcasecmp(retvalue.addr, "false")) {
+            *value = FALSE;
+            ret = TRUE;
+        }
+    }
+
+    g_free(rclass);
+    return ret;
 }
 
 static gboolean read_int(XrmDatabase db, gchar *rname, gint *value)

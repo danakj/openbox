@@ -31,29 +31,6 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#define OB_SHADOW "shadow"
-#define OB_SHADOW_OFFSET "shadowoffset"
-#define OB_SHADOW_ALPHA "shadowtint"
-
-FcObjectType objs[] = {
-    { OB_SHADOW,        FcTypeBool    },
-    { OB_SHADOW_OFFSET, FcTypeInteger },
-    { OB_SHADOW_ALPHA,  FcTypeInteger  }
-};
-
-static gboolean started = FALSE;
-
-static void font_startup(void)
-{
-    if (!XftInit(0)) {
-        g_warning(_("Couldn't initialize Xft."));
-        exit(EXIT_FAILURE);
-    }
-
-    /* Here we are teaching xft about the shadow, shadowoffset & shadowtint */
-    FcNameRegisterObjectTypes(objs, (sizeof(objs) / sizeof(objs[0])));
-}
-
 static void measure_font(const RrInstance *inst, RrFont *f)
 {
     PangoFontMetrics *metrics;
@@ -76,19 +53,11 @@ static void measure_font(const RrInstance *inst, RrFont *f)
 }
 
 RrFont *RrFontOpen(const RrInstance *inst, gchar *name, gint size,
-                   RrFontWeight weight, RrFontSlant slant, gboolean shadow,
-                   gint shadowoffset, gchar shadowtint)
+                   RrFontWeight weight, RrFontSlant slant)
 {
     RrFont *out;
     PangoWeight pweight;
     PangoStyle pstyle;
-
-    if (!started) {
-        font_startup();
-        started = TRUE;
-    }
-
-    g_assert(shadowtint <= 100 && shadowtint >= -100);
 
     out = g_new(RrFont, 1);
     out->inst = inst;
@@ -118,11 +87,6 @@ RrFont *RrFontOpen(const RrInstance *inst, gchar *name, gint size,
     pango_font_description_set_style(out->font_desc, pstyle);
     pango_font_description_set_size(out->font_desc, size * PANGO_SCALE);
 
-    /* setup the shadow */
-    out->shadow = shadow;
-    out->offset = shadowoffset;
-    out->tint = shadowtint;
-
     /* setup the layout */
     pango_layout_set_font_description(out->layout, out->font_desc);
     pango_layout_set_single_paragraph_mode(out->layout, TRUE);
@@ -137,9 +101,7 @@ RrFont *RrFontOpen(const RrInstance *inst, gchar *name, gint size,
 RrFont *RrFontOpenDefault(const RrInstance *inst)
 {
     return RrFontOpen(inst, RrDefaultFontFamily, RrDefaultFontSize,
-                      RrDefaultFontWeight, RrDefaultFontSlant,
-                      RrDefaultFontShadow, RrDefaultFontShadowOffset,
-                      RrDefaultFontShadowTint);
+                      RrDefaultFontWeight, RrDefaultFontSlant);
 }
 
 void RrFontRef(RrFont *f)
@@ -159,29 +121,29 @@ void RrFontClose(RrFont *f)
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,
-                              gint *x, gint *y)
+                              gint *x, gint *y, gint shadow_offset)
 {
     PangoRectangle rect;
 
     pango_layout_set_text(f->layout, str, -1);
     pango_layout_set_width(f->layout, -1);
     pango_layout_get_pixel_extents(f->layout, NULL, &rect);
-    *x = rect.width + (f->shadow ? ABS(f->offset) : 0);
-    *y = rect.height + (f->shadow ? ABS(f->offset) : 0);
+    *x = rect.width + ABS(shadow_offset);
+    *y = rect.height + ABS(shadow_offset);
 }
 
-RrSize *RrFontMeasureString(const RrFont *f, const gchar *str)
+RrSize *RrFontMeasureString(const RrFont *f, const gchar *str,
+                            gint shadow_offset)
 {
     RrSize *size;
     size = g_new(RrSize, 1);
-    font_measure_full(f, str, &size->width, &size->height);
+    font_measure_full(f, str, &size->width, &size->height, shadow_offset);
     return size;
 }
 
-gint RrFontHeight(const RrFont *f)
+gint RrFontHeight(const RrFont *f, gint shadow_offset)
 {
-    return (f->ascent + f->descent) / PANGO_SCALE +
-        (f->shadow ? f->offset : 0);
+    return (f->ascent + f->descent) / PANGO_SCALE + ABS(shadow_offset);
 }
 
 static inline int font_calculate_baseline(RrFont *f, gint height)
@@ -245,27 +207,27 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         break;
     }
 
-    if (t->font->shadow) {
-        if (t->font->tint >= 0) {
+    if (t->shadow_offset) {
+        if (t->shadow_tint >= 0) {
             c.color.red = 0;
             c.color.green = 0;
             c.color.blue = 0;
-            c.color.alpha = 0xffff * t->font->tint / 100;
+            c.color.alpha = 0xffff * t->shadow_tint / 100;
             c.pixel = BlackPixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
         } else {
             c.color.red = 0xffff;
             c.color.green = 0xffff;
             c.color.blue = 0xffff;
-            c.color.alpha = 0xffff * -t->font->tint / 100;
+            c.color.alpha = 0xffff * -t->shadow_tint / 100;
             c.pixel = WhitePixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
         }
         /* see below... */
         pango_xft_render_layout_line
             (d, &c, pango_layout_get_line(t->font->layout, 0),
-             (x + t->font->offset) * PANGO_SCALE,
-             (y + t->font->offset) * PANGO_SCALE);
+             (x + t->shadow_offset) * PANGO_SCALE,
+             (y + t->shadow_offset) * PANGO_SCALE);
     }
 
     c.color.red = t->color->r | t->color->r << 8;

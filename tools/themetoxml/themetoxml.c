@@ -321,8 +321,8 @@ int main(int argc, char **argv)
         CONT2("dimensions", "handle", NUM(i));
 
     if (read_int(db, "padding.width", &i)) {
-        ATTR2("dimensions", "padding", "horizontal", NUM(i));
-        ATTR2("dimensions", "padding", "vertical", NUM(i));
+        ATTR2("dimensions", "padding", "x", NUM(i));
+        ATTR2("dimensions", "padding", "y", NUM(i));
     }
     
     if (read_int(db, "borderWidth", &i)) {
@@ -339,8 +339,8 @@ int main(int argc, char **argv)
     }
 
     if (read_int(db, "window.client.padding.width", &i)) {
-        ATTR2("window", "clientpadding", "horizontal", NUM(i));
-        ATTR2("window", "clientpadding", "vertical", NUM(i));
+        ATTR2("window", "clientpadding", "x", NUM(i));
+        ATTR2("window", "clientpadding", "y", NUM(i));
     }
 
     if (read_string(db, "window.label.text.justify", &s)) {

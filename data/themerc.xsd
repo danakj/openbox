@@ -22,11 +22,6 @@
     </xs:annotation>
   </xs:element>
 
-  <xs:complexType name="padding">
-    <xs:attribute name="horizontal" type="xs:integer"/>
-    <xs:attribute name="vertical" type="xs:integer"/>
-  </xs:complexType>
-
   <xs:complexType name="color">
     <xs:attribute name="r" type="xs:integer"/>
     <xs:attribute name="g" type="xs:integer"/>
@@ -136,7 +131,7 @@
 
   <xs:complexType name="allwindows">
     <xs:all>
-      <xs:element name="clientpadding" type="obt:padding" minOccurs="0"/>
+      <xs:element name="clientpadding" type="obt:point" minOccurs="0"/>
       <xs:element name="justify" type="obt:justify" minOccurs="0"/>
       <xs:element name="border" type="obt:border" minOccurs="0"/>
       <xs:element name="inactive" type="obt:window" minOccurs="0"/>
@@ -152,7 +147,7 @@
 
   <xs:complexType name="themeDimensions">
     <xs:all>
-      <xs:element name="padding" type="obt:padding" minOccurs="0"/>
+      <xs:element name="padding" type="obt:point" minOccurs="0"/>
       <xs:element name="handle" type="xs:integer" minOccurs="0"/>
     </xs:all>
   </xs:complexType>

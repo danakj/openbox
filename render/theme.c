@@ -1307,8 +1307,8 @@ static gboolean find_point(ParseState *ps, xmlNodePtr n, gchar *names[],
 {
     if ((n = find_node(n, names))) {
         gint a, b;
-        if (parse_attr_int("horizontal", n, &a) &&
-            parse_attr_int("vertical", n, &b) &&
+        if (parse_attr_int("x", n, &a) &&
+            parse_attr_int("y", n, &b) &&
             a >= lowx && a <= upx && b >= lowy && b <= upy)
         {
             *x = a; *y = b;

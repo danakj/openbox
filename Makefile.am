@@ -28,7 +28,6 @@ lib_LTLIBRARIES = \
 
 bin_PROGRAMS = \
 	openbox/openbox \
-	tools/kdetrayproxy/kdetrayproxy \
 	tools/themetoxml/themetoxml \
 	tools/gnome-panel-control/gnome-panel-control
 
@@ -201,16 +200,6 @@ openbox_openbox_SOURCES = \
 	openbox/window.h \
 	openbox/xerror.c \
 	openbox/xerror.h
-
-
-## kdetrayproxy ##
-
-tools_kdetrayproxy_kdetrayproxy_CPPFLAGS = \
-	$(X_CFLAGS)
-tools_kdetrayproxy_kdetrayproxy_LDADD = \
-	$(X_LIBS)
-tools_kdetrayproxy_kdetrayproxy_SOURCES = \
-	tools/kdetrayproxy/kdetrayproxy.c
 
 
 ## themetoxml ##

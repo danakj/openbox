@@ -29,6 +29,7 @@ lib_LTLIBRARIES = \
 bin_PROGRAMS = \
 	openbox/openbox \
 	tools/kdetrayproxy/kdetrayproxy \
+	tools/themetoxml/themetoxml \
 	tools/gnome-panel-control/gnome-panel-control
 
 ## render ##
@@ -210,6 +211,22 @@ tools_kdetrayproxy_kdetrayproxy_LDADD = \
 	$(X_LIBS)
 tools_kdetrayproxy_kdetrayproxy_SOURCES = \
 	tools/kdetrayproxy/kdetrayproxy.c
+
+
+## themetoxml ##
+
+tools_themetoxml_themetoxml_CPPFLAGS = \
+	$(X_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(XML_CFLAGS)
+tools_themetoxml_themetoxml_LDADD = \
+	$(X_LIBS) \
+	$(GLIB_LIBS) \
+	$(XML_LIBS)
+tools_themetoxml_themetoxml_SOURCES = \
+	tools/themetoxml/themetoxml.c \
+	tools/themetoxml/themetoxml.h \
+	tools/themetoxml/rgb.h
 
 
 ## gnome-panel-control ##

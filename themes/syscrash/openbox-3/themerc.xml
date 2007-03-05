@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!-- syscrash's theme, based off nightm4re's flax or something -->
+
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>3</handle>

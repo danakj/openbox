@@ -85,10 +85,10 @@ AC_SUBST(XML_LIBS)
 AC_ARG_ENABLE(startup-notification,
   AC_HELP_STRING(
     [--enable-startup-notification],
-    [enable the startup notification library. [[default=disabled]]]
+    [enable the startup notification library. [[default=enabled]]]
   ),
   [enable_sn=$enableval],
-  [enable_sn=no]
+  [enable_sn=yes]
 )
 
 if test "$enable_sn" = yes; then

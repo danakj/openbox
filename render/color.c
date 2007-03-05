@@ -67,6 +67,10 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
     XColor xcol;
     gint key;
 
+    g_assert(r >= 0 && r < 256);
+    g_assert(g >= 0 && g < 256);
+    g_assert(b >= 0 && b < 256);
+
     key = (r << 24) + (g << 16) + (b << 8);
 #ifndef NO_COLOR_CACHE
     if ((out = g_hash_table_lookup(RrColorHash(inst), &key))) {

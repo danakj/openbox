@@ -524,7 +524,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (read_string(db, "menu.items.text.font", &s)) {
+    if (read_string(db, "menu.items.font", &s)) {
         char *p;
         if (strstr(s, "shadow=y")) {
             if ((p = strstr(s, "shadowoffset=")))

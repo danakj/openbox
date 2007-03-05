@@ -2,7 +2,7 @@
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>4</handle>
-    <padding horizontal="1" vertical="1"/>
+    <padding x="1" y="1"/>
   </dimensions>
   <window>
     <border>

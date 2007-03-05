@@ -1,17 +1,15 @@
-<!-- syscrash's theme, based off nightm4re's flax or something -->
-
 <?xml version="1.0"?>
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>3</handle>
-    <padding horizontal="2" vertical="2"/>
+    <padding x="2" y="2"/>
   </dimensions>
   <window>
     <border>
       <width>1</width>
       <primary r="34" g="34" b="28" a="255"/>
     </border>
-    <clientpadding horizontal="0" vertical="0"/>
+    <clientpadding x="0" y="0"/>
     <justify>left</justify>
     <active>
       <label>

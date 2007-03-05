@@ -2,14 +2,14 @@
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>4</handle>
-    <padding horizontal="3" vertical="3"/>
+    <padding x="3" y="3"/>
   </dimensions>
   <window>
     <border>
       <width>1</width>
       <primary r="78" g="78" b="78" a="255"/>
     </border>
-    <clientpadding horizontal="0" vertical="0"/>
+    <clientpadding x="0" y="0"/>
     <justify>center</justify>
     <active>
       <clientpadding r="238" g="238" b="236" a="255"/>

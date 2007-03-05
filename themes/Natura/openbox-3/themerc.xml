@@ -18,7 +18,7 @@
           <primary r="249" g="242" b="238" a="255"/>
           <shadow>
             <offset x="1" y="1"/>
-            <primary r="0" g="0" b="0" a="75"/>
+            <primary r="0" g="0" b="0" a="191"/>
           </shadow>
         </text>
         <style>parentrelative</style>
@@ -146,7 +146,7 @@
         <primary r="255" g="255" b="255" a="255"/>
         <shadow>
           <offset x="1" y="1"/>
-          <primary r="0" g="0" b="0" a="75"/>
+          <primary r="0" g="0" b="0" a="191"/>
         </shadow>
       </text>
       <style>flat gradient splitvertical</style>

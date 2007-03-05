@@ -85,7 +85,7 @@
           <primary r="179" g="179" b="179" a="255"/>
           <shadow>
             <offset x="3" y="3"/>
-            <primary r="0" g="0" b="0" a="32"/>
+            <primary r="0" g="0" b="0" a="81"/>
           </shadow>
         </text>
         <style>parentrelative</style>
@@ -161,7 +161,7 @@
         <primary r="204" g="204" b="255" a="255"/>
         <shadow>
           <offset x="2" y="2"/>
-          <primary r="0" g="0" b="0" a="35"/>
+          <primary r="0" g="0" b="0" a="89"/>
         </shadow>
       </text>
       <style>raised gradient crossdiagonal bevel1</style>
@@ -173,14 +173,14 @@
       <primary r="0" g="0" b="34" a="255"/>
       <shadow>
         <offset x="2" y="2"/>
-        <primary r="0" g="0" b="0" a="15"/>
+        <primary r="0" g="0" b="0" a="38"/>
       </shadow>
     </inactive>
     <disabled>
       <primary r="119" g="17" b="17" a="255"/>
       <shadow>
         <offset x="2" y="2"/>
-        <primary r="0" g="0" b="0" a="15"/>
+        <primary r="0" g="0" b="0" a="38"/>
       </shadow>
     </disabled>
     <active>
@@ -188,7 +188,7 @@
         <primary r="204" g="204" b="255" a="255"/>
         <shadow>
           <offset x="2" y="2"/>
-          <primary r="0" g="0" b="0" a="15"/>
+          <primary r="0" g="0" b="0" a="38"/>
         </shadow>
       </text>
       <style>raised gradient horizontal bevel1</style>

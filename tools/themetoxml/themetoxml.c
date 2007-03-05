@@ -477,7 +477,7 @@ int main(int argc, char **argv)
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
-            i = ABS(i);
+            i = ABS(i*255/100);
             COLOR6("window","active","label","text","shadow","primary",
                    j,j,j,i);
         }
@@ -499,7 +499,7 @@ int main(int argc, char **argv)
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
-            i = ABS(i);
+            i = ABS(i*255/100);
             COLOR6("window","inactive","label","text","shadow","primary",
                    j,j,j,i);
         }
@@ -519,7 +519,7 @@ int main(int argc, char **argv)
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
-            i = ABS(i);
+            i = ABS(i*255/100);
             COLOR5("menu","title","text","shadow","primary",j,j,j,i);
         }
     }
@@ -542,7 +542,7 @@ int main(int argc, char **argv)
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
-            i = ABS(i);
+            i = ABS(i*255/100);
             COLOR4("menu","inactive","shadow","primary",j,j,j,i);
             COLOR5("menu","active","text","shadow","primary",j,j,j,i);
             COLOR4("menu","disabled","shadow","primary",j,j,j,i);

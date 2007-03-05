@@ -57,8 +57,8 @@ void dock_startup(gboolean reconfig)
         GList *it;
 
         XSetWindowBorder(ob_display, dock->frame,
-                         RrColorPixel(ob_rr_theme->b_color));
-        XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->bwidth);
+                         RrColorPixel(ob_rr_theme->frame_b_color));
+        XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->fbwidth);
 
         RrAppearanceFree(dock->a_frame);
         dock->a_frame = RrAppearanceCopy(ob_rr_theme->a_focused_title);
@@ -91,8 +91,8 @@ void dock_startup(gboolean reconfig)
                                 &attrib);
     dock->a_frame = RrAppearanceCopy(ob_rr_theme->a_focused_title);
     XSetWindowBorder(ob_display, dock->frame,
-                     RrColorPixel(ob_rr_theme->b_color));
-    XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->bwidth);
+                     RrColorPixel(ob_rr_theme->frame_b_color));
+    XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->fbwidth);
 
     g_hash_table_insert(window_map, &dock->frame, dock);
     stacking_add(DOCK_AS_WINDOW(dock));
@@ -261,8 +261,8 @@ void dock_configure()
     }
 
     /* used for calculating offsets */
-    dock->w += ob_rr_theme->bwidth * 2;
-    dock->h += ob_rr_theme->bwidth * 2;
+    dock->w += ob_rr_theme->fbwidth * 2;
+    dock->h += ob_rr_theme->fbwidth * 2;
 
     a = screen_physical_area();
 
@@ -349,51 +349,51 @@ void dock_configure()
             case OB_DIRECTION_NORTHWEST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y -= dock->h - ob_rr_theme->bwidth;
+                    dock->y -= dock->h - ob_rr_theme->fbwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x -= dock->w - ob_rr_theme->bwidth;
+                    dock->x -= dock->w - ob_rr_theme->fbwidth;
                     break;
                 }
                 break;
             case OB_DIRECTION_NORTH:
-                dock->y -= dock->h - ob_rr_theme->bwidth;
+                dock->y -= dock->h - ob_rr_theme->fbwidth;
                 break;
             case OB_DIRECTION_NORTHEAST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y -= dock->h - ob_rr_theme->bwidth;
+                    dock->y -= dock->h - ob_rr_theme->fbwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x += dock->w - ob_rr_theme->bwidth;
+                    dock->x += dock->w - ob_rr_theme->fbwidth;
                     break;
                 }
                 break;
             case OB_DIRECTION_WEST:
-                dock->x -= dock->w - ob_rr_theme->bwidth;
+                dock->x -= dock->w - ob_rr_theme->fbwidth;
                 break;
             case OB_DIRECTION_EAST:
-                dock->x += dock->w - ob_rr_theme->bwidth;
+                dock->x += dock->w - ob_rr_theme->fbwidth;
                 break;
             case OB_DIRECTION_SOUTHWEST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y += dock->h - ob_rr_theme->bwidth;
+                    dock->y += dock->h - ob_rr_theme->fbwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x -= dock->w - ob_rr_theme->bwidth;
+                    dock->x -= dock->w - ob_rr_theme->fbwidth;
                     break;
                 } break;
             case OB_DIRECTION_SOUTH:
-                dock->y += dock->h - ob_rr_theme->bwidth;
+                dock->y += dock->h - ob_rr_theme->fbwidth;
                 break;
             case OB_DIRECTION_SOUTHEAST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y += dock->h - ob_rr_theme->bwidth;
+                    dock->y += dock->h - ob_rr_theme->fbwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x += dock->w - ob_rr_theme->bwidth;
+                    dock->x += dock->w - ob_rr_theme->fbwidth;
                     break;
                 }
                 break;
@@ -402,8 +402,8 @@ void dock_configure()
     }
 
     if (!config_dock_floating && config_dock_hide) {
-        strw = ob_rr_theme->bwidth;
-        strh = ob_rr_theme->bwidth;
+        strw = ob_rr_theme->fbwidth;
+        strh = ob_rr_theme->fbwidth;
     } else {
         strw = dock->w;
         strh = dock->h;
@@ -501,8 +501,8 @@ void dock_configure()
     dock->h += minh;
 
     /* not used for actually sizing shit */
-    dock->w -= ob_rr_theme->bwidth * 2;
-    dock->h -= ob_rr_theme->bwidth * 2;
+    dock->w -= ob_rr_theme->fbwidth * 2;
+    dock->h -= ob_rr_theme->fbwidth * 2;
 
     if (dock->dock_apps) {
         g_assert(dock->w > 0);
@@ -517,8 +517,8 @@ void dock_configure()
         XUnmapWindow(ob_display, dock->frame);
 
     /* but they are useful outside of this function! */
-    dock->w += ob_rr_theme->bwidth * 2;
-    dock->h += ob_rr_theme->bwidth * 2;
+    dock->w += ob_rr_theme->fbwidth * 2;
+    dock->h += ob_rr_theme->fbwidth * 2;
 
     screen_update_areas();
 }

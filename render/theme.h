@@ -2,7 +2,7 @@
 
    theme.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,28 +27,37 @@ G_BEGIN_DECLS
 typedef struct _RrTheme RrTheme;
 
 struct _RrTheme {
-    gchar *path;
-    gchar *name;
-
     const RrInstance *inst;
 
-    /* style settings - optional decor */
-    gboolean show_handle;
+    /* style settings - fonts */
+    RrFont *win_font_focused;
+    RrFont *win_font_unfocused;
+    RrFont *menu_title_font;
+    RrFont *menu_font;
 
     /* style settings - geometry */
-    gint padding;
+    gint paddingx;
+    gint paddingy;
     gint handle_height;
-    gint bwidth;
-    gint cbwidth;
+    gint fbwidth; /*!< frame border width */
+    gint mbwidth; /*!< menu border width */
+    gint cbwidthx;
+    gint cbwidthy;
+    gint menu_overlap;
+    /* these ones are calculated, not set directly by the theme file */
+    gint win_font_height;
+    gint menu_title_font_height;
+    gint menu_font_height;
     gint label_height;
     gint title_height;
     gint menu_title_height;
     gint button_size;
     gint grip_width;
-    gint menu_overlap;
+    gint top_grip_height;
 
     /* style settings - colors */
-    RrColor *b_color;
+    RrColor *menu_b_color;
+    RrColor *frame_b_color;
     RrColor *cb_focused_color;
     RrColor *cb_unfocused_color;
     RrColor *title_focused_color;
@@ -67,15 +76,21 @@ struct _RrTheme {
     RrColor *menu_color;
     RrColor *menu_disabled_color;
     RrColor *menu_selected_color;
-
-    /* style settings - fonts */
-    gint win_font_height;
-    RrFont *win_font_focused;
-    RrFont *win_font_unfocused;
-    gint menu_title_font_height;
-    RrFont *menu_title_font;
-    gint menu_font_height;
-    RrFont *menu_font;
+    RrColor *title_focused_shadow_color;
+    gchar    title_focused_shadow_alpha;
+    RrColor *title_unfocused_shadow_color;
+    gchar    title_unfocused_shadow_alpha;
+    RrColor *osd_color;
+    RrColor *osd_shadow_color;
+    gchar    osd_shadow_alpha;
+    RrColor *menu_title_shadow_color;
+    gchar    menu_title_shadow_alpha;
+    RrColor *menu_text_normal_shadow_color;
+    gchar    menu_text_normal_shadow_alpha;
+    RrColor *menu_text_selected_shadow_color;
+    gchar    menu_text_selected_shadow_alpha;
+    RrColor *menu_text_disabled_shadow_color;
+    gchar    menu_text_disabled_shadow_alpha;
 
     /* style settings - pics */
     RrPixel32 *def_win_icon; /* 48x48 RGBA */
@@ -178,12 +193,10 @@ struct _RrTheme {
     RrAppearance *a_clear;     /* clear with no texture */
     RrAppearance *a_clear_tex; /* clear with a texture */
 
-    RrAppearance *app_hilite_bg;
-    RrAppearance *app_unhilite_bg;
-    RrAppearance *app_hilite_fg; /* never parent relative */
-    RrAppearance *app_unhilite_fg; /* never parent relative */
-    RrAppearance *app_hilite_label; /* can be parent relative */
-    RrAppearance *app_unhilite_label; /* can be parent relative */
+    RrAppearance *osd_hilite_bg; /* can never be parent relative */
+    RrAppearance *osd_hilite_fg; /* can never be parent relative */
+    RrAppearance *osd_hilite_label; /* can be parent relative */
+    RrAppearance *osd_unhilite_fg; /* can never be parent relative */
 
 };
 

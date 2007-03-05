@@ -64,7 +64,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
     if test "$GCC" = "yes"; then
 	AC_MSG_RESULT([yes])
 	if test "$DEBUG" = "yes"; then
-	    FLAGS="$FLAGS -g -fno-inline -fno-strict-aliasing"
+	    FLAGS="$FLAGS -O0 -g -fno-inline"
 	    FLAGS="$FLAGS -Wall -Wsign-compare -Waggregate-return"
 	    FLAGS="$FLAGS -Wcast-qual -Wbad-function-cast -Wpointer-arith"
             # for Python.h
@@ -73,6 +73,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
 	if test "$STRICT" = "yes"; then
 	    FLAGS="$FLAGS -ansi -pedantic -D_XOPEN_SOURCE"
 	fi
+	FLAGS="$FLAGS -fno-strict-aliasing"
     fi
     AC_MSG_CHECKING([for compiler specific flags])
     AC_MSG_RESULT([$FLAGS])

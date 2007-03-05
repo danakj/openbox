@@ -313,7 +313,7 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
         menu_frame_move(frame, x, y);
     } else
         menu_frame_move(frame,
-                        x - ob_rr_theme->bwidth, y - ob_rr_theme->bwidth);
+                        x - ob_rr_theme->mbwidth, y - ob_rr_theme->mbwidth);
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *a = screen_physical_area_monitor(i);
         if (RECT_CONTAINS(*a, x, y)) {

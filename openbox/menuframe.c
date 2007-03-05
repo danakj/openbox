@@ -412,25 +412,25 @@ static void menu_frame_render(ObMenuFrame *self)
     gboolean has_icon = FALSE;
     ObMenu *sub;
 
-    XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->bwidth);
+    XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
     XSetWindowBorder(ob_display, self->window,
-                     RrColorPixel(ob_rr_theme->b_color));
+                     RrColorPixel(ob_rr_theme->menu_b_color));
 
     if (!self->parent && self->show_title) {
         XMoveWindow(ob_display, self->title, 
-                    -ob_rr_theme->bwidth, h - ob_rr_theme->bwidth);
+                    -ob_rr_theme->mbwidth, h - ob_rr_theme->mbwidth);
 
         self->a_title->texture[0].data.text.string = self->menu->title;
         RrMinsize(self->a_title, &tw, &th);
-        tw = MIN(tw, MAX_MENU_WIDTH) + ob_rr_theme->padding * 2;
+        tw = MIN(tw, MAX_MENU_WIDTH) + ob_rr_theme->paddingx * 2;
         w = MAX(w, tw);
 
         th = ob_rr_theme->menu_title_height;
-        h += (self->title_h = th + ob_rr_theme->bwidth);
+        h += (self->title_h = th + ob_rr_theme->mbwidth);
 
-        XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);
+        XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->mbwidth);
         XSetWindowBorder(ob_display, self->title,
-                         RrColorPixel(ob_rr_theme->b_color));
+                         RrColorPixel(ob_rr_theme->menu_b_color));
     }
 
     XMoveWindow(ob_display, self->items, 0, h);
@@ -538,9 +538,9 @@ static void menu_frame_render(ObMenuFrame *self)
 
     if (!self->parent && self->show_title) {
         XResizeWindow(ob_display, self->title,
-                      w, self->title_h - ob_rr_theme->bwidth);
+                      w, self->title_h - ob_rr_theme->mbwidth);
         RrPaint(self->a_title, self->title,
-                w, self->title_h - ob_rr_theme->bwidth);
+                w, self->title_h - ob_rr_theme->mbwidth);
         XMapWindow(ob_display, self->title);
     } else
         XUnmapWindow(ob_display, self->title);
@@ -550,8 +550,8 @@ static void menu_frame_render(ObMenuFrame *self)
     for (it = self->entries; it; it = g_list_next(it))
         menu_entry_frame_render(it->data);
 
-    w += ob_rr_theme->bwidth * 2;
-    h += ob_rr_theme->bwidth * 2;
+    w += ob_rr_theme->mbwidth * 2;
+    h += ob_rr_theme->mbwidth * 2;
 
     RECT_SET_SIZE(self->area, w, h);
 
@@ -721,8 +721,8 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
     GList *it;
 
     if ((frame = menu_frame_under(x, y))) {
-        x -= ob_rr_theme->bwidth + frame->area.x;
-        y -= frame->title_h + ob_rr_theme->bwidth + frame->area.y;
+        x -= ob_rr_theme->mbwidth + frame->area.x;
+        y -= frame->title_h + ob_rr_theme->mbwidth + frame->area.y;
 
         for (it = frame->entries; it; it = g_list_next(it)) {
             ObMenuEntryFrame *e = it->data;
@@ -795,7 +795,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
                     self->frame->area.x
                   + self->frame->area.width
                   - ob_rr_theme->menu_overlap
-                  - ob_rr_theme->bwidth,
+                  - ob_rr_theme->mbwidth,
                     self->frame->area.y
                   + self->frame->title_h
                   + self->area.y

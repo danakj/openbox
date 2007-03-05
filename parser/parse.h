@@ -38,6 +38,9 @@ void parse_shutdown(ObParseInst *inst);
 gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */
 gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
+/* Loads an Openbox menu, from the normal paths */
+gboolean parse_load_theme(const gchar *name, xmlDocPtr *doc, xmlNodePtr *root,
+                          gchar **path);
 
 void parse_register(ObParseInst *inst, const gchar *tag,
                     ParseCallback func, gpointer data);

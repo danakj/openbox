@@ -99,8 +99,8 @@ static gboolean read_string(XrmDatabase db, gchar *rname, gchar **value)
 static gchar hextodec(gchar h)
 {
     if (h >= '0' && h <= '9') return h - '0';
-    else if (h >= 'a' && h <= 'f') return h - 'a' + 9;
-    else if (h >= 'A' && h <= 'F') return h - 'A' + 9;
+    else if (h >= 'a' && h <= 'f') return h - 'a' + 10;
+    else if (h >= 'A' && h <= 'F') return h - 'A' + 10;
     return -1;
 }
 
@@ -109,9 +109,33 @@ static gboolean parse_color(gchar *c, gint *r, gint *g, gint *b)
     int dig1, dig2, i, color[3];
     int len = strlen(c);
 
-    if (c[0] == '#' && (len != 4 && len != 7)) return FALSE;
+    if (len > 4 && c[0] == 'r' && c[1] == 'g' && c[2] == 'b' && c[3] == ':') {
+        c += 4;
+        for (i = 0; i < 3; ++i) {
+            dig1 = hextodec(c[0]);
+            if (c[1] == '/') { dig2 = dig1; c+=2; }
+            else { dig2 = hextodec(c[1]); c+=3; }
 
-    if (c[0] != '#') {
+            if (dig1 < 0 || dig2 < 0) return FALSE;
+            
+            color[i] = dig1*16 + dig2;
+        }
+        *r = color[0]; *g = color[1]; *b = color[2];
+        return TRUE;
+    } else if ((len == 4 || len == 7) && c[0] == '#') {
+        c++;
+        for (i = 0; i < 3; ++i) {
+            dig1 = hextodec(c[0]);
+            if (len == 4) { dig2 = dig1; c++; }
+            else { dig2 = hextodec(c[1]); c+=2; }
+
+            if (dig1 < 0 || dig2 < 0) return FALSE;
+            
+            color[i] = dig1*16 + dig2;
+        }
+        *r = color[0]; *g = color[1]; *b = color[2];
+        return TRUE;
+    } else {
         int i;
 
         for (i = 0; colornames[i].name != NULL; ++i) {
@@ -122,21 +146,8 @@ static gboolean parse_color(gchar *c, gint *r, gint *g, gint *b)
                 return TRUE;
             }
         }
-        return FALSE;
     }
-
-    c++;
-    for (i = 0; i < 3; ++i, c += (len == 4 ? 1 : 2)) {
-        dig2 = hextodec(c[1]);
-        if (len == 4) dig1 = dig2;
-        else dig1 = hextodec(c[0]);
-
-        if (dig1 < 0 || dig2 < 0) return FALSE;
-
-        color[i] = dig1*16 + dig2;
-    }
-    *r = color[0]; *g = color[1]; *b = color[2];
-    return TRUE;
+    return FALSE;
 }
 
 static gboolean read_color(XrmDatabase db, gchar *rname,
@@ -197,48 +208,35 @@ static xmlNodePtr root;
 #define ATTR6(a,b,c,d,e,f,name,cont) (xmlSetProp(GO6(a,b,c,d,e,f), (const xmlChar*)name, (const xmlChar*)cont))
 #define ATTR7(a,b,c,d,e,f,g,name,cont) (xmlSetProp(GO7(a,b,c,d,e,f,g), (const xmlChar*)name, (const xmlChar*)cont))
 
-#define APPCONT1(a,cont) (CONT2("appearance",a,cont))
-#define APPCONT2(a,b,cont) (CONT3("appearance",a,b,cont))
-#define APPCONT3(a,b,c,cont) (CONT4("appearance",a,b,c,cont))
-#define APPCONT4(a,b,c,d,cont) (CONT5("appearance",a,b,c,d,cont))
-#define APPCONT5(a,b,c,d,e,cont) (CONT6("appearance",a,b,c,d,e,cont))
-
-#define APPATTR1(a,name,cont) (ATTR2("appearance",a,name,cont))
-#define APPATTR2(a,b,name,cont) (ATTR3("appearance",a,b,name,cont))
-#define APPATTR3(a,b,c,name,cont) (ATTR4("appearance",a,b,c,name,cont))
-#define APPATTR4(a,b,c,d,name,cont) (ATTR5("appearance",a,b,c,d,name,cont))
-#define APPATTR5(a,b,c,d,e,name,cont) (ATTR6("appearance",a,b,c,d,e,name,cont))
-#define APPATTR6(a,b,c,d,e,f,name,cont) (ATTR7("appearance",a,b,c,d,e,f,name,cont))
-
-#define COLOR1(a,R,G,B,A) (APPATTR1(a,"r",NUM(R)), \
-                           APPATTR1(a,"g",NUM(G)), \
-                           APPATTR1(a,"b",NUM(B)), \
-                           APPATTR1(a,"a",NUM(A)))
-#define COLOR2(a,b,R,G,B,A) (APPATTR2(a,b,"r",NUM(R)), \
-                             APPATTR2(a,b,"g",NUM(G)), \
-                             APPATTR2(a,b,"b",NUM(B)), \
-                             APPATTR2(a,b,"a",NUM(A)))
-#define COLOR3(a,b,c,R,G,B,A) (APPATTR3(a,b,c,"r",NUM(R)), \
-                               APPATTR3(a,b,c,"g",NUM(G)), \
-                               APPATTR3(a,b,c,"b",NUM(B)), \
-                               APPATTR3(a,b,c,"a",NUM(A)))
-#define COLOR4(a,b,c,d,R,G,B,A) (APPATTR4(a,b,c,d,"r",NUM(R)), \
-                                 APPATTR4(a,b,c,d,"g",NUM(G)), \
-                                 APPATTR4(a,b,c,d,"b",NUM(B)), \
-                                 APPATTR4(a,b,c,d,"a",NUM(A)))
-#define COLOR5(a,b,c,d,e,R,G,B,A) (APPATTR5(a,b,c,d,e,"r",NUM(R)), \
-                                   APPATTR5(a,b,c,d,e,"g",NUM(G)), \
-                                   APPATTR5(a,b,c,d,e,"b",NUM(B)), \
-                                   APPATTR5(a,b,c,d,e,"a",NUM(A)))
-#define COLOR6(a,b,c,d,e,f,R,G,B,A) (APPATTR6(a,b,c,d,e,f,"r",NUM(R)), \
-                                     APPATTR6(a,b,c,d,e,f,"g",NUM(G)), \
-                                     APPATTR6(a,b,c,d,e,f,"b",NUM(B)), \
-                                     APPATTR6(a,b,c,d,e,f,"a",NUM(A)))
+#define COLOR1(a,R,G,B,A) (ATTR1(a,"r",NUM(R)), \
+                           ATTR1(a,"g",NUM(G)), \
+                           ATTR1(a,"b",NUM(B)), \
+                           ATTR1(a,"a",NUM(A)))
+#define COLOR2(a,b,R,G,B,A) (ATTR2(a,b,"r",NUM(R)), \
+                             ATTR2(a,b,"g",NUM(G)), \
+                             ATTR2(a,b,"b",NUM(B)), \
+                             ATTR2(a,b,"a",NUM(A)))
+#define COLOR3(a,b,c,R,G,B,A) (ATTR3(a,b,c,"r",NUM(R)), \
+                               ATTR3(a,b,c,"g",NUM(G)), \
+                               ATTR3(a,b,c,"b",NUM(B)), \
+                               ATTR3(a,b,c,"a",NUM(A)))
+#define COLOR4(a,b,c,d,R,G,B,A) (ATTR4(a,b,c,d,"r",NUM(R)), \
+                                 ATTR4(a,b,c,d,"g",NUM(G)), \
+                                 ATTR4(a,b,c,d,"b",NUM(B)), \
+                                 ATTR4(a,b,c,d,"a",NUM(A)))
+#define COLOR5(a,b,c,d,e,R,G,B,A) (ATTR5(a,b,c,d,e,"r",NUM(R)), \
+                                   ATTR5(a,b,c,d,e,"g",NUM(G)), \
+                                   ATTR5(a,b,c,d,e,"b",NUM(B)), \
+                                   ATTR5(a,b,c,d,e,"a",NUM(A)))
+#define COLOR6(a,b,c,d,e,f,R,G,B,A) (ATTR6(a,b,c,d,e,f,"r",NUM(R)), \
+                                     ATTR6(a,b,c,d,e,f,"g",NUM(G)), \
+                                     ATTR6(a,b,c,d,e,f,"b",NUM(B)), \
+                                     ATTR6(a,b,c,d,e,f,"a",NUM(A)))
 
 #define APPEARANCE2(res,a,b) \
 { \
     if (read_string(db, res, &s)) \
-        APPCONT3(a, b, "style", s); \
+        CONT3(a, b, "style", s); \
     if (read_color(db, res".color", &i, &j, &k)) \
         COLOR3(a, b, "primary", i, j, k, 255); \
     if (read_color(db, res".colorTo", &i, &j, &k)) \
@@ -252,7 +250,7 @@ static xmlNodePtr root;
 #define APPEARANCE3(res,a,b,c) \
 { \
     if (read_string(db, res, &s)) \
-        APPCONT4(a, b, c, "style", s); \
+        CONT4(a, b, c, "style", s); \
     if (read_color(db, res".color", &i, &j, &k)) \
         COLOR4(a, b, c, "primary", i, j, k, 255); \
     if (read_color(db, res".colorTo", &i, &j, &k)) \
@@ -266,7 +264,7 @@ static xmlNodePtr root;
 #define APPEARANCE4(res,a,b,c,d) \
 { \
     if (read_string(db, res, &s)) \
-        APPCONT5(a, b, c, d, "style", s); \
+        CONT5(a, b, c, d, "style", s); \
     if (read_color(db, res".color", &i, &j, &k)) \
         COLOR5(a, b, c, d, "primary", i, j, k, 255); \
     if (read_color(db, res".colorTo", &i, &j, &k)) \
@@ -284,19 +282,40 @@ int main(int argc, char **argv)
     gchar *s;
     int ret = 0;
 
-    if (argc < 2) {
-        printf("Please specify an Openbox3 themerc file\n");
-        return 1;
+    if (argc > 1) {
+        fprintf(stderr, "themetoxml (C) 2007 Dana Jansens\n"
+                "This tool takes an older Openbox3 themerc file on stdin,"
+                " and gives back the\n"
+                "theme in the newer themerc.xml XML style.\n");
+        return 0;
     }
+    {
+        gchar *buf = g_new(gchar, 1000);
+        gint sz = 1000;
+        gint r = 0, rthis;
 
-    if ((db = XrmGetFileDatabase(argv[1])) == NULL) {
-        printf("Unable to open the database from stdin\n");
-        return 1;
+        while ((rthis = read(0, buf + r, sz - r)) > 0) {
+            r+=rthis;
+            if (r==sz) {
+                sz+=1000;
+                buf = g_renew(gchar,buf,sz);
+            }
+        }
+        
+
+        if ((db = XrmGetStringDatabase(buf)) == NULL) {
+            fprintf(stderr, "Unable to read the database from stdin\n");
+            return 1;
+        }
+        g_free(buf);
     }
 
     doc = xmlNewDoc((const xmlChar*) "1.0");
     xmlDocSetRootElement
         (doc,(root = xmlNewNode(NULL, (const xmlChar*)"openbox_theme")));
+    xmlSetProp(root, (const xmlChar*)"version", (const xmlChar*)"1");
+    xmlSetProp(root, (const xmlChar*)"xmlns",
+               (const xmlChar*)"http://openbox.org/themerc");
 
     if (read_int(db, "window.handle.width", &i))
         CONT2("dimensions", "handle", NUM(i));
@@ -306,9 +325,12 @@ int main(int argc, char **argv)
         ATTR2("dimensions", "padding", "vertical", NUM(i));
     }
     
-    if (read_int(db, "border.width", &i)) {
-        APPCONT3("window", "border", "width", NUM(i));
-        APPCONT3("menu", "border", "width", NUM(i));
+    if (read_int(db, "borderWidth", &i)) {
+        CONT3("window", "border", "width", NUM(i));
+        CONT3("menu", "border", "width", NUM(i));
+    } else if (read_int(db, "border.width", &i)) {
+        CONT3("window", "border", "width", NUM(i));
+        CONT3("menu", "border", "width", NUM(i));
     }
 
     if (read_color(db, "border.color", &i, &j, &k)) {
@@ -316,31 +338,33 @@ int main(int argc, char **argv)
         COLOR3("menu", "border", "primary", i, j, k, 255);
     }
 
-    if (read_int(db, "window.client.padding.width", &i))
-        APPCONT3("window", "clientborder", "width", NUM(i));
+    if (read_int(db, "window.client.padding.width", &i)) {
+        ATTR2("window", "clientpadding", "horizontal", NUM(i));
+        ATTR2("window", "clientpadding", "vertical", NUM(i));
+    }
 
     if (read_string(db, "window.label.text.justify", &s)) {
         if (!g_ascii_strcasecmp(s, "right")) s = "right";
         else if (!g_ascii_strcasecmp(s, "center")) s = "center";
         else s = "left";
-        APPCONT5("window", "inactive", "label", "text", "justify", s);
+        CONT2("window", "justify", s);
     }
 
     if (read_string(db, "menu.title.text.justify", &s)) {
         if (!g_ascii_strcasecmp(s, "right")) s = "right";
         else if (!g_ascii_strcasecmp(s, "center")) s = "center";
         else s = "left";
-        APPCONT4("menu", "title", "text", "justify", s);
+        CONT2("menu", "justify", s);
     }
 
     if (read_int(db, "menu.overlap", &i))
-        APPCONT2("menu", "overlap", NUM(i));
+        CONT2("menu", "overlap", NUM(i));
 
     if (read_color(db, "window.active.client.color", &i, &j, &k))
-        COLOR4("window","active","clientborder","primary",i,j,k,255);
+        COLOR3("window","active","clientpadding",i,j,k,255);
     
     if (read_color(db, "window.inactive.client.color", &i, &j, &k))
-        COLOR4("window","inactive","clientborder","primary",i,j,k,255);
+        COLOR3("window","inactive","clientpadding",i,j,k,255);
 
     if (read_color(db, "window.active.label.text.color", &i, &j, &k))
         COLOR5("window","active","label","text","primary",i,j,k,255);
@@ -394,7 +418,7 @@ int main(int argc, char **argv)
 
     if (read_color(db, "menu.items.text.color",
                    &i, &j, &k))
-        COLOR4("menu","inactive","text","primary",i,j,k,255);
+        COLOR3("menu","inactive","primary",i,j,k,255);
 
     if (read_color(db, "menu.items.disabled.text.color",
                    &i, &j, &k))
@@ -412,7 +436,7 @@ int main(int argc, char **argv)
     APPEARANCE3("window.inactive.handle.bg", "window", "inactive", "handle");
     APPEARANCE3("window.active.grip.bg", "window", "active", "grip");
     APPEARANCE3("window.inactive.grip.bg", "window", "inactive", "grip");
-    APPEARANCE2("menu.items.bg", "menu", "inactive");
+    APPEARANCE2("menu.items.bg", "menu", "entries");
     APPEARANCE2("menu.items.active.bg", "menu", "active");
     APPEARANCE2("menu.title.bg", "menu", "title");
 
@@ -444,9 +468,9 @@ int main(int argc, char **argv)
                 i = parse_inline_number(p + strlen("shadowoffset="));
             else
                 i = 1;
-            APPATTR6("window","active","label","text","shadow","offset",
+            ATTR6("window","active","label","text","shadow","offset",
                      "x",NUM(i));
-            APPATTR6("window","active","label","text","shadow","offset",
+            ATTR6("window","active","label","text","shadow","offset",
                      "y",NUM(i));
         }
         if ((p = strstr(s, "shadowtint=")))
@@ -466,9 +490,9 @@ int main(int argc, char **argv)
                 i = parse_inline_number(p + strlen("shadowoffset="));
             else
                 i = 1;
-            APPATTR6("window","inactive","label","text","shadow","offset",
+            ATTR6("window","inactive","label","text","shadow","offset",
                      "x",NUM(i));
-            APPATTR6("window","inactive","label","text","shadow","offset",
+            ATTR6("window","inactive","label","text","shadow","offset",
                      "y",NUM(i));
         }
         if ((p = strstr(s, "shadowtint=")))
@@ -488,8 +512,8 @@ int main(int argc, char **argv)
                 i = parse_inline_number(p + strlen("shadowoffset="));
             else
                 i = 1;
-            APPATTR5("menu","title","text","shadow","offset","x",NUM(i));
-            APPATTR5("menu","title","text","shadow","offset","y",NUM(i));
+            ATTR5("menu","title","text","shadow","offset","x",NUM(i));
+            ATTR5("menu","title","text","shadow","offset","y",NUM(i));
         }
         if ((p = strstr(s, "shadowtint=")))
         {
@@ -507,26 +531,26 @@ int main(int argc, char **argv)
                 i = parse_inline_number(p + strlen("shadowoffset="));
             else
                 i = 1;
-            APPATTR5("menu","inactive","text","shadow","offset","x",NUM(i));
-            APPATTR5("menu","inactive","text","shadow","offset","y",NUM(i));
-            APPATTR5("menu","active","text","shadow","offset","x",NUM(i));
-            APPATTR5("menu","active","text","shadow","offset","y",NUM(i));
-            APPATTR5("menu","disabled","text","shadow","offset","x",NUM(i));
-            APPATTR5("menu","disabled","text","shadow","offset","y",NUM(i));
+            ATTR4("menu","inactive","shadow","offset","x",NUM(i));
+            ATTR4("menu","inactive","shadow","offset","y",NUM(i));
+            ATTR5("menu","active","text","shadow","offset","x",NUM(i));
+            ATTR5("menu","active","text","shadow","offset","y",NUM(i));
+            ATTR4("menu","disabled","shadow","offset","x",NUM(i));
+            ATTR4("menu","disabled","shadow","offset","y",NUM(i));
         }
         if ((p = strstr(s, "shadowtint=")))
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
             i = ABS(i);
-            COLOR5("menu","inactive","text","shadow","primary",j,j,j,i);
+            COLOR4("menu","inactive","shadow","primary",j,j,j,i);
             COLOR5("menu","active","text","shadow","primary",j,j,j,i);
-            COLOR5("menu","disabled","text","shadow","primary",j,j,j,i);
+            COLOR4("menu","disabled","shadow","primary",j,j,j,i);
         }
     }
 
     if (xmlSaveFormatFile("-", doc, 1) < 0) {
-        printf("Error writing the xml tree\n");
+        fprintf(stderr, "Error writing the xml tree\n");
         ret = 1;
     }
 

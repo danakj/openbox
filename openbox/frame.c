@@ -159,15 +159,15 @@ static void set_theme_statics(ObFrame *self)
 {
     /* set colors/appearance/sizes for stuff that doesn't change */
     XSetWindowBorder(ob_display, self->window,
-                     RrColorPixel(ob_rr_theme->b_color));
+                     RrColorPixel(ob_rr_theme->frame_b_color));
     XSetWindowBorder(ob_display, self->title,
-                     RrColorPixel(ob_rr_theme->b_color));
+                     RrColorPixel(ob_rr_theme->frame_b_color));
     XSetWindowBorder(ob_display, self->handle,
-                     RrColorPixel(ob_rr_theme->b_color));
+                     RrColorPixel(ob_rr_theme->frame_b_color));
     XSetWindowBorder(ob_display, self->rgrip,
-                     RrColorPixel(ob_rr_theme->b_color));
+                     RrColorPixel(ob_rr_theme->frame_b_color));
     XSetWindowBorder(ob_display, self->lgrip,
-                     RrColorPixel(ob_rr_theme->b_color));
+                     RrColorPixel(ob_rr_theme->frame_b_color));
 
     XResizeWindow(ob_display, self->max,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
@@ -181,14 +181,16 @@ static void set_theme_statics(ObFrame *self)
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
     XResizeWindow(ob_display, self->shade,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
-    XResizeWindow(ob_display, self->lgrip,
-                  ob_rr_theme->grip_width, ob_rr_theme->handle_height);
-    XResizeWindow(ob_display, self->rgrip,
-                  ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+    if (ob_rr_theme->handle_height > 0) {
+        XResizeWindow(ob_display, self->lgrip,
+                      ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+        XResizeWindow(ob_display, self->rgrip,
+                      ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+    }
     XResizeWindow(ob_display, self->tlresize,
-                  ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+                  ob_rr_theme->grip_width, ob_rr_theme->top_grip_height);
     XResizeWindow(ob_display, self->trresize,
-                  ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+                  ob_rr_theme->grip_width, ob_rr_theme->top_grip_height);
 
     /* set up the dynamic appearances */
     self->a_unfocused_title = RrAppearanceCopy(ob_rr_theme->a_unfocused_title);
@@ -272,8 +274,8 @@ void frame_adjust_shape(ObFrame *self)
 
         num = 0;
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-            xrect[0].x = -ob_rr_theme->bwidth;
-            xrect[0].y = -ob_rr_theme->bwidth;
+            xrect[0].x = -ob_rr_theme->fbwidth;
+            xrect[0].y = -ob_rr_theme->fbwidth;
             xrect[0].width = self->width + self->rbwidth * 2;
             xrect[0].height = ob_rr_theme->title_height +
                 self->bwidth * 2;
@@ -281,7 +283,7 @@ void frame_adjust_shape(ObFrame *self)
         }
 
         if (self->decorations & OB_FRAME_DECOR_HANDLE) {
-            xrect[1].x = -ob_rr_theme->bwidth;
+            xrect[1].x = -ob_rr_theme->fbwidth;
             xrect[1].y = FRAME_HANDLE_Y(self);
             xrect[1].width = self->width + self->rbwidth * 2;
             xrect[1].height = ob_rr_theme->handle_height +
@@ -308,8 +310,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         self->max_horz = self->client->max_horz;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER) {
-            self->bwidth = ob_rr_theme->bwidth;
-            self->cbwidth_x = self->cbwidth_y = ob_rr_theme->cbwidth;
+            self->bwidth = ob_rr_theme->fbwidth;
+            self->cbwidth_x = ob_rr_theme->cbwidthx;
+            self->cbwidth_y = ob_rr_theme->cbwidthy;
         } else {
             self->bwidth = self->cbwidth_x = self->cbwidth_y = 0;
         }
@@ -340,7 +343,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->innersize.top += ob_rr_theme->title_height + self->rbwidth +
                 (self->rbwidth - self->bwidth);
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
-            ob_rr_theme->show_handle)
+            ob_rr_theme->handle_height > 0)
             self->innersize.bottom += ob_rr_theme->handle_height +
                 self->rbwidth + (self->rbwidth - self->bwidth);
   
@@ -382,7 +385,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         if (!fake) {
             if (self->decorations & OB_FRAME_DECOR_HANDLE &&
-                ob_rr_theme->show_handle)
+                ob_rr_theme->handle_height > 0)
             {
                 XMoveResizeWindow(ob_display, self->handle,
                                   -self->bwidth, FRAME_HANDLE_Y(self),
@@ -401,12 +404,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XUnmapWindow(ob_display, self->lgrip);
                     XUnmapWindow(ob_display, self->rgrip);
                 }
-
-                /* XXX make a subwindow with these dimentions?
-                   ob_rr_theme->grip_width + self->bwidth, 0,
-                   self->width - (ob_rr_theme->grip_width + self->bwidth) * 2,
-                   ob_rr_theme->handle_height);
-                */
             } else
                 XUnmapWindow(ob_display, self->handle);
 
@@ -608,14 +605,14 @@ static void layout_title(ObFrame *self)
     n = d = i = l = m = c = s = FALSE;
 
     /* figure out whats being shown, and the width of the label */
-    self->label_width = self->width - (ob_rr_theme->padding + 1) * 2;
+    self->label_width = self->width - (ob_rr_theme->paddingx + 1) * 2;
     for (lc = config_title_layout; *lc != '\0'; ++lc) {
         switch (*lc) {
         case 'N':
             if (n) { *lc = ' '; break; } /* rm duplicates */
             n = TRUE;
             self->label_width -= (ob_rr_theme->button_size + 2 +
-                                  ob_rr_theme->padding + 1);
+                                  ob_rr_theme->paddingx + 1);
             break;
         case 'D':
             if (d) { *lc = ' '; break; }
@@ -624,7 +621,7 @@ static void layout_title(ObFrame *self)
                 break;
             d = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->padding + 1);
+                                  ob_rr_theme->paddingx + 1);
             break;
         case 'S':
             if (s) { *lc = ' '; break; }
@@ -633,7 +630,7 @@ static void layout_title(ObFrame *self)
                 break;
             s = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->padding + 1);
+                                  ob_rr_theme->paddingx + 1);
             break;
         case 'I':
             if (i) { *lc = ' '; break; }
@@ -642,7 +639,7 @@ static void layout_title(ObFrame *self)
                 break;
             i = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->padding + 1);
+                                  ob_rr_theme->paddingx + 1);
             break;
         case 'L':
             if (l) { *lc = ' '; break; }
@@ -655,7 +652,7 @@ static void layout_title(ObFrame *self)
                 break;
             m = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->padding + 1);
+                                  ob_rr_theme->paddingx + 1);
             break;
         case 'C':
             if (c) { *lc = ' '; break; }
@@ -664,7 +661,7 @@ static void layout_title(ObFrame *self)
                 break;
             c = TRUE;
             self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->padding + 1);
+                                  ob_rr_theme->paddingx + 1);
             break;
         }
     }
@@ -678,57 +675,57 @@ static void layout_title(ObFrame *self)
     if (!m) XUnmapWindow(ob_display, self->max);
     if (!c) XUnmapWindow(ob_display, self->close);
 
-    x = ob_rr_theme->padding + 1;
+    x = ob_rr_theme->paddingx + 1;
     for (lc = config_title_layout; *lc != '\0'; ++lc) {
         switch (*lc) {
         case 'N':
             if (!n) break;
             self->icon_x = x;
             XMapWindow(ob_display, self->icon);
-            XMoveWindow(ob_display, self->icon, x, ob_rr_theme->padding);
-            x += ob_rr_theme->button_size + 2 + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display, self->icon, x, ob_rr_theme->paddingx);
+            x += ob_rr_theme->button_size + 2 + ob_rr_theme->paddingx + 1;
             break;
         case 'D':
             if (!d) break;
             self->desk_x = x;
             XMapWindow(ob_display, self->desk);
-            XMoveWindow(ob_display, self->desk, x, ob_rr_theme->padding + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display, self->desk, x, ob_rr_theme->paddingx + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'S':
             if (!s) break;
             self->shade_x = x;
             XMapWindow(ob_display, self->shade);
-            XMoveWindow(ob_display, self->shade, x, ob_rr_theme->padding + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display, self->shade, x, ob_rr_theme->paddingx + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'I':
             if (!i) break;
             self->iconify_x = x;
             XMapWindow(ob_display, self->iconify);
-            XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->padding + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->paddingx + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'L':
             if (!l) break;
             self->label_x = x;
             XMapWindow(ob_display, self->label);
-            XMoveWindow(ob_display, self->label, x, ob_rr_theme->padding);
-            x += self->label_width + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display, self->label, x, ob_rr_theme->paddingx);
+            x += self->label_width + ob_rr_theme->paddingx + 1;
             break;
         case 'M':
             if (!m) break;
             self->max_x = x;
             XMapWindow(ob_display, self->max);
-            XMoveWindow(ob_display, self->max, x, ob_rr_theme->padding + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display, self->max, x, ob_rr_theme->paddingx + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'C':
             if (!c) break;
             self->close_x = x;
             XMapWindow(ob_display, self->close);
-            XMoveWindow(ob_display, self->close, x, ob_rr_theme->padding + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            XMoveWindow(ob_display, self->close, x, ob_rr_theme->paddingx + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         }
     }

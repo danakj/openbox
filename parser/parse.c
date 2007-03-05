@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    parse.c for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 static gboolean xdg_start;
 static gchar   *xdg_config_home_path;
@@ -67,7 +68,7 @@ void parse_register(ObParseInst *i, const gchar *tag,
     struct Callback *c;
 
     if ((c = g_hash_table_lookup(i->callbacks, tag))) {
-        g_warning("tag '%s' already registered", tag);
+        g_warning("Tag '%s' already registered", tag);
         return;
     }
 
@@ -90,7 +91,35 @@ gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
         g_free(path);
     }
     if (!r)
-        g_warning("unable to find a valid config file, using defaults");
+        g_warning("Unable to find a valid config file, using defaults");
+    return r;
+}
+
+gboolean parse_load_theme(const gchar *name, xmlDocPtr *doc, xmlNodePtr *root,
+                          gchar **retpath)
+{
+    GSList *it;
+    gchar *path;
+    gboolean r = FALSE;
+
+    /* backward compatibility.. */
+    path = g_build_filename(g_get_home_dir(), ".themes", name,
+                            "openbox-3", "themerc.xml", NULL);
+    if ((r = parse_load(path, "openbox_theme", doc, root)))
+        *retpath = g_path_get_dirname(path);
+    g_free(path);
+
+    if (!r) {
+        for (it = xdg_data_dir_paths; !r && it; it = g_slist_next(it)) {
+            path = g_build_filename(it->data, "themes", name, "openbox-3",
+                                    "themerc.xml", NULL);
+            if ((r = parse_load(path, "openbox_theme", doc, root)))
+                *retpath = g_path_get_dirname(path);
+            g_free(path);
+        }
+    }
+    if (!r)
+        g_warning("Unable to load the theme %s", name);
     return r;
 }
 
@@ -110,14 +139,20 @@ gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root)
         }
     }
     if (!r)
-        g_warning("unable to find a valid menu file '%s'", file);
+        g_warning("Unable to find a valid menu file '%s'", file);
     return r;
 }
 
 gboolean parse_load(const gchar *path, const gchar *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root)
 {
-    if ((*doc = xmlParseFile(path))) {
+    struct stat s;
+    if (stat(path, &s) < 0)
+        return FALSE;
+
+    /* XML_PARSE_BLANKS is needed apparently. When it loads a theme file,
+       without this option, the tree is weird and has extra nodes in it. */
+    if ((*doc = xmlReadFile(path, NULL, XML_PARSE_NOBLANKS))) {
         *root = xmlDocGetRootElement(*doc);
         if (!*root) {
             xmlFreeDoc(*doc);
@@ -127,7 +162,7 @@ gboolean parse_load(const gchar *path, const gchar *rootname,
             if (xmlStrcasecmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
-                g_warning("document %s is of wrong type. root node is "
+                g_warning("Document %s is of wrong type. root node is "
                           "not '%s'", path, rootname);
             }
         }
@@ -150,7 +185,7 @@ gboolean parse_load_mem(gpointer data, guint len, const gchar *rootname,
             if (xmlStrcasecmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
-                g_warning("document in given memory is of wrong type. root "
+                g_warning("Document in given memory is of wrong type. root "
                           "node is not '%s'", rootname);
             }
         }
@@ -395,6 +430,10 @@ void parse_paths_shutdown()
         g_free(it->data);
     g_slist_free(xdg_data_dir_paths);
     xdg_data_dir_paths = NULL;
+    g_free(xdg_config_home_path);
+    xdg_config_home_path = NULL;
+    g_free(xdg_data_home_path);
+    xdg_data_home_path = NULL;
 }
 
 gchar *parse_expand_tilde(const gchar *f)

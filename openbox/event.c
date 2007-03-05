@@ -597,9 +597,9 @@ static void event_handle_root(XEvent *e)
         } else if (msgtype == prop_atoms.net_showing_desktop) {
             screen_show_desktop(e->xclient.data.l[0] != 0);
         } else if (msgtype == prop_atoms.ob_control) {
-            if ((Atom)e->xclient.data.l[0] == 1)
+            if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();
-            else if ((Atom)e->xclient.data.l[0] == 2)
+            else if (e->xclient.data.l[0] == 2)
                 ob_restart();
         }
         break;

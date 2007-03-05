@@ -2,7 +2,7 @@
 
    render.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
    Copyright (c) 2003        Derek Foreman
 
    This program is free software; you can redistribute it and/or modify
@@ -121,8 +121,10 @@ struct _RrTextureText {
     RrJustify justify;
     RrColor *color;
     gchar *string;
-    gint shadow_offset;
-    gchar shadow_tint;
+    gint shadow_offset_x;
+    gint shadow_offset_y;
+    RrColor *shadow_color;
+    gchar shadow_alpha;
 };
 
 struct _RrPixmapMask {
@@ -231,8 +233,8 @@ RrFont *RrFontOpen          (const RrInstance *inst, gchar *name, gint size,
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
-                             gint shadow_offset);
-gint    RrFontHeight        (const RrFont *f, gint shadow_offset);
+                             gint shadow_offset_x, gint shadow_offset_y);
+gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
 gint    RrFontMaxCharWidth  (const RrFont *f);
 
 void RrPaint   (RrAppearance *a, Window win, gint w, gint h);

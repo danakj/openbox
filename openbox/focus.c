@@ -392,7 +392,7 @@ void focus_cycle_draw_indicator()
 
         wt = wl = wr = wb = MAX(3,
                                 ob_rr_theme->handle_height +
-                                ob_rr_theme->bwidth * 2);
+                                ob_rr_theme->fbwidth * 2);
 
         x = focus_cycle_target->frame->area.x;
         y = focus_cycle_target->frame->area.y;

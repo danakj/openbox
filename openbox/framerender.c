@@ -147,43 +147,42 @@ void framerender_frame(ObFrame *self)
         ob_rr_theme->a_clear->surface.parenty = 0;
 
         RrPaint(ob_rr_theme->a_clear, self->tlresize,
-                ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+                ob_rr_theme->grip_width, ob_rr_theme->top_grip_height);
 
         ob_rr_theme->a_clear->surface.parentx =
             self->width - ob_rr_theme->grip_width;
 
         RrPaint(ob_rr_theme->a_clear, self->trresize,
-                ob_rr_theme->grip_width, ob_rr_theme->handle_height);
-
+                ob_rr_theme->grip_width, ob_rr_theme->top_grip_height);
 
         /* set parents for any parent relative guys */
         l->surface.parent = t;
         l->surface.parentx = self->label_x;
-        l->surface.parenty = ob_rr_theme->padding;
+        l->surface.parenty = ob_rr_theme->paddingy;
 
         m->surface.parent = t;
         m->surface.parentx = self->max_x;
-        m->surface.parenty = ob_rr_theme->padding + 1;
+        m->surface.parenty = ob_rr_theme->paddingy + 1;
 
         n->surface.parent = t;
         n->surface.parentx = self->icon_x;
-        n->surface.parenty = ob_rr_theme->padding;
+        n->surface.parenty = ob_rr_theme->paddingy;
 
         i->surface.parent = t;
         i->surface.parentx = self->iconify_x;
-        i->surface.parenty = ob_rr_theme->padding + 1;
+        i->surface.parenty = ob_rr_theme->paddingy + 1;
 
         d->surface.parent = t;
         d->surface.parentx = self->desk_x;
-        d->surface.parenty = ob_rr_theme->padding + 1;
+        d->surface.parenty = ob_rr_theme->paddingy + 1;
 
         s->surface.parent = t;
         s->surface.parentx = self->shade_x;
-        s->surface.parenty = ob_rr_theme->padding + 1;
+        s->surface.parenty = ob_rr_theme->paddingy + 1;
 
         c->surface.parent = t;
         c->surface.parentx = self->close_x;
-        c->surface.parenty = ob_rr_theme->padding + 1;
+        c->surface.parenty = ob_rr_theme->paddingy + 1;
 
         framerender_label(self, l);
         framerender_max(self, m);
@@ -194,7 +193,9 @@ void framerender_frame(ObFrame *self)
         framerender_close(self, c);
     }
 
-    if (self->decorations & OB_FRAME_DECOR_HANDLE) {
+    if (self->decorations & OB_FRAME_DECOR_HANDLE &&
+        ob_rr_theme->handle_height > 0)
+    {
         RrAppearance *h, *g;
 
         h = (self->focused ?

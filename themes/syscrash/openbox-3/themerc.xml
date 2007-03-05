@@ -1,0 +1,131 @@
+<!-- syscrash's theme, based off nightm4re's flax or something -->
+
+<?xml version="1.0"?>
+<openbox_theme version="1" xmlns="http://openbox.org/themerc">
+  <dimensions>
+    <handle>3</handle>
+    <padding horizontal="2" vertical="2"/>
+  </dimensions>
+  <window>
+    <border>
+      <width>1</width>
+      <primary r="34" g="34" b="28" a="255"/>
+    </border>
+    <clientpadding horizontal="0" vertical="0"/>
+    <justify>left</justify>
+    <active>
+      <label>
+        <text>
+          <primary r="255" g="255" b="255" a="255"/>
+        </text>
+        <style>flat gradient vertical border</style>
+        <primary r="76" g="76" b="76" a="255"/>
+        <secondary r="112" g="112" b="112" a="255"/>
+      </label>
+      <buttons>
+        <unpressed>
+          <image r="255" g="255" b="255" a="255"/>
+          <style>flat gradient vertical border</style>
+          <primary r="81" g="81" b="81" a="255"/>
+          <secondary r="103" g="103" b="103" a="255"/>
+        </unpressed>
+        <disabled>
+          <image r="159" g="191" b="193" a="255"/>
+          <style>parentrelative</style>
+        </disabled>
+        <pressed>
+          <style>flat gradient crossdiagonal border</style>
+          <primary r="211" g="222" b="218" a="255"/>
+          <secondary r="159" g="191" b="193" a="255"/>
+        </pressed>
+        <hover>
+          <style>flat solid border</style>
+          <primary r="230" g="230" b="224" a="255"/>
+        </hover>
+      </buttons>
+      <titlebar>
+        <style>flat solid</style>
+        <primary r="155" g="155" b="155" a="255"/>
+      </titlebar>
+      <handle>
+        <style>flat solid</style>
+      </handle>
+      <grip>
+        <style>flat solid</style>
+        <primary r="76" g="76" b="76" a="255"/>
+        <secondary r="112" g="112" b="112" a="255"/>
+      </grip>
+    </active>
+    <inactive>
+      <label>
+        <text>
+          <primary r="76" g="76" b="76" a="255"/>
+        </text>
+        <style>parentrelative</style>
+      </label>
+      <buttons>
+        <unpressed>
+          <image r="76" g="76" b="76" a="255"/>
+          <style>parentrelative</style>
+        </unpressed>
+        <disabled>
+          <style>flat solid</style>
+        </disabled>
+        <pressed>
+          <style>flat gradient crossdiagonal border</style>
+          <primary r="211" g="222" b="218" a="255"/>
+          <secondary r="159" g="191" b="193" a="255"/>
+        </pressed>
+        <hover>
+          <style>flat solid border</style>
+          <primary r="230" g="230" b="224" a="255"/>
+        </hover>
+      </buttons>
+      <titlebar>
+        <style>flat solid</style>
+        <primary r="155" g="155" b="155" a="255"/>
+      </titlebar>
+      <handle>
+        <style>flat solid</style>
+        <primary r="230" g="230" b="224" a="255"/>
+      </handle>
+      <grip>
+        <style>flat solid</style>
+        <primary r="230" g="230" b="224" a="255"/>
+      </grip>
+    </inactive>
+  </window>
+  <menu>
+    <border>
+      <width>1</width>
+      <primary r="34" g="34" b="28" a="255"/>
+    </border>
+    <justify>left</justify>
+    <overlap>0</overlap>
+    <title>
+      <text>
+        <primary r="255" g="255" b="255" a="255"/>
+      </text>
+      <style>flat gradient vertical</style>
+      <primary r="76" g="76" b="76" a="255"/>
+      <secondary r="112" g="112" b="112" a="255"/>
+    </title>
+    <inactive>
+      <primary r="34" g="34" b="28" a="255"/>
+    </inactive>
+    <disabled>
+      <primary r="68" g="68" b="56" a="255"/>
+    </disabled>
+    <active>
+      <text>
+        <primary r="255" g="255" b="255" a="255"/>
+      </text>
+      <style>flat solid</style>
+      <primary r="76" g="76" b="76" a="255"/>
+    </active>
+    <entries>
+      <style>flat solid</style>
+      <primary r="230" g="230" b="224" a="255"/>
+    </entries>
+  </menu>
+</openbox_theme>

@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<openbox_theme version="1" xmlns="http://openbox.org/themerc">
+  <dimensions>
+    <handle>0</handle>
+    <padding horizontal="1" vertical="1"/>
+  </dimensions>
+  <window>
+    <border>
+      <width>1</width>
+      <primary r="34" g="51" b="68" a="255"/>
+    </border>
+    <clientpadding horizontal="0" vertical="0"/>
+    <justify>left</justify>
+    <active>
+      <clientpadding r="128" g="128" b="160" a="255"/>
+      <label>
+        <text>
+          <primary r="191" g="233" b="255" a="255"/>
+        </text>
+        <style>parentrelative</style>
+        <primary r="0" g="0" b="0" a="255"/>
+        <secondary r="0" g="0" b="0" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </label>
+      <buttons>
+        <unpressed>
+          <image r="217" g="217" b="217" a="255"/>
+          <style>parentrelative</style>
+          <primary r="0" g="0" b="0" a="255"/>
+          <secondary r="0" g="0" b="0" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </unpressed>
+        <pressed>
+          <image r="0" g="255" b="0" a="255"/>
+          <style>sunken gradient crossdiagonal bevel1</style>
+          <primary r="102" g="153" b="204" a="255"/>
+          <secondary r="51" g="72" b="102" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </pressed>
+        <disabled>
+          <image r="0" g="0" b="0" a="255"/>
+          <style>parentrelative</style>
+          <primary r="0" g="0" b="0" a="255"/>
+          <secondary r="0" g="0" b="0" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </disabled>
+        <hover>
+          <image r="0" g="255" b="0" a="255"/>
+          <style>parentrelative</style>
+          <primary r="0" g="0" b="0" a="255"/>
+          <secondary r="0" g="0" b="0" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </hover>
+        <toggled>
+          <image r="217" g="217" b="217" a="255"/>
+          <style>sunken gradient crossdiagonal bevel1</style>
+          <primary r="102" g="153" b="204" a="255"/>
+          <secondary r="51" g="72" b="102" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </toggled>
+      </buttons>
+      <titlebar>
+        <style>raised gradient crossdiagonal bevel1</style>
+        <primary r="102" g="153" b="204" a="255"/>
+        <secondary r="51" g="72" b="102" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </titlebar>
+      <handle>
+        <style>flat gradient crossdiagonal bevel1</style>
+        <primary r="102" g="153" b="204" a="255"/>
+        <secondary r="51" g="72" b="102" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </handle>
+      <grip>
+        <style>parentrelative</style>
+        <primary r="0" g="0" b="0" a="255"/>
+        <secondary r="0" g="0" b="0" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </grip>
+    </active>
+    <inactive>
+      <clientpadding r="127" g="127" b="127" a="255"/>
+      <label>
+        <text>
+          <primary r="179" g="179" b="179" a="255"/>
+          <shadow>
+            <offset x="3" y="3"/>
+            <primary r="0" g="0" b="0" a="32"/>
+          </shadow>
+        </text>
+        <style>parentrelative</style>
+        <primary r="0" g="0" b="0" a="255"/>
+        <secondary r="0" g="0" b="0" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </label>
+      <buttons>
+        <unpressed>
+          <image r="153" g="153" b="153" a="255"/>
+          <style>parentrelative</style>
+          <primary r="0" g="0" b="0" a="255"/>
+          <secondary r="0" g="0" b="0" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </unpressed>
+        <pressed>
+          <image r="0" g="204" b="0" a="255"/>
+          <style>sunken gradient crossdiagonal bevel1</style>
+          <primary r="153" g="153" b="153" a="255"/>
+          <secondary r="51" g="51" b="51" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </pressed>
+        <disabled>
+          <image r="0" g="0" b="0" a="255"/>
+          <style>parentrelative</style>
+          <primary r="0" g="0" b="0" a="255"/>
+          <secondary r="0" g="0" b="0" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </disabled>
+        <hover>
+          <image r="0" g="204" b="0" a="255"/>
+          <style>parentrelative</style>
+          <primary r="0" g="0" b="0" a="255"/>
+          <secondary r="0" g="0" b="0" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </hover>
+        <toggled>
+          <image r="153" g="153" b="153" a="255"/>
+          <style>sunken gradient crossdiagonal bevel1</style>
+          <primary r="153" g="153" b="153" a="255"/>
+          <secondary r="51" g="51" b="51" a="255"/>
+          <border r="0" g="0" b="0" a="255"/>
+        </toggled>
+      </buttons>
+      <titlebar>
+        <style>flat gradient diagonal bevel1</style>
+        <primary r="127" g="127" b="136" a="255"/>
+        <secondary r="51" g="51" b="59" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </titlebar>
+      <handle>
+        <style>flat gradient diagonal bevel1</style>
+        <primary r="127" g="127" b="127" a="255"/>
+        <secondary r="51" g="51" b="51" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </handle>
+      <grip>
+        <style>parentrelative</style>
+        <primary r="0" g="0" b="0" a="255"/>
+        <secondary r="0" g="0" b="0" a="255"/>
+        <border r="0" g="0" b="0" a="255"/>
+      </grip>
+    </inactive>
+  </window>
+  <menu>
+    <border>
+      <width>1</width>
+      <primary r="34" g="51" b="68" a="255"/>
+    </border>
+    <justify>center</justify>
+    <title>
+      <text>
+        <primary r="204" g="204" b="255" a="255"/>
+        <shadow>
+          <offset x="2" y="2"/>
+          <primary r="0" g="0" b="0" a="35"/>
+        </shadow>
+      </text>
+      <style>raised gradient crossdiagonal bevel1</style>
+      <primary r="102" g="153" b="204" a="255"/>
+      <secondary r="51" g="72" b="102" a="255"/>
+      <border r="0" g="0" b="0" a="255"/>
+    </title>
+    <inactive>
+      <primary r="0" g="0" b="34" a="255"/>
+    </inactive>
+    <disabled>
+      <primary r="119" g="17" b="17" a="255"/>
+    </disabled>
+    <active>
+      <text>
+        <primary r="204" g="204" b="255" a="255"/>
+      </text>
+      <style>raised gradient horizontal bevel1</style>
+      <primary r="85" g="85" b="119" a="255"/>
+      <secondary r="102" g="153" b="204" a="255"/>
+      <border r="0" g="0" b="0" a="255"/>
+    </active>
+    <entries>
+      <style>flat gradient horizontal bevel1</style>
+      <primary r="170" g="170" b="204" a="255"/>
+      <secondary r="170" g="170" b="208" a="255"/>
+      <border r="0" g="0" b="0" a="255"/>
+    </entries>
+  </menu>
+</openbox_theme>

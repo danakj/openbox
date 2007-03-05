@@ -36,8 +36,8 @@ ObPopup *popup_new(gboolean hasicon)
     self->hasicon = hasicon;
     self->gravity = NorthWestGravity;
     self->x = self->y = self->w = self->h = 0;
-    self->a_bg = RrAppearanceCopy(ob_rr_theme->app_hilite_bg);
-    self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+    self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
+    self->a_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
 
     attrib.override_redirect = True;
     self->bg = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
@@ -88,11 +88,11 @@ void popup_size_to_string(ObPopup *self, gchar *text)
     self->a_text->texture[0].data.text.string = text;
     RrMinsize(self->a_text, &textw, &texth);
     /*XXX textw += ob_rr_theme->bevel * 2;*/
-    texth += ob_rr_theme->padding * 2;
+    texth += ob_rr_theme->paddingy * 2;
 
-    self->h = texth + ob_rr_theme->padding * 2;
+    self->h = texth + ob_rr_theme->paddingy * 2;
     iconw = (self->hasicon ? texth : 0);
-    self->w = textw + iconw + ob_rr_theme->padding * (self->hasicon ? 3 : 2);
+    self->w = textw + iconw + ob_rr_theme->paddingx * (self->hasicon ? 3 : 2);
 }
 
 void popup_set_text_align(ObPopup *self, RrJustify align)
@@ -115,8 +115,8 @@ void popup_show(ObPopup *self, gchar *text)
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
 
-    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->bwidth);
-    XSetWindowBorder(ob_display, self->bg, ob_rr_theme->b_color->pixel);
+    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->fbwidth);
+    XSetWindowBorder(ob_display, self->bg, ob_rr_theme->frame_b_color->pixel);
 
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;
@@ -124,22 +124,22 @@ void popup_show(ObPopup *self, gchar *text)
     /* measure the shit out */
     RrMinsize(self->a_text, &textw, &texth);
     /*XXX textw += ob_rr_theme->padding * 2;*/
-    texth += ob_rr_theme->padding * 2;
+    texth += ob_rr_theme->paddingy * 2;
 
     /* set the sizes up and reget the text sizes from the calculated
        outer sizes */
     if (self->h) {
         h = self->h;
-        texth = h - (t+b + ob_rr_theme->padding * 2);
+        texth = h - (t+b + ob_rr_theme->paddingy * 2);
     } else
-        h = t+b + texth + ob_rr_theme->padding * 2;
+        h = t+b + texth + ob_rr_theme->paddingy * 2;
     iconw = (self->hasicon ? texth : 0);
     if (self->w) {
         w = self->w;
-        textw = w - (l+r + iconw + ob_rr_theme->padding *
+        textw = w - (l+r + iconw + ob_rr_theme->paddingx *
                      (self->hasicon ? 3 : 2));
     } else
-        w = l+r + textw + iconw + ob_rr_theme->padding *
+        w = l+r + textw + iconw + ob_rr_theme->paddingx *
             (self->hasicon ? 3 : 2);
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
@@ -185,12 +185,12 @@ void popup_show(ObPopup *self, gchar *text)
 
     self->a_text->surface.parent = self->a_bg;
     self->a_text->surface.parentx = l + iconw +
-        ob_rr_theme->padding * (self->hasicon ? 2 : 1);
-    self->a_text->surface.parenty = t + ob_rr_theme->padding;
+        ob_rr_theme->paddingx * (self->hasicon ? 2 : 1);
+    self->a_text->surface.parenty = t + ob_rr_theme->paddingy;
     XMoveResizeWindow(ob_display, self->text,
-                      l + iconw + ob_rr_theme->padding *
+                      l + iconw + ob_rr_theme->paddingx *
                       (self->hasicon ? 2 : 1),
-                      t + ob_rr_theme->padding, textw, texth);
+                      t + ob_rr_theme->paddingy, textw, texth);
 
     RrPaint(self->a_bg, self->bg, w, h);
     RrPaint(self->a_text, self->text, textw, texth);
@@ -198,7 +198,8 @@ void popup_show(ObPopup *self, gchar *text)
     if (self->hasicon) {
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
         if (self->draw_icon)
-            self->draw_icon(l + ob_rr_theme->padding, t + ob_rr_theme->padding,
+            self->draw_icon(l + ob_rr_theme->paddingx,
+                            t + ob_rr_theme->paddingy,
                             iconw, texth, self->draw_icon_data);
     }
 
@@ -282,20 +283,20 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
     guint r, c;
     gint eachw, eachh;
 
-    eachw = (w - ob_rr_theme->bwidth -
-             (screen_desktop_layout.columns * ob_rr_theme->bwidth))
+    eachw = (w - ob_rr_theme->fbwidth -
+             (screen_desktop_layout.columns * ob_rr_theme->fbwidth))
         / screen_desktop_layout.columns;
-    eachh = (h - ob_rr_theme->bwidth -
-             (screen_desktop_layout.rows * ob_rr_theme->bwidth))
+    eachh = (h - ob_rr_theme->fbwidth -
+             (screen_desktop_layout.rows * ob_rr_theme->fbwidth))
         / screen_desktop_layout.rows;
     /* make them squares */
     eachw = eachh = MIN(eachw, eachh);
 
     /* center */
-    px += (w - (screen_desktop_layout.columns * (eachw + ob_rr_theme->bwidth) +
-                ob_rr_theme->bwidth)) / 2;
-    py += (h - (screen_desktop_layout.rows * (eachh + ob_rr_theme->bwidth) +
-                ob_rr_theme->bwidth)) / 2;
+    px += (w - (screen_desktop_layout.columns * (eachw + ob_rr_theme->fbwidth) +
+                ob_rr_theme->fbwidth)) / 2;
+    py += (h - (screen_desktop_layout.rows * (eachh + ob_rr_theme->fbwidth) +
+                ob_rr_theme->fbwidth)) / 2;
 
     if (eachw <= 0 || eachh <= 0)
         return;
@@ -361,10 +362,10 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
 
     rown = n;
     for (r = 0, y = 0; r < screen_desktop_layout.rows;
-         ++r, y += eachh + ob_rr_theme->bwidth)
+         ++r, y += eachh + ob_rr_theme->fbwidth)
     {
         for (c = 0, x = 0; c < screen_desktop_layout.columns;
-             ++c, x += eachw + ob_rr_theme->bwidth)
+             ++c, x += eachw + ob_rr_theme->fbwidth)
         {
             RrAppearance *a;
 
@@ -393,8 +394,8 @@ ObPagerPopup *pager_popup_new()
 
     self->desks = 0;
     self->wins = g_new(Window, self->desks);
-    self->hilight = RrAppearanceCopy(ob_rr_theme->app_hilite_fg);
-    self->unhilight = RrAppearanceCopy(ob_rr_theme->app_unhilite_fg);
+    self->hilight = RrAppearanceCopy(ob_rr_theme->osd_hilite_fg);
+    self->unhilight = RrAppearanceCopy(ob_rr_theme->osd_unhilite_fg);
 
     self->popup->draw_icon = pager_popup_draw_icon;
     self->popup->draw_icon_data = self;
@@ -432,9 +433,9 @@ void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk)
         for (i = self->desks; i < screen_num_desktops; ++i) {
             XSetWindowAttributes attr;
 
-            attr.border_pixel = RrColorPixel(ob_rr_theme->b_color);
+            attr.border_pixel = RrColorPixel(ob_rr_theme->frame_b_color);
             self->wins[i] = XCreateWindow(ob_display, self->popup->bg,
-                                          0, 0, 1, 1, ob_rr_theme->bwidth,
+                                          0, 0, 1, 1, ob_rr_theme->fbwidth,
                                           RrDepth(ob_rr_inst), InputOutput,
                                           RrVisual(ob_rr_inst), CWBorderPixel,
                                           &attr);

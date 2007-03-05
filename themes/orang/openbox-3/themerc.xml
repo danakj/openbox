@@ -1,17 +1,15 @@
-<!-- i be a mess -->
-
 <?xml version="1.0"?>
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>3</handle>
-    <padding horizontal="1" vertical="1"/>
+    <padding x="1" y="1"/>
   </dimensions>
   <window>
     <border>
       <width>1</width>
       <primary r="0" g="0" b="0" a="255"/>
     </border>
-    <clientpadding horizontal="0" vertical="0"/>
+    <clientpadding x="0" y="0"/>
     <justify>left</justify>
     <active>
       <clientpadding r="247" g="247" b="247" a="255"/>

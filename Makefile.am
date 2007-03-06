@@ -9,7 +9,6 @@ pkgconfigdir    = $(libdir)/pkgconfig
 pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
-userscriptdir   = $(datadir)/openbox
 
 theme = bear2
 
@@ -355,16 +354,11 @@ data/menu.xml: Makefile $(srcdir)/data/menu.xml.in data
 	@mkdir data 2>/dev/null || true
 	@$(edit) $(srcdir)/data/menu.xml.in >$@
 
-dist_userscript_DATA = \
-	tools/themeupdate/themeupdate.py
-
-install-data-hook:
-	chmod +x $(DESTDIR)$(userscriptdir)/themeupdate.py
-
 dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
+	tools/themeupdate/themeupdate.py \
 	version.h.in \
 	data/rc.xml.in \
 	data/menu.xml.in \

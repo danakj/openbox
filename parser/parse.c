@@ -152,7 +152,8 @@ gboolean parse_load(const gchar *path, const gchar *rootname,
 
     /* XML_PARSE_BLANKS is needed apparently. When it loads a theme file,
        without this option, the tree is weird and has extra nodes in it. */
-    if ((*doc = xmlReadFile(path, NULL, XML_PARSE_NOBLANKS))) {
+    if ((*doc = xmlReadFile(path, NULL,
+                            XML_PARSE_NOBLANKS | XML_PARSE_RECOVER))) {
         *root = xmlDocGetRootElement(*doc);
         if (!*root) {
             xmlFreeDoc(*doc);

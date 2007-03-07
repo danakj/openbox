@@ -237,9 +237,13 @@ RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
 gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
 gint    RrFontMaxCharWidth  (const RrFont *f);
 
-void RrPaint   (RrAppearance *a, Window win, gint w, gint h);
-void RrMinsize (RrAppearance *a, gint *w, gint *h);
-void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
+/* Paint into the appearance. The old pixmap is returned (if there was one). It
+   is the responsibility of the caller to call XFreePixmap on the return when
+   it is non-null. */
+Pixmap RrPaintPixmap (RrAppearance *a, gint w, gint h);
+void   RrPaint       (RrAppearance *a, Window win, gint w, gint h);
+void   RrMinsize     (RrAppearance *a, gint *w, gint *h);
+void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,

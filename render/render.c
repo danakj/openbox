@@ -38,7 +38,7 @@
 static void pixel_data_to_pixmap(RrAppearance *l,
                                  gint x, gint y, gint w, gint h);
 
-void RrPaint(RrAppearance *a, Window win, gint w, gint h)
+Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
 {
     gint i, transferred = 0, sw, sh, partial_w, partial_h;
     RrPixel32 *source, *dest;
@@ -46,11 +46,11 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
     RrRect tarea; /* area in which to draw textures */
     gboolean resized;
 
-    if (w <= 0 || h <= 0) return;
+    if (w <= 0 || h <= 0) return None;
 
     if (a->surface.parentx < 0 || a->surface.parenty < 0) {
         /* ob_debug("Invalid parent co-ordinates\n"); */
-        return;
+        return None;
     }
     resized = (a->w != w || a->h != h);
 
@@ -80,7 +80,7 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
         sh = a->surface.parent->h;
 
         if (a->surface.parentx >= sw || a->surface.parenty >= sh) {
-            return;
+            return oldp;
         }
 
         source = (a->surface.parent->surface.pixel_data +
@@ -164,8 +164,17 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
             pixel_data_to_pixmap(a, 0, 0, w, h);
     }
 
+    return oldp;
+}
+
+void RrPaint(RrAppearance *a, Window win, gint w, gint h)
+{
+    Pixmap oldp;
+
+    oldp = RrPaintPixmap(a, w, h);
     XSetWindowBackgroundPixmap(RrDisplay(a->inst), win, a->pixmap);
     XClearWindow(RrDisplay(a->inst), win);
+    /* free this after changing the visible pixmap */
     if (oldp) XFreePixmap(RrDisplay(a->inst), oldp);
 }
 

@@ -117,9 +117,11 @@ ObFrame *frame_new(ObClient *client)
 
     mask |= CWCursor;
     attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
-    self->tlresize = createWindow(self->title, NULL, mask, &attrib);
+    self->tltresize = createWindow(self->title, NULL, mask, &attrib);
+    self->tllresize = createWindow(self->title, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_NORTHEAST);
-    self->trresize = createWindow(self->title, NULL, mask, &attrib);
+    self->trtresize = createWindow(self->title, NULL, mask, &attrib);
+    self->trrresize = createWindow(self->title, NULL, mask, &attrib);
 
     mask &= ~CWCursor;
     self->label = createWindow(self->title, NULL, mask, &attrib);
@@ -187,10 +189,14 @@ static void set_theme_statics(ObFrame *self)
         XResizeWindow(ob_display, self->rgrip,
                       ob_rr_theme->grip_width, ob_rr_theme->handle_height);
     }
-    XResizeWindow(ob_display, self->tlresize,
-                  ob_rr_theme->grip_width, ob_rr_theme->top_grip_height);
-    XResizeWindow(ob_display, self->trresize,
-                  ob_rr_theme->grip_width, ob_rr_theme->top_grip_height);
+    XResizeWindow(ob_display, self->tltresize,
+                  ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
+    XResizeWindow(ob_display, self->trtresize,
+                  ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
+    XResizeWindow(ob_display, self->tllresize,
+                  ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
+    XResizeWindow(ob_display, self->trrresize,
+                  ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
 
     /* set up the dynamic appearances */
     self->a_unfocused_title = RrAppearanceCopy(ob_rr_theme->a_unfocused_title);
@@ -366,14 +372,21 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(ob_display, self->title);
 
                 if (self->decorations & OB_FRAME_DECOR_GRIPS) {
-                    XMoveWindow(ob_display, self->tlresize, 0, 0);
-                    XMoveWindow(ob_display, self->trresize,
+                    XMoveWindow(ob_display, self->tltresize, 0, 0);
+                    XMoveWindow(ob_display, self->tllresize, 0, 0);
+                    XMoveWindow(ob_display, self->trtresize,
                                 self->width - ob_rr_theme->grip_width, 0);
-                    XMapWindow(ob_display, self->tlresize);
-                    XMapWindow(ob_display, self->trresize);
+                    XMoveWindow(ob_display, self->trrresize,
+                                self->width - ob_rr_theme->paddingx - 1, 0);
+                    XMapWindow(ob_display, self->tltresize);
+                    XMapWindow(ob_display, self->tllresize);
+                    XMapWindow(ob_display, self->trtresize);
+                    XMapWindow(ob_display, self->trrresize);
                 } else {
-                    XUnmapWindow(ob_display, self->tlresize);
-                    XUnmapWindow(ob_display, self->trresize);
+                    XUnmapWindow(ob_display, self->tltresize);
+                    XUnmapWindow(ob_display, self->tllresize);
+                    XUnmapWindow(ob_display, self->trtresize);
+                    XUnmapWindow(ob_display, self->trrresize);
                 }
             } else
                 XUnmapWindow(ob_display, self->title);
@@ -536,8 +549,10 @@ void frame_grab_client(ObFrame *self, ObClient *client)
     g_hash_table_insert(window_map, &self->handle, client);
     g_hash_table_insert(window_map, &self->lgrip, client);
     g_hash_table_insert(window_map, &self->rgrip, client);
-    g_hash_table_insert(window_map, &self->tlresize, client);
-    g_hash_table_insert(window_map, &self->trresize, client);
+    g_hash_table_insert(window_map, &self->tltresize, client);
+    g_hash_table_insert(window_map, &self->tllresize, client);
+    g_hash_table_insert(window_map, &self->trtresize, client);
+    g_hash_table_insert(window_map, &self->trrresize, client);
 }
 
 void frame_release_client(ObFrame *self, ObClient *client)
@@ -588,8 +603,10 @@ void frame_release_client(ObFrame *self, ObClient *client)
     g_hash_table_remove(window_map, &self->handle);
     g_hash_table_remove(window_map, &self->lgrip);
     g_hash_table_remove(window_map, &self->rgrip);
-    g_hash_table_remove(window_map, &self->tlresize);
-    g_hash_table_remove(window_map, &self->trresize);
+    g_hash_table_remove(window_map, &self->tltresize);
+    g_hash_table_remove(window_map, &self->tllresize);
+    g_hash_table_remove(window_map, &self->trtresize);
+    g_hash_table_remove(window_map, &self->trrresize);
 
     ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
 
@@ -801,8 +818,10 @@ ObFrameContext frame_context(ObClient *client, Window win)
     if (win == self->handle)   return OB_FRAME_CONTEXT_HANDLE;
     if (win == self->lgrip)    return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->rgrip)    return OB_FRAME_CONTEXT_BRCORNER;
-    if (win == self->tlresize) return OB_FRAME_CONTEXT_TLCORNER;
-    if (win == self->trresize) return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->tltresize) return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->tllresize) return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->trtresize) return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->trrresize) return OB_FRAME_CONTEXT_TRCORNER;
     if (win == self->max)      return OB_FRAME_CONTEXT_MAXIMIZE;
     if (win == self->iconify)  return OB_FRAME_CONTEXT_ICONIFY;
     if (win == self->close)    return OB_FRAME_CONTEXT_CLOSE;

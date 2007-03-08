@@ -391,7 +391,8 @@ void focus_cycle_draw_indicator()
         gint wt, wl, wr, wb;
 
         wt = wl = wr = wb = MAX(3,
-                                ob_rr_theme->top_grip_height +
+                                MAX(1, MAX(ob_rr_theme->paddingx,
+                                           ob_rr_theme->paddingy)) * 2 +
                                 ob_rr_theme->fbwidth * 2);
 
         x = focus_cycle_target->frame->area.x;

@@ -53,7 +53,6 @@ struct _RrTheme {
     gint menu_title_height;
     gint button_size;
     gint grip_width;
-    gint top_grip_height;
 
     /* style settings - colors */
     RrColor *menu_b_color;

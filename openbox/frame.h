@@ -95,8 +95,10 @@ struct _ObFrame
     Window    lgrip;
     Window    rgrip;
 
-    Window    tlresize;
-    Window    trresize;
+    Window    tltresize;
+    Window    tllresize;
+    Window    trtresize;
+    Window    trrresize;
 
     Colormap  colormap;
 

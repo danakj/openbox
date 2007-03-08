@@ -987,8 +987,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     }
     theme->button_size = theme->label_height - 2;
     theme->grip_width = 25;
-    theme->top_grip_height = MAX(theme->handle_height,
-                                 theme->title_height / 4);
 
     return theme;
 }

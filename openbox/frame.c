@@ -682,49 +682,49 @@ static void layout_title(ObFrame *self)
             if (!n) break;
             self->icon_x = x;
             XMapWindow(ob_display, self->icon);
-            XMoveWindow(ob_display, self->icon, x, ob_rr_theme->paddingx);
+            XMoveWindow(ob_display, self->icon, x, ob_rr_theme->paddingy);
             x += ob_rr_theme->button_size + 2 + ob_rr_theme->paddingx + 1;
             break;
         case 'D':
             if (!d) break;
             self->desk_x = x;
             XMapWindow(ob_display, self->desk);
-            XMoveWindow(ob_display, self->desk, x, ob_rr_theme->paddingx + 1);
+            XMoveWindow(ob_display, self->desk, x, ob_rr_theme->paddingy + 1);
             x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'S':
             if (!s) break;
             self->shade_x = x;
             XMapWindow(ob_display, self->shade);
-            XMoveWindow(ob_display, self->shade, x, ob_rr_theme->paddingx + 1);
+            XMoveWindow(ob_display, self->shade, x, ob_rr_theme->paddingy + 1);
             x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'I':
             if (!i) break;
             self->iconify_x = x;
             XMapWindow(ob_display, self->iconify);
-            XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->paddingx + 1);
+            XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->paddingy + 1);
             x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'L':
             if (!l) break;
             self->label_x = x;
             XMapWindow(ob_display, self->label);
-            XMoveWindow(ob_display, self->label, x, ob_rr_theme->paddingx);
+            XMoveWindow(ob_display, self->label, x, ob_rr_theme->paddingy);
             x += self->label_width + ob_rr_theme->paddingx + 1;
             break;
         case 'M':
             if (!m) break;
             self->max_x = x;
             XMapWindow(ob_display, self->max);
-            XMoveWindow(ob_display, self->max, x, ob_rr_theme->paddingx + 1);
+            XMoveWindow(ob_display, self->max, x, ob_rr_theme->paddingy + 1);
             x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         case 'C':
             if (!c) break;
             self->close_x = x;
             XMapWindow(ob_display, self->close);
-            XMoveWindow(ob_display, self->close, x, ob_rr_theme->paddingx + 1);
+            XMoveWindow(ob_display, self->close, x, ob_rr_theme->paddingy + 1);
             x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
             break;
         }

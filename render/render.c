@@ -52,6 +52,14 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
         /* ob_debug("Invalid parent co-ordinates\n"); */
         return None;
     }
+
+    if (a->surface.grad == RR_SURFACE_PARENTREL &&
+        (a->surface.parentx >= a->surface.parent->w ||
+         a->surface.parenty >= a->surface.parent->h))
+    {
+        return None;
+    }
+
     resized = (a->w != w || a->h != h);
 
     oldp = a->pixmap; /* save to free after changing the visible pixmap */
@@ -78,10 +86,6 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
 
         sw = a->surface.parent->w;
         sh = a->surface.parent->h;
-
-        if (a->surface.parentx >= sw || a->surface.parenty >= sh) {
-            return oldp;
-        }
 
         source = (a->surface.parent->surface.pixel_data +
                   a->surface.parentx + sw * a->surface.parenty);

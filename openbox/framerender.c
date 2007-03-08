@@ -165,7 +165,7 @@ void framerender_frame(ObFrame *self)
 
         if (ob_rr_theme->title_height > 0)
             RrPaint(ob_rr_theme->a_clear, self->trrresize,
-                    ob_rr_theme->paddingx, ob_rr_theme->title_height);
+                    ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
 
         /* set parents for any parent relative guys */
         l->surface.parent = t;

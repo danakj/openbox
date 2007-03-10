@@ -4,6 +4,7 @@
     can easily put them side by side.
   * (xinerama) Make all placement strategies place windows on the screen with
     the mouse pointer, not just UnderMouse.
+  * Fixed several bugs, including the hanging of X when time is set backwards.
 
 3.3.1:
   * Fix panels getting a border with keepBorder turned on.

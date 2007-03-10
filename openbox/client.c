@@ -75,7 +75,6 @@ static void client_change_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
-static void client_urgent_notify(ObClient *self);
 
 void client_startup(gboolean reconfig)
 {
@@ -619,14 +618,6 @@ void client_unmanage(ObClient *self)
         grab_pointer(FALSE, OB_CURSOR_NONE);
 }
 
-static void client_urgent_notify(ObClient *self)
-{
-    if (self->urgent)
-        frame_flash_start(self->frame);
-    else
-        frame_flash_stop(self->frame);
-}
-
 static void client_restore_session_state(ObClient *self)
 {
     GList *it;
@@ -961,6 +952,8 @@ static void client_get_state(ObClient *self)
                 self->above = TRUE;
             else if (state[i] == prop_atoms.net_wm_state_below)
                 self->below = TRUE;
+            else if (state[i] == prop_atoms.net_wm_state_demands_attention)
+                self->demands_attention = TRUE;
             else if (state[i] == prop_atoms.ob_wm_state_undecorated)
                 self->undecorated = TRUE;
         }
@@ -1467,7 +1460,6 @@ void client_reconfigure(ObClient *self)
 void client_update_wmhints(ObClient *self)
 {
     XWMHints *hints;
-    gboolean ur = FALSE;
     GSList *it;
 
     /* assume a window takes input if it doesnt specify */
@@ -1482,9 +1474,6 @@ void client_update_wmhints(ObClient *self)
         if (ob_state() != OB_STATE_STARTING && self->frame == NULL)
             if (hints->flags & StateHint)
                 self->iconic = hints->initial_state == IconicState;
-
-        if (hints->flags & XUrgencyHint)
-            ur = TRUE;
 
         if (!(hints->flags & WindowGroupHint))
             hints->window_group = None;
@@ -1545,14 +1534,6 @@ void client_update_wmhints(ObClient *self)
         client_update_icons(self);
 
         XFree(hints);
-    }
-
-    if (ur != self->urgent) {
-        self->urgent = ur;
-        /* fire the urgent callback if we're mapped, otherwise, wait until
-           after we're mapped */
-        if (self->frame)
-            client_urgent_notify(self);
     }
 }
 
@@ -1871,6 +1852,8 @@ static void client_change_state(ObClient *self)
         netstate[num++] = prop_atoms.net_wm_state_above;
     if (self->below)
         netstate[num++] = prop_atoms.net_wm_state_below;
+    if (self->demands_attention)
+        netstate[num++] = prop_atoms.net_wm_state_demands_attention;
     if (self->undecorated)
         netstate[num++] = prop_atoms.ob_wm_state_undecorated;
     PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
@@ -2041,8 +2024,10 @@ static void client_apply_startup_state(ObClient *self)
         self->shaded = FALSE;
         client_shade(self, TRUE);
     }
-    if (self->urgent)
-        client_urgent_notify(self);
+    if (self->demands_attention) {
+        self->demands_attention = FALSE;
+        client_hilite(self, TRUE);
+    }
   
     if (self->max_vert && self->max_horz) {
         self->max_vert = self->max_horz = FALSE;
@@ -2548,6 +2533,17 @@ void client_kill(ObClient *self)
     XKillClient(ob_display, self->window);
 }
 
+void client_hilite(ObClient *self, gboolean hilite)
+{
+    /* don't allow focused windows to hilite */
+    self->demands_attention = hilite && !client_focused(self);
+    if (self->demands_attention)
+        frame_flash_start(self->frame);
+    else
+        frame_flash_stop(self->frame);
+    client_change_state(self);
+}
+
 void client_set_desktop_recursive(ObClient *self,
                                   guint target, gboolean donthide)
 {
@@ -2647,6 +2643,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     gboolean max_vert = self->max_vert;
     gboolean modal = self->modal;
     gboolean iconic = self->iconic;
+    gboolean demands_attention = self->demands_attention;
     gint i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
@@ -2696,6 +2693,10 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             else if (state == prop_atoms.net_wm_state_below)
                 action = self->below ? prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
+            else if (state == prop_atoms.net_wm_state_demands_attention)
+                action = self->demands_attention ?
+                    prop_atoms.net_wm_state_remove :
+                    prop_atoms.net_wm_state_add;
             else if (state == prop_atoms.ob_wm_state_undecorated)
                 action = undecorated ? prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
@@ -2724,6 +2725,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             } else if (state == prop_atoms.net_wm_state_below) {
                 self->above = FALSE;
                 self->below = TRUE;
+            } else if (state == prop_atoms.net_wm_state_demands_attention) {
+                demands_attention = TRUE;
             } else if (state == prop_atoms.ob_wm_state_undecorated) {
                 undecorated = TRUE;
             }
@@ -2749,6 +2752,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->above = FALSE;
             } else if (state == prop_atoms.net_wm_state_below) {
                 self->below = FALSE;
+            } else if (state == prop_atoms.net_wm_state_demands_attention) {
+                demands_attention = FALSE;
             } else if (state == prop_atoms.ob_wm_state_undecorated) {
                 undecorated = FALSE;
             }
@@ -2787,6 +2792,9 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     }
     if (iconic != self->iconic)
         client_iconify(self, iconic, FALSE);
+
+    if (demands_attention != self->demands_attention)
+        client_hilite(self, demands_attention);
 
     client_calc_layer(self);
     client_change_state(self); /* change the hint to reflect these changes */

@@ -201,6 +201,10 @@ void focus_set_client(ObClient *client)
         active = client ? client->window : None;
         PROP_SET32(RootWindow(ob_display, ob_screen),
                    net_active_window, window, active);
+
+        /* remove hiliting from the window when it gets focused */
+        if (client != NULL)
+            client_hilite(client, FALSE);
     }
 }
 

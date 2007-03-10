@@ -211,8 +211,6 @@ struct _ObClient
   
     /*! Can the window receive input focus? */
     gboolean can_focus;
-    /*! Urgency flag */
-    gboolean urgent;
     /*! Notify the window when it receives focus? */
     gboolean focus_notify;
 
@@ -243,6 +241,8 @@ struct _ObClient
     /*! The window should be underneath other windows of the same type.
       above takes priority over below. */
     gboolean below;
+    /*! Demands attention flag */
+    gboolean demands_attention;
 
     /*! The layer in which the window will be stacked, windows in lower layers
       are always below windows in higher layers. */
@@ -428,6 +428,9 @@ void client_maximize(ObClient *self, gboolean max, gint dir,
                unshaded.
 */
 void client_shade(ObClient *self, gboolean shade);
+
+/*! Hilite the window to make the user notice it */
+void client_hilite(ObClient *self, gboolean hilite);
 
 /*! Request the client to close its window */
 void client_close(ObClient *self);

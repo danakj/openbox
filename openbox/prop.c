@@ -129,6 +129,7 @@ void prop_startup()
     CREATE(net_wm_state_fullscreen, "_NET_WM_STATE_FULLSCREEN");
     CREATE(net_wm_state_above, "_NET_WM_STATE_ABOVE");
     CREATE(net_wm_state_below, "_NET_WM_STATE_BELOW");
+    CREATE(net_wm_state_demands_attention, "_NET_WM_STATE_DEMANDS_ATTENTION");
   
     prop_atoms.net_wm_state_add = 1;
     prop_atoms.net_wm_state_remove = 0;

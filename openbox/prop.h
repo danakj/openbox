@@ -138,6 +138,7 @@ typedef struct Atoms {
     Atom net_wm_state_fullscreen;
     Atom net_wm_state_above;
     Atom net_wm_state_below;
+    Atom net_wm_state_demands_attention;
 
     Atom net_wm_state_add;
     Atom net_wm_state_remove;

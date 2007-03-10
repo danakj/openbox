@@ -7,6 +7,7 @@
   * Fixed several bugs, including the hanging of X when time is set backwards.
   * Changed theme format to xml, use the included themetoxml program to convert
     themes to the new format.
+  * Fonts are now configured in rc.xml, not the theme.
   * You can now call `openbox --reconfigure' to have openbox reread config
     files instead of using killall -USR2 openbox.
 

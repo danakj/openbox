@@ -1036,7 +1036,13 @@ void client_update_transient_for(ObClient *self)
                    a dockapp, for example */
                 target = NULL;
             }
-            
+
+#if 0 
+/* we used to do this, but it violates the ICCCM and causes problems because
+   toolkits seem to set transient_for = root rather arbitrarily (eg kicker's
+   config dialogs), so it is being removed. the ewmh provides other ways to
+   make things transient for their group. -dana
+*/
             if (!target && self->group) {
                 /* not transient to a client, see if it is transient for a
                    group */
@@ -1048,6 +1054,8 @@ void client_update_transient_for(ObClient *self)
                     target = OB_TRAN_GROUP;
                 }
             }
+#endif
+
         }
     } else if (self->type == OB_CLIENT_TYPE_DIALOG && self->group) {
         self->transient = TRUE;

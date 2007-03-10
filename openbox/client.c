@@ -735,7 +735,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         /* avoid the xinerama monitor divide while we're at it,
          * remember to fix the placement stuff to avoid it also and
          * then remove this XXX */
-        a = screen_area(self->desktop);
+        a = screen_area_monitor(self->desktop, client_monitor(self));
         /* dont let windows map into the strut unless they
            are bigger than the available area */
         if (w <= a->width) {

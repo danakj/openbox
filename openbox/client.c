@@ -721,8 +721,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             *y = a->y + a->height - self->frame->area.height/10;
         if (!self->strut.left && *x + self->frame->area.width*9/10 - 1 < a->x)
             *x = a->x - self->frame->area.width*9/10;
-        if (!self->strut.top && *y < a->y)
-            *y = a->y;
+        if (!self->strut.top && *y + self->frame->area.height*9/10 - 1 < a->y)
+            *y = a->y - self->frame->area.width*9/10;
     }
 
     /* This here doesn't let windows even a pixel outside the screen,
@@ -735,7 +735,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         /* avoid the xinerama monitor divide while we're at it,
          * remember to fix the placement stuff to avoid it also and
          * then remove this XXX */
-        a = screen_physical_area_monitor(client_monitor(self));
+        a = screen_area(self->desktop);
         /* dont let windows map into the strut unless they
            are bigger than the available area */
         if (w <= a->width) {

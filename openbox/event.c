@@ -858,8 +858,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      client->frame->size.left + client->frame->size.right;
                 gint fh = h +
                      client->frame->size.top + client->frame->size.bottom;
+                /* make this rude for size-only changes but not for position
+                   changes.. */
+                gboolean moving = ((e->xconfigurerequest.value_mask & CWX) ||
+                                   (e->xconfigurerequest.value_mask & CWY));
+
                 client_find_onscreen(client, &newx, &newy, fw, fh,
-                                     FALSE);
+                                     !moving);
                 if (e->xconfigurerequest.value_mask & CWX)
                     x = newx;
                 if (e->xconfigurerequest.value_mask & CWY)

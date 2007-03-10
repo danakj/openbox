@@ -16,6 +16,7 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include <string.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

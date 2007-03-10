@@ -7,6 +7,8 @@
   * Fixed several bugs, including the hanging of X when time is set backwards.
   * Changed theme format to xml, use the included themetoxml program to convert
     themes to the new format.
+  * You can now call `openbox --reconfigure' to have openbox reread config
+    files instead of using killall -USR2 openbox.
 
 3.3.1:
   * Fix panels getting a border with keepBorder turned on.

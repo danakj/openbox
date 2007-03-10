@@ -164,8 +164,8 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
     case SN_MONITOR_EVENT_INITIATED:
         d = wait_data_new(seq);
         sn_waits = g_slist_prepend(sn_waits, d);
-        /* 30 second timeout for apps to start */
-        ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
+        /* 15 second timeout for apps to start */
+        ob_main_loop_timeout_add(ob_main_loop, 15 * G_USEC_PER_SEC,
                                  sn_wait_timeout, d, sn_wait_destroy);
         change = TRUE;
         break;
@@ -188,14 +188,17 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
         screen_set_root_cursor();
 }
 
-void sn_app_started(gchar *wmclass)
+void sn_app_started(const gchar *id, const gchar *wmclass)
 {
     GSList *it;
 
     for (it = sn_waits; it; it = g_slist_next(it)) {
         ObWaitData *d = it->data;
-        if (sn_startup_sequence_get_wmclass(d->seq) &&
-            !strcmp(sn_startup_sequence_get_wmclass(d->seq), wmclass))
+        const gchar *seqid, *seqclass;
+        seqid = sn_startup_sequence_get_id(d->seq);
+        seqclass = sn_startup_sequence_get_wmclass(d->seq);
+        if ((seqid && id && !strcmp(seqid, id)) ||
+            (seqclass && wmclass && !strcmp(seqclass, wmclass)))
         {
             sn_startup_sequence_complete(d->seq);
             break;

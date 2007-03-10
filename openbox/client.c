@@ -299,7 +299,7 @@ void client_manage(Window window)
     client_get_all(self);
     client_restore_session_state(self);
 
-    sn_app_started(self->class);
+    sn_app_started(self->startup_id, self->class);
 
     /* update the focus lists, do this before the call to change_state or
        it can end up in the list twice! */

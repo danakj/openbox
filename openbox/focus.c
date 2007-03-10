@@ -521,6 +521,7 @@ static gboolean valid_focus_target(ObClient *ft)
            ft->type == OB_CLIENT_TYPE_MENU ||
            ft->type == OB_CLIENT_TYPE_UTILITY))) &&
         ((ft->can_focus || ft->focus_notify) &&
+         !ft->skip_taskbar &&
          (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)) &&
         ft == client_focus_target(ft))
         return TRUE;

@@ -5,7 +5,8 @@
   * (xinerama) Make all placement strategies place windows on the screen with
     the mouse pointer, not just UnderMouse.
   * Fixed several bugs, including the hanging of X when time is set backwards.
-  * Changed theme format to xml.
+  * Changed theme format to xml, use the included themetoxml program to convert
+    themes to the new format.
 
 3.3.1:
   * Fix panels getting a border with keepBorder turned on.

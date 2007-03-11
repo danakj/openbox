@@ -2105,6 +2105,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     gboolean moved = FALSE, resized = FALSE;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
+    Rect desired_area = {x, y, w, h};
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
@@ -2121,7 +2122,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         Rect *a;
         guint i;
 
-        i = client_monitor(self);
+        i = screen_find_monitor(&desired_area);
         a = screen_physical_area_monitor(i);
 
         x = a->x;
@@ -2132,8 +2133,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         user = FALSE; /* ignore that increment etc shit when in fullscreen */
     } else {
         Rect *a;
+        guint i;
 
-        a = screen_area_monitor(self->desktop, client_monitor(self));
+        i = screen_find_monitor(&desired_area);
+        a = screen_area_monitor(self->desktop, i);
 
         /* set the size and position if maximized */
         if (self->max_horz) {
@@ -3204,31 +3207,9 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
     }
 }
 
-/* Determines which physical monitor a client is on by calculating the
-   area of the part of the client on each monitor.  The number of the
-   monitor containing the greatest area of the client is returned.*/
 guint client_monitor(ObClient *self)
 {
-    guint i;
-    guint most = 0;
-    guint mostv = 0;
-
-    for (i = 0; i < screen_num_monitors; ++i) {
-        Rect *area = screen_physical_area_monitor(i);
-        if (RECT_INTERSECTS_RECT(*area, self->frame->area)) {
-            Rect r;
-            guint v;
-
-            RECT_SET_INTERSECTION(r, *area, self->frame->area);
-            v = r.width * r.height;
-
-            if (v > mostv) {
-                mostv = v;
-                most = i;
-            }
-        }
-    }
-    return most;
+    return screen_find_monitor(&self->frame->area);
 }
 
 GSList *client_search_top_transients(ObClient *self)

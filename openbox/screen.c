@@ -1172,6 +1172,30 @@ Rect *screen_area_monitor(guint desktop, guint head)
     return &area[desktop][head];
 }
 
+guint screen_find_monitor(Rect *search)
+{
+    guint i;
+    guint most = 0;
+    guint mostv = 0;
+
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *area = screen_physical_area_monitor(i);
+        if (RECT_INTERSECTS_RECT(*area, *search)) {
+            Rect r;
+            guint v;
+
+            RECT_SET_INTERSECTION(r, *area, *search);
+            v = r.width * r.height;
+
+            if (v > mostv) {
+                mostv = v;
+                most = i;
+            }
+        }
+    }
+    return most;
+}
+
 Rect *screen_physical_area()
 {
     return screen_physical_area_monitor(screen_num_monitors);

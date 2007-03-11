@@ -468,8 +468,7 @@ void client_manage(Window window)
         /* If a nothing at all, or a parent was focused, then focus this
            always
         */
-        if (client_search_focus_parent(self) != NULL ||
-            !focus_client)
+        if (!focus_client || client_search_focus_parent(self) != NULL)
         {
             activate = TRUE;
         }
@@ -481,8 +480,7 @@ void client_manage(Window window)
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */
-            if (focus_client && !focus_client->can_focus &&
-                focus_client->focus_notify)
+            if (!focus_client->can_focus && focus_client->focus_notify)
             {
                 activate = FALSE;
             }

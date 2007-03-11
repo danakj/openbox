@@ -461,11 +461,34 @@ void client_manage(Window window)
     mouse_grab_for_client(self, TRUE);
 
     if (activate) {
-        /* This is focus stealing prevention, if a user_time has been set */
+        /* This is focus stealing prevention */
         ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
                  self->window, self->user_time, client_last_user_time);
-        if (!self->user_time || self->user_time >= client_last_user_time ||
-            client_search_focus_parent(self) != NULL)
+
+        /* If a nothing at all, or a parent was focused, then focus this
+           always
+        */
+        if (client_search_focus_parent(self) != NULL ||
+            !focus_client)
+        {
+            activate = TRUE;
+        }
+        else
+        {
+            /* If time stamp is old, don't steal focus */
+            if (self->user_time && self->user_time < client_last_user_time)
+                activate = FALSE;
+            /* Don't steal focus from globally active clients.
+               I stole this idea from KWin. It seems nice.
+             */
+            if (focus_client && focus_client->can_focus != TRUE &&
+                focus_client->focus_notify == TRUE)
+            {
+                activate = FALSE;
+            }
+        }
+
+        if (activate)
         {
             /* since focus can change the stacking orders, if we focus the
                window then the standard raise it gets is not enough, we need
@@ -478,9 +501,6 @@ void client_manage(Window window)
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);
-
-            /* don't focus it ! (focus stealing prevention) */
-            activate = FALSE;
         }
     }
     else {

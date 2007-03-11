@@ -1,5 +1,5 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [3.3.1], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.4.0], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
@@ -14,10 +14,10 @@ dnl
 dnl if MAJOR or MINOR version changes, be sure to change AC_INIT above to match
 dnl
 OB_MAJOR_VERSION=3
-OB_MINOR_VERSION=3
-OB_MICRO_VERSION=5
-OB_INTERFACE_AGE=1
-OB_BINARY_AGE=5
+OB_MINOR_VERSION=4
+OB_MICRO_VERSION=0
+OB_INTERFACE_AGE=0
+OB_BINARY_AGE=0
 OB_VERSION=$OB_MAJOR_VERSION.$OB_MINOR_VERSION
 
 AC_SUBST(OB_MAJOR_VERSION)

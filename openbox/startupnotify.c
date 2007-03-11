@@ -167,14 +167,35 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
     GSList *it;
     Time t = CurrentTime;
 
+    if (!id && !wmclass)
+        return t;
+
     for (it = sn_waits; it; it = g_slist_next(it)) {
         SnStartupSequence *seq = it->data;
-        const gchar *seqid, *seqclass;
+        gboolean found = FALSE;
+        const gchar *seqid, *seqclass, *seqname, *seqbin;
         seqid = sn_startup_sequence_get_id(seq);
         seqclass = sn_startup_sequence_get_wmclass(seq);
-        if ((seqid && id && !strcmp(seqid, id)) ||
-            (seqclass && wmclass && !strcmp(seqclass, wmclass)))
-        {
+        seqname = sn_startup_sequence_get_name(seq);
+        seqbin = sn_startup_sequence_get_binary_name(seq);
+
+        if (id && seqid) {
+            /* if the app has a startup id, then look for that for highest
+               accuracy */
+            if (!strcmp(seqid, id))
+                found = TRUE;
+        } else {
+            seqclass = sn_startup_sequence_get_wmclass(seq);
+            seqname = sn_startup_sequence_get_name(seq);
+            seqbin = sn_startup_sequence_get_binary_name(seq);
+
+            if ((seqname && !g_ascii_strcasecmp(seqname, wmclass)) ||
+                (seqbin && !g_ascii_strcasecmp(seqbin, wmclass)) ||
+                (seqclass && !strcmp(seqclass, wmclass)))
+                found = TRUE;
+        }
+
+        if (found) {
             sn_startup_sequence_complete(seq);
             t = sn_startup_sequence_get_timestamp(seq);
             break;

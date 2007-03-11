@@ -481,8 +481,8 @@ void client_manage(Window window)
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */
-            if (focus_client && focus_client->can_focus != TRUE &&
-                focus_client->focus_notify == TRUE)
+            if (focus_client && !focus_client->can_focus &&
+                focus_client->focus_notify)
             {
                 activate = FALSE;
             }

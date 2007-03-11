@@ -895,13 +895,17 @@ static void event_handle_client(ObClient *client, XEvent *e)
             switch (e->xconfigurerequest.detail) {
             case Below:
             case BottomIf:
-                client_lower(client);
+                /* Apps are so rude. And this is totally disconnected from
+                   activation/focus. Bleh. */
+                /*client_lower(client);*/
                 break;
 
             case Above:
             case TopIf:
             default:
-                client_raise(client);
+                /* Apps are so rude. And this is totally disconnected from
+                   activation/focus. Bleh. */
+                /*client_raise(client);*/
                 break;
             }
         }
@@ -940,7 +944,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                        it can happen now when the window is on
                                        another desktop, but we still don't
                                        want it! */
-        client_activate(client, FALSE, TRUE);
+        client_activate(client, FALSE, TRUE, CurrentTime);
         break;
     case ClientMessage:
         /* validate cuz we query stuff off the client here */
@@ -1002,7 +1006,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* XXX make use of data.l[1] and [2] ! */
             client_activate(client, FALSE,
                             (e->xclient.data.l[0] == 0 ||
-                             e->xclient.data.l[0] == 2));
+                             e->xclient.data.l[0] == 2),
+                            e->xclient.data.l[1]);
         } else if (msgtype == prop_atoms.net_wm_moveresize) {
             ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
             if ((Atom)e->xclient.data.l[2] ==
@@ -1242,7 +1247,8 @@ static void event_handle_menu(XEvent *ev)
         if (menu_can_hide) {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
-                menu_entry_frame_execute(e, ev->xbutton.state);
+                menu_entry_frame_execute(e, ev->xbutton.state,
+                                         ev->xbutton.time);
             else
                 menu_frame_hide_all();
         }
@@ -1272,7 +1278,8 @@ static void event_handle_menu(XEvent *ev)
         else if (ev->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
             ObMenuFrame *f;
             if ((f = find_active_menu()))
-                menu_entry_frame_execute(f->selected, ev->xkey.state);
+                menu_entry_frame_execute(f->selected, ev->xkey.state,
+                                         ev->xkey.time);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_LEFT)) {
             ObMenuFrame *f;
             if ((f = find_active_or_last_menu()) && f->parent)

@@ -184,9 +184,9 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
 }
 
 void keyboard_interactive_end(ObInteractiveState *s,
-                              guint state, gboolean cancel)
+                              guint state, gboolean cancel, Time time)
 {
-    action_run_interactive(s->actions, s->client, state, cancel, TRUE);
+    action_run_interactive(s->actions, s->client, state, time, cancel, TRUE);
 
     g_slist_free(s->actions);
     g_free(s);
@@ -236,7 +236,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
                 cancel = done = TRUE;
         }
         if (done) {
-            keyboard_interactive_end(s, e->xkey.state, cancel);
+            keyboard_interactive_end(s, e->xkey.state, cancel, e->xkey.time);
 
             handled = TRUE;
         } else
@@ -280,7 +280,8 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 keyboard_reset_chains();
 
                 action_run_key(p->actions, client, e->xkey.state,
-                               e->xkey.x_root, e->xkey.y_root);
+                               e->xkey.x_root, e->xkey.y_root,
+                               e->xkey.time);
             }
             break;
         }

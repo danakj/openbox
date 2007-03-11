@@ -803,7 +803,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     menu_frame_show(f, self->frame);
 }
 
-void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
+void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state, Time time)
 {
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.enabled)
@@ -821,9 +821,9 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
             menu_frame_hide_all();
 
         if (func)
-            func(entry, state, data);
+            func(entry, state, data, time);
         else
-            action_run(acts, client, state);
+            action_run(acts, client, state, time);
     }
 }
 

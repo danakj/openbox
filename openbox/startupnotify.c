@@ -18,6 +18,9 @@
 */
 
 #include "startupnotify.h"
+#include "gettext.h"
+
+extern gchar **environ;
 
 #ifndef USE_LIBSN
 
@@ -29,6 +32,11 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
     return CurrentTime;
 }
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
+gchar **sn_get_spawn_environment(char *program, Time time)
+{
+    return g_strdupv(environ);
+}
+void sn_spawn_cancel() {}
 
 #else
 
@@ -39,18 +47,12 @@ gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
 #define SN_API_NOT_YET_FROZEN
 #include <libsn/sn.h>
 
-typedef struct {
-    SnStartupSequence *seq;
-    gboolean feedback;
-} ObWaitData;
-
 static SnDisplay *sn_display;
 static SnMonitorContext *sn_context;
-static GSList *sn_waits; /* list of ObWaitDatas */
+static SnLauncherContext *sn_launcher;
+static GSList *sn_waits; /* list of SnStartupSequences we're waiting on */
 
-static ObWaitData* wait_data_new(SnStartupSequence *seq);
-static void wait_data_free(ObWaitData *d);
-static ObWaitData* wait_find(const gchar *id);
+static SnStartupSequence* sequence_find(const gchar *id);
 
 static void sn_handler(const XEvent *e, gpointer data);
 static void sn_event_func(SnMonitorEvent *event, gpointer data);
@@ -62,6 +64,7 @@ void sn_startup(gboolean reconfig)
     sn_display = sn_display_new(ob_display, NULL, NULL);
     sn_context = sn_monitor_context_new(sn_display, ob_screen,
                                         sn_event_func, NULL, NULL);
+    sn_launcher = sn_launcher_context_new(sn_display, ob_screen);
 
     ob_main_loop_x_add(ob_main_loop, sn_handler, NULL, NULL);
 }
@@ -75,45 +78,26 @@ void sn_shutdown(gboolean reconfig)
     ob_main_loop_x_remove(ob_main_loop, sn_handler);
 
     for (it = sn_waits; it; it = g_slist_next(it))
-        wait_data_free(it->data);
+        sn_startup_sequence_unref((SnStartupSequence*)it->data);
     g_slist_free(sn_waits);
     sn_waits = NULL;
 
     screen_set_root_cursor();
 
+    sn_launcher_context_unref(sn_launcher);
     sn_monitor_context_unref(sn_context);
     sn_display_unref(sn_display);
 }
 
-static ObWaitData* wait_data_new(SnStartupSequence *seq)
+static SnStartupSequence* sequence_find(const gchar *id)
 {
-    ObWaitData *d = g_new(ObWaitData, 1);
-    d->seq = seq;
-    d->feedback = TRUE;
-
-    sn_startup_sequence_ref(d->seq);
-
-    return d;
-}
-
-static void wait_data_free(ObWaitData *d)
-{
-    if (d) {
-        sn_startup_sequence_unref(d->seq);
-
-        g_free(d);
-    }
-}
-
-static ObWaitData* wait_find(const gchar *id)
-{
-    ObWaitData *ret = NULL;
+    SnStartupSequence*ret = NULL;
     GSList *it;
 
     for (it = sn_waits; it; it = g_slist_next(it)) {
-        ObWaitData *d = it->data;
-        if (!strcmp(id, sn_startup_sequence_get_id(d->seq))) {
-            ret = d;
+        SnStartupSequence *seq = it->data;
+        if (!strcmp(id, sn_startup_sequence_get_id(seq))) {
+            ret = seq;
             break;
         }
     }
@@ -122,29 +106,15 @@ static ObWaitData* wait_find(const gchar *id)
 
 gboolean sn_app_starting()
 {
-    GSList *it;
-
-    for (it = sn_waits; it; it = g_slist_next(it)) {
-        ObWaitData *d = it->data;
-        if (d->feedback)
-            return TRUE;
-    }
-    return FALSE;
+    return sn_waits != NULL;
 }
 
 static gboolean sn_wait_timeout(gpointer data)
 {
-    ObWaitData *d = data;
-    d->feedback = FALSE;
+    SnStartupSequence *seq = data;
+    sn_waits = g_slist_remove(sn_waits, seq);
     screen_set_root_cursor();
     return FALSE; /* don't repeat */
-}
-
-static void sn_wait_destroy(gpointer data)
-{
-    ObWaitData *d = data;
-    sn_waits = g_slist_remove(sn_waits, d);
-    wait_data_free(d);
 }
 
 static void sn_handler(const XEvent *e, gpointer data)
@@ -158,18 +128,19 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
 {
     SnStartupSequence *seq;
     gboolean change = FALSE;
-    ObWaitData *d;
 
     if (!(seq = sn_monitor_event_get_startup_sequence(ev)))
         return;
 
     switch (sn_monitor_event_get_type(ev)) {
     case SN_MONITOR_EVENT_INITIATED:
-        d = wait_data_new(seq);
-        sn_waits = g_slist_prepend(sn_waits, d);
-        /* 15 second timeout for apps to start */
-        ob_main_loop_timeout_add(ob_main_loop, 15 * G_USEC_PER_SEC,
-                                 sn_wait_timeout, d, sn_wait_destroy);
+        sn_startup_sequence_ref(seq);
+        sn_waits = g_slist_prepend(sn_waits, seq);
+        /* 30 second timeout for apps to start if the launcher doesn't
+           have a timeout */
+        ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
+                                 sn_wait_timeout, seq,
+                                 (GDestroyNotify)sn_startup_sequence_unref);
         change = TRUE;
         break;
     case SN_MONITOR_EVENT_CHANGED:
@@ -178,10 +149,10 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
         break;
     case SN_MONITOR_EVENT_COMPLETED:
     case SN_MONITOR_EVENT_CANCELED:
-        if ((d = wait_find(sn_startup_sequence_get_id(seq)))) {
-            d->feedback = FALSE;
+        if ((seq = sequence_find(sn_startup_sequence_get_id(seq)))) {
+            sn_waits = g_slist_remove(sn_waits, seq);
             ob_main_loop_timeout_remove_data(ob_main_loop, sn_wait_timeout,
-                                             d, FALSE);
+                                             seq, FALSE);
             change = TRUE;
         }
         break;
@@ -197,15 +168,15 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
     Time t = CurrentTime;
 
     for (it = sn_waits; it; it = g_slist_next(it)) {
-        ObWaitData *d = it->data;
+        SnStartupSequence *seq = it->data;
         const gchar *seqid, *seqclass;
-        seqid = sn_startup_sequence_get_id(d->seq);
-        seqclass = sn_startup_sequence_get_wmclass(d->seq);
+        seqid = sn_startup_sequence_get_id(seq);
+        seqclass = sn_startup_sequence_get_wmclass(seq);
         if ((seqid && id && !strcmp(seqid, id)) ||
             (seqclass && wmclass && !strcmp(seqclass, wmclass)))
         {
-            sn_startup_sequence_complete(d->seq);
-            t = sn_startup_sequence_get_timestamp(d->seq);
+            sn_startup_sequence_complete(seq);
+            t = sn_startup_sequence_get_timestamp(seq);
             break;
         }
     }
@@ -214,16 +185,65 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
 
 gboolean sn_get_desktop(gchar *id, guint *desktop)
 {
-    ObWaitData *d;
+    SnStartupSequence *seq;
 
-    if (id && (d = wait_find(id))) {
-        gint desk = sn_startup_sequence_get_workspace(d->seq);
+    if (id && (seq = sequence_find(id))) {
+        gint desk = sn_startup_sequence_get_workspace(seq);
         if (desk != -1) {
             *desktop = desk;
             return TRUE;
         }
     }
     return FALSE;
+}
+
+static gboolean sn_launch_wait_timeout(gpointer data)
+{
+    SnLauncherContext *sn = data;
+    sn_launcher_context_complete(sn);
+    return FALSE; /* don't repeat */
+}
+
+gchar **sn_get_spawn_environment(char *program, Time time)
+{
+    gchar **env, *desc;
+    guint len;
+    const char *id;
+
+    desc = g_strdup_printf(_("Running %s\n"), program);
+
+    if (sn_launcher_context_get_initiated(sn_launcher)) {
+        sn_launcher_context_unref(sn_launcher);
+        sn_launcher = sn_launcher_context_new(sn_display, ob_screen);
+    }
+
+    sn_launcher_context_set_name(sn_launcher, program);
+    sn_launcher_context_set_description(sn_launcher, desc);
+    sn_launcher_context_set_icon_name(sn_launcher, program);
+    sn_launcher_context_set_binary_name(sn_launcher, program);
+    sn_launcher_context_initiate(sn_launcher, "openbox", program, time);
+    id = sn_launcher_context_get_startup_id(sn_launcher);
+
+    /* 30 second timeout for apps to start */
+    sn_launcher_context_ref(sn_launcher);
+    ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
+                             sn_launch_wait_timeout, sn_launcher,
+                             (GDestroyNotify)sn_launcher_context_unref);
+
+    env = g_strdupv(environ);
+    len = g_strv_length(env); /* includes last null */
+    env = g_renew(gchar*, env, ++len); /* add one spot */
+    env[len-2] = g_strdup_printf("DESKTOP_STARTUP_ID=%s", id);
+    env[len-1] = NULL;
+
+    g_free(desc);
+
+    return env;
+}
+
+void sn_spawn_cancel()
+{
+    sn_launcher_context_complete(sn_launcher);
 }
 
 #endif

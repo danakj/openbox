@@ -296,11 +296,15 @@ void client_manage(Window window)
     self->wmstate = NormalState;
     self->layer = -1;
     self->desktop = screen_num_desktops; /* always an invalid value */
+    self->user_time = ~0; /* maximum value, always newer than the real time */
 
     client_get_all(self);
     client_restore_session_state(self);
 
-    self->user_time = sn_app_started(self->startup_id, self->class);
+    {
+        Time t = sn_app_started(self->startup_id, self->class);
+        if (t) self->user_time = t;
+    }
 
     /* update the focus lists, do this before the call to change_state or
        it can end up in the list twice! */
@@ -327,7 +331,7 @@ void client_manage(Window window)
     /* get and set application level settings */
     settings = get_settings(self);
 
-    stacking_add(CLIENT_AS_WINDOW(self));
+    stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
     client_restore_session_stacking(self);
 
     if (settings) {
@@ -453,34 +457,54 @@ void client_manage(Window window)
     keyboard_grab_for_client(self, TRUE);
     mouse_grab_for_client(self, TRUE);
 
-    client_showhide(self);
-
-    /* use client_focus instead of client_activate cuz client_activate does
-       stuff like switch desktops etc and I'm not interested in all that when
-       a window maps since its not based on an action from the user like
-       clicking a window to activate is. so keep the new window out of the way
-       but do focus it. */
     if (activate) {
         /* This is focus stealing prevention, if a user_time has been set */
-        if (self->user_time == CurrentTime ||
-            self->user_time > client_last_user_time)
+        ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
+                 self->window, self->user_time, client_last_user_time);
+        if (!self->user_time || self->user_time >= client_last_user_time)
         {
-            /* if using focus_delay, stop the timer now so that focus doesn't
-               go moving on us */
-            event_halt_focus_delay();
-
-            client_focus(self);
             /* since focus can change the stacking orders, if we focus the
                window then the standard raise it gets is not enough, we need
                to queue one for after the focus change takes place */
             client_raise(self);
         } else {
-            ob_debug("Focus stealing prevention activated for %s\n",
-                     self->title);
+            ob_debug("Focus stealing prevention activated for %s with time %u "
+                     "(last time %u)\n",
+                     self->title, self->user_time, client_last_user_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);
+
+            /* don't focus it ! (focus stealing prevention) */
+            activate = FALSE;
         }
+    }
+    else {
+        /* This may look rather odd. Well it's because new windows are added
+           to the stacking order non-intrusively. If we're not going to focus
+           the new window or hilite it, then we raise it to the top. This will
+           take affect for things that don't get focused like splash screens.
+           Also if you don't have focus_new enabled, then it's going to get
+           raised to the top. Legacy begets legacy I guess?
+        */
+        client_raise(self);
+    }
+
+    /* this has to happen before we try focus the window, but we want it to
+       happen after the client's stacking has been determined or it looks bad
+    */
+    client_showhide(self);
+
+    /* use client_focus instead of client_activate cuz client_activate does
+       stuff like switch desktops etc and I'm not interested in all that when
+       a window maps since its not based on an action from the user like
+       clicking a window to activate it. so keep the new window out of the way
+       but do focus it. */
+    if (activate) {
+        /* if using focus_delay, stop the timer now so that focus doesn't
+           go moving on us */
+        event_halt_focus_delay();
+        client_focus(self);
     }
 
     /* client_activate does this but we aret using it so we have to do it
@@ -2926,46 +2950,52 @@ void client_unfocus(ObClient *self)
     }
 }
 
-void client_activate(ObClient *self, gboolean here, gboolean user)
+void client_activate(ObClient *self, gboolean here, gboolean user,
+                     Time timestamp)
 {
     /* XXX do some stuff here if user is false to determine if we really want
-       to activate it or not (a parent or group member is currently active) */
+       to activate it or not (a parent or group member is currently
+       active)?
+    */
+    if (!user)
+        client_hilite(self, TRUE);
+    else {
+        if (client_normal(self) && screen_showing_desktop)
+            screen_show_desktop(FALSE);
+        if (self->iconic)
+            client_iconify(self, FALSE, here);
+        if (self->desktop != DESKTOP_ALL &&
+            self->desktop != screen_desktop) {
+            if (here)
+                client_set_desktop(self, screen_desktop, FALSE);
+            else
+                screen_set_desktop(self->desktop);
+        } else if (!self->frame->visible)
+            /* if its not visible for other reasons, then don't mess
+               with it */
+            return;
+        if (self->shaded)
+            client_shade(self, FALSE);
 
-    if (client_normal(self) && screen_showing_desktop)
-        screen_show_desktop(FALSE);
-    if (self->iconic)
-        client_iconify(self, FALSE, here);
-    if (self->desktop != DESKTOP_ALL &&
-        self->desktop != screen_desktop) {
-        if (here)
-            client_set_desktop(self, screen_desktop, FALSE);
-        else
-            screen_set_desktop(self->desktop);
-    } else if (!self->frame->visible)
-        /* if its not visible for other reasons, then don't mess
-           with it */
-        return;
-    if (self->shaded)
-        client_shade(self, FALSE);
+        client_focus(self);
 
-    client_focus(self);
-
-    /* we do this an action here. this is rather important. this is because
-       we want the results from the focus change to take place BEFORE we go
-       about raising the window. when a fullscreen window loses focus, we need
-       this or else the raise wont be able to raise above the to-lose-focus
-       fullscreen window. */
-    client_raise(self);
+        /* we do this an action here. this is rather important. this is because
+           we want the results from the focus change to take place BEFORE we go
+           about raising the window. when a fullscreen window loses focus, we
+           need this or else the raise wont be able to raise above the
+           to-lose-focus fullscreen window. */
+        client_raise(self);
+    }
 }
 
 void client_raise(ObClient *self)
 {
-    action_run_string("Raise", self);
+    action_run_string("Raise", self, CurrentTime);
 }
 
 void client_lower(ObClient *self)
 {
-    action_run_string("Lower", self);
+    action_run_string("Lower", self, CurrentTime);
 }
 
 gboolean client_focused(ObClient *self)

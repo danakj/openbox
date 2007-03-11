@@ -84,13 +84,14 @@ static void self_update(ObMenuFrame *frame, gpointer data)
 
 /* executes it using the client in the actions, since we set that
    when we make the actions! */
-static void menu_execute(ObMenuEntry *self, guint state, gpointer data)
+static void menu_execute(ObMenuEntry *self, guint state, gpointer data,
+                         Time time)
 {
     ObAction *a;
 
     if (self->data.normal.actions) {
         a = self->data.normal.actions->data;
-        action_run(self->data.normal.actions, a->data.any.c, state);
+        action_run(self->data.normal.actions, a->data.any.c, state, time);
     }
 }
 

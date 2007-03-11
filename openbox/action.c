@@ -33,6 +33,7 @@
 #include "dock.h"
 #include "config.h"
 #include "mainloop.h"
+#include "startupnotify.h"
 
 #include <glib.h>
 
@@ -1005,7 +1006,7 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
-                     guint state, guint button, gint x, gint y,
+                     guint state, guint button, gint x, gint y, Time time,
                      gboolean cancel, gboolean done)
 {
     GSList *it;
@@ -1048,6 +1049,8 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
 
             a->data.any.button = button;
 
+            a->data.any.time = time;
+
             if (a->data.any.interactive) {
                 a->data.inter.cancel = cancel;
                 a->data.inter.final = done;
@@ -1068,7 +1071,7 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
     }
 }
 
-void action_run_string(const gchar *name, struct _ObClient *c)
+void action_run_string(const gchar *name, struct _ObClient *c, Time time)
 {
     ObAction *a;
     GSList *l;
@@ -1078,7 +1081,7 @@ void action_run_string(const gchar *name, struct _ObClient *c)
 
     l = g_slist_append(NULL, a);
 
-    action_run(l, c, 0);
+    action_run(l, c, 0, time);
 }
 
 void action_execute(union ActionData *data)
@@ -1093,13 +1096,21 @@ void action_execute(union ActionData *data)
                           cmd, e->message);
                 g_error_free(e);
             } else {
-                if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
+                gchar **env, *program;
+                
+                program = g_path_get_basename(argv[0]);
+                env = sn_get_spawn_environment(program,
+                                               data->execute.any.time);
+                if (!g_spawn_async(NULL, argv, env, G_SPAWN_SEARCH_PATH |
                                    G_SPAWN_DO_NOT_REAP_CHILD,
                                    NULL, NULL, NULL, &e)) {
                     g_warning("failed to execute '%s': %s",
                               cmd, e->message);
                     g_error_free(e);
+                    sn_spawn_cancel();
                 }
+                g_strfreev(env);
+                g_free(program);
                 g_strfreev(argv);
             }
             g_free(cmd);
@@ -1119,7 +1130,8 @@ void action_activate(union ActionData *data)
            moving on us */
         event_halt_focus_delay();
 
-        client_activate(data->activate.any.c, data->activate.here, TRUE);
+        client_activate(data->activate.any.c, data->activate.here, TRUE,
+                        data->activate.any.time);
     }
 }
 
@@ -1594,7 +1606,8 @@ void action_cycle_windows(union ActionData *data)
 
     focus_cycle(data->cycle.forward, data->cycle.linear, data->any.interactive,
                 data->cycle.dialog,
-                data->cycle.inter.final, data->cycle.inter.cancel);
+                data->cycle.inter.final, data->cycle.inter.cancel,
+                data->cycle.inter.any.time);
 }
 
 void action_directional_focus(union ActionData *data)
@@ -1607,7 +1620,8 @@ void action_directional_focus(union ActionData *data)
                             data->any.interactive,
                             data->interdiraction.dialog,
                             data->interdiraction.inter.final,
-                            data->interdiraction.inter.cancel);
+                            data->interdiraction.inter.cancel,
+                            data->interdiraction.inter.any.time);
 }
 
 void action_movetoedge(union ActionData *data)

@@ -48,6 +48,7 @@ struct AnyAction {
     gint x;
     gint y;
     gint button;
+    Time time;
 };
 
 struct InteractiveAction {
@@ -209,22 +210,22 @@ ObAction* action_copy(const ObAction *a);
          affects interactive actions, but should generally always be FALSE.
 */
 void action_run_list(GSList *acts, struct _ObClient *c, ObFrameContext context,
-                     guint state, guint button, gint x, gint y,
+                     guint state, guint button, gint x, gint y, Time time,
                      gboolean cancel, gboolean done);
 
-#define action_run_mouse(a, c, n, s, b, x, y) \
-    action_run_list(a, c, n, s, b, x, y, FALSE, FALSE)
+#define action_run_mouse(a, c, n, s, b, x, y, t) \
+    action_run_list(a, c, n, s, b, x, y, t, FALSE, FALSE)
 
-#define action_run_interactive(a, c, s, n, d) \
-    action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, n, d)
+#define action_run_interactive(a, c, s, t, n, d) \
+    action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, t, n, d)
 
-#define action_run_key(a, c, s, x, y) \
-    action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, x, y, FALSE, FALSE)
+#define action_run_key(a, c, s, x, y, t) \
+    action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, x, y, t, FALSE, FALSE)
 
-#define action_run(a, c, s) \
-    action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, FALSE, FALSE)
+#define action_run(a, c, s, t) \
+    action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, t, FALSE, FALSE)
 
-void action_run_string(const gchar *name, struct _ObClient *c);
+void action_run_string(const gchar *name, struct _ObClient *c, Time time);
 
 /* Execute */
 void action_execute(union ActionData *data);

@@ -24,7 +24,10 @@
 void sn_startup(gboolean reconfig) {}
 void sn_shutdown(gboolean reconfig) {}
 gboolean sn_app_starting() { return FALSE; }
-void sn_app_started(gchar *wmclass) {}
+Time sn_app_started(const gchar *id, const gchar *wmclass)
+{
+    return CurrentTime;
+}
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
 
 #else
@@ -188,9 +191,10 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
         screen_set_root_cursor();
 }
 
-void sn_app_started(const gchar *id, const gchar *wmclass)
+Time sn_app_started(const gchar *id, const gchar *wmclass)
 {
     GSList *it;
+    Time t = CurrentTime;
 
     for (it = sn_waits; it; it = g_slist_next(it)) {
         ObWaitData *d = it->data;
@@ -201,9 +205,11 @@ void sn_app_started(const gchar *id, const gchar *wmclass)
             (seqclass && wmclass && !strcmp(seqclass, wmclass)))
         {
             sn_startup_sequence_complete(d->seq);
+            t = sn_startup_sequence_get_timestamp(d->seq);
             break;
         }
     }
+    return t;
 }
 
 gboolean sn_get_desktop(gchar *id, guint *desktop)

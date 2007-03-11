@@ -20,6 +20,7 @@
 #define ob__startupnotify_h
 
 #include <glib.h>
+#include <X11/Xlib.h>
 
 void sn_startup(gboolean reconfig);
 void sn_shutdown(gboolean reconfig);
@@ -27,7 +28,7 @@ void sn_shutdown(gboolean reconfig);
 gboolean sn_app_starting();
 
 /*! Notify that an app has started */
-void sn_app_started(const gchar *id, const gchar *wmclass);
+Time sn_app_started(const gchar *id, const gchar *wmclass);
 
 /*! Get the desktop requested via the startup-notiication protocol if one
   was requested */

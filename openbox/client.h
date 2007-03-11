@@ -269,6 +269,8 @@ struct _ObClient
     ObClientIcon *icons;
     /*! The number of icons in icons */
     guint nicons;
+
+    guint32 user_time;
 };
 
 struct _ObAppSettings
@@ -530,6 +532,8 @@ void client_update_class(ObClient *self);
 void client_update_strut(ObClient *self);
 /*! Updates the window's icons */
 void client_update_icons(ObClient *self);
+/*! Updates the window's user time */
+void client_update_user_time(ObClient *self, gboolean new_event);
 
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (ObClient::decorations and ObClient::functions).

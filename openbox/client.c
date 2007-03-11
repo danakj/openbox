@@ -57,8 +57,10 @@ typedef struct
     gpointer data;
 } Destructor;
 
-GList      *client_list        = NULL;
-GSList     *client_destructors = NULL;
+GList         *client_list           = NULL;
+
+static GSList *client_destructors    = NULL;
+static Time    client_last_user_time = CurrentTime;
 
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -298,7 +300,7 @@ void client_manage(Window window)
     client_get_all(self);
     client_restore_session_state(self);
 
-    sn_app_started(self->startup_id, self->class);
+    self->user_time = sn_app_started(self->startup_id, self->class);
 
     /* update the focus lists, do this before the call to change_state or
        it can end up in the list twice! */
@@ -459,15 +461,26 @@ void client_manage(Window window)
        clicking a window to activate is. so keep the new window out of the way
        but do focus it. */
     if (activate) {
-        /* if using focus_delay, stop the timer now so that focus doesn't go
-           moving on us */
-        event_halt_focus_delay();
+        /* This is focus stealing prevention, if a user_time has been set */
+        if (self->user_time == CurrentTime ||
+            self->user_time > client_last_user_time)
+        {
+            /* if using focus_delay, stop the timer now so that focus doesn't
+               go moving on us */
+            event_halt_focus_delay();
 
-        client_focus(self);
-        /* since focus can change the stacking orders, if we focus the window
-           then the standard raise it gets is not enough, we need to queue one
-           for after the focus change takes place */
-        client_raise(self);
+            client_focus(self);
+            /* since focus can change the stacking orders, if we focus the
+               window then the standard raise it gets is not enough, we need
+               to queue one for after the focus change takes place */
+            client_raise(self);
+        } else {
+            ob_debug("Focus stealing prevention activated for %s\n",
+                     self->title);
+            /* if the client isn't focused, then hilite it so the user
+               knows it is there */
+            client_hilite(self, TRUE);
+        }
     }
 
     /* client_activate does this but we aret using it so we have to do it
@@ -857,6 +870,7 @@ static void client_get_all(ObClient *self)
     client_update_sm_client_id(self);
     client_update_strut(self);
     client_update_icons(self);
+    client_update_user_time(self, FALSE);
 }
 
 static void client_get_startup_id(ObClient *self)
@@ -1802,6 +1816,26 @@ void client_update_icons(ObClient *self)
 
     if (self->frame)
         frame_adjust_icon(self->frame);
+}
+
+void client_update_user_time(ObClient *self, gboolean new_event)
+{
+    guint32 time;
+
+    if (PROP_GET32(self->window, net_wm_user_time, cardinal, &time)) {
+        self->user_time = time;
+        /* we set this every time, not just when it grows, because in practice
+           sometimes time goes backwards! (ntpdate.. yay....) so.. if it goes
+           backward we don't want all windows to stop focusing. we'll just
+           assume noone is setting times older than the last one, cuz that
+           would be pretty stupid anyways
+           However! This is called when a window is mapped to get its user time
+           but it's an old number, it's not changing it from new user
+           interaction, so in that case, don't change the last user time.
+        */
+        if (new_event)
+            client_last_user_time = time;
+    }
 }
 
 static void client_change_state(ObClient *self)

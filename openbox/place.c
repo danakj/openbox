@@ -24,19 +24,52 @@
 #include "focus.h"
 #include "config.h"
 
-static Rect *pick_head(ObClient *c)
+static void add_choice(guint *choice, guint mychoice)
 {
-    Rect *area = NULL;
+    guint i;
+    for (i = 0; i < screen_num_monitors; ++i) {
+        if (choice[i] == mychoice)
+            return;
+        else if (choice[i] == screen_num_monitors) {
+            choice[i] = mychoice;
+            return;
+        }
+    }
+}
+
+static Rect *pick_pointer_head(ObClient *c)
+{
     guint i;
     gint px, py;
 
+    screen_pointer_pos(&px, &py);
+     
+    for (i = 0; i < screen_num_monitors; ++i) {  
+        if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
+            return screen_area_monitor(c->desktop, i);
+        }
+    }
+    g_assert_not_reached();
+}
+
+static Rect **pick_head(ObClient *c)
+{
+    Rect **area;
+    guint *choice;
+    guint i;
+    gint px, py;
+
+    area = g_new(Rect*, screen_num_monitors);
+    choice = g_new(guint, screen_num_monitors);
+    for (i = 0; i < screen_num_monitors; ++i)
+        choice[i] = screen_num_monitors; /* make them all invalid to start */
+
     /* try direct parent first */
     if (c->transient_for && c->transient_for != OB_TRAN_GROUP) {
-        return screen_area_monitor(c->desktop,
-                                   client_monitor(c->transient_for));
+        add_choice(choice, client_monitor(c->transient_for));
     }
 
-    /* more than one guy in his group (more than just him) */
+    /* more than one window in its group (more than just this window) */
     if (client_has_group_siblings(c)) {
         GSList *it;
 
@@ -46,33 +79,34 @@ static Rect *pick_head(ObClient *c)
             if (itc != c &&
                 (itc->desktop == c->desktop ||
                  itc->desktop == DESKTOP_ALL || c->desktop == DESKTOP_ALL))
-                return screen_area_monitor(c->desktop,
-                                           client_monitor(it->data));
+                add_choice(choice, client_monitor(it->data));
         }
 
         /* try on all desktops */
         for (it = c->group->members; it; it = g_slist_next(it)) {
             ObClient *itc = it->data;            
             if (itc != c)
-                return screen_area_monitor(c->desktop,
-                                           client_monitor(it->data));
+                add_choice(choice, client_monitor(it->data));
         }
     }
 
+    if (focus_client)
+        add_choice(choice, client_monitor(focus_client));
+
     screen_pointer_pos(&px, &py);
 
-    for (i = 0; i < screen_num_monitors; i++) {
-        area = screen_area_monitor(c->desktop, i);
-        if (RECT_CONTAINS(*area, px, py))
+    for (i = 0; i < screen_num_monitors; i++)
+        if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
+            add_choice(choice, i);
             break;
-    }
-    if (i == screen_num_monitors)
-        area = screen_area_monitor(c->desktop, 0);    
+        }
 
-    /* Last resort */
-    if (!area)
-        area = screen_area_monitor(c->desktop,
-                                   g_random_int_range(0, screen_num_monitors));
+    /* add any leftover choices */
+    for (i = 0; i < screen_num_monitors; ++i)
+        add_choice(choice, i);
+
+    for (i = 0; i < screen_num_monitors; ++i)
+        area[i] = screen_area_monitor(c->desktop, choice[i]);
 
     return area;
 }
@@ -80,19 +114,23 @@ static Rect *pick_head(ObClient *c)
 static gboolean place_random(ObClient *client, gint *x, gint *y)
 {
     gint l, r, t, b;
-    Rect *area;
+    Rect **areas;
+    guint i;
 
-    area = pick_head(client);
+    areas = pick_head(client);
+    i = g_random_int_range(0, screen_num_monitors);
 
-    l = area->x;
-    t = area->y;
-    r = area->x + area->width - client->frame->area.width;
-    b = area->y + area->height - client->frame->area.height;
+    l = areas[i]->x;
+    t = areas[i]->y;
+    r = areas[i]->x + areas[i]->width - client->frame->area.width;
+    b = areas[i]->y + areas[i]->height - client->frame->area.height;
 
     if (r > l) *x = g_random_int_range(l, r + 1);
     else       *x = 0;
     if (b > t) *y = g_random_int_range(t, b + 1);
     else       *y = 0;
+
+    g_free(areas);
 
     return TRUE;
 }
@@ -224,28 +262,38 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
     gboolean ret = FALSE;
     GSList *spaces = NULL, *sit;
     GList *it;
+    Rect **areas;
+    guint i;
 
-    spaces = area_add(spaces, pick_head(client));
-
-    /* stay out from under windows in higher layers */
-    for (it = stacking_list; it; it = g_list_next(it)) {
-        ObClient *c;
-
-        if (WINDOW_IS_CLIENT(it->data)) {
-            c = it->data;
-            if (c->fullscreen)
-                continue;
-        } else
-            continue;
-
-        if (c->layer > client->layer) {
-            if (!SMART_IGNORE(client, c))
-                spaces = area_remove(spaces, &c->frame->area);
-        } else
-            break;
+    if (type == SMART_GROUP) {
+        /* has to be more than me in the group */
+        if (!client_has_group_siblings(client))
+            return FALSE;
     }
 
-    if (client->type == OB_CLIENT_TYPE_NORMAL) {
+    areas = pick_head(client);
+
+    for (i = 0; i < screen_num_monitors; ++i) {
+        spaces = area_add(spaces, areas[i]);
+
+        /* stay out from under windows in higher layers */
+        for (it = stacking_list; it; it = g_list_next(it)) {
+            ObClient *c;
+
+            if (WINDOW_IS_CLIENT(it->data)) {
+                c = it->data;
+                if (c->fullscreen)
+                    continue;
+            } else
+                continue;
+
+            if (c->layer > client->layer) {
+                if (!SMART_IGNORE(client, c))
+                    spaces = area_remove(spaces, &c->frame->area);
+            } else
+                break;
+        }
+
         if (type == SMART_FULL || type == SMART_FOCUSED) {
             gboolean found_foc = FALSE, stop = FALSE;
             ObClient *foc;
@@ -277,10 +325,6 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
                     found_foc = TRUE;
             }
         } else if (type == SMART_GROUP) {
-            /* has to be more than me in the group */
-            if (!client_has_group_siblings(client))
-                return FALSE;
-
             for (sit = client->group->members; sit; sit = g_slist_next(sit)) {
                 ObClient *c = sit->data;
                 if (!SMART_IGNORE(client, c))
@@ -288,32 +332,35 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
             }
         } else
             g_assert_not_reached();
-    }
 
-    spaces = g_slist_sort_with_data(spaces, area_cmp, client);
+        spaces = g_slist_sort_with_data(spaces, area_cmp, client);
 
-    for (sit = spaces; sit; sit = g_slist_next(sit)) {
-        Rect *r = sit->data;
+        for (sit = spaces; sit; sit = g_slist_next(sit)) {
+            Rect *r = sit->data;
 
-        if (!ret) {
-            if (r->width >= client->frame->area.width &&
-                r->height >= client->frame->area.height) {
-                ret = TRUE;
-                if (client->type == OB_CLIENT_TYPE_DIALOG ||
-                    type != SMART_FULL)
-                {
-                    *x = r->x + (r->width - client->frame->area.width) / 2;
-                    *y = r->y + (r->height - client->frame->area.height) / 2;
-                } else {
-                    *x = r->x;
-                    *y = r->y;
+            if (!ret) {
+                if (r->width >= client->frame->area.width &&
+                    r->height >= client->frame->area.height) {
+                    ret = TRUE;
+                    if (client->type == OB_CLIENT_TYPE_DIALOG ||
+                        type != SMART_FULL)
+                    {
+                        *x = r->x + (r->width - client->frame->area.width)/2;
+                        *y = r->y + (r->height - client->frame->area.height)/2;
+                    } else {
+                        *x = r->x;
+                        *y = r->y;
+                    }
                 }
             }
-        }
 
-        g_free(r);
+            g_free(r);
+        }
+        g_slist_free(spaces);
+        spaces = NULL;
     }
-    g_slist_free(spaces);
+
+    g_free(areas);
 
     return ret;
 }
@@ -324,8 +371,7 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     gint px, py;
     Rect *area;
 
-    area = pick_head(client);
-    screen_pointer_pos(&px, &py);
+    area = pick_pointer_head(client);
 
     l = area->x;
     t = area->y;
@@ -350,7 +396,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 
     /* Find which head the pointer is on */
     if (settings->head == -1)
-        screen = pick_head(client);
+        screen = pick_pointer_head(client);
     else
         screen = screen_area_monitor(client->desktop, settings->head);
 

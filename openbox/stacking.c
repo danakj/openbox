@@ -385,6 +385,15 @@ void stacking_add_nonintrusive(ObWindow *win)
         /* out of ideas, just add it normally... */
         stacking_add(win);
     } else {
+        GList *it;
+
+        /* make sure it's not in the wrong layer though ! */
+        while (it_before && client->layer < ((ObClient*)it_before->data)->layer)
+            it_before = g_list_next(it_before);
+        while (it_before != stacking_list &&
+               client->layer > ((ObClient*)g_list_previous(it_before)->data)->layer)
+            it_before = g_list_previous(it_before);
+
         GList *wins = g_list_append(NULL, win);
         do_restack(wins, it_before);
         g_list_free(wins);

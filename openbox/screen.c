@@ -2,7 +2,7 @@
 
    screen.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@
 /*! The event mask to grab on the root window */
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
                         EnterWindowMask | LeaveWindowMask | \
-                        SubstructureNotifyMask | SubstructureRedirectMask | \
+                        SubstructureRedirectMask | \
                         ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
 guint    screen_num_desktops;

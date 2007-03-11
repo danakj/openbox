@@ -146,8 +146,6 @@ void prop_startup()
     CREATE(kde_wm_change_state, "_KDE_WM_CHANGE_STATE");
     CREATE(kde_net_wm_window_type_override,"_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 
-    CREATE(kwm_win_icon, "KWM_WIN_ICON");
-  
     CREATE(rootpmapid, "_XROOTPMAP_ID");
     CREATE(esetrootid, "ESETROOT_PMAP_ID");
 

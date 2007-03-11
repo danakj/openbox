@@ -1776,23 +1776,6 @@ void client_update_icons(ObClient *self)
         }
 
         g_free(data);
-    } else if (PROP_GETA32(self->window, kwm_win_icon,
-                           kwm_win_icon, &data, &num)) {
-        if (num == 2) {
-            self->nicons++;
-            self->icons = g_new(ObClientIcon, self->nicons);
-            xerror_set_ignore(TRUE);
-            if (!RrPixmapToRGBA(ob_rr_inst,
-                                data[0], data[1],
-                                &self->icons[self->nicons-1].width,
-                                &self->icons[self->nicons-1].height,
-                                &self->icons[self->nicons-1].data)) {
-                g_free(&self->icons[self->nicons-1]);
-                self->nicons--;
-            }
-            xerror_set_ignore(FALSE);
-        }
-        g_free(data);
     } else {
         XWMHints *hints;
 

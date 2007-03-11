@@ -1110,11 +1110,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                  b == prop_atoms.wm_icon_name)) {
                 continue;
             }
-            if ((a == prop_atoms.net_wm_icon ||
-                 a == prop_atoms.kwm_win_icon)
-                &&
-                (b == prop_atoms.net_wm_icon ||
-                 b == prop_atoms.kwm_win_icon))
+            if (a == prop_atoms.net_wm_icon &&
+                b == prop_atoms.net_wm_icon)
                 continue;
 
             XPutBackEvent(ob_display, &ce);
@@ -1148,8 +1145,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.net_wm_strut) {
             client_update_strut(client);
         }
-        else if (msgtype == prop_atoms.net_wm_icon ||
-                 msgtype == prop_atoms.kwm_win_icon) {
+        else if (msgtype == prop_atoms.net_wm_icon) {
             client_update_icons(client);
         }
         else if (msgtype == prop_atoms.sm_client_id) {

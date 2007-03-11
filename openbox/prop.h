@@ -158,8 +158,6 @@ typedef struct Atoms {
     Atom kde_wm_change_state;
     Atom kde_net_wm_window_type_override;
 
-    Atom kwm_win_icon;
-
     Atom rootpmapid;
     Atom esetrootid;
 

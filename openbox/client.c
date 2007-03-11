@@ -68,6 +68,7 @@ static void client_get_startup_id(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
+static void client_get_layer(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_gravity(ObClient *self);
@@ -864,6 +865,7 @@ static void client_get_all(ObClient *self)
        work right (eg tsclient). */
     client_update_transient_for(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
+    client_get_state(self);
     client_update_transient_for(self);
 
     client_update_wmhints(self);
@@ -872,7 +874,8 @@ static void client_get_all(ObClient *self)
                                 desktop is not specified */
     client_get_shaped(self);
 
-    client_get_state(self);
+    client_get_layer(self); /* if layer hasn't been specified, get it from
+                               other sources if possible */
 
     {
         /* a couple type-based defaults for new windows */
@@ -965,6 +968,41 @@ static void client_get_desktop(ObClient *self)
     }
 }
 
+static void client_get_layer(ObClient *self)
+{
+    if (!(self->above || self->below)) {
+        if (self->group) {
+            /* apply stuff from the group */
+            GSList *it;
+            gint layer = -2;
+
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                ObClient *c = it->data;
+                if (c != self && !client_search_transient(self, c) &&
+                    client_normal(self) && client_normal(c))
+                {
+                    layer = MAX(layer,
+                                (c->above ? 1 : (c->below ? -1 : 0)));
+                }
+            }
+            switch (layer) {
+            case -1:
+                self->below = TRUE;
+                break;
+            case -2:
+            case 0:
+                break;
+            case 1:
+                self->above = TRUE;
+                break;
+            default:
+                g_assert_not_reached();
+                break;
+            }
+        }
+    }
+}
+
 static void client_get_state(ObClient *self)
 {
     guint32 *state;
@@ -1000,38 +1038,6 @@ static void client_get_state(ObClient *self)
         }
 
         g_free(state);
-    }
-
-    if (!(self->above || self->below)) {
-        if (self->group) {
-            /* apply stuff from the group */
-            GSList *it;
-            gint layer = -2;
-
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
-                if (c != self && !client_search_transient(self, c) &&
-                    client_normal(self) && client_normal(c))
-                {
-                    layer = MAX(layer,
-                                (c->above ? 1 : (c->below ? -1 : 0)));
-                }
-            }
-            switch (layer) {
-            case -1:
-                self->below = TRUE;
-                break;
-            case -2:
-            case 0:
-                break;
-            case 1:
-                self->above = TRUE;
-                break;
-            default:
-                g_assert_not_reached();
-                break;
-            }
-        }
     }
 }
 
@@ -1071,25 +1077,31 @@ void client_update_transient_for(ObClient *self)
                 target = NULL;
             }
 
-#if 0 
-/* we used to do this, but it violates the ICCCM and causes problems because
-   toolkits seem to set transient_for = root rather arbitrarily (eg kicker's
-   config dialogs), so it is being removed. the ewmh provides other ways to
-   make things transient for their group. -dana
-*/
+            /* THIS IS SO ANNOYING ! ! ! ! Let me explain.... have a seat..
+
+               Setting the transient_for to Root is actually illegal, however
+               applications from time have done this to specify transient for
+               their group.
+
+               Now you can do that by being a TYPE_DIALOG and not setting
+               the transient_for hint at all on your window. But people still
+               use Root, and Kwin is very strange in this regard.
+
+               KWin 3.0 will not consider windows with transient_for set to
+               Root as transient for their group *UNLESS* they are also modal.
+               In that case, it will make them transient for the group. This
+               leads to all sorts of weird behavior from KDE apps which are
+               only tested in KWin. I'd like to follow their behavior just to
+               make this work right with KDE stuff, but that seems wrong.
+            */
             if (!target && self->group) {
                 /* not transient to a client, see if it is transient for a
                    group */
-                if (t == self->group->leader ||
-                    t == None ||
-                    t == RootWindow(ob_display, ob_screen))
-                {
+                if (t == RootWindow(ob_display, ob_screen)) {
                     /* window is a transient for its group! */
                     target = OB_TRAN_GROUP;
                 }
             }
-#endif
-
         }
     } else if (self->type == OB_CLIENT_TYPE_DIALOG && self->group) {
         self->transient = TRUE;

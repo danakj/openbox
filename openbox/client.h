@@ -571,7 +571,11 @@ ObClient *client_search_focus_tree_full(ObClient *self);
 */
 ObClient *client_search_modal_child(ObClient *self);
 
-ObClient *client_search_top_transient(ObClient *self);
+/*! Returns a list of top-level windows which this is a transient for.
+  It will only contain more than 1 element if the client is transient for its
+  group.
+*/
+GSList *client_search_top_transients(ObClient *self);
 
 /*! Search for a parent of a client. This only searches up *ONE LEVEL*, and
   returns the searched for parent if it is a parent, or NULL if not. */

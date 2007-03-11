@@ -301,6 +301,8 @@ void client_manage(Window window)
     client_get_all(self);
     client_restore_session_state(self);
 
+    client_calc_layer(self);
+
     {
         Time t = sn_app_started(self->startup_id, self->class);
         if (t) self->user_time = t;
@@ -461,7 +463,8 @@ void client_manage(Window window)
         /* This is focus stealing prevention, if a user_time has been set */
         ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
                  self->window, self->user_time, client_last_user_time);
-        if (!self->user_time || self->user_time >= client_last_user_time)
+        if (!self->user_time || self->user_time >= client_last_user_time ||
+            client_search_focus_parent(self) != NULL)
         {
             /* since focus can change the stacking orders, if we focus the
                window then the standard raise it gets is not enough, we need
@@ -1901,8 +1904,6 @@ static void client_change_state(ObClient *self)
         netstate[num++] = prop_atoms.ob_wm_state_undecorated;
     PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
 
-    client_calc_layer(self);
-
     if (self->frame)
         frame_adjust_state(self->frame);
 }
@@ -1968,20 +1969,23 @@ static ObStackingLayer calc_layer(ObClient *self)
 }
 
 static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
-                                        ObStackingLayer l, gboolean raised)
+                                        ObStackingLayer min, gboolean raised)
 {
     ObStackingLayer old, own;
     GSList *it;
 
     old = self->layer;
     own = calc_layer(self);
-    self->layer = l > own ? l : own;
+    self->layer = MAX(own, min);
+
+    ob_debug("layer for %s: %d\n", self->title, self->layer);
 
     for (it = self->transients; it; it = g_slist_next(it))
         client_calc_layer_recursive(it->data, orig,
-                                    l, raised ? raised : l != old);
+                                    self->layer,
+                                    raised ? raised : self->layer != old);
 
-    if (!raised && l != old)
+    if (!raised && self->layer != old)
         if (orig->frame) { /* only restack if the original window is managed */
             stacking_remove(CLIENT_AS_WINDOW(self));
             stacking_add(CLIENT_AS_WINDOW(self));
@@ -1990,17 +1994,16 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
 
 void client_calc_layer(ObClient *self)
 {
-    ObStackingLayer l;
     ObClient *orig;
+    GSList *it;
 
     orig = self;
 
     /* transients take on the layer of their parents */
-    self = client_search_top_transient(self);
+    it = client_search_top_transients(self);
 
-    l = calc_layer(self);
-
-    client_calc_layer_recursive(self, orig, l, FALSE);
+    for (; it; it = g_slist_next(it))
+        client_calc_layer_recursive(it->data, orig, 0, FALSE);
 }
 
 gboolean client_should_show(ObClient *self)
@@ -2323,8 +2326,8 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
         self->fullscreen == fs) return;                   /* already done */
 
     self->fullscreen = fs;
-    client_change_state(self); /* change the state hints on the client,
-                                  and adjust out layer/stacking */
+    client_change_state(self); /* change the state hints on the client */
+    client_calc_layer(self);   /* and adjust out layer/stacking */
 
     if (fs) {
         if (savearea)
@@ -2427,11 +2430,13 @@ static void client_iconify_recursive(ObClient *self,
 
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
 {
-    /* move up the transient chain as far as possible first */
-    self = client_search_top_transient(self);
+    GSList *it;
 
-    client_iconify_recursive(client_search_top_transient(self),
-                             iconic, curdesk);
+    /* move up the transient chain as far as possible first */
+    it = client_search_top_transients(self);
+
+    for (; it; it = g_slist_next(it))
+    client_iconify_recursive(it->data, iconic, curdesk);
 }
 
 void client_maximize(ObClient *self, gboolean max, gint dir, gboolean savearea)
@@ -2631,8 +2636,12 @@ void client_set_desktop_recursive(ObClient *self,
 
 void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
-    client_set_desktop_recursive(client_search_top_transient(self),
-                                 target, donthide);
+    GSList *it;
+
+    it = client_search_top_transients(self);
+
+    for(; it; it = g_slist_next(it))
+        client_set_desktop_recursive(it->data, target, donthide);
 }
 
 ObClient *client_search_modal_child(ObClient *self)
@@ -2839,16 +2848,14 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     if (demands_attention != self->demands_attention)
         client_hilite(self, demands_attention);
 
-    client_calc_layer(self);
     client_change_state(self); /* change the hint to reflect these changes */
 }
 
 ObClient *client_focus_target(ObClient *self)
 {
-    ObClient *child;
-     
-    /* if we have a modal child, then focus it, not us */
-    child = client_search_modal_child(client_search_top_transient(self));
+    ObClient *child = NULL;
+
+    child = client_search_modal_child(self);
     if (child) return child;
     return self;
 }
@@ -3224,13 +3231,17 @@ guint client_monitor(ObClient *self)
     return most;
 }
 
-ObClient *client_search_top_transient(ObClient *self)
+GSList *client_search_top_transients(ObClient *self)
 {
-    /* move up the transient chain as far as possible */
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            return client_search_top_transient(self->transient_for);
-        } else {
+    GSList *ret = NULL;
+
+    /* move up the direct transient chain as far as possible */
+    while (self->transient_for && self->transient_for != OB_TRAN_GROUP)
+        self = self->transient_for;
+
+    if (!self->transient_for)
+        ret = g_slist_prepend(ret, self);
+    else {
             GSList *it;
 
             g_assert(self->group);
@@ -3238,16 +3249,15 @@ ObClient *client_search_top_transient(ObClient *self)
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
-                /* checking transient_for prevents infinate loops! */
-                if (c != self && !c->transient_for)
-                    break;
+                if (!c->transient_for)
+                    ret = g_slist_prepend(ret, c);
             }
-            if (it)
-                return it->data;
-        }
+
+            if (ret == NULL) /* no group parents */
+                ret = g_slist_prepend(ret, self);
     }
 
-    return self;
+    return ret;
 }
 
 ObClient *client_search_focus_parent(ObClient *self)

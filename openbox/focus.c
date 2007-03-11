@@ -260,11 +260,15 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
             if (!config_focus_follow || config_focus_last)
                 trans = TRUE;
             else {
-                if ((target = client_under_pointer()) &&
-                    client_search_transient
-                    (client_search_top_transient(target), old))
-                {
-                    trans = TRUE;
+                if ((target = client_under_pointer())) {
+                    GSList *sit;
+
+                    sit = client_search_top_transients(target);
+                    for (; sit; sit = g_slist_next(sit))
+                        if (client_search_transient(sit->data, old)) {
+                            trans = TRUE;
+                            break;
+                        }
                 }
             }
 

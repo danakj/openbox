@@ -465,7 +465,7 @@ void screen_set_desktop(guint num)
 
     event_ignore_queued_enters();
 
-    focus_hilite = focus_fallback_target(OB_FOCUS_FALLBACK_NOFOCUS);
+    focus_hilite = focus_fallback_target(OB_FOCUS_FALLBACK_NOFOCUS, NULL);
     if (focus_hilite) {
         frame_adjust_focus(focus_hilite->frame, TRUE);
 

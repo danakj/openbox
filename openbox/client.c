@@ -469,9 +469,7 @@ void client_manage(Window window)
            always
         */
         if (!focus_client || client_search_focus_parent(self) != NULL)
-        {
             activate = TRUE;
-        }
         else
         {
             /* If time stamp is old, don't steal focus */
@@ -481,9 +479,7 @@ void client_manage(Window window)
                I stole this idea from KWin. It seems nice.
              */
             if (!focus_client->can_focus && focus_client->focus_notify)
-            {
                 activate = FALSE;
-            }
         }
 
         if (activate)

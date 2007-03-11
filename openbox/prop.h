@@ -92,6 +92,8 @@ typedef struct Atoms {
     Atom net_wm_icon;
 /*  Atom net_wm_pid; */
     Atom net_wm_allowed_actions;
+    Atom net_frame_extents;
+
     /* application protocols */
 /*  Atom   Atom net_wm_ping; */
 
@@ -153,7 +155,6 @@ typedef struct Atoms {
 
     /* Extra atoms */
 
-    Atom kde_net_wm_frame_strut;
     Atom kde_wm_change_state;
     Atom kde_net_wm_window_type_override;
 

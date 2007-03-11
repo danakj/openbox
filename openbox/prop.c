@@ -84,6 +84,7 @@ void prop_startup()
     CREATE(net_wm_icon, "_NET_WM_ICON");
 /*   CREATE(net_wm_pid, "_NET_WM_PID"); */
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");
+    CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
 
 /*   CREATE(net_wm_ping, "_NET_WM_PING"); */
   
@@ -142,7 +143,6 @@ void prop_startup()
     prop_atoms.net_wm_bottomright = 2;
     prop_atoms.net_wm_bottomleft = 3;
 
-    CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(kde_wm_change_state, "_KDE_WM_CHANGE_STATE");
     CREATE(kde_net_wm_window_type_override,"_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 

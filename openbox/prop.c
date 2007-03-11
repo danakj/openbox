@@ -52,6 +52,8 @@ void prop_startup()
 
     CREATE(sm_client_id, "SM_CLIENT_ID");
 
+    CREATE(net_wm_full_placement, "_NET_WM_FULL_PLACEMENT");
+
     CREATE(net_supported, "_NET_SUPPORTED");
     CREATE(net_client_list, "_NET_CLIENT_LIST");
     CREATE(net_client_list_stacking, "_NET_CLIENT_LIST_STACKING");
@@ -109,6 +111,7 @@ void prop_startup()
     prop_atoms.net_wm_moveresize_move = 8;
     prop_atoms.net_wm_moveresize_size_keyboard = 9;
     prop_atoms.net_wm_moveresize_move_keyboard = 10;
+    prop_atoms.net_wm_moveresize_cancel = 11;
 
     CREATE(net_wm_action_move, "_NET_WM_ACTION_MOVE");
     CREATE(net_wm_action_resize, "_NET_WM_ACTION_RESIZE");

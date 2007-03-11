@@ -204,9 +204,10 @@ gboolean screen_annex()
                window, screen_support_win);
 
     /* set the _NET_SUPPORTED_ATOMS hint */
-    num_support = 54;
+    num_support = 55;
     i = 0;
     supported = g_new(gulong, num_support);
+    supported[i++] = prop_atoms.net_wm_full_placement;
     supported[i++] = prop_atoms.net_current_desktop;
     supported[i++] = prop_atoms.net_number_of_desktops;
     supported[i++] = prop_atoms.net_desktop_geometry;

@@ -56,7 +56,9 @@ typedef struct Atoms {
     Atom sm_client_id;
 
     /* NETWM atoms */
-     
+
+    Atom net_wm_full_placement;
+
     /* root window properties */
     Atom net_supported;
     Atom net_client_list;
@@ -118,6 +120,7 @@ typedef struct Atoms {
     Atom net_wm_moveresize_move;
     Atom net_wm_moveresize_size_keyboard;
     Atom net_wm_moveresize_move_keyboard;
+    Atom net_wm_moveresize_cancel;
 
     Atom net_wm_action_move;
     Atom net_wm_action_resize;

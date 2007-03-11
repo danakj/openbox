@@ -1009,7 +1009,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                              e->xclient.data.l[0] == 2),
                             e->xclient.data.l[1]);
         } else if (msgtype == prop_atoms.net_wm_moveresize) {
-            ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
+            ob_debug("net_wm_moveresize for 0x%lx direction %d\n",
+                     client->window, e->xclient.data.l[2]);
             if ((Atom)e->xclient.data.l[2] ==
                 prop_atoms.net_wm_moveresize_size_topleft ||
                 (Atom)e->xclient.data.l[2] ==
@@ -1039,6 +1040,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                  e->xclient.data.l[1], e->xclient.data.l[3],
                                  e->xclient.data.l[2]);
             }
+            else if ((Atom)e->xclient.data.l[2] ==
+                     prop_atoms.net_wm_moveresize_cancel)
+                moveresize_end(TRUE);
         } else if (msgtype == prop_atoms.net_moveresize_window) {
             gint oldg = client->gravity;
             gint tmpg, x, y, w, h;

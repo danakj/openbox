@@ -486,8 +486,7 @@ void client_unfocus(ObClient *self);
               otherwise, it means an application requested it on its own
   @param timestamp The time at which the activate was requested.
 */
-void client_activate(ObClient *self, gboolean here, gboolean user,
-                     Time timestamp);
+void client_activate(ObClient *self, gboolean here, gboolean user, Time time);
 
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);

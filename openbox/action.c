@@ -929,6 +929,15 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     act->data.execute.path = parse_expand_tilde(s);
                     g_free(s);
                 }
+                if ((n = parse_find_node("startupnotify", node->xmlChildrenNode))) {
+                    xmlNodePtr m;
+                    if ((m = parse_find_node("enabled", n->xmlChildrenNode)))
+                        act->data.execute.startupnotify = parse_bool(doc, m);
+                    if ((m = parse_find_node("name", n->xmlChildrenNode)))
+                        act->data.execute.name = parse_string(doc, m);
+                    if ((m = parse_find_node("icon", n->xmlChildrenNode)))
+                        act->data.execute.icon_name = parse_string(doc, m);
+                }
             } else if (act->func == action_showmenu) {
                 if ((n = parse_find_node("menu", node->xmlChildrenNode)))
                     act->data.showmenu.name = parse_string(doc, n);
@@ -1095,11 +1104,13 @@ void action_execute(union ActionData *data)
                 g_warning("failed to execute '%s': %s",
                           cmd, e->message);
                 g_error_free(e);
-            } else {
+            } else if (data->execute.startupnotify) {
                 gchar **env, *program;
                 
                 program = g_path_get_basename(argv[0]);
                 env = sn_get_spawn_environment(program,
+                                               data->execute.name,
+                                               data->execute.icon_name,
                                                data->execute.any.time);
                 if (!g_spawn_async(NULL, argv, env, G_SPAWN_SEARCH_PATH |
                                    G_SPAWN_DO_NOT_REAP_CHILD,
@@ -1111,6 +1122,16 @@ void action_execute(union ActionData *data)
                 }
                 g_strfreev(env);
                 g_free(program);
+                g_strfreev(argv);
+            } else {
+                if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
+                                   G_SPAWN_DO_NOT_REAP_CHILD,
+                                   NULL, NULL, NULL, &e))
+                {
+                    g_warning("failed to execute '%s': %s",
+                              cmd, e->message);
+                    g_error_free(e);
+                }
                 g_strfreev(argv);
             }
             g_free(cmd);

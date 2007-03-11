@@ -32,7 +32,8 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
     return CurrentTime;
 }
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
-gchar **sn_get_spawn_environment(char *program, Time time)
+gchar **sn_get_spawn_environment(char *program, char *name,
+                                 char *icon_name, Time time)
 {
     return g_strdupv(environ);
 }
@@ -225,7 +226,8 @@ static gboolean sn_launch_wait_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-gchar **sn_get_spawn_environment(char *program, Time time)
+gchar **sn_get_spawn_environment(char *program, char *name,
+                                 char *icon_name, Time time)
 {
     gchar **env, *desc;
     guint len;
@@ -238,9 +240,9 @@ gchar **sn_get_spawn_environment(char *program, Time time)
         sn_launcher = sn_launcher_context_new(sn_display, ob_screen);
     }
 
-    sn_launcher_context_set_name(sn_launcher, program);
+    sn_launcher_context_set_name(sn_launcher, name ? name : program);
     sn_launcher_context_set_description(sn_launcher, desc);
-    sn_launcher_context_set_icon_name(sn_launcher, program);
+    sn_launcher_context_set_icon_name(sn_launcher, icon_name ? icon_name : program);
     sn_launcher_context_set_binary_name(sn_launcher, program);
     sn_launcher_context_initiate(sn_launcher, "openbox", program, time);
     id = sn_launcher_context_get_startup_id(sn_launcher);

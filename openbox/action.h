@@ -72,6 +72,9 @@ struct DirectionalAction{
 struct Execute {
     struct AnyAction any;
     gchar *path;
+    gboolean startupnotify;
+    gchar *name;
+    gchar *icon_name;
 };
 
 struct ClientAction {

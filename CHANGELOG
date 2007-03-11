@@ -1,18 +1,22 @@
 3.4:
   * Fixed several bugs, including the hanging of X when time is set backwards.
+  * Support windows with 32-bit visuals, this means xcompmgr and friends
+    works with openbox.
+  * Using pango is now mandatory.
+  * Better support for startup notification and added support for focus
+    stealing prevention. For apps you launch from Openbox you can add
+    <startupnotify><enabled>yes</enabled></startupnotify> to your action
+    tags.
   * Add MoveFromEdge* actions corresponding to MoveToEdge* but aligns far
     edges instead of near edges, so if you have two overlapping windows you
     can easily put them side by side.
   * (xinerama) Make all placement strategies place windows on the screen with
     the mouse pointer, not just UnderMouse.
-  * Changed theme format to xml, use the included themetoxml program to convert
+! * Changed theme format to xml, use the included themetoxml program to convert
     themes to the new format.
   * Fonts are now configured in rc.xml, not the theme.
-  * Using pango is now mandatory.
   * You can now call `openbox --reconfigure' to have openbox reread config
     files instead of using killall -USR2 openbox.
-  * Support windows with 32-bit visuals, this means xcompmgr and friends
-    works with openbox.
 
 3.3.1:
   * Fix panels getting a border with keepBorder turned on.

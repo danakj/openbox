@@ -78,11 +78,7 @@ static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 static gboolean menu_hide_delay_func(gpointer data);
 
-/* The most recent time at which an event with a timestamp occured. */
-static Time event_lasttime = 0;
-/* The time for the current event being processed
-   (it's the event_lasttime for events without times, if this is a bug then
-   use CurrentTime instead, but it seems ok) */
+/* The time for the current event being processed */
 Time event_curtime = CurrentTime;
 
 /*! The value of the mask for the NumLock modifier */
@@ -216,9 +212,9 @@ static Window event_get_window(XEvent *e)
     return window;
 }
 
-static void event_set_lasttime(XEvent *e)
+static void event_set_curtime(XEvent *e)
 {
-    Time t = 0;
+    Time t = CurrentTime;
 
     /* grab the lasttime and hack up the state */
     switch (e->type) {
@@ -248,14 +244,7 @@ static void event_set_lasttime(XEvent *e)
         break;
     }
 
-    if (t > event_lasttime) {
-        event_lasttime = t;
-        event_curtime = event_lasttime;
-    } else if (t == 0) {
-        event_curtime = event_lasttime;
-    } else {
-        event_curtime = t;
-    }
+    event_curtime = t;
 }
 
 #define STRIP_MODS(s) \
@@ -455,7 +444,7 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    event_set_lasttime(e);
+    event_set_curtime(e);
     event_hack_mods(e);
     if (event_ignore(e, client)) {
         if (ed)
@@ -532,6 +521,9 @@ static void event_process(const XEvent *ec, gpointer data)
             }
         }
     }
+    /* if something happens and it's not from an XEvent, then we don't know
+       the time */
+    event_curtime = CurrentTime;
 }
 
 static void event_handle_root(XEvent *e)

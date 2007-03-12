@@ -47,10 +47,13 @@ static void self_update(ObMenuFrame *frame, gpointer data)
     for (desktop = 0; desktop < screen_num_desktops; desktop++) {
         gboolean empty = TRUE;
 
-        menu_add_separator(menu, -1);
+        /* Don't need a separator at the very top */
+        if (desktop > 0)
+            menu_add_separator(menu, -1);
         e = menu_add_normal(menu, -1, NULL, NULL);
         e->data.normal.enabled = FALSE;
         e->data.normal.label = g_strdup(screen_desktop_names[desktop]);
+        /* The one at the bottom will always have entries below it though */
         menu_add_separator(menu, -1);
         for (it = focus_order[desktop], i = 0; it; it = g_list_next(it), ++i) {
             ObClient *c = it->data;

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.0\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-02-28 12:50-0500\n"
+"POT-Creation-Date: 2007-03-12 19:19-0400\n"
 "PO-Revision-Date: 2003-11-20 15:00+0900\n"
 "Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_menu.c:187
+#: openbox/client_list_menu.c:188
 msgid "Desktops"
 msgstr "デスクトップ"
 
@@ -103,21 +103,7 @@ msgstr "--sm-client-id には引数が必要です\n"
 msgid "--sm-save-file requires an argument\n"
 msgstr "--sm-save-file には引数が必要です\n"
 
-#: openbox/session.c:160
+#: openbox/session.c:168
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "ディレクトリ'%s'を作れません: %s"
-
-#: render/font.c:58
-msgid "Couldn't initialize Xft."
-msgstr ""
-
-#: render/font.c:193 render/font.c:198
-#, c-format
-msgid "Unable to load font: %s\n"
-msgstr ""
-
-#: render/font.c:194
-#, c-format
-msgid "Trying fallback font: %s\n"
-msgstr ""

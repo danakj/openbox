@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-02-28 12:50-0500\n"
+"POT-Creation-Date: 2007-03-12 19:19-0400\n"
 "PO-Revision-Date: 2005-03-15 21:29+0200\n"
 "Last-Translator: Pauli Virtanen <pauli.virtanen@hut.fi>\n"
 "Language-Team: Finnish <fi@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 msgid "Go there..."
 msgstr "Näytä tämä..."
 
-#: openbox/client_list_menu.c:187
+#: openbox/client_list_menu.c:188
 msgid "Desktops"
 msgstr "Työtilat"
 
@@ -103,21 +103,16 @@ msgstr "--sm-client-id tarvitsee parametrin\n"
 msgid "--sm-save-file requires an argument\n"
 msgstr "--sm-save-file tarvitsee parametrin\n"
 
-#: openbox/session.c:160
+#: openbox/session.c:168
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
 
-#: render/font.c:58
-msgid "Couldn't initialize Xft."
-msgstr "Xft:n käynnistys epäonnistui."
+#~ msgid "Couldn't initialize Xft."
+#~ msgstr "Xft:n käynnistys epäonnistui."
 
-#: render/font.c:193 render/font.c:198
-#, c-format
-msgid "Unable to load font: %s\n"
-msgstr "Kirjasinlajin lataaminen epäonnistui: %s\n"
+#~ msgid "Unable to load font: %s\n"
+#~ msgstr "Kirjasinlajin lataaminen epäonnistui: %s\n"
 
-#: render/font.c:194
-#, c-format
-msgid "Trying fallback font: %s\n"
-msgstr "Kokeillaan varakirjasinlajia: %s\n"
+#~ msgid "Trying fallback font: %s\n"
+#~ msgstr "Kokeillaan varakirjasinlajia: %s\n"

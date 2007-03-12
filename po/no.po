@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-02-28 12:50-0500\n"
+"POT-Creation-Date: 2007-03-12 19:19-0400\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Øyvind Albrigtsen\n"
 "Language-Team: None\n"
@@ -19,7 +19,7 @@ msgstr ""
 msgid "Go there..."
 msgstr "Gå dit"
 
-#: openbox/client_list_menu.c:187
+#: openbox/client_list_menu.c:188
 msgid "Desktops"
 msgstr "Skrivebord"
 
@@ -103,21 +103,16 @@ msgstr "--sm-client-id krever et argument\n"
 msgid "--sm-save-file requires an argument\n"
 msgstr "--sm-save-file krever et argument\n"
 
-#: openbox/session.c:160
+#: openbox/session.c:168
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Kunde ikke lage katalogen '%s': %s"
 
-#: render/font.c:58
-msgid "Couldn't initialize Xft."
-msgstr "Kunde ikke initialisere Xft."
+#~ msgid "Couldn't initialize Xft."
+#~ msgstr "Kunde ikke initialisere Xft."
 
-#: render/font.c:193 render/font.c:198
-#, c-format
-msgid "Unable to load font: %s\n"
-msgstr "Kunde ikke laste fonten \"%s\"\n"
+#~ msgid "Unable to load font: %s\n"
+#~ msgstr "Kunde ikke laste fonten \"%s\"\n"
 
-#: render/font.c:194
-#, c-format
-msgid "Trying fallback font: %s\n"
-msgstr "Prøver med reservefonten: %s\n"
+#~ msgid "Trying fallback font: %s\n"
+#~ msgstr "Prøver med reservefonten: %s\n"

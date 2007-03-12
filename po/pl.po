@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.2\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-02-28 12:50-0500\n"
+"POT-Creation-Date: 2007-03-12 19:19-0400\n"
 "PO-Revision-Date: 2004-09-07 21:17+0200\n"
 "Last-Translator: Madej <madej@afn.no-ip.org>\n"
 "Language-Team: NONE\n"
@@ -19,7 +19,7 @@ msgstr ""
 msgid "Go there..."
 msgstr "Przejdź..."
 
-#: openbox/client_list_menu.c:187
+#: openbox/client_list_menu.c:188
 msgid "Desktops"
 msgstr "Pulpit"
 
@@ -103,21 +103,16 @@ msgstr "--sm-client-id wymaga argumentu\n"
 msgid "--sm-save-file requires an argument\n"
 msgstr "--sm-save-file wymaga argumentu\n"
 
-#: openbox/session.c:160
+#: openbox/session.c:168
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Nie mogę utworzyć katalogu '%s': %s"
 
-#: render/font.c:58
-msgid "Couldn't initialize Xft."
-msgstr "Błąd przy inicjalizacji Xft."
+#~ msgid "Couldn't initialize Xft."
+#~ msgstr "Błąd przy inicjalizacji Xft."
 
-#: render/font.c:193 render/font.c:198
-#, c-format
-msgid "Unable to load font: %s\n"
-msgstr "Nie mogę załadować czcionki: %s\n"
+#~ msgid "Unable to load font: %s\n"
+#~ msgstr "Nie mogę załadować czcionki: %s\n"
 
-#: render/font.c:194
-#, c-format
-msgid "Trying fallback font: %s\n"
-msgstr "Próbuję użyć czcionki: %s\n"
+#~ msgid "Trying fallback font: %s\n"
+#~ msgstr "Próbuję użyć czcionki: %s\n"

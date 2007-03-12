@@ -2426,6 +2426,10 @@ static void client_iconify_recursive(ObClient *self,
                    bottom'. */
                 focus_order_to_top(self);
 
+                /* Fall back focus since we're disappearing */
+                if (focus_client == self)
+                    client_unfocus(self);
+
                 changed = TRUE;
             }
         } else {
@@ -2992,8 +2996,9 @@ gboolean client_focus(ObClient *self)
     return TRUE;
 }
 
-/* Used when the current client is closed, focus_last will then prevent
- * focus from going to the mouse pointer */
+/* Used when the current client is closed or otherwise hidden, focus_last will
+   then prevent focus from going to the mouse pointer
+*/
 void client_unfocus(ObClient *self)
 {
     if (focus_client == self) {

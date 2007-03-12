@@ -664,7 +664,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
             /* There is no FocusIn, move focus where we can still hear events*/
-            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+            focus_set_client(NULL);
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             break;

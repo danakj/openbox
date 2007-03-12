@@ -433,7 +433,7 @@ static void event_process(const XEvent *ec, gpointer data)
             }
         }
 
-#if 1 /* focus debugging stuff */
+#if 0 /* focus debugging stuff */
     if (e->type == FocusIn || e->type == FocusOut) {
         gint mode = e->xfocus.mode;
         gint detail = e->xfocus.detail;
@@ -664,7 +664,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
             /* There is no FocusIn, move focus where we can still hear events*/
-            focus_set_client(NULL);
+            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             break;
@@ -674,8 +674,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             event_process(&ce, &ed);
             if (ed.ignored) {
                 /* The FocusIn was ignored, this means it was on a window
-                   that isn't a client? How did this happen? */
-                g_assert_not_reached();
+                   that isn't a client. */
+                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
             }
         }
 

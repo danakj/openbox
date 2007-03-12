@@ -2937,6 +2937,9 @@ gboolean client_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
+    if (!client_validate(self))
+        return FALSE;
+
     if (!client_can_focus(self)) {
         if (!self->frame->visible) {
             /* update the focus lists */

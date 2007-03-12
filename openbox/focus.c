@@ -223,8 +223,12 @@ static ObClient *find_transient_recursive(ObClient *c, ObClient *top,
     for (it = c->transients; it; it = g_slist_next(it)) {
         if (it->data == top) return NULL;
         ret = find_transient_recursive(it->data, top, skip);
-        if (ret && ret != skip && client_normal(ret)) return ret;
-        if (it->data != skip && client_normal(it->data)) return it->data;
+        if (ret && ret != skip && client_normal(ret) &&
+            client_can_focus(ret) && client_validate(ret))
+            return ret;
+        if (it->data != skip && client_normal(it->data) &&
+            client_can_focus(it->data) && client_validate(it->data))
+            return it->data;
     }
     return NULL;
 }
@@ -301,7 +305,8 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         (type == OB_FOCUS_FALLBACK_UNFOCUSING || !config_focus_last))
     {
         if ((target = client_under_pointer()))
-            if (client_normal(target) && client_can_focus(target)) {
+            if (client_normal(target) && client_can_focus(target) &&
+                client_validate(target)) {
                 ob_debug("found in pointer stuff\n");
                 return target;
             }
@@ -324,7 +329,9 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
     ob_debug("trying  the focus order\n");
     for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
-            if (client_normal(it->data) && client_can_focus(it->data)) {
+            if (client_normal(it->data) && client_can_focus(it->data) &&
+                client_validate(it->data))
+            {
                 ob_debug("found in focus order\n");
                 return it->data;
             }

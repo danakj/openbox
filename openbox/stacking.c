@@ -242,8 +242,10 @@ static void restack_windows(ObClient *selected, gboolean raise)
     last = NULL;
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it))
     {
-        if (window_layer(it->data) < selected->layer)
+        if (window_layer(it->data) < selected->layer) {
+            last = it;
             continue;
+        }
         /* if lowering, stop at the beginning of the layer */
         if (!raise)
             break;

@@ -36,6 +36,7 @@ ObMenu *combined_menu;
 static void self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
+    ObMenuEntry *e;
     GList *it;
     gint i;
     gboolean icons = FALSE;
@@ -44,13 +45,21 @@ static void self_update(ObMenuFrame *frame, gpointer data)
     menu_clear_entries(menu);
 
     for (desktop = 0; desktop < screen_num_desktops; desktop++) {
+        gboolean empty = TRUE;
+
+        menu_add_separator(menu, -1);
+        e = menu_add_normal(menu, -1, NULL, NULL);
+        e->data.normal.enabled = FALSE;
+        e->data.normal.label = g_strdup(screen_desktop_names[desktop]);
+        menu_add_separator(menu, -1);
         for (it = focus_order[desktop], i = 0; it; it = g_list_next(it), ++i) {
             ObClient *c = it->data;
             if (client_normal(c) && (!c->skip_taskbar || c->iconic)) {
                 GSList *acts = NULL;
                 ObAction* act;
-                ObMenuEntry *e;
                 const ObClientIcon *icon;
+
+                empty = FALSE;
 
                 if (!icons && c->iconic) {
                     icons = TRUE;
@@ -76,9 +85,22 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                 }
             }
         }
-        menu_add_separator(menu, -1);
-        menu_add_separator(menu, -1);
         icons = FALSE;
+
+        if (empty) {
+            /* no entries */
+
+            GSList *acts = NULL;
+            ObAction* act;
+            ObMenuEntry *e;
+
+            act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
+            act->data.desktop.desk = desktop;
+            acts = g_slist_append(acts, act);
+            e = menu_add_normal(menu, 0, _("Go there..."), acts);
+            if (desktop == screen_desktop)
+                e->data.normal.enabled = FALSE;
+        }
     }
 }
 
@@ -103,7 +125,9 @@ static void client_dest(ObClient *client, gpointer data)
     GList *eit;
     for (eit = combined_menu->entries; eit; eit = g_list_next(eit)) {
         ObMenuEntry *meit = eit->data;
-        if (meit->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+        if (meit->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+            meit->data.normal.actions)
+        {
             ObAction *a = meit->data.normal.actions->data;
             ObClient *c = a->data.any.c;
             if (c == client)

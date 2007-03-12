@@ -472,7 +472,9 @@ ObClient *client_focus_target(ObClient *self);
   without focusing it or modifying the focus order lists. */
 gboolean client_can_focus(ObClient *self);
 
-/*! Attempt to focus the client window */
+/*! Attempt to focus the client window
+  NOTE: You should validate the client before calling this !! (client_validate)
+*/
 gboolean client_focus(ObClient *self);
 
 /*! Remove focus from the client window */

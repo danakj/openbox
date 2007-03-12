@@ -894,7 +894,7 @@ void screen_show_desktop(gboolean show)
         /* focus desktop */
         for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
             if (((ObClient*)it->data)->type == OB_CLIENT_TYPE_DESKTOP &&
-                client_focus(it->data))
+                client_validate(it->data) && client_focus(it->data))
                 break;
     } else {
         focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);

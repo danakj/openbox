@@ -433,7 +433,7 @@ static void event_process(const XEvent *ec, gpointer data)
             }
         }
 
-#if 0 /* focus debugging stuff */
+#if 1 /* focus debugging stuff */
     if (e->type == FocusIn || e->type == FocusOut) {
         gint mode = e->xfocus.mode;
         gint detail = e->xfocus.detail;
@@ -1287,9 +1287,11 @@ static gboolean focus_delay_func(gpointer data)
     ObClient *c = data;
 
     if (focus_client != c) {
-        client_focus(c);
-        if (config_focus_raise)
-            client_raise(c);
+        if (client_validate(c)) {
+            client_focus(c);
+            if (config_focus_raise)
+                client_raise(c);
+        }
     }
     return FALSE; /* no repeat */
 }

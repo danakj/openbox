@@ -197,7 +197,9 @@ static void restack_windows(ObClient *selected, gboolean raise)
     stacking_list = g_list_delete_link(stacking_list, it);
 
     /* go from the bottom of the stacking list up */
-    for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
+    for (it = g_list_last(stacking_list); it; it = next) {
+        next = g_list_previous(it);
+
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *ch = it->data;
 

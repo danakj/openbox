@@ -256,18 +256,10 @@ ObClient* focus_fallback_target(ObFocusFallbackType type, ObClient *old)
 
             if (!config_focus_follow || config_focus_last)
                 trans = TRUE;
-            else {
-                if ((target = client_under_pointer())) {
-                    GSList *sit;
-
-                    sit = client_search_top_transients(target);
-                    for (; sit; sit = g_slist_next(sit))
-                        if (client_search_transient(sit->data, old)) {
-                            trans = TRUE;
-                            break;
-                        }
-                }
-            }
+            else if ((target = client_under_pointer()) &&
+                     (client_search_transient
+                      (client_search_top_parent(target), old)))
+                trans = TRUE;
 
             /* try for transient relations */
             if (trans) {
@@ -283,24 +275,33 @@ ObClient* focus_fallback_target(ObFocusFallbackType type, ObClient *old)
                             if (sit->data == it->data)
                                 if ((target =
                                      focus_fallback_transient(sit->data, old)))
+                                {
+                                    ob_debug("found in transient #1\n");
                                     return target;
+                                }
                         }
                     }
                 } else {
                     if ((target =
                          focus_fallback_transient(old->transient_for, old)))
+                    {
+                        ob_debug("found in transient #2\n");
                         return target;
+                    }
                 }
             }
         }
     }
 
+    ob_debug("trying pointer stuff\n");
     if (config_focus_follow &&
         (type == OB_FOCUS_FALLBACK_UNFOCUSING || !config_focus_last))
     {
         if ((target = client_under_pointer()))
-            if (client_normal(target) && client_can_focus(target))
+            if (client_normal(target) && client_can_focus(target)) {
+                ob_debug("found in pointer stuff\n");
                 return target;
+            }
     }
 
 #if 0
@@ -317,10 +318,13 @@ ObClient* focus_fallback_target(ObFocusFallbackType type, ObClient *old)
         }
 #endif
 
+    ob_debug("trying  the focus order\n");
     for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
-            if (client_normal(it->data) && client_can_focus(it->data))
+            if (client_normal(it->data) && client_can_focus(it->data)) {
+                ob_debug("found in focus order\n");
                 return it->data;
+            }
 
     /* XXX fallback to the "desktop window" if one exists ?
        could store it while going through all the windows in the loop right

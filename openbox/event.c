@@ -452,6 +452,7 @@ static void event_process(const XEvent *ec, gpointer data)
             ob_debug("UNKNOWN FOCUS %s (d %d, m %d) window 0x%x\n",
                      (e->type == FocusIn ? "IN" : "OUT"),
                      detail, mode, window);
+    }
 #endif
 
     event_set_lasttime(e);
@@ -523,10 +524,11 @@ static void event_process(const XEvent *ec, gpointer data)
                 if (e->type == ButtonPress || e->type == ButtonRelease ||
                     e->type == MotionNotify)
                     mouse_event(client, e);
-                else if (e->type == KeyPress)
+                else if (e->type == KeyPress) {
                     keyboard_event((focus_cycle_target ? focus_cycle_target :
                                     (focus_hilite ? focus_hilite : client)),
                                    e);
+                }
             }
         }
     }
@@ -678,6 +680,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 
         /* This client is no longer focused, so show that */
+        focus_hilite = NULL;
         frame_adjust_focus(client->frame, FALSE);
         client_calc_layer(client);
         break;

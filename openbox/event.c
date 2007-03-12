@@ -78,14 +78,6 @@ static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 static gboolean menu_hide_delay_func(gpointer data);
 
-#define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
-                            (e)->xfocus.detail == NotifyAncestor || \
-                            (e)->xfocus.detail > NotifyNonlinearVirtual)
-#define INVALID_FOCUSOUT(e) ((e)->xfocus.mode == NotifyGrab || \
-                             (e)->xfocus.detail == NotifyInferior || \
-                             (e)->xfocus.detail == NotifyAncestor || \
-                             (e)->xfocus.detail > NotifyNonlinearVirtual)
-
 /* The most recent time at which an event with a timestamp occured. */
 static Time event_lasttime = 0;
 /* The time for the current event being processed
@@ -327,6 +319,62 @@ static void event_hack_mods(XEvent *e)
     }
 }
 
+static gboolean wanted_focusevent(XEvent *e)
+{
+    gint mode = e->xfocus.mode;
+    gint detail = e->xfocus.detail;
+
+    if (e->type == FocusIn) {
+
+        /* These are ones we never want.. */
+
+        /* This means focus was given by a keyboard/mouse grab. */
+        if (mode == NotifyGrab)
+            return FALSE;
+        /* This means focus was given back from a keyboard/mouse grab. */
+        if (mode == NotifyUngrab)
+            return FALSE;
+
+        /* These are the ones we want.. */
+
+        /* This means focus moved from the root window to a client */
+        if (detail == NotifyVirtual)
+            return TRUE;
+        /* This means focus moved from one client to another */
+        if (detail == NotifyNonlinearVirtual)
+            return TRUE;
+
+        /* Otherwise.. */
+        return FALSE;
+    } else {
+        g_assert(e->type == FocusOut);
+
+
+        /* These are ones we never want.. */
+
+        /* This means focus was taken by a keyboard/mouse grab. */
+        if (mode == NotifyGrab)
+            return FALSE;
+
+        /* These are the ones we want.. */
+
+        /* This means focus moved from a client to the root window */
+        if (detail == NotifyVirtual)
+            return TRUE;
+        /* This means focus moved from one client to another */
+        if (detail == NotifyNonlinearVirtual)
+            return TRUE;
+
+        /* Otherwise.. */
+        return FALSE;
+    }
+}
+
+static Bool look_for_focusin(Display *d, XEvent *e, XPointer arg)
+{
+    return e->type == FocusIn && wanted_focusevent(e);
+}
+
 static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
@@ -336,122 +384,13 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             return TRUE;
         break;
     case FocusIn:
-        /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
-           because of RevertToPointerRoot. If the focus ends up reverting to
-           pointer root on a workspace change, then the FocusIn event that we
-           want will be of type NotifyAncestor. This situation does not occur
-           for FocusOut, so it is safely ignored there.
-        */
-        if (INVALID_FOCUSIN(e) ||
-            client == NULL) {
-#ifdef DEBUG_FOCUS
-            ob_debug("FocusIn on %lx mode %d detail %d IGNORED\n",
-                     e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
-#endif
-            /* says a client was not found for the event (or a valid FocusIn
-               event was not found.
-            */
-            e->xfocus.window = None;
-            return TRUE;
-        }
-
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusIn on %lx mode %d detail %d\n", e->xfocus.window,
-                 e->xfocus.mode, e->xfocus.detail);
-#endif
-        break;
     case FocusOut:
-        if (INVALID_FOCUSOUT(e)) {
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusOut on %lx mode %d detail %d IGNORED\n",
-                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
-#endif
+        /* I don't think this should ever happen with our event masks, but
+           if it does, we don't want it. */
+        if (client == NULL)
             return TRUE;
-        }
-
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusOut on %lx mode %d detail %d\n",
-                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
-#endif
-        {
-            XEvent fe;
-            gboolean fallback = TRUE;
-
-            while (TRUE) {
-                if (!XCheckTypedWindowEvent(ob_display, e->xfocus.window,
-                                            FocusOut, &fe))
-                    if (!XCheckTypedEvent(ob_display, FocusIn, &fe))
-                        break;
-                if (fe.type == FocusOut) {
-#ifdef DEBUG_FOCUS
-                    ob_debug("found pending FocusOut\n");
-#endif
-                    if (!INVALID_FOCUSOUT(&fe)) {
-                        /* if there is a VALID FocusOut still coming, don't
-                           fallback focus yet, we'll deal with it then */
-                        XPutBackEvent(ob_display, &fe);
-                        fallback = FALSE;
-                        break;
-                    }
-                } else {
-#ifdef DEBUG_FOCUS
-                    ob_debug("found pending FocusIn\n");
-#endif
-                    /* is the focused window getting a FocusOut/In back to
-                       itself?
-                    */
-                    if (fe.xfocus.window == e->xfocus.window &&
-                        !event_ignore(&fe, client)) {
-                        /*
-                          if focus_client is not set, then we can't do
-                          this. we need the FocusIn. This happens in the
-                          case when the set_focus_client(NULL) in the
-                          focus_fallback function fires and then
-                          focus_fallback picks the currently focused
-                          window (such as on a SendToDesktop-esque action.
-                        */
-                        if (focus_client) {
-#ifdef DEBUG_FOCUS
-                            ob_debug("focused window got an Out/In back to "
-                                     "itself IGNORED both\n");
-#endif
-                            return TRUE;
-                        } else {
-                            event_process(&fe, NULL);
-#ifdef DEBUG_FOCUS
-                            ob_debug("focused window got an Out/In back to "
-                                     "itself but focus_client was null "
-                                     "IGNORED just the Out\n");
-#endif
-                            return TRUE;
-                        }
-                    }
-
-                    {
-                        ObEventData d;
-
-                        /* once all the FocusOut's have been dealt with, if
-                           there is a FocusIn still left and it is valid, then
-                           use it */
-                        event_process(&fe, &d);
-                        if (!d.ignored) {
-#ifdef DEBUG_FOCUS
-                            ob_debug("FocusIn was OK, so don't fallback\n");
-#endif
-                            fallback = FALSE;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (fallback) {
-#ifdef DEBUG_FOCUS
-                ob_debug("no valid FocusIn and no FocusOut events found, "
-                         "falling back\n");
-#endif
-                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
-            }
-        }
+        if (!wanted_focusevent(e))
+            return TRUE;
         break;
     }
     return FALSE;
@@ -493,6 +432,27 @@ static void event_process(const XEvent *ec, gpointer data)
                 break;
             }
         }
+
+#if 0 /* focus debugging stuff */
+    if (e->type == FocusIn || e->type == FocusOut) {
+        gint mode = e->xfocus.mode;
+        gint detail = e->xfocus.detail;
+        Window window = e->xfocus.window;
+        if (detail == NotifyVirtual) {
+            ob_debug("FOCUS %s NOTIFY VIRTUAL window 0x%x\n",
+                     (e->type == FocusIn ? "IN" : "OUT"), window);
+        }
+
+        else if (detail == NotifyNonlinearVirtual) {
+            ob_debug("FOCUS %s NOTIFY NONLINVIRTUAL window 0x%x\n",
+                     (e->type == FocusIn ? "IN" : "OUT"), window);
+        }
+
+        else
+            ob_debug("UNKNOWN FOCUS %s (d %d, m %d) window 0x%x\n",
+                     (e->type == FocusIn ? "IN" : "OUT"),
+                     detail, mode, window);
+#endif
 
     event_set_lasttime(e);
     event_hack_mods(e);
@@ -692,11 +652,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case FocusIn:
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusIn on client for %lx (client %lx) mode %d detail %d\n",
-                 e->xfocus.window, client->window,
-                 e->xfocus.mode, e->xfocus.detail);
-#endif
         if (client != focus_client) {
             focus_set_client(client);
             frame_adjust_focus(client->frame, TRUE);
@@ -704,12 +659,25 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case FocusOut:
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusOut on client for %lx (client %lx) mode %d detail %d\n",
-                 e->xfocus.window, client->window,
-                 e->xfocus.mode, e->xfocus.detail);
-#endif
-        focus_hilite = NULL;
+        /* Look for the followup FocusIn */
+        if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
+            /* There is no FocusIn, move focus where we can still hear events*/
+            focus_set_client(NULL);
+        } else if (ce.xany.window == e->xany.window) {
+            /* If focus didn't actually move anywhere, there is nothing to do*/
+            break;
+        } else {
+            /* Focus did move, so process the FocusIn event */
+            ObEventData ed;
+            event_process(&ce, &ed);
+            if (ed.ignored) {
+                /* The FocusIn was ignored, this means it was on a window
+                   that isn't a client? How did this happen? */
+                g_assert_not_reached();
+            }
+        }
+
+        /* This client is no longer focused, so show that */
         frame_adjust_focus(client->frame, FALSE);
         client_calc_layer(client);
         break;

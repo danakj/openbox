@@ -2,7 +2,7 @@
 
    frame.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@
 #include "moveresize.h"
 #include "render/theme.h"
 
-#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
+#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask | \
+                         FocusChangeMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask | \
                          VisibilityChangeMask)

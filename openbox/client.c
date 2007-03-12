@@ -45,8 +45,7 @@
 #include <X11/Xutil.h>
 
 /*! The event mask to grab on client windows */
-#define CLIENT_EVENTMASK (PropertyChangeMask | FocusChangeMask | \
-                          StructureNotifyMask)
+#define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
                                 ButtonMotionMask)
@@ -555,7 +554,8 @@ void client_unmanage(ObClient *self)
     guint j;
     GSList *it;
 
-    ob_debug("Unmanaging window: %lx (%s)\n", self->window, self->class);
+    ob_debug("Unmanaging window: %lx (%s) (%s)\n", self->window, self->class,
+             self->title ? self->title : "");
 
     g_assert(self != NULL);
 
@@ -2613,6 +2613,9 @@ void client_kill(ObClient *self)
 
 void client_hilite(ObClient *self, gboolean hilite)
 {
+    if (self->demands_attention == hilite)
+        return; /* no change */
+
     /* don't allow focused windows to hilite */
     self->demands_attention = hilite && !client_focused(self);
     if (self->demands_attention)
@@ -2941,6 +2944,8 @@ gboolean client_focus(ObClient *self)
         }
         return FALSE;
     }
+
+    ob_debug("Focusing client \"%s\" at time %u\n", self->title, event_curtime);
 
     if (self->can_focus) {
         /* RevertToPointerRoot causes much more headache than RevertToNone, so

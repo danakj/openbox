@@ -1004,8 +1004,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        act->func == action_raiselower ||
                        act->func == action_shadelower ||
                        act->func == action_unshaderaise) {
-                if ((n = parse_find_node("group", node->xmlChildrenNode)))
-                    act->data.stacking.group = parse_bool(doc, n);
             }
             INTERACTIVE_LIMIT(act, uact);
         }
@@ -1221,7 +1219,7 @@ void action_raiselower(union ActionData *data)
 void action_raise(union ActionData *data)
 {
     client_action_start(data);
-    stacking_raise(CLIENT_AS_WINDOW(data->client.any.c), data->stacking.group);
+    stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
     client_action_end(data);
 }
 
@@ -1244,7 +1242,7 @@ void action_shadelower(union ActionData *data)
 void action_lower(union ActionData *data)
 {
     client_action_start(data);
-    stacking_lower(CLIENT_AS_WINDOW(data->client.any.c), data->stacking.group);
+    stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
     client_action_end(data);
 }
 

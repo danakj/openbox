@@ -145,7 +145,6 @@ struct CycleWindows {
 
 struct Stacking {
     struct AnyAction any;
-    gboolean group;
 };
 
 union ActionData {

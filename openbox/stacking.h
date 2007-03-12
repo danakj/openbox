@@ -48,10 +48,10 @@ void stacking_add_nonintrusive(ObWindow *win);
 #define stacking_remove(win) stacking_list = g_list_remove(stacking_list, win);
 
 /*! Raises a window above all others in its stacking layer */
-void stacking_raise(ObWindow *window, gboolean group);
+void stacking_raise(ObWindow *window);
 
 /*! Lowers a window below all others in its stacking layer */
-void stacking_lower(ObWindow *window, gboolean group);
+void stacking_lower(ObWindow *window);
 
 /*! Moves a window below another if its in the same layer.
   This function does not enforce stacking rules IRT transients n such, and so

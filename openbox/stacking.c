@@ -158,7 +158,7 @@ static void do_lower(GList *wins)
     }
 }
 
-static void restack_windows(ObClient *selected, gboolean raise, gboolean group)
+static void restack_windows(ObClient *selected, gboolean raise)
 {
     GList *it, *last, *below, *above, *next;
     GList *wins = NULL;
@@ -187,7 +187,7 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean group)
 
         /* call restack for each of these to lower them */
         for (top_it = top_reorder; top_it; top_it = g_slist_next(top_it))
-            restack_windows(top_it->data, raise, group);
+            restack_windows(top_it->data, raise);
         return;
     }
 
@@ -306,12 +306,12 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean group)
     g_list_free(wins);
 }
 
-void stacking_raise(ObWindow *window, gboolean group)
+void stacking_raise(ObWindow *window)
 {
     if (WINDOW_IS_CLIENT(window)) {
         ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
-        restack_windows(selected, TRUE, group);
+        restack_windows(selected, TRUE);
     } else {
         GList *wins;
         wins = g_list_append(NULL, window);
@@ -321,12 +321,12 @@ void stacking_raise(ObWindow *window, gboolean group)
     }
 }
 
-void stacking_lower(ObWindow *window, gboolean group)
+void stacking_lower(ObWindow *window)
 {
     if (WINDOW_IS_CLIENT(window)) {
         ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
-        restack_windows(selected, FALSE, group);
+        restack_windows(selected, FALSE);
     } else {
         GList *wins;
         wins = g_list_append(NULL, window);
@@ -356,7 +356,7 @@ void stacking_add(ObWindow *win)
                                              future */
 
     stacking_list = g_list_append(stacking_list, win);
-    stacking_raise(win, FALSE);
+    stacking_raise(win);
 }
 
 void stacking_add_nonintrusive(ObWindow *win)

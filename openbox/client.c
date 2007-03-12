@@ -1117,9 +1117,15 @@ void client_update_transient_for(ObClient *self)
                 }
             }
         }
-    } else if (self->type == OB_CLIENT_TYPE_DIALOG && self->group) {
-        self->transient = TRUE;
-        target = OB_TRAN_GROUP;
+    } else if (self->group) {
+        if (self->type == OB_CLIENT_TYPE_DIALOG ||
+            self->type == OB_CLIENT_TYPE_TOOLBAR ||
+            self->type == OB_CLIENT_TYPE_MENU ||
+            self->type == OB_CLIENT_TYPE_UTILITY)
+        {
+            self->transient = TRUE;
+            target = OB_TRAN_GROUP;
+        }
     } else
         self->transient = FALSE;
 
@@ -2024,7 +2030,7 @@ void client_calc_layer(ObClient *self)
     orig = self;
 
     /* transients take on the layer of their parents */
-    it = client_search_top_transients(self);
+    it = client_search_all_top_parents(self);
 
     for (; it; it = g_slist_next(it))
         client_calc_layer_recursive(it->data, orig, 0, FALSE);
@@ -2449,21 +2455,18 @@ static void client_iconify_recursive(ObClient *self,
             screen_update_areas();
     }
 
-    /* iconify all transients */
+    /* iconify all direct transients */
     for (it = self->transients; it; it = g_slist_next(it))
-        if (it->data != self) client_iconify_recursive(it->data,
-                                                       iconic, curdesk);
+        if (it->data != self)
+            if (client_is_direct_child(self, it->data))
+                client_iconify_recursive(it->data, iconic, curdesk);
 }
 
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
 {
-    GSList *it;
-
     /* move up the transient chain as far as possible first */
-    it = client_search_top_transients(self);
-
-    for (; it; it = g_slist_next(it))
-    client_iconify_recursive(it->data, iconic, curdesk);
+    self = client_search_top_parent(self);
+    client_iconify_recursive(self, iconic, curdesk);
 }
 
 void client_maximize(ObClient *self, gboolean max, gint dir, gboolean savearea)
@@ -2657,18 +2660,23 @@ void client_set_desktop_recursive(ObClient *self,
 
     /* move all transients */
     for (it = self->transients; it; it = g_slist_next(it))
-        if (it->data != self) client_set_desktop_recursive(it->data,
-                                                           target, donthide);
+        if (it->data != self)
+            if (client_is_direct_child(self, it->data))
+                client_set_desktop_recursive(it->data, target, donthide);
 }
 
 void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
-    GSList *it;
+    self = client_search_top_parent(self);
+    client_set_desktop_recursive(self, target, donthide);
+}
 
-    it = client_search_top_transients(self);
-
-    for(; it; it = g_slist_next(it))
-        client_set_desktop_recursive(it->data, target, donthide);
+gboolean client_is_direct_child(ObClient *parent, ObClient *child)
+{
+    while (child != parent &&
+           child->transient_for && child->transient_for != OB_TRAN_GROUP)
+        child = child->transient_for;
+    return child == parent;
 }
 
 ObClient *client_search_modal_child(ObClient *self)
@@ -3236,7 +3244,14 @@ guint client_monitor(ObClient *self)
     return screen_find_monitor(&self->frame->area);
 }
 
-GSList *client_search_top_transients(ObClient *self)
+ObClient *client_search_top_parent(ObClient *self)
+{
+    while (self->transient_for && self->transient_for != OB_TRAN_GROUP)
+        self = self->transient_for;
+    return self;
+}
+
+GSList *client_search_all_top_parents(ObClient *self)
 {
     GSList *ret = NULL;
 

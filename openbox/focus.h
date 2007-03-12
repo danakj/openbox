@@ -53,8 +53,7 @@ typedef enum {
     OB_FOCUS_FALLBACK_NOFOCUS     /*!< nothing has focus for some reason */
 } ObFocusFallbackType;
 
-struct _ObClient* focus_fallback_target(ObFocusFallbackType type,
-                                        struct _ObClient *old);
+struct _ObClient* focus_fallback_target(ObFocusFallbackType type);
 
 /*! Call this when you need to focus something! */
 void focus_fallback(ObFocusFallbackType type);

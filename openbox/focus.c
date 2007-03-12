@@ -244,10 +244,13 @@ static ObClient* focus_fallback_transient(ObClient *top, ObClient *old)
         return NULL;
 }
 
-ObClient* focus_fallback_target(ObFocusFallbackType type, ObClient *old)
+ObClient* focus_fallback_target(ObFocusFallbackType type)
 {
     GList *it;
+    ObClient *old;
     ObClient *target = NULL;
+
+    old = focus_client;
 
     if ((type == OB_FOCUS_FALLBACK_UNFOCUSING
          || type == OB_FOCUS_FALLBACK_CLOSED) && old) {
@@ -257,8 +260,8 @@ ObClient* focus_fallback_target(ObFocusFallbackType type, ObClient *old)
             if (!config_focus_follow || config_focus_last)
                 trans = TRUE;
             else if ((target = client_under_pointer()) &&
-                     (client_search_transient
-                      (client_search_top_parent(target), old)))
+                     client_search_transient
+                     (client_search_top_parent(target), old))
                 trans = TRUE;
 
             /* try for transient relations */
@@ -337,7 +340,6 @@ ObClient* focus_fallback_target(ObFocusFallbackType type, ObClient *old)
 void focus_fallback(ObFocusFallbackType type)
 {
     ObClient *new;
-    ObClient *old = focus_client;
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when I try focus them, I won't get a FocusIn event
@@ -345,7 +347,7 @@ void focus_fallback(ObFocusFallbackType type)
     */
     focus_set_client(NULL);
 
-    if ((new = focus_fallback_target(type, old)))
+    if ((new = focus_fallback_target(type)))
         client_focus(new);
 }
 

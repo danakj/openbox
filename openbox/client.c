@@ -71,9 +71,9 @@ static void client_get_layer(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_gravity(ObClient *self);
-static void client_showhide(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
+static void client_change_wm_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self, gint x, gint y);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
@@ -290,8 +290,6 @@ void client_manage(Window window)
        it can end up in the list twice! */
     focus_order_add_new(self);
 
-    client_change_state(self);
-
     /* remove the client's border (and adjust re gravity) */
     client_toggle_border(self, FALSE);
      
@@ -303,6 +301,10 @@ void client_manage(Window window)
     self->frame = frame_new(self);
 
     frame_grab_client(self->frame, self);
+
+    /* do this after we have a frame.. it uses the frame to help determine the
+       WM_STATE to apply. */
+    client_change_state(self);
 
     grab_server(FALSE);
 
@@ -1927,15 +1929,34 @@ void client_update_user_time(ObClient *self, gboolean new_event)
     }
 }
 
-static void client_change_state(ObClient *self)
+static void client_change_wm_state(ObClient *self)
 {
     gulong state[2];
+    glong old;
+
+    old = self->wmstate;
+
+    if (self->shaded || self->iconic || !self->frame->visible)
+        self->wmstate = IconicState;
+    else
+        self->wmstate = NormalState;
+
+    if (old != self->wmstate) {
+        PROP_MSG(self->window, kde_wm_change_state,
+                 self->wmstate, 1, 0, 0);
+
+        state[0] = self->wmstate;
+        state[1] = None;
+        PROP_SETA32(self->window, wm_state, wm_state, state, 2);
+    }
+}
+
+static void client_change_state(ObClient *self)
+{
     gulong netstate[11];
     guint num;
 
-    state[0] = self->wmstate;
-    state[1] = None;
-    PROP_SETA32(self->window, wm_state, wm_state, state, 2);
+    client_change_wm_state(self);
 
     num = 0;
     if (self->modal)
@@ -2093,13 +2114,21 @@ gboolean client_should_show(ObClient *self)
     return FALSE;
 }
 
-static void client_showhide(ObClient *self)
+void client_showhide(ObClient *self)
 {
 
-    if (client_should_show(self))
-        frame_show(self->frame);
-    else
+    if (client_should_show(self)) {
+        if (!self->frame->visible)
+            frame_show(self->frame);
+    }
+    else if (self->frame->visible)
         frame_hide(self->frame);
+
+    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
+       needs to be in IconicState. This includes when it is on another
+       desktop!
+    */
+    client_change_wm_state(self);
 }
 
 gboolean client_normal(ObClient *self) {
@@ -2471,14 +2500,6 @@ static void client_iconify_recursive(ObClient *self,
 
         if (iconic) {
             if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
-                glong old;
-
-                old = self->wmstate;
-                self->wmstate = IconicState;
-                if (old != self->wmstate)
-                    PROP_MSG(self->window, kde_wm_change_state,
-                             self->wmstate, 1, 0, 0);
-
                 /* update the focus lists.. iconic windows go to the bottom of
                    the list, put the new iconic window at the 'top of the
                    bottom'. */
@@ -2491,16 +2512,8 @@ static void client_iconify_recursive(ObClient *self,
                 changed = TRUE;
             }
         } else {
-            glong old;
-
             if (curdesk)
                 client_set_desktop(self, screen_desktop, FALSE);
-
-            old = self->wmstate;
-            self->wmstate = self->shaded ? IconicState : NormalState;
-            if (old != self->wmstate)
-                PROP_MSG(self->window, kde_wm_change_state,
-                         self->wmstate, 1, 0, 0);
 
             /* this puts it after the current focused window */
             focus_order_remove(self);
@@ -2616,17 +2629,6 @@ void client_shade(ObClient *self, gboolean shade)
     if ((!(self->functions & OB_CLIENT_FUNC_SHADE) &&
          shade) ||                         /* can't shade */
         self->shaded == shade) return;     /* already done */
-
-    /* when we're iconic, don't change the wmstate */
-    if (!self->iconic) {
-        glong old;
-
-        old = self->wmstate;
-        self->wmstate = shade ? IconicState : NormalState;
-        if (old != self->wmstate)
-            PROP_MSG(self->window, kde_wm_change_state,
-                     self->wmstate, 1, 0, 0);
-    }
 
     self->shaded = shade;
     client_change_state(self);

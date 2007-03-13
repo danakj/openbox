@@ -436,6 +436,11 @@ void client_kill(ObClient *self);
          desktop has been changed. Generally this should be FALSE. */
 void client_set_desktop(ObClient *self, guint target, gboolean donthide);
 
+/*! Show the client if it should be shown, and hide it if it should be
+  hidden. This is for example, when switching desktops.
+*/
+void client_showhide(ObClient *self);
+
 /*! Validate client, by making sure no Destroy or Unmap events exist in
   the event queue for the window.
   @return true if the client is valid; false if the client has already

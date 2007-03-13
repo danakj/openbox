@@ -449,8 +449,7 @@ void screen_set_desktop(guint num)
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (client_should_show(c))
-                frame_show(c->frame);
+            client_showhide(c);
         }
     }
 
@@ -458,8 +457,7 @@ void screen_set_desktop(guint num)
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (c->frame->visible && !client_should_show(c))
-                frame_hide(c->frame);
+            client_showhide(c);
         }
     }
 
@@ -875,8 +873,7 @@ void screen_show_desktop(gboolean show)
         for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
-                if (client->frame->visible && !client_should_show(client))
-                    frame_hide(client->frame);
+                client_showhide(client);
             }
         }
     } else {
@@ -884,8 +881,7 @@ void screen_show_desktop(gboolean show)
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
-                if (!client->frame->visible && client_should_show(client))
-                    frame_show(client->frame);
+                client_showhide(client);
             }
         }
     }

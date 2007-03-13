@@ -397,12 +397,8 @@ void client_move_onscreen(ObClient *self, gboolean rude);
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should
             be returned to normal state.
-  @param savearea true to have the client's current size and position saved;
-                  otherwise, they are not. You should not save when mapping a
-                  new window that is set to fullscreen. This has no effect
-                  when restoring a window from fullscreen.
 */
-void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea);
+void client_fullscreen(ObClient *self, gboolean fs);
 
 /*! Iconifies or uniconifies the client window
   @param iconic true if the window should be iconified; false if it should be
@@ -417,13 +413,8 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk);
   @param max true if the window should be maximized; false if it should be
              returned to normal size.
   @param dir 0 to set both horz and vert, 1 to set horz, 2 to set vert.
-  @param savearea true to have the client's current size and position saved;
-                  otherwise, they are not. You should not save when mapping a
-                  new window that is set to fullscreen. This has no effect
-                  when unmaximizing a window.
 */
-void client_maximize(ObClient *self, gboolean max, gint dir,
-                     gboolean savearea);
+void client_maximize(ObClient *self, gboolean max, gint dir);
 
 /*! Shades or unshades the client window
   @param shade true if the window should be shaded; false if it should be

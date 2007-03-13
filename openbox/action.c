@@ -1359,14 +1359,14 @@ void action_resize_relative(union ActionData *data)
 void action_maximize_full(union ActionData *data)
 {
     client_action_start(data);
-    client_maximize(data->client.any.c, TRUE, 0, TRUE);
+    client_maximize(data->client.any.c, TRUE, 0);
     client_action_end(data);
 }
 
 void action_unmaximize_full(union ActionData *data)
 {
     client_action_start(data);
-    client_maximize(data->client.any.c, FALSE, 0, TRUE);
+    client_maximize(data->client.any.c, FALSE, 0);
     client_action_end(data);
 }
 
@@ -1376,21 +1376,21 @@ void action_toggle_maximize_full(union ActionData *data)
     client_maximize(data->client.any.c,
                     !(data->client.any.c->max_horz ||
                       data->client.any.c->max_vert),
-                    0, TRUE);
+                    0);
     client_action_end(data);
 }
 
 void action_maximize_horz(union ActionData *data)
 {
     client_action_start(data);
-    client_maximize(data->client.any.c, TRUE, 1, TRUE);
+    client_maximize(data->client.any.c, TRUE, 1);
     client_action_end(data);
 }
 
 void action_unmaximize_horz(union ActionData *data)
 {
     client_action_start(data);
-    client_maximize(data->client.any.c, FALSE, 1, TRUE);
+    client_maximize(data->client.any.c, FALSE, 1);
     client_action_end(data);
 }
 
@@ -1398,21 +1398,21 @@ void action_toggle_maximize_horz(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c,
-                    !data->client.any.c->max_horz, 1, TRUE);
+                    !data->client.any.c->max_horz, 1);
     client_action_end(data);
 }
 
 void action_maximize_vert(union ActionData *data)
 {
     client_action_start(data);
-    client_maximize(data->client.any.c, TRUE, 2, TRUE);
+    client_maximize(data->client.any.c, TRUE, 2);
     client_action_end(data);
 }
 
 void action_unmaximize_vert(union ActionData *data)
 {
     client_action_start(data);
-    client_maximize(data->client.any.c, FALSE, 2, TRUE);
+    client_maximize(data->client.any.c, FALSE, 2);
     client_action_end(data);
 }
 
@@ -1420,15 +1420,14 @@ void action_toggle_maximize_vert(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c,
-                    !data->client.any.c->max_vert, 2, TRUE);
+                    !data->client.any.c->max_vert, 2);
     client_action_end(data);
 }
 
 void action_toggle_fullscreen(union ActionData *data)
 {
     client_action_start(data);
-    client_fullscreen(data->client.any.c,
-                      !(data->client.any.c->fullscreen), TRUE);
+    client_fullscreen(data->client.any.c, !(data->client.any.c->fullscreen));
     client_action_end(data);
 }
 

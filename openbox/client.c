@@ -74,9 +74,10 @@ static void client_get_gravity(ObClient *self);
 static void client_showhide(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
-static void client_apply_startup_state(ObClient *self);
+static void client_apply_startup_state(ObClient *self, gint x, gint y);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
+static ObAppSettings *client_get_settings_state(ObClient *self);
 
 void client_startup(gboolean reconfig)
 {
@@ -205,33 +206,6 @@ void client_manage_all()
     XFree(children);
 }
 
-static ObAppSettings *get_settings(ObClient *client)
-{
-    GSList *a = config_per_app_settings;
-
-    while (a) {
-        ObAppSettings *app = (ObAppSettings *) a->data;
-        
-        if (
-            (app->name && !app->class && !strcmp(app->name, client->name))
-            || (app->class && !app->name && !strcmp(app->class, client->class))
-            || (app->class && app->name && !strcmp(app->class, client->class)
-                && !strcmp(app->name, client->name))
-            ) {
-            ob_debug("Window matching: %s\n", app->name);
-            /* Match if no role was specified in the per app setting, or if the
-             * string matches the beginning of the role, since apps like to set
-             * the role to things like browser-window-23c4b2f */
-            if (!app->role
-                || !strncmp(app->role, client->role, strlen(app->role)))
-                return app;
-        }
-
-        a = a->next;
-    }
-    return NULL;
-}
-
 void client_manage(Window window)
 {
     ObClient *self;
@@ -241,6 +215,7 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
+    gint newx, newy;
 
     grab_server(TRUE);
 
@@ -300,6 +275,9 @@ void client_manage(Window window)
 
     client_get_all(self);
     client_restore_session_state(self);
+    /* per-app settings override stuff, and return the settings for other
+       uses too */
+    settings = client_get_settings_state(self);
 
     client_calc_layer(self);
 
@@ -328,56 +306,8 @@ void client_manage(Window window)
 
     grab_server(FALSE);
 
-    client_apply_startup_state(self);
-
-    /* get and set application level settings */
-    settings = get_settings(self);
-
     stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
     client_restore_session_stacking(self);
-
-    if (settings) {
-        /* Don't worry, we won't actually both shade and undecorate the
-         * window when push comes to shove. */
-        if (settings->shade != -1)
-            client_shade(self, !!settings->shade);
-        if (settings->decor != -1)
-            client_set_undecorated(self, !settings->decor);
-        if (settings->iconic != -1)
-            client_iconify(self, !!settings->iconic, FALSE);
-        if (settings->skip_pager != -1) {
-            self->skip_pager = !!settings->skip_pager;
-            client_change_state(self);
-        }
-        if (settings->skip_taskbar != -1) {
-            self->skip_taskbar = !!settings->skip_taskbar;
-            client_change_state(self);
-        }
-
-        /* 1 && -1 shouldn't be possible by the code in config.c */
-        if (settings->max_vert == 1 && settings->max_horz == 1)
-            client_maximize(self, TRUE, 0, TRUE);
-        else if (settings->max_vert == 0 && settings->max_horz == 0)
-            client_maximize(self, FALSE, 0, TRUE);
-        else if (settings->max_vert == 1 && settings->max_horz == 0) {
-            client_maximize(self, TRUE, 2, TRUE);
-            client_maximize(self, FALSE, 1, TRUE);
-        } else if (settings->max_vert == 0 && settings->max_horz == 1) {
-            client_maximize(self, TRUE, 1, TRUE);
-            client_maximize(self, FALSE, 2, TRUE);
-        }
-
-        if (settings->fullscreen != -1)
-            client_fullscreen(self, !!settings->fullscreen, TRUE);
-
-        if (settings->desktop < screen_num_desktops
-            || settings->desktop == DESKTOP_ALL)
-            client_set_desktop(self, settings->desktop, TRUE);
-
-        if (settings->layer > -2 && settings->layer < 2)
-            client_set_layer(self, settings->layer);
-
-    }
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
@@ -426,15 +356,18 @@ void client_manage(Window window)
 #endif
     }
 
+    /* get the current position */
+    newx = self->area.x;
+    newy = self->area.y;
+
+    /* figure out placement for the window */
     if (ob_state() == OB_STATE_RUNNING) {
-        gint x = self->area.x, ox = x;
-        gint y = self->area.y, oy = y;
         gboolean transient;
 
-        transient = place_client(self, &x, &y, settings);
+        transient = place_client(self, &newx, &newy, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &x, &y,
+        client_find_onscreen(self, &newx, &newy,
                              self->frame->area.width,
                              self->frame->area.height,
                              /* non-normal clients has less rules, and
@@ -452,9 +385,13 @@ void client_manage(Window window)
                                !(self->positioned & USPosition)) &&
                               client_normal(self) &&
                               !self->session));
-        if (x != ox || y != oy) 	 
-            client_move(self, x, y);
     }
+
+    /* do this after the window is placed, so the premax/prefullscreen numbers
+       won't be all wacko!!
+       also, this moves the window to the position where it has been placed
+    */
+    client_apply_startup_state(self, newx, newy);
 
     keyboard_grab_for_client(self, TRUE);
     mouse_grab_for_client(self, TRUE);
@@ -636,6 +573,27 @@ void client_unmanage(ObClient *self)
     /* reparent the window out of the frame, and free the frame */
     frame_release_client(self->frame, self);
     self->frame = NULL;
+
+    /* restore the window's original geometry so it is not lost */
+    if (self->fullscreen)
+        XMoveResizeWindow(ob_display, self->window,
+                          self->pre_fullscreen_area.x,
+                          self->pre_fullscreen_area.y,
+                          self->pre_fullscreen_area.width,
+                          self->pre_fullscreen_area.height);
+    else if (self->max_horz || self->max_vert) {
+        Rect a = self->area;
+        if (self->max_horz) {
+            a.x = self->pre_max_area.x;
+            a.width = self->pre_max_area.width;
+        }
+        if (self->max_vert) {
+            a.y = self->pre_max_area.y;
+            a.height = self->pre_max_area.height;
+        }
+        XMoveResizeWindow(ob_display, self->window,
+                          a.x, a.y, a.width, a.height);
+    }
      
     if (ob_state() != OB_STATE_EXITING) {
         /* these values should not be persisted across a window
@@ -671,6 +629,73 @@ void client_unmanage(ObClient *self)
 
     if (config_focus_last)
         grab_pointer(FALSE, OB_CURSOR_NONE);
+}
+
+static ObAppSettings *client_get_settings_state(ObClient *self)
+{
+    ObAppSettings *settings = NULL;
+    GSList *it;
+
+    for (it = config_per_app_settings; it; it = g_slist_next(it)) {
+        ObAppSettings *app;
+        
+        if ((app->name && !app->class && !strcmp(app->name, self->name))
+            || (app->class && !app->name && !strcmp(app->class, self->class))
+            || (app->class && app->name && !strcmp(app->class, self->class)
+                && !strcmp(app->name, self->name)))
+        {
+            ob_debug("Window matching: %s\n", app->name);
+            /* Match if no role was specified in the per app setting, or if the
+             * string matches the beginning of the role, since apps like to set
+             * the role to things like browser-window-23c4b2f */
+            if (!app->role
+                || !strncmp(app->role, self->role, strlen(app->role)))
+            {
+                /* use this one */
+                settings = app;
+                break;
+            }
+        }
+    }
+
+    if (settings) {
+        if (settings->shade != -1)
+            self->shaded = !!settings->shade;
+        if (settings->decor != -1)
+            self->undecorated = !settings->decor;
+        if (settings->iconic != -1)
+            self->iconic = !!settings->iconic;
+        if (settings->skip_pager != -1)
+            self->skip_pager = !!settings->skip_pager;
+        if (settings->skip_taskbar != -1)
+            self->skip_taskbar = !!settings->skip_taskbar;
+
+        if (settings->max_vert != -1)
+            self->max_vert = !!settings->max_vert;
+        if (settings->max_horz != -1)
+            self->max_vert = !!settings->max_horz;
+
+        if (settings->fullscreen != -1)
+            self->fullscreen = !!settings->fullscreen;
+
+        if (settings->desktop < screen_num_desktops
+            || settings->desktop == DESKTOP_ALL)
+            client_set_desktop(self, settings->desktop, TRUE);
+
+        if (settings->layer == -1) {
+            self->below = TRUE;
+            self->above = FALSE;
+        }
+        else if (settings->layer == 0) {
+            self->below = FALSE;
+            self->above = FALSE;
+        }
+        else if (settings->layer == 1) {
+            self->below = FALSE;
+            self->above = TRUE;
+        }
+    }
+    return settings;
 }
 
 static void client_restore_session_state(ObClient *self)
@@ -935,6 +960,9 @@ static void client_get_area(ObClient *self)
 
     RECT_SET(self->area, wattrib.x, wattrib.y, wattrib.width, wattrib.height);
     self->border_width = wattrib.border_width;
+
+    ob_debug("client area: %d %d  %d %d\n", wattrib.x, wattrib.y,
+             wattrib.width, wattrib.height);
 }
 
 static void client_get_desktop(ObClient *self)
@@ -1511,12 +1539,12 @@ static void client_change_allowed_actions(ObClient *self)
         else self->iconic = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
-        if (self->frame) client_fullscreen(self, FALSE, TRUE);
+        if (self->frame) client_fullscreen(self, FALSE);
         else self->fullscreen = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz ||
                                                          self->max_vert)) {
-        if (self->frame) client_maximize(self, FALSE, 0, TRUE);
+        if (self->frame) client_maximize(self, FALSE, 0);
         else self->max_vert = self->max_horz = FALSE;
     }
 }
@@ -2080,8 +2108,17 @@ gboolean client_normal(ObClient *self) {
               self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
-static void client_apply_startup_state(ObClient *self)
+static void client_apply_startup_state(ObClient *self, gint x, gint y)
 {
+    gboolean pos = FALSE; /* has the window's position been configured? */
+    gint ox, oy;
+
+    /* save the position, and set self->area for these to use */
+    ox = self->area.x;
+    oy = self->area.y;
+    self->area.x = x;
+    self->area.y = y;
+
     /* these are in a carefully crafted order.. */
 
     if (self->iconic) {
@@ -2090,7 +2127,8 @@ static void client_apply_startup_state(ObClient *self)
     }
     if (self->fullscreen) {
         self->fullscreen = FALSE;
-        client_fullscreen(self, TRUE, FALSE);
+        client_fullscreen(self, TRUE);
+        pos = TRUE;
     }
     if (self->undecorated) {
         self->undecorated = FALSE;
@@ -2107,13 +2145,24 @@ static void client_apply_startup_state(ObClient *self)
   
     if (self->max_vert && self->max_horz) {
         self->max_vert = self->max_horz = FALSE;
-        client_maximize(self, TRUE, 0, FALSE);
+        client_maximize(self, TRUE, 0);
+        pos = TRUE;
     } else if (self->max_vert) {
         self->max_vert = FALSE;
-        client_maximize(self, TRUE, 2, FALSE);
+        client_maximize(self, TRUE, 2);
+        pos = TRUE;
     } else if (self->max_horz) {
         self->max_horz = FALSE;
-        client_maximize(self, TRUE, 1, FALSE);
+        client_maximize(self, TRUE, 1);
+        pos = TRUE;
+    }
+
+    /* if the client didn't get positioned yet, then do so now */
+    if (!pos && (ox != x || oy != y)) {
+        /* use the saved position */
+        self->area.x = ox;
+        self->area.y = oy;
+        client_move(self, x, y);
     }
 
     /* nothing to do for the other states:
@@ -2351,7 +2400,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     XFlush(ob_display);
 }
 
-void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
+void client_fullscreen(ObClient *self, gboolean fs)
 {
     gint x, y, w, h;
 
@@ -2363,8 +2412,17 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
     client_calc_layer(self);   /* and adjust out layer/stacking */
 
     if (fs) {
-        if (savearea)
-            self->pre_fullscreen_area = self->area;
+        self->pre_fullscreen_area = self->area;
+        /* if the window is maximized, its area isn't all that meaningful.
+           save it's premax area instead. */
+        if (self->max_horz) {
+            self->pre_fullscreen_area.x = self->pre_max_area.x;
+            self->pre_fullscreen_area.width = self->pre_max_area.width;
+        }
+        if (self->max_vert) {
+            self->pre_fullscreen_area.y = self->pre_max_area.y;
+            self->pre_fullscreen_area.height = self->pre_max_area.height;
+        }
 
         /* these are not actually used cuz client_configure will set them
            as appropriate when the window is fullscreened */
@@ -2473,7 +2531,7 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
     client_iconify_recursive(self, iconic, curdesk);
 }
 
-void client_maximize(ObClient *self, gboolean max, gint dir, gboolean savearea)
+void client_maximize(ObClient *self, gboolean max, gint dir)
 {
     gint x, y, w, h;
      
@@ -2499,17 +2557,15 @@ void client_maximize(ObClient *self, gboolean max, gint dir, gboolean savearea)
     h = self->area.height;
 
     if (max) {
-        if (savearea) {
-            if ((dir == 0 || dir == 1) && !self->max_horz) { /* horz */
-                RECT_SET(self->pre_max_area,
-                         self->area.x, self->pre_max_area.y,
-                         self->area.width, self->pre_max_area.height);
-            }
-            if ((dir == 0 || dir == 2) && !self->max_vert) { /* vert */
-                RECT_SET(self->pre_max_area,
-                         self->pre_max_area.x, self->area.y,
-                         self->pre_max_area.width, self->area.height);
-            }
+        if ((dir == 0 || dir == 1) && !self->max_horz) { /* horz */
+            RECT_SET(self->pre_max_area,
+                     self->area.x, self->pre_max_area.y,
+                     self->area.width, self->pre_max_area.height);
+        }
+        if ((dir == 0 || dir == 2) && !self->max_vert) { /* vert */
+            RECT_SET(self->pre_max_area,
+                     self->pre_max_area.x, self->area.y,
+                     self->pre_max_area.width, self->area.height);
         }
     } else {
         Rect *a;
@@ -2857,23 +2913,23 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         if (max_horz != self->max_horz && max_vert != self->max_vert) {
             /* toggling both */
             if (max_horz == max_vert) { /* both going the same way */
-                client_maximize(self, max_horz, 0, TRUE);
+                client_maximize(self, max_horz, 0);
             } else {
-                client_maximize(self, max_horz, 1, TRUE);
-                client_maximize(self, max_vert, 2, TRUE);
+                client_maximize(self, max_horz, 1);
+                client_maximize(self, max_vert, 2);
             }
         } else {
             /* toggling one */
             if (max_horz != self->max_horz)
-                client_maximize(self, max_horz, 1, TRUE);
+                client_maximize(self, max_horz, 1);
             else
-                client_maximize(self, max_vert, 2, TRUE);
+                client_maximize(self, max_vert, 2);
         }
     }
     /* change fullscreen state before shading, as it will affect if the window
        can shade or not */
     if (fullscreen != self->fullscreen)
-        client_fullscreen(self, fullscreen, TRUE);
+        client_fullscreen(self, fullscreen);
     if (shaded != self->shaded)
         client_shade(self, shaded);
     if (undecorated != self->undecorated)

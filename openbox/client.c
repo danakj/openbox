@@ -2121,8 +2121,13 @@ void client_showhide(ObClient *self)
         if (!self->frame->visible)
             frame_show(self->frame);
     }
-    else if (self->frame->visible)
+    else if (self->frame->visible) {
         frame_hide(self->frame);
+
+        /* Fall back focus since we're disappearing */
+        if (focus_client == self)
+            client_unfocus(self);
+    }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
        needs to be in IconicState. This includes when it is on another
@@ -2504,10 +2509,6 @@ static void client_iconify_recursive(ObClient *self,
                    the list, put the new iconic window at the 'top of the
                    bottom'. */
                 focus_order_to_top(self);
-
-                /* Fall back focus since we're disappearing */
-                if (focus_client == self)
-                    client_unfocus(self);
 
                 changed = TRUE;
             }

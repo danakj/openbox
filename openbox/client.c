@@ -639,7 +639,7 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
     GSList *it;
 
     for (it = config_per_app_settings; it; it = g_slist_next(it)) {
-        ObAppSettings *app;
+        ObAppSettings *app = it->data;
         
         if ((app->name && !app->class && !strcmp(app->name, self->name))
             || (app->class && !app->name && !strcmp(app->class, self->class))

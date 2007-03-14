@@ -55,9 +55,11 @@ static void self_update(ObMenuFrame *frame, gpointer data)
         e->data.normal.label = g_strdup(screen_desktop_names[desktop]);
         /* The one at the bottom will always have entries below it though */
         menu_add_separator(menu, -1);
-        for (it = focus_order[desktop], i = 0; it; it = g_list_next(it), ++i) {
+        for (it = focus_order, i = 0; it; it = g_list_next(it), ++i) {
             ObClient *c = it->data;
-            if (client_normal(c) && (!c->skip_taskbar || c->iconic)) {
+            if (client_normal(c) && (!c->skip_taskbar || c->iconic) &&
+                (c->desktop == desktop || c->desktop == DESKTOP_ALL))
+            {
                 GSList *acts = NULL;
                 ObAction* act;
                 const ObClientIcon *icon;

@@ -297,11 +297,9 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
         if (type == SMART_FULL || type == SMART_FOCUSED) {
             gboolean found_foc = FALSE, stop = FALSE;
             ObClient *foc;
-            GList *list;
 
-            list = focus_order[client->desktop == DESKTOP_ALL ?
-                               screen_desktop : client->desktop];
-            foc = list ? list->data : NULL;
+            foc = focus_order_find_first(client->desktop == DESKTOP_ALL ?
+                                         screen_desktop : client->desktop);
 
             for (; it && !stop; it = g_list_next(it)) {
                 ObClient *c;

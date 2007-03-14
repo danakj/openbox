@@ -41,7 +41,7 @@ extern struct _ObClient *focus_hilite;
 extern struct _ObClient *focus_cycle_target;
 
 /*! The recent focus order on each desktop */
-extern GList **focus_order;
+extern GList *focus_order;
 
 void focus_startup(gboolean reconfig);
 void focus_shutdown(gboolean reconfig);
@@ -76,5 +76,7 @@ void focus_order_to_top(struct _ObClient *c);
 /*! Move a client to the bottom of the focus order (keeps iconic windows at the
   very bottom always though). */
 void focus_order_to_bottom(struct _ObClient *c);
+
+struct _ObClient *focus_order_find_first(guint desktop);
 
 #endif

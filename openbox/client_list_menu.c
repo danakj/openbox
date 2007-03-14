@@ -49,9 +49,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 
     menu_clear_entries(menu);
 
-    for (it = focus_order[d->desktop], i = 0; it; it = g_list_next(it), ++i) {
+    for (it = focus_order, i = 0; it; it = g_list_next(it), ++i) {
         ObClient *c = it->data;
-        if (client_normal(c) && (!c->skip_taskbar || c->iconic)) {
+        if (client_normal(c) && (!c->skip_taskbar || c->iconic) &&
+            (c->desktop == d->desktop || c->desktop == DESKTOP_ALL))
+        {
             GSList *acts = NULL;
             ObAction* act;
             ObMenuEntry *e;

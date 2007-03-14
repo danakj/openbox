@@ -38,8 +38,7 @@
 #include <assert.h>
 
 ObClient *focus_client, *focus_hilite;
-GList **focus_order; /* these lists are created when screen_startup
-                        sets the number of desktops */
+GList *focus_order;
 ObClient *focus_cycle_target;
 
 struct {
@@ -129,16 +128,10 @@ void focus_startup(gboolean reconfig)
 
 void focus_shutdown(gboolean reconfig)
 {
-    guint i;
-
     icon_popup_free(focus_cycle_popup);
 
     if (!reconfig) {
         client_remove_destructor(focus_cycle_destructor);
-
-        for (i = 0; i < screen_num_desktops; ++i)
-            g_list_free(focus_order[i]);
-        g_free(focus_order);
 
         /* reset focus to root */
         XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
@@ -156,12 +149,8 @@ void focus_shutdown(gboolean reconfig)
 
 static void push_to_top(ObClient *client)
 {
-    guint desktop;
-
-    desktop = client->desktop;
-    if (desktop == DESKTOP_ALL) desktop = screen_desktop;
-    focus_order[desktop] = g_list_remove(focus_order[desktop], client);
-    focus_order[desktop] = g_list_prepend(focus_order[desktop], client);
+    focus_order = g_list_remove(focus_order, client);
+    focus_order = g_list_prepend(focus_order, client);
 }
 
 void focus_set_client(ObClient *client)
@@ -212,87 +201,11 @@ void focus_set_client(ObClient *client)
     }
 }
 
-/* finds the first transient that isn't 'skip' and ensure's that client_normal
- is true for it */
-static ObClient *find_transient_recursive(ObClient *c, ObClient *top,
-                                          ObClient *skip)
-{
-    GSList *it;
-    ObClient *ret;
-
-    for (it = c->transients; it; it = g_slist_next(it)) {
-        if (it->data == top) return NULL;
-        ret = find_transient_recursive(it->data, top, skip);
-        if (ret && ret != skip && client_normal(ret) &&
-            client_can_focus(ret) && client_validate(ret))
-            return ret;
-        if (it->data != skip && client_normal(it->data) &&
-            client_can_focus(it->data) && client_validate(it->data))
-            return it->data;
-    }
-    return NULL;
-}
-
-static ObClient* focus_fallback_transient(ObClient *top, ObClient *old)
-{
-    ObClient *target = find_transient_recursive(top, top, old);
-    if (!target) {
-        /* make sure client_normal is true always */
-        if (!client_normal(top))
-            return NULL;
-        target = top; /* no transient, keep the top */
-    }
-    if (client_can_focus(target))
-        return target;
-    else
-        return NULL;
-}
-
 ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 {
     GList *it;
     ObClient *target = NULL;
-
-    if (!allow_refocus && old && old->transient_for) {
-        gboolean trans = FALSE;
-
-        if (!config_focus_follow || config_focus_last)
-            trans = TRUE;
-        else if ((target = client_under_pointer()) &&
-                 client_search_transient
-                 (client_search_top_parent(target), old))
-            trans = TRUE;
-
-        /* try for transient relations */
-        if (trans) {
-            if (old->transient_for == OB_TRAN_GROUP) {
-                for (it = focus_order[screen_desktop]; it;
-                     it = g_list_next(it))
-                {
-                    GSList *sit;
-
-                    for (sit = old->group->members; sit;
-                         sit = g_slist_next(sit))
-                    {
-                        if (sit->data == it->data)
-                            if ((target =
-                                 focus_fallback_transient(sit->data, old)))
-                            {
-                                ob_debug("found in transient #1\n");
-                                return target;
-                            }
-                    }
-                }
-            } else {
-                if ((target =
-                     focus_fallback_transient(old->transient_for, old)))
-                {
-                    ob_debug("found in transient #2\n");
-                    return target;
-                }
-            }
-        }
-    }
+    ObClient *desktop = NULL;
 
     ob_debug("trying pointer stuff\n");
     if (config_focus_follow && !config_focus_last)
@@ -321,21 +234,34 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 #endif
 
     ob_debug("trying  the focus order\n");
-    for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
-        if (allow_refocus || it->data != old)
-            if (client_normal(it->data) && client_can_focus(it->data) &&
-                client_validate(it->data))
+    for (it = focus_order; it; it = g_list_next(it))
+        if (allow_refocus || it->data != old) {
+            ObClient *c = it->data;
+            /* fallback focus to a window if:
+               1. it is actually focusable, cuz if it's not then we're sending
+               focus off to nothing
+               2. it is validated. if the window is about to disappear, then
+               don't try focus it.
+               3. it is visible on the screen right now.
+               4. it is a normal type window, don't fall back onto a dock or
+               a splashscreen or a desktop window (save the desktop as a
+               backup fallback though)
+            */
+            if (client_can_focus(c) && client_validate(c) &&
+                client_should_show(c))
             {
-                ob_debug("found in focus order\n");
-                return it->data;
+                if (client_normal(c)) {
+                    ob_debug("found in focus order\n");
+                    return it->data;
+                } else if (c->type == OB_CLIENT_TYPE_DESKTOP && !desktop)
+                    desktop = c;
             }
+        }
 
-    /* XXX fallback to the "desktop window" if one exists ?
-       could store it while going through all the windows in the loop right
-       above this..
+    /* as a last resort fallback to the desktop window if there is one.
+       (if there's more than one, then the one last focused.)
     */
-
-    return NULL;
+    return desktop;   
 }
 
 void focus_fallback(gboolean allow_refocus)
@@ -579,15 +505,15 @@ void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
         } else if (done)
             goto done_cycle;
 
-        if (!focus_order[screen_desktop])
+        if (!focus_order)
             goto done_cycle;
 
         if (!first) first = focus_client;
 
         if (linear) list = client_list;
-        else        list = focus_order[screen_desktop];
+        else        list = focus_order;
     } else {
-        if (!focus_order[screen_desktop])
+        if (!focus_order)
             goto done_cycle;
         list = client_list;
     }
@@ -657,7 +583,7 @@ void focus_directional_cycle(ObDirection dir, gboolean interactive,
     } else if (done)
         goto done_cycle;
 
-    if (!focus_order[screen_desktop])
+    if (!focus_order)
         goto done_cycle;
 
     if (!first) first = focus_client;
@@ -668,7 +594,7 @@ void focus_directional_cycle(ObDirection dir, gboolean interactive,
     else {
         GList *it;
 
-        for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
+        for (it = focus_order; it; it = g_list_next(it))
             if (valid_focus_target(it->data))
                 ft = it->data;
     }
@@ -701,92 +627,61 @@ done_cycle:
 
 void focus_order_add_new(ObClient *c)
 {
-    guint d, i;
-
     if (c->iconic)
         focus_order_to_top(c);
     else {
-        d = c->desktop;
-        if (d == DESKTOP_ALL) {
-            for (i = 0; i < screen_num_desktops; ++i) {
-                g_assert(!g_list_find(focus_order[i], c));
-                if (focus_order[i] && ((ObClient*)focus_order[i]->data)->iconic)
-                    focus_order[i] = g_list_insert(focus_order[i], c, 0);
-                else
-                    focus_order[i] = g_list_insert(focus_order[i], c, 1);
-            }
-        } else {
-            g_assert(!g_list_find(focus_order[d], c));
-            if (focus_order[d] && ((ObClient*)focus_order[d]->data)->iconic)
-                focus_order[d] = g_list_insert(focus_order[d], c, 0);
-            else
-                focus_order[d] = g_list_insert(focus_order[d], c, 1);
-        }
+        g_assert(!g_list_find(focus_order, c));
+        /* if there are any iconic windows, put this above them in the order,
+           but if there are not, then put it under the currently focused one */
+        if (focus_order && ((ObClient*)focus_order->data)->iconic)
+            focus_order = g_list_insert(focus_order, c, 0);
+        else
+            focus_order = g_list_insert(focus_order, c, 1);
     }
 }
 
 void focus_order_remove(ObClient *c)
 {
-    guint d, i;
-
-    d = c->desktop;
-    if (d == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_remove(focus_order[i], c);
-    } else
-        focus_order[d] = g_list_remove(focus_order[d], c);
-}
-
-static void to_top(ObClient *c, guint d)
-{
-    focus_order[d] = g_list_remove(focus_order[d], c);
-    if (!c->iconic) {
-        focus_order[d] = g_list_prepend(focus_order[d], c);
-    } else {
-        GList *it;
-
-        /* insert before first iconic window */
-        for (it = focus_order[d];
-             it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
-        focus_order[d] = g_list_insert_before(focus_order[d], it, c);
-    }
+    focus_order = g_list_remove(focus_order, c);
 }
 
 void focus_order_to_top(ObClient *c)
 {
-    guint d, i;
-
-    d = c->desktop;
-    if (d == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            to_top(c, i);
-    } else
-        to_top(c, d);
-}
-
-static void to_bottom(ObClient *c, guint d)
-{
-    focus_order[d] = g_list_remove(focus_order[d], c);
-    if (c->iconic) {
-        focus_order[d] = g_list_append(focus_order[d], c);
+    focus_order = g_list_remove(focus_order, c);
+    if (!c->iconic) {
+        focus_order = g_list_prepend(focus_order, c);
     } else {
         GList *it;
 
         /* insert before first iconic window */
-        for (it = focus_order[d];
+        for (it = focus_order;
              it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
-        focus_order[d] = g_list_insert_before(focus_order[d], it, c);
+        focus_order = g_list_insert_before(focus_order, it, c);
     }
 }
 
 void focus_order_to_bottom(ObClient *c)
 {
-    guint d, i;
+    focus_order = g_list_remove(focus_order, c);
+    if (c->iconic) {
+        focus_order = g_list_append(focus_order, c);
+    } else {
+        GList *it;
 
-    d = c->desktop;
-    if (d == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            to_bottom(c, i);
-    } else
-        to_bottom(c, d);
+        /* insert before first iconic window */
+        for (it = focus_order;
+             it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
+        focus_order = g_list_insert_before(focus_order, it, c);
+    }
+}
+
+ObClient *focus_order_find_first(guint desktop)
+{
+    GList *it;
+    for (it = focus_order; it; it = g_list_next(it)) {
+        ObClient *c = it->data;
+        if (c->desktop == desktop || c->desktop == DESKTOP_ALL)
+            return c;
+    }
+    return NULL;
 }

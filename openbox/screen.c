@@ -372,7 +372,7 @@ void screen_resize()
 
 void screen_set_num_desktops(guint num)
 {
-    guint i, old;
+    guint old;
     gulong *viewport;
     GList *it;
 
@@ -410,16 +410,6 @@ void screen_set_num_desktops(guint num)
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
         screen_set_desktop(num - 1);
-
-   /* update the focus lists */
-    /* free our lists for the desktops which have disappeared */
-    for (i = num; i < old; ++i)
-        g_list_free(focus_order[i]);
-    /* realloc the array */
-    focus_order = g_renew(GList*, focus_order, num);
-    /* set the new lists to be empty */
-    for (i = old; i < num; ++i)
-        focus_order[i] = NULL;
 }
 
 void screen_set_desktop(guint num)
@@ -888,10 +878,13 @@ void screen_show_desktop(gboolean show)
 
     if (show) {
         /* focus desktop */
-        for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
-            if (((ObClient*)it->data)->type == OB_CLIENT_TYPE_DESKTOP &&
+        for (it = focus_order; it; it = g_list_next(it)) {
+            ObClient *c = it->data;
+            if (c->type == OB_CLIENT_TYPE_DESKTOP &&
+                (c->desktop == screen_desktop || c->desktop == DESKTOP_ALL) &&
                 client_validate(it->data) && client_focus(it->data))
                 break;
+        }
     } else {
         focus_fallback(TRUE);
     }

@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <!-- syscrash's theme, based off nightm4re's flax or something -->
-
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
-    <handle>3</handle>
+    <handle>0</handle>
     <padding x="2" y="2"/>
   </dimensions>
   <window>
     <border>
       <width>1</width>
-      <primary r="34" g="34" b="28" a="255"/>
+      <primary r="155" g="155" b="155" a="255"/>
     </border>
     <clientpadding x="0" y="0"/>
     <justify>left</justify>
     <active>
+      <clientpadding r="76" g="76" b="76" a="255"/>
       <label>
         <text>
           <primary r="255" g="255" b="255" a="255"/>
@@ -57,6 +57,7 @@
       </grip>
     </active>
     <inactive>
+      <clientpadding r="112" g="112" b="112" a="255"/>
       <label>
         <text>
           <primary r="76" g="76" b="76" a="255"/>
@@ -98,7 +99,7 @@
   <menu>
     <border>
       <width>1</width>
-      <primary r="34" g="34" b="28" a="255"/>
+      <primary r="155" g="155" b="155" a="255"/>
     </border>
     <justify>left</justify>
     <overlap>0</overlap>

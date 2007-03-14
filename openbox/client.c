@@ -498,38 +498,9 @@ void client_unmanage(ObClient *self)
 
     g_assert(self != NULL);
 
-    keyboard_grab_for_client(self, FALSE);
-    mouse_grab_for_client(self, FALSE);
-
-    /* potentially fix focusLast */
-    if (config_focus_last)
-        grab_pointer(TRUE, OB_CURSOR_NONE);
-
-    /* remove the window from our save set */
-    XChangeSaveSet(ob_display, self->window, SetModeDelete);
-
-    /* we dont want events no more */
-    XSelectInput(ob_display, self->window, NoEventMask);
-
-    frame_hide(self->frame);
-
-    client_list = g_list_remove(client_list, self);
-    stacking_remove(self);
-    g_hash_table_remove(window_map, &self->window);
-
     /* update the focus lists */
     focus_order_remove(self);
 
-    /* once the client is out of the list, update the struts to remove it's
-       influence */
-    if (STRUT_EXISTS(self->strut))
-        screen_update_areas();
-
-    for (it = client_destructors; it; it = g_slist_next(it)) {
-        Destructor *d = it->data;
-        d->func(self, d->data);
-    }
-        
     if (focus_client == self) {
         XEvent e;
 
@@ -542,6 +513,36 @@ void client_unmanage(ObClient *self)
         self->focus_notify = FALSE;
         self->modal = FALSE;
         client_unfocus(self);
+    }
+
+    /* potentially fix focusLast */
+    if (config_focus_last)
+        grab_pointer(TRUE, OB_CURSOR_NONE);
+
+    frame_hide(self->frame);
+    XFlush(ob_display);
+
+    keyboard_grab_for_client(self, FALSE);
+    mouse_grab_for_client(self, FALSE);
+
+    /* remove the window from our save set */
+    XChangeSaveSet(ob_display, self->window, SetModeDelete);
+
+    /* we dont want events no more */
+    XSelectInput(ob_display, self->window, NoEventMask);
+
+    client_list = g_list_remove(client_list, self);
+    stacking_remove(self);
+    g_hash_table_remove(window_map, &self->window);
+
+    /* once the client is out of the list, update the struts to remove its
+       influence */
+    if (STRUT_EXISTS(self->strut))
+        screen_update_areas();
+
+    for (it = client_destructors; it; it = g_slist_next(it)) {
+        Destructor *d = it->data;
+        d->func(self, d->data);
     }
 
     /* tell our parent(s) that we're gone */

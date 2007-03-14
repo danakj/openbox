@@ -268,7 +268,7 @@ void client_manage(Window window)
 
     /* non-zero defaults */
     self->title_count = 1;
-    self->wmstate = NormalState;
+    self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->layer = -1;
     self->desktop = screen_num_desktops; /* always an invalid value */
     self->user_time = ~0; /* maximum value, always newer than the real time */
@@ -1956,8 +1956,6 @@ static void client_change_state(ObClient *self)
     gulong netstate[11];
     guint num;
 
-    client_change_wm_state(self);
-
     num = 0;
     if (self->modal)
         netstate[num++] = prop_atoms.net_wm_state_modal;
@@ -2633,6 +2631,7 @@ void client_shade(ObClient *self, gboolean shade)
 
     self->shaded = shade;
     client_change_state(self);
+    client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
     frame_adjust_area(self->frame, FALSE, FALSE, FALSE);
 }

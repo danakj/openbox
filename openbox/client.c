@@ -2116,10 +2116,9 @@ void client_showhide(ObClient *self)
 {
 
     if (client_should_show(self)) {
-        if (!self->frame->visible)
-            frame_show(self->frame);
+        frame_show(self->frame);
     }
-    else if (self->frame->visible) {
+    else {
         frame_hide(self->frame);
 
         /* Fall back focus since we're disappearing */

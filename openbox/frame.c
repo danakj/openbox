@@ -238,18 +238,28 @@ void frame_show(ObFrame *self)
         self->visible = TRUE;
         XMapWindow(ob_display, self->client->window);
         XMapWindow(ob_display, self->window);
+        self->firstmap = TRUE;
     }
 }
 
 void frame_hide(ObFrame *self)
 {
-    if (self->visible) {
-        self->visible = FALSE;
-        self->client->ignore_unmaps += 2;
-        /* we unmap the client itself so that we can get MapRequest
-           events, and because the ICCCM tells us to! */
-        XUnmapWindow(ob_display, self->window);
-        XUnmapWindow(ob_display, self->client->window);
+    if (self->visible || self->firstmap == FALSE) {
+        if (self->visible) {
+            self->visible = FALSE;
+            self->client->ignore_unmaps += 2;
+            /* we unmap the client itself so that we can get MapRequest
+               events, and because the ICCCM tells us to! */
+            XUnmapWindow(ob_display, self->window);
+            XUnmapWindow(ob_display, self->client->window);
+        } else {
+            /* the frame wasn't visible, but the frame is being hidden now.
+               so we don't need to unmap the frame, but we do need to unmap
+               the client. */
+            self->client->ignore_unmaps += 1;
+            XUnmapWindow(ob_display, self->client->window);
+        }
+        self->firstmap = TRUE;
     }
 }
 
@@ -535,10 +545,6 @@ void frame_grab_client(ObFrame *self, ObClient *client)
 
     /* map the client so it maps when the frame does */
     XMapWindow(ob_display, client->window);
-    /* map the frame so they are in a consistant state together */
-    XMapWindow(ob_display, self->window);
-    /* reflect that we're initially visible */
-    self->visible = TRUE;
 
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, client);

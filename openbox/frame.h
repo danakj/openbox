@@ -76,6 +76,7 @@ struct _ObFrame
     Strut     size;
     Rect      area;
     gboolean  visible;
+    gboolean  firstmap;
 
     /*! Whether the window is obscured at all or fully visible. */
     gboolean obscured;

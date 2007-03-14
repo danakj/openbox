@@ -50,7 +50,8 @@ void focus_shutdown(gboolean reconfig);
   send focus anywhere, its called by the Focus event handlers */
 void focus_set_client(struct _ObClient *client);
 
-struct _ObClient* focus_fallback_target(gboolean allow_refocus);
+struct _ObClient* focus_fallback_target(gboolean allow_refocus,
+                                        struct _ObClient *old);
 
 /*! Call this when you need to focus something! */
 void focus_fallback(gboolean allow_refocus);

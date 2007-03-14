@@ -463,7 +463,7 @@ void screen_set_desktop(guint num)
 
     event_ignore_queued_enters();
 
-    focus_hilite = focus_fallback_target(TRUE);
+    focus_hilite = focus_fallback_target(TRUE, focus_client);
     if (focus_hilite) {
         frame_adjust_focus(focus_hilite->frame, TRUE);
 

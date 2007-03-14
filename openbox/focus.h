@@ -50,17 +50,10 @@ void focus_shutdown(gboolean reconfig);
   send focus anywhere, its called by the Focus event handlers */
 void focus_set_client(struct _ObClient *client);
 
-typedef enum {
-    OB_FOCUS_FALLBACK_UNFOCUSING, /*!< forcefully remove focus from the
-                                    current window */
-    OB_FOCUS_FALLBACK_CLOSED,     /*!< closed the window with focus */
-    OB_FOCUS_FALLBACK_NOFOCUS     /*!< nothing has focus for some reason */
-} ObFocusFallbackType;
-
-struct _ObClient* focus_fallback_target(ObFocusFallbackType type);
+struct _ObClient* focus_fallback_target(gboolean allow_refocus);
 
 /*! Call this when you need to focus something! */
-void focus_fallback(ObFocusFallbackType type);
+void focus_fallback(gboolean allow_refocus);
 
 /*! Cycle focus amongst windows. */
 void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,

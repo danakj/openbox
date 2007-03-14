@@ -422,7 +422,7 @@ static void event_process(const XEvent *ec, gpointer data)
             }
         }
 
-#if 0 /* focus debugging stuff */
+#if 1 /* focus debugging stuff */
     if (e->type == FocusIn || e->type == FocusOut) {
         gint mode = e->xfocus.mode;
         gint detail = e->xfocus.detail;
@@ -655,8 +655,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case FocusOut:
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
-            /* There is no FocusIn, move focus where we can still hear events*/
-            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+            /* There is no FocusIn, this means focus went to a window that
+               is not being managed. most likely, this went to PointerRoot
+               or None, meaning the window is no longer around so fallback
+               focus, but not to that window */
+            ob_debug("Focus went to a black hole !\n");
+            focus_fallback(FALSE);
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             break;
@@ -667,7 +671,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (ed.ignored) {
                 /* The FocusIn was ignored, this means it was on a window
                    that isn't a client. */
-                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+                ob_debug("Focus went to an unmanaged window 0x%x !\n",
+                         ce.xfocus.window);
+                focus_fallback(TRUE);
             }
         }
 

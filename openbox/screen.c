@@ -463,7 +463,7 @@ void screen_set_desktop(guint num)
 
     event_ignore_queued_enters();
 
-    focus_hilite = focus_fallback_target(OB_FOCUS_FALLBACK_NOFOCUS);
+    focus_hilite = focus_fallback_target(TRUE);
     if (focus_hilite) {
         frame_adjust_focus(focus_hilite->frame, TRUE);
 
@@ -893,7 +893,7 @@ void screen_show_desktop(gboolean show)
                 client_validate(it->data) && client_focus(it->data))
                 break;
     } else {
-        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+        focus_fallback(TRUE);
     }
 
     show = !!show; /* make it boolean */

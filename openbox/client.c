@@ -78,6 +78,7 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
+static void client_unfocus(ObClient *self);
 
 void client_startup(gboolean reconfig)
 {
@@ -2515,10 +2516,10 @@ static void client_iconify_recursive(ObClient *self,
         ob_debug("%sconifying window: 0x%lx\n", (iconic ? "I" : "Uni"),
                  self->window);
 
-        self->iconic = iconic;
-
         if (iconic) {
             if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
+                self->iconic = iconic;
+
                 /* update the focus lists.. iconic windows go to the bottom of
                    the list, put the new iconic window at the 'top of the
                    bottom'. */
@@ -2527,6 +2528,8 @@ static void client_iconify_recursive(ObClient *self,
                 changed = TRUE;
             }
         } else {
+            self->iconic = iconic;
+
             if (curdesk)
                 client_set_desktop(self, screen_desktop, FALSE);
 
@@ -3031,14 +3034,7 @@ gboolean client_focus(ObClient *self)
     ob_debug("Focusing client \"%s\" at time %u\n", self->title, event_curtime);
 
     if (self->can_focus) {
-        /* RevertToPointerRoot causes much more headache than RevertToNone, so
-           I choose to use it always, hopefully to find errors quicker, if any
-           are left. (I hate X. I hate focus events.)
-           
-           Update: Changing this to RevertToNone fixed a bug with mozilla (bug
-           #799. So now it is RevertToNone again.
-        */
-        XSetInputFocus(ob_display, self->window, RevertToNone,
+        XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
                        event_curtime);
     }
 
@@ -3073,13 +3069,13 @@ gboolean client_focus(ObClient *self)
 /* Used when the current client is closed or otherwise hidden, focus_last will
    then prevent focus from going to the mouse pointer
 */
-void client_unfocus(ObClient *self)
+static void client_unfocus(ObClient *self)
 {
     if (focus_client == self) {
 #ifdef DEBUG_FOCUS
         ob_debug("client_unfocus for %lx\n", self->window);
 #endif
-        focus_fallback(OB_FOCUS_FALLBACK_CLOSED);
+        focus_fallback(FALSE);
     }
 }
 

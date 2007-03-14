@@ -494,9 +494,6 @@ gboolean client_can_focus(ObClient *self);
 */
 gboolean client_focus(ObClient *self);
 
-/*! Remove focus from the client window */
-void client_unfocus(ObClient *self);
-
 /*! Activates the client for use, focusing, uniconifying it, etc. To be used
   when the user deliberately selects a window for use.
   @param here If true, then the client is brought to the current desktop;

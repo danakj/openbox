@@ -248,7 +248,7 @@ static ObClient* focus_fallback_transient(ObClient *top, ObClient *old)
         return NULL;
 }
 
-ObClient* focus_fallback_target(ObFocusFallbackType type)
+ObClient* focus_fallback_target(gboolean allow_refocus)
 {
     GList *it;
     ObClient *old;
@@ -256,60 +256,57 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
 
     old = focus_client;
 
-    if ((type == OB_FOCUS_FALLBACK_UNFOCUSING
-         || type == OB_FOCUS_FALLBACK_CLOSED) && old) {
-        if (old->transient_for) {
-            gboolean trans = FALSE;
+    if (!allow_refocus && old && old->transient_for) {
+        gboolean trans = FALSE;
 
-            if (!config_focus_follow || config_focus_last)
-                trans = TRUE;
-            else if ((target = client_under_pointer()) &&
-                     client_search_transient
-                     (client_search_top_parent(target), old))
-                trans = TRUE;
+        if (!config_focus_follow || config_focus_last)
+            trans = TRUE;
+        else if ((target = client_under_pointer()) &&
+                 client_search_transient
+                 (client_search_top_parent(target), old))
+            trans = TRUE;
 
-            /* try for transient relations */
-            if (trans) {
-                if (old->transient_for == OB_TRAN_GROUP) {
-                    for (it = focus_order[screen_desktop]; it;
-                         it = g_list_next(it))
+        /* try for transient relations */
+        if (trans) {
+            if (old->transient_for == OB_TRAN_GROUP) {
+                for (it = focus_order[screen_desktop]; it;
+                     it = g_list_next(it))
+                {
+                    GSList *sit;
+
+                    for (sit = old->group->members; sit;
+                         sit = g_slist_next(sit))
                     {
-                        GSList *sit;
-
-                        for (sit = old->group->members; sit;
-                             sit = g_slist_next(sit))
-                        {
-                            if (sit->data == it->data)
-                                if ((target =
-                                     focus_fallback_transient(sit->data, old)))
-                                {
-                                    ob_debug("found in transient #1\n");
-                                    return target;
-                                }
-                        }
+                        if (sit->data == it->data)
+                            if ((target =
+                                 focus_fallback_transient(sit->data, old)))
+                            {
+                                ob_debug("found in transient #1\n");
+                                return target;
+                            }
                     }
-                } else {
-                    if ((target =
-                         focus_fallback_transient(old->transient_for, old)))
-                    {
-                        ob_debug("found in transient #2\n");
-                        return target;
-                    }
+                }
+            } else {
+                if ((target =
+                     focus_fallback_transient(old->transient_for, old)))
+                {
+                    ob_debug("found in transient #2\n");
+                    return target;
                 }
             }
         }
     }
 
     ob_debug("trying pointer stuff\n");
-    if (config_focus_follow &&
-        (type == OB_FOCUS_FALLBACK_UNFOCUSING || !config_focus_last))
+    if (config_focus_follow && !config_focus_last)
     {
         if ((target = client_under_pointer()))
-            if (client_normal(target) && client_can_focus(target) &&
-                client_validate(target)) {
-                ob_debug("found in pointer stuff\n");
-                return target;
-            }
+            if (allow_refocus || target != old)
+                if (client_normal(target) && client_can_focus(target) &&
+                    client_validate(target)) {
+                    ob_debug("found in pointer stuff\n");
+                    return target;
+                }
     }
 
 #if 0
@@ -328,7 +325,7 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
 
     ob_debug("trying  the focus order\n");
     for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
-        if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
+        if (allow_refocus || it->data != old)
             if (client_normal(it->data) && client_can_focus(it->data) &&
                 client_validate(it->data))
             {
@@ -344,7 +341,7 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
     return NULL;
 }
 
-void focus_fallback(ObFocusFallbackType type)
+void focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
 
@@ -354,7 +351,7 @@ void focus_fallback(ObFocusFallbackType type)
     */
     focus_set_client(NULL);
 
-    if ((new = focus_fallback_target(type)))
+    if ((new = focus_fallback_target(allow_refocus)))
         client_focus(new);
 }
 

@@ -347,6 +347,27 @@ gboolean client_focused(ObClient *self);
 #define client_configure(self, anchor, x, y, w, h, user, final) \
   client_configure_full(self, anchor, x, y, w, h, user, final, FALSE)
 
+/*! Figure out where a window will end up and what size it will be if you
+  told it to move/resize to these coordinates.
+
+  These values are what client_configure_full will give the window.
+
+  @param anchor The corner to keep in the same position when resizing.
+  @param x The x coordiante of the new position for the client.
+  @param y The y coordiante of the new position for the client.
+  @param w The width component of the new size for the client.
+  @param h The height component of the new size for the client.
+  @param logicalw Returns the width component of the new logical width.
+  @param logicalh Returns the height component of the new logical height.
+  @param user Specifies whether this is a user-requested change or a
+              program requested change. For program requested changes, the
+              constraints are not checked.
+*/
+void client_try_configure(ObClient *self, ObCorner anchor,
+                          gint *x, gint *y, gint *w, gint *h,
+                          gint *logicalw, gint *logicalh,
+                          gboolean user);
+
 /*! Move and/or resize the window.
   This also maintains things like the client's minsize, and size increments.
   @param anchor The corner to keep in the same position when resizing.

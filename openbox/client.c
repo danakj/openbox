@@ -2206,17 +2206,12 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     */
 }
 
-void client_configure_full(ObClient *self, ObCorner anchor,
-                           gint x, gint y, gint w, gint h,
-                           gboolean user, gboolean final,
-                           gboolean force_reply)
+void client_try_configure(ObClient *self, ObCorner anchor,
+                          gint *x, gint *y, gint *w, gint *h,
+                          gint *logicalw, gint *logicalh,
+                          gboolean user)
 {
-    gint oldw, oldh;
-    gboolean send_resize_client;
-    gboolean moved = FALSE, resized = FALSE;
-    guint fdecor = self->frame->decorations;
-    gboolean fhorz = self->frame->max_horz;
-    Rect desired_area = {x, y, w, h};
+    Rect desired_area = {*x, *y, *w, *h};
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
@@ -2224,7 +2219,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     frame_adjust_area(self->frame, TRUE, TRUE, TRUE);
 
     /* gets the frame's position */
-    frame_client_gravity(self->frame, &x, &y);
+    frame_client_gravity(self->frame, x, y);
 
     /* these positions are frame positions, not client positions */
 
@@ -2236,10 +2231,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         i = screen_find_monitor(&desired_area);
         a = screen_physical_area_monitor(i);
 
-        x = a->x;
-        y = a->y;
-        w = a->width;
-        h = a->height;
+        *x = a->x;
+        *y = a->y;
+        *w = a->width;
+        *h = a->height;
 
         user = FALSE; /* ignore that increment etc shit when in fullscreen */
     } else {
@@ -2251,31 +2246,31 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
         /* set the size and position if maximized */
         if (self->max_horz) {
-            x = a->x;
-            w = a->width - self->frame->size.left - self->frame->size.right;
+            *x = a->x;
+            *w = a->width - self->frame->size.left - self->frame->size.right;
         }
         if (self->max_vert) {
-            y = a->y;
-            h = a->height - self->frame->size.top - self->frame->size.bottom;
+            *y = a->y;
+            *h = a->height - self->frame->size.top - self->frame->size.bottom;
         }
     }
 
     /* gets the client's position */
-    frame_frame_gravity(self->frame, &x, &y);
+    frame_frame_gravity(self->frame, x, y);
 
     /* these override the above states! if you cant move you can't move! */
     if (user) {
         if (!(self->functions & OB_CLIENT_FUNC_MOVE)) {
-            x = self->area.x;
-            y = self->area.y;
+            *x = self->area.x;
+            *y = self->area.y;
         }
         if (!(self->functions & OB_CLIENT_FUNC_RESIZE)) {
-            w = self->area.width;
-            h = self->area.height;
+            *w = self->area.width;
+            *h = self->area.height;
         }
     }
 
-    if (!(w == self->area.width && h == self->area.height)) {
+    if (!(*w == self->area.width && *h == self->area.height)) {
         gint basew, baseh, minw, minh;
 
         /* base size is substituted with min size if not specified */
@@ -2299,83 +2294,104 @@ void client_configure_full(ObClient *self, ObCorner anchor,
            sizes */
 
         /* smaller than min size or bigger than max size? */
-        if (w > self->max_size.width) w = self->max_size.width;
-        if (w < minw) w = minw;
-        if (h > self->max_size.height) h = self->max_size.height;
-        if (h < minh) h = minh;
+        if (*w > self->max_size.width) *w = self->max_size.width;
+        if (*w < minw) *w = minw;
+        if (*h > self->max_size.height) *h = self->max_size.height;
+        if (*h < minh) *h = minh;
 
-        w -= basew;
-        h -= baseh;
+        *w -= basew;
+        *h -= baseh;
 
         /* keep to the increments */
-        w /= self->size_inc.width;
-        h /= self->size_inc.height;
+        *w /= self->size_inc.width;
+        *h /= self->size_inc.height;
 
         /* you cannot resize to nothing */
-        if (basew + w < 1) w = 1 - basew;
-        if (baseh + h < 1) h = 1 - baseh;
+        if (basew + *w < 1) *w = 1 - basew;
+        if (baseh + *h < 1) *h = 1 - baseh;
   
-        /* store the logical size */
-        SIZE_SET(self->logical_size,
-                 self->size_inc.width > 1 ? w : w + basew,
-                 self->size_inc.height > 1 ? h : h + baseh);
+        /* save the logical size */
+        *logicalw = self->size_inc.width > 1 ? *w : *w + basew;
+        *logicalh = self->size_inc.height > 1 ? *h : *h + baseh;
 
-        w *= self->size_inc.width;
-        h *= self->size_inc.height;
+        *w *= self->size_inc.width;
+        *h *= self->size_inc.height;
 
-        w += basew;
-        h += baseh;
+        *w += basew;
+        *h += baseh;
 
         /* adjust the height to match the width for the aspect ratios.
            for this, min size is not substituted for base size ever. */
-        w -= self->base_size.width;
-        h -= self->base_size.height;
+        *w -= self->base_size.width;
+        *h -= self->base_size.height;
 
         if (!self->fullscreen) {
             if (self->min_ratio)
-                if (h * self->min_ratio > w) {
-                    h = (gint)(w / self->min_ratio);
+                if (*h * self->min_ratio > *w) {
+                    *h = (gint)(*w / self->min_ratio);
 
                     /* you cannot resize to nothing */
-                    if (h < 1) {
-                        h = 1;
-                        w = (gint)(h * self->min_ratio);
+                    if (*h < 1) {
+                        *h = 1;
+                        *w = (gint)(*h * self->min_ratio);
                     }
                 }
             if (self->max_ratio)
-                if (h * self->max_ratio < w) {
-                    h = (gint)(w / self->max_ratio);
+                if (*h * self->max_ratio < *w) {
+                    *h = (gint)(*w / self->max_ratio);
 
                     /* you cannot resize to nothing */
-                    if (h < 1) {
-                        h = 1;
-                        w = (gint)(h * self->min_ratio);
+                    if (*h < 1) {
+                        *h = 1;
+                        *w = (gint)(*h * self->min_ratio);
                     }
                 }
         }
 
-        w += self->base_size.width;
-        h += self->base_size.height;
+        *w += self->base_size.width;
+        *h += self->base_size.height;
     }
 
-    g_assert(w > 0);
-    g_assert(h > 0);
+    g_assert(*w > 0);
+    g_assert(*h > 0);
 
     switch (anchor) {
     case OB_CORNER_TOPLEFT:
         break;
     case OB_CORNER_TOPRIGHT:
-        x -= w - self->area.width;
+        *x -= *w - self->area.width;
         break;
     case OB_CORNER_BOTTOMLEFT:
-        y -= h - self->area.height;
+        *y -= *h - self->area.height;
         break;
     case OB_CORNER_BOTTOMRIGHT:
-        x -= w - self->area.width;
-        y -= h - self->area.height;
+        *x -= *w - self->area.width;
+        *y -= *h - self->area.height;
         break;
     }
+}
 
+
+void client_configure_full(ObClient *self, ObCorner anchor,
+                           gint x, gint y, gint w, gint h,
+                           gboolean user, gboolean final,
+                           gboolean force_reply)
+{
+    gint oldw, oldh;
+    gboolean send_resize_client;
+    gboolean moved = FALSE, resized = FALSE;
+    guint fdecor = self->frame->decorations;
+    gboolean fhorz = self->frame->max_horz;
+    gint logicalw, logicalh;
+
+    /* find the new x, y, width, and height (and logical size) */
+    client_try_configure(self, anchor, &x, &y, &w, &h,
+                         &logicalw, &logicalh, user);
+
+    /* set the logical size */
+    SIZE_SET(self->logical_size, logicalw, logicalh);
+
+    /* figure out if we moved or resized or what */
     moved = x != self->area.x || y != self->area.y;
     resized = w != self->area.width || h != self->area.height;
 

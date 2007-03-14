@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-03-12 19:19-0400\n"
+"POT-Creation-Date: 2007-02-28 12:50-0500\n"
 "PO-Revision-Date: 2006-06-11 10:41+0200\n"
 "Last-Translator: Sebastian Vahl <svahl@web.de>\n"
 "Language-Team:  <de@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 msgid "Go there..."
 msgstr "Gehe zu..."
 
-#: openbox/client_list_menu.c:188
+#: openbox/client_list_menu.c:187
 msgid "Desktops"
 msgstr ""
 
@@ -88,7 +88,7 @@ msgstr "Verschieben"
 
 #: openbox/client_menu.c:249
 msgid "Resize"
-msgstr "Größe ändern "
+msgstr "Größe ändern"
 
 #: openbox/client_menu.c:255
 msgid "Close"
@@ -96,19 +96,27 @@ msgstr "Schließen"
 
 #: openbox/session.c:124
 msgid "--sm-client-id requires an argument\n"
-msgstr ""
+msgstr "--sm-client-id benötigt ein Argument\n"
 
 #: openbox/session.c:132
 msgid "--sm-save-file requires an argument\n"
-msgstr ""
+msgstr "--sm-save-file benötigt ein Argument\n"
 
-#: openbox/session.c:168
+#: openbox/session.c:160
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr ""
+msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
 
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "Konnte Xft nicht initializieren"
+#: render/font.c:58
+msgid "Couldn't initialize Xft."
+msgstr "Xft konnte nicht initialisiert werden"
 
-#~ msgid "Unable to load font: %s\n"
-#~ msgstr "Font konnte nicht geladen werden: %s\n"
+#: render/font.c:193 render/font.c:198
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Schriftart %s konnte nicht geladen werden\n"
+
+#: render/font.c:194
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Versuche Ersatz-Schriftart %s zu laden\n"

@@ -123,7 +123,7 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     gint x,y;
     RrPixel32 *p32 = (RrPixel32 *) im->data;
     RrPixel16 *p16 = (RrPixel16 *) im->data;
-    guchar *p8 = (guchar *)im->data;
+    RrPixel8  *p8  = (RrPixel8 *)  im->data;
     switch (im->bits_per_pixel) {
     case 32:
         if ((RrRedOffset(inst) != RrDefaultRedOffset) ||
@@ -161,16 +161,33 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     case 8:
-        g_assert(RrVisual(inst)->class != TrueColor);
-        for (y = 0; y < im->height; y++) {
-            for (x = 0; x < im->width; x++) {
-                p8[x] = RrPickColor(inst,
-                                    data[x] >> RrDefaultRedOffset,
-                                    data[x] >> RrDefaultGreenOffset,
-                                    data[x] >> RrDefaultBlueOffset)->pixel;
+        if (RrVisual(inst)->class == TrueColor) {
+            for (y = 0; y < im->height; y++) {
+                for (x = 0; x < im->width; x++) {
+                    r = (data[x] >> RrDefaultRedOffset) & 0xFF;
+                    r = r >> RrRedShift(inst);
+                    g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
+                    g = g >> RrGreenShift(inst);
+                    b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
+                    b = b >> RrBlueShift(inst);
+                    p8[x] = (r << RrRedOffset(inst))
+                        + (g << RrGreenOffset(inst))
+                        + (b << RrBlueOffset(inst));
+                }
+                data += im->width;
+                p8 += im->bytes_per_line;
             }
-            data += im->width;
-            p8 += im->bytes_per_line;
+        } else {
+            for (y = 0; y < im->height; y++) {
+                for (x = 0; x < im->width; x++) {
+                    p8[x] = RrPickColor(inst,
+                                        data[x] >> RrDefaultRedOffset,
+                                        data[x] >> RrDefaultGreenOffset,
+                                        data[x] >> RrDefaultBlueOffset)->pixel;
+                }
+                data += im->width;
+                p8 += im->bytes_per_line;
+            }
         }
         break;
     default:

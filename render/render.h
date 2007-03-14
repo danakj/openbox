@@ -45,6 +45,7 @@ typedef struct _RrColor            RrColor;
 
 typedef guint32 RrPixel32;
 typedef guint16 RrPixel16;
+typedef guchar  RrPixel8;
 
 typedef enum {
     RR_RELIEF_FLAT,

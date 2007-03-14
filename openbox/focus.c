@@ -242,13 +242,15 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
                focus off to nothing
                2. it is validated. if the window is about to disappear, then
                don't try focus it.
-               3. it is visible on the screen right now.
-               4. it is a normal type window, don't fall back onto a dock or
+               3. it is visible on the current desktop. this ignores
+               omnipresent windows, which are problematic in their own rite.
+               4. it's not iconic
+               5. it is a normal type window, don't fall back onto a dock or
                a splashscreen or a desktop window (save the desktop as a
                backup fallback though)
             */
             if (client_can_focus(c) && client_validate(c) &&
-                client_should_show(c))
+                c->desktop == screen_desktop && !c->iconic)
             {
                 if (client_normal(c)) {
                     ob_debug("found in focus order\n");

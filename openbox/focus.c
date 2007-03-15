@@ -234,7 +234,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 #endif
 
     ob_debug("trying omnipresentness\n");
-    if (old && old->desktop == DESKTOP_ALL)
+    if (allow_refocus && old && old->desktop == DESKTOP_ALL)
         return old;
 
 

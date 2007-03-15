@@ -233,6 +233,11 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
         }
 #endif
 
+    ob_debug("trying omnipresentness\n");
+    if (old && old->desktop == DESKTOP_ALL)
+        return old;
+
+
     ob_debug("trying  the focus order\n");
     for (it = focus_order; it; it = g_list_next(it))
         if (allow_refocus || it->data != old) {

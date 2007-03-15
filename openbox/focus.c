@@ -266,7 +266,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
         }
 
     /* as a last resort fallback to the desktop window if there is one.
-       (if there's more than one, then the one last focused.)
+       (if there's more than one, then the one most recently focused.)
     */
     return desktop;   
 }

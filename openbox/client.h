@@ -358,7 +358,11 @@ gboolean client_focused(ObClient *self);
   @param w The width component of the new size for the client.
   @param h The height component of the new size for the client.
   @param logicalw Returns the width component of the new logical width.
+                  This value is only returned when the new w or h calculated
+                  differ from the ones passed in.
   @param logicalh Returns the height component of the new logical height.
+                  This value is only returned when the new w or h calculated
+                  differ from the ones passed in.
   @param user Specifies whether this is a user-requested change or a
               program requested change. For program requested changes, the
               constraints are not checked.

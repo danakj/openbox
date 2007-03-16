@@ -2389,8 +2389,9 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     client_try_configure(self, anchor, &x, &y, &w, &h,
                          &logicalw, &logicalh, user);
 
-    /* set the logical size */
-    SIZE_SET(self->logical_size, logicalw, logicalh);
+    /* set the logical size if things changed */
+    if (!(w == self->area.width && h == self->area.height))
+        SIZE_SET(self->logical_size, logicalw, logicalh);
 
     /* figure out if we moved or resized or what */
     moved = x != self->area.x || y != self->area.y;

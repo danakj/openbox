@@ -335,6 +335,8 @@ static GSList* slist_path_add(GSList *list, gpointer data, GSListFunc func)
 
     if (!g_slist_find_custom(list, data, (GCompareFunc) slist_path_cmp))
         list = func(list, data);
+    else
+        g_free(data);
 
     return list;
 }
@@ -389,7 +391,7 @@ void parse_paths_startup()
                                               (GSListFunc) g_slist_append);
     }
     xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
-                                          xdg_config_home_path,
+                                          g_strdup(xdg_config_home_path),
                                           (GSListFunc) g_slist_prepend);
     
     path = g_getenv("XDG_DATA_DIRS");
@@ -411,7 +413,7 @@ void parse_paths_startup()
                                             (GSListFunc) g_slist_append);
     }
     xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
-                                        xdg_data_home_path,
+                                        g_strdup(xdg_data_home_path),
                                         (GSListFunc) g_slist_prepend);
 }
 

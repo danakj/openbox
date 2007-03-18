@@ -75,6 +75,7 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
         for (i = 0; i < *nxin; ++i)
             RECT_SET((*xin_areas)[i], info[i].x_org, info[i].y_org,
                      info[i].width, info[i].height);
+        XFree(info);
     } else
 #endif
     {

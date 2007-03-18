@@ -121,7 +121,7 @@ struct _RrTextureText {
     RrFont *font;
     RrJustify justify;
     RrColor *color;
-    gchar *string;
+    const gchar *string;
     gint shadow_offset_x;
     gint shadow_offset_y;
     RrColor *shadow_color;
@@ -229,7 +229,7 @@ RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 
-RrFont *RrFontOpen          (const RrInstance *inst, gchar *name, gint size,
+RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name, gint size,
                              RrFontWeight weight, RrFontSlant slant);
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);

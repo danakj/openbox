@@ -54,7 +54,7 @@ void ob_exit_replace();
 
 void ob_reconfigure();
 
-void ob_exit_with_error(gchar *msg);
+void ob_exit_with_error(const gchar *msg);
 
 Cursor ob_cursor(ObCursor cursor);
 

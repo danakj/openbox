@@ -40,27 +40,27 @@ static void parse_style(gchar *tex, RrSurfaceColorType *grad,
                         RrReliefType *relief, RrBevelType *bevel,
                         gboolean *interlaced, gboolean *border,
                         gboolean allow_trans);
-static gboolean read_mask(ParseState *ps, gchar *maskname,
+static gboolean read_mask(ParseState *ps, const gchar *maskname,
                           RrPixmapMask **value);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
-static xmlNodePtr find_node(xmlNodePtr n, gchar *names[]);
-static gboolean find_int(ParseState *ps, xmlNodePtr n, gchar *names[],
+static xmlNodePtr find_node(xmlNodePtr n, const gchar *names[]);
+static gboolean find_int(ParseState *ps, xmlNodePtr n, const gchar *names[],
                          gint *integer, gint lower, gint upper);
-static gboolean find_string(ParseState *ps, xmlNodePtr n, gchar *names[],
-                            gchar **string);
-static gboolean find_color(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_string(ParseState *ps, xmlNodePtr n, const gchar *names[],
+                            const gchar **string);
+static gboolean find_color(ParseState *ps, xmlNodePtr n, const gchar *names[],
                            RrColor **color, gchar *alpha);
-    static gboolean find_point(ParseState *ps, xmlNodePtr n, gchar *names[],
+    static gboolean find_point(ParseState *ps, xmlNodePtr n, const gchar *names[],
                            gint *x, gint *y,
                            gint lowx, gint lowy, gint upx, gint upy);
-static gboolean find_shadow(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_shadow(ParseState *ps, xmlNodePtr n, const gchar *names[],
                             RrAppearance *a);
-static gboolean find_appearance(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_appearance(ParseState *ps, xmlNodePtr n, const gchar *names[],
                                 RrAppearance *a, gboolean allow_trans);
 
 /* make a null terminated array out of a list of strings */
-#define L(args...) (gchar*[]){args,NULL}
+#define L(args...) (const gchar*[]){args,NULL}
 /* shortcut to the various find_* functions */
 #define FIND(type, args...) find_##type(&ps, root, args)
 
@@ -71,7 +71,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     ParseState ps;
     xmlNodePtr root;
     RrJustify winjust, mtitlejust;
-    gchar *str;
+    const gchar *str;
     RrTheme *theme;
 
     if (name) {
@@ -1131,7 +1131,7 @@ void RrThemeFree(RrTheme *theme)
     }
 }
 
-static gboolean read_mask(ParseState *ps, gchar *maskname,
+static gboolean read_mask(ParseState *ps, const gchar *maskname,
                           RrPixmapMask **value)
 {
     gboolean ret = FALSE;
@@ -1245,7 +1245,7 @@ static void parse_style(gchar *tex, RrSurfaceColorType *grad,
     }
 }
 
-static xmlNodePtr find_node(xmlNodePtr n, gchar *names[])
+static xmlNodePtr find_node(xmlNodePtr n, const gchar *names[])
 {
     gint i;
 
@@ -1254,7 +1254,7 @@ static xmlNodePtr find_node(xmlNodePtr n, gchar *names[])
     return n;
 }
 
-static gboolean find_int(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_int(ParseState *ps, xmlNodePtr n, const gchar *names[],
                          gint *integer, gint lower, gint upper)
 {
     gint i;
@@ -1269,8 +1269,8 @@ static gboolean find_int(ParseState *ps, xmlNodePtr n, gchar *names[],
     return FALSE;
 }
 
-static gboolean find_string(ParseState *ps, xmlNodePtr n, gchar *names[],
-                            gchar **string)
+static gboolean find_string(ParseState *ps, xmlNodePtr n, const gchar *names[],
+                            const gchar **string)
 {
     if ((n = find_node(n, names))) {
         *string = parse_string(ps->doc, n);
@@ -1279,7 +1279,7 @@ static gboolean find_string(ParseState *ps, xmlNodePtr n, gchar *names[],
     return FALSE;
 }
 
-static gboolean find_color(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_color(ParseState *ps, xmlNodePtr n, const gchar *names[],
                            RrColor **color, gchar *alpha)
 {
     if ((n = find_node(n, names))) {
@@ -1299,7 +1299,7 @@ static gboolean find_color(ParseState *ps, xmlNodePtr n, gchar *names[],
     return FALSE;
 }
 
-static gboolean find_point(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_point(ParseState *ps, xmlNodePtr n, const gchar *names[],
                            gint *x, gint *y,
                            gint lowx, gint upx, gint lowy, gint upy)
 {
@@ -1316,7 +1316,7 @@ static gboolean find_point(ParseState *ps, xmlNodePtr n, gchar *names[],
     return FALSE;
 }
 
-static gboolean find_shadow(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_shadow(ParseState *ps, xmlNodePtr n, const gchar *names[],
                             RrAppearance *a)
 {
     return find_point(ps, n, names,
@@ -1325,7 +1325,7 @@ static gboolean find_shadow(ParseState *ps, xmlNodePtr n, gchar *names[],
                       -20, 20, -20, 20);
 }
 
-static gboolean find_appearance(ParseState *ps, xmlNodePtr n, gchar *names[],
+static gboolean find_appearance(ParseState *ps, xmlNodePtr n, const gchar *names[],
                                 RrAppearance *a, gboolean allow_trans)
 {
     xmlNodePtr n2;

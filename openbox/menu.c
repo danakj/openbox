@@ -243,7 +243,7 @@ parse_menu_fail:
     g_free(script);
 }
 
-ObMenu* menu_new(gchar *name, gchar *title, gpointer data)
+ObMenu* menu_new(const gchar *name, const gchar *title, gpointer data)
 {
     ObMenu *self;
 
@@ -405,7 +405,7 @@ void menu_entry_remove(ObMenuEntry *self)
     menu_entry_free(self);
 }
 
-ObMenuEntry* menu_add_normal(ObMenu *self, gint id, gchar *label,
+ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
                              GSList *actions)
 {
     ObMenuEntry *e;
@@ -418,7 +418,7 @@ ObMenuEntry* menu_add_normal(ObMenu *self, gint id, gchar *label,
     return e;
 }
 
-ObMenuEntry* menu_add_submenu(ObMenu *self, gint id, gchar *submenu)
+ObMenuEntry* menu_add_submenu(ObMenu *self, gint id, const gchar *submenu)
 {
     ObMenuEntry *e;
 

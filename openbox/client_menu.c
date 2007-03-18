@@ -136,7 +136,7 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         return;
 
     for (i = 0; i <= screen_num_desktops; ++i) {
-        gchar *name;
+        const gchar *name;
         guint desk;
 
         if (i >= screen_num_desktops) {

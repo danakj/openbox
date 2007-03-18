@@ -120,7 +120,7 @@ struct _ObMenuEntry
 void menu_startup(gboolean reconfig);
 void menu_shutdown(gboolean reconfig);
 
-ObMenu* menu_new(gchar *name, gchar *title, gpointer data);
+ObMenu* menu_new(const gchar *name, const gchar *title, gpointer data);
 void menu_free(ObMenu *menu);
 
 /* Repopulate a pipe-menu by running its command */
@@ -133,9 +133,9 @@ void menu_set_execute_func(ObMenu *menu, ObMenuExecuteFunc func);
 void menu_set_destroy_func(ObMenu *menu, ObMenuDestroyFunc func);
 
 /* functions for building menus */
-ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, gchar *label,
+ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, const gchar *label,
                              GSList *actions);
-ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, gchar *submenu);
+ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, const gchar *submenu);
 ObMenuEntry* menu_add_separator(ObMenu *menu, gint id);
 
 void menu_clear_entries(ObMenu *menu);

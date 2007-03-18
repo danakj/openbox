@@ -73,7 +73,7 @@ void moveresize_shutdown(gboolean reconfig)
     popup = NULL;
 }
 
-static void popup_coords(ObClient *c, gchar *format, gint a, gint b)
+static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 {
     gchar *text;
 

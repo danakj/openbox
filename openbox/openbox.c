@@ -440,7 +440,7 @@ static void parse_args(gint argc, gchar **argv)
     }
 }
 
-void ob_exit_with_error(gchar *msg)
+void ob_exit_with_error(const gchar *msg)
 {
     g_critical(msg);
     session_shutdown(TRUE);

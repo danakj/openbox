@@ -52,7 +52,7 @@ static void measure_font(const RrInstance *inst, RrFont *f)
     g_free(locale);
 }
 
-RrFont *RrFontOpen(const RrInstance *inst, gchar *name, gint size,
+RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
                    RrFontWeight weight, RrFontSlant slant)
 {
     RrFont *out;

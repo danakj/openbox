@@ -542,6 +542,7 @@ static void event_handle_root(XEvent *e)
         msgtype = e->xclient.message_type;
         if (msgtype == prop_atoms.net_current_desktop) {
             guint d = e->xclient.data.l[0];
+            event_curtime = e->xclient.data.l[1];
             if (d < screen_num_desktops)
                 screen_set_desktop(d);
         } else if (msgtype == prop_atoms.net_number_of_desktops) {
@@ -880,6 +881,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case UnmapNotify:
+        ob_debug("UnmapNotify for window 0x%x\n", client->window);
         if (client->ignore_unmaps) {
             client->ignore_unmaps--;
             break;
@@ -887,6 +889,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         client_unmanage(client);
         break;
     case DestroyNotify:
+        ob_debug("DestroyNotify for window 0x%x\n", client->window);
         client_unmanage(client);
         break;
     case ReparentNotify:
@@ -913,7 +916,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                        it can happen now when the window is on
                                        another desktop, but we still don't
                                        want it! */
-        client_activate(client, FALSE, TRUE, CurrentTime);
+        client_activate(client, FALSE, TRUE);
         break;
     case ClientMessage:
         /* validate cuz we query stuff off the client here */
@@ -972,11 +975,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      (e->xclient.data.l[0] == 0 ? "unknown" :
                       (e->xclient.data.l[0] == 1 ? "application" :
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
-            /* XXX make use of data.l[1] and [2] ! */
+            /* XXX make use of data.l[2] ! */
+            event_curtime = e->xclient.data.l[1];
             client_activate(client, FALSE,
                             (e->xclient.data.l[0] == 0 ||
-                             e->xclient.data.l[0] == 2),
-                            e->xclient.data.l[1]);
+                             e->xclient.data.l[0] == 2));
         } else if (msgtype == prop_atoms.net_wm_moveresize) {
             ob_debug("net_wm_moveresize for 0x%lx direction %d\n",
                      client->window, e->xclient.data.l[2]);

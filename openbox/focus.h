@@ -58,10 +58,9 @@ void focus_fallback(gboolean allow_refocus);
 
 /*! Cycle focus amongst windows. */
 void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
-                 gboolean dialog, gboolean done, gboolean cancel, Time time);
+                 gboolean dialog, gboolean done, gboolean cancel);
 void focus_directional_cycle(ObDirection dir, gboolean interactive,
-                             gboolean dialog, gboolean done, gboolean cancel,
-                             Time time);
+                             gboolean dialog, gboolean done, gboolean cancel);
 void focus_cycle_draw_indicator();
 
 /*! Add a new client into the focus order */

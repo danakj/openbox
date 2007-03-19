@@ -1149,8 +1149,7 @@ void action_activate(union ActionData *data)
            moving on us */
         event_halt_focus_delay();
 
-        client_activate(data->activate.any.c, data->activate.here, TRUE,
-                        data->activate.any.time);
+        client_activate(data->activate.any.c, data->activate.here, TRUE);
     }
 }
 
@@ -1632,8 +1631,7 @@ void action_cycle_windows(union ActionData *data)
 
     focus_cycle(data->cycle.forward, data->cycle.linear, data->any.interactive,
                 data->cycle.dialog,
-                data->cycle.inter.final, data->cycle.inter.cancel,
-                data->cycle.inter.any.time);
+                data->cycle.inter.final, data->cycle.inter.cancel);
 }
 
 void action_directional_focus(union ActionData *data)
@@ -1646,8 +1644,7 @@ void action_directional_focus(union ActionData *data)
                             data->any.interactive,
                             data->interdiraction.dialog,
                             data->interdiraction.inter.final,
-                            data->interdiraction.inter.cancel,
-                            data->interdiraction.inter.any.time);
+                            data->interdiraction.inter.cancel);
 }
 
 void action_movetoedge(union ActionData *data)

@@ -504,9 +504,8 @@ gboolean client_focus(ObClient *self);
               otherwise, the desktop is changed to where the client lives.
   @param user If true, then a user action is what requested the activation;
               otherwise, it means an application requested it on its own
-  @param timestamp The time at which the activate was requested.
 */
-void client_activate(ObClient *self, gboolean here, gboolean user, Time time);
+void client_activate(ObClient *self, gboolean here, gboolean user);
 
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);

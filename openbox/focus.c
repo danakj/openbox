@@ -59,7 +59,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
        be used
     */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, CurrentTime);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
 static Window createWindow(Window parent, gulong mask,
@@ -180,7 +180,7 @@ void focus_set_client(ObClient *client)
        be used.
     */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, CurrentTime);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
     old = focus_client;
     focus_client = client;
@@ -497,7 +497,7 @@ static gboolean valid_focus_target(ObClient *ft)
 }
 
 void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
-                 gboolean dialog, gboolean done, gboolean cancel, Time time)
+                 gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
     static ObClient *t = NULL;
@@ -558,7 +558,7 @@ void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
 
 done_cycle:
     if (done && focus_cycle_target)
-        client_activate(focus_cycle_target, FALSE, TRUE, time);
+        client_activate(focus_cycle_target, FALSE, TRUE);
 
     t = NULL;
     first = NULL;
@@ -575,8 +575,7 @@ done_cycle:
 }
 
 void focus_directional_cycle(ObDirection dir, gboolean interactive,
-                             gboolean dialog, gboolean done, gboolean cancel,
-                             Time time)
+                             gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
     ObClient *ft = NULL;
@@ -621,7 +620,7 @@ void focus_directional_cycle(ObDirection dir, gboolean interactive,
 
 done_cycle:
     if (done && focus_cycle_target)
-        client_activate(focus_cycle_target, FALSE, TRUE, time);
+        client_activate(focus_cycle_target, FALSE, TRUE);
 
     first = NULL;
     focus_cycle_target = NULL;

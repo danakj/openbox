@@ -3080,7 +3080,7 @@ static void client_unfocus(ObClient *self)
     }
 }
 
-void client_activate(ObClient *self, gboolean here, gboolean user, Time time)
+void client_activate(ObClient *self, gboolean here, gboolean user)
 {
     /* XXX do some stuff here if user is false to determine if we really want
        to activate it or not (a parent or group member is currently
@@ -3088,9 +3088,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user, Time time)
     */
     ob_debug("Want to activate window 0x%x with time %u (last time %u), "
              "source=%s\n",
-             self->window, time, client_last_user_time,
+             self->window, event_curtime, client_last_user_time,
              (user ? "user" : "application"));
-    if (!user && time && time < client_last_user_time)
+    if (!user && event_curtime && event_curtime < client_last_user_time)
         client_hilite(self, TRUE);
     else {
         if (client_normal(self) && screen_showing_desktop)

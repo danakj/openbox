@@ -247,7 +247,7 @@ void frame_hide(ObFrame *self)
     if (self->visible || self->firstmap == FALSE) {
         if (self->visible) {
             self->visible = FALSE;
-            self->client->ignore_unmaps += 2;
+            self->client->ignore_unmaps += 1;
             /* we unmap the client itself so that we can get MapRequest
                events, and because the ICCCM tells us to! */
             XUnmapWindow(ob_display, self->window);

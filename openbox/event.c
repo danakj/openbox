@@ -312,6 +312,7 @@ static gboolean wanted_focusevent(XEvent *e)
 {
     gint mode = e->xfocus.mode;
     gint detail = e->xfocus.detail;
+    Window win = e->xany.window;
 
     if (e->type == FocusIn) {
 
@@ -326,6 +327,14 @@ static gboolean wanted_focusevent(XEvent *e)
 
         /* These are the ones we want.. */
 
+        if (win == RootWindow(ob_display, ob_screen)) {
+            /* This means focus reverted off of a client */
+            if (detail == NotifyPointerRoot || detail == NotifyDetailNone)
+                return TRUE;
+            else
+                return FALSE;
+        }
+
         /* This means focus moved from the root window to a client */
         if (detail == NotifyVirtual)
             return TRUE;
@@ -334,8 +343,7 @@ static gboolean wanted_focusevent(XEvent *e)
             return TRUE;
 
         /* This means focus reverted off of a client */
-        if (detail == NotifyPointerRoot || detail == NotifyDetailNone ||
-            detail == NotifyInferior)
+        if (detail == NotifyInferior)
             return TRUE;
 
         /* Otherwise.. */
@@ -348,6 +356,10 @@ static gboolean wanted_focusevent(XEvent *e)
 
         /* This means focus was taken by a keyboard/mouse grab. */
         if (mode == NotifyGrab)
+            return FALSE;
+
+        /* Focus left the root window revertedto state */
+        if (win == RootWindow(ob_display, ob_screen))
             return FALSE;
 
         /* These are the ones we want.. */

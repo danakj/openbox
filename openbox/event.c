@@ -333,6 +333,11 @@ static gboolean wanted_focusevent(XEvent *e)
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
 
+        /* This means focus reverted off of a client */
+        if (detail == NotifyPointerRoot || detail == NotifyDetailNone ||
+            detail == NotifyInferior)
+            return TRUE;
+
         /* Otherwise.. */
         return FALSE;
     } else {
@@ -657,17 +662,25 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
-               is not being managed. most likely, this went to PointerRoot
-               or None, meaning the window is no longer around so fallback
-               focus, but not to that window */
+               is not being managed, or a window on another screen. */
             ob_debug("Focus went to a black hole !\n");
-            focus_fallback(FALSE);
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             break;
+        } else if (ce.xfocus.detail == NotifyPointerRoot ||
+                 ce.xfocus.detail == NotifyDetailNone) {
+            ob_debug("Focus went to root\n");
+            /* Focus has been reverted to the root window or nothing, so fall
+               back to something other than the window which just had it. */
+            focus_fallback(FALSE);
+        } else if (ce.xfocus.detail == NotifyInferior) {
+            ob_debug("Focus went to parent\n");
+            /* Focus has been reverted to parent, which is our frame window,
+               so fall back to something other than the window which had it. */
+            focus_fallback(FALSE);
         } else {
             /* Focus did move, so process the FocusIn event */
-            ObEventData ed;
+            ObEventData ed = { .ignored = FALSE };
             event_process(&ce, &ed);
             if (ed.ignored) {
                 /* The FocusIn was ignored, this means it was on a window

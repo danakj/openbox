@@ -33,7 +33,7 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
 }
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
 gchar **sn_get_spawn_environment(char *program, char *name,
-                                 char *icon_name, Time time)
+                                 char *icon_name, gint desktop, Time time)
 {
     return g_strdupv(environ);
 }
@@ -227,7 +227,8 @@ static gboolean sn_launch_wait_timeout(gpointer data)
 }
 
 gchar **sn_get_spawn_environment(char *program, char *name,
-                                 char *icon_name, Time time)
+                                 char *icon_name, gint desktop,
+                                 Time time)
 {
     gchar **env, *desc;
     guint len;
@@ -244,6 +245,8 @@ gchar **sn_get_spawn_environment(char *program, char *name,
     sn_launcher_context_set_description(sn_launcher, desc);
     sn_launcher_context_set_icon_name(sn_launcher, icon_name ? icon_name : program);
     sn_launcher_context_set_binary_name(sn_launcher, program);
+    if (desktop >= 0 && (unsigned) desktop < screen_num_desktops)
+        sn_launcher_context_set_workspace(sn_launcher, (signed) desktop);
     sn_launcher_context_initiate(sn_launcher, "openbox", program, time);
     id = sn_launcher_context_get_startup_id(sn_launcher);
 

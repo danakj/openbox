@@ -1109,6 +1109,9 @@ void action_execute(union ActionData *data)
                 env = sn_get_spawn_environment(program,
                                                data->execute.name,
                                                data->execute.icon_name,
+                                               /* launch it on the current
+                                                  desktop */
+                                               screen_desktop,
                                                data->execute.any.time);
                 if (!g_spawn_async(NULL, argv, env, G_SPAWN_SEARCH_PATH |
                                    G_SPAWN_DO_NOT_REAP_CHILD,

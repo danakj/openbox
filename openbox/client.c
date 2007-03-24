@@ -1643,20 +1643,16 @@ void client_update_wmhints(ObClient *self)
 
 void client_update_title(ObClient *self)
 {
-    GList *it;
-    guint32 nums;
-    guint i;
     gchar *data = NULL;
-    gchar *old_title;
 
-    old_title = self->title;
+    g_free(self->title);
      
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
         /* try old x stuff */
         if (!(PROP_GETS(self->window, wm_name, locale, &data)
               || PROP_GETS(self->window, wm_name, utf8, &data))) {
-            if (self->transient != NULL) {
+            if (self->transient) {
                 /*
                   GNOME alert windows are not given titles:
                   http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
@@ -1672,8 +1668,6 @@ void client_update_title(ObClient *self)
 
     if (self->frame)
         frame_adjust_title(self->frame);
-
-    g_free(old_title);
 
     /* update the icon title */
     data = NULL;
@@ -1868,7 +1862,7 @@ void client_update_user_time(ObClient *self, gboolean new_event)
         if (new_event)
             client_last_user_time = time;
 
-        /*ob_debug("window 0x%x user time %u\n", self->window, time);*/
+        /*ob_debug("window %s user time %u\n", self->title, time);*/
     }
 }
 

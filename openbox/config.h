@@ -91,8 +91,6 @@ extern gboolean config_theme_keepborder;
 extern gboolean config_theme_hidedisabled;
 /*! Titlebar button layout */
 extern gchar *config_title_layout;
-/*! Append a unique number to windows with same titles */
-extern gboolean config_title_number;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;

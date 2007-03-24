@@ -40,7 +40,6 @@ gboolean config_theme_keepborder;
 gboolean config_theme_hidedisabled;
 
 gchar   *config_title_layout;
-gboolean config_title_number;
 
 RrFont *config_font_activewindow;
 RrFont *config_font_inactivewindow;
@@ -437,8 +436,6 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         g_free(config_title_layout);
         config_title_layout = parse_string(doc, n);
     }
-    if ((n = parse_find_node("titleNumber", node)))
-        config_title_number = parse_bool(doc, n);
     if ((n = parse_find_node("keepBorder", node)))
         config_theme_keepborder = parse_bool(doc, n);
     if ((n = parse_find_node("hideDisabled", node)))
@@ -797,7 +794,6 @@ void config_startup(ObParseInst *i)
     config_theme = NULL;
 
     config_title_layout = g_strdup("NLIMC");
-    config_title_number = TRUE;
     config_theme_keepborder = TRUE;
     config_theme_hidedisabled = FALSE;
 

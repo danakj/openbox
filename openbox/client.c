@@ -268,7 +268,6 @@ void client_manage(Window window)
     self->window = window;
 
     /* non-zero defaults */
-    self->title_count = 1;
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->layer = -1;
     self->desktop = screen_num_desktops; /* always an invalid value */
@@ -1648,7 +1647,6 @@ void client_update_title(ObClient *self)
     guint32 nums;
     guint i;
     gchar *data = NULL;
-    gboolean read_title;
     gchar *old_title;
 
     old_title = self->title;
@@ -1658,60 +1656,17 @@ void client_update_title(ObClient *self)
         /* try old x stuff */
         if (!(PROP_GETS(self->window, wm_name, locale, &data)
               || PROP_GETS(self->window, wm_name, utf8, &data))) {
-            // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-            if (self->transient) {
+            if (self->transient != NULL) {
+                /*
+                  GNOME alert windows are not given titles:
+                  http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+                */
                 data = g_strdup("");
-                goto no_number;
             } else
                 data = g_strdup("Unnamed Window");
         }
     }
 
-    if (config_title_number) {
-
-        /* did the title change? then reset the title_count */
-        if (old_title && 0 != strncmp(old_title, data, strlen(data)))
-            self->title_count = 1;
-
-        /* look for duplicates and append a number */
-        nums = 0;
-        for (it = client_list; it; it = g_list_next(it))
-            if (it->data != self) {
-                ObClient *c = it->data;
-
-                if (c->title_count == 1) {
-                    if (!strcmp(c->title, data))
-                        nums |= 1 << c->title_count;
-                } else {
-                    size_t len;
-                    gchar *end;
-
-                    /* find the beginning of our " - [%u]", this relies on
-                     that syntax being used */
-                    end = strrchr(c->title, '-') - 1; 
-                    len = end - c->title;
-                    if (!strncmp(c->title, data, len))
-                        nums |= 1 << c->title_count;
-                }
-            }
-        /* find first free number */
-        for (i = 1; i <= 32; ++i)
-            if (!(nums & (1 << i))) {
-                if (self->title_count == 1 || i == 1)
-                    self->title_count = i;
-                break;
-            }
-        /* dont display the number for the first window */
-        if (self->title_count > 1) {
-            gchar *ndata;
-            ndata = g_strdup_printf("%s - [%u]", data, self->title_count);
-            g_free(data);
-            data = ndata;
-        }
-    } else
-        self->title_count = 1;
-
-no_number:
     PROP_SETS(self->window, net_wm_visible_name, data);
     self->title = data;
 
@@ -1724,28 +1679,14 @@ no_number:
     data = NULL;
     g_free(self->icon_title);
 
-    read_title = TRUE;
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_icon_name, utf8, &data))
         /* try old x stuff */
-        if (!(PROP_GETS(self->window, wm_icon_name, locale, &data)
-              || PROP_GETS(self->window, wm_icon_name, utf8, &data))) {
+        if (!(PROP_GETS(self->window, wm_icon_name, locale, &data) ||
+              PROP_GETS(self->window, wm_icon_name, utf8, &data)))
             data = g_strdup(self->title);
-            read_title = FALSE;
-        }
-
-    /* append the title count, dont display the number for the first window.
-     * We don't need to check for config_title_number here since title_count
-     * is not set above 1 then. */
-    if (read_title && self->title_count > 1) {
-        gchar *newdata;
-        newdata = g_strdup_printf("%s - [%u]", data, self->title_count);
-        g_free(data);
-        data = newdata;
-    }
 
     PROP_SETS(self->window, net_wm_visible_icon_name, data);
-
     self->icon_title = data;
 }
 

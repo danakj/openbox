@@ -114,9 +114,6 @@ struct _ObClient
 
     /*! Normal window title */
     gchar *title;
-    /*! The count for the title. When another window with the same title
-      exists, a count will be appended to it. */
-    guint title_count;
     /*! Window title when iconified */
     gchar *icon_title;
 

@@ -329,7 +329,8 @@ static gboolean wanted_focusevent(XEvent *e)
 
         if (win == RootWindow(ob_display, ob_screen)) {
             /* This means focus reverted off of a client */
-            if (detail == NotifyPointerRoot || detail == NotifyDetailNone)
+            if (detail == NotifyPointerRoot || detail == NotifyDetailNone ||
+                detail == NotifyInferior)
                 return TRUE;
             else
                 return FALSE;
@@ -688,7 +689,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
         } else if (ce.xfocus.detail == NotifyInferior) {
             ob_debug("Focus went to parent\n");
             /* Focus has been reverted to parent, which is our frame window,
-               so fall back to something other than the window which had it. */
+               or the root window, so fall back to something other than the
+               window which had it. */
             focus_fallback(FALSE);
         } else {
             /* Focus did move, so process the FocusIn event */
@@ -906,7 +908,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case UnmapNotify:
-        ob_debug("UnmapNotify for window 0x%x\n", client->window);
+        ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
+                 "ignores left %d\n",
+                 client->window, e->xunmap.event, e->xunmap.from_configure,
+                 client->ignore_unmaps);
         if (client->ignore_unmaps) {
             client->ignore_unmaps--;
             break;
@@ -932,6 +937,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
            X server to deal with after we unmanage the window */
         XPutBackEvent(ob_display, e);
      
+        ob_debug("ReparentNotify for window 0x%x\n", client->window);
         client_unmanage(client);
         break;
     case MapRequest:

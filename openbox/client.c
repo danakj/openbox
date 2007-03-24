@@ -220,13 +220,14 @@ void client_manage(Window window)
 
     grab_server(TRUE);
 
-    /* check if it has already been unmapped by the time we started mapping
+    /* check if it has already been unmapped by the time we started mapping.
        the grab does a sync so we don't have to here */
     if (XCheckTypedWindowEvent(ob_display, window, DestroyNotify, &e) ||
         XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e))
     {
         XPutBackEvent(ob_display, &e);
 
+        ob_debug("Trying to manage unmapped window. Aborting that.\n");
         grab_server(FALSE);
         return; /* don't manage it */
     }
@@ -393,6 +394,8 @@ void client_manage(Window window)
        won't be all wacko!!
        also, this moves the window to the position where it has been placed
     */
+    ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
+             self->window, newx, newy, self->area.width, self->area.height);
     client_apply_startup_state(self, newx, newy);
 
     keyboard_grab_for_client(self, TRUE);

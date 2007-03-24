@@ -1862,7 +1862,10 @@ void client_update_user_time(ObClient *self, gboolean new_event)
         if (new_event)
             client_last_user_time = time;
 
-        /*ob_debug("window %s user time %u\n", self->title, time);*/
+        /*
+        ob_debug("window %s user time %u\n", self->title, time);
+        ob_debug("last user time %u\n", client_last_user_time);
+        */
     }
 }
 

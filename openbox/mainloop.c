@@ -20,6 +20,7 @@
 #include "mainloop.h"
 #include "action.h"
 #include "client.h"
+#include "event.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -325,14 +326,16 @@ void ob_main_loop_run(ObMainLoop *loop)
                 {
                     loop->action_queue =
                         g_slist_delete_link(loop->action_queue,
-                                loop->action_queue);
+                                            loop->action_queue);
                     action_unref(act);
                     act = NULL;
                 }
             } while (!act && loop->action_queue);
 
             if  (act) {
+                event_curtime = act->data.any.time;
                 act->func(&act->data);
+                event_curtime = CurrentTime;
                 loop->action_queue =
                     g_slist_delete_link(loop->action_queue,
                                         loop->action_queue);

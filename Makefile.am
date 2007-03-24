@@ -216,7 +216,6 @@ tools_themetoxml_themetoxml_LDADD = \
 	$(XML_LIBS)
 tools_themetoxml_themetoxml_SOURCES = \
 	tools/themetoxml/themetoxml.c \
-	tools/themetoxml/themetoxml.h \
 	tools/themetoxml/rgb.h
 
 

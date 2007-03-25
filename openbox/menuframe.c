@@ -193,7 +193,7 @@ void menu_frame_place_topmenu(ObMenuFrame *self, gint x, gint y)
         x = self->client->frame->area.x + self->client->frame->size.left;
         y = self->client->frame->area.y + self->client->frame->size.top;
     } else {
-        x -= ob_rr_theme->mbwidth;
+        x -= self->area.width / 2;
         y -= ob_rr_theme->mbwidth + self->title_h;
     }
     menu_frame_move(self, x, y);
@@ -205,9 +205,8 @@ void menu_frame_place_submenu(ObMenuFrame *self)
     gint overlap;
     gint bwidth;
 
-    overlap = (config_menu_middle ? 0 : ob_rr_theme->menu_overlap);
+    overlap = ob_rr_theme->menu_overlap;
     bwidth = ob_rr_theme->mbwidth;
-
 
     if (self->direction_right)
         x = self->parent->area.x + self->parent->area.width - overlap - bwidth;
@@ -215,9 +214,11 @@ void menu_frame_place_submenu(ObMenuFrame *self)
         x = self->parent->area.x - self->area.width + overlap + bwidth;
 
     y = self->parent->area.y + self->parent->title_h +
-        self->parent_entry->area.y + overlap;
+        self->parent_entry->area.y;
     if (config_menu_middle)
-        y = y - (self->area.height - (bwidth * 2) - self->item_h) / 2;
+        y -= (self->area.height - (bwidth * 2) - self->item_h) / 2;
+    else
+        y += overlap;
 
     menu_frame_move(self, x, y);
 }

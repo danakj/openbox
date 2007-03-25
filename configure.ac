@@ -84,8 +84,8 @@ AC_SUBST(XML_LIBS)
 
 AC_ARG_ENABLE(startup-notification,
   AC_HELP_STRING(
-    [--enable-startup-notification],
-    [enable the startup notification library. [[default=enabled]]]
+    [--disable-startup-notification],
+    [disable the startup notification library. [[default=enabled]]]
   ),
   [enable_sn=$enableval],
   [enable_sn=yes]
@@ -107,6 +107,16 @@ else
   sn_found=no
 fi
 
+AC_ARG_ENABLE(xcursor,
+  AC_HELP_STRING(
+    [--disable-xcursor],
+    [disable use of the X Cursor library. [[default=enabled]]]
+  ),
+  [enable_xcursor=$enableval],
+  [enable_xcursor=yes]
+)
+
+if test "$enable_xcursor" = yes; then
 PKG_CHECK_MODULES(XCURSOR, [xcursor],
   [
     AC_DEFINE(USE_XCURSOR, [1], [Use X Cursor library])
@@ -118,6 +128,9 @@ PKG_CHECK_MODULES(XCURSOR, [xcursor],
     xcursor_found=no
   ]
 )
+else
+  xcursor_found=no
+fi
 
 dnl Check for session management
 X11_SM

@@ -445,7 +445,7 @@ static Cursor load_cursor(const gchar *name, guint fontval)
     c = XcursorLibraryLoadCursor(ob_display, name);
 #endif
     if (c == None)
-        XCreateFontCursor(ob_display, fontval);
+        c = XCreateFontCursor(ob_display, fontval);
     return c;
 }
 

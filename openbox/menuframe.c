@@ -689,8 +689,6 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 
     if (menu_frame_is_visible(self))
         return TRUE;
-    if (!menu_frame_show(self))
-        return FALSE;
 
     self->monitor = parent->monitor;
     self->parent = parent;
@@ -700,6 +698,9 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     if (parent->child)
         menu_frame_hide(parent->child);
     parent->child = self;
+
+    if (!menu_frame_show(self))
+        return FALSE;
 
     menu_frame_place_submenu(self);
     menu_frame_move_on_screen(self, &dx, &dy);

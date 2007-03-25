@@ -105,6 +105,7 @@ parser_libobparser_la_SOURCES = \
 
 openbox_openbox_CPPFLAGS = \
 	$(X_CFLAGS) \
+	$(XCURSOR_CFLAGS) \
 	$(SM_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
@@ -122,6 +123,7 @@ openbox_openbox_LDADD = \
 	$(XSHAPE_LIBS) \
 	$(GLIB_LIBS) \
 	$(X_LIBS) \
+	$(XCURSOR_LIBS) \
 	$(LIBSN_LIBS) \
 	$(XML_LIBS) \
 	$(EFENCE_LIBS) \

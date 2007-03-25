@@ -107,6 +107,18 @@ else
   sn_found=no
 fi
 
+PKG_CHECK_MODULES(XCURSOR, [xcursor],
+  [
+    AC_DEFINE(USE_XCURSOR, [1], [Use X Cursor library])
+    AC_SUBST(XCURSOR_CFLAGS)
+    AC_SUBST(XCURSOR_LIBS)
+    xcursor_found=yes
+  ],
+  [
+    xcursor_found=no
+  ]
+)
+
 dnl Check for session management
 X11_SM
 
@@ -133,6 +145,7 @@ AC_OUTPUT
 AC_MSG_RESULT
 AC_MSG_RESULT([Compiling with these options:
                Startup Notification... $sn_found
+               X Cursor Library... $xcursor_found
                Session Management... $SM
                ])
 AC_MSG_RESULT([configure complete, now type "make"])

@@ -70,6 +70,9 @@
 #include <errno.h>
 
 #include <X11/cursorfont.h>
+#if USE_XCURSOR
+#include <X11/Xcursor/Xcursor.h>
+#endif
 
 RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
@@ -91,6 +94,7 @@ static gboolean  being_replaced = FALSE;
 
 static void signal_handler(gint signal, gpointer data);
 static void parse_args(gint argc, gchar **argv);
+static Cursor load_cursor(const gchar *name, guint fontval);
 
 gint main(gint argc, gchar **argv)
 {
@@ -174,28 +178,21 @@ gint main(gint argc, gchar **argv)
 
     /* create available cursors */
     cursors[OB_CURSOR_NONE] = None;
-    cursors[OB_CURSOR_POINTER] =
-        XCreateFontCursor(ob_display, XC_left_ptr);
-    cursors[OB_CURSOR_BUSY] =
-        XCreateFontCursor(ob_display, XC_watch);
-    cursors[OB_CURSOR_MOVE] =
-        XCreateFontCursor(ob_display, XC_fleur);
-    cursors[OB_CURSOR_NORTH] =
-        XCreateFontCursor(ob_display, XC_top_side);
-    cursors[OB_CURSOR_NORTHEAST] =
-        XCreateFontCursor(ob_display, XC_top_right_corner);
-    cursors[OB_CURSOR_EAST] =
-        XCreateFontCursor(ob_display, XC_right_side);
-    cursors[OB_CURSOR_SOUTHEAST] =
-        XCreateFontCursor(ob_display, XC_bottom_right_corner);
-    cursors[OB_CURSOR_SOUTH] =
-        XCreateFontCursor(ob_display, XC_bottom_side);
-    cursors[OB_CURSOR_SOUTHWEST] =
-        XCreateFontCursor(ob_display, XC_bottom_left_corner);
-    cursors[OB_CURSOR_WEST] =
-        XCreateFontCursor(ob_display, XC_left_side);
-    cursors[OB_CURSOR_NORTHWEST] =
-        XCreateFontCursor(ob_display, XC_top_left_corner);
+    cursors[OB_CURSOR_POINTER] = load_cursor("left_ptr", XC_left_ptr);
+    cursors[OB_CURSOR_BUSY] = load_cursor("left_ptr_watch", XC_watch);
+    cursors[OB_CURSOR_MOVE] = load_cursor("fleur", XC_fleur);
+    cursors[OB_CURSOR_NORTH] = load_cursor("top_side", XC_top_side);
+    cursors[OB_CURSOR_NORTHEAST] = load_cursor("top_right_corner",
+                                               XC_top_right_corner);
+    cursors[OB_CURSOR_EAST] = load_cursor("right_side", XC_right_side);
+    cursors[OB_CURSOR_SOUTHEAST] = load_cursor("bottom_right_corner",
+                                               XC_bottom_right_corner);
+    cursors[OB_CURSOR_SOUTH] = load_cursor("bottom_side", XC_bottom_side);
+    cursors[OB_CURSOR_SOUTHWEST] = load_cursor("bottom_left_corner",
+                                               XC_bottom_left_corner);
+    cursors[OB_CURSOR_WEST] = load_cursor("left_side", XC_left_side);
+    cursors[OB_CURSOR_NORTHWEST] = load_cursor("top_left_corner",
+                                               XC_top_left_corner);
 
     /* create available keycodes */
     keys[OB_KEY_RETURN] =
@@ -438,6 +435,18 @@ static void parse_args(gint argc, gchar **argv)
             remote_control = 2;
         }
     }
+}
+
+static Cursor load_cursor(const gchar *name, guint fontval)
+{
+    Cursor c = None;
+
+#if USE_XCURSOR
+    c = XcursorLibraryLoadCursor(ob_display, name);
+#endif
+    if (c == None)
+        XCreateFontCursor(ob_display, fontval);
+    return c;
 }
 
 void ob_exit_with_error(const gchar *msg)

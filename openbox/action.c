@@ -1013,7 +1013,7 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
-                     guint state, guint button, gint x, gint y, Time time,
+                     guint state, gint button, gint x, gint y, Time time,
                      gboolean cancel, gboolean done)
 {
     GSList *it;
@@ -1621,8 +1621,16 @@ void action_exit(union ActionData *data)
 void action_showmenu(union ActionData *data)
 {
     if (data->showmenu.name) {
-        menu_show(data->showmenu.name, data->any.x, data->any.y,
-                  data->showmenu.any.c);
+        gint x, y;
+        ObClient *c = data->showmenu.any.c;
+        if (data->any.button == -1 && c) {
+            x = c->frame->area.x + c->frame->size.left;
+            y = c->frame->area.y + c->frame->size.top;
+        } else {
+            x = data->any.x;
+            y = data->any.y;
+        }
+        menu_show(data->showmenu.name, x, y, c);
     }
 }
 

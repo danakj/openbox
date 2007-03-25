@@ -65,6 +65,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
     self->selected = NULL;
     self->show_title = TRUE;
     self->client = client;
+    self->direction_right = TRUE;
 
     attr.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen),
@@ -186,46 +187,71 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
     XMoveWindow(ob_display, self->window, self->area.x, self->area.y);
 }
 
-void menu_frame_move_on_screen(ObMenuFrame *self)
+void menu_frame_place_topmenu(ObMenuFrame *self, gint x, gint y)
+{
+    if (self->client && x < 0 && y < 0) {
+        x = self->client->frame->area.x + self->client->frame->size.left;
+        y = self->client->frame->area.y + self->client->frame->size.top;
+    } else {
+        if (config_menu_middle) {
+            x -= self->area.width / 2;
+            y -= self->title_h*3/4;
+        } else {
+            x -= ob_rr_theme->mbwidth;
+            y -= ob_rr_theme->mbwidth;
+        }
+    }
+    menu_frame_move(self, x, y);
+}
+
+void menu_frame_place_submenu(ObMenuFrame *self)
+{
+    gint x, y;
+    gint overlap;
+    gint bwidth;
+
+    overlap = (config_menu_middle ? 0 : ob_rr_theme->menu_overlap);
+    bwidth = ob_rr_theme->mbwidth;
+
+
+    if (self->direction_right)
+        x = self->parent->area.x + self->parent->area.width - overlap - bwidth;
+    else
+        x = self->parent->area.x - self->area.width + overlap + bwidth;
+
+    y = self->parent->area.y + self->parent->title_h +
+        self->parent_entry->area.y + overlap;
+    if (config_menu_middle)
+        y = y - self->area.height/2 + self->item_h/2;
+
+    menu_frame_move(self, x, y);
+}
+
+void menu_frame_move_on_screen(ObMenuFrame *self, gint *dx, gint *dy)
 {
     Rect *a = NULL;
-    gint dx = 0, dy = 0;
     gint pos, half;
+
+    *dx = *dy = 0;
 
     a = screen_physical_area_monitor(self->monitor);
 
     half = g_list_length(self->entries) / 2;
     pos = g_list_index(self->entries, self->selected);
 
-    /* if in the bottom half then check this shit first, will keep the bottom
+    /* if in the bottom half then check this stuff first, will keep the bottom
        edge of the menu visible */
     if (pos > half) {
-        dx = MAX(dx, a->x - self->area.x);
-        dy = MAX(dy, a->y - self->area.y);
+        *dx = MAX(*dx, a->x - self->area.x);
+        *dy = MAX(*dy, a->y - self->area.y);
     }
-    dx = MIN(dx, (a->x + a->width) - (self->area.x + self->area.width));
-    dy = MIN(dy, (a->y + a->height) - (self->area.y + self->area.height));
-    /* if in the top half then check this shit last, will keep the top
+    *dx = MIN(*dx, (a->x + a->width) - (self->area.x + self->area.width));
+    *dy = MIN(*dy, (a->y + a->height) - (self->area.y + self->area.height));
+    /* if in the top half then check this stuff last, will keep the top
        edge of the menu visible */
     if (pos <= half) {
-        dx = MAX(dx, a->x - self->area.x);
-        dy = MAX(dy, a->y - self->area.y);
-    }
-
-    if (dx || dy) {
-        ObMenuFrame *f;
-
-        /* move the current menu frame to fit, but dont touch parents yet */
-        menu_frame_move(self, self->area.x + dx, self->area.y + dy);
-        if (!config_menu_xorstyle)
-            dy = 0; /* if we want to be like xor, move parents in y- *
-                     * and x-direction, otherwise just in x-dir      */
-        for (f = self->parent; f; f = f->parent)
-            menu_frame_move(f, f->area.x + dx, f->area.y + dy);
-        for (f = self->child; f; f = f->child)
-            menu_frame_move(f, f->area.x + dx, f->area.y + dy);
-        if (config_menu_warppointer)
-            XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
+        *dx = MAX(*dx, a->x - self->area.x);
+        *dy = MAX(*dy, a->y - self->area.y);
     }
 }
 
@@ -590,12 +616,14 @@ static void menu_frame_update(ObMenuFrame *self)
     menu_frame_render(self);
 }
 
-gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
+static gboolean menu_frame_is_visible(ObMenuFrame *self)
+{
+    return !!(g_list_find(menu_frame_visible, self));
+}
+
+static gboolean menu_frame_show(ObMenuFrame *self)
 {
     GList *it;
-
-    if (g_list_find(menu_frame_visible, self))
-        return TRUE;
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
@@ -606,14 +634,6 @@ gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
             return FALSE;
         }
     }
-
-    if (parent) {
-        self->monitor = parent->monitor;
-        if (parent->child)
-            menu_frame_hide(parent->child);
-        parent->child = self;
-    }
-    self->parent = parent;
 
     /* determine if the underlying menu is already visible */
     for (it = menu_frame_visible; it; it = g_list_next(it)) {
@@ -629,18 +649,81 @@ gboolean menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
     menu_frame_update(self);
 
     menu_frame_visible = g_list_prepend(menu_frame_visible, self);
-    
-    if (config_menu_middle) {
-        if (self->parent)
-            menu_frame_move(self, self->area.x, self->area.y
-                                                - self->area.height/2
-                                                + self->item_h/2);
-        else if (self->show_title)
-            menu_frame_move(self, self->area.x - self->area.width/2,
-                            self->area.y - self->title_h*3/4);
+
+    return TRUE;
+}
+
+gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y)
+{
+    gint dx, dy;
+    guint i;
+
+    if (menu_frame_is_visible(self))
+        return TRUE;
+    if (!menu_frame_show(self))
+        return FALSE;
+
+    menu_frame_place_topmenu(self, x, y);
+
+    /* find the monitor the menu is on */
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *a = screen_physical_area_monitor(i);
+        if (RECT_CONTAINS(*a, x, y)) {
+            self->monitor = i;
+            break;
+        }
     }
 
-    menu_frame_move_on_screen(self);
+    menu_frame_move_on_screen(self, &dx, &dy);
+    menu_frame_move(self, self->area.x + dx, self->area.y + dy);
+
+    XMapWindow(ob_display, self->window);
+
+    return TRUE;
+}
+
+gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
+                                 ObMenuEntryFrame *parent_entry)
+{
+    gint dx, dy;
+
+    if (menu_frame_is_visible(self))
+        return TRUE;
+    if (!menu_frame_show(self))
+        return FALSE;
+
+    self->monitor = parent->monitor;
+    self->parent = parent;
+    self->parent_entry = parent_entry;
+
+    /* set up parent's child to be us */
+    if (parent->child)
+        menu_frame_hide(parent->child);
+    parent->child = self;
+
+    menu_frame_place_submenu(self);
+    menu_frame_move_on_screen(self, &dx, &dy);
+
+    if (dx == 0) {
+        menu_frame_move(self, self->area.x, self->area.y + dy);
+    } else {
+        gboolean dir;
+
+        /* flip the direction in which we're placing submenus */
+        if (dx > 0)
+            dir = TRUE;
+        else
+            dir = FALSE;
+
+        /* if it changed, then replace the menu on the opposite side,
+           and try keep it on the screen too */
+        if (dir != self->direction_right) {
+            self->direction_right = dir;
+            menu_frame_place_submenu(self);
+            menu_frame_move_on_screen(self, &dx, &dy);
+            menu_frame_move(self, self->area.x + dx, self->area.y + dy);
+        }
+    }
 
     XMapWindow(ob_display, self->window);
 
@@ -660,6 +743,7 @@ void menu_frame_hide(ObMenuFrame *self)
     if (self->parent)
         self->parent->child = NULL;
     self->parent = NULL;
+    self->parent_entry = NULL;
 
     menu_frame_visible = g_list_delete_link(menu_frame_visible, it);
 
@@ -791,16 +875,10 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
 
     f = menu_frame_new(self->entry->data.submenu.submenu,
                        self->frame->client);
-    menu_frame_move(f,
-                    self->frame->area.x
-                  + self->frame->area.width
-                  - ob_rr_theme->menu_overlap
-                  - ob_rr_theme->mbwidth,
-                    self->frame->area.y
-                  + self->frame->title_h
-                  + self->area.y
-                  + (config_menu_middle ? 1 : ob_rr_theme->menu_overlap));
-    menu_frame_show(f, self->frame);
+    /* pass our direction on to our child */
+    f->direction_right = self->frame->direction_right;
+
+    menu_frame_show_submenu(f, self->frame, self);
 }
 
 void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state, Time time)

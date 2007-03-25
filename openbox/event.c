@@ -1263,10 +1263,11 @@ static void event_handle_menu(XEvent *ev)
     case MotionNotify:
         if ((f = menu_frame_under(ev->xmotion.x_root,
                                   ev->xmotion.y_root))) {
-            menu_frame_move_on_screen(f);
             if ((e = menu_entry_frame_under(ev->xmotion.x_root,
-                                            ev->xmotion.y_root)))
+                                            ev->xmotion.y_root))) {
+                /* XXX menu_frame_entry_move_on_screen(f); */
                 menu_frame_select(f, e);
+            }
         }
         {
             ObMenuFrame *a;

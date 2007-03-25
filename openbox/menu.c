@@ -291,7 +291,6 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
 {
     ObMenu *self;
     ObMenuFrame *frame;
-    guint i;
 
     if (!(self = menu_from_name(name))
         || keyboard_interactively_grabbed()) return;
@@ -307,21 +306,7 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     menu_frame_hide_all();
 
     frame = menu_frame_new(self, client);
-    if (client && x < 0 && y < 0) {
-        x = client->frame->area.x + client->frame->size.left;
-        y = client->frame->area.y + client->frame->size.top;
-        menu_frame_move(frame, x, y);
-    } else
-        menu_frame_move(frame,
-                        x - ob_rr_theme->mbwidth, y - ob_rr_theme->mbwidth);
-    for (i = 0; i < screen_num_monitors; ++i) {
-        Rect *a = screen_physical_area_monitor(i);
-        if (RECT_CONTAINS(*a, x, y)) {
-            frame->monitor = i;
-            break;
-        }
-    }
-    if (!menu_frame_show(frame, NULL))
+    if (!menu_frame_show_topmenu(frame, x, y))
         menu_frame_free(frame);
     else if (frame->entries) {
         ObMenuEntryFrame *e = frame->entries->data;

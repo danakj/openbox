@@ -75,7 +75,6 @@ gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 
 gboolean config_menu_warppointer;
-gboolean config_menu_xorstyle;
 guint    config_menu_hide_delay;
 gboolean config_menu_middle;
 guint    config_submenu_show_delay;
@@ -647,8 +646,6 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         }
         if ((n = parse_find_node("warpPointer", node)))
             config_menu_warppointer = parse_bool(doc, n);
-        if ((n = parse_find_node("xorStyle", node)))
-            config_menu_xorstyle = parse_bool(doc, n);
         if ((n = parse_find_node("hideDelay", node)))
             config_menu_hide_delay = parse_int(doc, n);
         if ((n = parse_find_node("middle", node)))
@@ -853,7 +850,6 @@ void config_startup(ObParseInst *i)
     parse_register(i, "resistance", parse_resistance, NULL);
 
     config_menu_warppointer = TRUE;
-    config_menu_xorstyle = TRUE;
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
     config_submenu_show_delay = 0;

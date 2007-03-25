@@ -128,8 +128,6 @@ extern gboolean config_resist_layers_below;
 
 /*! Warp near edge on menu? */
 extern gboolean config_menu_warppointer;
-/*! make menus jump around a lot */
-extern gboolean config_menu_xorstyle;
 /*! delay for hiding menu when opening */
 extern guint    config_menu_hide_delay;
 /*! Center menus vertically about the parent entry */

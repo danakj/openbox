@@ -160,7 +160,7 @@ gboolean parse_load(const gchar *path, const gchar *rootname,
             *doc = NULL;
             g_warning("%s is an empty document", path);
         } else {
-            if (xmlStrcasecmp((*root)->name, (const xmlChar*)rootname)) {
+            if (xmlStrcmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
                 g_warning("Document %s is of wrong type. root node is "
@@ -183,7 +183,7 @@ gboolean parse_load_mem(gpointer data, guint len, const gchar *rootname,
             *doc = NULL;
             g_warning("Given memory is an empty document");
         } else {
-            if (xmlStrcasecmp((*root)->name, (const xmlChar*)rootname)) {
+            if (xmlStrcmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
                 g_warning("Document in given memory is of wrong type. root "
@@ -255,7 +255,7 @@ gboolean parse_contains(const gchar *val, xmlDocPtr doc, xmlNodePtr node)
 xmlNodePtr parse_find_node(const gchar *tag, xmlNodePtr node)
 {
     while (node) {
-        if (!xmlStrcasecmp(node->name, (const xmlChar*) tag))
+        if (!xmlStrcmp(node->name, (const xmlChar*) tag))
             return node;
         node = node->next;
     }

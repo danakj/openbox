@@ -222,7 +222,7 @@ void menu_frame_place_submenu(ObMenuFrame *self)
     y = self->parent->area.y + self->parent->title_h +
         self->parent_entry->area.y + overlap;
     if (config_menu_middle)
-        y = y - self->area.height/2 + self->item_h/2;
+        y = y - (self->area.height - (bwidth * 2) - self->item_h) / 2;
 
     menu_frame_move(self, x, y);
 }

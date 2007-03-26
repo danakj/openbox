@@ -671,7 +671,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             theme->osd_hilite_label->texture[0].data.text.shadow_offset_x = i;
             theme->osd_hilite_label->texture[0].data.text.shadow_offset_y = i;
         }
-        if (i && (p = strstr(str, "shadowtint=")))
+        if ((p = strstr(str, "shadowtint=")))
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
@@ -688,6 +688,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             theme->osd_shadow_alpha = 50;
         }
     }
+
+    theme->a_focused_label->texture[0].data.text.shadow_color =
+        theme->title_focused_shadow_color;
+    theme->a_focused_label->texture[0].data.text.shadow_alpha =
+        theme->title_focused_shadow_alpha;
+    theme->osd_hilite_label->texture[0].data.text.shadow_color =
+        theme->osd_shadow_color;
+    theme->osd_hilite_label->texture[0].data.text.shadow_alpha =
+        theme->osd_shadow_alpha;
 
     theme->a_unfocused_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_unfocused_label->texture[0].data.text.justify = winjust;
@@ -708,7 +717,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             theme->a_unfocused_label->texture[0].data.text.shadow_offset_x = i;
             theme->a_unfocused_label->texture[0].data.text.shadow_offset_y = i;
         }
-        if (i && (p = strstr(str, "shadowtint=")))
+        if ((p = strstr(str, "shadowtint=")))
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
@@ -722,6 +731,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         }
     }
 
+    theme->a_unfocused_label->texture[0].data.text.shadow_color =
+        theme->title_unfocused_shadow_color;
+    theme->a_unfocused_label->texture[0].data.text.shadow_alpha =
+        theme->title_unfocused_shadow_alpha;
 
     theme->a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_title->texture[0].data.text.justify = mtitlejust;
@@ -740,7 +753,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             theme->a_menu_title->texture[0].data.text.shadow_offset_x = i;
             theme->a_menu_title->texture[0].data.text.shadow_offset_y = i;
         }
-        if (i && (p = strstr(str, "shadowtint=")))
+        if ((p = strstr(str, "shadowtint=")))
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
@@ -754,6 +767,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         }
     }
 
+    theme->a_menu_title->texture[0].data.text.shadow_color =
+        theme->menu_title_shadow_color;
+    theme->a_menu_title->texture[0].data.text.shadow_alpha =
+        theme->menu_title_shadow_alpha;
 
     theme->a_menu_text_normal->texture[0].type =
         theme->a_menu_text_disabled->texture[0].type = 
@@ -794,7 +811,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             theme->a_menu_text_selected->
                 texture[0].data.text.shadow_offset_y = i;
         }
-        if (i && (p = strstr(str, "shadowtint=")))
+        if ((p = strstr(str, "shadowtint=")))
         {
             i = parse_inline_number(p + strlen("shadowtint="));
             j = (i > 0 ? 0 : 255);
@@ -815,6 +832,19 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             theme->menu_text_disabled_shadow_alpha = 50;
         }
     }
+
+    theme->a_menu_text_normal->texture[0].data.text.shadow_color =
+        theme->menu_text_normal_shadow_color;
+    theme->a_menu_text_normal->texture[0].data.text.shadow_alpha =
+        theme->menu_text_normal_shadow_alpha;
+    theme->a_menu_text_selected->texture[0].data.text.shadow_color =
+        theme->menu_text_selected_shadow_color;
+    theme->a_menu_text_selected->texture[0].data.text.shadow_alpha =
+        theme->menu_text_selected_shadow_alpha;
+    theme->a_menu_text_disabled->texture[0].data.text.shadow_color =
+        theme->menu_text_disabled_shadow_color;
+    theme->a_menu_text_disabled->texture[0].data.text.shadow_alpha =
+        theme->menu_text_disabled_shadow_alpha;
 
     theme->a_disabled_focused_max->texture[0].type = 
         theme->a_disabled_unfocused_max->texture[0].type = 

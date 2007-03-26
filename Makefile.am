@@ -29,9 +29,6 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
 
-noinst_PROGRAMS = \
-	tools/themetoxml/themetoxml
-
 ## render ##
 
 render_rendertest_CPPFLAGS = \
@@ -206,21 +203,6 @@ openbox_openbox_SOURCES = \
 	openbox/xerror.h
 
 
-## themetoxml ##
-
-tools_themetoxml_themetoxml_CPPFLAGS = \
-	$(X_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(XML_CFLAGS)
-tools_themetoxml_themetoxml_LDADD = \
-	$(X_LIBS) \
-	$(GLIB_LIBS) \
-	$(XML_LIBS)
-tools_themetoxml_themetoxml_SOURCES = \
-	tools/themetoxml/themetoxml.c \
-	tools/themetoxml/rgb.h
-
-
 ## gnome-panel-control ##
 
 tools_gnome_panel_control_gnome_panel_control_CPPFLAGS = \
@@ -240,7 +222,7 @@ dist_mikachu_theme_DATA= \
 	themes/Mikachu/openbox-3/desk.xbm \
 	themes/Mikachu/openbox-3/iconify.xbm \
 	themes/Mikachu/openbox-3/max.xbm \
-	themes/Mikachu/openbox-3/themerc.xml
+	themes/Mikachu/openbox-3/themerc
 
 
 natura_themedir = $(themedir)/Natura/openbox-3
@@ -257,7 +239,7 @@ dist_natura_theme_DATA= \
 	themes/Natura/openbox-3/max_toggled.xbm \
 	themes/Natura/openbox-3/max.xbm \
 	themes/Natura/openbox-3/shade.xbm \
-	themes/Natura/openbox-3/themerc.xml
+	themes/Natura/openbox-3/themerc
 
 artwizboxed_themedir = $(themedir)/artwiz-boxed/openbox-3
 dist_artwizboxed_theme_DATA= \
@@ -268,7 +250,7 @@ dist_artwizboxed_theme_DATA= \
 	themes/artwiz-boxed/openbox-3/iconify.xbm \
 	themes/artwiz-boxed/openbox-3/max_toggled.xbm \
 	themes/artwiz-boxed/openbox-3/max.xbm \
-	themes/artwiz-boxed/openbox-3/themerc.xml
+	themes/artwiz-boxed/openbox-3/themerc
  
 bear2_themedir = $(themedir)/bear2/openbox-3
 dist_bear2_theme_DATA= \
@@ -285,11 +267,11 @@ dist_bear2_theme_DATA= \
 	themes/bear2/openbox-3/max.xbm \
 	themes/bear2/openbox-3/shade_pressed.xbm \
 	themes/bear2/openbox-3/shade.xbm \
-	themes/bear2/openbox-3/themerc.xml
+	themes/bear2/openbox-3/themerc
  
 orang_themedir = $(themedir)/orang/openbox-3
 dist_orang_theme_DATA= \
-	themes/orang/openbox-3/themerc.xml
+	themes/orang/openbox-3/themerc
 
 syscrash_themedir = $(themedir)/syscrash/openbox-3
 dist_syscrash_theme_DATA= \
@@ -304,7 +286,7 @@ dist_syscrash_theme_DATA= \
 	themes/syscrash/openbox-3/max_toggled.xbm \
 	themes/syscrash/openbox-3/max.xbm \
 	themes/syscrash/openbox-3/shade.xbm \
-	themes/syscrash/openbox-3/themerc.xml
+	themes/syscrash/openbox-3/themerc
 
 ## public headers ##
 

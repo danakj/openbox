@@ -52,10 +52,10 @@ void framerender_frame(ObFrame *self)
           l = self->a_focused_label;
           m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
                ob_rr_theme->a_disabled_focused_max :
-               (self->max_press ?
-                ob_rr_theme->a_focused_pressed_max :
-                (self->client->max_vert || self->client->max_horz ?
-                 ob_rr_theme->a_toggled_focused_max :
+               (self->client->max_vert || self->client->max_horz ?
+                ob_rr_theme->a_toggled_focused_max :
+                (self->max_press ?
+                 ob_rr_theme->a_focused_pressed_max :
                  (self->max_hover ?
                   ob_rr_theme->a_hover_focused_max : 
                   ob_rr_theme->a_focused_unpressed_max))));
@@ -69,19 +69,19 @@ void framerender_frame(ObFrame *self)
                  ob_rr_theme->a_focused_unpressed_iconify)));
           d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
                ob_rr_theme->a_disabled_focused_desk :
-               (self->desk_press ?
-                ob_rr_theme->a_focused_pressed_desk :
-                (self->client->desktop == DESKTOP_ALL ?
-                 ob_rr_theme->a_toggled_focused_desk :
+               (self->client->desktop == DESKTOP_ALL ?
+                ob_rr_theme->a_toggled_focused_desk :
+                (self->desk_press ?
+                 ob_rr_theme->a_focused_pressed_desk :
                  (self->desk_hover ?
                   ob_rr_theme->a_hover_focused_desk : 
                   ob_rr_theme->a_focused_unpressed_desk))));
           s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
                ob_rr_theme->a_disabled_focused_shade :
-               (self->shade_press ?
-                ob_rr_theme->a_focused_pressed_shade :
-                (self->client->shaded ?
-                 ob_rr_theme->a_toggled_focused_shade :
+               (self->client->shaded ?
+                ob_rr_theme->a_toggled_focused_shade :
+                (self->shade_press ?
+                 ob_rr_theme->a_focused_pressed_shade :
                  (self->shade_hover ?
                   ob_rr_theme->a_hover_focused_shade : 
                   ob_rr_theme->a_focused_unpressed_shade))));
@@ -98,10 +98,10 @@ void framerender_frame(ObFrame *self)
             l = self->a_unfocused_label;
             m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
                  ob_rr_theme->a_disabled_unfocused_max :
-                 (self->max_press ?
-                  ob_rr_theme->a_unfocused_pressed_max :
-                  (self->client->max_vert || self->client->max_horz ?
-                   ob_rr_theme->a_toggled_unfocused_max :
+                 (self->client->max_vert || self->client->max_horz ?
+                  ob_rr_theme->a_toggled_unfocused_max :
+                  (self->max_press ?
+                   ob_rr_theme->a_unfocused_pressed_max :
                    (self->max_hover ?
                     ob_rr_theme->a_hover_unfocused_max : 
                     ob_rr_theme->a_unfocused_unpressed_max))));
@@ -115,19 +115,19 @@ void framerender_frame(ObFrame *self)
                    ob_rr_theme->a_unfocused_unpressed_iconify)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
                  ob_rr_theme->a_disabled_unfocused_desk :
-                 (self->desk_press ?
-                  ob_rr_theme->a_unfocused_pressed_desk :
-                  (self->client->desktop == DESKTOP_ALL ?
-                   ob_rr_theme->a_toggled_unfocused_desk :
+                 (self->client->desktop == DESKTOP_ALL ?
+                  ob_rr_theme->a_toggled_unfocused_desk :
+                  (self->desk_press ?
+                   ob_rr_theme->a_unfocused_pressed_desk :
                    (self->desk_hover ?
                     ob_rr_theme->a_hover_unfocused_desk : 
                     ob_rr_theme->a_unfocused_unpressed_desk))));
           s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
               ob_rr_theme->a_disabled_unfocused_shade :
-               (self->shade_press ?
-                ob_rr_theme->a_unfocused_pressed_shade :
-                (self->client->shaded ?
-                 ob_rr_theme->a_toggled_unfocused_shade :
+               (self->client->shaded ?
+                ob_rr_theme->a_toggled_unfocused_shade :
+                (self->shade_press ?
+                 ob_rr_theme->a_unfocused_pressed_shade :
                  (self->shade_hover ?
                   ob_rr_theme->a_hover_unfocused_shade : 
                   ob_rr_theme->a_unfocused_unpressed_shade))));

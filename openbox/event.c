@@ -1320,11 +1320,8 @@ static gboolean focus_delay_func(gpointer data)
     ObClient *c = data;
 
     if (focus_client != c) {
-        if (client_validate(c)) {
-            client_focus(c);
-            if (config_focus_raise)
-                client_raise(c);
-        }
+        if (client_focus(c) && config_focus_raise)
+            client_raise(c);
     }
     return FALSE; /* no repeat */
 }

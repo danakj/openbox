@@ -212,8 +212,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     {
         if ((target = client_under_pointer()))
             if (allow_refocus || target != old)
-                if (client_normal(target) && client_can_focus(target) &&
-                    client_validate(target)) {
+                if (client_normal(target) && client_can_focus(target)) {
                     ob_debug("found in pointer stuff\n");
                     return target;
                 }
@@ -254,8 +253,8 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
                a splashscreen or a desktop window (save the desktop as a
                backup fallback though)
             */
-            if (client_can_focus(c) && client_validate(c) &&
-                c->desktop == screen_desktop && !c->iconic)
+            if (client_can_focus(c) && c->desktop == screen_desktop &&
+                !c->iconic)
             {
                 if (client_normal(c)) {
                     ob_debug("found in focus order\n");

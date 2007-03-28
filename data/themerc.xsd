@@ -114,7 +114,9 @@
       <xs:element name="pressed" type="obt:buttonarea" minOccurs="0"/>
       <xs:element name="hover" type="obt:buttonarea" minOccurs="0"/>
       <xs:element name="disabled" type="obt:buttonarea" minOccurs="0"/>
-      <xs:element name="toggled" type="obt:buttonarea" minOccurs="0"/>
+      <xs:element name="toggled-unpressed" type="obt:buttonarea" minOccurs="0"/>
+      <xs:element name="toggled-pressed" type="obt:buttonarea" minOccurs="0"/>
+      <xs:element name="toggled-hover" type="obt:buttonarea" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 

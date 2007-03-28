@@ -26,12 +26,13 @@
 #include <ctype.h>
 #include <string.h>
 
-static gboolean read_int(XrmDatabase db, gchar *rname, gint *value);
-static gboolean read_string(XrmDatabase db, gchar *rname, gchar **value);
-static gboolean read_color(XrmDatabase db, gchar *rname,
+static gboolean read_int(XrmDatabase db, const gchar *rname, gint *value);
+static gboolean read_string(XrmDatabase db, const gchar *rname,
+                            const gchar **value);
+static gboolean read_color(XrmDatabase db, const gchar *rname,
                            gint *r, gint *g, gint *b);
 
-static int parse_inline_number(char *p)
+static int parse_inline_number(const char *p)
 {
     int neg = 1;
     int res = 0;
@@ -45,7 +46,7 @@ static int parse_inline_number(char *p)
     return res;
 }
 
-static gchar *create_class_name(gchar *rname)
+static gchar *create_class_name(const gchar *rname)
 {
     gchar *rclass = g_strdup(rname);
     gchar *p = rclass;
@@ -60,7 +61,7 @@ static gchar *create_class_name(gchar *rname)
     return rclass;
 }
 
-static gboolean read_int(XrmDatabase db, gchar *rname, gint *value)
+static gboolean read_int(XrmDatabase db, const gchar *rname, gint *value)
 {
     gboolean ret = FALSE;
     gchar *rclass = create_class_name(rname);
@@ -78,7 +79,8 @@ static gboolean read_int(XrmDatabase db, gchar *rname, gint *value)
     return ret;
 }
 
-static gboolean read_string(XrmDatabase db, gchar *rname, gchar **value)
+static gboolean read_string(XrmDatabase db, const gchar *rname,
+                            const gchar **value)
 {
     gboolean ret = FALSE;
     gchar *rclass = create_class_name(rname);
@@ -104,7 +106,7 @@ static gchar hextodec(gchar h)
     return -1;
 }
 
-static gboolean parse_color(gchar *c, gint *r, gint *g, gint *b)
+static gboolean parse_color(const gchar *c, gint *r, gint *g, gint *b)
 {
     int dig1, dig2, i, color[3];
     int len = strlen(c);
@@ -150,7 +152,7 @@ static gboolean parse_color(gchar *c, gint *r, gint *g, gint *b)
     return FALSE;
 }
 
-static gboolean read_color(XrmDatabase db, gchar *rname,
+static gboolean read_color(XrmDatabase db, const gchar *rname,
                            gint *r, gint *g, gint *b)
 {
     gboolean ret = FALSE;
@@ -279,7 +281,7 @@ int main(int argc, char **argv)
 {
     XrmDatabase db;
     int i,j,k;
-    gchar *s;
+    const gchar *s;
     int ret = 0;
 
     if (argc > 1) {
@@ -406,11 +408,11 @@ int main(int argc, char **argv)
 
     if (read_color(db, "window.active.button.toggled.image.color",
                    &i, &j, &k))
-        COLOR5("window","active","buttons","toggled","image",i,j,k,255);
+        COLOR5("window","active","buttons","toggled-unpressed","image",i,j,k,255);
 
     if (read_color(db, "window.inactive.button.toggled.image.color",
                    &i, &j, &k))
-        COLOR5("window","inactive","buttons","toggled","image",i,j,k,255);
+        COLOR5("window","inactive","buttons","toggled-unpressed","image",i,j,k,255);
 
     if (read_color(db, "menu.title.text.color",
                    &i, &j, &k))

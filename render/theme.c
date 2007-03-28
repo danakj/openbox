@@ -413,10 +413,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->max_pressed_mask = RrPixmapMaskCopy(theme->max_mask);
         theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
         theme->max_hover_mask = RrPixmapMaskCopy(theme->max_mask);
-        theme->desk_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->desk_toggled_mask);
-        theme->desk_toggled_hover_mask =
-            RrPixmapMaskCopy(theme->desk_toggled_mask);
+        theme->max_toggled_pressed_mask =
+            RrPixmapMaskCopy(theme->max_toggled_mask);
+        theme->max_toggled_hover_mask =
+            RrPixmapMaskCopy(theme->max_toggled_mask);
     }
 
     if (read_mask(&ps, "iconify.xbm", &theme->iconify_mask)) {

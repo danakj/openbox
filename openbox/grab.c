@@ -38,6 +38,14 @@ static guint pgrabs = 0;
 /*! The time at which the last grab was made */
 static Time  grab_time = CurrentTime;
 
+static Time ungrab_time()
+{
+    Time t = event_curtime;
+    if (!(t == 0 || event_time_after(t, grab_time)))
+        t = grab_time;
+    return t;
+}
+
 gboolean grab_on_keyboard()
 {
     return kgrabs > 0;
@@ -65,10 +73,7 @@ gboolean grab_keyboard(gboolean grab)
             ret = TRUE;
     } else if (kgrabs > 0) {
         if (--kgrabs == 0) {
-            Time t = event_curtime;
-            if (t != 0 && t < grab_time)
-                t = grab_time;
-            XUngrabKeyboard(ob_display, t);
+            XUngrabKeyboard(ob_display, ungrab_time());
         }
         ret = TRUE;
     }
@@ -94,10 +99,7 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
             ret = TRUE;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0) {
-            Time t = event_curtime;
-            if (t != 0 && t < grab_time)
-                t = grab_time;
-            XUngrabPointer(ob_display, event_curtime);
+            XUngrabPointer(ob_display, ungrab_time());
         }
         ret = TRUE;
     }
@@ -122,10 +124,7 @@ gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
             ret = TRUE;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0) {
-            Time t = event_curtime;
-            if (t != 0 && t < grab_time)
-                t = grab_time;
-            XUngrabPointer(ob_display, event_curtime);
+            XUngrabPointer(ob_display, ungrab_time());
         }
         ret = TRUE;
     }

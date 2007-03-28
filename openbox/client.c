@@ -414,8 +414,11 @@ void client_manage(Window window)
         else
         {
             /* If time stamp is old, don't steal focus */
-            if (self->user_time && self->user_time < client_last_user_time)
+            if (self->user_time &&
+                !event_time_after(self->user_time, client_last_user_time))
+            {
                 activate = FALSE;
+            }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */
@@ -3031,9 +3034,11 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
              "source=%s\n",
              self->window, event_curtime, client_last_user_time,
              (user ? "user" : "application"));
-    if (!user && event_curtime && event_curtime < client_last_user_time)
+    if (!user && event_curtime &&
+        !event_time_after(event_curtime, client_last_user_time))
+    {
         client_hilite(self, TRUE);
-    else {
+    } else {
         if (client_normal(self) && screen_showing_desktop)
             screen_show_desktop(FALSE);
         if (self->iconic)

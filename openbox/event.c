@@ -1376,3 +1376,15 @@ void event_ignore_queued_enters()
     }
     g_slist_free(saved);
 }
+
+gboolean event_time_after(Time t1, Time t2)
+{
+    /*
+      Timestamp values wrap around (after about 49.7 days). The server, given
+      its current time is represented by timestamp T, always interprets
+      timestamps from clients by treating half of the timestamp space as being
+      later in time than T.
+      - http://tronche.com/gui/x/xlib/input/pointer-grabbing.html
+    */
+    return t1 >= t2 && t1 <= t2 + (1 << (sizeof(Time)*8-1));
+}

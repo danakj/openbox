@@ -3031,9 +3031,11 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
              "source=%s\n",
              self->window, event_curtime, client_last_user_time,
              (user ? "user" : "application"));
-    if (!user && event_curtime && event_curtime < client_last_user_time)
+    if (!user && event_curtime &&
+        !event_time_after(event_curtime, client_last_user_time))
+    {
         client_hilite(self, TRUE);
-    else {
+    } else {
         if (client_normal(self) && screen_showing_desktop)
             screen_show_desktop(FALSE);
         if (self->iconic)

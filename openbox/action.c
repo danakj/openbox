@@ -1166,8 +1166,7 @@ void action_focus(union ActionData *data)
            moving on us */
         event_halt_focus_delay();
 
-        if (client_validate(data->client.any.c))
-            client_focus(data->client.any.c);
+        client_focus(data->client.any.c);
     }
 }
 

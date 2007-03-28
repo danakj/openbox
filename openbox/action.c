@@ -1103,17 +1103,18 @@ void action_execute(union ActionData *data)
                           cmd, e->message);
                 g_error_free(e);
             } else if (data->execute.startupnotify) {
-                gchar **env, *program;
+                gchar *program;
                 
                 program = g_path_get_basename(argv[0]);
-                env = sn_get_spawn_environment(program,
-                                               data->execute.name,
-                                               data->execute.icon_name,
-                                               /* launch it on the current
-                                                  desktop */
-                                               screen_desktop,
-                                               data->execute.any.time);
-                if (!g_spawn_async(NULL, argv, env, G_SPAWN_SEARCH_PATH |
+                /* sets up the environment */
+                sn_setup_spawn_environment(program,
+                                           data->execute.name,
+                                           data->execute.icon_name,
+                                           /* launch it on the current
+                                              desktop */
+                                           screen_desktop,
+                                           data->execute.any.time);
+                if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
                                    G_SPAWN_DO_NOT_REAP_CHILD,
                                    NULL, NULL, NULL, &e)) {
                     g_warning("failed to execute '%s': %s",
@@ -1121,7 +1122,6 @@ void action_execute(union ActionData *data)
                     g_error_free(e);
                     sn_spawn_cancel();
                 }
-                g_strfreev(env);
                 g_free(program);
                 g_strfreev(argv);
             } else {

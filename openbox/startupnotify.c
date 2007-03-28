@@ -20,7 +20,7 @@
 #include "startupnotify.h"
 #include "gettext.h"
 
-extern gchar **environ;
+#include <stdlib.h>
 
 #ifndef USE_LIBSN
 
@@ -32,8 +32,8 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
     return CurrentTime;
 }
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
-gchar **sn_get_spawn_environment(char *program, char *name,
-                                 char *icon_name, gint desktop, Time time)
+void sn_setup_spawn_environment(gchar *program, gchar *name,
+                                gchar *icon_name, gint desktop, Time time)
 {
     return g_strdupv(environ);
 }
@@ -226,12 +226,11 @@ static gboolean sn_launch_wait_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-gchar **sn_get_spawn_environment(char *program, char *name,
-                                 char *icon_name, gint desktop,
-                                 Time time)
+void sn_setup_spawn_environment(gchar *program, gchar *name,
+                                gchar *icon_name, gint desktop,
+                                Time time)
 {
-    gchar **env, *desc;
-    guint len;
+    gchar *desc;
     const char *id;
 
     desc = g_strdup_printf(_("Running %s\n"), program);
@@ -256,15 +255,9 @@ gchar **sn_get_spawn_environment(char *program, char *name,
                              sn_launch_wait_timeout, sn_launcher,
                              (GDestroyNotify)sn_launcher_context_unref);
 
-    env = g_strdupv(environ);
-    len = g_strv_length(env); /* includes last null */
-    env = g_renew(gchar*, env, ++len); /* add one spot */
-    env[len-2] = g_strdup_printf("DESKTOP_STARTUP_ID=%s", id);
-    env[len-1] = NULL;
+    setenv("DESKTOP_STARTUP_ID", id, TRUE);
 
     g_free(desc);
-
-    return env;
 }
 
 void sn_spawn_cancel()

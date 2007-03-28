@@ -41,8 +41,16 @@ static Time  grab_time = CurrentTime;
 static Time ungrab_time()
 {
     Time t = event_curtime;
-    if (!(t == 0 || event_time_after(t, grab_time)))
-        t = grab_time;
+    if (!(t == CurrentTime || event_time_after(t, grab_time)))
+        /* When the time moves backward on the server, then we can't use
+           the grab time because that will be in the future. So instead we
+           have to use CurrentTime.
+
+           "XUngrabPointer does not release the pointer if the specified time
+           is earlier than the last-pointer-grab time or is later than the
+           current X server time."
+        */
+        t = CurrentTime; /*grab_time;*/
     return t;
 }
 

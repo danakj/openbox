@@ -33,10 +33,7 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
 }
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
 void sn_setup_spawn_environment(gchar *program, gchar *name,
-                                gchar *icon_name, gint desktop, Time time)
-{
-    return g_strdupv(environ);
-}
+                                gchar *icon_name, gint desktop, Time time) {}
 void sn_spawn_cancel() {}
 
 #else

@@ -414,8 +414,11 @@ void client_manage(Window window)
         else
         {
             /* If time stamp is old, don't steal focus */
-            if (self->user_time && self->user_time < client_last_user_time)
+            if (self->user_time &&
+                !event_time_after(self->user_time, client_last_user_time))
+            {
                 activate = FALSE;
+            }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */

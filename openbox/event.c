@@ -1383,5 +1383,15 @@ gboolean event_time_after(Time t1, Time t2)
       later in time than T.
       - http://tronche.com/gui/x/xlib/input/pointer-grabbing.html
     */
-    return t1 >= t2 && t1 <= t2 + (1 << (sizeof(Time)*8-1));
+
+    /* TIME_HALF is half of the number space of a Time type variable */
+#define TIME_HALF (Time)(1 << (sizeof(Time)*8-1))
+
+    if (t2 >= TIME_HALF)
+        /* t2 is in the second half so t1 might wrap around and be smaller than
+           t2 */
+        return t1 >= t2 || t1 < (t2 + TIME_HALF);
+    else
+        /* t2 is in the first half so t1 has to come after it */
+        return t1 >= t2 && t1 < (t2 + TIME_HALF);
 }

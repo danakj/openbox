@@ -41,10 +41,10 @@
           <style>flat solid</style>
           <primary r="252" g="175" b="62" a="255"/>
         </hover>
-        <toggled>
+        <toggled-unpressed>
           <image r="255" g="255" b="255" a="255"/>
           <style>parentrelative</style>
-        </toggled>
+        </toggled-unpressed>
       </buttons>
       <titlebar>
         <style>flat border solid</style>
@@ -82,9 +82,9 @@
           <primary r="170" g="170" b="170" a="255"/>
           <border r="229" g="229" b="229" a="255"/>
         </pressed>
-        <toggled>
+        <toggled-unpressed>
           <style>parentrelative</style>
-        </toggled>
+        </toggled-unpressed>
         <hover>
           <style>flat solid</style>
           <primary r="227" g="227" b="227" a="255"/>

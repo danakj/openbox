@@ -451,9 +451,9 @@ int main(int argc, char **argv)
     APPEARANCE4("window.inactive.button.pressed.bg",
                 "window", "inactive", "buttons", "pressed");
     APPEARANCE4("window.active.button.toggled.bg",
-                "window", "active", "buttons", "toggled");
+                "window", "active", "buttons", "toggled-unpressed");
     APPEARANCE4("window.inactive.button.toggled.bg",
-                "window", "inactive", "buttons", "toggled");
+                "window", "inactive", "buttons", "toggled-unpressed");
     APPEARANCE4("window.active.button.unpressed.bg",
                 "window", "active", "buttons", "unpressed");
     APPEARANCE4("window.inactive.button.unpressed.bg",

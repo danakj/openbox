@@ -33,12 +33,12 @@
           <primary r="144" g="148" b="152" a="255"/>
           <secondary r="32" g="36" b="40" a="255"/>
         </disabled>
-        <toggled>
+        <toggled-unpressed>
           <image r="255" g="255" b="255" a="255"/>
           <style>raised gradient diagonal</style>
           <primary r="144" g="148" b="152" a="255"/>
           <secondary r="32" g="36" b="40" a="255"/>
-        </toggled>
+        </toggled-unpressed>
         <pressed>
           <style>sunken gradient diagonal</style>
           <primary r="32" g="64" b="80" a="255"/>
@@ -90,12 +90,12 @@
           <primary r="80" g="84" b="88" a="255"/>
           <secondary r="0" g="0" b="0" a="255"/>
         </disabled>
-        <toggled>
+        <toggled-unpressed>
           <image r="112" g="116" b="120" a="255"/>
           <style>raised gradient diagonal</style>
           <primary r="80" g="84" b="88" a="255"/>
           <secondary r="0" g="0" b="0" a="255"/>
-        </toggled>
+        </toggled-unpressed>
       </buttons>
       <titlebar>
         <style>raised vertical gradient</style>

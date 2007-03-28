@@ -50,11 +50,11 @@
           <primary r="87" g="103" b="115" a="255"/>
           <border r="154" g="171" b="185" a="255"/>
         </hover>
-        <toggled>
+        <toggled-unpressed>
           <image r="249" g="242" b="238" a="255"/>
           <style>parentrelative</style>
           <border r="78" g="88" b="96" a="255"/>
-        </toggled>
+        </toggled-unpressed>
       </buttons>
       <titlebar>
         <style>flat gradient splitvertical</style>
@@ -111,12 +111,12 @@
           <primary r="175" g="177" b="178" a="255"/>
           <border r="217" g="223" b="228" a="255"/>
         </hover>
-        <toggled>
+        <toggled-unpressed>
           <image r="182" g="182" b="182" a="255"/>
           <style>parentrelative</style>
           <primary r="238" g="238" b="238" a="255"/>
           <border r="201" g="201" b="201" a="255"/>
-        </toggled>
+        </toggled-unpressed>
       </buttons>
       <titlebar>
         <style>flat gradient vertical</style>

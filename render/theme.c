@@ -304,17 +304,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
               &theme->titlebut_toggled_hover_focused_color, NULL))
         theme->titlebut_toggled_hover_focused_color =
             RrColorNew(inst,
-                       theme->titlebut_focused_unpressed_color->r,
-                       theme->titlebut_focused_unpressed_color->g,
-                       theme->titlebut_focused_unpressed_color->b);
+                       theme->titlebut_toggled_focused_unpressed_color->r,
+                       theme->titlebut_toggled_focused_unpressed_color->g,
+                       theme->titlebut_toggled_focused_unpressed_color->b);
     if (!FIND(color,
               L("window","inactive","buttons","toggled-hover","image"),
               &theme->titlebut_toggled_hover_unfocused_color, NULL))
         theme->titlebut_toggled_hover_unfocused_color =
             RrColorNew(inst,
-                       theme->titlebut_unfocused_unpressed_color->r,
-                       theme->titlebut_unfocused_unpressed_color->g,
-                       theme->titlebut_unfocused_unpressed_color->b);
+                       theme->titlebut_toggled_unfocused_unpressed_color->r,
+                       theme->titlebut_toggled_unfocused_unpressed_color->g,
+                       theme->titlebut_toggled_unfocused_unpressed_color->b);
     if (!FIND(color, L("menu","title","text","primary"),
               &theme->menu_title_color, NULL))
         theme->menu_title_color = RrColorNew(inst, 0, 0, 0);
@@ -650,14 +650,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     {
         RrAppearanceFree(theme->a_toggled_hover_focused_max);
         theme->a_toggled_hover_focused_max =
-            RrAppearanceCopy(theme->a_focused_unpressed_max);
+            RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
     }
     if (!FIND(appearance, L("window","inactive","buttons","toggled-hover"),
               theme->a_toggled_hover_unfocused_max, TRUE))
     {
         RrAppearanceFree(theme->a_toggled_hover_unfocused_max);
         theme->a_toggled_hover_unfocused_max =
-            RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+            RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
     }
 
    theme->a_disabled_focused_close =

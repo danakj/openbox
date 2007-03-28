@@ -42,10 +42,10 @@
           <style>parentrelative</style>
           <primary r="114" g="159" b="207" a="255"/>
         </hover>
-        <toggled>
+        <toggled-unpressed>
           <image r="239" g="239" b="239" a="255"/>
           <style>parentrelative</style>
-        </toggled>
+        </toggled-unpressed>
       </buttons>
       <titlebar>
         <style>flat border gradient mirrorhorizontal</style>
@@ -91,10 +91,10 @@
           <image r="136" g="138" b="133" a="255"/>
           <style>parentrelative</style>
         </hover>
-        <toggled>
+        <toggled-unpressed>
           <image r="136" g="138" b="133" a="255"/>
           <style>parentrelative</style>
-        </toggled>
+        </toggled-unpressed>
       </buttons>
       <titlebar>
         <style>flat border gradient mirrorhorizontal</style>

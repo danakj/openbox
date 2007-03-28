@@ -272,7 +272,7 @@ void client_manage(Window window)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->layer = -1;
     self->desktop = screen_num_desktops; /* always an invalid value */
-    self->user_time = ~0; /* maximum value, always newer than the real time */
+    self->user_time = client_last_user_time;
 
     client_get_all(self);
     client_restore_session_state(self);

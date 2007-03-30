@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-03-12 19:19-0400\n"
+"POT-Creation-Date: 2007-03-25 13:41-0400\n"
 "PO-Revision-Date: 2005-03-25 09:31+0100\n"
 "Last-Translator: Miguel Calleja Gómez <mcg79@lycos.es>\n"
 "Language-Team: None\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:97
+#: openbox/client_list_menu.c:99
 msgid "Go there..."
 msgstr "Ir ahí..."
 
-#: openbox/client_list_menu.c:188
+#: openbox/client_list_menu.c:190
 msgid "Desktops"
 msgstr "Escritorios"
 

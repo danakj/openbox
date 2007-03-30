@@ -193,7 +193,9 @@ void menu_frame_place_topmenu(ObMenuFrame *self, gint x, gint y)
         x = self->client->frame->area.x + self->client->frame->size.left;
         y = self->client->frame->area.y + self->client->frame->size.top;
     } else {
-        x -= self->area.width / 2;
+        if (config_menu_middle) {
+            x -= self->area.width / 2;
+        }
         y -= self->title_h;
     }
     menu_frame_move(self, x, y);

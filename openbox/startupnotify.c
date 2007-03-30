@@ -24,7 +24,10 @@
 
 #ifndef USE_LIBSN
 
-void sn_startup(gboolean reconfig) {}
+void sn_startup(gboolean reconfig) {
+    /* unset this so we don't pass it on unknowingly */
+    if (!reconfig) unsetenv("DESKTOP_STARTUP_ID");
+}
 void sn_shutdown(gboolean reconfig) {}
 gboolean sn_app_starting() { return FALSE; }
 Time sn_app_started(const gchar *id, const gchar *wmclass)
@@ -58,6 +61,9 @@ static void sn_event_func(SnMonitorEvent *event, gpointer data);
 void sn_startup(gboolean reconfig)
 {
     if (reconfig) return;
+
+    /* unset this so we don't pass it on unknowingly */
+    unsetenv("DESKTOP_STARTUP_ID");
 
     sn_display = sn_display_new(ob_display, NULL, NULL);
     sn_context = sn_monitor_context_new(sn_display, ob_screen,

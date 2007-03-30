@@ -89,8 +89,7 @@ static gboolean read_string(XrmDatabase db, const gchar *rname,
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
-        *value = retvalue.addr;
-        g_strstrip(*value);
+        *value = g_strstrip(retvalue.addr);
         ret = TRUE;
     }
 

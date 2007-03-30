@@ -2163,58 +2163,7 @@ void client_try_configure(ObClient *self, ObCorner anchor,
        the updated frame dimensions. */
     frame_adjust_area(self->frame, TRUE, TRUE, TRUE);
 
-    /* gets the frame's position */
-    frame_client_gravity(self->frame, x, y);
-
-    /* these positions are frame positions, not client positions */
-
-    /* set the size and position if fullscreen */
-    if (self->fullscreen) {
-        Rect *a;
-        guint i;
-
-        i = screen_find_monitor(&desired_area);
-        a = screen_physical_area_monitor(i);
-
-        *x = a->x;
-        *y = a->y;
-        *w = a->width;
-        *h = a->height;
-
-        user = FALSE; /* ignore that increment etc shit when in fullscreen */
-    } else {
-        Rect *a;
-        guint i;
-
-        i = screen_find_monitor(&desired_area);
-        a = screen_area_monitor(self->desktop, i);
-
-        /* set the size and position if maximized */
-        if (self->max_horz) {
-            *x = a->x;
-            *w = a->width - self->frame->size.left - self->frame->size.right;
-        }
-        if (self->max_vert) {
-            *y = a->y;
-            *h = a->height - self->frame->size.top - self->frame->size.bottom;
-        }
-    }
-
-    /* gets the client's position */
-    frame_frame_gravity(self->frame, x, y);
-
-    /* these override the above states! if you cant move you can't move! */
-    if (user) {
-        if (!(self->functions & OB_CLIENT_FUNC_MOVE)) {
-            *x = self->area.x;
-            *y = self->area.y;
-        }
-        if (!(self->functions & OB_CLIENT_FUNC_RESIZE)) {
-            *w = self->area.width;
-            *h = self->area.height;
-        }
-    }
-
+    /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
         gint basew, baseh, minw, minh;
 
@@ -2295,6 +2244,62 @@ void client_try_configure(ObClient *self, ObCorner anchor,
 
         *w += self->base_size.width;
         *h += self->base_size.height;
+    }
+
+    /* gets the frame's position */
+    frame_client_gravity(self->frame, x, y);
+
+    /* these positions are frame positions, not client positions */
+
+    /* set the size and position if fullscreen */
+    if (self->fullscreen) {
+        Rect *a;
+        guint i;
+
+        i = screen_find_monitor(&desired_area);
+        a = screen_physical_area_monitor(i);
+
+        *x = a->x;
+        *y = a->y;
+        *w = a->width;
+        *h = a->height;
+
+        user = FALSE; /* ignore if the client can't be moved/resized when it
+                         is entering fullscreen */
+    } else if (self->max_horz || self->max_vert) {
+        Rect *a;
+        guint i;
+
+        i = screen_find_monitor(&desired_area);
+        a = screen_area_monitor(self->desktop, i);
+
+        /* set the size and position if maximized */
+        if (self->max_horz) {
+            *x = a->x;
+            *w = a->width - self->frame->size.left - self->frame->size.right;
+        }
+        if (self->max_vert) {
+            *y = a->y;
+            *h = a->height - self->frame->size.top - self->frame->size.bottom;
+        }
+
+        /* maximizing is not allowed if the user can't move+resize the window
+         */
+    }
+
+    /* gets the client's position */
+    frame_frame_gravity(self->frame, x, y);
+
+    /* these override the above states! if you cant move you can't move! */
+    if (user) {
+        if (!(self->functions & OB_CLIENT_FUNC_MOVE)) {
+            *x = self->area.x;
+            *y = self->area.y;
+        }
+        if (!(self->functions & OB_CLIENT_FUNC_RESIZE)) {
+            *w = self->area.width;
+            *h = self->area.height;
+        }
     }
 
     g_assert(*w > 0);

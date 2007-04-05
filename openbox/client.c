@@ -2134,8 +2134,12 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
         pos = TRUE;
     }
 
-    /* if the client didn't get positioned yet, then do so now */
-    if (!pos && (ox != x || oy != y)) {
+    /* if the client didn't get positioned yet, then do so now
+       call client_move even if the window is not being moved anywhere, because
+       when we reparent it and decorate it, it is getting moved and we need to
+       be telling it so with a ConfigureNotify event.
+    */
+    if (!pos) {
         /* use the saved position */
         self->area.x = ox;
         self->area.y = oy;

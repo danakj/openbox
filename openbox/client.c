@@ -275,10 +275,11 @@ void client_manage(Window window)
     self->user_time = client_last_user_time;
 
     client_get_all(self);
-    client_restore_session_state(self);
     /* per-app settings override stuff, and return the settings for other
        uses too */
     settings = client_get_settings_state(self);
+    /* the session should get the last say */
+    client_restore_session_state(self);
 
     client_calc_layer(self);
 

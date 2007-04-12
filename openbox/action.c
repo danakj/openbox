@@ -1122,7 +1122,7 @@ void action_execute(union ActionData *data)
                     g_error_free(e);
                     sn_spawn_cancel();
                 }
-                setenv("DESKTOP_STARTUP_ID");
+                unsetenv("DESKTOP_STARTUP_ID");
                 g_free(program);
                 g_strfreev(argv);
             } else {

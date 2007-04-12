@@ -690,7 +690,7 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
 
         if (settings->desktop < screen_num_desktops
             || settings->desktop == DESKTOP_ALL)
-            client_set_desktop(self, settings->desktop, TRUE);
+            self->desktop = settings->desktop;
 
         if (settings->layer == -1) {
             self->below = TRUE;
@@ -2398,10 +2398,12 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     /* find the client's position relative to the root window */
     oldrx = self->root_pos.x;
     oldry = self->root_pos.y;
-    rootmoved = (oldrx != (self->frame->area.x + self->frame->size.left -
-                           self->border_width) ||
-                 oldry != (self->frame->area.y + self->frame->size.top -
-                           self->border_width));
+    rootmoved = (oldrx != (signed)(self->frame->area.x +
+                                   self->frame->size.left -
+                                   self->border_width) ||
+                 oldry != (signed)(self->frame->area.y +
+                                   self->frame->size.top -
+                                   self->border_width));
 
     if (force_reply || ((!user || (user && final)) && rootmoved))
     {

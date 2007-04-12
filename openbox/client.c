@@ -455,7 +455,7 @@ void client_manage(Window window)
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
     */
-    client_showhide(self);
+    client_show(self);
 
     /* use client_focus instead of client_activate cuz client_activate does
        stuff like switch desktops etc and I'm not interested in all that when
@@ -2058,6 +2058,33 @@ gboolean client_should_show(ObClient *self)
     return FALSE;
 }
 
+void client_show(ObClient *self)
+{
+
+    if (client_should_show(self)) {
+        frame_show(self->frame);
+    }
+
+    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
+       needs to be in IconicState. This includes when it is on another
+       desktop!
+    */
+    client_change_wm_state(self);
+}
+
+void client_hide(ObClient *self)
+{
+    if (!client_should_show(self)) {
+        frame_hide(self->frame);
+    }
+
+    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
+       needs to be in IconicState. This includes when it is on another
+       desktop!
+    */
+    client_change_wm_state(self);
+}
+
 void client_showhide(ObClient *self)
 {
 
@@ -2066,10 +2093,6 @@ void client_showhide(ObClient *self)
     }
     else {
         frame_hide(self->frame);
-
-        /* Fall back focus since we're disappearing */
-        if (focus_client == self)
-            client_unfocus(self);
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it

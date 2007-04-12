@@ -435,11 +435,11 @@ void screen_set_desktop(guint num)
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 
-    /* show windows from top to bottom */
+    /* show/hide windows from top to bottom */
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            client_showhide(c);
+            client_show(c);
         }
     }
 
@@ -447,7 +447,7 @@ void screen_set_desktop(guint num)
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            client_showhide(c);
+            client_hide(c);
         }
     }
 
@@ -458,9 +458,10 @@ void screen_set_desktop(guint num)
         frame_adjust_focus(focus_hilite->frame, TRUE);
 
         /*!
-          When this focus_client check is not used, you can end up with races,
-          as demonstrated with gnome-panel, sometmies the window you click on
-          another desktop ends up losing focus cuz of the focus change here.
+          When this focus_client check is not used, you can end up with
+          races, as demonstrated with gnome-panel, sometimes the window
+          you click on another desktop ends up losing focus cuz of the
+          focus change here.
         */
         /*if (!focus_client)*/
         client_focus(focus_hilite);

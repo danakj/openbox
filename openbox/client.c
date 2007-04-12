@@ -576,34 +576,36 @@ void client_unmanage(ObClient *self)
         self->group = NULL;
     }
 
-    /* give the client its border back */
-    client_toggle_border(self, TRUE);
+    /* restore the window's original geometry so it is not lost */
+    {
+        Rect a = self->area;
+
+        if (self->fullscreen)
+            a = self->pre_fullscreen_area;
+        else if (self->max_horz || self->max_vert) {
+            if (self->max_horz) {
+                a.x = self->pre_max_area.x;
+                a.width = self->pre_max_area.width;
+            }
+            if (self->max_vert) {
+                a.y = self->pre_max_area.y;
+                a.height = self->pre_max_area.height;
+            }
+        }
+
+        /* give the client its border back */
+        client_toggle_border(self, TRUE);
+
+        self->fullscreen = self->max_horz = self->max_vert = FALSE;
+        self->decorations = 0; /* unmanaged windows have no decor */
+
+        client_move_resize(self, a.x, a.y, a.width, a.height);
+    }
 
     /* reparent the window out of the frame, and free the frame */
     frame_release_client(self->frame, self);
     self->frame = NULL;
 
-    /* restore the window's original geometry so it is not lost */
-    if (self->fullscreen)
-        XMoveResizeWindow(ob_display, self->window,
-                          self->pre_fullscreen_area.x,
-                          self->pre_fullscreen_area.y,
-                          self->pre_fullscreen_area.width,
-                          self->pre_fullscreen_area.height);
-    else if (self->max_horz || self->max_vert) {
-        Rect a = self->area;
-        if (self->max_horz) {
-            a.x = self->pre_max_area.x;
-            a.width = self->pre_max_area.width;
-        }
-        if (self->max_vert) {
-            a.y = self->pre_max_area.y;
-            a.height = self->pre_max_area.height;
-        }
-        XMoveResizeWindow(ob_display, self->window,
-                          a.x, a.y, a.width, a.height);
-    }
-     
     if (ob_state() != OB_STATE_EXITING) {
         /* these values should not be persisted across a window
            unmapping/mapping */
@@ -615,7 +617,6 @@ void client_unmanage(ObClient *self)
            is bad, since we will no longer be managing the window on restart */
         XMapWindow(ob_display, self->window);
     }
-
 
     ob_debug("Unmanaged window 0x%lx\n", self->window);
 
@@ -893,10 +894,9 @@ static void client_toggle_border(ObClient *self, gboolean show)
     if (show) {
         XSetWindowBorderWidth(ob_display, self->window, self->border_width);
 
-        /* move the client so it is back it the right spot _with_ its
-           border! */
-        if (x != oldx || y != oldy)
-            XMoveWindow(ob_display, self->window, x, y);
+        /* set border_width to 0 because there is no border to add into
+           calculations anymore */
+        self->border_width = 0;
     } else
         XSetWindowBorderWidth(ob_display, self->window, 0);
 }
@@ -968,6 +968,7 @@ static void client_get_area(ObClient *self)
     g_assert(ret != BadWindow);
 
     RECT_SET(self->area, wattrib.x, wattrib.y, wattrib.width, wattrib.height);
+    POINT_SET(self->root_pos, wattrib.x, wattrib.y);
     self->border_width = wattrib.border_width;
 
     ob_debug("client area: %d %d  %d %d\n", wattrib.x, wattrib.y,
@@ -2354,9 +2355,9 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                            gboolean user, gboolean final,
                            gboolean force_reply)
 {
-    gint oldw, oldh;
+    gint oldw, oldh, oldrx, oldry;
     gboolean send_resize_client;
-    gboolean moved = FALSE, resized = FALSE;
+    gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
     gint logicalw, logicalh;
@@ -2388,35 +2389,45 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     if (send_resize_client && user && (w > oldw || h > oldh))
         XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
 
-    /* move/resize the frame to match the request */
-    if (self->frame) {
-        if (self->decorations != fdecor || self->max_horz != fhorz)
-            moved = resized = TRUE;
+    /* find the frame's dimensions and move/resize it */
+    if (self->decorations != fdecor || self->max_horz != fhorz)
+        moved = resized = TRUE;
+    if (moved || resized)
+        frame_adjust_area(self->frame, moved, resized, FALSE);
 
-        if (moved || resized)
-            frame_adjust_area(self->frame, moved, resized, FALSE);
+    /* find the client's position relative to the root window */
+    oldrx = self->root_pos.x;
+    oldry = self->root_pos.y;
+    rootmoved = (oldrx != (self->frame->area.x + self->frame->size.left -
+                           self->border_width) ||
+                 oldry != (self->frame->area.y + self->frame->size.top -
+                           self->border_width));
 
-        if (!resized && (force_reply || ((!user && moved) || (user && final))))
-        {
-            XEvent event;
-            event.type = ConfigureNotify;
-            event.xconfigure.display = ob_display;
-            event.xconfigure.event = self->window;
-            event.xconfigure.window = self->window;
+    if (force_reply || ((!user || (user && final)) && rootmoved))
+    {
+        XEvent event;
 
-            /* root window real coords */
-            event.xconfigure.x = self->frame->area.x + self->frame->size.left -
-                self->border_width;
-            event.xconfigure.y = self->frame->area.y + self->frame->size.top -
-                self->border_width;
-            event.xconfigure.width = w;
-            event.xconfigure.height = h;
-            event.xconfigure.border_width = 0;
-            event.xconfigure.above = self->frame->plate;
-            event.xconfigure.override_redirect = FALSE;
-            XSendEvent(event.xconfigure.display, event.xconfigure.window,
-                       FALSE, StructureNotifyMask, &event);
-        }
+        POINT_SET(self->root_pos,
+                  self->frame->area.x + self->frame->size.left -
+                  self->border_width,
+                  self->frame->area.y + self->frame->size.top -
+                  self->border_width);
+
+        event.type = ConfigureNotify;
+        event.xconfigure.display = ob_display;
+        event.xconfigure.event = self->window;
+        event.xconfigure.window = self->window;
+
+        /* root window real coords */
+        event.xconfigure.x = self->root_pos.x;
+        event.xconfigure.y = self->root_pos.y;
+        event.xconfigure.width = w;
+        event.xconfigure.height = h;
+        event.xconfigure.border_width = 0;
+        event.xconfigure.above = self->frame->plate;
+        event.xconfigure.override_redirect = FALSE;
+        XSendEvent(event.xconfigure.display, event.xconfigure.window,
+                   FALSE, StructureNotifyMask, &event);
     }
 
     /* if the client is shrinking, then resize the frame before the client */

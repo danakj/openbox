@@ -136,6 +136,9 @@ struct _ObClient
     */
     Rect area;
 
+    /*! Position of the client window relative to the root window */
+    Point root_pos;
+
     /*! Position and size of the window prior to being maximized */
     Rect pre_max_area;
     /*! Position and size of the window prior to being fullscreened */

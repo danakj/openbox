@@ -136,6 +136,9 @@ struct _ObClient
     */
     Rect area;
 
+    /*! Position of the client window relative to the root window */
+    Point root_pos;
+
     /*! Position and size of the window prior to being maximized */
     Rect pre_max_area;
     /*! Position and size of the window prior to being fullscreened */
@@ -457,6 +460,12 @@ void client_kill(ObClient *self);
   @param donthide If TRUE, the window will not be shown/hidden after its
          desktop has been changed. Generally this should be FALSE. */
 void client_set_desktop(ObClient *self, guint target, gboolean donthide);
+
+/*! Show the client if it should be shown. */
+void client_show(ObClient *self);
+
+/*! Show the client if it should be shown. */
+void client_hide(ObClient *self);
 
 /*! Show the client if it should be shown, and hide it if it should be
   hidden. This is for example, when switching desktops.

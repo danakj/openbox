@@ -234,8 +234,6 @@ static void frame_free(ObFrame *self)
 
 void frame_show(ObFrame *self)
 {
-    ob_debug("frame_show for window 0x%x : %d\n", self->client->window,
-             self->visible);
     if (!self->visible) {
         self->visible = TRUE;
         XMapWindow(ob_display, self->client->window);
@@ -245,8 +243,6 @@ void frame_show(ObFrame *self)
 
 void frame_hide(ObFrame *self)
 {
-    ob_debug("frame_hide for window 0x%x : %d\n", self->client->window,
-             self->visible);
     if (self->visible) {
         self->visible = FALSE;
         self->client->ignore_unmaps += 1;

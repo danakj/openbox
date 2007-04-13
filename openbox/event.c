@@ -560,9 +560,11 @@ static void event_handle_root(XEvent *e)
         msgtype = e->xclient.message_type;
         if (msgtype == prop_atoms.net_current_desktop) {
             guint d = e->xclient.data.l[0];
-            event_curtime = e->xclient.data.l[1];
-            if (d < screen_num_desktops)
+            if (d < screen_num_desktops) {
+                event_curtime = e->xclient.data.l[1];
+                ob_debug("SWITCH DESKTOP TIME: %d\n", event_curtime);
                 screen_set_desktop(d);
+            }
         } else if (msgtype == prop_atoms.net_number_of_desktops) {
             guint d = e->xclient.data.l[0];
             if (d > 0)

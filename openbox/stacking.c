@@ -408,8 +408,10 @@ void stacking_add_nonintrusive(ObWindow *win)
         }
     }
     if (!it_below) {
-        /* out of ideas, just add it normally... */
-        stacking_add(win);
+        /* there is no window to put this directly above, so put it at the
+           bottom */
+        stacking_list = g_list_prepend(stacking_list, win);
+        stacking_lower(win);
     } else {
         /* make sure it's not in the wrong layer though ! */
         for (; it_below; it_below = g_list_next(it_below))

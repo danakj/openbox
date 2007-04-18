@@ -134,6 +134,8 @@ openbox_openbox_SOURCES = \
 	openbox/action.h \
 	openbox/client.c \
 	openbox/client.h \
+	openbox/client_time_heap.c \
+	openbox/client_time_heap.h \
 	openbox/client_list_menu.c \
 	openbox/client_list_menu.h \
 	openbox/client_list_combined_menu.c \

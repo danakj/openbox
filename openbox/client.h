@@ -2,7 +2,7 @@
 
    client.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 struct _ObFrame;
 struct _ObGroup;
 struct _ObSessionState;
+struct _ObClientTimeHeap;
 
 typedef struct _ObClient      ObClient;
 typedef struct _ObClientIcon  ObClientIcon;
@@ -300,6 +301,7 @@ struct _ObAppSettings
 };
 
 extern GList *client_list;
+extern struct _ObClientTimeHeap *client_user_times;
 
 void client_startup(gboolean reconfig);
 void client_shutdown(gboolean reconfig);
@@ -559,7 +561,7 @@ void client_update_strut(ObClient *self);
 /*! Updates the window's icons */
 void client_update_icons(ObClient *self);
 /*! Updates the window's user time */
-void client_update_user_time(ObClient *self, gboolean new_event);
+void client_update_user_time(ObClient *self);
 
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (ObClient::decorations and ObClient::functions).

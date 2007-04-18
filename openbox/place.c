@@ -2,7 +2,7 @@
 
    place.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -370,6 +370,7 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     Rect *area;
 
     area = pick_pointer_head(client);
+    screen_pointer_pos(&px, &py);
 
     l = area->x;
     t = area->y;

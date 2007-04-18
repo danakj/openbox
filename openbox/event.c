@@ -1163,7 +1163,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_icons(client);
         }
         else if (msgtype == prop_atoms.net_wm_user_time) {
-            client_update_user_time(client, TRUE);
+            client_update_user_time(client);
         }
         else if (msgtype == prop_atoms.sm_client_id) {
             client_update_sm_client_id(client);
@@ -1378,6 +1378,9 @@ void event_ignore_queued_enters()
 
 gboolean event_time_after(Time t1, Time t2)
 {
+    g_assert(t1 != CurrentTime);
+    g_assert(t2 != CurrentTime);
+
     /*
       Timestamp values wrap around (after about 49.7 days). The server, given
       its current time is represented by timestamp T, always interprets

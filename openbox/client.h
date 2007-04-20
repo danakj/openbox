@@ -32,7 +32,6 @@
 struct _ObFrame;
 struct _ObGroup;
 struct _ObSessionState;
-struct _ObClientTimeHeap;
 
 typedef struct _ObClient      ObClient;
 typedef struct _ObClientIcon  ObClientIcon;
@@ -301,7 +300,6 @@ struct _ObAppSettings
 };
 
 extern GList *client_list;
-extern struct _ObClientTimeHeap *client_user_times;
 
 void client_startup(gboolean reconfig);
 void client_shutdown(gboolean reconfig);

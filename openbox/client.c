@@ -18,7 +18,6 @@
 */
 
 #include "client.h"
-#include "client_time_heap.h"
 #include "debug.h"
 #include "startupnotify.h"
 #include "dock.h"
@@ -58,7 +57,6 @@ typedef struct
 } Destructor;
 
 GList            *client_list        = NULL;
-ObClientTimeHeap *client_user_times  = NULL;
 
 static GSList *client_destructors    = NULL;
 
@@ -85,13 +83,11 @@ void client_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    client_user_times = client_time_heap_new();
     client_set_list();
 }
 
 void client_shutdown(gboolean reconfig)
 {
-    client_time_heap_free(client_user_times);
 }
 
 void client_add_destructor(ObClientDestructor func, gpointer data)
@@ -406,10 +402,12 @@ void client_manage(Window window)
     mouse_grab_for_client(self, TRUE);
 
     if (activate) {
+        guint32 last_time = focus_client ?
+            focus_client->user_time : CurrentTime;
+
         /* This is focus stealing prevention */
         ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
-                 self->window, self->user_time,
-                 client_time_heap_maximum(client_user_times));
+                 self->window, self->user_time, last_time);
 
         /* If a nothing at all, or a parent was focused, then focus this
            always
@@ -418,7 +416,6 @@ void client_manage(Window window)
             activate = TRUE;
         else
         {
-            guint32 last_time = client_time_heap_maximum(client_user_times);
             /* If time stamp is old, don't steal focus */
             if (self->user_time && last_time &&
                 !event_time_after(self->user_time, last_time))
@@ -441,8 +438,7 @@ void client_manage(Window window)
         } else {
             ob_debug("Focus stealing prevention activated for %s with time %u "
                      "(last time %u)\n",
-                     self->title, self->user_time,
-                     client_time_heap_maximum(client_user_times));
+                     self->title, self->user_time, last_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);
@@ -543,9 +539,6 @@ void client_unmanage(ObClient *self)
 
     /* we dont want events no more */
     XSelectInput(ob_display, self->window, NoEventMask);
-
-    /* remove from the time heap */
-    client_time_heap_remove(client_user_times, self);
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
@@ -1866,7 +1859,6 @@ void client_update_user_time(ObClient *self)
     guint32 time;
 
     if (PROP_GET32(self->window, net_wm_user_time, cardinal, &time)) {
-        guint32 otime = self->user_time;
         /* we set this every time, not just when it grows, because in practice
            sometimes time goes backwards! (ntpdate.. yay....) so.. if it goes
            backward we don't want all windows to stop focusing. we'll just
@@ -1874,22 +1866,9 @@ void client_update_user_time(ObClient *self)
            would be pretty stupid anyways
         */
         self->user_time = time;
-        /* adjust the time heap - windows with CurrentTime for their user_time
-           are not in the heap */
-        if (time == CurrentTime && otime != CurrentTime)
-            client_time_heap_remove(client_user_times, self);
-        else if (time != CurrentTime && otime == CurrentTime)
-            client_time_heap_add(client_user_times, self);
-        else if (time != CurrentTime && otime != CurrentTime) {
-            if (event_time_after(time, otime))
-                client_time_heap_increase_key(client_user_times, self);
-            else
-                client_time_heap_decrease_key(client_user_times, self);
-        }
 
         /*
         ob_debug("window %s user time %u\n", self->title, time);
-        ob_debug("last user time %u\n", client_time_heap_maximum(client_user_times));
         */
     }
 }
@@ -3084,7 +3063,7 @@ static void client_unfocus(ObClient *self)
 
 void client_activate(ObClient *self, gboolean here, gboolean user)
 {
-    guint32 last_time;
+    guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
 
     /* XXX do some stuff here if user is false to determine if we really want
        to activate it or not (a parent or group member is currently
@@ -3092,11 +3071,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
     */
     ob_debug("Want to activate window 0x%x with time %u (last time %u), "
              "source=%s\n",
-             self->window, event_curtime,
-             client_time_heap_maximum(client_user_times),
+             self->window, event_curtime, last_time,
              (user ? "user" : "application"));
 
-    last_time = client_time_heap_maximum(client_user_times);
     if (!user && event_curtime && last_time &&
         !event_time_after(event_curtime, last_time))
     {

@@ -100,6 +100,9 @@ gint main(gint argc, gchar **argv)
 {
 #ifdef DEBUG
     ob_debug_show_output(TRUE);
+#ifdef DEBUG_FOCUS
+    ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
+#endif
 #endif
 
     state = OB_STATE_STARTING;

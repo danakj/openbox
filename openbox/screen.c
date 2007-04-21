@@ -166,7 +166,7 @@ gboolean screen_annex()
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
                                        CWOverrideRedirect, &attrib);
-    XMapRaised(ob_display, screen_support_win);
+    XMapWindow(ob_display, screen_support_win);
 
     if (!replace_wm()) {
         XDestroyWindow(ob_display, screen_support_win);

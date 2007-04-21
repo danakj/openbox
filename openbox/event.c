@@ -440,27 +440,28 @@ static void event_process(const XEvent *ec, gpointer data)
             }
         }
 
-#if 1 /* focus debugging stuff */
     if (e->type == FocusIn || e->type == FocusOut) {
         gint mode = e->xfocus.mode;
         gint detail = e->xfocus.detail;
         Window window = e->xfocus.window;
         if (detail == NotifyVirtual) {
-            ob_debug("FOCUS %s NOTIFY VIRTUAL window 0x%x\n",
-                     (e->type == FocusIn ? "IN" : "OUT"), window);
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "FOCUS %s NOTIFY VIRTUAL window 0x%x\n",
+                          (e->type == FocusIn ? "IN" : "OUT"), window);
         }
 
         else if (detail == NotifyNonlinearVirtual) {
-            ob_debug("FOCUS %s NOTIFY NONLINVIRTUAL window 0x%x\n",
-                     (e->type == FocusIn ? "IN" : "OUT"), window);
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "FOCUS %s NOTIFY NONLINVIRTUAL window 0x%x\n",
+                          (e->type == FocusIn ? "IN" : "OUT"), window);
         }
 
         else
-            ob_debug("UNKNOWN FOCUS %s (d %d, m %d) window 0x%x\n",
-                     (e->type == FocusIn ? "IN" : "OUT"),
-                     detail, mode, window);
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "UNKNOWN FOCUS %s (d %d, m %d) window 0x%x\n",
+                          (e->type == FocusIn ? "IN" : "OUT"),
+                          detail, mode, window);
     }
-#endif
 
     event_set_curtime(e);
     event_hack_mods(e);
@@ -678,18 +679,18 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
                is not being managed, or a window on another screen. */
-            ob_debug("Focus went to a black hole !\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to a black hole !\n");
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             break;
         } else if (ce.xfocus.detail == NotifyPointerRoot ||
                  ce.xfocus.detail == NotifyDetailNone) {
-            ob_debug("Focus went to root\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
             /* Focus has been reverted to the root window or nothing, so fall
                back to something other than the window which just had it. */
             focus_fallback(FALSE);
         } else if (ce.xfocus.detail == NotifyInferior) {
-            ob_debug("Focus went to parent\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to parent\n");
             /* Focus has been reverted to parent, which is our frame window,
                or the root window, so fall back to something other than the
                window which had it. */
@@ -701,8 +702,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (ed.ignored) {
                 /* The FocusIn was ignored, this means it was on a window
                    that isn't a client. */
-                ob_debug("Focus went to an unmanaged window 0x%x !\n",
-                         ce.xfocus.window);
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Focus went to an unmanaged window 0x%x !\n",
+                              ce.xfocus.window);
                 focus_fallback(TRUE);
             }
         }
@@ -780,21 +782,19 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab)
             {
-#ifdef DEBUG_FOCUS
-                ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
-                         (e->type == EnterNotify ? "Enter" : "Leave"),
-                         e->xcrossing.mode,
-                         e->xcrossing.detail, client?client->window:0);
-#endif
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "%sNotify mode %d detail %d on %lx IGNORED\n",
+                              (e->type == EnterNotify ? "Enter" : "Leave"),
+                              e->xcrossing.mode,
+                              e->xcrossing.detail, client?client->window:0);
             } else {
-#ifdef DEBUG_FOCUS
-                ob_debug("%sNotify mode %d detail %d on %lx, "
-                         "focusing window: %d\n",
-                         (e->type == EnterNotify ? "Enter" : "Leave"),
-                         e->xcrossing.mode,
-                         e->xcrossing.detail, (client?client->window:0),
-                         !nofocus);
-#endif
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "%sNotify mode %d detail %d on %lx, "
+                              "focusing window: %d\n",
+                              (e->type == EnterNotify ? "Enter" : "Leave"),
+                              e->xcrossing.mode,
+                              e->xcrossing.detail, (client?client->window:0),
+                              !nofocus);
                 if (!nofocus && config_focus_follow)
                     event_enter_client(client);
             }
@@ -910,14 +910,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case UnmapNotify:
-        ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
-                 "ignores left %d\n",
-                 client->window, e->xunmap.event, e->xunmap.from_configure,
-                 client->ignore_unmaps);
         if (client->ignore_unmaps) {
             client->ignore_unmaps--;
             break;
         }
+        ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
+                 "ignores left %d\n",
+                 client->window, e->xunmap.event, e->xunmap.from_configure,
+                 client->ignore_unmaps);
         client_unmanage(client);
         break;
     case DestroyNotify:

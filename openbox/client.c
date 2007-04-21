@@ -3013,11 +3013,17 @@ gboolean client_focus(ObClient *self)
         return FALSE;
     }
 
-    ob_debug("Focusing client \"%s\" at time %u\n", self->title, event_curtime);
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "Focusing client \"%s\" at time %u\n",
+                  self->title, event_curtime);
 
     if (self->can_focus) {
+        /* This can cause a BadMatch error with CurrentTime, or if an app
+           passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
+        xerror_set_ignore(TRUE);
         XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
                        event_curtime);
+        xerror_set_ignore(FALSE);
     }
 
     if (self->focus_notify) {
@@ -3341,7 +3347,7 @@ GSList *client_search_all_top_parents(ObClient *self)
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
-                if (!c->transient_for)
+                if (!c->transient_for && client_normal(c))
                     ret = g_slist_prepend(ret, c);
             }
 

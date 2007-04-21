@@ -176,19 +176,22 @@ static void restack_windows(ObClient *selected, gboolean raise)
            this window, or it won't move */
         top = client_search_all_top_parents(selected);
 
-        /* go thru stacking list backwards so we can use g_slist_prepend */
-        for (it = g_list_last(stacking_list); it && top;
-             it = g_list_previous(it))
-            if ((top_it = g_slist_find(top, it->data))) {
-                top_reorder = g_slist_prepend(top_reorder, top_it->data);
-                top = g_slist_delete_link(top, top_it);
-            }
-        g_assert(top == NULL);
+        /* that is, if it has any parents */
+        if (!(top->data == selected && top->next == NULL)) {
+            /* go thru stacking list backwards so we can use g_slist_prepend */
+            for (it = g_list_last(stacking_list); it && top;
+                 it = g_list_previous(it))
+                if ((top_it = g_slist_find(top, it->data))) {
+                    top_reorder = g_slist_prepend(top_reorder, top_it->data);
+                    top = g_slist_delete_link(top, top_it);
+                }
+            g_assert(top == NULL);
 
-        /* call restack for each of these to lower them */
-        for (top_it = top_reorder; top_it; top_it = g_slist_next(top_it))
-            restack_windows(top_it->data, raise);
-        return;
+            /* call restack for each of these to lower them */
+            for (top_it = top_reorder; top_it; top_it = g_slist_next(top_it))
+                restack_windows(top_it->data, raise);
+            return;
+        }
     }
 
     /* remove first so we can't run into ourself */
@@ -387,15 +390,16 @@ void stacking_add_nonintrusive(ObWindow *win)
             if (client->group)
                 for (it = stacking_list; !parent && it; it = g_list_next(it)) {
                     if ((sit = g_slist_find(client->group->members, it->data)))
-                for (sit = client->group->members; !parent && sit;
-                     sit = g_slist_next(sit))
-                {
-                    ObClient *c = sit->data;
-                    /* checking transient_for prevents infinate loops! */
-                    if (sit->data == it->data && !c->transient_for)
-                        parent = it->data;
+                        for (sit = client->group->members; !parent && sit;
+                             sit = g_slist_next(sit))
+                        {
+                            ObClient *c = sit->data;
+                            /* checking transient_for prevents infinate loops!
+                             */
+                            if (sit->data == it->data && !c->transient_for)
+                                parent = it->data;
+                        }
                 }
-            }
         }
     }
 

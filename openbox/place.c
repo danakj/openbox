@@ -429,7 +429,7 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
             gint l, r, t, b;
             for (it = client->group->members; it; it = g_slist_next(it)) {
                 ObClient *m = it->data;
-                if (!(m == client || m->transient_for)) {
+                if (!(m == client || m->transient_for) && client_normal(m)) {
                     if (first) {
                         l = RECT_LEFT(m->frame->area);
                         t = RECT_TOP(m->frame->area);

@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    debug.h for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,5 +24,14 @@
 void ob_debug_show_output(gboolean enable);
 
 void ob_debug(const gchar *a, ...);
+
+typedef enum {
+    OB_DEBUG_FOCUS,
+    OB_DEBUG_TYPE_NUM
+} ObDebugType;
+
+void ob_debug_type(ObDebugType type, const gchar *a, ...);
+
+void ob_debug_enable(ObDebugType type, gboolean enable);
 
 #endif

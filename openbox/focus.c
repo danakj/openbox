@@ -158,18 +158,16 @@ void focus_set_client(ObClient *client)
     Window active;
     ObClient *old;
 
-#ifdef DEBUG_FOCUS
-    ob_debug("focus_set_client 0x%lx\n", client ? client->window : 0);
-#endif
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "focus_set_client 0x%lx\n", client ? client->window : 0);
 
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
 
     if (client == NULL) {
-#ifdef DEBUG_FOCUS
-        ob_debug("actively focusing NONWINDOW\n");
-#endif
+        ob_debug_type(OB_DEBUG_FOCUS, "actively focusing NONWINDOW\n");
+
         /* when nothing will be focused, send focus to the backup target */
         XSetInputFocus(ob_display, screen_support_win, RevertToNone,
                        event_curtime);
@@ -207,13 +205,13 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     ObClient *target = NULL;
     ObClient *desktop = NULL;
 
-    ob_debug("trying pointer stuff\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
     if (config_focus_follow && !config_focus_last)
     {
         if ((target = client_under_pointer()))
             if (allow_refocus || target != old)
                 if (client_normal(target) && client_can_focus(target)) {
-                    ob_debug("found in pointer stuff\n");
+                    ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
                     return target;
                 }
     }
@@ -232,12 +230,12 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
         }
 #endif
 
-    ob_debug("trying omnipresentness\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying omnipresentness\n");
     if (allow_refocus && old && old->desktop == DESKTOP_ALL)
         return old;
 
 
-    ob_debug("trying  the focus order\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying  the focus order\n");
     for (it = focus_order; it; it = g_list_next(it))
         if (allow_refocus || it->data != old) {
             ObClient *c = it->data;
@@ -257,7 +255,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
                 !c->iconic)
             {
                 if (client_normal(c)) {
-                    ob_debug("found in focus order\n");
+                    ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
                     return it->data;
                 } else if (c->type == OB_CLIENT_TYPE_DESKTOP && !desktop)
                     desktop = c;

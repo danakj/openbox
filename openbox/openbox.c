@@ -91,6 +91,7 @@ static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
+static gchar    *config_file = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void parse_args(gint argc, gchar **argv);
@@ -100,9 +101,6 @@ gint main(gint argc, gchar **argv)
 {
 #ifdef DEBUG
     ob_debug_show_output(TRUE);
-#ifdef DEBUG_FOCUS
-    ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
-#endif
 #endif
 
     state = OB_STATE_STARTING;
@@ -227,8 +225,12 @@ gint main(gint argc, gchar **argv)
 
                 config_startup(i);
                 /* parse/load user options */
-                if (parse_load_rc(&doc, &node))
+                if (parse_load_rc(config_file, &doc, &node, &config_file)) {
+                    PROP_SETS(RootWindow(ob_display, ob_screen),
+                              openbox_rc, config_file);
                     parse_tree(i, doc, node->xmlChildrenNode);
+                } else
+                    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_rc);
                 /* we're done with parsing now, kill it */
                 parse_close(doc);
                 parse_shutdown(i);
@@ -322,6 +324,7 @@ gint main(gint argc, gchar **argv)
 
     XSync(ob_display, FALSE);
 
+    g_free(config_file); /* this is set by parse_load_rc */
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
@@ -383,7 +386,7 @@ static void print_version()
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
     g_print("Copyright (c) 2007 Mikael Magnusson\n");
-    g_print("Copyright (c) 2007 Dana Jansens\n\n");
+    g_print("Copyright (c) 2003-2007 Dana Jansens\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -396,6 +399,8 @@ static void print_help()
     g_print("  --reconfigure       Tell the currently running instance of "
             "Openbox to\n"
             "                      reconfigure (and then exit immediately)\n");
+    g_print("  --config-file FILE  Specify the file to load for the config "
+            "file\n");
 #ifdef USE_SM
     g_print("  --sm-disable        Disable connection to session manager\n");
     g_print("  --sm-client-id ID   Specify session management ID\n");
@@ -410,6 +415,7 @@ static void print_help()
             "meant for\n"
             "                      debugging X routines)\n");
     g_print("  --debug             Display debugging output\n");
+    g_print("  --debug-focus       Display debugging output\n");
     g_print("\nPlease report bugs at %s\n\n", PACKAGE_BUGREPORT);
 }
 
@@ -432,10 +438,20 @@ static void parse_args(gint argc, gchar **argv)
             xsync = TRUE;
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
+        } else if (!strcmp(argv[i], "--debug-focus")) {
+            ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;
         } else if (!strcmp(argv[i], "--restart")) {
             remote_control = 2;
+        } else if (!strcmp(argv[i], "--config-file")) {
+            if (i == argc - 1) /* no args left */
+                g_printerr(_("--config-file requires an argument\n"));
+            else {
+                config_file = g_strdup(argv[i+1]);
+                ++i;
+            }
         }
     }
 }

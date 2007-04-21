@@ -3341,7 +3341,7 @@ GSList *client_search_all_top_parents(ObClient *self)
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
-                if (!c->transient_for)
+                if (!c->transient_for && client_normal(c))
                     ret = g_slist_prepend(ret, c);
             }
 

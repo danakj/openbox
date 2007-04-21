@@ -87,11 +87,12 @@ gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root,
 
     *fileused = NULL;
 
-    for (it = xdg_config_dir_paths; !r && it; it = g_slist_next(it)) {
-        if (file) {
-            if ((r = parse_load(file, "openbox_config", doc, root)))
-                *fileused = g_strdup(file);
-        } else {
+    if (file) {
+        if ((r = parse_load(file, "openbox_config", doc, root)))
+            *fileused = g_strdup(file);
+    } else {
+        /* this won't run if the above code loaded a config */
+        for (it = xdg_config_dir_paths; !r && it; it = g_slist_next(it)) {
             gchar *path;
 
             path = g_build_filename(it->data, "openbox", "rc.xml", NULL);

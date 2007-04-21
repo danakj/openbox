@@ -2,7 +2,7 @@
 
    prop.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -154,6 +154,7 @@ void prop_startup()
     CREATE(esetrootid, "ESETROOT_PMAP_ID");
 
     CREATE(openbox_pid, "_OPENBOX_PID");
+    CREATE(openbox_rc, "_OPENBOX_RC");
     CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(ob_control, "_OB_CONTROL");
 }

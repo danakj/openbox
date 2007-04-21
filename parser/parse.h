@@ -35,7 +35,8 @@ ObParseInst* parse_startup();
 void parse_shutdown(ObParseInst *inst);
 
 /* Loads Openbox's rc, from the normal paths */
-gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root);
+gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root,
+                       gchar **fileused);
 /* Loads an Openbox menu, from the normal paths */
 gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */

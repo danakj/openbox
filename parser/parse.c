@@ -79,16 +79,27 @@ void parse_register(ObParseInst *i, const gchar *tag,
     g_hash_table_insert(i->callbacks, c->tag, c);
 }
 
-gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
+gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root,
+                       gchar **fileused)
 {
     GSList *it;
-    gchar *path;
     gboolean r = FALSE;
 
+    *fileused = NULL;
+
     for (it = xdg_config_dir_paths; !r && it; it = g_slist_next(it)) {
-        path = g_build_filename(it->data, "openbox", "rc.xml", NULL);
-        r = parse_load(path, "openbox_config", doc, root);
-        g_free(path);
+        if (file) {
+            if ((r = parse_load(file, "openbox_config", doc, root)))
+                *fileused = g_strdup(file);
+        } else {
+            gchar *path;
+
+            path = g_build_filename(it->data, "openbox", "rc.xml", NULL);
+            if ((r = parse_load(path, "openbox_config", doc, root)))
+                *fileused = path;
+            else
+                g_free(path);
+        }
     }
     if (!r)
         g_warning("Unable to find a valid config file, using defaults");

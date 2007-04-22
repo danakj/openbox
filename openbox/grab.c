@@ -114,33 +114,6 @@ gboolean grab_pointer(gboolean grab, gboolean owner_events, ObCursor cur)
     return ret;
 }
 
-gboolean grab_pointer_window(gboolean grab, gboolean owner_events,
-                             ObCursor cur, Window win)
-{
-    gboolean ret = FALSE;
-
-    if (grab) {
-        if (pgrabs++ == 0) {
-            ret = XGrabPointer(ob_display, win, owner_events,
-                               GRAB_PTR_MASK,
-                               GrabModeAsync, GrabModeAsync, None,
-                               ob_cursor(cur),
-                               event_curtime) == Success;
-            if (!ret)
-                --pgrabs;
-            else
-                grab_time = event_curtime;
-        } else
-            ret = TRUE;
-    } else if (pgrabs > 0) {
-        if (--pgrabs == 0) {
-            XUngrabPointer(ob_display, ungrab_time());
-        }
-        ret = TRUE;
-    }
-    return ret;
-}
-
 gint grab_server(gboolean grab)
 {
     static guint sgrabs = 0;
@@ -181,7 +154,6 @@ void grab_shutdown(gboolean reconfig)
 
     while (grab_keyboard(FALSE));
     while (grab_pointer(FALSE, FALSE, OB_CURSOR_NONE));
-    while (grab_pointer_window(FALSE, FALSE, OB_CURSOR_NONE, None));
     while (grab_server(FALSE));
 }
 

@@ -336,8 +336,7 @@ void focus_cycle_draw_indicator()
         XUnmapWindow(ob_display, focus_indicator.bottom.win);
 
         /* kill enter events cause by this unmapping */
-        XSync(ob_display, FALSE);
-        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+        event_ignore_queued_enters();
     } else {
         /*
           if (focus_cycle_target)

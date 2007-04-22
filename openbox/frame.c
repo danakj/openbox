@@ -29,8 +29,7 @@
 #include "moveresize.h"
 #include "render/theme.h"
 
-#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask | \
-                         FocusChangeMask)
+#define PLATE_EVENTMASK (ButtonPressMask | FocusChangeMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask | \
                          VisibilityChangeMask)

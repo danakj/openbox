@@ -164,10 +164,8 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
     g_assert(action->data.any.interactive);
 
     if (!interactive_states) {
-        if (!grab_keyboard(TRUE)) {
-            ob_debug("grab KEYBOARD failed\n");
+        if (!grab_keyboard(TRUE))
             return FALSE;
-        }
     }
 
     s = g_new(ObInteractiveState, 1);

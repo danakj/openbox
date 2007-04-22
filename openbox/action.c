@@ -434,6 +434,11 @@ void setup_action_showmenu(ObAction **a, ObUserAction uact)
     }
 }
 
+void setup_action_focus(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.any.client_action = OB_CLIENT_ACTION_OPTIONAL;
+}
+
 void setup_client_action(ObAction **a, ObUserAction uact)
 {
     (*a)->data.any.client_action = OB_CLIENT_ACTION_ALWAYS;
@@ -494,7 +499,7 @@ ActionString actionstrings[] =
     {
         "focus",
         action_focus,
-        setup_client_action
+        setup_action_focus
     },
     {
         "unfocus",
@@ -1159,15 +1164,22 @@ void action_activate(union ActionData *data)
 
 void action_focus(union ActionData *data)
 {
-    /* similar to the openbox dock for dockapps, don't let user actions give
-       focus to 3rd-party docks (panels) either (unless they ask for it
-       themselves). */
-    if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
-        /* if using focus_delay, stop the timer now so that focus doesn't go
-           moving on us */
-        event_halt_focus_delay();
+    if (data->client.any.c) {
+        /* similar to the openbox dock for dockapps, don't let user actions
+           give focus to 3rd-party docks (panels) either (unless they ask for
+           it themselves). */
+        if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+            /* if using focus_delay, stop the timer now so that focus doesn't
+               go moving on us */
+            event_halt_focus_delay();
 
-        client_focus(data->client.any.c);
+            client_focus(data->client.any.c);
+        }
+    } else {
+        /* focus action on something other than a client, make keybindings
+           work for this openbox instance, but don't focus any specific client
+        */
+        focus_nothing();
     }
 }
 

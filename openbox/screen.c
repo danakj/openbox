@@ -887,7 +887,21 @@ void screen_show_desktop(gboolean show)
                 break;
         }
     } else {
-        focus_fallback(TRUE);
+        /* use NULL for the "old" argument because the desktop was focused
+           and we don't want to fallback to the desktop by default */
+        focus_hilite = focus_fallback_target(TRUE, NULL);
+        if (focus_hilite) {
+            frame_adjust_focus(focus_hilite->frame, TRUE);
+
+            /*!
+              When this focus_client check is not used, you can end up with
+              races, as demonstrated with gnome-panel, sometimes the window
+              you click on another desktop ends up losing focus cuz of the
+              focus change here.
+            */
+            /*if (!focus_client)*/
+            client_focus(focus_hilite);
+        }
     }
 
     show = !!show; /* make it boolean */

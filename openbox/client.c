@@ -512,11 +512,9 @@ void client_unmanage(ObClient *self)
     XSync(ob_display, FALSE);
 
     if (focus_client == self) {
-        XEvent e;
-
-        /* focus the last focused window on the desktop, and ignore enter
-           events from the unmap so it doesnt mess with the focus */
-        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+        /* ignore enter events from the unmap so it doesnt mess with the focus
+         */
+        event_ignore_queued_enters();
     }
 
 

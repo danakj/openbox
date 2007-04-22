@@ -1276,17 +1276,12 @@ static void event_handle_menu(XEvent *ev)
         }
         break;
     case LeaveNotify:
-        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
-            if (e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
-                menu_frame_select(e->frame, NULL);
+        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
+            (f = find_active_menu()) && f->selected == e &&
+            e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
+        {
+            menu_frame_select(e->frame, NULL);
         }
-    case MotionNotify:
-        if ((e = menu_entry_frame_under(ev->xmotion.x_root,
-                                        ev->xmotion.y_root))) {
-            /* XXX menu_frame_entry_move_on_screen(f); */
-            menu_frame_select(e->frame, e);
-        }
-        break;
     case KeyPress:
         if (ev->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
             menu_frame_hide_all();

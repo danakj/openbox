@@ -738,7 +738,8 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 
     XMapWindow(ob_display, self->window);
 
-    if (screen_pointer_pos(&dx, &dy) && (e = menu_entry_frame_under(dx, dy)))
+    if (screen_pointer_pos(&dx, &dy) && (e = menu_entry_frame_under(dx, dy)) &&
+        e->frame == self)
         ++e->ignore_enters;
 
     return TRUE;

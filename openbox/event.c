@@ -1352,8 +1352,8 @@ static void focus_delay_dest(gpointer data)
 
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2)
 {
-    const ObFocusDelayData *f1 = d1, *f2 = d2;
-    return f1->client == f2->client;
+    const ObFocusDelayData *f1 = d1;
+    return f1->client == d2;
 }
 
 static gboolean focus_delay_func(gpointer data)

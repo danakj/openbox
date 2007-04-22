@@ -213,8 +213,14 @@ void popup_show(ObPopup *self, gchar *text)
 void popup_hide(ObPopup *self)
 {
     if (self->mapped) {
+        XEvent e;
+
         XUnmapWindow(ob_display, self->bg);
         self->mapped = FALSE;
+
+        /* kill enter events cause by this unmapping */
+        XSync(ob_display, FALSE);
+        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
     }
 }
 

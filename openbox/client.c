@@ -507,6 +507,8 @@ void client_unmanage(ObClient *self)
     g_assert(self != NULL);
 
     frame_hide(self->frame);
+    /* sync to send the hide to the server quickly, and to get back the enter
+       events */
     XSync(ob_display, FALSE);
 
     if (focus_client == self) {

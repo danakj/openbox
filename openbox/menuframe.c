@@ -326,6 +326,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->texture[0].data.text.string = sub ? sub->title : "";
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        text_a = self->a_text_normal;
         break;
     }
 

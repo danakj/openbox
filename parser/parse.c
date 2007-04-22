@@ -394,12 +394,12 @@ void parse_paths_startup()
         xdg_config_dir_paths = split_paths(path);
     else {
         xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
+                                              g_strdup(CONFIGDIR),
+                                              (GSListFunc) g_slist_append);
+        xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
                                               g_build_filename
                                               (G_DIR_SEPARATOR_S,
                                                "etc", "xdg", NULL),
-                                              (GSListFunc) g_slist_append);
-        xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
-                                              g_strdup(CONFIGDIR),
                                               (GSListFunc) g_slist_append);
     }
     xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,

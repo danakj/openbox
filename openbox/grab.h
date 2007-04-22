@@ -28,8 +28,9 @@ void grab_startup(gboolean reconfig);
 void grab_shutdown(gboolean reconfig);
 
 gboolean grab_keyboard(gboolean grab);
-gboolean grab_pointer(gboolean grab, ObCursor cur);
-gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win);
+gboolean grab_pointer(gboolean grab, gboolean owner_events, ObCursor cur);
+gboolean grab_pointer_window(gboolean grab, gboolean owner_events,
+                             ObCursor cur, Window win);
 gint grab_server(gboolean grab);
 
 gboolean grab_on_keyboard();

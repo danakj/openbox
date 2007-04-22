@@ -393,9 +393,6 @@ static Bool look_for_focusin(Display *d, XEvent *e, XPointer arg)
 static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
-    case EnterNotify:
-    case LeaveNotify:
-        return keyboard_interactively_grabbed();
     case FocusIn:
     case FocusOut:
         if (!wanted_focusevent(e)) {

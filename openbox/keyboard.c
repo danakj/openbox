@@ -166,7 +166,7 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
     if (!interactive_states) {
         if (!grab_keyboard(TRUE))
             return FALSE;
-        if (!grab_pointer(TRUE, OB_CURSOR_NONE)) {
+        if (!grab_pointer(TRUE, FALSE, OB_CURSOR_NONE)) {
             grab_keyboard(FALSE);
             return FALSE;
         }
@@ -195,7 +195,7 @@ void keyboard_interactive_end(ObInteractiveState *s,
 
     if (!interactive_states) {
         grab_keyboard(FALSE);
-        grab_pointer(FALSE, OB_CURSOR_NONE);
+        grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
         keyboard_reset_chains();
     }
 }

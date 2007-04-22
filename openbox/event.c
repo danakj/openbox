@@ -64,6 +64,12 @@ typedef struct
     gboolean ignored;
 } ObEventData;
 
+typedef struct
+{
+    ObClient *client;
+    Time time;
+} ObFocusDelayData;
+
 static void event_process(const XEvent *e, gpointer data);
 static void event_client_dest(ObClient *client, gpointer data);
 static void event_handle_root(XEvent *e);
@@ -73,6 +79,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_group(ObGroup *g, XEvent *e);
 
+static void focus_delay_destroy(gpointer data);
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
@@ -97,6 +104,11 @@ static gint mask_table_size;
 static guint ignore_enter_focus = 0;
 
 static gboolean menu_can_hide;
+
+static ObFocusDelayData focus_delay_data = { .client = NULL,
+                                             .time = CurrentTime };
+
+
 
 #ifdef USE_SM
 static void ice_handler(gint fd, gpointer conn)
@@ -617,12 +629,16 @@ void event_enter_client(ObClient *client)
     if (client_normal(client) && client_can_focus(client)) {
         if (config_focus_delay) {
             ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+
+            focus_delay_data.client = client;
+            focus_delay_data.time = event_curtime;
+
             ob_main_loop_timeout_add(ob_main_loop,
                                      config_focus_delay,
                                      focus_delay_func,
-                                     client, NULL);
+                                     NULL, focus_delay_destroy);
         } else
-            focus_delay_func(client);
+            focus_delay_func(NULL);
     }
 }
 
@@ -1316,14 +1332,21 @@ static gboolean menu_hide_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
+static void focus_delay_destroy(gpointer data)
+{
+    focus_delay_data.client = NULL;
+    focus_delay_data.time = CurrentTime;
+}
+
 static gboolean focus_delay_func(gpointer data)
 {
-    ObClient *c = data;
-
-    if (focus_client != c) {
-        if (client_focus(c) && config_focus_raise)
-            client_raise(c);
+    Time old = event_curtime;
+    event_curtime = focus_delay_data.time;
+    if (focus_client != focus_delay_data.client) {
+        if (client_focus(focus_delay_data.client) && config_focus_raise)
+            client_raise(focus_delay_data.client);
     }
+    event_curtime = old;
     return FALSE; /* no repeat */
 }
 

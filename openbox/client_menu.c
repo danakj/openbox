@@ -57,8 +57,6 @@ static void client_update(ObMenuFrame *frame, gpointer data)
     ObMenuEntry *e;
     GList *it;
 
-    frame->show_title = FALSE;
-
     for (it = menu->entries; it; it = g_list_next(it)) {
         e = it->data;
         if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
@@ -140,7 +138,7 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         guint desk;
 
         if (i >= screen_num_desktops) {
-            menu_add_separator(menu, -1);
+            menu_add_separator(menu, -1, NULL);
 
             desk = DESKTOP_ALL;
             name = _("All desktops");
@@ -192,11 +190,7 @@ void client_menu_startup()
     menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), NULL);
     menu_set_update_func(menu, client_update);
 
-    e = menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
-    e->data.normal.mask = ob_rr_theme->desk_mask;
-    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
-    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
+    menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
 
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
@@ -238,7 +232,7 @@ void client_menu_startup()
                             OB_USER_ACTION_MENU_SELECTION));
     menu_add_normal(menu, CLIENT_DECORATE, _("Decorate"), acts);
 
-    menu_add_separator(menu, -1);
+    menu_add_separator(menu, -1, NULL);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Move", OB_USER_ACTION_MENU_SELECTION));
@@ -248,7 +242,7 @@ void client_menu_startup()
                            ("Resize", OB_USER_ACTION_MENU_SELECTION));
     menu_add_normal(menu, CLIENT_RESIZE, _("Resize"), acts);
 
-    menu_add_separator(menu, -1);
+    menu_add_separator(menu, -1, NULL);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Close", OB_USER_ACTION_MENU_SELECTION));

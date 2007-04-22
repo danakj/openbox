@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    menu.h for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ struct _ObSubmenuMenuEntry {
 };
 
 struct _ObSeparatorMenuEntry {
-    gchar foo; /* placeholder */
+    gchar *label;
 };
 
 struct _ObMenuEntry
@@ -136,7 +136,7 @@ void menu_set_destroy_func(ObMenu *menu, ObMenuDestroyFunc func);
 ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, const gchar *label,
                              GSList *actions);
 ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, const gchar *submenu);
-ObMenuEntry* menu_add_separator(ObMenu *menu, gint id);
+ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label);
 
 void menu_clear_entries(ObMenu *menu);
 void menu_entry_remove(ObMenuEntry *self);

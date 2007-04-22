@@ -2,7 +2,7 @@
 
    menu.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -201,8 +201,15 @@ static void parse_menu_separator(ObParseInst *i,
 {
     ObMenuParseState *state = data;
 
-    if (state->parent)
-        menu_add_separator(state->parent, -1);
+    if (state->parent) {
+        gchar *label;
+
+        if (!parse_attr_string("label", node, &label))
+            label = NULL;
+
+        menu_add_separator(state->parent, -1, label);
+        g_free(label);
+    }
 }
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -414,11 +421,12 @@ ObMenuEntry* menu_add_submenu(ObMenu *self, gint id, const gchar *submenu)
     return e;
 }
 
-ObMenuEntry* menu_add_separator(ObMenu *self, gint id)
+ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
 {
     ObMenuEntry *e;
 
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR, id);
+    e->data.separator.label = g_strdup(label);
 
     self->entries = g_list_append(self->entries, e);
     return e;

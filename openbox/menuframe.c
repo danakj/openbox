@@ -2,7 +2,7 @@
 
    menuframe.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
                          LeaveWindowMask)
-#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
@@ -54,6 +53,22 @@ static Window createWindow(Window parent, gulong mask,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
 
+GHashTable *menu_frame_map;
+
+void menu_frame_startup(gboolean reconfig)
+{
+    if (reconfig) return;
+
+    menu_frame_map = g_hash_table_new(g_int_hash, g_int_equal);
+}
+
+void menu_frame_shutdown(gboolean reconfig)
+{
+    if (reconfig) return;
+
+    g_hash_table_destroy(menu_frame_map);
+}
+
 ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
 {
     ObMenuFrame *self;
@@ -63,18 +78,12 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
     self->type = Window_Menu;
     self->menu = menu;
     self->selected = NULL;
-    self->show_title = TRUE;
     self->client = client;
     self->direction_right = TRUE;
 
     attr.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen),
                                 CWEventMask, &attr);
-    attr.event_mask = TITLE_EVENTMASK;
-    self->title = createWindow(self->window, CWEventMask, &attr);
-    self->items = createWindow(self->window, 0, NULL);
-
-    XMapWindow(ob_display, self->items);
 
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
@@ -94,8 +103,6 @@ void menu_frame_free(ObMenuFrame *self)
 
         stacking_remove(MENU_AS_WINDOW(self));
 
-        XDestroyWindow(ob_display, self->items);
-        XDestroyWindow(ob_display, self->title);
         XDestroyWindow(ob_display, self->window);
 
         RrAppearanceFree(self->a_items);
@@ -116,11 +123,17 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     self->frame = frame;
 
     attr.event_mask = ENTRY_EVENTMASK;
-    self->window = createWindow(self->frame->items, CWEventMask, &attr);
+    self->window = createWindow(self->frame->window, CWEventMask, &attr);
     self->text = createWindow(self->window, 0, NULL);
-    if (entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR) {
+    g_hash_table_insert(menu_frame_map, &self->window, self);
+    g_hash_table_insert(menu_frame_map, &self->text, self);
+    if (entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
         self->icon = createWindow(self->window, 0, NULL);
+        g_hash_table_insert(menu_frame_map, &self->icon, self);
+    }
+    if (entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
         self->bullet = createWindow(self->window, 0, NULL);
+        g_hash_table_insert(menu_frame_map, &self->bullet, self);
     }
 
     XMapWindow(ob_display, self->window);
@@ -159,9 +172,15 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
     if (self) {
         XDestroyWindow(ob_display, self->text);
         XDestroyWindow(ob_display, self->window);
-        if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR) {
+        g_hash_table_insert(menu_frame_map, &self->text, self);
+        g_hash_table_insert(menu_frame_map, &self->window, self);
+        if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
             XDestroyWindow(ob_display, self->icon);
+            g_hash_table_insert(menu_frame_map, &self->icon, self);
+        }
+        if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
             XDestroyWindow(ob_display, self->bullet);
+            g_hash_table_insert(menu_frame_map, &self->bullet, self);
         }
 
         RrAppearanceFree(self->a_normal);
@@ -193,10 +212,8 @@ void menu_frame_place_topmenu(ObMenuFrame *self, gint x, gint y)
         x = self->client->frame->area.x + self->client->frame->size.left;
         y = self->client->frame->area.y + self->client->frame->size.top;
     } else {
-        if (config_menu_middle) {
-            x -= self->area.width / 2;
-        }
-        y -= self->title_h;
+        if (config_menu_middle)
+            y -= self->area.height / 2;
     }
     menu_frame_move(self, x, y);
 }
@@ -215,8 +232,7 @@ void menu_frame_place_submenu(ObMenuFrame *self)
     else
         x = self->parent->area.x - self->area.width + overlap + bwidth;
 
-    y = self->parent->area.y + self->parent->title_h +
-        self->parent_entry->area.y;
+    y = self->parent->area.y + self->parent_entry->area.y;
     if (config_menu_middle)
         y -= (self->area.height - (bwidth * 2) - self->item_h) / 2;
     else
@@ -260,19 +276,27 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     ObMenu *sub;
     ObMenuFrame *frame = self->frame;
 
-    item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-               !self->entry->data.normal.enabled) ?
-              self->a_disabled :
-              (self == self->frame->selected ?
-               self->a_selected :
-               self->a_normal));
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
     case OB_MENU_ENTRY_TYPE_SUBMENU:
+        item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                   !self->entry->data.normal.enabled) ?
+                  self->a_disabled :
+                  (self == self->frame->selected ?
+                   self->a_selected :
+                   self->a_normal));
         th = self->frame->item_h;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        th = SEPARATOR_HEIGHT + 2*PADDING;
+        if (self->entry->data.separator.label) {
+            item_a = self->frame->a_title;
+            item_a->texture[0].data.text.string =
+                self->entry->data.separator.label;
+            th = self->frame->title_h;
+        } else {
+            item_a = self->a_normal;
+            th = SEPARATOR_HEIGHT + 2*PADDING;
+        }
         break;
     default:
         g_assert_not_reached();
@@ -285,17 +309,19 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     item_a->surface.parenty = self->area.y;
     RrPaint(item_a, self->window, self->area.width, self->area.height);
 
-    text_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-               !self->entry->data.normal.enabled) ?
-              self->a_text_disabled :
-              (self == self->frame->selected ?
-               self->a_text_selected :
-               self->a_text_normal));
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
+        text_a = (!self->entry->data.normal.enabled ?
+                  self->a_text_disabled :
+                  (self == self->frame->selected ?
+                   self->a_text_selected :
+                   self->a_text_normal));
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
+        text_a = (self == self->frame->selected ?
+                  self->a_text_selected :
+                  self->a_text_normal);
         sub = self->entry->data.submenu.submenu;
         text_a->texture[0].data.text.string = sub ? sub->title : "";
         break;
@@ -327,24 +353,26 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 self->frame->item_h - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        XMoveResizeWindow(ob_display, self->text, PADDING, PADDING,
-                          self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
-        self->a_separator->surface.parent = item_a;
-        self->a_separator->surface.parentx = PADDING;
-        self->a_separator->surface.parenty = PADDING;
-        self->a_separator->texture[0].data.lineart.color =
-            text_a->texture[0].data.text.color;
-        self->a_separator->texture[0].data.lineart.x1 = 2*PADDING;
-        self->a_separator->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT / 2;
-        self->a_separator->texture[0].data.lineart.x2 =
-            self->area.width - 4*PADDING;
-        self->a_separator->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT / 2;
-        RrPaint(self->a_separator, self->text,
-                self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
+        if (self->entry->data.separator.label == NULL) {
+            XMoveResizeWindow(ob_display, self->text, PADDING, PADDING,
+                              self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
+            self->a_separator->surface.parent = item_a;
+            self->a_separator->surface.parentx = PADDING;
+            self->a_separator->surface.parenty = PADDING;
+            self->a_separator->texture[0].data.lineart.color =
+                text_a->texture[0].data.text.color;
+            self->a_separator->texture[0].data.lineart.x1 = 2*PADDING;
+            self->a_separator->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT/2;
+            self->a_separator->texture[0].data.lineart.x2 =
+                self->area.width - 4*PADDING;
+            self->a_separator->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT/2;
+            RrPaint(self->a_separator, self->text,
+                    self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
+        }
         break;
     }
 
-    if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
+    if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.icon_data)
     {
         XMoveResizeWindow(ob_display, self->icon,
@@ -368,7 +396,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 self->frame->item_h - frame->item_margin.top
                 - frame->item_margin.bottom);
         XMapWindow(ob_display, self->icon);
-    } else if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
+    } else if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                self->entry->data.normal.mask)
     {
         RrColor *c;
@@ -430,7 +458,6 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 static void menu_frame_render(ObMenuFrame *self)
 {
     gint w = 0, h = 0;
-    gint allitems_h = 0;
     gint tw, th; /* temps */
     GList *it;
     gboolean has_icon = FALSE;
@@ -440,24 +467,7 @@ static void menu_frame_render(ObMenuFrame *self)
     XSetWindowBorder(ob_display, self->window,
                      RrColorPixel(ob_rr_theme->menu_b_color));
 
-    if (!self->parent && self->show_title) {
-        XMoveWindow(ob_display, self->title, 
-                    -ob_rr_theme->mbwidth, h - ob_rr_theme->mbwidth);
-
-        self->a_title->texture[0].data.text.string = self->menu->title;
-        RrMinsize(self->a_title, &tw, &th);
-        tw = MIN(tw, MAX_MENU_WIDTH) + ob_rr_theme->paddingx * 2;
-        w = MAX(w, tw);
-
-        th = ob_rr_theme->menu_title_height;
-        h += (self->title_h = th + ob_rr_theme->mbwidth);
-
-        XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->mbwidth);
-        XSetWindowBorder(ob_display, self->title,
-                         RrColorPixel(ob_rr_theme->menu_b_color));
-    }
-
-    XMoveWindow(ob_display, self->items, 0, h);
+    /* find text dimensions */
 
     STRUT_SET(self->item_margin, 0, 0, 0, 0);
 
@@ -470,6 +480,12 @@ static void menu_frame_render(ObMenuFrame *self)
         tw += 2*PADDING;
         th += 2*PADDING;
         self->item_h = th;
+
+        self->a_title->texture[0].data.text.string = "";
+        RrMinsize(self->a_title, &tw, &th);
+        tw += 2*PADDING;
+        th += 2*PADDING;
+        self->title_h = th;
 
         RrMargins(e->a_normal, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
@@ -492,11 +508,13 @@ static void menu_frame_render(ObMenuFrame *self)
     } else
         self->item_h = 0;
 
+    /* render the entries */
+
     for (it = self->entries; it; it = g_list_next(it)) {
         RrAppearance *text_a;
         ObMenuEntryFrame *e = it->data;
 
-        RECT_SET_POINT(e->area, 0, allitems_h);
+        RECT_SET_POINT(e->area, 0, h);
         XMoveWindow(ob_display, e->window, 0, e->area.y);
 
         text_a = ((e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
@@ -528,15 +546,21 @@ static void menu_frame_render(ObMenuFrame *self)
             tw += self->item_h - PADDING;
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
-            tw = 0;
-            th = SEPARATOR_HEIGHT;
+            if (e->entry->data.separator.label != NULL) {
+                self->a_title->texture[0].data.text.string =
+                    e->entry->data.separator.label;
+                RrMinsize(self->a_title, &tw, &th);
+                tw = MIN(tw, MAX_MENU_WIDTH);
+            } else {
+                tw = 0;
+                th = SEPARATOR_HEIGHT;
+            }
             break;
         }
         tw += 2*PADDING;
         th += 2*PADDING;
         w = MAX(w, tw);
         h += th;
-        allitems_h += th;
     }
 
     self->text_x = PADDING;
@@ -550,26 +574,13 @@ static void menu_frame_render(ObMenuFrame *self)
     }
 
     if (!w) w = 10;
-    if (!allitems_h) {
-        allitems_h = 3;
-        h += 3;
-    }
+    if (!h) h = 3;
 
     XResizeWindow(ob_display, self->window, w, h);
-    XResizeWindow(ob_display, self->items, w, allitems_h);
 
     self->inner_w = w;
 
-    if (!self->parent && self->show_title) {
-        XResizeWindow(ob_display, self->title,
-                      w, self->title_h - ob_rr_theme->mbwidth);
-        RrPaint(self->a_title, self->title,
-                w, self->title_h - ob_rr_theme->mbwidth);
-        XMapWindow(ob_display, self->title);
-    } else
-        XUnmapWindow(ob_display, self->title);
-
-    RrPaint(self->a_items, self->items, w, allitems_h);
+    RrPaint(self->a_items, self->window, w, h);
 
     for (it = self->entries; it; it = g_list_next(it))
         menu_entry_frame_render(it->data);
@@ -625,10 +636,10 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
-        if (!grab_pointer(TRUE, OB_CURSOR_NONE))
+        if (!grab_pointer(TRUE, OB_CURSOR_POINTER))
             return FALSE;
         if (!grab_keyboard(TRUE)) {
-            grab_pointer(FALSE, OB_CURSOR_NONE);
+            grab_pointer(FALSE, OB_CURSOR_POINTER);
             return FALSE;
         }
     }
@@ -683,6 +694,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y)
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
                                  ObMenuEntryFrame *parent_entry)
 {
+    ObMenuEntryFrame *e;
     gint dx, dy;
 
     if (menu_frame_is_visible(self))
@@ -725,6 +737,9 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     }
 
     XMapWindow(ob_display, self->window);
+
+    if (screen_pointer_pos(&dx, &dy) && (e = menu_entry_frame_under(dx, dy)))
+        ++e->ignore_enters;
 
     return TRUE;
 }
@@ -805,7 +820,7 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
 
     if ((frame = menu_frame_under(x, y))) {
         x -= ob_rr_theme->mbwidth + frame->area.x;
-        y -= frame->title_h + ob_rr_theme->mbwidth + frame->area.y;
+        y -= ob_rr_theme->mbwidth + frame->area.y;
 
         for (it = frame->entries; it; it = g_list_next(it)) {
             ObMenuEntryFrame *e = it->data;

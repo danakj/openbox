@@ -1352,8 +1352,8 @@ static gboolean focus_delay_func(gpointer data)
 
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
-                                     client, TRUE);
+    if (focus_delay_data.client == client)
+        ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
 static void event_client_dest(ObClient *client, gpointer data)

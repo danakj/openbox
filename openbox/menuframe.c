@@ -326,6 +326,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->texture[0].data.text.string = sub ? sub->title : "";
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        text_a = self->a_text_normal;
         break;
     }
 
@@ -738,7 +739,8 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 
     XMapWindow(ob_display, self->window);
 
-    if (screen_pointer_pos(&dx, &dy) && (e = menu_entry_frame_under(dx, dy)))
+    if (screen_pointer_pos(&dx, &dy) && (e = menu_entry_frame_under(dx, dy)) &&
+        e->frame == self)
         ++e->ignore_enters;
 
     return TRUE;

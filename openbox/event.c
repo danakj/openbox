@@ -391,8 +391,6 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             return TRUE;
         break;
     case FocusOut:
-        if (client == NULL)
-            return TRUE;
         if (!wanted_focusevent(e))
             return TRUE;
         break;

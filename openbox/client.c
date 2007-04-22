@@ -506,6 +506,10 @@ void client_unmanage(ObClient *self)
 
     g_assert(self != NULL);
 
+    /* we dont want events no more. do this before hiding the frame so we
+       don't generate more events */
+    XSelectInput(ob_display, self->window, NoEventMask);
+
     frame_hide(self->frame);
     /* sync to send the hide to the server quickly, and to get back the enter
        events */
@@ -523,9 +527,6 @@ void client_unmanage(ObClient *self)
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
-
-    /* we dont want events no more */
-    XSelectInput(ob_display, self->window, NoEventMask);
 
     /* update the focus lists */
     focus_order_remove(self);

@@ -506,6 +506,11 @@ static void event_process(const XEvent *ec, gpointer data)
         xerror_set_ignore(FALSE);
     }
 
+    /* crossing events for menu */
+    if (e->type == EnterNotify || e->type == LeaveNotify)
+        if (menu_frame_visible)
+            event_handle_menu(e);
+
     /* user input (action-bound) events */
     if (e->type == ButtonPress || e->type == ButtonRelease ||
         e->type == MotionNotify || e->type == KeyPress ||
@@ -1262,24 +1267,24 @@ static void event_handle_menu(XEvent *ev)
                 menu_frame_hide_all();
         }
         break;
-    case MotionNotify:
-        if ((f = menu_frame_under(ev->xmotion.x_root,
-                                  ev->xmotion.y_root))) {
-            if ((e = menu_entry_frame_under(ev->xmotion.x_root,
-                                            ev->xmotion.y_root))) {
-                /* XXX menu_frame_entry_move_on_screen(f); */
-                menu_frame_select(f, e);
-            }
+    case EnterNotify:
+        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
+            if (e->ignore_enters)
+                --e->ignore_enters;
+            else
+                menu_frame_select(e->frame, e);
         }
-        {
-            ObMenuFrame *a;
-
-            a = find_active_menu();
-            if (a && a != f &&
-                a->selected->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
-            {
-                menu_frame_select(a, NULL);
-            }
+        break;
+    case LeaveNotify:
+        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
+            if (e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
+                menu_frame_select(e->frame, NULL);
+        }
+    case MotionNotify:
+        if ((e = menu_entry_frame_under(ev->xmotion.x_root,
+                                        ev->xmotion.y_root))) {
+            /* XXX menu_frame_entry_move_on_screen(f); */
+            menu_frame_select(e->frame, e);
         }
         break;
     case KeyPress:

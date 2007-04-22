@@ -48,13 +48,7 @@ static void self_update(ObMenuFrame *frame, gpointer data)
         gboolean empty = TRUE;
 
         /* Don't need a separator at the very top */
-        if (desktop > 0)
-            menu_add_separator(menu, -1);
-        e = menu_add_normal(menu, -1, NULL, NULL);
-        e->data.normal.enabled = FALSE;
-        e->data.normal.label = g_strdup(screen_desktop_names[desktop]);
-        /* The one at the bottom will always have entries below it though */
-        menu_add_separator(menu, -1);
+        menu_add_separator(menu, -1, screen_desktop_names[desktop]);
         for (it = focus_order, i = 0; it; it = g_list_next(it), ++i) {
             ObClient *c = it->data;
             if (client_normal(c) && (!c->skip_taskbar || c->iconic) &&
@@ -66,11 +60,6 @@ static void self_update(ObMenuFrame *frame, gpointer data)
 
                 empty = FALSE;
 
-                if (!icons && c->iconic) {
-                    icons = TRUE;
-                    menu_add_separator(menu, -1);
-                }
-
                 act = action_from_string("Activate",
                                          OB_USER_ACTION_MENU_SELECTION);
                 act->data.activate.any.c = c;
@@ -79,8 +68,13 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                                          OB_USER_ACTION_MENU_SELECTION);
                 act->data.desktop.desk = desktop;
                 acts = g_slist_append(acts, act);
-                e = menu_add_normal(menu, i, (c->iconic ?
-                                              c->icon_title : c->title), acts);
+
+                if (c->iconic) {
+                    gchar *title = g_strdup_printf("(%s)", c->icon_title);
+                    e = menu_add_normal(menu, i, title, acts);
+                    g_free(title);
+                } else
+                    e = menu_add_normal(menu, i, c->title, acts);
 
                 if (config_menu_client_list_icons
                         && (icon = client_icon(c, 32, 32))) {

@@ -26,7 +26,8 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | PointerMotionMask)
+#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | \
+                       PointerMotionMask | EnterWindowMask | LeaveWindowMask)
 #define GRAB_KEY_MASK (KeyPressMask | KeyReleaseMask)
 
 #define MASK_LIST_SIZE 8
@@ -96,7 +97,7 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
     if (grab) {
         if (pgrabs++ == 0) {
             ret = XGrabPointer(ob_display, screen_support_win,
-                               False, GRAB_PTR_MASK, GrabModeAsync,
+                               True, GRAB_PTR_MASK, GrabModeAsync,
                                GrabModeAsync, None,
                                ob_cursor(cur), event_curtime) == Success;
             if (!ret)
@@ -120,7 +121,7 @@ gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
 
     if (grab) {
         if (pgrabs++ == 0) {
-            ret = XGrabPointer(ob_display, win, False, GRAB_PTR_MASK,
+            ret = XGrabPointer(ob_display, win, True, GRAB_PTR_MASK,
                                GrabModeAsync, GrabModeAsync, None,
                                ob_cursor(cur),
                                event_curtime) == Success;

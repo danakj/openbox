@@ -2,7 +2,7 @@
 
    menuframe.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -57,22 +57,16 @@ struct _ObMenuFrame
     /* If the submenus are being drawn to the right or the left */
     gboolean direction_right;
 
-    /* If a titlebar is displayed for the menu or not (for top-level menus) */
-    gboolean show_title;
-
     /* On-screen area (including borders!) */
     Rect area;
     Strut item_margin;
     gint inner_w; /* inside the borders */
-    gint title_h; /* includes the bwidth below it */
+    gint title_h;  /* height of all title items */
     gint item_h;  /* height of all normal items */
     gint text_x;  /* offset at which the text appears in the items */
     gint text_w;  /* width of the text area in the items */
 
     gint monitor; /* monitor on which to show the menu in xinerama */
-
-    Window title;
-    Window items;
 
     RrAppearance *a_title;
     RrAppearance *a_items;
@@ -82,6 +76,8 @@ struct _ObMenuEntryFrame
 {
     struct _ObMenuEntry *entry;
     ObMenuFrame *frame;
+
+    guint ignore_enters;
 
     Rect area;
 
@@ -103,6 +99,11 @@ struct _ObMenuEntryFrame
     RrAppearance *a_text_disabled;
     RrAppearance *a_text_selected;
 };
+
+extern GHashTable *menu_frame_map;
+
+void menu_frame_startup(gboolean reconfig);
+void menu_frame_shutdown(gboolean reconfig);
 
 ObMenuFrame* menu_frame_new(struct _ObMenu *menu, struct _ObClient *client);
 void menu_frame_free(ObMenuFrame *self);

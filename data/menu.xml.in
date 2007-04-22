@@ -33,6 +33,7 @@
 </menu>
 
 <menu id="root-menu" label="Openbox 3">
+  <separator label="Openbox" />
   <menu id="apps-menu" />
   <menu id="games-menu" />
   <separator />

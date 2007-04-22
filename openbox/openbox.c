@@ -276,6 +276,7 @@ gint main(gint argc, gchar **argv)
             keyboard_startup(reconfigure);
             mouse_startup(reconfigure);
             menu_startup(reconfigure);
+            menu_frame_startup(reconfigure);
 
             if (!reconfigure) {
                 /* get all the existing windows */
@@ -305,6 +306,7 @@ gint main(gint argc, gchar **argv)
                 client_unmanage_all();
             }
 
+            menu_frame_shutdown(reconfigure);
             menu_shutdown(reconfigure);
             mouse_shutdown(reconfigure);
             keyboard_shutdown(reconfigure);

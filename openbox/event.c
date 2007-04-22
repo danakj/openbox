@@ -473,6 +473,7 @@ static void event_process(const XEvent *ec, gpointer data)
             /* nothing is focused */
             focus_set_client(NULL);
         } else if (ce.xany.window == e->xany.window) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus didn't go anywhere\n");
             /* If focus didn't actually move anywhere, there is nothing to do*/
             nomove = TRUE;
         } else if (ce.xfocus.detail == NotifyPointerRoot ||

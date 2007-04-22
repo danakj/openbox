@@ -37,9 +37,9 @@
 #include <glib.h>
 #include <assert.h>
 
-ObClient *focus_client, *focus_hilite;
-GList *focus_order;
-ObClient *focus_cycle_target;
+ObClient *focus_client = NULL;
+GList *focus_order = NULL;
+ObClient *focus_cycle_target = NULL;
 
 struct {
     InternalWindow top;
@@ -81,7 +81,7 @@ void focus_startup(gboolean reconfig)
         client_add_destructor(focus_cycle_destructor, NULL);
 
         /* start with nothing focused */
-        focus_set_client(NULL);
+        focus_nothing();
 
         focus_indicator.top.obwin.type = Window_Internal;
         focus_indicator.left.obwin.type = Window_Internal;
@@ -156,7 +156,6 @@ static void push_to_top(ObClient *client)
 void focus_set_client(ObClient *client)
 {
     Window active;
-    ObClient *old;
 
     ob_debug_type(OB_DEBUG_FOCUS,
                   "focus_set_client 0x%lx\n", client ? client->window : 0);
@@ -165,37 +164,26 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
 
-    if (client == NULL) {
-        ob_debug_type(OB_DEBUG_FOCUS, "actively focusing NONWINDOW\n");
-
-        /* when nothing will be focused, send focus to the backup target */
-        XSetInputFocus(ob_display, screen_support_win, RevertToNone,
-                       event_curtime);
-        XSync(ob_display, FALSE);
-    }
-
     /* in the middle of cycling..? kill it. CurrentTime is fine, time won't
        be used.
     */
     if (focus_cycle_target)
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
-    old = focus_client;
     focus_client = client;
 
-    /* move to the top of the list */
-    if (client != NULL)
+    if (client != NULL) {
+        /* move to the top of the list */
         push_to_top(client);
+        /* remove hiliting from the window when it gets focused */
+        client_hilite(client, FALSE);
+    }
 
     /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
     if (ob_state() != OB_STATE_EXITING) {
         active = client ? client->window : None;
         PROP_SET32(RootWindow(ob_display, ob_screen),
                    net_active_window, window, active);
-
-        /* remove hiliting from the window when it gets focused */
-        if (client != NULL)
-            client_hilite(client, FALSE);
     }
 }
 
@@ -280,10 +268,23 @@ void focus_fallback(gboolean allow_refocus)
        and such, and then when I try focus them, I won't get a FocusIn event
        at all for them.
     */
-    focus_set_client(NULL);
+    focus_nothing();
 
     if ((new = focus_fallback_target(allow_refocus, old)))
         client_focus(new);
+}
+
+void focus_nothing()
+{
+    /* Install our own colormap */
+    if (focus_client != NULL) {
+        screen_install_colormap(focus_client, FALSE);
+        screen_install_colormap(NULL, TRUE);
+    }
+
+    /* when nothing will be focused, send focus to the backup target */
+    XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,
+                   event_curtime);
 }
 
 static void popup_cycle(ObClient *c, gboolean show)

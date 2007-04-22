@@ -422,6 +422,7 @@ void screen_set_num_desktops(guint num)
 
 void screen_set_desktop(guint num)
 {
+    ObClient *c;
     GList *it;
     guint old;
      
@@ -459,19 +460,10 @@ void screen_set_desktop(guint num)
         }
     }
 
-    focus_hilite = focus_fallback_target(TRUE, focus_client);
-    if (focus_hilite) {
-        frame_adjust_focus(focus_hilite->frame, TRUE);
-
-        /*!
-          When this focus_client check is not used, you can end up with
-          races, as demonstrated with gnome-panel, sometimes the window
-          you click on another desktop ends up losing focus cuz of the
-          focus change here.
-        */
-        /*if (!focus_client)*/
-        client_focus(focus_hilite);
-    }
+    /* reduce flicker by hiliting now rather than waiting for the server
+       FocusIn event */
+    if ((c = focus_fallback_target(TRUE, focus_client)))
+        frame_adjust_focus(c->frame, TRUE);
 
     event_ignore_queued_enters();
 }
@@ -895,21 +887,12 @@ void screen_show_desktop(gboolean show)
                 break;
         }
     } else {
+        ObClient *c;
+
         /* use NULL for the "old" argument because the desktop was focused
            and we don't want to fallback to the desktop by default */
-        focus_hilite = focus_fallback_target(TRUE, NULL);
-        if (focus_hilite) {
-            frame_adjust_focus(focus_hilite->frame, TRUE);
-
-            /*!
-              When this focus_client check is not used, you can end up with
-              races, as demonstrated with gnome-panel, sometimes the window
-              you click on another desktop ends up losing focus cuz of the
-              focus change here.
-            */
-            /*if (!focus_client)*/
-            client_focus(focus_hilite);
-        }
+        if ((c = focus_fallback_target(TRUE, NULL)))
+            client_focus(c);
     }
 
     show = !!show; /* make it boolean */

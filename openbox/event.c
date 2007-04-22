@@ -71,7 +71,6 @@ typedef struct
 } ObFocusDelayData;
 
 static void event_process(const XEvent *e, gpointer data);
-static void event_client_dest(ObClient *client, gpointer data);
 static void event_handle_root(XEvent *e);
 static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
@@ -164,7 +163,6 @@ void event_startup(gboolean reconfig)
 #endif
 
     client_add_destructor(focus_delay_client_dest, NULL);
-    client_add_destructor(event_client_dest, NULL);
 }
 
 void event_shutdown(gboolean reconfig)
@@ -176,7 +174,6 @@ void event_shutdown(gboolean reconfig)
 #endif
 
     client_remove_destructor(focus_delay_client_dest);
-    client_remove_destructor(event_client_dest);
     XFreeModifiermap(modmap);
 }
 
@@ -395,11 +392,8 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
     switch(e->type) {
     case FocusIn:
     case FocusOut:
-        if (!wanted_focusevent(e)) {
-            ob_debug_type(OB_DEBUG_FOCUS, "focus event ignored\n");
+        if (!wanted_focusevent(e))
             return TRUE;
-        }
-        ob_debug_type(OB_DEBUG_FOCUS, "focus event used;\n");
         break;
     }
     return FALSE;
@@ -442,29 +436,6 @@ static void event_process(const XEvent *ec, gpointer data)
             }
         }
 
-    if (e->type == FocusIn || e->type == FocusOut) {
-        gint mode = e->xfocus.mode;
-        gint detail = e->xfocus.detail;
-        Window window = e->xfocus.window;
-        if (detail == NotifyVirtual) {
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "FOCUS %s NOTIFY VIRTUAL window 0x%x\n",
-                          (e->type == FocusIn ? "IN" : "OUT"), window);
-        }
-
-        else if (detail == NotifyNonlinearVirtual) {
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "FOCUS %s NOTIFY NONLINVIRTUAL window 0x%x\n",
-                          (e->type == FocusIn ? "IN" : "OUT"), window);
-        }
-
-        else
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "UNKNOWN FOCUS %s (d %d, m %d) window 0x%x\n",
-                          (e->type == FocusIn ? "IN" : "OUT"),
-                          detail, mode, window);
-    }
-
     event_set_curtime(e);
     event_hack_mods(e);
     if (event_ignore(e, client)) {
@@ -495,9 +466,9 @@ static void event_process(const XEvent *ec, gpointer data)
                window which had it. */
             focus_fallback(FALSE);
         } else if (client && client != focus_client) {
-            focus_set_client(client);
             frame_adjust_focus(client->frame, TRUE);
             client_calc_layer(client);
+            focus_set_client(client);
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
@@ -510,6 +481,8 @@ static void event_process(const XEvent *ec, gpointer data)
             /* There is no FocusIn, this means focus went to a window that
                is not being managed, or a window on another screen. */
             ob_debug_type(OB_DEBUG_FOCUS, "Focus went to a black hole !\n");
+            /* nothing is focused */
+            focus_set_client(NULL);
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             nomove = TRUE;
@@ -528,8 +501,6 @@ static void event_process(const XEvent *ec, gpointer data)
         }
 
         if (client && !nomove) {
-            /* This client is no longer focused, so show that */
-            focus_hilite = NULL;
             frame_adjust_focus(client->frame, FALSE);
             client_calc_layer(client);
         }
@@ -594,8 +565,7 @@ static void event_process(const XEvent *ec, gpointer data)
                     mouse_event(client, e);
                 } else if (e->type == KeyPress) {
                     keyboard_event((focus_cycle_target ? focus_cycle_target :
-                                    (focus_hilite ? focus_hilite : client)),
-                                   e);
+                                    client), e);
                 }
             }
         }
@@ -1374,12 +1344,6 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
     ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
                                      client, FALSE);
-}
-
-static void event_client_dest(ObClient *client, gpointer data)
-{
-    if (client == focus_hilite)
-        focus_hilite = NULL;
 }
 
 void event_halt_focus_delay()

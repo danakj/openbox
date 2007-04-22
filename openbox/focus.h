@@ -29,14 +29,6 @@ struct _ObClient;
 
 /*! The client which is currently focused */
 extern struct _ObClient *focus_client;
-/*! The client which is being decorated as focused, not always matching the
-  real focus, but this is used to track it so that it can be resolved to match.
-
-  This is for when you change desktops. We know which window is *going to be*
-  focused, so we hilight it. But since it's hilighted, we also want
-  keybindings to go to it, which is really what this is for.
-*/
-extern struct _ObClient *focus_hilite;
 /*! The client which appears focused during a focus cycle operation */
 extern struct _ObClient *focus_cycle_target;
 
@@ -49,6 +41,9 @@ void focus_shutdown(gboolean reconfig);
 /*! Specify which client is currently focused, this doesn't actually
   send focus anywhere, its called by the Focus event handlers */
 void focus_set_client(struct _ObClient *client);
+
+/*! Focus nothing, but let keyboard events be caught. */
+void focus_nothing();
 
 struct _ObClient* focus_fallback_target(gboolean allow_refocus,
                                         struct _ObClient *old);

@@ -471,8 +471,8 @@ static void event_process(const XEvent *ec, gpointer data)
             focus_fallback(TRUE);
         } else if (client && client != focus_client) {
             frame_adjust_focus(client->frame, TRUE);
-            client_calc_layer(client);
             focus_set_client(client);
+            client_calc_layer(client);
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;

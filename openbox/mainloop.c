@@ -99,6 +99,7 @@ struct _ObMainLoopTimer
     gulong delay;
     GSourceFunc func;
     gpointer data;
+    GEqualFunc equal;
     GDestroyNotify destroy;
 
     /* The timer needs to be freed */
@@ -585,12 +586,14 @@ void ob_main_loop_timeout_add(ObMainLoop *loop,
                               gulong microseconds,
                               GSourceFunc handler,
                               gpointer data,
+                              GEqualFunc cmp,
                               GDestroyNotify notify)
 {
     ObMainLoopTimer *t = g_new(ObMainLoopTimer, 1);
     t->delay = microseconds;
     t->func = handler;
     t->data = data;
+    t->equal = cmp;
     t->destroy = notify;
     t->del_me = FALSE;
     g_get_current_time(&loop->now);
@@ -619,7 +622,7 @@ void ob_main_loop_timeout_remove_data(ObMainLoop *loop, GSourceFunc handler,
 
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
-        if (t->func == handler && t->data == data) {
+        if (t->func == handler && t->equal(t->data, data)) {
             t->del_me = TRUE;
             if (cancel_dest)
                 t->destroy = NULL;

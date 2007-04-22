@@ -61,6 +61,7 @@ void ob_main_loop_timeout_add(ObMainLoop *loop,
                               gulong microseconds,
                               GSourceFunc handler,
                               gpointer data,
+                              GEqualFunc cmp,
                               GDestroyNotify notify);
 void ob_main_loop_timeout_remove(ObMainLoop *loop,
                                  GSourceFunc handler);

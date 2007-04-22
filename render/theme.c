@@ -80,7 +80,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme->a_focused_handle = RrAppearanceNew(inst, 0);
     theme->a_unfocused_handle = RrAppearanceNew(inst, 0);
     theme->a_menu = RrAppearanceNew(inst, 0);
-    theme->a_menu_title = RrAppearanceNew(inst, 1);
+    theme->a_menu_title = RrAppearanceNew(inst, 0);
+    theme->a_menu_text_title = RrAppearanceNew(inst, 1);
     theme->a_menu_normal = RrAppearanceNew(inst, 0);
     theme->a_menu_disabled = RrAppearanceNew(inst, 0);
     theme->a_menu_selected = RrAppearanceNew(inst, 0);
@@ -473,7 +474,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         set_default_appearance(theme->a_menu);
     if (!read_appearance(db, inst,
                          "menu.title.bg", theme->a_menu_title,
-                         FALSE))
+                         TRUE))
         set_default_appearance(theme->a_menu_title);
     if (!read_appearance(db, inst,
                          "menu.items.active.bg", theme->a_menu_selected,
@@ -636,6 +637,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme->a_icon->surface.grad =
         theme->a_clear->surface.grad =
         theme->a_clear_tex->surface.grad =
+        theme->a_menu_text_title->surface.grad =
         theme->a_menu_normal->surface.grad =
         theme->a_menu_disabled->surface.grad =
         theme->a_menu_text_normal->surface.grad =
@@ -736,10 +738,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme->a_unfocused_label->texture[0].data.text.shadow_alpha =
         theme->title_unfocused_shadow_alpha;
 
-    theme->a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
-    theme->a_menu_title->texture[0].data.text.justify = mtitlejust;
-    theme->a_menu_title->texture[0].data.text.font = theme->menu_title_font;
-    theme->a_menu_title->texture[0].data.text.color = theme->menu_title_color;
+    theme->a_menu_text_title->texture[0].type = RR_TEXTURE_TEXT;
+    theme->a_menu_text_title->texture[0].data.text.justify = mtitlejust;
+    theme->a_menu_text_title->texture[0].data.text.font =
+        theme->menu_title_font;
+    theme->a_menu_text_title->texture[0].data.text.color =
+        theme->menu_title_color;
 
     if (read_string(db, "menu.title.text.font", &str)) {
         char *p;
@@ -750,8 +754,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                 i = parse_inline_number(p + strlen("shadowoffset="));
             else
                 i = 1;
-            theme->a_menu_title->texture[0].data.text.shadow_offset_x = i;
-            theme->a_menu_title->texture[0].data.text.shadow_offset_y = i;
+            theme->a_menu_text_title->texture[0].data.text.shadow_offset_x = i;
+            theme->a_menu_text_title->texture[0].data.text.shadow_offset_y = i;
         }
         if ((p = strstr(str, "shadowtint=")))
         {
@@ -767,9 +771,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         }
     }
 
-    theme->a_menu_title->texture[0].data.text.shadow_color =
+    theme->a_menu_text_title->texture[0].data.text.shadow_color =
         theme->menu_title_shadow_color;
-    theme->a_menu_title->texture[0].data.text.shadow_alpha =
+    theme->a_menu_text_title->texture[0].data.text.shadow_alpha =
         theme->menu_title_shadow_alpha;
 
     theme->a_menu_text_normal->texture[0].type =
@@ -1042,7 +1046,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
              theme->a_unfocused_label->texture[0].data.text.shadow_offset_y));
     theme->menu_title_font_height = RrFontHeight
         (theme->menu_title_font,
-         theme->a_menu_title->texture[0].data.text.shadow_offset_y);
+         theme->a_menu_text_title->texture[0].data.text.shadow_offset_y);
     theme->menu_font_height = RrFontHeight
         (theme->menu_font,
          theme->a_menu_text_normal->texture[0].data.text.shadow_offset_y);
@@ -1199,6 +1203,7 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_unfocused_handle);
         RrAppearanceFree(theme->a_menu);
         RrAppearanceFree(theme->a_menu_title);
+        RrAppearanceFree(theme->a_menu_text_title);
         RrAppearanceFree(theme->a_menu_normal);
         RrAppearanceFree(theme->a_menu_disabled);
         RrAppearanceFree(theme->a_menu_selected);

@@ -144,6 +144,7 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
            have a timeout */
         ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
                                  sn_wait_timeout, seq,
+                                 g_direct_equal,
                                  (GDestroyNotify)sn_startup_sequence_unref);
         change = TRUE;
         break;
@@ -256,6 +257,7 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
     sn_launcher_context_ref(sn_launcher);
     ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
                              sn_launch_wait_timeout, sn_launcher,
+                             g_direct_equal,
                              (GDestroyNotify)sn_launcher_context_unref);
 
     setenv("DESKTOP_STARTUP_ID", id, TRUE);

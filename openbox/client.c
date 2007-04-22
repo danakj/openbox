@@ -77,7 +77,6 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
-static void client_unfocus(ObClient *self);
 
 void client_startup(gboolean reconfig)
 {
@@ -507,8 +506,8 @@ void client_unmanage(ObClient *self)
 
     g_assert(self != NULL);
 
-    /* update the focus lists */
-    focus_order_remove(self);
+    frame_hide(self->frame);
+    XSync(ob_display, FALSE);
 
     if (focus_client == self) {
         XEvent e;
@@ -516,20 +515,8 @@ void client_unmanage(ObClient *self)
         /* focus the last focused window on the desktop, and ignore enter
            events from the unmap so it doesnt mess with the focus */
         while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-        /* remove these flags so we don't end up getting focused in the
-           fallback! */
-        self->can_focus = FALSE;
-        self->focus_notify = FALSE;
-        self->modal = FALSE;
-        client_unfocus(self);
     }
 
-    /* potentially fix focusLast */
-    if (config_focus_last)
-        grab_pointer(TRUE, OB_CURSOR_NONE);
-
-    frame_hide(self->frame);
-    XFlush(ob_display);
 
     keyboard_grab_for_client(self, FALSE);
     mouse_grab_for_client(self, FALSE);
@@ -539,6 +526,9 @@ void client_unmanage(ObClient *self)
 
     /* we dont want events no more */
     XSelectInput(ob_display, self->window, NoEventMask);
+
+    /* update the focus lists */
+    focus_order_remove(self);
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
@@ -639,9 +629,6 @@ void client_unmanage(ObClient *self)
      
     /* update the list hints */
     client_set_list();
-
-    if (config_focus_last)
-        grab_pointer(FALSE, OB_CURSOR_NONE);
 }
 
 static ObAppSettings *client_get_settings_state(ObClient *self)
@@ -3052,19 +3039,6 @@ gboolean client_focus(ObClient *self)
        the focus_backup. */
     XSync(ob_display, FALSE);
     return TRUE;
-}
-
-/* Used when the current client is closed or otherwise hidden, focus_last will
-   then prevent focus from going to the mouse pointer
-*/
-static void client_unfocus(ObClient *self)
-{
-    if (focus_client == self) {
-#ifdef DEBUG_FOCUS
-        ob_debug("client_unfocus for %lx\n", self->window);
-#endif
-        focus_fallback(FALSE);
-    }
 }
 
 void client_activate(ObClient *self, gboolean here, gboolean user)

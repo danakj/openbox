@@ -72,7 +72,7 @@ gboolean grab_keyboard(gboolean grab)
     if (grab) {
         if (kgrabs++ == 0) {
             ret = XGrabKeyboard(ob_display, RootWindow(ob_display, ob_screen),
-                                FALSE, GrabModeAsync, GrabModeAsync,
+                                False, GrabModeAsync, GrabModeAsync,
                                 event_curtime) == Success;
             if (!ret)
                 --kgrabs;

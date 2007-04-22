@@ -387,9 +387,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
     switch(e->type) {
     case EnterNotify:
     case LeaveNotify:
-        if (e->xcrossing.detail == NotifyInferior)
-            return TRUE;
-        break;
+        return keyboard_interactively_grabbed();
     case FocusIn:
     case FocusOut:
         /* I don't think this should ever happen with our event masks, but
@@ -473,7 +471,13 @@ static void event_process(const XEvent *ec, gpointer data)
             ed->ignored = FALSE;
 
     /* deal with it in the kernel */
-    if (group)
+
+    if (menu_frame_visible &&
+        (e->type == EnterNotify || e->type == LeaveNotify))
+    {
+        /* crossing events for menu */
+        event_handle_menu(e);
+    } else if (group)
         event_handle_group(group, e);
     else if (client)
         event_handle_client(client, e);
@@ -505,11 +509,6 @@ static void event_process(const XEvent *ec, gpointer data)
                          e->xconfigurerequest.value_mask, &xwc);
         xerror_set_ignore(FALSE);
     }
-
-    /* crossing events for menu */
-    if (e->type == EnterNotify || e->type == LeaveNotify)
-        if (menu_frame_visible)
-            event_handle_menu(e);
 
     /* user input (action-bound) events */
     if (e->type == ButtonPress || e->type == ButtonRelease ||

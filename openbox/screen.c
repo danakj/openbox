@@ -300,8 +300,16 @@ void screen_startup(gboolean reconfig)
         screen_num_desktops = 0;
     screen_set_num_desktops(config_desktops_num);
     if (!reconfig) {
-        screen_set_desktop(MIN(config_screen_firstdesk, screen_num_desktops)
-                           - 1);
+        guint32 d;
+        /* start on the current desktop when a wm was already running */
+        if (PROP_GET32(RootWindow(ob_display, ob_screen),
+                       net_current_desktop, cardinal, &d) &&
+            d < screen_num_desktops)
+        {
+            screen_set_desktop(d);
+        } else
+            screen_set_desktop(MIN(config_screen_firstdesk,
+                                   screen_num_desktops) - 1);
 
         /* don't start in showing-desktop mode */
         screen_showing_desktop = FALSE;

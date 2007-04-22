@@ -456,15 +456,19 @@ static void event_process(const XEvent *ec, gpointer data)
         if (e->xfocus.detail == NotifyPointerRoot ||
                    e->xfocus.detail == NotifyDetailNone) {
             ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
-            /* Focus has been reverted to the root window or nothing, so fall
-               back to something other than the window which just had it. */
-            focus_fallback(FALSE);
+            /* Focus has been reverted to the root window or nothing
+               FocusOut events come after UnmapNotify, so we don't need to
+               worry about focusing an invalid window
+             */
+            focus_fallback(TRUE);
         } else if (e->xfocus.detail == NotifyInferior) {
             ob_debug_type(OB_DEBUG_FOCUS, "Focus went to parent\n");
             /* Focus has been reverted to parent, which is our frame window,
-               or the root window, so fall back to something other than the
-               window which had it. */
-            focus_fallback(FALSE);
+               or the root window
+               FocusOut events come after UnmapNotify, so we don't need to
+               worry about focusing an invalid window
+            */
+            focus_fallback(TRUE);
         } else if (client && client != focus_client) {
             frame_adjust_focus(client->frame, TRUE);
             client_calc_layer(client);

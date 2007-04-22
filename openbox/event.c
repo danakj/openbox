@@ -506,6 +506,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (client && !nomove) {
             frame_adjust_focus(client->frame, FALSE);
+            /* focus_set_client has already been called for sure */
             client_calc_layer(client);
         }
     } else if (group)

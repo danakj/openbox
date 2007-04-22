@@ -472,7 +472,7 @@ void client_manage(Window window)
         client_focus(self);
     }
 
-    /* client_activate does this but we aret using it so we have to do it
+    /* client_activate does this but we aren't using it so we have to do it
        here as well */
     if (screen_showing_desktop)
         screen_show_desktop(FALSE);

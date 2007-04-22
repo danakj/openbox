@@ -41,7 +41,7 @@ inline void client_action_start(union ActionData *data)
 {
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT && !data->any.button)
-            grab_pointer(TRUE, OB_CURSOR_NONE);
+            grab_pointer(TRUE, FALSE, OB_CURSOR_NONE);
 }
 
 inline void client_action_end(union ActionData *data)
@@ -49,7 +49,7 @@ inline void client_action_end(union ActionData *data)
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
             if (!data->any.button) {
-                grab_pointer(FALSE, OB_CURSOR_NONE);
+                grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
             } else {
                 ObClient *c;
 

@@ -393,17 +393,13 @@ static Bool look_for_focusin(Display *d, XEvent *e, XPointer arg)
 static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
-    case EnterNotify:
-    case LeaveNotify:
-        return keyboard_interactively_grabbed();
     case FocusIn:
     case FocusOut:
-        /* I don't think this should ever happen with our event masks, but
-           if it does, we don't want it. */
-        if (client == NULL)
+        if (!wanted_focusevent(e)) {
+            ob_debug_type(OB_DEBUG_FOCUS, "focus event ignored\n");
             return TRUE;
-        if (!wanted_focusevent(e))
-            return TRUE;
+        }
+        ob_debug_type(OB_DEBUG_FOCUS, "focus event used;\n");
         break;
     }
     return FALSE;
@@ -485,6 +481,58 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         /* crossing events for menu */
         event_handle_menu(e);
+    } else if (e->type == FocusIn) {
+        if (e->xfocus.detail == NotifyPointerRoot ||
+                   e->xfocus.detail == NotifyDetailNone) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
+            /* Focus has been reverted to the root window or nothing, so fall
+               back to something other than the window which just had it. */
+            focus_fallback(FALSE);
+        } else if (e->xfocus.detail == NotifyInferior) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to parent\n");
+            /* Focus has been reverted to parent, which is our frame window,
+               or the root window, so fall back to something other than the
+               window which had it. */
+            focus_fallback(FALSE);
+        } else if (client && client != focus_client) {
+            focus_set_client(client);
+            frame_adjust_focus(client->frame, TRUE);
+            client_calc_layer(client);
+        }
+    } else if (e->type == FocusOut) {
+        gboolean nomove = FALSE;
+        XEvent ce;
+
+        ob_debug_type(OB_DEBUG_FOCUS, "FocusOut Event\n");
+
+        /* Look for the followup FocusIn */
+        if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
+            /* There is no FocusIn, this means focus went to a window that
+               is not being managed, or a window on another screen. */
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to a black hole !\n");
+        } else if (ce.xany.window == e->xany.window) {
+            /* If focus didn't actually move anywhere, there is nothing to do*/
+            nomove = TRUE;
+        } else {
+            /* Focus did move, so process the FocusIn event */
+            ObEventData ed = { .ignored = FALSE };
+            event_process(&ce, &ed);
+            if (ed.ignored) {
+                /* The FocusIn was ignored, this means it was on a window
+                   that isn't a client. */
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Focus went to an unmanaged window 0x%x !\n",
+                              ce.xfocus.window);
+                focus_fallback(TRUE);
+            }
+        }
+
+        if (client && !nomove) {
+            /* This client is no longer focused, so show that */
+            focus_hilite = NULL;
+            frame_adjust_focus(client->frame, FALSE);
+            client_calc_layer(client);
+        }
     } else if (group)
         event_handle_group(group, e);
     else if (client)
@@ -689,53 +737,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 break;
             }
         }
-        break;
-    case FocusIn:
-        if (client != focus_client) {
-            focus_set_client(client);
-            frame_adjust_focus(client->frame, TRUE);
-            client_calc_layer(client);
-        }
-        break;
-    case FocusOut:
-        /* Look for the followup FocusIn */
-        if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
-            /* There is no FocusIn, this means focus went to a window that
-               is not being managed, or a window on another screen. */
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to a black hole !\n");
-        } else if (ce.xany.window == e->xany.window) {
-            /* If focus didn't actually move anywhere, there is nothing to do*/
-            break;
-        } else if (ce.xfocus.detail == NotifyPointerRoot ||
-                 ce.xfocus.detail == NotifyDetailNone) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
-            /* Focus has been reverted to the root window or nothing, so fall
-               back to something other than the window which just had it. */
-            focus_fallback(FALSE);
-        } else if (ce.xfocus.detail == NotifyInferior) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to parent\n");
-            /* Focus has been reverted to parent, which is our frame window,
-               or the root window, so fall back to something other than the
-               window which had it. */
-            focus_fallback(FALSE);
-        } else {
-            /* Focus did move, so process the FocusIn event */
-            ObEventData ed = { .ignored = FALSE };
-            event_process(&ce, &ed);
-            if (ed.ignored) {
-                /* The FocusIn was ignored, this means it was on a window
-                   that isn't a client. */
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Focus went to an unmanaged window 0x%x !\n",
-                              ce.xfocus.window);
-                focus_fallback(TRUE);
-            }
-        }
-
-        /* This client is no longer focused, so show that */
-        focus_hilite = NULL;
-        frame_adjust_focus(client->frame, FALSE);
-        client_calc_layer(client);
         break;
     case LeaveNotify:
         con = frame_context(client, e->xcrossing.window);

@@ -26,8 +26,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | \
-                       PointerMotionMask | EnterWindowMask | LeaveWindowMask)
+#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | PointerMotionMask)
 #define GRAB_KEY_MASK (KeyPressMask | KeyReleaseMask)
 
 #define MASK_LIST_SIZE 8
@@ -90,15 +89,15 @@ gboolean grab_keyboard(gboolean grab)
     return ret;
 }
 
-gboolean grab_pointer(gboolean grab, ObCursor cur)
+gboolean grab_pointer(gboolean grab, gboolean owner_events, ObCursor cur)
 {
     gboolean ret = FALSE;
 
     if (grab) {
         if (pgrabs++ == 0) {
-            ret = XGrabPointer(ob_display, screen_support_win,
-                               True, GRAB_PTR_MASK, GrabModeAsync,
-                               GrabModeAsync, None,
+            ret = XGrabPointer(ob_display, screen_support_win, owner_events,
+                               GRAB_PTR_MASK,
+                               GrabModeAsync, GrabModeAsync, None,
                                ob_cursor(cur), event_curtime) == Success;
             if (!ret)
                 --pgrabs;
@@ -115,13 +114,15 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
     return ret;
 }
 
-gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
+gboolean grab_pointer_window(gboolean grab, gboolean owner_events,
+                             ObCursor cur, Window win)
 {
     gboolean ret = FALSE;
 
     if (grab) {
         if (pgrabs++ == 0) {
-            ret = XGrabPointer(ob_display, win, True, GRAB_PTR_MASK,
+            ret = XGrabPointer(ob_display, win, owner_events,
+                               GRAB_PTR_MASK,
                                GrabModeAsync, GrabModeAsync, None,
                                ob_cursor(cur),
                                event_curtime) == Success;
@@ -179,8 +180,8 @@ void grab_shutdown(gboolean reconfig)
     if (reconfig) return;
 
     while (grab_keyboard(FALSE));
-    while (grab_pointer(FALSE, OB_CURSOR_NONE));
-    while (grab_pointer_window(FALSE, OB_CURSOR_NONE, None));
+    while (grab_pointer(FALSE, FALSE, OB_CURSOR_NONE));
+    while (grab_pointer_window(FALSE, FALSE, OB_CURSOR_NONE, None));
     while (grab_server(FALSE));
 }
 

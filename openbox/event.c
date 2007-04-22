@@ -454,23 +454,7 @@ static void event_process(const XEvent *ec, gpointer data)
         /* crossing events for menu */
         event_handle_menu(e);
     } else if (e->type == FocusIn) {
-        if (e->xfocus.detail == NotifyPointerRoot ||
-            e->xfocus.detail == NotifyDetailNone) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
-            /* Focus has been reverted to the root window or nothing
-               FocusOut events come after UnmapNotify, so we don't need to
-               worry about focusing an invalid window
-             */
-            focus_fallback(TRUE);
-        } else if (e->xfocus.detail == NotifyInferior) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to parent\n");
-            /* Focus has been reverted to parent, which is our frame window,
-               or the root window
-               FocusOut events come after UnmapNotify, so we don't need to
-               worry about focusing an invalid window
-            */
-            focus_fallback(TRUE);
-        } else if (client && client != focus_client) {
+        if (client && client != focus_client) {
             frame_adjust_focus(client->frame, TRUE);
             focus_set_client(client);
             client_calc_layer(client);
@@ -491,6 +475,15 @@ static void event_process(const XEvent *ec, gpointer data)
         } else if (ce.xany.window == e->xany.window) {
             /* If focus didn't actually move anywhere, there is nothing to do*/
             nomove = TRUE;
+        } else if (ce.xfocus.detail == NotifyPointerRoot ||
+                   ce.xfocus.detail == NotifyDetailNone ||
+                   ce.xfocus.detail == NotifyInferior) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
+            /* Focus has been reverted to the root window or nothing
+               FocusOut events come after UnmapNotify, so we don't need to
+               worry about focusing an invalid window
+             */
+            focus_fallback(TRUE);
         } else {
             /* Focus did move, so process the FocusIn event */
             ObEventData ed = { .ignored = FALSE };

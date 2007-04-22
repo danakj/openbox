@@ -460,10 +460,14 @@ void screen_set_desktop(guint num)
         }
     }
 
-    /* reduce flicker by hiliting now rather than waiting for the server
-       FocusIn event */
-    if ((c = focus_fallback_target(TRUE, focus_client)))
+    /* have to try focus here because when you leave an empty desktop
+       there is no focus out to watch for */
+    if ((c = focus_fallback_target(TRUE, focus_client))) {
+        /* reduce flicker by hiliting now rather than waiting for the server
+           FocusIn event */
         frame_adjust_focus(c->frame, TRUE);
+        client_focus(c);
+    }
 
     event_ignore_queued_enters();
 }

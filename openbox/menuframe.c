@@ -463,6 +463,7 @@ static void menu_frame_render(ObMenuFrame *self)
     GList *it;
     gboolean has_icon = FALSE;
     ObMenu *sub;
+    ObMenuEntryFrame *e;
 
     XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
     XSetWindowBorder(ob_display, self->window,
@@ -513,10 +514,28 @@ static void menu_frame_render(ObMenuFrame *self)
 
     for (it = self->entries; it; it = g_list_next(it)) {
         RrAppearance *text_a;
-        ObMenuEntryFrame *e = it->data;
+        e = it->data;
 
-        RECT_SET_POINT(e->area, 0, h);
-        XMoveWindow(ob_display, e->window, 0, e->area.y);
+        /* if the first entry is a labeled separator, then make its border
+           overlap with the menu's outside border */
+        if (it == self->entries &&
+            e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR &&
+            e->entry->data.separator.label)
+        {
+            h -= ob_rr_theme->mbwidth;
+        }
+
+        if (e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR &&
+            e->entry->data.separator.label)
+        {
+            e->border = ob_rr_theme->mbwidth;
+        }
+
+        RECT_SET_POINT(e->area, 0, h+e->border);
+        XMoveWindow(ob_display, e->window, e->area.x-e->border, e->area.y-e->border);
+        XSetWindowBorderWidth(ob_display, e->window, e->border);
+        XSetWindowBorder(ob_display, e->window,
+                         RrColorPixel(ob_rr_theme->menu_b_color));
 
         text_a = ((e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                    !e->entry->data.normal.enabled) ?
@@ -552,6 +571,7 @@ static void menu_frame_render(ObMenuFrame *self)
                     e->entry->data.separator.label;
                 RrMinsize(self->a_title, &tw, &th);
                 tw = MIN(tw, MAX_MENU_WIDTH);
+                th += ob_rr_theme->mbwidth * 2;
             } else {
                 tw = 0;
                 th = SEPARATOR_HEIGHT;
@@ -562,6 +582,16 @@ static void menu_frame_render(ObMenuFrame *self)
         th += 2*PADDING;
         w = MAX(w, tw);
         h += th;
+    }
+
+    /* if the last entry is a labeled separator, then make its border
+       overlap with the menu's outside border */
+    it = g_list_last(self->entries);
+    e = it ? it->data : NULL;
+    if (e && e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR &&
+        e->entry->data.separator.label)
+    {
+        h -= ob_rr_theme->mbwidth;
     }
 
     self->text_x = PADDING;

@@ -80,6 +80,7 @@ struct _ObMenuEntryFrame
     guint ignore_enters;
 
     Rect area;
+    gint border;
 
     Window window;
     Window icon;

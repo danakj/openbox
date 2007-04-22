@@ -590,9 +590,10 @@ static void event_process(const XEvent *ec, gpointer data)
                                          NULL, g_direct_equal, NULL);
 
                 if (e->type == ButtonPress || e->type == ButtonRelease ||
-                    e->type == MotionNotify)
-                    mouse_event(client, e);
-                else if (e->type == KeyPress) {
+                    e->type == MotionNotify) {
+                    if (!keyboard_interactively_grabbed())
+                        mouse_event(client, e);
+                } else if (e->type == KeyPress) {
                     keyboard_event((focus_cycle_target ? focus_cycle_target :
                                     (focus_hilite ? focus_hilite : client)),
                                    e);
@@ -762,6 +763,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
+            if (keyboard_interactively_grabbed())
+                break;
             if (config_focus_follow && config_focus_delay)
                 ob_main_loop_timeout_remove_data(ob_main_loop,
                                                  focus_delay_func,
@@ -803,6 +806,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
+            if (keyboard_interactively_grabbed())
+                break;
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab)
             {

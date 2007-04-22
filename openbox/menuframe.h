@@ -99,6 +99,7 @@ struct _ObMenuEntryFrame
     RrAppearance *a_text_normal;
     RrAppearance *a_text_disabled;
     RrAppearance *a_text_selected;
+    RrAppearance *a_text_title;
 };
 
 extern GHashTable *menu_frame_map;

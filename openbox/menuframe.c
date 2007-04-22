@@ -163,6 +163,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
         RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled);
     self->a_text_selected =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_selected);
+    self->a_text_title =
+        RrAppearanceCopy(ob_rr_theme->a_menu_text_title);
 
     return self;
 }
@@ -193,6 +195,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
         RrAppearanceFree(self->a_text_normal);
         RrAppearanceFree(self->a_text_disabled);
         RrAppearanceFree(self->a_text_selected);
+        RrAppearanceFree(self->a_text_title);
         RrAppearanceFree(self->a_bullet_normal);
         RrAppearanceFree(self->a_bullet_selected);
 
@@ -290,9 +293,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label) {
             item_a = self->frame->a_title;
-            item_a->texture[0].data.text.string =
-                self->entry->data.separator.label;
-            th = self->frame->title_h;
+            th = ob_rr_theme->menu_title_height;
         } else {
             item_a = self->a_normal;
             th = SEPARATOR_HEIGHT + 2*PADDING;
@@ -326,7 +327,10 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->texture[0].data.text.string = sub ? sub->title : "";
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        text_a = self->a_text_normal;
+        if (self->entry->data.separator.label != NULL)
+            text_a = self->a_text_title;
+        else
+            text_a = self->a_text_normal;
         break;
     }
 
@@ -354,7 +358,22 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 self->frame->item_h - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        if (self->entry->data.separator.label == NULL) {
+        if (self->entry->data.separator.label != NULL) {
+            /* labeled separator */
+            XMoveResizeWindow(ob_display, self->text,
+                              ob_rr_theme->paddingx, ob_rr_theme->paddingy,
+                              self->area.width - 2*ob_rr_theme->paddingx,
+                              ob_rr_theme->menu_title_height -
+                              2*ob_rr_theme->paddingy);
+            text_a->surface.parent = item_a;
+            text_a->surface.parentx = ob_rr_theme->paddingx;
+            text_a->surface.parenty = ob_rr_theme->paddingy;
+            RrPaint(text_a, self->text,
+                    self->area.width - 2*ob_rr_theme->paddingx,
+                    ob_rr_theme->menu_title_height -
+                    2*ob_rr_theme->paddingy);
+        } else {
+            /* unlabeled separaator */
             XMoveResizeWindow(ob_display, self->text, PADDING, PADDING,
                               self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
             self->a_separator->surface.parent = item_a;
@@ -483,12 +502,6 @@ static void menu_frame_render(ObMenuFrame *self)
         th += 2*PADDING;
         self->item_h = th;
 
-        self->a_title->texture[0].data.text.string = "";
-        RrMinsize(self->a_title, &tw, &th);
-        tw += 2*PADDING;
-        th += 2*PADDING;
-        self->title_h = th;
-
         RrMargins(e->a_normal, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
                   MAX(self->item_margin.left, l),
@@ -567,11 +580,12 @@ static void menu_frame_render(ObMenuFrame *self)
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
             if (e->entry->data.separator.label != NULL) {
-                self->a_title->texture[0].data.text.string =
+                e->a_text_title->texture[0].data.text.string =
                     e->entry->data.separator.label;
-                RrMinsize(self->a_title, &tw, &th);
+                RrMinsize(e->a_text_title, &tw, &th);
                 tw = MIN(tw, MAX_MENU_WIDTH);
-                th += ob_rr_theme->mbwidth * 2;
+                th = ob_rr_theme->menu_title_height +
+                    (ob_rr_theme->mbwidth - PADDING) *2;
             } else {
                 tw = 0;
                 th = SEPARATOR_HEIGHT;

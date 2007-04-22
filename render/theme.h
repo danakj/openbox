@@ -201,6 +201,7 @@ struct _RrTheme {
     RrAppearance *a_icon;
     RrAppearance *a_focused_handle;
     RrAppearance *a_unfocused_handle;
+    RrAppearance *a_menu_text_title;
     RrAppearance *a_menu_title;
     RrAppearance *a_menu;
     RrAppearance *a_menu_normal;

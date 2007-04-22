@@ -977,6 +977,7 @@ void frame_flash_start(ObFrame *self)
                                  G_USEC_PER_SEC * 0.6,
                                  flash_timeout,
                                  self,
+                                 g_direct_equal,
                                  flash_done);
     g_get_current_time(&self->flash_end);
     g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);

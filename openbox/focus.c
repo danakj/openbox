@@ -282,9 +282,6 @@ void focus_fallback(gboolean allow_refocus)
     */
     focus_set_client(NULL);
 
-    /* If some delayed focusing is going on, cancel it */
-    event_halt_focus_delay();
-
     if ((new = focus_fallback_target(allow_refocus, old)))
         client_focus(new);
 }

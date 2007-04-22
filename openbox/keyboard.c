@@ -271,7 +271,8 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
                 /* 5 second timeout for chains */
                 ob_main_loop_timeout_add(ob_main_loop, 5 * G_USEC_PER_SEC,
-                                         chain_timeout, NULL, NULL);
+                                         chain_timeout, NULL,
+                                         g_direct_equal, NULL);
                 grab_keys(FALSE);
                 curpos = p;
                 grab_keys(TRUE);

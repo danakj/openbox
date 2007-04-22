@@ -918,7 +918,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
                                          menu_entry_frame_submenu_timeout,
-                                         self->selected,
+                                         self->selected, g_direct_equal,
                                          NULL);
             } else {
                 menu_entry_frame_show_submenu(self->selected);

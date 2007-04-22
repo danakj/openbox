@@ -79,6 +79,8 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_group(ObGroup *g, XEvent *e);
 
+static void focus_delay_dest(gpointer data);
+static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
@@ -103,11 +105,6 @@ static gint mask_table_size;
 static guint ignore_enter_focus = 0;
 
 static gboolean menu_can_hide;
-
-static ObFocusDelayData focus_delay_data = { .client = NULL,
-                                             .time = CurrentTime };
-
-
 
 #ifdef USE_SM
 static void ice_handler(gint fd, gpointer conn)
@@ -542,7 +539,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_menu_hide_delay * 1000,
                                          menu_hide_delay_func,
-                                         NULL, NULL);
+                                         NULL, g_direct_equal, NULL);
 
                 if (e->type == ButtonPress || e->type == ButtonRelease ||
                     e->type == MotionNotify)
@@ -627,19 +624,23 @@ void event_enter_client(ObClient *client)
 
     if (client_normal(client) && client_can_focus(client)) {
         if (config_focus_delay) {
+            ObFocusDelayData *data;
+
             ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 
-            focus_delay_data.client = client;
-            focus_delay_data.time = event_curtime;
+            data = g_new(ObFocusDelayData, 1);
+            data->client = client;
+            data->time = event_curtime;
 
             ob_main_loop_timeout_add(ob_main_loop,
                                      config_focus_delay,
                                      focus_delay_func,
-                                     NULL, NULL);
+                                     data, focus_delay_cmp, focus_delay_dest);
         } else {
-            focus_delay_data.client = client;
-            focus_delay_data.time = event_curtime;
-            focus_delay_func(NULL);
+            ObFocusDelayData data;
+            data.client = client;
+            data.time = event_curtime;
+            focus_delay_func(&data);
         }
     }
 }
@@ -760,11 +761,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (config_focus_follow && config_focus_delay &&
-                focus_delay_data.client == client)
-            {
-                event_halt_focus_delay();
-            }
+            if (config_focus_follow && config_focus_delay)
+                ob_main_loop_timeout_remove_data(ob_main_loop,
+                                                 focus_delay_func,
+                                                 client, FALSE);
             break;
         default:
             break;
@@ -1340,13 +1340,26 @@ static gboolean menu_hide_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
+static void focus_delay_dest(gpointer data)
+{
+    g_free(data);
+}
+
+static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2)
+{
+    const ObFocusDelayData *f1 = d1, *f2 = d2;
+    return f1->client == f2->client;
+}
+
 static gboolean focus_delay_func(gpointer data)
 {
+    ObFocusDelayData *d = data;
     Time old = event_curtime;
-    event_curtime = focus_delay_data.time;
-    if (focus_client != focus_delay_data.client) {
-        if (client_focus(focus_delay_data.client) && config_focus_raise)
-            client_raise(focus_delay_data.client);
+
+    event_curtime = d->time;
+    if (focus_client != d->client) {
+        if (client_focus(d->client) && config_focus_raise)
+            client_raise(d->client);
     }
     event_curtime = old;
     return FALSE; /* no repeat */
@@ -1354,8 +1367,8 @@ static gboolean focus_delay_func(gpointer data)
 
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    if (focus_delay_data.client == client)
-        event_halt_focus_delay();
+    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
+                                     client, FALSE);
 }
 
 static void event_client_dest(ObClient *client, gpointer data)
@@ -1366,7 +1379,6 @@ static void event_client_dest(ObClient *client, gpointer data)
 
 void event_halt_focus_delay()
 {
-    focus_delay_data.client = NULL;
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 

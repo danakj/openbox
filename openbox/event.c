@@ -591,8 +591,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
                 if (e->type == ButtonPress || e->type == ButtonRelease ||
                     e->type == MotionNotify) {
-                    if (!keyboard_interactively_grabbed())
-                        mouse_event(client, e);
+                    mouse_event(client, e);
                 } else if (e->type == KeyPress) {
                     keyboard_event((focus_cycle_target ? focus_cycle_target :
                                     (focus_hilite ? focus_hilite : client)),

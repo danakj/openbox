@@ -1042,7 +1042,7 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
            it won't work right unless we XUngrabKeyboard first,
            even though we grabbed the key/button Asychronously.
            e.g. "gnome-panel-control --main-menu" */
-        XUngrabKeyboard(ob_display, event_curtime);
+        grab_keyboard(FALSE);
     }
 
     for (it = acts; it; it = g_slist_next(it)) {

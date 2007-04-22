@@ -23,6 +23,7 @@
 #include "frame.h"
 #include "client.h"
 #include "stacking.h"
+#include "event.h"
 #include "screen.h"
 #include "render/render.h"
 #include "render/theme.h"

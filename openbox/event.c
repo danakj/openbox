@@ -348,10 +348,6 @@ static gboolean wanted_focusevent(XEvent *e)
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
 
-        /* This means focus reverted off of a client */
-        if (detail == NotifyInferior)
-            return TRUE;
-
         /* Otherwise.. */
         return FALSE;
     } else {
@@ -391,7 +387,12 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
     case FocusIn:
+        if (!wanted_focusevent(e))
+            return TRUE;
+        break;
     case FocusOut:
+        if (client == NULL)
+            return TRUE;
         if (!wanted_focusevent(e))
             return TRUE;
         break;
@@ -453,26 +454,10 @@ static void event_process(const XEvent *ec, gpointer data)
         /* crossing events for menu */
         event_handle_menu(e);
     } else if (e->type == FocusIn) {
-        if (e->xfocus.detail == NotifyPointerRoot ||
-                   e->xfocus.detail == NotifyDetailNone) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
-            /* Focus has been reverted to the root window or nothing
-               FocusOut events come after UnmapNotify, so we don't need to
-               worry about focusing an invalid window
-             */
-            focus_fallback(TRUE);
-        } else if (e->xfocus.detail == NotifyInferior) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to parent\n");
-            /* Focus has been reverted to parent, which is our frame window,
-               or the root window
-               FocusOut events come after UnmapNotify, so we don't need to
-               worry about focusing an invalid window
-            */
-            focus_fallback(TRUE);
-        } else if (client && client != focus_client) {
+        if (client && client != focus_client) {
             frame_adjust_focus(client->frame, TRUE);
-            client_calc_layer(client);
             focus_set_client(client);
+            client_calc_layer(client);
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
@@ -488,8 +473,18 @@ static void event_process(const XEvent *ec, gpointer data)
             /* nothing is focused */
             focus_set_client(NULL);
         } else if (ce.xany.window == e->xany.window) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus didn't go anywhere\n");
             /* If focus didn't actually move anywhere, there is nothing to do*/
             nomove = TRUE;
+        } else if (ce.xfocus.detail == NotifyPointerRoot ||
+                   ce.xfocus.detail == NotifyDetailNone ||
+                   ce.xfocus.detail == NotifyInferior) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
+            /* Focus has been reverted to the root window or nothing
+               FocusOut events come after UnmapNotify, so we don't need to
+               worry about focusing an invalid window
+             */
+            focus_fallback(TRUE);
         } else {
             /* Focus did move, so process the FocusIn event */
             ObEventData ed = { .ignored = FALSE };
@@ -506,6 +501,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (client && !nomove) {
             frame_adjust_focus(client->frame, FALSE);
+            /* focus_set_client has already been called for sure */
             client_calc_layer(client);
         }
     } else if (group)

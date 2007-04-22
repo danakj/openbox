@@ -259,10 +259,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 void focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
-    ObClient *old;
-
-    /* save this before moving focus away to nothing */
-    old = focus_client;
+    ObClient *old = focus_client;
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when I try focus them, I won't get a FocusIn event
@@ -281,6 +278,8 @@ void focus_nothing()
         screen_install_colormap(focus_client, FALSE);
         screen_install_colormap(NULL, TRUE);
     }
+
+    focus_client = NULL;
 
     /* when nothing will be focused, send focus to the backup target */
     XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,

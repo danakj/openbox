@@ -348,10 +348,6 @@ static gboolean wanted_focusevent(XEvent *e)
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
 
-        /* This means focus reverted off of a client */
-        if (detail == NotifyInferior)
-            return TRUE;
-
         /* Otherwise.. */
         return FALSE;
     } else {
@@ -391,7 +387,12 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
     case FocusIn:
+        if (!wanted_focusevent(e))
+            return TRUE;
+        break;
     case FocusOut:
+        if (client == NULL)
+            return TRUE;
         if (!wanted_focusevent(e))
             return TRUE;
         break;
@@ -454,7 +455,7 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_menu(e);
     } else if (e->type == FocusIn) {
         if (e->xfocus.detail == NotifyPointerRoot ||
-                   e->xfocus.detail == NotifyDetailNone) {
+            e->xfocus.detail == NotifyDetailNone) {
             ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
             /* Focus has been reverted to the root window or nothing
                FocusOut events come after UnmapNotify, so we don't need to

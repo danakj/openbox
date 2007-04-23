@@ -41,6 +41,10 @@
 #include "mouse.h"
 #include "render/render.h"
 
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
 #include <glib.h>
 #include <X11/Xutil.h>
 

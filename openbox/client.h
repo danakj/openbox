@@ -116,7 +116,7 @@ struct _ObClient
     gchar *title;
     /*! Window title when iconified */
     gchar *icon_title;
-    /*! Hostname of machine running client */
+    /*! Hostname of machine running the client */
     gchar *client_machine;
 
     /*! The application that created the window */

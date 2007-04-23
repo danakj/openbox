@@ -418,11 +418,14 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
         if (client->transient_for != OB_TRAN_GROUP) {
             ObClient *c = client;
             ObClient *p = client->transient_for;
-            *x = (p->frame->area.width - c->frame->area.width) / 2 +
-                p->frame->area.x;
-            *y = (p->frame->area.height - c->frame->area.height) / 2 +
-                p->frame->area.y;
-            return TRUE;
+
+            if (client_normal(p)) {
+                *x = (p->frame->area.width - c->frame->area.width) / 2 +
+                    p->frame->area.x;
+                *y = (p->frame->area.height - c->frame->area.height) / 2 +
+                    p->frame->area.y;
+                return TRUE;
+            }
         } else {
             GSList *it;
             gboolean first = TRUE;
@@ -451,6 +454,19 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
             }
         }
     }
+
+    if (client->transient) {
+        Rect **areas;
+
+        areas = pick_head(client);
+
+        *x = (areas[0]->width - client->frame->area.width) / 2 + areas[0]->x;
+        *y = (areas[0]->height - client->frame->area.height) / 2 + areas[0]->y;
+
+        g_free(areas);
+        return TRUE;
+    }
+
     return FALSE;
 }
 

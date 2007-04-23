@@ -3225,7 +3225,8 @@ guint client_monitor(ObClient *self)
 
 ObClient *client_search_top_parent(ObClient *self)
 {
-    while (self->transient_for && self->transient_for != OB_TRAN_GROUP)
+    while (self->transient_for && self->transient_for != OB_TRAN_GROUP &&
+           client_normal(self))
         self = self->transient_for;
     return self;
 }

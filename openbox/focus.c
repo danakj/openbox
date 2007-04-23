@@ -219,8 +219,11 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 #endif
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying omnipresentness\n");
-    if (allow_refocus && old && old->desktop == DESKTOP_ALL)
+    if (allow_refocus && old && old->desktop == DESKTOP_ALL &&
+        client_normal(old))
+    {
         return old;
+    }
 
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying  the focus order\n");
@@ -239,13 +242,15 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
                a splashscreen or a desktop window (save the desktop as a
                backup fallback though)
             */
-            if (client_can_focus(c) && c->desktop == screen_desktop &&
-                !c->iconic)
+            if (client_can_focus(c) && !c->iconic)
             {
-                if (client_normal(c)) {
+                if (c->desktop == screen_desktop && client_normal(c)) {
                     ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
                     return it->data;
-                } else if (c->type == OB_CLIENT_TYPE_DESKTOP && !desktop)
+                } else if ((c->desktop == screen_desktop ||
+                            c->desktop == DESKTOP_ALL) &&
+                           c->type == OB_CLIENT_TYPE_DESKTOP && 
+                           desktop == NULL)
                     desktop = c;
             }
         }
@@ -253,6 +258,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     /* as a last resort fallback to the desktop window if there is one.
        (if there's more than one, then the one most recently focused.)
     */
+    ob_debug_type(OB_DEBUG_FOCUS, "found desktop: \n", !!desktop);
     return desktop;   
 }
 

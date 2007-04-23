@@ -2,7 +2,7 @@
 
    client_list_menu.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             acts = g_slist_append(acts, act);
             e = menu_add_normal(menu, i,
                                 (c->iconic ? c->icon_title : c->title), acts);
+
             if (config_menu_client_list_icons
                 && (icon = client_icon(c, 32, 32))) {
                 e->data.normal.icon_width = icon->width;

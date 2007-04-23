@@ -76,15 +76,19 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 
     if (name) {
         if (!parse_load_theme(name, &ps.doc, &root, &ps.path)) {
-            g_warning("Falling back to the default theme: '%s'",
+            g_message("Unable to load the theme '%s'", name);
+            g_message("Falling back to the default theme '%s'",
                       DEFAULT_THEME);
             /* make it fall back to default theme */
             name = NULL;
         }
     }
     if (!name) {
-        if (!parse_load_theme(DEFAULT_THEME, &ps.doc, &root, &ps.path))
+        if (!parse_load_theme(DEFAULT_THEME, &ps.doc, &root, &ps.path)) {
+            g_message("Unable to load the theme '%s'",
+                      name, DEFAULT_THEME);
             return NULL;
+        }
     }
     ps.inst = inst;
 

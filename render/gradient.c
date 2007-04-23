@@ -2,7 +2,7 @@
 
    gradient.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
    Copyright (c) 2003        Derek Foreman
 
    This program is free software; you can redistribute it and/or modify

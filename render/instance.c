@@ -2,7 +2,7 @@
 
    instance.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ void RrPseudoColorSetup (RrInstance *inst)
     _ncolors = RrPseudoNcolors(inst);
 
     if (_ncolors > 1 << inst->depth) {
-        g_warning("PseudoRenderControl: Invalid colormap size. Resizing.\n");
+        g_message("Invalid colormap size. Resizing.");
         inst->pseudo_bpc = 1 << (inst->depth/3) >> 3;
         _ncolors = 1 << (inst->pseudo_bpc * 3);
     }

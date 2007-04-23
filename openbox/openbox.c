@@ -2,7 +2,7 @@
 
    openbox.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ gint main(gint argc, gchar **argv)
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
-        g_warning("Couldn't set locale from environment.");
+        g_message(_("Couldn't set locale from environment."));
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
@@ -111,7 +111,7 @@ gint main(gint argc, gchar **argv)
     g_set_prgname(argv[0]);
 
     if (chdir(g_get_home_dir()) == -1)
-        g_warning("Unable to change to home directory (%s): %s",
+        g_message(_("Unable to change to home directory (%s): %s"),
                   g_get_home_dir(), g_strerror(errno));
      
     /* parse out command line args */
@@ -162,9 +162,9 @@ gint main(gint argc, gchar **argv)
 
     /* check for locale support */
     if (!XSupportsLocale())
-        g_warning("X server does not support locale.");
+        g_message(_("X server does not support locale."));
     if (!XSetLocaleModifiers(""))
-        g_warning("Cannot set locale modifiers for the X server.");
+        g_message(_("Cannot set locale modifiers for the X server."));
 
     /* set our error handler */
     XSetErrorHandler(xerror_handler);
@@ -225,8 +225,11 @@ gint main(gint argc, gchar **argv)
                     PROP_SETS(RootWindow(ob_display, ob_screen),
                               openbox_rc, config_file);
                     parse_tree(i, doc, node->xmlChildrenNode);
-                } else
+                } else {
+                    g_message(_("Unable to find a valid config file, using "
+                                "some simple defaults"));
                     PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_rc);
+                }
                 /* we're done with parsing now, kill it */
                 parse_close(doc);
                 parse_shutdown(i);
@@ -343,8 +346,8 @@ gint main(gint argc, gchar **argv)
                 execvp(argvp[0], argvp);
                 g_strfreev(argvp);
             } else {
-                g_warning("failed to execute '%s': %s", restart_path,
-                          err->message);
+                g_message(_("Restart failed to execute new executable "
+                            "'%s': %s"), restart_path, err->message);
                 g_error_free(err);
             }
         }
@@ -383,8 +386,10 @@ static void signal_handler(gint signal, gpointer data)
 static void print_version()
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
-    g_print("Copyright (c) 2007 Mikael Magnusson\n");
-    g_print("Copyright (c) 2003-2007 Dana Jansens\n\n");
+    g_print(_("Copyright (c)"));
+    g_print(" 2007        Mikael Magnusson\n");
+    g_print(_("Copyright (c)"));
+    g_print(" 2003-2007   Dana Jansens\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -392,29 +397,31 @@ static void print_version()
 
 static void print_help()
 {
-    g_print("Syntax: openbox [options]\n\n");
-    g_print("Options:\n\n");
-    g_print("  --reconfigure       Tell the currently running instance of "
-            "Openbox to\n"
-            "                      reconfigure (and then exit immediately)\n");
-    g_print("  --config-file FILE  Specify the file to load for the config "
-            "file\n");
+    g_print(_("Syntax: openbox [options]\n\n"));
+    g_print(_("Options:\n\n"));
+    g_print(_("  --reconfigure       Tell the currently running instance of "
+              "Openbox to\n"
+              "                      reconfigure (and then exit "
+              "immediately)\n"));
+    g_print(_("  --config-file FILE  Specify the file to load for the config "
+              "file\n"));
 #ifdef USE_SM
-    g_print("  --sm-disable        Disable connection to session manager\n");
-    g_print("  --sm-client-id ID   Specify session management ID\n");
-    g_print("  --sm-save-file FILE Specify file to load a saved session"
-            "from\n");
+    g_print(_("  --sm-disable        Disable connection to session "
+              "manager\n"));
+    g_print(_("  --sm-client-id ID   Specify session management ID\n"));
+    g_print(_("  --sm-save-file FILE Specify file to load a saved session"
+              "from\n"));
 #endif
-    g_print("  --replace           Replace the currently running window "
-            "manager\n");
-    g_print("  --help              Display this help and exit\n");
-    g_print("  --version           Display the version and exit\n");
-    g_print("  --sync              Run in synchronous mode (this is slow and "
-            "meant for\n"
-            "                      debugging X routines)\n");
-    g_print("  --debug             Display debugging output\n");
-    g_print("  --debug-focus       Display debugging output\n");
-    g_print("\nPlease report bugs at %s\n\n", PACKAGE_BUGREPORT);
+    g_print(_("  --replace           Replace the currently running window "
+              "manager\n"));
+    g_print(_("  --help              Display this help and exit\n"));
+    g_print(_("  --version           Display the version and exit\n"));
+    g_print(_("  --sync              Run in synchronous mode (this is slow and"
+              " meant for\n"
+              "                      debugging X routines)\n"));
+    g_print(_("  --debug             Display debugging output\n"));
+    g_print(_("  --debug-focus       Display debugging output\n"));
+    g_print(_("\nPlease report bugs at %s\n\n"), PACKAGE_BUGREPORT);
 }
 
 static void parse_args(gint argc, gchar **argv)

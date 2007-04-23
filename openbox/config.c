@@ -2,7 +2,7 @@
 
    config.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "screen.h"
 #include "parser/parse.h"
 #include "openbox.h"
+#include "gettext.h"
 
 gboolean config_focus_new;
 gboolean config_focus_follow;
@@ -625,7 +626,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_dock_app_move_button = b;
             config_dock_app_move_modifiers = s;
         } else {
-            g_warning("invalid button '%s'", str);
+            g_message(_("Invalid button '%s' specified in config file"), str);
         }
         g_free(str);
     }

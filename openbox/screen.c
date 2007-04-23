@@ -34,6 +34,7 @@
 #include "popup.h"
 #include "extensions.h"
 #include "render/render.h"
+#include "gettext.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -79,7 +80,7 @@ static gboolean replace_wm()
         current_wm_sn_owner = None;
     if (current_wm_sn_owner) {
         if (!ob_replace_wm) {
-            g_warning("A window manager is already running on screen %d",
+            g_message(_("A window manager is already running on screen %d"),
                       ob_screen);
             return FALSE;
         }
@@ -116,7 +117,7 @@ static gboolean replace_wm()
                        timestamp);
 
     if (XGetSelectionOwner(ob_display, wm_sn_atom) != screen_support_win) {
-        g_warning("Could not acquire window manager selection on screen %d",
+        g_message(_("Could not acquire window manager selection on screen %d"),
                   ob_screen);
         return FALSE;
     }
@@ -137,8 +138,8 @@ static gboolean replace_wm()
       }
 
       if (wait >= timeout) {
-          g_warning("Timeout expired while waiting for the current WM to die "
-                    "on screen %d", ob_screen);
+          g_message(_("Timeout expired while waiting for the current WM to die"
+                      " on screen %d"), ob_screen);
           return FALSE;
       }
     }
@@ -179,7 +180,7 @@ gboolean screen_annex()
                  ROOT_EVENTMASK);
     xerror_set_ignore(FALSE);
     if (xerror_occured) {
-        g_warning("A window manager is already running on screen %d",
+        g_message(_("A window manager is already running on screen %d"),
                   ob_screen);
 
         XDestroyWindow(ob_display, screen_support_win);

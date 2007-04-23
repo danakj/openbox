@@ -2,7 +2,7 @@
 
    action.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "config.h"
 #include "mainloop.h"
 #include "startupnotify.h"
+#include "gettext.h"
 
 #include <glib.h>
 
@@ -912,10 +913,11 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
             break;
         }
     if (!exist)
-        g_warning("Invalid action '%s' requested. No such action exists.",
+        g_message(_("Invalid action '%s' requested. No such action exists."),
                   name);
     if (!a)
-        g_warning("Invalid use of action '%s'. Action will be ignored.", name);
+        g_message(_("Invalid use of action '%s'. Action will be ignored."),
+                  name);
     return a;
 }
 
@@ -1104,7 +1106,7 @@ void action_execute(union ActionData *data)
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
-                g_warning("failed to execute '%s': %s",
+                g_message(_("Failed to execute '%s': %s"),
                           cmd, e->message);
                 g_error_free(e);
             } else if (data->execute.startupnotify) {
@@ -1122,7 +1124,7 @@ void action_execute(union ActionData *data)
                 if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
                                    G_SPAWN_DO_NOT_REAP_CHILD,
                                    NULL, NULL, NULL, &e)) {
-                    g_warning("failed to execute '%s': %s",
+                    g_message(_("Failed to execute '%s': %s"),
                               cmd, e->message);
                     g_error_free(e);
                     sn_spawn_cancel();
@@ -1135,7 +1137,7 @@ void action_execute(union ActionData *data)
                                    G_SPAWN_DO_NOT_REAP_CHILD,
                                    NULL, NULL, NULL, &e))
                 {
-                    g_warning("failed to execute '%s': %s",
+                    g_message(_("Failed to execute '%s': %s"),
                               cmd, e->message);
                     g_error_free(e);
                 }
@@ -1143,7 +1145,8 @@ void action_execute(union ActionData *data)
             }
             g_free(cmd);
         } else {
-            g_warning("failed to convert '%s' from utf8", data->execute.path);
+            g_message(_("Failed to convert the path '%s' from utf8"),
+                      data->execute.path);
         }
     }
 }

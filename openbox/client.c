@@ -41,6 +41,10 @@
 #include "mouse.h"
 #include "render/render.h"
 
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+
 #include <glib.h>
 #include <X11/Xutil.h>
 
@@ -70,6 +74,7 @@ static void client_get_layer(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_gravity(ObClient *self);
+static void client_get_client_machine(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
@@ -625,6 +630,7 @@ void client_unmanage(ObClient *self)
     g_free(self->name);
     g_free(self->class);
     g_free(self->role);
+    g_free(self->client_machine);
     g_free(self->sm_client_id);
     g_free(self);
      
@@ -934,6 +940,7 @@ static void client_get_all(ObClient *self)
        (min/max sizes), so we're ready to set up the decorations/functions */
     client_setup_decor_and_functions(self);
   
+    client_get_client_machine(self);
     client_update_title(self);
     client_update_class(self);
     client_update_sm_client_id(self);
@@ -1642,6 +1649,7 @@ void client_update_wmhints(ObClient *self)
 void client_update_title(ObClient *self)
 {
     gchar *data = NULL;
+    gchar *visible = NULL;
 
     g_free(self->title);
      
@@ -1661,8 +1669,14 @@ void client_update_title(ObClient *self)
         }
     }
 
-    PROP_SETS(self->window, net_wm_visible_name, data);
-    self->title = data;
+    if (self->client_machine) {
+        visible = g_strdup_printf("%s (%s)", data, self->client_machine);
+        g_free(data);
+    } else
+        visible = data;
+
+    PROP_SETS(self->window, net_wm_visible_name, visible);
+    self->title = visible;
 
     if (self->frame)
         frame_adjust_title(self->frame);
@@ -1858,6 +1872,21 @@ void client_update_user_time(ObClient *self)
         /*
         ob_debug("window %s user time %u\n", self->title, time);
         */
+    }
+}
+
+static void client_get_client_machine(ObClient *self)
+{
+    gchar *data = NULL;
+    gchar localhost[128];
+
+    g_free(self->client_machine);
+
+    if (PROP_GETS(self->window, wm_client_machine, locale, &data)) {
+        gethostname(localhost, 127);
+        localhost[127] = '\0';
+        if (strcmp(localhost, data))
+            self->client_machine = data;
     }
 }
 

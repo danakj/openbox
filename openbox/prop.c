@@ -48,6 +48,7 @@ void prop_startup()
     CREATE(wm_icon_name, "WM_ICON_NAME");
     CREATE(wm_class, "WM_CLASS");
     CREATE(wm_window_role, "WM_WINDOW_ROLE");
+    CREATE(wm_client_machine, "WM_CLIENT_MACHINE");
     CREATE(motif_wm_hints, "_MOTIF_WM_HINTS");
 
     CREATE(sm_client_id, "SM_CLIENT_ID");

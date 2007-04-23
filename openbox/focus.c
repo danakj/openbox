@@ -334,8 +334,6 @@ static void popup_cycle(ObClient *c, gboolean show)
 void focus_cycle_draw_indicator()
 {
     if (!focus_cycle_target) {
-        XEvent e;
-
         XUnmapWindow(ob_display, focus_indicator.top.win);
         XUnmapWindow(ob_display, focus_indicator.left.win);
         XUnmapWindow(ob_display, focus_indicator.right.win);

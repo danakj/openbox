@@ -525,7 +525,6 @@ void client_unmanage(ObClient *self)
         event_ignore_queued_enters();
     }
 
-
     keyboard_grab_for_client(self, FALSE);
     mouse_grab_for_client(self, FALSE);
 

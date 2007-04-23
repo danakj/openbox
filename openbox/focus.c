@@ -763,6 +763,8 @@ void focus_order_add_new(ObClient *c)
 void focus_order_remove(ObClient *c)
 {
     focus_order = g_list_remove(focus_order, c);
+    if (c == focus_client)
+        focus_client = NULL;
 }
 
 void focus_order_to_top(ObClient *c)

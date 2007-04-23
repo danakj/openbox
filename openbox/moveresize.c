@@ -82,7 +82,7 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
         popup_position(popup, SouthGravity,
                        c->frame->area.x
                      + c->frame->area.width/2,
-                       c->frame->area.y);
+                       c->frame->area.y - ob_rr_theme->fbwidth);
     else /* == "Center" */
         popup_position(popup, CenterGravity,
                        c->frame->area.x + c->frame->size.left +

@@ -406,7 +406,7 @@ void prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
 void prop_set_string_utf8(Window win, Atom prop, const gchar *val)
 {
     XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,
-                    PropModeReplace, (guchar*)val, strlen(val));
+                    PropModeReplace, (const guchar*)val, strlen(val));
 }
 
 void prop_set_strings_utf8(Window win, Atom prop, gchar **strs)

@@ -83,6 +83,7 @@ struct _ObFrame
     guint     decorations;
     gboolean  max_horz;
 
+    Window    inner;  /*!< The window for drawing the inner client border */
     Window    title;
     Window    label;
     Window    max;

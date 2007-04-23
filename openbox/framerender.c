@@ -40,8 +40,8 @@ void framerender_frame(ObFrame *self)
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->cb_focused_color) :
               RrColorPixel(ob_rr_theme->cb_unfocused_color));
-        XSetWindowBackground(ob_display, self->plate, px);
-        XClearWindow(ob_display, self->plate);
+        XSetWindowBackground(ob_display, self->inner, px);
+        XClearWindow(ob_display, self->inner);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {

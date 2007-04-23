@@ -733,12 +733,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "%sNotify mode %d detail %d on %lx\n",
+                          (e->type == EnterNotify ? "Enter" : "Leave"),
+                          e->xcrossing.mode,
+                          e->xcrossing.detail, (client?client->window:0));
             if (keyboard_interactively_grabbed())
                 break;
-            if (config_focus_follow && config_focus_delay)
+            if (config_focus_follow && config_focus_delay &&
+                /* leaveinferior events can happen when the mouse goes onto the
+                   window's border and then into the window before the delay
+                   is up */
+                e->xcrossing.detail != NotifyInferior)
+            {
                 ob_main_loop_timeout_remove_data(ob_main_loop,
                                                  focus_delay_func,
                                                  client, FALSE);
+            }
             break;
         default:
             break;

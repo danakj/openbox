@@ -511,9 +511,8 @@ void client_unmanage(ObClient *self)
     XSelectInput(ob_display, self->window, NoEventMask);
 
     frame_hide(self->frame);
-    /* sync to send the hide to the server quickly, and to get back the enter
-       events */
-    XSync(ob_display, FALSE);
+    /* flush to send the hide to the server quickly */
+    XFlush(ob_display);
 
     if (focus_client == self) {
         /* ignore enter events from the unmap so it doesnt mess with the focus

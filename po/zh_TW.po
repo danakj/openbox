@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3rc2\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-03-12 19:19-0400\n"
+"POT-Creation-Date: 2007-04-23 14:21-0400\n"
 "PO-Revision-Date: 2006-03-01 12:00+0800\n"
 "Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -16,85 +16,189 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/client_list_menu.c:97
+#: openbox/client_list_menu.c:99
 msgid "Go there..."
 msgstr "到那裡去..."
 
-#: openbox/client_list_menu.c:188
+#: openbox/client_list_menu.c:190
 msgid "Desktops"
 msgstr "桌面"
 
-#: openbox/client_menu.c:78
+#: openbox/client_menu.c:76
 msgid "Restore"
 msgstr "還原"
 
-#: openbox/client_menu.c:78
+#: openbox/client_menu.c:76
 msgid "Maximize"
 msgstr "最大化"
 
-#: openbox/client_menu.c:84
+#: openbox/client_menu.c:82
 msgid "Roll down"
 msgstr "向下捲動"
 
-#: openbox/client_menu.c:84
+#: openbox/client_menu.c:82
 msgid "Roll up"
 msgstr "向上捲動"
 
-#: openbox/client_menu.c:146
+#: openbox/client_menu.c:144
 msgid "All desktops"
 msgstr "所有桌面"
 
-#: openbox/client_menu.c:170
+#: openbox/client_menu.c:168
 msgid "Layer"
 msgstr "圖層"
 
-#: openbox/client_menu.c:175
+#: openbox/client_menu.c:173
 msgid "Always on top"
 msgstr "最上層"
 
-#: openbox/client_menu.c:180
+#: openbox/client_menu.c:178
 msgid "Normal"
 msgstr "一般"
 
-#: openbox/client_menu.c:185
+#: openbox/client_menu.c:183
 msgid "Always on bottom"
 msgstr "最下層"
 
-#: openbox/client_menu.c:188
+#: openbox/client_menu.c:186
 msgid "Send to desktop"
 msgstr "傳送到桌面"
 
-#: openbox/client_menu.c:192
+#: openbox/client_menu.c:190
 msgid "Client menu"
 msgstr "客戶端選單"
 
-#: openbox/client_menu.c:205
+#: openbox/client_menu.c:199
 msgid "Iconify"
 msgstr "最小化"
 
-#: openbox/client_menu.c:222
+#: openbox/client_menu.c:216
 msgid "Raise to top"
 msgstr "提到最上層"
 
-#: openbox/client_menu.c:226
+#: openbox/client_menu.c:220
 msgid "Lower to bottom"
 msgstr "降到最下層"
 
-#: openbox/client_menu.c:239
+#: openbox/client_menu.c:233
 msgid "Decorate"
 msgstr "裝飾"
 
-#: openbox/client_menu.c:245
+#: openbox/client_menu.c:239
 msgid "Move"
 msgstr "移動"
 
-#: openbox/client_menu.c:249
+#: openbox/client_menu.c:243
 msgid "Resize"
 msgstr "重新調整大小"
 
-#: openbox/client_menu.c:255
+#: openbox/client_menu.c:249
 msgid "Close"
 msgstr "關閉"
+
+#: openbox/openbox.c:106
+msgid "Couldn't set locale from environment."
+msgstr ""
+
+#: openbox/openbox.c:114
+#, fuzzy, c-format
+msgid "Unable to change to home directory (%s): %s"
+msgstr "無法製作目錄 '%s': %s"
+
+#: openbox/openbox.c:165
+msgid "X server does not support locale."
+msgstr ""
+
+#: openbox/openbox.c:167
+msgid "Cannot set locale modifiers for the X server."
+msgstr ""
+
+#: openbox/openbox.c:229
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr ""
+
+#: openbox/openbox.c:349
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr ""
+
+#: openbox/openbox.c:389 openbox/openbox.c:391
+msgid "Copyright (c)"
+msgstr ""
+
+#: openbox/openbox.c:400
+msgid ""
+"Syntax: openbox [options]\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:401
+msgid ""
+"Options:\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:402
+msgid ""
+"  --reconfigure       Tell the currently running instance of Openbox to\n"
+"                      reconfigure (and then exit immediately)\n"
+msgstr ""
+
+#: openbox/openbox.c:406
+msgid "  --config-file FILE  Specify the file to load for the config file\n"
+msgstr ""
+
+#: openbox/openbox.c:409
+msgid "  --sm-disable        Disable connection to session manager\n"
+msgstr ""
+
+#: openbox/openbox.c:411
+#, fuzzy
+msgid "  --sm-client-id ID   Specify session management ID\n"
+msgstr "--sm-client-id 要求引數\n"
+
+#: openbox/openbox.c:412
+msgid "  --sm-save-file FILE Specify file to load a saved sessionfrom\n"
+msgstr ""
+
+#: openbox/openbox.c:415
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr ""
+
+#: openbox/openbox.c:417
+msgid "  --help              Display this help and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:418
+msgid "  --version           Display the version and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:419
+msgid ""
+"  --sync              Run in synchronous mode (this is slow and meant for\n"
+"                      debugging X routines)\n"
+msgstr ""
+
+#: openbox/openbox.c:422
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:423
+msgid "  --debug-focus       Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:424
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:455
+#, fuzzy
+msgid "--config-file requires an argument\n"
+msgstr "--sm-save-file 要求引數\n"
 
 #: openbox/session.c:124
 msgid "--sm-client-id requires an argument\n"
@@ -108,6 +212,16 @@ msgstr "--sm-save-file 要求引數\n"
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "無法製作目錄 '%s': %s"
+
+#: openbox/session.c:343
+#, fuzzy, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr "無法製作目錄 '%s': %s"
+
+#: openbox/session.c:433
+#, c-format
+msgid "Error while saving the session to '%s': %s"
+msgstr ""
 
 #~ msgid "Couldn't initialize Xft."
 #~ msgstr "無法初始化 Xft。"

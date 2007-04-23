@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2007-02-28 12:50-0500\n"
+"POT-Creation-Date: 2007-04-23 14:21-0400\n"
 "PO-Revision-Date: 2006-06-11 10:41+0200\n"
 "Last-Translator: Sebastian Vahl <svahl@web.de>\n"
 "Language-Team:  <de@li.org>\n"
@@ -14,85 +14,189 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:97
+#: openbox/client_list_menu.c:99
 msgid "Go there..."
 msgstr "Gehe zu..."
 
-#: openbox/client_list_menu.c:187
+#: openbox/client_list_menu.c:190
 msgid "Desktops"
 msgstr ""
 
-#: openbox/client_menu.c:78
+#: openbox/client_menu.c:76
 msgid "Restore"
 msgstr "Wiederherstellen"
 
-#: openbox/client_menu.c:78
+#: openbox/client_menu.c:76
 msgid "Maximize"
 msgstr "Maximieren"
 
-#: openbox/client_menu.c:84
+#: openbox/client_menu.c:82
 msgid "Roll down"
 msgstr "Abrollen"
 
-#: openbox/client_menu.c:84
+#: openbox/client_menu.c:82
 msgid "Roll up"
 msgstr "Aufrollen"
 
-#: openbox/client_menu.c:146
+#: openbox/client_menu.c:144
 msgid "All desktops"
 msgstr "Alle Desktops"
 
-#: openbox/client_menu.c:170
+#: openbox/client_menu.c:168
 msgid "Layer"
 msgstr "Fenster"
 
-#: openbox/client_menu.c:175
+#: openbox/client_menu.c:173
 msgid "Always on top"
 msgstr "Immer im Vordergrund"
 
-#: openbox/client_menu.c:180
+#: openbox/client_menu.c:178
 msgid "Normal"
 msgstr ""
 
-#: openbox/client_menu.c:185
+#: openbox/client_menu.c:183
 msgid "Always on bottom"
 msgstr "Immer im Hintergrund"
 
-#: openbox/client_menu.c:188
+#: openbox/client_menu.c:186
 msgid "Send to desktop"
 msgstr "An Desktop senden"
 
-#: openbox/client_menu.c:192
+#: openbox/client_menu.c:190
 msgid "Client menu"
 msgstr ""
 
-#: openbox/client_menu.c:205
+#: openbox/client_menu.c:199
 msgid "Iconify"
 msgstr "Minimieren"
 
-#: openbox/client_menu.c:222
+#: openbox/client_menu.c:216
 msgid "Raise to top"
 msgstr "In den Vordergrund"
 
-#: openbox/client_menu.c:226
+#: openbox/client_menu.c:220
 msgid "Lower to bottom"
 msgstr "In den Hintergrund"
 
-#: openbox/client_menu.c:239
+#: openbox/client_menu.c:233
 msgid "Decorate"
 msgstr "Dekoriere"
 
-#: openbox/client_menu.c:245
+#: openbox/client_menu.c:239
 msgid "Move"
 msgstr "Verschieben"
 
-#: openbox/client_menu.c:249
+#: openbox/client_menu.c:243
 msgid "Resize"
 msgstr "Größe ändern"
 
-#: openbox/client_menu.c:255
+#: openbox/client_menu.c:249
 msgid "Close"
 msgstr "Schließen"
+
+#: openbox/openbox.c:106
+msgid "Couldn't set locale from environment."
+msgstr ""
+
+#: openbox/openbox.c:114
+#, fuzzy, c-format
+msgid "Unable to change to home directory (%s): %s"
+msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
+
+#: openbox/openbox.c:165
+msgid "X server does not support locale."
+msgstr ""
+
+#: openbox/openbox.c:167
+msgid "Cannot set locale modifiers for the X server."
+msgstr ""
+
+#: openbox/openbox.c:229
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr ""
+
+#: openbox/openbox.c:349
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr ""
+
+#: openbox/openbox.c:389 openbox/openbox.c:391
+msgid "Copyright (c)"
+msgstr ""
+
+#: openbox/openbox.c:400
+msgid ""
+"Syntax: openbox [options]\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:401
+msgid ""
+"Options:\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:402
+msgid ""
+"  --reconfigure       Tell the currently running instance of Openbox to\n"
+"                      reconfigure (and then exit immediately)\n"
+msgstr ""
+
+#: openbox/openbox.c:406
+msgid "  --config-file FILE  Specify the file to load for the config file\n"
+msgstr ""
+
+#: openbox/openbox.c:409
+msgid "  --sm-disable        Disable connection to session manager\n"
+msgstr ""
+
+#: openbox/openbox.c:411
+#, fuzzy
+msgid "  --sm-client-id ID   Specify session management ID\n"
+msgstr "--sm-client-id benötigt ein Argument\n"
+
+#: openbox/openbox.c:412
+msgid "  --sm-save-file FILE Specify file to load a saved sessionfrom\n"
+msgstr ""
+
+#: openbox/openbox.c:415
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr ""
+
+#: openbox/openbox.c:417
+msgid "  --help              Display this help and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:418
+msgid "  --version           Display the version and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:419
+msgid ""
+"  --sync              Run in synchronous mode (this is slow and meant for\n"
+"                      debugging X routines)\n"
+msgstr ""
+
+#: openbox/openbox.c:422
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:423
+msgid "  --debug-focus       Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:424
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:455
+#, fuzzy
+msgid "--config-file requires an argument\n"
+msgstr "--sm-save-file benötigt ein Argument\n"
 
 #: openbox/session.c:124
 msgid "--sm-client-id requires an argument\n"
@@ -102,21 +206,26 @@ msgstr "--sm-client-id benötigt ein Argument\n"
 msgid "--sm-save-file requires an argument\n"
 msgstr "--sm-save-file benötigt ein Argument\n"
 
-#: openbox/session.c:160
+#: openbox/session.c:168
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
 
-#: render/font.c:58
-msgid "Couldn't initialize Xft."
-msgstr "Xft konnte nicht initialisiert werden"
+#: openbox/session.c:343
+#, fuzzy, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
 
-#: render/font.c:193 render/font.c:198
+#: openbox/session.c:433
 #, c-format
-msgid "Unable to load font: %s\n"
-msgstr "Schriftart %s konnte nicht geladen werden\n"
+msgid "Error while saving the session to '%s': %s"
+msgstr ""
 
-#: render/font.c:194
-#, c-format
-msgid "Trying fallback font: %s\n"
-msgstr "Versuche Ersatz-Schriftart %s zu laden\n"
+#~ msgid "Couldn't initialize Xft."
+#~ msgstr "Xft konnte nicht initialisiert werden"
+
+#~ msgid "Unable to load font: %s\n"
+#~ msgstr "Schriftart %s konnte nicht geladen werden\n"
+
+#~ msgid "Trying fallback font: %s\n"
+#~ msgstr "Versuche Ersatz-Schriftart %s zu laden\n"

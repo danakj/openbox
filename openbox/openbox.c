@@ -99,15 +99,11 @@ static Cursor load_cursor(const gchar *name, guint fontval);
 
 gint main(gint argc, gchar **argv)
 {
-#ifdef DEBUG
-    ob_debug_show_output(TRUE);
-#endif
-
     state = OB_STATE_STARTING;
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
-        g_warning("Couldn't set locale from environment.\n");
+        g_warning("Couldn't set locale from environment.");
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);

@@ -39,7 +39,6 @@ static void self_update(ObMenuFrame *frame, gpointer data)
     ObMenuEntry *e;
     GList *it;
     gint i;
-    gboolean icons = FALSE;
     guint desktop;
 
     menu_clear_entries(menu);
@@ -84,7 +83,6 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                 }
             }
         }
-        icons = FALSE;
 
         if (empty) {
             /* no entries */

@@ -44,6 +44,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     DesktopData *d = data;
     GList *it;
     gint i;
+    gboolean icons = FALSE;
     gboolean empty = TRUE;
 
     menu_clear_entries(menu);
@@ -60,6 +61,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 
             empty = FALSE;
 
+            if (!icons && c->iconic) {
+                icons = TRUE;
+                menu_add_separator(menu, -1, NULL);
+            }
+
             act = action_from_string("Activate",
                                      OB_USER_ACTION_MENU_SELECTION);
             act->data.activate.any.c = c;
@@ -68,14 +74,8 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
                                      OB_USER_ACTION_MENU_SELECTION);
             act->data.desktop.desk = d->desktop;
             acts = g_slist_append(acts, act);
-
-            if (c->iconic) {
-                gchar *title = g_strdup_printf("(%s)", c->icon_title);
-                e = menu_add_normal(menu, i, title, acts);
-                g_free(title);
-            } else
-                e = menu_add_normal(menu, i, c->title, acts);
-
+            e = menu_add_normal(menu, i,
+                                (c->iconic ? c->icon_title : c->title), acts);
             if (config_menu_client_list_icons
                 && (icon = client_icon(c, 32, 32))) {
                 e->data.normal.icon_width = icon->width;

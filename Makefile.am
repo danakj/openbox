@@ -360,12 +360,28 @@ dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
-	tools/themeupdate/themeupdate.py \
 	version.h.in \
 	data/rc.xml.in \
 	data/menu.xml.in \
 	render/obrender-3.0.pc.in \
-	parser/obparser-3.0.pc.in
+	parser/obparser-3.0.pc.in \
+	tools/themeupdate/themeupdate.py \
+	tests/hideshow.py \
+	tests/Makefile \
+	tests/aspect.c \
+	tests/fullscreen.c \
+	tests/grav.c \
+	tests/grouptran.c \
+	tests/icons.c \
+	tests/modal2.c \
+	tests/modal3.c \
+	tests/modal.c \
+	tests/noresize.c \
+	tests/override.c \
+	tests/positioned.c \
+	tests/strut.c \
+	tests/title.c \
+	tests/urgent.c
 
 EXTRA_DIST = \
 	config.rpath \

@@ -177,6 +177,7 @@
             <xs:element minOccurs="0" name="wrap" type="ob:bool"/>
             <xs:element minOccurs="0" name="follow" type="ob:bool"/>
             <xs:element minOccurs="0" name="dialog" type="ob:bool"/>
+            <xs:element minOccurs="0" name="panels" type="ob:bool"/>
             <xs:element minOccurs="0" name="here" type="ob:bool"/>
             <xs:element minOccurs="0" name="linear" type="ob:bool"/>
             <xs:element minOccurs="0" name="group" type="ob:bool"/>

@@ -620,9 +620,6 @@ ObClient *client_search_parent(ObClient *self, ObClient *search);
   NULL is returned if the given search is not a transient of the client. */
 ObClient *client_search_transient(ObClient *self, ObClient *search);
 
-/*! Return the "closest" client in the given direction */
-ObClient *client_find_directional(ObClient *c, ObDirection dir);
-
 /*! Return the closest edge in the given direction */
 gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);
 

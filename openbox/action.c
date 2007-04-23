@@ -119,6 +119,7 @@ void setup_action_directional_focus_north(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTH;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
@@ -126,6 +127,7 @@ void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_EAST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
@@ -133,6 +135,7 @@ void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTH;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
@@ -140,6 +143,7 @@ void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_WEST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
@@ -147,6 +151,7 @@ void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
@@ -154,6 +159,7 @@ void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
@@ -161,6 +167,7 @@ void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
@@ -168,6 +175,7 @@ void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_send_to_desktop(ObAction **a, ObUserAction uact)
@@ -295,6 +303,7 @@ void setup_action_cycle_windows_next(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.linear = FALSE;
     (*a)->data.cycle.forward = TRUE;
     (*a)->data.cycle.dialog = TRUE;
+    (*a)->data.cycle.dock_windows = FALSE;
 }
 
 void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
@@ -303,6 +312,7 @@ void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.linear = FALSE;
     (*a)->data.cycle.forward = FALSE;
     (*a)->data.cycle.dialog = TRUE;
+    (*a)->data.cycle.dock_windows = FALSE;
 }
 
 void setup_action_movefromedge_north(ObAction **a, ObUserAction uact)
@@ -1003,9 +1013,13 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     act->data.cycle.linear = parse_bool(doc, n);
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.cycle.dialog = parse_bool(doc, n);
+                if ((n = parse_find_node("panels", node->xmlChildrenNode)))
+                    act->data.cycle.dock_windows = parse_bool(doc, n);
             } else if (act->func == action_directional_focus) {
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
-                    act->data.cycle.dialog = parse_bool(doc, n);
+                    act->data.interdiraction.dialog = parse_bool(doc, n);
+                if ((n = parse_find_node("panels", node->xmlChildrenNode)))
+                    act->data.interdiraction.dock_windows = parse_bool(doc, n);
             } else if (act->func == action_raise ||
                        act->func == action_lower ||
                        act->func == action_raiselower ||
@@ -1647,7 +1661,9 @@ void action_cycle_windows(union ActionData *data)
        on us */
     event_halt_focus_delay();
 
-    focus_cycle(data->cycle.forward, data->cycle.linear, data->any.interactive,
+    focus_cycle(data->cycle.forward,
+                data->cycle.dock_windows,
+                data->cycle.linear, data->any.interactive,
                 data->cycle.dialog,
                 data->cycle.inter.final, data->cycle.inter.cancel);
 }
@@ -1659,6 +1675,7 @@ void action_directional_focus(union ActionData *data)
     event_halt_focus_delay();
 
     focus_directional_cycle(data->interdiraction.direction,
+                            data->interdiraction.dock_windows,
                             data->any.interactive,
                             data->interdiraction.dialog,
                             data->interdiraction.inter.final,

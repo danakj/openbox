@@ -52,9 +52,11 @@ struct _ObClient* focus_fallback_target(gboolean allow_refocus,
 void focus_fallback(gboolean allow_refocus);
 
 /*! Cycle focus amongst windows. */
-void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
+void focus_cycle(gboolean forward, gboolean dock_windows,
+                 gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel);
-void focus_directional_cycle(ObDirection dir, gboolean interactive,
+void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
+                             gboolean interactive,
                              gboolean dialog, gboolean done, gboolean cancel);
 void focus_cycle_draw_indicator();
 

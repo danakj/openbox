@@ -61,6 +61,7 @@ struct InterDirectionalAction{
     struct InteractiveAction inter;
     ObDirection direction;
     gboolean dialog;
+    gboolean dock_windows;
 };
 
 struct DirectionalAction{
@@ -141,6 +142,7 @@ struct CycleWindows {
     gboolean linear;
     gboolean forward;
     gboolean dialog;
+    gboolean dock_windows;
 };
 
 struct Stacking {

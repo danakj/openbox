@@ -31,9 +31,8 @@
 #define SEPARATOR_HEIGHT 3
 #define MAX_MENU_WIDTH 400
 
-#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | \
-                         PointerMotionHintMask | \
-                         EnterWindowMask | LeaveWindowMask)
+#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
+                         LeaveWindowMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 

@@ -47,8 +47,7 @@
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
                         EnterWindowMask | LeaveWindowMask | \
                         SubstructureRedirectMask | FocusChangeMask | \
-                        ButtonPressMask | ButtonReleaseMask | \
-                        ButtonMotionMask | PointerMotionHintMask)
+                        ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
 guint    screen_num_desktops;
 guint    screen_num_monitors;

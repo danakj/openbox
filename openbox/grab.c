@@ -27,8 +27,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | \
-                       PointerMotionMask | PointerMotionHintMask)
+#define GRAB_PTR_MASK (ButtonPressMask | ButtonReleaseMask | PointerMotionMask)
 #define GRAB_KEY_MASK (KeyPressMask | KeyReleaseMask)
 
 #define MASK_LIST_SIZE 8

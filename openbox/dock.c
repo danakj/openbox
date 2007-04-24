@@ -41,7 +41,7 @@ static void dock_app_grab_button(ObDockApp *app, gboolean grab)
         grab_button_full(config_dock_app_move_button,
                          config_dock_app_move_modifiers, app->icon_win,
                          ButtonPressMask | ButtonReleaseMask |
-                         ButtonMotionMask | PointerMotionHintMask,
+                         ButtonMotionMask,
                          GrabModeAsync, OB_CURSOR_MOVE);
     } else {
         ungrab_button(config_dock_app_move_button,

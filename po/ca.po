@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 03:05-0400\n"
+"POT-Creation-Date: 2007-04-24 17:12-0400\n"
 "PO-Revision-Date: 2004-01-25 20:41+0100\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
@@ -101,7 +101,7 @@ msgstr ""
 
 #: openbox/openbox.c:114
 #, fuzzy, c-format
-msgid "Unable to change to home directory (%s): %s"
+msgid "Unable to change to home directory '%s': %s"
 msgstr "No és pot crear el directori '%s': %s"
 
 #: openbox/openbox.c:165
@@ -126,67 +126,76 @@ msgid "Copyright (c)"
 msgstr ""
 
 #: openbox/openbox.c:400
-msgid ""
-"Syntax: openbox [options]\n"
-"\n"
+msgid "Syntax: openbox [options]\n"
 msgstr ""
 
 #: openbox/openbox.c:401
 msgid ""
+"\n"
 "Options:\n"
 "\n"
 msgstr ""
 
 #: openbox/openbox.c:402
-msgid ""
-"  --reconfigure       Tell the currently running instance of Openbox to\n"
-"                      reconfigure (and then exit immediately)\n"
-msgstr ""
-
-#: openbox/openbox.c:406
 msgid "  --config-file FILE  Specify the file to load for the config file\n"
 msgstr ""
 
-#: openbox/openbox.c:409
+#: openbox/openbox.c:404
 msgid "  --sm-disable        Disable connection to session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:411
+#: openbox/openbox.c:405
 #, fuzzy
 msgid "  --sm-client-id ID   Specify session management ID\n"
 msgstr "--sm-client-id necessita un argument\n"
 
-#: openbox/openbox.c:412
-msgid "  --sm-save-file FILE Specify file to load a saved sessionfrom\n"
+#: openbox/openbox.c:406
+msgid "  --sm-save-file FILE Specify file to load a saved session from\n"
 msgstr ""
 
-#: openbox/openbox.c:415
+#: openbox/openbox.c:408
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:417
+#: openbox/openbox.c:409
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:418
+#: openbox/openbox.c:410
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:419
+#: openbox/openbox.c:411
 msgid ""
-"  --sync              Run in synchronous mode (this is slow and meant for\n"
-"                      debugging X routines)\n"
+"\n"
+"Passing messages to a running Openbox instance:\n"
+"\n"
 msgstr ""
 
-#: openbox/openbox.c:422
+#: openbox/openbox.c:412
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr ""
+
+#: openbox/openbox.c:413
+msgid ""
+"\n"
+"Debugging options:\n"
+"\n"
+msgstr ""
+
+#: openbox/openbox.c:414
+msgid "  --sync              Run in synchronous mode\n"
+msgstr ""
+
+#: openbox/openbox.c:415
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:423
-msgid "  --debug-focus       Display debugging output\n"
+#: openbox/openbox.c:416
+msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:424
+#: openbox/openbox.c:417
 #, c-format
 msgid ""
 "\n"
@@ -194,7 +203,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: openbox/openbox.c:455
+#: openbox/openbox.c:448
 #, fuzzy
 msgid "--config-file requires an argument\n"
 msgstr "--sm-save-file necessita un argument\n"

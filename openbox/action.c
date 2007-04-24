@@ -1566,22 +1566,10 @@ void action_toggle_decorations(union ActionData *data)
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 {
-    if (config_resize_four_corners) {
-        if (x - cx > cw / 2) {
-            if (y - cy > ch / 2)
-                return prop_atoms.net_wm_moveresize_size_bottomright;
-            else
-                return prop_atoms.net_wm_moveresize_size_topright;
-        } else {
-            if (y - cy > ch / 2)
-                return prop_atoms.net_wm_moveresize_size_bottomleft;
-            else
-                return prop_atoms.net_wm_moveresize_size_topleft;
-        }
-    } else {
-        /* let's make x and y client relative instead of screen relative */
-        x = x - cx;
-        y = ch - y + cy;
+    /* let's make x and y client relative instead of screen relative */
+    x = x - cx;
+    y = ch - (y - cy); /* y is inverted, 0 is at the bottom of the window */
+
 #define X x*ch/cw
 #define A -4*X + 7*ch/3
 #define B  4*X -15*ch/9
@@ -1596,26 +1584,67 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 #define c (x > 5*cw/9)
 #define d (y < 4*ch/9)
 
-        if (y < A && y >= C)
-            return prop_atoms.net_wm_moveresize_size_topleft;
-        else if (y >= A && y >= B && a)
-            return prop_atoms.net_wm_moveresize_size_top;
-        else if (y < B && y >= D)
-            return prop_atoms.net_wm_moveresize_size_topright;
-        else if (y < C && y >= E && b)
-            return prop_atoms.net_wm_moveresize_size_left;
-        else if (y < D && y >= F && c)
-            return prop_atoms.net_wm_moveresize_size_right;
-        else if (y < E && y >= G)
-            return prop_atoms.net_wm_moveresize_size_bottomleft;
-        else if (y < G && y < H && d)
-            return prop_atoms.net_wm_moveresize_size_bottom;
-        else if (y >= H && y < F)
-            return prop_atoms.net_wm_moveresize_size_bottomright;
-        else
-            return prop_atoms.net_wm_moveresize_move;
-    }
-}
+    /*
+      Each of these defines (except X which is just there for fun), represents
+      the equation of a line. The lines they represent are shown in the diagram
+      below. Checking y against these lines, we are able to choose a region
+      of the window as shown.
+
+      +---------------------A-------|-------|-------B---------------------+
+      |                     |A                     B|                     |
+      |                     |A      |       |      B|                     |
+      |                     | A                   B |                     |
+      |                     | A     |       |     B |                     |
+      |                     |  A                 B  |                     |
+      |                     |  A    |       |    B  |                     |
+      |        northwest    |   A     north     B   |   northeast         |
+      |                     |   A   |       |   B   |                     |
+      |                     |    A             B    |                     |
+      C---------------------+----A--+-------+--B----+---------------------D
+      |CCCCCCC              |     A           B     |              DDDDDDD|
+      |       CCCCCCCC      |     A |       | B     |      DDDDDDDD       |
+      |               CCCCCCC      A         B      DDDDDDD               |
+      - - - - - - - - - - - +CCCCCCC+aaaaaaa+DDDDDDD+ - - - - - - - - - - -
+      |                     |       b       c       |                     |
+      |             west    |       b  move c       |   east              |
+      |                     |       b       c       |                     |
+      - - - - - - - - - - - +EEEEEEE+ddddddd+FFFFFFF+- - - - - - - - - - - 
+      |               EEEEEEE      G         H      FFFFFFF               |
+      |       EEEEEEEE      |     G |       | H     |      FFFFFFFF       |
+      |EEEEEEE              |     G           H     |              FFFFFFF|
+      E---------------------+----G--+-------+--H----+---------------------F
+      |                     |    G             H    |                     |
+      |                     |   G   |       |   H   |                     |
+      |        southwest    |   G     south     H   |   southeast         |
+      |                     |  G    |       |    H  |                     |
+      |                     |  G                 H  |                     |
+      |                     | G     |       |     H |                     |
+      |                     | G                   H |                     |
+      |                     |G      |       |      H|                     |
+      |                     |G                     H|                     |
+      +---------------------G-------|-------|-------H---------------------+
+    */
+
+    if (y < A && y >= C)
+        return prop_atoms.net_wm_moveresize_size_topleft;
+    else if (y >= A && y >= B && a)
+        return prop_atoms.net_wm_moveresize_size_top;
+    else if (y < B && y >= D)
+        return prop_atoms.net_wm_moveresize_size_topright;
+    else if (y < C && y >= E && b)
+        return prop_atoms.net_wm_moveresize_size_left;
+    else if (y < D && y >= F && c)
+        return prop_atoms.net_wm_moveresize_size_right;
+    else if (y < E && y >= G)
+        return prop_atoms.net_wm_moveresize_size_bottomleft;
+    else if (y < G && y < H && d)
+        return prop_atoms.net_wm_moveresize_size_bottom;
+    else if (y >= H && y < F)
+        return prop_atoms.net_wm_moveresize_size_bottomright;
+    else
+        return prop_atoms.net_wm_moveresize_move;
+
+#undef X
 #undef A
 #undef B
 #undef C
@@ -1628,6 +1657,7 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 #undef b
 #undef c
 #undef d
+}
 
 void action_moveresize(union ActionData *data)
 {

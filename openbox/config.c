@@ -535,8 +535,6 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     
     if ((n = parse_find_node("drawContents", node)))
         config_resize_redraw = parse_bool(doc, n);
-    if ((n = parse_find_node("fourCorner", node)))
-        config_resize_four_corners = parse_bool(doc, n);
     if ((n = parse_find_node("popupShow", node))) {
         config_resize_popup_show = parse_int(doc, n);
         if (parse_contains("Always", doc, n))

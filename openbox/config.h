@@ -46,9 +46,6 @@ extern ObPlacePolicy config_place_policy;
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */
 extern gboolean config_resize_redraw;
-/*! Divide windows in 4 or 9 areas when doing a resize. The middle will be move
-  when selecting 9 corners */
-extern gboolean config_resize_four_corners;
 /*! show move/resize popups? 0 = no, 1 = always, 2 = only
   resizing !1 increments */
 extern gint config_resize_popup_show;

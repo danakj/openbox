@@ -1566,41 +1566,97 @@ void action_toggle_decorations(union ActionData *data)
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 {
-    if (config_resize_four_corners) {
-        if (x - cx > cw / 2) {
-            if (y - cy > ch / 2)
-                return prop_atoms.net_wm_moveresize_size_bottomright;
-            else
-                return prop_atoms.net_wm_moveresize_size_topright;
-        } else {
-            if (y - cy > ch / 2)
-                return prop_atoms.net_wm_moveresize_size_bottomleft;
-            else
-                return prop_atoms.net_wm_moveresize_size_topleft;
-        }
-    } else {
-        if (x - cx > cw * 2 / 3) {
-            if (y - cy > ch * 2 / 3)
-                return prop_atoms.net_wm_moveresize_size_bottomright;
-            else if (y - cy < ch / 3)
-                return prop_atoms.net_wm_moveresize_size_topright;
-            else
-                return prop_atoms.net_wm_moveresize_size_right;
-        } else if (x - cx < cw / 3) {
-            if (y - cy > ch * 2 / 3)
-                return prop_atoms.net_wm_moveresize_size_bottomleft;
-            else if (y - cy < ch / 3)
-                return prop_atoms.net_wm_moveresize_size_topleft;
-            else
-                return prop_atoms.net_wm_moveresize_size_left;
-        } else
-            if (y - cy > ch * 2 / 3)
-                return prop_atoms.net_wm_moveresize_size_bottom;
-            else if (y - cy < ch / 3)
-                return prop_atoms.net_wm_moveresize_size_top;
-            else
-                return prop_atoms.net_wm_moveresize_move;
-    }
+    /* let's make x and y client relative instead of screen relative */
+    x = x - cx;
+    y = ch - (y - cy); /* y is inverted, 0 is at the bottom of the window */
+
+#define X x*ch/cw
+#define A -4*X + 7*ch/3
+#define B  4*X -15*ch/9
+#define C -X/4 + 2*ch/3
+#define D  X/4 + 5*ch/12
+#define E  X/4 +   ch/3
+#define F -X/4 + 7*ch/12
+#define G  4*X - 4*ch/3
+#define H -4*X + 8*ch/3
+#define a (y > 5*ch/9)
+#define b (x < 4*cw/9)
+#define c (x > 5*cw/9)
+#define d (y < 4*ch/9)
+
+    /*
+      Each of these defines (except X which is just there for fun), represents
+      the equation of a line. The lines they represent are shown in the diagram
+      below. Checking y against these lines, we are able to choose a region
+      of the window as shown.
+
+      +---------------------A-------|-------|-------B---------------------+
+      |                     |A                     B|                     |
+      |                     |A      |       |      B|                     |
+      |                     | A                   B |                     |
+      |                     | A     |       |     B |                     |
+      |                     |  A                 B  |                     |
+      |                     |  A    |       |    B  |                     |
+      |        northwest    |   A     north     B   |   northeast         |
+      |                     |   A   |       |   B   |                     |
+      |                     |    A             B    |                     |
+      C---------------------+----A--+-------+--B----+---------------------D
+      |CCCCCCC              |     A           B     |              DDDDDDD|
+      |       CCCCCCCC      |     A |       | B     |      DDDDDDDD       |
+      |               CCCCCCC      A         B      DDDDDDD               |
+      - - - - - - - - - - - +CCCCCCC+aaaaaaa+DDDDDDD+ - - - - - - - - - - -
+      |                     |       b       c       |                     |
+      |             west    |       b  move c       |   east              |
+      |                     |       b       c       |                     |
+      - - - - - - - - - - - +EEEEEEE+ddddddd+FFFFFFF+- - - - - - - - - - - 
+      |               EEEEEEE      G         H      FFFFFFF               |
+      |       EEEEEEEE      |     G |       | H     |      FFFFFFFF       |
+      |EEEEEEE              |     G           H     |              FFFFFFF|
+      E---------------------+----G--+-------+--H----+---------------------F
+      |                     |    G             H    |                     |
+      |                     |   G   |       |   H   |                     |
+      |        southwest    |   G     south     H   |   southeast         |
+      |                     |  G    |       |    H  |                     |
+      |                     |  G                 H  |                     |
+      |                     | G     |       |     H |                     |
+      |                     | G                   H |                     |
+      |                     |G      |       |      H|                     |
+      |                     |G                     H|                     |
+      +---------------------G-------|-------|-------H---------------------+
+    */
+
+    if (y < A && y >= C)
+        return prop_atoms.net_wm_moveresize_size_topleft;
+    else if (y >= A && y >= B && a)
+        return prop_atoms.net_wm_moveresize_size_top;
+    else if (y < B && y >= D)
+        return prop_atoms.net_wm_moveresize_size_topright;
+    else if (y < C && y >= E && b)
+        return prop_atoms.net_wm_moveresize_size_left;
+    else if (y < D && y >= F && c)
+        return prop_atoms.net_wm_moveresize_size_right;
+    else if (y < E && y >= G)
+        return prop_atoms.net_wm_moveresize_size_bottomleft;
+    else if (y < G && y < H && d)
+        return prop_atoms.net_wm_moveresize_size_bottom;
+    else if (y >= H && y < F)
+        return prop_atoms.net_wm_moveresize_size_bottomright;
+    else
+        return prop_atoms.net_wm_moveresize_move;
+
+#undef X
+#undef A
+#undef B
+#undef C
+#undef D
+#undef E
+#undef F
+#undef G
+#undef H
+#undef a
+#undef b
+#undef c
+#undef d
 }
 
 void action_moveresize(union ActionData *data)
@@ -1627,6 +1683,26 @@ void action_moveresize(union ActionData *data)
                               c->frame->size.right,
                               c->area.height + c->frame->size.top +
                               c->frame->size.bottom));
+        const gchar *c;
+        if (corner == prop_atoms.net_wm_moveresize_size_topright)
+            c = "topright";
+        else if (corner == prop_atoms.net_wm_moveresize_size_top)
+            c = "top";
+        else if (corner == prop_atoms.net_wm_moveresize_size_topleft)
+            c = "topleft";
+        else if (corner == prop_atoms.net_wm_moveresize_size_right)
+            c = "right";
+        else if (corner == prop_atoms.net_wm_moveresize_move)
+            c = "middle";
+        else if (corner == prop_atoms.net_wm_moveresize_size_left)
+            c = "left";
+        else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
+            c = "bottomright";
+        else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
+            c = "bottom";
+        else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
+            c = "bottomleft";
+        ob_debug("corner: %s\n", c);
     }
 
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);

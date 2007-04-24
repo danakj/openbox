@@ -68,18 +68,12 @@ static void grab_for_window(Window win, gboolean grab)
     }
 }
 
-void keyboard_grab_for_client(ObClient *c, gboolean grab)
-{
-    grab_for_window(c->window, grab);
-}
-
 static void grab_keys(gboolean grab)
 {
     GList *it;
 
     grab_for_window(screen_support_win, grab);
-    for (it = client_list; it; it = g_list_next(it))
-        grab_for_window(((ObClient*)it->data)->window, grab);
+    grab_for_window(RootWindow(ob_display, ob_screen), grab);
 }
 
 static gboolean chain_timeout(gpointer data)

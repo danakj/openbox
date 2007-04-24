@@ -589,7 +589,7 @@ static void event_process(const XEvent *ec, gpointer data)
                     mouse_event(client, e);
                 } else if (e->type == KeyPress) {
                     keyboard_event((focus_cycle_target ? focus_cycle_target :
-                                    client), e);
+                                    (client ? client : focus_client)), e);
                 }
             }
         }

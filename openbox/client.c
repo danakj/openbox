@@ -374,7 +374,6 @@ void client_manage(Window window)
              self->window, newx, newy, self->area.width, self->area.height);
     client_apply_startup_state(self, newx, newy);
 
-    keyboard_grab_for_client(self, TRUE);
     mouse_grab_for_client(self, TRUE);
 
     if (activate) {
@@ -490,7 +489,6 @@ void client_unmanage(ObClient *self)
         event_ignore_queued_enters();
     }
 
-    keyboard_grab_for_client(self, FALSE);
     mouse_grab_for_client(self, FALSE);
 
     /* remove the window from our save set */

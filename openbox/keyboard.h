@@ -46,6 +46,4 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
                                            struct _ObClient **client);
 gboolean keyboard_interactively_grabbed();
 
-void keyboard_grab_for_client(struct _ObClient *c, gboolean grab);
-
 #endif

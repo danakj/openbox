@@ -91,7 +91,11 @@ void prop_startup()
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
 
 /*   CREATE(net_wm_ping, "_NET_WM_PING"); */
-  
+#ifdef SYNC
+    CREATE(net_wm_sync_request, "_NET_WM_SYNC_REQUEST");
+    CREATE(net_wm_sync_request_counter, "_NET_WM_SYNC_REQUEST_COUNTER");
+#endif
+
     CREATE(net_wm_window_type_desktop, "_NET_WM_WINDOW_TYPE_DESKTOP");
     CREATE(net_wm_window_type_dock, "_NET_WM_WINDOW_TYPE_DOCK");
     CREATE(net_wm_window_type_toolbar, "_NET_WM_WINDOW_TYPE_TOOLBAR");

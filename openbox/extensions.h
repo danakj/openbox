@@ -36,6 +36,9 @@
 #ifdef    XRANDR
 #include <X11/extensions/Xrandr.h>
 #endif
+#ifdef    SYNC
+#include <X11/extensions/sync.h>
+#endif
 
 #include <glib.h>
 
@@ -58,6 +61,11 @@ extern gint extensions_xinerama_event_basep;
 extern gboolean extensions_randr;
 /*! Base for events for the Randr extension */
 extern gint extensions_randr_event_basep;
+
+/*! Does the display have the Sync extension? */
+extern gboolean extensions_sync;
+/*! Base for events for the Sync extension */
+extern gint extensions_sync_event_basep;
 
 void extensions_query_all();
 

@@ -206,6 +206,9 @@ gboolean screen_annex()
 
     /* set the _NET_SUPPORTED_ATOMS hint */
     num_support = 55;
+#ifdef SYNC
+    num_support += 2;
+#endif
     i = 0;
     supported = g_new(gulong, num_support);
     supported[i++] = prop_atoms.net_wm_full_placement;
@@ -262,11 +265,12 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_moveresize;
     supported[i++] = prop_atoms.net_wm_user_time;
     supported[i++] = prop_atoms.net_frame_extents;
+#ifdef SYNC
+    supported[i++] = prop_atoms.net_wm_sync_request;
+    supported[i++] = prop_atoms.net_wm_sync_request_counter;
+#endif
     supported[i++] = prop_atoms.ob_wm_state_undecorated;
     g_assert(i == num_support);
-/*
-  supported[] = prop_atoms.net_wm_action_stick;
-*/
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
                 net_supported, atom, supported, num_support);

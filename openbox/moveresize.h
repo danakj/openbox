@@ -21,10 +21,17 @@
 
 #include <glib.h>
 
+#ifdef SYNC
+#include <X11/extensions/sync.h>
+#endif
+
 struct _ObClient;
 
 extern gboolean moveresize_in_progress;
 extern struct _ObClient *moveresize_client;
+#ifdef SYNC
+extern XSyncAlarm moveresize_alarm;
+#endif
 
 void moveresize_startup(gboolean reconfig);
 void moveresize_shutdown(gboolean reconfig);

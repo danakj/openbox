@@ -212,6 +212,13 @@ static Window event_get_window(XEvent *e)
             }
         } else
 #endif
+#ifdef SYNC
+        if (extensions_sync &&
+            e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+        {
+            window = None;
+        } else
+#endif
             window = e->xany.window;
     }
     return window;
@@ -244,6 +251,13 @@ static void event_set_curtime(XEvent *e)
         t = e->xcrossing.time;
         break;
     default:
+#ifdef SYNC
+        if (extensions_sync &&
+            e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+        {
+            t = ((XSyncAlarmNotifyEvent*)e)->time;
+        }
+#endif
         /* if more event types are anticipated, get their timestamp
            explicitly */
         break;
@@ -537,6 +551,15 @@ static void event_process(const XEvent *ec, gpointer data)
                          e->xconfigurerequest.value_mask, &xwc);
         xerror_set_ignore(FALSE);
     }
+#ifdef SYNC
+    else if (extensions_sync &&
+        e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+    {
+        XSyncAlarmNotifyEvent *se = (XSyncAlarmNotifyEvent*)e;
+        if (se->alarm == moveresize_alarm && moveresize_in_progress)
+            moveresize_event(e);
+    }
+#endif
 
     /* user input (action-bound) events */
     if (e->type == ButtonPress || e->type == ButtonRelease ||
@@ -1172,6 +1195,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.net_wm_user_time) {
             client_update_user_time(client);
         }
+#ifdef SYNC
+        else if (msgtype == prop_atoms.net_wm_sync_request_counter) {
+            client_update_sync_request_counter(client);
+        }
+#endif
         else if (msgtype == prop_atoms.sm_client_id) {
             client_update_sm_client_id(client);
         }

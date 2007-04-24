@@ -28,6 +28,9 @@
 #include "popup.h"
 #include "moveresize.h"
 #include "config.h"
+#include "event.h"
+#include "debug.h"
+#include "extensions.h"
 #include "render/render.h"
 #include "render/theme.h"
 
@@ -36,6 +39,9 @@
 
 gboolean moveresize_in_progress = FALSE;
 ObClient *moveresize_client = NULL;
+#ifdef SYNC
+XSyncAlarm moveresize_alarm = None;
+#endif
 
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
@@ -44,6 +50,9 @@ static gint cur_x, cur_y;
 static guint button;
 static guint32 corner;
 static ObCorner lockcorner;
+#ifdef SYNC
+static gboolean waiting_for_sync;
+#endif
 
 static ObPopup *popup = NULL;
 
@@ -164,6 +173,47 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     else
         g_assert_not_reached();
 
+#ifdef SYNC
+    if (!moving && extensions_shape && moveresize_client->sync_request &&
+        moveresize_client->sync_counter)
+    {
+        /* Initialize values for the resize syncing, and create an alarm for
+           the client's xsync counter */
+
+        XSyncValue val;
+        XSyncAlarmAttributes aa;
+
+        /* set the counter to an initial value */
+        XSyncIntToValue(&val, 0);
+        XSyncSetCounter(ob_display, moveresize_client->sync_counter, val);
+
+        /* this will be incremented when we tell the client what we're
+           looking for */
+        moveresize_client->sync_counter_value = 0;
+
+        /* the next sequence we're waiting for with the alarm */
+        XSyncIntToValue(&val, 1);
+
+        /* set an alarm on the counter */
+        aa.trigger.counter = moveresize_client->sync_counter;
+        aa.trigger.wait_value = val;
+        aa.trigger.value_type = XSyncAbsolute;
+        aa.trigger.test_type = XSyncPositiveTransition;
+        aa.events = True;
+        XSyncIntToValue(&aa.delta, 1);
+        moveresize_alarm = XSyncCreateAlarm(ob_display,
+                                            XSyncCACounter |
+                                            XSyncCAValue |
+                                            XSyncCAValueType |
+                                            XSyncCATestType |
+                                            XSyncCADelta |
+                                            XSyncCAEvents,
+                                            &aa);
+
+        waiting_for_sync = FALSE;
+    }
+#endif
+
     grab_pointer(TRUE, FALSE, cur);
     grab_keyboard(TRUE);
 }
@@ -180,6 +230,14 @@ void moveresize_end(gboolean cancel)
                     (cancel ? start_cx : cur_x),
                     (cancel ? start_cy : cur_y));
     } else {
+#ifdef SYNC
+        /* turn off the alarm */
+        if (moveresize_alarm != None) {
+            XSyncDestroyAlarm(ob_display, moveresize_alarm);
+            moveresize_alarm = None;
+        }
+#endif
+
         client_configure(moveresize_client, lockcorner,
                          moveresize_client->area.x,
                          moveresize_client->area.y,
@@ -209,7 +267,73 @@ static void do_move(gboolean resist)
                 moveresize_client->frame->area.y);
 }
 
-static void do_resize(gboolean resist)
+static void do_resize()
+{
+#ifdef SYNC
+    gint x, y, w, h, lw, lh;
+
+    /* see if it is actually going to resize */
+    x = moveresize_client->area.x;
+    y = moveresize_client->area.y;
+    w = cur_x;
+    h = cur_y;
+    client_try_configure(moveresize_client, lockcorner, &x, &y, &w, &h,
+                         &lw, &lh, TRUE);
+    if (w == moveresize_client->area.width &&
+        h == moveresize_client->area.height)
+    {
+        return;
+    }
+
+    if (extensions_sync && moveresize_client->sync_request &&
+        moveresize_client->sync_counter)
+    {
+        XEvent ce;
+        XSyncValue val;
+
+        /* are we already waiting for the sync counter to catch up? */
+        if (waiting_for_sync)
+            return;
+
+        /* increment the value we're waiting for */
+        ++moveresize_client->sync_counter_value;
+        XSyncIntToValue(&val, moveresize_client->sync_counter_value);
+
+        /* tell the client what we're waiting for */
+        ce.xclient.type = ClientMessage;
+        ce.xclient.message_type = prop_atoms.wm_protocols;
+        ce.xclient.display = ob_display;
+        ce.xclient.window = moveresize_client->window;
+        ce.xclient.format = 32;
+        ce.xclient.data.l[0] = prop_atoms.net_wm_sync_request;
+        ce.xclient.data.l[1] = event_curtime;
+        ce.xclient.data.l[2] = XSyncValueLow32(val);
+        ce.xclient.data.l[3] = XSyncValueHigh32(val);
+        ce.xclient.data.l[4] = 0l;
+        XSendEvent(ob_display, moveresize_client->window, FALSE,
+                   NoEventMask, &ce);
+
+        waiting_for_sync = TRUE;
+    }
+#endif
+
+    client_configure(moveresize_client, lockcorner, 
+                     moveresize_client->area.x, moveresize_client->area.y,
+                     cur_x, cur_y, TRUE, FALSE);
+
+    /* this would be better with a fixed width font ... XXX can do it better
+       if there are 2 text boxes */
+    if (config_resize_popup_show == 2 || /* == "Always" */
+            (config_resize_popup_show == 1 && /* == "Nonpixel" */
+                (moveresize_client->size_inc.width > 1 ||
+                 moveresize_client->size_inc.height > 1))
+        )
+        popup_coords(moveresize_client, "%d x %d",
+                     moveresize_client->logical_size.width,
+                     moveresize_client->logical_size.height);
+}
+
+static void calc_resize(gboolean resist)
 {
     /* resist_size_* needs the frame size */
     cur_x += moveresize_client->frame->size.left +
@@ -226,21 +350,6 @@ static void do_resize(gboolean resist)
         moveresize_client->frame->size.right;
     cur_y -= moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
- 
-    client_configure(moveresize_client, lockcorner, 
-                     moveresize_client->area.x, moveresize_client->area.y,
-                     cur_x, cur_y, TRUE, FALSE);
-
-    /* this would be better with a fixed width font ... XXX can do it better
-       if there are 2 text boxes */
-    if (config_resize_popup_show == 2 || /* == "Always" */
-            (config_resize_popup_show == 1 && /* == "Nonpixel" */
-                (moveresize_client->size_inc.width > 1 ||
-                 moveresize_client->size_inc.height > 1))
-        )
-        popup_coords(moveresize_client, "%d x %d",
-                     moveresize_client->logical_size.width,
-                     moveresize_client->logical_size.height);
 }
 
 void moveresize_event(XEvent *e)
@@ -304,7 +413,8 @@ void moveresize_event(XEvent *e)
             } else
                 g_assert_not_reached();
 
-            do_resize(TRUE);
+            calc_resize(TRUE);
+            do_resize();
         }
     } else if (e->type == KeyPress) {
         if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
@@ -382,4 +492,11 @@ void moveresize_event(XEvent *e)
             }
         }
     }
+#ifdef SYNC
+    else if (e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+    {
+        waiting_for_sync = FALSE; /* we got our sync... */
+        do_resize(); /* ...so try resize if there is more change pending */
+    }
+#endif
 }

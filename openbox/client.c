@@ -940,6 +940,9 @@ static void client_get_all(ObClient *self)
        (min/max sizes), so we're ready to set up the decorations/functions */
     client_setup_decor_and_functions(self);
   
+#ifdef SYNC
+    client_update_sync_request_counter(self);
+#endif
     client_get_client_machine(self);
     client_get_colormap(self);
     client_update_title(self);
@@ -1291,17 +1294,36 @@ void client_update_protocols(ObClient *self)
 
     if (PROP_GETA32(self->window, wm_protocols, atom, &proto, &num_return)) {
         for (i = 0; i < num_return; ++i) {
-            if (proto[i] == prop_atoms.wm_delete_window) {
+            if (proto[i] == prop_atoms.wm_delete_window)
                 /* this means we can request the window to close */
                 self->delete_window = TRUE;
-            } else if (proto[i] == prop_atoms.wm_take_focus)
+            else if (proto[i] == prop_atoms.wm_take_focus)
                 /* if this protocol is requested, then the window will be
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
+#ifdef SYNC
+            else if (proto[i] == prop_atoms.net_wm_sync_request) 
+                /* if this protocol is requested, then the resizing the
+                   window will be synchronized between the frame and the
+                   client */
+                self->sync_request = TRUE;
+#endif
         }
         g_free(proto);
     }
 }
+
+#ifdef SYNC
+void client_update_sync_request_counter(ObClient *self)
+{
+    guint32 i;
+
+    if (PROP_GET32(self->window, net_wm_sync_request_counter, cardinal, &i)) {
+        self->sync_counter = i;
+    } else
+        self->sync_counter = None;
+}
+#endif
 
 static void client_get_gravity(ObClient *self)
 {
@@ -3097,10 +3119,11 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
        to activate it or not (a parent or group member is currently
        active)?
     */
-    ob_debug("Want to activate window 0x%x with time %u (last time %u), "
-             "source=%s\n",
-             self->window, event_curtime, last_time,
-             (user ? "user" : "application"));
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "Want to activate window 0x%x with time %u (last time %u), "
+                  "source=%s\n",
+                  self->window, event_curtime, last_time,
+                  (user ? "user" : "application"));
 
     if (!user && event_curtime && last_time &&
         !event_time_after(event_curtime, last_time))

@@ -139,8 +139,7 @@ static gboolean replace_wm()
       }
 
       if (wait >= timeout) {
-          g_message(_("Timeout expired while waiting for the current WM to die"
-                      " on screen %d"), ob_screen);
+          g_message(_("The WM on screen %d is not exiting"), ob_screen);
           return FALSE;
       }
     }

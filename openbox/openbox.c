@@ -226,8 +226,7 @@ gint main(gint argc, gchar **argv)
                               openbox_rc, config_file);
                     parse_tree(i, doc, node->xmlChildrenNode);
                 } else {
-                    g_message(_("Unable to find a valid config file, using "
-                                "some simple defaults"));
+                    g_message(_("Unable to find a valid config file, using some simple defaults"));
                     PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_rc);
                 }
                 /* we're done with parsing now, kill it */
@@ -346,8 +345,9 @@ gint main(gint argc, gchar **argv)
                 execvp(argvp[0], argvp);
                 g_strfreev(argvp);
             } else {
-                g_message(_("Restart failed to execute new executable "
-                            "'%s': %s"), restart_path, err->message);
+                g_message(
+                    _("Restart failed to execute new executable '%s': %s"),
+                    restart_path, err->message);
                 g_error_free(err);
             }
         }
@@ -397,30 +397,23 @@ static void print_version()
 
 static void print_help()
 {
-    g_print(_("Syntax: openbox [options]\n\n"));
-    g_print(_("Options:\n\n"));
-    g_print(_("  --reconfigure       Tell the currently running instance of "
-              "Openbox to\n"
-              "                      reconfigure (and then exit "
-              "immediately)\n"));
-    g_print(_("  --config-file FILE  Specify the file to load for the config "
-              "file\n"));
+    g_print(_("Syntax: openbox [options]\n"));
+    g_print(_("\nOptions:\n\n"));
+    g_print(_("  --config-file FILE  Specify the file to load for the config file\n"));
 #ifdef USE_SM
-    g_print(_("  --sm-disable        Disable connection to session "
-              "manager\n"));
+    g_print(_("  --sm-disable        Disable connection to session manager\n"));
     g_print(_("  --sm-client-id ID   Specify session management ID\n"));
-    g_print(_("  --sm-save-file FILE Specify file to load a saved session"
-              "from\n"));
+    g_print(_("  --sm-save-file FILE Specify file to load a saved session from\n"));
 #endif
-    g_print(_("  --replace           Replace the currently running window "
-              "manager\n"));
+    g_print(_("  --replace           Replace the currently running window manager\n"));
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
-    g_print(_("  --sync              Run in synchronous mode (this is slow and"
-              " meant for\n"
-              "                      debugging X routines)\n"));
+    g_print(_("\nPassing messages to a running Openbox instance:\n\n"));
+    g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
+    g_print(_("\nDebugging options:\n\n"));
+    g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
-    g_print(_("  --debug-focus       Display debugging output\n"));
+    g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
     g_print(_("\nPlease report bugs at %s\n\n"), PACKAGE_BUGREPORT);
 }
 

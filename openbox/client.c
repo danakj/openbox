@@ -320,6 +320,7 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
+        !self->iconic &&
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
          client_search_focus_parent(self)) &&
@@ -332,37 +333,6 @@ void client_manage(Window window)
          self->type == OB_CLIENT_TYPE_DIALOG))
     {
         activate = TRUE;
-#if 0
-        if (self->desktop != screen_desktop) {
-            /* activate the window */
-            activate = TRUE;
-        } else {
-            gboolean group_foc = FALSE;
-
-            if (self->group) {
-                GSList *it;
-
-                for (it = self->group->members; it; it = g_slist_next(it))
-                {
-                    if (client_focused(it->data))
-                    {
-                        group_foc = TRUE;
-                        break;
-                    }
-                }
-            }
-            if ((group_foc ||
-                 (!self->transient_for && (!self->group ||
-                                           !self->group->members->next))) ||
-                client_search_focus_tree_full(self) ||
-                !focus_client ||
-                !client_normal(focus_client))
-            {
-                /* activate the window */
-                activate = TRUE;
-            }
-        }
-#endif
     }
 
     /* get the current position */
@@ -415,7 +385,7 @@ void client_manage(Window window)
         ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
                  self->window, self->user_time, last_time);
 
-        /* If a nothing at all, or a parent was focused, then focus this
+        /* If nothing is focused, or a parent was focused, then focus this
            always
         */
         if (!focus_client || client_search_focus_parent(self) != NULL)
@@ -435,13 +405,7 @@ void client_manage(Window window)
                 activate = FALSE;
         }
 
-        if (activate)
-        {
-            /* since focus can change the stacking orders, if we focus the
-               window then the standard raise it gets is not enough, we need
-               to queue one for after the focus change takes place */
-            client_raise(self);
-        } else {
+        if (!activate) {
             ob_debug("Focus stealing prevention activated for %s with time %u "
                      "(last time %u)\n",
                      self->title, self->user_time, last_time);
@@ -471,17 +435,8 @@ void client_manage(Window window)
        a window maps since its not based on an action from the user like
        clicking a window to activate it. so keep the new window out of the way
        but do focus it. */
-    if (activate) {
-        /* if using focus_delay, stop the timer now so that focus doesn't
-           go moving on us */
-        event_halt_focus_delay();
-        client_focus(self);
-    }
-
-    /* client_activate does this but we aren't using it so we have to do it
-       here as well */
-    if (screen_showing_desktop)
-        screen_show_desktop(FALSE);
+    if (activate)
+        client_activate(self, FALSE, TRUE);
 
     /* add to client list/map */
     client_list = g_list_append(client_list, self);
@@ -1893,6 +1848,7 @@ void client_update_icons(ObClient *self)
        right away afterwards */
     if (self->nicons == 0) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
+        gulong *data;
 
         data = g_new(guint32, 48*48+2);
         data[0] = data[1] =  48;
@@ -3150,6 +3106,10 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
     {
         client_hilite(self, TRUE);
     } else {
+        /* if using focus_delay, stop the timer now so that focus doesn't
+           go moving on us */
+        event_halt_focus_delay();
+
         if (client_normal(self) && screen_showing_desktop)
             screen_show_desktop(FALSE);
         if (self->iconic)
@@ -3169,11 +3129,11 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
 
         client_focus(self);
 
-        /* we do this an action here. this is rather important. this is because
-           we want the results from the focus change to take place BEFORE we go
-           about raising the window. when a fullscreen window loses focus, we
-           need this or else the raise wont be able to raise above the
-           to-lose-focus fullscreen window. */
+        /* we do this as an action here. this is rather important. this is
+           because we want the results from the focus change to take place 
+           BEFORE we go about raising the window. when a fullscreen window 
+           loses focus, we need this or else the raise wont be able to raise 
+           above the to-lose-focus fullscreen window. */
         client_raise(self);
     }
 }

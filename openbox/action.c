@@ -1581,27 +1581,62 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
     } else {
         /* let's make x and y client relative instead of screen relative */
         x = x - cx;
-        y = y - cy;
-        if (y < -4*x*ch/cw+7*ch/3 && y > -ch*x/4/cw+2*ch/3)
+        y = ch - y - cy;
+#define X x*ch/cw
+#define A -4*X + 7*ch/3
+#define B  4*X -15*ch/9
+#define C -X/4 + 2*ch/3
+#define D  X/4 + 5*ch/12
+#define E  X/4 +   ch/3
+#define F -X/4 + 7*ch/12
+#define G  4*X - 4*ch/3
+#define H -4*X + 8*ch/3
+#define a (y > 5*ch/9)
+#define b (x < 4*cw/9)
+#define c (x > 5*cw/9)
+#define d (y < 4*ch/9)
+
+        //1
+        if (y < A && y >= C)
             return prop_atoms.net_wm_moveresize_size_topleft;
-        else if (y > 5*ch/9 && y > 4*x*ch/cw-15*ch/9)
+        //2
+        else if (y >= A && y >= B && a)
             return prop_atoms.net_wm_moveresize_size_top;
-        else if (y > ch*x/4/cw+5*ch/12)
+        //3
+        else if (y < B && y >= D)
             return prop_atoms.net_wm_moveresize_size_topright;
-        else if (x < 4*cw/9 && y > ch*x/4/cw+ch/3)
+        //4
+        else if (y < C && y >= E && b)
             return prop_atoms.net_wm_moveresize_size_left;
-        else if (x > 5*cw/9 && y > -ch*x/4/cw+7*ch/12)
+        //6
+        else if (y < D && y >= F && c)
             return prop_atoms.net_wm_moveresize_size_right;
-        else if (y > 4*ch*x/cw-4*ch/3)
+        //7
+        else if (y < E && y >= G)
             return prop_atoms.net_wm_moveresize_size_bottomleft;
-        else if (y < 4*ch/9 && y < -4*x*ch/cw+8*ch/3)
+        //8
+        else if (y < G && y < H && d)
             return prop_atoms.net_wm_moveresize_size_bottom;
-        else if (y > 5*cw/9)
+        //9
+        else if (y >= G && y < F)
             return prop_atoms.net_wm_moveresize_size_bottomright;
+        //5
         else
             return prop_atoms.net_wm_moveresize_move;
     }
 }
+#undef A
+#undef B
+#undef C
+#undef D
+#undef E
+#undef F
+#undef G
+#undef H
+#undef a
+#undef b
+#undef c
+#undef d
 
 void action_moveresize(union ActionData *data)
 {

@@ -1887,7 +1887,25 @@ void client_update_icons(ObClient *self)
         }
     }
 
-    if (self->frame)
+    /* set the default icon onto the window
+       in theory, this could be a race, but if a window doesn't set an icon
+       or removes it entirely, it's not very likely it is going to set one
+       right away afterwards */
+    if (self->nicons == 0) {
+        RrPixel32 *icon = ob_rr_theme->def_win_icon;
+
+        data = g_new(guint32, 48*48+2);
+        data[0] = data[1] =  48;
+        for (i = 0; i < 48*48; ++i)
+            data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
+                (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
+                (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
+                (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
+        PROP_SETA32(self->window, net_wm_icon, cardinal, data, 48*48+2);
+        g_free(data);
+    } else if (self->frame)
+        /* don't draw the icon empty if we're just setting one now anyways,
+           we'll get the property change any second */
         frame_adjust_icon(self->frame);
 }
 

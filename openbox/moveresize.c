@@ -269,31 +269,30 @@ static void do_move(gboolean resist)
 
 static void do_resize()
 {
-    gint x, y, w, h, lw, lh;
-
-    /* see if it is actually going to resize */
-    x = moveresize_client->area.x;
-    y = moveresize_client->area.y;
-    w = cur_x;
-    h = cur_y;
-    client_try_configure(moveresize_client, lockcorner, &x, &y, &w, &h,
-                         &lw, &lh, TRUE);
-    if (w == moveresize_client->area.width &&
-        h == moveresize_client->area.height)
-    {
-        return;
-    }
-
 #ifdef SYNC
     if (config_resize_redraw && extensions_sync &&
         moveresize_client->sync_request && moveresize_client->sync_counter)
     {
         XEvent ce;
         XSyncValue val;
+        gint x, y, w, h, lw, lh;
 
         /* are we already waiting for the sync counter to catch up? */
         if (waiting_for_sync)
             return;
+
+        /* see if it is actually going to resize */
+        x = moveresize_client->area.x;
+        y = moveresize_client->area.y;
+        w = cur_x;
+        h = cur_y;
+        client_try_configure(moveresize_client, lockcorner, &x, &y, &w, &h,
+                             &lw, &lh, TRUE);
+        if (w == moveresize_client->area.width &&
+            h == moveresize_client->area.height)
+        {
+            return;
+        }
 
         /* increment the value we're waiting for */
         ++moveresize_client->sync_counter_value;

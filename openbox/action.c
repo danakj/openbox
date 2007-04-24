@@ -1598,8 +1598,35 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
                 return prop_atoms.net_wm_moveresize_size_bottom;
             else if (y - cy < ch / 3)
                 return prop_atoms.net_wm_moveresize_size_top;
-            else
-                return prop_atoms.net_wm_moveresize_move;
+            else {
+                /* inside the middle square... */
+                cx += cw / 3;
+                cy += ch / 3;
+                cw /= 3;
+                ch /= 3;
+                if (x - cx > cw * 2 / 3) {
+                    if (y - cy > ch * 2 / 3)
+                        return prop_atoms.net_wm_moveresize_size_bottomright;
+                    else if (y - cy < ch / 3)
+                        return prop_atoms.net_wm_moveresize_size_topright;
+                    else
+                        return prop_atoms.net_wm_moveresize_size_right;
+                } else if (x - cx < cw / 3) {
+                    if (y - cy > ch * 2 / 3)
+                        return prop_atoms.net_wm_moveresize_size_bottomleft;
+                    else if (y - cy < ch / 3)
+                        return prop_atoms.net_wm_moveresize_size_topleft;
+                    else
+                        return prop_atoms.net_wm_moveresize_size_left;
+                } else
+                    if (y - cy > ch * 2 / 3)
+                        return prop_atoms.net_wm_moveresize_size_bottom;
+                    else if (y - cy < ch / 3)
+                        return prop_atoms.net_wm_moveresize_size_top;
+                    else {
+                        return prop_atoms.net_wm_moveresize_move;
+                    }
+            }
     }
 }
 

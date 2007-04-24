@@ -273,8 +273,6 @@ void focus_fallback(gboolean allow_refocus)
     */
     focus_nothing();
 
-    focus_client = NULL;
-
     if ((new = focus_fallback_target(allow_refocus, old)))
         client_focus(new);
 }
@@ -286,6 +284,8 @@ void focus_nothing()
         screen_install_colormap(focus_client, FALSE);
         screen_install_colormap(NULL, TRUE);
     }
+
+    focus_client = NULL;
 
     /* when nothing will be focused, send focus to the backup target */
     XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,

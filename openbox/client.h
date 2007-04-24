@@ -193,6 +193,9 @@ struct _ObClient
 
     /*! Window decoration and functionality hints */
     ObMwmHints mwmhints;
+
+    /*! The client's specified colormap */
+    Colormap colormap;
   
     /*! Where to place the decorated window in relation to the undecorated
       window */
@@ -543,6 +546,8 @@ void client_update_transient_for(ObClient *self);
 /*! Update the protocols that the window supports and adjusts things if they
   change */
 void client_update_protocols(ObClient *self);
+/*! Updates the window's colormap */
+void client_update_colormap(ObClient *self, Colormap colormap);
 /*! Updates the WMNormalHints and adjusts things if they change */
 void client_update_normal_hints(ObClient *self);
 

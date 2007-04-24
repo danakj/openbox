@@ -49,7 +49,8 @@
 #include <X11/Xutil.h>
 
 /*! The event mask to grab on client windows */
-#define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask)
+#define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask | \
+                          ColormapChangeMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
                                 ButtonMotionMask)
@@ -75,6 +76,7 @@ static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_gravity(ObClient *self);
 static void client_get_client_machine(ObClient *self);
+static void client_get_colormap(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
@@ -939,6 +941,7 @@ static void client_get_all(ObClient *self)
     client_setup_decor_and_functions(self);
   
     client_get_client_machine(self);
+    client_get_colormap(self);
     client_update_title(self);
     client_update_class(self);
     client_update_sm_client_id(self);
@@ -1308,6 +1311,19 @@ static void client_get_gravity(ObClient *self)
     ret = XGetWindowAttributes(ob_display, self->window, &wattrib);
     g_assert(ret != BadWindow);
     self->gravity = wattrib.win_gravity;
+}
+
+void client_get_colormap(ObClient *self)
+{
+    XWindowAttributes wa;
+
+    if (XGetWindowAttributes(ob_display, self->window, &wa))
+        client_update_colormap(self, wa.colormap);
+}
+
+void client_update_colormap(ObClient *self, Colormap colormap)
+{
+    self->colormap = colormap;
 }
 
 void client_update_normal_hints(ObClient *self)

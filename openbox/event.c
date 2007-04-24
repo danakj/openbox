@@ -1175,6 +1175,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.sm_client_id) {
             client_update_sm_client_id(client);
         }
+    case ColormapNotify:
+        client_update_colormap(client, e->xcolormap.colormap);
+        break;
     default:
         ;
 #ifdef SHAPE

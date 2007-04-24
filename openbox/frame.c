@@ -108,6 +108,7 @@ ObFrame *frame_new(ObClient *client)
 
     /* create the visible decor windows */
 
+    mask = CWEventMask;
     if (visual) {
         /* client has a 32-bit visual */
         mask |= CWColormap | CWBackPixel | CWBorderPixel;

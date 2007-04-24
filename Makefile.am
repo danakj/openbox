@@ -104,6 +104,12 @@ parser_libobparser_la_SOURCES = \
 ## openbox ##
 
 openbox_openbox_CPPFLAGS = \
+	$(SM_CFLAGS) \
+	$(XINERAMA_CFLAGS) \
+	$(XKB_CFLAGS) \
+	$(XRANDR_CFLAGS) \
+	$(XSHAPE_CFLAGS) \
+	$(XSYNC_CFLAGS) \
 	$(X_CFLAGS) \
 	$(XCURSOR_CFLAGS) \
 	$(SM_CFLAGS) \
@@ -121,6 +127,7 @@ openbox_openbox_LDADD = \
 	$(XKB_LIBS) \
 	$(XRANDR_LIBS) \
 	$(XSHAPE_LIBS) \
+	$(XSYNC_LIBS) \
 	$(GLIB_LIBS) \
 	$(X_LIBS) \
 	$(XCURSOR_LIBS) \

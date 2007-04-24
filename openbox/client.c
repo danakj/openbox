@@ -385,10 +385,18 @@ void client_manage(Window window)
         ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
                  self->window, self->user_time, last_time);
 
+        /* if it's on another desktop */
+        if (!(self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
+            && /* the timestamp is from before you changed desktops */
+            self->user_time && screen_desktop_user_time &&
+            !event_time_after(self->user_time, screen_desktop_user_time))
+        {
+            activate = FALSE;
+        }
         /* If nothing is focused, or a parent was focused, then focus this
            always
         */
-        if (!focus_client || client_search_focus_parent(self) != NULL)
+        else if (!focus_client || client_search_focus_parent(self) != NULL)
             activate = TRUE;
         else
         {
@@ -3106,6 +3114,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
     {
         client_hilite(self, TRUE);
     } else {
+        if (event_curtime != CurrentTime)
+            self->user_time = event_curtime;
+
         /* if using focus_delay, stop the timer now so that focus doesn't
            go moving on us */
         event_halt_focus_delay();

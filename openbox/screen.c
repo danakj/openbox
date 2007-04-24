@@ -58,6 +58,7 @@ gboolean screen_showing_desktop;
 DesktopLayout screen_desktop_layout;
 gchar  **screen_desktop_names;
 Window   screen_support_win;
+Time     screen_desktop_user_time = CurrentTime;
 
 static Rect  **area; /* array of desktop holding array of xinerama areas */
 static Rect  *monitor_area;
@@ -475,6 +476,9 @@ void screen_set_desktop(guint num)
     }
 
     event_ignore_queued_enters();
+
+    if (event_curtime != CurrentTime)
+        screen_desktop_user_time = event_curtime;
 }
 
 static void get_row_col(guint d, guint *r, guint *c)

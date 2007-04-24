@@ -38,6 +38,8 @@ extern guint screen_last_desktop;
 extern gboolean screen_showing_desktop;
 /*! The support window also used for focus and stacking */
 extern Window screen_support_win;
+/*! The last time at which the user changed desktops */
+extern Time screen_desktop_user_time;
 
 typedef struct DesktopLayout {
     ObOrientation orientation;

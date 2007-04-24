@@ -828,7 +828,7 @@ ObFrameContext frame_context(ObClient *client, Window win)
     }
 
     self = client->frame;
-    if (win == self->inner) {
+    if (win == self->inner || win == self->plate) {
         /* conceptually, this is the desktop, as far as users are
            concerned */
         if (client->type == OB_CLIENT_TYPE_DESKTOP)
@@ -836,7 +836,6 @@ ObFrameContext frame_context(ObClient *client, Window win)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
-    if (win == self->plate)     return OB_FRAME_CONTEXT_CLIENT;
     if (win == self->window)    return OB_FRAME_CONTEXT_FRAME;
     if (win == self->title)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->label)     return OB_FRAME_CONTEXT_TITLEBAR;

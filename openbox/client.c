@@ -1306,7 +1306,7 @@ void client_update_protocols(ObClient *self)
                 self->focus_notify = TRUE;
 #ifdef SYNC
             else if (proto[i] == prop_atoms.net_wm_sync_request) 
-                /* if this protocol is requested, then the resizing the
+                /* if this protocol is requested, then resizing the
                    window will be synchronized between the frame and the
                    client */
                 self->sync_request = TRUE;

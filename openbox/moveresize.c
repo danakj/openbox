@@ -174,8 +174,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         g_assert_not_reached();
 
 #ifdef SYNC
-    if (!moving && extensions_shape && moveresize_client->sync_request &&
-        moveresize_client->sync_counter)
+    if (config_resize_redraw && !moving && extensions_shape &&
+        moveresize_client->sync_request && moveresize_client->sync_counter)
     {
         /* Initialize values for the resize syncing, and create an alarm for
            the client's xsync counter */
@@ -269,7 +269,6 @@ static void do_move(gboolean resist)
 
 static void do_resize()
 {
-#ifdef SYNC
     gint x, y, w, h, lw, lh;
 
     /* see if it is actually going to resize */
@@ -285,8 +284,9 @@ static void do_resize()
         return;
     }
 
-    if (extensions_sync && moveresize_client->sync_request &&
-        moveresize_client->sync_counter)
+#ifdef SYNC
+    if (config_resize_redraw && extensions_sync &&
+        moveresize_client->sync_request && moveresize_client->sync_counter)
     {
         XEvent ce;
         XSyncValue val;

@@ -43,24 +43,32 @@ void extensions_query_all()
     extensions_xkb =
         XkbQueryExtension(ob_display, &junk, &extensions_xkb_event_basep,
                           &junk, NULL, NULL);
+    if (!extensions_xkb)
+        ob_debug("XKB extension is not present on the server\n");
 #endif
 
 #ifdef SHAPE
     extensions_shape =
         XShapeQueryExtension(ob_display, &extensions_shape_event_basep,
                              &junk);
+    if (!extensions_shape)
+        ob_debug("X Shape extension is not present on the server\n");
 #endif
 
 #ifdef XINERAMA
     extensions_xinerama =
         XineramaQueryExtension(ob_display, &extensions_xinerama_event_basep,
                                &junk) && XineramaIsActive(ob_display);
+    if (!extensions_xinerama)
+        ob_debug("Xinerama extension is not present on the server\n");
 #endif
 
 #ifdef XRANDR
     extensions_randr =
         XRRQueryExtension(ob_display, &extensions_randr_event_basep,
                           &junk);
+    if (!extensions_randr)
+        ob_debug("XRandR extension is not present on the server\n");
 #endif
 
 #ifdef SYNC
@@ -70,7 +78,7 @@ void extensions_query_all()
         XSyncInitialize(ob_display, &junk, &junk);
     if (!extensions_sync)
         ob_debug("X Sync extension is not present on the server or is an "
-                 "incompatible version");
+                 "incompatible version\n");
 #endif
 }
 

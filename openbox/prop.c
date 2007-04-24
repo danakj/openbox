@@ -122,7 +122,6 @@ void prop_startup()
     CREATE(net_wm_action_resize, "_NET_WM_ACTION_RESIZE");
     CREATE(net_wm_action_minimize, "_NET_WM_ACTION_MINIMIZE");
     CREATE(net_wm_action_shade, "_NET_WM_ACTION_SHADE");
-    CREATE(net_wm_action_stick, "_NET_WM_ACTION_STICK");
     CREATE(net_wm_action_maximize_horz, "_NET_WM_ACTION_MAXIMIZE_HORZ");
     CREATE(net_wm_action_maximize_vert, "_NET_WM_ACTION_MAXIMIZE_VERT");
     CREATE(net_wm_action_fullscreen, "_NET_WM_ACTION_FULLSCREEN");

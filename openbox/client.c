@@ -3114,6 +3114,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
     {
         client_hilite(self, TRUE);
     } else {
+        if (event_curtime != CurrentTime)
+            self->user_time = event_curtime;
+
         /* if using focus_delay, stop the timer now so that focus doesn't
            go moving on us */
         event_halt_focus_delay();

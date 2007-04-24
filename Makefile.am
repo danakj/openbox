@@ -101,6 +101,12 @@ parser_libobparser_la_SOURCES = \
 ## openbox ##
 
 openbox_openbox_CPPFLAGS = \
+	$(SM_CFLAGS) \
+	$(XINERAMA_CFLAGS) \
+	$(XKB_CFLAGS) \
+	$(XRANDR_CFLAGS) \
+	$(XSHAPE_CFLAGS) \
+	$(XSYNC_CFLAGS) \
 	$(X_CFLAGS) \
 	$(XCURSOR_CFLAGS) \
 	$(SM_CFLAGS) \
@@ -118,6 +124,7 @@ openbox_openbox_LDADD = \
 	$(XKB_LIBS) \
 	$(XRANDR_LIBS) \
 	$(XSHAPE_LIBS) \
+	$(XSYNC_LIBS) \
 	$(GLIB_LIBS) \
 	$(X_LIBS) \
 	$(XCURSOR_LIBS) \
@@ -342,12 +349,28 @@ dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
-	tools/themeupdate/themeupdate.py \
 	version.h.in \
 	data/rc.xml.in \
 	data/menu.xml.in \
 	render/obrender-3.0.pc.in \
-	parser/obparser-3.0.pc.in
+	parser/obparser-3.0.pc.in \
+	tools/themeupdate/themeupdate.py \
+	tests/hideshow.py \
+	tests/Makefile \
+	tests/aspect.c \
+	tests/fullscreen.c \
+	tests/grav.c \
+	tests/grouptran.c \
+	tests/icons.c \
+	tests/modal2.c \
+	tests/modal3.c \
+	tests/modal.c \
+	tests/noresize.c \
+	tests/override.c \
+	tests/positioned.c \
+	tests/strut.c \
+	tests/title.c \
+	tests/urgent.c
 
 EXTRA_DIST = \
 	config.rpath \

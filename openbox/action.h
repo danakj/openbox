@@ -2,7 +2,7 @@
 
    action.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ struct InterDirectionalAction{
     struct InteractiveAction inter;
     ObDirection direction;
     gboolean dialog;
+    gboolean dock_windows;
 };
 
 struct DirectionalAction{
@@ -141,6 +142,7 @@ struct CycleWindows {
     gboolean linear;
     gboolean forward;
     gboolean dialog;
+    gboolean dock_windows;
 };
 
 struct Stacking {

@@ -2,7 +2,7 @@
 
    client_list_menu.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ static void self_update(ObMenuFrame *frame, gpointer data)
     ObMenuEntry *e;
     GList *it;
     gint i;
-    gboolean icons = FALSE;
     guint desktop;
 
     menu_clear_entries(menu);
@@ -84,7 +83,6 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                 }
             }
         }
-        icons = FALSE;
 
         if (empty) {
             /* no entries */

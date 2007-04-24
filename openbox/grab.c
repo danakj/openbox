@@ -2,7 +2,7 @@
 
    grab.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "event.h"
 #include "xerror.h"
 #include "screen.h"
+#include "debug.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -162,14 +163,14 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
 {
     guint i;
 
-    xerror_set_ignore(TRUE); /* can get BadAccess' from these */
+    xerror_set_ignore(TRUE); /* can get BadAccess from these */
     xerror_occured = FALSE;
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabButton(ob_display, button, state | mask_list[i], win, FALSE, mask,
                     pointer_mode, GrabModeSync, None, ob_cursor(cur));
     xerror_set_ignore(FALSE);
     if (xerror_occured)
-        g_warning("failed to grab button %d modifiers %d", button, state);
+        ob_debug("Failed to grab button %d modifiers %d", button, state);
 }
 
 void grab_button(guint button, guint state, Window win, guint mask)
@@ -196,7 +197,7 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode)
                  GrabModeAsync, keyboard_mode);
     xerror_set_ignore(FALSE);
     if (xerror_occured)
-        g_warning("failed to grab keycode %d modifiers %d", keycode, state);
+        ob_debug("Failed to grab keycode %d modifiers %d", keycode, state);
 }
 
 void ungrab_all_keys(Window win)

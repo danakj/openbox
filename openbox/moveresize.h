@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    moveresize.h for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,10 +21,17 @@
 
 #include <glib.h>
 
+#ifdef SYNC
+#include <X11/extensions/sync.h>
+#endif
+
 struct _ObClient;
 
 extern gboolean moveresize_in_progress;
 extern struct _ObClient *moveresize_client;
+#ifdef SYNC
+extern XSyncAlarm moveresize_alarm;
+#endif
 
 void moveresize_startup(gboolean reconfig);
 void moveresize_shutdown(gboolean reconfig);

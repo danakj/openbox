@@ -193,6 +193,9 @@ struct _ObClient
 
     /*! Window decoration and functionality hints */
     ObMwmHints mwmhints;
+
+    /*! The client's specified colormap */
+    Colormap colormap;
   
     /*! Where to place the decorated window in relation to the undecorated
       window */
@@ -215,6 +218,15 @@ struct _ObClient
     gboolean can_focus;
     /*! Notify the window when it receives focus? */
     gboolean focus_notify;
+
+#ifdef SYNC
+    /*! The client wants to sync during resizes */
+    gboolean sync_request;
+    /*! The XSync counter used for synchronizing during resizes */
+    guint32 sync_counter;
+    /*! The value we're waiting for the counter to reach */
+    gulong sync_counter_value;
+#endif
 
     /*! The window uses shape extension to be non-rectangular? */
     gboolean shaped;
@@ -543,6 +555,12 @@ void client_update_transient_for(ObClient *self);
 /*! Update the protocols that the window supports and adjusts things if they
   change */
 void client_update_protocols(ObClient *self);
+#ifdef SYNC
+/*! Updates the window's sync request counter for resizes */
+void client_update_sync_request_counter(ObClient *self);
+#endif
+/*! Updates the window's colormap */
+void client_update_colormap(ObClient *self, Colormap colormap);
 /*! Updates the WMNormalHints and adjusts things if they change */
 void client_update_normal_hints(ObClient *self);
 
@@ -619,9 +637,6 @@ ObClient *client_search_parent(ObClient *self, ObClient *search);
 /*! Search for a transient of a client. The transient is returned if it is one,
   NULL is returned if the given search is not a transient of the client. */
 ObClient *client_search_transient(ObClient *self, ObClient *search);
-
-/*! Return the "closest" client in the given direction */
-ObClient *client_find_directional(ObClient *c, ObDirection dir);
 
 /*! Return the closest edge in the given direction */
 gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);

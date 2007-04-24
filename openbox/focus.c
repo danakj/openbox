@@ -59,7 +59,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
        be used
     */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
 static Window createWindow(Window parent, gulong mask,
@@ -168,7 +168,7 @@ void focus_set_client(ObClient *client)
        be used.
     */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
     focus_client = client;
 
@@ -219,8 +219,11 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 #endif
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying omnipresentness\n");
-    if (allow_refocus && old && old->desktop == DESKTOP_ALL)
+    if (allow_refocus && old && old->desktop == DESKTOP_ALL &&
+        client_normal(old))
+    {
         return old;
+    }
 
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying  the focus order\n");
@@ -239,13 +242,15 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
                a splashscreen or a desktop window (save the desktop as a
                backup fallback though)
             */
-            if (client_can_focus(c) && c->desktop == screen_desktop &&
-                !c->iconic)
+            if (client_can_focus(c) && !c->iconic)
             {
-                if (client_normal(c)) {
+                if (c->desktop == screen_desktop && client_normal(c)) {
                     ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
                     return it->data;
-                } else if (c->type == OB_CLIENT_TYPE_DESKTOP && !desktop)
+                } else if ((c->desktop == screen_desktop ||
+                            c->desktop == DESKTOP_ALL) &&
+                           c->type == OB_CLIENT_TYPE_DESKTOP && 
+                           desktop == NULL)
                     desktop = c;
             }
         }
@@ -253,6 +258,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     /* as a last resort fallback to the desktop window if there is one.
        (if there's more than one, then the one most recently focused.)
     */
+    ob_debug_type(OB_DEBUG_FOCUS, "found desktop: \n", !!desktop);
     return desktop;   
 }
 
@@ -328,8 +334,6 @@ static void popup_cycle(ObClient *c, gboolean show)
 void focus_cycle_draw_indicator()
 {
     if (!focus_cycle_target) {
-        XEvent e;
-
         XUnmapWindow(ob_display, focus_indicator.top.win);
         XUnmapWindow(ob_display, focus_indicator.left.win);
         XUnmapWindow(ob_display, focus_indicator.right.win);
@@ -464,23 +468,27 @@ void focus_cycle_draw_indicator()
     }
 }
 
-static gboolean valid_focus_target(ObClient *ft)
+static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
 {
+    gboolean ok = FALSE;
     /* we don't use client_can_focus here, because that doesn't let you
        focus an iconic window, but we want to be able to, so we just check
        if the focus flags on the window allow it, and its on the current
        desktop */
-    if ((ft->type == OB_CLIENT_TYPE_NORMAL ||
-         ft->type == OB_CLIENT_TYPE_DIALOG ||
-         (!client_has_group_siblings(ft) &&
-          (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
-           ft->type == OB_CLIENT_TYPE_MENU ||
-           ft->type == OB_CLIENT_TYPE_UTILITY))) &&
-        ((ft->can_focus || ft->focus_notify) &&
-         !ft->skip_pager &&
-         (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)) &&
-        ft == client_focus_target(ft))
-        return TRUE;
+    if (dock_windows)
+        ok = ft->type == OB_CLIENT_TYPE_DOCK;
+    else
+        ok = (ft->type == OB_CLIENT_TYPE_NORMAL ||
+              ft->type == OB_CLIENT_TYPE_DIALOG ||
+              (!client_has_group_siblings(ft) &&
+               (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+                ft->type == OB_CLIENT_TYPE_MENU ||
+                ft->type == OB_CLIENT_TYPE_UTILITY)));
+    ok = ok && (ft->can_focus || ft->focus_notify);
+    ok = ok && !ft->skip_pager;
+    ok = ok && (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL);
+    ok = ok && ft == client_focus_target(ft);
+    return ok;
 /*
     {
         GSList *it;
@@ -494,11 +502,10 @@ static gboolean valid_focus_target(ObClient *ft)
         return TRUE;
     }
 */
-
-    return FALSE;
 }
 
-void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
+void focus_cycle(gboolean forward, gboolean dock_windows,
+                 gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
@@ -542,7 +549,7 @@ void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (valid_focus_target(ft)) {
+        if (valid_focus_target(ft, dock_windows)) {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
@@ -576,7 +583,112 @@ done_cycle:
     return;
 }
 
-void focus_directional_cycle(ObDirection dir, gboolean interactive,
+/* this be mostly ripped from fvwm */
+ObClient *focus_find_directional(ObClient *c, ObDirection dir,
+                                 gboolean dock_windows) 
+{
+    gint my_cx, my_cy, his_cx, his_cy;
+    gint offset = 0;
+    gint distance = 0;
+    gint score, best_score;
+    ObClient *best_client, *cur;
+    GList *it;
+
+    if(!client_list)
+        return NULL;
+
+    /* first, find the centre coords of the currently focused window */
+    my_cx = c->frame->area.x + c->frame->area.width / 2;
+    my_cy = c->frame->area.y + c->frame->area.height / 2;
+
+    best_score = -1;
+    best_client = NULL;
+
+    for(it = g_list_first(client_list); it; it = g_list_next(it)) {
+        cur = it->data;
+
+        /* the currently selected window isn't interesting */
+        if(cur == c)
+            continue;
+        if (!dock_windows && !client_normal(cur))
+            continue;
+        if (dock_windows && cur->type != OB_CLIENT_TYPE_DOCK)
+            continue;
+        /* using c->desktop instead of screen_desktop doesn't work if the
+         * current window was omnipresent, hope this doesn't have any other
+         * side effects */
+        if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+            continue;
+        if(cur->iconic)
+            continue;
+        if(!(client_focus_target(cur) == cur &&
+             client_can_focus(cur)))
+            continue;
+
+        /* find the centre coords of this window, from the
+         * currently focused window's point of view */
+        his_cx = (cur->frame->area.x - my_cx)
+            + cur->frame->area.width / 2;
+        his_cy = (cur->frame->area.y - my_cy)
+            + cur->frame->area.height / 2;
+
+        if(dir == OB_DIRECTION_NORTHEAST || dir == OB_DIRECTION_SOUTHEAST ||
+           dir == OB_DIRECTION_SOUTHWEST || dir == OB_DIRECTION_NORTHWEST) {
+            gint tx;
+            /* Rotate the diagonals 45 degrees counterclockwise.
+             * To do this, multiply the matrix /+h +h\ with the
+             * vector (x y).                   \-h +h/
+             * h = sqrt(0.5). We can set h := 1 since absolute
+             * distance doesn't matter here. */
+            tx = his_cx + his_cy;
+            his_cy = -his_cx + his_cy;
+            his_cx = tx;
+        }
+
+        switch(dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
+        case OB_DIRECTION_NORTHEAST:
+        case OB_DIRECTION_SOUTHWEST:
+            offset = (his_cx < 0) ? -his_cx : his_cx;
+            distance = ((dir == OB_DIRECTION_NORTH ||
+                         dir == OB_DIRECTION_NORTHEAST) ?
+                        -his_cy : his_cy);
+            break;
+        case OB_DIRECTION_EAST:
+        case OB_DIRECTION_WEST:
+        case OB_DIRECTION_SOUTHEAST:
+        case OB_DIRECTION_NORTHWEST:
+            offset = (his_cy < 0) ? -his_cy : his_cy;
+            distance = ((dir == OB_DIRECTION_WEST ||
+                         dir == OB_DIRECTION_NORTHWEST) ?
+                        -his_cx : his_cx);
+            break;
+        }
+
+        /* the target must be in the requested direction */
+        if(distance <= 0)
+            continue;
+
+        /* Calculate score for this window.  The smaller the better. */
+        score = distance + offset;
+
+        /* windows more than 45 degrees off the direction are
+         * heavily penalized and will only be chosen if nothing
+         * else within a million pixels */
+        if(offset > distance)
+            score += 1000000;
+
+        if(best_score == -1 || score < best_score)
+            best_client = cur,
+                best_score = score;
+    }
+
+    return best_client;
+}
+
+void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
+                             gboolean interactive,
                              gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
@@ -598,12 +710,12 @@ void focus_directional_cycle(ObDirection dir, gboolean interactive,
     if (!focus_cycle_target) focus_cycle_target = focus_client;
 
     if (focus_cycle_target)
-        ft = client_find_directional(focus_cycle_target, dir);
+        ft = focus_find_directional(focus_cycle_target, dir, dock_windows);
     else {
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (valid_focus_target(it->data))
+            if (valid_focus_target(it->data, dock_windows))
                 ft = it->data;
     }
         

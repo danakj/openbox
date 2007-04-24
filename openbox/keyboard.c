@@ -2,7 +2,7 @@
 
    keyboard.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "keyboard.h"
 #include "translate.h"
 #include "moveresize.h"
+#include "gettext.h"
 
 #include <glib.h>
 
@@ -127,7 +128,7 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
         t = tree;
 
     if (conflict) {
-        g_warning("conflict with binding");
+        g_message(_("Conflict with key binding in config file"));
         tree_destroy(tree);
         return FALSE;
     }

@@ -2,7 +2,7 @@
 
    xerror.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 */
 
 #include "openbox.h"
+#include "gettext.h"
 #include <glib.h>
 #include <X11/Xlib.h>
 
@@ -31,14 +32,11 @@ gint xerror_handler(Display *d, XErrorEvent *e)
     if (!xerror_ignore) {
         gchar errtxt[128];
 
-        /*if (e->error_code != BadWindow) */
-        {
-            XGetErrorText(d, e->error_code, errtxt, 127);
-            if (e->error_code == BadWindow)
-                /*g_warning("X Error: %s", errtxt)*/;
-            else
-                g_error("X Error: %s", errtxt);
-        }
+        XGetErrorText(d, e->error_code, errtxt, 127);
+        if (e->error_code == BadWindow)
+            /*g_message(_("X Error: %s\n"), errtxt)*/;
+        else
+            g_error(_("X Error: %s"), errtxt);
     }
 #else
     (void)d; (void)e;

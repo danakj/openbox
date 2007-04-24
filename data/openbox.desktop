@@ -6,4 +6,4 @@ Exec=openbox
 X-GNOME-WMName=Openbox
 
 # our config tool
-ConfigExec=obconf
+ConfigExec=obconf2

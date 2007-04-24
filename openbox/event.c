@@ -2,7 +2,7 @@
 
    event.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -212,6 +212,13 @@ static Window event_get_window(XEvent *e)
             }
         } else
 #endif
+#ifdef SYNC
+        if (extensions_sync &&
+            e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+        {
+            window = None;
+        } else
+#endif
             window = e->xany.window;
     }
     return window;
@@ -244,6 +251,13 @@ static void event_set_curtime(XEvent *e)
         t = e->xcrossing.time;
         break;
     default:
+#ifdef SYNC
+        if (extensions_sync &&
+            e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+        {
+            t = ((XSyncAlarmNotifyEvent*)e)->time;
+        }
+#endif
         /* if more event types are anticipated, get their timestamp
            explicitly */
         break;
@@ -537,6 +551,15 @@ static void event_process(const XEvent *ec, gpointer data)
                          e->xconfigurerequest.value_mask, &xwc);
         xerror_set_ignore(FALSE);
     }
+#ifdef SYNC
+    else if (extensions_sync &&
+        e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+    {
+        XSyncAlarmNotifyEvent *se = (XSyncAlarmNotifyEvent*)e;
+        if (se->alarm == moveresize_alarm && moveresize_in_progress)
+            moveresize_event(e);
+    }
+#endif
 
     /* user input (action-bound) events */
     if (e->type == ButtonPress || e->type == ButtonRelease ||
@@ -672,9 +695,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
     ObFrameContext con;
      
     switch (e->type) {
-    case VisibilityNotify:
-        client->frame->obscured = e->xvisibility.state != VisibilityUnobscured;
-        break;
     case ButtonPress:
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
@@ -733,12 +753,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "%sNotify mode %d detail %d on %lx\n",
+                          (e->type == EnterNotify ? "Enter" : "Leave"),
+                          e->xcrossing.mode,
+                          e->xcrossing.detail, (client?client->window:0));
             if (keyboard_interactively_grabbed())
                 break;
-            if (config_focus_follow && config_focus_delay)
+            if (config_focus_follow && config_focus_delay &&
+                /* leaveinferior events can happen when the mouse goes onto the
+                   window's border and then into the window before the delay
+                   is up */
+                e->xcrossing.detail != NotifyInferior)
+            {
                 ob_main_loop_timeout_remove_data(ob_main_loop,
                                                  focus_delay_func,
                                                  client, FALSE);
+            }
             break;
         default:
             break;
@@ -1164,9 +1195,17 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.net_wm_user_time) {
             client_update_user_time(client);
         }
+#ifdef SYNC
+        else if (msgtype == prop_atoms.net_wm_sync_request_counter) {
+            client_update_sync_request_counter(client);
+        }
+#endif
         else if (msgtype == prop_atoms.sm_client_id) {
             client_update_sm_client_id(client);
         }
+    case ColormapNotify:
+        client_update_colormap(client, e->xcolormap.colormap);
+        break;
     default:
         ;
 #ifdef SHAPE

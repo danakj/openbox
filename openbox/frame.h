@@ -2,7 +2,7 @@
 
    frame.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -77,12 +77,10 @@ struct _ObFrame
     Rect      area;
     gboolean  visible;
 
-    /*! Whether the window is obscured at all or fully visible. */
-    gboolean obscured;
-
     guint     decorations;
     gboolean  max_horz;
 
+    Window    inner;  /*!< The window for drawing the inner client border */
     Window    title;
     Window    label;
     Window    max;
@@ -153,6 +151,7 @@ void frame_adjust_theme(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);
+void frame_adjust_client_area(ObFrame *self);
 void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);

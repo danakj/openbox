@@ -68,7 +68,7 @@ void parse_register(ObParseInst *i, const gchar *tag,
     struct Callback *c;
 
     if ((c = g_hash_table_lookup(i->callbacks, tag))) {
-        g_warning("Tag '%s' already registered", tag);
+        g_error("Tag '%s' already registered", tag);
         return;
     }
 
@@ -101,8 +101,6 @@ gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root,
                 g_free(path);
         }
     }
-    if (!r)
-        g_warning("Unable to find a valid config file, using defaults");
     return r;
 }
 
@@ -129,8 +127,6 @@ gboolean parse_load_theme(const gchar *name, xmlDocPtr *doc, xmlNodePtr *root,
             g_free(path);
         }
     }
-    if (!r)
-        g_warning("Unable to load the theme %s", name);
     return r;
 }
 
@@ -149,8 +145,6 @@ gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root)
             g_free(path);
         }
     }
-    if (!r)
-        g_warning("Unable to find a valid menu file '%s'", file);
     return r;
 }
 
@@ -169,13 +163,13 @@ gboolean parse_load(const gchar *path, const gchar *rootname,
         if (!*root) {
             xmlFreeDoc(*doc);
             *doc = NULL;
-            g_warning("%s is an empty document", path);
+            g_message("%s is an empty document", path);
         } else {
             if (xmlStrcmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
-                g_warning("Document %s is of wrong type. root node is "
-                          "not '%s'", path, rootname);
+                g_message("XML Document %s is of wrong type. Root "
+                          "node is not '%s'", path, rootname);
             }
         }
     }
@@ -192,13 +186,13 @@ gboolean parse_load_mem(gpointer data, guint len, const gchar *rootname,
         if (!*root) {
             xmlFreeDoc(*doc);
             *doc = NULL;
-            g_warning("Given memory is an empty document");
+            g_message("Given memory is an empty document");
         } else {
             if (xmlStrcmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
-                g_warning("Document in given memory is of wrong type. root "
-                          "node is not '%s'", rootname);
+                g_message("XML Document in given memory is of wrong "
+                          "type. Root node is not '%s'\n", rootname);
             }
         }
     }

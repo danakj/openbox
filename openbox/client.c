@@ -49,7 +49,8 @@
 #include <X11/Xutil.h>
 
 /*! The event mask to grab on client windows */
-#define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask)
+#define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask | \
+                          ColormapChangeMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
                                 ButtonMotionMask)
@@ -75,6 +76,7 @@ static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_gravity(ObClient *self);
 static void client_get_client_machine(ObClient *self);
+static void client_get_colormap(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
@@ -516,16 +518,14 @@ void client_unmanage(ObClient *self)
     XSelectInput(ob_display, self->window, NoEventMask);
 
     frame_hide(self->frame);
-    /* sync to send the hide to the server quickly, and to get back the enter
-       events */
-    XSync(ob_display, FALSE);
+    /* flush to send the hide to the server quickly */
+    XFlush(ob_display);
 
     if (focus_client == self) {
         /* ignore enter events from the unmap so it doesnt mess with the focus
          */
         event_ignore_queued_enters();
     }
-
 
     keyboard_grab_for_client(self, FALSE);
     mouse_grab_for_client(self, FALSE);
@@ -535,6 +535,9 @@ void client_unmanage(ObClient *self)
 
     /* update the focus lists */
     focus_order_remove(self);
+    /* don't leave an invalid focus_client */
+    if (self == focus_client)
+        focus_client = NULL;
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
@@ -940,7 +943,11 @@ static void client_get_all(ObClient *self)
        (min/max sizes), so we're ready to set up the decorations/functions */
     client_setup_decor_and_functions(self);
   
+#ifdef SYNC
+    client_update_sync_request_counter(self);
+#endif
     client_get_client_machine(self);
+    client_get_colormap(self);
     client_update_title(self);
     client_update_class(self);
     client_update_sm_client_id(self);
@@ -1290,17 +1297,36 @@ void client_update_protocols(ObClient *self)
 
     if (PROP_GETA32(self->window, wm_protocols, atom, &proto, &num_return)) {
         for (i = 0; i < num_return; ++i) {
-            if (proto[i] == prop_atoms.wm_delete_window) {
+            if (proto[i] == prop_atoms.wm_delete_window)
                 /* this means we can request the window to close */
                 self->delete_window = TRUE;
-            } else if (proto[i] == prop_atoms.wm_take_focus)
+            else if (proto[i] == prop_atoms.wm_take_focus)
                 /* if this protocol is requested, then the window will be
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
+#ifdef SYNC
+            else if (proto[i] == prop_atoms.net_wm_sync_request) 
+                /* if this protocol is requested, then the resizing the
+                   window will be synchronized between the frame and the
+                   client */
+                self->sync_request = TRUE;
+#endif
         }
         g_free(proto);
     }
 }
+
+#ifdef SYNC
+void client_update_sync_request_counter(ObClient *self)
+{
+    guint32 i;
+
+    if (PROP_GET32(self->window, net_wm_sync_request_counter, cardinal, &i)) {
+        self->sync_counter = i;
+    } else
+        self->sync_counter = None;
+}
+#endif
 
 static void client_get_gravity(ObClient *self)
 {
@@ -1310,6 +1336,19 @@ static void client_get_gravity(ObClient *self)
     ret = XGetWindowAttributes(ob_display, self->window, &wattrib);
     g_assert(ret != BadWindow);
     self->gravity = wattrib.win_gravity;
+}
+
+void client_get_colormap(ObClient *self)
+{
+    XWindowAttributes wa;
+
+    if (XGetWindowAttributes(ob_display, self->window, &wa))
+        client_update_colormap(self, wa.colormap);
+}
+
+void client_update_colormap(ObClient *self, Colormap colormap)
+{
+    self->colormap = colormap;
 }
 
 void client_update_normal_hints(ObClient *self)
@@ -2400,8 +2439,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                                     (resized && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
-    if (send_resize_client && user && (w > oldw || h > oldh))
+    if (send_resize_client && user && (w > oldw || h > oldh)) {
         XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+        frame_adjust_client_area(self->frame);
+    }
 
     /* find the frame's dimensions and move/resize it */
     if (self->decorations != fdecor || self->max_horz != fhorz)
@@ -2447,8 +2488,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (!user || (w <= oldw || h <= oldh)))
+    if (send_resize_client && (!user || (w <= oldw || h <= oldh))) {
+        frame_adjust_client_area(self->frame);
         XResizeWindow(ob_display, self->window, w, h);
+    }
 
     XFlush(ob_display);
 }
@@ -3079,10 +3122,11 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
        to activate it or not (a parent or group member is currently
        active)?
     */
-    ob_debug("Want to activate window 0x%x with time %u (last time %u), "
-             "source=%s\n",
-             self->window, event_curtime, last_time,
-             (user ? "user" : "application"));
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "Want to activate window 0x%x with time %u (last time %u), "
+                  "source=%s\n",
+                  self->window, event_curtime, last_time,
+                  (user ? "user" : "application"));
 
     if (!user && event_curtime && last_time &&
         !event_time_after(event_curtime, last_time))
@@ -3189,107 +3233,6 @@ const ObClientIcon* client_icon(ObClient *self, gint w, gint h)
     return ret;
 }
 
-/* this be mostly ripped from fvwm */
-ObClient *client_find_directional(ObClient *c, ObDirection dir) 
-{
-    gint my_cx, my_cy, his_cx, his_cy;
-    gint offset = 0;
-    gint distance = 0;
-    gint score, best_score;
-    ObClient *best_client, *cur;
-    GList *it;
-
-    if(!client_list)
-        return NULL;
-
-    /* first, find the centre coords of the currently focused window */
-    my_cx = c->frame->area.x + c->frame->area.width / 2;
-    my_cy = c->frame->area.y + c->frame->area.height / 2;
-
-    best_score = -1;
-    best_client = NULL;
-
-    for(it = g_list_first(client_list); it; it = g_list_next(it)) {
-        cur = it->data;
-
-        /* the currently selected window isn't interesting */
-        if(cur == c)
-            continue;
-        if (!client_normal(cur))
-            continue;
-        /* using c->desktop instead of screen_desktop doesn't work if the
-         * current window was omnipresent, hope this doesn't have any other
-         * side effects */
-        if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
-            continue;
-        if(cur->iconic)
-            continue;
-        if(!(client_focus_target(cur) == cur &&
-             client_can_focus(cur)))
-            continue;
-
-        /* find the centre coords of this window, from the
-         * currently focused window's point of view */
-        his_cx = (cur->frame->area.x - my_cx)
-            + cur->frame->area.width / 2;
-        his_cy = (cur->frame->area.y - my_cy)
-            + cur->frame->area.height / 2;
-
-        if(dir == OB_DIRECTION_NORTHEAST || dir == OB_DIRECTION_SOUTHEAST ||
-           dir == OB_DIRECTION_SOUTHWEST || dir == OB_DIRECTION_NORTHWEST) {
-            gint tx;
-            /* Rotate the diagonals 45 degrees counterclockwise.
-             * To do this, multiply the matrix /+h +h\ with the
-             * vector (x y).                   \-h +h/
-             * h = sqrt(0.5). We can set h := 1 since absolute
-             * distance doesn't matter here. */
-            tx = his_cx + his_cy;
-            his_cy = -his_cx + his_cy;
-            his_cx = tx;
-        }
-
-        switch(dir) {
-        case OB_DIRECTION_NORTH:
-        case OB_DIRECTION_SOUTH:
-        case OB_DIRECTION_NORTHEAST:
-        case OB_DIRECTION_SOUTHWEST:
-            offset = (his_cx < 0) ? -his_cx : his_cx;
-            distance = ((dir == OB_DIRECTION_NORTH ||
-                         dir == OB_DIRECTION_NORTHEAST) ?
-                        -his_cy : his_cy);
-            break;
-        case OB_DIRECTION_EAST:
-        case OB_DIRECTION_WEST:
-        case OB_DIRECTION_SOUTHEAST:
-        case OB_DIRECTION_NORTHWEST:
-            offset = (his_cy < 0) ? -his_cy : his_cy;
-            distance = ((dir == OB_DIRECTION_WEST ||
-                         dir == OB_DIRECTION_NORTHWEST) ?
-                        -his_cx : his_cx);
-            break;
-        }
-
-        /* the target must be in the requested direction */
-        if(distance <= 0)
-            continue;
-
-        /* Calculate score for this window.  The smaller the better. */
-        score = distance + offset;
-
-        /* windows more than 45 degrees off the direction are
-         * heavily penalized and will only be chosen if nothing
-         * else within a million pixels */
-        if(offset > distance)
-            score += 1000000;
-
-        if(best_score == -1 || score < best_score)
-            best_client = cur,
-                best_score = score;
-    }
-
-    return best_client;
-}
-
 void client_set_layer(ObClient *self, gint layer)
 {
     if (layer < 0) {
@@ -3328,7 +3271,8 @@ guint client_monitor(ObClient *self)
 
 ObClient *client_search_top_parent(ObClient *self)
 {
-    while (self->transient_for && self->transient_for != OB_TRAN_GROUP)
+    while (self->transient_for && self->transient_for != OB_TRAN_GROUP &&
+           client_normal(self))
         self = self->transient_for;
     return self;
 }

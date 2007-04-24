@@ -174,15 +174,15 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
     if (self) {
         XDestroyWindow(ob_display, self->text);
         XDestroyWindow(ob_display, self->window);
-        g_hash_table_insert(menu_frame_map, &self->text, self);
-        g_hash_table_insert(menu_frame_map, &self->window, self);
+        g_hash_table_remove(menu_frame_map, &self->text);
+        g_hash_table_remove(menu_frame_map, &self->window);
         if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
             XDestroyWindow(ob_display, self->icon);
-            g_hash_table_insert(menu_frame_map, &self->icon, self);
+            g_hash_table_remove(menu_frame_map, &self->icon);
         }
         if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
             XDestroyWindow(ob_display, self->bullet);
-            g_hash_table_insert(menu_frame_map, &self->bullet, self);
+            g_hash_table_remove(menu_frame_map, &self->bullet);
         }
 
         RrAppearanceFree(self->a_normal);

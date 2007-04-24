@@ -2,7 +2,7 @@
 
    mouse.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 #include "frame.h"
 #include "translate.h"
 #include "mouse.h"
+#include "gettext.h"
+
 #include <glib.h>
 
 typedef struct {
@@ -309,13 +311,13 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
     GSList *it;
 
     if (!translate_button(buttonstr, &state, &button)) {
-        g_warning("invalid button '%s'", buttonstr);
+        g_message(_("Invalid button '%s' in pointer binding"), buttonstr);
         return FALSE;
     }
 
     context = frame_context_from_string(contextstr);
     if (!context) {
-        g_warning("invalid context '%s'", contextstr);
+        g_message(_("Invalid context '%s' in pointer binding"), contextstr);
         return FALSE;
     }
 

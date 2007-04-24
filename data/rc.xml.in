@@ -152,6 +152,12 @@
   <keybind key="A-S-Tab">
     <action name="PreviousWindow"/>
   </keybind>
+  <keybind key="C-A-Tab">
+    <action name="NextWindow"><panels>yes</panels></action>
+  </keybind>
+  <keybind key="C-A-S-Tab">
+    <action name="PreviousWindow"><panels>yes</panels></action>
+  </keybind>
   <keybind key="A-F7">
     <action name="Move"/>
   </keybind>

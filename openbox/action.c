@@ -2,7 +2,7 @@
 
    action.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "config.h"
 #include "mainloop.h"
 #include "startupnotify.h"
+#include "gettext.h"
 
 #include <glib.h>
 
@@ -118,6 +119,7 @@ void setup_action_directional_focus_north(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTH;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
@@ -125,6 +127,7 @@ void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_EAST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
@@ -132,6 +135,7 @@ void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTH;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
@@ -139,6 +143,7 @@ void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_WEST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
@@ -146,6 +151,7 @@ void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
@@ -153,6 +159,7 @@ void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
@@ -160,6 +167,7 @@ void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
@@ -167,6 +175,7 @@ void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
     (*a)->data.interdiraction.dialog = TRUE;
+    (*a)->data.interdiraction.dock_windows = FALSE;
 }
 
 void setup_action_send_to_desktop(ObAction **a, ObUserAction uact)
@@ -294,6 +303,7 @@ void setup_action_cycle_windows_next(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.linear = FALSE;
     (*a)->data.cycle.forward = TRUE;
     (*a)->data.cycle.dialog = TRUE;
+    (*a)->data.cycle.dock_windows = FALSE;
 }
 
 void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
@@ -302,6 +312,7 @@ void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.linear = FALSE;
     (*a)->data.cycle.forward = FALSE;
     (*a)->data.cycle.dialog = TRUE;
+    (*a)->data.cycle.dock_windows = FALSE;
 }
 
 void setup_action_movefromedge_north(ObAction **a, ObUserAction uact)
@@ -912,10 +923,11 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
             break;
         }
     if (!exist)
-        g_warning("Invalid action '%s' requested. No such action exists.",
+        g_message(_("Invalid action '%s' requested. No such action exists."),
                   name);
     if (!a)
-        g_warning("Invalid use of action '%s'. Action will be ignored.", name);
+        g_message(_("Invalid use of action '%s'. Action will be ignored."),
+                  name);
     return a;
 }
 
@@ -1001,9 +1013,13 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     act->data.cycle.linear = parse_bool(doc, n);
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.cycle.dialog = parse_bool(doc, n);
+                if ((n = parse_find_node("panels", node->xmlChildrenNode)))
+                    act->data.cycle.dock_windows = parse_bool(doc, n);
             } else if (act->func == action_directional_focus) {
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
-                    act->data.cycle.dialog = parse_bool(doc, n);
+                    act->data.interdiraction.dialog = parse_bool(doc, n);
+                if ((n = parse_find_node("panels", node->xmlChildrenNode)))
+                    act->data.interdiraction.dock_windows = parse_bool(doc, n);
             } else if (act->func == action_raise ||
                        act->func == action_lower ||
                        act->func == action_raiselower ||
@@ -1104,7 +1120,7 @@ void action_execute(union ActionData *data)
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
-                g_warning("failed to execute '%s': %s",
+                g_message(_("Failed to execute '%s': %s"),
                           cmd, e->message);
                 g_error_free(e);
             } else if (data->execute.startupnotify) {
@@ -1122,7 +1138,7 @@ void action_execute(union ActionData *data)
                 if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
                                    G_SPAWN_DO_NOT_REAP_CHILD,
                                    NULL, NULL, NULL, &e)) {
-                    g_warning("failed to execute '%s': %s",
+                    g_message(_("Failed to execute '%s': %s"),
                               cmd, e->message);
                     g_error_free(e);
                     sn_spawn_cancel();
@@ -1135,7 +1151,7 @@ void action_execute(union ActionData *data)
                                    G_SPAWN_DO_NOT_REAP_CHILD,
                                    NULL, NULL, NULL, &e))
                 {
-                    g_warning("failed to execute '%s': %s",
+                    g_message(_("Failed to execute '%s': %s"),
                               cmd, e->message);
                     g_error_free(e);
                 }
@@ -1143,7 +1159,8 @@ void action_execute(union ActionData *data)
             }
             g_free(cmd);
         } else {
-            g_warning("failed to convert '%s' from utf8", data->execute.path);
+            g_message(_("Failed to convert the path '%s' from utf8"),
+                      data->execute.path);
         }
     }
 }
@@ -1644,7 +1661,9 @@ void action_cycle_windows(union ActionData *data)
        on us */
     event_halt_focus_delay();
 
-    focus_cycle(data->cycle.forward, data->cycle.linear, data->any.interactive,
+    focus_cycle(data->cycle.forward,
+                data->cycle.dock_windows,
+                data->cycle.linear, data->any.interactive,
                 data->cycle.dialog,
                 data->cycle.inter.final, data->cycle.inter.cancel);
 }
@@ -1656,6 +1675,7 @@ void action_directional_focus(union ActionData *data)
     event_halt_focus_delay();
 
     focus_directional_cycle(data->interdiraction.direction,
+                            data->interdiraction.dock_windows,
                             data->any.interactive,
                             data->interdiraction.dialog,
                             data->interdiraction.inter.final,

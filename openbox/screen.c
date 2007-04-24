@@ -34,6 +34,7 @@
 #include "popup.h"
 #include "extensions.h"
 #include "render/render.h"
+#include "gettext.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -79,7 +80,7 @@ static gboolean replace_wm()
         current_wm_sn_owner = None;
     if (current_wm_sn_owner) {
         if (!ob_replace_wm) {
-            g_warning("A window manager is already running on screen %d",
+            g_message(_("A window manager is already running on screen %d"),
                       ob_screen);
             return FALSE;
         }
@@ -116,7 +117,7 @@ static gboolean replace_wm()
                        timestamp);
 
     if (XGetSelectionOwner(ob_display, wm_sn_atom) != screen_support_win) {
-        g_warning("Could not acquire window manager selection on screen %d",
+        g_message(_("Could not acquire window manager selection on screen %d"),
                   ob_screen);
         return FALSE;
     }
@@ -137,8 +138,8 @@ static gboolean replace_wm()
       }
 
       if (wait >= timeout) {
-          g_warning("Timeout expired while waiting for the current WM to die "
-                    "on screen %d", ob_screen);
+          g_message(_("Timeout expired while waiting for the current WM to die"
+                      " on screen %d"), ob_screen);
           return FALSE;
       }
     }
@@ -179,7 +180,7 @@ gboolean screen_annex()
                  ROOT_EVENTMASK);
     xerror_set_ignore(FALSE);
     if (xerror_occured) {
-        g_warning("A window manager is already running on screen %d",
+        g_message(_("A window manager is already running on screen %d"),
                   ob_screen);
 
         XDestroyWindow(ob_display, screen_support_win);
@@ -205,6 +206,9 @@ gboolean screen_annex()
 
     /* set the _NET_SUPPORTED_ATOMS hint */
     num_support = 55;
+#ifdef SYNC
+    num_support += 2;
+#endif
     i = 0;
     supported = g_new(gulong, num_support);
     supported[i++] = prop_atoms.net_wm_full_placement;
@@ -261,11 +265,12 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_moveresize;
     supported[i++] = prop_atoms.net_wm_user_time;
     supported[i++] = prop_atoms.net_frame_extents;
+#ifdef SYNC
+    supported[i++] = prop_atoms.net_wm_sync_request;
+    supported[i++] = prop_atoms.net_wm_sync_request_counter;
+#endif
     supported[i++] = prop_atoms.ob_wm_state_undecorated;
     g_assert(i == num_support);
-/*
-  supported[] = prop_atoms.net_wm_action_stick;
-*/
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
                 net_supported, atom, supported, num_support);
@@ -906,23 +911,19 @@ void screen_show_desktop(gboolean show)
 
 void screen_install_colormap(ObClient *client, gboolean install)
 {
-    XWindowAttributes wa;
-
     if (client == NULL) {
         if (install)
             XInstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
         else
             XUninstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
     } else {
-        if (XGetWindowAttributes(ob_display, client->window, &wa) &&
-            wa.colormap != None) {
-            xerror_set_ignore(TRUE);
-            if (install)
-                XInstallColormap(RrDisplay(ob_rr_inst), wa.colormap);
-            else
-                XUninstallColormap(RrDisplay(ob_rr_inst), wa.colormap);
-            xerror_set_ignore(FALSE);
-        }
+        xerror_set_ignore(TRUE);
+        if (install) {
+            if (client->colormap != None)
+                XInstallColormap(RrDisplay(ob_rr_inst), client->colormap);
+        } else
+            XUninstallColormap(RrDisplay(ob_rr_inst), client->colormap);
+        xerror_set_ignore(FALSE);
     }
 }
 

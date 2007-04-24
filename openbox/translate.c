@@ -2,7 +2,7 @@
 
    translate.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "openbox.h"
 #include "mouse.h"
+#include "gettext.h"
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +38,7 @@ static guint translate_modifier(gchar *str)
              !g_ascii_strcasecmp("C", str)) return ControlMask;
     else if (!g_ascii_strcasecmp("Shift", str) ||
              !g_ascii_strcasecmp("S", str)) return ShiftMask;
-    g_warning("Invalid modifier '%s' in binding.", str);
+    g_message(_("Invalid modifier key '%s' in key/pointer binding"), str);
     return 0;
 }
 
@@ -73,7 +74,7 @@ gboolean translate_button(const gchar *str, guint *state, guint *button)
     else if (!g_ascii_strcasecmp("Down", l)) *button = 5;
     else if (!g_ascii_strncasecmp("Button", l, 6)) *button = atoi(l+6);
     if (!*button) {
-        g_warning("Invalid button '%s' in pointer binding.", l);
+        g_message(_("Invalid button '%s' in pointer binding"), l);
         goto translation_fail;
     }
 
@@ -115,20 +116,20 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
         /* take it directly */
         *keycode = strtol(l, &end, 16);
         if (*l == '\0' || *end != '\0') {
-            g_warning("Invalid key code '%s' in key binding.", l);
+            g_message(_("Invalid key code '%s' in key binding"), l);
             goto translation_fail;
         }
     } else {
         /* figure out the keycode */
         sym = XStringToKeysym(l);
         if (sym == NoSymbol) {
-            g_warning("Invalid key name '%s' in key binding.", l);
+            g_message(_("Invalid key name '%s' in key binding"), l);
             goto translation_fail;
         }
         *keycode = XKeysymToKeycode(ob_display, sym);
     }
     if (!*keycode) {
-        g_warning("Key '%s' does not exist on the display.", l); 
+        g_message(_("Requested key '%s' does not exist on the display"), l); 
         goto translation_fail;
     }
 

@@ -31,6 +31,7 @@
 #include "client_menu.h"
 #include "client_list_menu.h"
 #include "client_list_combined_menu.h"
+#include "gettext.h"
 #include "parser/parse.h"
 
 typedef struct _ObMenuParseState ObMenuParseState;
@@ -90,13 +91,17 @@ void menu_startup(gboolean reconfig)
             loaded = TRUE;
             parse_tree(menu_parse_inst, doc, node->children);
             xmlFreeDoc(doc);
-        }
+        } else
+            g_message(_("Unable to find a valid menu file '%s'"),
+                      (const gchar*)it->data);
     }
     if (!loaded) {
         if (parse_load_menu("menu.xml", &doc, &node)) {
             parse_tree(menu_parse_inst, doc, node->children);
             xmlFreeDoc(doc);
-        }
+        } else
+            g_message(_("Unable to find a valid menu file '%s'"),
+                      "menu.xml");
     }
     
     g_assert(menu_parse_state.parent == NULL);
@@ -138,7 +143,8 @@ void menu_pipe_execute(ObMenu *self)
         return;
 
     if (!g_spawn_command_line_sync(self->execute, &output, NULL, NULL, &err)) {
-        g_warning("Failed to execute command for pipe-menu: %s", err->message);
+        g_message(_("Failed to execute command for pipe-menu '%s': %s"),
+                  self->execute, err->message);
         g_error_free(err);
         return;
     }
@@ -154,7 +160,7 @@ void menu_pipe_execute(ObMenu *self)
         parse_tree(menu_parse_inst, doc, node->children);
         xmlFreeDoc(doc);
     } else {
-        g_warning("Invalid output from pipe-menu: %s", self->execute);
+        g_message(_("Invalid output from pipe-menu '%s'"), self->execute);
     }
 
     g_free(output);
@@ -167,7 +173,7 @@ static ObMenu* menu_from_name(gchar *name)
     g_assert(name != NULL);
 
     if (!(self = g_hash_table_lookup(menu_hash, name)))
-        g_warning("Attempted to access menu '%s' but it does not exist.",
+        g_message(_("Attempted to access menu '%s' but it does not exist"),
                   name);
     return self;
 }  

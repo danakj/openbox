@@ -2,7 +2,7 @@
 
    framerender.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ void framerender_frame(ObFrame *self)
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->cb_focused_color) :
               RrColorPixel(ob_rr_theme->cb_unfocused_color));
-        XSetWindowBackground(ob_display, self->plate, px);
-        XClearWindow(ob_display, self->plate);
+        XSetWindowBackground(ob_display, self->inner, px);
+        XClearWindow(ob_display, self->inner);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {

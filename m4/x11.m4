@@ -397,6 +397,60 @@ AC_DEFUN([X11_EXT_XINERAMA],
   fi
 ])
 
+# X11_EXT_SYNC()
+#
+# Check for the presence of the "Sync" X Window System extension.
+# Defines "SYNC", sets the $(SYNC) variable to "yes", and sets the $(LIBS)
+# appropriately if the extension is present.
+AC_DEFUN([X11_EXT_SYNC],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+     
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_LIBS"
+
+  AC_CHECK_LIB([Xext], [XSyncInitialize],
+    AC_MSG_CHECKING([for X11/extensions/sync.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xutil.h>
+      #include <X11/extensions/sync.h>
+    ],
+    [
+      XSyncValueType foo;
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      SYNC="yes"
+      AC_DEFINE([SYNC], [1], [Found the XSync extension])
+
+      XSYNC_CFLAGS=""
+      XSYNC_LIBS="-lXext"
+      AC_SUBST(XSYNC_CFLAGS)
+      AC_SUBST(XSYNC_LIBS)
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      SYNC="no"
+    ])
+  )
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+ 
+  AC_MSG_CHECKING([for the Sync extension])
+  if test "$SYNC" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
 # X11_SM()
 #
 # Check for the presence of SMlib for session management.

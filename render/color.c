@@ -2,7 +2,7 @@
 
    color.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
    Copyright (c) 2003        Derek Foreman
 
    This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ RrColor *RrColorParse(const RrInstance *inst, gchar *colorname)
     xcol.blue = 0;
     xcol.pixel = 0;
     if (!XParseColor(RrDisplay(inst), RrColormap(inst), colorname, &xcol)) {
-        g_warning("unable to parse color '%s'", colorname);
+        g_message("Unable to parse color '%s'", colorname);
         return NULL;
     }
     return RrColorNew(inst, xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
@@ -191,7 +191,8 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     default:
-        g_warning("your bit depth is currently unhandled\n");
+        g_error("Your bit depth is currently unhandled\n");
+        
     }
 }
 
@@ -228,7 +229,8 @@ static void swap_byte_order(XImage *im)
             case 1:
                 break;
             default:
-                g_warning("Your bit depth is currently unhandled");
+                g_error("Your bit depth (%i) is currently unhandled",
+                        im->bits_per_pixel);
             }
         }
         di += im->bytes_per_line;
@@ -289,7 +291,7 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     case 8:
-        g_warning("this image bit depth is currently unhandled");
+        g_error("This image bit depth (%i) is currently unhandled", 8);
         break;
     case 1:
         for (y = 0; y < im->height; y++) {
@@ -304,7 +306,8 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     default:
-        g_warning("this image bit depth is currently unhandled");
+        g_error("This image bit depth (%i) is currently unhandled",
+                im->bits_per_pixel);
     }
 }
 

@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    session.c for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+   Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ static void save_commands()
 {
     SmProp *props[2];
     SmProp prop_cmd = { SmCloneCommand, SmLISTofARRAY8, 1, };
-    SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8, };
+    SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8 };
     gint i;
 
     prop_cmd.vals = g_new(SmPropValue, sm_argc);
@@ -164,9 +164,10 @@ void session_startup(gint argc, gchar **argv)
 
     sm_sessions_path = g_build_filename(parse_xdg_data_home_path(),
                                         "openbox", "sessions", NULL);
-    if (!parse_mkdir_path(sm_sessions_path, 0700))
-        g_warning(_("Unable to make directory '%s': %s"),
+    if (!parse_mkdir_path(sm_sessions_path, 0700)) {
+        g_message(_("Unable to make directory '%s': %s"),
                   sm_sessions_path, g_strerror(errno));
+    }
 
     if (save_file)
         session_load(save_file);
@@ -339,7 +340,7 @@ static gboolean session_save()
     f = fopen(save_file, "w");
     if (!f) {
         success = FALSE;
-        g_warning("unable to save the session to %s: %s",
+        g_message(_("Unable to save the session to '%s': %s"),
                   save_file, g_strerror(errno));
     } else {
         guint stack_pos = 0;
@@ -429,7 +430,7 @@ static gboolean session_save()
 
         if (fflush(f)) {
             success = FALSE;
-            g_warning("error while saving the session to %s: %s",
+            g_message(_("Error while saving the session to '%s': %s"),
                       save_file, g_strerror(errno));
         }
         fclose(f);

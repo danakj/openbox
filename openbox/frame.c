@@ -36,6 +36,12 @@
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | \
                            EnterWindowMask | LeaveWindowMask)
+/* The inner window does not need enter/leave events.
+   If it does get them, then it needs its own context for enter events
+   because sloppy focus will focus the window when you enter the inner window
+   from the frame. */
+#define INNER_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
+                         ButtonMotionMask)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
                            f->cbwidth_y)
@@ -100,7 +106,7 @@ ObFrame *frame_new(ObClient *client)
     self->window = createWindow(RootWindow(ob_display, ob_screen), visual,
                                 mask, &attrib);
 
-    attrib.event_mask = ELEMENT_EVENTMASK;
+    attrib.event_mask = INNER_EVENTMASK;
     self->inner = createWindow(self->window, visual, mask, &attrib);
 
     mask &= ~CWEventMask;

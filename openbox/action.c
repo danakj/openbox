@@ -1662,6 +1662,26 @@ void action_moveresize(union ActionData *data)
                               c->frame->size.right,
                               c->area.height + c->frame->size.top +
                               c->frame->size.bottom));
+        const gchar *c;
+        if (corner == prop_atoms.net_wm_moveresize_size_topright)
+            c = "topright";
+        else if (corner == prop_atoms.net_wm_moveresize_size_top)
+            c = "top";
+        else if (corner == prop_atoms.net_wm_moveresize_size_topleft)
+            c = "topleft";
+        else if (corner == prop_atoms.net_wm_moveresize_size_right)
+            c = "right";
+        else if (corner == prop_atoms.net_wm_moveresize_move)
+            c = "middle";
+        else if (corner == prop_atoms.net_wm_moveresize_size_left)
+            c = "left";
+        else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
+            c = "bottomright";
+        else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
+            c = "bottom";
+        else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
+            c = "bottomleft";
+        ob_debug("corner: %s\n", c);
     }
 
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);

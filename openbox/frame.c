@@ -29,8 +29,7 @@
 #include "moveresize.h"
 #include "render/theme.h"
 
-#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask | \
-                         FocusChangeMask)
+#define PLATE_EVENTMASK (SubstructureRedirectMask | FocusChangeMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
@@ -40,8 +39,7 @@
    If it does get them, then it needs its own context for enter events
    because sloppy focus will focus the window when you enter the inner window
    from the frame. */
-#define INNER_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                         ButtonMotionMask)
+#define INNER_EVENTMASK (ButtonPressMask)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
                            f->cbwidth_y)
@@ -830,7 +828,7 @@ ObFrameContext frame_context(ObClient *client, Window win)
     }
 
     self = client->frame;
-    if (win == self->plate) {
+    if (win == self->inner) {
         /* conceptually, this is the desktop, as far as users are
            concerned */
         if (client->type == OB_CLIENT_TYPE_DESKTOP)
@@ -838,8 +836,8 @@ ObFrameContext frame_context(ObClient *client, Window win)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
+    if (win == self->plate)     return OB_FRAME_CONTEXT_CLIENT;
     if (win == self->window)    return OB_FRAME_CONTEXT_FRAME;
-    if (win == self->inner)     return OB_FRAME_CONTEXT_FRAME;
     if (win == self->title)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->label)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->handle)    return OB_FRAME_CONTEXT_HANDLE;

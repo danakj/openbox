@@ -82,7 +82,6 @@
 
 <resize>
   <drawContents>yes</drawContents>
-  <fourCorners>no</fourCorners>
   <popupShow>Nonpixel</popupShow>
   <!-- 'Always', 'Never', or 'Nonpixel' (xterms and such) -->
   <popupPosition>Center</popupPosition>

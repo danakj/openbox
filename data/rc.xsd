@@ -45,6 +45,8 @@
          Add font section to theme section
      Sun Mar  4 13:49:37 EST 2007 - danakj(a)orodu.net
          Removing font shadows - they are going back into the themerc
+     Tue Apr 24 18:42:24 UTC 2007 - mikachu(a)openbox.org
+         Removed fourCorners option.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -143,7 +145,6 @@
     <xs:complexType name="resize">
         <xs:sequence>
             <xs:element minOccurs="0" name="drawContents" type="ob:bool"/>
-            <xs:element minOccurs="0" name="fourCorners" type="ob:bool"/>
             <xs:element minOccurs="0" name="popupShow" type="ob:popupshow"/>
             <xs:element minOccurs="0" name="popupPosition" type="ob:popupposition"/>
         </xs:sequence>

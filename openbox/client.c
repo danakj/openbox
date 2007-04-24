@@ -385,7 +385,7 @@ void client_manage(Window window)
         ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
                  self->window, self->user_time, last_time);
 
-        /* If a nothing at all, or a parent was focused, then focus this
+        /* If nothing is focused, or a parent was focused, then focus this
            always
         */
         if (!focus_client || client_search_focus_parent(self) != NULL)

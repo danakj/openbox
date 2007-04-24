@@ -535,6 +535,9 @@ void client_unmanage(ObClient *self)
 
     /* update the focus lists */
     focus_order_remove(self);
+    /* don't leave an invalid focus_client */
+    if (self == focus_client)
+        focus_client = NULL;
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);

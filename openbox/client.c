@@ -683,7 +683,7 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         if (settings->max_vert != -1)
             self->max_vert = !!settings->max_vert;
         if (settings->max_horz != -1)
-            self->max_vert = !!settings->max_horz;
+            self->max_horz = !!settings->max_horz;
 
         if (settings->fullscreen != -1)
             self->fullscreen = !!settings->fullscreen;
@@ -1018,10 +1018,6 @@ static void client_get_desktop(ObClient *self)
                 /* defaults to the current desktop */
                 self->desktop = screen_desktop;
         }
-    }
-    if (self->desktop != d) {
-        /* set the desktop hint, to make sure that it always exists */
-        PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
     }
 }
 
@@ -2172,6 +2168,9 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     oy = self->area.y;
     self->area.x = x;
     self->area.y = y;
+
+    /* set the desktop hint, to make sure that it always exists */
+    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
 
     /* these are in a carefully crafted order.. */
 

@@ -111,7 +111,7 @@ gint main(gint argc, gchar **argv)
     g_set_prgname(argv[0]);
 
     if (chdir(g_get_home_dir()) == -1)
-        g_message(_("Unable to change to home directory (%s): %s"),
+        g_message(_("Unable to change to home directory '%s': %s"),
                   g_get_home_dir(), g_strerror(errno));
      
     /* parse out command line args */

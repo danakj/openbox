@@ -1581,7 +1581,7 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
     } else {
         /* let's make x and y client relative instead of screen relative */
         x = x - cx;
-        y = ch - y - cy;
+        y = ch - y + cy;
 #define X x*ch/cw
 #define A -4*X + 7*ch/3
 #define B  4*X -15*ch/9
@@ -1596,31 +1596,22 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 #define c (x > 5*cw/9)
 #define d (y < 4*ch/9)
 
-        //1
         if (y < A && y >= C)
             return prop_atoms.net_wm_moveresize_size_topleft;
-        //2
         else if (y >= A && y >= B && a)
             return prop_atoms.net_wm_moveresize_size_top;
-        //3
         else if (y < B && y >= D)
             return prop_atoms.net_wm_moveresize_size_topright;
-        //4
         else if (y < C && y >= E && b)
             return prop_atoms.net_wm_moveresize_size_left;
-        //6
         else if (y < D && y >= F && c)
             return prop_atoms.net_wm_moveresize_size_right;
-        //7
         else if (y < E && y >= G)
             return prop_atoms.net_wm_moveresize_size_bottomleft;
-        //8
         else if (y < G && y < H && d)
             return prop_atoms.net_wm_moveresize_size_bottom;
-        //9
-        else if (y >= G && y < F)
+        else if (y >= H && y < F)
             return prop_atoms.net_wm_moveresize_size_bottomright;
-        //5
         else
             return prop_atoms.net_wm_moveresize_move;
     }

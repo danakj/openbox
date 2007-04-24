@@ -1579,54 +1579,27 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
                 return prop_atoms.net_wm_moveresize_size_topleft;
         }
     } else {
-        if (x - cx > cw * 2 / 3) {
-            if (y - cy > ch * 2 / 3)
-                return prop_atoms.net_wm_moveresize_size_bottomright;
-            else if (y - cy < ch / 3)
-                return prop_atoms.net_wm_moveresize_size_topright;
-            else
-                return prop_atoms.net_wm_moveresize_size_right;
-        } else if (x - cx < cw / 3) {
-            if (y - cy > ch * 2 / 3)
-                return prop_atoms.net_wm_moveresize_size_bottomleft;
-            else if (y - cy < ch / 3)
-                return prop_atoms.net_wm_moveresize_size_topleft;
-            else
-                return prop_atoms.net_wm_moveresize_size_left;
-        } else
-            if (y - cy > ch * 2 / 3)
-                return prop_atoms.net_wm_moveresize_size_bottom;
-            else if (y - cy < ch / 3)
-                return prop_atoms.net_wm_moveresize_size_top;
-            else {
-                /* inside the middle square... */
-                cx += cw / 3;
-                cy += ch / 3;
-                cw /= 3;
-                ch /= 3;
-                if (x - cx > cw * 2 / 3) {
-                    if (y - cy > ch * 2 / 3)
-                        return prop_atoms.net_wm_moveresize_size_bottomright;
-                    else if (y - cy < ch / 3)
-                        return prop_atoms.net_wm_moveresize_size_topright;
-                    else
-                        return prop_atoms.net_wm_moveresize_size_right;
-                } else if (x - cx < cw / 3) {
-                    if (y - cy > ch * 2 / 3)
-                        return prop_atoms.net_wm_moveresize_size_bottomleft;
-                    else if (y - cy < ch / 3)
-                        return prop_atoms.net_wm_moveresize_size_topleft;
-                    else
-                        return prop_atoms.net_wm_moveresize_size_left;
-                } else
-                    if (y - cy > ch * 2 / 3)
-                        return prop_atoms.net_wm_moveresize_size_bottom;
-                    else if (y - cy < ch / 3)
-                        return prop_atoms.net_wm_moveresize_size_top;
-                    else {
-                        return prop_atoms.net_wm_moveresize_move;
-                    }
-            }
+        /* let's make x and y client relative instead of screen relative */
+        x = x - cx;
+        y = y - cy;
+        if (y < -4*x*ch/cw+7*ch/3 && y > -ch*x/4/cw+2*ch/3)
+            return prop_atoms.net_wm_moveresize_size_topleft;
+        else if (y > 5*ch/9 && y > 4*x*ch/cw-15*ch/9)
+            return prop_atoms.net_wm_moveresize_size_top;
+        else if (y > ch*x/4/cw+5*ch/12)
+            return prop_atoms.net_wm_moveresize_size_topright;
+        else if (x < 4*cw/9 && y > ch*x/4/cw+ch/3)
+            return prop_atoms.net_wm_moveresize_size_left;
+        else if (x > 5*cw/9 && y > -ch*x/4/cw+7*ch/12)
+            return prop_atoms.net_wm_moveresize_size_right;
+        else if (y > 4*ch*x/cw-4*ch/3)
+            return prop_atoms.net_wm_moveresize_size_bottomleft;
+        else if (y < 4*ch/9 && y < -4*x*ch/cw+8*ch/3)
+            return prop_atoms.net_wm_moveresize_size_bottom;
+        else if (y > 5*cw/9)
+            return prop_atoms.net_wm_moveresize_size_bottomright;
+        else
+            return prop_atoms.net_wm_moveresize_move;
     }
 }
 

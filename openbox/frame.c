@@ -34,7 +34,7 @@
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                           ButtonMotionMask | PointerMotionHintMask \
+                           ButtonMotionMask | PointerMotionHintMask | \
                            EnterWindowMask | LeaveWindowMask)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \

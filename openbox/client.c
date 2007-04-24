@@ -52,7 +52,7 @@
 #define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
-                                ButtonMotionMask)
+                                ButtonMotionMask | PointerMotionHintMask)
 
 typedef struct
 {

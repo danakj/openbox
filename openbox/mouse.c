@@ -106,7 +106,8 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
             if (FRAME_CONTEXT(i, client)) {
                 win = client->frame->window;
                 mode = GrabModeAsync;
-                mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
+                mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask |
+                    PointerMotionHintMask;
             } else if (CLIENT_CONTEXT(i, client)) {
                 win = client->frame->plate;
                 mode = GrabModeSync; /* this is handled in event */

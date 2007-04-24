@@ -672,9 +672,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
     ObFrameContext con;
      
     switch (e->type) {
-    case VisibilityNotify:
-        client->frame->obscured = e->xvisibility.state != VisibilityUnobscured;
-        break;
     case ButtonPress:
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it

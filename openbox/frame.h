@@ -77,9 +77,6 @@ struct _ObFrame
     Rect      area;
     gboolean  visible;
 
-    /*! Whether the window is obscured at all or fully visible. */
-    gboolean obscured;
-
     guint     decorations;
     gboolean  max_horz;
 
@@ -154,6 +151,7 @@ void frame_adjust_theme(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);
+void frame_adjust_client_area(ObFrame *self);
 void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);

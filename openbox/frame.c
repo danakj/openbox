@@ -32,10 +32,9 @@
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask | \
                          FocusChangeMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask | \
-                         VisibilityChangeMask)
+                         ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                           ButtonMotionMask | ExposureMask | \
+                           ButtonMotionMask | \
                            EnterWindowMask | LeaveWindowMask)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
@@ -81,8 +80,6 @@ ObFrame *frame_new(ObClient *client)
 
     self = g_new0(ObFrame, 1);
 
-    self->obscured = TRUE;
-
     visual = check_32bit_client(client);
 
     /* create the non-visible decor windows */
@@ -103,6 +100,12 @@ ObFrame *frame_new(ObClient *client)
     self->window = createWindow(RootWindow(ob_display, ob_screen), visual,
                                 mask, &attrib);
 
+    attrib.event_mask = ELEMENT_EVENTMASK;
+    self->inner = createWindow(self->window, visual, mask, &attrib);
+
+    mask &= ~CWEventMask;
+    self->plate = createWindow(self->inner, visual, mask, &attrib);
+
     /* create the visible decor windows */
 
     if (visual) {
@@ -111,7 +114,6 @@ ObFrame *frame_new(ObClient *client)
         attrib.colormap = RrColormap(ob_rr_inst);
     }
     attrib.event_mask = ELEMENT_EVENTMASK;
-    self->inner = createWindow(self->window, NULL, mask, &attrib);
     self->title = createWindow(self->window, NULL, mask, &attrib);
 
     mask |= CWCursor;
@@ -137,11 +139,6 @@ ObFrame *frame_new(ObClient *client)
     self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
     self->rgrip = createWindow(self->handle, NULL, mask, &attrib); 
-
-    /* create the plate window which holds the client */
-
-    mask &= ~(CWEventMask | CWCursor);
-    self->plate = createWindow(self->inner, visual, mask, &attrib);
 
     self->focused = FALSE;
 
@@ -435,12 +432,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
-            /* move and resize the plate */
-            XMoveResizeWindow(ob_display, self->plate,
-                              self->cbwidth_x,
-                              self->cbwidth_y,
-                              self->client->area.width,
-                              self->client->area.height);
+            /* move the plate */
+            XMoveWindow(ob_display, self->plate,
+                        self->cbwidth_x, self->cbwidth_y);
+
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window, 0, 0);
         }
@@ -512,6 +507,13 @@ void frame_adjust_focus(ObFrame *self, gboolean hilite)
     self->focused = hilite;
     framerender_frame(self);
     XFlush(ob_display);
+}
+
+void frame_adjust_client_area(ObFrame *self)
+{
+    /* resize the plate */
+    XResizeWindow(ob_display, self->plate,
+                  self->client->area.width, self->client->area.height);
 }
 
 void frame_adjust_title(ObFrame *self)

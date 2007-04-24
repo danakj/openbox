@@ -2398,8 +2398,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                                     (resized && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
-    if (send_resize_client && user && (w > oldw || h > oldh))
+    if (send_resize_client && user && (w > oldw || h > oldh)) {
         XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+        frame_adjust_client_area(self->frame);
+    }
 
     /* find the frame's dimensions and move/resize it */
     if (self->decorations != fdecor || self->max_horz != fhorz)
@@ -2445,8 +2447,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (!user || (w <= oldw || h <= oldh)))
+    if (send_resize_client && (!user || (w <= oldw || h <= oldh))) {
         XResizeWindow(ob_display, self->window, w, h);
+        frame_adjust_client_area(self->frame);
+    }
 
     XFlush(ob_display);
 }

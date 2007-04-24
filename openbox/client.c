@@ -2448,8 +2448,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
     /* if the client is shrinking, then resize the frame before the client */
     if (send_resize_client && (!user || (w <= oldw || h <= oldh))) {
-        XResizeWindow(ob_display, self->window, w, h);
         frame_adjust_client_area(self->frame);
+        XResizeWindow(ob_display, self->window, w, h);
     }
 
     XFlush(ob_display);

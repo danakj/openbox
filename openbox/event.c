@@ -761,9 +761,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (keyboard_interactively_grabbed())
                 break;
             if (config_focus_follow && config_focus_delay &&
-                /* leaveinferior events can happen when the mouse goes onto the
-                   window's border and then into the window before the delay
-                   is up */
+                /* leave inferior events can happen when the mouse goes onto
+                   the window's border and then into the window before the
+                   delay is up */
                 e->xcrossing.detail != NotifyInferior)
             {
                 ob_main_loop_timeout_remove_data(ob_main_loop,
@@ -810,7 +810,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (keyboard_interactively_grabbed())
                 break;
             if (e->xcrossing.mode == NotifyGrab ||
-                e->xcrossing.mode == NotifyUngrab)
+                e->xcrossing.mode == NotifyUngrab ||
+                /*ignore enters when we're already in the window */
+                e->xcrossing.detail == NotifyInferior)
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d on %lx IGNORED\n",

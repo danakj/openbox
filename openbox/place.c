@@ -126,9 +126,9 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     b = areas[i]->y + areas[i]->height - client->frame->area.height;
 
     if (r > l) *x = g_random_int_range(l, r + 1);
-    else       *x = 0;
+    else       *x = areas[i]->x;
     if (b > t) *y = g_random_int_range(t, b + 1);
-    else       *y = 0;
+    else       *y = areas[i]->y;
 
     g_free(areas);
 

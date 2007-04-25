@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 17:12-0400\n"
+"POT-Creation-Date: 2007-04-24 21:37-0400\n"
 "PO-Revision-Date: 2004-06-11 23:06+0200\n"
 "Last-Translator: Julien Louis <leonptitlouis@wanadoo.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -23,77 +23,93 @@ msgstr "Aller à..."
 msgid "Desktops"
 msgstr "Bureaux"
 
-#: openbox/client_menu.c:76
-msgid "Restore"
-msgstr "Restaurer"
+#: openbox/client_menu.c:75
+#, fuzzy
+msgid "Restor&e"
+msgstr "R&estaurer"
 
-#: openbox/client_menu.c:76
-msgid "Maximize"
-msgstr "Maximiser"
+#: openbox/client_menu.c:75
+#, fuzzy
+msgid "Maximiz&e"
+msgstr "Maximis&er"
 
-#: openbox/client_menu.c:82
-msgid "Roll down"
-msgstr "Dérouler"
+#: openbox/client_menu.c:80
+#, fuzzy
+msgid "&Roll down"
+msgstr "Dé&rouler"
 
-#: openbox/client_menu.c:82
-msgid "Roll up"
-msgstr "Enrouler"
+#: openbox/client_menu.c:80
+#, fuzzy
+msgid "&Roll up"
+msgstr "En&rouler"
 
-#: openbox/client_menu.c:144
+#: openbox/client_menu.c:142
 msgid "All desktops"
 msgstr "Tous les bureaux"
 
-#: openbox/client_menu.c:168
-msgid "Layer"
-msgstr "Emplacement"
+#: openbox/client_menu.c:166
+#, fuzzy
+msgid "&Layer"
+msgstr "E&mplacement"
 
-#: openbox/client_menu.c:173
-msgid "Always on top"
-msgstr "Toujours au premier plan"
+#: openbox/client_menu.c:172
+#, fuzzy
+msgid "Always on &top"
+msgstr "Toujours au &premier plan"
 
-#: openbox/client_menu.c:178
-msgid "Normal"
-msgstr "Normal"
+#: openbox/client_menu.c:177
+#, fuzzy
+msgid "&Normal"
+msgstr "&Normal"
 
-#: openbox/client_menu.c:183
-msgid "Always on bottom"
-msgstr "Toujours en arrière plan"
+#: openbox/client_menu.c:182
+#, fuzzy
+msgid "Always on &bottom"
+msgstr "Toujours en &arrière plan"
 
-#: openbox/client_menu.c:186
-msgid "Send to desktop"
-msgstr "Envoyer vers le bureau"
+#: openbox/client_menu.c:185
+#, fuzzy
+msgid "&Send to desktop"
+msgstr "Envoyer vers le &bureau"
 
 #: openbox/client_menu.c:190
 msgid "Client menu"
 msgstr "Menu de la fenêtre"
 
-#: openbox/client_menu.c:199
-msgid "Iconify"
-msgstr "Iconifier"
+#: openbox/client_menu.c:200
+#, fuzzy
+msgid "Ico&nify"
+msgstr "Ico&nifier"
 
-#: openbox/client_menu.c:216
-msgid "Raise to top"
-msgstr "Mettre au premier plan"
+#: openbox/client_menu.c:217
+#, fuzzy
+msgid "Raise to &top"
+msgstr "Mettre au &premier plan"
 
-#: openbox/client_menu.c:220
-msgid "Lower to bottom"
-msgstr "Mettre en arrière plan"
+#: openbox/client_menu.c:221
+#, fuzzy
+msgid "Lower to &bottom"
+msgstr "Mettre en &arrière plan"
 
-#: openbox/client_menu.c:233
-msgid "Decorate"
-msgstr "Décorer"
+#: openbox/client_menu.c:234
+#, fuzzy
+msgid "&Decorate"
+msgstr "Dé&corer"
 
-#: openbox/client_menu.c:239
-msgid "Move"
-msgstr "Déplacer"
+#: openbox/client_menu.c:240
+#, fuzzy
+msgid "&Move"
+msgstr "&Déplacer"
 
-#: openbox/client_menu.c:243
-msgid "Resize"
-msgstr "Redimensionner"
+#: openbox/client_menu.c:244
+#, fuzzy
+msgid "Resi&ze"
+msgstr "Redimen&sionner"
 
-#: openbox/client_menu.c:249
-msgid "Close"
-msgstr "Fermer"
+#: openbox/client_menu.c:250
+#, fuzzy
+msgid "&Close"
+msgstr "&Fermer"
 
 #: openbox/openbox.c:106
 msgid "Couldn't set locale from environment."

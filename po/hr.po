@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 17:12-0400\n"
+"POT-Creation-Date: 2007-04-24 21:37-0400\n"
 "PO-Revision-Date: 2006-09-05 16:45+0100\n"
 "Last-Translator: Daniel Radetic <drade@boobah.info>\n"
 "Language-Team: None\n"
@@ -23,77 +23,93 @@ msgstr "Odi na..."
 msgid "Desktops"
 msgstr "Radne površine"
 
-#: openbox/client_menu.c:76
-msgid "Restore"
-msgstr "Ponovno uspostavi"
+#: openbox/client_menu.c:75
+#, fuzzy
+msgid "Restor&e"
+msgstr "Ponovno uspostav&i"
 
-#: openbox/client_menu.c:76
-msgid "Maximize"
-msgstr "Maksimiziraj"
+#: openbox/client_menu.c:75
+#, fuzzy
+msgid "Maximiz&e"
+msgstr "Maks&imiziraj"
 
-#: openbox/client_menu.c:82
-msgid "Roll down"
-msgstr "Spusti dolje"
+#: openbox/client_menu.c:80
+#, fuzzy
+msgid "&Roll down"
+msgstr "Sp&usti dolje"
 
-#: openbox/client_menu.c:82
-msgid "Roll up"
-msgstr "Povuci gore"
+#: openbox/client_menu.c:80
+#, fuzzy
+msgid "&Roll up"
+msgstr "Pov&uci gore"
 
-#: openbox/client_menu.c:144
+#: openbox/client_menu.c:142
 msgid "All desktops"
 msgstr "Sve radne površine"
 
-#: openbox/client_menu.c:168
-msgid "Layer"
-msgstr "Razina"
+#: openbox/client_menu.c:166
+#, fuzzy
+msgid "&Layer"
+msgstr "&Razina"
 
-#: openbox/client_menu.c:173
-msgid "Always on top"
-msgstr "Uvijek na vrhu"
+#: openbox/client_menu.c:172
+#, fuzzy
+msgid "Always on &top"
+msgstr "Uvijek na &vrhu"
 
-#: openbox/client_menu.c:178
-msgid "Normal"
-msgstr "Normalno"
+#: openbox/client_menu.c:177
+#, fuzzy
+msgid "&Normal"
+msgstr "&Normalno"
 
-#: openbox/client_menu.c:183
-msgid "Always on bottom"
-msgstr "Uvijek na dnu"
+#: openbox/client_menu.c:182
+#, fuzzy
+msgid "Always on &bottom"
+msgstr "Uvijek na &dnu"
 
-#: openbox/client_menu.c:186
-msgid "Send to desktop"
-msgstr "Pošalji na radnu površinu"
+#: openbox/client_menu.c:185
+#, fuzzy
+msgid "&Send to desktop"
+msgstr "&Pošalji na radnu površinu"
 
 #: openbox/client_menu.c:190
 msgid "Client menu"
 msgstr "Meni klijenta"
 
-#: openbox/client_menu.c:199
-msgid "Iconify"
-msgstr "Ikonificiraj"
+#: openbox/client_menu.c:200
+#, fuzzy
+msgid "Ico&nify"
+msgstr "Iko&nificiraj"
 
-#: openbox/client_menu.c:216
-msgid "Raise to top"
-msgstr "Podigni na vrh"
+#: openbox/client_menu.c:217
+#, fuzzy
+msgid "Raise to &top"
+msgstr "Podigni na &vrh"
 
-#: openbox/client_menu.c:220
-msgid "Lower to bottom"
-msgstr "Spusti na dno"
+#: openbox/client_menu.c:221
+#, fuzzy
+msgid "Lower to &bottom"
+msgstr "Spusti na &dno"
 
-#: openbox/client_menu.c:233
-msgid "Decorate"
-msgstr "Dekoriraj"
+#: openbox/client_menu.c:234
+#, fuzzy
+msgid "&Decorate"
+msgstr "De&koriraj"
 
-#: openbox/client_menu.c:239
-msgid "Move"
-msgstr "Pomakni"
+#: openbox/client_menu.c:240
+#, fuzzy
+msgid "&Move"
+msgstr "Po&makni"
 
-#: openbox/client_menu.c:243
-msgid "Resize"
-msgstr "Promjeni veličinu"
+#: openbox/client_menu.c:244
+#, fuzzy
+msgid "Resi&ze"
+msgstr "Prom&jeni veličinu"
 
-#: openbox/client_menu.c:249
-msgid "Close"
-msgstr "Zatvori"
+#: openbox/client_menu.c:250
+#, fuzzy
+msgid "&Close"
+msgstr "&Zatvori"
 
 #: openbox/openbox.c:106
 msgid "Couldn't set locale from environment."

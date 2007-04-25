@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 17:12-0400\n"
+"POT-Creation-Date: 2007-04-24 21:37-0400\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Øyvind Albrigtsen\n"
 "Language-Team: None\n"
@@ -23,77 +23,93 @@ msgstr "Gå dit"
 msgid "Desktops"
 msgstr "Skrivebord"
 
-#: openbox/client_menu.c:76
-msgid "Restore"
-msgstr "Tilbakestill"
+#: openbox/client_menu.c:75
+#, fuzzy
+msgid "Restor&e"
+msgstr "Tilbak&estill"
 
-#: openbox/client_menu.c:76
-msgid "Maximize"
-msgstr "Maximer"
+#: openbox/client_menu.c:75
+#, fuzzy
+msgid "Maximiz&e"
+msgstr "Maxim&er"
 
-#: openbox/client_menu.c:82
-msgid "Roll down"
-msgstr "Rull ned"
+#: openbox/client_menu.c:80
+#, fuzzy
+msgid "&Roll down"
+msgstr "&Rull ned"
 
-#: openbox/client_menu.c:82
-msgid "Roll up"
-msgstr "Rull opp"
+#: openbox/client_menu.c:80
+#, fuzzy
+msgid "&Roll up"
+msgstr "&Rull opp"
 
-#: openbox/client_menu.c:144
+#: openbox/client_menu.c:142
 msgid "All desktops"
 msgstr "Alle skrivebord"
 
-#: openbox/client_menu.c:168
-msgid "Layer"
-msgstr "Lag"
+#: openbox/client_menu.c:166
+#, fuzzy
+msgid "&Layer"
+msgstr "La&g"
 
-#: openbox/client_menu.c:173
-msgid "Always on top"
-msgstr "Alltid øverst"
+#: openbox/client_menu.c:172
+#, fuzzy
+msgid "Always on &top"
+msgstr "Alltid ø&verst"
 
-#: openbox/client_menu.c:178
-msgid "Normal"
-msgstr "Normal"
+#: openbox/client_menu.c:177
+#, fuzzy
+msgid "&Normal"
+msgstr "&Normal"
 
-#: openbox/client_menu.c:183
-msgid "Always on bottom"
-msgstr "Alltid nederst"
+#: openbox/client_menu.c:182
+#, fuzzy
+msgid "Always on &bottom"
+msgstr "Alltid &nederst"
 
-#: openbox/client_menu.c:186
-msgid "Send to desktop"
-msgstr "Send til"
+#: openbox/client_menu.c:185
+#, fuzzy
+msgid "&Send to desktop"
+msgstr "&Send til"
 
 #: openbox/client_menu.c:190
 msgid "Client menu"
 msgstr "Klient meny"
 
-#: openbox/client_menu.c:199
-msgid "Iconify"
-msgstr "Minimer"
+#: openbox/client_menu.c:200
+#, fuzzy
+msgid "Ico&nify"
+msgstr "&Minimer"
 
-#: openbox/client_menu.c:216
-msgid "Raise to top"
-msgstr "Legg øverst"
+#: openbox/client_menu.c:217
+#, fuzzy
+msgid "Raise to &top"
+msgstr "Legg ø&verst"
 
-#: openbox/client_menu.c:220
-msgid "Lower to bottom"
-msgstr "Legg nederst"
+#: openbox/client_menu.c:221
+#, fuzzy
+msgid "Lower to &bottom"
+msgstr "Legg &nederst"
 
-#: openbox/client_menu.c:233
-msgid "Decorate"
-msgstr "Dekorer"
+#: openbox/client_menu.c:234
+#, fuzzy
+msgid "&Decorate"
+msgstr "&Dekorer"
 
-#: openbox/client_menu.c:239
-msgid "Move"
-msgstr "Flytt"
+#: openbox/client_menu.c:240
+#, fuzzy
+msgid "&Move"
+msgstr "&Flytt"
 
-#: openbox/client_menu.c:243
-msgid "Resize"
-msgstr "Endre størrelse"
+#: openbox/client_menu.c:244
+#, fuzzy
+msgid "Resi&ze"
+msgstr "Endre s&tørrelse"
 
-#: openbox/client_menu.c:249
-msgid "Close"
-msgstr "Lukk"
+#: openbox/client_menu.c:250
+#, fuzzy
+msgid "&Close"
+msgstr "&Lukk"
 
 #: openbox/openbox.c:106
 msgid "Couldn't set locale from environment."

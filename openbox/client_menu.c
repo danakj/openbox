@@ -241,7 +241,7 @@ void client_menu_startup()
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Resize", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_RESIZE, _("&Resize"), acts);
+    menu_add_normal(menu, CLIENT_RESIZE, _("Resi&ze"), acts);
 
     menu_add_separator(menu, -1, NULL);
 

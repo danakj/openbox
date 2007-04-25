@@ -175,7 +175,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     XftColor c;
     gint mw;
     PangoRectangle rect;
-    gchar *text;
     PangoAttrList* attrs = NULL;
 
     /* center the text vertically
@@ -192,13 +191,11 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 
     /* * * set up the layout * * */
 
-    text = g_strdup(t->string);
-
     if (t->shortcut) {
         gchar *i;
         gchar *lowertext;
 
-        lowertext = g_utf8_strdown(text, -1);
+        lowertext = g_utf8_strdown(t->string, -1);
         i = g_utf8_strchr(lowertext, -1, t->shortcut);
         if (i != NULL) {
             PangoAttribute *a;
@@ -214,10 +211,8 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         g_free(lowertext);
     }
 
-    pango_layout_set_text(t->font->layout, text, -1);
+    pango_layout_set_text(t->font->layout, t->string, -1);
     pango_layout_set_width(t->font->layout, w * PANGO_SCALE);
-
-    g_free(text);
 
     /* * * end of setting up the layout * * */
 

@@ -32,11 +32,10 @@
 #include "keyboard.h"
 #include "translate.h"
 #include "moveresize.h"
+#include "popup.h"
 #include "gettext.h"
 
 #include <glib.h>
-
-KeyBindingTree *keyboard_firstnode;
 
 typedef struct {
     guint state;
@@ -45,35 +44,29 @@ typedef struct {
     ObFrameContext context;
 } ObInteractiveState;
 
+KeyBindingTree *keyboard_firstnode = NULL;
+static ObPopup *popup = NULL;
 static GSList *interactive_states;
-
 static KeyBindingTree *curpos;
 
-static void grab_for_window(Window win, gboolean grab)
+static void grab_keys(gboolean grab)
 {
     KeyBindingTree *p;
 
-    ungrab_all_keys(win);
+    ungrab_all_keys(RootWindow(ob_display, ob_screen));
 
     if (grab) {
         p = curpos ? curpos->first_child : keyboard_firstnode;
         while (p) {
-            grab_key(p->key, p->state, win, GrabModeAsync);
+            grab_key(p->key, p->state, RootWindow(ob_display, ob_screen),
+                     GrabModeAsync);
             p = p->next_sibling;
         }
         if (curpos)
             grab_key(config_keyboard_reset_keycode,
                      config_keyboard_reset_state,
-                     win, GrabModeAsync);
+                     RootWindow(ob_display, ob_screen), GrabModeAsync);
     }
-}
-
-static void grab_keys(gboolean grab)
-{
-    GList *it;
-
-    grab_for_window(screen_support_win, grab);
-    grab_for_window(RootWindow(ob_display, ob_screen), grab);
 }
 
 static gboolean chain_timeout(gpointer data)
@@ -83,23 +76,38 @@ static gboolean chain_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
+static void set_curpos(KeyBindingTree *newpos)
+{
+    grab_keys(FALSE);
+    curpos = newpos;
+    grab_keys(TRUE);
+
+    if (curpos != NULL) {
+        gchar *text = NULL;
+        GList *it;
+
+        for (it = curpos->keylist; it; it = g_list_next(it))
+            text = g_strconcat((text ? text : ""), it->data, "-", NULL);
+
+        popup_position(popup, NorthWestGravity, 10, 10);
+        popup_show(popup, text);
+        g_free(text);
+    } else
+        popup_hide(popup);
+}
+
 void keyboard_reset_chains()
 {
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 
-    if (curpos) {
-        grab_keys(FALSE);
-        curpos = NULL;
-        grab_keys(TRUE);
-    }
+    if (curpos)
+        set_curpos(NULL);
 }
 
 void keyboard_unbind_all()
 {
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;
-    grab_keys(FALSE);
-    curpos = NULL;
 }
 
 gboolean keyboard_bind(GList *keylist, ObAction *action)
@@ -269,9 +277,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 ob_main_loop_timeout_add(ob_main_loop, 5 * G_USEC_PER_SEC,
                                          chain_timeout, NULL,
                                          g_direct_equal, NULL);
-                grab_keys(FALSE);
-                curpos = p;
-                grab_keys(TRUE);
+                set_curpos(p);
             } else {
 
                 keyboard_reset_chains();
@@ -294,6 +300,7 @@ gboolean keyboard_interactively_grabbed()
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
+    popup = popup_new(FALSE);
 
     if (!reconfig)
         client_add_destructor(keyboard_interactive_end_client, NULL);
@@ -314,5 +321,9 @@ void keyboard_shutdown(gboolean reconfig)
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 
     keyboard_unbind_all();
+    set_curpos(NULL);
+
+    popup_free(popup);
+    popup = NULL;
 }
 

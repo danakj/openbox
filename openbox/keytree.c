@@ -52,16 +52,14 @@ KeyBindingTree *tree_build(GList *keylist)
         return NULL; /* nothing in the list.. */
 
     for (it = g_list_last(keylist); it; it = g_list_previous(it)) {
+        GList *kit;
+
         p = ret;
         ret = g_new0(KeyBindingTree, 1);
-        if (p == NULL) {
-            GList *it;
 
-            /* this is the first built node, the bottom node of the tree */
-            ret->keylist = g_list_copy(keylist); /* shallow copy */
-            for (it = ret->keylist; it; it = g_list_next(it)) /* deep copy */
-                it->data = g_strdup(it->data);
-        }
+        for (kit = it; kit != NULL; kit = g_list_previous(kit))
+            ret->keylist = g_list_prepend(ret->keylist,
+                                          g_strdup(kit->data)); /* deep copy */
         ret->first_child = p;
         if (!translate_key(it->data, &ret->state, &ret->key)) {
             tree_destroy(ret);

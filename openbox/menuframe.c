@@ -318,8 +318,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                    self->a_text_selected :
                    self->a_text_normal));
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
-        if (self->frame->menu->show_all_shortcuts ||
-            self->entry->data.normal.shortcut > 0)
+        if (self->entry->data.normal.shortcut &&
+            (self->frame->menu->show_all_shortcuts ||
+             self->entry->data.normal.shortcut_position > 0))
         {
             text_a->texture[0].data.text.shortcut = TRUE;
             text_a->texture[0].data.text.shortcut_pos =
@@ -333,7 +334,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   self->a_text_normal);
         sub = self->entry->data.submenu.submenu;
         text_a->texture[0].data.text.string = sub ? sub->title : "";
-        if (self->frame->menu->show_all_shortcuts || sub->shortcut > 0) {
+        if (sub->shortcut && (self->frame->menu->show_all_shortcuts ||
+                              sub->shortcut_position > 0))
+        {
             text_a->texture[0].data.text.shortcut = TRUE;
             text_a->texture[0].data.text.shortcut_pos = sub->shortcut_position;
         } else

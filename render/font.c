@@ -221,6 +221,13 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 
     t->font->shortcut_underline->start_index = 0;
     t->font->shortcut_underline->end_index = 0;
+    /* the attributes are owned by the layout.
+       re-add the attributes to the layout after changing the
+       start and end index */
+    attrlist = pango_layout_get_attributes(t->font->layout);
+    pango_attr_list_ref(attrlist);
+    pango_layout_set_attributes(t->font->layout, attrlist);
+    pango_attr_list_unref(attrlist);
 
     if (t->shadow_offset_x || t->shadow_offset_y) {
         c.color.red = t->shadow_color->r | t->shadow_color->r << 8;
@@ -228,14 +235,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         c.color.blue = t->shadow_color->b | t->shadow_color->b << 8;
         c.color.alpha = 0xffff * t->shadow_alpha / 255;
         c.pixel = t->shadow_color->pixel;
-
-        /* the attributes are owned by the layout.
-           re-add the attributes to the layout after changing the
-           start and end index */
-        attrlist = pango_layout_get_attributes(t->font->layout);
-        pango_attr_list_ref(attrlist);
-        pango_layout_set_attributes(t->font->layout, attrlist);
-        pango_attr_list_unref(attrlist);
 
         /* see below... */
         pango_xft_render_layout_line

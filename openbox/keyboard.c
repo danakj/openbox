@@ -69,9 +69,10 @@ static void grab_keys(gboolean grab)
     }
 }
 
-static gboolean chain_timeout(gpointer data)
+static gboolean popup_show_timeout(gpointer data)
 {
-    keyboard_reset_chains();
+    gchar *text = data;
+    popup_show(popup, text);
 
     return FALSE; /* don't repeat */
 }
@@ -90,16 +91,23 @@ static void set_curpos(KeyBindingTree *newpos)
             text = g_strconcat((text ? text : ""), it->data, "-", NULL);
 
         popup_position(popup, NorthWestGravity, 10, 10);
-        popup_show(popup, text);
-        g_free(text);
-    } else
+        if (popup->mapped) {
+            popup_show_timeout(text);
+            g_free(text);
+        } else {
+            ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+            ob_main_loop_timeout_add(ob_main_loop, 1 * G_USEC_PER_SEC,
+                                     popup_show_timeout, text,
+                                     g_direct_equal, g_free);
+        }
+    } else {
         popup_hide(popup);
+        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+    }
 }
 
 void keyboard_reset_chains()
 {
-    ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
-
     if (curpos)
         set_curpos(NULL);
 }
@@ -272,11 +280,6 @@ void keyboard_event(ObClient *client, const XEvent *e)
             p->state == e->xkey.state)
         {
             if (p->first_child != NULL) { /* part of a chain */
-                ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
-                /* 5 second timeout for chains */
-                ob_main_loop_timeout_add(ob_main_loop, 5 * G_USEC_PER_SEC,
-                                         chain_timeout, NULL,
-                                         g_direct_equal, NULL);
                 set_curpos(p);
             } else {
 
@@ -318,7 +321,7 @@ void keyboard_shutdown(gboolean reconfig)
     g_slist_free(interactive_states);
     interactive_states = NULL;
 
-    ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+    ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
 
     keyboard_unbind_all();
     set_curpos(NULL);

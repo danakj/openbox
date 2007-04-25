@@ -34,7 +34,6 @@ gint grab_server(gboolean grab);
 gboolean grab_on_keyboard();
 gboolean grab_on_pointer();
 
-void grab_button(guint button, guint state, Window win, guint mask);
 void grab_button_full(guint button, guint state, Window win, guint mask,
                       gint pointer_mode, ObCursor cursor);
 void ungrab_button(guint button, guint state, Window win);

@@ -159,8 +159,11 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
     g_assert(action->data.any.interactive);
 
     if (!interactive_states) {
-        if (!grab_keyboard(TRUE))
+        grab_pointer(TRUE, FALSE, OB_CURSOR_POINTER);
+        if (!grab_keyboard(TRUE)) {
+            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
             return FALSE;
+        }
     }
 
     s = g_new(ObInteractiveState, 1);
@@ -186,6 +189,7 @@ void keyboard_interactive_end(ObInteractiveState *s,
 
     if (!interactive_states) {
         grab_keyboard(FALSE);
+        grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
         keyboard_reset_chains();
     }
 }
@@ -224,7 +228,9 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
                 done = TRUE;
             else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
                 cancel = done = TRUE;
-        }
+        } else if (e->type == ButtonPress)
+            cancel = done = TRUE;
+
         if (done) {
             keyboard_interactive_end(s, e->xkey.state, cancel, e->xkey.time);
 

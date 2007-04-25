@@ -167,7 +167,7 @@ ObFrame *frame_new(ObClient *client)
 static void set_theme_statics(ObFrame *self)
 {
     /* set colors/appearance/sizes for stuff that doesn't change */
-    XSetWindowBorder(ob_display, self->window,
+    XSetWindowBorder(ob_display, self->inner,
                      RrColorPixel(ob_rr_theme->frame_b_color));
     XSetWindowBorder(ob_display, self->title,
                      RrColorPixel(ob_rr_theme->frame_b_color));
@@ -346,6 +346,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* set border widths */
         if (!fake) {
             XSetWindowBorderWidth(ob_display, self->window, self->bwidth);
+            XSetWindowBorderWidth(ob_display, self->inner, self->bwidth);
             XSetWindowBorderWidth(ob_display, self->title,  self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->handle, self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->lgrip,  self->rbwidth);
@@ -430,8 +431,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             /* move and resize the inner border window which contains the plate
              */
             XMoveResizeWindow(ob_display, self->inner,
-                              self->innersize.left - self->cbwidth_x,
-                              self->innersize.top - self->cbwidth_y,
+                              self->innersize.left - self->cbwidth_x -
+                              self->bwidth,
+                              self->innersize.top - self->cbwidth_y -
+                              self->bwidth,
                               self->client->area.width +
                               self->cbwidth_x * 2,
                               self->client->area.height +

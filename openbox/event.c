@@ -1331,7 +1331,8 @@ static void event_handle_menu_shortcut(XEvent *ev)
         ObMenuEntryFrame *e = it->data;
         gunichar entrykey = 0;
 
-        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
+        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+            e->entry->data.normal.enabled)
             entrykey = e->entry->data.normal.shortcut;
         else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
             entrykey = e->entry->data.submenu.submenu->shortcut;

@@ -126,7 +126,8 @@ struct _RrTextureText {
     gint shadow_offset_y;
     RrColor *shadow_color;
     gchar shadow_alpha;
-    gunichar shortcut; /*!< Underline this character */
+    gboolean shortcut; /*!< Underline a character */
+    guint shortcut_pos; /*!< Position in bytes of the character to underline */
 };
 
 struct _RrPixmapMask {

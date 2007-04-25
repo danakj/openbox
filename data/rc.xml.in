@@ -94,7 +94,7 @@
   <floatingX>0</floatingX>
   <floatingY>0</floatingY>
   <noStrut>no</noStrut>
-  <stacking>Top</stacking>
+  <stacking>Above</stacking>
   <direction>Vertical</direction>
   <!-- 'Vertical' or 'Horizontal' -->
   <autoHide>no</autoHide>

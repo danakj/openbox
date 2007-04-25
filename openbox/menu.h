@@ -48,6 +48,15 @@ struct _ObMenu
     gchar *name;
     /* Displayed title */
     gchar *title;
+    /*! The shortcut key that would be used to activate this menu if it was
+      displayed as a submenu */
+    gunichar shortcut;
+    /*! The shortcut's position in the string */
+    guint shortcut_position;
+
+    /*! If the shortcut key should be shown in menu entries even when it
+      is the first character in the string */
+    gboolean show_all_shortcuts;
 
     /* Command to execute to rebuild the menu */
     gchar *execute;
@@ -75,6 +84,10 @@ typedef enum
 
 struct _ObNormalMenuEntry {
     gchar *label;
+    /*! The shortcut key that would be used to activate this menu entry */
+    gunichar shortcut;
+    /*! The shortcut's position in the string */
+    guint shortcut_position;
 
     /* state */
     gboolean enabled;
@@ -126,6 +139,8 @@ void menu_free(ObMenu *menu);
 /* Repopulate a pipe-menu by running its command */
 void menu_pipe_execute(ObMenu *self);
 
+void menu_show_all_shortcuts(ObMenu *self, gboolean show);
+
 void menu_show(gchar *name, gint x, gint y, struct _ObClient *client);
 
 void menu_set_update_func(ObMenu *menu, ObMenuUpdateFunc func);
@@ -140,6 +155,8 @@ ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label);
 
 void menu_clear_entries(ObMenu *menu);
 void menu_entry_remove(ObMenuEntry *self);
+
+void menu_entry_set_label(ObMenuEntry *self, const gchar *label);
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 21:37-0400\n"
+"POT-Creation-Date: 2007-04-24 22:57-0400\n"
 "PO-Revision-Date: 2003-11-20 15:00+0900\n"
 "Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:99
+#: openbox/client_list_menu.c:100
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_menu.c:190
+#: openbox/client_list_menu.c:191
 msgid "Desktops"
 msgstr "デスクトップ"
 
@@ -72,41 +72,41 @@ msgstr "常に最下位にする(&B)"
 msgid "&Send to desktop"
 msgstr "デスクトップに送る(&S)"
 
-#: openbox/client_menu.c:190
+#: openbox/client_menu.c:189
 msgid "Client menu"
 msgstr "クライアントメニュー"
 
-#: openbox/client_menu.c:200
+#: openbox/client_menu.c:199
 #, fuzzy
 msgid "Ico&nify"
 msgstr "アイコン化(&N)"
 
-#: openbox/client_menu.c:217
+#: openbox/client_menu.c:216
 #, fuzzy
 msgid "Raise to &top"
 msgstr "最上位に上げる(&T)"
 
-#: openbox/client_menu.c:221
+#: openbox/client_menu.c:220
 #, fuzzy
 msgid "Lower to &bottom"
 msgstr "最下位に下げる(&B)"
 
-#: openbox/client_menu.c:234
+#: openbox/client_menu.c:233
 #, fuzzy
 msgid "&Decorate"
 msgstr "装飾(&D)"
 
-#: openbox/client_menu.c:240
+#: openbox/client_menu.c:239
 #, fuzzy
 msgid "&Move"
 msgstr "移動(&M)"
 
-#: openbox/client_menu.c:244
+#: openbox/client_menu.c:243
 #, fuzzy
 msgid "Resi&ze"
 msgstr "リサイズ(&Z)"
 
-#: openbox/client_menu.c:250
+#: openbox/client_menu.c:249
 #, fuzzy
 msgid "&Close"
 msgstr "閉じる(&C)"

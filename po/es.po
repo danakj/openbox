@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 21:37-0400\n"
+"POT-Creation-Date: 2007-04-24 22:57-0400\n"
 "PO-Revision-Date: 2005-03-25 09:31+0100\n"
 "Last-Translator: Miguel Calleja Gómez <mcg79@lycos.es>\n"
 "Language-Team: None\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:99
+#: openbox/client_list_menu.c:100
 msgid "Go there..."
 msgstr "Ir ahí..."
 
-#: openbox/client_list_menu.c:190
+#: openbox/client_list_menu.c:191
 msgid "Desktops"
 msgstr "Escritorios"
 
@@ -72,41 +72,41 @@ msgstr "Siempre &debajo"
 msgid "&Send to desktop"
 msgstr "&Enviar a escritorio"
 
-#: openbox/client_menu.c:190
+#: openbox/client_menu.c:189
 msgid "Client menu"
 msgstr "Menú del cliente"
 
-#: openbox/client_menu.c:200
+#: openbox/client_menu.c:199
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Mi&nimizar"
 
-#: openbox/client_menu.c:217
+#: openbox/client_menu.c:216
 #, fuzzy
 msgid "Raise to &top"
 msgstr "Poner en p&rimer plano"
 
-#: openbox/client_menu.c:221
+#: openbox/client_menu.c:220
 #, fuzzy
 msgid "Lower to &bottom"
 msgstr "Poner en ú&ltimo plano"
 
-#: openbox/client_menu.c:234
+#: openbox/client_menu.c:233
 #, fuzzy
 msgid "&Decorate"
 msgstr "&Decorar"
 
-#: openbox/client_menu.c:240
+#: openbox/client_menu.c:239
 #, fuzzy
 msgid "&Move"
 msgstr "&Mover"
 
-#: openbox/client_menu.c:244
+#: openbox/client_menu.c:243
 #, fuzzy
 msgid "Resi&ze"
 msgstr "Redimen&sionar"
 
-#: openbox/client_menu.c:250
+#: openbox/client_menu.c:249
 #, fuzzy
 msgid "&Close"
 msgstr "&Cerrar"

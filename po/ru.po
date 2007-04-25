@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 21:37-0400\n"
+"POT-Creation-Date: 2007-04-24 22:57-0400\n"
 "PO-Revision-Date: 2004-04-23 13:00+0300\n"
 "Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:99
+#: openbox/client_list_menu.c:100
 msgid "Go there..."
 msgstr "Перейти..."
 
-#: openbox/client_list_menu.c:190
+#: openbox/client_list_menu.c:191
 msgid "Desktops"
 msgstr "Рабочие места"
 
@@ -72,41 +72,41 @@ msgstr "Всегда на заднем плане(&B)"
 msgid "&Send to desktop"
 msgstr "Переместить на рабочее место(&S)"
 
-#: openbox/client_menu.c:190
+#: openbox/client_menu.c:189
 msgid "Client menu"
 msgstr "Меню клиента"
 
-#: openbox/client_menu.c:200
+#: openbox/client_menu.c:199
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Свернуть(&N)"
 
-#: openbox/client_menu.c:217
+#: openbox/client_menu.c:216
 #, fuzzy
 msgid "Raise to &top"
 msgstr "Поднять на передний план(&T)"
 
-#: openbox/client_menu.c:221
+#: openbox/client_menu.c:220
 #, fuzzy
 msgid "Lower to &bottom"
 msgstr "Опустить на задний план(&B)"
 
-#: openbox/client_menu.c:234
+#: openbox/client_menu.c:233
 #, fuzzy
 msgid "&Decorate"
 msgstr "Убрать оформление(&D)"
 
-#: openbox/client_menu.c:240
+#: openbox/client_menu.c:239
 #, fuzzy
 msgid "&Move"
 msgstr "Переместить(&M)"
 
-#: openbox/client_menu.c:244
+#: openbox/client_menu.c:243
 #, fuzzy
 msgid "Resi&ze"
 msgstr "Изменить размер(&Z)"
 
-#: openbox/client_menu.c:250
+#: openbox/client_menu.c:249
 #, fuzzy
 msgid "&Close"
 msgstr "Закрыть(&C)"

@@ -598,11 +598,11 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_dock_nostrut = parse_bool(doc, n);
     }
     if ((n = parse_find_node("stacking", node))) {
-        if (parse_contains("top", doc, n))
+        if (parse_contains("above", doc, n))
             config_dock_layer = OB_STACKING_LAYER_ABOVE;
         else if (parse_contains("normal", doc, n))
             config_dock_layer = OB_STACKING_LAYER_NORMAL;
-        else if (parse_contains("bottom", doc, n))
+        else if (parse_contains("below", doc, n))
             config_dock_layer = OB_STACKING_LAYER_BELOW;
     }
     if ((n = parse_find_node("direction", node))) {

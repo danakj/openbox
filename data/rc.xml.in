@@ -206,12 +206,6 @@
     <mousebind button="C-A-Down" action="Click">
       <action name="SendToDesktopNext"/>
     </mousebind>
-    <mousebind button="Left" action="Click">
-      <action name="Raise"/>
-    </mousebind>
-    <mousebind button="Left" action="Press">
-      <action name="Focus"/>
-    </mousebind>
   </context>
   <context name="Titlebar">
     <mousebind button="Left" action="Drag">

@@ -58,12 +58,21 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     RrFont *out;
     PangoWeight pweight;
     PangoStyle pstyle;
+    PangoAttrList *attrlist;
 
     out = g_new(RrFont, 1);
     out->inst = inst;
     out->ref = 1;
     out->font_desc = pango_font_description_new();
     out->layout = pango_layout_new(inst->pango);
+    out->shortcut_underline = pango_attr_underline_new(PANGO_UNDERLINE_LOW);
+
+    attrlist = pango_attr_list_new();
+    /* shortcut_underline is owned by the attrlist */
+    pango_attr_list_insert(attrlist, out->shortcut_underline);
+    /* the attributes are owned by the layout */
+    pango_layout_set_attributes(out->layout, attrlist);
+    pango_attr_list_unref(attrlist);
 
     switch (weight) {
     case RR_FONTWEIGHT_LIGHT:     pweight = PANGO_WEIGHT_LIGHT;     break;
@@ -175,7 +184,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     XftColor c;
     gint mw;
     PangoRectangle rect;
-    PangoAttrList* attrs = NULL;
+    PangoAttrList *attrlist;
 
     /* center the text vertically
        We do this centering based on the 'baseline' since different fonts have
@@ -188,28 +197,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     x = area->x + 2;
     w = area->width - 4;
     h = area->height;
-
-    /* * * set up the layout * * */
-
-    if (t->shortcut) {
-        gchar *i;
-        gchar *lowertext;
-
-        lowertext = g_utf8_strdown(t->string, -1);
-        i = g_utf8_strchr(lowertext, -1, t->shortcut);
-        if (i != NULL) {
-            PangoAttribute *a;
-
-            a = pango_attr_underline_new(PANGO_UNDERLINE_LOW);
-            a->start_index = i - lowertext;
-            a->end_index = i - lowertext +
-                g_unichar_to_utf8(t->shortcut, NULL);
-
-            attrs = pango_attr_list_new();
-            pango_attr_list_insert(attrs, a);
-        }
-        g_free(lowertext);
-    }
 
     pango_layout_set_text(t->font->layout, t->string, -1);
     pango_layout_set_width(t->font->layout, w * PANGO_SCALE);
@@ -232,6 +219,9 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         break;
     }
 
+    t->font->shortcut_underline->start_index = 0;
+    t->font->shortcut_underline->end_index = 0;
+
     if (t->shadow_offset_x || t->shadow_offset_y) {
         c.color.red = t->shadow_color->r | t->shadow_color->r << 8;
         c.color.green = t->shadow_color->g | t->shadow_color->g << 8;
@@ -239,7 +229,13 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         c.color.alpha = 0xffff * t->shadow_alpha / 255;
         c.pixel = t->shadow_color->pixel;
 
-        pango_layout_set_attributes(t->font->layout, NULL);
+        /* the attributes are owned by the layout.
+           re-add the attributes to the layout after changing the
+           start and end index */
+        attrlist = pango_layout_get_attributes(t->font->layout);
+        pango_attr_list_ref(attrlist);
+        pango_layout_set_attributes(t->font->layout, attrlist);
+        pango_attr_list_unref(attrlist);
 
         /* see below... */
         pango_xft_render_layout_line
@@ -254,8 +250,23 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     c.color.alpha = 0xff | 0xff << 8; /* fully opaque text */
     c.pixel = t->color->pixel;
 
-    pango_layout_set_attributes(t->font->layout, attrs);
-    if (attrs != NULL) pango_attr_list_unref(attrs);
+    if (t->shortcut) {
+        const gchar *c = t->string + t->shortcut_pos;
+
+        if (g_utf8_validate(c, -1, NULL)) {
+            t->font->shortcut_underline->start_index = t->shortcut_pos;
+            t->font->shortcut_underline->end_index = t->shortcut_pos +
+                (g_utf8_next_char(c) - c);
+
+            /* the attributes are owned by the layout.
+               re-add the attributes to the layout after changing the
+               start and end index */
+            attrlist = pango_layout_get_attributes(t->font->layout);
+            pango_attr_list_ref(attrlist);
+            pango_layout_set_attributes(t->font->layout, attrlist);
+            pango_attr_list_unref(attrlist);
+        }
+    }
 
     /* layout_line() uses y to specify the baseline
        The line doesn't need to be freed, it's a part of the layout */

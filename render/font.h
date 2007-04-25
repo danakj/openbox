@@ -28,6 +28,7 @@ struct _RrFont {
     gint ref;
     PangoFontDescription *font_desc; 
     PangoLayout *layout; /*!< Used for measuring and rendering strings */
+    PangoAttribute *shortcut_underline; /*< For underlining the shortcut key */
     gint ascent; /*!< The font's ascent in pango-units */
     gint descent; /*!< The font's descent in pango-units */
 };

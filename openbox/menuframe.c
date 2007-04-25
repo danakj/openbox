@@ -319,12 +319,13 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                    self->a_text_normal));
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
         if (self->frame->menu->show_all_shortcuts ||
-            self->entry->data.normal.shortcut_position > 0)
+            self->entry->data.normal.shortcut > 0)
         {
-            text_a->texture[0].data.text.shortcut =
-                self->entry->data.normal.shortcut;
+            text_a->texture[0].data.text.shortcut = TRUE;
+            text_a->texture[0].data.text.shortcut_pos =
+                self->entry->data.normal.shortcut_position;
         } else
-            text_a->texture[0].data.text.shortcut = 0;
+            text_a->texture[0].data.text.shortcut = FALSE;
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         text_a = (self == self->frame->selected ?
@@ -332,11 +333,11 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   self->a_text_normal);
         sub = self->entry->data.submenu.submenu;
         text_a->texture[0].data.text.string = sub ? sub->title : "";
-        if (self->frame->menu->show_all_shortcuts ||
-            sub->shortcut_position > 0) {
-            text_a->texture[0].data.text.shortcut = sub->shortcut;
+        if (self->frame->menu->show_all_shortcuts || sub->shortcut > 0) {
+            text_a->texture[0].data.text.shortcut = TRUE;
+            text_a->texture[0].data.text.shortcut_pos = sub->shortcut_position;
         } else
-            text_a->texture[0].data.text.shortcut = 0;
+            text_a->texture[0].data.text.shortcut = FALSE;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label != NULL)

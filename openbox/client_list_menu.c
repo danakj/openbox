@@ -75,7 +75,8 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             act->data.desktop.desk = d->desktop;
             acts = g_slist_append(acts, act);
             e = menu_add_normal(menu, i,
-                                (c->iconic ? c->icon_title : c->title), acts);
+                                (c->iconic ? c->icon_title : c->title),
+                                acts, FALSE);
 
             if (config_menu_client_list_icons
                 && (icon = client_icon(c, 32, 32))) {
@@ -96,7 +97,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
         act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
         act->data.desktop.desk = d->desktop;
         acts = g_slist_append(acts, act);
-        e = menu_add_normal(menu, 0, _("Go there..."), acts);
+        e = menu_add_normal(menu, 0, _("Go there..."), acts, TRUE);
         if (d->desktop == screen_desktop)
             e->data.normal.enabled = FALSE;
     }
@@ -138,7 +139,7 @@ static void self_update(ObMenuFrame *frame, gpointer data)
             DesktopData *data = g_new(DesktopData, 1);
 
             data->desktop = i;
-            submenu = menu_new(name, screen_desktop_names[i], data);
+            submenu = menu_new(name, screen_desktop_names[i], FALSE, data);
             menu_set_update_func(submenu, desk_menu_update);
             menu_set_execute_func(submenu, desk_menu_execute);
             menu_set_destroy_func(submenu, desk_menu_destroy);
@@ -187,7 +188,7 @@ void client_list_menu_startup(gboolean reconfig)
     if (!reconfig)
         client_add_destructor(client_dest, NULL);
 
-    menu = menu_new(MENU_NAME, _("Desktops"), NULL);
+    menu = menu_new(MENU_NAME, _("Desktops"), TRUE, NULL);
     menu_set_update_func(menu, self_update);
 }
 

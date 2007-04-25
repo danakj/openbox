@@ -70,10 +70,10 @@ static void self_update(ObMenuFrame *frame, gpointer data)
 
                 if (c->iconic) {
                     gchar *title = g_strdup_printf("(%s)", c->icon_title);
-                    e = menu_add_normal(menu, i, title, acts);
+                    e = menu_add_normal(menu, i, title, acts, FALSE);
                     g_free(title);
                 } else
-                    e = menu_add_normal(menu, i, c->title, acts);
+                    e = menu_add_normal(menu, i, c->title, acts, FALSE);
 
                 if (config_menu_client_list_icons
                         && (icon = client_icon(c, 32, 32))) {
@@ -94,7 +94,7 @@ static void self_update(ObMenuFrame *frame, gpointer data)
             act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
             act->data.desktop.desk = desktop;
             acts = g_slist_append(acts, act);
-            e = menu_add_normal(menu, 0, _("Go there..."), acts);
+            e = menu_add_normal(menu, 0, _("Go there..."), acts, TRUE);
             if (desktop == screen_desktop)
                 e->data.normal.enabled = FALSE;
         }
@@ -138,7 +138,7 @@ void client_list_combined_menu_startup(gboolean reconfig)
     if (!reconfig)
         client_add_destructor(client_dest, NULL);
 
-    combined_menu = menu_new(MENU_NAME, _("Windows"), NULL);
+    combined_menu = menu_new(MENU_NAME, _("Windows"), TRUE, NULL);
     menu_set_update_func(combined_menu, self_update);
     menu_set_execute_func(combined_menu, menu_execute);
 }

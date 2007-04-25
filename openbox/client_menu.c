@@ -70,16 +70,14 @@ static void client_update(ObMenuFrame *frame, gpointer data)
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
 
     e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
-    g_free(e->data.normal.label);
-    e->data.normal.label =
-        g_strdup(frame->client->max_vert || frame->client->max_horz ?
-                 _("Restore") : _("Maximize"));
+    menu_entry_set_label(e,
+                         (frame->client->max_vert || frame->client->max_horz ?
+                          _("Restor&e") : _("Maximiz&e")), TRUE);
     e->data.normal.enabled =frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE;
 
     e = menu_find_entry_id(menu, CLIENT_SHADE);
-    g_free(e->data.normal.label);
-    e->data.normal.label = g_strdup(frame->client->shaded ?
-                                    _("Roll down") : _("Roll up"));
+    menu_entry_set_label(e, (frame->client->shaded ?
+                             _("&Roll down") : _("&Roll up")), TRUE);
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
 
     e = menu_find_entry_id(menu, CLIENT_MOVE);
@@ -152,7 +150,7 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         act->data.sendto.desk = desk;
         act->data.sendto.follow = FALSE;
         acts = g_slist_prepend(NULL, act);
-        e = menu_add_normal(menu, desk, name, acts);
+        e = menu_add_normal(menu, desk, name, acts, FALSE);
 
         if (frame->client->desktop == desk)
             e->data.normal.enabled = FALSE;
@@ -165,29 +163,31 @@ void client_menu_startup()
     ObMenu *menu;
     ObMenuEntry *e;
 
-    menu = menu_new(LAYER_MENU_NAME, _("Layer"), NULL);
+    menu = menu_new(LAYER_MENU_NAME, _("&Layer"), TRUE, NULL);
+    menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, layer_update);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("SendToTopLayer", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, LAYER_TOP, _("Always on top"), acts);
+    menu_add_normal(menu, LAYER_TOP, _("Always on &top"), acts, TRUE);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("SendToNormalLayer",
                             OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, LAYER_NORMAL, _("Normal"), acts);
+    menu_add_normal(menu, LAYER_NORMAL, _("&Normal"), acts, TRUE);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("SendToBottomLayer",
                             OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, LAYER_BOTTOM, _("Always on bottom"),acts);
+    menu_add_normal(menu, LAYER_BOTTOM, _("Always on &bottom"),acts, TRUE);
 
 
-    menu = menu_new(SEND_TO_MENU_NAME, _("Send to desktop"), NULL);
+    menu = menu_new(SEND_TO_MENU_NAME, _("&Send to desktop"), TRUE, NULL);
     menu_set_update_func(menu, send_to_update);
 
 
-    menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), NULL);
+    menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), TRUE, NULL);
+    menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, client_update);
 
     menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
@@ -196,7 +196,7 @@ void client_menu_startup()
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Iconify", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Iconify"), acts);
+    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico&nify"), acts, TRUE);
     e->data.normal.mask = ob_rr_theme->iconify_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -205,7 +205,7 @@ void client_menu_startup()
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleMaximizeFull",
                             OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_MAXIMIZE, "MAXIMIZE", acts);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, "MAXIMIZE", acts, TRUE);
     e->data.normal.mask = ob_rr_theme->max_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -213,15 +213,15 @@ void client_menu_startup()
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Raise", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_RAISE, _("Raise to top"), acts);
+    menu_add_normal(menu, CLIENT_RAISE, _("Raise to &top"), acts, TRUE);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Lower", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_LOWER, _("Lower to bottom"),acts);
+    menu_add_normal(menu, CLIENT_LOWER, _("Lower to &bottom"),acts, TRUE);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleShade", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_SHADE, "SHADE", acts);
+    e = menu_add_normal(menu, CLIENT_SHADE, "SHADE", acts, TRUE);
     e->data.normal.mask = ob_rr_theme->shade_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -230,23 +230,23 @@ void client_menu_startup()
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleDecorations",
                             OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_DECORATE, _("Decorate"), acts);
+    menu_add_normal(menu, CLIENT_DECORATE, _("&Decorate"), acts, TRUE);
 
     menu_add_separator(menu, -1, NULL);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Move", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_MOVE, _("Move"), acts);
+    menu_add_normal(menu, CLIENT_MOVE, _("&Move"), acts, TRUE);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Resize", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_RESIZE, _("Resize"), acts);
+    menu_add_normal(menu, CLIENT_RESIZE, _("Resi&ze"), acts, TRUE);
 
     menu_add_separator(menu, -1, NULL);
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("Close", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_CLOSE, _("Close"), acts);
+    e = menu_add_normal(menu, CLIENT_CLOSE, _("&Close"), acts, TRUE);
     e->data.normal.mask = ob_rr_theme->close_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;

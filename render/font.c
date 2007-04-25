@@ -175,6 +175,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     XftColor c;
     gint mw;
     PangoRectangle rect;
+    PangoAttrList* attrs = NULL;
 
     /* center the text vertically
        We do this centering based on the 'baseline' since different fonts have
@@ -188,8 +189,32 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     w = area->width - 4;
     h = area->height;
 
+    /* * * set up the layout * * */
+
+    if (t->shortcut) {
+        gchar *i;
+        gchar *lowertext;
+
+        lowertext = g_utf8_strdown(t->string, -1);
+        i = g_utf8_strchr(lowertext, -1, t->shortcut);
+        if (i != NULL) {
+            PangoAttribute *a;
+
+            a = pango_attr_underline_new(PANGO_UNDERLINE_LOW);
+            a->start_index = i - lowertext;
+            a->end_index = i - lowertext +
+                g_unichar_to_utf8(t->shortcut, NULL);
+
+            attrs = pango_attr_list_new();
+            pango_attr_list_insert(attrs, a);
+        }
+        g_free(lowertext);
+    }
+
     pango_layout_set_text(t->font->layout, t->string, -1);
     pango_layout_set_width(t->font->layout, w * PANGO_SCALE);
+
+    /* * * end of setting up the layout * * */
 
     pango_layout_get_pixel_extents(t->font->layout, NULL, &rect);
     mw = rect.width;
@@ -213,6 +238,9 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         c.color.blue = t->shadow_color->b | t->shadow_color->b << 8;
         c.color.alpha = 0xffff * t->shadow_alpha / 255;
         c.pixel = t->shadow_color->pixel;
+
+        pango_layout_set_attributes(t->font->layout, NULL);
+
         /* see below... */
         pango_xft_render_layout_line
             (d, &c, pango_layout_get_line(t->font->layout, 0),
@@ -225,6 +253,9 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     c.color.blue = t->color->b | t->color->b << 8;
     c.color.alpha = 0xff | 0xff << 8; /* fully opaque text */
     c.pixel = t->color->pixel;
+
+    pango_layout_set_attributes(t->font->layout, attrs);
+    if (attrs != NULL) pango_attr_list_unref(attrs);
 
     /* layout_line() uses y to specify the baseline
        The line doesn't need to be freed, it's a part of the layout */

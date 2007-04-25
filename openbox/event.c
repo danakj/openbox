@@ -39,6 +39,7 @@
 #include "group.h"
 #include "stacking.h"
 #include "extensions.h"
+#include "translate.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -50,6 +51,9 @@
 #endif
 #ifdef HAVE_SIGNAL_H
 #  include <signal.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h> /* for usleep() */
 #endif
 #ifdef XKB
 #  include <X11/XKBlib.h>
@@ -72,6 +76,7 @@ typedef struct
 
 static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
+static void event_handle_menu_shortcut(XEvent *e);
 static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
@@ -589,7 +594,7 @@ static void event_process(const XEvent *ec, gpointer data)
                     mouse_event(client, e);
                 } else if (e->type == KeyPress) {
                     keyboard_event((focus_cycle_target ? focus_cycle_target :
-                                    client), e);
+                                    (client ? client : focus_client)), e);
                 }
             }
         }
@@ -1262,7 +1267,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
     }
 }
 
-ObMenuFrame* find_active_menu()
+static ObMenuFrame* find_active_menu()
 {
     GList *it;
     ObMenuFrame *ret = NULL;
@@ -1276,7 +1281,7 @@ ObMenuFrame* find_active_menu()
     return ret;
 }
 
-ObMenuFrame* find_active_or_last_menu()
+static ObMenuFrame* find_active_or_last_menu()
 {
     ObMenuFrame *ret = NULL;
 
@@ -1284,6 +1289,77 @@ ObMenuFrame* find_active_or_last_menu()
     if (!ret && menu_frame_visible)
         ret = menu_frame_visible->data;
     return ret;
+}
+
+static void event_handle_menu_shortcut(XEvent *ev)
+{
+    gunichar unikey = 0;
+    ObMenuFrame *frame;
+    GList *start;
+    GList *it;
+    ObMenuEntryFrame *found = NULL;
+    guint num_found = 0;
+
+    {
+        const char *key;
+        if ((key = translate_keycode(ev->xkey.keycode)) == NULL)
+            return;
+        unikey = g_utf8_get_char_validated(key, -1);
+        if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
+            return;
+    }
+
+    if ((frame = find_active_or_last_menu()) == NULL)
+        return;
+
+
+    if (!frame->entries)
+        return; /* nothing in the menu anyways */
+
+    /* start after the selected one */
+    start = frame->entries;
+    if (frame->selected) {
+        for (it = start; frame->selected != it->data; it = g_list_next(it))
+            g_assert(it != NULL); /* nothing was selected? */
+        /* next with wraparound */
+        start = g_list_next(it);
+        if (start == NULL) start = frame->entries;
+    }
+
+    it = start;
+    do {
+        ObMenuEntryFrame *e = it->data;
+        gunichar entrykey = 0;
+
+        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
+            entrykey = e->entry->data.normal.shortcut;
+        else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+            entrykey = e->entry->data.submenu.submenu->shortcut;
+
+        if (unikey == entrykey) {
+            if (found == NULL) found = e;
+            ++num_found;
+        }
+
+        /* next with wraparound */
+        it = g_list_next(it);
+        if (it == NULL) it = frame->entries;
+    } while (it != start);
+
+    if (found) {
+        if (found->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+            num_found == 1)
+        {
+            menu_frame_select(frame, found, TRUE);
+            usleep(50000);
+            menu_entry_frame_execute(found, ev->xkey.state,
+                                     ev->xkey.time);
+        } else {
+            menu_frame_select(frame, found, TRUE);
+            if (num_found == 1)
+                menu_frame_select_next(frame->child);
+        }
+    }
 }
 
 static void event_handle_menu(XEvent *ev)
@@ -1307,7 +1383,7 @@ static void event_handle_menu(XEvent *ev)
             if (e->ignore_enters)
                 --e->ignore_enters;
             else
-                menu_frame_select(e->frame, e);
+                menu_frame_select(e->frame, e, FALSE);
         }
         break;
     case LeaveNotify:
@@ -1315,28 +1391,35 @@ static void event_handle_menu(XEvent *ev)
             (f = find_active_menu()) && f->selected == e &&
             e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
         {
-            menu_frame_select(e->frame, NULL);
+            menu_frame_select(e->frame, NULL, FALSE);
         }
     case MotionNotify:   
         if ((e = menu_entry_frame_under(ev->xmotion.x_root,   
                                         ev->xmotion.y_root)))
-            menu_frame_select(e->frame, e);   
+            menu_frame_select(e->frame, e, FALSE);
         break;
     case KeyPress:
         if (ev->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
-            menu_frame_hide_all();
+            if ((f = find_active_or_last_menu()) && f->parent)
+                menu_frame_select(f, NULL, TRUE);
+            else
+                menu_frame_hide_all();
         else if (ev->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
             ObMenuFrame *f;
-            if ((f = find_active_menu()))
-                menu_entry_frame_execute(f->selected, ev->xkey.state,
-                                         ev->xkey.time);
+            if ((f = find_active_menu())) {
+                if (f->child)
+                    menu_frame_select_next(f->child);
+                else
+                    menu_entry_frame_execute(f->selected, ev->xkey.state,
+                                             ev->xkey.time);
+            }
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_LEFT)) {
             ObMenuFrame *f;
-            if ((f = find_active_or_last_menu()) && f->parent)
-                menu_frame_select(f, NULL);
+            if ((f = find_active_or_last_menu()))
+                menu_frame_select(f, NULL, TRUE);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) {
             ObMenuFrame *f;
-            if ((f = find_active_or_last_menu()) && f->child)
+            if ((f = find_active_menu()) && f->child)
                 menu_frame_select_next(f->child);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_UP)) {
             ObMenuFrame *f;
@@ -1346,7 +1429,8 @@ static void event_handle_menu(XEvent *ev)
             ObMenuFrame *f;
             if ((f = find_active_or_last_menu()))
                 menu_frame_select_next(f);
-        }
+        } else
+            event_handle_menu_shortcut(ev);
         break;
     }
 }

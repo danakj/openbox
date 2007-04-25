@@ -54,6 +54,9 @@ static void parse_menu_separator(ObParseInst *i,
                                  gpointer data);
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data);
+static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
+                               gchar **strippedlabel, guint *position);
+
 
 static void client_dest(ObClient *client, gpointer data)
 {
@@ -178,6 +181,60 @@ static ObMenu* menu_from_name(gchar *name)
     return self;
 }  
 
+#define VALID_SHORTCUT(c) (((c) >= '0' && (c) <= '9') || \
+                           ((c) >= 'A' && (c) <= 'Z') || \
+                           ((c) >= 'a' && (c) <= 'z'))
+
+static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
+                               gchar **strippedlabel, guint *position)
+{
+    gunichar shortcut = 0;
+    
+    *position = 0;
+
+    g_assert(strippedlabel != NULL);
+
+    if (label == NULL) {
+        *strippedlabel = NULL;
+    } else {
+        gchar *i;
+
+        *strippedlabel = g_strdup(label);
+
+        /* if allow_shortcut is false, then you can't use the &, instead you
+           have to just use the first valid character
+        */
+
+        i = strchr(*strippedlabel, '&');
+        if (allow_shortcut && i != NULL) {
+            /* there is an ampersand in the string */
+
+            /* you have to use a printable ascii character for shortcuts
+               don't allow space either, so you can have like "a & b"
+            */
+            if (VALID_SHORTCUT(*(i+1))) {
+                shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
+                *position = i - *strippedlabel;
+
+                /* remove the & from the string */
+                for (; *i != '\0'; ++i)
+                    *i = *(i+1);
+            }
+        } else {
+            /* there is no ampersand, so find the first valid character to use
+               instead */
+
+            for (i = *strippedlabel; *i != '\0'; ++i)
+                if (VALID_SHORTCUT(*i)) {
+                    *position = i - *strippedlabel;
+                    shortcut = g_unichar_tolower(g_utf8_get_char(i));
+                    break;
+                }
+        }
+    }
+    return shortcut;
+}
+
 static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                             gpointer data)
 {
@@ -195,7 +252,7 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     if (a)
                         acts = g_slist_append(acts, a);
                 }
-            menu_add_normal(state->parent, -1, label, acts);
+            menu_add_normal(state->parent, -1, label, acts, FALSE);
             g_free(label);
         }
     }
@@ -232,7 +289,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         if (!parse_attr_string("label", node, &title))
             goto parse_menu_fail;
 
-        if ((menu = menu_new(name, title, NULL))) {
+        if ((menu = menu_new(name, title, FALSE, NULL))) {
             menu->pipe_creator = state->pipe_creator;
             if (parse_attr_string("execute", node, &script)) {
                 menu->execute = parse_expand_tilde(script);
@@ -256,14 +313,17 @@ parse_menu_fail:
     g_free(script);
 }
 
-ObMenu* menu_new(const gchar *name, const gchar *title, gpointer data)
+ObMenu* menu_new(const gchar *name, const gchar *title,
+                 gboolean allow_shortcut, gpointer data)
 {
     ObMenu *self;
 
     self = g_new0(ObMenu, 1);
     self->name = g_strdup(name);
-    self->title = g_strdup(title);
     self->data = data;
+
+    self->shortcut = parse_shortcut(title, allow_shortcut, &self->title,
+                                    &self->shortcut_position);
 
     g_hash_table_replace(menu_hash, self->name, self);
 
@@ -325,7 +385,7 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
         ObMenuEntryFrame *e = frame->entries->data;
         if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
             e->entry->data.normal.enabled)
-                menu_frame_select(frame, e);
+                menu_frame_select(frame, e, FALSE);
     }
 }
 
@@ -404,13 +464,14 @@ void menu_entry_remove(ObMenuEntry *self)
 }
 
 ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
-                             GSList *actions)
+                             GSList *actions, gboolean allow_shortcut)
 {
     ObMenuEntry *e;
 
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_NORMAL, id);
-    e->data.normal.label = g_strdup(label);
     e->data.normal.actions = actions;
+
+    menu_entry_set_label(e, label, allow_shortcut);
 
     self->entries = g_list_append(self->entries, e);
     return e;
@@ -432,7 +493,8 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
     ObMenuEntry *e;
 
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR, id);
-    e->data.separator.label = g_strdup(label);
+
+    menu_entry_set_label(e, label, FALSE);
 
     self->entries = g_list_append(self->entries, e);
     return e;
@@ -479,4 +541,28 @@ void menu_find_submenus(ObMenu *self)
         if (e->type == OB_MENU_ENTRY_TYPE_SUBMENU)
             e->data.submenu.submenu = menu_from_name(e->data.submenu.name);
     }
+}
+
+void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
+                          gboolean allow_shortcut)
+{
+    switch (self->type) {
+    case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        g_free(self->data.separator.label);
+        self->data.separator.label = g_strdup(label);
+        break;
+    case OB_MENU_ENTRY_TYPE_NORMAL:
+        g_free(self->data.normal.label);
+        self->data.normal.shortcut =
+            parse_shortcut(label, allow_shortcut, &self->data.normal.label,
+                           &self->data.normal.shortcut_position);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+}
+
+void menu_show_all_shortcuts(ObMenu *self, gboolean show)
+{
+    self->show_all_shortcuts = show;
 }

@@ -374,7 +374,6 @@ void client_manage(Window window)
              self->window, newx, newy, self->area.width, self->area.height);
     client_apply_startup_state(self, newx, newy);
 
-    keyboard_grab_for_client(self, TRUE);
     mouse_grab_for_client(self, TRUE);
 
     if (activate) {
@@ -490,7 +489,6 @@ void client_unmanage(ObClient *self)
         event_ignore_queued_enters();
     }
 
-    keyboard_grab_for_client(self, FALSE);
     mouse_grab_for_client(self, FALSE);
 
     /* remove the window from our save set */
@@ -1858,7 +1856,7 @@ void client_update_icons(ObClient *self)
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
         gulong *data;
 
-        data = g_new(guint32, 48*48+2);
+        data = g_new(gulong, 48*48+2);
         data[0] = data[1] =  48;
         for (i = 0; i < 48*48; ++i)
             data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +

@@ -139,3 +139,13 @@ translation_fail:
     g_strfreev(parsed);
     return ret;
 }
+
+const gchar *translate_keycode(guint keycode)
+{
+    KeySym sym;
+    const gchar *ret = NULL;
+
+    if ((sym = XKeycodeToKeysym(ob_display, keycode, 0)) != NoSymbol)
+        ret = XKeysymToString(sym);
+    return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
+}

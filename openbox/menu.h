@@ -48,6 +48,15 @@ struct _ObMenu
     gchar *name;
     /* Displayed title */
     gchar *title;
+    /*! The shortcut key that would be used to activate this menu if it was
+      displayed as a submenu */
+    gunichar shortcut;
+    /*! The shortcut's position in the string */
+    guint shortcut_position;
+
+    /*! If the shortcut key should be shown in menu entries even when it
+      is the first character in the string */
+    gboolean show_all_shortcuts;
 
     /* Command to execute to rebuild the menu */
     gchar *execute;
@@ -75,6 +84,10 @@ typedef enum
 
 struct _ObNormalMenuEntry {
     gchar *label;
+    /*! The shortcut key that would be used to activate this menu entry */
+    gunichar shortcut;
+    /*! The shortcut's position in the string */
+    guint shortcut_position;
 
     /* state */
     gboolean enabled;
@@ -120,11 +133,16 @@ struct _ObMenuEntry
 void menu_startup(gboolean reconfig);
 void menu_shutdown(gboolean reconfig);
 
-ObMenu* menu_new(const gchar *name, const gchar *title, gpointer data);
+/*! @param allow_shortcut this should be false when the label is coming from
+           outside data like window or desktop titles */
+ObMenu* menu_new(const gchar *name, const gchar *title,
+                 gboolean allow_shortcut, gpointer data);
 void menu_free(ObMenu *menu);
 
 /* Repopulate a pipe-menu by running its command */
 void menu_pipe_execute(ObMenu *self);
+
+void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
 void menu_show(gchar *name, gint x, gint y, struct _ObClient *client);
 
@@ -133,13 +151,18 @@ void menu_set_execute_func(ObMenu *menu, ObMenuExecuteFunc func);
 void menu_set_destroy_func(ObMenu *menu, ObMenuDestroyFunc func);
 
 /* functions for building menus */
+/*! @param allow_shortcut this should be false when the label is coming from
+           outside data like window or desktop titles */
 ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, const gchar *label,
-                             GSList *actions);
+                             GSList *actions, gboolean allow_shortcut);
 ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, const gchar *submenu);
 ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label);
 
 void menu_clear_entries(ObMenu *menu);
 void menu_entry_remove(ObMenuEntry *self);
+
+void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
+                          gboolean allow_shortcut);
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
 

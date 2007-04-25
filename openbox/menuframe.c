@@ -318,6 +318,13 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                    self->a_text_selected :
                    self->a_text_normal));
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
+        if (self->frame->menu->show_all_shortcuts ||
+            self->entry->data.normal.shortcut_position > 0)
+        {
+            text_a->texture[0].data.text.shortcut =
+                self->entry->data.normal.shortcut;
+        } else
+            text_a->texture[0].data.text.shortcut = 0;
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         text_a = (self == self->frame->selected ?
@@ -325,6 +332,11 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   self->a_text_normal);
         sub = self->entry->data.submenu.submenu;
         text_a->texture[0].data.text.string = sub ? sub->title : "";
+        if (self->frame->menu->show_all_shortcuts ||
+            sub->shortcut_position > 0) {
+            text_a->texture[0].data.text.shortcut = sub->shortcut;
+        } else
+            text_a->texture[0].data.text.shortcut = 0;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label != NULL)
@@ -886,7 +898,8 @@ static gboolean menu_entry_frame_submenu_timeout(gpointer data)
     return FALSE;
 }
 
-void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
+void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
+                       gboolean immediate)
 {
     ObMenuEntryFrame *old = self->selected;
     ObMenuFrame *oldchild = self->child;
@@ -913,7 +926,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
         menu_entry_frame_render(self->selected);
 
         if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
-            if (config_submenu_show_delay) {
+            if (config_submenu_show_delay && !immediate) {
                 /* initiate a new submenu open request */
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
@@ -988,7 +1001,7 @@ void menu_frame_select_previous(ObMenuFrame *self)
             }
         }
     }
-    menu_frame_select(self, it ? it->data : NULL);
+    menu_frame_select(self, it ? it->data : NULL, TRUE);
 }
 
 void menu_frame_select_next(ObMenuFrame *self)
@@ -1014,5 +1027,5 @@ void menu_frame_select_next(ObMenuFrame *self)
             }
         }
     }
-    menu_frame_select(self, it ? it->data : NULL);
+    menu_frame_select(self, it ? it->data : NULL, TRUE);
 }

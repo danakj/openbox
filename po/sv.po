@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 21:37-0400\n"
+"POT-Creation-Date: 2007-04-24 23:36-0400\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:99
+#: openbox/client_list_menu.c:100
 msgid "Go there..."
 msgstr "Gå dit"
 
-#: openbox/client_list_menu.c:190
+#: openbox/client_list_menu.c:191
 msgid "Desktops"
 msgstr "Skrivbord"
 
@@ -72,41 +72,41 @@ msgstr "Alltid &underst"
 msgid "&Send to desktop"
 msgstr "&Skicka till"
 
-#: openbox/client_menu.c:190
+#: openbox/client_menu.c:189
 msgid "Client menu"
 msgstr "Klientmeny"
 
-#: openbox/client_menu.c:200
+#: openbox/client_menu.c:199
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Mi&nimera"
 
-#: openbox/client_menu.c:217
+#: openbox/client_menu.c:216
 #, fuzzy
 msgid "Raise to &top"
 msgstr "Lägg ö&verst"
 
-#: openbox/client_menu.c:221
+#: openbox/client_menu.c:220
 #, fuzzy
 msgid "Lower to &bottom"
 msgstr "Lägg &underst"
 
-#: openbox/client_menu.c:234
+#: openbox/client_menu.c:233
 #, fuzzy
 msgid "&Decorate"
 msgstr "&Dekorera"
 
-#: openbox/client_menu.c:240
+#: openbox/client_menu.c:239
 #, fuzzy
 msgid "&Move"
 msgstr "&Flytta"
 
-#: openbox/client_menu.c:244
+#: openbox/client_menu.c:243
 #, fuzzy
 msgid "Resi&ze"
 msgstr "Ändra s&torlek"
 
-#: openbox/client_menu.c:250
+#: openbox/client_menu.c:249
 #, fuzzy
 msgid "&Close"
 msgstr "Stän&g"

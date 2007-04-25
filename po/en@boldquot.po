@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 21:37-0400\n"
-"PO-Revision-Date: 2007-04-24 21:37-0400\n"
+"POT-Creation-Date: 2007-04-24 23:36-0400\n"
+"PO-Revision-Date: 2007-04-24 23:36-0400\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -41,11 +41,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/client_list_menu.c:99
+#: openbox/client_list_menu.c:100
 msgid "Go there..."
 msgstr "Go there..."
 
-#: openbox/client_list_menu.c:190
+#: openbox/client_list_menu.c:191
 msgid "Desktops"
 msgstr "Desktops"
 
@@ -89,35 +89,35 @@ msgstr "Always on &bottom"
 msgid "&Send to desktop"
 msgstr "&Send to desktop"
 
-#: openbox/client_menu.c:190
+#: openbox/client_menu.c:189
 msgid "Client menu"
 msgstr "Client menu"
 
-#: openbox/client_menu.c:200
+#: openbox/client_menu.c:199
 msgid "Ico&nify"
 msgstr "Ico&nify"
 
-#: openbox/client_menu.c:217
+#: openbox/client_menu.c:216
 msgid "Raise to &top"
 msgstr "Raise to &top"
 
-#: openbox/client_menu.c:221
+#: openbox/client_menu.c:220
 msgid "Lower to &bottom"
 msgstr "Lower to &bottom"
 
-#: openbox/client_menu.c:234
+#: openbox/client_menu.c:233
 msgid "&Decorate"
 msgstr "&Decorate"
 
-#: openbox/client_menu.c:240
+#: openbox/client_menu.c:239
 msgid "&Move"
 msgstr "&Move"
 
-#: openbox/client_menu.c:244
+#: openbox/client_menu.c:243
 msgid "Resi&ze"
 msgstr "Resi&ze"
 
-#: openbox/client_menu.c:250
+#: openbox/client_menu.c:249
 msgid "&Close"
 msgstr "&Close"
 

@@ -1856,7 +1856,7 @@ void client_update_icons(ObClient *self)
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
         gulong *data;
 
-        data = g_new(guint32, 48*48+2);
+        data = g_new(gulong, 48*48+2);
         data[0] = data[1] =  48;
         for (i = 0; i < 48*48; ++i)
             data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +

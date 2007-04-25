@@ -47,6 +47,8 @@
          Removing font shadows - they are going back into the themerc
      Tue Apr 24 18:42:24 UTC 2007 - mikachu(a)openbox.org
          Removed fourCorners option.
+     Wed Apr 25 14:02:40 UTC 2007
+         Fixed values for layer to be above/below, not top/bottom.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -451,9 +453,9 @@
     </xs:simpleType>
     <xs:simpleType name="layer">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="Top"/>
-            <xs:enumeration value="Normal"/>
-            <xs:enumeration value="Bottom"/>
+            <xs:enumeration value="above"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="below"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="maximization">

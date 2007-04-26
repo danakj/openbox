@@ -1732,7 +1732,7 @@ void action_showmenu(union ActionData *data)
 {
     if (data->showmenu.name) {
         menu_show(data->showmenu.name, data->any.x, data->any.y,
-                  data->showmenu.any.c);
+                  data->any.button, data->showmenu.any.c);
     }
 }
 

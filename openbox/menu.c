@@ -360,7 +360,7 @@ void menu_free(ObMenu *menu)
     g_hash_table_remove(menu_hash, menu->name);
 }
 
-void menu_show(gchar *name, gint x, gint y, ObClient *client)
+void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
 {
     ObMenu *self;
     ObMenuFrame *frame;
@@ -379,7 +379,7 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     menu_frame_hide_all();
 
     frame = menu_frame_new(self, client);
-    if (!menu_frame_show_topmenu(frame, x, y))
+    if (!menu_frame_show_topmenu(frame, x, y, button))
         menu_frame_free(frame);
     else if (frame->entries) {
         ObMenuEntryFrame *e = frame->entries->data;
@@ -513,6 +513,11 @@ void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
 void menu_set_destroy_func(ObMenu *self, ObMenuDestroyFunc func)
 {
     self->destroy_func = func;
+}
+
+void menu_set_place_func(ObMenu *self, ObMenuPlaceFunc func)
+{
+    self->place_func = func;
 }
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)

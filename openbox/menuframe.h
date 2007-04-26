@@ -111,12 +111,11 @@ ObMenuFrame* menu_frame_new(struct _ObMenu *menu, struct _ObClient *client);
 void menu_frame_free(ObMenuFrame *self);
 
 void menu_frame_move(ObMenuFrame *self, gint x, gint y);
-void menu_frame_move_on_screen(ObMenuFrame *self, gint *dx, gint *dy);
+void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
+                               gint *dx, gint *dy);
 
-void menu_frame_place_topmenu(ObMenuFrame *self, gint x, gint y);
-void menu_frame_place_submenu(ObMenuFrame *self);
-
-gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y);
+gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
+                                 gint button);
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
                                  ObMenuEntryFrame *parent_entry);
 void menu_frame_hide(ObMenuFrame *self);

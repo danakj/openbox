@@ -157,6 +157,69 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
     }
 }
 
+static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
+                              gint button, gpointer data)
+{
+    gint dx, dy;
+
+    if (button == 0 && frame->client) {
+        *x = frame->client->frame->area.x;
+
+        /* try below the titlebar */
+        *y = frame->client->frame->area.y + frame->client->frame->size.top -
+            frame->client->frame->bwidth;
+        menu_frame_move_on_screen(frame, *x, *y, &dx, &dy);
+        if (dy != 0) {
+            /* try above the titlebar */
+            *y = frame->client->frame->area.y + frame->client->frame->bwidth -
+                frame->area.height;
+            menu_frame_move_on_screen(frame, *x, *y, &dx, &dy);
+        }
+        if (dy != 0) {
+            /* didnt fit either way, use move on screen's values */
+            *y = frame->client->frame->area.y + frame->client->frame->size.top;
+            menu_frame_move_on_screen(frame, *x, *y, &dx, &dy);
+        }
+
+        *x += dx;
+        *y += dy;
+    } else {
+        gint myx, myy;
+
+        myx = *x;
+        myy = *y;
+
+        /* try to the bottom right of the cursor */
+        menu_frame_move_on_screen(frame, myx, myy, &dx, &dy);
+        if (dx != 0 || dy != 0) {
+            /* try to the bottom left of the cursor */
+            myx = *x - frame->area.width;
+            myy = *y;
+            menu_frame_move_on_screen(frame, myx, myy, &dx, &dy);
+        }
+        if (dx != 0 || dy != 0) {
+            /* try to the top right of the cursor */
+            myx = *x;
+            myy = *y - frame->area.height;
+            menu_frame_move_on_screen(frame, myx, myy, &dx, &dy);
+        }
+        if (dx != 0 || dy != 0) {
+            /* try to the top left of the cursor */
+            myx = *x - frame->area.width;
+            myy = *y - frame->area.height;
+            menu_frame_move_on_screen(frame, myx, myy, &dx, &dy);
+        }
+        if (dx != 0 || dy != 0) {
+            /* if didnt fit on either side so just use what it says */
+            myx = *x;
+            myy = *y;
+            menu_frame_move_on_screen(frame, myx, myy, &dx, &dy);
+        }
+        *x = myx + dx;
+        *y = myy + dy;
+    }
+}
+
 void client_menu_startup()
 {
     GSList *acts;
@@ -189,6 +252,7 @@ void client_menu_startup()
     menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, client_update);
+    menu_set_place_func(menu, client_menu_place);
 
     menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
 

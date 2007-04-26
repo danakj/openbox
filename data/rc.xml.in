@@ -44,26 +44,32 @@
   <keepBorder>yes</keepBorder>
   <hideDisabled>no</hideDisabled>
   <font place="ActiveWindow">
-    <name>arial,sans</name>
+    <name>sans</name>
     <size>7</size>
     <weight>bold</weight>
     <slant>normal</slant>
   </font>
   <font place="InactiveWindow">
-    <name>arial,sans</name>
+    <name>sans</name>
     <size>7</size>
     <weight>bold</weight>
     <slant>normal</slant>
   </font>
-  <font place="MenuTitle">
-    <name>arial,sans</name>
+  <font place="MenuHeader">
+    <name>sans</name>
     <size>8</size>
     <weight>bold</weight>
     <slant>normal</slant>
   </font>
   <font place="MenuItem">
-    <name>arial,sans</name>
-    <size>8</size>
+    <name>sans</name>
+    <size>9</size>
+    <weight>bold</weight>
+    <slant>normal</slant>
+  </font>
+  <font place="OnScreenDisplay">
+    <name>sans</name>
+    <size>9</size>
     <weight>bold</weight>
     <slant>normal</slant>
   </font>

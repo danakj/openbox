@@ -48,7 +48,8 @@ static void set_default_appearance(RrAppearance *a);
 
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                     RrFont *active_window_font, RrFont *inactive_window_font,
-                    RrFont *menu_title_font, RrFont *menu_item_font)
+                    RrFont *menu_title_font, RrFont *menu_item_font,
+                    RrFont *osd_font)
 {
     XrmDatabase db = NULL;
     RrJustify winjust, mtitlejust;
@@ -149,6 +150,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         RrFontRef(menu_item_font);
     } else
         theme->menu_font = RrFontOpenDefault(inst);
+
+    if (osd_font) {
+        theme->osd_font = osd_font;
+        RrFontRef(osd_font);
+    } else
+        theme->osd_font = RrFontOpenDefault(inst);
 
     /* load direct dimensions */
     if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
@@ -652,8 +659,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme->a_focused_label->texture[0].data.text.justify = winjust;
     theme->osd_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_focused_label->texture[0].data.text.font =
-        theme->osd_hilite_label->texture[0].data.text.font =
         theme->win_font_focused;
+    theme->osd_hilite_label->texture[0].data.text.font = theme->osd_font;
     theme->a_focused_label->texture[0].data.text.color =
         theme->title_focused_color;
     theme->osd_hilite_label->texture[0].data.text.color =

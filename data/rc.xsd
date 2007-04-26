@@ -348,6 +348,7 @@
     </xs:simpleType>
     <xs:simpleType name="button">
         <xs:restriction base="xs:string">
+            <!-- FIXME what??? -->
             <xs:enumeration value="Left"/>
             <xs:enumeration value="Middle"/>
             <xs:enumeration value="Right"/>

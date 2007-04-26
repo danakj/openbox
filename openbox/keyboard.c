@@ -106,16 +106,37 @@ static void set_curpos(KeyBindingTree *newpos)
     }
 }
 
-void keyboard_reset_chains()
+void keyboard_reset_chains(gint break_chroots)
 {
-    if (curpos)
-        set_curpos(NULL);
+    KeyBindingTree *p;
+
+    for (p = curpos; p; p = p->parent) {
+        if (p->chroot) {
+            if (break_chroots == 0) break; /* stop here */
+            if (break_chroots > 0)
+                --break_chroots;
+        }
+    }
+    set_curpos(p);
 }
 
 void keyboard_unbind_all()
 {
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;
+}
+
+void keyboard_chroot(GList *keylist)
+{
+    /* try do it in the existing tree. if we can't that means it is an empty
+       chroot binding. so add it to the tree then. */
+    if (!tree_chroot(keyboard_firstnode, keylist)) {
+        KeyBindingTree *tree;
+        if (!(tree = tree_build(keylist)))
+            return;
+        tree_chroot(tree, keylist);
+        tree_assimilate(tree);
+    }
 }
 
 gboolean keyboard_bind(GList *keylist, ObAction *action)
@@ -206,7 +227,6 @@ void keyboard_interactive_end(ObInteractiveState *s,
     if (!interactive_states) {
         grab_keyboard(FALSE);
         grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-        keyboard_reset_chains();
     }
 }
 
@@ -267,7 +287,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         e->xkey.state == config_keyboard_reset_state)
     {
-        keyboard_reset_chains();
+        keyboard_reset_chains(-1);
         return;
     }
 
@@ -279,11 +299,12 @@ void keyboard_event(ObClient *client, const XEvent *e)
         if (p->key == e->xkey.keycode &&
             p->state == e->xkey.state)
         {
-            if (p->first_child != NULL) { /* part of a chain */
+            if (p->first_child != NULL) /* part of a chain */
                 set_curpos(p);
-            } else {
-
-                keyboard_reset_chains();
+            else if (p->chroot)         /* an empty chroot */
+                set_curpos(p);
+            else {
+                keyboard_reset_chains(0);
 
                 action_run_key(p->actions, client, e->xkey.state,
                                e->xkey.x_root, e->xkey.y_root,

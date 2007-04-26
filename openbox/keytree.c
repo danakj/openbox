@@ -61,6 +61,7 @@ KeyBindingTree *tree_build(GList *keylist)
             ret->keylist = g_list_prepend(ret->keylist,
                                           g_strdup(kit->data)); /* deep copy */
         ret->first_child = p;
+        if (p != NULL) p->parent = ret;
         if (!translate_key(it->data, &ret->state, &ret->key)) {
             tree_destroy(ret);
             return NULL;
@@ -91,10 +92,12 @@ void tree_assimilate(KeyBindingTree *node)
                 a = a->first_child;
             }
         }
-        if (!(last->state == b->state && last->key == b->key))
+        if (!(last->state == b->state && last->key == b->key)) {
             last->next_sibling = b;
-        else {
+            b->parent = last->parent;
+        } else {
             last->first_child = b->first_child;
+            last->first_child->parent = last;
             g_free(b);
         }
     }
@@ -126,4 +129,21 @@ KeyBindingTree *tree_find(KeyBindingTree *search, gboolean *conflict)
         }
     }
     return NULL; /* it just isn't in here */
+}
+
+gboolean tree_chroot(KeyBindingTree *tree, GList *keylist)
+{
+    if (keylist == NULL) {
+        tree->chroot = TRUE;
+        return TRUE;
+    } else {
+        guint key, state;
+        if (translate_key(keylist->data, &state, &key)) {
+            while (tree != NULL && !(tree->state == state && tree->key == key))
+                tree = tree->next_sibling;
+            if (tree != NULL)
+                return tree_chroot(tree, keylist->next);
+        }
+    }
+    return FALSE;
 }

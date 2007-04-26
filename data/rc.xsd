@@ -50,6 +50,7 @@
      Wed Apr 25 14:02:40 UTC 2007
          Fixed values for layer to be above/below, not top/bottom.
          Add chroot attribute and keybind element to keybind element.
+         Remove xs:sequence from everywhere, we don't care about order.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -63,19 +64,17 @@
             <xs:documentation>all these elements are expected in a openbox config file</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="resistance" type="ob:resistance"/>
-                <xs:element name="focus" type="ob:focus"/>
-                <xs:element name="placement" type="ob:placement"/>
-                <xs:element name="theme" type="ob:theme"/>
-                <xs:element name="desktops" type="ob:desktops"/>
-                <xs:element name="resize" type="ob:resize"/>
-                <xs:element name="dock" type="ob:dock"/>
-                <xs:element name="keyboard" type="ob:keyboard"/>
-                <xs:element name="mouse" type="ob:mouse"/>
-                <xs:element name="menu" type="ob:menu"/>
-                <xs:element name="applications" type="ob:applications"/>
-            </xs:sequence>
+            <xs:element name="resistance" type="ob:resistance"/>
+            <xs:element name="focus" type="ob:focus"/>
+            <xs:element name="placement" type="ob:placement"/>
+            <xs:element name="theme" type="ob:theme"/>
+            <xs:element name="desktops" type="ob:desktops"/>
+            <xs:element name="resize" type="ob:resize"/>
+            <xs:element name="dock" type="ob:dock"/>
+            <xs:element name="keyboard" type="ob:keyboard"/>
+            <xs:element name="mouse" type="ob:mouse"/>
+            <xs:element name="menu" type="ob:menu"/>
+            <xs:element name="applications" type="ob:applications"/>
         </xs:complexType>
     </xs:element>
     <!--
@@ -85,184 +84,148 @@
         <xs:annotation>
             <xs:documentation>defines behaviour of windows when close to each other or the screen edge</xs:documentation>
         </xs:annotation>
-        <xs:sequence>
-            <xs:element minOccurs="0" name="strength" type="xs:integer"/>
-            <xs:element minOccurs="0" name="screen_edge_strength" type="xs:integer"/>
-            <xs:element minOccurs="0" name="edges_hit_layers_below" type="ob:bool"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="strength" type="xs:integer"/>
+        <xs:element minOccurs="0" name="screen_edge_strength" type="xs:integer"/>
+        <xs:element minOccurs="0" name="edges_hit_layers_below" type="ob:bool"/>
     </xs:complexType>
     <xs:complexType name="focus">
         <xs:annotation>
             <xs:documentation>defines aspects of window focus</xs:documentation>
         </xs:annotation>
-        <xs:sequence>
-            <xs:element minOccurs="0" name="focusNew" type="ob:bool"/>
-            <xs:element minOccurs="0" name="focusLast" type="ob:bool"/>
-            <xs:element minOccurs="0" name="followMouse" type="ob:bool"/>
-            <xs:element minOccurs="0" name="focusDelay" type="xs:integer"/>
-            <xs:element minOccurs="0" name="raiseOnFocus" type="ob:bool"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="focusNew" type="ob:bool"/>
+        <xs:element minOccurs="0" name="focusLast" type="ob:bool"/>
+        <xs:element minOccurs="0" name="followMouse" type="ob:bool"/>
+        <xs:element minOccurs="0" name="focusDelay" type="xs:integer"/>
+        <xs:element minOccurs="0" name="raiseOnFocus" type="ob:bool"/>
     </xs:complexType>
     <xs:complexType name="placement">
         <xs:annotation>
             <xs:documentation>defines how new windows are placed</xs:documentation>
         </xs:annotation>
-        <xs:sequence>
-            <xs:element name="policy" type="ob:placementpolicy"/>
-        </xs:sequence>
+        <xs:element name="policy" type="ob:placementpolicy"/>
     </xs:complexType>
     <xs:complexType name="theme">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="name" type="xs:string"/>
-            <xs:element minOccurs="0" name="titleLayout" type="xs:string"/>
-            <xs:element minOccurs="0" name="titleNumber" type="ob:bool"/>
-            <xs:element minOccurs="0" name="keepBorder" type="ob:bool"/>
-            <xs:element minOccurs="0" name="hideDisabled" type="ob:bool"/>
-            <xs:element minOccurs="0" name="font" type="ob:font"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="name" type="xs:string"/>
+        <xs:element minOccurs="0" name="titleLayout" type="xs:string"/>
+        <xs:element minOccurs="0" name="titleNumber" type="ob:bool"/>
+        <xs:element minOccurs="0" name="keepBorder" type="ob:bool"/>
+        <xs:element minOccurs="0" name="hideDisabled" type="ob:bool"/>
+        <xs:element minOccurs="0" name="font" type="ob:font"/>
     </xs:complexType>
     <xs:complexType name="font">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="name" type="xs:string"/>
-            <xs:element minOccurs="0" name="size" type="xs:integer"/>
-            <xs:element minOccurs="0" name="weight" type="ob:fontweight"/>
-            <xs:element minOccurs="0" name="slant" type="ob:fontslant"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="name" type="xs:string"/>
+        <xs:element minOccurs="0" name="size" type="xs:integer"/>
+        <xs:element minOccurs="0" name="weight" type="ob:fontweight"/>
+        <xs:element minOccurs="0" name="slant" type="ob:fontslant"/>
     </xs:complexType>
     <xs:complexType name="desktops">
         <xs:annotation>
             <xs:documentation>defines the number and names of desktops</xs:documentation>
         </xs:annotation>
-        <xs:sequence>
-            <xs:element minOccurs="0" name="number" type="xs:integer"/>
-            <xs:element minOccurs="0" name="firstdesk" type="xs:integer"/>
-            <xs:element minOccurs="0" name="names">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" name="name" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="number" type="xs:integer"/>
+        <xs:element minOccurs="0" name="firstdesk" type="xs:integer"/>
+        <xs:element minOccurs="0" name="names">
+            <xs:complexType>
+                <xs:element maxOccurs="unbounded" name="name" type="xs:string"/>
+            </xs:complexType>
+        </xs:element>
     </xs:complexType>
     <xs:complexType name="resize">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="drawContents" type="ob:bool"/>
-            <xs:element minOccurs="0" name="popupShow" type="ob:popupshow"/>
-            <xs:element minOccurs="0" name="popupPosition" type="ob:popupposition"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="drawContents" type="ob:bool"/>
+        <xs:element minOccurs="0" name="popupShow" type="ob:popupshow"/>
+        <xs:element minOccurs="0" name="popupPosition" type="ob:popupposition"/>
     </xs:complexType>
     <xs:complexType name="dock">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="position" type="ob:dock_position"/>
-            <xs:element minOccurs="0" name="floatingX" type="xs:integer"/>
-            <xs:element minOccurs="0" name="floatingY" type="xs:integer"/>
-            <xs:element minOccurs="0" name="noStrut" type="ob:bool"/>
-            <xs:element minOccurs="0" name="stacking" type="ob:layer"/>
-            <xs:element minOccurs="0" name="direction" type="ob:direction"/>
-            <xs:element minOccurs="0" name="autoHide" type="ob:bool"/>
-            <xs:element minOccurs="0" name="hideDelay" type="xs:integer"/>
-            <xs:element minOccurs="0" name="showDelay" type="xs:integer"/>
-            <xs:element minOccurs="0" name="moveButton" type="ob:button"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="position" type="ob:dock_position"/>
+        <xs:element minOccurs="0" name="floatingX" type="xs:integer"/>
+        <xs:element minOccurs="0" name="floatingY" type="xs:integer"/>
+        <xs:element minOccurs="0" name="noStrut" type="ob:bool"/>
+        <xs:element minOccurs="0" name="stacking" type="ob:layer"/>
+        <xs:element minOccurs="0" name="direction" type="ob:direction"/>
+        <xs:element minOccurs="0" name="autoHide" type="ob:bool"/>
+        <xs:element minOccurs="0" name="hideDelay" type="xs:integer"/>
+        <xs:element minOccurs="0" name="showDelay" type="xs:integer"/>
+        <xs:element minOccurs="0" name="moveButton" type="ob:button"/>
     </xs:complexType>
     <xs:complexType name="action">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="execute" type="xs:string"/>
-            <xs:element minOccurs="0" name="menu" type="xs:string"/>
-            <xs:element minOccurs="0" name="delta" type="xs:integer"/>
-            <xs:element minOccurs="0" name="x" type="xs:integer"/>
-            <xs:element minOccurs="0" name="y" type="xs:integer"/>
-            <xs:element minOccurs="0" name="left" type="xs:integer"/>
-            <xs:element minOccurs="0" name="right" type="xs:integer"/>
-            <xs:element minOccurs="0" name="up" type="xs:integer"/>
-            <xs:element minOccurs="0" name="down" type="xs:integer"/>
-            <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
-            <xs:element minOccurs="0" name="wrap" type="ob:bool"/>
-            <xs:element minOccurs="0" name="follow" type="ob:bool"/>
-            <xs:element minOccurs="0" name="dialog" type="ob:bool"/>
-            <xs:element minOccurs="0" name="panels" type="ob:bool"/>
-            <xs:element minOccurs="0" name="here" type="ob:bool"/>
-            <xs:element minOccurs="0" name="linear" type="ob:bool"/>
-            <xs:element minOccurs="0" name="group" type="ob:bool"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="execute" type="xs:string"/>
+        <xs:element minOccurs="0" name="menu" type="xs:string"/>
+        <xs:element minOccurs="0" name="delta" type="xs:integer"/>
+        <xs:element minOccurs="0" name="x" type="xs:integer"/>
+        <xs:element minOccurs="0" name="y" type="xs:integer"/>
+        <xs:element minOccurs="0" name="left" type="xs:integer"/>
+        <xs:element minOccurs="0" name="right" type="xs:integer"/>
+        <xs:element minOccurs="0" name="up" type="xs:integer"/>
+        <xs:element minOccurs="0" name="down" type="xs:integer"/>
+        <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
+        <xs:element minOccurs="0" name="wrap" type="ob:bool"/>
+        <xs:element minOccurs="0" name="follow" type="ob:bool"/>
+        <xs:element minOccurs="0" name="dialog" type="ob:bool"/>
+        <xs:element minOccurs="0" name="panels" type="ob:bool"/>
+        <xs:element minOccurs="0" name="here" type="ob:bool"/>
+        <xs:element minOccurs="0" name="linear" type="ob:bool"/>
+        <xs:element minOccurs="0" name="group" type="ob:bool"/>
         <xs:attribute name="name" type="ob:actionname" use="required"/>
     </xs:complexType>
     <xs:complexType name="keybind">
-        <xs:sequence>
+        <xs:choice>
             <xs:element maxOccurs="unbounded" name="action" type="ob:action"/>
             <xs:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
-            <xs:attribute name="chroot" type="ob:bool"/>
-        </xs:sequence>
+        </xs:choice>
+        <xs:attribute name="chroot" type="ob:bool"/>
         <xs:attribute name="key" type="ob:keyname" use="required"/>
     </xs:complexType>
     <xs:complexType name="keyboard">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="chainQuitKey" type="ob:keyname"/>
-            <xs:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="chainQuitKey" type="ob:keyname"/>
+        <xs:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
     </xs:complexType>
     <xs:complexType name="mousebind">
-        <xs:sequence>
-            <xs:element maxOccurs="unbounded" name="action" type="ob:action"/>
-        </xs:sequence>
+        <xs:element maxOccurs="unbounded" name="action" type="ob:action"/>
         <xs:attribute name="action" type="ob:mouseaction" use="required"/>
         <xs:attribute name="button" type="ob:button" use="required"/>
     </xs:complexType>
     <xs:complexType name="context">
-        <xs:sequence>
-            <xs:element maxOccurs="unbounded" name="mousebind" type="ob:mousebind"/>
-        </xs:sequence>
+        <xs:element maxOccurs="unbounded" name="mousebind" type="ob:mousebind"/>
         <xs:attribute name="name" type="ob:contextname" use="required"/>
     </xs:complexType>
     <xs:complexType name="mouse">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="dragThreshold" type="xs:integer"/>
-            <xs:element minOccurs="0" name="doubleClickTime" type="xs:integer"/>
-            <xs:element maxOccurs="unbounded" name="context" type="ob:context"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="dragThreshold" type="xs:integer"/>
+        <xs:element minOccurs="0" name="doubleClickTime" type="xs:integer"/>
+        <xs:element maxOccurs="unbounded" name="context" type="ob:context"/>
     </xs:complexType>
     <xs:complexType name="menu">
-        <xs:sequence>
-            <xs:element maxOccurs="unbounded" name="file" type="xs:string"/>
-            <xs:element minOccurs="0" name="warpPointer" type="ob:bool"/>
-            <xs:element minOccurs="0" name="xorStyle" type="ob:bool"/>
-            <xs:element minOccurs="0" name="hideDelay" type="xs:integer"/>
-            <xs:element minOccurs="0" name="middle" type="ob:bool"/>
-            <xs:element minOccurs="0" name="submenuShowDelay" type="xs:integer"/>
-            <xs:element minOccurs="0" name="desktopMenuIcons" type="ob:bool"/>
-        </xs:sequence>
+        <xs:element maxOccurs="unbounded" name="file" type="xs:string"/>
+        <xs:element minOccurs="0" name="warpPointer" type="ob:bool"/>
+        <xs:element minOccurs="0" name="xorStyle" type="ob:bool"/>
+        <xs:element minOccurs="0" name="hideDelay" type="xs:integer"/>
+        <xs:element minOccurs="0" name="middle" type="ob:bool"/>
+        <xs:element minOccurs="0" name="submenuShowDelay" type="xs:integer"/>
+        <xs:element minOccurs="0" name="desktopMenuIcons" type="ob:bool"/>
     </xs:complexType>
     <xs:complexType name="window_position">
-        <xs:sequence>
-            <xs:element name="x" type="ob:center_or_int"/>
-            <xs:element name="y" type="ob:center_or_int"/>
-        </xs:sequence>
+        <xs:element name="x" type="ob:center_or_int"/>
+        <xs:element name="y" type="ob:center_or_int"/>
     </xs:complexType>
     <xs:complexType name="application">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="decor" type="xs:string"/>
-            <xs:element minOccurs="0" name="shade" type="ob:bool"/>
-            <xs:element minOccurs="0" name="position" type="ob:window_position"/>
-            <xs:element minOccurs="0" name="focus" type="xs:string"/>
-            <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
-            <xs:element minOccurs="0" name="head" type="xs:string"/>
-            <xs:element minOccurs="0" name="layer" type="ob:layer"/>
-            <xs:element minOccurs="0" name="iconic" type="ob:bool"/>
-            <xs:element minOccurs="0" name="skip_pager" type="ob:bool"/>
-            <xs:element minOccurs="0" name="skip_taskbar" type="ob:bool"/>
-            <xs:element minOccurs="0" name="fullscreen" type="ob:bool"/>
-            <xs:element minOccurs="0" name="maximized" type="ob:maximization"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" name="decor" type="xs:string"/>
+        <xs:element minOccurs="0" name="shade" type="ob:bool"/>
+        <xs:element minOccurs="0" name="position" type="ob:window_position"/>
+        <xs:element minOccurs="0" name="focus" type="xs:string"/>
+        <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
+        <xs:element minOccurs="0" name="head" type="xs:string"/>
+        <xs:element minOccurs="0" name="layer" type="ob:layer"/>
+        <xs:element minOccurs="0" name="iconic" type="ob:bool"/>
+        <xs:element minOccurs="0" name="skip_pager" type="ob:bool"/>
+        <xs:element minOccurs="0" name="skip_taskbar" type="ob:bool"/>
+        <xs:element minOccurs="0" name="fullscreen" type="ob:bool"/>
+        <xs:element minOccurs="0" name="maximized" type="ob:maximization"/>
         <!-- at least one of these must be present -->
         <xs:attribute name="name" type="xs:string"/>
         <xs:attribute name="class" type="xs:string"/>
         <xs:attribute name="role" type="xs:string"/>
     </xs:complexType>
     <xs:complexType name="applications">
-        <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="application" type="ob:application"/>
-        </xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="application" type="ob:application"/>
     </xs:complexType>
     <!--
          simple types / restrictions
@@ -270,6 +233,7 @@
     <xs:simpleType name="actionname">
         <xs:restriction base="xs:string">
             <xs:enumeration value="Activate"/>
+            <xs:enumeration value="BreakChroot"/>
             <xs:enumeration value="Close"/>
             <xs:enumeration value="Desktop"/>
             <xs:enumeration value="DesktopDown"/>

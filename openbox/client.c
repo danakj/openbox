@@ -483,11 +483,8 @@ void client_unmanage(ObClient *self)
     /* flush to send the hide to the server quickly */
     XFlush(ob_display);
 
-    if (focus_client == self) {
-        /* ignore enter events from the unmap so it doesnt mess with the focus
-         */
-        event_ignore_queued_enters();
-    }
+    /* ignore enter events from the unmap so it doesnt mess with the focus */
+    event_ignore_queued_enters();
 
     mouse_grab_for_client(self, FALSE);
 
@@ -1137,7 +1134,8 @@ void client_update_transient_for(ObClient *self)
             /* remove from old parents */
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
-                if (c != self && !c->transient_for)
+                if (c != self && (!c->transient_for ||
+                                  c->transient_for != OB_TRAN_GROUP))
                     c->transients = g_slist_remove(c->transients, self);
             }
         } else if (self->transient_for != NULL) { /* transient of window */
@@ -1152,7 +1150,8 @@ void client_update_transient_for(ObClient *self)
             /* add to new parents */
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
-                if (c != self && !c->transient_for)
+                if (c != self && (!c->transient_for ||
+                                  c->transient_for != OB_TRAN_GROUP))
                     c->transients = g_slist_append(c->transients, self);
             }
 

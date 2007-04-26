@@ -41,6 +41,13 @@ typedef void (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame, gpointer data);
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry,
                                   guint state, gpointer data, Time time);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
+/*! @param x is the mouse x coordinate. on return it should be the x coordinate
+             for the menu
+    @param y is the mouse y coordinate. on return it should be the y coordinate
+             for the menu
+*/
+typedef void (*ObMenuPlaceFunc)(struct _ObMenuFrame *frame, gint *x, gint *y,
+                                gint button, gpointer data);
 
 struct _ObMenu
 {
@@ -70,6 +77,7 @@ struct _ObMenu
     ObMenuUpdateFunc update_func;
     ObMenuExecuteFunc execute_func;
     ObMenuDestroyFunc destroy_func;
+    ObMenuPlaceFunc place_func;
 
     /* Pipe-menu parent, we get destroyed when it is destroyed */
     ObMenu *pipe_creator;
@@ -144,11 +152,13 @@ void menu_pipe_execute(ObMenu *self);
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
-void menu_show(gchar *name, gint x, gint y, struct _ObClient *client);
+void menu_show(gchar *name, gint x, gint y, gint button,
+               struct _ObClient *client);
 
 void menu_set_update_func(ObMenu *menu, ObMenuUpdateFunc func);
 void menu_set_execute_func(ObMenu *menu, ObMenuExecuteFunc func);
 void menu_set_destroy_func(ObMenu *menu, ObMenuDestroyFunc func);
+void menu_set_place_func(ObMenu *menu, ObMenuPlaceFunc func);
 
 /* functions for building menus */
 /*! @param allow_shortcut this should be false when the label is coming from

@@ -32,11 +32,10 @@
 #include "keyboard.h"
 #include "translate.h"
 #include "moveresize.h"
+#include "popup.h"
 #include "gettext.h"
 
 #include <glib.h>
-
-KeyBindingTree *keyboard_firstnode;
 
 typedef struct {
     guint state;
@@ -45,61 +44,112 @@ typedef struct {
     ObFrameContext context;
 } ObInteractiveState;
 
+KeyBindingTree *keyboard_firstnode = NULL;
+static ObPopup *popup = NULL;
 static GSList *interactive_states;
-
 static KeyBindingTree *curpos;
 
-static void grab_for_window(Window win, gboolean grab)
+static void grab_keys(gboolean grab)
 {
     KeyBindingTree *p;
 
-    ungrab_all_keys(win);
+    ungrab_all_keys(RootWindow(ob_display, ob_screen));
 
     if (grab) {
         p = curpos ? curpos->first_child : keyboard_firstnode;
         while (p) {
-            grab_key(p->key, p->state, win, GrabModeAsync);
+            grab_key(p->key, p->state, RootWindow(ob_display, ob_screen),
+                     GrabModeAsync);
             p = p->next_sibling;
         }
         if (curpos)
             grab_key(config_keyboard_reset_keycode,
                      config_keyboard_reset_state,
-                     win, GrabModeAsync);
+                     RootWindow(ob_display, ob_screen), GrabModeAsync);
     }
-}
-
-static void grab_keys(gboolean grab)
-{
-    GList *it;
-
-    grab_for_window(screen_support_win, grab);
-    grab_for_window(RootWindow(ob_display, ob_screen), grab);
 }
 
 static gboolean chain_timeout(gpointer data)
 {
-    keyboard_reset_chains();
+    keyboard_reset_chains(0);
+    return FALSE; /* don't repeat */
+}
+
+static gboolean popup_show_timeout(gpointer data)
+{
+    gchar *text = data;
+    popup_show(popup, text);
 
     return FALSE; /* don't repeat */
 }
 
-void keyboard_reset_chains()
+static void set_curpos(KeyBindingTree *newpos)
 {
-    ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+    grab_keys(FALSE);
+    curpos = newpos;
+    grab_keys(TRUE);
 
-    if (curpos) {
-        grab_keys(FALSE);
-        curpos = NULL;
-        grab_keys(TRUE);
+    if (curpos != NULL) {
+        gchar *text = NULL;
+        GList *it;
+
+        for (it = curpos->keylist; it; it = g_list_next(it)) {
+            gchar *oldtext = text;
+            if (text == NULL)
+                text = g_strdup(it->data);
+            else
+                text = g_strconcat(text, " - ", it->data, NULL);
+            g_free(oldtext);
+        }
+
+        popup_position(popup, NorthWestGravity, 10, 10);
+        if (popup->mapped) {
+            popup_show_timeout(text);
+            g_free(text);
+        } else {
+            ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+            /* 1 second delay for the popup to show */
+            ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC,
+                                     popup_show_timeout, text,
+                                     g_direct_equal, g_free);
+        }
+    } else {
+        popup_hide(popup);
+        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
     }
+}
+
+void keyboard_reset_chains(gint break_chroots)
+{
+    KeyBindingTree *p;
+
+    for (p = curpos; p; p = p->parent) {
+        if (p->chroot) {
+            if (break_chroots == 0) break; /* stop here */
+            if (break_chroots > 0)
+                --break_chroots;
+        }
+    }
+    set_curpos(p);
 }
 
 void keyboard_unbind_all()
 {
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;
-    grab_keys(FALSE);
-    curpos = NULL;
+}
+
+void keyboard_chroot(GList *keylist)
+{
+    /* try do it in the existing tree. if we can't that means it is an empty
+       chroot binding. so add it to the tree then. */
+    if (!tree_chroot(keyboard_firstnode, keylist)) {
+        KeyBindingTree *tree;
+        if (!(tree = tree_build(keylist)))
+            return;
+        tree_chroot(tree, keylist);
+        tree_assimilate(tree);
+    }
 }
 
 gboolean keyboard_bind(GList *keylist, ObAction *action)
@@ -190,7 +240,6 @@ void keyboard_interactive_end(ObInteractiveState *s,
     if (!interactive_states) {
         grab_keyboard(FALSE);
         grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-        keyboard_reset_chains();
     }
 }
 
@@ -251,7 +300,8 @@ void keyboard_event(ObClient *client, const XEvent *e)
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         e->xkey.state == config_keyboard_reset_state)
     {
-        keyboard_reset_chains();
+        ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+        keyboard_reset_chains(-1);
         return;
     }
 
@@ -265,16 +315,15 @@ void keyboard_event(ObClient *client, const XEvent *e)
         {
             if (p->first_child != NULL) { /* part of a chain */
                 ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
-                /* 5 second timeout for chains */
-                ob_main_loop_timeout_add(ob_main_loop, 5 * G_USEC_PER_SEC,
+                /* 3 second timeout for chains */
+                ob_main_loop_timeout_add(ob_main_loop, 3 * G_USEC_PER_SEC,
                                          chain_timeout, NULL,
                                          g_direct_equal, NULL);
-                grab_keys(FALSE);
-                curpos = p;
-                grab_keys(TRUE);
-            } else {
-
-                keyboard_reset_chains();
+                set_curpos(p);
+            } else if (p->chroot)         /* an empty chroot */
+                set_curpos(p);
+            else {
+                keyboard_reset_chains(0);
 
                 action_run_key(p->actions, client, e->xkey.state,
                                e->xkey.x_root, e->xkey.y_root,
@@ -294,6 +343,7 @@ gboolean keyboard_interactively_grabbed()
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
+    popup = popup_new(FALSE);
 
     if (!reconfig)
         client_add_destructor(keyboard_interactive_end_client, NULL);
@@ -312,7 +362,12 @@ void keyboard_shutdown(gboolean reconfig)
     interactive_states = NULL;
 
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+    ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
 
     keyboard_unbind_all();
+    set_curpos(NULL);
+
+    popup_free(popup);
+    popup = NULL;
 }
 

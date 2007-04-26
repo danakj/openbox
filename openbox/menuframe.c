@@ -209,21 +209,69 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
     XMoveWindow(ob_display, self->window, self->area.x, self->area.y);
 }
 
-void menu_frame_place_topmenu(ObMenuFrame *self, gint x, gint y)
+static void menu_frame_place_topmenu(ObMenuFrame *self, gint *x, gint *y)
 {
-    if (self->client && x < 0 && y < 0) {
-        x = self->client->frame->area.x + self->client->frame->size.left;
-        y = self->client->frame->area.y + self->client->frame->size.top;
+    gint dx, dy;
+
+    if (config_menu_middle) {
+        gint myx;
+
+        myx = *x;
+        *y -= self->area.height / 2;
+
+        /* try to the right of the cursor */
+        menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        if (dx != 0) {
+            /* try to the left of the cursor */
+            myx = *x - self->area.width;
+            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        }
+        if (dx != 0) {
+            /* if didnt fit on either side so just use what it says */
+            myx = *x;
+            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        }
+        *x = myx + dx;
+        *y += dy;
     } else {
-        if (config_menu_middle)
-            y -= self->area.height / 2;
+        gint myx, myy;
+
+        myx = *x;
+        myy = *y;
+
+        /* try to the bottom right of the cursor */
+        menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        if (dx != 0 || dy != 0) {
+            /* try to the bottom left of the cursor */
+            myx = *x - self->area.width;
+            myy = *y;
+            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        }
+        if (dx != 0 || dy != 0) {
+            /* try to the top right of the cursor */
+            myx = *x;
+            myy = *y - self->area.height;
+            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        }
+        if (dx != 0 || dy != 0) {
+            /* try to the top left of the cursor */
+            myx = *x - self->area.width;
+            myy = *y - self->area.height;
+            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        }
+        if (dx != 0 || dy != 0) {
+            /* if didnt fit on either side so just use what it says */
+            myx = *x;
+            myy = *y;
+            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        }
+        *x = myx + dx;
+        *y = myy + dy;
     }
-    menu_frame_move(self, x, y);
 }
 
-void menu_frame_place_submenu(ObMenuFrame *self)
+static void menu_frame_place_submenu(ObMenuFrame *self, gint *x, gint *y)
 {
-    gint x, y;
     gint overlap;
     gint bwidth;
 
@@ -231,20 +279,20 @@ void menu_frame_place_submenu(ObMenuFrame *self)
     bwidth = ob_rr_theme->mbwidth;
 
     if (self->direction_right)
-        x = self->parent->area.x + self->parent->area.width - overlap - bwidth;
+        *x = self->parent->area.x + self->parent->area.width -
+            overlap - bwidth;
     else
-        x = self->parent->area.x - self->area.width + overlap + bwidth;
+        *x = self->parent->area.x - self->area.width + overlap + bwidth;
 
-    y = self->parent->area.y + self->parent_entry->area.y;
+    *y = self->parent->area.y + self->parent_entry->area.y;
     if (config_menu_middle)
-        y -= (self->area.height - (bwidth * 2) - self->item_h) / 2;
+        *y -= (self->area.height - (bwidth * 2) - self->item_h) / 2;
     else
-        y += overlap;
-
-    menu_frame_move(self, x, y);
+        *y += overlap;
 }
 
-void menu_frame_move_on_screen(ObMenuFrame *self, gint *dx, gint *dy)
+void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
+                               gint *dx, gint *dy)
 {
     Rect *a = NULL;
     gint pos, half;
@@ -259,16 +307,16 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint *dx, gint *dy)
     /* if in the bottom half then check this stuff first, will keep the bottom
        edge of the menu visible */
     if (pos > half) {
-        *dx = MAX(*dx, a->x - self->area.x);
-        *dy = MAX(*dy, a->y - self->area.y);
+        *dx = MAX(*dx, a->x - x);
+        *dy = MAX(*dy, a->y - y);
     }
-    *dx = MIN(*dx, (a->x + a->width) - (self->area.x + self->area.width));
-    *dy = MIN(*dy, (a->y + a->height) - (self->area.y + self->area.height));
+    *dx = MIN(*dx, (a->x + a->width) - (x + self->area.width));
+    *dy = MIN(*dy, (a->y + a->height) - (y + self->area.height));
     /* if in the top half then check this stuff last, will keep the top
        edge of the menu visible */
     if (pos <= half) {
-        *dx = MAX(*dx, a->x - self->area.x);
-        *dy = MAX(*dy, a->y - self->area.y);
+        *dx = MAX(*dx, a->x - x);
+        *dy = MAX(*dy, a->y - y);
     }
 }
 
@@ -723,17 +771,15 @@ static gboolean menu_frame_show(ObMenuFrame *self)
     return TRUE;
 }
 
-gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y)
+gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
+                                 gint button)
 {
-    gint dx, dy;
     guint i;
 
     if (menu_frame_is_visible(self))
         return TRUE;
     if (!menu_frame_show(self))
         return FALSE;
-
-    menu_frame_place_topmenu(self, x, y);
 
     /* find the monitor the menu is on */
     for (i = 0; i < screen_num_monitors; ++i) {
@@ -744,8 +790,12 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y)
         }
     }
 
-    menu_frame_move_on_screen(self, &dx, &dy);
-    menu_frame_move(self, self->area.x + dx, self->area.y + dy);
+    if (self->menu->place_func)
+        self->menu->place_func(self, &x, &y, button, self->menu->data);
+    else
+        menu_frame_place_topmenu(self, &x, &y);
+
+    menu_frame_move(self, x, y);
 
     XMapWindow(ob_display, self->window);
 
@@ -756,7 +806,7 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
                                  ObMenuEntryFrame *parent_entry)
 {
     ObMenuEntryFrame *e;
-    gint dx, dy;
+    gint x, y, dx, dy;
 
     if (menu_frame_is_visible(self))
         return TRUE;
@@ -773,29 +823,16 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     if (!menu_frame_show(self))
         return FALSE;
 
-    menu_frame_place_submenu(self);
-    menu_frame_move_on_screen(self, &dx, &dy);
+    menu_frame_place_submenu(self, &x, &y);
+    menu_frame_move_on_screen(self, x, y, &dx, &dy);
 
-    if (dx == 0) {
-        menu_frame_move(self, self->area.x, self->area.y + dy);
-    } else {
-        gboolean dir;
-
-        /* flip the direction in which we're placing submenus */
-        if (dx > 0)
-            dir = TRUE;
-        else
-            dir = FALSE;
-
-        /* if it changed, then replace the menu on the opposite side,
-           and try keep it on the screen too */
-        if (dir != self->direction_right) {
-            self->direction_right = dir;
-            menu_frame_place_submenu(self);
-            menu_frame_move_on_screen(self, &dx, &dy);
-            menu_frame_move(self, self->area.x + dx, self->area.y + dy);
-        }
+    if (dx != 0) {
+        /*try the other side */
+        self->direction_right = !self->direction_right;
+        menu_frame_place_submenu(self, &x, &y);
+        menu_frame_move_on_screen(self, x, y, &dx, &dy);
     }
+    menu_frame_move(self, x + dx, y + dy);
 
     XMapWindow(ob_display, self->window);
 

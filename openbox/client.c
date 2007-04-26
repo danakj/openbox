@@ -1134,7 +1134,8 @@ void client_update_transient_for(ObClient *self)
             /* remove from old parents */
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
-                if (c != self && !c->transient_for)
+                if (c != self && (!c->transient_for ||
+                                  c->transient_for != OB_TRAN_GROUP))
                     c->transients = g_slist_remove(c->transients, self);
             }
         } else if (self->transient_for != NULL) { /* transient of window */
@@ -1149,7 +1150,8 @@ void client_update_transient_for(ObClient *self)
             /* add to new parents */
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
-                if (c != self && !c->transient_for)
+                if (c != self && (!c->transient_for ||
+                                  c->transient_for != OB_TRAN_GROUP))
                     c->transients = g_slist_append(c->transients, self);
             }
 

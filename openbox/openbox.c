@@ -241,7 +241,8 @@ gint main(gint argc, gchar **argv)
                                         config_font_activewindow,
                                         config_font_inactivewindow,
                                         config_font_menutitle,
-                                        config_font_menuitem)))
+                                        config_font_menuitem,
+                                        config_font_osd)))
                 {
                     RrThemeFree(ob_rr_theme);
                     ob_rr_theme = theme;

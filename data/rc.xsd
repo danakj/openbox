@@ -47,10 +47,12 @@
          Removing font shadows - they are going back into the themerc
      Tue Apr 24 18:42:24 UTC 2007 - mikachu(a)openbox.org
          Removed fourCorners option.
-     Wed Apr 25 14:02:40 UTC 2007
+     Wed Apr 25 14:02:40 UTC 2007 - mikachu(a)openbox.org
          Fixed values for layer to be above/below, not top/bottom.
          Add chroot attribute and keybind element to keybind element.
          Remove xsd:sequence from everywhere, we don't care about order.
+     Thu Apr 26 09:11:03 EDT 2007 - danakj(a)orodu.net
+         Add the place attribute for fonts
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -117,6 +119,7 @@
         <xsd:element minOccurs="0" name="size" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="weight" type="ob:fontweight"/>
         <xsd:element minOccurs="0" name="slant" type="ob:fontslant"/>
+        <xsd:attribute name="place" type="ob:fontplace" use="required"/>
     </xsd:complexType>
     <xsd:complexType name="desktops">
         <xsd:annotation>
@@ -331,6 +334,15 @@
             <xsd:enumeration value="false"/>
             <xsd:enumeration value="on"/>
             <xsd:enumeration value="off"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="fontplace">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ActiveWindow"/>
+            <xsd:enumeration value="InactiveWindow"/>
+            <xsd:enumeration value="MenuHeader"/>
+            <xsd:enumeration value="MenuItem"/>
+            <xsd:enumeration value="OnScreenDisplay"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="fontweight">

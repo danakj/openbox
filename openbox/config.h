@@ -97,6 +97,8 @@ extern RrFont *config_font_inactivewindow;
 extern RrFont *config_font_menutitle;
 /*! The font for menu items */
 extern RrFont *config_font_menuitem;
+/*! The font for on-screen-displays/popups */
+extern RrFont *config_font_osd;
 
 /*! The number of desktops */
 extern gint config_desktops_num;

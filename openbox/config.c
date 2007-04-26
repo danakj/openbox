@@ -46,6 +46,7 @@ RrFont *config_font_activewindow;
 RrFont *config_font_inactivewindow;
 RrFont *config_font_menuitem;
 RrFont *config_font_menutitle;
+RrFont *config_font_osd;
 
 gint    config_desktops_num;
 GSList *config_desktops_names;
@@ -467,10 +468,12 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             font = &config_font_activewindow;
         else if (parse_attr_contains("InactiveWindow", n, "place"))
             font = &config_font_inactivewindow;
-        else if (parse_attr_contains("MenuTitle", n, "place"))
+        else if (parse_attr_contains("MenuHeader", n, "place"))
             font = &config_font_menutitle;
         else if (parse_attr_contains("MenuItem", n, "place"))
             font = &config_font_menuitem;
+        else if (parse_attr_contains("OnScreenDisplay", n, "place"))
+            font = &config_font_osd;
         else
             goto next_font;
 

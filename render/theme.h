@@ -34,6 +34,7 @@ struct _RrTheme {
     RrFont *win_font_unfocused;
     RrFont *menu_title_font;
     RrFont *menu_font;
+    RrFont *osd_font;
 
     /* style settings - geometry */
     gint paddingx;
@@ -226,7 +227,8 @@ struct _RrTheme {
   the default font will be used. */
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *theme,
                     RrFont *active_window_font, RrFont *inactive_window_font,
-                    RrFont *menu_title_font, RrFont *menu_item_font);
+                    RrFont *menu_title_font, RrFont *menu_item_font,
+                    RrFont *osd_font);
 void RrThemeFree(RrTheme *theme);
 
 G_END_DECLS

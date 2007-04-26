@@ -278,6 +278,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     if (!parse_attr_string("key", node, &key))
         return;
+
     parse_attr_bool("chroot", node, &is_chroot);
 
     keylist = g_list_append(keylist, key);
@@ -304,9 +305,6 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     g_free(key);
     keylist = g_list_delete_link(keylist, g_list_last(keylist));
-
-    /* go to next sibling */
-    if (node->next) parse_key(i, doc, node->next, keylist);
 }
 
 static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -325,7 +323,10 @@ static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
 
     if ((n = parse_find_node("keybind", node->children)))
-        parse_key(i, doc, n, NULL);
+        while (n) {
+            parse_key(i, doc, n, NULL);
+            n = parse_find_node("keybind", n->next);
+        }
 }
 
 /*

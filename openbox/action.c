@@ -893,6 +893,11 @@ ActionString actionstrings[] =
         setup_action_growtoedge_east
     },
     {
+        "breakchroot",
+        action_break_chroot,
+        NULL
+    },
+    {
         NULL,
         NULL,
         NULL
@@ -1898,4 +1903,10 @@ void action_show_desktop(union ActionData *data)
 void action_unshow_desktop(union ActionData *data)
 {
     screen_show_desktop(FALSE);
+}
+
+void action_break_chroot(union ActionData *data)
+{
+    /* break out of one chroot */
+    keyboard_reset_chains(1);
 }

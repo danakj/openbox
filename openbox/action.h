@@ -341,5 +341,7 @@ void action_toggle_show_desktop(union ActionData *data);
 void action_show_desktop(union ActionData *data);
 /* Any */
 void action_unshow_desktop(union ActionData *data);
+/* Any */
+void action_break_chroot(union ActionData *data);
 
 #endif

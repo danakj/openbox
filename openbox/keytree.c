@@ -133,16 +133,16 @@ KeyBindingTree *tree_find(KeyBindingTree *search, gboolean *conflict)
 
 gboolean tree_chroot(KeyBindingTree *tree, GList *keylist)
 {
-    if (keylist == NULL) {
-        tree->chroot = TRUE;
-        return TRUE;
-    } else {
-        guint key, state;
-        if (translate_key(keylist->data, &state, &key)) {
-            while (tree != NULL && !(tree->state == state && tree->key == key))
-                tree = tree->next_sibling;
-            if (tree != NULL)
-                return tree_chroot(tree, keylist->next);
+    guint key, state;
+    if (translate_key(keylist->data, &state, &key)) {
+        while (tree != NULL && !(tree->state == state && tree->key == key))
+            tree = tree->next_sibling;
+        if (tree != NULL) {
+            if (keylist->next == NULL) {
+                tree->chroot = TRUE;
+                return TRUE;
+            } else
+                return tree_chroot(tree->first_child, keylist->next);
         }
     }
     return FALSE;

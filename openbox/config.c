@@ -289,7 +289,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             n = parse_find_node("keybind", n->next);
         }
     }
-    if ((n = parse_find_node("action", node->children))) {
+    else if ((n = parse_find_node("action", node->children))) {
         while (n) {
             ObAction *action;
             

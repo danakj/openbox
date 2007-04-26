@@ -49,6 +49,7 @@
          Removed fourCorners option.
      Wed Apr 25 14:02:40 UTC 2007
          Fixed values for layer to be above/below, not top/bottom.
+         Add chroot attribute and keybind element to keybind element.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -190,6 +191,8 @@
     <xs:complexType name="keybind">
         <xs:sequence>
             <xs:element maxOccurs="unbounded" name="action" type="ob:action"/>
+            <xs:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
+            <xs:attribute name="chroot" type="ob:bool"/>
         </xs:sequence>
         <xs:attribute name="key" type="ob:keyname" use="required"/>
     </xs:complexType>

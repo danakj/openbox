@@ -240,30 +240,30 @@ static void menu_frame_place_topmenu(ObMenuFrame *self, gint *x, gint *y)
         myy = *y;
 
         /* try to the bottom right of the cursor */
-        menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
         if (dx != 0 || dy != 0) {
             /* try to the bottom left of the cursor */
             myx = *x - self->area.width;
             myy = *y;
-            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+            menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
         }
         if (dx != 0 || dy != 0) {
             /* try to the top right of the cursor */
             myx = *x;
             myy = *y - self->area.height;
-            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+            menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
         }
         if (dx != 0 || dy != 0) {
             /* try to the top left of the cursor */
             myx = *x - self->area.width;
             myy = *y - self->area.height;
-            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+            menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
         }
         if (dx != 0 || dy != 0) {
             /* if didnt fit on either side so just use what it says */
             myx = *x;
             myy = *y;
-            menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+            menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
         }
         *x = myx + dx;
         *y = myy + dy;

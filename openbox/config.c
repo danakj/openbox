@@ -283,13 +283,13 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     keylist = g_list_append(keylist, key);
 
-    /* a node either contains actions or key bindings */
     if ((n = parse_find_node("keybind", node->children))) {
         while (n) {
             parse_key(i, doc, n, keylist);
             n = parse_find_node("keybind", n->next);
         }
-    } else if ((n = parse_find_node("action", node->children))) {
+    }
+    if ((n = parse_find_node("action", node->children))) {
         while (n) {
             ObAction *action;
             

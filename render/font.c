@@ -252,19 +252,17 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     if (t->shortcut) {
         const gchar *c = t->string + t->shortcut_pos;
 
-        if (g_utf8_validate(c, -1, NULL)) {
-            t->font->shortcut_underline->start_index = t->shortcut_pos;
-            t->font->shortcut_underline->end_index = t->shortcut_pos +
-                (g_utf8_next_char(c) - c);
+        t->font->shortcut_underline->start_index = t->shortcut_pos;
+        t->font->shortcut_underline->end_index = t->shortcut_pos +
+            (g_utf8_next_char(c) - c);
 
-            /* the attributes are owned by the layout.
-               re-add the attributes to the layout after changing the
-               start and end index */
-            attrlist = pango_layout_get_attributes(t->font->layout);
-            pango_attr_list_ref(attrlist);
-            pango_layout_set_attributes(t->font->layout, attrlist);
-            pango_attr_list_unref(attrlist);
-        }
+        /* the attributes are owned by the layout.
+           re-add the attributes to the layout after changing the
+           start and end index */
+        attrlist = pango_layout_get_attributes(t->font->layout);
+        pango_attr_list_ref(attrlist);
+        pango_layout_set_attributes(t->font->layout, attrlist);
+        pango_attr_list_unref(attrlist);
     }
 
     /* layout_line() uses y to specify the baseline

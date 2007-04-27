@@ -45,6 +45,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     GList *it;
     gint i;
     gboolean empty = TRUE;
+    gboolean onlyiconic = TRUE;
 
     menu_clear_entries(menu);
 
@@ -73,8 +74,10 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
                 gchar *title = g_strdup_printf("(%s)", c->icon_title);
                 e = menu_add_normal(menu, i, title, acts, FALSE);
                 g_free(title);
-            } else
+            } else {
+                onlyiconic = FALSE;
                 e = menu_add_normal(menu, i, c->title, acts, FALSE);
+            }
 
             if (config_menu_client_list_icons
                 && (icon = client_icon(c, 32, 32))) {
@@ -85,8 +88,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
         }
     }
 
-    if (empty) {
-        /* no entries */
+    if (empty || onlyiconic) {
+        /* no entries or only iconified windows, so add a
+         * way to go to this desktop without uniconifying a window */
+        if (!empty)
+            menu_add_separator(menu, -1, NULL);
 
         GSList *acts = NULL;
         ObAction* act;

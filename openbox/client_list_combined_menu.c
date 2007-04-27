@@ -45,8 +45,8 @@ static void self_update(ObMenuFrame *frame, gpointer data)
 
     for (desktop = 0; desktop < screen_num_desktops; desktop++) {
         gboolean empty = TRUE;
+        gboolean onlyiconic = TRUE;
 
-        /* Don't need a separator at the very top */
         menu_add_separator(menu, -1, screen_desktop_names[desktop]);
         for (it = focus_order, i = 0; it; it = g_list_next(it), ++i) {
             ObClient *c = it->data;
@@ -72,8 +72,10 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                     gchar *title = g_strdup_printf("(%s)", c->icon_title);
                     e = menu_add_normal(menu, i, title, acts, FALSE);
                     g_free(title);
-                } else
+                } else {
+                    onlyiconic = FALSE;
                     e = menu_add_normal(menu, i, c->title, acts, FALSE);
+                }
 
                 if (config_menu_client_list_icons
                         && (icon = client_icon(c, 32, 32))) {
@@ -84,8 +86,11 @@ static void self_update(ObMenuFrame *frame, gpointer data)
             }
         }
 
-        if (empty) {
-            /* no entries */
+        if (empty || onlyiconic) {
+            /* no entries or only iconified windows, so add a
+             * way to go to this desktop without uniconifying a window */
+            if (!empty)
+                menu_add_separator(menu, -1, NULL);
 
             GSList *acts = NULL;
             ObAction* act;

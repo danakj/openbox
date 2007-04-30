@@ -1,15 +1,17 @@
-To build Openbox from CVS you need:
+To build Openbox from SVN you need:
 
 A C Compiler (GNU GCC 3.2+ suggested)
-GNU Gettext 0.12.1
+GNU Gettext 0.14.4
 GNU Autoconf 2.50+
-GNU Automake 1.7+
+GNU Automake 1.9+
 GNU Libtool
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Pkg-Config
 Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
 libxml2 2.0+ library/headers (devel package)
+Pango 1.10+ library/headers (devel package)
+cvs
 
 I recommend the latest version of all these packages.
 
@@ -19,7 +21,7 @@ Do the following to build and install Openbox in CVS:
 % ./configure
 % make all install
 
-Don't try running it from the src/ directory without installing, it won't work.
+Don't try running it from the openbox/ directory without installing, it won't work.
 It needs to be installed before it is run.
 
 The installed binary is 'openbox'.

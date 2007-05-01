@@ -18,14 +18,14 @@
 
 #include <stdio.h>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 int main () {
-  XSetWindowAttributes xswa;
-  unsigned long        xswamask;
   Display   *display;
   Window     win;
   XEvent     report;
   int        x=10,y=10,h=100,w=400;
+  XSizeHints *hints;
 
   display = XOpenDisplay(NULL);
 
@@ -34,17 +34,22 @@ int main () {
     return 0;
   }
 
-  xswa.win_gravity = StaticGravity;
-  xswamask = CWWinGravity;
-
   win = XCreateWindow(display, RootWindow(display, 0),
 		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
-		      CopyFromParent, xswamask, &xswa);
+		      CopyFromParent, 0, NULL);
+
+  hints = XAllocSizeHints();
+  hints->flags = PWinGravity;
+  hints->win_gravity = SouthEastGravity;
+  XSetWMNormalHints(display, win, hints);
+  XFree(hints);
 
   XSetWindowBackground(display,win,WhitePixel(display,0)); 
 
   XMapWindow(display, win);
   XFlush(display);
+
+  XMoveWindow(display, win, 960-1, 600-1);
 
   XSelectInput(display, win, ExposureMask | StructureNotifyMask);
 

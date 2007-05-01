@@ -82,6 +82,50 @@ void moveresize_shutdown(gboolean reconfig)
     popup = NULL;
 }
 
+static void get_resize_position(gint *x, gint *y, gboolean cancel)
+{
+    gint dw, dh;
+    gint w, h, lw, lh;
+
+    *x = moveresize_client->frame->area.x;
+    *y = moveresize_client->frame->area.y;
+
+    if (cancel) {
+        w = start_cw;
+        h = start_ch;
+    } else {
+        w = cur_x;
+        h = cur_y;
+    }
+
+    /* see how much it is actually going to resize */
+    {
+        gint cx = x, cy = y;
+        frame_frame_gravity(moveresize_client->frame, &cx, &cy, w, h);
+        client_try_configure(moveresize_client, &cx, &cy, &w, &h,
+                             &lw, &lh, TRUE);
+    }
+    dw = w - moveresize_client->area.width;
+    dh = h - moveresize_client->area.height;
+
+    switch (lockcorner) {
+    case OB_CORNER_TOPLEFT:
+        break;
+    case OB_CORNER_TOPRIGHT:
+        *x -= dw;
+        break;
+    case OB_CORNER_BOTTOMLEFT:
+        *y -= dh;
+        break;
+    case OB_CORNER_BOTTOMRIGHT:
+        *x -= dw;
+        *y -= dh;
+        break;
+    }
+
+    frame_frame_gravity(moveresize_client->frame, x, y, w, h);
+}
+
 static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 {
     gchar *text;
@@ -116,8 +160,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         return;
 
     moveresize_client = c;
-    start_cx = c->frame->area.x;
-    start_cy = c->frame->area.y;
+    start_cx = c->area.x;
+    start_cy = c->area.y;
     /* these adjustments for the size_inc make resizing a terminal more
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
@@ -220,6 +264,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 
 void moveresize_end(gboolean cancel)
 {
+    gint x, y;
+
     grab_keyboard(FALSE);
     grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
 
@@ -238,9 +284,8 @@ void moveresize_end(gboolean cancel)
         }
 #endif
 
-        client_configure(moveresize_client, lockcorner,
-                         moveresize_client->area.x,
-                         moveresize_client->area.y,
+        get_resize_position(&x, &y, cancel);
+        client_configure(moveresize_client, x, y,
                          (cancel ? start_cw : cur_x),
                          (cancel ? start_ch : cur_y), TRUE, TRUE);
     }
@@ -256,9 +301,7 @@ static void do_move(gboolean resist)
         resist_move_monitors(moveresize_client, &cur_x, &cur_y);
     }
 
-    /* get where the client should be */
-    frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
-    client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
+    client_configure(moveresize_client, cur_x, cur_y,
                      moveresize_client->area.width,
                      moveresize_client->area.height, TRUE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
@@ -282,11 +325,11 @@ static void do_resize()
             return;
 
         /* see if it is actually going to resize */
-        x = moveresize_client->area.x;
-        y = moveresize_client->area.y;
+        x = 0;
+        y = 0;
         w = cur_x;
         h = cur_y;
-        client_try_configure(moveresize_client, lockcorner, &x, &y, &w, &h,
+        client_try_configure(moveresize_client, &x, &y, &w, &h,
                              &lw, &lh, TRUE);
         if (w == moveresize_client->area.width &&
             h == moveresize_client->area.height)
@@ -316,9 +359,11 @@ static void do_resize()
     }
 #endif
 
-    client_configure(moveresize_client, lockcorner, 
-                     moveresize_client->area.x, moveresize_client->area.y,
-                     cur_x, cur_y, TRUE, FALSE);
+    {
+        gint x, y;
+        get_resize_position(&x, &y, FALSE);
+        client_configure(moveresize_client, x, y, cur_x, cur_y, TRUE, FALSE);
+    }
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

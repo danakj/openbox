@@ -442,9 +442,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
-            /* move the plate */
-            XMoveWindow(ob_display, self->plate,
-                        self->cbwidth_x, self->cbwidth_y);
+            /* move and resize the plate */
+            XMoveResizeWindow(ob_display, self->plate,
+                              self->cbwidth_x, self->cbwidth_y,
+                              self->client->area.width,
+                              self->client->area.height);
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window, 0, 0);
@@ -466,12 +468,14 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
-    if (moved) {
+    if (moved || resized) {
         /* find the new coordinates, done after setting the frame.size, for
            frame_client_gravity. */
         self->area.x = self->client->area.x;
         self->area.y = self->client->area.y;
-        frame_client_gravity(self, &self->area.x, &self->area.y);
+        frame_client_gravity(self, &self->area.x, &self->area.y,
+                             self->client->area.width,
+                             self->client->area.height);
     }
 
     if (!fake) {
@@ -517,13 +521,6 @@ void frame_adjust_focus(ObFrame *self, gboolean hilite)
     self->focused = hilite;
     framerender_frame(self);
     XFlush(ob_display);
-}
-
-void frame_adjust_client_area(ObFrame *self)
-{
-    /* resize the plate */
-    XResizeWindow(ob_display, self->plate,
-                  self->client->area.width, self->client->area.height);
 }
 
 void frame_adjust_title(ObFrame *self)
@@ -861,7 +858,7 @@ ObFrameContext frame_context(ObClient *client, Window win)
     return OB_FRAME_CONTEXT_NONE;
 }
 
-void frame_client_gravity(ObFrame *self, gint *x, gint *y)
+void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
 {
     /* horizontal */
     switch (self->client->gravity) {
@@ -874,13 +871,13 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y)
     case NorthGravity:
     case SouthGravity:
     case CenterGravity:
-        *x -= (self->size.left + self->size.right) / 2;
+        *x -= (self->size.left + w) / 2;
         break;
 
     case NorthEastGravity:
     case SouthEastGravity:
     case EastGravity:
-        *x -= self->size.left + self->size.right;
+        *x -= (self->size.left + self->size.right + w) - 1;
         break;
 
     case ForgetGravity:
@@ -900,13 +897,13 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y)
     case CenterGravity:
     case EastGravity:
     case WestGravity:
-        *y -= (self->size.top + self->size.bottom) / 2;
+        *y -= (self->size.top + h) / 2;
         break;
 
     case SouthWestGravity:
     case SouthEastGravity:
     case SouthGravity:
-        *y -= self->size.top + self->size.bottom;
+        *y -= (self->size.top + self->size.bottom + h) - 1;
         break;
 
     case ForgetGravity:
@@ -916,7 +913,7 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y)
     }
 }
 
-void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
+void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
 {
     /* horizontal */
     switch (self->client->gravity) {
@@ -928,12 +925,12 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
     case NorthGravity:
     case CenterGravity:
     case SouthGravity:
-        *x += (self->size.left + self->size.right) / 2;
+        *x += (self->size.left + w) / 2;
         break;
     case NorthEastGravity:
     case EastGravity:
     case SouthEastGravity:
-        *x += self->size.left + self->size.right;
+        *x += (self->size.left + self->size.right + w) - 1;
         break;
     case StaticGravity:
     case ForgetGravity:
@@ -951,12 +948,12 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
     case WestGravity:
     case CenterGravity:
     case EastGravity:
-        *y += (self->size.top + self->size.bottom) / 2;
+        *y += (self->size.top + h) / 2;
         break;
     case SouthWestGravity:
     case SouthGravity:
     case SouthEastGravity:
-        *y += self->size.top + self->size.bottom;
+        *y += (self->size.top + self->size.bottom + h) - 1;
         break;
     case StaticGravity:
     case ForgetGravity:

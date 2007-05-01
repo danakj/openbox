@@ -1394,7 +1394,7 @@ void action_resize_relative(union ActionData *data)
     h = oh + data->relative.deltay * c->size_inc.height
         + data->relative.deltayu * c->size_inc.height;
     
-    client_try_configure(c, OB_CORNER_TOPLEFT, &x, &y, &w, &h, &lw, &lh, TRUE);
+    client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
     client_move_resize(c, x + (ow - w), y + (oh - h), w, h);
     client_action_end(data);
 }
@@ -1795,7 +1795,7 @@ void action_movetoedge(union ActionData *data)
     default:
         g_assert_not_reached();
     }
-    frame_frame_gravity(c->frame, &x, &y);
+    frame_frame_gravity(c->frame, &x, &y, c->area.width, c->area.height);
     client_action_start(data);
     client_move(c, x, y);
     client_action_end(data);
@@ -1859,9 +1859,9 @@ void action_growtoedge(union ActionData *data)
     default:
         g_assert_not_reached();
     }
-    frame_frame_gravity(c->frame, &x, &y);
     width -= c->frame->size.left + c->frame->size.right;
     height -= c->frame->size.top + c->frame->size.bottom;
+    frame_frame_gravity(c->frame, &x, &y, width, height);
     client_action_start(data);
     client_move_resize(c, x, y, width, height);
     client_action_end(data);

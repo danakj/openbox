@@ -5,13 +5,16 @@ GNU Gettext 0.14.4
 GNU Autoconf 2.50+
 GNU Automake 1.9+
 GNU Libtool
-Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Pkg-Config
 Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
 libxml2 2.0+ library/headers (devel package)
 Pango 1.10+ library/headers (devel package)
 cvs
+
+Optionally you may way:
+X Cursor library/headers (devel package)
+Startup Notification library/headers (devel package)
 
 I recommend the latest version of all these packages.
 
@@ -32,16 +35,18 @@ The installed binary is 'openbox'.
 In debian unstable, you want these packages:
 gcc
 gettext
-automake1.7
+automake1.9
 autoconf
 libtool
-libxft2-dev
-libxrender-dev
+libpango1.0-dev
 pkg-config
 libglib2.0-dev
 libxml2-dev
+libxcursor-dev
+libstartup-notification0-dev
+xlibs-dev
 
-tip: run "update-alternatives --config automake" and select automake1.7 before
+tip: run "update-alternatives --config automake" and select automake1.9 before
   running ./configure
 
 ----

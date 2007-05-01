@@ -442,11 +442,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
-            /* move and resize the plate */
-            XMoveResizeWindow(ob_display, self->plate,
-                              self->cbwidth_x, self->cbwidth_y,
-                              self->client->area.width,
-                              self->client->area.height);
+            /* move the plate */
+            XMoveWindow(ob_display, self->plate,
+                        self->cbwidth_x, self->cbwidth_y);
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window, 0, 0);
@@ -509,6 +507,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(ob_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
+}
+
+void frame_adjust_client_area(ObFrame *self)
+{
+    /* resize the plate */
+    XResizeWindow(ob_display, self->plate,
+                  self->client->area.width, self->client->area.height);
 }
 
 void frame_adjust_state(ObFrame *self)

@@ -754,8 +754,6 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     Rect *a;
     gint ox = *x, oy = *y;
 
-    /* XXX figure out if it is on screen now, and be rude if it is */
-
     /* get where the frame would be */
     frame_client_gravity(self->frame, x, y, w, h);
 
@@ -779,6 +777,15 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             *x = a->x - self->frame->area.width*9/10;
         if (!self->strut.top && *y + self->frame->area.height*9/10 - 1 < a->y)
             *y = a->y - self->frame->area.width*9/10;
+    }
+
+    /* If rudeness wasn't requested, then figure out of the client is currently
+       entirely on the screen. If it is, then be rude even though it wasn't
+       requested */
+    if (!rude) {
+        a = screen_area_monitor(self->desktop, client_monitor(self));
+        if (RECT_CONTAINS_RECT(*a, self->area))
+            rude = TRUE;
     }
 
     /* This here doesn't let windows even a pixel outside the screen,

@@ -873,7 +873,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                                CWX | CWY |
                                                CWBorderWidth)) {
             gint x, y, w, h;
-            ObCorner corner;
 
             if (e->xconfigurerequest.value_mask & CWBorderWidth)
                 client->border_width = e->xconfigurerequest.border_width;
@@ -887,44 +886,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             h = (e->xconfigurerequest.value_mask & CWHeight) ?
                 e->xconfigurerequest.height : client->area.height;
 
-            {
-                gint newx = x;
-                gint newy = y;
-                gint fw = w +
-                     client->frame->size.left + client->frame->size.right;
-                gint fh = h +
-                     client->frame->size.top + client->frame->size.bottom;
-                /* make this rude for size-only changes but not for position
-                   changes.. */
-                gboolean moving = ((e->xconfigurerequest.value_mask & CWX) ||
-                                   (e->xconfigurerequest.value_mask & CWY));
-
-                client_find_onscreen(client, &newx, &newy, fw, fh,
-                                     !moving);
-                if (e->xconfigurerequest.value_mask & CWX)
-                    x = newx;
-                if (e->xconfigurerequest.value_mask & CWY)
-                    y = newy;
-            }
-
-            switch (client->gravity) {
-            case NorthEastGravity:
-            case EastGravity:
-                corner = OB_CORNER_TOPRIGHT;
-                break;
-            case SouthWestGravity:
-            case SouthGravity:
-                corner = OB_CORNER_BOTTOMLEFT;
-                break;
-            case SouthEastGravity:
-                corner = OB_CORNER_BOTTOMRIGHT;
-                break;
-            default:     /* NorthWest, Static, etc */
-                corner = OB_CORNER_TOPLEFT;
-            }
-
-            client_configure_full(client, corner, x, y, w, h, FALSE, TRUE,
-                                  TRUE);
+            client_find_onscreen(client, &x, &y, w, h, client_normal(client));
+            client_configure_full(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
 
         if (e->xconfigurerequest.value_mask & CWStackMode) {
@@ -1086,13 +1049,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      prop_atoms.net_wm_moveresize_cancel)
                 moveresize_end(TRUE);
         } else if (msgtype == prop_atoms.net_moveresize_window) {
-            gint oldg = client->gravity;
-            gint tmpg, x, y, w, h;
+            gint grav, x, y, w, h;
 
             if (e->xclient.data.l[0] & 0xff)
-                tmpg = e->xclient.data.l[0] & 0xff;
-            else
-                tmpg = oldg;
+                grav = e->xclient.data.l[0] & 0xff;
+            else 
+                grav = client->gravity;
 
             if (e->xclient.data.l[0] & 1 << 8)
                 x = e->xclient.data.l[1];
@@ -1110,27 +1072,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 h = e->xclient.data.l[4];
             else
                 h = client->area.height;
-            client->gravity = tmpg;
 
-            {
-                gint newx = x;
-                gint newy = y;
-                gint fw = w +
-                     client->frame->size.left + client->frame->size.right;
-                gint fh = h +
-                     client->frame->size.top + client->frame->size.bottom;
-                client_find_onscreen(client, &newx, &newy, fw, fh,
-                                     client_normal(client));
-                if (e->xclient.data.l[0] & 1 << 8)
-                    x = newx;
-                if (e->xclient.data.l[0] & 1 << 9)
-                    y = newy;
-            }
-
-            client_configure(client, OB_CORNER_TOPLEFT,
-                             x, y, w, h, FALSE, TRUE);
-
-            client->gravity = oldg;
+            client_convert_gravity(client, grav, &x, &y, w, h);
+            client_find_onscreen(client, &x, &y, w, h, client_normal(client));
+            client_configure(client, x, y, w, h, FALSE, TRUE);
         }
         break;
     case PropertyNotify:

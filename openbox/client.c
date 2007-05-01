@@ -754,8 +754,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     Rect *a;
     gint ox = *x, oy = *y;
 
-    frame_client_gravity(self->frame, x, y); /* get where the frame
-                                                would be */
+    /* get where the frame would be */
+    frame_client_gravity(self->frame, x, y, w, h);
 
     /* XXX watch for xinerama dead areas */
     /* This makes sure windows aren't entirely outside of the screen so you
@@ -777,6 +777,15 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             *x = a->x - self->frame->area.width*9/10;
         if (!self->strut.top && *y + self->frame->area.height*9/10 - 1 < a->y)
             *y = a->y - self->frame->area.width*9/10;
+    }
+
+    /* If rudeness wasn't requested, then figure out of the client is currently
+       entirely on the screen. If it is, then be rude even though it wasn't
+       requested */
+    if (!rude) {
+        a = screen_area_monitor(self->desktop, client_monitor(self));
+        if (RECT_CONTAINS_RECT(*a, self->area))
+            rude = TRUE;
     }
 
     /* This here doesn't let windows even a pixel outside the screen,
@@ -804,8 +813,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         }
     }
 
-    frame_frame_gravity(self->frame, x, y); /* get where the client
-                                               should be */
+    /* get where the client should be */
+    frame_frame_gravity(self->frame, x, y, w, h);
 
     return ox != *x || oy != *y;
 }
@@ -1351,9 +1360,9 @@ void client_update_normal_hints(ObClient *self)
             if (self->frame && self->gravity != oldgravity) {
                 /* move our idea of the client's position based on its new
                    gravity */
-                self->area.x = self->frame->area.x;
-                self->area.y = self->frame->area.y;
-                frame_frame_gravity(self->frame, &self->area.x, &self->area.y);
+                client_convert_gravity(self, oldgravity,
+                                       &self->area.x, &self->area.y,
+                                       self->area.width, self->area.height);
             }
         }
 
@@ -1572,7 +1581,7 @@ void client_reconfigure(ObClient *self)
     /* by making this pass FALSE for user, we avoid the emacs event storm where
        every configurenotify causes an update in its normal hints, i think this
        is generally what we want anyways... */
-    client_configure(self, OB_CORNER_TOPLEFT, self->area.x, self->area.y,
+    client_configure(self, self->area.x, self->area.y,
                      self->area.width, self->area.height, FALSE, TRUE);
 }
 
@@ -2225,8 +2234,21 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     */
 }
 
-void client_try_configure(ObClient *self, ObCorner anchor,
-                          gint *x, gint *y, gint *w, gint *h,
+void client_convert_gravity(ObClient *self, gint gravity, gint *x, gint *y,
+                            gint w, gint h)
+{
+    gint oldg = self->gravity;
+
+    /* get the frame's position from the requested stuff */
+    self->gravity = gravity;
+    frame_client_gravity(self->frame, x, y, w, h);
+    self->gravity = oldg;
+
+    /* get the client's position in its true gravity from that */
+    frame_frame_gravity(self->frame, x, y, w, h);
+}
+
+void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                           gint *logicalw, gint *logicalh,
                           gboolean user)
 {
@@ -2321,7 +2343,7 @@ void client_try_configure(ObClient *self, ObCorner anchor,
     }
 
     /* gets the frame's position */
-    frame_client_gravity(self->frame, x, y);
+    frame_client_gravity(self->frame, x, y, *w, *h);
 
     /* these positions are frame positions, not client positions */
 
@@ -2362,7 +2384,7 @@ void client_try_configure(ObClient *self, ObCorner anchor,
     }
 
     /* gets the client's position */
-    frame_frame_gravity(self->frame, x, y);
+    frame_frame_gravity(self->frame, x, y, *w, *h);
 
     /* these override the above states! if you cant move you can't move! */
     if (user) {
@@ -2378,26 +2400,10 @@ void client_try_configure(ObClient *self, ObCorner anchor,
 
     g_assert(*w > 0);
     g_assert(*h > 0);
-
-    switch (anchor) {
-    case OB_CORNER_TOPLEFT:
-        break;
-    case OB_CORNER_TOPRIGHT:
-        *x -= *w - self->area.width;
-        break;
-    case OB_CORNER_BOTTOMLEFT:
-        *y -= *h - self->area.height;
-        break;
-    case OB_CORNER_BOTTOMRIGHT:
-        *x -= *w - self->area.width;
-        *y -= *h - self->area.height;
-        break;
-    }
 }
 
 
-void client_configure_full(ObClient *self, ObCorner anchor,
-                           gint x, gint y, gint w, gint h,
+void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
                            gboolean user, gboolean final,
                            gboolean force_reply)
 {
@@ -2409,8 +2415,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     gint logicalw, logicalh;
 
     /* find the new x, y, width, and height (and logical size) */
-    client_try_configure(self, anchor, &x, &y, &w, &h,
-                         &logicalw, &logicalh, user);
+    client_try_configure(self, &x, &y, &w, &h, &logicalw, &logicalh, user);
 
     /* set the logical size if things changed */
     if (!(w == self->area.width && h == self->area.height))
@@ -2432,10 +2437,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                                     (resized && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
-    if (send_resize_client && user && (w > oldw || h > oldh)) {
+    if (send_resize_client && user && (w > oldw || h > oldh))
         XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
-        frame_adjust_client_area(self->frame);
-    }
 
     /* find the frame's dimensions and move/resize it */
     if (self->decorations != fdecor || self->max_horz != fhorz)
@@ -2481,10 +2484,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (!user || (w <= oldw || h <= oldh))) {
-        frame_adjust_client_area(self->frame);
+    if (send_resize_client && (!user || (w <= oldw || h <= oldh)))
         XResizeWindow(ob_display, self->window, w, h);
-    }
 
     XFlush(ob_display);
 }
@@ -3258,7 +3259,7 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
          * since 125 of these are sent per second when moving the window (with
          * user = FALSE) i doubt it matters much.
          */
-        client_configure(self, OB_CORNER_TOPLEFT, self->area.x, self->area.y,
+        client_configure(self, self->area.x, self->area.y,
                          self->area.width, self->area.height, TRUE, TRUE);
         client_change_state(self); /* reflect this in the state hints */
     }

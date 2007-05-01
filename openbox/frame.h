@@ -151,7 +151,6 @@ void frame_adjust_theme(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);
-void frame_adjust_client_area(ObFrame *self);
 void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);
@@ -167,13 +166,13 @@ ObFrameContext frame_context(struct _ObClient *self, Window win);
   be positioned.
   @return The proper coordinates for the frame, based on the client.
 */
-void frame_client_gravity(ObFrame *self, gint *x, gint *y);
+void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
 
 /*! Reversly applies gravity to the frame's position to find where the client
   should be positioned.
     @return The proper coordinates for the client, based on the frame.
 */
-void frame_frame_gravity(ObFrame *self, gint *x, gint *y);
+void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
 
 void frame_flash_start(ObFrame *self);
 void frame_flash_stop(ObFrame *self);

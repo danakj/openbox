@@ -146,8 +146,8 @@ static gboolean replace_wm()
 
     /* Send client message indicating that we are now the WM */
     prop_message(RootWindow(ob_display, ob_screen), prop_atoms.manager,
-                 timestamp, wm_sn_atom, 0, 0, SubstructureNotifyMask);
-
+                 timestamp, wm_sn_atom, screen_support_win, 0,
+                 SubstructureNotifyMask);
 
     return TRUE;
 }

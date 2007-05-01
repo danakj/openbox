@@ -443,6 +443,7 @@ void prop_message(Window about, Atom messagetype, glong data0, glong data1,
     ce.xclient.data.l[1] = data1;
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
+    ce.xclient.data.l[4] = 0;
     XSendEvent(ob_display, RootWindow(ob_display, ob_screen), FALSE,
                mask, &ce);
 }

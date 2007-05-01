@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   grav.c for the Openbox window manager
-   Copyright (c) 2003-2007   Dana Jansens
+   resize.c for the Openbox window manager
+   Copyright (c) 2007        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ int main () {
   Window     win;
   XEvent     report;
   int        x=10,y=10,h=100,w=400;
-  XSizeHints *hints;
 
   display = XOpenDisplay(NULL);
 
@@ -38,25 +37,14 @@ int main () {
 		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
 		      CopyFromParent, 0, NULL);
 
-  hints = XAllocSizeHints();
-  hints->flags = PWinGravity;
-  hints->win_gravity = SouthEastGravity;
-  XSetWMNormalHints(display, win, hints);
-  XFree(hints);
-
   XSetWindowBackground(display,win,WhitePixel(display,0)); 
 
   XMapWindow(display, win);
   XFlush(display);
 
-<<<<<<< .working
-  XMoveWindow(display, win, 960-1, 600-1);
+  sleep(5);
+  XResizeWindow(display, win, 600, 150);
 
-=======
-  XMoveResizeWindow(display, win, 960-1, 600-1, 600, 150);
-  /*XResizeWindow(display, win, 600, 150);*/
-
->>>>>>> .merge-right.r5963
   XSelectInput(display, win, ExposureMask | StructureNotifyMask);
 
   while (1) {

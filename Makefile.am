@@ -10,7 +10,7 @@ pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 
-theme = bear2
+theme = Clearlooks
 
 AUTOMAKE_OPTIONS = subdir-objects foreign
 
@@ -240,6 +240,28 @@ tools_gnome_panel_control_gnome_panel_control_SOURCES = \
 
 ## themes ##
 
+clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
+dist_clearlooks_theme_DATA= \
+	themes/Clearlooks/openbox-3/bullet.xbm \
+	themes/Clearlooks/openbox-3/close.xbm \
+	themes/Clearlooks/openbox-3/desk_toggled.xbm \
+	themes/Clearlooks/openbox-3/desk.xbm \
+	themes/Clearlooks/openbox-3/iconify.xbm \
+	themes/Clearlooks/openbox-3/max_toggled.xbm \
+	themes/Clearlooks/openbox-3/max.xbm \
+	themes/Clearlooks/openbox-3/themerc.xml
+
+clearlooksolive_themedir = $(themedir)/Clearlooks-Olive/openbox-3
+dist_clearlooksolive_theme_DATA= \
+	themes/Clearlooks-Olive/openbox-3/bullet.xbm \
+	themes/Clearlooks-Olive/openbox-3/close.xbm \
+	themes/Clearlooks-Olive/openbox-3/desk_toggled.xbm \
+	themes/Clearlooks-Olive/openbox-3/desk.xbm \
+	themes/Clearlooks-Olive/openbox-3/iconify.xbm \
+	themes/Clearlooks-Olive/openbox-3/max_toggled.xbm \
+	themes/Clearlooks-Olive/openbox-3/max.xbm \
+	themes/Clearlooks-Olive/openbox-3/themerc.xml
+
 mikachu_themedir = $(themedir)/Mikachu/openbox-3
 dist_mikachu_theme_DATA= \
 	themes/Mikachu/openbox-3/bullet.xbm \
@@ -276,7 +298,7 @@ dist_artwizboxed_theme_DATA= \
 	themes/artwiz-boxed/openbox-3/max_toggled.xbm \
 	themes/artwiz-boxed/openbox-3/max.xbm \
 	themes/artwiz-boxed/openbox-3/themerc.xml
- 
+
 bear2_themedir = $(themedir)/bear2/openbox-3
 dist_bear2_theme_DATA= \
 	themes/bear2/openbox-3/close_pressed.xbm \
@@ -293,7 +315,7 @@ dist_bear2_theme_DATA= \
 	themes/bear2/openbox-3/shade_pressed.xbm \
 	themes/bear2/openbox-3/shade.xbm \
 	themes/bear2/openbox-3/themerc.xml
- 
+
 orang_themedir = $(themedir)/orang/openbox-3
 dist_orang_theme_DATA= \
 	themes/orang/openbox-3/themerc.xml

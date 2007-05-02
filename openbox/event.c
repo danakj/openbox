@@ -1365,7 +1365,9 @@ static gboolean event_handle_menu(XEvent *ev)
 
     switch (ev->type) {
     case ButtonRelease:
-        if (ev->xbutton.button <= 3 && menu_can_hide) {
+        if ((ev->xbutton.button < 4 || ev->xbutton.button > 5)
+            && menu_can_hide)
+        {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
                 menu_entry_frame_execute(e, ev->xbutton.state,

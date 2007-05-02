@@ -301,20 +301,20 @@ dist_artwizboxed_theme_DATA= \
 
 bear2_themedir = $(themedir)/Bear2/openbox-3
 dist_bear2_theme_DATA= \
-       themes/Bear2/openbox-3/close_pressed.xbm \
-       themes/Bear2/openbox-3/close.xbm \
-       themes/Bear2/openbox-3/desk_toggled.xbm \
-       themes/Bear2/openbox-3/desk.xbm \
-       themes/Bear2/openbox-3/iconify_disabled.xbm \
-       themes/Bear2/openbox-3/iconify_pressed.xbm \
-       themes/Bear2/openbox-3/iconify.xbm \
-       themes/Bear2/openbox-3/max_disabled.xbm \
-       themes/Bear2/openbox-3/max_pressed.xbm \
-       themes/Bear2/openbox-3/max_toggled.xbm \
-       themes/Bear2/openbox-3/max.xbm \
-       themes/Bear2/openbox-3/shade_pressed.xbm \
-       themes/Bear2/openbox-3/shade.xbm \
-       themes/Bear2/openbox-3/themerc.xml
+	themes/Bear2/openbox-3/close_pressed.xbm \
+	themes/Bear2/openbox-3/close.xbm \
+	themes/Bear2/openbox-3/desk_toggled.xbm \
+	themes/Bear2/openbox-3/desk.xbm \
+	themes/Bear2/openbox-3/iconify_disabled.xbm \
+	themes/Bear2/openbox-3/iconify_pressed.xbm \
+	themes/Bear2/openbox-3/iconify.xbm \
+	themes/Bear2/openbox-3/max_disabled.xbm \
+	themes/Bear2/openbox-3/max_pressed.xbm \
+	themes/Bear2/openbox-3/max_toggled.xbm \
+	themes/Bear2/openbox-3/max.xbm \
+	themes/Bear2/openbox-3/shade_pressed.xbm \
+	themes/Bear2/openbox-3/shade.xbm \
+	themes/Bear2/openbox-3/themerc.xml
 
 orang_themedir = $(themedir)/Orang/openbox-3
 dist_orang_theme_DATA= \

@@ -1249,6 +1249,9 @@ static void event_handle_menu_shortcut(XEvent *ev)
         const char *key;
         if ((key = translate_keycode(ev->xkey.keycode)) == NULL)
             return;
+        /* don't accept keys that aren't a single letter, like "space" */
+        if (key[1] != '\0')
+            return;
         unikey = g_utf8_get_char_validated(key, -1);
         if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
             return;

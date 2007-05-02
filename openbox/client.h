@@ -258,6 +258,9 @@ struct _ObClient
     /*! Demands attention flag */
     gboolean demands_attention;
 
+    /*! The urgent flag */
+    gboolean urgent;
+
     /*! The layer in which the window will be stacked, windows in lower layers
       are always below windows in higher layers. */
     ObStackingLayer layer;

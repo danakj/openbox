@@ -288,52 +288,52 @@ dist_natura_theme_DATA= \
 	themes/Natura/openbox-3/shade.xbm \
 	themes/Natura/openbox-3/themerc.xml
 
-artwizboxed_themedir = $(themedir)/artwiz-boxed/openbox-3
+artwizboxed_themedir = $(themedir)/Artwiz-boxed/openbox-3
 dist_artwizboxed_theme_DATA= \
-	themes/artwiz-boxed/openbox-3/bullet.xbm \
-	themes/artwiz-boxed/openbox-3/close.xbm \
-	themes/artwiz-boxed/openbox-3/desk_toggled.xbm \
-	themes/artwiz-boxed/openbox-3/desk.xbm \
-	themes/artwiz-boxed/openbox-3/iconify.xbm \
-	themes/artwiz-boxed/openbox-3/max_toggled.xbm \
-	themes/artwiz-boxed/openbox-3/max.xbm \
-	themes/artwiz-boxed/openbox-3/themerc.xml
+	themes/Artwiz-boxed/openbox-3/bullet.xbm \
+	themes/Artwiz-boxed/openbox-3/close.xbm \
+	themes/Artwiz-boxed/openbox-3/desk_toggled.xbm \
+	themes/Artwiz-boxed/openbox-3/desk.xbm \
+	themes/Artwiz-boxed/openbox-3/iconify.xbm \
+	themes/Artwiz-boxed/openbox-3/max_toggled.xbm \
+	themes/Artwiz-boxed/openbox-3/max.xbm \
+	themes/Artwiz-boxed/openbox-3/themerc.xml
 
-bear2_themedir = $(themedir)/bear2/openbox-3
+bear2_themedir = $(themedir)/Bear2/openbox-3
 dist_bear2_theme_DATA= \
-	themes/bear2/openbox-3/close_pressed.xbm \
-	themes/bear2/openbox-3/close.xbm \
-	themes/bear2/openbox-3/desk_toggled.xbm \
-	themes/bear2/openbox-3/desk.xbm \
-	themes/bear2/openbox-3/iconify_disabled.xbm \
-	themes/bear2/openbox-3/iconify_pressed.xbm \
-	themes/bear2/openbox-3/iconify.xbm \
-	themes/bear2/openbox-3/max_disabled.xbm \
-	themes/bear2/openbox-3/max_pressed.xbm \
-	themes/bear2/openbox-3/max_toggled.xbm \
-	themes/bear2/openbox-3/max.xbm \
-	themes/bear2/openbox-3/shade_pressed.xbm \
-	themes/bear2/openbox-3/shade.xbm \
-	themes/bear2/openbox-3/themerc.xml
+       themes/Bear2/openbox-3/close_pressed.xbm \
+       themes/Bear2/openbox-3/close.xbm \
+       themes/Bear2/openbox-3/desk_toggled.xbm \
+       themes/Bear2/openbox-3/desk.xbm \
+       themes/Bear2/openbox-3/iconify_disabled.xbm \
+       themes/Bear2/openbox-3/iconify_pressed.xbm \
+       themes/Bear2/openbox-3/iconify.xbm \
+       themes/Bear2/openbox-3/max_disabled.xbm \
+       themes/Bear2/openbox-3/max_pressed.xbm \
+       themes/Bear2/openbox-3/max_toggled.xbm \
+       themes/Bear2/openbox-3/max.xbm \
+       themes/Bear2/openbox-3/shade_pressed.xbm \
+       themes/Bear2/openbox-3/shade.xbm \
+       themes/Bear2/openbox-3/themerc.xml
 
-orang_themedir = $(themedir)/orang/openbox-3
+orang_themedir = $(themedir)/Orang/openbox-3
 dist_orang_theme_DATA= \
-	themes/orang/openbox-3/themerc.xml
+	themes/Orang/openbox-3/themerc.xml
 
-syscrash_themedir = $(themedir)/syscrash/openbox-3
+syscrash_themedir = $(themedir)/Syscrash/openbox-3
 dist_syscrash_theme_DATA= \
-	themes/syscrash/openbox-3/bullet.xbm \
-	themes/syscrash/openbox-3/close_disabled.xbm \
-	themes/syscrash/openbox-3/close.xbm \
-	themes/syscrash/openbox-3/desk_toggled.xbm \
-	themes/syscrash/openbox-3/desk.xbm \
-	themes/syscrash/openbox-3/iconify.xbm \
-	themes/syscrash/openbox-3/max_disabled.xbm \
-	themes/syscrash/openbox-3/max_pressed.xbm \
-	themes/syscrash/openbox-3/max_toggled.xbm \
-	themes/syscrash/openbox-3/max.xbm \
-	themes/syscrash/openbox-3/shade.xbm \
-	themes/syscrash/openbox-3/themerc.xml
+	themes/Syscrash/openbox-3/bullet.xbm \
+	themes/Syscrash/openbox-3/close_disabled.xbm \
+	themes/Syscrash/openbox-3/close.xbm \
+	themes/Syscrash/openbox-3/desk_toggled.xbm \
+	themes/Syscrash/openbox-3/desk.xbm \
+	themes/Syscrash/openbox-3/iconify.xbm \
+	themes/Syscrash/openbox-3/max_disabled.xbm \
+	themes/Syscrash/openbox-3/max_pressed.xbm \
+	themes/Syscrash/openbox-3/max_toggled.xbm \
+	themes/Syscrash/openbox-3/max.xbm \
+	themes/Syscrash/openbox-3/shade.xbm \
+	themes/Syscrash/openbox-3/themerc.xml
 
 ## public headers ##
 

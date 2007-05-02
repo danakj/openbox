@@ -601,8 +601,7 @@ void screen_desktop_popup(guint d, gboolean show)
         pager_popup_width(desktop_cycle_popup, MAX(a->width/3, POPUP_WIDTH));
         pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
 
-        pager_popup_delay_show(desktop_cycle_popup, G_USEC_PER_SEC/12,
-                               screen_desktop_names[d], d);
+        pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
     }
 }
 

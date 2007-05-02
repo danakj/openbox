@@ -27,6 +27,7 @@
 #include "client.h"
 #include "action.h"
 #include "prop.h"
+#include "menuframe.h"
 #include "config.h"
 #include "keytree.h"
 #include "keyboard.h"
@@ -297,6 +298,10 @@ void keyboard_event(ObClient *client, const XEvent *e)
         if (p->key == e->xkey.keycode &&
             p->state == e->xkey.state)
         {
+            /* if we hit a key binding, then close any open menus and run it */
+            if (menu_frame_visible)
+                menu_frame_hide_all();
+
             if (p->first_child != NULL) { /* part of a chain */
                 ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
                 /* 3 second timeout for chains */

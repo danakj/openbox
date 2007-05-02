@@ -149,3 +149,19 @@ const gchar *translate_keycode(guint keycode)
         ret = XKeysymToString(sym);
     return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
 }
+
+gunichar translate_unichar(guint keycode)
+{
+    gunichar unikey = 0;
+
+    const char *key;
+    if ((key = translate_keycode(keycode)) != NULL &&
+        /* don't accept keys that aren't a single letter, like "space" */
+        key[1] == '\0')
+    {
+        unikey = g_utf8_get_char_validated(key, -1);
+        if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
+            unikey = 0;
+    }
+    return unikey;
+}

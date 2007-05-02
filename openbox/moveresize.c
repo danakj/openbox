@@ -369,9 +369,8 @@ static void do_resize()
        if there are 2 text boxes */
     if (config_resize_popup_show == 2 || /* == "Always" */
             (config_resize_popup_show == 1 && /* == "Nonpixel" */
-                (moveresize_client->size_inc.width > 1 ||
-                 moveresize_client->size_inc.height > 1))
-        )
+             moveresize_client->size_inc.width > 1 &&
+             moveresize_client->size_inc.height > 1))
         popup_coords(moveresize_client, "%d x %d",
                      moveresize_client->logical_size.width,
                      moveresize_client->logical_size.height);

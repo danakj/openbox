@@ -76,8 +76,8 @@ typedef struct
 
 static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
-static void event_handle_menu_shortcut(XEvent *e);
-static void event_handle_menu(XEvent *e);
+static gboolean event_handle_menu_keyboard(XEvent *e);
+static gboolean event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
@@ -571,9 +571,17 @@ static void event_process(const XEvent *ec, gpointer data)
         e->type == MotionNotify || e->type == KeyPress ||
         e->type == KeyRelease)
     {
-        if (menu_frame_visible)
-            event_handle_menu(e);
-        else {
+        gboolean useevent = TRUE;
+
+        if (menu_frame_visible) {
+            if (event_handle_menu(e))
+                /* don't use the event if the menu used it, but if the menu
+                   didn't use it and it's a keypress that is bound, it will
+                   close the menu and be used */
+                useevent = FALSE;
+        }
+
+        if (useevent) {
             if (!keyboard_process_interactive_grab(e, &client)) {
                 if (moveresize_in_progress) {
                     moveresize_event(e);
@@ -886,7 +894,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             h = (e->xconfigurerequest.value_mask & CWHeight) ?
                 e->xconfigurerequest.height : client->area.height;
 
-            client_find_onscreen(client, &x, &y, w, h, client_normal(client));
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure_full(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
 
@@ -1074,7 +1082,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 h = client->area.height;
 
             client_convert_gravity(client, grav, &x, &y, w, h);
-            client_find_onscreen(client, &x, &y, w, h, client_normal(client));
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
         }
         break;
@@ -1236,86 +1244,128 @@ static ObMenuFrame* find_active_or_last_menu()
     return ret;
 }
 
-static void event_handle_menu_shortcut(XEvent *ev)
+static gboolean event_handle_menu_keyboard(XEvent *ev)
 {
-    gunichar unikey = 0;
+    guint keycode, state;
+    gunichar unikey;
     ObMenuFrame *frame;
-    GList *start;
-    GList *it;
-    ObMenuEntryFrame *found = NULL;
-    guint num_found = 0;
+    gboolean ret = TRUE;
 
+    keycode = ev->xkey.keycode;
+    state = ev->xkey.state;
+    unikey = translate_unichar(keycode);
+
+    frame = find_active_or_last_menu();
+    if (frame == NULL)
+        ret = FALSE;
+
+    else if (keycode == ob_keycode(OB_KEY_ESCAPE) && state == 0) {
+        /* Escape closes the active menu */
+        menu_frame_hide(frame);
+    }
+
+    else if (keycode == ob_keycode(OB_KEY_RETURN) && (state == 0 ||
+                                                      state == ControlMask))
     {
-        const char *key;
-        if ((key = translate_keycode(ev->xkey.keycode)) == NULL)
-            return;
-        unikey = g_utf8_get_char_validated(key, -1);
-        if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
-            return;
+        /* Enter runs the active item or goes into the submenu.
+           Control-Enter runs it without closing the menu. */
+        if (frame->child)
+            menu_frame_select_next(frame->child);
+        else
+            menu_entry_frame_execute(frame->selected, state, ev->xkey.time);
     }
 
-    if ((frame = find_active_or_last_menu()) == NULL)
-        return;
-
-
-    if (!frame->entries)
-        return; /* nothing in the menu anyways */
-
-    /* start after the selected one */
-    start = frame->entries;
-    if (frame->selected) {
-        for (it = start; frame->selected != it->data; it = g_list_next(it))
-            g_assert(it != NULL); /* nothing was selected? */
-        /* next with wraparound */
-        start = g_list_next(it);
-        if (start == NULL) start = frame->entries;
+    else if (keycode == ob_keycode(OB_KEY_LEFT) && ev->xkey.state == 0) {
+        /* Left goes to the parent menu */
+        menu_frame_select(frame, NULL, TRUE);
     }
 
-    it = start;
-    do {
-        ObMenuEntryFrame *e = it->data;
-        gunichar entrykey = 0;
+    else if (keycode == ob_keycode(OB_KEY_RIGHT) && ev->xkey.state == 0) {
+        /* Right goes to the selected submenu */
+        if (frame->child) menu_frame_select_next(frame->child);
+    }
 
-        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-            e->entry->data.normal.enabled)
-            entrykey = e->entry->data.normal.shortcut;
-        else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
-            entrykey = e->entry->data.submenu.submenu->shortcut;
+    else if (keycode == ob_keycode(OB_KEY_UP) && state == 0) {
+        menu_frame_select_previous(frame);
+    }
 
-        if (unikey == entrykey) {
-            if (found == NULL) found = e;
-            ++num_found;
+    else if (keycode == ob_keycode(OB_KEY_DOWN) && state == 0) {
+        menu_frame_select_next(frame);
+    }
+
+    /* keyboard accelerator shortcuts. */
+    else if (ev->xkey.state == 0 &&
+             /* was it a valid key? */
+             unikey != 0 &&
+             /* don't bother if the menu is empty. */
+             frame->entries)
+    {
+        GList *start;
+        GList *it;
+        ObMenuEntryFrame *found = NULL;
+        guint num_found = 0;
+
+        /* start after the selected one */
+        start = frame->entries;
+        if (frame->selected) {
+            for (it = start; frame->selected != it->data; it = g_list_next(it))
+                g_assert(it != NULL); /* nothing was selected? */
+            /* next with wraparound */
+            start = g_list_next(it);
+            if (start == NULL) start = frame->entries;
         }
 
-        /* next with wraparound */
-        it = g_list_next(it);
-        if (it == NULL) it = frame->entries;
-    } while (it != start);
+        it = start;
+        do {
+            ObMenuEntryFrame *e = it->data;
+            gunichar entrykey = 0;
 
-    if (found) {
-        if (found->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-            num_found == 1)
-        {
-            menu_frame_select(frame, found, TRUE);
-            usleep(50000);
-            menu_entry_frame_execute(found, ev->xkey.state,
-                                     ev->xkey.time);
-        } else {
-            menu_frame_select(frame, found, TRUE);
-            if (num_found == 1)
-                menu_frame_select_next(frame->child);
-        }
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                e->entry->data.normal.enabled)
+                entrykey = e->entry->data.normal.shortcut;
+            else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                entrykey = e->entry->data.submenu.submenu->shortcut;
+
+            if (unikey == entrykey) {
+                if (found == NULL) found = e;
+                ++num_found;
+            }
+
+            /* next with wraparound */
+            it = g_list_next(it);
+            if (it == NULL) it = frame->entries;
+        } while (it != start);
+
+        if (found) {
+            if (found->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                num_found == 1)
+            {
+                menu_frame_select(frame, found, TRUE);
+                usleep(50000);
+                menu_entry_frame_execute(found, state, ev->xkey.time);
+            } else {
+                menu_frame_select(frame, found, TRUE);
+                if (num_found == 1)
+                    menu_frame_select_next(frame->child);
+            }
+        } else
+            ret = FALSE;
     }
+    else
+        ret = FALSE;
+
+    return ret;
 }
 
-static void event_handle_menu(XEvent *ev)
+static gboolean event_handle_menu(XEvent *ev)
 {
     ObMenuFrame *f;
     ObMenuEntryFrame *e;
+    gboolean ret = TRUE;
 
     switch (ev->type) {
     case ButtonRelease:
-        if (menu_can_hide) {
+        if (ev->xbutton.button <= 3 && menu_can_hide) {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
                 menu_entry_frame_execute(e, ev->xbutton.state,
@@ -1345,40 +1395,10 @@ static void event_handle_menu(XEvent *ev)
             menu_frame_select(e->frame, e, FALSE);
         break;
     case KeyPress:
-        if (ev->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
-            if ((f = find_active_or_last_menu()) && f->parent)
-                menu_frame_select(f, NULL, TRUE);
-            else
-                menu_frame_hide_all();
-        else if (ev->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
-            ObMenuFrame *f;
-            if ((f = find_active_menu())) {
-                if (f->child)
-                    menu_frame_select_next(f->child);
-                else
-                    menu_entry_frame_execute(f->selected, ev->xkey.state,
-                                             ev->xkey.time);
-            }
-        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_LEFT)) {
-            ObMenuFrame *f;
-            if ((f = find_active_or_last_menu()))
-                menu_frame_select(f, NULL, TRUE);
-        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) {
-            ObMenuFrame *f;
-            if ((f = find_active_menu()) && f->child)
-                menu_frame_select_next(f->child);
-        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_UP)) {
-            ObMenuFrame *f;
-            if ((f = find_active_or_last_menu()))
-                menu_frame_select_previous(f);
-        } else if (ev->xkey.keycode == ob_keycode(OB_KEY_DOWN)) {
-            ObMenuFrame *f;
-            if ((f = find_active_or_last_menu()))
-                menu_frame_select_next(f);
-        } else
-            event_handle_menu_shortcut(ev);
+        ret = event_handle_menu_keyboard(ev);
         break;
     }
+    return ret;
 }
 
 static gboolean menu_hide_delay_func(gpointer data)

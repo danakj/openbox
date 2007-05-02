@@ -751,66 +751,94 @@ void client_move_onscreen(ObClient *self, gboolean rude)
 gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
                               gboolean rude)
 {
-    Rect *a;
+    Rect *mon_a, *all_a;
     gint ox = *x, oy = *y;
+    gboolean rudel = rude, ruder = rude, rudet = rude, rudeb = rude;
+    gint fw, fh;
+
+    all_a = screen_area(self->desktop);
+    mon_a = screen_area_monitor(self->desktop, client_monitor(self));
 
     /* get where the frame would be */
     frame_client_gravity(self->frame, x, y, w, h);
 
-    /* XXX watch for xinerama dead areas */
+    /* get the requested size of the window with decorations */
+    fw = self->frame->size.left + w + self->frame->size.right;
+    fh = self->frame->size.top + h + self->frame->size.bottom;
+
     /* This makes sure windows aren't entirely outside of the screen so you
        can't see them at all.
        It makes sure 10% of the window is on the screen at least. At don't let
        it move itself off the top of the screen, which would hide the titlebar
        on you. (The user can still do this if they want too, it's only limiting
        the application.
+
+       XXX watch for xinerama dead areas...
     */
     if (client_normal(self)) {
-        a = screen_area(self->desktop);
-        if (!self->strut.right &&
-            *x + self->frame->area.width/10 >= a->x + a->width - 1)
-            *x = a->x + a->width - self->frame->area.width/10;
-        if (!self->strut.bottom &&
-            *y + self->frame->area.height/10 >= a->y + a->height - 1)
-            *y = a->y + a->height - self->frame->area.height/10;
-        if (!self->strut.left && *x + self->frame->area.width*9/10 - 1 < a->x)
-            *x = a->x - self->frame->area.width*9/10;
-        if (!self->strut.top && *y + self->frame->area.height*9/10 - 1 < a->y)
-            *y = a->y - self->frame->area.width*9/10;
+        if (!self->strut.right && *x + fw/10 >= all_a->x + all_a->width - 1)
+            *x = all_a->x + all_a->width - fw/10;
+        if (!self->strut.bottom && *y + fh/10 >= all_a->y + all_a->height - 1)
+            *y = all_a->y + all_a->height - fh/10;
+        if (!self->strut.left && *x + fw*9/10 - 1 < all_a->x)
+            *x = all_a->x - fw*9/10;
+        if (!self->strut.top && *y + fh*9/10 - 1 < all_a->y)
+            *y = all_a->y - fw*9/10;
     }
 
     /* If rudeness wasn't requested, then figure out of the client is currently
-       entirely on the screen. If it is, then be rude even though it wasn't
+       entirely on the screen. If it is, and the position isn't changing by
+       request, and it is enlarging, then be rude even though it wasn't
        requested */
     if (!rude) {
-        a = screen_area_monitor(self->desktop, client_monitor(self));
-        if (RECT_CONTAINS_RECT(*a, self->area))
-            rude = TRUE;
+        Point oldtl, oldtr, oldbl, oldbr;
+        Point newtl, newtr, newbl, newbr;
+        gboolean stationary;
+
+        POINT_SET(oldtl, self->frame->area.x, self->frame->area.y);
+        POINT_SET(oldbr, self->frame->area.x + self->frame->area.width - 1,
+                  self->frame->area.y + self->frame->area.height - 1);
+        POINT_SET(oldtr, oldbr.x, oldtl.y);
+        POINT_SET(oldbl, oldtl.x, oldbr.y);
+
+        POINT_SET(newtl, *x, *y);
+        POINT_SET(newbr, *x + fw - 1, *y + fh - 1);
+        POINT_SET(newtr, newbr.x, newtl.y);
+        POINT_SET(newbl, newtl.x, newbr.y);
+
+        /* is it moving or just resizing from some corner? */
+        stationary = (POINT_EQUAL(oldtl, newtl) || POINT_EQUAL(oldtr, newtr) ||
+                      POINT_EQUAL(oldbl, newbl) || POINT_EQUAL(oldbr, newbr));
+
+        /* if left edge is growing */
+        if (stationary && newtl.x < oldtl.x)
+            rudel = TRUE;
+        /* if right edge is growing */
+        if (stationary && newtr.x > oldtr.x)
+            ruder = TRUE;
+        /* if top edge is growing */
+        if (stationary && newtl.y < oldtl.y)
+            rudet = TRUE;
+        /* if bottom edge is growing */
+        if (stationary && newbl.y > oldbl.y)
+            rudeb = TRUE;
     }
 
-    /* This here doesn't let windows even a pixel outside the screen,
-     * when called from client_manage, programs placing themselves are
+    /* This here doesn't let windows even a pixel outside the struts/screen.
+     * When called from client_manage, programs placing themselves are
      * forced completely onscreen, while things like
      * xterm -geometry resolution-width/2 will work fine. Trying to
      * place it completely offscreen will be handled in the above code.
      * Sorry for this confused comment, i am tired. */
-    if (rude) {
-        /* avoid the xinerama monitor divide while we're at it,
-         * remember to fix the placement stuff to avoid it also and
-         * then remove this XXX */
-        a = screen_area_monitor(self->desktop, client_monitor(self));
-        /* dont let windows map into the strut unless they
-           are bigger than the available area */
-        if (w <= a->width) {
-            if (!self->strut.left && *x < a->x) *x = a->x;
-            if (!self->strut.right && *x + w > a->x + a->width)
-                *x = a->x + a->width - w;
-        }
-        if (h <= a->height) {
-            if (!self->strut.top && *y < a->y) *y = a->y;
-            if (!self->strut.bottom && *y + h > a->y + a->height)
-                *y = a->y + a->height - h;
-        }
+    if (fw <= mon_a->width) {
+        if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
+        if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
+            *x = mon_a->x + mon_a->width - fw;
+    }
+    if (fh <= mon_a->height) {
+        if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
+        if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
+            *y = mon_a->y + mon_a->height - fh;
     }
 
     /* get where the client should be */

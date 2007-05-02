@@ -598,13 +598,11 @@ void screen_desktop_popup(guint d, gboolean show)
         a = screen_physical_area_monitor(0);
         pager_popup_position(desktop_cycle_popup, CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
-        /* XXX the size and the font extents need to be related on some level
-         */
-        pager_popup_size(desktop_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
+        pager_popup_width(desktop_cycle_popup, MAX(a->width/3, POPUP_WIDTH));
+        pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
 
-        pager_popup_set_text_align(desktop_cycle_popup, RR_JUSTIFY_CENTER);
-
-        pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
+        pager_popup_delay_show(desktop_cycle_popup, G_USEC_PER_SEC/12,
+                               screen_desktop_names[d], d);
     }
 }
 

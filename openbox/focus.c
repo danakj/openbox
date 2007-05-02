@@ -304,13 +304,8 @@ static void popup_cycle(ObClient *c, gboolean show)
         a = screen_physical_area_monitor(0);
         icon_popup_position(focus_cycle_popup, CenterGravity,
                             a->x + a->width / 2, a->y + a->height / 2);
-/*        icon_popup_size(focus_cycle_popup, a->height/2, a->height/16);
-        icon_popup_show(focus_cycle_popup, c->title,
-                        client_icon(c, a->height/16, a->height/16));
-*/
-        /* XXX the size and the font extents need to be related on some level
-         */
-        icon_popup_size(focus_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
+        icon_popup_width(focus_cycle_popup, MAX(a->width/3, POPUP_WIDTH));
+        icon_popup_height(focus_cycle_popup, POPUP_HEIGHT);
 
         /* use the transient's parent's title/icon */
         while (p->transient_for && p->transient_for != OB_TRAN_GROUP)
@@ -323,10 +318,10 @@ static void popup_cycle(ObClient *c, gboolean show)
                                 (p->iconic ? p->icon_title : p->title),
                                 NULL);
             */
-        icon_popup_show(focus_cycle_popup,
-                        (title ? title :
-                         (c->iconic ? c->icon_title : c->title)),
-                        client_icon(p, 48, 48));
+        icon_popup_delay_show(focus_cycle_popup, G_USEC_PER_SEC/12,
+                              (title ? title :
+                               (c->iconic ? c->icon_title : c->title)),
+                              client_icon(p, 48, 48));
         g_free(title);
     }
 }

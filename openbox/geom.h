@@ -26,6 +26,7 @@ typedef struct _Point {
 } Point;
 
 #define POINT_SET(pt, nx, ny) (pt).x = (nx), (pt).y = (ny)
+#define POINT_EQUAL(p1, p2) ((p1).x == (p2).x && (p1).y == (p2).y)
 
 typedef struct _Size {
     int width;

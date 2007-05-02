@@ -344,52 +344,85 @@ void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b)
     }
 }
 
-void RrMinsize(RrAppearance *a, gint *w, gint *h)
+void RrMinSize(RrAppearance *a, gint *w, gint *h)
+{
+    *w = RrMinWidth(a);
+    *h = RrMinHeight(a);
+}
+
+gint RrMinWidth(RrAppearance *a)
 {
     gint i;
     RrSize *m;
     gint l, t, r, b;
-    *w = *h = 0;
+    gint w = 0;
 
     for (i = 0; i < a->textures; ++i) {
         switch (a->texture[i].type) {
         case RR_TEXTURE_NONE:
             break;
         case RR_TEXTURE_MASK:
-            *w = MAX(*w, a->texture[i].data.mask.mask->width);
-            *h = MAX(*h, a->texture[i].data.mask.mask->height);
+            w = MAX(w, a->texture[i].data.mask.mask->width);
             break;
         case RR_TEXTURE_TEXT:
             m = RrFontMeasureString(a->texture[i].data.text.font,
                                     a->texture[i].data.text.string, 
                                     a->texture[i].data.text.shadow_offset_x,
                                     a->texture[i].data.text.shadow_offset_y);
-            *w = MAX(*w, m->width + 4);
-            m->height = RrFontHeight(a->texture[i].data.text.font,
-                                     a->texture[i].data.text.shadow_offset_y);
-            *h += MAX(*h, m->height);
+            w = MAX(w, m->width + 4);
             g_free(m);
             break;
         case RR_TEXTURE_RGBA:
-            *w += MAX(*w, a->texture[i].data.rgba.width);
-            *h += MAX(*h, a->texture[i].data.rgba.height);
+            w += MAX(w, a->texture[i].data.rgba.width);
             break;
         case RR_TEXTURE_LINE_ART:
-            *w += MAX(*w, MAX(a->texture[i].data.lineart.x1,
-                              a->texture[i].data.lineart.x2));
-            *h += MAX(*h, MAX(a->texture[i].data.lineart.y1,
-                              a->texture[i].data.lineart.y2));
+            w += MAX(w, MAX(a->texture[i].data.lineart.x1,
+                            a->texture[i].data.lineart.x2));
             break;
         }
     }
 
     RrMargins(a, &l, &t, &r, &b);
 
-    *w += l + r;
-    *h += t + b;
+    w += l + r;
 
-    if (*w < 1) *w = 1;
-    if (*h < 1) *h = 1;
+    if (w < 1) w = 1;
+    return w;
+}
+
+gint RrMinHeight(RrAppearance *a)
+{
+    gint i;
+    gint l, t, r, b;
+    gint h = 0;
+
+    for (i = 0; i < a->textures; ++i) {
+        switch (a->texture[i].type) {
+        case RR_TEXTURE_NONE:
+            break;
+        case RR_TEXTURE_MASK:
+            h = MAX(h, a->texture[i].data.mask.mask->height);
+            break;
+        case RR_TEXTURE_TEXT:
+            h += MAX(h, RrFontHeight(a->texture[i].data.text.font,
+                                     a->texture[i].data.text.shadow_offset_y));
+            break;
+        case RR_TEXTURE_RGBA:
+            h += MAX(h, a->texture[i].data.rgba.height);
+            break;
+        case RR_TEXTURE_LINE_ART:
+            h += MAX(h, MAX(a->texture[i].data.lineart.y1,
+                            a->texture[i].data.lineart.y2));
+            break;
+        }
+    }
+
+    RrMargins(a, &l, &t, &r, &b);
+
+    h += t + b;
+
+    if (h < 1) h = 1;
+    return h;
 }
 
 static void reverse_bits(gchar *c, gint n)

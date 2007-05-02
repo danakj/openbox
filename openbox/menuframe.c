@@ -221,15 +221,18 @@ static void menu_frame_place_topmenu(ObMenuFrame *self, gint *x, gint *y)
 
         /* try to the right of the cursor */
         menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+        self->direction_right = TRUE;
         if (dx != 0) {
             /* try to the left of the cursor */
             myx = *x - self->area.width;
             menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+            self->direction_right = FALSE;
         }
         if (dx != 0) {
             /* if didnt fit on either side so just use what it says */
             myx = *x;
             menu_frame_move_on_screen(self, myx, *y, &dx, &dy);
+            self->direction_right = TRUE;
         }
         *x = myx + dx;
         *y += dy;
@@ -241,29 +244,34 @@ static void menu_frame_place_topmenu(ObMenuFrame *self, gint *x, gint *y)
 
         /* try to the bottom right of the cursor */
         menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
+        self->direction_right = TRUE;
         if (dx != 0 || dy != 0) {
             /* try to the bottom left of the cursor */
             myx = *x - self->area.width;
             myy = *y;
             menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
+            self->direction_right = FALSE;
         }
         if (dx != 0 || dy != 0) {
             /* try to the top right of the cursor */
             myx = *x;
             myy = *y - self->area.height;
             menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
+            self->direction_right = TRUE;
         }
         if (dx != 0 || dy != 0) {
             /* try to the top left of the cursor */
             myx = *x - self->area.width;
             myy = *y - self->area.height;
             menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
+            self->direction_right = FALSE;
         }
         if (dx != 0 || dy != 0) {
             /* if didnt fit on either side so just use what it says */
             myx = *x;
             myy = *y;
             menu_frame_move_on_screen(self, myx, myy, &dx, &dy);
+            self->direction_right = TRUE;
         }
         *x = myx + dx;
         *y = myy + dy;
@@ -561,7 +569,7 @@ static void menu_frame_render(ObMenuFrame *self)
         gint l, t, r, b;
 
         e->a_text_normal->texture[0].data.text.string = "";
-        RrMinsize(e->a_text_normal, &tw, &th);
+        RrMinSize(e->a_text_normal, &tw, &th);
         tw += 2*PADDING;
         th += 2*PADDING;
         self->item_h = th;
@@ -623,7 +631,7 @@ static void menu_frame_render(ObMenuFrame *self)
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
-            RrMinsize(text_a, &tw, &th);
+            RrMinSize(text_a, &tw, &th);
             tw = MIN(tw, MAX_MENU_WIDTH);
 
             if (e->entry->data.normal.icon_data ||
@@ -633,7 +641,7 @@ static void menu_frame_render(ObMenuFrame *self)
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             sub = e->entry->data.submenu.submenu;
             text_a->texture[0].data.text.string = sub ? sub->title : "";
-            RrMinsize(text_a, &tw, &th);
+            RrMinSize(text_a, &tw, &th);
             tw = MIN(tw, MAX_MENU_WIDTH);
 
             if (e->entry->data.normal.icon_data ||
@@ -646,7 +654,7 @@ static void menu_frame_render(ObMenuFrame *self)
             if (e->entry->data.separator.label != NULL) {
                 e->a_text_title->texture[0].data.text.string =
                     e->entry->data.separator.label;
-                RrMinsize(e->a_text_title, &tw, &th);
+                RrMinSize(e->a_text_title, &tw, &th);
                 tw = MIN(tw, MAX_MENU_WIDTH);
                 th = ob_rr_theme->menu_title_height +
                     (ob_rr_theme->mbwidth - PADDING) *2;

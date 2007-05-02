@@ -25,8 +25,21 @@
 #include "stacking.h"
 #include "event.h"
 #include "screen.h"
+#include "mainloop.h"
 #include "render/render.h"
 #include "render/theme.h"
+
+static gboolean popup_show_timeout(gpointer data)
+{
+    ObPopup *self = data;
+    
+    XMapWindow(ob_display, self->bg);
+    stacking_raise(INTERNAL_AS_WINDOW(self));
+    self->mapped = TRUE;
+    self->delay_mapped = FALSE;
+
+    return FALSE; /* don't repeat */
+}
 
 ObPopup *popup_new(gboolean hasicon)
 {
@@ -75,25 +88,52 @@ void popup_position(ObPopup *self, gint gravity, gint x, gint y)
     self->y = y;
 }
 
-void popup_size(ObPopup *self, gint w, gint h)
+void popup_width(ObPopup *self, gint w)
 {
     self->w = w;
-    self->h = h;
 }
 
-void popup_size_to_string(ObPopup *self, gchar *text)
+void popup_height(ObPopup *self, gint h)
 {
-    gint textw, texth;
-    gint iconw;
+    gint texth;
+
+    /* don't let the height be smaller than the text */
+    texth = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
+    self->h = MAX(h, texth);
+}
+
+void popup_width_to_string(ObPopup *self, gchar *text, gint max)
+{
+    gint textw, iconw;
 
     self->a_text->texture[0].data.text.string = text;
-    RrMinsize(self->a_text, &textw, &texth);
-    /*XXX textw += ob_rr_theme->bevel * 2;*/
-    texth += ob_rr_theme->paddingy * 2;
-
-    self->h = texth + ob_rr_theme->paddingy * 2;
-    iconw = (self->hasicon ? texth : 0);
+    textw = RrMinWidth(self->a_text);
+    if (self->hasicon) {
+        gint texth = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
+        iconw = texth;
+    } else
+        iconw = 0;
     self->w = textw + iconw + ob_rr_theme->paddingx * (self->hasicon ? 3 : 2);
+    /* cap it at "max" */
+    if (max > 0)
+        self->w = MIN(self->w, max);
+}
+
+void popup_height_to_string(ObPopup *self, gchar *text)
+{
+    self->h = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
+}
+
+void popup_width_to_strings(ObPopup *self, gchar **strings, gint max)
+{
+    gint i, maxw;
+
+    maxw = 0;
+    for (i = 0; strings[i] != NULL; ++i) {
+        popup_width_to_string(self, strings[i], max);
+        maxw = MAX(maxw, self->w);
+    }
+    self->w = maxw;
 }
 
 void popup_set_text_align(ObPopup *self, RrJustify align)
@@ -101,7 +141,7 @@ void popup_set_text_align(ObPopup *self, RrJustify align)
     self->a_text->texture[0].data.text.justify = align;
 }
 
-void popup_show(ObPopup *self, gchar *text)
+void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 {
     gint l, t, r, b;
     gint x, y, w, h;
@@ -122,9 +162,8 @@ void popup_show(ObPopup *self, gchar *text)
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;
 
-    /* measure the shit out */
-    RrMinsize(self->a_text, &textw, &texth);
-    /*XXX textw += ob_rr_theme->padding * 2;*/
+    /* measure the text out */
+    RrMinSize(self->a_text, &textw, &texth);
     texth += ob_rr_theme->paddingy * 2;
 
     /* set the sizes up and reget the text sizes from the calculated
@@ -204,10 +243,19 @@ void popup_show(ObPopup *self, gchar *text)
                             iconw, texth, self->draw_icon_data);
     }
 
+    /* do the actual showing */
     if (!self->mapped) {
-        XMapWindow(ob_display, self->bg);
-        stacking_raise(INTERNAL_AS_WINDOW(self));
-        self->mapped = TRUE;
+        if (usec) {
+            /* don't kill previous show timers */
+            if (!self->delay_mapped) {
+                ob_main_loop_timeout_add(ob_main_loop, usec,
+                                         popup_show_timeout, self,
+                                         g_direct_equal, NULL);
+                self->delay_mapped = TRUE;
+            }
+        } else {
+            popup_show_timeout(self);
+        }
     }
 }
 
@@ -219,6 +267,9 @@ void popup_hide(ObPopup *self)
 
         /* kill enter events cause by this unmapping */
         event_ignore_queued_enters();
+    } else if (self->delay_mapped) {
+        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+        self->delay_mapped = FALSE;
     }
 }
 
@@ -262,8 +313,8 @@ void icon_popup_free(ObIconPopup *self)
     }
 }
 
-void icon_popup_show(ObIconPopup *self,
-                     gchar *text, const ObClientIcon *icon)
+void icon_popup_delay_show(ObIconPopup *self, gulong usec,
+                           gchar *text, const ObClientIcon *icon)
 {
     if (icon) {
         self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
@@ -273,7 +324,7 @@ void icon_popup_show(ObIconPopup *self,
     } else
         self->a_icon->texture[0].type = RR_TEXTURE_NONE;
 
-    popup_show(self->popup, text);
+    popup_delay_show(self->popup, usec, text);
 }
 
 static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
@@ -422,7 +473,8 @@ void pager_popup_free(ObPagerPopup *self)
     }
 }
 
-void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk)
+void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
+                            gchar *text, guint desk)
 {
     guint i;
 
@@ -449,5 +501,5 @@ void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk)
     self->desks = screen_num_desktops;
     self->curdesk = desk;
 
-    popup_show(self->popup, text);
+    popup_delay_show(self->popup, usec, text);
 }

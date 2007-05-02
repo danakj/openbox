@@ -75,14 +75,6 @@ static gboolean chain_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-static gboolean popup_show_timeout(gpointer data)
-{
-    gchar *text = data;
-    popup_show(popup, text);
-
-    return FALSE; /* don't repeat */
-}
-
 static void set_curpos(KeyBindingTree *newpos)
 {
     grab_keys(FALSE);
@@ -103,19 +95,11 @@ static void set_curpos(KeyBindingTree *newpos)
         }
 
         popup_position(popup, NorthWestGravity, 10, 10);
-        if (popup->mapped) {
-            popup_show_timeout(text);
-            g_free(text);
-        } else {
-            ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
-            /* 1 second delay for the popup to show */
-            ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC,
-                                     popup_show_timeout, text,
-                                     g_direct_equal, g_free);
-        }
+        /* 1 second delay for the popup to show */
+        popup_delay_show(popup, G_USEC_PER_SEC, text);
+        g_free(text);
     } else {
         popup_hide(popup);
-        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
     }
 }
 
@@ -362,7 +346,6 @@ void keyboard_shutdown(gboolean reconfig)
     interactive_states = NULL;
 
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
-    ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
 
     keyboard_unbind_all();
     set_curpos(NULL);

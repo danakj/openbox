@@ -48,6 +48,7 @@ struct _ObPopup
     gint w;
     gint h;
     gboolean mapped;
+    gboolean delay_mapped;
  
     void (*draw_icon)(gint x, gint y, gint w, gint h, gpointer data);
     gpointer draw_icon_data;
@@ -91,7 +92,8 @@ void popup_width_to_strings(ObPopup *self, gchar **strings, gint max);
 
 void popup_set_text_align(ObPopup *self, RrJustify align);
 
-void popup_show(ObPopup *self, gchar *text);
+#define popup_show(s, t) popup_delay_show((s),0,(t))
+void popup_delay_show(ObPopup *self, gulong usec, gchar *text);
 void popup_hide(ObPopup *self);
 
 RrAppearance *popup_icon_appearance(ObPopup *self);
@@ -100,8 +102,9 @@ RrAppearance *popup_icon_appearance(ObPopup *self);
 ObIconPopup *icon_popup_new();
 void icon_popup_free(ObIconPopup *self);
 
-void icon_popup_show(ObIconPopup *self,
-                     gchar *text, const struct _ObClientIcon *icon);
+#define icon_popup_show(s, t, i) icon_popup_delay_show((s),0,(t),(i))
+void icon_popup_delay_show(ObIconPopup *self, gulong usec,
+                           gchar *text, const struct _ObClientIcon *icon);
 #define icon_popup_hide(p) popup_hide((p)->popup)
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
 #define icon_popup_width(p, w) popup_width((p)->popup,(w))
@@ -115,7 +118,9 @@ void icon_popup_show(ObIconPopup *self,
 ObPagerPopup *pager_popup_new();
 void pager_popup_free(ObPagerPopup *self);
 
-void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk);
+#define pager_popup_show(s, t, d) paper_popup_delay_show((s),0,(t),(d;2D))
+void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
+                            gchar *text, guint desk);
 #define pager_popup_hide(p) popup_hide((p)->popup)
 #define pager_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
 #define pager_popup_width(p, w) popup_width((p)->popup,(w))

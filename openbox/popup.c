@@ -25,8 +25,21 @@
 #include "stacking.h"
 #include "event.h"
 #include "screen.h"
+#include "mainloop.h"
 #include "render/render.h"
 #include "render/theme.h"
+
+static gboolean popup_show_timeout(gpointer data)
+{
+    ObPopup *self = data;
+    
+    XMapWindow(ob_display, self->bg);
+    stacking_raise(INTERNAL_AS_WINDOW(self));
+    self->mapped = TRUE;
+    self->delay_mapped = FALSE;
+
+    return FALSE; /* don't repeat */
+}
 
 ObPopup *popup_new(gboolean hasicon)
 {
@@ -128,7 +141,7 @@ void popup_set_text_align(ObPopup *self, RrJustify align)
     self->a_text->texture[0].data.text.justify = align;
 }
 
-void popup_show(ObPopup *self, gchar *text)
+void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 {
     gint l, t, r, b;
     gint x, y, w, h;
@@ -230,10 +243,19 @@ void popup_show(ObPopup *self, gchar *text)
                             iconw, texth, self->draw_icon_data);
     }
 
+    /* do the actual showing */
     if (!self->mapped) {
-        XMapWindow(ob_display, self->bg);
-        stacking_raise(INTERNAL_AS_WINDOW(self));
-        self->mapped = TRUE;
+        if (usec) {
+            /* don't kill previous show timers */
+            if (!self->delay_mapped) {
+                ob_main_loop_timeout_add(ob_main_loop, usec,
+                                         popup_show_timeout, self,
+                                         g_direct_equal, NULL);
+                self->delay_mapped = TRUE;
+            }
+        } else {
+            popup_show_timeout(self);
+        }
     }
 }
 
@@ -245,6 +267,9 @@ void popup_hide(ObPopup *self)
 
         /* kill enter events cause by this unmapping */
         event_ignore_queued_enters();
+    } else if (self->delay_mapped) {
+        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+        self->delay_mapped = FALSE;
     }
 }
 
@@ -288,8 +313,8 @@ void icon_popup_free(ObIconPopup *self)
     }
 }
 
-void icon_popup_show(ObIconPopup *self,
-                     gchar *text, const ObClientIcon *icon)
+void icon_popup_delay_show(ObIconPopup *self, gulong usec,
+                           gchar *text, const ObClientIcon *icon)
 {
     if (icon) {
         self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
@@ -299,7 +324,7 @@ void icon_popup_show(ObIconPopup *self,
     } else
         self->a_icon->texture[0].type = RR_TEXTURE_NONE;
 
-    popup_show(self->popup, text);
+    popup_delay_show(self->popup, usec, text);
 }
 
 static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
@@ -448,7 +473,8 @@ void pager_popup_free(ObPagerPopup *self)
     }
 }
 
-void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk)
+void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
+                            gchar *text, guint desk)
 {
     guint i;
 
@@ -475,5 +501,5 @@ void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk)
     self->desks = screen_num_desktops;
     self->curdesk = desk;
 
-    popup_show(self->popup, text);
+    popup_delay_show(self->popup, usec, text);
 }

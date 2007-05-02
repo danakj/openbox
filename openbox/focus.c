@@ -318,10 +318,10 @@ static void popup_cycle(ObClient *c, gboolean show)
                                 (p->iconic ? p->icon_title : p->title),
                                 NULL);
             */
-        icon_popup_show(focus_cycle_popup,
-                        (title ? title :
-                         (c->iconic ? c->icon_title : c->title)),
-                        client_icon(p, 48, 48));
+        icon_popup_delay_show(focus_cycle_popup, G_USEC_PER_SEC/12,
+                              (title ? title :
+                               (c->iconic ? c->icon_title : c->title)),
+                              client_icon(p, 48, 48));
         g_free(title);
     }
 }

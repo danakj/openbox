@@ -245,7 +245,9 @@ gint    RrFontMaxCharWidth  (const RrFont *f);
    it is non-null. */
 Pixmap RrPaintPixmap (RrAppearance *a, gint w, gint h);
 void   RrPaint       (RrAppearance *a, Window win, gint w, gint h);
-void   RrMinsize     (RrAppearance *a, gint *w, gint *h);
+void   RrMinSize     (RrAppearance *a, gint *w, gint *h);
+gint   RrMinWidth    (RrAppearance *a);
+gint   RrMinHeight   (RrAppearance *a);
 void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,

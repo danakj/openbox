@@ -83,8 +83,11 @@ void popup_free(ObPopup *self);
 void popup_position(ObPopup *self, gint gravity, gint x, gint y);
 /*! Set the sizes for the popup. When set to 0, the size will be based on
   the text size. */
-void popup_size(ObPopup *self, gint w, gint h);
-void popup_size_to_string(ObPopup *self, gchar *text);
+void popup_width(ObPopup *self, gint w);
+void popup_height(ObPopup *self, gint w);
+void popup_width_to_string(ObPopup *self, gchar *text, gint max);
+void popup_height_to_string(ObPopup *self, gchar *text);
+void popup_width_to_strings(ObPopup *self, gchar **strings, gint max);
 
 void popup_set_text_align(ObPopup *self, RrJustify align);
 
@@ -101,8 +104,12 @@ void icon_popup_show(ObIconPopup *self,
                      gchar *text, const struct _ObClientIcon *icon);
 #define icon_popup_hide(p) popup_hide((p)->popup)
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
-#define icon_popup_size(p, w, h) popup_size((p)->popup,(w),(h))
-#define icon_popup_size_to_string(p, s) popup_size_to_string((p)->popup,(s))
+#define icon_popup_width(p, w) popup_width((p)->popup,(w))
+#define icon_popup_height(p, h) popup_height((p)->popup,(h))
+#define icon_popup_width_to_string(p, s, m) \
+    popup_width_to_string((p)->popup,(s),(m))
+#define icon_popup_width_to_strings(p, s, m) \
+    popup_width_to_strings((p)->popup,(s),(m))
 #define icon_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 
 ObPagerPopup *pager_popup_new();
@@ -111,8 +118,12 @@ void pager_popup_free(ObPagerPopup *self);
 void pager_popup_show(ObPagerPopup *self, gchar *text, guint desk);
 #define pager_popup_hide(p) popup_hide((p)->popup)
 #define pager_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
-#define pager_popup_size(p, w, h) popup_size((p)->popup,(w),(h))
-#define pager_popup_size_to_string(p, s) popup_size_to_string((p)->popup,(s))
+#define pager_popup_width(p, w) popup_width((p)->popup,(w))
+#define pager_popup_height(p, h) popup_height((p)->popup,(h))
+#define pager_popup_width_to_string(p, s, m) \
+    popup_width_to_string((p)->popup,(s),(m))
+#define pager_popup_width_to_strings(p, s, m) \
+    popup_width_to_strings((p)->popup,(s),(m))
 #define pager_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 
 #endif

@@ -220,7 +220,7 @@ void dock_configure()
     gint strw, strh;
     Rect *a;
 
-    RrMinsize(dock->a_frame, &minw, &minh);
+    RrMinSize(dock->a_frame, &minw, &minh);
 
     dock->w = dock->h = 0;
 

@@ -561,7 +561,7 @@ static void menu_frame_render(ObMenuFrame *self)
         gint l, t, r, b;
 
         e->a_text_normal->texture[0].data.text.string = "";
-        RrMinsize(e->a_text_normal, &tw, &th);
+        RrMinSize(e->a_text_normal, &tw, &th);
         tw += 2*PADDING;
         th += 2*PADDING;
         self->item_h = th;
@@ -623,7 +623,7 @@ static void menu_frame_render(ObMenuFrame *self)
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
-            RrMinsize(text_a, &tw, &th);
+            RrMinSize(text_a, &tw, &th);
             tw = MIN(tw, MAX_MENU_WIDTH);
 
             if (e->entry->data.normal.icon_data ||
@@ -633,7 +633,7 @@ static void menu_frame_render(ObMenuFrame *self)
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             sub = e->entry->data.submenu.submenu;
             text_a->texture[0].data.text.string = sub ? sub->title : "";
-            RrMinsize(text_a, &tw, &th);
+            RrMinSize(text_a, &tw, &th);
             tw = MIN(tw, MAX_MENU_WIDTH);
 
             if (e->entry->data.normal.icon_data ||
@@ -646,7 +646,7 @@ static void menu_frame_render(ObMenuFrame *self)
             if (e->entry->data.separator.label != NULL) {
                 e->a_text_title->texture[0].data.text.string =
                     e->entry->data.separator.label;
-                RrMinsize(e->a_text_title, &tw, &th);
+                RrMinSize(e->a_text_title, &tw, &th);
                 tw = MIN(tw, MAX_MENU_WIDTH);
                 th = ob_rr_theme->menu_title_height +
                     (ob_rr_theme->mbwidth - PADDING) *2;

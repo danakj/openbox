@@ -480,7 +480,8 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
                 ft->type == OB_CLIENT_TYPE_MENU ||
                 ft->type == OB_CLIENT_TYPE_UTILITY)));
     ok = ok && (ft->can_focus || ft->focus_notify);
-    ok = ok && !ft->skip_pager;
+    if (!dock_windows) /* use dock windows that skip taskbar too */
+        ok = ok && !ft->skip_taskbar;
     ok = ok && (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL);
     ok = ok && ft == client_focus_target(ft);
     return ok;

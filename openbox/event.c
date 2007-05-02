@@ -886,7 +886,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             h = (e->xconfigurerequest.value_mask & CWHeight) ?
                 e->xconfigurerequest.height : client->area.height;
 
-            client_find_onscreen(client, &x, &y, w, h, client_normal(client));
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure_full(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
 
@@ -1074,7 +1074,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 h = client->area.height;
 
             client_convert_gravity(client, grav, &x, &y, w, h);
-            client_find_onscreen(client, &x, &y, w, h, client_normal(client));
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
         }
         break;

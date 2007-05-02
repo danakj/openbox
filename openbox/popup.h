@@ -118,7 +118,7 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
 ObPagerPopup *pager_popup_new();
 void pager_popup_free(ObPagerPopup *self);
 
-#define pager_popup_show(s, t, d) paper_popup_delay_show((s),0,(t),(d;2D))
+#define pager_popup_show(s, t, d) pager_popup_delay_show((s),0,(t),(d))
 void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
                             gchar *text, guint desk);
 #define pager_popup_hide(p) popup_hide((p)->popup)

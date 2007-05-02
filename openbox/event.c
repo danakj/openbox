@@ -1365,7 +1365,7 @@ static gboolean event_handle_menu(XEvent *ev)
 
     switch (ev->type) {
     case ButtonRelease:
-        if ((ev->xbutton.button < 4 || ev->xbutton.button > 7)
+        if ((ev->xbutton.button < 4 || ev->xbutton.button > 5)
             && menu_can_hide)
         {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,

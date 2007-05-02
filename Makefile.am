@@ -231,7 +231,7 @@ dist_clearlooks_theme_DATA= \
 	themes/Clearlooks/openbox-3/iconify.xbm \
 	themes/Clearlooks/openbox-3/max_toggled.xbm \
 	themes/Clearlooks/openbox-3/max.xbm \
-	themes/Clearlooks/openbox-3/themerc.xml
+	themes/Clearlooks/openbox-3/themerc
 
 clearlooksolive_themedir = $(themedir)/Clearlooks-Olive/openbox-3
 dist_clearlooksolive_theme_DATA= \
@@ -242,7 +242,7 @@ dist_clearlooksolive_theme_DATA= \
 	themes/Clearlooks-Olive/openbox-3/iconify.xbm \
 	themes/Clearlooks-Olive/openbox-3/max_toggled.xbm \
 	themes/Clearlooks-Olive/openbox-3/max.xbm \
-	themes/Clearlooks-Olive/openbox-3/themerc.xml
+	themes/Clearlooks-Olive/openbox-3/themerc
 
 mikachu_themedir = $(themedir)/Mikachu/openbox-3
 dist_mikachu_theme_DATA= \

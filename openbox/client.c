@@ -1622,6 +1622,8 @@ void client_update_wmhints(ObClient *self)
     self->can_focus = TRUE;
   
     if ((hints = XGetWMHints(ob_display, self->window)) != NULL) {
+        gboolean ur;
+
         if (hints->flags & InputHint)
             self->can_focus = hints->input;
 
@@ -1630,6 +1632,13 @@ void client_update_wmhints(ObClient *self)
         if (ob_state() != OB_STATE_STARTING && self->frame == NULL)
             if (hints->flags & StateHint)
                 self->iconic = hints->initial_state == IconicState;
+
+        ur = self->urgent;
+        self->urgent = (hints->flags & XUrgencyHint);
+        if (self->urgent && !ur)
+            client_hilite(self, TRUE);
+        else if (!self->urgent && ur && self->demands_attention)
+            client_hilite(self, FALSE);
 
         if (!(hints->flags & WindowGroupHint))
             hints->window_group = None;
@@ -2775,11 +2784,13 @@ void client_hilite(ObClient *self, gboolean hilite)
 
     /* don't allow focused windows to hilite */
     self->demands_attention = hilite && !client_focused(self);
-    if (self->demands_attention)
-        frame_flash_start(self->frame);
-    else
-        frame_flash_stop(self->frame);
-    client_change_state(self);
+    if (self->frame != NULL) { /* if we're mapping, just set the state */
+        if (self->demands_attention)
+            frame_flash_start(self->frame);
+        else
+            frame_flash_stop(self->frame);
+        client_change_state(self);
+    }
 }
 
 void client_set_desktop_recursive(ObClient *self,

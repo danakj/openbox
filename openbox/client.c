@@ -347,8 +347,8 @@ void client_manage(Window window)
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &newx, &newy,
-                             self->frame->area.width,
-                             self->frame->area.height,
+                             self->area.width,
+                             self->area.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
                                 session do also. we can assume you want
@@ -742,8 +742,8 @@ void client_move_onscreen(ObClient *self, gboolean rude)
     gint x = self->area.x;
     gint y = self->area.y;
     if (client_find_onscreen(self, &x, &y,
-                             self->frame->area.width,
-                             self->frame->area.height, rude)) {
+                             self->area.width,
+                             self->area.height, rude)) {
         client_move(self, x, y);
     }
 }

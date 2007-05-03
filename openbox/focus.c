@@ -475,7 +475,7 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
     else
         ok = (ft->type == OB_CLIENT_TYPE_NORMAL ||
               ft->type == OB_CLIENT_TYPE_DIALOG ||
-              (!client_has_group_siblings(ft) &&
+              (!client_has_application_group_siblings(ft) &&
                (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
                 ft->type == OB_CLIENT_TYPE_MENU ||
                 ft->type == OB_CLIENT_TYPE_UTILITY)));

@@ -348,6 +348,11 @@ gboolean client_should_show(ObClient *self);
   to them in a number of places regarding focus or user interaction. */
 gboolean client_normal(ObClient *self);
 
+/*! Returns if the window is one of an application's main windows (normal or
+  dialog type) rather than an accessory window (utilty, menu, etc) or a
+  non-normal window */
+gboolean client_application(ObClient *self);
+
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
 
@@ -660,5 +665,7 @@ void client_update_sm_client_id(ObClient *self);
 ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
+
+gboolean client_has_application_group_siblings(ObClient *self);
 
 #endif

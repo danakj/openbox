@@ -329,7 +329,8 @@ void keyboard_shutdown(gboolean reconfig)
     if (!reconfig)
         client_remove_destructor(keyboard_interactive_end_client);
 
-    keyboard_interactive_end(0, TRUE, 0, TRUE);
+    if (istate.active)
+        keyboard_interactive_end(0, TRUE, 0, TRUE);
 
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 

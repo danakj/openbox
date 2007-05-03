@@ -240,22 +240,24 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
     gboolean done = FALSE;
     gboolean cancel = FALSE;
 
-    if ((e->type == KeyRelease && !(istate.state & e->xkey.state)))
-        done = TRUE;
-    else if (e->type == KeyPress) {
-        /*if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
-          done = TRUE;
-          else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
-              cancel = done = TRUE;
-    } else if (e->type == ButtonPress)
-        cancel = done = TRUE;
+    if (istate.active) {
+        if ((e->type == KeyRelease && !(istate.state & e->xkey.state)))
+            done = TRUE;
+        else if (e->type == KeyPress) {
+            /*if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+              done = TRUE;
+              else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+                  cancel = done = TRUE;
+        } else if (e->type == ButtonPress)
+            cancel = done = TRUE;
 
-    if (done) {
-        keyboard_interactive_end(e->xkey.state, cancel, e->xkey.time, TRUE);
+        if (done) {
+            keyboard_interactive_end(e->xkey.state, cancel, e->xkey.time,TRUE);
 
-        handled = TRUE;
-    } else
-        *client = istate.client;
+            handled = TRUE;
+        } else
+            *client = istate.client;
+    }
 
     return handled;
 }
@@ -324,8 +326,6 @@ void keyboard_startup(gboolean reconfig)
 
 void keyboard_shutdown(gboolean reconfig)
 {
-    GSList *it;
-
     if (!reconfig)
         client_remove_destructor(keyboard_interactive_end_client);
 

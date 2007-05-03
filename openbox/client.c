@@ -2198,6 +2198,12 @@ gboolean client_normal(ObClient *self) {
               self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
+gboolean client_application(ObClient *self)
+{
+    return (self->type == OB_CLIENT_TYPE_NORMAL ||
+            self->type == OB_CLIENT_TYPE_DIALOG);
+}
+
 static void client_apply_startup_state(ObClient *self, gint x, gint y)
 {
     gboolean pos = FALSE; /* has the window's position been configured? */
@@ -3632,4 +3638,18 @@ ObClient* client_under_pointer()
 gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
+}
+
+gboolean client_has_application_group_siblings(ObClient *self)
+{
+    GSList *it;
+
+    if (!self->group) return FALSE;
+
+    for (it = self->group->members; it; it = g_slist_next(it)) {
+        ObClient *c = it->data;
+        if (c != self && client_application(c))
+            return TRUE;
+    }
+    return FALSE;
 }

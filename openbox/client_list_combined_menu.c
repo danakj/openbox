@@ -33,7 +33,7 @@
 
 ObMenu *combined_menu;
 
-static void self_update(ObMenuFrame *frame, gpointer data)
+static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     ObMenuEntry *e;
@@ -104,6 +104,7 @@ static void self_update(ObMenuFrame *frame, gpointer data)
                 e->data.normal.enabled = FALSE;
         }
     }
+    return TRUE; /* always show the menu */
 }
 
 /* executes it using the client in the actions, since we set that

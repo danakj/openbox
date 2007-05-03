@@ -51,20 +51,20 @@ enum {
     CLIENT_CLOSE
 };
 
-static void client_update(ObMenuFrame *frame, gpointer data)
+static gboolean client_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     ObMenuEntry *e;
     GList *it;
 
+    if (frame->client == NULL || !client_normal(frame->client))
+        return FALSE; /* don't show the menu */
+
     for (it = menu->entries; it; it = g_list_next(it)) {
         e = it->data;
         if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
-            e->data.normal.enabled = !!frame->client;
+            e->data.normal.enabled = TRUE;
     }
-
-    if (!frame->client)
-        return;
 
     e = menu_find_entry_id(menu, CLIENT_ICONIFY);
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
@@ -91,22 +91,23 @@ static void client_update(ObMenuFrame *frame, gpointer data)
 
     e = menu_find_entry_id(menu, CLIENT_DECORATE);
     e->data.normal.enabled = client_normal(frame->client);
+    return TRUE; /* show the menu */
 }
 
-static void layer_update(ObMenuFrame *frame, gpointer data)
+static gboolean layer_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     ObMenuEntry *e;
     GList *it;
 
+    if (frame->client == NULL || !client_normal(frame->client))
+        return FALSE; /* don't show the menu */
+
     for (it = menu->entries; it; it = g_list_next(it)) {
         e = it->data;
         if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
-            e->data.normal.enabled = !!frame->client;
+            e->data.normal.enabled = TRUE;
     }
-
-    if (!frame->client)
-        return;
 
     e = menu_find_entry_id(menu, LAYER_TOP);
     e->data.normal.enabled = !frame->client->above;
@@ -116,9 +117,10 @@ static void layer_update(ObMenuFrame *frame, gpointer data)
 
     e = menu_find_entry_id(menu, LAYER_BOTTOM);
     e->data.normal.enabled = !frame->client->below;
+    return TRUE; /* show the menu */
 }
 
-static void send_to_update(ObMenuFrame *frame, gpointer data)
+static gboolean send_to_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     guint i;
@@ -128,8 +130,8 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
 
     menu_clear_entries(menu);
 
-    if (!frame->client)
-        return;
+    if (frame->client == NULL || !client_normal(frame->client))
+        return FALSE; /* don't show the menu */
 
     for (i = 0; i <= screen_num_desktops; ++i) {
         const gchar *name;
@@ -155,6 +157,7 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         if (frame->client->desktop == desk)
             e->data.normal.enabled = FALSE;
     }
+    return TRUE; /* show the menu */
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
@@ -269,7 +272,7 @@ void client_menu_startup()
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleMaximizeFull",
                             OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_MAXIMIZE, "MAXIMIZE", acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Maximiz&e"), acts, TRUE);
     e->data.normal.mask = ob_rr_theme->max_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -285,7 +288,7 @@ void client_menu_startup()
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleShade", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_SHADE, "SHADE", acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_SHADE, _("&Roll up"), acts, TRUE);
     e->data.normal.mask = ob_rr_theme->shade_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;

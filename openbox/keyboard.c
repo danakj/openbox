@@ -39,15 +39,15 @@
 #include <glib.h>
 
 typedef struct {
+    gboolean active;
     guint state;
     ObClient *client;
-    GSList *actions;
-    ObFrameContext context;
+    ObAction *action;
 } ObInteractiveState;
 
 KeyBindingTree *keyboard_firstnode = NULL;
 static ObPopup *popup = NULL;
-static GSList *interactive_states;
+static ObInteractiveState istate;
 static KeyBindingTree *curpos;
 
 static void grab_keys(gboolean grab)
@@ -186,92 +186,76 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
     return TRUE;
 }
 
-gboolean keyboard_interactive_grab(guint state, ObClient *client,
-                                   ObAction *action)
+static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
+                                     gboolean ungrab)
 {
-    ObInteractiveState *s;
+    GSList *alist;
 
-    g_assert(action->data.any.interactive);
+    g_assert(istate.active);
 
-    if (!interactive_states) {
-        grab_pointer(TRUE, FALSE, OB_CURSOR_POINTER);
-        if (!grab_keyboard(TRUE)) {
-            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-            return FALSE;
-        }
-    }
+    alist = g_slist_append(NULL, istate.action);
+    action_run_interactive(alist, istate.client, state, time, cancel, TRUE);
+    g_slist_free(alist);
 
-    s = g_new(ObInteractiveState, 1);
+    istate.active = FALSE;
 
-    s->state = state;
-    s->client = client;
-    s->actions = g_slist_append(NULL, action);
-
-    interactive_states = g_slist_append(interactive_states, s);
-
-    return TRUE;
-}
-
-void keyboard_interactive_end(ObInteractiveState *s,
-                              guint state, gboolean cancel, Time time)
-{
-    action_run_interactive(s->actions, s->client, state, time, cancel, TRUE);
-
-    g_slist_free(s->actions);
-    g_free(s);
-
-    interactive_states = g_slist_remove(interactive_states, s);
-
-    if (!interactive_states) {
+    if (ungrab) {
         grab_keyboard(FALSE);
         grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
     }
 }
 
-void keyboard_interactive_end_client(ObClient *client, gpointer data)
+static void keyboard_interactive_end_client(ObClient *client, gpointer data)
 {
-    GSList *it, *next;
+    if (istate.active && istate.client == client)
+        istate.client = NULL;
+}
 
-    for (it = interactive_states; it; it = next) {
-        ObInteractiveState *s = it->data;
+gboolean keyboard_interactive_grab(guint state, ObClient *client,
+                                   ObAction *action)
+{
+    g_assert(action->data.any.interactive);
 
-        next = g_slist_next(it);
-
-        if (s->client == client)
-            s->client = NULL;
+    if (!istate.active) {
+        grab_pointer(TRUE, FALSE, OB_CURSOR_POINTER);
+        if (!grab_keyboard(TRUE)) {
+            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+            return FALSE;
+        }
+    } else if (action->func != istate.action->func) {
+        keyboard_interactive_end(state, FALSE, action->data.any.time, FALSE);
     }
+
+    istate.active = TRUE;
+    istate.state = state;
+    istate.client = client;
+    istate.action = action;
+
+    return TRUE;
 }
 
 gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
 {
-    GSList *it, *next;
     gboolean handled = FALSE;
     gboolean done = FALSE;
     gboolean cancel = FALSE;
 
-    for (it = interactive_states; it; it = next) {
-        ObInteractiveState *s = it->data;
+    if ((e->type == KeyRelease && !(istate.state & e->xkey.state)))
+        done = TRUE;
+    else if (e->type == KeyPress) {
+        /*if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+          done = TRUE;
+          else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+              cancel = done = TRUE;
+    } else if (e->type == ButtonPress)
+        cancel = done = TRUE;
 
-        next = g_slist_next(it);
-        
-        if ((e->type == KeyRelease && 
-             !(s->state & e->xkey.state)))
-            done = TRUE;
-        else if (e->type == KeyPress) {
-            /*if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
-                done = TRUE;
-            else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
-                cancel = done = TRUE;
-        } else if (e->type == ButtonPress)
-            cancel = done = TRUE;
+    if (done) {
+        keyboard_interactive_end(e->xkey.state, cancel, e->xkey.time, TRUE);
 
-        if (done) {
-            keyboard_interactive_end(s, e->xkey.state, cancel, e->xkey.time);
-
-            handled = TRUE;
-        } else
-            *client = s->client;
-    }
+        handled = TRUE;
+    } else
+        *client = istate.client;
 
     return handled;
 }
@@ -326,7 +310,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
 
 gboolean keyboard_interactively_grabbed()
 {
-    return !!interactive_states;
+    return istate.active;
 }
 
 void keyboard_startup(gboolean reconfig)
@@ -345,10 +329,7 @@ void keyboard_shutdown(gboolean reconfig)
     if (!reconfig)
         client_remove_destructor(keyboard_interactive_end_client);
 
-    for (it = interactive_states; it; it = g_slist_next(it))
-        g_free(it->data);
-    g_slist_free(interactive_states);
-    interactive_states = NULL;
+    istate.active = FALSE;
 
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 

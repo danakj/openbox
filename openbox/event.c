@@ -894,6 +894,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             h = (e->xconfigurerequest.value_mask & CWHeight) ?
                 e->xconfigurerequest.height : client->area.height;
 
+            ob_debug("ConfigureRequest x %d %d y %d %d\n",
+                     e->xconfigurerequest.value_mask & CWX, x,
+                     e->xconfigurerequest.value_mask & CWY, y);
+
             client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure_full(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
@@ -1081,6 +1085,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             else
                 h = client->area.height;
 
+            ob_debug("MOVERESIZE x %d %d y %d %d\n",
+                     e->xclient.data.l[0] & 1 << 8, x,
+                     e->xclient.data.l[0] & 1 << 9, y);
             client_convert_gravity(client, grav, &x, &y, w, h);
             client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure(client, x, y, w, h, FALSE, TRUE);

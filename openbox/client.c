@@ -2633,10 +2633,11 @@ static void client_iconify_recursive(ObClient *self,
             screen_update_areas();
     }
 
-    /* iconify all direct transients */
+    /* iconify all direct transients, and deiconify all transients
+       (non-direct too) */
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
-            if (client_is_direct_child(self, it->data))
+            if (client_is_direct_child(self, it->data) || !iconic)
                 client_iconify_recursive(it->data, iconic, curdesk);
 }
 

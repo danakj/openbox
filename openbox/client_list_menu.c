@@ -38,7 +38,7 @@ typedef struct
     guint desktop;
 } DesktopData;
 
-static void desk_menu_update(ObMenuFrame *frame, gpointer data)
+static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     DesktopData *d = data;
@@ -105,6 +105,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
         if (d->desktop == screen_desktop)
             e->data.normal.enabled = FALSE;
     }
+    return TRUE; /* always show */
 }
 
 /* executes it using the client in the actions, since we set that
@@ -129,7 +130,7 @@ static void desk_menu_destroy(ObMenu *menu, gpointer data)
     desktop_menus = g_slist_remove(desktop_menus, menu);
 }
 
-static void self_update(ObMenuFrame *frame, gpointer data)
+static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     guint i;
@@ -162,6 +163,8 @@ static void self_update(ObMenuFrame *frame, gpointer data)
         desktop_menus = g_slist_delete_link(desktop_menus, it);
         menu_entry_remove(menu_find_entry_id(menu, i));
     }
+
+    return TRUE; /* always show */
 }
 
 static void client_dest(ObClient *client, gpointer data)

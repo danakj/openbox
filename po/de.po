@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 22:57-0400\n"
+"POT-Creation-Date: 2007-04-26 11:53-0400\n"
 "PO-Revision-Date: 2006-06-11 10:41+0200\n"
 "Last-Translator: Simon A. Wilper <simonaw@openoffice.org>\n"
 "Language-Team:  <de@li.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:100
+#: openbox/client_list_menu.c:98
 msgid "Go there..."
 msgstr "Gehe zu..."
 
-#: openbox/client_list_menu.c:191
+#: openbox/client_list_menu.c:189
 msgid "Desktops"
 msgstr ""
 
@@ -47,65 +47,65 @@ msgstr "Auf&rollen"
 msgid "All desktops"
 msgstr "Alle Desktops"
 
-#: openbox/client_menu.c:166
+#: openbox/client_menu.c:229
 #, fuzzy
 msgid "&Layer"
 msgstr "&Fenster"
 
-#: openbox/client_menu.c:172
+#: openbox/client_menu.c:235
 #, fuzzy
 msgid "Always on &top"
 msgstr "Immer im &Vordergrund"
 
-#: openbox/client_menu.c:177
+#: openbox/client_menu.c:240
 msgid "&Normal"
 msgstr "&Normal"
 
-#: openbox/client_menu.c:182
+#: openbox/client_menu.c:245
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "Immer im &Hintergrund"
 
-#: openbox/client_menu.c:185
+#: openbox/client_menu.c:248
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "&An Desktop senden"
 
-#: openbox/client_menu.c:189
+#: openbox/client_menu.c:252
 msgid "Client menu"
 msgstr ""
 
-#: openbox/client_menu.c:199
+#: openbox/client_menu.c:263
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Mi&nimieren"
 
-#: openbox/client_menu.c:216
+#: openbox/client_menu.c:280
 #, fuzzy
 msgid "Raise to &top"
 msgstr "In den &Vordergrund"
 
-#: openbox/client_menu.c:220
+#: openbox/client_menu.c:284
 #, fuzzy
 msgid "Lower to &bottom"
 msgstr "In den &Hintergrund"
 
-#: openbox/client_menu.c:233
+#: openbox/client_menu.c:297
 #, fuzzy
 msgid "&Decorate"
 msgstr "&Dekoriere"
 
-#: openbox/client_menu.c:239
+#: openbox/client_menu.c:303
 #, fuzzy
 msgid "&Move"
 msgstr "Vers&chieben"
 
-#: openbox/client_menu.c:243
+#: openbox/client_menu.c:307
 #, fuzzy
 msgid "Resi&ze"
 msgstr "&Größe ändern"
 
-#: openbox/client_menu.c:249
+#: openbox/client_menu.c:313
 #, fuzzy
 msgid "&Close"
 msgstr "&Schließen"
@@ -135,20 +135,20 @@ msgstr ""
 "Es wurde keine gültige Konfigurationsdatei gefunden, benutze einfache "
 "Standardwerte."
 
-#: openbox/openbox.c:349
+#: openbox/openbox.c:350
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Neustart fehlgeschlagen, um die ausführbare Datei '%s' zu starten: %s"
 
-#: openbox/openbox.c:389 openbox/openbox.c:391
+#: openbox/openbox.c:390 openbox/openbox.c:392
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:400
+#: openbox/openbox.c:401
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [Optionen]\n"
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:402
 msgid ""
 "\n"
 "Options:\n"
@@ -158,40 +158,40 @@ msgstr ""
 "Optionen:\n"
 "\n"
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:403
 msgid "  --config-file FILE  Specify the file to load for the config file\n"
 msgstr ""
 "  --config-file FILE  Datei, die als Konfigurationsdatei geladen werden "
 "soll\n"
 
-#: openbox/openbox.c:404
+#: openbox/openbox.c:405
 msgid "  --sm-disable        Disable connection to session manager\n"
 msgstr "  --sm-disable        Keine Verbindung zum Sitzungsmanager aufbauen\n"
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:406
 #, fuzzy
 msgid "  --sm-client-id ID   Specify session management ID\n"
 msgstr "  --sm-client-id ID   ID des Sitzungsmanagers\n"
 
-#: openbox/openbox.c:406
+#: openbox/openbox.c:407
 msgid "  --sm-save-file FILE Specify file to load a saved session from\n"
 msgstr ""
 "  --sm-save-file FILE Datei von der eine gespeicherte Sitzung geladen werden "
 "soll\n"
 
-#: openbox/openbox.c:408
+#: openbox/openbox.c:409
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Den aktuell laufenden Fenstermanager ersetzen\n"
 
-#: openbox/openbox.c:409
+#: openbox/openbox.c:410
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Diese Hilfe anzeigen und beenden\n"
 
-#: openbox/openbox.c:410
+#: openbox/openbox.c:411
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Version anzeigen und beenden\n"
 
-#: openbox/openbox.c:411
+#: openbox/openbox.c:412
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -201,11 +201,11 @@ msgstr ""
 "Nachrichten an eine laufende Openbox-Instanz weiterleiten:\n"
 "\n"
 
-#: openbox/openbox.c:412
+#: openbox/openbox.c:413
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
 
-#: openbox/openbox.c:413
+#: openbox/openbox.c:414
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -216,20 +216,20 @@ msgstr ""
 "Debugging Optionen:\n"
 "\n"
 
-#: openbox/openbox.c:414
+#: openbox/openbox.c:415
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --snyc              im Synchronisierungsmodus starten\n"
 
-#: openbox/openbox.c:415
+#: openbox/openbox.c:416
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Debugging-Informationen anzeigen\n"
 
-#: openbox/openbox.c:416
+#: openbox/openbox.c:417
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Debugging-Informationen fürs Fokus-Handling anzeigen\n"
 
-#: openbox/openbox.c:417
+#: openbox/openbox.c:418
 #, c-format
 msgid ""
 "\n"
@@ -240,7 +240,7 @@ msgstr ""
 "Bitte melden Sie Bugreports an: %s\n"
 "\n"
 
-#: openbox/openbox.c:448
+#: openbox/openbox.c:449
 #, fuzzy
 msgid "--config-file requires an argument\n"
 msgstr "--config-file benötigt ein Argument\n"

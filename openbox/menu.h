@@ -37,7 +37,8 @@ typedef struct _ObNormalMenuEntry ObNormalMenuEntry;
 typedef struct _ObSubmenuMenuEntry ObSubmenuMenuEntry;
 typedef struct _ObSeparatorMenuEntry ObSeparatorMenuEntry;
 
-typedef void (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame, gpointer data);
+typedef gboolean (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame,
+                                     gpointer data);
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry,
                                   guint state, gpointer data, Time time);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);

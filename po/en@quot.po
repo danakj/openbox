@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 22:57-0400\n"
+"POT-Creation-Date: 2007-04-26 11:53-0400\n"
 "PO-Revision-Date: 2007-04-24 22:57-0400\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -38,11 +38,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/client_list_menu.c:100
+#: openbox/client_list_menu.c:98
 msgid "Go there..."
 msgstr "Go there..."
 
-#: openbox/client_list_menu.c:191
+#: openbox/client_list_menu.c:189
 msgid "Desktops"
 msgstr "Desktops"
 
@@ -66,55 +66,55 @@ msgstr "&Roll up"
 msgid "All desktops"
 msgstr "All desktops"
 
-#: openbox/client_menu.c:166
+#: openbox/client_menu.c:229
 msgid "&Layer"
 msgstr "&Layer"
 
-#: openbox/client_menu.c:172
+#: openbox/client_menu.c:235
 msgid "Always on &top"
 msgstr "Always on &top"
 
-#: openbox/client_menu.c:177
+#: openbox/client_menu.c:240
 msgid "&Normal"
 msgstr "&Normal"
 
-#: openbox/client_menu.c:182
+#: openbox/client_menu.c:245
 msgid "Always on &bottom"
 msgstr "Always on &bottom"
 
-#: openbox/client_menu.c:185
+#: openbox/client_menu.c:248
 msgid "&Send to desktop"
 msgstr "&Send to desktop"
 
-#: openbox/client_menu.c:189
+#: openbox/client_menu.c:252
 msgid "Client menu"
 msgstr "Client menu"
 
-#: openbox/client_menu.c:199
+#: openbox/client_menu.c:263
 msgid "Ico&nify"
 msgstr "Ico&nify"
 
-#: openbox/client_menu.c:216
+#: openbox/client_menu.c:280
 msgid "Raise to &top"
 msgstr "Raise to &top"
 
-#: openbox/client_menu.c:220
+#: openbox/client_menu.c:284
 msgid "Lower to &bottom"
 msgstr "Lower to &bottom"
 
-#: openbox/client_menu.c:233
+#: openbox/client_menu.c:297
 msgid "&Decorate"
 msgstr "&Decorate"
 
-#: openbox/client_menu.c:239
+#: openbox/client_menu.c:303
 msgid "&Move"
 msgstr "&Move"
 
-#: openbox/client_menu.c:243
+#: openbox/client_menu.c:307
 msgid "Resi&ze"
 msgstr "Resi&ze"
 
-#: openbox/client_menu.c:249
+#: openbox/client_menu.c:313
 msgid "&Close"
 msgstr "&Close"
 
@@ -139,20 +139,20 @@ msgstr "Cannot set locale modifiers for the X server."
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "Unable to find a valid config file, using some simple defaults"
 
-#: openbox/openbox.c:349
+#: openbox/openbox.c:350
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Restart failed to execute new executable '%s': %s"
 
-#: openbox/openbox.c:389 openbox/openbox.c:391
+#: openbox/openbox.c:390 openbox/openbox.c:392
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:400
+#: openbox/openbox.c:401
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [options]\n"
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:402
 msgid ""
 "\n"
 "Options:\n"
@@ -162,35 +162,35 @@ msgstr ""
 "Options:\n"
 "\n"
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:403
 msgid "  --config-file FILE  Specify the file to load for the config file\n"
 msgstr "  --config-file FILE  Specify the file to load for the config file\n"
 
-#: openbox/openbox.c:404
+#: openbox/openbox.c:405
 msgid "  --sm-disable        Disable connection to session manager\n"
 msgstr "  --sm-disable        Disable connection to session manager\n"
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:406
 msgid "  --sm-client-id ID   Specify session management ID\n"
 msgstr "  --sm-client-id ID   Specify session management ID\n"
 
-#: openbox/openbox.c:406
+#: openbox/openbox.c:407
 msgid "  --sm-save-file FILE Specify file to load a saved session from\n"
 msgstr "  --sm-save-file FILE Specify file to load a saved session from\n"
 
-#: openbox/openbox.c:408
+#: openbox/openbox.c:409
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Replace the currently running window manager\n"
 
-#: openbox/openbox.c:409
+#: openbox/openbox.c:410
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Display this help and exit\n"
 
-#: openbox/openbox.c:410
+#: openbox/openbox.c:411
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Display the version and exit\n"
 
-#: openbox/openbox.c:411
+#: openbox/openbox.c:412
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -200,11 +200,11 @@ msgstr ""
 "Passing messages to a running Openbox instance:\n"
 "\n"
 
-#: openbox/openbox.c:412
+#: openbox/openbox.c:413
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Reload Openbox's configuration\n"
 
-#: openbox/openbox.c:413
+#: openbox/openbox.c:414
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -214,19 +214,19 @@ msgstr ""
 "Debugging options:\n"
 "\n"
 
-#: openbox/openbox.c:414
+#: openbox/openbox.c:415
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Run in synchronous mode\n"
 
-#: openbox/openbox.c:415
+#: openbox/openbox.c:416
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Display debugging output\n"
 
-#: openbox/openbox.c:416
+#: openbox/openbox.c:417
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Display debugging output for focus handling\n"
 
-#: openbox/openbox.c:417
+#: openbox/openbox.c:418
 #, c-format
 msgid ""
 "\n"
@@ -237,7 +237,7 @@ msgstr ""
 "Please report bugs at %s\n"
 "\n"
 
-#: openbox/openbox.c:448
+#: openbox/openbox.c:449
 msgid "--config-file requires an argument\n"
 msgstr "--config-file requires an argument\n"
 

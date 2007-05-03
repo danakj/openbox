@@ -751,16 +751,6 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 {
     GList *it;
 
-    if (menu_frame_visible == NULL) {
-        /* no menus shown yet */
-        if (!grab_pointer(TRUE, TRUE, OB_CURSOR_POINTER))
-            return FALSE;
-        if (!grab_keyboard(TRUE)) {
-            grab_pointer(FALSE, TRUE, OB_CURSOR_POINTER);
-            return FALSE;
-        }
-    }
-
     /* determine if the underlying menu is already visible */
     for (it = menu_frame_visible; it; it = g_list_next(it)) {
         ObMenuFrame *f = it->data;
@@ -769,7 +759,18 @@ static gboolean menu_frame_show(ObMenuFrame *self)
     }
     if (!it) {
         if (self->menu->update_func)
-            self->menu->update_func(self, self->menu->data);
+            if (!self->menu->update_func(self, self->menu->data))
+                return FALSE;
+    }
+
+    if (menu_frame_visible == NULL) {
+        /* no menus shown yet */
+        if (!grab_pointer(TRUE, TRUE, OB_CURSOR_POINTER))
+            return FALSE;
+        if (!grab_keyboard(TRUE)) {
+            grab_pointer(FALSE, TRUE, OB_CURSOR_POINTER);
+            return FALSE;
+        }
     }
 
     menu_frame_update(self);

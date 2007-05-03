@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3rc2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-24 22:57-0400\n"
+"POT-Creation-Date: 2007-04-26 11:53-0400\n"
 "PO-Revision-Date: 2006-03-01 12:00+0800\n"
 "Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/client_list_menu.c:100
+#: openbox/client_list_menu.c:98
 msgid "Go there..."
 msgstr "到那裡去..."
 
-#: openbox/client_list_menu.c:191
+#: openbox/client_list_menu.c:189
 msgid "Desktops"
 msgstr "桌面"
 
@@ -48,66 +48,66 @@ msgstr "向上捲動(&R)"
 msgid "All desktops"
 msgstr "所有桌面(&A)"
 
-#: openbox/client_menu.c:166
+#: openbox/client_menu.c:229
 #, fuzzy
 msgid "&Layer"
 msgstr "圖層(&L)"
 
-#: openbox/client_menu.c:172
+#: openbox/client_menu.c:235
 #, fuzzy
 msgid "Always on &top"
 msgstr "最上層(&T)"
 
-#: openbox/client_menu.c:177
+#: openbox/client_menu.c:240
 #, fuzzy
 msgid "&Normal"
 msgstr "一般(&N)"
 
-#: openbox/client_menu.c:182
+#: openbox/client_menu.c:245
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "最下層(&B)"
 
-#: openbox/client_menu.c:185
+#: openbox/client_menu.c:248
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "傳送到桌面(&S)"
 
-#: openbox/client_menu.c:189
+#: openbox/client_menu.c:252
 msgid "Client menu"
 msgstr "客戶端選單"
 
-#: openbox/client_menu.c:199
+#: openbox/client_menu.c:263
 #, fuzzy
 msgid "Ico&nify"
 msgstr "最小化(&N)"
 
-#: openbox/client_menu.c:216
+#: openbox/client_menu.c:280
 #, fuzzy
 msgid "Raise to &top"
 msgstr "提到最上層(&T)"
 
-#: openbox/client_menu.c:220
+#: openbox/client_menu.c:284
 #, fuzzy
 msgid "Lower to &bottom"
 msgstr "降到最下層(&B)"
 
-#: openbox/client_menu.c:233
+#: openbox/client_menu.c:297
 #, fuzzy
 msgid "&Decorate"
 msgstr "裝飾(&D)"
 
-#: openbox/client_menu.c:239
+#: openbox/client_menu.c:303
 #, fuzzy
 msgid "&Move"
 msgstr "移動(&M)"
 
-#: openbox/client_menu.c:243
+#: openbox/client_menu.c:307
 #, fuzzy
 msgid "Resi&ze"
 msgstr "重新調整大小(&Z)"
 
-#: openbox/client_menu.c:249
+#: openbox/client_menu.c:313
 #, fuzzy
 msgid "&Close"
 msgstr "關閉(&C)"
@@ -133,86 +133,86 @@ msgstr ""
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
-#: openbox/openbox.c:349
+#: openbox/openbox.c:350
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:389 openbox/openbox.c:391
+#: openbox/openbox.c:390 openbox/openbox.c:392
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:400
+#: openbox/openbox.c:401
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:402
 msgid ""
 "\n"
 "Options:\n"
 "\n"
 msgstr ""
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:403
 msgid "  --config-file FILE  Specify the file to load for the config file\n"
 msgstr ""
 
-#: openbox/openbox.c:404
+#: openbox/openbox.c:405
 msgid "  --sm-disable        Disable connection to session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:406
 #, fuzzy
 msgid "  --sm-client-id ID   Specify session management ID\n"
 msgstr "--sm-client-id 要求引數\n"
 
-#: openbox/openbox.c:406
+#: openbox/openbox.c:407
 msgid "  --sm-save-file FILE Specify file to load a saved session from\n"
 msgstr ""
 
-#: openbox/openbox.c:408
+#: openbox/openbox.c:409
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:409
+#: openbox/openbox.c:410
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:410
+#: openbox/openbox.c:411
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:411
+#: openbox/openbox.c:412
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 "\n"
 msgstr ""
 
-#: openbox/openbox.c:412
+#: openbox/openbox.c:413
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
-#: openbox/openbox.c:413
+#: openbox/openbox.c:414
 msgid ""
 "\n"
 "Debugging options:\n"
 "\n"
 msgstr ""
 
-#: openbox/openbox.c:414
+#: openbox/openbox.c:415
 msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
-#: openbox/openbox.c:415
+#: openbox/openbox.c:416
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:416
+#: openbox/openbox.c:417
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:417
+#: openbox/openbox.c:418
 #, c-format
 msgid ""
 "\n"
@@ -220,7 +220,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: openbox/openbox.c:448
+#: openbox/openbox.c:449
 #, fuzzy
 msgid "--config-file requires an argument\n"
 msgstr "--sm-save-file 要求引數\n"

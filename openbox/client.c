@@ -1657,32 +1657,32 @@ void client_update_wmhints(ObClient *self)
                 self->group = NULL;
             }
 
+            /* add ourself to the group */
+            if (hints->window_group != None)
+                self->group = group_add(hints->window_group, self);
+
+
             /* because the self->transient flag wont change from this call,
                we don't need to update the window's type and such, only its
-               transient_for, and the transients lists of other windows in
-               the group may be affected
+               transient_for
 
                do this before adding transients from the group so we know if
                we are actually transient for the group or not.
             */
             client_update_transient_for(self);
 
-            if (hints->window_group != None) {
-                self->group = group_add(hints->window_group, self);
-
-                /* i can only have transients from the group if i am not
-                   transient for the group myself */
-                if (self->transient_for != OB_TRAN_GROUP) {
-                    /* add other transients of the group that are already
-                       set up */
-                    for (it = self->group->members; it;
-                         it = g_slist_next(it))
-                    {
-                        ObClient *c = it->data;
-                        if (c != self && c->transient_for == OB_TRAN_GROUP)
-                            self->transients =
-                                g_slist_append(self->transients, c);
-                    }
+            /* i can only have transients from the group if i am not
+               transient for the group myself */
+            if (self->group && (self->transient_for == NULL ||
+                                self->transient_for != OB_TRAN_GROUP))
+            {
+                /* add other transients of the group that are already
+                   set up */
+                for (it = self->group->members; it; it = g_slist_next(it))
+                {
+                    ObClient *c = it->data;
+                    if (c != self && c->transient_for == OB_TRAN_GROUP)
+                        self->transients = g_slist_append(self->transients, c);
                 }
             }
         }

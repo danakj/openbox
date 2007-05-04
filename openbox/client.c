@@ -503,22 +503,8 @@ void client_unmanage(ObClient *self)
     /* update the focus lists */
     focus_order_remove(self);
     if (client_focused(self)) {
-        /* we have to fall back here because we might not get a focus out.
-           1. we need to xselectinput off the window before we unmap it because
-           otherwise we end up getting unmapnotifies we don't want and they
-           can mess up mapping it again quickly
-           2. this means that if we unmanage from a synthetic unmapnotify, we
-              are the ones unmapped it, and causing the focusout. so we won't
-              get the focusout event.
-           3. we can't handle focusin events on the root window because they
-              come from all screens, so the focus change gets lost
-
-           if this ever gets removed in the future MAKE SURE to replace it
-           with:
-           /- don't leave an invalid focus_client -/
-           focus_client = NULL;
-        */
-        focus_fallback(FALSE);
+        /* don't leave an invalid focus_client */
+        focus_client = NULL;
     }
 
     client_list = g_list_remove(client_list, self);

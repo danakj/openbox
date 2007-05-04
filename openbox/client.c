@@ -381,8 +381,10 @@ void client_manage(Window window)
             focus_client->user_time : CurrentTime;
 
         /* This is focus stealing prevention */
-        ob_debug("Want to focus new window 0x%x with time %u (last time %u)\n",
-                 self->window, self->user_time, last_time);
+        ob_debug_type(OB_DEBUG_FOCUS,
+                      "Want to focus new window 0x%x with time %u "
+                      "(last time %u)\n",
+                      self->window, self->user_time, last_time);
 
         /* if it's on another desktop */
         if (!(self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
@@ -391,31 +393,38 @@ void client_manage(Window window)
             !event_time_after(self->user_time, screen_desktop_user_time))
         {
             activate = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because its on another "
+                          "desktop\n");
         }
-        /* If nothing is focused, or a parent was focused, then focus this
-           always
-        */
-        else if (!focus_client || client_search_focus_parent(self) != NULL)
-            activate = TRUE;
-        else
+        /* If something is focused, and it's not our parent... */
+        else if (focus_client && client_search_focus_parent(self) == NULL)
         {
             /* If time stamp is old, don't steal focus */
             if (self->user_time && last_time &&
                 !event_time_after(self->user_time, last_time))
             {
                 activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because the time is "
+                              "too old\n");
             }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */
-            if (!(focus_client->can_focus || focus_client->focus_notify))
+            if (!(focus_client->can_focus || focus_client->focus_notify)) {
                 activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because a globally "
+                              "active client has focus\n");
+            }
         }
 
         if (!activate) {
-            ob_debug("Focus stealing prevention activated for %s with time %u "
-                     "(last time %u)\n",
-                     self->title, self->user_time, last_time);
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Focus stealing prevention activated for %s with "
+                          "time %u (last time %u)\n",
+                          self->title, self->user_time, last_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);

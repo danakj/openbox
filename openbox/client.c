@@ -277,7 +277,7 @@ void client_manage(Window window)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->layer = -1;
     self->desktop = screen_num_desktops; /* always an invalid value */
-    self->user_time = CurrentTime;
+    self->user_time = focus_client ? focus_client->user_time : CurrentTime;
 
     client_get_all(self);
     /* per-app settings override stuff, and return the settings for other
@@ -1201,6 +1201,8 @@ void client_update_transient_for(ObClient *self)
                                   c->transient_for != OB_TRAN_GROUP))
                     c->transients = g_slist_append(c->transients, self);
             }
+
+/* XXX can i remove this ?? */
 
             /* remove all transients which are in the group, that causes
                circlular pointer hell of doom */

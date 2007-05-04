@@ -2611,7 +2611,8 @@ static void client_iconify_recursive(ObClient *self,
         } else {
             self->iconic = iconic;
 
-            if (curdesk)
+            if (curdesk && self->desktop != screen_desktop &&
+                self->desktop != DESKTOP_ALL)
                 client_set_desktop(self, screen_desktop, FALSE);
 
             /* this puts it after the current focused window */
@@ -3182,7 +3183,8 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
         if (self->iconic)
             client_iconify(self, FALSE, here);
         if (self->desktop != DESKTOP_ALL &&
-            self->desktop != screen_desktop) {
+            self->desktop != screen_desktop)
+        {
             if (here)
                 client_set_desktop(self, screen_desktop, FALSE);
             else

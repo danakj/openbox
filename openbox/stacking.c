@@ -366,10 +366,44 @@ void stacking_add(ObWindow *win)
     stacking_raise(win);
 }
 
+static GList *find_highest_relative(ObClient *client)
+{    
+    GList *ret = NULL;
+
+    if (client->transient_for) {
+        GList *it;
+        GSList *top;
+
+        /* get all top level relatives of this client */
+        top = client_search_all_top_parents(client);
+
+        /* go from the top of the stacking order down */
+        for (it = stacking_list; !ret && it; it = g_list_next(it)) {
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = it->data;
+                /* only look at windows in the same layer */
+                if (c->layer == client->layer) {
+                    GSList *sit;
+
+                    /* go through each top level parent and see it this window
+                       is related to them */
+                    for (sit = top; !ret && sit; sit = g_slist_next(sit)) {
+                        ObClient *topc = sit->data;
+
+                        /* are they related ? */
+                        if (topc == c || client_search_transient(topc, c))
+                            ret = it;
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
 void stacking_add_nonintrusive(ObWindow *win)
 {
     ObClient *client;
-    ObClient *parent = NULL;
     GList *it_below = NULL;
 
     if (!WINDOW_IS_CLIENT(win)) {
@@ -379,33 +413,12 @@ void stacking_add_nonintrusive(ObWindow *win)
 
     client = WINDOW_AS_CLIENT(win);
 
-    /* insert above its highest parent */
-    if (client->transient_for) {
-        if (client->transient_for != OB_TRAN_GROUP) {
-            parent = client->transient_for;
-        } else {
-            GSList *sit;
-            GList *it;
+    /* insert above its highest parent (or its highest child !) */
+    it_below = find_highest_relative(client);
 
-            if (client->group)
-                for (it = stacking_list; !parent && it; it = g_list_next(it)) {
-                    if ((sit = g_slist_find(client->group->members, it->data)))
-                        for (sit = client->group->members; !parent && sit;
-                             sit = g_slist_next(sit))
-                        {
-                            ObClient *c = sit->data;
-                            /* checking transient_for prevents infinate loops!
-                             */
-                            if (sit->data == it->data && !c->transient_for)
-                                parent = it->data;
-                        }
-                }
-        }
-    }
-
-    if (!(it_below = g_list_find(stacking_list, parent))) {
-        /* no parent to put above, try find the focused client to go
-           under */
+    if (!it_below) {
+        /* nothing to put it directly above, so try find the focused client to
+           put it underneath it */
         if (focus_client && focus_client->layer == client->layer) {
             if ((it_below = g_list_find(stacking_list, focus_client)))
                 it_below = it_below->next;

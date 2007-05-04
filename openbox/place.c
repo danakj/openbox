@@ -282,7 +282,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
 
             if (WINDOW_IS_CLIENT(it->data)) {
                 c = it->data;
-                if (c->fullscreen)
+                if (c->fullscreen || (c->max_vert && c->max_horz))
                     continue;
             } else
                 continue;
@@ -306,7 +306,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
 
                 if (WINDOW_IS_CLIENT(it->data)) {
                     c = it->data;
-                    if (c->fullscreen)
+                    if (c->fullscreen || (c->max_vert && c->max_horz))
                         continue;
                 } else
                     continue;

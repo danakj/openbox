@@ -49,14 +49,9 @@ int main () {
   XMapWindow(display, win);
   XFlush(display);
 
-<<<<<<< .working
-  XMoveWindow(display, win, 960-1, 600-1);
-
-=======
   XMoveResizeWindow(display, win, 960-1, 600-1, 600, 150);
   /*XResizeWindow(display, win, 600, 150);*/
 
->>>>>>> .merge-right.r5963
   XSelectInput(display, win, ExposureMask | StructureNotifyMask);
 
   while (1) {

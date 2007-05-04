@@ -27,7 +27,7 @@
         Mod2Mask (1<<4), Mod3Mask (1<<5), Mod4Mask (1<<6), Mod5Mask (1<<7)
 */
 #define NUM_MASKS 8
-#define ALL_MASKS 0xf /* an or'ing of all 8 keyboard masks */
+#define ALL_MASKS 0xff /* an or'ing of all 8 keyboard masks */
 
 /* Get the bitflag for the n'th modifier mask */
 #define nth_mask(n) (1 << n)
@@ -40,15 +40,21 @@ static guchar modkeys_keys[OB_MODKEY_NUM_KEYS];
 
 void modkeys_startup(gboolean reconfigure)
 {
-    /* keycodes for the modifier keys which will be bound to the masks */
+    KeySym *keymap;
     gint i, j, k;
-
-    modmap = XGetModifierMapping(ob_display);
-    g_assert(modmap->max_keypermod > 0);
+    gint min_keycode, max_keycode, keysyms_per_keycode;
 
     /* reset the keys to not be bound to any masks */
     for (i = 0; i < OB_MODKEY_NUM_KEYS; ++i)
         modkeys_keys[i] = 0;
+
+    modmap = XGetModifierMapping(ob_display);
+    g_assert(modmap->max_keypermod > 0);
+
+    XDisplayKeycodes(ob_display, &min_keycode, &max_keycode);
+    keymap = XGetKeyboardMapping(ob_display, min_keycode,
+                                 max_keycode - min_keycode + 1,
+                                 &keysyms_per_keycode);
 
     /* go through each of the modifier masks (eg ShiftMask, CapsMask...) */
     for (i = 0; i < NUM_MASKS; ++i) {
@@ -58,15 +64,16 @@ void modkeys_startup(gboolean reconfigure)
             /* get a keycode that is bound to the mask (i) */
             KeyCode keycode = modmap->modifiermap[i*modmap->max_keypermod + j];
             /* go through each keysym bound to the given keycode */
-            for (k = 0; ; ++k) {
-                sym = XKeycodeToKeysym(ob_display, keycode, k);
-                if (sym == NoSymbol) break;
-
-                /* bind the key to the mask (e.g. Alt_L => Mod1Mask) */
-                set_modkey_mask(nth_mask(i), sym);
+            for (k = 0; k < keysyms_per_keycode; ++k) {
+                sym = keymap[(keycode-min_keycode) * keysyms_per_keycode + k];
+                if (sym != NoSymbol) {
+                    /* bind the key to the mask (e.g. Alt_L => Mod1Mask) */
+                    set_modkey_mask(nth_mask(i), sym);
+                }
             }
         }
     }
+    XFree(keymap);
 }
 
 void modkeys_shutdown(gboolean reconfigure)

@@ -248,8 +248,10 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
               done = TRUE;
               else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
                   cancel = done = TRUE;
-        } else if (e->type == ButtonPress)
-            cancel = done = TRUE;
+        } else if (e->type == ButtonPress) {
+            cancel = FALSE;
+            done = TRUE;
+        }
 
         if (done) {
             keyboard_interactive_end(e->xkey.state, cancel, e->xkey.time,TRUE);

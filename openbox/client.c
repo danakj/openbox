@@ -915,7 +915,10 @@ static void client_get_all(ObClient *self)
     /* The transient hint is used to pick a type, but the type can also affect
        transiency (dialogs are always made transients of their group if they
        have one). This is Havoc's idea, but it is needed to make some apps
-       work right (eg tsclient). */
+       work right (eg tsclient).
+       I also have made non-application type windows be transients based on
+       their type, like dialogs.
+    */
     client_update_transient_for(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
     client_get_state(self);
@@ -1643,7 +1646,8 @@ void client_update_wmhints(ObClient *self)
                     {
                         ObClient *c = it->data;
 
-                        if (c != self && !c->transient_for)
+                        if (c != self && (!c->transient_for ||
+                                          c->transient_for != OB_TRAN_GROUP))
                             c->transients = g_slist_remove(c->transients,
                                                            self);
                     }
@@ -1652,12 +1656,23 @@ void client_update_wmhints(ObClient *self)
                 group_remove(self->group, self);
                 self->group = NULL;
             }
+
+            /* because the self->transient flag wont change from this call,
+               we don't need to update the window's type and such, only its
+               transient_for, and the transients lists of other windows in
+               the group may be affected
+
+               do this before adding transients from the group so we know if
+               we are actually transient for the group or not.
+            */
+            client_update_transient_for(self);
+
             if (hints->window_group != None) {
                 self->group = group_add(hints->window_group, self);
 
                 /* i can only have transients from the group if i am not
-                   transient myself */
-                if (!self->transient_for) {
+                   transient for the group myself */
+                if (self->transient_for != OB_TRAN_GROUP) {
                     /* add other transients of the group that are already
                        set up */
                     for (it = self->group->members; it;
@@ -1670,12 +1685,6 @@ void client_update_wmhints(ObClient *self)
                     }
                 }
             }
-
-            /* because the self->transient flag wont change from this call,
-               we don't need to update the window's type and such, only its
-               transient_for, and the transients lists of other windows in
-               the group may be affected */
-            client_update_transient_for(self);
         }
 
         /* the WM_HINTS can contain an icon */

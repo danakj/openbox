@@ -1201,20 +1201,6 @@ void client_update_transient_for(ObClient *self)
                                   c->transient_for != OB_TRAN_GROUP))
                     c->transients = g_slist_append(c->transients, self);
             }
-
-/* XXX can i remove this ?? */
-
-            /* remove all transients which are in the group, that causes
-               circlular pointer hell of doom */
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                GSList *sit, *next;
-                for (sit = self->transients; sit; sit = next) {
-                    next = g_slist_next(sit);
-                    if (sit->data == it->data)
-                        self->transients =
-                            g_slist_delete_link(self->transients, sit);
-                }
-            }
         } else if (self->transient_for != NULL) { /* transient of window */
             /* add to new parent */
             self->transient_for->transients =

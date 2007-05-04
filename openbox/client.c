@@ -262,9 +262,7 @@ void client_manage(Window window)
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
-    attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
-    XChangeWindowAttributes(ob_display, window,
-                            CWEventMask|CWDontPropagate, &attrib_set);
+    XChangeWindowAttributes(ob_display, window, CWEventMask, &attrib_set);
 
 
     /* create the ObClient struct, and populate it from the hints on the

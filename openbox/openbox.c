@@ -21,6 +21,7 @@
 #include "openbox.h"
 #include "session.h"
 #include "dock.h"
+#include "modkeys.h"
 #include "event.h"
 #include "menu.h"
 #include "client.h"
@@ -215,6 +216,8 @@ gint main(gint argc, gchar **argv)
                 xmlDocPtr doc;
                 xmlNodePtr node;
 
+                modkeys_startup(reconfigure);
+
                 /* startup the parsing so everything can register sections
                    of the rc */
                 i = parse_startup();
@@ -320,6 +323,7 @@ gint main(gint argc, gchar **argv)
             window_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
+            modkeys_shutdown(reconfigure);
         } while (reconfigure);
     }
 

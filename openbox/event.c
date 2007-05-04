@@ -31,6 +31,7 @@
 #include "menu.h"
 #include "menuframe.h"
 #include "keyboard.h"
+#include "modkeys.h"
 #include "mouse.h"
 #include "mainloop.h"
 #include "framerender.h"
@@ -93,21 +94,7 @@ static gboolean menu_hide_delay_func(gpointer data);
 /* The time for the current event being processed */
 Time event_curtime = CurrentTime;
 
-/*! The value of the mask for the NumLock modifier */
-guint NumLockMask;
-/*! The value of the mask for the ScrollLock modifier */
-guint ScrollLockMask;
-/*! The key codes for the modifier keys */
-static XModifierKeymap *modmap;
-/*! Table of the constant modifier masks */
-static const gint mask_table[] = {
-    ShiftMask, LockMask, ControlMask, Mod1Mask,
-    Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
-};
-static gint mask_table_size;
-
 static guint ignore_enter_focus = 0;
-
 static gboolean menu_can_hide;
 
 #ifdef USE_SM
@@ -136,31 +123,6 @@ void event_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    mask_table_size = sizeof(mask_table) / sizeof(mask_table[0]);
-     
-    /* get lock masks that are defined by the display (not constant) */
-    modmap = XGetModifierMapping(ob_display);
-    g_assert(modmap);
-    if (modmap && modmap->max_keypermod > 0) {
-        size_t cnt;
-        const size_t size = mask_table_size * modmap->max_keypermod;
-        /* get the values of the keyboard lock modifiers
-           Note: Caps lock is not retrieved the same way as Scroll and Num
-           lock since it doesn't need to be. */
-        const KeyCode num_lock = XKeysymToKeycode(ob_display, XK_Num_Lock);
-        const KeyCode scroll_lock = XKeysymToKeycode(ob_display,
-                                                     XK_Scroll_Lock);
-
-        for (cnt = 0; cnt < size; ++cnt) {
-            if (! modmap->modifiermap[cnt]) continue;
-
-            if (num_lock == modmap->modifiermap[cnt])
-                NumLockMask = mask_table[cnt / modmap->max_keypermod];
-            if (scroll_lock == modmap->modifiermap[cnt])
-                ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
-        }
-    }
-
     ob_main_loop_x_add(ob_main_loop, event_process, NULL, NULL);
 
 #ifdef USE_SM
@@ -179,7 +141,6 @@ void event_shutdown(gboolean reconfig)
 #endif
 
     client_remove_destructor(focus_delay_client_dest);
-    XFreeModifiermap(modmap);
 }
 
 static Window event_get_window(XEvent *e)
@@ -271,54 +232,34 @@ static void event_set_curtime(XEvent *e)
     event_curtime = t;
 }
 
-#define STRIP_MODS(s) \
-        s &= ~(LockMask | NumLockMask | ScrollLockMask), \
-        /* kill off the Button1Mask etc, only want the modifiers */ \
-        s &= (ControlMask | ShiftMask | Mod1Mask | \
-              Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask) \
-
 static void event_hack_mods(XEvent *e)
 {
 #ifdef XKB
     XkbStateRec xkb_state;
 #endif
-    KeyCode *kp;
-    gint i, k;
 
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
-        STRIP_MODS(e->xbutton.state);
+        e->xbutton.state = modkeys_only_modifier_masks(e->xbutton.state);
         break;
     case KeyPress:
-        STRIP_MODS(e->xkey.state);
+        e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
         break;
     case KeyRelease:
-        STRIP_MODS(e->xkey.state);
-        /* remove from the state the mask of the modifier being released, if
-           it is a modifier key being released (this is a little ugly..) */
+        e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
 #ifdef XKB
         if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success) {
             e->xkey.state = xkb_state.compat_state;
             break;
         }
 #endif
-        kp = modmap->modifiermap;
-        for (i = 0; i < mask_table_size; ++i) {
-            for (k = 0; k < modmap->max_keypermod; ++k) {
-                if (*kp == e->xkey.keycode) { /* found the keycode */
-                    /* remove the mask for it */
-                    e->xkey.state &= ~mask_table[i];
-                    /* cause the first loop to break; */
-                    i = mask_table_size;
-                    break; /* get outta here! */
-                }
-                ++kp;
-            }
-        }
+        /* remove from the state the mask of the modifier key being released,
+           if it is a modifier key being released that is */
+        e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);
         break;
     case MotionNotify:
-        STRIP_MODS(e->xmotion.state);
+        e->xmotion.state = modkeys_only_modifier_masks(e->xmotion.state);
         /* compress events */
         {
             XEvent ce;

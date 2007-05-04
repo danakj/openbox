@@ -19,6 +19,7 @@
 
 #include "openbox.h"
 #include "mouse.h"
+#include "modkeys.h"
 #include "gettext.h"
 #include <glib.h>
 #include <string.h>
@@ -26,20 +27,37 @@
 
 static guint translate_modifier(gchar *str)
 {
-    if (!g_ascii_strcasecmp("Mod1", str) ||
-        !g_ascii_strcasecmp("A", str)) return Mod1Mask;
-    else if (!g_ascii_strcasecmp("Mod2", str)) return Mod2Mask;
-    else if (!g_ascii_strcasecmp("Mod3", str) ||
-             !g_ascii_strcasecmp("M", str)) return Mod3Mask;
-    else if (!g_ascii_strcasecmp("Mod4", str) ||
-             !g_ascii_strcasecmp("W", str)) return Mod4Mask;
-    else if (!g_ascii_strcasecmp("Mod5", str)) return Mod5Mask;
+    guint mask = 0;
+
+    if (!g_ascii_strcasecmp("Mod1", str)) mask = Mod1Mask;
+    else if (!g_ascii_strcasecmp("Mod2", str)) mask = Mod2Mask;
+    else if (!g_ascii_strcasecmp("Mod3", str)) mask = Mod3Mask;
+    else if (!g_ascii_strcasecmp("Mod4", str)) mask = Mod4Mask;
+    else if (!g_ascii_strcasecmp("Mod5", str)) mask = Mod5Mask;
+
     else if (!g_ascii_strcasecmp("Control", str) ||
-             !g_ascii_strcasecmp("C", str)) return ControlMask;
+             !g_ascii_strcasecmp("C", str))
+        mask = modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL);
+    else if (!g_ascii_strcasecmp("Alt", str) ||
+             !g_ascii_strcasecmp("A", str))
+        mask = modkeys_key_to_mask(OB_MODKEY_KEY_ALT);
+    else if (!g_ascii_strcasecmp("Meta", str) ||
+             !g_ascii_strcasecmp("M", str))
+        mask = modkeys_key_to_mask(OB_MODKEY_KEY_META);
+    /* W = windows key, is linked to the Super_L/R buttons */
+    else if (!g_ascii_strcasecmp("Super", str) ||
+             !g_ascii_strcasecmp("W", str))
+        mask = modkeys_key_to_mask(OB_MODKEY_KEY_SUPER);
     else if (!g_ascii_strcasecmp("Shift", str) ||
-             !g_ascii_strcasecmp("S", str)) return ShiftMask;
-    g_message(_("Invalid modifier key '%s' in key/pointer binding"), str);
-    return 0;
+             !g_ascii_strcasecmp("S", str))
+        mask = modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT);
+    else if (!g_ascii_strcasecmp("Hyper", str) ||
+             !g_ascii_strcasecmp("H", str))
+        mask = modkeys_key_to_mask(OB_MODKEY_KEY_HYPER);
+    else
+        g_message(_("Invalid modifier key '%s' in key/pointer binding"), str);
+
+    return mask;
 }
 
 gboolean translate_button(const gchar *str, guint *state, guint *button)

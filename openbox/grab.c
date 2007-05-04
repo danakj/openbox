@@ -18,6 +18,7 @@
 */
 
 #include "grab.h"
+#include "modkeys.h"
 #include "openbox.h"
 #include "event.h"
 #include "xerror.h"
@@ -135,17 +136,20 @@ gint grab_server(gboolean grab)
 void grab_startup(gboolean reconfig)
 {
     guint i = 0;
+    guint num, caps, scroll;
 
-    if (reconfig) return;
+    num = modkeys_key_to_mask(OB_MODKEY_KEY_NUMLOCK);
+    caps = modkeys_key_to_mask(OB_MODKEY_KEY_CAPSLOCK);
+    scroll = modkeys_key_to_mask(OB_MODKEY_KEY_SCROLLLOCK);
 
     mask_list[i++] = 0;
-    mask_list[i++] = LockMask;
-    mask_list[i++] = NumLockMask;
-    mask_list[i++] = LockMask | NumLockMask;
-    mask_list[i++] = ScrollLockMask;
-    mask_list[i++] = ScrollLockMask | LockMask;
-    mask_list[i++] = ScrollLockMask | NumLockMask;
-    mask_list[i++] = ScrollLockMask | LockMask | NumLockMask;
+    mask_list[i++] = num;
+    mask_list[i++] = caps;
+    mask_list[i++] = scroll;
+    mask_list[i++] = num | caps;
+    mask_list[i++] = num | scroll;
+    mask_list[i++] = caps | scroll;
+    mask_list[i++] = num | caps | scroll;
     g_assert(i == MASK_LIST_SIZE);
 }
 

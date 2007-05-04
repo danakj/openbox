@@ -179,6 +179,8 @@ openbox_openbox_SOURCES = \
 	openbox/menu.c \
 	openbox/menu.h \
 	openbox/misc.h \
+	openbox/modkeys.c \
+	openbox/modkeys.h \
 	openbox/mouse.c \
 	openbox/mouse.h \
 	openbox/moveresize.c \

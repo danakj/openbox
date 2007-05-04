@@ -505,7 +505,7 @@ ActionString actionstrings[] =
     {
         "activate",
         action_activate,
-        setup_client_action
+        setup_action_focus
     },
     {
         "focus",
@@ -1183,15 +1183,22 @@ void action_execute(union ActionData *data)
 
 void action_activate(union ActionData *data)
 {
-    /* similar to the openbox dock for dockapps, don't let user actions give
-       focus to 3rd-party docks (panels) either (unless they ask for it
-       themselves). */
-    if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
-        /* if using focus_delay, stop the timer now so that focus doesn't go
-           moving on us */
-        event_halt_focus_delay();
+    if (data->client.any.c) {
+        /* similar to the openbox dock for dockapps, don't let user actions
+           give focus to 3rd-party docks (panels) either (unless they ask for
+           it themselves). */
+        if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+            /* if using focus_delay, stop the timer now so that focus doesn't
+               go moving on us */
+            event_halt_focus_delay();
 
-        client_activate(data->activate.any.c, data->activate.here, TRUE);
+            client_activate(data->activate.any.c, data->activate.here, TRUE);
+        }
+    } else {
+        /* focus action on something other than a client, make keybindings
+           work for this openbox instance, but don't focus any specific client
+        */
+        focus_nothing();
     }
 }
 
@@ -1818,36 +1825,37 @@ void action_growtoedge(union ActionData *data)
     ObClient *c = data->diraction.any.c;
     Rect *a;
 
-    //FIXME growtoedge resizes shaded windows to 0 height
-    if (c->shaded)
-        return;
-
     a = screen_area(c->desktop);
     x = c->frame->area.x;
     y = c->frame->area.y;
-    width = c->frame->area.width;
-    height = c->frame->area.height;
+    /* get the unshaded frame's dimensions..if it is shaded */
+    width = c->area.width + c->frame->size.left + c->frame->size.right;
+    height = c->area.height + c->frame->size.top + c->frame->size.bottom;
 
     switch(data->diraction.direction) {
     case OB_DIRECTION_NORTH:
+        if (c->shaded) break; /* don't allow vertical resize if shaded */
+
         dest = client_directional_edge_search(c, OB_DIRECTION_NORTH, FALSE);
         if (a->y == y)
-            height = c->frame->area.height / 2;
+            height = height / 2;
         else {
-            height = c->frame->area.y + c->frame->area.height - dest;
+            height = c->frame->area.y + height - dest;
             y = dest;
         }
         break;
     case OB_DIRECTION_WEST:
         dest = client_directional_edge_search(c, OB_DIRECTION_WEST, FALSE);
         if (a->x == x)
-            width = c->frame->area.width / 2;
+            width = width / 2;
         else {
-            width = c->frame->area.x + c->frame->area.width - dest;
+            width = c->frame->area.x + width - dest;
             x = dest;
         }
         break;
     case OB_DIRECTION_SOUTH:
+        if (c->shaded) break; /* don't allow vertical resize if shaded */
+
         dest = client_directional_edge_search(c, OB_DIRECTION_SOUTH, FALSE);
         if (a->y + a->height == y + c->frame->area.height) {
             height = c->frame->area.height / 2;

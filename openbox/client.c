@@ -1765,7 +1765,7 @@ void client_update_wmhints(ObClient *self)
             */
             if (self->transient &&
                 ((self->transient_for == NULL && oldgroup == NULL) ||
-                 self->transient_for == OB_TRAN_GROUP && self->group == NULL))
+                 (self->transient_for == OB_TRAN_GROUP && !self->group)))
                 client_update_transient_for(self);
         }
 

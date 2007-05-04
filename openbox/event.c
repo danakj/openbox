@@ -96,6 +96,7 @@ Time event_curtime = CurrentTime;
 
 static guint ignore_enter_focus = 0;
 static gboolean menu_can_hide;
+static gboolean focus_left_screen = FALSE;
 
 #ifdef USE_SM
 static void ice_handler(gint fd, gpointer conn)
@@ -415,7 +416,23 @@ static void event_process(const XEvent *ec, gpointer data)
         /* crossing events for menu */
         event_handle_menu(e);
     } else if (e->type == FocusIn) {
-        if (client && client != focus_client) {
+        if (e->xfocus.detail == NotifyPointerRoot ||
+            e->xfocus.detail == NotifyDetailNone)
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to pointer root/none\n");
+            /* Focus has been reverted to the root window or nothing.
+               FocusOut events come after UnmapNotify, so we don't need to
+               worry about focusing an invalid window
+             */
+            if (!focus_left_screen)
+                focus_fallback(TRUE);
+        } else if (e->xfocus.detail == NotifyInferior) {
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Focus went to root or our frame window");
+            /* Focus has been given to the root window. */
+            focus_fallback(TRUE);
+        } else if (client && client != focus_client) {
+            focus_left_screen = FALSE;
             frame_adjust_focus(client->frame, TRUE);
             focus_set_client(client);
             client_calc_layer(client);
@@ -430,22 +447,28 @@ static void event_process(const XEvent *ec, gpointer data)
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
                is not being managed, or a window on another screen. */
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to a black hole !\n");
+            Window win, root;
+            gint i;
+            guint u;
+            xerror_set_ignore(TRUE);
+            if (XGetInputFocus(ob_display, &win, &i) != 0 &&
+                XGetGeometry(ob_display, win, &root, &i,&i,&u,&u,&u,&u) != 0 &&
+                root != RootWindow(ob_display, ob_screen))
+            {
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Focus went to another screen !\n");
+                focus_left_screen = TRUE;
+            }
+            else
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Focus went to a black hole !\n");
+            xerror_set_ignore(FALSE);
             /* nothing is focused */
             focus_set_client(NULL);
         } else if (ce.xany.window == e->xany.window) {
             ob_debug_type(OB_DEBUG_FOCUS, "Focus didn't go anywhere\n");
             /* If focus didn't actually move anywhere, there is nothing to do*/
             nomove = TRUE;
-        } else if (ce.xfocus.detail == NotifyPointerRoot ||
-                   ce.xfocus.detail == NotifyDetailNone ||
-                   ce.xfocus.detail == NotifyInferior) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root\n");
-            /* Focus has been reverted to the root window or nothing
-               FocusOut events come after UnmapNotify, so we don't need to
-               worry about focusing an invalid window
-             */
-            focus_fallback(TRUE);
         } else {
             /* Focus did move, so process the FocusIn event */
             ObEventData ed = { .ignored = FALSE };

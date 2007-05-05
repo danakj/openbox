@@ -442,7 +442,7 @@ static void event_process(const XEvent *ec, gpointer data)
             if (XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
                 XPutBackEvent(ob_display, &ce);
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "  but another FocusIn is coming\n)");
+                              "  but another FocusIn is coming\n");
             } else {
                 /* Focus has been reverted to the root window, nothing, or to
                    our frame window.

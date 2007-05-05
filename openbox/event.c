@@ -810,8 +810,19 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 e->xconfigurerequest.detail = ce.xconfigurerequest.detail;
         }
 
-        /* if we are iconic (or shaded (fvwm does this)) ignore the event */
-        if (client->iconic || client->shaded) return;
+        ob_debug("ConfigureRequest desktop %d wmstate %d vis %d\n",
+                 screen_desktop, client->wmstate, client->frame->visible);
+
+        /* If the client is in IconicState then ignore the event.
+           This used to only ignore iconic or shaded windows, but windows on
+           other desktops are also in IconicState, so now those can't
+           send ConfigureRequests either..
+           This fixes the bug of KDE apps moving when they try to active them-
+           selves on another desktop.
+           It used to say "fvwm does this" but I'm not sure if fvwm does
+           this for windows on other desktops too. Probably, it makes sense.
+        */
+        if (client->wmstate == IconicState) return;
 
         /* resize, then move, as specified in the EWMH section 7.7 */
         if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
@@ -1386,7 +1397,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
         {
             /* the frame may not be "visible" but they can still click on it
                in the case where it is animating before disappearing */
-            if (client && client->frame->visible)
+            if (!client || !frame_iconify_animating(client->frame))
                 mouse_event(client, e);
         } else if (e->type == KeyPress) {
             keyboard_event((focus_cycle_target ? focus_cycle_target :

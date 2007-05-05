@@ -145,14 +145,12 @@ struct _ObFrame
     gboolean  flash_on;
     GTimeVal  flash_end;
 
-    /*! The step which the client is currently in for animating iconify and
-      restore.
-      0 means that it is not animating. FRAME_ANIMATE_ICONIFY_STEPS is the
-      first step for iconifying, and -FRAME_ANIMATE_ICONIFY_STEPS is the
-      forst step for restoring. It counts towards 0 either way. Visually,
-      +x == -(FRAME_ANIMATE_ICONIFY_STEPS-x+1)
+    /*! Is the frame currently in an animation for iconify or restore.
+      0 means that it is not animating. > 0 means it is animating an iconify.
+      < 0 means it is animating a restore.
     */
-    gint iconify_animation_step;
+    gint iconify_animation_going;
+    GTimeVal  iconify_animation_end;
     ObFrameIconifyAnimateFunc iconify_animation_cb;
     gpointer iconify_animation_data;
 };

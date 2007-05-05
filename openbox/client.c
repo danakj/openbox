@@ -931,7 +931,7 @@ static void client_get_all(ObClient *self)
 
     client_update_wmhints(self);
     /* this may have already been called from client_update_wmhints */
-    if (self->transient && self->transient_for == NULL)
+    if (self->transient_for == NULL)
         client_update_transient_for(self);
     client_get_startup_id(self);
     client_get_desktop(self);/* uses transient data/group/startup id if a

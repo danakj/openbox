@@ -94,7 +94,7 @@ window.inactive.button.disabled.bg: Flat Gradient Vertical Border
 window.inactive.button.disabled.bg.color: #efebe7
 window.inactive.button.disabled.bg.colorTo: #ddd6ce
 window.inactive.button.disabled.bg.border.color: #8f8173
-window.inactive.button.disabled.image.color: #aaaaaa
+window.inactive.button.disabled.image.color: #8f8173
 
 window.inactive.button.toggled.bg: Flat Gradient Vertical Border
 window.inactive.button.toggled.bg.color: #efebe7

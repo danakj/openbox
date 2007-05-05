@@ -424,6 +424,8 @@ int main(int argc, char **argv)
     if (read_color(db, "menu.items.disabled.text.color",
                    &i, &j, &k)) {
         COLOR3("menu","disabled","primary",i,j,k,255);
+        read_color(db, "menu.items.activedisabled.text.color",
+                   &i, &j, &k); /* read this if we can */
         COLOR4("menu","activedisabled","text","primary",i,j,k,255);
     }
 

@@ -57,7 +57,7 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
             target = it->data;
 
             /* don't snap to self or non-visibles */
-            if (!target->frame->visible || target == c) continue; 
+            if (!frame_visible(target->frame) || target == c) continue; 
 
             /* don't snap to windows in layers beneath */
             if(target->layer < c->layer && !config_resist_layers_below)
@@ -199,7 +199,7 @@ void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
             target = it->data;
 
             /* don't snap to invisibles or ourself */
-            if (!target->frame->visible || target == c) continue;
+            if (!frame_visible(target->frame) || target == c) continue; 
 
             /* don't snap to windows in layers beneath */
             if(target->layer < c->layer && !config_resist_layers_below)

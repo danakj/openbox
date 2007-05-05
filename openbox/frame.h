@@ -77,6 +77,9 @@ struct _ObFrame
 
     Strut     size;
     Rect      area;
+    /*! Is the frame visible? Don't read this directly ! Use frame_visible()
+      instead, because that takes into account if the frame is visible but
+      animating to the iconic (invisible) state. */
     gboolean  visible;
 
     guint     decorations;
@@ -195,5 +198,12 @@ void frame_flash_stop(ObFrame *self);
 void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
                                    ObFrameIconifyAnimateFunc callback,
                                    gpointer data);
+void frame_end_iconify_animation(ObFrame *self);
+
+/* Returns true if the frame is visible (but false if it is only visible
+   because it is animating */
+gboolean frame_visible(ObFrame *self);
+
+#define frame_iconify_animating(f) (f->iconify_animation_going != 0)
 
 #endif

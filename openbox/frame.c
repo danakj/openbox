@@ -42,7 +42,8 @@
    from the frame. */
 #define INNER_EVENTMASK (ButtonPressMask)
 
-#define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
+//#define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
+#define FRAME_ANIMATE_ICONIFY_TIME 2000000
 #define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 30) /* 30 Hz */
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
@@ -481,17 +482,18 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                              self->client->area.height);
     }
 
-    if (!fake && !self->iconify_animation_going) {
-        /* move and resize the top level frame.
-           shading can change without being moved or resized.
-
-           but don't do this during an iconify animation. it will be
-           reflected afterwards.
-        */
-        XMoveResizeWindow(ob_display, self->window,
-                          self->area.x, self->area.y,
-                          self->area.width - self->bwidth * 2,
-                          self->area.height - self->bwidth * 2);
+    if (!fake) {
+        if (!frame_iconify_animating(self))
+            /* move and resize the top level frame.
+               shading can change without being moved or resized.
+               
+               but don't do this during an iconify animation. it will be
+               reflected afterwards.
+            */
+            XMoveResizeWindow(ob_display, self->window,
+                              self->area.x, self->area.y,
+                              self->area.width - self->bwidth * 2,
+                              self->area.height - self->bwidth * 2);
 
         if (resized) {
             framerender_frame(self);
@@ -839,10 +841,6 @@ ObFrameContext frame_context(ObClient *client, Window win)
     if (win == RootWindow(ob_display, ob_screen))
         return OB_FRAME_CONTEXT_DESKTOP;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
-
-    self = client->frame;
-    if (self->iconify_animation_going) return OB_FRAME_CONTEXT_NONE;
-
     if (win == client->window) {
         /* conceptually, this is the desktop, as far as users are
            concerned */
@@ -851,6 +849,7 @@ ObFrameContext frame_context(ObClient *client, Window win)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
+    self = client->frame;
     if (win == self->inner || win == self->plate) {
         /* conceptually, this is the desktop, as far as users are
            concerned */
@@ -1108,19 +1107,33 @@ static gboolean frame_animate_iconify(gpointer p)
         h = self->innersize.top; /* just the titlebar */
     }
 
-    if (time == 0) {
-        /* call the callback when it's done */
-        if (self->iconify_animation_cb)
-            self->iconify_animation_cb(self->iconify_animation_data);
-        /* we're not animating any more ! */
-        self->iconify_animation_going = 0;
+    if (time == 0)
+        frame_end_iconify_animation(self);
+    else {
+        XMoveResizeWindow(ob_display, self->window, x, y, w, h);
+        XFlush(ob_display);
     }
 
-    /* move to the next spot (after the callback for the animation ending) */
-    XMoveResizeWindow(ob_display, self->window, x, y, w, h);
-    XFlush(ob_display);
-
     return time > 0; /* repeat until we're out of time */
+}
+
+void frame_end_iconify_animation(ObFrame *self)
+{
+    /* see if there is an animation going */
+    if (self->iconify_animation_going == 0) return;
+
+    /* call the callback when it's done */
+    if (self->iconify_animation_cb)
+        self->iconify_animation_cb(self->iconify_animation_data);
+    /* we're not animating any more ! */
+    self->iconify_animation_going = 0;
+
+    /* move after the callback for the animation ending */
+    XMoveResizeWindow(ob_display, self->window,
+                      self->area.x, self->area.y,
+                      self->area.width - self->bwidth * 2,
+                      self->area.height - self->bwidth * 2);
+    XFlush(ob_display);
 }
 
 void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
@@ -1128,7 +1141,7 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
                                    gpointer data)
 {
     gulong time;
-    gboolean start_timer = TRUE;
+    gboolean new_anim = FALSE;
     gboolean set_end = TRUE;
     GTimeVal now;
 
@@ -1151,8 +1164,8 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
         } else
             /* animation was already going in the same direction */
             set_end = FALSE;
-        start_timer = FALSE;
-    }
+    } else
+        new_anim = TRUE;
     self->iconify_animation_going = iconifying ? 1 : -1;
 
     self->iconify_animation_cb = callback;
@@ -1165,14 +1178,25 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
         g_time_val_add(&self->iconify_animation_end, time);
     }
 
-    if (start_timer) {
+    if (new_anim) {
         ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
                                          self, FALSE);
         ob_main_loop_timeout_add(ob_main_loop,
                                  FRAME_ANIMATE_ICONIFY_STEP_TIME,
                                  frame_animate_iconify, self,
                                  g_direct_equal, NULL);
+
         /* do the first step */
         frame_animate_iconify(self);
+
+        if (!self->visible)
+            frame_show(self);
     }
+}
+
+gboolean frame_visible(ObFrame *self)
+{
+    /* if it is animating back from iconic state then it is considered
+       visible. but if it is iconifying then it is not visible. */
+    return self->visible && self->iconify_animation_going <= 0;
 }

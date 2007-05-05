@@ -1098,16 +1098,29 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
             if (a->data.any.interactive || a->func == action_moveresize) {
                 /* interactive actions are not queued */
                 a->func(&a->data);
-            } else if (context == OB_FRAME_CONTEXT_CLIENT ||
-                       (c && c->type == OB_CLIENT_TYPE_DESKTOP &&
-                        context == OB_FRAME_CONTEXT_DESKTOP)) {
+            } else if ((context == OB_FRAME_CONTEXT_CLIENT ||
+                        (c && c->type == OB_CLIENT_TYPE_DESKTOP &&
+                         context == OB_FRAME_CONTEXT_DESKTOP)) &&
+                       (a->func == action_focus ||
+                        a->func == action_activate))
+            {
                 /* XXX MORE UGLY HACK
                    actions from clicks on client windows are NOT queued.
                    this solves the mysterious click-and-drag-doesnt-work
                    problem. it was because the window gets focused and stuff
                    after the button event has already been passed through. i
                    dont really know why it should care but it does and it makes
-                   a difference. */
+                   a difference.
+
+                   however this very bogus ! !
+                   we want to send the button press to the window BEFORE
+                   we do the action because the action might move the windows
+                   (eg change desktops) and then the button press ends up on
+                   the completely wrong window !
+                   so, this is just for that bug, and it will only NOT queue it
+                   if it is a focusing action that can be used with the mouse
+                   pointer. ugh.
+                */
                 a->func(&a->data);
             } else
                 ob_main_loop_queue_action(ob_main_loop, a);

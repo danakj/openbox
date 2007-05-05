@@ -475,13 +475,20 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
     else
         ok = (ft->type == OB_CLIENT_TYPE_NORMAL ||
               ft->type == OB_CLIENT_TYPE_DIALOG ||
-              (!client_has_application_group_siblings(ft) &&
-               (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+              ((ft->type == OB_CLIENT_TYPE_TOOLBAR ||
                 ft->type == OB_CLIENT_TYPE_MENU ||
-                ft->type == OB_CLIENT_TYPE_UTILITY)));
+                ft->type == OB_CLIENT_TYPE_UTILITY) &&
+               /* let alt-tab go to these windows when a window in its group
+                  already has focus ... */
+               ((focus_client && ft->group == focus_client->group) ||
+                /* ... or if there are no application windows in its group */
+                !client_has_application_group_siblings(ft))));
     ok = ok && (ft->can_focus || ft->focus_notify);
-    if (!dock_windows) /* use dock windows that skip taskbar too */
-        ok = ok && !ft->skip_taskbar;
+    if (!dock_windows && /* use dock windows that skip taskbar too */
+        !(ft->type == OB_CLIENT_TYPE_TOOLBAR || /* also, if we actually are */
+          ft->type == OB_CLIENT_TYPE_MENU ||    /* being allowed to target */
+          ft->type == OB_CLIENT_TYPE_UTILITY))  /* one of these, don't let */
+        ok = ok && !ft->skip_taskbar;           /*  skip taskbar stop us */
     ok = ok && (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL);
     ok = ok && ft == client_focus_target(ft);
     return ok;

@@ -931,7 +931,7 @@ static void client_get_all(ObClient *self)
 
     client_update_wmhints(self);
     /* this may have already been called from client_update_wmhints */
-    if (self->transient && self->transient_for == NULL)
+    if (self->transient_for == NULL)
         client_update_transient_for(self);
     client_get_startup_id(self);
     client_get_desktop(self);/* uses transient data/group/startup id if a
@@ -1179,15 +1179,14 @@ void client_update_transient_for(ObClient *self)
                 }
             }
         }
-    } else if (self->group) {
-        if (self->type == OB_CLIENT_TYPE_DIALOG ||
-            self->type == OB_CLIENT_TYPE_TOOLBAR ||
-            self->type == OB_CLIENT_TYPE_MENU ||
-            self->type == OB_CLIENT_TYPE_UTILITY)
-        {
-            self->transient = TRUE;
+    } else if (self->type == OB_CLIENT_TYPE_DIALOG ||
+               self->type == OB_CLIENT_TYPE_TOOLBAR ||
+               self->type == OB_CLIENT_TYPE_MENU ||
+               self->type == OB_CLIENT_TYPE_UTILITY)
+    {
+        self->transient = TRUE;
+        if (self->group)
             target = OB_TRAN_GROUP;
-        }
     } else
         self->transient = FALSE;
 
@@ -1281,7 +1280,7 @@ static void client_update_transient_tree(ObClient *self,
              !client_is_direct_child(self, newparent))
         newparent->transients = g_slist_append(newparent->transients, self);
 
-    /* If the group changed then we need to add any old group transient
+    /* If the group changed then we need to add any new group transient
        windows to our children. But if we're transient for the group, then
        other group transients are not our children.
 

@@ -12,7 +12,7 @@ menu.title.text.justify: Left
 menu.items.bg: Flat Solid
 menu.items.bg.color: #f1eee0
 menu.items.text.color: #444444
-menu.items.disabled.text.color: #999999
+menu.items.disabled.text.color: #aaaaaa
 
 menu.items.active.bg: Flat Gradient Vertical Border
 menu.items.active.bg.color: #b4c994
@@ -94,7 +94,7 @@ window.inactive.button.disabled.bg: Flat Gradient Vertical Border
 window.inactive.button.disabled.bg.color: #efebe7
 window.inactive.button.disabled.bg.colorTo: #ddd6ce
 window.inactive.button.disabled.bg.border.color: #8f8173
-window.inactive.button.disabled.image.color: #8f8173
+window.inactive.button.disabled.image.color: #aaaaaa
 
 window.inactive.button.toggled.bg: Flat Gradient Vertical Border
 window.inactive.button.toggled.bg.color: #efebe7

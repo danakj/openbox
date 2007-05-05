@@ -1125,6 +1125,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.net_wm_icon) {
             client_update_icons(client);
         }
+        else if (msgtype == prop_atoms.net_wm_icon_geometry) {
+            client_update_icon_geometry(client);
+        }
         else if (msgtype == prop_atoms.net_wm_user_time) {
             client_update_user_time(client);
         }

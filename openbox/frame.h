@@ -27,6 +27,8 @@ typedef struct _ObFrame ObFrame;
 
 struct _ObClient;
 
+typedef void (*ObFrameIconifyAnimateFunc)(gpointer data);
+
 typedef enum {
     OB_FRAME_CONTEXT_NONE,
     OB_FRAME_CONTEXT_DESKTOP,
@@ -142,6 +144,17 @@ struct _ObFrame
     gboolean  flashing;
     gboolean  flash_on;
     GTimeVal  flash_end;
+
+    /*! The step which the client is currently in for animating iconify and
+      restore.
+      0 means that it is not animating. FRAME_ANIMATE_ICONIFY_STEPS is the
+      first step for iconifying, and -FRAME_ANIMATE_ICONIFY_STEPS is the
+      forst step for restoring. It counts towards 0 either way. Visually,
+      +x == -(FRAME_ANIMATE_ICONIFY_STEPS-x+1)
+    */
+    gint iconify_animation_step;
+    ObFrameIconifyAnimateFunc iconify_animation_cb;
+    gpointer iconify_animation_data;
 };
 
 ObFrame *frame_new(struct _ObClient *c);
@@ -177,5 +190,12 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
 
 void frame_flash_start(ObFrame *self);
 void frame_flash_stop(ObFrame *self);
+
+/*! Start an animation for iconifying or restoring a frame. The callback
+  will be called when the animation finishes. But if another animation is
+  started in the meantime, the callback will never get called. */
+void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
+                                   ObFrameIconifyAnimateFunc callback,
+                                   gpointer data);
 
 #endif

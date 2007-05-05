@@ -42,6 +42,8 @@ gboolean config_theme_hidedisabled;
 
 gchar   *config_title_layout;
 
+gboolean config_animate_iconify;
+
 RrFont *config_font_activewindow;
 RrFont *config_font_inactivewindow;
 RrFont *config_font_menuitem;
@@ -454,6 +456,8 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_theme_keepborder = parse_bool(doc, n);
     if ((n = parse_find_node("hideDisabled", node)))
         config_theme_hidedisabled = parse_bool(doc, n);
+    if ((n = parse_find_node("animateIconify", node)))
+        config_animate_iconify = parse_bool(doc, n);
 
     n = parse_find_node("font", node);
     while (n) {
@@ -805,6 +809,7 @@ void config_startup(ObParseInst *i)
 
     config_theme = NULL;
 
+    config_animate_iconify = TRUE;
     config_title_layout = g_strdup("NLIMC");
     config_theme_keepborder = TRUE;
     config_theme_hidedisabled = FALSE;

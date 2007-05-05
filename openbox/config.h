@@ -88,6 +88,8 @@ extern gboolean config_theme_keepborder;
 extern gboolean config_theme_hidedisabled;
 /*! Titlebar button layout */
 extern gchar *config_title_layout;
+/*! Animate windows iconifying and restoring */
+extern gboolean config_animate_iconify;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;

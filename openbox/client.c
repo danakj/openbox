@@ -970,6 +970,7 @@ static void client_get_all(ObClient *self)
     client_update_strut(self);
     client_update_icons(self);
     client_update_user_time(self);
+    client_update_icon_geometry(self);
 }
 
 static void client_get_startup_id(ObClient *self)
@@ -2022,6 +2023,22 @@ void client_update_user_time(ObClient *self)
     }
 }
 
+void client_update_icon_geometry(ObClient *self)
+{
+    guint num;
+    guint32 *data;
+
+    RECT_SET(self->icon_geometry, 0, 0, 0, 0);
+
+    if (PROP_GETA32(self->window, net_wm_icon_geometry, cardinal, &data, &num)
+        && num == 4)
+    {
+        /* don't let them set it with an area < 0 */
+        RECT_SET(self->icon_geometry, data[0], data[1],
+                 MAX(data[2],0), MAX(data[3],0));
+    }
+}
+
 static void client_get_client_machine(ObClient *self)
 {
     gchar *data = NULL;
@@ -2707,9 +2724,23 @@ static void client_iconify_recursive(ObClient *self,
 
     if (changed) {
         client_change_state(self);
-        client_showhide(self);
-        if (STRUT_EXISTS(self->strut))
-            screen_update_areas();
+        if (iconic) {
+            if (ob_state() != OB_STATE_STARTING && config_animate_iconify) {
+                /* delay the showhide until the window is done the animation */
+                frame_begin_iconify_animation
+                    (self->frame, iconic,
+                     (ObFrameIconifyAnimateFunc)client_showhide, self);
+                /* but focus a new window now please */
+                focus_fallback(TRUE);
+            } else
+                client_showhide(self);
+        } else {
+            if (config_animate_iconify)
+                /* start the animation then show it, this way the whole window
+                   doesnt get shown, just the first step of the animation */
+                frame_begin_iconify_animation(self->frame, iconic, NULL, NULL);
+            client_showhide(self);
+        }
     }
 
     /* iconify all direct transients, and deiconify all transients

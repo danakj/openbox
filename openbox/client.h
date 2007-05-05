@@ -287,6 +287,9 @@ struct _ObClient
     /*! The number of icons in icons */
     guint nicons;
 
+    /* Where the window should iconify to/from */
+    Rect icon_geometry;
+
     guint32 user_time;
 };
 
@@ -587,6 +590,8 @@ void client_update_strut(ObClient *self);
 void client_update_icons(ObClient *self);
 /*! Updates the window's user time */
 void client_update_user_time(ObClient *self);
+/*! Updates the window's icon geometry (where to iconify to/from) */
+void client_update_icon_geometry(ObClient *self);
 
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (ObClient::decorations and ObClient::functions).

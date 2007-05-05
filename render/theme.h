@@ -74,8 +74,9 @@ struct _RrTheme {
     RrColor *titlebut_unfocused_unpressed_color;
     RrColor *menu_title_color;
     RrColor *menu_color;
-    RrColor *menu_disabled_color;
     RrColor *menu_selected_color;
+    RrColor *menu_disabled_color;
+    RrColor *menu_disabled_selected_color;
     RrColor *title_focused_shadow_color;
     gchar    title_focused_shadow_alpha;
     RrColor *title_unfocused_shadow_color;
@@ -91,6 +92,8 @@ struct _RrTheme {
     gchar    menu_text_selected_shadow_alpha;
     RrColor *menu_text_disabled_shadow_color;
     gchar    menu_text_disabled_shadow_alpha;
+    RrColor *menu_text_disabled_selected_shadow_color;
+    gchar    menu_text_disabled_selected_shadow_alpha;
 
     /* style settings - pics */
     RrPixel32 *def_win_icon; /* 48x48 RGBA */
@@ -184,10 +187,12 @@ struct _RrTheme {
     RrAppearance *a_menu_title;
     RrAppearance *a_menu;
     RrAppearance *a_menu_normal;
-    RrAppearance *a_menu_disabled;
     RrAppearance *a_menu_selected;
+    RrAppearance *a_menu_disabled;
+    RrAppearance *a_menu_disabled_selected;
     RrAppearance *a_menu_text_normal;
     RrAppearance *a_menu_text_disabled;
+    RrAppearance *a_menu_text_disabled_selected;
     RrAppearance *a_menu_text_selected;
     RrAppearance *a_menu_bullet_normal;
     RrAppearance *a_menu_bullet_selected;

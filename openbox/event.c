@@ -1288,8 +1288,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
             ObMenuEntryFrame *e = it->data;
             gunichar entrykey = 0;
 
-            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-                e->entry->data.normal.enabled)
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
                 entrykey = e->entry->data.normal.shortcut;
             else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
                 entrykey = e->entry->data.submenu.submenu->shortcut;
@@ -1309,7 +1308,8 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
                 num_found == 1)
             {
                 menu_frame_select(frame, found, TRUE);
-                usleep(50000);
+                usleep(50000); /* highlight the item for a short bit so the
+                                  user can see what happened */
                 menu_entry_frame_execute(found, state, ev->xkey.time);
             } else {
                 menu_frame_select(frame, found, TRUE);

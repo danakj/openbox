@@ -88,8 +88,9 @@ struct _ObMenuEntryFrame
     Window bullet;
 
     RrAppearance *a_normal;
-    RrAppearance *a_disabled;
     RrAppearance *a_selected;
+    RrAppearance *a_disabled;
+    RrAppearance *a_disabled_selected;
 
     RrAppearance *a_icon;
     RrAppearance *a_mask;
@@ -97,8 +98,9 @@ struct _ObMenuEntryFrame
     RrAppearance *a_bullet_selected;
     RrAppearance *a_separator;
     RrAppearance *a_text_normal;
-    RrAppearance *a_text_disabled;
     RrAppearance *a_text_selected;
+    RrAppearance *a_text_disabled;
+    RrAppearance *a_text_disabled_selected;
     RrAppearance *a_text_title;
 };
 

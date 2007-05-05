@@ -112,8 +112,9 @@ struct _ObNormalMenuEntry {
     /* Mask icon */
     RrPixmapMask *mask;
     RrColor *mask_normal_color;
-    RrColor *mask_disabled_color;
     RrColor *mask_selected_color;
+    RrColor *mask_disabled_color;
+    RrColor *mask_disabled_selected_color;
 };
 
 struct _ObSubmenuMenuEntry {

@@ -601,7 +601,8 @@ void frame_release_client(ObFrame *self, ObClient *client)
     g_assert(self->client == client);
 
     /* if there was any animation going on, kill it */
-    ob_main_loop_timeout_remove(ob_main_loop, frame_animate_iconify);
+    ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
+                                     self, FALSE);
 
     /* check if the app has already reparented its window away */
     while (XCheckTypedWindowEvent(ob_display, client->window,
@@ -1120,7 +1121,8 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
     if (self->iconify_animation_step == FRAME_ANIMATE_ICONIFY_STEPS ||
         self->iconify_animation_step == -FRAME_ANIMATE_ICONIFY_STEPS)
     {
-        ob_main_loop_timeout_remove(ob_main_loop, frame_animate_iconify);
+        ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
+                                         self, FALSE);
         ob_main_loop_timeout_add(ob_main_loop,
                                  FRAME_ANIMATE_ICONIFY_TIME /
                                  FRAME_ANIMATE_ICONIFY_STEPS,

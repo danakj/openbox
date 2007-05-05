@@ -41,6 +41,9 @@
    from the frame. */
 #define INNER_EVENTMASK (ButtonPressMask)
 
+#define FRAME_ANIMATE_ICONIFY_STEPS 20
+#define FRAME_ANIMATE_ICONIFY_TIME (G_USEC_PER_SEC/10)
+
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
                            f->cbwidth_y)
 
@@ -50,6 +53,7 @@ static gboolean flash_timeout(gpointer data);
 
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
+static gboolean frame_animate_iconify(gpointer self);
 
 static Window createWindow(Window parent, Visual *visual,
                            gulong mask, XSetWindowAttributes *attrib)
@@ -476,9 +480,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                              self->client->area.height);
     }
 
-    if (!fake) {
+    if (!fake && !self->iconify_animation_step) {
         /* move and resize the top level frame.
-           shading can change without being moved or resized */
+           shading can change without being moved or resized.
+
+           but don't do this during an iconify animation. it will be
+           reflected afterwards.
+        */
         XMoveResizeWindow(ob_display, self->window,
                           self->area.x, self->area.y,
                           self->area.width - self->bwidth * 2,
@@ -591,6 +599,9 @@ void frame_release_client(ObFrame *self, ObClient *client)
     gboolean reparent = TRUE;
 
     g_assert(self->client == client);
+
+    /* if there was any animation going on, kill it */
+    ob_main_loop_timeout_remove(ob_main_loop, frame_animate_iconify);
 
     /* check if the app has already reparented its window away */
     while (XCheckTypedWindowEvent(ob_display, client->window,
@@ -1018,4 +1029,104 @@ void frame_flash_start(ObFrame *self)
 void frame_flash_stop(ObFrame *self)
 {
     self->flashing = FALSE;
+}
+
+static gboolean frame_animate_iconify(gpointer p)
+{
+    ObFrame *self = p;
+    gint step = self->iconify_animation_step;
+    gint absstep, nextstep;
+    gint x, y, w, h;
+    gint iconx, icony, iconw;
+
+    if (self->client->icon_geometry.width == 0) {
+        /* there is no icon geometry set so just go straight down */
+        Rect *a = screen_physical_area();
+        iconx = self->area.x + self->area.width / 2 + 32;
+        icony = a->y + a->width;
+        iconw = 64;
+    } else {
+        iconx = self->client->icon_geometry.x;
+        icony = self->client->icon_geometry.y;
+        iconw = self->client->icon_geometry.width;
+    }
+
+    if (step >= 0)
+        absstep = FRAME_ANIMATE_ICONIFY_STEPS - step + 1;
+    else
+        absstep = FRAME_ANIMATE_ICONIFY_STEPS + step + 1;
+
+    if (step >= 0) {
+        /* start where the frame is supposed to be */
+        x = self->area.x;
+        y = self->area.y;
+        w = self->area.width - self->bwidth * 2;
+        h = self->area.height - self->bwidth * 2;
+    } else {
+        /* start at the icon */
+        x = iconx;
+        y = icony;
+        w = iconw;
+        h = self->innersize.top; /* just the titlebar */
+    }
+
+    if (step != 0) {
+        gint dx, dy, dw;
+        dx = self->area.x - iconx;
+        dy = self->area.y - icony;
+        dw = self->area.width - self->bwidth * 2 - iconw;
+         /* if restoring, we move in the opposite direction */
+        if (step < 0) { dx = -dx; dy = -dy; dw = -dw; }
+        x = x - dx / FRAME_ANIMATE_ICONIFY_STEPS * absstep;
+        y = y - dy / FRAME_ANIMATE_ICONIFY_STEPS * absstep;
+        w = w - dw / FRAME_ANIMATE_ICONIFY_STEPS * absstep;
+        h = self->innersize.top; /* just the titlebar */
+    }
+
+    /* move one step forward */
+    self->iconify_animation_step = step + (step < 0 ? 1 : (step > 0 ? -1 : 0));
+
+    /* call the callback when it's done */
+    if (step == 0 && self->iconify_animation_cb)
+            self->iconify_animation_cb(self->iconify_animation_data);
+
+    /* move to the next spot (after the callback for the animation ending) */
+    XMoveResizeWindow(ob_display, self->window, x, y, w, h);
+    XFlush(ob_display);
+
+    return step != 0; /* repeat until step is 0 */
+}
+
+void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
+                                   ObFrameIconifyAnimateFunc callback,
+                                   gpointer data)
+{
+    if (iconifying) {
+        if (self->iconify_animation_step == 0) /* wasnt doing anything */
+            self->iconify_animation_step = FRAME_ANIMATE_ICONIFY_STEPS;
+        else if (self->iconify_animation_step < 0) /* was deiconifying */
+            self->iconify_animation_step =
+                FRAME_ANIMATE_ICONIFY_STEPS + self->iconify_animation_step;
+    } else {
+        if (self->iconify_animation_step == 0) /* wasnt doing anything */
+            self->iconify_animation_step = -FRAME_ANIMATE_ICONIFY_STEPS;
+        else if (self->iconify_animation_step > 0) /* was iconifying */
+            self->iconify_animation_step =
+                -FRAME_ANIMATE_ICONIFY_STEPS + self->iconify_animation_step;
+    }
+    self->iconify_animation_cb = callback;
+    self->iconify_animation_data = data;
+
+    if (self->iconify_animation_step == FRAME_ANIMATE_ICONIFY_STEPS ||
+        self->iconify_animation_step == -FRAME_ANIMATE_ICONIFY_STEPS)
+    {
+        ob_main_loop_timeout_remove(ob_main_loop, frame_animate_iconify);
+        ob_main_loop_timeout_add(ob_main_loop,
+                                 FRAME_ANIMATE_ICONIFY_TIME /
+                                 FRAME_ANIMATE_ICONIFY_STEPS,
+                                 frame_animate_iconify, self,
+                                 g_direct_equal, NULL);
+        /* do the first step */
+        frame_animate_iconify(self);
+    }
 }

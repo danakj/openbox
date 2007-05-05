@@ -34,9 +34,11 @@ typedef void (*ParseCallback)(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 ObParseInst* parse_startup();
 void parse_shutdown(ObParseInst *inst);
 
-/* Loads Openbox's rc, from the normal paths */
-gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root,
-                       gchar **fileused);
+/*! Loads Openbox's rc, from the normal paths
+  @type The configuration type to load, or NULL to use the default.
+        e.g. "gnome" would load rc-gnome.xml.
+ */
+gboolean parse_load_rc(const gchar *type, xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */
 gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */

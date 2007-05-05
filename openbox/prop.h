@@ -184,7 +184,7 @@ typedef struct Atoms {
      
     Atom openbox_wm_state_undecorated;
     Atom openbox_pid;
-    Atom openbox_rc;
+    Atom openbox_config;
     Atom openbox_control;
 } Atoms;
 Atoms prop_atoms;

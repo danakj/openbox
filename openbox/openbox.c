@@ -92,7 +92,7 @@ static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
-static gchar    *config_file = NULL;
+static gchar    *config_type = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void parse_args(gint argc, gchar **argv);
@@ -222,18 +222,21 @@ gint main(gint argc, gchar **argv)
                    of the rc */
                 i = parse_startup();
 
+                /* start up config which sets up with the parser */
                 config_startup(i);
+
                 /* parse/load user options */
-                if (parse_load_rc(config_file, &doc, &node, &config_file)) {
-                    PROP_SETS(RootWindow(ob_display, ob_screen),
-                              openbox_rc, config_file);
+                if (parse_load_rc(config_type, &doc, &node)) {
                     parse_tree(i, doc, node->xmlChildrenNode);
-                } else {
+                    parse_close(doc);
+                } else
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
-                    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_rc);
-                }
+
+                if (config_type != NULL)
+                    PROP_SETS(RootWindow(ob_display, ob_screen),
+                              openbox_config, config_type);
+
                 /* we're done with parsing now, kill it */
-                parse_close(doc);
                 parse_shutdown(i);
             }
 
@@ -329,7 +332,6 @@ gint main(gint argc, gchar **argv)
 
     XSync(ob_display, FALSE);
 
-    g_free(config_file); /* this is set by parse_load_rc */
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
@@ -404,7 +406,7 @@ static void print_help()
 {
     g_print(_("Syntax: openbox [options]\n"));
     g_print(_("\nOptions:\n\n"));
-    g_print(_("  --config-file FILE  Specify the file to load for the config file\n"));
+    g_print(_("  --config TYPE       Specify the configuration profile to use\n"));
 #ifdef USE_SM
     g_print(_("  --sm-disable        Disable connection to session manager\n"));
     g_print(_("  --sm-client-id ID   Specify session management ID\n"));
@@ -450,11 +452,11 @@ static void parse_args(gint argc, gchar **argv)
             remote_control = 1;
         } else if (!strcmp(argv[i], "--restart")) {
             remote_control = 2;
-        } else if (!strcmp(argv[i], "--config-file")) {
+        } else if (!strcmp(argv[i], "--config")) {
             if (i == argc - 1) /* no args left */
                 g_printerr(_("--config-file requires an argument\n"));
             else {
-                config_file = g_strdup(argv[i+1]);
+                config_type = g_strdup(argv[i+1]);
                 ++i;
             }
         }

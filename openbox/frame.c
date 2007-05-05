@@ -838,6 +838,10 @@ ObFrameContext frame_context(ObClient *client, Window win)
     if (win == RootWindow(ob_display, ob_screen))
         return OB_FRAME_CONTEXT_DESKTOP;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
+
+    self = client->frame;
+    if (self->iconify_animation_step) return OB_FRAME_CONTEXT_NONE;
+
     if (win == client->window) {
         /* conceptually, this is the desktop, as far as users are
            concerned */
@@ -846,7 +850,6 @@ ObFrameContext frame_context(ObClient *client, Window win)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
-    self = client->frame;
     if (win == self->inner || win == self->plate) {
         /* conceptually, this is the desktop, as far as users are
            concerned */

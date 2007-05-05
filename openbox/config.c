@@ -809,7 +809,7 @@ void config_startup(ObParseInst *i)
 
     config_theme = NULL;
 
-    config_animate_iconify = FALSE;
+    config_animate_iconify = TRUE;
     config_title_layout = g_strdup("NLIMC");
     config_theme_keepborder = TRUE;
     config_theme_hidedisabled = FALSE;

@@ -43,7 +43,7 @@
   -->
   <keepBorder>yes</keepBorder>
   <hideDisabled>no</hideDisabled>
-  <animateIconify>yes</animateIconify>
+  <animateIconify>no</animateIconify>
   <font place="ActiveWindow">
     <name>sans</name>
     <size>7</size>

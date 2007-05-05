@@ -1266,7 +1266,7 @@ static void client_update_transient_tree(ObClient *self,
             c = it->data;
             if (c != self && (!c->transient_for ||
                               c->transient_for != OB_TRAN_GROUP))
-                c->transients = g_slist_append(c->transients, self);
+                c->transients = g_slist_prepend(c->transients, self);
         }
     }
     /* If we are now transient for a single window which we weren't before,
@@ -1279,7 +1279,7 @@ static void client_update_transient_tree(ObClient *self,
              newparent != oldparent &&
              /* don't make ourself its child if it is already our child */
              !client_is_direct_child(self, newparent))
-        newparent->transients = g_slist_append(newparent->transients, self);
+        newparent->transients = g_slist_prepend(newparent->transients, self);
 
     /* If the group changed then we need to add any new group transient
        windows to our children. But if we're transient for the group, then
@@ -1298,7 +1298,7 @@ static void client_update_transient_tree(ObClient *self,
                 /* Don't make it our child if it is already our parent */
                 !client_is_direct_child(c, self))
             {
-                self->transients = g_slist_append(self->transients, c);
+                self->transients = g_slist_prepend(self->transients, c);
             }
         }
     }

@@ -39,7 +39,7 @@ menu.items.active.bg:			flat solid
 menu.items.active.bg.color:		#4c4c4c
 menu.items.active.text.color:		#ffffff
 
-menu.items.disabled.text.color:		#444438
+menu.items.disabled.text.color:		#8c8c75
 
 !!---------------------------------------------------------------------------
 !! Window Settings
@@ -91,7 +91,7 @@ window.active.button.hover.bg:			flat solid border
 window.active.button.hover.bg.color:			#e6e6e0
 
 window.active.button.disabled.bg:			parentrelative
-window.active.button.disabled.image.color:		#9fbfc1
+window.active.button.disabled.image.color:		#8c8c75
 
 !! without this it looks right
 !!window.active.button.toggled.bg:			flat solid
@@ -106,8 +106,8 @@ window.inactive.button.pressed.bg:			flat gradient crossdiagonal border
 window.inactive.button.pressed.bg.color:		#d3deda
 window.inactive.button.pressed.bg.colorTo:		#9fbfc1
 
-window.inactive.button.disabled.bg:			flat solid
-window.inactive.button.disabled.bg.image.color:		#444438
+window.inactive.button.disabled.bg:			parentrelative
+window.inactive.button.disabled.image.color:		#8c8c75
 
 !! window.inactive.button.toggled.bg:			flat solid
 !! window.inactive.button.toggled.bg.color:		#444438

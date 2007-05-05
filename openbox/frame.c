@@ -42,7 +42,7 @@
 #define INNER_EVENTMASK (ButtonPressMask)
 
 #define FRAME_ANIMATE_ICONIFY_STEPS 20
-#define FRAME_ANIMATE_ICONIFY_TIME (G_USEC_PER_SEC/10)
+#define FRAME_ANIMATE_ICONIFY_TIME (G_USEC_PER_SEC/5)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
                            f->cbwidth_y)

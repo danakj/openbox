@@ -12,7 +12,7 @@
     <clientpadding x="0" y="0"/>
     <justify>left</justify>
     <active>
-      <clientpadding r="128" g="128" b="160" a="255"/>
+      <clientpadding r="0" g="255" b="0" a="255"/>
       <label>
         <text>
           <primary r="191" g="233" b="255" a="255"/>
@@ -53,7 +53,7 @@
         </hover>
         <toggled-unpressed>
           <image r="217" g="217" b="217" a="255"/>
-          <style>sunken gradient crossdiagonal bevel2</style>
+          <style>sunken gradient crossdiagonal bevel1</style>
           <primary r="102" g="153" b="204" a="255"/>
           <secondary r="51" g="72" b="102" a="255"/>
           <border r="0" g="0" b="0" a="255"/>
@@ -82,7 +82,7 @@
       <clientpadding r="127" g="127" b="127" a="255"/>
       <label>
         <text>
-          <primary r="195" g="195" b="224" a="255"/>
+          <primary r="179" g="179" b="179" a="255"/>
           <shadow>
             <offset x="3" y="3"/>
             <primary r="0" g="0" b="0" a="81"/>
@@ -132,8 +132,8 @@
       </buttons>
       <titlebar>
         <style>flat gradient diagonal bevel1</style>
-        <primary r="127" g="127" b="160" a="255"/>
-        <secondary r="51" g="51" b="80" a="255"/>
+        <primary r="127" g="127" b="136" a="255"/>
+        <secondary r="51" g="51" b="59" a="255"/>
         <border r="0" g="0" b="0" a="255"/>
       </titlebar>
       <handle>
@@ -183,6 +183,19 @@
         <primary r="0" g="0" b="0" a="38"/>
       </shadow>
     </disabled>
+    <activedisabled>
+      <text>
+        <primary r="119" g="17" b="17" a="255"/>
+        <shadow>
+          <offset x="2" y="2"/>
+          <primary r="0" g="0" b="0" a="38"/>
+        </shadow>
+      </text>
+      <style>raised gradient horizontal bevel1</style>
+      <primary r="85" g="85" b="119" a="255"/>
+      <secondary r="102" g="153" b="204" a="255"/>
+      <border r="0" g="0" b="0" a="255"/>
+    </activedisabled>
     <active>
       <text>
         <primary r="204" g="204" b="255" a="255"/>
@@ -191,15 +204,15 @@
           <primary r="0" g="0" b="0" a="38"/>
         </shadow>
       </text>
-      <style>raised gradient mirrorhorizontal</style>
+      <style>raised gradient horizontal bevel1</style>
       <primary r="85" g="85" b="119" a="255"/>
       <secondary r="102" g="153" b="204" a="255"/>
       <border r="0" g="0" b="0" a="255"/>
     </active>
     <entries>
-      <style>flat gradient vertical bevel1</style>
-      <primary r="184" g="184" b="216" a="255"/>
-      <secondary r="160" g="160" b="186" a="255"/>
+      <style>flat gradient horizontal bevel1</style>
+      <primary r="170" g="170" b="204" a="255"/>
+      <secondary r="170" g="170" b="208" a="255"/>
       <border r="0" g="0" b="0" a="255"/>
     </entries>
   </menu>

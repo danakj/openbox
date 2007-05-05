@@ -140,8 +140,10 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     XMapWindow(ob_display, self->text);
 
     self->a_normal = RrAppearanceCopy(ob_rr_theme->a_menu_normal);
-    self->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
     self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_selected);
+    self->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
+    self->a_disabled_selected =
+        RrAppearanceCopy(ob_rr_theme->a_menu_disabled_selected);
 
     if (entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR) {
         self->a_separator = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
@@ -159,10 +161,12 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 
     self->a_text_normal =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_normal);
-    self->a_text_disabled =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled);
     self->a_text_selected =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_selected);
+    self->a_text_disabled =
+        RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled);
+    self->a_text_disabled_selected =
+        RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled_selected);
     self->a_text_title =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_title);
 
@@ -186,15 +190,17 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
         }
 
         RrAppearanceFree(self->a_normal);
-        RrAppearanceFree(self->a_disabled);
         RrAppearanceFree(self->a_selected);
+        RrAppearanceFree(self->a_disabled);
+        RrAppearanceFree(self->a_disabled_selected);
 
         RrAppearanceFree(self->a_separator);
         RrAppearanceFree(self->a_icon);
         RrAppearanceFree(self->a_mask);
         RrAppearanceFree(self->a_text_normal);
-        RrAppearanceFree(self->a_text_disabled);
         RrAppearanceFree(self->a_text_selected);
+        RrAppearanceFree(self->a_text_disabled);
+        RrAppearanceFree(self->a_text_disabled_selected);
         RrAppearanceFree(self->a_text_title);
         RrAppearanceFree(self->a_bullet_normal);
         RrAppearanceFree(self->a_bullet_selected);
@@ -338,12 +344,14 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
     case OB_MENU_ENTRY_TYPE_SUBMENU:
-        item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-                   !self->entry->data.normal.enabled) ?
-                  self->a_disabled :
+        item_a = (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                  !self->entry->data.normal.enabled ?
+                  /* disabled */
                   (self == self->frame->selected ?
-                   self->a_selected :
-                   self->a_normal));
+                   self->a_disabled_selected : self->a_disabled) :
+                  /* enabled */
+                  (self == self->frame->selected ?
+                   self->a_selected : self->a_normal));
         th = self->frame->item_h;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
@@ -368,11 +376,14 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
-        text_a = (!self->entry->data.normal.enabled ?
-                  self->a_text_disabled :
+        text_a = (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                  !self->entry->data.normal.enabled ?
+                  /* disabled */
                   (self == self->frame->selected ?
-                   self->a_text_selected :
-                   self->a_text_normal));
+                   self->a_text_disabled_selected : self->a_text_disabled) :
+                  /* enabled */
+                  (self == self->frame->selected ?
+                   self->a_text_selected : self->a_text_normal));
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
         if (self->entry->data.normal.shortcut &&
             (self->frame->menu->show_all_shortcuts ||
@@ -502,9 +513,13 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         self->a_mask->texture[0].data.mask.mask =
             self->entry->data.normal.mask;
 
-        c = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-              !self->entry->data.normal.enabled) ?
-             self->entry->data.normal.mask_disabled_color :
+        c = (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+             !self->entry->data.normal.enabled ?
+             /* disabled */
+             (self == self->frame->selected ?
+              self->entry->data.normal.mask_disabled_selected_color :
+              self->entry->data.normal.mask_disabled_color) :
+             /* enabled */
              (self == self->frame->selected ?
               self->entry->data.normal.mask_selected_color :
               self->entry->data.normal.mask_normal_color));
@@ -592,6 +607,12 @@ static void menu_frame_render(ObMenuFrame *self)
                   MAX(self->item_margin.top, t),
                   MAX(self->item_margin.right, r),
                   MAX(self->item_margin.bottom, b));
+        RrMargins(e->a_disabled_selected, &l, &t, &r, &b);
+        STRUT_SET(self->item_margin,
+                  MAX(self->item_margin.left, l),
+                  MAX(self->item_margin.top, t),
+                  MAX(self->item_margin.right, r),
+                  MAX(self->item_margin.bottom, b));
     } else
         self->item_h = 0;
 
@@ -622,12 +643,15 @@ static void menu_frame_render(ObMenuFrame *self)
         XSetWindowBorder(ob_display, e->window,
                          RrColorPixel(ob_rr_theme->menu_b_color));
 
-        text_a = ((e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-                   !e->entry->data.normal.enabled) ?
-                  e->a_text_disabled :
+
+        text_a = (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                  !e->entry->data.normal.enabled ?
+                  /* disabled */
                   (e == self->selected ?
-                   e->a_text_selected :
-                   e->a_text_normal));
+                   e->a_text_disabled_selected : e->a_text_disabled) :
+                  /* enabled */
+                  (e == self->selected ?
+                   e->a_text_selected : e->a_text_normal));
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
@@ -1045,8 +1069,7 @@ void menu_frame_select_previous(ObMenuFrame *self)
                 e = it->data;
                 if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
                     break;
-                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-                    e->entry->data.normal.enabled)
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
                     break;
             }
         }
@@ -1071,8 +1094,7 @@ void menu_frame_select_next(ObMenuFrame *self)
                 e = it->data;
                 if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
                     break;
-                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-                    e->entry->data.normal.enabled)
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
                     break;
             }
         }

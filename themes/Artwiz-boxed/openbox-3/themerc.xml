@@ -144,5 +144,10 @@
       <primary r="16" g="32" b="48" a="255"/>
       <secondary r="112" g="128" b="144" a="255"/>
     </entries>
+    <activedisabled>
+      <style>raised gradient diagonal</style>
+      <primary r="144" g="148" b="152" a="255"/>
+      <secondary r="32" g="36" b="40" a="255"/>
+    </activedisabled>
   </menu>
 </openbox_theme>

@@ -292,7 +292,6 @@ dist_natura_theme_DATA= \
 
 artwizboxed_themedir = $(themedir)/Artwiz-boxed/openbox-3
 dist_artwizboxed_theme_DATA= \
-	themes/Artwiz-boxed/openbox-3/bullet.xbm \
 	themes/Artwiz-boxed/openbox-3/close.xbm \
 	themes/Artwiz-boxed/openbox-3/desk_toggled.xbm \
 	themes/Artwiz-boxed/openbox-3/desk.xbm \

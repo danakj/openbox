@@ -48,7 +48,7 @@
         </toggled-unpressed>
       </buttons>
       <titlebar>
-        <style>flat border gradient mirrorhorizontal</style>
+        <style>flat border gradient osx</style>
         <primary r="52" g="101" b="164" a="255"/>
         <secondary r="64" g="124" b="202" a="255"/>
         <border r="105" g="154" b="205" a="255"/>
@@ -97,7 +97,7 @@
         </toggled-unpressed>
       </buttons>
       <titlebar>
-        <style>flat border gradient mirrorhorizontal</style>
+        <style>flat border gradient osx</style>
         <primary r="220" g="220" b="220" a="255"/>
         <secondary r="238" g="238" b="236" a="255"/>
         <border r="239" g="239" b="239" a="255"/>
@@ -137,6 +137,15 @@
     <disabled>
       <primary r="186" g="189" b="182" a="255"/>
     </disabled>
+    <activedisabled>
+      <text>
+        <primary r="186" g="189" b="182" a="255"/>
+      </text>
+      <style>flat solid</style>
+      <primary r="68" g="129" b="192" a="255"/>
+      <secondary r="65" g="117" b="170" a="255"/>
+      <border r="65" g="108" b="152" a="255"/>
+    </activedisabled>
     <active>
       <text>
         <primary r="246" g="248" b="251" a="255"/>

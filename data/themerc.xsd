@@ -105,6 +105,7 @@
       <xs:element name="inactive" type="obt:text" minOccurs="0"/>
       <xs:element name="active" type="obt:textarea" minOccurs="0"/>
       <xs:element name="disabled" type="obt:text" minOccurs="0"/>
+      <xs:element name="activedisabled" type="obt:textarea" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 

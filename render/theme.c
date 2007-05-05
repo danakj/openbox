@@ -123,10 +123,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme->a_menu_text_title = RrAppearanceNew(inst, 1);
     theme->a_menu_normal = RrAppearanceNew(inst, 0);
     theme->a_menu_disabled = RrAppearanceNew(inst, 0);
+    theme->a_menu_disabled_selected = RrAppearanceNew(inst, 0);
     theme->a_menu_selected = RrAppearanceNew(inst, 0);
     theme->a_menu_text_normal = RrAppearanceNew(inst, 1);
-    theme->a_menu_text_disabled = RrAppearanceNew(inst, 1);
     theme->a_menu_text_selected = RrAppearanceNew(inst, 1);
+    theme->a_menu_text_disabled = RrAppearanceNew(inst, 1);
+    theme->a_menu_text_disabled_selected = RrAppearanceNew(inst, 1);
     theme->a_menu_bullet_normal = RrAppearanceNew(inst, 1);
     theme->a_menu_bullet_selected = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
@@ -299,17 +301,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
               &theme->titlebut_toggled_focused_unpressed_color, NULL))
         theme->titlebut_toggled_focused_unpressed_color =
             RrColorNew(inst,
-                       theme->titlebut_focused_unpressed_color->r,
-                       theme->titlebut_focused_unpressed_color->g,
-                       theme->titlebut_focused_unpressed_color->b);
+                       theme->titlebut_focused_pressed_color->r,
+                       theme->titlebut_focused_pressed_color->g,
+                       theme->titlebut_focused_pressed_color->b);
     if (!FIND(color,
               L("window","inactive","buttons","toggled-unpressed","image"),
               &theme->titlebut_toggled_unfocused_unpressed_color, NULL))
         theme->titlebut_toggled_unfocused_unpressed_color =
             RrColorNew(inst,
-                       theme->titlebut_unfocused_unpressed_color->r,
-                       theme->titlebut_unfocused_unpressed_color->g,
-                       theme->titlebut_unfocused_unpressed_color->b);
+                       theme->titlebut_unfocused_pressed_color->r,
+                       theme->titlebut_unfocused_pressed_color->g,
+                       theme->titlebut_unfocused_pressed_color->b);
     if (!FIND(color,
               L("window","active","buttons","toggled-hover","image"),
               &theme->titlebut_toggled_hover_focused_color, NULL))
@@ -334,6 +336,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     if (!FIND(color, L("menu","disabled","primary"),
               &theme->menu_disabled_color, NULL))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
+    if (!FIND(color, L("menu","activedisabled","text","primary"),
+              &theme->menu_disabled_selected_color, NULL))
+        theme->menu_disabled_selected_color =
+            RrColorNew(inst,
+                       theme->menu_disabled_color->r,
+                       theme->menu_disabled_color->g,
+                       theme->menu_disabled_color->b);
     if (!FIND(color, L("menu","active","text","primary"),
               &theme->menu_selected_color, NULL))
         theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
@@ -391,6 +400,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                        theme->menu_text_normal_shadow_color->b);
         theme->menu_text_disabled_shadow_alpha = 
             theme->menu_text_normal_shadow_alpha;
+    }
+    if (!FIND(color, L("menu","activedisabled","shadow","primary"),
+              &theme->menu_text_disabled_selected_shadow_color,
+              &theme->menu_text_disabled_selected_shadow_alpha))
+    {
+        theme->menu_text_disabled_selected_shadow_color =
+            RrColorNew(inst, theme->menu_text_disabled_shadow_color->r,
+                       theme->menu_text_disabled_shadow_color->g,
+                       theme->menu_text_disabled_shadow_color->b);
+        theme->menu_text_disabled_selected_shadow_alpha = 
+            theme->menu_text_disabled_shadow_alpha;
     }
     
     /* load the image masks */
@@ -582,6 +602,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         set_default_appearance(theme->a_menu_title);
     if (!FIND(appearance, L("menu", "active"), theme->a_menu_selected, TRUE))
         set_default_appearance(theme->a_menu_selected);
+    if (!FIND(appearance, L("menu", "activedisabled"),
+              theme->a_menu_disabled_selected, TRUE))
+        theme->a_menu_disabled_selected =
+            RrAppearanceCopy(theme->a_menu_selected);
 
     /* read the appearances for rendering non-decorations */
     theme->osd_hilite_bg = RrAppearanceCopy(theme->a_focused_title);
@@ -647,28 +671,28 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     {
         RrAppearanceFree(theme->a_toggled_focused_unpressed_max);
         theme->a_toggled_focused_unpressed_max =
-            RrAppearanceCopy(theme->a_focused_unpressed_max);
+            RrAppearanceCopy(theme->a_focused_pressed_max);
     }
     if (!FIND(appearance, L("window","inactive","buttons","toggled-unpressed"),
               theme->a_toggled_unfocused_unpressed_max, TRUE))
     {
         RrAppearanceFree(theme->a_toggled_unfocused_unpressed_max);
         theme->a_toggled_unfocused_unpressed_max =
-            RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+            RrAppearanceCopy(theme->a_unfocused_pressed_max);
     }
     if (!FIND(appearance, L("window","active","buttons","toggled-hover"),
               theme->a_toggled_hover_focused_max, TRUE))
     {
         RrAppearanceFree(theme->a_toggled_hover_focused_max);
         theme->a_toggled_hover_focused_max =
-            RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
+            RrAppearanceCopy(theme->a_toggled_focused_pressed_max);
     }
     if (!FIND(appearance, L("window","inactive","buttons","toggled-hover"),
               theme->a_toggled_hover_unfocused_max, TRUE))
     {
         RrAppearanceFree(theme->a_toggled_hover_unfocused_max);
         theme->a_toggled_hover_unfocused_max =
-            RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
+            RrAppearanceCopy(theme->a_toggled_unfocused_pressed_max);
     }
 
    theme->a_disabled_focused_close =
@@ -767,8 +791,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->a_menu_normal->surface.grad =
         theme->a_menu_disabled->surface.grad =
         theme->a_menu_text_normal->surface.grad =
-        theme->a_menu_text_disabled->surface.grad =
         theme->a_menu_text_selected->surface.grad =
+        theme->a_menu_text_disabled->surface.grad =
+        theme->a_menu_text_disabled_selected->surface.grad =
         theme->a_menu_bullet_normal->surface.grad =
         theme->a_menu_bullet_selected->surface.grad = RR_SURFACE_PARENTREL;
 
@@ -840,21 +865,27 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->menu_title_shadow_alpha;
 
     theme->a_menu_text_normal->texture[0].type =
+        theme->a_menu_text_selected->texture[0].type =
         theme->a_menu_text_disabled->texture[0].type = 
-        theme->a_menu_text_selected->texture[0].type = RR_TEXTURE_TEXT;
+        theme->a_menu_text_disabled_selected->texture[0].type = 
+        RR_TEXTURE_TEXT;
     theme->a_menu_text_normal->texture[0].data.text.justify = 
-        theme->a_menu_text_disabled->texture[0].data.text.justify = 
         theme->a_menu_text_selected->texture[0].data.text.justify =
+        theme->a_menu_text_disabled->texture[0].data.text.justify = 
+        theme->a_menu_text_disabled_selected->texture[0].data.text.justify = 
         RR_JUSTIFY_LEFT;
     theme->a_menu_text_normal->texture[0].data.text.font =
-        theme->a_menu_text_disabled->texture[0].data.text.font =
         theme->a_menu_text_selected->texture[0].data.text.font =
+        theme->a_menu_text_disabled->texture[0].data.text.font =
+        theme->a_menu_text_disabled_selected->texture[0].data.text.font =
         theme->menu_font;
     theme->a_menu_text_normal->texture[0].data.text.color = theme->menu_color;
-    theme->a_menu_text_disabled->texture[0].data.text.color =
-        theme->menu_disabled_color;
     theme->a_menu_text_selected->texture[0].data.text.color =
         theme->menu_selected_color;
+    theme->a_menu_text_disabled->texture[0].data.text.color =
+        theme->menu_disabled_color;
+    theme->a_menu_text_disabled_selected->texture[0].data.text.color =
+        theme->menu_disabled_selected_color;
 
     if (!FIND(shadow, L("menu","inactive","shadow","offset"),
               theme->a_menu_text_normal))
@@ -871,6 +902,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->a_menu_text_disabled->texture[0].data.text.shadow_offset_x =
             theme->a_menu_text_disabled->texture[0].data.text.shadow_offset_y =
             0;
+    if (!FIND(shadow, L("menu","activedisabled","shadow","offset"),
+              theme->a_menu_text_disabled_selected))
+        theme->a_menu_text_disabled_selected->
+            texture[0].data.text.shadow_offset_x = 0;
+    theme->a_menu_text_disabled_selected->
+        texture[0].data.text.shadow_offset_y = 0;
     theme->a_menu_text_normal->texture[0].data.text.shadow_color =
         theme->menu_text_normal_shadow_color;
     theme->a_menu_text_normal->texture[0].data.text.shadow_alpha =
@@ -883,6 +920,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->menu_text_disabled_shadow_color;
     theme->a_menu_text_disabled->texture[0].data.text.shadow_alpha =
         theme->menu_text_disabled_shadow_alpha;
+    theme->a_menu_text_disabled_selected->texture[0].data.text.shadow_color =
+        theme->menu_text_disabled_selected_shadow_color;
+    theme->a_menu_text_disabled_selected->texture[0].data.text.shadow_alpha =
+        theme->menu_text_disabled_selected_shadow_alpha;
 
     theme->a_disabled_focused_max->texture[0].type = 
         theme->a_disabled_unfocused_max->texture[0].type = 
@@ -1119,7 +1160,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 
     {
         gint ft, fb, fl, fr, ut, ub, ul, ur;
-        RrAppearance *a, *b, *c;
+        RrAppearance *a, *b, *c, *d;
 
         /* caluclate the font heights*/
         a = theme->a_focused_label;
@@ -1138,11 +1179,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         a = theme->a_menu_text_normal;
         b = theme->a_menu_text_selected;
         c = theme->a_menu_text_disabled;
+        d = theme->a_menu_text_disabled_selected;
         theme->menu_font_height =
             RrFontHeight(theme->menu_font,
                          MAX(a->texture[0].data.text.shadow_offset_y,
                              MAX(b->texture[0].data.text.shadow_offset_y,
-                                 c->texture[0].data.text.shadow_offset_y)));
+                                 MAX(c->texture[0].data.text.shadow_offset_y,
+                                     d->texture[0].data.text.shadow_offset_y
+                                     ))));
 
         RrMargins(theme->a_focused_label, &fl, &ft, &fr, &fb);
         RrMargins(theme->a_unfocused_label, &ul, &ut, &ur, &ub);
@@ -1196,8 +1240,9 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->titlebut_toggled_unfocused_unpressed_color);
         RrColorFree(theme->menu_title_color);
         RrColorFree(theme->menu_color);
-        RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_selected_color);
+        RrColorFree(theme->menu_disabled_color);
+        RrColorFree(theme->menu_disabled_selected_color);
         RrColorFree(theme->title_focused_shadow_color);
         RrColorFree(theme->title_unfocused_shadow_color);
         RrColorFree(theme->osd_color);
@@ -1206,6 +1251,7 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_text_normal_shadow_color);
         RrColorFree(theme->menu_text_selected_shadow_color);
         RrColorFree(theme->menu_text_disabled_shadow_color);
+        RrColorFree(theme->menu_text_disabled_selected_shadow_color);
 
         g_free(theme->def_win_icon);
 
@@ -1310,11 +1356,13 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_menu_title);
         RrAppearanceFree(theme->a_menu_text_title);
         RrAppearanceFree(theme->a_menu_normal);
-        RrAppearanceFree(theme->a_menu_disabled);
         RrAppearanceFree(theme->a_menu_selected);
+        RrAppearanceFree(theme->a_menu_disabled);
+        RrAppearanceFree(theme->a_menu_disabled_selected);
         RrAppearanceFree(theme->a_menu_text_normal);
-        RrAppearanceFree(theme->a_menu_text_disabled);
         RrAppearanceFree(theme->a_menu_text_selected);
+        RrAppearanceFree(theme->a_menu_text_disabled);
+        RrAppearanceFree(theme->a_menu_text_disabled_selected);
         RrAppearanceFree(theme->a_menu_bullet_normal);
         RrAppearanceFree(theme->a_menu_bullet_selected);
         RrAppearanceFree(theme->a_clear);

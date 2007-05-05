@@ -1,6 +1,4 @@
 <?xml version="1.0"?>
-<!-- i be a mess -->
-
 <openbox_theme version="1" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>3</handle>
@@ -125,6 +123,13 @@
     <disabled>
       <primary r="115" g="117" b="115" a="255"/>
     </disabled>
+    <activedisabled>
+      <text>
+        <primary r="115" g="117" b="115" a="255"/>
+      </text>
+      <style>flat solid</style>
+      <primary r="206" g="92" b="0" a="255"/>
+    </activedisabled>
     <active>
       <text>
         <primary r="255" g="255" b="255" a="255"/>

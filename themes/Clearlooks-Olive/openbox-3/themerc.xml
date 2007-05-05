@@ -148,8 +148,17 @@
       <primary r="68" g="68" b="68" a="255"/>
     </inactive>
     <disabled>
-      <primary r="153" g="153" b="153" a="255"/>
+      <primary r="170" g="170" b="170" a="255"/>
     </disabled>
+    <activedisabled>
+      <text>
+        <primary r="150" g="150" b="150" a="255"/>
+      </text>
+      <style>Flat Gradient Vertical Border</style>
+      <primary r="180" g="201" b="148" a="255"/>
+      <secondary r="146" g="170" b="109" a="255"/>
+      <border r="146" g="170" b="109" a="255"/>
+    </activedisabled>
     <active>
       <text>
         <primary r="255" g="255" b="255" a="255"/>

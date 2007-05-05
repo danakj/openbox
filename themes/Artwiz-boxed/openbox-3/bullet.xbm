@@ -1,4 +1,0 @@
-#define bullet_blank_width 7
-#define bullet_blank_height 7
-static unsigned char bullet_blank_bits[] = {
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };

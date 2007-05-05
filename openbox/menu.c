@@ -382,10 +382,10 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
     if (!menu_frame_show_topmenu(frame, x, y, button))
         menu_frame_free(frame);
     else if (frame->entries) {
+        /* select the first entry if it's not a submenu */
         ObMenuEntryFrame *e = frame->entries->data;
-        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-            e->entry->data.normal.enabled)
-                menu_frame_select(frame, e, FALSE);
+        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
+            menu_frame_select(frame, e, FALSE);
     }
 }
 

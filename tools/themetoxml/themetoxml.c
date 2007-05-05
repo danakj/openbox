@@ -422,8 +422,10 @@ int main(int argc, char **argv)
         COLOR3("menu","inactive","primary",i,j,k,255);
 
     if (read_color(db, "menu.items.disabled.text.color",
-                   &i, &j, &k))
+                   &i, &j, &k)) {
         COLOR3("menu","disabled","primary",i,j,k,255);
+        COLOR4("menu","activedisabled","text","primary",i,j,k,255);
+    }
 
     if (read_color(db, "menu.items.active.text.color",
                    &i, &j, &k))
@@ -439,6 +441,7 @@ int main(int argc, char **argv)
     APPEARANCE3("window.inactive.grip.bg", "window", "inactive", "grip");
     APPEARANCE2("menu.items.bg", "menu", "entries");
     APPEARANCE2("menu.items.active.bg", "menu", "active");
+    APPEARANCE2("menu.items.active.bg", "menu", "activedisabled");
     APPEARANCE2("menu.title.bg", "menu", "title");
 
     APPEARANCE4("window.active.button.disabled.bg",
@@ -538,6 +541,8 @@ int main(int argc, char **argv)
             ATTR5("menu","active","text","shadow","offset","y",NUM(i));
             ATTR4("menu","disabled","shadow","offset","x",NUM(i));
             ATTR4("menu","disabled","shadow","offset","y",NUM(i));
+            ATTR5("menu","activedisabled","text","shadow","offset","x",NUM(i));
+            ATTR5("menu","activedisabled","text","shadow","offset","y",NUM(i));
         }
         if ((p = strstr(s, "shadowtint=")))
         {
@@ -547,6 +552,7 @@ int main(int argc, char **argv)
             COLOR4("menu","inactive","shadow","primary",j,j,j,i);
             COLOR5("menu","active","text","shadow","primary",j,j,j,i);
             COLOR4("menu","disabled","shadow","primary",j,j,j,i);
+            COLOR5("menu","activedisabled","text","shadow","primary",j,j,j,i);
         }
     }
 

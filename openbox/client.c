@@ -2061,7 +2061,7 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic || !frame_visible(self->frame))
+    if (self->shaded || !self->frame->visible)
         self->wmstate = IconicState;
     else
         self->wmstate = NormalState;
@@ -2724,27 +2724,10 @@ static void client_iconify_recursive(ObClient *self,
 
     if (changed) {
         client_change_state(self);
-        if (iconic) {
-            if (ob_state() != OB_STATE_STARTING && config_animate_iconify) {
-                /* delay the showhide until the window is done the animation */
-                frame_begin_iconify_animation
-                    (self->frame, iconic,
-                     (ObFrameIconifyAnimateFunc)client_showhide, self);
-                /* but focus a new window now please */
-                focus_fallback(FALSE);
-            } else
-                client_showhide(self);
-        } else {
-            if (config_animate_iconify)
-                /* the animation will show the window when it is hidden,
-                   but the window state needs to be adjusted after the
-                   animation finishes, so call showhide when it's done to make
-                   sure everything is updated appropriately
-                */
-                frame_begin_iconify_animation
-                    (self->frame, iconic,
-                     (ObFrameIconifyAnimateFunc)client_showhide, self);
-        }
+        if (ob_state() != OB_STATE_STARTING && config_animate_iconify)
+            frame_begin_iconify_animation(self->frame, iconic);
+        /* do this after starting the animation so it doesn't flash */
+        client_showhide(self);
     }
 
     /* iconify all direct transients, and deiconify all transients
@@ -3188,7 +3171,7 @@ gboolean client_can_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
-    if (!frame_visible(self->frame))
+    if (!self->frame->visible)
         return FALSE;
 
     if (!(self->can_focus || self->focus_notify))
@@ -3221,7 +3204,7 @@ gboolean client_focus(ObClient *self)
     self = client_focus_target(self);
 
     if (!client_can_focus(self)) {
-        if (!frame_visible(self->frame)) {
+        if (!self->frame->visible) {
             /* update the focus lists */
             focus_order_to_top(self);
         }
@@ -3306,7 +3289,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
                 client_set_desktop(self, screen_desktop, FALSE);
             else
                 screen_set_desktop(self->desktop);
-        } else if (!frame_visible(self->frame))
+        } else if (!self->frame->visible)
             /* if its not visible for other reasons, then don't mess
                with it */
             return;
@@ -3733,7 +3716,7 @@ ObClient* client_under_pointer()
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (frame_visible(c->frame) &&
+                if (c->frame->visible &&
                     /* ignore all animating windows */
                     !frame_iconify_animating(c->frame) &&
                     RECT_CONTAINS(c->frame->area, x, y))

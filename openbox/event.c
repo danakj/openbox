@@ -1386,7 +1386,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
         {
             /* the frame may not be "visible" but they can still click on it
                in the case where it is animating before disappearing */
-            if (client && frame_visible(client->frame))
+            if (client && client->frame->visible)
                 mouse_event(client, e);
         } else if (e->type == KeyPress) {
             keyboard_event((focus_cycle_target ? focus_cycle_target :

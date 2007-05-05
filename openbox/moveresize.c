@@ -153,7 +153,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     moving = (cnr == prop_atoms.net_wm_moveresize_move ||
               cnr == prop_atoms.net_wm_moveresize_move_keyboard);
 
-    if (moveresize_in_progress || !frame_visible(c->frame) ||
+    if (moveresize_in_progress || !c->frame->visible ||
         !(moving ?
           (c->functions & OB_CLIENT_FUNC_MOVE) :
           (c->functions & OB_CLIENT_FUNC_RESIZE)))

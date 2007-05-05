@@ -258,11 +258,12 @@ void frame_hide(ObFrame *self)
 {
     if (self->visible) {
         self->visible = FALSE;
-        self->client->ignore_unmaps += 1;
+        if (!frame_iconify_animating(self))
+            XUnmapWindow(ob_display, self->window);
         /* we unmap the client itself so that we can get MapRequest
            events, and because the ICCCM tells us to! */
-        XUnmapWindow(ob_display, self->window);
         XUnmapWindow(ob_display, self->client->window);
+        self->client->ignore_unmaps += 1;
     }
 }
 
@@ -1121,13 +1122,12 @@ void frame_end_iconify_animation(ObFrame *self)
     /* see if there is an animation going */
     if (self->iconify_animation_going == 0) return;
 
-    /* call the callback when it's done */
-    if (self->iconify_animation_cb)
-        self->iconify_animation_cb(self->iconify_animation_data);
+    if (!self->visible)
+        XUnmapWindow(ob_display, self->window);
+
     /* we're not animating any more ! */
     self->iconify_animation_going = 0;
 
-    /* move after the callback for the animation ending */
     XMoveResizeWindow(ob_display, self->window,
                       self->area.x, self->area.y,
                       self->area.width - self->bwidth * 2,
@@ -1135,9 +1135,7 @@ void frame_end_iconify_animation(ObFrame *self)
     XFlush(ob_display);
 }
 
-void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
-                                   ObFrameIconifyAnimateFunc callback,
-                                   gpointer data)
+void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
 {
     gulong time;
     gboolean new_anim = FALSE;
@@ -1146,10 +1144,8 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
 
     /* if there is no titlebar, just don't animate for now
        XXX it would be nice tho.. */
-    if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR)) {
-        if (callback) callback(data);
+    if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
         return;
-    }
 
     /* get the current time */
     g_get_current_time(&now);
@@ -1166,9 +1162,6 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
     } else
         new_anim = TRUE;
     self->iconify_animation_going = iconifying ? 1 : -1;
-
-    self->iconify_animation_cb = callback;
-    self->iconify_animation_data = data;
 
     /* set the ending time */
     if (set_end) {
@@ -1188,14 +1181,8 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
         /* do the first step */
         frame_animate_iconify(self);
 
+        /* show it during the animation even if it is not "visible" */
         if (!self->visible)
-            frame_show(self);
+            XMapWindow(ob_display, self->window);
     }
-}
-
-gboolean frame_visible(ObFrame *self)
-{
-    /* if it is animating back from iconic state then it is considered
-       visible. but if it is iconifying then it is not visible. */
-    return self->visible && self->iconify_animation_going <= 0;
 }

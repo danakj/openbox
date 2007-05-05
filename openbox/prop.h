@@ -58,7 +58,33 @@ typedef struct Atoms {
 
     /* NETWM atoms */
 
-    Atom net_wm_full_placement;
+    /* Atoms that are used inside messages - these don't go in net_supported */
+
+    Atom net_wm_moveresize_size_topleft; 
+    Atom net_wm_moveresize_size_top;
+    Atom net_wm_moveresize_size_topright;
+    Atom net_wm_moveresize_size_right;
+    Atom net_wm_moveresize_size_bottomright;
+    Atom net_wm_moveresize_size_bottom;
+    Atom net_wm_moveresize_size_bottomleft;
+    Atom net_wm_moveresize_size_left;
+    Atom net_wm_moveresize_move;
+    Atom net_wm_moveresize_size_keyboard;
+    Atom net_wm_moveresize_move_keyboard;
+    Atom net_wm_moveresize_cancel;
+
+    Atom net_wm_state_add;
+    Atom net_wm_state_remove;
+    Atom net_wm_state_toggle;
+
+    Atom net_wm_orientation_horz;
+    Atom net_wm_orientation_vert;
+    Atom net_wm_topleft;
+    Atom net_wm_topright;
+    Atom net_wm_bottomright;
+    Atom net_wm_bottomleft;
+
+    /* Everything below here must go in net_supported on the root window */
 
     /* root window properties */
     Atom net_supported;
@@ -70,14 +96,19 @@ typedef struct Atoms {
     Atom net_current_desktop;
     Atom net_desktop_names;
     Atom net_active_window;
+/*    Atom net_restack_window;*/
     Atom net_workarea;
     Atom net_supporting_wm_check;
     Atom net_desktop_layout;
     Atom net_showing_desktop;
+
     /* root window messages */
     Atom net_close_window;
     Atom net_wm_moveresize;
     Atom net_moveresize_window;
+
+    /* helpful hints to apps that aren't used for anything */
+    Atom net_wm_full_placement;
 
     /* startup-notification extension */
     Atom net_startup_id;
@@ -115,19 +146,6 @@ typedef struct Atoms {
     Atom net_wm_window_type_dialog;
     Atom net_wm_window_type_normal;
 
-    Atom net_wm_moveresize_size_topleft; 
-    Atom net_wm_moveresize_size_top;
-    Atom net_wm_moveresize_size_topright;
-    Atom net_wm_moveresize_size_right;
-    Atom net_wm_moveresize_size_bottomright;
-    Atom net_wm_moveresize_size_bottom;
-    Atom net_wm_moveresize_size_bottomleft;
-    Atom net_wm_moveresize_size_left;
-    Atom net_wm_moveresize_move;
-    Atom net_wm_moveresize_size_keyboard;
-    Atom net_wm_moveresize_move_keyboard;
-    Atom net_wm_moveresize_cancel;
-
     Atom net_wm_action_move;
     Atom net_wm_action_resize;
     Atom net_wm_action_minimize;
@@ -139,7 +157,7 @@ typedef struct Atoms {
     Atom net_wm_action_close;
 
     Atom net_wm_state_modal;
-    Atom net_wm_state_sticky;
+/*    Atom net_wm_state_sticky;*/
     Atom net_wm_state_maximized_vert;
     Atom net_wm_state_maximized_horz;
     Atom net_wm_state_shaded;
@@ -151,31 +169,23 @@ typedef struct Atoms {
     Atom net_wm_state_below;
     Atom net_wm_state_demands_attention;
 
-    Atom net_wm_state_add;
-    Atom net_wm_state_remove;
-    Atom net_wm_state_toggle;
-
-    Atom net_wm_orientation_horz;
-    Atom net_wm_orientation_vert;
-    Atom net_wm_topleft;
-    Atom net_wm_topright;
-    Atom net_wm_bottomright;
-    Atom net_wm_bottomleft;
-
-    /* Extra atoms */
+    /* KDE atoms */
 
     Atom kde_wm_change_state;
+    Atom kde_net_wm_frame_strut;
     Atom kde_net_wm_window_type_override;
 
+/*
     Atom rootpmapid;
     Atom esetrootid;
+*/
 
     /* Openbox specific atoms */
      
+    Atom openbox_wm_state_undecorated;
     Atom openbox_pid;
     Atom openbox_rc;
-    Atom ob_wm_state_undecorated;
-    Atom ob_control;
+    Atom openbox_control;
 } Atoms;
 Atoms prop_atoms;
 

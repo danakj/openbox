@@ -508,6 +508,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             vals[3] = self->size.bottom;
             PROP_SETA32(self->client->window, net_frame_extents,
                         cardinal, vals, 4);
+            PROP_SETA32(self->client->window, kde_net_wm_frame_strut,
+                        cardinal, vals, 4);
         }
 
         /* if this occurs while we are focus cycling, the indicator needs to

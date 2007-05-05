@@ -1103,7 +1103,7 @@ static void client_get_state(ObClient *self)
                 self->below = TRUE;
             else if (state[i] == prop_atoms.net_wm_state_demands_attention)
                 self->demands_attention = TRUE;
-            else if (state[i] == prop_atoms.ob_wm_state_undecorated)
+            else if (state[i] == prop_atoms.openbox_wm_state_undecorated)
                 self->undecorated = TRUE;
         }
 
@@ -2105,7 +2105,7 @@ static void client_change_state(ObClient *self)
     if (self->demands_attention)
         netstate[num++] = prop_atoms.net_wm_state_demands_attention;
     if (self->undecorated)
-        netstate[num++] = prop_atoms.ob_wm_state_undecorated;
+        netstate[num++] = prop_atoms.openbox_wm_state_undecorated;
     PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
 
     if (self->frame)
@@ -3053,7 +3053,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 action = self->demands_attention ?
                     prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.ob_wm_state_undecorated)
+            else if (state == prop_atoms.openbox_wm_state_undecorated)
                 action = undecorated ? prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
         }
@@ -3083,7 +3083,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->below = TRUE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = TRUE;
-            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+            } else if (state == prop_atoms.openbox_wm_state_undecorated) {
                 undecorated = TRUE;
             }
 
@@ -3110,7 +3110,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->below = FALSE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = FALSE;
-            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+            } else if (state == prop_atoms.openbox_wm_state_undecorated) {
                 undecorated = FALSE;
             }
         }

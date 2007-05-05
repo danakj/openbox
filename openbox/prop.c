@@ -64,6 +64,7 @@ void prop_startup()
     CREATE(net_current_desktop, "_NET_CURRENT_DESKTOP");
     CREATE(net_desktop_names, "_NET_DESKTOP_NAMES");
     CREATE(net_active_window, "_NET_ACTIVE_WINDOW");
+/*    CREATE(net_restack_window, "_NET_RESTACK_WINDOW");*/
     CREATE(net_workarea, "_NET_WORKAREA");
     CREATE(net_supporting_wm_check, "_NET_SUPPORTING_WM_CHECK");
     CREATE(net_desktop_layout, "_NET_DESKTOP_LAYOUT");
@@ -89,6 +90,7 @@ void prop_startup()
 /*   CREATE(net_wm_pid, "_NET_WM_PID"); */
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");
     CREATE(net_wm_user_time, "_NET_WM_USER_TIME");
+    CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
 
 /*   CREATE(net_wm_ping, "_NET_WM_PING"); */
@@ -129,7 +131,7 @@ void prop_startup()
     CREATE(net_wm_action_change_desktop, "_NET_WM_ACTION_CHANGE_DESKTOP");
     CREATE(net_wm_action_close, "_NET_WM_ACTION_CLOSE");
     CREATE(net_wm_state_modal, "_NET_WM_STATE_MODAL");
-    CREATE(net_wm_state_sticky, "_NET_WM_STATE_STICKY");
+/*    CREATE(net_wm_state_sticky, "_NET_WM_STATE_STICKY");*/
     CREATE(net_wm_state_maximized_vert, "_NET_WM_STATE_MAXIMIZED_VERT");
     CREATE(net_wm_state_maximized_horz, "_NET_WM_STATE_MAXIMIZED_HORZ");
     CREATE(net_wm_state_shaded, "_NET_WM_STATE_SHADED");
@@ -155,13 +157,15 @@ void prop_startup()
     CREATE(kde_wm_change_state, "_KDE_WM_CHANGE_STATE");
     CREATE(kde_net_wm_window_type_override,"_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 
+/*
     CREATE(rootpmapid, "_XROOTPMAP_ID");
     CREATE(esetrootid, "ESETROOT_PMAP_ID");
+*/
 
     CREATE(openbox_pid, "_OPENBOX_PID");
     CREATE(openbox_rc, "_OPENBOX_RC");
-    CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
-    CREATE(ob_control, "_OB_CONTROL");
+    CREATE(openbox_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
+    CREATE(openbox_control, "_OB_CONTROL");
 }
 
 #include <X11/Xutil.h>

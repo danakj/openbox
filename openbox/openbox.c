@@ -137,7 +137,7 @@ gint main(gint argc, gchar **argv)
          * remote_control = 1 -> reconfigure 
          * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
-                 ob_control, remote_control, 0, 0, 0);
+                 openbox_control, remote_control, 0, 0, 0);
         XCloseDisplay(ob_display);
         exit(EXIT_SUCCESS);
     }

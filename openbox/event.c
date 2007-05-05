@@ -309,6 +309,9 @@ static gboolean wanted_focusevent(XEvent *e)
         /* This means focus moved from one client to another */
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
+        /* This means focus moved to the frame window */
+        if (detail == NotifyInferior)
+            return TRUE;
 
         /* Otherwise.. */
         return FALSE;

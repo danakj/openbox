@@ -395,8 +395,10 @@ static void calc_resize(gboolean resist)
         moveresize_client->frame->size.bottom;
 }
 
-void moveresize_event(XEvent *e)
+gboolean moveresize_event(XEvent *e)
 {
+    gboolean used = FALSE;
+
     g_assert(moveresize_in_progress);
 
     if (e->type == ButtonPress) {
@@ -405,10 +407,12 @@ void moveresize_event(XEvent *e)
             start_y = e->xbutton.y_root;
             button = e->xbutton.button; /* this will end it now */
         }
+        used = TRUE;
     } else if (e->type == ButtonRelease) {
         if (!button || e->xbutton.button == button) {
             moveresize_end(FALSE);
         }
+        used = TRUE;
     } else if (e->type == MotionNotify) {
         if (moving) {
             cur_x = start_cx + e->xmotion.x_root - start_x;
@@ -459,12 +463,19 @@ void moveresize_event(XEvent *e)
             calc_resize(TRUE);
             do_resize();
         }
+        used = TRUE;
     } else if (e->type == KeyPress) {
-        if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+        if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
             moveresize_end(TRUE);
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+            used = TRUE;
+        } else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
             moveresize_end(FALSE);
-        else {
+            used = TRUE;
+        } else if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT) ||
+                   e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
+                   e->xkey.keycode == ob_keycode(OB_KEY_DOWN) ||
+                   e->xkey.keycode == ob_keycode(OB_KEY_UP))
+        {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
                 gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
 
@@ -474,10 +485,8 @@ void moveresize_event(XEvent *e)
                     dx = -MAX(4, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
                     dy = MAX(4, moveresize_client->size_inc.height);
-                else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
+                else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
                     dy = -MAX(4, moveresize_client->size_inc.height);
-                else
-                    return;
 
                 cur_x += dx;
                 cur_y += dy;
@@ -497,6 +506,8 @@ void moveresize_event(XEvent *e)
                    actually is */
                 start_x += dx - (cur_x - ox);
                 start_y += dy - (cur_y - oy);
+
+                used = TRUE;
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
                 gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
                 gint opx, px, opy, py;
@@ -507,10 +518,8 @@ void moveresize_event(XEvent *e)
                     dx = -4;
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
                     dy = 4;
-                else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
+                else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
                     dy = -4;
-                else
-                    return;
 
                 cur_x += dx;
                 cur_y += dy;
@@ -532,6 +541,8 @@ void moveresize_event(XEvent *e)
                    actually is */
                 start_x += (px - opx) - (cur_x - ox);
                 start_y += (py - opy) - (cur_y - oy);
+
+                used = TRUE;
             }
         }
     }
@@ -540,6 +551,8 @@ void moveresize_event(XEvent *e)
     {
         waiting_for_sync = FALSE; /* we got our sync... */
         do_resize(); /* ...so try resize if there is more change pending */
+        used = TRUE;
     }
 #endif
+    return used;
 }

@@ -546,14 +546,16 @@ static void event_process(const XEvent *ec, gpointer data)
         }
 
         if (useevent) {
-            if (!keyboard_process_interactive_grab(e, &client)) {
-                if (moveresize_in_progress) {
-                    moveresize_event(e);
-
+            /* if the keyboard interactive action uses the event then dont
+               use it for bindings. likewise is moveresize uses the event. */
+            if (!keyboard_process_interactive_grab(e, &client) &&
+                !(moveresize_in_progress && moveresize_event(e)))
+            {
+                if (moveresize_in_progress)
                     /* make further actions work on the client being
                        moved/resized */
                     client = moveresize_client;
-                }
+
 
                 menu_can_hide = FALSE;
                 ob_main_loop_timeout_add(ob_main_loop,

@@ -441,8 +441,10 @@ static void parse_args(gint argc, gchar **argv)
             xsync = TRUE;
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
         } else if (!strcmp(argv[i], "--debug-focus")) {
             ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;

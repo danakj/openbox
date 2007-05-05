@@ -35,6 +35,7 @@ void ob_debug(const gchar *a, ...)
     va_list vl;
 
     if (show) {
+        fprintf(stderr, "DEBUG: ");
         va_start(vl, a);
         vfprintf(stderr, a, vl);
         va_end(vl);
@@ -56,6 +57,17 @@ void ob_debug_type(ObDebugType type, const gchar *a, ...)
     g_assert(type < OB_DEBUG_TYPE_NUM);
 
     if (show && enabled_types[type]) {
+        switch (type) {
+        case OB_DEBUG_FOCUS:
+            fprintf(stderr, "FOCUS: ");
+            break;
+        case OB_DEBUG_APP_BUGS:
+            fprintf(stderr, "APPLICATION BUG: ");
+            break;
+        default:
+            g_assert_not_reached();
+        }
+
         va_start(vl, a);
         vfprintf(stderr, a, vl);
         va_end(vl);

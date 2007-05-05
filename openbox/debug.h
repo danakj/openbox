@@ -27,6 +27,7 @@ void ob_debug(const gchar *a, ...);
 
 typedef enum {
     OB_DEBUG_FOCUS,
+    OB_DEBUG_APP_BUGS,
     OB_DEBUG_TYPE_NUM
 } ObDebugType;
 

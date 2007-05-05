@@ -251,8 +251,7 @@ typedef enum
 } ObSmartType;
 
 #define SMART_IGNORE(placer, c) \
-    (placer == c || c->shaded || !client_normal(c) || \
-     !frame_visible(c->frame) || \
+    (placer == c || c->shaded || !client_normal(c) || !c->frame->visible || \
      (c->desktop != DESKTOP_ALL && \
       c->desktop != (placer->desktop == DESKTOP_ALL ? \
                      screen_desktop : placer->desktop)))

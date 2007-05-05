@@ -1263,9 +1263,9 @@ void action_raiselower(union ActionData *data)
 
             if (cit == c) break;
             if (client_normal(cit) == client_normal(c) &&
-                    cit->layer == c->layer &&
-                    frame_visible(cit->frame) &&
-                    !client_search_transient(c, cit))
+                cit->layer == c->layer &&
+                cit->frame->visible &&
+                !client_search_transient(c, cit))
             {
                 if (RECT_INTERSECTS_RECT(cit->frame->area, c->frame->area)) {
                     raise = TRUE;

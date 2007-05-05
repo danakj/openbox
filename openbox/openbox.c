@@ -137,7 +137,7 @@ gint main(gint argc, gchar **argv)
          * remote_control = 1 -> reconfigure 
          * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
-                 ob_control, remote_control, 0, 0, 0);
+                 openbox_control, remote_control, 0, 0, 0);
         XCloseDisplay(ob_display);
         exit(EXIT_SUCCESS);
     }
@@ -441,8 +441,10 @@ static void parse_args(gint argc, gchar **argv)
             xsync = TRUE;
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
         } else if (!strcmp(argv[i], "--debug-focus")) {
             ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;

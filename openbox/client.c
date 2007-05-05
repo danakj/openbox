@@ -1103,7 +1103,7 @@ static void client_get_state(ObClient *self)
                 self->below = TRUE;
             else if (state[i] == prop_atoms.net_wm_state_demands_attention)
                 self->demands_attention = TRUE;
-            else if (state[i] == prop_atoms.ob_wm_state_undecorated)
+            else if (state[i] == prop_atoms.openbox_wm_state_undecorated)
                 self->undecorated = TRUE;
         }
 
@@ -1266,7 +1266,7 @@ static void client_update_transient_tree(ObClient *self,
             c = it->data;
             if (c != self && (!c->transient_for ||
                               c->transient_for != OB_TRAN_GROUP))
-                c->transients = g_slist_append(c->transients, self);
+                c->transients = g_slist_prepend(c->transients, self);
         }
     }
     /* If we are now transient for a single window which we weren't before,
@@ -1279,7 +1279,7 @@ static void client_update_transient_tree(ObClient *self,
              newparent != oldparent &&
              /* don't make ourself its child if it is already our child */
              !client_is_direct_child(self, newparent))
-        newparent->transients = g_slist_append(newparent->transients, self);
+        newparent->transients = g_slist_prepend(newparent->transients, self);
 
     /* If the group changed then we need to add any new group transient
        windows to our children. But if we're transient for the group, then
@@ -1298,7 +1298,7 @@ static void client_update_transient_tree(ObClient *self,
                 /* Don't make it our child if it is already our parent */
                 !client_is_direct_child(c, self))
             {
-                self->transients = g_slist_append(self->transients, c);
+                self->transients = g_slist_prepend(self->transients, c);
             }
         }
     }
@@ -2061,7 +2061,7 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic || !frame_visible(self->frame))
+    if (self->shaded || !self->frame->visible)
         self->wmstate = IconicState;
     else
         self->wmstate = NormalState;
@@ -2105,7 +2105,7 @@ static void client_change_state(ObClient *self)
     if (self->demands_attention)
         netstate[num++] = prop_atoms.net_wm_state_demands_attention;
     if (self->undecorated)
-        netstate[num++] = prop_atoms.ob_wm_state_undecorated;
+        netstate[num++] = prop_atoms.openbox_wm_state_undecorated;
     PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
 
     if (self->frame)
@@ -2724,27 +2724,10 @@ static void client_iconify_recursive(ObClient *self,
 
     if (changed) {
         client_change_state(self);
-        if (iconic) {
-            if (ob_state() != OB_STATE_STARTING && config_animate_iconify) {
-                /* delay the showhide until the window is done the animation */
-                frame_begin_iconify_animation
-                    (self->frame, iconic,
-                     (ObFrameIconifyAnimateFunc)client_showhide, self);
-                /* but focus a new window now please */
-                focus_fallback(FALSE);
-            } else
-                client_showhide(self);
-        } else {
-            if (config_animate_iconify)
-                /* the animation will show the window when it is hidden,
-                   but the window state needs to be adjusted after the
-                   animation finishes, so call showhide when it's done to make
-                   sure everything is updated appropriately
-                */
-                frame_begin_iconify_animation
-                    (self->frame, iconic,
-                     (ObFrameIconifyAnimateFunc)client_showhide, self);
-        }
+        if (ob_state() != OB_STATE_STARTING && config_animate_iconify)
+            frame_begin_iconify_animation(self->frame, iconic);
+        /* do this after starting the animation so it doesn't flash */
+        client_showhide(self);
     }
 
     /* iconify all direct transients, and deiconify all transients
@@ -3070,7 +3053,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 action = self->demands_attention ?
                     prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.ob_wm_state_undecorated)
+            else if (state == prop_atoms.openbox_wm_state_undecorated)
                 action = undecorated ? prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
         }
@@ -3100,7 +3083,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->below = TRUE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = TRUE;
-            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+            } else if (state == prop_atoms.openbox_wm_state_undecorated) {
                 undecorated = TRUE;
             }
 
@@ -3127,7 +3110,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 self->below = FALSE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = FALSE;
-            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+            } else if (state == prop_atoms.openbox_wm_state_undecorated) {
                 undecorated = FALSE;
             }
         }
@@ -3188,7 +3171,7 @@ gboolean client_can_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
-    if (!frame_visible(self->frame))
+    if (!self->frame->visible)
         return FALSE;
 
     if (!(self->can_focus || self->focus_notify))
@@ -3221,7 +3204,7 @@ gboolean client_focus(ObClient *self)
     self = client_focus_target(self);
 
     if (!client_can_focus(self)) {
-        if (!frame_visible(self->frame)) {
+        if (!self->frame->visible) {
             /* update the focus lists */
             focus_order_to_top(self);
         }
@@ -3306,7 +3289,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
                 client_set_desktop(self, screen_desktop, FALSE);
             else
                 screen_set_desktop(self->desktop);
-        } else if (!frame_visible(self->frame))
+        } else if (!self->frame->visible)
             /* if its not visible for other reasons, then don't mess
                with it */
             return;
@@ -3733,7 +3716,7 @@ ObClient* client_under_pointer()
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (frame_visible(c->frame) &&
+                if (c->frame->visible &&
                     /* ignore all animating windows */
                     !frame_iconify_animating(c->frame) &&
                     RECT_CONTAINS(c->frame->area, x, y))

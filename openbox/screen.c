@@ -157,6 +157,7 @@ gboolean screen_annex()
     XSetWindowAttributes attrib;
     pid_t pid;
     gint i, num_support;
+    Atom *prop_atoms_start, *wm_supported_pos;
     gulong *supported;
 
     /* create the netwm support window */
@@ -205,12 +206,15 @@ gboolean screen_annex()
                window, screen_support_win);
 
     /* set the _NET_SUPPORTED_ATOMS hint */
-    num_support = 55;
-#ifdef SYNC
-    num_support += 2;
-#endif
+
+    /* this is all the atoms after net_supported in the prop_atoms struct */
+    prop_atoms_start = (Atom*)&prop_atoms;
+    wm_supported_pos = (Atom*)&(prop_atoms.net_supported);
+    num_support = sizeof(prop_atoms) / sizeof(Atom) -
+        (wm_supported_pos - prop_atoms_start) - 1;
     i = 0;
     supported = g_new(gulong, num_support);
+    supported[i++] = prop_atoms.net_supporting_wm_check;
     supported[i++] = prop_atoms.net_wm_full_placement;
     supported[i++] = prop_atoms.net_current_desktop;
     supported[i++] = prop_atoms.net_number_of_desktops;
@@ -230,6 +234,9 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_visible_icon_name;
     supported[i++] = prop_atoms.net_wm_desktop;
     supported[i++] = prop_atoms.net_wm_strut;
+    supported[i++] = prop_atoms.net_wm_strut_partial;
+    supported[i++] = prop_atoms.net_wm_icon;
+    supported[i++] = prop_atoms.net_wm_icon_geometry;
     supported[i++] = prop_atoms.net_wm_window_type;
     supported[i++] = prop_atoms.net_wm_window_type_desktop;
     supported[i++] = prop_atoms.net_wm_window_type_dock;
@@ -265,11 +272,20 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_moveresize;
     supported[i++] = prop_atoms.net_wm_user_time;
     supported[i++] = prop_atoms.net_frame_extents;
+    supported[i++] = prop_atoms.net_startup_id;
 #ifdef SYNC
     supported[i++] = prop_atoms.net_wm_sync_request;
     supported[i++] = prop_atoms.net_wm_sync_request_counter;
 #endif
-    supported[i++] = prop_atoms.ob_wm_state_undecorated;
+
+    supported[i++] = prop_atoms.kde_wm_change_state;
+    supported[i++] = prop_atoms.kde_net_wm_frame_strut;
+    supported[i++] = prop_atoms.kde_net_wm_window_type_override;
+
+    supported[i++] = prop_atoms.openbox_wm_state_undecorated;
+    supported[i++] = prop_atoms.openbox_pid;
+    supported[i++] = prop_atoms.openbox_rc;
+    supported[i++] = prop_atoms.openbox_control;
     g_assert(i == num_support);
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),

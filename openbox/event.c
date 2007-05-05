@@ -309,6 +309,9 @@ static gboolean wanted_focusevent(XEvent *e)
         /* This means focus moved from one client to another */
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
+        /* This means focus moved to the frame window */
+        if (detail == NotifyInferior)
+            return TRUE;
 
         /* Otherwise.. */
         return FALSE;
@@ -561,7 +564,10 @@ static void event_handle_root(XEvent *e)
             guint d = e->xclient.data.l[0];
             if (d < screen_num_desktops) {
                 event_curtime = e->xclient.data.l[1];
-                ob_debug("SWITCH DESKTOP TIME: %d\n", event_curtime);
+                if (event_curtime == 0)
+                    ob_debug_type(OB_DEBUG_APP_BUGS,
+                                  "_NET_CURRENT_DESKTOP message is missing "
+                                  "a timestamp\n");
                 screen_set_desktop(d);
             }
         } else if (msgtype == prop_atoms.net_number_of_desktops) {
@@ -570,7 +576,7 @@ static void event_handle_root(XEvent *e)
                 screen_set_num_desktops(d);
         } else if (msgtype == prop_atoms.net_showing_desktop) {
             screen_show_desktop(e->xclient.data.l[0] != 0, TRUE);
-        } else if (msgtype == prop_atoms.ob_control) {
+        } else if (msgtype == prop_atoms.openbox_control) {
             if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();
             else if (e->xclient.data.l[0] == 2)
@@ -635,7 +641,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
-    gint i=0;
     ObFrameContext con;
      
     switch (e->type) {
@@ -787,31 +792,20 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     }
     case ConfigureRequest:
-        /* compress these */
-        while (XCheckTypedWindowEvent(ob_display, client->window,
-                                      ConfigureRequest, &ce)) {
-            ++i;
-            /* XXX if this causes bad things.. we can compress config req's
-               with the same mask. */
-            e->xconfigurerequest.value_mask |=
-                ce.xconfigurerequest.value_mask;
-            if (ce.xconfigurerequest.value_mask & CWX)
-                e->xconfigurerequest.x = ce.xconfigurerequest.x;
-            if (ce.xconfigurerequest.value_mask & CWY)
-                e->xconfigurerequest.y = ce.xconfigurerequest.y;
-            if (ce.xconfigurerequest.value_mask & CWWidth)
-                e->xconfigurerequest.width = ce.xconfigurerequest.width;
-            if (ce.xconfigurerequest.value_mask & CWHeight)
-                e->xconfigurerequest.height = ce.xconfigurerequest.height;
-            if (ce.xconfigurerequest.value_mask & CWBorderWidth)
-                e->xconfigurerequest.border_width =
-                    ce.xconfigurerequest.border_width;
-            if (ce.xconfigurerequest.value_mask & CWStackMode)
-                e->xconfigurerequest.detail = ce.xconfigurerequest.detail;
-        }
+        /* dont compress these unless you're going to watch for property
+           notifies in between (these can change what the configure would
+           do to the window).
+           also you can't compress stacking events
+        */
 
-        /* if we are iconic (or shaded (fvwm does this)) ignore the event */
-        if (client->iconic || client->shaded) return;
+        ob_debug("ConfigureRequest desktop %d wmstate %d vis %d\n",
+                 screen_desktop, client->wmstate, client->frame->visible);
+
+        /* don't allow clients to move shaded windows (fvwm does this) */
+        if (client->shaded) {
+            e->xconfigurerequest.value_mask &= ~CWX;
+            e->xconfigurerequest.value_mask &= ~CWY;
+        }
 
         /* resize, then move, as specified in the EWMH section 7.7 */
         if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
@@ -834,6 +828,30 @@ static void event_handle_client(ObClient *client, XEvent *e)
             ob_debug("ConfigureRequest x %d %d y %d %d\n",
                      e->xconfigurerequest.value_mask & CWX, x,
                      e->xconfigurerequest.value_mask & CWY, y);
+
+            /* check for broken apps moving to their root position
+
+               XXX remove this some day...that would be nice. right now all
+               kde apps do this when they try activate themselves on another
+               desktop. eg. open amarok window on desktop 1, switch to desktop
+               2, click amarok tray icon. it will move by its decoration size.
+            */
+            if (x != client->area.x &&
+                x == (client->frame->area.x + client->frame->size.left -
+                      (gint)client->border_width) &&
+                y != client->area.y &&
+                y == (client->frame->area.y + client->frame->size.top -
+                      (gint)client->border_width))
+            {
+                ob_debug_type(OB_DEBUG_APP_BUGS,
+                              "Application %s is trying to move via "
+                              "ConfigureRequest to it's root window position "
+                              "but it is not using StaticGravity\n",
+                              client->title);
+                /* don't move it */
+                x = client->area.x;
+                y = client->area.y;
+            }
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure_full(client, x, y, w, h, FALSE, TRUE, TRUE);
@@ -957,8 +975,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      (e->xclient.data.l[0] == 0 ? "unknown" :
                       (e->xclient.data.l[0] == 1 ? "application" :
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
-            /* XXX make use of data.l[2] ! */
+            /* XXX make use of data.l[2] !? */
             event_curtime = e->xclient.data.l[1];
+            ob_debug_type(OB_DEBUG_APP_BUGS,
+                          "_NET_ACTIVE_WINDOW message for window %s is "
+                          "missing a timestamp\n", client->title);
             client_activate(client, FALSE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));
@@ -1386,7 +1407,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
         {
             /* the frame may not be "visible" but they can still click on it
                in the case where it is animating before disappearing */
-            if (client && frame_visible(client->frame))
+            if (!client || !frame_iconify_animating(client->frame))
                 mouse_event(client, e);
         } else if (e->type == KeyPress) {
             keyboard_event((focus_cycle_target ? focus_cycle_target :

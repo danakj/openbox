@@ -40,6 +40,6 @@ void moveresize_start(struct _ObClient *c,
                       gint x, gint y, guint button, guint32 corner);
 void moveresize_end(gboolean cancel);
 
-void moveresize_event(XEvent *e);
+gboolean moveresize_event(XEvent *e);
 
 #endif

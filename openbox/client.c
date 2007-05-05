@@ -1694,7 +1694,6 @@ void client_reconfigure(ObClient *self)
 void client_update_wmhints(ObClient *self)
 {
     XWMHints *hints;
-    GSList *it;
 
     /* assume a window takes input if it doesnt specify */
     self->can_focus = TRUE;

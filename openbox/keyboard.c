@@ -199,10 +199,8 @@ static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
 
     istate.active = FALSE;
 
-    if (ungrab) {
+    if (ungrab)
         grab_keyboard(FALSE);
-        grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-    }
 }
 
 static void keyboard_interactive_end_client(ObClient *client, gpointer data)
@@ -217,11 +215,8 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
     g_assert(action->data.any.interactive);
 
     if (!istate.active) {
-        grab_pointer(TRUE, FALSE, OB_CURSOR_POINTER);
-        if (!grab_keyboard(TRUE)) {
-            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+        if (!grab_keyboard(TRUE))
             return FALSE;
-        }
     } else if (action->func != istate.action->func) {
         keyboard_interactive_end(state, FALSE, action->data.any.time, FALSE);
     }
@@ -241,23 +236,26 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
     gboolean cancel = FALSE;
 
     if (istate.active) {
-        if ((e->type == KeyRelease && !(istate.state & e->xkey.state)))
+        if ((e->type == KeyRelease && !(istate.state & e->xkey.state))) {
             done = TRUE;
-        else if (e->type == KeyPress) {
+            handled = TRUE;
+        } else if (e->type == KeyPress) {
             /*if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
               done = TRUE;
-              else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+              else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
                   cancel = done = TRUE;
+                  handled = TRUE;
+              }
         } else if (e->type == ButtonPress) {
             cancel = FALSE;
             done = TRUE;
+            handled = FALSE;
         }
 
-        if (done) {
+        if (done)
             keyboard_interactive_end(e->xkey.state, cancel, e->xkey.time,TRUE);
 
-            handled = TRUE;
-        } else
+        if (handled)
             *client = istate.client;
     }
 

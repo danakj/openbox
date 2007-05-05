@@ -860,7 +860,7 @@ void screen_update_desktop_names()
     }
 }
 
-void screen_show_desktop(gboolean show)
+void screen_show_desktop(gboolean show, gboolean restore_focus)
 {
     GList *it;
      
@@ -895,7 +895,7 @@ void screen_show_desktop(gboolean show)
                 client_focus(it->data))
                 break;
         }
-    } else {
+    } else if (restore_focus) {
         ObClient *c;
 
         /* use NULL for the "old" argument because the desktop was focused

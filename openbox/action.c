@@ -1932,17 +1932,17 @@ void action_toggle_dockautohide(union ActionData *data)
 
 void action_toggle_show_desktop(union ActionData *data)
 {
-    screen_show_desktop(!screen_showing_desktop);
+    screen_show_desktop(!screen_showing_desktop, TRUE);
 }
 
 void action_show_desktop(union ActionData *data)
 {
-    screen_show_desktop(TRUE);
+    screen_show_desktop(TRUE, TRUE);
 }
 
 void action_unshow_desktop(union ActionData *data)
 {
-    screen_show_desktop(FALSE);
+    screen_show_desktop(FALSE, TRUE);
 }
 
 void action_break_chroot(union ActionData *data)

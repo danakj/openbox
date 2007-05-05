@@ -3261,7 +3261,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
         event_halt_focus_delay();
 
         if (client_normal(self) && screen_showing_desktop)
-            screen_show_desktop(FALSE);
+            screen_show_desktop(FALSE, FALSE);
         if (self->iconic)
             client_iconify(self, FALSE, here);
         if (self->desktop != DESKTOP_ALL &&

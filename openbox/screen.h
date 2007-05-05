@@ -76,7 +76,7 @@ void screen_desktop_popup(guint d, gboolean show);
 
 /*! Shows and focuses the desktop and hides all the client windows, or
   returns to the normal state, showing client windows. */
-void screen_show_desktop(gboolean show);
+void screen_show_desktop(gboolean show, gboolean restore_focus);
 
 /*! Updates the desktop layout from the root property if available */
 void screen_update_layout();

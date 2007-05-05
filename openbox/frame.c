@@ -42,8 +42,7 @@
    from the frame. */
 #define INNER_EVENTMASK (ButtonPressMask)
 
-//#define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
-#define FRAME_ANIMATE_ICONIFY_TIME 2000000
+#define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
 #define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 30) /* 30 Hz */
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \

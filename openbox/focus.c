@@ -499,7 +499,7 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
         for (it = ft->transients; it; it = g_slist_next(it)) {
             ObClient *c = it->data;
 
-            if (c->frame->visible)
+            if (frame_visible(c->frame))
                 return FALSE;
         }
         return TRUE;

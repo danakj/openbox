@@ -83,6 +83,7 @@ static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_group(ObGroup *g, XEvent *e);
+static void event_handle_user_input(ObClient *client, XEvent *e);
 
 static void focus_delay_dest(gpointer data);
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
@@ -530,49 +531,13 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    /* user input (action-bound) events */
     if (e->type == ButtonPress || e->type == ButtonRelease ||
         e->type == MotionNotify || e->type == KeyPress ||
         e->type == KeyRelease)
     {
-        gboolean useevent = TRUE;
-
-        if (menu_frame_visible) {
-            if (event_handle_menu(e))
-                /* don't use the event if the menu used it, but if the menu
-                   didn't use it and it's a keypress that is bound, it will
-                   close the menu and be used */
-                useevent = FALSE;
-        }
-
-        if (useevent) {
-            /* if the keyboard interactive action uses the event then dont
-               use it for bindings. likewise is moveresize uses the event. */
-            if (!keyboard_process_interactive_grab(e, &client) &&
-                !(moveresize_in_progress && moveresize_event(e)))
-            {
-                if (moveresize_in_progress)
-                    /* make further actions work on the client being
-                       moved/resized */
-                    client = moveresize_client;
-
-
-                menu_can_hide = FALSE;
-                ob_main_loop_timeout_add(ob_main_loop,
-                                         config_menu_hide_delay * 1000,
-                                         menu_hide_delay_func,
-                                         NULL, g_direct_equal, NULL);
-
-                if (e->type == ButtonPress || e->type == ButtonRelease ||
-                    e->type == MotionNotify) {
-                    mouse_event(client, e);
-                } else if (e->type == KeyPress) {
-                    keyboard_event((focus_cycle_target ? focus_cycle_target :
-                                    (client ? client : focus_client)), e);
-                }
-            }
-        }
+        event_handle_user_input(client, e);
     }
+
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
     event_curtime = CurrentTime;
@@ -732,6 +697,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
+            /* When the mouse leaves an animating window, don't use the
+               corresponding enter events. Pretend like the animating window
+               doesn't even exist..! */
+            if (frame_iconify_animating(client->frame))
+                event_ignore_queued_enters();
+
             ob_debug_type(OB_DEBUG_FOCUS,
                           "%sNotify mode %d detail %d on %lx\n",
                           (e->type == EnterNotify ? "Enter" : "Leave"),
@@ -1377,6 +1348,51 @@ static gboolean event_handle_menu(XEvent *ev)
         break;
     }
     return ret;
+}
+
+static void event_handle_user_input(ObClient *client, XEvent *e)
+{
+    g_assert(e->type == ButtonPress || e->type == ButtonRelease ||
+             e->type == MotionNotify || e->type == KeyPress ||
+             e->type == KeyRelease);
+
+    if (menu_frame_visible) {
+        if (event_handle_menu(e))
+            /* don't use the event if the menu used it, but if the menu
+               didn't use it and it's a keypress that is bound, it will
+               close the menu and be used */
+            return;
+    }
+
+    /* if the keyboard interactive action uses the event then dont
+       use it for bindings. likewise is moveresize uses the event. */
+    if (!keyboard_process_interactive_grab(e, &client) &&
+        !(moveresize_in_progress && moveresize_event(e)))
+    {
+        if (moveresize_in_progress)
+            /* make further actions work on the client being
+               moved/resized */
+            client = moveresize_client;
+
+        menu_can_hide = FALSE;
+        ob_main_loop_timeout_add(ob_main_loop,
+                                 config_menu_hide_delay * 1000,
+                                 menu_hide_delay_func,
+                                 NULL, g_direct_equal, NULL);
+
+        if (e->type == ButtonPress ||
+            e->type == ButtonRelease ||
+            e->type == MotionNotify)
+        {
+            /* the frame may not be "visible" but they can still click on it
+               in the case where it is animating before disappearing */
+            if (client && frame_visible(client->frame))
+                mouse_event(client, e);
+        } else if (e->type == KeyPress) {
+            keyboard_event((focus_cycle_target ? focus_cycle_target :
+                            (client ? client : focus_client)), e);
+        }
+    }
 }
 
 static gboolean menu_hide_delay_func(gpointer data)

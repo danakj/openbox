@@ -77,6 +77,9 @@ struct _ObFrame
 
     Strut     size;
     Rect      area;
+    /*! Is the frame visible? Don't read this directly ! Use frame_visible()
+      instead, because that takes into account if the frame is visible but
+      animating to the iconic (invisible) state. */
     gboolean  visible;
 
     guint     decorations;
@@ -145,14 +148,12 @@ struct _ObFrame
     gboolean  flash_on;
     GTimeVal  flash_end;
 
-    /*! The step which the client is currently in for animating iconify and
-      restore.
-      0 means that it is not animating. FRAME_ANIMATE_ICONIFY_STEPS is the
-      first step for iconifying, and -FRAME_ANIMATE_ICONIFY_STEPS is the
-      forst step for restoring. It counts towards 0 either way. Visually,
-      +x == -(FRAME_ANIMATE_ICONIFY_STEPS-x+1)
+    /*! Is the frame currently in an animation for iconify or restore.
+      0 means that it is not animating. > 0 means it is animating an iconify.
+      < 0 means it is animating a restore.
     */
-    gint iconify_animation_step;
+    gint iconify_animation_going;
+    GTimeVal  iconify_animation_end;
     ObFrameIconifyAnimateFunc iconify_animation_cb;
     gpointer iconify_animation_data;
 };
@@ -197,5 +198,12 @@ void frame_flash_stop(ObFrame *self);
 void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying,
                                    ObFrameIconifyAnimateFunc callback,
                                    gpointer data);
+void frame_end_iconify_animation(ObFrame *self);
+
+/* Returns true if the frame is visible (but false if it is only visible
+   because it is animating */
+gboolean frame_visible(ObFrame *self);
+
+#define frame_iconify_animating(f) (f->iconify_animation_going != 0)
 
 #endif

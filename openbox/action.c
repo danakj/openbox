@@ -48,19 +48,8 @@ inline void client_action_start(union ActionData *data)
 inline void client_action_end(union ActionData *data)
 {
     if (config_focus_follow)
-        if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button) {
-                grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-            } else {
-                ObClient *c;
-
-                /* usually this is sorta redundant, but with a press action
-                   the enter event will come as a GrabNotify which is
-                   ignored, so this will handle that case */
-                if ((c = client_under_pointer()))
-                    event_enter_client(c);
-            }
-        }
+        if (data->any.context != OB_FRAME_CONTEXT_CLIENT && !data->any.button)
+            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
 }
 
 typedef struct
@@ -1275,7 +1264,7 @@ void action_raiselower(union ActionData *data)
             if (cit == c) break;
             if (client_normal(cit) == client_normal(c) &&
                     cit->layer == c->layer &&
-                    cit->frame->visible &&
+                    frame_visible(cit->frame) &&
                     !client_search_transient(c, cit))
             {
                 if (RECT_INTERSECTS_RECT(cit->frame->area, c->frame->area)) {

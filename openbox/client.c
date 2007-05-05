@@ -2061,7 +2061,7 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic || !self->frame->visible)
+    if (self->shaded || self->iconic || !frame_visible(self->frame))
         self->wmstate = IconicState;
     else
         self->wmstate = NormalState;
@@ -2731,15 +2731,19 @@ static void client_iconify_recursive(ObClient *self,
                     (self->frame, iconic,
                      (ObFrameIconifyAnimateFunc)client_showhide, self);
                 /* but focus a new window now please */
-                focus_fallback(TRUE);
+                focus_fallback(FALSE);
             } else
                 client_showhide(self);
         } else {
             if (config_animate_iconify)
-                /* start the animation then show it, this way the whole window
-                   doesnt get shown, just the first step of the animation */
-                frame_begin_iconify_animation(self->frame, iconic, NULL, NULL);
-            client_showhide(self);
+                /* the animation will show the window when it is hidden,
+                   but the window state needs to be adjusted after the
+                   animation finishes, so call showhide when it's done to make
+                   sure everything is updated appropriately
+                */
+                frame_begin_iconify_animation
+                    (self->frame, iconic,
+                     (ObFrameIconifyAnimateFunc)client_showhide, self);
         }
     }
 
@@ -3184,7 +3188,7 @@ gboolean client_can_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
-    if (!self->frame->visible)
+    if (!frame_visible(self->frame))
         return FALSE;
 
     if (!(self->can_focus || self->focus_notify))
@@ -3217,7 +3221,7 @@ gboolean client_focus(ObClient *self)
     self = client_focus_target(self);
 
     if (!client_can_focus(self)) {
-        if (!self->frame->visible) {
+        if (!frame_visible(self->frame)) {
             /* update the focus lists */
             focus_order_to_top(self);
         }
@@ -3302,7 +3306,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
                 client_set_desktop(self, screen_desktop, FALSE);
             else
                 screen_set_desktop(self->desktop);
-        } else if (!self->frame->visible)
+        } else if (!frame_visible(self->frame))
             /* if its not visible for other reasons, then don't mess
                with it */
             return;
@@ -3729,8 +3733,11 @@ ObClient* client_under_pointer()
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (c->frame->visible &&
-                    RECT_CONTAINS(c->frame->area, x, y)) {
+                if (frame_visible(c->frame) &&
+                    /* ignore all animating windows */
+                    !frame_iconify_animating(c->frame) &&
+                    RECT_CONTAINS(c->frame->area, x, y))
+                {
                     ret = c;
                     break;
                 }

@@ -407,12 +407,12 @@ gboolean moveresize_event(XEvent *e)
             start_y = e->xbutton.y_root;
             button = e->xbutton.button; /* this will end it now */
         }
-        used = TRUE;
+        used = e->xbutton.button == button;
     } else if (e->type == ButtonRelease) {
         if (!button || e->xbutton.button == button) {
             moveresize_end(FALSE);
+            used = TRUE;
         }
-        used = TRUE;
     } else if (e->type == MotionNotify) {
         if (moving) {
             cur_x = start_cx + e->xmotion.x_root - start_x;

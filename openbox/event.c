@@ -591,7 +591,7 @@ static void event_handle_root(XEvent *e)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_CURRENT_DESKTOP message is missing "
                                   "a timestamp\n");
-                screen_set_desktop(d);
+                screen_set_desktop(d, TRUE);
             }
         } else if (msgtype == prop_atoms.net_number_of_desktops) {
             guint d = e->xclient.data.l[0];

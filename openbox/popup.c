@@ -91,6 +91,7 @@ void popup_position(ObPopup *self, gint gravity, gint x, gint y)
 void popup_width(ObPopup *self, gint w)
 {
     self->w = w;
+    self->maxw = w;
 }
 
 void popup_height(ObPopup *self, gint h)
@@ -104,19 +105,9 @@ void popup_height(ObPopup *self, gint h)
 
 void popup_width_to_string(ObPopup *self, gchar *text, gint max)
 {
-    gint textw, iconw;
-
     self->a_text->texture[0].data.text.string = text;
-    textw = RrMinWidth(self->a_text);
-    if (self->hasicon) {
-        gint texth = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
-        iconw = texth;
-    } else
-        iconw = 0;
-    self->w = textw + iconw + ob_rr_theme->paddingx * (self->hasicon ? 3 : 2);
-    /* cap it at "max" */
-    if (max > 0)
-        self->w = MIN(self->w, max);
+    self->w = RrMinWidth(self->a_text);
+    self->maxw = max;
 }
 
 void popup_height_to_string(ObPopup *self, gchar *text)
@@ -124,12 +115,12 @@ void popup_height_to_string(ObPopup *self, gchar *text)
     self->h = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
 }
 
-void popup_width_to_strings(ObPopup *self, gchar **strings, gint max)
+void popup_width_to_strings(ObPopup *self, gchar **strings, gint num, gint max)
 {
     gint i, maxw;
 
     maxw = 0;
-    for (i = 0; strings[i] != NULL; ++i) {
+    for (i = 0; i < num; ++i) {
         popup_width_to_string(self, strings[i], max);
         maxw = MAX(maxw, self->w);
     }
@@ -174,13 +165,13 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     } else
         h = t+b + texth + ob_rr_theme->paddingy * 2;
     iconw = (self->hasicon ? texth : 0);
-    if (self->w) {
-        w = self->w;
-        textw = w - (l+r + iconw + ob_rr_theme->paddingx *
-                     (self->hasicon ? 3 : 2));
-    } else
-        w = l+r + textw + iconw + ob_rr_theme->paddingx *
-            (self->hasicon ? 3 : 2);
+    if (self->w)
+        textw = self->w;
+    w = l+r + textw + iconw + ob_rr_theme->paddingx *
+        (self->hasicon ? 3 : 2);
+    /* cap it at "maxw" */
+    w = MIN(w, self->maxw);
+
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
@@ -452,6 +443,7 @@ ObPagerPopup *pager_popup_new()
     self->hilight = RrAppearanceCopy(ob_rr_theme->osd_hilite_fg);
     self->unhilight = RrAppearanceCopy(ob_rr_theme->osd_unhilite_fg);
 
+    self->popup->hasicon = TRUE;
     self->popup->draw_icon = pager_popup_draw_icon;
     self->popup->draw_icon_data = self;
 

@@ -61,7 +61,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
        be used
     */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
 static Window createWindow(Window parent, gulong mask,
@@ -170,7 +170,7 @@ void focus_set_client(ObClient *client)
        be used.
     */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
     focus_client = client;
 
@@ -295,8 +295,10 @@ static void popup_cycle(ObClient *c, gboolean show)
         icon_popup_hide(focus_cycle_popup);
     } else {
         Rect *a;
-        ObClient *p = c;
+        ObClient *p;
+        gchar *text;
         gchar *title = NULL;
+        const gchar *desk = NULL;
 
         a = screen_physical_area_monitor(0);
         icon_popup_position(focus_cycle_popup, CenterGravity,
@@ -305,20 +307,27 @@ static void popup_cycle(ObClient *c, gboolean show)
         icon_popup_height(focus_cycle_popup, POPUP_HEIGHT);
 
         /* use the transient's parent's title/icon */
-        while (p->transient_for && p->transient_for != OB_TRAN_GROUP)
-            p = p->transient_for;
+        p = client_search_top_parent(c);
+
+        if (c->desktop != DESKTOP_ALL && c->desktop != screen_desktop)
+            desk = screen_desktop_names[c->desktop];
 
         if (p != c && !strcmp("", (c->iconic ? c->icon_title : c->title)))
             title = g_strdup(p->iconic ? p->icon_title : p->title);
-            /*title = g_strconcat((c->iconic ? c->icon_title : c->title),
+            /*ptitle = g_strconcat((c->iconic ? c->icon_title : c->title),
                                 " - ",
                                 (p->iconic ? p->icon_title : p->title),
                                 NULL);
             */
-        icon_popup_show(focus_cycle_popup,
-                        (title ? title :
-                         (c->iconic ? c->icon_title : c->title)),
-                        client_icon(p, 48, 48));
+        if (title == NULL)
+            title = g_strdup(c->iconic ? c->icon_title : c->title);
+        if (desk)
+            text = g_strdup_printf("%s [%s]", title, desk);
+        else
+            text = g_strdup(title);
+
+        icon_popup_show(focus_cycle_popup, text, client_icon(p, 48, 48));
+        g_free(text);
         g_free(title);
     }
 }
@@ -457,7 +466,9 @@ void focus_cycle_draw_indicator()
     }
 }
 
-static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
+static gboolean valid_focus_target(ObClient *ft,
+                                   gboolean all_desktops,
+                                   gboolean dock_windows)
 {
     gboolean ok = FALSE;
     /* we don't use client_can_focus here, because that doesn't let you
@@ -483,7 +494,9 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
           ft->type == OB_CLIENT_TYPE_MENU ||    /* being allowed to target */
           ft->type == OB_CLIENT_TYPE_UTILITY))  /* one of these, don't let */
         ok = ok && !ft->skip_taskbar;           /*  skip taskbar stop us */
-    ok = ok && (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL);
+    if (!all_desktops)
+        ok = ok && (ft->desktop == screen_desktop ||
+                    ft->desktop == DESKTOP_ALL);
     ok = ok && ft == client_focus_target(ft);
     return ok;
 /*
@@ -501,7 +514,8 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
 */
 }
 
-void focus_cycle(gboolean forward, gboolean dock_windows,
+void focus_cycle(gboolean forward, gboolean all_desktops,
+                 gboolean dock_windows,
                  gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
@@ -546,7 +560,7 @@ void focus_cycle(gboolean forward, gboolean dock_windows,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (valid_focus_target(ft, dock_windows)) {
+        if (valid_focus_target(ft, all_desktops, dock_windows)) {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
@@ -712,7 +726,7 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (valid_focus_target(it->data, dock_windows))
+            if (valid_focus_target(it->data, FALSE, dock_windows))
                 ft = it->data;
     }
         

@@ -3297,7 +3297,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
         if (here)
             client_set_desktop(self, screen_desktop, FALSE);
         else
-            screen_set_desktop(self->desktop);
+            screen_set_desktop(self->desktop, FALSE);
     } else if (!self->frame->visible)
         /* if its not visible for other reasons, then don't mess
            with it */

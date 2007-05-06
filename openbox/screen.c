@@ -170,6 +170,7 @@ gboolean screen_annex()
                                        CopyFromParent,
                                        CWOverrideRedirect, &attrib);
     XMapWindow(ob_display, screen_support_win);
+    XLowerWindow(ob_display, screen_support_win);
 
     if (!replace_wm()) {
         XDestroyWindow(ob_display, screen_support_win);

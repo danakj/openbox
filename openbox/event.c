@@ -275,14 +275,13 @@ static void event_hack_mods(XEvent *e)
     }
 }
 
-static gboolean wanted_focusevent(XEvent *e)
+static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
 {
     gint mode = e->xfocus.mode;
     gint detail = e->xfocus.detail;
     Window win = e->xany.window;
 
     if (e->type == FocusIn) {
-
         /* These are ones we never want.. */
 
         /* This means focus was given by a keyboard/mouse grab. */
@@ -294,7 +293,7 @@ static gboolean wanted_focusevent(XEvent *e)
 
         /* These are the ones we want.. */
 
-        if (win == RootWindow(ob_display, ob_screen)) {
+        if (win == RootWindow(ob_display, ob_screen) && !in_client_only) {
             /* This means focus reverted off of a client */
             if (detail == NotifyPointerRoot || detail == NotifyDetailNone ||
                 detail == NotifyInferior)
@@ -310,14 +309,13 @@ static gboolean wanted_focusevent(XEvent *e)
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
         /* This means focus moved to the frame window */
-        if (detail == NotifyInferior)
+        if (detail == NotifyInferior && !in_client_only)
             return TRUE;
 
         /* Otherwise.. */
         return FALSE;
     } else {
         g_assert(e->type == FocusOut);
-
 
         /* These are ones we never want.. */
 
@@ -348,18 +346,58 @@ static gboolean wanted_focusevent(XEvent *e)
 
 static Bool look_for_focusin(Display *d, XEvent *e, XPointer arg)
 {
-    return e->type == FocusIn && wanted_focusevent(e);
+    return e->type == FocusIn && wanted_focusevent(e, FALSE);
+}
+
+static Bool look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
+{
+    return e->type == FocusIn && wanted_focusevent(e, TRUE);
+}
+
+static void print_focusevent(XEvent *e)
+{
+    gint mode = e->xfocus.mode;
+    gint detail = e->xfocus.detail;
+    Window win = e->xany.window;
+    const gchar *modestr, *detailstr;
+
+    switch (mode) {
+    case NotifyNormal:       modestr="NotifyNormal";       break;
+    case NotifyGrab:         modestr="NotifyGrab";         break;
+    case NotifyUngrab:       modestr="NotifyUngrab";       break;
+    case NotifyWhileGrabbed: modestr="NotifyWhileGrabbed"; break;
+    }
+    switch (detail) {
+    case NotifyAncestor:    detailstr="NotifyAncestor";    break;
+    case NotifyVirtual:     detailstr="NotifyVirtual";     break;
+    case NotifyInferior:    detailstr="NotifyInferior";    break;
+    case NotifyNonlinear:   detailstr="NotifyNonlinear";   break;
+    case NotifyNonlinearVirtual: detailstr="NotifyNonlinearVirtual"; break;
+    case NotifyPointer:     detailstr="NotifyPointer";     break;
+    case NotifyPointerRoot: detailstr="NotifyPointerRoot"; break;
+    case NotifyDetailNone:  detailstr="NotifyDetailNone";  break;
+    }
+
+    g_assert(modestr);
+    g_assert(detailstr);
+    ob_debug_type(OB_DEBUG_FOCUS, "Focus%s 0x%x mode=%s detail=%s\n",
+                  (e->xfocus.type == FocusIn ? "In" : "Out"),
+                  win,
+                  modestr, detailstr);
+
 }
 
 static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
     case FocusIn:
-        if (!wanted_focusevent(e))
+        print_focusevent(e);
+        if (!wanted_focusevent(e, FALSE))
             return TRUE;
         break;
     case FocusOut:
-        if (!wanted_focusevent(e))
+        print_focusevent(e);
+        if (!wanted_focusevent(e, FALSE))
             return TRUE;
         break;
     }
@@ -438,8 +476,11 @@ static void event_process(const XEvent *ec, gpointer data)
                  hasn't received focus yet, so something else) -> send focusin
                which means the "something else" is the last thing to get a
                focusin sent to it, so the new window doesn't end up with focus.
+
+               But if the other focus in is something like PointerRoot then we
+               still want to fall back.
             */
-            if (XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
+            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
                 XPutBackEvent(ob_display, &ce);
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "  but another FocusIn is coming\n");
@@ -467,8 +508,6 @@ static void event_process(const XEvent *ec, gpointer data)
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
         XEvent ce;
-
-        ob_debug_type(OB_DEBUG_FOCUS, "FocusOut Event\n");
 
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {

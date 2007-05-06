@@ -81,6 +81,9 @@ ObMainLoop *ob_main_loop;
 Display    *ob_display;
 gint        ob_screen;
 gboolean    ob_replace_wm = FALSE;
+gboolean    ob_sm_use = TRUE;
+gchar      *ob_sm_id = NULL;
+gchar      *ob_sm_save_file = NULL;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -92,10 +95,12 @@ static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
-static gchar    *config_file = NULL;
+static gchar    *config_type = NULL;
 
 static void signal_handler(gint signal, gpointer data);
-static void parse_args(gint argc, gchar **argv);
+static void parse_env(char **argv0);
+static void remove_args(gint *argc, gchar **argv, gint index, gint num);
+static void parse_args(gint *argc, gchar **argv);
 static Cursor load_cursor(const gchar *name, guint fontval);
 
 gint main(gint argc, gchar **argv)
@@ -115,14 +120,16 @@ gint main(gint argc, gchar **argv)
         g_message(_("Unable to change to home directory '%s': %s"),
                   g_get_home_dir(), g_strerror(errno));
      
-    /* parse out command line args */
-    parse_args(argc, argv);
+    /* parse out environment and command line args */
+    parse_env(&argv[0]);
+    parse_args(&argc, argv);
 
     if (!remote_control) {
         parse_paths_startup();
 
         session_startup(argc, argv);
     }
+
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
@@ -222,18 +229,21 @@ gint main(gint argc, gchar **argv)
                    of the rc */
                 i = parse_startup();
 
+                /* start up config which sets up with the parser */
                 config_startup(i);
+
                 /* parse/load user options */
-                if (parse_load_rc(config_file, &doc, &node, &config_file)) {
-                    PROP_SETS(RootWindow(ob_display, ob_screen),
-                              openbox_rc, config_file);
+                if (parse_load_rc(config_type, &doc, &node)) {
                     parse_tree(i, doc, node->xmlChildrenNode);
-                } else {
+                    parse_close(doc);
+                } else
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
-                    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_rc);
-                }
+
+                if (config_type != NULL)
+                    PROP_SETS(RootWindow(ob_display, ob_screen),
+                              openbox_config, config_type);
+
                 /* we're done with parsing now, kill it */
-                parse_close(doc);
                 parse_shutdown(i);
             }
 
@@ -281,9 +291,21 @@ gint main(gint argc, gchar **argv)
             menu_frame_startup(reconfigure);
 
             if (!reconfigure) {
+                guint32 xid;
+                ObWindow *w;
+
                 /* get all the existing windows */
                 client_manage_all();
-                focus_fallback(TRUE);
+                focus_nothing();
+
+                /* focus what was focused if a wm was already running */
+                if (PROP_GET32(RootWindow(ob_display, ob_screen),
+                               net_active_window, window, &xid) &&
+                    (w = g_hash_table_lookup(window_map, &xid)) &&
+                    WINDOW_IS_CLIENT(w))
+                {
+                    client_focus(WINDOW_AS_CLIENT(w));
+                }
             } else {
                 GList *it;
 
@@ -329,7 +351,6 @@ gint main(gint argc, gchar **argv)
 
     XSync(ob_display, FALSE);
 
-    g_free(config_file); /* this is set by parse_load_rc */
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
@@ -357,11 +378,32 @@ gint main(gint argc, gchar **argv)
             }
         }
 
+        /* we remove the session arguments from argv, so put them back */
+        if (ob_sm_save_file != NULL) {
+            guint l = g_strv_length(argv);
+            argv = g_renew(gchar*, argv, l+2);
+            argv[l] = g_strdup("--sm-save-file");
+            argv[l+1] = ob_sm_save_file;
+            argv[l+2] = NULL;
+        }
+        if (ob_sm_id != NULL) {
+            guint l = g_strv_length(argv);
+            argv = g_renew(gchar*, argv, l+2);
+            argv[l] = g_strdup("--sm-client-id");
+            argv[l+1] = ob_sm_id;
+            argv[l+2] = NULL;
+        }
+
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
         execlp(argv[0], g_path_get_basename(argv[0]),
                (char *)NULL); /* last resort */
     }
+
+    /* free stuff passed in from the command line or environment */
+    g_free(ob_sm_save_file);
+    g_free(ob_sm_id);
+    g_free(config_type);
      
     return exitcode;
 }
@@ -403,30 +445,52 @@ static void print_version()
 static void print_help()
 {
     g_print(_("Syntax: openbox [options]\n"));
-    g_print(_("\nOptions:\n\n"));
-    g_print(_("  --config-file FILE  Specify the file to load for the config file\n"));
+    g_print(_("\nOptions:\n"));
+    g_print(_("  --config TYPE       Specify the configuration profile to use\n"));
 #ifdef USE_SM
-    g_print(_("  --sm-disable        Disable connection to session manager\n"));
-    g_print(_("  --sm-client-id ID   Specify session management ID\n"));
-    g_print(_("  --sm-save-file FILE Specify file to load a saved session from\n"));
+    g_print(_("  --sm-disable        Disable connection to the session manager\n"));
 #endif
     g_print(_("  --replace           Replace the currently running window manager\n"));
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
-    g_print(_("\nPassing messages to a running Openbox instance:\n\n"));
+    g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
-    g_print(_("\nDebugging options:\n\n"));
+    g_print(_("\nOptions for internal use:\n"));
+    g_print(_("  --sm-save-file FILE Specify file to load a saved session from\n"));
+    g_print(_("  --sm-client-id ID   Specify session management ID\n"));
+    g_print(_("\nDebugging options:\n"));
     g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
     g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
-    g_print(_("\nPlease report bugs at %s\n\n"), PACKAGE_BUGREPORT);
+    g_print(_("\nPlease report bugs at %s\n"), PACKAGE_BUGREPORT);
 }
 
-static void parse_args(gint argc, gchar **argv)
+static void parse_env(gchar **argv0)
+{
+    const char *c;
+
+    /* pretend we are this other application */
+    if ((c = getenv("OPENBOX_RESTART_BINARY")))
+        *argv0 = g_strdup(c);
+    unsetenv("OPENBOX_RESTART_BINARY");
+}
+
+static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 {
     gint i;
 
-    for (i = 1; i < argc; ++i) {
+    for (i = index; i < index + num; ++i)
+        argv[i] = argv[i+num];
+    for (; i < *argc; ++i)
+        argv[i] = NULL;
+    *argc -= num;
+}
+
+static void parse_args(gint *argc, gchar **argv)
+{
+    gint i;
+
+    for (i = 1; i < *argc; ++i) {
         if (!strcmp(argv[i], "--version")) {
             print_version();
             exit(0);
@@ -441,22 +505,53 @@ static void parse_args(gint argc, gchar **argv)
             xsync = TRUE;
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_SM, TRUE);
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
         } else if (!strcmp(argv[i], "--debug-focus")) {
             ob_debug_show_output(TRUE);
+            ob_debug_enable(OB_DEBUG_SM, TRUE);
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
         } else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;
+/* don't make this do anything if it's not in --help ..
         } else if (!strcmp(argv[i], "--restart")) {
             remote_control = 2;
-        } else if (!strcmp(argv[i], "--config-file")) {
-            if (i == argc - 1) /* no args left */
-                g_printerr(_("--config-file requires an argument\n"));
+*/
+        } else if (!strcmp(argv[i], "--config")) {
+            if (i == *argc - 1) /* no args left */
+                g_printerr(_("--config requires an argument\n"));
             else {
-                config_file = g_strdup(argv[i+1]);
+                config_type = g_strdup(argv[i+1]);
                 ++i;
             }
+        }
+#ifdef USE_SM
+        else if (!strcmp(argv[i], "--sm-save-file")) {
+            if (i == *argc - 1) /* no args left */
+                g_printerr(_("--sm-save-file requires an argument\n"));
+            else {
+                ob_sm_save_file = g_strdup(argv[i+1]);
+                remove_args(argc, argv, i, 2);
+                --i; /* this arg was removed so go back */
+            }
+        } else if (!strcmp(argv[i], "--sm-client-id")) {
+            if (i == *argc - 1) /* no args left */
+                g_printerr(_("--sm-client-id requires an argument\n"));
+            else {
+                ob_sm_id = g_strdup(argv[i+1]);
+                remove_args(argc, argv, i, 2);
+                --i; /* this arg was removed so go back */
+            }
+        } else if (!strcmp(argv[i], "--sm-disable")) {
+            ob_sm_use = FALSE;
+        }
+#endif
+        else {
+            /* this is a memleak.. oh well.. heh */
+            gchar *err = g_strdup_printf
+                ("Invalid command line argument '%s'\n", argv[i]);
+            ob_exit_with_error(err);
         }
     }
 }

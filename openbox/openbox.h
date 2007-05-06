@@ -40,8 +40,11 @@ extern Display *ob_display;
 /*! The number of the screen on which we're running */
 extern gint     ob_screen;
 
-extern gchar   *ob_sm_id;
 extern gboolean ob_sm_use;
+extern gchar   *ob_sm_id;
+/* This save_file will get pass to ourselves if we restart too! So we won't
+ make a new file every time, yay. */
+extern gchar   *ob_sm_save_file;
 extern gboolean ob_replace_wm;
 
 /* The state of execution of the window manager */

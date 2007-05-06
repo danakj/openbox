@@ -421,20 +421,43 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_menu(e);
     } else if (e->type == FocusIn) {
         if (e->xfocus.detail == NotifyPointerRoot ||
-            e->xfocus.detail == NotifyDetailNone)
+            e->xfocus.detail == NotifyDetailNone ||
+            e->xfocus.detail == NotifyInferior)
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to pointer root/none\n");
-            /* Focus has been reverted to the root window or nothing.
-               FocusOut events come after UnmapNotify, so we don't need to
-               worry about focusing an invalid window
-             */
-            if (!focus_left_screen)
-                focus_fallback(TRUE);
-        } else if (e->xfocus.detail == NotifyInferior) {
+            XEvent ce;
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus went to root or our frame window");
-            /* Focus has been given to the root window. */
-            focus_fallback(TRUE);
+                          "Focus went to pointer root/none or to our frame "
+                          "window\n");
+
+            /* If another FocusIn is in the queue then don't fallback yet. This
+               fixes the fun case of:
+               window map -> send focusin
+               window unmap -> get focusout
+               window map -> send focusin
+               get first focus out -> fall back to something (new window
+                 hasn't received focus yet, so something else) -> send focusin
+               which means the "something else" is the last thing to get a
+               focusin sent to it, so the new window doesn't end up with focus.
+            */
+            if (XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
+                XPutBackEvent(ob_display, &ce);
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  but another FocusIn is coming\n");
+            } else {
+                /* Focus has been reverted to the root window, nothing, or to
+                   our frame window.
+
+                   FocusOut events come after UnmapNotify, so we don't need to
+                   worry about focusing an invalid window
+                */
+
+                /* In this case we know focus is in our screen */
+                if (e->xfocus.detail == NotifyInferior)
+                    focus_left_screen = FALSE;
+
+                if (!focus_left_screen)
+                    focus_fallback(TRUE);
+            }
         } else if (client && client != focus_client) {
             focus_left_screen = FALSE;
             frame_adjust_focus(client->frame, TRUE);

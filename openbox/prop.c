@@ -163,7 +163,7 @@ void prop_startup()
 */
 
     CREATE(openbox_pid, "_OPENBOX_PID");
-    CREATE(openbox_rc, "_OPENBOX_RC");
+    CREATE(openbox_config, "_OPENBOX_CONFIG");
     CREATE(openbox_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(openbox_control, "_OB_CONTROL");
 }

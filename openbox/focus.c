@@ -232,24 +232,19 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
             ObClient *c = it->data;
             /* fallback focus to a window if:
                1. it is actually focusable, cuz if it's not then we're sending
-               focus off to nothing
-               2. it is validated. if the window is about to disappear, then
-               don't try focus it.
-               3. it is visible on the current desktop. this ignores
-               omnipresent windows, which are problematic in their own rite.
-               4. it's not iconic
-               5. it is a normal type window, don't fall back onto a dock or
+               focus off to nothing. this includes if it is visible right now
+               2. it is on the current desktop. this ignores omnipresent
+               windows, which are problematic in their own rite.
+               3. it is a normal type window, don't fall back onto a dock or
                a splashscreen or a desktop window (save the desktop as a
                backup fallback though)
             */
-            if (client_can_focus(c) && !c->iconic)
+            if (client_can_focus(c))
             {
                 if (c->desktop == screen_desktop && client_normal(c)) {
                     ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
                     return it->data;
-                } else if ((c->desktop == screen_desktop ||
-                            c->desktop == DESKTOP_ALL) &&
-                           c->type == OB_CLIENT_TYPE_DESKTOP && 
+                } else if (c->type == OB_CLIENT_TYPE_DESKTOP && 
                            desktop == NULL)
                     desktop = c;
             }

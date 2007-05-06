@@ -28,6 +28,7 @@
 #include "config.h"
 #include "screen.h"
 #include "client.h"
+#include "session.h"
 #include "frame.h"
 #include "event.h"
 #include "focus.h"
@@ -284,7 +285,7 @@ gboolean screen_annex()
 
     supported[i++] = prop_atoms.openbox_wm_state_undecorated;
     supported[i++] = prop_atoms.openbox_pid;
-    supported[i++] = prop_atoms.openbox_rc;
+    supported[i++] = prop_atoms.openbox_config;
     supported[i++] = prop_atoms.openbox_control;
     g_assert(i == num_support);
 
@@ -328,7 +329,10 @@ void screen_startup(gboolean reconfig)
             d < screen_num_desktops)
         {
             screen_set_desktop(d);
-        } else
+        } else if (session_desktop >= 0)
+            screen_set_desktop(MIN((guint)session_desktop,
+                                   screen_num_desktops));
+        else
             screen_set_desktop(MIN(config_screen_firstdesk,
                                    screen_num_desktops) - 1);
 

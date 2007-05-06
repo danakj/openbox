@@ -27,14 +27,18 @@ typedef struct _ObSessionState ObSessionState;
 
 struct _ObSessionState {
     gchar *id, *name, *class, *role;
-    guint stacking;
     guint desktop;
     gint x, y, w, h;
     gboolean shaded, iconic, skip_pager, skip_taskbar, fullscreen;
-    gboolean above, below, max_horz, max_vert;
+    gboolean above, below, max_horz, max_vert, undecorated;
+    gboolean focused;
 
     gboolean matched;
 };
+
+/*! The desktop being viewed when the session was saved. A valud of -1 means
+  it was not saved */
+extern gint session_desktop;
 
 extern GList *session_saved_state;
 
@@ -42,7 +46,5 @@ void session_startup(gint argc, gchar **argv);
 void session_shutdown(gboolean permanent);
 
 GList* session_state_find(struct _ObClient *c);
-gboolean session_state_cmp(ObSessionState *s, struct _ObClient *c);
-void session_state_free(ObSessionState *state);
 
 #endif

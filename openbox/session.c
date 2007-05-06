@@ -18,26 +18,24 @@
 
 /* This session code is largely inspired by metacity code. */
 
-#ifndef USE_SM
-
 #include "session.h"
-#include "client.h"
 
-GList *session_saved_state;
+struct _ObClient;
 
+GList *session_saved_state = NULL;
+gint session_desktop = -1;
+
+#ifndef USE_SM
 void session_startup(gint argc, gchar **argv) {}
 void session_shutdown(gboolean permanent) {}
-GList* session_state_find(ObClient *c) { return NULL; }
-gboolean session_state_cmp(ObSessionState *s, ObClient *c) { return FALSE; }
-void session_state_free(ObSessionState *state) {}
-
+GList* session_state_find(struct _ObClient *c) { return NULL; }
 #else
 
 #include "debug.h"
 #include "openbox.h"
-#include "session.h"
 #include "client.h"
 #include "prop.h"
+#include "screen.h"
 #include "gettext.h"
 #include "parser/parse.h"
 
@@ -52,18 +50,24 @@ void session_state_free(ObSessionState *state) {}
 
 #include <X11/SM/SMlib.h>
 
-GList *session_saved_state;
+#define SM_ERR_LEN 1024
 
-static gboolean    sm_disable;
-static SmcConn     sm_conn;
-static gchar      *save_file;
-static gchar      *sm_id;
-static gint        sm_argc;
-static gchar     **sm_argv;
-static gchar      *sm_sessions_path;
+static SmcConn  sm_conn;
+static gint     sm_argc;
+static gchar  **sm_argv;
 
-static void session_load(gchar *path);
-static gboolean session_save();
+static gboolean session_connect();
+
+static void session_load_file(gchar *path);
+static gboolean session_save_to_file();
+
+static void session_setup_program();
+static void session_setup_user();
+static void session_setup_restart_style(gboolean restart);
+static void session_setup_pid();
+static void session_setup_priority();
+static void session_setup_clone_command();
+static void session_setup_restart_command();
 
 static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
                              Bool shutdown, gint interact_style, Bool fast);
@@ -71,223 +75,61 @@ static void sm_die(SmcConn conn, SmPointer data);
 static void sm_save_complete(SmcConn conn, SmPointer data);
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data);
 
-static void save_commands()
-{
-    SmProp *props[2];
-    SmProp prop_cmd = { SmCloneCommand, SmLISTofARRAY8, 1, };
-    SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8 };
-    gint i;
-
-    prop_cmd.vals = g_new(SmPropValue, sm_argc);
-    prop_cmd.num_vals = sm_argc;
-    for (i = 0; i < sm_argc; ++i) {
-        prop_cmd.vals[i].value = sm_argv[i];
-        prop_cmd.vals[i].length = strlen(sm_argv[i]);
-    }
-
-    prop_res.vals = g_new(SmPropValue, sm_argc + 2);
-    prop_res.num_vals = sm_argc + 2;
-    for (i = 0; i < sm_argc; ++i) { 
-        prop_res.vals[i].value = sm_argv[i];
-        prop_res.vals[i].length = strlen(sm_argv[i]);
-    }
-
-    prop_res.vals[i].value = "--sm-save-file";
-    prop_res.vals[i++].length = strlen("--sm-save-file");
-    prop_res.vals[i].value = save_file;
-    prop_res.vals[i++].length = strlen(save_file);
-
-    props[0] = &prop_res;
-    props[1] = &prop_cmd;
-    SmcSetProperties(sm_conn, 2, props);
-
-    g_free(prop_res.vals);
-    g_free(prop_cmd.vals);
-}
-
-static void remove_args(gint *argc, gchar ***argv, gint index, gint num)
-{
-    gint i;
-
-    for (i = index; i < index + num; ++i)
-        (*argv)[i] = (*argv)[i+num];
-    *argc -= num;
-}
-
-static void parse_args(gint *argc, gchar ***argv)
-{
-    gint i;
-
-    for (i = 1; i < *argc; ++i) {
-        if (!strcmp((*argv)[i], "--sm-client-id")) {
-            if (i == *argc - 1) /* no args left */
-                g_printerr(_("--sm-client-id requires an argument\n"));
-            else {
-                sm_id = g_strdup((*argv)[i+1]);
-                remove_args(argc, argv, i, 2);
-                ++i;
-            }
-        } else if (!strcmp((*argv)[i], "--sm-save-file")) {
-            if (i == *argc - 1) /* no args left */
-                g_printerr(_("--sm-save-file requires an argument\n"));
-            else {
-                save_file = g_strdup((*argv)[i+1]);
-                remove_args(argc, argv, i, 2);
-                ++i;
-            }
-        } else if (!strcmp((*argv)[i], "--sm-disable")) {
-            sm_disable = TRUE;
-            remove_args(argc, argv, i, 1);
-        }
-    }
-}
+static gboolean session_state_cmp(ObSessionState *s, ObClient *c);
+static void session_state_free(ObSessionState *state);
 
 void session_startup(gint argc, gchar **argv)
 {
-#define SM_ERR_LEN 1024
+    gchar *dir;
 
-    SmcCallbacks cb;
-    gchar sm_err[SM_ERR_LEN];
-    gint i;
+    if (!ob_sm_use) return;
 
     sm_argc = argc;
-    sm_argv = g_new(gchar*, argc);
-    for (i = 0; i < argc; ++i)
-        sm_argv[i] = argv[i];
+    sm_argv = argv;
 
-    parse_args(&sm_argc, &sm_argv);
-
-    if (sm_disable) {
-        g_free(sm_argv);
-        return;
-    }
-
-    sm_sessions_path = g_build_filename(parse_xdg_data_home_path(),
-                                        "openbox", "sessions", NULL);
-    if (!parse_mkdir_path(sm_sessions_path, 0700)) {
+    dir = g_build_filename(parse_xdg_data_home_path(),
+                           "openbox", "sessions", NULL);
+    if (!parse_mkdir_path(dir, 0700)) {
         g_message(_("Unable to make directory '%s': %s"),
-                  sm_sessions_path, g_strerror(errno));
+                  dir, g_strerror(errno));
     }
 
-    if (save_file)
-        session_load(save_file);
-    else {
+    if (ob_sm_save_file != NULL) {
+        ob_debug_type(OB_DEBUG_SM, "Loading from session file %s\n",
+                      ob_sm_save_file);
+        session_load_file(ob_sm_save_file);
+    } else {
         gchar *filename;
 
         /* this algo is from metacity */
-        filename = g_strdup_printf("%d-%d-%u.obs",
-                                   (gint) time(NULL),
-                                   (gint) getpid(),
+        filename = g_strdup_printf("%u-%u-%u.obs",
+                                   (guint)time(NULL),
+                                   (guint)getpid(),
                                    g_random_int());
-        save_file = g_build_filename(sm_sessions_path, filename, NULL);
+        ob_sm_save_file = g_build_filename(dir, filename, NULL);
         g_free(filename);
     }
 
-    cb.save_yourself.callback = sm_save_yourself;
-    cb.save_yourself.client_data = NULL;
-
-    cb.die.callback = sm_die;
-    cb.die.client_data = NULL;
-
-    cb.save_complete.callback = sm_save_complete;
-    cb.save_complete.client_data = NULL;
-
-    cb.shutdown_cancelled.callback = sm_shutdown_cancelled;
-    cb.shutdown_cancelled.client_data = NULL;
-
-    sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
-                                SmcSaveYourselfProcMask |
-                                SmcDieProcMask |
-                                SmcSaveCompleteProcMask |
-                                SmcShutdownCancelledProcMask,
-                                &cb, sm_id, &sm_id,
-                                SM_ERR_LEN, sm_err);
-    if (sm_conn == NULL)
-        ob_debug("Failed to connect to session manager: %s\n", sm_err);
-    else {
-        SmPropValue val_prog;
-        SmPropValue val_uid;
-        SmPropValue val_hint; 
-        SmPropValue val_pri;
-        SmPropValue val_pid;
-        SmProp prop_prog = { SmProgram, SmARRAY8, 1, };
-        SmProp prop_uid = { SmUserID, SmARRAY8, 1, };
-        SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
-        SmProp prop_pid = { SmProcessID, SmARRAY8, 1, };
-        SmProp prop_pri = { "_GSM_Priority", SmCARD8, 1, };
-        SmProp *props[6];
-        gchar hint, pri;
-        gchar pid[32];
-
-        val_prog.value = sm_argv[0];
-        val_prog.length = strlen(sm_argv[0]);
-
-        val_uid.value = g_strdup(g_get_user_name());
-        val_uid.length = strlen(val_uid.value);
-
-        hint = SmRestartImmediately;
-        val_hint.value = &hint;
-        val_hint.length = 1;
-
-        g_snprintf(pid, sizeof(pid), "%ld", (glong) getpid());
-        val_pid.value = pid;
-        val_pid.length = strlen(pid);
-
-        /* priority with gnome-session-manager, low to run before other apps */
-        pri = 20;
-        val_pri.value = &pri;
-        val_pri.length = 1;
-
-        prop_prog.vals = &val_prog;
-        prop_uid.vals = &val_uid;
-        prop_hint.vals = &val_hint;
-        prop_pid.vals = &val_pid;
-        prop_pri.vals = &val_pri;
-
-        props[0] = &prop_prog;
-        props[1] = &prop_uid;
-        props[2] = &prop_hint;
-        props[3] = &prop_pid;
-        props[4] = &prop_pri;
-
-        SmcSetProperties(sm_conn, 5, props);
-
-        g_free(val_uid.value);
-
-        save_commands();
+    if (session_connect()) {
+        session_setup_program();
+        session_setup_user();
+        session_setup_restart_style(TRUE);
+        session_setup_pid();
+        session_setup_priority();
+        session_setup_clone_command();
     }
+
+    g_free(dir);
 }
 
 void session_shutdown(gboolean permanent)
 {
-    if (sm_disable)
-        return;
-
-    g_free(sm_sessions_path);
-    g_free(save_file);
-    g_free(sm_id);
-    g_free(sm_argv);
+    if (!ob_sm_use) return;
 
     if (sm_conn) {
         /* if permanent is true then we will change our session state so that
            the SM won't run us again */
-        if (permanent) {
-            SmPropValue val_hint;
-            SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
-            SmProp *props[1];
-            gulong hint;
-
-            /* when we exit, we want to reset this to a more friendly state */
-            hint = SmRestartIfRunning;
-            val_hint.value = &hint;
-            val_hint.length = 1;
-
-            prop_hint.vals = &val_hint;
-
-            props[0] = &prop_hint;
-
-            SmcSetProperties(sm_conn, 1, props);
-        }
+        session_setup_restart_style(!permanent);
 
         SmcCloseConnection(sm_conn, 0, NULL);
 
@@ -299,55 +141,263 @@ void session_shutdown(gboolean permanent)
     }
 }
 
-static void sm_save_yourself_phase2(SmcConn conn, SmPointer data)
+/*! Connect to the session manager and set up our callback functions */
+static gboolean session_connect()
+{
+    SmcCallbacks cb;
+    gchar *oldid;
+    gchar sm_err[SM_ERR_LEN];
+
+    /* set up our callback functions */
+    cb.save_yourself.callback = sm_save_yourself;
+    cb.save_yourself.client_data = NULL;
+    cb.die.callback = sm_die;
+    cb.die.client_data = NULL;
+    cb.save_complete.callback = sm_save_complete;
+    cb.save_complete.client_data = NULL;
+    cb.shutdown_cancelled.callback = sm_shutdown_cancelled;
+    cb.shutdown_cancelled.client_data = NULL;
+
+    /* connect to the server */
+    oldid = ob_sm_id;
+    ob_debug_type(OB_DEBUG_SM, "Connecting to SM with id: %s\n",
+                  oldid ? oldid : "(null)");
+    sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
+                                SmcSaveYourselfProcMask |
+                                SmcDieProcMask |
+                                SmcSaveCompleteProcMask |
+                                SmcShutdownCancelledProcMask,
+                                &cb, oldid, &ob_sm_id,
+                                SM_ERR_LEN, sm_err);
+    g_free(oldid);
+    if (sm_conn == NULL)
+        ob_debug("Failed to connect to session manager: %s\n", sm_err);
+    return sm_conn != NULL;
+}
+
+static void session_setup_program()
+{
+    SmPropValue vals = {
+        .value = sm_argv[0],
+        .length = strlen(sm_argv[0]) + 1
+    };
+    SmProp prop = {
+        .name = g_strdup(SmProgram),
+        .type = g_strdup(SmARRAY8),
+        .num_vals = 1,
+        .vals = &vals
+    };
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+}
+
+static void session_setup_user()
+{
+    char *user = g_strdup(g_get_user_name());
+
+    SmPropValue vals = {
+        .value = user,
+        .length = strlen(user) + 1
+    };
+    SmProp prop = {
+        .name = g_strdup(SmUserID),
+        .type = g_strdup(SmARRAY8),
+        .num_vals = 1,
+        .vals = &vals
+    };
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+    g_free(user);
+}
+
+static void session_setup_restart_style(gboolean restart)
+{
+    char restart_hint = restart ? SmRestartImmediately : SmRestartIfRunning;
+
+    SmPropValue vals = {
+        .value = &restart_hint,
+        .length = 1
+    };
+    SmProp prop = {
+        .name = g_strdup(SmRestartStyleHint),
+        .type = g_strdup(SmCARD8),
+        .num_vals = 1,
+        .vals = &vals
+    };
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+}
+
+static void session_setup_pid()
+{
+    gchar *pid = g_strdup_printf("%ld", (glong) getpid());
+
+    SmPropValue vals = {
+        .value = pid,
+        .length = strlen(pid) + 1
+    };
+    SmProp prop = {
+        .name = g_strdup(SmProcessID),
+        .type = g_strdup(SmARRAY8),
+        .num_vals = 1,
+        .vals = &vals
+    };
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+    g_free(pid);
+}
+
+/*! This is a gnome-session-manager extension */
+static void session_setup_priority()
+{
+    gchar priority = 20; /* 20 is a lower prioity to run before other apps */
+
+    SmPropValue vals = {
+        .value = &priority,
+        .length = 1
+    };
+    SmProp prop = {
+        .name = g_strdup("_GSM_Priority"),
+        .type = g_strdup(SmCARD8),
+        .num_vals = 1,
+        .vals = &vals
+    };
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+}
+
+static void session_setup_clone_command()
+{
+    gint i;
+
+    SmPropValue *vals = g_new(SmPropValue, sm_argc);
+    SmProp prop = {
+        .name = g_strdup(SmCloneCommand),
+        .type = g_strdup(SmLISTofARRAY8),
+        .num_vals = sm_argc,
+        .vals = vals
+    };
+
+    for (i = 0; i < sm_argc; ++i) {
+        vals[i].value = sm_argv[i];
+        vals[i].length = strlen(sm_argv[i]) + 1;
+    }
+
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+    g_free(vals);
+}
+
+static void session_setup_restart_command()
+{
+    gint i;
+
+    SmPropValue *vals = g_new(SmPropValue, sm_argc + 4);
+    SmProp prop = {
+        .name = g_strdup(SmRestartCommand),
+        .type = g_strdup(SmLISTofARRAY8),
+        .num_vals = sm_argc + 4,
+        .vals = vals
+    };
+
+    for (i = 0; i < sm_argc; ++i) {
+        vals[i].value = sm_argv[i];
+        vals[i].length = strlen(sm_argv[i]) + 1;
+    }
+
+    vals[i].value = g_strdup("--sm-save-file");
+    vals[i].length = strlen("--sm-save-file") + 1;
+    vals[i+1].value = ob_sm_save_file;
+    vals[i+1].length = strlen(ob_sm_save_file) + 1;
+
+    vals[i+2].value = g_strdup("--sm-client-id");
+    vals[i+2].length = strlen("--sm-client-id") + 1;
+    vals[i+3].value = ob_sm_id;
+    vals[i+3].length = strlen(ob_sm_id) + 1;
+
+    SmProp *list = &prop;
+    SmcSetProperties(sm_conn, 1, &list);
+    g_free(prop.name);
+    g_free(prop.type);
+    g_free(vals[i].value);
+    g_free(vals[i+2].value);
+    g_free(vals);
+}
+
+static void sm_save_yourself_2(SmcConn conn, SmPointer data)
 {
     gboolean success;
 
-    success = session_save();
-    save_commands();
+    /* save the current state */
+    ob_debug_type(OB_DEBUG_SM, "Session save phase 2 requested\n");
+    ob_debug_type(OB_DEBUG_SM,
+                  "  Saving session to file '%s'\n", ob_sm_save_file);
+    success = session_save_to_file();
 
+    /* tell the session manager how to restore this state */
+    if (success) session_setup_restart_command();
+
+    ob_debug_type(OB_DEBUG_SM, "Saving is done (success = %d)\n", success);
     SmcSaveYourselfDone(conn, success);
 }
+
 
 static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
                              Bool shutdown, gint interact_style, Bool fast)
 {
-    if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_phase2, data)) {
-        ob_debug("SAVE YOURSELF PHASE 2 failed\n");
+    ob_debug_type(OB_DEBUG_SM, "Session save requested\n");
+    if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, data)) {
+        ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed\n");
         SmcSaveYourselfDone(conn, FALSE);
     }
 }
 
 static void sm_die(SmcConn conn, SmPointer data)
 {
+    ob_debug_type(OB_DEBUG_SM, "Die requested\n");
     ob_exit(0);
 }
 
 static void sm_save_complete(SmcConn conn, SmPointer data)
 {
+    ob_debug_type(OB_DEBUG_SM, "Save complete\n");
 }
 
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 {
+    ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled\n");    
 }
 
-static gboolean session_save()
+static gboolean session_save_to_file()
 {
     FILE *f;
     GList *it;
     gboolean success = TRUE;
 
-    f = fopen(save_file, "w");
+    f = fopen(ob_sm_save_file, "w");
     if (!f) {
         success = FALSE;
         g_message(_("Unable to save the session to '%s': %s"),
-                  save_file, g_strerror(errno));
+                  ob_sm_save_file, g_strerror(errno));
     } else {
-        guint stack_pos = 0;
-
         fprintf(f, "<?xml version=\"1.0\"?>\n\n");
-        fprintf(f, "<openbox_session id=\"%s\">\n\n", sm_id);
+        fprintf(f, "<openbox_session>\n\n");
 
+        fprintf(f, "<desktop>%d</desktop>\n", screen_desktop);
+
+        /* they are ordered top to bottom in stacking order */
         for (it = stacking_list; it; it = g_list_next(it)) {
             gint prex, prey, prew, preh;
             ObClient *c;
@@ -361,8 +411,15 @@ static gboolean session_save()
             if (!client_normal(c))
                 continue;
 
-            if (!c->sm_client_id)
+            if (!c->sm_client_id) {
+                ob_debug_type(OB_DEBUG_SM, "Client %s does not have a client "
+                              "id set, so we can't save its state\n",
+                              c->title);
                 continue;
+            }
+
+            ob_debug_type(OB_DEBUG_SM, "Saving state for client %s\n",
+                          c->title);
 
             prex = c->area.x;
             prey = c->area.y;
@@ -398,7 +455,6 @@ static gboolean session_save()
             g_free(t);
 
             fprintf(f, "\t<desktop>%d</desktop>\n", c->desktop);
-            fprintf(f, "\t<stacking>%d</stacking>\n", stack_pos);
             fprintf(f, "\t<x>%d</x>\n", prex);
             fprintf(f, "\t<y>%d</y>\n", prey);
             fprintf(f, "\t<width>%d</width>\n", prew);
@@ -421,9 +477,11 @@ static gboolean session_save()
                 fprintf(f, "\t<max_horz />\n");
             if (c->max_vert)
                 fprintf(f, "\t<max_vert />\n");
+            if (c->undecorated)
+                fprintf(f, "\t<undecorated />\n");
+            if (client_focused(c))
+                fprintf(f, "\t<focused />\n");
             fprintf(f, "</window>\n\n");
-
-            ++stack_pos;
         }
 
         fprintf(f, "</openbox_session>\n");
@@ -431,7 +489,7 @@ static gboolean session_save()
         if (fflush(f)) {
             success = FALSE;
             g_message(_("Error while saving the session to '%s': %s"),
-                      save_file, g_strerror(errno));
+                      ob_sm_save_file, g_strerror(errno));
         }
         fclose(f);
     }
@@ -439,7 +497,7 @@ static gboolean session_save()
     return success;
 }
 
-void session_state_free(ObSessionState *state)
+static void session_state_free(ObSessionState *state)
 {
     if (state) {
         g_free(state->id);
@@ -451,8 +509,17 @@ void session_state_free(ObSessionState *state)
     }
 }
 
-gboolean session_state_cmp(ObSessionState *s, ObClient *c)
+static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
 {
+    ob_debug_type(OB_DEBUG_SM, "Comparing client against saved state: \n");
+    ob_debug_type(OB_DEBUG_SM, "  client id: %s \n", c->sm_client_id);
+    ob_debug_type(OB_DEBUG_SM, "  client name: %s \n", c->name);
+    ob_debug_type(OB_DEBUG_SM, "  client class: %s \n", c->class);
+    ob_debug_type(OB_DEBUG_SM, "  client role: %s \n", c->role);
+    ob_debug_type(OB_DEBUG_SM, "  state id: %s \n", s->id);
+    ob_debug_type(OB_DEBUG_SM, "  state name: %s \n", s->name);
+    ob_debug_type(OB_DEBUG_SM, "  state class: %s \n", s->class);
+    ob_debug_type(OB_DEBUG_SM, "  state role: %s \n", s->role);
     return (c->sm_client_id &&
             !strcmp(s->id, c->sm_client_id) &&
             !strcmp(s->name, c->name) &&
@@ -474,27 +541,20 @@ GList* session_state_find(ObClient *c)
     return it;
 }
 
-static gint stack_sort(const ObSessionState *s1, const ObSessionState *s2)
-{
-    return s1->stacking - s2->stacking;
-}
-
-static void session_load(gchar *path)
+static void session_load_file(gchar *path)
 {
     xmlDocPtr doc;
     xmlNodePtr node, n;
-    gchar *id;
 
     if (!parse_load(path, "openbox_session", &doc, &node))
         return;
 
-    if (!parse_attr_string("id", node, &id))
-        return;
-    g_free(sm_id);
-    sm_id = id;
+    if ((n = parse_find_node("desktop", node->children)))
+        session_desktop = parse_int(doc, n);
 
-    node = parse_find_node("window", node->children);
-    while (node) {
+    for (node = parse_find_node("window", node->children); node != NULL;
+         node = parse_find_node("window", node->next))
+    {
         ObSessionState *state;
 
         state = g_new0(ObSessionState, 1);
@@ -510,9 +570,6 @@ static void session_load(gchar *path)
         if (!(n = parse_find_node("role", node->children)))
             goto session_load_bail;
         state->role = parse_string(doc, n);
-        if (!(n = parse_find_node("stacking", node->children)))
-            goto session_load_bail;
-        state->stacking = parse_int(doc, n);
         if (!(n = parse_find_node("desktop", node->children)))
             goto session_load_bail;
         state->desktop = parse_int(doc, n);
@@ -547,22 +604,19 @@ static void session_load(gchar *path)
             parse_find_node("max_horz", node->children) != NULL;
         state->max_vert =
             parse_find_node("max_vert", node->children) != NULL;
+        state->undecorated =
+            parse_find_node("undecorated", node->children) != NULL;
+        state->focused =
+            parse_find_node("focused", node->children) != NULL;
         
-        /* save this */
-        session_saved_state = g_list_prepend(session_saved_state, state);
-        goto session_load_ok;
+        /* save this. they are in the file in stacking order, so preserve
+           that order here */
+        session_saved_state = g_list_append(session_saved_state, state);
+        continue;
 
     session_load_bail:
         session_state_free(state);
-
-    session_load_ok:
-
-        node = parse_find_node("window", node->next);
     }
-
-    /* sort them by their stacking order */
-    session_saved_state = g_list_sort(session_saved_state,
-                                      (GCompareFunc)stack_sort);
 
     xmlFreeDoc(doc);
 }

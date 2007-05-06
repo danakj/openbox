@@ -64,6 +64,9 @@ void ob_debug_type(ObDebugType type, const gchar *a, ...)
         case OB_DEBUG_APP_BUGS:
             fprintf(stderr, "APPLICATION BUG: ");
             break;
+        case OB_DEBUG_SM:
+            fprintf(stderr, "SESSION: ");
+            break;
         default:
             g_assert_not_reached();
         }

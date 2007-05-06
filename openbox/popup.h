@@ -47,6 +47,7 @@ struct _ObPopup
     gint y;
     gint w;
     gint h;
+    gint maxw;
     gboolean mapped;
     gboolean delay_mapped;
  
@@ -88,7 +89,7 @@ void popup_width(ObPopup *self, gint w);
 void popup_height(ObPopup *self, gint w);
 void popup_width_to_string(ObPopup *self, gchar *text, gint max);
 void popup_height_to_string(ObPopup *self, gchar *text);
-void popup_width_to_strings(ObPopup *self, gchar **strings, gint max);
+void popup_width_to_strings(ObPopup *self, gchar **strings, gint num,gint max);
 
 void popup_set_text_align(ObPopup *self, RrJustify align);
 
@@ -109,10 +110,10 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
 #define icon_popup_width(p, w) popup_width((p)->popup,(w))
 #define icon_popup_height(p, h) popup_height((p)->popup,(h))
-#define icon_popup_width_to_string(p, s, m) \
-    popup_width_to_string((p)->popup,(s),(m))
-#define icon_popup_width_to_strings(p, s, m) \
-    popup_width_to_strings((p)->popup,(s),(m))
+#define icon_popup_width_to_string(p, s, n, m) \
+    popup_width_to_string((p)->popup,(s),(n),(m))
+#define icon_popup_width_to_strings(p, s, n, m) \
+    popup_width_to_strings((p)->popup,(s),(n),(m))
 #define icon_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 
 ObPagerPopup *pager_popup_new();
@@ -125,10 +126,10 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
 #define pager_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
 #define pager_popup_width(p, w) popup_width((p)->popup,(w))
 #define pager_popup_height(p, h) popup_height((p)->popup,(h))
-#define pager_popup_width_to_string(p, s, m) \
-    popup_width_to_string((p)->popup,(s),(m))
-#define pager_popup_width_to_strings(p, s, m) \
-    popup_width_to_strings((p)->popup,(s),(m))
+#define pager_popup_width_to_string(p, s, n, m) \
+    popup_width_to_string((p)->popup,(s),(n),(m))
+#define pager_popup_width_to_strings(p, s, n, m) \
+    popup_width_to_strings((p)->popup,(s),(n),(m))
 #define pager_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 
 #endif

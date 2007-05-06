@@ -170,7 +170,8 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     w = l+r + textw + iconw + ob_rr_theme->paddingx *
         (self->hasicon ? 3 : 2);
     /* cap it at "maxw" */
-    w = MIN(w, self->maxw);
+    if (self->maxw)
+        w = MIN(w, self->maxw);
 
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;

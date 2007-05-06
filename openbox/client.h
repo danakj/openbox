@@ -295,32 +295,6 @@ struct _ObClient
     guint32 user_time;
 };
 
-struct _ObAppSettings
-{
-    gchar *class;
-    gchar *name;
-    gchar *role;
-
-    Point position;
-    gboolean center_x;
-    gboolean center_y;
-    gboolean pos_given;
-
-    guint desktop;
-    gint shade;
-    gint decor;
-    gint focus;
-    gint head;
-    gint iconic;
-    gint skip_pager;
-    gint skip_taskbar;
-    gint max_horz;
-    gint max_vert;
-    gint fullscreen;
-
-    gint layer;
-};
-
 extern GList *client_list;
 
 void client_startup(gboolean reconfig);

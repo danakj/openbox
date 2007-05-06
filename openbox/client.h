@@ -118,6 +118,8 @@ struct _ObClient
     gchar *icon_title;
     /*! Hostname of machine running the client */
     gchar *client_machine;
+    /*! The command used to run the program. Pre-XSMP window identification. */
+    gchar *wm_command;
 
     /*! The application that created the window */
     gchar *name;
@@ -582,6 +584,8 @@ void client_update_normal_hints(ObClient *self);
 void client_update_wmhints(ObClient *self);
 /*! Updates the window's title and icon title */
 void client_update_title(ObClient *self);
+/*! Updates the command used to run the program */
+void client_update_command(ObClient *self);
 /*! Updates the window's application name and class */
 void client_update_class(ObClient *self);
 /*! Updates the strut for the client */

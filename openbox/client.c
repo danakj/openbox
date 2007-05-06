@@ -612,6 +612,7 @@ void client_unmanage(ObClient *self)
         g_free(self->icons[j].data);
     if (self->nicons > 0)
         g_free(self->icons);
+    g_free(self->wm_command);
     g_free(self->title);
     g_free(self->icon_title);
     g_free(self->name);
@@ -994,6 +995,7 @@ static void client_get_all(ObClient *self)
     client_update_title(self);
     client_update_class(self);
     client_update_sm_client_id(self);
+    client_update_command(self);
     client_update_strut(self);
     client_update_icons(self);
     client_update_user_time(self);
@@ -3579,20 +3581,36 @@ void client_update_sm_client_id(ObClient *self)
     g_free(self->sm_client_id);
     self->sm_client_id = NULL;
 
-    if (!PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id) &&
-        self->group) {
-        ob_debug_type(OB_DEBUG_SM, "Client %s does not have session id\n",
-                      self->title);
-        if (!PROP_GETS(self->group->leader, sm_client_id, locale,
-                       &self->sm_client_id)) {
-            ob_debug_type(OB_DEBUG_SM, "Client %s does not have session id on "
-                          "group window\n", self->title);
-        } else
-            ob_debug_type(OB_DEBUG_SM, "Client %s has session id on "
-                          "group window\n", self->title);
-    } else
-        ob_debug_type(OB_DEBUG_SM, "Client %s has session id\n",
-                      self->title);
+    if (!PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id))
+        if (self->group)
+            PROP_GETS(self->group->leader, sm_client_id, locale,
+                      &self->sm_client_id);
+}
+
+void client_update_command(ObClient *self)
+{
+    gchar **data;
+
+    g_free(self->wm_command);
+    self->wm_command = NULL;
+
+    if (PROP_GETSS(self->window, wm_command, locale, &data)) {
+        /* merge/mash them all together */
+        gchar *merge = NULL;
+        gint i;
+
+        for (i = 0; data[i]; ++i) {
+            gchar *tmp = merge;
+            if (merge)
+                merge = g_strconcat(merge, data[i], NULL);
+            else
+                merge = g_strconcat(data[i], NULL);
+            g_free(tmp);
+        }
+        g_strfreev(data);
+
+        self->wm_command = merge;
+    }
 }
 
 #define WANT_EDGE(cur, c) \

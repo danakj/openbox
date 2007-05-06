@@ -26,7 +26,7 @@ struct _ObClient;
 typedef struct _ObSessionState ObSessionState;
 
 struct _ObSessionState {
-    gchar *id, *name, *class, *role;
+    gchar *id, *command, *name, *class, *role;
     guint desktop;
     gint x, y, w, h;
     gboolean shaded, iconic, skip_pager, skip_taskbar, fullscreen;

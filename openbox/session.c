@@ -35,6 +35,7 @@ GList* session_state_find(struct _ObClient *c) { return NULL; }
 #include "openbox.h"
 #include "client.h"
 #include "prop.h"
+#include "focus.h"
 #include "screen.h"
 #include "gettext.h"
 #include "parser/parse.h"
@@ -56,10 +57,16 @@ static SmcConn  sm_conn;
 static gint     sm_argc;
 static gchar  **sm_argv;
 
+/* Data saved from the first level save yourself */
+typedef struct {
+    ObClient *focus_client;
+    gint      desktop;
+} ObSMSaveData;
+
 static gboolean session_connect();
 
-static void session_load_file(gchar *path);
-static gboolean session_save_to_file();
+static void session_load_file(const gchar *path);
+static gboolean session_save_to_file(const ObSMSaveData *savedata);
 
 static void session_setup_program();
 static void session_setup_user();
@@ -336,15 +343,27 @@ static void session_setup_restart_command()
     g_free(vals);
 }
 
+static ObSMSaveData *sm_save_get_data()
+{
+    ObSMSaveData *savedata = g_new0(ObSMSaveData, 1);
+    savedata->focus_client = focus_client;
+    savedata->desktop = screen_desktop;
+    return savedata;
+}
+
 static void sm_save_yourself_2(SmcConn conn, SmPointer data)
 {
     gboolean success;
+    ObSMSaveData *savedata = data;
 
     /* save the current state */
     ob_debug_type(OB_DEBUG_SM, "Session save phase 2 requested\n");
     ob_debug_type(OB_DEBUG_SM,
                   "  Saving session to file '%s'\n", ob_sm_save_file);
-    success = session_save_to_file();
+    if (savedata == NULL)
+        savedata = sm_save_get_data();
+    success = session_save_to_file(savedata);
+    g_free(savedata);
 
     /* tell the session manager how to restore this state */
     if (success) session_setup_restart_command();
@@ -357,9 +376,22 @@ static void sm_save_yourself_2(SmcConn conn, SmPointer data)
 static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
                              Bool shutdown, gint interact_style, Bool fast)
 {
+    ObSMSaveData *savedata = NULL;
+    gchar *vendor;
+
     ob_debug_type(OB_DEBUG_SM, "Session save requested\n");
 
-    if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, data)) {
+    vendor = SmcVendor(sm_conn);
+    ob_debug_type(OB_DEBUG_SM, "Session manager's vendor: %s\n", vendor);
+
+    if (!strcmp(vendor, "KDE")) {
+        /* ksmserver guarantees that phase 1 will complete before allowing any
+           clients interaction, so we can save this sanely here before they
+           get messed up from interaction */
+        savedata = sm_save_get_data();
+    }
+
+    if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, savedata)) {
         ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed\n");
         SmcSaveYourselfDone(conn, FALSE);
     }
@@ -381,7 +413,7 @@ static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
     ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled\n");    
 }
 
-static gboolean session_save_to_file()
+static gboolean session_save_to_file(const ObSMSaveData *savedata)
 {
     FILE *f;
     GList *it;
@@ -396,7 +428,7 @@ static gboolean session_save_to_file()
         fprintf(f, "<?xml version=\"1.0\"?>\n\n");
         fprintf(f, "<openbox_session>\n\n");
 
-        fprintf(f, "<desktop>%d</desktop>\n", screen_desktop);
+        fprintf(f, "<desktop>%d</desktop>\n", savedata->desktop);
 
         /* they are ordered top to bottom in stacking order */
         for (it = stacking_list; it; it = g_list_next(it)) {
@@ -413,10 +445,16 @@ static gboolean session_save_to_file()
                 continue;
 
             if (!c->sm_client_id) {
-                ob_debug_type(OB_DEBUG_SM, "Client %s does not have a client "
-                              "id set, so we can't save its state\n",
+                ob_debug_type(OB_DEBUG_SM, "Client %s does not have a "
+                              "session id set\n",
                               c->title);
-                continue;
+                if (!c->wm_command) {
+                    ob_debug_type(OB_DEBUG_SM, "Client %s does not have an "
+                                  "oldskool wm_command set either. We won't "
+                                  "be saving its data\n",
+                                  c->title);
+                    continue;
+                }
             }
 
             ob_debug_type(OB_DEBUG_SM, "Saving state for client %s\n",
@@ -441,7 +479,10 @@ static gboolean session_save_to_file()
                 preh = c->pre_max_area.height;
             }
 
-            fprintf(f, "<window id=\"%s\">\n", c->sm_client_id);
+            if (c->sm_client_id)
+                fprintf(f, "<window id=\"%s\">\n", c->sm_client_id);
+            else
+                fprintf(f, "<window command=\"%s\">\n", c->wm_command);
 
             t = g_markup_escape_text(c->name, -1);
             fprintf(f, "\t<name>%s</name>\n", t);
@@ -480,7 +521,7 @@ static gboolean session_save_to_file()
                 fprintf(f, "\t<max_vert />\n");
             if (c->undecorated)
                 fprintf(f, "\t<undecorated />\n");
-            if (client_focused(c))
+            if (savedata->focus_client == c)
                 fprintf(f, "\t<focused />\n");
             fprintf(f, "</window>\n\n");
         }
@@ -502,6 +543,7 @@ static void session_state_free(ObSessionState *state)
 {
     if (state) {
         g_free(state->id);
+        g_free(state->command);
         g_free(state->name);
         g_free(state->class);
         g_free(state->role);
@@ -517,15 +559,23 @@ static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
     ob_debug_type(OB_DEBUG_SM, "  client name: %s \n", c->name);
     ob_debug_type(OB_DEBUG_SM, "  client class: %s \n", c->class);
     ob_debug_type(OB_DEBUG_SM, "  client role: %s \n", c->role);
+    ob_debug_type(OB_DEBUG_SM, "  client command: %s \n",
+                  c->wm_command ? c->wm_command : "(null)");
     ob_debug_type(OB_DEBUG_SM, "  state id: %s \n", s->id);
     ob_debug_type(OB_DEBUG_SM, "  state name: %s \n", s->name);
     ob_debug_type(OB_DEBUG_SM, "  state class: %s \n", s->class);
     ob_debug_type(OB_DEBUG_SM, "  state role: %s \n", s->role);
-    return (c->sm_client_id &&
-            !strcmp(s->id, c->sm_client_id) &&
-            !strcmp(s->name, c->name) &&
-            !strcmp(s->class, c->class) &&
-            !strcmp(s->role, c->role));
+    ob_debug_type(OB_DEBUG_SM, "  state command: %s \n",
+                  s->command ? s->command : "(null)");
+
+    if ((c->sm_client_id && s->id && !strcmp(c->sm_client_id, s->id)) ||
+        (c->wm_command && s->command && !strcmp(c->wm_command, s->command)))
+    {
+        return (!strcmp(s->name, c->name) &&
+                !strcmp(s->class, c->class) &&
+                !strcmp(s->role, c->role));
+    }
+    return FALSE;
 }
 
 GList* session_state_find(ObClient *c)
@@ -542,7 +592,7 @@ GList* session_state_find(ObClient *c)
     return it;
 }
 
-static void session_load_file(gchar *path)
+static void session_load_file(const gchar *path)
 {
     xmlDocPtr doc;
     xmlNodePtr node, n;
@@ -561,6 +611,7 @@ static void session_load_file(gchar *path)
         state = g_new0(ObSessionState, 1);
 
         if (!parse_attr_string("id", node, &state->id))
+            if (!parse_attr_string("command", node, &state->command))
             goto session_load_bail;
         if (!(n = parse_find_node("name", node->children)))
             goto session_load_bail;

@@ -51,6 +51,7 @@ typedef struct Atoms {
     Atom wm_class;
     Atom wm_window_role;
     Atom wm_client_machine;
+    Atom wm_command;
     Atom motif_wm_hints;
 
     /* SM atoms */

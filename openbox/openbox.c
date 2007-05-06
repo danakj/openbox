@@ -109,7 +109,7 @@ gint main(gint argc, gchar **argv)
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
-        g_message(_("Couldn't set locale from environment."));
+        g_message("Couldn't set locale from environment.");
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);

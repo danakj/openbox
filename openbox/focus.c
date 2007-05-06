@@ -295,8 +295,10 @@ static void popup_cycle(ObClient *c, gboolean show)
         icon_popup_hide(focus_cycle_popup);
     } else {
         Rect *a;
-        ObClient *p = c;
+        ObClient *p;
+        gchar *text;
         gchar *title = NULL;
+        const gchar *desk = NULL;
 
         a = screen_physical_area_monitor(0);
         icon_popup_position(focus_cycle_popup, CenterGravity,
@@ -305,20 +307,27 @@ static void popup_cycle(ObClient *c, gboolean show)
         icon_popup_height(focus_cycle_popup, POPUP_HEIGHT);
 
         /* use the transient's parent's title/icon */
-        while (p->transient_for && p->transient_for != OB_TRAN_GROUP)
-            p = p->transient_for;
+        p = client_search_top_parent(c);
+
+        if (c->desktop != DESKTOP_ALL && c->desktop != screen_desktop)
+            desk = screen_desktop_names[c->desktop];
 
         if (p != c && !strcmp("", (c->iconic ? c->icon_title : c->title)))
             title = g_strdup(p->iconic ? p->icon_title : p->title);
-            /*title = g_strconcat((c->iconic ? c->icon_title : c->title),
+            /*ptitle = g_strconcat((c->iconic ? c->icon_title : c->title),
                                 " - ",
                                 (p->iconic ? p->icon_title : p->title),
                                 NULL);
             */
-        icon_popup_show(focus_cycle_popup,
-                        (title ? title :
-                         (c->iconic ? c->icon_title : c->title)),
-                        client_icon(p, 48, 48));
+        if (title == NULL)
+            title = g_strdup(c->iconic ? c->icon_title : c->title);
+        if (desk)
+            text = g_strdup_printf("%s [%s]", title, desk);
+        else
+            text = g_strdup(title);
+
+        icon_popup_show(focus_cycle_popup, text, client_icon(p, 48, 48));
+        g_free(text);
         g_free(title);
     }
 }

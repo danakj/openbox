@@ -37,6 +37,8 @@
 #include <glib.h>
 #include <assert.h>
 
+#define FOCUS_INDICATOR_WIDTH 5
+
 ObClient *focus_client = NULL;
 GList *focus_order = NULL;
 ObClient *focus_cycle_target = NULL;
@@ -340,10 +342,7 @@ void focus_cycle_draw_indicator()
         gint x, y, w, h;
         gint wt, wl, wr, wb;
 
-        wt = wl = wr = wb = MAX(3,
-                                MAX(1, MAX(ob_rr_theme->paddingx,
-                                           ob_rr_theme->paddingy)) * 2 +
-                                ob_rr_theme->fbwidth * 2);
+        wt = wl = wr = wb = FOCUS_INDICATOR_WIDTH;
 
         x = focus_cycle_target->frame->area.x;
         y = focus_cycle_target->frame->area.y;

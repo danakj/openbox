@@ -302,20 +302,29 @@ void screen_startup(gboolean reconfig)
     guint i;
 
     desktop_cycle_popup = pager_popup_new(FALSE);
+    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
 
     if (!reconfig)
         /* get the initial size */
         screen_resize();
 
-    /* set the names */
-    screen_desktop_names = g_new(gchar*,
-                                 g_slist_length(config_desktops_names) + 1);
-    for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
-        screen_desktop_names[i] = it->data; /* dont strdup */
-    screen_desktop_names[i] = NULL;
+    /* get the names */
+    if (PROP_GETSS(RootWindow(ob_display, ob_screen),
+                   net_desktop_names, utf8, &screen_desktop_names))
+        for (i = 0; screen_desktop_names[i]; ++i);
+    else
+        i = 0;
+    for (it = g_slist_nth(config_desktops_names, i); it;
+         it = g_slist_next(it), ++i)
+    {
+        screen_desktop_names = g_renew(gchar*, screen_desktop_names, i + 2);
+        screen_desktop_names[i+1] = NULL;
+        screen_desktop_names[i] = g_strdup(it->data);
+    }
+    /* then set the names */
     PROP_SETSS(RootWindow(ob_display, ob_screen),
                net_desktop_names, screen_desktop_names);
-    g_free(screen_desktop_names); /* dont free the individual strings */
+    g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
 
     if (!reconfig)
@@ -427,9 +436,6 @@ void screen_set_num_desktops(guint num)
     /* the number of rows/columns will differ */
     screen_update_layout();
 
-    /* may be some unnamed desktops that we need to fill in with names */
-    screen_update_desktop_names();
-
     /* move windows on desktops that will no longer exist! */
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
@@ -439,6 +445,10 @@ void screen_set_num_desktops(guint num)
  
     /* change our struts/area to match (after moving windows) */
     screen_update_areas();
+
+    /* may be some unnamed desktops that we need to fill in with names
+     (after updating the areas so the popup can resize) */
+    screen_update_desktop_names();
 
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
@@ -618,9 +628,6 @@ void screen_desktop_popup(guint d, gboolean show)
         a = screen_physical_area_monitor(0);
         pager_popup_position(desktop_cycle_popup, CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
-        pager_popup_width(desktop_cycle_popup, MAX(a->width/3, POPUP_WIDTH));
-        pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
-
         pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
     }
 }
@@ -876,8 +883,15 @@ void screen_update_desktop_names()
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
         for (; i < screen_num_desktops; ++i)
-            screen_desktop_names[i] = g_strdup_printf("Desktop %i", i + 1);
+            screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
     }
+
+    /* resize the pager for these names */
+    pager_popup_width_to_strings(desktop_cycle_popup,
+                                 screen_desktop_names,
+                                 screen_num_desktops,
+                                 MAX(screen_physical_area_monitor(0)->width/3,
+                                     POPUP_WIDTH));
 }
 
 void screen_show_desktop(gboolean show, gboolean restore_focus)

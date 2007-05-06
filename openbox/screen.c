@@ -328,13 +328,13 @@ void screen_startup(gboolean reconfig)
                        net_current_desktop, cardinal, &d) &&
             d < screen_num_desktops)
         {
-            screen_set_desktop(d);
+            screen_set_desktop(d, FALSE);
         } else if (session_desktop >= 0)
             screen_set_desktop(MIN((guint)session_desktop,
-                                   screen_num_desktops));
+                                   screen_num_desktops), FALSE);
         else
             screen_set_desktop(MIN(config_screen_firstdesk,
-                                   screen_num_desktops) - 1);
+                                   screen_num_desktops) - 1, FALSE);
 
         /* don't start in showing-desktop mode */
         screen_showing_desktop = FALSE;
@@ -442,10 +442,10 @@ void screen_set_num_desktops(guint num)
 
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
-        screen_set_desktop(num - 1);
+        screen_set_desktop(num - 1, TRUE);
 }
 
-void screen_set_desktop(guint num)
+void screen_set_desktop(guint num, gboolean dofocus)
 {
     ObClient *c;
     GList *it;
@@ -487,7 +487,7 @@ void screen_set_desktop(guint num)
 
     /* have to try focus here because when you leave an empty desktop
        there is no focus out to watch for */
-    if ((c = focus_fallback_target(TRUE, focus_client))) {
+    if (dofocus && (c = focus_fallback_target(TRUE, focus_client))) {
         /* reduce flicker by hiliting now rather than waiting for the server
            FocusIn event */
         frame_adjust_focus(c->frame, TRUE);

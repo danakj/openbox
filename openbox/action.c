@@ -293,6 +293,7 @@ void setup_action_cycle_windows_next(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.forward = TRUE;
     (*a)->data.cycle.dialog = TRUE;
     (*a)->data.cycle.dock_windows = FALSE;
+    (*a)->data.cycle.all_desktops = FALSE;
 }
 
 void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
@@ -302,6 +303,7 @@ void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.forward = FALSE;
     (*a)->data.cycle.dialog = TRUE;
     (*a)->data.cycle.dock_windows = FALSE;
+    (*a)->data.cycle.all_desktops = FALSE;
 }
 
 void setup_action_movefromedge_north(ObAction **a, ObUserAction uact)
@@ -1009,6 +1011,9 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     act->data.cycle.dialog = parse_bool(doc, n);
                 if ((n = parse_find_node("panels", node->xmlChildrenNode)))
                     act->data.cycle.dock_windows = parse_bool(doc, n);
+                if ((n = parse_find_node("allDesktops",
+                                         node->xmlChildrenNode)))
+                    act->data.cycle.all_desktops = parse_bool(doc, n);
             } else if (act->func == action_directional_focus) {
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.interdiraction.dialog = parse_bool(doc, n);
@@ -1512,7 +1517,7 @@ void action_send_to_desktop(union ActionData *data)
         data->sendto.desk == DESKTOP_ALL) {
         client_set_desktop(c, data->sendto.desk, data->sendto.follow);
         if (data->sendto.follow)
-            screen_set_desktop(data->sendto.desk);
+            screen_set_desktop(data->sendto.desk, TRUE);
     }
 }
 
@@ -1529,12 +1534,12 @@ void action_desktop(union ActionData *data)
         if (data->desktop.desk < screen_num_desktops ||
             data->desktop.desk == DESKTOP_ALL)
         {
-            screen_set_desktop(data->desktop.desk);
+            screen_set_desktop(data->desktop.desk, TRUE);
             if (data->inter.any.interactive)
                 screen_desktop_popup(data->desktop.desk, TRUE);
         }
     } else if (data->inter.cancel) {
-        screen_set_desktop(first);
+        screen_set_desktop(first, TRUE);
     }
 
     if (!data->inter.any.interactive || data->inter.final) {
@@ -1557,7 +1562,7 @@ void action_desktop_dir(union ActionData *data)
         !data->sendtodir.inter.final ||
         data->sendtodir.inter.cancel)
     {
-        screen_set_desktop(d);
+        screen_set_desktop(d, TRUE);
     }
 }
 
@@ -1579,13 +1584,13 @@ void action_send_to_desktop_dir(union ActionData *data)
     {
         client_set_desktop(c, d, data->sendtodir.follow);
         if (data->sendtodir.follow)
-            screen_set_desktop(d);
+            screen_set_desktop(d, TRUE);
     }
 }
 
 void action_desktop_last(union ActionData *data)
 {
-    screen_set_desktop(screen_last_desktop);
+    screen_set_desktop(screen_last_desktop, TRUE);
 }
 
 void action_toggle_decorations(union ActionData *data)
@@ -1771,6 +1776,7 @@ void action_cycle_windows(union ActionData *data)
     event_halt_focus_delay();
 
     focus_cycle(data->cycle.forward,
+                data->cycle.all_desktops,
                 data->cycle.dock_windows,
                 data->cycle.linear, data->any.interactive,
                 data->cycle.dialog,

@@ -61,7 +61,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
        be used
     */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
 static Window createWindow(Window parent, gulong mask,
@@ -170,7 +170,7 @@ void focus_set_client(ObClient *client)
        be used.
     */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
     focus_client = client;
 
@@ -457,7 +457,9 @@ void focus_cycle_draw_indicator()
     }
 }
 
-static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
+static gboolean valid_focus_target(ObClient *ft,
+                                   gboolean all_desktops,
+                                   gboolean dock_windows)
 {
     gboolean ok = FALSE;
     /* we don't use client_can_focus here, because that doesn't let you
@@ -483,7 +485,9 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
           ft->type == OB_CLIENT_TYPE_MENU ||    /* being allowed to target */
           ft->type == OB_CLIENT_TYPE_UTILITY))  /* one of these, don't let */
         ok = ok && !ft->skip_taskbar;           /*  skip taskbar stop us */
-    ok = ok && (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL);
+    if (!all_desktops)
+        ok = ok && (ft->desktop == screen_desktop ||
+                    ft->desktop == DESKTOP_ALL);
     ok = ok && ft == client_focus_target(ft);
     return ok;
 /*
@@ -501,7 +505,8 @@ static gboolean valid_focus_target(ObClient *ft, gboolean dock_windows)
 */
 }
 
-void focus_cycle(gboolean forward, gboolean dock_windows,
+void focus_cycle(gboolean forward, gboolean all_desktops,
+                 gboolean dock_windows,
                  gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
@@ -546,7 +551,7 @@ void focus_cycle(gboolean forward, gboolean dock_windows,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (valid_focus_target(ft, dock_windows)) {
+        if (valid_focus_target(ft, all_desktops, dock_windows)) {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
@@ -712,7 +717,7 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (valid_focus_target(it->data, dock_windows))
+            if (valid_focus_target(it->data, FALSE, dock_windows))
                 ft = it->data;
     }
         

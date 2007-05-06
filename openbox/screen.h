@@ -66,7 +66,7 @@ void screen_resize();
 /*! Change the number of available desktops */
 void screen_set_num_desktops(guint num);
 /*! Change the current desktop */
-void screen_set_desktop(guint num);
+void screen_set_desktop(guint num, gboolean dofocus);
 /*! Interactively change desktops */
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel);

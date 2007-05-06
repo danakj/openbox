@@ -143,6 +143,7 @@ struct CycleWindows {
     gboolean forward;
     gboolean dialog;
     gboolean dock_windows;
+    gboolean all_desktops;
 };
 
 struct Stacking {

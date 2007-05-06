@@ -136,6 +136,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 {
     gint l, t, r, b;
     gint x, y, w, h;
+    gint xpadding, ypadding;
     gint textw, texth;
     gint iconw;
     Rect *area; /* won't go outside this */
@@ -157,21 +158,26 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     RrMinSize(self->a_text, &textw, &texth);
     texth += ob_rr_theme->paddingy * 2;
 
+    ypadding = (t+b + ob_rr_theme->paddingy * 2);
+
     /* set the sizes up and reget the text sizes from the calculated
        outer sizes */
     if (self->h) {
         h = self->h;
-        texth = h - (t+b + ob_rr_theme->paddingy * 2);
+        texth = h - ypadding;
     } else
-        h = t+b + texth + ob_rr_theme->paddingy * 2;
+        h = texth + ypadding;
+
     iconw = (self->hasicon ? texth : 0);
+    xpadding = l+r + iconw + ob_rr_theme->paddingx *
+        (self->hasicon ? 3 : 2);
+
     if (self->w)
         textw = self->w;
-    w = l+r + textw + iconw + ob_rr_theme->paddingx *
-        (self->hasicon ? 3 : 2);
+    w = textw + xpadding;
     /* cap it at "maxw" */
-    if (self->maxw)
-        w = MIN(w, self->maxw);
+    if (self->maxw) w = MIN(w, self->maxw);
+    textw = w - xpadding;
 
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;

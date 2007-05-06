@@ -815,7 +815,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     if (!rude) {
         Point oldtl, oldtr, oldbl, oldbr;
         Point newtl, newtr, newbl, newbr;
-        gboolean stationary;
+        gboolean stationary_l, stationary_r, stationary_t, stationary_b;
 
         POINT_SET(oldtl, self->frame->area.x, self->frame->area.y);
         POINT_SET(oldbr, self->frame->area.x + self->frame->area.width - 1,
@@ -829,20 +829,22 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         POINT_SET(newbl, newtl.x, newbr.y);
 
         /* is it moving or just resizing from some corner? */
-        stationary = (POINT_EQUAL(oldtl, newtl) || POINT_EQUAL(oldtr, newtr) ||
-                      POINT_EQUAL(oldbl, newbl) || POINT_EQUAL(oldbr, newbr));
+        stationary_l = oldtl.x == oldtl.x;
+        stationary_r = oldtr.x == oldtr.x;
+        stationary_t = oldtl.y == oldtl.y;
+        stationary_b = oldbl.y == oldbl.y;
 
-        /* if left edge is growing */
-        if (stationary && newtl.x < oldtl.x)
+        /* if left edge is growing and didnt move right edge */
+        if (stationary_r && newtl.x < oldtl.x)
             rudel = TRUE;
-        /* if right edge is growing */
-        if (stationary && newtr.x > oldtr.x)
+        /* if right edge is growing and didnt move left edge */
+        if (stationary_l && newtr.x > oldtr.x)
             ruder = TRUE;
-        /* if top edge is growing */
-        if (stationary && newtl.y < oldtl.y)
+        /* if top edge is growing and didnt move bottom edge */
+        if (stationary_b && newtl.y < oldtl.y)
             rudet = TRUE;
-        /* if bottom edge is growing */
-        if (stationary && newbl.y > oldbl.y)
+        /* if bottom edge is growing and didnt move top edge */
+        if (stationary_t && newbl.y > oldbl.y)
             rudeb = TRUE;
     }
 

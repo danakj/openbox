@@ -174,7 +174,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
         
         /* if it's a transient lowering, lower its parents so that we can lower
            this window, or it won't move */
-        top = client_search_all_top_parents(selected);
+        top = client_search_all_top_parents_layer(selected);
 
         /* that is, if it has any parents */
         if (!(top->data == selected && top->next == NULL)) {
@@ -375,7 +375,7 @@ static GList *find_highest_relative(ObClient *client)
         GSList *top;
 
         /* get all top level relatives of this client */
-        top = client_search_all_top_parents(client);
+        top = client_search_all_top_parents_layer(client);
 
         /* go from the top of the stacking order down */
         for (it = stacking_list; !ret && it; it = g_list_next(it)) {

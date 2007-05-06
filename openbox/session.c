@@ -390,6 +390,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
            get messed up from interaction */
         savedata = sm_save_get_data();
     }
+    free(vendor);
 
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, savedata)) {
         ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed\n");

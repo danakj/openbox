@@ -215,6 +215,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                         gint i = parse_int(doc, n);
                         if (i > 0)
                             settings->desktop = i;
+                    }
                     g_free(s);
                 } else
                     settings->desktop = 0;

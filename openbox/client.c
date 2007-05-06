@@ -673,9 +673,13 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         if (settings->fullscreen != -1)
             self->fullscreen = !!settings->fullscreen;
 
-        if (settings->desktop < screen_num_desktops
-            || settings->desktop == DESKTOP_ALL)
-            self->desktop = settings->desktop;
+        if (settings->desktop) {
+            if (settings->desktop == DESKTOP_ALL)
+                self->desktop = settings->desktop;
+            else if (settings->desktop > 0 &&
+                     settings->desktop <= screen_num_desktops)
+                self->desktop = settings->desktop - 1;
+        }
 
         if (settings->layer == -1) {
             self->below = TRUE;

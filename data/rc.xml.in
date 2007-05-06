@@ -80,10 +80,10 @@
   <number>4</number>
   <firstdesk>1</firstdesk>
   <names>
-    <name>one</name>
-    <name>two</name>
-    <name>three</name>
-    <name>four</name>
+    <name>desktop one</name>
+    <name>desktop two</name>
+    <name>desktop three</name>
+    <name>desktop four</name>
   </names>
 </desktops>
 

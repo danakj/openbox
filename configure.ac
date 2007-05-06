@@ -57,7 +57,7 @@ LIBTOOL="$LIBTOOL --silent"
 
 AC_PROG_INSTALL
 
-AM_GNU_GETTEXT_VERSION(0.14.4)
+AM_GNU_GETTEXT_VERSION(0.15)
 AM_GNU_GETTEXT([external])
 
 AC_CHECK_HEADERS(ctype.h fcntl.h locale.h signal.h string.h stdio.h stdlib.h)

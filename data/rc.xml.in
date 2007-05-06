@@ -97,11 +97,12 @@
 
 <dock>
   <position>TopLeft</position>
-  <!-- (Top|Bottom)(Left|Right|)|Left|Right|Floating -->
+  <!-- (Top|Bottom)(Left|Right|)|Top|Bottom|Left|Right|Floating -->
   <floatingX>0</floatingX>
   <floatingY>0</floatingY>
   <noStrut>no</noStrut>
   <stacking>Above</stacking>
+  <!-- 'Above', 'Normal', or 'Below' -->
   <direction>Vertical</direction>
   <!-- 'Vertical' or 'Horizontal' -->
   <autoHide>no</autoHide>

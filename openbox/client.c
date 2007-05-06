@@ -2183,22 +2183,22 @@ static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
 
-    if ((self->fullscreen ||
-         /* no decorations and fills the monitor means oldskool fullscreen */
-         (self->frame != NULL &&
-          (self->frame->size.top == 0 && self->frame->size.left == 0 &&
-           self->frame->size.bottom == 0 && self->frame->size.right == 0 &&
-           RECT_EQUAL(self->area,
-                      *screen_physical_area_monitor(client_monitor(self))))))
-        &&
-        (client_focused(self) || client_search_focus_tree(self)))
-        l = OB_STACKING_LAYER_FULLSCREEN;
-    else if (self->type == OB_CLIENT_TYPE_DESKTOP)
+    if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
         if (self->below) l = OB_STACKING_LAYER_NORMAL;
         else l = OB_STACKING_LAYER_ABOVE;
     }
+    else if ((self->fullscreen ||
+              /* no decorations and fills the monitor = oldskool fullscreen */
+              (self->frame != NULL &&
+               (self->frame->size.right == 0 && self->frame->size.left == 0 &&
+                self->frame->size.bottom == 0 && self->frame->size.top == 0 &&
+                RECT_EQUAL(self->area,
+                           *screen_physical_area_monitor
+                           (client_monitor(self)))))) &&
+             (client_focused(self) || client_search_focus_tree(self)))
+        l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
     else l = OB_STACKING_LAYER_NORMAL;

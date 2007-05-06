@@ -639,13 +639,13 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
             || (app->class && app->name && !strcmp(app->class, self->class)
                 && !strcmp(app->name, self->name)))
         {
-            ob_debug("Window matching: %s\n", app->name);
             /* Match if no role was specified in the per app setting, or if the
              * string matches the beginning of the role, since apps like to set
              * the role to things like browser-window-23c4b2f */
             if (!app->role
                 || !strncmp(app->role, self->role, strlen(app->role)))
             {
+                ob_debug("Window matching: %s\n", app->name);
                 /* use this one */
                 settings = app;
                 break;

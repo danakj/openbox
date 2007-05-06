@@ -47,32 +47,47 @@
   <font place="ActiveWindow">
     <name>sans</name>
     <size>7</size>
+    <!-- font size in points -->
     <weight>bold</weight>
+    <!-- 'bold' or 'normal' -->
     <slant>normal</slant>
+    <!-- 'italic' or 'normal' -->
   </font>
   <font place="InactiveWindow">
     <name>sans</name>
     <size>7</size>
+    <!-- font size in points -->
     <weight>bold</weight>
+    <!-- 'bold' or 'normal' -->
     <slant>normal</slant>
+    <!-- 'italic' or 'normal' -->
   </font>
   <font place="MenuHeader">
     <name>sans</name>
     <size>8</size>
+    <!-- font size in points -->
     <weight>bold</weight>
+    <!-- 'bold' or 'normal' -->
     <slant>normal</slant>
+    <!-- 'italic' or 'normal' -->
   </font>
   <font place="MenuItem">
     <name>sans</name>
     <size>9</size>
+    <!-- font size in points -->
     <weight>bold</weight>
+    <!-- 'bold' or 'normal' -->
     <slant>normal</slant>
+    <!-- 'italic' or 'normal' -->
   </font>
   <font place="OnScreenDisplay">
     <name>sans</name>
     <size>9</size>
+    <!-- font size in points -->
     <weight>bold</weight>
+    <!-- 'bold' or 'normal' -->
     <slant>normal</slant>
+    <!-- 'italic' or 'normal' -->
   </font>
 </theme>
 
@@ -408,38 +423,68 @@
 
   <!-- default menu file (or custom one in $HOME/.config/openbox/) -->
   <file>menu.xml</file>
-  <warpPointer>yes</warpPointer>
-  <xorStyle>yes</xorStyle>
   <hideDelay>250</hideDelay>
   <middle>no</middle>
   <submenuShowDelay>0</submenuShowDelay>
-  <desktopMenuIcons>yes</desktopMenuIcons>
-  <!-- -->
+  <applicationIcons>yes</applicationIcons>
 </menu>
 
+<!-- this section is commented out.. remove this and the ending comment if you
+     want to use it -->
 <applications>
-<!--
-  <application name="this application does not exist">
-    <decor>yes</decor>
-    <shade>no</shade>
-    <position>
-      <x>center</x>
-      <y>200</y>
-    </position>
-    <focus>yes</focus>
-    <desktop>1</desktop>
-    <head>0</head>
-    # specifies xinerama head
-    <layer>normal</layer>
-    # 'above', 'normal', or 'below'
-    <iconic>no</iconic>
-    <skip_pager>no</skip_pager>
-    <skip_taskbar>no</skip_taskbar>
-    <fullscreen>yes</fullscreen>
-    <maximized>true</maximized>
-    # 'Horizontal', 'Vertical' or boolean (yes/no/on/off/true/false)
-  </application>
+  <!-- the name or the class can be set, or both. this is used to match
+       windows when they appear
+
+       role can optionally be set, and only as much as you provide will be 
+       checked to see if it matches, eg. if you set role="abc" and the window's
+       role is actually "abcde" it would match.
  -->
+  <application name="first element of window's WM_CLASS property (see xprop)"
+              class="second element of window's WM_CLASS property (see xprop)"
+               role="the window's WM_WINDOW_ROLE property (see xprop)">
+
+    <!-- each element can be left out or set to 'default' to specify to not 
+         change that attribute of the window -->
+
+    <decor>yes</decor>
+
+    <shade>no</shade>
+
+    <position>
+      <!-- the position is only used if both an x and y coordinate are provided
+           (and not set to 'default') -->
+      <x>center</x>
+      <!-- a number or 'center' to center on screen -->
+      <y>200</y>
+      <!-- a number or 'center' to center on screen -->
+      <head>0</head>
+      <!-- specifies the xinerama head, 'mouse' for wherever the mouse is -->
+    </position>
+
+    <focus>yes</focus>
+    <!-- if the window should try be given focus when it appears -->
+
+    <desktop>1</desktop>
+    <!-- 0 is the first desktop, 'all' for all desktops -->
+
+    <layer>normal</layer>
+    <!-- 'above', 'normal', or 'below' -->
+
+    <iconic>no</iconic>
+
+    <skip_pager>no</skip_pager>
+    <!-- asks to not be shown in pagers -->
+
+    <skip_taskbar>no</skip_taskbar>
+    <!-- asks to not be shown in taskbars. window cycling actions will also
+         skip past such windows -->
+
+    <fullscreen>yes</fullscreen>
+
+    <maximized>true</maximized>
+    <!-- 'Horizontal', 'Vertical' or boolean (yes/no/on/off/true/false) -->
+  </application>
 </applications>
+ -->
 
 </openbox_config>

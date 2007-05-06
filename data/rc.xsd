@@ -199,24 +199,22 @@
     </xsd:complexType>
     <xsd:complexType name="menu">
         <xsd:element maxOccurs="unbounded" name="file" type="xsd:string"/>
-        <xsd:element minOccurs="0" name="warpPointer" type="ob:bool"/>
-        <xsd:element minOccurs="0" name="xorStyle" type="ob:bool"/>
         <xsd:element minOccurs="0" name="hideDelay" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="middle" type="ob:bool"/>
         <xsd:element minOccurs="0" name="submenuShowDelay" type="xsd:integer"/>
-        <xsd:element minOccurs="0" name="desktopMenuIcons" type="ob:bool"/>
+        <xsd:element minOccurs="0" name="applicationIcons" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="window_position">
         <xsd:element name="x" type="ob:center_or_int"/>
         <xsd:element name="y" type="ob:center_or_int"/>
+        <xsd:element minOccurs="0" name="head" type="xsd:string"/>
     </xsd:complexType>
     <xsd:complexType name="application">
-        <xsd:element minOccurs="0" name="decor" type="xsd:string"/>
+        <xsd:element minOccurs="0" name="decor" type="xsd:bool"/>
         <xsd:element minOccurs="0" name="shade" type="ob:bool"/>
         <xsd:element minOccurs="0" name="position" type="ob:window_position"/>
         <xsd:element minOccurs="0" name="focus" type="xsd:string"/>
         <xsd:element minOccurs="0" name="desktop" type="xsd:integer"/>
-        <xsd:element minOccurs="0" name="head" type="xsd:string"/>
         <xsd:element minOccurs="0" name="layer" type="ob:layer"/>
         <xsd:element minOccurs="0" name="iconic" type="ob:bool"/>
         <xsd:element minOccurs="0" name="skip_pager" type="ob:bool"/>
@@ -434,9 +432,9 @@
     </xsd:simpleType>
     <xsd:simpleType name="layer">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="above"/>
-            <xsd:enumeration value="normal"/>
-            <xsd:enumeration value="below"/>
+            <xsd:enumeration value="Above"/>
+            <xsd:enumeration value="Normal"/>
+            <xsd:enumeration value="Below"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="maximization">

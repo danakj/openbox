@@ -379,19 +379,27 @@ gint main(gint argc, gchar **argv)
         }
 
         /* we remove the session arguments from argv, so put them back */
-        if (ob_sm_save_file != NULL) {
-            guint l = g_strv_length(argv);
-            argv = g_renew(gchar*, argv, l+2);
-            argv[l] = g_strdup("--sm-save-file");
-            argv[l+1] = ob_sm_save_file;
-            argv[l+2] = NULL;
-        }
-        if (ob_sm_id != NULL) {
-            guint l = g_strv_length(argv);
-            argv = g_renew(gchar*, argv, l+2);
-            argv[l] = g_strdup("--sm-client-id");
-            argv[l+1] = ob_sm_id;
-            argv[l+2] = NULL;
+        if (ob_sm_save_file != NULL || ob_sm_id != NULL) {
+            gchar **nargv;
+            gint i, l;
+
+            l = argc +
+                (ob_sm_save_file != NULL ? 2 : 0) +
+                (ob_sm_id != NULL ? 2 : 0);
+            nargv = g_new0(gchar*, l+1);
+            for (i = 0; i < argc; ++i)
+                nargv[i] = argv[i];
+
+            if (ob_sm_save_file != NULL) {
+                nargv[i++] = g_strdup("--sm-save-file");
+                nargv[i++] = ob_sm_save_file;
+            }
+            if (ob_sm_id != NULL) {
+                nargv[i++] = g_strdup("--sm-client-id");
+                nargv[i++] = ob_sm_id;
+            }
+            g_assert(i == l);
+            argv = nargv;
         }
 
         /* re-run me */

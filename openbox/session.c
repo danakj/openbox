@@ -358,6 +358,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
                              Bool shutdown, gint interact_style, Bool fast)
 {
     ob_debug_type(OB_DEBUG_SM, "Session save requested\n");
+
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, data)) {
         ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed\n");
         SmcSaveYourselfDone(conn, FALSE);

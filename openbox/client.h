@@ -634,10 +634,17 @@ ObClient *client_search_modal_child(ObClient *self);
 */
 GSList *client_search_all_top_parents(ObClient *self);
 
+/*! Returns a list of top-level windows which this is a transient for, and
+  which are in the same layer as this client.
+  It will only contain more than 1 element if the client is transient for its
+  group.
+*/
+GSList *client_search_all_top_parents_layer(ObClient *self);
+
 /*! Returns a window's top level parent. This only counts direct parents,
   not groups if it is transient for its group.
 */
-ObClient *client_search_top_parent(ObClient *self);
+ObClient *client_search_top_normal_parent(ObClient *self);
 
 /*! Is one client a direct child of another (i.e. not through the group.) */
 gboolean client_is_direct_child(ObClient *parent, ObClient *child);

@@ -90,6 +90,9 @@ static void client_update_transient_tree(ObClient *self,
                                          ObClient* oldparent,
                                          ObClient *newparent);
 static void client_present(ObClient *self, gboolean here, gboolean raise);
+static GSList *client_search_all_top_parents_internal(ObClient *self,
+                                                      gboolean bylayer,
+                                                      ObStackingLayer layer);
 
 void client_startup(gboolean reconfig)
 {
@@ -2180,7 +2183,14 @@ static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
 
-    if (self->fullscreen &&
+    if ((self->fullscreen ||
+         /* no decorations and fills the monitor means oldskool fullscreen */
+         (self->frame != NULL &&
+          (self->frame->size.top == 0 && self->frame->size.left == 0 &&
+           self->frame->size.bottom == 0 && self->frame->size.right == 0 &&
+           RECT_EQUAL(self->area,
+                      *screen_physical_area_monitor(client_monitor(self))))))
+        &&
         (client_focused(self) || client_search_focus_tree(self)))
         l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->type == OB_CLIENT_TYPE_DESKTOP)
@@ -2765,7 +2775,7 @@ static void client_iconify_recursive(ObClient *self,
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
 {
     /* move up the transient chain as far as possible first */
-    self = client_search_top_parent(self);
+    self = client_search_top_normal_parent(self);
     client_iconify_recursive(self, iconic, curdesk);
 }
 
@@ -2960,7 +2970,7 @@ void client_set_desktop_recursive(ObClient *self,
 
 void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
-    self = client_search_top_parent(self);
+    self = client_search_top_normal_parent(self);
     client_set_desktop_recursive(self, target, donthide);
 }
 
@@ -3451,20 +3461,24 @@ guint client_monitor(ObClient *self)
     return screen_find_monitor(&self->frame->area);
 }
 
-ObClient *client_search_top_parent(ObClient *self)
+ObClient *client_search_top_normal_parent(ObClient *self)
 {
     while (self->transient_for && self->transient_for != OB_TRAN_GROUP &&
-           client_normal(self))
+           client_normal(self->transient_for))
         self = self->transient_for;
     return self;
 }
 
-GSList *client_search_all_top_parents(ObClient *self)
+static GSList *client_search_all_top_parents_internal(ObClient *self,
+                                                      gboolean bylayer,
+                                                      ObStackingLayer layer)
 {
     GSList *ret = NULL;
-
+    
     /* move up the direct transient chain as far as possible */
-    while (self->transient_for && self->transient_for != OB_TRAN_GROUP)
+    while (self->transient_for && self->transient_for != OB_TRAN_GROUP &&
+           (!bylayer || self->transient_for->layer == layer) &&
+           client_normal(self->transient_for))
         self = self->transient_for;
 
     if (!self->transient_for)
@@ -3477,8 +3491,11 @@ GSList *client_search_all_top_parents(ObClient *self)
             for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
-                if (!c->transient_for && client_normal(c))
+                if (!c->transient_for && client_normal(c) &&
+                    (!bylayer || c->layer == layer))
+                {
                     ret = g_slist_prepend(ret, c);
+                }
             }
 
             if (ret == NULL) /* no group parents */
@@ -3486,6 +3503,16 @@ GSList *client_search_all_top_parents(ObClient *self)
     }
 
     return ret;
+}
+
+GSList *client_search_all_top_parents(ObClient *self)
+{
+    return client_search_all_top_parents_internal(self, FALSE, 0);
+}
+
+GSList *client_search_all_top_parents_layer(ObClient *self)
+{
+    return client_search_all_top_parents_internal(self, TRUE, self->layer);
 }
 
 ObClient *client_search_focus_parent(ObClient *self)

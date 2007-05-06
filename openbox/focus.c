@@ -306,12 +306,14 @@ static void popup_cycle(ObClient *c, gboolean show)
         icon_popup_width(focus_cycle_popup, MAX(a->width/3, POPUP_WIDTH));
         icon_popup_height(focus_cycle_popup, POPUP_HEIGHT);
 
-        /* use the transient's parent's title/icon */
-        p = client_search_top_parent(c);
+        /* find our highest direct parent, including non-normal windows */
+        for (p = c; p->transient_for && p->transient_for != OB_TRAN_GROUP;
+             p = p->transient_for);
 
         if (c->desktop != DESKTOP_ALL && c->desktop != screen_desktop)
             desk = screen_desktop_names[c->desktop];
 
+        /* use the transient's parent's title/icon if we don't have one */
         if (p != c && !strcmp("", (c->iconic ? c->icon_title : c->title)))
             title = g_strdup(p->iconic ? p->icon_title : p->title);
             /*ptitle = g_strconcat((c->iconic ? c->icon_title : c->title),

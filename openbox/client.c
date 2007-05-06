@@ -2079,7 +2079,10 @@ static void client_get_client_machine(ObClient *self)
 
     g_free(self->client_machine);
 
-    if (PROP_GETS(self->window, wm_client_machine, locale, &data)) {
+    if (PROP_GETS(self->window, wm_client_machine, locale, &data) ||
+        (self->group &&
+         PROP_GETS(self->group->leader, wm_client_machine, locale, &data)))
+    {
         gethostname(localhost, 127);
         localhost[127] = '\0';
         if (strcmp(localhost, data))
@@ -3598,7 +3601,10 @@ void client_update_command(ObClient *self)
     g_free(self->wm_command);
     self->wm_command = NULL;
 
-    if (PROP_GETSS(self->window, wm_command, locale, &data)) {
+    if (PROP_GETSS(self->window, wm_command, locale, &data) ||
+        (self->group &&
+         PROP_GETSS(self->group->leader, wm_command, locale, &data)))
+    {
         /* merge/mash them all together */
         gchar *merge = NULL;
         gint i;

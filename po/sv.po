@@ -149,7 +149,7 @@ msgstr ""
 
 #: openbox/openbox.c:465
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Ladda om Openbox konfiguration"
+msgstr "  --reconfigure       Ladda om Openbox konfiguration\n"
 
 #: openbox/openbox.c:466
 msgid ""

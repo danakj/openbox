@@ -83,12 +83,13 @@ static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self, gint x, gint y);
 static void client_restore_session_state(ObClient *self);
-static void client_restore_session_stacking(ObClient *self);
+static gboolean client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
 static void client_update_transient_tree(ObClient *self,
                                          ObGroup *oldgroup, ObGroup *newgroup,
                                          ObClient* oldparent,
                                          ObClient *newparent);
+static void client_present(ObClient *self, gboolean here, gboolean raise);
 
 void client_startup(gboolean reconfig)
 {
@@ -321,10 +322,10 @@ void client_manage(Window window)
     grab_server(FALSE);
 
     stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
-    client_restore_session_stacking(self);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
+        (!self->session || self->session->focused) &&
         !self->iconic &&
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
@@ -377,6 +378,10 @@ void client_manage(Window window)
     */
     ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
              self->window, newx, newy, self->area.width, self->area.height);
+    if (self->session)
+        ob_debug("session requested %d %d\n",
+                 self->session->x, self->session->y);
+
     client_apply_startup_state(self, newx, newy);
 
     mouse_grab_for_client(self, TRUE);
@@ -443,7 +448,8 @@ void client_manage(Window window)
            Also if you don't have focus_new enabled, then it's going to get
            raised to the top. Legacy begets legacy I guess?
         */
-        client_raise(self);
+        if (!client_restore_session_stacking(self))
+            client_raise(self);
     }
 
     /* this has to happen before we try focus the window, but we want it to
@@ -456,8 +462,10 @@ void client_manage(Window window)
        a window maps since its not based on an action from the user like
        clicking a window to activate it. so keep the new window out of the way
        but do focus it. */
-    if (activate)
-        client_activate(self, FALSE, TRUE);
+    if (activate) {
+        gboolean stacked = client_restore_session_stacking(self);
+        client_present(self, FALSE, !stacked);
+    }
 
     /* add to client list/map */
     client_list = g_list_append(client_list, self);
@@ -685,13 +693,22 @@ static void client_restore_session_state(ObClient *self)
 {
     GList *it;
 
-    if (!(it = session_state_find(self)))
+    ob_debug_type(OB_DEBUG_SM,
+                  "Restore session for client %s\n", self->title);
+
+    if (!(it = session_state_find(self))) {
+        ob_debug_type(OB_DEBUG_SM,
+                      "Session data not found for client %s\n", self->title);
         return;
+    }
 
     self->session = it->data;
 
+    ob_debug_type(OB_DEBUG_SM, "Session data loaded for client %s\n",
+                  self->title);
+
     RECT_SET_POINT(self->area, self->session->x, self->session->y);
-    self->positioned = PPosition;
+    self->positioned = USPosition;
     if (self->session->w > 0)
         self->area.width = self->session->w;
     if (self->session->h > 0)
@@ -713,28 +730,33 @@ static void client_restore_session_state(ObClient *self)
     self->below = self->session->below;
     self->max_horz = self->session->max_horz;
     self->max_vert = self->session->max_vert;
+    self->undecorated = self->session->undecorated;
 }
 
-static void client_restore_session_stacking(ObClient *self)
+static gboolean client_restore_session_stacking(ObClient *self)
 {
-    GList *it;
+    GList *it, *mypos;
 
-    if (!self->session) return;
+    if (!self->session) return FALSE;
 
-    it = g_list_find(session_saved_state, self->session);
-    for (it = g_list_previous(it); it; it = g_list_previous(it)) {
+    mypos = g_list_find(session_saved_state, self->session);
+    if (!mypos) return FALSE;
+
+    /* start above me and look for the first client */
+    for (it = g_list_previous(mypos); it; it = g_list_previous(it)) {
         GList *cit;
 
-        for (cit = client_list; cit; cit = g_list_next(cit))
-            if (session_state_cmp(it->data, cit->data))
-                break;
-        if (cit) {
-            client_calc_layer(self);
-            stacking_below(CLIENT_AS_WINDOW(self),
-                           CLIENT_AS_WINDOW(cit->data));
-            break;
+        for (cit = client_list; cit; cit = g_list_next(cit)) {
+            ObClient *c = cit->data;
+            /* found a client that was in the session, so go below it */
+            if (c->session == it->data) {
+                stacking_below(CLIENT_AS_WINDOW(self),
+                               CLIENT_AS_WINDOW(cit->data));
+                return TRUE;
+            }
         }
     }
+    return FALSE;
 }
 
 void client_move_onscreen(ObClient *self, gboolean rude)
@@ -3252,6 +3274,47 @@ gboolean client_focus(ObClient *self)
     return TRUE;
 }
 
+/*! Present the client to the user.
+  @param raise If the client should be raised or not. You should only set
+               raise to false if you don't care if the window is completely
+               hidden.
+*/
+static void client_present(ObClient *self, gboolean here, gboolean raise)
+{
+    /* if using focus_delay, stop the timer now so that focus doesn't
+       go moving on us */
+    event_halt_focus_delay();
+
+    if (client_normal(self) && screen_showing_desktop)
+        screen_show_desktop(FALSE, FALSE);
+    if (self->iconic)
+        client_iconify(self, FALSE, here);
+    if (self->desktop != DESKTOP_ALL &&
+        self->desktop != screen_desktop)
+    {
+        if (here)
+            client_set_desktop(self, screen_desktop, FALSE);
+        else
+            screen_set_desktop(self->desktop);
+    } else if (!self->frame->visible)
+        /* if its not visible for other reasons, then don't mess
+           with it */
+        return;
+    if (self->shaded)
+        client_shade(self, FALSE);
+
+    client_focus(self);
+
+    if (raise) {
+        /* we do this as an action here. this is rather important. this is
+           because we want the results from the focus change to take place 
+           BEFORE we go about raising the window. when a fullscreen window 
+           loses focus, we need this or else the raise wont be able to raise 
+           above the to-lose-focus fullscreen window. */
+        client_raise(self);
+    }
+}
+
 void client_activate(ObClient *self, gboolean here, gboolean user)
 {
     guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
@@ -3274,36 +3337,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
         if (event_curtime != CurrentTime)
             self->user_time = event_curtime;
 
-        /* if using focus_delay, stop the timer now so that focus doesn't
-           go moving on us */
-        event_halt_focus_delay();
-
-        if (client_normal(self) && screen_showing_desktop)
-            screen_show_desktop(FALSE, FALSE);
-        if (self->iconic)
-            client_iconify(self, FALSE, here);
-        if (self->desktop != DESKTOP_ALL &&
-            self->desktop != screen_desktop)
-        {
-            if (here)
-                client_set_desktop(self, screen_desktop, FALSE);
-            else
-                screen_set_desktop(self->desktop);
-        } else if (!self->frame->visible)
-            /* if its not visible for other reasons, then don't mess
-               with it */
-            return;
-        if (self->shaded)
-            client_shade(self, FALSE);
-
-        client_focus(self);
-
-        /* we do this as an action here. this is rather important. this is
-           because we want the results from the focus change to take place 
-           BEFORE we go about raising the window. when a fullscreen window 
-           loses focus, we need this or else the raise wont be able to raise 
-           above the to-lose-focus fullscreen window. */
-        client_raise(self);
+        client_present(self, here, TRUE);
     }
 }
 
@@ -3517,15 +3551,25 @@ void client_update_sm_client_id(ObClient *self)
     self->sm_client_id = NULL;
 
     if (!PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id) &&
-        self->group)
-        PROP_GETS(self->group->leader, sm_client_id, locale,
-                  &self->sm_client_id);
+        self->group) {
+        ob_debug_type(OB_DEBUG_SM, "Client %s does not have session id\n",
+                      self->title);
+        if (!PROP_GETS(self->group->leader, sm_client_id, locale,
+                       &self->sm_client_id)) {
+            ob_debug_type(OB_DEBUG_SM, "Client %s does not have session id on "
+                          "group window\n", self->title);
+        } else
+            ob_debug_type(OB_DEBUG_SM, "Client %s has session id on "
+                          "group window\n", self->title);
+    } else
+        ob_debug_type(OB_DEBUG_SM, "Client %s has session id\n",
+                      self->title);
 }
 
 #define WANT_EDGE(cur, c) \
             if(cur == c)                                                      \
                 continue;                                                     \
-            if(!client_normal(cur))                                   \
+            if(!client_normal(cur))                                           \
                 continue;                                                     \
             if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL) \
                 continue;                                                     \

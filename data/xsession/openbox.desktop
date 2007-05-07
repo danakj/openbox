@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Openbox
-Comment=Log in using the Openbox window manager
+Comment=Log in using the Openbox window manager (without a session manager)
 Exec=openbox
 TryExec=openbox
 Icon=openbox.png

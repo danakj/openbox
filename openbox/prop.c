@@ -328,7 +328,7 @@ gboolean prop_get_strings_locale(Window win, Atom prop, gchar ***ret)
     if (get_all(win, prop, prop_atoms.string, 8, (guchar**)&raw, &num)) {
 
         p = raw;
-        while (p < raw + num - 1) {
+        while (p < raw + num) {
             ++count;
             strs = g_slist_append(strs, p);
             p += strlen(p) + 1; /* next string */
@@ -377,7 +377,7 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, gchar ***ret)
     if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
 
         p = raw;
-        while (p < raw + num - 1) {
+        while (p < raw + num) {
             ++count;
             strs = g_slist_append(strs, p);
             p += strlen(p) + 1; /* next string */

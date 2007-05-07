@@ -299,8 +299,7 @@ gboolean screen_annex(const gchar *program_name)
 
 void screen_startup(gboolean reconfig)
 {
-    GSList *it;
-    guint i;
+    guint i, numnames;
 
     if (!reconfig)
         /* get the initial size */
@@ -317,12 +316,18 @@ void screen_startup(gboolean reconfig)
     else
 #endif
         i = 0;
-    for (it = g_slist_nth(config_desktops_names, i); it;
-         it = g_slist_next(it), ++i)
-    {
-        screen_desktop_names = g_renew(gchar*, screen_desktop_names, i + 2);
-        screen_desktop_names[i] = g_strdup(it->data);
-        screen_desktop_names[i+1] = NULL;
+    numnames = g_slist_length(config_desktops_names);
+    if (numnames > i) {
+        GSList *it;
+
+        screen_desktop_names = g_renew(gchar*,screen_desktop_names,numnames+1);
+        screen_desktop_names[numnames] = NULL;
+
+        for (it = g_slist_nth(config_desktops_names, i); it;
+             it = g_slist_next(it), ++i)
+        {
+            screen_desktop_names[i] = g_strdup(it->data);
+        }
     }
     /* then set the names */
     PROP_SETSS(RootWindow(ob_display, ob_screen),
@@ -883,11 +888,11 @@ void screen_update_desktop_names()
         for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
         i = 0;
-    if (i < screen_num_desktops - 1) {
+    if (i < screen_num_desktops) {
         screen_desktop_names = g_renew(gchar*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
-        for (; i < screen_num_desktops - 1; ++i)
+        for (; i < screen_num_desktops; ++i)
             screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
     }
 

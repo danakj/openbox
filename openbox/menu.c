@@ -314,7 +314,7 @@ parse_menu_fail:
 }
 
 ObMenu* menu_new(const gchar *name, const gchar *title,
-                 gboolean allow_shortcut, gpointer data)
+                 gboolean allow_shortcut_selection, gpointer data)
 {
     ObMenu *self;
 
@@ -322,8 +322,8 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     self->name = g_strdup(name);
     self->data = data;
 
-    self->shortcut = parse_shortcut(title, allow_shortcut, &self->title,
-                                    &self->shortcut_position);
+    self->shortcut = parse_shortcut(title, allow_shortcut_selection,
+                                    &self->title, &self->shortcut_position);
 
     g_hash_table_replace(menu_hash, self->name, self);
 
@@ -378,7 +378,7 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
 
     menu_frame_hide_all();
 
-    frame = menu_frame_new(self, client);
+    frame = menu_frame_new(self, 0, client);
     if (!menu_frame_show_topmenu(frame, x, y, button))
         menu_frame_free(frame);
     else if (frame->entries) {
@@ -396,6 +396,7 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
     g_assert(menu);
 
     self = g_new0(ObMenuEntry, 1);
+    self->ref = 1;
     self->type = type;
     self->menu = menu;
     self->id = id;
@@ -412,9 +413,14 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
     return self;
 }
 
-void menu_entry_free(ObMenuEntry *self)
+void menu_entry_ref(ObMenuEntry *self)
 {
-    if (self) {
+    ++self->ref;
+}
+
+void menu_entry_unref(ObMenuEntry *self)
+{
+    if (self && --self->ref == 0) {
         switch (self->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             g_free(self->data.normal.label);
@@ -452,7 +458,7 @@ void menu_clear_entries(ObMenu *self)
 #endif
 
     while (self->entries) {
-        menu_entry_free(self->entries->data);
+        menu_entry_unref(self->entries->data);
         self->entries = g_list_delete_link(self->entries, self->entries);
     }
 }
@@ -460,7 +466,7 @@ void menu_clear_entries(ObMenu *self)
 void menu_entry_remove(ObMenuEntry *self)
 {
     self->menu->entries = g_list_remove(self->menu->entries, self);
-    menu_entry_free(self);
+    menu_entry_unref(self);
 }
 
 ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
@@ -474,6 +480,15 @@ ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
     menu_entry_set_label(e, label, allow_shortcut);
 
     self->entries = g_list_append(self->entries, e);
+    return e;
+}
+
+ObMenuEntry* menu_get_more(ObMenu *self, guint show_from)
+{
+    ObMenuEntry *e;
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SUBMENU, -1);
+    e->data.submenu.name = g_strdup(self->name); /* points to itself */
+    e->data.submenu.show_from = show_from;
     return e;
 }
 

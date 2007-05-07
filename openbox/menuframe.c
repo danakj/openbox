@@ -69,7 +69,7 @@ void menu_frame_shutdown(gboolean reconfig)
     g_hash_table_destroy(menu_frame_map);
 }
 
-ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
+ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 {
     ObMenuFrame *self;
     XSetWindowAttributes attr;
@@ -80,13 +80,20 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
     self->selected = NULL;
     self->client = client;
     self->direction_right = TRUE;
+    self->show_from = show_from;
 
     attr.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen),
                                 CWEventMask, &attr);
 
+    XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
+    XSetWindowBorder(ob_display, self->window,
+                     RrColorPixel(ob_rr_theme->menu_b_color));
+
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
+
+    self->item_h = ob_rr_theme->menu_font_height + 2*PADDING;
 
     stacking_add(MENU_AS_WINDOW(self));
 
@@ -121,6 +128,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     self = g_new0(ObMenuEntryFrame, 1);
     self->entry = entry;
     self->frame = frame;
+
+    menu_entry_ref(entry);
 
     attr.event_mask = ENTRY_EVENTMASK;
     self->window = createWindow(self->frame->window, CWEventMask, &attr);
@@ -176,6 +185,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 static void menu_entry_frame_free(ObMenuEntryFrame *self)
 {
     if (self) {
+        menu_entry_unref(self->entry);
+
         XDestroyWindow(ob_display, self->text);
         XDestroyWindow(ob_display, self->window);
         g_hash_table_remove(menu_frame_map, &self->text);
@@ -562,6 +573,50 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     XFlush(ob_display);
 }
 
+/*! this code is taken from the menu_frame_render. if that changes, this won't
+  work.. */
+static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
+                                        gboolean first_entry,
+                                        gboolean last_entry)
+{
+    ObMenuEntryType t;
+    gint h = 0;
+
+    /* if the first entry is a labeled separator, then make its border
+       overlap with the menu's outside border */
+    if (first_entry)
+        h -= ob_rr_theme->mbwidth;
+    /* if the last entry is a labeled separator, then make its border
+       overlap with the menu's outside border */
+    if (last_entry)
+        h -= ob_rr_theme->mbwidth;
+
+    h += 2*PADDING;
+
+    if (self)
+        t = self->entry->type;
+    else
+        /* this is the More... entry, it's NORMAL type */
+        t = OB_MENU_ENTRY_TYPE_NORMAL;
+
+    switch (self->entry->type) {
+    case OB_MENU_ENTRY_TYPE_NORMAL:
+    case OB_MENU_ENTRY_TYPE_SUBMENU:
+        h += self->frame->item_h;
+        break;
+    case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        if (self->entry->data.separator.label != NULL) {
+            h += ob_rr_theme->menu_title_height +
+                (ob_rr_theme->mbwidth - PADDING) * 2;
+        } else {
+            h += SEPARATOR_HEIGHT;
+        }
+        break;
+    }
+
+    return h;
+}
+
 static void menu_frame_render(ObMenuFrame *self)
 {
     gint w = 0, h = 0;
@@ -570,10 +625,6 @@ static void menu_frame_render(ObMenuFrame *self)
     gboolean has_icon = FALSE;
     ObMenu *sub;
     ObMenuEntryFrame *e;
-
-    XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
-    XSetWindowBorder(ob_display, self->window,
-                     RrColorPixel(ob_rr_theme->menu_b_color));
 
     /* find text dimensions */
 
@@ -584,10 +635,10 @@ static void menu_frame_render(ObMenuFrame *self)
         gint l, t, r, b;
 
         e->a_text_normal->texture[0].data.text.string = "";
-        RrMinSize(e->a_text_normal, &tw, &th);
+        tw = RrMinWidth(e->a_text_normal);
         tw += 2*PADDING;
-        th += 2*PADDING;
-        self->item_h = th;
+
+        th = self->item_h;
 
         RrMargins(e->a_normal, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
@@ -737,12 +788,19 @@ static void menu_frame_render(ObMenuFrame *self)
 static void menu_frame_update(ObMenuFrame *self)
 {
     GList *mit, *fit;
+    Rect *a;
+    gint h;
 
     menu_pipe_execute(self->menu);
     menu_find_submenus(self->menu);
 
     self->selected = NULL;
 
+    /* start at show_from */
+    mit = g_list_nth(self->menu->entries, self->show_from);
+
+    /* go through the menu's and frame's entries and connect the frame entries
+       to the menu entries */
     for (mit = self->menu->entries, fit = self->entries; mit && fit;
          mit = g_list_next(mit), fit = g_list_next(fit))
     {
@@ -750,12 +808,15 @@ static void menu_frame_update(ObMenuFrame *self)
         f->entry = mit->data;
     }
 
+    /* if there are more menu entries than in the frame, add them */
     while (mit) {
         ObMenuEntryFrame *e = menu_entry_frame_new(mit->data, self);
         self->entries = g_list_append(self->entries, e);
         mit = g_list_next(mit);
     }
-    
+
+    /* if there are more frame entries than menu entries then get rid of
+       them */
     while (fit) {
         GList *n = g_list_next(fit);
         menu_entry_frame_free(fit->data);
@@ -764,6 +825,58 @@ static void menu_frame_update(ObMenuFrame *self)
     }
 
     menu_frame_render(self);
+
+    /* make the menu fit on the screen. at most we call render twice, at least
+       not like n times or sometime */
+
+    a = screen_physical_area_monitor(self->monitor);
+    h = self->area.height;
+
+    if (h > a->height) {
+        GList *flast, *tmp;
+        gboolean last_entry = TRUE;
+
+        /* take the height of our More... entry into account */
+        h += menu_entry_frame_get_height(NULL, FALSE, TRUE);
+
+        /* start at the end of the entries */
+        flast = g_list_last(self->entries);
+
+        /* pull out all the entries from the frame that don't
+           fit on the screen, leaving at least 1 though */
+        while (h > a->height && g_list_previous(flast) != NULL) {
+            /* update the height, without this entry */
+            h -= menu_entry_frame_get_height(flast->data, FALSE, last_entry);
+
+            /* destroy the entry we're not displaying */
+            tmp = flast;
+            flast = g_list_previous(flast);
+            menu_entry_frame_free(tmp->data);
+            self->entries = g_list_delete_link(self->entries, tmp);
+
+            /* only the first one that we see is the last entry in the menu */
+            last_entry = FALSE;
+        };
+
+        {
+            ObMenuEntry *more_entry;
+            ObMenuEntryFrame *more_frame;
+            /* make the More... menu entry frame which will display in this
+               frame. */
+            more_entry = menu_get_more(self->menu,
+                                       self->show_from +
+                                       g_list_length(self->entries));
+            more_frame = menu_entry_frame_new(more_entry, self);
+            /* make it get deleted when the menu frame goes away */
+            menu_entry_unref(more_entry);
+                                       
+            /* add our More... entry to the frame */
+            self->entries = g_list_append(self->entries, more_frame);
+        }
+
+        /* render again */
+        menu_frame_render(self);
+    }
 }
 
 static gboolean menu_frame_is_visible(ObMenuFrame *self)
@@ -1021,6 +1134,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     if (!self->entry->data.submenu.submenu) return;
 
     f = menu_frame_new(self->entry->data.submenu.submenu,
+                       self->entry->data.submenu.show_from,
                        self->frame->client);
     /* pass our direction on to our child */
     f->direction_right = self->frame->direction_right;

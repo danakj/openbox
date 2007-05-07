@@ -120,6 +120,7 @@ struct _ObNormalMenuEntry {
 struct _ObSubmenuMenuEntry {
     gchar *name;
     ObMenu *submenu;
+    guint show_from;
 };
 
 struct _ObSeparatorMenuEntry {
@@ -128,6 +129,8 @@ struct _ObSeparatorMenuEntry {
 
 struct _ObMenuEntry
 {
+    guint ref;
+
     ObMenuEntryType type;
     ObMenu *menu;
 
@@ -143,10 +146,13 @@ struct _ObMenuEntry
 void menu_startup(gboolean reconfig);
 void menu_shutdown(gboolean reconfig);
 
+void menu_entry_ref(ObMenuEntry *self);
+void menu_entry_unref(ObMenuEntry *self);
+
 /*! @param allow_shortcut this should be false when the label is coming from
            outside data like window or desktop titles */
 ObMenu* menu_new(const gchar *name, const gchar *title,
-                 gboolean allow_shortcut, gpointer data);
+                 gboolean allow_shortcut_selection, gpointer data);
 void menu_free(ObMenu *menu);
 
 /* Repopulate a pipe-menu by running its command */
@@ -180,5 +186,7 @@ ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
 
 /* fills in the submenus, for use when a menu is being shown */
 void menu_find_submenus(ObMenu *self);
+
+ObMenuEntry* menu_get_more(ObMenu *menu, guint show_from);
 
 #endif

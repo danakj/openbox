@@ -373,10 +373,6 @@ nodist_rc_DATA = \
 	data/rc.xml \
 	data/menu.xml
 
-dist_xsd_DATA = \
-	data/rc.xsd \
-	data/menu.xsd
-
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@xsddir\@!$(xsddir)!'
@@ -405,6 +401,9 @@ dist_xsessions_DATA = \
 
 dist_noinst_DATA = \
 	version.h.in \
+	data/rc.xsd \
+	data/menu.xsd \
+	data/themerc.xsd \
 	data/rc.xml.in \
 	data/menu.xml.in \
 	render/obrender-3.0.pc.in \

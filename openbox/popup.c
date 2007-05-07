@@ -29,27 +29,14 @@
 #include "render/render.h"
 #include "render/theme.h"
 
-static gboolean popup_show_timeout(gpointer data)
-{
-    ObPopup *self = data;
-    
-    XMapWindow(ob_display, self->bg);
-    stacking_raise(INTERNAL_AS_WINDOW(self));
-    self->mapped = TRUE;
-    self->delay_mapped = FALSE;
-
-    return FALSE; /* don't repeat */
-}
-
-ObPopup *popup_new(gboolean hasicon)
+ObPopup *popup_new()
 {
     XSetWindowAttributes attrib;
     ObPopup *self = g_new0(ObPopup, 1);
 
     self->obwin.type = Window_Internal;
-    self->hasicon = hasicon;
     self->gravity = NorthWestGravity;
-    self->x = self->y = self->w = self->h = 0;
+    self->x = self->y = self->textw = self->h = 0;
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
     self->a_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
 
@@ -62,6 +49,9 @@ ObPopup *popup_new(gboolean hasicon)
     self->text = XCreateWindow(ob_display, self->bg,
                                0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                                InputOutput, RrVisual(ob_rr_inst), 0, NULL);
+
+    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->fbwidth);
+    XSetWindowBorder(ob_display, self->bg, ob_rr_theme->frame_b_color->pixel);
 
     XMapWindow(ob_display, self->text);
 
@@ -88,10 +78,19 @@ void popup_position(ObPopup *self, gint gravity, gint x, gint y)
     self->y = y;
 }
 
-void popup_width(ObPopup *self, gint w)
+void popup_text_width(ObPopup *self, gint w)
 {
-    self->w = w;
-    self->maxw = w;
+    self->textw = w;
+}
+
+void popup_min_width(ObPopup *self, gint minw)
+{
+    self->minw = minw;
+}
+
+void popup_max_width(ObPopup *self, gint maxw)
+{
+    self->maxw = maxw;
 }
 
 void popup_height(ObPopup *self, gint h)
@@ -103,11 +102,13 @@ void popup_height(ObPopup *self, gint h)
     self->h = MAX(h, texth);
 }
 
-void popup_width_to_string(ObPopup *self, gchar *text, gint max)
+void popup_text_width_to_string(ObPopup *self, gchar *text)
 {
-    self->a_text->texture[0].data.text.string = text;
-    self->w = RrMinWidth(self->a_text);
-    self->maxw = max;
+    if (text[0] != '\0') {
+        self->a_text->texture[0].data.text.string = text;
+        self->textw = RrMinWidth(self->a_text);
+    } else
+        self->textw = 0;    
 }
 
 void popup_height_to_string(ObPopup *self, gchar *text)
@@ -115,16 +116,16 @@ void popup_height_to_string(ObPopup *self, gchar *text)
     self->h = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
 }
 
-void popup_width_to_strings(ObPopup *self, gchar **strings, gint num, gint max)
+void popup_text_width_to_strings(ObPopup *self, gchar **strings, gint num)
 {
     gint i, maxw;
 
     maxw = 0;
     for (i = 0; i < num; ++i) {
-        popup_width_to_string(self, strings[i], max);
-        maxw = MAX(maxw, self->w);
+        popup_text_width_to_string(self, strings[i]);
+        maxw = MAX(maxw, self->textw);
     }
-    self->w = maxw;
+    self->textw = maxw;
 }
 
 void popup_set_text_align(ObPopup *self, RrJustify align)
@@ -132,70 +133,80 @@ void popup_set_text_align(ObPopup *self, RrJustify align)
     self->a_text->texture[0].data.text.justify = align;
 }
 
+static gboolean popup_show_timeout(gpointer data)
+{
+    ObPopup *self = data;
+    
+    XMapWindow(ob_display, self->bg);
+    stacking_raise(INTERNAL_AS_WINDOW(self));
+    self->mapped = TRUE;
+    self->delay_mapped = FALSE;
+
+    return FALSE; /* don't repeat */
+}
+
 void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 {
     gint l, t, r, b;
     gint x, y, w, h;
-    gint xpadding, ypadding;
-    gint textw, texth;
-    gint iconw;
-    Rect *area; /* won't go outside this */
-
-    area = screen_physical_area();          /* XXX this should work quite
-                                               good, someone with xinerama,
-                                               and different resolutions on
-                                               screens? */
+    gint emptyx, emptyy; /* empty space between elements */
+    gint textx, texty, textw, texth;
+    gint iconx, icony, iconw, iconh;
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
-
-    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->fbwidth);
-    XSetWindowBorder(ob_display, self->bg, ob_rr_theme->frame_b_color->pixel);
 
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;
 
     /* measure the text out */
-    RrMinSize(self->a_text, &textw, &texth);
-    texth += ob_rr_theme->paddingy * 2;
+    if (text[0] != '\0') {
+        RrMinSize(self->a_text, &textw, &texth);
+    } else {
+        textw = 0;
+        texth = RrMinHeight(self->a_text);
+    }
 
-    ypadding = (t+b + ob_rr_theme->paddingy * 2);
-
-    /* set the sizes up and reget the text sizes from the calculated
-       outer sizes */
+    /* get the height, which is also used for the icon width */
+    emptyy = t + b + ob_rr_theme->paddingy * 2;
     if (self->h) {
         h = self->h;
-        texth = h - ypadding;
+        texth = h - emptyy;
     } else
-        h = texth + ypadding;
+        h = texth + emptyy;
 
-    iconw = (self->hasicon ? texth : 0);
-    xpadding = l+r + iconw + ob_rr_theme->paddingx *
-        (self->hasicon ? 3 : 2);
+    if (self->textw)
+        textw = self->textw;
 
-    if (self->w)
-        textw = self->w;
-    w = textw + xpadding;
-    /* cap it at "maxw" */
+    iconx = textx = l + ob_rr_theme->paddingx;
+    icony = texty = t + ob_rr_theme->paddingy;
+
+    emptyx = l + r + ob_rr_theme->paddingx * 2;
+    if (self->hasicon) {
+        iconw = iconh = texth;
+        textx += iconw + ob_rr_theme->paddingx;
+        if (textw)
+            emptyx += ob_rr_theme->paddingx; /* between the icon and text */
+    } else
+        iconw = 0;
+
+    w = textw + emptyx + iconw;
+    /* cap it at maxw/minw */
     if (self->maxw) w = MIN(w, self->maxw);
-    textw = w - xpadding;
+    if (self->minw) w = MAX(w, self->minw);
+    textw = w - emptyx - iconw;
 
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
-    if (textw < 1) textw = 1;
     if (texth < 1) texth = 1;
 
     /* set up the x coord */
     x = self->x;
     switch (self->gravity) {
-    case NorthGravity:
-    case CenterGravity:
-    case SouthGravity:
+    case NorthGravity: case CenterGravity: case SouthGravity:
         x -= w / 2;
         break;
-    case NorthEastGravity:
-    case EastGravity:
-    case SouthEastGravity:
+    case NorthEastGravity: case EastGravity: case SouthEastGravity:
         x -= w;
         break;
     }
@@ -203,43 +214,28 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     /* set up the y coord */
     y = self->y;
     switch (self->gravity) {
-    case WestGravity:
-    case CenterGravity:
-    case EastGravity:
+    case WestGravity: case CenterGravity: case EastGravity:
         y -= h / 2;
         break;
-    case SouthWestGravity:
-    case SouthGravity:
-    case SouthEastGravity:
+    case SouthWestGravity: case SouthGravity: case SouthEastGravity:
         y -= h;
         break;
     }
 
-    x=MAX(MIN(x, area->width-w),0);
-    y=MAX(MIN(y, area->height-h),0);
-
     /* set the windows/appearances up */
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
-
-    self->a_text->surface.parent = self->a_bg;
-    self->a_text->surface.parentx = l + iconw +
-        ob_rr_theme->paddingx * (self->hasicon ? 2 : 1);
-    self->a_text->surface.parenty = t + ob_rr_theme->paddingy;
-    XMoveResizeWindow(ob_display, self->text,
-                      l + iconw + ob_rr_theme->paddingx *
-                      (self->hasicon ? 2 : 1),
-                      t + ob_rr_theme->paddingy, textw, texth);
-
     RrPaint(self->a_bg, self->bg, w, h);
-    RrPaint(self->a_text, self->text, textw, texth);
 
-    if (self->hasicon) {
-        if (iconw < 1) iconw = 1; /* sanity check for crashes */
-        if (self->draw_icon)
-            self->draw_icon(l + ob_rr_theme->paddingx,
-                            t + ob_rr_theme->paddingy,
-                            iconw, texth, self->draw_icon_data);
+    if (textw) {
+        self->a_text->surface.parent = self->a_bg;
+        self->a_text->surface.parentx = textx;
+        self->a_text->surface.parenty = texty;
+        XMoveResizeWindow(ob_display, self->text, textx, texty, textw, texth);
+        RrPaint(self->a_text, self->text, textw, texth);
     }
+
+    if (self->hasicon)
+        self->draw_icon(iconx, icony, iconw, iconh, self->draw_icon_data);
 
     /* do the actual showing */
     if (!self->mapped) {
@@ -295,6 +291,7 @@ ObIconPopup *icon_popup_new()
                                RrVisual(ob_rr_inst), 0, NULL);
     XMapWindow(ob_display, self->icon);
 
+    self->popup->hasicon = TRUE;
     self->popup->draw_icon = icon_popup_draw_icon;
     self->popup->draw_icon_data = self;
 
@@ -335,21 +332,18 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
     guint vert_inc;
     guint r, c;
     gint eachw, eachh;
+    const guint cols = screen_desktop_layout.columns;
+    const guint rows = screen_desktop_layout.rows;
+    const gint linewidth = ob_rr_theme->fbwidth;
 
-    eachw = (w - ob_rr_theme->fbwidth -
-             (screen_desktop_layout.columns * ob_rr_theme->fbwidth))
-        / screen_desktop_layout.columns;
-    eachh = (h - ob_rr_theme->fbwidth -
-             (screen_desktop_layout.rows * ob_rr_theme->fbwidth))
-        / screen_desktop_layout.rows;
+    eachw = (w - ((cols + 1) * linewidth)) / cols;
+    eachh = (h - ((rows + 1) * linewidth)) / rows;
     /* make them squares */
     eachw = eachh = MIN(eachw, eachh);
 
     /* center */
-    px += (w - (screen_desktop_layout.columns * (eachw + ob_rr_theme->fbwidth) +
-                ob_rr_theme->fbwidth)) / 2;
-    py += (h - (screen_desktop_layout.rows * (eachh + ob_rr_theme->fbwidth) +
-                ob_rr_theme->fbwidth)) / 2;
+    px += (w - (cols * (eachw + linewidth) + linewidth)) / 2;
+    py += (h - (rows * (eachh + linewidth) + linewidth)) / 2;
 
     if (eachw <= 0 || eachh <= 0)
         return;
@@ -360,23 +354,22 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
         case OB_CORNER_TOPLEFT:
             n = 0;
             horz_inc = 1;
-            vert_inc = screen_desktop_layout.columns;
+            vert_inc = cols;
             break;
         case OB_CORNER_TOPRIGHT:
-            n = screen_desktop_layout.columns - 1;
+            n = cols - 1;
             horz_inc = -1;
-            vert_inc = screen_desktop_layout.columns;
+            vert_inc = cols;
             break;
         case OB_CORNER_BOTTOMRIGHT:
-            n = screen_desktop_layout.rows * screen_desktop_layout.columns - 1;
+            n = rows * cols - 1;
             horz_inc = -1;
             vert_inc = -screen_desktop_layout.columns;
             break;
         case OB_CORNER_BOTTOMLEFT:
-            n = (screen_desktop_layout.rows - 1)
-                * screen_desktop_layout.columns;
+            n = (rows - 1) * cols;
             horz_inc = 1;
-            vert_inc = -screen_desktop_layout.columns;
+            vert_inc = -cols;
             break;
         default:
             g_assert_not_reached();
@@ -386,23 +379,22 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
         switch (screen_desktop_layout.start_corner) {
         case OB_CORNER_TOPLEFT:
             n = 0;
-            horz_inc = screen_desktop_layout.rows;
+            horz_inc = rows;
             vert_inc = 1;
             break;
         case OB_CORNER_TOPRIGHT:
-            n = screen_desktop_layout.rows
-                * (screen_desktop_layout.columns - 1);
-            horz_inc = -screen_desktop_layout.rows;
+            n = rows * (cols - 1);
+            horz_inc = -rows;
             vert_inc = 1;
             break;
         case OB_CORNER_BOTTOMRIGHT:
-            n = screen_desktop_layout.rows * screen_desktop_layout.columns - 1;
-            horz_inc = -screen_desktop_layout.rows;
+            n = rows * cols - 1;
+            horz_inc = -rows;
             vert_inc = -1;
             break;
         case OB_CORNER_BOTTOMLEFT:
-            n = screen_desktop_layout.rows - 1;
-            horz_inc = screen_desktop_layout.rows;
+            n = rows - 1;
+            horz_inc = rows;
             vert_inc = -1;
             break;
         default:
@@ -414,11 +406,9 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
     }
 
     rown = n;
-    for (r = 0, y = 0; r < screen_desktop_layout.rows;
-         ++r, y += eachh + ob_rr_theme->fbwidth)
+    for (r = 0, y = 0; r < rows; ++r, y += eachh + linewidth)
     {
-        for (c = 0, x = 0; c < screen_desktop_layout.columns;
-             ++c, x += eachw + ob_rr_theme->fbwidth)
+        for (c = 0, x = 0; c < cols; ++c, x += eachw + linewidth)
         {
             RrAppearance *a;
 

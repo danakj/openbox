@@ -343,6 +343,10 @@ static void popup_cycle(ObClient *c, gboolean show,
         icon_popup_position(focus_cycle_popup, CenterGravity,
                             a->x + a->width / 2, a->y + a->height / 2);
         icon_popup_height(focus_cycle_popup, POPUP_HEIGHT);
+        icon_popup_min_width(focus_cycle_popup, POPUP_WIDTH);
+        icon_popup_max_width(focus_cycle_popup,
+                             MAX(a->width/3, POPUP_WIDTH));
+
 
         /* make its width to be the width of all the possible titles */
 
@@ -367,9 +371,7 @@ static void popup_cycle(ObClient *c, gboolean show,
         }
         names[n] = NULL;
 
-        icon_popup_width_to_strings(focus_cycle_popup,
-                                    names, n,
-                                    MAX(a->width/3, POPUP_WIDTH));
+        icon_popup_text_width_to_strings(focus_cycle_popup, names, n);
         g_strfreev(names);
     }
 
@@ -528,47 +530,45 @@ static gboolean valid_focus_target(ObClient *ft,
                                    gboolean dock_windows)
 {
     gboolean ok = FALSE;
-    /* we don't use client_can_focus here, because that doesn't let you
-       focus an iconic window, but we want to be able to, so we just check
-       if the focus flags on the window allow it, and its on the current
-       desktop */
-    if (dock_windows)
-        ok = ft->type == OB_CLIENT_TYPE_DOCK;
-    else
-        ok = (ft->type == OB_CLIENT_TYPE_NORMAL ||
-              ft->type == OB_CLIENT_TYPE_DIALOG ||
-              ((ft->type == OB_CLIENT_TYPE_TOOLBAR ||
-                ft->type == OB_CLIENT_TYPE_MENU ||
-                ft->type == OB_CLIENT_TYPE_UTILITY) &&
-               /* let alt-tab go to these windows when a window in its group
-                  already has focus ... */
-               ((focus_client && ft->group == focus_client->group) ||
-                /* ... or if there are no application windows in its group */
-                !client_has_application_group_siblings(ft))));
+
+    /* it's on this desktop unless you want all desktops.
+
+       do this check first because it will usually filter out the most
+       windows */
+    ok = (all_desktops || ft->desktop == screen_desktop ||
+          ft->desktop == DESKTOP_ALL);
+
+    /* the window can receive focus somehow */
     ok = ok && (ft->can_focus || ft->focus_notify);
-    if (!dock_windows && /* use dock windows that skip taskbar too */
-        !(ft->type == OB_CLIENT_TYPE_TOOLBAR || /* also, if we actually are */
-          ft->type == OB_CLIENT_TYPE_MENU ||    /* being allowed to target */
-          ft->type == OB_CLIENT_TYPE_UTILITY))  /* one of these, don't let */
-        ok = ok && !ft->skip_taskbar;           /*  skip taskbar stop us */
-    if (!all_desktops)
-        ok = ok && (ft->desktop == screen_desktop ||
-                    ft->desktop == DESKTOP_ALL);
+
+    /* it's the right type of window */
+    if (dock_windows)
+        ok = ok && ft->type == OB_CLIENT_TYPE_DOCK;
+    else
+        ok = ok && (ft->type == OB_CLIENT_TYPE_NORMAL ||
+                    ft->type == OB_CLIENT_TYPE_DIALOG ||
+                    ((ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+                      ft->type == OB_CLIENT_TYPE_MENU ||
+                      ft->type == OB_CLIENT_TYPE_UTILITY) &&
+                     /* let alt-tab go to these windows when a window in its
+                        group already has focus ... */
+                     ((focus_client && ft->group == focus_client->group) ||
+                      /* ... or if there are no application windows in its
+                         group */
+                      !client_has_application_group_siblings(ft))));
+
+    /* it's not set to skip the taskbar (unless it is a type that would be
+       expected to set this hint */
+    ok = ok && (!(ft->type == OB_CLIENT_TYPE_DOCK ||
+                  ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+                  ft->type == OB_CLIENT_TYPE_MENU ||
+                  ft->type == OB_CLIENT_TYPE_UTILITY) ||
+                !ft->skip_taskbar);
+
+    /* it's not going to just send fous off somewhere else (modal window) */
     ok = ok && ft == client_focus_target(ft);
+
     return ok;
-/*
-    {
-        GSList *it;
-
-        for (it = ft->transients; it; it = g_slist_next(it)) {
-            ObClient *c = it->data;
-
-            if (frame_visible(c->frame))
-                return FALSE;
-        }
-        return TRUE;
-    }
-*/
 }
 
 void focus_cycle(gboolean forward, gboolean all_desktops,

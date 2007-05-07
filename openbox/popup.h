@@ -45,8 +45,9 @@ struct _ObPopup
     gint gravity;
     gint x;
     gint y;
-    gint w;
+    gint textw;
     gint h;
+    gint minw;
     gint maxw;
     gboolean mapped;
     gboolean delay_mapped;
@@ -74,7 +75,7 @@ struct _ObPagerPopup
     RrAppearance *unhilight;
 };
 
-ObPopup *popup_new(gboolean hasicon);
+ObPopup *popup_new();
 void popup_free(ObPopup *self);
 
 /*! Position the popup. The gravity rules are not the same X uses for windows,
@@ -85,11 +86,13 @@ void popup_free(ObPopup *self);
 void popup_position(ObPopup *self, gint gravity, gint x, gint y);
 /*! Set the sizes for the popup. When set to 0, the size will be based on
   the text size. */
-void popup_width(ObPopup *self, gint w);
 void popup_height(ObPopup *self, gint w);
-void popup_width_to_string(ObPopup *self, gchar *text, gint max);
+void popup_min_width(ObPopup *self, gint minw);
+void popup_max_width(ObPopup *self, gint maxw);
+void popup_text_width(ObPopup *self, gint w);
+void popup_text_width_to_string(ObPopup *self, gchar *text);
 void popup_height_to_string(ObPopup *self, gchar *text);
-void popup_width_to_strings(ObPopup *self, gchar **strings, gint num,gint max);
+void popup_text_width_to_strings(ObPopup *self, gchar **strings, gint num);
 
 void popup_set_text_align(ObPopup *self, RrJustify align);
 
@@ -108,12 +111,14 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
                            gchar *text, const struct _ObClientIcon *icon);
 #define icon_popup_hide(p) popup_hide((p)->popup)
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
-#define icon_popup_width(p, w) popup_width((p)->popup,(w))
+#define icon_popup_text_width(p, w) popup_text_width((p)->popup,(w))
 #define icon_popup_height(p, h) popup_height((p)->popup,(h))
-#define icon_popup_width_to_string(p, s, n, m) \
-    popup_width_to_string((p)->popup,(s),(n),(m))
-#define icon_popup_width_to_strings(p, s, n, m) \
-    popup_width_to_strings((p)->popup,(s),(n),(m))
+#define icon_popup_min_width(p, m) popup_min_width((p)->popup,(m))
+#define icon_popup_max_width(p, m) popup_max_width((p)->popup,(m))
+#define icon_popup_text_width_to_string(p, s) \
+    popup_text_width_to_string((p)->popup,(s))
+#define icon_popup_text_width_to_strings(p, s, n) \
+    popup_text_width_to_strings((p)->popup,(s),(n))
 #define icon_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 
 ObPagerPopup *pager_popup_new();
@@ -124,12 +129,14 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
                             gchar *text, guint desk);
 #define pager_popup_hide(p) popup_hide((p)->popup)
 #define pager_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
-#define pager_popup_width(p, w) popup_width((p)->popup,(w))
+#define pager_popup_text_width(p, w) popup_text_width((p)->popup,(w))
 #define pager_popup_height(p, h) popup_height((p)->popup,(h))
-#define pager_popup_width_to_string(p, s, n, m) \
-    popup_width_to_string((p)->popup,(s),(n),(m))
-#define pager_popup_width_to_strings(p, s, n, m) \
-    popup_width_to_strings((p)->popup,(s),(n),(m))
+#define pager_popup_min_width(p, m) popup_min_width((p)->popup,(m))
+#define pager_popup_max_width(p, m) popup_max_width((p)->popup,(m))
+#define pager_popup_text_width_to_string(p, s) \
+    popup_text_width_to_string((p)->popup,(s))
+#define pager_popup_text_width_to_strings(p, s, n) \
+    popup_text_width_to_strings((p)->popup,(s),(n))
 #define pager_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 
 #endif

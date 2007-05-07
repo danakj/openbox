@@ -302,25 +302,27 @@ void screen_startup(gboolean reconfig)
     GSList *it;
     guint i;
 
-    desktop_cycle_popup = pager_popup_new(FALSE);
-    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
-
     if (!reconfig)
         /* get the initial size */
         screen_resize();
 
+    desktop_cycle_popup = pager_popup_new(FALSE);
+    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
+
+#if 0
     /* get the names */
     if (PROP_GETSS(RootWindow(ob_display, ob_screen),
                    net_desktop_names, utf8, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i]; ++i);
     else
+#endif
         i = 0;
     for (it = g_slist_nth(config_desktops_names, i); it;
          it = g_slist_next(it), ++i)
     {
         screen_desktop_names = g_renew(gchar*, screen_desktop_names, i + 2);
-        screen_desktop_names[i+1] = NULL;
         screen_desktop_names[i] = g_strdup(it->data);
+        screen_desktop_names[i+1] = NULL;
     }
     /* then set the names */
     PROP_SETSS(RootWindow(ob_display, ob_screen),
@@ -629,6 +631,8 @@ void screen_desktop_popup(guint d, gboolean show)
         a = screen_physical_area_monitor(0);
         pager_popup_position(desktop_cycle_popup, CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
+        pager_popup_max_width(desktop_cycle_popup,
+                              MAX(a->width/3, POPUP_WIDTH));
         pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
     }
 }
@@ -876,23 +880,21 @@ void screen_update_desktop_names()
 
     if (PROP_GETSS(RootWindow(ob_display, ob_screen),
                    net_desktop_names, utf8, &screen_desktop_names))
-        for (i = 0; screen_desktop_names[i] && i <= screen_num_desktops; ++i);
+        for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
         i = 0;
-    if (i <= screen_num_desktops) {
+    if (i < screen_num_desktops - 1) {
         screen_desktop_names = g_renew(gchar*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
-        for (; i < screen_num_desktops; ++i)
+        for (; i < screen_num_desktops - 1; ++i)
             screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
     }
 
     /* resize the pager for these names */
-    pager_popup_width_to_strings(desktop_cycle_popup,
-                                 screen_desktop_names,
-                                 screen_num_desktops,
-                                 MAX(screen_physical_area_monitor(0)->width/3,
-                                     POPUP_WIDTH));
+    pager_popup_text_width_to_strings(desktop_cycle_popup,
+                                      screen_desktop_names,
+                                      screen_num_desktops);
 }
 
 void screen_show_desktop(gboolean show, gboolean restore_focus)

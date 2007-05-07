@@ -54,6 +54,9 @@ struct _ObMenuFrame
     GList *entries;
     ObMenuEntryFrame *selected;
 
+    /* show entries from the menu starting at this index */
+    guint show_from;
+
     /* If the submenus are being drawn to the right or the left */
     gboolean direction_right;
 
@@ -61,10 +64,10 @@ struct _ObMenuFrame
     Rect area;
     Strut item_margin;
     gint inner_w; /* inside the borders */
-    gint title_h;  /* height of all title items */
     gint item_h;  /* height of all normal items */
     gint text_x;  /* offset at which the text appears in the items */
     gint text_w;  /* width of the text area in the items */
+    gint text_h;  /* height of the items */
 
     gint monitor; /* monitor on which to show the menu in xinerama */
 
@@ -74,6 +77,9 @@ struct _ObMenuFrame
 
 struct _ObMenuEntryFrame
 {
+    /* if this is true then it doesn't have an entry to point to */
+    gboolean more;
+
     struct _ObMenuEntry *entry;
     ObMenuFrame *frame;
 
@@ -109,7 +115,9 @@ extern GHashTable *menu_frame_map;
 void menu_frame_startup(gboolean reconfig);
 void menu_frame_shutdown(gboolean reconfig);
 
-ObMenuFrame* menu_frame_new(struct _ObMenu *menu, struct _ObClient *client);
+ObMenuFrame* menu_frame_new(struct _ObMenu *menu,
+                            guint show_from,
+                            struct _ObClient *client);
 void menu_frame_free(ObMenuFrame *self);
 
 void menu_frame_move(ObMenuFrame *self, gint x, gint y);

@@ -1204,9 +1204,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
            MAX(theme->padding * 2, ut + ub));
         */
         theme->title_height = theme->label_height + theme->paddingy * 2;
-        /* this should match the above title_height given the same font size
-           for both. */
-        theme->menu_title_height = theme->menu_title_font_height +
+
+        RrMargins(theme->a_menu_title, &ul, &ut, &ur, &ub);
+        theme->menu_title_label_height = theme->menu_title_font_height+ut+ub;
+        theme->menu_title_height = theme->menu_title_label_height +
             theme->paddingy * 2;
     }
     theme->button_size = theme->label_height - 2;

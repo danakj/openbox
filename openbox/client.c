@@ -1254,11 +1254,13 @@ static void client_update_transient_tree(ObClient *self,
     }
             
 
-    /* If the group changed then we need to remove any old group transient
-       windows from our children. But if we're transient for the group, then
+    /* If the group changed, or if we are just becoming transient for the
+       group, then we need to remove any old group transient windows
+       from our children. But if we were already transient for the group, then
        other group transients are not our children. */
-    if (oldgroup != newgroup && oldgroup != NULL &&
-        oldparent != OB_TRAN_GROUP)
+    if ((oldgroup != newgroup ||
+         (newparent == OB_TRAN_GROUP && oldparent != newparent)) &&
+        oldgroup != NULL && oldparent != OB_TRAN_GROUP)
     {
         for (it = self->transients; it; it = next) {
             next = g_slist_next(it);

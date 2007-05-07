@@ -824,13 +824,18 @@ static void menu_frame_update(ObMenuFrame *self)
         fit = n;
     }
 
-    menu_frame_render(self);
+    /* * make the menu fit on the screen */
 
-    /* make the menu fit on the screen. at most we call render twice, at least
-       not like n times or sometime */
+    /* calculate the height of the menu */
+    h = 0;
+    for (fit = self->entries; fit; fit = g_list_next(fit))
+        h += menu_entry_frame_get_height(fit->data,
+                                         fit == self->entries,
+                                         g_list_next(fit) == NULL);
+    /* add the border at the top and bottom */
+    h += ob_rr_theme->mbwidth * 2;
 
     a = screen_physical_area_monitor(self->monitor);
-    h = self->area.height;
 
     if (h > a->height) {
         GList *flast, *tmp;
@@ -853,8 +858,6 @@ static void menu_frame_update(ObMenuFrame *self)
             flast = g_list_previous(flast);
             menu_entry_frame_free(tmp->data);
             self->entries = g_list_delete_link(self->entries, tmp);
-
-            menu_frame_render(self);
 
             /* only the first one that we see is the last entry in the menu */
             last_entry = FALSE;
@@ -881,10 +884,9 @@ static void menu_frame_update(ObMenuFrame *self)
             /* add our More... entry to the frame */
             self->entries = g_list_append(self->entries, more_frame);
         }
-
-        /* render again */
-        menu_frame_render(self);
     }
+
+    menu_frame_render(self);
 }
 
 static gboolean menu_frame_is_visible(ObMenuFrame *self)

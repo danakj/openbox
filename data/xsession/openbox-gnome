@@ -1,5 +1,4 @@
 #!/bin/sh
 
 # A temporary script to be replaced by a real program..
-export OPENBOX_RESTART_BINARY=openbox-gnome
-exec openbox "$@"
+exec openbox --restart-binary openbox-gnome "$@"

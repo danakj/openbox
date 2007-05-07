@@ -96,10 +96,8 @@ static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
 static gchar    *config_type = NULL;
-static pid_t     reconfigure_notify = 0;
 
 static void signal_handler(gint signal, gpointer data);
-static void parse_env(char **argv0);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
 static void parse_args(gint *argc, gchar **argv);
 static Cursor load_cursor(const gchar *name, guint fontval);
@@ -121,14 +119,11 @@ gint main(gint argc, gchar **argv)
         g_message(_("Unable to change to home directory '%s': %s"),
                   g_get_home_dir(), g_strerror(errno));
      
-    /* parse the environment first, it can change the argv[0] */
-    parse_env(&argv[0]);
+    /* parse the command line args, which can change the argv[0] */
+    parse_args(&argc, argv);
 
     program_name = g_path_get_basename(argv[0]);
     g_set_prgname(program_name);
-
-    /* parse the command line args */
-    parse_args(&argc, argv);
 
     if (!remote_control) {
         parse_paths_startup();
@@ -469,28 +464,11 @@ static void print_help()
     g_print(_("  --version           Display the version and exit\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
-    g_print(_("\nOptions for internal use:\n"));
-    g_print(_("  --sm-save-file FILE Specify file to load a saved session from\n"));
-    g_print(_("  --sm-client-id ID   Specify session management ID\n"));
     g_print(_("\nDebugging options:\n"));
     g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
     g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
     g_print(_("\nPlease report bugs at %s\n"), PACKAGE_BUGREPORT);
-}
-
-static void parse_env(gchar **argv0)
-{
-    const char *c;
-
-    /* pretend we are this other application */
-    if ((c = getenv("OPENBOX_RESTART_BINARY")))
-        *argv0 = g_strdup(c);
-    unsetenv("OPENBOX_RESTART_BINARY");
-
-    /* notify this application when openbox reconfigures */
-    if ((c = getenv("OPENBOX_RECONFIGURE_NOTIFY_PID")))
-        reconfigure_notify = (pid_t) atol(c);
 }
 
 static void remove_args(gint *argc, gchar **argv, gint index, gint num)
@@ -547,7 +525,8 @@ static void parse_args(gint *argc, gchar **argv)
 #ifdef USE_SM
         else if (!strcmp(argv[i], "--sm-save-file")) {
             if (i == *argc - 1) /* no args left */
-                g_printerr(_("--sm-save-file requires an argument\n"));
+                /* not translated cuz it's sekret */
+                g_printerr("--sm-save-file requires an argument\n");
             else {
                 ob_sm_save_file = g_strdup(argv[i+1]);
                 remove_args(argc, argv, i, 2);
@@ -555,7 +534,8 @@ static void parse_args(gint *argc, gchar **argv)
             }
         } else if (!strcmp(argv[i], "--sm-client-id")) {
             if (i == *argc - 1) /* no args left */
-                g_printerr(_("--sm-client-id requires an argument\n"));
+                /* not translated cuz it's sekret */
+                g_printerr("--sm-client-id requires an argument\n");
             else {
                 ob_sm_id = g_strdup(argv[i+1]);
                 remove_args(argc, argv, i, 2);
@@ -565,7 +545,16 @@ static void parse_args(gint *argc, gchar **argv)
             ob_sm_use = FALSE;
         }
 #endif
-        else {
+        else if (!strcmp(argv[i], "--restart-binary")) {
+            if (i == *argc - 1) /* no args left */
+                /* not translated cuz it's sekret */
+                g_printerr("--restart-binary requires an argument\n");
+            else {
+                argv[0] = g_strdup(argv[i+1]);
+                remove_args(argc, argv, i, 2);
+                --i; /* this arg was removed so go back */
+            }
+        } else {
             /* this is a memleak.. oh well.. heh */
             gchar *err = g_strdup_printf
                 ("Invalid command line argument '%s'\n", argv[i]);
@@ -607,9 +596,6 @@ void ob_restart()
 
 void ob_reconfigure()
 {
-    if (reconfigure_notify)
-        kill(reconfigure_notify, SIGUSR2);
-
     reconfigure = TRUE;
     ob_exit(0);
 }

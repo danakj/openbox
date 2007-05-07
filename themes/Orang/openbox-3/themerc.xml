@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<openbox_theme version="1" xmlns="http://openbox.org/themerc">
+<openbox_theme version="1" engine="box" xmlns="http://openbox.org/themerc">
   <dimensions>
     <handle>3</handle>
     <padding x="1" y="1"/>

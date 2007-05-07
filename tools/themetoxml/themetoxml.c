@@ -314,6 +314,7 @@ int main(int argc, char **argv)
     doc = xmlNewDoc((const xmlChar*) "1.0");
     xmlDocSetRootElement
         (doc,(root = xmlNewNode(NULL, (const xmlChar*)"openbox_theme")));
+    xmlSetProp(root, (const xmlChar*)"engine", (const xmlChar*)"box");
     xmlSetProp(root, (const xmlChar*)"version", (const xmlChar*)"1");
     xmlSetProp(root, (const xmlChar*)"xmlns",
                (const xmlChar*)"http://openbox.org/themerc");

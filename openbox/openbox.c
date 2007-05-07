@@ -96,6 +96,7 @@ static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
 static gchar    *config_type = NULL;
+static pid_t     reconfigure_notify = 0;
 
 static void signal_handler(gint signal, gpointer data);
 static void parse_env(char **argv0);
@@ -105,6 +106,8 @@ static Cursor load_cursor(const gchar *name, guint fontval);
 
 gint main(gint argc, gchar **argv)
 {
+    gchar *program_name;
+
     state = OB_STATE_STARTING;
 
     /* initialize the locale */
@@ -114,14 +117,17 @@ gint main(gint argc, gchar **argv)
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
 
-    g_set_prgname(argv[0]);
-
     if (chdir(g_get_home_dir()) == -1)
         g_message(_("Unable to change to home directory '%s': %s"),
                   g_get_home_dir(), g_strerror(errno));
      
-    /* parse out environment and command line args */
+    /* parse the environment first, it can change the argv[0] */
     parse_env(&argv[0]);
+
+    program_name = g_path_get_basename(argv[0]);
+    g_set_prgname(program_name);
+
+    /* parse the command line args */
     parse_args(&argc, argv);
 
     if (!remote_control) {
@@ -216,7 +222,7 @@ gint main(gint argc, gchar **argv)
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
 
-    if (screen_annex()) { /* it will be ours! */
+    if (screen_annex(program_name)) { /* it will be ours! */
         do {
             {
                 ObParseInst *i;
@@ -404,14 +410,14 @@ gint main(gint argc, gchar **argv)
 
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
-        execlp(argv[0], g_path_get_basename(argv[0]),
-               (char *)NULL); /* last resort */
+        execlp(argv[0], program_name, (gchar*)NULL); /* last resort */
     }
 
     /* free stuff passed in from the command line or environment */
     g_free(ob_sm_save_file);
     g_free(ob_sm_id);
     g_free(config_type);
+    g_free(program_name);
      
     return exitcode;
 }
@@ -481,6 +487,10 @@ static void parse_env(gchar **argv0)
     if ((c = getenv("OPENBOX_RESTART_BINARY")))
         *argv0 = g_strdup(c);
     unsetenv("OPENBOX_RESTART_BINARY");
+
+    /* notify this application when openbox reconfigures */
+    if ((c = getenv("OPENBOX_RECONFIGURE_NOTIFY_PID")))
+        reconfigure_notify = (pid_t) atol(c);
 }
 
 static void remove_args(gint *argc, gchar **argv, gint index, gint num)
@@ -597,6 +607,9 @@ void ob_restart()
 
 void ob_reconfigure()
 {
+    if (reconfigure_notify)
+        kill(reconfigure_notify, SIGUSR2);
+
     reconfigure = TRUE;
     ob_exit(0);
 }

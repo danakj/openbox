@@ -4,7 +4,8 @@ themedir        = $(datadir)/themes
 localedir       = $(datadir)/locale
 configdir       = $(sysconfdir)/xdg
 rcdir           = $(configdir)/openbox
-desktopfilesdir = $(datadir)/gnome/wm-properties
+xsessionsdir    = $(datadir)/xsessions
+gnomewmfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
@@ -28,6 +29,12 @@ lib_LTLIBRARIES = \
 bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
+
+bin_SCRIPTS = \
+	data/xsession/openbox-gnome-session \
+	data/xsession/openbox-kde-session \
+	data/xsession/openbox-gnome \
+	data/xsession/openbox-kde
 
 noinst_PROGRAMS = \
 	tools/themetoxml/themetoxml
@@ -386,8 +393,15 @@ data/menu.xml: Makefile $(srcdir)/data/menu.xml.in data
 	@mkdir data 2>/dev/null || true
 	@$(edit) $(srcdir)/data/menu.xml.in >$@
 
-dist_desktopfiles_DATA = \
-	data/openbox.desktop
+dist_gnomewmfiles_DATA = \
+	data/gnome-wm-properties/openbox.desktop \
+	data/gnome-wm-properties/openbox-gnome.desktop \
+	data/gnome-wm-properties/openbox-kde.desktop
+
+dist_xsessions_DATA = \
+	data/xsession/openbox.desktop \
+	data/xsession/openbox-gnome.desktop \
+	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
 	version.h.in \

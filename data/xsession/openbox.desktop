@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Openbox
+Comment=Use this session to run Openbox as your desktop environment
+Exec=openbox
+TryExec=openbox-shell
+Icon=openbox.png
+Type=XSession

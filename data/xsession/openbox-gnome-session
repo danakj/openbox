@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Run GNOME with Openbox as its window manager
+export WINDOW_MANAGER=openbox-gnome
+exec gnome-session "$@"

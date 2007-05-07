@@ -114,7 +114,7 @@ static gboolean parse_color(const gchar *c, gint *r, gint *g, gint *b)
         c += 4;
         for (i = 0; i < 3; ++i) {
             dig1 = hextodec(c[0]);
-            if (c[1] == '/') { dig2 = dig1; c+=2; }
+            if (c[1] == '/' || (c[1] == '\0' && i == 2)) { dig2 = dig1; c+=2; }
             else { dig2 = hextodec(c[1]); c+=3; }
 
             if (dig1 < 0 || dig2 < 0) return FALSE;
@@ -283,14 +283,15 @@ int main(int argc, char **argv)
     const gchar *s;
     int ret = 0;
 
-    if (argc > 1) {
+    if (argc > 2) {
         fprintf(stderr, "themetoxml (C) 2007 Dana Jansens\n"
-                "This tool takes an older Openbox3 themerc file on stdin,"
-                " and gives back the\n"
-                "theme in the newer themerc.xml XML style.\n");
+                "This tool takes an older Openbox3 themerc file and prints "
+                "out the theme in\n"
+                "theme in the newer XML (themerc.xml) style.\n");
         return 0;
     }
-    {
+
+    if (argc == 1 || !strcmp(argv[1], "-")) {
         gchar *buf = g_new(gchar, 1000);
         gint sz = 1000;
         gint r = 0, rthis;
@@ -310,6 +311,13 @@ int main(int argc, char **argv)
         }
         g_free(buf);
     }
+    else if (argc == 2) {
+        if ((db = XrmGetFileDatabase(argv[1])) == NULL) {
+            fprintf(stderr, "Unable to read the database from %s\n", argv[1]);
+            return 1;
+        }
+    }
+
 
     doc = xmlNewDoc((const xmlChar*) "1.0");
     xmlDocSetRootElement

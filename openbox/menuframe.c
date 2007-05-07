@@ -924,6 +924,9 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 
     menu_frame_visible = g_list_prepend(menu_frame_visible, self);
 
+    if (self->menu->show_func)
+        self->menu->show_func(self, self->menu->data);
+
     return TRUE;
 }
 
@@ -1005,6 +1008,9 @@ void menu_frame_hide(ObMenuFrame *self)
 
     if (!it)
         return;
+
+    if (self->menu->hide_func)
+        self->menu->hide_func(self, self->menu->data);
 
     if (self->child)
         menu_frame_hide(self->child);

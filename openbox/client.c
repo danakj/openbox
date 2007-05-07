@@ -57,13 +57,14 @@
 
 typedef struct
 {
-    ObClientDestructor func;
+    ObClientCallback func;
     gpointer data;
-} Destructor;
+} ClientCallback;
 
-GList            *client_list        = NULL;
+GList            *client_list          = NULL;
 
-static GSList *client_destructors    = NULL;
+static GSList *client_destructors      = NULL;
+static GSList *client_desktop_notifies = NULL;
 
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -105,23 +106,46 @@ void client_shutdown(gboolean reconfig)
 {
 }
 
-void client_add_destructor(ObClientDestructor func, gpointer data)
+void client_add_destructor(ObClientCallback func, gpointer data)
 {
-    Destructor *d = g_new(Destructor, 1);
+    ClientCallback *d = g_new(ClientCallback, 1);
     d->func = func;
     d->data = data;
     client_destructors = g_slist_prepend(client_destructors, d);
 }
 
-void client_remove_destructor(ObClientDestructor func)
+void client_remove_destructor(ObClientCallback func)
 {
     GSList *it;
 
     for (it = client_destructors; it; it = g_slist_next(it)) {
-        Destructor *d = it->data;
+        ClientCallback *d = it->data;
         if (d->func == func) {
             g_free(d);
             client_destructors = g_slist_delete_link(client_destructors, it);
+            break;
+        }
+    }
+}
+
+void client_add_desktop_notify(ObClientCallback func, gpointer data)
+{
+    ClientCallback *d = g_new(ClientCallback, 1);
+    d->func = func;
+    d->data = data;
+    client_desktop_notifies = g_slist_prepend(client_desktop_notifies, d);
+}
+
+void client_remove_desktop_notify(ObClientCallback func)
+{
+    GSList *it;
+
+    for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
+        ClientCallback *d = it->data;
+        if (d->func == func) {
+            g_free(d);
+            client_desktop_notifies =
+                g_slist_delete_link(client_desktop_notifies, it);
             break;
         }
     }
@@ -533,7 +557,7 @@ void client_unmanage(ObClient *self)
         screen_update_areas();
 
     for (it = client_destructors; it; it = g_slist_next(it)) {
-        Destructor *d = it->data;
+        ClientCallback *d = it->data;
         d->func(self, d->data);
     }
 
@@ -3001,6 +3025,12 @@ void client_set_desktop_recursive(ObClient *self,
             focus_order_to_top(self);
         else
             focus_order_to_bottom(self);
+
+        /* call the notifies */
+        for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
+            ClientCallback *d = it->data;
+            d->func(self, d->data);
+        }
     }
 
     /* move all transients */

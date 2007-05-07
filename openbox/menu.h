@@ -37,6 +37,8 @@ typedef struct _ObNormalMenuEntry ObNormalMenuEntry;
 typedef struct _ObSubmenuMenuEntry ObSubmenuMenuEntry;
 typedef struct _ObSeparatorMenuEntry ObSeparatorMenuEntry;
 
+typedef void (*ObMenuShowFunc)(struct _ObMenuFrame *frame, gpointer data);
+typedef void (*ObMenuHideFunc)(struct _ObMenuFrame *frame, gpointer data);
 typedef gboolean (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame,
                                      gpointer data);
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry,
@@ -75,6 +77,8 @@ struct _ObMenu
     /* plugin data */
     gpointer data;
 
+    ObMenuShowFunc show_func;
+    ObMenuHideFunc hide_func;
     ObMenuUpdateFunc update_func;
     ObMenuExecuteFunc execute_func;
     ObMenuDestroyFunc destroy_func;
@@ -166,6 +170,8 @@ void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 void menu_show(gchar *name, gint x, gint y, gint button,
                struct _ObClient *client);
 
+void menu_set_show_func(ObMenu *menu, ObMenuShowFunc func);
+void menu_set_hide_func(ObMenu *menu, ObMenuHideFunc func);
 void menu_set_update_func(ObMenu *menu, ObMenuUpdateFunc func);
 void menu_set_execute_func(ObMenu *menu, ObMenuExecuteFunc func);
 void menu_set_destroy_func(ObMenu *menu, ObMenuDestroyFunc func);

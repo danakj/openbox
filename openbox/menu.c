@@ -528,6 +528,16 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
     return e;
 }
 
+void menu_set_show_func(ObMenu *self, ObMenuShowFunc func)
+{
+    self->show_func = func;
+}
+
+void menu_set_hide_func(ObMenu *self, ObMenuHideFunc func)
+{
+    self->hide_func = func;
+}
+
 void menu_set_update_func(ObMenu *self, ObMenuUpdateFunc func)
 {
     self->update_func = func;

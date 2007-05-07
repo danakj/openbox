@@ -295,7 +295,6 @@ static gchar *popup_get_name(ObClient *c, ObClient **nametarget)
     /* find our highest direct parent, including non-normal windows */
     for (p = c; p->transient_for && p->transient_for != OB_TRAN_GROUP;
          p = p->transient_for);
-    if (nametarget) *nametarget = p;
 
     if (c->desktop != DESKTOP_ALL && c->desktop != screen_desktop)
         desk = screen_desktop_names[c->desktop];
@@ -315,6 +314,8 @@ static gchar *popup_get_name(ObClient *c, ObClient **nametarget)
     }
     g_free(title);
 
+    /* set this only if we're returning true and they asked for it */
+    if (ret && nametarget) *nametarget = p;
     return ret;
 }
 
@@ -361,13 +362,15 @@ static void popup_cycle(ObClient *c, gboolean show,
         /* make it null terminated so we can use g_strfreev */
         names = g_new(char*, n+1);
         for (it = targets, i = 0; it; it = g_list_next(it), ++i) {
-            ObClient *ft = it->data;
-            names[i] = popup_get_name(ft, &showtarget);
+            ObClient *ft = it->data, *t;
+            names[i] = popup_get_name(ft, &t);
 
-            /* little optimization.. save this text so we dont have to get it
-               again */
-            if (ft == c)
+            /* little optimization.. save this text and client, so we dont
+               have to get it again */
+            if (ft == c) {
                 showtext = g_strdup(names[i]);
+                showtarget = t;
+            }
         }
         names[n] = NULL;
 

@@ -68,6 +68,7 @@ static GSList *client_destructors    = NULL;
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
 static void client_get_startup_id(ObClient *self);
+static void client_get_session_ids(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
@@ -75,7 +76,6 @@ static void client_get_layer(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_gravity(ObClient *self);
-static void client_get_client_machine(ObClient *self);
 static void client_get_colormap(ObClient *self);
 static void client_get_transientness(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
@@ -994,12 +994,12 @@ static void client_get_all(ObClient *self)
 #ifdef SYNC
     client_update_sync_request_counter(self);
 #endif
-    client_get_client_machine(self);
+
+    /* get the session related properties */
+    client_get_session_ids(self);
+
     client_get_colormap(self);
     client_update_title(self);
-    client_update_class(self);
-    client_update_sm_client_id(self);
-    client_update_command(self);
     client_update_strut(self);
     client_update_icons(self);
     client_update_user_time(self);
@@ -1858,34 +1858,6 @@ void client_update_title(ObClient *self)
     self->icon_title = data;
 }
 
-void client_update_class(ObClient *self)
-{
-    gchar **data;
-    gchar *s;
-
-    if (self->name) g_free(self->name);
-    if (self->class) g_free(self->class);
-    if (self->role) g_free(self->role);
-
-    self->name = self->class = self->role = NULL;
-
-    if (PROP_GETSS(self->window, wm_class, locale, &data)) {
-        if (data[0]) {
-            self->name = g_strdup(data[0]);
-            if (data[1])
-                self->class = g_strdup(data[1]);
-        }
-        g_strfreev(data);     
-    }
-
-    if (PROP_GETS(self->window, wm_window_role, locale, &s))
-        self->role = s;
-
-    if (self->name == NULL) self->name = g_strdup("");
-    if (self->class == NULL) self->class = g_strdup("");
-    if (self->role == NULL) self->role = g_strdup("");
-}
-
 void client_update_strut(ObClient *self)
 {
     guint num;
@@ -2072,21 +2044,95 @@ void client_update_icon_geometry(ObClient *self)
     }
 }
 
-static void client_get_client_machine(ObClient *self)
+static void client_get_session_ids(ObClient *self)
 {
-    gchar *data = NULL;
-    gchar localhost[128];
+    guint32 leader;
+    gboolean got;
+    gchar *s;
+    gchar **ss;
 
-    g_free(self->client_machine);
+    if (!PROP_GET32(self->window, wm_client_leader, window, &leader))
+        leader = None;
 
-    if (PROP_GETS(self->window, wm_client_machine, locale, &data) ||
-        (self->group &&
-         PROP_GETS(self->group->leader, wm_client_machine, locale, &data)))
-    {
+    /* get the SM_CLIENT_ID */
+    got = FALSE;
+    if (leader)
+        got = PROP_GETS(leader, sm_client_id, locale, &self->sm_client_id);
+    if (!got)
+        PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id);
+
+    /* get the WM_CLASS (name and class). make them "" if they are not
+       provided */
+    got = FALSE;
+    if (leader)
+        got = PROP_GETSS(leader, wm_class, locale, &ss);
+    if (!got)
+        got = PROP_GETSS(self->window, wm_class, locale, &ss);
+
+    if (got) {
+        if (ss[0]) {
+            self->name = g_strdup(ss[0]);
+            if (ss[1])
+                self->class = g_strdup(ss[1]);
+        }
+        g_strfreev(ss);
+    }
+
+    if (self->name == NULL) self->name = g_strdup("");
+    if (self->class == NULL) self->class = g_strdup("");
+
+    /* get the WM_WINDOW_ROLE. make it "" if it is not provided */
+    got = FALSE;
+    if (leader)
+        got = PROP_GETS(leader, wm_window_role, locale, &s);
+    if (!got)
+        got = PROP_GETS(self->window, wm_window_role, locale, &s);
+
+    if (got)
+        self->role = s;
+    else
+        self->role = g_strdup("");
+
+    /* get the WM_COMMAND */
+    got = FALSE;
+
+    if (leader)
+        got = PROP_GETSS(leader, wm_command, locale, &ss);
+    if (!got)
+        got = PROP_GETSS(self->window, wm_command, locale, &ss);
+
+    if (got) {
+        /* merge/mash them all together */
+        gchar *merge = NULL;
+        gint i;
+
+        for (i = 0; ss[i]; ++i) {
+            gchar *tmp = merge;
+            if (merge)
+                merge = g_strconcat(merge, ss[i], NULL);
+            else
+                merge = g_strconcat(ss[i], NULL);
+            g_free(tmp);
+        }
+        g_strfreev(ss);
+
+        self->wm_command = merge;
+    }
+
+    /* get the WM_CLIENT_MACHINE */
+    got = FALSE;
+    if (leader)
+        got = PROP_GETS(leader, wm_client_machine, locale, &s);
+    if (!got)
+        got = PROP_GETS(self->window, wm_client_machine, locale, &s);
+
+    if (got) {
+        gchar localhost[128];
+
         gethostname(localhost, 127);
         localhost[127] = '\0';
-        if (strcmp(localhost, data))
-            self->client_machine = data;
+        if (strcmp(localhost, s) != 0)
+            self->client_machine = s;
     }
 }
 
@@ -3581,46 +3627,6 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
             return search;
     }
     return NULL;
-}
-
-void client_update_sm_client_id(ObClient *self)
-{
-    g_free(self->sm_client_id);
-    self->sm_client_id = NULL;
-
-    if (!PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id))
-        if (self->group)
-            PROP_GETS(self->group->leader, sm_client_id, locale,
-                      &self->sm_client_id);
-}
-
-void client_update_command(ObClient *self)
-{
-    gchar **data;
-
-    g_free(self->wm_command);
-    self->wm_command = NULL;
-
-    if (PROP_GETSS(self->window, wm_command, locale, &data) ||
-        (self->group &&
-         PROP_GETSS(self->group->leader, wm_command, locale, &data)))
-    {
-        /* merge/mash them all together */
-        gchar *merge = NULL;
-        gint i;
-
-        for (i = 0; data[i]; ++i) {
-            gchar *tmp = merge;
-            if (merge)
-                merge = g_strconcat(merge, data[i], NULL);
-            else
-                merge = g_strconcat(data[i], NULL);
-            g_free(tmp);
-        }
-        g_strfreev(data);
-
-        self->wm_command = merge;
-    }
 }
 
 #define WANT_EDGE(cur, c) \

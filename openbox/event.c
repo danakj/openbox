@@ -1167,10 +1167,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                    msgtype == prop_atoms.net_wm_icon_name ||
                    msgtype == prop_atoms.wm_icon_name) {
             client_update_title(client);
-        } else if (msgtype == prop_atoms.wm_command) {
-            client_update_command(client);
-        } else if (msgtype == prop_atoms.wm_class) {
-            client_update_class(client);
         } else if (msgtype == prop_atoms.wm_protocols) {
             client_update_protocols(client);
             client_setup_decor_and_functions(client);
@@ -1192,9 +1188,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_sync_request_counter(client);
         }
 #endif
-        else if (msgtype == prop_atoms.sm_client_id) {
-            client_update_sm_client_id(client);
-        }
     case ColormapNotify:
         client_update_colormap(client, e->xcolormap.colormap);
         break;

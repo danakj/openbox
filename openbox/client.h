@@ -558,10 +558,6 @@ void client_update_normal_hints(ObClient *self);
 void client_update_wmhints(ObClient *self);
 /*! Updates the window's title and icon title */
 void client_update_title(ObClient *self);
-/*! Updates the command used to run the program */
-void client_update_command(ObClient *self);
-/*! Updates the window's application name and class */
-void client_update_class(ObClient *self);
 /*! Updates the strut for the client */
 void client_update_strut(ObClient *self);
 /*! Updates the window's icons */
@@ -649,8 +645,6 @@ void client_set_layer(ObClient *self, gint layer);
 void client_set_undecorated(ObClient *self, gboolean undecorated);
 
 guint client_monitor(ObClient *self);
-
-void client_update_sm_client_id(ObClient *self);
 
 ObClient* client_under_pointer();
 

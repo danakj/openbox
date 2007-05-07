@@ -328,8 +328,8 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     g_hash_table_replace(menu_hash, self->name, self);
 
     self->more_menu = g_new0(ObMenu, 1);
-    self->more_menu->name = "More...";
-    self->more_menu->title = "More...";
+    self->more_menu->name = _("More...");
+    self->more_menu->title = _("More...");
     self->more_menu->data = data;
     self->more_menu->shortcut = g_unichar_tolower(g_utf8_get_char("M"));
 

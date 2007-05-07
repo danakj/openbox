@@ -2143,9 +2143,11 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic)
+    if (self->shaded || self->iconic ||
+        (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop))
+    {
         self->wmstate = IconicState;
-    else
+    } else
         self->wmstate = NormalState;
 
     if (old != self->wmstate) {

@@ -480,7 +480,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 
-    /* show/hide windows from top to bottom */
+    /* show windows from top to bottom */
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;

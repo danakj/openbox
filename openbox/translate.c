@@ -55,7 +55,7 @@ static guint translate_modifier(gchar *str)
              !g_ascii_strcasecmp("H", str))
         mask = modkeys_key_to_mask(OB_MODKEY_KEY_HYPER);
     else
-        g_message(_("Invalid modifier key '%s' in key/pointer binding"), str);
+        g_message(_("Invalid modifier key '%s' in key/mouse binding"), str);
 
     return mask;
 }
@@ -91,10 +91,8 @@ gboolean translate_button(const gchar *str, guint *state, guint *button)
     else if (!g_ascii_strcasecmp("Up", l)) *button = 4;
     else if (!g_ascii_strcasecmp("Down", l)) *button = 5;
     else if (!g_ascii_strncasecmp("Button", l, 6)) *button = atoi(l+6);
-    if (!*button) {
-        g_message(_("Invalid button '%s' in pointer binding"), l);
+    if (!*button)
         goto translation_fail;
-    }
 
     ret = TRUE;
 

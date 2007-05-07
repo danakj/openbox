@@ -178,8 +178,19 @@ static void desktop_change_callback(ObClient *c, gpointer data)
         if (frame->parent) {
             ObMenuEntryFrame *me = frame->parent_entry;
             ObMenuFrame *parent = frame->parent;
+            gint sel =
+                g_list_position(frame->entries,
+                                g_list_find(frame->entries, frame->selected));
             menu_frame_select(parent, NULL, TRUE);
             menu_frame_select(parent, me, TRUE);
+
+            frame = parent->child;
+            /* reselect the same spot or the last one if it got shorter */
+            sel = MIN(sel, (gint)g_list_length(frame->entries));
+            if (sel >= 0)
+                menu_frame_select(frame,
+                                  g_list_nth(frame->entries, sel)->data,
+                                  TRUE);
         } else
             menu_frame_hide(frame);
     }

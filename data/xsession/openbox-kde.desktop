@@ -1,6 +1,6 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=Openbox/KDE
+Name=KDE/Openbox
 Comment=Use the Openbox window manager inside of the K Desktop Environment
 Exec=openbox-kde-session
 TryExec=startkde

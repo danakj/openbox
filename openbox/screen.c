@@ -299,55 +299,55 @@ gboolean screen_annex(const gchar *program_name)
 
 void screen_startup(gboolean reconfig)
 {
-    if (!reconfig) {
-        guint i, numnames;
-        gchar **names;
-        GSList *it;
-
-        /* get the initial size */
-        screen_resize();
-
-        /* get the desktop names */
-        numnames = g_slist_length(config_desktops_names);
-        names = g_new(gchar*, numnames + 1);
-        names[numnames] = NULL;
-        for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
-            names[i] = g_strdup(it->data);
-
-        /* set the root window property */
-        PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
-
-        g_strfreev(names);
-    }
+    guint i, numnames;
+    gchar **names;
+    GSList *it;
+    guint32 d;
 
     desktop_cycle_popup = pager_popup_new(FALSE);
     pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
 
-    if (!reconfig)
-        screen_num_desktops = 0;
+    if (reconfig)
+        return;
+
+    /* get the initial size */
+    screen_resize();
+
+    /* get the desktop names */
+    numnames = g_slist_length(config_desktops_names);
+    names = g_new(gchar*, numnames + 1);
+    names[numnames] = NULL;
+    for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
+        names[i] = g_strdup(it->data);
+
+    /* set the root window property */
+    PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
+
+    g_strfreev(names);
+
+    /* set the number of desktops */
+    screen_num_desktops = 0;
     screen_set_num_desktops(config_desktops_num);
-    if (!reconfig) {
-        guint32 d;
-        /* start on the current desktop when a wm was already running */
-        if (PROP_GET32(RootWindow(ob_display, ob_screen),
-                       net_current_desktop, cardinal, &d) &&
-            d < screen_num_desktops)
-        {
-            screen_set_desktop(d, FALSE);
-        } else if (session_desktop >= 0)
-            screen_set_desktop(MIN((guint)session_desktop,
-                                   screen_num_desktops), FALSE);
-        else
-            screen_set_desktop(MIN(config_screen_firstdesk,
-                                   screen_num_desktops) - 1, FALSE);
 
-        /* don't start in showing-desktop mode */
-        screen_showing_desktop = FALSE;
-        PROP_SET32(RootWindow(ob_display, ob_screen),
-                   net_showing_desktop, cardinal, screen_showing_desktop);
+    /* start on the current desktop when a wm was already running */
+    if (PROP_GET32(RootWindow(ob_display, ob_screen),
+                   net_current_desktop, cardinal, &d) &&
+        d < screen_num_desktops)
+    {
+        screen_set_desktop(d, FALSE);
+    } else if (session_desktop >= 0)
+        screen_set_desktop(MIN((guint)session_desktop,
+                               screen_num_desktops), FALSE);
+    else
+        screen_set_desktop(MIN(config_screen_firstdesk,
+                               screen_num_desktops) - 1, FALSE);
 
-        screen_update_layout();
-    }
+    /* don't start in showing-desktop mode */
+    screen_showing_desktop = FALSE;
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               net_showing_desktop, cardinal, screen_showing_desktop);
+
+    screen_update_layout();
 }
 
 void screen_shutdown(gboolean reconfig)
@@ -356,22 +356,24 @@ void screen_shutdown(gboolean reconfig)
 
     pager_popup_free(desktop_cycle_popup);
 
-    if (!reconfig) {
-        XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
-                     NoEventMask);
+    if (reconfig)
+        return;
 
-        /* we're not running here no more! */
-        PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_pid);
-        /* not without us */
-        PROP_ERASE(RootWindow(ob_display, ob_screen), net_supported);
-        /* don't keep this mode */
-        PROP_ERASE(RootWindow(ob_display, ob_screen), net_showing_desktop);
+    XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
+                 NoEventMask);
 
-        XDestroyWindow(ob_display, screen_support_win);
-    }
+    /* we're not running here no more! */
+    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_pid);
+    /* not without us */
+    PROP_ERASE(RootWindow(ob_display, ob_screen), net_supported);
+    /* don't keep this mode */
+    PROP_ERASE(RootWindow(ob_display, ob_screen), net_showing_desktop);
+
+    XDestroyWindow(ob_display, screen_support_win);
 
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
+
     for (r = area; *r; ++r)
         g_free(*r);
     g_free(area);

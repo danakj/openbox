@@ -299,34 +299,29 @@ gboolean screen_annex(const gchar *program_name)
 
 void screen_startup(gboolean reconfig)
 {
-    GSList *it;
-    guint i;
+    if (!reconfig) {
+        guint i, numnames;
+        gchar **names;
+        GSList *it;
 
-    desktop_cycle_popup = pager_popup_new(FALSE);
-    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
-
-    if (!reconfig)
         /* get the initial size */
         screen_resize();
 
-    /* get the names */
-    if (PROP_GETSS(RootWindow(ob_display, ob_screen),
-                   net_desktop_names, utf8, &screen_desktop_names))
-        for (i = 0; screen_desktop_names[i]; ++i);
-    else
-        i = 0;
-    for (it = g_slist_nth(config_desktops_names, i); it;
-         it = g_slist_next(it), ++i)
-    {
-        screen_desktop_names = g_renew(gchar*, screen_desktop_names, i + 2);
-        screen_desktop_names[i+1] = NULL;
-        screen_desktop_names[i] = g_strdup(it->data);
+        /* get the desktop names */
+        numnames = g_slist_length(config_desktops_names);
+        names = g_new(gchar*, numnames + 1);
+        names[numnames] = NULL;
+        for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
+            names[i] = g_strdup(it->data);
+
+        /* set the root window property */
+        PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
+
+        g_strfreev(names);
     }
-    /* then set the names */
-    PROP_SETSS(RootWindow(ob_display, ob_screen),
-               net_desktop_names, screen_desktop_names);
-    g_strfreev(screen_desktop_names);
-    screen_desktop_names = NULL;
+
+    desktop_cycle_popup = pager_popup_new(FALSE);
+    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
 
     if (!reconfig)
         screen_num_desktops = 0;
@@ -480,7 +475,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 
-    /* show/hide windows from top to bottom */
+    /* show windows from top to bottom */
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
@@ -629,6 +624,8 @@ void screen_desktop_popup(guint d, gboolean show)
         a = screen_physical_area_monitor(0);
         pager_popup_position(desktop_cycle_popup, CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
+        pager_popup_max_width(desktop_cycle_popup,
+                              MAX(a->width/3, POPUP_WIDTH));
         pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
     }
 }
@@ -876,10 +873,10 @@ void screen_update_desktop_names()
 
     if (PROP_GETSS(RootWindow(ob_display, ob_screen),
                    net_desktop_names, utf8, &screen_desktop_names))
-        for (i = 0; screen_desktop_names[i] && i <= screen_num_desktops; ++i);
+        for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
         i = 0;
-    if (i <= screen_num_desktops) {
+    if (i < screen_num_desktops) {
         screen_desktop_names = g_renew(gchar*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
@@ -888,11 +885,9 @@ void screen_update_desktop_names()
     }
 
     /* resize the pager for these names */
-    pager_popup_width_to_strings(desktop_cycle_popup,
-                                 screen_desktop_names,
-                                 screen_num_desktops,
-                                 MAX(screen_physical_area_monitor(0)->width/3,
-                                     POPUP_WIDTH));
+    pager_popup_text_width_to_strings(desktop_cycle_popup,
+                                      screen_desktop_names,
+                                      screen_num_desktops);
 }
 
 void screen_show_desktop(gboolean show, gboolean restore_focus)

@@ -95,6 +95,8 @@
   <number>4</number>
   <firstdesk>1</firstdesk>
   <names>
+    <!-- the desktop names are only set at startup, pagers allow you to
+	 change them during a session -->
     <name>desktop one</name>
     <name>desktop two</name>
     <name>desktop three</name>

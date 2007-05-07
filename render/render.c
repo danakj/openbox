@@ -369,7 +369,7 @@ gint RrMinWidth(RrAppearance *a)
                                     a->texture[i].data.text.string, 
                                     a->texture[i].data.text.shadow_offset_x,
                                     a->texture[i].data.text.shadow_offset_y);
-            w = MAX(w, m->width + 4);
+            w = MAX(w, m->width);
             g_free(m);
             break;
         case RR_TEXTURE_RGBA:

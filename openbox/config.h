@@ -23,11 +23,38 @@
 #include "misc.h"
 #include "stacking.h"
 #include "place.h"
+#include "geom.h"
 #include "render/render.h"
 
 #include <glib.h>
 
 struct _ObParseInst;
+
+struct _ObAppSettings
+{
+    gchar *class;
+    gchar *name;
+    gchar *role;
+
+    Point position;
+    gboolean center_x;
+    gboolean center_y;
+    gboolean pos_given;
+
+    guint desktop;
+    gint shade;
+    gint decor;
+    gint focus;
+    gint monitor;
+    gint iconic;
+    gint skip_pager;
+    gint skip_taskbar;
+    gint max_horz;
+    gint max_vert;
+    gint fullscreen;
+
+    gint layer;
+};
 
 /*! Should new windows be focused */
 extern gboolean config_focus_new;

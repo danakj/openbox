@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# A temporary script to be replaced by a real program..
+exec openbox --restart-binary openbox-kde "$@"

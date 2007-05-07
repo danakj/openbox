@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Openbox/GNOME
+Exec=openbox-gnome
+
+# name we put on the WM spec check window
+X-GNOME-WMName=openbox-gnome
+
+# our config tool
+ConfigExec=obconf

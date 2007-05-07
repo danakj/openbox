@@ -161,5 +161,6 @@
       <xs:element name="window" type="obt:allwindows" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="version" type="xs:integer" use="required" fixed="1"/>
+    <xs:attribute name="engine" type="xs:string" use="required" fixed="box"/>
   </xs:complexType>
 </xs:schema>

@@ -108,20 +108,35 @@ gboolean parse_load_theme(const gchar *name, xmlDocPtr *doc, xmlNodePtr *root,
     GSList *it;
     gchar *path;
     gboolean r = FALSE;
+    gchar *eng;
 
     /* backward compatibility.. */
     path = g_build_filename(g_get_home_dir(), ".themes", name,
                             "openbox-3", "themerc.xml", NULL);
-    if ((r = parse_load(path, "openbox_theme", doc, root)))
-        *retpath = g_path_get_dirname(path);
+    if (parse_load(path, "openbox_theme", doc, root) &&
+        parse_attr_string("engine", *root, &eng))
+    {
+        if (!strcmp(eng, "box")) {
+            *retpath = g_path_get_dirname(path);
+            r = TRUE;
+        }
+        g_free(eng);
+    }
     g_free(path);
 
     if (!r) {
         for (it = xdg_data_dir_paths; !r && it; it = g_slist_next(it)) {
             path = g_build_filename(it->data, "themes", name, "openbox-3",
                                     "themerc.xml", NULL);
-            if ((r = parse_load(path, "openbox_theme", doc, root)))
-                *retpath = g_path_get_dirname(path);
+            if (parse_load(path, "openbox_theme", doc, root) &&
+                parse_attr_string("engine", *root, &eng))
+            {
+                if (!strcmp(eng, "box")) {
+                    *retpath = g_path_get_dirname(path);
+                    r = TRUE;
+                }
+                g_free(eng);
+            }
             g_free(path);
         }
     }

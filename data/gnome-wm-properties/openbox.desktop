@@ -3,7 +3,7 @@ Name=Openbox
 Exec=openbox
 
 # name we put on the WM spec check window
-X-GNOME-WMName=Openbox
+X-GNOME-WMName=openbox
 
 # our config tool
-ConfigExec=obconf2
+ConfigExec=obconf

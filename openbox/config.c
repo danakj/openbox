@@ -102,22 +102,23 @@ GSList *config_per_app_settings;
       <position>
         <x>700</x>
         <y>0</y>
+        <monitor>1</monitor>
       </position>
-      <head>1</head>
+      .. there is a lot more settings available
     </application>
   </applications>
 */
 
 /* Manages settings for individual applications.
-   Some notes: head is the screen number in a multi monitor
+   Some notes: monitor is the screen number in a multi monitor
    (Xinerama) setup (starting from 0) or mouse, meaning the
-   head the pointer is on. Default: mouse.
+   monitor the pointer is on. Default: mouse.
    Layer can be three values, above (Always on top), below
    (Always on bottom) and everything else (normal behaviour).
    Positions can be an integer value or center, which will
-   center the window in the specified axis. Position is relative
-   from head, so <position><x>center</x></position><head>1</head>
-   will center the window on the second head.
+   center the window in the specified axis. Position is within
+   the monitor, so <position><x>center</x></position><monitor>2</monitor>
+   will center the window on the second monitor.
 */
 static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                                    xmlNodePtr node, gpointer d)
@@ -151,108 +152,124 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
 
             settings->decor = -1;
             if ((n = parse_find_node("decor", app->children)))
-                settings->decor = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->decor = parse_bool(doc, n);
 
             settings->shade = -1;
             if ((n = parse_find_node("shade", app->children)))
-                settings->shade = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->shade = parse_bool(doc, n);
 
             settings->position.x = settings->position.y = 0;
             settings->pos_given = FALSE;
             if ((n = parse_find_node("position", app->children))) {
-                if ((c = parse_find_node("x", n->children))) {
-                    gchar *s = parse_string(doc, c);
-                    if (!strcmp(s, "center")) {
-                        settings->center_x = TRUE;
-                        x_pos_given = TRUE;
-                    } else {
-                        settings->position.x = parse_int(doc, c);
-                        x_pos_given = TRUE;
+                if ((c = parse_find_node("x", n->children)))
+                    if (!parse_contains("default", doc, c)) {
+                        gchar *s = parse_string(doc, c);
+                        if (!strcmp(s, "center")) {
+                            settings->center_x = TRUE;
+                            x_pos_given = TRUE;
+                        } else {
+                            settings->position.x = parse_int(doc, c);
+                            x_pos_given = TRUE;
+                        }
+                        g_free(s);
                     }
-                    g_free(s);
-                }
 
-                if (x_pos_given && (c = parse_find_node("y", n->children))) {
-                    gchar *s = parse_string(doc, c);
-                    if (!strcmp(s, "center")) {
-                        settings->center_y = TRUE;
-                        settings->pos_given = TRUE;
-                    } else {
-                        settings->position.y = parse_int(doc, c);
-                        settings->pos_given = TRUE;
+                if (x_pos_given && (c = parse_find_node("y", n->children)))
+                    if (!parse_contains("default", doc, c)) {
+                        gchar *s = parse_string(doc, c);
+                        if (!strcmp(s, "center")) {
+                            settings->center_y = TRUE;
+                            settings->pos_given = TRUE;
+                        } else {
+                            settings->position.y = parse_int(doc, c);
+                            settings->pos_given = TRUE;
+                        }
+                        g_free(s);
                     }
-                    g_free(s);
-                }
+
+                if (settings->pos_given &&
+                    (c = parse_find_node("monitor", n->children)))
+                    if (!parse_contains("default", doc, c)) {
+                        gchar *s = parse_string(doc, c);
+                        if (!strcmp(s, "mouse"))
+                            settings->monitor = 0;
+                        else
+                            settings->monitor = parse_int(doc, c) + 1;
+                        g_free(s);
+                    }
             }
 
             settings->focus = -1;
             if ((n = parse_find_node("focus", app->children)))
-                settings->focus = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->focus = parse_bool(doc, n);
 
             if ((n = parse_find_node("desktop", app->children))) {
-                gchar *s = parse_string(doc, n);
-                if (!strcmp(s, "all"))
-                    settings->desktop = DESKTOP_ALL;
-                else
-                    settings->desktop = parse_int(doc, n);
-                g_free(s);
-            } else
-                settings->desktop = DESKTOP_ALL - 1; /* lets hope the user
-                                                      * doesn't have 2^32
-                                                      * desktops */
-
-            if ((n = parse_find_node("head", app->children))) {
-                gchar *s = parse_string(doc, n);
-                if (!strcmp(s, "mouse"))
-                    settings->head = -1;
-                else
-                    settings->head = parse_int(doc, n);
-                g_free(s);
+                if (!parse_contains("default", doc, n)) {
+                    gchar *s = parse_string(doc, n);
+                    if (!strcmp(s, "all"))
+                        settings->desktop = DESKTOP_ALL;
+                    else {
+                        gint i = parse_int(doc, n);
+                        if (i > 0)
+                            settings->desktop = i;
+                    }
+                    g_free(s);
+                } else
+                    settings->desktop = 0;
             }
 
             settings->layer = -2;
-            if ((n = parse_find_node("layer", app->children))) {
-                gchar *s = parse_string(doc, n);
-                if (!strcmp(s, "above"))
-                    settings->layer = 1;
-                else if (!strcmp(s, "below"))
-                    settings->layer = -1;
-                else
-                    settings->layer = 0;
-                g_free(s);
-            }
+            if ((n = parse_find_node("layer", app->children)))
+                if (!parse_contains("default", doc, n)) {
+                    gchar *s = parse_string(doc, n);
+                    if (!strcmp(s, "above"))
+                        settings->layer = 1;
+                    else if (!strcmp(s, "below"))
+                        settings->layer = -1;
+                    else
+                        settings->layer = 0;
+                    g_free(s);
+                }
 
             settings->iconic = -1;
             if ((n = parse_find_node("iconic", app->children)))
-                settings->iconic = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->iconic = parse_bool(doc, n);
 
             settings->skip_pager = -1;
             if ((n = parse_find_node("skip_pager", app->children)))
-                settings->skip_pager = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->skip_pager = parse_bool(doc, n);
 
             settings->skip_taskbar = -1;
             if ((n = parse_find_node("skip_taskbar", app->children)))
-                settings->skip_taskbar = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->skip_taskbar = parse_bool(doc, n);
 
             settings->fullscreen = -1;
             if ((n = parse_find_node("fullscreen", app->children)))
-                settings->fullscreen = parse_bool(doc, n);
+                if (!parse_contains("default", doc, n))
+                    settings->fullscreen = parse_bool(doc, n);
 
             settings->max_horz = -1;
             settings->max_vert = -1;
-            if ((n = parse_find_node("maximized", app->children))) {
-                gchar *s = parse_string(doc, n);
-                if (!strcmp(s, "horizontal")) {
-                    settings->max_horz = TRUE;
-                    settings->max_vert = FALSE;
-                } else if (!strcmp(s, "vertical")) {
-                    settings->max_horz = FALSE;
-                    settings->max_vert = TRUE;
-                } else
-                    settings->max_horz = settings->max_vert =
-                        parse_bool(doc, n);
-                g_free(s);
-            }
+            if ((n = parse_find_node("maximized", app->children)))
+                if (!parse_contains("default", doc, n)) {
+                    gchar *s = parse_string(doc, n);
+                    if (!strcmp(s, "horizontal")) {
+                        settings->max_horz = TRUE;
+                        settings->max_vert = FALSE;
+                    } else if (!strcmp(s, "vertical")) {
+                        settings->max_horz = FALSE;
+                        settings->max_vert = TRUE;
+                    } else
+                        settings->max_horz = settings->max_vert =
+                            parse_bool(doc, n);
+                    g_free(s);
+                }
 
             config_per_app_settings = g_slist_append(config_per_app_settings,
                                               (gpointer) settings);
@@ -663,15 +680,13 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                                                parse_expand_tilde(c));
             g_free(c);
         }
-        if ((n = parse_find_node("warpPointer", node)))
-            config_menu_warppointer = parse_bool(doc, n);
         if ((n = parse_find_node("hideDelay", node)))
             config_menu_hide_delay = parse_int(doc, n);
         if ((n = parse_find_node("middle", node)))
             config_menu_middle = parse_bool(doc, n);
         if ((n = parse_find_node("submenuShowDelay", node)))
             config_submenu_show_delay = parse_int(doc, n);
-        if ((n = parse_find_node("desktopMenuIcons", node)))
+        if ((n = parse_find_node("applicationIcons", node)))
             config_menu_client_list_icons = parse_bool(doc, n);
     }
 }

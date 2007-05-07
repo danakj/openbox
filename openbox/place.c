@@ -52,6 +52,9 @@ static Rect *pick_pointer_head(ObClient *c)
     g_assert_not_reached();
 }
 
+/*! Pick a monitor to place a window on.
+  The returned array value should be freed with g_free. The areas within the
+  array should not be freed. */
 static Rect **pick_head(ObClient *c)
 {
     Rect **area;
@@ -388,16 +391,24 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
                                       ObAppSettings *settings)
 {
-    Rect *screen;
+    Rect *screen = NULL;
 
     if (!settings || (settings && !settings->pos_given))
         return FALSE;
 
     /* Find which head the pointer is on */
-    if (settings->head == -1)
+    if (settings->monitor == 0)
         screen = pick_pointer_head(client);
-    else
-        screen = screen_area_monitor(client->desktop, settings->head);
+    else if (settings->monitor > 0 &&
+             (guint)settings->monitor <= screen_num_monitors)
+        screen = screen_area_monitor(client->desktop,
+                                     (guint)settings->monitor - 1);
+    else {
+        Rect **all = NULL;
+        all = pick_head(client);
+        screen = all[0];
+        g_free(all); /* the areas themselves don't need to be freed */
+    }
 
     if (settings->center_x)
         *x = screen->x + screen->width / 2 - client->area.width / 2;

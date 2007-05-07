@@ -31,6 +31,8 @@
 #define SEPARATOR_HEIGHT 3
 #define MAX_MENU_WIDTH 400
 
+#define ITEM_HEIGHT (ob_rr_theme->menu_font_height + 2*PADDING)
+
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
                          LeaveWindowMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
@@ -92,8 +94,6 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
-
-    self->item_h = ob_rr_theme->menu_font_height + 2*PADDING;
 
     stacking_add(MENU_AS_WINDOW(self));
 
@@ -311,7 +311,7 @@ static void menu_frame_place_submenu(ObMenuFrame *self, gint *x, gint *y)
 
     *y = self->parent->area.y + self->parent_entry->area.y;
     if (config_menu_middle)
-        *y -= (self->area.height - (bwidth * 2) - self->item_h) / 2;
+        *y -= (self->area.height - (bwidth * 2) - ITEM_HEIGHT) / 2;
     else
         *y += overlap;
 }
@@ -363,7 +363,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   /* enabled */
                   (self == self->frame->selected ?
                    self->a_selected : self->a_normal));
-        th = self->frame->item_h;
+        th = ITEM_HEIGHT;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label) {
@@ -433,23 +433,23 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         XMoveResizeWindow(ob_display, self->text,
                           self->frame->text_x, PADDING,
                           self->frame->text_w,
-                          self->frame->item_h - 2*PADDING);
+                          ITEM_HEIGHT - 2*PADDING);
         text_a->surface.parent = item_a;
         text_a->surface.parentx = self->frame->text_x;
         text_a->surface.parenty = PADDING;
         RrPaint(text_a, self->text, self->frame->text_w,
-                self->frame->item_h - 2*PADDING);
+                ITEM_HEIGHT - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         XMoveResizeWindow(ob_display, self->text,
                           self->frame->text_x, PADDING,
-                          self->frame->text_w - self->frame->item_h,
-                          self->frame->item_h - 2*PADDING);
+                          self->frame->text_w - ITEM_HEIGHT,
+                          ITEM_HEIGHT - 2*PADDING);
         text_a->surface.parent = item_a;
         text_a->surface.parentx = self->frame->text_x;
         text_a->surface.parenty = PADDING;
-        RrPaint(text_a, self->text, self->frame->text_w - self->frame->item_h,
-                self->frame->item_h - 2*PADDING);
+        RrPaint(text_a, self->text, self->frame->text_w - ITEM_HEIGHT,
+                ITEM_HEIGHT - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label != NULL) {
@@ -491,9 +491,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     {
         XMoveResizeWindow(ob_display, self->icon,
                           PADDING, frame->item_margin.top,
-                          self->frame->item_h - frame->item_margin.top
+                          ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom,
-                          self->frame->item_h - frame->item_margin.top
+                          ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom);
         self->a_icon->texture[0].data.rgba.width =
             self->entry->data.normal.icon_width;
@@ -505,9 +505,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         self->a_icon->surface.parentx = PADDING;
         self->a_icon->surface.parenty = frame->item_margin.top;
         RrPaint(self->a_icon, self->icon,
-                self->frame->item_h - frame->item_margin.top
+                ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom,
-                self->frame->item_h - frame->item_margin.top
+                ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom);
         XMapWindow(ob_display, self->icon);
     } else if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
@@ -517,9 +517,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 
         XMoveResizeWindow(ob_display, self->icon,
                           PADDING, frame->item_margin.top,
-                          self->frame->item_h - frame->item_margin.top
+                          ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom,
-                          self->frame->item_h - frame->item_margin.top
+                          ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom);
         self->a_mask->texture[0].data.mask.mask =
             self->entry->data.normal.mask;
@@ -540,9 +540,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         self->a_mask->surface.parentx = PADDING;
         self->a_mask->surface.parenty = frame->item_margin.top;
         RrPaint(self->a_mask, self->icon,
-                self->frame->item_h - frame->item_margin.top
+                ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom,
-                self->frame->item_h - frame->item_margin.top
+                ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom);
         XMapWindow(ob_display, self->icon);
     } else
@@ -551,21 +551,20 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
         RrAppearance *bullet_a;
         XMoveResizeWindow(ob_display, self->bullet,
-                          self->frame->text_x + self->frame->text_w
-                          - self->frame->item_h + PADDING, PADDING,
-                          self->frame->item_h - 2*PADDING,
-                          self->frame->item_h - 2*PADDING);
+                          self->frame->text_x + self->frame->text_w -
+                          ITEM_HEIGHT + PADDING, PADDING,
+                          ITEM_HEIGHT - 2*PADDING,
+                          ITEM_HEIGHT - 2*PADDING);
         bullet_a = (self == self->frame->selected ?
                     self->a_bullet_selected :
                     self->a_bullet_normal);
         bullet_a->surface.parent = item_a;
         bullet_a->surface.parentx =
-            self->frame->text_x + self->frame->text_w - self->frame->item_h
-            + PADDING;
+            self->frame->text_x + self->frame->text_w - ITEM_HEIGHT + PADDING;
         bullet_a->surface.parenty = PADDING;
         RrPaint(bullet_a, self->bullet,
-                self->frame->item_h - 2*PADDING,
-                self->frame->item_h - 2*PADDING);
+                ITEM_HEIGHT - 2*PADDING,
+                ITEM_HEIGHT - 2*PADDING);
         XMapWindow(ob_display, self->bullet);
     } else
         XUnmapWindow(ob_display, self->bullet);
@@ -582,15 +581,6 @@ static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
     ObMenuEntryType t;
     gint h = 0;
 
-    /* if the first entry is a labeled separator, then make its border
-       overlap with the menu's outside border */
-    if (first_entry)
-        h -= ob_rr_theme->mbwidth;
-    /* if the last entry is a labeled separator, then make its border
-       overlap with the menu's outside border */
-    if (last_entry)
-        h -= ob_rr_theme->mbwidth;
-
     h += 2*PADDING;
 
     if (self)
@@ -599,15 +589,24 @@ static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
         /* this is the More... entry, it's NORMAL type */
         t = OB_MENU_ENTRY_TYPE_NORMAL;
 
-    switch (self->entry->type) {
+    switch (t) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
     case OB_MENU_ENTRY_TYPE_SUBMENU:
-        h += self->frame->item_h;
+        h += ob_rr_theme->menu_font_height;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label != NULL) {
             h += ob_rr_theme->menu_title_height +
                 (ob_rr_theme->mbwidth - PADDING) * 2;
+ 
+            /* if the first entry is a labeled separator, then make its border
+               overlap with the menu's outside border */
+            if (first_entry)
+                h -= ob_rr_theme->mbwidth;
+            /* if the last entry is a labeled separator, then make its border
+               overlap with the menu's outside border */
+            if (last_entry)
+                h -= ob_rr_theme->mbwidth;
         } else {
             h += SEPARATOR_HEIGHT;
         }
@@ -638,7 +637,7 @@ static void menu_frame_render(ObMenuFrame *self)
         tw = RrMinWidth(e->a_text_normal);
         tw += 2*PADDING;
 
-        th = self->item_h;
+        th = ITEM_HEIGHT;
 
         RrMargins(e->a_normal, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
@@ -664,8 +663,7 @@ static void menu_frame_render(ObMenuFrame *self)
                   MAX(self->item_margin.top, t),
                   MAX(self->item_margin.right, r),
                   MAX(self->item_margin.bottom, b));
-    } else
-        self->item_h = 0;
+    }
 
     /* render the entries */
 
@@ -706,8 +704,9 @@ static void menu_frame_render(ObMenuFrame *self)
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
-            RrMinSize(text_a, &tw, &th);
+            tw = RrMinWidth(text_a);
             tw = MIN(tw, MAX_MENU_WIDTH);
+            th = ob_rr_theme->menu_font_height;
 
             if (e->entry->data.normal.icon_data ||
                 e->entry->data.normal.mask)
@@ -716,20 +715,21 @@ static void menu_frame_render(ObMenuFrame *self)
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             sub = e->entry->data.submenu.submenu;
             text_a->texture[0].data.text.string = sub ? sub->title : "";
-            RrMinSize(text_a, &tw, &th);
+            tw = RrMinWidth(text_a);
             tw = MIN(tw, MAX_MENU_WIDTH);
+            th = ob_rr_theme->menu_font_height;
 
             if (e->entry->data.normal.icon_data ||
                 e->entry->data.normal.mask)
                 has_icon = TRUE;
 
-            tw += self->item_h - PADDING;
+            tw += ITEM_HEIGHT - PADDING;
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
             if (e->entry->data.separator.label != NULL) {
                 e->a_text_title->texture[0].data.text.string =
                     e->entry->data.separator.label;
-                RrMinSize(e->a_text_title, &tw, &th);
+                tw = RrMinWidth(text_a);
                 tw = MIN(tw, MAX_MENU_WIDTH);
                 th = ob_rr_theme->menu_title_height +
                     (ob_rr_theme->mbwidth - PADDING) *2;
@@ -760,8 +760,8 @@ static void menu_frame_render(ObMenuFrame *self)
 
     if (self->entries) {
         if (has_icon) {
-            w += self->item_h + PADDING;
-            self->text_x += self->item_h + PADDING;
+            w += ITEM_HEIGHT + PADDING;
+            self->text_x += ITEM_HEIGHT + PADDING;
         }
     }
 
@@ -801,7 +801,7 @@ static void menu_frame_update(ObMenuFrame *self)
 
     /* go through the menu's and frame's entries and connect the frame entries
        to the menu entries */
-    for (mit = self->menu->entries, fit = self->entries; mit && fit;
+    for (fit = self->entries; mit && fit;
          mit = g_list_next(mit), fit = g_list_next(fit))
     {
         ObMenuEntryFrame *f = fit->data;
@@ -854,6 +854,8 @@ static void menu_frame_update(ObMenuFrame *self)
             menu_entry_frame_free(tmp->data);
             self->entries = g_list_delete_link(self->entries, tmp);
 
+            menu_frame_render(self);
+
             /* only the first one that we see is the last entry in the menu */
             last_entry = FALSE;
         };
@@ -862,8 +864,14 @@ static void menu_frame_update(ObMenuFrame *self)
             ObMenuEntry *more_entry;
             ObMenuEntryFrame *more_frame;
             /* make the More... menu entry frame which will display in this
-               frame. */
-            more_entry = menu_get_more(self->menu,
+               frame.
+               if self->menu->more_menu is NULL that means that this is already
+               More... menu, so just use ourself.
+            */
+            more_entry = menu_get_more((self->menu->more_menu ?
+                                        self->menu->more_menu :
+                                        self->menu),
+                                       /* continue where we left off */
                                        self->show_from +
                                        g_list_length(self->entries));
             more_frame = menu_entry_frame_new(more_entry, self);

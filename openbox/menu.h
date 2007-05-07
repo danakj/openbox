@@ -82,6 +82,9 @@ struct _ObMenu
 
     /* Pipe-menu parent, we get destroyed when it is destroyed */
     ObMenu *pipe_creator;
+
+    /* The menu used as the destination for the "More..." entry for this menu*/
+    ObMenu *more_menu;
 };
 
 typedef enum

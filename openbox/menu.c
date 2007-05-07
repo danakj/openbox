@@ -327,6 +327,12 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 
     g_hash_table_replace(menu_hash, self->name, self);
 
+    self->more_menu = g_new0(ObMenu, 1);
+    self->more_menu->name = "More...";
+    self->more_menu->title = "More...";
+    self->more_menu->data = data;
+    self->more_menu->shortcut = g_unichar_tolower(g_utf8_get_char("M"));
+
     return self;
 }
 
@@ -355,9 +361,10 @@ static void menu_destroy_hash_value(ObMenu *self)
     g_free(self);
 }
 
-void menu_free(ObMenu *menu)
+void menu_unref(ObMenu *menu)
 {
-    g_hash_table_remove(menu_hash, menu->name);
+    if (menu)
+        g_hash_table_remove(menu_hash, menu->name);
 }
 
 void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
@@ -461,6 +468,7 @@ void menu_clear_entries(ObMenu *self)
         menu_entry_unref(self->entries->data);
         self->entries = g_list_delete_link(self->entries, self->entries);
     }
+    self->more_menu->entries = self->entries; /* keep it in sync */
 }
 
 void menu_entry_remove(ObMenuEntry *self)
@@ -480,6 +488,7 @@ ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
     menu_entry_set_label(e, label, allow_shortcut);
 
     self->entries = g_list_append(self->entries, e);
+    self->more_menu->entries = self->entries; /* keep it in sync */
     return e;
 }
 
@@ -487,7 +496,9 @@ ObMenuEntry* menu_get_more(ObMenu *self, guint show_from)
 {
     ObMenuEntry *e;
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SUBMENU, -1);
-    e->data.submenu.name = g_strdup(self->name); /* points to itself */
+    /* points to itself */
+    e->data.submenu.name = g_strdup(self->name);
+    e->data.submenu.submenu = self;
     e->data.submenu.show_from = show_from;
     return e;
 }
@@ -500,6 +511,7 @@ ObMenuEntry* menu_add_submenu(ObMenu *self, gint id, const gchar *submenu)
     e->data.submenu.name = g_strdup(submenu);
 
     self->entries = g_list_append(self->entries, e);
+    self->more_menu->entries = self->entries; /* keep it in sync */
     return e;
 }
 
@@ -512,6 +524,7 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
     menu_entry_set_label(e, label, FALSE);
 
     self->entries = g_list_append(self->entries, e);
+    self->more_menu->entries = self->entries; /* keep it in sync */
     return e;
 }
 

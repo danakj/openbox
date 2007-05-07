@@ -1,6 +1,15 @@
 # List of source files containing translatable strings.
+openbox/action.c
+openbox/client_list_combined_menu.c
 openbox/client_list_menu.c
 openbox/client_menu.c
+openbox/config.c
+openbox/keyboard.c
+openbox/menu.c
+openbox/mouse.c
 openbox/openbox.c
+openbox/screen.c
 openbox/session.c
-render/font.c
+openbox/startupnotify.c
+openbox/translate.c
+openbox/xerror.c

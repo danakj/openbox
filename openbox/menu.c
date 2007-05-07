@@ -361,7 +361,7 @@ static void menu_destroy_hash_value(ObMenu *self)
     g_free(self);
 }
 
-void menu_unref(ObMenu *menu)
+void menu_free(ObMenu *menu)
 {
     if (menu)
         g_hash_table_remove(menu_hash, menu->name);

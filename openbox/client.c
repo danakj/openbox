@@ -3027,6 +3027,7 @@ void client_set_desktop_recursive(ObClient *self,
             focus_order_to_bottom(self);
 
         /* call the notifies */
+        GSList *it;
         for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
             ClientCallback *d = it->data;
             d->func(self, d->data);

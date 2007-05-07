@@ -2143,7 +2143,7 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || !self->frame->visible)
+    if (self->shaded || self->iconic)
         self->wmstate = IconicState;
     else
         self->wmstate = NormalState;
@@ -2303,23 +2303,6 @@ gboolean client_should_show(ObClient *self)
         return FALSE;
     if (client_normal(self) && screen_showing_desktop)
         return FALSE;
-    /*
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP)
-            return client_should_show(self->transient_for);
-        else {
-            GSList *it;
-
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
-                if (c != self && !c->transient_for) {
-                    if (client_should_show(c))
-                        return TRUE;
-                }
-            }
-        }
-    }
-    */
     if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
         return TRUE;
     

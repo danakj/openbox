@@ -37,7 +37,7 @@
 #include <glib.h>
 #include <assert.h>
 
-#define FOCUS_INDICATOR_WIDTH 5
+#define FOCUS_INDICATOR_WIDTH 6
 
 ObClient *focus_client = NULL;
 GList *focus_order = NULL;
@@ -528,6 +528,28 @@ void focus_cycle_draw_indicator()
     }
 }
 
+static gboolean has_valid_group_siblings_on_desktop(ObClient *ft,
+                                                    gboolean all_desktops)
+                                                         
+{
+    GSList *it;
+
+    if (!ft->group) return FALSE;
+
+    for (it = ft->group->members; it; it = g_slist_next(it)) {
+        ObClient *c = it->data;
+        /* check that it's not a helper window to avoid infinite recursion */
+        if (c != ft && !client_helper(ft) &&
+            valid_focus_target(ft, all_desktops, FALSE))
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/*! @param allow_helpers This is used for calling itself recursively while
+                         checking helper windows. */
 static gboolean valid_focus_target(ObClient *ft,
                                    gboolean all_desktops,
                                    gboolean dock_windows)
@@ -548,16 +570,17 @@ static gboolean valid_focus_target(ObClient *ft,
     if (dock_windows)
         ok = ok && ft->type == OB_CLIENT_TYPE_DOCK;
     else
-        ok = ok && (ft->type == OB_CLIENT_TYPE_NORMAL ||
-                    ft->type == OB_CLIENT_TYPE_DIALOG ||
-                    ((ft->type == OB_CLIENT_TYPE_TOOLBAR ||
-                      ft->type == OB_CLIENT_TYPE_MENU ||
-                      ft->type == OB_CLIENT_TYPE_UTILITY) &&
-                     /* let alt-tab go to these windows when a window in its
-                        group already has focus ... */
-                     ((focus_client && ft->group == focus_client->group) ||
-                      /* ... or if there are no main windows in its group */
-                      !client_has_non_helper_group_siblings(ft))));
+        /* normal non-helper windows are valid targets */
+        ok = ok &&
+            ((client_normal(ft) && !client_helper(ft))
+             ||
+             /* helper windows are valid targets it... */
+             (client_helper(ft) &&
+              /* ...a window in its group already has focus ... */
+              ((focus_client && ft->group == focus_client->group) ||
+               /* ... or if there are no other windows in its group 
+                  that can be cycled to instead */
+               !has_valid_group_siblings_on_desktop(ft, all_desktops))));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
        expected to set this hint */

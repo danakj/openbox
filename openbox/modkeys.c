@@ -20,6 +20,7 @@
 #include "openbox.h"
 
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 /* These masks are constants and the modifier keys are bound to them as
    anyone sees fit:

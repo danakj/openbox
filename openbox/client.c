@@ -2994,8 +2994,7 @@ void client_hilite(ObClient *self, gboolean hilite)
 
 void client_set_desktop_recursive(ObClient *self,
                                   guint target,
-                                  gboolean donthide,
-                                  gboolean focus_nonintrusive)
+                                  gboolean donthide)
 {
     guint old;
     GSList *it;
@@ -3005,10 +3004,6 @@ void client_set_desktop_recursive(ObClient *self,
         ob_debug("Setting desktop %u\n", target+1);
 
         g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
-
-        /* remove from the old desktop(s) */
-        if (!focus_nonintrusive)
-            focus_order_remove(self);
 
         old = self->desktop;
         self->desktop = target;
@@ -3023,14 +3018,6 @@ void client_set_desktop_recursive(ObClient *self,
             client_raise(self);
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
-
-        /* add to the new desktop(s) */
-        if (!focus_nonintrusive) {
-            if (config_focus_new)
-                focus_order_to_top(self);
-            else
-                focus_order_to_bottom(self);
-        }
 
         /* call the notifies */
         GSList *it;
@@ -3049,7 +3036,7 @@ void client_set_desktop_recursive(ObClient *self,
 }
 
 void client_set_desktop(ObClient *self, guint target,
-                        gboolean donthide, gboolean focus_nonintrusive)
+                        gboolean donthide)
 {
     self = client_search_top_normal_parent(self);
     client_set_desktop_recursive(self, target, donthide, focus_nonintrusive);
@@ -3460,7 +3447,8 @@ static void client_bring_helper_windows_recursive(ObClient *self,
     if (client_helper(self) &&
         self->desktop != desktop && self->desktop != DESKTOP_ALL)
     {
-        client_set_desktop(self, desktop, FALSE, TRUE);
+        client_set_desktop(self, desktop, FALSE);
+>>>>>>> .merge-right.r6182
     }
 }
 
@@ -3901,18 +3889,4 @@ ObClient* client_under_pointer()
 gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
-}
-
-gboolean client_has_non_helper_group_siblings(ObClient *self)
-{
-    GSList *it;
-
-    if (!self->group) return FALSE;
-
-    for (it = self->group->members; it; it = g_slist_next(it)) {
-        ObClient *c = it->data;
-        if (c != self && client_normal(c) && !client_helper(c))
-            return TRUE;
-    }
-    return FALSE;
 }

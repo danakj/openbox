@@ -425,7 +425,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 
 static gboolean place_transient(ObClient *client, gint *x, gint *y)
 {
-    if (client->transient_for) {
+    if (client->transient_for && client->type == OB_CLIENT_TYPE_DIALOG) {
         if (client->transient_for != OB_TRAN_GROUP) {
             ObClient *c = client;
             ObClient *p = client->transient_for;

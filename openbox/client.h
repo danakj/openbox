@@ -464,6 +464,9 @@ void client_maximize(ObClient *self, gboolean max, gint dir);
 */
 void client_shade(ObClient *self, gboolean shade);
 
+/*! Set a client window to have decorations or not */
+void client_set_undecorated(ObClient *self, gboolean undecorated);
+
 /*! Hilite the window to make the user notice it */
 void client_hilite(ObClient *self, gboolean hilite);
 
@@ -657,14 +660,11 @@ ObClient *client_search_transient(ObClient *self, ObClient *search);
 gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);
 
 /*! Set a client window to be above/below other clients.
-  @layer < 0 indicates the client should be placed below other clients.<br>
-         = 0 indicates the client should be placed with other clients.<br>
+  @layer < 0 indicates the client should be placed below other clients.<br />
+         = 0 indicates the client should be placed with other clients.<br />
          > 0 indicates the client should be placed above other clients.
 */
 void client_set_layer(ObClient *self, gint layer);
-
-/*! Set a client window to have decorations or not */
-void client_set_undecorated(ObClient *self, gboolean undecorated);
 
 guint client_monitor(ObClient *self);
 

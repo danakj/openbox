@@ -3412,37 +3412,18 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
 {
     guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
     gboolean allow = FALSE;
-    gboolean relative = FALSE;
 
-    if (user || !focus_client)
+    /* if the request came from the user, or if nothing is focused, then grant
+       the request.
+       if the currently focused app doesn't set a user_time, then it can't
+       benefit from any focus stealing prevention.
+    */
+    if (user || !focus_client || !last_time)
         allow = TRUE;
-    /* if the request came from an application and something already has focus
-       then do some checks; */
-    else {
-        GSList *it;
-
-        /* search if someone related to us by transience already has focus */
-        for (it = client_search_all_top_parents(self); it && !relative;
-             it = g_slist_next(it))
-        {
-            if (client_search_transient(it->data, focus_client))
-                relative = TRUE;
-        }
-
-        /* search if someone in the group already has focus */
-        for (it = client_search_all_top_parents(self); it && !relative;
-             it = g_slist_next(it))
-        {
-            if (client_search_transient(it->data, focus_client))
-                relative = TRUE;
-        }
-
-        /* if a relative has focus, then if the time is newer (or we can't
-           check the time - very lenient), allow focus to move */
-        allow = relative && (!event_curtime || !last_time ||
-                             event_time_after(event_curtime, last_time));
-    }
-    
+    /* otherwise, if they didn't give a time stamp or if it is too old, they
+       don't get focus */
+    else
+        allow = event_curtime && event_time_after(event_curtime, last_time);
 
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Want to activate window 0x%x with time %u (last time %u), "

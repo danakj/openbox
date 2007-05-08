@@ -2857,7 +2857,7 @@ static void client_iconify_recursive(ObClient *self,
 
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
 {
-    if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
+    if (self->functions & OB_CLIENT_FUNC_ICONIFY || !iconic) {
         /* move up the transient chain as far as possible first */
         self = client_search_top_normal_parent(self);
         client_iconify_recursive(self, iconic, curdesk);

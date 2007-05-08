@@ -3411,27 +3411,53 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
 void client_activate(ObClient *self, gboolean here, gboolean user)
 {
     guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
+    gboolean allow = FALSE;
+    gboolean relative = FALSE;
 
-    /* XXX do some stuff here if user is false to determine if we really want
-       to activate it or not (a parent or group member is currently
-       active)?
-    */
+    if (user || !focus_client)
+        allow = TRUE;
+    /* if the request came from an application and something already has focus
+       then do some checks; */
+    else {
+        GSList *it;
+
+        /* search if someone related to us by transience already has focus */
+        for (it = client_search_all_top_parents(self); it && !relative;
+             it = g_slist_next(it))
+        {
+            if (client_search_transient(it->data, focus_client))
+                relative = TRUE;
+        }
+
+        /* search if someone in the group already has focus */
+        for (it = client_search_all_top_parents(self); it && !relative;
+             it = g_slist_next(it))
+        {
+            if (client_search_transient(it->data, focus_client))
+                relative = TRUE;
+        }
+
+        /* if a relative has focus, then if the time is newer (or we can't
+           check the time - very lenient), allow focus to move */
+        allow = relative && (!event_curtime || !last_time ||
+                             event_time_after(event_curtime, last_time));
+    }
+    
+
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Want to activate window 0x%x with time %u (last time %u), "
-                  "source=%s\n",
+                  "source=%s allowing? %d\n",
                   self->window, event_curtime, last_time,
-                  (user ? "user" : "application"));
+                  (user ? "user" : "application"), allow);
 
-    if (!user && event_curtime && last_time &&
-        !event_time_after(event_curtime, last_time))
-    {
-        client_hilite(self, TRUE);
-    } else {
+    if (allow) {
         if (event_curtime != CurrentTime)
             self->user_time = event_curtime;
 
         client_present(self, here, TRUE);
-    }
+    } else
+        /* don't focus it but tell the user it wants attention */
+        client_hilite(self, TRUE);
 }
 
 static void client_bring_helper_windows_recursive(ObClient *self,

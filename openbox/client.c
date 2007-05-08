@@ -3888,17 +3888,3 @@ gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
 }
-
-gboolean client_has_non_helper_group_siblings(ObClient *self)
-{
-    GSList *it;
-
-    if (!self->group) return FALSE;
-
-    for (it = self->group->members; it; it = g_slist_next(it)) {
-        ObClient *c = it->data;
-        if (c != self && client_normal(c) && !client_helper(c))
-            return TRUE;
-    }
-    return FALSE;
-}

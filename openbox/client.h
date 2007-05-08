@@ -661,8 +661,4 @@ ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
 
-/*! Returns if a client has an group siblings which are main application
-  windows (not helper or non-normal windows) */
-gboolean client_has_non_helper_group_siblings(ObClient *self);
-
 #endif

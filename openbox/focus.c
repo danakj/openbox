@@ -528,6 +528,25 @@ void focus_cycle_draw_indicator()
     }
 }
 
+static gboolean has_non_helper_group_siblings_on_desktop(ObClient *ft,
+                                                         gboolean all_desktops)
+{
+    GSList *it;
+
+    if (!ft->group) return FALSE;
+
+    for (it = ft->group->members; it; it = g_slist_next(it)) {
+        ObClient *c = it->data;
+        if (c != ft && client_normal(c) && !client_helper(c) &&
+            (c->desktop == ft->desktop || c->desktop == DESKTOP_ALL ||
+             all_desktops))
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static gboolean valid_focus_target(ObClient *ft,
                                    gboolean all_desktops,
                                    gboolean dock_windows)
@@ -557,7 +576,9 @@ static gboolean valid_focus_target(ObClient *ft,
                         group already has focus ... */
                      ((focus_client && ft->group == focus_client->group) ||
                       /* ... or if there are no main windows in its group */
-                      !client_has_non_helper_group_siblings(ft))));
+                      !has_non_helper_group_siblings_on_desktop(ft,
+                                                                all_desktops))
+                        ));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
        expected to set this hint */

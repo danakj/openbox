@@ -159,7 +159,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     }
     for (; it; it = next, ++i) {
         next = g_slist_next(it);
-        menu_unref(it->data);
+        menu_free(it->data);
         desktop_menus = g_slist_delete_link(desktop_menus, it);
         menu_entry_remove(menu_find_entry_id(menu, i));
     }

@@ -464,13 +464,9 @@ void client_kill(ObClient *self);
 
 /*! Sends the window to the specified desktop
   @param donthide If TRUE, the window will not be shown/hidden after its
-         desktop has been changed. Generally this should be FALSE.
-  @param focus_nonintrusive If TRUE, the window will not be moved in the
-         focus order at all. Do this when moving windows to a desktop in
-         the "background" or something. It can be used to make a window share
-         multiple desktops. Generally this should be FALSE. */
-void client_set_desktop(ObClient *self, guint target,
-                        gboolean donthide, gboolean focus_nonintrusive);
+                  desktop has been changed. Generally this should be FALSE.
+*/
+void client_set_desktop(ObClient *self, guint target, gboolean donthide);
 
 /*! Show the client if it should be shown. */
 void client_show(ObClient *self);

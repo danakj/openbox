@@ -438,7 +438,7 @@ void screen_set_num_desktops(guint num)
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         if (c->desktop >= num && c->desktop != DESKTOP_ALL)
-            client_set_desktop(c, num - 1, FALSE, FALSE);
+            client_set_desktop(c, num - 1, FALSE);
     }
  
     /* change our struts/area to match (after moving windows) */
@@ -473,7 +473,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ob_debug("Moving to desktop %d\n", num+1);
 
     if (moveresize_client)
-        client_set_desktop(moveresize_client, num, TRUE, FALSE);
+        client_set_desktop(moveresize_client, num, TRUE);
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 

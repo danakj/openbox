@@ -1351,7 +1351,7 @@ void action_toggle_omnipresent(union ActionData *data)
 { 
     client_set_desktop(data->client.any.c,
                        data->client.any.c->desktop == DESKTOP_ALL ?
-                       screen_desktop : DESKTOP_ALL, FALSE, FALSE);
+                       screen_desktop : DESKTOP_ALL, FALSE);
 }
 
 void action_move_relative_horz(union ActionData *data)
@@ -1515,7 +1515,7 @@ void action_send_to_desktop(union ActionData *data)
 
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, data->sendto.follow, FALSE);
+        client_set_desktop(c, data->sendto.desk, data->sendto.follow);
         if (data->sendto.follow)
             screen_set_desktop(data->sendto.desk, TRUE);
     }
@@ -1582,7 +1582,7 @@ void action_send_to_desktop_dir(union ActionData *data)
         !data->sendtodir.inter.final ||
         data->sendtodir.inter.cancel)
     {
-        client_set_desktop(c, d, data->sendtodir.follow, FALSE);
+        client_set_desktop(c, d, data->sendtodir.follow);
         if (data->sendtodir.follow)
             screen_set_desktop(d, TRUE);
     }

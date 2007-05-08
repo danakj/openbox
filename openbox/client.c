@@ -1599,10 +1599,15 @@ void client_setup_decor_and_functions(ObClient *self)
         self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
         break;
 
+    case OB_CLIENT_TYPE_SPLASH:
+        /* these don't get get any decorations, and the only thing you can
+           do with them is move them */
+        self->decorations = 0;
+        self->functions = OB_CLIENT_FUNC_MOVE;
+
     case OB_CLIENT_TYPE_DESKTOP:
     case OB_CLIENT_TYPE_DOCK:
-    case OB_CLIENT_TYPE_SPLASH:
-        /* none of these windows are manipulated by the window manager */
+        /* these windows are not manipulated by the window manager */
         self->decorations = 0;
         self->functions = 0;
         break;

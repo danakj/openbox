@@ -64,7 +64,6 @@ typedef struct
 GList            *client_list          = NULL;
 
 static GSList *client_destructors      = NULL;
-static GSList *client_desktop_notifies = NULL;
 
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -123,29 +122,6 @@ void client_remove_destructor(ObClientCallback func)
         if (d->func == func) {
             g_free(d);
             client_destructors = g_slist_delete_link(client_destructors, it);
-            break;
-        }
-    }
-}
-
-void client_add_desktop_notify(ObClientCallback func, gpointer data)
-{
-    ClientCallback *d = g_new(ClientCallback, 1);
-    d->func = func;
-    d->data = data;
-    client_desktop_notifies = g_slist_prepend(client_desktop_notifies, d);
-}
-
-void client_remove_desktop_notify(ObClientCallback func)
-{
-    GSList *it;
-
-    for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        if (d->func == func) {
-            g_free(d);
-            client_desktop_notifies =
-                g_slist_delete_link(client_desktop_notifies, it);
             break;
         }
     }
@@ -3043,13 +3019,6 @@ void client_set_desktop_recursive(ObClient *self,
             client_raise(self);
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
-
-        /* call the notifies */
-        GSList *it;
-        for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
-            ClientCallback *d = it->data;
-            d->func(self, d->data);
-        }
     }
 
     /* move all transients */

@@ -23,6 +23,8 @@
 #include "client.h"
 #include "openbox.h"
 #include "frame.h"
+#include "moveresize.h"
+#include "prop.h"
 #include "gettext.h"
 
 #include <glib.h>
@@ -50,81 +52,176 @@ enum {
     CLIENT_CLOSE
 };
 
-static gboolean client_update(ObMenuFrame *frame, gpointer data)
+static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
-    ObMenuEntry *e;
     GList *it;
 
     if (frame->client == NULL || !client_normal(frame->client))
         return FALSE; /* don't show the menu */
 
     for (it = menu->entries; it; it = g_list_next(it)) {
-        e = it->data;
-        if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
-            e->data.normal.enabled = TRUE;
+        ObMenuEntry *e = it->data;
+        gboolean *en = &e->data.normal.enabled; /* save some typing */
+        ObClient *c = frame->client;
+
+        if (e->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+            switch (e->id) {
+            case CLIENT_ICONIFY:
+                *en = c->functions & OB_CLIENT_FUNC_ICONIFY;
+                break;
+            case CLIENT_RESTORE:
+                *en = c->max_horz || c->max_vert;
+                break;
+            case CLIENT_MAXIMIZE:
+                *en = ((c->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
+                       (!c->max_horz || !c->max_vert));
+                break;
+            case CLIENT_SHADE:
+                *en = c->functions & OB_CLIENT_FUNC_SHADE;
+                break;
+            case CLIENT_MOVE:
+                *en = c->functions & OB_CLIENT_FUNC_MOVE;
+                break;
+            case CLIENT_RESIZE:
+                *en = c->functions & OB_CLIENT_FUNC_RESIZE;
+                break;
+            case CLIENT_CLOSE:
+                *en = c->functions & OB_CLIENT_FUNC_CLOSE;
+                break;
+            case CLIENT_DECORATE:
+                *en = client_normal(c);
+                break;
+            default:
+                *en = TRUE;
+            }
+        }
     }
-
-    e = menu_find_entry_id(menu, CLIENT_ICONIFY);
-    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
-
-    e = menu_find_entry_id(menu, CLIENT_RESTORE);
-    e->data.normal.enabled =frame->client->max_horz || frame->client->max_vert;
-
-    e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
-    e->data.normal.enabled =
-        (frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
-        (!frame->client->max_horz || !frame->client->max_vert);
-
-    e = menu_find_entry_id(menu, CLIENT_SHADE);
-    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
-
-    e = menu_find_entry_id(menu, CLIENT_MOVE);
-    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_MOVE;
-
-    e = menu_find_entry_id(menu, CLIENT_RESIZE);
-    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_RESIZE;
-
-    e = menu_find_entry_id(menu, CLIENT_CLOSE);
-    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_CLOSE;
-
-    e = menu_find_entry_id(menu, CLIENT_DECORATE);
-    e->data.normal.enabled = client_normal(frame->client);
     return TRUE; /* show the menu */
 }
 
-static gboolean layer_update(ObMenuFrame *frame, gpointer data)
+static void client_menu_execute(ObMenuEntry *e, guint state, gpointer data,
+                                Time time)
+{
+    GList *it;
+    ObMenuFrame *f;
+    ObClient *c;
+
+    /* find our frame */
+    for (it = menu_frame_visible; it; it = g_list_next(it)) {
+        f = it->data;
+        /* yay this is our menu frame */
+        if (f->menu == e->menu)
+            break;
+    }
+    g_assert(it);
+
+    c = f->client;
+
+    switch (e->id) {
+    case CLIENT_ICONIFY:
+        client_iconify(c, TRUE, FALSE);
+        break;
+    case CLIENT_RESTORE:
+        client_maximize(c, FALSE, 0);
+        break;
+    case CLIENT_MAXIMIZE:
+        client_maximize(c, TRUE, 0);
+        break;
+    case CLIENT_SHADE:
+        client_shade(c, !c->shaded);
+        break;
+    case CLIENT_DECORATE:
+        client_set_undecorated(c, !c->undecorated);
+        break;
+    case CLIENT_MOVE:
+        moveresize_start(c,0,0,0, prop_atoms.net_wm_moveresize_move_keyboard);
+        break;
+    case CLIENT_RESIZE:
+        moveresize_start(c,0,0,0,prop_atoms.net_wm_moveresize_size_keyboard);
+        break;
+    case CLIENT_CLOSE:
+        client_close(c);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+
+    /* update the menu cuz stuff can have changed */
+    client_menu_update(f, NULL);
+    menu_frame_render(f);
+}
+
+static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
-    ObMenuEntry *e;
     GList *it;
 
     if (frame->client == NULL || !client_normal(frame->client))
         return FALSE; /* don't show the menu */
 
     for (it = menu->entries; it; it = g_list_next(it)) {
-        e = it->data;
-        if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
-            e->data.normal.enabled = TRUE;
+        ObMenuEntry *e = it->data;
+        gboolean *en = &e->data.normal.enabled; /* save some typing */
+        ObClient *c = frame->client;
+
+        if (e->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+            switch (e->id) {
+            case LAYER_TOP:
+                *en = !c->above;
+                break;
+            case LAYER_NORMAL:
+                *en = c->above || c->below;
+                break;
+            case LAYER_BOTTOM:
+                *en = !c->below;
+                break;
+            default:
+                *en = TRUE;
+            }
+        }
     }
-
-    e = menu_find_entry_id(menu, LAYER_TOP);
-    e->data.normal.enabled = !frame->client->above;
-
-    e = menu_find_entry_id(menu, LAYER_NORMAL);
-    e->data.normal.enabled = (frame->client->above || frame->client->below);
-
-    e = menu_find_entry_id(menu, LAYER_BOTTOM);
-    e->data.normal.enabled = !frame->client->below;
     return TRUE; /* show the menu */
 }
 
-static gboolean send_to_update(ObMenuFrame *frame, gpointer data)
+static void layer_menu_execute(ObMenuEntry *e, guint state, gpointer data,
+                               Time time)
+{
+    GList *it;
+    ObMenuFrame *f;
+
+    /* find our frame */
+    for (it = menu_frame_visible; it; it = g_list_next(it)) {
+        f = it->data;
+        /* yay this is our menu frame */
+        if (f->menu == e->menu)
+            break;
+    }
+    g_assert(it);
+
+    switch (e->id) {
+    case LAYER_TOP:
+        client_set_layer(f->client, 1);
+        break;
+    case LAYER_NORMAL:
+        client_set_layer(f->client, 0);
+        break;
+    case LAYER_BOTTOM:
+        client_set_layer(f->client, -1);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+
+    /* update the menu cuz stuff can have changed */
+    layer_menu_update(f, NULL);
+    menu_frame_render(f);
+}
+
+static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     guint i;
-    GSList *acts;
-    ObAction *act;
     ObMenuEntry *e;
 
     menu_clear_entries(menu);
@@ -146,12 +243,8 @@ static gboolean send_to_update(ObMenuFrame *frame, gpointer data)
             name = screen_desktop_names[i];
         }
 
-        act = action_from_string("SendToDesktop",
-                                 OB_USER_ACTION_MENU_SELECTION);
-        act->data.sendto.desk = desk;
-        act->data.sendto.follow = FALSE;
-        acts = g_slist_prepend(NULL, act);
-        e = menu_add_normal(menu, desk, name, acts, FALSE);
+        e = menu_add_normal(menu, desk, name, NULL, FALSE);
+        e->id = desk;
         if (desk == DESKTOP_ALL) {
             e->data.normal.mask = ob_rr_theme->desk_mask;
             e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
@@ -169,23 +262,24 @@ static gboolean send_to_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void desktop_change_callback(ObClient *c, gpointer data)
+static void send_to_menu_execute(ObMenuEntry *e, guint state, gpointer data,
+                                 Time time)
 {
-    ObMenuFrame *frame = data;
-    if (c == frame->client) {
-        /* the client won't even be on the screen anymore, so hide the menu */
-        menu_frame_hide_all();
+    GList *it;
+    ObMenuFrame *f;
+
+    /* find our frame */
+    for (it = menu_frame_visible; it; it = g_list_next(it)) {
+        f = it->data;
+        /* yay this is our menu frame */
+        if (f->menu == e->menu)
+            break;
     }
-}
+    g_assert(it);
 
-static void show_callback(ObMenuFrame *frame, gpointer data)
-{
-    client_add_desktop_notify(desktop_change_callback, frame);
-}
-
-static void hide_callback(ObMenuFrame *frame, gpointer data)
-{
-    client_remove_desktop_notify(desktop_change_callback);
+    client_set_desktop(f->client, e->id, FALSE);
+    /* the client won't even be on the screen anymore, so hide the menu */
+    menu_frame_hide_all();
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
@@ -253,44 +347,30 @@ static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
 
 void client_menu_startup()
 {
-    GSList *acts;
     ObMenu *menu;
     ObMenuEntry *e;
 
     menu = menu_new(LAYER_MENU_NAME, _("&Layer"), TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
-    menu_set_update_func(menu, layer_update);
+    menu_set_update_func(menu, layer_menu_update);
+    menu_set_execute_func(menu, layer_menu_execute);
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("SendToTopLayer", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, LAYER_TOP, _("Always on &top"), acts, TRUE);
-
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("SendToNormalLayer",
-                            OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, LAYER_NORMAL, _("&Normal"), acts, TRUE);
-
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("SendToBottomLayer",
-                            OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, LAYER_BOTTOM, _("Always on &bottom"),acts, TRUE);
+    menu_add_normal(menu, LAYER_TOP, _("Always on &top"), NULL, TRUE);
+    menu_add_normal(menu, LAYER_NORMAL, _("&Normal"), NULL, TRUE);
+    menu_add_normal(menu, LAYER_BOTTOM, _("Always on &bottom"),NULL, TRUE);
 
 
     menu = menu_new(SEND_TO_MENU_NAME, _("&Send to desktop"), TRUE, NULL);
-    menu_set_update_func(menu, send_to_update);
-    menu_set_show_func(menu, show_callback);
-    menu_set_hide_func(menu, hide_callback);
-
+    menu_set_update_func(menu, send_to_menu_update);
+    menu_set_execute_func(menu, send_to_menu_execute);
 
     menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
-    menu_set_update_func(menu, client_update);
+    menu_set_update_func(menu, client_menu_update);
     menu_set_place_func(menu, client_menu_place);
+    menu_set_execute_func(menu, client_menu_execute);
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("UnmaximizeFull",
-                            OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_RESTORE, _("R&estore"), acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_RESTORE, _("R&estore"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_toggled_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -298,17 +378,11 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("Move", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_MOVE, _("&Move"), acts, TRUE);
+    menu_add_normal(menu, CLIENT_MOVE, _("&Move"), NULL, TRUE);
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("Resize", OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_RESIZE, _("Resi&ze"), acts, TRUE);
+    menu_add_normal(menu, CLIENT_RESIZE, _("Resi&ze"), NULL, TRUE);
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("Iconify", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico&nify"), acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico&nify"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->iconify_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -316,10 +390,7 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("MaximizeFull",
-                            OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma&ximize"), acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma&ximize"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -327,9 +398,7 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("ToggleShade", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_SHADE, _("&Roll up/down"), acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_SHADE, _("&Roll up/down"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->shade_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -337,10 +406,7 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("ToggleDecorations",
-                            OB_USER_ACTION_MENU_SELECTION));
-    menu_add_normal(menu, CLIENT_DECORATE, _("Un/&Decorate"), acts, TRUE);
+    menu_add_normal(menu, CLIENT_DECORATE, _("Un/&Decorate"), NULL, TRUE);
 
     menu_add_separator(menu, -1, NULL);
 
@@ -350,9 +416,7 @@ void client_menu_startup()
 
     menu_add_separator(menu, -1, NULL);
 
-    acts = g_slist_prepend(NULL, action_from_string
-                           ("Close", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_CLOSE, _("&Close"), acts, TRUE);
+    e = menu_add_normal(menu, CLIENT_CLOSE, _("&Close"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->close_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;

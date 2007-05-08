@@ -308,10 +308,6 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 void client_add_destructor(ObClientCallback func, gpointer data);
 void client_remove_destructor(ObClientCallback func);
 
-/*! Get notified when the client changes desktop */
-void client_add_desktop_notify(ObClientCallback func, gpointer data);
-void client_remove_desktop_notify(ObClientCallback func);
-
 /*! Manages all existing windows */
 void client_manage_all();
 /*! Manages a given window */

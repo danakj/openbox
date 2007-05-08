@@ -43,7 +43,6 @@ GList *menu_frame_visible;
 static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame);
 static void menu_entry_frame_free(ObMenuEntryFrame *self);
-static void menu_frame_render(ObMenuFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
 static gboolean menu_entry_frame_submenu_timeout(gpointer data);
 
@@ -616,7 +615,7 @@ static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
     return h;
 }
 
-static void menu_frame_render(ObMenuFrame *self)
+void menu_frame_render(ObMenuFrame *self)
 {
     gint w = 0, h = 0;
     gint tw, th; /* temps */

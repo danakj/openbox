@@ -288,7 +288,7 @@ void client_menu_startup()
     menu_set_place_func(menu, client_menu_place);
 
     acts = g_slist_prepend(NULL, action_from_string
-                           ("ToggleMaximizeFull",
+                           ("UnmaximizeFull",
                             OB_USER_ACTION_MENU_SELECTION));
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R&estore"), acts, TRUE);
     e->data.normal.mask = ob_rr_theme->max_toggled_mask; 
@@ -317,7 +317,7 @@ void client_menu_startup()
         ob_rr_theme->menu_disabled_selected_color;
 
     acts = g_slist_prepend(NULL, action_from_string
-                           ("ToggleMaximizeFull",
+                           ("MaximizeFull",
                             OB_USER_ACTION_MENU_SELECTION));
     e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma&ximize"), acts, TRUE);
     e->data.normal.mask = ob_rr_theme->max_mask; 

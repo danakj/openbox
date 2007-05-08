@@ -37,7 +37,7 @@
 #include <glib.h>
 #include <assert.h>
 
-#define FOCUS_INDICATOR_WIDTH 5
+#define FOCUS_INDICATOR_WIDTH 6
 
 ObClient *focus_client = NULL;
 GList *focus_order = NULL;

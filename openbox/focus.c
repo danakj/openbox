@@ -556,9 +556,8 @@ static gboolean valid_focus_target(ObClient *ft,
                      /* let alt-tab go to these windows when a window in its
                         group already has focus ... */
                      ((focus_client && ft->group == focus_client->group) ||
-                      /* ... or if there are no application windows in its
-                         group */
-                      !client_has_application_group_siblings(ft))));
+                      /* ... or if there are no main windows in its group */
+                      !client_has_non_helper_group_siblings(ft))));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
        expected to set this hint */

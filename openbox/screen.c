@@ -498,7 +498,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         if (c->can_focus) {
             /* do this here so that if you switch desktops to a window with
                helper windows then the helper windows won't flash */
-            client_bring_non_application_windows(c);
+            client_bring_helper_windows(c);
             /* reduce flicker by hiliting now rather than waiting for the
                server FocusIn event */
             frame_adjust_focus(c->frame, TRUE);

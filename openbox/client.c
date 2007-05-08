@@ -2387,10 +2387,11 @@ gboolean client_normal(ObClient *self) {
               self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
-gboolean client_application(ObClient *self)
+gboolean client_helper(ObClient *self)
 {
-    return (self->type == OB_CLIENT_TYPE_NORMAL ||
-            self->type == OB_CLIENT_TYPE_DIALOG);
+    return (self->type == OB_CLIENT_TYPE_UTILITY ||
+            self->type == OB_CLIENT_TYPE_MENU ||
+            self->type == OB_CLIENT_TYPE_TOOLBAR);
 }
 
 static void client_apply_startup_state(ObClient *self, gint x, gint y)
@@ -3433,24 +3434,24 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
     }
 }
 
-static void client_bring_non_application_windows_recursive(ObClient *self,
-                                                           guint desktop)
+static void client_bring_helper_windows_recursive(ObClient *self,
+                                                  guint desktop)
 {
     GSList *it;
 
     for (it = self->transients; it; it = g_slist_next(it))
-        client_bring_non_application_windows_recursive(it->data, desktop);
+        client_bring_helper_windows_recursive(it->data, desktop);
 
-    if (client_normal(self) && !client_application(self) &&
+    if (client_helper(self) &&
         self->desktop != desktop && self->desktop != DESKTOP_ALL)
     {
         client_set_desktop(self, desktop, FALSE, TRUE);
     }
 }
 
-void client_bring_non_application_windows(ObClient *self)
+void client_bring_helper_windows(ObClient *self)
 {
-    client_bring_non_application_windows_recursive(self, self->desktop);
+    client_bring_helper_windows_recursive(self, self->desktop);
 }
 
 void client_raise(ObClient *self)
@@ -3887,7 +3888,7 @@ gboolean client_has_group_siblings(ObClient *self)
     return self->group && self->group->members->next;
 }
 
-gboolean client_has_application_group_siblings(ObClient *self)
+gboolean client_has_non_helper_group_siblings(ObClient *self)
 {
     GSList *it;
 
@@ -3895,7 +3896,7 @@ gboolean client_has_application_group_siblings(ObClient *self)
 
     for (it = self->group->members; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
-        if (c != self && client_application(c))
+        if (c != self && client_normal(c) && !client_helper(c))
             return TRUE;
     }
     return FALSE;

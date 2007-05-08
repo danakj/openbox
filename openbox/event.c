@@ -504,7 +504,7 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, TRUE);
             focus_set_client(client);
             client_calc_layer(client);
-            client_bring_non_application_windows(client);
+            client_bring_helper_windows(client);
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;

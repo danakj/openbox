@@ -465,8 +465,13 @@ void client_kill(ObClient *self);
 
 /*! Sends the window to the specified desktop
   @param donthide If TRUE, the window will not be shown/hidden after its
-         desktop has been changed. Generally this should be FALSE. */
-void client_set_desktop(ObClient *self, guint target, gboolean donthide);
+         desktop has been changed. Generally this should be FALSE.
+  @param focus_nonintrusive If TRUE, the window will not be moved in the
+         focus order at all. Do this when moving windows to a desktop in
+         the "background" or something. It can be used to make a window share
+         multiple desktops. Generally this should be FALSE. */
+void client_set_desktop(ObClient *self, guint target,
+                        gboolean donthide, gboolean focus_nonintrusive);
 
 /*! Show the client if it should be shown. */
 void client_show(ObClient *self);
@@ -519,6 +524,10 @@ gboolean client_focus(ObClient *self);
               otherwise, it means an application requested it on its own
 */
 void client_activate(ObClient *self, gboolean here, gboolean user);
+
+/*! Bring all of its non-application windows to its desktop. These are the
+  utility and stuff windows. */
+void client_bring_non_application_windows(ObClient *client);
 
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);

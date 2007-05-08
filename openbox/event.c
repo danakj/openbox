@@ -504,6 +504,7 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, TRUE);
             focus_set_client(client);
             client_calc_layer(client);
+            client_bring_non_application_windows(client);
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
@@ -1024,7 +1025,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
-                                   FALSE);
+                                   FALSE, FALSE);
         } else if (msgtype == prop_atoms.net_wm_state) {
             /* can't compress these */
             ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",

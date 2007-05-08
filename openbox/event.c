@@ -504,6 +504,7 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, TRUE);
             focus_set_client(client);
             client_calc_layer(client);
+            client_bring_helper_windows(client);
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
@@ -709,8 +710,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case ButtonPress:
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
-           is a waste of resources to go drawing it. */
-        if (!(e->xbutton.button == 4 || e->xbutton.button == 5)) {
+           is a waste of resources to go drawing it.
+           if the user is doing an intereactive thing, or has a menu open then
+           the mouse is grabbed (possibly) and if we get these events we don't
+           want to deal with them
+        */
+        if (!(e->xbutton.button == 4 || e->xbutton.button == 5) &&
+            !keyboard_interactively_grabbed() &&
+            !menu_frame_visible)
+        {
             con = frame_context(client, e->xbutton.window);
             con = mouse_button_frame_context(con, e->xbutton.button);
             switch (con) {
@@ -1017,7 +1025,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
-                                   FALSE);
+                                   FALSE, FALSE);
         } else if (msgtype == prop_atoms.net_wm_state) {
             /* can't compress these */
             ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",
@@ -1039,9 +1047,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
             /* XXX make use of data.l[2] !? */
             event_curtime = e->xclient.data.l[1];
-            ob_debug_type(OB_DEBUG_APP_BUGS,
-                          "_NET_ACTIVE_WINDOW message for window %s is "
-                          "missing a timestamp\n", client->title);
+            if (event_curtime == 0)
+                ob_debug_type(OB_DEBUG_APP_BUGS,
+                              "_NET_ACTIVE_WINDOW message for window %s is "
+                              "missing a timestamp\n", client->title);
             client_activate(client, FALSE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));

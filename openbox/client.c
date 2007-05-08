@@ -2387,10 +2387,11 @@ gboolean client_normal(ObClient *self) {
               self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
-gboolean client_application(ObClient *self)
+gboolean client_helper(ObClient *self)
 {
-    return (self->type == OB_CLIENT_TYPE_NORMAL ||
-            self->type == OB_CLIENT_TYPE_DIALOG);
+    return (self->type == OB_CLIENT_TYPE_UTILITY ||
+            self->type == OB_CLIENT_TYPE_MENU ||
+            self->type == OB_CLIENT_TYPE_TOOLBAR);
 }
 
 static void client_apply_startup_state(ObClient *self, gint x, gint y)
@@ -2812,7 +2813,7 @@ static void client_iconify_recursive(ObClient *self,
 
             if (curdesk && self->desktop != screen_desktop &&
                 self->desktop != DESKTOP_ALL)
-                client_set_desktop(self, screen_desktop, FALSE);
+                client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
             /* this puts it after the current focused window */
             focus_order_remove(self);
@@ -2992,7 +2993,9 @@ void client_hilite(ObClient *self, gboolean hilite)
 }
 
 void client_set_desktop_recursive(ObClient *self,
-                                  guint target, gboolean donthide)
+                                  guint target,
+                                  gboolean donthide,
+                                  gboolean focus_nonintrusive)
 {
     guint old;
     GSList *it;
@@ -3004,7 +3007,8 @@ void client_set_desktop_recursive(ObClient *self,
         g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 
         /* remove from the old desktop(s) */
-        focus_order_remove(self);
+        if (!focus_nonintrusive)
+            focus_order_remove(self);
 
         old = self->desktop;
         self->desktop = target;
@@ -3021,10 +3025,12 @@ void client_set_desktop_recursive(ObClient *self,
             screen_update_areas();
 
         /* add to the new desktop(s) */
-        if (config_focus_new)
-            focus_order_to_top(self);
-        else
-            focus_order_to_bottom(self);
+        if (!focus_nonintrusive) {
+            if (config_focus_new)
+                focus_order_to_top(self);
+            else
+                focus_order_to_bottom(self);
+        }
 
         /* call the notifies */
         GSList *it;
@@ -3038,13 +3044,15 @@ void client_set_desktop_recursive(ObClient *self,
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
             if (client_is_direct_child(self, it->data))
-                client_set_desktop_recursive(it->data, target, donthide);
+                client_set_desktop_recursive(it->data, target,
+                                             donthide, focus_nonintrusive);
 }
 
-void client_set_desktop(ObClient *self, guint target, gboolean donthide)
+void client_set_desktop(ObClient *self, guint target,
+                        gboolean donthide, gboolean focus_nonintrusive)
 {
     self = client_search_top_normal_parent(self);
-    client_set_desktop_recursive(self, target, donthide);
+    client_set_desktop_recursive(self, target, donthide, focus_nonintrusive);
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
@@ -3107,6 +3115,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     gboolean modal = self->modal;
     gboolean iconic = self->iconic;
     gboolean demands_attention = self->demands_attention;
+    gboolean above = self->above;
+    gboolean below = self->below;
     gint i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
@@ -3183,11 +3193,11 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             } else if (state == prop_atoms.net_wm_state_fullscreen) {
                 fullscreen = TRUE;
             } else if (state == prop_atoms.net_wm_state_above) {
-                self->above = TRUE;
-                self->below = FALSE;
+                above = TRUE;
+                below = FALSE;
             } else if (state == prop_atoms.net_wm_state_below) {
-                self->above = FALSE;
-                self->below = TRUE;
+                above = FALSE;
+                below = TRUE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = TRUE;
             } else if (state == prop_atoms.openbox_wm_state_undecorated) {
@@ -3212,9 +3222,9 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             } else if (state == prop_atoms.net_wm_state_fullscreen) {
                 fullscreen = FALSE;
             } else if (state == prop_atoms.net_wm_state_above) {
-                self->above = FALSE;
+                above = FALSE;
             } else if (state == prop_atoms.net_wm_state_below) {
-                self->below = FALSE;
+                below = FALSE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = FALSE;
             } else if (state == prop_atoms.openbox_wm_state_undecorated) {
@@ -3258,6 +3268,12 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
 
     if (demands_attention != self->demands_attention)
         client_hilite(self, demands_attention);
+
+    if (above != self->above || below != self->below) {
+        self->above = above;
+        self->below = below;
+        client_calc_layer(self);
+    }
 
     client_change_state(self); /* change the hint to reflect these changes */
 }
@@ -3378,7 +3394,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
         self->desktop != screen_desktop)
     {
         if (here)
-            client_set_desktop(self, screen_desktop, FALSE);
+            client_set_desktop(self, screen_desktop, FALSE, FALSE);
         else
             screen_set_desktop(self->desktop, FALSE);
     } else if (!self->frame->visible)
@@ -3403,27 +3419,54 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
 void client_activate(ObClient *self, gboolean here, gboolean user)
 {
     guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
+    gboolean allow = FALSE;
 
-    /* XXX do some stuff here if user is false to determine if we really want
-       to activate it or not (a parent or group member is currently
-       active)?
+    /* if the request came from the user, or if nothing is focused, then grant
+       the request.
+       if the currently focused app doesn't set a user_time, then it can't
+       benefit from any focus stealing prevention.
     */
+    if (user || !focus_client || !last_time)
+        allow = TRUE;
+    /* otherwise, if they didn't give a time stamp or if it is too old, they
+       don't get focus */
+    else
+        allow = event_curtime && event_time_after(event_curtime, last_time);
+
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Want to activate window 0x%x with time %u (last time %u), "
-                  "source=%s\n",
+                  "source=%s allowing? %d\n",
                   self->window, event_curtime, last_time,
-                  (user ? "user" : "application"));
+                  (user ? "user" : "application"), allow);
 
-    if (!user && event_curtime && last_time &&
-        !event_time_after(event_curtime, last_time))
-    {
-        client_hilite(self, TRUE);
-    } else {
+    if (allow) {
         if (event_curtime != CurrentTime)
             self->user_time = event_curtime;
 
         client_present(self, here, TRUE);
+    } else
+        /* don't focus it but tell the user it wants attention */
+        client_hilite(self, TRUE);
+}
+
+static void client_bring_helper_windows_recursive(ObClient *self,
+                                                  guint desktop)
+{
+    GSList *it;
+
+    for (it = self->transients; it; it = g_slist_next(it))
+        client_bring_helper_windows_recursive(it->data, desktop);
+
+    if (client_helper(self) &&
+        self->desktop != desktop && self->desktop != DESKTOP_ALL)
+    {
+        client_set_desktop(self, desktop, FALSE, TRUE);
     }
+}
+
+void client_bring_helper_windows(ObClient *self)
+{
+    client_bring_helper_windows_recursive(self, self->desktop);
 }
 
 void client_raise(ObClient *self)
@@ -3860,7 +3903,7 @@ gboolean client_has_group_siblings(ObClient *self)
     return self->group && self->group->members->next;
 }
 
-gboolean client_has_application_group_siblings(ObClient *self)
+gboolean client_has_non_helper_group_siblings(ObClient *self)
 {
     GSList *it;
 
@@ -3868,7 +3911,7 @@ gboolean client_has_application_group_siblings(ObClient *self)
 
     for (it = self->group->members; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
-        if (c != self && client_application(c))
+        if (c != self && client_normal(c) && !client_helper(c))
             return TRUE;
     }
     return FALSE;

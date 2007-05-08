@@ -224,7 +224,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     }
 
 
-    ob_debug_type(OB_DEBUG_FOCUS, "trying  the focus order\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order\n");
     for (it = focus_order; it; it = g_list_next(it))
         if (allow_refocus || it->data != old) {
             ObClient *c = it->data;
@@ -556,9 +556,8 @@ static gboolean valid_focus_target(ObClient *ft,
                      /* let alt-tab go to these windows when a window in its
                         group already has focus ... */
                      ((focus_client && ft->group == focus_client->group) ||
-                      /* ... or if there are no application windows in its
-                         group */
-                      !client_has_application_group_siblings(ft))));
+                      /* ... or if there are no main windows in its group */
+                      !client_has_non_helper_group_siblings(ft))));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
        expected to set this hint */

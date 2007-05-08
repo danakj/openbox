@@ -334,10 +334,9 @@ gboolean client_should_show(ObClient *self);
   to them in a number of places regarding focus or user interaction. */
 gboolean client_normal(ObClient *self);
 
-/*! Returns if the window is one of an application's main windows (normal or
-  dialog type) rather than an accessory window (utilty, menu, etc) or a
-  non-normal window */
-gboolean client_application(ObClient *self);
+/*! Returns if the window is one of an application's helper windows
+  (utilty, menu, etc) */
+gboolean client_helper(ObClient *self);
 
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
@@ -465,8 +464,13 @@ void client_kill(ObClient *self);
 
 /*! Sends the window to the specified desktop
   @param donthide If TRUE, the window will not be shown/hidden after its
-         desktop has been changed. Generally this should be FALSE. */
-void client_set_desktop(ObClient *self, guint target, gboolean donthide);
+         desktop has been changed. Generally this should be FALSE.
+  @param focus_nonintrusive If TRUE, the window will not be moved in the
+         focus order at all. Do this when moving windows to a desktop in
+         the "background" or something. It can be used to make a window share
+         multiple desktops. Generally this should be FALSE. */
+void client_set_desktop(ObClient *self, guint target,
+                        gboolean donthide, gboolean focus_nonintrusive);
 
 /*! Show the client if it should be shown. */
 void client_show(ObClient *self);
@@ -519,6 +523,10 @@ gboolean client_focus(ObClient *self);
               otherwise, it means an application requested it on its own
 */
 void client_activate(ObClient *self, gboolean here, gboolean user);
+
+/*! Bring all of its helper windows to its desktop. These are the utility and
+  stuff windows. */
+void client_bring_helper_windows(ObClient *client);
 
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);
@@ -657,6 +665,8 @@ ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
 
-gboolean client_has_application_group_siblings(ObClient *self);
+/*! Returns if a client has an group siblings which are main application
+  windows (not helper or non-normal windows) */
+gboolean client_has_non_helper_group_siblings(ObClient *self);
 
 #endif

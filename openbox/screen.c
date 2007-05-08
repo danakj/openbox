@@ -438,7 +438,7 @@ void screen_set_num_desktops(guint num)
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         if (c->desktop >= num && c->desktop != DESKTOP_ALL)
-            client_set_desktop(c, num - 1, FALSE);
+            client_set_desktop(c, num - 1, FALSE, FALSE);
     }
  
     /* change our struts/area to match (after moving windows) */
@@ -473,7 +473,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ob_debug("Moving to desktop %d\n", num+1);
 
     if (moveresize_client)
-        client_set_desktop(moveresize_client, num, TRUE);
+        client_set_desktop(moveresize_client, num, TRUE, FALSE);
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 
@@ -485,21 +485,33 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
+    /* have to try focus here because when you leave an empty desktop
+       there is no focus out to watch for
+
+       do this before hiding the windows so if helper windows are coming
+       with us, they don't get hidden
+    */
+    if (dofocus && (c = focus_fallback_target(TRUE, focus_client))) {
+        /* only do the flicker reducing stuff ahead of time if we are going
+           to call xsetinputfocus on the window ourselves. otherwise there is
+           no guarantee the window will actually take focus.. */
+        if (c->can_focus) {
+            /* do this here so that if you switch desktops to a window with
+               helper windows then the helper windows won't flash */
+            client_bring_helper_windows(c);
+            /* reduce flicker by hiliting now rather than waiting for the
+               server FocusIn event */
+            frame_adjust_focus(c->frame, TRUE);
+        }
+        client_focus(c);
+    }
+
     /* hide windows from bottom to top */
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             client_hide(c);
         }
-    }
-
-    /* have to try focus here because when you leave an empty desktop
-       there is no focus out to watch for */
-    if (dofocus && (c = focus_fallback_target(TRUE, focus_client))) {
-        /* reduce flicker by hiliting now rather than waiting for the server
-           FocusIn event */
-        frame_adjust_focus(c->frame, TRUE);
-        client_focus(c);
     }
 
     event_ignore_queued_enters();

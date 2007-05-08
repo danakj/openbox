@@ -125,7 +125,7 @@ static gboolean send_to_update(ObMenuFrame *frame, gpointer data)
     guint i;
     GSList *acts;
     ObAction *act;
-    ObMenuEntry *e;;
+    ObMenuEntry *e;
 
     menu_clear_entries(menu);
 
@@ -167,6 +167,25 @@ static gboolean send_to_update(ObMenuFrame *frame, gpointer data)
             e->data.normal.enabled = FALSE;
     }
     return TRUE; /* show the menu */
+}
+
+static void desktop_change_callback(ObClient *c, gpointer data)
+{
+    ObMenuFrame *frame = data;
+    if (c == frame->client) {
+        /* the client won't even be on the screen anymore, so hide the menu */
+        menu_frame_hide_all();
+    }
+}
+
+static void show_callback(ObMenuFrame *frame, gpointer data)
+{
+    client_add_desktop_notify(desktop_change_callback, frame);
+}
+
+static void hide_callback(ObMenuFrame *frame, gpointer data)
+{
+    client_remove_desktop_notify(desktop_change_callback);
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
@@ -259,6 +278,8 @@ void client_menu_startup()
 
     menu = menu_new(SEND_TO_MENU_NAME, _("&Send to desktop"), TRUE, NULL);
     menu_set_update_func(menu, send_to_update);
+    menu_set_show_func(menu, show_callback);
+    menu_set_hide_func(menu, hide_callback);
 
 
     menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), TRUE, NULL);

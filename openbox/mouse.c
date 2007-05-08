@@ -311,13 +311,13 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
     GSList *it;
 
     if (!translate_button(buttonstr, &state, &button)) {
-        g_message(_("Invalid button '%s' in pointer binding"), buttonstr);
+        g_message(_("Invalid button '%s' in mouse binding"), buttonstr);
         return FALSE;
     }
 
     context = frame_context_from_string(contextstr);
     if (!context) {
-        g_message(_("Invalid context '%s' in pointer binding"), contextstr);
+        g_message(_("Invalid context '%s' in mouse binding"), contextstr);
         return FALSE;
     }
 

@@ -824,6 +824,68 @@ static void menu_frame_update(ObMenuFrame *self)
         fit = n;
     }
 
+    /* * make the menu fit on the screen */
+
+    /* calculate the height of the menu */
+    h = 0;
+    for (fit = self->entries; fit; fit = g_list_next(fit))
+        h += menu_entry_frame_get_height(fit->data,
+                                         fit == self->entries,
+                                         g_list_next(fit) == NULL);
+    /* add the border at the top and bottom */
+    h += ob_rr_theme->mbwidth * 2;
+
+    a = screen_physical_area_monitor(self->monitor);
+
+    if (h > a->height) {
+        GList *flast, *tmp;
+        gboolean last_entry = TRUE;
+
+        /* take the height of our More... entry into account */
+        h += menu_entry_frame_get_height(NULL, FALSE, TRUE);
+
+        /* start at the end of the entries */
+        flast = g_list_last(self->entries);
+
+        /* pull out all the entries from the frame that don't
+           fit on the screen, leaving at least 1 though */
+        while (h > a->height && g_list_previous(flast) != NULL) {
+            /* update the height, without this entry */
+            h -= menu_entry_frame_get_height(flast->data, FALSE, last_entry);
+
+            /* destroy the entry we're not displaying */
+            tmp = flast;
+            flast = g_list_previous(flast);
+            menu_entry_frame_free(tmp->data);
+            self->entries = g_list_delete_link(self->entries, tmp);
+
+            /* only the first one that we see is the last entry in the menu */
+            last_entry = FALSE;
+        };
+
+        {
+            ObMenuEntry *more_entry;
+            ObMenuEntryFrame *more_frame;
+            /* make the More... menu entry frame which will display in this
+               frame.
+               if self->menu->more_menu is NULL that means that this is already
+               More... menu, so just use ourself.
+            */
+            more_entry = menu_get_more((self->menu->more_menu ?
+                                        self->menu->more_menu :
+                                        self->menu),
+                                       /* continue where we left off */
+                                       self->show_from +
+                                       g_list_length(self->entries));
+            more_frame = menu_entry_frame_new(more_entry, self);
+            /* make it get deleted when the menu frame goes away */
+            menu_entry_unref(more_entry);
+                                       
+            /* add our More... entry to the frame */
+            self->entries = g_list_append(self->entries, more_frame);
+        }
+    }
+
     menu_frame_render(self);
 
     /* make the menu fit on the screen. at most we call render twice, at least
@@ -922,6 +984,9 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 
     menu_frame_visible = g_list_prepend(menu_frame_visible, self);
 
+    if (self->menu->show_func)
+        self->menu->show_func(self, self->menu->data);
+
     return TRUE;
 }
 
@@ -1003,6 +1068,9 @@ void menu_frame_hide(ObMenuFrame *self)
 
     if (!it)
         return;
+
+    if (self->menu->hide_func)
+        self->menu->hide_func(self, self->menu->data);
 
     if (self->child)
         menu_frame_hide(self->child);

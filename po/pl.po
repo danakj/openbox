@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-04-26 11:53-0400\n"
+"POT-Creation-Date: 2007-05-07 18:50-0400\n"
 "PO-Revision-Date: 2004-09-07 21:17+0200\n"
 "Last-Translator: Madej <madej@afn.no-ip.org>\n"
 "Language-Team: NONE\n"
@@ -15,237 +15,219 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:98
+#: openbox/client_list_menu.c:104
 msgid "Go there..."
 msgstr "Przejdź..."
 
-#: openbox/client_list_menu.c:189
+#: openbox/client_list_menu.c:198
 msgid "Desktops"
 msgstr "Pulpit"
 
-#: openbox/client_menu.c:75
-#, fuzzy
-msgid "Restor&e"
-msgstr "Prz&ywróć"
-
-#: openbox/client_menu.c:75
-#, fuzzy
-msgid "Maximiz&e"
-msgstr "Maks&ymalizuj"
-
-#: openbox/client_menu.c:80
-#, fuzzy
-msgid "&Roll down"
-msgstr "Ro&zwiń"
-
-#: openbox/client_menu.c:80
-#, fuzzy
-msgid "&Roll up"
-msgstr "&Zwiń"
-
-#: openbox/client_menu.c:142
+#: openbox/client_menu.c:149
 msgid "All desktops"
 msgstr "Wszystkie pulpity"
 
-#: openbox/client_menu.c:229
+#: openbox/client_menu.c:247
 #, fuzzy
 msgid "&Layer"
 msgstr "Warstwa"
 
-#: openbox/client_menu.c:235
+#: openbox/client_menu.c:253
 #, fuzzy
 msgid "Always on &top"
 msgstr "Zawsze na &wierzchu"
 
-#: openbox/client_menu.c:240
+#: openbox/client_menu.c:258
 #, fuzzy
 msgid "&Normal"
 msgstr "&Normalnie"
 
-#: openbox/client_menu.c:245
+#: openbox/client_menu.c:263
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "Zawsze pod &spodem"
 
-#: openbox/client_menu.c:248
+#: openbox/client_menu.c:266
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "Wyślij na &pulpit"
 
-#: openbox/client_menu.c:252
+#: openbox/client_menu.c:270
 msgid "Client menu"
 msgstr "Menu klienta"
 
-#: openbox/client_menu.c:263
+#: openbox/client_menu.c:278
 #, fuzzy
-msgid "Ico&nify"
-msgstr "Mi&nimalizuj"
+msgid "R&estore"
+msgstr "Prz&ywróć"
 
-#: openbox/client_menu.c:280
-#, fuzzy
-msgid "Raise to &top"
-msgstr "Wyślij na &wierzch"
-
-#: openbox/client_menu.c:284
-#, fuzzy
-msgid "Lower to &bottom"
-msgstr "Wyślij na &spód"
-
-#: openbox/client_menu.c:297
-#, fuzzy
-msgid "&Decorate"
-msgstr "&Obramówka"
-
-#: openbox/client_menu.c:303
+#: openbox/client_menu.c:288
 #, fuzzy
 msgid "&Move"
 msgstr "Prz&esuń"
 
-#: openbox/client_menu.c:307
+#: openbox/client_menu.c:292
 #, fuzzy
 msgid "Resi&ze"
 msgstr "Zmień &rozmiar"
 
-#: openbox/client_menu.c:313
+#: openbox/client_menu.c:296
+#, fuzzy
+msgid "Ico&nify"
+msgstr "Mi&nimalizuj"
+
+#: openbox/client_menu.c:307
+#, fuzzy
+msgid "Ma&ximize"
+msgstr "Maks&ymalizuj"
+
+#: openbox/client_menu.c:317
+#, fuzzy
+msgid "&Roll up/down"
+msgstr "Ro&zwiń"
+
+#: openbox/client_menu.c:328
+#, fuzzy
+msgid "Un/&Decorate"
+msgstr "&Obramówka"
+
+#: openbox/client_menu.c:340
 #, fuzzy
 msgid "&Close"
 msgstr "Z&amknij"
 
-#: openbox/openbox.c:106
-msgid "Couldn't set locale from environment."
-msgstr ""
-
-#: openbox/openbox.c:114
+#: openbox/openbox.c:119
 #, fuzzy, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Nie mogę utworzyć katalogu '%s': %s"
 
-#: openbox/openbox.c:165
+#: openbox/openbox.c:174
 msgid "X server does not support locale."
 msgstr ""
 
-#: openbox/openbox.c:167
+#: openbox/openbox.c:176
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 
-#: openbox/openbox.c:229
+#: openbox/openbox.c:241
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
-#: openbox/openbox.c:350
+#: openbox/openbox.c:376
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:390 openbox/openbox.c:392
+#: openbox/openbox.c:445 openbox/openbox.c:447
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:456
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:457
 msgid ""
 "\n"
 "Options:\n"
-"\n"
 msgstr ""
 
-#: openbox/openbox.c:403
-msgid "  --config-file FILE  Specify the file to load for the config file\n"
+#: openbox/openbox.c:458
+msgid "  --config TYPE       Specify the configuration profile to use\n"
 msgstr ""
 
-#: openbox/openbox.c:405
-msgid "  --sm-disable        Disable connection to session manager\n"
+#: openbox/openbox.c:460
+msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:406
-#, fuzzy
-msgid "  --sm-client-id ID   Specify session management ID\n"
-msgstr "--sm-client-id wymaga argumentu\n"
-
-#: openbox/openbox.c:407
-msgid "  --sm-save-file FILE Specify file to load a saved session from\n"
-msgstr ""
-
-#: openbox/openbox.c:409
+#: openbox/openbox.c:462
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:410
+#: openbox/openbox.c:463
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:411
+#: openbox/openbox.c:464
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:412
+#: openbox/openbox.c:465
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
-"\n"
 msgstr ""
 
-#: openbox/openbox.c:413
+#: openbox/openbox.c:466
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
-#: openbox/openbox.c:414
+#: openbox/openbox.c:467
 msgid ""
 "\n"
 "Debugging options:\n"
-"\n"
 msgstr ""
 
-#: openbox/openbox.c:415
+#: openbox/openbox.c:468
 msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
-#: openbox/openbox.c:416
+#: openbox/openbox.c:469
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:417
+#: openbox/openbox.c:470
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:418
+#: openbox/openbox.c:471
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
-"\n"
 msgstr ""
 
-#: openbox/openbox.c:449
+#: openbox/openbox.c:519
 #, fuzzy
-msgid "--config-file requires an argument\n"
+msgid "--config requires an argument\n"
 msgstr "--sm-save-file wymaga argumentu\n"
 
-#: openbox/session.c:124
-msgid "--sm-client-id requires an argument\n"
-msgstr "--sm-client-id wymaga argumentu\n"
-
-#: openbox/session.c:132
-msgid "--sm-save-file requires an argument\n"
-msgstr "--sm-save-file wymaga argumentu\n"
-
-#: openbox/session.c:168
+#: openbox/session.c:100
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Nie mogę utworzyć katalogu '%s': %s"
 
-#: openbox/session.c:343
+#: openbox/session.c:426
 #, fuzzy, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Nie mogę utworzyć katalogu '%s': %s"
 
-#: openbox/session.c:433
+#: openbox/session.c:534
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr ""
+
+#, fuzzy
+#~ msgid "&Roll up"
+#~ msgstr "&Zwiń"
+
+#, fuzzy
+#~ msgid "Raise to &top"
+#~ msgstr "Wyślij na &wierzch"
+
+#, fuzzy
+#~ msgid "Lower to &bottom"
+#~ msgstr "Wyślij na &spód"
+
+#, fuzzy
+#~ msgid "  --sm-client-id ID   Specify session management ID\n"
+#~ msgstr "--sm-client-id wymaga argumentu\n"
+
+#~ msgid "--sm-client-id requires an argument\n"
+#~ msgstr "--sm-client-id wymaga argumentu\n"
+
+#~ msgid "--sm-save-file requires an argument\n"
+#~ msgstr "--sm-save-file wymaga argumentu\n"
 
 #~ msgid "Couldn't initialize Xft."
 #~ msgstr "Błąd przy inicjalizacji Xft."

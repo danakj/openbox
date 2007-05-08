@@ -328,8 +328,8 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     g_hash_table_replace(menu_hash, self->name, self);
 
     self->more_menu = g_new0(ObMenu, 1);
-    self->more_menu->name = "More...";
-    self->more_menu->title = "More...";
+    self->more_menu->name = _("More...");
+    self->more_menu->title = _("More...");
     self->more_menu->data = data;
     self->more_menu->shortcut = g_unichar_tolower(g_utf8_get_char("M"));
 
@@ -526,6 +526,16 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
     self->entries = g_list_append(self->entries, e);
     self->more_menu->entries = self->entries; /* keep it in sync */
     return e;
+}
+
+void menu_set_show_func(ObMenu *self, ObMenuShowFunc func)
+{
+    self->show_func = func;
+}
+
+void menu_set_hide_func(ObMenu *self, ObMenuHideFunc func)
+{
+    self->hide_func = func;
 }
 
 void menu_set_update_func(ObMenu *self, ObMenuUpdateFunc func)

@@ -338,6 +338,16 @@ gboolean client_normal(ObClient *self);
   (utilty, menu, etc) */
 gboolean client_helper(ObClient *self);
 
+/*! Return if the client is a type which should be given focus from mouse
+  actions like button presses. This doesn't count for focus cycling, different
+  rules apply to that. */
+gboolean client_mouse_focusable(ObClient *self);
+
+/*! Return if the client is a type which should be given focus from the
+  mouse entering the window. This doesn't count for focus cycling, different
+  rules apply to that. */
+gboolean client_enter_focusable(ObClient *self);
+
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
 

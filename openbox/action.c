@@ -1199,10 +1199,7 @@ void action_execute(union ActionData *data)
 void action_activate(union ActionData *data)
 {
     if (data->client.any.c) {
-        /* similar to the openbox dock for dockapps, don't let user actions
-           give focus to 3rd-party docks (panels) either (unless they ask for
-           it themselves). */
-        if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+        if (!data->any.button || client_mouse_focusable(data->client.any.c)) {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */
             event_halt_focus_delay();
@@ -1220,10 +1217,7 @@ void action_activate(union ActionData *data)
 void action_focus(union ActionData *data)
 {
     if (data->client.any.c) {
-        /* similar to the openbox dock for dockapps, don't let user actions
-           give focus to 3rd-party docks (panels) either (unless they ask for
-           it themselves). */
-        if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+        if (!data->any.button || client_mouse_focusable(data->client.any.c)) {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */
             event_halt_focus_delay();

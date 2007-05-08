@@ -2394,6 +2394,22 @@ gboolean client_helper(ObClient *self)
             self->type == OB_CLIENT_TYPE_TOOLBAR);
 }
 
+gboolean client_mouse_focusable(ObClient *self)
+{
+    return !(self->type == OB_CLIENT_TYPE_MENU ||
+             self->type == OB_CLIENT_TYPE_TOOLBAR ||
+             self->type == OB_CLIENT_TYPE_SPLASH ||
+             self->type == OB_CLIENT_TYPE_DOCK);
+}
+
+gboolean client_enter_focusable(ObClient *self)
+{
+    /* you can focus desktops but it shouldn't on enter */
+    return (client_mouse_focusable(self) &&
+            self->type != OB_CLIENT_TYPE_DESKTOP);
+}
+
+
 static void client_apply_startup_state(ObClient *self, gint x, gint y)
 {
     gboolean pos = FALSE; /* has the window's position been configured? */

@@ -676,7 +676,7 @@ void event_enter_client(ObClient *client)
 {
     g_assert(config_focus_follow);
 
-    if (client_normal(client) && client_can_focus(client)) {
+    if (client_enter_focusable(client) && client_can_focus(client)) {
         if (config_focus_delay) {
             ObFocusDelayData *data;
 

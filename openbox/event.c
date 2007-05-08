@@ -1047,9 +1047,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
             /* XXX make use of data.l[2] !? */
             event_curtime = e->xclient.data.l[1];
-            ob_debug_type(OB_DEBUG_APP_BUGS,
-                          "_NET_ACTIVE_WINDOW message for window %s is "
-                          "missing a timestamp\n", client->title);
+            if (event_curtime == 0)
+                ob_debug_type(OB_DEBUG_APP_BUGS,
+                              "_NET_ACTIVE_WINDOW message for window %s is "
+                              "missing a timestamp\n", client->title);
             client_activate(client, FALSE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));

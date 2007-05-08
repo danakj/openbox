@@ -972,10 +972,10 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
-        if (!grab_pointer(TRUE, TRUE, OB_CURSOR_POINTER))
+        if (!grab_pointer(TRUE, FALSE, OB_CURSOR_POINTER))
             return FALSE;
         if (!grab_keyboard(TRUE)) {
-            grab_pointer(FALSE, TRUE, OB_CURSOR_POINTER);
+            grab_pointer(FALSE, FALSE, OB_CURSOR_POINTER);
             return FALSE;
         }
     }
@@ -1084,7 +1084,7 @@ void menu_frame_hide(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* last menu shown */
-        grab_pointer(FALSE, TRUE, OB_CURSOR_NONE);
+        grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
         grab_keyboard(FALSE);
     }
 

@@ -2813,7 +2813,7 @@ static void client_iconify_recursive(ObClient *self,
 
             if (curdesk && self->desktop != screen_desktop &&
                 self->desktop != DESKTOP_ALL)
-                client_set_desktop(self, screen_desktop, FALSE, FALSE);
+                client_set_desktop(self, screen_desktop, FALSE);
 
             /* this puts it after the current focused window */
             focus_order_remove(self);
@@ -3031,15 +3031,14 @@ void client_set_desktop_recursive(ObClient *self,
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
             if (client_is_direct_child(self, it->data))
-                client_set_desktop_recursive(it->data, target,
-                                             donthide, focus_nonintrusive);
+                client_set_desktop_recursive(it->data, target, donthide);
 }
 
 void client_set_desktop(ObClient *self, guint target,
                         gboolean donthide)
 {
     self = client_search_top_normal_parent(self);
-    client_set_desktop_recursive(self, target, donthide, focus_nonintrusive);
+    client_set_desktop_recursive(self, target, donthide);
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
@@ -3381,7 +3380,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
         self->desktop != screen_desktop)
     {
         if (here)
-            client_set_desktop(self, screen_desktop, FALSE, FALSE);
+            client_set_desktop(self, screen_desktop, FALSE);
         else
             screen_set_desktop(self->desktop, FALSE);
     } else if (!self->frame->visible)
@@ -3448,7 +3447,6 @@ static void client_bring_helper_windows_recursive(ObClient *self,
         self->desktop != desktop && self->desktop != DESKTOP_ALL)
     {
         client_set_desktop(self, desktop, FALSE);
->>>>>>> .merge-right.r6182
     }
 }
 

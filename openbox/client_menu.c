@@ -74,7 +74,7 @@ static gboolean client_update(ObMenuFrame *frame, gpointer data)
     e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
     e->data.normal.enabled =
         (frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
-        !frame->client->max_horz && !frame->client->max_vert;
+        (!frame->client->max_horz || !frame->client->max_vert);
 
     e = menu_find_entry_id(menu, CLIENT_SHADE);
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;

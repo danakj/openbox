@@ -3115,6 +3115,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     gboolean modal = self->modal;
     gboolean iconic = self->iconic;
     gboolean demands_attention = self->demands_attention;
+    gboolean above = self->above;
+    gboolean below = self->below;
     gint i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
@@ -3191,11 +3193,11 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             } else if (state == prop_atoms.net_wm_state_fullscreen) {
                 fullscreen = TRUE;
             } else if (state == prop_atoms.net_wm_state_above) {
-                self->above = TRUE;
-                self->below = FALSE;
+                above = TRUE;
+                below = FALSE;
             } else if (state == prop_atoms.net_wm_state_below) {
-                self->above = FALSE;
-                self->below = TRUE;
+                above = FALSE;
+                below = TRUE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = TRUE;
             } else if (state == prop_atoms.openbox_wm_state_undecorated) {
@@ -3220,9 +3222,9 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             } else if (state == prop_atoms.net_wm_state_fullscreen) {
                 fullscreen = FALSE;
             } else if (state == prop_atoms.net_wm_state_above) {
-                self->above = FALSE;
+                above = FALSE;
             } else if (state == prop_atoms.net_wm_state_below) {
-                self->below = FALSE;
+                below = FALSE;
             } else if (state == prop_atoms.net_wm_state_demands_attention) {
                 demands_attention = FALSE;
             } else if (state == prop_atoms.openbox_wm_state_undecorated) {
@@ -3266,6 +3268,12 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
 
     if (demands_attention != self->demands_attention)
         client_hilite(self, demands_attention);
+
+    if (above != self->above || below != self->below) {
+        self->above = above;
+        self->below = below;
+        client_calc_layer(self);
+    }
 
     client_change_state(self); /* change the hint to reflect these changes */
 }

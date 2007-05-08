@@ -224,7 +224,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     }
 
 
-    ob_debug_type(OB_DEBUG_FOCUS, "trying  the focus order\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order\n");
     for (it = focus_order; it; it = g_list_next(it))
         if (allow_refocus || it->data != old) {
             ObClient *c = it->data;

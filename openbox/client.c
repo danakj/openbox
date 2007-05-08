@@ -2814,7 +2814,9 @@ static void client_iconify_recursive(ObClient *self,
                  self->window);
 
         if (iconic) {
-            if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
+            /* don't let non-normal windows iconify along with their parents
+               or whatever */
+            if (client_normal(self)) {
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of

@@ -133,18 +133,18 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         menu_frame_hide_all();
         f = NULL; /* and don't update */
 
-        if (screen_pointer_pos(&x, &y))
-            moveresize_start(c, x, y, 0,
-                             prop_atoms.net_wm_moveresize_move_keyboard);
+        screen_pointer_pos(&x, &y);
+        moveresize_start(c, x, y, 0,
+                         prop_atoms.net_wm_moveresize_move_keyboard);
         break;
     case CLIENT_RESIZE:
         /* this needs to grab the keyboard so hide the menu */
         menu_frame_hide_all();
         f = NULL; /* and don't update */
 
-        if (screen_pointer_pos(&x, &y))
-            moveresize_start(c, x, y, 0,
-                             prop_atoms.net_wm_moveresize_size_keyboard);
+        screen_pointer_pos(&x, &y);
+        moveresize_start(c, x, y, 0,
+                         prop_atoms.net_wm_moveresize_size_keyboard);
         break;
     case CLIENT_CLOSE:
         client_close(c);

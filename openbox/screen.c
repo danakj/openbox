@@ -1267,7 +1267,16 @@ gboolean screen_pointer_pos(gint *x, gint *y)
     Window w;
     gint i;
     guint u;
+    gboolean ret;
 
-    return !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
-                           &w, &w, x, y, &i, &i, &u);
+    ret = !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
+                          &w, &w, x, y, &i, &i, &u);
+    if (!ret) {
+        for (i = 0; i < ScreenCount(ob_display); ++i)
+            if (i != ob_screen)
+                if (XQueryPointer(ob_display, RootWindow(ob_display, i),
+                                  &w, &w, x, y, &i, &i, &u))
+                    break;
+    }
+    return ret;
 }

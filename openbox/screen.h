@@ -107,6 +107,8 @@ guint screen_find_monitor(Rect *search);
   gotta call it to let it know it should change. */
 void screen_set_root_cursor();
 
+/*! Gives back the pointer's position in x and y. Returns TRUE if the pointer
+  is on this screen and FALSE if it is on another screen. */
 gboolean screen_pointer_pos(gint *x, gint *y);
 
 #endif

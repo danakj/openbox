@@ -577,6 +577,9 @@ void frame_grab_client(ObFrame *self, ObClient *client)
     /* map the client so it maps when the frame does */
     XMapWindow(ob_display, client->window);
 
+    /* adjust the frame to the client's size */
+    frame_adjust_area(self, FALSE, TRUE, FALSE);
+
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, client);
     g_hash_table_insert(window_map, &self->plate, client);

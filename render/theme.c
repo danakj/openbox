@@ -48,7 +48,7 @@ static xmlNodePtr find_node(xmlNodePtr n, const gchar *names[]);
 static gboolean find_int(ParseState *ps, xmlNodePtr n, const gchar *names[],
                          gint *integer, gint lower, gint upper);
 static gboolean find_string(ParseState *ps, xmlNodePtr n, const gchar *names[],
-                            const gchar **string);
+                            gchar **string);
 static gboolean find_color(ParseState *ps, xmlNodePtr n, const gchar *names[],
                            RrColor **color, gchar *alpha);
     static gboolean find_point(ParseState *ps, xmlNodePtr n, const gchar *names[],
@@ -72,7 +72,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     ParseState ps;
     xmlNodePtr root;
     RrJustify winjust, mtitlejust;
-    const gchar *str;
+    gchar *str;
     RrTheme *theme;
 
     if (name) {
@@ -154,6 +154,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             winjust = RR_JUSTIFY_RIGHT;
         else if (strcmp(str, "center") == 0)
             winjust = RR_JUSTIFY_CENTER;
+        g_free(str);
     }
 
     if (menu_title_font) {
@@ -168,6 +169,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             mtitlejust = RR_JUSTIFY_RIGHT;
         else if (strcmp(str, "center") == 0)
             mtitlejust = RR_JUSTIFY_CENTER;
+        g_free(str);
     }
 
     if (menu_item_font) {
@@ -1516,7 +1518,7 @@ static gboolean find_int(ParseState *ps, xmlNodePtr n, const gchar *names[],
 }
 
 static gboolean find_string(ParseState *ps, xmlNodePtr n, const gchar *names[],
-                            const gchar **string)
+                            gchar **string)
 {
     if ((n = find_node(n, names))) {
         *string = parse_string(ps->doc, n);

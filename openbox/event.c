@@ -791,32 +791,47 @@ static void event_handle_client(ObClient *client, XEvent *e)
         switch (con) {
         case OB_FRAME_CONTEXT_TITLEBAR:
             /* we've left the button area inside the titlebar */
-            client->frame->max_hover = FALSE;
-            client->frame->desk_hover = FALSE;
-            client->frame->shade_hover = FALSE;
-            client->frame->iconify_hover = FALSE;
-            client->frame->close_hover = FALSE;
-            frame_adjust_state(client->frame);
+            if (client->frame->max_hover || client->frame->desk_hover ||
+                client->frame->shade_hover || client->frame->iconify_hover ||
+                client->frame->close_hover)
+            {
+                client->frame->max_hover = FALSE;
+                client->frame->desk_hover = FALSE;
+                client->frame->shade_hover = FALSE;
+                client->frame->iconify_hover = FALSE;
+                client->frame->close_hover = FALSE;
+                frame_adjust_state(client->frame);
+            }
             break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
-            client->frame->max_hover = TRUE;
-            frame_adjust_state(client->frame);
+            if (!client->frame->max_hover) {
+                client->frame->max_hover = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            client->frame->desk_hover = TRUE;
-            frame_adjust_state(client->frame);
+            if (!client->frame->desk_hover) {
+                client->frame->desk_hover = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         case OB_FRAME_CONTEXT_SHADE:
-            client->frame->shade_hover = TRUE;
-            frame_adjust_state(client->frame);
+            if (!client->frame->shade_hover) {
+                client->frame->shade_hover = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
-            client->frame->iconify_hover = TRUE;
-            frame_adjust_state(client->frame);
+            if (!client->frame->iconify_hover) {
+                client->frame->iconify_hover = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         case OB_FRAME_CONTEXT_CLOSE:
-            client->frame->close_hover = TRUE;
-            frame_adjust_state(client->frame);
+            if (!client->frame->close_hover) {
+                client->frame->close_hover = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         default:
             break;

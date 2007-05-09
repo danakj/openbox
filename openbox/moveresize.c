@@ -37,6 +37,9 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+/* how far windows move and resize with the keyboard arrows */
+#define KEY_DIST 4
+
 gboolean moveresize_in_progress = FALSE;
 ObClient *moveresize_client = NULL;
 #ifdef SYNC
@@ -296,20 +299,23 @@ void moveresize_end(gboolean cancel)
     moveresize_client = NULL;
 }
 
-static void do_move(gboolean resist)
+static void do_move(gboolean keyboard)
 {
-    if (resist) {
-        resist_move_windows(moveresize_client, &cur_x, &cur_y);
-        resist_move_monitors(moveresize_client, &cur_x, &cur_y);
-    }
+    gint resist;
+
+    if (keyboard) resist = KEY_DIST - 1; /* resist for one key press */
+    else resist = config_resist_win;
+    resist_move_windows(moveresize_client, resist, &cur_x, &cur_y);
+    if (!keyboard) resist = config_resist_edge;
+    resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
 
     client_configure(moveresize_client, cur_x, cur_y,
                      moveresize_client->area.width,
                      moveresize_client->area.height, TRUE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
         popup_coords(moveresize_client, "%d x %d",
-                moveresize_client->frame->area.x,
-                moveresize_client->frame->area.y);
+                     moveresize_client->frame->area.x,
+                     moveresize_client->frame->area.y);
 }
 
 static void do_resize()
@@ -378,18 +384,21 @@ static void do_resize()
                      moveresize_client->logical_size.height);
 }
 
-static void calc_resize(gboolean resist)
+static void calc_resize(gboolean keyboard)
 {
+    gint resist;
+
     /* resist_size_* needs the frame size */
     cur_x += moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
     cur_y += moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
 
-    if (resist) {
-        resist_size_windows(moveresize_client, &cur_x, &cur_y, lockcorner);
-        resist_size_monitors(moveresize_client, &cur_x, &cur_y, lockcorner);
-    }
+    if (keyboard) resist = KEY_DIST - 1; /* resist for one key press */
+    else resist = config_resist_win;
+    resist_size_windows(moveresize_client, resist, &cur_x, &cur_y, lockcorner);
+    if (!keyboard) resist = config_resist_edge;
+    resist_size_monitors(moveresize_client, resist, &cur_x, &cur_y,lockcorner);
 
     cur_x -= moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
@@ -419,7 +428,7 @@ gboolean moveresize_event(XEvent *e)
         if (moving) {
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
-            do_move(TRUE);
+            do_move(FALSE);
         } else {
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
                 cur_x = start_cw - (e->xmotion.x_root - start_x);
@@ -462,7 +471,7 @@ gboolean moveresize_event(XEvent *e)
             } else
                 g_assert_not_reached();
 
-            calc_resize(TRUE);
+            calc_resize(FALSE);
             do_resize();
         }
         used = TRUE;
@@ -482,13 +491,13 @@ gboolean moveresize_event(XEvent *e)
                 gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
 
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                    dx = MAX(4, moveresize_client->size_inc.width);
+                    dx = MAX(KEY_DIST, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                    dx = -MAX(4, moveresize_client->size_inc.width);
+                    dx = -MAX(KEY_DIST, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                    dy = MAX(4, moveresize_client->size_inc.height);
+                    dy = MAX(KEY_DIST, moveresize_client->size_inc.height);
                 else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
-                    dy = -MAX(4, moveresize_client->size_inc.height);
+                    dy = -MAX(KEY_DIST, moveresize_client->size_inc.height);
 
                 cur_x += dx;
                 cur_y += dy;
@@ -500,7 +509,8 @@ gboolean moveresize_event(XEvent *e)
                     while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
                 }
 
-                do_resize(FALSE);
+                calc_resize(TRUE);
+                do_resize();
 
                 /* because the cursor moves even though the window does
                    not nessesarily (resistance), this adjusts where the curor
@@ -515,13 +525,13 @@ gboolean moveresize_event(XEvent *e)
                 gint opx, px, opy, py;
 
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                    dx = 4;
+                    dx = KEY_DIST;
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                    dx = -4;
+                    dx = -KEY_DIST;
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                    dy = 4;
+                    dy = KEY_DIST;
                 else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
-                    dy = -4;
+                    dy = -KEY_DIST;
 
                 cur_x += dx;
                 cur_y += dy;
@@ -535,7 +545,7 @@ gboolean moveresize_event(XEvent *e)
                 }
                 screen_pointer_pos(&px, &py);
 
-                do_move(FALSE);
+                do_move(TRUE);
 
                 /* because the cursor moves even though the window does
                    not nessesarily (resistance), this adjusts where the curor

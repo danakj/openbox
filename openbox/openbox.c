@@ -205,31 +205,26 @@ gint main(gint argc, gchar **argv)
     cursors[OB_CURSOR_NORTHWEST] = load_cursor("top_left_corner",
                                                XC_top_left_corner);
 
-    /* create available keycodes */
-    keys[OB_KEY_RETURN] =
-        XKeysymToKeycode(ob_display, XK_Return);
-    keys[OB_KEY_ESCAPE] =
-        XKeysymToKeycode(ob_display, XK_Escape);
-    keys[OB_KEY_LEFT] =
-        XKeysymToKeycode(ob_display, XK_Left);
-    keys[OB_KEY_RIGHT] =
-        XKeysymToKeycode(ob_display, XK_Right);
-    keys[OB_KEY_UP] =
-        XKeysymToKeycode(ob_display, XK_Up);
-    keys[OB_KEY_DOWN] =
-        XKeysymToKeycode(ob_display, XK_Down);
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
 
     if (screen_annex(program_name)) { /* it will be ours! */
         do {
+            modkeys_startup(reconfigure);
+
+            /* get the keycodes for keys we use */
+            keys[OB_KEY_RETURN] = modkeys_sym_to_code(XK_Return);
+            keys[OB_KEY_ESCAPE] = modkeys_sym_to_code(XK_Escape);
+            keys[OB_KEY_LEFT] = modkeys_sym_to_code(XK_Left);
+            keys[OB_KEY_RIGHT] = modkeys_sym_to_code(XK_Right);
+            keys[OB_KEY_UP] = modkeys_sym_to_code(XK_Up);
+            keys[OB_KEY_DOWN] = modkeys_sym_to_code(XK_Down);
+
             {
                 ObParseInst *i;
                 xmlDocPtr doc;
                 xmlNodePtr node;
-
-                modkeys_startup(reconfigure);
 
                 /* startup the parsing so everything can register sections
                    of the rc */

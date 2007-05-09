@@ -36,14 +36,14 @@
 static void set_modkey_mask(guchar mask, KeySym sym);
 
 static XModifierKeymap *modmap;
+static KeySym *keymap;
+static gint min_keycode, max_keycode, keysyms_per_keycode;
 /* This is a bitmask of the different masks for each modifier key */
 static guchar modkeys_keys[OB_MODKEY_NUM_KEYS];
 
 void modkeys_startup(gboolean reconfigure)
 {
-    KeySym *keymap;
     gint i, j, k;
-    gint min_keycode, max_keycode, keysyms_per_keycode;
 
     /* reset the keys to not be bound to any masks */
     for (i = 0; i < OB_MODKEY_NUM_KEYS; ++i)
@@ -77,12 +77,12 @@ void modkeys_startup(gboolean reconfigure)
             }
         }
     }
-    XFree(keymap);
 }
 
 void modkeys_shutdown(gboolean reconfigure)
 {
     XFreeModifiermap(modmap);
+    XFree(keymap);
 }
 
 guint modkeys_keycode_to_mask(guint keycode)
@@ -142,3 +142,16 @@ static void set_modkey_mask(guchar mask, KeySym sym)
     else if (sym == XK_Meta_L || sym == XK_Meta_R)
         modkeys_keys[OB_MODKEY_KEY_META] |= mask;
 }
+
+KeyCode modkeys_sym_to_code(KeySym sym)
+{
+    gint i, j;
+
+    /* go through each keycode and look for the keysym */
+    for (i = min_keycode; i <= max_keycode; ++i)
+        for (j = 0; j < keysyms_per_keycode; ++j)
+            if (sym == keymap[(i-min_keycode) * keysyms_per_keycode + j])
+                return i;
+    return 0;
+}
+

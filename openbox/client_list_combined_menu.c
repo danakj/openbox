@@ -109,7 +109,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 
 /* executes it using the client in the actions, since we set that
    when we make the actions! */
-static void menu_execute(ObMenuEntry *self, guint state, gpointer data,
+static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
+                         ObClient *c, guint state, gpointer data,
                          Time time)
 {
     ObAction *a;

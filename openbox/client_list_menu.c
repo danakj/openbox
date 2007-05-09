@@ -110,7 +110,8 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 
 /* executes it using the client in the actions, since we set that
    when we make the actions! */
-static void desk_menu_execute(ObMenuEntry *self, guint state, gpointer data,
+static void desk_menu_execute(ObMenuEntry *self, ObMenuFrame *f,
+                              ObClient *c, guint state, gpointer data,
                               Time time)
 {
     ObAction *a;

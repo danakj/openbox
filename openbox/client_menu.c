@@ -187,13 +187,13 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
 
     switch (e->id) {
     case LAYER_TOP:
-        client_set_layer(f->client, 1);
+        client_set_layer(c, 1);
         break;
     case LAYER_NORMAL:
-        client_set_layer(f->client, 0);
+        client_set_layer(c, 0);
         break;
     case LAYER_BOTTOM:
-        client_set_layer(f->client, -1);
+        client_set_layer(c, -1);
         break;
     default:
         g_assert_not_reached();

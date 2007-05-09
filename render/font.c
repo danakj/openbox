@@ -66,6 +66,8 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     out->font_desc = pango_font_description_new();
     out->layout = pango_layout_new(inst->pango);
     out->shortcut_underline = pango_attr_underline_new(PANGO_UNDERLINE_LOW);
+    out->shortcut_underline->start_index = 0;
+    out->shortcut_underline->end_index = 0;
 
     attrlist = pango_attr_list_new();
     /* shortcut_underline is owned by the attrlist */
@@ -219,16 +221,6 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         break;
     }
 
-    t->font->shortcut_underline->start_index = 0;
-    t->font->shortcut_underline->end_index = 0;
-    /* the attributes are owned by the layout.
-       re-add the attributes to the layout after changing the
-       start and end index */
-    attrlist = pango_layout_get_attributes(t->font->layout);
-    pango_attr_list_ref(attrlist);
-    pango_layout_set_attributes(t->font->layout, attrlist);
-    pango_attr_list_unref(attrlist);
-
     if (t->shadow_offset_x || t->shadow_offset_y) {
         c.color.red = t->shadow_color->r | t->shadow_color->r << 8;
         c.color.green = t->shadow_color->g | t->shadow_color->g << 8;
@@ -270,4 +262,16 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     pango_xft_render_layout_line
         (d, &c, pango_layout_get_line(t->font->layout, 0),
          x * PANGO_SCALE, y * PANGO_SCALE);
+
+    if (t->shortcut) {
+        t->font->shortcut_underline->start_index = 0;
+        t->font->shortcut_underline->end_index = 0;
+        /* the attributes are owned by the layout.
+           re-add the attributes to the layout after changing the
+           start and end index */
+        attrlist = pango_layout_get_attributes(t->font->layout);
+        pango_attr_list_ref(attrlist);
+        pango_layout_set_attributes(t->font->layout, attrlist);
+        pango_attr_list_unref(attrlist);
+    }
 }

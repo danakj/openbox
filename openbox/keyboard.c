@@ -249,7 +249,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
                   handled = TRUE;
               }
         } else if (e->type == ButtonPress) {
-            cancel = FALSE;
+            cancel = TRUE;
             done = TRUE;
             handled = FALSE;
         }

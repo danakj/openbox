@@ -1521,11 +1521,6 @@ void action_send_to_desktop(union ActionData *data)
 
 void action_desktop(union ActionData *data)
 {
-    static guint first = (unsigned) -1;
-
-    if (data->inter.any.interactive && first == (unsigned) -1)
-        first = screen_desktop;
-
     if (!data->inter.any.interactive ||
         (!data->inter.cancel && !data->inter.final))
     {
@@ -1536,14 +1531,10 @@ void action_desktop(union ActionData *data)
             if (data->inter.any.interactive)
                 screen_desktop_popup(data->desktop.desk, TRUE);
         }
-    } else if (data->inter.cancel) {
-        screen_set_desktop(first, TRUE);
     }
 
-    if (!data->inter.any.interactive || data->inter.final) {
+    if (!data->inter.any.interactive || data->inter.final)
         screen_desktop_popup(0, FALSE);
-        first = (unsigned) -1;
-    }
 }
 
 void action_desktop_dir(union ActionData *data)

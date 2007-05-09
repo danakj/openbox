@@ -2199,6 +2199,8 @@ static void client_get_session_ids(ObClient *self)
         localhost[127] = '\0';
         if (strcmp(localhost, s) != 0)
             self->client_machine = s;
+        else
+            g_free(s);
     }
 }
 

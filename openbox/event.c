@@ -81,7 +81,7 @@ static gboolean event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void event_handle_group(ObGroup *g, XEvent *e);
+static void event_handle_user_time_window_client(ObClient *c, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
 
 static void focus_delay_dest(gpointer data);
@@ -406,11 +406,11 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 static void event_process(const XEvent *ec, gpointer data)
 {
     Window window;
-    ObGroup *group = NULL;
     ObClient *client = NULL;
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
+    ObClient *timewinclient = NULL;
     XEvent ee, *e;
     ObEventData *ed = data;
 
@@ -419,8 +419,9 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
-    if (!(e->type == PropertyNotify &&
-          (group = g_hash_table_lookup(group_map, &window))))
+    if (e->type != PropertyNotify ||
+        !(timewinclient =
+          g_hash_table_lookup(client_user_time_window_map, &window)))
         if ((obwin = g_hash_table_lookup(window_map, &window))) {
             switch (obwin->type) {
             case Window_Dock:
@@ -554,8 +555,8 @@ static void event_process(const XEvent *ec, gpointer data)
             /* focus_set_client has already been called for sure */
             client_calc_layer(client);
         }
-    } else if (group)
-        event_handle_group(group, e);
+    } else if (timewinclient)
+        event_handle_user_time_window_client(timewinclient, e);
     else if (client)
         event_handle_client(client, e);
     else if (dockapp)
@@ -662,16 +663,6 @@ static void event_handle_root(XEvent *e)
     }
 }
 
-static void event_handle_group(ObGroup *group, XEvent *e)
-{
-    GSList *it;
-
-    g_assert(e->type == PropertyNotify);
-
-    for (it = group->members; it; it = g_slist_next(it))
-        event_handle_client(it->data, e);
-}
-
 void event_enter_client(ObClient *client)
 {
     g_assert(config_focus_follow);
@@ -697,6 +688,13 @@ void event_enter_client(ObClient *client)
             focus_delay_func(&data);
         }
     }
+}
+
+static void event_handle_user_time_window_client(ObClient *client, XEvent *e)
+{
+    g_assert(e->type == PropertyNotify);
+    if (e->xproperty.atom == prop_atoms.net_wm_user_time)
+        client_update_user_time(client);
 }
 
 static void event_handle_client(ObClient *client, XEvent *e)
@@ -1190,6 +1188,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         else if (msgtype == prop_atoms.net_wm_user_time) {
             client_update_user_time(client);
+        }
+        else if (msgtype == prop_atoms.net_wm_user_time_window) {
+            client_update_user_time_window(client);
         }
 #ifdef SYNC
         else if (msgtype == prop_atoms.net_wm_sync_request_counter) {

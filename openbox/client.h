@@ -289,13 +289,17 @@ struct _ObClient
     /*! The number of icons in icons */
     guint nicons;
 
-    /* Where the window should iconify to/from */
+    /*! Where the window should iconify to/from */
     Rect icon_geometry;
 
+    /*! The time when the client last received user interaction */
     guint32 user_time;
+    /*! A separate window for the client to update it's user_time on */
+    Window  user_time_window;
 };
 
-extern GList *client_list;
+extern GList      *client_list;
+extern GHashTable *client_user_time_window_map;
 
 void client_startup(gboolean reconfig);
 void client_shutdown(gboolean reconfig);
@@ -585,6 +589,8 @@ void client_update_strut(ObClient *self);
 void client_update_icons(ObClient *self);
 /*! Updates the window's user time */
 void client_update_user_time(ObClient *self);
+/*! Updates the window's user time window */
+void client_update_user_time_window(ObClient *self);
 /*! Updates the window's icon geometry (where to iconify to/from) */
 void client_update_icon_geometry(ObClient *self);
 

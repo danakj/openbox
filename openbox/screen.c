@@ -273,6 +273,7 @@ gboolean screen_annex(const gchar *program_name)
     supported[i++] = prop_atoms.net_moveresize_window;
     supported[i++] = prop_atoms.net_wm_moveresize;
     supported[i++] = prop_atoms.net_wm_user_time;
+    supported[i++] = prop_atoms.net_wm_user_time_window;
     supported[i++] = prop_atoms.net_frame_extents;
     supported[i++] = prop_atoms.net_startup_id;
 #ifdef SYNC

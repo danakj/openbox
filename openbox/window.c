@@ -25,11 +25,15 @@
 
 GHashTable *window_map;
 
+static guint window_hash(Window *w) { return *w; }
+static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
+
 void window_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    window_map = g_hash_table_new(g_int_hash, g_int_equal);
+    window_map = g_hash_table_new((GHashFunc)window_hash,
+                                  (GEqualFunc)window_comp);
 }
 
 void window_shutdown(gboolean reconfig)

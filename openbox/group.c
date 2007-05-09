@@ -19,17 +19,17 @@
 #include "group.h"
 #include "client.h"
 
-GHashTable *group_map = NULL;
+static GHashTable *group_map;
 
-static guint map_hash(Window *w) { return *w; }
-static gboolean map_key_comp(Window *w1, Window *w2) { return *w1 == *w2; }
+static guint window_hash(Window *w) { return *w; }
+static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
 
 void group_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    group_map = g_hash_table_new((GHashFunc)map_hash,
-                                 (GEqualFunc)map_key_comp);
+    group_map = g_hash_table_new((GHashFunc)window_hash,
+                                 (GEqualFunc)window_comp);
 }
 
 void group_shutdown(gboolean reconfig)

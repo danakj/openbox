@@ -62,6 +62,7 @@ typedef struct
 } ClientCallback;
 
 GList            *client_list          = NULL;
+GHashTable       *client_user_time_window_map;
 
 static GSList *client_destructors      = NULL;
 
@@ -94,15 +95,23 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
 
+static guint window_hash(Window *w) { return *w; }
+static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
+
 void client_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
+    client_user_time_window_map = g_hash_table_new((GHashFunc)window_hash,
+                                                   (GEqualFunc)window_comp);
     client_set_list();
 }
 
 void client_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
+
+    g_hash_table_destroy(client_user_time_window_map);
 }
 
 void client_add_destructor(ObClientCallback func, gpointer data)
@@ -503,6 +512,10 @@ void client_unmanage(ObClient *self)
     /* we dont want events no more. do this before hiding the frame so we
        don't generate more events */
     XSelectInput(ob_display, self->window, NoEventMask);
+    if (self->user_time_window) {
+        XSelectInput(ob_display, self->user_time_window, NoEventMask);
+        g_hash_table_remove(client_user_time_window_map, &w);
+    }
 
     frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
@@ -1002,7 +1015,9 @@ static void client_get_all(ObClient *self)
     client_update_title(self);
     client_update_strut(self);
     client_update_icons(self);
-    client_update_user_time(self);
+    client_update_user_time_window(self);
+    if (!self->user_time_window) /* check if this would have been called */
+        client_update_user_time(self);
     client_update_icon_geometry(self);
 }
 
@@ -2019,8 +2034,15 @@ void client_update_icons(ObClient *self)
 void client_update_user_time(ObClient *self)
 {
     guint32 time;
+    gboolean got = FALSE;
 
-    if (PROP_GET32(self->window, net_wm_user_time, cardinal, &time)) {
+    if (self->user_time_window)
+        got = PROP_GET32(self->user_time_window,
+                         net_wm_user_time, cardinal, &time);
+    if (!got)
+        got = PROP_GET32(self->window, net_wm_user_time, cardinal, &time);
+
+    if (got) {
         /* we set this every time, not just when it grows, because in practice
            sometimes time goes backwards! (ntpdate.. yay....) so.. if it goes
            backward we don't want all windows to stop focusing. we'll just
@@ -2029,9 +2051,50 @@ void client_update_user_time(ObClient *self)
         */
         self->user_time = time;
 
-        /*
-        ob_debug("window %s user time %u\n", self->title, time);
-        */
+        /*ob_debug("window %s user time %u\n", self->title, time);*/
+    }
+}
+
+void client_update_user_time_window(ObClient *self)
+{
+    guint32 w;
+    ObClient *c;
+
+    if (!PROP_GET32(self->window, net_wm_user_time_window, window, &w))
+        w = None;
+
+    if (w != self->user_time_window) {
+        if (self->user_time_window) {
+            XSelectInput(ob_display, self->user_time_window, NoEventMask);
+            g_hash_table_remove(client_user_time_window_map, &w);
+            self->user_time_window = None;
+        }
+
+        if (self->group && self->group->leader == w) {
+            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
+                          "_NET_WM_USER_TYPE_WINDOW to its group leader\n");
+            /* do it anyways..? */
+        }
+        else if (w == self->window) {
+            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
+                          "_NET_WM_USER_TIME_WINDOW to itself\n");
+            w = None; /* don't do it */
+        }
+        else if (((c = g_hash_table_lookup(client_user_time_window_map,&w)))) {
+            ob_debug_type(OB_DEBUG_APP_BUGS, "Client %s is trying to use "
+                          "the _NET_WM_USER_TIME_WINDOW of %s\n",
+                          self->title, c->title);
+            w = None; /* don't do it */
+        }
+
+        self->user_time_window = w;
+        if (self->user_time_window != None) {
+            XSelectInput(ob_display,self->user_time_window,PropertyChangeMask);
+            g_hash_table_insert(client_user_time_window_map,
+                                &self->user_time_window, self);
+        }
+
+        client_update_user_time(self);
     }
 }
 

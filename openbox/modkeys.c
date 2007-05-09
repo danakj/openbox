@@ -64,12 +64,17 @@ void modkeys_startup(gboolean reconfigure)
             KeySym sym;
             /* get a keycode that is bound to the mask (i) */
             KeyCode keycode = modmap->modifiermap[i*modmap->max_keypermod + j];
-            /* go through each keysym bound to the given keycode */
-            for (k = 0; k < keysyms_per_keycode; ++k) {
-                sym = keymap[(keycode-min_keycode) * keysyms_per_keycode + k];
-                if (sym != NoSymbol) {
-                    /* bind the key to the mask (e.g. Alt_L => Mod1Mask) */
-                    set_modkey_mask(nth_mask(i), sym);
+            g_print("keycode %d for mask %d\n", keycode, i);
+            if (keycode) {
+                /* go through each keysym bound to the given keycode */
+                for (k = 0; k < keysyms_per_keycode; ++k) {
+                    sym = keymap[(keycode-min_keycode) * keysyms_per_keycode +
+                                 k];
+                    g_print("k %d sym %s \n", k, XKeysymToString(sym));
+                    if (sym != NoSymbol) {
+                        /* bind the key to the mask (e.g. Alt_L => Mod1Mask) */
+                        set_modkey_mask(nth_mask(i), sym);
+                    }
                 }
             }
         }

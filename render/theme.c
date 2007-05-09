@@ -131,7 +131,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             winjust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
             winjust = RR_JUSTIFY_CENTER;
-        g_free(str);
     }
 
     if (menu_title_font) {
@@ -146,7 +145,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             mtitlejust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
             mtitlejust = RR_JUSTIFY_CENTER;
-        g_free(str);
     }
 
     if (menu_item_font) {

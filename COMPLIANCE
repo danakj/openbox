@@ -46,15 +46,14 @@ the version of the spec which Openbox is compliant up to for the hint.
 + _NET_WM_STRUT (1.3)
 + _NET_WM_STRUT_PARTIAL (1.3)
 	Openbox uses these to create per-monitor struts in Xinerama setups.
-- _NET_WM_ICON_GEOMETRY (1.3)
-	Openbox does not display icons for iconic windows.
++ _NET_WM_ICON_GEOMETRY (1.3)
 + _NET_WM_ICON (1.3)
 - _NET_WM_PID (1.3)
-	Openbox does not make use of available PIDs as I don't believe there is
-	a reliable way to tell what client the window is running on.
+	Openbox does not currently kill processes.
 - _NET_WM_HANDLED_ICONS (1.3)
 	Openbox does not display icons for iconic windows.
 + _NET_WM_USER_TIME (1.3)
++ _NET_WM_USER_TIME_WINDOW (1.4)
 - _NET_WM_PING (1.3)
 	Openbox doesn't look for hung processes at this time.
 + _NET_FRAME_EXTENTS (1.3)
@@ -64,4 +63,4 @@ the version of the spec which Openbox is compliant up to for the hint.
 + _NET_WM_SYNC_REQUEST (1.3)
 + _NET_WM_FULL_PLACEMENT (1.4)
 + _NET_WM_MOVERESIZE_CANCEL (1.4)
-- _NET_REQUEST_FRAME_EXTENTS (1.3)
++ _NET_REQUEST_FRAME_EXTENTS (1.3)

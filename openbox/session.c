@@ -175,7 +175,7 @@ static gboolean session_connect()
                                 SmcSaveCompleteProcMask |
                                 SmcShutdownCancelledProcMask,
                                 &cb, oldid, &ob_sm_id,
-                                SM_ERR_LEN, sm_err);
+                                SM_ERR_LEN-1, sm_err);
     g_free(oldid);
     if (sm_conn == NULL)
         ob_debug("Failed to connect to session manager: %s\n", sm_err);
@@ -394,6 +394,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
 
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, savedata)) {
         ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed\n");
+        g_free(savedata);
         SmcSaveYourselfDone(conn, FALSE);
     }
 }

@@ -568,8 +568,32 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_root(e);
     else if (e->type == MapRequest)
         client_manage(window);
+    else if (e->type == ClientMessage) {
+        /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for
+           windows that are not managed yet. */
+        if (e->xclient.message_type == prop_atoms.net_request_frame_extents) {
+            /* Pretend to manage the client, getting information used to
+               determine its decorations */
+            ObClient *c = client_fake_manage(e->xclient.window);
+            gulong vals[4];
+
+            /* adjust the decorations so we know the sizes */
+            frame_adjust_area(c->frame, FALSE, TRUE, TRUE);
+
+            /* set the frame extents on the window */
+            vals[0] = c->frame->size.left;
+            vals[1] = c->frame->size.right;
+            vals[2] = c->frame->size.top;
+            vals[3] = c->frame->size.bottom;
+            PROP_SETA32(e->xclient.window, net_frame_extents,
+                        cardinal, vals, 4);
+
+            /* Free the pretend client */
+            client_fake_unmanage(c);
+        }
+    }
     else if (e->type == ConfigureRequest) {
-        /* unhandled configure requests must be used to configure the
+        /* unhandled config5Aure requests must be used to configure the
            window directly */
         XWindowChanges xwc;
 
@@ -705,9 +729,17 @@ static void event_handle_client(ObClient *client, XEvent *e)
     XEvent ce;
     Atom msgtype;
     ObFrameContext con;
+    static gint px = -1, py = -1;
+    static guint pb = 0;
      
     switch (e->type) {
     case ButtonPress:
+        /* save where the press occured for the first button pressed */
+        if (!pb) {
+            pb = e->xbutton.button;
+            px = e->xbutton.x;
+            py = e->xbutton.y;
+        }
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it.
@@ -719,8 +751,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
             !keyboard_interactively_grabbed() &&
             !menu_frame_visible)
         {
-            con = frame_context(client, e->xbutton.window);
+            /* use where the press occured */
+            con = frame_context(client, e->xbutton.window, px, py);
             con = mouse_button_frame_context(con, e->xbutton.button);
+
+            if (e->type == ButtonRelease && e->xbutton.button == pb)
+                pb = 0, px = py = -1;
+
             switch (con) {
             case OB_FRAME_CONTEXT_MAXIMIZE:
                 client->frame->max_press = (e->type == ButtonPress);
@@ -748,8 +785,46 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
         }
         break;
+    case MotionNotify:
+        con = frame_context(client, e->xmotion.window,
+                            e->xmotion.x, e->xmotion.y);
+        switch (con) {
+        case OB_FRAME_CONTEXT_TITLEBAR:
+            /* we've left the button area inside the titlebar */
+            client->frame->max_hover = FALSE;
+            client->frame->desk_hover = FALSE;
+            client->frame->shade_hover = FALSE;
+            client->frame->iconify_hover = FALSE;
+            client->frame->close_hover = FALSE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            client->frame->max_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            client->frame->desk_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_SHADE:
+            client->frame->shade_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            client->frame->iconify_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_CLOSE:
+            client->frame->close_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        default:
+            break;
+        }
+        break;
     case LeaveNotify:
-        con = frame_context(client, e->xcrossing.window);
+        con = frame_context(client, e->xcrossing.window,
+                            e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = FALSE;
@@ -809,7 +884,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             nofocus = TRUE;
         }
 
-        con = frame_context(client, e->xcrossing.window);
+        con = frame_context(client, e->xcrossing.window,
+                            e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = TRUE;
@@ -1167,7 +1243,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {
             client_update_transient_for(client);
-            client_get_type(client);
+            client_get_type_and_transientness(client);
             /* type may have changed, so update the layer */
             client_calc_layer(client);
             client_setup_decor_and_functions(client);

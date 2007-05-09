@@ -66,7 +66,7 @@ GList            *client_list          = NULL;
 
 static GSList *client_destructors      = NULL;
 
-static void client_get_all(ObClient *self);
+static void client_get_all(ObClient *self, gboolean real);
 static void client_toggle_border(ObClient *self, gboolean show);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
@@ -76,9 +76,7 @@ static void client_get_state(ObClient *self);
 static void client_get_layer(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
-static void client_get_gravity(ObClient *self);
 static void client_get_colormap(ObClient *self);
-static void client_get_transientness(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
@@ -236,8 +234,8 @@ void client_manage(Window window)
 
     grab_server(TRUE);
 
-    /* check if it has already been unmapped by the time we started mapping.
-       the grab does a sync so we don't have to here */
+    /* check if it has already been unmapped by the time we started
+       mapping. the grab does a sync so we don't have to here */
     if (XCheckTypedWindowEvent(ob_display, window, DestroyNotify, &e) ||
         XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e))
     {
@@ -277,7 +275,6 @@ void client_manage(Window window)
     XChangeWindowAttributes(ob_display, window,
                             CWEventMask|CWDontPropagate, &attrib_set);
 
-
     /* create the ObClient struct, and populate it from the hints on the
        window */
     self = g_new0(ObClient, 1);
@@ -290,7 +287,7 @@ void client_manage(Window window)
     self->desktop = screen_num_desktops; /* always an invalid value */
     self->user_time = focus_client ? focus_client->user_time : CurrentTime;
 
-    client_get_all(self);
+    client_get_all(self, TRUE);
     /* per-app settings override stuff, and return the settings for other
        uses too */
     settings = client_get_settings_state(self);
@@ -311,14 +308,14 @@ void client_manage(Window window)
     /* remove the client's border (and adjust re gravity) */
     client_toggle_border(self, FALSE);
      
-    /* specify that if we exit, the window should not be destroyed and should
-       be reparented back to root automatically */
+    /* specify that if we exit, the window should not be destroyed and
+       should be reparented back to root automatically */
     XChangeSaveSet(ob_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
 
-    frame_grab_client(self->frame, self);
+    frame_grab_client(self->frame);
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
@@ -484,6 +481,31 @@ void client_manage(Window window)
     client_set_list();
 
     ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
+
+    return;
+}
+
+
+ObClient *client_fake_manage(Window window)
+{
+    ObClient *self;
+    ObAppSettings *settings;
+
+    ob_debug("Pretend-managing window: %lx\n", window);
+
+    /* do this minimal stuff to figure out the client's decorations */
+
+    self = g_new0(ObClient, 1);
+    self->window = window;
+
+    client_get_all(self, FALSE);
+    /* per-app settings override stuff, and return the settings for other
+       uses too */
+    settings = client_get_settings_state(self);
+
+    /* create the decoration frame for the client window */
+    self->frame = frame_new(self);
+    return self;
 }
 
 void client_unmanage_all()
@@ -497,8 +519,8 @@ void client_unmanage(ObClient *self)
     guint j;
     GSList *it;
 
-    ob_debug("Unmanaging window: %lx (%s) (%s)\n", self->window, self->class,
-             self->title ? self->title : "");
+    ob_debug("Unmanaging window: %lx (%s) (%s)\n", self->window,
+             self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);
 
@@ -510,7 +532,8 @@ void client_unmanage(ObClient *self)
     /* flush to send the hide to the server quickly */
     XFlush(ob_display);
 
-    /* ignore enter events from the unmap so it doesnt mess with the focus */
+    /* ignore enter events from the unmap so it doesnt mess with the
+       focus */
     event_ignore_queued_enters();
 
     mouse_grab_for_client(self, FALSE);
@@ -547,7 +570,7 @@ void client_unmanage(ObClient *self)
         for (it = self->group->members; it; it = g_slist_next(it))
             if (it->data != self)
                 ((ObClient*)it->data)->transients =
-                    g_slist_remove(((ObClient*)it->data)->transients, self);
+                    g_slist_remove(((ObClient*)it->data)->transients,self);
     } else if (self->transient_for) {        /* transient of window */
         self->transient_for->transients =
             g_slist_remove(self->transient_for->transients, self);
@@ -594,7 +617,8 @@ void client_unmanage(ObClient *self)
     }
 
     /* reparent the window out of the frame, and free the frame */
-    frame_release_client(self->frame, self);
+    frame_release_client(self->frame);
+    frame_free(self->frame);
     self->frame = NULL;
 
     if (ob_state() != OB_STATE_EXITING) {
@@ -604,10 +628,14 @@ void client_unmanage(ObClient *self)
         PROP_ERASE(self->window, net_wm_state);
         PROP_ERASE(self->window, wm_state);
     } else {
-        /* if we're left in an unmapped state, the client wont be mapped. this
-           is bad, since we will no longer be managing the window on restart */
+        /* if we're left in an unmapped state, the client wont be mapped.
+           this is bad, since we will no longer be managing the window on
+           restart */
         XMapWindow(ob_display, self->window);
     }
+
+    /* update the list hints */
+    client_set_list();
 
     ob_debug("Unmanaged window 0x%lx\n", self->window);
 
@@ -626,9 +654,14 @@ void client_unmanage(ObClient *self)
     g_free(self->client_machine);
     g_free(self->sm_client_id);
     g_free(self);
-     
-    /* update the list hints */
-    client_set_list();
+}
+
+void client_fake_unmanage(ObClient *self)
+{
+    /* this is all that got allocated to get the decorations */
+
+    frame_free(self->frame);
+    g_free(self);
 }
 
 static ObAppSettings *client_get_settings_state(ObClient *self)
@@ -949,68 +982,62 @@ static void client_toggle_border(ObClient *self, gboolean show)
 }
 
 
-static void client_get_all(ObClient *self)
+static void client_get_all(ObClient *self, gboolean real)
 {
+    /* this is needed for the frame to set itself up */
     client_get_area(self);
+
+    /* these things can change the decor and functions of the window */
+
     client_get_mwm_hints(self);
-
-    /* The transient-ness of a window is used to pick a type, but the type can
-       also affect transiency.
-
-       Dialogs are always made transients for their group if they have one.
-
-       I also have made non-application type windows be transients for their
-       group (eg utility windows).
-    */
-    client_get_transientness(self);
-    client_get_type(self);/* this can change the mwmhints for special cases */
+    /* this can change the mwmhints for special cases */
+    client_get_type_and_transientness(self);
     client_get_state(self);
-
-    client_update_wmhints(self);
-    /* this may have already been called from client_update_wmhints */
-    if (self->transient_for == NULL)
-        client_update_transient_for(self);
-    client_get_startup_id(self);
-    client_get_desktop(self);/* uses transient data/group/startup id if a
-                                desktop is not specified */
-    client_get_shaped(self);
-
-    client_get_layer(self); /* if layer hasn't been specified, get it from
-                               other sources if possible */
-
-    {
-        /* a couple type-based defaults for new windows */
-
-        /* this makes sure that these windows appear on all desktops */
-        if (self->type == OB_CLIENT_TYPE_DESKTOP)
-            self->desktop = DESKTOP_ALL;
-    }
-
     client_update_protocols(self);
-
-    client_get_gravity(self); /* get the attribute gravity */
-    client_update_normal_hints(self); /* this may override the attribute
-                                         gravity */
+    client_update_normal_hints(self);
 
     /* got the type, the mwmhints, the protocols, and the normal hints
        (min/max sizes), so we're ready to set up the decorations/functions */
     client_setup_decor_and_functions(self);
+
+    if (real) {
+        client_update_wmhints(self);
+        /* this may have already been called from client_update_wmhints */
+        if (self->transient_for == NULL)
+            client_update_transient_for(self);
+
+        client_get_startup_id(self);
+        client_get_desktop(self);/* uses transient data/group/startup id if a
+                                    desktop is not specified */
+        client_get_shaped(self);
+
+        client_get_layer(self); /* if layer hasn't been specified, get it from
+                                   other sources if possible */
+
+        {
+            /* a couple type-based defaults for new windows */
+
+            /* this makes sure that these windows appear on all desktops */
+            if (self->type == OB_CLIENT_TYPE_DESKTOP)
+                self->desktop = DESKTOP_ALL;
+        }
   
 #ifdef SYNC
-    client_update_sync_request_counter(self);
+        client_update_sync_request_counter(self);
 #endif
 
-    /* get the session related properties */
-    client_get_session_ids(self);
+        /* get the session related properties */
+        client_get_session_ids(self);
 
-    client_get_colormap(self);
-    client_update_title(self);
-    client_update_strut(self);
-    client_update_icons(self);
-    client_update_user_time_window(self);
-    if (!self->user_time_window) /* check if this would have been called */
-        client_update_user_time(self);
-    client_update_icon_geometry(self);
+        client_get_colormap(self);
+        client_update_title(self);
+        client_update_strut(self);
+        client_update_icons(self);
+        client_update_user_time_window(self);
+        if (!self->user_time_window) /* check if this would have been called */
+            client_update_user_time(self);
+        client_update_icon_geometry(self);
+    }
 }
 
 static void client_get_startup_id(ObClient *self)
@@ -1170,20 +1197,12 @@ static void client_get_shaped(ObClient *self)
 #endif
 }
 
-void client_get_transientness(ObClient *self)
-{
-    Window t;
-    if (XGetTransientForHint(ob_display, self->window, &t))
-        self->transient = TRUE;
-}
-
 void client_update_transient_for(ObClient *self)
 {
     Window t = None;
     ObClient *target = NULL;
 
     if (XGetTransientForHint(ob_display, self->window, &t)) {
-        self->transient = TRUE;
         if (t != self->window) { /* cant be transient to itself! */
             target = g_hash_table_lookup(window_map, &t);
             /* if this happens then we need to check for it*/
@@ -1220,16 +1239,8 @@ void client_update_transient_for(ObClient *self)
                 }
             }
         }
-    } else if (self->type == OB_CLIENT_TYPE_DIALOG ||
-               self->type == OB_CLIENT_TYPE_TOOLBAR ||
-               self->type == OB_CLIENT_TYPE_MENU ||
-               self->type == OB_CLIENT_TYPE_UTILITY)
-    {
-        self->transient = TRUE;
-        if (self->group)
-            target = OB_TRAN_GROUP;
-    } else
-        self->transient = FALSE;
+    } else if (self->transient && self->group)
+        target = OB_TRAN_GROUP;
 
     client_update_transient_tree(self, self->group, self->group,
                                  self->transient_for, target);
@@ -1364,12 +1375,14 @@ static void client_get_mwm_hints(ObClient *self)
     }
 }
 
-void client_get_type(ObClient *self)
+void client_get_type_and_transientness(ObClient *self)
 {
     guint num, i;
     guint32 *val;
+    Window t;
 
     self->type = -1;
+    self->transient = FALSE;
   
     if (PROP_GETA32(self->window, net_wm_window_type, atom, &val, &num)) {
         /* use the first value that we know about in the array */
@@ -1403,7 +1416,10 @@ void client_get_type(ObClient *self)
         }
         g_free(val);
     }
-    
+
+    if (XGetTransientForHint(ob_display, self->window, &t))
+        self->transient = TRUE;
+            
     if (self->type == (ObClientType) -1) {
         /*the window type hint was not set, which means we either classify
           ourself as a normal window or a dialog, depending on if we are a
@@ -1412,6 +1428,15 @@ void client_get_type(ObClient *self)
             self->type = OB_CLIENT_TYPE_DIALOG;
         else
             self->type = OB_CLIENT_TYPE_NORMAL;
+    }
+
+    /* then, based on our type, we can update our transientness.. */
+    if (self->type == OB_CLIENT_TYPE_DIALOG ||
+        self->type == OB_CLIENT_TYPE_TOOLBAR ||
+        self->type == OB_CLIENT_TYPE_MENU ||
+        self->type == OB_CLIENT_TYPE_UTILITY)
+    {
+        self->transient = TRUE;
     }
 }
 
@@ -1455,16 +1480,6 @@ void client_update_sync_request_counter(ObClient *self)
         self->sync_counter = None;
 }
 #endif
-
-static void client_get_gravity(ObClient *self)
-{
-    XWindowAttributes wattrib;
-    Status ret;
-
-    ret = XGetWindowAttributes(ob_display, self->window, &wattrib);
-    g_assert(ret != BadWindow);
-    self->gravity = wattrib.win_gravity;
-}
 
 void client_get_colormap(ObClient *self)
 {
@@ -1649,7 +1664,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
     /* kill the handle on fully maxed windows */
     if (self->max_vert && self->max_horz)
-        self->decorations &= ~OB_FRAME_DECOR_HANDLE;
+        self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
 
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */
@@ -2184,6 +2199,8 @@ static void client_get_session_ids(ObClient *self)
         localhost[127] = '\0';
         if (strcmp(localhost, s) != 0)
             self->client_machine = s;
+        else
+            g_free(s);
     }
 }
 

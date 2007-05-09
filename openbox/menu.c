@@ -357,6 +357,7 @@ static void menu_destroy_hash_value(ObMenu *self)
     g_free(self->name);
     g_free(self->title);
     g_free(self->execute);
+    g_free(self->more_menu);
 
     g_free(self);
 }

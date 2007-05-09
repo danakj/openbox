@@ -20,6 +20,7 @@
 #define ob__modkeys_h
 
 #include <glib.h>
+#include <X11/Xlib.h>
 
 /*! These keys are bound to the modifier masks in any fashion */
 typedef enum {
@@ -50,5 +51,9 @@ guint modkeys_only_modifier_masks(guint mask);
 /*! Get the modifier masks for a modifier key. This includes both the left and
   right keys when there are both. */
 guint modkeys_key_to_mask(ObModkeysKey key);
+
+/*! Convert a KeySym to a KeyCode, because the X function is terrible - says
+  valgrind. */
+KeyCode modkeys_sym_to_code(KeySym sym);
 
 #endif

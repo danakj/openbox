@@ -34,7 +34,7 @@
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                           ButtonMotionMask | \
+                           ButtonMotionMask | PointerMotionMask | \
                            EnterWindowMask | LeaveWindowMask)
 /* The inner window does not need enter/leave events.
    If it does get them, then it needs its own context for enter events
@@ -99,6 +99,7 @@ ObFrame *frame_new(ObClient *client)
     Visual *visual;
 
     self = g_new0(ObFrame, 1);
+    self->client = client;
 
     visual = check_32bit_client(client);
 
@@ -245,7 +246,7 @@ static void free_theme_statics(ObFrame *self)
     RrAppearanceFree(self->a_icon);
 }
 
-static void frame_free(ObFrame *self)
+void frame_free(ObFrame *self)
 {
     free_theme_statics(self);
 
@@ -553,12 +554,10 @@ void frame_adjust_icon(ObFrame *self)
     framerender_frame(self);
 }
 
-void frame_grab_client(ObFrame *self, ObClient *client)
+void frame_grab_client(ObFrame *self)
 {
-    self->client = client;
-
     /* reparent the client to the frame */
-    XReparentWindow(ob_display, client->window, self->plate, 0, 0);
+    XReparentWindow(ob_display, self->client->window, self->plate, 0, 0);
     /*
       When reparenting the client window, it is usually not mapped yet, since
       this occurs from a MapRequest. However, in the case where Openbox is
@@ -568,52 +567,50 @@ void frame_grab_client(ObFrame *self, ObClient *client)
       handled and need to be ignored.
     */
     if (ob_state() == OB_STATE_STARTING)
-        client->ignore_unmaps += 2;
+        self->client->ignore_unmaps += 2;
 
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */
     XSelectInput(ob_display, self->plate, PLATE_EVENTMASK);
 
     /* map the client so it maps when the frame does */
-    XMapWindow(ob_display, client->window);
+    XMapWindow(ob_display, self->client->window);
 
     /* adjust the frame to the client's size */
     frame_adjust_area(self, FALSE, TRUE, FALSE);
 
     /* set all the windows for the frame in the window_map */
-    g_hash_table_insert(window_map, &self->window, client);
-    g_hash_table_insert(window_map, &self->plate, client);
-    g_hash_table_insert(window_map, &self->inner, client);
-    g_hash_table_insert(window_map, &self->title, client);
-    g_hash_table_insert(window_map, &self->label, client);
-    g_hash_table_insert(window_map, &self->max, client);
-    g_hash_table_insert(window_map, &self->close, client);
-    g_hash_table_insert(window_map, &self->desk, client);
-    g_hash_table_insert(window_map, &self->shade, client);
-    g_hash_table_insert(window_map, &self->icon, client);
-    g_hash_table_insert(window_map, &self->iconify, client);
-    g_hash_table_insert(window_map, &self->handle, client);
-    g_hash_table_insert(window_map, &self->lgrip, client);
-    g_hash_table_insert(window_map, &self->rgrip, client);
-    g_hash_table_insert(window_map, &self->tltresize, client);
-    g_hash_table_insert(window_map, &self->tllresize, client);
-    g_hash_table_insert(window_map, &self->trtresize, client);
-    g_hash_table_insert(window_map, &self->trrresize, client);
+    g_hash_table_insert(window_map, &self->window, self->client);
+    g_hash_table_insert(window_map, &self->plate, self->client);
+    g_hash_table_insert(window_map, &self->inner, self->client);
+    g_hash_table_insert(window_map, &self->title, self->client);
+    g_hash_table_insert(window_map, &self->label, self->client);
+    g_hash_table_insert(window_map, &self->max, self->client);
+    g_hash_table_insert(window_map, &self->close, self->client);
+    g_hash_table_insert(window_map, &self->desk, self->client);
+    g_hash_table_insert(window_map, &self->shade, self->client);
+    g_hash_table_insert(window_map, &self->icon, self->client);
+    g_hash_table_insert(window_map, &self->iconify, self->client);
+    g_hash_table_insert(window_map, &self->handle, self->client);
+    g_hash_table_insert(window_map, &self->lgrip, self->client);
+    g_hash_table_insert(window_map, &self->rgrip, self->client);
+    g_hash_table_insert(window_map, &self->tltresize, self->client);
+    g_hash_table_insert(window_map, &self->tllresize, self->client);
+    g_hash_table_insert(window_map, &self->trtresize, self->client);
+    g_hash_table_insert(window_map, &self->trrresize, self->client);
 }
 
-void frame_release_client(ObFrame *self, ObClient *client)
+void frame_release_client(ObFrame *self)
 {
     XEvent ev;
     gboolean reparent = TRUE;
-
-    g_assert(self->client == client);
 
     /* if there was any animation going on, kill it */
     ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
                                      self, FALSE);
 
     /* check if the app has already reparented its window away */
-    while (XCheckTypedWindowEvent(ob_display, client->window,
+    while (XCheckTypedWindowEvent(ob_display, self->client->window,
                                   ReparentNotify, &ev))
     {
         /* This check makes sure we don't catch our own reparent action to
@@ -633,10 +630,10 @@ void frame_release_client(ObFrame *self, ObClient *client)
     if (reparent) {
         /* according to the ICCCM - if the client doesn't reparent itself,
            then we will reparent the window to root for them */
-        XReparentWindow(ob_display, client->window,
+        XReparentWindow(ob_display, self->client->window,
                         RootWindow(ob_display, ob_screen),
-                        client->area.x,
-                        client->area.y);
+                        self->client->area.x,
+                        self->client->area.y);
     }
 
     /* remove all the windows for the frame from the window_map */
@@ -660,8 +657,6 @@ void frame_release_client(ObFrame *self, ObClient *client)
     g_hash_table_remove(window_map, &self->trrresize);
 
     ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
-
-    frame_free(self);
 }
 
 /* is there anything present between us and the label? */
@@ -688,7 +683,7 @@ static gboolean is_button_present(ObFrame *self, const gchar *lc, gint dir) {
 static void layout_title(ObFrame *self)
 {
     gchar *lc;
-    gint i, x;
+    gint i;
 
     const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
     /* position of the left most button */
@@ -700,6 +695,7 @@ static void layout_title(ObFrame *self)
     self->icon_on = self->desk_on = self->shade_on = self->iconify_on =
         self->max_on = self->close_on = self->label_on = FALSE;
     self->label_width = self->width - (ob_rr_theme->paddingx + 1) * 2;
+    self->leftmost = self->rightmost = OB_FRAME_CONTEXT_NONE;
 
     /* figure out what's being show, find each element's position, and the
        width of the label
@@ -708,16 +704,21 @@ static void layout_title(ObFrame *self)
        i will be +1 the first time through when working to the left,
        and -1 the second time through when working to the right */
     for (i = 1; i >= -1; i-=2) {
+        gint x;
+        ObFrameContext *firstcon;
+
         if (i > 0) {
             x = left;
             lc = config_title_layout;
+            firstcon = &self->leftmost;
         } else {
             x = right;
             lc = config_title_layout + strlen(config_title_layout)-1;
+            firstcon = &self->rightmost;
         }
 
         /* stop at the end of the string (or the label, which calls break) */
-        for (; *lc != '\0' && lc >= config_title_layout; lc+=i)
+        for (; *lc != '\0' && lc >= config_title_layout; lc+=i) {
             if (*lc == 'L') {
                 if (i > 0) {
                     self->label_on = TRUE;
@@ -725,6 +726,7 @@ static void layout_title(ObFrame *self)
                 }
                 break; /* break the for loop, do other side of label */
             } else if (*lc == 'N') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICON;
                 if ((self->icon_on = is_button_present(self, lc, i))) {
                     /* icon gets extra padding */
                     self->label_width -= bwidth + 2;
@@ -732,36 +734,44 @@ static void layout_title(ObFrame *self)
                     x += i * (bwidth + 2);
                 }
             } else if (*lc == 'D') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_ALLDESKTOPS;
                 if ((self->desk_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->desk_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'S') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_SHADE;
                 if ((self->shade_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->shade_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'I') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICONIFY;
                 if ((self->iconify_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->iconify_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'M') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_MAXIMIZE;
                 if ((self->max_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->max_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'C') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_CLOSE;
                 if ((self->close_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->close_x = x;
                     x += i * bwidth;
                 }
-            }
+            } else
+                continue; /* don't set firstcon */
+            firstcon = NULL;
+        }
     }
 
     /* position and map the elements */
@@ -853,7 +863,7 @@ ObFrameContext frame_context_from_string(const gchar *name)
     return OB_FRAME_CONTEXT_NONE;
 }
 
-ObFrameContext frame_context(ObClient *client, Window win)
+ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
 {
     ObFrame *self;
 
@@ -880,8 +890,30 @@ ObFrameContext frame_context(ObClient *client, Window win)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
+    if (win == self->title) {
+        /* when the user clicks in the corners of the titlebar and the client
+           is fully maximized, then treat it like they clicked in the
+           button that is there */
+        if (self->client->max_horz && self->client->max_vert &&
+            y < ob_rr_theme->paddingy + 1 + ob_rr_theme->button_size)
+        {
+            if (x < ((ob_rr_theme->paddingx + 1) * 2 +
+                     ob_rr_theme->button_size)) {
+                if (self->leftmost != OB_FRAME_CONTEXT_NONE)
+                    return self->leftmost;
+            }
+            else if (x > (self->width -
+                          (ob_rr_theme->paddingx + 1 +
+                           ob_rr_theme->button_size)))
+            {
+                if (self->rightmost != OB_FRAME_CONTEXT_NONE)
+                    return self->rightmost;
+            }
+        }
+        return OB_FRAME_CONTEXT_TITLEBAR;
+    }
+
     if (win == self->window)    return OB_FRAME_CONTEXT_FRAME;
-    if (win == self->title)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->label)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->handle)    return OB_FRAME_CONTEXT_HANDLE;
     if (win == self->lgrip)     return OB_FRAME_CONTEXT_BLCORNER;

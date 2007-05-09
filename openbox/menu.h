@@ -42,6 +42,8 @@ typedef void (*ObMenuHideFunc)(struct _ObMenuFrame *frame, gpointer data);
 typedef gboolean (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame,
                                      gpointer data);
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry,
+                                  struct _ObMenuFrame *frame,
+                                  struct _ObClient *client,
                                   guint state, gpointer data, Time time);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
 /*! @param x is the mouse x coordinate. on return it should be the x coordinate

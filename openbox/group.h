@@ -34,8 +34,6 @@ struct _ObGroup
     GSList *members;
 };
 
-extern GHashTable *group_map;
-
 void group_startup(gboolean reconfig);
 void group_shutdown(gboolean reconfig);
 

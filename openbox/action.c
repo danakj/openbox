@@ -1199,10 +1199,9 @@ void action_execute(union ActionData *data)
 void action_activate(union ActionData *data)
 {
     if (data->client.any.c) {
-        /* similar to the openbox dock for dockapps, don't let user actions
-           give focus to 3rd-party docks (panels) either (unless they ask for
-           it themselves). */
-        if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+        if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
+            data->any.context != OB_FRAME_CONTEXT_CLIENT)
+        {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */
             event_halt_focus_delay();
@@ -1220,10 +1219,9 @@ void action_activate(union ActionData *data)
 void action_focus(union ActionData *data)
 {
     if (data->client.any.c) {
-        /* similar to the openbox dock for dockapps, don't let user actions
-           give focus to 3rd-party docks (panels) either (unless they ask for
-           it themselves). */
-        if (data->client.any.c->type != OB_CLIENT_TYPE_DOCK) {
+        if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
+            data->any.context != OB_FRAME_CONTEXT_CLIENT)
+        {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */
             event_halt_focus_delay();
@@ -1523,11 +1521,6 @@ void action_send_to_desktop(union ActionData *data)
 
 void action_desktop(union ActionData *data)
 {
-    static guint first = (unsigned) -1;
-
-    if (data->inter.any.interactive && first == (unsigned) -1)
-        first = screen_desktop;
-
     if (!data->inter.any.interactive ||
         (!data->inter.cancel && !data->inter.final))
     {
@@ -1538,14 +1531,8 @@ void action_desktop(union ActionData *data)
             if (data->inter.any.interactive)
                 screen_desktop_popup(data->desktop.desk, TRUE);
         }
-    } else if (data->inter.cancel) {
-        screen_set_desktop(first, TRUE);
-    }
-
-    if (!data->inter.any.interactive || data->inter.final) {
+    } else
         screen_desktop_popup(0, FALSE);
-        first = (unsigned) -1;
-    }
 }
 
 void action_desktop_dir(union ActionData *data)
@@ -1562,7 +1549,7 @@ void action_desktop_dir(union ActionData *data)
         !data->sendtodir.inter.final ||
         data->sendtodir.inter.cancel)
     {
-        screen_set_desktop(d, TRUE);
+        if (d != screen_desktop) screen_set_desktop(d, TRUE);
     }
 }
 
@@ -1583,7 +1570,7 @@ void action_send_to_desktop_dir(union ActionData *data)
         data->sendtodir.inter.cancel)
     {
         client_set_desktop(c, d, data->sendtodir.follow);
-        if (data->sendtodir.follow)
+        if (data->sendtodir.follow && d != screen_desktop)
             screen_set_desktop(d, TRUE);
     }
 }
@@ -1701,8 +1688,6 @@ void action_moveresize(union ActionData *data)
 {
     ObClient *c = data->moveresize.any.c;
     guint32 corner;
-
-    if (!client_normal(c)) return;
 
     if (data->moveresize.keyboard) {
         corner = (data->moveresize.move ?

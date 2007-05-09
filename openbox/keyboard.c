@@ -78,9 +78,11 @@ static gboolean chain_timeout(gpointer data)
 
 static void set_curpos(KeyBindingTree *newpos)
 {
-    grab_keys(FALSE);
-    curpos = newpos;
-    grab_keys(TRUE);
+    if (curpos != newpos) {
+        grab_keys(FALSE);
+        curpos = newpos;
+        grab_keys(TRUE);
+    }
 
     if (curpos != NULL) {
         gchar *text = NULL;
@@ -247,7 +249,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
                   handled = TRUE;
               }
         } else if (e->type == ButtonPress) {
-            cancel = FALSE;
+            cancel = TRUE;
             done = TRUE;
             handled = FALSE;
         }

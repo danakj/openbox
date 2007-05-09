@@ -36,6 +36,7 @@ extern XSyncAlarm moveresize_alarm;
 void moveresize_startup(gboolean reconfig);
 void moveresize_shutdown(gboolean reconfig);
 
+/*! @param corner This is one of the prop_atoms.net_wm_moveresize_ atoms */
 void moveresize_start(struct _ObClient *c,
                       gint x, gint y, guint button, guint32 corner);
 void moveresize_end(gboolean cancel);

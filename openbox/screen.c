@@ -273,6 +273,7 @@ gboolean screen_annex(const gchar *program_name)
     supported[i++] = prop_atoms.net_moveresize_window;
     supported[i++] = prop_atoms.net_wm_moveresize;
     supported[i++] = prop_atoms.net_wm_user_time;
+    supported[i++] = prop_atoms.net_wm_user_time_window;
     supported[i++] = prop_atoms.net_frame_extents;
     supported[i++] = prop_atoms.net_startup_id;
 #ifdef SYNC
@@ -647,20 +648,12 @@ void screen_desktop_popup(guint d, gboolean show)
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel)
 {
-    static gboolean first = TRUE;
-    static guint origd, d;
-    guint r, c;
+    guint d, r, c;
 
-    if (cancel) {
-        d = origd;
-        goto done_cycle;
-    } else if (done && dialog) {
-        goto done_cycle;
-    }
-    if (first) {
-        first = FALSE;
-        d = origd = screen_desktop;
-    }
+    d = screen_desktop;
+
+    if ((cancel || done) && dialog)
+        goto show_cycle_dialog;
 
     get_row_col(d, &r, &c);
 
@@ -773,16 +766,10 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
     }
 
 show_cycle_dialog:
-    if (dialog) {
+    if (dialog && !cancel && !done) {
         screen_desktop_popup(d, TRUE);
-        return d;
-    }
-
-done_cycle:
-    first = TRUE;
-
-    screen_desktop_popup(0, FALSE);
-
+    } else
+        screen_desktop_popup(0, FALSE);
     return d;
 }
 
@@ -1267,7 +1254,16 @@ gboolean screen_pointer_pos(gint *x, gint *y)
     Window w;
     gint i;
     guint u;
+    gboolean ret;
 
-    return !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
-                           &w, &w, x, y, &i, &i, &u);
+    ret = !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
+                          &w, &w, x, y, &i, &i, &u);
+    if (!ret) {
+        for (i = 0; i < ScreenCount(ob_display); ++i)
+            if (i != ob_screen)
+                if (XQueryPointer(ob_display, RootWindow(ob_display, i),
+                                  &w, &w, x, y, &i, &i, &u))
+                    break;
+    }
+    return ret;
 }

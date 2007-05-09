@@ -111,7 +111,6 @@
         <xsd:element minOccurs="0" name="titleLayout" type="xsd:string"/>
         <xsd:element minOccurs="0" name="titleNumber" type="ob:bool"/>
         <xsd:element minOccurs="0" name="keepBorder" type="ob:bool"/>
-        <xsd:element minOccurs="0" name="hideDisabled" type="ob:bool"/>
         <xsd:element minOccurs="0" name="animateIconify" type="ob:bool"/>
         <xsd:element minOccurs="0" name="font" type="ob:font"/>
     </xsd:complexType>

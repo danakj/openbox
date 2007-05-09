@@ -26,13 +26,15 @@
 
 #include <glib.h>
 
-void resist_move_windows(ObClient *c, gint *x, gint *y)
+void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 {
     GList *it;
     gint l, t, r, b; /* requested edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
     ObClient *snapx = NULL, *snapy = NULL;
+
+    if (!resist) return;
 
     w = c->frame->area.width;
     h = c->frame->area.height;
@@ -47,73 +49,72 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
     cr = RECT_RIGHT(c->frame->area);
     cb = RECT_BOTTOM(c->frame->area);
     
-    if (config_resist_win)
-        for (it = stacking_list; it; it = g_list_next(it)) {
-            ObClient *target;
-            gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
+    for (it = stacking_list; it; it = g_list_next(it)) {
+        ObClient *target;
+        gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
-            if (!WINDOW_IS_CLIENT(it->data))
-                continue;
-            target = it->data;
+        if (!WINDOW_IS_CLIENT(it->data))
+            continue;
+        target = it->data;
 
-            /* don't snap to self or non-visibles */
-            if (!target->frame->visible || target == c) continue; 
+        /* don't snap to self or non-visibles */
+        if (!target->frame->visible || target == c) continue; 
 
-            /* don't snap to windows in layers beneath */
-            if(target->layer < c->layer && !config_resist_layers_below)
-                continue;
+        /* don't snap to windows in layers beneath */
+        if(target->layer < c->layer && !config_resist_layers_below)
+            continue;
 
-            tl = RECT_LEFT(target->frame->area) - 1;
-            tt = RECT_TOP(target->frame->area) - 1;
-            tr = RECT_RIGHT(target->frame->area) + 1;
-            tb = RECT_BOTTOM(target->frame->area) + 1;
+        tl = RECT_LEFT(target->frame->area) - 1;
+        tt = RECT_TOP(target->frame->area) - 1;
+        tr = RECT_RIGHT(target->frame->area) + 1;
+        tb = RECT_BOTTOM(target->frame->area) + 1;
 
-            /* snapx and snapy ensure that the window snaps to the top-most
-               window edge available, without going all the way from
-               bottom-to-top in the stacking list
-            */
-            if (snapx == NULL) {
-                if (ct < tb && cb > tt) {
-                    if (cl >= tr && l < tr && l >= tr - config_resist_win)
-                        *x = tr, snapx = target;
-                    else if (cr <= tl && r > tl &&
-                             r <= tl + config_resist_win)
-                        *x = tl - w + 1, snapx = target;
-                    if (snapx != NULL) {
-                        /* try to corner snap to the window */
-                        if (ct > tt && t <= tt &&
-                            t > tt - config_resist_win)
-                            *y = tt + 1, snapy = target;
-                        else if (cb < tb && b >= tb &&
-                                 b < tb + config_resist_win)
-                            *y = tb - h, snapy = target;
-                    }
+        /* snapx and snapy ensure that the window snaps to the top-most
+           window edge available, without going all the way from
+           bottom-to-top in the stacking list
+        */
+        if (snapx == NULL) {
+            if (ct < tb && cb > tt) {
+                if (cl >= tr && l < tr && l >= tr - resist)
+                    *x = tr, snapx = target;
+                else if (cr <= tl && r > tl &&
+                         r <= tl + resist)
+                    *x = tl - w + 1, snapx = target;
+                if (snapx != NULL) {
+                    /* try to corner snap to the window */
+                    if (ct > tt && t <= tt &&
+                        t > tt - resist)
+                        *y = tt + 1, snapy = target;
+                    else if (cb < tb && b >= tb &&
+                             b < tb + resist)
+                        *y = tb - h, snapy = target;
                 }
             }
-            if (snapy == NULL) {
-                if (cl < tr && cr > tl) {
-                    if (ct >= tb && t < tb && t >= tb - config_resist_win)
-                        *y = tb, snapy = target;
-                    else if (cb <= tt && b > tt &&
-                             b <= tt + config_resist_win)
-                        *y = tt - h + 1, snapy = target;
-                    if (snapy != NULL) {
-                        /* try to corner snap to the window */
-                        if (cl > tl && l <= tl &&
-                            l > tl - config_resist_win)
-                            *x = tl + 1, snapx = target;
-                        else if (cr < tr && r >= tr &&
-                                 r < tr + config_resist_win)
-                            *x = tr - w, snapx = target;
-                    }
-                }
-            }
-
-            if (snapx && snapy) break;
         }
+        if (snapy == NULL) {
+            if (cl < tr && cr > tl) {
+                if (ct >= tb && t < tb && t >= tb - resist)
+                    *y = tb, snapy = target;
+                else if (cb <= tt && b > tt &&
+                         b <= tt + resist)
+                    *y = tt - h + 1, snapy = target;
+                if (snapy != NULL) {
+                    /* try to corner snap to the window */
+                    if (cl > tl && l <= tl &&
+                        l > tl - resist)
+                        *x = tl + 1, snapx = target;
+                    else if (cr < tr && r >= tr &&
+                             r < tr + resist)
+                        *x = tr - w, snapx = target;
+                }
+            }
+        }
+
+        if (snapx && snapy) break;
+    }
 }
 
-void resist_move_monitors(ObClient *c, gint *x, gint *y)
+void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
 {
     Rect *area, *parea;
     guint i;
@@ -123,6 +124,8 @@ void resist_move_monitors(ObClient *c, gint *x, gint *y)
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
 
+    if (!resist) return;
+
     w = c->frame->area.width;
     h = c->frame->area.height;
 
@@ -136,45 +139,44 @@ void resist_move_monitors(ObClient *c, gint *x, gint *y)
     cr = RECT_RIGHT(c->frame->area);
     cb = RECT_BOTTOM(c->frame->area);
     
-    if (config_resist_edge) {
-        for (i = 0; i < screen_num_monitors; ++i) {
-            area = screen_area_monitor(c->desktop, i);
-            parea = screen_physical_area_monitor(i);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        area = screen_area_monitor(c->desktop, i);
+        parea = screen_physical_area_monitor(i);
 
-            if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
-                continue;
+        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
+            continue;
 
-            al = RECT_LEFT(*area);
-            at = RECT_TOP(*area);
-            ar = RECT_RIGHT(*area);
-            ab = RECT_BOTTOM(*area);
-            pl = RECT_LEFT(*parea);
-            pt = RECT_TOP(*parea);
-            pr = RECT_RIGHT(*parea);
-            pb = RECT_BOTTOM(*parea);
+        al = RECT_LEFT(*area);
+        at = RECT_TOP(*area);
+        ar = RECT_RIGHT(*area);
+        ab = RECT_BOTTOM(*area);
+        pl = RECT_LEFT(*parea);
+        pt = RECT_TOP(*parea);
+        pr = RECT_RIGHT(*parea);
+        pb = RECT_BOTTOM(*parea);
 
-            if (cl >= al && l < al && l >= al - config_resist_edge)
-                *x = al;
-            else if (cr <= ar && r > ar && r <= ar + config_resist_edge)
-                *x = ar - w + 1;
-            else if (cl >= pl && l < pl && l >= pl - config_resist_edge)
-                *x = pl;
-            else if (cr <= pr && r > pr && r <= pr + config_resist_edge)
-                *x = pr - w + 1;
+        if (cl >= al && l < al && l >= al - resist)
+            *x = al;
+        else if (cr <= ar && r > ar && r <= ar + resist)
+            *x = ar - w + 1;
+        else if (cl >= pl && l < pl && l >= pl - resist)
+            *x = pl;
+        else if (cr <= pr && r > pr && r <= pr + resist)
+            *x = pr - w + 1;
 
-            if (ct >= at && t < at && t >= at - config_resist_edge)
-                *y = at;
-            else if (cb <= ab && b > ab && b < ab + config_resist_edge)
-                *y = ab - h + 1;
-            else if (ct >= pt && t < pt && t >= pt - config_resist_edge)
-                *y = pt;
-            else if (cb <= pb && b > pb && b < pb + config_resist_edge)
-                *y = pb - h + 1;
-        }
+        if (ct >= at && t < at && t >= at - resist)
+            *y = at;
+        else if (cb <= ab && b > ab && b < ab + resist)
+            *y = ab - h + 1;
+        else if (ct >= pt && t < pt && t >= pt - resist)
+            *y = pt;
+        else if (cb <= pb && b > pb && b < pb + resist)
+            *y = pb - h + 1;
     }
 }
 
-void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
+void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
+                         ObCorner corn)
 {
     GList *it;
     ObClient *target; /* target */
@@ -184,6 +186,8 @@ void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
     gint incw, inch;
     ObClient *snapx = NULL, *snapy = NULL;
 
+    if (!resist) return;
+
     incw = c->size_inc.width;
     inch = c->size_inc.height;
 
@@ -192,79 +196,78 @@ void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
     t = RECT_TOP(c->frame->area);
     b = RECT_BOTTOM(c->frame->area);
 
-    if (config_resist_win) {
-        for (it = stacking_list; it; it = g_list_next(it)) {
-            if (!WINDOW_IS_CLIENT(it->data))
-                continue;
-            target = it->data;
+    for (it = stacking_list; it; it = g_list_next(it)) {
+        if (!WINDOW_IS_CLIENT(it->data))
+            continue;
+        target = it->data;
 
-            /* don't snap to invisibles or ourself */
-            if (!target->frame->visible || target == c) continue; 
+        /* don't snap to invisibles or ourself */
+        if (!target->frame->visible || target == c) continue; 
 
-            /* don't snap to windows in layers beneath */
-            if(target->layer < c->layer && !config_resist_layers_below)
-                continue;
+        /* don't snap to windows in layers beneath */
+        if(target->layer < c->layer && !config_resist_layers_below)
+            continue;
 
-            tl = RECT_LEFT(target->frame->area);
-            tr = RECT_RIGHT(target->frame->area);
-            tt = RECT_TOP(target->frame->area);
-            tb = RECT_BOTTOM(target->frame->area);
+        tl = RECT_LEFT(target->frame->area);
+        tr = RECT_RIGHT(target->frame->area);
+        tt = RECT_TOP(target->frame->area);
+        tb = RECT_BOTTOM(target->frame->area);
 
-            if (snapx == NULL) {
-                /* horizontal snapping */
-                if (t < tb && b > tt) {
-                    switch (corn) {
-                    case OB_CORNER_TOPLEFT:
-                    case OB_CORNER_BOTTOMLEFT:
-                        dlt = l;
-                        drb = r + *w - c->frame->area.width;
-                        if (r < tl && drb >= tl &&
-                            drb < tl + config_resist_win)
-                            *w = tl - l, snapx = target;
-                        break;
-                    case OB_CORNER_TOPRIGHT:
-                    case OB_CORNER_BOTTOMRIGHT:
-                        dlt = l - *w + c->frame->area.width;
-                        drb = r;
-                        if (l > tr && dlt <= tr &&
-                            dlt > tr - config_resist_win)
-                            *w = r - tr, snapx = target;
-                        break;
-                    }
+        if (snapx == NULL) {
+            /* horizontal snapping */
+            if (t < tb && b > tt) {
+                switch (corn) {
+                case OB_CORNER_TOPLEFT:
+                case OB_CORNER_BOTTOMLEFT:
+                    dlt = l;
+                    drb = r + *w - c->frame->area.width;
+                    if (r < tl && drb >= tl &&
+                        drb < tl + resist)
+                        *w = tl - l, snapx = target;
+                    break;
+                case OB_CORNER_TOPRIGHT:
+                case OB_CORNER_BOTTOMRIGHT:
+                    dlt = l - *w + c->frame->area.width;
+                    drb = r;
+                    if (l > tr && dlt <= tr &&
+                        dlt > tr - resist)
+                        *w = r - tr, snapx = target;
+                    break;
                 }
             }
-
-            if (snapy == NULL) {
-                /* vertical snapping */
-                if (l < tr && r > tl) {
-                    switch (corn) {
-                    case OB_CORNER_TOPLEFT:
-                    case OB_CORNER_TOPRIGHT:
-                        dlt = t;
-                        drb = b + *h - c->frame->area.height;
-                        if (b < tt && drb >= tt &&
-                            drb < tt + config_resist_win)
-                            *h = tt - t, snapy = target;
-                        break;
-                    case OB_CORNER_BOTTOMLEFT:
-                    case OB_CORNER_BOTTOMRIGHT:
-                        dlt = t - *h + c->frame->area.height;
-                        drb = b;
-                        if (t > tb && dlt <= tb &&
-                            dlt > tb - config_resist_win)
-                            *h = b - tb, snapy = target;
-                        break;
-                    }
-                }
-            }
-
-            /* snapped both ways */
-            if (snapx && snapy) break;
         }
+
+        if (snapy == NULL) {
+            /* vertical snapping */
+            if (l < tr && r > tl) {
+                switch (corn) {
+                case OB_CORNER_TOPLEFT:
+                case OB_CORNER_TOPRIGHT:
+                    dlt = t;
+                    drb = b + *h - c->frame->area.height;
+                    if (b < tt && drb >= tt &&
+                        drb < tt + resist)
+                        *h = tt - t, snapy = target;
+                    break;
+                case OB_CORNER_BOTTOMLEFT:
+                case OB_CORNER_BOTTOMRIGHT:
+                    dlt = t - *h + c->frame->area.height;
+                    drb = b;
+                    if (t > tb && dlt <= tb &&
+                        dlt > tb - resist)
+                        *h = b - tb, snapy = target;
+                    break;
+                }
+            }
+        }
+
+        /* snapped both ways */
+        if (snapx && snapy) break;
     }
 }
 
-void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
+void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
+                          ObCorner corn)
 {
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint dlt, drb; /* my destination left/top and right/bottom sides */
@@ -273,6 +276,8 @@ void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
     gint pl, pt, pr, pb; /* physical screen boundaries */
     gint incw, inch;
     guint i;
+
+    if (!resist) return;
 
     l = RECT_LEFT(c->frame->area);
     r = RECT_RIGHT(c->frame->area);
@@ -299,50 +304,48 @@ void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
         pr = RECT_RIGHT(*parea);
         pb = RECT_BOTTOM(*parea);
 
-        if (config_resist_edge) {
-            /* horizontal snapping */
-            switch (corn) {
-            case OB_CORNER_TOPLEFT:
-            case OB_CORNER_BOTTOMLEFT:
-                dlt = l;
-                drb = r + *w - c->frame->area.width;
-                if (r <= ar && drb > ar && drb <= ar + config_resist_edge)
-                    *w = ar - l + 1;
-                else if (r <= pr && drb > pr && drb <= pr + config_resist_edge)
-                    *w = pr - l + 1;
-                break;
-            case OB_CORNER_TOPRIGHT:
-            case OB_CORNER_BOTTOMRIGHT:
-                dlt = l - *w + c->frame->area.width;
-                drb = r;
-                if (l >= al && dlt < al && dlt >= al - config_resist_edge)
-                    *w = r - al + 1;
-                else if (l >= pl && dlt < pl && dlt >= pl - config_resist_edge)
-                    *w = r - pl + 1;
-                break;
-            }
+        /* horizontal snapping */
+        switch (corn) {
+        case OB_CORNER_TOPLEFT:
+        case OB_CORNER_BOTTOMLEFT:
+            dlt = l;
+            drb = r + *w - c->frame->area.width;
+            if (r <= ar && drb > ar && drb <= ar + resist)
+                *w = ar - l + 1;
+            else if (r <= pr && drb > pr && drb <= pr + resist)
+                *w = pr - l + 1;
+            break;
+        case OB_CORNER_TOPRIGHT:
+        case OB_CORNER_BOTTOMRIGHT:
+            dlt = l - *w + c->frame->area.width;
+            drb = r;
+            if (l >= al && dlt < al && dlt >= al - resist)
+                *w = r - al + 1;
+            else if (l >= pl && dlt < pl && dlt >= pl - resist)
+                *w = r - pl + 1;
+            break;
+        }
 
-            /* vertical snapping */
-            switch (corn) {
-            case OB_CORNER_TOPLEFT:
-            case OB_CORNER_TOPRIGHT:
-                dlt = t;
-                drb = b + *h - c->frame->area.height;
-                if (b <= ab && drb > ab && drb <= ab + config_resist_edge)
-                    *h = ab - t + 1;
-                else if (b <= pb && drb > pb && drb <= pb + config_resist_edge)
-                    *h = pb - t + 1;
-                break;
-            case OB_CORNER_BOTTOMLEFT:
-            case OB_CORNER_BOTTOMRIGHT:
-                dlt = t - *h + c->frame->area.height;
-                drb = b;
-                if (t >= at && dlt < at && dlt >= at - config_resist_edge)
-                    *h = b - at + 1;
-                else if (t >= pt && dlt < pt && dlt >= pt - config_resist_edge)
-                    *h = b - pt + 1;
-                break;
-            }
+        /* vertical snapping */
+        switch (corn) {
+        case OB_CORNER_TOPLEFT:
+        case OB_CORNER_TOPRIGHT:
+            dlt = t;
+            drb = b + *h - c->frame->area.height;
+            if (b <= ab && drb > ab && drb <= ab + resist)
+                *h = ab - t + 1;
+            else if (b <= pb && drb > pb && drb <= pb + resist)
+                *h = pb - t + 1;
+            break;
+        case OB_CORNER_BOTTOMLEFT:
+        case OB_CORNER_BOTTOMRIGHT:
+            dlt = t - *h + c->frame->area.height;
+            drb = b;
+            if (t >= at && dlt < at && dlt >= at - resist)
+                *h = b - at + 1;
+            else if (t >= pt && dlt < pt && dlt >= pt - resist)
+                *h = b - pt + 1;
+            break;
         }
     }
 }

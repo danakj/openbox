@@ -42,7 +42,6 @@
       D: omnipresent (on all desktops).
   -->
   <keepBorder>yes</keepBorder>
-  <hideDisabled>no</hideDisabled>
   <animateIconify>yes</animateIconify>
   <font place="ActiveWindow">
     <name>sans</name>

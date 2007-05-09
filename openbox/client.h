@@ -289,13 +289,17 @@ struct _ObClient
     /*! The number of icons in icons */
     guint nicons;
 
-    /* Where the window should iconify to/from */
+    /*! Where the window should iconify to/from */
     Rect icon_geometry;
 
+    /*! The time when the client last received user interaction */
     guint32 user_time;
+    /*! A separate window for the client to update it's user_time on */
+    Window  user_time_window;
 };
 
-extern GList *client_list;
+extern GList      *client_list;
+extern GHashTable *client_user_time_window_map;
 
 void client_startup(gboolean reconfig);
 void client_shutdown(gboolean reconfig);
@@ -307,10 +311,6 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 /*! Get notified when the client is unmanaged */
 void client_add_destructor(ObClientCallback func, gpointer data);
 void client_remove_destructor(ObClientCallback func);
-
-/*! Get notified when the client changes desktop */
-void client_add_desktop_notify(ObClientCallback func, gpointer data);
-void client_remove_desktop_notify(ObClientCallback func);
 
 /*! Manages all existing windows */
 void client_manage_all();
@@ -337,6 +337,17 @@ gboolean client_normal(ObClient *self);
 /*! Returns if the window is one of an application's helper windows
   (utilty, menu, etc) */
 gboolean client_helper(ObClient *self);
+
+/*! Return if the client is a type which should be given focus from mouse
+  presses on the *client* window. This doesn't affect clicking on the
+  decorations. This doesn't count for focus cycling, different rules apply to
+  that. */
+gboolean client_mouse_focusable(ObClient *self);
+
+/*! Return if the client is a type which should be given focus from the
+  mouse entering the window. This doesn't count for focus cycling, different
+  rules apply to that. */
+gboolean client_enter_focusable(ObClient *self);
 
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
@@ -452,6 +463,9 @@ void client_maximize(ObClient *self, gboolean max, gint dir);
                unshaded.
 */
 void client_shade(ObClient *self, gboolean shade);
+
+/*! Set a client window to have decorations or not */
+void client_set_undecorated(ObClient *self, gboolean undecorated);
 
 /*! Hilite the window to make the user notice it */
 void client_hilite(ObClient *self, gboolean hilite);
@@ -575,6 +589,8 @@ void client_update_strut(ObClient *self);
 void client_update_icons(ObClient *self);
 /*! Updates the window's user time */
 void client_update_user_time(ObClient *self);
+/*! Updates the window's user time window */
+void client_update_user_time_window(ObClient *self);
 /*! Updates the window's icon geometry (where to iconify to/from) */
 void client_update_icon_geometry(ObClient *self);
 
@@ -646,14 +662,11 @@ ObClient *client_search_transient(ObClient *self, ObClient *search);
 gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);
 
 /*! Set a client window to be above/below other clients.
-  @layer < 0 indicates the client should be placed below other clients.<br>
-         = 0 indicates the client should be placed with other clients.<br>
+  @layer < 0 indicates the client should be placed below other clients.<br />
+         = 0 indicates the client should be placed with other clients.<br />
          > 0 indicates the client should be placed above other clients.
 */
 void client_set_layer(ObClient *self, gint layer);
-
-/*! Set a client window to have decorations or not */
-void client_set_undecorated(ObClient *self, gboolean undecorated);
 
 guint client_monitor(ObClient *self);
 

@@ -32,6 +32,7 @@
 #include "event.h"
 #include "grab.h"
 #include "focus.h"
+#include "propwin.h"
 #include "stacking.h"
 #include "openbox.h"
 #include "group.h"
@@ -64,7 +65,6 @@ typedef struct
 GList            *client_list          = NULL;
 
 static GSList *client_destructors      = NULL;
-static GSList *client_desktop_notifies = NULL;
 
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -104,6 +104,7 @@ void client_startup(gboolean reconfig)
 
 void client_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
 }
 
 void client_add_destructor(ObClientCallback func, gpointer data)
@@ -123,29 +124,6 @@ void client_remove_destructor(ObClientCallback func)
         if (d->func == func) {
             g_free(d);
             client_destructors = g_slist_delete_link(client_destructors, it);
-            break;
-        }
-    }
-}
-
-void client_add_desktop_notify(ObClientCallback func, gpointer data)
-{
-    ClientCallback *d = g_new(ClientCallback, 1);
-    d->func = func;
-    d->data = data;
-    client_desktop_notifies = g_slist_prepend(client_desktop_notifies, d);
-}
-
-void client_remove_desktop_notify(ObClientCallback func)
-{
-    GSList *it;
-
-    for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        if (d->func == func) {
-            g_free(d);
-            client_desktop_notifies =
-                g_slist_delete_link(client_desktop_notifies, it);
             break;
         }
     }
@@ -539,6 +517,9 @@ void client_unmanage(ObClient *self)
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
+
+    /* kill the property windows */
+    propwin_remove(self->user_time_window, OB_PROPWIN_USER_TIME, self);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -1026,7 +1007,9 @@ static void client_get_all(ObClient *self)
     client_update_title(self);
     client_update_strut(self);
     client_update_icons(self);
-    client_update_user_time(self);
+    client_update_user_time_window(self);
+    if (!self->user_time_window) /* check if this would have been called */
+        client_update_user_time(self);
     client_update_icon_geometry(self);
 }
 
@@ -1599,10 +1582,15 @@ void client_setup_decor_and_functions(ObClient *self)
         self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
         break;
 
+    case OB_CLIENT_TYPE_SPLASH:
+        /* these don't get get any decorations, and the only thing you can
+           do with them is move them */
+        self->decorations = 0;
+        self->functions = OB_CLIENT_FUNC_MOVE;
+
     case OB_CLIENT_TYPE_DESKTOP:
     case OB_CLIENT_TYPE_DOCK:
-    case OB_CLIENT_TYPE_SPLASH:
-        /* none of these windows are manipulated by the window manager */
+        /* these windows are not manipulated by the window manager */
         self->decorations = 0;
         self->functions = 0;
         break;
@@ -2038,8 +2026,15 @@ void client_update_icons(ObClient *self)
 void client_update_user_time(ObClient *self)
 {
     guint32 time;
+    gboolean got = FALSE;
 
-    if (PROP_GET32(self->window, net_wm_user_time, cardinal, &time)) {
+    if (self->user_time_window)
+        got = PROP_GET32(self->user_time_window,
+                         net_wm_user_time, cardinal, &time);
+    if (!got)
+        got = PROP_GET32(self->window, net_wm_user_time, cardinal, &time);
+
+    if (got) {
         /* we set this every time, not just when it grows, because in practice
            sometimes time goes backwards! (ntpdate.. yay....) so.. if it goes
            backward we don't want all windows to stop focusing. we'll just
@@ -2048,9 +2043,39 @@ void client_update_user_time(ObClient *self)
         */
         self->user_time = time;
 
-        /*
-        ob_debug("window %s user time %u\n", self->title, time);
-        */
+        /*ob_debug("window %s user time %u\n", self->title, time);*/
+    }
+}
+
+void client_update_user_time_window(ObClient *self)
+{
+    guint32 w;
+
+    if (!PROP_GET32(self->window, net_wm_user_time_window, window, &w))
+        w = None;
+
+    if (w != self->user_time_window) {
+        /* remove the old window */
+        propwin_remove(self->user_time_window, OB_PROPWIN_USER_TIME, self);
+        self->user_time_window = None;
+
+        if (self->group && self->group->leader == w) {
+            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
+                          "_NET_WM_USER_TYPE_WINDOW to its group leader\n");
+            /* do it anyways..? */
+        }
+        else if (w == self->window) {
+            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
+                          "_NET_WM_USER_TIME_WINDOW to itself\n");
+            w = None; /* don't do it */
+        }
+
+        /* add the new window */
+        propwin_add(w, OB_PROPWIN_USER_TIME, self);
+        self->user_time_window = w;
+
+        /* and update from it */
+        client_update_user_time(self);
     }
 }
 
@@ -2394,6 +2419,22 @@ gboolean client_helper(ObClient *self)
             self->type == OB_CLIENT_TYPE_TOOLBAR);
 }
 
+gboolean client_mouse_focusable(ObClient *self)
+{
+    return !(self->type == OB_CLIENT_TYPE_MENU ||
+             self->type == OB_CLIENT_TYPE_TOOLBAR ||
+             self->type == OB_CLIENT_TYPE_SPLASH ||
+             self->type == OB_CLIENT_TYPE_DOCK);
+}
+
+gboolean client_enter_focusable(ObClient *self)
+{
+    /* you can focus desktops but it shouldn't on enter */
+    return (client_mouse_focusable(self) &&
+            self->type != OB_CLIENT_TYPE_DESKTOP);
+}
+
+
 static void client_apply_startup_state(ObClient *self, gint x, gint y)
 {
     gboolean pos = FALSE; /* has the window's position been configured? */
@@ -2446,7 +2487,7 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
         pos = TRUE;
     }
 
-    /* if the client didn't get positioned yet, then do so now
+    /* if the client didn't get positioned yet, then do so now.
        call client_move even if the window is not being moved anywhere, because
        when we reparent it and decorate it, it is getting moved and we need to
        be telling it so with a ConfigureNotify event.
@@ -2798,7 +2839,9 @@ static void client_iconify_recursive(ObClient *self,
                  self->window);
 
         if (iconic) {
-            if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
+            /* don't let non-normal windows iconify along with their parents
+               or whatever */
+            if (client_normal(self)) {
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of
@@ -2841,9 +2884,11 @@ static void client_iconify_recursive(ObClient *self,
 
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
 {
-    /* move up the transient chain as far as possible first */
-    self = client_search_top_normal_parent(self);
-    client_iconify_recursive(self, iconic, curdesk);
+    if (self->functions & OB_CLIENT_FUNC_ICONIFY || !iconic) {
+        /* move up the transient chain as far as possible first */
+        self = client_search_top_normal_parent(self);
+        client_iconify_recursive(self, iconic, curdesk);
+    }
 }
 
 void client_maximize(ObClient *self, gboolean max, gint dir)
@@ -3018,13 +3063,6 @@ void client_set_desktop_recursive(ObClient *self,
             client_raise(self);
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
-
-        /* call the notifies */
-        GSList *it;
-        for (it = client_desktop_notifies; it; it = g_slist_next(it)) {
-            ClientCallback *d = it->data;
-            d->func(self, d->data);
-        }
     }
 
     /* move all transients */

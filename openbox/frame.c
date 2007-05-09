@@ -48,10 +48,21 @@
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
                            f->cbwidth_y)
 
-static void layout_title(ObFrame *self);
+/* the offsets for the titlebar elements from the edge of the titlebar.
+   negative means from the right edge. */
+gint icon_off;
+gint label_off;
+gint iconify_off;
+gint desk_off;
+gint shade_off;
+gint max_off;
+gint close_off;
+
+
 static void flash_done(gpointer data);
 static gboolean flash_timeout(gpointer data);
 
+static void layout_title(ObFrame *self);
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 static gboolean frame_animate_iconify(gpointer self);
@@ -369,15 +380,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->innersize.bottom += ob_rr_theme->handle_height +
                 self->rbwidth + (self->rbwidth - self->bwidth);
   
-        /* they all default off, they're turned on in layout_title */
-        self->icon_x = -1;
-        self->desk_x = -1;
-        self->shade_x = -1;
-        self->iconify_x = -1;
-        self->label_x = -1;
-        self->max_x = -1;
-        self->close_x = -1;
-
         /* position/size and map/unmap all the windows */
 
         if (!fake) {
@@ -408,7 +410,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XUnmapWindow(ob_display, self->title);
         }
 
-        if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
+        if ((self->decorations & OB_FRAME_DECOR_TITLEBAR))
             /* layout the title bar elements */
             layout_title(self);
 
@@ -572,10 +574,11 @@ void frame_grab_client(ObFrame *self, ObClient *client)
        req's) the ButtonPress is to catch clicks on the client border */
     XSelectInput(ob_display, self->plate, PLATE_EVENTMASK);
 
-    frame_adjust_area(self, TRUE, TRUE, FALSE);
-
     /* map the client so it maps when the frame does */
     XMapWindow(ob_display, client->window);
+
+    /* adjust the frame to the client's size */
+    frame_adjust_area(self, FALSE, TRUE, FALSE);
 
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, client);
@@ -661,139 +664,156 @@ void frame_release_client(ObFrame *self, ObClient *client)
     frame_free(self);
 }
 
+/* is there anything present between us and the label? */
+static gboolean is_button_present(ObFrame *self, const gchar *lc, gint dir) {
+    for (; *lc != '\0' && lc >= config_title_layout; lc += dir) {
+        if (*lc == ' ') continue; /* it was invalid */
+        if (*lc == 'N' && self->decorations & OB_FRAME_DECOR_ICON)
+            return TRUE;
+        if (*lc == 'D' && self->decorations & OB_FRAME_DECOR_ALLDESKTOPS)
+            return TRUE;
+        if (*lc == 'S' && self->decorations & OB_FRAME_DECOR_SHADE)
+            return TRUE;
+        if (*lc == 'I' && self->decorations & OB_FRAME_DECOR_ICONIFY)
+            return TRUE;
+        if (*lc == 'M' && self->decorations & OB_FRAME_DECOR_MAXIMIZE)
+            return TRUE;
+        if (*lc == 'C' && self->decorations & OB_FRAME_DECOR_CLOSE)
+            return TRUE;
+        if (*lc == 'L') return FALSE;
+    }
+    return FALSE;
+}
+
 static void layout_title(ObFrame *self)
 {
     gchar *lc;
-    gint x;
-    gboolean n, d, i, l, m, c, s;
+    gint i, x;
 
-    n = d = i = l = m = c = s = FALSE;
+    const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
+    /* position of the left most button */
+    const gint left = ob_rr_theme->paddingx + 1;
+    /* position of the right most button */
+    const gint right = self->width - bwidth;
 
-    /* figure out whats being shown, and the width of the label */
+    /* turn them all off */
+    self->icon_on = self->desk_on = self->shade_on = self->iconify_on =
+        self->max_on = self->close_on = self->label_on = FALSE;
     self->label_width = self->width - (ob_rr_theme->paddingx + 1) * 2;
-    for (lc = config_title_layout; *lc != '\0'; ++lc) {
-        switch (*lc) {
-        case 'N':
-            if (n) { *lc = ' '; break; } /* rm duplicates */
-            n = TRUE;
-            self->label_width -= (ob_rr_theme->button_size + 2 +
-                                  ob_rr_theme->paddingx + 1);
-            break;
-        case 'D':
-            if (d) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS)
-                && config_theme_hidedisabled)
-                break;
-            d = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
-            break;
-        case 'S':
-            if (s) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_SHADE)
-                && config_theme_hidedisabled)
-                break;
-            s = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
-            break;
-        case 'I':
-            if (i) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_ICONIFY)
-                && config_theme_hidedisabled)
-                break;
-            i = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
-            break;
-        case 'L':
-            if (l) { *lc = ' '; break; }
-            l = TRUE;
-            break;
-        case 'M':
-            if (m) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE)
-                && config_theme_hidedisabled)
-                break;
-            m = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
-            break;
-        case 'C':
-            if (c) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_CLOSE)
-                && config_theme_hidedisabled)
-                break;
-            c = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
-            break;
-        }
-    }
-    if (self->label_width < 1) self->label_width = 1;
 
-    if (!n) XUnmapWindow(ob_display, self->icon);
-    if (!d) XUnmapWindow(ob_display, self->desk);
-    if (!s) XUnmapWindow(ob_display, self->shade);
-    if (!i) XUnmapWindow(ob_display, self->iconify);
-    if (!l) XUnmapWindow(ob_display, self->label);
-    if (!m) XUnmapWindow(ob_display, self->max);
-    if (!c) XUnmapWindow(ob_display, self->close);
+    /* figure out what's being show, find each element's position, and the
+       width of the label
 
-    x = ob_rr_theme->paddingx + 1;
-    for (lc = config_title_layout; *lc != '\0'; ++lc) {
-        switch (*lc) {
-        case 'N':
-            if (!n) break;
-            self->icon_x = x;
-            XMapWindow(ob_display, self->icon);
-            XMoveWindow(ob_display, self->icon, x, ob_rr_theme->paddingy);
-            x += ob_rr_theme->button_size + 2 + ob_rr_theme->paddingx + 1;
-            break;
-        case 'D':
-            if (!d) break;
-            self->desk_x = x;
-            XMapWindow(ob_display, self->desk);
-            XMoveWindow(ob_display, self->desk, x, ob_rr_theme->paddingy + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
-            break;
-        case 'S':
-            if (!s) break;
-            self->shade_x = x;
-            XMapWindow(ob_display, self->shade);
-            XMoveWindow(ob_display, self->shade, x, ob_rr_theme->paddingy + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
-            break;
-        case 'I':
-            if (!i) break;
-            self->iconify_x = x;
-            XMapWindow(ob_display, self->iconify);
-            XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->paddingy + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
-            break;
-        case 'L':
-            if (!l) break;
-            self->label_x = x;
-            XMapWindow(ob_display, self->label);
-            XMoveWindow(ob_display, self->label, x, ob_rr_theme->paddingy);
-            x += self->label_width + ob_rr_theme->paddingx + 1;
-            break;
-        case 'M':
-            if (!m) break;
-            self->max_x = x;
-            XMapWindow(ob_display, self->max);
-            XMoveWindow(ob_display, self->max, x, ob_rr_theme->paddingy + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
-            break;
-        case 'C':
-            if (!c) break;
-            self->close_x = x;
-            XMapWindow(ob_display, self->close);
-            XMoveWindow(ob_display, self->close, x, ob_rr_theme->paddingy + 1);
-            x += ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
-            break;
+       do the ones before the label, then after the label,
+       i will be +1 the first time through when working to the left,
+       and -1 the second time through when working to the right */
+    for (i = 1; i >= -1; i-=2) {
+        if (i > 0) {
+            x = left;
+            lc = config_title_layout;
+        } else {
+            x = right;
+            lc = config_title_layout + strlen(config_title_layout)-1;
         }
+
+        /* stop at the end of the string (or the label, which calls break) */
+        for (; *lc != '\0' && lc >= config_title_layout; lc+=i)
+            if (*lc == 'L') {
+                if (i > 0) {
+                    self->label_on = TRUE;
+                    self->label_x = x;
+                }
+                break; /* break the for loop, do other side of label */
+            } else if (*lc == 'N') {
+                if ((self->icon_on = is_button_present(self, lc, i))) {
+                    /* icon gets extra padding */
+                    self->label_width -= bwidth + 2;
+                    self->icon_x = x + (i * 1);
+                    x += i * (bwidth + 2);
+                }
+            } else if (*lc == 'D') {
+                if ((self->desk_on = is_button_present(self, lc, i))) {
+                    self->label_width -= bwidth;
+                    self->desk_x = x;
+                    x += i * bwidth;
+                }
+            } else if (*lc == 'S') {
+                if ((self->shade_on = is_button_present(self, lc, i))) {
+                    self->label_width -= bwidth;
+                    self->shade_x = x;
+                    x += i * bwidth;
+                }
+            } else if (*lc == 'I') {
+                if ((self->iconify_on = is_button_present(self, lc, i))) {
+                    self->label_width -= bwidth;
+                    self->iconify_x = x;
+                    x += i * bwidth;
+                }
+            } else if (*lc == 'M') {
+                if ((self->max_on = is_button_present(self, lc, i))) {
+                    self->label_width -= bwidth;
+                    self->max_x = x;
+                    x += i * bwidth;
+                }
+            } else if (*lc == 'C') {
+                if ((self->close_on = is_button_present(self, lc, i))) {
+                    self->label_width -= bwidth;
+                    self->close_x = x;
+                    x += i * bwidth;
+                }
+            }
     }
+
+    /* position and map the elements */
+    if (self->icon_on) {
+        XMapWindow(ob_display, self->icon);
+        XMoveWindow(ob_display, self->icon, self->icon_x,
+                    ob_rr_theme->paddingy);
+    } else
+        XUnmapWindow(ob_display, self->icon);
+
+    if (self->desk_on) {
+        XMapWindow(ob_display, self->desk);
+        XMoveWindow(ob_display, self->desk, self->desk_x,
+                    ob_rr_theme->paddingy + 1);
+    } else
+        XUnmapWindow(ob_display, self->desk);
+
+    if (self->shade_on) {
+        XMapWindow(ob_display, self->shade);
+        XMoveWindow(ob_display, self->shade, self->shade_x,
+                    ob_rr_theme->paddingy + 1);
+    } else
+        XUnmapWindow(ob_display, self->shade);
+
+    if (self->iconify_on) {
+        XMapWindow(ob_display, self->iconify);
+        XMoveWindow(ob_display, self->iconify, self->iconify_x,
+                    ob_rr_theme->paddingy + 1);
+    } else
+        XUnmapWindow(ob_display, self->iconify);
+
+    if (self->max_on) {
+        XMapWindow(ob_display, self->max);
+        XMoveWindow(ob_display, self->max, self->max_x,
+                    ob_rr_theme->paddingy + 1);
+    } else
+        XUnmapWindow(ob_display, self->max);
+
+    if (self->close_on) {
+        XMapWindow(ob_display, self->close);
+        XMoveWindow(ob_display, self->close, self->close_x,
+                    ob_rr_theme->paddingy + 1);
+    } else
+        XUnmapWindow(ob_display, self->close);
+
+    if (self->label_on) {
+        self->label_width = MAX(1, self->label_width); /* no lower than 1 */
+        XMapWindow(ob_display, self->label);
+        XMoveWindow(ob_display, self->label, self->label_x,
+                    ob_rr_theme->paddingy);
+    } else
+        XUnmapWindow(ob_display, self->label);
 }
 
 ObFrameContext frame_context_from_string(const gchar *name)

@@ -114,8 +114,16 @@ struct _ObFrame
 
     GSList   *clients;
 
-    gint      width;         /* title and handle */
-    gint      label_width;
+    gint      icon_on;    /* if the window icon button is on */
+    gint      label_on;   /* if the window title is on */
+    gint      iconify_on; /* if the window iconify button is on */
+    gint      desk_on;    /* if the window all-desktops button is on */
+    gint      shade_on;   /* if the window shade button is on */
+    gint      max_on;     /* if the window maximize button is on */
+    gint      close_on;   /* if the window close button is on */
+
+    gint      width;         /* width of the titlebar and handle */
+    gint      label_width;   /* width of the label in the titlebar */
     gint      icon_x;        /* x-position of the window icon button */
     gint      label_x;       /* x-position of the window title */
     gint      iconify_x;     /* x-position of the window iconify button */

@@ -1549,7 +1549,7 @@ void action_desktop_dir(union ActionData *data)
         !data->sendtodir.inter.final ||
         data->sendtodir.inter.cancel)
     {
-        screen_set_desktop(d, TRUE);
+        if (d != screen_desktop) screen_set_desktop(d, TRUE);
     }
 }
 
@@ -1570,7 +1570,7 @@ void action_send_to_desktop_dir(union ActionData *data)
         data->sendtodir.inter.cancel)
     {
         client_set_desktop(c, d, data->sendtodir.follow);
-        if (data->sendtodir.follow)
+        if (data->sendtodir.follow && d != screen_desktop)
             screen_set_desktop(d, TRUE);
     }
 }

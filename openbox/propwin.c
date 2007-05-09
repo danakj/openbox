@@ -19,6 +19,8 @@
 
 #include "propwin.h"
 #include "openbox.h"
+#include "client.h"
+#include "debug.h"
 
 typedef struct _ObPropWin     ObPropWin;
 typedef struct _ObPropWinData ObPropWinData;
@@ -57,7 +59,7 @@ void propwin_shutdown(gboolean reconfig)
         g_assert(g_hash_table_size(propwin_map) == 0);
 }
 
-void propwin_add(Window win, ObPropWinType type, struct _ObClient *client)
+void propwin_add(Window win, ObPropWinType type, ObClient *client)
 {
     ObPropWin *p;
 
@@ -84,7 +86,7 @@ void propwin_add(Window win, ObPropWinType type, struct _ObClient *client)
     p->data[type].clients = g_slist_prepend(p->data[type].clients, client);
 }
 
-void propwin_remove(Window win, ObPropWinType type, struct _ObClient *client)
+void propwin_remove(Window win, ObPropWinType type, ObClient *client)
 {
     ObPropWin *p;
 

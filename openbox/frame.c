@@ -99,6 +99,7 @@ ObFrame *frame_new(ObClient *client)
     Visual *visual;
 
     self = g_new0(ObFrame, 1);
+    self->client = client;
 
     visual = check_32bit_client(client);
 
@@ -245,7 +246,7 @@ static void free_theme_statics(ObFrame *self)
     RrAppearanceFree(self->a_icon);
 }
 
-static void frame_free(ObFrame *self)
+void frame_free(ObFrame *self)
 {
     free_theme_statics(self);
 
@@ -553,12 +554,10 @@ void frame_adjust_icon(ObFrame *self)
     framerender_frame(self);
 }
 
-void frame_grab_client(ObFrame *self, ObClient *client)
+void frame_grab_client(ObFrame *self)
 {
-    self->client = client;
-
     /* reparent the client to the frame */
-    XReparentWindow(ob_display, client->window, self->plate, 0, 0);
+    XReparentWindow(ob_display, self->client->window, self->plate, 0, 0);
     /*
       When reparenting the client window, it is usually not mapped yet, since
       this occurs from a MapRequest. However, in the case where Openbox is
@@ -568,52 +567,50 @@ void frame_grab_client(ObFrame *self, ObClient *client)
       handled and need to be ignored.
     */
     if (ob_state() == OB_STATE_STARTING)
-        client->ignore_unmaps += 2;
+        self->client->ignore_unmaps += 2;
 
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */
     XSelectInput(ob_display, self->plate, PLATE_EVENTMASK);
 
     /* map the client so it maps when the frame does */
-    XMapWindow(ob_display, client->window);
+    XMapWindow(ob_display, self->client->window);
 
     /* adjust the frame to the client's size */
     frame_adjust_area(self, FALSE, TRUE, FALSE);
 
     /* set all the windows for the frame in the window_map */
-    g_hash_table_insert(window_map, &self->window, client);
-    g_hash_table_insert(window_map, &self->plate, client);
-    g_hash_table_insert(window_map, &self->inner, client);
-    g_hash_table_insert(window_map, &self->title, client);
-    g_hash_table_insert(window_map, &self->label, client);
-    g_hash_table_insert(window_map, &self->max, client);
-    g_hash_table_insert(window_map, &self->close, client);
-    g_hash_table_insert(window_map, &self->desk, client);
-    g_hash_table_insert(window_map, &self->shade, client);
-    g_hash_table_insert(window_map, &self->icon, client);
-    g_hash_table_insert(window_map, &self->iconify, client);
-    g_hash_table_insert(window_map, &self->handle, client);
-    g_hash_table_insert(window_map, &self->lgrip, client);
-    g_hash_table_insert(window_map, &self->rgrip, client);
-    g_hash_table_insert(window_map, &self->tltresize, client);
-    g_hash_table_insert(window_map, &self->tllresize, client);
-    g_hash_table_insert(window_map, &self->trtresize, client);
-    g_hash_table_insert(window_map, &self->trrresize, client);
+    g_hash_table_insert(window_map, &self->window, self->client);
+    g_hash_table_insert(window_map, &self->plate, self->client);
+    g_hash_table_insert(window_map, &self->inner, self->client);
+    g_hash_table_insert(window_map, &self->title, self->client);
+    g_hash_table_insert(window_map, &self->label, self->client);
+    g_hash_table_insert(window_map, &self->max, self->client);
+    g_hash_table_insert(window_map, &self->close, self->client);
+    g_hash_table_insert(window_map, &self->desk, self->client);
+    g_hash_table_insert(window_map, &self->shade, self->client);
+    g_hash_table_insert(window_map, &self->icon, self->client);
+    g_hash_table_insert(window_map, &self->iconify, self->client);
+    g_hash_table_insert(window_map, &self->handle, self->client);
+    g_hash_table_insert(window_map, &self->lgrip, self->client);
+    g_hash_table_insert(window_map, &self->rgrip, self->client);
+    g_hash_table_insert(window_map, &self->tltresize, self->client);
+    g_hash_table_insert(window_map, &self->tllresize, self->client);
+    g_hash_table_insert(window_map, &self->trtresize, self->client);
+    g_hash_table_insert(window_map, &self->trrresize, self->client);
 }
 
-void frame_release_client(ObFrame *self, ObClient *client)
+void frame_release_client(ObFrame *self)
 {
     XEvent ev;
     gboolean reparent = TRUE;
-
-    g_assert(self->client == client);
 
     /* if there was any animation going on, kill it */
     ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
                                      self, FALSE);
 
     /* check if the app has already reparented its window away */
-    while (XCheckTypedWindowEvent(ob_display, client->window,
+    while (XCheckTypedWindowEvent(ob_display, self->client->window,
                                   ReparentNotify, &ev))
     {
         /* This check makes sure we don't catch our own reparent action to
@@ -633,10 +630,10 @@ void frame_release_client(ObFrame *self, ObClient *client)
     if (reparent) {
         /* according to the ICCCM - if the client doesn't reparent itself,
            then we will reparent the window to root for them */
-        XReparentWindow(ob_display, client->window,
+        XReparentWindow(ob_display, self->client->window,
                         RootWindow(ob_display, ob_screen),
-                        client->area.x,
-                        client->area.y);
+                        self->client->area.x,
+                        self->client->area.y);
     }
 
     /* remove all the windows for the frame from the window_map */
@@ -660,8 +657,6 @@ void frame_release_client(ObFrame *self, ObClient *client)
     g_hash_table_remove(window_map, &self->trrresize);
 
     ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
-
-    frame_free(self);
 }
 
 /* is there anything present between us and the label? */

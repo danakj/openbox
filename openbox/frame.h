@@ -162,6 +162,8 @@ struct _ObFrame
 };
 
 ObFrame *frame_new(struct _ObClient *c);
+void frame_free(ObFrame *self);
+
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);
 void frame_adjust_theme(ObFrame *self);
@@ -173,8 +175,8 @@ void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);
 void frame_adjust_icon(ObFrame *self);
-void frame_grab_client(ObFrame *self, struct _ObClient *client);
-void frame_release_client(ObFrame *self, struct _ObClient *client);
+void frame_grab_client(ObFrame *self);
+void frame_release_client(ObFrame *self);
 
 ObFrameContext frame_context_from_string(const gchar *name);
 

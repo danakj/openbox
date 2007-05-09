@@ -132,6 +132,7 @@ typedef struct Atoms {
     Atom net_wm_user_time;
     Atom net_wm_user_time_window;
     Atom net_frame_extents;
+    Atom net_request_frame_extents;
 
     /* application protocols */
 /*  Atom net_wm_ping; */

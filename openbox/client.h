@@ -314,12 +314,21 @@ void client_remove_destructor(ObClientCallback func);
 
 /*! Manages all existing windows */
 void client_manage_all();
-/*! Manages a given window */
+/*! Manages a given window
+*/
 void client_manage(Window win);
 /*! Unmanages all managed windows */
 void client_unmanage_all();
 /*! Unmanages a given client */
 void client_unmanage(ObClient *client);
+
+/*! This manages a window only so far as is needed to get it's decorations.
+   This is used when you want to determine a window's decorations before it
+   is mapped. Call client_fake_unmanage() with the returned client when you
+   are done with it. */
+ObClient *client_fake_manage(Window win);
+/*! Free the stuff created by client_fake_manage() */
+void client_fake_unmanage(ObClient *self);
 
 /*! Sets the client list on the root window from the client_list */
 void client_set_list();
@@ -354,7 +363,7 @@ gboolean client_focused(ObClient *self);
 
 /*! Convery a position/size from a given gravity to the client's true gravity
  */
-void client_convert_gravity(ObClient *client, gint gravity, gint *x, gint *y,
+void client_convert_gravity(ObClient *self, gint gravity, gint *x, gint *y,
                             gint w, gint h);
 
 #define client_move(self, x, y) \
@@ -536,7 +545,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user);
 
 /*! Bring all of its helper windows to its desktop. These are the utility and
   stuff windows. */
-void client_bring_helper_windows(ObClient *client);
+void client_bring_helper_windows(ObClient *self);
 
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);
@@ -600,8 +609,8 @@ void client_update_icon_geometry(ObClient *self);
 */
 void client_setup_decor_and_functions(ObClient *self);
 
-/*! Retrieves the window's type and sets ObClient->type */
-void client_get_type(ObClient *self);
+/*! Sets the window's type and transient flag */
+void client_get_type_and_transientness(ObClient *self);
 
 const ObClientIcon *client_icon(ObClient *self, gint w, gint h);
 

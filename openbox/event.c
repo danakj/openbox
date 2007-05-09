@@ -568,8 +568,32 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_root(e);
     else if (e->type == MapRequest)
         client_manage(window);
+    else if (e->type == ClientMessage) {
+        /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for
+           windows that are not managed yet. */
+        if (e->xclient.message_type == prop_atoms.net_request_frame_extents) {
+            /* Pretend to manage the client, getting information used to
+               determine its decorations */
+            ObClient *c = client_fake_manage(e->xclient.window);
+            gulong vals[4];
+
+            /* adjust the decorations so we know the sizes */
+            frame_adjust_area(c->frame, FALSE, TRUE, TRUE);
+
+            /* set the frame extents on the window */
+            vals[0] = c->frame->size.left;
+            vals[1] = c->frame->size.right;
+            vals[2] = c->frame->size.top;
+            vals[3] = c->frame->size.bottom;
+            PROP_SETA32(e->xclient.window, net_frame_extents,
+                        cardinal, vals, 4);
+
+            /* Free the pretend client */
+            client_fake_unmanage(c);
+        }
+    }
     else if (e->type == ConfigureRequest) {
-        /* unhandled configure requests must be used to configure the
+        /* unhandled config5Aure requests must be used to configure the
            window directly */
         XWindowChanges xwc;
 
@@ -1167,7 +1191,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {
             client_update_transient_for(client);
-            client_get_type(client);
+            client_get_type_and_transientness(client);
             /* type may have changed, so update the layer */
             client_calc_layer(client);
             client_setup_decor_and_functions(client);

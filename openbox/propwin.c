@@ -76,6 +76,10 @@ void propwin_add(Window win, ObPropWinType type, struct _ObClient *client)
     } else
         g_assert(g_slist_find(p->data[type].clients, client) == NULL);
 
+    if (p->data[type].clients != NULL)
+        ob_debug("Client %s is using a property window 0x%x that is already "
+                 "in use\n", client->title, win);
+
     /* add it to the clients list */
     p->data[type].clients = g_slist_prepend(p->data[type].clients, client);
 }

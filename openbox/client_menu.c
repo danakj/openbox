@@ -104,7 +104,6 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
                                 ObClient *c, guint state, gpointer data,
                                 Time time)
 {
-    GList *it;
     gint x, y;
 
     g_assert(c);

@@ -661,75 +661,129 @@ void frame_release_client(ObFrame *self, ObClient *client)
     frame_free(self);
 }
 
+/* is there anything present between us and the label? */
+static gboolean is_button_present(const gchar *lc, gint dir,
+                                  gboolean n, gboolean d, gboolean s,
+                                  gboolean i, gboolean m, gboolean c) {
+    for (lc += dir; *lc != '\0'; lc += dir) {
+        if (c == ' ') continue; /* it was invalid */
+        if (c == 'N' && n) return TRUE;
+        if (c == 'D' && d) return TRUE;
+        if (c == 'S' && s) return TRUE;
+        if (c == 'I' && i) return TRUE;
+        if (c == 'M' && m) return TRUE;
+        if (c == 'C' && c) return TRUE;
+        if (c == 'L') return FALSE;
+    }
+    return FALSE;
+}
+
 static void layout_title(ObFrame *self)
 {
     gchar *lc;
     gint x;
-    gboolean n, d, i, l, m, c, s;
+    /* which ones the user asked for */
+    gboolean has_n, has_d, has_i, has_m, has_c, has_s;
+    /* which ones to include in titlebar */
+    gboolean n, d, i, m, c, s, l;
+    gboolean before_label;
+    const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
 
-    n = d = i = l = m = c = s = FALSE;
+    has_n = has_d = has_s = has_i = has_m = has_c = FALSE;
+    l = FALSE;
 
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (ob_rr_theme->paddingx + 1) * 2;
     for (lc = config_title_layout; *lc != '\0'; ++lc) {
         switch (*lc) {
         case 'N':
-            if (n) { *lc = ' '; break; } /* rm duplicates */
-            n = TRUE;
-            self->label_width -= (ob_rr_theme->button_size + 2 +
-                                  ob_rr_theme->paddingx + 1);
+            if (has_n) { *lc = ' '; break; } /* rm duplicates */
+            has_n = TRUE;
             break;
         case 'D':
-            if (d) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS)
-                && config_theme_hidedisabled)
-                break;
-            d = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
+            if (has_d) { *lc = ' '; break; }
+            has_d = TRUE;
             break;
         case 'S':
-            if (s) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_SHADE)
-                && config_theme_hidedisabled)
-                break;
-            s = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
+            if (has_s) { *lc = ' '; break; }
+            has_s = TRUE;
             break;
         case 'I':
-            if (i) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_ICONIFY)
-                && config_theme_hidedisabled)
-                break;
-            i = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
+            if (has_i) { *lc = ' '; break; }
+            has_i = TRUE;
             break;
         case 'L':
             if (l) { *lc = ' '; break; }
             l = TRUE;
             break;
         case 'M':
-            if (m) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE)
-                && config_theme_hidedisabled)
-                break;
-            m = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
+            if (has_m) { *lc = ' '; break; }
+            has_m = TRUE;
             break;
         case 'C':
-            if (c) { *lc = ' '; break; }
-            if (!(self->decorations & OB_FRAME_DECOR_CLOSE)
-                && config_theme_hidedisabled)
-                break;
-            c = TRUE;
-            self->label_width -= (ob_rr_theme->button_size +
-                                  ob_rr_theme->paddingx + 1);
+            if (has_c) { *lc = ' '; break; }
+            has_c = TRUE;
+            break;
+        default:
+            *lc = ' '; /* invalid */
             break;
         }
     }
+
+    n = d = i = m = c = s = FALSE;
+    before_label = TRUE;
+
+    /* go through again and see which buttons can hide */
+    for (lc = config_title_layout; *lc != '\0'; ++lc) {
+        switch (*lc) {
+        case 'N':
+            n = has_n && (self->decorations & OB_FRAME_DECOR_ICON ||
+                          is_button_present(lc, (before_label?1:-1),
+                                            has_n, has_d, has_s, has_i,
+                                            has_m, has_c));
+            break;
+        case 'D':
+            d = has_d && (self->decorations & OB_FRAME_DECOR_ALLDESKTOPS ||
+                          is_button_present(lc, (before_label?1:-1),
+                                            has_n, has_d, has_s, has_i,
+                                            has_m, has_c));
+            break;
+        case 'S':
+            s = has_s && (self->decorations & OB_FRAME_DECOR_SHADE ||
+                          is_button_present(lc, (before_label?1:-1),
+                                            has_n, has_d, has_s, has_i,
+                                            has_m, has_c));
+            break;
+        case 'I':
+            i = has_i && (self->decorations & OB_FRAME_DECOR_ICONIFY ||
+                          is_button_present(lc, (before_label?1:-1),
+                                            has_n, has_d, has_s, has_i,
+                                            has_m, has_c));
+            break;
+        case 'L':
+            before_label = FALSE;
+            break;
+        case 'M':
+            m = has_m && (self->decorations & OB_FRAME_DECOR_MAXIMIZE ||
+                          is_button_present(lc, (before_label?1:-1),
+                                            has_n, has_d, has_s, has_i,
+                                            has_m, has_c));
+            break;
+        case 'C':
+            c = has_c && (self->decorations & OB_FRAME_DECOR_CLOSE ||
+                          is_button_present(lc, (before_label?1:-1),
+                                            has_n, has_d, has_s, has_i,
+                                            has_m, has_c));
+            break;
+        }
+    }
+
+    if (n) self->label_width -= bwidth + 2; /* icon gets extra padding */
+    if (d) self->label_width -= bwidth;
+    if (s) self->label_width -= bwidth;
+    if (i) self->label_width -= bwidth;
+    if (m) self->label_width -= bwidth;
+    if (c) self->label_width -= bwidth;
     if (self->label_width < 1) self->label_width = 1;
 
     if (!n) XUnmapWindow(ob_display, self->icon);

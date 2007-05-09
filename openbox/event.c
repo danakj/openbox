@@ -730,12 +730,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
     Atom msgtype;
     ObFrameContext con;
     static gint px = -1, py = -1;
+    static guint pb = 0;
      
     switch (e->type) {
     case ButtonPress:
         /* save where the press occured for the first button pressed */
-        if (px == -1) px = e->xbutton.x;
-        if (py == -1) py = e->xbutton.y;
+        if (!pb) {
+            pb = e->xbutton.button;
+            px = e->xbutton.x;
+            py = e->xbutton.y;
+        }
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it.
@@ -751,8 +755,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             con = frame_context(client, e->xbutton.window, px, py);
             con = mouse_button_frame_context(con, e->xbutton.button);
 
-            if (e->type == ButtonRelease)
-                px = py = -1;
+            if (e->type == ButtonRelease && e->xbutton.button == pb)
+                pb = 0, px = py = -1;
 
             switch (con) {
             case OB_FRAME_CONTEXT_MAXIMIZE:
@@ -779,6 +783,43 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 /* nothing changes with clicks for any other contexts */
                 break;
             }
+        }
+        break;
+    case MotionNotify:
+        con = frame_context(client, e->xmotion.window,
+                            e->xmotion.x, e->xmotion.y);
+        switch (con) {
+        case OB_FRAME_CONTEXT_TITLEBAR:
+            /* we've left the button area inside the titlebar */
+            client->frame->max_hover = FALSE;
+            client->frame->desk_hover = FALSE;
+            client->frame->shade_hover = FALSE;
+            client->frame->iconify_hover = FALSE;
+            client->frame->close_hover = FALSE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            client->frame->max_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            client->frame->desk_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_SHADE:
+            client->frame->shade_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            client->frame->iconify_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_CLOSE:
+            client->frame->close_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        default:
+            break;
         }
         break;
     case LeaveNotify:

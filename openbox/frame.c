@@ -34,7 +34,7 @@
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                           ButtonMotionMask | \
+                           ButtonMotionMask | PointerMotionMask | \
                            EnterWindowMask | LeaveWindowMask)
 /* The inner window does not need enter/leave events.
    If it does get them, then it needs its own context for enter events

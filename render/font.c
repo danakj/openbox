@@ -34,13 +34,29 @@
 static void measure_font(const RrInstance *inst, RrFont *f)
 {
     PangoFontMetrics *metrics;
+    static PangoLanguage *lang = NULL;
+
+    if (lang == NULL) {
+#if PANGO_VERSION_CHECK(1,16,0)
+        lang = pango_language_get_default();
+#else
+        gchar *locale, *p;
+        /* get the default language from the locale
+           (based on gtk_get_default_language in gtkmain.c) */
+        locale = g_strdup(setlocale(LC_CTYPE, NULL));
+        if ((p = strchr(locale, '.'))) *p = '\0'; /* strip off the . */
+        if ((p = strchr(locale, '@'))) *p = '\0'; /* strip off the @ */
+        lang = pango_language_from_string(locale);
+        g_free(locale);
+#endif
+    }
 
     /* measure the ascent and descent */
-    metrics = pango_context_get_metrics(inst->pango, f->font_desc,
-                                        pango_language_get_default());
+    metrics = pango_context_get_metrics(inst->pango, f->font_desc, lang);
     f->ascent = pango_font_metrics_get_ascent(metrics);
     f->descent = pango_font_metrics_get_descent(metrics);
     pango_font_metrics_unref(metrics);
+
 }
 
 RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,

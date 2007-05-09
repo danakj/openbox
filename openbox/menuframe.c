@@ -1169,13 +1169,16 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state, Time time)
         gpointer data = self->frame->menu->data;
         GSList *acts = self->entry->data.normal.actions;
         ObClient *client = self->frame->client;
+        ObMenuFrame *frame = self->frame;
 
         /* release grabs before executing the shit */
-        if (!(state & ControlMask))
+        if (!(state & ControlMask)) {
             menu_frame_hide_all();
+            frame = NULL;
+        }
 
         if (func)
-            func(entry, state, data, time);
+            func(entry, frame, client, state, data, time);
         else
             action_run(acts, client, state, time);
     }

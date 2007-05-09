@@ -100,30 +100,21 @@ static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void client_menu_execute(ObMenuEntry *e, guint state, gpointer data,
+static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
+                                ObClient *c, guint state, gpointer data,
                                 Time time)
 {
     GList *it;
-    ObMenuFrame *f;
-    ObClient *c;
 
-    /* find our frame */
-    for (it = menu_frame_visible; it; it = g_list_next(it)) {
-        f = it->data;
-        /* yay this is our menu frame */
-        if (f->menu == e->menu)
-            break;
-    }
-    g_assert(it);
-
-    c = f->client;
+    g_assert(c);
 
     switch (e->id) {
     case CLIENT_ICONIFY:
         client_iconify(c, TRUE, FALSE);
         /* the client won't be on screen anymore so hide the menu */
         menu_frame_hide_all();
-        return; /* and don't update */
+        f = NULL; /* and don't update */
+        break;
     case CLIENT_RESTORE:
         client_maximize(c, FALSE, 0);
         break;
@@ -150,8 +141,10 @@ static void client_menu_execute(ObMenuEntry *e, guint state, gpointer data,
     }
 
     /* update the menu cuz stuff can have changed */
-    client_menu_update(f, NULL);
-    menu_frame_render(f);
+    if (f) {
+        client_menu_update(f, NULL);
+        menu_frame_render(f);
+    }
 }
 
 static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
@@ -186,20 +179,11 @@ static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void layer_menu_execute(ObMenuEntry *e, guint state, gpointer data,
+static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
+                               ObClient *c, guint state, gpointer data,
                                Time time)
 {
-    GList *it;
-    ObMenuFrame *f;
-
-    /* find our frame */
-    for (it = menu_frame_visible; it; it = g_list_next(it)) {
-        f = it->data;
-        /* yay this is our menu frame */
-        if (f->menu == e->menu)
-            break;
-    }
-    g_assert(it);
+    g_assert(c);
 
     switch (e->id) {
     case LAYER_TOP:
@@ -216,8 +200,10 @@ static void layer_menu_execute(ObMenuEntry *e, guint state, gpointer data,
     }
 
     /* update the menu cuz stuff can have changed */
-    layer_menu_update(f, NULL);
-    menu_frame_render(f);
+    if (f) {
+        layer_menu_update(f, NULL);
+        menu_frame_render(f);
+    }
 }
 
 static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
@@ -264,24 +250,16 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void send_to_menu_execute(ObMenuEntry *e, guint state, gpointer data,
+static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
+                                 ObClient *c, guint state, gpointer data,
                                  Time time)
 {
-    GList *it;
-    ObMenuFrame *f;
+    g_assert(c);
 
-    /* find our frame */
-    for (it = menu_frame_visible; it; it = g_list_next(it)) {
-        f = it->data;
-        /* yay this is our menu frame */
-        if (f->menu == e->menu)
-            break;
-    }
-    g_assert(it);
-
-    client_set_desktop(f->client, e->id, FALSE);
+    client_set_desktop(c, e->id, FALSE);
     /* the client won't even be on the screen anymore, so hide the menu */
-    menu_frame_hide_all();
+    if (f)
+        menu_frame_hide_all();
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,

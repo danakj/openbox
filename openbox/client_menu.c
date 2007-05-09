@@ -105,15 +105,17 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
                                 Time time)
 {
     GList *it;
+    gint x, y;
 
     g_assert(c);
 
     switch (e->id) {
     case CLIENT_ICONIFY:
-        client_iconify(c, TRUE, FALSE);
         /* the client won't be on screen anymore so hide the menu */
         menu_frame_hide_all();
         f = NULL; /* and don't update */
+
+        client_iconify(c, TRUE, FALSE);
         break;
     case CLIENT_RESTORE:
         client_maximize(c, FALSE, 0);
@@ -128,10 +130,22 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         client_set_undecorated(c, !c->undecorated);
         break;
     case CLIENT_MOVE:
-        moveresize_start(c,0,0,0, prop_atoms.net_wm_moveresize_move_keyboard);
+        /* this needs to grab the keyboard so hide the menu */
+        menu_frame_hide_all();
+        f = NULL; /* and don't update */
+
+        if (screen_pointer_pos(&x, &y))
+            moveresize_start(c, x, y, 0,
+                             prop_atoms.net_wm_moveresize_move_keyboard);
         break;
     case CLIENT_RESIZE:
-        moveresize_start(c,0,0,0,prop_atoms.net_wm_moveresize_size_keyboard);
+        /* this needs to grab the keyboard so hide the menu */
+        menu_frame_hide_all();
+        f = NULL; /* and don't update */
+
+        if (screen_pointer_pos(&x, &y))
+            moveresize_start(c, x, y, 0,
+                             ,prop_atoms.net_wm_moveresize_size_keyboard);
         break;
     case CLIENT_CLOSE:
         client_close(c);

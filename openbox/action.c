@@ -1531,9 +1531,7 @@ void action_desktop(union ActionData *data)
             if (data->inter.any.interactive)
                 screen_desktop_popup(data->desktop.desk, TRUE);
         }
-    }
-
-    if (!data->inter.any.interactive || data->inter.final)
+    } else
         screen_desktop_popup(0, FALSE);
 }
 

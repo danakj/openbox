@@ -647,20 +647,12 @@ void screen_desktop_popup(guint d, gboolean show)
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel)
 {
-    static gboolean first = TRUE;
-    static guint origd, d;
-    guint r, c;
+    guint d, r, c;
 
-    if (cancel) {
-        d = origd;
-        goto done_cycle;
-    } else if (done && dialog) {
-        goto done_cycle;
-    }
-    if (first) {
-        first = FALSE;
-        d = origd = screen_desktop;
-    }
+    d = screen_desktop;
+
+    if ((cancel || done) && dialog)
+        goto show_cycle_dialog;
 
     get_row_col(d, &r, &c);
 
@@ -773,16 +765,10 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
     }
 
 show_cycle_dialog:
-    if (dialog) {
+    if (dialog && !cancel && !done) {
         screen_desktop_popup(d, TRUE);
-        return d;
-    }
-
-done_cycle:
-    first = TRUE;
-
-    screen_desktop_popup(0, FALSE);
-
+    } else
+        screen_desktop_popup(0, FALSE);
     return d;
 }
 

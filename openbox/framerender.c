@@ -265,7 +265,7 @@ void framerender_frame(ObFrame *self)
 
 static void framerender_label(ObFrame *self, RrAppearance *a)
 {
-    if (self->label_x < 0) return;
+    if (!self->label_on) return;
     /* set the texture's text! */
     a->texture[0].data.text.string = self->client->title;
     RrPaint(a, self->label, self->label_width, ob_rr_theme->label_height);
@@ -275,7 +275,7 @@ static void framerender_icon(ObFrame *self, RrAppearance *a)
 {
     const ObClientIcon *icon;
 
-    if (self->icon_x < 0) return;
+    if (!self->icon_on) return;
 
     icon = client_icon(self->client,
                        ob_rr_theme->button_size + 2,
@@ -294,33 +294,33 @@ static void framerender_icon(ObFrame *self, RrAppearance *a)
 
 static void framerender_max(ObFrame *self, RrAppearance *a)
 {
-    if (self->max_x < 0) return;
+    if (!self->max_on) return;
     RrPaint(a, self->max, ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
 static void framerender_iconify(ObFrame *self, RrAppearance *a)
 {
-    if (self->iconify_x < 0) return;
+    if (!self->iconify_on) return;
     RrPaint(a, self->iconify,
             ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
 static void framerender_desk(ObFrame *self, RrAppearance *a)
 {
-    if (self->desk_x < 0) return;
+    if (!self->desk_on) return;
     RrPaint(a, self->desk, ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
 static void framerender_shade(ObFrame *self, RrAppearance *a)
 {
-    if (self->shade_x < 0) return;
+    if (!self->shade_on) return;
     RrPaint(a, self->shade,
             ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
 static void framerender_close(ObFrame *self, RrAppearance *a)
 {
-    if (self->close_x < 0) return;
+    if (!self->close_on) return;
     RrPaint(a, self->close,
             ob_rr_theme->button_size, ob_rr_theme->button_size);
 }

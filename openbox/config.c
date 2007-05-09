@@ -466,8 +466,15 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         g_free(c);
     }
     if ((n = parse_find_node("titleLayout", node))) {
+        gchar *c, *d;
+
         g_free(config_title_layout);
         config_title_layout = parse_string(doc, n);
+
+        /* replace duplicates with spaces */
+        for (c = config_title_layout; *c != '\0'; ++c)
+            for (d = c+1; *d != '\0'; ++d)
+                if (*c == *d) *d = ' ';
     }
     if ((n = parse_find_node("keepBorder", node)))
         config_theme_keepborder = parse_bool(doc, n);

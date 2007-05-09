@@ -1689,8 +1689,6 @@ void action_moveresize(union ActionData *data)
     ObClient *c = data->moveresize.any.c;
     guint32 corner;
 
-    if (!client_normal(c)) return;
-
     if (data->moveresize.keyboard) {
         corner = (data->moveresize.move ?
                   prop_atoms.net_wm_moveresize_move_keyboard :

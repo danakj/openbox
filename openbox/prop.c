@@ -95,6 +95,7 @@ void prop_startup()
     CREATE(net_wm_user_time_window, "_NET_WM_USER_TIME_WINDOW");
     CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
+    CREATE(net_request_frame_extents, "_NET_REQUEST_FRAME_EXTENTS");
 
 /*   CREATE(net_wm_ping, "_NET_WM_PING"); */
 #ifdef SYNC
@@ -167,7 +168,7 @@ void prop_startup()
 
     CREATE(openbox_pid, "_OPENBOX_PID");
     CREATE(openbox_config, "_OPENBOX_CONFIG");
-    CREATE(openbox_wm_state_undecorated, "_OPENBOX_WM_STATE_UNDECORATED");
+    CREATE(openbox_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(openbox_control, "_OPENBOX_CONTROL");
 }
 

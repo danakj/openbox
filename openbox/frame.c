@@ -728,9 +728,9 @@ static void layout_title(ObFrame *self)
             } else if (*lc == 'N') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICON;
                 if ((self->icon_on = is_button_present(self, lc, i))) {
-                    /* icon gets extra padding */
+                    /* icon is bigger than buttons */
                     self->label_width -= bwidth + 2;
-                    self->icon_x = x + (i * 1);
+                    self->icon_x = x;
                     x += i * (bwidth + 2);
                 }
             } else if (*lc == 'D') {

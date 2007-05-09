@@ -76,6 +76,10 @@
 #include <X11/Xcursor/Xcursor.h>
 #endif
 
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+
+
 RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
 ObMainLoop *ob_main_loop;
@@ -203,17 +207,17 @@ gint main(gint argc, gchar **argv)
 
     /* create available keycodes */
     keys[OB_KEY_RETURN] =
-        XKeysymToKeycode(ob_display, XStringToKeysym("Return"));
+        XKeysymToKeycode(ob_display, XK_Return);
     keys[OB_KEY_ESCAPE] =
-        XKeysymToKeycode(ob_display, XStringToKeysym("Escape"));
+        XKeysymToKeycode(ob_display, XK_Escape);
     keys[OB_KEY_LEFT] =
-        XKeysymToKeycode(ob_display, XStringToKeysym("Left"));
+        XKeysymToKeycode(ob_display, XK_Left);
     keys[OB_KEY_RIGHT] =
-        XKeysymToKeycode(ob_display, XStringToKeysym("Right"));
+        XKeysymToKeycode(ob_display, XK_Right);
     keys[OB_KEY_UP] =
-        XKeysymToKeycode(ob_display, XStringToKeysym("Up"));
+        XKeysymToKeycode(ob_display, XK_Up);
     keys[OB_KEY_DOWN] =
-        XKeysymToKeycode(ob_display, XStringToKeysym("Down"));
+        XKeysymToKeycode(ob_display, XK_Down);
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */

@@ -1589,7 +1589,8 @@ void action_toggle_decorations(union ActionData *data)
     client_action_end(data);
 }
 
-static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
+static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
+                           gboolean shaded)
 {
     /* let's make x and y client relative instead of screen relative */
     x = x - cx;
@@ -1629,11 +1630,11 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
       |CCCCCCC              |     A           B     |              DDDDDDD|
       |       CCCCCCCC      |     A |       | B     |      DDDDDDDD       |
       |               CCCCCCC      A         B      DDDDDDD               |
-      - - - - - - - - - - - +CCCCCCC+aaaaaaa+DDDDDDD+ - - - - - - - - - - -
-      |                     |       b       c       |                     |
-      |             west    |       b  move c       |   east              |
-      |                     |       b       c       |                     |
-      - - - - - - - - - - - +EEEEEEE+ddddddd+FFFFFFF+- - - - - - - - - - - 
+      - - - - - - - - - - - +CCCCCCC+aaaaaaa+DDDDDDD+ - - - - - - - - - - - -
+      |                     |       b       c       |                     | sh
+      |             west    |       b  move c       |   east              | ad
+      |                     |       b       c       |                     | ed
+      - - - - - - - - - - - +EEEEEEE+ddddddd+FFFFFFF+- - - - - - - - - - -  -
       |               EEEEEEE      G         H      FFFFFFF               |
       |       EEEEEEEE      |     G |       | H     |      FFFFFFFF       |
       |EEEEEEE              |     G           H     |              FFFFFFF|
@@ -1649,6 +1650,15 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
       |                     |G                     H|                     |
       +---------------------G-------|-------|-------H---------------------+
     */
+
+    if (shaded) {
+        /* for shaded windows, you can only resize west/east and move */
+        if (b)
+            return prop_atoms.net_wm_moveresize_size_left;
+        if (c)
+            return prop_atoms.net_wm_moveresize_size_right;
+        return prop_atoms.net_wm_moveresize_move;
+    }
 
     if (y < A && y >= C)
         return prop_atoms.net_wm_moveresize_size_topleft;
@@ -1705,7 +1715,7 @@ void action_moveresize(union ActionData *data)
                               c->area.width + c->frame->size.left +
                               c->frame->size.right,
                               c->area.height + c->frame->size.top +
-                              c->frame->size.bottom));
+                              c->frame->size.bottom, c->shaded));
     }
 
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);

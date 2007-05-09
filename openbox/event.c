@@ -32,6 +32,7 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "modkeys.h"
+#include "propwin.h"
 #include "mouse.h"
 #include "mainloop.h"
 #include "framerender.h"
@@ -81,7 +82,7 @@ static gboolean event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void event_handle_user_time_window_client(ObClient *c, XEvent *e);
+static void event_handle_user_time_window_clients(GSList *l, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
 
 static void focus_delay_dest(gpointer data);
@@ -410,7 +411,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
-    ObClient *timewinclient = NULL;
+    GSList *timewinclients = NULL;
     XEvent ee, *e;
     ObEventData *ed = data;
 
@@ -420,8 +421,8 @@ static void event_process(const XEvent *ec, gpointer data)
 
     window = event_get_window(e);
     if (e->type != PropertyNotify ||
-        !(timewinclient =
-          g_hash_table_lookup(client_user_time_window_map, &window)))
+        !(timewinclients = propwin_get_clients(window,
+                                               OB_PROPWIN_USER_TIME)))
         if ((obwin = g_hash_table_lookup(window_map, &window))) {
             switch (obwin->type) {
             case Window_Dock:
@@ -555,8 +556,8 @@ static void event_process(const XEvent *ec, gpointer data)
             /* focus_set_client has already been called for sure */
             client_calc_layer(client);
         }
-    } else if (timewinclient)
-        event_handle_user_time_window_client(timewinclient, e);
+    } else if (timewinclients)
+        event_handle_user_time_window_clients(timewinclients, e);
     else if (client)
         event_handle_client(client, e);
     else if (dockapp)
@@ -690,11 +691,13 @@ void event_enter_client(ObClient *client)
     }
 }
 
-static void event_handle_user_time_window_client(ObClient *client, XEvent *e)
+static void event_handle_user_time_window_clients(GSList *l, XEvent *e)
 {
     g_assert(e->type == PropertyNotify);
-    if (e->xproperty.atom == prop_atoms.net_wm_user_time)
-        client_update_user_time(client);
+    if (e->xproperty.atom == prop_atoms.net_wm_user_time) {
+        for (; l; l = g_slist_next(l))
+            client_update_user_time(l->data);
+    }
 }
 
 static void event_handle_client(ObClient *client, XEvent *e)

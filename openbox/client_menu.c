@@ -121,7 +121,9 @@ static void client_menu_execute(ObMenuEntry *e, guint state, gpointer data,
     switch (e->id) {
     case CLIENT_ICONIFY:
         client_iconify(c, TRUE, FALSE);
-        break;
+        /* the client won't be on screen anymore so hide the menu */
+        menu_frame_hide_all();
+        return; /* and don't update */
     case CLIENT_RESTORE:
         client_maximize(c, FALSE, 0);
         break;

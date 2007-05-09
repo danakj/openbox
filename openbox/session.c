@@ -175,7 +175,7 @@ static gboolean session_connect()
                                 SmcSaveCompleteProcMask |
                                 SmcShutdownCancelledProcMask,
                                 &cb, oldid, &ob_sm_id,
-                                SM_ERR_LEN, sm_err);
+                                SM_ERR_LEN-1, sm_err);
     g_free(oldid);
     if (sm_conn == NULL)
         ob_debug("Failed to connect to session manager: %s\n", sm_err);

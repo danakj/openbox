@@ -167,8 +167,8 @@ void prop_startup()
 
     CREATE(openbox_pid, "_OPENBOX_PID");
     CREATE(openbox_config, "_OPENBOX_CONFIG");
-    CREATE(openbox_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
-    CREATE(openbox_control, "_OB_CONTROL");
+    CREATE(openbox_wm_state_undecorated, "_OPENBOX_WM_STATE_UNDECORATED");
+    CREATE(openbox_control, "_OPENBOX_CONTROL");
 }
 
 #include <X11/Xutil.h>

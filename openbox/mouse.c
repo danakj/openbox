@@ -179,7 +179,7 @@ void mouse_event(ObClient *client, XEvent *e)
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
     static Window lwindow = None;
-    static gint px, py;
+    static gint px, py, pwx = -1, pwy = -1;
 
     ObFrameContext context;
     gboolean click = FALSE;
@@ -187,11 +187,14 @@ void mouse_event(ObClient *client, XEvent *e)
 
     switch (e->type) {
     case ButtonPress:
-        context = frame_context(client, e->xany.window);
+        context = frame_context(client, e->xbutton.window,
+                                e->xbutton.x, e->xbutton.y);
         context = mouse_button_frame_context(context, e->xbutton.button);
 
         px = e->xbutton.x_root;
         py = e->xbutton.y_root;
+        if (pwx == -1) pwx = e->xbutton.x;
+        if (pwy == -1) pwy = e->xbutton.y;
         button = e->xbutton.button;
         state = e->xbutton.state;
 
@@ -209,8 +212,11 @@ void mouse_event(ObClient *client, XEvent *e)
             break;
 
     case ButtonRelease:
-        context = frame_context(client, e->xany.window);
+        /* use where the press occured in the window */
+        context = frame_context(client, e->xbutton.window, pwx, pwy);
         context = mouse_button_frame_context(context, e->xbutton.button);
+
+        pwx = pwy = -1;
 
         if (e->xbutton.button == button) {
             /* clicks are only valid if its released over the window */
@@ -272,7 +278,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     case MotionNotify:
         if (button) {
-            context = frame_context(client, e->xany.window);
+            context = frame_context(client, e->xmotion.window, pwx, pwy);
             context = mouse_button_frame_context(context, button);
 
             if (ABS(e->xmotion.x_root - px) >=

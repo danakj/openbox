@@ -683,7 +683,7 @@ static gboolean is_button_present(ObFrame *self, const gchar *lc, gint dir) {
 static void layout_title(ObFrame *self)
 {
     gchar *lc;
-    gint i, x;
+    gint i;
 
     const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
     /* position of the left most button */
@@ -695,6 +695,7 @@ static void layout_title(ObFrame *self)
     self->icon_on = self->desk_on = self->shade_on = self->iconify_on =
         self->max_on = self->close_on = self->label_on = FALSE;
     self->label_width = self->width - (ob_rr_theme->paddingx + 1) * 2;
+    self->leftmost = self->rightmost = OB_FRAME_CONTEXT_NONE;
 
     /* figure out what's being show, find each element's position, and the
        width of the label
@@ -703,16 +704,21 @@ static void layout_title(ObFrame *self)
        i will be +1 the first time through when working to the left,
        and -1 the second time through when working to the right */
     for (i = 1; i >= -1; i-=2) {
+        gint x;
+        ObFrameContext *firstcon;
+
         if (i > 0) {
             x = left;
             lc = config_title_layout;
+            firstcon = &self->leftmost;
         } else {
             x = right;
             lc = config_title_layout + strlen(config_title_layout)-1;
+            firstcon = &self->rightmost;
         }
 
         /* stop at the end of the string (or the label, which calls break) */
-        for (; *lc != '\0' && lc >= config_title_layout; lc+=i)
+        for (; *lc != '\0' && lc >= config_title_layout; lc+=i) {
             if (*lc == 'L') {
                 if (i > 0) {
                     self->label_on = TRUE;
@@ -720,6 +726,7 @@ static void layout_title(ObFrame *self)
                 }
                 break; /* break the for loop, do other side of label */
             } else if (*lc == 'N') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICON;
                 if ((self->icon_on = is_button_present(self, lc, i))) {
                     /* icon gets extra padding */
                     self->label_width -= bwidth + 2;
@@ -727,36 +734,44 @@ static void layout_title(ObFrame *self)
                     x += i * (bwidth + 2);
                 }
             } else if (*lc == 'D') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_ALLDESKTOPS;
                 if ((self->desk_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->desk_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'S') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_SHADE;
                 if ((self->shade_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->shade_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'I') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICONIFY;
                 if ((self->iconify_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->iconify_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'M') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_MAXIMIZE;
                 if ((self->max_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->max_x = x;
                     x += i * bwidth;
                 }
             } else if (*lc == 'C') {
+                if (firstcon) *firstcon = OB_FRAME_CONTEXT_CLOSE;
                 if ((self->close_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
                     self->close_x = x;
                     x += i * bwidth;
                 }
-            }
+            } else
+                continue; /* don't set firstcon */
+            firstcon = NULL;
+        }
     }
 
     /* position and map the elements */
@@ -848,7 +863,7 @@ ObFrameContext frame_context_from_string(const gchar *name)
     return OB_FRAME_CONTEXT_NONE;
 }
 
-ObFrameContext frame_context(ObClient *client, Window win)
+ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
 {
     ObFrame *self;
 
@@ -875,8 +890,30 @@ ObFrameContext frame_context(ObClient *client, Window win)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
+    if (win == self->title) {
+        /* when the user clicks in the corners of the titlebar and the client
+           is fully maximized, then treat it like they clicked in the
+           button that is there */
+        if (self->client->max_horz && self->client->max_vert &&
+            y < ob_rr_theme->paddingy + 1 + ob_rr_theme->button_size)
+        {
+            if (x < ((ob_rr_theme->paddingx + 1) * 2 +
+                     ob_rr_theme->button_size)) {
+                if (self->leftmost != OB_FRAME_CONTEXT_NONE)
+                    return self->leftmost;
+            }
+            else if (x > (self->width -
+                          (ob_rr_theme->paddingx + 1 +
+                           ob_rr_theme->button_size)))
+            {
+                if (self->rightmost != OB_FRAME_CONTEXT_NONE)
+                    return self->rightmost;
+            }
+        }
+        return OB_FRAME_CONTEXT_TITLEBAR;
+    }
+
     if (win == self->window)    return OB_FRAME_CONTEXT_FRAME;
-    if (win == self->title)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->label)     return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->handle)    return OB_FRAME_CONTEXT_HANDLE;
     if (win == self->lgrip)     return OB_FRAME_CONTEXT_BLCORNER;

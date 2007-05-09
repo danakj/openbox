@@ -1664,7 +1664,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
     /* kill the handle on fully maxed windows */
     if (self->max_vert && self->max_horz)
-        self->decorations &= ~OB_FRAME_DECOR_HANDLE;
+        self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
 
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */

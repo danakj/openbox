@@ -136,6 +136,10 @@ struct _ObFrame
     gint      cbwidth_x;     /* client border width */
     gint      cbwidth_y;     /* client border width */
 
+    /* the leftmost and rightmost elements in the titlebar */
+    ObFrameContext leftmost;
+    ObFrameContext rightmost;
+
     gboolean  max_press;
     gboolean  close_press;
     gboolean  desk_press;
@@ -180,7 +184,8 @@ void frame_release_client(ObFrame *self);
 
 ObFrameContext frame_context_from_string(const gchar *name);
 
-ObFrameContext frame_context(struct _ObClient *self, Window win);
+ObFrameContext frame_context(struct _ObClient *self, Window win,
+                             gint x, gint y);
 
 /*! Applies gravity to the client's position to find where the frame should
   be positioned.

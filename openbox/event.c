@@ -729,9 +729,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
     XEvent ce;
     Atom msgtype;
     ObFrameContext con;
+    static gint px = -1, py = -1;
      
     switch (e->type) {
     case ButtonPress:
+        /* save where the press occured for the first button pressed */
+        if (px == -1) px = e->xbutton.x;
+        if (py == -1) py = e->xbutton.y;
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it.
@@ -743,8 +747,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
             !keyboard_interactively_grabbed() &&
             !menu_frame_visible)
         {
-            con = frame_context(client, e->xbutton.window);
+            /* use where the press occured */
+            con = frame_context(client, e->xbutton.window, px, py);
             con = mouse_button_frame_context(con, e->xbutton.button);
+
+            if (e->type == ButtonRelease)
+                px = py = -1;
+
             switch (con) {
             case OB_FRAME_CONTEXT_MAXIMIZE:
                 client->frame->max_press = (e->type == ButtonPress);
@@ -773,7 +782,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case LeaveNotify:
-        con = frame_context(client, e->xcrossing.window);
+        con = frame_context(client, e->xcrossing.window,
+                            e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = FALSE;
@@ -833,7 +843,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             nofocus = TRUE;
         }
 
-        con = frame_context(client, e->xcrossing.window);
+        con = frame_context(client, e->xcrossing.window,
+                            e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = TRUE;

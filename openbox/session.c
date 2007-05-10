@@ -136,7 +136,8 @@ void session_shutdown(gboolean permanent)
     if (sm_conn) {
         /* if permanent is true then we will change our session state so that
            the SM won't run us again */
-        session_setup_restart_style(!permanent);
+        if (permanent)
+            session_setup_restart_style(FALSE);
 
         SmcCloseConnection(sm_conn, 0, NULL);
 
@@ -177,6 +178,7 @@ static gboolean session_connect()
                                 &cb, oldid, &ob_sm_id,
                                 SM_ERR_LEN-1, sm_err);
     g_free(oldid);
+    ob_debug_type(OB_DEBUG_SM, "Connected to SM with id: %s\n", ob_sm_id);
     if (sm_conn == NULL)
         ob_debug("Failed to connect to session manager: %s\n", sm_err);
     return sm_conn != NULL;
@@ -195,6 +197,7 @@ static void session_setup_program()
         .vals = &vals
     };
     SmProp *list = &prop;
+    ob_debug_type(OB_DEBUG_SM, "Setting program: %s\n", sm_argv[0]);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -215,6 +218,7 @@ static void session_setup_user()
         .vals = &vals
     };
     SmProp *list = &prop;
+    ob_debug_type(OB_DEBUG_SM, "Setting user: %s\n", user);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -223,7 +227,7 @@ static void session_setup_user()
 
 static void session_setup_restart_style(gboolean restart)
 {
-    char restart_hint = restart ? SmRestartImmediately : SmRestartIfRunning;
+    gchar restart_hint = restart ? SmRestartImmediately : SmRestartIfRunning;
 
     SmPropValue vals = {
         .value = &restart_hint,
@@ -236,6 +240,7 @@ static void session_setup_restart_style(gboolean restart)
         .vals = &vals
     };
     SmProp *list = &prop;
+    ob_debug_type(OB_DEBUG_SM, "Setting restart: %d\n", restart);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -256,6 +261,7 @@ static void session_setup_pid()
         .vals = &vals
     };
     SmProp *list = &prop;
+    ob_debug_type(OB_DEBUG_SM, "Setting pid: %s\n", pid);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -278,6 +284,7 @@ static void session_setup_priority()
         .vals = &vals
     };
     SmProp *list = &prop;
+    ob_debug_type(OB_DEBUG_SM, "Setting priority: %d\n", priority);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -294,13 +301,15 @@ static void session_setup_clone_command()
         .num_vals = sm_argc,
         .vals = vals
     };
+    SmProp *list = &prop;
 
+    ob_debug_type(OB_DEBUG_SM, "Setting clone command: (%d)\n", sm_argc);
     for (i = 0; i < sm_argc; ++i) {
         vals[i].value = sm_argv[i];
         vals[i].length = strlen(sm_argv[i]) + 1;
+        ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i].value);
     }
 
-    SmProp *list = &prop;
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -318,23 +327,29 @@ static void session_setup_restart_command()
         .num_vals = sm_argc + 4,
         .vals = vals
     };
+    SmProp *list = &prop;
 
+    ob_debug_type(OB_DEBUG_SM, "Setting restart command: (%d)\n", sm_argc+4);
     for (i = 0; i < sm_argc; ++i) {
         vals[i].value = sm_argv[i];
         vals[i].length = strlen(sm_argv[i]) + 1;
+        ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i].value);
     }
 
-    vals[i].value = g_strdup("--sm-save-file");
-    vals[i].length = strlen("--sm-save-file") + 1;
-    vals[i+1].value = ob_sm_save_file;
-    vals[i+1].length = strlen(ob_sm_save_file) + 1;
+    vals[i].value = g_strdup("--sm-client-id");
+    vals[i].length = strlen("--sm-client-id") + 1;
+    vals[i+1].value = ob_sm_id;
+    vals[i+1].length = strlen(ob_sm_id) + 1;
+    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i].value);
+    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+1].value);
 
-    vals[i+2].value = g_strdup("--sm-client-id");
-    vals[i+2].length = strlen("--sm-client-id") + 1;
-    vals[i+3].value = ob_sm_id;
-    vals[i+3].length = strlen(ob_sm_id) + 1;
+    vals[i+2].value = g_strdup("--sm-save-file");
+    vals[i+2].length = strlen("--sm-save-file") + 1;
+    vals[i+3].value = ob_sm_save_file;
+    vals[i+3].length = strlen(ob_sm_save_file) + 1;
+    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+2].value);
+    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+3].value);
 
-    SmProp *list = &prop;
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);

@@ -641,6 +641,11 @@ void screen_desktop_popup(guint d, gboolean show)
         a = screen_physical_area_monitor(0);
         pager_popup_position(desktop_cycle_popup, CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
+        pager_popup_icon_size_multiplier(desktop_cycle_popup,
+                                         screen_desktop_layout.columns /
+                                         screen_desktop_layout.rows,
+                                         screen_desktop_layout.rows/
+                                         screen_desktop_layout.columns);
         pager_popup_max_width(desktop_cycle_popup,
                               MAX(a->width/3, POPUP_WIDTH));
         pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
@@ -650,13 +655,15 @@ void screen_desktop_popup(guint d, gboolean show)
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel)
 {
-    guint d, r, c;
-
-    d = screen_desktop;
+    guint r, c;
+    static guint d = (guint)-1;
+    guint ret;
 
     if ((cancel || done) && dialog)
         goto show_cycle_dialog;
 
+    if (d == (guint)-1)
+        d = screen_desktop;
     get_row_col(d, &r, &c);
 
     if (linear) {
@@ -772,7 +779,12 @@ show_cycle_dialog:
         screen_desktop_popup(d, TRUE);
     } else
         screen_desktop_popup(0, FALSE);
-    return d;
+    ret = d;
+
+    if (!dialog || cancel || done)
+        d = (guint)-1;
+
+    return ret;
 }
 
 void screen_update_layout()

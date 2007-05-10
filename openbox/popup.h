@@ -49,6 +49,8 @@ struct _ObPopup
     gint h;
     gint minw;
     gint maxw;
+    guint iconwm; /* icon width multiplier. multiplied by the normal width */
+    guint iconhm; /* icon height multiplier. multipled by the normal height */
     gboolean mapped;
     gboolean delay_mapped;
  
@@ -120,6 +122,7 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
 #define icon_popup_text_width_to_strings(p, s, n) \
     popup_text_width_to_strings((p)->popup,(s),(n))
 #define icon_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
+void icon_popup_icon_size_multiplier(ObIconPopup *self, guint wm, guint hm);
 
 ObPagerPopup *pager_popup_new();
 void pager_popup_free(ObPagerPopup *self);
@@ -138,5 +141,6 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
 #define pager_popup_text_width_to_strings(p, s, n) \
     popup_text_width_to_strings((p)->popup,(s),(n))
 #define pager_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
+void pager_popup_icon_size_multiplier(ObPagerPopup *self, guint wm, guint hm);
 
 #endif

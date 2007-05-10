@@ -39,6 +39,7 @@ ObPopup *popup_new()
     self->x = self->y = self->textw = self->h = 0;
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
     self->a_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
+    self->iconwm = self->iconhm = 1;
 
     attrib.override_redirect = True;
     self->bg = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
@@ -172,7 +173,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         h = self->h;
         texth = h - emptyy;
     } else
-        h = texth + emptyy;
+        h = texth * self->iconhm + emptyy;
 
     if (self->textw)
         textw = self->textw;
@@ -182,7 +183,8 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
     emptyx = l + r + ob_rr_theme->paddingx * 2;
     if (self->hasicon) {
-        iconw = iconh = texth;
+        iconw = texth * self->iconwm;
+        iconh = texth * self->iconhm;
         textx += iconw + ob_rr_theme->paddingx;
         if (textw)
             emptyx += ob_rr_theme->paddingx; /* between the icon and text */
@@ -320,6 +322,12 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
         self->a_icon->texture[0].type = RR_TEXTURE_NONE;
 
     popup_delay_show(self->popup, usec, text);
+}
+
+void icon_popup_icon_size_multiplier(ObIconPopup *self, guint wm, guint hm)
+{
+    if (wm != 0) self->popup->iconwm = wm;
+    if (hm != 0) self->popup->iconhm = hm;
 }
 
 static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
@@ -491,4 +499,10 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
     self->curdesk = desk;
 
     popup_delay_show(self->popup, usec, text);
+}
+
+void pager_popup_icon_size_multiplier(ObPagerPopup *self, guint wm, guint hm)
+{
+    if (wm != 0) self->popup->iconwm = wm;
+    if (hm != 0) self->popup->iconhm = hm;
 }

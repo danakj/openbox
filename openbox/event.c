@@ -593,7 +593,7 @@ static void event_process(const XEvent *ec, gpointer data)
         }
     }
     else if (e->type == ConfigureRequest) {
-        /* unhandled config5Aure requests must be used to configure the
+        /* unhandled configure requests must be used to configure the
            window directly */
         XWindowChanges xwc;
 

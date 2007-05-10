@@ -426,7 +426,7 @@ void stacking_add_nonintrusive(ObWindow *win)
         }
     }
     if (!it_below) {
-        if (client == focus_client) {
+        if (client_search_transient(client, focus_client)) {
             /* it's focused so put it at the top */
             stacking_list = g_list_append(stacking_list, win);
             stacking_raise(win);

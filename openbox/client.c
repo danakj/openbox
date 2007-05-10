@@ -282,7 +282,6 @@ void client_manage(Window window)
 
     /* non-zero defaults */
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
-    self->layer = -1;
     self->desktop = screen_num_desktops; /* always an invalid value */
     self->user_time = focus_client ? focus_client->user_time : CurrentTime;
 
@@ -294,8 +293,6 @@ void client_manage(Window window)
     client_restore_session_state(self);
 
     client_setup_decor_and_functions(self);
-
-    client_calc_layer(self);
 
     {
         Time t = sn_app_started(self->startup_id, self->class);
@@ -324,7 +321,8 @@ void client_manage(Window window)
 
     grab_server(FALSE);
 
-    stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
+    /* do this to add ourselves to the stacking list in a non-intrusive way */
+    client_calc_layer(self);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
@@ -2298,7 +2296,7 @@ static ObStackingLayer calc_layer(ObClient *self)
 }
 
 static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
-                                        ObStackingLayer min, gboolean raised)
+                                        ObStackingLayer min)
 {
     ObStackingLayer old, own;
     GSList *it;
@@ -2307,28 +2305,14 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
     own = calc_layer(self);
     self->layer = MAX(own, min);
 
+    if (self->layer != old) {
+        stacking_remove(CLIENT_AS_WINDOW(self));
+        stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
+    }
+
     for (it = self->transients; it; it = g_slist_next(it))
         client_calc_layer_recursive(it->data, orig,
-                                    self->layer,
-                                    raised ? raised : self->layer > old);
-
-    /* restack. but only if the original window is managed.
-
-       raised is used so that only the bottom-most window in the stacking
-       order is raised, the others will automatically come with it.
-
-       also only the highest windows in the stacking order (no transients)
-       are lowered, cuz the rest come for free
-    */
-    if (!raised && orig->frame) {
-        if (self->layer > old) {
-            stacking_remove(CLIENT_AS_WINDOW(self));
-            stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
-        } else if (self->layer < old && self->transients == NULL) {
-            stacking_remove(CLIENT_AS_WINDOW(self));
-            stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
-        }
-    }
+                                    self->layer);
 }
 
 void client_calc_layer(ObClient *self)
@@ -2342,7 +2326,7 @@ void client_calc_layer(ObClient *self)
     it = client_search_all_top_parents(self);
 
     for (; it; it = g_slist_next(it))
-        client_calc_layer_recursive(it->data, orig, 0, FALSE);
+        client_calc_layer_recursive(it->data, orig, 0);
 }
 
 gboolean client_should_show(ObClient *self)

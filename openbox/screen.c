@@ -643,9 +643,9 @@ void screen_desktop_popup(guint d, gboolean show)
                              a->x + a->width / 2, a->y + a->height / 2);
         pager_popup_icon_size_multiplier(desktop_cycle_popup,
                                          screen_desktop_layout.columns /
-                                         screen_desktop_layout.rows,
+                                         screen_desktop_layout.rows / 2,
                                          screen_desktop_layout.rows/
-                                         screen_desktop_layout.columns);
+                                         screen_desktop_layout.columns / 2);
         pager_popup_max_width(desktop_cycle_popup,
                               MAX(a->width/3, POPUP_WIDTH));
         pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);

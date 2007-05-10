@@ -659,11 +659,12 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
     static guint d = (guint)-1;
     guint ret;
 
+    if (d == (guint)-1)
+        d = screen_desktop;
+
     if ((cancel || done) && dialog)
         goto show_cycle_dialog;
 
-    if (d == (guint)-1)
-        d = screen_desktop;
     get_row_col(d, &r, &c);
 
     if (linear) {

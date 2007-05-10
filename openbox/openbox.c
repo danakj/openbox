@@ -139,9 +139,9 @@ gint main(gint argc, gchar **argv)
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
-        ob_exit_with_error("Failed to open the display.");
+        ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
-        ob_exit_with_error("Failed to set display as close-on-exec.");
+        ob_exit_with_error("Failed to set display as close-on-exec");
 
     if (remote_control) {
         prop_startup();
@@ -170,7 +170,7 @@ gint main(gint argc, gchar **argv)
 
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
     if (ob_rr_inst == NULL)
-        ob_exit_with_error("Failed to initialize the render library.");
+        ob_exit_with_error(_("Failed to initialize the render library."));
 
     XSynchronize(ob_display, xsync);
 
@@ -262,7 +262,7 @@ gint main(gint argc, gchar **argv)
                     ob_rr_theme = theme;
                 }
                 if (ob_rr_theme == NULL)
-                    ob_exit_with_error("Unable to load a theme.");
+                    ob_exit_with_error(_("Unable to load a theme."));
             }
 
             if (reconfigure) {
@@ -565,7 +565,7 @@ static void parse_args(gint *argc, gchar **argv)
         else {
             /* this is a memleak.. oh well.. heh */
             gchar *err = g_strdup_printf
-                ("Invalid command line argument '%s'\n", argv[i]);
+                (_("Invalid command line argument '%s'\n"), argv[i]);
             ob_exit_with_error(err);
         }
     }
@@ -585,7 +585,7 @@ static Cursor load_cursor(const gchar *name, guint fontval)
 
 void ob_exit_with_error(const gchar *msg)
 {
-    g_critical(msg);
+    g_message(msg);
     session_shutdown(TRUE);
     exit(EXIT_FAILURE);
 }

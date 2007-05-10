@@ -2,8 +2,7 @@
 
 <openbox_menu xmlns="http://openbox.org/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://openbox.org/
-                file://@xsddir@/menu.xsd">
+        xsi:schemaLocation="http://openbox.org/">
 
 <menu id="games-menu" label="Games">
   <item label="Crack-Attack">

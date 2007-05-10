@@ -1,5 +1,5 @@
 #!/bin/sh
 
 # Run KDE with Openbox as its window manager
-export KDEWM=openbox-kde
+export KDEWM="@bindir@/openbox"
 exec startkde "$@"

@@ -32,9 +32,7 @@ bin_PROGRAMS = \
 
 bin_SCRIPTS = \
 	data/xsession/openbox-gnome-session \
-	data/xsession/openbox-kde-session \
-	data/xsession/openbox-gnome \
-	data/xsession/openbox-kde
+	data/xsession/openbox-kde-session
 
 noinst_PROGRAMS = \
 	tools/themetoxml/themetoxml
@@ -377,19 +375,23 @@ nodist_rc_DATA = \
 
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
-	-e 's!@xsddir\@!$(xsddir)!'
+	-e 's!@bindir\@!$(bindir)!'
 
-data/rc.xml: Makefile $(srcdir)/data/rc.xml.in data
+data/xsession/openbox-gnome-session: Makefile data \
+		$(srcdir)/data/xsession/openbox-gnome-session.in
 	@echo make: creating $@
 	@rm -f $@
 	@mkdir data 2>/dev/null || true
-	@$(edit) $(srcdir)/data/rc.xml.in >$@
+	@$(edit) $(srcdir)/data/xsession/openbox-gnome-session.in >$@
+	@chmod +x $@
 
-data/menu.xml: Makefile $(srcdir)/data/menu.xml.in data
+data/xsession/openbox-kde-session: Makefile data \
+		$(srcdir)/data/xsession/openbox-kde-session.in
 	@echo make: creating $@
 	@rm -f $@
 	@mkdir data 2>/dev/null || true
-	@$(edit) $(srcdir)/data/menu.xml.in >$@
+	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
+	@chmod +x $@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop \
@@ -406,8 +408,8 @@ dist_noinst_DATA = \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/themerc.xsd \
-	data/rc.xml.in \
-	data/menu.xml.in \
+	data/xsession/openbox-gnome-session.in \
+	data/xsession/openbox-kde-session.in \
 	render/obrender-3.0.pc.in \
 	parser/obparser-3.0.pc.in \
 	tools/themeupdate/themeupdate.py \

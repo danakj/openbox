@@ -326,8 +326,9 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
 
 void icon_popup_icon_size_multiplier(ObIconPopup *self, guint wm, guint hm)
 {
-    if (wm != 0) self->popup->iconwm = wm;
-    if (hm != 0) self->popup->iconhm = hm;
+    /* cap them at 1 */
+    self->popup->iconwm = MAX(1, wm);
+    self->popup->iconhm = MAX(1, hm);
 }
 
 static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
@@ -503,6 +504,7 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
 
 void pager_popup_icon_size_multiplier(ObPagerPopup *self, guint wm, guint hm)
 {
-    if (wm != 0) self->popup->iconwm = wm;
-    if (hm != 0) self->popup->iconhm = hm;
+    /* cap them at 1 */
+    self->popup->iconwm = MAX(1, wm);
+    self->popup->iconhm = MAX(1, hm);
 }

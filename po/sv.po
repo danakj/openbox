@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-08 00:55+0200\n"
+"POT-Creation-Date: 2007-05-10 01:37-0400\n"
 "PO-Revision-Date: 2007-05-06 13:44+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -39,80 +39,80 @@ msgstr "Lyckades inte konvertera sökvägen '%s' från utf8"
 msgid "Go there..."
 msgstr "Gå dit"
 
-#: openbox/client_list_combined_menu.c:147
+#: openbox/client_list_combined_menu.c:148
 msgid "Windows"
 msgstr "Fönster"
 
-#: openbox/client_list_menu.c:198
+#: openbox/client_list_menu.c:199
 msgid "Desktops"
 msgstr "Skrivbord"
 
-#: openbox/client_menu.c:143
+#: openbox/client_menu.c:241
 msgid "All desktops"
 msgstr "Alla skrivbord"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:346
 msgid "&Layer"
 msgstr "&Lager"
 
-#: openbox/client_menu.c:247
+#: openbox/client_menu.c:351
 msgid "Always on &top"
 msgstr "Alltid ö&verst"
 
-#: openbox/client_menu.c:252
+#: openbox/client_menu.c:352
 msgid "&Normal"
 msgstr "&Normal"
 
-#: openbox/client_menu.c:257
+#: openbox/client_menu.c:353
 msgid "Always on &bottom"
 msgstr "Alltid &underst"
 
-#: openbox/client_menu.c:260
+#: openbox/client_menu.c:356
 msgid "&Send to desktop"
 msgstr "&Skicka till"
 
-#: openbox/client_menu.c:264
+#: openbox/client_menu.c:360
 msgid "Client menu"
 msgstr "Klientmeny"
 
-#: openbox/client_menu.c:272
+#: openbox/client_menu.c:366
 msgid "R&estore"
 msgstr "Åt&erställ"
 
-#: openbox/client_menu.c:282
+#: openbox/client_menu.c:374
 msgid "&Move"
 msgstr "&Flytta"
 
-#: openbox/client_menu.c:286
+#: openbox/client_menu.c:376
 msgid "Resi&ze"
 msgstr "Ändra s&torlek"
 
-#: openbox/client_menu.c:290
+#: openbox/client_menu.c:378
 msgid "Ico&nify"
 msgstr "Mi&nimera"
 
-#: openbox/client_menu.c:301
+#: openbox/client_menu.c:386
 msgid "Ma&ximize"
 msgstr "Ma&ximera"
 
-#: openbox/client_menu.c:311
+#: openbox/client_menu.c:394
 msgid "&Roll up/down"
 msgstr "&Rulla upp/ner"
 
-#: openbox/client_menu.c:322
+#: openbox/client_menu.c:402
 msgid "Un/&Decorate"
 msgstr "(Av)&Dekorera"
 
-#: openbox/client_menu.c:334
+#: openbox/client_menu.c:412
 msgid "&Close"
 msgstr "Stän&g"
 
-#: openbox/config.c:664
+#: openbox/config.c:668
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ogiltig knapp '%s' angiven i konfigurationsfilen"
 
-#: openbox/keyboard.c:160
+#: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt med annan tangentbindning i konfigurationsfilen"
 
@@ -140,26 +140,34 @@ msgstr "Försökte öppna menyn '%s', men den finns inte"
 msgid "More..."
 msgstr "Mer..."
 
-#: openbox/mouse.c:314 openbox/translate.c:95
+#: openbox/mouse.c:320
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr "Ogiltig knapp '%s' i musbindning"
 
-#: openbox/mouse.c:320
+#: openbox/mouse.c:326
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Ogiltig kontext '%s' i musbindning"
 
-#: openbox/openbox.c:119
+#: openbox/openbox.c:124
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Kunde inte gå till hemkatalogen '%s': %s"
 
-#: openbox/openbox.c:174
+#: openbox/openbox.c:142
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr ""
+
+#: openbox/openbox.c:173
+msgid "Failed to initialize the render library."
+msgstr ""
+
+#: openbox/openbox.c:179
 msgid "X server does not support locale."
 msgstr "X-servern stödjer inte lokalisering."
 
-#: openbox/openbox.c:176
+#: openbox/openbox.c:181
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 
@@ -167,20 +175,24 @@ msgstr ""
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "Kunde inte hitta en giltig konfiguration, använder standardvärden"
 
-#: openbox/openbox.c:376
+#: openbox/openbox.c:265
+msgid "Unable to load a theme."
+msgstr ""
+
+#: openbox/openbox.c:378
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Restart misslyckades att starta nytt program '%s': %s"
 
-#: openbox/openbox.c:445 openbox/openbox.c:447
+#: openbox/openbox.c:447 openbox/openbox.c:449
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:456
+#: openbox/openbox.c:458
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [alternativ]\n"
 
-#: openbox/openbox.c:457
+#: openbox/openbox.c:459
 msgid ""
 "\n"
 "Options:\n"
@@ -188,28 +200,28 @@ msgstr ""
 "\n"
 "Alternativ:\n"
 
-#: openbox/openbox.c:458
+#: openbox/openbox.c:460
 msgid "  --config TYPE       Specify the configuration profile to use\n"
 msgstr ""
 "  --config TYP        Ange vilken konfigurationsprofil som ska användas\n"
 
-#: openbox/openbox.c:460
+#: openbox/openbox.c:462
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Avaktivera anslutning till sessions-hanteraren\n"
 
-#: openbox/openbox.c:462
+#: openbox/openbox.c:464
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Ersätt den befintliga fönsterhanteraren\n"
 
-#: openbox/openbox.c:463
+#: openbox/openbox.c:465
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Visa den här hjälpen och avsluta\n"
 
-#: openbox/openbox.c:464
+#: openbox/openbox.c:466
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Visa versionen och avsluta\n"
 
-#: openbox/openbox.c:465
+#: openbox/openbox.c:467
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -217,11 +229,11 @@ msgstr ""
 "\n"
 "Skicka meddelanden till en exekverande instans av Openbox:\n"
 
-#: openbox/openbox.c:466
+#: openbox/openbox.c:468
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ladda om Openbox konfiguration\n"
 
-#: openbox/openbox.c:467
+#: openbox/openbox.c:469
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -229,19 +241,19 @@ msgstr ""
 "\n"
 "Debug-alternativ:\n"
 
-#: openbox/openbox.c:468
+#: openbox/openbox.c:470
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Kör i synkroniserat läge\n"
 
-#: openbox/openbox.c:469
+#: openbox/openbox.c:471
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Visa debuginformation\n"
 
-#: openbox/openbox.c:470
+#: openbox/openbox.c:472
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Visa debuginformation för fokushantering\n"
 
-#: openbox/openbox.c:471
+#: openbox/openbox.c:473
 #, c-format
 msgid ""
 "\n"
@@ -250,9 +262,14 @@ msgstr ""
 "\n"
 "Rapportera buggar till %s\n"
 
-#: openbox/openbox.c:519
+#: openbox/openbox.c:531
 msgid "--config requires an argument\n"
 msgstr "--config kräver ett argument\n"
+
+#: openbox/openbox.c:568
+#, fuzzy, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr "Ogiltig utdata från pipe-menyn '%s'"
 
 #: openbox/screen.c:85 openbox/screen.c:186
 #, c-format
@@ -274,12 +291,12 @@ msgstr "Fönsterhanteraren på skärm %d avslutar inte"
 msgid "Unable to make directory '%s': %s"
 msgstr "Kunde inte skapa katalogen '%s': %s"
 
-#: openbox/session.c:426
+#: openbox/session.c:442
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Kunde inte spara sessionen till '%s': %s"
 
-#: openbox/session.c:534
+#: openbox/session.c:550
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Fel inträffade när sessionen skulle sparas till '%s': %s"
@@ -294,17 +311,17 @@ msgstr "Kör %s\n"
 msgid "Invalid modifier key '%s' in key/mouse binding"
 msgstr "Ogiltig modifikationstangent '%s' i tangent/musbindning"
 
-#: openbox/translate.c:137
+#: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
 msgstr "Ogiltig tangentkod '%s' i tantentbindning"
 
-#: openbox/translate.c:144
+#: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
 msgstr "Ogiltigt tangentnamn '%s' i tangentbindning"
 
-#: openbox/translate.c:150
+#: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
 msgstr "Efterfrågad tangent '%s' finns inte på displayen"

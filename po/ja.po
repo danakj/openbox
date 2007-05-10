@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-07 18:50-0400\n"
+"POT-Creation-Date: 2007-05-10 01:37-0400\n"
 "PO-Revision-Date: 2003-11-20 15:00+0900\n"
 "Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -15,97 +15,173 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:104
+#: openbox/action.c:922
+#, c-format
+msgid "Invalid action '%s' requested. No such action exists."
+msgstr ""
+
+#: openbox/action.c:925
+#, c-format
+msgid "Invalid use of action '%s'. Action will be ignored."
+msgstr ""
+
+#: openbox/action.c:1154 openbox/action.c:1172 openbox/action.c:1185
+#, fuzzy, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "ディレクトリ'%s'を作れません: %s"
+
+#: openbox/action.c:1193
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_menu.c:198
+#: openbox/client_list_combined_menu.c:148
+msgid "Windows"
+msgstr ""
+
+#: openbox/client_list_menu.c:199
 msgid "Desktops"
 msgstr "デスクトップ"
 
-#: openbox/client_menu.c:149
+#: openbox/client_menu.c:241
 msgid "All desktops"
 msgstr "すべてのデスクトップ(&A)"
 
-#: openbox/client_menu.c:247
+#: openbox/client_menu.c:346
 #, fuzzy
 msgid "&Layer"
 msgstr "レイヤー(&L)"
 
-#: openbox/client_menu.c:253
+#: openbox/client_menu.c:351
 #, fuzzy
 msgid "Always on &top"
 msgstr "常に最上位にする(&T)"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:352
 #, fuzzy
 msgid "&Normal"
 msgstr "ノーマル(&N)"
 
-#: openbox/client_menu.c:263
+#: openbox/client_menu.c:353
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "常に最下位にする(&B)"
 
-#: openbox/client_menu.c:266
+#: openbox/client_menu.c:356
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "デスクトップに送る(&S)"
 
-#: openbox/client_menu.c:270
+#: openbox/client_menu.c:360
 msgid "Client menu"
 msgstr "クライアントメニュー"
 
-#: openbox/client_menu.c:278
+#: openbox/client_menu.c:366
 #, fuzzy
 msgid "R&estore"
 msgstr "リストア(&E)"
 
-#: openbox/client_menu.c:288
+#: openbox/client_menu.c:374
 #, fuzzy
 msgid "&Move"
 msgstr "移動(&M)"
 
-#: openbox/client_menu.c:292
+#: openbox/client_menu.c:376
 #, fuzzy
 msgid "Resi&ze"
 msgstr "リサイズ(&Z)"
 
-#: openbox/client_menu.c:296
+#: openbox/client_menu.c:378
 #, fuzzy
 msgid "Ico&nify"
 msgstr "アイコン化(&N)"
 
-#: openbox/client_menu.c:307
+#: openbox/client_menu.c:386
 #, fuzzy
 msgid "Ma&ximize"
 msgstr "最大化(&E)"
 
-#: openbox/client_menu.c:317
+#: openbox/client_menu.c:394
 #, fuzzy
 msgid "&Roll up/down"
 msgstr "ロールダウン(&R)"
 
-#: openbox/client_menu.c:328
+#: openbox/client_menu.c:402
 #, fuzzy
 msgid "Un/&Decorate"
 msgstr "装飾(&D)"
 
-#: openbox/client_menu.c:340
+#: openbox/client_menu.c:412
 #, fuzzy
 msgid "&Close"
 msgstr "閉じる(&C)"
 
-#: openbox/openbox.c:119
+#: openbox/config.c:668
+#, c-format
+msgid "Invalid button '%s' specified in config file"
+msgstr ""
+
+#: openbox/keyboard.c:162
+msgid "Conflict with key binding in config file"
+msgstr ""
+
+#: openbox/menu.c:98 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file '%s'"
+msgstr ""
+
+#: openbox/menu.c:149
+#, c-format
+msgid "Failed to execute command for pipe-menu '%s': %s"
+msgstr ""
+
+#: openbox/menu.c:166
+#, c-format
+msgid "Invalid output from pipe-menu '%s'"
+msgstr ""
+
+#: openbox/menu.c:179
+#, c-format
+msgid "Attempted to access menu '%s' but it does not exist"
+msgstr ""
+
+#: openbox/menu.c:331 openbox/menu.c:332
+#, fuzzy
+msgid "More..."
+msgstr "移動する..."
+
+#: openbox/mouse.c:320
+#, c-format
+msgid "Invalid button '%s' in mouse binding"
+msgstr ""
+
+#: openbox/mouse.c:326
+#, c-format
+msgid "Invalid context '%s' in mouse binding"
+msgstr ""
+
+#: openbox/openbox.c:124
 #, fuzzy, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "ディレクトリ'%s'を作れません: %s"
 
-#: openbox/openbox.c:174
+#: openbox/openbox.c:142
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr ""
+
+#: openbox/openbox.c:173
+msgid "Failed to initialize the render library."
+msgstr ""
+
+#: openbox/openbox.c:179
 msgid "X server does not support locale."
 msgstr ""
 
-#: openbox/openbox.c:176
+#: openbox/openbox.c:181
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 
@@ -113,98 +189,152 @@ msgstr ""
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
-#: openbox/openbox.c:376
+#: openbox/openbox.c:265
+msgid "Unable to load a theme."
+msgstr ""
+
+#: openbox/openbox.c:378
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:445 openbox/openbox.c:447
+#: openbox/openbox.c:447 openbox/openbox.c:449
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:456
+#: openbox/openbox.c:458
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:457
+#: openbox/openbox.c:459
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 
-#: openbox/openbox.c:458
+#: openbox/openbox.c:460
 msgid "  --config TYPE       Specify the configuration profile to use\n"
 msgstr ""
 
-#: openbox/openbox.c:460
+#: openbox/openbox.c:462
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:462
+#: openbox/openbox.c:464
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:463
+#: openbox/openbox.c:465
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:464
-msgid "  --version           Display the version and exit\n"
-msgstr ""
-
-#: openbox/openbox.c:465
-msgid ""
-"\n"
-"Passing messages to a running Openbox instance:\n"
-msgstr ""
-
 #: openbox/openbox.c:466
-msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgid "  --version           Display the version and exit\n"
 msgstr ""
 
 #: openbox/openbox.c:467
 msgid ""
 "\n"
-"Debugging options:\n"
+"Passing messages to a running Openbox instance:\n"
 msgstr ""
 
 #: openbox/openbox.c:468
-msgid "  --sync              Run in synchronous mode\n"
+msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
 #: openbox/openbox.c:469
-msgid "  --debug             Display debugging output\n"
+msgid ""
+"\n"
+"Debugging options:\n"
 msgstr ""
 
 #: openbox/openbox.c:470
-msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
 #: openbox/openbox.c:471
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:472
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+
+#: openbox/openbox.c:473
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:519
+#: openbox/openbox.c:531
 #, fuzzy
 msgid "--config requires an argument\n"
 msgstr "--sm-save-file には引数が必要です\n"
+
+#: openbox/openbox.c:568
+#, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr ""
+
+#: openbox/screen.c:85 openbox/screen.c:186
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr ""
+
+#: openbox/screen.c:122
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr ""
+
+#: openbox/screen.c:143
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr ""
 
 #: openbox/session.c:100
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "ディレクトリ'%s'を作れません: %s"
 
-#: openbox/session.c:426
+#: openbox/session.c:442
 #, fuzzy, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "ディレクトリ'%s'を作れません: %s"
 
-#: openbox/session.c:534
+#: openbox/session.c:550
 #, c-format
 msgid "Error while saving the session to '%s': %s"
+msgstr ""
+
+#: openbox/startupnotify.c:240
+#, c-format
+msgid "Running %s\n"
+msgstr ""
+
+#: openbox/translate.c:58
+#, c-format
+msgid "Invalid modifier key '%s' in key/mouse binding"
+msgstr ""
+
+#: openbox/translate.c:135
+#, c-format
+msgid "Invalid key code '%s' in key binding"
+msgstr ""
+
+#: openbox/translate.c:142
+#, c-format
+msgid "Invalid key name '%s' in key binding"
+msgstr ""
+
+#: openbox/translate.c:148
+#, c-format
+msgid "Requested key '%s' does not exist on the display"
+msgstr ""
+
+#: openbox/xerror.c:39
+#, c-format
+msgid "X Error: %s"
 msgstr ""
 
 #, fuzzy

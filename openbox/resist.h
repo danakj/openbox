@@ -23,7 +23,13 @@ struct _ObClient;
 
 #include <glib.h>
 
+/*! @x The client's x destination (in the client's coordinates, not the frame's
+    @y The client's y destination (in the client's coordinates, not the frame's
+*/
 void resist_move_windows(struct _ObClient *c, gint resist, gint *x, gint *y);
+/*! @x The client's x destination (in the client's coordinates, not the frame's
+    @y The client's y destination (in the client's coordinates, not the frame's
+*/
 void resist_move_monitors(struct _ObClient *c, gint resist, gint *x, gint *y);
 void resist_size_windows(struct _ObClient *c, gint resist, gint *w, gint *h,
                          ObCorner corn);

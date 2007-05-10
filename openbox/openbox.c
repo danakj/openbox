@@ -477,7 +477,7 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 {
     gint i;
 
-    for (i = index; i < index + num; ++i)
+    for (i = index; i < *argc - num; ++i)
         argv[i] = argv[i+num];
     for (; i < *argc; ++i)
         argv[i] = NULL;
@@ -492,31 +492,41 @@ static void parse_args(gint *argc, gchar **argv)
         if (!strcmp(argv[i], "--version")) {
             print_version();
             exit(0);
-        } else if (!strcmp(argv[i], "--help")) {
+        }
+        else if (!strcmp(argv[i], "--help")) {
             print_help();
             exit(0);
-        } else if (!strcmp(argv[i], "--g-fatal-warnings")) {
+        }
+        else if (!strcmp(argv[i], "--g-fatal-warnings")) {
             g_log_set_always_fatal(G_LOG_LEVEL_CRITICAL);
-        } else if (!strcmp(argv[i], "--replace")) {
+        }
+        else if (!strcmp(argv[i], "--replace")) {
             ob_replace_wm = TRUE;
-        } else if (!strcmp(argv[i], "--sync")) {
+            remove_args(argc, argv, i, 1);
+            --i; /* this arg was removed so go back */
+        }
+        else if (!strcmp(argv[i], "--sync")) {
             xsync = TRUE;
-        } else if (!strcmp(argv[i], "--debug")) {
+        }
+        else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
             ob_debug_enable(OB_DEBUG_SM, TRUE);
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
-        } else if (!strcmp(argv[i], "--debug-focus")) {
+        }
+        else if (!strcmp(argv[i], "--debug-focus")) {
             ob_debug_show_output(TRUE);
             ob_debug_enable(OB_DEBUG_SM, TRUE);
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
-        } else if (!strcmp(argv[i], "--reconfigure")) {
+        }
+        else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;
 /* don't make this do anything if it's not in --help ..
         } else if (!strcmp(argv[i], "--restart")) {
             remote_control = 2;
 */
-        } else if (!strcmp(argv[i], "--config")) {
+        }
+        else if (!strcmp(argv[i], "--config")) {
             if (i == *argc - 1) /* no args left */
                 g_printerr(_("--config requires an argument\n"));
             else {
@@ -533,8 +543,11 @@ static void parse_args(gint *argc, gchar **argv)
                 ob_sm_save_file = g_strdup(argv[i+1]);
                 remove_args(argc, argv, i, 2);
                 --i; /* this arg was removed so go back */
+                ob_debug_type(OB_DEBUG_SM, "--sm-save-file %s\n",
+                              ob_sm_save_file);
             }
-        } else if (!strcmp(argv[i], "--sm-client-id")) {
+        }
+        else if (!strcmp(argv[i], "--sm-client-id")) {
             if (i == *argc - 1) /* no args left */
                 /* not translated cuz it's sekret */
                 g_printerr("--sm-client-id requires an argument\n");
@@ -542,21 +555,14 @@ static void parse_args(gint *argc, gchar **argv)
                 ob_sm_id = g_strdup(argv[i+1]);
                 remove_args(argc, argv, i, 2);
                 --i; /* this arg was removed so go back */
+                ob_debug_type(OB_DEBUG_SM, "--sm-client-id %s\n", ob_sm_id);
             }
-        } else if (!strcmp(argv[i], "--sm-disable")) {
+        }
+        else if (!strcmp(argv[i], "--sm-disable")) {
             ob_sm_use = FALSE;
         }
 #endif
-        else if (!strcmp(argv[i], "--restart-binary")) {
-            if (i == *argc - 1) /* no args left */
-                /* not translated cuz it's sekret */
-                g_printerr("--restart-binary requires an argument\n");
-            else {
-                argv[0] = g_strdup(argv[i+1]);
-                remove_args(argc, argv, i, 2);
-                --i; /* this arg was removed so go back */
-            }
-        } else {
+        else {
             /* this is a memleak.. oh well.. heh */
             gchar *err = g_strdup_printf
                 ("Invalid command line argument '%s'\n", argv[i]);

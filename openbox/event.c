@@ -1019,22 +1019,20 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 
         if (e->xconfigurerequest.value_mask & CWStackMode) {
-            switch (e->xconfigurerequest.detail) {
-            case Below:
-            case BottomIf:
-                /* Apps are so rude. And this is totally disconnected from
-                   activation/focus. Bleh. */
-                /*client_lower(client);*/
-                break;
+            ObClient *sibling = NULL;
 
-            case Above:
-            case TopIf:
-            default:
-                /* Apps are so rude. And this is totally disconnected from
-                   activation/focus. Bleh. */
-                /*client_raise(client);*/
-                break;
+            /* get the sibling */
+            if (e->xconfigurerequest.value_mask & CWSibling) {
+                ObWindow *win;
+                win = g_hash_table_lookup(window_map,
+                                          &e->xconfigurerequest.above);
+                if (WINDOW_IS_CLIENT(win) && WINDOW_AS_CLIENT(win) != client)
+                    sibling = WINDOW_AS_CLIENT(win);
             }
+
+            /* activate it rather than just focus it */
+            stacking_restack_request(client, sibling,
+                                     e->xconfigurerequest.detail, TRUE);
         }
         break;
     case UnmapNotify:
@@ -1211,6 +1209,43 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_convert_gravity(client, grav, &x, &y, w, h);
             client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
+        } else if (msgtype == prop_atoms.net_restack_window) {
+            if (e->xclient.data.l[0] != 2) {
+                ob_debug_type(OB_DEBUG_APP_BUGS,
+                              "_NET_RESTACK_WINDOW sent for window %s with "
+                              "invalid source indication %ld\n",
+                              client->title, e->xclient.data.l[0]);
+            } else {
+                ObClient *sibling = NULL;
+                if (e->xclient.data.l[1]) {
+                    ObWindow *win = g_hash_table_lookup(window_map,
+                                                        &e->xclient.data.l[1]);
+                    if (WINDOW_IS_CLIENT(win) &&
+                        WINDOW_AS_CLIENT(win) != client)
+                    {
+                        sibling = WINDOW_AS_CLIENT(win);
+                    }
+                    if (sibling == NULL)
+                        ob_debug_type(OB_DEBUG_APP_BUGS,
+                                      "_NET_RESTACK_WINDOW sent for window %s "
+                                      "with invalid sibling 0x%x\n",
+                                 client->title, e->xclient.data.l[1]);
+                }
+                if (e->xclient.data.l[2] == Below ||
+                    e->xclient.data.l[2] == BottomIf ||
+                    e->xclient.data.l[2] == Above ||
+                    e->xclient.data.l[2] == TopIf ||
+                    e->xclient.data.l[2] == Opposite)
+                {
+                    /* just raise, don't activate */
+                    stacking_restack_request(client, sibling,
+                                             e->xclient.data.l[2], FALSE);
+                } else
+                    ob_debug_type(OB_DEBUG_APP_BUGS,
+                                  "_NET_RESTACK_WINDOW sent for window %s "
+                                  "with invalid detail %d\n",
+                                  client->title, e->xclient.data.l[2]);
+            }
         }
         break;
     case PropertyNotify:
@@ -1601,7 +1636,7 @@ static gboolean focus_delay_func(gpointer data)
     event_curtime = d->time;
     if (focus_client != d->client) {
         if (client_focus(d->client) && config_focus_raise)
-            client_raise(d->client);
+            stacking_raise(CLIENT_AS_WINDOW(d->client));
     }
     event_curtime = old;
     return FALSE; /* no repeat */

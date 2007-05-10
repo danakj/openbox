@@ -193,8 +193,8 @@ void mouse_event(ObClient *client, XEvent *e)
 
         px = e->xbutton.x_root;
         py = e->xbutton.y_root;
-        if (pwx == -1) pwx = e->xbutton.x;
-        if (pwy == -1) pwy = e->xbutton.y;
+        if (!button) pwx = e->xbutton.x;
+        if (!button) pwy = e->xbutton.y;
         button = e->xbutton.button;
         state = e->xbutton.state;
 
@@ -216,7 +216,8 @@ void mouse_event(ObClient *client, XEvent *e)
         context = frame_context(client, e->xbutton.window, pwx, pwy);
         context = mouse_button_frame_context(context, e->xbutton.button);
 
-        pwx = pwy = -1;
+        if (e->xbutton.button == button)
+            pwx = pwy = -1;
 
         if (e->xbutton.button == button) {
             /* clicks are only valid if its released over the window */
@@ -258,7 +259,8 @@ void mouse_event(ObClient *client, XEvent *e)
         fire_binding(OB_MOUSE_ACTION_RELEASE, context,
                      client, e->xbutton.state,
                      e->xbutton.button,
-                     e->xbutton.x_root, e->xbutton.y_root,
+                     e->xbutton.x_root,
+                     e->xbutton.y_root,
                      e->xbutton.time);
         if (click)
             fire_binding(OB_MOUSE_ACTION_CLICK, context,
@@ -281,10 +283,8 @@ void mouse_event(ObClient *client, XEvent *e)
             context = frame_context(client, e->xmotion.window, pwx, pwy);
             context = mouse_button_frame_context(context, button);
 
-            if (ABS(e->xmotion.x_root - px) >=
-                config_mouse_threshold ||
-                ABS(e->xmotion.y_root - py) >=
-                config_mouse_threshold) {
+            if (ABS(e->xmotion.x_root - px) >= config_mouse_threshold ||
+                ABS(e->xmotion.y_root - py) >= config_mouse_threshold) {
 
                 /* You can't drag on buttons */
                 if (context == OB_FRAME_CONTEXT_MAXIMIZE ||

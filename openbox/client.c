@@ -451,7 +451,7 @@ void client_manage(Window window)
            raised to the top. Legacy begets legacy I guess?
         */
         if (!client_restore_session_stacking(self))
-            client_raise(self);
+            stacking_raise(CLIENT_AS_WINDOW(self));
     }
 
     /* this has to happen before we try focus the window, but we want it to
@@ -2344,13 +2344,25 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
     for (it = self->transients; it; it = g_slist_next(it))
         client_calc_layer_recursive(it->data, orig,
                                     self->layer,
-                                    raised ? raised : self->layer != old);
+                                    raised ? raised : self->layer > old);
 
-    if (!raised && self->layer != old)
-        if (orig->frame) { /* only restack if the original window is managed */
+    /* restack. but only if the original window is managed.
+
+       raised is used so that only the bottom-most window in the stacking
+       order is raised, the others will automatically come with it.
+
+       also only the highest windows in the stacking order (no transients)
+       are lowered, cuz the rest come for free
+    */
+    if (!raised && orig->frame) {
+        if (self->layer > old) {
             stacking_remove(CLIENT_AS_WINDOW(self));
-            stacking_add(CLIENT_AS_WINDOW(self));
+            stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
+        } else if (self->layer < old && self->transients == NULL) {
+            stacking_remove(CLIENT_AS_WINDOW(self));
+            stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
         }
+    }
 }
 
 void client_calc_layer(ObClient *self)
@@ -3077,7 +3089,7 @@ void client_set_desktop_recursive(ObClient *self,
             client_showhide(self);
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL)
-            client_raise(self);
+            stacking_raise(CLIENT_AS_WINDOW(self));
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
     }
@@ -3302,7 +3314,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         self->modal = modal;
         /* when a window changes modality, then its stacking order with its
            transients needs to change */
-        client_raise(self);
+        stacking_raise(CLIENT_AS_WINDOW(self));
     }
     if (iconic != self->iconic)
         client_iconify(self, iconic, FALSE);
@@ -3444,17 +3456,10 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
         return;
     if (self->shaded)
         client_shade(self, FALSE);
+    if (raise)
+        stacking_raise(CLIENT_AS_WINDOW(self));
 
     client_focus(self);
-
-    if (raise) {
-        /* we do this as an action here. this is rather important. this is
-           because we want the results from the focus change to take place 
-           BEFORE we go about raising the window. when a fullscreen window 
-           loses focus, we need this or else the raise wont be able to raise 
-           above the to-lose-focus fullscreen window. */
-        client_raise(self);
-    }
 }
 
 void client_activate(ObClient *self, gboolean here, gboolean user)
@@ -3508,16 +3513,6 @@ static void client_bring_helper_windows_recursive(ObClient *self,
 void client_bring_helper_windows(ObClient *self)
 {
     client_bring_helper_windows_recursive(self, self->desktop);
-}
-
-void client_raise(ObClient *self)
-{
-    action_run_string("Raise", self, CurrentTime);
-}
-
-void client_lower(ObClient *self)
-{
-    action_run_string("Lower", self, CurrentTime);
 }
 
 gboolean client_focused(ObClient *self)

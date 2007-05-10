@@ -25,6 +25,7 @@
 #include "group.h"
 #include "frame.h"
 #include "window.h"
+#include "debug.h"
 
 GList  *stacking_list = NULL;
 
@@ -416,7 +417,7 @@ void stacking_add_nonintrusive(ObWindow *win)
     /* insert above its highest parent (or its highest child !) */
     it_below = find_highest_relative(client);
 
-    if (!it_below) {
+    if (!it_below && client != focus_client) {
         /* nothing to put it directly above, so try find the focused client to
            put it underneath it */
         if (focus_client && focus_client->layer == client->layer) {
@@ -425,10 +426,16 @@ void stacking_add_nonintrusive(ObWindow *win)
         }
     }
     if (!it_below) {
-        /* there is no window to put this directly above, so put it at the
-           bottom */
-        stacking_list = g_list_prepend(stacking_list, win);
-        stacking_lower(win);
+        if (client == focus_client) {
+            /* it's focused so put it at the top */
+            stacking_list = g_list_append(stacking_list, win);
+            stacking_raise(win);
+        } else {
+            /* there is no window to put this directly above, so put it at the
+               bottom */
+            stacking_list = g_list_prepend(stacking_list, win);
+            stacking_lower(win);
+        }
     } else {
         /* make sure it's not in the wrong layer though ! */
         for (; it_below; it_below = g_list_next(it_below))
@@ -451,5 +458,143 @@ void stacking_add_nonintrusive(ObWindow *win)
         GList *wins = g_list_append(NULL, win);
         do_restack(wins, it_below);
         g_list_free(wins);
+    }
+}
+
+/*! Returns TRUE if client is occluded by the sibling. If sibling is NULL it
+  tries against all other clients.
+*/
+static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
+{
+    GList *it;
+    gboolean occluded = FALSE;
+    gboolean found = FALSE;
+
+    /* no need for any looping in this case */
+    if (sibling && client->layer != sibling->layer)
+        return occluded;
+
+    for (it = stacking_list; it;
+         it = (found ? g_list_previous(it) :g_list_next(it)))
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = it->data;
+            if (found) {
+                if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
+                {
+                    if (sibling != NULL) {
+                        if (c == sibling) {
+                            occluded = TRUE;
+                            break;
+                        }
+                    }
+                    else if (c->layer == client->layer) {
+                        occluded = TRUE;
+                        break;
+                    }
+                    else if (c->layer > client->layer)
+                        break; /* we past its layer */
+                }
+            }
+            else if (c == client)
+                found = TRUE;
+        }
+    return occluded;
+}
+
+/*! Returns TRUE if client is occludes the sibling. If sibling is NULL it tries
+  against all other clients.
+*/
+static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
+{
+    GList *it;
+    gboolean occludes = FALSE;
+    gboolean found = FALSE;
+
+    /* no need for any looping in this case */
+    if (sibling && client->layer != sibling->layer)
+        return occludes;
+
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = it->data;
+            if (found) {
+                if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
+                {
+                    if (sibling != NULL) {
+                        if (c == sibling) {
+                            occludes = TRUE;
+                            break;
+                        }
+                    }
+                    else if (c->layer == client->layer) {
+                        occludes = TRUE;
+                        break;
+                    }
+                    else if (c->layer > client->layer)
+                        break; /* we past its layer */
+                }
+            }
+            else if (c == client)
+                found = TRUE;
+        }
+    return occludes;
+}
+
+void stacking_restack_request(ObClient *client, ObClient *sibling,
+                              gint detail, gboolean activate)
+{
+    switch (detail) {
+    case Below:
+        ob_debug("Restack request Below for client %s sibling %s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        /* just lower it */
+        stacking_lower(CLIENT_AS_WINDOW(client));
+        break;
+    case BottomIf:
+        ob_debug("Restack request BottomIf for client %s sibling "
+                 "%s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        /* if this client occludes sibling (or anything if NULL), then
+           lower it to the bottom */
+        if (stacking_occludes(client, sibling))
+            stacking_lower(CLIENT_AS_WINDOW(client));
+        break;
+    case Above:
+        ob_debug("Restack request Above for client %s sibling %s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        if (activate)
+            /* use user=TRUE because it is impossible to get a timestamp
+               for this */
+            client_activate(client, FALSE, TRUE);
+        else
+            stacking_raise(CLIENT_AS_WINDOW(client));
+        break;
+    case TopIf:
+        ob_debug("Restack request TopIf for client %s sibling %s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        if (stacking_occluded(client, sibling)) {
+            if (activate)
+                /* use user=TRUE because it is impossible to get a timestamp
+                   for this */
+                client_activate(client, FALSE, TRUE);
+            else
+                stacking_raise(CLIENT_AS_WINDOW(client));
+        }
+        break;
+    case Opposite:
+        ob_debug("Restack request Opposite for client %s sibling "
+                 "%s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        if (stacking_occluded(client, sibling)) {
+            if (activate)
+                /* use user=TRUE because it is impossible to get a timestamp
+                   for this */
+                client_activate(client, FALSE, TRUE);
+            else
+                stacking_raise(CLIENT_AS_WINDOW(client));
+        }
+        else if (stacking_occludes(client, sibling))
+            stacking_lower(CLIENT_AS_WINDOW(client));
+        break;
     }
 }

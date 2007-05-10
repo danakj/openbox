@@ -364,6 +364,7 @@ data/xsession/openbox-gnome-session: Makefile data \
 	@echo make: creating $@
 	@rm -f $@
 	@mkdir data 2>/dev/null || true
+	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $(srcdir)/data/xsession/openbox-gnome-session.in >$@
 	@chmod +x $@
 
@@ -372,6 +373,7 @@ data/xsession/openbox-kde-session: Makefile data \
 	@echo make: creating $@
 	@rm -f $@
 	@mkdir data 2>/dev/null || true
+	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
 	@chmod +x $@
 

@@ -73,7 +73,6 @@ static void client_get_session_ids(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
-static void client_get_layer(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_colormap(ObClient *self);
@@ -1004,6 +1003,7 @@ static void client_get_all(ObClient *self, gboolean real)
        from per-app settings */
     client_get_session_ids(self);
 
+    /* now we got everything that can affect the decorations */
     if (!real)
         return;
 
@@ -1018,9 +1018,6 @@ static void client_get_all(ObClient *self, gboolean real)
     client_get_desktop(self);/* uses transient data/group/startup id if a
                                 desktop is not specified */
     client_get_shaped(self);
-
-    client_get_layer(self); /* if layer hasn't been specified, get it from
-                               other sources if possible */
 
     {
         /* a couple type-based defaults for new windows */
@@ -1105,41 +1102,6 @@ static void client_get_desktop(ObClient *self)
             } else
                 /* defaults to the current desktop */
                 self->desktop = screen_desktop;
-        }
-    }
-}
-
-static void client_get_layer(ObClient *self)
-{
-    if (!(self->above || self->below)) {
-        if (self->group) {
-            /* apply stuff from the group */
-            GSList *it;
-            gint layer = -2;
-
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
-                if (c != self && !client_search_transient(self, c) &&
-                    client_normal(self) && client_normal(c))
-                {
-                    layer = MAX(layer,
-                                (c->above ? 1 : (c->below ? -1 : 0)));
-                }
-            }
-            switch (layer) {
-            case -1:
-                self->below = TRUE;
-                break;
-            case -2:
-            case 0:
-                break;
-            case 1:
-                self->above = TRUE;
-                break;
-            default:
-                g_assert_not_reached();
-                break;
-            }
         }
     }
 }

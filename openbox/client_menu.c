@@ -114,7 +114,7 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         menu_frame_hide_all();
         f = NULL; /* and don't update */
 
-        client_iconify(c, TRUE, FALSE);
+        client_iconify(c, TRUE, FALSE, FALSE);
         break;
     case CLIENT_RESTORE:
         client_maximize(c, FALSE, 0);

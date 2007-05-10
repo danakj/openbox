@@ -906,7 +906,7 @@ void screen_update_desktop_names()
                                       screen_num_desktops);
 }
 
-void screen_show_desktop(gboolean show, gboolean restore_focus)
+void screen_show_desktop(gboolean show, ObClient *show_only)
 {
     GList *it;
      
@@ -915,19 +915,25 @@ void screen_show_desktop(gboolean show, gboolean restore_focus)
     screen_showing_desktop = show;
 
     if (show) {
-        /* bottom to top */
+        /* hide windows bottom to top */
         for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
                 client_showhide(client);
             }
         }
-    } else {
-        /* top to bottom */
+    }
+    else {
+        /* restore windows top to bottom */
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
-                client_showhide(client);
+                if (client_should_show(client)) {
+                    if (!show_only || client == show_only)
+                        client_show(client);
+                    else
+                        client_iconify(client, TRUE, FALSE, TRUE);
+                }
             }
         }
     }
@@ -941,7 +947,8 @@ void screen_show_desktop(gboolean show, gboolean restore_focus)
                 client_focus(it->data))
                 break;
         }
-    } else if (restore_focus) {
+    }
+    else if (!show_only) {
         ObClient *c;
 
         /* use NULL for the "old" argument because the desktop was focused

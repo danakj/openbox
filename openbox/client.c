@@ -1694,7 +1694,7 @@ static void client_change_allowed_actions(ObClient *self)
         else self->shaded = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
-        if (self->frame) client_iconify(self, FALSE, TRUE);
+        if (self->frame) client_iconify(self, FALSE, TRUE, FALSE);
         else self->iconic = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
@@ -2432,7 +2432,7 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
 
     if (self->iconic) {
         self->iconic = FALSE;
-        client_iconify(self, TRUE, FALSE);
+        client_iconify(self, TRUE, FALSE, TRUE);
     }
     if (self->fullscreen) {
         self->fullscreen = FALSE;
@@ -2807,7 +2807,8 @@ void client_fullscreen(ObClient *self, gboolean fs)
 }
 
 static void client_iconify_recursive(ObClient *self,
-                                     gboolean iconic, gboolean curdesk)
+                                     gboolean iconic, gboolean curdesk,
+                                     gboolean hide_animation)
 {
     GSList *it;
     gboolean changed = FALSE;
@@ -2847,7 +2848,7 @@ static void client_iconify_recursive(ObClient *self,
 
     if (changed) {
         client_change_state(self);
-        if (ob_state() != OB_STATE_STARTING && config_animate_iconify)
+        if (config_animate_iconify && !hide_animation)
             frame_begin_iconify_animation(self->frame, iconic);
         /* do this after starting the animation so it doesn't flash */
         client_showhide(self);
@@ -2858,15 +2859,17 @@ static void client_iconify_recursive(ObClient *self,
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
             if (client_is_direct_child(self, it->data) || !iconic)
-                client_iconify_recursive(it->data, iconic, curdesk);
+                client_iconify_recursive(it->data, iconic, curdesk,
+                                         hide_animation);
 }
 
-void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
+void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
+                    gboolean hide_animation)
 {
     if (self->functions & OB_CLIENT_FUNC_ICONIFY || !iconic) {
         /* move up the transient chain as far as possible first */
         self = client_search_top_normal_parent(self);
-        client_iconify_recursive(self, iconic, curdesk);
+        client_iconify_recursive(self, iconic, curdesk, hide_animation);
     }
 }
 
@@ -3100,10 +3103,10 @@ void client_set_wm_state(ObClient *self, glong state)
   
     switch (state) {
     case IconicState:
-        client_iconify(self, TRUE, TRUE);
+        client_iconify(self, TRUE, TRUE, FALSE);
         break;
     case NormalState:
-        client_iconify(self, FALSE, TRUE);
+        client_iconify(self, FALSE, TRUE, FALSE);
         break;
     }
 }
@@ -3267,7 +3270,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         stacking_raise(CLIENT_AS_WINDOW(self));
     }
     if (iconic != self->iconic)
-        client_iconify(self, iconic, FALSE);
+        client_iconify(self, iconic, FALSE, FALSE);
 
     if (demands_attention != self->demands_attention)
         client_hilite(self, demands_attention);
@@ -3390,9 +3393,9 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
     event_halt_focus_delay();
 
     if (client_normal(self) && screen_showing_desktop)
-        screen_show_desktop(FALSE, FALSE);
+        screen_show_desktop(FALSE, self);
     if (self->iconic)
-        client_iconify(self, FALSE, here);
+        client_iconify(self, FALSE, here, FALSE);
     if (self->desktop != DESKTOP_ALL &&
         self->desktop != screen_desktop)
     {

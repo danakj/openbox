@@ -75,8 +75,12 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
 void screen_desktop_popup(guint d, gboolean show);
 
 /*! Shows and focuses the desktop and hides all the client windows, or
-  returns to the normal state, showing client windows. */
-void screen_show_desktop(gboolean show, gboolean restore_focus);
+  returns to the normal state, showing client windows.
+  @param If show_only is non-NULL, then only that client is shown (assuming
+         show is FALSE (restoring from show-desktop mode), and the rest are
+         iconified.
+*/
+void screen_show_desktop(gboolean show, struct _ObClient *show_only);
 
 /*! Updates the desktop layout from the root property if available */
 void screen_update_layout();

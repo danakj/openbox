@@ -1245,7 +1245,7 @@ void action_unfocus (union ActionData *data)
 void action_iconify(union ActionData *data)
 {
     client_action_start(data);
-    client_iconify(data->client.any.c, TRUE, TRUE);
+    client_iconify(data->client.any.c, TRUE, TRUE, FALSE);
     client_action_end(data);
 }
 
@@ -1906,17 +1906,17 @@ void action_toggle_dockautohide(union ActionData *data)
 
 void action_toggle_show_desktop(union ActionData *data)
 {
-    screen_show_desktop(!screen_showing_desktop, TRUE);
+    screen_show_desktop(!screen_showing_desktop, NULL);
 }
 
 void action_show_desktop(union ActionData *data)
 {
-    screen_show_desktop(TRUE, TRUE);
+    screen_show_desktop(TRUE, NULL);
 }
 
 void action_unshow_desktop(union ActionData *data)
 {
-    screen_show_desktop(FALSE, TRUE);
+    screen_show_desktop(FALSE, NULL);
 }
 
 void action_break_chroot(union ActionData *data)

@@ -660,7 +660,7 @@ static void event_handle_root(XEvent *e)
             if (d > 0)
                 screen_set_num_desktops(d);
         } else if (msgtype == prop_atoms.net_showing_desktop) {
-            screen_show_desktop(e->xclient.data.l[0] != 0, TRUE);
+            screen_show_desktop(e->xclient.data.l[0] != 0, NULL);
         } else if (msgtype == prop_atoms.openbox_control) {
             if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();

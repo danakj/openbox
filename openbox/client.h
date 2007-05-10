@@ -458,7 +458,8 @@ void client_fullscreen(ObClient *self, gboolean fs);
                  be uniconified to the current viewable desktop (true) or to
                  its previous desktop (false)
 */
-void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk);
+void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
+                    gboolean hide_animation);
 
 /*! Maximize or unmaximize the client window
   @param max true if the window should be maximized; false if it should be

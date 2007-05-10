@@ -506,11 +506,10 @@ ObClient *client_fake_manage(Window window)
     settings = client_get_settings_state(self);
 
     client_setup_decor_and_functions(self);
-    /* adjust the decorations so we know the sizes */
-    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
-    /* create the decoration frame for the client window */
+    /* create the decoration frame for the client window and adjust its size */
     self->frame = frame_new(self);
+    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
     return self;
 }
 

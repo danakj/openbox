@@ -25,6 +25,7 @@
 #include "group.h"
 #include "frame.h"
 #include "window.h"
+#include "debug.h"
 
 GList  *stacking_list = NULL;
 
@@ -491,4 +492,47 @@ gboolean stacking_occluded(ObClient *client, ObClient *sibling)
                 found = TRUE;
         }
     return obscured;
+}
+
+void stacking_restack_request(ObClient *client, ObClient *sibling,
+                              gint detail)
+{
+    switch (detail) {
+    case Below:
+        ob_debug("Restack request Below for client %s sibling %s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        /* just lower it */
+        stacking_lower(CLIENT_AS_WINDOW(client));
+        break;
+    case BottomIf:
+        ob_debug("Restack request BottomIf for client %s sibling "
+                 "%s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        /* if this client occludes sibling (or anything if NULL), then
+           lower it to the bottom */
+        if (stacking_occluded(sibling, client))
+            stacking_lower(CLIENT_AS_WINDOW(client));
+        break;
+    case Above:
+        ob_debug("Restack request Above for client %s sibling %s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        /* activate it rather than just focus it */
+        client_activate(client, FALSE, FALSE);
+        break;
+    case TopIf:
+        ob_debug("Restack request TopIf for client %s sibling %s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        if (stacking_occluded(client, sibling))
+            /* activate it rather than just focus it */
+            client_activate(client, FALSE, FALSE);
+    case Opposite:
+        ob_debug("Restack request Opposite for client %s sibling "
+                 "%s\n",
+                 client->title, sibling ? sibling->title : "(all)");
+        if (stacking_occluded(client, sibling))
+            /* activate it rather than just focus it */
+            client_activate(client, FALSE, FALSE);
+        else if (stacking_occluded(sibling, client))
+            stacking_lower(CLIENT_AS_WINDOW(client));
+    }
 }

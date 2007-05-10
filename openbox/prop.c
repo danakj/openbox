@@ -75,6 +75,8 @@ void prop_startup()
     CREATE(net_close_window, "_NET_CLOSE_WINDOW");
     CREATE(net_wm_moveresize, "_NET_WM_MOVERESIZE");
     CREATE(net_moveresize_window, "_NET_MOVERESIZE_WINDOW");
+    CREATE(net_request_frame_extents, "_NET_REQUEST_FRAME_EXTENTS");
+    CREATE(net_restack_window, "_NET_RESTACK_WINDOW");
 
     CREATE(net_startup_id, "_NET_STARTUP_ID");
 
@@ -95,7 +97,6 @@ void prop_startup()
     CREATE(net_wm_user_time_window, "_NET_WM_USER_TIME_WINDOW");
     CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
-    CREATE(net_request_frame_extents, "_NET_REQUEST_FRAME_EXTENTS");
 
 /*   CREATE(net_wm_ping, "_NET_WM_PING"); */
 #ifdef SYNC

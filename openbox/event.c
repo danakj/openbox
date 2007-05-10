@@ -1026,50 +1026,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 ObWindow *win;
                 win = g_hash_table_lookup(window_map,
                                           &e->xconfigurerequest.above);
-                if (WINDOW_IS_CLIENT(win))
+                if (WINDOW_IS_CLIENT(win) && WINDOW_AS_CLIENT(win) != client)
                     sibling = WINDOW_AS_CLIENT(win);
             }
 
-            switch (e->xconfigurerequest.detail) {
-            case Below:
-                ob_debug("ConfigureRequest Below for client %s sibling %s\n",
-                         client->title, sibling ? sibling->title : "(all)");
-                /* just lower it */
-                stacking_lower(CLIENT_AS_WINDOW(client));
-                break;
-            case BottomIf:
-                ob_debug("ConfigureRequest BottomIf for client %s sibling "
-                         "%s\n",
-                         client->title, sibling ? sibling->title : "(all)");
-                /* if this client occludes sibling (or anything if NULL), then
-                   lower it to the bottom */
-                if (stacking_occluded(sibling, client))
-                    stacking_lower(CLIENT_AS_WINDOW(client));
-                break;
-            case Above:
-                ob_debug("ConfigureRequest Above for client %s sibling %s\n",
-                         client->title, sibling ? sibling->title : "(all)");
-                /* activate it rather than just focus it */
-                client_activate(client, FALSE, FALSE);
-                break;
-            case TopIf:
-                ob_debug("ConfigureRequest TopIf for client %s sibling %s\n",
-                         client->title, sibling ? sibling->title : "(all)");
-                if (stacking_occluded(client, sibling))
-                    /* activate it rather than just focus it */
-                    client_activate(client, FALSE, FALSE);
-            case Opposite:
-                ob_debug("ConfigureRequest Opposite for client %s sibling "
-                         "%s\n",
-                         client->title, sibling ? sibling->title : "(all)");
-                if (stacking_occluded(client, sibling))
-                    /* activate it rather than just focus it */
-                    client_activate(client, FALSE, FALSE);
-                else if (stacking_occluded(sibling, client))
-                    stacking_lower(CLIENT_AS_WINDOW(client));
-            default:
-                break;
-            }
+            stacking_restack_request(client, sibling,
+                                     e->xconfigurerequest.detail);
         }
         break;
     case UnmapNotify:
@@ -1246,6 +1208,41 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_convert_gravity(client, grav, &x, &y, w, h);
             client_find_onscreen(client, &x, &y, w, h, FALSE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
+        } else if (msgtype == prop_atoms.net_restack_window) {
+            if (e->xclient.data.l[0] != 2) {
+                ob_debug_type(OB_DEBUG_APP_BUGS,
+                              "_NET_RESTACK_WINDOW sent for window %s with "
+                              "invalid source indication %ld\n",
+                              client->title, e->xclient.data.l[0]);
+            } else {
+                ObClient *sibling = NULL;
+                if (e->xclient.data.l[1]) {
+                    ObWindow *win = g_hash_table_lookup(window_map,
+                                                        &e->xclient.data.l[1]);
+                    if (WINDOW_IS_CLIENT(win) &&
+                        WINDOW_AS_CLIENT(win) != client)
+                    {
+                        sibling = WINDOW_AS_CLIENT(win);
+                    }
+                    if (sibling == NULL)
+                        ob_debug_type(OB_DEBUG_APP_BUGS,
+                                      "_NET_RESTACK_WINDOW sent for window %s "
+                                      "with invalid sibling 0x%x\n",
+                                 client->title, e->xclient.data.l[1]);
+                }
+                if (e->xclient.data.l[2] == Below ||
+                    e->xclient.data.l[2] == BottomIf ||
+                    e->xclient.data.l[2] == Above ||
+                    e->xclient.data.l[2] == TopIf ||
+                    e->xclient.data.l[2] == Opposite)
+                {
+                    stacking_restack_request(client, sibling,
+                                             e->xclient.data.l[2]);
+                }
+                ob_debug_type(OB_DEBUG_APP_BUGS, "_NET_RESTACK_WINDOW sent "
+                              "for window %s with invalid detail 0d\n",
+                              client->title, e->xclient.data.l[2]);
+            }
         }
         break;
     case PropertyNotify:

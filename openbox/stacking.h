@@ -64,4 +64,16 @@ void stacking_below(ObWindow *window, ObWindow *below);
 */
 gboolean stacking_occluded(struct _ObClient *client,struct _ObClient *sibling);
 
+/*! Restack a window based upon a sibling (or all windows) in various ways.
+  @param client The client to be restacked
+  @param sibling Another client to compare to, or NULL to compare to all
+                 windows
+  @param detail One of Above, Below, TopIf, BottomIf, Opposite
+  See http://tronche.com/gui/x/xlib/window/configure.html for details on
+  how each detail works with and without a sibling.
+*/
+void stacking_restack_request(struct _ObClient *client,
+                              struct _ObClient *sibling,
+                              gint detail);
+
 #endif

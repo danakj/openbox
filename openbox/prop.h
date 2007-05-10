@@ -108,6 +108,8 @@ typedef struct Atoms {
     Atom net_close_window;
     Atom net_wm_moveresize;
     Atom net_moveresize_window;
+    Atom net_request_frame_extents;
+    Atom net_restack_window;
 
     /* helpful hints to apps that aren't used for anything */
     Atom net_wm_full_placement;
@@ -132,7 +134,6 @@ typedef struct Atoms {
     Atom net_wm_user_time;
     Atom net_wm_user_time_window;
     Atom net_frame_extents;
-    Atom net_request_frame_extents;
 
     /* application protocols */
 /*  Atom net_wm_ping; */

@@ -1545,6 +1545,9 @@ void action_desktop_dir(union ActionData *data)
                              data->desktopdir.inter.any.interactive,
                              data->desktopdir.inter.final,
                              data->desktopdir.inter.cancel);
+    /* only move the desktop when the action is complete. if we switch
+       desktops during the interactive action, focus will move but with
+       NotifyWhileGrabbed and applications don't like that. */
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {
@@ -1564,6 +1567,9 @@ void action_send_to_desktop_dir(union ActionData *data)
                              data->sendtodir.inter.any.interactive,
                              data->sendtodir.inter.final,
                              data->sendtodir.inter.cancel);
+    /* only move the desktop when the action is complete. if we switch
+       desktops during the interactive action, focus will move but with
+       NotifyWhileGrabbed and applications don't like that. */
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {

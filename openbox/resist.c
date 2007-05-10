@@ -36,6 +36,8 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 
     if (!resist) return;
 
+    frame_client_gravity(c->frame, x, y, c->area.width, c->area.height);
+
     w = c->frame->area.width;
     h = c->frame->area.height;
 
@@ -112,6 +114,8 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 
         if (snapx && snapy) break;
     }
+
+    frame_frame_gravity(c->frame, x, y, c->area.width, c->area.height);
 }
 
 void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
@@ -125,6 +129,8 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     gint w, h; /* current size */
 
     if (!resist) return;
+
+    frame_client_gravity(c->frame, x, y, c->area.width, c->area.height);
 
     w = c->frame->area.width;
     h = c->frame->area.height;
@@ -173,6 +179,8 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
         else if (cb <= pb && b > pb && b < pb + resist)
             *y = pb - h + 1;
     }
+
+    frame_frame_gravity(c->frame, x, y, c->area.width, c->area.height);
 }
 
 void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,

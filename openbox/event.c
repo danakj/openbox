@@ -1030,8 +1030,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     sibling = WINDOW_AS_CLIENT(win);
             }
 
+            /* activate it rather than just focus it */
             stacking_restack_request(client, sibling,
-                                     e->xconfigurerequest.detail);
+                                     e->xconfigurerequest.detail, TRUE);
         }
         break;
     case UnmapNotify:
@@ -1236,12 +1237,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     e->xclient.data.l[2] == TopIf ||
                     e->xclient.data.l[2] == Opposite)
                 {
+                    /* just raise, don't activate */
                     stacking_restack_request(client, sibling,
-                                             e->xclient.data.l[2]);
-                }
-                ob_debug_type(OB_DEBUG_APP_BUGS, "_NET_RESTACK_WINDOW sent "
-                              "for window %s with invalid detail 0d\n",
-                              client->title, e->xclient.data.l[2]);
+                                             e->xclient.data.l[2], FALSE);
+                } else
+                    ob_debug_type(OB_DEBUG_APP_BUGS,
+                                  "_NET_RESTACK_WINDOW sent for window %s "
+                                  "with invalid detail %d\n",
+                                  client->title, e->xclient.data.l[2]);
             }
         }
         break;

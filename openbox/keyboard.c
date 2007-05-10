@@ -195,14 +195,15 @@ static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
 
     g_assert(istate.active);
 
+    /* ungrab first so they won't be NotifyWhileGrabbed */
+    if (ungrab)
+        grab_keyboard(FALSE);
+
     alist = g_slist_append(NULL, istate.action);
     action_run_interactive(alist, istate.client, state, time, cancel, TRUE);
     g_slist_free(alist);
 
     istate.active = FALSE;
-
-    if (ungrab)
-        grab_keyboard(FALSE);
 }
 
 static void keyboard_interactive_end_client(ObClient *client, gpointer data)

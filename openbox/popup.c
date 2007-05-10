@@ -177,7 +177,6 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         textw = self->textw;
 
     iconx = textx = l + ob_rr_theme->paddingx;
-    icony = texty = t + ob_rr_theme->paddingy;
 
     emptyx = l + r + ob_rr_theme->paddingx * 2;
     if (self->hasicon) {
@@ -188,6 +187,9 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
             emptyx += ob_rr_theme->paddingx; /* between the icon and text */
     } else
         iconw = 0;
+
+    texty = (h - texth - emptyy) / 2 + t + ob_rr_theme->paddingy;
+    icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->paddingy;
 
     w = textw + emptyx + iconw;
     /* cap it at maxw/minw */

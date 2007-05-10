@@ -530,7 +530,7 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
                         occludes = TRUE;
                         break;
                     }
-                    else if (c->layer > client->layer)
+                    else if (c->layer < client->layer)
                         break; /* we past its layer */
                 }
             }

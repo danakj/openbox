@@ -728,7 +728,7 @@ void menu_frame_render(ObMenuFrame *self)
             if (e->entry->data.separator.label != NULL) {
                 e->a_text_title->texture[0].data.text.string =
                     e->entry->data.separator.label;
-                tw = RrMinWidth(text_a);
+                tw = RrMinWidth(e->a_text_title);
                 tw = MIN(tw, MAX_MENU_WIDTH);
                 th = ob_rr_theme->menu_title_height +
                     (ob_rr_theme->mbwidth - PADDING) *2;

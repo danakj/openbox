@@ -294,6 +294,8 @@ void client_manage(Window window)
     /* the session should get the last say */
     client_restore_session_state(self);
 
+    client_setup_decor_and_functions(self);
+
     client_calc_layer(self);
 
     {
@@ -502,6 +504,10 @@ ObClient *client_fake_manage(Window window)
     /* per-app settings override stuff, and return the settings for other
        uses too */
     settings = client_get_settings_state(self);
+
+    client_setup_decor_and_functions(self);
+    /* adjust the decorations so we know the sizes */
+    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
@@ -993,51 +999,50 @@ static void client_get_all(ObClient *self, gboolean real)
     /* this can change the mwmhints for special cases */
     client_get_type_and_transientness(self);
     client_get_state(self);
-    client_update_protocols(self);
     client_update_normal_hints(self);
 
-    /* got the type, the mwmhints, the protocols, and the normal hints
-       (min/max sizes), so we're ready to set up the decorations/functions */
-    client_setup_decor_and_functions(self);
+    /* get the session related properties, these can change decorations
+       from per-app settings */
+    client_get_session_ids(self);
 
-    if (real) {
-        client_update_wmhints(self);
-        /* this may have already been called from client_update_wmhints */
-        if (self->transient_for == NULL)
-            client_update_transient_for(self);
+    if (!real)
+        return;
 
-        client_get_startup_id(self);
-        client_get_desktop(self);/* uses transient data/group/startup id if a
-                                    desktop is not specified */
-        client_get_shaped(self);
+    client_update_protocols(self);
 
-        client_get_layer(self); /* if layer hasn't been specified, get it from
-                                   other sources if possible */
+    client_update_wmhints(self);
+    /* this may have already been called from client_update_wmhints */
+    if (self->transient_for == NULL)
+        client_update_transient_for(self);
 
-        {
-            /* a couple type-based defaults for new windows */
+    client_get_startup_id(self);
+    client_get_desktop(self);/* uses transient data/group/startup id if a
+                                desktop is not specified */
+    client_get_shaped(self);
 
-            /* this makes sure that these windows appear on all desktops */
-            if (self->type == OB_CLIENT_TYPE_DESKTOP)
-                self->desktop = DESKTOP_ALL;
-        }
+    client_get_layer(self); /* if layer hasn't been specified, get it from
+                               other sources if possible */
+
+    {
+        /* a couple type-based defaults for new windows */
+
+        /* this makes sure that these windows appear on all desktops */
+        if (self->type == OB_CLIENT_TYPE_DESKTOP)
+            self->desktop = DESKTOP_ALL;
+    }
   
 #ifdef SYNC
-        client_update_sync_request_counter(self);
+    client_update_sync_request_counter(self);
 #endif
 
-        /* get the session related properties */
-        client_get_session_ids(self);
-
-        client_get_colormap(self);
-        client_update_title(self);
-        client_update_strut(self);
-        client_update_icons(self);
-        client_update_user_time_window(self);
-        if (!self->user_time_window) /* check if this would have been called */
-            client_update_user_time(self);
-        client_update_icon_geometry(self);
-    }
+    client_get_colormap(self);
+    client_update_title(self);
+    client_update_strut(self);
+    client_update_icons(self);
+    client_update_user_time_window(self);
+    if (!self->user_time_window) /* check if this would have been called */
+        client_update_user_time(self);
+    client_update_icon_geometry(self);
 }
 
 static void client_get_startup_id(ObClient *self)

@@ -577,9 +577,6 @@ static void event_process(const XEvent *ec, gpointer data)
             ObClient *c = client_fake_manage(e->xclient.window);
             gulong vals[4];
 
-            /* adjust the decorations so we know the sizes */
-            frame_adjust_area(c->frame, FALSE, TRUE, TRUE);
-
             /* set the frame extents on the window */
             vals[0] = c->frame->size.left;
             vals[1] = c->frame->size.right;

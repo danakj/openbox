@@ -59,4 +59,9 @@ void stacking_lower(ObWindow *window);
 */
 void stacking_below(ObWindow *window, ObWindow *below);
 
+/*! Returns TRUE if client is occluded by sibling. If sibling is NULL it tries
+  against all other clients. Otherwise, it returns FALSE.
+*/
+gboolean stacking_occluded(struct _ObClient *client,struct _ObClient *sibling);
+
 #endif

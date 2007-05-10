@@ -416,7 +416,7 @@ void stacking_add_nonintrusive(ObWindow *win)
     /* insert above its highest parent (or its highest child !) */
     it_below = find_highest_relative(client);
 
-    if (!it_below) {
+    if (!it_below && client != focus_client) {
         /* nothing to put it directly above, so try find the focused client to
            put it underneath it */
         if (focus_client && focus_client->layer == client->layer) {
@@ -425,10 +425,16 @@ void stacking_add_nonintrusive(ObWindow *win)
         }
     }
     if (!it_below) {
-        /* there is no window to put this directly above, so put it at the
-           bottom */
-        stacking_list = g_list_prepend(stacking_list, win);
-        stacking_lower(win);
+        if (client == focus_client) {
+            /* it's focused so put it at the top */
+            stacking_list = g_list_append(stacking_list, win);
+            stacking_raise(win);
+        } else {
+            /* there is no window to put this directly above, so put it at the
+               bottom */
+            stacking_list = g_list_prepend(stacking_list, win);
+            stacking_lower(win);
+        }
     } else {
         /* make sure it's not in the wrong layer though ! */
         for (; it_below; it_below = g_list_next(it_below))
@@ -452,4 +458,37 @@ void stacking_add_nonintrusive(ObWindow *win)
         do_restack(wins, it_below);
         g_list_free(wins);
     }
+}
+
+gboolean stacking_occluded(ObClient *client, ObClient *sibling)
+{
+    GList *it;
+    gboolean obscured = FALSE;
+    gboolean found = FALSE;
+
+    /* no need for any looping in this case */
+    if (sibling && client->layer != sibling->layer)
+        return obscured;
+
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = it->data;
+            if (found) {
+                if (sibling != NULL) {
+                    if (c == sibling) {
+                        obscured = TRUE;
+                        break;
+                    }
+                }
+                else if (c->layer == client->layer) {
+                    obscured = TRUE;
+                    break;
+                }
+                else if (c->layer > client->layer)
+                    break; /* we past its layer */
+            }
+            else if (c == client)
+                found = TRUE;
+        }
+    return obscured;
 }

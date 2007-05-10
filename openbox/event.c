@@ -1019,20 +1019,55 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 
         if (e->xconfigurerequest.value_mask & CWStackMode) {
+            ObClient *sibling = NULL;
+
+            /* get the sibling */
+            if (e->xconfigurerequest.value_mask & CWSibling) {
+                ObWindow *win;
+                win = g_hash_table_lookup(window_map,
+                                          &e->xconfigurerequest.above);
+                if (WINDOW_IS_CLIENT(win))
+                    sibling = WINDOW_AS_CLIENT(win);
+            }
+
             switch (e->xconfigurerequest.detail) {
             case Below:
-            case BottomIf:
-                /* Apps are so rude. And this is totally disconnected from
-                   activation/focus. Bleh. */
-                /*client_lower(client);*/
+                ob_debug("ConfigureRequest Below for client %s sibling %s\n",
+                         client->title, sibling ? sibling->title : "(all)");
+                /* just lower it */
+                stacking_lower(CLIENT_AS_WINDOW(client));
                 break;
-
+            case BottomIf:
+                ob_debug("ConfigureRequest BottomIf for client %s sibling "
+                         "%s\n",
+                         client->title, sibling ? sibling->title : "(all)");
+                /* if this client occludes sibling (or anything if NULL), then
+                   lower it to the bottom */
+                if (stacking_occluded(sibling, client))
+                    stacking_lower(CLIENT_AS_WINDOW(client));
+                break;
             case Above:
+                ob_debug("ConfigureRequest Above for client %s sibling %s\n",
+                         client->title, sibling ? sibling->title : "(all)");
+                /* activate it rather than just focus it */
+                client_activate(client, FALSE, FALSE);
+                break;
             case TopIf:
+                ob_debug("ConfigureRequest TopIf for client %s sibling %s\n",
+                         client->title, sibling ? sibling->title : "(all)");
+                if (stacking_occluded(client, sibling))
+                    /* activate it rather than just focus it */
+                    client_activate(client, FALSE, FALSE);
+            case Opposite:
+                ob_debug("ConfigureRequest Opposite for client %s sibling "
+                         "%s\n",
+                         client->title, sibling ? sibling->title : "(all)");
+                if (stacking_occluded(client, sibling))
+                    /* activate it rather than just focus it */
+                    client_activate(client, FALSE, FALSE);
+                else if (stacking_occluded(sibling, client))
+                    stacking_lower(CLIENT_AS_WINDOW(client));
             default:
-                /* Apps are so rude. And this is totally disconnected from
-                   activation/focus. Bleh. */
-                /*client_raise(client);*/
                 break;
             }
         }
@@ -1601,7 +1636,7 @@ static gboolean focus_delay_func(gpointer data)
     event_curtime = d->time;
     if (focus_client != d->client) {
         if (client_focus(d->client) && config_focus_raise)
-            client_raise(d->client);
+            stacking_raise(CLIENT_AS_WINDOW(d->client));
     }
     event_curtime = old;
     return FALSE; /* no repeat */

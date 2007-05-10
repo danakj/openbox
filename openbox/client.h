@@ -550,26 +550,6 @@ void client_bring_helper_windows(ObClient *self);
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);
 
-/*! Raises the client to the top of its stacking layer
-  Normally actions call to the client_* functions to make stuff go, but this
-  one is an exception. It just fires off an action, which will be queued.
-  This is because stacking order rules can be changed by focus state, and so
-  any time focus changes you have to wait for it to complete before you can
-  properly restart windows. As such, this only queues an action for later
-  execution, once the focus change has gone through.
-*/
-void client_raise(ObClient *self);
-
-/*! Lowers the client to the bottom of its stacking layer
-  Normally actions call to the client_* functions to make stuff go, but this
-  one is an exception. It just fires off an action, which will be queued.
-  This is because stacking order rules can be changed by focus state, and so
-  any time focus changes you have to wait for it to complete before you can
-  properly restart windows. As such, this only queues an action for later
-  execution, once the focus change has gone through.
-*/
-void client_lower(ObClient *self);
-
 /*! Updates the window's transient status, and any parents of it */
 void client_update_transient_for(ObClient *self);
 /*! Update the protocols that the window supports and adjusts things if they

@@ -37,7 +37,8 @@ static void measure_font(const RrInstance *inst, RrFont *f)
     static PangoLanguage *lang = NULL;
 
     if (lang == NULL) {
-#if PANGO_VERSION_CHECK(1,16,0)
+#if PANGO_VERSION_MAJOR > 1 || \
+    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
         lang = pango_language_get_default();
 #else
         gchar *locale, *p;

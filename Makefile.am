@@ -369,7 +369,7 @@ nodist_pkgconfig_DATA = \
 dist_pixmap_DATA = \
 	data/openbox.png
 
-nodist_rc_DATA = \
+dist_rc_DATA = \
 	data/rc.xml \
 	data/menu.xml
 
@@ -438,10 +438,6 @@ EXTRA_DIST = \
 	README \
 	COPYING \
 	AUTHORS
-
-CLEANFILES = \
-	data/rc.xml \
-	data/menu.xml
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

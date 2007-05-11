@@ -346,7 +346,7 @@ int main(int argc, char **argv)
         CONT3("dimensions", "window", "border", NUM(i));
         CONT3("dimensions", "menu", "border", NUM(i));
     }
-    if (read_int(db, "menu.border.width", &i))
+    if (read_int(db, "menu.border.width", &i)) 
         CONT3("dimensions", "menu", "border", NUM(i));
 
     if (read_color(db, "border.color", &i, &j, &k)) {

@@ -1123,10 +1123,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->a_toggled_focused_unpressed_shade->texture[0].data.mask.color = 
         theme->titlebut_toggled_focused_unpressed_color;
     theme->a_toggled_unfocused_unpressed_max->texture[0].data.mask.color = 
-        theme->a_toggled_unfocused_unpressed_desk->
-        texture[0].data.mask.color = 
-        theme->a_toggled_unfocused_unpressed_shade->
-        texture[0].data.mask.color = 
+        theme->a_toggled_unfocused_unpressed_desk->texture[0].data.mask.color =
+        theme->a_toggled_unfocused_unpressed_shade->texture[0].data.mask.color=
         theme->titlebut_toggled_unfocused_unpressed_color;
     theme->a_focused_unpressed_max->texture[0].data.mask.color = 
         theme->a_focused_unpressed_close->texture[0].data.mask.color = 
@@ -1260,16 +1258,22 @@ void RrThemeFree(RrTheme *theme)
 
         RrPixmapMaskFree(theme->max_mask);
         RrPixmapMaskFree(theme->max_toggled_mask);
+        RrPixmapMaskFree(theme->max_toggled_hover_mask);
+        RrPixmapMaskFree(theme->max_toggled_pressed_mask);
         RrPixmapMaskFree(theme->max_disabled_mask);
         RrPixmapMaskFree(theme->max_hover_mask);
         RrPixmapMaskFree(theme->max_pressed_mask);
         RrPixmapMaskFree(theme->desk_mask);
         RrPixmapMaskFree(theme->desk_toggled_mask);
+        RrPixmapMaskFree(theme->desk_toggled_hover_mask);
+        RrPixmapMaskFree(theme->desk_toggled_pressed_mask);
         RrPixmapMaskFree(theme->desk_disabled_mask);
         RrPixmapMaskFree(theme->desk_hover_mask);
         RrPixmapMaskFree(theme->desk_pressed_mask);
         RrPixmapMaskFree(theme->shade_mask);
         RrPixmapMaskFree(theme->shade_toggled_mask);
+        RrPixmapMaskFree(theme->shade_toggled_hover_mask);
+        RrPixmapMaskFree(theme->shade_toggled_pressed_mask);
         RrPixmapMaskFree(theme->shade_disabled_mask);
         RrPixmapMaskFree(theme->shade_hover_mask);
         RrPixmapMaskFree(theme->shade_pressed_mask);

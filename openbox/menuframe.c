@@ -89,7 +89,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 
     XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
     XSetWindowBorder(ob_display, self->window,
-                     RrColorPixel(ob_rr_theme->menu_b_color));
+                     RrColorPixel(ob_rr_theme->menu_border_color));
 
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
@@ -689,7 +689,7 @@ void menu_frame_render(ObMenuFrame *self)
         XMoveWindow(ob_display, e->window, e->area.x-e->border, e->area.y-e->border);
         XSetWindowBorderWidth(ob_display, e->window, e->border);
         XSetWindowBorder(ob_display, e->window,
-                         RrColorPixel(ob_rr_theme->menu_b_color));
+                         RrColorPixel(ob_rr_theme->menu_border_color));
 
 
         text_a = (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&

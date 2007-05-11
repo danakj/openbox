@@ -1,16 +1,25 @@
 <?xml version="1.0"?>
-<openbox_theme version="1" engine="box" xmlns="http://openbox.org/themerc">
+<openbox_theme engine="box" version="1" xmlns="http://openbox.org/themerc">
+  <about>
+    <author></author>
+    <email></email>
+    <webpage></webpage>
+    <comment></comment>
+  </about>
   <dimensions>
     <handle>3</handle>
     <padding x="2" y="2"/>
+    <window>
+      <border>1</border>
+      <clientpadding x="0" y="0"/>
+    </window>
+    <menu>
+      <border>1</border>
+    </menu>
   </dimensions>
   <window>
-    <border>
-      <width>1</width>
-      <primary r="0" g="0" b="0" a="255"/>
-    </border>
-    <clientpadding x="0" y="0"/>
     <active>
+      <border r="0" g="0" b="0" a="255"/>
       <label>
         <text>
           <primary r="255" g="255" b="255" a="255"/>
@@ -68,6 +77,7 @@
       </grip>
     </active>
     <inactive>
+      <border r="0" g="0" b="0" a="255"/>
       <label>
         <text>
           <primary r="0" g="0" b="0" a="255"/>
@@ -126,10 +136,7 @@
     </inactive>
   </window>
   <menu>
-    <border>
-      <width>1</width>
-      <primary r="0" g="0" b="0" a="255"/>
-    </border>
+    <border r="0" g="0" b="0" a="255"/>
     <justify>left</justify>
     <overlap>0</overlap>
     <title>

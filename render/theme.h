@@ -57,8 +57,9 @@ struct _RrTheme {
     gint menu_title_height;
 
     /* style settings - colors */
-    RrColor *menu_b_color;
-    RrColor *frame_b_color;
+    RrColor *menu_border_color;
+    RrColor *frame_focused_border_color;
+    RrColor *frame_unfocused_border_color;
     RrColor *cb_focused_color;
     RrColor *cb_unfocused_color;
     RrColor *title_focused_color;

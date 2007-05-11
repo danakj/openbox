@@ -1,17 +1,25 @@
 <?xml version="1.0"?>
-<openbox_theme version="1" engine="box" xmlns="http://openbox.org/themerc">
+<openbox_theme engine="box" version="1" xmlns="http://openbox.org/themerc">
+  <about>
+    <author></author>
+    <email></email>
+    <webpage></webpage>
+    <comment></comment>
+  </about>
   <dimensions>
     <handle>0</handle>
     <padding x="1" y="1"/>
+    <window>
+      <border>1</border>
+      <clientpadding x="0" y="0"/>
+    </window>
+    <menu>
+      <border>1</border>
+    </menu>
   </dimensions>
   <window>
-    <border>
-      <width>1</width>
-      <primary r="34" g="51" b="68" a="255"/>
-    </border>
-    <clientpadding x="0" y="0"/>
-    <justify>left</justify>
     <active>
+      <border r="34" g="51" b="68" a="255"/>
       <clientpadding r="0" g="255" b="0" a="255"/>
       <label>
         <text>
@@ -79,6 +87,7 @@
       </grip>
     </active>
     <inactive>
+      <border r="34" g="51" b="68" a="255"/>
       <clientpadding r="127" g="127" b="127" a="255"/>
       <label>
         <text>
@@ -149,12 +158,10 @@
         <border r="0" g="0" b="0" a="255"/>
       </grip>
     </inactive>
+    <justify>left</justify>
   </window>
   <menu>
-    <border>
-      <width>1</width>
-      <primary r="34" g="51" b="68" a="255"/>
-    </border>
+    <border r="34" g="51" b="68" a="255"/>
     <justify>center</justify>
     <title>
       <text>

@@ -1,17 +1,25 @@
 <?xml version="1.0"?>
-<openbox_theme version="1" engine="box" xmlns="http://openbox.org/themerc">
+<openbox_theme engine="box" version="1" xmlns="http://openbox.org/themerc">
+  <about>
+    <author></author>
+    <email></email>
+    <webpage></webpage>
+    <comment></comment>
+  </about>
   <dimensions>
     <handle>4</handle>
     <padding x="3" y="3"/>
+    <window>
+      <border>1</border>
+      <clientpadding x="0" y="0"/>
+    </window>
+    <menu>
+      <border>1</border>
+    </menu>
   </dimensions>
   <window>
-    <border>
-      <width>1</width>
-      <primary r="78" g="78" b="78" a="255"/>
-    </border>
-    <clientpadding x="0" y="0"/>
-    <justify>center</justify>
     <active>
+      <border r="78" g="78" b="78" a="255"/>
       <clientpadding r="238" g="238" b="236" a="255"/>
       <label>
         <text>
@@ -62,6 +70,7 @@
       </grip>
     </active>
     <inactive>
+      <border r="78" g="78" b="78" a="255"/>
       <clientpadding r="238" g="238" b="236" a="255"/>
       <label>
         <text>
@@ -110,12 +119,10 @@
         <style>parentrelative</style>
       </grip>
     </inactive>
+    <justify>center</justify>
   </window>
   <menu>
-    <border>
-      <width>1</width>
-      <primary r="78" g="78" b="78" a="255"/>
-    </border>
+    <border r="78" g="78" b="78" a="255"/>
     <justify>center</justify>
     <overlap>2</overlap>
     <title>

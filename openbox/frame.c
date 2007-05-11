@@ -184,19 +184,6 @@ ObFrame *frame_new(ObClient *client)
 static void set_theme_statics(ObFrame *self)
 {
     /* set colors/appearance/sizes for stuff that doesn't change */
-    XSetWindowBorder(ob_display, self->window,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
-    XSetWindowBorder(ob_display, self->inner,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
-    XSetWindowBorder(ob_display, self->title,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
-    XSetWindowBorder(ob_display, self->handle,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
-    XSetWindowBorder(ob_display, self->rgrip,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
-    XSetWindowBorder(ob_display, self->lgrip,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
-
     XResizeWindow(ob_display, self->max,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
     XResizeWindow(ob_display, self->iconify,

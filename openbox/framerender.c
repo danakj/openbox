@@ -42,6 +42,16 @@ void framerender_frame(ObFrame *self)
               RrColorPixel(ob_rr_theme->cb_unfocused_color));
         XSetWindowBackground(ob_display, self->inner, px);
         XClearWindow(ob_display, self->inner);
+
+        px = (self->focused ?
+              RrColorPixel(ob_rr_theme->frame_focused_border_color) :
+              RrColorPixel(ob_rr_theme->frame_unfocused_border_color));
+        XSetWindowBorder(ob_display, self->window, px);
+        XSetWindowBorder(ob_display, self->inner, px);
+        XSetWindowBorder(ob_display, self->title, px);
+        XSetWindowBorder(ob_display, self->handle, px);
+        XSetWindowBorder(ob_display, self->rgrip, px);
+        XSetWindowBorder(ob_display, self->lgrip, px);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {

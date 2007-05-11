@@ -326,6 +326,10 @@ int main(int argc, char **argv)
     xmlSetProp(root, (const xmlChar*)"version", (const xmlChar*)"1");
     xmlSetProp(root, (const xmlChar*)"xmlns",
                (const xmlChar*)"http://openbox.org/themerc");
+    CONT2("about", "author", "");
+    CONT2("about", "email", "");
+    CONT2("about", "webpage", "");
+    CONT2("about", "comment", "");
 
     if (read_int(db, "window.handle.width", &i))
         CONT2("dimensions", "handle", NUM(i));
@@ -336,21 +340,22 @@ int main(int argc, char **argv)
     }
     
     if (read_int(db, "borderWidth", &i)) {
-        CONT3("window", "border", "width", NUM(i));
-        CONT3("menu", "border", "width", NUM(i));
+        CONT3("dimensions", "window", "border", NUM(i));
+        CONT3("dimensions", "menu", "border", NUM(i));
     } else if (read_int(db, "border.width", &i)) {
-        CONT3("window", "border", "width", NUM(i));
-        CONT3("menu", "border", "width", NUM(i));
+        CONT3("dimensions", "window", "border", NUM(i));
+        CONT3("dimensions", "menu", "border", NUM(i));
     }
 
     if (read_color(db, "border.color", &i, &j, &k)) {
-        COLOR3("window", "border", "primary", i, j, k, 255);
-        COLOR3("menu", "border", "primary", i, j, k, 255);
+        COLOR3("window", "active", "border", i, j, k, 255);
+        COLOR3("window", "inactive", "border", i, j, k, 255);
+        COLOR2("menu", "border", i, j, k, 255);
     }
 
     if (read_int(db, "window.client.padding.width", &i)) {
-        ATTR2("window", "clientpadding", "x", NUM(i));
-        ATTR2("window", "clientpadding", "y", NUM(i));
+        ATTR3("dimensions", "window", "clientpadding", "x", NUM(i));
+        ATTR3("dimensions", "window", "clientpadding", "y", NUM(i));
     }
 
     if (read_string(db, "window.label.text.justify", &s)) {

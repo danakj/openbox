@@ -482,13 +482,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         RrPixmapMaskCopy(theme->desk_toggled_mask);
     theme->shade_toggled_hover_mask =
         RrPixmapMaskCopy(theme->shade_toggled_mask);
-    /* the toggled pressed mask = the pressed mask (the toggled fallback..) */
+    /* the toggled pressed mask = the toggled unpressed mask (i.e. no change)*/
     theme->max_toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->max_pressed_mask);
+        RrPixmapMaskCopy(theme->max_toggled_mask);
     theme->desk_toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->desk_pressed_mask);
+        RrPixmapMaskCopy(theme->desk_toggled_mask);
     theme->shade_toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->shade_pressed_mask);
+        RrPixmapMaskCopy(theme->shade_toggled_mask);
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,

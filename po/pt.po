@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-10 01:37-0400\n"
+"POT-Creation-Date: 2007-05-11 00:34-0400\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Gonçalo Ferreira <gonsas@gmail.com>\n"
 "Language-Team: None\n"
@@ -47,75 +47,80 @@ msgstr ""
 msgid "Desktops"
 msgstr "Áreas de trabalho"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:248
 msgid "All desktops"
 msgstr "Todas as áreas de trabalho"
 
-#: openbox/client_menu.c:346
+#: openbox/client_menu.c:353
 #, fuzzy
 msgid "&Layer"
 msgstr "&Camada"
 
-#: openbox/client_menu.c:351
+#: openbox/client_menu.c:358
 #, fuzzy
 msgid "Always on &top"
 msgstr "Sempre em &cima"
 
-#: openbox/client_menu.c:352
+#: openbox/client_menu.c:359
 #, fuzzy
 msgid "&Normal"
 msgstr "&Normal"
 
-#: openbox/client_menu.c:353
+#: openbox/client_menu.c:360
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "Sempre no &fundo"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:363
 #, fuzzy
 msgid "&Send to desktop"
-msgstr "&Enviar para área de trabalho"
+msgstr "Enviar para área de &trabalho"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:367
 msgid "Client menu"
 msgstr "Menu de clientes"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:373
 #, fuzzy
 msgid "R&estore"
 msgstr "Rest&aurar"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:381
 #, fuzzy
 msgid "&Move"
 msgstr "&Mover"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:383
 #, fuzzy
 msgid "Resi&ze"
 msgstr "Redimen&sionar"
 
-#: openbox/client_menu.c:378
+#: openbox/client_menu.c:385
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Mi&nimizar"
 
-#: openbox/client_menu.c:386
+#: openbox/client_menu.c:393
 #, fuzzy
 msgid "Ma&ximize"
 msgstr "M&aximizar"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:401
 #, fuzzy
-msgid "&Roll up/down"
+msgid "Roll &up"
+msgstr "&Enrolar"
+
+#: openbox/client_menu.c:403
+#, fuzzy
+msgid "Roll do&wn"
 msgstr "Desen&rolar"
 
-#: openbox/client_menu.c:402
+#: openbox/client_menu.c:405
 #, fuzzy
 msgid "Un/&Decorate"
 msgstr "&Decorar"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:415
 #, fuzzy
 msgid "&Close"
 msgstr "&Fechar"
@@ -337,10 +342,6 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "&Roll up"
-#~ msgstr "En&rolar"
 
 #, fuzzy
 #~ msgid "Raise to &top"

@@ -3478,9 +3478,7 @@ gboolean client_focused(ObClient *self)
 static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
 {
     guint i;
-    /* si is the smallest image >= req */
-    /* li is the largest image < req */
-    gulong size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
+    gulong min_diff, min_i;
 
     if (!self->nicons) {
         ObClientIcon *parent = NULL;
@@ -3503,20 +3501,27 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
         return parent;
     }
 
-    for (i = 0; i < self->nicons; ++i) {
-        size = self->icons[i].width * self->icons[i].height;
-        if (size < smallest && size >= (unsigned)(w * h)) {
-            smallest = size;
-            si = i;
-        }
-        if (size > largest && size <= (unsigned)(w * h)) {
-            largest = size;
-            li = i;
+    /* some kind of crappy approximation to find the icon closest in size to
+       what we requested, but icons are generally all the same ratio as
+       eachother so it's good enough. */
+
+    min_diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
+    min_i = 0;
+
+    for (i = 1; i < self->nicons; ++i) {
+        gulong diff;
+
+        ob_debug("icon %d %d wanted %d %d\n",
+                 self->icons[i].width, self->icons[i].height, w, h);
+        diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
+        ob_debug("dsize %u\n", diff);
+        if (diff < min_diff) {
+            min_diff = diff;
+            min_i = i;
+            ob_debug("chose it\n");
         }
     }
-    if (largest == 0) /* didnt find one smaller than the requested size */
-        return &self->icons[si];
-    return &self->icons[li];
+    return &self->icons[min_i];
 }
 
 const ObClientIcon* client_icon(ObClient *self, gint w, gint h)

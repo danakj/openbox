@@ -3511,14 +3511,10 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
     for (i = 1; i < self->nicons; ++i) {
         gulong diff;
 
-        ob_debug("icon %d %d wanted %d %d\n",
-                 self->icons[i].width, self->icons[i].height, w, h);
         diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
-        ob_debug("dsize %u\n", diff);
         if (diff < min_diff) {
             min_diff = diff;
             min_i = i;
-            ob_debug("chose it\n");
         }
     }
     return &self->icons[min_i];

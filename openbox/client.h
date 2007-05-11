@@ -166,7 +166,7 @@ struct _ObClient
       The window manager will set this to 0 while the window is being managed,
       but needs to restore it afterwards, so it is saved here.
     */
-    guint border_width;
+    gint border_width;
 
     /*! The minimum aspect ratio the client window can be sized to.
       A value of 0 means this is ignored.
@@ -375,7 +375,7 @@ void client_convert_gravity(ObClient *self, gint gravity, gint *x, gint *y,
   client_configure(self, x, y, w, h, TRUE, TRUE)
 
 #define client_configure(self, x, y, w, h, user, final) \
-  client_configure_full(self, x, y, w, h, user, final, FALSE)
+  client_configure_full(self, x, y, w, h, user, final)
 
 /*! Figure out where a window will end up and what size it will be if you
   told it to move/resize to these coordinates.
@@ -417,8 +417,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                      the position changed.
 */
 void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
-                           gboolean user, gboolean final,
-                           gboolean force_reply);
+                           gboolean user, gboolean final);
 
 void client_reconfigure(ObClient *self);
 

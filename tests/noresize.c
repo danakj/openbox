@@ -40,7 +40,7 @@ int main () {
   xswamask = CWWinGravity;
 
   win = XCreateWindow(display, RootWindow(display, 0),
-		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
+		      x, y, w, h, 0, CopyFromParent, CopyFromParent,
 		      CopyFromParent, xswamask, &xswa);
 
   XSetWindowBackground(display,win,WhitePixel(display,0)); 
@@ -52,10 +52,13 @@ int main () {
   size.min_height = h;
   XSetWMNormalHints(display, win, &size);
   
+  XSelectInput(display, win, ExposureMask | StructureNotifyMask);
+
   XMapWindow(display, win);
   XFlush(display);
 
-  XSelectInput(display, win, ExposureMask | StructureNotifyMask);
+  XMoveWindow(display, win, 10, 10);
+  XMoveWindow(display, win, 10, 10);
 
   while (1) {
     XNextEvent(display, &report);

@@ -282,30 +282,13 @@ void client_manage(Window window)
 
     /* non-zero defaults */
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
+    self->gravity = NorthWestGravity;
     self->desktop = screen_num_desktops; /* always an invalid value */
     self->user_time = focus_client ? focus_client->user_time : CurrentTime;
 
+    /* get all the stuff off the window */
     client_get_all(self, TRUE);
-    /* per-app settings override stuff, and return the settings for other
-       uses too */
-    settings = client_get_settings_state(self);
-    /* the session should get the last say */
-    client_restore_session_state(self);
 
-    client_setup_decor_and_functions(self);
-
-    {
-        Time t = sn_app_started(self->startup_id, self->class);
-        if (t) self->user_time = t;
-    }
-
-    /* update the focus lists, do this before the call to change_state or
-       it can end up in the list twice! */
-    focus_order_add_new(self);
-
-    /* remove the client's border (and adjust re gravity) */
-    client_toggle_border(self, FALSE);
-     
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically */
     XChangeSaveSet(ob_display, window, SetModeInsert);
@@ -315,11 +298,33 @@ void client_manage(Window window)
 
     frame_grab_client(self->frame);
 
+    /* we've grabbed everything and set everything that we need to at mapping
+       time now */
+    grab_server(FALSE);
+
+    /* per-app settings override stuff from client_get_all, and return the
+       settings for other uses too */
+    settings = client_get_settings_state(self);
+    /* the session should get the last say thought */
+    client_restore_session_state(self);
+
+    /* now we have all of the window's information so we can set this up */
+    client_setup_decor_and_functions(self);
+
+    /* remove the client's border (and adjust re gravity) */
+    client_toggle_border(self, FALSE);
+     
+    {
+        Time t = sn_app_started(self->startup_id, self->class);
+        if (t) self->user_time = t;
+    }
+
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
     client_change_state(self);
 
-    grab_server(FALSE);
+    /* add ourselves to the focus order */
+    focus_order_add_new(self);
 
     /* do this to add ourselves to the stacking list in a non-intrusive way */
     client_calc_layer(self);
@@ -452,6 +457,9 @@ void client_manage(Window window)
         if (!client_restore_session_stacking(self))
             stacking_raise(CLIENT_AS_WINDOW(self));
     }
+
+    /* adjust the frame to the client's size before showing the window */
+    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
@@ -594,7 +602,12 @@ void client_unmanage(ObClient *self)
 
     /* restore the window's original geometry so it is not lost */
     {
-        Rect a = self->area;
+        Rect a;
+
+        /* give the client its border back */
+        client_toggle_border(self, TRUE);
+
+        a = self->area;
 
         if (self->fullscreen)
             a = self->pre_fullscreen_area;
@@ -608,9 +621,6 @@ void client_unmanage(ObClient *self)
                 a.height = self->pre_max_area.height;
             }
         }
-
-        /* give the client its border back */
-        client_toggle_border(self, TRUE);
 
         self->fullscreen = self->max_horz = self->max_vert = FALSE;
         self->decorations = 0; /* unmanaged windows have no decor */
@@ -2657,12 +2667,11 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
 
 void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
-                           gboolean user, gboolean final,
-                           gboolean force_reply)
+                           gboolean user, gboolean final)
 {
-    gint oldw, oldh, oldrx, oldry;
+    gint oldw, oldh;
     gboolean send_resize_client;
-    gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
+    gboolean moved = FALSE, resized = FALSE;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
     gint logicalw, logicalh;
@@ -2702,17 +2711,7 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
     if (moved || resized)
         frame_adjust_area(self->frame, moved, resized, FALSE);
 
-    /* find the client's position relative to the root window */
-    oldrx = self->root_pos.x;
-    oldry = self->root_pos.y;
-    rootmoved = (oldrx != (signed)(self->frame->area.x +
-                                   self->frame->size.left -
-                                   self->border_width) ||
-                 oldry != (signed)(self->frame->area.y +
-                                   self->frame->size.top -
-                                   self->border_width));
-
-    if (force_reply || ((!user || (user && final)) && rootmoved))
+    if ((!user || (user && final)) && !resized)
     {
         XEvent event;
 
@@ -2726,6 +2725,9 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.display = ob_display;
         event.xconfigure.event = self->window;
         event.xconfigure.window = self->window;
+
+        ob_debug("Sending ConfigureNotify to %s for %d,%d %dx%d\n",
+                 self->title, self->root_pos.x, self->root_pos.y, w, h);
 
         /* root window real coords */
         event.xconfigure.x = self->root_pos.x;

@@ -950,70 +950,33 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     }
     case ConfigureRequest:
+    {
         /* dont compress these unless you're going to watch for property
            notifies in between (these can change what the configure would
            do to the window).
            also you can't compress stacking events
         */
 
-        ob_debug("ConfigureRequest desktop %d wmstate %d vis %d\n",
+        gint x, y, w, h;
+
+        /* if nothing is changed, then a configurenotify is needed */
+        gboolean config = TRUE;
+
+        x = client->area.x;
+        y = client->area.y;
+        w = client->area.width;
+        h = client->area.height;
+
+        ob_debug("ConfigureRequest desktop %d wmstate %d visibile %d\n",
                  screen_desktop, client->wmstate, client->frame->visible);
 
-        /* don't allow clients to move shaded windows (fvwm does this) */
-        if (client->shaded) {
-            e->xconfigurerequest.value_mask &= ~CWX;
-            e->xconfigurerequest.value_mask &= ~CWY;
-        }
-
-        /* resize, then move, as specified in the EWMH section 7.7 */
-        if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
-                                               CWX | CWY |
-                                               CWBorderWidth)) {
-            gint x, y, w, h;
-
-            if (e->xconfigurerequest.value_mask & CWBorderWidth)
+        if (e->xconfigurerequest.value_mask & CWBorderWidth)
+            if (client->border_width != e->xconfigurerequest.border_width) {
                 client->border_width = e->xconfigurerequest.border_width;
-
-            x = (e->xconfigurerequest.value_mask & CWX) ?
-                e->xconfigurerequest.x : client->area.x;
-            y = (e->xconfigurerequest.value_mask & CWY) ?
-                e->xconfigurerequest.y : client->area.y;
-            w = (e->xconfigurerequest.value_mask & CWWidth) ?
-                e->xconfigurerequest.width : client->area.width;
-            h = (e->xconfigurerequest.value_mask & CWHeight) ?
-                e->xconfigurerequest.height : client->area.height;
-
-            ob_debug("ConfigureRequest x %d %d y %d %d\n",
-                     e->xconfigurerequest.value_mask & CWX, x,
-                     e->xconfigurerequest.value_mask & CWY, y);
-
-            /* check for broken apps moving to their root position
-
-               XXX remove this some day...that would be nice. right now all
-               kde apps do this when they try activate themselves on another
-               desktop. eg. open amarok window on desktop 1, switch to desktop
-               2, click amarok tray icon. it will move by its decoration size.
-            */
-            if (x != client->area.x &&
-                x == (client->frame->area.x + client->frame->size.left -
-                      (gint)client->border_width) &&
-                y != client->area.y &&
-                y == (client->frame->area.y + client->frame->size.top -
-                      (gint)client->border_width))
-            {
-                ob_debug_type(OB_DEBUG_APP_BUGS,
-                              "Application %s is trying to move via "
-                              "ConfigureRequest to it's root window position "
-                              "but it is not using StaticGravity\n",
-                              client->title);
-                /* don't move it */
-                x = client->area.x;
-                y = client->area.y;
+                /* if only the border width is changing, then it's not needed*/
+                config = FALSE;
             }
 
-            client_find_onscreen(client, &x, &y, w, h, FALSE);
-            client_configure_full(client, x, y, w, h, FALSE, TRUE, TRUE);
-        }
 
         if (e->xconfigurerequest.value_mask & CWStackMode) {
             ObClient *sibling = NULL;
@@ -1030,8 +993,78 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* activate it rather than just focus it */
             stacking_restack_request(client, sibling,
                                      e->xconfigurerequest.detail, TRUE);
+
+            /* if a stacking change is requested then it is needed */
+            config = TRUE;
+        }
+
+        /* don't allow clients to move shaded windows (fvwm does this) */
+        if (client->shaded && (e->xconfigurerequest.value_mask & CWX ||
+                               e->xconfigurerequest.value_mask & CWY))
+        {
+            e->xconfigurerequest.value_mask &= ~CWX;
+            e->xconfigurerequest.value_mask &= ~CWY;
+
+            /* if the client tried to move and we aren't letting it then a
+               synthetic event is needed */
+            config = TRUE;
+        }
+
+        if (e->xconfigurerequest.value_mask & CWX ||
+            e->xconfigurerequest.value_mask & CWY ||
+            e->xconfigurerequest.value_mask & CWWidth ||
+            e->xconfigurerequest.value_mask & CWHeight)
+        {
+            if (e->xconfigurerequest.value_mask & CWX)
+                x = e->xconfigurerequest.x;
+            if (e->xconfigurerequest.value_mask & CWY)
+                y = e->xconfigurerequest.y;
+            if (e->xconfigurerequest.value_mask & CWWidth)
+                w = e->xconfigurerequest.width;
+            if (e->xconfigurerequest.value_mask & CWHeight)
+                h = e->xconfigurerequest.height;
+
+            /* if a new position or size is requested, then a configure is
+               needed */
+            config = TRUE;
+        }
+
+        ob_debug("ConfigureRequest x(%d) %d y(%d) %d w(%d) %d h(%d) %d\n",
+                 e->xconfigurerequest.value_mask & CWX, x,
+                 e->xconfigurerequest.value_mask & CWY, y,
+                 e->xconfigurerequest.value_mask & CWWidth, w,
+                 e->xconfigurerequest.value_mask & CWHeight, h);
+
+        /* check for broken apps moving to their root position
+
+           XXX remove this some day...that would be nice. right now all
+           kde apps do this when they try activate themselves on another
+           desktop. eg. open amarok window on desktop 1, switch to desktop
+           2, click amarok tray icon. it will move by its decoration size.
+        */
+        if (x != client->area.x &&
+            x == (client->frame->area.x + client->frame->size.left -
+                  (gint)client->border_width) &&
+            y != client->area.y &&
+            y == (client->frame->area.y + client->frame->size.top -
+                  (gint)client->border_width))
+        {
+            ob_debug_type(OB_DEBUG_APP_BUGS,
+                          "Application %s is trying to move via "
+                          "ConfigureRequest to it's root window position "
+                          "but it is not using StaticGravity\n",
+                          client->title);
+            /* don't move it */
+            x = client->area.x;
+            y = client->area.y;
+        }
+
+        if (config) {
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
+            client_configure_full(client, x, y, w, h, FALSE, TRUE);
         }
         break;
+    }
     case UnmapNotify:
         if (client->ignore_unmaps) {
             client->ignore_unmaps--;
@@ -1237,6 +1270,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     /* just raise, don't activate */
                     stacking_restack_request(client, sibling,
                                              e->xclient.data.l[2], FALSE);
+                    /* send a synthetic ConfigureNotify, cuz this is supposed
+                       to be like a ConfigureRequest. */
+                    client_configure_full(client, client->area.x,
+                                          client->area.y,
+                                          client->area.width,
+                                          client->area.height,
+                                          FALSE, TRUE);
                 } else
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_RESTACK_WINDOW sent for window %s "

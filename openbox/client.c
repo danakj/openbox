@@ -1015,6 +1015,9 @@ static void client_get_all(ObClient *self, gboolean real)
     if (!real)
         return;
 
+    /* get this early so we have it for debugging */
+    client_update_title(self);
+
     client_update_protocols(self);
 
     client_update_wmhints(self);
@@ -1040,7 +1043,6 @@ static void client_get_all(ObClient *self, gboolean real)
 #endif
 
     client_get_colormap(self);
-    client_update_title(self);
     client_update_strut(self);
     client_update_icons(self);
     client_update_user_time_window(self);
@@ -1230,19 +1232,34 @@ static void client_update_transient_tree(ObClient *self,
     GSList *it, *next;
     ObClient *c;
 
+    /* * *
+      Group transient windows are not allowed to have other group
+      transient windows as their children.
+      * * */
+
+
     /* No change has occured */
     if (oldgroup == newgroup && oldparent == newparent) return;
 
     /** Remove the client from the transient tree wherever it has changed **/
 
     /* If the window is becoming a direct transient for a window in its group
-       then that window can't be a child of this window anymore */
+       then any group transients which were our children and are now becoming
+       our parents need to stop being our children.
+
+       Group transients can't be children of group transients already, but
+       we could have any number of direct parents above up, any of which could
+       be transient for the group, and we need to remove it from our children.
+    */
     if (oldparent != newparent &&
         newparent != NULL && newparent != OB_TRAN_GROUP &&
-        newparent->transient_for == OB_TRAN_GROUP &&
         newgroup != NULL && newgroup == oldgroup)
     {
-        self->transients = g_slist_remove(self->transients, newparent);
+        ObClient *look = newparent;
+        do {
+            self->transients = g_slist_remove(self->transients, look);
+            look = look->transient_for;
+        } while (look != NULL && look != OB_TRAN_GROUP);
     }
             
 
@@ -1314,7 +1331,9 @@ static void client_update_transient_tree(ObClient *self,
 
        WARNING: Cyclical transient-ness is possible. For e.g. if:
        A is transient for the group
-       B is a member of the group and transient for A
+       B is transient for A
+       C is transient for B
+       A can't be transient for C or we have a cycle
     */
     if (oldgroup != newgroup && newgroup != NULL &&
         newparent != OB_TRAN_GROUP)

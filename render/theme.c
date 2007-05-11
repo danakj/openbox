@@ -173,6 +173,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     if (!read_int(db, "border.width", &theme->fbwidth) ||
         theme->fbwidth < 0 || theme->fbwidth > 100)
         theme->fbwidth = 1;
+    /* menu border width inherits from the frame border width */
+    if (!read_int(db, "menu.border.width", &theme->mbwidth) ||
+        theme->mbwidth < 0 || theme->mbwidth > 100)
+        theme->mbwidth = theme->fbwidth;
     theme->mbwidth = theme->fbwidth;
     if (!read_int(db, "window.client.padding.width", &theme->cbwidthx) ||
         theme->cbwidthx < 0 || theme->cbwidthx > 100)
@@ -181,12 +185,25 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 
     /* load colors */
     if (!read_color(db, inst,
-                    "border.color", &theme->frame_b_color))
-        theme->frame_b_color = RrColorNew(inst, 0, 0, 0);
-    theme->menu_b_color = RrColorNew(inst,
-                                     theme->frame_b_color->r,
-                                     theme->frame_b_color->g,
-                                     theme->frame_b_color->b);
+                    "window.active.border.color",
+                    &theme->frame_focused_border_color) &&
+        !read_color(db, inst,
+                    "border.color",
+                    &theme->frame_focused_border_color))
+        theme->frame_focused_border_color = RrColorNew(inst, 0, 0, 0);
+    /* unfocused border color inherits from frame focused border color */
+    if (!read_color(db, inst,
+                    "window.inactive.border.color",
+                    &theme->frame_unfocused_border_color))
+        theme->frame_unfocused_border_color = RrColorNew(inst, 0, 0, 0);
+    /* menu border color inherits from frame focused border color */
+    if (!read_color(db, inst,
+                    "menu.border.color",
+                    &theme->menu_border_color))
+        theme->menu_border_color = RrColorNew(inst,
+                                     theme->frame_focused_border_color->r,
+                                     theme->frame_focused_border_color->g,
+                                     theme->frame_focused_border_color->b);
     if (!read_color(db, inst,
                     "window.active.client.color",
                     &theme->cb_focused_color))
@@ -1233,8 +1250,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 void RrThemeFree(RrTheme *theme)
 {
     if (theme) {
-        RrColorFree(theme->menu_b_color);
-        RrColorFree(theme->frame_b_color);
+        RrColorFree(theme->menu_border_color);
+        RrColorFree(theme->frame_focused_border_color);
+        RrColorFree(theme->frame_unfocused_border_color);
         RrColorFree(theme->cb_unfocused_color);
         RrColorFree(theme->cb_focused_color);
         RrColorFree(theme->title_focused_color);

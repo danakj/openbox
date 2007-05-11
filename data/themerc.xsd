@@ -88,16 +88,9 @@
    </xs:all>
   </xs:complexType>
 
-  <xs:complexType name="border">
-    <xs:all>
-      <xs:element name="primary" type="obt:color" minOccurs="0"/>
-      <xs:element name="width" type="xs:integer" minOccurs="0"/>
-    </xs:all>
-  </xs:complexType>
-
   <xs:complexType name="allmenus">
     <xs:all>
-      <xs:element name="border" type="obt:border" minOccurs="0"/>
+      <xs:element name="border" type="obt:color" minOccurs="0"/>
       <xs:element name="overlap" type="xs:integer" minOccurs="0"/>
       <xs:element name="justify" type="obt:justify" minOccurs="0"/>
       <xs:element name="title" type="obt:textarea" minOccurs="0"/>
@@ -121,6 +114,7 @@
 
   <xs:complexType name="window">
     <xs:all>
+      <xs:element name="border" type="obt:border" minOccurs="0"/>
       <xs:element name="clientpadding" type="obt:color" minOccurs="0"/>
       <xs:element name="titlebar" type="obt:area" minOccurs="0"/>
       <xs:element name="label" type="obt:textarea" minOccurs="0"/>
@@ -132,9 +126,7 @@
 
   <xs:complexType name="allwindows">
     <xs:all>
-      <xs:element name="clientpadding" type="obt:point" minOccurs="0"/>
       <xs:element name="justify" type="obt:justify" minOccurs="0"/>
-      <xs:element name="border" type="obt:border" minOccurs="0"/>
       <xs:element name="inactive" type="obt:window" minOccurs="0"/>
       <xs:element name="active" type="obt:window" minOccurs="0"/>
     </xs:all>
@@ -146,15 +138,40 @@
     </xs:all>
   </xs:complexType>
 
+  <xs:complexType name="windowDimensions">
+    <xs:all>
+      <xs:element name="borderwidth" type="xs:integer" minOccurs="0"/>
+      <xs:element name="clientpadding" type="obt:point" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="menuDimensions">
+    <xs:all>
+      <xs:element name="borderwidth" type="xs:integer" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
   <xs:complexType name="themeDimensions">
     <xs:all>
       <xs:element name="padding" type="obt:point" minOccurs="0"/>
       <xs:element name="handle" type="xs:integer" minOccurs="0"/>
+      <xs:element name="window" type="obt:windowDimensions" minOccurs="0"/>
+      <xs:element name="menu" type="obt:menuDimensions" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="about">
+    <xs:all>
+      <xs:element name="author" type="xs:string" minOccurs="0"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="webpage" type="xs:string" minOccurs="0"/>
+      <xs:element name="comment" type="xs:string" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 
   <xs:complexType name="theme">
     <xs:all>
+      <xs:element name="about" type="obt:about" minOccurs="0"/>
       <xs:element name="dimensions" type="obt:themeDimensions" minOccurs="0"/>
       <xs:element name="osd" type="obt:allosd" minOccurs="0"/>
       <xs:element name="menu" type="obt:allmenus" minOccurs="0"/>

@@ -1645,7 +1645,7 @@ void client_setup_decor_and_functions(ObClient *self)
     if (!(self->functions & OB_CLIENT_FUNC_ICONIFY))
         self->decorations &= ~OB_FRAME_DECOR_ICONIFY;
     if (!(self->functions & OB_CLIENT_FUNC_RESIZE))
-        self->decorations &= ~OB_FRAME_DECOR_GRIPS;
+        self->decorations &= ~(OB_FRAME_DECOR_GRIPS | OB_FRAME_DECOR_HANDLE);
 
     /* can't maximize without moving/resizing */
     if (!((self->functions & OB_CLIENT_FUNC_MAXIMIZE) &&

@@ -57,7 +57,8 @@ void dock_startup(gboolean reconfig)
         GList *it;
 
         XSetWindowBorder(ob_display, dock->frame,
-                         RrColorPixel(ob_rr_theme->frame_b_color));
+                         RrColorPixel(ob_rr_theme->
+                                      frame_focused_border_color));
         XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->fbwidth);
 
         RrAppearanceFree(dock->a_frame);
@@ -91,7 +92,7 @@ void dock_startup(gboolean reconfig)
                                 &attrib);
     dock->a_frame = RrAppearanceCopy(ob_rr_theme->a_focused_title);
     XSetWindowBorder(ob_display, dock->frame,
-                     RrColorPixel(ob_rr_theme->frame_b_color));
+                     RrColorPixel(ob_rr_theme->frame_focused_border_color));
     XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->fbwidth);
 
     g_hash_table_insert(window_map, &dock->frame, dock);

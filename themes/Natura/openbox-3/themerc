@@ -7,7 +7,9 @@ window.client.padding.width: 0
 border.Width: 1
 padding.width: 2
 
-border.color: #000000
+window.active.border.color: #000000
+window.inactive.border.color: #000000
+menu.border.color: #000000
 menu.overlap: 0
 window.frameColor: #eeeeee
 window.*.client.color: #eeeeee

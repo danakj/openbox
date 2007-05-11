@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3rc2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-10 01:37-0400\n"
+"POT-Creation-Date: 2007-05-11 00:34-0400\n"
 "PO-Revision-Date: 2006-03-01 12:00+0800\n"
 "Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -48,75 +48,80 @@ msgstr ""
 msgid "Desktops"
 msgstr "桌面"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:248
 msgid "All desktops"
 msgstr "所有桌面(&A)"
 
-#: openbox/client_menu.c:346
+#: openbox/client_menu.c:353
 #, fuzzy
 msgid "&Layer"
 msgstr "圖層(&L)"
 
-#: openbox/client_menu.c:351
+#: openbox/client_menu.c:358
 #, fuzzy
 msgid "Always on &top"
 msgstr "最上層(&T)"
 
-#: openbox/client_menu.c:352
+#: openbox/client_menu.c:359
 #, fuzzy
 msgid "&Normal"
 msgstr "一般(&N)"
 
-#: openbox/client_menu.c:353
+#: openbox/client_menu.c:360
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "最下層(&B)"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:363
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "傳送到桌面(&S)"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:367
 msgid "Client menu"
 msgstr "客戶端選單"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:373
 #, fuzzy
 msgid "R&estore"
 msgstr "還原(&E)"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:381
 #, fuzzy
 msgid "&Move"
 msgstr "移動(&M)"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:383
 #, fuzzy
 msgid "Resi&ze"
 msgstr "重新調整大小(&Z)"
 
-#: openbox/client_menu.c:378
+#: openbox/client_menu.c:385
 #, fuzzy
 msgid "Ico&nify"
 msgstr "最小化(&N)"
 
-#: openbox/client_menu.c:386
+#: openbox/client_menu.c:393
 #, fuzzy
 msgid "Ma&ximize"
 msgstr "最大化(&E)"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:401
 #, fuzzy
-msgid "&Roll up/down"
-msgstr "向下捲動(&R)"
+msgid "Roll &up"
+msgstr "向上捲動(&U)"
 
-#: openbox/client_menu.c:402
+#: openbox/client_menu.c:403
+#, fuzzy
+msgid "Roll do&wn"
+msgstr "向下捲動(&W)"
+
+#: openbox/client_menu.c:405
 #, fuzzy
 msgid "Un/&Decorate"
 msgstr "裝飾(&D)"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:415
 #, fuzzy
 msgid "&Close"
 msgstr "關閉(&C)"
@@ -338,10 +343,6 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "&Roll up"
-#~ msgstr "向上捲動(&R)"
 
 #, fuzzy
 #~ msgid "Raise to &top"

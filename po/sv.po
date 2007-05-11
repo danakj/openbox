@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-10 01:37-0400\n"
+"POT-Creation-Date: 2007-05-11 00:34-0400\n"
 "PO-Revision-Date: 2007-05-06 13:44+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -47,63 +47,69 @@ msgstr "Fönster"
 msgid "Desktops"
 msgstr "Skrivbord"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:248
 msgid "All desktops"
 msgstr "Alla skrivbord"
 
-#: openbox/client_menu.c:346
+#: openbox/client_menu.c:353
 msgid "&Layer"
 msgstr "&Lager"
 
-#: openbox/client_menu.c:351
+#: openbox/client_menu.c:358
 msgid "Always on &top"
 msgstr "Alltid ö&verst"
 
-#: openbox/client_menu.c:352
+#: openbox/client_menu.c:359
 msgid "&Normal"
 msgstr "&Normal"
 
-#: openbox/client_menu.c:353
+#: openbox/client_menu.c:360
 msgid "Always on &bottom"
 msgstr "Alltid &underst"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:363
 msgid "&Send to desktop"
 msgstr "&Skicka till"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:367
 msgid "Client menu"
 msgstr "Klientmeny"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:373
 msgid "R&estore"
 msgstr "Åt&erställ"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:381
 msgid "&Move"
 msgstr "&Flytta"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:383
 msgid "Resi&ze"
 msgstr "Ändra s&torlek"
 
-#: openbox/client_menu.c:378
+#: openbox/client_menu.c:385
 msgid "Ico&nify"
 msgstr "Mi&nimera"
 
-#: openbox/client_menu.c:386
+#: openbox/client_menu.c:393
 msgid "Ma&ximize"
 msgstr "Ma&ximera"
 
-#: openbox/client_menu.c:394
-msgid "&Roll up/down"
-msgstr "&Rulla upp/ner"
+#: openbox/client_menu.c:401
+#, fuzzy
+msgid "Roll &up"
+msgstr "Rulla &upp"
 
-#: openbox/client_menu.c:402
+#: openbox/client_menu.c:403
+#, fuzzy
+msgid "Roll do&wn"
+msgstr "Rull&a ner"
+
+#: openbox/client_menu.c:405
 msgid "Un/&Decorate"
 msgstr "(Av)&Dekorera"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:415
 msgid "&Close"
 msgstr "Stän&g"
 

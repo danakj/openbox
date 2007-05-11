@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox-3.3rc2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-10 01:37-0400\n"
+"POT-Creation-Date: 2007-05-11 00:34-0400\n"
 "PO-Revision-Date: 2006-08-25 00:52+0200\n"
 "Last-Translator: Jozef Riha <jose1711@gmail.com\n"
 "Language-Team: Slovak <LL@li.org>\n"
@@ -47,78 +47,83 @@ msgstr ""
 msgid "Desktops"
 msgstr "Plochy"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:248
 msgid "All desktops"
 msgstr "Všetky plochy"
 
-#: openbox/client_menu.c:346
-#, fuzzy
-msgid "&Layer"
-msgstr "Vrstva"
-
-#: openbox/client_menu.c:351
-#, fuzzy
-msgid "Always on &top"
-msgstr "Vždy navrchu"
-
-#: openbox/client_menu.c:352
-#, fuzzy
-msgid "&Normal"
-msgstr "Normálna"
-
 #: openbox/client_menu.c:353
 #, fuzzy
-msgid "Always on &bottom"
-msgstr "Vždy dole"
+msgid "&Layer"
+msgstr "&Vrstva"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:358
 #, fuzzy
-msgid "&Send to desktop"
-msgstr "Poslať na plochu"
+msgid "Always on &top"
+msgstr "Vždy &navrchu"
+
+#: openbox/client_menu.c:359
+#, fuzzy
+msgid "&Normal"
+msgstr "Nor&málna"
 
 #: openbox/client_menu.c:360
+#, fuzzy
+msgid "Always on &bottom"
+msgstr "Vždy &dole"
+
+#: openbox/client_menu.c:363
+#, fuzzy
+msgid "&Send to desktop"
+msgstr "&Poslať na plochu"
+
+#: openbox/client_menu.c:367
 msgid "Client menu"
 msgstr "Menu klienta"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:373
 #, fuzzy
 msgid "R&estore"
-msgstr "Obnoviť"
+msgstr "&Obnoviť"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:381
 #, fuzzy
 msgid "&Move"
-msgstr "Presunúť"
+msgstr "Pre&sunúť"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:383
 #, fuzzy
 msgid "Resi&ze"
-msgstr "Zmena veľkosti"
+msgstr "Z&mena veľkosti"
 
-#: openbox/client_menu.c:378
+#: openbox/client_menu.c:385
 #, fuzzy
 msgid "Ico&nify"
-msgstr "Do ikony"
+msgstr "Do iko&ny"
 
-#: openbox/client_menu.c:386
+#: openbox/client_menu.c:393
 #, fuzzy
 msgid "Ma&ximize"
-msgstr "Maximalizovať"
+msgstr "Ma&ximalizovať"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:401
 #, fuzzy
-msgid "&Roll up/down"
-msgstr "Rozvinúť"
+msgid "Roll &up"
+msgstr "&Zvinúť"
 
-#: openbox/client_menu.c:402
+#: openbox/client_menu.c:403
+#, fuzzy
+msgid "Roll do&wn"
+msgstr "&Rozvinúť"
+
+#: openbox/client_menu.c:405
 #, fuzzy
 msgid "Un/&Decorate"
-msgstr "Dekorácia"
+msgstr "&Dekorácia"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:415
 #, fuzzy
 msgid "&Close"
-msgstr "Zavrieť"
+msgstr "Z&avrieť"
 
 #: openbox/config.c:668
 #, c-format
@@ -337,10 +342,6 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "&Roll up"
-#~ msgstr "Zvinúť"
 
 #, fuzzy
 #~ msgid "Raise to &top"

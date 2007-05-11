@@ -45,7 +45,8 @@ enum {
     CLIENT_ICONIFY,
     CLIENT_RESTORE,
     CLIENT_MAXIMIZE,
-    CLIENT_SHADE,
+    CLIENT_ROLL_UP,
+    CLIENT_ROLL_DOWN,
     CLIENT_DECORATE,
     CLIENT_MOVE,
     CLIENT_RESIZE,
@@ -77,8 +78,11 @@ static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
                 *en = ((c->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
                        (!c->max_horz || !c->max_vert));
                 break;
-            case CLIENT_SHADE:
-                *en = c->functions & OB_CLIENT_FUNC_SHADE;
+            case CLIENT_ROLL_UP:
+                *en = c->functions & OB_CLIENT_FUNC_SHADE && !c->shaded;
+                break;
+            case CLIENT_ROLL_DOWN:
+                *en = c->functions & OB_CLIENT_FUNC_SHADE && c->shaded;
                 break;
             case CLIENT_MOVE:
                 *en = c->functions & OB_CLIENT_FUNC_MOVE;
@@ -122,8 +126,11 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     case CLIENT_MAXIMIZE:
         client_maximize(c, TRUE, 0);
         break;
-    case CLIENT_SHADE:
-        client_shade(c, !c->shaded);
+    case CLIENT_ROLL_UP:
+        client_shade(c, TRUE);
+        break;
+    case CLIENT_ROLL_DOWN:
+        client_shade(c, FALSE);
         break;
     case CLIENT_DECORATE:
         client_set_undecorated(c, !c->undecorated);
@@ -391,13 +398,9 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    e = menu_add_normal(menu, CLIENT_SHADE, _("&Roll up/down"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->shade_mask;
-    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
-    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
-    e->data.normal.mask_disabled_selected_color =
-        ob_rr_theme->menu_disabled_selected_color;
+    menu_add_normal(menu, CLIENT_ROLL_UP, _("Roll &up"), NULL, TRUE);
+
+    menu_add_normal(menu, CLIENT_ROLL_DOWN, _("Roll do&wn"), NULL, TRUE);
 
     menu_add_normal(menu, CLIENT_DECORATE, _("Un/&Decorate"), NULL, TRUE);
 

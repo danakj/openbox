@@ -539,8 +539,8 @@ static gboolean has_valid_group_siblings_on_desktop(ObClient *ft,
     for (it = ft->group->members; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
-        if (c != ft && !client_helper(ft) &&
-            valid_focus_target(ft, all_desktops, FALSE))
+        if (c != ft && !client_helper(c) &&
+            valid_focus_target(c, all_desktops, FALSE))
         {
             return TRUE;
         }

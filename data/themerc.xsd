@@ -162,8 +162,18 @@
     </xs:all>
   </xs:complexType>
 
+  <xs:complexType name="about">
+    <xs:all>
+      <xs:element name="author" type="xs:string" minOccurs="0"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="webpage" type="xs:string" minOccurs="0"/>
+      <xs:element name="comment" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
   <xs:complexType name="theme">
     <xs:all>
+      <xs:element name="about" type="obt:about" minOccurs="0"/>
       <xs:element name="dimensions" type="obt:themeDimensions" minOccurs="0"/>
       <xs:element name="osd" type="obt:allosd" minOccurs="0"/>
       <xs:element name="menu" type="obt:allmenus" minOccurs="0"/>

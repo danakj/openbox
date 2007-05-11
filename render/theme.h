@@ -135,7 +135,9 @@ struct _RrTheme {
     RrPixmapMask *close_pressed_mask;
 
     RrPixmapMask *menu_bullet_mask; /* submenu pointer */
+#if 0
     RrPixmapMask *menu_toggle_mask; /* menu boolean */
+#endif
 
     /* global appearances */
     RrAppearance *a_disabled_focused_max;

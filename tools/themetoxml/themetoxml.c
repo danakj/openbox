@@ -346,12 +346,20 @@ int main(int argc, char **argv)
         CONT3("dimensions", "window", "border", NUM(i));
         CONT3("dimensions", "menu", "border", NUM(i));
     }
+    if (read_int(db, "menu.border.width", &i))
+        CONT3("dimensions", "menu", "border", NUM(i));
 
     if (read_color(db, "border.color", &i, &j, &k)) {
         COLOR3("window", "active", "border", i, j, k, 255);
         COLOR3("window", "inactive", "border", i, j, k, 255);
         COLOR2("menu", "border", i, j, k, 255);
     }
+    if (read_color(db, "window.active.border.color", &i, &j, &k))
+        COLOR3("window", "active", "border", i, j, k, 255);
+    if (read_color(db, "window.inactive.border.color", &i, &j, &k))
+        COLOR3("window", "inactive", "border", i, j, k, 255);
+    if (read_color(db, "menu.border.color", &i, &j, &k))
+        COLOR2("menu", "border", i, j, k, 255);
 
     if (read_int(db, "window.client.padding.width", &i)) {
         ATTR3("dimensions", "window", "clientpadding", "x", NUM(i));

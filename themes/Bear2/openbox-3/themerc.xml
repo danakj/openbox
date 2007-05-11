@@ -122,7 +122,7 @@
     <justify>center</justify>
   </window>
   <menu>
-    <border r="78" g="78" b="78" a="255"/>
+    <border r="157" g="157" b="157" a="255"/>
     <justify>center</justify>
     <overlap>2</overlap>
     <title>

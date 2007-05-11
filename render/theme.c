@@ -425,7 +425,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         if (!read_mask(&ps, "max_toggled_pressed.xbm",
                        &theme->max_toggled_pressed_mask))
             theme->max_toggled_pressed_mask =
-                RrPixmapMaskCopy(theme->max_toggled_mask);
+                RrPixmapMaskCopy(theme->max_pressed_mask);
         if (!read_mask(&ps, "max_toggled_hover.xbm",
                        &theme->max_toggled_hover_mask))
             theme->max_toggled_hover_mask =
@@ -447,7 +447,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
         theme->max_hover_mask = RrPixmapMaskCopy(theme->max_mask);
         theme->max_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->max_toggled_mask);
+            RrPixmapMaskCopy(theme->max_pressed_mask);
         theme->max_toggled_hover_mask =
             RrPixmapMaskCopy(theme->max_toggled_mask);
     }
@@ -486,7 +486,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         if (!read_mask(&ps, "desk_toggled_pressed.xbm",
                        &theme->desk_toggled_pressed_mask))
             theme->desk_toggled_pressed_mask =
-                RrPixmapMaskCopy(theme->desk_toggled_mask);
+                RrPixmapMaskCopy(theme->desk_pressed_mask);
         if (!read_mask(&ps, "desk_toggled_hover.xbm",
                        &theme->desk_toggled_hover_mask))
             theme->desk_toggled_hover_mask =
@@ -509,7 +509,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->desk_disabled_mask = RrPixmapMaskCopy(theme->desk_mask);
         theme->desk_hover_mask = RrPixmapMaskCopy(theme->desk_mask);
         theme->desk_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->desk_toggled_mask);
+            RrPixmapMaskCopy(theme->desk_pressed_mask);
         theme->desk_toggled_hover_mask =
             RrPixmapMaskCopy(theme->desk_toggled_mask);
     }
@@ -523,7 +523,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         if (!read_mask(&ps, "shade_toggled_pressed.xbm",
                        &theme->shade_toggled_pressed_mask))
             theme->shade_toggled_pressed_mask =
-                RrPixmapMaskCopy(theme->shade_toggled_mask);
+                RrPixmapMaskCopy(theme->shade_pressed_mask);
         if (!read_mask(&ps, "shade_toggled_hover.xbm",
                        &theme->shade_toggled_hover_mask))
             theme->shade_toggled_hover_mask =
@@ -546,7 +546,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_mask);
         theme->shade_hover_mask = RrPixmapMaskCopy(theme->shade_mask);
         theme->shade_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->shade_toggled_mask);
+            RrPixmapMaskCopy(theme->shade_pressed_mask);
         theme->shade_toggled_hover_mask =
             RrPixmapMaskCopy(theme->shade_toggled_mask);
     }
@@ -687,14 +687,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     {
         RrAppearanceFree(theme->a_toggled_hover_focused_max);
         theme->a_toggled_hover_focused_max =
-            RrAppearanceCopy(theme->a_toggled_focused_pressed_max);
+            RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
     }
     if (!FIND(appearance, L("window","inactive","buttons","toggled-hover"),
               theme->a_toggled_hover_unfocused_max, TRUE))
     {
         RrAppearanceFree(theme->a_toggled_hover_unfocused_max);
         theme->a_toggled_hover_unfocused_max =
-            RrAppearanceCopy(theme->a_toggled_unfocused_pressed_max);
+            RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
     }
 
    theme->a_disabled_focused_close =

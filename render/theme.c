@@ -37,7 +37,7 @@ static gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value);
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
                            const gchar *rname, RrColor **value);
 static gboolean read_mask(const RrInstance *inst, const gchar *path,
-                          const gchar *maskname, RrTheme *theme,
+                          RrTheme *theme, const gchar *maskname,
                           RrPixmapMask **value);
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 const gchar *rname, RrAppearance *value,
@@ -336,159 +336,131 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                    theme->titlebut_unfocused_pressed_color->g,
                    theme->titlebut_unfocused_pressed_color->b);
     
-    if (read_mask(inst, path, "max.xbm", theme, &theme->max_mask)) {
-        if (!read_mask(inst, path, "max_pressed.xbm", theme,
-                       &theme->max_pressed_mask)) {
-            theme->max_pressed_mask = RrPixmapMaskCopy(theme->max_mask);
-        } 
-        if (!read_mask(inst, path, "max_toggled.xbm", theme,
-                       &theme->max_toggled_mask)) {
-            theme->max_toggled_mask =
-                RrPixmapMaskCopy(theme->max_pressed_mask);
-        }
-        if (!read_mask(inst, path, "max_disabled.xbm", theme,
-                       &theme->max_disabled_mask)) {
-            theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
-        } 
-        if (!read_mask(inst, path, "max_hover.xbm", theme,
-                       &theme->max_hover_mask)) {
-            theme->max_hover_mask = RrPixmapMaskCopy(theme->max_mask);
-        }
-    } else {
-        {
+    /* load the image masks */
+
+    /* maximize button masks */
+    if (!read_mask(inst, path, theme, "max.xbm", &theme->max_mask)) {
             guchar data[] = { 0x3f, 0x3f, 0x21, 0x21, 0x21, 0x3f };
             theme->max_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
         }
-        {
-            guchar data[] = { 0x3e, 0x22, 0x2f, 0x29, 0x39, 0x0f };
-            theme->max_toggled_mask = RrPixmapMaskNew(inst, 6, 6,(gchar*)data);
-        }
+    if (!read_mask(inst, path, theme, "max_toggled.xbm",
+                   &theme->max_toggled_mask))
+    {
+        guchar data[] = { 0x3e, 0x22, 0x2f, 0x29, 0x39, 0x0f };
+        theme->max_toggled_mask = RrPixmapMaskNew(inst, 6, 6,(gchar*)data);
+    }
+    if (!read_mask(inst, path, theme, "max_pressed.xbm",
+                   &theme->max_pressed_mask))
         theme->max_pressed_mask = RrPixmapMaskCopy(theme->max_mask);
+    if (!read_mask(inst,path,theme,"max_disabled.xbm",
+                   &theme->max_disabled_mask))
         theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
+    if (!read_mask(inst, path, theme, "max_hover.xbm", &theme->max_hover_mask))
         theme->max_hover_mask = RrPixmapMaskCopy(theme->max_mask);
-    }
+    if (!read_mask(inst, path, theme, "max_toggled_pressed.xbm",
+                   &theme->max_toggled_pressed_mask))
+        theme->max_toggled_pressed_mask =
+            RrPixmapMaskCopy(theme->max_toggled_mask);
+    if (!read_mask(inst, path, theme, "max_toggled_hover.xbm",
+                   &theme->max_toggled_hover_mask))
+        theme->max_toggled_hover_mask =
+            RrPixmapMaskCopy(theme->max_toggled_mask);
 
-    if (read_mask(inst, path, "iconify.xbm", theme, &theme->iconify_mask)) {
-        if (!read_mask(inst, path, "iconify_pressed.xbm", theme,
-                       &theme->iconify_pressed_mask)) {
-            theme->iconify_pressed_mask =
-                RrPixmapMaskCopy(theme->iconify_mask);
-        } 
-        if (!read_mask(inst, path, "iconify_disabled.xbm", theme,
-                       &theme->iconify_disabled_mask)) {
-            theme->iconify_disabled_mask =
-                RrPixmapMaskCopy(theme->iconify_mask);
-        } 
-        if (!read_mask(inst, path, "iconify_hover.xbm", theme,
-                       &theme->iconify_hover_mask)) {
-            theme->iconify_hover_mask = RrPixmapMaskCopy(theme->iconify_mask);
-        }
-    } else {
-        {
-            guchar data[] = { 0x00, 0x00, 0x00, 0x00, 0x3f, 0x3f };
-            theme->iconify_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
-        }
+    /* iconify button masks */
+    if (!read_mask(inst, path, theme, "iconify.xbm", &theme->iconify_mask)) {
+        guchar data[] = { 0x00, 0x00, 0x00, 0x00, 0x3f, 0x3f };
+        theme->iconify_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+    }
+    if (!read_mask(inst, path, theme, "iconify_pressed.xbm",
+                   &theme->iconify_pressed_mask))
         theme->iconify_pressed_mask = RrPixmapMaskCopy(theme->iconify_mask);
+    if (!read_mask(inst, path, theme, "iconify_disabled.xbm",
+                   &theme->iconify_disabled_mask))
         theme->iconify_disabled_mask = RrPixmapMaskCopy(theme->iconify_mask);
+    if (!read_mask(inst, path, theme, "iconify_hover.xbm",
+                   &theme->iconify_hover_mask))
         theme->iconify_hover_mask = RrPixmapMaskCopy(theme->iconify_mask);
+
+    /* all desktops button masks */
+    if (!read_mask(inst, path, theme, "desk.xbm", &theme->desk_mask)) {
+        guchar data[] = { 0x33, 0x33, 0x00, 0x00, 0x33, 0x33 };
+        theme->desk_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-
-    theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
-                                       OB_DEFAULT_ICON_HEIGHT,
-                                       OB_DEFAULT_ICON_pixel_data);
-
-    if (read_mask(inst, path, "desk.xbm", theme, &theme->desk_mask)) {
-        if (!read_mask(inst, path, "desk_pressed.xbm", theme,
-                       &theme->desk_pressed_mask)) {
-            theme->desk_pressed_mask = RrPixmapMaskCopy(theme->desk_mask);
-        } 
-        if (!read_mask(inst, path, "desk_toggled.xbm", theme,
-                       &theme->desk_toggled_mask)) {
-            theme->desk_toggled_mask =
-                RrPixmapMaskCopy(theme->desk_pressed_mask);
-        }
-        if (!read_mask(inst, path, "desk_disabled.xbm", theme,
-                       &theme->desk_disabled_mask)) {
-            theme->desk_disabled_mask = RrPixmapMaskCopy(theme->desk_mask);
-        } 
-        if (!read_mask(inst, path, "desk_hover.xbm", theme, 
-                       &theme->desk_hover_mask)) {
-            theme->desk_hover_mask = RrPixmapMaskCopy(theme->desk_mask);
-        }
-    } else {
-        {
-            guchar data[] = { 0x33, 0x33, 0x00, 0x00, 0x33, 0x33 };
-            theme->desk_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
-        }
-        {
-            guchar data[] = { 0x00, 0x1e, 0x1a, 0x16, 0x1e, 0x00 };
-            theme->desk_toggled_mask = RrPixmapMaskNew(inst,6,6,(gchar*)data);
-        }
+    if (!read_mask(inst, path, theme, "desk_toggled.xbm",
+                   &theme->desk_toggled_mask)) {
+        guchar data[] = { 0x00, 0x1e, 0x1a, 0x16, 0x1e, 0x00 };
+        theme->desk_toggled_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+    }
+    if (!read_mask(inst, path, theme, "desk_pressed.xbm",
+                   &theme->desk_pressed_mask))
         theme->desk_pressed_mask = RrPixmapMaskCopy(theme->desk_mask);
+    if (!read_mask(inst, path, theme, "desk_disabled.xbm",
+                   &theme->desk_disabled_mask))
         theme->desk_disabled_mask = RrPixmapMaskCopy(theme->desk_mask);
+    if (!read_mask(inst, path, theme, "desk_hover.xbm",
+                   &theme->desk_hover_mask))
         theme->desk_hover_mask = RrPixmapMaskCopy(theme->desk_mask);
-    }
+    if (!read_mask(inst, path, theme, "desk_toggled_pressed.xbm",
+                   &theme->desk_toggled_pressed_mask))
+        theme->desk_toggled_pressed_mask =
+            RrPixmapMaskCopy(theme->desk_toggled_mask);
+    if (!read_mask(inst, path, theme, "desk_toggled_hover.xbm",
+                   &theme->desk_toggled_hover_mask))
+        theme->desk_toggled_hover_mask =
+            RrPixmapMaskCopy(theme->desk_toggled_mask);
 
-    if (read_mask(inst, path, "shade.xbm", theme, &theme->shade_mask)) {
-        if (!read_mask(inst, path, "shade_pressed.xbm", theme,
-                       &theme->shade_pressed_mask)) {
-            theme->shade_pressed_mask = RrPixmapMaskCopy(theme->shade_mask);
-        } 
-        if (!read_mask(inst, path, "shade_toggled.xbm", theme,
-                       &theme->shade_toggled_mask)) {
-            theme->shade_toggled_mask =
-                RrPixmapMaskCopy(theme->shade_pressed_mask);
-        }
-        if (!read_mask(inst, path, "shade_disabled.xbm", theme,
-                       &theme->shade_disabled_mask)) {
-            theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_mask);
-        } 
-        if (!read_mask(inst, path, "shade_hover.xbm", theme, 
-                       &theme->shade_hover_mask)) {
-            theme->shade_hover_mask = RrPixmapMaskCopy(theme->shade_mask);
-        }
-    } else {
-        {
-            guchar data[] = { 0x3f, 0x3f, 0x00, 0x00, 0x00, 0x00 };
-            theme->shade_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
-        }
-        {
-            guchar data[] = { 0x3f, 0x3f, 0x00, 0x00, 0x00, 0x00 };
-            theme->shade_toggled_mask = RrPixmapMaskNew(inst,6,6,(gchar*)data);
-        }
+    /* shade button masks */
+    if (!read_mask(inst, path, theme, "shade.xbm", &theme->shade_mask)) {
+        guchar data[] = { 0x3f, 0x3f, 0x00, 0x00, 0x00, 0x00 };
+        theme->shade_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+    }
+    if (!read_mask(inst, path, theme, "shade_toggled.xbm",
+                  &theme->shade_toggled_mask))
+        theme->shade_toggled_mask = RrPixmapMaskCopy(theme->shade_mask);
+    if (!read_mask(inst, path, theme, "shade_pressed.xbm",
+                   &theme->shade_pressed_mask))
         theme->shade_pressed_mask = RrPixmapMaskCopy(theme->shade_mask);
+    if (!read_mask(inst, path, theme, "shade_disabled.xbm",
+                   &theme->shade_disabled_mask))
         theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_mask);
+    if (!read_mask(inst, path, theme, "shade_hover.xbm",
+                   &theme->shade_hover_mask))
         theme->shade_hover_mask = RrPixmapMaskCopy(theme->shade_mask);
-    }
+    if (!read_mask(inst, path, theme, "shade_toggled_pressed.xbm",
+                   &theme->shade_toggled_pressed_mask))
+        theme->shade_toggled_pressed_mask =
+            RrPixmapMaskCopy(theme->shade_toggled_mask);
+    if (!read_mask(inst, path, theme, "shade_toggled_hover.xbm",
+                   &theme->shade_toggled_hover_mask))
+        theme->shade_toggled_hover_mask =
+            RrPixmapMaskCopy(theme->shade_toggled_mask);
 
-    if (read_mask(inst, path, "close.xbm", theme, &theme->close_mask)) {
-        if (!read_mask(inst, path, "close_pressed.xbm", theme,
-                       &theme->close_pressed_mask)) {
-            theme->close_pressed_mask = RrPixmapMaskCopy(theme->close_mask);
-        } 
-        if (!read_mask(inst, path, "close_disabled.xbm", theme,
-                       &theme->close_disabled_mask)) {
-            theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
-        } 
-        if (!read_mask(inst, path, "close_hover.xbm", theme,
-                       &theme->close_hover_mask)) {
-            theme->close_hover_mask = RrPixmapMaskCopy(theme->close_mask);
-        }
-    } else {
-        {
-            guchar data[] = { 0x33, 0x3f, 0x1e, 0x1e, 0x3f, 0x33 };
-            theme->close_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
-        }
+    /* close button masks */
+    if (!read_mask(inst, path, theme, "close.xbm", &theme->close_mask)) {
+        guchar data[] = { 0x33, 0x3f, 0x1e, 0x1e, 0x3f, 0x33 };
+        theme->close_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+    }
+    if (!read_mask(inst, path, theme, "close_pressed.xbm",
+                   &theme->close_pressed_mask))
         theme->close_pressed_mask = RrPixmapMaskCopy(theme->close_mask);
+    if (!read_mask(inst, path, theme, "close_disabled.xbm",
+                   &theme->close_disabled_mask))
         theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
+    if (!read_mask(inst, path, theme, "close_hover.xbm",
+                   &theme->close_hover_mask))
         theme->close_hover_mask = RrPixmapMaskCopy(theme->close_mask);
-    }
 
-    if (!read_mask(inst, path, "bullet.xbm", theme,
-                   &theme->menu_bullet_mask)) {
+    /* submenu bullet mask */
+    if (!read_mask(inst, path, theme, "bullet.xbm", &theme->menu_bullet_mask))
+    {
         guchar data[] = { 0x01, 0x03, 0x07, 0x0f, 0x07, 0x03, 0x01 };
         theme->menu_bullet_mask = RrPixmapMaskNew(inst, 4, 7, (gchar*)data);
     }
+
+    /* setup the default window icon */
+    theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
+                                       OB_DEFAULT_ICON_HEIGHT,
+                                       OB_DEFAULT_ICON_pixel_data);
 
     /* the toggled hover mask = the toggled unpressed mask (i.e. no change) */
     theme->max_toggled_hover_mask =
@@ -1525,7 +1497,7 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
 }
 
 static gboolean read_mask(const RrInstance *inst, const gchar *path,
-                          const gchar *maskname, RrTheme *theme,
+                          RrTheme *theme, const gchar *maskname,
                           RrPixmapMask **value)
 {
     gboolean ret = FALSE;

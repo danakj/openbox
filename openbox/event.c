@@ -98,6 +98,12 @@ Time event_curtime = CurrentTime;
 static guint ignore_enter_focus = 0;
 static gboolean menu_can_hide;
 static gboolean focus_left_screen = FALSE;
+/*! This variable is used for focus fallback. If we fallback to a window, we
+  set this to the window. And when focus goes somewhere after that, it will
+  be set to NULL. If between falling back to that window and something
+  getting focused, the window gets unmanaged, then if there are no incoming
+  FocusIn events, we fallback again because focus has just gotten itself lost.
+ */
 static ObClient *focus_tried = NULL;
 
 #ifdef USE_SM
@@ -1081,9 +1087,17 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         /* we were trying to focus this window but it's gone */
         if (client == focus_tried) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x but it "
-                          "is being unmanaged. Falling back focus again.\n");
-            focus_tried = focus_fallback(TRUE);
+            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
+                          "is being unmanaged:\n");
+            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
+                XPutBackEvent(ob_display, &ce);
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  but another FocusIn is coming\n");
+            } else {
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  so falling back focus again.\n");
+                focus_tried = focus_fallback(TRUE);
+            }
         }
         break;
     case DestroyNotify:
@@ -1092,9 +1106,17 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         /* we were trying to focus this window but it's gone */
         if (client == focus_tried) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x but it "
-                          "is being unmanaged. Falling back focus again.\n");
-            focus_tried = focus_fallback(TRUE);
+            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
+                          "is being unmanaged:\n");
+            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
+                XPutBackEvent(ob_display, &ce);
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  but another FocusIn is coming\n");
+            } else {
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  so falling back focus again.\n");
+                focus_tried = focus_fallback(TRUE);
+            }
         }
         break;
     case ReparentNotify:
@@ -1117,9 +1139,17 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         /* we were trying to focus this window but it's gone */
         if (client == focus_tried) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x but it "
-                          "is being unmanaged. Falling back focus again.\n");
-            focus_tried = focus_fallback(TRUE);
+            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
+                          "is being unmanaged:\n");
+            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
+                XPutBackEvent(ob_display, &ce);
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  but another FocusIn is coming\n");
+            } else {
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  so falling back focus again.\n");
+                focus_tried = focus_fallback(TRUE);
+            }
         }
         break;
     case MapRequest:

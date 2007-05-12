@@ -363,7 +363,7 @@ dist_rc_DATA = \
 	data/menu.xml
 
 edit = $(SED) \
-	-e 's!@time\@!`date`!' \
+	-e 's!@time\@!$(shell date "+%a, %d %B %Y %T %z")!' \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
@@ -390,7 +390,6 @@ debian/changelog: debian debian/changelog.in
 	@rm -f $@
 	@mkdir debian 2>/dev/null || true
 	@$(edit) $(srcdir)/debian/changelog.in >$@
-	@chmod +x $@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop \
@@ -465,8 +464,8 @@ distclean-local:
 		done \
 	done
 
-deb:    dist debian/changelog
+deb:	dist debian/changelog
 	fakeroot debian/rules binary
-#        dpkg-buildpackage -rfakeroot
+#	dpkg-buildpackage -b -rfakeroot -f openbox-$(VERSION).tar.gz
 
 .PHONY: doc deb

@@ -8,7 +8,7 @@ Standards-Version: 3.7.2
 Package: openbox
 Architecture: i386
 Depends: libc6 (>= 2.5), libglib2.0-0, libxcursor, libx11-6, libpango1.0-0, libice6, libsm6, libxext6, libxinerama1, libxml2, libstartup-notification0, libxft2
-Recommends: obconf, x-display-manager, (ksmserver | gnome-session), ttf-bitstream-vera
+Recommends: obconf, x-display-manager, ksmserver | gnome-session, ttf-bitstream-vera
 Suggests: menu
 Conflicts: menu (<< 2.1.12)
 Provides: x-window-manager

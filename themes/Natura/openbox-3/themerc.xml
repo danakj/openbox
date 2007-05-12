@@ -43,10 +43,10 @@
           <style>parentrelative</style>
           <primary r="52" g="59" b="64" a="255"/>
           <secondary r="0" g="0" b="0" a="255"/>
-          <border r="149" g="165" b="178" a="255"/>
+          <border r="177" g="161" b="158" a="255"/>
         </pressed>
         <disabled>
-          <image r="255" g="255" b="255" a="255"/>
+          <image r="114" g="94" b="81" a="255"/>
           <style>parentrelative</style>
           <border r="78" g="88" b="96" a="255"/>
         </disabled>
@@ -107,13 +107,13 @@
           <border r="123" g="125" b="123" a="255"/>
         </pressed>
         <disabled>
-          <image r="255" g="255" b="255" a="255"/>
+          <image r="221" g="221" b="221" a="255"/>
           <style>parentrelative</style>
           <primary r="238" g="238" b="238" a="255"/>
           <border r="201" g="201" b="201" a="255"/>
         </disabled>
         <hover>
-          <image r="255" g="255" b="255" a="255"/>
+          <image r="160" g="160" b="160" a="255"/>
           <style>parentrelative</style>
           <primary r="175" g="177" b="178" a="255"/>
           <border r="217" g="223" b="228" a="255"/>

@@ -1,5 +1,6 @@
 SUBDIRS = m4 po
 
+docxbmdir       = $(docdir)/xbm
 themedir        = $(datadir)/themes
 localedir       = $(datadir)/locale
 configdir       = $(sysconfdir)/xdg
@@ -247,28 +248,27 @@ tools_gnome_panel_control_gnome_panel_control_SOURCES = \
 	tools/gnome-panel-control/gnome-panel-control.c
 
 
+## default button masks ##
+dist_docxbm_DATA = \
+        data/xbm/bullet.xbm \
+        data/xbm/close.xbm \
+        data/xbm/desk_toggled.xbm \
+        data/xbm/desk.xbm \
+        data/xbm/iconify.xbm \
+        data/xbm/max_toggled.xbm \
+        data/xbm/max.xbm \
+        data/xbm/shade_toggled.xbm \
+        data/xbm/shade.xbm
+
+
 ## themes ##
 
 clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
 dist_clearlooks_theme_DATA= \
-	themes/Clearlooks/openbox-3/bullet.xbm \
-	themes/Clearlooks/openbox-3/close.xbm \
-	themes/Clearlooks/openbox-3/desk_toggled.xbm \
-	themes/Clearlooks/openbox-3/desk.xbm \
-	themes/Clearlooks/openbox-3/iconify.xbm \
-	themes/Clearlooks/openbox-3/max_toggled.xbm \
-	themes/Clearlooks/openbox-3/max.xbm \
 	themes/Clearlooks/openbox-3/themerc.xml
 
 clearlooksolive_themedir = $(themedir)/Clearlooks-Olive/openbox-3
 dist_clearlooksolive_theme_DATA= \
-	themes/Clearlooks-Olive/openbox-3/bullet.xbm \
-	themes/Clearlooks-Olive/openbox-3/close.xbm \
-	themes/Clearlooks-Olive/openbox-3/desk_toggled.xbm \
-	themes/Clearlooks-Olive/openbox-3/desk.xbm \
-	themes/Clearlooks-Olive/openbox-3/iconify.xbm \
-	themes/Clearlooks-Olive/openbox-3/max_toggled.xbm \
-	themes/Clearlooks-Olive/openbox-3/max.xbm \
 	themes/Clearlooks-Olive/openbox-3/themerc.xml
 
 mikachu_themedir = $(themedir)/Mikachu/openbox-3
@@ -286,25 +286,19 @@ dist_natura_theme_DATA= \
 	themes/Natura/openbox-3/close_hover.xbm \
 	themes/Natura/openbox-3/close.xbm \
 	themes/Natura/openbox-3/desk_toggled.xbm \
+	themes/Natura/openbox-3/desk_hover.xbm \
 	themes/Natura/openbox-3/desk.xbm \
-	themes/Natura/openbox-3/iconify_disabled.xbm \
 	themes/Natura/openbox-3/iconify_hover.xbm \
 	themes/Natura/openbox-3/iconify.xbm \
-	themes/Natura/openbox-3/max_disabled.xbm \
 	themes/Natura/openbox-3/max_hover.xbm \
 	themes/Natura/openbox-3/max_toggled.xbm \
 	themes/Natura/openbox-3/max.xbm \
 	themes/Natura/openbox-3/shade.xbm \
+	themes/Natura/openbox-3/shade_hover.xbm \
 	themes/Natura/openbox-3/themerc.xml
 
 artwizboxed_themedir = $(themedir)/Artwiz-boxed/openbox-3
 dist_artwizboxed_theme_DATA= \
-	themes/Artwiz-boxed/openbox-3/close.xbm \
-	themes/Artwiz-boxed/openbox-3/desk_toggled.xbm \
-	themes/Artwiz-boxed/openbox-3/desk.xbm \
-	themes/Artwiz-boxed/openbox-3/iconify.xbm \
-	themes/Artwiz-boxed/openbox-3/max_toggled.xbm \
-	themes/Artwiz-boxed/openbox-3/max.xbm \
 	themes/Artwiz-boxed/openbox-3/themerc.xml
 
 bear2_themedir = $(themedir)/Bear2/openbox-3
@@ -313,10 +307,8 @@ dist_bear2_theme_DATA= \
 	themes/Bear2/openbox-3/close.xbm \
 	themes/Bear2/openbox-3/desk_toggled.xbm \
 	themes/Bear2/openbox-3/desk.xbm \
-	themes/Bear2/openbox-3/iconify_disabled.xbm \
 	themes/Bear2/openbox-3/iconify_pressed.xbm \
 	themes/Bear2/openbox-3/iconify.xbm \
-	themes/Bear2/openbox-3/max_disabled.xbm \
 	themes/Bear2/openbox-3/max_pressed.xbm \
 	themes/Bear2/openbox-3/max_toggled.xbm \
 	themes/Bear2/openbox-3/max.xbm \
@@ -330,17 +322,10 @@ dist_orang_theme_DATA= \
 
 syscrash_themedir = $(themedir)/Syscrash/openbox-3
 dist_syscrash_theme_DATA= \
-	themes/Syscrash/openbox-3/bullet.xbm \
-	themes/Syscrash/openbox-3/close_disabled.xbm \
-	themes/Syscrash/openbox-3/close.xbm \
-	themes/Syscrash/openbox-3/desk_toggled.xbm \
-	themes/Syscrash/openbox-3/desk.xbm \
-	themes/Syscrash/openbox-3/iconify.xbm \
 	themes/Syscrash/openbox-3/max_disabled.xbm \
 	themes/Syscrash/openbox-3/max_pressed.xbm \
 	themes/Syscrash/openbox-3/max_toggled.xbm \
 	themes/Syscrash/openbox-3/max.xbm \
-	themes/Syscrash/openbox-3/shade.xbm \
 	themes/Syscrash/openbox-3/themerc.xml
 
 ## public headers ##
@@ -432,14 +417,16 @@ dist_noinst_DATA = \
 	tests/title.c \
 	tests/urgent.c
 
+dist_doc_DATA = \
+	COMPLIANCE \
+	README \
+	AUTHORS
+
 EXTRA_DIST = \
 	config.rpath \
 	mkinstalldirs \
 	CHANGELOG \
-	COMPLIANCE \
-	README \
-	COPYING \
-	AUTHORS
+	COPYING
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

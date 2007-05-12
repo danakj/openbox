@@ -42,7 +42,7 @@
           <primary r="167" g="206" b="242" a="255"/>
         </pressed>
         <disabled>
-          <image r="221" g="221" b="221" a="255"/>
+          <image r="109" g="143" b="188" a="255"/>
           <style>parentrelative</style>
         </disabled>
         <hover>
@@ -93,7 +93,7 @@
           <primary r="79" g="80" b="81" a="255"/>
         </pressed>
         <disabled>
-          <image r="255" g="255" b="255" a="255"/>
+          <image r="208" g="208" b="208" a="255"/>
           <style>parentrelative</style>
         </disabled>
         <hover>

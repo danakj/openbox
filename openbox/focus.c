@@ -57,7 +57,8 @@ static ObIconPopup *focus_cycle_popup;
 
 static gboolean valid_focus_target(ObClient *ft,
                                    gboolean all_desktops,
-                                   gboolean dock_windows);
+                                   gboolean dock_windows,
+                                   gboolean desktop_windows);
 static void focus_cycle_destructor(ObClient *client, gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
@@ -166,7 +167,7 @@ void focus_set_client(ObClient *client)
        be used.
     */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
     focus_client = client;
 
@@ -323,7 +324,8 @@ static gchar *popup_get_name(ObClient *c, ObClient **nametarget)
 }
 
 static void popup_cycle(ObClient *c, gboolean show,
-                        gboolean all_desktops, gboolean dock_windows)
+                        gboolean all_desktops, gboolean dock_windows,
+                        gboolean desktop_windows)
 {
     gchar *showtext = NULL;
     ObClient *showtarget;
@@ -357,7 +359,9 @@ static void popup_cycle(ObClient *c, gboolean show,
         /* build a list of all the valid focus targets */
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *ft = it->data;
-            if (valid_focus_target(ft, all_desktops, dock_windows)) {
+            if (valid_focus_target(ft, all_desktops, dock_windows
+                                   , desktop_windows))
+            {
                 targets = g_list_prepend(targets, ft);
                 ++n;
             }
@@ -394,7 +398,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
        be used
     */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
 void focus_cycle_draw_indicator()
@@ -543,7 +547,7 @@ static gboolean has_valid_group_siblings_on_desktop(ObClient *ft,
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
         if (c != ft && !client_helper(c) &&
-            valid_focus_target(c, all_desktops, FALSE))
+            valid_focus_target(c, all_desktops, FALSE, FALSE))
         {
             return TRUE;
         }
@@ -555,7 +559,8 @@ static gboolean has_valid_group_siblings_on_desktop(ObClient *ft,
                          checking helper windows. */
 static gboolean valid_focus_target(ObClient *ft,
                                    gboolean all_desktops,
-                                   gboolean dock_windows)
+                                   gboolean dock_windows,
+                                   gboolean desktop_windows)
 {
     gboolean ok = FALSE;
 
@@ -570,8 +575,9 @@ static gboolean valid_focus_target(ObClient *ft,
     ok = ok && (ft->can_focus || ft->focus_notify);
 
     /* it's the right type of window */
-    if (dock_windows)
-        ok = ok && ft->type == OB_CLIENT_TYPE_DOCK;
+    if (dock_windows || desktop_windows)
+        ok = ok && ((dock_windows && ft->type == OB_CLIENT_TYPE_DOCK) ||
+                    (desktop_windows && ft->type == OB_CLIENT_TYPE_DESKTOP));
     else
         /* normal non-helper windows are valid targets */
         ok = ok &&
@@ -600,7 +606,7 @@ static gboolean valid_focus_target(ObClient *ft,
 }
 
 void focus_cycle(gboolean forward, gboolean all_desktops,
-                 gboolean dock_windows,
+                 gboolean dock_windows, gboolean desktop_windows,
                  gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
@@ -645,14 +651,17 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (valid_focus_target(ft, all_desktops, dock_windows)) {
+        if (valid_focus_target(ft, all_desktops, dock_windows,
+                               desktop_windows))
+        {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
                     focus_cycle_draw_indicator();
                 }
                 /* same arguments as valid_focus_target */
-                popup_cycle(ft, dialog, all_desktops, dock_windows);
+                popup_cycle(ft, dialog, all_desktops, dock_windows,
+                            desktop_windows);
                 return;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
@@ -674,7 +683,7 @@ done_cycle:
 
     if (interactive) {
         focus_cycle_draw_indicator();
-        popup_cycle(ft, FALSE, FALSE, FALSE);
+        popup_cycle(ft, FALSE, FALSE, FALSE, FALSE);
     }
 
     return;
@@ -682,7 +691,8 @@ done_cycle:
 
 /* this be mostly ripped from fvwm */
 static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
-                                 gboolean dock_windows) 
+                                        gboolean dock_windows,
+                                        gboolean desktop_windows) 
 {
     gint my_cx, my_cy, his_cx, his_cy;
     gint offset = 0;
@@ -707,9 +717,10 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if(cur == c)
             continue;
-        if (!dock_windows && !client_normal(cur))
+        if (!dock_windows && !desktop_windows && !client_normal(cur))
             continue;
-        if (dock_windows && cur->type != OB_CLIENT_TYPE_DOCK)
+        if (!(dock_windows && cur->type == OB_CLIENT_TYPE_DOCK) ||
+            (desktop_windows && cur->type == OB_CLIENT_TYPE_DESKTOP))
             continue;
         /* using c->desktop instead of screen_desktop doesn't work if the
          * current window was omnipresent, hope this doesn't have any other
@@ -785,7 +796,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
 }
 
 void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
-                             gboolean interactive,
+                             gboolean desktop_windows, gboolean interactive,
                              gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
@@ -807,12 +818,14 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (!focus_cycle_target) focus_cycle_target = focus_client;
 
     if (focus_cycle_target)
-        ft = focus_find_directional(focus_cycle_target, dir, dock_windows);
+        ft = focus_find_directional(focus_cycle_target, dir, dock_windows,
+                                    desktop_windows);
     else {
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (valid_focus_target(it->data, FALSE, dock_windows))
+            if (valid_focus_target(it->data, FALSE, dock_windows,
+                                   desktop_windows))
                 ft = it->data;
     }
         
@@ -824,7 +837,8 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     }
     if (focus_cycle_target) {
         /* same arguments as valid_focus_target */
-        popup_cycle(focus_cycle_target, dialog, FALSE, dock_windows);
+        popup_cycle(focus_cycle_target, dialog, FALSE, dock_windows,
+                    desktop_windows);
         if (dialog)
             return;
     }
@@ -838,7 +852,7 @@ done_cycle:
     focus_cycle_target = NULL;
 
     focus_cycle_draw_indicator();
-    popup_cycle(ft, FALSE, FALSE, FALSE);
+    popup_cycle(ft, FALSE, FALSE, FALSE, FALSE);
 
     return;
 }

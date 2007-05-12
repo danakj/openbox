@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-     xml Schema for the openbox windowmanager menu file
 
-     Changes:
-     Don Aug 14 21:10:27 CEST 2003 - pch(a)myzel.net
-         split from rc3.xsd
-     Mon Sep  8 12:33:57 CEST 2003 - pch(a)myzel.net
-         up to beta1
-     Die Sep 16 21:22:59 CEST 2003 - pch(a)myzel.net
-         use a namespace
-     Fri Sep 19 14:36:33 EDT 2003 - xor(a)orodu.net
-         use openbox.org for namespace
-     Mon Sep 22 02:42:10 EDT 2003 - xor(a)orodu.net
-         fix some capitalization
--->
+<!-- XML Schema for the Openbox windowm anager menu file -->
+
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/4.0/menu"
     xmlns:ob="http://openbox.org/4.0/menu"

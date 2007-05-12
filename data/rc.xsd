@@ -1,59 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> <!-- -*- nxml -*- -->
-<!--
-     xml Schema for the openbox windowmanager configuration file
 
-     Changes:
-     Son Aug 10 15:49:10 CEST 2003 - pch(a)myzel.net
-         restrictions added, up to current format
-     Don Aug 14 21:10:27 CEST 2003 - pch(a)myzel.net
-         up to current (from action.c,config.c)
-     Don Aug 21 23:07:30 CEST 2003 - pch(a)myzel.net
-         new element - follow
-     Mon Sep  1 00:57:55 CEST 2003 - pch(a)myzel.net
-         up to alpha7
-     Mit Sep  3 12:40:10 CEST 2003 - pch(a)myzel.net
-         up to alpha8, a little documentation
-     Mon Sep  8 11:52:07 CEST 2003 - pch(a)myzel.net
-         up to cvs 1.12
-     Mon Sep 15 14:27:42 CEST 2003 - pch(a)myzel.net
-         up to cvs 1.14
-     Die Sep 16 20:56:37 CEST 2003 - pch(a)myzel.net
-         use a namespace
-     Fri Sep 19 14:36:33 EDT 2003 - xor(a)orodu.net
-         use openbox.org for namespace
-     Mon Sep 22 02:34:53 EDT 2003 - xor(a)orodu.net
-         add the focusLast and raiseOnFocus options
-         fix some capitalization
-     Mon Sep 22 14:08:16 EDT 2003 - xor(a)orodu.net
-         update hideTimeout to hideDelay
-     Thu Apr 22 12:33:11 UTC 2004 - mikachu(a)openbox.org
-         add diffs between 3.1 and 3.2
-     Sun Oct 31 10:08:34 UTC 2004 - mikachu(a)openbox.org
-         we haven't remembered to update this changelog in a while,
-         adding desktopMenuIcons.
-     Thu Nov  4 12:07:08 UTC 2004 - mikachu(a)openbox.org
-         Add fourCorners to resize context.
-     Sat Feb 12 01:57:16 UTC 2005 - mikachu(a)openbox.org
-         Add the group option to raise/lower stuff.
-     Sun Sep 25 14:44:21 UTC 2005 - mikachu(a)openbox.org
-         Add showDelay for the dock
-     Tue Jul 18 23:43:15 CEST 2006 - jonaskoelker(a)gnu.org
-         hack code for great justice
-     Tue Oct 31 03:30:26 UTC 2006 - mikachu(a)openbox.org
-         Add movefromedge* actions
-     Sun Mar  4 12:12:19 EST 2007 - danakj(a)orodu.net
-         Add font section to theme section
-     Sun Mar  4 13:49:37 EST 2007 - danakj(a)orodu.net
-         Removing font shadows - they are going back into the themerc
-     Tue Apr 24 18:42:24 UTC 2007 - mikachu(a)openbox.org
-         Removed fourCorners option.
-     Wed Apr 25 14:02:40 UTC 2007 - mikachu(a)openbox.org
-         Fixed values for layer to be above/below, not top/bottom.
-         Add chroot attribute and keybind element to keybind element.
-         Remove xsd:sequence from everywhere, we don't care about order.
-     Thu Apr 26 09:11:03 EDT 2007 - danakj(a)orodu.net
-         Add the place attribute for fonts
--->
+<!-- XML Schema for the openbox windowmanager configuration file -->
+
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/4.0/rc"
     xmlns:ob="http://openbox.org/4.0/rc"

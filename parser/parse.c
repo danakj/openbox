@@ -417,6 +417,9 @@ void parse_paths_startup()
         xdg_data_dir_paths = split_paths(path);
     else {
         xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
+                                            g_strdup(DATADIR),
+                                            (GSListFunc) g_slist_append);
+        xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
                                             g_build_filename
                                             (G_DIR_SEPARATOR_S,
                                              "usr", "local", "share", NULL),
@@ -425,9 +428,6 @@ void parse_paths_startup()
                                             g_build_filename
                                             (G_DIR_SEPARATOR_S,
                                              "usr", "share", NULL),
-                                            (GSListFunc) g_slist_append);
-        xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
-                                            g_strdup(DATADIR),
                                             (GSListFunc) g_slist_append);
     }
     xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,

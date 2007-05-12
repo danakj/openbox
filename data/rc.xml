@@ -16,7 +16,7 @@
   <focusNew>yes</focusNew>
   <focusLast>no</focusLast>
   <followMouse>no</followMouse>
-  <focusDelay>0</focusDelay>
+  <focusDelay>200</focusDelay>
   <raiseOnFocus>no</raiseOnFocus>
 </focus>
 
@@ -31,12 +31,12 @@
   <titleNumber>yes</titleNumber>
   <!--
       avaible characters are NDSLIMC, each can occur at most once.
-      N: client menu
+      N: window icon
       L: window label (AKA title).
       I: iconify
       M: maximize
       C: close
-      S: shade
+      S: shade (roll up/down)
       D: omnipresent (on all desktops).
   -->
   <keepBorder>yes</keepBorder>

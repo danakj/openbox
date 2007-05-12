@@ -345,7 +345,6 @@ dist_rc_DATA = \
 	data/menu.xml
 
 edit = $(SED) \
-	-e 's!@time\@!$(shell date "+%a, %d %B %Y %T %z")!' \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
@@ -376,21 +375,21 @@ dist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
-	debian/changelog.in
-	debian/compat
-	debian/control
-	debian/copyright
-	debian/dirs
-	debian/docs
-	debian/menu.ex
-	debian/openbox-default.ex
-	debian/openbox.doc-base.EX
-	debian/postinst.ex
-	debian/postrm.ex
-	debian/preinst.ex
-	debian/prerm.ex
-	debian/rules
-	debian/watch.ex
+	debian/changelog.in \
+	debian/compat \
+	debian/control \
+	debian/copyright \
+	debian/dirs \
+	debian/docs \
+	debian/menu.ex \
+	debian/openbox-default.ex \
+	debian/openbox.doc-base.EX \
+	debian/postinst.ex \
+	debian/postrm.ex \
+	debian/preinst.ex \
+	debian/prerm.ex \
+	debian/rules \
+	debian/watch.ex \
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \
@@ -437,10 +436,4 @@ distclean-local:
 		done \
 	done
 
-deb:	Makefile
-	$(edit) $(srcdir)/debian/changelog.in >$(srcdir)/debian/changelog
-	fakeroot debian/rules binary
-
-#	dpkg-buildpackage -b -rfakeroot -f openbox-$(VERSION).tar.gz
-
-.PHONY: doc deb
+.PHONY: doc

@@ -1,0 +1,17 @@
+#!/bin/sh -x
+
+# get the version from configure.ac
+VERSION=$(grep AC_INIT\(\\\[openbox\\] configure.ac|cut -d [ -f 3-|cut -d ] -f 1)
+
+TIME="$(date '+%a, %d %B %Y %T %z')"
+
+IN=debian/changelog.in
+OUT=debian/changelog
+
+# make sure configure gets run with the right parameters
+make distclean || rm -f config.status
+
+rm -f $OUT
+
+sed -e "s!@time@!$TIME!" -e "s!@version@!$VERSION!" $IN >$OUT && \
+fakeroot debian/rules binary

@@ -325,7 +325,7 @@ int main(int argc, char **argv)
     xmlSetProp(root, (const xmlChar*)"engine", (const xmlChar*)"box");
     xmlSetProp(root, (const xmlChar*)"version", (const xmlChar*)"1");
     xmlSetProp(root, (const xmlChar*)"xmlns",
-               (const xmlChar*)"http://openbox.org/themerc");
+               (const xmlChar*)"http://openbox.org/4.0/themerc");
     CONT2("about", "author", "");
     CONT2("about", "email", "");
     CONT2("about", "webpage", "");

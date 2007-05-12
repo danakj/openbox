@@ -15,8 +15,8 @@
          fix some capitalization
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openbox.org/"
-    xmlns:ob="http://openbox.org/"
+    targetNamespace="http://openbox.org/4.0/menu"
+    xmlns:ob="http://openbox.org/4.0/menu"
     elementFormDefault="qualified">
     <!--
          root node

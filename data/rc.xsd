@@ -55,8 +55,8 @@
          Add the place attribute for fonts
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openbox.org/"
-    xmlns:ob="http://openbox.org/"
+    targetNamespace="http://openbox.org/4.0/rc"
+    xmlns:ob="http://openbox.org/4.0/rc"
     elementFormDefault="qualified">
     <!--
          root node

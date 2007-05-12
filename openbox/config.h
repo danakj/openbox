@@ -149,8 +149,6 @@ extern gint config_mouse_dclicktime;
 extern gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
 extern gint config_resist_edge;
-/*! Should windows resist edges at layers below */
-extern gboolean config_resist_layers_below;
 
 /*! Warp near edge on menu? */
 extern gboolean config_menu_warppointer;

@@ -3710,7 +3710,7 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
                 continue;                                                     \
             if(cur->iconic)                                                   \
                 continue;                                                     \
-            if(cur->layer < c->layer && !config_resist_layers_below)          \
+            if(cur->layer == c->layer)                                        \
                 continue;
 
 #define HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end) \

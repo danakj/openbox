@@ -5,7 +5,7 @@
 
 <openbox_config xmlns="http://openbox.org/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://openbox.org/3.4/">
+        xsi:schemaLocation="http://openbox.org/3.4/rc">
 
 <resistance>
   <strength>10</strength>

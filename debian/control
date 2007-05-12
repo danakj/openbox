@@ -1,0 +1,18 @@
+Source: openbox
+Section: x11
+Priority: optional
+Maintainer: Dana Jansens <danakj@orodu.net>
+Build-Depends: debhelper (>= 5), autotools-dev, gcc, automake1.9, autoconf, libtool, pkg-config, libpango1.0-dev, libglib2.0-dev, libxml2-dev, libxcursor-dev, libstartup-notification0-dev, xlibs-dev, libxinerama-dev, libxft2-dev
+Standards-Version: 3.7.2
+
+Package: openbox
+Architecture: i386
+Depends: libc6 (>= 2.5), libglib2.0-0, libxcursor, libx11-6, libpango1.0-0, libice6, libsm6, libxext6, libxinerama1, libxml2, libstartup-notification0, libxft2
+Recommends: obconf, x-display-manager, x-session-manager, ttf-bitstream-vera
+Suggests: menu
+Conflicts: menu (<< 2.1.12)
+Provides: x-window-manager
+Description: stuff
+ long stuff
+ .
+ http://openbox.org/

@@ -1,0 +1,21 @@
+Homepage: http://openbox.org/
+
+The main upstream author is Dana Jansens <danakj@orodu.net>.  To see
+a more complete listing of contributors, look at the AUTHORS file.
+
+Copyright:
+
+ This program is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by the
+ Free Software Foundation; either version 2, or (at your option) any
+ later version.
+
+ On Debian GNU/Linux systems, the complete text of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL'.
+
+Copyright for the Debian-related build-scripts:
+
+ Copyright (C) 2007      Dana Jansens <danakj@orodu.net>
+
+ These scripts are placed under the BSD license, which may be found in
+ the file `/usr/share/common-licenses/BSD' on most Debian systems.

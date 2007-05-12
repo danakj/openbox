@@ -109,7 +109,7 @@ msgstr "最大化(&X)"
 #: openbox/client_menu.c:394
 #, fuzzy
 msgid "&Roll up/down"
-#~ msgstr "向上捲動/向下捲動(&R)"
+msgstr "向上捲動/向下捲動(&R)"
 
 #: openbox/client_menu.c:402
 #, fuzzy

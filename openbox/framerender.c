@@ -177,8 +177,15 @@ void framerender_frame(ObFrame *self)
         RrPaint(t, self->title, self->width, ob_rr_theme->title_height);
 
         ob_rr_theme->a_clear->surface.parent = t;
-        ob_rr_theme->a_clear->surface.parentx = 0;
         ob_rr_theme->a_clear->surface.parenty = 0;
+
+        ob_rr_theme->a_clear->surface.parentx = ob_rr_theme->grip_width +
+            self->bwidth;
+        RrPaint(ob_rr_theme->a_clear, self->topresize,
+                self->width - (ob_rr_theme->grip_width + self->bwidth) * 2,
+                ob_rr_theme->paddingy + 1);
+
+        ob_rr_theme->a_clear->surface.parentx = 0;
 
         if (ob_rr_theme->grip_width > 0)
             RrPaint(ob_rr_theme->a_clear, self->tltresize,

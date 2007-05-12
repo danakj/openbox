@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-12 15:53-0400\n"
+"POT-Creation-Date: 2007-05-12 18:24-0400\n"
 "PO-Revision-Date: 2006-09-05 16:45+0100\n"
 "Last-Translator: Daniel Radetic <drade@boobah.info>\n"
 "Language-Team: None\n"
@@ -15,33 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:932
-#, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr ""
-
-#: openbox/action.c:935
-#, c-format
-msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr ""
-
-#: openbox/action.c:1209 openbox/action.c:1227 openbox/action.c:1240
-#, fuzzy, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "Nemogu napraviti direktorij '%s': %s"
-
-#: openbox/action.c:1248
-#, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr ""
-
-#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+#: openbox/client_list_menu.c:104
 msgid "Go there..."
 msgstr "Odi na..."
-
-#: openbox/client_list_combined_menu.c:148
-msgid "Windows"
-msgstr ""
 
 #: openbox/client_list_menu.c:199
 msgid "Desktops"
@@ -118,50 +94,6 @@ msgstr "De&koriraj"
 #, fuzzy
 msgid "&Close"
 msgstr "&Zatvori"
-
-#: openbox/config.c:667
-#, c-format
-msgid "Invalid button '%s' specified in config file"
-msgstr ""
-
-#: openbox/keyboard.c:162
-msgid "Conflict with key binding in config file"
-msgstr ""
-
-#: openbox/menu.c:98 openbox/menu.c:106
-#, c-format
-msgid "Unable to find a valid menu file '%s'"
-msgstr ""
-
-#: openbox/menu.c:149
-#, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr ""
-
-#: openbox/menu.c:166
-#, c-format
-msgid "Invalid output from pipe-menu '%s'"
-msgstr ""
-
-#: openbox/menu.c:179
-#, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
-msgstr ""
-
-#: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
-msgid "More..."
-msgstr "Odi na..."
-
-#: openbox/mouse.c:321
-#, c-format
-msgid "Invalid button '%s' in mouse binding"
-msgstr ""
-
-#: openbox/mouse.c:327
-#, c-format
-msgid "Invalid context '%s' in mouse binding"
-msgstr ""
 
 #: openbox/openbox.c:124
 #, fuzzy, c-format
@@ -277,21 +209,6 @@ msgstr "--sm-save-file zahtjeva argument\n"
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
 
-#: openbox/screen.c:85 openbox/screen.c:186
-#, c-format
-msgid "A window manager is already running on screen %d"
-msgstr ""
-
-#: openbox/screen.c:122
-#, c-format
-msgid "Could not acquire window manager selection on screen %d"
-msgstr ""
-
-#: openbox/screen.c:143
-#, c-format
-msgid "The WM on screen %d is not exiting"
-msgstr ""
-
 #: openbox/session.c:100
 #, c-format
 msgid "Unable to make directory '%s': %s"
@@ -307,35 +224,13 @@ msgstr "Nemogu napraviti direktorij '%s': %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr ""
 
-#: openbox/startupnotify.c:240
-#, c-format
-msgid "Running %s\n"
-msgstr ""
+#, fuzzy
+#~ msgid "Failed to execute '%s': %s"
+#~ msgstr "Nemogu napraviti direktorij '%s': %s"
 
-#: openbox/translate.c:58
-#, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr ""
-
-#: openbox/translate.c:135
-#, c-format
-msgid "Invalid key code '%s' in key binding"
-msgstr ""
-
-#: openbox/translate.c:142
-#, c-format
-msgid "Invalid key name '%s' in key binding"
-msgstr ""
-
-#: openbox/translate.c:148
-#, c-format
-msgid "Requested key '%s' does not exist on the display"
-msgstr ""
-
-#: openbox/xerror.c:39
-#, c-format
-msgid "X Error: %s"
-msgstr ""
+#, fuzzy
+#~ msgid "More..."
+#~ msgstr "Odi na..."
 
 #, fuzzy
 #~ msgid "Roll &up"

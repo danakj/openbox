@@ -154,9 +154,10 @@ ObFrame *frame_new(ObClient *client)
     self->shade = createWindow(self->title, NULL, mask, &attrib);
     self->icon = createWindow(self->title, NULL, mask, &attrib);
     self->iconify = createWindow(self->title, NULL, mask, &attrib);
-    self->handle = createWindow(self->window, NULL, mask, &attrib);
 
     mask |= CWCursor;
+    attrib.cursor = ob_cursor(OB_CURSOR_SOUTH);
+    self->handle = createWindow(self->window, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
     self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);

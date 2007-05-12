@@ -258,16 +258,10 @@
   </context>
   <context name="Handle">
     <mousebind button="Left" action="Drag">
-      <action name="Move"/>
-    </mousebind>
-    <mousebind button="Left" action="Click">
-      <action name="Raise"/>
+      <action name="Resize"><edge>bottom</edge></action>
     </mousebind>
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
-    </mousebind>
-    <mousebind button="Middle" action="Press">
-      <action name="Lower"/>
     </mousebind>
   </context>
   <context name="BLCorner">

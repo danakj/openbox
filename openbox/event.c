@@ -1632,7 +1632,6 @@ static gboolean event_handle_menu(XEvent *ev)
         break;
     case EnterNotify:
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
-            g_print("ignore enters: %d\n", e->ignore_enters);
             if (e->ignore_enters)
                 --e->ignore_enters;
             else

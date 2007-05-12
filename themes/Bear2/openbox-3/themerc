@@ -53,7 +53,7 @@ window.active.button.*.image.color: #efefef
 window.active.button.hover.bg.color: #729fcf
 window.active.button.hover.image.color: #ffffff
 window.active.button.pressed.bg.color: #a7cef2
-window.active.button.disabled.image.color: #dddddd
+window.active.button.disabled.image.color: #6d8fbc
 
 window.active.handle.bg: raised solid
 window.active.handle.bg.color: #E7e7e7
@@ -72,7 +72,7 @@ window.inactive.button.*.bg: parentrelative
 window.inactive.button.*.image.color:  #888a85
 window.inactive.button.pressed.bg.color: #d3d7cf
 window.inactive.button.pressed.bg.color: #4f5051
-window.inactive.button.disabled.image.color: #ffffff
+window.inactive.button.disabled.image.color: #d0d0d0
 
 window.inactive.handle.bg: raised solid
 window.inactive.handle.bg.color: #E7e7e7

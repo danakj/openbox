@@ -1,4 +1,0 @@
-#define close_width 5
-#define close_height 5
-static unsigned char close_bits[] = {
-   0x1b, 0x1f, 0x0e, 0x1f, 0x1b };

@@ -1,4 +1,0 @@
-#define max_width 7
-#define max_height 7
-static unsigned char max_bits[] = {
-   0x7f, 0x7f, 0x41, 0x41, 0x41, 0x41, 0x7f };

@@ -39,6 +39,7 @@ bin_SCRIPTS = \
 
 render_rendertest_CPPFLAGS = \
 	$(PANGO_CFLAGS) \
+	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"RenderTest\"
 render_rendertest_LDADD = \
@@ -46,6 +47,7 @@ render_rendertest_LDADD = \
 	render/libobrender.la \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
+	$(XFT_LIBS) \
 	$(XML_LIBS) \
 	$(X_LIBS)
 render_rendertest_SOURCES = render/test.c
@@ -55,6 +57,7 @@ render_libobrender_la_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
+	$(XFT_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
@@ -63,6 +66,7 @@ render_libobrender_la_LIBADD = \
 	parser/libobparser.la \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
+	$(XFT_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
 render_libobrender_la_SOURCES = \
@@ -341,6 +345,7 @@ dist_rc_DATA = \
 	data/menu.xml
 
 edit = $(SED) \
+	-e 's!@time\@!$(shell date "+%a, %d %B %Y %T %z")!' \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
@@ -362,6 +367,12 @@ data/xsession/openbox-kde-session: Makefile data \
 	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
 	@chmod +x $@
 
+debian/changelog: debian debian/changelog.in
+	@echo make: creating $@
+	@rm -f $@
+	@mkdir debian 2>/dev/null || true
+	@$(edit) $(srcdir)/debian/changelog.in >$@
+
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop \
 	data/gnome-wm-properties/openbox-gnome.desktop \
@@ -373,6 +384,21 @@ dist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
+	debian/changelog.in
+	debian/compat
+	debian/control
+	debian/copyright
+	debian/dirs
+	debian/docs
+	debian/menu.ex
+	debian/openbox-default.ex
+	debian/openbox.doc-base.EX
+	debian/postinst.ex
+	debian/postrm.ex
+	debian/preinst.ex
+	debian/prerm.ex
+	debian/rules
+	debian/watch.ex
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \
@@ -419,4 +445,8 @@ distclean-local:
 		done \
 	done
 
-.PHONY: doc
+deb:	dist debian/changelog
+	fakeroot debian/rules binary
+#	dpkg-buildpackage -b -rfakeroot -f openbox-$(VERSION).tar.gz
+
+.PHONY: doc deb

@@ -1,5 +1,5 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [3.4.0], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.3.990], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
@@ -77,6 +77,10 @@ AC_SUBST(GLIB_LIBS)
 PKG_CHECK_MODULES(PANGO, [pango >= 1.8.0 pangoxft >= 1.8.0])
 AC_SUBST(PANGO_CFLAGS)
 AC_SUBST(PANGO_LIBS)
+
+PKG_CHECK_MODULES(XFT, [xft])
+AC_SUBST(XFT_CFLAGS)
+AC_SUBST(XFT_LIBS)
 
 PKG_CHECK_MODULES(XML, [libxml-2.0])
 AC_SUBST(XML_CFLAGS)

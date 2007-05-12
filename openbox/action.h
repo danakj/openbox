@@ -129,8 +129,8 @@ struct DesktopDirection {
 
 struct MoveResize {
     struct AnyAction any;
-    gboolean move;
     gboolean keyboard;
+    guint32 corner;
 };
 
 struct ShowMenu {
@@ -314,8 +314,10 @@ void action_desktop_dir(union ActionData *data);
 void action_desktop_last(union ActionData *data);
 /* ClientAction */
 void action_toggle_decorations(union ActionData *data);
-/* MoveResize */
-void action_moveresize(union ActionData *data);
+/* Move */
+void action_move(union ActionData *data);
+/* Resize */
+void action_resize(union ActionData *data);
 /* Any */
 void action_reconfigure(union ActionData *data);
 /* Execute */

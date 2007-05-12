@@ -139,6 +139,8 @@ ObFrame *frame_new(ObClient *client)
     self->title = createWindow(self->window, NULL, mask, &attrib);
 
     mask |= CWCursor;
+    attrib.cursor = ob_cursor(OB_CURSOR_NORTH);
+    self->topresize = createWindow(self->title, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
     self->tltresize = createWindow(self->title, NULL, mask, &attrib);
     self->tllresize = createWindow(self->title, NULL, mask, &attrib);
@@ -154,9 +156,10 @@ ObFrame *frame_new(ObClient *client)
     self->shade = createWindow(self->title, NULL, mask, &attrib);
     self->icon = createWindow(self->title, NULL, mask, &attrib);
     self->iconify = createWindow(self->title, NULL, mask, &attrib);
-    self->handle = createWindow(self->window, NULL, mask, &attrib);
 
     mask |= CWCursor;
+    attrib.cursor = ob_cursor(OB_CURSOR_SOUTH);
+    self->handle = createWindow(self->window, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
     self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
@@ -378,17 +381,27 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(ob_display, self->title);
 
                 if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+                    XMoveResizeWindow(ob_display, self->topresize,
+                                      ob_rr_theme->grip_width + self->bwidth,
+                                      0,
+                                      self->width - (ob_rr_theme->grip_width +
+                                                     self->bwidth) * 2,
+                                      ob_rr_theme->paddingy + 1);
+
                     XMoveWindow(ob_display, self->tltresize, 0, 0);
                     XMoveWindow(ob_display, self->tllresize, 0, 0);
                     XMoveWindow(ob_display, self->trtresize,
                                 self->width - ob_rr_theme->grip_width, 0);
                     XMoveWindow(ob_display, self->trrresize,
                                 self->width - ob_rr_theme->paddingx - 1, 0);
+
+                    XMapWindow(ob_display, self->topresize);
                     XMapWindow(ob_display, self->tltresize);
                     XMapWindow(ob_display, self->tllresize);
                     XMapWindow(ob_display, self->trtresize);
                     XMapWindow(ob_display, self->trrresize);
                 } else {
+                    XUnmapWindow(ob_display, self->topresize);
                     XUnmapWindow(ob_display, self->tltresize);
                     XUnmapWindow(ob_display, self->tllresize);
                     XUnmapWindow(ob_display, self->trtresize);
@@ -578,6 +591,7 @@ void frame_grab_client(ObFrame *self)
     g_hash_table_insert(window_map, &self->handle, self->client);
     g_hash_table_insert(window_map, &self->lgrip, self->client);
     g_hash_table_insert(window_map, &self->rgrip, self->client);
+    g_hash_table_insert(window_map, &self->topresize, self->client);
     g_hash_table_insert(window_map, &self->tltresize, self->client);
     g_hash_table_insert(window_map, &self->tllresize, self->client);
     g_hash_table_insert(window_map, &self->trtresize, self->client);
@@ -635,6 +649,7 @@ void frame_release_client(ObFrame *self)
     g_hash_table_remove(window_map, &self->handle);
     g_hash_table_remove(window_map, &self->lgrip);
     g_hash_table_remove(window_map, &self->rgrip);
+    g_hash_table_remove(window_map, &self->topresize);
     g_hash_table_remove(window_map, &self->tltresize);
     g_hash_table_remove(window_map, &self->tllresize);
     g_hash_table_remove(window_map, &self->trtresize);
@@ -818,8 +833,6 @@ ObFrameContext frame_context_from_string(const gchar *name)
         return OB_FRAME_CONTEXT_CLIENT;
     else if (!g_ascii_strcasecmp("Titlebar", name))
         return OB_FRAME_CONTEXT_TITLEBAR;
-    else if (!g_ascii_strcasecmp("Handle", name))
-        return OB_FRAME_CONTEXT_HANDLE;
     else if (!g_ascii_strcasecmp("Frame", name))
         return OB_FRAME_CONTEXT_FRAME;
     else if (!g_ascii_strcasecmp("TLCorner", name))
@@ -830,6 +843,10 @@ ObFrameContext frame_context_from_string(const gchar *name)
         return OB_FRAME_CONTEXT_BLCORNER;
     else if (!g_ascii_strcasecmp("BRCorner", name))
         return OB_FRAME_CONTEXT_BRCORNER;
+    else if (!g_ascii_strcasecmp("Top", name))
+        return OB_FRAME_CONTEXT_TOP;
+    else if (!g_ascii_strcasecmp("Handle", name))
+        return OB_FRAME_CONTEXT_BOTTOM;
     else if (!g_ascii_strcasecmp("Maximize", name))
         return OB_FRAME_CONTEXT_MAXIMIZE;
     else if (!g_ascii_strcasecmp("AllDesktops", name))
@@ -899,9 +916,10 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
 
     if (win == self->window)    return OB_FRAME_CONTEXT_FRAME;
     if (win == self->label)     return OB_FRAME_CONTEXT_TITLEBAR;
-    if (win == self->handle)    return OB_FRAME_CONTEXT_HANDLE;
+    if (win == self->handle)    return OB_FRAME_CONTEXT_BOTTOM;
     if (win == self->lgrip)     return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->rgrip)     return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->topresize) return OB_FRAME_CONTEXT_TOP;
     if (win == self->tltresize) return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->tllresize) return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->trtresize) return OB_FRAME_CONTEXT_TRCORNER;

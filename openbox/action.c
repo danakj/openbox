@@ -417,21 +417,21 @@ void setup_action_bottom_layer(ObAction **a, ObUserAction uact)
 void setup_action_move(ObAction **a, ObUserAction uact)
 {
     (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
-    (*a)->data.moveresize.move = TRUE;
     (*a)->data.moveresize.keyboard =
         (uact == OB_USER_ACTION_NONE ||
          uact == OB_USER_ACTION_KEYBOARD_KEY ||
          uact == OB_USER_ACTION_MENU_SELECTION);
+    (*a)->data.moveresize.corner = 0;
 }
 
 void setup_action_resize(ObAction **a, ObUserAction uact)
 {
     (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
-    (*a)->data.moveresize.move = FALSE;
     (*a)->data.moveresize.keyboard =
         (uact == OB_USER_ACTION_NONE ||
          uact == OB_USER_ACTION_KEYBOARD_KEY ||
          uact == OB_USER_ACTION_MENU_SELECTION);
+    (*a)->data.moveresize.corner = 0;
 }
 
 void setup_action_showmenu(ObAction **a, ObUserAction uact)
@@ -745,12 +745,12 @@ ActionString actionstrings[] =
     },
     {
         "move",
-        action_moveresize,
+        action_move,
         setup_action_move
     },
     {
         "resize",
-        action_moveresize,
+        action_resize,
         setup_action_resize
     },
     {
@@ -1034,6 +1034,35 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.interdiraction.desktop_windows =
                         parse_bool(doc, n);
+            } else if (act->func == action_resize) {
+                if ((n = parse_find_node("edge", node->xmlChildrenNode))) {
+                    gchar *s = parse_string(doc, n);
+                    if (!g_ascii_strcasecmp(s, "top"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_top;
+                    else if (!g_ascii_strcasecmp(s, "bottom"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_bottom;
+                    else if (!g_ascii_strcasecmp(s, "left"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_left;
+                    else if (!g_ascii_strcasecmp(s, "right"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_right;
+                    else if (!g_ascii_strcasecmp(s, "topleft"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_topleft;
+                    else if (!g_ascii_strcasecmp(s, "topright"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_topright;
+                    else if (!g_ascii_strcasecmp(s, "bottomleft"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_bottomleft;
+                    else if (!g_ascii_strcasecmp(s, "bottomright"))
+                        act->data.moveresize.corner =
+                            prop_atoms.net_wm_moveresize_size_bottomright;
+                    g_free(s);
+                }
             } else if (act->func == action_raise ||
                        act->func == action_lower ||
                        act->func == action_raiselower ||
@@ -1104,7 +1133,9 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
             /* XXX UGLY HACK race with motion event starting a move and the
                button release gettnig processed first. answer: don't queue
                moveresize starts. UGLY HACK XXX */
-            if (a->data.any.interactive || a->func == action_moveresize) {
+            if (a->data.any.interactive || a->func == action_move ||
+                a->func == action_resize)
+            {
                 /* interactive actions are not queued */
                 a->func(&a->data);
             } else if ((context == OB_FRAME_CONTEXT_CLIENT ||
@@ -1713,29 +1744,39 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
 #undef d
 }
 
-void action_moveresize(union ActionData *data)
+void action_move(union ActionData *data)
 {
     ObClient *c = data->moveresize.any.c;
     guint32 corner;
 
-    if (data->moveresize.keyboard) {
-        corner = (data->moveresize.move ?
-                  prop_atoms.net_wm_moveresize_move_keyboard :
-                  prop_atoms.net_wm_moveresize_size_keyboard);
-    } else {
-        corner = (data->moveresize.move ?
-                  prop_atoms.net_wm_moveresize_move :
-                  pick_corner(data->any.x, data->any.y,
-                              c->frame->area.x, c->frame->area.y,
-                              /* use the client size because the frame
-                                 can be differently sized (shaded
-                                 windows) and we want this based on the
-                                 clients size */
-                              c->area.width + c->frame->size.left +
-                              c->frame->size.right,
-                              c->area.height + c->frame->size.top +
-                              c->frame->size.bottom, c->shaded));
-    }
+    if (data->moveresize.keyboard)
+        corner = prop_atoms.net_wm_moveresize_move_keyboard;
+    else
+        corner = prop_atoms.net_wm_moveresize_move;
+
+    moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
+}
+
+void action_resize(union ActionData *data)
+{
+    ObClient *c = data->moveresize.any.c;
+    guint32 corner;
+
+    if (data->moveresize.keyboard)
+        corner = prop_atoms.net_wm_moveresize_size_keyboard;
+    else if (data->moveresize.corner)
+        corner = data->moveresize.corner; /* it was specified in the binding */
+    else
+        corner = pick_corner(data->any.x, data->any.y,
+                             c->frame->area.x, c->frame->area.y,
+                             /* use the client size because the frame
+                                can be differently sized (shaded
+                                windows) and we want this based on the
+                                clients size */
+                             c->area.width + c->frame->size.left +
+                             c->frame->size.right,
+                             c->area.height + c->frame->size.top +
+                             c->frame->size.bottom, c->shaded);
 
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
 }

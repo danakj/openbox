@@ -388,12 +388,13 @@
             <xsd:enumeration value="Desktop"/>
             <xsd:enumeration value="Client"/>
             <xsd:enumeration value="Titlebar"/>
-            <xsd:enumeration value="Handle"/>
             <xsd:enumeration value="Frame"/>
             <xsd:enumeration value="TLCorner"/>
             <xsd:enumeration value="TRCorner"/>
             <xsd:enumeration value="BLCorner"/>
             <xsd:enumeration value="BRCorner"/>
+            <xsd:enumeration value="Top"/>
+            <xsd:enumeration value="Handle"/>
             <xsd:enumeration value="Maximize"/>
             <xsd:enumeration value="AllDesktops"/>
             <xsd:enumeration value="Shade"/>

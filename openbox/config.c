@@ -765,7 +765,6 @@ static void bind_default_mouse()
         { "Left", "Client", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Left", "Titlebar", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Middle", "Titlebar", OB_MOUSE_ACTION_CLICK, "Lower" },
-        { "Left", "Handle", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Left", "BLCorner", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Left", "BRCorner", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Left", "TLCorner", OB_MOUSE_ACTION_CLICK, "Raise" },

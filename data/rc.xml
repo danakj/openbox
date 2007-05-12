@@ -5,7 +5,7 @@
 
 <openbox_config xmlns="http://openbox.org/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://openbox.org/">
+        xsi:schemaLocation="http://openbox.org/3.4">
 
 <resistance>
   <strength>10</strength>
@@ -256,18 +256,20 @@
       <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
-  <context name="Handle">
+  <context name="Top">
     <mousebind button="Left" action="Drag">
-      <action name="Move"/>
-    </mousebind>
-    <mousebind button="Left" action="Click">
-      <action name="Raise"/>
+      <action name="Resize"><edge>top</edge></action>
     </mousebind>
     <mousebind button="Left" action="Press">
-      <action name="Focus"/>
+      <action name="Activate"/>
     </mousebind>
-    <mousebind button="Middle" action="Press">
-      <action name="Lower"/>
+  </context>
+  <context name="Handle">
+    <mousebind button="Left" action="Drag">
+      <action name="Resize"><edge>bottom</edge></action>
+    </mousebind>
+    <mousebind button="Left" action="Press">
+      <action name="Activate"/>
     </mousebind>
   </context>
   <context name="BLCorner">

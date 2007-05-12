@@ -34,12 +34,13 @@ typedef enum {
     OB_FRAME_CONTEXT_DESKTOP,
     OB_FRAME_CONTEXT_CLIENT,
     OB_FRAME_CONTEXT_TITLEBAR,
-    OB_FRAME_CONTEXT_HANDLE,
     OB_FRAME_CONTEXT_FRAME,
     OB_FRAME_CONTEXT_BLCORNER,
     OB_FRAME_CONTEXT_BRCORNER,
     OB_FRAME_CONTEXT_TLCORNER,
     OB_FRAME_CONTEXT_TRCORNER,
+    OB_FRAME_CONTEXT_TOP,
+    OB_FRAME_CONTEXT_BOTTOM,
     OB_FRAME_CONTEXT_MAXIMIZE,
     OB_FRAME_CONTEXT_ALLDESKTOPS,
     OB_FRAME_CONTEXT_SHADE,
@@ -95,6 +96,7 @@ struct _ObFrame
     Window    lgrip;
     Window    rgrip;
 
+    Window    topresize;
     Window    tltresize;
     Window    tllresize;
     Window    trtresize;

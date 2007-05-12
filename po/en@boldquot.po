@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-11 00:34-0400\n"
-"PO-Revision-Date: 2007-05-11 00:34-0400\n"
+"POT-Creation-Date: 2007-05-12 11:52-0400\n"
+"PO-Revision-Date: 2007-05-12 11:52-0400\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -73,67 +73,63 @@ msgstr "Windows"
 msgid "Desktops"
 msgstr "Desktops"
 
-#: openbox/client_menu.c:248
+#: openbox/client_menu.c:241
 msgid "All desktops"
 msgstr "All desktops"
 
-#: openbox/client_menu.c:353
+#: openbox/client_menu.c:346
 msgid "&Layer"
 msgstr "&Layer"
 
-#: openbox/client_menu.c:358
+#: openbox/client_menu.c:351
 msgid "Always on &top"
 msgstr "Always on &top"
 
-#: openbox/client_menu.c:359
+#: openbox/client_menu.c:352
 msgid "&Normal"
 msgstr "&Normal"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:353
 msgid "Always on &bottom"
 msgstr "Always on &bottom"
 
-#: openbox/client_menu.c:363
+#: openbox/client_menu.c:356
 msgid "&Send to desktop"
 msgstr "&Send to desktop"
 
-#: openbox/client_menu.c:367
+#: openbox/client_menu.c:360
 msgid "Client menu"
 msgstr "Client menu"
 
-#: openbox/client_menu.c:373
+#: openbox/client_menu.c:366
 msgid "R&estore"
 msgstr "R&estore"
 
-#: openbox/client_menu.c:381
+#: openbox/client_menu.c:374
 msgid "&Move"
 msgstr "&Move"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:376
 msgid "Resi&ze"
 msgstr "Resi&ze"
 
-#: openbox/client_menu.c:385
+#: openbox/client_menu.c:378
 msgid "Ico&nify"
 msgstr "Ico&nify"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:386
 msgid "Ma&ximize"
 msgstr "Ma&ximize"
 
-#: openbox/client_menu.c:401
-msgid "Roll &up"
-msgstr "Roll &up"
+#: openbox/client_menu.c:394
+msgid "&Roll up/down"
+msgstr "&Roll up/down"
 
-#: openbox/client_menu.c:403
-msgid "Roll do&wn"
-msgstr "Roll do&wn"
-
-#: openbox/client_menu.c:405
+#: openbox/client_menu.c:402
 msgid "Un/&Decorate"
 msgstr "Un/&Decorate"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:412
 msgid "&Close"
 msgstr "&Close"
 

@@ -391,7 +391,7 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    menu_add_normal(menu, CLIENT_SHADE, _("&Roll up/down"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_SHADE, _("&Roll up/down"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->shade_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;

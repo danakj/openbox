@@ -363,7 +363,6 @@ dist_rc_DATA = \
 	data/menu.xml
 
 edit = $(SED) \
-	-e 's!@time\@!$(shell date "+%a, %d %B %Y %T %z")!' \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
@@ -456,10 +455,4 @@ distclean-local:
 		done \
 	done
 
-deb:	Makefile
-	$(edit) $(srcdir)/debian/changelog.in >$(srcdir)/debian/changelog
-	fakeroot debian/rules binary
-
-#	dpkg-buildpackage -b -rfakeroot -f openbox-$(VERSION).tar.gz
-
-.PHONY: doc deb
+.PHONY: doc

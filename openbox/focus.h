@@ -49,7 +49,7 @@ struct _ObClient* focus_fallback_target(gboolean allow_refocus,
                                         struct _ObClient *old);
 
 /*! Call this when you need to focus something! */
-void focus_fallback(gboolean allow_refocus);
+struct _ObClient* focus_fallback(gboolean allow_refocus);
 
 /*! Cycle focus amongst windows. */
 void focus_cycle(gboolean forward, gboolean all_desktops,

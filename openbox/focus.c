@@ -255,7 +255,7 @@ ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     return desktop;   
 }
 
-void focus_fallback(gboolean allow_refocus)
+ObClient* focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
     ObClient *old = focus_client;
@@ -266,8 +266,11 @@ void focus_fallback(gboolean allow_refocus)
     */
     focus_nothing();
 
-    if ((new = focus_fallback_target(allow_refocus, old)))
+    if ((new = focus_fallback_target(allow_refocus, old))) {
         client_focus(new);
+        return new;
+    } else
+        return NULL;
 }
 
 void focus_nothing()

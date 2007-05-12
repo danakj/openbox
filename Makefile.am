@@ -363,6 +363,7 @@ dist_rc_DATA = \
 	data/menu.xml
 
 edit = $(SED) \
+	-e 's!@time\@!`date`!' \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
@@ -384,6 +385,13 @@ data/xsession/openbox-kde-session: Makefile data \
 	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
 	@chmod +x $@
 
+debian/changelog: debian debian/changelog.in
+	@echo make: creating $@
+	@rm -f $@
+	@mkdir debian 2>/dev/null || true
+	@$(edit) $(srcdir)/debian/changelog.in >$@
+	@chmod +x $@
+
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop \
 	data/gnome-wm-properties/openbox-gnome.desktop \
@@ -395,6 +403,21 @@ dist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
+	debian/changelog.in
+	debian/compat
+	debian/control
+	debian/copyright
+	debian/dirs
+	debian/docs
+	debian/menu.ex
+	debian/openbox-default.ex
+	debian/openbox.doc-base.EX
+	debian/postinst.ex
+	debian/postrm.ex
+	debian/preinst.ex
+	debian/prerm.ex
+	debian/rules
+	debian/watch.ex
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \
@@ -442,4 +465,8 @@ distclean-local:
 		done \
 	done
 
-.PHONY: doc
+deb:    dist debian/changelog
+	fakeroot debian/rules binary
+#        dpkg-buildpackage -rfakeroot
+
+.PHONY: doc deb

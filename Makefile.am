@@ -394,21 +394,21 @@ dist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
-	debian/changelog.in
-	debian/compat
-	debian/control
-	debian/copyright
-	debian/dirs
-	debian/docs
-	debian/menu.ex
-	debian/openbox-default.ex
-	debian/openbox.doc-base.EX
-	debian/postinst.ex
-	debian/postrm.ex
-	debian/preinst.ex
-	debian/prerm.ex
-	debian/rules
-	debian/watch.ex
+	debian/changelog.in \
+	debian/compat \
+	debian/control \
+	debian/copyright \
+	debian/dirs \
+	debian/docs \
+	debian/menu.ex \
+	debian/openbox-default.ex \
+	debian/openbox.doc-base.EX \
+	debian/postinst.ex \
+	debian/postrm.ex \
+	debian/preinst.ex \
+	debian/prerm.ex \
+	debian/rules \
+	debian/watch.ex \
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \

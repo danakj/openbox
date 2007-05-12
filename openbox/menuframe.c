@@ -992,6 +992,7 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
                                  gint button)
 {
+    gint px, py;
     guint i;
 
     if (menu_frame_is_visible(self))
@@ -1017,14 +1018,20 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
 
     XMapWindow(ob_display, self->window);
 
+    if (screen_pointer_pos(&px, &py)) {
+        ObMenuEntryFrame *e = menu_entry_frame_under(px, py);
+        if (e && e->frame == self)
+            e->ignore_enters++;
+    }
+
     return TRUE;
 }
 
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
                                  ObMenuEntryFrame *parent_entry)
 {
-    ObMenuEntryFrame *e;
     gint x, y, dx, dy;
+    gint px, py;
 
     if (menu_frame_is_visible(self))
         return TRUE;
@@ -1054,9 +1061,11 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 
     XMapWindow(ob_display, self->window);
 
-    if (screen_pointer_pos(&dx, &dy) && (e = menu_entry_frame_under(dx, dy)) &&
-        e->frame == self)
-        ++e->ignore_enters;
+    if (screen_pointer_pos(&px, &py)) {
+        ObMenuEntryFrame *e = menu_entry_frame_under(px, py);
+        if (e && e->frame == self)
+            e->ignore_enters++;
+    }
 
     return TRUE;
 }
@@ -1146,7 +1155,7 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
             ObMenuEntryFrame *e = it->data;
 
             if (RECT_CONTAINS(e->area, x, y)) {
-                ret = e;            
+                ret = e;
                 break;
             }
         }

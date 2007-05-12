@@ -1645,6 +1645,7 @@ static gboolean event_handle_menu(XEvent *ev)
         {
             menu_frame_select(e->frame, NULL, FALSE);
         }
+        break;
     case MotionNotify:   
         if ((e = menu_entry_frame_under(ev->xmotion.x_root,   
                                         ev->xmotion.y_root)))

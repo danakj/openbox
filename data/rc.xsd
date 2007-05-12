@@ -36,7 +36,6 @@
         </xsd:annotation>
         <xsd:element minOccurs="0" name="strength" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="screen_edge_strength" type="xsd:integer"/>
-        <xsd:element minOccurs="0" name="edges_hit_layers_below" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="focus">
         <xsd:annotation>

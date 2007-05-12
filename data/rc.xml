@@ -10,7 +10,6 @@
 <resistance>
   <strength>10</strength>
   <screen_edge_strength>20</screen_edge_strength>
-  <edges_hit_layers_below>no</edges_hit_layers_below>
 </resistance>
 
 <focus>

@@ -1101,12 +1101,20 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
             }
         }
 
-    if (!inter) {
-        /* sometimes when we execute another app as an action,
-           it won't work right unless we XUngrabKeyboard first,
-           even though we grabbed the key/button Asychronously.
-           e.g. "gnome-panel-control --main-menu" */
-        grab_keyboard(FALSE);
+    if (!inter && button == 0) {
+        /* Ungrab the keyboard before running the action, if it was
+           not from a mouse event.
+
+           We have to do this because a key press causes a passive
+           grab on the keyboard, and so if the action we are running
+           wants to grab the keyboard, it will fail if the button is still
+           held down (which is likely).
+
+           Use the X function not out own, because we're not considering
+           a grab to be in place at all so our function won't try ungrab
+           anything.
+        */
+        XUngrabKeyboard(ob_display, time);
     }
 
     for (it = acts; it; it = g_slist_next(it)) {
@@ -1138,8 +1146,9 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
             {
                 /* interactive actions are not queued */
                 a->func(&a->data);
-            } else if ((context == OB_FRAME_CONTEXT_CLIENT ||
-                        (c && c->type == OB_CLIENT_TYPE_DESKTOP &&
+            } else if (c &&
+                       (context == OB_FRAME_CONTEXT_CLIENT ||
+                        (c->type == OB_CLIENT_TYPE_DESKTOP &&
                          context == OB_FRAME_CONTEXT_DESKTOP)) &&
                        (a->func == action_focus ||
                         a->func == action_activate ||

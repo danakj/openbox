@@ -1198,7 +1198,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         RrMargins(theme->a_focused_label, &fl, &ft, &fr, &fb);
         RrMargins(theme->a_unfocused_label, &ul, &ut, &ur, &ub);
         theme->label_height = theme->win_font_height + MAX(ft + fb, ut + ub);
-        theme->label_height += theme->label_height % 2;
+        theme->label_height += theme->label_height & 1;
 
         /* this would be nice I think, since padding.width can now be 0,
            but it breaks frame.c horribly and I don't feel like fixing that

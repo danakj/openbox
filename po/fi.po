@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-11 00:34-0400\n"
+"POT-Creation-Date: 2007-05-12 11:52-0400\n"
 "PO-Revision-Date: 2005-03-15 21:29+0200\n"
 "Last-Translator: Pauli Virtanen <pauli.virtanen@hut.fi>\n"
 "Language-Team: Finnish <fi@li.org>\n"
@@ -47,80 +47,75 @@ msgstr ""
 msgid "Desktops"
 msgstr "Työtilat"
 
-#: openbox/client_menu.c:248
+#: openbox/client_menu.c:241
 msgid "All desktops"
 msgstr "Kaikkiin työtiloihin"
 
-#: openbox/client_menu.c:353
+#: openbox/client_menu.c:346
 #, fuzzy
 msgid "&Layer"
 msgstr "K&erros"
 
-#: openbox/client_menu.c:358
+#: openbox/client_menu.c:351
 #, fuzzy
 msgid "Always on &top"
 msgstr "Aina &päällimmäinen"
 
-#: openbox/client_menu.c:359
+#: openbox/client_menu.c:352
 #, fuzzy
 msgid "&Normal"
 msgstr "&Tavallinen"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:353
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "Aina &alimmainen"
 
-#: openbox/client_menu.c:363
+#: openbox/client_menu.c:356
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "Siirrä &työtilaan"
 
-#: openbox/client_menu.c:367
+#: openbox/client_menu.c:360
 msgid "Client menu"
 msgstr "Ikkunan valikko"
 
-#: openbox/client_menu.c:373
+#: openbox/client_menu.c:366
 #, fuzzy
 msgid "R&estore"
 msgstr "&Palauta"
 
-#: openbox/client_menu.c:381
+#: openbox/client_menu.c:374
 #, fuzzy
 msgid "&Move"
 msgstr "S&iirrä"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:376
 #, fuzzy
 msgid "Resi&ze"
 msgstr "&Muuta kokoa"
 
-#: openbox/client_menu.c:385
+#: openbox/client_menu.c:378
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Pie&nennä"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:386
 #, fuzzy
 msgid "Ma&ximize"
 msgstr "Suurenn&a"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:394
 #, fuzzy
-msgid "Roll &up"
+msgid "&Roll up/down"
 msgstr "&Rullaa"
 
-#: openbox/client_menu.c:403
-#, fuzzy
-msgid "Roll do&wn"
-msgstr "Rullaa &auki"
-
-#: openbox/client_menu.c:405
+#: openbox/client_menu.c:402
 #, fuzzy
 msgid "Un/&Decorate"
 msgstr "Piirrä/poista &kehykset"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:412
 #, fuzzy
 msgid "&Close"
 msgstr "&Sulje"
@@ -342,6 +337,13 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Roll &up"
+#~ msgstr "&Rullaa"
+
+#~ msgid "Roll &down"
+#~ msgstr "&Rullaa auki"
 
 #, fuzzy
 #~ msgid "Raise to &top"

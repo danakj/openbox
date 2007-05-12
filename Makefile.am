@@ -370,7 +370,6 @@ edit = $(SED) \
 data/xsession/openbox-gnome-session: Makefile data \
 		$(srcdir)/data/xsession/openbox-gnome-session.in
 	@echo make: creating $@
-	@rm -f $@
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $(srcdir)/data/xsession/openbox-gnome-session.in >$@
@@ -379,17 +378,10 @@ data/xsession/openbox-gnome-session: Makefile data \
 data/xsession/openbox-kde-session: Makefile data \
 		$(srcdir)/data/xsession/openbox-kde-session.in
 	@echo make: creating $@
-	@rm -f $@
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
 	@chmod +x $@
-
-debian/changelog: debian debian/changelog.in
-	@echo make: creating $@
-	@rm -f $@
-	@mkdir debian 2>/dev/null || true
-	@$(edit) $(srcdir)/debian/changelog.in >$@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop \
@@ -464,8 +456,10 @@ distclean-local:
 		done \
 	done
 
-deb:	dist debian/changelog
+deb:	Makefile
+	$(edit) $(srcdir)/debian/changelog.in >$(srcdir)/debian/changelog
 	fakeroot debian/rules binary
+
 #	dpkg-buildpackage -b -rfakeroot -f openbox-$(VERSION).tar.gz
 
 .PHONY: doc deb

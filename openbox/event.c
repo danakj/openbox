@@ -98,6 +98,7 @@ Time event_curtime = CurrentTime;
 static guint ignore_enter_focus = 0;
 static gboolean menu_can_hide;
 static gboolean focus_left_screen = FALSE;
+static ObClient *focus_tried = NULL;
 
 #ifdef USE_SM
 static void ice_handler(gint fd, gpointer conn)
@@ -498,7 +499,7 @@ static void event_process(const XEvent *ec, gpointer data)
                     focus_left_screen = FALSE;
 
                 if (!focus_left_screen)
-                    focus_fallback(TRUE);
+                    focus_tried = focus_fallback(TRUE);
             }
         } else if (client && client != focus_client) {
             focus_left_screen = FALSE;
@@ -506,6 +507,8 @@ static void event_process(const XEvent *ec, gpointer data)
             focus_set_client(client);
             client_calc_layer(client);
             client_bring_helper_windows(client);
+
+            focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
@@ -547,7 +550,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to an unmanaged window 0x%x !\n",
                               ce.xfocus.window);
-                focus_fallback(TRUE);
+                focus_tried = focus_fallback(TRUE);
             }
         }
 
@@ -1075,10 +1078,24 @@ static void event_handle_client(ObClient *client, XEvent *e)
                  client->window, e->xunmap.event, e->xunmap.from_configure,
                  client->ignore_unmaps);
         client_unmanage(client);
+
+        /* we were trying to focus this window but it's gone */
+        if (client == focus_tried) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x but it "
+                          "is being unmanaged. Falling back focus again.\n");
+            focus_tried = focus_fallback(TRUE);
+        }
         break;
     case DestroyNotify:
         ob_debug("DestroyNotify for window 0x%x\n", client->window);
         client_unmanage(client);
+
+        /* we were trying to focus this window but it's gone */
+        if (client == focus_tried) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x but it "
+                          "is being unmanaged. Falling back focus again.\n");
+            focus_tried = focus_fallback(TRUE);
+        }
         break;
     case ReparentNotify:
         /* this is when the client is first taken captive in the frame */
@@ -1097,6 +1114,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
      
         ob_debug("ReparentNotify for window 0x%x\n", client->window);
         client_unmanage(client);
+
+        /* we were trying to focus this window but it's gone */
+        if (client == focus_tried) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x but it "
+                          "is being unmanaged. Falling back focus again.\n");
+            focus_tried = focus_fallback(TRUE);
+        }
         break;
     case MapRequest:
         ob_debug("MapRequest for 0x%lx\n", client->window);

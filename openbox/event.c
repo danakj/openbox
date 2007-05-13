@@ -363,7 +363,8 @@ static Bool look_for_focusin(Display *d, XEvent *e, XPointer arg)
 
 static Bool look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
 {
-    return e->type == FocusIn && wanted_focusevent(e, TRUE);
+    return e->type == FocusIn && wanted_focusevent(e, TRUE) &&
+        e->xfocus.window != screen_support_win;
 }
 
 static void print_focusevent(XEvent *e)

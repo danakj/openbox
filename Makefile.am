@@ -455,7 +455,7 @@ dist_doc_DATA = \
 	data/menu.xsd \
 	data/themerc.xsd
 
-man_MANS = \
+dist_man_MANS = \
 	doc/openbox.1 \
 	doc/openbox-gnome-session.1 \
 	doc/openbox-kde-session.1

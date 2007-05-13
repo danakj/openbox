@@ -68,7 +68,7 @@ static gboolean valid_focus_target(ObClient *ft,
                                    gboolean dock_windows,
                                    gboolean desktop_windows);
 static void focus_cycle_destructor(ObClient *client, gpointer data);
-static void focus_tried_destructor(ObClient *client, gpointer data);
+static void focus_tried_hide_notify(ObClient *client, gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -87,7 +87,7 @@ void focus_startup(gboolean reconfig)
         XSetWindowAttributes attr;
 
         client_add_destructor(focus_cycle_destructor, NULL);
-        client_add_destructor(focus_tried_destructor, NULL);
+        client_add_hide_notify(focus_tried_hide_notify, NULL);
 
         /* start with nothing focused */
         focus_nothing();
@@ -141,7 +141,7 @@ void focus_shutdown(gboolean reconfig)
 
     if (!reconfig) {
         client_remove_destructor(focus_cycle_destructor);
-        client_remove_destructor(focus_tried_destructor);
+        client_remove_hide_notify(focus_tried_hide_notify);
 
         /* reset focus to root */
         XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
@@ -942,7 +942,7 @@ ObClient *focus_order_find_first(guint desktop)
     return NULL;
 }
 
-static void focus_tried_destructor(ObClient *client, gpointer data)
+static void focus_tried_hide_notify(ObClient *client, gpointer data)
 {
     XEvent ce;
 

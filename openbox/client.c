@@ -65,6 +65,7 @@ typedef struct
 GList            *client_list          = NULL;
 
 static GSList *client_destructors      = NULL;
+static GSList *client_hide_notifies    = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -91,6 +92,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise);
 static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
+static void client_call_callbacks(ObClient *self, GSList *list);
 
 void client_startup(gboolean reconfig)
 {
@@ -102,6 +104,16 @@ void client_startup(gboolean reconfig)
 void client_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
+}
+
+static void client_call_callbacks(ObClient *self, GSList *list)
+{
+    GSList *it;
+
+    for (it = list; it; it = g_slist_next(it)) {
+        ClientCallback *d = it->data;
+        d->func(self, d->data);
+    }
 }
 
 void client_add_destructor(ObClientCallback func, gpointer data)
@@ -121,6 +133,29 @@ void client_remove_destructor(ObClientCallback func)
         if (d->func == func) {
             g_free(d);
             client_destructors = g_slist_delete_link(client_destructors, it);
+            break;
+        }
+    }
+}
+
+void client_add_hide_notify(ObClientCallback func, gpointer data)
+{
+    ClientCallback *d = g_new(ClientCallback, 1);
+    d->func = func;
+    d->data = data;
+    client_hide_notifies = g_slist_prepend(client_destructors, d);
+}
+
+void client_remove_hide_notify(ObClientCallback func)
+{
+    GSList *it;
+
+    for (it = client_hide_notifies; it; it = g_slist_next(it)) {
+        ClientCallback *d = it->data;
+        if (d->func == func) {
+            g_free(d);
+            client_hide_notifies =
+                g_slist_delete_link(client_hide_notifies, it);
             break;
         }
     }
@@ -565,10 +600,7 @@ void client_unmanage(ObClient *self)
     if (STRUT_EXISTS(self->strut))
         screen_update_areas();
 
-    for (it = client_destructors; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        d->func(self, d->data);
-    }
+    client_call_callbacks(self, client_destructors);
 
     /* tell our parent(s) that we're gone */
     if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
@@ -2383,6 +2415,8 @@ void client_hide(ObClient *self)
 {
     if (!client_should_show(self)) {
         frame_hide(self->frame);
+
+        client_call_callbacks(self, client_hide_notifies);
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
@@ -2400,6 +2434,8 @@ void client_showhide(ObClient *self)
     }
     else {
         frame_hide(self->frame);
+
+        client_call_callbacks(self, client_hide_notifies);
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it

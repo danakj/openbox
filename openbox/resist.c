@@ -57,9 +57,6 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 
         if (!WINDOW_IS_CLIENT(it->data))
             continue;
-        /* only snap in the same layer */
-        if (window_layer(it->data) != c->layer)
-            continue;
         target = it->data;
 
         /* don't snap to self or non-visibles */
@@ -205,9 +202,6 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
 
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (!WINDOW_IS_CLIENT(it->data))
-            continue;
-        /* only snap in the same layer */
-        if (window_layer(it->data) != c->layer)
             continue;
         target = it->data;
 

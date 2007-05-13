@@ -429,7 +429,10 @@ dist_noinst_DATA = \
 dist_doc_DATA = \
 	COMPLIANCE \
 	README \
-	AUTHORS
+	AUTHORS \
+	data/rc.xsd \
+	data/menu.xsd \
+	data/themerc.xsd
 
 EXTRA_DIST = \
 	config.rpath \

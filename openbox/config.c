@@ -748,7 +748,7 @@ static void bind_default_mouse()
         { "Middle", "Desktop", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Right", "Desktop", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Left", "Titlebar", OB_MOUSE_ACTION_PRESS, "Focus" },
-        { "Left", "Handle", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Bottom", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Left", "BLCorner", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Left", "BRCorner", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Left", "TLCorner", OB_MOUSE_ACTION_PRESS, "Focus" },

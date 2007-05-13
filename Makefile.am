@@ -393,6 +393,7 @@ dist_xsessions_DATA = \
 dist_noinst_DATA = \
 	debian/changelog.in \
 	debian/compat \
+	debian/conffiles \
 	debian/control \
 	debian/copyright \
 	debian/menu \

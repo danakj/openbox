@@ -87,9 +87,10 @@ manpage.1: manpage.sgml
 
     <para>There are 3 default configuration files, <literal>rc.xml</literal>,
       <literal>rc-gnome.xml</literal>, and <literal>rc-kde.xml</literal>. The
-      rc-gnome.xml is used when you run <command>openbox-gnome-session
-      </command> and the rc-kde.xml is used when you run
-      <command>openbox-kde-session</command></para>.
+      rc-gnome.xml is used when you run
+      <command>openbox-gnome-session</command> and the rc-kde.xml is used when
+      you run <command>openbox-kde-session</command>. The configuration
+      files should be named the same in ~/.config/openbox/.</para>
 
   </refsect1>
   <refsect1>

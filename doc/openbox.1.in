@@ -48,11 +48,10 @@ liking.
 .PP 
 There are 3 default configuration files, \fBrc.xml\fP, 
 \fBrc-gnome.xml\fP, and \fBrc-kde.xml\fP. The 
-rc-gnome.xml is used when you run \fBopenbox-gnome-session 
-\fR and the rc-kde.xml is used when you run 
-\fBopenbox-kde-session\fR. 
- 
- 
+rc-gnome.xml is used when you run 
+\fBopenbox-gnome-session\fR and the rc-kde.xml is used when 
+you run \fBopenbox-kde-session\fR. The configuration 
+files should be named the same in ~/.config/openbox/. 
 .SH "OPTIONS" 
 .PP 
 These are the possible options that \fBopenbox\fR accepts: 
@@ -83,4 +82,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 19:04 
+.\" created by instant / docbook-to-man, Sun 13 May 2007, 19:06 

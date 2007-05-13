@@ -1255,7 +1255,8 @@ void action_activate(union ActionData *data)
 {
     if (data->client.any.c) {
         if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
-            data->any.context != OB_FRAME_CONTEXT_CLIENT)
+            (data->any.context != OB_FRAME_CONTEXT_CLIENT &&
+             data->any.context != OB_FRAME_CONTEXT_FRAME))
         {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */
@@ -1275,7 +1276,8 @@ void action_focus(union ActionData *data)
 {
     if (data->client.any.c) {
         if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
-            data->any.context != OB_FRAME_CONTEXT_CLIENT)
+            (data->any.context != OB_FRAME_CONTEXT_CLIENT &&
+             data->any.context != OB_FRAME_CONTEXT_FRAME))
         {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */

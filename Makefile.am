@@ -386,7 +386,7 @@ data/xsession/openbox-kde-session: Makefile data \
 doc/openbox.1.in: Makefile doc $(srcdir)/doc/openbox.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	docbook-to-man $(srcdir)/doc/openbox.1.sgml > $@
+	@docbook-to-man $(srcdir)/doc/openbox.1.sgml > $@
 
 doc/openbox.1: Makefile doc doc/openbox.1.in
 	@echo make: creating $@
@@ -396,12 +396,12 @@ doc/openbox.1: Makefile doc doc/openbox.1.in
 doc/openbox-gnome-session.1: Makefile doc doc/openbox-gnome-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	docbook-to-man $(srcdir)/doc/openbox-gnome-session.1.sgml > $@
+	@docbook-to-man $(srcdir)/doc/openbox-gnome-session.1.sgml > $@
 
 doc/openbox-kde-session.1: Makefile doc doc/openbox-kde-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	docbook-to-man $(srcdir)/doc/openbox-kde-session.1.sgml > $@
+	@docbook-to-man $(srcdir)/doc/openbox-kde-session.1.sgml > $@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop

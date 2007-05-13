@@ -160,6 +160,8 @@ typedef struct Atoms {
     Atom net_wm_action_fullscreen;
     Atom net_wm_action_change_desktop;
     Atom net_wm_action_close;
+    Atom net_wm_action_above;
+    Atom net_wm_action_below;
 
     Atom net_wm_state_modal;
 /*    Atom net_wm_state_sticky;*/

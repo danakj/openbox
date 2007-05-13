@@ -1594,7 +1594,9 @@ void client_setup_decor_and_functions(ObClient *self)
          OB_CLIENT_FUNC_ICONIFY |
          OB_CLIENT_FUNC_MAXIMIZE |
          OB_CLIENT_FUNC_SHADE |
-         OB_CLIENT_FUNC_CLOSE);
+         OB_CLIENT_FUNC_CLOSE |
+         OB_CLIENT_FUNC_BELOW |
+         OB_CLIENT_FUNC_ABOVE);
 
     if (!(self->min_size.width < self->max_size.width ||
           self->min_size.height < self->max_size.height))
@@ -1626,10 +1628,15 @@ void client_setup_decor_and_functions(ObClient *self)
         self->functions = OB_CLIENT_FUNC_MOVE;
 
     case OB_CLIENT_TYPE_DESKTOP:
-    case OB_CLIENT_TYPE_DOCK:
         /* these windows are not manipulated by the window manager */
         self->decorations = 0;
         self->functions = 0;
+
+    case OB_CLIENT_TYPE_DOCK:
+        /* these windows are not manipulated by the window manager, but they
+           can set below layer which has a special meaning */
+        self->decorations = 0;
+        self->functions = OB_CLIENT_FUNC_BELOW;
         break;
     }
 
@@ -1719,7 +1726,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
 static void client_change_allowed_actions(ObClient *self)
 {
-    gulong actions[9];
+    gulong actions[11];
     gint num = 0;
 
     /* desktop windows are kept on all desktops */
@@ -1742,6 +1749,10 @@ static void client_change_allowed_actions(ObClient *self)
         actions[num++] = prop_atoms.net_wm_action_maximize_horz;
         actions[num++] = prop_atoms.net_wm_action_maximize_vert;
     }
+    if (self->functions & OB_CLIENT_FUNC_ABOVE)
+        actions[num++] = prop_atoms.net_wm_action_above;
+    if (self->functions & OB_CLIENT_FUNC_BELOW)
+        actions[num++] = prop_atoms.net_wm_action_below;
 
     PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
 

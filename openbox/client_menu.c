@@ -176,13 +176,13 @@ static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
         if (e->type == OB_MENU_ENTRY_TYPE_NORMAL) {
             switch (e->id) {
             case LAYER_TOP:
-                *en = !c->above;
+                *en = !c->above && (c->functions & OB_CLIENT_FUNC_ABOVE);
                 break;
             case LAYER_NORMAL:
                 *en = c->above || c->below;
                 break;
             case LAYER_BOTTOM:
-                *en = !c->below;
+                *en = !c->below && (c->functions & OB_CLIENT_FUNC_BELOW);
                 break;
             default:
                 *en = TRUE;

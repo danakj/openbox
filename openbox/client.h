@@ -71,7 +71,9 @@ typedef enum
     OB_CLIENT_FUNC_MAXIMIZE   = 1 << 3, /*!< Allow to be maximized */
     OB_CLIENT_FUNC_SHADE      = 1 << 4, /*!< Allow to be shaded */
     OB_CLIENT_FUNC_FULLSCREEN = 1 << 5, /*!< Allow to be made fullscreen */
-    OB_CLIENT_FUNC_CLOSE      = 1 << 6  /*!< Allow to be closed */
+    OB_CLIENT_FUNC_CLOSE      = 1 << 6, /*!< Allow to be closed */
+    OB_CLIENT_FUNC_ABOVE      = 1 << 7, /*!< Allow to be put in lower layer */
+    OB_CLIENT_FUNC_BELOW      = 1 << 8  /*!< Allow to be put in higher layer */
 } ObFunctions;
 
 struct _ObClient

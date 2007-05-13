@@ -258,6 +258,8 @@ gboolean screen_annex(const gchar *program_name)
     supported[i++] = prop_atoms.net_wm_action_fullscreen;
     supported[i++] = prop_atoms.net_wm_action_change_desktop;
     supported[i++] = prop_atoms.net_wm_action_close;
+    supported[i++] = prop_atoms.net_wm_action_above;
+    supported[i++] = prop_atoms.net_wm_action_below;
     supported[i++] = prop_atoms.net_wm_state;
     supported[i++] = prop_atoms.net_wm_state_modal;
     supported[i++] = prop_atoms.net_wm_state_maximized_vert;

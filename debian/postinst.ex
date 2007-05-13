@@ -20,6 +20,7 @@ set -e
 
 case "$1" in
     configure)
+        if [ -x /usr/bin/update-menus ]; then update-menus; fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

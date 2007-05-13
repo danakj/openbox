@@ -41,7 +41,7 @@ void parse_shutdown(ObParseInst *inst);
 gboolean parse_load_rc(const gchar *type, xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */
 gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
-/* Loads an Openbox menu, from the normal paths */
+/* Loads an Openbox theme, from the normal paths */
 gboolean parse_load_theme(const gchar *name, xmlDocPtr *doc, xmlNodePtr *root,
                           gchar **path);
 

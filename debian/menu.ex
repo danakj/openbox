@@ -1,2 +1,6 @@
-?package(openbox):needs="X11|text|vc|wm" section="Apps/see-menu-manual"\
-  title="openbox" command="/usr/bin/openbox"
+?package(openbox):\
+  needs="wm"\
+  section="WindowManagers"\
+  title="Openbox"\
+  command="/usr/bin/openbox"\
+  icon="/usr/share/pixmaps/openbox.png"

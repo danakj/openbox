@@ -38,6 +38,9 @@ manpage.1: manpage.sgml
 
     <para><command>&dhpackage;</command> runs a GNOME session with
       Openbox as the window manager.</para>
+
+    <para>When running inside GNOME like this, Openbox will use the
+      <literal>rc-gnome.xml</literal> configuration file.</para>
   </refsect1>
   <refsect1>
     <title>SEE ALSO</title>

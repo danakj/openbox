@@ -154,6 +154,9 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     gint emptyx, emptyy; /* empty space between elements */
     gint textx, texty, textw, texth;
     gint iconx, icony, iconw, iconh;
+    Rect *area;
+
+    area = screen_physical_area();
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
 
@@ -225,6 +228,9 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         break;
     }
 
+    x=MAX(MIN(x, area->width-w),0);
+    y=MAX(MIN(y, area->height-h),0);
+    
     /* set the windows/appearances up */
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
     RrPaint(self->a_bg, self->bg, w, h);

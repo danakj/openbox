@@ -170,7 +170,7 @@ void prop_startup()
     CREATE(esetrootid, "ESETROOT_PMAP_ID");
 */
 
-    CREATE(ob_pid, "_OB_PID");
+    CREATE(openbox_pid, "_OPENBOX_PID");
     CREATE(ob_config, "_OB_CONFIG");
     CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(ob_control, "_OB_CONTROL");

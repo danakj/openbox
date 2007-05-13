@@ -457,13 +457,11 @@ static void print_help()
 {
     g_print(_("Syntax: openbox [options]\n"));
     g_print(_("\nOptions:\n"));
-    g_print(_("  --config TYPE       Specify the configuration profile to use\n"));
-#ifdef USE_SM
-    g_print(_("  --sm-disable        Disable connection to the session manager\n"));
-#endif
-    g_print(_("  --replace           Replace the currently running window manager\n"));
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
+    g_print(_("  --replace           Replace the currently running window manager\n"));
+    g_print(_("  --sm-disable        Disable connection to the session manager\n"));
+    g_print(_("  --config TYPE       Specify the configuration profile to use\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
     g_print(_("\nDebugging options:\n"));
@@ -534,7 +532,6 @@ static void parse_args(gint *argc, gchar **argv)
                 ++i;
             }
         }
-#ifdef USE_SM
         else if (!strcmp(argv[i], "--sm-save-file")) {
             if (i == *argc - 1) /* no args left */
                 /* not translated cuz it's sekret */
@@ -561,7 +558,6 @@ static void parse_args(gint *argc, gchar **argv)
         else if (!strcmp(argv[i], "--sm-disable")) {
             ob_sm_use = FALSE;
         }
-#endif
         else {
             /* this is a memleak.. oh well.. heh */
             gchar *err = g_strdup_printf

@@ -414,7 +414,7 @@ void dock_configure()
     if (!dock->dock_apps) {
         STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
-    } else if (config_dock_floating || config_dock_nostrut || config_dock_hide)
+    } else if (config_dock_floating || config_dock_nostrut)
     {
         STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);

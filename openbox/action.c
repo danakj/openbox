@@ -1095,40 +1095,12 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
 {
     GSList *it;
     ObAction *a;
-    gboolean inter = FALSE;
 
     if (!acts)
         return;
 
     if (x < 0 && y < 0)
         screen_pointer_pos(&x, &y);
-
-    if (grab_on_keyboard())
-        inter = TRUE;
-    else
-        for (it = acts; it; it = g_slist_next(it)) {
-            a = it->data;
-            if (a->data.any.interactive) {
-                inter = TRUE;
-                break;
-            }
-        }
-
-    if (!inter && button == 0) {
-        /* Ungrab the keyboard before running the action, if it was
-           not from a mouse event.
-
-           We have to do this because a key press causes a passive
-           grab on the keyboard, and so if the action we are running
-           wants to grab the keyboard, it will fail if the button is still
-           held down (which is likely).
-
-           Use the X function not out own, because we're not considering
-           a grab to be in place at all so our function won't try ungrab
-           anything.
-        */
-        XUngrabKeyboard(ob_display, time);
-    }
 
     for (it = acts; it; it = g_slist_next(it)) {
         a = it->data;
@@ -1216,6 +1188,25 @@ void action_execute(union ActionData *data)
     GError *e = NULL;
     gchar *cmd, **argv = 0;
     if (data->execute.path) {
+        /* Ungrab the keyboard before running the action.
+
+           If there is an interactive action going on, then cancel it to
+           release the keyboard. If not, then call XUngrabKeyboard().
+
+           We call XUngrabKeyboard because a key press causes a passive
+           grab on the keyboard, and so if program we are executing wants to
+           grab the keyboard, it will fail if the button is still held down
+           (which is likely).
+
+           Use the X function not out own, because we're not considering
+           a grab to be in place at all so our function won't try ungrab
+           anything.
+        */
+        if (keyboard_interactively_grabbed())
+            keyboard_interactive_cancel();
+        else
+            XUngrabKeyboard(ob_display, data->any.time);
+
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {

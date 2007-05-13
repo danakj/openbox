@@ -87,6 +87,7 @@ void focus_startup(gboolean reconfig)
         XSetWindowAttributes attr;
 
         client_add_destructor(focus_cycle_destructor, NULL);
+        client_add_destructor(focus_tried_hide_notify, NULL);
         client_add_hide_notify(focus_tried_hide_notify, NULL);
 
         /* start with nothing focused */
@@ -141,6 +142,7 @@ void focus_shutdown(gboolean reconfig)
 
     if (!reconfig) {
         client_remove_destructor(focus_cycle_destructor);
+        client_remove_destructor(focus_tried_hide_notify);
         client_remove_hide_notify(focus_tried_hide_notify);
 
         /* reset focus to root */

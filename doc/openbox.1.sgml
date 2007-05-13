@@ -16,13 +16,7 @@ manpage.1: manpage.sgml
 
   -->
 
-  <!ENTITY dhfirstname "<firstname>Dana</firstname>">
-  <!ENTITY dhsurname   "<surname>Jansens</surname>">
-  <!-- Please adjust the date whenever revising the manpage. -->
-  <!ENTITY dhdate      "<date>May 13, 2007</date>">
   <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
-  <!ENTITY dhemail     "<email>danakj@orodu.net</email>">
-  <!ENTITY dhusername  "Dana Jansens">
   <!ENTITY dhucpackage "<refentrytitle>OPENBOX</refentrytitle>">
   <!ENTITY dhpackage   "openbox">
 
@@ -38,7 +32,8 @@ manpage.1: manpage.sgml
   <refnamediv>
     <refname>&dhpackage;</refname>
 
-    <refpurpose>Next generation window manager</refpurpose>
+    <refpurpose>Next generation, highly configurable window manager
+      </refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>

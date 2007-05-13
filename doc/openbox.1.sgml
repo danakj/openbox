@@ -19,8 +19,6 @@ manpage.1: manpage.sgml
   <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
   <!ENTITY dhucpackage "<refentrytitle>OPENBOX</refentrytitle>">
   <!ENTITY dhpackage   "openbox">
-
-  <!ENTITY gnu         "<acronym>GNU</acronym>">
 ]>
 
 <refentry>

@@ -397,8 +397,6 @@ dist_noinst_DATA = \
 	debian/compat \
 	debian/control \
 	debian/copyright \
-	debian/dirs \
-	debian/docs \
 	debian/menu.ex \
 	debian/openbox-default.ex \
 	debian/openbox.doc-base.EX \

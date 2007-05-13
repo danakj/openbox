@@ -454,7 +454,7 @@ dist_doc_DATA = \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/themerc.xsd \
-	data/rc-mouse-focus.xml
+	doc/rc-mouse-focus.xml
 
 dist_man_MANS = \
 	doc/openbox.1 \

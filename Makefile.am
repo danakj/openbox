@@ -367,41 +367,41 @@ edit = $(SED) \
 	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
-data/xsession/openbox-gnome-session: Makefile \
+data/xsession/openbox-gnome-session: \
 		$(srcdir)/data/xsession/openbox-gnome-session.in
 	@echo make: creating $@
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $(srcdir)/data/xsession/openbox-gnome-session.in >$@
+	@$(edit) $< >$@
 	@chmod a+x $@
 
-data/xsession/openbox-kde-session: Makefile \
+data/xsession/openbox-kde-session: \
 		$(srcdir)/data/xsession/openbox-kde-session.in
 	@echo make: creating $@
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
+	@$(edit) $< >$@
 	@chmod a+x $@
 
-doc/openbox.1.in: Makefile $(srcdir)/doc/openbox.1.sgml
+doc/openbox.1.in: $(srcdir)/doc/openbox.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@docbook-to-man $(srcdir)/doc/openbox.1.sgml > $@
+	@docbook-to-man $< > $@
 
-doc/openbox.1: Makefile doc/openbox.1.in
+doc/openbox.1: doc/openbox.1.in
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@$(edit) $(srcdir)/doc/openbox.1.in >$@
+	@$(edit) $< >$@
 
-doc/openbox-gnome-session.1: Makefile doc/openbox-gnome-session.1.sgml
+doc/openbox-gnome-session.1: $(srcdir)/doc/openbox-gnome-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@docbook-to-man $(srcdir)/doc/openbox-gnome-session.1.sgml > $@
+	@docbook-to-man $< > $@
 
-doc/openbox-kde-session.1: Makefile doc/openbox-kde-session.1.sgml
+doc/openbox-kde-session.1: $(srcdir)/doc/openbox-kde-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@docbook-to-man $(srcdir)/doc/openbox-kde-session.1.sgml > $@
+	@docbook-to-man $< > $@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop

@@ -187,10 +187,11 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     else
         g_assert_not_reached();
 
-    if (!grab_pointer(TRUE, FALSE, cur))
+    /* keep the pointer bounded to the screen for move/resize */
+    if (!grab_pointer(FALSE, TRUE, cur))
         return;
-    if (!grab_keyboard(TRUE)) {
-        grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+    if (!grab_keyboard()) {
+        ungrab_pointer();
         return;
     }
 
@@ -275,8 +276,8 @@ void moveresize_end(gboolean cancel)
 {
     gint x, y;
 
-    grab_keyboard(FALSE);
-    grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+    ungrab_keyboard();
+    ungrab_pointer();
 
     popup_hide(popup);
 

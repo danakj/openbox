@@ -24,10 +24,7 @@
 
 #ifndef USE_LIBSN
 
-void sn_startup(gboolean reconfig) {
-    /* unset this so we don't pass it on unknowingly */
-    if (!reconfig) unsetenv("DESKTOP_STARTUP_ID");
-}
+void sn_startup(gboolean reconfig) {}
 void sn_shutdown(gboolean reconfig) {}
 gboolean sn_app_starting() { return FALSE; }
 Time sn_app_started(const gchar *id, const gchar *wmclass)

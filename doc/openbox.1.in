@@ -4,7 +4,7 @@ openbox \(em Next generation, highly configurable window manager
  
 .SH "SYNOPSIS" 
 .PP 
-\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-config \fITYPE\fR\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  
+\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  
 .SH "DESCRIPTION" 
 .PP 
 Openbox is a next generation, highly 
@@ -59,8 +59,6 @@ If Openbox is already running on the display, tell it to
 reload it's configuration. 
 .IP "\fB\-\-sm-disable\fP" 10 
 Do not connect to the session manager. 
-.IP "\fB\-\-config\fITYPE\fR\fP" 10 
-Specify the configuration profile to use. 
 .IP "\fB\-\-sync\fP" 10 
 Run in synchronous mode (for debugging). 
 .IP "\fB\-\-debug\fP" 10 
@@ -77,4 +75,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 18:06 
+.\" created by instant / docbook-to-man, Sun 13 May 2007, 18:47 

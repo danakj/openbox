@@ -104,6 +104,7 @@ static gchar    *config_type = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
+static void parse_env();
 static void parse_args(gint *argc, gchar **argv);
 static Cursor load_cursor(const gchar *name, guint fontval);
 
@@ -126,6 +127,8 @@ gint main(gint argc, gchar **argv)
      
     /* parse the command line args, which can change the argv[0] */
     parse_args(&argc, argv);
+    /* parse the environment variables */
+    parse_env();
 
     program_name = g_path_get_basename(argv[0]);
     g_set_prgname(program_name);
@@ -405,6 +408,10 @@ gint main(gint argc, gchar **argv)
             argv = nargv;
         }
 
+        /* we also remove some environment variables, so put them back */
+        if (config_type)
+            setenv("OPENBOX_CONFIG_NAMESPACE", config_type, 1);
+
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
         execlp(argv[0], program_name, (gchar*)NULL); /* last resort */
@@ -461,7 +468,6 @@ static void print_help()
     g_print(_("  --version           Display the version and exit\n"));
     g_print(_("  --replace           Replace the currently running window manager\n"));
     g_print(_("  --sm-disable        Disable connection to the session manager\n"));
-    g_print(_("  --config TYPE       Specify the configuration profile to use\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
     g_print(_("\nDebugging options:\n"));
@@ -480,6 +486,18 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
     for (; i < *argc; ++i)
         argv[i] = NULL;
     *argc -= num;
+}
+
+static void parse_env()
+{
+    /* unset this so we don't pass it on unknowingly */
+    unsetenv("DESKTOP_STARTUP_ID");
+
+    if (getenv("OPENBOX_CONFIG_NAMESPACE")) {
+        config_type = g_strdup(getenv("OPENBOX_CONFIG_NAMESPACE"));
+        /* don't pass it on except if we restart */
+        unsetenv("OPENBOX_CONFIG_NAMESPACE");
+    }
 }
 
 static void parse_args(gint *argc, gchar **argv)
@@ -523,14 +541,6 @@ static void parse_args(gint *argc, gchar **argv)
         } else if (!strcmp(argv[i], "--restart")) {
             remote_control = 2;
 */
-        }
-        else if (!strcmp(argv[i], "--config")) {
-            if (i == *argc - 1) /* no args left */
-                g_printerr(_("--config requires an argument\n"));
-            else {
-                config_type = g_strdup(argv[i+1]);
-                ++i;
-            }
         }
         else if (!strcmp(argv[i], "--sm-save-file")) {
             if (i == *argc - 1) /* no args left */

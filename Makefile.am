@@ -433,7 +433,8 @@ dist_doc_DATA = \
 	README \
 	AUTHORS \
 	data/rc.xsd \
-	data/menu.xsd
+	data/menu.xsd \
+	doc/rc-mouse-focus.xml
 
 dist_man_MANS = \
 	doc/openbox.1 \

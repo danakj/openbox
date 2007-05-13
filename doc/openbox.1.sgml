@@ -156,10 +156,10 @@ manpage.1: manpage.sgml
       </para>
 
     <para>The program's full documentation is available on the website:
-      <olink>http://openbox.org/</olink></para>
+      <literal>http://openbox.org/</literal></para>
 
-    <para>Please report bugs to: <olink>http://bugzilla.icculus.org/</olink>
-      </para>
+    <para>Please report bugs to: <literal>http://bugzilla.icculus.org/
+      </literal></para>
   </refsect1>
 </refentry>
 

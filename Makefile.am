@@ -393,6 +393,16 @@ doc/openbox.1: Makefile doc doc/openbox.1.in
 	@mkdir doc 2>/dev/null || true
 	@$(edit) $(srcdir)/doc/openbox.1.in >$@
 
+doc/openbox-gnome-session.1: Makefile doc doc/openbox-gnome-session.1.sgml
+	@echo make: creating $@
+	@mkdir doc 2>/dev/null || true
+	docbook-to-man $(srcdir)/doc/openbox-gnome-session.1.sgml > $@
+
+doc/openbox-kde-session.1: Makefile doc doc/openbox-kde-session.1.sgml
+	@echo make: creating $@
+	@mkdir doc 2>/dev/null || true
+	docbook-to-man $(srcdir)/doc/openbox-kde-session.1.sgml > $@
+
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop
 
@@ -446,7 +456,9 @@ dist_doc_DATA = \
 	data/themerc.xsd
 
 man_MANS = \
-	doc/openbox.1
+	doc/openbox.1 \
+	doc/openbox-gnome-session.1 \
+	doc/openbox-kde-session.1
 
 EXTRA_DIST = \
 	config.rpath \

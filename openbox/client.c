@@ -64,7 +64,8 @@ typedef struct
 
 GList            *client_list          = NULL;
 
-static GSList *client_destructors      = NULL;
+static GSList *client_destroy_notifies = NULL;
+static GSList *client_hide_notifies    = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -79,7 +80,7 @@ static void client_get_colormap(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
-static void client_apply_startup_state(ObClient *self, gint x, gint y);
+static void client_apply_startup_state(ObClient *self);
 static void client_restore_session_state(ObClient *self);
 static gboolean client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
@@ -91,6 +92,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise);
 static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
+static void client_call_notifies(ObClient *self, GSList *list);
 
 void client_startup(gboolean reconfig)
 {
@@ -104,23 +106,57 @@ void client_shutdown(gboolean reconfig)
     if (reconfig) return;
 }
 
-void client_add_destructor(ObClientCallback func, gpointer data)
+static void client_call_notifies(ObClient *self, GSList *list)
+{
+    GSList *it;
+
+    for (it = list; it; it = g_slist_next(it)) {
+        ClientCallback *d = it->data;
+        d->func(self, d->data);
+    }
+}
+
+void client_add_destroy_notify(ObClientCallback func, gpointer data)
 {
     ClientCallback *d = g_new(ClientCallback, 1);
     d->func = func;
     d->data = data;
-    client_destructors = g_slist_prepend(client_destructors, d);
+    client_destroy_notifies = g_slist_prepend(client_destroy_notifies, d);
 }
 
-void client_remove_destructor(ObClientCallback func)
+void client_remove_destroy_notify(ObClientCallback func)
 {
     GSList *it;
 
-    for (it = client_destructors; it; it = g_slist_next(it)) {
+    for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
         if (d->func == func) {
             g_free(d);
-            client_destructors = g_slist_delete_link(client_destructors, it);
+            client_destroy_notifies =
+                g_slist_delete_link(client_destroy_notifies, it);
+            break;
+        }
+    }
+}
+
+void client_add_hide_notify(ObClientCallback func, gpointer data)
+{
+    ClientCallback *d = g_new(ClientCallback, 1);
+    d->func = func;
+    d->data = data;
+    client_hide_notifies = g_slist_prepend(client_hide_notifies, d);
+}
+
+void client_remove_hide_notify(ObClientCallback func)
+{
+    GSList *it;
+
+    for (it = client_hide_notifies; it; it = g_slist_next(it)) {
+        ClientCallback *d = it->data;
+        if (d->func == func) {
+            g_free(d);
+            client_hide_notifies =
+                g_slist_delete_link(client_hide_notifies, it);
             break;
         }
     }
@@ -229,7 +265,6 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
-    gint newx, newy;
 
     grab_server(TRUE);
 
@@ -347,20 +382,21 @@ void client_manage(Window window)
         activate = TRUE;
     }
 
-    /* get the current position */
-    newx = self->area.x;
-    newy = self->area.y;
-
     /* figure out placement for the window */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
 
-        transient = place_client(self, &newx, &newy, settings);
+        ob_debug("Positioned: %s @ %d %d\n",
+                 (!self->positioned ? "no" :
+                  (self->positioned == PPosition ? "program specified" :
+                   (self->positioned == USPosition ? "user specified" :
+                    "BADNESS !?"))), self->area.x, self->area.y);
+
+        transient = place_client(self, &self->area.x, &self->area.y, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &newx, &newy,
-                             self->area.width,
-                             self->area.height,
+        client_find_onscreen(self, &self->area.x, &self->area.y,
+                             self->area.width, self->area.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
                                 session do also. we can assume you want
@@ -383,12 +419,18 @@ void client_manage(Window window)
        also, this moves the window to the position where it has been placed
     */
     ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
-             self->window, newx, newy, self->area.width, self->area.height);
+             self->window, self->area.x, self->area.y,
+             self->area.width, self->area.height);
     if (self->session)
-        ob_debug("session requested %d %d\n",
+        ob_debug("  but session requested %d %d instead, overriding\n",
                  self->session->x, self->session->y);
 
-    client_apply_startup_state(self, newx, newy);
+    /* generate a ConfigureNotify telling the client where it is */
+    client_configure_full(self, self->area.x, self->area.y,
+                          self->area.width, self->area.height,
+                          FALSE, TRUE);
+
+    client_apply_startup_state(self);
 
     mouse_grab_for_client(self, TRUE);
 
@@ -460,6 +502,7 @@ void client_manage(Window window)
 
     /* adjust the frame to the client's size before showing the window */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    frame_adjust_client_area(self->frame);
 
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
@@ -565,10 +608,7 @@ void client_unmanage(ObClient *self)
     if (STRUT_EXISTS(self->strut))
         screen_update_areas();
 
-    for (it = client_destructors; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        d->func(self, d->data);
-    }
+    client_call_notifies(self, client_destroy_notifies);
 
     /* tell our parent(s) that we're gone */
     if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
@@ -1560,7 +1600,9 @@ void client_setup_decor_and_functions(ObClient *self)
          OB_CLIENT_FUNC_ICONIFY |
          OB_CLIENT_FUNC_MAXIMIZE |
          OB_CLIENT_FUNC_SHADE |
-         OB_CLIENT_FUNC_CLOSE);
+         OB_CLIENT_FUNC_CLOSE |
+         OB_CLIENT_FUNC_BELOW |
+         OB_CLIENT_FUNC_ABOVE);
 
     if (!(self->min_size.width < self->max_size.width ||
           self->min_size.height < self->max_size.height))
@@ -1592,10 +1634,15 @@ void client_setup_decor_and_functions(ObClient *self)
         self->functions = OB_CLIENT_FUNC_MOVE;
 
     case OB_CLIENT_TYPE_DESKTOP:
-    case OB_CLIENT_TYPE_DOCK:
         /* these windows are not manipulated by the window manager */
         self->decorations = 0;
         self->functions = 0;
+
+    case OB_CLIENT_TYPE_DOCK:
+        /* these windows are not manipulated by the window manager, but they
+           can set below layer which has a special meaning */
+        self->decorations = 0;
+        self->functions = OB_CLIENT_FUNC_BELOW;
         break;
     }
 
@@ -1685,7 +1732,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
 static void client_change_allowed_actions(ObClient *self)
 {
-    gulong actions[9];
+    gulong actions[11];
     gint num = 0;
 
     /* desktop windows are kept on all desktops */
@@ -1708,6 +1755,10 @@ static void client_change_allowed_actions(ObClient *self)
         actions[num++] = prop_atoms.net_wm_action_maximize_horz;
         actions[num++] = prop_atoms.net_wm_action_maximize_vert;
     }
+    if (self->functions & OB_CLIENT_FUNC_ABOVE)
+        actions[num++] = prop_atoms.net_wm_action_above;
+    if (self->functions & OB_CLIENT_FUNC_BELOW)
+        actions[num++] = prop_atoms.net_wm_action_below;
 
     PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
 
@@ -2383,6 +2434,8 @@ void client_hide(ObClient *self)
 {
     if (!client_should_show(self)) {
         frame_hide(self->frame);
+
+        client_call_notifies(self, client_hide_notifies);
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
@@ -2400,6 +2453,8 @@ void client_showhide(ObClient *self)
     }
     else {
         frame_hide(self->frame);
+
+        client_call_notifies(self, client_hide_notifies);
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
@@ -2438,17 +2493,8 @@ gboolean client_enter_focusable(ObClient *self)
 }
 
 
-static void client_apply_startup_state(ObClient *self, gint x, gint y)
+static void client_apply_startup_state(ObClient *self)
 {
-    gboolean pos = FALSE; /* has the window's position been configured? */
-    gint ox, oy;
-
-    /* save the position, and set self->area for these to use */
-    ox = self->area.x;
-    oy = self->area.y;
-    self->area.x = x;
-    self->area.y = y;
-
     /* set the desktop hint, to make sure that it always exists */
     PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
 
@@ -2461,7 +2507,6 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     if (self->fullscreen) {
         self->fullscreen = FALSE;
         client_fullscreen(self, TRUE);
-        pos = TRUE;
     }
     if (self->undecorated) {
         self->undecorated = FALSE;
@@ -2479,27 +2524,12 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     if (self->max_vert && self->max_horz) {
         self->max_vert = self->max_horz = FALSE;
         client_maximize(self, TRUE, 0);
-        pos = TRUE;
     } else if (self->max_vert) {
         self->max_vert = FALSE;
         client_maximize(self, TRUE, 2);
-        pos = TRUE;
     } else if (self->max_horz) {
         self->max_horz = FALSE;
         client_maximize(self, TRUE, 1);
-        pos = TRUE;
-    }
-
-    /* if the client didn't get positioned yet, then do so now.
-       call client_move even if the window is not being moved anywhere, because
-       when we reparent it and decorate it, it is getting moved and we need to
-       be telling it so with a ConfigureNotify event.
-    */
-    if (!pos) {
-        /* use the saved position */
-        self->area.x = ox;
-        self->area.y = oy;
-        client_move(self, x, y);
     }
 
     /* nothing to do for the other states:
@@ -2713,8 +2743,9 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
                                     (resized && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
-    if (send_resize_client && user && (w > oldw || h > oldh)) {
-        XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+    if (send_resize_client && (w > oldw || h > oldh)) {
+        XResizeWindow(ob_display, self->window,
+                      MAX(w, oldw), MAX(h, oldh));
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
     }
@@ -2756,11 +2787,12 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (!user || (w <= oldw || h <= oldh))) {
+    if (send_resize_client && (w <= oldw || h <= oldh)) {
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
 
-        XResizeWindow(ob_display, self->window, w, h);
+        if (send_resize_client)
+            XResizeWindow(ob_display, self->window, w, h);
     }
 
     XFlush(ob_display);
@@ -3359,6 +3391,16 @@ gboolean client_focus(ObClient *self)
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Focusing client \"%s\" at time %u\n",
                   self->title, event_curtime);
+
+    /* if there is a grab going on, then we need to cancel it. if we move
+       focus during the grab, applications will get NotifyWhileGrabbed events
+       and ignore them !
+
+       actions should not rely on being able to move focus during an
+       interactive grab.
+    */
+    if (keyboard_interactively_grabbed())
+        keyboard_interactive_cancel();
 
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app

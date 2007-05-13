@@ -135,6 +135,9 @@ void prop_startup()
     CREATE(net_wm_action_fullscreen, "_NET_WM_ACTION_FULLSCREEN");
     CREATE(net_wm_action_change_desktop, "_NET_WM_ACTION_CHANGE_DESKTOP");
     CREATE(net_wm_action_close, "_NET_WM_ACTION_CLOSE");
+    CREATE(net_wm_action_above, "_NET_WM_ACTION_ABOVE");
+    CREATE(net_wm_action_below, "_NET_WM_ACTION_BELOW");
+
     CREATE(net_wm_state_modal, "_NET_WM_STATE_MODAL");
 /*    CREATE(net_wm_state_sticky, "_NET_WM_STATE_STICKY");*/
     CREATE(net_wm_state_maximized_vert, "_NET_WM_STATE_MAXIMIZED_VERT");

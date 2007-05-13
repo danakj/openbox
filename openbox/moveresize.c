@@ -70,7 +70,7 @@ void moveresize_startup(gboolean reconfig)
     popup = popup_new(FALSE);
 
     if (!reconfig)
-        client_add_destructor(client_dest, NULL);
+        client_add_destroy_notify(client_dest, NULL);
 }
 
 void moveresize_shutdown(gboolean reconfig)
@@ -78,7 +78,7 @@ void moveresize_shutdown(gboolean reconfig)
     if (!reconfig) {
         if (moveresize_in_progress)
             moveresize_end(FALSE);
-        client_remove_destructor(client_dest);
+        client_remove_destroy_notify(client_dest);
     }
 
     popup_free(popup);

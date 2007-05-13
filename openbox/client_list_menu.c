@@ -194,7 +194,7 @@ void client_list_menu_startup(gboolean reconfig)
     ObMenu *menu;
 
     if (!reconfig)
-        client_add_destructor(client_dest, NULL);
+        client_add_destroy_notify(client_dest, NULL);
 
     menu = menu_new(MENU_NAME, _("Desktops"), TRUE, NULL);
     menu_set_update_func(menu, self_update);
@@ -203,5 +203,5 @@ void client_list_menu_startup(gboolean reconfig)
 void client_list_menu_shutdown(gboolean reconfig)
 {
     if (!reconfig)
-        client_remove_destructor(client_dest);
+        client_remove_destroy_notify(client_dest);
 }

@@ -67,8 +67,8 @@ static gboolean valid_focus_target(ObClient *ft,
                                    gboolean all_desktops,
                                    gboolean dock_windows,
                                    gboolean desktop_windows);
-static void focus_cycle_destructor(ObClient *client, gpointer data);
-static void focus_tried_destructor(ObClient *client, gpointer data);
+static void focus_cycle_destroy_notify(ObClient *client, gpointer data);
+static void focus_tried_hide_notify(ObClient *client, gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -86,8 +86,9 @@ void focus_startup(gboolean reconfig)
     if (!reconfig) {
         XSetWindowAttributes attr;
 
-        client_add_destructor(focus_cycle_destructor, NULL);
-        client_add_destructor(focus_tried_destructor, NULL);
+        client_add_destroy_notify(focus_cycle_destroy_notify, NULL);
+        client_add_destroy_notify(focus_tried_hide_notify, NULL);
+        client_add_hide_notify(focus_tried_hide_notify, NULL);
 
         /* start with nothing focused */
         focus_nothing();
@@ -140,8 +141,9 @@ void focus_shutdown(gboolean reconfig)
     icon_popup_free(focus_cycle_popup);
 
     if (!reconfig) {
-        client_remove_destructor(focus_cycle_destructor);
-        client_remove_destructor(focus_tried_destructor);
+        client_remove_destroy_notify(focus_cycle_destroy_notify);
+        client_remove_destroy_notify(focus_tried_hide_notify);
+        client_remove_hide_notify(focus_tried_hide_notify);
 
         /* reset focus to root */
         XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
@@ -415,7 +417,7 @@ static void popup_cycle(ObClient *c, gboolean show,
     g_free(showtext);
 }
 
-static void focus_cycle_destructor(ObClient *client, gpointer data)
+static void focus_cycle_destroy_notify(ObClient *client, gpointer data)
 {
     /* end cycling if the target disappears. CurrentTime is fine, time won't
        be used
@@ -741,10 +743,13 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if(cur == c)
             continue;
-        if (!dock_windows && !desktop_windows && !client_normal(cur))
+        if (cur->type == OB_CLIENT_TYPE_DOCK && !dock_windows)
             continue;
-        if (!(dock_windows && cur->type == OB_CLIENT_TYPE_DOCK) ||
-            (desktop_windows && cur->type == OB_CLIENT_TYPE_DESKTOP))
+        if (cur->type == OB_CLIENT_TYPE_DESKTOP && !desktop_windows)
+            continue;
+        if (!client_normal(cur) &&
+            cur->type != OB_CLIENT_TYPE_DOCK &&
+            cur->type != OB_CLIENT_TYPE_DESKTOP)
             continue;
         /* using c->desktop instead of screen_desktop doesn't work if the
          * current window was omnipresent, hope this doesn't have any other
@@ -942,7 +947,7 @@ ObClient *focus_order_find_first(guint desktop)
     return NULL;
 }
 
-static void focus_tried_destructor(ObClient *client, gpointer data)
+static void focus_tried_hide_notify(ObClient *client, gpointer data)
 {
     XEvent ce;
 

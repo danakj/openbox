@@ -282,7 +282,7 @@ void ob_main_loop_run(ObMainLoop *loop)
     loop->run = TRUE;
     loop->running = TRUE;
 
-    client_add_destructor(ob_main_loop_client_destroy, loop);
+    client_add_destroy_notify(ob_main_loop_client_destroy, loop);
 
     while (loop->run) {
         if (loop->signal_fired) {
@@ -365,7 +365,7 @@ void ob_main_loop_run(ObMainLoop *loop)
         }
     }
 
-    client_remove_destructor(ob_main_loop_client_destroy);
+    client_remove_destroy_notify(ob_main_loop_client_destroy);
 
     loop->running = FALSE;
 }

@@ -143,7 +143,7 @@ static void client_dest(ObClient *client, gpointer data)
 void client_list_combined_menu_startup(gboolean reconfig)
 {
     if (!reconfig)
-        client_add_destructor(client_dest, NULL);
+        client_add_destroy_notify(client_dest, NULL);
 
     combined_menu = menu_new(MENU_NAME, _("Windows"), TRUE, NULL);
     menu_set_update_func(combined_menu, self_update);
@@ -153,5 +153,5 @@ void client_list_combined_menu_startup(gboolean reconfig)
 void client_list_combined_menu_shutdown(gboolean reconfig)
 {
     if (!reconfig)
-        client_remove_destructor(client_dest);
+        client_remove_destroy_notify(client_dest);
 }

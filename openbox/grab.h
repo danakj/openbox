@@ -27,9 +27,16 @@
 void grab_startup(gboolean reconfig);
 void grab_shutdown(gboolean reconfig);
 
-gboolean grab_keyboard(gboolean grab);
-gboolean grab_pointer(gboolean grab, gboolean owner_events, ObCursor cur);
+gboolean grab_keyboard_full(gboolean grab);
+/*! @param confine If true the pointer is confined to the screen */
+gboolean grab_pointer_full(gboolean grab, gboolean owner_events,
+                           gboolean confine, ObCursor cur);
 gint grab_server(gboolean grab);
+
+#define grab_keyboard() grab_keyboard_full(TRUE)
+#define ungrab_keyboard() grab_keyboard_full(FALSE)
+#define grab_pointer(o,c,u) grab_pointer_full(TRUE, (o), (c), (u))
+#define ungrab_pointer() grab_pointer_full(FALSE, FALSE, FALSE, OB_CURSOR_NONE)
 
 gboolean grab_on_keyboard();
 gboolean grab_on_pointer();

@@ -162,6 +162,39 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
 
+    if (corner == prop_atoms.net_wm_moveresize_size_topleft)
+        cur = OB_CURSOR_NORTHWEST;
+    else if (corner == prop_atoms.net_wm_moveresize_size_top)
+        cur = OB_CURSOR_NORTH;
+    else if (corner == prop_atoms.net_wm_moveresize_size_topright)
+        cur = OB_CURSOR_NORTHEAST;
+    else if (corner == prop_atoms.net_wm_moveresize_size_right)
+        cur = OB_CURSOR_EAST;
+    else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
+        cur = OB_CURSOR_SOUTHEAST;
+    else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
+        cur = OB_CURSOR_SOUTH;
+    else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
+        cur = OB_CURSOR_SOUTHWEST;
+    else if (corner == prop_atoms.net_wm_moveresize_size_left)
+        cur = OB_CURSOR_WEST;
+    else if (corner == prop_atoms.net_wm_moveresize_size_keyboard)
+        cur = OB_CURSOR_SOUTHEAST;
+    else if (corner == prop_atoms.net_wm_moveresize_move)
+        cur = OB_CURSOR_MOVE;
+    else if (corner == prop_atoms.net_wm_moveresize_move_keyboard)
+        cur = OB_CURSOR_MOVE;
+    else
+        g_assert_not_reached();
+
+    /* keep the pointer bounded to the screen for move/resize */
+    if (!grab_pointer(FALSE, TRUE, cur))
+        return;
+    if (!grab_keyboard()) {
+        ungrab_pointer();
+        return;
+    }
+
     frame_end_iconify_animation(c->frame);
 
     moveresize_client = c;
@@ -196,31 +229,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     }
 
     moveresize_in_progress = TRUE;
-
-    if (corner == prop_atoms.net_wm_moveresize_size_topleft)
-        cur = OB_CURSOR_NORTHWEST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_top)
-        cur = OB_CURSOR_NORTH;
-    else if (corner == prop_atoms.net_wm_moveresize_size_topright)
-        cur = OB_CURSOR_NORTHEAST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_right)
-        cur = OB_CURSOR_EAST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
-        cur = OB_CURSOR_SOUTHEAST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
-        cur = OB_CURSOR_SOUTH;
-    else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
-        cur = OB_CURSOR_SOUTHWEST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_left)
-        cur = OB_CURSOR_WEST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_keyboard)
-        cur = OB_CURSOR_SOUTHEAST;
-    else if (corner == prop_atoms.net_wm_moveresize_move)
-        cur = OB_CURSOR_MOVE;
-    else if (corner == prop_atoms.net_wm_moveresize_move_keyboard)
-        cur = OB_CURSOR_MOVE;
-    else
-        g_assert_not_reached();
 
 #ifdef SYNC
     if (config_resize_redraw && !moving && extensions_shape &&
@@ -262,17 +270,14 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         waiting_for_sync = FALSE;
     }
 #endif
-
-    grab_pointer(TRUE, FALSE, cur);
-    grab_keyboard(TRUE);
 }
 
 void moveresize_end(gboolean cancel)
 {
     gint x, y;
 
-    grab_keyboard(FALSE);
-    grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+    ungrab_keyboard();
+    ungrab_pointer();
 
     popup_hide(popup);
 

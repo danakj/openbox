@@ -197,7 +197,7 @@ static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
 
     /* ungrab first so they won't be NotifyWhileGrabbed */
     if (ungrab)
-        grab_keyboard(FALSE);
+        ungrab_keyboard();
 
     /* set this before running the actions so they know the keyboard is not
        grabbed */
@@ -226,7 +226,7 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
     g_assert(action->data.any.interactive);
 
     if (!istate.active) {
-        if (!grab_keyboard(TRUE))
+        if (!grab_keyboard())
             return FALSE;
     } else if (action->func != istate.action->func) {
         keyboard_interactive_end(state, TRUE, action->data.any.time, FALSE);

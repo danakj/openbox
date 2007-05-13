@@ -386,6 +386,12 @@ void client_manage(Window window)
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
 
+        ob_debug("Positioned: %s @ %d %d\n",
+                 (!self->positioned ? "no" :
+                  (self->positioned == PPosition ? "program specified" :
+                   (self->positioned == USPosition ? "user specified" :
+                    "BADNESS !?"))), self->area.x, self->area.y);
+
         transient = place_client(self, &self->area.x, &self->area.y, settings);
 
         /* make sure the window is visible. */

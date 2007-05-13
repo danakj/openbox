@@ -307,14 +307,25 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
                 return FALSE;
         }
 
+        /* This means focus moved to the frame window */
+        if (detail == NotifyInferior && !in_client_only)
+            return TRUE;
+
+        /* It was on a client, was it a valid one?
+           It's possible to get a FocusIn event for a client that was managed
+           but has disappeared. Don't even parse those FocusIn events.
+        */
+        {
+            ObWindow *w = g_hash_table_lookup(window_map, &e->xfocus.window);
+            if (!w || !WINDOW_IS_CLIENT(w))
+                return FALSE;
+        }
+
         /* This means focus moved from the root window to a client */
         if (detail == NotifyVirtual)
             return TRUE;
         /* This means focus moved from one client to another */
         if (detail == NotifyNonlinearVirtual)
-            return TRUE;
-        /* This means focus moved to the frame window */
-        if (detail == NotifyInferior && !in_client_only)
             return TRUE;
 
         /* Otherwise.. */
@@ -356,13 +367,7 @@ static Bool event_look_for_focusin(Display *d, XEvent *e, XPointer arg)
 
 Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
 {
-    ObWindow *w;
-
-    /* It is possible to get FocusIn events or unmanaged windows, meaning
-       they won't be for any known client */
-    return e->type == FocusIn && wanted_focusevent(e, TRUE) &&
-        (w = g_hash_table_lookup(window_map, &e->xfocus.window)) &&
-        WINDOW_IS_CLIENT(w);
+    return e->type == FocusIn && wanted_focusevent(e, TRUE);
 }
 
 static void print_focusevent(XEvent *e)
@@ -475,6 +480,7 @@ static void event_process(const XEvent *ec, gpointer data)
             e->xfocus.detail == NotifyInferior)
         {
             XEvent ce;
+
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Focus went to pointer root/none or to our frame "
                           "window\n");
@@ -513,17 +519,6 @@ static void event_process(const XEvent *ec, gpointer data)
                 if (!focus_left_screen)
                     focus_fallback(TRUE);
             }
-        }
-        else if (!client) {
-            /* It is possible to get FocusIn events or unmanaged windows,
-               meaning they won't be for any known client
-
-               If this happens, set the client to NULL so we know focus
-               has wandered off, and we'll get a focus out for it
-               shortly.
-            */
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to an invalid target\n");
-            focus_set_client(NULL);
         }
         else if (client != focus_client) {
             focus_left_screen = FALSE;

@@ -28,7 +28,7 @@
 #include "render/theme.h"
 
 #define DOCK_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \
-                         EnterWindowMask | LeaveWindowMask)
+                         EnterWindowMask | LeaveWindowMask | FocusChangeMask)
 #define DOCKAPP_EVENT_MASK (StructureNotifyMask)
 
 static ObDock *dock;

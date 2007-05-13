@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-13 14:36-0400\n"
+"POT-Creation-Date: 2007-05-13 16:42-0400\n"
 "PO-Revision-Date: 2006-06-11 10:41+0200\n"
 "Last-Translator: Simon A. Wilper <simonaw@openoffice.org>\n"
 "Language-Team:  <de@li.org>\n"
@@ -222,28 +222,28 @@ msgstr ""
 "\n"
 
 #: openbox/openbox.c:460
-#, fuzzy
-msgid "  --config TYPE       Specify the configuration profile to use\n"
-msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Diese Hilfe anzeigen und beenden\n"
+
+#: openbox/openbox.c:461
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Version anzeigen und beenden\n"
 
 #: openbox/openbox.c:462
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr "  --replace           Den aktuell laufenden Fenstermanager ersetzen\n"
+
+#: openbox/openbox.c:463
 #, fuzzy
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Keine Verbindung zum Sitzungsmanager aufbauen\n"
 
 #: openbox/openbox.c:464
-msgid "  --replace           Replace the currently running window manager\n"
-msgstr "  --replace           Den aktuell laufenden Fenstermanager ersetzen\n"
+#, fuzzy
+msgid "  --config TYPE       Specify the configuration profile to use\n"
+msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
 
 #: openbox/openbox.c:465
-msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Diese Hilfe anzeigen und beenden\n"
-
-#: openbox/openbox.c:466
-msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Version anzeigen und beenden\n"
-
-#: openbox/openbox.c:467
 #, fuzzy
 msgid ""
 "\n"
@@ -253,11 +253,11 @@ msgstr ""
 "Nachrichten an eine laufende Openbox-Instanz weiterleiten:\n"
 "\n"
 
-#: openbox/openbox.c:468
+#: openbox/openbox.c:466
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
 
-#: openbox/openbox.c:469
+#: openbox/openbox.c:467
 #, fuzzy
 msgid ""
 "\n"
@@ -268,20 +268,20 @@ msgstr ""
 "Debugging Optionen:\n"
 "\n"
 
-#: openbox/openbox.c:470
+#: openbox/openbox.c:468
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --snyc              im Synchronisierungsmodus starten\n"
 
-#: openbox/openbox.c:471
+#: openbox/openbox.c:469
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Debugging-Informationen anzeigen\n"
 
-#: openbox/openbox.c:472
+#: openbox/openbox.c:470
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Debugging-Informationen fürs Fokus-Handling anzeigen\n"
 
-#: openbox/openbox.c:473
+#: openbox/openbox.c:471
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -291,12 +291,12 @@ msgstr ""
 "Bitte melden Sie Bugreports an: %s\n"
 "\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:529
 #, fuzzy
 msgid "--config requires an argument\n"
 msgstr "--config-file benötigt ein Argument\n"
 
-#: openbox/openbox.c:568
+#: openbox/openbox.c:564
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""

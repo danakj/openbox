@@ -346,7 +346,7 @@ dist_rc_DATA = \
 
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
-	-e 's!@confdir\@!$(confdir)!' \
+	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
 data/xsession/openbox-gnome-session: Makefile data \
@@ -435,7 +435,7 @@ dist_doc_DATA = \
 	data/rc.xsd \
 	data/menu.xsd
 
-man_MANS = \
+dist_man_MANS = \
 	doc/openbox.1 \
 	doc/openbox-gnome-session.1 \
 	doc/openbox-kde-session.1

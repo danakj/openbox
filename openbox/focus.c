@@ -280,19 +280,15 @@ ObClient* focus_fallback(gboolean allow_refocus)
     old = focus_client;
     new = focus_fallback_target(allow_refocus, focus_client);
 
-    /* send focus somewhere if it is moving or if it was NULL before,
-       in which case it may not even be on the screen */
-    if (!old || new != old) {
-        /* unfocus any focused clients.. they can be focused by Pointer events
-           and such, and then when we try focus them, we won't get a FocusIn
-           event at all for them. */
-        focus_nothing();
+    /* unfocus any focused clients.. they can be focused by Pointer events
+       and such, and then when we try focus them, we won't get a FocusIn
+       event at all for them. */
+    focus_nothing();
 
-        if (new) {
-            client_focus(new);
-            /* remember that we tried to send focus here */
-            focus_tried = new;
-        }
+    if (new) {
+        client_focus(new);
+        /* remember that we tried to send focus here */
+        focus_tried = new;
     }
 
     return new;

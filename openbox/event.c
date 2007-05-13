@@ -300,10 +300,15 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
 
         /* These are the ones we want.. */
 
-        if (win == RootWindow(ob_display, ob_screen) && !in_client_only) {
+        if (win == RootWindow(ob_display, ob_screen)) {
+            /* If looking for a focus in on a client, then always return
+               FALSE for focus in's to the root window */
+            if (in_client_only)
+                return FALSE;
             /* This means focus reverted off of a client */
-            if (detail == NotifyPointerRoot || detail == NotifyDetailNone ||
-                detail == NotifyInferior)
+            else if (detail == NotifyPointerRoot ||
+                     detail == NotifyDetailNone ||
+                     detail == NotifyInferior)
                 return TRUE;
             else
                 return FALSE;

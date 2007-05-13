@@ -162,6 +162,13 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
 
+    if (!grab_pointer(TRUE, FALSE, cur))
+        return;
+    if (!grab_keyboard(TRUE)) {
+        grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+        return;
+    }
+
     frame_end_iconify_animation(c->frame);
 
     moveresize_client = c;
@@ -262,9 +269,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         waiting_for_sync = FALSE;
     }
 #endif
-
-    grab_pointer(TRUE, FALSE, cur);
-    grab_keyboard(TRUE);
 }
 
 void moveresize_end(gboolean cancel)

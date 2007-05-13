@@ -42,7 +42,7 @@ int main () {
       XSetWindowBackground(display,win,WhitePixel(display,0)); 
       XMapWindow(display, win);
       XFlush(display);
-      usleep(10000);
+      usleep(1000);
       XDestroyWindow(display, win);
       XSync(display, False);
 

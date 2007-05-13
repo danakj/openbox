@@ -81,7 +81,7 @@ manpage.1: manpage.sgml
     <para>You can use the <command>obconf</command> tool to configure Openbox
       easily with a graphical interface, however more in-depth configuration
       is possible by editing the configuration files by hand. The default
-      configuration file is installed in @confdir@/xdg/openbox/rc.xml, and the
+      configuration file is installed in @configdir@/openbox/rc.xml, and the
       user configuration is placed in ~/.config/openbox/rc.xml. You can copy
       the default configuration to ~/.config/openbox and edit it to your
       liking.</para>

@@ -364,7 +364,7 @@ dist_rc_DATA = \
 
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
-	-e 's!@confdir\@!$(confdir)!' \
+	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
 data/xsession/openbox-gnome-session: Makefile data \

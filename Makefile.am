@@ -453,7 +453,8 @@ dist_doc_DATA = \
 	AUTHORS \
 	data/rc.xsd \
 	data/menu.xsd \
-	data/themerc.xsd
+	data/themerc.xsd \
+	data/rc-mouse-focus.xml
 
 dist_man_MANS = \
 	doc/openbox.1 \

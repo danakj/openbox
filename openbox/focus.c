@@ -743,10 +743,13 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if(cur == c)
             continue;
-        if (!dock_windows && !desktop_windows && !client_normal(cur))
+        if (cur->type == OB_CLIENT_TYPE_DOCK && !dock_windows)
             continue;
-        if (!(dock_windows && cur->type == OB_CLIENT_TYPE_DOCK) ||
-            (desktop_windows && cur->type == OB_CLIENT_TYPE_DESKTOP))
+        if (cur->type == OB_CLIENT_TYPE_DESKTOP && !desktop_windows)
+            continue;
+        if (!client_normal(cur) &&
+            cur->type != OB_CLIENT_TYPE_DOCK &&
+            cur->type != OB_CLIENT_TYPE_DESKTOP)
             continue;
         /* using c->desktop instead of screen_desktop doesn't work if the
          * current window was omnipresent, hope this doesn't have any other

@@ -49,4 +49,6 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
                                            struct _ObClient **client);
 gboolean keyboard_interactively_grabbed();
 
+void keyboard_interactive_cancel();
+
 #endif

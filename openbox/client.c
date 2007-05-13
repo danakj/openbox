@@ -3397,6 +3397,16 @@ gboolean client_focus(ObClient *self)
                   "Focusing client \"%s\" at time %u\n",
                   self->title, event_curtime);
 
+    /* if there is a grab going on, then we need to cancel it. if we move
+       focus during the grab, applications will get NotifyWhileGrabbed events
+       and ignore them !
+
+       actions should not rely on being able to move focus during an
+       interactive grab.
+    */
+    if (keyboard_interactively_grabbed())
+        keyboard_interactive_cancel();
+
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
            passed in a bad time for _NET_WM_ACTIVE_WINDOW. */

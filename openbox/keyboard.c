@@ -199,17 +199,25 @@ static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
     if (ungrab)
         grab_keyboard(FALSE);
 
+    /* set this before running the actions so they know the keyboard is not
+       grabbed */
+    istate.active = FALSE;
+
     alist = g_slist_append(NULL, istate.action);
     action_run_interactive(alist, istate.client, state, time, cancel, TRUE);
     g_slist_free(alist);
-
-    istate.active = FALSE;
 }
 
 static void keyboard_interactive_end_client(ObClient *client, gpointer data)
 {
     if (istate.active && istate.client == client)
         istate.client = NULL;
+}
+
+
+void keyboard_interactive_cancel()
+{
+    keyboard_interactive_end(0, TRUE, event_curtime, TRUE);
 }
 
 gboolean keyboard_interactive_grab(guint state, ObClient *client,
@@ -333,7 +341,7 @@ void keyboard_shutdown(gboolean reconfig)
         client_remove_destroy_notify(keyboard_interactive_end_client);
 
     if (istate.active)
-        keyboard_interactive_end(0, TRUE, 0, TRUE);
+        keyboard_interactive_cancel();
 
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 

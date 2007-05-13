@@ -110,13 +110,13 @@ void menu_startup(gboolean reconfig)
     g_assert(menu_parse_state.parent == NULL);
 
     if (!reconfig)
-        client_add_destructor(client_dest, NULL);
+        client_add_destroy_notify(client_dest, NULL);
 }
 
 void menu_shutdown(gboolean reconfig)
 {
     if (!reconfig)
-        client_remove_destructor(client_dest);
+        client_remove_destroy_notify(client_dest);
 
     parse_shutdown(menu_parse_inst);
     menu_parse_inst = NULL;

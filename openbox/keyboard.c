@@ -324,13 +324,13 @@ void keyboard_startup(gboolean reconfig)
     popup = popup_new(FALSE);
 
     if (!reconfig)
-        client_add_destructor(keyboard_interactive_end_client, NULL);
+        client_add_destroy_notify(keyboard_interactive_end_client, NULL);
 }
 
 void keyboard_shutdown(gboolean reconfig)
 {
     if (!reconfig)
-        client_remove_destructor(keyboard_interactive_end_client);
+        client_remove_destroy_notify(keyboard_interactive_end_client);
 
     if (istate.active)
         keyboard_interactive_end(0, TRUE, 0, TRUE);

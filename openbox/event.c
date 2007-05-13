@@ -131,7 +131,7 @@ void event_startup(gboolean reconfig)
     IceAddConnectionWatch(ice_watch, NULL);
 #endif
 
-    client_add_destructor(focus_delay_client_dest, NULL);
+    client_add_destroy_notify(focus_delay_client_dest, NULL);
 }
 
 void event_shutdown(gboolean reconfig)
@@ -142,7 +142,7 @@ void event_shutdown(gboolean reconfig)
     IceRemoveConnectionWatch(ice_watch, NULL);
 #endif
 
-    client_remove_destructor(focus_delay_client_dest);
+    client_remove_destroy_notify(focus_delay_client_dest);
 }
 
 static Window event_get_window(XEvent *e)

@@ -67,7 +67,7 @@ static gboolean valid_focus_target(ObClient *ft,
                                    gboolean all_desktops,
                                    gboolean dock_windows,
                                    gboolean desktop_windows);
-static void focus_cycle_destructor(ObClient *client, gpointer data);
+static void focus_cycle_destroy_notify(ObClient *client, gpointer data);
 static void focus_tried_hide_notify(ObClient *client, gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
@@ -86,8 +86,8 @@ void focus_startup(gboolean reconfig)
     if (!reconfig) {
         XSetWindowAttributes attr;
 
-        client_add_destructor(focus_cycle_destructor, NULL);
-        client_add_destructor(focus_tried_hide_notify, NULL);
+        client_add_destroy_notify(focus_cycle_destroy_notify, NULL);
+        client_add_destroy_notify(focus_tried_hide_notify, NULL);
         client_add_hide_notify(focus_tried_hide_notify, NULL);
 
         /* start with nothing focused */
@@ -141,8 +141,8 @@ void focus_shutdown(gboolean reconfig)
     icon_popup_free(focus_cycle_popup);
 
     if (!reconfig) {
-        client_remove_destructor(focus_cycle_destructor);
-        client_remove_destructor(focus_tried_hide_notify);
+        client_remove_destroy_notify(focus_cycle_destroy_notify);
+        client_remove_destroy_notify(focus_tried_hide_notify);
         client_remove_hide_notify(focus_tried_hide_notify);
 
         /* reset focus to root */
@@ -417,7 +417,7 @@ static void popup_cycle(ObClient *c, gboolean show,
     g_free(showtext);
 }
 
-static void focus_cycle_destructor(ObClient *client, gpointer data)
+static void focus_cycle_destroy_notify(ObClient *client, gpointer data)
 {
     /* end cycling if the target disappears. CurrentTime is fine, time won't
        be used

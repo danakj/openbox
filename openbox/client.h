@@ -309,8 +309,8 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 /* Callback functions */
 
 /*! Get notified when the client is unmanaged */
-void client_add_destructor(ObClientCallback func, gpointer data);
-void client_remove_destructor(ObClientCallback func);
+void client_add_destroy_notify(ObClientCallback func, gpointer data);
+void client_remove_destroy_notify(ObClientCallback func);
 
 /*! Get notified when the client is hidden */
 void client_add_hide_notify(ObClientCallback func, gpointer data);

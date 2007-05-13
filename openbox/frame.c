@@ -48,17 +48,6 @@
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
                            f->cbwidth_y)
 
-/* the offsets for the titlebar elements from the edge of the titlebar.
-   negative means from the right edge. */
-gint icon_off;
-gint label_off;
-gint iconify_off;
-gint desk_off;
-gint shade_off;
-gint max_off;
-gint close_off;
-
-
 static void flash_done(gpointer data);
 static gboolean flash_timeout(gpointer data);
 

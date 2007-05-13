@@ -221,7 +221,7 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
         if (!grab_keyboard(TRUE))
             return FALSE;
     } else if (action->func != istate.action->func) {
-        keyboard_interactive_end(state, FALSE, action->data.any.time, FALSE);
+        keyboard_interactive_end(state, TRUE, action->data.any.time, FALSE);
     }
 
     istate.active = TRUE;

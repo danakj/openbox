@@ -493,11 +493,8 @@ static void parse_env()
     /* unset this so we don't pass it on unknowingly */
     unsetenv("DESKTOP_STARTUP_ID");
 
-    if (getenv("OPENBOX_CONFIG_NAMESPACE")) {
+    if (getenv("OPENBOX_CONFIG_NAMESPACE"))
         ob_config_type = g_strdup(getenv("OPENBOX_CONFIG_NAMESPACE"));
-        /* don't pass it on except if we restart */
-        unsetenv("OPENBOX_CONFIG_NAMESPACE");
-    }
 }
 
 static void parse_args(gint *argc, gchar **argv)

@@ -383,9 +383,7 @@ data/xsession/openbox-kde-session: Makefile data \
 	@chmod +x $@
 
 dist_gnomewmfiles_DATA = \
-	data/gnome-wm-properties/openbox.desktop \
-	data/gnome-wm-properties/openbox-gnome.desktop \
-	data/gnome-wm-properties/openbox-kde.desktop
+	data/gnome-wm-properties/openbox.desktop
 
 dist_xsessions_DATA = \
 	data/xsession/openbox.desktop \
@@ -397,15 +395,10 @@ dist_noinst_DATA = \
 	debian/compat \
 	debian/control \
 	debian/copyright \
-	debian/menu.ex \
-	debian/openbox-default.ex \
-	debian/openbox.doc-base.EX \
-	debian/postinst.ex \
-	debian/postrm.ex \
-	debian/preinst.ex \
-	debian/prerm.ex \
+	debian/menu \
+	debian/postinst \
+	debian/postrm \
 	debian/rules \
-	debian/watch.ex \
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \

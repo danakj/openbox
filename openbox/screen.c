@@ -312,8 +312,13 @@ void screen_startup(gboolean reconfig)
     desktop_cycle_popup = pager_popup_new(FALSE);
     pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
 
-    if (reconfig)
+    if (reconfig) {
+        /* update the pager popup's width */
+        pager_popup_text_width_to_strings(desktop_cycle_popup,
+                                          screen_desktop_names,
+                                          screen_num_desktops);
         return;
+    }
 
     /* get the initial size */
     screen_resize();

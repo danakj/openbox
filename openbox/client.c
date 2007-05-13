@@ -3746,8 +3746,6 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
             if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL) \
                 continue;                                                     \
             if(cur->iconic)                                                   \
-                continue;                                                     \
-            if(cur->layer == c->layer)                                        \
                 continue;
 
 #define HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end) \

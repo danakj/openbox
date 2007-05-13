@@ -28,6 +28,7 @@
 #include "screen.h"
 #include "group.h"
 #include "prop.h"
+#include "keyboard.h"
 #include "focus.h"
 #include "stacking.h"
 #include "popup.h"

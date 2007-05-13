@@ -229,7 +229,7 @@
       <action name="Resize"/>
     </mousebind> 
 
-    <mousebind button="A-Middle" action="Click">
+    <mousebind button="A-Middle" action="Press">
       <action name="Lower"/>
       <action name="FocusToBottom"/>
       <action name="Unfocus"/>

@@ -150,7 +150,7 @@ gint main(gint argc, gchar **argv)
          * remote_control = 1 -> reconfigure 
          * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
-                 openbox_control, remote_control, 0, 0, 0);
+                 ob_control, remote_control, 0, 0, 0);
         XCloseDisplay(ob_display);
         exit(EXIT_SUCCESS);
     }
@@ -242,7 +242,7 @@ gint main(gint argc, gchar **argv)
 
                 if (config_type != NULL)
                     PROP_SETS(RootWindow(ob_display, ob_screen),
-                              openbox_config, config_type);
+                              ob_config, config_type);
 
                 /* we're done with parsing now, kill it */
                 parse_shutdown(i);

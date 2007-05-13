@@ -41,10 +41,17 @@ above ~/.xsession file.
 You can use the \fBobconf\fR tool to configure Openbox 
 easily with a graphical interface, however more in-depth configuration 
 is possible by editing the configuration files by hand. The default 
-configuration file is installed in @configdir@/openbox/rc.xml, and the 
-user configuration is placed in ~/.config/openbox/rc.xml. You can copy 
+configuration files are installed in @configdir@/openbox/, and the 
+user configuration is placed in ~/.config/openbox/. You can copy 
 the default configuration to ~/.config/openbox and edit it to your 
 liking. 
+.PP 
+There are 3 default configuration files, \fBrc.xml\fP       \fBrc-gnome.xml\fP, and \fBrc-kde.xml\fP. The 
+rc-gnome.xml is used when you run \fBopenbox-gnome-session 
+\fR and the rc-kde.xml is used when you run 
+\fBopenbox-kde-session\fR. 
+ 
+ 
 .SH "OPTIONS" 
 .PP 
 These are the possible options that \fBopenbox\fR accepts: 
@@ -75,4 +82,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 18:47 
+.\" created by instant / docbook-to-man, Sun 13 May 2007, 18:59 

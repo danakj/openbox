@@ -48,8 +48,21 @@ inline void client_action_start(union ActionData *data)
 inline void client_action_end(union ActionData *data)
 {
     if (config_focus_follow)
-        if (data->any.context != OB_FRAME_CONTEXT_CLIENT && !data->any.button)
-            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+        if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
+            if (!data->any.button) {
+                grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+            } else {
+                ObClient *c;
+
+                /* usually this is sorta redundant, but with a press action
+                   that moves windows our from under the cursor, the enter
+                   event will come as a GrabNotify which is ignored, so this
+                   makes a fake enter event
+                */
+                if ((c = client_under_pointer()))
+                    event_enter_client(c);
+            }
+        }
 }
 
 typedef struct
@@ -1255,7 +1268,8 @@ void action_activate(union ActionData *data)
 {
     if (data->client.any.c) {
         if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
-            data->any.context != OB_FRAME_CONTEXT_CLIENT)
+            (data->any.context != OB_FRAME_CONTEXT_CLIENT &&
+             data->any.context != OB_FRAME_CONTEXT_FRAME))
         {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */
@@ -1275,7 +1289,8 @@ void action_focus(union ActionData *data)
 {
     if (data->client.any.c) {
         if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
-            data->any.context != OB_FRAME_CONTEXT_CLIENT)
+            (data->any.context != OB_FRAME_CONTEXT_CLIENT &&
+             data->any.context != OB_FRAME_CONTEXT_FRAME))
         {
             /* if using focus_delay, stop the timer now so that focus doesn't
                go moving on us */

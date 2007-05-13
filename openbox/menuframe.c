@@ -971,6 +971,9 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
+
+        /* grab the pointer in such a way as to pass through "owner events"
+           so that we can get enter/leave notifies in the menu. */
         if (!grab_pointer(TRUE, TRUE, OB_CURSOR_POINTER))
             return FALSE;
         if (!grab_keyboard(TRUE)) {

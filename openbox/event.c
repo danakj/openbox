@@ -356,8 +356,13 @@ static Bool event_look_for_focusin(Display *d, XEvent *e, XPointer arg)
 
 Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
 {
+    ObWindow *w;
+
+    /* It is possible to get FocusIn events or unmanaged windows, meaning
+       they won't be for any known client */
     return e->type == FocusIn && wanted_focusevent(e, TRUE) &&
-        e->xfocus.window != screen_support_win;
+        (w = g_hash_table_lookup(window_map, &e->xfocus.window)) &&
+        WINDOW_IS_CLIENT(w);
 }
 
 static void print_focusevent(XEvent *e)
@@ -508,7 +513,19 @@ static void event_process(const XEvent *ec, gpointer data)
                 if (!focus_left_screen)
                     focus_fallback(TRUE);
             }
-        } else if (client && client != focus_client) {
+        }
+        else if (!client) {
+            /* It is possible to get FocusIn events or unmanaged windows,
+               meaning they won't be for any known client
+
+               If this happens, set the client to NULL so we know focus
+               has wandered off, and we'll get a focus out for it
+               shortly.
+            */
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to an invalid target\n");
+            focus_set_client(NULL);
+        }
+        else if (client != focus_client) {
             focus_left_screen = FALSE;
             frame_adjust_focus(client->frame, TRUE);
             focus_set_client(client);

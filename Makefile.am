@@ -349,7 +349,7 @@ edit = $(SED) \
 	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
-data/xsession/openbox-gnome-session: Makefile data \
+data/xsession/openbox-gnome-session: Makefile \
 		$(srcdir)/data/xsession/openbox-gnome-session.in
 	@echo make: creating $@
 	@mkdir data 2>/dev/null || true
@@ -357,7 +357,7 @@ data/xsession/openbox-gnome-session: Makefile data \
 	@$(edit) $(srcdir)/data/xsession/openbox-gnome-session.in >$@
 	@chmod a+x $@
 
-data/xsession/openbox-kde-session: Makefile data \
+data/xsession/openbox-kde-session: Makefile \
 		$(srcdir)/data/xsession/openbox-kde-session.in
 	@echo make: creating $@
 	@mkdir data 2>/dev/null || true
@@ -365,25 +365,25 @@ data/xsession/openbox-kde-session: Makefile data \
 	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
 	@chmod a+x $@
 
-doc/openbox.1.in: Makefile doc $(srcdir)/doc/openbox.1.sgml
+doc/openbox.1.in: Makefile $(srcdir)/doc/openbox.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	docbook-to-man $(srcdir)/doc/openbox.1.sgml > $@
+	@docbook-to-man $(srcdir)/doc/openbox.1.sgml > $@
 
-doc/openbox.1: Makefile doc doc/openbox.1.in
+doc/openbox.1: Makefile doc/openbox.1.in
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
 	@$(edit) $(srcdir)/doc/openbox.1.in >$@
 
-doc/openbox-gnome-session.1: Makefile doc doc/openbox-gnome-session.1.sgml
+doc/openbox-gnome-session.1: Makefile doc/openbox-gnome-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	docbook-to-man $(srcdir)/doc/openbox-gnome-session.1.sgml > $@
+	@docbook-to-man $(srcdir)/doc/openbox-gnome-session.1.sgml > $@
 
-doc/openbox-kde-session.1: Makefile doc doc/openbox-kde-session.1.sgml
+doc/openbox-kde-session.1: Makefile doc/openbox-kde-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	docbook-to-man $(srcdir)/doc/openbox-kde-session.1.sgml > $@
+	@docbook-to-man $(srcdir)/doc/openbox-kde-session.1.sgml > $@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop

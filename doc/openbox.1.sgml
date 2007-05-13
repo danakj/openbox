@@ -85,11 +85,11 @@ manpage.1: manpage.sgml
       the default configuration to ~/.config/openbox and edit it to your
       liking.</para>
 
-    <para>There are 3 default configuration files, <literal>rc.xml</literaL,
+    <para>There are 3 default configuration files, <literal>rc.xml</literal>,
       <literal>rc-gnome.xml</literal>, and <literal>rc-kde.xml</literal>. The
       rc-gnome.xml is used when you run <command>openbox-gnome-session
       </command> and the rc-kde.xml is used when you run
-      <command>openbox-kde-session</command>.
+      <command>openbox-kde-session</command></para>.
 
   </refsect1>
   <refsect1>

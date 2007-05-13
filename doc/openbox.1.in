@@ -46,7 +46,8 @@ user configuration is placed in ~/.config/openbox/. You can copy
 the default configuration to ~/.config/openbox and edit it to your 
 liking. 
 .PP 
-There are 3 default configuration files, \fBrc.xml\fP       \fBrc-gnome.xml\fP, and \fBrc-kde.xml\fP. The 
+There are 3 default configuration files, \fBrc.xml\fP, 
+\fBrc-gnome.xml\fP, and \fBrc-kde.xml\fP. The 
 rc-gnome.xml is used when you run \fBopenbox-gnome-session 
 \fR and the rc-kde.xml is used when you run 
 \fBopenbox-kde-session\fR. 
@@ -82,4 +83,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 18:59 
+.\" created by instant / docbook-to-man, Sun 13 May 2007, 19:04 

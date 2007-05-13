@@ -41,7 +41,6 @@ manpage.1: manpage.sgml
       <arg><option>--replace</option></arg>
       <arg><option>--reconfigure</option></arg>
       <arg><option>--sm-disable</option></arg>
-      <arg><option>--config <replaceable>TYPE</replaceable></option></arg>
       <arg><option>--sync</option></arg>
       <arg><option>--debug</option></arg>
       <arg><option>--debug-focus</option></arg>
@@ -81,10 +80,17 @@ manpage.1: manpage.sgml
     <para>You can use the <command>obconf</command> tool to configure Openbox
       easily with a graphical interface, however more in-depth configuration
       is possible by editing the configuration files by hand. The default
-      configuration file is installed in @configdir@/openbox/rc.xml, and the
-      user configuration is placed in ~/.config/openbox/rc.xml. You can copy
+      configuration files are installed in @configdir@/openbox/, and the
+      user configuration is placed in ~/.config/openbox/. You can copy
       the default configuration to ~/.config/openbox and edit it to your
       liking.</para>
+
+    <para>There are 3 default configuration files, <literal>rc.xml</literal>,
+      <literal>rc-gnome.xml</literal>, and <literal>rc-kde.xml</literal>. The
+      rc-gnome.xml is used when you run
+      <command>openbox-gnome-session</command> and the rc-kde.xml is used when
+      you run <command>openbox-kde-session</command>. The configuration
+      files should be named the same in ~/.config/openbox/.</para>
 
   </refsect1>
   <refsect1>
@@ -121,12 +127,6 @@ manpage.1: manpage.sgml
         <term><option>--sm-disable</option></term>
         <listitem>
           <para>Do not connect to the session manager.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term><option>--config<replaceable>TYPE</replaceable></option></term>
-        <listitem>
-          <para>Specify the configuration profile to use.</para>
         </listitem>
       </varlistentry>
       <varlistentry>

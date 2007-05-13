@@ -89,6 +89,7 @@ gboolean    ob_replace_wm = FALSE;
 gboolean    ob_sm_use = TRUE;
 gchar      *ob_sm_id = NULL;
 gchar      *ob_sm_save_file = NULL;
+gchar      *ob_config_type = NULL;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -100,10 +101,10 @@ static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
-static gchar    *config_type = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
+static void parse_env();
 static void parse_args(gint *argc, gchar **argv);
 static Cursor load_cursor(const gchar *name, guint fontval);
 
@@ -126,6 +127,8 @@ gint main(gint argc, gchar **argv)
      
     /* parse the command line args, which can change the argv[0] */
     parse_args(&argc, argv);
+    /* parse the environment variables */
+    parse_env();
 
     program_name = g_path_get_basename(argv[0]);
     g_set_prgname(program_name);
@@ -234,15 +237,15 @@ gint main(gint argc, gchar **argv)
                 config_startup(i);
 
                 /* parse/load user options */
-                if (parse_load_rc(config_type, &doc, &node)) {
+                if (parse_load_rc(ob_config_type, &doc, &node)) {
                     parse_tree(i, doc, node->xmlChildrenNode);
                     parse_close(doc);
                 } else
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
 
-                if (config_type != NULL)
+                if (ob_config_type != NULL)
                     PROP_SETS(RootWindow(ob_display, ob_screen),
-                              ob_config, config_type);
+                              ob_config, ob_config_type);
 
                 /* we're done with parsing now, kill it */
                 parse_shutdown(i);
@@ -405,6 +408,10 @@ gint main(gint argc, gchar **argv)
             argv = nargv;
         }
 
+        /* we also remove some environment variables, so put them back */
+        if (ob_config_type)
+            setenv("OPENBOX_CONFIG_NAMESPACE", ob_config_type, 1);
+
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
         execlp(argv[0], program_name, (gchar*)NULL); /* last resort */
@@ -413,7 +420,7 @@ gint main(gint argc, gchar **argv)
     /* free stuff passed in from the command line or environment */
     g_free(ob_sm_save_file);
     g_free(ob_sm_id);
-    g_free(config_type);
+    g_free(ob_config_type);
     g_free(program_name);
      
     return exitcode;
@@ -461,7 +468,6 @@ static void print_help()
     g_print(_("  --version           Display the version and exit\n"));
     g_print(_("  --replace           Replace the currently running window manager\n"));
     g_print(_("  --sm-disable        Disable connection to the session manager\n"));
-    g_print(_("  --config TYPE       Specify the configuration profile to use\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
     g_print(_("\nDebugging options:\n"));
@@ -480,6 +486,15 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
     for (; i < *argc; ++i)
         argv[i] = NULL;
     *argc -= num;
+}
+
+static void parse_env()
+{
+    /* unset this so we don't pass it on unknowingly */
+    unsetenv("DESKTOP_STARTUP_ID");
+
+    if (getenv("OPENBOX_CONFIG_NAMESPACE"))
+        ob_config_type = g_strdup(getenv("OPENBOX_CONFIG_NAMESPACE"));
 }
 
 static void parse_args(gint *argc, gchar **argv)
@@ -524,12 +539,16 @@ static void parse_args(gint *argc, gchar **argv)
             remote_control = 2;
 */
         }
-        else if (!strcmp(argv[i], "--config")) {
+        else if (!strcmp(argv[i], "--config-namespace")) {
             if (i == *argc - 1) /* no args left */
-                g_printerr(_("--config requires an argument\n"));
+                /* not translated cuz it's sekret */
+                g_printerr("--config-namespace requires an argument\n");
             else {
-                config_type = g_strdup(argv[i+1]);
-                ++i;
+                ob_config_type = g_strdup(argv[i+1]);
+                remove_args(argc, argv, i, 2);
+                --i; /* this arg was removed so go back */
+                ob_debug_type(OB_DEBUG_SM, "--config-namespace %s\n",
+                              ob_sm_save_file);
             }
         }
         else if (!strcmp(argv[i], "--sm-save-file")) {

@@ -98,13 +98,6 @@ Time event_curtime = CurrentTime;
 static guint ignore_enter_focus = 0;
 static gboolean menu_can_hide;
 static gboolean focus_left_screen = FALSE;
-/*! This variable is used for focus fallback. If we fallback to a window, we
-  set this to the window. And when focus goes somewhere after that, it will
-  be set to NULL. If between falling back to that window and something
-  getting focused, the window gets unmanaged, then if there are no incoming
-  FocusIn events, we fallback again because focus has just gotten itself lost.
- */
-static ObClient *focus_tried = NULL;
 
 #ifdef USE_SM
 static void ice_handler(gint fd, gpointer conn)
@@ -300,10 +293,15 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
 
         /* These are the ones we want.. */
 
-        if (win == RootWindow(ob_display, ob_screen) && !in_client_only) {
+        if (win == RootWindow(ob_display, ob_screen)) {
+            /* If looking for a focus in on a client, then always return
+               FALSE for focus in's to the root window */
+            if (in_client_only)
+                return FALSE;
             /* This means focus reverted off of a client */
-            if (detail == NotifyPointerRoot || detail == NotifyDetailNone ||
-                detail == NotifyInferior)
+            else if (detail == NotifyPointerRoot ||
+                     detail == NotifyDetailNone ||
+                     detail == NotifyInferior)
                 return TRUE;
             else
                 return FALSE;
@@ -351,14 +349,15 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
     }
 }
 
-static Bool look_for_focusin(Display *d, XEvent *e, XPointer arg)
+static Bool event_look_for_focusin(Display *d, XEvent *e, XPointer arg)
 {
     return e->type == FocusIn && wanted_focusevent(e, FALSE);
 }
 
-static Bool look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
+Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
 {
-    return e->type == FocusIn && wanted_focusevent(e, TRUE);
+    return e->type == FocusIn && wanted_focusevent(e, TRUE) &&
+        e->xfocus.window != screen_support_win;
 }
 
 static void print_focusevent(XEvent *e)
@@ -488,7 +487,9 @@ static void event_process(const XEvent *ec, gpointer data)
                But if the other focus in is something like PointerRoot then we
                still want to fall back.
             */
-            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
+            if (XCheckIfEvent(ob_display, &ce, event_look_for_focusin_client,
+                              NULL))
+            {
                 XPutBackEvent(ob_display, &ce);
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "  but another FocusIn is coming\n");
@@ -505,7 +506,7 @@ static void event_process(const XEvent *ec, gpointer data)
                     focus_left_screen = FALSE;
 
                 if (!focus_left_screen)
-                    focus_tried = focus_fallback(TRUE);
+                    focus_fallback(TRUE);
             }
         } else if (client && client != focus_client) {
             focus_left_screen = FALSE;
@@ -513,15 +514,13 @@ static void event_process(const XEvent *ec, gpointer data)
             focus_set_client(client);
             client_calc_layer(client);
             client_bring_helper_windows(client);
-
-            focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
         }
     } else if (e->type == FocusOut) {
         gboolean nomove = FALSE;
         XEvent ce;
 
         /* Look for the followup FocusIn */
-        if (!XCheckIfEvent(ob_display, &ce, look_for_focusin, NULL)) {
+        if (!XCheckIfEvent(ob_display, &ce, event_look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
                is not being managed, or a window on another screen. */
             Window win, root;
@@ -556,7 +555,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to an unmanaged window 0x%x !\n",
                               ce.xfocus.window);
-                focus_tried = focus_fallback(TRUE);
+                focus_fallback(TRUE);
             }
         }
 
@@ -1084,40 +1083,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                  client->window, e->xunmap.event, e->xunmap.from_configure,
                  client->ignore_unmaps);
         client_unmanage(client);
-
-        /* we were trying to focus this window but it's gone */
-        if (client == focus_tried) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
-                          "is being unmanaged:\n");
-            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
-                XPutBackEvent(ob_display, &ce);
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  but another FocusIn is coming\n");
-            } else {
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  so falling back focus again.\n");
-                focus_tried = focus_fallback(TRUE);
-            }
-        }
         break;
     case DestroyNotify:
         ob_debug("DestroyNotify for window 0x%x\n", client->window);
         client_unmanage(client);
-
-        /* we were trying to focus this window but it's gone */
-        if (client == focus_tried) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
-                          "is being unmanaged:\n");
-            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
-                XPutBackEvent(ob_display, &ce);
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  but another FocusIn is coming\n");
-            } else {
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  so falling back focus again.\n");
-                focus_tried = focus_fallback(TRUE);
-            }
-        }
         break;
     case ReparentNotify:
         /* this is when the client is first taken captive in the frame */
@@ -1136,21 +1105,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
      
         ob_debug("ReparentNotify for window 0x%x\n", client->window);
         client_unmanage(client);
-
-        /* we were trying to focus this window but it's gone */
-        if (client == focus_tried) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
-                          "is being unmanaged:\n");
-            if (XCheckIfEvent(ob_display, &ce, look_for_focusin_client, NULL)){
-                XPutBackEvent(ob_display, &ce);
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  but another FocusIn is coming\n");
-            } else {
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  so falling back focus again.\n");
-                focus_tried = focus_fallback(TRUE);
-            }
-        }
         break;
     case MapRequest:
         ob_debug("MapRequest for 0x%lx\n", client->window);

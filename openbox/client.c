@@ -466,11 +466,6 @@ void client_manage(Window window)
     */
     client_show(self);
 
-    /* use client_focus instead of client_activate cuz client_activate does
-       stuff like switch desktops etc and I'm not interested in all that when
-       a window maps since its not based on an action from the user like
-       clicking a window to activate it. so keep the new window out of the way
-       but do focus it. */
     if (activate) {
         gboolean stacked = client_restore_session_stacking(self);
         client_present(self, FALSE, !stacked);

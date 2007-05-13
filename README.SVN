@@ -45,7 +45,6 @@ libxml2-dev
 libxcursor-dev
 libstartup-notification0-dev
 xlibs-dev
-docbook-to-man
 
 tip: run "update-alternatives --config automake" and select automake1.9 before
   running ./configure

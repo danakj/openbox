@@ -2722,8 +2722,8 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
        for user-requested ones, only resize if final is true, or when
        resizing in redraw mode */
     send_resize_client = ((!user && resized) ||
-                          (user && resized &&
-                           (final || config_resize_redraw)));
+                          (user && (final ||
+                                    (resized && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {

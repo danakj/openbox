@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-13 14:36-0400\n"
+"POT-Creation-Date: 2007-05-13 16:42-0400\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Gonçalo Ferreira <gonsas@gmail.com>\n"
 "Language-Team: None\n"
@@ -214,66 +214,66 @@ msgid ""
 msgstr ""
 
 #: openbox/openbox.c:460
-msgid "  --config TYPE       Specify the configuration profile to use\n"
+msgid "  --help              Display this help and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:461
+msgid "  --version           Display the version and exit\n"
 msgstr ""
 
 #: openbox/openbox.c:462
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr ""
+
+#: openbox/openbox.c:463
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
 #: openbox/openbox.c:464
-msgid "  --replace           Replace the currently running window manager\n"
+msgid "  --config TYPE       Specify the configuration profile to use\n"
 msgstr ""
 
 #: openbox/openbox.c:465
-msgid "  --help              Display this help and exit\n"
-msgstr ""
-
-#: openbox/openbox.c:466
-msgid "  --version           Display the version and exit\n"
-msgstr ""
-
-#: openbox/openbox.c:467
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 
-#: openbox/openbox.c:468
+#: openbox/openbox.c:466
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
-#: openbox/openbox.c:469
+#: openbox/openbox.c:467
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
 
-#: openbox/openbox.c:470
+#: openbox/openbox.c:468
 msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
-#: openbox/openbox.c:471
+#: openbox/openbox.c:469
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:472
+#: openbox/openbox.c:470
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:473
+#: openbox/openbox.c:471
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:529
 #, fuzzy
 msgid "--config requires an argument\n"
 msgstr "--sm-save-file requer um argumento\n"
 
-#: openbox/openbox.c:568
+#: openbox/openbox.c:564
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-13 14:36-0400\n"
+"POT-Creation-Date: 2007-05-13 16:42-0400\n"
 "PO-Revision-Date: 2007-05-06 13:44+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -202,27 +202,27 @@ msgstr ""
 "Alternativ:\n"
 
 #: openbox/openbox.c:460
-msgid "  --config TYPE       Specify the configuration profile to use\n"
-msgstr ""
-"  --config TYP        Ange vilken konfigurationsprofil som ska användas\n"
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Visa den här hjälpen och avsluta\n"
+
+#: openbox/openbox.c:461
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Visa versionen och avsluta\n"
 
 #: openbox/openbox.c:462
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr "  --replace           Ersätt den befintliga fönsterhanteraren\n"
+
+#: openbox/openbox.c:463
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Avaktivera anslutning till sessions-hanteraren\n"
 
 #: openbox/openbox.c:464
-msgid "  --replace           Replace the currently running window manager\n"
-msgstr "  --replace           Ersätt den befintliga fönsterhanteraren\n"
+msgid "  --config TYPE       Specify the configuration profile to use\n"
+msgstr ""
+"  --config TYP        Ange vilken konfigurationsprofil som ska användas\n"
 
 #: openbox/openbox.c:465
-msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Visa den här hjälpen och avsluta\n"
-
-#: openbox/openbox.c:466
-msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Visa versionen och avsluta\n"
-
-#: openbox/openbox.c:467
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -230,11 +230,11 @@ msgstr ""
 "\n"
 "Skicka meddelanden till en exekverande instans av Openbox:\n"
 
-#: openbox/openbox.c:468
+#: openbox/openbox.c:466
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ladda om Openbox konfiguration\n"
 
-#: openbox/openbox.c:469
+#: openbox/openbox.c:467
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -242,19 +242,19 @@ msgstr ""
 "\n"
 "Debug-alternativ:\n"
 
-#: openbox/openbox.c:470
+#: openbox/openbox.c:468
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Kör i synkroniserat läge\n"
 
-#: openbox/openbox.c:471
+#: openbox/openbox.c:469
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Visa debuginformation\n"
 
-#: openbox/openbox.c:472
+#: openbox/openbox.c:470
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Visa debuginformation för fokushantering\n"
 
-#: openbox/openbox.c:473
+#: openbox/openbox.c:471
 #, c-format
 msgid ""
 "\n"
@@ -263,11 +263,11 @@ msgstr ""
 "\n"
 "Rapportera buggar till %s\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:529
 msgid "--config requires an argument\n"
 msgstr "--config kräver ett argument\n"
 
-#: openbox/openbox.c:568
+#: openbox/openbox.c:564
 #, fuzzy, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Ogiltig utdata från pipe-menyn '%s'"

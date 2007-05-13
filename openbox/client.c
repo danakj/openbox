@@ -80,7 +80,7 @@ static void client_get_colormap(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
-static void client_apply_startup_state(ObClient *self, gint x, gint y);
+static void client_apply_startup_state(ObClient *self);
 static void client_restore_session_state(ObClient *self);
 static gboolean client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
@@ -265,7 +265,6 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
-    gint newx, newy;
 
     grab_server(TRUE);
 
@@ -383,20 +382,15 @@ void client_manage(Window window)
         activate = TRUE;
     }
 
-    /* get the current position */
-    newx = self->area.x;
-    newy = self->area.y;
-
     /* figure out placement for the window */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
 
-        transient = place_client(self, &newx, &newy, settings);
+        transient = place_client(self, &self->area.x, &self->area.y, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &newx, &newy,
-                             self->area.width,
-                             self->area.height,
+        client_find_onscreen(self, &self->area.x, &self->area.y,
+                             self->area.width, self->area.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
                                 session do also. we can assume you want
@@ -419,12 +413,18 @@ void client_manage(Window window)
        also, this moves the window to the position where it has been placed
     */
     ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
-             self->window, newx, newy, self->area.width, self->area.height);
+             self->window, self->area.x, self->area.y,
+             self->area.width, self->area.height);
     if (self->session)
-        ob_debug("session requested %d %d\n",
+        ob_debug("  but session requested %d %d instead, overriding\n",
                  self->session->x, self->session->y);
 
-    client_apply_startup_state(self, newx, newy);
+    /* generate a ConfigureNotify telling the client where it is */
+    client_configure_full(self, self->area.x, self->area.y,
+                          self->area.width, self->area.height,
+                          FALSE, TRUE);
+
+    client_apply_startup_state(self);
 
     mouse_grab_for_client(self, TRUE);
 
@@ -496,6 +496,7 @@ void client_manage(Window window)
 
     /* adjust the frame to the client's size before showing the window */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    frame_adjust_client_area(self->frame);
 
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
@@ -2475,17 +2476,8 @@ gboolean client_enter_focusable(ObClient *self)
 }
 
 
-static void client_apply_startup_state(ObClient *self, gint x, gint y)
+static void client_apply_startup_state(ObClient *self)
 {
-    gboolean pos = FALSE; /* has the window's position been configured? */
-    gint ox, oy;
-
-    /* save the position, and set self->area for these to use */
-    ox = self->area.x;
-    oy = self->area.y;
-    self->area.x = x;
-    self->area.y = y;
-
     /* set the desktop hint, to make sure that it always exists */
     PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
 
@@ -2498,7 +2490,6 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     if (self->fullscreen) {
         self->fullscreen = FALSE;
         client_fullscreen(self, TRUE);
-        pos = TRUE;
     }
     if (self->undecorated) {
         self->undecorated = FALSE;
@@ -2516,27 +2507,12 @@ static void client_apply_startup_state(ObClient *self, gint x, gint y)
     if (self->max_vert && self->max_horz) {
         self->max_vert = self->max_horz = FALSE;
         client_maximize(self, TRUE, 0);
-        pos = TRUE;
     } else if (self->max_vert) {
         self->max_vert = FALSE;
         client_maximize(self, TRUE, 2);
-        pos = TRUE;
     } else if (self->max_horz) {
         self->max_horz = FALSE;
         client_maximize(self, TRUE, 1);
-        pos = TRUE;
-    }
-
-    /* if the client didn't get positioned yet, then do so now.
-       call client_move even if the window is not being moved anywhere, because
-       when we reparent it and decorate it, it is getting moved and we need to
-       be telling it so with a ConfigureNotify event.
-    */
-    if (!pos) {
-        /* use the saved position */
-        self->area.x = ox;
-        self->area.y = oy;
-        client_move(self, x, y);
     }
 
     /* nothing to do for the other states:
@@ -2746,12 +2722,13 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
        for user-requested ones, only resize if final is true, or when
        resizing in redraw mode */
     send_resize_client = ((!user && resized) ||
-                          (user && (final ||
-                                    (resized && config_resize_redraw))));
+                          (user && resized &&
+                           (final || config_resize_redraw)));
 
     /* if the client is enlarging, then resize the client before the frame */
-    if (send_resize_client && user && (w > oldw || h > oldh)) {
-        XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+    if (send_resize_client && (w > oldw || h > oldh)) {
+        XResizeWindow(ob_display, self->window,
+                      MAX(w, oldw), MAX(h, oldh));
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
     }
@@ -2793,11 +2770,12 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (!user || (w <= oldw || h <= oldh))) {
+    if (send_resize_client && (w <= oldw || h <= oldh)) {
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
 
-        XResizeWindow(ob_display, self->window, w, h);
+        if (send_resize_client)
+            XResizeWindow(ob_display, self->window, w, h);
     }
 
     XFlush(ob_display);

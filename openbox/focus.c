@@ -594,6 +594,7 @@ static gboolean valid_focus_target(ObClient *ft,
     /* it's not set to skip the taskbar (unless it is a type that would be
        expected to set this hint */
     ok = ok && ((ft->type == OB_CLIENT_TYPE_DOCK ||
+                 ft->type == OB_CLIENT_TYPE_DESKTOP ||
                  ft->type == OB_CLIENT_TYPE_TOOLBAR ||
                  ft->type == OB_CLIENT_TYPE_MENU ||
                  ft->type == OB_CLIENT_TYPE_UTILITY) ||

@@ -494,7 +494,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if (dofocus && (c = focus_fallback_target(TRUE, focus_client))) {
+    if (dofocus && (c = focus_fallback(TRUE))) {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is
            no guarantee the window will actually take focus.. */
@@ -506,7 +506,6 @@ void screen_set_desktop(guint num, gboolean dofocus)
                server FocusIn event */
             frame_adjust_focus(c->frame, TRUE);
         }
-        client_focus(c);
     }
 
     /* hide windows from bottom to top */
@@ -939,7 +938,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     }
 
     if (show) {
-        /* focus desktop */
+        /* focus the desktop */
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (c->type == OB_CLIENT_TYPE_DESKTOP &&
@@ -951,10 +950,16 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     else if (!show_only) {
         ObClient *c;
 
-        /* use NULL for the "old" argument because the desktop was focused
-           and we don't want to fallback to the desktop by default */
-        if ((c = focus_fallback_target(TRUE, NULL)))
-            client_focus(c);
+        if ((c = focus_fallback(TRUE))) {
+            /* only do the flicker reducing stuff ahead of time if we are going
+               to call xsetinputfocus on the window ourselves. otherwise there
+               is no guarantee the window will actually take focus.. */
+            if (c->can_focus) {
+                /* reduce flicker by hiliting now rather than waiting for the
+                   server FocusIn event */
+                frame_adjust_focus(c->frame, TRUE);
+            }
+        }
     }
 
     show = !!show; /* make it boolean */

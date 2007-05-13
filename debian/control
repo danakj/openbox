@@ -2,7 +2,7 @@ Source: openbox
 Section: x11
 Priority: optional
 Maintainer: Dana Jansens <danakj@orodu.net>
-Build-Depends: debhelper (>= 5), coreutils, sed, autotools-dev, gcc, automake1.9, autoconf, libtool, pkg-config, libpango1.0-dev, libglib2.0-dev, libxml2-dev, libxcursor-dev, libstartup-notification0-dev, xlibs-dev, libxinerama-dev, libxft2-dev, docbook-to-man
+Build-Depends: debhelper (>= 5), coreutils, sed, autotools-dev, gcc, automake1.9, autoconf, libtool, pkg-config, libpango1.0-dev, libglib2.0-dev, libxml2-dev, libxcursor-dev, libstartup-notification0-dev, xlibs-dev, libxinerama-dev, libxft2-dev
 Standards-Version: 3.7.2
 
 Package: openbox

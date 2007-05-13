@@ -360,6 +360,8 @@ dist_pixmap_DATA = \
 
 dist_rc_DATA = \
 	data/rc.xml \
+	data/rc-gnome.xml \
+	data/rc-kde.xml \
 	data/menu.xml
 
 edit = $(SED) \

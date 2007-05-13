@@ -170,10 +170,10 @@ void prop_startup()
     CREATE(esetrootid, "ESETROOT_PMAP_ID");
 */
 
-    CREATE(openbox_pid, "_OPENBOX_PID");
-    CREATE(openbox_config, "_OPENBOX_CONFIG");
-    CREATE(openbox_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
-    CREATE(openbox_control, "_OPENBOX_CONTROL");
+    CREATE(ob_pid, "_OB_PID");
+    CREATE(ob_config, "_OB_CONFIG");
+    CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
+    CREATE(ob_control, "_OB_CONTROL");
 }
 
 #include <X11/Xutil.h>

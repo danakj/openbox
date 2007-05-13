@@ -196,7 +196,7 @@ gboolean screen_annex(const gchar *program_name)
     /* set the OPENBOX_PID hint */
     pid = getpid();
     PROP_SET32(RootWindow(ob_display, ob_screen),
-               openbox_pid, cardinal, pid);
+               ob_pid, cardinal, pid);
 
     /* set supporting window */
     PROP_SET32(RootWindow(ob_display, ob_screen),
@@ -289,10 +289,10 @@ gboolean screen_annex(const gchar *program_name)
     supported[i++] = prop_atoms.kde_net_wm_frame_strut;
     supported[i++] = prop_atoms.kde_net_wm_window_type_override;
 
-    supported[i++] = prop_atoms.openbox_wm_state_undecorated;
-    supported[i++] = prop_atoms.openbox_pid;
-    supported[i++] = prop_atoms.openbox_config;
-    supported[i++] = prop_atoms.openbox_control;
+    supported[i++] = prop_atoms.ob_wm_state_undecorated;
+    supported[i++] = prop_atoms.ob_pid;
+    supported[i++] = prop_atoms.ob_config;
+    supported[i++] = prop_atoms.ob_control;
     g_assert(i == num_support);
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
@@ -373,7 +373,7 @@ void screen_shutdown(gboolean reconfig)
                  NoEventMask);
 
     /* we're not running here no more! */
-    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_pid);
+    PROP_ERASE(RootWindow(ob_display, ob_screen), ob_pid);
     /* not without us */
     PROP_ERASE(RootWindow(ob_display, ob_screen), net_supported);
     /* don't keep this mode */

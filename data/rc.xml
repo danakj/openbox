@@ -235,10 +235,10 @@
       <action name="Unfocus"/>
     </mousebind>
 
-    <mousebind button="A-S-Up" action="Click">
+    <mousebind button="A-Up" action="Click">
       <action name="DesktopPrevious"/>
     </mousebind>
-    <mousebind button="A-S-Down" action="Click">
+    <mousebind button="A-Down" action="Click">
       <action name="DesktopNext"/>
     </mousebind>
     <mousebind button="A-S-Up" action="Click">

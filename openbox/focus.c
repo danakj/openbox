@@ -309,6 +309,16 @@ void focus_nothing()
     focus_client = NULL;
     focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
 
+    /* if there is a grab going on, then we need to cancel it. if we move
+       focus during the grab, applications will get NotifyWhileGrabbed events
+       and ignore them !
+
+       actions should not rely on being able to move focus during an
+       interactive grab.
+    */
+    if (keyboard_interactively_grabbed())
+        keyboard_interactive_cancel();
+
     /* when nothing will be focused, send focus to the backup target */
     XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,
                    event_curtime);

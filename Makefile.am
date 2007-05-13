@@ -346,6 +346,7 @@ dist_rc_DATA = \
 
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
+	-e 's!@confdir\@!$(confdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
 data/xsession/openbox-gnome-session: Makefile data \
@@ -354,7 +355,7 @@ data/xsession/openbox-gnome-session: Makefile data \
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $(srcdir)/data/xsession/openbox-gnome-session.in >$@
-	@chmod +x $@
+	@chmod a+x $@
 
 data/xsession/openbox-kde-session: Makefile data \
 		$(srcdir)/data/xsession/openbox-kde-session.in
@@ -362,7 +363,17 @@ data/xsession/openbox-kde-session: Makefile data \
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $(srcdir)/data/xsession/openbox-kde-session.in >$@
-	@chmod +x $@
+	@chmod a+x $@
+
+doc/openbox.1.in: Makefile doc $(srcdir)/doc/openbox.1.sgml
+	@echo make: creating $@
+	@mkdir doc 2>/dev/null || true
+	docbook-to-man $(srcdir)/doc/openbox.1.sgml > $@
+
+doc/openbox.1: Makefile doc doc/openbox.1.in
+	@echo make: creating $@
+	@mkdir doc 2>/dev/null || true
+	@$(edit) $(srcdir)/doc/openbox.1.in >$@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop
@@ -413,6 +424,9 @@ dist_doc_DATA = \
 	AUTHORS \
 	data/rc.xsd \
 	data/menu.xsd
+
+man_MANS = \
+	doc/openbox.1
 
 EXTRA_DIST = \
 	config.rpath \

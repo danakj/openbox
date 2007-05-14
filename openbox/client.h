@@ -314,10 +314,6 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 void client_add_destroy_notify(ObClientCallback func, gpointer data);
 void client_remove_destroy_notify(ObClientCallback func);
 
-/*! Get notified when the client is hidden */
-void client_add_hide_notify(ObClientCallback func, gpointer data);
-void client_remove_hide_notify(ObClientCallback func);
-
 /*! Manages all existing windows */
 void client_manage_all();
 /*! Manages a given window

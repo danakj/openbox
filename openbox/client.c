@@ -65,7 +65,6 @@ typedef struct
 GList            *client_list          = NULL;
 
 static GSList *client_destroy_notifies = NULL;
-static GSList *client_hide_notifies    = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -134,29 +133,6 @@ void client_remove_destroy_notify(ObClientCallback func)
             g_free(d);
             client_destroy_notifies =
                 g_slist_delete_link(client_destroy_notifies, it);
-            break;
-        }
-    }
-}
-
-void client_add_hide_notify(ObClientCallback func, gpointer data)
-{
-    ClientCallback *d = g_new(ClientCallback, 1);
-    d->func = func;
-    d->data = data;
-    client_hide_notifies = g_slist_prepend(client_hide_notifies, d);
-}
-
-void client_remove_hide_notify(ObClientCallback func)
-{
-    GSList *it;
-
-    for (it = client_hide_notifies; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        if (d->func == func) {
-            g_free(d);
-            client_hide_notifies =
-                g_slist_delete_link(client_hide_notifies, it);
             break;
         }
     }
@@ -2442,11 +2418,8 @@ void client_show(ObClient *self)
 
 void client_hide(ObClient *self)
 {
-    if (!client_should_show(self)) {
+    if (!client_should_show(self))
         frame_hide(self->frame);
-
-        client_call_notifies(self, client_hide_notifies);
-    }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
        needs to be in IconicState. This includes when it is on another
@@ -2458,14 +2431,10 @@ void client_hide(ObClient *self)
 void client_showhide(ObClient *self)
 {
 
-    if (client_should_show(self)) {
+    if (client_should_show(self))
         frame_show(self->frame);
-    }
-    else {
+    else
         frame_hide(self->frame);
-
-        client_call_notifies(self, client_hide_notifies);
-    }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
        needs to be in IconicState. This includes when it is on another

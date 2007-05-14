@@ -425,11 +425,6 @@ void client_manage(Window window)
         ob_debug("  but session requested %d %d instead, overriding\n",
                  self->session->x, self->session->y);
 
-    /* generate a ConfigureNotify telling the client where it is */
-    client_configure_full(self, self->area.x, self->area.y,
-                          self->area.width, self->area.height,
-                          FALSE, TRUE);
-
     client_apply_startup_state(self);
 
     mouse_grab_for_client(self, TRUE);
@@ -508,6 +503,15 @@ void client_manage(Window window)
        happen after the client's stacking has been determined or it looks bad
     */
     client_show(self);
+
+    /* generate a ConfigureNotify telling the client where it is.
+
+       do this after showing the window. otherwise applications tend to
+       ignore the configurenotify. */
+    client_configure_full(self, self->area.x, self->area.y,
+                          self->area.width, self->area.height,
+                          FALSE, TRUE);
+
 
     if (activate) {
         gboolean stacked = client_restore_session_stacking(self);

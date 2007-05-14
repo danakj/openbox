@@ -394,6 +394,9 @@ static void print_focusevent(XEvent *e)
     case NotifyDetailNone:  detailstr="NotifyDetailNone";  break;
     }
 
+    if (mode == NotifyGrab || mode == NotifyUngrab)
+        return;
+
     g_assert(modestr);
     g_assert(detailstr);
     ob_debug_type(OB_DEBUG_FOCUS, "Focus%s 0x%x mode=%s detail=%s\n",

@@ -95,6 +95,8 @@ void action_unref(ObAction *a)
     /* deal with pointers */
     if (a->func == action_execute || a->func == action_restart)
         g_free(a->data.execute.path);
+    else if (a->func == action_debug)
+        g_free(a->data.debug.string);
     else if (a->func == action_showmenu)
         g_free(a->data.showmenu.name);
 
@@ -110,6 +112,8 @@ ObAction* action_copy(const ObAction *src)
     /* deal with pointers */
     if (a->func == action_execute || a->func == action_restart)
         a->data.execute.path = g_strdup(a->data.execute.path);
+    else if (a->func == action_debug)
+        a->data.debug.string = g_strdup(a->data.debug.string);
     else if (a->func == action_showmenu)
         a->data.showmenu.name = g_strdup(a->data.showmenu.name);
 
@@ -472,8 +476,13 @@ void setup_client_action(ObAction **a, ObUserAction uact)
 ActionString actionstrings[] =
 {
     {
+        "debug", 
+        action_debug,
+        NULL
+    },
+    {
         "execute", 
-        action_execute, 
+        action_execute,
         NULL
     },
     {
@@ -974,6 +983,9 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     if ((m = parse_find_node("icon", n->xmlChildrenNode)))
                         act->data.execute.icon_name = parse_string(doc, m);
                 }
+            } else if (act->func == action_debug) {
+                if ((n = parse_find_node("string", node->xmlChildrenNode)))
+                    act->data.debug.string = parse_string(doc, n);
             } else if (act->func == action_showmenu) {
                 if ((n = parse_find_node("menu", node->xmlChildrenNode)))
                     act->data.showmenu.name = parse_string(doc, n);
@@ -1181,6 +1193,12 @@ void action_run_string(const gchar *name, struct _ObClient *c, Time time)
     l = g_slist_append(NULL, a);
 
     action_run(l, c, 0, time);
+}
+
+void action_debug(union ActionData *data)
+{
+    if (data->debug.string)
+        g_print("%s\n", data->debug.string);
 }
 
 void action_execute(union ActionData *data)

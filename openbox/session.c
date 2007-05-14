@@ -319,15 +319,12 @@ static void session_setup_clone_command()
 static void session_setup_restart_command()
 {
     gint i;
-    gint num = 4;
 
-    if (ob_config_type) num += 2;
-
-    SmPropValue *vals = g_new(SmPropValue, sm_argc + num);
+    SmPropValue *vals = g_new(SmPropValue, sm_argc + 4);
     SmProp prop = {
         .name = g_strdup(SmRestartCommand),
         .type = g_strdup(SmLISTofARRAY8),
-        .num_vals = sm_argc + num,
+        .num_vals = sm_argc + 4,
         .vals = vals
     };
     SmProp *list = &prop;
@@ -353,22 +350,11 @@ static void session_setup_restart_command()
     ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+2].value);
     ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+3].value);
 
-    if (ob_config_type) {
-        vals[i+4].value = g_strdup("--config-namespace");
-        vals[i+4].length = strlen("--config-namespace") + 1;
-        vals[i+5].value = ob_config_type;
-        vals[i+5].length = strlen(ob_config_type) + 1;
-        ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+4].value);
-        ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+5].value);
-    }
-
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
     g_free(vals[i].value);
     g_free(vals[i+2].value);
-    if (ob_config_type)
-        g_free(vals[i+4].value);
     g_free(vals);
 }
 

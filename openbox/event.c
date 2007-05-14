@@ -313,7 +313,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
 
         /* It was on a client, was it a valid one?
            It's possible to get a FocusIn event for a client that was managed
-           but has disappeared. Don't even parse those FocusIn events.
+           but has disappeared.
         */
         if (in_client_only) {
             ObWindow *w = g_hash_table_lookup(window_map, &e->xfocus.window);

@@ -40,11 +40,14 @@ above ~/.xsession file.
 .PP 
 You can use the \fBobconf\fR tool to configure Openbox 
 easily with a graphical interface, however more in-depth configuration 
-is possible by editing the configuration files by hand. The default 
-configuration files are installed in @configdir@/openbox/, and the 
-user configuration is placed in ~/.config/openbox/. You can copy 
-the default configuration to ~/.config/openbox and edit it to your 
-liking. 
+is possible by editing the configuration files by hand. Please note that 
+\fBobconf\fR older than version 2.0 may not work at all 
+for you. 
+.PP 
+The default configuration files are installed in 
+configdir@/openbox/, and the user configuration is placed in 
+~/.config/openbox/. You can copy the default configuration 
+to ~/.config/openbox and edit it to your liking. 
 .PP 
 There are 3 default configuration files, \fBrc.xml\fP, 
 \fBrc-gnome.xml\fP, and \fBrc-kde.xml\fP. The 
@@ -86,16 +89,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-<<<<<<< .working
-<<<<<<< .working
-<<<<<<< .working
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 17:59 
-=======
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 19:06 
->>>>>>> .merge-right.r6502
-=======
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 19:06 
->>>>>>> .merge-right.r6502
-=======
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 20:29 
->>>>>>> .merge-right.r6510
+.\" created by instant / docbook-to-man, Sun 13 May 2007, 20:35 

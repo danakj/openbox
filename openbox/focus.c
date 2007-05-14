@@ -201,6 +201,7 @@ void focus_set_client(ObClient *client)
 
 
     focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
+    ob_debug_type(OB_DEBUG_FOCUS, "focus tried = NULL\n");
 }
 
 static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
@@ -290,6 +291,8 @@ ObClient* focus_fallback(gboolean allow_refocus)
         client_focus(new);
         /* remember that we tried to send focus here */
         focus_tried = new;
+
+        ob_debug_type(OB_DEBUG_FOCUS, "focus tried = %s\n", new->title);
     }
 
     return new;
@@ -311,6 +314,7 @@ void focus_nothing()
     */
 
     focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
+    ob_debug_type(OB_DEBUG_FOCUS, "focus tried = NULL\n");
 
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events
@@ -963,6 +967,9 @@ ObClient *focus_order_find_first(guint desktop)
 static void focus_tried_hide_notify(ObClient *client, gpointer data)
 {
     XEvent ce;
+
+    ob_debug_type(OB_DEBUG_FOCUS, "checking focus tried (%s) against %s\n",
+                  (focus_tried?focus_tried->title:"(null)"), client->title);
 
     if (client == focus_tried) {
         /* we were trying to focus this window but it's gone */

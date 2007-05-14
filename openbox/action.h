@@ -71,6 +71,10 @@ struct DirectionalAction{
     gboolean hang;
 };
 
+struct Debug {
+    gchar *string;
+};
+
 struct Execute {
     struct AnyAction any;
     gchar *path;
@@ -157,6 +161,7 @@ union ActionData {
     struct InteractiveAction inter;
     struct InterDirectionalAction interdiraction;
     struct DirectionalAction diraction;
+    struct Debug debug;
     struct Execute execute;
     struct ClientAction client;
     struct Activate activate;
@@ -185,6 +190,7 @@ struct _ObAction {
 /* Creates a new Action from the name of the action
    A few action types need data set after making this call still. Check if
    the returned action's "func" is one of these.
+   action_debug - the string to print should be set
    action_execute - the path needs to be set
    action_restart - the path can optionally be set
    action_desktop - the destination desktop needs to be set
@@ -234,6 +240,8 @@ void action_run_list(GSList *acts, struct _ObClient *c, ObFrameContext context,
 
 void action_run_string(const gchar *name, struct _ObClient *c, Time time);
 
+/* Debug */
+void action_debug(union ActionData *data);
 /* Execute */
 void action_execute(union ActionData *data);
 /* ActivateAction */

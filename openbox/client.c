@@ -2367,9 +2367,12 @@ static ObStackingLayer calc_layer(ObClient *self)
                 self->frame->size.bottom == 0 && self->frame->size.top == 0 &&
                 RECT_EQUAL(self->area,
                            *screen_physical_area_monitor
-                           (client_monitor(self)))))) &&
-             (client_focused(self) || client_search_focus_tree(self)))
-        l = OB_STACKING_LAYER_FULLSCREEN;
+                           (client_monitor(self))))))) {
+        if (client_focused(self) || client_search_focus_tree(self))
+            l = OB_STACKING_LAYER_FULLSCREEN;
+        else
+            l = OB_STACKING_LAYER_FULLSCREEN_BELOW;
+    }
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
     else l = OB_STACKING_LAYER_NORMAL;
@@ -2814,7 +2817,6 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     self->fullscreen = fs;
     client_change_state(self); /* change the state hints on the client */
-    client_calc_layer(self);   /* and adjust out layer/stacking */
 
     if (fs) {
         self->pre_fullscreen_area = self->area;
@@ -2850,8 +2852,15 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     client_move_resize(self, x, y, w, h);
 
-    /* try focus us when we go into fullscreen mode */
-    client_focus(self);
+    /* and adjust our layer/stacking. do this after resizing the window,
+       and applying decorations, because windows which fill the screen are
+       considered "fullscreen" and it affects their layer */
+    client_calc_layer(self);
+
+    if (fs) {
+        /* try focus us when we go into fullscreen mode */
+        client_focus(self);
+    }
 }
 
 static void client_iconify_recursive(ObClient *self,

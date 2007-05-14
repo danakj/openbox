@@ -3343,13 +3343,15 @@ gboolean client_focus(ObClient *self)
                   "Focusing client \"%s\" at time %u\n",
                   self->title, event_curtime);
 
-    /* if we move focus during a grab, applications will get
-       NotifyWhileGrabbed events and ignore them !
+    /* if there is a grab going on, then we need to cancel it. if we move
+       focus during the grab, applications will get NotifyWhileGrabbed events
+       and ignore them !
 
-       interactive actions should not do anything that can move focus until
-       their finishing.
+       actions should not rely on being able to move focus during an
+       interactive grab.
     */
-    g_assert(!keyboard_interactively_grabbed());
+    if (keyboard_interactively_grabbed())
+        keyboard_interactive_cancel();
 
     error = FALSE;
     xerror_set_ignore(TRUE);

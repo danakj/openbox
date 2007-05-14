@@ -3349,7 +3349,7 @@ gboolean client_focus(ObClient *self)
        interactive actions should not do anything that can move focus until
        their finishing.
     */
-    g_assert(keyboard_interactively_grabbed());
+    g_assert(!keyboard_interactively_grabbed());
 
     error = FALSE;
     xerror_set_ignore(TRUE);

@@ -2399,11 +2399,13 @@ gboolean client_should_show(ObClient *self)
     return FALSE;
 }
 
-void client_show(ObClient *self)
+gboolean client_show(ObClient *self)
 {
+    gboolean show = FALSE;
 
     if (client_should_show(self)) {
         frame_show(self->frame);
+        show = TRUE;
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
@@ -2411,27 +2413,30 @@ void client_show(ObClient *self)
        desktop!
     */
     client_change_wm_state(self);
+    return show;
 }
 
-void client_hide(ObClient *self)
+gboolean client_hide(ObClient *self)
 {
-    if (!client_should_show(self))
+    gboolean hide = FALSE;
+
+    if (!client_should_show(self)) {
         frame_hide(self->frame);
+        hide = TRUE;
+    }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
        needs to be in IconicState. This includes when it is on another
        desktop!
     */
     client_change_wm_state(self);
+    return hide;
 }
 
 void client_showhide(ObClient *self)
 {
-
-    if (client_should_show(self))
-        frame_show(self->frame);
-    else
-        frame_hide(self->frame);
+    if (!client_show(self))
+        client_hide(self);
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
        needs to be in IconicState. This includes when it is on another
@@ -3338,15 +3343,13 @@ gboolean client_focus(ObClient *self)
                   "Focusing client \"%s\" at time %u\n",
                   self->title, event_curtime);
 
-    /* if there is a grab going on, then we need to cancel it. if we move
-       focus during the grab, applications will get NotifyWhileGrabbed events
-       and ignore them !
+    /* if we move focus during a grab, applications will get
+       NotifyWhileGrabbed events and ignore them !
 
-       actions should not rely on being able to move focus during an
-       interactive grab.
+       interactive actions should not do anything that can move focus until
+       their finishing.
     */
-    if (keyboard_interactively_grabbed())
-        keyboard_interactive_cancel();
+    g_assert(keyboard_interactively_grabbed());
 
     error = FALSE;
     xerror_set_ignore(TRUE);

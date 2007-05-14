@@ -493,11 +493,11 @@ void client_kill(ObClient *self);
 */
 void client_set_desktop(ObClient *self, guint target, gboolean donthide);
 
-/*! Show the client if it should be shown. */
-void client_show(ObClient *self);
+/*! Show the client if it should be shown. Returns if the window is shown. */
+gboolean client_show(ObClient *self);
 
-/*! Show the client if it should be shown. */
-void client_hide(ObClient *self);
+/*! Show the client if it should be shown. Returns if the window is hidden. */
+gboolean client_hide(ObClient *self);
 
 /*! Show the client if it should be shown, and hide it if it should be
   hidden. This is for example, when switching desktops.

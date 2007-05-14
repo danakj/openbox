@@ -2421,6 +2421,18 @@ gboolean client_hide(ObClient *self)
     gboolean hide = FALSE;
 
     if (!client_should_show(self)) {
+        if (self == focus_client) {
+            /* if there is a grab going on, then we need to cancel it. if we
+               move focus during the grab, applications will get
+               NotifyWhileGrabbed events and ignore them !
+
+               actions should not rely on being able to move focus during an
+               interactive grab.
+            */
+            if (keyboard_interactively_grabbed())
+                keyboard_interactive_cancel();
+        }
+
         frame_hide(self->frame);
         hide = TRUE;
     }

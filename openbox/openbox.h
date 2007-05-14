@@ -46,7 +46,6 @@ extern gchar   *ob_sm_id;
  make a new file every time, yay. */
 extern gchar   *ob_sm_save_file;
 extern gboolean ob_replace_wm;
-extern gchar   *ob_config_type;
 extern gboolean ob_debug_xinerama;
 
 /* The state of execution of the window manager */

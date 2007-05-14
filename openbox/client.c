@@ -3355,6 +3355,8 @@ gboolean client_can_focus(ObClient *self)
 
 gboolean client_focus(ObClient *self)
 {
+    gboolean error;
+
     /* choose the correct target */
     self = client_focus_target(self);
 
@@ -3380,13 +3382,14 @@ gboolean client_focus(ObClient *self)
     if (keyboard_interactively_grabbed())
         keyboard_interactive_cancel();
 
+    error = FALSE;
+    xerror_set_ignore(TRUE);
+
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
            passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
-        xerror_set_ignore(TRUE);
         XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
                        event_curtime);
-        xerror_set_ignore(FALSE);
     }
 
     if (self->focus_notify) {
@@ -3404,17 +3407,13 @@ gboolean client_focus(ObClient *self)
         XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-#ifdef DEBUG_FOCUS
-    ob_debug("%sively focusing %lx at %d\n",
-             (self->can_focus ? "act" : "pass"),
-             self->window, (gint) event_curtime);
-#endif
+    /* This calls XSync, which will cause the FocusIn to come back to us.
+       That's important for desktop switches, since otherwise we'll have no
+       FocusIn on the queue and end up falling back again. */
+    xerror_set_ignore(FALSE);
+    if (!xerror_occured) error = TRUE;
 
-    /* Cause the FocusIn to come back to us. Important for desktop switches,
-       since otherwise we'll have no FocusIn on the queue and send it off to
-       the focus_backup. */
-    XSync(ob_display, FALSE);
-    return TRUE;
+    return !error;
 }
 
 /*! Present the client to the user.

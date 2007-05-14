@@ -525,7 +525,8 @@ void client_manage(Window window)
     /* update the list hints */
     client_set_list();
 
-    ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
+    ob_debug("Managed window 0x%lx plate 0x%x (%s)\n",
+             window, self->frame->plate, self->class);
 
     return;
 }
@@ -567,7 +568,8 @@ void client_unmanage(ObClient *self)
     guint j;
     GSList *it;
 
-    ob_debug("Unmanaging window: %lx (%s) (%s)\n", self->window,
+    ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)\n",
+             self->window, self->frame->plate,
              self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);

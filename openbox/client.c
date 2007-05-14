@@ -2343,12 +2343,9 @@ static ObStackingLayer calc_layer(ObClient *self)
                 self->frame->size.bottom == 0 && self->frame->size.top == 0 &&
                 RECT_EQUAL(self->area,
                            *screen_physical_area_monitor
-                           (client_monitor(self))))))) {
-        if (client_focused(self) || client_search_focus_tree(self))
-            l = OB_STACKING_LAYER_FULLSCREEN;
-        else
-            l = OB_STACKING_LAYER_FULLSCREEN_BELOW;
-    }
+                           (client_monitor(self)))))) &&
+             (client_focused(self) || client_search_focus_tree(self)))
+        l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
     else l = OB_STACKING_LAYER_NORMAL;

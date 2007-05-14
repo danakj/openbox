@@ -162,27 +162,27 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
 
-    if (corner == prop_atoms.net_wm_moveresize_size_topleft)
+    if (cnr == prop_atoms.net_wm_moveresize_size_topleft)
         cur = OB_CURSOR_NORTHWEST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_top)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_top)
         cur = OB_CURSOR_NORTH;
-    else if (corner == prop_atoms.net_wm_moveresize_size_topright)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_topright)
         cur = OB_CURSOR_NORTHEAST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_right)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_right)
         cur = OB_CURSOR_EAST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_bottomright)
         cur = OB_CURSOR_SOUTHEAST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_bottom)
         cur = OB_CURSOR_SOUTH;
-    else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_bottomleft)
         cur = OB_CURSOR_SOUTHWEST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_left)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_left)
         cur = OB_CURSOR_WEST;
-    else if (corner == prop_atoms.net_wm_moveresize_size_keyboard)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_keyboard)
         cur = OB_CURSOR_SOUTHEAST;
-    else if (corner == prop_atoms.net_wm_moveresize_move)
+    else if (cnr == prop_atoms.net_wm_moveresize_move)
         cur = OB_CURSOR_MOVE;
-    else if (corner == prop_atoms.net_wm_moveresize_move_keyboard)
+    else if (cnr == prop_atoms.net_wm_moveresize_move_keyboard)
         cur = OB_CURSOR_MOVE;
     else
         g_assert_not_reached();

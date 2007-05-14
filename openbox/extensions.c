@@ -99,7 +99,15 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
         XFree(info);
     } else
 #endif
-    {
+    if (ob_debug_xinerama) {
+        gint w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+        gint h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+        *nxin = 2;
+        *xin_areas = g_new(Rect, *nxin + 1);
+        RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
+        RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
+    }
+    else {
         *nxin = 1;
         *xin_areas = g_new(Rect, *nxin + 1);
         RECT_SET((*xin_areas)[0], 0, 0,

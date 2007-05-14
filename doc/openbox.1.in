@@ -4,7 +4,7 @@ openbox \(em Next generation, highly configurable window manager
  
 .SH "SYNOPSIS" 
 .PP 
-\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  
+\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  [\fB\-\-debug-xinerama\fP]  
 .SH "DESCRIPTION" 
 .PP 
 Openbox is a next generation, highly 
@@ -72,6 +72,10 @@ Run in synchronous mode (for debugging).
 Display debugging output. 
 .IP "\fB\-\-debug-focus\fP" 10 
 Display debugging output for focus handling. 
+.IP "\fB\-\-debug-xinerama\fP" 10 
+Split the display into two fake xinerama regions, if 
+xinerama is not already enabled. This is for debugging 
+xinerama support. 
 .SH "SEE ALSO" 
 .PP 
 obconf (1), openbox-gnome-session (1), openbox-kde-session (1). 
@@ -82,4 +86,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Sun 13 May 2007, 19:06 
+.\" created by instant / docbook-to-man, Sun 13 May 2007, 20:29 

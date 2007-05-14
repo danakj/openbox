@@ -80,11 +80,14 @@ manpage.1: manpage.sgml
 
     <para>You can use the <command>obconf</command> tool to configure Openbox
       easily with a graphical interface, however more in-depth configuration
-      is possible by editing the configuration files by hand. The default
-      configuration files are installed in @configdir@/openbox/, and the
-      user configuration is placed in ~/.config/openbox/. You can copy
-      the default configuration to ~/.config/openbox and edit it to your
-      liking.</para>
+      is possible by editing the configuration files by hand. Please note that
+      <command>obconf</command> older than version 2.0 may not work at all
+      for you.</para>
+
+    <para>The default configuration files are installed in
+      configdir@/openbox/, and the user configuration is placed in
+      ~/.config/openbox/. You can copy the default configuration
+      to ~/.config/openbox and edit it to your liking.</para>
 
     <para>There are 3 default configuration files, <literal>rc.xml</literal>,
       <literal>rc-gnome.xml</literal>, and <literal>rc-kde.xml</literal>. The

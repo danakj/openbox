@@ -1111,6 +1111,7 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
 {
     GSList *it;
     ObAction *a;
+    gboolean ungrabbed = FALSE;
 
     if (!acts)
         return;
@@ -1137,6 +1138,33 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                 if (!(cancel || done))
                     if (!keyboard_interactive_grab(state, a->data.any.c, a))
                         continue;
+            }
+            else if (!ungrabbed) {
+                /* Ungrab the keyboard before running the action if it's not
+                   interactive.
+
+                   If there is an interactive action going on, then cancel it
+                   to release the keyboard. If not, then call
+                   XUngrabKeyboard().
+
+                   We call XUngrabKeyboard() because a key press causes a
+                   passive grab on the keyboard, and so if program we are
+                   executing wants to grab the keyboard, it will fail if the
+                   button is still held down (which is likely).
+
+                   Use the X function not out own, because we're not
+                   considering a grab to be in place at all so our function
+                   won't try ungrab anything.
+                */
+                if (keyboard_interactively_grabbed())
+                    keyboard_interactive_cancel();
+                else
+                    XUngrabKeyboard(ob_display, time);
+
+                /* We don't the same with XUngrabPointer, even though it can
+                   cause the same problem. But then Press bindings cause
+                   Drag bindings to break.
+                XUngrabPointer(ob_display, time);*/
             }
 
             /* XXX UGLY HACK race with motion event starting a move and the
@@ -1210,25 +1238,6 @@ void action_execute(union ActionData *data)
     GError *e = NULL;
     gchar *cmd, **argv = 0;
     if (data->execute.path) {
-        /* Ungrab the keyboard before running the action.
-
-           If there is an interactive action going on, then cancel it to
-           release the keyboard. If not, then call XUngrabKeyboard().
-
-           We call XUngrabKeyboard because a key press causes a passive
-           grab on the keyboard, and so if program we are executing wants to
-           grab the keyboard, it will fail if the button is still held down
-           (which is likely).
-
-           Use the X function not out own, because we're not considering
-           a grab to be in place at all so our function won't try ungrab
-           anything.
-        */
-        if (keyboard_interactively_grabbed())
-            keyboard_interactive_cancel();
-        else
-            XUngrabKeyboard(ob_display, data->any.time);
-
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {

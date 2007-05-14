@@ -2,5 +2,4 @@
 
 # Run KDE with Openbox as its window manager
 export KDEWM="@bindir@/openbox"
-export OPENBOX_CONFIG_NAMESPACE="kde"
 exec startkde "$@"

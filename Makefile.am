@@ -32,6 +32,7 @@ bin_PROGRAMS = \
 	tools/gnome-panel-control/gnome-panel-control
 
 bin_SCRIPTS = \
+	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session
 
@@ -383,6 +384,14 @@ data/xsession/openbox-kde-session: \
 	@$(edit) $< >$@
 	@chmod a+x $@
 
+data/xsession/openbox-session: \
+		$(srcdir)/data/xsession/openbox-session.in
+	@echo make: creating $@
+	@mkdir data 2>/dev/null || true
+	@mkdir data/xsession 2>/dev/null || true
+	@$(edit) $< >$@
+	@chmod a+x $@
+
 doc/openbox.1.in: $(srcdir)/doc/openbox.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
@@ -425,6 +434,7 @@ dist_noinst_DATA = \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/themerc.xsd \
+	data/xsession/openbox-session.in \
 	data/xsession/openbox-gnome-session.in \
 	data/xsession/openbox-kde-session.in \
 	render/obrender-3.0.pc.in \

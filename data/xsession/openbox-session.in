@@ -1,0 +1,10 @@
+#!/bin/sh
+
+AUTOSTART="$HOME/.config/openbox/autostart"
+
+if test -e $AUTOSTART; then
+    # sleep for 1 second so Openbox is there before anything else
+    (sleep 1 && . $AUTOSTART) &
+fi
+
+exec @bindir@/openbox "$@"

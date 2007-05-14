@@ -2822,28 +2822,21 @@ void client_fullscreen(ObClient *self, gboolean fs)
             self->pre_fullscreen_area.height = self->pre_max_area.height;
         }
 
-        /* these are not actually used cuz client_configure will set them
-           as appropriate when the window is fullscreened */
-        x = y = w = h = 0;
+        /* these will help configure_full figure out where to fullscreen
+           the window */
+        x = self->area.x;
+        y = self->area.y;
+        w = self->area.width;
+        h = self->area.height;
     } else {
-        Rect *a;
+        g_assert(self->pre_fullscreen_area.width > 0 &&
+                 self->pre_fullscreen_area.height > 0);
 
-        if (self->pre_fullscreen_area.width > 0 &&
-            self->pre_fullscreen_area.height > 0)
-        {
-            x = self->pre_fullscreen_area.x;
-            y = self->pre_fullscreen_area.y;
-            w = self->pre_fullscreen_area.width;
-            h = self->pre_fullscreen_area.height;
-            RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
-        } else {
-            /* pick some fallbacks... */
-            a = screen_area_monitor(self->desktop, 0);
-            x = a->x + a->width / 4;
-            y = a->y + a->height / 4;
-            w = a->width / 2;
-            h = a->height / 2;
-        }
+        x = self->pre_fullscreen_area.x;
+        y = self->pre_fullscreen_area.y;
+        w = self->pre_fullscreen_area.width;
+        h = self->pre_fullscreen_area.height;
+        RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
     }
 
     client_setup_decor_and_functions(self);
@@ -2939,8 +2932,8 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
         if (dir == 2 && !self->max_vert) return;
     }
 
-    /* we just tell it to configure in the same place and client_configure
-       worries about filling the screen with the window */
+    /* these will help configure_full figure out which screen to fill with
+       the window */
     x = self->area.x;
     y = self->area.y;
     w = self->area.width;
@@ -2958,34 +2951,23 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
                      self->pre_max_area.width, self->area.height);
         }
     } else {
-        Rect *a;
-
-        a = screen_area_monitor(self->desktop, 0);
         if ((dir == 0 || dir == 1) && self->max_horz) { /* horz */
-            if (self->pre_max_area.width > 0) {
-                x = self->pre_max_area.x;
-                w = self->pre_max_area.width;
+            g_assert(self->pre_max_area.width > 0);
 
-                RECT_SET(self->pre_max_area, 0, self->pre_max_area.y,
-                         0, self->pre_max_area.height);
-            } else {
-                /* pick some fallbacks... */
-                x = a->x + a->width / 4;
-                w = a->width / 2;
-            }
+            x = self->pre_max_area.x;
+            w = self->pre_max_area.width;
+
+            RECT_SET(self->pre_max_area, 0, self->pre_max_area.y,
+                     0, self->pre_max_area.height);
         }
         if ((dir == 0 || dir == 2) && self->max_vert) { /* vert */
-            if (self->pre_max_area.height > 0) {
-                y = self->pre_max_area.y;
-                h = self->pre_max_area.height;
+            g_assert(self->pre_max_area.height > 0);
 
-                RECT_SET(self->pre_max_area, self->pre_max_area.x, 0,
-                         self->pre_max_area.width, 0);
-            } else {
-                /* pick some fallbacks... */
-                y = a->y + a->height / 4;
-                h = a->height / 2;
-            }
+            y = self->pre_max_area.y;
+            h = self->pre_max_area.height;
+
+            RECT_SET(self->pre_max_area, self->pre_max_area.x, 0,
+                     self->pre_max_area.width, 0);
         }
     }
 

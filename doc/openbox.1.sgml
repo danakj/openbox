@@ -44,6 +44,7 @@ manpage.1: manpage.sgml
       <arg><option>--sync</option></arg>
       <arg><option>--debug</option></arg>
       <arg><option>--debug-focus</option></arg>
+      <arg><option>--debug-xinerama</option></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1>
@@ -145,6 +146,14 @@ manpage.1: manpage.sgml
         <term><option>--debug-focus</option></term>
         <listitem>
           <para>Display debugging output for focus handling.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--debug-xinerama</option></term>
+        <listitem>
+          <para>Split the display into two fake xinerama regions, if
+	    xinerama is not already enabled. This is for debugging
+	    xinerama support.</para>
         </listitem>
       </varlistentry>
     </variablelist>

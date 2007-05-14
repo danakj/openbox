@@ -315,7 +315,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
            It's possible to get a FocusIn event for a client that was managed
            but has disappeared. Don't even parse those FocusIn events.
         */
-        {
+        if (in_client_only) {
             ObWindow *w = g_hash_table_lookup(window_map, &e->xfocus.window);
             if (!w || !WINDOW_IS_CLIENT(w))
                 return FALSE;
@@ -518,6 +518,26 @@ static void event_process(const XEvent *ec, gpointer data)
 
                 if (!focus_left_screen)
                     focus_fallback(TRUE);
+            }
+        }
+        else if (!client)
+        {
+            XEvent ce;
+
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Focus went to a window that is already gone\n");
+
+            /* If you send focus to a window and then it disappears, you can
+               get the FocusIn FocusOut for it, after it is unmanaged.
+            */
+            if (XCheckIfEvent(ob_display, &ce, event_look_for_focusin_client,
+                              NULL))
+            {
+                XPutBackEvent(ob_display, &ce);
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "  but another FocusIn is coming\n");
+            } else {
+                focus_fallback(TRUE);
             }
         }
         else if (client != focus_client) {

@@ -414,10 +414,6 @@ void client_manage(Window window)
                               !self->session));
     }
 
-    /* do this after the window is placed, so the premax/prefullscreen numbers
-       won't be all wacko!!
-       also, this moves the window to the position where it has been placed
-    */
     ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
              self->window, self->area.x, self->area.y,
              self->area.width, self->area.height);
@@ -425,14 +421,25 @@ void client_manage(Window window)
         ob_debug("  but session requested %d %d instead, overriding\n",
                  self->session->x, self->session->y);
 
-    /* generate a ConfigureNotify telling the client where it is */
+    /* adjust the frame to the client's size before showing the window */
+    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    frame_adjust_client_area(self->frame);
+
+
+    /* move the client to its placed position, or it it's already there,
+       generate a ConfigureNotify telling the client where it is.
+
+       do this after adjusting the frame. otherwise it gets all weird and
+       clients don't work right */
     client_configure_full(self, self->area.x, self->area.y,
                           self->area.width, self->area.height,
                           FALSE, TRUE);
 
+    /* do this after the window is placed, so the premax/prefullscreen numbers
+       won't be all wacko!!
+       also, this moves the window to the position where it has been placed
+    */
     client_apply_startup_state(self);
-
-    mouse_grab_for_client(self, TRUE);
 
     if (activate) {
         guint32 last_time = focus_client ?
@@ -500,9 +507,7 @@ void client_manage(Window window)
             stacking_raise(CLIENT_AS_WINDOW(self));
     }
 
-    /* adjust the frame to the client's size before showing the window */
-    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-    frame_adjust_client_area(self->frame);
+    mouse_grab_for_client(self, TRUE);
 
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad

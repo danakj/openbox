@@ -3332,8 +3332,6 @@ ObClient *client_focus_target(ObClient *self)
 
 gboolean client_can_focus(ObClient *self)
 {
-    XEvent ev;
-
     /* choose the correct target */
     self = client_focus_target(self);
 

@@ -260,7 +260,9 @@ void setup_action_send_to_desktop_down(ObAction **a, ObUserAction uact)
 
 void setup_action_desktop(ObAction **a, ObUserAction uact)
 {
+/*
     (*a)->data.desktop.inter.any.interactive = FALSE;
+*/
 }
 
 void setup_action_desktop_prev(ObAction **a, ObUserAction uact)
@@ -1013,9 +1015,11 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.desktop.desk = parse_int(doc, n);
                 if (act->data.desktop.desk > 0) act->data.desktop.desk--;
+/*
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.desktop.inter.any.interactive =
                         parse_bool(doc, n);
+*/
            } else if (act->func == action_send_to_desktop) {
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.sendto.desk = parse_int(doc, n);
@@ -1600,18 +1604,15 @@ void action_send_to_desktop(union ActionData *data)
 
 void action_desktop(union ActionData *data)
 {
-    if (!data->inter.any.interactive ||
-        (!data->inter.cancel && !data->inter.final))
+    /* XXX add the interactive/dialog option back again once the dialog
+       has been made to not use grabs */
+    if (data->desktop.desk < screen_num_desktops ||
+        data->desktop.desk == DESKTOP_ALL)
     {
-        if (data->desktop.desk < screen_num_desktops ||
-            data->desktop.desk == DESKTOP_ALL)
-        {
-            screen_set_desktop(data->desktop.desk, TRUE);
-            if (data->inter.any.interactive)
-                screen_desktop_popup(data->desktop.desk, TRUE);
-        }
-    } else
-        screen_desktop_popup(0, FALSE);
+        screen_set_desktop(data->desktop.desk, TRUE);
+        if (data->inter.any.interactive)
+            screen_desktop_popup(data->desktop.desk, TRUE);
+    }
 }
 
 void action_desktop_dir(union ActionData *data)

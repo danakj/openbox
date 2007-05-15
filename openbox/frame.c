@@ -528,9 +528,11 @@ void frame_adjust_state(ObFrame *self)
 
 void frame_adjust_focus(ObFrame *self, gboolean hilite)
 {
-    self->focused = hilite;
-    framerender_frame(self);
-    XFlush(ob_display);
+    if (self->focused != hilite) {
+        self->focused = hilite;
+        framerender_frame(self);
+        XFlush(ob_display);
+    }
 }
 
 void frame_adjust_title(ObFrame *self)

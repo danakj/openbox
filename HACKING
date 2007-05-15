@@ -1,19 +1,13 @@
-Woop, a HACKING document for openbox at last!
-
 dirs:
-	kernel - core of the WM
+	openbox - core of the WM
 	render - librender, rendering routines for the WM and for apps
 	parser - libparser, for parsing config files
 
 Beware the Client.transient_for. It can be set to a !NULL value of TRAN_GROUP,
 which is not a valid pointer. You must ALWAYS check for TRAN_GROUP before
-following transient_for. When TRAN_GROUP is found, Client.group will always
-be !NULL. Some smart action should be taken using all members of the group in
-this case.
-    Smart action idea:
-        Skip over members of the group that are also transients of the group
-        (have Client.transient_for set to TRAN_GROUP). These windows are not
-        ancestors and using them will also end up causing infinite loops!
+following transient_for. However if it is transient for the group, this
+excludes other windows whom are transient for the group, and windows which
+are children of the window (infinite loops would result)!
 
 When using coordinates/sizes of windows, make sure you use the right area. The
 Client.area rect is the reference point and size of the *CLIENT* window. This

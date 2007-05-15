@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=Openbox
 Comment=Log in using the Openbox window manager (without a session manager)
-Exec=openbox-session
-TryExec=openbox-session
+Exec=@bindir@/openbox-session
+TryExec=@bidir@/openbox-session
 Icon=openbox.png
 Type=XSession

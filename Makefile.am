@@ -360,6 +360,7 @@ dist_pixmap_DATA = \
 	data/openbox.png
 
 dist_rc_DATA = \
+	data/autostart.sh \
 	data/rc.xml \
 	data/menu.xml
 
@@ -367,6 +368,30 @@ edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
+
+data/xsession/openbox-gnome.desktop: \
+		$(srcdir)/data/xsession/openbox-gnome.desktop.in
+	@echo make: creating $@
+	@mkdir data 2>/dev/null || true
+	@mkdir data/xsession 2>/dev/null || true
+	@$(edit) $< >$@
+	@chmod a+x $@
+
+data/xsession/openbox-kde.desktop: \
+		$(srcdir)/data/xsession/openbox-kde.desktop.in
+	@echo make: creating $@
+	@mkdir data 2>/dev/null || true
+	@mkdir data/xsession 2>/dev/null || true
+	@$(edit) $< >$@
+	@chmod a+x $@
+
+data/xsession/openbox.desktop: \
+		$(srcdir)/data/xsession/openbox.desktop.in
+	@echo make: creating $@
+	@mkdir data 2>/dev/null || true
+	@mkdir data/xsession 2>/dev/null || true
+	@$(edit) $< >$@
+	@chmod a+x $@
 
 data/xsession/openbox-gnome-session: \
 		$(srcdir)/data/xsession/openbox-gnome-session.in
@@ -392,25 +417,25 @@ data/xsession/openbox-session: \
 	@$(edit) $< >$@
 	@chmod a+x $@
 
-doc/openbox.1.in: $(srcdir)/doc/openbox.1.sgml
+doc/openbox.1: $(srcdir)/doc/openbox.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@docbook-to-man $< > $@
+	@$(edit) $< | docbook-to-man - >$@
 
-doc/openbox.1: doc/openbox.1.in
+doc/openbox-session.1: $(srcdir)/doc/openbox-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@$(edit) $< >$@
+	@$(edit) $< | docbook-to-man - >$@
 
 doc/openbox-gnome-session.1: $(srcdir)/doc/openbox-gnome-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@docbook-to-man $< > $@
+	@$(edit) $< | docbook-to-man - >$@
 
 doc/openbox-kde-session.1: $(srcdir)/doc/openbox-kde-session.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@docbook-to-man $< > $@
+	@$(edit) $< | docbook-to-man - >$@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop
@@ -434,6 +459,9 @@ dist_noinst_DATA = \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/themerc.xsd \
+	data/xsession/openbox.desktop.in \
+	data/xsession/openbox-gnome.desktop.in \
+	data/xsession/openbox-kde.desktop.in \
 	data/xsession/openbox-session.in \
 	data/xsession/openbox-gnome-session.in \
 	data/xsession/openbox-kde-session.in \
@@ -468,6 +496,7 @@ dist_doc_DATA = \
 
 dist_man_MANS = \
 	doc/openbox.1 \
+	doc/openbox-session.1 \
 	doc/openbox-gnome-session.1 \
 	doc/openbox-kde-session.1
 

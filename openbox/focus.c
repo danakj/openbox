@@ -160,6 +160,9 @@ void focus_set_client(ObClient *client)
     ob_debug_type(OB_DEBUG_FOCUS,
                   "focus_set_client 0x%lx\n", client ? client->window : 0);
 
+    if (focus_client == client)
+        return;
+
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);

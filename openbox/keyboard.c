@@ -311,6 +311,14 @@ void keyboard_event(ObClient *client, const XEvent *e)
             else {
                 keyboard_reset_chains(0);
 
+                /* If we don't have the keyboard grabbed, then ungrab it with
+                   XUngrabKeyboard, so that there is not a passive grab left
+                   on from the KeyPress. If the grab is left on, and focus
+                   moves during that time, it will be NotifyWhileGrabbed, and
+                   applications like to ignore those! */
+                if (!keyboard_interactively_grabbed())
+                    XUngrabKeyboard(ob_display, e->xkey.time);
+
                 action_run_key(p->actions, client, e->xkey.state,
                                e->xkey.x_root, e->xkey.y_root,
                                e->xkey.time);

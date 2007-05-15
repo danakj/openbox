@@ -28,12 +28,12 @@
 /*! The possible stacking layers a client window can be a part of */
 typedef enum {
     OB_STACKING_LAYER_INVALID,
-    OB_STACKING_LAYER_DESKTOP,     /*!< 0 - desktop windows */
-    OB_STACKING_LAYER_BELOW,       /*!< 1 - normal windows w/ below */
-    OB_STACKING_LAYER_NORMAL,      /*!< 2 - normal windows */
-    OB_STACKING_LAYER_ABOVE,       /*!< 3 - normal windows w/ above */
-    OB_STACKING_LAYER_FULLSCREEN,  /*!< 4 - fullscreeen windows */
-    OB_STACKING_LAYER_INTERNAL,    /*!< 5 - openbox windows/menus */
+    OB_STACKING_LAYER_DESKTOP,          /*!< 0 - desktop windows */
+    OB_STACKING_LAYER_BELOW,            /*!< 1 - normal windows w/ below */
+    OB_STACKING_LAYER_NORMAL,           /*!< 2 - normal windows */
+    OB_STACKING_LAYER_ABOVE,            /*!< 3 - normal windows w/ above */
+    OB_STACKING_LAYER_FULLSCREEN,       /*!< 4 - fullscreeen windows */
+    OB_STACKING_LAYER_INTERNAL,         /*!< 5 - openbox windows/menus */
     OB_NUM_STACKING_LAYERS
 } ObStackingLayer;
 

@@ -101,7 +101,6 @@ static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
-static gchar    *config_type = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
@@ -213,7 +212,7 @@ gint main(gint argc, gchar **argv)
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
 
-    if (screen_annex(program_name)) { /* it will be ours! */
+    if (screen_annex()) { /* it will be ours! */
         do {
             modkeys_startup(reconfigure);
 
@@ -238,15 +237,17 @@ gint main(gint argc, gchar **argv)
                 config_startup(i);
 
                 /* parse/load user options */
-                if (parse_load_rc(config_type, &doc, &node)) {
+                if (parse_load_rc(NULL, &doc, &node)) {
                     parse_tree(i, doc, node->xmlChildrenNode);
                     parse_close(doc);
                 } else
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
 
+/*
                 if (config_type != NULL)
                     PROP_SETS(RootWindow(ob_display, ob_screen),
                               ob_config, config_type);
+*/
 
                 /* we're done with parsing now, kill it */
                 parse_shutdown(i);
@@ -310,7 +311,7 @@ gint main(gint argc, gchar **argv)
                     (w = g_hash_table_lookup(window_map, &xid)) &&
                     WINDOW_IS_CLIENT(w))
                 {
-                    client_focus(WINDOW_AS_CLIENT(w));
+                    client_focus(WINDOW_AS_CLIENT(w), FALSE);
                 }
             } else {
                 GList *it;
@@ -489,8 +490,6 @@ static void parse_env()
 {
     /* unset this so we don't pass it on unknowingly */
     unsetenv("DESKTOP_STARTUP_ID");
-
-    config_type = getenv("OPENBOX_CONFIG_NAMESPACE");
 }
 
 static void parse_args(gint *argc, gchar **argv)

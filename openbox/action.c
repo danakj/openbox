@@ -260,7 +260,9 @@ void setup_action_send_to_desktop_down(ObAction **a, ObUserAction uact)
 
 void setup_action_desktop(ObAction **a, ObUserAction uact)
 {
+/*
     (*a)->data.desktop.inter.any.interactive = FALSE;
+*/
 }
 
 void setup_action_desktop_prev(ObAction **a, ObUserAction uact)
@@ -1013,9 +1015,11 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.desktop.desk = parse_int(doc, n);
                 if (act->data.desktop.desk > 0) act->data.desktop.desk--;
+/*
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.desktop.inter.any.interactive =
                         parse_bool(doc, n);
+*/
            } else if (act->func == action_send_to_desktop) {
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.sendto.desk = parse_int(doc, n);
@@ -1206,27 +1210,14 @@ void action_execute(union ActionData *data)
     GError *e = NULL;
     gchar *cmd, **argv = 0;
     if (data->execute.path) {
-        /* Ungrab the keyboard before running the action.
-
-           If there is an interactive action going on, then cancel it to
-           release the keyboard. If not, then call XUngrabKeyboard().
-
-           We call XUngrabKeyboard because a key press causes a passive
-           grab on the keyboard, and so if program we are executing wants to
-           grab the keyboard, it will fail if the button is still held down
-           (which is likely).
-
-           Use the X function not out own, because we're not considering
-           a grab to be in place at all so our function won't try ungrab
-           anything.
-        */
-        if (keyboard_interactively_grabbed())
-            keyboard_interactive_cancel();
-        else
-            XUngrabKeyboard(ob_display, data->any.time);
-
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
+            /* If there is an interactive action going on, then cancel it
+               to release the keyboard, so that the run application
+               can grab the keyboard if it wants to. */
+            if (keyboard_interactively_grabbed())
+                keyboard_interactive_cancel();
+
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
                 g_message(_("Failed to execute '%s': %s"),
                           cmd, e->message);
@@ -1305,7 +1296,7 @@ void action_focus(union ActionData *data)
                go moving on us */
             event_halt_focus_delay();
 
-            client_focus(data->client.any.c);
+            client_focus(data->client.any.c, FALSE);
         }
     } else {
         /* focus action on something other than a client, make keybindings
@@ -1600,18 +1591,15 @@ void action_send_to_desktop(union ActionData *data)
 
 void action_desktop(union ActionData *data)
 {
-    if (!data->inter.any.interactive ||
-        (!data->inter.cancel && !data->inter.final))
+    /* XXX add the interactive/dialog option back again once the dialog
+       has been made to not use grabs */
+    if (data->desktop.desk < screen_num_desktops ||
+        data->desktop.desk == DESKTOP_ALL)
     {
-        if (data->desktop.desk < screen_num_desktops ||
-            data->desktop.desk == DESKTOP_ALL)
-        {
-            screen_set_desktop(data->desktop.desk, TRUE);
-            if (data->inter.any.interactive)
-                screen_desktop_popup(data->desktop.desk, TRUE);
-        }
-    } else
-        screen_desktop_popup(0, FALSE);
+        screen_set_desktop(data->desktop.desk, TRUE);
+        if (data->inter.any.interactive)
+            screen_desktop_popup(data->desktop.desk, TRUE);
+    }
 }
 
 void action_desktop_dir(union ActionData *data)

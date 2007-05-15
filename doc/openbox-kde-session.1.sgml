@@ -38,14 +38,11 @@ manpage.1: manpage.sgml
 
     <para><command>&dhpackage;</command> runs a KDE session with
       Openbox as the window manager.</para>
-
-    <para>When running inside KDE like this, Openbox will use the
-      <literal>rc-kde.xml</literal> configuration file.</para>
   </refsect1>
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para>openbox(1), openbox-gnome-session (1).
+    <para>openbox(1), openbox-gnome-session (1), openbox-session (1).
       </para>
 
     <para>The program's full documentation is available on the website:

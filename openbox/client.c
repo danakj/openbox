@@ -65,7 +65,6 @@ typedef struct
 GList            *client_list          = NULL;
 
 static GSList *client_destroy_notifies = NULL;
-static GSList *client_hide_notifies    = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -134,29 +133,6 @@ void client_remove_destroy_notify(ObClientCallback func)
             g_free(d);
             client_destroy_notifies =
                 g_slist_delete_link(client_destroy_notifies, it);
-            break;
-        }
-    }
-}
-
-void client_add_hide_notify(ObClientCallback func, gpointer data)
-{
-    ClientCallback *d = g_new(ClientCallback, 1);
-    d->func = func;
-    d->data = data;
-    client_hide_notifies = g_slist_prepend(client_hide_notifies, d);
-}
-
-void client_remove_hide_notify(ObClientCallback func)
-{
-    GSList *it;
-
-    for (it = client_hide_notifies; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        if (d->func == func) {
-            g_free(d);
-            client_hide_notifies =
-                g_slist_delete_link(client_hide_notifies, it);
             break;
         }
     }
@@ -2423,11 +2399,13 @@ gboolean client_should_show(ObClient *self)
     return FALSE;
 }
 
-void client_show(ObClient *self)
+gboolean client_show(ObClient *self)
 {
+    gboolean show = FALSE;
 
     if (client_should_show(self)) {
         frame_show(self->frame);
+        show = TRUE;
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
@@ -2435,14 +2413,28 @@ void client_show(ObClient *self)
        desktop!
     */
     client_change_wm_state(self);
+    return show;
 }
 
-void client_hide(ObClient *self)
+gboolean client_hide(ObClient *self)
 {
-    if (!client_should_show(self)) {
-        frame_hide(self->frame);
+    gboolean hide = FALSE;
 
-        client_call_notifies(self, client_hide_notifies);
+    if (!client_should_show(self)) {
+        if (self == focus_client) {
+            /* if there is a grab going on, then we need to cancel it. if we
+               move focus during the grab, applications will get
+               NotifyWhileGrabbed events and ignore them !
+
+               actions should not rely on being able to move focus during an
+               interactive grab.
+            */
+            if (keyboard_interactively_grabbed())
+                keyboard_interactive_cancel();
+        }
+
+        frame_hide(self->frame);
+        hide = TRUE;
     }
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
@@ -2450,19 +2442,13 @@ void client_hide(ObClient *self)
        desktop!
     */
     client_change_wm_state(self);
+    return hide;
 }
 
 void client_showhide(ObClient *self)
 {
-
-    if (client_should_show(self)) {
-        frame_show(self->frame);
-    }
-    else {
-        frame_hide(self->frame);
-
-        client_call_notifies(self, client_hide_notifies);
-    }
+    if (!client_show(self))
+        client_hide(self);
 
     /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
        needs to be in IconicState. This includes when it is on another
@@ -2814,7 +2800,6 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     self->fullscreen = fs;
     client_change_state(self); /* change the state hints on the client */
-    client_calc_layer(self);   /* and adjust out layer/stacking */
 
     if (fs) {
         self->pre_fullscreen_area = self->area;
@@ -2850,8 +2835,15 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     client_move_resize(self, x, y, w, h);
 
-    /* try focus us when we go into fullscreen mode */
-    client_focus(self);
+    /* and adjust our layer/stacking. do this after resizing the window,
+       and applying decorations, because windows which fill the screen are
+       considered "fullscreen" and it affects their layer */
+    client_calc_layer(self);
+
+    if (fs) {
+        /* try focus us when we go into fullscreen mode */
+        client_focus(self, FALSE);
+    }
 }
 
 static void client_iconify_recursive(ObClient *self,
@@ -3332,8 +3324,6 @@ ObClient *client_focus_target(ObClient *self)
 
 gboolean client_can_focus(ObClient *self)
 {
-    XEvent ev;
-
     /* choose the correct target */
     self = client_focus_target(self);
 
@@ -3346,7 +3336,7 @@ gboolean client_can_focus(ObClient *self)
     return TRUE;
 }
 
-gboolean client_focus(ObClient *self)
+gboolean client_focus(ObClient *self, gboolean checkinvalid)
 {
     /* choose the correct target */
     self = client_focus_target(self);
@@ -3373,13 +3363,15 @@ gboolean client_focus(ObClient *self)
     if (keyboard_interactively_grabbed())
         keyboard_interactive_cancel();
 
+    if (checkinvalid)
+        xerror_set_ignore(TRUE);
+    xerror_occured = FALSE;
+
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
            passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
-        xerror_set_ignore(TRUE);
         XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
                        event_curtime);
-        xerror_set_ignore(FALSE);
     }
 
     if (self->focus_notify) {
@@ -3397,17 +3389,10 @@ gboolean client_focus(ObClient *self)
         XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-#ifdef DEBUG_FOCUS
-    ob_debug("%sively focusing %lx at %d\n",
-             (self->can_focus ? "act" : "pass"),
-             self->window, (gint) event_curtime);
-#endif
+    if (checkinvalid)
+        xerror_set_ignore(FALSE);
 
-    /* Cause the FocusIn to come back to us. Important for desktop switches,
-       since otherwise we'll have no FocusIn on the queue and send it off to
-       the focus_backup. */
-    XSync(ob_display, FALSE);
-    return TRUE;
+    return !xerror_occured;
 }
 
 /*! Present the client to the user.
@@ -3441,7 +3426,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
     if (raise)
         stacking_raise(CLIENT_AS_WINDOW(self));
 
-    client_focus(self);
+    client_focus(self, FALSE);
 }
 
 void client_activate(ObClient *self, gboolean here, gboolean user)

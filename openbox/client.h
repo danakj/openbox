@@ -314,10 +314,6 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 void client_add_destroy_notify(ObClientCallback func, gpointer data);
 void client_remove_destroy_notify(ObClientCallback func);
 
-/*! Get notified when the client is hidden */
-void client_add_hide_notify(ObClientCallback func, gpointer data);
-void client_remove_hide_notify(ObClientCallback func);
-
 /*! Manages all existing windows */
 void client_manage_all();
 /*! Manages a given window
@@ -497,11 +493,11 @@ void client_kill(ObClient *self);
 */
 void client_set_desktop(ObClient *self, guint target, gboolean donthide);
 
-/*! Show the client if it should be shown. */
-void client_show(ObClient *self);
+/*! Show the client if it should be shown. Returns if the window is shown. */
+gboolean client_show(ObClient *self);
 
-/*! Show the client if it should be shown. */
-void client_hide(ObClient *self);
+/*! Show the client if it should be shown. Returns if the window is hidden. */
+gboolean client_hide(ObClient *self);
 
 /*! Show the client if it should be shown, and hide it if it should be
   hidden. This is for example, when switching desktops.
@@ -536,9 +532,10 @@ ObClient *client_focus_target(ObClient *self);
 gboolean client_can_focus(ObClient *self);
 
 /*! Attempt to focus the client window
-  NOTE: You should validate the client before calling this !! (client_validate)
-*/
-gboolean client_focus(ObClient *self);
+  If you care if focus actually went to the window or not, pass checkinvalid
+  as TRUE.
+ */
+gboolean client_focus(ObClient *self, gboolean checkinvalid);
 
 /*! Activates the client for use, focusing, uniconifying it, etc. To be used
   when the user deliberately selects a window for use.

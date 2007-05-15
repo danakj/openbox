@@ -153,7 +153,7 @@ static gboolean replace_wm()
     return TRUE;
 }
 
-gboolean screen_annex(const gchar *program_name)
+gboolean screen_annex()
 {
     XSetWindowAttributes attrib;
     pid_t pid;
@@ -190,7 +190,6 @@ gboolean screen_annex(const gchar *program_name)
         return FALSE;
     }
 
-
     screen_set_root_cursor();
 
     /* set the OPENBOX_PID hint */
@@ -203,7 +202,7 @@ gboolean screen_annex(const gchar *program_name)
                net_supporting_wm_check, window, screen_support_win);
 
     /* set properties on the supporting window */
-    PROP_SETS(screen_support_win, net_wm_name, program_name);
+    PROP_SETS(screen_support_win, net_wm_name, "Openbox");
     PROP_SET32(screen_support_win, net_supporting_wm_check,
                window, screen_support_win);
 
@@ -506,12 +505,12 @@ void screen_set_desktop(guint num, gboolean dofocus)
            to call xsetinputfocus on the window ourselves. otherwise there is
            no guarantee the window will actually take focus.. */
         if (c->can_focus) {
-            /* do this here so that if you switch desktops to a window with
-               helper windows then the helper windows won't flash */
-            client_bring_helper_windows(c);
             /* reduce flicker by hiliting now rather than waiting for the
                server FocusIn event */
             frame_adjust_focus(c->frame, TRUE);
+            /* do this here so that if you switch desktops to a window with
+               helper windows then the helper windows won't flash */
+            client_bring_helper_windows(c);
         }
     }
 
@@ -943,7 +942,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
             ObClient *c = it->data;
             if (c->type == OB_CLIENT_TYPE_DESKTOP &&
                 (c->desktop == screen_desktop || c->desktop == DESKTOP_ALL) &&
-                client_focus(it->data))
+                client_focus(it->data, FALSE))
                 break;
         }
     }

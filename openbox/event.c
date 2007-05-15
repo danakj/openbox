@@ -307,10 +307,6 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
                 return FALSE;
         }
 
-        /* This means focus moved to the frame window */
-        if (detail == NotifyInferior && !in_client_only)
-            return TRUE;
-
         /* It was on a client, was it a valid one?
            It's possible to get a FocusIn event for a client that was managed
            but has disappeared.
@@ -350,9 +346,6 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
             return TRUE;
         /* This means focus moved from one client to another */
         if (detail == NotifyNonlinearVirtual)
-            return TRUE;
-        /* This means focus had moved to our frame window and now moved off */
-        if (detail == NotifyNonlinear)
             return TRUE;
 
         /* Otherwise.. */
@@ -484,9 +477,7 @@ static void event_process(const XEvent *ec, gpointer data)
         {
             XEvent ce;
 
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus went to pointer root/none or to our frame "
-                          "window\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to pointer root/none\n");
 
             /* If another FocusIn is in the queue then don't fallback yet. This
                fixes the fun case of:
@@ -508,16 +499,11 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "  but another FocusIn is coming\n");
             } else {
-                /* Focus has been reverted to the root window, nothing, or to
-                   our frame window.
+                /* Focus has been reverted to the root window or nothing.
 
                    FocusOut events come after UnmapNotify, so we don't need to
                    worry about focusing an invalid window
                 */
-
-                /* In this case we know focus is in our screen */
-                if (e->xfocus.detail == NotifyInferior)
-                    focus_left_screen = FALSE;
 
                 if (!focus_left_screen)
                     focus_fallback(TRUE);
@@ -525,23 +511,12 @@ static void event_process(const XEvent *ec, gpointer data)
         }
         else if (!client)
         {
-            XEvent ce;
-
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Focus went to a window that is already gone\n");
 
             /* If you send focus to a window and then it disappears, you can
-               get the FocusIn FocusOut for it, after it is unmanaged.
-            */
-            if (XCheckIfEvent(ob_display, &ce, event_look_for_focusin_client,
-                              NULL))
-            {
-                XPutBackEvent(ob_display, &ce);
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "  but another FocusIn is coming\n");
-            } else {
-                focus_fallback(TRUE);
-            }
+               get the FocusIn for it, after it is unmanaged.
+               Just wait for the next FocusOut/FocusIn pair. */
         }
         else if (client != focus_client) {
             focus_left_screen = FALSE;
@@ -1718,7 +1693,7 @@ static gboolean focus_delay_func(gpointer data)
 
     event_curtime = d->time;
     if (focus_client != d->client) {
-        if (client_focus(d->client) && config_focus_raise)
+        if (client_focus(d->client, FALSE) && config_focus_raise)
             stacking_raise(CLIENT_AS_WINDOW(d->client));
     }
     event_curtime = old;

@@ -44,14 +44,6 @@ ObClient *focus_client = NULL;
 GList *focus_order = NULL;
 ObClient *focus_cycle_target = NULL;
 
-/*! This variable is used for focus fallback. If we fallback to a window, we
-  set this to the window. And when focus goes somewhere after that, it will
-  be set to NULL. If between falling back to that window and something
-  getting focused, the window gets unmanaged, then if there are no incoming
-  FocusIn events, we fallback again because focus has just gotten itself lost.
- */
-static ObClient *focus_tried = NULL;
-
 struct {
     InternalWindow top;
     InternalWindow left;
@@ -69,7 +61,6 @@ static gboolean valid_focus_target(ObClient *ft,
                                    gboolean dock_windows,
                                    gboolean desktop_windows);
 static void focus_cycle_destroy_notify(ObClient *client, gpointer data);
-static void focus_tried_hide_notify(ObClient *client, gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -88,8 +79,6 @@ void focus_startup(gboolean reconfig)
         XSetWindowAttributes attr;
 
         client_add_destroy_notify(focus_cycle_destroy_notify, NULL);
-        client_add_destroy_notify(focus_tried_hide_notify, NULL);
-        client_add_hide_notify(focus_tried_hide_notify, NULL);
 
         /* start with nothing focused */
         focus_nothing();
@@ -143,8 +132,6 @@ void focus_shutdown(gboolean reconfig)
 
     if (!reconfig) {
         client_remove_destroy_notify(focus_cycle_destroy_notify);
-        client_remove_destroy_notify(focus_tried_hide_notify);
-        client_remove_hide_notify(focus_tried_hide_notify);
 
         /* reset focus to root */
         XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
@@ -173,6 +160,9 @@ void focus_set_client(ObClient *client)
     ob_debug_type(OB_DEBUG_FOCUS,
                   "focus_set_client 0x%lx\n", client ? client->window : 0);
 
+    if (focus_client == client)
+        return;
+
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
@@ -198,102 +188,88 @@ void focus_set_client(ObClient *client)
         PROP_SET32(RootWindow(ob_display, ob_screen),
                    net_active_window, window, active);
     }
-
-
-    focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
-    ob_debug_type(OB_DEBUG_FOCUS, "focus tried = NULL\n");
 }
 
-static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
+static ObClient* focus_fallback_target(gboolean allow_refocus)
 {
     GList *it;
-    ObClient *target = NULL;
-    ObClient *desktop = NULL;
+    ObClient *c;
+    ObClient *old = focus_client;
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
     if (config_focus_follow && !config_focus_last)
-    {
-        if ((target = client_under_pointer()))
-            if (allow_refocus || target != old)
-                if (client_normal(target) && client_can_focus(target)) {
-                    ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
-                    return target;
-                }
-    }
-
-#if 0
-        /* try for group relations */
-        if (old->group) {
-            GSList *sit;
-
-            for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
-                for (sit = old->group->members; sit; sit = g_slist_next(sit))
-                    if (sit->data == it->data)
-                        if (sit->data != old && client_normal(sit->data))
-                            if (client_can_focus(sit->data))
-                                return sit->data;
+        if ((c = client_under_pointer()) &&
+            (allow_refocus || c != old) &&
+            (client_normal(c) &&
+             client_focus(c, TRUE)))
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
+            return c;
         }
-#endif
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying omnipresentness\n");
-    if (allow_refocus && old && old->desktop == DESKTOP_ALL &&
-        client_normal(old))
+    if (allow_refocus && old &&
+        old->desktop == DESKTOP_ALL &&
+        client_normal(old) &&
+        client_focus(old, TRUE))
     {
+        ob_debug_type(OB_DEBUG_FOCUS, "found in omnipresentness\n");
         return old;
     }
 
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order\n");
-    for (it = focus_order; it; it = g_list_next(it))
-        if (allow_refocus || it->data != old) {
-            ObClient *c = it->data;
-            /* fallback focus to a window if:
-               1. it is actually focusable, cuz if it's not then we're sending
-               focus off to nothing. this includes if it is visible right now
-               2. it is on the current desktop. this ignores omnipresent
-               windows, which are problematic in their own rite.
-               3. it is a normal type window, don't fall back onto a dock or
-               a splashscreen or a desktop window (save the desktop as a
-               backup fallback though)
-            */
-            if (client_can_focus(c))
-            {
-                if (c->desktop == screen_desktop && client_normal(c)) {
-                    ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
-                    return it->data;
-                } else if (c->type == OB_CLIENT_TYPE_DESKTOP && 
-                           desktop == NULL)
-                    desktop = c;
-            }
+    for (it = focus_order; it; it = g_list_next(it)) {
+        c = it->data;
+        /* fallback focus to a window if:
+           1. it is on the current desktop. this ignores omnipresent
+           windows, which are problematic in their own rite.
+           2. it is a normal type window, don't fall back onto a dock or
+           a splashscreen or a desktop window (save the desktop as a
+           backup fallback though)
+        */
+        if (c->desktop == screen_desktop &&
+            client_normal(c) &&
+            (allow_refocus || c != old) &&
+            client_focus(c, TRUE))
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
+            return c;
         }
+    }
 
-    /* as a last resort fallback to the desktop window if there is one.
-       (if there's more than one, then the one most recently focused.)
-    */
-    ob_debug_type(OB_DEBUG_FOCUS, "found desktop: \n", !!desktop);
-    return desktop;   
+    ob_debug_type(OB_DEBUG_FOCUS, "trying a desktop window\n");
+    for (it = focus_order; it; it = g_list_next(it)) {
+        c = it->data;
+        /* fallback focus to a window if:
+           1. it is on the current desktop. this ignores omnipresent
+           windows, which are problematic in their own rite.
+           2. it is a normal type window, don't fall back onto a dock or
+           a splashscreen or a desktop window (save the desktop as a
+           backup fallback though)
+        */
+        if (c->type == OB_CLIENT_TYPE_DESKTOP &&
+            (allow_refocus || c != old) &&
+            client_focus(c, TRUE))
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window\n");
+            return c;
+        }
+    }
+
+    return NULL;
 }
 
 ObClient* focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
-    ObClient *old;
-
-    old = focus_client;
-    new = focus_fallback_target(allow_refocus, focus_client);
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when we try focus them, we won't get a FocusIn
        event at all for them. */
     focus_nothing();
 
-    if (new) {
-        client_focus(new);
-        /* remember that we tried to send focus here */
-        focus_tried = new;
-
-        ob_debug_type(OB_DEBUG_FOCUS, "focus tried = %s\n", new->title);
-    }
+    new = focus_fallback_target(allow_refocus);
 
     return new;
 }
@@ -312,9 +288,6 @@ void focus_nothing()
        ends up being NULL anyways.
     focus_client = NULL;
     */
-
-    focus_tried = NULL; /* focus isn't "trying" to go anywhere now */
-    ob_debug_type(OB_DEBUG_FOCUS, "focus tried = NULL\n");
 
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events
@@ -962,29 +935,4 @@ ObClient *focus_order_find_first(guint desktop)
             return c;
     }
     return NULL;
-}
-
-static void focus_tried_hide_notify(ObClient *client, gpointer data)
-{
-    XEvent ce;
-
-    ob_debug_type(OB_DEBUG_FOCUS, "checking focus tried (%s) against %s\n",
-                  (focus_tried?focus_tried->title:"(null)"), client->title);
-
-    if (client == focus_tried) {
-        /* we were trying to focus this window but it's gone */
-
-        focus_tried = NULL;
-
-        ob_debug_type(OB_DEBUG_FOCUS, "Tried to focus window 0x%x and it "
-                      "is being unmanaged:\n");
-        if (XCheckIfEvent(ob_display, &ce, event_look_for_focusin_client,NULL))
-        {
-            XPutBackEvent(ob_display, &ce);
-            ob_debug_type(OB_DEBUG_FOCUS, "  but another FocusIn is coming\n");
-        } else {
-            ob_debug_type(OB_DEBUG_FOCUS, "  so falling back focus again.\n");
-            focus_fallback(TRUE);
-        }
-    }
 }

@@ -115,7 +115,7 @@ struct SendToDesktopDirection {
 };
 
 struct Desktop {
-    struct InteractiveAction inter;
+    struct AnyAction inter;
     guint desk;
 };
 

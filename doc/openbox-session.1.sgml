@@ -18,7 +18,7 @@ manpage.1: manpage.sgml
 
   <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
   <!ENTITY dhucpackage "<refentrytitle>OPENBOX</refentrytitle>">
-  <!ENTITY dhpackage   "openbox-gnome-session">
+  <!ENTITY dhpackage   "openbox-session">
 ]>
 
 <refentry>
@@ -30,19 +30,36 @@ manpage.1: manpage.sgml
   <refnamediv>
     <refname>&dhpackage;</refname>
 
-    <refpurpose>Run a GNOME session with Openbox as the window manager
+    <refpurpose>Runs an Openbox session without any session manager.
       </refpurpose>
   </refnamediv>
   <refsect1>
     <title>DESCRIPTION</title>
 
-    <para><command>&dhpackage;</command> runs a GNOME session with
-      Openbox as the window manager.</para>
+    <para><command>&dhpackage;</command> runs an openbox session without
+      any session manager. Without a session manager, you will not be able
+      to save your state from one log in to the next.</para>
+
+    <para>On log in, <command>&dhpackage;</command> will run the
+      ~/.config/openbox/autostart.sh script if it exists, and will run the
+      system-wide script @configdir@/openbox/autostart.sh otherwise. You may
+      place anything you want to run automatically in those files, for example:
+      </para>
+
+    <blockquote><literallayout>
+      xsetroot -solid grey &
+      gnome-settings-daemon &</literallayout></blockquote>
+
+    <para>Make sure that each line is followed by a "&" or else the script will
+      stop there and further commands will not be executed. You can use the
+      @configdir@/openbox/autostart.sh file as an example for creating your
+      own.</para>
+
   </refsect1>
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para>openbox(1), openbox-kde-session (1), openbox-session(1).
+    <para>openbox(1), openbox-kde-session (1), openbox-gnome-session (1).
       </para>
 
     <para>The program's full documentation is available on the website:

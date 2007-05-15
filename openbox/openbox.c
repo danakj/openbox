@@ -311,7 +311,7 @@ gint main(gint argc, gchar **argv)
                     (w = g_hash_table_lookup(window_map, &xid)) &&
                     WINDOW_IS_CLIENT(w))
                 {
-                    client_focus(WINDOW_AS_CLIENT(w), FALSE);
+                    client_focus(WINDOW_AS_CLIENT(w));
                 }
             } else {
                 GList *it;

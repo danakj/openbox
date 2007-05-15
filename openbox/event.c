@@ -1693,7 +1693,7 @@ static gboolean focus_delay_func(gpointer data)
 
     event_curtime = d->time;
     if (focus_client != d->client) {
-        if (client_focus(d->client, FALSE) && config_focus_raise)
+        if (client_focus(d->client) && config_focus_raise)
             stacking_raise(CLIENT_AS_WINDOW(d->client));
     }
     event_curtime = old;

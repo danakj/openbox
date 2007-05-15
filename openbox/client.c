@@ -2842,7 +2842,7 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     if (fs) {
         /* try focus us when we go into fullscreen mode */
-        client_focus(self, FALSE);
+        client_focus(self);
     }
 }
 
@@ -3336,7 +3336,7 @@ gboolean client_can_focus(ObClient *self)
     return TRUE;
 }
 
-gboolean client_focus(ObClient *self, gboolean checkinvalid)
+gboolean client_focus(ObClient *self)
 {
     /* choose the correct target */
     self = client_focus_target(self);
@@ -3363,8 +3363,7 @@ gboolean client_focus(ObClient *self, gboolean checkinvalid)
     if (keyboard_interactively_grabbed())
         keyboard_interactive_cancel();
 
-    if (checkinvalid)
-        xerror_set_ignore(TRUE);
+    xerror_set_ignore(TRUE);
     xerror_occured = FALSE;
 
     if (self->can_focus) {
@@ -3389,8 +3388,7 @@ gboolean client_focus(ObClient *self, gboolean checkinvalid)
         XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    if (checkinvalid)
-        xerror_set_ignore(FALSE);
+    xerror_set_ignore(FALSE);
 
     return !xerror_occured;
 }
@@ -3426,7 +3424,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
     if (raise)
         stacking_raise(CLIENT_AS_WINDOW(self));
 
-    client_focus(self, FALSE);
+    client_focus(self);
 }
 
 void client_activate(ObClient *self, gboolean here, gboolean user)

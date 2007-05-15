@@ -53,7 +53,7 @@ extern DesktopLayout screen_desktop_layout;
 extern gchar **screen_desktop_names;
 
 /*! Take over the screen, set the basic hints on it claming it as ours */
-gboolean screen_annex(const gchar *program_name);
+gboolean screen_annex();
 
 /*! Once the screen is ours, set up its initial state */
 void screen_startup(gboolean reconfig);

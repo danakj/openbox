@@ -31,7 +31,7 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
 
-bin_SCRIPTS = \
+nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session
@@ -375,7 +375,6 @@ data/xsession/openbox-gnome.desktop: \
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $< >$@
-	@chmod a+x $@
 
 data/xsession/openbox-kde.desktop: \
 		$(srcdir)/data/xsession/openbox-kde.desktop.in
@@ -383,7 +382,6 @@ data/xsession/openbox-kde.desktop: \
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $< >$@
-	@chmod a+x $@
 
 data/xsession/openbox.desktop: \
 		$(srcdir)/data/xsession/openbox.desktop.in
@@ -391,7 +389,6 @@ data/xsession/openbox.desktop: \
 	@mkdir data 2>/dev/null || true
 	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $< >$@
-	@chmod a+x $@
 
 data/xsession/openbox-gnome-session: \
 		$(srcdir)/data/xsession/openbox-gnome-session.in
@@ -440,21 +437,12 @@ doc/openbox-kde-session.1: $(srcdir)/doc/openbox-kde-session.1.sgml
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop
 
-dist_xsessions_DATA = \
+nodist_xsessions_DATA = \
 	data/xsession/openbox.desktop \
 	data/xsession/openbox-gnome.desktop \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
-	debian/changelog.in \
-	debian/compat \
-	debian/conffiles \
-	debian/control \
-	debian/copyright \
-	debian/menu \
-	debian/postinst \
-	debian/postrm \
-	debian/rules \
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \
@@ -465,6 +453,10 @@ dist_noinst_DATA = \
 	data/xsession/openbox-session.in \
 	data/xsession/openbox-gnome-session.in \
 	data/xsession/openbox-kde-session.in \
+	doc/openbox.1.sgml \
+	doc/openbox-session.1.sgml \
+	doc/openbox-gnome-session.1.sgml \
+	doc/openbox-kde-session.1.sgml \
 	render/obrender-3.0.pc.in \
 	parser/obparser-3.0.pc.in \
 	tools/themeupdate/themeupdate.py \
@@ -489,6 +481,8 @@ dist_doc_DATA = \
 	COMPLIANCE \
 	README \
 	AUTHORS \
+	CHANGELOG \
+	COPYING \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/themerc.xsd \
@@ -501,10 +495,17 @@ dist_man_MANS = \
 	doc/openbox-kde-session.1
 
 EXTRA_DIST = \
+	debian/changelog.in \
+	debian/compat \
+	debian/conffiles \
+	debian/control \
+	debian/copyright \
+	debian/menu \
+	debian/postinst \
+	debian/postrm \
+	debian/rules \
 	config.rpath \
-	mkinstalldirs \
-	CHANGELOG \
-	COPYING
+	mkinstalldirs
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

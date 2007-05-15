@@ -212,7 +212,7 @@ gint main(gint argc, gchar **argv)
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
 
-    if (screen_annex(program_name)) { /* it will be ours! */
+    if (screen_annex()) { /* it will be ours! */
         do {
             modkeys_startup(reconfigure);
 

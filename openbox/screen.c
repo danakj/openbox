@@ -153,7 +153,7 @@ static gboolean replace_wm()
     return TRUE;
 }
 
-gboolean screen_annex(const gchar *program_name)
+gboolean screen_annex()
 {
     XSetWindowAttributes attrib;
     pid_t pid;
@@ -203,7 +203,7 @@ gboolean screen_annex(const gchar *program_name)
                net_supporting_wm_check, window, screen_support_win);
 
     /* set properties on the supporting window */
-    PROP_SETS(screen_support_win, net_wm_name, program_name);
+    PROP_SETS(screen_support_win, net_wm_name, "Openbox");
     PROP_SET32(screen_support_win, net_supporting_wm_check,
                window, screen_support_win);
 

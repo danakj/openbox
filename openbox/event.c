@@ -515,7 +515,7 @@ static void event_process(const XEvent *ec, gpointer data)
                           "Focus went to a window that is already gone\n");
 
             /* If you send focus to a window and then it disappears, you can
-               get the FocusIn FocusOut for it, after it is unmanaged.
+               get the FocusIn for it, after it is unmanaged.
                Just wait for the next FocusOut/FocusIn pair. */
         }
         else if (client != focus_client) {

@@ -2842,7 +2842,7 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     if (fs) {
         /* try focus us when we go into fullscreen mode */
-        client_focus(self);
+        client_focus(self, FALSE);
     }
 }
 
@@ -3336,10 +3336,8 @@ gboolean client_can_focus(ObClient *self)
     return TRUE;
 }
 
-gboolean client_focus(ObClient *self)
+gboolean client_focus(ObClient *self, gboolean checkinvalid)
 {
-    gboolean error;
-
     /* choose the correct target */
     self = client_focus_target(self);
 
@@ -3365,8 +3363,9 @@ gboolean client_focus(ObClient *self)
     if (keyboard_interactively_grabbed())
         keyboard_interactive_cancel();
 
-    error = FALSE;
-    xerror_set_ignore(TRUE);
+    if (checkinvalid)
+        xerror_set_ignore(TRUE);
+    xerror_occured = FALSE;
 
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
@@ -3390,13 +3389,10 @@ gboolean client_focus(ObClient *self)
         XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    /* This calls XSync, which will cause the FocusIn to come back to us.
-       That's important for desktop switches, since otherwise we'll have no
-       FocusIn on the queue and end up falling back again. */
-    xerror_set_ignore(FALSE);
-    if (!xerror_occured) error = TRUE;
+    if (checkinvalid)
+        xerror_set_ignore(FALSE);
 
-    return !error;
+    return !xerror_occured;
 }
 
 /*! Present the client to the user.
@@ -3430,7 +3426,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
     if (raise)
         stacking_raise(CLIENT_AS_WINDOW(self));
 
-    client_focus(self);
+    client_focus(self, FALSE);
 }
 
 void client_activate(ObClient *self, gboolean here, gboolean user)

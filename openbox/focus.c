@@ -190,91 +190,86 @@ void focus_set_client(ObClient *client)
     }
 }
 
-static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
+static ObClient* focus_fallback_target(gboolean allow_refocus)
 {
     GList *it;
-    ObClient *target = NULL;
-    ObClient *desktop = NULL;
+    ObClient *c;
+    ObClient *old = focus_client;
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
     if (config_focus_follow && !config_focus_last)
-    {
-        if ((target = client_under_pointer()))
-            if (allow_refocus || target != old)
-                if (client_normal(target) && client_can_focus(target)) {
-                    ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
-                    return target;
-                }
-    }
-
-#if 0
-        /* try for group relations */
-        if (old->group) {
-            GSList *sit;
-
-            for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
-                for (sit = old->group->members; sit; sit = g_slist_next(sit))
-                    if (sit->data == it->data)
-                        if (sit->data != old && client_normal(sit->data))
-                            if (client_can_focus(sit->data))
-                                return sit->data;
+        if ((c = client_under_pointer()) &&
+            (allow_refocus || c != old) &&
+            (client_normal(c) &&
+             client_focus(c, TRUE)))
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
+            return c;
         }
-#endif
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying omnipresentness\n");
-    if (allow_refocus && old && old->desktop == DESKTOP_ALL &&
-        client_normal(old))
+    if (allow_refocus && old &&
+        old->desktop == DESKTOP_ALL &&
+        client_normal(old) &&
+        client_focus(old, TRUE))
     {
+        ob_debug_type(OB_DEBUG_FOCUS, "found in omnipresentness\n");
         return old;
     }
 
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order\n");
-    for (it = focus_order; it; it = g_list_next(it))
-        if (allow_refocus || it->data != old) {
-            ObClient *c = it->data;
-            /* fallback focus to a window if:
-               1. it is actually focusable, cuz if it's not then we're sending
-               focus off to nothing. this includes if it is visible right now
-               2. it is on the current desktop. this ignores omnipresent
-               windows, which are problematic in their own rite.
-               3. it is a normal type window, don't fall back onto a dock or
-               a splashscreen or a desktop window (save the desktop as a
-               backup fallback though)
-            */
-            if (client_can_focus(c))
-            {
-                if (c->desktop == screen_desktop && client_normal(c)) {
-                    ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
-                    return it->data;
-                } else if (c->type == OB_CLIENT_TYPE_DESKTOP && 
-                           desktop == NULL)
-                    desktop = c;
-            }
+    for (it = focus_order; it; it = g_list_next(it)) {
+        c = it->data;
+        /* fallback focus to a window if:
+           1. it is on the current desktop. this ignores omnipresent
+           windows, which are problematic in their own rite.
+           2. it is a normal type window, don't fall back onto a dock or
+           a splashscreen or a desktop window (save the desktop as a
+           backup fallback though)
+        */
+        if (c->desktop == screen_desktop &&
+            client_normal(c) &&
+            (allow_refocus || c != old) &&
+            client_focus(c, TRUE))
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
+            return c;
         }
+    }
 
-    /* as a last resort fallback to the desktop window if there is one.
-       (if there's more than one, then the one most recently focused.)
-    */
-    ob_debug_type(OB_DEBUG_FOCUS, "found desktop: \n", !!desktop);
-    return desktop;   
+    ob_debug_type(OB_DEBUG_FOCUS, "trying a desktop window\n");
+    for (it = focus_order; it; it = g_list_next(it)) {
+        c = it->data;
+        /* fallback focus to a window if:
+           1. it is on the current desktop. this ignores omnipresent
+           windows, which are problematic in their own rite.
+           2. it is a normal type window, don't fall back onto a dock or
+           a splashscreen or a desktop window (save the desktop as a
+           backup fallback though)
+        */
+        if (c->type == OB_CLIENT_TYPE_DESKTOP &&
+            (allow_refocus || c != old) &&
+            client_focus(c, TRUE))
+        {
+            ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window\n");
+            return c;
+        }
+    }
+
+    return NULL;
 }
 
 ObClient* focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
-    ObClient *old;
-
-    old = focus_client;
-    new = focus_fallback_target(allow_refocus, focus_client);
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when we try focus them, we won't get a FocusIn
        event at all for them. */
     focus_nothing();
 
-    if (new)
-        client_focus(new);
+    new = focus_fallback_target(allow_refocus);
 
     return new;
 }

@@ -532,9 +532,10 @@ ObClient *client_focus_target(ObClient *self);
 gboolean client_can_focus(ObClient *self);
 
 /*! Attempt to focus the client window
-  NOTE: You should validate the client before calling this !! (client_validate)
-*/
-gboolean client_focus(ObClient *self);
+  If you care if focus actually went to the window or not, pass checkinvalid
+  as TRUE.
+ */
+gboolean client_focus(ObClient *self, gboolean checkinvalid);
 
 /*! Activates the client for use, focusing, uniconifying it, etc. To be used
   when the user deliberately selects a window for use.

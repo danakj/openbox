@@ -1296,7 +1296,7 @@ void action_focus(union ActionData *data)
                go moving on us */
             event_halt_focus_delay();
 
-            client_focus(data->client.any.c);
+            client_focus(data->client.any.c, FALSE);
         }
     } else {
         /* focus action on something other than a client, make keybindings

@@ -942,7 +942,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
             ObClient *c = it->data;
             if (c->type == OB_CLIENT_TYPE_DESKTOP &&
                 (c->desktop == screen_desktop || c->desktop == DESKTOP_ALL) &&
-                client_focus(it->data))
+                client_focus(it->data, FALSE))
                 break;
         }
     }

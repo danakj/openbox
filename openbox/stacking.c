@@ -426,16 +426,21 @@ void stacking_add_nonintrusive(ObWindow *win)
         }
     }
     if (!it_below) {
-        if (client_search_transient(client, focus_client)) {
-            /* it's focused so put it at the top */
-            stacking_list = g_list_append(stacking_list, win);
-            stacking_raise(win);
-        } else {
-            /* there is no window to put this directly above, so put it at the
-               bottom */
-            stacking_list = g_list_prepend(stacking_list, win);
-            stacking_lower(win);
-        }
+        /* There is no window to put this directly above, so put it at the
+           top, so you know it is there.
+
+           It used to do this only if the window was focused and lower
+           it otherwise.
+
+           We also put it at the top not the bottom to fix a bug with
+           fullscreen windows. When focusLast is off and followsMouse is
+           on, when you switch desktops, the fullscreen window loses
+           focus and goes into its lower layer. If this puts it at the
+           bottom then when you come back to the desktop, the window is
+           at the bottom and won't get focus back.
+        */
+        stacking_list = g_list_append(stacking_list, win);
+        stacking_raise(win);
     } else {
         /* make sure it's not in the wrong layer though ! */
         for (; it_below; it_below = g_list_next(it_below))

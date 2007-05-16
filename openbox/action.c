@@ -1143,7 +1143,7 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                button release gettnig processed first. answer: don't queue
                moveresize starts. UGLY HACK XXX */
             if (a->data.any.interactive || a->func == action_move ||
-                a->func == action_resize)
+                a->func == action_resize || a->func == action_showmenu)
             {
                 /* interactive actions are not queued */
                 a->func(&a->data);

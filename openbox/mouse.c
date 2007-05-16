@@ -205,6 +205,11 @@ void mouse_event(ObClient *client, XEvent *e)
                      e->xbutton.x_root, e->xbutton.y_root,
                      e->xbutton.time);
 
+        /* if the bindings grab the pointer, there won't be a ButtonRelease
+           event for us */
+        if (grab_on_pointer())
+            button = 0;
+
         if (CLIENT_CONTEXT(context, client)) {
             /* Replay the event, so it goes to the client*/
             XAllowEvents(ob_display, ReplayPointer, event_curtime);

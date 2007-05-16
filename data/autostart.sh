@@ -29,3 +29,11 @@ fi
 if which start_kdeinit >/dev/null; then
   LD_BIND_NOW=true start_kdeinit --new-startup +kcminit_startup &
 fi
+
+# Support for SCIM
+if which scim >/dev/null; then
+  export XMODIFIERS=@im=SCIM
+  export GTK_IM_MODULE=scim
+  export QT_IM_MODULE=scim
+  scim -d &
+fi

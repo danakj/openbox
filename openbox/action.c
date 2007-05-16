@@ -1141,7 +1141,13 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
 
             /* XXX UGLY HACK race with motion event starting a move and the
                button release gettnig processed first. answer: don't queue
-               moveresize starts. UGLY HACK XXX */
+               moveresize starts. UGLY HACK XXX
+
+               XXX ALSO don't queue showmenu events, because on button press
+               events we need to know if a mouse grab is going to take place,
+               and set the button to 0, so that later motion events don't think
+               that a drag is going on. since showmenu grabs the pointer..
+            */
             if (a->data.any.interactive || a->func == action_move ||
                 a->func == action_resize || a->func == action_showmenu)
             {

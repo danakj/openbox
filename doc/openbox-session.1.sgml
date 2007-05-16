@@ -59,11 +59,11 @@ manpage.1: manpage.sgml
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para>openbox(1), openbox-kde-session (1), openbox-gnome-session (1).
+    <para>openbox(1), openbox-session(1), openbox-gnome-session(1).
       </para>
 
     <para>The program's full documentation is available on the website:
-      <literal>http://openbox.org/</literal></para>
+      <literal>http://icculus.org/openbox/</literal></para>
 
     <para>Please report bugs to: <literal>http://bugzilla.icculus.org/
       </literal></para>

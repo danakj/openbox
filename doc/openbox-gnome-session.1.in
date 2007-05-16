@@ -8,12 +8,12 @@ openbox-gnome-session \(em Run a GNOME session with Openbox as the window manage
 Openbox as the window manager. 
 .SH "SEE ALSO" 
 .PP 
-openbox(1), openbox-kde-session (1), openbox-session(1). 
+openbox(1), openbox-kde-session(1), openbox-session(1). 
  
 .PP 
 The program's full documentation is available on the website: 
-\fBhttp://openbox.org/\fP 
+\fBhttp://icculus.org/openbox/\fP 
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Tue 15 May 2007, 20:08 
+.\" created by instant / docbook-to-man, Wed 16 May 2007, 01:19 

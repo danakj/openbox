@@ -414,25 +414,15 @@ data/xsession/openbox-session: \
 	@$(edit) $< >$@
 	@chmod a+x $@
 
-doc/openbox.1: $(srcdir)/doc/openbox.1.sgml
+%.1.in: %.1.sgml
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@$(edit) $< | docbook-to-man - >$@
+	@docbook-to-man $< >$@
 
-doc/openbox-session.1: $(srcdir)/doc/openbox-session.1.sgml
+%.1: %.1.in
 	@echo make: creating $@
 	@mkdir doc 2>/dev/null || true
-	@$(edit) $< | docbook-to-man - >$@
-
-doc/openbox-gnome-session.1: $(srcdir)/doc/openbox-gnome-session.1.sgml
-	@echo make: creating $@
-	@mkdir doc 2>/dev/null || true
-	@$(edit) $< | docbook-to-man - >$@
-
-doc/openbox-kde-session.1: $(srcdir)/doc/openbox-kde-session.1.sgml
-	@echo make: creating $@
-	@mkdir doc 2>/dev/null || true
-	@$(edit) $< | docbook-to-man - >$@
+	@$(edit) $< >$@	
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop
@@ -454,9 +444,13 @@ dist_noinst_DATA = \
 	data/xsession/openbox-gnome-session.in \
 	data/xsession/openbox-kde-session.in \
 	doc/openbox.1.sgml \
+	doc/openbox.1.in \
 	doc/openbox-session.1.sgml \
+	doc/openbox-session.1.in \
 	doc/openbox-gnome-session.1.sgml \
+	doc/openbox-gnome-session.1.in \
 	doc/openbox-kde-session.1.sgml \
+	doc/openbox-kde-session.1.in \
 	render/obrender-3.0.pc.in \
 	parser/obparser-3.0.pc.in \
 	tools/themeupdate/themeupdate.py \

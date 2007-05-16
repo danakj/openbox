@@ -21,7 +21,7 @@ launch GNOME or KDE with Openbox as the window manager.
 .PP 
 The third option at log in, which is \fBOpenbox\fR       without a session manager, uses the \fBopenbox-session\fR       command to start Openbox. On log in, \fBopenbox\fR will 
 run the ~/.config/openbox/autostart.sh script if it exists, and will run 
-the system-wide script /opt/openbox/etc/xdg/openbox/autostart.sh otherwise. You 
+the system-wide script @configdir@/openbox/autostart.sh otherwise. You 
 may place anything you want to run automatically in those files, for 
 example: 
  
@@ -36,10 +36,10 @@ gnome-settings-daemon &
 .PP 
 Make sure that each line is followed by a "&" or else the script will 
 stop there and further commands will not be executed. You can use the 
-/opt/openbox/etc/xdg/openbox/autostart.sh file as an example for creating your 
+@configdir@/openbox/autostart.sh file as an example for creating your 
 own. 
 .PP 
-The default /opt/openbox/etc/xdg/openbox/autostart.sh runs a number of things 
+The default @configdir@/openbox/autostart.sh runs a number of things 
 with Openbox. 
 .PP 
 Lastly, if you use \fBstartx\fR to launch your X 
@@ -54,7 +54,7 @@ is possible by editing the configuration files by hand. Please note that
 for you. 
 .PP 
 The default configuration and menu files are installed in 
-/opt/openbox/etc/xdg/openbox/, and the user configuration is placed in 
+@configdir@/openbox/, and the user configuration is placed in 
 ~/.config/openbox/. You can copy the default configuration and menus 
 to ~/.config/openbox and edit it to your liking. 
 .SH "OPTIONS" 
@@ -91,4 +91,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Mon 14 May 2007, 22:02 
+.\" created by instant / docbook-to-man, Tue 15 May 2007, 20:08 

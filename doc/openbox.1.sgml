@@ -30,8 +30,8 @@ manpage.1: manpage.sgml
   <refnamediv>
     <refname>&dhpackage;</refname>
 
-    <refpurpose>Next generation, highly configurable window manager
-      </refpurpose>
+    <refpurpose>A minimalistic, highly configurable, next generation window
+      manager with extensive standards support.</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
@@ -50,9 +50,8 @@ manpage.1: manpage.sgml
   <refsect1>
     <title>DESCRIPTION</title>
 
-    <para>Openbox is a next generation, highly
-      configurable window manager. Openbox is compliant with the
-      latest window manager standards.</para>
+    <para>Openbox is minimalistic, highly configurable, next generation window
+      manager with extensive standards support.</para>
 
     <para>You can start Openbox in three ways:</para>
 

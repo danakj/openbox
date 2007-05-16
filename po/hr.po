@@ -336,34 +336,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "Povuci &gore"
-
-#~ msgid "Roll &down"
-#~ msgstr "Spusti &dolje"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "Podigni na &vrh"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "Spusti na &dno"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id zahtjeva argument\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id zahtjeva argument\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file zahtjeva argument\n"
-
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "Nemogu pokrenuti Xft."
-
-#~ msgid "Trying fallback font: %s\n"
-#~ msgstr "Isprobavam osnovni tip slova: %s\n"

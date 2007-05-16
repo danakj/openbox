@@ -336,28 +336,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "ロールアップ(&U)"
-
-#~ msgid "Roll &down"
-#~ msgstr "ロールダウン(&R)"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "最上位に上げる(&T)"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "最下位に下げる(&B)"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id には引数が必要です\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id には引数が必要です\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file には引数が必要です\n"

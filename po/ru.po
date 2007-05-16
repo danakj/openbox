@@ -337,34 +337,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "Скрутить(&U)"
-
-#~ msgid "Roll &down"
-#~ msgstr "Раскрутить(&W)"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "Поднять на передний план(&T)"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "Опустить на задний план(&B)"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id требует параметр\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id требует параметр\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file требует параметр\n"
-
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "Не удалось инициализировать Xft."
-
-#~ msgid "Trying fallback font: %s\n"
-#~ msgstr "Попытка вернуть шрифт: %s\n"

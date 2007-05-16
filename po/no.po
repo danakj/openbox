@@ -337,34 +337,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "Rull &opp"
-
-#~ msgid "Roll &down"
-#~ msgstr "Rull &ned"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "Legg ø&verst"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "Legg &nederst"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id krever et argument\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id krever et argument\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file krever et argument\n"
-
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "Kunde ikke initialisere Xft."
-
-#~ msgid "Trying fallback font: %s\n"
-#~ msgstr "Prøver med reservefonten: %s\n"

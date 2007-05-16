@@ -1,4 +1,5 @@
-#!/bin/sh
+# This shell script is run before Openbox launches.
+# Environment variables set here are passed to the Openbox session.
 
 # Set a background color
 BG=""

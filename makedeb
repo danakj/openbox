@@ -1,10 +1,21 @@
 #!/bin/sh
 
+if test "$1" = "ubuntu"; then
+    APPEND="ubuntu1";
+else
+    if test "$1" = "debian"; then
+        APPEND="";
+    else
+        echo "Usage: makedeb [ubuntu|debian]";
+        exit 1;
+    fi
+fi
+
 # get the version from configure.ac
 VERSION=$(grep AC_INIT\(\\\[openbox\\] configure.ac|cut -d [ -f 3-|cut -d ] -f 1)
 
 echo
-echo "Building deb for openbox-$VERSION"
+echo "Building deb for openbox-$VERSION$APPEND"
 echo
 
 TIME="$(date '+%a, %d %B %Y %T %z')"
@@ -17,6 +28,6 @@ make distclean > /dev/null || rm -f config.status
 
 rm -f $OUT
 
-sed -e "s!@time@!$TIME!" -e "s!@version@!$VERSION!" $IN >$OUT && \
+sed -e "s!@time@!$TIME!" -e "s!@version@!$VERSION$APPEND!" $IN >$OUT && \
 fakeroot debian/rules binary && \
 make distclean > /dev/null

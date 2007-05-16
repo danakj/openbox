@@ -1,15 +1,14 @@
 .TH "OPENBOX" "1" 
 .SH "NAME" 
-openbox \(em Next generation, highly configurable window manager 
- 
+openbox \(em A minimalistic, highly configurable, next generation window 
+manager with extensive standards support. 
 .SH "SYNOPSIS" 
 .PP 
 \fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  [\fB\-\-debug-xinerama\fP]  
 .SH "DESCRIPTION" 
 .PP 
-Openbox is a next generation, highly 
-configurable window manager. Openbox is compliant with the 
-latest window manager standards. 
+Openbox is minimalistic, highly configurable, next generation window 
+manager with extensive standards support. 
 .PP 
 You can start Openbox in three ways: 
 .PP 
@@ -91,4 +90,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Wed 16 May 2007, 01:19 
+.\" created by instant / docbook-to-man, Wed 16 May 2007, 13:16 

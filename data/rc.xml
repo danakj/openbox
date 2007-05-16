@@ -158,13 +158,13 @@
     <action name="Desktop"><desktop>1</desktop></action>
   </keybind>
   <keybind key="W-F2">
-    <action name="Desktop"><desktop>1</desktop></action>
+    <action name="Desktop"><desktop>2</desktop></action>
   </keybind>
   <keybind key="W-F3">
-    <action name="Desktop"><desktop>1</desktop></action>
+    <action name="Desktop"><desktop>3</desktop></action>
   </keybind>
   <keybind key="W-F4">
-    <action name="Desktop"><desktop>1</desktop></action>
+    <action name="Desktop"><desktop>4</desktop></action>
   </keybind>
   <keybind key="W-d">
     <action name="ToggleShowDesktop"/>

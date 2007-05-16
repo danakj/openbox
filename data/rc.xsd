@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> <!-- -*- nxml -*- -->
 
-<!-- XML Schema for the openbox windowmanager configuration file -->
+<!-- XML Schema for the Openbox window manager configuration file -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/4.0/rc"

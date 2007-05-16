@@ -2339,6 +2339,7 @@ static ObStackingLayer calc_layer(ObClient *self)
     else if ((self->fullscreen ||
               /* no decorations and fills the monitor = oldskool fullscreen */
               (self->frame != NULL &&
+               self->decorations == 0 &&
                (self->frame->size.right == 0 && self->frame->size.left == 0 &&
                 self->frame->size.bottom == 0 && self->frame->size.top == 0 &&
                 RECT_EQUAL(self->area,

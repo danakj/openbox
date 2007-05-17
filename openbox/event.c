@@ -1717,39 +1717,29 @@ void event_halt_focus_delay()
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
+static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
+{
+    guint *count = (guint*)arg;
+    if (e->type == EnterNotify) {
+        ObWindow *win;
+            
+        win = g_hash_table_lookup(window_map, &e->xany.window);
+        if (win && WINDOW_IS_CLIENT(win))
+            ++(*count);
+    }
+    return False; /* don't disrupt the focus order, just count them */
+}
+
 void event_ignore_queued_enters()
 {
-    GSList *saved = NULL, *it;
-    XEvent *e;
-    gint i = 0;
+    XEvent e;
                 
     XSync(ob_display, FALSE);
 
-    /* count the events */
-    while (TRUE) {
-        e = g_new(XEvent, 1);
-        if (XCheckTypedEvent(ob_display, EnterNotify, e)) {
-            ObWindow *win;
-            
-            win = g_hash_table_lookup(window_map, &e->xany.window);
-            /* check to make sure we're not ignoring the same event multiple
-               times */
-            if (win && WINDOW_IS_CLIENT(win) && i >= ignore_enter_focus)
-                ++ignore_enter_focus;
-            
-            saved = g_slist_append(saved, e);
-            ++i;
-        } else {
-            g_free(e);
-            break;
-        }
-    }
-    /* put the events back */
-    for (it = saved; it; it = g_slist_next(it)) {
-        XPutBackEvent(ob_display, it->data);
-        g_free(it->data);
-    }
-    g_slist_free(saved);
+    /* count the events without disrupting them */
+    XCheckIfEvent(ob_display, &e, event_look_for_enters,
+                  (XPointer)&ignore_enter_focus);
+
 }
 
 gboolean event_time_after(Time t1, Time t2)

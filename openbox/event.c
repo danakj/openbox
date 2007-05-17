@@ -1727,7 +1727,7 @@ static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
         if (win && WINDOW_IS_CLIENT(win))
             ++(*count);
     }
-    return False; /* don't disrupt the focus order, just count them */
+    return False; /* don't disrupt the queue order, just count them */
 }
 
 void event_ignore_queued_enters()

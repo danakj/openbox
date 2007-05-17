@@ -1082,11 +1082,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         if (config) {
             client_find_onscreen(client, &x, &y, w, h, FALSE);
-
-            /* don't create enter events from clients moving themselves */
-            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
-            ungrab_pointer();
+
+            /* ignore enter events caused by these like ob actions do */
+            event_ignore_queued_enters();
         }
         break;
     }
@@ -1180,6 +1179,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      client->window);
             client_set_state(client, e->xclient.data.l[0],
                              e->xclient.data.l[1], e->xclient.data.l[2]);
+
+            /* ignore enter events caused by these like ob actions do */
+            event_ignore_queued_enters();
         } else if (msgtype == prop_atoms.net_close_window) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
@@ -1264,10 +1266,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_convert_gravity(client, grav, &x, &y, w, h);
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            /* don't create enter events from clients moving themselves */
-            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
-            ungrab_pointer();
+
+            /* ignore enter events caused by these like ob actions do */
+            event_ignore_queued_enters();
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,

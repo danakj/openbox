@@ -337,34 +337,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "&Zvinúť"
-
-#~ msgid "Roll &down"
-#~ msgstr "&Rozvinúť"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "Presunúť navrch"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "Presunúť naspodok"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id vyžaduje parameter\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id vyžaduje parameter\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file vyžaduje parameter\n"
-
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "Nepodarilo sa inicializovať Xft."
-
-#~ msgid "Trying fallback font: %s\n"
-#~ msgstr "Pokus o návrat k fontu: %s\n"

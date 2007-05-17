@@ -337,34 +337,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "&Rullaa"
-
-#~ msgid "Roll &down"
-#~ msgstr "&Rullaa auki"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "Nosta &päällimmäiseksi"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "&Laske alimmaiseksi"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id tarvitsee parametrin\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id tarvitsee parametrin\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file tarvitsee parametrin\n"
-
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "Xft:n käynnistys epäonnistui."
-
-#~ msgid "Trying fallback font: %s\n"
-#~ msgstr "Kokeillaan varakirjasinlajia: %s\n"

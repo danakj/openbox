@@ -338,34 +338,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "向上捲動(&U)"
-
-#~ msgid "Roll &down"
-#~ msgstr "向下捲動(&W)"
-
-#, fuzzy
-#~ msgid "Raise to &top"
-#~ msgstr "提到最上層(&T)"
-
-#, fuzzy
-#~ msgid "Lower to &bottom"
-#~ msgstr "降到最下層(&B)"
-
-#, fuzzy
-#~ msgid "  --sm-client-id ID   Specify session management ID\n"
-#~ msgstr "--sm-client-id 要求引數\n"
-
-#~ msgid "--sm-client-id requires an argument\n"
-#~ msgstr "--sm-client-id 要求引數\n"
-
-#~ msgid "--sm-save-file requires an argument\n"
-#~ msgstr "--sm-save-file 要求引數\n"
-
-#~ msgid "Couldn't initialize Xft."
-#~ msgstr "無法初始化 Xft。"
-
-#~ msgid "Trying fallback font: %s\n"
-#~ msgstr "正在嘗試權宜字型：%s\n"

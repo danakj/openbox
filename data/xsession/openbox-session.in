@@ -4,12 +4,10 @@ AUTOSTART="$HOME/.config/openbox/autostart.sh"
 GLOBALAUTOSTART="@configdir@/openbox/autostart.sh"
 
 if test -e $AUTOSTART; then
-    # sleep for 1 second so Openbox is there before anything else
-    (sleep 1 && . $AUTOSTART) &
+    . $AUTOSTART
 else
     if test -e $GLOBALAUTOSTART; then
-        # sleep for 1 second so Openbox is there before anything else
-        (sleep 1 && . $GLOBALAUTOSTART) &
+        . $GLOBALAUTOSTART
     fi
 fi
 

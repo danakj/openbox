@@ -28,6 +28,7 @@
 #include "config.h"
 #include "screen.h"
 #include "frame.h"
+#include "grab.h"
 #include "menu.h"
 #include "menuframe.h"
 #include "keyboard.h"
@@ -1081,7 +1082,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         if (config) {
             client_find_onscreen(client, &x, &y, w, h, FALSE);
-            client_configure_full(client, x, y, w, h, FALSE, TRUE);
+
+            /* don't create enter events from clients moving themselves */
+            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
+            client_configure(client, x, y, w, h, FALSE, TRUE);
+            ungrab_pointer();
         }
         break;
     }
@@ -1258,7 +1263,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      e->xclient.data.l[0] & 1 << 9, y);
             client_convert_gravity(client, grav, &x, &y, w, h);
             client_find_onscreen(client, &x, &y, w, h, FALSE);
+
+            /* don't create enter events from clients moving themselves */
+            grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
             client_configure(client, x, y, w, h, FALSE, TRUE);
+            ungrab_pointer();
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
@@ -1292,11 +1301,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                              e->xclient.data.l[2], FALSE);
                     /* send a synthetic ConfigureNotify, cuz this is supposed
                        to be like a ConfigureRequest. */
-                    client_configure_full(client, client->area.x,
-                                          client->area.y,
-                                          client->area.width,
-                                          client->area.height,
-                                          FALSE, TRUE);
+                    client_reconfigure(client);
                 } else
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_RESTACK_WINDOW sent for window %s "

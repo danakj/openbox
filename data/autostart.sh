@@ -1,4 +1,5 @@
-#!/bin/sh
+# This shell script is run before Openbox launches.
+# Environment variables set here are passed to the Openbox session.
 
 # Set a background color
 BG=""
@@ -28,4 +29,12 @@ fi
 # Preload stuff for KDE apps
 if which start_kdeinit >/dev/null; then
   LD_BIND_NOW=true start_kdeinit --new-startup +kcminit_startup &
+fi
+
+# Support for SCIM
+if which scim >/dev/null; then
+  export XMODIFIERS=@im=SCIM
+  export GTK_IM_MODULE=scim
+  export QT_IM_MODULE=scim
+  scim -d &
 fi

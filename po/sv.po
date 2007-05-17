@@ -331,10 +331,3 @@ msgstr "Efterfrågad tangent '%s' finns inte på displayen"
 #, c-format
 msgid "X Error: %s"
 msgstr "X Fel: %s"
-
-#, fuzzy
-#~ msgid "Roll &up"
-#~ msgstr "Rulla &upp"
-
-#~ msgid "Roll &down"
-#~ msgstr "Rull&a ner"

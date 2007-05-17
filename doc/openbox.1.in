@@ -48,9 +48,7 @@ above regarding the autostart.sh file.
 .PP 
 You can use the \fBobconf\fR tool to configure Openbox 
 easily with a graphical interface, however more in-depth configuration 
-is possible by editing the configuration files by hand. Please note that 
-\fBobconf\fR older than version 2.0 may not work at all 
-for you. 
+is possible by editing the configuration files by hand. 
 .PP 
 The default configuration and menu files are installed in 
 @configdir@/openbox/, and the user configuration is placed in 
@@ -90,4 +88,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Wed 16 May 2007, 13:16 
+.\" created by instant / docbook-to-man, Thu 17 May 2007, 12:52 

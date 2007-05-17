@@ -1721,6 +1721,7 @@ void event_ignore_queued_enters()
 {
     GSList *saved = NULL, *it;
     XEvent *e;
+    gint i = 0;
                 
     XSync(ob_display, FALSE);
 
@@ -1731,10 +1732,13 @@ void event_ignore_queued_enters()
             ObWindow *win;
             
             win = g_hash_table_lookup(window_map, &e->xany.window);
-            if (win && WINDOW_IS_CLIENT(win))
+            /* check to make sure we're not ignoring the same event multiple
+               times */
+            if (win && WINDOW_IS_CLIENT(win) && i >= ignore_enter_focus)
                 ++ignore_enter_focus;
             
             saved = g_slist_append(saved, e);
+            ++i;
         } else {
             g_free(e);
             break;

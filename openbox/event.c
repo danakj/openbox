@@ -574,7 +574,6 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, FALSE);
             if (client == focus_client)
                 focus_set_client(NULL);
-            /* focus_set_client has already been called for sure */
             client_calc_layer(client);
         }
     } else if (timewinclients)

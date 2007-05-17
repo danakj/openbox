@@ -1721,7 +1721,7 @@ void client_setup_decor_and_functions(ObClient *self)
 
 static void client_change_allowed_actions(ObClient *self)
 {
-    gulong actions[11];
+    gulong actions[12];
     gint num = 0;
 
     /* desktop windows are kept on all desktops */
@@ -1748,6 +1748,8 @@ static void client_change_allowed_actions(ObClient *self)
         actions[num++] = prop_atoms.net_wm_action_above;
     if (self->functions & OB_CLIENT_FUNC_BELOW)
         actions[num++] = prop_atoms.net_wm_action_below;
+    if (self->functions & OB_CLIENT_FUNC_UNDECORATE)
+        actions[num++] = prop_atoms.ob_wm_action_undecorate;
 
     PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
 

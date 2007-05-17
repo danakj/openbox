@@ -190,6 +190,7 @@ typedef struct Atoms {
 
     /* Openbox specific atoms */
      
+    Atom ob_wm_action_undecorate;
     Atom ob_wm_state_undecorated;
     Atom openbox_pid; /* this is depreecated in favour of ob_control */
     Atom ob_config;

@@ -1737,6 +1737,7 @@ void event_ignore_queued_enters()
     XSync(ob_display, FALSE);
 
     /* count the events without disrupting them */
+    ignore_enter_focus = 0;
     XCheckIfEvent(ob_display, &e, event_look_for_enters,
                   (XPointer)&ignore_enter_focus);
 

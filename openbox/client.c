@@ -1585,7 +1585,8 @@ void client_setup_decor_and_functions(ObClient *self)
          OB_CLIENT_FUNC_SHADE |
          OB_CLIENT_FUNC_CLOSE |
          OB_CLIENT_FUNC_BELOW |
-         OB_CLIENT_FUNC_ABOVE);
+         OB_CLIENT_FUNC_ABOVE |
+         OB_CLIENT_FUNC_UNDECORATE);
 
     if (!(self->min_size.width < self->max_size.width ||
           self->min_size.height < self->max_size.height))
@@ -1683,6 +1684,11 @@ void client_setup_decor_and_functions(ObClient *self)
     /* kill the handle on fully maxed windows */
     if (self->max_vert && self->max_horz)
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
+
+    /* If there are no decorations to remove, don't allow the user to try
+       toggle the state */
+    if (self->decorations == 0)
+        self->functions &= ~OB_CLIENT_FUNC_UNDECORATE;
 
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */
@@ -3571,7 +3577,11 @@ void client_set_layer(ObClient *self, gint layer)
 
 void client_set_undecorated(ObClient *self, gboolean undecorated)
 {
-    if (self->undecorated != undecorated) {
+    if (self->undecorated != undecorated &&
+        /* don't let it undecorate if the function is missing, but let 
+           it redecorate */
+        (self->functions & OB_CLIENT_FUNC_UNDECORATE || !undecorated))
+    {
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self);
         client_change_state(self); /* reflect this in the state hints */

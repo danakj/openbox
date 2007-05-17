@@ -91,7 +91,7 @@ static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
                 *en = c->functions & OB_CLIENT_FUNC_CLOSE;
                 break;
             case CLIENT_DECORATE:
-                *en = client_normal(c);
+                *en = c->functions & OB_CLIENT_FUNC_UNDECORATE;
                 break;
             default:
                 *en = TRUE;

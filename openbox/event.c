@@ -1301,11 +1301,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                              e->xclient.data.l[2], FALSE);
                     /* send a synthetic ConfigureNotify, cuz this is supposed
                        to be like a ConfigureRequest. */
-                    client_configure_full(client, client->area.x,
-                                          client->area.y,
-                                          client->area.width,
-                                          client->area.height,
-                                          FALSE, TRUE);
+                    client_reconfigure(client);
                 } else
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_RESTACK_WINDOW sent for window %s "

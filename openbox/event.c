@@ -359,7 +359,7 @@ static Bool event_look_for_focusin(Display *d, XEvent *e, XPointer arg)
     return e->type == FocusIn && wanted_focusevent(e, FALSE);
 }
 
-Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
+static Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
 {
     return e->type == FocusIn && wanted_focusevent(e, TRUE);
 }

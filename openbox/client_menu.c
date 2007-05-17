@@ -24,6 +24,7 @@
 #include "openbox.h"
 #include "frame.h"
 #include "moveresize.h"
+#include "event.h"
 #include "prop.h"
 #include "gettext.h"
 
@@ -90,7 +91,7 @@ static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
                 *en = c->functions & OB_CLIENT_FUNC_CLOSE;
                 break;
             case CLIENT_DECORATE:
-                *en = client_normal(c);
+                *en = c->functions & OB_CLIENT_FUNC_UNDECORATE;
                 break;
             default:
                 *en = TRUE;
@@ -118,15 +119,19 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         break;
     case CLIENT_RESTORE:
         client_maximize(c, FALSE, 0);
+        event_ignore_queued_enters();
         break;
     case CLIENT_MAXIMIZE:
         client_maximize(c, TRUE, 0);
+        event_ignore_queued_enters();
         break;
     case CLIENT_SHADE:
         client_shade(c, !c->shaded);
+        event_ignore_queued_enters();
         break;
     case CLIENT_DECORATE:
         client_set_undecorated(c, !c->undecorated);
+        event_ignore_queued_enters();
         break;
     case CLIENT_MOVE:
         /* this needs to grab the keyboard so hide the menu */
@@ -211,6 +216,8 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     default:
         g_assert_not_reached();
     }
+
+    event_ignore_queued_enters();
 
     /* update the menu cuz stuff can have changed */
     if (f) {

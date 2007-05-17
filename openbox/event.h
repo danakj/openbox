@@ -51,7 +51,4 @@ void event_halt_focus_delay();
   comes at the same time or later than t2. */
 gboolean event_time_after(Time t1, Time t2);
 
-/*! Used with XCheckIfEvent to find a focusin event on a client window */
-Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg);
-
 #endif

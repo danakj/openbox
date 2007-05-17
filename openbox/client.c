@@ -1771,8 +1771,8 @@ void client_reconfigure(ObClient *self)
     /* by making this pass FALSE for user, we avoid the emacs event storm where
        every configurenotify causes an update in its normal hints, i think this
        is generally what we want anyways... */
-    client_configure(self, self->area.x, self->area.y,
-                     self->area.width, self->area.height, FALSE, TRUE);
+    client_configure_full(self, self->area.x, self->area.y,
+                          self->area.width, self->area.height, FALSE, TRUE);
 }
 
 void client_update_wmhints(ObClient *self)
@@ -2710,6 +2710,7 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
     gint oldw, oldh;
     gboolean send_resize_client;
     gboolean moved = FALSE, resized = FALSE;
+    gboolean fmoved, fresized;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
     gint logicalw, logicalh;
@@ -2745,10 +2746,12 @@ void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
     }
 
     /* find the frame's dimensions and move/resize it */
+    fmoved = moved;
+    fresized = resized;
     if (self->decorations != fdecor || self->max_horz != fhorz)
-        moved = resized = TRUE;
-    if (moved || resized)
-        frame_adjust_area(self->frame, moved, resized, FALSE);
+        fmoved = fresized = TRUE;
+    if (fmoved || fresized)
+        frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
     if ((!user || (user && final)) && !resized)
     {
@@ -3304,19 +3307,26 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         client_calc_layer(self);
     }
 
-    /* These things below can change focus so we can't grab pointer for them */
-    ungrab_pointer();
-
     if (modal != self->modal) {
         self->modal = modal;
         /* when a window changes modality, then its stacking order with its
            transients needs to change */
         stacking_raise(CLIENT_AS_WINDOW(self));
+
+        /* These things below can change focus so we can't grab pointer for
+           them. Note how we have two ungrab_pointers.. */
+        ungrab_pointer();
+
         /* it also may get focused. if something is focused that shouldn't
            be focused anymore, then move the focus */
         if (focus_client && client_focus_target(focus_client) != focus_client)
             client_focus(focus_client);
     }
+    else
+        /* These things below can change focus so we can't grab pointer for
+           them. Note how we have two ungrab_pointers.. */
+        ungrab_pointer();
+
     if (iconic != self->iconic)
         client_iconify(self, iconic, FALSE, FALSE);
 
@@ -3576,13 +3586,6 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
     if (self->undecorated != undecorated) {
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self);
-        /* Make sure the client knows it might have moved. Maybe there is a
-         * better way of doing this so only one client_configure is sent, but
-         * since 125 of these are sent per second when moving the window (with
-         * user = FALSE) i doubt it matters much.
-         */
-        client_configure(self, self->area.x, self->area.y,
-                         self->area.width, self->area.height, TRUE, TRUE);
         client_change_state(self); /* reflect this in the state hints */
     }
 }

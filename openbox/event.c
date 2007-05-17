@@ -1085,7 +1085,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             /* don't create enter events from clients moving themselves */
             grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-            client_configure_full(client, x, y, w, h, FALSE, TRUE);
+            client_configure(client, x, y, w, h, FALSE, TRUE);
             ungrab_pointer();
         }
         break;
@@ -1266,7 +1266,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             /* don't create enter events from clients moving themselves */
             grab_pointer(FALSE, FALSE, OB_CURSOR_NONE);
-            client_configure_full(client, x, y, w, h, FALSE, TRUE);
+            client_configure(client, x, y, w, h, FALSE, TRUE);
             ungrab_pointer();
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {

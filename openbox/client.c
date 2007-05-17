@@ -407,9 +407,9 @@ void client_manage(Window window)
 
        do this after adjusting the frame. otherwise it gets all weird and
        clients don't work right */
-    client_configure_full(self, self->area.x, self->area.y,
-                          self->area.width, self->area.height,
-                          FALSE, TRUE);
+    client_configure(self, self->area.x, self->area.y,
+                     self->area.width, self->area.height,
+                     FALSE, TRUE);
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!
@@ -1771,8 +1771,8 @@ void client_reconfigure(ObClient *self)
     /* by making this pass FALSE for user, we avoid the emacs event storm where
        every configurenotify causes an update in its normal hints, i think this
        is generally what we want anyways... */
-    client_configure_full(self, self->area.x, self->area.y,
-                          self->area.width, self->area.height, FALSE, TRUE);
+    client_configure(self, self->area.x, self->area.y,
+                     self->area.width, self->area.height, FALSE, TRUE);
 }
 
 void client_update_wmhints(ObClient *self)
@@ -2704,8 +2704,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 }
 
 
-void client_configure_full(ObClient *self, gint x, gint y, gint w, gint h,
-                           gboolean user, gboolean final)
+void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
+                      gboolean user, gboolean final)
 {
     gint oldw, oldh;
     gboolean send_resize_client;

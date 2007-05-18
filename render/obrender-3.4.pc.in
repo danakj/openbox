@@ -12,6 +12,6 @@ pangolibs=@PANGO_LIBS@
 Name: ObRender
 Description: Openbox Render Library
 Version: @VERSION@
-Requires: obparser-3.0 glib-2.0 xft pangoxft
+Requires: obparser-3.4 glib-2.0 xft pangoxft
 Libs: -L${libdir} -lobrender ${xlibs} ${pangolibs}
 Cflags: -I${includedir}/openbox/@OB_VERSION@ ${xcflags} ${pangocflags}

@@ -154,8 +154,8 @@ AC_CONFIG_FILES([
   Makefile
   m4/Makefile
   po/Makefile.in
-  render/obrender-3.0.pc
-  parser/obparser-3.0.pc
+  render/obrender-3.4.pc
+  parser/obparser-3.4.pc
   version.h
 ])
 AC_OUTPUT

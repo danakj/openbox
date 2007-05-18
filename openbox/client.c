@@ -565,7 +565,7 @@ void client_unmanage(ObClient *self)
 
     /* ignore enter events from the unmap so it doesnt mess with the
        focus */
-    event_ignore_queued_enters();
+    event_ignore_enters_leaving_window(self);
 
     mouse_grab_for_client(self, FALSE);
 

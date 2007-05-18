@@ -523,7 +523,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    event_ignore_queued_enters();
+    event_ignore_all_queued_enters();
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;

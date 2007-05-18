@@ -85,6 +85,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_user_time_window_clients(GSList *l, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
+static gboolean is_enter_focus_event_ignored(XEvent *e);
 
 static void focus_delay_dest(gpointer data);
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
@@ -96,7 +97,11 @@ static gboolean menu_hide_delay_func(gpointer data);
 /* The time for the current event being processed */
 Time event_curtime = CurrentTime;
 
+#define NUM_IGNORE_SERIALS 20
+
 static guint ignore_enter_focus = 0;
+/*! This is a 0 terminated list of ignored serials */
+static gulong ignore_enter_serials[NUM_IGNORE_SERIALS+1] = {0};
 static gboolean menu_can_hide;
 static gboolean focus_left_screen = FALSE;
 
@@ -883,7 +888,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                corresponding enter events. Pretend like the animating window
                doesn't even exist..! */
             if (frame_iconify_animating(client->frame))
-                event_ignore_queued_enters();
+                event_ignore_enters_leaving_window(client);
 
             ob_debug_type(OB_DEBUG_FOCUS,
                           "%sNotify mode %d detail %d on %lx\n",
@@ -911,10 +916,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
     {
         gboolean nofocus = FALSE;
 
-        if (ignore_enter_focus) {
-            ignore_enter_focus--;
+        if (is_enter_focus_event_ignored(e))
             nofocus = TRUE;
-        }
 
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
@@ -1084,7 +1087,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_queued_enters();
+            event_ignore_enters_leaving_window(client);
         }
         break;
     }
@@ -1180,7 +1183,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                              e->xclient.data.l[1], e->xclient.data.l[2]);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_queued_enters();
+            event_ignore_enters_leaving_window(client);
         } else if (msgtype == prop_atoms.net_close_window) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
@@ -1268,7 +1271,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_queued_enters();
+            event_ignore_enters_leaving_window(client);
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
@@ -1717,30 +1720,90 @@ void event_halt_focus_delay()
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
+struct ObLookForEnters
+{
+    ObClient *c;
+    gulong looking_for_enter;
+};
+
 static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
 {
-    guint *count = (guint*)arg;
-    if (e->type == EnterNotify) {
+    struct ObLookForEnters *lfe = (struct ObLookForEnters*)arg;
+
+    if (lfe->c != NULL && e->type == LeaveNotify) {
+        if (g_hash_table_lookup(window_map, &e->xany.window) == lfe->c)
+            /* found an event leaving this window */
+            lfe->looking_for_enter = e->xany.serial;
+    } else if (e->type == EnterNotify &&
+               (lfe->c == NULL || e->xany.serial == lfe->looking_for_enter))
+    {
         ObWindow *win;
-            
-        win = g_hash_table_lookup(window_map, &e->xany.window);
-        if (win && WINDOW_IS_CLIENT(win))
-            ++(*count);
+        gint i;
+        gboolean ignored = FALSE;
+
+        /* make sure the serial isn't already being ignored */
+        for (i = 0; ignore_enter_serials[i] != 0 && !ignored; ++i) {
+            if (ignore_enter_serials[i] == e->xany.serial)
+                ignored = TRUE;
+        }
+
+        if (!ignored) {
+            /* found an enter for that leave, ignore it if it's going to
+               another window */
+            win = g_hash_table_lookup(window_map, &e->xany.window);
+            if (win && WINDOW_IS_CLIENT(win))
+                ++ignore_enter_focus;
+        }
+
+        /* add it to the ignored list if there is room */
+        if (i < NUM_IGNORE_SERIALS) {
+            ignore_enter_serials[i] = e->xany.serial;
+            ignore_enter_serials[i+1] = 0;
+        }
     }
     return False; /* don't disrupt the queue order, just count them */
 }
 
-void event_ignore_queued_enters()
+void event_ignore_all_queued_enters()
 {
+    event_ignore_enters_leaving_window(NULL);
+}
+
+void event_ignore_enters_leaving_window(ObClient *c)
+{
+    struct ObLookForEnters lfe;
     XEvent e;
-                
+
     XSync(ob_display, FALSE);
 
     /* count the events without disrupting them */
     ignore_enter_focus = 0;
-    XCheckIfEvent(ob_display, &e, event_look_for_enters,
-                  (XPointer)&ignore_enter_focus);
+    lfe.c = c;
+    lfe.looking_for_enter = 0;
+    XCheckIfEvent(ob_display, &e, event_look_for_enters, (XPointer)&lfe);
 
+}
+
+static gboolean is_enter_focus_event_ignored(XEvent *e)
+{
+    g_assert(e->type == EnterNotify);
+
+    if (ignore_enter_focus) {
+        gint i;
+
+        --ignore_enter_focus;
+
+        /* remove the serial */
+        for (i = 0; ignore_enter_serials[i] != 0; ++i) {
+            if (ignore_enter_serials[i] == e->xany.serial) {
+                for (; ignore_enter_serials[i+1] != 0; ++i)
+                    ignore_enter_serials[i] = ignore_enter_serials[i+1];
+                ignore_enter_serials[i] = 0;
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
 }
 
 gboolean event_time_after(Time t1, Time t2)

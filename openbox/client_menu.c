@@ -119,19 +119,15 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         break;
     case CLIENT_RESTORE:
         client_maximize(c, FALSE, 0);
-        event_ignore_queued_enters();
         break;
     case CLIENT_MAXIMIZE:
         client_maximize(c, TRUE, 0);
-        event_ignore_queued_enters();
         break;
     case CLIENT_SHADE:
         client_shade(c, !c->shaded);
-        event_ignore_queued_enters();
         break;
     case CLIENT_DECORATE:
         client_set_undecorated(c, !c->undecorated);
-        event_ignore_queued_enters();
         break;
     case CLIENT_MOVE:
         /* this needs to grab the keyboard so hide the menu */
@@ -157,6 +153,10 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     default:
         g_assert_not_reached();
     }
+
+    /* we have to ignore all queued enters because the menu has a grab, and the
+       so the cursor isnt considered inside the client's window */
+    event_ignore_all_queued_enters();
 
     /* update the menu cuz stuff can have changed */
     if (f) {
@@ -217,7 +217,9 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         g_assert_not_reached();
     }
 
-    event_ignore_queued_enters();
+    /* we have to ignore all queued enters because the menu has a grab, and the
+       so the cursor isnt considered inside the client's window */
+    event_ignore_all_queued_enters();
 
     /* update the menu cuz stuff can have changed */
     if (f) {

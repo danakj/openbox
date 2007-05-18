@@ -269,7 +269,7 @@ void popup_hide(ObPopup *self)
         self->mapped = FALSE;
 
         /* kill enter events cause by this unmapping */
-        event_ignore_queued_enters();
+        event_ignore_all_queued_enters();
     } else if (self->delay_mapped) {
         ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
         self->delay_mapped = FALSE;

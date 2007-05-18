@@ -46,8 +46,8 @@ static void client_action_end(union ActionData *data)
 {
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button) {
-                event_ignore_queued_enters();
+            if (!data->any.button && data->any.c) {
+                event_ignore_enters_leaving_window(data->any.c);
             } else {
                 ObClient *c;
 

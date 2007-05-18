@@ -15,7 +15,7 @@ fi
 VERSION=$(grep AC_INIT\(\\\[openbox\\] configure.ac|cut -d [ -f 3-|cut -d ] -f 1)
 
 echo
-echo "Building deb for openbox-$VERSION$APPEND"
+echo "Building deb for openbox-$VERSION-0$APPEND"
 echo
 
 TIME="$(date '+%a, %d %B %Y %T %z')"
@@ -28,6 +28,6 @@ make distclean > /dev/null || rm -f config.status
 
 rm -f $OUT
 
-sed -e "s!@time@!$TIME!" -e "s!@version@!$VERSION$APPEND!" $IN >$OUT && \
+sed -e "s!@time@!$TIME!" -e "s!@version@!$VERSION-0$APPEND!" $IN >$OUT && \
 fakeroot debian/rules binary && \
 make distclean > /dev/null

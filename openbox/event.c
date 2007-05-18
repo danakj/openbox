@@ -97,11 +97,7 @@ static gboolean menu_hide_delay_func(gpointer data);
 /* The time for the current event being processed */
 Time event_curtime = CurrentTime;
 
-#define NUM_IGNORE_SERIALS 20
-
 static guint ignore_enter_focus = 0;
-/*! This is a 0 terminated list of ignored serials */
-static gulong ignore_enter_serials[NUM_IGNORE_SERIALS+1] = {0};
 static gboolean menu_can_hide;
 static gboolean focus_left_screen = FALSE;
 
@@ -914,11 +910,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case EnterNotify:
     {
-        gboolean nofocus = FALSE;
-
-        if (is_enter_focus_event_ignored(e))
-            nofocus = TRUE;
-
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
@@ -948,22 +939,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab ||
                 /*ignore enters when we're already in the window */
-                e->xcrossing.detail == NotifyInferior)
+                e->xcrossing.detail == NotifyInferior ||
+                is_enter_focus_event_ignored(e))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d on %lx IGNORED\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
                               e->xcrossing.detail, client?client->window:0);
-            } else {
+            }
+            else {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d on %lx, "
-                              "focusing window: %d\n",
+                              "focusing window\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
-                              e->xcrossing.detail, (client?client->window:0),
-                              !nofocus);
-                if (!nofocus && config_focus_follow)
+                              e->xcrossing.detail, (client?client->window:0));
+                if (config_focus_follow)
                     event_enter_client(client);
             }
             break;
@@ -1720,46 +1712,22 @@ void event_halt_focus_delay()
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
-struct ObLookForEnters
-{
-    ObClient *c;
-    gulong looking_for_enter;
-};
-
 static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
 {
-    struct ObLookForEnters *lfe = (struct ObLookForEnters*)arg;
-
-    if (lfe->c != NULL && e->type == LeaveNotify) {
-        if (g_hash_table_lookup(window_map, &e->xany.window) == lfe->c)
-            /* found an event leaving this window */
-            lfe->looking_for_enter = e->xany.serial;
-    } else if (e->type == EnterNotify &&
-               (lfe->c == NULL || e->xany.serial == lfe->looking_for_enter))
+    if (e->type == EnterNotify &&
+        /* these types aren't used for focusing */
+        (e->xcrossing.mode == NotifyGrab ||
+         e->xcrossing.mode == NotifyUngrab ||
+         /*ignore enters when we're already in the window */
+         e->xcrossing.detail == NotifyInferior))
     {
         ObWindow *win;
-        gint i;
-        gboolean ignored = FALSE;
 
-        /* make sure the serial isn't already being ignored */
-        for (i = 0; ignore_enter_serials[i] != 0 && !ignored; ++i) {
-            if (ignore_enter_serials[i] == e->xany.serial)
-                ignored = TRUE;
-        }
-
-        if (!ignored) {
-            /* found an enter for that leave, ignore it if it's going to
-               another window */
-            win = g_hash_table_lookup(window_map, &e->xany.window);
-            if (win && WINDOW_IS_CLIENT(win))
-                ++ignore_enter_focus;
-        }
-
-        /* add it to the ignored list if there is room */
-        if (i < NUM_IGNORE_SERIALS) {
-            ignore_enter_serials[i] = e->xany.serial;
-            ignore_enter_serials[i+1] = 0;
-        }
+        /* found an enter for that leave, ignore it if it's going to
+           another window */
+        win = g_hash_table_lookup(window_map, &e->xany.window);
+        if (win && WINDOW_IS_CLIENT(win))
+            ++ignore_enter_focus;
     }
     return False; /* don't disrupt the queue order, just count them */
 }
@@ -1771,36 +1739,27 @@ void event_ignore_all_queued_enters()
 
 void event_ignore_enters_leaving_window(ObClient *c)
 {
-    struct ObLookForEnters lfe;
     XEvent e;
 
     XSync(ob_display, FALSE);
 
+    ob_debug_type(OB_DEBUG_FOCUS, "want to ignore enters leaving window "
+                  "%s\n", c?c->title:"(all)");
+
     /* count the events without disrupting them */
     ignore_enter_focus = 0;
-    lfe.c = c;
-    lfe.looking_for_enter = 0;
-    XCheckIfEvent(ob_display, &e, event_look_for_enters, (XPointer)&lfe);
-
+    XCheckIfEvent(ob_display, &e, event_look_for_enters, NULL);
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
 {
     g_assert(e->type == EnterNotify);
 
+    ob_debug_type(OB_DEBUG_FOCUS, "# enters ignored: %d\n",
+                  ignore_enter_focus);
+
     if (ignore_enter_focus) {
-        gint i;
-
         --ignore_enter_focus;
-
-        /* remove the serial */
-        for (i = 0; ignore_enter_serials[i] != 0; ++i) {
-            if (ignore_enter_serials[i] == e->xany.serial) {
-                for (; ignore_enter_serials[i+1] != 0; ++i)
-                    ignore_enter_serials[i] = ignore_enter_serials[i+1];
-                ignore_enter_serials[i] = 0;
-            }
-        }
         return TRUE;
     }
     return FALSE;

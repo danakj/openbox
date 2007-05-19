@@ -31,6 +31,7 @@
 #include "config.h"
 #include "keytree.h"
 #include "keyboard.h"
+#include "translate.h"
 #include "moveresize.h"
 #include "popup.h"
 #include "gettext.h"
@@ -292,16 +293,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
         p = curpos->first_child;
     while (p) {
         if (p->key == e->xkey.keycode &&
-            /* tricksy.
-               if you have Super_L and Super_R bound to different modXmasks,
-               this makes either mod mask count as Super
-
-               e.g. Super_L is mod1 and Super_R is mod2, so..
-               p->state = 00011
-               key state is just Super_L so 00001
-               00011 | 00001 == 00011 == p->state
-            */
-            (p->state | e->xkey.state) == p->state)
+            p->state == e->xkey.state)
         {
             /* if we hit a key binding, then close any open menus and run it */
             if (menu_frame_visible)

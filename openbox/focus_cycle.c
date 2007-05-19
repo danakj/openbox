@@ -35,6 +35,7 @@ ObClient     *focus_cycle_target = NULL;
 
 static void      focus_cycle_destroy_notify (ObClient *client, gpointer data);
 static gboolean  focus_target_has_siblings  (ObClient *ft,
+                                             gboolean iconic_windows,
                                              gboolean all_desktops);
 static ObClient *focus_find_directional    (ObClient *c,
                                             ObDirection dir,
@@ -76,7 +77,9 @@ static void focus_cycle_destroy_notify(ObClient *client, gpointer data)
 
 /*! Returns if a focus target has valid group siblings that can be cycled
   to in its place */
-static gboolean focus_target_has_siblings(ObClient *ft, gboolean all_desktops)
+static gboolean focus_target_has_siblings(ObClient *ft,
+                                          gboolean iconic_windows,
+                                          gboolean all_desktops)
                                                          
 {
     GSList *it;
@@ -87,7 +90,8 @@ static gboolean focus_target_has_siblings(ObClient *ft, gboolean all_desktops)
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
         if (c != ft && !client_helper(c) &&
-            focus_cycle_target_valid(c, all_desktops, FALSE, FALSE))
+            focus_cycle_target_valid(c, iconic_windows, all_desktops, FALSE,
+                                     FALSE))
         {
             return TRUE;
         }
@@ -96,6 +100,7 @@ static gboolean focus_target_has_siblings(ObClient *ft, gboolean all_desktops)
 }
 
 gboolean focus_cycle_target_valid(ObClient *ft,
+                                  gboolean iconic_windows,
                                   gboolean all_desktops,
                                   gboolean dock_windows,
                                   gboolean desktop_windows)
@@ -112,6 +117,9 @@ gboolean focus_cycle_target_valid(ObClient *ft,
     /* the window can receive focus somehow */
     ok = ok && (ft->can_focus || ft->focus_notify);
 
+    /* the window is not iconic, or we're allowed to go to iconic ones */
+    ok = ok && (iconic_windows || !ft->iconic);
+
     /* it's the right type of window */
     if (dock_windows || desktop_windows)
         ok = ok && ((dock_windows && ft->type == OB_CLIENT_TYPE_DOCK) ||
@@ -127,7 +135,7 @@ gboolean focus_cycle_target_valid(ObClient *ft,
               ((focus_client && ft->group == focus_client->group) ||
                /* ... or if there are no other windows in its group 
                   that can be cycled to instead */
-               !focus_target_has_siblings(ft, all_desktops))));
+               !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
        expected to set this hint */
@@ -190,7 +198,8 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (focus_cycle_target_valid(ft, all_desktops, dock_windows,
+        if (focus_cycle_target_valid(ft, TRUE,
+                                     all_desktops, dock_windows,
                                      desktop_windows))
         {
             if (interactive) {
@@ -200,7 +209,8 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
                 }
                 if (dialog)
                     /* same arguments as focus_target_valid */
-                    focus_cycle_popup_show(ft, all_desktops, dock_windows,
+                    focus_cycle_popup_show(ft, TRUE,
+                                           all_desktops, dock_windows,
                                            desktop_windows);
                 return;
             } else if (ft != focus_cycle_target) {
@@ -257,23 +267,8 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if(cur == c)
             continue;
-        if (cur->type == OB_CLIENT_TYPE_DOCK && !dock_windows)
-            continue;
-        if (cur->type == OB_CLIENT_TYPE_DESKTOP && !desktop_windows)
-            continue;
-        if (!client_normal(cur) &&
-            cur->type != OB_CLIENT_TYPE_DOCK &&
-            cur->type != OB_CLIENT_TYPE_DESKTOP)
-            continue;
-        /* using c->desktop instead of screen_desktop doesn't work if the
-         * current window was omnipresent, hope this doesn't have any other
-         * side effects */
-        if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
-            continue;
-        if(cur->iconic)
-            continue;
-        if(!(client_focus_target(cur) == cur &&
-             client_can_focus(cur)))
+        if (!focus_cycle_target_valid(it->data, FALSE, FALSE, dock_windows,
+                                      desktop_windows))
             continue;
 
         /* find the centre coords of this window, from the
@@ -367,7 +362,7 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_cycle_target_valid(it->data, FALSE, dock_windows,
+            if (focus_cycle_target_valid(it->data, FALSE, FALSE, dock_windows,
                                          desktop_windows))
                 ft = it->data;
     }
@@ -380,7 +375,7 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     }
     if (focus_cycle_target && dialog) {
         /* same arguments as focus_target_valid */
-        focus_cycle_popup_show(focus_cycle_target, FALSE, dock_windows,
+        focus_cycle_popup_show(focus_cycle_target, FALSE, FALSE, dock_windows,
                                desktop_windows);
         return;
     }

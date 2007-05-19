@@ -27,7 +27,7 @@ struct _ObClient;
 void focus_cycle_popup_startup(gboolean reconfig);
 void focus_cycle_popup_shutdown(gboolean reconfig);
 
-void focus_cycle_popup_show(struct _ObClient *c,
+void focus_cycle_popup_show(struct _ObClient *c, gboolean iconic_windows,
                             gboolean all_desktops, gboolean dock_windows,
                             gboolean desktop_windows);
 void focus_cycle_popup_hide();

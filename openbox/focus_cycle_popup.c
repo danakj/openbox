@@ -71,9 +71,13 @@ struct _ObFocusCyclePopup
 static ObFocusCyclePopup popup;
 
 static gchar *popup_get_name (ObClient *c);
-static void   popup_setup    (ObFocusCyclePopup *p,gboolean all_desktops,
-                              gboolean dock_windows, gboolean desktop_windows);
-static void   popup_render   (ObFocusCyclePopup *p, const ObClient *c);
+static void   popup_setup    (ObFocusCyclePopup *p,
+                              gboolean iconic_windows,
+                              gboolean all_desktops,
+                              gboolean dock_windows,
+                              gboolean desktop_windows);
+static void   popup_render   (ObFocusCyclePopup *p,
+                              const ObClient *c);
 
 static Window create_window(Window parent, guint bwidth, gulong mask,
                             XSetWindowAttributes *attr)
@@ -142,7 +146,8 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     RrAppearanceFree(popup.a_bg);
 }
 
-static void popup_setup(ObFocusCyclePopup *p,gboolean all_desktops,
+static void popup_setup(ObFocusCyclePopup *p,
+                        gboolean iconic_windows, gboolean all_desktops,
                         gboolean dock_windows, gboolean desktop_windows)
 {
     gint maxwidth, n;
@@ -161,6 +166,7 @@ static void popup_setup(ObFocusCyclePopup *p,gboolean all_desktops,
         ObClient *ft = it->data;
 
         if (focus_cycle_target_valid(ft,
+                                     iconic_windows,
                                      all_desktops,
                                      dock_windows,
                                      desktop_windows))
@@ -410,7 +416,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     p->last_target = newtarget;
 }
 
-void focus_cycle_popup_show(ObClient *c,
+void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
                             gboolean all_desktops, gboolean dock_windows,
                             gboolean desktop_windows)
 {
@@ -418,7 +424,8 @@ void focus_cycle_popup_show(ObClient *c,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped)
-        popup_setup(&popup, all_desktops, dock_windows, desktop_windows);
+        popup_setup(&popup, iconic_windows, all_desktops,
+                    dock_windows, desktop_windows);
     g_assert(popup.targets != NULL);
 
     popup_render(&popup, c);

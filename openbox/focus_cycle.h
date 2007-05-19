@@ -44,4 +44,9 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
 
 void focus_cycle_stop();
 
+gboolean  focus_cycle_target_valid(struct _ObClient *ft,
+                                   gboolean all_desktops,
+                                   gboolean dock_windows,
+                                   gboolean desktop_windows);
+
 #endif

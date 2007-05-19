@@ -264,7 +264,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* how many icons will fit in that row? make the width fit that */
     w -= l + r;
-    icons_per_row = w / ICON_SIZE;
+    icons_per_row = (w + ICON_SIZE - 1) / ICON_SIZE;
     w = icons_per_row * ICON_SIZE + l + r;
 
     /* how many rows do we need? */

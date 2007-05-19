@@ -1482,8 +1482,11 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
         ret = FALSE;
 
     else if (keycode == ob_keycode(OB_KEY_ESCAPE) && state == 0) {
-        /* Escape closes the active menu */
-        menu_frame_hide(frame);
+        /* Escape goes to the parent menu or closes the last one */
+        if (frame->parent)
+            menu_frame_select(frame, NULL, TRUE);
+        else
+            menu_frame_hide_all();
     }
 
     else if (keycode == ob_keycode(OB_KEY_RETURN) && (state == 0 ||

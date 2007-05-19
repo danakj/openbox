@@ -42,7 +42,7 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
 {
     gint i, transferred = 0, sw, sh, partial_w, partial_h;
     RrPixel32 *source, *dest;
-    Pixmap oldp;
+    Pixmap oldp = None;
     RrRect tarea; /* area in which to draw textures */
     gboolean resized;
 
@@ -77,8 +77,10 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
                                RrVisual(a->inst), RrColormap(a->inst));
     g_assert(a->xftdraw != NULL);
 
-    g_free(a->surface.pixel_data);
-    a->surface.pixel_data = g_new(RrPixel32, w * h);
+    if (resized) {
+        g_free(a->surface.pixel_data);
+        a->surface.pixel_data = g_new(RrPixel32, w * h);
+    }
 
     if (a->surface.grad == RR_SURFACE_PARENTREL) {
         g_assert (a->surface.parent);

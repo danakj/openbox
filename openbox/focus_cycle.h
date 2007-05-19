@@ -41,7 +41,6 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
 void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                              gboolean desktop_windows, gboolean interactive,
                              gboolean dialog, gboolean done, gboolean cancel);
-void focus_cycle_draw_indicator();
 
 void focus_cycle_stop();
 

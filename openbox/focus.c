@@ -74,9 +74,7 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
 
-    /* in the middle of cycling..? kill it. CurrentTime is fine, time won't
-       be used.
-    */
+    /* in the middle of cycling..? kill it. */
     focus_cycle_stop();
 
     focus_client = client;

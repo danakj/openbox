@@ -1607,6 +1607,10 @@ static gboolean event_handle_menu(XEvent *ev)
         }
         break;
     case LeaveNotify:
+        /*ignore leaves when we're already in the window */
+        if (ev->xcrossing.detail == NotifyInferior)
+            break;
+
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
             (f = find_active_menu()) && f->selected == e &&
             e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)

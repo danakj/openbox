@@ -351,8 +351,8 @@ nodist_pubinclude_HEADERS = \
 	version.h
 
 nodist_pkgconfig_DATA = \
-	render/obrender-3.4.pc \
-	parser/obparser-3.4.pc
+	render/obrender-3.0.pc \
+	parser/obparser-3.0.pc
 
 ## data ##
 
@@ -451,8 +451,8 @@ dist_noinst_DATA = \
 	doc/openbox-gnome-session.1.in \
 	doc/openbox-kde-session.1.sgml \
 	doc/openbox-kde-session.1.in \
-	render/obrender-3.4.pc.in \
-	parser/obparser-3.4.pc.in \
+	render/obrender-3.0.pc.in \
+	parser/obparser-3.0.pc.in \
 	tools/themeupdate/themeupdate.py \
 	tests/hideshow.py \
 	tests/Makefile \

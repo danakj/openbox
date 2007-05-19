@@ -398,35 +398,17 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XMoveWindow(ob_display, self->trrresize,
                                 self->width - ob_rr_theme->paddingx - 1, 0);
 
-                    XMoveResizeWindow(ob_display, self->leftresize,
-                                      -(ob_rr_theme->fbwidth * 2) - 1,
-                                      0,
-                                      1,
-                                      self->client->area.height +
-                                      self->cbwidth_y * 2);
-                    XMoveResizeWindow(ob_display, self->rightresize,
-                                      self->client->area.width +
-                                      self->cbwidth_x * 2,
-                                      0,
-                                      1,
-                                      self->client->area.height +
-                                      self->cbwidth_y * 2);
-
                     XMapWindow(ob_display, self->topresize);
                     XMapWindow(ob_display, self->tltresize);
                     XMapWindow(ob_display, self->tllresize);
                     XMapWindow(ob_display, self->trtresize);
                     XMapWindow(ob_display, self->trrresize);
-                    XMapWindow(ob_display, self->leftresize);
-                    XMapWindow(ob_display, self->rightresize);
                 } else {
                     XUnmapWindow(ob_display, self->topresize);
                     XUnmapWindow(ob_display, self->tltresize);
                     XUnmapWindow(ob_display, self->tllresize);
                     XUnmapWindow(ob_display, self->trtresize);
                     XUnmapWindow(ob_display, self->trrresize);
-                    XUnmapWindow(ob_display, self->leftresize);
-                    XUnmapWindow(ob_display, self->rightresize);
                 }
             } else
                 XUnmapWindow(ob_display, self->title);
@@ -465,6 +447,28 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 }
             } else
                 XUnmapWindow(ob_display, self->handle);
+
+            if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+                XMoveResizeWindow(ob_display, self->leftresize,
+                                  -(ob_rr_theme->fbwidth * 2) - 1,
+                                  0,
+                                  1,
+                                  self->client->area.height +
+                                  self->cbwidth_y * 2);
+                XMoveResizeWindow(ob_display, self->rightresize,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2,
+                                  0,
+                                  1,
+                                  self->client->area.height +
+                                  self->cbwidth_y * 2);
+
+                XMapWindow(ob_display, self->leftresize);
+                XMapWindow(ob_display, self->rightresize);
+            } else {
+                XUnmapWindow(ob_display, self->leftresize);
+                XUnmapWindow(ob_display, self->rightresize);
+            }
 
             /* move and resize the inner border window which contains the plate
              */

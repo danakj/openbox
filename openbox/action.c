@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "client.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "moveresize.h"
 #include "menu.h"
 #include "prop.h"

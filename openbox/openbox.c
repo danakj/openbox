@@ -196,7 +196,8 @@ gint main(gint argc, gchar **argv)
     /* create available cursors */
     cursors[OB_CURSOR_NONE] = None;
     cursors[OB_CURSOR_POINTER] = load_cursor("left_ptr", XC_left_ptr);
-    cursors[OB_CURSOR_BUSY] = load_cursor("left_ptr_watch", XC_watch);
+    cursors[OB_CURSOR_BUSYPOINTER] = load_cursor("left_ptr_watch",XC_left_ptr);
+    cursors[OB_CURSOR_BUSY] = load_cursor("watch", XC_watch);
     cursors[OB_CURSOR_MOVE] = load_cursor("fleur", XC_fleur);
     cursors[OB_CURSOR_NORTH] = load_cursor("top_side", XC_top_side);
     cursors[OB_CURSOR_NORTHEAST] = load_cursor("top_right_corner",

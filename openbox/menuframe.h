@@ -128,7 +128,6 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
                                  gint button);
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
                                  ObMenuEntryFrame *parent_entry);
-void menu_frame_hide(ObMenuFrame *self);
 
 void menu_frame_hide_all();
 void menu_frame_hide_all_client(struct _ObClient *client);

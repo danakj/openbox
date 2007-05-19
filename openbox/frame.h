@@ -32,6 +32,7 @@ typedef void (*ObFrameIconifyAnimateFunc)(gpointer data);
 typedef enum {
     OB_FRAME_CONTEXT_NONE,
     OB_FRAME_CONTEXT_DESKTOP,
+    OB_FRAME_CONTEXT_ROOT,
     OB_FRAME_CONTEXT_CLIENT,
     OB_FRAME_CONTEXT_TITLEBAR,
     OB_FRAME_CONTEXT_FRAME,
@@ -41,6 +42,8 @@ typedef enum {
     OB_FRAME_CONTEXT_TRCORNER,
     OB_FRAME_CONTEXT_TOP,
     OB_FRAME_CONTEXT_BOTTOM,
+    OB_FRAME_CONTEXT_LEFT,
+    OB_FRAME_CONTEXT_RIGHT,
     OB_FRAME_CONTEXT_MAXIMIZE,
     OB_FRAME_CONTEXT_ALLDESKTOPS,
     OB_FRAME_CONTEXT_SHADE,
@@ -101,6 +104,8 @@ struct _ObFrame
     Window    tllresize;
     Window    trtresize;
     Window    trrresize;
+    Window    leftresize;
+    Window    rightresize;
 
     Colormap  colormap;
 

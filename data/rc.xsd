@@ -333,6 +333,7 @@
     <xsd:simpleType name="contextname">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="Desktop"/>
+            <xsd:enumeration value="Root"/>
             <xsd:enumeration value="Client"/>
             <xsd:enumeration value="Titlebar"/>
             <xsd:enumeration value="Frame"/>

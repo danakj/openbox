@@ -45,6 +45,7 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 static void menu_entry_frame_free(ObMenuEntryFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
 static gboolean menu_entry_frame_submenu_timeout(gpointer data);
+static void menu_frame_hide(ObMenuFrame *self);
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -1013,7 +1014,7 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     return TRUE;
 }
 
-void menu_frame_hide(ObMenuFrame *self)
+static void menu_frame_hide(ObMenuFrame *self)
 {
     GList *it = g_list_find(menu_frame_visible, self);
 

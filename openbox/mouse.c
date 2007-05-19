@@ -48,7 +48,8 @@ typedef struct {
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
 
 ObFrameContext mouse_button_frame_context(ObFrameContext context,
-                                          guint button)
+                                          guint button,
+                                          guint state)
 {
     GSList *it;
     ObFrameContext x = context;
@@ -56,7 +57,7 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
     for (it = bound_contexts[context]; it; it = g_slist_next(it)) {
         ObMouseBinding *b = it->data;
 
-        if (b->button == button)
+        if (b->button == button && b->state == state)
             return context;
     }
 
@@ -67,6 +68,11 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
     case OB_FRAME_CONTEXT_TITLEBAR:
     case OB_FRAME_CONTEXT_FRAME:
     case OB_FRAME_CONTEXT_MOVE_RESIZE:
+    case OB_FRAME_CONTEXT_LEFT:
+    case OB_FRAME_CONTEXT_RIGHT:
+        break;
+    case OB_FRAME_CONTEXT_ROOT:
+        x = OB_FRAME_CONTEXT_DESKTOP;
         break;
     case OB_FRAME_CONTEXT_BOTTOM:
     case OB_FRAME_CONTEXT_BLCORNER:
@@ -88,7 +94,11 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
         g_assert_not_reached();
     }
 
-    return x;
+    /* allow for multiple levels of fall-through */
+    if (x != context)
+        return mouse_button_frame_context(x, button, state);
+    else
+        return x;
 }
 
 void mouse_grab_for_client(ObClient *client, gboolean grab)
@@ -190,7 +200,8 @@ void mouse_event(ObClient *client, XEvent *e)
     case ButtonPress:
         context = frame_context(client, e->xbutton.window,
                                 e->xbutton.x, e->xbutton.y);
-        context = mouse_button_frame_context(context, e->xbutton.button);
+        context = mouse_button_frame_context(context, e->xbutton.button,
+                                             e->xbutton.state);
 
         px = e->xbutton.x_root;
         py = e->xbutton.y_root;
@@ -220,7 +231,8 @@ void mouse_event(ObClient *client, XEvent *e)
     case ButtonRelease:
         /* use where the press occured in the window */
         context = frame_context(client, e->xbutton.window, pwx, pwy);
-        context = mouse_button_frame_context(context, e->xbutton.button);
+        context = mouse_button_frame_context(context, e->xbutton.button,
+                                             e->xbutton.state);
 
         if (e->xbutton.button == button)
             pwx = pwy = -1;
@@ -287,7 +299,7 @@ void mouse_event(ObClient *client, XEvent *e)
     case MotionNotify:
         if (button) {
             context = frame_context(client, e->xmotion.window, pwx, pwy);
-            context = mouse_button_frame_context(context, button);
+            context = mouse_button_frame_context(context, button, state);
 
             if (ABS(e->xmotion.x_root - px) >= config_mouse_threshold ||
                 ABS(e->xmotion.y_root - py) >= config_mouse_threshold) {

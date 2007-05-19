@@ -296,6 +296,30 @@
     </mousebind>
   </context>
 
+  <context name="Left">
+    <mousebind button="Left" action="Press">
+      <action name="Focus"/>
+    </mousebind>
+    <mousebind button="Left" action="Click">
+      <action name="Raise"/>
+    </mousebind>
+    <mousebind button="Left" action="Drag">
+      <action name="Resize"><edge>top</edge></action>
+    </mousebind>
+  </context>
+
+  <context name="Right">
+    <mousebind button="Left" action="Press">
+      <action name="Focus"/>
+    </mousebind>
+    <mousebind button="Left" action="Click">
+      <action name="Raise"/>
+    </mousebind>
+    <mousebind button="Left" action="Drag">
+      <action name="Resize"><edge>top</edge></action>
+    </mousebind>
+  </context>
+
   <context name="Handle">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>

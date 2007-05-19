@@ -429,6 +429,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     }
 
     /* draw the text */
+    p->a_text->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
     p->a_text->texture[0].data.text.string = newtarget->text;
     p->a_text->surface.parentx = textx;
     p->a_text->surface.parenty = texty;

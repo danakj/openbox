@@ -32,6 +32,7 @@ typedef void (*ObFrameIconifyAnimateFunc)(gpointer data);
 typedef enum {
     OB_FRAME_CONTEXT_NONE,
     OB_FRAME_CONTEXT_DESKTOP,
+    OB_FRAME_CONTEXT_ROOT,
     OB_FRAME_CONTEXT_CLIENT,
     OB_FRAME_CONTEXT_TITLEBAR,
     OB_FRAME_CONTEXT_FRAME,

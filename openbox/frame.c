@@ -861,6 +861,8 @@ ObFrameContext frame_context_from_string(const gchar *name)
 {
     if (!g_ascii_strcasecmp("Desktop", name))
         return OB_FRAME_CONTEXT_DESKTOP;
+    else if (!g_ascii_strcasecmp("Root", name))
+        return OB_FRAME_CONTEXT_ROOT;
     else if (!g_ascii_strcasecmp("Client", name))
         return OB_FRAME_CONTEXT_CLIENT;
     else if (!g_ascii_strcasecmp("Titlebar", name))
@@ -908,7 +910,7 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
 
     if (win == RootWindow(ob_display, ob_screen))
-        return OB_FRAME_CONTEXT_DESKTOP;
+        return OB_FRAME_CONTEXT_ROOT ;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
     if (win == client->window) {
         /* conceptually, this is the desktop, as far as users are

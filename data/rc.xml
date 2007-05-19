@@ -462,7 +462,9 @@
     <mousebind button="Left" action="Press">
       <action name="Activate"/>
     </mousebind>
+  </context>
 
+  <context name="Root">
     <!-- Menus -->
     <mousebind button="Middle" action="Press">
       <action name="ShowMenu"><menu>client-list-combined-menu</menu></action>

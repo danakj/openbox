@@ -71,6 +71,9 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
     case OB_FRAME_CONTEXT_LEFT:
     case OB_FRAME_CONTEXT_RIGHT:
         break;
+    case OB_FRAME_CONTEXT_ROOT:
+        x = OB_FRAME_CONTEXT_DESKTOP;
+        break;
     case OB_FRAME_CONTEXT_BOTTOM:
     case OB_FRAME_CONTEXT_BLCORNER:
     case OB_FRAME_CONTEXT_BRCORNER:

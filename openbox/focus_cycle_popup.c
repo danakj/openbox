@@ -32,7 +32,8 @@
 
 #define ICON_SIZE 48
 #define ICON_HILITE_WIDTH 2
-#define OUTSIDE_BORDER 2
+#define ICON_HILITE_MARGIN 1
+#define OUTSIDE_BORDER 3
 
 typedef struct _ObFocusCyclePopup       ObFocusCyclePopup;
 typedef struct _ObFocusCyclePopupTarget ObFocusCyclePopupTarget;
@@ -54,7 +55,7 @@ struct _ObFocusCyclePopup
     GList *targets;
     gint n_targets;
 
-    ObFocusCyclePopupTarget *last_target;
+    const ObFocusCyclePopupTarget *last_target;
 
     gint maxtextw;
 
@@ -219,13 +220,15 @@ static gchar *popup_get_name(ObClient *c)
 
 static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 {
+    gint ml, mt, mr, mb;
     gint l, t, r, b;
     gint x, y, w, h;
     Rect *screen_area;
     gint icons_per_row;
     gint icon_rows;
     gint textx, texty, textw, texth;
-    gint iconw, iconh;
+    gint rgbax, rgbay, rgbaw, rgbah;
+    gint innerw, innerh;
     gint i;
     GList *it;
     const ObFocusCyclePopupTarget *newtarget;
@@ -235,15 +238,17 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     screen_area = screen_physical_area_monitor(0);
 
     /* get the outside margins */
-    RrMargins(p->a_bg, &l, &t, &r, &b);
-    l += ob_rr_theme->paddingx + OUTSIDE_BORDER;
-    r += ob_rr_theme->paddingx + OUTSIDE_BORDER;
-    t += ob_rr_theme->paddingy + OUTSIDE_BORDER;
-    b += ob_rr_theme->paddingy + OUTSIDE_BORDER;
+    RrMargins(p->a_bg, &ml, &mt, &mr, &mb);
 
-    /* get the icons sizes */
-    iconw = ICON_SIZE - (ICON_HILITE_WIDTH + ob_rr_theme->paddingx) * 2;
-    iconh = ICON_SIZE - (ICON_HILITE_WIDTH + ob_rr_theme->paddingy) * 2;
+    /* get our outside borders */
+    l = ml + OUTSIDE_BORDER;
+    r = mr + OUTSIDE_BORDER;
+    t = mt + OUTSIDE_BORDER;
+    b = mb + OUTSIDE_BORDER;
+
+    /* get the icon pictures' sizes */
+    innerw = ICON_SIZE - (ICON_HILITE_WIDTH + ICON_HILITE_MARGIN) * 2;
+    innerh = ICON_SIZE - (ICON_HILITE_WIDTH + ICON_HILITE_MARGIN) * 2;
 
     /* get the width from the text and keep it within limits */
     w = l + r + p->maxtextw;
@@ -263,8 +268,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     texth = RrMinHeight(p->a_text);
 
     /* find the height of the dialog */
-    h = t + b + (icon_rows * ICON_SIZE) +
-        (ob_rr_theme->paddingy * 2 + OUTSIDE_BORDER + texth);
+    h = t + b + (icon_rows * ICON_SIZE) + (OUTSIDE_BORDER + texth);
 
     /* get the position of the text */
     textx = l;
@@ -276,14 +280,20 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     y = screen_area->y + (screen_area->height -
                           (h + ob_rr_theme->fbwidth * 2)) / 2;
 
+    /* get the dimensions of the target hilite texture */
+    rgbax = ml;
+    rgbay = mt;
+    rgbaw = w - ml - mr;
+    rgbah = h - mt - mb;
+
     if (!p->mapped) {
         /* position the background but don't draw it*/
         XMoveResizeWindow(ob_display, p->bg, x, y, w, h);
 
         /* set up the hilite texture for the background */
-        p->a_bg->texture[0].data.rgba.width = w;
-        p->a_bg->texture[0].data.rgba.height = h;
-        p->hilite_rgba = g_new(RrPixel32, w * h);
+        p->a_bg->texture[0].data.rgba.width = rgbaw;
+        p->a_bg->texture[0].data.rgba.height = rgbah;
+        p->hilite_rgba = g_new(RrPixel32, rgbaw * rgbah);
         p->a_bg->texture[0].data.rgba.data = p->hilite_rgba;
 
         /* position the text, but don't draw it */
@@ -314,17 +324,18 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     /* create the hilite under the target icon */
     {
         RrPixel32 color;
-        gint i, j;
+        gint i, j, o;
 
         color = ((ob_rr_theme->osd_color->r & 0xff) << RrDefaultRedOffset) +
             ((ob_rr_theme->osd_color->g & 0xff) << RrDefaultGreenOffset) +
             ((ob_rr_theme->osd_color->b & 0xff) << RrDefaultBlueOffset);
 
-        for (i = 0; i < h; ++i)
-            for (j = 0; j < w; ++j) {
+        o = 0;
+        for (i = 0; i < rgbah; ++i)
+            for (j = 0; j < rgbaw; ++j) {
                 guchar a;
-                const gint x = j - newtargetx;
-                const gint y = i - newtargety;
+                const gint x = j + rgbax - newtargetx;
+                const gint y = i + rgbay - newtargety;
 
                 if (x < 0 || x >= ICON_SIZE ||
                     y < 0 || y >= ICON_SIZE)
@@ -333,9 +344,9 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                     a = 0x00;
                 }
                 else if (x < ICON_HILITE_WIDTH ||
-                         x >= ICON_SIZE-ICON_HILITE_WIDTH ||
+                         x >= ICON_SIZE - ICON_HILITE_WIDTH ||
                          y < ICON_HILITE_WIDTH ||
-                         y >= ICON_SIZE-ICON_HILITE_WIDTH)
+                         y >= ICON_SIZE - ICON_HILITE_WIDTH)
                 {
                     /* the border of the target */
                     a = 0x88;
@@ -345,7 +356,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                     a = 0x22;
                 }
 
-                p->hilite_rgba[i * w + j] =
+                p->hilite_rgba[o++] =
                     color + (a << RrDefaultAlphaOffset);
             }
     }
@@ -365,28 +376,28 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             const ObClientIcon *icon;
             const gint row = i / icons_per_row; /* starting from 0 */
             const gint col = i % icons_per_row; /* starting from 0 */
-            gint iconx, icony;
+            gint innerx, innery;
 
             /* find the dimensions of the icon inside it */
-            iconx = l + (col * ICON_SIZE) + ICON_HILITE_WIDTH +
-                ob_rr_theme->paddingx;
-            icony = t + (row * ICON_SIZE) + ICON_HILITE_WIDTH +
-                ob_rr_theme->paddingy;
+            innerx = l + (col * ICON_SIZE);
+            innerx += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
+            innery = t + (row * ICON_SIZE);
+            innery += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
 
             /* move the icon */
             XMoveResizeWindow(ob_display, target->win,
-                              iconx, icony, iconw, iconh);
+                              innerx, innery, innerw, innerh);
 
             /* get the icon from the client */
-            icon = client_icon(target->client, iconw, iconh);
+            icon = client_icon(target->client, innerw, innerh);
             p->a_icon->texture[0].data.rgba.width = icon->width;
             p->a_icon->texture[0].data.rgba.height = icon->height;
             p->a_icon->texture[0].data.rgba.data = icon->data;
 
             /* draw the icon */
-            p->a_icon->surface.parentx = iconx;
-            p->a_icon->surface.parenty = icony;
-            RrPaint(p->a_icon, target->win, iconw, iconh);
+            p->a_icon->surface.parentx = innerx;
+            p->a_icon->surface.parenty = innery;
+            RrPaint(p->a_icon, target->win, innerw, innerh);
         }
     }
 

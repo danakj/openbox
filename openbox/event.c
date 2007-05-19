@@ -772,7 +772,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
         {
             /* use where the press occured */
             con = frame_context(client, e->xbutton.window, px, py);
-            con = mouse_button_frame_context(con, e->xbutton.button);
+            con = mouse_button_frame_context(con, e->xbutton.button,
+                                             e->xbutton.state);
 
             if (e->type == ButtonRelease && e->xbutton.button == pb)
                 pb = 0, px = py = -1;

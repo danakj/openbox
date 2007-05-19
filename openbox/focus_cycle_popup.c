@@ -311,29 +311,39 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* create the hilite under the target icon */
     {
-        RrPixel32 color = 0;
+        RrPixel32 color;
         gint i, j;
 
-        memset(p->hilite_rgba, color, w * h * sizeof(RrPixel32));
+        color = ((ob_rr_theme->osd_color->r & 0xff) << RrDefaultRedOffset) +
+            ((ob_rr_theme->osd_color->g & 0xff) << RrDefaultGreenOffset) +
+            ((ob_rr_theme->osd_color->b & 0xff) << RrDefaultBlueOffset);
 
-        for (i = 0; i < ICON_SIZE; ++i)
-            for (j = 0; j < ICON_SIZE; ++j) {
+        for (i = 0; i < h; ++i)
+            for (j = 0; j < w; ++j) {
                 guchar a;
+                const gint x = j - newtargetx;
+                const gint y = i - newtargety;
 
-                if (i < ICON_HILITE_WIDTH ||
-                    i >= ICON_SIZE-ICON_HILITE_WIDTH ||
-                    j < ICON_HILITE_WIDTH ||
-                    j >= ICON_SIZE-ICON_HILITE_WIDTH)
+                if (x < 0 || x >= ICON_SIZE ||
+                    y < 0 || y >= ICON_SIZE)
+                {
+                    /* outside the target */
+                    a = 0x00;
+                }
+                else if (x < ICON_HILITE_WIDTH ||
+                         x >= ICON_SIZE-ICON_HILITE_WIDTH ||
+                         y < ICON_HILITE_WIDTH ||
+                         y >= ICON_SIZE-ICON_HILITE_WIDTH)
                 {
                     /* the border of the target */
                     a = 0x88;
                 }
                 else {
                     /* the background of the target */
-                    a = 0x33;
+                    a = 0x22;
                 }
 
-                p->hilite_rgba[(i+newtargety) * w + (j+newtargetx)] =
+                p->hilite_rgba[i * w + j] =
                     color + (a << RrDefaultAlphaOffset);
             }
     }

@@ -32,6 +32,7 @@
 
 #define ICON_SIZE 48
 #define ICON_HILITE_WIDTH 2
+#define OUTSIDE_BORDER 2
 
 typedef struct _ObFocusCyclePopup       ObFocusCyclePopup;
 typedef struct _ObFocusCyclePopupTarget ObFocusCyclePopupTarget;
@@ -235,10 +236,10 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* get the outside margins */
     RrMargins(p->a_bg, &l, &t, &r, &b);
-    l += ob_rr_theme->paddingx;
-    r += ob_rr_theme->paddingx;
-    t += ob_rr_theme->paddingy;
-    b += ob_rr_theme->paddingy;
+    l += ob_rr_theme->paddingx + OUTSIDE_BORDER;
+    r += ob_rr_theme->paddingx + OUTSIDE_BORDER;
+    t += ob_rr_theme->paddingy + OUTSIDE_BORDER;
+    b += ob_rr_theme->paddingy + OUTSIDE_BORDER;
 
     /* get the icons sizes */
     iconw = ICON_SIZE - (ICON_HILITE_WIDTH + ob_rr_theme->paddingx) * 2;
@@ -262,11 +263,12 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     texth = RrMinHeight(p->a_text);
 
     /* find the height of the dialog */
-    h = t + b + (icon_rows * ICON_SIZE) + (ob_rr_theme->paddingy + texth);
+    h = t + b + (icon_rows * ICON_SIZE) +
+        (ob_rr_theme->paddingy * 2 + OUTSIDE_BORDER + texth);
 
     /* get the position of the text */
     textx = l;
-    texty = h - texth;
+    texty = h - texth - b;
 
     /* find the position for the popup (include the outer borders) */
     x = screen_area->x + (screen_area->width -

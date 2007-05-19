@@ -230,6 +230,7 @@ GC       RrColorGC    (RrColor *c);
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
+void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name, gint size,
                              RrFontWeight weight, RrFontSlant slant);

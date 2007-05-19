@@ -194,6 +194,14 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
   return out;
 }
 
+void RrAppearanceAddTextures(RrAppearance *a, gint numtex)
+{
+    g_assert(a->textures == 0);
+
+    a->textures = numtex;
+    if (numtex) a->texture = g_new0(RrTexture, numtex);
+}
+
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;

@@ -375,8 +375,9 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     }
     if (focus_cycle_target && dialog) {
         /* same arguments as focus_target_valid */
-        focus_cycle_popup_show(focus_cycle_target, FALSE, FALSE, dock_windows,
-                               desktop_windows);
+        focus_cycle_popup_single_show(focus_cycle_target,
+                                      FALSE, FALSE, dock_windows,
+                                      desktop_windows);
         return;
     }
 
@@ -388,7 +389,7 @@ done_cycle:
     focus_cycle_target = NULL;
 
     focus_cycle_draw_indicator(NULL);
-    focus_cycle_popup_hide();
+    focus_cycle_popup_single_hide();
 
     return;
 }

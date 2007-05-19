@@ -32,4 +32,11 @@ void focus_cycle_popup_show(struct _ObClient *c, gboolean iconic_windows,
                             gboolean desktop_windows);
 void focus_cycle_popup_hide();
 
+void focus_cycle_popup_single_show(struct _ObClient *c,
+                                   gboolean iconic_windows,
+                                   gboolean all_desktops,
+                                   gboolean dock_windows,
+                                   gboolean desktop_windows);
+void focus_cycle_popup_single_hide();
+
 #endif

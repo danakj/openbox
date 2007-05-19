@@ -38,6 +38,7 @@
 #include "mainloop.h"
 #include "framerender.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "moveresize.h"
 #include "group.h"
 #include "stacking.h"

@@ -30,6 +30,7 @@
 #include "screen.h"
 #include "startupnotify.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "moveresize.h"
 #include "frame.h"
 #include "keyboard.h"
@@ -283,6 +284,7 @@ gint main(gint argc, gchar **argv)
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
             focus_startup(reconfigure);
+            focus_cycle_startup(reconfigure);
             window_startup(reconfigure);
             sn_startup(reconfigure);
             screen_startup(reconfigure);
@@ -348,6 +350,7 @@ gint main(gint argc, gchar **argv)
             propwin_shutdown(reconfigure);
             grab_shutdown(reconfigure);
             screen_shutdown(reconfigure);
+            focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             window_shutdown(reconfigure);

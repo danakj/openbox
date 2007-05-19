@@ -25,7 +25,7 @@
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
-#include "focus.h"
+#include "focus_cycle.h"
 #include "moveresize.h"
 #include "screen.h"
 #include "render/theme.h"

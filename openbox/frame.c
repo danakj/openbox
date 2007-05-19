@@ -176,6 +176,14 @@ ObFrame *frame_new(ObClient *client)
 
 static void set_theme_statics(ObFrame *self)
 {
+    gint handle_height;
+
+    if (ob_rr_theme->handle_height > 0)
+        handle_height = ob_rr_theme->handle_height;
+    else
+        handle_height = 1;
+        
+
     /* set colors/appearance/sizes for stuff that doesn't change */
     XResizeWindow(ob_display, self->max,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
@@ -189,12 +197,10 @@ static void set_theme_statics(ObFrame *self)
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
     XResizeWindow(ob_display, self->shade,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
-    if (ob_rr_theme->handle_height > 0) {
-        XResizeWindow(ob_display, self->lgrip,
-                      ob_rr_theme->grip_width, ob_rr_theme->handle_height);
-        XResizeWindow(ob_display, self->rgrip,
-                      ob_rr_theme->grip_width, ob_rr_theme->handle_height);
-    }
+    XResizeWindow(ob_display, self->lgrip,
+                  ob_rr_theme->grip_width, handle_height);
+    XResizeWindow(ob_display, self->rgrip,
+                  ob_rr_theme->grip_width, handle_height);
     XResizeWindow(ob_display, self->tltresize,
                   ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
     XResizeWindow(ob_display, self->trtresize,
@@ -406,12 +412,18 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             layout_title(self);
 
         if (!fake) {
-            if (self->decorations & OB_FRAME_DECOR_HANDLE &&
-                ob_rr_theme->handle_height > 0)
+            if (self->decorations & OB_FRAME_DECOR_HANDLE)
             {
+                gint handle_height;
+
+                if (ob_rr_theme->handle_height > 0)
+                    handle_height = ob_rr_theme->handle_height;
+                else
+                    handle_height = 1;
+
                 XMoveResizeWindow(ob_display, self->handle,
                                   -self->bwidth, FRAME_HANDLE_Y(self),
-                                  self->width, ob_rr_theme->handle_height);
+                                  self->width, handle_height);
                 XMapWindow(ob_display, self->handle);
 
                 if (self->decorations & OB_FRAME_DECOR_GRIPS) {

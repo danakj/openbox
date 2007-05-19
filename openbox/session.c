@@ -513,6 +513,8 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
             fprintf(f, "\t<role>%s</role>\n", t);
             g_free(t);
 
+            fprintf(f, "\t<windowtype>%d</windowtype>\n", c->type);
+
             fprintf(f, "\t<desktop>%d</desktop>\n", c->desktop);
             fprintf(f, "\t<x>%d</x>\n", prex);
             fprintf(f, "\t<y>%d</y>\n", prey);
@@ -576,12 +578,14 @@ static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
     ob_debug_type(OB_DEBUG_SM, "  client name: %s \n", c->name);
     ob_debug_type(OB_DEBUG_SM, "  client class: %s \n", c->class);
     ob_debug_type(OB_DEBUG_SM, "  client role: %s \n", c->role);
+    ob_debug_type(OB_DEBUG_SM, "  client type: %s \n", c->type);
     ob_debug_type(OB_DEBUG_SM, "  client command: %s \n",
                   c->wm_command ? c->wm_command : "(null)");
     ob_debug_type(OB_DEBUG_SM, "  state id: %s \n", s->id);
     ob_debug_type(OB_DEBUG_SM, "  state name: %s \n", s->name);
     ob_debug_type(OB_DEBUG_SM, "  state class: %s \n", s->class);
     ob_debug_type(OB_DEBUG_SM, "  state role: %s \n", s->role);
+    ob_debug_type(OB_DEBUG_SM, "  state type: %s \n", s->type);
     ob_debug_type(OB_DEBUG_SM, "  state command: %s \n",
                   s->command ? s->command : "(null)");
 
@@ -590,7 +594,13 @@ static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
     {
         return (!strcmp(s->name, c->name) &&
                 !strcmp(s->class, c->class) &&
-                !strcmp(s->role, c->role));
+                !strcmp(s->role, c->role) &&
+                /* the check for type is to catch broken clients, like
+                   firefox, which open a different window on startup
+                   with the same info as the one we saved. only do this
+                   check for old windows that dont use xsmp, others should
+                   know better ! */
+                (!s->command || c->type == s->type));
     }
     return FALSE;
 }
@@ -639,6 +649,9 @@ static void session_load_file(const gchar *path)
         if (!(n = parse_find_node("role", node->children)))
             goto session_load_bail;
         state->role = parse_string(doc, n);
+        if (!(n = parse_find_node("windowtype", node->children)))
+            goto session_load_bail;
+        state->type = parse_int(doc, n);
         if (!(n = parse_find_node("desktop", node->children)))
             goto session_load_bail;
         state->desktop = parse_int(doc, n);

@@ -80,7 +80,6 @@ typedef enum
 struct _ObClient
 {
     ObWindow obwin;
-
     Window  window;
 
     /*! The window's decorations. NULL while the window is being managed! */

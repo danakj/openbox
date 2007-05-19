@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "client.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "moveresize.h"
 #include "menu.h"
 #include "prop.h"
@@ -38,16 +39,16 @@
 
 #include <glib.h>
 
-inline void client_action_start(union ActionData *data)
+static void client_action_start(union ActionData *data)
 {
 }
 
-inline void client_action_end(union ActionData *data)
+static void client_action_end(union ActionData *data)
 {
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button) {
-                event_ignore_queued_enters();
+            if (!data->any.button && data->any.c) {
+                event_ignore_all_queued_enters();
             } else {
                 ObClient *c;
 

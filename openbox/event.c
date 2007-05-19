@@ -38,6 +38,7 @@
 #include "mainloop.h"
 #include "framerender.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "moveresize.h"
 #include "group.h"
 #include "stacking.h"
@@ -85,6 +86,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_user_time_window_clients(GSList *l, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
+static gboolean is_enter_focus_event_ignored(XEvent *e);
 
 static void focus_delay_dest(gpointer data);
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
@@ -359,7 +361,7 @@ static Bool event_look_for_focusin(Display *d, XEvent *e, XPointer arg)
     return e->type == FocusIn && wanted_focusevent(e, FALSE);
 }
 
-Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
+static Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
 {
     return e->type == FocusIn && wanted_focusevent(e, TRUE);
 }
@@ -574,7 +576,6 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, FALSE);
             if (client == focus_client)
                 focus_set_client(NULL);
-            /* focus_set_client has already been called for sure */
             client_calc_layer(client);
         }
     } else if (timewinclients)
@@ -884,7 +885,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                corresponding enter events. Pretend like the animating window
                doesn't even exist..! */
             if (frame_iconify_animating(client->frame))
-                event_ignore_queued_enters();
+                event_ignore_all_queued_enters();
 
             ob_debug_type(OB_DEBUG_FOCUS,
                           "%sNotify mode %d detail %d on %lx\n",
@@ -910,13 +911,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case EnterNotify:
     {
-        gboolean nofocus = FALSE;
-
-        if (ignore_enter_focus) {
-            ignore_enter_focus--;
-            nofocus = TRUE;
-        }
-
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
@@ -946,22 +940,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab ||
                 /*ignore enters when we're already in the window */
-                e->xcrossing.detail == NotifyInferior)
+                e->xcrossing.detail == NotifyInferior ||
+                is_enter_focus_event_ignored(e))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d on %lx IGNORED\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
                               e->xcrossing.detail, client?client->window:0);
-            } else {
+            }
+            else {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d on %lx, "
-                              "focusing window: %d\n",
+                              "focusing window\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
-                              e->xcrossing.detail, (client?client->window:0),
-                              !nofocus);
-                if (!nofocus && config_focus_follow)
+                              e->xcrossing.detail, (client?client->window:0));
+                if (config_focus_follow)
                     event_enter_client(client);
             }
             break;
@@ -1085,7 +1080,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_queued_enters();
+            event_ignore_all_queued_enters();
         }
         break;
     }
@@ -1181,7 +1176,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                              e->xclient.data.l[1], e->xclient.data.l[2]);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_queued_enters();
+            event_ignore_all_queued_enters();
         } else if (msgtype == prop_atoms.net_close_window) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
@@ -1269,7 +1264,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_queued_enters();
+            event_ignore_all_queued_enters();
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
@@ -1279,8 +1274,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             } else {
                 ObClient *sibling = NULL;
                 if (e->xclient.data.l[1]) {
-                    ObWindow *win = g_hash_table_lookup(window_map,
-                                                        &e->xclient.data.l[1]);
+                    ObWindow *win = g_hash_table_lookup
+                        (window_map, &e->xclient.data.l[1]);
                     if (WINDOW_IS_CLIENT(win) &&
                         WINDOW_AS_CLIENT(win) != client)
                     {
@@ -1612,6 +1607,10 @@ static gboolean event_handle_menu(XEvent *ev)
         }
         break;
     case LeaveNotify:
+        /*ignore leaves when we're already in the window */
+        if (ev->xcrossing.detail == NotifyInferior)
+            break;
+
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
             (f = find_active_menu()) && f->selected == e &&
             e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
@@ -1718,35 +1717,51 @@ void event_halt_focus_delay()
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
-void event_ignore_queued_enters()
+static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
 {
-    GSList *saved = NULL, *it;
-    XEvent *e;
-                
+    if (e->type == EnterNotify &&
+        /* these types aren't used for focusing */
+        !(e->xcrossing.mode == NotifyGrab ||
+          e->xcrossing.mode == NotifyUngrab ||
+          e->xcrossing.detail == NotifyInferior))
+    {
+        ObWindow *win;
+
+        /* found an enter for that leave, ignore it if it's going to
+           another window */
+        win = g_hash_table_lookup(window_map, &e->xany.window);
+        if (win && WINDOW_IS_CLIENT(win))
+            ++ignore_enter_focus;
+    }
+    return False; /* don't disrupt the queue order, just count them */
+}
+
+void event_ignore_all_queued_enters()
+{
+    XEvent e;
+
     XSync(ob_display, FALSE);
 
-    /* count the events */
-    while (TRUE) {
-        e = g_new(XEvent, 1);
-        if (XCheckTypedEvent(ob_display, EnterNotify, e)) {
-            ObWindow *win;
-            
-            win = g_hash_table_lookup(window_map, &e->xany.window);
-            if (win && WINDOW_IS_CLIENT(win))
-                ++ignore_enter_focus;
-            
-            saved = g_slist_append(saved, e);
-        } else {
-            g_free(e);
-            break;
-        }
+    /* count the events without disrupting them */
+    ignore_enter_focus = 0;
+    XCheckIfEvent(ob_display, &e, event_look_for_enters, NULL);
+}
+
+static gboolean is_enter_focus_event_ignored(XEvent *e)
+{
+    g_assert(e->type == EnterNotify &&
+             !(e->xcrossing.mode == NotifyGrab ||
+               e->xcrossing.mode == NotifyUngrab ||
+               e->xcrossing.detail == NotifyInferior));
+
+    ob_debug_type(OB_DEBUG_FOCUS, "# enters ignored: %d\n",
+                  ignore_enter_focus);
+
+    if (ignore_enter_focus) {
+        --ignore_enter_focus;
+        return TRUE;
     }
-    /* put the events back */
-    for (it = saved; it; it = g_slist_next(it)) {
-        XPutBackEvent(ob_display, it->data);
-        g_free(it->data);
-    }
-    g_slist_free(saved);
+    return FALSE;
 }
 
 gboolean event_time_after(Time t1, Time t2)

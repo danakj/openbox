@@ -288,6 +288,7 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.kde_net_wm_frame_strut;
     supported[i++] = prop_atoms.kde_net_wm_window_type_override;
 
+    supported[i++] = prop_atoms.ob_wm_action_undecorate;
     supported[i++] = prop_atoms.ob_wm_state_undecorated;
     supported[i++] = prop_atoms.openbox_pid;
     supported[i++] = prop_atoms.ob_config;
@@ -522,7 +523,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    event_ignore_queued_enters();
+    event_ignore_all_queued_enters();
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;

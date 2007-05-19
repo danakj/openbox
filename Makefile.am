@@ -170,6 +170,12 @@ openbox_openbox_SOURCES = \
 	openbox/extensions.h \
 	openbox/focus.c \
 	openbox/focus.h \
+	openbox/focus_cycle.c \
+	openbox/focus_cycle.h \
+	openbox/focus_cycle_indicator.c \
+	openbox/focus_cycle_indicator.h \
+	openbox/focus_cycle_popup.c \
+	openbox/focus_cycle_popup.h \
 	openbox/frame.c \
 	openbox/frame.h \
 	openbox/framerender.c \

@@ -29,8 +29,6 @@ struct _ObClient;
 
 /*! The client which is currently focused */
 extern struct _ObClient *focus_client;
-/*! The client which appears focused during a focus cycle operation */
-extern struct _ObClient *focus_cycle_target;
 
 /*! The recent focus order on each desktop */
 extern GList *focus_order;
@@ -47,16 +45,6 @@ void focus_nothing();
 
 /*! Call this when you need to focus something! */
 struct _ObClient* focus_fallback(gboolean allow_refocus);
-
-/*! Cycle focus amongst windows. */
-void focus_cycle(gboolean forward, gboolean all_desktops,
-                 gboolean dock_windows, gboolean desktop_windows,
-                 gboolean linear, gboolean interactive,
-                 gboolean dialog, gboolean done, gboolean cancel);
-void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
-                             gboolean desktop_windows, gboolean interactive,
-                             gboolean dialog, gboolean done, gboolean cancel);
-void focus_cycle_draw_indicator();
 
 /*! Add a new client into the focus order */
 void focus_order_add_new(struct _ObClient *c);

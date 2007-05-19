@@ -25,7 +25,8 @@
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
-#include "focus.h"
+#include "focus_cycle.h"
+#include "focus_cycle_indicator.h"
 #include "moveresize.h"
 #include "screen.h"
 #include "render/theme.h"
@@ -507,7 +508,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* if this occurs while we are focus cycling, the indicator needs to
            match the changes */
         if (focus_cycle_target == self->client)
-            focus_cycle_draw_indicator();
+            focus_cycle_draw_indicator(self->client);
     }
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(ob_display, self->label, self->label_width,
@@ -1171,6 +1172,10 @@ void frame_end_iconify_animation(ObFrame *self)
 
     if (!self->visible)
         XUnmapWindow(ob_display, self->window);
+    else
+        /* Send a ConfigureNotify when the animation is done, this fixes
+           KDE's pager showing the window in the wrong place. */
+        client_reconfigure(self->client);
 
     /* we're not animating any more ! */
     self->iconify_animation_going = 0;

@@ -19,14 +19,15 @@
 #ifndef __ob__session_h
 #define __ob__session_h
 
-#include <glib.h>
+#include "client.h"
 
-struct _ObClient;
+#include <glib.h>
 
 typedef struct _ObSessionState ObSessionState;
 
 struct _ObSessionState {
     gchar *id, *command, *name, *class, *role;
+    ObClientType type;
     guint desktop;
     gint x, y, w, h;
     gboolean shaded, iconic, skip_pager, skip_taskbar, fullscreen;

@@ -90,9 +90,7 @@ manpage.1: manpage.sgml
 
     <para>You can use the <command>obconf</command> tool to configure Openbox
       easily with a graphical interface, however more in-depth configuration
-      is possible by editing the configuration files by hand. Please note that
-      <command>obconf</command> older than version 2.0 may not work at all
-      for you.</para>
+      is possible by editing the configuration files by hand.</para>
 
     <para>The default configuration and menu files are installed in
       @configdir@/openbox/, and the user configuration is placed in

@@ -234,6 +234,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint icon_rows;
     gint textx, texty, textw, texth;
     gint rgbax, rgbay, rgbaw, rgbah;
+    gint icons_center_x;
     gint innerw, innerh;
     gint i;
     GList *it;
@@ -292,6 +293,12 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     rgbaw = w - ml - mr;
     rgbah = h - mt - mb;
 
+    /* center the icons if there is less than one row */
+    if (icon_rows == 1)
+        icons_center_x = (w - p->n_targets * ICON_SIZE) / 2;
+    else
+        icons_center_x;
+
     if (!p->mapped) {
         /* position the background but don't draw it*/
         XMoveResizeWindow(ob_display, p->bg, x, y, w, h);
@@ -317,7 +324,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         if (target->client == c) {
             /* save the target */
             newtarget = target;
-            newtargetx = l + (col * ICON_SIZE);
+            newtargetx = icons_center_x + l + (col * ICON_SIZE);
             newtargety = t + (row * ICON_SIZE);
 
             if (!p->mapped)
@@ -385,7 +392,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             gint innerx, innery;
 
             /* find the dimensions of the icon inside it */
-            innerx = l + (col * ICON_SIZE);
+            innerx = icons_center_x + l + (col * ICON_SIZE);
             innerx += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
             innery = t + (row * ICON_SIZE);
             innery += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;

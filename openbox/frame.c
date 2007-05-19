@@ -138,6 +138,11 @@ ObFrame *frame_new(ObClient *client)
     self->trtresize = createWindow(self->title, NULL, mask, &attrib);
     self->trrresize = createWindow(self->title, NULL, mask, &attrib);
 
+    attrib.cursor = ob_cursor(OB_CURSOR_WEST);
+    self->leftresize = createWindow(self->inner, NULL, mask, &attrib);
+    attrib.cursor = ob_cursor(OB_CURSOR_EAST);
+    self->rightresize = createWindow(self->inner, NULL, mask, &attrib);
+
     mask &= ~CWCursor;
     self->label = createWindow(self->title, NULL, mask, &attrib);
     self->max = createWindow(self->title, NULL, mask, &attrib);
@@ -357,6 +362,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             XSetWindowBorderWidth(ob_display, self->handle, self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->lgrip,  self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->rgrip,  self->rbwidth);
+            XSetWindowBorderWidth(ob_display, self->leftresize, self->bwidth);
+            XSetWindowBorderWidth(ob_display, self->rightresize, self->bwidth);
         }
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
@@ -391,17 +398,35 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XMoveWindow(ob_display, self->trrresize,
                                 self->width - ob_rr_theme->paddingx - 1, 0);
 
+                    XMoveResizeWindow(ob_display, self->leftresize,
+                                      -(ob_rr_theme->fbwidth * 2) - 1,
+                                      0,
+                                      1,
+                                      self->client->area.height +
+                                      self->cbwidth_y * 2);
+                    XMoveResizeWindow(ob_display, self->rightresize,
+                                      self->client->area.width +
+                                      self->cbwidth_x * 2,
+                                      0,
+                                      1,
+                                      self->client->area.height +
+                                      self->cbwidth_y * 2);
+
                     XMapWindow(ob_display, self->topresize);
                     XMapWindow(ob_display, self->tltresize);
                     XMapWindow(ob_display, self->tllresize);
                     XMapWindow(ob_display, self->trtresize);
                     XMapWindow(ob_display, self->trrresize);
+                    XMapWindow(ob_display, self->leftresize);
+                    XMapWindow(ob_display, self->rightresize);
                 } else {
                     XUnmapWindow(ob_display, self->topresize);
                     XUnmapWindow(ob_display, self->tltresize);
                     XUnmapWindow(ob_display, self->tllresize);
                     XUnmapWindow(ob_display, self->trtresize);
                     XUnmapWindow(ob_display, self->trrresize);
+                    XUnmapWindow(ob_display, self->leftresize);
+                    XUnmapWindow(ob_display, self->rightresize);
                 }
             } else
                 XUnmapWindow(ob_display, self->title);
@@ -560,6 +585,7 @@ void frame_grab_client(ObFrame *self)
 {
     /* reparent the client to the frame */
     XReparentWindow(ob_display, self->client->window, self->plate, 0, 0);
+
     /*
       When reparenting the client window, it is usually not mapped yet, since
       this occurs from a MapRequest. However, in the case where Openbox is
@@ -598,6 +624,8 @@ void frame_grab_client(ObFrame *self)
     g_hash_table_insert(window_map, &self->tllresize, self->client);
     g_hash_table_insert(window_map, &self->trtresize, self->client);
     g_hash_table_insert(window_map, &self->trrresize, self->client);
+    g_hash_table_insert(window_map, &self->leftresize, self->client);
+    g_hash_table_insert(window_map, &self->rightresize, self->client);
 }
 
 void frame_release_client(ObFrame *self)
@@ -656,6 +684,8 @@ void frame_release_client(ObFrame *self)
     g_hash_table_remove(window_map, &self->tllresize);
     g_hash_table_remove(window_map, &self->trtresize);
     g_hash_table_remove(window_map, &self->trrresize);
+    g_hash_table_remove(window_map, &self->leftresize);
+    g_hash_table_remove(window_map, &self->rightresize);
 
     ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
 }
@@ -849,6 +879,10 @@ ObFrameContext frame_context_from_string(const gchar *name)
         return OB_FRAME_CONTEXT_TOP;
     else if (!g_ascii_strcasecmp("Bottom", name))
         return OB_FRAME_CONTEXT_BOTTOM;
+    else if (!g_ascii_strcasecmp("Left", name))
+        return OB_FRAME_CONTEXT_LEFT;
+    else if (!g_ascii_strcasecmp("Right", name))
+        return OB_FRAME_CONTEXT_RIGHT;
     else if (!g_ascii_strcasecmp("Maximize", name))
         return OB_FRAME_CONTEXT_MAXIMIZE;
     else if (!g_ascii_strcasecmp("AllDesktops", name))
@@ -926,6 +960,8 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->tllresize) return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->trtresize) return OB_FRAME_CONTEXT_TRCORNER;
     if (win == self->trrresize) return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->leftresize) return OB_FRAME_CONTEXT_LEFT;
+    if (win == self->rightresize) return OB_FRAME_CONTEXT_RIGHT;
     if (win == self->max)       return OB_FRAME_CONTEXT_MAXIMIZE;
     if (win == self->iconify)   return OB_FRAME_CONTEXT_ICONIFY;
     if (win == self->close)     return OB_FRAME_CONTEXT_CLOSE;

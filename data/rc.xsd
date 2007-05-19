@@ -342,6 +342,8 @@
             <xsd:enumeration value="BRCorner"/>
             <xsd:enumeration value="Top"/>
             <xsd:enumeration value="Bottom"/>
+            <xsd:enumeration value="Left"/>
+            <xsd:enumeration value="Right"/>
             <xsd:enumeration value="Maximize"/>
             <xsd:enumeration value="AllDesktops"/>
             <xsd:enumeration value="Shade"/>

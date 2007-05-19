@@ -41,6 +41,8 @@ typedef enum {
     OB_FRAME_CONTEXT_TRCORNER,
     OB_FRAME_CONTEXT_TOP,
     OB_FRAME_CONTEXT_BOTTOM,
+    OB_FRAME_CONTEXT_LEFT,
+    OB_FRAME_CONTEXT_RIGHT,
     OB_FRAME_CONTEXT_MAXIMIZE,
     OB_FRAME_CONTEXT_ALLDESKTOPS,
     OB_FRAME_CONTEXT_SHADE,
@@ -101,6 +103,8 @@ struct _ObFrame
     Window    tllresize;
     Window    trtresize;
     Window    trrresize;
+    Window    leftresize;
+    Window    rightresize;
 
     Colormap  colormap;
 

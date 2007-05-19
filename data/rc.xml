@@ -290,6 +290,24 @@
     </mousebind>
   </context>
 
+  <context name="Left">
+    <mousebind button="Left" action="Press">
+      <action name="Activate"/>
+    </mousebind>
+    <mousebind button="Left" action="Drag">
+      <action name="Resize"><edge>left</edge></action>
+    </mousebind>
+  </context>
+
+  <context name="Right">
+    <mousebind button="Left" action="Press">
+      <action name="Activate"/>
+    </mousebind>
+    <mousebind button="Left" action="Drag">
+      <action name="Resize"><edge>right</edge></action>
+    </mousebind>
+  </context>
+
   <context name="Bottom">
     <mousebind button="Left" action="Press">
       <action name="Activate"/>

@@ -1273,8 +1273,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             } else {
                 ObClient *sibling = NULL;
                 if (e->xclient.data.l[1]) {
-                    ObWindow *win = g_hash_table_lookup(window_map,
-                                                        &e->xclient.data.l[1]);
+                    ObWindow *win = g_hash_table_lookup
+                        (window_map, &e->xclient.data.l[1]);
                     if (WINDOW_IS_CLIENT(win) &&
                         WINDOW_AS_CLIENT(win) != client)
                     {

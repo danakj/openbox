@@ -884,7 +884,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                corresponding enter events. Pretend like the animating window
                doesn't even exist..! */
             if (frame_iconify_animating(client->frame))
-                event_ignore_enters_leaving_window(client);
+                event_ignore_all_queued_enters();
 
             ob_debug_type(OB_DEBUG_FOCUS,
                           "%sNotify mode %d detail %d on %lx\n",
@@ -1079,7 +1079,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_enters_leaving_window(client);
+            event_ignore_all_queued_enters();
         }
         break;
     }
@@ -1175,7 +1175,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                              e->xclient.data.l[1], e->xclient.data.l[2]);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_enters_leaving_window(client);
+            event_ignore_all_queued_enters();
         } else if (msgtype == prop_atoms.net_close_window) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
@@ -1263,7 +1263,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_enters_leaving_window(client);
+            event_ignore_all_queued_enters();
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
@@ -1716,10 +1716,9 @@ static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
 {
     if (e->type == EnterNotify &&
         /* these types aren't used for focusing */
-        (e->xcrossing.mode == NotifyGrab ||
-         e->xcrossing.mode == NotifyUngrab ||
-         /*ignore enters when we're already in the window */
-         e->xcrossing.detail == NotifyInferior))
+        !(e->xcrossing.mode == NotifyGrab ||
+          e->xcrossing.mode == NotifyUngrab ||
+          e->xcrossing.detail == NotifyInferior))
     {
         ObWindow *win;
 
@@ -1734,17 +1733,9 @@ static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
 
 void event_ignore_all_queued_enters()
 {
-    event_ignore_enters_leaving_window(NULL);
-}
-
-void event_ignore_enters_leaving_window(ObClient *c)
-{
     XEvent e;
 
     XSync(ob_display, FALSE);
-
-    ob_debug_type(OB_DEBUG_FOCUS, "want to ignore enters leaving window "
-                  "%s\n", c?c->title:"(all)");
 
     /* count the events without disrupting them */
     ignore_enter_focus = 0;
@@ -1753,7 +1744,10 @@ void event_ignore_enters_leaving_window(ObClient *c)
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
 {
-    g_assert(e->type == EnterNotify);
+    g_assert(e->type == EnterNotify &&
+             !(e->xcrossing.mode == NotifyGrab ||
+               e->xcrossing.mode == NotifyUngrab ||
+               e->xcrossing.detail == NotifyInferior));
 
     ob_debug_type(OB_DEBUG_FOCUS, "# enters ignored: %d\n",
                   ignore_enter_focus);

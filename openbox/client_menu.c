@@ -154,8 +154,6 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         g_assert_not_reached();
     }
 
-    /* we have to ignore all queued enters because the menu has a grab, and the
-       so the cursor isnt considered inside the client's window */
     event_ignore_all_queued_enters();
 
     /* update the menu cuz stuff can have changed */
@@ -217,8 +215,6 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         g_assert_not_reached();
     }
 
-    /* we have to ignore all queued enters because the menu has a grab, and the
-       so the cursor isnt considered inside the client's window */
     event_ignore_all_queued_enters();
 
     /* update the menu cuz stuff can have changed */

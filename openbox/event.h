@@ -39,10 +39,6 @@ void event_shutdown(gboolean reconfig);
   follows mouse */
 void event_enter_client(struct _ObClient *client);
 
-/*! Make mouse focus not move if the mouse leaves this client from what
-  has just transpired. */
-void event_ignore_enters_leaving_window(struct _ObClient *c);
-
 /*! Make mouse focus not move at all from the stuff that has happened up
   till now. */
 void event_ignore_all_queued_enters();

@@ -67,6 +67,8 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
     case OB_FRAME_CONTEXT_TITLEBAR:
     case OB_FRAME_CONTEXT_FRAME:
     case OB_FRAME_CONTEXT_MOVE_RESIZE:
+    case OB_FRAME_CONTEXT_LEFT:
+    case OB_FRAME_CONTEXT_RIGHT:
         break;
     case OB_FRAME_CONTEXT_BOTTOM:
     case OB_FRAME_CONTEXT_BLCORNER:

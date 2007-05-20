@@ -413,7 +413,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                       ob_rr_theme->title_height + self->bwidth,
                                       self->client->area.width +
                                       self->cbwidth_x * 2,
-                                      self->bwidth);
+                                      self->rbwidth);
 
                     XMapWindow(ob_display, self->titlebottom);
                 } else

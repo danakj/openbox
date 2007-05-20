@@ -77,9 +77,6 @@ struct _ObMenuFrame
 
 struct _ObMenuEntryFrame
 {
-    /* if this is true then it doesn't have an entry to point to */
-    gboolean more;
-
     struct _ObMenuEntry *entry;
     ObMenuFrame *frame;
 

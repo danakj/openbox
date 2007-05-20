@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-13 16:42-0400\n"
+"POT-Creation-Date: 2007-05-20 17:27+0200\n"
 "PO-Revision-Date: 2006-09-05 16:45+0100\n"
 "Last-Translator: Daniel Radetic <drade@boobah.info>\n"
 "Language-Team: None\n"
@@ -15,22 +15,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:945
+#: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr ""
 
-#: openbox/action.c:948
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
-#: openbox/action.c:1222 openbox/action.c:1240 openbox/action.c:1253
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, fuzzy, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Nemogu napraviti direktorij '%s': %s"
 
-#: openbox/action.c:1261
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr ""
@@ -47,79 +47,79 @@ msgstr ""
 msgid "Desktops"
 msgstr "Radne površine"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:246
 msgid "All desktops"
 msgstr "Sve radne površine"
 
-#: openbox/client_menu.c:346
+#: openbox/client_menu.c:351
 #, fuzzy
 msgid "&Layer"
 msgstr "&Razina"
 
-#: openbox/client_menu.c:351
+#: openbox/client_menu.c:356
 #, fuzzy
 msgid "Always on &top"
 msgstr "Uvijek na &vrhu"
 
-#: openbox/client_menu.c:352
+#: openbox/client_menu.c:357
 #, fuzzy
 msgid "&Normal"
 msgstr "&Normalno"
 
-#: openbox/client_menu.c:353
+#: openbox/client_menu.c:358
 #, fuzzy
 msgid "Always on &bottom"
 msgstr "Uvijek na &dnu"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:361
 #, fuzzy
 msgid "&Send to desktop"
 msgstr "&Pošalji na radnu površinu"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:365
 msgid "Client menu"
 msgstr "Meni klijenta"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:371
 #, fuzzy
 msgid "R&estore"
 msgstr "Ponovno uspostav&i"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:379
 #, fuzzy
 msgid "&Move"
 msgstr "Po&makni"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:381
 #, fuzzy
 msgid "Resi&ze"
 msgstr "Prom&jeni veličinu"
 
-#: openbox/client_menu.c:378
+#: openbox/client_menu.c:383
 #, fuzzy
 msgid "Ico&nify"
 msgstr "Iko&nificiraj"
 
-#: openbox/client_menu.c:386
+#: openbox/client_menu.c:391
 #, fuzzy
 msgid "Ma&ximize"
 msgstr "M&aksimiziraj"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:399
 msgid "&Roll up/down"
 msgstr ""
 
-#: openbox/client_menu.c:396
+#: openbox/client_menu.c:401
 #, fuzzy
 msgid "Un/&Decorate"
 msgstr "De&koriraj"
 
-#: openbox/client_menu.c:406
+#: openbox/client_menu.c:411
 #, fuzzy
 msgid "&Close"
 msgstr "&Zatvori"
 
-#: openbox/config.c:667
+#: openbox/config.c:666
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr ""
@@ -153,126 +153,125 @@ msgstr ""
 msgid "More..."
 msgstr "Odi na..."
 
-#: openbox/mouse.c:321
+#: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr ""
 
-#: openbox/mouse.c:327
+#: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
-#: openbox/openbox.c:124
+#: openbox/openbox.c:128
 #, fuzzy, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Nemogu napraviti direktorij '%s': %s"
 
-#: openbox/openbox.c:142
+#: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr ""
 
-#: openbox/openbox.c:173
+#: openbox/openbox.c:179
 msgid "Failed to initialize the render library."
 msgstr ""
 
-#: openbox/openbox.c:179
+#: openbox/openbox.c:185
 msgid "X server does not support locale."
 msgstr ""
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:187
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 
-#: openbox/openbox.c:241
+#: openbox/openbox.c:248
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
-#: openbox/openbox.c:265
+#: openbox/openbox.c:274
 #, fuzzy
 msgid "Unable to load a theme."
 msgstr "Nemogu učitati slova: %s\n"
 
-#: openbox/openbox.c:378
+#: openbox/openbox.c:393
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:447 openbox/openbox.c:449
+#: openbox/openbox.c:461 openbox/openbox.c:463
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:458
+#: openbox/openbox.c:472
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:459
+#: openbox/openbox.c:473
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 
-#: openbox/openbox.c:460
+#: openbox/openbox.c:474
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:461
+#: openbox/openbox.c:475
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:462
+#: openbox/openbox.c:476
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:463
+#: openbox/openbox.c:477
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:464
-msgid "  --config TYPE       Specify the configuration profile to use\n"
-msgstr ""
-
-#: openbox/openbox.c:465
+#: openbox/openbox.c:478
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 
-#: openbox/openbox.c:466
+#: openbox/openbox.c:479
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
-#: openbox/openbox.c:467
+#: openbox/openbox.c:480
+msgid "  --restart           Restart Openbox\n"
+msgstr ""
+
+#: openbox/openbox.c:481
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
 
-#: openbox/openbox.c:468
+#: openbox/openbox.c:482
 msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
-#: openbox/openbox.c:469
+#: openbox/openbox.c:483
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:470
+#: openbox/openbox.c:484
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:471
+#: openbox/openbox.c:485
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+
+#: openbox/openbox.c:486
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:529
-#, fuzzy
-msgid "--config requires an argument\n"
-msgstr "--sm-save-file zahtjeva argument\n"
-
-#: openbox/openbox.c:564
+#: openbox/openbox.c:578
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
@@ -302,12 +301,12 @@ msgstr "Nemogu napraviti direktorij '%s': %s"
 msgid "Unable to save the session to '%s': %s"
 msgstr "Nemogu napraviti direktorij '%s': %s"
 
-#: openbox/session.c:550
+#: openbox/session.c:552
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr ""
 
-#: openbox/startupnotify.c:240
+#: openbox/startupnotify.c:237
 #, c-format
 msgid "Running %s\n"
 msgstr ""
@@ -336,3 +335,7 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
+
+#, fuzzy
+#~ msgid "--config requires an argument\n"
+#~ msgstr "--sm-save-file zahtjeva argument\n"

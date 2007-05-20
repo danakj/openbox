@@ -109,8 +109,8 @@ ObFrame *frame_new(ObClient *client)
             XCreateColormap(ob_display,
                             RootWindow(ob_display, ob_screen),
                             visual, AllocNone);
-        attrib.background_pixel = BlackPixel(ob_display, 0);
-        attrib.border_pixel = BlackPixel(ob_display, 0);
+        attrib.background_pixel = BlackPixel(ob_display, ob_screen);
+        attrib.border_pixel = BlackPixel(ob_display, ob_screen);
     }
     attrib.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen), visual,

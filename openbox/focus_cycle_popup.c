@@ -289,7 +289,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     texth = RrMinHeight(p->a_text);
 
     /* find the height of the dialog */
-    h = t + b + (icon_rows * ICON_SIZE) + (OUTSIDE_BORDER + texth);
+    h = t + b + (icon_rows * ICON_SIZE) + (OUTSIDE_BORDER*2 + texth);
 
     /* get the position of the text */
     textx = l;
@@ -429,7 +429,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     }
 
     /* draw the text */
-    p->a_text->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
     p->a_text->texture[0].data.text.string = newtarget->text;
     p->a_text->surface.parentx = textx;
     p->a_text->surface.parenty = texty;

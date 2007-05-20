@@ -853,9 +853,11 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     gint ox = *x, oy = *y;
     gboolean rudel = rude, ruder = rude, rudet = rude, rudeb = rude;
     gint fw, fh;
+    Rect desired;
 
+    RECT_SET(desired, *x, *y, w, h);
     all_a = screen_area(self->desktop);
-    mon_a = screen_area_monitor(self->desktop, client_monitor(self));
+    mon_a = screen_area_monitor(self->desktop, screen_find_monitor(&desired));
 
     /* get where the frame would be */
     frame_client_gravity(self->frame, x, y, w, h);

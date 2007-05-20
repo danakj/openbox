@@ -421,6 +421,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 } else
                     XUnmapWindow(ob_display, self->titlebottom);
             } else {
+                XUnmapWindow(ob_display, self->titlebottom);
+
                 XUnmapWindow(ob_display, self->titletop);
                 XUnmapWindow(ob_display, self->titletopleft);
                 XUnmapWindow(ob_display, self->titletopright);
@@ -581,6 +583,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 } else
                     XUnmapWindow(ob_display, self->handletop);
             } else {
+                XUnmapWindow(ob_display, self->handletop);
+
                 XUnmapWindow(ob_display, self->handlebottom);
                 XUnmapWindow(ob_display, self->lgripleft);
                 XUnmapWindow(ob_display, self->rgripright);

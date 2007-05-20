@@ -580,9 +580,20 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                         XUnmapWindow(ob_display, self->lgriptop);
                         XUnmapWindow(ob_display, self->rgriptop);
                     }
-                } else
+                } else {
+                    XUnmapWindow(ob_display, self->handleleft);
+                    XUnmapWindow(ob_display, self->handleright);
+                    XUnmapWindow(ob_display, self->lgriptop);
+                    XUnmapWindow(ob_display, self->rgriptop);
+
                     XUnmapWindow(ob_display, self->handletop);
+                }
             } else {
+                XUnmapWindow(ob_display, self->handleleft);
+                XUnmapWindow(ob_display, self->handleright);
+                XUnmapWindow(ob_display, self->lgriptop);
+                XUnmapWindow(ob_display, self->rgriptop);
+
                 XUnmapWindow(ob_display, self->handletop);
 
                 XUnmapWindow(ob_display, self->handlebottom);

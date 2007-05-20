@@ -132,22 +132,15 @@ ObFrame *frame_new(ObClient *client)
     attrib.event_mask = ELEMENT_EVENTMASK;
     self->title = createWindow(self->window, NULL, mask, &attrib);
 
-    mask |= CWCursor;
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTH);
     self->topresize = createWindow(self->title, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
     self->tltresize = createWindow(self->title, NULL, mask, &attrib);
     self->tllresize = createWindow(self->title, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTHEAST);
     self->trtresize = createWindow(self->title, NULL, mask, &attrib);
     self->trrresize = createWindow(self->title, NULL, mask, &attrib);
 
-    attrib.cursor = ob_cursor(OB_CURSOR_WEST);
     self->leftresize = createWindow(self->inner, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_EAST);
     self->rightresize = createWindow(self->inner, NULL, mask, &attrib);
 
-    mask &= ~CWCursor;
     self->label = createWindow(self->title, NULL, mask, &attrib);
     self->max = createWindow(self->title, NULL, mask, &attrib);
     self->close = createWindow(self->title, NULL, mask, &attrib);
@@ -156,12 +149,8 @@ ObFrame *frame_new(ObClient *client)
     self->icon = createWindow(self->title, NULL, mask, &attrib);
     self->iconify = createWindow(self->title, NULL, mask, &attrib);
 
-    mask |= CWCursor;
-    attrib.cursor = ob_cursor(OB_CURSOR_SOUTH);
     self->handle = createWindow(self->window, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
     self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
     self->rgrip = createWindow(self->handle, NULL, mask, &attrib); 
 
     self->focused = FALSE;
@@ -548,6 +537,36 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(ob_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
+
+    /* set up cursors */
+    if (!fake &&
+        (self->functions & OB_CLIENT_FUNC_RESIZE) !=
+        (self->client->functions & OB_CLIENT_FUNC_RESIZE))
+    {
+        gboolean r = self->client->functions & OB_CLIENT_FUNC_RESIZE;
+        XSetWindowAttributes a;
+
+        a.cursor = ob_cursor(r ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->topresize, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_NORTHWEST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->tltresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->tllresize, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_NORTHEAST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->trtresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->trrresize, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_WEST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->leftresize, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_EAST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->rightresize, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHWEST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->lgrip, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHEAST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->rgrip, CWCursor, &a);
+
+        self->functions = self->client->functions;
+    }
 }
 
 void frame_adjust_client_area(ObFrame *self)

@@ -83,6 +83,7 @@ struct _ObFrame
     Rect      area;
     gboolean  visible;
 
+    guint     functions;
     guint     decorations;
     gboolean  max_horz;
 

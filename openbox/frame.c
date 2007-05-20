@@ -190,8 +190,6 @@ ObFrame *frame_new(ObClient *client)
 
 static void set_theme_statics(ObFrame *self)
 {
-    gint handle_height;
-
     /* set colors/appearance/sizes for stuff that doesn't change */
     XResizeWindow(ob_display, self->max,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
@@ -354,12 +352,12 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   self->cbwidth_y + self->bwidth);
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
-            self->size.top += ob_rr_theme->title_height + self->bwidth +
-                (self->bwidth - self->bwidth);
+            self->size.top += ob_rr_theme->title_height + self->rbwidth;
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
             ob_rr_theme->handle_height > 0)
-            self->size.bottom += ob_rr_theme->handle_height +
-                self->bwidth + (self->bwidth - self->bwidth);
+        {
+            self->size.bottom += ob_rr_theme->handle_height + self->bwidth;
+        }
   
         /* position/size and map/unmap all the windows */
 
@@ -399,7 +397,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(ob_display, self->titleleft);
                 XMapWindow(ob_display, self->titleright);
 
-                if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
+                if (self->decorations & OB_FRAME_DECOR_TITLEBAR &&
+                    self->rbwidth)
+                {
                     XMoveResizeWindow(ob_display, self->titlebottom,
                                       self->bwidth,
                                       ob_rr_theme->title_height + self->bwidth,

@@ -107,8 +107,18 @@ struct _ObFrame
     Window    titletopright;
     Window    titleright;
     Window    titlebottom;
-    Window    leftresize;
-    Window    rightresize;
+    Window    left;
+    Window    right;
+    Window    handleleft;
+    Window    handletop;
+    Window    handleright;
+    Window    handlebottom;
+    Window    lgriptop;
+    Window    lgripleft;
+    Window    lgripbottom;
+    Window    rgriptop;
+    Window    rgripright;
+    Window    rgripbottom;
 
     /* These are resize handles inside the titlebar */
     Window    topresize;

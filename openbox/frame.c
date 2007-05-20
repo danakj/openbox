@@ -46,8 +46,7 @@
 #define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
 #define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 60) /* 60 Hz */
 
-#define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
-                           f->cbwidth_y)
+#define FRAME_HANDLE_Y(f) (f->size.top + f->client->area.height + f->cbwidth_y)
 
 static void flash_done(gpointer data);
 static gboolean flash_timeout(gpointer data);
@@ -71,6 +70,11 @@ static Visual *check_32bit_client(ObClient *c)
 {
     XWindowAttributes wattrib;
     Status ret;
+
+    /* we're already running at 32 bit depth, yay. we don't need to use their
+       visual */
+    if (RrDepth(ob_rr_inst) == 32)
+        return NULL;
 
     ret = XGetWindowAttributes(ob_display, c->window, &wattrib);
     g_assert(ret != BadDrawable);
@@ -104,8 +108,8 @@ ObFrame *frame_new(ObClient *client)
             XCreateColormap(ob_display,
                             RootWindow(ob_display, ob_screen),
                             visual, AllocNone);
-        attrib.background_pixel = BlackPixel(ob_display, 0);
-        attrib.border_pixel = BlackPixel(ob_display, 0);
+        attrib.background_pixel = BlackPixel(ob_display, ob_screen);
+        attrib.border_pixel = BlackPixel(ob_display, ob_screen);
     }
     attrib.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen), visual,
@@ -127,23 +131,22 @@ ObFrame *frame_new(ObClient *client)
     }
     attrib.event_mask = ELEMENT_EVENTMASK;
     self->title = createWindow(self->window, NULL, mask, &attrib);
+    self->titleleft = createWindow(self->window, NULL, mask, &attrib);
+    self->titletop = createWindow(self->window, NULL, mask, &attrib);
+    self->titletopleft = createWindow(self->window, NULL, mask, &attrib);
+    self->titletopright = createWindow(self->window, NULL, mask, &attrib);
+    self->titleright = createWindow(self->window, NULL, mask, &attrib);
+    self->titlebottom = createWindow(self->window, NULL, mask, &attrib);
 
-    mask |= CWCursor;
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTH);
     self->topresize = createWindow(self->title, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
     self->tltresize = createWindow(self->title, NULL, mask, &attrib);
     self->tllresize = createWindow(self->title, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTHEAST);
     self->trtresize = createWindow(self->title, NULL, mask, &attrib);
     self->trrresize = createWindow(self->title, NULL, mask, &attrib);
 
-    attrib.cursor = ob_cursor(OB_CURSOR_WEST);
-    self->leftresize = createWindow(self->inner, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_EAST);
-    self->rightresize = createWindow(self->inner, NULL, mask, &attrib);
+    self->left = createWindow(self->window, NULL, mask, &attrib);
+    self->right = createWindow(self->window, NULL, mask, &attrib);
 
-    mask &= ~CWCursor;
     self->label = createWindow(self->title, NULL, mask, &attrib);
     self->max = createWindow(self->title, NULL, mask, &attrib);
     self->close = createWindow(self->title, NULL, mask, &attrib);
@@ -152,21 +155,27 @@ ObFrame *frame_new(ObClient *client)
     self->icon = createWindow(self->title, NULL, mask, &attrib);
     self->iconify = createWindow(self->title, NULL, mask, &attrib);
 
-    mask |= CWCursor;
-    attrib.cursor = ob_cursor(OB_CURSOR_SOUTH);
     self->handle = createWindow(self->window, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
     self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
     self->rgrip = createWindow(self->handle, NULL, mask, &attrib); 
+
+    self->handleleft = createWindow(self->handle, NULL, mask, &attrib);
+    self->handleright = createWindow(self->handle, NULL, mask, &attrib);
+
+    self->handletop = createWindow(self->window, NULL, mask, &attrib);
+    self->handlebottom = createWindow(self->window, NULL, mask, &attrib);
+    self->lgripleft = createWindow(self->window, NULL, mask, &attrib);
+    self->lgriptop = createWindow(self->window, NULL, mask, &attrib);
+    self->lgripbottom = createWindow(self->window, NULL, mask, &attrib);
+    self->rgripright = createWindow(self->window, NULL, mask, &attrib);
+    self->rgriptop = createWindow(self->window, NULL, mask, &attrib);
+    self->rgripbottom = createWindow(self->window, NULL, mask, &attrib);
 
     self->focused = FALSE;
 
     /* the other stuff is shown based on decor settings */
     XMapWindow(ob_display, self->plate);
     XMapWindow(ob_display, self->inner);
-    XMapWindow(ob_display, self->lgrip);
-    XMapWindow(ob_display, self->rgrip);
     XMapWindow(ob_display, self->label);
 
     self->max_press = self->close_press = self->desk_press = 
@@ -181,14 +190,6 @@ ObFrame *frame_new(ObClient *client)
 
 static void set_theme_statics(ObFrame *self)
 {
-    gint handle_height;
-
-    if (ob_rr_theme->handle_height > 0)
-        handle_height = ob_rr_theme->handle_height;
-    else
-        handle_height = 1;
-        
-
     /* set colors/appearance/sizes for stuff that doesn't change */
     XResizeWindow(ob_display, self->max,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
@@ -202,10 +203,6 @@ static void set_theme_statics(ObFrame *self)
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
     XResizeWindow(ob_display, self->shade,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
-    XResizeWindow(ob_display, self->lgrip,
-                  ob_rr_theme->grip_width, handle_height);
-    XResizeWindow(ob_display, self->rgrip,
-                  ob_rr_theme->grip_width, handle_height);
     XResizeWindow(ob_display, self->tltresize,
                   ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
     XResizeWindow(ob_display, self->trtresize,
@@ -285,14 +282,14 @@ void frame_adjust_shape(ObFrame *self)
     if (!self->client->shaped) {
         /* clear the shape on the frame window */
         XShapeCombineMask(ob_display, self->window, ShapeBounding,
-                          self->innersize.left,
-                          self->innersize.top,
+                          self->size.left,
+                          self->size.top,
                           None, ShapeSet);
     } else {
         /* make the frame's shape match the clients */
         XShapeCombineShape(ob_display, self->window, ShapeBounding,
-                           self->innersize.left,
-                           self->innersize.top,
+                           self->size.left,
+                           self->size.top,
                            self->client->window,
                            ShapeBounding, ShapeSet);
 
@@ -300,7 +297,7 @@ void frame_adjust_shape(ObFrame *self)
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
             xrect[0].x = -ob_rr_theme->fbwidth;
             xrect[0].y = -ob_rr_theme->fbwidth;
-            xrect[0].width = self->width + self->rbwidth * 2;
+            xrect[0].width = self->width + self->bwidth * 2;
             xrect[0].height = ob_rr_theme->title_height +
                 self->bwidth * 2;
             ++num;
@@ -309,7 +306,7 @@ void frame_adjust_shape(ObFrame *self)
         if (self->decorations & OB_FRAME_DECOR_HANDLE) {
             xrect[1].x = -ob_rr_theme->fbwidth;
             xrect[1].y = FRAME_HANDLE_Y(self);
-            xrect[1].width = self->width + self->rbwidth * 2;
+            xrect[1].width = self->width + self->bwidth * 2;
             xrect[1].height = ob_rr_theme->handle_height +
                 self->bwidth * 2;
             ++num;
@@ -341,46 +338,99 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->bwidth = self->cbwidth_x = self->cbwidth_y = 0;
         }
         self->rbwidth = self->bwidth;
+        self->leftb = self->rightb = TRUE;
 
-        if (self->max_horz)
-            self->bwidth = self->cbwidth_x = 0;
-
-        STRUT_SET(self->innersize,
-                  self->cbwidth_x,
-                  self->cbwidth_y,
-                  self->cbwidth_x,
-                  self->cbwidth_y);
-        self->width = self->client->area.width + self->cbwidth_x * 2 -
-            (self->max_horz ? self->rbwidth * 2 : 0);
-        self->width = MAX(self->width, 1); /* no lower than 1 */
-
-        /* set border widths */
-        if (!fake) {
-            XSetWindowBorderWidth(ob_display, self->window, self->bwidth);
-            XSetWindowBorderWidth(ob_display, self->inner, self->bwidth);
-            XSetWindowBorderWidth(ob_display, self->title,  self->rbwidth);
-            XSetWindowBorderWidth(ob_display, self->handle, self->rbwidth);
-            XSetWindowBorderWidth(ob_display, self->lgrip,  self->rbwidth);
-            XSetWindowBorderWidth(ob_display, self->rgrip,  self->rbwidth);
-            XSetWindowBorderWidth(ob_display, self->leftresize, self->bwidth);
-            XSetWindowBorderWidth(ob_display, self->rightresize, self->bwidth);
+        if (self->max_horz) {
+            self->leftb = self->rightb = FALSE;
+            self->cbwidth_x = 0;
         }
 
+        self->width = self->client->area.width + self->cbwidth_x * 2;
+        self->width = MAX(self->width, 1); /* no lower than 1 */
+
+        STRUT_SET(self->size,
+                  self->cbwidth_x + (self->leftb ? self->bwidth : 0),
+                  self->cbwidth_y + self->bwidth,
+                  self->cbwidth_x + (self->rightb ? self->bwidth : 0),
+                  self->cbwidth_y + self->bwidth);
+
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
-            self->innersize.top += ob_rr_theme->title_height + self->rbwidth +
-                (self->rbwidth - self->bwidth);
+            self->size.top += ob_rr_theme->title_height + self->rbwidth;
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
             ob_rr_theme->handle_height > 0)
-            self->innersize.bottom += ob_rr_theme->handle_height +
-                self->rbwidth + (self->rbwidth - self->bwidth);
+        {
+            self->size.bottom += ob_rr_theme->handle_height + self->bwidth;
+        }
   
         /* position/size and map/unmap all the windows */
 
         if (!fake) {
+            if (self->bwidth) {
+                XMoveResizeWindow(ob_display, self->titletop,
+                                  ob_rr_theme->grip_width + self->bwidth, 0,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2 + self->bwidth * 2 -
+                                  (ob_rr_theme->grip_width + self->bwidth) * 2,
+                                  self->bwidth);
+                XMoveResizeWindow(ob_display, self->titletopleft,
+                                  0, 0,
+                                  ob_rr_theme->grip_width + self->bwidth,
+                                  self->bwidth);
+                XMoveResizeWindow(ob_display, self->titletopright,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2 + self->bwidth * 2 -
+                                  ob_rr_theme->grip_width - self->bwidth,
+                                  0,
+                                  ob_rr_theme->grip_width + self->bwidth,
+                                  self->bwidth);
+
+                XMoveResizeWindow(ob_display, self->titleleft,
+                                  0, self->bwidth,
+                                  self->bwidth,
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.top - self->bwidth));
+                XMoveResizeWindow(ob_display, self->titleright,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2 + self->bwidth,
+                                  self->bwidth,
+                                  self->bwidth,
+                                  (self->rightb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.top - self->bwidth));
+
+                XMapWindow(ob_display, self->titletop);
+                XMapWindow(ob_display, self->titletopleft);
+                XMapWindow(ob_display, self->titletopright);
+                XMapWindow(ob_display, self->titleleft);
+                XMapWindow(ob_display, self->titleright);
+
+                if (self->decorations & OB_FRAME_DECOR_TITLEBAR &&
+                    self->rbwidth)
+                {
+                    XMoveResizeWindow(ob_display, self->titlebottom,
+                                      self->bwidth,
+                                      ob_rr_theme->title_height + self->bwidth,
+                                      self->client->area.width +
+                                      self->cbwidth_x * 2,
+                                      self->rbwidth);
+
+                    XMapWindow(ob_display, self->titlebottom);
+                } else
+                    XUnmapWindow(ob_display, self->titlebottom);
+            } else {
+                XUnmapWindow(ob_display, self->titletop);
+                XUnmapWindow(ob_display, self->titletopleft);
+                XUnmapWindow(ob_display, self->titletopright);
+                XUnmapWindow(ob_display, self->titleleft);
+                XUnmapWindow(ob_display, self->titleright);
+            }
+
             if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
                 XMoveResizeWindow(ob_display, self->title,
-                                  -self->bwidth, -self->bwidth,
+                                  self->bwidth, self->bwidth,
                                   self->width, ob_rr_theme->title_height);
+
                 XMapWindow(ob_display, self->title);
 
                 if (self->decorations & OB_FRAME_DECOR_GRIPS) {
@@ -398,35 +448,17 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XMoveWindow(ob_display, self->trrresize,
                                 self->width - ob_rr_theme->paddingx - 1, 0);
 
-                    XMoveResizeWindow(ob_display, self->leftresize,
-                                      -(ob_rr_theme->fbwidth * 2) - 1,
-                                      0,
-                                      1,
-                                      self->client->area.height +
-                                      self->cbwidth_y * 2);
-                    XMoveResizeWindow(ob_display, self->rightresize,
-                                      self->client->area.width +
-                                      self->cbwidth_x * 2,
-                                      0,
-                                      1,
-                                      self->client->area.height +
-                                      self->cbwidth_y * 2);
-
                     XMapWindow(ob_display, self->topresize);
                     XMapWindow(ob_display, self->tltresize);
                     XMapWindow(ob_display, self->tllresize);
                     XMapWindow(ob_display, self->trtresize);
                     XMapWindow(ob_display, self->trrresize);
-                    XMapWindow(ob_display, self->leftresize);
-                    XMapWindow(ob_display, self->rightresize);
                 } else {
                     XUnmapWindow(ob_display, self->topresize);
                     XUnmapWindow(ob_display, self->tltresize);
                     XUnmapWindow(ob_display, self->tllresize);
                     XUnmapWindow(ob_display, self->trtresize);
                     XUnmapWindow(ob_display, self->trrresize);
-                    XUnmapWindow(ob_display, self->leftresize);
-                    XUnmapWindow(ob_display, self->rightresize);
                 }
             } else
                 XUnmapWindow(ob_display, self->title);
@@ -437,26 +469,143 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             layout_title(self);
 
         if (!fake) {
-            if (self->decorations & OB_FRAME_DECOR_HANDLE)
+            if (self->bwidth) {
+                XMoveResizeWindow(ob_display, self->handlebottom,
+                                  ob_rr_theme->grip_width +
+                                  self->bwidth * 2,
+                                  self->size.top + self->client->area.height +
+                                  self->size.bottom - self->bwidth,
+                                  self->width - (ob_rr_theme->grip_width +
+                                                 self->bwidth) * 2,
+                                  self->bwidth);
+
+                XMoveResizeWindow(ob_display, self->lgripleft,
+                                  0,
+                                  self->size.top + self->client->area.height +
+                                  self->size.bottom -
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom),
+                                  self->bwidth,
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom));
+                XMoveResizeWindow(ob_display, self->rgripright,
+                                  self->size.left + self->client->area.width +
+                                  self->size.right - self->bwidth,
+                                  self->size.top + self->client->area.height +
+                                  self->size.bottom -
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom),
+                                  self->bwidth,
+                                  (self->rightb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom));
+
+                XMoveResizeWindow(ob_display, self->lgripbottom,
+                                  self->bwidth,
+                                  self->size.top + self->client->area.height +
+                                  self->size.bottom - self->bwidth,
+                                  ob_rr_theme->grip_width + self->bwidth,
+                                  self->bwidth);
+                XMoveResizeWindow(ob_display, self->rgripbottom,
+                                  self->size.left + self->client->area.width +
+                                  self->size.right - self->bwidth * 2 -
+                                  ob_rr_theme->grip_width,
+                                  self->size.top + self->client->area.height +
+                                  self->size.bottom - self->bwidth,
+                                  ob_rr_theme->grip_width + self->bwidth,
+                                  self->bwidth);
+
+                XMapWindow(ob_display, self->handlebottom);
+                XMapWindow(ob_display, self->lgripleft);
+                XMapWindow(ob_display, self->rgripright);
+                XMapWindow(ob_display, self->lgripbottom);
+                XMapWindow(ob_display, self->rgripbottom);
+
+                if (self->decorations & OB_FRAME_DECOR_HANDLE &&
+                    ob_rr_theme->handle_height > 0)
+                {
+                    XMoveResizeWindow(ob_display, self->handletop,
+                                      ob_rr_theme->grip_width +
+                                      self->bwidth * 2,
+                                      FRAME_HANDLE_Y(self),
+                                      self->width - (ob_rr_theme->grip_width +
+                                                     self->bwidth) * 2,
+                                      self->bwidth);
+                    XMapWindow(ob_display, self->handletop);
+
+                    if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+                        XMoveResizeWindow(ob_display, self->handleleft,
+                                          ob_rr_theme->grip_width,
+                                          0,
+                                          self->bwidth,
+                                          ob_rr_theme->handle_height);
+                        XMoveResizeWindow(ob_display, self->handleright,
+                                          self->width -
+                                          ob_rr_theme->grip_width -
+                                          self->bwidth,
+                                          0,
+                                          self->bwidth,
+                                          ob_rr_theme->handle_height);
+
+                        XMoveResizeWindow(ob_display, self->lgriptop,
+                                          self->bwidth,
+                                          FRAME_HANDLE_Y(self),
+                                          ob_rr_theme->grip_width +
+                                          self->bwidth,
+                                          self->bwidth);
+                        XMoveResizeWindow(ob_display, self->rgriptop,
+                                          self->size.left +
+                                          self->client->area.width +
+                                          self->size.right - self->bwidth * 2 -
+                                          ob_rr_theme->grip_width,
+                                          FRAME_HANDLE_Y(self),
+                                          ob_rr_theme->grip_width +
+                                          self->bwidth,
+                                          self->bwidth);
+
+                        XMapWindow(ob_display, self->handleleft);
+                        XMapWindow(ob_display, self->handleright);
+                        XMapWindow(ob_display, self->lgriptop);
+                        XMapWindow(ob_display, self->rgriptop);
+                    } else {
+                        XUnmapWindow(ob_display, self->handleleft);
+                        XUnmapWindow(ob_display, self->handleright);
+                        XUnmapWindow(ob_display, self->lgriptop);
+                        XUnmapWindow(ob_display, self->rgriptop);
+                    }
+                } else
+                    XUnmapWindow(ob_display, self->handletop);
+            } else {
+                XUnmapWindow(ob_display, self->handlebottom);
+                XUnmapWindow(ob_display, self->lgripleft);
+                XUnmapWindow(ob_display, self->rgripright);
+                XUnmapWindow(ob_display, self->lgripbottom);
+                XUnmapWindow(ob_display, self->rgripbottom);
+            }
+
+            if (self->decorations & OB_FRAME_DECOR_HANDLE &&
+                ob_rr_theme->handle_height > 0)
             {
-                gint handle_height;
-
-                if (ob_rr_theme->handle_height > 0)
-                    handle_height = ob_rr_theme->handle_height;
-                else
-                    handle_height = 1;
-
                 XMoveResizeWindow(ob_display, self->handle,
-                                  -self->bwidth, FRAME_HANDLE_Y(self),
-                                  self->width, handle_height);
+                                  self->bwidth,
+                                  FRAME_HANDLE_Y(self) + self->bwidth,
+                                  self->width, ob_rr_theme->handle_height);
                 XMapWindow(ob_display, self->handle);
 
                 if (self->decorations & OB_FRAME_DECOR_GRIPS) {
-                    XMoveWindow(ob_display, self->lgrip,
-                                -self->rbwidth, -self->rbwidth);
-                    XMoveWindow(ob_display, self->rgrip,
-                                -self->rbwidth + self->width -
-                                ob_rr_theme->grip_width, -self->rbwidth);
+                    XMoveResizeWindow(ob_display, self->lgrip,
+                                      0, 0,
+                                      ob_rr_theme->grip_width,
+                                      ob_rr_theme->handle_height);
+                    XMoveResizeWindow(ob_display, self->rgrip,
+                                      self->width - ob_rr_theme->grip_width,
+                                      0,
+                                      ob_rr_theme->grip_width,
+                                      ob_rr_theme->handle_height);
+
                     XMapWindow(ob_display, self->lgrip);
                     XMapWindow(ob_display, self->rgrip);
                 } else {
@@ -466,31 +615,50 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->handle);
 
+            if (self->bwidth && !self->max_horz) {
+                XMoveResizeWindow(ob_display, self->left,
+                                  0,
+                                  self->bwidth + ob_rr_theme->grip_width,
+                                  self->bwidth,
+                                  self->client->area.height +
+                                  self->size.top + self->size.bottom -
+                                  ob_rr_theme->grip_width * 2);
+                XMoveResizeWindow(ob_display, self->right,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2 + self->bwidth,
+                                  self->bwidth + ob_rr_theme->grip_width,
+                                  self->bwidth,
+                                  self->client->area.height +
+                                  self->size.top + self->size.bottom -
+                                  ob_rr_theme->grip_width * 2);
+
+                XMapWindow(ob_display, self->left);
+                XMapWindow(ob_display, self->right);
+            } else {
+                XUnmapWindow(ob_display, self->left);
+                XUnmapWindow(ob_display, self->right);
+            }
+
             /* move and resize the inner border window which contains the plate
              */
             XMoveResizeWindow(ob_display, self->inner,
-                              self->innersize.left - self->cbwidth_x -
-                              self->bwidth,
-                              self->innersize.top - self->cbwidth_y -
-                              self->bwidth,
+                              0,
+                              self->size.top - self->cbwidth_y,
                               self->client->area.width +
-                              self->cbwidth_x * 2,
+                              self->cbwidth_x * 2 +
+                              (self->leftb ? self->bwidth : 0) +
+                              (self->rightb ? self->bwidth : 0),
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
             /* move the plate */
             XMoveWindow(ob_display, self->plate,
-                        self->cbwidth_x, self->cbwidth_y);
+                        (self->leftb ? self->bwidth : 0) + self->cbwidth_x,
+                        self->cbwidth_y);
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window, 0, 0);
         }
-
-        STRUT_SET(self->size,
-                  self->innersize.left + self->bwidth,
-                  self->innersize.top + self->bwidth,
-                  self->innersize.right + self->bwidth,
-                  self->innersize.bottom + self->bwidth);
     }
 
     /* shading can change without being moved or resized */
@@ -498,7 +666,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   self->client->area.width +
                   self->size.left + self->size.right,
                   (self->client->shaded ?
-                   ob_rr_theme->title_height + self->rbwidth * 2:
+                   ob_rr_theme->title_height + self->bwidth * 2:
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
@@ -521,9 +689,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                reflected afterwards.
             */
             XMoveResizeWindow(ob_display, self->window,
-                              self->area.x, self->area.y,
-                              self->area.width - self->bwidth * 2,
-                              self->area.height - self->bwidth * 2);
+                              self->area.x,
+                              self->area.y,
+                              self->area.width,
+                              self->area.height);
 
         if (resized) {
             framerender_frame(self);
@@ -550,6 +719,51 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(ob_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
+
+    /* set up cursors */
+    if (!fake &&
+        (self->functions & OB_CLIENT_FUNC_RESIZE) !=
+        (self->client->functions & OB_CLIENT_FUNC_RESIZE))
+    {
+        gboolean r = self->client->functions & OB_CLIENT_FUNC_RESIZE;
+        XSetWindowAttributes a;
+
+        a.cursor = ob_cursor(r ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->topresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->titletop, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_NORTHWEST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->tltresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->tllresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->titletopleft, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->titleleft, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_NORTHEAST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->trtresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->trrresize, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->titletopright, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->titleright, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_WEST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->left, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_EAST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->right, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handletop, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handlebottom, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHWEST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->lgrip, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handleleft, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->lgripleft, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->lgriptop, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->lgripbottom, CWCursor, &a);
+        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHEAST : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->rgrip, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handleright, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->rgripright, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->rgriptop, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->rgripbottom, CWCursor, &a);
+
+        self->functions = self->client->functions;
+    }
 }
 
 void frame_adjust_client_area(ObFrame *self)
@@ -624,8 +838,24 @@ void frame_grab_client(ObFrame *self)
     g_hash_table_insert(window_map, &self->tllresize, self->client);
     g_hash_table_insert(window_map, &self->trtresize, self->client);
     g_hash_table_insert(window_map, &self->trrresize, self->client);
-    g_hash_table_insert(window_map, &self->leftresize, self->client);
-    g_hash_table_insert(window_map, &self->rightresize, self->client);
+    g_hash_table_insert(window_map, &self->left, self->client);
+    g_hash_table_insert(window_map, &self->right, self->client);
+    g_hash_table_insert(window_map, &self->titleleft, self->client);
+    g_hash_table_insert(window_map, &self->titletop, self->client);
+    g_hash_table_insert(window_map, &self->titletopleft, self->client);
+    g_hash_table_insert(window_map, &self->titletopright, self->client);
+    g_hash_table_insert(window_map, &self->titleright, self->client);
+    g_hash_table_insert(window_map, &self->titlebottom, self->client);
+    g_hash_table_insert(window_map, &self->handleleft, self->client);
+    g_hash_table_insert(window_map, &self->handletop, self->client);
+    g_hash_table_insert(window_map, &self->handleright, self->client);
+    g_hash_table_insert(window_map, &self->handlebottom, self->client);
+    g_hash_table_insert(window_map, &self->lgripleft, self->client);
+    g_hash_table_insert(window_map, &self->lgriptop, self->client);
+    g_hash_table_insert(window_map, &self->lgripbottom, self->client);
+    g_hash_table_insert(window_map, &self->rgripright, self->client);
+    g_hash_table_insert(window_map, &self->rgriptop, self->client);
+    g_hash_table_insert(window_map, &self->rgripbottom, self->client);
 }
 
 void frame_release_client(ObFrame *self)
@@ -684,8 +914,24 @@ void frame_release_client(ObFrame *self)
     g_hash_table_remove(window_map, &self->tllresize);
     g_hash_table_remove(window_map, &self->trtresize);
     g_hash_table_remove(window_map, &self->trrresize);
-    g_hash_table_remove(window_map, &self->leftresize);
-    g_hash_table_remove(window_map, &self->rightresize);
+    g_hash_table_remove(window_map, &self->left);
+    g_hash_table_remove(window_map, &self->right);
+    g_hash_table_remove(window_map, &self->titleleft);
+    g_hash_table_remove(window_map, &self->titletop);
+    g_hash_table_remove(window_map, &self->titletopleft);
+    g_hash_table_remove(window_map, &self->titletopright);
+    g_hash_table_remove(window_map, &self->titleright);
+    g_hash_table_remove(window_map, &self->titlebottom);
+    g_hash_table_remove(window_map, &self->handleleft);
+    g_hash_table_remove(window_map, &self->handletop);
+    g_hash_table_remove(window_map, &self->handleright);
+    g_hash_table_remove(window_map, &self->handlebottom);
+    g_hash_table_remove(window_map, &self->lgripleft);
+    g_hash_table_remove(window_map, &self->lgriptop);
+    g_hash_table_remove(window_map, &self->lgripbottom);
+    g_hash_table_remove(window_map, &self->rgripright);
+    g_hash_table_remove(window_map, &self->rgriptop);
+    g_hash_table_remove(window_map, &self->rgripbottom);
 
     ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
 }
@@ -954,24 +1200,39 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
         return OB_FRAME_CONTEXT_TITLEBAR;
     }
 
-    if (win == self->window)    return OB_FRAME_CONTEXT_FRAME;
-    if (win == self->label)     return OB_FRAME_CONTEXT_TITLEBAR;
-    if (win == self->handle)    return OB_FRAME_CONTEXT_BOTTOM;
-    if (win == self->lgrip)     return OB_FRAME_CONTEXT_BLCORNER;
-    if (win == self->rgrip)     return OB_FRAME_CONTEXT_BRCORNER;
-    if (win == self->topresize) return OB_FRAME_CONTEXT_TOP;
-    if (win == self->tltresize) return OB_FRAME_CONTEXT_TLCORNER;
-    if (win == self->tllresize) return OB_FRAME_CONTEXT_TLCORNER;
-    if (win == self->trtresize) return OB_FRAME_CONTEXT_TRCORNER;
-    if (win == self->trrresize) return OB_FRAME_CONTEXT_TRCORNER;
-    if (win == self->leftresize) return OB_FRAME_CONTEXT_LEFT;
-    if (win == self->rightresize) return OB_FRAME_CONTEXT_RIGHT;
-    if (win == self->max)       return OB_FRAME_CONTEXT_MAXIMIZE;
-    if (win == self->iconify)   return OB_FRAME_CONTEXT_ICONIFY;
-    if (win == self->close)     return OB_FRAME_CONTEXT_CLOSE;
-    if (win == self->icon)      return OB_FRAME_CONTEXT_ICON;
-    if (win == self->desk)      return OB_FRAME_CONTEXT_ALLDESKTOPS;
-    if (win == self->shade)     return OB_FRAME_CONTEXT_SHADE;
+    if (win == self->window)            return OB_FRAME_CONTEXT_FRAME;
+    if (win == self->label)             return OB_FRAME_CONTEXT_TITLEBAR;
+    if (win == self->handle)            return OB_FRAME_CONTEXT_BOTTOM;
+    if (win == self->handletop)         return OB_FRAME_CONTEXT_BOTTOM;
+    if (win == self->handlebottom)      return OB_FRAME_CONTEXT_BOTTOM;
+    if (win == self->handleleft)        return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->lgrip)             return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->lgripleft)         return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->lgriptop)          return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->lgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->handleright)       return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->rgrip)             return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->rgripright)        return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->titletop)          return OB_FRAME_CONTEXT_TOP;
+    if (win == self->topresize)         return OB_FRAME_CONTEXT_TOP;
+    if (win == self->tltresize)         return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->tllresize)         return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->titleleft)         return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->titletopleft)      return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->trtresize)         return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->trrresize)         return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->titleright)        return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->titletopright)     return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->left)              return OB_FRAME_CONTEXT_LEFT;
+    if (win == self->right)             return OB_FRAME_CONTEXT_RIGHT;
+    if (win == self->max)               return OB_FRAME_CONTEXT_MAXIMIZE;
+    if (win == self->iconify)           return OB_FRAME_CONTEXT_ICONIFY;
+    if (win == self->close)             return OB_FRAME_CONTEXT_CLOSE;
+    if (win == self->icon)              return OB_FRAME_CONTEXT_ICON;
+    if (win == self->desk)              return OB_FRAME_CONTEXT_ALLDESKTOPS;
+    if (win == self->shade)             return OB_FRAME_CONTEXT_SHADE;
 
     return OB_FRAME_CONTEXT_NONE;
 }
@@ -1185,7 +1446,7 @@ static gboolean frame_animate_iconify(gpointer p)
         x = iconx;
         y = icony;
         w = iconw;
-        h = self->innersize.top; /* just the titlebar */
+        h = self->size.top; /* just the titlebar */
     }
 
     if (time > 0) {
@@ -1202,7 +1463,7 @@ static gboolean frame_animate_iconify(gpointer p)
         x = x - (dx * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
         y = y - (dy * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
         w = w - (dw * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
-        h = self->innersize.top; /* just the titlebar */
+        h = self->size.top; /* just the titlebar */
     }
 
     if (time == 0)

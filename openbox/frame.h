@@ -83,6 +83,7 @@ struct _ObFrame
     Rect      area;
     gboolean  visible;
 
+    guint     functions;
     guint     decorations;
     gboolean  max_horz;
 
@@ -99,13 +100,32 @@ struct _ObFrame
     Window    lgrip;
     Window    rgrip;
 
+    /* These are borders of the frame and its elements */
+    Window    titleleft;
+    Window    titletop;
+    Window    titletopleft;
+    Window    titletopright;
+    Window    titleright;
+    Window    titlebottom;
+    Window    left;
+    Window    right;
+    Window    handleleft;
+    Window    handletop;
+    Window    handleright;
+    Window    handlebottom;
+    Window    lgriptop;
+    Window    lgripleft;
+    Window    lgripbottom;
+    Window    rgriptop;
+    Window    rgripright;
+    Window    rgripbottom;
+
+    /* These are resize handles inside the titlebar */
     Window    topresize;
     Window    tltresize;
     Window    tllresize;
     Window    trtresize;
     Window    trrresize;
-    Window    leftresize;
-    Window    rightresize;
 
     Colormap  colormap;
 
@@ -116,8 +136,6 @@ struct _ObFrame
     RrAppearance *a_icon;
     RrAppearance *a_unfocused_handle;
     RrAppearance *a_focused_handle;
-
-    Strut     innersize;
 
     GSList   *clients;
 
@@ -139,9 +157,11 @@ struct _ObFrame
     gint      max_x;         /* x-position of the window maximize button */
     gint      close_x;       /* x-position of the window close button */
     gint      bwidth;        /* border width */
-    gint      rbwidth;       /* title border width */
+    gint      rbwidth;       /* border width between the title and client */
     gint      cbwidth_x;     /* client border width */
     gint      cbwidth_y;     /* client border width */
+    gboolean  leftb;         /* is there a border to the left of the client? */
+    gboolean  rightb;        /* is there a border to the right of the client?*/
 
     /* the leftmost and rightmost elements in the titlebar */
     ObFrameContext leftmost;

@@ -301,8 +301,8 @@ gint main(gint argc, gchar **argv)
             moveresize_startup(reconfigure);
             keyboard_startup(reconfigure);
             mouse_startup(reconfigure);
-            menu_startup(reconfigure);
             menu_frame_startup(reconfigure);
+            menu_startup(reconfigure);
 
             if (!reconfigure) {
                 guint32 xid;
@@ -344,8 +344,8 @@ gint main(gint argc, gchar **argv)
                 client_unmanage_all();
             }
 
-            menu_frame_shutdown(reconfigure);
             menu_shutdown(reconfigure);
+            menu_frame_shutdown(reconfigure);
             mouse_shutdown(reconfigure);
             keyboard_shutdown(reconfigure);
             moveresize_shutdown(reconfigure);

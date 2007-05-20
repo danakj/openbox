@@ -40,6 +40,7 @@ manpage.1: manpage.sgml
       <arg><option>--version</option></arg>
       <arg><option>--replace</option></arg>
       <arg><option>--reconfigure</option></arg>
+      <arg><option>--restart</option></arg>
       <arg><option>--sm-disable</option></arg>
       <arg><option>--sync</option></arg>
       <arg><option>--debug</option></arg>
@@ -125,6 +126,14 @@ manpage.1: manpage.sgml
         <listitem>
           <para>If Openbox is already running on the display, tell it to
             reload its configuration.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--restart</option></term>
+        <listitem>
+          <para>If Openbox is already running on the display, tell it to
+            restart. This is useful if you have upgraded Openbox and don't
+            want to restart X.</para>
         </listitem>
       </varlistentry>
       <varlistentry>

@@ -531,32 +531,32 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
 
 void menu_set_show_func(ObMenu *self, ObMenuShowFunc func)
 {
-    self->show_func = func;
+    self->show_func = self->more_menu->show_func = func;
 }
 
 void menu_set_hide_func(ObMenu *self, ObMenuHideFunc func)
 {
-    self->hide_func = func;
+    self->hide_func = self->more_menu->hide_func = func;
 }
 
 void menu_set_update_func(ObMenu *self, ObMenuUpdateFunc func)
 {
-    self->update_func = func;
+    self->update_func = self->more_menu->update_func = func;
 }
 
 void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
 {
-    self->execute_func = func;
+    self->execute_func = self->more_menu->execute_func = func;
 }
 
 void menu_set_destroy_func(ObMenu *self, ObMenuDestroyFunc func)
 {
-    self->destroy_func = func;
+    self->destroy_func = self->more_menu->destroy_func = func;
 }
 
 void menu_set_place_func(ObMenu *self, ObMenuPlaceFunc func)
 {
-    self->place_func = func;
+    self->place_func = self->more_menu->place_func = func;
 }
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)

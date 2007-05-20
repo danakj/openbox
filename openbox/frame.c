@@ -629,10 +629,14 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XUnmapWindow(ob_display, self->lgrip);
                     XUnmapWindow(ob_display, self->rgrip);
                 }
-            } else
-                XUnmapWindow(ob_display, self->handle);
+            } else {
+                XUnmapWindow(ob_display, self->lgrip);
+                XUnmapWindow(ob_display, self->rgrip);
 
-            if (self->bwidth && !self->max_horz) {
+                XUnmapWindow(ob_display, self->handle);
+            }
+
+            if (self->bwidth && self->leftb) {
                 XMoveResizeWindow(ob_display, self->left,
                                   0,
                                   self->bwidth + ob_rr_theme->grip_width,
@@ -640,6 +644,12 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->client->area.height +
                                   self->size.top + self->size.bottom -
                                   ob_rr_theme->grip_width * 2);
+
+                XMapWindow(ob_display, self->left);
+            } else
+                XUnmapWindow(ob_display, self->left);
+
+            if (self->bwidth && self->rightb) {
                 XMoveResizeWindow(ob_display, self->right,
                                   self->client->area.width +
                                   self->cbwidth_x * 2 + self->bwidth,
@@ -649,12 +659,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->size.top + self->size.bottom -
                                   ob_rr_theme->grip_width * 2);
 
-                XMapWindow(ob_display, self->left);
                 XMapWindow(ob_display, self->right);
-            } else {
-                XUnmapWindow(ob_display, self->left);
+            } else
                 XUnmapWindow(ob_display, self->right);
-            }
 
             /* move and resize the inner border window which contains the plate
              */
@@ -1454,8 +1461,8 @@ static gboolean frame_animate_iconify(gpointer p)
         /* start where the frame is supposed to be */
         x = self->area.x;
         y = self->area.y;
-        w = self->area.width - self->bwidth * 2;
-        h = self->area.height - self->bwidth * 2;
+        w = self->area.width;
+        h = self->area.height;
     } else {
         /* start at the icon */
         x = iconx;
@@ -1508,8 +1515,7 @@ void frame_end_iconify_animation(ObFrame *self)
 
     XMoveResizeWindow(ob_display, self->window,
                       self->area.x, self->area.y,
-                      self->area.width - self->bwidth * 2,
-                      self->area.height - self->bwidth * 2);
+                      self->area.width, self->area.height);
     XFlush(ob_display);
 }
 

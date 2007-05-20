@@ -26,9 +26,8 @@ msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
-#, fuzzy, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Impossible de créer le répertoire '%s': %s"
+msgstr ""
 
 #: openbox/action.c:1265
 #, c-format
@@ -52,27 +51,22 @@ msgid "All desktops"
 msgstr "Tous les bureaux"
 
 #: openbox/client_menu.c:351
-#, fuzzy
 msgid "&Layer"
-msgstr "E&mplacement"
+msgstr ""
 
 #: openbox/client_menu.c:356
-#, fuzzy
 msgid "Always on &top"
 msgstr "Toujours au &premier plan"
 
 #: openbox/client_menu.c:357
-#, fuzzy
 msgid "&Normal"
 msgstr "&Normal"
 
 #: openbox/client_menu.c:358
-#, fuzzy
 msgid "Always on &bottom"
 msgstr "Toujours en &arrière plan"
 
 #: openbox/client_menu.c:361
-#, fuzzy
 msgid "&Send to desktop"
 msgstr "Envoyer vers le &bureau"
 
@@ -81,44 +75,36 @@ msgid "Client menu"
 msgstr "Menu de la fenêtre"
 
 #: openbox/client_menu.c:371
-#, fuzzy
 msgid "R&estore"
 msgstr "R&estaurer"
 
 #: openbox/client_menu.c:379
-#, fuzzy
 msgid "&Move"
 msgstr "&Déplacer"
 
 #: openbox/client_menu.c:381
-#, fuzzy
 msgid "Resi&ze"
 msgstr "Redimen&sionner"
 
 #: openbox/client_menu.c:383
-#, fuzzy
 msgid "Ico&nify"
 msgstr "Ico&nifier"
 
 #: openbox/client_menu.c:391
-#, fuzzy
 msgid "Ma&ximize"
 msgstr "Ma&ximiser"
 
 #: openbox/client_menu.c:399
-#, fuzzy
 msgid "&Roll up/down"
 msgstr "En/Dé&rouler"
 
 #: openbox/client_menu.c:401
-#, fuzzy
 msgid "Un/&Decorate"
-msgstr "Dé&corer"
+msgstr ""
 
 #: openbox/client_menu.c:411
-#, fuzzy
 msgid "&Close"
-msgstr "&Fermer"
+msgstr ""
 
 #: openbox/config.c:666
 #, c-format
@@ -150,9 +136,8 @@ msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
 #: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
 msgid "More..."
-msgstr "Aller à..."
+msgstr ""
 
 #: openbox/mouse.c:338
 #, c-format
@@ -165,9 +150,9 @@ msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
 #: openbox/openbox.c:128
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Impossible de créer le répertoire '%s': %s"
+msgstr ""
 
 #: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -190,9 +175,8 @@ msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
 #: openbox/openbox.c:274
-#, fuzzy
 msgid "Unable to load a theme."
-msgstr "Impossible de charger la police : %s\n"
+msgstr ""
 
 #: openbox/openbox.c:393
 #, c-format
@@ -298,9 +282,9 @@ msgid "Unable to make directory '%s': %s"
 msgstr "Impossible de créer le répertoire '%s': %s"
 
 #: openbox/session.c:442
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Impossible de créer le répertoire '%s': %s"
+msgstr ""
 
 #: openbox/session.c:552
 #, c-format
@@ -336,7 +320,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "--config requires an argument\n"
-#~ msgstr "--sm-save-file requiert un argument\n"

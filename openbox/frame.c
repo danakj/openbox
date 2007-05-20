@@ -46,8 +46,7 @@
 #define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
 #define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 60) /* 60 Hz */
 
-#define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
-                           f->cbwidth_y)
+#define FRAME_HANDLE_Y(f) (f->size.top + f->client->area.height + f->cbwidth_y)
 
 static void flash_done(gpointer data);
 static gboolean flash_timeout(gpointer data);
@@ -290,14 +289,14 @@ void frame_adjust_shape(ObFrame *self)
     if (!self->client->shaped) {
         /* clear the shape on the frame window */
         XShapeCombineMask(ob_display, self->window, ShapeBounding,
-                          self->innersize.left,
-                          self->innersize.top,
+                          self->size.left,
+                          self->size.top,
                           None, ShapeSet);
     } else {
         /* make the frame's shape match the clients */
         XShapeCombineShape(ob_display, self->window, ShapeBounding,
-                           self->innersize.left,
-                           self->innersize.top,
+                           self->size.left,
+                           self->size.top,
                            self->client->window,
                            ShapeBounding, ShapeSet);
 
@@ -350,33 +349,30 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (self->max_horz)
             self->bwidth = self->cbwidth_x = 0;
 
-        STRUT_SET(self->innersize,
-                  self->cbwidth_x,
-                  self->cbwidth_y,
-                  self->cbwidth_x,
-                  self->cbwidth_y);
         self->width = self->client->area.width + self->cbwidth_x * 2 -
             (self->max_horz ? self->rbwidth * 2 : 0);
         self->width = MAX(self->width, 1); /* no lower than 1 */
 
+        STRUT_SET(self->size,
+                  self->cbwidth_x + self->bwidth,
+                  self->cbwidth_y + self->bwidth,
+                  self->cbwidth_x + self->bwidth,
+                  self->cbwidth_y + self->bwidth);
+
         /* set border widths */
         if (!fake) {
-            XSetWindowBorderWidth(ob_display, self->window, self->bwidth);
-            XSetWindowBorderWidth(ob_display, self->inner, self->bwidth);
             XSetWindowBorderWidth(ob_display, self->title,  self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->handle, self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->lgrip,  self->rbwidth);
             XSetWindowBorderWidth(ob_display, self->rgrip,  self->rbwidth);
-            XSetWindowBorderWidth(ob_display, self->leftresize, self->bwidth);
-            XSetWindowBorderWidth(ob_display, self->rightresize, self->bwidth);
         }
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
-            self->innersize.top += ob_rr_theme->title_height + self->rbwidth +
+            self->size.top += ob_rr_theme->title_height + self->rbwidth +
                 (self->rbwidth - self->bwidth);
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
             ob_rr_theme->handle_height > 0)
-            self->innersize.bottom += ob_rr_theme->handle_height +
+            self->size.bottom += ob_rr_theme->handle_height +
                 self->rbwidth + (self->rbwidth - self->bwidth);
   
         /* position/size and map/unmap all the windows */
@@ -384,7 +380,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (!fake) {
             if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
                 XMoveResizeWindow(ob_display, self->title,
-                                  -self->bwidth, -self->bwidth,
+                                  0, 0,
                                   self->width, ob_rr_theme->title_height);
                 XMapWindow(ob_display, self->title);
 
@@ -434,7 +430,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     handle_height = 1;
 
                 XMoveResizeWindow(ob_display, self->handle,
-                                  -self->bwidth, FRAME_HANDLE_Y(self),
+                                  0, FRAME_HANDLE_Y(self),
                                   self->width, handle_height);
                 XMapWindow(ob_display, self->handle);
 
@@ -455,16 +451,16 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
             if (self->decorations & OB_FRAME_DECOR_GRIPS) {
                 XMoveResizeWindow(ob_display, self->leftresize,
-                                  -(ob_rr_theme->fbwidth * 2) - 1,
                                   0,
-                                  1,
+                                  0,
+                                  self->bwidth,
                                   self->client->area.height +
                                   self->cbwidth_y * 2);
                 XMoveResizeWindow(ob_display, self->rightresize,
                                   self->client->area.width +
-                                  self->cbwidth_x * 2,
+                                  self->cbwidth_x * 2 + self->bwidth,
                                   0,
-                                  1,
+                                  self->bwidth,
                                   self->client->area.height +
                                   self->cbwidth_y * 2);
 
@@ -478,28 +474,20 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             /* move and resize the inner border window which contains the plate
              */
             XMoveResizeWindow(ob_display, self->inner,
-                              self->innersize.left - self->cbwidth_x -
-                              self->bwidth,
-                              self->innersize.top - self->cbwidth_y -
-                              self->bwidth,
+                              0,
+                              self->size.top - self->cbwidth_y,
                               self->client->area.width +
-                              self->cbwidth_x * 2,
+                              self->cbwidth_x * 2 + self->bwidth * 2,
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
             /* move the plate */
             XMoveWindow(ob_display, self->plate,
-                        self->cbwidth_x, self->cbwidth_y);
+                        self->bwidth + self->cbwidth_x, self->cbwidth_y);
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window, 0, 0);
         }
-
-        STRUT_SET(self->size,
-                  self->innersize.left + self->bwidth,
-                  self->innersize.top + self->bwidth,
-                  self->innersize.right + self->bwidth,
-                  self->innersize.bottom + self->bwidth);
     }
 
     /* shading can change without being moved or resized */
@@ -530,9 +518,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                reflected afterwards.
             */
             XMoveResizeWindow(ob_display, self->window,
-                              self->area.x, self->area.y,
-                              self->area.width - self->bwidth * 2,
-                              self->area.height - self->bwidth * 2);
+                              self->area.x,
+                              self->area.y,
+                              self->area.width,
+                              self->area.height);
 
         if (resized) {
             framerender_frame(self);
@@ -1192,7 +1181,7 @@ static gboolean frame_animate_iconify(gpointer p)
         x = iconx;
         y = icony;
         w = iconw;
-        h = self->innersize.top; /* just the titlebar */
+        h = self->size.top; /* just the titlebar */
     }
 
     if (time > 0) {
@@ -1209,7 +1198,7 @@ static gboolean frame_animate_iconify(gpointer p)
         x = x - (dx * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
         y = y - (dy * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
         w = w - (dw * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
-        h = self->innersize.top; /* just the titlebar */
+        h = self->size.top; /* just the titlebar */
     }
 
     if (time == 0)

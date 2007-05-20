@@ -51,8 +51,8 @@ void framerender_frame(ObFrame *self)
         XSetWindowBorder(ob_display, self->handle, px);
         XSetWindowBorder(ob_display, self->rgrip, px);
         XSetWindowBorder(ob_display, self->lgrip, px);
-        XSetWindowBorder(ob_display, self->leftresize, px);
-        XSetWindowBorder(ob_display, self->rightresize, px);
+        XSetWindowBackground(ob_display, self->leftresize, px);
+        XSetWindowBackground(ob_display, self->rightresize, px);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {

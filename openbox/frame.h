@@ -117,8 +117,6 @@ struct _ObFrame
     RrAppearance *a_unfocused_handle;
     RrAppearance *a_focused_handle;
 
-    Strut     innersize;
-
     GSList   *clients;
 
     gint      icon_on;    /* if the window icon button is on */

@@ -160,6 +160,8 @@ struct _ObFrame
     gint      rbwidth;       /* border width between the title and client */
     gint      cbwidth_x;     /* client border width */
     gint      cbwidth_y;     /* client border width */
+    gboolean  leftb;         /* is there a border to the left of the client? */
+    gboolean  rightb;        /* is there a border to the right of the client?*/
 
     /* the leftmost and rightmost elements in the titlebar */
     ObFrameContext leftmost;

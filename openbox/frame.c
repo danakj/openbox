@@ -338,17 +338,20 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->bwidth = self->cbwidth_x = self->cbwidth_y = 0;
         }
         self->rbwidth = self->bwidth;
+        self->leftb = self->rightb = TRUE;
 
-        if (self->max_horz)
+        if (self->max_horz) {
+            self->leftb = self->rightb = FALSE;
             self->cbwidth_x = 0;
+        }
 
         self->width = self->client->area.width + self->cbwidth_x * 2;
         self->width = MAX(self->width, 1); /* no lower than 1 */
 
         STRUT_SET(self->size,
-                  self->cbwidth_x + self->bwidth,
+                  self->cbwidth_x + (self->leftb ? self->bwidth : 0),
                   self->cbwidth_y + self->bwidth,
-                  self->cbwidth_x + self->bwidth,
+                  self->cbwidth_x + (self->rightb ? self->bwidth : 0),
                   self->cbwidth_y + self->bwidth);
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
@@ -380,16 +383,21 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   0,
                                   ob_rr_theme->grip_width + self->bwidth,
                                   self->bwidth);
+
                 XMoveResizeWindow(ob_display, self->titleleft,
                                   0, self->bwidth,
                                   self->bwidth,
-                                  ob_rr_theme->grip_width);
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.top - self->bwidth));
                 XMoveResizeWindow(ob_display, self->titleright,
                                   self->client->area.width +
                                   self->cbwidth_x * 2 + self->bwidth,
                                   self->bwidth,
                                   self->bwidth,
-                                  ob_rr_theme->grip_width);
+                                  (self->rightb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.top - self->bwidth));
 
                 XMapWindow(ob_display, self->titletop);
                 XMapWindow(ob_display, self->titletopleft);
@@ -475,17 +483,25 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   0,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom -
-                                  ob_rr_theme->grip_width,
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom),
                                   self->bwidth,
-                                  ob_rr_theme->grip_width);
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom));
                 XMoveResizeWindow(ob_display, self->rgripright,
                                   self->size.left + self->client->area.width +
                                   self->size.right - self->bwidth,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom -
-                                  ob_rr_theme->grip_width,
+                                  (self->leftb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom),
                                   self->bwidth,
-                                  ob_rr_theme->grip_width);
+                                  (self->rightb ?
+                                   ob_rr_theme->grip_width :
+                                   self->size.bottom));
 
                 XMoveResizeWindow(ob_display, self->lgripbottom,
                                   self->bwidth,
@@ -629,13 +645,16 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               0,
                               self->size.top - self->cbwidth_y,
                               self->client->area.width +
-                              self->cbwidth_x * 2 + self->bwidth * 2,
+                              self->cbwidth_x * 2 +
+                              (self->leftb ? self->bwidth : 0) +
+                              (self->rightb ? self->bwidth : 0),
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
             /* move the plate */
             XMoveWindow(ob_display, self->plate,
-                        self->bwidth + self->cbwidth_x, self->cbwidth_y);
+                        (self->leftb ? self->bwidth : 0) + self->cbwidth_x,
+                        self->cbwidth_y);
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window, 0, 0);

@@ -449,7 +449,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->handle);
 
-            if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+            if (self->decorations & OB_FRAME_DECOR_BORDER) {
                 XMoveResizeWindow(ob_display, self->leftresize,
                                   0,
                                   0,

@@ -150,8 +150,6 @@ extern gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
 extern gint config_resist_edge;
 
-/*! Warp near edge on menu? */
-extern gboolean config_menu_warppointer;
 /*! delay for hiding menu when opening */
 extern guint    config_menu_hide_delay;
 /*! Center menus vertically about the parent entry */

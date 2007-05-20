@@ -295,18 +295,20 @@ void frame_adjust_shape(ObFrame *self)
 
         num = 0;
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-            xrect[0].x = -ob_rr_theme->fbwidth;
-            xrect[0].y = -ob_rr_theme->fbwidth;
-            xrect[0].width = self->width + self->bwidth * 2;
+            xrect[0].x = 0;
+            xrect[0].y = 0;
+            xrect[0].width = self->area.width;
             xrect[0].height = ob_rr_theme->title_height +
-                self->bwidth * 2;
+                self->bwidth + self->rbwidth;
             ++num;
         }
 
-        if (self->decorations & OB_FRAME_DECOR_HANDLE) {
-            xrect[1].x = -ob_rr_theme->fbwidth;
+        if (self->decorations & OB_FRAME_DECOR_HANDLE &&
+            ob_rr_theme->handle_height > 0)
+        {
+            xrect[1].x = 0;
             xrect[1].y = FRAME_HANDLE_Y(self);
-            xrect[1].width = self->width + self->bwidth * 2;
+            xrect[1].width = self->area.width;
             xrect[1].height = ob_rr_theme->handle_height +
                 self->bwidth * 2;
             ++num;
@@ -419,6 +421,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 } else
                     XUnmapWindow(ob_display, self->titlebottom);
             } else {
+                XUnmapWindow(ob_display, self->titlebottom);
+
                 XUnmapWindow(ob_display, self->titletop);
                 XUnmapWindow(ob_display, self->titletopleft);
                 XUnmapWindow(ob_display, self->titletopright);
@@ -579,6 +583,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 } else
                     XUnmapWindow(ob_display, self->handletop);
             } else {
+                XUnmapWindow(ob_display, self->handletop);
+
                 XUnmapWindow(ob_display, self->handlebottom);
                 XUnmapWindow(ob_display, self->lgripleft);
                 XUnmapWindow(ob_display, self->rgripright);

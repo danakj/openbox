@@ -23,6 +23,7 @@
 #include "frame.h"
 #include "focus.h"
 #include "config.h"
+#include "debug.h"
 
 static void add_choice(guint *choice, guint mychoice)
 {
@@ -70,6 +71,8 @@ static Rect **pick_head(ObClient *c)
     /* try direct parent first */
     if (c->transient_for && c->transient_for != OB_TRAN_GROUP) {
         add_choice(choice, client_monitor(c->transient_for));
+        ob_debug("placement adding choice %d for parent\n",
+                 client_monitor(c->transient_for));
     }
 
     /* more than one window in its group (more than just this window) */
@@ -82,25 +85,36 @@ static Rect **pick_head(ObClient *c)
             if (itc != c &&
                 (itc->desktop == c->desktop ||
                  itc->desktop == DESKTOP_ALL || c->desktop == DESKTOP_ALL))
+            {
                 add_choice(choice, client_monitor(it->data));
+                ob_debug("placement adding choice %d for group sibling\n",
+                         client_monitor(it->data));
+            }
         }
 
         /* try on all desktops */
         for (it = c->group->members; it; it = g_slist_next(it)) {
             ObClient *itc = it->data;            
-            if (itc != c)
+            if (itc != c) {
                 add_choice(choice, client_monitor(it->data));
+                ob_debug("placement adding choice %d for group sibling on "
+                         "another desktop\n", client_monitor(it->data));
+            }
         }
     }
 
-    if (focus_client)
+    if (focus_client) {
         add_choice(choice, client_monitor(focus_client));
+        ob_debug("placement adding choice %d for focused window\n",
+                 client_monitor(focus_client));
+    }
 
     screen_pointer_pos(&px, &py);
 
     for (i = 0; i < screen_num_monitors; i++)
         if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
             add_choice(choice, i);
+            ob_debug("placement adding choice %d for mouse pointer\n", i);
             break;
         }
 
@@ -276,7 +290,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
 
     areas = pick_head(client);
 
-    for (i = 0; i < screen_num_monitors; ++i) {
+    for (i = 0; i < screen_num_monitors && !ret; ++i) {
         spaces = area_add(spaces, areas[i]);
 
         /* stay out from under windows in higher layers */

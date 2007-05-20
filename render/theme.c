@@ -56,6 +56,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     gchar *str;
     RrTheme *theme;
     gchar *path;
+    gboolean userdef;
 
     theme = g_new0(RrTheme, 1);
 
@@ -339,15 +340,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     /* load the image masks */
 
     /* maximize button masks */
+    userdef = TRUE;
     if (!read_mask(inst, path, theme, "max.xbm", &theme->max_mask)) {
             guchar data[] = { 0x3f, 0x3f, 0x21, 0x21, 0x21, 0x3f };
             theme->max_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
-        }
+            userdef = FALSE;
+    }
     if (!read_mask(inst, path, theme, "max_toggled.xbm",
                    &theme->max_toggled_mask))
     {
-        guchar data[] = { 0x3e, 0x22, 0x2f, 0x29, 0x39, 0x0f };
-        theme->max_toggled_mask = RrPixmapMaskNew(inst, 6, 6,(gchar*)data);
+        if (userdef)
+            theme->max_toggled_mask = RrPixmapMaskCopy(theme->max_mask);
+        else {
+            guchar data[] = { 0x3e, 0x22, 0x2f, 0x29, 0x39, 0x0f };
+            theme->max_toggled_mask = RrPixmapMaskNew(inst, 6, 6,(gchar*)data);
+        }
     }
     if (!read_mask(inst, path, theme, "max_pressed.xbm",
                    &theme->max_pressed_mask))
@@ -382,14 +389,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         theme->iconify_hover_mask = RrPixmapMaskCopy(theme->iconify_mask);
 
     /* all desktops button masks */
+    userdef = TRUE;
     if (!read_mask(inst, path, theme, "desk.xbm", &theme->desk_mask)) {
         guchar data[] = { 0x33, 0x33, 0x00, 0x00, 0x33, 0x33 };
         theme->desk_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+        userdef = FALSE;
     }
     if (!read_mask(inst, path, theme, "desk_toggled.xbm",
                    &theme->desk_toggled_mask)) {
-        guchar data[] = { 0x00, 0x1e, 0x1a, 0x16, 0x1e, 0x00 };
-        theme->desk_toggled_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+        if (userdef)
+            theme->desk_toggled_mask = RrPixmapMaskCopy(theme->desk_mask);
+        else {
+            guchar data[] = { 0x00, 0x1e, 0x1a, 0x16, 0x1e, 0x00 };
+            theme->desk_toggled_mask =
+                RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
+        }
     }
     if (!read_mask(inst, path, theme, "desk_pressed.xbm",
                    &theme->desk_pressed_mask))

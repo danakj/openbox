@@ -77,7 +77,6 @@ guint config_keyboard_reset_state;
 gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 
-gboolean config_menu_warppointer;
 guint    config_menu_hide_delay;
 gboolean config_menu_middle;
 guint    config_submenu_show_delay;
@@ -882,7 +881,6 @@ void config_startup(ObParseInst *i)
 
     parse_register(i, "resistance", parse_resistance, NULL);
 
-    config_menu_warppointer = TRUE;
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
     config_submenu_show_delay = 0;

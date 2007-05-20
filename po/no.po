@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-20 16:54+0200\n"
+"POT-Creation-Date: 2007-05-20 17:27+0200\n"
 "PO-Revision-Date: 2007-05-20 18:41+0200\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@switch-case.org>\n"
 "Language-Team: None\n"
@@ -107,7 +107,7 @@ msgstr "Fjern/Legg til &dekorasjon"
 msgid "&Close"
 msgstr "&Lukk"
 
-#: openbox/config.c:667
+#: openbox/config.c:666
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ugyldig tast '%s' spesifisert i konfigurasjonsfilen"

@@ -99,6 +99,10 @@ msgstr "Ma&ximieren"
 msgid "&Roll up/down"
 msgstr "Auf/Ab&rollen"
 
+#: openbox/client_menu.c:401
+msgid "Un/&Decorate"
+msgstr ""
+
 #: openbox/client_menu.c:411
 msgid "&Close"
 msgstr "&Schließen"
@@ -113,6 +117,7 @@ msgid "Conflict with key binding in config file"
 msgstr ""
 
 #: openbox/menu.c:98 openbox/menu.c:106
+#, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr ""
 

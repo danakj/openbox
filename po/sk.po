@@ -151,6 +151,7 @@ msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
 #: openbox/openbox.c:128
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr ""
 

@@ -26,6 +26,7 @@ msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#, c-format
 msgid "Failed to execute '%s': %s"
 msgstr ""
 

@@ -46,13 +46,27 @@ void framerender_frame(ObFrame *self)
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->frame_focused_border_color) :
               RrColorPixel(ob_rr_theme->frame_unfocused_border_color));
-        XSetWindowBorder(ob_display, self->window, px);
-        XSetWindowBorder(ob_display, self->title, px);
         XSetWindowBorder(ob_display, self->handle, px);
         XSetWindowBorder(ob_display, self->rgrip, px);
         XSetWindowBorder(ob_display, self->lgrip, px);
+
         XSetWindowBackground(ob_display, self->leftresize, px);
+        XClearWindow(ob_display, self->leftresize);
         XSetWindowBackground(ob_display, self->rightresize, px);
+        XClearWindow(ob_display, self->rightresize);
+
+        XSetWindowBackground(ob_display, self->titleleft, px);
+        XClearWindow(ob_display, self->titleleft);
+        XSetWindowBackground(ob_display, self->titletop, px);
+        XClearWindow(ob_display, self->titletop);
+        XSetWindowBackground(ob_display, self->titletopleft, px);
+        XClearWindow(ob_display, self->titletopleft);
+        XSetWindowBackground(ob_display, self->titletopright, px);
+        XClearWindow(ob_display, self->titletopright);
+        XSetWindowBackground(ob_display, self->titleright, px);
+        XClearWindow(ob_display, self->titleright);
+        XSetWindowBackground(ob_display, self->titlebottom, px);
+        XClearWindow(ob_display, self->titlebottom);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {

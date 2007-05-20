@@ -100,13 +100,22 @@ struct _ObFrame
     Window    lgrip;
     Window    rgrip;
 
+    /* These are borders of the frame and its elements */
+    Window    titleleft;
+    Window    titletop;
+    Window    titletopleft;
+    Window    titletopright;
+    Window    titleright;
+    Window    titlebottom;
+    Window    leftresize;
+    Window    rightresize;
+
+    /* These are resize handles inside the titlebar */
     Window    topresize;
     Window    tltresize;
     Window    tllresize;
     Window    trtresize;
     Window    trrresize;
-    Window    leftresize;
-    Window    rightresize;
 
     Colormap  colormap;
 
@@ -138,7 +147,7 @@ struct _ObFrame
     gint      max_x;         /* x-position of the window maximize button */
     gint      close_x;       /* x-position of the window close button */
     gint      bwidth;        /* border width */
-    gint      rbwidth;       /* title border width */
+    gint      rbwidth;       /* border width between the title and client */
     gint      cbwidth_x;     /* client border width */
     gint      cbwidth_y;     /* client border width */
 

@@ -30,7 +30,7 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-#define ICON_SIZE 48
+#define ICON_SIZE 40
 #define ICON_HILITE_WIDTH 2
 #define ICON_HILITE_MARGIN 1
 #define OUTSIDE_BORDER 3

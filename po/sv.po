@@ -254,7 +254,7 @@ msgstr "  --debug-focus       Visa debuginformation för fokushantering\n"
 
 #: openbox/openbox.c:485
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Dela skärmen i fejkade xinerama-skärmar"
+msgstr "  --debug-xinerama    Dela skärmen i fejkade xinerama-skärmar\n"
 
 #: openbox/openbox.c:486
 #, c-format

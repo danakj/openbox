@@ -1,39 +1,40 @@
 # openbox Finnish translation.
-# Copyright (C) 2005  Mikael Magnusson
+# Copyright (C) 2007  Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
 # Pauli Virtanen <pauli.virtanen@hut.fi>, 2005.
+# Lauri Hakko, 2007.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.3\n"
+"Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-05-20 17:27+0200\n"
-"PO-Revision-Date: 2005-03-15 21:29+0200\n"
-"Last-Translator: Pauli Virtanen <pauli.virtanen@hut.fi>\n"
-"Language-Team: Finnish <fi@li.org>\n"
+"PO-Revision-Date: 2007-05-21 00:06+0200\n"
+"Last-Translator: Lauri Hakko\n"
+"Language-Team: None\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr ""
+msgstr "Virheellinen toiminto '%s'. Toimintoa ei ole olemassa"
 
 #: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr ""
+msgstr "Toiminnon virheellinen käyttö '%s'. Toiminto ohitetaan"
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
+msgstr "Ohjelman suorittaminen epäonnistui '%s': %s"
 
 #: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
-msgstr ""
+msgstr "Polun muuntaminen utf8:sta epäonnistui: '%s'"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
@@ -41,7 +42,7 @@ msgstr "Näytä tämä..."
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
-msgstr ""
+msgstr "Ikkunat"
 
 #: openbox/client_list_menu.c:199
 msgid "Desktops"
@@ -52,122 +53,108 @@ msgid "All desktops"
 msgstr "Kaikkiin työtiloihin"
 
 #: openbox/client_menu.c:351
-#, fuzzy
 msgid "&Layer"
-msgstr "K&erros"
+msgstr "&Kerros"
 
 #: openbox/client_menu.c:356
-#, fuzzy
 msgid "Always on &top"
 msgstr "Aina &päällimmäinen"
 
 #: openbox/client_menu.c:357
-#, fuzzy
 msgid "&Normal"
 msgstr "&Tavallinen"
 
 #: openbox/client_menu.c:358
-#, fuzzy
 msgid "Always on &bottom"
 msgstr "Aina &alimmainen"
 
 #: openbox/client_menu.c:361
-#, fuzzy
 msgid "&Send to desktop"
-msgstr "Siirrä &työtilaan"
+msgstr "&Lähetä työtilaan"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
 msgstr "Ikkunan valikko"
 
 #: openbox/client_menu.c:371
-#, fuzzy
 msgid "R&estore"
 msgstr "&Palauta"
 
 #: openbox/client_menu.c:379
-#, fuzzy
 msgid "&Move"
 msgstr "S&iirrä"
 
 #: openbox/client_menu.c:381
-#, fuzzy
 msgid "Resi&ze"
 msgstr "&Muuta kokoa"
 
 #: openbox/client_menu.c:383
-#, fuzzy
 msgid "Ico&nify"
 msgstr "Pie&nennä"
 
 #: openbox/client_menu.c:391
-#, fuzzy
 msgid "Ma&ximize"
 msgstr "Suurenn&a"
 
 #: openbox/client_menu.c:399
-#, fuzzy
 msgid "&Roll up/down"
-msgstr "&Rullaa"
+msgstr "Rullaa ylös/alas"
 
 #: openbox/client_menu.c:401
-#, fuzzy
 msgid "Un/&Decorate"
-msgstr "Piirrä/poista &kehykset"
+msgstr "(Epä)reunusta"
 
 #: openbox/client_menu.c:411
-#, fuzzy
 msgid "&Close"
 msgstr "&Sulje"
 
 #: openbox/config.c:666
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr ""
+msgstr "Virheellinen painike '%s' määritelty konfiguraatio tiedostossa"
 
 #: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
-msgstr ""
+msgstr "Päällekäisiä key bindejä konfiguraatio tiedostossa"
 
 #: openbox/menu.c:98 openbox/menu.c:106
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr ""
+msgstr "Toimivaa menu tiedostoa ei löytynyt '%s'"
 
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr ""
+msgstr "Putki-menun komennon suorittaminen epäonnistui"
 
 #: openbox/menu.c:166
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr ""
+msgstr "Virheellinen tulos putki-menusta '%s'"
 
 #: openbox/menu.c:179
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr ""
+msgstr "Menun '%s' lukemista yritettiin mutta sitä ei ole olemassa"
 
 #: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
 msgid "More..."
-msgstr "Näytä tämä..."
+msgstr "Lisää..."
 
 #: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr ""
+msgstr "Virheellinen nappi '%s' hiiribindeissä"
 
 #: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr ""
+msgstr "Virheellinen asiayhteys '%s' hiiribindeissä"
 
 #: openbox/openbox.c:128
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
+msgstr "Kotihakemistoon vaihtaminen epäonnistui '%s': '%s'"
 
 #: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -175,11 +162,11 @@ msgstr ""
 
 #: openbox/openbox.c:179
 msgid "Failed to initialize the render library."
-msgstr ""
+msgstr "render kirjaston käynnistäminen epäonnistui"
 
 #: openbox/openbox.c:185
 msgid "X server does not support locale."
-msgstr ""
+msgstr "X serveri ei tue localea"
 
 #: openbox/openbox.c:187
 msgid "Cannot set locale modifiers for the X server."
@@ -187,61 +174,64 @@ msgstr ""
 
 #: openbox/openbox.c:248
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr ""
+msgstr "Oikeanlaista konfiguraation tiedostoa ei löytynyt, käytetään joitain yksinkertaisia oletusarvoja"
 
 #: openbox/openbox.c:274
-#, fuzzy
 msgid "Unable to load a theme."
-msgstr "Kirjasinlajin lataaminen epäonnistui: %s\n"
+msgstr "Teeman lataaminen epäonnistui"
 
 #: openbox/openbox.c:393
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr ""
+msgstr "Uudelleenkäynnistyi epäonnistui käynnistämään uutta ohjelmaa '%s': %s"
 
 #: openbox/openbox.c:461 openbox/openbox.c:463
 msgid "Copyright (c)"
-msgstr ""
+msgstr "Tekijänoikeudet (c)"
 
 #: openbox/openbox.c:472
 msgid "Syntax: openbox [options]\n"
-msgstr ""
+msgstr "Syntaksi: openbox [ominaisuudet]\n"
 
 #: openbox/openbox.c:473
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
+"\n"
+"Ominaisuudet:\n"
 
 #: openbox/openbox.c:474
 msgid "  --help              Display this help and exit\n"
-msgstr ""
+msgstr "  --help              Näytä tämä apu ja sulje\n"
 
 #: openbox/openbox.c:475
 msgid "  --version           Display the version and exit\n"
-msgstr ""
+msgstr "  --version           Näytä versio ja sulje\n"
 
 #: openbox/openbox.c:476
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
+msgstr "  --replace           Korvaa päällä oleva window manager\n"
 
 #: openbox/openbox.c:477
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
+msgstr "  --sm-disable        Estä yhteys session manageriin\n"
 
 #: openbox/openbox.c:478
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
+"\n"
+"Lähetetään viestejä päällä olevaan Openboxiin\n"
 
 #: openbox/openbox.c:479
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr ""
+msgstr "  --reconfigure       Lataa Openboxin konfiguraation uudelleen\n"
 
 #: openbox/openbox.c:480
 msgid "  --restart           Restart Openbox\n"
-msgstr ""
+msgstr "  --restart           Käynnistä Openbox uudelleen\n"
 
 #: openbox/openbox.c:481
 msgid ""
@@ -251,7 +241,7 @@ msgstr ""
 
 #: openbox/openbox.c:482
 msgid "  --sync              Run in synchronous mode\n"
-msgstr ""
+msgstr "  --sync              aja synkroni tilassa\n"
 
 #: openbox/openbox.c:483
 msgid "  --debug             Display debugging output\n"
@@ -271,11 +261,13 @@ msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
+"\n"
+"Ilmoita virheistä: %s\n"
 
 #: openbox/openbox.c:578
 #, c-format
 msgid "Invalid command line argument '%s'\n"
-msgstr ""
+msgstr "Virheellinen komentorivi käsky '%s'\n"
 
 #: openbox/screen.c:85 openbox/screen.c:186
 #, c-format
@@ -298,9 +290,9 @@ msgid "Unable to make directory '%s': %s"
 msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
 
 #: openbox/session.c:442
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
+msgstr ""
 
 #: openbox/session.c:552
 #, c-format
@@ -335,8 +327,4 @@ msgstr ""
 #: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
-msgstr ""
-
-#, fuzzy
-#~ msgid "--config requires an argument\n"
-#~ msgstr "--sm-save-file tarvitsee parametrin\n"
+msgstr "X virhe: %s"

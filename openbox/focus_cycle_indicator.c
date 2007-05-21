@@ -105,6 +105,11 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 
     RrAppearanceFree(a_focus_indicator);
 
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.top));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.left));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.right));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
+
     XDestroyWindow(ob_display, focus_indicator.top.win);
     XDestroyWindow(ob_display, focus_indicator.left.win);
     XDestroyWindow(ob_display, focus_indicator.right.win);

@@ -26,9 +26,9 @@ msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Nemogu napraviti direktorij '%s': %s"
+msgstr ""
 
 #: openbox/action.c:1265
 #, c-format
@@ -52,27 +52,22 @@ msgid "All desktops"
 msgstr "Sve radne površine"
 
 #: openbox/client_menu.c:351
-#, fuzzy
 msgid "&Layer"
-msgstr "&Razina"
+msgstr ""
 
 #: openbox/client_menu.c:356
-#, fuzzy
 msgid "Always on &top"
 msgstr "Uvijek na &vrhu"
 
 #: openbox/client_menu.c:357
-#, fuzzy
 msgid "&Normal"
 msgstr "&Normalno"
 
 #: openbox/client_menu.c:358
-#, fuzzy
 msgid "Always on &bottom"
 msgstr "Uvijek na &dnu"
 
 #: openbox/client_menu.c:361
-#, fuzzy
 msgid "&Send to desktop"
 msgstr "&Pošalji na radnu površinu"
 
@@ -81,27 +76,22 @@ msgid "Client menu"
 msgstr "Meni klijenta"
 
 #: openbox/client_menu.c:371
-#, fuzzy
 msgid "R&estore"
 msgstr "Ponovno uspostav&i"
 
 #: openbox/client_menu.c:379
-#, fuzzy
 msgid "&Move"
 msgstr "Po&makni"
 
 #: openbox/client_menu.c:381
-#, fuzzy
 msgid "Resi&ze"
 msgstr "Prom&jeni veličinu"
 
 #: openbox/client_menu.c:383
-#, fuzzy
 msgid "Ico&nify"
 msgstr "Iko&nificiraj"
 
 #: openbox/client_menu.c:391
-#, fuzzy
 msgid "Ma&ximize"
 msgstr "M&aksimiziraj"
 
@@ -110,12 +100,10 @@ msgid "&Roll up/down"
 msgstr ""
 
 #: openbox/client_menu.c:401
-#, fuzzy
 msgid "Un/&Decorate"
-msgstr "De&koriraj"
+msgstr ""
 
 #: openbox/client_menu.c:411
-#, fuzzy
 msgid "&Close"
 msgstr "&Zatvori"
 
@@ -149,9 +137,8 @@ msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
 #: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
 msgid "More..."
-msgstr "Odi na..."
+msgstr ""
 
 #: openbox/mouse.c:338
 #, c-format
@@ -164,9 +151,9 @@ msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
 #: openbox/openbox.c:128
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Nemogu napraviti direktorij '%s': %s"
+msgstr ""
 
 #: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -189,9 +176,8 @@ msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
 #: openbox/openbox.c:274
-#, fuzzy
 msgid "Unable to load a theme."
-msgstr "Nemogu učitati slova: %s\n"
+msgstr ""
 
 #: openbox/openbox.c:393
 #, c-format
@@ -297,9 +283,9 @@ msgid "Unable to make directory '%s': %s"
 msgstr "Nemogu napraviti direktorij '%s': %s"
 
 #: openbox/session.c:442
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Nemogu napraviti direktorij '%s': %s"
+msgstr ""
 
 #: openbox/session.c:552
 #, c-format
@@ -335,7 +321,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "--config requires an argument\n"
-#~ msgstr "--sm-save-file zahtjeva argument\n"

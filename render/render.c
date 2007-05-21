@@ -40,7 +40,7 @@ static void pixel_data_to_pixmap(RrAppearance *l,
 
 Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
 {
-    gint i, transferred = 0, sw, sh, partial_w, partial_h;
+    gint i, transferred = 0, sw, sh, partial_w, partial_h, force_transfer = 0;
     RrPixel32 *source, *dest;
     Pixmap oldp = None;
     RrRect tarea; /* area in which to draw textures */
@@ -160,14 +160,18 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
                         &a->texture[i].data.rgba,
                         a->w, a->h,
                         &tarea);
+            force_transfer = 1;
         break;
         }
     }
 
     if (!transferred) {
         transferred = 1;
-        if ((a->surface.grad != RR_SURFACE_SOLID) || (a->surface.interlaced))
+        if ((a->surface.grad != RR_SURFACE_SOLID) || (a->surface.interlaced) ||
+            force_transfer)
+        {
             pixel_data_to_pixmap(a, 0, 0, w, h);
+        }
     }
 
     return oldp;

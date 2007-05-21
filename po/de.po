@@ -26,9 +26,9 @@ msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
+msgstr ""
 
 #: openbox/action.c:1265
 #, c-format
@@ -52,12 +52,10 @@ msgid "All desktops"
 msgstr "Alle Desktops"
 
 #: openbox/client_menu.c:351
-#, fuzzy
 msgid "&Layer"
-msgstr "&Fenster"
+msgstr ""
 
 #: openbox/client_menu.c:356
-#, fuzzy
 msgid "Always on &top"
 msgstr "Immer im &Vordergrund"
 
@@ -66,12 +64,10 @@ msgid "&Normal"
 msgstr "&Normal"
 
 #: openbox/client_menu.c:358
-#, fuzzy
 msgid "Always on &bottom"
 msgstr "Immer im &Hintergrund"
 
 #: openbox/client_menu.c:361
-#, fuzzy
 msgid "&Send to desktop"
 msgstr "&An Desktop senden"
 
@@ -80,42 +76,34 @@ msgid "Client menu"
 msgstr ""
 
 #: openbox/client_menu.c:371
-#, fuzzy
 msgid "R&estore"
 msgstr "Wi&ederherstellen"
 
 #: openbox/client_menu.c:379
-#, fuzzy
 msgid "&Move"
 msgstr "Vers&chieben"
 
 #: openbox/client_menu.c:381
-#, fuzzy
 msgid "Resi&ze"
 msgstr "&Größe ändern"
 
 #: openbox/client_menu.c:383
-#, fuzzy
 msgid "Ico&nify"
 msgstr "Mi&nimieren"
 
 #: openbox/client_menu.c:391
-#, fuzzy
 msgid "Ma&ximize"
 msgstr "Ma&ximieren"
 
 #: openbox/client_menu.c:399
-#, fuzzy
 msgid "&Roll up/down"
 msgstr "Auf/Ab&rollen"
 
 #: openbox/client_menu.c:401
-#, fuzzy
 msgid "Un/&Decorate"
-msgstr "&Dekoriere"
+msgstr ""
 
 #: openbox/client_menu.c:411
-#, fuzzy
 msgid "&Close"
 msgstr "&Schließen"
 
@@ -129,16 +117,14 @@ msgid "Conflict with key binding in config file"
 msgstr ""
 
 #: openbox/menu.c:98 openbox/menu.c:106
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr ""
-"Es wurde keine gültige Konfigurationsdatei gefunden, benutze einfache "
-"Standardwerte."
 
 #: openbox/menu.c:149
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Neustart fehlgeschlagen, um die ausführbare Datei '%s' zu starten: %s"
+msgstr ""
 
 #: openbox/menu.c:166
 #, c-format
@@ -151,9 +137,8 @@ msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
 #: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
 msgid "More..."
-msgstr "Gehe zu..."
+msgstr ""
 
 #: openbox/mouse.c:338
 #, c-format
@@ -166,9 +151,9 @@ msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
 #: openbox/openbox.c:128
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
+msgstr ""
 
 #: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -194,9 +179,8 @@ msgstr ""
 "Standardwerte."
 
 #: openbox/openbox.c:274
-#, fuzzy
 msgid "Unable to load a theme."
-msgstr "Schriftart %s konnte nicht geladen werden\n"
+msgstr ""
 
 #: openbox/openbox.c:393
 #, c-format
@@ -212,14 +196,12 @@ msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [Optionen]\n"
 
 #: openbox/openbox.c:473
-#, fuzzy
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 "\n"
 "Optionen:\n"
-"\n"
 
 #: openbox/openbox.c:474
 msgid "  --help              Display this help and exit\n"
@@ -234,19 +216,16 @@ msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Den aktuell laufenden Fenstermanager ersetzen\n"
 
 #: openbox/openbox.c:477
-#, fuzzy
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Keine Verbindung zum Sitzungsmanager aufbauen\n"
 
 #: openbox/openbox.c:478
-#, fuzzy
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
 "Nachrichten an eine laufende Openbox-Instanz weiterleiten:\n"
-"\n"
 
 #: openbox/openbox.c:479
 msgid "  --reconfigure       Reload Openbox's configuration\n"
@@ -257,15 +236,12 @@ msgid "  --restart           Restart Openbox\n"
 msgstr ""
 
 #: openbox/openbox.c:481
-#, fuzzy
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
 "\n"
-"\n"
 "Debugging Optionen:\n"
-"\n"
 
 #: openbox/openbox.c:482
 msgid "  --sync              Run in synchronous mode\n"
@@ -285,14 +261,13 @@ msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 
 #: openbox/openbox.c:486
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
 "Bitte melden Sie Bugreports an: %s\n"
-"\n"
 
 #: openbox/openbox.c:578
 #, c-format
@@ -320,9 +295,9 @@ msgid "Unable to make directory '%s': %s"
 msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
 
 #: openbox/session.c:442
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
+msgstr ""
 
 #: openbox/session.c:552
 #, c-format
@@ -358,11 +333,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "  --config TYPE       Specify the configuration profile to use\n"
-#~ msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
-
-#, fuzzy
-#~ msgid "--config requires an argument\n"
-#~ msgstr "--config-file benötigt ein Argument\n"

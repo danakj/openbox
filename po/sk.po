@@ -26,9 +26,9 @@ msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Nebolo možné vytvoriť adresár '%s': %s"
+msgstr ""
 
 #: openbox/action.c:1265
 #, c-format
@@ -52,27 +52,22 @@ msgid "All desktops"
 msgstr "Všetky plochy"
 
 #: openbox/client_menu.c:351
-#, fuzzy
 msgid "&Layer"
-msgstr "&Vrstva"
+msgstr ""
 
 #: openbox/client_menu.c:356
-#, fuzzy
 msgid "Always on &top"
 msgstr "Vždy &navrchu"
 
 #: openbox/client_menu.c:357
-#, fuzzy
 msgid "&Normal"
 msgstr "Nor&málna"
 
 #: openbox/client_menu.c:358
-#, fuzzy
 msgid "Always on &bottom"
 msgstr "Vždy &dole"
 
 #: openbox/client_menu.c:361
-#, fuzzy
 msgid "&Send to desktop"
 msgstr "&Poslať na plochu"
 
@@ -81,42 +76,34 @@ msgid "Client menu"
 msgstr "Menu klienta"
 
 #: openbox/client_menu.c:371
-#, fuzzy
 msgid "R&estore"
 msgstr "&Obnoviť"
 
 #: openbox/client_menu.c:379
-#, fuzzy
 msgid "&Move"
 msgstr "Pre&sunúť"
 
 #: openbox/client_menu.c:381
-#, fuzzy
 msgid "Resi&ze"
 msgstr "Z&mena veľkosti"
 
 #: openbox/client_menu.c:383
-#, fuzzy
 msgid "Ico&nify"
 msgstr "Do iko&ny"
 
 #: openbox/client_menu.c:391
-#, fuzzy
 msgid "Ma&ximize"
 msgstr "Ma&ximalizovať"
 
 #: openbox/client_menu.c:399
-#, fuzzy
 msgid "&Roll up/down"
 msgstr "Ro/&Zvinúť"
 
 #: openbox/client_menu.c:401
-#, fuzzy
 msgid "Un/&Decorate"
-msgstr "&Dekorácia"
+msgstr ""
 
 #: openbox/client_menu.c:411
-#, fuzzy
 msgid "&Close"
 msgstr "Z&avrieť"
 
@@ -150,9 +137,8 @@ msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
 #: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
 msgid "More..."
-msgstr "Prejsť na..."
+msgstr ""
 
 #: openbox/mouse.c:338
 #, c-format
@@ -165,9 +151,9 @@ msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
 #: openbox/openbox.c:128
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Nebolo možné vytvoriť adresár '%s': %s"
+msgstr ""
 
 #: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -190,9 +176,8 @@ msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
 #: openbox/openbox.c:274
-#, fuzzy
 msgid "Unable to load a theme."
-msgstr "Nepodarilo sa načítať font: %s\n"
+msgstr ""
 
 #: openbox/openbox.c:393
 #, c-format
@@ -298,9 +283,9 @@ msgid "Unable to make directory '%s': %s"
 msgstr "Nebolo možné vytvoriť adresár '%s': %s"
 
 #: openbox/session.c:442
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Nebolo možné vytvoriť adresár '%s': %s"
+msgstr ""
 
 #: openbox/session.c:552
 #, c-format
@@ -336,7 +321,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "--config requires an argument\n"
-#~ msgstr "--sm-save-file vyžaduje parameter\n"

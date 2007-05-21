@@ -125,7 +125,7 @@ msgstr "Toimivaa menu tiedostoa ei löytynyt '%s'"
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Putki-menun komennon suorittaminen epäonnistui"
+msgstr "Putki-menun komennon suorittaminen epäonnistui '%s': %s"
 
 #: openbox/menu.c:166
 #, c-format

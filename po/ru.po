@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-20 17:27+0200\n"
+"POT-Creation-Date: 2007-05-21 00:08-0400\n"
 "PO-Revision-Date: 2004-04-23 13:00+0300\n"
 "Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -107,7 +107,7 @@ msgstr ""
 msgid "&Close"
 msgstr "Закрыть(&C)"
 
-#: openbox/config.c:666
+#: openbox/config.c:701
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr ""

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-20 17:27+0200\n"
+"POT-Creation-Date: 2007-05-21 00:08-0400\n"
 "PO-Revision-Date: 2007-05-21 00:06+0200\n"
 "Last-Translator: Lauri Hakko\n"
 "Language-Team: None\n"
@@ -108,7 +108,7 @@ msgstr "(Epä)reunusta"
 msgid "&Close"
 msgstr "&Sulje"
 
-#: openbox/config.c:666
+#: openbox/config.c:701
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Virheellinen painike '%s' määritelty konfiguraatio tiedostossa"
@@ -125,7 +125,7 @@ msgstr "Toimivaa menu tiedostoa ei löytynyt '%s'"
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Putki-menun komennon suorittaminen epäonnistui"
+msgstr "Putki-menun komennon suorittaminen epäonnistui '%s': %s"
 
 #: openbox/menu.c:166
 #, c-format
@@ -174,7 +174,9 @@ msgstr ""
 
 #: openbox/openbox.c:248
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr "Oikeanlaista konfiguraation tiedostoa ei löytynyt, käytetään joitain yksinkertaisia oletusarvoja"
+msgstr ""
+"Oikeanlaista konfiguraation tiedostoa ei löytynyt, käytetään joitain "
+"yksinkertaisia oletusarvoja"
 
 #: openbox/openbox.c:274
 msgid "Unable to load a theme."

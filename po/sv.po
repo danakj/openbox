@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-21 00:08-0400\n"
-"PO-Revision-Date: 2007-05-06 13:44+0200\n"
+"POT-Creation-Date: 2007-05-21 15:39+0200\n"
+"PO-Revision-Date: 2007-05-22 00:29+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Ogiltig action '%s' efterfrågades, men finns inte."
+msgstr "Ogiltig action '%s' efterfrågades, men den finns inte."
 
 #: openbox/action.c:957
 #, c-format
@@ -37,7 +37,7 @@ msgstr "Lyckades inte konvertera sökvägen '%s' från utf8"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
-msgstr "Gå dit"
+msgstr "Gå dit..."
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
@@ -69,7 +69,7 @@ msgstr "Alltid &underst"
 
 #: openbox/client_menu.c:361
 msgid "&Send to desktop"
-msgstr "&Skicka till"
+msgstr "&Skicka till skrivbord"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
@@ -101,7 +101,7 @@ msgstr "&Rulla upp/ner"
 
 #: openbox/client_menu.c:401
 msgid "Un/&Decorate"
-msgstr "(Av)&Dekorera"
+msgstr "&Dekorationer"
 
 #: openbox/client_menu.c:411
 msgid "&Close"
@@ -157,7 +157,7 @@ msgstr "Kunde inte gå till hemkatalogen '%s': %s"
 
 #: openbox/openbox.c:148
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Kunde inte öppna en display från DISPLAY-miljövariabeln."
+msgstr "Kunde inte öppna en display från miljövariabeln DISPLAY."
 
 #: openbox/openbox.c:179
 msgid "Failed to initialize the render library."
@@ -169,11 +169,11 @@ msgstr "X-servern stödjer inte lokalisering."
 
 #: openbox/openbox.c:187
 msgid "Cannot set locale modifiers for the X server."
-msgstr ""
+msgstr "Kan inte sätta lokaliseringsmodifierare för X-servern."
 
 #: openbox/openbox.c:248
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr "Kunde inte hitta en giltig konfiguration, använder standardvärden"
+msgstr "Kunde inte hitta en giltig konfigurationsfil, använder enkla standardvärden"
 
 #: openbox/openbox.c:274
 msgid "Unable to load a theme."
@@ -186,7 +186,7 @@ msgstr "Restart misslyckades att starta nytt program '%s': %s"
 
 #: openbox/openbox.c:461 openbox/openbox.c:463
 msgid "Copyright (c)"
-msgstr ""
+msgstr "Copyright (c)"
 
 #: openbox/openbox.c:472
 msgid "Syntax: openbox [options]\n"
@@ -214,7 +214,7 @@ msgstr "  --replace           Ersätt den befintliga fönsterhanteraren\n"
 
 #: openbox/openbox.c:477
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Avaktivera anslutning till sessions-hanteraren\n"
+msgstr "  --sm-disable        Avaktivera anslutning till sessionshanteraren\n"
 
 #: openbox/openbox.c:478
 msgid ""
@@ -254,7 +254,7 @@ msgstr "  --debug-focus       Visa debuginformation för fokushantering\n"
 
 #: openbox/openbox.c:485
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Dela skärmen i fejkade xinerama-skärmar\n"
+msgstr "  --debug-xinerama    Dela skärmen i simulerade xinerama-skärmar\n"
 
 #: openbox/openbox.c:486
 #, c-format
@@ -308,7 +308,7 @@ msgstr "Kör %s\n"
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Ogiltig modifikationstangent '%s' i tangent/musbindning"
+msgstr "Ogiltig modifikationstangent '%s' i tangent-/musbindning"
 
 #: openbox/translate.c:135
 #, c-format
@@ -328,4 +328,4 @@ msgstr "Efterfrågad tangent '%s' finns inte på displayen"
 #: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
-msgstr "X Fel: %s"
+msgstr "X-fel: %s"

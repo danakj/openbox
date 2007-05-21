@@ -1,4 +1,4 @@
-# translation of openbox.po to Estonian
+# translation of openbox to Estonian
 # Copyright (C) 2007 Dana Jansens
 # This file is distributed under the same license as the Openbox 3 package.
 #
@@ -39,7 +39,7 @@ msgstr "Raja '%s' ümberkodeerimine UTF8-st ebaõnnestus"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
-msgstr "Mina sinna..."
+msgstr "Mine sinna..."
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
@@ -59,7 +59,7 @@ msgstr "&Kiht"
 
 #: openbox/client_menu.c:351
 msgid "Always on &top"
-msgstr "Alati teiste &peal"
+msgstr "Aken teiste &peal"
 
 #: openbox/client_menu.c:352
 msgid "&Normal"
@@ -159,7 +159,7 @@ msgstr "Ei suudetud siseneda kodukataloogi '%s': %s"
 
 #: openbox/openbox.c:145
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "DISPLAY keskkonnamuutujas oleva displei avamine ebaõnnestus."
+msgstr "DISPLAY keskkonnamuutujas oleva ekraani avamine ebaõnnestus."
 
 #: openbox/openbox.c:176
 msgid "Failed to initialize the render library."
@@ -175,7 +175,7 @@ msgstr "Ei suudetud sättida lokaadimuutujaid X serveri jaoks."
 
 #: openbox/openbox.c:244
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr "Ei suudetud leida kehtivat konfiguratsioonifaili, kasutatakse lihtsaid vaikimisiseadeid"
+msgstr "Ei suudetud leida kehtivat konfiguratsioonifaili, kasutatakse lihtsaid vaikimisi seadeid"
 
 #: openbox/openbox.c:270
 msgid "Unable to load a theme."
@@ -184,11 +184,11 @@ msgstr "Ei suudetud laadida teemat."
 #: openbox/openbox.c:383
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Taaskäivitusel ebaõnnestus käivitada uut käivitusfaili '%s': %s"
+msgstr "Taaskäivitusel ebaõnnestus uue käivitusfaili '%s' käivitamine: %s"
 
 #: openbox/openbox.c:451 openbox/openbox.c:453
 msgid "Copyright (c)"
-msgstr "Autoriõigus (c)"
+msgstr "Autoriõigused (c)"
 
 #: openbox/openbox.c:462
 msgid "Syntax: openbox [options]\n"
@@ -276,7 +276,7 @@ msgstr "Ekraanil %d juba jookseb aknahaldur"
 #: openbox/screen.c:122
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Ei suuda hankida aknahaldurite valikut ekraanil %d"
+msgstr "Ei suuda hankida aknahaldurite loetelu ekraanil %d"
 
 #: openbox/screen.c:143
 #, c-format
@@ -306,17 +306,17 @@ msgstr "Jooksev %s\n"
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Vigane muutujaklahv '%s' hiire/klaviatuuri kiirklahvil"
+msgstr "Vigane muutujaklahv '%s' hiire/klaviatuuri kiirklahvides"
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "Vigane klahvikood '%s' kiirklahvis"
+msgstr "Vigane klahvikood '%s' kiirklahvil"
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Vigane klahvinimi '%s' kiirklahvis"
+msgstr "Vigane klahvinimi '%s' kiirklahvil"
 
 #: openbox/translate.c:148
 #, c-format

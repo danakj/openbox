@@ -35,7 +35,6 @@ struct _ObSessionState;
 
 typedef struct _ObClient      ObClient;
 typedef struct _ObClientIcon  ObClientIcon;
-typedef struct _ObAppSettings ObAppSettings;
 
 /* The value in client.transient_for indicating it is a transient for its
    group instead of for a single window */

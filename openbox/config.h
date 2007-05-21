@@ -30,11 +30,13 @@
 
 struct _ObParseInst;
 
+typedef struct _ObAppSettings ObAppSettings;
+
 struct _ObAppSettings
 {
-    gchar *class;
-    gchar *name;
-    gchar *role;
+    GPatternSpec *class;
+    GPatternSpec *name;
+    GPatternSpec *role;
 
     Point position;
     gboolean center_x;
@@ -165,5 +167,13 @@ extern GSList *config_per_app_settings;
 
 void config_startup(struct _ObParseInst *i);
 void config_shutdown();
+
+/*! Create an ObAppSettings structure with the default values */
+ObAppSettings* config_create_app_settings();
+/*! Copies any settings in src to dest, if they are their default value in
+  src. */
+void config_app_settings_copy_non_defaults(const ObAppSettings *src,
+                                           ObAppSettings *dest);
+
 
 #endif

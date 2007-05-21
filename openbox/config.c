@@ -89,6 +89,54 @@ gint     config_resist_edge;
 
 GSList *config_per_app_settings;
 
+ObAppSettings* config_create_app_settings()
+{
+    ObAppSettings *settings = g_new0(ObAppSettings, 1);
+    settings->decor = -1;
+    settings->shade = -1;
+    settings->monitor = -1;
+    settings->focus = -1;
+    settings->desktop = 0;
+    settings->layer = -2;
+    settings->iconic = -1;
+    settings->skip_pager = -1;
+    settings->skip_taskbar = -1;
+    settings->fullscreen = -1;
+    settings->max_horz = -1;
+    settings->max_vert = -1;
+    return settings;
+}
+
+#define copy_if(setting, default) \
+  if (src->setting != default) dst->setting = src->setting
+void config_app_settings_copy_non_defaults(const ObAppSettings *src,
+                                           ObAppSettings *dst)
+{
+    g_assert(src != NULL);
+    g_assert(dst != NULL);
+
+    copy_if(decor, -1);
+    copy_if(shade, -1);
+    copy_if(focus, -1);
+    copy_if(desktop, 0);
+    copy_if(layer, -2);
+    copy_if(iconic, -1);
+    copy_if(skip_pager, -1);
+    copy_if(skip_taskbar, -1);
+    copy_if(fullscreen, -1);
+    copy_if(max_horz, -1);
+    copy_if(max_vert, -1);
+
+    if (src->pos_given) {
+        dst->pos_given = TRUE;
+        dst->center_x = src->center_x;
+        dst->center_y = src->center_y;
+        dst->position.x = src->position.x;
+        dst->position.y = src->position.y;
+        dst->monitor = src->monitor;
+    }
+}
+
 /*
   <applications>
     <application name="aterm">
@@ -121,7 +169,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                                    xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = parse_find_node("application", node->children);
-    gchar *name, *class;
+    gchar *name = NULL, *class = NULL, *role = NULL;
     gboolean name_set, class_set;
     gboolean x_pos_given;
 
@@ -132,33 +180,25 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
         name_set = parse_attr_string("name", app, &name);
         if (class_set || name_set) {
             xmlNodePtr n, c;
-            ObAppSettings *settings = g_new0(ObAppSettings, 1);
+            ObAppSettings *settings = config_create_app_settings();;
             
             if (name_set)
-                settings->name = name;
-            else
-                settings->name = NULL;
+                settings->name = g_pattern_spec_new(name);
 
             if (class_set)
-                settings->class = class;
-            else
-                settings->class = NULL;
+                settings->class = g_pattern_spec_new(class);
 
-            if (!parse_attr_string("role", app, &settings->role))
-                settings->role = NULL;
+            if (parse_attr_string("role", app, &role))
+                settings->role = g_pattern_spec_new(role);
 
-            settings->decor = -1;
             if ((n = parse_find_node("decor", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->decor = parse_bool(doc, n);
 
-            settings->shade = -1;
             if ((n = parse_find_node("shade", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->shade = parse_bool(doc, n);
 
-            settings->position.x = settings->position.y = 0;
-            settings->pos_given = FALSE;
             if ((n = parse_find_node("position", app->children))) {
                 if ((c = parse_find_node("x", n->children)))
                     if (!parse_contains("default", doc, c)) {
@@ -198,7 +238,6 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                     }
             }
 
-            settings->focus = -1;
             if ((n = parse_find_node("focus", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->focus = parse_bool(doc, n);
@@ -214,11 +253,9 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                             settings->desktop = i;
                     }
                     g_free(s);
-                } else
-                    settings->desktop = 0;
+                }
             }
 
-            settings->layer = -2;
             if ((n = parse_find_node("layer", app->children)))
                 if (!parse_contains("default", doc, n)) {
                     gchar *s = parse_string(doc, n);
@@ -231,28 +268,22 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                     g_free(s);
                 }
 
-            settings->iconic = -1;
             if ((n = parse_find_node("iconic", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->iconic = parse_bool(doc, n);
 
-            settings->skip_pager = -1;
             if ((n = parse_find_node("skip_pager", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->skip_pager = parse_bool(doc, n);
 
-            settings->skip_taskbar = -1;
             if ((n = parse_find_node("skip_taskbar", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->skip_taskbar = parse_bool(doc, n);
 
-            settings->fullscreen = -1;
             if ((n = parse_find_node("fullscreen", app->children)))
                 if (!parse_contains("default", doc, n))
                     settings->fullscreen = parse_bool(doc, n);
 
-            settings->max_horz = -1;
-            settings->max_vert = -1;
             if ((n = parse_find_node("maximized", app->children)))
                 if (!parse_contains("default", doc, n)) {
                     gchar *s = parse_string(doc, n);
@@ -274,6 +305,10 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
         
         app = parse_find_node("application", app->next);
     }
+
+    g_free(name);
+    g_free(class);
+    g_free(role);
 }
 
 /*
@@ -917,9 +952,9 @@ void config_shutdown()
 
     for (it = config_per_app_settings; it; it = g_slist_next(it)) {
         ObAppSettings *itd = (ObAppSettings *)it->data;
-        g_free(itd->name);
-        g_free(itd->role);
-        g_free(itd->class);
+        if (itd->name)  g_pattern_spec_free(itd->name);
+        if (itd->role)  g_pattern_spec_free(itd->role);
+        if (itd->class) g_pattern_spec_free(itd->class);
         g_free(it->data);
     }
     g_slist_free(config_per_app_settings);

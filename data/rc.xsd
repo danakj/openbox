@@ -153,6 +153,7 @@
     <xsd:complexType name="window_position">
         <xsd:element name="x" type="ob:center_or_int"/>
         <xsd:element name="y" type="ob:center_or_int"/>
+	<xsd:element name="monitor" type="ob:mouse_or_int"/>	
         <xsd:element minOccurs="0" name="head" type="xsd:string"/>
     </xsd:complexType>
     <xsd:complexType name="application">
@@ -328,6 +329,13 @@
             <!-- ob: atoi($_) unless $_ eq 'center'; -->
             <!-- I think the regexp DTRT WRT atoi. -->
             <xsd:pattern value="center|0|[1-9][0-9]*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="mouse_or_int">
+        <xsd:restriction base="xsd:string">
+            <!-- ob: atoi($_) unless $_ eq 'center'; -->
+            <!-- I think the regexp DTRT WRT atoi. -->
+            <xsd:pattern value="mouse|0|[1-9][0-9]*"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="contextname">

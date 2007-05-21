@@ -330,7 +330,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
     if (resized) {
         self->decorations = self->client->decorations;
-        self->max_horz = self->client->max_horz;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER) {
             self->bwidth = ob_rr_theme->fbwidth;
@@ -340,20 +339,20 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->bwidth = self->cbwidth_x = self->cbwidth_y = 0;
         }
         self->rbwidth = self->bwidth;
-        self->leftb = self->rightb = TRUE;
+
+        self->max_horz = self->client->max_horz;
+        self->max_vert = self->client->max_vert;
 
         if (self->max_horz) {
-            self->leftb = self->rightb = FALSE;
             self->cbwidth_x = 0;
-        }
-
-        self->width = self->client->area.width + self->cbwidth_x * 2;
-        self->width = MAX(self->width, 1); /* no lower than 1 */
+            self->width = self->client->area.width - self->bwidth * 2;
+        } else
+            self->width = self->client->area.width + self->cbwidth_x * 2;
 
         STRUT_SET(self->size,
-                  self->cbwidth_x + (self->leftb ? self->bwidth : 0),
+                  self->cbwidth_x + (!self->max_horz ? self->bwidth : 0),
                   self->cbwidth_y + self->bwidth,
-                  self->cbwidth_x + (self->rightb ? self->bwidth : 0),
+                  self->cbwidth_x + (!self->max_horz ? self->bwidth : 0),
                   self->cbwidth_y + self->bwidth);
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
@@ -370,9 +369,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->bwidth) {
                 XMoveResizeWindow(ob_display, self->titletop,
                                   ob_rr_theme->grip_width + self->bwidth, 0,
-                                  self->client->area.width +
-                                  self->cbwidth_x * 2 + self->bwidth * 2 -
-                                  (ob_rr_theme->grip_width + self->bwidth) * 2,
+                                  /* width + bwidth*2 - bwidth*2 - grips*2 */
+                                  self->width + ob_rr_theme->grip_width * 2,
                                   self->bwidth);
                 XMoveResizeWindow(ob_display, self->titletopleft,
                                   0, 0,
@@ -380,7 +378,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->bwidth);
                 XMoveResizeWindow(ob_display, self->titletopright,
                                   self->client->area.width +
-                                  self->cbwidth_x * 2 + self->bwidth * 2 -
+                                  self->size.left + self->size.right -
                                   ob_rr_theme->grip_width - self->bwidth,
                                   0,
                                   ob_rr_theme->grip_width + self->bwidth,
@@ -389,15 +387,16 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMoveResizeWindow(ob_display, self->titleleft,
                                   0, self->bwidth,
                                   self->bwidth,
-                                  (self->leftb ?
+                                  (!self->max_horz ?
                                    ob_rr_theme->grip_width :
                                    self->size.top - self->bwidth));
                 XMoveResizeWindow(ob_display, self->titleright,
                                   self->client->area.width +
-                                  self->cbwidth_x * 2 + self->bwidth,
+                                  self->size.left + self->size.right -
                                   self->bwidth,
                                   self->bwidth,
-                                  (self->rightb ?
+                                  self->bwidth,
+                                  (!self->max_horz ?
                                    ob_rr_theme->grip_width :
                                    self->size.top - self->bwidth));
 
@@ -413,8 +412,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XMoveResizeWindow(ob_display, self->titlebottom,
                                       self->bwidth,
                                       ob_rr_theme->title_height + self->bwidth,
-                                      self->client->area.width +
-                                      self->cbwidth_x * 2,
+                                      self->width,
                                       self->rbwidth);
 
                     XMapWindow(ob_display, self->titlebottom);
@@ -487,11 +485,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   0,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom -
-                                  (self->leftb ?
+                                  (!self->max_horz ?
                                    ob_rr_theme->grip_width :
                                    self->size.bottom),
                                   self->bwidth,
-                                  (self->leftb ?
+                                  (!self->max_horz ?
                                    ob_rr_theme->grip_width :
                                    self->size.bottom));
                 XMoveResizeWindow(ob_display, self->rgripright,
@@ -499,11 +497,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->size.right - self->bwidth,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom -
-                                  (self->leftb ?
+                                  (!self->max_horz ?
                                    ob_rr_theme->grip_width :
                                    self->size.bottom),
                                   self->bwidth,
-                                  (self->rightb ?
+                                  (!self->max_horz ?
                                    ob_rr_theme->grip_width :
                                    self->size.bottom));
 
@@ -636,7 +634,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XUnmapWindow(ob_display, self->handle);
             }
 
-            if (self->bwidth && self->leftb) {
+            if (self->bwidth && !self->max_horz) {
                 XMoveResizeWindow(ob_display, self->left,
                                   0,
                                   self->bwidth + ob_rr_theme->grip_width,
@@ -649,7 +647,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->left);
 
-            if (self->bwidth && self->rightb) {
+            if (self->bwidth && !self->max_horz) {
                 XMoveResizeWindow(ob_display, self->right,
                                   self->client->area.width +
                                   self->cbwidth_x * 2 + self->bwidth,
@@ -670,14 +668,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               self->size.top - self->cbwidth_y,
                               self->client->area.width +
                               self->cbwidth_x * 2 +
-                              (self->leftb ? self->bwidth : 0) +
-                              (self->rightb ? self->bwidth : 0),
+                              (!self->max_horz ? self->bwidth * 2 : 0),
                               self->client->area.height +
                               self->cbwidth_y * 2);
 
             /* move the plate */
             XMoveWindow(ob_display, self->plate,
-                        (self->leftb ? self->bwidth : 0) + self->cbwidth_x,
+                        (!self->max_horz ? self->bwidth : 0) + self->cbwidth_x,
                         self->cbwidth_y);
 
             /* when the client has StaticGravity, it likes to move around. */
@@ -749,7 +746,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         (self->functions & OB_CLIENT_FUNC_RESIZE) !=
         (self->client->functions & OB_CLIENT_FUNC_RESIZE))
     {
-        gboolean r = self->client->functions & OB_CLIENT_FUNC_RESIZE;
+        gboolean r = self->client->functions & OB_CLIENT_FUNC_RESIZE &&
+            !(self->max_horz && self->max_vert);
         XSetWindowAttributes a;
 
         a.cursor = ob_cursor(r ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
@@ -1199,27 +1197,52 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
-    if (win == self->title) {
-        /* when the user clicks in the corners of the titlebar and the client
-           is fully maximized, then treat it like they clicked in the
-           button that is there */
-        if (self->client->max_horz && self->client->max_vert &&
-            y < ob_rr_theme->paddingy + 1 + ob_rr_theme->button_size)
+    /* when the user clicks in the corners of the titlebar and the client
+       is fully maximized, then treat it like they clicked in the
+       button that is there */
+    if (self->max_horz && self->max_vert &&
+        (win == self->title ||
+         win == self->titleleft || win == self->titletopleft ||
+         win == self->titleright || win == self->titletopright))
+    {
+        /* get the mouse coords in reference to the whole frame */
+        gint fx = x;
+        gint fy = y;
+
+        /* these windows are down a border width from the top of the frame */
+        if (win == self->title ||
+            win == self->titleleft || win == self->titleright)
+            fy += self->bwidth;
+
+        /* title is a border width in from the edge */
+        if (win == self->title)
+            fx += self->bwidth;
+        /* titletopright is way to the right edge */
+        else if (win == self->titletopright)
+            fx += self->area.width - (ob_rr_theme->grip_width + self->bwidth);
+        /* titleright is even more way to the right edge */
+        else if (win == self->titleright)
+            fx += self->area.width - self->bwidth;
+
+        /* figure out if we're over the area that should be considered a
+           button */
+        if (fy < self->bwidth + ob_rr_theme->paddingy + 1 +
+            ob_rr_theme->button_size)
         {
-            if (x < ((ob_rr_theme->paddingx + 1) * 2 +
-                     ob_rr_theme->button_size)) {
+            if (fx < (self->bwidth + ob_rr_theme->paddingx + 1 +
+                      ob_rr_theme->button_size))
+            {
                 if (self->leftmost != OB_FRAME_CONTEXT_NONE)
                     return self->leftmost;
             }
-            else if (x > (self->width -
-                          (ob_rr_theme->paddingx + 1 +
-                           ob_rr_theme->button_size)))
+            else if (fx >= (self->area.width -
+                            (self->bwidth + ob_rr_theme->paddingx + 1 +
+                             ob_rr_theme->button_size)))
             {
                 if (self->rightmost != OB_FRAME_CONTEXT_NONE)
                     return self->rightmost;
             }
         }
-        return OB_FRAME_CONTEXT_TITLEBAR;
     }
 
     if (win == self->window)            return OB_FRAME_CONTEXT_FRAME;
@@ -1237,16 +1260,17 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->rgripright)        return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->title)             return OB_FRAME_CONTEXT_TITLEBAR;
+    if (win == self->titleleft)         return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->titletopleft)      return OB_FRAME_CONTEXT_TLCORNER;
+    if (win == self->titleright)        return OB_FRAME_CONTEXT_TRCORNER;
+    if (win == self->titletopright)     return OB_FRAME_CONTEXT_TRCORNER;
     if (win == self->titletop)          return OB_FRAME_CONTEXT_TOP;
     if (win == self->topresize)         return OB_FRAME_CONTEXT_TOP;
     if (win == self->tltresize)         return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->tllresize)         return OB_FRAME_CONTEXT_TLCORNER;
-    if (win == self->titleleft)         return OB_FRAME_CONTEXT_TLCORNER;
-    if (win == self->titletopleft)      return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->trtresize)         return OB_FRAME_CONTEXT_TRCORNER;
     if (win == self->trrresize)         return OB_FRAME_CONTEXT_TRCORNER;
-    if (win == self->titleright)        return OB_FRAME_CONTEXT_TRCORNER;
-    if (win == self->titletopright)     return OB_FRAME_CONTEXT_TRCORNER;
     if (win == self->left)              return OB_FRAME_CONTEXT_LEFT;
     if (win == self->right)             return OB_FRAME_CONTEXT_RIGHT;
     if (win == self->max)               return OB_FRAME_CONTEXT_MAXIMIZE;

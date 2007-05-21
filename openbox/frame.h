@@ -85,7 +85,6 @@ struct _ObFrame
 
     guint     functions;
     guint     decorations;
-    gboolean  max_horz;
 
     Window    inner;  /*!< The window for drawing the inner client border */
     Window    title;
@@ -160,8 +159,8 @@ struct _ObFrame
     gint      rbwidth;       /* border width between the title and client */
     gint      cbwidth_x;     /* client border width */
     gint      cbwidth_y;     /* client border width */
-    gboolean  leftb;         /* is there a border to the left of the client? */
-    gboolean  rightb;        /* is there a border to the right of the client?*/
+    gboolean  max_horz;      /* when maxed some decorations are hidden */
+    gboolean  max_vert;      /* when maxed some decorations are hidden */
 
     /* the leftmost and rightmost elements in the titlebar */
     ObFrameContext leftmost;

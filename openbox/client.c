@@ -2740,6 +2740,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     gboolean fmoved, fresized;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
+    gboolean fvert = self->frame->max_vert;
     gint logicalw, logicalh;
 
     /* find the new x, y, width, and height (and logical size) */
@@ -2775,8 +2776,11 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     /* find the frame's dimensions and move/resize it */
     fmoved = moved;
     fresized = resized;
-    if (self->decorations != fdecor || self->max_horz != fhorz)
+    if (self->decorations != fdecor ||
+        self->max_horz != fhorz || self->max_vert != fvert)
+    {
         fmoved = fresized = TRUE;
+    }
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 

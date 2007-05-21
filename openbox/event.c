@@ -810,6 +810,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                             e->xmotion.x, e->xmotion.y);
         switch (con) {
         case OB_FRAME_CONTEXT_TITLEBAR:
+        case OB_FRAME_CONTEXT_TLCORNER:
+        case OB_FRAME_CONTEXT_TRCORNER:
             /* we've left the button area inside the titlebar */
             if (client->frame->max_hover || client->frame->desk_hover ||
                 client->frame->shade_hover || client->frame->iconify_hover ||
@@ -861,6 +863,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
+        case OB_FRAME_CONTEXT_TITLEBAR:
+        case OB_FRAME_CONTEXT_TLCORNER:
+        case OB_FRAME_CONTEXT_TRCORNER:
+            /* we've left the button area inside the titlebar */
+            if (client->frame->max_hover || client->frame->desk_hover ||
+                client->frame->shade_hover || client->frame->iconify_hover ||
+                client->frame->close_hover)
+            {
+                client->frame->max_hover = FALSE;
+                client->frame->desk_hover = FALSE;
+                client->frame->shade_hover = FALSE;
+                client->frame->iconify_hover = FALSE;
+                client->frame->close_hover = FALSE;
+                frame_adjust_state(client->frame);
+            }
+            break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = FALSE;
             frame_adjust_state(client->frame);

@@ -45,7 +45,7 @@ msgstr "Janelas"
 
 #: openbox/client_list_menu.c:199
 msgid "Desktops"
-msgstr "Áreas de tabalho"
+msgstr "Áreas de trabalho"
 
 #: openbox/client_menu.c:246
 msgid "All desktops"

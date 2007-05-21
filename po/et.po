@@ -1,0 +1,330 @@
+# translation of openbox.po to Estonian
+# Copyright (C) 2007 Dana Jansens
+# This file is distributed under the same license as the Openbox 3 package.
+#
+# Andres Järv <andresjarv@gmail.com>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.4\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"POT-Creation-Date: 2007-05-14 22:09-0400\n"
+"PO-Revision-Date: 2007-05-21 20:11+0300\n"
+"Last-Translator: Andres Järv <andresjarv@gmail.com>\n"
+"Language-Team: Estonian <et@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: openbox/action.c:956
+#, c-format
+msgid "Invalid action '%s' requested. No such action exists."
+msgstr "Taotleti kehtetut käsklust '%s'. Sellist käsklust pole olemas."
+
+#: openbox/action.c:959
+#, c-format
+msgid "Invalid use of action '%s'. Action will be ignored."
+msgstr "Käskluse '%s' kasutus on kehtetu. Käsklust ignoreeritakse."
+
+#: openbox/action.c:1222 openbox/action.c:1240 openbox/action.c:1253
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "'%s' käivitamine ebaõnnestus: %s"
+
+#: openbox/action.c:1261
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr "Raja '%s' ümberkodeerimine UTF8-st ebaõnnestus"
+
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+msgid "Go there..."
+msgstr "Mina sinna..."
+
+#: openbox/client_list_combined_menu.c:148
+msgid "Windows"
+msgstr "Aknad"
+
+#: openbox/client_list_menu.c:199
+msgid "Desktops"
+msgstr "Töölauad"
+
+#: openbox/client_menu.c:241
+msgid "All desktops"
+msgstr "Kõik töölauad"
+
+#: openbox/client_menu.c:346
+msgid "&Layer"
+msgstr "&Kiht"
+
+#: openbox/client_menu.c:351
+msgid "Always on &top"
+msgstr "Alati teiste &peal"
+
+#: openbox/client_menu.c:352
+msgid "&Normal"
+msgstr "&Normaalne"
+
+#: openbox/client_menu.c:353
+msgid "Always on &bottom"
+msgstr "Aken teiste &all"
+
+#: openbox/client_menu.c:356
+msgid "&Send to desktop"
+msgstr "&Saada töölauale"
+
+#: openbox/client_menu.c:360
+msgid "Client menu"
+msgstr "Kliendi menüü"
+
+#: openbox/client_menu.c:366
+msgid "R&estore"
+msgstr "&Taasta"
+
+#: openbox/client_menu.c:374
+msgid "&Move"
+msgstr "&Liiguta"
+
+#: openbox/client_menu.c:376
+msgid "Resi&ze"
+msgstr "Muuda &suurust"
+
+#: openbox/client_menu.c:378
+msgid "Ico&nify"
+msgstr "Muuda &ikooniks"
+
+#: openbox/client_menu.c:386
+msgid "Ma&ximize"
+msgstr "Ma&ksimeeri"
+
+#: openbox/client_menu.c:394
+msgid "&Roll up/down"
+msgstr "&Rulli üles/alla"
+
+#: openbox/client_menu.c:396
+msgid "Un/&Decorate"
+msgstr "Äär&ed sisse/välja"
+
+#: openbox/client_menu.c:406
+msgid "&Close"
+msgstr "S&ulge"
+
+#: openbox/config.c:667
+#, c-format
+msgid "Invalid button '%s' specified in config file"
+msgstr "Vigane nupp '%s' määratletud konfiguratsioonifailis"
+
+#: openbox/keyboard.c:162
+msgid "Conflict with key binding in config file"
+msgstr "Konflikt kiirklahviga konfiguratsioonifailis"
+
+#: openbox/menu.c:98 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file '%s'"
+msgstr "Ei suudetud leida kehtivat menüüfaili '%s'"
+
+#: openbox/menu.c:149
+#, c-format
+msgid "Failed to execute command for pipe-menu '%s': %s"
+msgstr "Ei suudetud käivitada torumenüü '%s' käsku: %s"
+
+#: openbox/menu.c:166
+#, c-format
+msgid "Invalid output from pipe-menu '%s'"
+msgstr "Vigane väljund torumenüüst '%s'"
+
+#: openbox/menu.c:179
+#, c-format
+msgid "Attempted to access menu '%s' but it does not exist"
+msgstr "Üritati ligi pääseda menüüle '%s', aga seda pole olemas"
+
+#: openbox/menu.c:331 openbox/menu.c:332
+msgid "More..."
+msgstr "Rohkem..."
+
+#: openbox/mouse.c:321
+#, c-format
+msgid "Invalid button '%s' in mouse binding"
+msgstr "Vigane nupp '%s' hiire kiirklahvides"
+
+#: openbox/mouse.c:327
+#, c-format
+msgid "Invalid context '%s' in mouse binding"
+msgstr "Vigane kontekst '%s' hiire kiirklahvides"
+
+#: openbox/openbox.c:125
+#, c-format
+msgid "Unable to change to home directory '%s': %s"
+msgstr "Ei suudetud siseneda kodukataloogi '%s': %s"
+
+#: openbox/openbox.c:145
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr "DISPLAY keskkonnamuutujas oleva displei avamine ebaõnnestus."
+
+#: openbox/openbox.c:176
+msgid "Failed to initialize the render library."
+msgstr "Renderdamisteegi käivitamine ebaõnnestus."
+
+#: openbox/openbox.c:182
+msgid "X server does not support locale."
+msgstr "X server ei toeta lokaati."
+
+#: openbox/openbox.c:184
+msgid "Cannot set locale modifiers for the X server."
+msgstr "Ei suudetud sättida lokaadimuutujaid X serveri jaoks."
+
+#: openbox/openbox.c:244
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr "Ei suudetud leida kehtivat konfiguratsioonifaili, kasutatakse lihtsaid vaikimisiseadeid"
+
+#: openbox/openbox.c:270
+msgid "Unable to load a theme."
+msgstr "Ei suudetud laadida teemat."
+
+#: openbox/openbox.c:383
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr "Taaskäivitusel ebaõnnestus käivitada uut käivitusfaili '%s': %s"
+
+#: openbox/openbox.c:451 openbox/openbox.c:453
+msgid "Copyright (c)"
+msgstr "Autoriõigus (c)"
+
+#: openbox/openbox.c:462
+msgid "Syntax: openbox [options]\n"
+msgstr "Süntaks: openbox [seaded]\n"
+
+#: openbox/openbox.c:463
+msgid ""
+"\n"
+"Options:\n"
+msgstr ""
+"\n"
+"Seaded:\n"
+
+#: openbox/openbox.c:464
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Selle abi kuvamine ja väljumine\n"
+
+#: openbox/openbox.c:465
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Versiooni kuvamine ja väljumine\n"
+
+#: openbox/openbox.c:466
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr "  --replace           Hetkel töötava aknahalduri asendamine\n"
+
+#: openbox/openbox.c:467
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr "  --sm-disable        Seansihalduriga ühenduse keelamine\n"
+
+#: openbox/openbox.c:468
+msgid ""
+"\n"
+"Passing messages to a running Openbox instance:\n"
+msgstr ""
+"\n"
+"Jooksvale Openboxi seansile sõnumite edastamine:\n"
+
+#: openbox/openbox.c:469
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr "  --reconfigure       Openboxi konfiguratsioon uuesti laadimine\n"
+
+#: openbox/openbox.c:470
+msgid ""
+"\n"
+"Debugging options:\n"
+msgstr ""
+"\n"
+"Silumise seaded:\n"
+
+#: openbox/openbox.c:471
+msgid "  --sync              Run in synchronous mode\n"
+msgstr "  --sync              Sünkroonselt jooksutamine\n"
+
+#: openbox/openbox.c:472
+msgid "  --debug             Display debugging output\n"
+msgstr "  --debug             Silumisväljundi kuvamine\n"
+
+#: openbox/openbox.c:473
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr "  --debug-focus       Fookusekäsitluse siluriväljundi kuvamine\n"
+
+#: openbox/openbox.c:474
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr "  --debug-xinerama    Ekraani võlts-Xinerama ekraanideks jagamine\n"
+
+#: openbox/openbox.c:475
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+msgstr ""
+"\n"
+"Palun teata vigadest siia %s\n"
+
+#: openbox/openbox.c:569
+#, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr "Vigane käsurea argument '%s'\n"
+
+#: openbox/screen.c:85 openbox/screen.c:186
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr "Ekraanil %d juba jookseb aknahaldur"
+
+#: openbox/screen.c:122
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr "Ei suuda hankida aknahaldurite valikut ekraanil %d"
+
+#: openbox/screen.c:143
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr "Aknahaldur ekraanil %d ei sulgu"
+
+#: openbox/session.c:100
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Kausta '%s' tegemine ebaõnnestus: %s"
+
+#: openbox/session.c:442
+#, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr "Seansi '%s' salvestamine ebaõnnestus: %s"
+
+#: openbox/session.c:550
+#, c-format
+msgid "Error while saving the session to '%s': %s"
+msgstr "Seansi '%s' salvestamisel ilmnes viga: %s"
+
+#: openbox/startupnotify.c:237
+#, c-format
+msgid "Running %s\n"
+msgstr "Jooksev %s\n"
+
+#: openbox/translate.c:58
+#, c-format
+msgid "Invalid modifier key '%s' in key/mouse binding"
+msgstr "Vigane muutujaklahv '%s' hiire/klaviatuuri kiirklahvil"
+
+#: openbox/translate.c:135
+#, c-format
+msgid "Invalid key code '%s' in key binding"
+msgstr "Vigane klahvikood '%s' kiirklahvis"
+
+#: openbox/translate.c:142
+#, c-format
+msgid "Invalid key name '%s' in key binding"
+msgstr "Vigane klahvinimi '%s' kiirklahvis"
+
+#: openbox/translate.c:148
+#, c-format
+msgid "Requested key '%s' does not exist on the display"
+msgstr "Soovitud klahvi '%s' ei ole sellel ekraanil"
+
+#: openbox/xerror.c:39
+#, c-format
+msgid "X Error: %s"
+msgstr "X-i viga: %s"
+

@@ -314,7 +314,8 @@ void client_manage(Window window)
     grab_server(FALSE);
 
     /* per-app settings override stuff from client_get_all, and return the
-       settings for other uses too */
+       settings for other uses too. the returned settings is a shallow copy,
+       that needs to be freed with g_free(). */
     settings = client_get_settings_state(self);
     /* the session should get the last say thought */
     client_restore_session_state(self);
@@ -506,6 +507,9 @@ void client_manage(Window window)
     /* update the list hints */
     client_set_list();
 
+    /* free the ObAppSettings shallow copy */
+    g_free(settings);
+
     ob_debug("Managed window 0x%lx plate 0x%x (%s)\n",
              window, self->frame->plate, self->class);
 
@@ -527,7 +531,7 @@ ObClient *client_fake_manage(Window window)
 
     client_get_all(self, FALSE);
     /* per-app settings override stuff, and return the settings for other
-       uses too */
+       uses too. this returns a shallow copy that needs to be freed */
     settings = client_get_settings_state(self);
 
     client_setup_decor_and_functions(self);
@@ -535,6 +539,10 @@ ObClient *client_fake_manage(Window window)
     /* create the decoration frame for the client window and adjust its size */
     self->frame = frame_new(self);
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
+
+    /* free the ObAppSettings shallow copy */
+    g_free(settings);
+
     return self;
 }
 
@@ -694,30 +702,39 @@ void client_fake_unmanage(ObClient *self)
     g_free(self);
 }
 
+/*! Returns a new structure containing the per-app settings for this client.
+  The returned structure needs to be freed with g_free. */
 static ObAppSettings *client_get_settings_state(ObClient *self)
 {
-    ObAppSettings *settings = NULL;
+    ObAppSettings *settings;
     GSList *it;
+
+    settings = config_create_app_settings();
 
     for (it = config_per_app_settings; it; it = g_slist_next(it)) {
         ObAppSettings *app = it->data;
-        
-        if ((app->name && !app->class && !strcmp(app->name, self->name))
-            || (app->class && !app->name && !strcmp(app->class, self->class))
-            || (app->class && app->name && !strcmp(app->class, self->class)
-                && !strcmp(app->name, self->name)))
-        {
-            /* Match if no role was specified in the per app setting, or if the
-             * string matches the beginning of the role, since apps like to set
-             * the role to things like browser-window-23c4b2f */
-            if (!app->role
-                || !strncmp(app->role, self->role, strlen(app->role)))
-            {
-                ob_debug("Window matching: %s\n", app->name);
-                /* use this one */
-                settings = app;
-                break;
-            }
+        gboolean match = TRUE;
+
+        g_assert(app->name != NULL || app->class != NULL);
+
+        /* we know that either name or class is not NULL so it will have to
+           match to use the rule */
+        if (app->name &&
+            !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
+            match = FALSE;
+        if (app->class &&
+            !g_pattern_match(app->class, strlen(self->class),self->class,NULL))
+            match = FALSE;
+        if (app->role &&
+            !g_pattern_match(app->role, strlen(self->role), self->role, NULL))
+            match = FALSE;
+
+        if (match) {
+            ob_debug("Window matching: %s\n", app->name);
+
+            /* copy the settings to our struct, overriding the existing
+               settings if they are not defaults */
+            config_app_settings_copy_non_defaults(app, settings);
         }
     }
 

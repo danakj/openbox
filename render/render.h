@@ -195,7 +195,7 @@ struct _RrAppearance {
 
 #define RrDefaultFontFamily       "arial,sans"
 #define RrDefaultFontSize         8
-#define RrDefaultFontWeight       RR_FONTWEIGHT_BOLD
+#define RrDefaultFontWeight       RR_FONTWEIGHT_NORMAL
 #define RrDefaultFontSlant        RR_FONTSLANT_NORMAL
 
 RrInstance* RrInstanceNew (Display *display, gint screen);

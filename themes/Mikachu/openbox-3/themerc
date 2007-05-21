@@ -151,9 +151,9 @@ focus.outer.color: #0000A0
 border.color: #223344
 
 !! Font stuff
-window.active.label.text.font: Candara,sans:pixelsize=14:shadow=n:weight=0
-window.inactive.label.text.font: Candara,sans:pixelsize=14:shadowoffset=3:shadowtint=32:shadow=y:weight=0
-menu.title.text.font: Technical,sans:pixelsize=26:shadowoffset=2:shadowtint=35:shadow=y
-menu.items.font: Technical,sans:pixelsize=14:shadowoffset=2:shadowtint=15:shadow=y
+window.active.label.text.font:shadow=n
+window.inactive.label.text.font:shadowoffset=3:shadowtint=32:shadow=y
+menu.title.text.font:shadowoffset=2:shadowtint=35:shadow=y
+menu.items.font:shadowoffset=2:shadowtint=15:shadow=y
 
 !menu.overlap: 3

@@ -97,6 +97,6 @@ padding.width:				1
 borderWidth:			1
 window.handle.width:			4
 
-window.active.label.text.font: sans:pixelsize=10
-menu.title.text.font: sans:pixelsize=10
-menu.items.font: sans:pixelsize=10
+window.active.label.text.font:
+menu.title.text.font:
+menu.items.font:

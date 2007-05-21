@@ -92,7 +92,7 @@ window.inactive.handle.bg.color: #f9f7f3
 window.inactive.grip.bg:  parentrelative
 
 !! Fonts
-window.active.label.text.font: sans:pixelsize=12:bold:shadow=y:shadowoffset=1:shadowtint=75
-window.inactive.label.text.font: sans:pixelsize=12:bold:shadow=y:shadowoffset=1:shadowtint=0
-menu.items.font: sans:pixelsize=12
-menu.title.text.font: sans:pixelsize=12:bold:shadow=y:shadowoffset=1:shadowtint=75
+window.active.label.text.font: shadow=y:shadowoffset=1:shadowtint=75
+window.inactive.label.text.font: shadow=y:shadowoffset=1:shadowtint=0
+menu.items.font: 
+menu.title.text.font: shadow=y:shadowoffset=1:shadowtint=75

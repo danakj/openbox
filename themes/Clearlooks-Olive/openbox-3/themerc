@@ -114,7 +114,7 @@ menu.overlap: 0
 
 
 ### Fonts
-window.active.label.text.font:Bitstream Vera Sans:pixelsize=10:bold:shadow=y:shadowtint=70:shadowoffset=1
-window.inactive.label.text.font:Bitstream Vera Sans:pixelsize=10:bold:shadow=y:shadowtint=20:shadowoffset=1
-menu.items.font:Bitstream Vera Sans:pixelsize=10
-menu.title.text.font:Bitstream Vera Sans:bold:pixelsize=10:shadow=y:shadowtint=70
+window.active.label.text.font:shadow=y:shadowtint=70:shadowoffset=1
+window.inactive.label.text.font:shadow=y:shadowtint=20:shadowoffset=1
+menu.items.font:
+menu.title.text.font:shadow=y:shadowtint=70

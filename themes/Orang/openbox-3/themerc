@@ -92,9 +92,8 @@ menu.overlap: 2
 border.color: #000000
 
 !! font me!
-window.active.label.text.font: sans:pixelsize=10:bold
-window.inactive.label.text.font: sans:pixelsize=10:bold
-
-menu.title.text.font: sans:pixelsize=10:bold
-menu.items.font: sans:pixelsize=9
+window.active.label.text.font:
+window.inactive.label.text.font:
+menu.title.text.font:
+menu.items.font:
 

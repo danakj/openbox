@@ -16,10 +16,10 @@ window.*.client.color: #eeeeec
 
 !!Fonts
 
-window.active.label.text.font: sans:pixelsize=12:shadow=y:shadowoffset=1:shadowtint=3:bold
-window.inactive.label.text.font: sans:pixelsize=12:shadow=y:shadowoffset=1:shadowtint=0:bold
-menu.items.font: sans:pixelsize=12
-menu.title.text.font: sans:pixelsize=12:shadow=y:shadowoffset=1:shadowtint=30:bold
+window.active.label.text.font: shadow=y:shadowoffset=1:shadowtint=3
+window.inactive.label.text.font: shadow=y:shadowoffset=1:shadowtint=0
+menu.items.font:
+menu.title.text.font: shadow=y:shadowoffset=1:shadowtint=30
 
 !!Menu
 menu.border.color: #9d9d9d

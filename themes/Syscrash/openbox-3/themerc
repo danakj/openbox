@@ -15,13 +15,13 @@ menu.overlap:				0
 !!---------------------------------------------------------------------------
 !! Fonts
 
-window.active.label.text.font:		verdana-7:style=bold:shadow=y
+window.active.label.text.font:		shadow=y
 window.label.text.justify:		left
 
-menu.title.text.font:			verdana-7:style=bold:shadow=y
+menu.title.text.font:			shadow=y
 menu.title.text.justify:		left
 
-menu.items.font:			verdana-7
+menu.items.font:			
 
 !!---------------------------------------------------------------------------
 !! Menu Settings

@@ -3488,12 +3488,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
                   self->window, event_curtime, last_time,
                   (user ? "user" : "application"), allow);
 
-    if (allow) {
-        if (event_curtime != CurrentTime)
-            self->user_time = event_curtime;
-
+    if (allow)
         client_present(self, here, TRUE);
-    } else
+    else
         /* don't focus it but tell the user it wants attention */
         client_hilite(self, TRUE);
 }

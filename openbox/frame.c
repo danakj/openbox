@@ -696,7 +696,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
-    if (moved || resized) {
+    if ((moved || resized) && !fake) {
         /* find the new coordinates, done after setting the frame.size, for
            frame_client_gravity. */
         self->area.x = self->client->area.x;
@@ -1309,17 +1309,20 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case NorthGravity:
     case SouthGravity:
     case CenterGravity:
-        *x -= (self->size.left + w) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *x -= (self->size.right - self->size.left) / 2;
         break;
 
     case NorthEastGravity:
     case SouthEastGravity:
     case EastGravity:
-        *x -= (self->size.left + self->size.right + w) - 1;
+        /* the right side of the client will be the right side of the frame */
+        *x -= self->size.right + self->size.left;
         break;
 
     case ForgetGravity:
     case StaticGravity:
+        /* the client's position won't move */
         *x -= self->size.left;
         break;
     }
@@ -1335,17 +1338,20 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case CenterGravity:
     case EastGravity:
     case WestGravity:
-        *y -= (self->size.top + h) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *y -= (self->size.bottom - self->size.top) / 2;
         break;
 
     case SouthWestGravity:
     case SouthEastGravity:
     case SouthGravity:
-        *y -= (self->size.top + self->size.bottom + h) - 1;
+        /* the bottom of the client will be the bottom of the frame */
+        *y -= self->size.bottom + self->size.top;
         break;
 
     case ForgetGravity:
     case StaticGravity:
+        /* the client's position won't move */
         *y -= self->size.top;
         break;
     }
@@ -1363,16 +1369,19 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case NorthGravity:
     case CenterGravity:
     case SouthGravity:
-        *x += (self->size.left + w) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *x += (self->size.right - self->size.left) / 2;
         break;
     case NorthEastGravity:
     case EastGravity:
     case SouthEastGravity:
-        *x += (self->size.left + self->size.right + w) - 1;
+        /* the right side of the client will be the right side of the frame */
+        *x += self->size.right + self->size.left;
         break;
     case StaticGravity:
     case ForgetGravity:
-        *x += self->size.left;
+        /* the client's position won't move */
+        *x -= self->size.left;
         break;
     }
 
@@ -1386,15 +1395,18 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case WestGravity:
     case CenterGravity:
     case EastGravity:
-        *y += (self->size.top + h) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *y += (self->size.bottom - self->size.top) / 2;
         break;
     case SouthWestGravity:
     case SouthGravity:
     case SouthEastGravity:
-        *y += (self->size.top + self->size.bottom + h) - 1;
+        /* the bottom of the client will be the bottom of the frame */
+        *y += self->size.bottom + self->size.top;
         break;
     case StaticGravity:
     case ForgetGravity:
+        /* the client's position won't move */
         *y += self->size.top;
         break;
     }

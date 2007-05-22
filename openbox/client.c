@@ -2446,13 +2446,13 @@ gboolean client_show(ObClient *self)
     if (client_should_show(self)) {
         frame_show(self->frame);
         show = TRUE;
-    }
 
-    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
-       needs to be in IconicState. This includes when it is on another
-       desktop!
-    */
-    client_change_wm_state(self);
+        /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
+           it needs to be in IconicState. This includes when it is on another
+           desktop!
+        */
+        client_change_wm_state(self);
+    }
     return show;
 }
 
@@ -2475,13 +2475,13 @@ gboolean client_hide(ObClient *self)
 
         frame_hide(self->frame);
         hide = TRUE;
-    }
 
-    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
-       needs to be in IconicState. This includes when it is on another
-       desktop!
-    */
-    client_change_wm_state(self);
+        /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
+           it needs to be in IconicState. This includes when it is on another
+           desktop!
+        */
+        client_change_wm_state(self);
+    }
     return hide;
 }
 
@@ -2489,12 +2489,6 @@ void client_showhide(ObClient *self)
 {
     if (!client_show(self))
         client_hide(self);
-
-    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
-       needs to be in IconicState. This includes when it is on another
-       desktop!
-    */
-    client_change_wm_state(self);
 }
 
 gboolean client_normal(ObClient *self) {
@@ -2597,7 +2591,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
        the updated frame dimensions. */
-    frame_adjust_area(self->frame, TRUE, TRUE, TRUE);
+    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
     /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
@@ -2788,11 +2782,15 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     /* find the frame's dimensions and move/resize it */
     fmoved = moved;
     fresized = resized;
+
+    /* if decorations changed, then readjust everything for the frame */
     if (self->decorations != fdecor ||
         self->max_horz != fhorz || self->max_vert != fvert)
     {
         fmoved = fresized = TRUE;
     }
+
+    /* adjust the frame */
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 

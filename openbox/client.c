@@ -241,6 +241,7 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
+    gint placex, placey;
 
     grab_server(TRUE);
 
@@ -364,6 +365,10 @@ void client_manage(Window window)
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
     frame_adjust_client_area(self->frame);
 
+    /* where the frame was placed is where the window was originally */
+    placex = self->area.x;
+    placey = self->area.y;
+
     /* figure out placement for the window */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
@@ -374,10 +379,10 @@ void client_manage(Window window)
                    (self->positioned == USPosition ? "user specified" :
                     "BADNESS !?"))), self->area.x, self->area.y);
 
-        transient = place_client(self, &self->area.x, &self->area.y, settings);
+        transient = place_client(self, &placex, &placey, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &self->area.x, &self->area.y,
+        client_find_onscreen(self, &placex, &placey,
                              self->area.width, self->area.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
@@ -397,7 +402,7 @@ void client_manage(Window window)
     }
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
-             self->window, self->area.x, self->area.y,
+             self->window, placex, placey,
              self->area.width, self->area.height);
     if (self->session)
         ob_debug("  but session requested %d %d instead, overriding\n",
@@ -419,7 +424,7 @@ void client_manage(Window window)
        will get the right sizes and positions if the client is starting with
        those states
     */
-    client_configure(self, self->area.x, self->area.y,
+    client_configure(self, placex, placey,
                      self->area.width, self->area.height,
                      FALSE, TRUE);
 

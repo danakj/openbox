@@ -1685,10 +1685,6 @@ void client_setup_decor_and_functions(ObClient *self)
         }
     }
 
-    /* can't resize maximized windows */
-    if (self->max_horz && self->max_vert)
-        self->functions &=~ OB_CLIENT_FUNC_RESIZE;
-
     if (!(self->functions & OB_CLIENT_FUNC_SHADE))
         self->decorations &= ~OB_FRAME_DECOR_SHADE;
     if (!(self->functions & OB_CLIENT_FUNC_ICONIFY))
@@ -1702,6 +1698,15 @@ void client_setup_decor_and_functions(ObClient *self)
           (self->functions & OB_CLIENT_FUNC_RESIZE))) {
         self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
+    }
+
+    if (self->max_horz && self->max_vert) {
+        /* also can't resize maximized windows.
+           do this after checking for resize to let you maximize */
+        self->functions &=~ OB_CLIENT_FUNC_RESIZE;
+
+        /* kill the handle on fully maxed windows */
+        self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
     }
 
     /* If there are no decorations to remove, don't allow the user to try

@@ -2,4 +2,4 @@
 
 # Run GNOME with Openbox as its window manager
 export WINDOW_MANAGER="@bindir@/openbox"
-exec gnome-session "$@"
+exec gnome-session --choose-session=openbox-session "$@"

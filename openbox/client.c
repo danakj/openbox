@@ -649,6 +649,8 @@ void client_unmanage(ObClient *self)
         }
 
         self->fullscreen = self->max_horz = self->max_vert = FALSE;
+        /* let it be moved and resized no matter what */
+        self->functions = OB_CLIENT_FUNC_MOVE | OB_CLIENT_FUNC_RESIZE;
         self->decorations = 0; /* unmanaged windows have no decor */
 
         client_move_resize(self, a.x, a.y, a.width, a.height);
@@ -3097,7 +3099,7 @@ void client_set_desktop_recursive(ObClient *self,
     guint old;
     GSList *it;
 
-    if (target != self->desktop) {
+    if (target != self->desktop && self->type != OB_CLIENT_TYPE_DESKTOP) {
 
         ob_debug("Setting desktop %u\n", target+1);
 

@@ -1635,6 +1635,7 @@ void client_setup_decor_and_functions(ObClient *self)
            do with them is move them */
         self->decorations = 0;
         self->functions = OB_CLIENT_FUNC_MOVE;
+        break;
 
     case OB_CLIENT_TYPE_DESKTOP:
         /* these windows are not manipulated by the window manager */

@@ -215,6 +215,7 @@ gboolean screen_annex()
         (wm_supported_pos - prop_atoms_start) - 1;
     i = 0;
     supported = g_new(gulong, num_support);
+    supported[i++] = prop_atoms.net_supporting_wm_check;
     supported[i++] = prop_atoms.net_wm_full_placement;
     supported[i++] = prop_atoms.net_current_desktop;
     supported[i++] = prop_atoms.net_number_of_desktops;
@@ -256,6 +257,8 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_action_fullscreen;
     supported[i++] = prop_atoms.net_wm_action_change_desktop;
     supported[i++] = prop_atoms.net_wm_action_close;
+    supported[i++] = prop_atoms.net_wm_action_above;
+    supported[i++] = prop_atoms.net_wm_action_below;
     supported[i++] = prop_atoms.net_wm_state;
     supported[i++] = prop_atoms.net_wm_state_modal;
     supported[i++] = prop_atoms.net_wm_state_maximized_vert;
@@ -280,10 +283,6 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_sync_request;
     supported[i++] = prop_atoms.net_wm_sync_request_counter;
 #endif
-
-    supported[i++] = prop_atoms.net_supporting_wm_check;
-    supported[i++] = prop_atoms.net_wm_action_above;
-    supported[i++] = prop_atoms.net_wm_action_below;
 
     supported[i++] = prop_atoms.kde_wm_change_state;
     supported[i++] = prop_atoms.kde_net_wm_frame_strut;

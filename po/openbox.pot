@@ -1,0 +1,324 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Dana Jansens
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"POT-Creation-Date: 2007-05-21 00:08-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/action.c:954
+#, c-format
+msgid "Invalid action '%s' requested. No such action exists."
+msgstr ""
+
+#: openbox/action.c:957
+#, c-format
+msgid "Invalid use of action '%s'. Action will be ignored."
+msgstr ""
+
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr ""
+
+#: openbox/action.c:1265
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+msgid "Go there..."
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:148
+msgid "Windows"
+msgstr ""
+
+#: openbox/client_list_menu.c:199
+msgid "Desktops"
+msgstr ""
+
+#: openbox/client_menu.c:246
+msgid "All desktops"
+msgstr ""
+
+#: openbox/client_menu.c:351
+msgid "&Layer"
+msgstr ""
+
+#: openbox/client_menu.c:356
+msgid "Always on &top"
+msgstr ""
+
+#: openbox/client_menu.c:357
+msgid "&Normal"
+msgstr ""
+
+#: openbox/client_menu.c:358
+msgid "Always on &bottom"
+msgstr ""
+
+#: openbox/client_menu.c:361
+msgid "&Send to desktop"
+msgstr ""
+
+#: openbox/client_menu.c:365
+msgid "Client menu"
+msgstr ""
+
+#: openbox/client_menu.c:371
+msgid "R&estore"
+msgstr ""
+
+#: openbox/client_menu.c:379
+msgid "&Move"
+msgstr ""
+
+#: openbox/client_menu.c:381
+msgid "Resi&ze"
+msgstr ""
+
+#: openbox/client_menu.c:383
+msgid "Ico&nify"
+msgstr ""
+
+#: openbox/client_menu.c:391
+msgid "Ma&ximize"
+msgstr ""
+
+#: openbox/client_menu.c:399
+msgid "&Roll up/down"
+msgstr ""
+
+#: openbox/client_menu.c:401
+msgid "Un/&Decorate"
+msgstr ""
+
+#: openbox/client_menu.c:411
+msgid "&Close"
+msgstr ""
+
+#: openbox/config.c:701
+#, c-format
+msgid "Invalid button '%s' specified in config file"
+msgstr ""
+
+#: openbox/keyboard.c:162
+msgid "Conflict with key binding in config file"
+msgstr ""
+
+#: openbox/menu.c:98 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file '%s'"
+msgstr ""
+
+#: openbox/menu.c:149
+#, c-format
+msgid "Failed to execute command for pipe-menu '%s': %s"
+msgstr ""
+
+#: openbox/menu.c:166
+#, c-format
+msgid "Invalid output from pipe-menu '%s'"
+msgstr ""
+
+#: openbox/menu.c:179
+#, c-format
+msgid "Attempted to access menu '%s' but it does not exist"
+msgstr ""
+
+#: openbox/menu.c:331 openbox/menu.c:332
+msgid "More..."
+msgstr ""
+
+#: openbox/mouse.c:338
+#, c-format
+msgid "Invalid button '%s' in mouse binding"
+msgstr ""
+
+#: openbox/mouse.c:344
+#, c-format
+msgid "Invalid context '%s' in mouse binding"
+msgstr ""
+
+#: openbox/openbox.c:128
+#, c-format
+msgid "Unable to change to home directory '%s': %s"
+msgstr ""
+
+#: openbox/openbox.c:148
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr ""
+
+#: openbox/openbox.c:179
+msgid "Failed to initialize the render library."
+msgstr ""
+
+#: openbox/openbox.c:185
+msgid "X server does not support locale."
+msgstr ""
+
+#: openbox/openbox.c:187
+msgid "Cannot set locale modifiers for the X server."
+msgstr ""
+
+#: openbox/openbox.c:248
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr ""
+
+#: openbox/openbox.c:274
+msgid "Unable to load a theme."
+msgstr ""
+
+#: openbox/openbox.c:393
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr ""
+
+#: openbox/openbox.c:461 openbox/openbox.c:463
+msgid "Copyright (c)"
+msgstr ""
+
+#: openbox/openbox.c:472
+msgid "Syntax: openbox [options]\n"
+msgstr ""
+
+#: openbox/openbox.c:473
+msgid ""
+"\n"
+"Options:\n"
+msgstr ""
+
+#: openbox/openbox.c:474
+msgid "  --help              Display this help and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:475
+msgid "  --version           Display the version and exit\n"
+msgstr ""
+
+#: openbox/openbox.c:476
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr ""
+
+#: openbox/openbox.c:477
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr ""
+
+#: openbox/openbox.c:478
+msgid ""
+"\n"
+"Passing messages to a running Openbox instance:\n"
+msgstr ""
+
+#: openbox/openbox.c:479
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr ""
+
+#: openbox/openbox.c:480
+msgid "  --restart           Restart Openbox\n"
+msgstr ""
+
+#: openbox/openbox.c:481
+msgid ""
+"\n"
+"Debugging options:\n"
+msgstr ""
+
+#: openbox/openbox.c:482
+msgid "  --sync              Run in synchronous mode\n"
+msgstr ""
+
+#: openbox/openbox.c:483
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:484
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+
+#: openbox/openbox.c:485
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+
+#: openbox/openbox.c:486
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+msgstr ""
+
+#: openbox/openbox.c:578
+#, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr ""
+
+#: openbox/screen.c:85 openbox/screen.c:186
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr ""
+
+#: openbox/screen.c:122
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr ""
+
+#: openbox/screen.c:143
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr ""
+
+#: openbox/session.c:100
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr ""
+
+#: openbox/session.c:442
+#, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr ""
+
+#: openbox/session.c:552
+#, c-format
+msgid "Error while saving the session to '%s': %s"
+msgstr ""
+
+#: openbox/startupnotify.c:237
+#, c-format
+msgid "Running %s\n"
+msgstr ""
+
+#: openbox/translate.c:58
+#, c-format
+msgid "Invalid modifier key '%s' in key/mouse binding"
+msgstr ""
+
+#: openbox/translate.c:135
+#, c-format
+msgid "Invalid key code '%s' in key binding"
+msgstr ""
+
+#: openbox/translate.c:142
+#, c-format
+msgid "Invalid key name '%s' in key binding"
+msgstr ""
+
+#: openbox/translate.c:148
+#, c-format
+msgid "Requested key '%s' does not exist on the display"
+msgstr ""
+
+#: openbox/xerror.c:39
+#, c-format
+msgid "X Error: %s"
+msgstr ""

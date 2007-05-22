@@ -1209,7 +1209,7 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
        is fully maximized, then treat it like they clicked in the
        button that is there */
     if (self->max_horz && self->max_vert &&
-        (win == self->title ||
+        (win == self->title || win == self->titletop ||
          win == self->titleleft || win == self->titletopleft ||
          win == self->titleright || win == self->titletopright))
     {
@@ -1225,6 +1225,9 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
         /* title is a border width in from the edge */
         if (win == self->title)
             fx += self->bwidth;
+        /* titletop is a bit to the right */
+        else if (win == self->titletop)
+            fx += ob_rr_theme->grip_width + self->bwidth;
         /* titletopright is way to the right edge */
         else if (win == self->titletopright)
             fx += self->area.width - (ob_rr_theme->grip_width + self->bwidth);

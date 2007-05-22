@@ -374,7 +374,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMoveResizeWindow(ob_display, self->titletop,
                                   ob_rr_theme->grip_width + self->bwidth, 0,
                                   /* width + bwidth*2 - bwidth*2 - grips*2 */
-                                  self->width + ob_rr_theme->grip_width * 2,
+                                  self->width - ob_rr_theme->grip_width * 2,
                                   self->bwidth);
                 XMoveResizeWindow(ob_display, self->titletopleft,
                                   0, 0,
@@ -443,8 +443,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     XMoveResizeWindow(ob_display, self->topresize,
                                       ob_rr_theme->grip_width + self->bwidth,
                                       0,
-                                      self->width - (ob_rr_theme->grip_width +
-                                                     self->bwidth) * 2,
+                                      self->width - ob_rr_theme->grip_width *2,
                                       ob_rr_theme->paddingy + 1);
 
                     XMoveWindow(ob_display, self->tltresize, 0, 0);

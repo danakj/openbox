@@ -735,11 +735,13 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         if (app->name &&
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
             match = FALSE;
-        if (app->class &&
-            !g_pattern_match(app->class, strlen(self->class),self->class,NULL))
+        else if (app->class &&
+                !g_pattern_match(app->class,
+                                 strlen(self->class), self->class, NULL))
             match = FALSE;
-        if (app->role &&
-            !g_pattern_match(app->role, strlen(self->role), self->role, NULL))
+        else if (app->role &&
+                 !g_pattern_match(app->role,
+                                  strlen(self->role), self->role, NULL))
             match = FALSE;
 
         if (match) {
@@ -751,46 +753,44 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         }
     }
 
-    if (settings) {
-        if (settings->shade != -1)
-            self->shaded = !!settings->shade;
-        if (settings->decor != -1)
-            self->undecorated = !settings->decor;
-        if (settings->iconic != -1)
-            self->iconic = !!settings->iconic;
-        if (settings->skip_pager != -1)
-            self->skip_pager = !!settings->skip_pager;
-        if (settings->skip_taskbar != -1)
-            self->skip_taskbar = !!settings->skip_taskbar;
+    if (settings->shade != -1)
+        self->shaded = !!settings->shade;
+    if (settings->decor != -1)
+        self->undecorated = !settings->decor;
+    if (settings->iconic != -1)
+        self->iconic = !!settings->iconic;
+    if (settings->skip_pager != -1)
+        self->skip_pager = !!settings->skip_pager;
+    if (settings->skip_taskbar != -1)
+        self->skip_taskbar = !!settings->skip_taskbar;
 
-        if (settings->max_vert != -1)
-            self->max_vert = !!settings->max_vert;
-        if (settings->max_horz != -1)
-            self->max_horz = !!settings->max_horz;
+    if (settings->max_vert != -1)
+        self->max_vert = !!settings->max_vert;
+    if (settings->max_horz != -1)
+        self->max_horz = !!settings->max_horz;
 
-        if (settings->fullscreen != -1)
-            self->fullscreen = !!settings->fullscreen;
+    if (settings->fullscreen != -1)
+        self->fullscreen = !!settings->fullscreen;
 
-        if (settings->desktop) {
-            if (settings->desktop == DESKTOP_ALL)
-                self->desktop = settings->desktop;
-            else if (settings->desktop > 0 &&
-                     settings->desktop <= screen_num_desktops)
-                self->desktop = settings->desktop - 1;
-        }
+    if (settings->desktop) {
+        if (settings->desktop == DESKTOP_ALL)
+            self->desktop = settings->desktop;
+        else if (settings->desktop > 0 &&
+                 settings->desktop <= screen_num_desktops)
+            self->desktop = settings->desktop - 1;
+    }
 
-        if (settings->layer == -1) {
-            self->below = TRUE;
-            self->above = FALSE;
-        }
-        else if (settings->layer == 0) {
-            self->below = FALSE;
-            self->above = FALSE;
-        }
-        else if (settings->layer == 1) {
-            self->below = FALSE;
-            self->above = TRUE;
-        }
+    if (settings->layer == -1) {
+        self->below = TRUE;
+        self->above = FALSE;
+    }
+    else if (settings->layer == 0) {
+        self->below = FALSE;
+        self->above = FALSE;
+    }
+    else if (settings->layer == 1) {
+        self->below = FALSE;
+        self->above = TRUE;
     }
     return settings;
 }
@@ -2957,6 +2957,10 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
         /* move up the transient chain as far as possible first */
         self = client_search_top_normal_parent(self);
         client_iconify_recursive(self, iconic, curdesk, hide_animation);
+
+        /* try focus the window that was de-iconified if focusNew is on */
+        if (!iconic && config_focus_new)
+            client_focus(self);
     }
 }
 

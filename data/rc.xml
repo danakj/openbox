@@ -503,7 +503,8 @@
 </menu>
 
 <!-- this section is commented out.. remove this and the ending comment if you
-     want to use it -->
+     want to use it
+
 <applications>
   <!-- the name or the class can be set, or both. this is used to match
        windows when they appear. role can optionally be set as well, to

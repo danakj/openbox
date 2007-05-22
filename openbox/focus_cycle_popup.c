@@ -25,6 +25,7 @@
 #include "focus_cycle.h"
 #include "openbox.h"
 #include "window.h"
+#include "event.h"
 #include "render/render.h"
 
 #include <X11/Xlib.h>
@@ -465,6 +466,12 @@ void focus_cycle_popup_hide()
     XFlush(ob_display);
 
     popup.mapped = FALSE;
+
+    /* kill enter events cause by this unmapping */
+    event_ignore_all_queued_enters();
+
+    /* kill enter events cause by this unmapping */
+    event_ignore_all_queued_enters();
 
     while(popup.targets) {
         ObFocusCyclePopupTarget *t = popup.targets->data;

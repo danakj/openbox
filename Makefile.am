@@ -377,22 +377,18 @@ edit = $(SED) \
 
 %.desktop: %.desktop.in Makefile
 	@echo make: creating $@
-#	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $< >$@	
 
 %-session: %-session.in Makefile
 	@echo make: creating $@
-#	@mkdir data/xsession 2>/dev/null || true
 	@$(edit) $< >$@	
 
 %.1.in: %.1.sgml
 	@echo make: creating $@
-#	@mkdir doc 2>/dev/null || true
 	@docbook-to-man $< >$@
 
 %.1: %.1.in Makefile
 	@echo make: creating $@
-#	@mkdir doc 2>/dev/null || true
 	@$(edit) $< >$@	
 
 dist_gnomewmfiles_DATA = \

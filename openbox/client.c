@@ -937,10 +937,10 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         POINT_SET(newbl, newtl.x, newbr.y);
 
         /* is it moving or just resizing from some corner? */
-        stationary_l = oldtl.x == oldtl.x;
-        stationary_r = oldtr.x == oldtr.x;
-        stationary_t = oldtl.y == oldtl.y;
-        stationary_b = oldbl.y == oldbl.y;
+        stationary_l = oldtl.x == newtl.x;
+        stationary_r = oldtr.x == newtr.x;
+        stationary_t = oldtl.y == newtl.y;
+        stationary_b = oldbl.y == newbl.y;
 
         /* if left edge is growing and didnt move right edge */
         if (stationary_r && newtl.x < oldtl.x)

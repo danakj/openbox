@@ -515,8 +515,6 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
             fprintf(f, "\t<role>%s</role>\n", t);
             g_free(t);
 
-            fprintf(f, "\t<windowtype>%d</windowtype>\n", c->type);
-
             fprintf(f, "\t<desktop>%d</desktop>\n", c->desktop);
             fprintf(f, "\t<x>%d</x>\n", prex);
             fprintf(f, "\t<y>%d</y>\n", prey);
@@ -580,14 +578,12 @@ static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
     ob_debug_type(OB_DEBUG_SM, "  client name: %s \n", c->name);
     ob_debug_type(OB_DEBUG_SM, "  client class: %s \n", c->class);
     ob_debug_type(OB_DEBUG_SM, "  client role: %s \n", c->role);
-    ob_debug_type(OB_DEBUG_SM, "  client type: %s \n", c->type);
     ob_debug_type(OB_DEBUG_SM, "  client command: %s \n",
                   c->wm_command ? c->wm_command : "(null)");
     ob_debug_type(OB_DEBUG_SM, "  state id: %s \n", s->id);
     ob_debug_type(OB_DEBUG_SM, "  state name: %s \n", s->name);
     ob_debug_type(OB_DEBUG_SM, "  state class: %s \n", s->class);
     ob_debug_type(OB_DEBUG_SM, "  state role: %s \n", s->role);
-    ob_debug_type(OB_DEBUG_SM, "  state type: %s \n", s->type);
     ob_debug_type(OB_DEBUG_SM, "  state command: %s \n",
                   s->command ? s->command : "(null)");
 
@@ -596,13 +592,7 @@ static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
     {
         return (!strcmp(s->name, c->name) &&
                 !strcmp(s->class, c->class) &&
-                !strcmp(s->role, c->role) &&
-                /* the check for type is to catch broken clients, like
-                   firefox, which open a different window on startup
-                   with the same info as the one we saved. only do this
-                   check for old windows that dont use xsmp, others should
-                   know better ! */
-                (!s->command || c->type == s->type));
+                !strcmp(s->role, c->role));
     }
     return FALSE;
 }
@@ -625,6 +615,7 @@ static void session_load_file(const gchar *path)
 {
     xmlDocPtr doc;
     xmlNodePtr node, n;
+    GList *it, *inext;
 
     if (!parse_load(path, "openbox_session", &doc, &node))
         return;
@@ -651,9 +642,6 @@ static void session_load_file(const gchar *path)
         if (!(n = parse_find_node("role", node->children)))
             goto session_load_bail;
         state->role = parse_string(doc, n);
-        if (!(n = parse_find_node("windowtype", node->children)))
-            goto session_load_bail;
-        state->type = parse_int(doc, n);
         if (!(n = parse_find_node("desktop", node->children)))
             goto session_load_bail;
         state->desktop = parse_int(doc, n);
@@ -700,6 +688,50 @@ static void session_load_file(const gchar *path)
 
     session_load_bail:
         session_state_free(state);
+    }
+
+    /* Remove any duplicates.  This means that if two windows (or more) are
+       saved with the same session state, we won't restore a session for any
+       of them because we don't know what window to put what on. AHEM FIREFOX.
+
+       This is going to be an O(2^n) kind of operation unfortunately.
+    */
+    for (it = session_saved_state; it; it = inext) {
+        GList *jt, *jnext;
+        gboolean founddup = FALSE;
+        ObSessionState *s1 = it->data;
+
+        inext = g_list_next(it);
+
+        for (jt = g_list_next(it); jt; jt = jnext) {
+            ObSessionState *s2 = jt->data;
+            gboolean match;
+
+            jnext = g_list_next(jt);
+
+            if (s1->id && s2->id)
+                match = strcmp(s1->id, s2->id) == 0;
+            else if (s1->command && s2->command)
+                match = strcmp(s1->command, s2->command) == 0;
+            else
+                match = FALSE;
+
+            if (match &&
+                !strcmp(s1->name, s2->name) &&
+                !strcmp(s1->class, s2->class) &&
+                !strcmp(s1->role, s2->role))
+            {
+                session_state_free(s2);
+                session_saved_state =
+                    g_list_delete_link(session_saved_state, jt);
+                founddup = TRUE;
+            }
+        }
+
+        if (founddup) {
+            session_state_free(s1);
+            session_saved_state = g_list_delete_link(session_saved_state, it);
+        }
     }
 
     xmlFreeDoc(doc);

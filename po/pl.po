@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-21 00:08-0400\n"
+"POT-Creation-Date: 2007-05-22 01:20-0400\n"
 "PO-Revision-Date: 2007-05-21 18:09+0100\n"
 "Last-Translator: Paweł Rusinek <p.rusinek@gmail.com>\n"
 "Language-Team: None\n"
@@ -26,9 +26,7 @@ msgstr "Wywołano niepoprawną akcję '%s'. Taka akcja nie istnieje."
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Niepoprawne użycie akcji '%s'. Akcja zostanie pominięta."
 
-#: openbox/action.c:1226
-#: openbox/action.c:1244
-#: openbox/action.c:1257
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Nie udało się uruchomić '%s': %s"
@@ -38,8 +36,7 @@ msgstr "Nie udało się uruchomić '%s': %s"
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Nie można przekonwertować ścieżki '%s' z kodowania utf8"
 
-#: openbox/client_list_combined_menu.c:102
-#: openbox/client_list_menu.c:104
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
 msgstr "Przejdź..."
 
@@ -120,8 +117,7 @@ msgstr "Niepoprawny klawisz '%s' użyty w pliku konfiguracyjnym"
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt z powiązaniem klawiaturowym w pliku konfiguracyjnym"
 
-#: openbox/menu.c:98
-#: openbox/menu.c:106
+#: openbox/menu.c:98 openbox/menu.c:106
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Nie można odnaleźć poprawnego pliku menu '%s'"
@@ -141,8 +137,7 @@ msgstr "Niepoprawny wynik z pipe-menu '%s'"
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Plik menu '%s' nie istnieje"
 
-#: openbox/menu.c:331
-#: openbox/menu.c:332
+#: openbox/menu.c:331 openbox/menu.c:332
 msgid "More..."
 msgstr "Więcej..."
 
@@ -156,50 +151,51 @@ msgstr "Niepoprawny klawisz '%s' w powiązaniu myszy"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Niepoprawny kontekst '%s' w powiązaniu myszy"
 
-#: openbox/openbox.c:128
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Nie można przejść do katalogu domowego '%s': %s"
 
-#: openbox/openbox.c:148
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Nie udało się otworzyć ekranu na podstawie zmiennej środowiskowej DISPLAY."
+msgstr ""
+"Nie udało się otworzyć ekranu na podstawie zmiennej środowiskowej DISPLAY."
 
-#: openbox/openbox.c:179
+#: openbox/openbox.c:180
 msgid "Failed to initialize the render library."
 msgstr "Nie udało się zainicjować biblioteki render."
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "Serwer X nie obsługuje ustawień lokalnych."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Nie można ustawić modyfikatorów lokalnych dla serwera X."
 
-#: openbox/openbox.c:248
+#: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr "Nie można odnaleźć poprawnego pliku konfiguracyjnego, użyte domyślne wartości"
+msgstr ""
+"Nie można odnaleźć poprawnego pliku konfiguracyjnego, użyte domyślne wartości"
 
-#: openbox/openbox.c:274
+#: openbox/openbox.c:275
 msgid "Unable to load a theme."
 msgstr "Nie można załadować motywu."
 
-#: openbox/openbox.c:393
+#: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Podczas restartu nie udało się uruchomić nowego pliku '%s': %s"
 
-#: openbox/openbox.c:461
-#: openbox/openbox.c:463
+#: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:472
+#: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
 msgstr "Składnia: openbox [opcje]\n"
 
-#: openbox/openbox.c:473
+#: openbox/openbox.c:476
 msgid ""
 "\n"
 "Options:\n"
@@ -207,23 +203,23 @@ msgstr ""
 "\n"
 "Opcje:\n"
 
-#: openbox/openbox.c:474
+#: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Wypisuje tę pomoc i kończy\n"
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Wypisuje informację o wersji i kończy\n"
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:479
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Zastępuje aktualnie działający menedżer okien\n"
 
-#: openbox/openbox.c:477
+#: openbox/openbox.c:480
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Nie tworzy połączenia z menedżerem sesji\n"
 
-#: openbox/openbox.c:478
+#: openbox/openbox.c:481
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -231,15 +227,15 @@ msgstr ""
 "\n"
 "Przekazywanie komunikatów do działającej instancji Openboksa:\n"
 
-#: openbox/openbox.c:479
+#: openbox/openbox.c:482
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ponownie odczytuje pliki konfiguracyjne\n"
 
-#: openbox/openbox.c:480
+#: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Ponownie uruchamia Openboksa\n"
 
-#: openbox/openbox.c:481
+#: openbox/openbox.c:484
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -247,23 +243,27 @@ msgstr ""
 "\n"
 "Opcje debugowania:\n"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:485
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Uruchamia w trybie synchronicznym\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:486
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Wypisuje informacje dotyczące debugowania\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr "  --debug             Wypisuje informacje dotyczące debugowania, związane z obsługą aktywacji\n"
+msgstr ""
+"  --debug             Wypisuje informacje dotyczące debugowania, związane z "
+"obsługą aktywacji\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:488
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Dzieli obszar wyświetlania na sztuczne ekrany xineramy\n"
+msgstr ""
+"  --debug-xinerama    Dzieli obszar wyświetlania na sztuczne ekrany "
+"xineramy\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:489
 #, c-format
 msgid ""
 "\n"
@@ -272,13 +272,12 @@ msgstr ""
 "\n"
 "Proszę zgłaszać błędy (w języku angielskim) w serwisie %s\n"
 
-#: openbox/openbox.c:578
+#: openbox/openbox.c:586
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Niepoprawny argument '%s'\n"
 
-#: openbox/screen.c:85
-#: openbox/screen.c:186
+#: openbox/screen.c:85 openbox/screen.c:186
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Menedżer okien jest już uruchomiony na ekranie %d"
@@ -298,12 +297,12 @@ msgstr "Menedżer okien na ekranie %d nie kończy działania"
 msgid "Unable to make directory '%s': %s"
 msgstr "Nie można utworzyć katalogu '%s': %s"
 
-#: openbox/session.c:442
+#: openbox/session.c:444
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Nie można zapisać sesji do '%s': %s"
 
-#: openbox/session.c:552
+#: openbox/session.c:554
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Wystąpił błąd podczas zapisywania sesji do '%s': %s"
@@ -337,4 +336,3 @@ msgstr "Żądany klawisz '%s' nie istnieje na ekranie"
 #, c-format
 msgid "X Error: %s"
 msgstr "Błąd serwera X: %s"
-

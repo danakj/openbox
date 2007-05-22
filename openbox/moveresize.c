@@ -373,11 +373,8 @@ static void do_resize()
     }
 #endif
 
-    {
-        gint x, y;
-        get_resize_position(&x, &y, FALSE);
-        client_configure(moveresize_client, x, y, cur_x, cur_y, TRUE, FALSE);
-    }
+    get_resize_position(&x, &y, FALSE);
+    client_configure(moveresize_client, x, y, cur_x, cur_y, TRUE, FALSE);
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

@@ -92,6 +92,7 @@ gboolean    ob_replace_wm = FALSE;
 gboolean    ob_sm_use = TRUE;
 gchar      *ob_sm_id = NULL;
 gchar      *ob_sm_save_file = NULL;
+gboolean    ob_sm_restore = TRUE;
 gboolean    ob_debug_xinerama = FALSE;
 
 static ObState   state;
@@ -396,12 +397,13 @@ gint main(gint argc, gchar **argv)
             }
         }
 
-        /* we remove the session arguments from argv, so put them back */
+        /* we remove the session arguments from argv, so put them back,
+           also don't restore the session on restart */
         if (ob_sm_save_file != NULL || ob_sm_id != NULL) {
             gchar **nargv;
             gint i, l;
 
-            l = argc +
+            l = argc + 1 +
                 (ob_sm_save_file != NULL ? 2 : 0) +
                 (ob_sm_id != NULL ? 2 : 0);
             nargv = g_new0(gchar*, l+1);
@@ -416,6 +418,7 @@ gint main(gint argc, gchar **argv)
                 nargv[i++] = g_strdup("--sm-client-id");
                 nargv[i++] = ob_sm_id;
             }
+            nargv[i++] = g_strdup("--sm-no-load");
             g_assert(i == l);
             argv = nargv;
         }
@@ -571,6 +574,11 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--sm-disable")) {
             ob_sm_use = FALSE;
+        }
+        else if (!strcmp(argv[i], "--sm-no-load")) {
+            ob_sm_restore = FALSE;
+            remove_args(argc, argv, i, 1);
+            --i; /* this arg was removed so go back */
         }
         else {
             /* this is a memleak.. oh well.. heh */

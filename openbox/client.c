@@ -241,6 +241,7 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
+    gint placex, placey;
 
     grab_server(TRUE);
 
@@ -359,6 +360,15 @@ void client_manage(Window window)
         activate = TRUE;
     }
 
+    /* adjust the frame to the client's size before showing or placing
+       the window */
+    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    frame_adjust_client_area(self->frame);
+
+    /* where the frame was placed is where the window was originally */
+    placex = self->area.x;
+    placey = self->area.y;
+
     /* figure out placement for the window */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
@@ -369,10 +379,10 @@ void client_manage(Window window)
                    (self->positioned == USPosition ? "user specified" :
                     "BADNESS !?"))), self->area.x, self->area.y);
 
-        transient = place_client(self, &self->area.x, &self->area.y, settings);
+        transient = place_client(self, &placex, &placey, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &self->area.x, &self->area.y,
+        client_find_onscreen(self, &placex, &placey,
                              self->area.width, self->area.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
@@ -392,31 +402,32 @@ void client_manage(Window window)
     }
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
-             self->window, self->area.x, self->area.y,
+             self->window, placex, placey,
              self->area.width, self->area.height);
     if (self->session)
         ob_debug("  but session requested %d %d instead, overriding\n",
                  self->session->x, self->session->y);
-
-    /* adjust the frame to the client's size before showing the window */
-    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-    frame_adjust_client_area(self->frame);
-
-
-    /* move the client to its placed position, or it it's already there,
-       generate a ConfigureNotify telling the client where it is.
-
-       do this after adjusting the frame. otherwise it gets all weird and
-       clients don't work right */
-    client_configure(self, self->area.x, self->area.y,
-                     self->area.width, self->area.height,
-                     FALSE, TRUE);
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!
        also, this moves the window to the position where it has been placed
     */
     client_apply_startup_state(self);
+
+    /* move the client to its placed position, or it it's already there,
+       generate a ConfigureNotify telling the client where it is.
+
+       do this after adjusting the frame. otherwise it gets all weird and
+       clients don't work right
+
+       also do this after applying the startup state so maximize and fullscreen
+       will get the right sizes and positions if the client is starting with
+       those states
+    */
+    client_configure(self, placex, placey,
+                     self->area.width, self->area.height,
+                     FALSE, TRUE);
+
 
     if (activate) {
         guint32 last_time = focus_client ?
@@ -649,6 +660,8 @@ void client_unmanage(ObClient *self)
         }
 
         self->fullscreen = self->max_horz = self->max_vert = FALSE;
+        /* let it be moved and resized no matter what */
+        self->functions = OB_CLIENT_FUNC_MOVE | OB_CLIENT_FUNC_RESIZE;
         self->decorations = 0; /* unmanaged windows have no decor */
 
         client_move_resize(self, a.x, a.y, a.width, a.height);
@@ -924,10 +937,10 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         POINT_SET(newbl, newtl.x, newbr.y);
 
         /* is it moving or just resizing from some corner? */
-        stationary_l = oldtl.x == oldtl.x;
-        stationary_r = oldtr.x == oldtr.x;
-        stationary_t = oldtl.y == oldtl.y;
-        stationary_b = oldbl.y == oldbl.y;
+        stationary_l = oldtl.x == newtl.x;
+        stationary_r = oldtr.x == newtr.x;
+        stationary_t = oldtl.y == newtl.y;
+        stationary_b = oldbl.y == newbl.y;
 
         /* if left edge is growing and didnt move right edge */
         if (stationary_r && newtl.x < oldtl.x)
@@ -1582,6 +1595,8 @@ void client_update_normal_hints(ObClient *self)
     }
 }
 
+/*! This needs to be followed by a call to client_configure to make
+  the changes show */
 void client_setup_decor_and_functions(ObClient *self)
 {
     /* start with everything (cept fullscreen) */
@@ -1635,11 +1650,13 @@ void client_setup_decor_and_functions(ObClient *self)
            do with them is move them */
         self->decorations = 0;
         self->functions = OB_CLIENT_FUNC_MOVE;
+        break;
 
     case OB_CLIENT_TYPE_DESKTOP:
         /* these windows are not manipulated by the window manager */
         self->decorations = 0;
         self->functions = 0;
+        break;
 
     case OB_CLIENT_TYPE_DOCK:
         /* these windows are not manipulated by the window manager, but they
@@ -1700,8 +1717,8 @@ void client_setup_decor_and_functions(ObClient *self)
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
 
-    /* kill the handle on fully maxed windows */
-    if (self->max_vert && self->max_horz)
+    if (self->max_horz && self->max_vert)
+        /* kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
 
     /* If there are no decorations to remove, don't allow the user to try
@@ -1731,11 +1748,6 @@ void client_setup_decor_and_functions(ObClient *self)
     }
 
     client_change_allowed_actions(self);
-
-    if (self->frame) {
-        /* adjust the client's decorations, etc. */
-        client_reconfigure(self);
-    }
 }
 
 static void client_change_allowed_actions(ObClient *self)
@@ -2740,6 +2752,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     gboolean fmoved, fresized;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
+    gboolean fvert = self->frame->max_vert;
     gint logicalw, logicalh;
 
     /* find the new x, y, width, and height (and logical size) */
@@ -2775,8 +2788,11 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     /* find the frame's dimensions and move/resize it */
     fmoved = moved;
     fresized = resized;
-    if (self->decorations != fdecor || self->max_horz != fhorz)
+    if (self->decorations != fdecor ||
+        self->max_horz != fhorz || self->max_vert != fvert)
+    {
         fmoved = fresized = TRUE;
+    }
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
@@ -3086,7 +3102,7 @@ void client_set_desktop_recursive(ObClient *self,
     guint old;
     GSList *it;
 
-    if (target != self->desktop) {
+    if (target != self->desktop && self->type != OB_CLIENT_TYPE_DESKTOP) {
 
         ob_debug("Setting desktop %u\n", target+1);
 
@@ -3488,12 +3504,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
                   self->window, event_curtime, last_time,
                   (user ? "user" : "application"), allow);
 
-    if (allow) {
-        if (event_curtime != CurrentTime)
-            self->user_time = event_curtime;
-
+    if (allow)
         client_present(self, here, TRUE);
-    } else
+    else
         /* don't focus it but tell the user it wants attention */
         client_hilite(self, TRUE);
 }
@@ -3605,6 +3618,7 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
     {
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self);
+        client_reconfigure(self); /* show the lack of decorations */
         client_change_state(self); /* reflect this in the state hints */
     }
 }

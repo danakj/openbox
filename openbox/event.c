@@ -810,6 +810,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                             e->xmotion.x, e->xmotion.y);
         switch (con) {
         case OB_FRAME_CONTEXT_TITLEBAR:
+        case OB_FRAME_CONTEXT_TLCORNER:
+        case OB_FRAME_CONTEXT_TRCORNER:
             /* we've left the button area inside the titlebar */
             if (client->frame->max_hover || client->frame->desk_hover ||
                 client->frame->shade_hover || client->frame->iconify_hover ||
@@ -861,6 +863,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
+        case OB_FRAME_CONTEXT_TITLEBAR:
+        case OB_FRAME_CONTEXT_TLCORNER:
+        case OB_FRAME_CONTEXT_TRCORNER:
+            /* we've left the button area inside the titlebar */
+            if (client->frame->max_hover || client->frame->desk_hover ||
+                client->frame->shade_hover || client->frame->iconify_hover ||
+                client->frame->close_hover)
+            {
+                client->frame->max_hover = FALSE;
+                client->frame->desk_hover = FALSE;
+                client->frame->shade_hover = FALSE;
+                client->frame->iconify_hover = FALSE;
+                client->frame->close_hover = FALSE;
+                frame_adjust_state(client->frame);
+            }
+            break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = FALSE;
             frame_adjust_state(client->frame);
@@ -975,14 +993,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
         */
 
         gint x, y, w, h;
+        gboolean move = FALSE;
+        gboolean resize = FALSE;
 
-        /* if nothing is changed, then a configurenotify is needed */
-        gboolean config = TRUE;
-
-        x = client->area.x;
-        y = client->area.y;
-        w = client->area.width;
-        h = client->area.height;
+        /* get the current area */
+        RECT_TO_DIMS(client->area, x, y, w, h);
 
         ob_debug("ConfigureRequest desktop %d wmstate %d visibile %d\n",
                  screen_desktop, client->wmstate, client->frame->visible);
@@ -990,8 +1005,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (e->xconfigurerequest.value_mask & CWBorderWidth)
             if (client->border_width != e->xconfigurerequest.border_width) {
                 client->border_width = e->xconfigurerequest.border_width;
-                /* if only the border width is changing, then it's not needed*/
-                config = FALSE;
+
+                /* if the border width is changing then that is the same
+                   as requesting a resize, but we don't actually change
+                   the client's border, so it will change their root
+                   coordiantes (since they include the border width) and
+                   we need to a notify then */
+                move = TRUE;
             }
 
 
@@ -1011,8 +1031,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             stacking_restack_request(client, sibling,
                                      e->xconfigurerequest.detail, TRUE);
 
-            /* if a stacking change is requested then it is needed */
-            config = TRUE;
+            /* if a stacking change moves the window without resizing */
+            move = TRUE;
         }
 
         /* don't allow clients to move shaded windows (fvwm does this) */
@@ -1024,7 +1044,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             /* if the client tried to move and we aren't letting it then a
                synthetic event is needed */
-            config = TRUE;
+            move = TRUE;
         }
 
         if (e->xconfigurerequest.value_mask & CWX ||
@@ -1032,25 +1052,31 @@ static void event_handle_client(ObClient *client, XEvent *e)
             e->xconfigurerequest.value_mask & CWWidth ||
             e->xconfigurerequest.value_mask & CWHeight)
         {
-            if (e->xconfigurerequest.value_mask & CWX)
+            if (e->xconfigurerequest.value_mask & CWX) {
                 x = e->xconfigurerequest.x;
-            if (e->xconfigurerequest.value_mask & CWY)
+                move = TRUE;
+            }
+            if (e->xconfigurerequest.value_mask & CWY) {
                 y = e->xconfigurerequest.y;
-            if (e->xconfigurerequest.value_mask & CWWidth)
+                move = TRUE;
+            }
+            if (e->xconfigurerequest.value_mask & CWWidth) {
                 w = e->xconfigurerequest.width;
-            if (e->xconfigurerequest.value_mask & CWHeight)
+                resize = TRUE;
+            }
+            if (e->xconfigurerequest.value_mask & CWHeight) {
                 h = e->xconfigurerequest.height;
-
-            /* if a new position or size is requested, then a configure is
-               needed */
-            config = TRUE;
+                resize = TRUE;
+            }
         }
 
-        ob_debug("ConfigureRequest x(%d) %d y(%d) %d w(%d) %d h(%d) %d\n",
+        ob_debug("ConfigureRequest x(%d) %d y(%d) %d w(%d) %d h(%d) %d "
+                 "move %d resize %d\n",
                  e->xconfigurerequest.value_mask & CWX, x,
                  e->xconfigurerequest.value_mask & CWY, y,
                  e->xconfigurerequest.value_mask & CWWidth, w,
-                 e->xconfigurerequest.value_mask & CWHeight, h);
+                 e->xconfigurerequest.value_mask & CWHeight, h,
+                 move, resize);
 
         /* check for broken apps moving to their root position
 
@@ -1059,7 +1085,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
            desktop. eg. open amarok window on desktop 1, switch to desktop
            2, click amarok tray icon. it will move by its decoration size.
         */
-        if (x != client->area.x &&
+        if (move && !resize &&
+            x != client->area.x &&
             x == (client->frame->area.x + client->frame->size.left -
                   (gint)client->border_width) &&
             y != client->area.y &&
@@ -1074,11 +1101,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* don't move it */
             x = client->area.x;
             y = client->area.y;
+
+            /* they still requested a move, so don't change whether a
+               notify is sent or not */
         }
 
-        if (config) {
+        if (move || resize) {
+            gint lw,lh;
+
             client_find_onscreen(client, &x, &y, w, h, FALSE);
-            client_configure(client, x, y, w, h, FALSE, TRUE);
+            client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+            /* if they requested something that moves the window, or if
+               the window is actually being changed then configure it and
+               send a configure notify to them */
+            if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
+                ob_debug("Doing configure\n");
+                client_configure(client, x, y, w, h, FALSE, TRUE);
+            }
 
             /* ignore enter events caused by these like ob actions do */
             event_ignore_all_queued_enters();

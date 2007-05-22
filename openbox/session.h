@@ -27,6 +27,7 @@ typedef struct _ObSessionState ObSessionState;
 
 struct _ObSessionState {
     gchar *id, *command, *name, *class, *role;
+    ObClientType type;
     guint desktop;
     gint x, y, w, h;
     gboolean shaded, iconic, skip_pager, skip_taskbar, fullscreen;

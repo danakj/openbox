@@ -359,6 +359,11 @@ void client_manage(Window window)
         activate = TRUE;
     }
 
+    /* adjust the frame to the client's size before showing or placing
+       the window */
+    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    frame_adjust_client_area(self->frame);
+
     /* figure out placement for the window */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
@@ -397,11 +402,6 @@ void client_manage(Window window)
     if (self->session)
         ob_debug("  but session requested %d %d instead, overriding\n",
                  self->session->x, self->session->y);
-
-    /* adjust the frame to the client's size before showing the window */
-    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-    frame_adjust_client_area(self->frame);
-
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!

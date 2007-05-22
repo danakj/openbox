@@ -1641,6 +1641,7 @@ void client_setup_decor_and_functions(ObClient *self)
         /* these windows are not manipulated by the window manager */
         self->decorations = 0;
         self->functions = 0;
+        break;
 
     case OB_CLIENT_TYPE_DOCK:
         /* these windows are not manipulated by the window manager, but they

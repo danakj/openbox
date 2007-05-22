@@ -446,12 +446,14 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                       self->width - ob_rr_theme->grip_width *2,
                                       ob_rr_theme->paddingy + 1);
 
-                    XMoveWindow(ob_display, self->tltresize, 0, 0);
-                    XMoveWindow(ob_display, self->tllresize, 0, 0);
+                    XMoveWindow(ob_display, self->tltresize, self->bwidth, 0);
+                    XMoveWindow(ob_display, self->tllresize, self->bwidth, 0);
                     XMoveWindow(ob_display, self->trtresize,
-                                self->width - ob_rr_theme->grip_width, 0);
+                                self->bwidth + self->width -
+                                ob_rr_theme->grip_width, 0);
                     XMoveWindow(ob_display, self->trrresize,
-                                self->width - ob_rr_theme->paddingx - 1, 0);
+                                self->bwidth + self->width -
+                                ob_rr_theme->paddingx - 1, 0);
 
                     XMapWindow(ob_display, self->topresize);
                     XMapWindow(ob_display, self->tltresize);

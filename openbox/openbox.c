@@ -177,7 +177,7 @@ gint main(gint argc, gchar **argv)
 
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
     if (ob_rr_inst == NULL)
-        ob_exit_with_error(_("Failed to initialize the render library."));
+        ob_exit_with_error(_("Failed to initialize the obrender library."));
 
     XSynchronize(ob_display, xsync);
 

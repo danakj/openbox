@@ -124,7 +124,9 @@ gboolean focus_cycle_target_valid(ObClient *ft,
     if (dock_windows || desktop_windows)
         ok = ok && ((dock_windows && ft->type == OB_CLIENT_TYPE_DOCK) ||
                     (desktop_windows && ft->type == OB_CLIENT_TYPE_DESKTOP));
-    else
+    /* modal windows are important and can always get focus if they are
+       visible and stuff, so don't change 'ok' based on their type */ 
+    else if (!ft->modal)
         /* normal non-helper windows are valid targets */
         ok = ok &&
             ((client_normal(ft) && !client_helper(ft))
@@ -138,12 +140,13 @@ gboolean focus_cycle_target_valid(ObClient *ft,
                !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
-       expected to set this hint */
+       expected to set this hint, or modal) */
     ok = ok && ((ft->type == OB_CLIENT_TYPE_DOCK ||
                  ft->type == OB_CLIENT_TYPE_DESKTOP ||
                  ft->type == OB_CLIENT_TYPE_TOOLBAR ||
                  ft->type == OB_CLIENT_TYPE_MENU ||
                  ft->type == OB_CLIENT_TYPE_UTILITY) ||
+                ft->modal ||
                 !ft->skip_taskbar);
 
     /* it's not going to just send fous off somewhere else (modal window) */

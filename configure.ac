@@ -158,6 +158,12 @@ AC_CONFIG_FILES([
   parser/obparser-3.0.pc
   version.h
 ])
+AC_CONFIG_COMMANDS([doc],
+                   [test -d doc || mkdir doc])
+AC_CONFIG_COMMANDS([data],
+                   [test -d data || mkdir data])
+AC_CONFIG_COMMANDS([data/xsession],
+                   [test -d data/xsession || mkdir data/xsession])
 AC_OUTPUT
 
 AC_MSG_RESULT

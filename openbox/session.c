@@ -102,9 +102,11 @@ void session_startup(gint argc, gchar **argv)
     }
 
     if (ob_sm_save_file != NULL) {
-        ob_debug_type(OB_DEBUG_SM, "Loading from session file %s\n",
-                      ob_sm_save_file);
-        session_load_file(ob_sm_save_file);
+        if (ob_sm_restore) {
+            ob_debug_type(OB_DEBUG_SM, "Loading from session file %s\n",
+                          ob_sm_save_file);
+            session_load_file(ob_sm_save_file);
+        }
     } else {
         gchar *filename;
 

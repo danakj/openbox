@@ -164,8 +164,8 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Nepodařilo se otevřít displej z proměnné prostředí DISPLAY."
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Nepodařilo se inicializovat knihovnu render."
+msgid "Failed to initialize the obrender library."
+msgstr "Nepodařilo se inicializovat knihovnu obrender."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."

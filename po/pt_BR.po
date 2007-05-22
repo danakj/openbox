@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 19:35+0200\n"
+"POT-Creation-Date: 2007-05-22 20:08+0200\n"
 "PO-Revision-Date: 2007-05-22 19:35+0200\n"
 "Last-Translator: Og Maciel <ogmaciel@ubuntu.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
@@ -162,8 +162,8 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Falha ao abrir a tela da variavel de ambiente DISPLAY"
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Falha ao iniciar a biblioteca de processamento"
+msgid "Failed to initialize the obrender library."
+msgstr "Falha ao iniciar a biblioteca obrender."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."

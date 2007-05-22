@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-21 00:08-0400\n"
+"POT-Creation-Date: 2007-05-22 20:08+0200\n"
 "PO-Revision-Date: 2006-06-11 10:41+0200\n"
 "Last-Translator: Simon A. Wilper <simonaw@openoffice.org>\n"
 "Language-Team:  <de@li.org>\n"
@@ -150,52 +150,52 @@ msgstr ""
 msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
-#: openbox/openbox.c:128
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:148
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr ""
 
-#: openbox/openbox.c:179
-msgid "Failed to initialize the render library."
+#: openbox/openbox.c:180
+msgid "Failed to initialize the obrender library."
 msgstr ""
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "Die gewählte Lokalisierung wird vom X-Server nicht unterstützt."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 "Die Lokalisierungsmodifizierer für den X-Server konnten nicht gesetzt werden."
 
-#: openbox/openbox.c:248
+#: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Es wurde keine gültige Konfigurationsdatei gefunden, benutze einfache "
 "Standardwerte."
 
-#: openbox/openbox.c:274
+#: openbox/openbox.c:275
 msgid "Unable to load a theme."
 msgstr ""
 
-#: openbox/openbox.c:393
+#: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Neustart fehlgeschlagen, um die ausführbare Datei '%s' zu starten: %s"
 
-#: openbox/openbox.c:461 openbox/openbox.c:463
+#: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:472
+#: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [Optionen]\n"
 
-#: openbox/openbox.c:473
+#: openbox/openbox.c:476
 msgid ""
 "\n"
 "Options:\n"
@@ -203,23 +203,23 @@ msgstr ""
 "\n"
 "Optionen:\n"
 
-#: openbox/openbox.c:474
+#: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Diese Hilfe anzeigen und beenden\n"
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Version anzeigen und beenden\n"
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:479
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Den aktuell laufenden Fenstermanager ersetzen\n"
 
-#: openbox/openbox.c:477
+#: openbox/openbox.c:480
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Keine Verbindung zum Sitzungsmanager aufbauen\n"
 
-#: openbox/openbox.c:478
+#: openbox/openbox.c:481
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -227,15 +227,15 @@ msgstr ""
 "\n"
 "Nachrichten an eine laufende Openbox-Instanz weiterleiten:\n"
 
-#: openbox/openbox.c:479
+#: openbox/openbox.c:482
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
 
-#: openbox/openbox.c:480
+#: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:481
+#: openbox/openbox.c:484
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -243,24 +243,24 @@ msgstr ""
 "\n"
 "Debugging Optionen:\n"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:485
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --snyc              im Synchronisierungsmodus starten\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:486
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Debugging-Informationen anzeigen\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Debugging-Informationen fürs Fokus-Handling anzeigen\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:488
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:489
 #, c-format
 msgid ""
 "\n"
@@ -269,7 +269,7 @@ msgstr ""
 "\n"
 "Bitte melden Sie Bugreports an: %s\n"
 
-#: openbox/openbox.c:578
+#: openbox/openbox.c:586
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
@@ -294,12 +294,12 @@ msgstr ""
 msgid "Unable to make directory '%s': %s"
 msgstr "Das Verzeichnis '%s' konnte nicht angelegt werden: %s"
 
-#: openbox/session.c:442
+#: openbox/session.c:444
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr ""
 
-#: openbox/session.c:552
+#: openbox/session.c:554
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Fehler beim Speichern der Sitzung nach '%s': %s"

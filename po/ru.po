@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-21 00:08-0400\n"
+"POT-Creation-Date: 2007-05-22 20:08+0200\n"
 "PO-Revision-Date: 2004-04-23 13:00+0300\n"
 "Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -150,114 +150,114 @@ msgstr ""
 msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
-#: openbox/openbox.c:128
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:148
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr ""
 
-#: openbox/openbox.c:179
-msgid "Failed to initialize the render library."
+#: openbox/openbox.c:180
+msgid "Failed to initialize the obrender library."
 msgstr ""
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr ""
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 
-#: openbox/openbox.c:248
+#: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
-#: openbox/openbox.c:274
+#: openbox/openbox.c:275
 msgid "Unable to load a theme."
 msgstr ""
 
-#: openbox/openbox.c:393
+#: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:461 openbox/openbox.c:463
+#: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:472
+#: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:473
+#: openbox/openbox.c:476
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 
-#: openbox/openbox.c:474
+#: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:479
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:477
-msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
-
-#: openbox/openbox.c:478
-msgid ""
-"\n"
-"Passing messages to a running Openbox instance:\n"
-msgstr ""
-
-#: openbox/openbox.c:479
-msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr ""
-
 #: openbox/openbox.c:480
-msgid "  --restart           Restart Openbox\n"
+msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
 #: openbox/openbox.c:481
 msgid ""
 "\n"
-"Debugging options:\n"
+"Passing messages to a running Openbox instance:\n"
 msgstr ""
 
 #: openbox/openbox.c:482
-msgid "  --sync              Run in synchronous mode\n"
+msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
 #: openbox/openbox.c:483
-msgid "  --debug             Display debugging output\n"
+msgid "  --restart           Restart Openbox\n"
 msgstr ""
 
 #: openbox/openbox.c:484
-msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgid ""
+"\n"
+"Debugging options:\n"
 msgstr ""
 
 #: openbox/openbox.c:485
-msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
 #: openbox/openbox.c:486
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:487
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+
+#: openbox/openbox.c:488
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+
+#: openbox/openbox.c:489
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:578
+#: openbox/openbox.c:586
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
@@ -282,12 +282,12 @@ msgstr ""
 msgid "Unable to make directory '%s': %s"
 msgstr "Невозможно создать каталог '%s': %s"
 
-#: openbox/session.c:442
+#: openbox/session.c:444
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr ""
 
-#: openbox/session.c:552
+#: openbox/session.c:554
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr ""

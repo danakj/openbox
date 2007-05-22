@@ -161,7 +161,7 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr ""
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
+msgid "Failed to initialize the obrender library."
 msgstr ""
 
 #: openbox/openbox.c:186

@@ -357,59 +357,24 @@ edit = $(SED) \
 	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
-data/xsession/openbox-gnome.desktop: \
-		$(srcdir)/data/xsession/openbox-gnome.desktop.in
+%.desktop: %.desktop.in Makefile
 	@echo make: creating $@
-	@mkdir data 2>/dev/null || true
-	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $< >$@
+#	@mkdir data/xsession 2>/dev/null || true
+	@$(edit) $< >$@	
 
-data/xsession/openbox-kde.desktop: \
-		$(srcdir)/data/xsession/openbox-kde.desktop.in
+%-session: %-session.in Makefile
 	@echo make: creating $@
-	@mkdir data 2>/dev/null || true
-	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $< >$@
-
-data/xsession/openbox.desktop: \
-		$(srcdir)/data/xsession/openbox.desktop.in
-	@echo make: creating $@
-	@mkdir data 2>/dev/null || true
-	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $< >$@
-
-data/xsession/openbox-gnome-session: \
-		$(srcdir)/data/xsession/openbox-gnome-session.in
-	@echo make: creating $@
-	@mkdir data 2>/dev/null || true
-	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $< >$@
-	@chmod a+x $@
-
-data/xsession/openbox-kde-session: \
-		$(srcdir)/data/xsession/openbox-kde-session.in
-	@echo make: creating $@
-	@mkdir data 2>/dev/null || true
-	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $< >$@
-	@chmod a+x $@
-
-data/xsession/openbox-session: \
-		$(srcdir)/data/xsession/openbox-session.in
-	@echo make: creating $@
-	@mkdir data 2>/dev/null || true
-	@mkdir data/xsession 2>/dev/null || true
-	@$(edit) $< >$@
-	@chmod a+x $@
+#	@mkdir data/xsession 2>/dev/null || true
+	@$(edit) $< >$@	
 
 %.1.in: %.1.sgml
 	@echo make: creating $@
-	@mkdir doc 2>/dev/null || true
+#	@mkdir doc 2>/dev/null || true
 	@docbook-to-man $< >$@
 
-%.1: %.1.in
+%.1: %.1.in Makefile
 	@echo make: creating $@
-	@mkdir doc 2>/dev/null || true
+#	@mkdir doc 2>/dev/null || true
 	@$(edit) $< >$@	
 
 dist_gnomewmfiles_DATA = \
@@ -486,6 +451,16 @@ EXTRA_DIST = \
 	debian/rules \
 	config.rpath \
 	mkinstalldirs
+
+# make clean doesn't delete these for some reason, even though they are
+# built by make
+CLEANFILES = \
+	data/xsession/openbox-session \
+	data/xsession/openbox-gnome-session \
+	data/xsession/openbox-kde-session \
+	data/xsession/openbox.desktop \
+	data/xsession/openbox-gnome.desktop \
+	data/xsession/openbox-kde.desktop
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

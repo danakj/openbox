@@ -55,6 +55,7 @@ static void layout_title(ObFrame *self);
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 static gboolean frame_animate_iconify(gpointer self);
+static void frame_adjust_cursors(ObFrame *self);
 
 static Window createWindow(Window parent, Visual *visual,
                            gulong mask, XSetWindowAttributes *attrib)
@@ -329,7 +330,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     oldsize = self->size;
 
     if (resized) {
+        /* do this before changing the frame's status like max_horz max_vert */
+        frame_adjust_cursors(self);
+
+        self->functions = self->client->functions;
         self->decorations = self->client->decorations;
+        self->max_horz = self->client->max_horz;
+        self->max_vert = self->client->max_vert;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER) {
             self->bwidth = ob_rr_theme->fbwidth;
@@ -339,9 +346,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->bwidth = self->cbwidth_x = self->cbwidth_y = 0;
         }
         self->rbwidth = self->bwidth;
-
-        self->max_horz = self->client->max_horz;
-        self->max_vert = self->client->max_vert;
 
         if (self->max_horz) {
             self->cbwidth_x = 0;
@@ -740,14 +744,17 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(ob_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
+}
 
-    /* set up cursors */
-    if (!fake &&
-        (self->functions & OB_CLIENT_FUNC_RESIZE) !=
-        (self->client->functions & OB_CLIENT_FUNC_RESIZE))
+static void frame_adjust_cursors(ObFrame *self)
+{
+    if ((self->functions & OB_CLIENT_FUNC_RESIZE) !=
+        (self->client->functions & OB_CLIENT_FUNC_RESIZE) ||
+        ((self->max_horz && self->max_vert) !=
+         (self->client->max_horz && self->client->max_vert)))
     {
-        gboolean r = self->client->functions & OB_CLIENT_FUNC_RESIZE &&
-            !(self->max_horz && self->max_vert);
+        gboolean r = (self->client->functions & OB_CLIENT_FUNC_RESIZE) &&
+            !(self->client->max_horz && self->client->max_vert);
         XSetWindowAttributes a;
 
         a.cursor = ob_cursor(r ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
@@ -783,8 +790,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         XChangeWindowAttributes(ob_display, self->rgripright, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->rgriptop, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->rgripbottom, CWCursor, &a);
-
-        self->functions = self->client->functions;
     }
 }
 

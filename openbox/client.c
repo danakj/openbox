@@ -403,20 +403,26 @@ void client_manage(Window window)
     frame_adjust_client_area(self->frame);
 
 
-    /* move the client to its placed position, or it it's already there,
-       generate a ConfigureNotify telling the client where it is.
-
-       do this after adjusting the frame. otherwise it gets all weird and
-       clients don't work right */
-    client_configure(self, self->area.x, self->area.y,
-                     self->area.width, self->area.height,
-                     FALSE, TRUE);
-
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!
        also, this moves the window to the position where it has been placed
     */
     client_apply_startup_state(self);
+
+    /* move the client to its placed position, or it it's already there,
+       generate a ConfigureNotify telling the client where it is.
+
+       do this after adjusting the frame. otherwise it gets all weird and
+       clients don't work right
+
+       also do this after applying the startup state so maximize and fullscreen
+       will get the right sizes and positions if the client is starting with
+       those states
+    */
+    client_configure(self, self->area.x, self->area.y,
+                     self->area.width, self->area.height,
+                     FALSE, TRUE);
+
 
     if (activate) {
         guint32 last_time = focus_client ?
@@ -1584,6 +1590,8 @@ void client_update_normal_hints(ObClient *self)
     }
 }
 
+/*! This needs to be followed by a call to client_configure to make
+  the changes show */
 void client_setup_decor_and_functions(ObClient *self)
 {
     /* start with everything (cept fullscreen) */
@@ -1704,14 +1712,9 @@ void client_setup_decor_and_functions(ObClient *self)
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
 
-    if (self->max_horz && self->max_vert) {
-        /* also can't resize maximized windows.
-           do this after checking for resize to let you maximize */
-        self->functions &=~ OB_CLIENT_FUNC_RESIZE;
-
+    if (self->max_horz && self->max_vert)
         /* kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
-    }
 
     /* If there are no decorations to remove, don't allow the user to try
        toggle the state */
@@ -1740,11 +1743,6 @@ void client_setup_decor_and_functions(ObClient *self)
     }
 
     client_change_allowed_actions(self);
-
-    if (self->frame) {
-        /* adjust the client's decorations, etc. */
-        client_reconfigure(self);
-    }
 }
 
 static void client_change_allowed_actions(ObClient *self)
@@ -3615,6 +3613,7 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
     {
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self);
+        client_reconfigure(self); /* show the lack of decorations */
         client_change_state(self); /* reflect this in the state hints */
     }
 }

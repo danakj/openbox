@@ -265,6 +265,15 @@ static void event_hack_mods(XEvent *e)
         break;
     case MotionNotify:
         e->xmotion.state = modkeys_only_modifier_masks(e->xmotion.state);
+        /* compress events */
+        {
+            XEvent ce;
+            while (XCheckTypedWindowEvent(ob_display, e->xmotion.window,
+                                          e->type, &ce)) {
+                e->xmotion.x_root = ce.xmotion.x_root;
+                e->xmotion.y_root = ce.xmotion.y_root;
+            }
+        }
         break;
     }
 }

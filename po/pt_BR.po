@@ -2,18 +2,20 @@
 # Copyright (C) 2007 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
 # crimeboy, 2007.
+# Og Maciel <ogmaciel@ubuntu.com>, 2007.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 01:20-0400\n"
-"PO-Revision-Date: 2007-05-21 15:53+0200\n"
-"Last-Translator: crimeboy <celobox@gmail.com>\n"
-"Language-Team: pt-br\n"
+"POT-Creation-Date: 2007-05-22 19:35+0200\n"
+"PO-Revision-Date: 2007-05-22 19:35+0200\n"
+"Last-Translator: Og Maciel <ogmaciel@ubuntu.com>\n"
+"Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: openbox/action.c:954
 #, c-format
@@ -37,7 +39,7 @@ msgstr "Falha ao converter o caminho '%s' do utf8"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
-msgstr "Ir para..."
+msgstr "Ir lá..."
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
@@ -73,7 +75,7 @@ msgstr "Enviar para área de &trabalho"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
-msgstr "Menu cliente"
+msgstr "Menu do cliente"
 
 #: openbox/client_menu.c:371
 msgid "R&estore"
@@ -97,11 +99,11 @@ msgstr "Ma&ximizar"
 
 #: openbox/client_menu.c:399
 msgid "&Roll up/down"
-msgstr "En/Desen&rolar"
+msgstr "(Des)en&rolar"
 
 #: openbox/client_menu.c:401
 msgid "Un/&Decorate"
-msgstr "Des/&Decorar"
+msgstr "(Não) &Decorar"
 
 #: openbox/client_menu.c:411
 msgid "&Close"
@@ -110,26 +112,26 @@ msgstr "&Fechar"
 #: openbox/config.c:701
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr "Botão inválido '%s' apontado no arquivo de configuração"
+msgstr "Botão inválido '%s' especificado no arquivo de configuração"
 
 #: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
-msgstr "Conflito com key binding no arquivo de configuração"
+msgstr "Conflito com associação de chave no arquivo de configuração"
 
 #: openbox/menu.c:98 openbox/menu.c:106
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr "Arquivo de menu não encotrado '%s'"
+msgstr "Não foi possível encontrar um arquivo de menu '%s' válido"
 
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Falha ao executar comando para pipe-memu '%s': %s"
+msgstr "Falha ao executar comando para menu de processamento '%s': %s"
 
 #: openbox/menu.c:166
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr "Saida inválida do pipe-menu '%s'"
+msgstr "Saída inválida do menu de processamento '%s'"
 
 #: openbox/menu.c:179
 #, c-format
@@ -143,50 +145,53 @@ msgstr "Mais.."
 #: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr "Botão inválido '%s' no mouse binding"
+msgstr "Botão inválido '%s' na associação do mouse"
 
 #: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr "Contexto inválido '%s' no mouse binding"
+msgstr "Contexto '%s' inválido na associação do mouse"
 
 #: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Incapaz de criar o diretório '%s': %s"
+msgstr "Não foi possível mudar para o diretório pessoal '%s': %s"
 
 #: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Falha ao abrir a tela da variavel DISPLAY"
+msgstr "Falha ao abrir a tela da variavel de ambiente DISPLAY"
 
 #: openbox/openbox.c:180
 msgid "Failed to initialize the render library."
-msgstr "Falha ao iniciar a biblioteca de render"
+msgstr "Falha ao iniciar a biblioteca de processamento"
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
-msgstr "Servidor X não suporta locale."
+msgstr "Servidor X não suporta localização."
 
 #: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Não pode setar locales modificadas pelo servidor X."
+msgstr ""
+"Não foi possível configurar modificadores de localização para o servidor X."
 
 #: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr "Arquivo de configuração não encontrado, usando padrão."
+msgstr ""
+"Não foi possível encontrar um arquivo de configuração válido, usando alguns "
+"valores padrão simples."
 
 #: openbox/openbox.c:275
 msgid "Unable to load a theme."
-msgstr "Não pode carregar tema."
+msgstr "Não foi possível carregar um tema."
 
 #: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Falha ao executar outro binário '%s': %s"
+msgstr "O comando de reiniciar falhou ao executar novo executável '%s': %s"
 
 #: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
-msgstr ""
+msgstr "Copyright (c)"
 
 #: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
@@ -202,7 +207,7 @@ msgstr ""
 
 #: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Mostra este help e sai\n"
+msgstr "  --help              Mostra esta ajuda e sai\n"
 
 #: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
@@ -223,15 +228,15 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Passando mensagens para rodar instância do openbox:\n"
+"Passando mensagens para uma instância do Openbox em execução:\n"
 
 #: openbox/openbox.c:482
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Recarrega configuração do Openbox\n"
+msgstr "  --reconfigure       Recarrega a configuração do Openbox\n"
 
 #: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Reiniciar Openbox\n"
+msgstr "  --restart           Reinicia o Openbox\n"
 
 #: openbox/openbox.c:484
 msgid ""
@@ -239,25 +244,26 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Opções de relatório de erros:\n"
+"Opções de depuração:\n"
 
 #: openbox/openbox.c:485
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Roda em modo sincronizado\n"
+msgstr "  --sync              Executa em modo sincronizado\n"
 
 #: openbox/openbox.c:486
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Mostra saida de erros\n"
+msgstr "  --debug             Mostra saida de depuração\n"
 
 #: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
-"  --debug-focus       Mostra saida de correção de erros para manipulação em "
-"foco\n"
+"  --debug-focus       Mostra saída de depuração para manipulação de foco\n"
 
 #: openbox/openbox.c:488
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Divide a exibição de telas do xinerama\n"
+msgstr ""
+"  --debug-xinerama    Divide a exibição de telas em telas de xinerama "
+"falsas\n"
 
 #: openbox/openbox.c:489
 #, c-format
@@ -266,7 +272,7 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Por favor reporte o erro em %s\n"
+"Por favor reporte erros em %s\n"
 
 #: openbox/openbox.c:586
 #, c-format
@@ -276,57 +282,58 @@ msgstr "Argumento de linha de comando inválido '%s'\n"
 #: openbox/screen.c:85 openbox/screen.c:186
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Um gerenciador de janelas já está rodando na tela %d"
+msgstr "Um gerenciador de janelas já está em execução na tela %d"
 
 #: openbox/screen.c:122
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Impossível adquirir a seleção do gerenciador de janelas na tela %d"
+msgstr ""
+"Não foi possível adquirir a seleção do gerenciador de janelas na tela %d"
 
 #: openbox/screen.c:143
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "O gerenciador de janelas na tela '%d' não existe"
+msgstr "O gerenciador de janelas na tela %d não está saindo"
 
 #: openbox/session.c:100
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr "Incapaz de criar o diretório '%s': %s"
+msgstr "Não foi possível criar o diretório '%s': %s"
 
 #: openbox/session.c:444
 #, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Impossível salvar a sessão para '%s': %s"
+msgstr "Não foi possível salvar a sessão em '%s': %s"
 
 #: openbox/session.c:554
 #, c-format
 msgid "Error while saving the session to '%s': %s"
-msgstr "Erro enquanto salva a sessão para '%s': %s"
+msgstr "Erro enquanto salvando a sessão em '%s': %s"
 
 #: openbox/startupnotify.c:237
 #, c-format
 msgid "Running %s\n"
-msgstr "Rodando %s\n"
+msgstr "Executando %s\n"
 
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Modificador chave '%s' inválido no key/mouse binding"
+msgstr "Chave modificadora '%s' inválida na associação de tecla/mouse"
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "Código chave '%s' inválido no key binding"
+msgstr "Código chave '%s' inválido na associação de chave"
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Nome da chave '%s' inválida no key binding"
+msgstr "Nome de chave '%s' inválido na associação de chave"
 
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
-msgstr "Requisição de chave '%s' inexistente no display"
+msgstr "Chave requerida '%s' não existe na tela"
 
 #: openbox/xerror.c:39
 #, c-format

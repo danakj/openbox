@@ -449,7 +449,7 @@ dist_doc_DATA = \
 	data/themerc.xsd \
 	doc/rc-mouse-focus.xml
 
-dist_man_MANS = \
+nodist_man_MANS = \
 	doc/openbox.1 \
 	doc/openbox-session.1 \
 	doc/openbox-gnome-session.1 \
@@ -471,6 +471,10 @@ EXTRA_DIST = \
 # make clean doesn't delete these for some reason, even though they are
 # built by make
 CLEANFILES = \
+	doc/openbox.1 \
+	doc/openbox-session.1 \
+	doc/openbox-gnome-session.1 \
+	doc/openbox-kde-session.1 \
 	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session \

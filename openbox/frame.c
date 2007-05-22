@@ -1249,6 +1249,10 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
                     return self->rightmost;
             }
         }
+
+        /* there is no resizing maximized windows so make them the titlebar
+           context */
+        return OB_FRAME_CONTEXT_TITLEBAR;
     }
 
     if (win == self->window)            return OB_FRAME_CONTEXT_FRAME;

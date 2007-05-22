@@ -159,12 +159,11 @@ AC_CONFIG_FILES([
   version.h
 ])
 AC_CONFIG_COMMANDS([doc],
-                   [echo "  creating doc"],
-                   [mkdir doc 2>/dev/null])
+                   [test -d doc || mkdir doc])
+AC_CONFIG_COMMANDS([data],
+                   [test -d data || mkdir data])
 AC_CONFIG_COMMANDS([data/xsession],
-                   [echo "  creating data/xsession"],
-                   [mkdir data 2>/dev/null],
-                   [mkdir data/xsession 2>/dev/null])
+                   [test -d data/xsession || mkdir data/xsession])
 AC_OUTPUT
 
 AC_MSG_RESULT

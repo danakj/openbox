@@ -4,7 +4,7 @@ openbox \(em A minimalistic, highly configurable, next generation window
 manager with extensive standards support. 
 .SH "SYNOPSIS" 
 .PP 
-\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  [\fB\-\-debug-xinerama\fP]  
+\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-version\fP]  [\fB\-\-replace\fP]  [\fB\-\-reconfigure\fP]  [\fB\-\-restart\fP]  [\fB\-\-sm-disable\fP]  [\fB\-\-sync\fP]  [\fB\-\-debug\fP]  [\fB\-\-debug-focus\fP]  [\fB\-\-debug-xinerama\fP]  
 .SH "DESCRIPTION" 
 .PP 
 Openbox is minimalistic, highly configurable, next generation window 
@@ -66,6 +66,10 @@ Replace the currently running window manager.
 .IP "\fB\-\-reconfigure\fP" 10 
 If Openbox is already running on the display, tell it to 
 reload its configuration. 
+.IP "\fB\-\-restart\fP" 10 
+If Openbox is already running on the display, tell it to 
+restart. This is useful if you have upgraded Openbox and don't 
+want to restart X. 
 .IP "\fB\-\-sm-disable\fP" 10 
 Do not connect to the session manager. 
 .IP "\fB\-\-sync\fP" 10 
@@ -88,4 +92,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Thu 17 May 2007, 12:52 
+.\" created by instant / docbook-to-man, Mon 21 May 2007, 23:10 

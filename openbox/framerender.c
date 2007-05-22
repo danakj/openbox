@@ -217,7 +217,7 @@ void framerender_frame(ObFrame *self)
         ob_rr_theme->a_clear->surface.parentx = ob_rr_theme->grip_width +
             self->bwidth;
         RrPaint(ob_rr_theme->a_clear, self->topresize,
-                self->width - (ob_rr_theme->grip_width + self->bwidth) * 2,
+                self->width - ob_rr_theme->grip_width * 2,
                 ob_rr_theme->paddingy + 1);
 
         ob_rr_theme->a_clear->surface.parentx = 0;

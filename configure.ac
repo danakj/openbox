@@ -158,6 +158,13 @@ AC_CONFIG_FILES([
   parser/obparser-3.0.pc
   version.h
 ])
+AC_CONFIG_COMMANDS([doc],
+                   [echo "  creating doc"],
+                   [mkdir doc 2>/dev/null])
+AC_CONFIG_COMMANDS([data/xsession],
+                   [echo "  creating data/xsession"],
+                   [mkdir data 2>/dev/null],
+                   [mkdir data/xsession 2>/dev/null])
 AC_OUTPUT
 
 AC_MSG_RESULT

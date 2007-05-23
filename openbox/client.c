@@ -1619,15 +1619,15 @@ void client_setup_decor_and_functions(ObClient *self)
         break;
 
     case OB_CLIENT_TYPE_DIALOG:
-    case OB_CLIENT_TYPE_UTILITY:
-        /* these windows cannot be maximized */
-        self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+        /* these windows don't have anything added or removed by default */
         break;
 
+    case OB_CLIENT_TYPE_UTILITY:
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
-        /* these windows get less functionality */
-        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
+        /* these windows can't iconify */
+        self->decorations &= ~OB_FRAME_DECOR_ICONIFY;
+        self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
         break;
 
     case OB_CLIENT_TYPE_SPLASH:
@@ -1702,9 +1702,12 @@ void client_setup_decor_and_functions(ObClient *self)
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
 
-    if (self->max_horz && self->max_vert)
+    if (self->max_horz && self->max_vert) {
+        /* you can't resize fully maximized windows */
+        self->functions &= ~OB_CLIENT_FUNC_RESIZE;
         /* kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
+    }
 
     /* If there are no decorations to remove, don't allow the user to try
        toggle the state */
@@ -2725,7 +2728,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *h = a->height;
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
-                         is entering fullscreen */
+                         is fullscreening */
     } else if (self->max_horz || self->max_vert) {
         Rect *a;
         guint i;
@@ -2743,8 +2746,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
             *h = a->height - self->frame->size.top - self->frame->size.bottom;
         }
 
-        /* maximizing is not allowed if the user can't move+resize the window
-         */
+        user = FALSE; /* ignore if the client can't be moved/resized when it
+                         is maximizing */
     }
 
     /* gets the client's position */

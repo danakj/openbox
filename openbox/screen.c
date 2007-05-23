@@ -900,11 +900,28 @@ void screen_update_desktop_names()
     else
         i = 0;
     if (i < screen_num_desktops) {
+        GSList *it;
+
         screen_desktop_names = g_renew(gchar*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
-        for (; i < screen_num_desktops; ++i)
-            screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
+
+        it = g_slist_nth(config_desktops_names, i);
+
+        for (; i < screen_num_desktops; ++i) {
+            if (it)
+                /* use the names from the config file when possible */
+                screen_desktop_names[i] = g_strdup(it->data);
+            else
+                /* make up a nice name if it's not though */
+                screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
+            if (it) it = g_slist_next(it);
+        }
+
+        /* if we changed any names, then set the root property so we can
+           all agree on the names */
+        PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,
+                   screen_desktop_names);
     }
 
     /* resize the pager for these names */

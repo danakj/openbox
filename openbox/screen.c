@@ -935,7 +935,8 @@ void screen_update_desktop_names()
                 screen_desktop_names[i] = g_strdup(it->data);
             else
                 /* make up a nice name if it's not though */
-                screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
+                screen_desktop_names[i] = g_strdup_printf(_("desktop %i"),
+                                                          i + 1);
             if (it) it = g_slist_next(it);
         }
 

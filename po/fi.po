@@ -289,7 +289,7 @@ msgstr ""
 #: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
-msgstr ""
+msgstr "työtila %i"
 
 #: openbox/session.c:103
 #, c-format

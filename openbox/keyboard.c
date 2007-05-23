@@ -78,11 +78,11 @@ static gboolean chain_timeout(gpointer data)
 
 static void set_curpos(KeyBindingTree *newpos)
 {
-    if (curpos != newpos) {
-        grab_keys(FALSE);
-        curpos = newpos;
-        grab_keys(TRUE);
-    }
+    if (curpos == newpos) return;
+
+    grab_keys(FALSE);
+    curpos = newpos;
+    grab_keys(TRUE);
 
     if (curpos != NULL) {
         gchar *text = NULL;

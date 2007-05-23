@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 00:26-0400\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2004-01-25 20:41+0100\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
@@ -262,22 +262,22 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
 
-#: openbox/screen.c:85 openbox/screen.c:186
+#: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr ""
 
-#: openbox/screen.c:122
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr ""
 
-#: openbox/screen.c:143
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/screen.c:938
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr ""

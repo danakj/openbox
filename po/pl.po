@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 00:26-0400\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-21 18:09+0100\n"
 "Last-Translator: Paweł Rusinek <p.rusinek@gmail.com>\n"
 "Language-Team: None\n"
@@ -277,25 +277,25 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr "Niepoprawny argument '%s'\n"
 
-#: openbox/screen.c:85 openbox/screen.c:186
+#: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Menedżer okien jest już uruchomiony na ekranie %d"
 
-#: openbox/screen.c:122
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 
-#: openbox/screen.c:143
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
 
-#: openbox/screen.c:938
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
-msgstr ""
+msgstr "pulpit %i"
 
 #: openbox/session.c:103
 #, c-format

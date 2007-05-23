@@ -1619,10 +1619,10 @@ void client_setup_decor_and_functions(ObClient *self)
         break;
 
     case OB_CLIENT_TYPE_DIALOG:
+    case OB_CLIENT_TYPE_UTILITY:
         /* these windows don't have anything added or removed by default */
         break;
 
-    case OB_CLIENT_TYPE_UTILITY:
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
         /* these windows can't iconify */

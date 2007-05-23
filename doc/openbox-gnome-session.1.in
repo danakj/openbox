@@ -6,6 +6,9 @@ openbox-gnome-session \(em Run a GNOME session with Openbox as the window manage
 .PP 
 \fBopenbox-gnome-session\fR runs a GNOME session with 
 Openbox as the window manager. 
+.PP 
+\fBopenbox-gnome-session\fR does not take any command line 
+arguments. 
 .SH "SEE ALSO" 
 .PP 
 openbox(1), openbox-kde-session(1), openbox-session(1). 
@@ -16,4 +19,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Tue 22 May 2007, 00:06 
+.\" created by instant / docbook-to-man, Wed 23 May 2007, 14:03 

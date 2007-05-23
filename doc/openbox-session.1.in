@@ -8,6 +8,9 @@ openbox-session \(em Runs an Openbox session without any session manager.
 any session manager. Without a session manager, you will not be able 
 to save your state from one log in to the next. 
 .PP 
+\fBopenbox-session\fR does not take any command line 
+arguments. 
+.PP 
 On log in, \fBopenbox-session\fR will run the 
 ~/.config/openbox/autostart.sh script if it exists, and will run the 
 system-wide script @configdir@/openbox/autostart.sh otherwise. You may 
@@ -36,4 +39,4 @@ The program's full documentation is available on the website:
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Tue 22 May 2007, 00:06 
+.\" created by instant / docbook-to-man, Wed 23 May 2007, 14:03 

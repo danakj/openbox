@@ -38,6 +38,9 @@ manpage.1: manpage.sgml
 
     <para><command>&dhpackage;</command> runs a GNOME session with
       Openbox as the window manager.</para>
+
+    <para><command>&dhpackage;</command> does not take any command line
+      arguments.</para>
   </refsect1>
   <refsect1>
     <title>SEE ALSO</title>

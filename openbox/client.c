@@ -1625,9 +1625,11 @@ void client_setup_decor_and_functions(ObClient *self)
 
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
-        /* these windows can't iconify */
-        self->decorations &= ~OB_FRAME_DECOR_ICONIFY;
-        self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
+        /* these windows can't iconify or maximize */
+        self->decorations &= ~(OB_FRAME_DECOR_ICONIFY |
+                               OB_FRAME_DECOR_MAXIMIZE);
+        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY |
+                             OB_CLIENT_FUNC_MAXIMIZE);
         break;
 
     case OB_CLIENT_TYPE_SPLASH:

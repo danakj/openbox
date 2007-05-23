@@ -304,10 +304,9 @@ gboolean screen_annex()
 
 void screen_startup(gboolean reconfig)
 {
-    guint i, numnames;
-    gchar **names;
-    GSList *it, *namelist;
+    gchar **names = NULL;
     guint32 d;
+    gboolean namesexist = FALSE;
 
     desktop_cycle_popup = pager_popup_new(FALSE);
     pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
@@ -323,23 +322,45 @@ void screen_startup(gboolean reconfig)
     /* get the initial size */
     screen_resize();
 
-    /* get the desktop names */
-    namelist = session_desktop_names ?
-        session_desktop_names : config_desktops_names;
-    numnames = g_slist_length(namelist);
-    names = g_new(gchar*, numnames + 1);
-    names[numnames] = NULL;
-    for (i = 0, it = namelist; it; ++i, it = g_slist_next(it))
-        names[i] = g_strdup(it->data);
+    /* have names already been set for the desktops? */
+    if (PROP_GETSS(RootWindow(ob_display, ob_screen),
+                   net_desktop_names, utf8, &names))
+    {
+        g_strfreev(names);
+        namesexist = TRUE;
+    }
 
-    /* set the root window property */
-    PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
+    /* if names don't exist and we have session names, set those.
+       do this stuff BEFORE setting the number of desktops, because that
+       will create default names for them
+    */
+    if (!namesexist && session_desktop_names != NULL) {
+        guint i, numnames;
+        GSList *it;
 
-    g_strfreev(names);
+        /* get the desktop names */
+        numnames = g_slist_length(session_desktop_names);
+        names = g_new(gchar*, numnames + 1);
+        names[numnames] = NULL;
+        for (i = 0, it = session_desktop_names; it; ++i, it = g_slist_next(it))
+            names[i] = g_strdup(it->data);
 
-    /* set the number of desktops */
+        /* set the root window property */
+        PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
+
+        g_strfreev(names);
+    }
+
+    /* set the number of desktops, if it's not already set.
+
+       this will also set the default names from the config file up for
+       desktops that don't have names yet */
     screen_num_desktops = 0;
-    if (session_num_desktops)
+    if (PROP_GET32(RootWindow(ob_display, ob_screen),
+                   net_number_of_desktops, cardinal, &d))
+        screen_set_num_desktops(d);
+    /* restore from session if possible */
+    else if (session_num_desktops)
         screen_set_num_desktops(session_num_desktops);
     else
         screen_set_num_desktops(config_desktops_num);

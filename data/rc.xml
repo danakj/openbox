@@ -90,6 +90,9 @@
   <!-- this stuff is only used at startup, pagers allow you to change them
        during a session
 
+       these are default values to use when other ones are not already set
+       by other applications, or saved in your session
+
        use obconf if you want to change these without having to log out
        and back in -->
   <number>4</number>

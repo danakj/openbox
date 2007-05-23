@@ -88,7 +88,10 @@
 
 <desktops>
   <!-- this stuff is only used at startup, pagers allow you to change them
-       during a session -->
+       during a session
+
+       use obconf if you want to change these without having to log out
+       and back in -->
   <number>4</number>
   <firstdesk>1</firstdesk>
   <names>

@@ -362,10 +362,24 @@ gboolean client_enter_focusable(ObClient *self);
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
 
-/*! Convery a position/size from a given gravity to the client's true gravity
+/*! When the client is resized but not moved, figure out the new position
+  for it based on its gravity:
+  http://standards.freedesktop.org/wm-spec/wm-spec-1.4.html#id2512541
+*/
+void client_gravity_resize_w(ObClient *self, gint *x, gint oldw, gint neww);
+
+/*! When the client is resized but not moved, figure out the new position
+  for it based on its gravity:
+  http://standards.freedesktop.org/wm-spec/wm-spec-1.4.html#id2512541
+*/
+void client_gravity_resize_h(ObClient *self, gint *y, gint oldh, gint newh);
+
+/*! Convert a position/size from a given gravity to the client's true gravity,
+  when the client is only resizing (the reference point doesn't move)
  */
-void client_convert_gravity(ObClient *self, gint gravity, gint *x, gint *y,
-                            gint w, gint h);
+void client_convert_gravity_resize(ObClient *self, gint gravity,
+                                   gint *x, gint *y,
+                                   gint w, gint h);
 
 #define client_move(self, x, y) \
   client_configure(self, x, y, self->area.width, self->area.height, TRUE, TRUE)

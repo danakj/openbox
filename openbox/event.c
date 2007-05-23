@@ -1035,38 +1035,43 @@ static void event_handle_client(ObClient *client, XEvent *e)
             move = TRUE;
         }
 
-        /* don't allow clients to move shaded windows (fvwm does this) */
-        if (client->shaded && (e->xconfigurerequest.value_mask & CWX ||
-                               e->xconfigurerequest.value_mask & CWY))
-        {
-            e->xconfigurerequest.value_mask &= ~CWX;
-            e->xconfigurerequest.value_mask &= ~CWY;
-
-            /* if the client tried to move and we aren't letting it then a
-               synthetic event is needed */
-            move = TRUE;
-        }
-
         if (e->xconfigurerequest.value_mask & CWX ||
             e->xconfigurerequest.value_mask & CWY ||
             e->xconfigurerequest.value_mask & CWWidth ||
             e->xconfigurerequest.value_mask & CWHeight)
         {
             if (e->xconfigurerequest.value_mask & CWX) {
-                x = e->xconfigurerequest.x;
+                /* don't allow clients to move shaded windows (fvwm does this)
+                 */
+                if (!client->shaded)
+                    x = e->xconfigurerequest.x;
                 move = TRUE;
             }
             if (e->xconfigurerequest.value_mask & CWY) {
-                y = e->xconfigurerequest.y;
+                /* don't allow clients to move shaded windows (fvwm does this)
+                 */
+                if (!client->shaded)
+                    y = e->xconfigurerequest.y;
                 move = TRUE;
             }
+
             if (e->xconfigurerequest.value_mask & CWWidth) {
                 w = e->xconfigurerequest.width;
                 resize = TRUE;
+
+                /* if x was not given, then use gravity to figure out the new
+                   x.  the reference point should not be moved */
+                if (!(e->xconfigurerequest.value_mask & CWX))
+                    client_gravity_resize_w(client, &x, client->area.width, w);
             }
             if (e->xconfigurerequest.value_mask & CWHeight) {
                 h = e->xconfigurerequest.height;
                 resize = TRUE;
+
+                /* if y was not given, then use gravity to figure out the new
+                   y.  the reference point should not be moved */
+                if (!(e->xconfigurerequest.value_mask & CWY))
+                    client_gravity_resize_h(client, &y, client->area.height,h);
             }
         }
 
@@ -1276,12 +1281,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                      prop_atoms.net_wm_moveresize_cancel)
                 moveresize_end(TRUE);
         } else if (msgtype == prop_atoms.net_moveresize_window) {
-            gint grav, x, y, w, h;
+            gint ograv, x, y, w, h;
+
+            ograv = client->gravity;
 
             if (e->xclient.data.l[0] & 0xff)
-                grav = e->xclient.data.l[0] & 0xff;
-            else 
-                grav = client->gravity;
+                client->gravity = e->xclient.data.l[0] & 0xff;
 
             if (e->xclient.data.l[0] & 1 << 8)
                 x = e->xclient.data.l[1];
@@ -1291,22 +1296,39 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 y = e->xclient.data.l[2];
             else
                 y = client->area.y;
-            if (e->xclient.data.l[0] & 1 << 10)
+
+            if (e->xclient.data.l[0] & 1 << 10) {
                 w = e->xclient.data.l[3];
+
+                /* if x was not given, then use gravity to figure out the new
+                   x.  the reference point should not be moved */
+                if (!(e->xclient.data.l[0] & 1 << 8))
+                    client_gravity_resize_w(client, &x, client->area.width, w);
+            }
             else
                 w = client->area.width;
-            if (e->xclient.data.l[0] & 1 << 11)
+
+            if (e->xclient.data.l[0] & 1 << 11) {
                 h = e->xclient.data.l[4];
+
+                /* if y was not given, then use gravity to figure out the new
+                   y.  the reference point should not be moved */
+                if (!(e->xclient.data.l[0] & 1 << 9))
+                    client_gravity_resize_h(client, &y, client->area.height,h);
+            }
             else
                 h = client->area.height;
 
-            ob_debug("MOVERESIZE x %d %d y %d %d\n",
+            ob_debug("MOVERESIZE x %d %d y %d %d (gravity %d)\n",
                      e->xclient.data.l[0] & 1 << 8, x,
-                     e->xclient.data.l[0] & 1 << 9, y);
-            client_convert_gravity(client, grav, &x, &y, w, h);
+                     e->xclient.data.l[0] & 1 << 9, y,
+                     client->gravity);
+
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
             client_configure(client, x, y, w, h, FALSE, TRUE);
+
+            client->gravity = ograv;
 
             /* ignore enter events caused by these like ob actions do */
             event_ignore_all_queued_enters();

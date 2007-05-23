@@ -1386,7 +1386,7 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case StaticGravity:
     case ForgetGravity:
         /* the client's position won't move */
-        *x -= self->size.left;
+        *x += self->size.left;
         break;
     }
 

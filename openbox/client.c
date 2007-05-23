@@ -1538,7 +1538,6 @@ void client_update_normal_hints(ObClient *self)
 {
     XSizeHints size;
     glong ret;
-    gint oldgravity = self->gravity;
 
     /* defaults */
     self->min_ratio = 0.0f;
@@ -1555,19 +1554,8 @@ void client_update_normal_hints(ObClient *self)
         */
         self->positioned = (size.flags & (PPosition|USPosition));
 
-        if (size.flags & PWinGravity) {
+        if (size.flags & PWinGravity)
             self->gravity = size.win_gravity;
-      
-            /* if the client has a frame, i.e. has already been mapped and
-               is changing its gravity */
-            if (self->frame && self->gravity != oldgravity) {
-                /* move our idea of the client's position based on its new
-                   gravity */
-                client_convert_gravity(self, oldgravity,
-                                       &self->area.x, &self->area.y,
-                                       self->area.width, self->area.height);
-            }
-        }
 
         if (size.flags & PAspect) {
             if (size.min_aspect.y)
@@ -2566,18 +2554,62 @@ static void client_apply_startup_state(ObClient *self)
     */
 }
 
-void client_convert_gravity(ObClient *self, gint gravity, gint *x, gint *y,
-                            gint w, gint h)
+void client_gravity_resize_w(ObClient *self, gint *x, gint oldw, gint neww)
 {
-    gint oldg = self->gravity;
+    /* these should be the current values. this is for when you're not moving,
+       just resizing */
+    g_assert(*x == self->area.x);
+    g_assert(oldw == self->area.width);
 
-    /* get the frame's position from the requested stuff */
-    self->gravity = gravity;
-    frame_client_gravity(self->frame, x, y, w, h);
-    self->gravity = oldg;
+    /* horizontal */
+    switch (self->gravity) {
+    default:
+    case NorthWestGravity:
+    case WestGravity:
+    case SouthWestGravity:
+    case StaticGravity:
+    case ForgetGravity:
+        break;
+    case NorthGravity:
+    case CenterGravity:
+    case SouthGravity:
+        *x -= (neww - oldw) / 2;
+        break;
+    case NorthEastGravity:
+    case EastGravity:
+    case SouthEastGravity:
+        *x -= neww - oldw;
+        break;
+    }
+}
 
-    /* get the client's position in its true gravity from that */
-    frame_frame_gravity(self->frame, x, y, w, h);
+void client_gravity_resize_h(ObClient *self, gint *y, gint oldh, gint newh)
+{
+    /* these should be the current values. this is for when you're not moving,
+       just resizing */
+    g_assert(*y == self->area.y);
+    g_assert(oldh == self->area.height);
+
+    /* vertical */
+    switch (self->gravity) {
+    default:
+    case NorthWestGravity:
+    case NorthGravity:
+    case NorthEastGravity:
+    case StaticGravity:
+    case ForgetGravity:
+        break;
+    case WestGravity:
+    case CenterGravity:
+    case EastGravity:
+        *y -= (newh - oldh) / 2;
+        break;
+    case SouthWestGravity:
+    case SouthGravity:
+    case SouthEastGravity:
+        *y -= newh - oldh;
+        break;
+    }
 }
 
 void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,

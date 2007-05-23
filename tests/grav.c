@@ -50,7 +50,9 @@ int main () {
   XFlush(display);
 
   XMoveResizeWindow(display, win, 1172-600, 668-150, 600, 150);
-  /*XResizeWindow(display, win, 600, 150);*/
+  XFlush(display);
+  sleep(1);
+  XResizeWindow(display, win, 900, 275);
 
   XSelectInput(display, win, ExposureMask | StructureNotifyMask);
 

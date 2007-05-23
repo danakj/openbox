@@ -95,10 +95,10 @@
   <number>4</number>
   <firstdesk>1</firstdesk>
   <names>
+    <!-- set names up here if you want to, like this:
     <name>desktop 1</name>
     <name>desktop 2</name>
-    <name>desktop 3</name>
-    <name>desktop 4</name>
+    -->
   </names>
 </desktops>
 

@@ -20,6 +20,7 @@
 #define __ob__session_h
 
 #include "client.h"
+#include "screen.h"
 
 #include <glib.h>
 
@@ -40,6 +41,10 @@ struct _ObSessionState {
 /*! The desktop being viewed when the session was saved. A valud of -1 means
   it was not saved */
 extern gint session_desktop;
+extern gint session_num_desktops;
+extern gboolean session_desktop_layout_present;
+extern ObDesktopLayout session_desktop_layout;
+extern GSList *session_desktop_names;
 
 extern GList *session_saved_state;
 

@@ -56,7 +56,7 @@ guint    screen_desktop;
 guint    screen_last_desktop;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
-DesktopLayout screen_desktop_layout;
+ObDesktopLayout screen_desktop_layout;
 gchar  **screen_desktop_names;
 Window   screen_support_win;
 Time     screen_desktop_user_time = CurrentTime;
@@ -306,7 +306,7 @@ void screen_startup(gboolean reconfig)
 {
     guint i, numnames;
     gchar **names;
-    GSList *it;
+    GSList *it, *namelist;
     guint32 d;
 
     desktop_cycle_popup = pager_popup_new(FALSE);
@@ -324,10 +324,12 @@ void screen_startup(gboolean reconfig)
     screen_resize();
 
     /* get the desktop names */
-    numnames = g_slist_length(config_desktops_names);
+    namelist = session_desktop_names ?
+        session_desktop_names : config_desktops_names;
+    numnames = g_slist_length(namelist);
     names = g_new(gchar*, numnames + 1);
     names[numnames] = NULL;
-    for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
+    for (i = 0, it = namelist; it; ++i, it = g_slist_next(it))
         names[i] = g_strdup(it->data);
 
     /* set the root window property */
@@ -337,7 +339,10 @@ void screen_startup(gboolean reconfig)
 
     /* set the number of desktops */
     screen_num_desktops = 0;
-    screen_set_num_desktops(config_desktops_num);
+    if (session_num_desktops)
+        screen_set_num_desktops(session_num_desktops);
+    else
+        screen_set_num_desktops(config_desktops_num);
 
     /* start on the current desktop when a wm was already running */
     if (PROP_GET32(RootWindow(ob_display, ob_screen),
@@ -357,7 +362,10 @@ void screen_startup(gboolean reconfig)
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_showing_desktop, cardinal, screen_showing_desktop);
 
-    screen_update_layout();
+    if (session_desktop_layout_present)
+        screen_desktop_layout = session_desktop_layout;
+    else
+        screen_update_layout();
 }
 
 void screen_shutdown(gboolean reconfig)

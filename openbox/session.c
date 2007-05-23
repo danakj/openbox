@@ -24,6 +24,10 @@ struct _ObClient;
 
 GList *session_saved_state = NULL;
 gint session_desktop = -1;
+gint session_num_desktops = 0;
+gboolean session_desktop_layout_present = FALSE;
+ObDesktopLayout session_desktop_layout;
+GSList *session_desktop_names = NULL;
 
 #ifndef USE_SM
 void session_startup(gint argc, gchar **argv) {}
@@ -36,7 +40,6 @@ GList* session_state_find(struct _ObClient *c) { return NULL; }
 #include "client.h"
 #include "prop.h"
 #include "focus.h"
-#include "screen.h"
 #include "gettext.h"
 #include "parser/parse.h"
 
@@ -363,6 +366,10 @@ static void session_setup_restart_command()
 static ObSMSaveData *sm_save_get_data()
 {
     ObSMSaveData *savedata = g_new0(ObSMSaveData, 1);
+    /* save the active desktop and client.
+       we don't bother to preemptively save the other desktop state like
+       number and names of desktops, cuz those shouldn't be changing during
+       the save.. */
     savedata->focus_client = focus_client;
     savedata->desktop = screen_desktop;
     return savedata;
@@ -448,6 +455,28 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
         fprintf(f, "<openbox_session>\n\n");
 
         fprintf(f, "<desktop>%d</desktop>\n", savedata->desktop);
+
+        fprintf(f, "<numdesktops>%d</numdesktops>\n", screen_num_desktops);
+
+        fprintf(f, "<desktoplayout>\n");
+        fprintf(f, "  <orientation>%d</orientation>\n",
+                screen_desktop_layout.orientation);
+        fprintf(f, "  <startcorner>%d</startcorner>\n",
+                screen_desktop_layout.start_corner);
+        fprintf(f, "  <columns>%d</columns>\n",
+                screen_desktop_layout.columns);
+        fprintf(f, "  <rows>%d</rows>\n",
+                screen_desktop_layout.rows);
+        fprintf(f, "</desktoplayout>\n");
+
+        if (screen_desktop_names) {
+            gint i;
+
+            fprintf(f, "<desktopnames>\n");
+            for (i = 0; screen_desktop_names[i]; ++i)
+                fprintf(f, "  <name>%s</name>\n", screen_desktop_names[i]);
+            fprintf(f, "</desktopnames>\n");
+        }
 
         /* they are ordered top to bottom in stacking order */
         for (it = stacking_list; it; it = g_list_next(it)) {
@@ -580,14 +609,14 @@ static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
     ob_debug_type(OB_DEBUG_SM, "  client name: %s \n", c->name);
     ob_debug_type(OB_DEBUG_SM, "  client class: %s \n", c->class);
     ob_debug_type(OB_DEBUG_SM, "  client role: %s \n", c->role);
-    ob_debug_type(OB_DEBUG_SM, "  client type: %s \n", c->type);
+    ob_debug_type(OB_DEBUG_SM, "  client type: %d \n", c->type);
     ob_debug_type(OB_DEBUG_SM, "  client command: %s \n",
                   c->wm_command ? c->wm_command : "(null)");
     ob_debug_type(OB_DEBUG_SM, "  state id: %s \n", s->id);
     ob_debug_type(OB_DEBUG_SM, "  state name: %s \n", s->name);
     ob_debug_type(OB_DEBUG_SM, "  state class: %s \n", s->class);
     ob_debug_type(OB_DEBUG_SM, "  state role: %s \n", s->role);
-    ob_debug_type(OB_DEBUG_SM, "  state type: %s \n", s->type);
+    ob_debug_type(OB_DEBUG_SM, "  state type: %d \n", s->type);
     ob_debug_type(OB_DEBUG_SM, "  state command: %s \n",
                   s->command ? s->command : "(null)");
 
@@ -624,7 +653,7 @@ GList* session_state_find(ObClient *c)
 static void session_load_file(const gchar *path)
 {
     xmlDocPtr doc;
-    xmlNodePtr node, n;
+    xmlNodePtr node, n, m;
     GList *it, *inext;
 
     if (!parse_load(path, "openbox_session", &doc, &node))
@@ -632,6 +661,31 @@ static void session_load_file(const gchar *path)
 
     if ((n = parse_find_node("desktop", node->children)))
         session_desktop = parse_int(doc, n);
+
+    if ((n = parse_find_node("numdesktops", node->children)))
+        session_num_desktops = parse_int(doc, n);
+
+    if ((n = parse_find_node("desktoplayout", node->children))) {
+        /* make sure they are all there for it to be valid */
+        if ((m = parse_find_node("orientation", n->children)))
+            session_desktop_layout.orientation = parse_int(doc, m);
+        if (m && (m = parse_find_node("startcorner", n->children)))
+            session_desktop_layout.start_corner = parse_int(doc, m);
+        if (m && (m = parse_find_node("columns", n->children)))
+            session_desktop_layout.columns = parse_int(doc, m);
+        if (m && (m = parse_find_node("rows", n->children)))
+            session_desktop_layout.rows = parse_int(doc, m);
+        session_desktop_layout_present = m != NULL;
+    }
+
+    if ((n = parse_find_node("desktopnames", node->children))) {
+        for (m = parse_find_node("name", n->children); m;
+             m = parse_find_node("name", m->next))
+        {
+            session_desktop_names = g_slist_append(session_desktop_names,
+                                                   parse_string(doc, m));
+        }
+    }
 
     for (node = parse_find_node("window", node->children); node != NULL;
          node = parse_find_node("window", node->next))

@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if test -n "$1"; then
+    echo "Syntax: openbox-kde-session"
+    echo
+    echo "See the openbox-kde-session(1) manpage for help."
+  exit
+fi
+
 # Run KDE with Openbox as its window manager
 export KDEWM="@bindir@/openbox"
 exec startkde "$@"

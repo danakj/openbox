@@ -962,16 +962,13 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
      * xterm -geometry resolution-width/2 will work fine. Trying to
      * place it completely offscreen will be handled in the above code.
      * Sorry for this confused comment, i am tired. */
-    if (fw <= mon_a->width) {
-        if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
-        if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
-            *x = mon_a->x + mon_a->width - fw;
-    }
-    if (fh <= mon_a->height) {
-        if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
-        if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
-            *y = mon_a->y + mon_a->height - fh;
-    }
+    if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
+    if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
+        *x = mon_a->x + MAX(0, mon_a->width - fw);
+
+    if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
+    if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
+        *y = mon_a->y + MAX(0, mon_a->height - fh);
 
     /* get where the client should be */
     frame_frame_gravity(self->frame, x, y, w, h);

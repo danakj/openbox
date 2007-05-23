@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 20:08+0200\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
 "PO-Revision-Date: 2007-05-22 19:00+0100\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -164,8 +164,8 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Nepodařilo se otevřít displej z proměnné prostředí DISPLAY."
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Nepodařilo se inicializovat knihovnu render."
+msgid "Failed to initialize the obrender library."
+msgstr "Nepodařilo se inicializovat knihovnu obrender."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
@@ -338,3 +338,6 @@ msgstr "Požadovaná klávesa '%s' na displeji neexistuje"
 #, c-format
 msgid "X Error: %s"
 msgstr "X Chyba: %s"
+
+#~ msgid "desktop %i"
+#~ msgstr "plochu %i"

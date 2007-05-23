@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 20:08+0200\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
 "PO-Revision-Date: 2007-05-21 11:33+0200\n"
 "Last-Translator: \n"
 "Language-Team:  <it@li.org>\n"
@@ -161,7 +161,7 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr ""
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
+msgid "Failed to initialize the obrender library."
 msgstr ""
 
 #: openbox/openbox.c:186

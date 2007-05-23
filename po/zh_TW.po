@@ -1,15 +1,15 @@
-# Traditional Chinese Messages for openbox
+# Traditional Chinese Messages for openbox.
 # Copyright (C) 2006 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# Wei-Lun Chao <william.chao@ossii.com.tw>, 2006.
+# Wei-Lun Chao <chaoweilun@gmail.com>, 2006, 07.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.3rc2\n"
+"Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 01:20-0400\n"
-"PO-Revision-Date: 2006-03-01 12:00+0800\n"
-"Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
+"PO-Revision-Date: 2007-05-23 16:22+0200\n"
+"Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,30 +19,30 @@ msgstr ""
 #: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr ""
+msgstr "要求的動作「%s」無效。無此類動作存在。"
 
 #: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr ""
+msgstr "使用的動作「%s」無效。動作將被忽略。"
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
-msgstr ""
+msgstr "執行「%s」時失敗：%s"
 
 #: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
-msgstr ""
+msgstr "從 utf8 轉換路徑「%s」時失敗"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
-msgstr "到那裡去..."
+msgstr "到那裏去…"
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
-msgstr ""
+msgstr "視窗"
 
 #: openbox/client_list_menu.c:199
 msgid "Desktops"
@@ -50,11 +50,11 @@ msgstr "桌面"
 
 #: openbox/client_menu.c:246
 msgid "All desktops"
-msgstr "所有桌面(&A)"
+msgstr "所有桌面"
 
 #: openbox/client_menu.c:351
 msgid "&Layer"
-msgstr "圖層(&L)"
+msgstr "層次(&L)"
 
 #: openbox/client_menu.c:356
 msgid "Always on &top"
@@ -86,7 +86,7 @@ msgstr "移動(&M)"
 
 #: openbox/client_menu.c:381
 msgid "Resi&ze"
-msgstr "重新調整大小(&Z)"
+msgstr "調整大小(&Z)"
 
 #: openbox/client_menu.c:383
 msgid "Ico&nify"
@@ -98,11 +98,11 @@ msgstr "最大化(&X)"
 
 #: openbox/client_menu.c:399
 msgid "&Roll up/down"
-msgstr "向上捲動/向下捲動(&R)"
+msgstr "向上/向下捲動(&R)"
 
 #: openbox/client_menu.c:401
 msgid "Un/&Decorate"
-msgstr ""
+msgstr "去除/裝飾(&D)"
 
 #: openbox/client_menu.c:411
 msgid "&Close"
@@ -111,145 +111,151 @@ msgstr "關閉(&C)"
 #: openbox/config.c:701
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr ""
+msgstr "在配置檔中指定的按鈕「%s」無效"
 
 #: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
-msgstr ""
+msgstr "與配置檔中的按鍵組合衝突"
 
 #: openbox/menu.c:98 openbox/menu.c:106
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr ""
+msgstr "無法找到有效的選單檔案「%s」"
 
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr ""
+msgstr "執行命令於管線選單「%s」時失敗：%s"
 
 #: openbox/menu.c:166
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr ""
+msgstr "從管線選單「%s」的輸出無效"
 
 #: openbox/menu.c:179
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr ""
+msgstr "試圖存取選單「%s」但是它不存在"
 
 #: openbox/menu.c:331 openbox/menu.c:332
 msgid "More..."
-msgstr ""
+msgstr "更多…"
 
 #: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr ""
+msgstr "與滑鼠組合的按鈕「%s」無效"
 
 #: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr ""
+msgstr "與滑鼠組合的上下文「%s」無效"
 
 #: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr ""
+msgstr "無法變更到主目錄「%s」：%s"
 
 #: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr ""
+msgstr "開啟依 DISPLAY 環境變數所指的顯示時失敗。"
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr ""
+msgid "Failed to initialize the obrender library."
+msgstr "初始化 obrender 函式庫時失敗。"
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
-msgstr ""
+msgstr "X 伺服器不支援語區。"
 
 #: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
-msgstr ""
+msgstr "無法設定用於 X 伺服器的語區修飾項。"
 
 #: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr ""
+msgstr "無法找到有效的配置檔案，而使用某些簡單的預設值"
 
 #: openbox/openbox.c:275
 msgid "Unable to load a theme."
-msgstr ""
+msgstr "無法載入佈景主題。"
 
 #: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr ""
+msgstr "重新啟動以執行新的可執行檔「%s」時失敗：%s"
 
 #: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
-msgstr ""
+msgstr "著作權 (c)"
 
 #: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
-msgstr ""
+msgstr "語法：openbox [選項]\n"
 
 #: openbox/openbox.c:476
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
+"\n"
+"選項：\n"
 
 #: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
-msgstr ""
+msgstr "  --help              顯示此說明然後離開\n"
 
 #: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
-msgstr ""
+msgstr "  --version           顯示版本然後離開\n"
 
 #: openbox/openbox.c:479
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
+msgstr "  --replace           替換目前執行的視窗管理員\n"
 
 #: openbox/openbox.c:480
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
+msgstr "  --sm-disable        停用與執行階段管理程式的連結\n"
 
 #: openbox/openbox.c:481
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
+"\n"
+"傳遞訊息到執行中的 Openbox 實體：\n"
 
 #: openbox/openbox.c:482
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr ""
+msgstr "  --reconfigure       重新載入 Openbox 配置\n"
 
 #: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
-msgstr ""
+msgstr "  --restart           重新啟動 Openbox\n"
 
 #: openbox/openbox.c:484
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
+"\n"
+"偵錯選項：\n"
 
 #: openbox/openbox.c:485
 msgid "  --sync              Run in synchronous mode\n"
-msgstr ""
+msgstr "  --sync              在同步模式中運行\n"
 
 #: openbox/openbox.c:486
 msgid "  --debug             Display debugging output\n"
-msgstr ""
+msgstr "  --debug             顯示偵錯輸出\n"
 
 #: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
+msgstr "  --debug-focus       顯示焦點處理的偵錯輸出\n"
 
 #: openbox/openbox.c:488
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr ""
+msgstr "  --debug-xinerama    分割顯示以進入假造的 xinerama 螢幕\n"
 
 #: openbox/openbox.c:489
 #, c-format
@@ -257,68 +263,73 @@ msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
+"\n"
+"請向 %s 報告錯誤\n"
 
 #: openbox/openbox.c:586
 #, c-format
 msgid "Invalid command line argument '%s'\n"
-msgstr ""
+msgstr "無效的命令列引數「%s」\n"
 
 #: openbox/screen.c:85 openbox/screen.c:186
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr ""
+msgstr "螢幕 %d 中已經有視窗管理員在運行"
 
 #: openbox/screen.c:122
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr ""
+msgstr "無法於螢幕 %d 獲選為視窗管理員"
 
 #: openbox/screen.c:143
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr ""
+msgstr "螢幕 %d 中的視窗管理員並未離開"
 
 #: openbox/session.c:100
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr "無法製作目錄 '%s': %s"
+msgstr "無法製作目錄「%s」：%s"
 
 #: openbox/session.c:444
 #, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr ""
+msgstr "無法儲存執行階段到「%s」：%s"
 
 #: openbox/session.c:554
 #, c-format
 msgid "Error while saving the session to '%s': %s"
-msgstr ""
+msgstr "當儲存執行階段「%s」時發生錯誤：%s"
 
 #: openbox/startupnotify.c:237
 #, c-format
 msgid "Running %s\n"
-msgstr ""
+msgstr "正在運行 %s\n"
 
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr ""
+msgstr "與鍵盤/滑鼠組合的輔助按鍵「%s」無效"
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr ""
+msgstr "與按鍵組合的鍵碼「%s」無效"
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr ""
+msgstr "與按鍵組合的鍵名「%s」無效"
 
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
-msgstr ""
+msgstr "要求的按鍵「%s」不存在於畫面之中"
 
 #: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
-msgstr ""
+msgstr "X 錯誤：%s"
+
+#~ msgid "desktop %i"
+#~ msgstr "桌面 %i"

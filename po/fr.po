@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 01:20-0400\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
 "PO-Revision-Date: 2007-05-21 00:53+0200\n"
 "Last-Translator: Cyrille Bagard <nocbos@gmail.com>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -163,8 +163,8 @@ msgstr ""
 "DISPLAY."
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Echec de l'initialisation de la bibliothèque de rendu."
+msgid "Failed to initialize the obrender library."
+msgstr "Echec de l'initialisation de la bibliothèque obrender."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
@@ -346,3 +346,6 @@ msgstr "La touche demandée '%s' n'existe pas pour l'affichage"
 #, c-format
 msgid "X Error: %s"
 msgstr "Erreur X: %s"
+
+#~ msgid "desktop %i"
+#~ msgstr "bureau %i"

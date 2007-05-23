@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 01:20-0400\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
 "PO-Revision-Date: 2007-05-21 20:11+0300\n"
 "Last-Translator: Andres Järv <andresjarv@gmail.com>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -162,8 +162,8 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "DISPLAY keskkonnamuutujas oleva ekraani avamine ebaõnnestus."
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Renderdamisteegi käivitamine ebaõnnestus."
+msgid "Failed to initialize the obrender library."
+msgstr "Obrender-damisteegi käivitamine ebaõnnestus."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
@@ -333,3 +333,6 @@ msgstr "Soovitud klahvi '%s' ei ole sellel ekraanil"
 #, c-format
 msgid "X Error: %s"
 msgstr "X-i viga: %s"
+
+#~ msgid "desktop %i"
+#~ msgstr "töölaud %i"

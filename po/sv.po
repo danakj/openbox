@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 01:20-0400\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
 "PO-Revision-Date: 2007-05-22 00:29+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -160,8 +160,8 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Kunde inte öppna en display från miljövariabeln DISPLAY."
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Kunde inte initialisera render-biblioteket."
+msgid "Failed to initialize the obrender library."
+msgstr "Kunde inte initialisera obrender-biblioteket."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
@@ -330,3 +330,6 @@ msgstr "Efterfrågad tangent '%s' finns inte på displayen"
 #, c-format
 msgid "X Error: %s"
 msgstr "X-fel: %s"
+
+#~ msgid "desktop %i"
+#~ msgstr "skrivbord %i"

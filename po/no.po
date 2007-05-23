@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 01:20-0400\n"
+"POT-Creation-Date: 2007-05-23 22:49+0200\n"
 "PO-Revision-Date: 2007-05-20 18:41+0200\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@switch-case.org>\n"
 "Language-Team: None\n"
@@ -160,8 +160,8 @@ msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Kunne ikke åpne displayet fra DISPLAY-miljøvariabelen"
 
 #: openbox/openbox.c:180
-msgid "Failed to initialize the render library."
-msgstr "Kunne ikke starte render-biblioteket."
+msgid "Failed to initialize the obrender library."
+msgstr "Kunne ikke starte obrender-biblioteket."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
@@ -329,3 +329,6 @@ msgstr "Ønsket tast '%s' eksisterer ikke i displayet"
 #, c-format
 msgid "X Error: %s"
 msgstr "Feil i X: %s"
+
+#~ msgid "desktop %i"
+#~ msgstr "skrivebord %i"

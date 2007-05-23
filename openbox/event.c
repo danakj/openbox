@@ -679,7 +679,7 @@ static void event_handle_root(XEvent *e)
             }
         } else if (msgtype == prop_atoms.net_number_of_desktops) {
             guint d = e->xclient.data.l[0];
-            if (d > 0)
+            if (d > 0 && d <= 1000)
                 screen_set_num_desktops(d);
         } else if (msgtype == prop_atoms.net_showing_desktop) {
             screen_show_desktop(e->xclient.data.l[0] != 0, NULL);

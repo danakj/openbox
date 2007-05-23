@@ -146,9 +146,12 @@ static void font_measure_full(const RrFont *f, const gchar *str,
 
     pango_layout_set_text(f->layout, str, -1);
     pango_layout_set_width(f->layout, -1);
-    pango_layout_get_pixel_extents(f->layout, NULL, &rect);
-    *x = rect.width + ABS(shadow_x) + 4 /* we put a 2 px edge on each side */;
-    *y = rect.height + ABS(shadow_y);
+    pango_layout_get_extents(f->layout, NULL, &rect);
+    /* DONT use pango_layout_get_pixel_extents. they say it's guaranteed to
+       fit the text but they lie. figure it out ourselves */
+    *x = (rect.width + PANGO_SCALE - 1) / PANGO_SCALE
+        + ABS(shadow_x) + 4 /* we put a 2 px edge on each side */;
+    *y = (rect.height + PANGO_SCALE - 1) / PANGO_SCALE + ABS(shadow_y);
 }
 
 RrSize *RrFontMeasureString(const RrFont *f, const gchar *str,

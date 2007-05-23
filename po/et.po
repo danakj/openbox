@@ -292,7 +292,7 @@ msgstr "Aknahaldur ekraanil %d ei sulgu"
 #: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
-msgstr ""
+msgstr "töölaud %i"
 
 #: openbox/session.c:103
 #, c-format

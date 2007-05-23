@@ -29,8 +29,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3.991\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 20:08+0200\n"
-"PO-Revision-Date: 2007-05-22 20:08+0200\n"
+"POT-Creation-Date: 2007-05-23 00:26-0400\n"
+"PO-Revision-Date: 2007-05-23 00:26-0400\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "Go there..."
 msgid "Windows"
 msgstr "Windows"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Desktops"
 
@@ -308,17 +308,22 @@ msgstr "Could not acquire window manager selection on screen %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "The WM on screen %d is not exiting"
 
-#: openbox/session.c:100
+#: openbox/screen.c:938
+#, c-format
+msgid "desktop %i"
+msgstr "desktop %i"
+
+#: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Unable to make directory '%s': %s"
 
-#: openbox/session.c:444
+#: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Unable to save the session to '%s': %s"
 
-#: openbox/session.c:554
+#: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Error while saving the session to '%s': %s"

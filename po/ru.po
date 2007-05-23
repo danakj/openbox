@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-22 20:08+0200\n"
+"POT-Creation-Date: 2007-05-23 00:26-0400\n"
 "PO-Revision-Date: 2004-04-23 13:00+0300\n"
 "Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -43,7 +43,7 @@ msgstr "Перейти..."
 msgid "Windows"
 msgstr ""
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Рабочие места"
 
@@ -277,17 +277,22 @@ msgstr ""
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/session.c:100
+#: openbox/screen.c:938
+#, c-format
+msgid "desktop %i"
+msgstr ""
+
+#: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Невозможно создать каталог '%s': %s"
 
-#: openbox/session.c:444
+#: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr ""
 
-#: openbox/session.c:554
+#: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr ""

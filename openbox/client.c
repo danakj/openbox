@@ -1139,15 +1139,27 @@ static void client_get_desktop(ObClient *self)
                 self->desktop = self->transient_for->desktop;
                 trdesk = TRUE;
             } else {
+                /* if all the group is on one desktop, then open it on the
+                   same desktop */
                 GSList *it;
+                gboolean first = TRUE;
+                guint all = screen_num_desktops; /* not a valid value */
 
-                for (it = self->group->members; it; it = g_slist_next(it))
-                    if (it->data != self &&
-                        !((ObClient*)it->data)->transient_for) {
-                        self->desktop = ((ObClient*)it->data)->desktop;
-                        trdesk = TRUE;
-                        break;
+                for (it = self->group->members; it; it = g_slist_next(it)) {
+                    ObClient *c = it->data;
+                    if (c != self) {
+                        if (first) {
+                            all = c->desktop;
+                            first = FALSE;
+                        }
+                        else if (all != c->desktop)
+                            all = screen_num_desktops; /* make it invalid */
                     }
+                }
+                if (all != screen_num_desktops) {
+                    self->desktop = all;
+                    trdesk = TRUE;
+                }
             }
         }
         if (!trdesk) {

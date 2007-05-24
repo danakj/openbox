@@ -251,7 +251,6 @@ void frame_show(ObFrame *self)
     if (!self->visible) {
         self->visible = TRUE;
         XMapWindow(ob_display, self->client->window);
-        XMapWindow(ob_display, self->plate);
         XMapWindow(ob_display, self->window);
     }
 }
@@ -262,10 +261,6 @@ void frame_hide(ObFrame *self)
         self->visible = FALSE;
         if (!frame_iconify_animating(self))
             XUnmapWindow(ob_display, self->window);
-        /* unmap the plate along with the client. some people (libwnck) look
-           to see if it is unmapped when the client is iconified, for whatever
-           reason. so let's play along... */
-        XUnmapWindow(ob_display, self->plate);
         /* we unmap the client itself so that we can get MapRequest
            events, and because the ICCCM tells us to! */
         XUnmapWindow(ob_display, self->client->window);

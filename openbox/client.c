@@ -1882,7 +1882,8 @@ void client_update_wmhints(ObClient *self)
         }
 
         /* the WM_HINTS can contain an icon */
-        client_update_icons(self);
+        if (hints->flags & IconPixmapHint)
+            client_update_icons(self);
 
         XFree(hints);
     }
@@ -3605,7 +3606,7 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
     for (i = 1; i < self->nicons; ++i) {
         gulong diff;
 
-        diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
+        diff = ABS(self->icons[i].width - w) + ABS(self->icons[i].height - h);
         if (diff < min_diff) {
             min_diff = diff;
             min_i = i;

@@ -90,7 +90,7 @@ void framerender_frame(ObFrame *self)
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-        RrAppearance *t, *l, *m, *n, *i, *d, *s, *c;
+        RrAppearance *t, *l, *m, *n, *i, *d, *s, *c, *clear;
         if (self->focused) {
 
             t = self->a_focused_title;
@@ -208,39 +208,38 @@ void framerender_frame(ObFrame *self)
                    ob_rr_theme->a_hover_unfocused_close : 
                    ob_rr_theme->a_unfocused_unpressed_close)));
         }
+        clear = ob_rr_theme->a_clear;
 
         RrPaint(t, self->title, self->width, ob_rr_theme->title_height);
 
-        ob_rr_theme->a_clear->surface.parent = t;
-        ob_rr_theme->a_clear->surface.parenty = 0;
+        clear->surface.parent = t;
+        clear->surface.parenty = 0;
 
-        ob_rr_theme->a_clear->surface.parentx = ob_rr_theme->grip_width +
-            self->bwidth;
-        RrPaint(ob_rr_theme->a_clear, self->topresize,
+        clear->surface.parentx = ob_rr_theme->grip_width;
+
+        RrPaint(clear, self->topresize,
                 self->width - ob_rr_theme->grip_width * 2,
                 ob_rr_theme->paddingy + 1);
 
-        ob_rr_theme->a_clear->surface.parentx = 0;
+        clear->surface.parentx = 0;
 
         if (ob_rr_theme->grip_width > 0)
-            RrPaint(ob_rr_theme->a_clear, self->tltresize,
+            RrPaint(clear, self->tltresize,
                     ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
         if (ob_rr_theme->title_height > 0)
-            RrPaint(ob_rr_theme->a_clear, self->tllresize,
+            RrPaint(clear, self->tllresize,
                     ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
 
-        ob_rr_theme->a_clear->surface.parentx =
-            self->width - ob_rr_theme->grip_width;
+        clear->surface.parentx = self->width - ob_rr_theme->grip_width;
 
         if (ob_rr_theme->grip_width > 0)
-            RrPaint(ob_rr_theme->a_clear, self->trtresize,
+            RrPaint(clear, self->trtresize,
                     ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
 
-        ob_rr_theme->a_clear->surface.parentx =
-            self->width - (ob_rr_theme->paddingx + 1);
+        clear->surface.parentx = self->width - (ob_rr_theme->paddingx + 1);
 
         if (ob_rr_theme->title_height > 0)
-            RrPaint(ob_rr_theme->a_clear, self->trrresize,
+            RrPaint(clear, self->trrresize,
                     ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
 
         /* set parents for any parent relative guys */

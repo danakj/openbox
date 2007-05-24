@@ -486,10 +486,24 @@ void client_manage(Window window)
                               "Not focusing the window because the time is "
                               "too old\n");
             }
+            /* If its a transient (and parents aren't focused) and the time
+               is ambiguous (either the current focus target doesn't have
+               a timestamp, or they are the same (we probably inherited it
+               from them) */
+            else if (self->transient_for != NULL &&
+                     (!last_time || self->user_time == last_time))
+            {
+                activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because it is a "
+                              "transient, and the time is very ambiguous\n");
+            }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */
-            if (!(focus_client->can_focus || focus_client->focus_notify)) {
+            else if (!(focus_client->can_focus ||
+                       focus_client->focus_notify))
+            {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because a globally "

@@ -756,16 +756,24 @@ static void frame_adjust_cursors(ObFrame *self)
 {
     if ((self->functions & OB_CLIENT_FUNC_RESIZE) !=
         (self->client->functions & OB_CLIENT_FUNC_RESIZE) ||
-        ((self->max_horz && self->max_vert) !=
-         (self->client->max_horz && self->client->max_vert)))
+        self->max_horz != self->client->max_horz ||
+        self->max_vert != self->client->max_vert)
     {
         gboolean r = (self->client->functions & OB_CLIENT_FUNC_RESIZE) &&
             !(self->client->max_horz && self->client->max_vert);
+        gboolean topbot = !self->client->max_vert;
         XSetWindowAttributes a;
 
-        a.cursor = ob_cursor(r ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
+        /* these ones turn off when max vert */
+        a.cursor = ob_cursor(r && topbot ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->topresize, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->titletop, CWCursor, &a);
+        a.cursor = ob_cursor(r && topbot ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handletop, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handlebottom, CWCursor, &a);
+
+        /* these ones don't */
         a.cursor = ob_cursor(r ? OB_CURSOR_NORTHWEST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->tltresize, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->tllresize, CWCursor, &a);
@@ -780,10 +788,6 @@ static void frame_adjust_cursors(ObFrame *self)
         XChangeWindowAttributes(ob_display, self->left, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_EAST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->right, CWCursor, &a);
-        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
-        XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
-        XChangeWindowAttributes(ob_display, self->handletop, CWCursor, &a);
-        XChangeWindowAttributes(ob_display, self->handlebottom, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHWEST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->lgrip, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->handleleft, CWCursor, &a);
@@ -1262,6 +1266,10 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
            context */
         return OB_FRAME_CONTEXT_TITLEBAR;
     }
+    else if (self->max_vert &&
+             (win == self->titletop || win == self->topresize))
+        /* can't resize vertically when max vert */
+        return OB_FRAME_CONTEXT_TITLEBAR;
 
     if (win == self->window)            return OB_FRAME_CONTEXT_FRAME;
     if (win == self->label)             return OB_FRAME_CONTEXT_TITLEBAR;

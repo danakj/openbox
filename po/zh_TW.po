@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 22:49+0200\n"
+"POT-Creation-Date: 2007-05-24 14:51+0200\n"
 "PO-Revision-Date: 2007-05-23 16:22+0200\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -16,22 +16,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:953
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "要求的動作「%s」無效。無此類動作存在。"
 
-#: openbox/action.c:957
+#: openbox/action.c:956
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "使用的動作「%s」無效。動作將被忽略。"
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "執行「%s」時失敗：%s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1264
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "從 utf8 轉換路徑「%s」時失敗"
@@ -44,7 +44,7 @@ msgstr "到那裏去…"
 msgid "Windows"
 msgstr "視窗"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "桌面"
 
@@ -271,32 +271,37 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr "無效的命令列引數「%s」\n"
 
-#: openbox/screen.c:85 openbox/screen.c:186
+#: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "螢幕 %d 中已經有視窗管理員在運行"
 
-#: openbox/screen.c:122
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "無法於螢幕 %d 獲選為視窗管理員"
 
-#: openbox/screen.c:143
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "螢幕 %d 中的視窗管理員並未離開"
 
-#: openbox/session.c:100
+#: openbox/screen.c:939
+#, c-format
+msgid "desktop %i"
+msgstr "桌面 %i"
+
+#: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "無法製作目錄「%s」：%s"
 
-#: openbox/session.c:444
+#: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "無法儲存執行階段到「%s」：%s"
 
-#: openbox/session.c:554
+#: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "當儲存執行階段「%s」時發生錯誤：%s"
@@ -330,6 +335,3 @@ msgstr "要求的按鍵「%s」不存在於畫面之中"
 #, c-format
 msgid "X Error: %s"
 msgstr "X 錯誤：%s"
-
-#~ msgid "desktop %i"
-#~ msgstr "桌面 %i"

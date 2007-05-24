@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 22:49+0200\n"
+"POT-Creation-Date: 2007-05-24 14:51+0200\n"
 "PO-Revision-Date: 2007-05-21 18:09+0100\n"
 "Last-Translator: Paweł Rusinek <p.rusinek@gmail.com>\n"
 "Language-Team: None\n"
@@ -16,22 +16,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:953
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Wywołano niepoprawną akcję '%s'. Taka akcja nie istnieje."
 
-#: openbox/action.c:957
+#: openbox/action.c:956
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Niepoprawne użycie akcji '%s'. Akcja zostanie pominięta."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Nie udało się uruchomić '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1264
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Nie można przekonwertować ścieżki '%s' z kodowania utf8"
@@ -44,7 +44,7 @@ msgstr "Przejdź..."
 msgid "Windows"
 msgstr "Okna"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Pulpity"
 
@@ -277,32 +277,37 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr "Niepoprawny argument '%s'\n"
 
-#: openbox/screen.c:85 openbox/screen.c:186
+#: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Menedżer okien jest już uruchomiony na ekranie %d"
 
-#: openbox/screen.c:122
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 
-#: openbox/screen.c:143
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
 
-#: openbox/session.c:100
+#: openbox/screen.c:939
+#, c-format
+msgid "desktop %i"
+msgstr "pulpit %i"
+
+#: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Nie można utworzyć katalogu '%s': %s"
 
-#: openbox/session.c:444
+#: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Nie można zapisać sesji do '%s': %s"
 
-#: openbox/session.c:554
+#: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Wystąpił błąd podczas zapisywania sesji do '%s': %s"
@@ -336,6 +341,3 @@ msgstr "Żądany klawisz '%s' nie istnieje na ekranie"
 #, c-format
 msgid "X Error: %s"
 msgstr "Błąd serwera X: %s"
-
-#~ msgid "desktop %i"
-#~ msgstr "pulpit %i"

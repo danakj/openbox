@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 22:49+0200\n"
+"POT-Creation-Date: 2007-05-24 14:51+0200\n"
 "PO-Revision-Date: 2007-05-23 00:34+0200\n"
 "Last-Translator: Althaser <Althaser@gmail.com>\n"
 "Language-Team: None\n"
@@ -16,22 +16,22 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:953
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Pedido de acção '%s' inválido. Não existem quaisquer acções."
 
-#: openbox/action.c:957
+#: openbox/action.c:956
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Uso inválido da acção '%s'. A acção será ignorada."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Falha a executar '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1264
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Falha a converter o caminho '%s' do utf8"
@@ -44,7 +44,7 @@ msgstr "Ir para..."
 msgid "Windows"
 msgstr "Janelas"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Áreas de trabalho"
 
@@ -275,32 +275,37 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr "Argumento inválido na linha de comandos '%s'\n"
 
-#: openbox/screen.c:85 openbox/screen.c:186
+#: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "O gestor de janelas já está em execução no ecrã %d"
 
-#: openbox/screen.c:122
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Não consegui adequirir o gestor de janelas selecionado no ecrã %d"
 
-#: openbox/screen.c:143
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "O gestor de janelas no ecrã %d não está fechando"
 
-#: openbox/session.c:100
+#: openbox/screen.c:939
+#, c-format
+msgid "desktop %i"
+msgstr "trabalho %i"
+
+#: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Incapaz de criar o directório '%s': %s "
 
-#: openbox/session.c:444
+#: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Incapaz de guardar a sessão em '%s': %s"
 
-#: openbox/session.c:554
+#: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Erro enquanto guardava a sessão em '%s': %s"
@@ -334,6 +339,3 @@ msgstr "Chave pedida '%s' não existe no ecrã"
 #, c-format
 msgid "X Error: %s"
 msgstr "Erro no X: %s"
-
-#~ msgid "desktop %i"
-#~ msgstr "trabalho %i"

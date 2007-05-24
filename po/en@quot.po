@@ -29,8 +29,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.3.991\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 22:49+0200\n"
-"PO-Revision-Date: 2007-05-23 22:49+0200\n"
+"POT-Creation-Date: 2007-05-24 14:51+0200\n"
+"PO-Revision-Date: 2007-05-24 14:51+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -38,22 +38,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:953
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Invalid action ‘%s’ requested. No such action exists."
 
-#: openbox/action.c:957
+#: openbox/action.c:956
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Invalid use of action '%s'. Action will be ignored."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Failed to execute '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1264
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Failed to convert the path ‘%s’ from utf8"
@@ -66,7 +66,7 @@ msgstr "Go there..."
 msgid "Windows"
 msgstr "Windows"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Desktops"
 
@@ -293,32 +293,37 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr "Invalid command line argument ‘%s’\n"
 
-#: openbox/screen.c:85 openbox/screen.c:186
+#: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "A window manager is already running on screen %d"
 
-#: openbox/screen.c:122
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Could not acquire window manager selection on screen %d"
 
-#: openbox/screen.c:143
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "The WM on screen %d is not exiting"
 
-#: openbox/session.c:100
+#: openbox/screen.c:939
+#, c-format
+msgid "desktop %i"
+msgstr "desktop %i"
+
+#: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Unable to make directory '%s': %s"
 
-#: openbox/session.c:444
+#: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
 msgstr "Unable to save the session to '%s': %s"
 
-#: openbox/session.c:554
+#: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
 msgstr "Error while saving the session to '%s': %s"

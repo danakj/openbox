@@ -251,6 +251,7 @@ void frame_show(ObFrame *self)
     if (!self->visible) {
         self->visible = TRUE;
         XMapWindow(ob_display, self->client->window);
+        XMapWindow(ob_display, self->plate);
         XMapWindow(ob_display, self->window);
     }
 }
@@ -261,6 +262,10 @@ void frame_hide(ObFrame *self)
         self->visible = FALSE;
         if (!frame_iconify_animating(self))
             XUnmapWindow(ob_display, self->window);
+        /* unmap the plate along with the client. some people (libwnck) look
+           to see if it is unmapped when the client is iconified, for whatever
+           reason. so let's play along... */
+        XUnmapWindow(ob_display, self->plate);
         /* we unmap the client itself so that we can get MapRequest
            events, and because the ICCCM tells us to! */
         XUnmapWindow(ob_display, self->client->window);
@@ -696,7 +701,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
-    if (moved || resized) {
+    if ((moved || resized) && !fake) {
         /* find the new coordinates, done after setting the frame.size, for
            frame_client_gravity. */
         self->area.x = self->client->area.x;
@@ -751,16 +756,24 @@ static void frame_adjust_cursors(ObFrame *self)
 {
     if ((self->functions & OB_CLIENT_FUNC_RESIZE) !=
         (self->client->functions & OB_CLIENT_FUNC_RESIZE) ||
-        ((self->max_horz && self->max_vert) !=
-         (self->client->max_horz && self->client->max_vert)))
+        self->max_horz != self->client->max_horz ||
+        self->max_vert != self->client->max_vert)
     {
         gboolean r = (self->client->functions & OB_CLIENT_FUNC_RESIZE) &&
             !(self->client->max_horz && self->client->max_vert);
+        gboolean topbot = !self->client->max_vert;
         XSetWindowAttributes a;
 
-        a.cursor = ob_cursor(r ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
+        /* these ones turn off when max vert */
+        a.cursor = ob_cursor(r && topbot ? OB_CURSOR_NORTH : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->topresize, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->titletop, CWCursor, &a);
+        a.cursor = ob_cursor(r && topbot ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
+        XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handletop, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->handlebottom, CWCursor, &a);
+
+        /* these ones don't */
         a.cursor = ob_cursor(r ? OB_CURSOR_NORTHWEST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->tltresize, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->tllresize, CWCursor, &a);
@@ -775,10 +788,6 @@ static void frame_adjust_cursors(ObFrame *self)
         XChangeWindowAttributes(ob_display, self->left, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_EAST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->right, CWCursor, &a);
-        a.cursor = ob_cursor(r ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
-        XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
-        XChangeWindowAttributes(ob_display, self->handletop, CWCursor, &a);
-        XChangeWindowAttributes(ob_display, self->handlebottom, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHWEST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->lgrip, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->handleleft, CWCursor, &a);
@@ -1259,6 +1268,10 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
            context */
         return OB_FRAME_CONTEXT_TITLEBAR;
     }
+    else if (self->max_vert &&
+             (win == self->titletop || win == self->topresize))
+        /* can't resize vertically when max vert */
+        return OB_FRAME_CONTEXT_TITLEBAR;
 
     if (win == self->window)            return OB_FRAME_CONTEXT_FRAME;
     if (win == self->label)             return OB_FRAME_CONTEXT_TITLEBAR;
@@ -1311,17 +1324,20 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case NorthGravity:
     case SouthGravity:
     case CenterGravity:
-        *x -= (self->size.left + w) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *x -= (self->size.right - self->size.left) / 2;
         break;
 
     case NorthEastGravity:
     case SouthEastGravity:
     case EastGravity:
-        *x -= (self->size.left + self->size.right + w) - 1;
+        /* the right side of the client will be the right side of the frame */
+        *x -= self->size.right + self->size.left;
         break;
 
     case ForgetGravity:
     case StaticGravity:
+        /* the client's position won't move */
         *x -= self->size.left;
         break;
     }
@@ -1337,17 +1353,20 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case CenterGravity:
     case EastGravity:
     case WestGravity:
-        *y -= (self->size.top + h) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *y -= (self->size.bottom - self->size.top) / 2;
         break;
 
     case SouthWestGravity:
     case SouthEastGravity:
     case SouthGravity:
-        *y -= (self->size.top + self->size.bottom + h) - 1;
+        /* the bottom of the client will be the bottom of the frame */
+        *y -= self->size.bottom + self->size.top;
         break;
 
     case ForgetGravity:
     case StaticGravity:
+        /* the client's position won't move */
         *y -= self->size.top;
         break;
     }
@@ -1365,15 +1384,18 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case NorthGravity:
     case CenterGravity:
     case SouthGravity:
-        *x += (self->size.left + w) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *x += (self->size.right - self->size.left) / 2;
         break;
     case NorthEastGravity:
     case EastGravity:
     case SouthEastGravity:
-        *x += (self->size.left + self->size.right + w) - 1;
+        /* the right side of the client will be the right side of the frame */
+        *x += self->size.right + self->size.left;
         break;
     case StaticGravity:
     case ForgetGravity:
+        /* the client's position won't move */
         *x += self->size.left;
         break;
     }
@@ -1388,15 +1410,18 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case WestGravity:
     case CenterGravity:
     case EastGravity:
-        *y += (self->size.top + h) / 2;
+        /* the middle of the client will be the middle of the frame */
+        *y += (self->size.bottom - self->size.top) / 2;
         break;
     case SouthWestGravity:
     case SouthGravity:
     case SouthEastGravity:
-        *y += (self->size.top + self->size.bottom + h) - 1;
+        /* the bottom of the client will be the bottom of the frame */
+        *y += self->size.bottom + self->size.top;
         break;
     case StaticGravity:
     case ForgetGravity:
+        /* the client's position won't move */
         *y += self->size.top;
         break;
     }

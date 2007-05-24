@@ -40,6 +40,9 @@ manpage.1: manpage.sgml
       any session manager. Without a session manager, you will not be able
       to save your state from one log in to the next.</para>
 
+    <para><command>&dhpackage;</command> does not take any command line
+      arguments.</para>
+
     <para>On log in, <command>&dhpackage;</command> will run the
       ~/.config/openbox/autostart.sh script if it exists, and will run the
       system-wide script @configdir@/openbox/autostart.sh otherwise. You may

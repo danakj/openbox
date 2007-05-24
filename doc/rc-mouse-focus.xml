@@ -88,14 +88,20 @@
 
 <desktops>
   <!-- this stuff is only used at startup, pagers allow you to change them
-       during a session -->
+       during a session
+
+       these are default values to use when other ones are not already set
+       by other applications, or saved in your session
+
+       use obconf if you want to change these without having to log out
+       and back in -->
   <number>4</number>
   <firstdesk>1</firstdesk>
   <names>
-    <name>desktop one</name>
-    <name>desktop two</name>
-    <name>desktop three</name>
-    <name>desktop four</name>
+    <!-- set names up here if you want to, like this:
+    <name>desktop 1</name>
+    <name>desktop 2</name>
+    -->
   </names>
 </desktops>
 
@@ -528,63 +534,77 @@
   <applicationIcons>yes</applicationIcons>
 </menu>
 
-<!-- this section is commented out.. remove this and the ending comment if you
-     want to use it -->
 <applications>
-  <!-- the name or the class can be set, or both. this is used to match
-       windows when they appear
+<!--
+  # this is an example with comments through out. use these to make your
+  # own rules, but without the comments of course.
 
-       role can optionally be set, and only as much as you provide will be 
-       checked to see if it matches, eg. if you set role="abc" and the window's
-       role is actually "abcde" it would match.
- -->
   <application name="first element of window's WM_CLASS property (see xprop)"
               class="second element of window's WM_CLASS property (see xprop)"
                role="the window's WM_WINDOW_ROLE property (see xprop)">
+  # the name or the class can be set, or both. this is used to match
+  # windows when they appear. role can optionally be set as well, to
+  # further restrict your matches.
 
-    <!-- each element can be left out or set to 'default' to specify to not 
-         change that attribute of the window -->
+  # the name, class, and role use simple wildcard matching such as those
+  # used by a shell. you can use * to match any characters and ? to match
+  # any single character.
+
+  # when multiple rules match a window, they will all be applied, in the
+  # order that they appear in this list
+
+
+    # each element can be left out or set to 'default' to specify to not 
+    # change that attribute of the window
 
     <decor>yes</decor>
+    # enable or disable window decorations
 
     <shade>no</shade>
+    # make the window shaded when it appears, or not
 
     <position>
-      <!-- the position is only used if both an x and y coordinate are provided
-           (and not set to 'default') -->
+      # the position is only used if both an x and y coordinate are provided
+      # (and not set to 'default')
       <x>center</x>
-      <!-- a number or 'center' to center on screen -->
+      # a number like 50, or 'center' to center on screen
       <y>200</y>
-      <!-- a number or 'center' to center on screen -->
+      # a number like 50, or 'center' to center on screen
       <monitor>1</monitor>
-      <!-- specifies the monitor in a xinerama setup.
-           1 is the first head, or 'mouse' for wherever the mouse is -->
+      # specifies the monitor in a xinerama setup.
+      # 1 is the first head, or 'mouse' for wherever the mouse is
     </position>
 
     <focus>yes</focus>
-    <!-- if the window should try be given focus when it appears -->
+    # if the window should try be given focus when it appears. if this is set
+    # to yes it doesn't guarantee the window will be given focus. some
+    # restrictions may apply, but Openbox will try to
 
     <desktop>1</desktop>
-    <!-- 1 is the first desktop, 'all' for all desktops -->
+    # 1 is the first desktop, 'all' for all desktops
 
     <layer>normal</layer>
-    <!-- 'above', 'normal', or 'below' -->
+    # 'above', 'normal', or 'below'
 
     <iconic>no</iconic>
+    # make the window iconified when it appears, or not
 
     <skip_pager>no</skip_pager>
-    <!-- asks to not be shown in pagers -->
+    # asks to not be shown in pagers
 
     <skip_taskbar>no</skip_taskbar>
-    <!-- asks to not be shown in taskbars. window cycling actions will also
-         skip past such windows -->
+    # asks to not be shown in taskbars. window cycling actions will also
+    # skip past such windows
 
     <fullscreen>yes</fullscreen>
+    # make the window in fullscreen mode when it appears
 
     <maximized>true</maximized>
-    <!-- 'Horizontal', 'Vertical' or boolean (yes/no/on/off/true/false) -->
+    # 'Horizontal', 'Vertical' or boolean (yes/no)
   </application>
+
+  # end of the example
+-->
 </applications>
- -->
 
 </openbox_config>

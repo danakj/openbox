@@ -146,7 +146,19 @@ static void font_measure_full(const RrFont *f, const gchar *str,
 
     pango_layout_set_text(f->layout, str, -1);
     pango_layout_set_width(f->layout, -1);
-    pango_layout_get_pixel_extents(f->layout, NULL, &rect);
+
+    /* pango_layout_get_pixel_extents lies! this is the right way to get the
+       size of the text's area */
+    pango_layout_get_extents(f->layout, NULL, &rect);
+#if PANGO_VERSION_MAJOR > 1 || \
+    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
+    /* pass the logical rect as the ink rect, this is on purpose so we get the
+       full area for the text */
+    pango_extents_to_pixels(&rect, NULL);
+#else
+    rect.width = (rect.width + PANGO_SCALE - 1) / PANGO_SCALE;
+    rect.height = (rect.height + PANGO_SCALE - 1) / PANGO_SCALE;
+#endif
     *x = rect.width + ABS(shadow_x) + 4 /* we put a 2 px edge on each side */;
     *y = rect.height + ABS(shadow_y);
 }

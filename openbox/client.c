@@ -735,11 +735,13 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         if (app->name &&
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
             match = FALSE;
-        if (app->class &&
-            !g_pattern_match(app->class, strlen(self->class),self->class,NULL))
+        else if (app->class &&
+                !g_pattern_match(app->class,
+                                 strlen(self->class), self->class, NULL))
             match = FALSE;
-        if (app->role &&
-            !g_pattern_match(app->role, strlen(self->role), self->role, NULL))
+        else if (app->role &&
+                 !g_pattern_match(app->role,
+                                  strlen(self->role), self->role, NULL))
             match = FALSE;
 
         if (match) {
@@ -751,46 +753,44 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         }
     }
 
-    if (settings) {
-        if (settings->shade != -1)
-            self->shaded = !!settings->shade;
-        if (settings->decor != -1)
-            self->undecorated = !settings->decor;
-        if (settings->iconic != -1)
-            self->iconic = !!settings->iconic;
-        if (settings->skip_pager != -1)
-            self->skip_pager = !!settings->skip_pager;
-        if (settings->skip_taskbar != -1)
-            self->skip_taskbar = !!settings->skip_taskbar;
+    if (settings->shade != -1)
+        self->shaded = !!settings->shade;
+    if (settings->decor != -1)
+        self->undecorated = !settings->decor;
+    if (settings->iconic != -1)
+        self->iconic = !!settings->iconic;
+    if (settings->skip_pager != -1)
+        self->skip_pager = !!settings->skip_pager;
+    if (settings->skip_taskbar != -1)
+        self->skip_taskbar = !!settings->skip_taskbar;
 
-        if (settings->max_vert != -1)
-            self->max_vert = !!settings->max_vert;
-        if (settings->max_horz != -1)
-            self->max_horz = !!settings->max_horz;
+    if (settings->max_vert != -1)
+        self->max_vert = !!settings->max_vert;
+    if (settings->max_horz != -1)
+        self->max_horz = !!settings->max_horz;
 
-        if (settings->fullscreen != -1)
-            self->fullscreen = !!settings->fullscreen;
+    if (settings->fullscreen != -1)
+        self->fullscreen = !!settings->fullscreen;
 
-        if (settings->desktop) {
-            if (settings->desktop == DESKTOP_ALL)
-                self->desktop = settings->desktop;
-            else if (settings->desktop > 0 &&
-                     settings->desktop <= screen_num_desktops)
-                self->desktop = settings->desktop - 1;
-        }
+    if (settings->desktop) {
+        if (settings->desktop == DESKTOP_ALL)
+            self->desktop = settings->desktop;
+        else if (settings->desktop > 0 &&
+                 settings->desktop <= screen_num_desktops)
+            self->desktop = settings->desktop - 1;
+    }
 
-        if (settings->layer == -1) {
-            self->below = TRUE;
-            self->above = FALSE;
-        }
-        else if (settings->layer == 0) {
-            self->below = FALSE;
-            self->above = FALSE;
-        }
-        else if (settings->layer == 1) {
-            self->below = FALSE;
-            self->above = TRUE;
-        }
+    if (settings->layer == -1) {
+        self->below = TRUE;
+        self->above = FALSE;
+    }
+    else if (settings->layer == 0) {
+        self->below = FALSE;
+        self->above = FALSE;
+    }
+    else if (settings->layer == 1) {
+        self->below = FALSE;
+        self->above = TRUE;
     }
     return settings;
 }
@@ -962,16 +962,13 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
      * xterm -geometry resolution-width/2 will work fine. Trying to
      * place it completely offscreen will be handled in the above code.
      * Sorry for this confused comment, i am tired. */
-    if (fw <= mon_a->width) {
-        if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
-        if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
-            *x = mon_a->x + mon_a->width - fw;
-    }
-    if (fh <= mon_a->height) {
-        if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
-        if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
-            *y = mon_a->y + mon_a->height - fh;
-    }
+    if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
+    if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
+        *x = mon_a->x + MAX(0, mon_a->width - fw);
+
+    if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
+    if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
+        *y = mon_a->y + MAX(0, mon_a->height - fh);
 
     /* get where the client should be */
     frame_frame_gravity(self->frame, x, y, w, h);
@@ -1541,7 +1538,6 @@ void client_update_normal_hints(ObClient *self)
 {
     XSizeHints size;
     glong ret;
-    gint oldgravity = self->gravity;
 
     /* defaults */
     self->min_ratio = 0.0f;
@@ -1558,19 +1554,8 @@ void client_update_normal_hints(ObClient *self)
         */
         self->positioned = (size.flags & (PPosition|USPosition));
 
-        if (size.flags & PWinGravity) {
+        if (size.flags & PWinGravity)
             self->gravity = size.win_gravity;
-      
-            /* if the client has a frame, i.e. has already been mapped and
-               is changing its gravity */
-            if (self->frame && self->gravity != oldgravity) {
-                /* move our idea of the client's position based on its new
-                   gravity */
-                client_convert_gravity(self, oldgravity,
-                                       &self->area.x, &self->area.y,
-                                       self->area.width, self->area.height);
-            }
-        }
 
         if (size.flags & PAspect) {
             if (size.min_aspect.y)
@@ -1635,14 +1620,16 @@ void client_setup_decor_and_functions(ObClient *self)
 
     case OB_CLIENT_TYPE_DIALOG:
     case OB_CLIENT_TYPE_UTILITY:
-        /* these windows cannot be maximized */
-        self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+        /* these windows don't have anything added or removed by default */
         break;
 
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
-        /* these windows get less functionality */
-        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
+        /* these windows can't iconify or maximize */
+        self->decorations &= ~(OB_FRAME_DECOR_ICONIFY |
+                               OB_FRAME_DECOR_MAXIMIZE);
+        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY |
+                             OB_CLIENT_FUNC_MAXIMIZE);
         break;
 
     case OB_CLIENT_TYPE_SPLASH:
@@ -1717,9 +1704,12 @@ void client_setup_decor_and_functions(ObClient *self)
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
 
-    if (self->max_horz && self->max_vert)
+    if (self->max_horz && self->max_vert) {
+        /* you can't resize fully maximized windows */
+        self->functions &= ~OB_CLIENT_FUNC_RESIZE;
         /* kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
+    }
 
     /* If there are no decorations to remove, don't allow the user to try
        toggle the state */
@@ -2286,6 +2276,7 @@ static void client_change_wm_state(ObClient *self)
         state[0] = self->wmstate;
         state[1] = None;
         PROP_SETA32(self->window, wm_state, wm_state, state, 2);
+        ob_debug("setting wm_state %d\n", self->wmstate);
     }
 }
 
@@ -2377,10 +2368,10 @@ static ObStackingLayer calc_layer(ObClient *self)
     }
     else if ((self->fullscreen ||
               /* No decorations and fills the monitor = oldskool fullscreen.
-                 But not for undecorated windows, because the user can do that
+                 But not for maximized windows.
               */
               (self->decorations == 0 &&
-               !self->undecorated &&
+               !(self->max_horz && self->max_vert) &&
                RECT_EQUAL(self->area,
                           *screen_physical_area_monitor
                           (client_monitor(self))))) &&
@@ -2446,13 +2437,13 @@ gboolean client_show(ObClient *self)
     if (client_should_show(self)) {
         frame_show(self->frame);
         show = TRUE;
-    }
 
-    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
-       needs to be in IconicState. This includes when it is on another
-       desktop!
-    */
-    client_change_wm_state(self);
+        /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
+           it needs to be in IconicState. This includes when it is on another
+           desktop!
+        */
+        client_change_wm_state(self);
+    }
     return show;
 }
 
@@ -2475,13 +2466,13 @@ gboolean client_hide(ObClient *self)
 
         frame_hide(self->frame);
         hide = TRUE;
-    }
 
-    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
-       needs to be in IconicState. This includes when it is on another
-       desktop!
-    */
-    client_change_wm_state(self);
+        /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
+           it needs to be in IconicState. This includes when it is on another
+           desktop!
+        */
+        client_change_wm_state(self);
+    }
     return hide;
 }
 
@@ -2489,12 +2480,6 @@ void client_showhide(ObClient *self)
 {
     if (!client_show(self))
         client_hide(self);
-
-    /* According to the ICCCM (sec 4.1.3.1) when a window is not visible, it
-       needs to be in IconicState. This includes when it is on another
-       desktop!
-    */
-    client_change_wm_state(self);
 }
 
 gboolean client_normal(ObClient *self) {
@@ -2574,18 +2559,62 @@ static void client_apply_startup_state(ObClient *self)
     */
 }
 
-void client_convert_gravity(ObClient *self, gint gravity, gint *x, gint *y,
-                            gint w, gint h)
+void client_gravity_resize_w(ObClient *self, gint *x, gint oldw, gint neww)
 {
-    gint oldg = self->gravity;
+    /* these should be the current values. this is for when you're not moving,
+       just resizing */
+    g_assert(*x == self->area.x);
+    g_assert(oldw == self->area.width);
 
-    /* get the frame's position from the requested stuff */
-    self->gravity = gravity;
-    frame_client_gravity(self->frame, x, y, w, h);
-    self->gravity = oldg;
+    /* horizontal */
+    switch (self->gravity) {
+    default:
+    case NorthWestGravity:
+    case WestGravity:
+    case SouthWestGravity:
+    case StaticGravity:
+    case ForgetGravity:
+        break;
+    case NorthGravity:
+    case CenterGravity:
+    case SouthGravity:
+        *x -= (neww - oldw) / 2;
+        break;
+    case NorthEastGravity:
+    case EastGravity:
+    case SouthEastGravity:
+        *x -= neww - oldw;
+        break;
+    }
+}
 
-    /* get the client's position in its true gravity from that */
-    frame_frame_gravity(self->frame, x, y, w, h);
+void client_gravity_resize_h(ObClient *self, gint *y, gint oldh, gint newh)
+{
+    /* these should be the current values. this is for when you're not moving,
+       just resizing */
+    g_assert(*y == self->area.y);
+    g_assert(oldh == self->area.height);
+
+    /* vertical */
+    switch (self->gravity) {
+    default:
+    case NorthWestGravity:
+    case NorthGravity:
+    case NorthEastGravity:
+    case StaticGravity:
+    case ForgetGravity:
+        break;
+    case WestGravity:
+    case CenterGravity:
+    case EastGravity:
+        *y -= (newh - oldh) / 2;
+        break;
+    case SouthWestGravity:
+    case SouthGravity:
+    case SouthEastGravity:
+        *y -= newh - oldh;
+        break;
+    }
 }
 
 void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
@@ -2597,7 +2626,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
        the updated frame dimensions. */
-    frame_adjust_area(self->frame, TRUE, TRUE, TRUE);
+    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
     /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
@@ -2701,7 +2730,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *h = a->height;
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
-                         is entering fullscreen */
+                         is fullscreening */
     } else if (self->max_horz || self->max_vert) {
         Rect *a;
         guint i;
@@ -2719,8 +2748,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
             *h = a->height - self->frame->size.top - self->frame->size.bottom;
         }
 
-        /* maximizing is not allowed if the user can't move+resize the window
-         */
+        user = FALSE; /* ignore if the client can't be moved/resized when it
+                         is maximizing */
     }
 
     /* gets the client's position */
@@ -2788,11 +2817,15 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     /* find the frame's dimensions and move/resize it */
     fmoved = moved;
     fresized = resized;
+
+    /* if decorations changed, then readjust everything for the frame */
     if (self->decorations != fdecor ||
         self->max_horz != fhorz || self->max_vert != fvert)
     {
         fmoved = fresized = TRUE;
     }
+
+    /* adjust the frame */
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 

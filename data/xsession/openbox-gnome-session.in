@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if test -n "$1"; then
+    echo "Syntax: openbox-gnome-session"
+    echo
+    echo "See the openbox-gnome-session(1) manpage for help."
+  exit
+fi
+
 # Run GNOME with Openbox as its window manager
 export WINDOW_MANAGER="@bindir@/openbox"
 exec gnome-session --choose-session=openbox-session "$@"

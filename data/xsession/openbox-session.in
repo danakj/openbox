@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if test -n "$1"; then
+    echo "Syntax: openbox-session"
+    echo
+    echo "See the openbox-session(1) manpage for help."
+  exit
+fi
+
 AUTOSTART="$HOME/.config/openbox/autostart.sh"
 GLOBALAUTOSTART="@configdir@/openbox/autostart.sh"
 

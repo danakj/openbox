@@ -50,13 +50,16 @@
                         SubstructureRedirectMask | FocusChangeMask | \
                         ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
+static gboolean screen_validate_layout(ObDesktopLayout *l);
+static gboolean replace_wm();
+
 guint    screen_num_desktops;
 guint    screen_num_monitors;
 guint    screen_desktop;
 guint    screen_last_desktop;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
-DesktopLayout screen_desktop_layout;
+ObDesktopLayout screen_desktop_layout;
 gchar  **screen_desktop_names;
 Window   screen_support_win;
 Time     screen_desktop_user_time = CurrentTime;
@@ -304,10 +307,9 @@ gboolean screen_annex()
 
 void screen_startup(gboolean reconfig)
 {
-    guint i, numnames;
-    gchar **names;
-    GSList *it;
+    gchar **names = NULL;
     guint32 d;
+    gboolean namesexist = FALSE;
 
     desktop_cycle_popup = pager_popup_new(FALSE);
     pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
@@ -323,21 +325,48 @@ void screen_startup(gboolean reconfig)
     /* get the initial size */
     screen_resize();
 
-    /* get the desktop names */
-    numnames = g_slist_length(config_desktops_names);
-    names = g_new(gchar*, numnames + 1);
-    names[numnames] = NULL;
-    for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
-        names[i] = g_strdup(it->data);
+    /* have names already been set for the desktops? */
+    if (PROP_GETSS(RootWindow(ob_display, ob_screen),
+                   net_desktop_names, utf8, &names))
+    {
+        g_strfreev(names);
+        namesexist = TRUE;
+    }
 
-    /* set the root window property */
-    PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
+    /* if names don't exist and we have session names, set those.
+       do this stuff BEFORE setting the number of desktops, because that
+       will create default names for them
+    */
+    if (!namesexist && session_desktop_names != NULL) {
+        guint i, numnames;
+        GSList *it;
 
-    g_strfreev(names);
+        /* get the desktop names */
+        numnames = g_slist_length(session_desktop_names);
+        names = g_new(gchar*, numnames + 1);
+        names[numnames] = NULL;
+        for (i = 0, it = session_desktop_names; it; ++i, it = g_slist_next(it))
+            names[i] = g_strdup(it->data);
 
-    /* set the number of desktops */
+        /* set the root window property */
+        PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,names);
+
+        g_strfreev(names);
+    }
+
+    /* set the number of desktops, if it's not already set.
+
+       this will also set the default names from the config file up for
+       desktops that don't have names yet */
     screen_num_desktops = 0;
-    screen_set_num_desktops(config_desktops_num);
+    if (PROP_GET32(RootWindow(ob_display, ob_screen),
+                   net_number_of_desktops, cardinal, &d))
+        screen_set_num_desktops(d);
+    /* restore from session if possible */
+    else if (session_num_desktops)
+        screen_set_num_desktops(session_num_desktops);
+    else
+        screen_set_num_desktops(config_desktops_num);
 
     /* start on the current desktop when a wm was already running */
     if (PROP_GET32(RootWindow(ob_display, ob_screen),
@@ -357,7 +386,13 @@ void screen_startup(gboolean reconfig)
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_showing_desktop, cardinal, screen_showing_desktop);
 
-    screen_update_layout();
+    if (session_desktop_layout_present &&
+        screen_validate_layout(&session_desktop_layout))
+    {
+        screen_desktop_layout = session_desktop_layout;
+    }
+    else
+        screen_update_layout();
 }
 
 void screen_shutdown(gboolean reconfig)
@@ -787,95 +822,90 @@ show_cycle_dialog:
     return ret;
 }
 
-void screen_update_layout()
+static gboolean screen_validate_layout(ObDesktopLayout *l)
 {
-    ObOrientation orient;
-    ObCorner corner;
-    guint rows;
-    guint cols;
+    if (l->columns == 0 && l->rows == 0) /* both 0's is bad data.. */
+        return FALSE;
+
+    /* fill in a zero rows/columns */
+    if (l->columns == 0) {
+        l->columns = screen_num_desktops / l->rows;
+        if (l->rows * l->columns < screen_num_desktops)
+            l->columns++;
+        if (l->rows * l->columns >= screen_num_desktops + l->columns)
+            l->rows--;
+    } else if (l->rows == 0) {
+        l->rows = screen_num_desktops / l->columns;
+        if (l->columns * l->rows < screen_num_desktops)
+            l->rows++;
+        if (l->columns * l->rows >= screen_num_desktops + l->rows)
+            l->columns--;
+    }
+
+    /* bounds checking */
+    if (l->orientation == OB_ORIENTATION_HORZ) {
+        l->columns = MIN(screen_num_desktops, l->columns);
+        l->rows = MIN(l->rows,
+                      (screen_num_desktops + l->columns - 1) / l->columns);
+        l->columns = screen_num_desktops / l->rows +
+            !!(screen_num_desktops % l->rows);
+    } else {
+        l->rows = MIN(screen_num_desktops, l->rows);
+        l->columns = MIN(l->columns,
+                         (screen_num_desktops + l->rows - 1) / l->rows);
+        l->rows = screen_num_desktops / l->columns +
+            !!(screen_num_desktops % l->columns);
+    }
+    return TRUE;
+}
+
+void screen_update_layout()
+
+{
+    ObDesktopLayout l;
     guint32 *data;
     guint num;
-    gboolean valid = FALSE;
+
+    screen_desktop_layout.orientation = OB_ORIENTATION_HORZ;
+    screen_desktop_layout.start_corner = OB_CORNER_TOPLEFT;
+    screen_desktop_layout.rows = 1;
+    screen_desktop_layout.columns = screen_num_desktops;
 
     if (PROP_GETA32(RootWindow(ob_display, ob_screen),
                     net_desktop_layout, cardinal, &data, &num)) {
         if (num == 3 || num == 4) {
-
+            
             if (data[0] == prop_atoms.net_wm_orientation_vert)
-                orient = OB_ORIENTATION_VERT;
+                l.orientation = OB_ORIENTATION_VERT;
             else if (data[0] == prop_atoms.net_wm_orientation_horz)
-                orient = OB_ORIENTATION_HORZ;
+                l.orientation = OB_ORIENTATION_HORZ;
             else
-                goto screen_update_layout_bail;
+                return;
 
             if (num < 4)
-                corner = OB_CORNER_TOPLEFT;
+                l.start_corner = OB_CORNER_TOPLEFT;
             else {
                 if (data[3] == prop_atoms.net_wm_topleft)
-                    corner = OB_CORNER_TOPLEFT;
+                    l.start_corner = OB_CORNER_TOPLEFT;
                 else if (data[3] == prop_atoms.net_wm_topright)
-                    corner = OB_CORNER_TOPRIGHT;
+                    l.start_corner = OB_CORNER_TOPRIGHT;
                 else if (data[3] == prop_atoms.net_wm_bottomright)
-                    corner = OB_CORNER_BOTTOMRIGHT;
+                    l.start_corner = OB_CORNER_BOTTOMRIGHT;
                 else if (data[3] == prop_atoms.net_wm_bottomleft)
-                    corner = OB_CORNER_BOTTOMLEFT;
+                    l.start_corner = OB_CORNER_BOTTOMLEFT;
                 else
-                    goto screen_update_layout_bail;
+                    return;
             }
 
-            cols = data[1];
-            rows = data[2];
+            l.columns = data[1];
+            l.rows = data[2];
 
-            /* fill in a zero rows/columns */
-            if ((cols == 0 && rows == 0)) { /* both 0's is bad data.. */
-                goto screen_update_layout_bail;
-            } else {
-                if (cols == 0) {
-                    cols = screen_num_desktops / rows;
-                    if (rows * cols < screen_num_desktops)
-                        cols++;
-                    if (rows * cols >= screen_num_desktops + cols)
-                        rows--;
-                } else if (rows == 0) {
-                    rows = screen_num_desktops / cols;
-                    if (cols * rows < screen_num_desktops)
-                        rows++;
-                    if (cols * rows >= screen_num_desktops + rows)
-                        cols--;
-                }
-            }
+            if (screen_validate_layout(&l))
+                screen_desktop_layout = l;
 
-            /* bounds checking */
-            if (orient == OB_ORIENTATION_HORZ) {
-                cols = MIN(screen_num_desktops, cols);
-                rows = MIN(rows, (screen_num_desktops + cols - 1) / cols);
-                cols = screen_num_desktops / rows +
-                    !!(screen_num_desktops % rows);
-            } else {
-                rows = MIN(screen_num_desktops, rows);
-                cols = MIN(cols, (screen_num_desktops + rows - 1) / rows);
-                rows = screen_num_desktops / cols +
-                    !!(screen_num_desktops % cols);
-            }
-
-            valid = TRUE;
+            g_free(data);
         }
-    screen_update_layout_bail:
-        g_free(data);
     }
-
-    if (!valid) {
-        /* defaults */
-        orient = OB_ORIENTATION_HORZ;
-        corner = OB_CORNER_TOPLEFT;
-        rows = 1;
-        cols = screen_num_desktops;
-    }
-
-    screen_desktop_layout.orientation = orient;
-    screen_desktop_layout.start_corner = corner;
-    screen_desktop_layout.rows = rows;
-    screen_desktop_layout.columns = cols;
 }
 
 void screen_update_desktop_names()
@@ -892,11 +922,29 @@ void screen_update_desktop_names()
     else
         i = 0;
     if (i < screen_num_desktops) {
+        GSList *it;
+
         screen_desktop_names = g_renew(gchar*, screen_desktop_names,
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
-        for (; i < screen_num_desktops; ++i)
-            screen_desktop_names[i] = g_strdup_printf("desktop %i", i + 1);
+
+        it = g_slist_nth(config_desktops_names, i);
+
+        for (; i < screen_num_desktops; ++i) {
+            if (it)
+                /* use the names from the config file when possible */
+                screen_desktop_names[i] = g_strdup(it->data);
+            else
+                /* make up a nice name if it's not though */
+                screen_desktop_names[i] = g_strdup_printf(_("desktop %i"),
+                                                          i + 1);
+            if (it) it = g_slist_next(it);
+        }
+
+        /* if we changed any names, then set the root property so we can
+           all agree on the names */
+        PROP_SETSS(RootWindow(ob_display, ob_screen), net_desktop_names,
+                   screen_desktop_names);
     }
 
     /* resize the pager for these names */

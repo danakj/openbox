@@ -136,33 +136,30 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     ObMenu *menu = frame->menu;
     guint i;
     GSList *it, *next;
-    
-    it = desktop_menus;
-    for (i = 0; i < screen_num_desktops; ++i) {
-        if (!it) {
-            ObMenu *submenu;
-            gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
-            DesktopData *data = g_new(DesktopData, 1);
 
-            data->desktop = i;
-            submenu = menu_new(name, screen_desktop_names[i], FALSE, data);
-            menu_set_update_func(submenu, desk_menu_update);
-            menu_set_execute_func(submenu, desk_menu_execute);
-            menu_set_destroy_func(submenu, desk_menu_destroy);
+    menu_clear_entries(menu);
 
-            menu_add_submenu(menu, i, name);
-
-            g_free(name);
-
-            desktop_menus = g_slist_append(desktop_menus, submenu);
-        } else
-            it = g_slist_next(it);
+    while (desktop_menus) {
+        menu_free(desktop_menus->data);
+        desktop_menus = g_slist_delete_link(desktop_menus, desktop_menus);
     }
-    for (; it; it = next, ++i) {
-        next = g_slist_next(it);
-        menu_free(it->data);
-        desktop_menus = g_slist_delete_link(desktop_menus, it);
-        menu_entry_remove(menu_find_entry_id(menu, i));
+    
+    for (i = 0; i < screen_num_desktops; ++i) {
+        ObMenu *submenu;
+        gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
+        DesktopData *data = g_new(DesktopData, 1);
+
+        data->desktop = i;
+        submenu = menu_new(name, screen_desktop_names[i], FALSE, data);
+        menu_set_update_func(submenu, desk_menu_update);
+        menu_set_execute_func(submenu, desk_menu_execute);
+        menu_set_destroy_func(submenu, desk_menu_destroy);
+
+        menu_add_submenu(menu, i, name);
+
+        g_free(name);
+
+        desktop_menus = g_slist_append(desktop_menus, submenu);
     }
 
     return TRUE; /* always show */

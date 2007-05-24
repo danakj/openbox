@@ -369,7 +369,7 @@ void client_manage(Window window)
     placex = self->area.x;
     placey = self->area.y;
 
-    /* figure out placement for the window */
+    /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
 
@@ -380,6 +380,27 @@ void client_manage(Window window)
                     "BADNESS !?"))), self->area.x, self->area.y);
 
         transient = place_client(self, &placex, &placey, settings);
+
+        /* if the window isn't user-positioned, then make it fit inside
+           the visible screen area on its monitor.
+
+           the monitor is chosen by place_client! */
+        if (!(self->positioned & USPosition)) {
+            /* make a copy to modify */
+            Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
+
+            /* shrink by the frame's area */
+            a.width -= self->frame->size.left + self->frame->size.right;
+            a.height -= self->frame->size.top + self->frame->size.bottom;
+
+            /* fit the window inside the area */
+            self->area.width = MIN(self->area.width, a.width);
+            self->area.height = MIN(self->area.height, a.height);
+
+            /* adjust the frame to the client's new size */
+            frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+            frame_adjust_client_area(self->frame);
+        }
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &placex, &placey,

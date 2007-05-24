@@ -186,12 +186,8 @@ void focus_nothing()
         screen_install_colormap(NULL, TRUE);
     }
 
-    /* Don't set focus_client to NULL here. It will be set to NULL when the
-       FocusOut event comes. Otherwise, if we focus nothing and then focus the
-       same window again, The focus code says nothing changed, but focus_client
-       ends up being NULL anyways.
-    focus_client = NULL;
-    */
+    /* nothing is focused, update the colormap and _the root property_ */
+    focus_set_client(NULL);
 
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events

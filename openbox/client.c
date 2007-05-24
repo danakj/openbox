@@ -2368,10 +2368,10 @@ static ObStackingLayer calc_layer(ObClient *self)
     }
     else if ((self->fullscreen ||
               /* No decorations and fills the monitor = oldskool fullscreen.
-                 But not for undecorated windows, because the user can do that
+                 But not for maximized windows.
               */
               (self->decorations == 0 &&
-               !self->undecorated &&
+               !(self->max_horz && self->max_vert) &&
                RECT_EQUAL(self->area,
                           *screen_physical_area_monitor
                           (client_monitor(self))))) &&

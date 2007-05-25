@@ -537,8 +537,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
        with us, they don't get hidden
     */
     if (dofocus
-        && (!focus_client || (focus->client.desktop != DESKTOP_ALL
-                              && focus->client.desktop != num))
+        && (!focus_client || (focus_client->desktop != DESKTOP_ALL
+                              && focus_client->desktop != num))
         && (c = focus_fallback(TRUE)))
     {
         /* only do the flicker reducing stuff ahead of time if we are going

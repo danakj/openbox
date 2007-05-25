@@ -539,13 +539,6 @@ static void event_process(const XEvent *ec, gpointer data)
         gboolean nomove = FALSE;
         XEvent ce;
 
-        if (client) {
-            frame_adjust_focus(client->frame, FALSE);
-            /* focus_set_client(NULL) has already been called in this
-               section or by focus_fallback */
-            client_calc_layer(client);
-        }
-
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, event_look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
@@ -580,6 +573,13 @@ static void event_process(const XEvent *ec, gpointer data)
                               ce.xfocus.window);
                 focus_fallback(TRUE);
             }
+        }
+
+        if (client && client != focus_client) {
+            frame_adjust_focus(client->frame, FALSE);
+            /* focus_set_client(NULL) has already been called in this
+               section or by focus_fallback */
+            client_calc_layer(client);
         }
     } else if (timewinclients)
         event_handle_user_time_window_clients(timewinclients, e);

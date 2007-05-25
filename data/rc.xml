@@ -26,7 +26,6 @@
 <theme>
   <name>Clearlooks</name>
   <titleLayout>NLIMC</titleLayout>
-  <titleNumber>yes</titleNumber>
   <!--
       avaible characters are NDSLIMC, each can occur at most once.
       N: window icon

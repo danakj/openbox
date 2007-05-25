@@ -938,7 +938,7 @@ void screen_update_desktop_names()
         it = g_slist_nth(config_desktops_names, i);
 
         for (; i < screen_num_desktops; ++i) {
-            if (it)
+            if (it && ((char*)it->data)[0]) /* not empty */
                 /* use the names from the config file when possible */
                 screen_desktop_names[i] = g_strdup(it->data);
             else

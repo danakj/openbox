@@ -526,7 +526,10 @@ static void event_process(const XEvent *ec, gpointer data)
 
             /* If you send focus to a window and then it disappears, you can
                get the FocusIn for it, after it is unmanaged.
-               Just wait for the next FocusOut/FocusIn pair. */
+               Just wait for the next FocusOut/FocusIn pair, but note that
+               nothing is focused now.
+            */
+            focus_set_client(NULL);
         }
         else if (client != focus_client) {
             focus_left_screen = FALSE;

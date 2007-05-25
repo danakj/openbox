@@ -146,8 +146,9 @@ static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old,
              /* if not just see if we could try, or it's already focused */
              (!send_focus && (c == old || client_can_focus(c)))))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order (%d)\n",
-                          send_focus);
+            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order (%d) 0x%x "
+                          "from 0x%x\n",
+                          send_focus, c, old);
             return c;
         }
     }

@@ -1588,8 +1588,8 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
         menu_frame_select_next(frame);
     }
 
-    /* keyboard accelerator shortcuts. */
-    else if (ev->xkey.state == 0 &&
+    /* keyboard accelerator shortcuts. (allow controlmask) */
+    else if ((ev->xkey.state & ~ControlMask) == 0 &&
              /* was it a valid key? */
              unikey != 0 &&
              /* don't bother if the menu is empty. */

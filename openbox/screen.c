@@ -530,16 +530,17 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
+    if (focus_client && (focus_client->desktop == DESKTOP_ALL ||
+                         focus_client->desktop == screen_desktop))
+        dofocus = FALSE;
+
     /* have to try focus here because when you leave an empty desktop
        there is no focus out to watch for
 
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if (dofocus
-        && (!focus_client || (focus_client->desktop != DESKTOP_ALL
-                              && focus_client->desktop != num))
-        && (c = focus_fallback(TRUE)))
+    if (dofocus && (c = focus_fallback(TRUE)))
     {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is

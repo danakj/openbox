@@ -2996,9 +2996,8 @@ static void client_iconify_recursive(ObClient *self,
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of
-                   the list, put the new iconic window at the 'top of the
-                   bottom'. */
-                focus_order_to_top(self);
+                   the list */
+                focus_order_to_bottom(self);
 
                 changed = TRUE;
             }

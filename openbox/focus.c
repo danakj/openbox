@@ -94,11 +94,10 @@ void focus_set_client(ObClient *client)
     }
 }
 
-static ObClient* focus_fallback_target(gboolean allow_refocus)
+static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 {
     GList *it;
     ObClient *c;
-    ObClient *old = focus_client;
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
     if (config_focus_follow && !config_focus_last)
@@ -167,13 +166,14 @@ static ObClient* focus_fallback_target(gboolean allow_refocus)
 ObClient* focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
+    ObClient *old = focus_client;
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when we try focus them, we won't get a FocusIn
        event at all for them. */
     focus_nothing();
 
-    new = focus_fallback_target(allow_refocus);
+    new = focus_fallback_target(allow_refocus, old);
 
     return new;
 }

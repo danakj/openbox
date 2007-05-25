@@ -397,13 +397,16 @@
 
   <context name="Client">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Middle" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
   </context>
 
@@ -491,7 +494,7 @@
     </mousebind>
 
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
     </mousebind>
   </context>
 

@@ -221,14 +221,20 @@
 
   <context name="Frame">
     <mousebind button="A-Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+    </mousebind>
+    <mousebind button="A-Left" action="Click">
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="A-Left" action="Drag">
       <action name="Move"/>
     </mousebind>
 
     <mousebind button="A-Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="A-Right" action="Drag">
       <action name="Resize"/>
@@ -262,7 +268,11 @@
 
   <context name="Titlebar">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+    </mousebind>
+    <mousebind button="Left" action="Click">
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Move"/>
@@ -287,14 +297,17 @@
     </mousebind>
 
     <mousebind button="Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
       <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
 
   <context name="Top">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"><edge>top</edge></action>
@@ -303,7 +316,8 @@
 
   <context name="Left">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"><edge>left</edge></action>
@@ -312,7 +326,8 @@
 
   <context name="Right">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"><edge>right</edge></action>
@@ -321,7 +336,8 @@
 
   <context name="Bottom">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"><edge>bottom</edge></action>
@@ -334,14 +350,16 @@
     </mousebind>
 
     <mousebind button="Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
       <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
 
   <context name="BLCorner">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
@@ -350,7 +368,8 @@
 
   <context name="BRCorner">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
@@ -359,7 +378,9 @@
 
   <context name="TLCorner">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
@@ -368,7 +389,9 @@
 
   <context name="TRCorner">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"/>
@@ -377,30 +400,38 @@
 
   <context name="Client">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Middle" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
   </context>
 
   <context name="Icon">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
       <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
     <mousebind button="Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
       <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
 
   <context name="AllDesktops">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Click">
       <action name="ToggleOmnipresent"/>
@@ -409,7 +440,8 @@
 
   <context name="Shade">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Click">
       <action name="ToggleShade"/>
@@ -418,7 +450,8 @@
 
   <context name="Iconify">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Click">
       <action name="Iconify"/>
@@ -427,13 +460,19 @@
 
   <context name="Maximize">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Middle" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Right" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Click">
       <action name="ToggleMaximizeFull"/>
@@ -448,7 +487,9 @@
 
   <context name="Close">
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Click">
       <action name="Close"/>
@@ -477,7 +518,8 @@
     </mousebind>
 
     <mousebind button="Left" action="Press">
-      <action name="Activate"/>
+      <action name="Focus"/>
+      <action name="Raise"/>
     </mousebind>
   </context>
 

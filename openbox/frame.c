@@ -251,7 +251,6 @@ void frame_show(ObFrame *self)
     if (!self->visible) {
         self->visible = TRUE;
         XMapWindow(ob_display, self->client->window);
-        XMapWindow(ob_display, self->plate);
         XMapWindow(ob_display, self->window);
     }
 }
@@ -262,10 +261,6 @@ void frame_hide(ObFrame *self)
         self->visible = FALSE;
         if (!frame_iconify_animating(self))
             XUnmapWindow(ob_display, self->window);
-        /* unmap the plate along with the client. some people (libwnck) look
-           to see if it is unmapped when the client is iconified, for whatever
-           reason. so let's play along... */
-        XUnmapWindow(ob_display, self->plate);
         /* we unmap the client itself so that we can get MapRequest
            events, and because the ICCCM tells us to! */
         XUnmapWindow(ob_display, self->client->window);
@@ -357,6 +352,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->width = self->client->area.width - self->bwidth * 2;
         } else
             self->width = self->client->area.width + self->cbwidth_x * 2;
+
+        /* some elements are sized based of the width, so don't let them have
+           negative values */
+        self->width = MAX(self->width,
+                          (ob_rr_theme->grip_width + self->bwidth) * 2) + 1;
 
         STRUT_SET(self->size,
                   self->cbwidth_x + (!self->max_horz ? self->bwidth : 0),
@@ -748,6 +748,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(ob_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
+
 }
 
 static void frame_adjust_cursors(ObFrame *self)

@@ -368,6 +368,7 @@ void screen_startup(gboolean reconfig)
     else
         screen_set_num_desktops(config_desktops_num);
 
+    screen_desktop = screen_num_desktops;  /* something invalid */
     /* start on the current desktop when a wm was already running */
     if (PROP_GET32(RootWindow(ob_display, ob_screen),
                    net_current_desktop, cardinal, &d) &&
@@ -380,6 +381,7 @@ void screen_startup(gboolean reconfig)
     else
         screen_set_desktop(MIN(config_screen_firstdesk,
                                screen_num_desktops) - 1, FALSE);
+    screen_last_desktop = screen_desktop;
 
     /* don't start in showing-desktop mode */
     screen_showing_desktop = FALSE;
@@ -506,12 +508,12 @@ void screen_set_desktop(guint num, gboolean dofocus)
      
     g_assert(num < screen_num_desktops);
 
+    if (old == num) return;
+
     old = screen_desktop;
     screen_desktop = num;
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_current_desktop, cardinal, num);
-
-    if (old == num) return;
 
     screen_last_desktop = old;
 
@@ -530,13 +532,18 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
+    if (focus_client && (focus_client->desktop == DESKTOP_ALL ||
+                         focus_client->desktop == screen_desktop))
+        dofocus = FALSE;
+
     /* have to try focus here because when you leave an empty desktop
        there is no focus out to watch for
 
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if (dofocus && (c = focus_fallback(TRUE))) {
+    if (dofocus && (c = focus_fallback(TRUE)))
+    {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is
            no guarantee the window will actually take focus.. */
@@ -931,7 +938,7 @@ void screen_update_desktop_names()
         it = g_slist_nth(config_desktops_names, i);
 
         for (; i < screen_num_desktops; ++i) {
-            if (it)
+            if (it && ((char*)it->data)[0]) /* not empty */
                 /* use the names from the config file when possible */
                 screen_desktop_names[i] = g_strdup(it->data);
             else

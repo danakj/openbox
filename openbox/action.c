@@ -1587,7 +1587,7 @@ void action_send_to_desktop(union ActionData *data)
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
         client_set_desktop(c, data->sendto.desk, data->sendto.follow);
-        if (data->sendto.follow)
+        if (data->sendto.follow && data->sendto.desk != screen_desktop)
             screen_set_desktop(data->sendto.desk, TRUE);
     }
 }
@@ -1621,7 +1621,8 @@ void action_desktop_dir(union ActionData *data)
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {
-        if (d != screen_desktop) screen_set_desktop(d, TRUE);
+        if (d != screen_desktop)
+            screen_set_desktop(d, TRUE);
     }
 }
 

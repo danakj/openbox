@@ -369,7 +369,7 @@ void client_manage(Window window)
     placex = self->area.x;
     placey = self->area.y;
 
-    /* figure out placement for the window */
+    /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
         gboolean transient;
 
@@ -380,6 +380,30 @@ void client_manage(Window window)
                     "BADNESS !?"))), self->area.x, self->area.y);
 
         transient = place_client(self, &placex, &placey, settings);
+
+        /* if the window isn't user-positioned, then make it fit inside
+           the visible screen area on its monitor.
+
+           the monitor is chosen by place_client! */
+        if (!(self->positioned & USPosition)) {
+            /* make a copy to modify */
+            Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
+
+            /* shrink by the frame's area */
+            a.width -= self->frame->size.left + self->frame->size.right;
+            a.height -= self->frame->size.top + self->frame->size.bottom;
+
+            /* fit the window inside the area */
+            self->area.width = MIN(self->area.width, a.width);
+            self->area.height = MIN(self->area.height, a.height);
+
+            ob_debug("setting window size to %dx%d\n",
+                     self->area.width, self->area.height);
+
+            /* adjust the frame to the client's new size */
+            frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+            frame_adjust_client_area(self->frame);
+        }
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &placex, &placey,
@@ -462,10 +486,24 @@ void client_manage(Window window)
                               "Not focusing the window because the time is "
                               "too old\n");
             }
+            /* If its a transient (and parents aren't focused) and the time
+               is ambiguous (either the current focus target doesn't have
+               a timestamp, or they are the same (we probably inherited it
+               from them) */
+            else if (self->transient_for != NULL &&
+                     (!last_time || self->user_time == last_time))
+            {
+                activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because it is a "
+                              "transient, and the time is very ambiguous\n");
+            }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
              */
-            if (!(focus_client->can_focus || focus_client->focus_notify)) {
+            else if (!(focus_client->can_focus ||
+                       focus_client->focus_notify))
+            {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because a globally "
@@ -1139,15 +1177,27 @@ static void client_get_desktop(ObClient *self)
                 self->desktop = self->transient_for->desktop;
                 trdesk = TRUE;
             } else {
+                /* if all the group is on one desktop, then open it on the
+                   same desktop */
                 GSList *it;
+                gboolean first = TRUE;
+                guint all = screen_num_desktops; /* not a valid value */
 
-                for (it = self->group->members; it; it = g_slist_next(it))
-                    if (it->data != self &&
-                        !((ObClient*)it->data)->transient_for) {
-                        self->desktop = ((ObClient*)it->data)->desktop;
-                        trdesk = TRUE;
-                        break;
+                for (it = self->group->members; it; it = g_slist_next(it)) {
+                    ObClient *c = it->data;
+                    if (c != self) {
+                        if (first) {
+                            all = c->desktop;
+                            first = FALSE;
+                        }
+                        else if (all != c->desktop)
+                            all = screen_num_desktops; /* make it invalid */
                     }
+                }
+                if (all != screen_num_desktops) {
+                    self->desktop = all;
+                    trdesk = TRUE;
+                }
             }
         }
         if (!trdesk) {
@@ -1882,7 +1932,8 @@ void client_update_wmhints(ObClient *self)
         }
 
         /* the WM_HINTS can contain an icon */
-        client_update_icons(self);
+        if (hints->flags & IconPixmapHint)
+            client_update_icons(self);
 
         XFree(hints);
     }
@@ -1934,8 +1985,14 @@ void client_update_title(ObClient *self)
               PROP_GETS(self->window, wm_icon_name, utf8, &data)))
             data = g_strdup(self->title);
 
-    PROP_SETS(self->window, net_wm_visible_icon_name, data);
-    self->icon_title = data;
+    if (self->client_machine) {
+        visible = g_strdup_printf("%s (%s)", data, self->client_machine);
+        g_free(data);
+    } else
+        visible = data;
+
+    PROP_SETS(self->window, net_wm_visible_icon_name, visible);
+    self->icon_title = visible;
 }
 
 void client_update_strut(ObClient *self)
@@ -2945,9 +3002,8 @@ static void client_iconify_recursive(ObClient *self,
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of
-                   the list, put the new iconic window at the 'top of the
-                   bottom'. */
-                focus_order_to_top(self);
+                   the list */
+                focus_order_to_bottom(self);
 
                 changed = TRUE;
             }
@@ -3605,7 +3661,7 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
     for (i = 1; i < self->nicons; ++i) {
         gulong diff;
 
-        diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
+        diff = ABS(self->icons[i].width - w) + ABS(self->icons[i].height - h);
         if (diff < min_diff) {
             min_diff = diff;
             min_i = i;

@@ -94,11 +94,10 @@ void focus_set_client(ObClient *client)
     }
 }
 
-static ObClient* focus_fallback_target(gboolean allow_refocus)
+static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 {
     GList *it;
     ObClient *c;
-    ObClient *old = focus_client;
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
     if (config_focus_follow && !config_focus_last)
@@ -110,17 +109,6 @@ static ObClient* focus_fallback_target(gboolean allow_refocus)
             ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
             return c;
         }
-
-    ob_debug_type(OB_DEBUG_FOCUS, "trying omnipresentness\n");
-    if (allow_refocus && old &&
-        old->desktop == DESKTOP_ALL &&
-        client_normal(old) &&
-        client_focus(old))
-    {
-        ob_debug_type(OB_DEBUG_FOCUS, "found in omnipresentness\n");
-        return old;
-    }
-
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order\n");
     for (it = focus_order; it; it = g_list_next(it)) {
@@ -167,13 +155,14 @@ static ObClient* focus_fallback_target(gboolean allow_refocus)
 ObClient* focus_fallback(gboolean allow_refocus)
 {
     ObClient *new;
+    ObClient *old = focus_client;
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when we try focus them, we won't get a FocusIn
        event at all for them. */
     focus_nothing();
 
-    new = focus_fallback_target(allow_refocus);
+    new = focus_fallback_target(allow_refocus, old);
 
     return new;
 }
@@ -186,12 +175,8 @@ void focus_nothing()
         screen_install_colormap(NULL, TRUE);
     }
 
-    /* Don't set focus_client to NULL here. It will be set to NULL when the
-       FocusOut event comes. Otherwise, if we focus nothing and then focus the
-       same window again, The focus code says nothing changed, but focus_client
-       ends up being NULL anyways.
-    focus_client = NULL;
-    */
+    /* nothing is focused, update the colormap and _the root property_ */
+    focus_set_client(NULL);
 
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events

@@ -319,6 +319,12 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
             if (!w || !WINDOW_IS_CLIENT(w))
                 return FALSE;
         }
+        else {
+            /* This means focus reverted to parent from the client (this
+               happens often during iconify animation) */
+            if (detail == NotifyInferior)
+                return TRUE;
+        }
 
         /* This means focus moved from the root window to a client */
         if (detail == NotifyVirtual)
@@ -480,7 +486,8 @@ static void event_process(const XEvent *ec, gpointer data)
         {
             XEvent ce;
 
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to pointer root/none\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to pointer root/none or"
+                          " the frame window\n");
 
             /* If another FocusIn is in the queue then don't fallback yet. This
                fixes the fun case of:
@@ -502,7 +509,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "  but another FocusIn is coming\n");
             } else {
-                /* Focus has been reverted to the root window or nothing.
+                /* Focus has been reverted.
 
                    FocusOut events come after UnmapNotify, so we don't need to
                    worry about focusing an invalid window
@@ -532,6 +539,13 @@ static void event_process(const XEvent *ec, gpointer data)
         gboolean nomove = FALSE;
         XEvent ce;
 
+        if (client) {
+            frame_adjust_focus(client->frame, FALSE);
+            /* focus_set_client(NULL) has already been called in this
+               section or by focus_fallback */
+            client_calc_layer(client);
+        }
+
         /* Look for the followup FocusIn */
         if (!XCheckIfEvent(ob_display, &ce, event_look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
@@ -554,12 +568,8 @@ static void event_process(const XEvent *ec, gpointer data)
             xerror_set_ignore(FALSE);
             /* nothing is focused */
             focus_set_client(NULL);
-        } else if (ce.xany.window == e->xany.window) {
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus didn't go anywhere\n");
-            /* If focus didn't actually move anywhere, there is nothing to do*/
-            nomove = TRUE;
         } else {
-            /* Focus did move, so process the FocusIn event */
+            /* Focus moved, so process the FocusIn event */
             ObEventData ed = { .ignored = FALSE };
             event_process(&ce, &ed);
             if (ed.ignored) {
@@ -570,13 +580,6 @@ static void event_process(const XEvent *ec, gpointer data)
                               ce.xfocus.window);
                 focus_fallback(TRUE);
             }
-        }
-
-        if (client && !nomove) {
-            frame_adjust_focus(client->frame, FALSE);
-            if (client == focus_client)
-                focus_set_client(NULL);
-            client_calc_layer(client);
         }
     } else if (timewinclients)
         event_handle_user_time_window_clients(timewinclients, e);
@@ -1585,8 +1588,8 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
         menu_frame_select_next(frame);
     }
 
-    /* keyboard accelerator shortcuts. */
-    else if (ev->xkey.state == 0 &&
+    /* keyboard accelerator shortcuts. (allow controlmask) */
+    else if ((ev->xkey.state & ~ControlMask) == 0 &&
              /* was it a valid key? */
              unikey != 0 &&
              /* don't bother if the menu is empty. */

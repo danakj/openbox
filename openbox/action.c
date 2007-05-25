@@ -1599,8 +1599,7 @@ void action_desktop(union ActionData *data)
     if (data->desktop.desk < screen_num_desktops ||
         data->desktop.desk == DESKTOP_ALL)
     {
-        screen_set_desktop(data->desktop.desk, !focus_client
-                           || focus->client.desktop != DESKTOP_ALL);
+        screen_set_desktop(data->desktop.desk, TRUE);
         if (data->inter.any.interactive)
             screen_desktop_popup(data->desktop.desk, TRUE);
     }

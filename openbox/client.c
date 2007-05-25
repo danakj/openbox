@@ -1985,8 +1985,14 @@ void client_update_title(ObClient *self)
               PROP_GETS(self->window, wm_icon_name, utf8, &data)))
             data = g_strdup(self->title);
 
-    PROP_SETS(self->window, net_wm_visible_icon_name, data);
-    self->icon_title = data;
+    if (self->client_machine) {
+        visible = g_strdup_printf("%s (%s)", data, self->client_machine);
+        g_free(data);
+    } else
+        visible = data;
+
+    PROP_SETS(self->window, net_wm_visible_icon_name, visible);
+    self->icon_title = visible;
 }
 
 void client_update_strut(ObClient *self)

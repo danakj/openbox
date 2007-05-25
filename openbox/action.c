@@ -1588,7 +1588,7 @@ void action_send_to_desktop(union ActionData *data)
         data->sendto.desk == DESKTOP_ALL) {
         client_set_desktop(c, data->sendto.desk, data->sendto.follow);
         if (data->sendto.follow && data->sendto.desk != screen_desktop)
-            screen_set_desktop(data->sendto.desk, c == focus_client);
+            screen_set_desktop(data->sendto.desk, c != focus_client);
     }
 }
 
@@ -1645,7 +1645,7 @@ void action_send_to_desktop_dir(union ActionData *data)
     {
         client_set_desktop(c, d, data->sendtodir.follow);
         if (data->sendtodir.follow && d != screen_desktop)
-            screen_set_desktop(d, c == focus_client);
+            screen_set_desktop(d, c != focus_client);
     }
 }
 

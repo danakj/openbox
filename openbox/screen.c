@@ -508,10 +508,11 @@ void screen_set_desktop(guint num, gboolean dofocus)
      
     g_assert(num < screen_num_desktops);
 
-    if (old == num) return;
-
     old = screen_desktop;
     screen_desktop = num;
+
+    if (old == num) return;
+
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_current_desktop, cardinal, num);
 

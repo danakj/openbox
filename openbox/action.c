@@ -1601,7 +1601,7 @@ void action_desktop(union ActionData *data)
     {
         screen_set_desktop(data->desktop.desk, TRUE);
         if (data->inter.any.interactive)
-            screen_desktop_popup(data->desktop.desk, TRUE);
+            screen_desktop_popup(data->desktop.desk, focus_client->desktop != DESKTOP_ALL);
     }
 }
 
@@ -1621,7 +1621,7 @@ void action_desktop_dir(union ActionData *data)
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {
-        if (d != screen_desktop) screen_set_desktop(d, TRUE);
+        if (d != screen_desktop) screen_set_desktop(d, focus_client->desktop != DESKTOP_ALL);
     }
 }
 

@@ -533,7 +533,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    if (focus_client && (focus_client->desktop == DESKTOP_ALL ||
+    if (focus_client && ((client_normal(focus_client) &&
+                          focus_client->desktop == DESKTOP_ALL) ||
                          focus_client->desktop == screen_desktop))
         dofocus = FALSE;
 

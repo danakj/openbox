@@ -368,6 +368,7 @@ void screen_startup(gboolean reconfig)
     else
         screen_set_num_desktops(config_desktops_num);
 
+    screen_desktop = screen_num_desktops;  /* something invalid */
     /* start on the current desktop when a wm was already running */
     if (PROP_GET32(RootWindow(ob_display, ob_screen),
                    net_current_desktop, cardinal, &d) &&
@@ -380,6 +381,7 @@ void screen_startup(gboolean reconfig)
     else
         screen_set_desktop(MIN(config_screen_firstdesk,
                                screen_num_desktops) - 1, FALSE);
+    screen_last_desktop = screen_desktop;
 
     /* don't start in showing-desktop mode */
     screen_showing_desktop = FALSE;
@@ -506,12 +508,12 @@ void screen_set_desktop(guint num, gboolean dofocus)
      
     g_assert(num < screen_num_desktops);
 
+    if (old == num) return;
+
     old = screen_desktop;
     screen_desktop = num;
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_current_desktop, cardinal, num);
-
-    if (old == num) return;
 
     screen_last_desktop = old;
 

@@ -1588,7 +1588,7 @@ void action_send_to_desktop(union ActionData *data)
         data->sendto.desk == DESKTOP_ALL) {
         client_set_desktop(c, data->sendto.desk, data->sendto.follow);
         if (data->sendto.follow && data->sendto.desk != screen_desktop)
-            screen_set_desktop(data->sendto.desk, c != focus_client);
+            screen_set_desktop(data->sendto.desk, TRUE);
     }
 }
 
@@ -1599,9 +1599,10 @@ void action_desktop(union ActionData *data)
     if (data->desktop.desk < screen_num_desktops ||
         data->desktop.desk == DESKTOP_ALL)
     {
-        screen_set_desktop(data->desktop.desk, TRUE);
+        screen_set_desktop(data->desktop.desk, !focus_client
+                           || focus->client.desktop != DESKTOP_ALL);
         if (data->inter.any.interactive)
-            screen_desktop_popup(data->desktop.desk, focus_client->desktop != DESKTOP_ALL);
+            screen_desktop_popup(data->desktop.desk, TRUE);
     }
 }
 
@@ -1621,7 +1622,8 @@ void action_desktop_dir(union ActionData *data)
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {
-        if (d != screen_desktop) screen_set_desktop(d, focus_client->desktop != DESKTOP_ALL);
+        if (d != screen_desktop)
+            screen_set_desktop(d, TRUE);
     }
 }
 
@@ -1645,7 +1647,7 @@ void action_send_to_desktop_dir(union ActionData *data)
     {
         client_set_desktop(c, d, data->sendtodir.follow);
         if (data->sendtodir.follow && d != screen_desktop)
-            screen_set_desktop(d, c != focus_client);
+            screen_set_desktop(d, TRUE);
     }
 }
 

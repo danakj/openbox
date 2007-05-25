@@ -94,8 +94,7 @@ void focus_set_client(ObClient *client)
     }
 }
 
-static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old,
-                                       gboolean send_focus)
+static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
 {
     GList *it;
     ObClient *c;
@@ -104,14 +103,10 @@ static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old,
     if (config_focus_follow && !config_focus_last)
         if ((c = client_under_pointer()) &&
             (allow_refocus || c != old) &&
-            client_normal(c) &&
-            /* if we're sending focus then try to */
-            ((send_focus && client_focus(c)) ||
-             /* if not just see if we could try, or it's already focused */
-             (!send_focus && (c == old || client_can_focus(c)))))
+            (client_normal(c) &&
+             client_focus(c)))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff (%d)\n",
-                          send_focus);
+            ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
             return c;
         }
 
@@ -119,11 +114,9 @@ static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old,
     if (allow_refocus && old &&
         old->desktop == DESKTOP_ALL &&
         client_normal(old) &&
-        /* this one is only for when not sending focus, to keep it there */
-        !send_focus)
+        client_focus(old))
     {
-        ob_debug_type(OB_DEBUG_FOCUS, "found in omnipresentness (%d)\n",
-                      send_focus);
+        ob_debug_type(OB_DEBUG_FOCUS, "found in omnipresentness\n");
         return old;
     }
 
@@ -141,14 +134,9 @@ static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old,
         if (c->desktop == screen_desktop &&
             client_normal(c) &&
             (allow_refocus || c != old) &&
-            /* if we're sending focus then try to */
-            ((send_focus && client_focus(c)) ||
-             /* if not just see if we could try, or it's already focused */
-             (!send_focus && (c == old || client_can_focus(c)))))
+            client_focus(c))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order (%d) 0x%x "
-                          "from 0x%x\n",
-                          send_focus, c, old);
+            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
             return c;
         }
     }
@@ -165,13 +153,9 @@ static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old,
         */
         if (c->type == OB_CLIENT_TYPE_DESKTOP &&
             (allow_refocus || c != old) &&
-            /* if we're sending focus then try to */
-            ((send_focus && client_focus(c)) ||
-             /* if not just see if we could try, or it's already focused */
-             (!send_focus && (c == old || client_can_focus(c)))))
+            client_focus(c))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window (%d)\n",
-                          send_focus);
+            ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window\n");
             return c;
         }
     }
@@ -184,15 +168,12 @@ ObClient* focus_fallback(gboolean allow_refocus)
     ObClient *new;
     ObClient *old = focus_client;
 
-    new = focus_fallback_target(allow_refocus, old, FALSE);
-    if (new == old) return;
-
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when we try focus them, we won't get a FocusIn
        event at all for them. */
     focus_nothing();
 
-    new = focus_fallback_target(allow_refocus, old, TRUE);
+    new = focus_fallback_target(allow_refocus, old);
 
     return new;
 }

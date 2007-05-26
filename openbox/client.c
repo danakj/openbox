@@ -377,7 +377,9 @@ void client_manage(Window window)
                  (!self->positioned ? "no" :
                   (self->positioned == PPosition ? "program specified" :
                    (self->positioned == USPosition ? "user specified" :
-                    "BADNESS !?"))), self->area.x, self->area.y);
+                    (self->positioned == PPosition | USPosition ?
+                     "program + user specified" :
+                     "BADNESS !?")))), self->area.x, self->area.y);
 
         transient = place_client(self, &placex, &placey, settings);
 

@@ -2357,7 +2357,6 @@ static void client_change_wm_state(ObClient *self)
         state[0] = self->wmstate;
         state[1] = None;
         PROP_SETA32(self->window, wm_state, wm_state, state, 2);
-        ob_debug("setting wm_state %d\n", self->wmstate);
     }
 }
 

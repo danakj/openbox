@@ -142,10 +142,13 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
         source = rgba->data;
     }
 
-    /* copy source -> dest, and apply the alpha channel */
+    /* copy source -> dest, and apply the alpha channel.
+
+       center the image if it is smaller than the area */
     col = 0;
     num_pixels = dw * dh;
-    dest = target + area->x + target_w * area->y;
+    dest = target + area->x + (area->width - dw) / 2 +
+        (target_w * (area->y + (area->height - dh) / 2));
     while (num_pixels-- > 0) {
         guchar alpha, r, g, b, bgr, bgg, bgb;
 

@@ -32,6 +32,7 @@
 #include <glib.h>
 
 ObClient       *focus_cycle_target = NULL;
+static gboolean focus_cycle_iconic_windows;
 static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_dock_windows;
 static gboolean focus_cycle_desktop_windows;
@@ -58,9 +59,17 @@ void focus_cycle_shutdown(gboolean reconfig)
     if (reconfig) return;
 }
 
-void focus_cycle_stop()
+void focus_cycle_stop(ObClient *ifclient)
 {
-    if (focus_cycle_target) {
+    /* stop focus cycling if the given client is a valid focus target,
+       and so the cycling is being disrupted */
+    if (focus_cycle_target && ifclient &&
+        focus_cycle_target_valid(ifclient,
+                                 focus_cycle_iconic_windows,
+                                 focus_cycle_all_desktops,
+                                 focus_cycle_dock_windows,
+                                 focus_cycle_desktop_windows))
+    {
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
         focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
     }
@@ -179,7 +188,8 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
 
 
     if (focus_cycle_target == NULL) {
-        focus_cycle_all_desktops = FALSE;
+        focus_cycle_iconic_windows = TRUE;
+        focus_cycle_all_desktops = all_desktops;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
         focus_cycle_target = focus_client;
@@ -199,7 +209,8 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (focus_cycle_target_valid(ft, TRUE,
+        if (focus_cycle_target_valid(ft,
+                                     focus_cycle_iconic_windows,
                                      focus_cycle_all_desktops,
                                      focus_cycle_dock_windows,
                                      focus_cycle_desktop_windows))
@@ -211,7 +222,8 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
                 }
                 if (dialog)
                     /* same arguments as focus_target_valid */
-                    focus_cycle_popup_show(ft, TRUE,
+                    focus_cycle_popup_show(ft,
+                                           focus_cycle_iconic_windows,
                                            focus_cycle_all_desktops,
                                            focus_cycle_dock_windows,
                                            focus_cycle_desktop_windows);
@@ -356,6 +368,7 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         goto done_cycle;
 
     if (focus_cycle_target == NULL) {
+        focus_cycle_iconic_windows = FALSE;
         focus_cycle_all_desktops = FALSE;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
@@ -371,7 +384,9 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_cycle_target_valid(it->data, FALSE, FALSE,
+            if (focus_cycle_target_valid(it->data,
+                                         focus_cycle_iconic_windows,
+                                         focus_cycle_all_desktops,
                                          focus_cycle_dock_windows,
                                          focus_cycle_desktop_windows))
                 ft = it->data;
@@ -386,7 +401,8 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (focus_cycle_target && dialog) {
         /* same arguments as focus_target_valid */
         focus_cycle_popup_single_show(focus_cycle_target,
-                                      FALSE, FALSE,
+                                      focus_cycle_iconic_windows,
+                                      focus_cycle_all_desktops,
                                       focus_cycle_dock_windows,
                                       focus_cycle_desktop_windows);
         return;

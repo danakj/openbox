@@ -75,7 +75,8 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(client, TRUE);
 
     /* in the middle of cycling..? kill it. */
-    focus_cycle_stop();
+    focus_cycle_stop(focus_client);
+    focus_cycle_stop(client);
 
     focus_client = client;
 
@@ -208,7 +209,7 @@ void focus_order_add_new(ObClient *c)
     }
 
     /* in the middle of cycling..? kill it. */
-    focus_cycle_stop();
+    focus_cycle_stop(c);
 }
 
 void focus_order_remove(ObClient *c)
@@ -216,7 +217,7 @@ void focus_order_remove(ObClient *c)
     focus_order = g_list_remove(focus_order, c);
 
     /* in the middle of cycling..? kill it. */
-    focus_cycle_stop();
+    focus_cycle_stop(c);
 }
 
 void focus_order_to_top(ObClient *c)

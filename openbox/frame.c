@@ -860,9 +860,6 @@ void frame_grab_client(ObFrame *self)
        req's) the ButtonPress is to catch clicks on the client border */
     XSelectInput(ob_display, self->plate, PLATE_EVENTMASK);
 
-    /* map the client so it maps when the frame does */
-    XMapWindow(ob_display, self->client->window);
-
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, self->client);
     g_hash_table_insert(window_map, &self->plate, self->client);

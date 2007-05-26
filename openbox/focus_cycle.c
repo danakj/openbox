@@ -36,7 +36,6 @@ static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_dock_windows;
 static gboolean focus_cycle_desktop_windows;
 
-static void      focus_cycle_destroy_notify (ObClient *client, gpointer data);
 static gboolean  focus_target_has_siblings  (ObClient *ft,
                                              gboolean iconic_windows,
                                              gboolean all_desktops);
@@ -52,15 +51,11 @@ static ObClient *focus_find_directional    (ObClient *c,
 void focus_cycle_startup(gboolean reconfig)
 {
     if (reconfig) return;
-
-    client_add_destroy_notify(focus_cycle_destroy_notify, NULL);
 }
 
 void focus_cycle_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
-
-    client_remove_destroy_notify(focus_cycle_destroy_notify);
 }
 
 void focus_cycle_stop()
@@ -69,14 +64,6 @@ void focus_cycle_stop()
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
         focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
     }
-}
-
-static void focus_cycle_destroy_notify(ObClient *client, gpointer data)
-{
-    /* end cycling if the target disappears. CurrentTime is fine, time won't
-       be used */
-    if (focus_cycle_target == client)
-        focus_cycle_stop();
 }
 
 /*! Returns if a focus target has valid group siblings that can be cycled

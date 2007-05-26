@@ -2819,9 +2819,16 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XMoveResizeWindow(ob_display, self->window,
-                          -self->border_width, -self->border_width,
-                          MAX(w, oldw), MAX(h, oldh));
+        XWindowChanges changes;
+        changes.x = -self->border_width;
+        changes.y = -self->border_width;
+        changes.width = MAX(w, oldw);
+        changes.height = MAX(h, oldh);
+        changes.border_width = self->border_width;
+        XConfigureWindow(ob_display, self->window,
+                         (moved ? CWX|CWY : 0) |
+                         (resized ? CWWidth|CWHeight|CWBorderWidth : 0),
+                         &changes);
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
     }
@@ -2878,10 +2885,18 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
 
-        if (send_resize_client)
-            XMoveResizeWindow(ob_display, self->window,
-                              -self->border_width, -self->border_width,
-                              w, h);
+        if (send_resize_client) {
+            XWindowChanges changes;
+            changes.x = -self->border_width;
+            changes.y = -self->border_width;
+            changes.width = w;
+            changes.height = h;
+            changes.border_width = self->border_width;
+            XConfigureWindow(ob_display, self->window,
+                             (moved ? CWX|CWY : 0) |
+                             (resized ? CWWidth|CWHeight|CWBorderWidth : 0),
+                             &changes);
+        }
     }
 
     XFlush(ob_display);

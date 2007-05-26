@@ -381,13 +381,21 @@ void client_manage(Window window)
                      "program + user specified" :
                      "BADNESS !?")))), self->area.x, self->area.y);
 
+        ob_debug("Sized: %s @ %d %d\n",
+                 (!self->sized ? "no" :
+                  (self->sized == PSize ? "program specified" :
+                   (self->sized == USSize ? "user specified" :
+                    (self->sized == PSize | USSize ?
+                     "program + user specified" :
+                     "BADNESS !?")))), self->area.width, self->area.height);
+
         transient = place_client(self, &placex, &placey, settings);
 
         /* if the window isn't user-positioned, then make it fit inside
            the visible screen area on its monitor.
 
            the monitor is chosen by place_client! */
-        if (!(self->positioned & USPosition)) {
+        if (!(self->sized & USSize)) {
             /* make a copy to modify */
             Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
 
@@ -867,6 +875,7 @@ static void client_restore_session_state(ObClient *self)
 
     RECT_SET_POINT(self->area, self->session->x, self->session->y);
     self->positioned = USPosition;
+    self->sized = USSize;
     if (self->session->w > 0)
         self->area.width = self->session->w;
     if (self->session->h > 0)
@@ -1617,6 +1626,7 @@ void client_update_normal_hints(ObClient *self)
         if (!client_normal(self))
         */
         self->positioned = (size.flags & (PPosition|USPosition));
+        self->sized = (size.flags & (PSize|USSize));
 
         if (size.flags & PWinGravity)
             self->gravity = size.win_gravity;

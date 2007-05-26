@@ -216,6 +216,10 @@ struct _ObClient
       we only force it if it tries to go completely offscreen, if neither, we
       should place the window ourselves when it first appears */
     guint positioned;
+
+    /*! Was the window's size requested by the application or the user?
+      If by the application we don't let it go outside the available area */
+    guint sized;
   
     /*! Can the window receive input focus? */
     gboolean can_focus;

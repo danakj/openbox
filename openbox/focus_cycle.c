@@ -62,8 +62,10 @@ void focus_cycle_shutdown(gboolean reconfig)
 
 void focus_cycle_stop()
 {
-    if (focus_cycle_target)
+    if (focus_cycle_target) {
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+    }
 }
 
 static void focus_cycle_destroy_notify(ObClient *client, gpointer data)

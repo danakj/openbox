@@ -567,7 +567,7 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
     case Above:
         ob_debug("Restack request Above for client %s sibling %s\n",
                  client->title, sibling ? sibling->title : "(all)");
-        if (activate && !client->iconic)
+        if (activate && !client->iconic && client_normal(client))
             /* use user=TRUE because it is impossible to get a timestamp
                for this */
             client_activate(client, FALSE, TRUE);
@@ -578,7 +578,7 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
         ob_debug("Restack request TopIf for client %s sibling %s\n",
                  client->title, sibling ? sibling->title : "(all)");
         if (stacking_occluded(client, sibling)) {
-            if (activate && !client->iconic)
+            if (activate && !client->iconic && client_normal(client))
                 /* use user=TRUE because it is impossible to get a timestamp
                    for this */
                 client_activate(client, FALSE, TRUE);
@@ -591,7 +591,7 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
                  "%s\n",
                  client->title, sibling ? sibling->title : "(all)");
         if (stacking_occluded(client, sibling)) {
-            if (activate && !client->iconic)
+            if (activate && !client->iconic && client_normal(client))
                 /* use user=TRUE because it is impossible to get a timestamp
                    for this */
                 client_activate(client, FALSE, TRUE);

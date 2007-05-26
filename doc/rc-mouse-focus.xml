@@ -238,7 +238,7 @@
       <action name="Resize"/>
     </mousebind> 
 
-    <mousebind button="A-Middle" action="Press">
+    <mousebind button="A-Middle" action="Click">
       <action name="Focus"/>
       <action name="Lower"/>
     </mousebind>
@@ -279,6 +279,8 @@
 
     <mousebind button="Middle" action="Press">
       <action name="Focus"/>
+    </mousebind>
+    <mousebind button="Middle" action="Click">
       <action name="Lower"/>
     </mousebind>
 
@@ -344,6 +346,8 @@
 
     <mousebind button="Middle" action="Press">
       <action name="Focus"/>
+    </mousebind>
+    <mousebind button="Middle" action="Click">
       <action name="Lower"/>
     </mousebind>
 

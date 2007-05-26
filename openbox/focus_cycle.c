@@ -71,10 +71,9 @@ void focus_cycle_stop()
 static void focus_cycle_destroy_notify(ObClient *client, gpointer data)
 {
     /* end cycling if the target disappears. CurrentTime is fine, time won't
-       be used
-    */
+       be used */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle_stop();
 }
 
 /*! Returns if a focus target has valid group siblings that can be cycled

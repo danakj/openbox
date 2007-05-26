@@ -695,7 +695,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                         self->cbwidth_y);
 
             /* when the client has StaticGravity, it likes to move around. */
-            XMoveWindow(ob_display, self->client->window, 0, 0);
+            XMoveWindow(ob_display, self->client->window,
+                        -self->client->border_width,
+                        -self->client->border_width);
         }
     }
 
@@ -848,7 +850,8 @@ void frame_grab_client(ObFrame *self)
     */
 
     /* reparent the client to the frame */
-    XReparentWindow(ob_display, self->client->window, self->plate, 0, 0);
+    XReparentWindow(ob_display, self->client->window, self->plate,
+                    -self->client->border_width, -self->client->border_width);
 
     /*
       When reparenting the client window, it is usually not mapped yet, since

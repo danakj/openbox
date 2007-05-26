@@ -67,7 +67,6 @@ GList            *client_list          = NULL;
 static GSList *client_destroy_notifies = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
-static void client_toggle_border(ObClient *self, gboolean show);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
 static void client_get_area(ObClient *self);
@@ -324,9 +323,6 @@ void client_manage(Window window)
     /* now we have all of the window's information so we can set this up */
     client_setup_decor_and_functions(self);
 
-    /* remove the client's border (and adjust re gravity) */
-    client_toggle_border(self, FALSE);
-     
     {
         Time t = sn_app_started(self->startup_id, self->class);
         if (t) self->user_time = t;
@@ -377,7 +373,7 @@ void client_manage(Window window)
                  (!self->positioned ? "no" :
                   (self->positioned == PPosition ? "program specified" :
                    (self->positioned == USPosition ? "user specified" :
-                    (self->positioned == PPosition | USPosition ?
+                    (self->positioned == (PPosition | USPosition) ?
                      "program + user specified" :
                      "BADNESS !?")))), self->area.x, self->area.y);
 
@@ -385,7 +381,7 @@ void client_manage(Window window)
                  (!self->sized ? "no" :
                   (self->sized == PSize ? "program specified" :
                    (self->sized == USSize ? "user specified" :
-                    (self->sized == PSize | USSize ?
+                    (self->sized == (PSize | USSize) ?
                      "program + user specified" :
                      "BADNESS !?")))), self->area.width, self->area.height);
 
@@ -460,6 +456,7 @@ void client_manage(Window window)
     */
     client_configure(self, placex, placey,
                      self->area.width, self->area.height,
+                     self->border_width,
                      FALSE, TRUE);
 
 
@@ -700,9 +697,6 @@ void client_unmanage(ObClient *self)
     /* restore the window's original geometry so it is not lost */
     {
         Rect a;
-
-        /* give the client its border back */
-        client_toggle_border(self, TRUE);
 
         a = self->area;
 
@@ -1036,71 +1030,6 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 
     return ox != *x || oy != *y;
 }
-
-static void client_toggle_border(ObClient *self, gboolean show)
-{
-    /* adjust our idea of where the client is, based on its border. When the
-       border is removed, the client should now be considered to be in a
-       different position.
-       when re-adding the border to the client, the same operation needs to be
-       reversed. */
-    gint oldx = self->area.x, oldy = self->area.y;
-    gint x = oldx, y = oldy;
-    switch(self->gravity) {
-    default:
-    case NorthWestGravity:
-    case WestGravity:
-    case SouthWestGravity:
-        break;
-    case NorthEastGravity:
-    case EastGravity:
-    case SouthEastGravity:
-        if (show) x -= self->border_width * 2;
-        else      x += self->border_width * 2;
-        break;
-    case NorthGravity:
-    case SouthGravity:
-    case CenterGravity:
-    case ForgetGravity:
-    case StaticGravity:
-        if (show) x -= self->border_width;
-        else      x += self->border_width;
-        break;
-    }
-    switch(self->gravity) {
-    default:
-    case NorthWestGravity:
-    case NorthGravity:
-    case NorthEastGravity:
-        break;
-    case SouthWestGravity:
-    case SouthGravity:
-    case SouthEastGravity:
-        if (show) y -= self->border_width * 2;
-        else      y += self->border_width * 2;
-        break;
-    case WestGravity:
-    case EastGravity:
-    case CenterGravity:
-    case ForgetGravity:
-    case StaticGravity:
-        if (show) y -= self->border_width;
-        else      y += self->border_width;
-        break;
-    }
-    self->area.x = x;
-    self->area.y = y;
-
-    if (show) {
-        XSetWindowBorderWidth(ob_display, self->window, self->border_width);
-
-        /* set border_width to 0 because there is no border to add into
-           calculations anymore */
-        self->border_width = 0;
-    } else
-        XSetWindowBorderWidth(ob_display, self->window, 0);
-}
-
 
 static void client_get_all(ObClient *self, gboolean real)
 {
@@ -1875,7 +1804,8 @@ void client_reconfigure(ObClient *self)
        every configurenotify causes an update in its normal hints, i think this
        is generally what we want anyways... */
     client_configure(self, self->area.x, self->area.y,
-                     self->area.width, self->area.height, FALSE, TRUE);
+                     self->area.width, self->area.height,
+                     self->border_width, FALSE, TRUE);
 }
 
 void client_update_wmhints(ObClient *self)
@@ -2851,7 +2781,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 }
 
 
-void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
+void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
                       gboolean user, gboolean final)
 {
     gint oldw, oldh;
@@ -2872,11 +2802,13 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     /* figure out if we moved or resized or what */
     moved = x != self->area.x || y != self->area.y;
-    resized = w != self->area.width || h != self->area.height;
+    resized = w != self->area.width || h != self->area.height ||
+        b != self->border_width;
 
     oldw = self->area.width;
     oldh = self->area.height;
     RECT_SET(self->area, x, y, w, h);
+    self->border_width = b;
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when
@@ -2887,8 +2819,9 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XResizeWindow(ob_display, self->window,
-                      MAX(w, oldw), MAX(h, oldh));
+        XMoveResizeWindow(ob_display, self->window,
+                          -self->border_width, -self->border_width,
+                          MAX(w, oldw), MAX(h, oldh));
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
     }
@@ -2915,8 +2848,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         /* we have reset the client to 0 border width, so don't include
            it in these coords */
         POINT_SET(self->root_pos,
-                  self->frame->area.x + self->frame->size.left,
-                  self->frame->area.y + self->frame->size.top);
+                  self->frame->area.x + self->frame->size.left -
+                  self->border_width,
+                  self->frame->area.y + self->frame->size.top -
+                  self->border_width);
 
         event.type = ConfigureNotify;
         event.xconfigure.display = ob_display;
@@ -2931,7 +2866,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.y = self->root_pos.y;
         event.xconfigure.width = w;
         event.xconfigure.height = h;
-        event.xconfigure.border_width = 0;
+        event.xconfigure.border_width = self->border_width;
         event.xconfigure.above = self->frame->plate;
         event.xconfigure.override_redirect = FALSE;
         XSendEvent(event.xconfigure.display, event.xconfigure.window,
@@ -2944,7 +2879,9 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         frame_adjust_client_area(self->frame);
 
         if (send_resize_client)
-            XResizeWindow(ob_display, self->window, w, h);
+            XMoveResizeWindow(ob_display, self->window,
+                              -self->border_width, -self->border_width,
+                              w, h);
     }
 
     XFlush(ob_display);

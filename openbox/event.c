@@ -536,7 +536,6 @@ static void event_process(const XEvent *ec, gpointer data)
             client_bring_helper_windows(client);
         }
     } else if (e->type == FocusOut) {
-        gboolean nomove = FALSE;
         XEvent ce;
 
         /* Look for the followup FocusIn */
@@ -995,26 +994,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
            also you can't compress stacking events
         */
 
-        gint x, y, w, h;
+        gint x, y, w, h, b;
         gboolean move = FALSE;
         gboolean resize = FALSE;
+        gboolean border = FALSE;
 
         /* get the current area */
         RECT_TO_DIMS(client->area, x, y, w, h);
+        b = client->border_width;
 
         ob_debug("ConfigureRequest desktop %d wmstate %d visibile %d\n",
                  screen_desktop, client->wmstate, client->frame->visible);
 
         if (e->xconfigurerequest.value_mask & CWBorderWidth)
             if (client->border_width != e->xconfigurerequest.border_width) {
-                client->border_width = e->xconfigurerequest.border_width;
-
-                /* if the border width is changing then that is the same
-                   as requesting a resize, but we don't actually change
-                   the client's border, so it will change their root
-                   coordiantes (since they include the border width) and
-                   we need to a notify then */
-                move = TRUE;
+                b = e->xconfigurerequest.border_width;
+                border = TRUE;
             }
 
 
@@ -1114,17 +1109,21 @@ static void event_handle_client(ObClient *client, XEvent *e)
                notify is sent or not */
         }
 
-        if (move || resize) {
+        if (move || resize || border) {
             gint lw,lh;
 
-            client_find_onscreen(client, &x, &y, w, h, FALSE);
-            client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+            if (move || resize) {
+                client_find_onscreen(client, &x, &y, w, h, FALSE);
+                client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+            }
             /* if they requested something that moves the window, or if
                the window is actually being changed then configure it and
                send a configure notify to them */
-            if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
+            if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h) ||
+                border)
+            {
                 ob_debug("Doing configure\n");
-                client_configure(client, x, y, w, h, FALSE, TRUE);
+                client_configure(client, x, y, w, h, b, FALSE, TRUE);
             }
 
             /* ignore enter events caused by these like ob actions do */
@@ -1329,7 +1328,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            client_configure(client, x, y, w, h, FALSE, TRUE);
+            client_configure(client, x, y, w, h, client->border_width,
+                             FALSE, TRUE);
 
             client->gravity = ograv;
 

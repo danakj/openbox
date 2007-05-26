@@ -348,7 +348,7 @@ void client_manage(Window window)
         !self->iconic &&
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
-         client_search_focus_parent(self)) &&
+         client_search_focus_tree_full(self)) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
@@ -377,7 +377,17 @@ void client_manage(Window window)
                  (!self->positioned ? "no" :
                   (self->positioned == PPosition ? "program specified" :
                    (self->positioned == USPosition ? "user specified" :
-                    "BADNESS !?"))), self->area.x, self->area.y);
+                    (self->positioned == PPosition | USPosition ?
+                     "program + user specified" :
+                     "BADNESS !?")))), self->area.x, self->area.y);
+
+        ob_debug("Sized: %s @ %d %d\n",
+                 (!self->sized ? "no" :
+                  (self->sized == PSize ? "program specified" :
+                   (self->sized == USSize ? "user specified" :
+                    (self->sized == PSize | USSize ?
+                     "program + user specified" :
+                     "BADNESS !?")))), self->area.width, self->area.height);
 
         transient = place_client(self, &placex, &placey, settings);
 
@@ -385,7 +395,7 @@ void client_manage(Window window)
            the visible screen area on its monitor.
 
            the monitor is chosen by place_client! */
-        if (!(self->positioned & USPosition)) {
+        if (!(self->sized & USSize)) {
             /* make a copy to modify */
             Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
 
@@ -474,8 +484,8 @@ void client_manage(Window window)
                           "Not focusing the window because its on another "
                           "desktop\n");
         }
-        /* If something is focused, and it's not our parent... */
-        else if (focus_client && client_search_focus_parent(self) == NULL)
+        /* If something is focused, and it's not our relative... */
+        else if (focus_client && client_search_focus_tree_full(self) == NULL)
         {
             /* If time stamp is old, don't steal focus */
             if (self->user_time && last_time &&
@@ -508,6 +518,14 @@ void client_manage(Window window)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because a globally "
                               "active client has focus\n");
+            }
+            /* Don't move focus if it's not going to go to this window
+               anyway */
+            else if (client_focus_target(self) != self) {
+                activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because another window "
+                              "would get the focus anyway\n");
             }
         }
 
@@ -588,6 +606,10 @@ ObClient *client_fake_manage(Window window)
     /* create the decoration frame for the client window and adjust its size */
     self->frame = frame_new(self);
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
+
+    ob_debug("gave extents left %d right %d top %d bottom %d\n",
+             self->frame->size.left, self->frame->size.right, 
+             self->frame->size.top, self->frame->size.bottom);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
@@ -853,6 +875,7 @@ static void client_restore_session_state(ObClient *self)
 
     RECT_SET_POINT(self->area, self->session->x, self->session->y);
     self->positioned = USPosition;
+    self->sized = USSize;
     if (self->session->w > 0)
         self->area.width = self->session->w;
     if (self->session->h > 0)
@@ -1603,6 +1626,7 @@ void client_update_normal_hints(ObClient *self)
         if (!client_normal(self))
         */
         self->positioned = (size.flags & (PPosition|USPosition));
+        self->sized = (size.flags & (PSize|USSize));
 
         if (size.flags & PWinGravity)
             self->gravity = size.win_gravity;

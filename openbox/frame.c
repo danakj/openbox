@@ -356,7 +356,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* some elements are sized based of the width, so don't let them have
            negative values */
         self->width = MAX(self->width,
-                          (ob_rr_theme->grip_width + self->bwidth) * 2) + 1;
+                          (ob_rr_theme->grip_width + self->bwidth) * 2 + 1);
 
         STRUT_SET(self->size,
                   self->cbwidth_x + (!self->max_horz ? self->bwidth : 0),
@@ -376,6 +376,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         if (!fake) {
             if (self->bwidth) {
+                gint titlesides;
+
+                /* height of titleleft and titleright */
+                titlesides = (!self->max_horz ?
+                              ob_rr_theme->grip_width :
+                              self->size.top - self->bwidth);
+
                 XMoveResizeWindow(ob_display, self->titletop,
                                   ob_rr_theme->grip_width + self->bwidth, 0,
                                   /* width + bwidth*2 - bwidth*2 - grips*2 */
@@ -393,27 +400,29 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   ob_rr_theme->grip_width + self->bwidth,
                                   self->bwidth);
 
-                XMoveResizeWindow(ob_display, self->titleleft,
-                                  0, self->bwidth,
-                                  self->bwidth,
-                                  (!self->max_horz ?
-                                   ob_rr_theme->grip_width :
-                                   self->size.top - self->bwidth));
-                XMoveResizeWindow(ob_display, self->titleright,
-                                  self->client->area.width +
-                                  self->size.left + self->size.right -
-                                  self->bwidth,
-                                  self->bwidth,
-                                  self->bwidth,
-                                  (!self->max_horz ?
-                                   ob_rr_theme->grip_width :
-                                   self->size.top - self->bwidth));
+                if (titlesides > 0) {
+                    XMoveResizeWindow(ob_display, self->titleleft,
+                                      0, self->bwidth,
+                                      self->bwidth,
+                                      titlesides);
+                    XMoveResizeWindow(ob_display, self->titleright,
+                                      self->client->area.width +
+                                      self->size.left + self->size.right -
+                                      self->bwidth,
+                                      self->bwidth,
+                                      self->bwidth,
+                                      titlesides);
+
+                    XMapWindow(ob_display, self->titleleft);
+                    XMapWindow(ob_display, self->titleright);
+                } else {
+                    XUnmapWindow(ob_display, self->titleleft);
+                    XUnmapWindow(ob_display, self->titleright);
+                }
 
                 XMapWindow(ob_display, self->titletop);
                 XMapWindow(ob_display, self->titletopleft);
                 XMapWindow(ob_display, self->titletopright);
-                XMapWindow(ob_display, self->titleleft);
-                XMapWindow(ob_display, self->titleright);
 
                 if (self->decorations & OB_FRAME_DECOR_TITLEBAR &&
                     self->rbwidth)

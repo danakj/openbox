@@ -240,7 +240,7 @@
       <action name="Resize"/>
     </mousebind> 
 
-    <mousebind button="A-Middle" action="Press">
+    <mousebind button="A-Middle" action="Click">
       <action name="Lower"/>
       <action name="FocusToBottom"/>
       <action name="Unfocus"/>
@@ -281,7 +281,7 @@
       <action name="ToggleMaximizeFull"/>
     </mousebind>
 
-    <mousebind button="Middle" action="Press">
+    <mousebind button="Middle" action="Click">
       <action name="Lower"/>
       <action name="FocusToBottom"/>
       <action name="Unfocus"/>
@@ -343,7 +343,7 @@
       <action name="Resize"><edge>bottom</edge></action>
     </mousebind>
 
-    <mousebind button="Middle" action="Press">
+    <mousebind button="Middle" action="Click">
       <action name="Lower"/>
       <action name="FocusToBottom"/>
       <action name="Unfocus"/>

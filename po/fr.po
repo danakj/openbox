@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-25 15:23-0400\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-21 00:53+0200\n"
 "Last-Translator: Cyrille Bagard <nocbos@gmail.com>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -16,22 +16,22 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:953
+#: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Action demandée '%s' invalide. Aucune action de ce type n'existe."
 
-#: openbox/action.c:956
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Utilisation invalide de l'action '%s'. L'action sera ignorée."
 
-#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Echec de l'exécution de '%s': %s"
 
-#: openbox/action.c:1264
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Echec de la conversion du chemin '%s' depuis l'UTF-8"
@@ -300,7 +300,7 @@ msgid "The WM on screen %d is not exiting"
 msgstr ""
 "Le gestionnaire de fenêtres sur l'écran %d n'est pas en train de quitter"
 
-#: openbox/screen.c:946
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr "bureau %i"

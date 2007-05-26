@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-25 15:23-0400\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-22 19:00+0100\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -15,22 +15,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:953
+#: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Požadována neplatná akce '%s'. Žádná taková akce neexistuje."
 
-#: openbox/action.c:956
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Neplatné užití akce '%s'. Akce bude ignorována."
 
-#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Nepodařilo se spustit '%s': %s"
 
-#: openbox/action.c:1264
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Nepodařilo se převést cestu '%s' z utf8"
@@ -293,7 +293,7 @@ msgstr "Nepodařilo se získat výseč pro window manager na obrazovce %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Window manager na obrazovce %d ne a ne skončit"
 
-#: openbox/screen.c:946
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr "plochu %i"

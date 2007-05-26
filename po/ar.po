@@ -1,198 +1,198 @@
-# Spanish messages for openbox.
-# Copyright (C) 2005 Mikael Magnusson
-# This file is distributed under the same license as the openbox package.
-# Miguel Calleja Gómez <mcg79@lycos.es>, 2005.
-# Gustavo Varela <gustavo.varela [en] gmail [punto] com>, 2007
+# translation of openbox.po to Arabic
+# Copyright (C) 2007 Dana Jansens
+# This file is distributed under the same license as the Openbox package.
+#
+# Khaled Hosny <khaledhosny@eglug.org>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4\n"
+"Project-Id-Version: openbox\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-05-23 16:20+0200\n"
-"PO-Revision-Date: 2007-05-22 20:48+0200\n"
-"Last-Translator:  Gustavo Varela <gustavo.varela [en] gmail [punto] com>\n"
-"Language-Team: None\n"
+"PO-Revision-Date: 2007-05-26 03:11+0300\n"
+"Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
+"Language-Team: Arabic <doc@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : 3\n"
 
 #: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr "La acción '%s' solicitada es inválida. No existe tal acción."
+msgstr "طُلِب إجراء '%s' غير سليم. لا يوجد إجراء كهذا."
 
 #: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr "Uso inválido de la acción '%s'. La acción sera ignorada."
+msgstr "استخدام غير سليم للإجراء '%s'. سيُتَجاهل هذا الإجراء."
 
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Falló al ejecutar '%s': %s"
+msgstr "فشلت في تنفيذ '%s': %s"
 
 #: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
-msgstr "Falló al convertir el path '%s' desde utf8"
+msgstr "فشلت في تحويل المسار '%s' من utf8"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
-msgstr "Ir ahí..."
+msgstr "اذهب هناك..."
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
-msgstr "Ventanas"
+msgstr "نوافذ"
 
 #: openbox/client_list_menu.c:196
 msgid "Desktops"
-msgstr "Escritorios"
+msgstr "أسطح مكتب"
 
 #: openbox/client_menu.c:246
 msgid "All desktops"
-msgstr "Todos los escritorios"
+msgstr "كل أسطح المكتب"
 
 #: openbox/client_menu.c:351
 msgid "&Layer"
-msgstr "&Capa"
+msgstr "طبقة (&L)"
 
 #: openbox/client_menu.c:356
 msgid "Always on &top"
-msgstr "Siempre &encima"
+msgstr "دائما على السطح (&T)"
 
 #: openbox/client_menu.c:357
 msgid "&Normal"
-msgstr "&Normal"
+msgstr "طبيعي (&N)"
 
 #: openbox/client_menu.c:358
 msgid "Always on &bottom"
-msgstr "Siempre &debajo"
+msgstr "دائما في القاع (&B)"
 
 #: openbox/client_menu.c:361
-msgid "&Send to desktop"
-msgstr "&Enviar a escritorio"
+msgid "&Send to desktop (&S)"
+msgstr "أرسِل إلى سطح المكتب"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
-msgstr "Menú del cliente"
+msgstr "قائمة العميل"
 
 #: openbox/client_menu.c:371
 msgid "R&estore"
-msgstr "Rest&aurar"
+msgstr "استعِد (&E)"
 
 #: openbox/client_menu.c:379
 msgid "&Move"
-msgstr "&Mover"
+msgstr "انقل (&M)"
 
 #: openbox/client_menu.c:381
 msgid "Resi&ze"
-msgstr "Redimen&sionar"
+msgstr "حجِّم (&Z)"
 
 #: openbox/client_menu.c:383
 msgid "Ico&nify"
-msgstr "Mi&nimizar"
+msgstr "صغّر (&N)"
 
 #: openbox/client_menu.c:391
 msgid "Ma&ximize"
-msgstr "Ma&ximizar"
+msgstr "كبّر (&X)"
 
 #: openbox/client_menu.c:399
 msgid "&Roll up/down"
-msgstr "En/Desen&rollar"
+msgstr "لُف لأعلى/لأسفل (&R)"
 
 #: openbox/client_menu.c:401
 msgid "Un/&Decorate"
-msgstr "&Decorar"
+msgstr "ضع/أزل الحواف (&D)"
 
 #: openbox/client_menu.c:411
 msgid "&Close"
-msgstr "&Cerrar"
+msgstr "أغلق (&C)"
 
 #: openbox/config.c:701
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr "Botón invalido '%s' especificado en el archivo de configuración"
+msgstr "زر غير صحيح '%s' محدد في ملف الإعدادات"
 
 #: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
-msgstr "Conflicto con la combinación de teclas en el archivo de configuración"
+msgstr "يتعارض مع ارتباط المفاتيح في ملف الإعدادات"
 
 #: openbox/menu.c:98 openbox/menu.c:106
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr "No es posible encontrar un archivo de menú '%s' valido"
+msgstr "لم أعثر على ملف قائمة سليم '%s'"
 
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Falló al ejecutar el comando para el pipe-menu '%s': '%s'"
+msgstr "فشل تنفيذ أمر ل pipe-menu '%s': %s"
 
 #: openbox/menu.c:166
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr "Salida inválida del pipe-menu '%s'"
+msgstr "خرج غير سليم من pipe-menu '%s'"
 
 #: openbox/menu.c:179
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Intentó acceder al menú '%s' pero este no existe"
+msgstr "حاولت الوصول إلى القائمة '%s' لكنها غير موجودة"
 
 #: openbox/menu.c:331 openbox/menu.c:332
 msgid "More..."
-msgstr "Más..."
+msgstr "المزيد..."
 
 #: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr "Botón inválido '%s' en mouse binding"
+msgstr "زر غير صحيح '%s' في ارتباط الفأرة"
 
 #: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr "Contexto inválido '%s' en mouse binding"
+msgstr "سياق غير صحيح '%s' في ارتباط الفأرة"
 
 #: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "No es posible cambiar al directorio home '%s': %s"
+msgstr "لم أستطع تغيير المجلد المنزلي '%s': %s"
 
 #: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Falló abrir la pantalla desde la variable de entorno DISPLAY"
+msgstr "تعذّر فتح العرض من متغير البيئة DISPLAY."
 
 #: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
-msgstr "Falló la inicialización de la librería obrender"
+msgstr "تعذّر بدأ مكتبة obrender."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
-msgstr "El servidor X no soporta locale."
+msgstr "خادم إكس لا يدعم المحليّة."
 
 #: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
-msgstr "No se puede establecer los modificadores locale para el servidor X."
+msgstr "لم أستطِع ضبط مُغيِّرات المحليّة لخادم إكس."
 
 #: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr ""
-"No es posible encontrar un archivo de configuración valido, usando algunos "
-"por defecto"
+msgstr "لم أعثر على ملف إعدادات سليم، سأستخدم بعض الإفتراضيات البسيطة"
 
 #: openbox/openbox.c:275
 msgid "Unable to load a theme."
-msgstr "No es posible cargar el tema."
+msgstr "لم أستطِع تحميل سِمة."
 
 #: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Reiniciada falló en ejecutar nuevo ejecutable '%s': %s"
+msgstr "فشلت إعادة التشغيل في تنفيذ مُنفّذ جديد '%s': %s"
 
 #: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
-msgstr "Copyright (c)"
+msgstr "حقوق النسخ"
 
 #: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
-msgstr "Sintaxis: openbox [opciones]\n"
+msgstr "الصيغة: openbox [options]\n"
 
 #: openbox/openbox.c:476
 msgid ""
@@ -200,26 +200,23 @@ msgid ""
 "Options:\n"
 msgstr ""
 "\n"
-"Opciones\n"
+"الخيارات:\n"
 
 #: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Muestra esta ayuda y sale\n"
+msgstr "  --help              اعرض هذه المساعدة ثم اخرج\n"
 
 #: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Muestra la versión y sale\n"
+msgstr "  --version           اعرض النسخة ثم اخرج\n"
 
 #: openbox/openbox.c:479
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
-"  --replace            Remplaza el gestor de ventanas que esta corriendo "
-"actualmente\n"
+msgstr "  --replace           استبدل مدير النوافذ الذي يعمل حاليا\n"
 
 #: openbox/openbox.c:480
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
-"  --sm-disable        Deshabilita la conexión con el gestor de sesión\n"
+msgstr "  --sm-disable        عطِّل الإتصال بمدير الجلسة\n"
 
 #: openbox/openbox.c:481
 msgid ""
@@ -227,15 +224,15 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Pasando mensajes a la instancia que esta corriendo de Openbox:\n"
+"تمرير رسائل لمرّة تعمل من أوبن‌بوكس:\n"
 
 #: openbox/openbox.c:482
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Recarga la configuración de Openbox\n"
+msgstr "  --reconfigure       أعِد تحميل إعدادات أوبن‌بوكس\n"
 
 #: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Reinicia Openbox\n"
+msgstr "  --restart           أعِد تشغيل أوبن‌بوكس\n"
 
 #: openbox/openbox.c:484
 msgid ""
@@ -243,25 +240,23 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Opciones de depuración:\n"
+"خيارات التنقيح:\n"
 
 #: openbox/openbox.c:485
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Correr en modo sincrónico\n"
+msgstr "  --sync              شغّل في النمط المزامن\n"
 
 #: openbox/openbox.c:486
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Mostrar salida del depurador\n"
+msgstr "  --debug             اعرض خرْج التنقيح\n"
 
 #: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
-"  --debug-focus       Mostrar salida del depurador para focus handling\n"
+msgstr "  --debug-focus       اعرض خرج التنقيح للتعامل مع البؤرة\n"
 
 #: openbox/openbox.c:488
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr ""
-"  --debug-xinerama    Separar la pantalla en pantallas de xinerama falsas\n"
+msgstr "  --debug-xinerama    شق العرض إلى شاشات xinerama زائفة\n"
 
 #: openbox/openbox.c:489
 #, c-format
@@ -270,75 +265,75 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Por favor reportar errores a %s\n"
+"من فضلك أبلغ عن العلل إلى %s\n"
 
 #: openbox/openbox.c:586
 #, c-format
 msgid "Invalid command line argument '%s'\n"
-msgstr "Argumento de linea de comando inválido '%s'\n"
+msgstr "معامل سطر أوامر غير سليم '%s'\n"
 
 #: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Un gestor de ventanas ya esta corriendo en la pantalla %d"
+msgstr "يعمل مدير نوافذ بالفعل على الشاشة %Id"
 
 #: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr ""
-"No se pudo obtener el gestor de ventanas para la selección de pantalla %d"
+msgstr "تعذّر الحصول على انتقاء مدير النوافذ على الشاشة %Id"
 
 #: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "El WM en la pantalla %d no esta saliendo"
+msgstr "مدير النوافذ على الشاشة %Id لا وجود له"
 
 #: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
-msgstr "Escritorio %i"
+msgstr "سطح المكتب %Ii"
 
 #: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr "No se puede crear el directorio '%s': %s"
+msgstr "لم أستطِع إنشاء الدليل '%s': %s"
 
 #: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "No se puede salvar la sesión a '%s': '%s'"
+msgstr "لم أستطِع حفظ الجلسة إلى '%s': %s"
 
 #: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
-msgstr "Error mientras se salvaba la sesión a '%s': '%s'"
+msgstr "خطأ أثناء حفظ الجلسة إلى '%s': %s"
 
 #: openbox/startupnotify.c:237
 #, c-format
 msgid "Running %s\n"
-msgstr "Ejecutando %s\n"
+msgstr "تشغيل %s\n"
 
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Modificador de tecla '%s' inválido en combinaciones de teclas o ratón"
+msgstr "مفتاح مُغيِّر '%s' غير سليم في ارتبط الفأرة/لوحة المفاتيح"
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "Código de tecla '%s' inválido en combinaciones de teclas"
+msgstr "رمز مفتاح '%s' غير سليم في ارتباط المفتاح"
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Nombre de tecla '%s' inválido en combinaciones de teclas"
+msgstr "اسم مفتاح '%s' غير سليم في ارتباط المفتاح"
 
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
-msgstr "Tecla solicitada '%s' no existe en la pantalla"
+msgstr "المفتاح المطلوب '%s' لا وجود له في العرض"
 
 #: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
-msgstr "Error en X: %s"
+msgstr "خطأ إكس: %s"
+

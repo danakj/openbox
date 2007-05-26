@@ -589,6 +589,10 @@ ObClient *client_fake_manage(Window window)
     self->frame = frame_new(self);
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
+    ob_debug("gave extents left %d right %d top %d bottom %d\n",
+             self->frame->size.left, self->frame->size.right, 
+             self->frame->size.top, self->frame->size.bottom);
+
     /* free the ObAppSettings shallow copy */
     g_free(settings);
 

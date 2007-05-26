@@ -47,17 +47,18 @@ static void client_action_end(union ActionData *data)
 {
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button && data->any.c)
+            if (!data->any.button && data->any.c) {
                 event_ignore_all_queued_enters();
-            else {
-                /* we USED to create a fake enter event here, so that when you
-                   used a Press context, and the button was still down,
-                   you could still get enter events that weren't
-                   NotifyWhileGrabbed.
+            } else {
+                ObClient *c;
 
-                   only problem with this is that then the resulting focus
-                   change events can ALSO be NotifyWhileGrabbed. And that is
-                   bad. So, don't create fake enter events anymore. */
+                /* usually this is sorta redundant, but with a press action
+                   that moves windows our from under the cursor, the enter
+                   event will come as a GrabNotify which is ignored, so this
+                   makes a fake enter event
+                */
+                if ((c = client_under_pointer()))
+                    event_enter_client(c);
             }
         }
 }

@@ -400,15 +400,17 @@ void client_manage(Window window)
             a.height -= self->frame->size.top + self->frame->size.bottom;
 
             /* fit the window inside the area */
-            self->area.width = MIN(self->area.width, a.width);
-            self->area.height = MIN(self->area.height, a.height);
+            if (self->area.width > a.width || self->area.height > a.height) {
+                self->area.width = MIN(self->area.width, a.width);
+                self->area.height = MIN(self->area.height, a.height);
 
-            ob_debug("setting window size to %dx%d\n",
-                     self->area.width, self->area.height);
+                ob_debug("setting window size to %dx%d\n",
+                         self->area.width, self->area.height);
 
-            /* adjust the frame to the client's new size */
-            frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-            frame_adjust_client_area(self->frame);
+                /* adjust the frame to the client's new size */
+                frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+                frame_adjust_client_area(self->frame);
+            }
         }
 
         /* make sure the window is visible. */

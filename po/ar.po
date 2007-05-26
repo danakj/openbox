@@ -5,7 +5,7 @@
 # Khaled Hosny <khaledhosny@eglug.org>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox\n"
+"Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-26 03:11+0300\n"

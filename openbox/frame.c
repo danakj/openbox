@@ -356,7 +356,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* some elements are sized based of the width, so don't let them have
            negative values */
         self->width = MAX(self->width,
-                          (ob_rr_theme->grip_width + self->bwidth) * 2) + 1;
+                          (ob_rr_theme->grip_width + self->bwidth) * 2 + 1);
 
         STRUT_SET(self->size,
                   self->cbwidth_x + (!self->max_horz ? self->bwidth : 0),

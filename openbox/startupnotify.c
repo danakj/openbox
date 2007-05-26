@@ -137,9 +137,9 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
     case SN_MONITOR_EVENT_INITIATED:
         sn_startup_sequence_ref(seq);
         sn_waits = g_slist_prepend(sn_waits, seq);
-        /* 30 second timeout for apps to start if the launcher doesn't
+        /* 20 second timeout for apps to start if the launcher doesn't
            have a timeout */
-        ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
+        ob_main_loop_timeout_add(ob_main_loop, 20 * G_USEC_PER_SEC,
                                  sn_wait_timeout, seq,
                                  g_direct_equal,
                                  (GDestroyNotify)sn_startup_sequence_unref);
@@ -250,9 +250,9 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
     sn_launcher_context_initiate(sn_launcher, "openbox", program, time);
     id = sn_launcher_context_get_startup_id(sn_launcher);
 
-    /* 30 second timeout for apps to start */
+    /* 20 second timeout for apps to start */
     sn_launcher_context_ref(sn_launcher);
-    ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
+    ob_main_loop_timeout_add(ob_main_loop, 20 * G_USEC_PER_SEC,
                              sn_launch_wait_timeout, sn_launcher,
                              g_direct_equal,
                              (GDestroyNotify)sn_launcher_context_unref);

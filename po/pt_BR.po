@@ -298,7 +298,7 @@ msgstr "O gerenciador de janelas na tela %d não está saindo"
 #: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
-msgstr "trabalho %i"
+msgstr "�rea de trabalho %i"
 
 #: openbox/session.c:103
 #, c-format

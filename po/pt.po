@@ -293,7 +293,7 @@ msgstr "O gestor de janelas no ecrã %d não está fechando"
 #: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
-msgstr "trabalho %i"
+msgstr "área de trabalho %i"
 
 #: openbox/session.c:103
 #, c-format

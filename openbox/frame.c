@@ -842,6 +842,11 @@ void frame_adjust_icon(ObFrame *self)
 
 void frame_grab_client(ObFrame *self)
 {
+    /* DO NOT map the client window here. we used to do that, but it is bogus.
+       we need to set up the client's dimensions and everything before we
+       send a mapnotify or we create race conditions.
+    */
+
     /* reparent the client to the frame */
     XReparentWindow(ob_display, self->client->window, self->plate, 0, 0);
 

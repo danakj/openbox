@@ -1216,11 +1216,9 @@ void action_execute(union ActionData *data)
     if (data->execute.path) {
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
-            /* If there is an interactive action going on, then cancel it
-               to release the keyboard, so that the run application
-               can grab the keyboard if it wants to. */
-            if (keyboard_interactively_grabbed())
-                keyboard_interactive_cancel();
+            /* If there is a keyboard grab going on then we need to cancel
+               it so the application can grab things */
+            event_cancel_all_key_grabs();
 
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
                 g_message(_("Failed to execute '%s': %s"),

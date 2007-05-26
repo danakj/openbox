@@ -47,7 +47,8 @@ int main () {
     XSetWindowBackground(display,win,WhitePixel(display,0)); 
     XSetWindowBackground(display,child,BlackPixel(display,0)); 
 
-    XSelectInput(display, win, FocusChangeMask);
+    XSelectInput(display, win,
+                 FocusChangeMask|EnterWindowMask|LeaveWindowMask);
     XMapWindow(display, win);
     XMapWindow(display, child);
 
@@ -157,8 +158,62 @@ int main () {
             printf("mode      : %s\n", mode);
             printf("detail    : %s\n", detail);
             printf("---\n");
-        }
+            break;
+        case EnterNotify:
+            switch (report.xcrossing.mode) {
+            case NotifyNormal: mode = "NotifyNormal"; break;
+            case NotifyGrab: mode = "NotifyGrab"; break;
+            case NotifyUngrab: mode = "NotifyUngrab"; break;
+            }
 
+            switch (report.xcrossing.detail) {
+            case NotifyAncestor: detail = "NotifyAncestor"; break;
+            case NotifyVirtual: detail = "NotifyVirtual"; break;
+            case NotifyInferior: detail = "NotifyInferior"; break;
+            case NotifyNonlinear: detail = "NotifyNonlinear"; break;
+            case NotifyNonlinearVirtual: detail = "NotifyNonlinearVirtual"; break;
+            case NotifyPointer: detail = "NotifyPointer"; break;
+            case NotifyPointerRoot: detail = "NotifyPointerRoot"; break;
+            case NotifyDetailNone: detail = "NotifyDetailNone"; break;
+            }
+            printf("enternotify\n");
+            printf("type      : %d\n", report.xcrossing.type);
+            printf("serial    : %d\n", report.xcrossing.serial);
+            printf("send_event: %d\n", report.xcrossing.send_event);
+            printf("display   : 0x%x\n", report.xcrossing.display);
+            printf("window    : 0x%x\n", report.xcrossing.window);
+            printf("mode      : %s\n", mode);
+            printf("detail    : %s\n", detail);
+            printf("---\n");
+            break;
+        case LeaveNotify:
+            switch (report.xcrossing.mode) {
+            case NotifyNormal: mode = "NotifyNormal"; break;
+            case NotifyGrab: mode = "NotifyGrab"; break;
+            case NotifyUngrab: mode = "NotifyUngrab"; break;
+            }
+
+            switch (report.xcrossing.detail) {
+            case NotifyAncestor: detail = "NotifyAncestor"; break;
+            case NotifyVirtual: detail = "NotifyVirtual"; break;
+            case NotifyInferior: detail = "NotifyInferior"; break;
+            case NotifyNonlinear: detail = "NotifyNonlinear"; break;
+            case NotifyNonlinearVirtual: detail = "NotifyNonlinearVirtual"; break;
+            case NotifyPointer: detail = "NotifyPointer"; break;
+            case NotifyPointerRoot: detail = "NotifyPointerRoot"; break;
+            case NotifyDetailNone: detail = "NotifyDetailNone"; break;
+            }
+            printf("leavenotify\n");
+            printf("type      : %d\n", report.xcrossing.type);
+            printf("serial    : %d\n", report.xcrossing.serial);
+            printf("send_event: %d\n", report.xcrossing.send_event);
+            printf("display   : 0x%x\n", report.xcrossing.display);
+            printf("window    : 0x%x\n", report.xcrossing.window);
+            printf("mode      : %s\n", mode);
+            printf("detail    : %s\n", detail);
+            printf("---\n");
+            break;
+        }
     }
 
     return 1;

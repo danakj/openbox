@@ -2540,8 +2540,7 @@ gboolean client_hide(ObClient *self)
                actions should not rely on being able to move focus during an
                interactive grab.
             */
-            if (keyboard_interactively_grabbed())
-                keyboard_interactive_cancel();
+            event_cancel_all_key_grabs();
         }
 
         frame_hide(self->frame);
@@ -3526,8 +3525,7 @@ gboolean client_focus(ObClient *self)
        actions should not rely on being able to move focus during an
        interactive grab.
     */
-    if (keyboard_interactively_grabbed())
-        keyboard_interactive_cancel();
+    event_cancel_all_key_grabs();
 
     xerror_set_ignore(TRUE);
     xerror_occured = FALSE;

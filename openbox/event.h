@@ -43,6 +43,9 @@ void event_enter_client(struct _ObClient *client);
   till now. */
 void event_ignore_all_queued_enters();
 
+/*! End *all* active and passive grabs on the keyboard */
+void event_cancel_all_key_grabs();
+
 /* Halts any focus delay in progress, use this when the user is selecting a
    window for focus */
 void event_halt_focus_delay();

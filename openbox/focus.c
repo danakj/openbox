@@ -75,7 +75,8 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(client, TRUE);
 
     /* in the middle of cycling..? kill it. */
-    focus_cycle_stop();
+    focus_cycle_stop(focus_client);
+    focus_cycle_stop(client);
 
     focus_client = client;
 
@@ -193,9 +194,30 @@ void focus_nothing()
                    event_curtime);
 }
 
+void focus_order_add_new(ObClient *c)
+{
+    if (c->iconic)
+        focus_order_to_top(c);
+    else {
+        g_assert(!g_list_find(focus_order, c));
+        /* if there are any iconic windows, put this above them in the order,
+           but if there are not, then put it under the currently focused one */
+        if (focus_order && ((ObClient*)focus_order->data)->iconic)
+            focus_order = g_list_insert(focus_order, c, 0);
+        else
+            focus_order = g_list_insert(focus_order, c, 1);
+    }
+
+    /* in the middle of cycling..? kill it. */
+    focus_cycle_stop(c);
+}
+
 void focus_order_remove(ObClient *c)
 {
     focus_order = g_list_remove(focus_order, c);
+
+    /* in the middle of cycling..? kill it. */
+    focus_cycle_stop(c);
 }
 
 void focus_order_to_top(ObClient *c)

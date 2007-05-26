@@ -2540,8 +2540,7 @@ gboolean client_hide(ObClient *self)
                actions should not rely on being able to move focus during an
                interactive grab.
             */
-            if (keyboard_interactively_grabbed())
-                keyboard_interactive_cancel();
+            event_cancel_all_key_grabs();
         }
 
         frame_hide(self->frame);
@@ -2932,7 +2931,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.y = self->root_pos.y;
         event.xconfigure.width = w;
         event.xconfigure.height = h;
-        event.xconfigure.border_width = 0;
+        event.xconfigure.border_width = self->border_width;
         event.xconfigure.above = self->frame->plate;
         event.xconfigure.override_redirect = FALSE;
         XSendEvent(event.xconfigure.display, event.xconfigure.window,
@@ -3526,8 +3525,7 @@ gboolean client_focus(ObClient *self)
        actions should not rely on being able to move focus during an
        interactive grab.
     */
-    if (keyboard_interactively_grabbed())
-        keyboard_interactive_cancel();
+    event_cancel_all_key_grabs();
 
     xerror_set_ignore(TRUE);
     xerror_occured = FALSE;

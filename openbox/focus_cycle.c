@@ -31,9 +31,12 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-ObClient     *focus_cycle_target = NULL;
+ObClient       *focus_cycle_target = NULL;
+static gboolean focus_cycle_iconic_windows;
+static gboolean focus_cycle_all_desktops;
+static gboolean focus_cycle_dock_windows;
+static gboolean focus_cycle_desktop_windows;
 
-static void      focus_cycle_destroy_notify (ObClient *client, gpointer data);
 static gboolean  focus_target_has_siblings  (ObClient *ft,
                                              gboolean iconic_windows,
                                              gboolean all_desktops);
@@ -49,30 +52,27 @@ static ObClient *focus_find_directional    (ObClient *c,
 void focus_cycle_startup(gboolean reconfig)
 {
     if (reconfig) return;
-
-    client_add_destroy_notify(focus_cycle_destroy_notify, NULL);
 }
 
 void focus_cycle_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
-
-    client_remove_destroy_notify(focus_cycle_destroy_notify);
 }
 
-void focus_cycle_stop()
+void focus_cycle_stop(ObClient *ifclient)
 {
-    if (focus_cycle_target)
+    /* stop focus cycling if the given client is a valid focus target,
+       and so the cycling is being disrupted */
+    if (focus_cycle_target && ifclient &&
+        focus_cycle_target_valid(ifclient,
+                                 focus_cycle_iconic_windows,
+                                 focus_cycle_all_desktops,
+                                 focus_cycle_dock_windows,
+                                 focus_cycle_desktop_windows))
+    {
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-}
-
-static void focus_cycle_destroy_notify(ObClient *client, gpointer data)
-{
-    /* end cycling if the target disappears. CurrentTime is fine, time won't
-       be used
-    */
-    if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+    }
 }
 
 /*! Returns if a focus target has valid group siblings that can be cycled
@@ -185,7 +185,15 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             goto done_cycle;
         list = client_list;
     }
-    if (!focus_cycle_target) focus_cycle_target = focus_client;
+
+
+    if (focus_cycle_target == NULL) {
+        focus_cycle_iconic_windows = TRUE;
+        focus_cycle_all_desktops = all_desktops;
+        focus_cycle_dock_windows = dock_windows;
+        focus_cycle_desktop_windows = desktop_windows;
+        focus_cycle_target = focus_client;
+    }
 
     start = it = g_list_find(list, focus_cycle_target);
     if (!start) /* switched desktops or something? */
@@ -201,9 +209,11 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (focus_cycle_target_valid(ft, TRUE,
-                                     all_desktops, dock_windows,
-                                     desktop_windows))
+        if (focus_cycle_target_valid(ft,
+                                     focus_cycle_iconic_windows,
+                                     focus_cycle_all_desktops,
+                                     focus_cycle_dock_windows,
+                                     focus_cycle_desktop_windows))
         {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
@@ -212,9 +222,11 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
                 }
                 if (dialog)
                     /* same arguments as focus_target_valid */
-                    focus_cycle_popup_show(ft, TRUE,
-                                           all_desktops, dock_windows,
-                                           desktop_windows);
+                    focus_cycle_popup_show(ft,
+                                           focus_cycle_iconic_windows,
+                                           focus_cycle_all_desktops,
+                                           focus_cycle_dock_windows,
+                                           focus_cycle_desktop_windows);
                 return;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
@@ -355,8 +367,15 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (!focus_order)
         goto done_cycle;
 
+    if (focus_cycle_target == NULL) {
+        focus_cycle_iconic_windows = FALSE;
+        focus_cycle_all_desktops = FALSE;
+        focus_cycle_dock_windows = dock_windows;
+        focus_cycle_desktop_windows = desktop_windows;
+        focus_cycle_target = focus_client;
+    }
+
     if (!first) first = focus_client;
-    if (!focus_cycle_target) focus_cycle_target = focus_client;
 
     if (focus_cycle_target)
         ft = focus_find_directional(focus_cycle_target, dir, dock_windows,
@@ -365,8 +384,11 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_cycle_target_valid(it->data, FALSE, FALSE, dock_windows,
-                                         desktop_windows))
+            if (focus_cycle_target_valid(it->data,
+                                         focus_cycle_iconic_windows,
+                                         focus_cycle_all_desktops,
+                                         focus_cycle_dock_windows,
+                                         focus_cycle_desktop_windows))
                 ft = it->data;
     }
         
@@ -379,8 +401,10 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (focus_cycle_target && dialog) {
         /* same arguments as focus_target_valid */
         focus_cycle_popup_single_show(focus_cycle_target,
-                                      FALSE, FALSE, dock_windows,
-                                      desktop_windows);
+                                      focus_cycle_iconic_windows,
+                                      focus_cycle_all_desktops,
+                                      focus_cycle_dock_windows,
+                                      focus_cycle_desktop_windows);
         return;
     }
 
@@ -396,19 +420,3 @@ done_cycle:
 
     return;
 }
-
-void focus_order_add_new(ObClient *c)
-{
-    if (c->iconic)
-        focus_order_to_top(c);
-    else {
-        g_assert(!g_list_find(focus_order, c));
-        /* if there are any iconic windows, put this above them in the order,
-           but if there are not, then put it under the currently focused one */
-        if (focus_order && ((ObClient*)focus_order->data)->iconic)
-            focus_order = g_list_insert(focus_order, c, 0);
-        else
-            focus_order = g_list_insert(focus_order, c, 1);
-    }
-}
-

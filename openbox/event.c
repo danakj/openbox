@@ -1837,6 +1837,25 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
     return FALSE;
 }
 
+void event_cancel_all_key_grabs()
+{
+    if (keyboard_interactively_grabbed())
+        keyboard_interactive_cancel();
+    else if (menu_frame_visible)
+        menu_frame_hide_all();
+    else if (grab_on_keyboard())
+        ungrab_keyboard();
+    else
+        /* If we don't have the keyboard grabbed, then ungrab it with
+           XUngrabKeyboard, so that there is not a passive grab left
+           on from the KeyPress. If the grab is left on, and focus
+           moves during that time, it will be NotifyWhileGrabbed, and
+           applications like to ignore those! */
+        if (!keyboard_interactively_grabbed())
+            XUngrabKeyboard(ob_display, CurrentTime);
+
+}
+
 gboolean event_time_after(Time t1, Time t2)
 {
     g_assert(t1 != CurrentTime);

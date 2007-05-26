@@ -47,17 +47,18 @@ static void client_action_end(union ActionData *data)
 {
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button && data->any.c)
+            if (!data->any.button && data->any.c) {
                 event_ignore_all_queued_enters();
-            else {
-                /* we USED to create a fake enter event here, so that when you
-                   used a Press context, and the button was still down,
-                   you could still get enter events that weren't
-                   NotifyWhileGrabbed.
+            } else {
+                ObClient *c;
 
-                   only problem with this is that then the resulting focus
-                   change events can ALSO be NotifyWhileGrabbed. And that is
-                   bad. So, don't create fake enter events anymore. */
+                /* usually this is sorta redundant, but with a press action
+                   that moves windows our from under the cursor, the enter
+                   event will come as a GrabNotify which is ignored, so this
+                   makes a fake enter event
+                */
+                if ((c = client_under_pointer()))
+                    event_enter_client(c);
             }
         }
 }
@@ -1215,11 +1216,9 @@ void action_execute(union ActionData *data)
     if (data->execute.path) {
         cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
         if (cmd) {
-            /* If there is an interactive action going on, then cancel it
-               to release the keyboard, so that the run application
-               can grab the keyboard if it wants to. */
-            if (keyboard_interactively_grabbed())
-                keyboard_interactive_cancel();
+            /* If there is a keyboard grab going on then we need to cancel
+               it so the application can grab things */
+            event_cancel_all_key_grabs();
 
             if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
                 g_message(_("Failed to execute '%s': %s"),

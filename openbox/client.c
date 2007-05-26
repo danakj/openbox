@@ -348,7 +348,7 @@ void client_manage(Window window)
         !self->iconic &&
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
-         client_search_focus_parent(self)) &&
+         client_search_focus_tree_full(self)) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
@@ -474,8 +474,8 @@ void client_manage(Window window)
                           "Not focusing the window because its on another "
                           "desktop\n");
         }
-        /* If something is focused, and it's not our parent... */
-        else if (focus_client && client_search_focus_parent(self) == NULL)
+        /* If something is focused, and it's not our relative... */
+        else if (focus_client && client_search_focus_tree_full(self) == NULL)
         {
             /* If time stamp is old, don't steal focus */
             if (self->user_time && last_time &&
@@ -508,6 +508,14 @@ void client_manage(Window window)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because a globally "
                               "active client has focus\n");
+            }
+            /* Don't move focus if it's not going to go to this window
+               anyway */
+            else if (client_focus_target(self) != self) {
+                activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because another window "
+                              "would get the focus anyway\n");
             }
         }
 

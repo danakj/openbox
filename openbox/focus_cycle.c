@@ -31,7 +31,10 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-ObClient     *focus_cycle_target = NULL;
+ObClient       *focus_cycle_target = NULL;
+static gboolean focus_cycle_all_desktops;
+static gboolean focus_cycle_dock_windows;
+static gboolean focus_cycle_desktop_windows;
 
 static void      focus_cycle_destroy_notify (ObClient *client, gpointer data);
 static gboolean  focus_target_has_siblings  (ObClient *ft,
@@ -186,7 +189,14 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             goto done_cycle;
         list = client_list;
     }
-    if (!focus_cycle_target) focus_cycle_target = focus_client;
+
+
+    if (focus_cycle_target == NULL) {
+        focus_cycle_all_desktops = FALSE;
+        focus_cycle_dock_windows = dock_windows;
+        focus_cycle_desktop_windows = desktop_windows;
+        focus_cycle_target = focus_client;
+    }
 
     start = it = g_list_find(list, focus_cycle_target);
     if (!start) /* switched desktops or something? */
@@ -203,8 +213,9 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
         }
         ft = it->data;
         if (focus_cycle_target_valid(ft, TRUE,
-                                     all_desktops, dock_windows,
-                                     desktop_windows))
+                                     focus_cycle_all_desktops,
+                                     focus_cycle_dock_windows,
+                                     focus_cycle_desktop_windows))
         {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
@@ -214,8 +225,9 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
                 if (dialog)
                     /* same arguments as focus_target_valid */
                     focus_cycle_popup_show(ft, TRUE,
-                                           all_desktops, dock_windows,
-                                           desktop_windows);
+                                           focus_cycle_all_desktops,
+                                           focus_cycle_dock_windows,
+                                           focus_cycle_desktop_windows);
                 return;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
@@ -356,8 +368,14 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (!focus_order)
         goto done_cycle;
 
+    if (focus_cycle_target == NULL) {
+        focus_cycle_all_desktops = FALSE;
+        focus_cycle_dock_windows = dock_windows;
+        focus_cycle_desktop_windows = desktop_windows;
+        focus_cycle_target = focus_client;
+    }
+
     if (!first) first = focus_client;
-    if (!focus_cycle_target) focus_cycle_target = focus_client;
 
     if (focus_cycle_target)
         ft = focus_find_directional(focus_cycle_target, dir, dock_windows,
@@ -366,8 +384,9 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_cycle_target_valid(it->data, FALSE, FALSE, dock_windows,
-                                         desktop_windows))
+            if (focus_cycle_target_valid(it->data, FALSE, FALSE,
+                                         focus_cycle_dock_windows,
+                                         focus_cycle_desktop_windows))
                 ft = it->data;
     }
         
@@ -380,8 +399,9 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (focus_cycle_target && dialog) {
         /* same arguments as focus_target_valid */
         focus_cycle_popup_single_show(focus_cycle_target,
-                                      FALSE, FALSE, dock_windows,
-                                      desktop_windows);
+                                      FALSE, FALSE,
+                                      focus_cycle_dock_windows,
+                                      focus_cycle_desktop_windows);
         return;
     }
 

@@ -74,14 +74,13 @@ static ObFocusCyclePopup popup;
 /*! This popup shows a single window */
 static ObIconPopup *single_popup;
 
-static gboolean cycle_iconic_windows;
-static gboolean cycle_all_desktops;
-static gboolean cycle_dock_windows;
-static gboolean cycle_desktop_windows;
-
 static gchar *popup_get_name (ObClient *c);
 static void   popup_setup    (ObFocusCyclePopup *p,
-                              gboolean create_targets);
+                              gboolean create_targets,
+                              gboolean iconic_windows,
+                              gboolean all_desktops,
+                              gboolean dock_windows,
+                              gboolean desktop_windows);
 static void   popup_render   (ObFocusCyclePopup *p,
                               const ObClient *c);
 
@@ -156,7 +155,9 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     RrAppearanceFree(popup.a_bg);
 }
 
-static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets)
+static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
+                        gboolean iconic_windows, gboolean all_desktops,
+                        gboolean dock_windows, gboolean desktop_windows)
 {
     gint maxwidth, n;
     GList *it;
@@ -174,10 +175,10 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets)
         ObClient *ft = it->data;
 
         if (focus_cycle_target_valid(ft,
-                                     cycle_iconic_windows,
-                                     cycle_all_desktops,
-                                     cycle_dock_windows,
-                                     cycle_desktop_windows))
+                                     iconic_windows,
+                                     all_desktops,
+                                     dock_windows,
+                                     desktop_windows))
         {
             gchar *text = popup_get_name(ft);
 
@@ -444,13 +445,9 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
     g_assert(c != NULL);
 
     /* do this stuff only when the dialog is first showing */
-    if (!popup.mapped) {
-        cycle_iconic_windows = iconic_windows;
-        cycle_all_desktops = all_desktops;
-        cycle_dock_windows = dock_windows;
-        cycle_desktop_windows = desktop_windows;
-        popup_setup(&popup, TRUE);
-    }
+    if (!popup.mapped)
+        popup_setup(&popup, TRUE, iconic_windows, all_desktops,
+                    dock_windows, desktop_windows);
     g_assert(popup.targets != NULL);
 
     popup_render(&popup, c);
@@ -502,11 +499,8 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     if (!popup.mapped) {
         Rect *a;
 
-        cycle_iconic_windows = iconic_windows;
-        cycle_all_desktops = all_desktops;
-        cycle_dock_windows = dock_windows;
-        cycle_desktop_windows = desktop_windows;
-        popup_setup(&popup, FALSE);
+        popup_setup(&popup, FALSE, iconic_windows, all_desktops,
+                    dock_windows, desktop_windows);
         g_assert(popup.targets == NULL);
 
         /* position the popup */

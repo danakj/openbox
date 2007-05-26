@@ -842,6 +842,11 @@ void frame_adjust_icon(ObFrame *self)
 
 void frame_grab_client(ObFrame *self)
 {
+    /* DO NOT map the client window here. we used to do that, but it is bogus.
+       we need to set up the client's dimensions and everything before we
+       send a mapnotify or we create race conditions.
+    */
+
     /* reparent the client to the frame */
     XReparentWindow(ob_display, self->client->window, self->plate, 0, 0);
 
@@ -859,9 +864,6 @@ void frame_grab_client(ObFrame *self)
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */
     XSelectInput(ob_display, self->plate, PLATE_EVENTMASK);
-
-    /* map the client so it maps when the frame does */
-    XMapWindow(ob_display, self->client->window);
 
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, self->client);

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-25 15:23-0400\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-22 00:29+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -15,22 +15,22 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:953
+#: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Ogiltig action '%s' efterfrågades, men den finns inte."
 
-#: openbox/action.c:956
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Ogiltigt användande av action '%s', den kommer ignoreras."
 
-#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Kunde inte exekvera '%s': %s"
 
-#: openbox/action.c:1264
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Lyckades inte konvertera sökvägen '%s' från utf8"
@@ -286,7 +286,7 @@ msgstr "Kunde inte erhålla fönsterhanterarmarkeringen på skärm %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Fönsterhanteraren på skärm %d avslutar inte"
 
-#: openbox/screen.c:946
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr "skrivbord %i"

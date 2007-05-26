@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-25 15:23-0400\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-23 16:22+0200\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -16,22 +16,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/action.c:953
+#: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "要求的動作「%s」無效。無此類動作存在。"
 
-#: openbox/action.c:956
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "使用的動作「%s」無效。動作將被忽略。"
 
-#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "執行「%s」時失敗：%s"
 
-#: openbox/action.c:1264
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "從 utf8 轉換路徑「%s」時失敗"
@@ -286,7 +286,7 @@ msgstr "無法於螢幕 %d 獲選為視窗管理員"
 msgid "The WM on screen %d is not exiting"
 msgstr "螢幕 %d 中的視窗管理員並未離開"
 
-#: openbox/screen.c:946
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"

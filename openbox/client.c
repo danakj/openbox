@@ -2931,7 +2931,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.y = self->root_pos.y;
         event.xconfigure.width = w;
         event.xconfigure.height = h;
-        event.xconfigure.border_width = 0;
+        event.xconfigure.border_width = self->border_width;
         event.xconfigure.above = self->frame->plate;
         event.xconfigure.override_redirect = FALSE;
         XSendEvent(event.xconfigure.display, event.xconfigure.window,

@@ -249,6 +249,12 @@
     <mousebind button="A-Down" action="Click">
       <action name="DesktopNext"/>
     </mousebind>
+    <mousebind button="C-A-Up" action="Click">
+      <action name="DesktopPrevious"/>
+    </mousebind>
+    <mousebind button="C-A-Down" action="Click">
+      <action name="DesktopNext"/>
+    </mousebind>
     <mousebind button="A-S-Up" action="Click">
       <action name="SendToDesktopPrevious"/>
     </mousebind>
@@ -398,15 +404,12 @@
   <context name="Client">
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
-      <action name="Raise"/>
     </mousebind>
     <mousebind button="Middle" action="Press">
       <action name="Focus"/>
-      <action name="Raise"/>
     </mousebind>
     <mousebind button="Right" action="Press">
       <action name="Focus"/>
-      <action name="Raise"/>
     </mousebind>
   </context>
 
@@ -490,6 +493,12 @@
       <action name="DesktopPrevious"/>
     </mousebind>
     <mousebind button="A-Down" action="Press">
+      <action name="DesktopNext"/>
+    </mousebind>
+    <mousebind button="C-A-Up" action="Press">
+      <action name="DesktopPrevious"/>
+    </mousebind>
+    <mousebind button="C-A-Down" action="Press">
       <action name="DesktopNext"/>
     </mousebind>
 

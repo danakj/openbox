@@ -2879,7 +2879,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (w <= oldw || h <= oldh)) {
+    if (send_resize_client && (w <= oldw && h <= oldh)) {
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
 

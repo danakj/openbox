@@ -21,50 +21,65 @@
 #include <X11/Xlib.h>
 
 int main () {
-  Display   *display;
-  Window     win;
-  XEvent     report;
-  XEvent     msg;
-  int        x=10,y=10,h=100,w=100;
+    Display   *display;
+    Window     win;
+    XEvent     report;
+    XEvent     msg;
+    int        x=10,y=10,h=100,w=100;
 
-  display = XOpenDisplay(NULL);
+    display = XOpenDisplay(NULL);
 
-  if (display == NULL) {
-    fprintf(stderr, "couldn't connect to X server :0\n");
-    return 0;
-  }
-
-  win = XCreateWindow(display, RootWindow(display, 0),
-		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
-		      CopyFromParent, 0, NULL);
-
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
-
-  XSelectInput(display, win, ExposureMask | StructureNotifyMask);
-
-  XMapWindow(display, win);
-  XFlush(display);
-
-  while (1) {
-    XNextEvent(display, &report);
-
-    switch (report.type) {
-    case MapNotify:
-        printf("map notify\n");
-        break;
-    case Expose:
-      printf("exposed\n");
-      break;
-    case ConfigureNotify:
-      x = report.xconfigure.x;
-      y = report.xconfigure.y;
-      w = report.xconfigure.width;
-      h = report.xconfigure.height;
-      printf("confignotify %i,%i-%ix%i\n",x,y,w,h);
-      break;
+    if (display == NULL) {
+        fprintf(stderr, "couldn't connect to X server :0\n");
+        return 0;
     }
 
-  }
+    win = XCreateWindow(display, RootWindow(display, 0),
+                        x, y, w, h, 10, CopyFromParent, CopyFromParent,
+                        CopyFromParent, 0, NULL);
 
-  return 1;
+    XSetWindowBackground(display,win,WhitePixel(display,0)); 
+
+    XSelectInput(display, win, (ExposureMask | StructureNotifyMask |
+                                GravityNotify));
+
+    XMapWindow(display, win);
+    XFlush(display);
+
+    while (1) {
+        XNextEvent(display, &report);
+
+        switch (report.type) {
+        case MapNotify:
+            printf("map notify\n");
+            break;
+        case Expose:
+            printf("exposed\n");
+            break;
+        case GravityNotify:
+            printf("gravity notify event 0x%x window 0x%x x %d y %d\n",
+                   report.xgravity.event, report.xgravity.window,
+                   report.xgravity.x, report.xgravity.y);
+            break;
+        case ConfigureNotify: {
+            int se = report.xconfigure.send_event;
+            int event = report.xconfigure.event;
+            int window = report.xconfigure.window;
+            int x = report.xconfigure.x;
+            int y = report.xconfigure.y;
+            int w = report.xconfigure.width;
+            int h = report.xconfigure.height;
+            int bw = report.xconfigure.border_width;
+            int above = report.xconfigure.above;
+            int or = report.xconfigure.override_redirect;
+            printf("confignotify send %d ev 0x%x win 0x%x %i,%i-%ix%i bw %i\n"
+                   "             above 0x%x ovrd %d\n",
+                   se,event,window,x,y,w,h,bw,above,or);
+            break;
+        }
+        }
+
+    }
+
+    return 1;
 }

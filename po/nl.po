@@ -1,16 +1,17 @@
-# Translation of openbox.pot to Slovak.
-# Copyright (C) 2006 Mikael Magnusson
-# This file is distributed under the same license as the Openbox 3 package.
-# Jozef Říha <jose1711@gmail.com>, 2006, 2007.
-#
+# Dutch messages for openbox.
+# Copyright (C) 2007 Mark Pustjens
+# This file is distributed under the same license as the openbox package.
+# Mark Pustjens <pustjens@dds.nl>, 2007.
+# 
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox-3.4\n"
+"Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-05-27 16:40+0200\n"
-"PO-Revision-Date: 2007-05-27 13:43Central Europe Daylight Time\n"
-"Last-Translator: Jozef Riha <jose1711@gmail.com\n"
-"Language-Team: Slovak <LL@li.org>\n"
+"PO-Revision-Date: 2007-05-24 16:39+0200\n"
+"Last-Translator: Mark Pustjens <pustjens@dds.nl>\n"
+"Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,173 +19,173 @@ msgstr ""
 #: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Vyžiadaná neplatná akcia '%s'. Takáto akcia neexistuje."
+msgstr "Ongeldige actie '%s' gevraagd. Deze actie bestaat niet"
 
 #: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr "Neplatné použitie akcie '%s'. Akcia bude ignorovaná."
+msgstr "Ongeldig gebruik van actie '%s'. Actie wordt genegeerd."
 
 #: openbox/action.c:1224 openbox/action.c:1242 openbox/action.c:1255
 #, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Nepodarilo sa spustiť '%s': %s"
+msgstr "Uitvoeren van '%s' mislukt: %s"
 
 #: openbox/action.c:1263
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
-msgstr "Nepodarilo sa skonvertovať cestu '%s' z utf8"
+msgstr "Converteren van het pad '%s' vanuit utf8 mislukt"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
 msgid "Go there..."
-msgstr "Prejsť na..."
+msgstr "Ga hierheen..."
 
 #: openbox/client_list_combined_menu.c:148
 msgid "Windows"
-msgstr "Okná"
+msgstr "Vensters"
 
 #: openbox/client_list_menu.c:196
 msgid "Desktops"
-msgstr "Plochy"
+msgstr "Bureaubladen"
 
 #: openbox/client_menu.c:246
 msgid "All desktops"
-msgstr "Všetky plochy"
+msgstr "Alle bureaubladen"
 
 #: openbox/client_menu.c:351
 msgid "&Layer"
-msgstr "&Vrstva"
+msgstr "&Laag"
 
 #: openbox/client_menu.c:356
 msgid "Always on &top"
-msgstr "Vždy &navrchu"
+msgstr "Altijd &bovenop"
 
 #: openbox/client_menu.c:357
 msgid "&Normal"
-msgstr "Nor&málna"
+msgstr "&Normaal"
 
 #: openbox/client_menu.c:358
 msgid "Always on &bottom"
-msgstr "Vždy &dole"
+msgstr "Altijd &onderop"
 
 #: openbox/client_menu.c:361
 msgid "&Send to desktop"
-msgstr "&Poslať na plochu"
+msgstr "Verplaats &naar bureaublad"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
-msgstr "Menu klienta"
+msgstr "Venster menu"
 
 #: openbox/client_menu.c:371
 msgid "R&estore"
-msgstr "&Obnoviť"
+msgstr "&Herstellen"
 
 #: openbox/client_menu.c:379
 msgid "&Move"
-msgstr "Pre&sunúť"
+msgstr "&Verplaatsen"
 
 #: openbox/client_menu.c:381
 msgid "Resi&ze"
-msgstr "Z&mena veľkosti"
+msgstr "&Grootte aanpassen"
 
 #: openbox/client_menu.c:383
 msgid "Ico&nify"
-msgstr "Do iko&ny"
+msgstr "&Iconificeren"
 
 #: openbox/client_menu.c:391
 msgid "Ma&ximize"
-msgstr "Ma&ximalizovať"
+msgstr "&Maximaliseren"
 
 #: openbox/client_menu.c:399
 msgid "&Roll up/down"
-msgstr "Ro/&Zvinúť"
+msgstr "&Op/neerklappen"
 
 #: openbox/client_menu.c:401
 msgid "Un/&Decorate"
-msgstr "(Ne)&Dekorovať"
+msgstr "&Vensterrand weghalen/toevoegen"
 
 #: openbox/client_menu.c:411
 msgid "&Close"
-msgstr "Z&avrieť"
+msgstr "&Sluiten"
 
 #: openbox/config.c:701
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr "Neplatné tlačidlo '%s' špecifikované v konfiguračnom súbore"
+msgstr "Ongeldige knop '%s' gespecificeerd in het configuratie bestand"
 
 #: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
-msgstr "Konflikt priradenie klávesov v konfiguračnom súbore"
+msgstr "Conflict met toetsen binding in het configuratie bestand"
 
 #: openbox/menu.c:98 openbox/menu.c:106
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr "Nepodarilo sa nájsť platný súbor menu '%s'"
+msgstr "Het vinden van een geldig menu bestand '%s' is mislukt"
 
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Nepodarilo sa spustiť príkaz pre pipe-menu '%s': %s"
+msgstr "Uitvoeren mislukt van het commando '%s' voor pipe-menu: %s"
 
 #: openbox/menu.c:166
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr "Neplatný výstup z pipe-menu '%s'"
+msgstr "Ongeldige uitvoer van pipe-menu '%s'"
 
 #: openbox/menu.c:179
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Pokus o sprístupnenie menu '%s', ale to neexistuje"
+msgstr "Toegang gevraagd tot menu '%s' maar het besstaat niet"
 
 #: openbox/menu.c:331 openbox/menu.c:332
 msgid "More..."
-msgstr "Viac..."
+msgstr "Meer..."
 
 #: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr "Neplatné tlačidlo '%s' v priradení myši"
+msgstr "Ongeldige knop '%s' in muis binding"
 
 #: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr "Neplatný kontext '%s' v priradení myši"
+msgstr "Ongeldige context '%s' in muis binding"
 
 #: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Nepodarilo sa prejsť do domovského adresára '%s': %s"
+msgstr "Mislukt om het pad in te stellen naar de thuis map '%s': %s"
 
 #: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Nepodarilo sa otvoriť displej z premennej prostredia DISPLAY"
+msgstr "Mislukt om het scherm van de DISPLAY omgevings variabele te openen."
 
 #: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
-msgstr "Nepodarilo sa inicializovať knižnicu obrender."
+msgstr "Initialiseren van de obrender bibliotheek mislukt."
 
 #: openbox/openbox.c:186
 msgid "X server does not support locale."
-msgstr "X server nepodporuje locale."
+msgstr "X server ondersteunt locale niet"
 
 #: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Nemôžem nastaviť locale pre X server."
+msgstr "Kan de locale bepalinging van de X server niet instellen"
 
 #: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Nepodarilo sa nájsť platný konfiguračný súbor, použijem jednoduché "
-"implicitné nastavenia"
+"Mislukt om een geldig configuratie bestand te vinden, eenvoudige standaard "
+"instellingen worden gebruikt"
 
 #: openbox/openbox.c:275
 msgid "Unable to load a theme."
-msgstr "Nepodarilo sa nahrať tému."
+msgstr "Mislukt om een theme te laden."
 
 #: openbox/openbox.c:394
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Reštart zlyhal pri spúšťaní novej binárky '%s': %s"
+msgstr "Uitvoeren van nieuw programma '%s' tijdens herstart miskukt: %s"
 
 #: openbox/openbox.c:464 openbox/openbox.c:466
 msgid "Copyright (c)"
@@ -192,7 +193,7 @@ msgstr "Copyright (c)"
 
 #: openbox/openbox.c:475
 msgid "Syntax: openbox [options]\n"
-msgstr "Syntax: openbox [volby]\n"
+msgstr "Syntax: openbox [opties]\n"
 
 #: openbox/openbox.c:476
 msgid ""
@@ -200,24 +201,24 @@ msgid ""
 "Options:\n"
 msgstr ""
 "\n"
-"Volby:\n"
+"Opties:\n"
 
 #: openbox/openbox.c:477
 msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Zobrazi tuto napovedu a skonci\n"
+msgstr "  --help              Toont deze helptext en sluit af\n"
 
 #: openbox/openbox.c:478
 msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Zobrazi cislo verzie a skonci\n"
+msgstr "  --version           Toont versie en sluit af\n"
 
 #: openbox/openbox.c:479
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
-"  --replace           Nahradi momentalne beziace sedenie window manazera\n"
+msgstr "  --replace           Vervang de huidig draaiende window manager\n"
 
 #: openbox/openbox.c:480
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Vypne spojenie k manazerovi sedenia\n"
+msgstr ""
+"  --sm-disable        Verbinding met de sessie beheerder uitschakelen\n"
 
 #: openbox/openbox.c:481
 msgid ""
@@ -225,15 +226,15 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Predavanie sprav beziacej instancii Openboxu:\n"
+"Berichten worden naar een draaiende Openbox instantie gestuurd:\n"
 
 #: openbox/openbox.c:482
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Opatovne nacita konfiguraciu Openboxu\n"
+msgstr "  --reconfigure       Openbox configuratie opnieuw laden\n"
 
 #: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Restartuje Openbox\n"
+msgstr "  --restart           Herstart Openbox\n"
 
 #: openbox/openbox.c:484
 msgid ""
@@ -241,24 +242,23 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Volby ladenia:\n"
+"Debugging opties:\n"
 
 #: openbox/openbox.c:485
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Spustit v synchronnom mode\n"
+msgstr "  --sync              Start in synchrone modus\n"
 
 #: openbox/openbox.c:486
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Zobrazit ladiaci vystup\n"
+msgstr "  --debug             Debug uitvoer weergeven\n"
 
 #: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
-"  --debug-focus       Zobrazit ladiaci vystup pre manipulaciu s fokusom\n"
+msgstr "  --debug-focus       Debug uitvoer voor focus afhandeling weergeven\n"
 
 #: openbox/openbox.c:488
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Rozdelit displej na neprave obrazovky xineramy\n"
+msgstr "  --debug-xinerama    Splits het scherm in nep xinerama schermen\n"
 
 #: openbox/openbox.c:489
 #, c-format
@@ -267,74 +267,74 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Prosim hlaste chyby na %s\n"
+"Geliever bugs te melden bij %s\n"
 
 #: openbox/openbox.c:586
 #, c-format
 msgid "Invalid command line argument '%s'\n"
-msgstr "Neplatny parameter prikazoveho riadku '%s'\n"
+msgstr "Onbekende optie '%s'\n"
 
 #: openbox/screen.c:88 openbox/screen.c:189
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Okenny manazer uz bezi na obrazovke %d"
+msgstr "Een window manager draait al op scherm %d"
 
 #: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Nepodarilo sa získať výber okenného manažéra na obrazovke %d"
+msgstr "Kon window manager selectie op scherm %d niet verkrijgen"
 
 #: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "Okenný manažér na obrazovke %d sa neukončuje"
+msgstr "De window manager op scherm %d sluit zichzelf niet af"
 
 #: openbox/screen.c:948
 #, c-format
 msgid "desktop %i"
-msgstr "plocha %i"
+msgstr "bureaublad %i"
 
 #: openbox/session.c:103
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr "Nebolo možné vytvoriť adresár '%s': %s"
+msgstr "Kan map '%s' niet aanmaken: %s"
 
 #: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Nepodarilo sa uložiť sedenie '%s': %s"
+msgstr "Kan de sessie niet opslaan naar '%s': %s"
 
 #: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
-msgstr "Chyba pri ukladaní sedenia do '%s': %s"
+msgstr "Fout tijdens het opslaan van de sessie naar '%s': %s"
 
 #: openbox/startupnotify.c:237
 #, c-format
 msgid "Running %s\n"
-msgstr "Spúšťam %s\n"
+msgstr "Starten %s\n"
 
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Neplatný kláves pre modifikátor '%s' v priradení klávesov/myši"
+msgstr "Ongeldige modificatie-toets '%s' in toetsen/muis binding"
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "Neplatný kód klávesu '%s' v priradení klávesov"
+msgstr "Ongeldige toest code '%s' in toetsen binding"
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Neplatný názov klávesu '%s' v priradení klávesov"
+msgstr "Ongeldige toest naam '%s' in toetsen binding"
 
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
-msgstr "Požadovaný kláves '%s' na displeji neexistuje"
+msgstr "Aangevraagde toets '%s' bestaat niet op het scherm"
 
 #: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
-msgstr "Chyba X: %s"
+msgstr "X Fout: %s"

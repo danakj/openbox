@@ -396,8 +396,9 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
     frame = menu_frame_new(self, 0, client);
     if (!menu_frame_show_topmenu(frame, x, y, button))
         menu_frame_free(frame);
-    else {
-        /* select the first entry if it's not a submenu */
+    else if (!button) {
+        /* select the first entry if it's not a submenu and we opened
+         * the menu with the keyboard, and skip all headers */
         GList *it = frame->entries;
         while (it) {
             ObMenuEntryFrame *e = it->data;

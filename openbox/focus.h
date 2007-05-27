@@ -44,7 +44,8 @@ void focus_set_client(struct _ObClient *client);
 void focus_nothing();
 
 /*! Call this when you need to focus something! */
-struct _ObClient* focus_fallback(gboolean allow_refocus);
+struct _ObClient* focus_fallback(gboolean allow_refocus,
+                                 gboolean allow_pointer);
 
 /*! Add a new client into the focus order */
 void focus_order_add_new(struct _ObClient *c);

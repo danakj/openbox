@@ -135,7 +135,6 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     guint i;
-    GSList *it, *next;
 
     menu_clear_entries(menu);
 

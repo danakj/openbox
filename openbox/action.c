@@ -1311,7 +1311,7 @@ void action_focus(union ActionData *data)
 void action_unfocus (union ActionData *data)
 {
     if (data->client.any.c == focus_client)
-        focus_fallback(FALSE);
+        focus_fallback(FALSE, FALSE);
 }
 
 void action_iconify(union ActionData *data)

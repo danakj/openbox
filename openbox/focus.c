@@ -95,13 +95,15 @@ void focus_set_client(ObClient *client)
     }
 }
 
-static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
+static ObClient* focus_fallback_target(gboolean allow_refocus,
+                                       gboolean allow_pointer,
+                                       ObClient *old)
 {
     GList *it;
     ObClient *c;
 
     ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
-    if (config_focus_follow && !config_focus_last)
+    if (allow_pointer && config_focus_follow)
         if ((c = client_under_pointer()) &&
             (allow_refocus || c != old) &&
             (client_normal(c) &&
@@ -153,7 +155,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus, ObClient *old)
     return NULL;
 }
 
-ObClient* focus_fallback(gboolean allow_refocus)
+ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer)
 {
     ObClient *new;
     ObClient *old = focus_client;
@@ -163,7 +165,7 @@ ObClient* focus_fallback(gboolean allow_refocus)
        event at all for them. */
     focus_nothing();
 
-    new = focus_fallback_target(allow_refocus, old);
+    new = focus_fallback_target(allow_refocus, allow_pointer, old);
 
     return new;
 }

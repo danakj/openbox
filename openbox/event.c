@@ -343,6 +343,9 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
         /* This means focus was taken by a keyboard/mouse grab. */
         if (mode == NotifyGrab)
             return FALSE;
+        /* This means focus was grabbed on a window and it was released. */
+        if (mode == NotifyUngrab)
+            return FALSE;
 
         /* Focus left the root window revertedto state */
         if (win == RootWindow(ob_display, ob_screen))
@@ -516,7 +519,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 */
 
                 if (!focus_left_screen)
-                    focus_fallback(TRUE);
+                    focus_fallback(TRUE, FALSE);
             }
         }
         else if (!client)
@@ -570,7 +573,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to an unmanaged window 0x%x !\n",
                               ce.xfocus.window);
-                focus_fallback(TRUE);
+                focus_fallback(TRUE, FALSE);
             }
         }
 

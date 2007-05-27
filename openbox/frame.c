@@ -1014,7 +1014,7 @@ static void layout_title(ObFrame *self)
     /* position of the left most button */
     const gint left = ob_rr_theme->paddingx + 1;
     /* position of the right most button */
-    const gint right = self->width - bwidth;
+    const gint right = self->width;
 
     /* turn them all off */
     self->icon_on = self->desk_on = self->shade_on = self->iconify_on =
@@ -1055,43 +1055,49 @@ static void layout_title(ObFrame *self)
                 if ((self->icon_on = is_button_present(self, lc, i))) {
                     /* icon is bigger than buttons */
                     self->label_width -= bwidth + 2;
-                    self->icon_x = x;
+                    if (i > 0) self->icon_x = x;
                     x += i * (bwidth + 2);
+                    if (i < 0) self->icon_x = x;
                 }
             } else if (*lc == 'D') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ALLDESKTOPS;
                 if ((self->desk_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
-                    self->desk_x = x;
+                    if (i > 0) self->desk_x = x;
                     x += i * bwidth;
+                    if (i < 0) self->desk_x = x;
                 }
             } else if (*lc == 'S') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_SHADE;
                 if ((self->shade_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
-                    self->shade_x = x;
+                    if (i > 0) self->shade_x = x;
                     x += i * bwidth;
+                    if (i < 0) self->shade_x = x;
                 }
             } else if (*lc == 'I') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICONIFY;
                 if ((self->iconify_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
-                    self->iconify_x = x;
+                    if (i > 0) self->iconify_x = x;
                     x += i * bwidth;
+                    if (i < 0) self->iconify_x = x;
                 }
             } else if (*lc == 'M') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_MAXIMIZE;
                 if ((self->max_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
-                    self->max_x = x;
+                    if (i > 0) self->max_x = x;
                     x += i * bwidth;
+                    if (i < 0) self->max_x = x;
                 }
             } else if (*lc == 'C') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_CLOSE;
                 if ((self->close_on = is_button_present(self, lc, i))) {
                     self->label_width -= bwidth;
-                    self->close_x = x;
+                    if (i > 0) self->close_x = x;
                     x += i * bwidth;
+                    if (i < 0) self->close_x = x;
                 }
             } else
                 continue; /* don't set firstcon */

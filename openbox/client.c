@@ -1802,9 +1802,6 @@ static void client_change_allowed_actions(ObClient *self)
 
 void client_reconfigure(ObClient *self)
 {
-    /* by making this pass FALSE for user, we avoid the emacs event storm where
-       every configurenotify causes an update in its normal hints, i think this
-       is generally what we want anyways... */
     client_configure(self, self->area.x, self->area.y,
                      self->area.width, self->area.height,
                      self->border_width, FALSE, TRUE);
@@ -2828,8 +2825,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
         changes.height = MAX(h, oldh);
         changes.border_width = self->border_width;
         XConfigureWindow(ob_display, self->window,
-                         (moved ? CWX|CWY : 0) |
-                         (resized ? CWWidth|CWHeight|CWBorderWidth : 0),
+                         CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
                          &changes);
         /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
@@ -2895,8 +2891,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
             changes.height = h;
             changes.border_width = self->border_width;
             XConfigureWindow(ob_display, self->window,
-                             (moved ? CWX|CWY : 0) |
-                             (resized ? CWWidth|CWHeight|CWBorderWidth : 0),
+                             CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
                              &changes);
         }
     }

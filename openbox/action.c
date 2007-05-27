@@ -1151,13 +1151,9 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
             {
                 /* interactive actions are not queued */
                 a->func(&a->data);
-            } else if (c &&
-                       (context == OB_FRAME_CONTEXT_CLIENT ||
-                        (c->type == OB_CLIENT_TYPE_DESKTOP &&
-                         context == OB_FRAME_CONTEXT_DESKTOP)) &&
-                       (a->func == action_focus ||
-                        a->func == action_activate ||
-                        a->func == action_showmenu))
+            } else if (a->func == action_focus ||
+                       a->func == action_activate ||
+                       a->func == action_showmenu)
             {
                 /* XXX MORE UGLY HACK
                    actions from clicks on client windows are NOT queued.
@@ -1177,11 +1173,15 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                    pointer. ugh.
 
                    also with the menus, there is a race going on. if the
-                   desktop wants to pop up a menu, and we do to, we send them
+                   desktop wants to pop up a menu, and we do too, we send them
                    the button before we pop up the menu, so they pop up their
                    menu first. but not always. if we pop up our menu before
                    sending them the button press, then the result is
                    deterministic. yay.
+
+                   XXX further more. focus actions are not queued at all,
+                   because if you bind focus->showmenu, the menu will get
+                   hidden to do the focusing
                 */
                 a->func(&a->data);
             } else

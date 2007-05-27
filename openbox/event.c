@@ -1566,7 +1566,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
            Control-Enter runs it without closing the menu. */
         if (frame->child)
             menu_frame_select_next(frame->child);
-        else
+        else if (frame->selected)
             menu_entry_frame_execute(frame->selected, state, ev->xkey.time);
     }
 

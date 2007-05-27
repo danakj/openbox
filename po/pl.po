@@ -254,7 +254,7 @@ msgstr "  --debug             Wypisuje informacje dotyczące debugowania\n"
 #: openbox/openbox.c:487
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
-"  --debug             Wypisuje informacje dotyczące debugowania, związane z "
+"  --debug-focus       Wypisuje informacje dotyczące debugowania, związane z "
 "obsługą aktywacji\n"
 
 #: openbox/openbox.c:488

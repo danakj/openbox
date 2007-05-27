@@ -427,8 +427,7 @@ void client_manage(Window window)
                                 it is up to the placement routines to avoid
                                 the xinerama divides) */
                              transient ||
-                             (((self->positioned & PPosition) &&
-                               !(self->positioned & USPosition)) &&
+                             (!(self->positioned & USPosition) &&
                               client_normal(self) &&
                               !self->session));
     }
@@ -1110,8 +1109,8 @@ static void client_get_area(ObClient *self)
     POINT_SET(self->root_pos, wattrib.x, wattrib.y);
     self->border_width = wattrib.border_width;
 
-    ob_debug("client area: %d %d  %d %d\n", wattrib.x, wattrib.y,
-             wattrib.width, wattrib.height);
+    ob_debug("client area: %d %d  %d %d  bw %d\n", wattrib.x, wattrib.y,
+             wattrib.width, wattrib.height, wattrib.border_width);
 }
 
 static void client_get_desktop(ObClient *self)

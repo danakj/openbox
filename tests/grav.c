@@ -24,7 +24,7 @@ int main () {
   Display   *display;
   Window     win;
   XEvent     report;
-  int        x=10,y=10,h=100,w=400;
+  int        x=10,y=10,h=100,w=400,b=10;
   XSizeHints *hints;
 
   display = XOpenDisplay(NULL);
@@ -35,7 +35,7 @@ int main () {
   }
 
   win = XCreateWindow(display, RootWindow(display, 0),
-		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
+		      x, y, w, h, b, CopyFromParent, CopyFromParent,
 		      CopyFromParent, 0, NULL);
 
   hints = XAllocSizeHints();
@@ -49,7 +49,7 @@ int main () {
   XMapWindow(display, win);
   XFlush(display);
 
-  XMoveResizeWindow(display, win, 1172-600, 668-150, 600, 150);
+  XMoveResizeWindow(display, win, 1172-600-b*2, 668-150-b*2, 600, 150);
   XFlush(display);
   sleep(1);
   XResizeWindow(display, win, 900, 275);

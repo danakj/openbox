@@ -277,7 +277,7 @@ void client_manage(Window window)
         XFree(wmhint);
     }
 
-    ob_debug("Managing window: %lx\n", window);
+    ob_debug("Managing window: 0x%lx\n", window);
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
@@ -1534,7 +1534,16 @@ void client_get_colormap(ObClient *self)
 
 void client_update_colormap(ObClient *self, Colormap colormap)
 {
-    self->colormap = colormap;
+    if (colormap == self->colormap) return;
+
+    ob_debug("Setting client %s colormap: 0x%x\n", self->title, colormap);
+
+    if (client_focused(self)) {
+        screen_install_colormap(self, FALSE); /* uninstall old one */
+        self->colormap = colormap;
+        screen_install_colormap(self, FALSE); /* install new one */
+    } else
+        self->colormap = colormap;
 }
 
 void client_update_normal_hints(ObClient *self)
@@ -3463,8 +3472,8 @@ gboolean client_focus(ObClient *self)
     }
 
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "Focusing client \"%s\" at time %u\n",
-                  self->title, event_curtime);
+                  "Focusing client \"%s\" (0x%x) at time %u\n",
+                  self->title, self->window, event_curtime);
 
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events
@@ -3502,6 +3511,7 @@ gboolean client_focus(ObClient *self)
 
     xerror_set_ignore(FALSE);
 
+    ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n", xerror_occured);
     return !xerror_occured;
 }
 

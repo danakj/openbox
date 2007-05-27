@@ -856,13 +856,11 @@ void frame_grab_client(ObFrame *self)
     /*
       When reparenting the client window, it is usually not mapped yet, since
       this occurs from a MapRequest. However, in the case where Openbox is
-      starting up, the window is already mapped, so we'll see unmap events for
-      it. There are 2 unmap events generated that we see, one with the 'event'
-      member set the root window, and one set to the client, but both get
-      handled and need to be ignored.
+      starting up, the window is already mapped, so we'll see an unmap event
+      for it.
     */
     if (ob_state() == OB_STATE_STARTING)
-        self->client->ignore_unmaps += 2;
+        ++self->client->ignore_unmaps;
 
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */

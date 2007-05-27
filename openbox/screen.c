@@ -1026,17 +1026,16 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
 
 void screen_install_colormap(ObClient *client, gboolean install)
 {
-    if (client == NULL) {
+    if (client == NULL || client->colormap == None) {
         if (install)
             XInstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
         else
             XUninstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
     } else {
         xerror_set_ignore(TRUE);
-        if (install) {
-            if (client->colormap != None)
-                XInstallColormap(RrDisplay(ob_rr_inst), client->colormap);
-        } else
+        if (install)
+            XInstallColormap(RrDisplay(ob_rr_inst), client->colormap);
+        else
             XUninstallColormap(RrDisplay(ob_rr_inst), client->colormap);
         xerror_set_ignore(FALSE);
     }

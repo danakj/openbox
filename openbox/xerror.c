@@ -27,20 +27,22 @@ gboolean xerror_occured = FALSE;
 
 gint xerror_handler(Display *d, XErrorEvent *e)
 {
-    xerror_occured = TRUE;
 #ifdef DEBUG
-    if (!xerror_ignore) {
-        gchar errtxt[128];
+    gchar errtxt[128];
 
-        XGetErrorText(d, e->error_code, errtxt, 127);
+    XGetErrorText(d, e->error_code, errtxt, 127);
+    if (!xerror_ignore) {
         if (e->error_code == BadWindow)
             /*g_message(_("X Error: %s\n"), errtxt)*/;
         else
             g_error(_("X Error: %s"), errtxt);
-    }
+    } else
+        ob_debug("XError code %d '%s'\n", e->error_code, errtxt);
 #else
     (void)d; (void)e;
 #endif
+
+    xerror_occured = TRUE;
     return 0;
 }
 

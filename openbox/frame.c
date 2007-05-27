@@ -1343,7 +1343,8 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case SouthEastGravity:
     case EastGravity:
         /* the right side of the client will be the right side of the frame */
-        *x -= self->size.right + self->size.left - self->client->border_width*2;
+        *x -= self->size.right + self->size.left -
+            self->client->border_width * 2;
         break;
 
     case ForgetGravity:
@@ -1372,7 +1373,8 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case SouthEastGravity:
     case SouthGravity:
         /* the bottom of the client will be the bottom of the frame */
-        *y -= self->size.bottom + self->size.top - self->client->border_width*2;
+        *y -= self->size.bottom + self->size.top -
+            self->client->border_width * 2;
         break;
 
     case ForgetGravity:
@@ -1402,7 +1404,8 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case EastGravity:
     case SouthEastGravity:
         /* the right side of the client will be the right side of the frame */
-        *x += self->size.right + self->size.left - self->client->border_width*2;
+        *x += self->size.right + self->size.left -
+            self->client->border_width * 2;
         break;
     case StaticGravity:
     case ForgetGravity:
@@ -1428,7 +1431,8 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     case SouthGravity:
     case SouthEastGravity:
         /* the bottom of the client will be the bottom of the frame */
-        *y += self->size.bottom + self->size.top - self->client->border_width*2;
+        *y += self->size.bottom + self->size.top -
+            self->client->border_width * 2;
         break;
     case StaticGravity:
     case ForgetGravity:

@@ -1534,7 +1534,16 @@ void client_get_colormap(ObClient *self)
 
 void client_update_colormap(ObClient *self, Colormap colormap)
 {
-    self->colormap = colormap;
+    if (colormap == self->colormap) return;
+
+    ob_debug("Setting client %s colormap: 0x%x\n", self->title, colormap);
+
+    if (client_focused(self)) {
+        screen_install_colormap(self, FALSE); /* uninstall old one */
+        self->colormap = colormap;
+        screen_install_colormap(self, FALSE); /* install new one */
+    } else
+        self->colormap = colormap;
 }
 
 void client_update_normal_hints(ObClient *self)

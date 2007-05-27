@@ -12,10 +12,19 @@
 
 <focus>
   <focusNew>yes</focusNew>
+  <!-- always try to focus new windows when they appear. other rules do
+       apply -->
   <focusLast>yes</focusLast>
+  <!-- focus the last used window when changing desktops, instead of the one
+       under the mouse pointer. when followMouse is enabled -->
   <followMouse>yes</followMouse>
+  <!-- move focus to a window when you move the mouse into it -->
   <focusDelay>200</focusDelay>
+  <!-- when followMouse is enabled, the mouse must be inside the window for
+       this many milliseconds (1000 = 1 sec) before moving focus to it -->
   <raiseOnFocus>no</raiseOnFocus>
+  <!-- when followMouse is enabled, and a window is given focus by moving the
+       mouse into it, also raise the window -->
 </focus>
 
 <placement>

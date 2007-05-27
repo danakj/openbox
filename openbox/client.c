@@ -427,8 +427,7 @@ void client_manage(Window window)
                                 it is up to the placement routines to avoid
                                 the xinerama divides) */
                              transient ||
-                             (((self->positioned & PPosition) &&
-                               !(self->positioned & USPosition)) &&
+                             (!(self->positioned & USPosition) &&
                               client_normal(self) &&
                               !self->session));
     }

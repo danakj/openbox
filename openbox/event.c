@@ -1455,6 +1455,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_sync_request_counter(client);
         }
 #endif
+        break;
     case ColormapNotify:
         client_update_colormap(client, e->xcolormap.colormap);
         break;

@@ -396,11 +396,19 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
     frame = menu_frame_new(self, 0, client);
     if (!menu_frame_show_topmenu(frame, x, y, button))
         menu_frame_free(frame);
-    else if (frame->entries) {
+    else {
         /* select the first entry if it's not a submenu */
-        ObMenuEntryFrame *e = frame->entries->data;
-        if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
-            menu_frame_select(frame, e, FALSE);
+        GList *it = frame->entries;
+        while (it) {
+            ObMenuEntryFrame *e = it->data;
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+                menu_frame_select(frame, e, FALSE);
+                break;
+            } else if (e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
+                it = g_list_next(it);
+            else
+                break;
+        }
     }
 }
 

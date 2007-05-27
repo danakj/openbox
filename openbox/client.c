@@ -277,7 +277,7 @@ void client_manage(Window window)
         XFree(wmhint);
     }
 
-    ob_debug("Managing window: %lx\n", window);
+    ob_debug("Managing window: 0x%lx\n", window);
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
@@ -3463,8 +3463,8 @@ gboolean client_focus(ObClient *self)
     }
 
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "Focusing client \"%s\" at time %u\n",
-                  self->title, event_curtime);
+                  "Focusing client \"%s\" (0x%x) at time %u\n",
+                  self->title, self->window, event_curtime);
 
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events
@@ -3502,6 +3502,7 @@ gboolean client_focus(ObClient *self)
 
     xerror_set_ignore(FALSE);
 
+    ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n", xerror_occured);
     return !xerror_occured;
 }
 

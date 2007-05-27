@@ -539,12 +539,14 @@ void screen_set_desktop(guint num, gboolean dofocus)
         dofocus = FALSE;
 
     /* have to try focus here because when you leave an empty desktop
-       there is no focus out to watch for
+       there is no focus out to watch for. also, we have different rules
+       here. we always allow it to look under the mouse pointer if
+       config_focus_last is FALSE
 
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if (dofocus && (c = focus_fallback(TRUE)))
+    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last)))
     {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is
@@ -1007,7 +1009,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     else if (!show_only) {
         ObClient *c;
 
-        if ((c = focus_fallback(TRUE))) {
+        if ((c = focus_fallback(TRUE, FALSE))) {
             /* only do the flicker reducing stuff ahead of time if we are going
                to call xsetinputfocus on the window ourselves. otherwise there
                is no guarantee the window will actually take focus.. */

@@ -152,12 +152,11 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 {
     ObCursor cur;
-
-    moving = (cnr == prop_atoms.net_wm_moveresize_move ||
-              cnr == prop_atoms.net_wm_moveresize_move_keyboard);
+    gboolean mv = (cnr == prop_atoms.net_wm_moveresize_move ||
+                   cnr == prop_atoms.net_wm_moveresize_move_keyboard);
 
     if (moveresize_in_progress || !c->frame->visible ||
-        !(moving ?
+        !(mv ?
           (c->functions & OB_CLIENT_FUNC_MOVE) :
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
@@ -197,6 +196,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 
     frame_end_iconify_animation(c->frame);
 
+    moving = mv;
     moveresize_client = c;
     start_cx = c->area.x;
     start_cy = c->area.y;

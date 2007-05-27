@@ -35,7 +35,7 @@ int main () {
     }
 
     win = XCreateWindow(display, RootWindow(display, 0),
-                        x, y, w, h, 10, CopyFromParent, CopyFromParent,
+                        x, y, w, h, 0, CopyFromParent, CopyFromParent,
                         CopyFromParent, 0, NULL);
 
     XSetWindowBackground(display,win,WhitePixel(display,0)); 
@@ -45,6 +45,10 @@ int main () {
 
     XMapWindow(display, win);
     XFlush(display);
+
+    sleep(1);
+    XResizeWindow(display, win, w+5, h+5);
+    XMoveWindow(display, win, x, y);
 
     while (1) {
         XNextEvent(display, &report);

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 16:20+0200\n"
+"POT-Creation-Date: 2007-05-27 16:34+0200\n"
 "PO-Revision-Date: 2007-05-22 19:35+0200\n"
 "Last-Translator: Og Maciel <ogmaciel@ubuntu.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
@@ -27,12 +27,12 @@ msgstr "Ação inválida '%s' requisitada. Ação não existe."
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Uso inválido da ação '%s'. Ação será ignorada."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1224 openbox/action.c:1242 openbox/action.c:1255
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Falha ao executar '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1263
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Falha ao converter o caminho '%s' do utf8"
@@ -295,10 +295,10 @@ msgstr ""
 msgid "The WM on screen %d is not exiting"
 msgstr "O gerenciador de janelas na tela %d não está saindo"
 
-#: openbox/screen.c:939
+#: openbox/screen.c:948
 #, c-format
 msgid "desktop %i"
-msgstr "�rea de trabalho %i"
+msgstr "área de trabalho %i"
 
 #: openbox/session.c:103
 #, c-format

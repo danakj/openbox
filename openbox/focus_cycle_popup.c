@@ -470,9 +470,6 @@ void focus_cycle_popup_hide()
     /* kill enter events cause by this unmapping */
     event_ignore_all_queued_enters();
 
-    /* kill enter events cause by this unmapping */
-    event_ignore_all_queued_enters();
-
     while(popup.targets) {
         ObFocusCyclePopupTarget *t = popup.targets->data;
 

@@ -358,6 +358,9 @@ void client_manage(Window window)
         activate = TRUE;
     }
 
+    /* remove the client's border */
+    XSetWindowBorderWidth(ob_display, self->window, 0);
+
     /* adjust the frame to the client's size before showing or placing
        the window */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
@@ -570,7 +573,7 @@ void client_manage(Window window)
     g_free(settings);
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)\n",
-             window, self->frame->plate, self->class);
+             window, self->frame->window, self->class);
 
     return;
 }
@@ -621,7 +624,7 @@ void client_unmanage(ObClient *self)
     GSList *it;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)\n",
-             self->window, self->frame->plate,
+             self->window, self->frame->window,
              self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);
@@ -712,6 +715,9 @@ void client_unmanage(ObClient *self)
         /* let it be moved and resized no matter what */
         self->functions = OB_CLIENT_FUNC_MOVE | OB_CLIENT_FUNC_RESIZE;
         self->decorations = 0; /* unmanaged windows have no decor */
+
+        /* give the client its border back */
+        XSetWindowBorderWidth(ob_display, self->window, self->border_width);
 
         client_move_resize(self, a.x, a.y, a.width, a.height);
     }
@@ -1810,7 +1816,7 @@ void client_reconfigure(ObClient *self)
 {
     client_configure(self, self->area.x, self->area.y,
                      self->area.width, self->area.height,
-                     self->border_width, FALSE, TRUE);
+                     FALSE, TRUE);
 }
 
 void client_update_wmhints(ObClient *self)
@@ -2568,7 +2574,7 @@ static void client_apply_startup_state(ObClient *self,
        do this before applying the states so they have the correct
        pre-max/pre-fullscreen values
     */
-    client_configure(self, x, y, w, h, self->border_width, FALSE, TRUE);
+    client_configure(self, x, y, w, h, FALSE, TRUE);
     ob_debug("placed window 0x%x at %d, %d with size %d x %d\n",
              self->window, self->area.x, self->area.y,
              self->area.width, self->area.height);
@@ -2818,7 +2824,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 }
 
 
-void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
+void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                       gboolean user, gboolean final)
 {
     gint oldw, oldh;
@@ -2839,13 +2845,11 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
 
     /* figure out if we moved or resized or what */
     moved = x != self->area.x || y != self->area.y;
-    resized = w != self->area.width || h != self->area.height ||
-        b != self->border_width;
+    resized = w != self->area.width || h != self->area.height;
 
     oldw = self->area.width;
     oldh = self->area.height;
     RECT_SET(self->area, x, y, w, h);
-    self->border_width = b;
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when
@@ -2856,16 +2860,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XWindowChanges changes;
-        changes.x = -self->border_width;
-        changes.y = -self->border_width;
-        changes.width = MAX(w, oldw);
-        changes.height = MAX(h, oldh);
-        changes.border_width = self->border_width;
-        XConfigureWindow(ob_display, self->window,
-                         CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
-                         &changes);
-        /* resize the plate to show the client padding color underneath */
+        XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
         frame_adjust_client_area(self->frame);
     }
 
@@ -2918,20 +2913,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
 
     /* if the client is shrinking, then resize the frame before the client */
     if (send_resize_client && (w <= oldw && h <= oldh)) {
-        /* resize the plate to show the client padding color underneath */
         frame_adjust_client_area(self->frame);
-
-        if (send_resize_client) {
-            XWindowChanges changes;
-            changes.x = -self->border_width;
-            changes.y = -self->border_width;
-            changes.width = w;
-            changes.height = h;
-            changes.border_width = self->border_width;
-            XConfigureWindow(ob_display, self->window,
-                             CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
-                             &changes);
-        }
+        XResizeWindow(ob_display, self->window, w, h);
     }
 
     XFlush(ob_display);

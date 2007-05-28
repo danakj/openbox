@@ -77,7 +77,6 @@ struct _ObFrame
     struct _ObClient *client;
 
     Window    window;
-    Window    plate;
 
     Strut     size;
     Rect      area;
@@ -86,7 +85,6 @@ struct _ObFrame
     guint     functions;
     guint     decorations;
 
-    Window    inner;  /*!< The window for drawing the inner client border */
     Window    title;
     Window    label;
     Window    max;
@@ -118,6 +116,13 @@ struct _ObFrame
     Window    rgriptop;
     Window    rgripright;
     Window    rgripbottom;
+    Window    innerleft;    /*!< For drawing the inner client border */
+    Window    innertop;     /*!< For drawing the inner client border */
+    Window    innerright;   /*!< For drawing the inner client border */
+    Window    innerbottom;  /*!< For drawing the inner client border */
+    Window    backback;     /*!< A colored window shown while resizing */
+    Window    backfront;    /*!< An undrawn-in window, to prevent flashing on
+                                 unmap */
 
     /* These are resize handles inside the titlebar */
     Window    topresize;

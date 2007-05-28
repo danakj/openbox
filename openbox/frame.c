@@ -31,17 +31,12 @@
 #include "screen.h"
 #include "render/theme.h"
 
-#define PLATE_EVENTMASK (SubstructureRedirectMask | FocusChangeMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | \
+                         SubstructureRedirectMask | FocusChangeMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | PointerMotionMask | \
                            EnterWindowMask | LeaveWindowMask)
-/* The inner window does not need enter/leave events.
-   If it does get them, then it needs its own context for enter events
-   because sloppy focus will focus the window when you enter the inner window
-   from the frame. */
-#define INNER_EVENTMASK (ButtonPressMask)
 
 #define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
 #define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 60) /* 60 Hz */
@@ -100,7 +95,7 @@ ObFrame *frame_new(ObClient *client)
 
     /* create the non-visible decor windows */
 
-    mask = CWEventMask;
+    mask = 0;
     if (visual) {
         /* client has a 32-bit visual */
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
@@ -112,24 +107,22 @@ ObFrame *frame_new(ObClient *client)
         attrib.background_pixel = BlackPixel(ob_display, ob_screen);
         attrib.border_pixel = BlackPixel(ob_display, ob_screen);
     }
-    attrib.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen), visual,
                                 mask, &attrib);
 
-    attrib.event_mask = INNER_EVENTMASK;
-    self->inner = createWindow(self->window, visual, mask, &attrib);
-
-    mask &= ~CWEventMask;
-    self->plate = createWindow(self->inner, visual, mask, &attrib);
-
     /* create the visible decor windows */
 
-    mask = CWEventMask;
+    mask = 0;
     if (visual) {
         /* client has a 32-bit visual */
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
         attrib.colormap = RrColormap(ob_rr_inst);
     }
+
+    self->backback = createWindow(self->window, NULL, mask, &attrib);
+    self->backfront = createWindow(self->backback, NULL, mask, &attrib);
+
+    mask |= CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
     self->title = createWindow(self->window, NULL, mask, &attrib);
     self->titleleft = createWindow(self->window, NULL, mask, &attrib);
@@ -147,6 +140,11 @@ ObFrame *frame_new(ObClient *client)
 
     self->left = createWindow(self->window, NULL, mask, &attrib);
     self->right = createWindow(self->window, NULL, mask, &attrib);
+
+    self->innerleft = createWindow(self->window, NULL, mask, &attrib);
+    self->innertop = createWindow(self->window, NULL, mask, &attrib);
+    self->innerright = createWindow(self->window, NULL, mask, &attrib);
+    self->innerbottom = createWindow(self->window, NULL, mask, &attrib);
 
     self->label = createWindow(self->title, NULL, mask, &attrib);
     self->max = createWindow(self->title, NULL, mask, &attrib);
@@ -175,9 +173,9 @@ ObFrame *frame_new(ObClient *client)
     self->focused = FALSE;
 
     /* the other stuff is shown based on decor settings */
-    XMapWindow(ob_display, self->plate);
-    XMapWindow(ob_display, self->inner);
     XMapWindow(ob_display, self->label);
+    XMapWindow(ob_display, self->backback);
+    XMapWindow(ob_display, self->backfront);
 
     self->max_press = self->close_press = self->desk_press = 
         self->iconify_press = self->shade_press = FALSE;
@@ -375,6 +373,42 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* position/size and map/unmap all the windows */
 
         if (!fake) {
+            if (self->cbwidth_x) {
+                XMoveResizeWindow(ob_display, self->innerleft,
+                                  self->size.left - self->cbwidth_x,
+                                  self->size.top,
+                                  self->cbwidth_x, self->client->area.height);
+                XMoveResizeWindow(ob_display, self->innerright,
+                                  self->size.left + self->client->area.width,
+                                  self->size.top,
+                                  self->cbwidth_x, self->client->area.height);
+
+                XMapWindow(ob_display, self->innerleft);
+                XMapWindow(ob_display, self->innerright);
+            } else {
+                XUnmapWindow(ob_display, self->innerleft);
+                XUnmapWindow(ob_display, self->innerright);
+            }
+
+            if (self->cbwidth_y) {
+                XMoveResizeWindow(ob_display, self->innertop,
+                                  self->size.left - self->cbwidth_x,
+                                  self->size.top - self->cbwidth_y,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2, self->cbwidth_y);
+                XMoveResizeWindow(ob_display, self->innerbottom,
+                                  self->size.left - self->cbwidth_x,
+                                  self->size.top + self->client->area.height,
+                                  self->client->area.width +
+                                  self->cbwidth_x * 2, self->cbwidth_y);
+
+                XMapWindow(ob_display, self->innertop);
+                XMapWindow(ob_display, self->innerbottom);
+            } else {
+                XUnmapWindow(ob_display, self->innertop);
+                XUnmapWindow(ob_display, self->innerbottom);
+            }
+
             if (self->bwidth) {
                 gint titlesides;
 
@@ -678,26 +712,14 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->right);
 
-            /* move and resize the inner border window which contains the plate
-             */
-            XMoveResizeWindow(ob_display, self->inner,
-                              0,
-                              self->size.top - self->cbwidth_y,
-                              self->client->area.width +
-                              self->cbwidth_x * 2 +
-                              (!self->max_horz ? self->bwidth * 2 : 0),
-                              self->client->area.height +
-                              self->cbwidth_y * 2);
-
-            /* move the plate */
-            XMoveWindow(ob_display, self->plate,
-                        (!self->max_horz ? self->bwidth : 0) + self->cbwidth_x,
-                        self->cbwidth_y);
+            XMoveResizeWindow(ob_display, self->backback,
+                              self->size.left, self->size.top,
+                              self->client->area.width,
+                              self->client->area.height);
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window,
-                        -self->client->border_width,
-                        -self->client->border_width);
+                        self->size.left, self->size.top);
         }
     }
 
@@ -782,6 +804,7 @@ static void frame_adjust_cursors(ObFrame *self)
         XChangeWindowAttributes(ob_display, self->handle, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->handletop, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->handlebottom, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerbottom, CWCursor, &a);
 
         /* these ones don't */
         a.cursor = ob_cursor(r ? OB_CURSOR_NORTHWEST : OB_CURSOR_NONE);
@@ -796,8 +819,10 @@ static void frame_adjust_cursors(ObFrame *self)
         XChangeWindowAttributes(ob_display, self->titleright, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_WEST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->left, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerleft, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_EAST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->right, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerright, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHWEST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->lgrip, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->handleleft, CWCursor, &a);
@@ -815,9 +840,10 @@ static void frame_adjust_cursors(ObFrame *self)
 
 void frame_adjust_client_area(ObFrame *self)
 {
-    /* resize the plate */
-    XResizeWindow(ob_display, self->plate,
-                  self->client->area.width, self->client->area.height);
+    /* adjust the window which is there to prevent flashing on unmap */
+    XMoveResizeWindow(ob_display, self->backfront, 0, 0,
+                      self->client->area.width,
+                      self->client->area.height);
 }
 
 void frame_adjust_state(ObFrame *self)
@@ -850,8 +876,7 @@ void frame_grab_client(ObFrame *self)
     */
 
     /* reparent the client to the frame */
-    XReparentWindow(ob_display, self->client->window, self->plate,
-                    -self->client->border_width, -self->client->border_width);
+    XReparentWindow(ob_display, self->client->window, self->window, 0, 0);
 
     /*
       When reparenting the client window, it is usually not mapped yet, since
@@ -864,12 +889,16 @@ void frame_grab_client(ObFrame *self)
 
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */
-    XSelectInput(ob_display, self->plate, PLATE_EVENTMASK);
+    XSelectInput(ob_display, self->window, FRAME_EVENTMASK);
 
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, self->client);
-    g_hash_table_insert(window_map, &self->plate, self->client);
-    g_hash_table_insert(window_map, &self->inner, self->client);
+    g_hash_table_insert(window_map, &self->backback, self->client);
+    g_hash_table_insert(window_map, &self->backfront, self->client);
+    g_hash_table_insert(window_map, &self->innerleft, self->client);
+    g_hash_table_insert(window_map, &self->innertop, self->client);
+    g_hash_table_insert(window_map, &self->innerright, self->client);
+    g_hash_table_insert(window_map, &self->innerbottom, self->client);
     g_hash_table_insert(window_map, &self->title, self->client);
     g_hash_table_insert(window_map, &self->label, self->client);
     g_hash_table_insert(window_map, &self->max, self->client);
@@ -926,7 +955,7 @@ void frame_release_client(ObFrame *self)
            Reparent events that are generated by us are just discarded here.
            They are of no consequence to us anyhow.
         */
-        if (ev.xreparent.parent != self->plate) {
+        if (ev.xreparent.parent != self->window) {
             reparent = FALSE;
             XPutBackEvent(ob_display, &ev);
             break;
@@ -944,8 +973,12 @@ void frame_release_client(ObFrame *self)
 
     /* remove all the windows for the frame from the window_map */
     g_hash_table_remove(window_map, &self->window);
-    g_hash_table_remove(window_map, &self->plate);
-    g_hash_table_remove(window_map, &self->inner);
+    g_hash_table_remove(window_map, &self->backback);
+    g_hash_table_remove(window_map, &self->backfront);
+    g_hash_table_remove(window_map, &self->innerleft);
+    g_hash_table_remove(window_map, &self->innertop);
+    g_hash_table_remove(window_map, &self->innerright);
+    g_hash_table_remove(window_map, &self->innerbottom);
     g_hash_table_remove(window_map, &self->title);
     g_hash_table_remove(window_map, &self->label);
     g_hash_table_remove(window_map, &self->max);
@@ -1223,13 +1256,6 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     }
 
     self = client->frame;
-    if (win == self->inner || win == self->plate) {
-        /* conceptually, this is the desktop, as far as users are
-           concerned */
-        if (client->type == OB_CLIENT_TYPE_DESKTOP)
-            return OB_FRAME_CONTEXT_DESKTOP;
-        return OB_FRAME_CONTEXT_CLIENT;
-    }
 
     /* when the user clicks in the corners of the titlebar and the client
        is fully maximized, then treat it like they clicked in the
@@ -1306,6 +1332,7 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->title)             return OB_FRAME_CONTEXT_TITLEBAR;
+    if (win == self->titlebottom)       return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->titleleft)         return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->titletopleft)      return OB_FRAME_CONTEXT_TLCORNER;
     if (win == self->titleright)        return OB_FRAME_CONTEXT_TRCORNER;
@@ -1318,6 +1345,10 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->trrresize)         return OB_FRAME_CONTEXT_TRCORNER;
     if (win == self->left)              return OB_FRAME_CONTEXT_LEFT;
     if (win == self->right)             return OB_FRAME_CONTEXT_RIGHT;
+    if (win == self->innertop)          return OB_FRAME_CONTEXT_TITLEBAR;
+    if (win == self->innerleft)         return OB_FRAME_CONTEXT_LEFT;
+    if (win == self->innerbottom)       return OB_FRAME_CONTEXT_BOTTOM;
+    if (win == self->innerright)        return OB_FRAME_CONTEXT_RIGHT;
     if (win == self->max)               return OB_FRAME_CONTEXT_MAXIMIZE;
     if (win == self->iconify)           return OB_FRAME_CONTEXT_ICONIFY;
     if (win == self->close)             return OB_FRAME_CONTEXT_CLOSE;

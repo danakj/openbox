@@ -40,8 +40,17 @@ void framerender_frame(ObFrame *self)
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->cb_focused_color) :
               RrColorPixel(ob_rr_theme->cb_unfocused_color));
-        XSetWindowBackground(ob_display, self->inner, px);
-        XClearWindow(ob_display, self->inner);
+
+        XSetWindowBackground(ob_display, self->backback, px);
+        XClearWindow(ob_display, self->backback);
+        XSetWindowBackground(ob_display, self->innerleft, px);
+        XClearWindow(ob_display, self->innerleft);
+        XSetWindowBackground(ob_display, self->innertop, px);
+        XClearWindow(ob_display, self->innertop);
+        XSetWindowBackground(ob_display, self->innerright, px);
+        XClearWindow(ob_display, self->innerright);
+        XSetWindowBackground(ob_display, self->innerbottom, px);
+        XClearWindow(ob_display, self->innerbottom);
 
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->frame_focused_border_color) :

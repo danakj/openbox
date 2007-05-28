@@ -77,7 +77,6 @@ struct _ObFrame
     struct _ObClient *client;
 
     Window    window;
-    Window    plate;
 
     Strut     size;
     Rect      area;
@@ -203,7 +202,6 @@ void frame_adjust_theme(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);
-void frame_adjust_client_area(ObFrame *self);
 void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);

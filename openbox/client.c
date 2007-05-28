@@ -361,7 +361,6 @@ void client_manage(Window window)
     /* adjust the frame to the client's size before showing or placing
        the window */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-    frame_adjust_client_area(self->frame);
 
     /* where the frame was placed is where the window was originally */
     placex = self->area.x;
@@ -570,7 +569,7 @@ void client_manage(Window window)
     g_free(settings);
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)\n",
-             window, self->frame->plate, self->class);
+             window, self->frame->window, self->class);
 
     return;
 }
@@ -621,7 +620,7 @@ void client_unmanage(ObClient *self)
     GSList *it;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)\n",
-             self->window, self->frame->plate,
+             self->window, self->frame->window,
              self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);
@@ -2857,16 +2856,14 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
         XWindowChanges changes;
-        changes.x = -self->border_width;
-        changes.y = -self->border_width;
+        changes.x = self->frame->size.left - self->border_width;
+        changes.y = self->frame->size.top -self->border_width;
         changes.width = MAX(w, oldw);
         changes.height = MAX(h, oldh);
         changes.border_width = self->border_width;
         XConfigureWindow(ob_display, self->window,
                          CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
                          &changes);
-        /* resize the plate to show the client padding color underneath */
-        frame_adjust_client_area(self->frame);
     }
 
     /* find the frame's dimensions and move/resize it */
@@ -2918,13 +2915,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
 
     /* if the client is shrinking, then resize the frame before the client */
     if (send_resize_client && (w <= oldw && h <= oldh)) {
-        /* resize the plate to show the client padding color underneath */
-        frame_adjust_client_area(self->frame);
-
         if (send_resize_client) {
             XWindowChanges changes;
-            changes.x = -self->border_width;
-            changes.y = -self->border_width;
+            changes.x = self->frame->size.left - self->border_width;
+            changes.y = self->frame->size.top -self->border_width;
             changes.width = w;
             changes.height = h;
             changes.border_width = self->border_width;

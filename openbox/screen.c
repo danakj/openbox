@@ -52,6 +52,7 @@
 
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm();
+static void     screen_tell_ksplash();
 
 guint    screen_num_desktops;
 guint    screen_num_monitors;
@@ -294,7 +295,7 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.ob_wm_action_undecorate;
     supported[i++] = prop_atoms.ob_wm_state_undecorated;
     supported[i++] = prop_atoms.openbox_pid;
-    supported[i++] = prop_atoms.ob_config;
+    supported[i++] = prop_atoms.ob_theme;
     supported[i++] = prop_atoms.ob_control;
     g_assert(i == num_support);
 
@@ -302,7 +303,34 @@ gboolean screen_annex()
                 net_supported, atom, supported, num_support);
     g_free(supported);
 
+    screen_tell_ksplash();
+
     return TRUE;
+}
+
+static void screen_tell_ksplash()
+{
+    XEvent e;
+    const char *args[] = { "dcop", "ksplash", "ksplash",
+                           "upAndRunning(QString)", "wm started", NULL };
+
+    /* tell the dcop server through the command line interface */
+    g_spawn_async(NULL, args, NULL,
+                  G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
+                  NULL, NULL, NULL, NULL);
+
+    /* i'm not sure why we do this, kwin does it, but ksplash doesn't seem to
+       hear it anyways. perhaps it is for old ksplash. or new ksplash. or
+       something. oh well. */
+    e.xclient.type = ClientMessage;
+    e.xclient.display = ob_display;
+    e.xclient.window = RootWindow(ob_display, ob_screen);
+    e.xclient.message_type =
+        XInternAtom(ob_display, "_KDE_SPLASH_PROGRESS", False );
+    e.xclient.format = 8;
+    strcpy(e.xclient.data.b, "wm started");
+    XSendEvent(ob_display, RootWindow(ob_display, ob_screen),
+               False, SubstructureNotifyMask, &e );
 }
 
 void screen_startup(gboolean reconfig)

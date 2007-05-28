@@ -61,6 +61,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme = g_new0(RrTheme, 1);
 
     theme->inst = inst;
+    theme->name = g_strdup(name);
 
     theme->a_disabled_focused_max = RrAppearanceNew(inst, 1);
     theme->a_disabled_unfocused_max = RrAppearanceNew(inst, 1);
@@ -1234,6 +1235,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 void RrThemeFree(RrTheme *theme)
 {
     if (theme) {
+        g_free(theme->name);
+
         RrColorFree(theme->menu_border_color);
         RrColorFree(theme->frame_focused_border_color);
         RrColorFree(theme->frame_unfocused_border_color);

@@ -171,7 +171,7 @@ void prop_startup()
 */
 
     CREATE(openbox_pid, "_OPENBOX_PID");
-    CREATE(ob_config, "_OB_CONFIG");
+    CREATE(ob_theme, "_OB_THEME");
     CREATE(ob_wm_action_undecorate, "_OB_WM_ACTION_UNDECORATE");
     CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(ob_control, "_OB_CONTROL");

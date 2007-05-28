@@ -150,7 +150,11 @@ gboolean focus_cycle_target_valid(ObClient *ft,
                 !ft->skip_taskbar);
 
     /* it's not going to just send fous off somewhere else (modal window) */
-    ok = ok && ft == client_focus_target(ft);
+    {
+        ObClient *cft = client_focus_target(ft);
+        ok = ok && (ft == cft || (cft->desktop != DESKTOP_ALL &&
+                                  cft->desktop != ft->desktop));
+    }
 
     return ok;
 }

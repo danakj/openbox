@@ -3463,6 +3463,8 @@ gboolean client_can_focus(ObClient *self)
 
 gboolean client_focus(ObClient *self)
 {
+    client_bring_modal_windows(self);
+
     /* choose the correct target */
     self = client_focus_target(self);
 
@@ -3582,15 +3584,18 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
         client_hilite(self, TRUE);
 }
 
-static void client_bring_helper_windows_recursive(ObClient *self,
-                                                  guint desktop)
+static void client_bring_windows_recursive(ObClient *self,
+                                           guint desktop,
+                                           gboolean helpers,
+                                           gboolean modals)
 {
     GSList *it;
 
     for (it = self->transients; it; it = g_slist_next(it))
-        client_bring_helper_windows_recursive(it->data, desktop);
+        client_bring_windows_recursive(it->data, desktop, helpers, modals);
 
-    if (client_helper(self) &&
+    if (((helpers && client_helper(self)) ||
+         (modals && self->modal))&&
         self->desktop != desktop && self->desktop != DESKTOP_ALL)
     {
         client_set_desktop(self, desktop, FALSE);
@@ -3599,7 +3604,12 @@ static void client_bring_helper_windows_recursive(ObClient *self,
 
 void client_bring_helper_windows(ObClient *self)
 {
-    client_bring_helper_windows_recursive(self, self->desktop);
+    client_bring_windows_recursive(self, self->desktop, TRUE, FALSE);
+}
+
+void client_bring_modal_windows(ObClient *self)
+{
+    client_bring_windows_recursive(self, self->desktop, FALSE, TRUE);
 }
 
 gboolean client_focused(ObClient *self)

@@ -49,7 +49,9 @@ int main () {
   XMapWindow(display, win);
   XFlush(display);
 
-  XMoveResizeWindow(display, win, 1172-600-b*2, 668-150-b*2, 600, 150);
+  w = 600;
+  h = 160;
+  XMoveResizeWindow(display, win, 1172-w-b*2, 668-h-b*2, w, h);
   XFlush(display);
   sleep(1);
   XResizeWindow(display, win, 900, 275);

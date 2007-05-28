@@ -230,6 +230,7 @@ struct _RrTheme {
     RrAppearance *osd_hilite_label; /* can be parent relative */
     RrAppearance *osd_unhilite_fg; /* can never be parent relative */
 
+    gchar *name;
 };
 
 /*! The font values are all optional. If a NULL is used for any of them, then

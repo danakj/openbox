@@ -273,6 +273,9 @@ gint main(gint argc, gchar **argv)
                 }
                 if (ob_rr_theme == NULL)
                     ob_exit_with_error(_("Unable to load a theme."));
+
+                PROP_SETS(RootWindow(ob_display, ob_screen),
+                          ob_theme, theme->name);
             }
 
             if (reconfigure) {

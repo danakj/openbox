@@ -78,7 +78,8 @@ static void client_get_colormap(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
-static void client_apply_startup_state(ObClient *self);
+static void client_apply_startup_state(ObClient *self,
+                                       gint x, gint y, gint w, gint h);
 static void client_restore_session_state(ObClient *self);
 static gboolean client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
@@ -240,7 +241,8 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
-    gint placex, placey;
+    gint placex, placey, placew, placeh;
+    gboolean transient = FALSE;
 
     grab_server(TRUE);
 
@@ -364,18 +366,18 @@ void client_manage(Window window)
     /* where the frame was placed is where the window was originally */
     placex = self->area.x;
     placey = self->area.y;
+    placew = self->area.width;
+    placeh = self->area.height;
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
-        gboolean transient;
-
         ob_debug("Positioned: %s @ %d %d\n",
                  (!self->positioned ? "no" :
                   (self->positioned == PPosition ? "program specified" :
                    (self->positioned == USPosition ? "user specified" :
                     (self->positioned == (PPosition | USPosition) ?
                      "program + user specified" :
-                     "BADNESS !?")))), self->area.x, self->area.y);
+                     "BADNESS !?")))), placex, placey);
 
         ob_debug("Sized: %s @ %d %d\n",
                  (!self->sized ? "no" :
@@ -383,39 +385,12 @@ void client_manage(Window window)
                    (self->sized == USSize ? "user specified" :
                     (self->sized == (PSize | USSize) ?
                      "program + user specified" :
-                     "BADNESS !?")))), self->area.width, self->area.height);
+                     "BADNESS !?")))), placew, placeh);
 
         transient = place_client(self, &placex, &placey, settings);
 
-        /* if the window isn't user-positioned, then make it fit inside
-           the visible screen area on its monitor.
-
-           the monitor is chosen by place_client! */
-        if (!(self->sized & USSize)) {
-            /* make a copy to modify */
-            Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
-
-            /* shrink by the frame's area */
-            a.width -= self->frame->size.left + self->frame->size.right;
-            a.height -= self->frame->size.top + self->frame->size.bottom;
-
-            /* fit the window inside the area */
-            if (self->area.width > a.width || self->area.height > a.height) {
-                self->area.width = MIN(self->area.width, a.width);
-                self->area.height = MIN(self->area.height, a.height);
-
-                ob_debug("setting window size to %dx%d\n",
-                         self->area.width, self->area.height);
-
-                /* adjust the frame to the client's new size */
-                frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-                frame_adjust_client_area(self->frame);
-            }
-        }
-
         /* make sure the window is visible. */
-        client_find_onscreen(self, &placex, &placey,
-                             self->area.width, self->area.height,
+        client_find_onscreen(self, &placex, &placey, placew, placeh,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
                                 session do also. we can assume you want
@@ -432,33 +407,53 @@ void client_manage(Window window)
                               !self->session));
     }
 
-    ob_debug("placing window 0x%x at %d, %d with size %d x %d\n",
-             self->window, placex, placey,
-             self->area.width, self->area.height);
+    /* if the window isn't user-sized, then make it fit inside
+       the visible screen area on its monitor. Use basically the same rules
+       for forcing the window on screen in the client_find_onscreen call.
+
+       do this after place_client, it chooses the monitor! */
+    if (transient ||
+        (!(self->sized & USSize) &&
+         client_normal(self) &&
+         !self->session))
+    {
+        /* make a copy to modify */
+        Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
+
+        /* shrink by the frame's area */
+        a.width -= self->frame->size.left + self->frame->size.right;
+        a.height -= self->frame->size.top + self->frame->size.bottom;
+
+        /* fit the window inside the area */
+        if (placew > a.width || self->area.height > a.height) {
+            placew = MAX(MIN(MIN(self->area.width, a.width),
+                             self->max_size.width),
+                         self->min_size.width);
+            placeh = MAX(MIN(MIN(self->area.height, a.height),
+                             self->max_size.height),
+                         self->min_size.height);
+
+            ob_debug("setting window size to %dx%d\n",
+                     self->area.width, self->area.height);
+        }
+    }
+
+
+    ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
+             "some restrictions may apply\n",
+             self->window, placex, placey, placew, placeh);
     if (self->session)
-        ob_debug("  but session requested %d %d instead, overriding\n",
-                 self->session->x, self->session->y);
+        ob_debug("  but session requested %d, %d  %d x %d instead, "
+                 "overriding\n",
+                 self->session->x, self->session->y,
+                 self->session->w, self->session->h);
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!
+
+       this also places the window
     */
-    client_apply_startup_state(self);
-
-    /* move the client to its placed position, or it it's already there,
-       generate a ConfigureNotify telling the client where it is.
-
-       do this after adjusting the frame. otherwise it gets all weird and
-       clients don't work right
-
-       also do this after applying the startup state so maximize and fullscreen
-       will get the right sizes and positions if the client is starting with
-       those states
-    */
-    client_configure(self, placex, placey,
-                     self->area.width, self->area.height,
-                     self->border_width,
-                     FALSE, TRUE);
-
+    client_apply_startup_state(self, placex, placey, placew, placeh);
 
     if (activate) {
         guint32 last_time = focus_client ?
@@ -2547,44 +2542,59 @@ gboolean client_enter_focusable(ObClient *self)
 }
 
 
-static void client_apply_startup_state(ObClient *self)
+static void client_apply_startup_state(ObClient *self,
+                                       gint x, gint y, gint w, gint h)
 {
+    /* save the states that we are going to apply */
+    gboolean iconic = self->iconic;
+    gboolean fullscreen = self->fullscreen;
+    gboolean undecorated = self->undecorated;
+    gboolean shaded = self->shaded;
+    gboolean demands_attention = self->demands_attention;
+    gboolean max_horz = self->max_horz;
+    gboolean max_vert = self->max_vert;
+
+    /* turn them all off in the client, so they won't affect the window
+       being placed */
+    self->iconic = self->fullscreen = self->undecorated = self->shaded =
+        self->demands_attention = self->max_horz = self->max_vert = FALSE;
+
+    /* move the client to its placed position, or it it's already there,
+       generate a ConfigureNotify telling the client where it is.
+
+       do this after adjusting the frame. otherwise it gets all weird and
+       clients don't work right
+
+       do this before applying the states so they have the correct
+       pre-max/pre-fullscreen values
+    */
+    client_configure(self, x, y, w, h, self->border_width, FALSE, TRUE);
+    ob_debug("placed window 0x%x at %d, %d with size %d x %d\n",
+             self->window, self->area.x, self->area.y,
+             self->area.width, self->area.height);
+
+    /* apply the states. these are in a carefully crafted order.. */
+
+    if (iconic)
+        client_iconify(self, TRUE, FALSE, TRUE);
+    if (fullscreen)
+        client_fullscreen(self, TRUE);
+    if (undecorated)
+        client_set_undecorated(self, TRUE);
+    if (shaded)
+        client_shade(self, TRUE);
+    if (demands_attention)
+        client_hilite(self, TRUE);
+  
+    if (max_vert && max_horz)
+        client_maximize(self, TRUE, 0);
+    else if (max_vert)
+        client_maximize(self, TRUE, 2);
+    else if (max_horz)
+        client_maximize(self, TRUE, 1);
+
     /* set the desktop hint, to make sure that it always exists */
     PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
-
-    /* these are in a carefully crafted order.. */
-
-    if (self->iconic) {
-        self->iconic = FALSE;
-        client_iconify(self, TRUE, FALSE, TRUE);
-    }
-    if (self->fullscreen) {
-        self->fullscreen = FALSE;
-        client_fullscreen(self, TRUE);
-    }
-    if (self->undecorated) {
-        self->undecorated = FALSE;
-        client_set_undecorated(self, TRUE);
-    }
-    if (self->shaded) {
-        self->shaded = FALSE;
-        client_shade(self, TRUE);
-    }
-    if (self->demands_attention) {
-        self->demands_attention = FALSE;
-        client_hilite(self, TRUE);
-    }
-  
-    if (self->max_vert && self->max_horz) {
-        self->max_vert = self->max_horz = FALSE;
-        client_maximize(self, TRUE, 0);
-    } else if (self->max_vert) {
-        self->max_vert = FALSE;
-        client_maximize(self, TRUE, 2);
-    } else if (self->max_horz) {
-        self->max_horz = FALSE;
-        client_maximize(self, TRUE, 1);
-    }
 
     /* nothing to do for the other states:
        skip_taskbar
@@ -3490,6 +3500,8 @@ gboolean client_focus(ObClient *self)
             /* update the focus lists */
             focus_order_to_top(self);
         }
+        ob_debug_type(OB_DEBUG_FOCUS,
+                      "Client %s can't be focused\n", self->title);
         return FALSE;
     }
 

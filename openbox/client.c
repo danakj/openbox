@@ -598,7 +598,7 @@ ObClient *client_fake_manage(Window window)
        uses too. this returns a shallow copy that needs to be freed */
     settings = client_get_settings_state(self);
 
-    client_setup_decor_and_functions(self);
+    client_setup_decor_and_functions(self, FALSE);
 
     /* create the decoration frame for the client window and adjust its size */
     self->frame = frame_new(self);
@@ -2967,8 +2967,7 @@ void client_fullscreen(ObClient *self, gboolean fs)
         RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
     }
 
-    client_setup_decor_and_functions(self);
-
+    client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);
 
     /* and adjust our layer/stacking. do this after resizing the window,
@@ -3112,8 +3111,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
 
     client_change_state(self); /* change the state hints on the client */
 
-    client_setup_decor_and_functions(self);
-
+    client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);
 }
 

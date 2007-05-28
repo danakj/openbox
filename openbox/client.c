@@ -321,7 +321,7 @@ void client_manage(Window window)
     client_restore_session_state(self);
 
     /* now we have all of the window's information so we can set this up */
-    client_setup_decor_and_functions(self);
+    client_setup_decor_and_functions(self, FALSE);
 
     {
         Time t = sn_app_started(self->startup_id, self->class);
@@ -1595,9 +1595,7 @@ void client_update_normal_hints(ObClient *self)
     }
 }
 
-/*! This needs to be followed by a call to client_configure to make
-  the changes show */
-void client_setup_decor_and_functions(ObClient *self)
+void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
 {
     /* start with everything (cept fullscreen) */
     self->decorations =
@@ -1753,6 +1751,9 @@ void client_setup_decor_and_functions(ObClient *self)
     }
 
     client_change_allowed_actions(self);
+
+    if (reconfig)
+        client_reconfigure(self);
 }
 
 static void client_change_allowed_actions(ObClient *self)
@@ -3716,8 +3717,7 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
         (self->functions & OB_CLIENT_FUNC_UNDECORATE || !undecorated))
     {
         self->undecorated = undecorated;
-        client_setup_decor_and_functions(self);
-        client_reconfigure(self); /* show the lack of decorations */
+        client_setup_decor_and_functions(self, TRUE);
         client_change_state(self); /* reflect this in the state hints */
     }
 }

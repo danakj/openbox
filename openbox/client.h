@@ -604,8 +604,10 @@ void client_update_icon_geometry(ObClient *self);
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (ObClient::decorations and ObClient::functions).
   This also updates the NET_WM_ALLOWED_ACTIONS hint.
+  @param reconfig When TRUE, the window will be reconfigured to show the
+         changes
 */
-void client_setup_decor_and_functions(ObClient *self);
+void client_setup_decor_and_functions(ObClient *self, gboolean reconfig);
 
 /*! Sets the window's type and transient flag */
 void client_get_type_and_transientness(ObClient *self);

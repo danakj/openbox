@@ -434,7 +434,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                      /* 7/16 opacity */
                     gint a = ((*s >> RrDefaultAlphaOffset) & 0xff);
                     *d = *s - (a << RrDefaultAlphaOffset) +
-                        (((a>>2) + (a>>3) + (a>>4)) << RrDefaultAlphaOffset);
+                        (((a>>1) - (a>>4)) << RrDefaultAlphaOffset);
                 }
                     
             } else

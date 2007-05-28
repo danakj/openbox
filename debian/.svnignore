@@ -1,6 +1,0 @@
-openbox.postinst.debhelper
-openbox.postrm.debhelper
-changelog
-files
-openbox.substvars
-openbox

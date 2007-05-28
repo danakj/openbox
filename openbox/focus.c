@@ -190,8 +190,7 @@ void focus_nothing()
        actions should not rely on being able to move focus during an
        interactive grab.
     */
-    if (keyboard_interactively_grabbed())
-        keyboard_interactive_cancel();
+    event_cancel_all_key_grabs();
 
     /* when nothing will be focused, send focus to the backup target */
     XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,

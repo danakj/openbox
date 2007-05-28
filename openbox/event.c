@@ -1430,8 +1430,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (msgtype == XA_WM_NORMAL_HINTS) {
             client_update_normal_hints(client);
             /* normal hints can make a window non-resizable */
-            client_setup_decor_and_functions(client);
-            client_reconfigure(client);
+            client_setup_decor_and_functions(client, TRUE);
         } else if (msgtype == XA_WM_HINTS) {
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {
@@ -1439,8 +1438,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_get_type_and_transientness(client);
             /* type may have changed, so update the layer */
             client_calc_layer(client);
-            client_setup_decor_and_functions(client);
-            client_reconfigure(client);
+            client_setup_decor_and_functions(client, TRUE);
         } else if (msgtype == prop_atoms.net_wm_name ||
                    msgtype == prop_atoms.wm_name ||
                    msgtype == prop_atoms.net_wm_icon_name ||
@@ -1448,8 +1446,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_title(client);
         } else if (msgtype == prop_atoms.wm_protocols) {
             client_update_protocols(client);
-            client_setup_decor_and_functions(client);
-            client_reconfigure(client);
+            client_setup_decor_and_functions(client, TRUE);
         }
         else if (msgtype == prop_atoms.net_wm_strut) {
             client_update_strut(client);

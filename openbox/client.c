@@ -498,7 +498,7 @@ void client_manage(Window window)
                is ambiguous (either the current focus target doesn't have
                a timestamp, or they are the same (we probably inherited it
                from them) */
-            else if (self->transient_for != NULL &&
+            else if (client_has_parent(self) &&
                      (!last_time || self->user_time == last_time))
             {
                 activate = FALSE;
@@ -2372,6 +2372,13 @@ ObClient *client_search_focus_tree_full(ObClient *self)
     if (client_focused(self))
         return self;
     return client_search_focus_tree(self);
+}
+
+gboolean client_has_parent(ObClient *self)
+{
+    return (self->transient_for &&
+            (self->transient_for != TRAN_GROUP ||
+             self->group && self->group->members->next));
 }
 
 static ObStackingLayer calc_layer(ObClient *self)

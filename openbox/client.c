@@ -441,7 +441,6 @@ void client_manage(Window window)
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!
-       also, this moves the window to the position where it has been placed
     */
     client_apply_startup_state(self);
 
@@ -2376,9 +2375,21 @@ ObClient *client_search_focus_tree_full(ObClient *self)
 
 gboolean client_has_parent(ObClient *self)
 {
-    return (self->transient_for &&
-            (self->transient_for != OB_TRAN_GROUP ||
-             (self->group && self->group->members->next)));
+    if (self->transient_for) {
+        if (self->transient_for != OB_TRAN_GROUP) {
+            if (client_normal(self->transient_for))
+                return TRUE;
+        }
+        else if (self->group) {
+            GSList *it;
+
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                if (it->data != self && client_normal(it->data))
+                    return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 static ObStackingLayer calc_layer(ObClient *self)

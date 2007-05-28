@@ -1431,6 +1431,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_normal_hints(client);
             /* normal hints can make a window non-resizable */
             client_setup_decor_and_functions(client);
+            client_reconfigure(client);
         } else if (msgtype == XA_WM_HINTS) {
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {
@@ -1439,6 +1440,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* type may have changed, so update the layer */
             client_calc_layer(client);
             client_setup_decor_and_functions(client);
+            client_reconfigure(client);
         } else if (msgtype == prop_atoms.net_wm_name ||
                    msgtype == prop_atoms.wm_name ||
                    msgtype == prop_atoms.net_wm_icon_name ||
@@ -1447,8 +1449,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
         } else if (msgtype == prop_atoms.wm_protocols) {
             client_update_protocols(client);
             client_setup_decor_and_functions(client);
+            client_reconfigure(client);
         }
         else if (msgtype == prop_atoms.net_wm_strut) {
+            client_update_strut(client);
+        }
+        else if (msgtype == prop_atoms.net_wm_strut_partial) {
             client_update_strut(client);
         }
         else if (msgtype == prop_atoms.net_wm_icon) {
@@ -1679,8 +1685,11 @@ static gboolean event_handle_menu(XEvent *ev)
         {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
+            {
+                menu_frame_select(e->frame, e, TRUE);
                 menu_entry_frame_execute(e, ev->xbutton.state,
                                          ev->xbutton.time);
+            }
             else
                 menu_frame_hide_all();
         }
@@ -1689,7 +1698,10 @@ static gboolean event_handle_menu(XEvent *ev)
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
             if (e->ignore_enters)
                 --e->ignore_enters;
-            else
+            else if (!(f = find_active_menu()) ||
+                     f == e->frame ||
+                     f->parent == e->frame ||
+                     f->child == e->frame)
                 menu_frame_select(e->frame, e, FALSE);
         }
         break;
@@ -1708,7 +1720,11 @@ static gboolean event_handle_menu(XEvent *ev)
     case MotionNotify:   
         if ((e = menu_entry_frame_under(ev->xmotion.x_root,   
                                         ev->xmotion.y_root)))
-            menu_frame_select(e->frame, e, FALSE);
+            if (!(f = find_active_menu()) ||
+                f == e->frame ||
+                f->parent == e->frame ||
+                f->child == e->frame)
+                menu_frame_select(e->frame, e, FALSE);
         break;
     case KeyPress:
         ret = event_handle_menu_keyboard(ev);

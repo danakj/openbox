@@ -1692,7 +1692,10 @@ static gboolean event_handle_menu(XEvent *ev)
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
             if (e->ignore_enters)
                 --e->ignore_enters;
-            else
+            else if (!(f = find_active_menu()) ||
+                     f == e->frame ||
+                     f->parent == e->frame ||
+                     f->child == e->frame)
                 menu_frame_select(e->frame, e, FALSE);
         }
         break;
@@ -1711,7 +1714,11 @@ static gboolean event_handle_menu(XEvent *ev)
     case MotionNotify:   
         if ((e = menu_entry_frame_under(ev->xmotion.x_root,   
                                         ev->xmotion.y_root)))
-            menu_frame_select(e->frame, e, FALSE);
+            if (!(f = find_active_menu()) ||
+                f == e->frame ||
+                f->parent == e->frame ||
+                f->child == e->frame)
+                menu_frame_select(e->frame, e, FALSE);
         break;
     case KeyPress:
         ret = event_handle_menu_keyboard(ev);

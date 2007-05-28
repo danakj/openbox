@@ -294,7 +294,6 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.ob_wm_action_undecorate;
     supported[i++] = prop_atoms.ob_wm_state_undecorated;
     supported[i++] = prop_atoms.openbox_pid;
-    supported[i++] = prop_atoms.ob_config;
     supported[i++] = prop_atoms.ob_control;
     g_assert(i == num_support);
 

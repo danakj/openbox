@@ -1682,8 +1682,11 @@ static gboolean event_handle_menu(XEvent *ev)
         {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
+            {
+                menu_frame_select(e->frame, e, TRUE);
                 menu_entry_frame_execute(e, ev->xbutton.state,
                                          ev->xbutton.time);
+            }
             else
                 menu_frame_hide_all();
         }

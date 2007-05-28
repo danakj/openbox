@@ -314,7 +314,7 @@ static void screen_tell_ksplash()
     const char *args[] = { "dcop", "ksplash", "ksplash",
                            "upAndRunning(QString)", "wm started", NULL };
 
-    /* tell the dcop server through the command line interface */
+    /* tell ksplash through the dcop server command line interface */
     g_spawn_async(NULL, args, NULL,
                   G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                   NULL, NULL, NULL, NULL);

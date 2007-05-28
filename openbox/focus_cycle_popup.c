@@ -431,10 +431,10 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                 s = icon->data;
                 d = icon_data;
                 for (i = 0; i < icon->width * icon->height; ++i, ++d, ++s) {
-                     /* 50% opacity */
+                     /* 3/8 opacity */
                     gint a = ((*s >> RrDefaultAlphaOffset) & 0xff);
                     *d = *s - (a << RrDefaultAlphaOffset) +
-                        ((a>>1) << RrDefaultAlphaOffset);
+                        (((a>>2) + (a>>3)) << RrDefaultAlphaOffset);
                 }
                     
             } else

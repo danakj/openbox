@@ -1009,26 +1009,30 @@ static void event_handle_client(ObClient *client, XEvent *e)
            also you can't compress stacking events
         */
 
-        gint x, y, w, h, b;
+        gint x, y, w, h;
         gboolean move = FALSE;
         gboolean resize = FALSE;
-        gboolean border = FALSE;
 
         /* get the current area */
         RECT_TO_DIMS(client->area, x, y, w, h);
-        b = client->border_width;
 
         ob_debug("ConfigureRequest for \"%s\" desktop %d wmstate %d "
                  "visibile %d\n"
                  "                     x %d y %d w %d h %d b %d\n",
                  client->title,
                  screen_desktop, client->wmstate, client->frame->visible,
-                 x, y, w, h, b);
+                 x, y, w, h, client->border_width);
 
         if (e->xconfigurerequest.value_mask & CWBorderWidth)
             if (client->border_width != e->xconfigurerequest.border_width) {
-                b = e->xconfigurerequest.border_width;
-                border = TRUE;
+                client->border_width = e->xconfigurerequest.border_width;
+
+                /* if the border width is changing then that is the same
+                   as requesting a resize, but we don't actually change
+                   the client's border, so it will change their root
+                   coordiantes (since they include the border width) and
+                   we need to a notify then */
+                move = TRUE;
             }
 
 
@@ -1118,35 +1122,31 @@ static void event_handle_client(ObClient *client, XEvent *e)
                notify is sent or not */
         }
 
-        if (move || resize || border) {
+        if (move || resize) {
             gint lw,lh;
 
-            if (move || resize) {
-                client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+            client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
 
-                /* if x was not given, then use gravity to figure out the new
-                   x.  the reference point should not be moved */
-                if ((e->xconfigurerequest.value_mask & CWWidth &&
-                     !(e->xconfigurerequest.value_mask & CWX)))
-                    client_gravity_resize_w(client, &x, client->area.width, w);
-                /* if y was not given, then use gravity to figure out the new
-                   y.  the reference point should not be moved */
-                if ((e->xconfigurerequest.value_mask & CWHeight &&
-                     !(e->xconfigurerequest.value_mask & CWY)))
-                    client_gravity_resize_h(client, &y, client->area.height,h);
+            /* if x was not given, then use gravity to figure out the new
+               x.  the reference point should not be moved */
+            if ((e->xconfigurerequest.value_mask & CWWidth &&
+                 !(e->xconfigurerequest.value_mask & CWX)))
+                client_gravity_resize_w(client, &x, client->area.width, w);
+            /* if y was not given, then use gravity to figure out the new
+               y.  the reference point should not be moved */
+            if ((e->xconfigurerequest.value_mask & CWHeight &&
+                 !(e->xconfigurerequest.value_mask & CWY)))
+                client_gravity_resize_h(client, &y, client->area.height,h);
 
-                client_find_onscreen(client, &x, &y, w, h, FALSE);
-            }
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
+
             /* if they requested something that moves the window, or if
                the window is actually being changed then configure it and
                send a configure notify to them */
-            if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h) ||
-                border)
-            {
-                ob_debug("Granting ConfigureRequest x %d y %d w %d h %d "
-                         "b %d\n",
-                         x, y, w, h, b);
-                client_configure(client, x, y, w, h, b, FALSE, TRUE);
+            if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
+                ob_debug("Granting ConfigureRequest x %d y %d w %d h %d\n",
+                         x, y, w, h);
+                client_configure(client, x, y, w, h, FALSE, TRUE);
             }
 
             /* ignore enter events caused by these like ob actions do */
@@ -1351,8 +1351,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            client_configure(client, x, y, w, h, client->border_width,
-                             FALSE, TRUE);
+            client_configure(client, x, y, w, h, FALSE, TRUE);
 
             client->gravity = ograv;
 

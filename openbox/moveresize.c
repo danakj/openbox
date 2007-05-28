@@ -298,7 +298,7 @@ void moveresize_end(gboolean cancel)
         client_configure(moveresize_client, x, y,
                          (cancel ? start_cw : cur_x),
                          (cancel ? start_ch : cur_y),
-                         moveresize_client->border_width, TRUE, TRUE);
+                         TRUE, TRUE);
     }
 
     moveresize_in_progress = FALSE;
@@ -318,7 +318,7 @@ static void do_move(gboolean keyboard)
     client_configure(moveresize_client, cur_x, cur_y,
                      moveresize_client->area.width,
                      moveresize_client->area.height,
-                     moveresize_client->border_width, TRUE, FALSE);
+                     TRUE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
         popup_coords(moveresize_client, "%d x %d",
                      moveresize_client->frame->area.x,
@@ -376,8 +376,7 @@ static void do_resize()
 #endif
 
     get_resize_position(&x, &y, FALSE);
-    client_configure(moveresize_client, x, y, cur_x, cur_y,
-                     moveresize_client->border_width, TRUE, FALSE);
+    client_configure(moveresize_client, x, y, cur_x, cur_y, TRUE, FALSE);
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

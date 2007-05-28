@@ -719,8 +719,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window,
-                        self->size.left - self->client->border_width,
-                        self->size.top - self->client->border_width);
+                        self->size.left, self->size.top);
         }
     }
 

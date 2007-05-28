@@ -386,13 +386,11 @@ void client_convert_gravity_resize(ObClient *self, gint gravity,
                                    gint w, gint h);
 
 #define client_move(self, x, y) \
-  client_configure(self, x, y, self->area.width, self->area.height, \
-                   self->border_width, TRUE, TRUE)
+  client_configure(self, x, y, self->area.width, self->area.height, TRUE, TRUE)
 #define client_resize(self, w, h) \
-  client_configure(self, self->area.x, self->area.y, w, h, \
-                   self->border_width, TRUE, TRUE)
+  client_configure(self, self->area.x, self->area.y, w, h, TRUE, TRUE)
 #define client_move_resize(self, x, y, w, h) \
-  client_configure(self, x, y, w, h, self->border_width, TRUE, TRUE)
+  client_configure(self, x, y, w, h, TRUE, TRUE)
 
 /*! Figure out where a window will end up and what size it will be if you
   told it to move/resize to these coordinates.
@@ -433,7 +431,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
   @param force_reply Send a ConfigureNotify to the client regardless of if
                      the position changed.
 */
-void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
+void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                       gboolean user, gboolean final);
 
 void client_reconfigure(ObClient *self);

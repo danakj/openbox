@@ -498,7 +498,7 @@ void client_manage(Window window)
                is ambiguous (either the current focus target doesn't have
                a timestamp, or they are the same (we probably inherited it
                from them) */
-            else if (self->transient_for != NULL &&
+            else if (client_has_parent(self) &&
                      (!last_time || self->user_time == last_time))
             {
                 activate = FALSE;
@@ -2355,25 +2355,30 @@ ObClient *client_search_focus_tree_full(ObClient *self)
             return client_search_focus_tree_full(self->transient_for);
         } else {
             GSList *it;
-            gboolean recursed = FALSE;
         
-            for (it = self->group->members; it; it = g_slist_next(it))
-                if (!((ObClient*)it->data)->transient_for) {
-                    ObClient *c;
-                    if ((c = client_search_focus_tree_full(it->data)))
-                        return c;
-                    recursed = TRUE;
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                if (it->data != self) {
+                    ObClient *c = it->data;
+
+                    if (client_focused(c)) return c;
+                    if ((c = client_search_focus_tree(it->data))) return c;
                 }
-            if (recursed)
-                return NULL;
+            }
         }
     }
 
-    /* this function checks the whole tree, the client_search_focus_tree~
+    /* this function checks the whole tree, the client_search_focus_tree
        does not, so we need to check this window */
     if (client_focused(self))
         return self;
     return client_search_focus_tree(self);
+}
+
+gboolean client_has_parent(ObClient *self)
+{
+    return (self->transient_for &&
+            (self->transient_for != OB_TRAN_GROUP ||
+             (self->group && self->group->members->next)));
 }
 
 static ObStackingLayer calc_layer(ObClient *self)

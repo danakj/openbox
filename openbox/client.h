@@ -612,6 +612,11 @@ void client_get_type_and_transientness(ObClient *self);
 
 const ObClientIcon *client_icon(ObClient *self, gint w, gint h);
 
+/*! Return TRUE if the client is transient for some other window. Return
+  FALSE if it's not transient or there is no window for it to be
+  transient for */
+gboolean client_has_parent(ObClient *self);
+
 /*! Searches a client's direct parents for a focused window. The function does
   not check for the passed client, only for *ONE LEVEL* of its parents.
   If no focused parentt is found, NULL is returned.

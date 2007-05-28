@@ -149,11 +149,16 @@ gboolean focus_cycle_target_valid(ObClient *ft,
                 ft->modal ||
                 !ft->skip_taskbar);
 
-    /* it's not going to just send fous off somewhere else (modal window) */
+    /* it's not going to just send focus off somewhere else (modal window),
+       unless that modal window is not one of our valid targets, then let
+       you choose this window and bring the modal one here */
     {
         ObClient *cft = client_focus_target(ft);
-        ok = ok && (ft == cft || (cft->desktop != DESKTOP_ALL &&
-                                  cft->desktop != ft->desktop));
+        ok = ok && (ft == cft || !focus_cycle_target_valid(cft,
+                                                           iconic_windows,
+                                                           all_desktops,
+                                                           dock_windows,
+                                                           desktop_windows));
     }
 
     return ok;

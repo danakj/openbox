@@ -2377,7 +2377,8 @@ ObClient *client_search_focus_tree_full(ObClient *self)
 gboolean client_has_parent(ObClient *self)
 {
     return (self->transient_for &&
-            (self->transient_for != OB_TRAN_GROUP ||
+            ((self->transient_for != OB_TRAN_GROUP &&
+              client_normal(self->transient_for) ||
              (self->group && self->group->members->next)));
 }
 

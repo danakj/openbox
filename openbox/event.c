@@ -270,6 +270,8 @@ static void event_hack_mods(XEvent *e)
             XEvent ce;
             while (XCheckTypedWindowEvent(ob_display, e->xmotion.window,
                                           e->type, &ce)) {
+                e->xmotion.x = ce.xmotion.x;
+                e->xmotion.y = ce.xmotion.y;
                 e->xmotion.x_root = ce.xmotion.x_root;
                 e->xmotion.y_root = ce.xmotion.y_root;
             }
@@ -1006,8 +1008,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
         RECT_TO_DIMS(client->area, x, y, w, h);
         b = client->border_width;
 
-        ob_debug("ConfigureRequest desktop %d wmstate %d visibile %d\n",
-                 screen_desktop, client->wmstate, client->frame->visible);
+        ob_debug("ConfigureRequest for \"%s\" desktop %d wmstate %d "
+                 "visibile %d\n"
+                 "                     x %d y %d w %d h %d b %d\n",
+                 client->title,
+                 screen_desktop, client->wmstate, client->frame->visible,
+                 x, y, w, h, b);
 
         if (e->xconfigurerequest.value_mask & CWBorderWidth)
             if (client->border_width != e->xconfigurerequest.border_width) {
@@ -1036,10 +1042,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             move = TRUE;
         }
 
-        if (e->xconfigurerequest.value_mask & CWX ||
-            e->xconfigurerequest.value_mask & CWY ||
-            e->xconfigurerequest.value_mask & CWWidth ||
-            e->xconfigurerequest.value_mask & CWHeight)
+        if ((e->xconfigurerequest.value_mask & CWX) ||
+            (e->xconfigurerequest.value_mask & CWY) ||
+            (e->xconfigurerequest.value_mask & CWWidth) ||
+            (e->xconfigurerequest.value_mask & CWHeight))
         {
             if (e->xconfigurerequest.value_mask & CWX) {
                 /* don't allow clients to move shaded windows (fvwm does this)
@@ -1059,20 +1065,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xconfigurerequest.value_mask & CWWidth) {
                 w = e->xconfigurerequest.width;
                 resize = TRUE;
-
-                /* if x was not given, then use gravity to figure out the new
-                   x.  the reference point should not be moved */
-                if (!(e->xconfigurerequest.value_mask & CWX))
-                    client_gravity_resize_w(client, &x, client->area.width, w);
             }
             if (e->xconfigurerequest.value_mask & CWHeight) {
                 h = e->xconfigurerequest.height;
                 resize = TRUE;
-
-                /* if y was not given, then use gravity to figure out the new
-                   y.  the reference point should not be moved */
-                if (!(e->xconfigurerequest.value_mask & CWY))
-                    client_gravity_resize_h(client, &y, client->area.height,h);
             }
         }
 
@@ -1116,8 +1112,20 @@ static void event_handle_client(ObClient *client, XEvent *e)
             gint lw,lh;
 
             if (move || resize) {
-                client_find_onscreen(client, &x, &y, w, h, FALSE);
                 client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+
+                /* if x was not given, then use gravity to figure out the new
+                   x.  the reference point should not be moved */
+                if ((e->xconfigurerequest.value_mask & CWWidth &&
+                     !(e->xconfigurerequest.value_mask & CWX)))
+                    client_gravity_resize_w(client, &x, client->area.width, w);
+                /* if y was not given, then use gravity to figure out the new
+                   y.  the reference point should not be moved */
+                if ((e->xconfigurerequest.value_mask & CWHeight &&
+                     !(e->xconfigurerequest.value_mask & CWY)))
+                    client_gravity_resize_h(client, &y, client->area.height,h);
+
+                client_find_onscreen(client, &x, &y, w, h, FALSE);
             }
             /* if they requested something that moves the window, or if
                the window is actually being changed then configure it and
@@ -1125,7 +1133,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h) ||
                 border)
             {
-                ob_debug("Doing configure\n");
+                ob_debug("Granting ConfigureRequest x %d y %d w %d h %d "
+                         "b %d\n",
+                         x, y, w, h, b);
                 client_configure(client, x, y, w, h, b, FALSE, TRUE);
             }
 

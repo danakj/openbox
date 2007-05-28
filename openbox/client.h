@@ -562,6 +562,9 @@ void client_activate(ObClient *self, gboolean here, gboolean user);
   stuff windows. */
 void client_bring_helper_windows(ObClient *self);
 
+/*! Bring all of its modal windows to its desktop. */
+void client_bring_modal_windows(ObClient *self);
+
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);
 

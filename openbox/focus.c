@@ -166,6 +166,8 @@ ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer)
     focus_nothing();
 
     new = focus_fallback_target(allow_refocus, allow_pointer, old);
+    /* get what was really focused */
+    if (new) new = client_focus_target(new);
 
     return new;
 }

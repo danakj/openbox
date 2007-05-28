@@ -2378,7 +2378,7 @@ gboolean client_has_parent(ObClient *self)
 {
     return (self->transient_for &&
             ((self->transient_for != OB_TRAN_GROUP &&
-              client_normal(self->transient_for) ||
+              client_normal(self->transient_for)) ||
              (self->group && self->group->members->next)));
 }
 

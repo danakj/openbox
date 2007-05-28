@@ -3463,6 +3463,8 @@ gboolean client_can_focus(ObClient *self)
 
 gboolean client_focus(ObClient *self)
 {
+    /* we might not focus this window, so if we have modal children which would
+       be focused instead, bring them to this desktop */
     client_bring_modal_windows(self);
 
     /* choose the correct target */

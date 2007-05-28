@@ -1451,6 +1451,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.net_wm_strut) {
             client_update_strut(client);
         }
+        else if (msgtype == prop_atoms.net_wm_strut_partial) {
+            client_update_strut(client);
+        }
         else if (msgtype == prop_atoms.net_wm_icon) {
             client_update_icons(client);
         }

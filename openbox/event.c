@@ -270,6 +270,8 @@ static void event_hack_mods(XEvent *e)
             XEvent ce;
             while (XCheckTypedWindowEvent(ob_display, e->xmotion.window,
                                           e->type, &ce)) {
+                e->xmotion.x = ce.xmotion.x;
+                e->xmotion.y = ce.xmotion.y;
                 e->xmotion.x_root = ce.xmotion.x_root;
                 e->xmotion.y_root = ce.xmotion.y_root;
             }

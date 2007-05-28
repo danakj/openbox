@@ -441,7 +441,6 @@ void client_manage(Window window)
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
        won't be all wacko!!
-       also, this moves the window to the position where it has been placed
     */
     client_apply_startup_state(self);
 

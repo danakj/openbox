@@ -112,12 +112,17 @@ ObFrame *frame_new(ObClient *client)
 
     /* create the visible decor windows */
 
-    mask = CWEventMask;
+    mask = 0;
     if (visual) {
         /* client has a 32-bit visual */
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
         attrib.colormap = RrColormap(ob_rr_inst);
     }
+
+    self->backback = createWindow(self->window, NULL, mask, &attrib);
+    self->backfront = createWindow(self->backback, NULL, mask, &attrib);
+
+    mask |= CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
     self->title = createWindow(self->window, NULL, mask, &attrib);
     self->titleleft = createWindow(self->window, NULL, mask, &attrib);
@@ -169,6 +174,8 @@ ObFrame *frame_new(ObClient *client)
 
     /* the other stuff is shown based on decor settings */
     XMapWindow(ob_display, self->label);
+    XMapWindow(ob_display, self->backback);
+    XMapWindow(ob_display, self->backfront);
 
     self->max_press = self->close_press = self->desk_press = 
         self->iconify_press = self->shade_press = FALSE;
@@ -705,6 +712,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->right);
 
+            XMoveResizeWindow(ob_display, self->backback,
+                              self->size.left, self->size.top,
+                              self->client->area.width,
+                              self->client->area.height);
+
             /* when the client has StaticGravity, it likes to move around. */
             XMoveWindow(ob_display, self->client->window,
                         self->size.left - self->client->border_width,
@@ -827,6 +839,14 @@ static void frame_adjust_cursors(ObFrame *self)
     }
 }
 
+void frame_adjust_client_area(ObFrame *self)
+{
+    /* adjust the window which is there to prevent flashing on unmap */
+    XMoveResizeWindow(ob_display, self->backfront, 0, 0,
+                      self->client->area.width,
+                      self->client->area.height);
+}
+
 void frame_adjust_state(ObFrame *self)
 {
     framerender_frame(self);
@@ -874,6 +894,8 @@ void frame_grab_client(ObFrame *self)
 
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, self->client);
+    g_hash_table_insert(window_map, &self->backback, self->client);
+    g_hash_table_insert(window_map, &self->backfront, self->client);
     g_hash_table_insert(window_map, &self->innerleft, self->client);
     g_hash_table_insert(window_map, &self->innertop, self->client);
     g_hash_table_insert(window_map, &self->innerright, self->client);
@@ -952,6 +974,8 @@ void frame_release_client(ObFrame *self)
 
     /* remove all the windows for the frame from the window_map */
     g_hash_table_remove(window_map, &self->window);
+    g_hash_table_remove(window_map, &self->backback);
+    g_hash_table_remove(window_map, &self->backfront);
     g_hash_table_remove(window_map, &self->innerleft);
     g_hash_table_remove(window_map, &self->innertop);
     g_hash_table_remove(window_map, &self->innerright);

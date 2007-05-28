@@ -120,6 +120,9 @@ struct _ObFrame
     Window    innertop;     /*!< For drawing the inner client border */
     Window    innerright;   /*!< For drawing the inner client border */
     Window    innerbottom;  /*!< For drawing the inner client border */
+    Window    backback;     /*!< A colored window shown while resizing */
+    Window    backfront;    /*!< An undrawn-in window, to prevent flashing on
+                                 unmap */
 
     /* These are resize handles inside the titlebar */
     Window    topresize;
@@ -202,6 +205,7 @@ void frame_adjust_theme(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);
+void frame_adjust_client_area(ObFrame *self);
 void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);

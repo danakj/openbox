@@ -361,6 +361,7 @@ void client_manage(Window window)
     /* adjust the frame to the client's size before showing or placing
        the window */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    frame_adjust_client_area(self->frame);
 
     /* where the frame was placed is where the window was originally */
     placex = self->area.x;
@@ -2864,6 +2865,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
         XConfigureWindow(ob_display, self->window,
                          CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
                          &changes);
+
+        frame_adjust_client_area(self->frame);
     }
 
     /* find the frame's dimensions and move/resize it */
@@ -2915,17 +2918,18 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h, gint b,
 
     /* if the client is shrinking, then resize the frame before the client */
     if (send_resize_client && (w <= oldw && h <= oldh)) {
-        if (send_resize_client) {
-            XWindowChanges changes;
-            changes.x = self->frame->size.left - self->border_width;
-            changes.y = self->frame->size.top -self->border_width;
-            changes.width = w;
-            changes.height = h;
-            changes.border_width = self->border_width;
-            XConfigureWindow(ob_display, self->window,
-                             CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
-                             &changes);
-        }
+        XWindowChanges changes;
+
+        frame_adjust_client_area(self->frame);
+
+        changes.x = self->frame->size.left - self->border_width;
+        changes.y = self->frame->size.top -self->border_width;
+        changes.width = w;
+        changes.height = h;
+        changes.border_width = self->border_width;
+        XConfigureWindow(ob_display, self->window,
+                         CWX|CWY|CWWidth|CWHeight|CWBorderWidth,
+                         &changes);
     }
 
     XFlush(ob_display);

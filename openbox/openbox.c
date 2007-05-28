@@ -328,9 +328,7 @@ gint main(gint argc, gchar **argv)
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
                     /* the new config can change the window's decorations */
-                    client_setup_decor_and_functions(c);
-                    /* redraw the frames */
-                    frame_adjust_area(c->frame, TRUE, TRUE, FALSE);
+                    client_setup_decor_and_functions(c, TRUE);
                 }
             }
 

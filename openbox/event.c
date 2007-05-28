@@ -306,7 +306,9 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
             /* This means focus reverted off of a client */
             else if (detail == NotifyPointerRoot ||
                      detail == NotifyDetailNone ||
-                     detail == NotifyInferior)
+                     detail == NotifyInferior ||
+                     /* This means focus got here from another screen */
+                     detail == NotifyNonlinear)
                 return TRUE;
             else
                 return FALSE;
@@ -487,12 +489,20 @@ static void event_process(const XEvent *ec, gpointer data)
     } else if (e->type == FocusIn) {
         if (e->xfocus.detail == NotifyPointerRoot ||
             e->xfocus.detail == NotifyDetailNone ||
-            e->xfocus.detail == NotifyInferior)
+            e->xfocus.detail == NotifyInferior ||
+            e->xfocus.detail == NotifyNonlinear)
         {
             XEvent ce;
 
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to pointer root/none or"
-                          " the frame window\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root, "
+                          "pointer root/none or "
+                          "the frame window\n");
+
+            if (e->xfocus.detail == NotifyInferior ||
+                e->xfocus.detail == NotifyNonlinear)
+            {
+                focus_left_screen = FALSE;
+            }
 
             /* If another FocusIn is in the queue then don't fallback yet. This
                fixes the fun case of:

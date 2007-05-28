@@ -1122,13 +1122,16 @@ static void client_get_desktop(ObClient *self)
             self->desktop = screen_num_desktops - 1;
         else
             self->desktop = d;
+        ob_debug("client requested desktop 0x%x\n", self->desktop); 
     } else {
         gboolean trdesk = FALSE;
 
         if (self->transient_for) {
             if (self->transient_for != OB_TRAN_GROUP) {
-                self->desktop = self->transient_for->desktop;
-                trdesk = TRUE;
+                if (self->transient_for->desktop != DESKTOP_ALL) {
+                    self->desktop = self->transient_for->desktop;
+                    trdesk = TRUE;
+                }
             } else {
                 /* if all the group is on one desktop, then open it on the
                    same desktop */

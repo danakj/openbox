@@ -152,7 +152,8 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
     while (num_pixels-- > 0) {
         guchar alpha, r, g, b, bgr, bgg, bgb;
 
-        alpha = *source >> RrDefaultAlphaOffset;
+        /* apply the rgba's opacity as well */
+        alpha = ((*source >> RrDefaultAlphaOffset) * rgba->alpha >> 8) & 0xff;
         r = *source >> RrDefaultRedOffset;
         g = *source >> RrDefaultGreenOffset;
         b = *source >> RrDefaultBlueOffset;

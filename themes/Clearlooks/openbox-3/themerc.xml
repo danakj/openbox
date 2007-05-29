@@ -11,7 +11,7 @@
     <padding x="2" y="2"/>
     <window>
       <border>1</border>
-      <clientpadding x="5" y="5"/>
+      <clientpadding x="0" y="0"/>
     </window>
     <menu>
       <border>1</border>
@@ -20,7 +20,6 @@
   <window>
     <active>
       <border r="0" g="0" b="0" a="255"/>
-      <clientpadding r="102" g="153" b="204" a="255"/>
       <label>
         <text>
           <primary r="255" g="255" b="255" a="255"/>

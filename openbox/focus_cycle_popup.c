@@ -321,6 +321,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         /* set up the hilite texture for the background */
         p->a_bg->texture[0].data.rgba.width = rgbaw;
         p->a_bg->texture[0].data.rgba.height = rgbah;
+        p->a_bg->texture[0].data.rgba.alpha = 0xff;
         p->hilite_rgba = g_new(RrPixel32, rgbaw * rgbah);
         p->a_bg->texture[0].data.rgba.data = p->hilite_rgba;
 
@@ -405,7 +406,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             const gint row = i / icons_per_row; /* starting from 0 */
             const gint col = i % icons_per_row; /* starting from 0 */
             gint innerx, innery;
-            RrPixel32 *icon_data;
 
             /* find the dimensions of the icon inside it */
             innerx = icons_center_x + l + (col * ICON_SIZE);
@@ -421,33 +421,14 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             icon = client_icon(target->client, innerw, innerh);
             p->a_icon->texture[0].data.rgba.width = icon->width;
             p->a_icon->texture[0].data.rgba.height = icon->height;
-            if (target->client->iconic) {
-                /* fade iconic windows */
-                gint i;
-                RrPixel32 *d, *s;
-
-                icon_data = g_new(RrPixel32, icon->width * icon->height);
-
-                s = icon->data;
-                d = icon_data;
-                for (i = 0; i < icon->width * icon->height; ++i, ++d, ++s) {
-                     /* 7/16 opacity */
-                    gint a = ((*s >> RrDefaultAlphaOffset) & 0xff);
-                    *d = *s - (a << RrDefaultAlphaOffset) +
-                        (((a>>1) - (a>>4)) << RrDefaultAlphaOffset);
-                }
-                    
-            } else
-                icon_data = icon->data;
-            p->a_icon->texture[0].data.rgba.data = icon_data;
+            p->a_icon->texture[0].data.rgba.alpha =
+                target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
+            p->a_icon->texture[0].data.rgba.data = icon->data;
 
             /* draw the icon */
             p->a_icon->surface.parentx = innerx;
             p->a_icon->surface.parenty = innery;
             RrPaint(p->a_icon, target->win, innerw, innerh);
-
-            if (target->client->iconic)
-                g_free(icon_data);
         }
     }
 

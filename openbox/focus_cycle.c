@@ -346,9 +346,10 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         if (offset > distance)
             score += 1000000;
 
-        if (best_score == -1 || score < best_score)
-            best_client = cur,
-                best_score = score;
+        if (best_score == -1 || score < best_score) {
+            best_client = cur;
+            best_score = score;
+        }
     }
 
     return best_client;

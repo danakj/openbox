@@ -499,6 +499,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
             self->entry->data.normal.icon_width;
         self->a_icon->texture[0].data.rgba.height =
             self->entry->data.normal.icon_height;
+        self->a_icon->texture[0].data.rgba.alpha =
+            self->entry->data.normal.icon_alpha;
         self->a_icon->texture[0].data.rgba.data =
             self->entry->data.normal.icon_data;
         self->a_icon->surface.parent = item_a;

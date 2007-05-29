@@ -344,6 +344,7 @@ static void framerender_icon(ObFrame *self, RrAppearance *a)
         a->texture[0].type = RR_TEXTURE_RGBA;
         a->texture[0].data.rgba.width = icon->width;
         a->texture[0].data.rgba.height = icon->height;
+        a->texture[0].data.rgba.alpha = 0xff;
         a->texture[0].data.rgba.data = icon->data;
     } else
         a->texture[0].type = RR_TEXTURE_NONE;

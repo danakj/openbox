@@ -324,6 +324,7 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
         self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
         self->a_icon->texture[0].data.rgba.width = icon->width;
         self->a_icon->texture[0].data.rgba.height = icon->height;
+        self->a_icon->texture[0].data.rgba.alpha = 0xff;
         self->a_icon->texture[0].data.rgba.data = icon->data;
     } else
         self->a_icon->texture[0].type = RR_TEXTURE_NONE;

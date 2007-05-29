@@ -311,13 +311,21 @@ gboolean screen_annex()
 static void screen_tell_ksplash()
 {
     XEvent e;
-    const char *args[] = { "dcop", "ksplash", "ksplash",
-                           "upAndRunning(QString)", "wm started", NULL };
+    char **argv;
+
+    argv = g_new(gchar*, 6);
+    argv[0] = g_strdup("dcop");
+    argv[1] = g_strdup("ksplash");
+    argv[2] = g_strdup("ksplash");
+    argv[3] = g_strdup("upAndRunning(QString)");
+    argv[4] = g_strdup("wm started");
+    argv[5] = NULL;
 
     /* tell ksplash through the dcop server command line interface */
-    g_spawn_async(NULL, args, NULL,
+    g_spawn_async(NULL, argv, NULL,
                   G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                   NULL, NULL, NULL, NULL);
+    g_strfreev(argv);
 
     /* i'm not sure why we do this, kwin does it, but ksplash doesn't seem to
        hear it anyways. perhaps it is for old ksplash. or new ksplash. or

@@ -84,6 +84,7 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
                 e->data.normal.icon_width = icon->width;
                 e->data.normal.icon_height = icon->height;
                 e->data.normal.icon_data = icon->data;
+                e->data.normal.icon_alpha = c->iconic ? OB_ICONIC_ALPHA : 0xff;
             }
         }
     }

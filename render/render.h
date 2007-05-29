@@ -146,6 +146,7 @@ struct _RrTextureMask {
 struct _RrTextureRGBA {
     gint width;
     gint height;
+    gint alpha;
     RrPixel32 *data;
 /* cached scaled so we don't have to scale often */
     gint cwidth;

@@ -437,7 +437,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     return TRUE;
 }
 
-static gboolean place_transient(ObClient *client, gint *x, gint *y)
+static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for && client->type == OB_CLIENT_TYPE_DIALOG) {
         if (client->transient_for != OB_TRAN_GROUP) {
@@ -480,7 +480,9 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
         }
     }
 
-    if (client->transient) {
+    if ((client->transient && client->type == OB_CLIENT_TYPE_DIALOG)
+        || client->type == OB_CLIENT_TYPE_SPLASH)
+    {
         Rect **areas;
 
         areas = pick_head(client);
@@ -502,7 +504,7 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
     gboolean ret = FALSE;
     if (client->positioned)
         return FALSE;
-    if (place_transient(client, x, y))
+    if (place_transient_splash(client, x, y))
         ret = TRUE;
     else if (!(
         place_per_app_setting(client, x, y, settings) ||

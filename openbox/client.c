@@ -390,6 +390,8 @@ void client_manage(Window window)
                      "program + user specified" :
                      "BADNESS !?")))), placew, placeh);
 
+        /* splash screens are also returned as TRUE for transient,
+           and so will be forced on screen below */
         transient = place_client(self, &placex, &placey, settings);
 
         /* make sure the window is visible. */
@@ -403,7 +405,11 @@ void client_manage(Window window)
                                 place.c or by the user are allowed partially
                                 off-screen and on xinerama divides (ie,
                                 it is up to the placement routines to avoid
-                                the xinerama divides) */
+                                the xinerama divides)
+
+                                splash screens get "transient" set to TRUE by
+                                the place_client call
+                             */
                              transient ||
                              (!(self->positioned & USPosition) &&
                               client_normal(self) &&
@@ -414,7 +420,11 @@ void client_manage(Window window)
        the visible screen area on its monitor. Use basically the same rules
        for forcing the window on screen in the client_find_onscreen call.
 
-       do this after place_client, it chooses the monitor! */
+       do this after place_client, it chooses the monitor!
+
+       splash screens get "transient" set to TRUE by
+       the place_client call
+    */
     if (transient ||
         (!(self->sized & USSize) &&
          client_normal(self) &&

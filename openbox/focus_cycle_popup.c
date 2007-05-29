@@ -422,8 +422,11 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             icon = client_icon(target->client, innerw, innerh);
             p->a_icon->texture[0].data.rgba.width = icon->width;
             p->a_icon->texture[0].data.rgba.height = icon->height;
-            /* 7/16 alpha */
-            p->a_icon->texture[0].data.rgba.alpha = (0xff>>1 - 0xff>>4);
+            if (target->client->iconic)
+                /* 7/16 alpha */
+                p->a_icon->texture[0].data.rgba.alpha = (0xff>>1 - 0xff>>4);
+            else
+                p->a_icon->texture[0].data.rgba.alpha = 0xff;
             p->a_icon->texture[0].data.rgba.data = icon->data;
 
             /* draw the icon */

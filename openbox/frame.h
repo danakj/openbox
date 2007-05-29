@@ -162,8 +162,10 @@ struct _ObFrame
     gint      close_x;       /* x-position of the window close button */
     gint      bwidth;        /* border width */
     gint      rbwidth;       /* border width between the title and client */
-    gint      cbwidth_x;     /* client border width */
-    gint      cbwidth_y;     /* client border width */
+    gint      cbwidth_l;     /* client border width */
+    gint      cbwidth_t;     /* client border width */
+    gint      cbwidth_r;     /* client border width */
+    gint      cbwidth_b;     /* client border width */
     gboolean  max_horz;      /* when maxed some decorations are hidden */
     gboolean  max_vert;      /* when maxed some decorations are hidden */
 

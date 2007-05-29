@@ -429,12 +429,8 @@ void client_manage(Window window)
 
         /* fit the window inside the area */
         if (placew > a.width || self->area.height > a.height) {
-            placew = MAX(MIN(MIN(self->area.width, a.width),
-                             self->max_size.width),
-                         self->min_size.width);
-            placeh = MAX(MIN(MIN(self->area.height, a.height),
-                             self->max_size.height),
-                         self->min_size.height);
+            placew = MIN(self->area.width, a.width);
+            placeh = MIN(self->area.height, a.height);
 
             ob_debug("setting window size to %dx%d\n",
                      self->area.width, self->area.height);

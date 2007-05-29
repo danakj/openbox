@@ -116,6 +116,7 @@ struct _ObNormalMenuEntry {
     /* Icon shit */
     gint icon_width;
     gint icon_height;
+    gint icon_alpha;
     RrPixel32 *icon_data;
 
     /* Mask icon */

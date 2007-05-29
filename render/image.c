@@ -153,7 +153,7 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
         guchar alpha, r, g, b, bgr, bgg, bgb;
 
         /* apply the rgba's opacity as well */
-        alpha = ((*source >> RrDefaultAlphaOffset) * rgba->alpha >> 8) & 0xff;
+        alpha = (((*source >> RrDefaultAlphaOffset) * rgba->alpha) >> 8)&0xff;
         r = *source >> RrDefaultRedOffset;
         g = *source >> RrDefaultGreenOffset;
         b = *source >> RrDefaultBlueOffset;

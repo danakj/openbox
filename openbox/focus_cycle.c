@@ -169,7 +169,6 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
                  gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
-    static ObClient *first = NULL;
     static ObClient *t = NULL;
     static GList *order = NULL;
     GList *it, *start, *list;
@@ -185,8 +184,6 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
         if (!focus_order)
             goto done_cycle;
 
-        if (!first) first = focus_client;
-
         if (linear) list = client_list;
         else        list = focus_order;
     } else {
@@ -201,10 +198,10 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
         focus_cycle_all_desktops = all_desktops;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
-        focus_cycle_target = focus_client;
-    }
+        start = it = g_list_find(list, focus_client);
+    } else
+        start = it = g_list_find(list, focus_cycle_target);
 
-    start = it = g_list_find(list, focus_cycle_target);
     if (!start) /* switched desktops or something? */
         start = it = forward ? g_list_last(list) : g_list_first(list);
     if (!start) goto done_cycle;
@@ -250,7 +247,6 @@ done_cycle:
         client_activate(focus_cycle_target, FALSE, TRUE);
 
     t = NULL;
-    first = NULL;
     focus_cycle_target = NULL;
     g_list_free(order);
     order = NULL;
@@ -275,7 +271,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
     ObClient *best_client, *cur;
     GList *it;
 
-    if(!client_list)
+    if (!client_list)
         return NULL;
 
     /* first, find the centre coords of the currently focused window */
@@ -283,13 +279,13 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
     my_cy = c->frame->area.y + c->frame->area.height / 2;
 
     best_score = -1;
-    best_client = NULL;
+    best_client = c;
 
-    for(it = g_list_first(client_list); it; it = g_list_next(it)) {
+    for (it = g_list_first(client_list); it; it = g_list_next(it)) {
         cur = it->data;
 
         /* the currently selected window isn't interesting */
-        if(cur == c)
+        if (cur == c)
             continue;
         if (!focus_cycle_target_valid(it->data, FALSE, FALSE, dock_windows,
                                       desktop_windows))
@@ -302,8 +298,9 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         his_cy = (cur->frame->area.y - my_cy)
             + cur->frame->area.height / 2;
 
-        if(dir == OB_DIRECTION_NORTHEAST || dir == OB_DIRECTION_SOUTHEAST ||
-           dir == OB_DIRECTION_SOUTHWEST || dir == OB_DIRECTION_NORTHWEST) {
+        if (dir == OB_DIRECTION_NORTHEAST || dir == OB_DIRECTION_SOUTHEAST ||
+            dir == OB_DIRECTION_SOUTHWEST || dir == OB_DIRECTION_NORTHWEST)
+        {
             gint tx;
             /* Rotate the diagonals 45 degrees counterclockwise.
              * To do this, multiply the matrix /+h +h\ with the
@@ -315,7 +312,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
             his_cx = tx;
         }
 
-        switch(dir) {
+        switch (dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_SOUTH:
         case OB_DIRECTION_NORTHEAST:
@@ -337,7 +334,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         }
 
         /* the target must be in the requested direction */
-        if(distance <= 0)
+        if (distance <= 0)
             continue;
 
         /* Calculate score for this window.  The smaller the better. */
@@ -346,10 +343,10 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* windows more than 45 degrees off the direction are
          * heavily penalized and will only be chosen if nothing
          * else within a million pixels */
-        if(offset > distance)
+        if (offset > distance)
             score += 1000000;
 
-        if(best_score == -1 || score < best_score)
+        if (best_score == -1 || score < best_score)
             best_client = cur,
                 best_score = score;
     }
@@ -381,7 +378,6 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         focus_cycle_all_desktops = FALSE;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
-        focus_cycle_target = focus_client;
     }
 
     if (!first) first = focus_client;
@@ -389,6 +385,8 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (focus_cycle_target)
         ft = focus_find_directional(focus_cycle_target, dir, dock_windows,
                                     desktop_windows);
+    else if (first)
+        ft = focus_find_directional(first, dir, dock_windows, desktop_windows);
     else {
         GList *it;
 

@@ -480,7 +480,9 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         }
     }
 
-    if (client->transient || client->type == OB_CLIENT_TYPE_SPLASH) {
+    if ((client->transient && client->type == OB_CLIENT_TYPE_DIALOG)
+        || client->type == OB_CLIENT_TYPE_SPLASH)
+    {
         Rect **areas;
 
         areas = pick_head(client);

@@ -406,7 +406,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             const gint row = i / icons_per_row; /* starting from 0 */
             const gint col = i % icons_per_row; /* starting from 0 */
             gint innerx, innery;
-            RrPixel32 *icon_data;
 
             /* find the dimensions of the icon inside it */
             innerx = icons_center_x + l + (col * ICON_SIZE);
@@ -433,9 +432,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             p->a_icon->surface.parentx = innerx;
             p->a_icon->surface.parenty = innery;
             RrPaint(p->a_icon, target->win, innerw, innerh);
-
-            if (target->client->iconic)
-                g_free(icon_data);
         }
     }
 

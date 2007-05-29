@@ -82,8 +82,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
                     e->data.normal.icon_width = icon->width;
                     e->data.normal.icon_height = icon->height;
                     e->data.normal.icon_data = icon->data;
-                    /* 7/16 opacity if iconic */
-                    e->data.normal.icon_alpha = c->iconic ? 0x70 : 0xff;
+                    e->data.normal.icon_alpha =
+                        c->iconic ? OB_ICONIC_ALPHA : 0xff;
                 }
             }
         }

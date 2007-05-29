@@ -19,6 +19,12 @@
 #ifndef __ob__misc_h
 #define __ob__misc_h
 
+/*! The alpha value to use for icons of iconified windows in various places
+  like the focus cycle popup and client list menus.
+  Give iconic windows 7/16 alpha. A little under 50%.
+ */
+#define OB_ICONIC_ALPHA 0x70
+
 typedef enum
 {
     OB_CURSOR_NONE,

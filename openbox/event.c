@@ -1101,13 +1101,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
            desktop. eg. open amarok window on desktop 1, switch to desktop
            2, click amarok tray icon. it will move by its decoration size.
         */
-        if (move && !resize &&
-            x != client->area.x &&
+        if (x != client->area.x &&
             x == (client->frame->area.x + client->frame->size.left -
                   (gint)client->border_width) &&
             y != client->area.y &&
             y == (client->frame->area.y + client->frame->size.top -
-                  (gint)client->border_width))
+                  (gint)client->border_width) &&
+            w == client->area.width &&
+            h == client->area.height)
         {
             ob_debug_type(OB_DEBUG_APP_BUGS,
                           "Application %s is trying to move via "

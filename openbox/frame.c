@@ -716,10 +716,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               self->size.left, self->size.top,
                               self->client->area.width,
                               self->client->area.height);
-
-            /* when the client has StaticGravity, it likes to move around. */
-            XMoveWindow(ob_display, self->client->window,
-                        self->size.left, self->size.top);
         }
     }
 
@@ -733,6 +729,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                    self->size.top + self->size.bottom));
 
     if ((moved || resized) && !fake) {
+        /* when the client has StaticGravity, it likes to move around. */
+        XMoveWindow(ob_display, self->client->window,
+                    self->size.left, self->size.top);
+
         /* find the new coordinates, done after setting the frame.size, for
            frame_client_gravity. */
         self->area.x = self->client->area.x;

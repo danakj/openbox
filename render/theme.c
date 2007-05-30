@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static XrmDatabase loaddb(RrTheme *theme, const gchar *name, gchar **path);
+static XrmDatabase loaddb(const gchar *name, gchar **path);
 static gboolean read_int(XrmDatabase db, const gchar *rname, gint *value);
 static gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value);
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
@@ -57,6 +57,23 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     RrTheme *theme;
     gchar *path;
     gboolean userdef;
+
+    if (name) {
+        db = loaddb(name, &path);
+        if (db == NULL) {
+            g_message("Unable to load the theme '%s'", name);
+            g_message("Falling back to the default theme '%s'",
+                      DEFAULT_THEME);
+        }
+    }
+    if (db == NULL) {
+        db = loaddb(DEFAULT_THEME, &path);
+        if (db == NULL) {
+            g_message("Unable to load the theme '%s'", DEFAULT_THEME);
+            return NULL;
+        }
+        name = DEFAULT_THEME;
+    }
 
     theme = g_new0(RrTheme, 1);
 
@@ -97,22 +114,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     theme->a_menu_bullet_selected = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
     theme->a_clear_tex = RrAppearanceNew(inst, 1);
-
-    if (name) {
-        db = loaddb(theme, name, &path);
-        if (db == NULL) {
-            g_message("Unable to load the theme '%s'", name);
-            g_message("Falling back to the default theme '%s'",
-                      DEFAULT_THEME);
-        }
-    }
-    if (db == NULL) {
-        db = loaddb(theme, DEFAULT_THEME, &path);
-        if (db == NULL) {
-            g_message("Unable to load the theme '%s'", DEFAULT_THEME);
-            return NULL;
-        }
-    }
 
     /* load the font stuff */
     if (active_window_font) {
@@ -1402,7 +1403,7 @@ void RrThemeFree(RrTheme *theme)
     }
 }
 
-static XrmDatabase loaddb(RrTheme *theme, const gchar *name, gchar **path)
+static XrmDatabase loaddb(const gchar *name, gchar **path)
 {
     GSList *it;
     XrmDatabase db = NULL;

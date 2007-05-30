@@ -2850,8 +2850,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         SIZE_SET(self->logical_size, logicalw, logicalh);
 
     /* figure out if we moved or resized or what */
-    moved = x != self->area.x || y != self->area.y;
-    resized = w != self->area.width || h != self->area.height;
+    moved = (x != self->area.x || y != self->area.y);
+    resized = (w != self->area.width || h != self->area.height);
 
     oldw = self->area.width;
     oldh = self->area.height;
@@ -2917,8 +2917,12 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                    FALSE, StructureNotifyMask, &event);
     }
 
-    /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (w <= oldw && h <= oldh)) {
+    /* if the client is shrinking, then resize the frame before the client.
+
+       both of these resize sections may run, because the top one only resizes
+       in the direction that is growing
+     */
+    if (send_resize_client && (w <= oldw || h <= oldh)) {
         frame_adjust_client_area(self->frame);
         XResizeWindow(ob_display, self->window, w, h);
     }

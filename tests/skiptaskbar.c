@@ -23,9 +23,9 @@
 
 int main () {
   Display   *display;
-  Window     parent, child;
+  Window     win;
   XEvent     report;
-  Atom       state, modal;
+  Atom       state, skip;
   int        x=10,y=10,h=400,w=400;
 
   display = XOpenDisplay(NULL);
@@ -36,24 +36,18 @@ int main () {
   }
 
   state = XInternAtom(display, "_NET_WM_STATE", True);
-  modal = XInternAtom(display, "_NET_WM_STATE_MODAL", True);
+  skip = XInternAtom(display, "_NET_WM_STATE_SKIP_TASKBAR", True);
 
-  parent = XCreateWindow(display, RootWindow(display, 0),
-			 x, y, w, h, 10, CopyFromParent, CopyFromParent,
+  win = XCreateWindow(display, RootWindow(display, 0),
+                      x, y, w, h, 10, CopyFromParent, CopyFromParent,
 			 CopyFromParent, 0, 0);
-  child = XCreateWindow(display, RootWindow(display, 0),
-			x, y, w/2, h/2, 10, CopyFromParent, CopyFromParent,
-			CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,parent,WhitePixel(display,0)); 
-  XSetWindowBackground(display,child,BlackPixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0)); 
 
-  XSetTransientForHint(display, child, parent);
-  XChangeProperty(display, child, state, XA_ATOM, 32,
-		  PropModeReplace, (unsigned char*)&modal, 1);
-  
-  XMapWindow(display, parent);
-  XMapWindow(display, child);
+  XChangeProperty(display, win, state, XA_ATOM, 32,
+		  PropModeReplace, (unsigned char*)&skip, 1);
+
+  XMapWindow(display, win);
   XFlush(display);
 
   while (1) {

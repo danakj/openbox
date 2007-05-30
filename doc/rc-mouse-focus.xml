@@ -324,7 +324,7 @@
       <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
-      <action name="Resize"><edge>top</edge></action>
+      <action name="Resize"><edge>left</edge></action>
     </mousebind>
   </context>
 
@@ -336,7 +336,7 @@
       <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
-      <action name="Resize"><edge>top</edge></action>
+      <action name="Resize"><edge>right</edge></action>
     </mousebind>
   </context>
 

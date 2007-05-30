@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-28 07:55+0200\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-28 15:54+0200\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
@@ -25,12 +25,12 @@ msgstr "L'acció sol·licitada '%s' no és vàlida. Aquesta acció no existeix."
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "L'ús de l'acció '%s' no és vàlid. S'ignorarà aquesta acció."
 
-#: openbox/action.c:1224 openbox/action.c:1242 openbox/action.c:1255
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "No s'ha pogut executar '%s': %s"
 
-#: openbox/action.c:1263
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "No s'ha pogut convertir el camí '%s' des de utf8"
@@ -43,7 +43,7 @@ msgstr "Vés aquí..."
 msgid "Windows"
 msgstr "Finestres"
 
-#: openbox/client_list_menu.c:195
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Escriptoris"
 
@@ -298,7 +298,7 @@ msgstr ""
 msgid "The WM on screen %d is not exiting"
 msgstr "El gestor de finestres de la pantalla %d no està sortint"
 
-#: openbox/screen.c:950
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr "escriptori %i"
@@ -344,7 +344,7 @@ msgstr "El nom de la tecla '%s' no és vàlid en la vinculació de tecles"
 msgid "Requested key '%s' does not exist on the display"
 msgstr "La tecla seleccionada '%s' no existeix a la pantalla"
 
-#: openbox/xerror.c:38
+#: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
 msgstr "Error d'X: %s"

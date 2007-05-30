@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-24 16:51+0200\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-24 19:41+0100\n"
 "Last-Translator: Pavel Shevchuk <stlwrt@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -15,23 +15,23 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:953
+#: openbox/action.c:954
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Запрошено некорректное действие '%s'. Нет такого действия."
 
-#: openbox/action.c:956
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 "Некорректное использование действия '%s'. Действие будет проигнорировано."
 
-#: openbox/action.c:1225 openbox/action.c:1243 openbox/action.c:1256
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Не удалось запустить '%s': %s"
 
-#: openbox/action.c:1264
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Не удалось сконвертировать путь '%s' из utf8"

@@ -1509,7 +1509,9 @@ static void event_handle_dock(ObDock *s, XEvent *e)
         dock_hide(FALSE);
         break;
     case LeaveNotify:
-        dock_hide(TRUE);
+        /* don't hide when moving into a dock app */
+        if (e->xcrossing.detail != NotifyInferior)
+            dock_hide(TRUE);
         break;
     }
 }

@@ -15,7 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : 3\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : "
+"3\n"
 
 #: openbox/action.c:954
 #, c-format
@@ -70,7 +71,8 @@ msgid "Always on &bottom"
 msgstr "دائما في القاع (&B)"
 
 #: openbox/client_menu.c:361
-msgid "&Send to desktop (&S)"
+#, fuzzy
+msgid "&Send to desktop"
 msgstr "أرسِل إلى سطح المكتب"
 
 #: openbox/client_menu.c:365
@@ -336,4 +338,3 @@ msgstr "المفتاح المطلوب '%s' لا وجود له في العرض"
 #, c-format
 msgid "X Error: %s"
 msgstr "خطأ إكس: %s"
-

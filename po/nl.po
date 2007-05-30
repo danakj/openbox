@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-27 16:40+0200\n"
+"POT-Creation-Date: 2007-05-23 16:20+0200\n"
 "PO-Revision-Date: 2007-05-24 16:39+0200\n"
 "Last-Translator: Mark Pustjens <pustjens@dds.nl>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -26,12 +26,12 @@ msgstr "Ongeldige actie '%s' gevraagd. Deze actie bestaat niet"
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Ongeldig gebruik van actie '%s'. Actie wordt genegeerd."
 
-#: openbox/action.c:1224 openbox/action.c:1242 openbox/action.c:1255
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Uitvoeren van '%s' mislukt: %s"
 
-#: openbox/action.c:1263
+#: openbox/action.c:1265
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Converteren van het pad '%s' vanuit utf8 mislukt"
@@ -289,7 +289,7 @@ msgstr "Kon window manager selectie op scherm %d niet verkrijgen"
 msgid "The WM on screen %d is not exiting"
 msgstr "De window manager op scherm %d sluit zichzelf niet af"
 
-#: openbox/screen.c:948
+#: openbox/screen.c:939
 #, c-format
 msgid "desktop %i"
 msgstr "bureaublad %i"

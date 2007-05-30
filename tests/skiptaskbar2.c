@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   skiptaskbar.c for the Openbox window manager
-   Copyright (c) 2003-2007   Dana Jansens
+   skiptaskbar2.c for the Openbox window manager
+   Copyright (c) 2007        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 int main () {
   Display   *display;
   Window     win;
-  XEvent     report;
+  XEvent     report, ce;
   Atom       state, skip;
   int        x=10,y=10,h=400,w=400;
 
@@ -44,11 +44,21 @@ int main () {
 
   XSetWindowBackground(display,win,WhitePixel(display,0)); 
 
-  XChangeProperty(display, win, state, XA_ATOM, 32,
-		  PropModeReplace, (unsigned char*)&skip, 1);
-
   XMapWindow(display, win);
   XFlush(display);
+
+  sleep(1);
+
+  ce.xclient.type = ClientMessage;
+  ce.xclient.message_type = state;
+  ce.xclient.display = display;
+  ce.xclient.window = win;
+  ce.xclient.format = 32;
+  ce.xclient.data.l[0] = 1;
+  ce.xclient.data.l[1] = skip;
+  ce.xclient.data.l[2] = 0;
+  XSendEvent(display, RootWindow(display, DefaultScreen(display)),
+	     False, SubstructureNotifyMask | SubstructureRedirectMask, &ce);
 
   while (1) {
     XNextEvent(display, &report);

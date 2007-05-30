@@ -547,50 +547,38 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
 
 void menu_set_show_func(ObMenu *self, ObMenuShowFunc func)
 {
-    do {
-        self->show_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->show_func = func;
+    self->more_menu->show_func = func; /* keep it in sync */
 }
 
 void menu_set_hide_func(ObMenu *self, ObMenuHideFunc func)
 {
-    do {
-        self->hide_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->hide_func = func;
+    self->more_menu->hide_func = func; /* keep it in sync */
 }
 
 void menu_set_update_func(ObMenu *self, ObMenuUpdateFunc func)
 {
-    do {
-        self->update_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->update_func = func;
+    self->more_menu->update_func = func; /* keep it in sync */
 }
 
 void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
 {
-    do {
-        self->execute_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->execute_func = func;
+    self->more_menu->execute_func = func; /* keep it in sync */
 }
 
 void menu_set_destroy_func(ObMenu *self, ObMenuDestroyFunc func)
 {
-    do {
-        self->destroy_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->destroy_func = func;
+    self->more_menu->destroy_func = func; /* keep it in sync */
 }
 
 void menu_set_place_func(ObMenu *self, ObMenuPlaceFunc func)
 {
-    do {
-        self->place_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->place_func = func;
+    self->more_menu->place_func = func; /* keep it in sync */
 }
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)

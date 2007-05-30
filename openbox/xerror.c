@@ -19,6 +19,7 @@
 
 #include "openbox.h"
 #include "gettext.h"
+#include "debug.h"
 #include <glib.h>
 #include <X11/Xlib.h>
 

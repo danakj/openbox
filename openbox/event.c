@@ -531,7 +531,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 */
 
                 if (!focus_left_screen)
-                    focus_fallback(TRUE, FALSE);
+                    focus_fallback(FALSE, FALSE);
             }
         }
         else if (!client)

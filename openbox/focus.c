@@ -105,7 +105,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
     ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
     if (allow_pointer && config_focus_follow)
         if ((c = client_under_pointer()) &&
-            (allow_refocus || c != old) &&
+            (allow_refocus || client_focus_target(c) != old) &&
             (client_normal(c) &&
              client_focus(c)))
         {
@@ -125,7 +125,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
         */
         if (c->desktop == screen_desktop &&
             client_normal(c) &&
-            (allow_refocus || c != old) &&
+            (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
             ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
@@ -144,7 +144,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            backup fallback though)
         */
         if (c->type == OB_CLIENT_TYPE_DESKTOP &&
-            (allow_refocus || c != old) &&
+            (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
             ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window\n");

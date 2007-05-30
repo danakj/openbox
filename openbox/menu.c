@@ -327,6 +327,15 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 
     g_hash_table_replace(menu_hash, self->name, self);
 
+    /* Each menu has a single more_menu.  When the menu spills past what
+       can fit on the screen, a new menu frame entry is created from this
+       more_menu, and a new menu frame for the submenu is created for this
+       menu, also pointing to the more_menu.
+
+       This can be done multiple times using the same more_menu.
+
+       more_menu->more_menu will always be NULL, since there is only 1 for
+       each menu. */
     self->more_menu = g_new0(ObMenu, 1);
     self->more_menu->name = _("More...");
     self->more_menu->title = _("More...");
@@ -547,50 +556,38 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
 
 void menu_set_show_func(ObMenu *self, ObMenuShowFunc func)
 {
-    do {
-        self->show_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->show_func = func;
+    self->more_menu->show_func = func; /* keep it in sync */
 }
 
 void menu_set_hide_func(ObMenu *self, ObMenuHideFunc func)
 {
-    do {
-        self->hide_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->hide_func = func;
+    self->more_menu->hide_func = func; /* keep it in sync */
 }
 
 void menu_set_update_func(ObMenu *self, ObMenuUpdateFunc func)
 {
-    do {
-        self->update_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->update_func = func;
+    self->more_menu->update_func = func; /* keep it in sync */
 }
 
 void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
 {
-    do {
-        self->execute_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->execute_func = func;
+    self->more_menu->execute_func = func; /* keep it in sync */
 }
 
 void menu_set_destroy_func(ObMenu *self, ObMenuDestroyFunc func)
 {
-    do {
-        self->destroy_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->destroy_func = func;
+    self->more_menu->destroy_func = func; /* keep it in sync */
 }
 
 void menu_set_place_func(ObMenu *self, ObMenuPlaceFunc func)
 {
-    do {
-        self->place_func = func;
-        self = self->more_menu;
-    } while (self);
+    self->place_func = func;
+    self->more_menu->place_func = func; /* keep it in sync */
 }
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)

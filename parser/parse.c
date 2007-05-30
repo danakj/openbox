@@ -166,8 +166,6 @@ gboolean parse_load(const gchar *path, const gchar *rootname,
 {
     struct stat s;
 
-    g_print("Trying to load file %s for %s\n", path, rootname);
-
     if (stat(path, &s) < 0)
         return FALSE;
 

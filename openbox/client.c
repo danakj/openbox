@@ -349,10 +349,11 @@ void client_manage(Window window)
          client_search_focus_tree_full(self)) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        /* note the check against Type_Normal/Dialog, not client_normal(self),
-           which would also include other types. in this case we want more
-           strict rules for focus */
+        /* note the check against type Normal/Dialog/Utility,
+           not client_normal(self), which would also include other types.
+           in this case we want more strict rules for focus */
         (self->type == OB_CLIENT_TYPE_NORMAL ||
+         self->type == OB_CLIENT_TYPE_UTILITY ||
          self->type == OB_CLIENT_TYPE_DIALOG))
     {
         activate = TRUE;

@@ -327,6 +327,15 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 
     g_hash_table_replace(menu_hash, self->name, self);
 
+    /* Each menu has a single more_menu.  When the menu spills past what
+       can fit on the screen, a new menu frame entry is created from this
+       more_menu, and a new menu frame for the submenu is created for this
+       menu, also pointing to the more_menu.
+
+       This can be done multiple times using the same more_menu.
+
+       more_menu->more_menu will always be NULL, since there is only 1 for
+       each menu. */
     self->more_menu = g_new0(ObMenu, 1);
     self->more_menu->name = _("More...");
     self->more_menu->title = _("More...");

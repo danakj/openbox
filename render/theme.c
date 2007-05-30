@@ -64,6 +64,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             g_message("Unable to load the theme '%s'", name);
             g_message("Falling back to the default theme '%s'",
                       DEFAULT_THEME);
+            /* fallback to the default theme */
+            name = NULL;
         }
     }
     if (db == NULL) {
@@ -72,13 +74,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             g_message("Unable to load the theme '%s'", DEFAULT_THEME);
             return NULL;
         }
-        name = DEFAULT_THEME;
     }
 
     theme = g_new0(RrTheme, 1);
 
     theme->inst = inst;
-    theme->name = g_strdup(name);
+    theme->name = g_strdup(name ? name : DEFAULT_THEME);
 
     theme->a_disabled_focused_max = RrAppearanceNew(inst, 1);
     theme->a_disabled_unfocused_max = RrAppearanceNew(inst, 1);

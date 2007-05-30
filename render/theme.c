@@ -90,6 +90,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             g_message("Unable to load the theme '%s'", DEFAULT_THEME);
             return NULL;
         }
+        name = DEFAULT_THEME;
     }
     ps.inst = inst;
 

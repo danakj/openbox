@@ -47,6 +47,7 @@ static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
+                    gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
                     RrFont *menu_title_font, RrFont *menu_item_font,
                     RrFont *osd_font)
@@ -62,19 +63,22 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
         db = loaddb(name, &path);
         if (db == NULL) {
             g_message("Unable to load the theme '%s'", name);
-            g_message("Falling back to the default theme '%s'",
-                      DEFAULT_THEME);
+            if (allow_fallback)
+                g_message("Falling back to the default theme '%s'",
+                          DEFAULT_THEME);
             /* fallback to the default theme */
             name = NULL;
         }
     }
-    if (db == NULL) {
+    if (name == NULL && allow_fallback) {
         db = loaddb(DEFAULT_THEME, &path);
         if (db == NULL) {
             g_message("Unable to load the theme '%s'", DEFAULT_THEME);
             return NULL;
         }
     }
+    if (name == NULL)
+        return NULL;
 
     theme = g_new0(RrTheme, 1);
 

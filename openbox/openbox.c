@@ -330,10 +330,72 @@ gint main(gint argc, gchar **argv)
                 /* redecorate all existing windows */
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
+                    Strut oldsize, newsize;
+                    gint x, y;
+
+                    oldsize = c->frame->size;
+                    x = c->area.x;
+                    y = c->area.y;
+
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, TRUE);
                     /* redraw the frames */
                     frame_adjust_area(c->frame, TRUE, TRUE, FALSE);
+
+                    /* move windows if their decorations are a new size, based
+                       on their gravity */
+                    newsize = c->frame->size;
+
+                    /* x coord */
+                    switch (c->gravity) {
+                    case NorthWestGravity:
+                    case WestGravity:
+                    case SouthWestGravity:
+                        break;
+                    case NorthGravity:
+                    case CenterGravity:
+                    case SouthGravity:
+                        x += (newsize.left - oldsize.left +
+                              oldsize.right - newsize.right) / 2;
+                        break;
+                    case NorthEastGravity:
+                    case EastGravity:
+                    case SouthEastGravity:
+                        x -= (newsize.left - oldsize.left +
+                              newsize.right - oldsize.right);
+
+                        break;
+                    case StaticGravity:
+                        x -= newsize.left - oldsize.left;
+                        break;
+                    }
+
+                    /* y coord */
+                    switch (c->gravity) {
+                    case NorthWestGravity:
+                    case NorthGravity:
+                    case NorthEastGravity:
+                        break;
+                    case WestGravity:
+                    case CenterGravity:
+                    case EastGravity:
+                        y += (newsize.top - oldsize.top +
+                              oldsize.bottom - newsize.bottom) / 2;
+                        break;
+                    case SouthWestGravity:
+                    case SouthGravity:
+                    case SouthEastGravity:
+                        y -= (newsize.top - oldsize.top +
+                              newsize.bottom - oldsize.bottom);
+
+                        break;
+                    case StaticGravity:
+                        x -= newsize.top - oldsize.top;
+                        break;
+                    }
+
+                    if (x != c->area.x || y != c->area.y)
+                        client_move(c, x, y);
                 }
             }
 

@@ -331,11 +331,10 @@ gint main(gint argc, gchar **argv)
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
                     Strut oldsize, newsize;
-                    gint x, y;
+                    gint dx, dy;
 
                     oldsize = c->frame->size;
-                    x = c->area.x;
-                    y = c->area.y;
+                    dx = dy = 0;
 
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, TRUE);
@@ -355,18 +354,18 @@ gint main(gint argc, gchar **argv)
                     case NorthGravity:
                     case CenterGravity:
                     case SouthGravity:
-                        x += (newsize.left - oldsize.left +
+                        dx = (newsize.left - oldsize.left +
                               oldsize.right - newsize.right) / 2;
                         break;
                     case NorthEastGravity:
                     case EastGravity:
                     case SouthEastGravity:
-                        x -= (newsize.left - oldsize.left +
-                              newsize.right - oldsize.right);
+                        dx = -(newsize.left - oldsize.left +
+                               newsize.right - oldsize.right);
 
                         break;
                     case StaticGravity:
-                        x -= newsize.left - oldsize.left;
+                        dx = -(newsize.left - oldsize.left);
                         break;
                     }
 
@@ -379,23 +378,23 @@ gint main(gint argc, gchar **argv)
                     case WestGravity:
                     case CenterGravity:
                     case EastGravity:
-                        y += (newsize.top - oldsize.top +
+                        dy = (newsize.top - oldsize.top +
                               oldsize.bottom - newsize.bottom) / 2;
                         break;
                     case SouthWestGravity:
                     case SouthGravity:
                     case SouthEastGravity:
-                        y -= (newsize.top - oldsize.top +
-                              newsize.bottom - oldsize.bottom);
+                        dy = -(newsize.top - oldsize.top +
+                               newsize.bottom - oldsize.bottom);
 
                         break;
                     case StaticGravity:
-                        x -= newsize.top - oldsize.top;
+                        dx = -(newsize.top - oldsize.top);
                         break;
                     }
 
-                    if (x != c->area.x || y != c->area.y)
-                        client_move(c, x, y);
+                    if (dx || dy)
+                        client_move(c, c->area.x + dx, c->area.y + dy);
                 }
             }
 

@@ -77,7 +77,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             return NULL;
         }
     }
-    if (name == NULL)
+    if (db == NULL)
         return NULL;
 
     theme = g_new0(RrTheme, 1);

@@ -823,6 +823,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case MotionNotify:
+        /* when there is a grab on the pointer, we won't get enter/leave
+           notifies, but we still get motion events */
+        if (grab_on_pointer()) break;
+
         con = frame_context(client, e->xmotion.window,
                             e->xmotion.x, e->xmotion.y);
         switch (con) {

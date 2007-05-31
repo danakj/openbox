@@ -40,7 +40,7 @@
           <secondary r="103" g="103" b="103" a="255"/>
         </unpressed>
         <disabled>
-          <image r="140" g="140" b="117" a="255"/>
+          <image r="159" g="191" b="193" a="255"/>
           <style>parentrelative</style>
         </disabled>
         <pressed>
@@ -82,8 +82,7 @@
           <style>parentrelative</style>
         </unpressed>
         <disabled>
-          <image r="140" g="140" b="117" a="255"/>
-          <style>parentrelative</style>
+          <style>flat solid</style>
         </disabled>
         <pressed>
           <style>flat gradient crossdiagonal border</style>
@@ -129,11 +128,11 @@
       <primary r="34" g="34" b="28" a="255"/>
     </inactive>
     <disabled>
-      <primary r="140" g="140" b="117" a="255"/>
+      <primary r="68" g="68" b="56" a="255"/>
     </disabled>
     <activedisabled>
       <text>
-        <primary r="140" g="140" b="117" a="255"/>
+        <primary r="68" g="68" b="56" a="255"/>
       </text>
       <style>flat solid</style>
       <primary r="76" g="76" b="76" a="255"/>

@@ -80,8 +80,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (name) {
         if (!parse_load_theme(name, &ps.doc, &root, &ps.path)) {
             g_message("Unable to load the theme '%s'", name);
-            g_message("Falling back to the default theme '%s'",
-                      DEFAULT_THEME);
+            if (allow_fallback)
+                g_message("Falling back to the default theme '%s'",
+                          DEFAULT_THEME);
             /* make it fall back to default theme */
             name = NULL;
         }

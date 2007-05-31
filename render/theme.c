@@ -87,14 +87,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             name = NULL;
         }
     }
-    if (name == NULL && allow_fallback) {
-        if (!parse_load_theme(DEFAULT_THEME, &ps.doc, &root, &ps.path)) {
-            g_message("Unable to load the theme '%s'", DEFAULT_THEME);
-            return NULL;
-        }
-    }
     if (name == NULL)
-        return NULL;
+        if (allow_fallback) {
+            if (!parse_load_theme(DEFAULT_THEME, &ps.doc, &root, &ps.path)) {
+                g_message("Unable to load the theme '%s'", DEFAULT_THEME);
+                return NULL;
+            }
+        } else
+            return NULL;
+    }
 
     ps.inst = inst;
 

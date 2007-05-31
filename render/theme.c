@@ -65,6 +65,7 @@ static gboolean find_appearance(ParseState *ps, xmlNodePtr n, const gchar *names
 #define FIND(type, args...) find_##type(&ps, root, args)
 
 RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
+                    gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
                     RrFont *menu_title_font, RrFont *menu_item_font,
                     RrFont *osd_font)
@@ -85,12 +86,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             name = NULL;
         }
     }
-    if (!name) {
+    if (name == NULL && allow_fallback) {
         if (!parse_load_theme(DEFAULT_THEME, &ps.doc, &root, &ps.path)) {
             g_message("Unable to load the theme '%s'", DEFAULT_THEME);
             return NULL;
         }
     }
+    if (name == NULL)
+        return NULL;
+
     ps.inst = inst;
 
     theme = g_new0(RrTheme, 1);

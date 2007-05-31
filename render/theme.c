@@ -64,7 +64,7 @@ static gboolean find_appearance(ParseState *ps, xmlNodePtr n, const gchar *names
 /* shortcut to the various find_* functions */
 #define FIND(type, args...) find_##type(&ps, root, args)
 
-RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
+RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     RrFont *active_window_font, RrFont *inactive_window_font,
                     RrFont *menu_title_font, RrFont *menu_item_font,
                     RrFont *osd_font)

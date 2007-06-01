@@ -764,7 +764,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                               self->area.width,
                               self->area.height);
 
-        /* when the client has StaticGravity, it likes to move around. */
+        /* when the client has StaticGravity, it likes to move around.
+           also this correctly positions the client when it maps.
+           this also needs to be run when the frame's decorations sizes change!
+        */
         XMoveWindow(ob_display, self->client->window,
                     self->size.left, self->size.top);
 

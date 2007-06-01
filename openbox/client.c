@@ -319,7 +319,7 @@ void client_manage(Window window)
        settings for other uses too. the returned settings is a shallow copy,
        that needs to be freed with g_free(). */
     settings = client_get_settings_state(self);
-    /* the session should get the last say thought */
+    /* the session should get the last say though */
     client_restore_session_state(self);
 
     /* now we have all of the window's information so we can set this up */
@@ -2566,6 +2566,8 @@ static void client_apply_startup_state(ObClient *self,
     gboolean demands_attention = self->demands_attention;
     gboolean max_horz = self->max_horz;
     gboolean max_vert = self->max_vert;
+    Rect oldarea;
+    gint l;
 
     /* turn them all off in the client, so they won't affect the window
        being placed */
@@ -2581,10 +2583,12 @@ static void client_apply_startup_state(ObClient *self,
        do this before applying the states so they have the correct
        pre-max/pre-fullscreen values
     */
-    client_configure(self, x, y, w, h, FALSE, TRUE);
+    client_try_configure(self, &x, &y, &w, &h, &l, &l, FALSE);
     ob_debug("placed window 0x%x at %d, %d with size %d x %d\n",
              self->window, self->area.x, self->area.y,
              self->area.width, self->area.height);
+    oldarea = self->area;              /* save the area */
+    RECT_SET(self->area, x, y, w, h);  /* put where it should be for the premax stuff */
 
     /* apply the states. these are in a carefully crafted order.. */
 
@@ -2605,6 +2609,12 @@ static void client_apply_startup_state(ObClient *self,
         client_maximize(self, TRUE, 2);
     else if (max_horz)
         client_maximize(self, TRUE, 1);
+
+    /* if the window hasn't been configured yet, then do so now */
+    if (!fullscreen && !max_vert && !max_horz) {
+        self->area = oldarea;
+        client_configure(self, x, y, w, h, FALSE, TRUE);
+    }
 
     /* set the desktop hint, to make sure that it always exists */
     PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
@@ -2867,7 +2877,9 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+        XMoveResizeWindow(ob_display, self->window,
+                          self->frame->size.left, self->frame->size.top,
+                          MAX(w, oldw), MAX(h, oldh));
         frame_adjust_client_area(self->frame);
     }
 
@@ -2886,7 +2898,20 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
-    if ((!user || (user && final)) && !resized)
+    /* This is kinda tricky and should not be changed.. let me explain!
+
+       When user = FALSE, then the request is coming from the application
+       itself, and we are more strict about when to send a synthetic
+       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
+       in this case.
+
+       When user = TRUE, then the request is coming from "us", like when we
+       maximize a window or sometihng.  In this case we are more lenient.  We
+       used to follow the same rules as above, but _Java_ Swing can't handle
+       this. So just to appease Swing, when user = TRUE, we always send
+       a synthetic ConfigureNotify to give the window its root coordinates.
+    */
+    if ((!user && !resized) || (user && final))
     {
         XEvent event;
 
@@ -2925,7 +2950,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
      */
     if (send_resize_client && (w <= oldw || h <= oldh)) {
         frame_adjust_client_area(self->frame);
-        XResizeWindow(ob_display, self->window, w, h);
+        XMoveResizeWindow(ob_display, self->window,
+                          self->frame->size.left, self->frame->size.top, w, h);
     }
 
     XFlush(ob_display);

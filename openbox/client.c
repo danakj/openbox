@@ -3246,8 +3246,7 @@ void client_set_desktop_recursive(ObClient *self,
                 client_set_desktop_recursive(it->data, target, donthide);
 }
 
-void client_set_desktop(ObClient *self, guint target,
-                        gboolean donthide)
+void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
     self = client_search_top_normal_parent(self);
     client_set_desktop_recursive(self, target, donthide);

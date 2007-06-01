@@ -545,8 +545,8 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
     return occludes;
 }
 
-gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
-                                  gint detail, gboolean activate)
+void stacking_restack_request(ObClient *client, ObClient *sibling,
+                              gint detail, gboolean activate)
 {
     switch (detail) {
     case Below:
@@ -563,8 +563,6 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
            lower it to the bottom */
         if (stacking_occludes(client, sibling))
             stacking_lower(CLIENT_AS_WINDOW(client));
-        else
-            return FALSE;
         break;
     case Above:
         ob_debug("Restack request Above for client %s sibling %s\n",
@@ -586,8 +584,7 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
                 client_activate(client, FALSE, TRUE);
             else
                 stacking_raise(CLIENT_AS_WINDOW(client));
-        } else
-            return FALSE;
+        }
         break;
     case Opposite:
         ob_debug("Restack request Opposite for client %s sibling "
@@ -605,5 +602,4 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
             stacking_lower(CLIENT_AS_WINDOW(client));
         break;
     }
-    return TRUE;
 }

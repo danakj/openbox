@@ -72,6 +72,6 @@ void stacking_below(ObWindow *window, ObWindow *below);
 */
 void stacking_restack_request(struct _ObClient *client,
                               struct _ObClient *sibling,
-                              gint detail, gboolean);
+                              gint detail, gboolean activate);
 
 #endif

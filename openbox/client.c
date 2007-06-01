@@ -2898,7 +2898,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
-    if ((!user || (user && final)) && !resized)
+    if ((!user && !resized) || (user && final))
     {
         XEvent event;
 

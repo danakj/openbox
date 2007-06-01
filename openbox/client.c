@@ -2867,7 +2867,9 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+        XMoveResizeWindow(ob_display, self->window,
+                          self->frame->size.left, self->frame->size.top,
+                          MAX(w, oldw), MAX(h, oldh));
         frame_adjust_client_area(self->frame);
     }
 
@@ -2925,7 +2927,15 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
      */
     if (send_resize_client && (w <= oldw || h <= oldh)) {
         frame_adjust_client_area(self->frame);
-        XResizeWindow(ob_display, self->window, w, h);
+        XMoveResizeWindow(ob_display, self->window,
+                          self->frame->size.left, self->frame->size.top, w, h);
+    }
+
+    if (!resized) {
+        /* when the client has StaticGravity, it likes to move around.
+           also this correctly positions the client when it maps */
+        XMoveWindow(ob_display, self->window,
+                    self->frame->size.left, self->frame->size.top);
     }
 
     XFlush(ob_display);

@@ -483,7 +483,7 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
          it = (found ? g_list_previous(it) :g_list_next(it)))
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (found) {
+            if (found && c->frame->visible) {
                 if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
                 {
                     if (sibling != NULL) {
@@ -522,7 +522,7 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
     for (it = stacking_list; it; it = g_list_next(it))
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (found) {
+            if (found && c->frame->visible) {
                 if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
                 {
                     if (sibling != NULL) {

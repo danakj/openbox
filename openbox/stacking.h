@@ -67,11 +67,13 @@ void stacking_below(ObWindow *window, ObWindow *below);
   @param detail One of Above, Below, TopIf, BottomIf, Opposite
   @param activate If TRUE, and if the window is going to be raised, it will
                   be activated instead
+  @return false if given TopIf or BottomIf and no action was taken,
+          true otherwise
   See http://tronche.com/gui/x/xlib/window/configure.html for details on
   how each detail works with and without a sibling.
 */
-void stacking_restack_request(struct _ObClient *client,
-                              struct _ObClient *sibling,
-                              gint detail, gboolean activate);
+gboolean stacking_restack_request(struct _ObClient *client,
+                                  struct _ObClient *sibling,
+                                  gint detail, gboolean activate);
 
 #endif

@@ -1,0 +1,3 @@
+Use this command to create a new .po
+
+msginit --locale xx_YY file.pot

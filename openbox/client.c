@@ -319,7 +319,7 @@ void client_manage(Window window)
        settings for other uses too. the returned settings is a shallow copy,
        that needs to be freed with g_free(). */
     settings = client_get_settings_state(self);
-    /* the session should get the last say thought */
+    /* the session should get the last say though */
     client_restore_session_state(self);
 
     /* now we have all of the window's information so we can set this up */

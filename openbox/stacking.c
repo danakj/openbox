@@ -483,7 +483,10 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
          it = (found ? g_list_previous(it) :g_list_next(it)))
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (found && c->frame->visible) {
+            if (found && !c->iconic &&
+                (c->desktop == DESKTOP_ALL || client->desktop == DESKTOP_ALL ||
+                 c->desktop == client->desktop))
+            {
                 if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
                 {
                     if (sibling != NULL) {
@@ -522,7 +525,10 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
     for (it = stacking_list; it; it = g_list_next(it))
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (found && c->frame->visible) {
+            if (found && !c->iconic &&
+                (c->desktop == DESKTOP_ALL || client->desktop == DESKTOP_ALL ||
+                 c->desktop == client->desktop))
+            {
                 if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
                 {
                     if (sibling != NULL) {
@@ -548,6 +554,16 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
 void stacking_restack_request(ObClient *client, ObClient *sibling,
                               gint detail, gboolean activate)
 {
+    if (sibling && ((client->desktop != sibling->desktop &&
+                     client->desktop != DESKTOP_ALL &&
+                     sibling->desktop != DESKTOP_ALL) ||
+                    sibling->iconic))
+    {
+        ob_debug("Setting restack sibling to NULL, they are not on the same "
+                 "desktop or it is iconified\n");
+        sibling = NULL;
+    }
+
     switch (detail) {
     case Below:
         ob_debug("Restack request Below for client %s sibling %s\n",

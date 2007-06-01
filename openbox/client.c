@@ -2310,7 +2310,7 @@ static void client_change_wm_state(ObClient *self)
 
 static void client_change_state(ObClient *self)
 {
-    gulong netstate[11];
+    gulong netstate[12];
     guint num;
 
     num = 0;

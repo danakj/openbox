@@ -904,7 +904,7 @@ void config_startup(ObParseInst *i)
 
     parse_register(i, "keyboard", parse_keyboard, NULL);
 
-    config_mouse_threshold = 3;
+    config_mouse_threshold = 8;
     config_mouse_dclicktime = 200;
 
     bind_default_mouse();

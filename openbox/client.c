@@ -2898,6 +2898,19 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     if (fmoved || fresized)
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
+    /* This is kinda tricky and should not be changed.. let me explain!
+
+       When user = FALSE, then the request is coming from the application
+       itself, and we are more strict about when to send a synthetic
+       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
+       in this case.
+
+       When user = TRUE, then the request is coming from "us", like when we
+       maximize a window or sometihng.  In this case we are more lenient.  We
+       used to follow the same rules as above, but _Java_ Swing can't handle
+       this. So just to appease Swing, when user = TRUE, we always send
+       a synthetic ConfigureNotify to give the window its root coordinates.
+    */
     if ((!user && !resized) || (user && final))
     {
         XEvent event;

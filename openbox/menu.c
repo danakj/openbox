@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "menu.h"
 #include "openbox.h"
+#include "mainloop.h"
 #include "stacking.h"
 #include "client.h"
 #include "config.h"
@@ -45,6 +46,7 @@ struct _ObMenuParseState
 static GHashTable *menu_hash = NULL;
 static ObParseInst *menu_parse_inst;
 static ObMenuParseState menu_parse_state;
+static gboolean menu_can_hide = FALSE;
 
 static void menu_destroy_hash_value(ObMenu *self);
 static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -384,6 +386,12 @@ void menu_free(ObMenu *menu)
         g_hash_table_remove(menu_hash, menu->name);
 }
 
+static gboolean menu_hide_delay_func(gpointer data)
+{
+    menu_can_hide = TRUE;
+    return FALSE; /* no repeat */
+}
+
 void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
 {
     ObMenu *self;
@@ -420,6 +428,21 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
                 break;
         }
     }
+
+    if (!button)
+        menu_can_hide = TRUE;
+    else {
+        menu_can_hide = FALSE;
+        ob_main_loop_timeout_add(ob_main_loop,
+                                 config_menu_hide_delay * 1000,
+                                 menu_hide_delay_func,
+                                 NULL, g_direct_equal, NULL);
+    }
+}
+
+gboolean menu_hide_delay_reached()
+{
+    return menu_can_hide;
 }
 
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)

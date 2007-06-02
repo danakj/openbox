@@ -93,13 +93,10 @@ static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
-static gboolean menu_hide_delay_func(gpointer data);
-
 /* The time for the current event being processed */
 Time event_curtime = CurrentTime;
 
 static guint ignore_enter_focus = 0;
-static gboolean menu_can_hide;
 static gboolean focus_left_screen = FALSE;
 
 #ifdef USE_SM
@@ -1688,8 +1685,8 @@ static gboolean event_handle_menu(XEvent *ev)
 
     switch (ev->type) {
     case ButtonRelease:
-        if ((ev->xbutton.button < 4 || ev->xbutton.button > 5)
-            && menu_can_hide)
+        if (menu_hide_delay_reached() &&
+            (ev->xbutton.button < 4 || ev->xbutton.button > 5))
         {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
@@ -1765,12 +1762,6 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
                moved/resized */
             client = moveresize_client;
 
-        menu_can_hide = FALSE;
-        ob_main_loop_timeout_add(ob_main_loop,
-                                 config_menu_hide_delay * 1000,
-                                 menu_hide_delay_func,
-                                 NULL, g_direct_equal, NULL);
-
         if (e->type == ButtonPress ||
             e->type == ButtonRelease ||
             e->type == MotionNotify)
@@ -1784,12 +1775,6 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
                             (client ? client : focus_client)), e);
         }
     }
-}
-
-static gboolean menu_hide_delay_func(gpointer data)
-{
-    menu_can_hide = TRUE;
-    return FALSE; /* no repeat */
 }
 
 static void focus_delay_dest(gpointer data)

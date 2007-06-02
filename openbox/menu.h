@@ -172,6 +172,7 @@ void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
 void menu_show(gchar *name, gint x, gint y, gint button,
                struct _ObClient *client);
+gboolean menu_hide_delay_reached();
 
 void menu_set_show_func(ObMenu *menu, ObMenuShowFunc func);
 void menu_set_hide_func(ObMenu *menu, ObMenuHideFunc func);

@@ -182,6 +182,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     if (!read_int(db, "border.width", &theme->fbwidth) ||
         theme->fbwidth < 0 || theme->fbwidth > 100)
         theme->fbwidth = 1;
+    /* title separator width inherits from frame border width */
+    if (!read_int(db, "window.title.separator.width", &theme->tswidth) ||
+        theme->tswidth < 0 || theme->tswidth > 100)
+        theme->tswidth = theme->fbwidth;
     /* menu border width inherits from the frame border width */
     if (!read_int(db, "menu.border.width", &theme->mbwidth) ||
         theme->mbwidth < 0 || theme->mbwidth > 100)

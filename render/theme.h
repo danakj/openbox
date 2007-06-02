@@ -41,6 +41,8 @@ struct _RrTheme {
     gint paddingy;
     gint handle_height;
     gint fbwidth; /*!< frame border width */
+    gint tswidth; /*!< title separator width - between the titlebar and the
+                    client */
     gint mbwidth; /*!< menu border width */
     gint cbwidthx;
     gint cbwidthy;

@@ -540,7 +540,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                          FALSE) &&
         !read_appearance(db, inst,
                          "menu.items.bg", theme->a_menu,
-                         FALSE) &&
+                         FALSE))
         set_default_appearance(theme->a_menu);
     if (!read_appearance(db, inst,
                          "menu.title.bg", theme->a_menu_title,

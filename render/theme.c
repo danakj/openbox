@@ -355,7 +355,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(color, L("menu","disabled","primary"),
               &theme->menu_disabled_color, NULL))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
-    if (!FIND(color, L("menu","activedisabled","text","primary"),
+    if (!FIND(color, L("menu","active-disabled","text","primary"),
               &theme->menu_disabled_selected_color, NULL))
         theme->menu_disabled_selected_color =
             RrColorNew(inst,
@@ -420,7 +420,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->menu_text_disabled_shadow_alpha = 
             theme->menu_text_normal_shadow_alpha;
     }
-    if (!FIND(color, L("menu","activedisabled","shadow","primary"),
+    if (!FIND(color, L("menu","active-disabled","shadow","primary"),
               &theme->menu_text_disabled_selected_shadow_color,
               &theme->menu_text_disabled_selected_shadow_alpha))
     {
@@ -583,7 +583,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         set_default_appearance(theme->a_menu_title);
     if (!FIND(appearance, L("menu", "active"), theme->a_menu_selected, TRUE))
         set_default_appearance(theme->a_menu_selected);
-    if (!FIND(appearance, L("menu", "activedisabled"),
+    if (!FIND(appearance, L("menu", "active-disabled"),
               theme->a_menu_disabled_selected, TRUE))
         theme->a_menu_disabled_selected =
             RrAppearanceCopy(theme->a_menu_selected);
@@ -883,7 +883,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->a_menu_text_disabled->texture[0].data.text.shadow_offset_x =
             theme->a_menu_text_disabled->texture[0].data.text.shadow_offset_y =
             0;
-    if (!FIND(shadow, L("menu","activedisabled","shadow","offset"),
+    if (!FIND(shadow, L("menu","active-disabled","shadow","offset"),
               theme->a_menu_text_disabled_selected))
         theme->a_menu_text_disabled_selected->
             texture[0].data.text.shadow_offset_x = 0;

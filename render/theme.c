@@ -190,7 +190,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     if (!read_int(db, "menu.border.width", &theme->mbwidth) ||
         theme->mbwidth < 0 || theme->mbwidth > 100)
         theme->mbwidth = theme->fbwidth;
-    theme->mbwidth = theme->fbwidth;
     if (!read_int(db, "window.client.padding.width", &theme->cbwidthx) ||
         theme->cbwidthx < 0 || theme->cbwidthx > 100)
         theme->cbwidthx = theme->paddingx;

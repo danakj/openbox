@@ -363,6 +363,13 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
         /* This means focus moved from one client to another */
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
+        /* This means focus moved off of our frame window.
+           When the client reverts to parent and it lands on our frame window,
+           and they are iconifying (not being unmanaged), then we don't get
+           a focus out from the client but only from the frame window, which
+           is this event */
+        if (detail == NotifyNonlinear)
+            return TRUE;
 
         /* Otherwise.. */
         return FALSE;

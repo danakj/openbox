@@ -225,7 +225,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(color, L("window","active","titleseparator"),
               &theme->title_separator_focused_color, NULL))
         theme->title_separator_focused_color =
-            RrColorNew(inst, theme->frame_focused_border_color->r,
+            RrColorNew(inst,
+                       theme->frame_focused_border_color->r,
                        theme->frame_focused_border_color->g,
                        theme->frame_focused_border_color->b);
     /* frame unfocused border color inherits from frame focused border color */
@@ -240,7 +241,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(color, L("window","inactive","titleseparator"),
               &theme->title_separator_unfocused_color, NULL))
         theme->title_separator_unfocused_color =
-            RrColorNew(inst, theme->frame_unfocused_border_color->r,
+            RrColorNew(inst,
+                       theme->frame_unfocused_border_color->r,
                        theme->frame_unfocused_border_color->g,
                        theme->frame_unfocused_border_color->b);
 

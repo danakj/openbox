@@ -1329,31 +1329,10 @@ void action_focus_order_to_bottom(union ActionData *data)
 void action_raiselower(union ActionData *data)
 {
     ObClient *c = data->client.any.c;
-    GList *it;
-    gboolean raise = FALSE;
 
-    for (it = stacking_list; it; it = g_list_next(it)) {
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *cit = it->data;
-
-            if (cit == c) break;
-            if (client_normal(cit) == client_normal(c) &&
-                cit->layer == c->layer &&
-                cit->frame->visible &&
-                !client_search_transient(c, cit))
-            {
-                if (RECT_INTERSECTS_RECT(cit->frame->area, c->frame->area)) {
-                    raise = TRUE;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (raise)
-        action_raise(data);
-    else
-        action_lower(data);
+    client_action_start(data);
+    stacking_restack_request(c, NULL, Opposite, FALSE);
+    client_action_end(data);
 }
 
 void action_raise(union ActionData *data)

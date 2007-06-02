@@ -3246,8 +3246,7 @@ void client_set_desktop_recursive(ObClient *self,
                 client_set_desktop_recursive(it->data, target, donthide);
 }
 
-void client_set_desktop(ObClient *self, guint target,
-                        gboolean donthide)
+void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
     self = client_search_top_normal_parent(self);
     client_set_desktop_recursive(self, target, donthide);
@@ -3871,13 +3870,12 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
 }
 
 #define WANT_EDGE(cur, c) \
-            if(cur == c)                                                      \
+            if (cur == c)                                                     \
                 continue;                                                     \
-            if(!client_normal(cur))                                           \
+            if (c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&  \
+                cur->desktop != screen_desktop)                               \
                 continue;                                                     \
-            if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL) \
-                continue;                                                     \
-            if(cur->iconic)                                                   \
+            if (cur->iconic)                                                  \
                 continue;
 
 #define HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end) \

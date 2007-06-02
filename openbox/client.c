@@ -3878,9 +3878,8 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
 #define WANT_EDGE(cur, c) \
             if(cur == c)                                                      \
                 continue;                                                     \
-            if(!client_normal(cur))                                           \
-                continue;                                                     \
-            if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL) \
+            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&   \
+               c->desktop != DESKTOP_ALL)                                     \
                 continue;                                                     \
             if(cur->iconic)                                                   \
                 continue;

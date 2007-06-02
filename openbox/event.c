@@ -363,13 +363,6 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
         /* This means focus moved from one client to another */
         if (detail == NotifyNonlinearVirtual)
             return TRUE;
-        /* This means focus moved off of our frame window.
-           When the client reverts to parent and it lands on our frame window,
-           and they are iconifying (not being unmanaged), then we don't get
-           a focus out from the client but only from the frame window, which
-           is this event */
-        if (detail == NotifyNonlinear)
-            return TRUE;
 
         /* Otherwise.. */
         return FALSE;
@@ -494,6 +487,23 @@ static void event_process(const XEvent *ec, gpointer data)
         /* crossing events for menu */
         event_handle_menu(e);
     } else if (e->type == FocusIn) {
+        if (client &&
+            e->xfocus.detail == NotifyInferior)
+        {
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Focus went to the frame window");
+
+            focus_left_screen = FALSE;
+
+            focus_fallback(FALSE, FALSE);
+
+            /* We don't get a FocusOut for this case, because it's just moving
+               from our Inferior up to us. This happens when iconifying a
+               window with RevertToParent focus */
+            frame_adjust_focus(client->frame, FALSE);
+            /* focus_set_client(NULL) has already been called */
+            client_calc_layer(client);
+        }
         if (e->xfocus.detail == NotifyPointerRoot ||
             e->xfocus.detail == NotifyDetailNone ||
             e->xfocus.detail == NotifyInferior ||
@@ -501,9 +511,8 @@ static void event_process(const XEvent *ec, gpointer data)
         {
             XEvent ce;
 
-            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to root, "
-                          "pointer root/none or "
-                          "the frame window\n");
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Focus went to root or pointer root/none\n");
 
             if (e->xfocus.detail == NotifyInferior ||
                 e->xfocus.detail == NotifyNonlinear)
@@ -548,7 +557,9 @@ static void event_process(const XEvent *ec, gpointer data)
 
             /* If you send focus to a window and then it disappears, you can
                get the FocusIn for it, after it is unmanaged.
-               Just wait for the next FocusOut/FocusIn pair. */
+               Just wait for the next FocusOut/FocusIn pair, but make note that
+               the window that was focused no longer is. */
+            focus_set_client(NULL);
         }
         else if (client != focus_client) {
             focus_left_screen = FALSE;

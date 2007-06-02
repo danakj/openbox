@@ -117,6 +117,7 @@
   <xs:complexType name="window">
     <xs:all>
       <xs:element name="border" type="obt:color" minOccurs="0"/>
+      <xs:element name="titleseparator" type="obt:color" minOccurs="0"/>
       <xs:element name="clientpadding" type="obt:color" minOccurs="0"/>
       <xs:element name="titlebar" type="obt:area" minOccurs="0"/>
       <xs:element name="label" type="obt:textarea" minOccurs="0"/>

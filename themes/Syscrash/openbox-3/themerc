@@ -9,6 +9,7 @@ border.color:				#6d6d6d
 padding.width:				1
 window.handle.width:			0
 window.client.padding.width:		0
+window.client.padding.height:		0
 
 menu.overlap:				0
 

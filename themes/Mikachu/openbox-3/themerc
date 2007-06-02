@@ -144,6 +144,7 @@ border.width: 1
 padding.width: 1
 window.handle.width: 0
 window.client.padding.width: 0
+window.client.padding.height: 0
 focus.inner.color: #A6CAF3
 focus.outer.color: #0000A0
 

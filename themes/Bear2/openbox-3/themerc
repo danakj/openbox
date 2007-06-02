@@ -6,6 +6,7 @@
 
 window.handle.width: 4
 window.client.padding.width: 0
+window.client.padding.height: 0
 border.Width: 1
 padding.width: 3
 menu.overlap: 2

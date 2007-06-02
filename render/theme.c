@@ -204,7 +204,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     if (!read_color(db, inst,
                     "window.inactive.border.color",
                     &theme->frame_unfocused_border_color))
-        theme->frame_unfocused_border_color = RrColorNew(inst, 0, 0, 0);
+        theme->frame_unfocused_border_color =
+            RrColorNew(inst, theme->frame_focused_border_color->r,
+                       theme->frame_focused_border_color->g,
+                       theme->frame_focused_border_color->b);
     /* menu border color inherits from frame focused border color */
     if (!read_color(db, inst,
                     "menu.border.color",

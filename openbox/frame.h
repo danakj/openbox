@@ -161,7 +161,6 @@ struct _ObFrame
     gint      max_x;         /* x-position of the window maximize button */
     gint      close_x;       /* x-position of the window close button */
     gint      bwidth;        /* border width */
-    gint      rbwidth;       /* border width between the title and client */
     gint      cbwidth_l;     /* client border width */
     gint      cbwidth_t;     /* client border width */
     gint      cbwidth_r;     /* client border width */

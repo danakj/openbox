@@ -207,6 +207,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(int, L("dimensions","window","border"),
               &theme->fbwidth, 0, 100))
         theme->fbwidth = 1;
+    theme->tswidth = theme->fbwidth;
 
     /* menu border width inherits from frame border width */
     if (!FIND(int, L("dimensions","menu","border"),

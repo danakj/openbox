@@ -536,9 +536,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                          TRUE))
         set_default_appearance(theme->a_unfocused_grip);
     if (!read_appearance(db, inst,
-                         "menu.bg", theme->a_menu,
-                         FALSE) &&
-        !read_appearance(db, inst,
                          "menu.items.bg", theme->a_menu,
                          FALSE))
         set_default_appearance(theme->a_menu);
@@ -547,9 +544,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                          TRUE))
         set_default_appearance(theme->a_menu_title);
     if (!read_appearance(db, inst,
-                         "menu.active.bg", theme->a_menu_selected,
-                         TRUE) &&
-        !read_appearance(db, inst,
                          "menu.items.active.bg", theme->a_menu_selected,
                          TRUE))
         set_default_appearance(theme->a_menu_selected);

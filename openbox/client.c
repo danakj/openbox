@@ -3876,12 +3876,12 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
 }
 
 #define WANT_EDGE(cur, c) \
-            if(cur == c)                                                      \
+            if (cur == c)                                                     \
                 continue;                                                     \
-            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&   \
-               c->desktop != DESKTOP_ALL)                                     \
+            if (c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&  \
+                cur->desktop != screen_desktop)                               \
                 continue;                                                     \
-            if(cur->iconic)                                                   \
+            if (cur->iconic)                                                  \
                 continue;
 
 #define HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end) \

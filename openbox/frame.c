@@ -297,8 +297,7 @@ void frame_adjust_shape(ObFrame *self)
             xrect[0].x = 0;
             xrect[0].y = 0;
             xrect[0].width = self->area.width;
-            xrect[0].height = ob_rr_theme->title_height +
-                self->bwidth + self->rbwidth;
+            xrect[0].height = self->size.top;
             ++num;
         }
 
@@ -344,7 +343,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->bwidth = self->cbwidth_l = self->cbwidth_t =
                 self->cbwidth_r = self->cbwidth_b = 0;
         }
-        self->rbwidth = self->bwidth;
 
         if (self->max_horz) {
             self->cbwidth_l = self->cbwidth_r = 0;
@@ -367,7 +365,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   self->cbwidth_b + (!self->max_horz || !self->max_vert ? self->bwidth : 0));
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
-            self->size.top += ob_rr_theme->title_height + self->rbwidth;
+            self->size.top += ob_rr_theme->title_height + ob_rr_theme->tswidth;
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
             ob_rr_theme->handle_height > 0)
         {
@@ -471,13 +469,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(ob_display, self->titletopright);
 
                 if (self->decorations & OB_FRAME_DECOR_TITLEBAR &&
-                    self->rbwidth)
+                    ob_rr_theme->tswidth)
                 {
                     XMoveResizeWindow(ob_display, self->titlebottom,
                                       self->bwidth,
                                       ob_rr_theme->title_height + self->bwidth,
                                       self->width,
-                                      self->rbwidth);
+                                      ob_rr_theme->tswidth);
 
                     XMapWindow(ob_display, self->titlebottom);
                 } else

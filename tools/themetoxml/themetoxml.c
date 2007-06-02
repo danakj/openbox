@@ -351,13 +351,19 @@ int main(int argc, char **argv)
 
     if (read_color(db, "border.color", &i, &j, &k)) {
         COLOR3("window", "active", "border", i, j, k, 255);
+        COLOR3("window", "active", "titleseparator", i, j, k, 255);
         COLOR3("window", "inactive", "border", i, j, k, 255);
+        COLOR3("window", "inactive", "titleseparator", i, j, k, 255);
         COLOR2("menu", "border", i, j, k, 255);
     }
-    if (read_color(db, "window.active.border.color", &i, &j, &k))
+    if (read_color(db, "window.active.border.color", &i, &j, &k)) {
         COLOR3("window", "active", "border", i, j, k, 255);
-    if (read_color(db, "window.inactive.border.color", &i, &j, &k))
+        COLOR3("window", "active", "titleseparator", i, j, k, 255);
+    }
+    if (read_color(db, "window.inactive.border.color", &i, &j, &k)) {
         COLOR3("window", "inactive", "border", i, j, k, 255);
+        COLOR3("window", "inactive", "titleseparator", i, j, k, 255);
+    }
     if (read_color(db, "menu.border.color", &i, &j, &k))
         COLOR2("menu", "border", i, j, k, 255);
 

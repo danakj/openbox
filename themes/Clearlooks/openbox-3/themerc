@@ -110,7 +110,6 @@ window.client.padding.width: 0
 window.client.padding.height: 0
 border.color: #000000
 menu.overlap: 0
-window.title.separator.width: 0
 
 ### Fonts
 window.active.label.text.font:shadow=y:shadowtint=70:shadowoffset=1

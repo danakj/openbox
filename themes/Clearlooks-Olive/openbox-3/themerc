@@ -13,7 +13,7 @@ menu.items.bg: Flat Solid
 menu.items.bg.color: #f1eee0
 menu.items.text.color: #444444
 menu.items.disabled.text.color: #aaaaaa
-menu.items.activedisabled.text.color: #969696
+menu.items.active.disabled.text.color: #969696
 
 menu.items.active.bg: Flat Gradient Vertical Border
 menu.items.active.bg.color: #b4c994

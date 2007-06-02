@@ -313,7 +313,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                     &theme->menu_disabled_color))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
-                    "menu.items.activedisabled.text.color",
+                    "menu.items.active.disabled.text.color",
                     &theme->menu_disabled_selected_color))
         theme->menu_disabled_selected_color =
             RrColorNew(inst,

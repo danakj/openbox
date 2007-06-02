@@ -71,8 +71,6 @@ void framerender_frame(ObFrame *self)
         XClearWindow(ob_display, self->titletopright);
         XSetWindowBackground(ob_display, self->titleright, px);
         XClearWindow(ob_display, self->titleright);
-        XSetWindowBackground(ob_display, self->titlebottom, px);
-        XClearWindow(ob_display, self->titlebottom);
 
         XSetWindowBackground(ob_display, self->handleleft, px);
         XClearWindow(ob_display, self->handleleft);
@@ -96,6 +94,13 @@ void framerender_frame(ObFrame *self)
         XClearWindow(ob_display, self->rgriptop);
         XSetWindowBackground(ob_display, self->rgripbottom, px);
         XClearWindow(ob_display, self->rgripbottom);
+
+        px = (self->focused ?
+              RrColorPixel(ob_rr_theme->title_separator_focused_color) :
+              RrColorPixel(ob_rr_theme->title_separator_unfocused_color));
+
+        XSetWindowBackground(ob_display, self->titlebottom, px);
+        XClearWindow(ob_display, self->titlebottom);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {

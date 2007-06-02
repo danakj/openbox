@@ -365,7 +365,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   self->cbwidth_b + (!self->max_horz || !self->max_vert ? self->bwidth : 0));
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
-            self->size.top += ob_rr_theme->title_height + ob_rr_theme->tswidth;
+            self->size.top += ob_rr_theme->title_height + self->bwidth;
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
             ob_rr_theme->handle_height > 0)
         {
@@ -468,14 +468,12 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(ob_display, self->titletopleft);
                 XMapWindow(ob_display, self->titletopright);
 
-                if (self->decorations & OB_FRAME_DECOR_TITLEBAR &&
-                    ob_rr_theme->tswidth)
-                {
+                if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
                     XMoveResizeWindow(ob_display, self->titlebottom,
                                       self->bwidth,
                                       ob_rr_theme->title_height + self->bwidth,
                                       self->width,
-                                      ob_rr_theme->tswidth);
+                                      self->bwidth);
 
                     XMapWindow(ob_display, self->titlebottom);
                 } else

@@ -207,7 +207,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(int, L("dimensions","window","border"),
               &theme->fbwidth, 0, 100))
         theme->fbwidth = 1;
-    theme->tswidth = theme->fbwidth;
 
     /* menu border width inherits from frame border width */
     if (!FIND(int, L("dimensions","menu","border"),
@@ -222,6 +221,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(color, L("window","active","border"),
               &theme->frame_focused_border_color, NULL))
         theme->frame_focused_border_color = RrColorNew(inst, 0, 0, 0);
+    /* title separator focused color inherits from focused boder color */
+    if (!FIND(color, L("window","active","titleseparator"),
+              &theme->title_separator_focused_color, NULL))
+        theme->title_separator_focused_color =
+            RrColorNew(inst, theme->frame_focused_border_color->r,
+                       theme->frame_focused_border_color->g,
+                       theme->frame_focused_border_color->b);
     /* frame unfocused border color inherits from frame focused border color */
     if (!FIND(color, L("window","inactive","border"),
               &theme->frame_unfocused_border_color, NULL))
@@ -230,6 +236,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                        theme->frame_focused_border_color->r,
                        theme->frame_focused_border_color->g,
                        theme->frame_focused_border_color->b);
+    /* title separator unfocused color inherits from unfocused boder color */
+    if (!FIND(color, L("window","inactive","titleseparator"),
+              &theme->title_separator_unfocused_color, NULL))
+        theme->title_separator_unfocused_color =
+            RrColorNew(inst, theme->frame_unfocused_border_color->r,
+                       theme->frame_unfocused_border_color->g,
+                       theme->frame_unfocused_border_color->b);
 
     /* menu border color inherits from frame focused border color */
     if (!FIND(color, L("menu","border"),

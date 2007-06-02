@@ -182,10 +182,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
     if (!read_int(db, "border.width", &theme->fbwidth) ||
         theme->fbwidth < 0 || theme->fbwidth > 100)
         theme->fbwidth = 1;
-    /* title separator width inherits from frame border width */
-    if (!read_int(db, "window.title.separator.width", &theme->tswidth) ||
-        theme->tswidth < 0 || theme->tswidth > 100)
-        theme->tswidth = theme->fbwidth;
     /* menu border width inherits from the frame border width */
     if (!read_int(db, "menu.border.width", &theme->mbwidth) ||
         theme->mbwidth < 0 || theme->mbwidth > 100)
@@ -205,6 +201,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
                     "border.color",
                     &theme->frame_focused_border_color))
         theme->frame_focused_border_color = RrColorNew(inst, 0, 0, 0);
+    /* title separator focused color inherits from focused boder color */
+    if (!read_color(db, inst,
+                    "window.active.title.separator.color",
+                    &theme->title_separator_focused_color))
+        theme->title_separator_focused_color =
+            RrColorNew(inst,
+                       theme->frame_focused_border_color->r,
+                       theme->frame_focused_border_color->g,
+                       theme->frame_focused_border_color->b);
     /* unfocused border color inherits from frame focused border color */
     if (!read_color(db, inst,
                     "window.inactive.border.color",
@@ -213,6 +218,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
             RrColorNew(inst, theme->frame_focused_border_color->r,
                        theme->frame_focused_border_color->g,
                        theme->frame_focused_border_color->b);
+    /* title separator unfocused color inherits from unfocused boder color */
+    if (!read_color(db, inst,
+                    "window.inactive.title.separator.color",
+                    &theme->title_separator_unfocused_color))
+        theme->title_separator_unfocused_color =
+            RrColorNew(inst,
+                       theme->frame_unfocused_border_color->r,
+                       theme->frame_unfocused_border_color->g,
+                       theme->frame_unfocused_border_color->b);
+
     /* menu border color inherits from frame focused border color */
     if (!read_color(db, inst,
                     "menu.border.color",

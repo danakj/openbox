@@ -41,8 +41,6 @@ struct _RrTheme {
     gint paddingy;
     gint handle_height;
     gint fbwidth; /*!< frame border width */
-    gint tswidth; /*!< title separator width - between the titlebar and the
-                    client */
     gint mbwidth; /*!< menu border width */
     gint cbwidthx;
     gint cbwidthy;
@@ -62,6 +60,8 @@ struct _RrTheme {
     RrColor *menu_border_color;
     RrColor *frame_focused_border_color;
     RrColor *frame_unfocused_border_color;
+    RrColor *title_separator_focused_color;
+    RrColor *title_separator_unfocused_color;
     RrColor *cb_focused_color;
     RrColor *cb_unfocused_color;
     RrColor *title_focused_color;

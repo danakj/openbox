@@ -170,7 +170,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
 
     /* load direct dimensions */
     if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
-        theme->menu_overlap < 0 || theme->menu_overlap > 20)
+        theme->menu_overlap < -100 || theme->menu_overlap > 100)
         theme->menu_overlap = 0;
     if (!read_int(db, "window.handle.width", &theme->handle_height) ||
         theme->handle_height < 0 || theme->handle_height > 100)

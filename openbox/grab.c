@@ -84,7 +84,7 @@ gboolean grab_keyboard_full(gboolean grab)
             ret = TRUE;
     } else if (kgrabs > 0) {
         if (--kgrabs == 0) {
-            XUngrabKeyboard(ob_display, CurrentTime);
+            XUngrabKeyboard(ob_display, ungrab_time());
         }
         ret = TRUE;
     }
@@ -113,7 +113,7 @@ gboolean grab_pointer_full(gboolean grab, gboolean owner_events,
             ret = TRUE;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0) {
-            XUngrabPointer(ob_display, CurrentTime);
+            XUngrabPointer(ob_display, ungrab_time());
         }
         ret = TRUE;
     }

@@ -1887,11 +1887,12 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
 
         /* XXX wraparound... */
         ob_debug("  ignore range %u-%u\n", r->start, r->end);
-        if (e->xany.serial > r->end) {
+        if ((glong)(e->xany.serial - r->end) > 0) {
+            /* past the end */
             ignore_serials = g_slist_delete_link(ignore_serials, it);
             g_free(r);
         }
-        else if (e->xany.serial >= r->start)
+        else if ((glong)(e->xany.serial - r->start) >= 0)
             return TRUE;
     }
     return FALSE;

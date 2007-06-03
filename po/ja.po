@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 16:20+0200\n"
+"POT-Creation-Date: 2007-06-03 16:46-0400\n"
 "PO-Revision-Date: 2003-11-20 15:00+0900\n"
 "Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -15,31 +15,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr ""
 
-#: openbox/action.c:957
+#: openbox/action.c:960
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
-#, fuzzy, c-format
+#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
+#, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "ディレクトリ'%s'を作れません: %s"
+msgstr ""
 
-#: openbox/action.c:1265
+#: openbox/action.c:1266
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_combined_menu.c:148
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr ""
 
@@ -47,80 +47,67 @@ msgstr ""
 msgid "Desktops"
 msgstr "デスクトップ"
 
-#: openbox/client_menu.c:246
+#: openbox/client_menu.c:258
 msgid "All desktops"
 msgstr "すべてのデスクトップ(&A)"
 
-#: openbox/client_menu.c:351
-#, fuzzy
+#: openbox/client_menu.c:363
 msgid "&Layer"
-msgstr "レイヤー(&L)"
+msgstr ""
 
-#: openbox/client_menu.c:356
-#, fuzzy
+#: openbox/client_menu.c:368
 msgid "Always on &top"
-msgstr "常に最上位にする(&T)"
+msgstr ""
 
-#: openbox/client_menu.c:357
-#, fuzzy
+#: openbox/client_menu.c:369
 msgid "&Normal"
-msgstr "ノーマル(&N)"
+msgstr ""
 
-#: openbox/client_menu.c:358
-#, fuzzy
+#: openbox/client_menu.c:370
 msgid "Always on &bottom"
-msgstr "常に最下位にする(&B)"
+msgstr ""
 
-#: openbox/client_menu.c:361
-#, fuzzy
+#: openbox/client_menu.c:373
 msgid "&Send to desktop"
-msgstr "デスクトップに送る(&S)"
+msgstr ""
 
-#: openbox/client_menu.c:365
+#: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "クライアントメニュー"
 
-#: openbox/client_menu.c:371
-#, fuzzy
-msgid "R&estore"
-msgstr "リストア(&E)"
-
-#: openbox/client_menu.c:379
-#, fuzzy
-msgid "&Move"
-msgstr "移動(&M)"
-
-#: openbox/client_menu.c:381
-#, fuzzy
-msgid "Resi&ze"
-msgstr "リサイズ(&Z)"
-
 #: openbox/client_menu.c:383
-#, fuzzy
-msgid "Ico&nify"
-msgstr "アイコン化(&N)"
+msgid "R&estore"
+msgstr ""
 
 #: openbox/client_menu.c:391
-#, fuzzy
+msgid "&Move"
+msgstr ""
+
+#: openbox/client_menu.c:393
+msgid "Resi&ze"
+msgstr ""
+
+#: openbox/client_menu.c:395
+msgid "Ico&nify"
+msgstr ""
+
+#: openbox/client_menu.c:403
 msgid "Ma&ximize"
-msgstr "最大化(&X)"
-
-#: openbox/client_menu.c:399
-#, fuzzy
-msgid "&Roll up/down"
-msgstr "ロールアップ/ダウン(&R)"
-
-#: openbox/client_menu.c:401
-#, fuzzy
-msgid "Un/&Decorate"
-msgstr "装飾(&D)"
+msgstr ""
 
 #: openbox/client_menu.c:411
-#, fuzzy
-msgid "&Close"
-msgstr "閉じる(&C)"
+msgid "&Roll up/down"
+msgstr ""
 
-#: openbox/config.c:701
+#: openbox/client_menu.c:413
+msgid "Un/&Decorate"
+msgstr ""
+
+#: openbox/client_menu.c:423
+msgid "&Close"
+msgstr ""
+
+#: openbox/config.c:704
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr ""
@@ -129,30 +116,29 @@ msgstr ""
 msgid "Conflict with key binding in config file"
 msgstr ""
 
-#: openbox/menu.c:98 openbox/menu.c:106
+#: openbox/menu.c:100 openbox/menu.c:108
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr ""
 
-#: openbox/menu.c:149
+#: openbox/menu.c:151
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr ""
 
-#: openbox/menu.c:166
+#: openbox/menu.c:168
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr ""
 
-#: openbox/menu.c:179
+#: openbox/menu.c:181
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
-#: openbox/menu.c:331 openbox/menu.c:332
-#, fuzzy
+#: openbox/menu.c:342 openbox/menu.c:343
 msgid "More..."
-msgstr "移動する..."
+msgstr ""
 
 #: openbox/mouse.c:338
 #, c-format
@@ -165,9 +151,9 @@ msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
 #: openbox/openbox.c:129
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "ディレクトリ'%s'を作れません: %s"
+msgstr ""
 
 #: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -193,105 +179,105 @@ msgstr ""
 msgid "Unable to load a theme."
 msgstr ""
 
-#: openbox/openbox.c:394
+#: openbox/openbox.c:458
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:464 openbox/openbox.c:466
+#: openbox/openbox.c:528 openbox/openbox.c:530
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:539
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:540
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 
-#: openbox/openbox.c:477
+#: openbox/openbox.c:541
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:478
+#: openbox/openbox.c:542
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:479
+#: openbox/openbox.c:543
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:480
+#: openbox/openbox.c:544
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:481
+#: openbox/openbox.c:545
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:546
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:547
 msgid "  --restart           Restart Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:548
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:549
 msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:550
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:551
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:553
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:586
+#: openbox/openbox.c:650
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
 
-#: openbox/screen.c:88 openbox/screen.c:189
+#: openbox/screen.c:89 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr ""
 
-#: openbox/screen.c:125
+#: openbox/screen.c:126
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr ""
 
-#: openbox/screen.c:146
+#: openbox/screen.c:147
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/screen.c:939
+#: openbox/screen.c:991
 #, c-format
 msgid "desktop %i"
 msgstr ""
@@ -302,9 +288,9 @@ msgid "Unable to make directory '%s': %s"
 msgstr "ディレクトリ'%s'を作れません: %s"
 
 #: openbox/session.c:451
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "ディレクトリ'%s'を作れません: %s"
+msgstr ""
 
 #: openbox/session.c:583
 #, c-format
@@ -340,7 +326,3 @@ msgstr ""
 #, c-format
 msgid "X Error: %s"
 msgstr ""
-
-#, fuzzy
-#~ msgid "--config requires an argument\n"
-#~ msgstr "--sm-save-file には引数が必要です\n"

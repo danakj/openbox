@@ -1,8 +1,6 @@
 zh_TW
 zh_CN
-ja
 de
-hr
 es
 ca
 sv
@@ -15,9 +13,12 @@ pt
 pt_BR
 fi
 en@quot en@boldquot
-it
 et
 cs
 nl
 ar
 bn_IN
+
+#hr
+#it
+#ja

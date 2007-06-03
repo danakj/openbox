@@ -1220,8 +1220,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_border_color);
         RrColorFree(theme->frame_focused_border_color);
         RrColorFree(theme->frame_unfocused_border_color);
-        RrColorFree(title_separator_focused_color);
-        RrColorFree(title_separator_unfocused_color);
+        RrColorFree(theme->title_separator_focused_color);
+        RrColorFree(theme->title_separator_unfocused_color);
         RrColorFree(theme->cb_unfocused_color);
         RrColorFree(theme->cb_focused_color);
         RrColorFree(theme->title_focused_color);

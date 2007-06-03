@@ -542,6 +542,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ObClient *c;
     GList *it;
     guint old;
+    gulong ignore_start;
      
     g_assert(num < screen_num_desktops);
 
@@ -556,6 +557,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
     screen_last_desktop = old;
 
     ob_debug("Moving to desktop %d\n", num+1);
+
+    /* ignore enter events caused by the move */
+    ignore_start = event_start_ignore_all_enters();
 
     if (moveresize_client)
         client_set_desktop(moveresize_client, num, TRUE);
@@ -606,7 +610,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    event_ignore_all_queued_enters();
+    event_end_ignore_all_enters(ignore_start);
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;

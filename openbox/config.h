@@ -69,6 +69,9 @@ extern guint    config_focus_delay;
 extern gboolean config_focus_raise;
 /*! Focus the last focused window, not under the mouse, in follow mouse mode */
 extern gboolean config_focus_last;
+/*! Try keep focus on the window under the mouse when the mouse is not moving
+ */
+extern gboolean config_focus_under_mouse;
 
 extern ObPlacePolicy config_place_policy;
 

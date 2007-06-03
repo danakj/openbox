@@ -19,6 +19,7 @@
 #include "debug.h"
 #include "menu.h"
 #include "menuframe.h"
+#include "config.h"
 #include "screen.h"
 #include "client.h"
 #include "openbox.h"
@@ -106,8 +107,12 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
                                 Time time)
 {
     gint x, y;
+    gulong ignore_start;
 
     g_assert(c);
+
+    if (!config_focus_under_mouse)
+        ignore_start = event_start_ignore_all_enters();
 
     switch (e->id) {
     case CLIENT_ICONIFY:
@@ -154,7 +159,8 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         g_assert_not_reached();
     }
 
-    event_ignore_all_queued_enters();
+    if (!config_focus_under_mouse)
+        event_end_ignore_all_enters(ignore_start);
 
     /* update the menu cuz stuff can have changed */
     if (f) {
@@ -199,7 +205,12 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
                                ObClient *c, guint state, gpointer data,
                                Time time)
 {
+    gulong ignore_start;
+
     g_assert(c);
+
+    if (!config_focus_under_mouse)
+        ignore_start = event_start_ignore_all_enters();
 
     switch (e->id) {
     case LAYER_TOP:
@@ -215,7 +226,8 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
         g_assert_not_reached();
     }
 
-    event_ignore_all_queued_enters();
+    if (!config_focus_under_mouse)
+        event_end_ignore_all_enters(ignore_start);
 
     /* update the menu cuz stuff can have changed */
     if (f) {

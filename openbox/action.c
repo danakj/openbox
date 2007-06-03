@@ -39,16 +39,19 @@
 
 #include <glib.h>
 
+static gulong ignore_start = 0;
+
 static void client_action_start(union ActionData *data)
 {
+    ignore_start = event_start_ignore_all_enters();
 }
 
-static void client_action_end(union ActionData *data)
+static void client_action_end(union ActionData *data, gboolean allow_enters)
 {
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button && data->any.c) {
-                event_ignore_all_queued_enters();
+            if (!data->any.button && data->any.c && !allow_enters) {
+                event_end_ignore_all_enters(ignore_start);
             } else {
                 ObClient *c;
 
@@ -1318,7 +1321,7 @@ void action_iconify(union ActionData *data)
 {
     client_action_start(data);
     client_iconify(data->client.any.c, TRUE, TRUE, FALSE);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_focus_order_to_bottom(union ActionData *data)
@@ -1332,14 +1335,14 @@ void action_raiselower(union ActionData *data)
 
     client_action_start(data);
     stacking_restack_request(c, NULL, Opposite, FALSE);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_raise(union ActionData *data)
 {
     client_action_start(data);
     stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_unshaderaise(union ActionData *data)
@@ -1362,7 +1365,7 @@ void action_lower(union ActionData *data)
 {
     client_action_start(data);
     stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_close(union ActionData *data)
@@ -1379,21 +1382,21 @@ void action_shade(union ActionData *data)
 {
     client_action_start(data);
     client_shade(data->client.any.c, TRUE);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_unshade(union ActionData *data)
 {
     client_action_start(data);
     client_shade(data->client.any.c, FALSE);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_shade(union ActionData *data)
 {
     client_action_start(data);
     client_shade(data->client.any.c, !data->client.any.c->shaded);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_omnipresent(union ActionData *data)
@@ -1408,7 +1411,7 @@ void action_move_relative_horz(union ActionData *data)
     ObClient *c = data->relative.any.c;
     client_action_start(data);
     client_move(c, c->area.x + data->relative.deltax, c->area.y);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_move_relative_vert(union ActionData *data)
@@ -1416,7 +1419,7 @@ void action_move_relative_vert(union ActionData *data)
     ObClient *c = data->relative.any.c;
     client_action_start(data);
     client_move(c, c->area.x, c->area.y + data->relative.deltax);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_move_to_center(union ActionData *data)
@@ -1427,7 +1430,7 @@ void action_move_to_center(union ActionData *data)
     client_action_start(data);
     client_move(c, area->width / 2 - c->area.width / 2,
                 area->height / 2 - c->area.height / 2);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_resize_relative_horz(union ActionData *data)
@@ -1437,7 +1440,7 @@ void action_resize_relative_horz(union ActionData *data)
     client_resize(c,
                   c->area.width + data->relative.deltax * c->size_inc.width,
                   c->area.height);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_resize_relative_vert(union ActionData *data)
@@ -1447,7 +1450,7 @@ void action_resize_relative_vert(union ActionData *data)
         client_action_start(data);
         client_resize(c, c->area.width, c->area.height +
                       data->relative.deltax * c->size_inc.height);
-        client_action_end(data);
+        client_action_end(data, FALSE);
     }
 }
 
@@ -1457,7 +1460,7 @@ void action_move_relative(union ActionData *data)
     client_action_start(data);
     client_move(c, c->area.x + data->relative.deltax, c->area.y +
                 data->relative.deltay);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_resize_relative(union ActionData *data)
@@ -1478,21 +1481,21 @@ void action_resize_relative(union ActionData *data)
     
     client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
     client_move_resize(c, x + (ow - w), y + (oh - h), w, h);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_maximize_full(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c, TRUE, 0);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_unmaximize_full(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c, FALSE, 0);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_maximize_full(union ActionData *data)
@@ -1502,21 +1505,21 @@ void action_toggle_maximize_full(union ActionData *data)
                     !(data->client.any.c->max_horz ||
                       data->client.any.c->max_vert),
                     0);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_maximize_horz(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c, TRUE, 1);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_unmaximize_horz(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c, FALSE, 1);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_maximize_horz(union ActionData *data)
@@ -1524,21 +1527,21 @@ void action_toggle_maximize_horz(union ActionData *data)
     client_action_start(data);
     client_maximize(data->client.any.c,
                     !data->client.any.c->max_horz, 1);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_maximize_vert(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c, TRUE, 2);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_unmaximize_vert(union ActionData *data)
 {
     client_action_start(data);
     client_maximize(data->client.any.c, FALSE, 2);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_maximize_vert(union ActionData *data)
@@ -1546,14 +1549,14 @@ void action_toggle_maximize_vert(union ActionData *data)
     client_action_start(data);
     client_maximize(data->client.any.c,
                     !data->client.any.c->max_vert, 2);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_fullscreen(union ActionData *data)
 {
     client_action_start(data);
     client_fullscreen(data->client.any.c, !(data->client.any.c->fullscreen));
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_send_to_desktop(union ActionData *data)
@@ -1639,7 +1642,7 @@ void action_toggle_decorations(union ActionData *data)
 
     client_action_start(data);
     client_set_undecorated(c, !c->undecorated);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
@@ -1872,7 +1875,7 @@ void action_movetoedge(union ActionData *data)
     frame_frame_gravity(c->frame, &x, &y, c->area.width, c->area.height);
     client_action_start(data);
     client_move(c, x, y);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_growtoedge(union ActionData *data)
@@ -1939,7 +1942,7 @@ void action_growtoedge(union ActionData *data)
     frame_frame_gravity(c->frame, &x, &y, width, height);
     client_action_start(data);
     client_move_resize(c, x, y, width, height);
-    client_action_end(data);
+    client_action_end(data, FALSE);
 }
 
 void action_send_to_layer(union ActionData *data)
@@ -1956,7 +1959,7 @@ void action_toggle_layer(union ActionData *data)
         client_set_layer(c, c->below ? 0 : -1);
     else if (data->layer.layer > 0)
         client_set_layer(c, c->above ? 0 : 1);
-    client_action_end(data);
+    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_toggle_dockautohide(union ActionData *data)

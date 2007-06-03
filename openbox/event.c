@@ -77,6 +77,12 @@ typedef struct
     Time time;
 } ObFocusDelayData;
 
+typedef struct
+{
+    gulong start; /* inclusive */
+    gulong end;   /* inclusive */
+} ObSerialRange;
+
 static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static gboolean event_handle_menu_keyboard(XEvent *e);
@@ -96,8 +102,9 @@ static void focus_delay_client_dest(ObClient *client, gpointer data);
 /* The time for the current event being processed */
 Time event_curtime = CurrentTime;
 
-static guint ignore_enter_focus = 0;
 static gboolean focus_left_screen = FALSE;
+/*! A list of ObSerialRanges which are to be ignored for mouse enter events */
+static GSList *ignore_serials = NULL;
 
 #ifdef USE_SM
 static void ice_handler(gint fd, gpointer conn)
@@ -940,7 +947,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                corresponding enter events. Pretend like the animating window
                doesn't even exist..! */
             if (frame_iconify_animating(client->frame))
-                event_ignore_all_queued_enters();
+                event_end_ignore_all_enters(event_start_ignore_all_enters());
 
             ob_debug_type(OB_DEBUG_FOCUS,
                           "%sNotify mode %d detail %d on %lx\n",
@@ -1069,7 +1076,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             /* activate it rather than just focus it */
             stacking_restack_request(client, sibling,
-                                     e->xconfigurerequest.detail, TRUE);
+                                     e->xconfigurerequest.detail,
+                                     TRUE);
 
             /* if a stacking change moves the window without resizing */
             move = TRUE;
@@ -1164,13 +1172,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
                the window is actually being changed then configure it and
                send a configure notify to them */
             if (move || !RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
+                gulong ignore_start;
+
                 ob_debug("Granting ConfigureRequest x %d y %d w %d h %d\n",
                          x, y, w, h);
+                ignore_start = event_start_ignore_all_enters();
                 client_configure(client, x, y, w, h, FALSE, TRUE);
+                event_end_ignore_all_enters(ignore_start);
             }
-
-            /* ignore enter events caused by these like ob actions do */
-            event_ignore_all_queued_enters();
         }
         break;
     }
@@ -1255,6 +1264,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
                                    FALSE);
         } else if (msgtype == prop_atoms.net_wm_state) {
+            gulong ignore_start;
+
             /* can't compress these */
             ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",
                      (e->xclient.data.l[0] == 0 ? "Remove" :
@@ -1262,11 +1273,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
                       e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
                      e->xclient.data.l[1], e->xclient.data.l[2],
                      client->window);
-            client_set_state(client, e->xclient.data.l[0],
-                             e->xclient.data.l[1], e->xclient.data.l[2]);
 
             /* ignore enter events caused by these like ob actions do */
-            event_ignore_all_queued_enters();
+            if (!config_focus_under_mouse)
+                ignore_start = event_start_ignore_all_enters();
+            client_set_state(client, e->xclient.data.l[0],
+                             e->xclient.data.l[1], e->xclient.data.l[2]);
+            if (!config_focus_under_mouse)
+                event_end_ignore_all_enters(ignore_start);
         } else if (msgtype == prop_atoms.net_close_window) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
@@ -1327,6 +1341,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 moveresize_end(TRUE);
         } else if (msgtype == prop_atoms.net_moveresize_window) {
             gint ograv, x, y, w, h;
+            gulong ignore_start;
 
             ograv = client->gravity;
 
@@ -1371,12 +1386,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
+            /* ignore enter events caused by these like ob actions do */
+            ignore_start = event_start_ignore_all_enters();
             client_configure(client, x, y, w, h, FALSE, TRUE);
+            event_end_ignore_all_enters(ignore_start);
 
             client->gravity = ograv;
-
-            /* ignore enter events caused by these like ob actions do */
-            event_ignore_all_queued_enters();
         } else if (msgtype == prop_atoms.net_restack_window) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
@@ -1831,49 +1846,54 @@ void event_halt_focus_delay()
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
-static Bool event_look_for_enters(Display *d, XEvent *e, XPointer arg)
+gulong event_start_ignore_all_enters()
 {
-    if (e->type == EnterNotify &&
-        /* these types aren't used for focusing */
-        !(e->xcrossing.mode == NotifyGrab ||
-          e->xcrossing.mode == NotifyUngrab ||
-          e->xcrossing.detail == NotifyInferior))
-    {
-        ObWindow *win;
-
-        /* found an enter for that leave, ignore it if it's going to
-           another window */
-        win = g_hash_table_lookup(window_map, &e->xany.window);
-        if (win && WINDOW_IS_CLIENT(win))
-            ++ignore_enter_focus;
-    }
-    return False; /* don't disrupt the queue order, just count them */
+    XSync(ob_display, FALSE);
+    return LastKnownRequestProcessed(ob_display);
 }
 
-void event_ignore_all_queued_enters()
+void event_end_ignore_all_enters(gulong start)
 {
-    XEvent e;
+    ObSerialRange *r;
 
+    g_assert(start != 0);
     XSync(ob_display, FALSE);
 
-    /* count the events without disrupting them */
-    ignore_enter_focus = 0;
-    XCheckIfEvent(ob_display, &e, event_look_for_enters, NULL);
+    r = g_new(ObSerialRange, 1);
+    r->start = start;
+    r->end = LastKnownRequestProcessed(ob_display);
+    ignore_serials = g_slist_prepend(ignore_serials, r);
+    ob_debug("ignoring serials %u-%u\n", r->start, r->end);
+
+    /* increment the serial so we don't ignore events we weren't meant to */
+    XSync(ob_display, FALSE);
+    ob_debug("now last serial %u\n", LastKnownRequestProcessed(ob_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
 {
+    GSList *it, *next;
+
     g_assert(e->type == EnterNotify &&
              !(e->xcrossing.mode == NotifyGrab ||
                e->xcrossing.mode == NotifyUngrab ||
                e->xcrossing.detail == NotifyInferior));
 
-    ob_debug_type(OB_DEBUG_FOCUS, "# enters ignored: %d\n",
-                  ignore_enter_focus);
+    ob_debug("checking serial %u\n", e->xany.serial);
+    for (it = ignore_serials; it; it = next) {
+        ObSerialRange *r = it->data;
 
-    if (ignore_enter_focus) {
-        --ignore_enter_focus;
-        return TRUE;
+        next = g_slist_next(it);
+
+        /* XXX wraparound... */
+        ob_debug("  ignore range %u-%u\n", r->start, r->end);
+        if ((glong)(e->xany.serial - r->end) > 0) {
+            /* past the end */
+            ignore_serials = g_slist_delete_link(ignore_serials, it);
+            g_free(r);
+        }
+        else if ((glong)(e->xany.serial - r->start) >= 0)
+            return TRUE;
     }
     return FALSE;
 }

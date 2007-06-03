@@ -39,9 +39,10 @@ void event_shutdown(gboolean reconfig);
   follows mouse */
 void event_enter_client(struct _ObClient *client);
 
-/*! Make mouse focus not move at all from the stuff that has happened up
-  till now. */
-void event_ignore_all_queued_enters();
+/*! Make mouse focus not move at all from the stuff that happens between these
+ two function calls. */
+gulong event_start_ignore_all_enters();
+void event_end_ignore_all_enters(gulong start);
 
 /*! End *all* active and passive grabs on the keyboard */
 void event_cancel_all_key_grabs();

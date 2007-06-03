@@ -119,13 +119,17 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 void focus_cycle_draw_indicator(ObClient *c)
 {
     if (!c) {
+        gulong ignore_start;
+
+        /* kill enter events cause by this unmapping */
+        ignore_start = event_start_ignore_all_enters();
+
         XUnmapWindow(ob_display, focus_indicator.top.win);
         XUnmapWindow(ob_display, focus_indicator.left.win);
         XUnmapWindow(ob_display, focus_indicator.right.win);
         XUnmapWindow(ob_display, focus_indicator.bottom.win);
 
-        /* kill enter events cause by this unmapping */
-        event_ignore_all_queued_enters();
+        event_end_ignore_all_enters(ignore_start);
     } else {
         /*
           if (c)

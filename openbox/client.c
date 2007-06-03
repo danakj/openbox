@@ -629,6 +629,7 @@ void client_unmanage(ObClient *self)
 {
     guint j;
     GSList *it;
+    gulong ignore_start;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)\n",
              self->window, self->frame->window,
@@ -640,15 +641,16 @@ void client_unmanage(ObClient *self)
        don't generate more events */
     XSelectInput(ob_display, self->window, NoEventMask);
 
+    /* ignore enter events from the unmap so it doesnt mess with the focus */
+    if (!client_focused(self) || !config_focus_under_mouse)
+        ignore_start = event_start_ignore_all_enters();
+
     frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
     XFlush(ob_display);
 
-    if (!client_focused(self) || !config_focus_under_mouse) {
-        /* ignore enter events from the unmap so it doesnt mess with the
-           focus */
-        event_ignore_all_queued_enters();
-    }
+    if (!client_focused(self) || !config_focus_under_mouse)
+        event_end_ignore_all_enters(ignore_start);
 
     mouse_grab_for_client(self, FALSE);
 

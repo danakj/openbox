@@ -39,8 +39,11 @@
 
 #include <glib.h>
 
+static gulong ignore_start = 0;
+
 static void client_action_start(union ActionData *data)
 {
+    ignore_start = event_start_ignore_all_enters();
 }
 
 static void client_action_end(union ActionData *data, gboolean allow_enters)
@@ -48,7 +51,7 @@ static void client_action_end(union ActionData *data, gboolean allow_enters)
     if (config_focus_follow)
         if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
             if (!data->any.button && data->any.c && !allow_enters) {
-                event_ignore_all_queued_enters();
+                event_end_ignore_all_enters(ignore_start);
             } else {
                 ObClient *c;
 

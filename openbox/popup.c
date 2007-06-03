@@ -265,11 +265,15 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 void popup_hide(ObPopup *self)
 {
     if (self->mapped) {
+        gulong ignore_start;
+
+        /* kill enter events cause by this unmapping */
+        ignore_start = event_start_ignore_all_enters();
+
         XUnmapWindow(ob_display, self->bg);
         self->mapped = FALSE;
 
-        /* kill enter events cause by this unmapping */
-        event_ignore_all_queued_enters();
+        event_end_ignore_all_enters(ignore_start);
     } else if (self->delay_mapped) {
         ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
         self->delay_mapped = FALSE;

@@ -465,13 +465,16 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
 
 void focus_cycle_popup_hide()
 {
+    gulong ignore_start;
+
+    ignore_start = event_start_ignore_all_enters();
+
     XUnmapWindow(ob_display, popup.bg);
     XFlush(ob_display);
 
-    popup.mapped = FALSE;
+    event_end_ignore_all_enters(ignore_start);
 
-    /* kill enter events cause by this unmapping */
-    event_ignore_all_queued_enters();
+    popup.mapped = FALSE;
 
     while(popup.targets) {
         ObFocusCyclePopupTarget *t = popup.targets->data;

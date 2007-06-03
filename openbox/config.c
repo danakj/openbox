@@ -851,7 +851,7 @@ void config_startup(ObParseInst *i)
     config_focus_follow = FALSE;
     config_focus_delay = 0;
     config_focus_raise = FALSE;
-    config_focus_last = FALSE;
+    config_focus_last = TRUE;
     config_focus_under_mouse = FALSE;
 
     parse_register(i, "focus", parse_focus, NULL);

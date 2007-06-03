@@ -46,7 +46,7 @@ static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
-RrTheme* RrThemeNew(const RrInstance *inst, gchar *name,
+RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
                     RrFont *menu_title_font, RrFont *menu_item_font,

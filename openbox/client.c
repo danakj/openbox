@@ -644,9 +644,11 @@ void client_unmanage(ObClient *self)
     /* flush to send the hide to the server quickly */
     XFlush(ob_display);
 
-    /* ignore enter events from the unmap so it doesnt mess with the
-       focus */
-    event_ignore_all_queued_enters();
+    if (!client_focused(self) || !config_focus_under_mouse) {
+        /* ignore enter events from the unmap so it doesnt mess with the
+           focus */
+        event_ignore_all_queued_enters();
+    }
 
     mouse_grab_for_client(self, FALSE);
 

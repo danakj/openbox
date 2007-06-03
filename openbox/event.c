@@ -1031,6 +1031,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         gint x, y, w, h;
         gboolean move = FALSE;
         gboolean resize = FALSE;
+        gboolean restack = FALSE;
 
         /* get the current area */
         RECT_TO_DIMS(client->area, x, y, w, h);
@@ -1068,8 +1069,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
 
             /* activate it rather than just focus it */
-            stacking_restack_request(client, sibling,
-                                     e->xconfigurerequest.detail, TRUE);
+            restack = stacking_restack_request(client, sibling,
+                                               e->xconfigurerequest.detail,
+                                               TRUE);
 
             /* if a stacking change moves the window without resizing */
             move = TRUE;
@@ -1169,8 +1171,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 client_configure(client, x, y, w, h, FALSE, TRUE);
             }
 
-            /* ignore enter events caused by these like ob actions do */
-            event_ignore_all_queued_enters();
+            if (!restack || !config_focus_under_mouse) {
+                /* ignore enter events caused by these like ob actions do */
+                event_ignore_all_queued_enters();
+            }
         }
         break;
     }
@@ -1265,8 +1269,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_set_state(client, e->xclient.data.l[0],
                              e->xclient.data.l[1], e->xclient.data.l[2]);
 
-            /* ignore enter events caused by these like ob actions do */
-            event_ignore_all_queued_enters();
+            if (!config_focus_under_mouse) {
+                /* ignore enter events caused by these like ob actions do */
+                event_ignore_all_queued_enters();
+            }
         } else if (msgtype == prop_atoms.net_close_window) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);

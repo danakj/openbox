@@ -44,6 +44,7 @@
         <xsd:element minOccurs="0" name="focusNew" type="ob:bool"/>
         <xsd:element minOccurs="0" name="focusLast" type="ob:bool"/>
         <xsd:element minOccurs="0" name="followMouse" type="ob:bool"/>
+        <xsd:element minOccurs="0" name="underMouse" type="ob:bool"/>
         <xsd:element minOccurs="0" name="focusDelay" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="raiseOnFocus" type="ob:bool"/>
     </xsd:complexType>

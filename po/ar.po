@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 16:20+0200\n"
+"POT-Creation-Date: 2007-06-03 15:54-0400\n"
 "PO-Revision-Date: 2007-05-26 03:11+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
@@ -15,33 +15,34 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : 3\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : "
+"3\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "طُلِب إجراء '%s' غير سليم. لا يوجد إجراء كهذا."
 
-#: openbox/action.c:957
+#: openbox/action.c:960
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "استخدام غير سليم للإجراء '%s'. سيُتَجاهل هذا الإجراء."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "فشلت في تنفيذ '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1266
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "فشلت في تحويل المسار '%s' من utf8"
 
-#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
 msgid "Go there..."
 msgstr "اذهب هناك..."
 
-#: openbox/client_list_combined_menu.c:148
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "نوافذ"
 
@@ -49,67 +50,67 @@ msgstr "نوافذ"
 msgid "Desktops"
 msgstr "أسطح مكتب"
 
-#: openbox/client_menu.c:246
+#: openbox/client_menu.c:258
 msgid "All desktops"
 msgstr "كل أسطح المكتب"
 
-#: openbox/client_menu.c:351
+#: openbox/client_menu.c:363
 msgid "&Layer"
 msgstr "طبقة (&L)"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:368
 msgid "Always on &top"
 msgstr "دائما على السطح (&T)"
 
-#: openbox/client_menu.c:357
+#: openbox/client_menu.c:369
 msgid "&Normal"
 msgstr "طبيعي (&N)"
 
-#: openbox/client_menu.c:358
+#: openbox/client_menu.c:370
 msgid "Always on &bottom"
 msgstr "دائما في القاع (&B)"
 
-#: openbox/client_menu.c:361
-msgid "&Send to desktop (&S)"
-msgstr "أرسِل إلى سطح المكتب"
+#: openbox/client_menu.c:373
+msgid "&Send to desktop"
+msgstr "أرسِل إلى سطح المكتب (&S)"
 
-#: openbox/client_menu.c:365
+#: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "قائمة العميل"
 
-#: openbox/client_menu.c:371
+#: openbox/client_menu.c:383
 msgid "R&estore"
 msgstr "استعِد (&E)"
 
-#: openbox/client_menu.c:379
+#: openbox/client_menu.c:391
 msgid "&Move"
 msgstr "انقل (&M)"
 
-#: openbox/client_menu.c:381
+#: openbox/client_menu.c:393
 msgid "Resi&ze"
 msgstr "حجِّم (&Z)"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:395
 msgid "Ico&nify"
 msgstr "صغّر (&N)"
 
-#: openbox/client_menu.c:391
+#: openbox/client_menu.c:403
 msgid "Ma&ximize"
 msgstr "كبّر (&X)"
 
-#: openbox/client_menu.c:399
+#: openbox/client_menu.c:411
 msgid "&Roll up/down"
 msgstr "لُف لأعلى/لأسفل (&R)"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:413
 msgid "Un/&Decorate"
 msgstr "ضع/أزل الحواف (&D)"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:423
 msgid "&Close"
 msgstr "أغلق (&C)"
 
-#: openbox/config.c:701
+#: openbox/config.c:704
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "زر غير صحيح '%s' محدد في ملف الإعدادات"
@@ -118,27 +119,27 @@ msgstr "زر غير صحيح '%s' محدد في ملف الإعدادات"
 msgid "Conflict with key binding in config file"
 msgstr "يتعارض مع ارتباط المفاتيح في ملف الإعدادات"
 
-#: openbox/menu.c:98 openbox/menu.c:106
+#: openbox/menu.c:100 openbox/menu.c:108
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr "لم أعثر على ملف قائمة سليم '%s'"
 
-#: openbox/menu.c:149
+#: openbox/menu.c:151
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "فشل تنفيذ أمر ل pipe-menu '%s': %s"
 
-#: openbox/menu.c:166
+#: openbox/menu.c:168
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "خرج غير سليم من pipe-menu '%s'"
 
-#: openbox/menu.c:179
+#: openbox/menu.c:181
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "حاولت الوصول إلى القائمة '%s' لكنها غير موجودة"
 
-#: openbox/menu.c:331 openbox/menu.c:332
+#: openbox/menu.c:342 openbox/menu.c:343
 msgid "More..."
 msgstr "المزيد..."
 
@@ -181,20 +182,20 @@ msgstr "لم أعثر على ملف إعدادات سليم، سأستخدم ب�
 msgid "Unable to load a theme."
 msgstr "لم أستطِع تحميل سِمة."
 
-#: openbox/openbox.c:394
+#: openbox/openbox.c:458
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "فشلت إعادة التشغيل في تنفيذ مُنفّذ جديد '%s': %s"
 
-#: openbox/openbox.c:464 openbox/openbox.c:466
+#: openbox/openbox.c:528 openbox/openbox.c:530
 msgid "Copyright (c)"
 msgstr "حقوق النسخ"
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:539
 msgid "Syntax: openbox [options]\n"
 msgstr "الصيغة: openbox [options]\n"
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:540
 msgid ""
 "\n"
 "Options:\n"
@@ -202,23 +203,23 @@ msgstr ""
 "\n"
 "الخيارات:\n"
 
-#: openbox/openbox.c:477
+#: openbox/openbox.c:541
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              اعرض هذه المساعدة ثم اخرج\n"
 
-#: openbox/openbox.c:478
+#: openbox/openbox.c:542
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           اعرض النسخة ثم اخرج\n"
 
-#: openbox/openbox.c:479
+#: openbox/openbox.c:543
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           استبدل مدير النوافذ الذي يعمل حاليا\n"
 
-#: openbox/openbox.c:480
+#: openbox/openbox.c:544
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        عطِّل الإتصال بمدير الجلسة\n"
 
-#: openbox/openbox.c:481
+#: openbox/openbox.c:545
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -226,15 +227,15 @@ msgstr ""
 "\n"
 "تمرير رسائل لمرّة تعمل من أوبن‌بوكس:\n"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:546
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       أعِد تحميل إعدادات أوبن‌بوكس\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:547
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           أعِد تشغيل أوبن‌بوكس\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:548
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -242,23 +243,23 @@ msgstr ""
 "\n"
 "خيارات التنقيح:\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:549
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              شغّل في النمط المزامن\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:550
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             اعرض خرْج التنقيح\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:551
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       اعرض خرج التنقيح للتعامل مع البؤرة\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    شق العرض إلى شاشات xinerama زائفة\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:553
 #, c-format
 msgid ""
 "\n"
@@ -267,27 +268,27 @@ msgstr ""
 "\n"
 "من فضلك أبلغ عن العلل إلى %s\n"
 
-#: openbox/openbox.c:586
+#: openbox/openbox.c:650
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "معامل سطر أوامر غير سليم '%s'\n"
 
-#: openbox/screen.c:88 openbox/screen.c:189
+#: openbox/screen.c:89 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "يعمل مدير نوافذ بالفعل على الشاشة %Id"
 
-#: openbox/screen.c:125
+#: openbox/screen.c:126
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "تعذّر الحصول على انتقاء مدير النوافذ على الشاشة %Id"
 
-#: openbox/screen.c:146
+#: openbox/screen.c:147
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "مدير النوافذ على الشاشة %Id لا وجود له"
 
-#: openbox/screen.c:939
+#: openbox/screen.c:991
 #, c-format
 msgid "desktop %i"
 msgstr "سطح المكتب %Ii"
@@ -336,4 +337,3 @@ msgstr "المفتاح المطلوب '%s' لا وجود له في العرض"
 #, c-format
 msgid "X Error: %s"
 msgstr "خطأ إكس: %s"
-

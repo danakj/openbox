@@ -330,7 +330,6 @@ gint main(gint argc, gchar **argv)
                 /* redecorate all existing windows */
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
-                    Strut oldsize, newsize;
 
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, TRUE);

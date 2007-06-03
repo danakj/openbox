@@ -551,9 +551,11 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
     return occludes;
 }
 
-void stacking_restack_request(ObClient *client, ObClient *sibling,
-                              gint detail, gboolean activate)
+gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
+                                  gint detail, gboolean activate)
 {
+    gboolean ret = FALSE;
+
     if (sibling && ((client->desktop != sibling->desktop &&
                      client->desktop != DESKTOP_ALL &&
                      sibling->desktop != DESKTOP_ALL) ||
@@ -570,6 +572,7 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
                  client->title, sibling ? sibling->title : "(all)");
         /* just lower it */
         stacking_lower(CLIENT_AS_WINDOW(client));
+        ret = TRUE;
         break;
     case BottomIf:
         ob_debug("Restack request BottomIf for client %s sibling "
@@ -577,8 +580,10 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
                  client->title, sibling ? sibling->title : "(all)");
         /* if this client occludes sibling (or anything if NULL), then
            lower it to the bottom */
-        if (stacking_occludes(client, sibling))
+        if (stacking_occludes(client, sibling)) {
             stacking_lower(CLIENT_AS_WINDOW(client));
+            ret = TRUE;
+        }
         break;
     case Above:
         ob_debug("Restack request Above for client %s sibling %s\n",
@@ -589,6 +594,7 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
             client_activate(client, FALSE, TRUE);
         else
             stacking_raise(CLIENT_AS_WINDOW(client));
+        ret = TRUE;
         break;
     case TopIf:
         ob_debug("Restack request TopIf for client %s sibling %s\n",
@@ -600,6 +606,7 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
                 client_activate(client, FALSE, TRUE);
             else
                 stacking_raise(CLIENT_AS_WINDOW(client));
+            ret = TRUE;
         }
         break;
     case Opposite:
@@ -613,9 +620,13 @@ void stacking_restack_request(ObClient *client, ObClient *sibling,
                 client_activate(client, FALSE, TRUE);
             else
                 stacking_raise(CLIENT_AS_WINDOW(client));
+            ret = TRUE;
         }
-        else if (stacking_occludes(client, sibling))
+        else if (stacking_occludes(client, sibling)) {
             stacking_lower(CLIENT_AS_WINDOW(client));
+            ret = TRUE;
+        }
         break;
     }
+    return ret;
 }

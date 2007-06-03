@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 16:20+0200\n"
+"POT-Creation-Date: 2007-06-01 17:07+0200\n"
 "PO-Revision-Date: 2007-05-20 18:41+0200\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@switch-case.org>\n"
 "Language-Team: None\n"
@@ -25,21 +25,21 @@ msgstr "Ugyldig operasjon '%s' etterspurt. Operasjonen finnes ikke."
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr "Ugyldig bruk av aksjonen '%s'. Aksjonen vil bli ignorert."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1224 openbox/action.c:1242 openbox/action.c:1255
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Kunne ikke kjøre '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1263
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Feil ved konvertering av '%s' fra utf8 "
 
-#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
 msgid "Go there..."
 msgstr "Gå dit..."
 
-#: openbox/client_list_combined_menu.c:148
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "Vinduer"
 
@@ -136,7 +136,7 @@ msgstr "Ugyldig utdata fra pipe-menyen '%s'"
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Forsøkte å åpne menyen '%s', men denne finnes ikke"
 
-#: openbox/menu.c:331 openbox/menu.c:332
+#: openbox/menu.c:340 openbox/menu.c:341
 msgid "More..."
 msgstr "Mer..."
 
@@ -179,20 +179,20 @@ msgstr "Kunne ikke finne en gyldig konfigurasjonsfil, bruker standardverdier"
 msgid "Unable to load a theme."
 msgstr "Kan ikke laste et tema."
 
-#: openbox/openbox.c:394
+#: openbox/openbox.c:458
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Restart kunne ikke starte nytt program '%s': %s"
 
-#: openbox/openbox.c:464 openbox/openbox.c:466
+#: openbox/openbox.c:528 openbox/openbox.c:530
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:539
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [alternativer\n"
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:540
 msgid ""
 "\n"
 "Options:\n"
@@ -200,23 +200,23 @@ msgstr ""
 "\n"
 "Alternativ:\n"
 
-#: openbox/openbox.c:477
+#: openbox/openbox.c:541
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Vise denne hjelpeteksten og avslutt\n"
 
-#: openbox/openbox.c:478
+#: openbox/openbox.c:542
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Vis versjonsnummeret og avslutt\n"
 
-#: openbox/openbox.c:479
+#: openbox/openbox.c:543
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Erstatt den kjørende vindusbehandleren\n"
 
-#: openbox/openbox.c:480
+#: openbox/openbox.c:544
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Deaktiver tilkobling til sesjonsbehandleren\n"
 
-#: openbox/openbox.c:481
+#: openbox/openbox.c:545
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -224,15 +224,15 @@ msgstr ""
 "\n"
 "Sender beskjeder til en kjørende Openbox-instans:\n"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:546
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Oppdater Openbox' konfigurasjon\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:547
 msgid "  --restart           Restart Openbox\n"
-msgstr ""
+msgstr "  --restart           Start Openbox p� nytt\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:548
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -240,23 +240,23 @@ msgstr ""
 "\n"
 "Debug-alternativ:\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:549
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Kjør i synkron-modus\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:550
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Vis debuggingsinformasjon\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:551
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Vis debuggingsinformasjon for fokus-håndtering\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  -debug-xinerama    Splitt displayet for falske xinerama-skjermer\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:553
 #, c-format
 msgid ""
 "\n"
@@ -265,27 +265,27 @@ msgstr ""
 "\n"
 "Vennligst rapporter bugs til %s\n"
 
-#: openbox/openbox.c:586
+#: openbox/openbox.c:650
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Ugyldig kommandolinje-argument '%s'\n"
 
-#: openbox/screen.c:88 openbox/screen.c:189
+#: openbox/screen.c:89 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "En vindusbehandler kjører allerede på skjerm %d"
 
-#: openbox/screen.c:125
+#: openbox/screen.c:126
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Kunne ikke hendte vindusbehandlerens markering på skjerm %d"
 
-#: openbox/screen.c:146
+#: openbox/screen.c:147
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Vindusbehandleren på skjerm %d vil ikke avslutte"
 
-#: openbox/screen.c:939
+#: openbox/screen.c:987
 #, c-format
 msgid "desktop %i"
 msgstr "skrivebord %i"

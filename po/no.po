@@ -230,7 +230,7 @@ msgstr "  --reconfigure       Oppdater Openbox' konfigurasjon\n"
 
 #: openbox/openbox.c:547
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Start Openbox på nytt\n"
+msgstr "  --restart           Start Openbox pÃ¥ nytt\n"
 
 #: openbox/openbox.c:548
 msgid ""

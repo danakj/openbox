@@ -1,20 +1,391 @@
 3.4:
-  * Fixed several bugs, including the hanging of X when time is set backwards.
-  * Support windows with 32-bit visuals, this means xcompmgr and friends
-    works with openbox.
-  * Using pango is now mandatory.
-  * Better support for startup notification and added support for focus
-    stealing prevention. For apps you launch from Openbox you can add
-    <startupnotify><enabled>yes</enabled></startupnotify> to your action
-    tags.
+  * Add Indian Bengali translation
+  * Removed out-of-date Japanese translation (ja.po)
+  * Removed out-of-date Croatian translation (hr.po)
+  * Add new theme elements: window.active.title.separator.color and
+    window.inactive.title.separator.color  (note that globbing might set these
+    properties when you didnt mean to)
+  * Add new underMouse focus option
+  * Rename new theme element menu.items.activedisabled to
+    menu.items.active.disabled for consistency with other elements
+  * Fix left and right contexts resizing the wrong way in the example mouse
+    focus config file
+  * Fix so dock doesn't auto-hide when the mouse is inside it (over top of a
+    dock app)
+  * Allow new utility windows to gain focus like normal windows
+  * Add workarounds for Java Swing applications (Extra ConfigureNotify events)
+  * More fixes for modal window usability (Deiconify the modal window when you
+    try to focus its parent)
+  * Fixes to focus tracking, especially with iconify animation
+  * Changes to libobrender's API for ObConf 2.0 (RrThemeNew)
+  * Check for libxml >= 2.6.0 when compiling
+  * Fix for Openoffice windows (Static window gravity)
+  * Fix for hovering over window buttons while a menu is open
+  * Make the Escape key close all levels of a menu, not just one
+  * Change default drag threshold to 8px (Same as in XSettings)
+  * Fixes for windows restacking with TopIf, BottomIf, or Opposite modes.
+    Only compare with valid windows
+  * Fix for actions which find other window edges.  Find all windows, and only
+    windows which are on the right desktop
+  * Improve RaiseLower action (Not lower when it doesn't need to move the
+    window)
+  * Fix for the menu hideDelay (Don't hide immediately when you click to open
+    the menu), make it work reliably
+  * Make focusLast default to true when not present in the config file
+
+3.3.995:
+  * Fix bug introduced in 3.3.993 that prevented you from raising focused
+    windows above fullscreen windows
+  * Fix bug introduced in 3.3.993 that made the desktop window keep focus
+    when changing desktops
+  * Add Arabic translations
+  * Added Control-Alt-Up/Down bindings to the mouse focus example rc.xml
+  * Don't raise on clients in the client context in the mouse focus example
+    rc.xml
+  * Fixes for when to focus new windows - improve keeping transient windows
+    from stealing focus, and allow new windows to get focus when any relative
+    window is focused
+  * Fixes for frame decorations layout
+  * Fixes for forcing window sizes to fit on the screen.  Don't resize windows
+    if they are a user-specified size (USSize) or if they are non-normal
+    windows.  (Fix Rox pinboard mapping across multiple monitors)
+  * Centre window icons when they are not square
+  * Fixes for Java windows behaving badly - Java makes all kinds of
+    non-standard-compliant assumptions which we are forced to meet
+  * Changed startup notification timeout from 30 to 20 seconds
+  * Fix possible crashes and misbehaviors with new focus cycling dialogs
+  * Recreate enter events when Press mouse actions move windows (e.g. Lower
+    action) for focus-follows-mouse
+  * Update Slovak translation
+  * Highlight the first menu entry when there is a separator/header at the top
+  * Only highlight the first menu entry when the menu is opened with a key
+    binding
+  * Fix crash when you press enter with nothing selected in the menu
+  * Fix for ignoring an unmap event after restart
+  * Fixes for setting the clients' colormaps
+  * Change focusLast option behavior to what it was in 3.3.1.  It only affects
+    changing desktops.
+  * Add comments to the default rc.xml files about the various focus options
+  * Fix focus bug where a window had the keyboard grabbed when it unmapped
+    (Firefox gmarks extension)
+  * Update Catalan translation
+  * Fix alignment of the titlebar elements when the window icon is placed to
+    the right of the label
+  * Improve placement of child (transient) windows.  When their parent is
+    omnipresent, open the child on the current desktop only.
+  * When a window has modal children on another desktop and you try to focus
+    it, bring the modal child to the current desktop to focus it instead
+  * Let you focus cycle to windows with a modal child on another desktop
+  * Fix for not seeing windows change their partial strut
+  * Give iconified windows a faded icon in the focus cycling (Alt-Tab) dialog,
+    and in the client list menus
+  * Make it more difficult to select items by accident in parent menus when it
+    changes direction.  Moving the mouse only selects menu entries for a few
+    levels of open menus.  Mouse clicks will select menu entries further down.
+  * Add Simplified Chinese translation
+  * Set the current theme in the OB_THEME root property for other applications
+  * Notify ksplash when we have started up if dcop is installed
+  * Allow you to resize the window on the client padding as well as the outer
+    border
+  * Fix to show the focus cycle indicator when focus cycling and there is only
+    1 valid target
+  * Centre splash screens on one monitor
+  * Don't centre parent-less utility/menu/toolbar windows on the screen
+  * Remove the bottom decorations for fully maximized windows
+  * Fix crash when reconfiguring and no themes can be found
+
+3.3.994:
+  * Fix a bug introduced in .993 that prevented you from switching desktops
+    and caused general mayhem
+
+3.3.993:
+  * Update for Russian translation
+  * Added Dutch translation
+  * Fix for choosing badly sized icons from the window for the window cycling
+    dialog (and other things). (Fixes Pidgin icon)
+  * Open child (transient) windows on the current desktop if they don't have
+    a direct parent, or if the parents are not all on some other desktop.
+    (Fixes Pidgin and Gimp dialogs appearing on the wrong desktop)
+  * Make windows fit within the available space when they are first created,
+    if they are not user-positioned. (Fix xpdf making itself bigger than the
+    space inside the struts, and hiding behind them).
+  * Don't let child (transient) windows steal focus when the situation is
+    ambiguous
+  * Fix bevels and borders display in the titlebar
+  * Set the _NET_ACTIVE_WINDOW hint properly, when nothing is focused (This
+    is the proper fix for libwnck pagers.)
+  * Fallback focus immediately during iconify animation in all cases (was
+    missing RevertToParent case)
+  * Fix new frame elements being given 0 sizes for very small windows
+  * Send iconified windows to the bottom of the focus order so you can
+    Alt-Shift-Tab to get back what you just iconified. This makes things more
+    predictable.
+  * Show the hostname for remotely run programs in iconified titles
+  * Stop focus flicker when sending windows to a desktop and following them,
+    and when changing desktops with an omnipresent window focused
+  * Empty desktop names in the configuration file are not used, so you can set
+    a name on the second desktop without having to set one on the first
+  * Make control key work for menu accelerators like it does for mouse
+    clicking and hitting enter
+  * Add C-A-Up/Down mouse bindings to switch desktops, similar to the
+    C-A-Left/Right/Up/Down keyboard bindings
+
+3.3.992:
+  * Don't move mouse focus when the mouse is over the focus cycling dialog
+  * Fixes for positioning of frame decoration elements
+  * Update for Brazilian Portuguese translation
+  * Improvements in how decorations respond for maximized windows. (If they
+    can't be resized don't "hide" the resizing contexts)
+  * Updated Italian translation
+  * Added Czech translation
+  * Fix for applications that do weird things with modal windows (Make sure
+    you can focus cycle to them)
+  * Updated Spanish translation
+  * Fix for programs using the old WM-spec, and not setting unused fields to
+    0 in _NET_ACTIVE_WINDOW messages (Rox pinboard)
+  * Fixes for default rc.xml configuration file. Updated comments and comment
+    out the applications section in an xml compatible way.
+  * Update for Portuguese translation
+  * Fix support for window gravity (eg xterm -geometry -0+0)
+  * Fix for libwnck with iconify animation (Unmap the parent of the client's
+    window)
+  * Force the top left corner of new windows onto the screen area, if the
+    position wasn't requested by the user (Fix xpdf and others hiding their
+    titlebar under a panel)
+  * Fix for determining text geometry from Pango
+  * Save the desktop layout and names in the session, and restore them on next
+    log in.
+  * The &lt;desktop&gt; section from the configuration file is only used for
+    defaults, and so is only applied at the start of a new log-in. (Use ObConf
+    1.6.2 to change the config file for these options, and have them set
+    immediately, if you don't use a session manager to save them.)
+  * Fix updating and crashing in the old split client list menu
+  * Translate the default desktop names
+  * Update Taiwanese Chinese translation
+  * Less restrictions of behavior based on window type (Let you maximize
+    dialogs and utility windows)
+  * Fix for focus tracking when Press mouse actions are used
+  * Fix bug which let the openbox-*-session scripts take command-line arguments
+  * Better detection of legacy fullscreen windows vs. undercorated windows
+    that the user has maximized
+
+3.3.991:
+  * Added Brazilian Portuguese translation
+  * Added a rough Italian translation
+  * Added Estonian translation
+  * Update Polish translation
+  * Make focus stealing prevention a little less intrusive, especially with
+    default config
+  * Updates for Swedish translation
+  * Fixes for decorations of maximized windows
+  * Fix so that clicking in the corner of a maximized window presses the button
+  * Don't reload the session and reapply it when restarting
+  * Fix for losing the original size of a window that mapped with maximized
+    state (or on restart)
+  * Let you move splash type windows
+  * Fix for window placement using wrong dimensions
+  * Stop xemacs ConfigureNotify storm
+  * Fix bug stopping panels from moving themselves off-screen to hide
+    themselves
+  * Fix for GNOME/Openbox and openbox-gnome-session to use a new session name,
+    because GNOME won't let you replace the window manager in the saved session
+  * Don't restore session state when multiple windows have the same
+    identifiers, because we can't tell them apart then (Firefox/Thunderbird)
+  * Small fixes to build system to make it more reliable
+  * Fix for what manpage files are distributed in the source code, so they
+    will not be pre-built with the wrong info
+  * Fix pkg-config files for compiling things against Openbox libraries
+
+3.3.990:
+  * Wildcard matching for per-application (per-window) settings. Let you match
+    multiple rules for a window. (Props to Mark Pustjens for code to do this.)
+  * Added startup notification support to the menus and key/mouse bindings
+    with <startupnotify>. It's an option for execute actions.
+  * New combined client menu, accessed with
+    <action name="ShowMenu"><menu>client-list-combined-menu</menu></action>
+  * No menu titles - instead added separators with labels to be used as menu
+    headers anywhere in menus
+  * Improved client menu - placement, the options in it, and added an icon for
+    "All Desktops"
+  * Keyboard shortcuts in menus, by highlighted letter or by the first letter
+  * Menus dont jump around, are always placed on screen
+  * Menus larger than can fit on the screen are broken into a submenu at the
+    bottom titled "More..."
+  * Disabled menu items can be selected now (not used though, of course)
+  * Using ()'s instead of a line separator to signify iconified windows in the
+    client list menus
+  * New Root context for mouse bindings
+  * New "alt-tab" focus switching dialog
+  * openbox-session command and log-in option which provides the autostart
+    capability.
+  * SCIM support in the default Openbox session launched by the
+    openbox-session command
+  * Many code paths made significantly faster
+  * Sections of code rewritten to be more reliable, such as session
+    save/restore and input focus handling
+  * Handle the X server's clock going backwards, without locking up. Sometimes
+    the server can still lock up though, it is not recommended to do this!
+  * Better handling of window types such as docks, utility windows, tool bar
+    windows. Clicking to focus these windows is done more intelligently.  Dock
+    windows no longer get focus when you click them, so that you don't have
+    focus flickering when you use a dock window with a taskbar.
+  * Better language support through Pango, which is now mandatory, and the
+    code for Pango has been greatly improved and optimized.
+  * Support for windows that use true 32-bit transparency
+  * Resize grips (with mouse binding contexts) for the top, left, and right of
+    the window frame
+  * Smarter about keeping windows on the screen without invading user's
+    capabilities
   * Add MoveFromEdge* actions corresponding to MoveToEdge* but aligns far
     edges instead of near edges, so if you have two overlapping windows you
     can easily put them side by side.
-  * (xinerama) Make all placement strategies place windows on the screen with
-    the mouse pointer, not just UnderMouse.
-  * Fonts are now configured in rc.xml, not the theme.
-  * You can now call `openbox --reconfigure' to have openbox reread config
-    files instead of using killall -USR2 openbox.
+  * Better choice of mouse cursors for startup notification
+  * Focus stealing prevention
+  * Improve window placement across multiple Xinerama monitors
+  * Support 8-bit truecolor visuals (such as in vncserver)
+  * Better, more friendly support for omnipresent windows
+  * Full support for EWMH 1.4-draft2
+  * Iconify/restore animation !
+  * Improved support for running openbox with multiple screens (non-xinerama)
+    - won't steal focus from other screens, and let you focus a screen by
+    clicking on the desktop (root window).
+  * Support for more cursors through XCursor, means that startup notification
+    can use a pointer+watch cursor if you are using an XCursor theme
+  * Fully maximize terminal windows (and any resized-by-increment window)
+  * Show the hostname of clients running on remote computers in the titlebar
+  * Add <panels> and <desktop> options to NextWindow, PreviousWindow,
+    DirectionalFocusNorth etc..
+  * Synchronize resizing with the application when possible
+  * Smarter subdivision of windows into 9 sections for resizing
+  * Set default icon on windows so applications can agree on an icon
+  * Better support for programs that are on more than one desktop
+    (multiple firefox windows for example) - move to the desktop when you're
+    using the application and it opens a window on another desktop.
+  * Chrooted key chains, and key quoting through chroots
+  * New BreakChroot action to break out of the current chroot
+  * New keychains popup, to show where you are in a keychain
+  * Improved show-desktop mode. When you open a new window, the old windows
+    are not all restored
+  * Add <allDesktops> option to NextWindow and PreviousWindow. The desktop
+    name will be shown in the focus cycling popup
+  * Dynamically size the window and desktop dialogs. Desktop layouts that
+    aren't horizontal look better in the desktop cycling dialog.
+  * Support for legacy fullscreen applications (that don't use EWMH) such as
+    VLC
+  * Session support for old clients that do not use the session management
+    protocol
+  * Desktop setup is only changed on startup, so as to not overwrite settings
+    from other apps like pagers
+  * Take advantage of ksmserver (KDE Session Manager) features
+  * KDE/Openbox and GNOME/Openbox options for display manager GDM/KDM. Use
+    openbox-gnome-session and openbox-kde-session to run a GNOME or KDE
+    session with Openbox as the window manager.
+  * Titlebar buttons autohide when hiding won't move other buttons (removed
+    the hideDisabled option from config file)
+  * Support user time window hint, which is good for laptops power usage
+  * When legacy windows raise themselves, interpreate as wanting to be
+    activated. Makes Firefox more pleasant.
+  * Don't show handles on windows that cant resize for more extreme visual
+    minimalism
+  * Let you move maximized windows between Xinerama monitors
+  * Improve application awareness of focus, e.g. Kopete and Firefox, so they
+    know when they are or aren't focused, and which window in their
+    application is focused
+  * Improvements in the distributed themes
+  * Add new Clearlooks and Clearlooks-Olive themes by John McKnight
+  * Fonts are no longer loaded from theme. They are loaded from the rc.xml
+    config file. Font shadow settings are still loaded from the theme though.
+    5 fonts to be set: ActiveWindow InactiveWindow, MenuHeader, MenuItem and
+    OnScreenDisplay
+  * Distributed theme names have been renamed with Capitalization
+  * menu.items.activedisabled.text.color
+  * menu.border.color   (note that globbing might set these properties when
+    you didnt mean to)
+  * window.active.border.color   (note that globbing might set these
+    properties when you didnt mean to)
+  * window.inactive.border.color   (note that globbing might set these
+    properties when you didnt mean to)
+  * menu.border.width
+  * Guarantee that titlebar buttons are even sized, so even sized icons
+    (button masks) will be centered
+  * Default titlebar button icons (as xbms) installed to /usr/share/doc/openbox
+  * New mouse binding contexts Left, Right, TLCorner, TRCorner and Top. These
+    need bindings in config file to be useful. Also new context Bottom which
+    is synonym for Handle.
+  * W is no longer hard coded to Mod4. It is now a shortcut for Super, which
+    is usually bound to Mod4. xmodmap will show your mapping.
+  * The per-app setting <head> has been renamed to <monitor>
+  * Can use "default" for anything in per-app settings
+  * Removed <edges_hit_layers_below> option from config file
+  * --reconfigure command line option
+  * --restart command line option
+  * Closed bug #886 - Reference point for client-menu
+  * Closed bug #898 - Add option for OB2 style menu behaviour
+  * Closed bug #952 - Focus sometimes gets lost when closing windows
+  * Closed bug #1006 - duplicate window title numbering is so-so
+  * Closed bug #1080 - menus dont update when using ctrl to keep them open
+  * Closed bug #1082 - doing window stuff while changing focus is mad slow
+  * Closed bug #1106 - Openbox resize problems with Beep Media Player and some
+    websites using Mozilla
+  * Closed bug #1146 - minimized windows dont unminimize from fspanel if ob
+    restarted
+  * Closed bug #1409 - Window stacking is messed up when dealing with multiple
+    nested dialog boxes
+  * Closed bug #1526 - Incorrect handling of utility windows
+  * Closed bug #1846 - Patch for theme overrides
+  * Closed bug #1974 - Limit the number of resizes per second to make window
+    resizing smoother
+  * Closed bug #2060 - Apps disappear when using composite extension
+  * Closed bug #2221 - _NET_WM_STATE_(ABOVE|BELOW) is being inherited
+  * Closed bug #2250 - openbox ignores size request ?
+  * Closed bug #2251 - support for legacy ""fullscreen""
+  * Closed bug #2254 - segfault in render/render.c on sendtodesktop [endian?]
+  * Closed bug #2255 - segmentation fault on 8-bit truecolor visual
+  * Closed bug #2258 - long menus truncated
+  * Closed bug #2311 - Does not display the pressed state while a button in the
+    frame is toggled
+  * Closed bug #2321 - ResizeRelative -up and -left makes window move when at
+    min_size
+  * Closed bug #2483 - Pinned windows raise to top on all desktops when they
+    become focused on just one desktop
+  * Closed bug #2491 - Client List by App instead of by Desktop
+  * Closed bug #2551 - Request to be able to cycle docks (e.g.
+  * Closed bug #2659 - Menu header display should be configurable
+  * Closed bug #2769 - temporarily chroot the keychain tree
+  * Closed bug #2841 - Changes to the keepborder option aren't applied when
+    reconfiguring
+  * Closed bug #2850 - Openbox gives black backgrounds to windows using the
+    new 'rgba' or 'argb' visual
+  * Closed bug #2865 - openbox 3.3 is not C89 compatible
+  * Closed bug #2872 - Focus issues with Eclipse and Firefox
+  * Closed bug #2878 - Openbox crash when used with vncserver
+  * Closed bug #2897 - Openbox shouldn't redraw the whole screen everytime
+    when minimizing windows.
+  * Closed bug #2898 - Patch adding advanced keyboard support in popup menus.
+  * Closed bug #2982 - tilda doesn't work propertly
+  * Closed bug #3034 - themeupdate.py seems to bee broken
+  * Closed bug #3045 - RrPaint in obrender should be split for easier use by
+    external apps
+  * Closed bug #3050 - 'syscrash' theme update
+  * Closed bug #3051 - When closing windows
+  * Closed bug #3053 - Updates de.po for German Localisation
+  * Closed bug #3059 - Feature Request: NextWindowForAllWorkspaces
+  * Closed bug #3063 - extensions_xinerama_screens() leaks memory if Xinerama
+    is enabled
+  * Closed bug #3064 - slist_path_add() might leak memory
+  * Closed bug #3068 - Multimonitor focus problems
+  * Closed bug #3081 - window doesn't appear
+  * Closed bug #3092 - Config parser expects wrong values of "layer" in
+    per-application settings
+  * Closed bug #3094 - smart placement should Ignore maximized windows
+  * Closed bug #3100 - Netwmpager is configured with layer = "below" but OB
+    is ignoring it
+  * Closed bug #3101 - Openbox won't compile on CentOS 4.4
+  * Closed bug #3102 - svn-6175 windows come not back in the foregroud
+  * Closed bug #3106 - Fullscreened mplayer loses focus when switching to
+    another desktop and back
+  * Closed bug #3108 - After revision 6437 the desktop dialog window stays on
+    screen
 
 3.3.1:
   * Fix panels getting a border with keepBorder turned on.

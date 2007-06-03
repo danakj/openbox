@@ -95,9 +95,11 @@ void framerender_frame(ObFrame *self)
         XSetWindowBackground(ob_display, self->rgripbottom, px);
         XClearWindow(ob_display, self->rgripbottom);
 
-        px = (self->focused ?
-              RrColorPixel(ob_rr_theme->title_separator_focused_color) :
-              RrColorPixel(ob_rr_theme->title_separator_unfocused_color));
+        /* don't use the separator color for shaded windows */
+        if (!self->client->shaded)
+            px = (self->focused ?
+                  RrColorPixel(ob_rr_theme->title_separator_focused_color) :
+                  RrColorPixel(ob_rr_theme->title_separator_unfocused_color));
 
         XSetWindowBackground(ob_display, self->titlebottom, px);
         XClearWindow(ob_display, self->titlebottom);

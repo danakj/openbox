@@ -447,7 +447,10 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for && client->type == OB_CLIENT_TYPE_DIALOG) {
-        if (client->transient_for != OB_TRAN_GROUP && !client->iconic) {
+        if (client->transient_for != OB_TRAN_GROUP &&
+            client_normal(client->transient_for) &&
+            !client->iconic)
+        {
             ObClient *c = client;
             ObClient *p = client->transient_for;
 

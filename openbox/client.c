@@ -1152,6 +1152,9 @@ static void client_get_desktop(ObClient *self)
 
                 for (it = self->group->members; it; it = g_slist_next(it)) {
                     ObClient *c = it->data;
+
+                    if (c->desktop == DESKTOP_ALL) continue;
+
                     if (c != self) {
                         if (first) {
                             all = c->desktop;
@@ -3519,10 +3522,6 @@ gboolean client_focus(ObClient *self)
     self = client_focus_target(self);
 
     if (!client_can_focus(self)) {
-        if (!self->frame->visible) {
-            /* update the focus lists */
-            focus_order_to_top(self);
-        }
         ob_debug_type(OB_DEBUG_FOCUS,
                       "Client %s can't be focused\n", self->title);
         return FALSE;

@@ -69,7 +69,9 @@ static Rect **pick_head(ObClient *c)
         choice[i] = screen_num_monitors; /* make them all invalid to start */
 
     /* try direct parent first */
-    if (c->transient_for && c->transient_for != OB_TRAN_GROUP) {
+    if (c->transient_for && c->transient_for != OB_TRAN_GROUP &&
+        client_normal(c->transient_for))
+    {
         add_choice(choice, client_monitor(c->transient_for));
         ob_debug("placement adding choice %d for parent\n",
                  client_monitor(c->transient_for));
@@ -445,7 +447,10 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for && client->type == OB_CLIENT_TYPE_DIALOG) {
-        if (client->transient_for != OB_TRAN_GROUP && !client->iconic) {
+        if (client->transient_for != OB_TRAN_GROUP &&
+            client_normal(client->transient_for) &&
+            !client->iconic)
+        {
             ObClient *c = client;
             ObClient *p = client->transient_for;
 

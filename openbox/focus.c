@@ -97,6 +97,7 @@ void focus_set_client(ObClient *client)
 
 static ObClient* focus_fallback_target(gboolean allow_refocus,
                                        gboolean allow_pointer,
+                                       gboolean allow_omnipresent,
                                        ObClient *old)
 {
     GList *it;
@@ -118,12 +119,13 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
         c = it->data;
         /* fallback focus to a window if:
            1. it is on the current desktop. this ignores omnipresent
-           windows, which are problematic in their own rite.
+           windows, which are problematic in their own rite, unless they are
+           specifically allowed
            2. it is a normal type window, don't fall back onto a dock or
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (c->desktop == screen_desktop &&
+        if ((allow_omnipresent || c->desktop == screen_desktop) &&
             client_normal(c) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
@@ -155,7 +157,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
     return NULL;
 }
 
-ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer)
+ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer,
+                         gboolean allow_omnipresent)
 {
     ObClient *new;
     ObClient *old = focus_client;
@@ -165,7 +168,8 @@ ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer)
        event at all for them. */
     focus_nothing();
 
-    new = focus_fallback_target(allow_refocus, allow_pointer, old);
+    new = focus_fallback_target(allow_refocus, allow_pointer,
+                                allow_omnipresent, old);
     /* get what was really focused */
     if (new) new = client_focus_target(new);
 

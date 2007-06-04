@@ -587,7 +587,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last)))
+    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last, FALSE)))
     {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is
@@ -1050,7 +1050,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     else if (!show_only) {
         ObClient *c;
 
-        if ((c = focus_fallback(TRUE, FALSE))) {
+        if ((c = focus_fallback(TRUE, FALSE, TRUE))) {
             /* only do the flicker reducing stuff ahead of time if we are going
                to call xsetinputfocus on the window ourselves. otherwise there
                is no guarantee the window will actually take focus.. */

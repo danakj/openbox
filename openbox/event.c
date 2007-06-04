@@ -1064,6 +1064,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         if (e->xconfigurerequest.value_mask & CWStackMode) {
             ObClient *sibling = NULL;
+            gulong ignore_start;
 
             /* get the sibling */
             if (e->xconfigurerequest.value_mask & CWSibling) {
@@ -1075,9 +1076,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
 
             /* activate it rather than just focus it */
+            if (!config_focus_under_mouse)
+                ignore_start = event_start_ignore_all_enters();
             stacking_restack_request(client, sibling,
                                      e->xconfigurerequest.detail,
                                      TRUE);
+            if (!config_focus_under_mouse)
+                event_end_ignore_all_enters(ignore_start);
 
             /* if a stacking change moves the window without resizing */
             move = TRUE;
@@ -1420,9 +1425,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     e->xclient.data.l[2] == TopIf ||
                     e->xclient.data.l[2] == Opposite)
                 {
+                    gulong ignore_start;
+
+                    if (!config_focus_under_mouse)
+                        ignore_start = event_start_ignore_all_enters();
                     /* just raise, don't activate */
                     stacking_restack_request(client, sibling,
                                              e->xclient.data.l[2], FALSE);
+                    if (!config_focus_under_mouse)
+                        event_end_ignore_all_enters(ignore_start);
+
                     /* send a synthetic ConfigureNotify, cuz this is supposed
                        to be like a ConfigureRequest. */
                     client_reconfigure(client);

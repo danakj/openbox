@@ -37,9 +37,9 @@ static void gradient_pyramid(RrSurface *sf, gint inw, gint inh);
 void RrRender(RrAppearance *a, gint w, gint h)
 {
     RrPixel32 *data = a->surface.pixel_data;
-    RrPixel32 current, *source, *dest;
+    RrPixel32 current;
     guint r,g,b;
-    gint off, x, sw, sh, partial_w, partial_h, i;
+    gint off, x;
 
     switch (a->surface.grad) {
     case RR_SURFACE_PARENTREL:

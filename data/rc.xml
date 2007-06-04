@@ -26,7 +26,7 @@
        this many milliseconds (1000 = 1 sec) before moving focus to it -->
   <raiseOnFocus>no</raiseOnFocus>
   <!-- when followMouse is enabled, and a window is given focus by moving the
-       mouse into it, also raise the window -->
+s       mouse into it, also raise the window -->
 </focus>
 
 <placement>

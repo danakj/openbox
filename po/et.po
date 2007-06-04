@@ -234,7 +234,7 @@ msgstr "  --reconfigure       Openboxi konfiguratsioon uuesti laadimine\n"
 
 #: openbox/openbox.c:483
 msgid "  --restart           Restart Openbox\n"
-msgstr ""
+msgstr "  --restart           Openboxi taaskäivitamine\n"
 
 #: openbox/openbox.c:484
 msgid ""

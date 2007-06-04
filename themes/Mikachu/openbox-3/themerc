@@ -7,14 +7,14 @@ menu.title.bg.border.color: #000000
 menu.title.text.color: #CCCCFF
 menu.title.text.justify: center
 
-menu.items.bg: flat gradient horizontal bevel1
-menu.items.bg.color: #AAAACC
-menu.items.bg.colorTo: #AAAAD0
+menu.items.bg: flat gradient vertical bevel1
+menu.items.bg.color: #B8B8D8
+menu.items.bg.colorTo: #A0A0BA
 menu.items.bg.border.color: #000000
 menu.items.text.color: #000022
 menu.items.disabled.text.color: #711
 
-menu.items.active.bg: raised gradient horizontal bevel1
+menu.items.active.bg: raised gradient mirrorhorizontal bevel1
 menu.items.active.bg.color: #555577
 menu.items.active.bg.colorTo: #6699CC
 menu.items.active.bg.border.color: #000000
@@ -26,7 +26,7 @@ menu.frame.justify: left
 window.label.text.justify: left
 
 !! focused window settings
-window.active.client.color: #00FF00
+window.active.client.color: #80A080
 
 window.active.title.bg: raised gradient crossdiagonal bevel1
 window.active.title.bg.color: #6699CC
@@ -55,13 +55,13 @@ window.active.button.unpressed.bg.colorTo: #000000
 window.active.button.unpressed.bg.border.color: #000000
 window.active.button.unpressed.image.color: grey85
 
-window.active.button.pressed.bg: sunken gradient crossdiagonal bevel1
+window.active.button.pressed.bg: sunken parentrelative bevel1
 window.active.button.pressed.bg.color: #6699CC
 window.active.button.pressed.bg.colorTo: #334866
 window.active.button.pressed.bg.border.color: #000000
 window.active.button.pressed.image.color: green
 
-window.active.button.toggled.bg: sunken gradient crossdiagonal bevel1
+window.active.button.toggled.bg: sunken parentrelative bevel2
 window.active.button.toggled.bg.color: #6699CC
 window.active.button.toggled.bg.colorTo: #334866
 window.active.button.toggled.bg.border.color: #000000
@@ -89,8 +89,8 @@ window.active.button.hover.bg.border.color: #000000
 window.inactive.client.color: grey50
 
 window.inactive.title.bg: flat gradient diagonal bevel1
-window.inactive.title.bg.color: #7F7F88
-window.inactive.title.bg.colorTo: #33333B
+window.inactive.title.bg.color: #7F7FA0
+window.inactive.title.bg.colorTo: #333350
 window.inactive.title.bg.border.color: #000000
 
 window.inactive.handle.bg: flat gradient diagonal bevel1
@@ -107,7 +107,7 @@ window.inactive.label.bg: parentrelative
 window.inactive.label.bg.color: #000000
 window.inactive.label.bg.colorTo: #000000
 window.inactive.label.bg.border.color: #000000
-window.inactive.label.text.color: grey70
+window.inactive.label.text.color: #C3C3E0
 
 window.inactive.button.unpressed.bg: parentrelative
 window.inactive.button.unpressed.bg.color: #000000
@@ -115,7 +115,7 @@ window.inactive.button.unpressed.bg.colorTo: #000000
 window.inactive.button.unpressed.bg.border.color: #000000
 window.inactive.button.unpressed.image.color: grey60
 
-window.inactive.button.pressed.bg: sunken gradient crossdiagonal bevel1
+window.inactive.button.pressed.bg: sunken parentrelative bevel1
 window.inactive.button.pressed.bg.color: grey60
 window.inactive.button.pressed.bg.colorTo: grey20
 window.inactive.button.pressed.bg.border.color: #000000
@@ -127,7 +127,7 @@ window.inactive.button.disabled.bg.colorTo: #000000
 window.inactive.button.disabled.bg.border.color: #000000
 window.inactive.button.disabled.image.color:  #000000
 
-window.inactive.button.toggled.bg: sunken gradient crossdiagonal bevel1
+window.inactive.button.toggled.bg: sunken parentrelative bevel2
 window.inactive.button.toggled.bg.color: grey60
 window.inactive.button.toggled.bg.colorTo: grey20
 window.inactive.button.toggled.bg.border.color: #000000

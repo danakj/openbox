@@ -85,6 +85,14 @@ typedef enum {
     RR_JUSTIFY_RIGHT
 } RrJustify;
 
+/* Put middle first so it's the default */
+typedef enum {
+    RR_ELLIPSIZE_MIDDLE,
+    RR_ELLIPSIZE_NONE,
+    RR_ELLIPSIZE_START,
+    RR_ELLIPSIZE_END
+} RrEllipsizeMode;
+
 typedef enum {
     RR_FONTWEIGHT_LIGHT,
     RR_FONTWEIGHT_NORMAL,
@@ -128,6 +136,7 @@ struct _RrTextureText {
     guchar shadow_alpha;
     gboolean shortcut; /*!< Underline a character */
     guint shortcut_pos; /*!< Position in bytes of the character to underline */
+    RrEllipsizeMode ellipsize;
 };
 
 struct _RrPixmapMask {

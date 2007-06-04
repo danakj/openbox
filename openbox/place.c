@@ -274,7 +274,7 @@ typedef enum
                      screen_desktop : placer->desktop)))
 
 static gboolean place_smart(ObClient *client, gint *x, gint *y,
-                            ObSmartType type)
+                            ObSmartType type, gboolean ignore_max)
 {
     gboolean ret = FALSE;
     GSList *spaces = NULL, *sit;
@@ -299,7 +299,8 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
 
             if (WINDOW_IS_CLIENT(it->data)) {
                 c = it->data;
-                if (c->fullscreen || (c->max_vert && c->max_horz))
+                if (ignore_max &&
+                    (c->fullscreen || (c->max_vert && c->max_horz)))
                     continue;
             } else
                 continue;
@@ -323,7 +324,8 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
 
                 if (WINDOW_IS_CLIENT(it->data)) {
                     c = it->data;
-                    if (c->fullscreen || (c->max_vert && c->max_horz))
+                    if (ignore_max &&
+                        (c->fullscreen || (c->max_vert && c->max_horz)))
                         continue;
                 } else
                     continue;
@@ -440,7 +442,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for && client->type == OB_CLIENT_TYPE_DIALOG) {
-        if (client->transient_for != OB_TRAN_GROUP) {
+        if (client->transient_for != OB_TRAN_GROUP && !client->iconic) {
             ObClient *c = client;
             ObClient *p = client->transient_for;
 
@@ -457,7 +459,9 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
             gint l, r, t, b;
             for (it = client->group->members; it; it = g_slist_next(it)) {
                 ObClient *m = it->data;
-                if (!(m == client || m->transient_for) && client_normal(m)) {
+                if (!(m == client || m->transient_for) && client_normal(m) &&
+                    !m->iconic)
+                {
                     if (first) {
                         l = RECT_LEFT(m->frame->area);
                         t = RECT_TOP(m->frame->area);
@@ -510,9 +514,11 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         place_per_app_setting(client, x, y, settings) ||
         ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
          place_under_mouse(client, x, y) :
-         place_smart(client, x, y, SMART_FULL)    ||
-         place_smart(client, x, y, SMART_GROUP)   ||
-         place_smart(client, x, y, SMART_FOCUSED) ||
+         place_smart(client, x, y, SMART_FULL, FALSE)   ||
+         place_smart(client, x, y, SMART_FULL, TRUE)    ||
+         place_smart(client, x, y, SMART_GROUP, FALSE)  ||
+         place_smart(client, x, y, SMART_GROUP, TRUE)   ||
+         place_smart(client, x, y, SMART_FOCUSED, TRUE) ||
          place_random(client, x, y))))
         g_assert_not_reached(); /* the last one better succeed */
     /* get where the client should be */

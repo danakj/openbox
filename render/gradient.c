@@ -24,6 +24,7 @@
 #include <glib.h>
 
 static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised);
+static void gradient_parentrelative(RrAppearance *a, gint w, gint h);
 static void gradient_solid(RrAppearance *l, gint w, gint h);
 static void gradient_splitvertical(RrAppearance *a, gint w, gint h);
 static void gradient_vertical(RrSurface *sf, gint w, gint h);
@@ -36,11 +37,14 @@ static void gradient_pyramid(RrSurface *sf, gint inw, gint inh);
 void RrRender(RrAppearance *a, gint w, gint h)
 {
     RrPixel32 *data = a->surface.pixel_data;
-    RrPixel32 current;
+    RrPixel32 current, *source, *dest;
     guint r,g,b;
-    gint off, x;
+    gint off, x, sw, sh, partial_w, partial_h, i;
 
     switch (a->surface.grad) {
+    case RR_SURFACE_PARENTREL:
+        gradient_parentrelative(a, w, h);
+        break;
     case RR_SURFACE_SOLID:
         gradient_solid(a, w, h);
         break;
@@ -188,6 +192,34 @@ static void create_bevel_colors(RrAppearance *l)
     b = (b >> 1) + (b >> 2);
     g_assert(!l->surface.bevel_dark);
     l->surface.bevel_dark = RrColorNew(l->inst, r, g, b);
+}
+
+static void gradient_parentrelative(RrAppearance *a, gint w, gint h)
+{
+    RrPixel32 *source, *dest;
+    gint sw, sh, partial_w, partial_h, i;
+
+    g_assert (a->surface.parent);
+    g_assert (a->surface.parent->w);
+
+    sw = a->surface.parent->w;
+    sh = a->surface.parent->h;
+
+    source = (a->surface.parent->surface.pixel_data +
+            a->surface.parentx + sw * a->surface.parenty);
+    dest = a->surface.pixel_data;
+
+    if (a->surface.parentx + w > sw) {
+        partial_w = sw - a->surface.parentx;
+    } else partial_w = w;
+
+    if (a->surface.parenty + h > sh) {
+        partial_h = sh - a->surface.parenty;
+    } else partial_h = h;
+
+    for (i = 0; i < partial_h; i++, source += sw, dest += w) {
+        memcpy(dest, source, partial_w * sizeof(RrPixel32));
+    }
 }
 
 static void gradient_solid(RrAppearance *l, gint w, gint h) 

@@ -242,7 +242,7 @@ gchar *parse_string(xmlDocPtr doc, xmlNodePtr node)
 gint parse_int(xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *c = xmlNodeListGetString(doc, node->children, TRUE);
-    gint i = atoi((gchar*)c);
+    gint i = c ? atoi((gchar*)c) : 0;
     xmlFree(c);
     return i;
 }

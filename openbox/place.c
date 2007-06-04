@@ -268,7 +268,10 @@ typedef enum
 } ObSmartType;
 
 #define SMART_IGNORE(placer, c) \
-    (placer == c || c->shaded || !client_normal(c) || !c->frame->visible || \
+    (placer == c || c->shaded || !c->frame->visible || \
+     c->type == OB_CLIENT_TYPE_SPLASH || c->type == OB_CLIENT_TYPE_DESKTOP || \
+     ((c->type == OB_CLIENT_TYPE_MENU || c->type == OB_CLIENT_TYPE_TOOLBAR) &&\
+      client_has_parent(c)) || \
      (c->desktop != DESKTOP_ALL && \
       c->desktop != (placer->desktop == DESKTOP_ALL ? \
                      screen_desktop : placer->desktop)))

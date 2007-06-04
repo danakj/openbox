@@ -1,13 +1,19 @@
 3.4:
   * Add Indian Bengali translation
+  * Updated Italian translation
+  * Small updates to Czech, Estonian, Norwegian, and German translations
   * Removed out-of-date Japanese translation (ja.po)
   * Removed out-of-date Croatian translation (hr.po)
+  * Allow parentrelative theme textures to have borders and bevels
   * Add new theme elements: window.active.title.separator.color and
     window.inactive.title.separator.color  (note that globbing might set these
     properties when you didnt mean to)
   * Add new underMouse focus option
   * Rename new theme element menu.items.activedisabled to
     menu.items.active.disabled for consistency with other elements
+  * Improvements to smart placement - especially with xinerama (Twinview)
+  * Fix bug #3196 - Unable to alt-tab away from full-screen windows
+  * Fix crash in parsing empty xml fields
   * Fix left and right contexts resizing the wrong way in the example mouse
     focus config file
   * Fix so dock doesn't auto-hide when the mouse is inside it (over top of a

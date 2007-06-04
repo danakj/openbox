@@ -12,6 +12,11 @@
   * Rename new theme element menu.items.activedisabled to
     menu.items.active.disabled for consistency with other elements
   * Improvements to smart placement - especially with xinerama (Twinview)
+  * Fixes for focus with omnipresent windows - Allow focus to fallback to them
+    except during desktop switches (other mechanisms exist for that)
+  * Fix for putting child windows (transients) on all desktops
+  * Fix focus fallback when windows are not visible (showing the desktop, or
+    iconic windows)
   * Fix bug #3196 - Unable to alt-tab away from full-screen windows
   * Fix crash in parsing empty xml fields
   * Fix left and right contexts resizing the wrong way in the example mouse

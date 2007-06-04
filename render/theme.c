@@ -1598,30 +1598,33 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
         } else {
             *grad = RR_SURFACE_SOLID;
         }
-
-        if (strstr(tex, "sunken") != NULL)
-            *relief = RR_RELIEF_SUNKEN;
-        else if (strstr(tex, "flat") != NULL)
-            *relief = RR_RELIEF_FLAT;
-        else
-            *relief = RR_RELIEF_RAISED;
-
-        *border = FALSE;
-        if (*relief == RR_RELIEF_FLAT) {
-            if (strstr(tex, "border") != NULL)
-                *border = TRUE;
-        } else {
-            if (strstr(tex, "bevel2") != NULL)
-                *bevel = RR_BEVEL_2;
-            else
-                *bevel = RR_BEVEL_1;
-        }
-
-        if (strstr(tex, "interlaced") != NULL)
-            *interlaced = TRUE;
-        else
-            *interlaced = FALSE;
     }
+
+    if (strstr(tex, "sunken") != NULL)
+        *relief = RR_RELIEF_SUNKEN;
+    else if (strstr(tex, "flat") != NULL)
+        *relief = RR_RELIEF_FLAT;
+    else if (strstr(tex, "raised") != NULL)
+        *relief = RR_RELIEF_RAISED;
+    else
+        *relief = (*grad == RR_SURFACE_PARENTREL) ?
+                  RR_RELIEF_FLAT : RR_RELIEF_RAISED;
+
+    *border = FALSE;
+    if (*relief == RR_RELIEF_FLAT) {
+        if (strstr(tex, "border") != NULL)
+            *border = TRUE;
+    } else {
+        if (strstr(tex, "bevel2") != NULL)
+            *bevel = RR_BEVEL_2;
+        else
+            *bevel = RR_BEVEL_1;
+    }
+
+    if (strstr(tex, "interlaced") != NULL)
+        *interlaced = TRUE;
+    else
+        *interlaced = FALSE;
 }
 
 

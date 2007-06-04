@@ -40,8 +40,7 @@ static void pixel_data_to_pixmap(RrAppearance *l,
 
 Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
 {
-    gint i, transferred = 0, sw, sh, partial_w, partial_h, force_transfer = 0;
-    RrPixel32 *source, *dest;
+    gint i, transferred = 0, force_transfer = 0;
     Pixmap oldp = None;
     RrRect tarea; /* area in which to draw textures */
     gboolean resized;
@@ -82,30 +81,7 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
         a->surface.pixel_data = g_new(RrPixel32, w * h);
     }
 
-    if (a->surface.grad == RR_SURFACE_PARENTREL) {
-        g_assert (a->surface.parent);
-        g_assert (a->surface.parent->w);
-
-        sw = a->surface.parent->w;
-        sh = a->surface.parent->h;
-
-        source = (a->surface.parent->surface.pixel_data +
-                  a->surface.parentx + sw * a->surface.parenty);
-        dest = a->surface.pixel_data;
-
-        if (a->surface.parentx + w > sw) {
-            partial_w = sw - a->surface.parentx;
-        } else partial_w = w;
-
-        if (a->surface.parenty + h > sh) {
-            partial_h = sh - a->surface.parenty;
-        } else partial_h = h;
-
-        for (i = 0; i < partial_h; i++, source += sw, dest += w) {
-            memcpy(dest, source, partial_w * sizeof(RrPixel32));
-        }
-    } else
-        RrRender(a, w, h);
+    RrRender(a, w, h);
 
     {
         gint l, t, r, b;

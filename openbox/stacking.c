@@ -405,7 +405,8 @@ static GList *find_highest_relative(ObClient *client)
 void stacking_add_nonintrusive(ObWindow *win)
 {
     ObClient *client;
-    GList *it_below = NULL;
+    GList *it_below = NULL; /* this client will be below us */
+    GList *it_above;
 
     if (!WINDOW_IS_CLIENT(win)) {
         stacking_add(win); /* no special rules for others */
@@ -417,53 +418,55 @@ void stacking_add_nonintrusive(ObWindow *win)
     /* insert above its highest parent (or its highest child !) */
     it_below = find_highest_relative(client);
 
-    if (!it_below && client != focus_client) {
-        /* nothing to put it directly above, so try find the focused client to
-           put it underneath it */
-        if (focus_client && focus_client->layer == client->layer) {
-            if ((it_below = g_list_find(stacking_list, focus_client)))
-                it_below = it_below->next;
-        }
-    }
     if (!it_below) {
-        /* There is no window to put this directly above, so put it at the
-           top, so you know it is there.
-
-           It used to do this only if the window was focused and lower
-           it otherwise.
-
-           We also put it at the top not the bottom to fix a bug with
-           fullscreen windows. When focusLast is off and followsMouse is
-           on, when you switch desktops, the fullscreen window loses
-           focus and goes into its lower layer. If this puts it at the
-           bottom then when you come back to the desktop, the window is
-           at the bottom and won't get focus back.
-        */
-        stacking_list = g_list_append(stacking_list, win);
-        stacking_raise(win);
-    } else {
-        /* make sure it's not in the wrong layer though ! */
-        for (; it_below; it_below = g_list_next(it_below))
+        /* nothing to put it directly above, so try find the focused client
+           to put it underneath it */
+        if (focus_client && client != focus_client &&
+            focus_client->layer == client->layer)
         {
-            /* stop when the window is not in a higher layer than the window
-               it is going above (it_below) */
-            if (client->layer >= window_layer(it_below->data))
-                break;
+            it_below = g_list_find(stacking_list, focus_client);
+            /* this can give NULL, but it means the focused window is on the
+               bottom of the stacking order, so go to the bottom in that case,
+               below it */
+            it_below = g_list_next(it_below);
         }
-        for (; it_below != stacking_list;
-             it_below = g_list_previous(it_below))
-        {
-            /* stop when the window is not in a lower layer than the
-               window it is going under (it_above) */
-            GList *it_above = g_list_previous(it_below);
-            if (client->layer <= window_layer(it_above->data))
-                break;
-        }
+        else {
+            /* There is no window to put this directly above, so put it at the
+               top, so you know it is there.
 
-        GList *wins = g_list_append(NULL, win);
-        do_restack(wins, it_below);
-        g_list_free(wins);
+               It used to do this only if the window was focused and lower
+               it otherwise.
+
+               We also put it at the top not the bottom to fix a bug with
+               fullscreen windows. When focusLast is off and followsMouse is
+               on, when you switch desktops, the fullscreen window loses
+               focus and goes into its lower layer. If this puts it at the
+               bottom then when you come back to the desktop, the window is
+               at the bottom and won't get focus back.
+            */
+            it_below = stacking_list;
+        }
     }
+
+    /* make sure it's not in the wrong layer though ! */
+    for (; it_below; it_below = g_list_next(it_below)) {
+        /* stop when the window is not in a higher layer than the window
+           it is going above (it_below) */
+        if (client->layer >= window_layer(it_below->data))
+            break;
+    }
+    for (; it_below != stacking_list; it_below = it_above) {
+        /* stop when the window is not in a lower layer than the
+           window it is going under (it_above) */
+        it_above = it_below ?
+            g_list_previous(it_below) : g_list_last(stacking_list);
+        if (client->layer <= window_layer(it_above->data))
+            break;
+    }
+
+    GList *wins = g_list_append(NULL, win);
+    do_restack(wins, it_below);
+    g_list_free(wins);
 }
 
 /*! Returns TRUE if client is occluded by the sibling. If sibling is NULL it

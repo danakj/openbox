@@ -1476,10 +1476,13 @@ static void parse_style(gchar *tex, RrSurfaceColorType *grad,
 
     if (strstr(tex, "sunken") != NULL)
         *relief = RR_RELIEF_SUNKEN;
-    else if ((strstr(tex, "flat") != NULL) || (*grad == RR_SURFACE_PARENTREL))
+    else if (strstr(tex, "flat") != NULL)
         *relief = RR_RELIEF_FLAT;
-    else
+    else if (strstr(tex, "raised") != NULL)
         *relief = RR_RELIEF_RAISED;
+    else
+        *relief = (*grad == RR_SURFACE_PARENTREL) ?
+                  RR_RELIEF_FLAT : RR_RELIEF_RAISED;
 
     *border = FALSE;
     if (*relief == RR_RELIEF_FLAT) {

@@ -1152,6 +1152,9 @@ static void client_get_desktop(ObClient *self)
 
                 for (it = self->group->members; it; it = g_slist_next(it)) {
                     ObClient *c = it->data;
+
+                    if (c->desktop == DESKTOP_ALL) continue;
+
                     if (c != self) {
                         if (first) {
                             all = c->desktop;

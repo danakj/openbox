@@ -382,8 +382,14 @@ static GList *find_highest_relative(ObClient *client)
         for (it = stacking_list; !ret && it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = it->data;
-                /* only look at windows in the same layer */
-                if (c->layer == client->layer) {
+                /* only look at windows in the same layer and that are
+                   visible */
+                if (c->layer == client->layer &&
+                    !c->iconic && 
+                    (c->desktop == client->desktop ||
+                     c->desktop == DESKTOP_ALL ||
+                     client->desktop == DESKTOP_ALL))
+                {
                     GSList *sit;
 
                     /* go through each top level parent and see it this window

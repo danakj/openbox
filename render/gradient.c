@@ -210,18 +210,20 @@ static void gradient_parentrelative(RrAppearance *a, gint w, gint h)
        of the parent's, amplifying it. So instead, rerender the child with
        the parent's settings, but the child's bevel and interlace */
     if (a->surface.relief != RR_RELIEF_FLAT &&
+        (a->surface.parent->surface.relief != RR_RELIEF_FLAT ||
+         a->surface.parent->surface.border) &&
         !a->surface.parentx && !a->surface.parenty &&
         sw == w && sh == h)
     {
         RrSurface old = a->surface;
         a->surface = a->surface.parent->surface;
-        a->surface.relief = old.relief;
-        a->surface.bevel = old.bevel;
+
+        /* turn these off for the parent */
+        a->surface.relief = RR_RELIEF_FLAT;
+        a->surface.border = FALSE;
+
         a->surface.pixel_data = old.pixel_data;
-        if (old.interlaced) {
-            a->surface.interlaced = TRUE;
-            a->surface.interlace_color = old.interlace_color;
-        }
+
         RrRender(a, w, h);
         a->surface = old;
     } else {

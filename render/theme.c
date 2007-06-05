@@ -120,6 +120,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_menu_bullet_selected = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
     theme->a_clear_tex = RrAppearanceNew(inst, 1);
+    theme->osd_hilite_bg = RrAppearanceNew(inst, 0);
+    theme->osd_hilite_label = RrAppearanceNew(inst, 1);
+    theme->osd_hilite_fg = RrAppearanceNew(inst, 0);
+    theme->osd_unhilite_fg = RrAppearanceNew(inst, 0);
 
     /* load the font stuff */
     if (active_window_font) {
@@ -248,10 +252,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     "window.active.label.text.color",
                     &theme->title_focused_color))
         theme->title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
-    theme->osd_color = RrColorNew(inst,
-                                  theme->title_focused_color->r,
-                                  theme->title_focused_color->g,
-                                  theme->title_focused_color->b);
+    if (!read_color(db, inst, "osd.label.text.color", &theme->osd_color))
+        theme->osd_color = RrColorNew(inst,
+                                      theme->title_focused_color->r,
+                                      theme->title_focused_color->g,
+                                      theme->title_focused_color->b);
     if (!read_color(db, inst,
                     "window.inactive.label.text.color",
                     &theme->title_unfocused_color))
@@ -570,17 +575,34 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_menu_disabled_selected =
         RrAppearanceCopy(theme->a_menu_selected);
 
-    /* read the appearances for rendering non-decorations */
-    theme->osd_hilite_bg = RrAppearanceCopy(theme->a_focused_title);
-    theme->osd_hilite_label = RrAppearanceCopy(theme->a_focused_label);
-    if (theme->a_focused_label->surface.grad != RR_SURFACE_PARENTREL)
-        theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_label);
-    else
-        theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_title);
-    if (theme->a_unfocused_label->surface.grad != RR_SURFACE_PARENTREL)
-        theme->osd_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_label);
-    else
-        theme->osd_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_title);
+    /* read appearances for non-decorations (on-screen-display) */
+    if (!read_appearance(db, inst, "osd.bg", theme->osd_hilite_bg, FALSE)) {
+        RrAppearanceFree(theme->osd_hilite_bg);
+        theme->osd_hilite_bg = RrAppearanceCopy(theme->a_focused_title);
+    }
+    if (!read_appearance(db, inst, "osd.label.bg",
+                         theme->osd_hilite_label, TRUE)) {
+        RrAppearanceFree(theme->osd_hilite_label);
+        theme->osd_hilite_label = RrAppearanceCopy(theme->a_focused_label);
+    }
+    /* osd_hilite_fg can't be parentrel */
+    if (!read_appearance(db, inst, "osd.hilight.bg",
+                         theme->osd_hilite_fg, FALSE)) {
+        RrAppearanceFree(theme->osd_hilite_fg);
+        if (theme->a_focused_label->surface.grad != RR_SURFACE_PARENTREL)
+            theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_label);
+        else
+            theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_title);
+    }
+    /* osd_unhilite_fg can't be parentrel either */
+    if (!read_appearance(db, inst, "osd.unhilight.bg",
+                         theme->osd_unhilite_fg, FALSE)) {
+        RrAppearanceFree(theme->osd_unhilite_fg);
+        if (theme->a_unfocused_label->surface.grad != RR_SURFACE_PARENTREL)
+            theme->osd_unhilite_fg=RrAppearanceCopy(theme->a_unfocused_label);
+        else
+            theme->osd_unhilite_fg=RrAppearanceCopy(theme->a_unfocused_title);
+    }
 
     /* read buttons textures */
     if (!read_appearance(db, inst,
@@ -764,19 +786,49 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->a_menu_bullet_selected->surface.grad = RR_SURFACE_PARENTREL;
 
     /* set up the textures */
-    theme->a_focused_label->texture[0].type = 
-        theme->osd_hilite_label->texture[0].type = RR_TEXTURE_TEXT;
+    theme->a_focused_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_focused_label->texture[0].data.text.justify = winjust;
-    theme->osd_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-    theme->a_focused_label->texture[0].data.text.font =
-        theme->win_font_focused;
-    theme->osd_hilite_label->texture[0].data.text.font = theme->osd_font;
+    theme->a_focused_label->texture[0].data.text.font=theme->win_font_focused;
     theme->a_focused_label->texture[0].data.text.color =
         theme->title_focused_color;
-    theme->osd_hilite_label->texture[0].data.text.color =
-        theme->osd_color;
 
     if (read_string(db, "window.active.label.text.font", &str)) {
+        char *p;
+        gint i = 0;
+        gint j;
+        if (strstr(str, "shadow=y")) {
+            if ((p = strstr(str, "shadowoffset=")))
+                i = parse_inline_number(p + strlen("shadowoffset="));
+            else
+                i = 1;
+            theme->a_focused_label->texture[0].data.text.shadow_offset_x = i;
+            theme->a_focused_label->texture[0].data.text.shadow_offset_y = i;
+        }
+        if ((p = strstr(str, "shadowtint=")))
+        {
+            i = parse_inline_number(p + strlen("shadowtint="));
+            j = (i > 0 ? 0 : 255);
+            i = ABS(i*255/100);
+
+            theme->title_focused_shadow_color = RrColorNew(inst, j, j, j);
+            theme->title_focused_shadow_alpha = i;
+        } else {
+            theme->title_focused_shadow_color = RrColorNew(inst, 0, 0, 0);
+            theme->title_focused_shadow_alpha = 50;
+        }
+    }
+
+    theme->a_focused_label->texture[0].data.text.shadow_color =
+        theme->title_focused_shadow_color;
+    theme->a_focused_label->texture[0].data.text.shadow_alpha =
+        theme->title_focused_shadow_alpha;
+
+    theme->osd_hilite_label->texture[0].type = RR_TEXTURE_TEXT;
+    theme->osd_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
+    theme->osd_hilite_label->texture[0].data.text.font = theme->osd_font;
+    theme->osd_hilite_label->texture[0].data.text.color = theme->osd_color;
+
+    if (read_string(db, "osd.label.text.font", &str)) {
         char *p;
         gint i = 0;
         gint j;
@@ -806,12 +858,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->osd_shadow_color = RrColorNew(inst, 0, 0, 0);
             theme->osd_shadow_alpha = 50;
         }
+    } else {
+        /* inherit the font settings from the focused label */
+        theme->osd_hilite_label->texture[0].data.text.shadow_offset_x =
+            theme->a_focused_label->texture[0].data.text.shadow_offset_x;
+        theme->osd_hilite_label->texture[0].data.text.shadow_offset_y =
+            theme->a_focused_label->texture[0].data.text.shadow_offset_y;
+        theme->osd_shadow_color =
+            RrColorNew(inst,
+                       theme->title_focused_shadow_color->r,
+                       theme->title_focused_shadow_color->g,
+                       theme->title_focused_shadow_color->b);
+        theme->osd_shadow_alpha = theme->title_focused_shadow_alpha;
     }
 
-    theme->a_focused_label->texture[0].data.text.shadow_color =
-        theme->title_focused_shadow_color;
-    theme->a_focused_label->texture[0].data.text.shadow_alpha =
-        theme->title_focused_shadow_alpha;
     theme->osd_hilite_label->texture[0].data.text.shadow_color =
         theme->osd_shadow_color;
     theme->osd_hilite_label->texture[0].data.text.shadow_alpha =

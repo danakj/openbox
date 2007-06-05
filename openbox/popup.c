@@ -185,6 +185,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
     if (self->textw)
         textw = self->textw;
+    else
 
     iconx = textx = l + ob_rr_theme->paddingx;
 

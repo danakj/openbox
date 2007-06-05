@@ -330,6 +330,7 @@ void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
     popup = popup_new(FALSE);
+    popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 
     if (!reconfig)
         client_add_destroy_notify(keyboard_interactive_end_client, NULL);

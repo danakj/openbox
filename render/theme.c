@@ -874,11 +874,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->a_focused_label->texture[0].data.text.shadow_offset_x;
         theme->osd_hilite_label->texture[0].data.text.shadow_offset_y =
             theme->a_focused_label->texture[0].data.text.shadow_offset_y;
-        theme->osd_shadow_color =
-            RrColorNew(inst,
-                       theme->title_focused_shadow_color->r,
-                       theme->title_focused_shadow_color->g,
-                       theme->title_focused_shadow_color->b);
+        if (theme->title_focused_shadow_color)
+            theme->osd_shadow_color =
+                RrColorNew(inst,
+                           theme->title_focused_shadow_color->r,
+                           theme->title_focused_shadow_color->g,
+                           theme->title_focused_shadow_color->b);
+        else
+            theme->osd_shadow_color = RrColorNew(inst, 0, 0, 0);
         theme->osd_shadow_alpha = theme->title_focused_shadow_alpha;
     }
 

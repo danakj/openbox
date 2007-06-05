@@ -202,10 +202,10 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     texty = (h - texth - emptyy) / 2 + t + ob_rr_theme->paddingy;
     icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->paddingy;
 
-    /* when there is no icon and the text is not parent relative, then 
-       fill the whole dialog with the text appearance, don't use the bg at all
+    /* when there is no icon, then fill the whole dialog with the text
+       appearance
     */
-    if (!(self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL))
+    if (!self->hasicon)
     {
         textx = texty = 0;
         texth += emptyy;

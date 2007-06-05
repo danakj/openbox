@@ -411,10 +411,11 @@ void client_manage(Window window)
                                 splash screens get "transient" set to TRUE by
                                 the place_client call
                              */
-                             transient ||
-                             (!(self->positioned & USPosition) &&
-                              client_normal(self) &&
-                              !self->session));
+                             ob_state() == OB_STATE_RUNNING &&
+                             (transient ||
+                              (!(self->positioned & USPosition) &&
+                               client_normal(self) &&
+                               !self->session)));
     }
 
     /* if the window isn't user-sized, then make it fit inside
@@ -426,10 +427,11 @@ void client_manage(Window window)
        splash screens get "transient" set to TRUE by
        the place_client call
     */
-    if (transient ||
-        (!(self->sized & USSize) &&
-         client_normal(self) &&
-         !self->session))
+    if (ob_state() == OB_STATE_RUNNING &&
+        (transient ||
+         (!(self->sized & USSize) &&
+          client_normal(self) &&
+          !self->session)))
     {
         /* make a copy to modify */
         Rect a = *screen_area_monitor(self->desktop, client_monitor(self));

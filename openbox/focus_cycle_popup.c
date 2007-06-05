@@ -35,6 +35,7 @@
 #define ICON_HILITE_WIDTH 2
 #define ICON_HILITE_MARGIN 1
 #define OUTSIDE_BORDER 3
+#define TEXT_BORDER 2
 
 typedef struct _ObFocusCyclePopup       ObFocusCyclePopup;
 typedef struct _ObFocusCyclePopupTarget ObFocusCyclePopupTarget;
@@ -287,10 +288,10 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* get the text dimensions */
     textw = w - l - r;
-    texth = RrMinHeight(p->a_text);
+    texth = RrMinHeight(p->a_text) + TEXT_BORDER * 2;
 
     /* find the height of the dialog */
-    h = t + b + (icon_rows * ICON_SIZE) + (OUTSIDE_BORDER*2 + texth);
+    h = t + b + (icon_rows * ICON_SIZE) + (OUTSIDE_BORDER + texth);
 
     /* get the position of the text */
     textx = l;

@@ -4,7 +4,7 @@
   * Small updates to Czech, Estonian, Norwegian, and German translations
   * Removed out-of-date Japanese translation (ja.po)
   * Removed out-of-date Croatian translation (hr.po)
-  * Allow parentrelative theme textures to have borders and bevels
+  * Allow parentrelative theme textures to have borders, bevels and interlacing
   * Add new theme elements: window.active.title.separator.color and
     window.inactive.title.separator.color  (note that globbing might set these
     properties when you didnt mean to)

@@ -112,9 +112,9 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.a_bg->texture[0].type = RR_TEXTURE_RGBA;
 
     attrib.override_redirect = True;
-    attrib.border_pixel=RrColorPixel(ob_rr_theme->frame_focused_border_color);
+    attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
     popup.bg = create_window(RootWindow(ob_display, ob_screen),
-                             ob_rr_theme->fbwidth,
+                             ob_rr_theme->obwidth,
                              CWOverrideRedirect | CWBorderPixel, &attrib);
 
     popup.text = create_window(popup.bg, 0, 0, NULL);
@@ -298,9 +298,9 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* find the position for the popup (include the outer borders) */
     x = screen_area->x + (screen_area->width -
-                          (w + ob_rr_theme->fbwidth * 2)) / 2;
+                          (w + ob_rr_theme->obwidth * 2)) / 2;
     y = screen_area->y + (screen_area->height -
-                          (h + ob_rr_theme->fbwidth * 2)) / 2;
+                          (h + ob_rr_theme->obwidth * 2)) / 2;
 
     /* get the dimensions of the target hilite texture */
     rgbax = ml;

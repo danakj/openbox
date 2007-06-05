@@ -190,6 +190,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!read_int(db, "menu.border.width", &theme->mbwidth) ||
         theme->mbwidth < 0 || theme->mbwidth > 100)
         theme->mbwidth = theme->fbwidth;
+    /* osd border width inherits from the frame border width */
+    if (!read_int(db, "osd.border.width", &theme->obwidth) ||
+        theme->obwidth < 0 || theme->obwidth > 100)
+        theme->obwidth = theme->fbwidth;
     if (!read_int(db, "window.client.padding.width", &theme->cbwidthx) ||
         theme->cbwidthx < 0 || theme->cbwidthx > 100)
         theme->cbwidthx = theme->paddingx;
@@ -233,13 +237,19 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                        theme->frame_unfocused_border_color->b);
 
     /* menu border color inherits from frame focused border color */
-    if (!read_color(db, inst,
-                    "menu.border.color",
-                    &theme->menu_border_color))
-        theme->menu_border_color = RrColorNew(inst,
-                                     theme->frame_focused_border_color->r,
-                                     theme->frame_focused_border_color->g,
-                                     theme->frame_focused_border_color->b);
+    if (!read_color(db, inst, "menu.border.color", &theme->menu_border_color))
+        theme->menu_border_color =
+            RrColorNew(inst,
+                       theme->frame_focused_border_color->r,
+                       theme->frame_focused_border_color->g,
+                       theme->frame_focused_border_color->b);
+    /* osd border color inherits from frame focused border color */
+    if (!read_color(db, inst, "osd.border.color", &theme->osd_border_color))
+        theme->osd_border_color =
+            RrColorNew(inst,
+                       theme->frame_focused_border_color->r,
+                       theme->frame_focused_border_color->g,
+                       theme->frame_focused_border_color->b);
     if (!read_color(db, inst,
                     "window.active.client.color",
                     &theme->cb_focused_color))
@@ -1328,6 +1338,7 @@ void RrThemeFree(RrTheme *theme)
         g_free(theme->name);
 
         RrColorFree(theme->menu_border_color);
+        RrColorFree(theme->osd_border_color);
         RrColorFree(theme->frame_focused_border_color);
         RrColorFree(theme->frame_unfocused_border_color);
         RrColorFree(theme->title_separator_focused_color);

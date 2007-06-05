@@ -109,7 +109,6 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     /* setup the layout */
     pango_layout_set_font_description(out->layout, out->font_desc);
     pango_layout_set_single_paragraph_mode(out->layout, TRUE);
-    pango_layout_set_ellipsize(out->layout, PANGO_ELLIPSIZE_MIDDLE);
 
     /* get the ascent and descent */
     measure_font(inst, out);
@@ -207,6 +206,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     gint mw;
     PangoRectangle rect;
     PangoAttrList *attrlist;
+    PangoEllipsizeMode ell;
 
     /* center the text vertically
        We do this centering based on the 'baseline' since different fonts have
@@ -220,8 +220,24 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     w = area->width - 4;
     h = area->height;
 
+    switch (t->ellipsize) {
+    case RR_ELLIPSIZE_NONE:
+        ell = PANGO_ELLIPSIZE_NONE;
+        break;
+    case RR_ELLIPSIZE_START:
+        ell = PANGO_ELLIPSIZE_START;
+        break;
+    case RR_ELLIPSIZE_MIDDLE:
+        ell = PANGO_ELLIPSIZE_MIDDLE;
+        break;
+    case RR_ELLIPSIZE_END:
+        ell = PANGO_ELLIPSIZE_END;
+        break;
+    }
+
     pango_layout_set_text(t->font->layout, t->string, -1);
     pango_layout_set_width(t->font->layout, w * PANGO_SCALE);
+    pango_layout_set_ellipsize(t->font->layout, ell);
 
     /* * * end of setting up the layout * * */
 

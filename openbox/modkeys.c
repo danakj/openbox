@@ -108,7 +108,10 @@ guint modkeys_only_modifier_masks(guint mask)
 {
     mask &= ALL_MASKS;
     /* strip off these lock keys. they shouldn't affect key bindings */
-    mask &= ~modkeys_key_to_mask(OB_MODKEY_KEY_CAPSLOCK);
+    mask &= ~LockMask; /* use the LockMask, not what capslock is bound to,
+                          because you could bind it to something else and it
+                          should work as that modifier then. i think capslock
+                          is weird in xkb. */
     mask &= ~modkeys_key_to_mask(OB_MODKEY_KEY_NUMLOCK);
     mask &= ~modkeys_key_to_mask(OB_MODKEY_KEY_SCROLLLOCK);
     return mask;

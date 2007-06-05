@@ -22,7 +22,8 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-/*! These keys are bound to the modifier masks in any fashion */
+/*! These keys are bound to the modifier masks in any fashion,
+  except for CapsLock, Shift, and Control. */
 typedef enum {
     OB_MODKEY_KEY_CAPSLOCK,
     OB_MODKEY_KEY_NUMLOCK,

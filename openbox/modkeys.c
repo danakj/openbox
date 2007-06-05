@@ -77,6 +77,11 @@ void modkeys_startup(gboolean reconfigure)
             }
         }
     }
+
+    /* CapsLock, Shift, and Control are special and hard-coded */
+    modkeys_keys[OB_MODKEY_KEY_CAPSLOCK] = LockMask;
+    modkeys_keys[OB_MODKEY_KEY_SHIFT] = ShiftMask;
+    modkeys_keys[OB_MODKEY_KEY_CONTROL] = ControlMask;
 }
 
 void modkeys_shutdown(gboolean reconfigure)
@@ -130,12 +135,6 @@ static void set_modkey_mask(guchar mask, KeySym sym)
         modkeys_keys[OB_MODKEY_KEY_NUMLOCK] |= mask;
     else if (sym == XK_Scroll_Lock)
         modkeys_keys[OB_MODKEY_KEY_SCROLLLOCK] |= mask;
-    else if (sym == XK_Caps_Lock)
-        modkeys_keys[OB_MODKEY_KEY_CAPSLOCK] |= mask;
-    else if (sym == XK_Shift_L || sym == XK_Shift_R)
-        modkeys_keys[OB_MODKEY_KEY_SHIFT] |= mask;
-    else if (sym == XK_Control_L || sym == XK_Control_R)
-        modkeys_keys[OB_MODKEY_KEY_CONTROL] |= mask;
     else if (sym == XK_Super_L || sym == XK_Super_R)
         modkeys_keys[OB_MODKEY_KEY_SUPER] |= mask;
     else if (sym == XK_Hyper_L || sym == XK_Hyper_R)
@@ -144,6 +143,7 @@ static void set_modkey_mask(guchar mask, KeySym sym)
         modkeys_keys[OB_MODKEY_KEY_ALT] |= mask;
     else if (sym == XK_Meta_L || sym == XK_Meta_R)
         modkeys_keys[OB_MODKEY_KEY_META] |= mask;
+    /* CapsLock, Shift, and Control are special and hard-coded */
 }
 
 KeyCode modkeys_sym_to_code(KeySym sym)

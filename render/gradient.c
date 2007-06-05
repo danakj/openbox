@@ -205,20 +205,41 @@ static void gradient_parentrelative(RrAppearance *a, gint w, gint h)
     sw = a->surface.parent->w;
     sh = a->surface.parent->h;
 
-    source = (a->surface.parent->surface.pixel_data +
-            a->surface.parentx + sw * a->surface.parenty);
-    dest = a->surface.pixel_data;
+    /* This is a little hack. When a texture is parentrelative, and the same
+       area as the parent, and has a bevel, it will draw its bevel on top
+       of the parent's, amplifying it. So instead, rerender the child with
+       the parent's settings, but the child's bevel and interlace */
+    if (a->surface.relief != RR_RELIEF_FLAT &&
+        !a->surface.parentx && !a->surface.parenty &&
+        sw == w && sh == h)
+    {
+        RrSurface old = a->surface;
+        a->surface = a->surface.parent->surface;
+        a->surface.relief = old.relief;
+        a->surface.bevel = old.bevel;
+        a->surface.pixel_data = old.pixel_data;
+        if (old.interlaced) {
+            a->surface.interlaced = TRUE;
+            a->surface.interlace_color = old.interlace_color;
+        }
+        RrRender(a, w, h);
+        a->surface = old;
+    } else {
+        source = (a->surface.parent->surface.pixel_data +
+                  a->surface.parentx + sw * a->surface.parenty);
+        dest = a->surface.pixel_data;
 
-    if (a->surface.parentx + w > sw) {
-        partial_w = sw - a->surface.parentx;
-    } else partial_w = w;
+        if (a->surface.parentx + w > sw) {
+            partial_w = sw - a->surface.parentx;
+        } else partial_w = w;
 
-    if (a->surface.parenty + h > sh) {
-        partial_h = sh - a->surface.parenty;
-    } else partial_h = h;
+        if (a->surface.parenty + h > sh) {
+            partial_h = sh - a->surface.parenty;
+        } else partial_h = h;
 
-    for (i = 0; i < partial_h; i++, source += sw, dest += w) {
-        memcpy(dest, source, partial_w * sizeof(RrPixel32));
+        for (i = 0; i < partial_h; i++, source += sw, dest += w) {
+            memcpy(dest, source, partial_w * sizeof(RrPixel32));
+        }
     }
 }
 

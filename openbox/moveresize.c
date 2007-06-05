@@ -68,6 +68,7 @@ static void client_dest(ObClient *client, gpointer data)
 void moveresize_startup(gboolean reconfig)
 {
     popup = popup_new(FALSE);
+    popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 
     if (!reconfig)
         client_add_destroy_notify(client_dest, NULL);

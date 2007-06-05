@@ -183,11 +183,9 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         texth = self->h - emptyy;
     h = texth * self->iconhm + emptyy;
 
-    if (self->textw) {
-        self->a_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
+    if (self->textw)
         textw = self->textw;
-    } else
-        self->a_text->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
+    else
 
     iconx = textx = l + ob_rr_theme->paddingx;
 

@@ -342,12 +342,16 @@ int main(int argc, char **argv)
     if (read_int(db, "borderWidth", &i)) {
         CONT3("dimensions", "window", "border", NUM(i));
         CONT3("dimensions", "menu", "border", NUM(i));
+        CONT3("dimensions", "osd", "border", NUM(i));
     } else if (read_int(db, "border.width", &i)) {
         CONT3("dimensions", "window", "border", NUM(i));
         CONT3("dimensions", "menu", "border", NUM(i));
+        CONT3("dimensions", "osd", "border", NUM(i));
     }
     if (read_int(db, "menu.border.width", &i)) 
         CONT3("dimensions", "menu", "border", NUM(i));
+    if (read_int(db, "osd.border.width", &i)) 
+        CONT3("dimensions", "osd", "border", NUM(i));
 
     if (read_color(db, "border.color", &i, &j, &k)) {
         COLOR3("window", "active", "border", i, j, k, 255);

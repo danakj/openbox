@@ -51,9 +51,9 @@ ObPopup *popup_new()
                                0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                                InputOutput, RrVisual(ob_rr_inst), 0, NULL);
 
-    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->fbwidth);
+    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->obwidth);
     XSetWindowBorder(ob_display, self->bg,
-                     RrColorPixel(ob_rr_theme->frame_focused_border_color));
+                     RrColorPixel(ob_rr_theme->osd_border_color));
 
     XMapWindow(ob_display, self->text);
 
@@ -355,7 +355,7 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
     gint eachw, eachh;
     const guint cols = screen_desktop_layout.columns;
     const guint rows = screen_desktop_layout.rows;
-    const gint linewidth = ob_rr_theme->fbwidth;
+    const gint linewidth = ob_rr_theme->obwidth;
 
     eachw = (w - ((cols + 1) * linewidth)) / cols;
     eachh = (h - ((rows + 1) * linewidth)) / rows;
@@ -500,9 +500,9 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
             XSetWindowAttributes attr;
 
             attr.border_pixel = 
-                RrColorPixel(ob_rr_theme->frame_focused_border_color);
+                RrColorPixel(ob_rr_theme->osd_border_color);
             self->wins[i] = XCreateWindow(ob_display, self->popup->bg,
-                                          0, 0, 1, 1, ob_rr_theme->fbwidth,
+                                          0, 0, 1, 1, ob_rr_theme->obwidth,
                                           RrDepth(ob_rr_inst), InputOutput,
                                           RrVisual(ob_rr_inst), CWBorderPixel,
                                           &attr);

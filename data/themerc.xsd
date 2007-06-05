@@ -137,6 +137,7 @@
 
   <xs:complexType name="allosd">
     <xs:all>
+      <xs:element name="border" type="obt:color" minOccurs="0"/>
       <xs:element name="label" type="obt:textarea" minOccurs="0"/>
       <xs:element name="background" type="obt:area" minOccurs="0"/>
       <xs:element name="hilight" type="obt:area" minOccurs="0"/>
@@ -157,12 +158,19 @@
     </xs:all>
   </xs:complexType>
 
+  <xs:complexType name="osdDimensions">
+    <xs:all>
+      <xs:element name="borderwidth" type="xs:integer" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
   <xs:complexType name="themeDimensions">
     <xs:all>
       <xs:element name="padding" type="obt:point" minOccurs="0"/>
       <xs:element name="handle" type="xs:integer" minOccurs="0"/>
       <xs:element name="window" type="obt:windowDimensions" minOccurs="0"/>
       <xs:element name="menu" type="obt:menuDimensions" minOccurs="0"/>
+      <xs:element name="osd" type="obt:osdDimensions" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 

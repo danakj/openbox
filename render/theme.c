@@ -213,9 +213,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->fbwidth = 1;
 
     /* menu border width inherits from frame border width */
-    if (!FIND(int, L("dimensions","menu","border"),
-              &theme->mbwidth, 0, 100))
+    if (!FIND(int, L("dimensions","menu","border"), &theme->mbwidth, 0, 100))
         theme->mbwidth = theme->fbwidth;
+
+    /* osd border width inherits from frame border width */
+    if (!FIND(int, L("dimensions","osd","border"), &theme->obwidth, 0, 100))
+        theme->obwidth = theme->fbwidth;
 
     if (!FIND(point, L("dimensions","window","clientpadding"),
               &theme->cbwidthx, &theme->cbwidthy, 0, 100, 0, 100))
@@ -251,9 +254,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                        theme->frame_unfocused_border_color->b);
 
     /* menu border color inherits from frame focused border color */
-    if (!FIND(color, L("menu","border"),
-              &theme->menu_border_color, NULL))
+    if (!FIND(color, L("menu","border"), &theme->menu_border_color, NULL))
         theme->menu_border_color =
+            RrColorNew(inst,
+                       theme->frame_focused_border_color->r,
+                       theme->frame_focused_border_color->g,
+                       theme->frame_focused_border_color->b);
+    /* osd border color inherits from frame focused border color */
+    if (!FIND(color, L("osd","border"), &theme->osd_border_color, NULL))
+        theme->osd_border_color =
             RrColorNew(inst,
                        theme->frame_focused_border_color->r,
                        theme->frame_focused_border_color->g,
@@ -1238,6 +1247,7 @@ void RrThemeFree(RrTheme *theme)
         g_free(theme->name);
 
         RrColorFree(theme->menu_border_color);
+        RrColorFree(theme->osd_border_color);
         RrColorFree(theme->frame_focused_border_color);
         RrColorFree(theme->frame_unfocused_border_color);
         RrColorFree(theme->title_separator_focused_color);

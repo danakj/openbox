@@ -42,6 +42,7 @@ struct _RrTheme {
     gint handle_height;
     gint fbwidth; /*!< frame border width */
     gint mbwidth; /*!< menu border width */
+    gint obwidth; /*!< osd border width */
     gint cbwidthx;
     gint cbwidthy;
     gint menu_overlap;
@@ -58,6 +59,7 @@ struct _RrTheme {
 
     /* style settings - colors */
     RrColor *menu_border_color;
+    RrColor *osd_border_color;
     RrColor *frame_focused_border_color;
     RrColor *frame_unfocused_border_color;
     RrColor *title_separator_focused_color;

@@ -374,6 +374,8 @@ int main(int argc, char **argv)
         COLOR3("window", "inactive", "titleseparator", i, j, k, 255);
     if (read_color(db, "menu.border.color", &i, &j, &k))
         COLOR2("menu", "border", i, j, k, 255);
+    if (read_color(db, "osd.border.color", &i, &j, &k))
+        COLOR2("osd", "border", i, j, k, 255);
 
     if (read_int(db, "window.client.padding.width", &i)) {
         ATTR3("dimensions", "window", "clientpadding", "x", NUM(i));

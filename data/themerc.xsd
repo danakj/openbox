@@ -147,20 +147,20 @@
 
   <xs:complexType name="windowDimensions">
     <xs:all>
-      <xs:element name="borderwidth" type="xs:integer" minOccurs="0"/>
+      <xs:element name="border" type="xs:integer" minOccurs="0"/>
       <xs:element name="clientpadding" type="obt:point" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 
   <xs:complexType name="menuDimensions">
     <xs:all>
-      <xs:element name="borderwidth" type="xs:integer" minOccurs="0"/>
+      <xs:element name="border" type="xs:integer" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 
   <xs:complexType name="osdDimensions">
     <xs:all>
-      <xs:element name="borderwidth" type="xs:integer" minOccurs="0"/>
+      <xs:element name="border" type="xs:integer" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 

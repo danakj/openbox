@@ -158,7 +158,13 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
     area = screen_physical_area();
 
-    RrMargins(self->a_bg, &l, &t, &r, &b);
+    /* when there is no icon and the text is not parent relative, then 
+       fill the whole dialog with the text appearance, don't use the bg at all
+    */
+    if (self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
+        RrMargins(self->a_bg, &l, &t, &r, &b);
+    else
+        l = t = r = b = 0;
 
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;
@@ -194,6 +200,17 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
     texty = (h - texth - emptyy) / 2 + t + ob_rr_theme->paddingy;
     icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->paddingy;
+
+    /* when there is no icon and the text is not parent relative, then 
+       fill the whole dialog with the text appearance, don't use the bg at all
+    */
+    if (!(self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL))
+    {
+        textx = texty = 0;
+        texth += emptyy;
+        textw += emptyx;
+        emptyx = emptyy = 0;
+    }
 
     w = textw + emptyx + iconw;
     /* cap it at maxw/minw */
@@ -233,7 +250,11 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     
     /* set the windows/appearances up */
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
-    RrPaint(self->a_bg, self->bg, w, h);
+    /* when there is no icon and the text is not parent relative, then 
+       fill the whole dialog with the text appearance, don't use the bg at all
+    */
+    if (self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
+        RrPaint(self->a_bg, self->bg, w, h);
 
     if (textw) {
         self->a_text->surface.parent = self->a_bg;

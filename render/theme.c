@@ -141,6 +141,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_menu_bullet_selected = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
     theme->a_clear_tex = RrAppearanceNew(inst, 1);
+    theme->osd_hilite_bg = RrAppearanceNew(inst, 0);
+    theme->osd_hilite_label = RrAppearanceNew(inst, 1);
+    theme->osd_hilite_fg = RrAppearanceNew(inst, 0);
+    theme->osd_unhilite_fg = RrAppearanceNew(inst, 0);
 
     /* load the font stuff */
 
@@ -263,7 +267,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(color, L("window","active","label","text","primary"),
               &theme->title_focused_color, NULL))
         theme->title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
-    if (!FIND(color, L("osd","text","primary"),
+    if (!FIND(color, L("osd","label","text","primary"),
               &theme->osd_color, NULL))
         theme->osd_color = RrColorNew(inst,
                                       theme->title_focused_color->r,
@@ -388,7 +392,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->title_focused_shadow_color = RrColorNew(inst, 0, 0, 0);
         theme->title_focused_shadow_alpha = 50;
     }
-    if (!FIND(color, L("osd","text","shadow","primary"),
+    if (!FIND(color, L("osd","label","text","shadow","primary"),
               &theme->osd_shadow_color, &theme->osd_shadow_alpha))
     {
         theme->osd_shadow_color = 
@@ -604,17 +608,33 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->a_menu_disabled_selected =
             RrAppearanceCopy(theme->a_menu_selected);
 
-    /* read the appearances for rendering non-decorations */
-    theme->osd_hilite_bg = RrAppearanceCopy(theme->a_focused_title);
-    theme->osd_hilite_label = RrAppearanceCopy(theme->a_focused_label);
-    if (theme->a_focused_label->surface.grad != RR_SURFACE_PARENTREL)
-        theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_label);
-    else
-        theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_title);
-    if (theme->a_unfocused_label->surface.grad != RR_SURFACE_PARENTREL)
-        theme->osd_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_label);
-    else
-        theme->osd_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_title);
+    /* read appearances for non-decorations (on-screen-display) */
+    if (!FIND(appearance, L("osd", "background"), theme->osd_hilite_bg, FALSE)) {
+        RrAppearanceFree(theme->osd_hilite_bg);
+        theme->osd_hilite_bg = RrAppearanceCopy(theme->a_focused_title);
+    }
+    if (!FIND(appearance, L("osd", "label"), theme->osd_hilite_label, TRUE)) {
+        RrAppearanceFree(theme->osd_hilite_label);
+        theme->osd_hilite_label = RrAppearanceCopy(theme->a_focused_label);
+    }
+    /* osd_hilite_fg can't be parentrel */
+    if (!FIND(appearance, L("osd", "hilight"), theme->osd_hilite_fg, FALSE)) {
+        RrAppearanceFree(theme->osd_hilite_fg);
+        if (theme->a_focused_label->surface.grad != RR_SURFACE_PARENTREL)
+            theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_label);
+        else
+            theme->osd_hilite_fg = RrAppearanceCopy(theme->a_focused_title);
+    }
+    /* osd_unhilite_fg can't be parentrel either */
+    if (!FIND(appearance, L("osd", "unhilight"), theme->osd_unhilite_fg,
+              FALSE))
+    {
+        RrAppearanceFree(theme->osd_unhilite_fg);
+        if (theme->a_unfocused_label->surface.grad != RR_SURFACE_PARENTREL)
+            theme->osd_unhilite_fg=RrAppearanceCopy(theme->a_unfocused_label);
+        else
+            theme->osd_unhilite_fg=RrAppearanceCopy(theme->a_unfocused_title);
+    }
 
     /* read buttons textures */
     if (!FIND(appearance, L("window","active","buttons","disabled"),
@@ -816,7 +836,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_focused_label->texture[0].data.text.shadow_alpha =
         theme->title_focused_shadow_alpha;
 
-    if (!FIND(shadow, L("osd","text","shadow","offset"),
+    if (!FIND(shadow, L("osd","label","text","shadow","offset"),
               theme->osd_hilite_label))
     {
         theme->osd_hilite_label->texture[0].data.text.shadow_offset_x =

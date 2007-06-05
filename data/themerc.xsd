@@ -137,7 +137,10 @@
 
   <xs:complexType name="allosd">
     <xs:all>
-      <xs:element name="text" type="obt:text" minOccurs="0"/>
+      <xs:element name="label" type="obt:textarea" minOccurs="0"/>
+      <xs:element name="background" type="obt:area" minOccurs="0"/>
+      <xs:element name="hilight" type="obt:area" minOccurs="0"/>
+      <xs:element name="unhilight" type="obt:area" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 

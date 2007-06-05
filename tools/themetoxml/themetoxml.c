@@ -465,6 +465,9 @@ int main(int argc, char **argv)
                    &i, &j, &k))
         COLOR4("menu","active","text","primary",i,j,k,255);
 
+    if (read_color(db, "osd.label.text.color", &i, &j, &k))
+        COLOR4("osd","label","text","primary",i,j,k,255);
+
     APPEARANCE3("window.active.title.bg", "window", "active", "titlebar");
     APPEARANCE3("window.inactive.title.bg", "window", "inactive", "titlebar");
     APPEARANCE3("window.active.label.bg", "window", "active", "label");
@@ -498,6 +501,11 @@ int main(int argc, char **argv)
                 "window", "active", "buttons", "hover");
     APPEARANCE4("window.inactive.button.hover.bg",
                 "window", "inactive", "buttons", "hover");
+
+    APPEARANCE2("osd.bg", "osd", "background");
+    APPEARANCE2("osd.label.bg", "osd", "label");
+    APPEARANCE2("osd.hilight.bg", "osd", "hilight");
+    APPEARANCE2("osd.unhilight.bg", "osd", "unhilight");
 
     if (read_string(db, "window.active.label.text.font", &s)) {
         char *p;
@@ -589,6 +597,25 @@ int main(int argc, char **argv)
             COLOR5("menu","active","text","shadow","primary",j,j,j,i);
             COLOR4("menu","disabled","shadow","primary",j,j,j,i);
             COLOR5("menu","active-disabled","text","shadow","primary",j,j,j,i);
+        }
+    }
+
+    if (read_string(db, "osd.label.text.font", &s)) {
+        char *p;
+        if (strstr(s, "shadow=y")) {
+            if ((p = strstr(s, "shadowoffset=")))
+                i = parse_inline_number(p + strlen("shadowoffset="));
+            else
+                i = 1;
+            ATTR5("osd","label","text","shadow","offset","x",NUM(i));
+            ATTR5("osd","label","text","shadow","offset","y",NUM(i));
+        }
+        if ((p = strstr(s, "shadowtint=")))
+        {
+            i = parse_inline_number(p + strlen("shadowtint="));
+            j = (i > 0 ? 0 : 255);
+            i = ABS(i*255/100);
+            COLOR5("osd","label","text","shadow","primary",j,j,j,i);
         }
     }
 

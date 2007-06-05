@@ -12,6 +12,9 @@
   * Add new theme elements: window.active.title.separator.color and
     window.inactive.title.separator.color  (note that globbing might set these
     properties when you didnt mean to)
+  * Add new theme elements: osd.border.width, osd.border.color, osd.bg,
+    osd.label.bg, osd.label.text.color, osd.label.text.font, osd.hilight.bg,
+    osd.unhilight.bg
   * Add new underMouse focus option
   * Rename new theme element menu.items.activedisabled to
     menu.items.active.disabled for consistency with other elements

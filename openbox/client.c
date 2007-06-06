@@ -2396,11 +2396,13 @@ ObClient *client_search_focus_group_full(ObClient *self)
 {
     GSList *it;
 
-    for (it = self->group->members; it; it = g_slist_next(it)) {
-        ObClient *c = it->data;
+    if (self->group) {
+        for (it = self->group->members; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
 
-        if (client_focused(c)) return c;
-        if ((c = client_search_focus_tree(it->data))) return c;
+            if (client_focused(c)) return c;
+            if ((c = client_search_focus_tree(it->data))) return c;
+        }
     }
 }
 

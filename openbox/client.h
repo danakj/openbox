@@ -635,6 +635,11 @@ ObClient *client_search_focus_tree(ObClient *self);
 */
 ObClient *client_search_focus_tree_full(ObClient *self);
 
+/*! Searches a client's group and each member's transients for a focused
+  window.  This doesn't go up the window's transient tree at all. If no
+  focused client is found, NULL is returned. */
+ObClient *client_search_focus_group_full(ObClient *self);
+
 /*! Return a modal child of the client window that can be focused.
     @return A modal child of the client window that can be focused, or 0 if
             none was found.

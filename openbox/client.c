@@ -489,7 +489,8 @@ void client_manage(Window window)
                           "desktop\n");
         }
         /* If something is focused, and it's not our relative... */
-        else if (focus_client && client_search_focus_tree_full(self) == NULL)
+        else if (focus_client && client_search_focus_tree_full(self) == NULL &&
+                 client_search_focus_group_full(self) == NULL)
         {
             /* If time stamp is old, don't steal focus */
             if (self->user_time && last_time &&
@@ -2367,19 +2368,20 @@ ObClient *client_search_focus_tree(ObClient *self)
 
 ObClient *client_search_focus_tree_full(ObClient *self)
 {
-    GSList *it;
-    ObClient *c;
-
-    if (self->transient_for && self->transient_for != OB_TRAN_GROUP) {
-        if ((c = client_search_focus_tree_full(self->transient_for)))
-            return c;
-    }
+    if (self->transient_for) {
+        if (self->transient_for != OB_TRAN_GROUP) {
+            return client_search_focus_tree_full(self->transient_for);
+        } else {
+            GSList *it;
         
-    for (it = self->group->members; it; it = g_slist_next(it)) {
-        if (it->data != self) {
-            c = it->data;
-            if (client_focused(c)) return c;
-            if ((c = client_search_focus_tree(it->data))) return c;
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                if (it->data != self) {
+                    ObClient *c = it->data;
+
+                    if (client_focused(c)) return c;
+                    if ((c = client_search_focus_tree(it->data))) return c;
+                }
+            }
         }
     }
 
@@ -2388,6 +2390,18 @@ ObClient *client_search_focus_tree_full(ObClient *self)
     if (client_focused(self))
         return self;
     return client_search_focus_tree(self);
+}
+
+ObClient *client_search_focus_group_full(ObClient *self)
+{
+    GSList *it;
+
+    for (it = self->group->members; it; it = g_slist_next(it)) {
+        ObClient *c = it->data;
+
+        if (client_focused(c)) return c;
+        if ((c = client_search_focus_tree(it->data))) return c;
+    }
 }
 
 gboolean client_has_parent(ObClient *self)

@@ -1,0 +1,336 @@
+# Vietnamese messages for Openbox.
+# Copyright (C) 2007 Dana Jansens
+# This file is distributed under the same license as the Openbox package.
+# Quan Tran <qeed.quan@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.4\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"POT-Creation-Date: 2007-06-06 10:29-0500\n"
+"PO-Revision-Date: 2007-06-06 16:29-0500\n"
+"Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
+"Language-Team: None\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/action.c:954
+#, c-format
+msgid "Invalid action '%s' requested. No such action exists."
+msgstr "Hành động '%s' làm không được. Hành động đó không có."
+
+#: openbox/action.c:957
+#, c-format
+msgid "Invalid use of action '%s'. Action will be ignored."
+msgstr "Sự dùng hành động '%s' sai rồi. Không làm hành động đó."
+
+#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "Làm không được '%s':%s"
+
+#: openbox/action.c:1265
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr "Không thể chuyển chỗ '%s' từ utf8"
+
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+msgid "Go there..."
+msgstr "Đi đến chỗ đó"
+
+#: openbox/client_list_combined_menu.c:148
+msgid "Windows"
+msgstr "Cửa sổ"
+
+#: openbox/client_list_menu.c:196
+msgid "Desktops"
+msgstr "Chỗ làm việc"
+
+#: openbox/client_menu.c:246
+msgid "All desktops"
+msgstr "Tất cả chỗ làm việc"
+
+#: openbox/client_menu.c:351
+msgid "&Layer"
+msgstr "Lớp"
+
+#: openbox/client_menu.c:356
+msgid "Always on &top"
+msgstr "Luôn luôn ở trên"
+
+#: openbox/client_menu.c:357
+msgid "&Normal"
+msgstr "Bình thường"
+
+#: openbox/client_menu.c:358
+msgid "Always on &bottom"
+msgstr "Luôn luôn ở dưới"
+
+#: openbox/client_menu.c:361
+msgid "&Send to desktop"
+msgstr "Gửi đến chỗ làm việc"
+
+#: openbox/client_menu.c:365
+msgid "Client menu"
+msgstr "Khách thực đơn"
+
+#: openbox/client_menu.c:371
+msgid "R&estore"
+msgstr "Hoàn lại"
+
+#: openbox/client_menu.c:379
+msgid "&Move"
+msgstr "Chuyển đi"
+
+#: openbox/client_menu.c:381
+msgid "Resi&ze"
+msgstr "Làm nhỏ hơn/lớn hơn"
+
+#: openbox/client_menu.c:383
+msgid "Ico&nify"
+msgstr "Biến xuống"
+
+#: openbox/client_menu.c:391
+msgid "Ma&ximize"
+msgstr "Biến lớn nhất"
+
+#: openbox/client_menu.c:399
+msgid "&Roll up/down"
+msgstr "Cuốn lên/xuống"
+
+#: openbox/client_menu.c:401
+msgid "Un/&Decorate"
+msgstr "Trang/Không Trang trí"
+
+#: openbox/client_menu.c:411
+msgid "&Close"
+msgstr "Đóng"
+
+#: openbox/config.c:701
+#, c-format
+msgid "Invalid button '%s' specified in config file"
+msgstr "Sai nút '%s' ở trong hình thể"
+
+#: openbox/keyboard.c:162
+msgid "Conflict with key binding in config file"
+msgstr "Xung đột với chữ trói ở trong hình thể"
+
+#: openbox/menu.c:98 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file '%s'"
+msgstr "Không có thể tìm vững chắc thực đơn '%s'"
+
+#: openbox/menu.c:149
+#, c-format
+msgid "Failed to execute command for pipe-menu '%s': %s"
+msgstr "Không có thể chạy lệnh cho ống-thực đơn '%s':%s"
+
+#: openbox/menu.c:166
+#, c-format
+msgid "Invalid output from pipe-menu '%s'"
+msgstr "Vô hiệu sản xuất của ống-thực đơn '%s'"
+
+#: openbox/menu.c:179
+#, c-format
+msgid "Attempted to access menu '%s' but it does not exist"
+msgstr "Thử mở thực đơn '%s' nhưng mà cái đó không có '%s'"
+
+#: openbox/menu.c:331 openbox/menu.c:332
+msgid "More..."
+msgstr "Thêm nữa"
+
+#: openbox/mouse.c:338
+#, c-format
+msgid "Invalid button '%s' in mouse binding"
+msgstr "Vô hiệu nút '%s' ở trong máy chuột đặt"
+
+#: openbox/mouse.c:344
+#, c-format
+msgid "Invalid context '%s' in mouse binding"
+msgstr "Vô hiệu văn cảnh '%s' ở trong chuột đặt"
+
+#: openbox/openbox.c:129
+#, c-format
+msgid "Unable to change to home directory '%s': %s"
+msgstr "Không thể đổi đến chỗ nhà '%s': %s"
+
+#: openbox/openbox.c:149
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr "Không mở hình từ DISPLAY được."
+
+#: openbox/openbox.c:180
+msgid "Failed to initialize the obrender library."
+msgstr "Không mở được thư viện obrender."
+
+#: openbox/openbox.c:186
+msgid "X server does not support locale."
+msgstr "Chương trình X không có locale cho tiếng nay."
+
+#: openbox/openbox.c:188
+msgid "Cannot set locale modifiers for the X server."
+msgstr "Không thể dùng locale cho chương trình X."
+
+#: openbox/openbox.c:249
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr "Không thể tìm ra hình thể, sẽ dùng bắt đầu hình thể"
+
+#: openbox/openbox.c:275
+msgid "Unable to load a theme."
+msgstr "Không thể đọc theme."
+
+#: openbox/openbox.c:394
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr "Bắt đầu lại hỏng mở được executable mới '%s': %s"
+
+#: openbox/openbox.c:464 openbox/openbox.c:466
+msgid "Copyright (c)"
+msgstr "Bản quyền (c)"
+
+#: openbox/openbox.c:475
+msgid "Syntax: openbox [options]\n"
+msgstr "Cách dùng: openbox [chọn lựa]\n"
+
+#: openbox/openbox.c:476
+msgid ""
+"\n"
+"Options:\n"
+msgstr ""
+"\n"
+"Chọn lựa:\n"
+
+#: openbox/openbox.c:477
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Trưng bày giúp đỡ này và đi ra\n"
+
+#: openbox/openbox.c:478
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Trưng bày số của chương trình và đi ra\n"
+
+#: openbox/openbox.c:479
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr "  --replace           Thay thế chương trình quản lý cửa sổ cho đến openbox\n"
+
+#: openbox/openbox.c:480
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr "  --sm-disable        Tắt liên lạc đến session quản lý\n"
+
+#: openbox/openbox.c:481
+msgid ""
+"\n"
+"Passing messages to a running Openbox instance:\n"
+msgstr ""
+"\n"
+"Đưa thông báo cho chương trình Openbox:\n"
+
+#: openbox/openbox.c:482
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr "  --reconfigure       Bắt đầu lại Openbox's hình thể\n"
+
+#: openbox/openbox.c:483
+msgid "  --restart           Restart Openbox\n"
+msgstr "  --restart           Bắt đầu lại Openbox\n"
+
+#: openbox/openbox.c:484
+msgid ""
+"\n"
+"Debugging options:\n"
+msgstr ""
+"\n"
+"Debugging chọn lựa:\n"
+
+#: openbox/openbox.c:485
+msgid "  --sync              Run in synchronous mode\n"
+msgstr "  --sync              Chạy trong cách thức synchronous\n"
+
+#: openbox/openbox.c:486
+msgid "  --debug             Display debugging output\n"
+msgstr "  --debug             Trưng bày debugging đoàn chữ\n"
+
+#: openbox/openbox.c:487
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr "  --debug-focus       Trưng bày debugging đoàn chữ cho điều khiển tập trung\n"
+
+#: openbox/openbox.c:488
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr "  --debug-xinerama    Tách trưng bày vào giả xinerama màn\n"
+
+#: openbox/openbox.c:489
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+msgstr ""
+"\n"
+"Làm ơn báo cáo bugs ở chỗ %s\n"
+
+#: openbox/openbox.c:586
+#, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr "Mệnh lệnh viết sai '%s'\n"
+
+#: openbox/screen.c:88 openbox/screen.c:189
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr "Chương trình quản lý cửa sổ khác đang chạy trên màn hình %d"
+
+#: openbox/screen.c:125
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr "Không thể lấy được chương trình quản lý cửa sổ ở trên màn hình %d"
+
+#: openbox/screen.c:146
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr "Chương trình quản lý cửa sổ trên màn hình %d không đi ra"
+
+#: openbox/screen.c:939
+#, c-format
+msgid "desktop %i"
+msgstr "chỗ làm việc %i"
+
+#: openbox/session.c:103
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Không thể chế directory '%s': %s"
+
+#: openbox/session.c:451
+#, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr "Không thể tiết kiệm thời kỳ cho '%s': %s"
+
+#: openbox/session.c:583
+#, c-format
+msgid "Error while saving the session to '%s': %s"
+msgstr "Bĩ trục chật lúc tiết kiệm thời kỳ cho '%s': %s"
+
+#: openbox/startupnotify.c:237
+#, c-format
+msgid "Running %s\n"
+msgstr "Đan Chạy %s\n"
+
+#: openbox/translate.c:58
+#, c-format
+msgid "Invalid modifier key '%s' in key/mouse binding"
+msgstr "Vô hiệu Modifier key '%s' ở chỗ máy keyboard/chuột đặt"
+
+#: openbox/translate.c:135
+#, c-format
+msgid "Invalid key code '%s' in key binding"
+msgstr "Vô hiệu key mã '%s' ở chỗ key đặt"
+
+#: openbox/translate.c:142
+#, c-format
+msgid "Invalid key name '%s' in key binding"
+msgstr "Vô hiệu key tên '%s' ở chỗ key đặt"
+
+#: openbox/translate.c:148
+#, c-format
+msgid "Requested key '%s' does not exist on the display"
+msgstr "Yêu cầu key '%s' không có ở chỗ màn hình"
+
+#: openbox/xerror.c:39
+#, c-format
+msgid "X Error: %s"
+msgstr "X trục chật: %s"

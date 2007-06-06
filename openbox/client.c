@@ -2404,7 +2404,7 @@ ObClient *client_search_focus_group_full(ObClient *self)
             if ((c = client_search_focus_tree(it->data))) return c;
         }
     } else
-        if (client_focused(c)) return c;
+        if (client_focused(self)) return self;
     return NULL;
 }
 

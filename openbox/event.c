@@ -1875,11 +1875,9 @@ void event_end_ignore_all_enters(gulong start)
     r->start = start;
     r->end = LastKnownRequestProcessed(ob_display);
     ignore_serials = g_slist_prepend(ignore_serials, r);
-    ob_debug("ignoring serials %u-%u\n", r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
     XSync(ob_display, FALSE);
-    ob_debug("now last serial %u\n", LastKnownRequestProcessed(ob_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
@@ -1891,14 +1889,11 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
                e->xcrossing.mode == NotifyUngrab ||
                e->xcrossing.detail == NotifyInferior));
 
-    ob_debug("checking serial %u\n", e->xany.serial);
     for (it = ignore_serials; it; it = next) {
         ObSerialRange *r = it->data;
 
         next = g_slist_next(it);
 
-        /* XXX wraparound... */
-        ob_debug("  ignore range %u-%u\n", r->start, r->end);
         if ((glong)(e->xany.serial - r->end) > 0) {
             /* past the end */
             ignore_serials = g_slist_delete_link(ignore_serials, it);

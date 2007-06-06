@@ -2403,7 +2403,9 @@ ObClient *client_search_focus_group_full(ObClient *self)
             if (client_focused(c)) return c;
             if ((c = client_search_focus_tree(it->data))) return c;
         }
-    }
+    } else
+        if (client_focused(c)) return c;
+    return NULL;
 }
 
 gboolean client_has_parent(ObClient *self)

@@ -53,23 +53,23 @@ msgstr "Tất cả chỗ làm việc"
 
 #: openbox/client_menu.c:351
 msgid "&Layer"
-msgstr "Lớp"
+msgstr "Lớ&p"
 
 #: openbox/client_menu.c:356
 msgid "Always on &top"
-msgstr "Luôn luôn ở trên"
+msgstr "Luôn luôn ở &trên"
 
 #: openbox/client_menu.c:357
 msgid "&Normal"
-msgstr "Bình thường"
+msgstr "&Bình thường"
 
 #: openbox/client_menu.c:358
 msgid "Always on &bottom"
-msgstr "Luôn luôn ở dưới"
+msgstr "Luôn luôn ở &dưới"
 
 #: openbox/client_menu.c:361
 msgid "&Send to desktop"
-msgstr "Gửi đến chỗ làm việc"
+msgstr "Gửi đến chỗ làm &việc"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
@@ -77,35 +77,35 @@ msgstr "Khách thực đơn"
 
 #: openbox/client_menu.c:371
 msgid "R&estore"
-msgstr "Hoàn lại"
+msgstr "&Hoàn lại"
 
 #: openbox/client_menu.c:379
 msgid "&Move"
-msgstr "Chuyển đi"
+msgstr "Chu&yển đi"
 
 #: openbox/client_menu.c:381
 msgid "Resi&ze"
-msgstr "Làm nhỏ hơn/lớn hơn"
+msgstr "Làm &nhỏ hơn/lớn hơn"
 
 #: openbox/client_menu.c:383
 msgid "Ico&nify"
-msgstr "Biến xuống"
+msgstr "Biến &xuống"
 
 #: openbox/client_menu.c:391
 msgid "Ma&ximize"
-msgstr "Biến lớn nhất"
+msgstr "Biến &lớn nhất"
 
 #: openbox/client_menu.c:399
 msgid "&Roll up/down"
-msgstr "Cuốn lên/xuống"
+msgstr "&Cuốn lên/xuống"
 
 #: openbox/client_menu.c:401
 msgid "Un/&Decorate"
-msgstr "Trang/Không Trang trí"
+msgstr "&Trang/Không Trang trí"
 
 #: openbox/client_menu.c:411
 msgid "&Close"
-msgstr "Đóng"
+msgstr "Đón&g"
 
 #: openbox/config.c:701
 #, c-format

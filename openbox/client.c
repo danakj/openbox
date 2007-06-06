@@ -2367,20 +2367,19 @@ ObClient *client_search_focus_tree(ObClient *self)
 
 ObClient *client_search_focus_tree_full(ObClient *self)
 {
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            return client_search_focus_tree_full(self->transient_for);
-        } else {
-            GSList *it;
-        
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                if (it->data != self) {
-                    ObClient *c = it->data;
+    GSList *it;
+    ObClient *c;
 
-                    if (client_focused(c)) return c;
-                    if ((c = client_search_focus_tree(it->data))) return c;
-                }
-            }
+    if (self->transient_for && self->transient_for != OB_TRAN_GROUP) {
+        if ((c = client_search_focus_tree_full(self->transient_for)))
+            return c;
+    }
+        
+    for (it = self->group->members; it; it = g_slist_next(it)) {
+        if (it->data != self) {
+            c = it->data;
+            if (client_focused(c)) return c;
+            if ((c = client_search_focus_tree(it->data))) return c;
         }
     }
 

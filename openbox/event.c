@@ -499,7 +499,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
             focus_left_screen = FALSE;
 
-            focus_fallback(FALSE, FALSE, TRUE);
+            focus_fallback(FALSE, config_focus_under_mouse, TRUE);
 
             /* We don't get a FocusOut for this case, because it's just moving
                from our Inferior up to us. This happens when iconifying a
@@ -551,7 +551,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 */
 
                 if (!focus_left_screen)
-                    focus_fallback(FALSE, FALSE, TRUE);
+                    focus_fallback(FALSE, config_focus_under_mouse, TRUE);
             }
         }
         else if (!client)
@@ -607,7 +607,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to an unmanaged window 0x%x !\n",
                               ce.xfocus.window);
-                focus_fallback(TRUE, FALSE, TRUE);
+                focus_fallback(TRUE, config_focus_under_mouse, TRUE);
             }
         }
 

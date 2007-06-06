@@ -931,9 +931,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!FIND(shadow, L("menu","active-disabled","shadow","offset"),
               theme->a_menu_text_disabled_selected))
         theme->a_menu_text_disabled_selected->
-            texture[0].data.text.shadow_offset_x = 0;
-    theme->a_menu_text_disabled_selected->
-        texture[0].data.text.shadow_offset_y = 0;
+            texture[0].data.text.shadow_offset_x =
+            theme->a_menu_text_disabled_selected->
+            texture[0].data.text.shadow_offset_y = 0;
     theme->a_menu_text_normal->texture[0].data.text.shadow_color =
         theme->menu_text_normal_shadow_color;
     theme->a_menu_text_normal->texture[0].data.text.shadow_alpha =

@@ -8,11 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-<<<<<<< .working
-"POT-Creation-Date: 2007-06-05 16:46-0400\n"
-=======
 "POT-Creation-Date: 2007-06-07 14:18+0200\n"
->>>>>>> .merge-right.r7434
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

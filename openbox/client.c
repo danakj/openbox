@@ -1293,8 +1293,7 @@ static void client_update_transient_tree(ObClient *self,
         for (it = self->parents; it; it = next) {
             next = g_slist_next(it);
             c = it->data;
-            if ((!c->transient_for || c->transient_for != OB_TRAN_GROUP) &&
-                client_normal(c))
+            if (c->transient_for != OB_TRAN_GROUP && client_normal(c))
             {
                 c->transients = g_slist_remove(c->transients, self);
                 self->parents = g_slist_delete_link(self->parents, it);
@@ -1320,9 +1319,7 @@ static void client_update_transient_tree(ObClient *self,
         for (it = oldgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
             if (c != self &&
-                (!c->transient_for ||
-                 c->transient_for != OB_TRAN_GROUP) &&
-                client_normal(c))
+                c->transient_for != OB_TRAN_GROUP && client_normal(c))
             {
                 c->transients = g_slist_prepend(c->transients, self);
                 self->parents = g_slist_prepend(self->parents, c);
@@ -1356,14 +1353,14 @@ static void client_update_transient_tree(ObClient *self,
        A can't be transient for C or we have a cycle
     */
     if (oldgroup != newgroup && newgroup != NULL &&
-        newparent != OB_TRAN_GROUP)
+        newparent != OB_TRAN_GROUP &&
+        client_normal(self))
     {
         for (it = newgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
             if (c != self && c->transient_for == OB_TRAN_GROUP &&
                 /* Don't make it our child if it is already our parent */
-                !client_is_direct_child(c, self) &&
-                client_normal(self))
+                !client_is_direct_child(c, self))
             {
                 self->transients = g_slist_prepend(self->transients, c);
                 c->parents = g_slist_prepend(c->parents, self);
@@ -1848,7 +1845,7 @@ void client_update_wmhints(ObClient *self)
                transient for something, even if transient_for was NULL because
                it wasn't in a group before.
 
-               If transient_for was NULL and oldgroup was NULL we can assume
+               If parents was NULL and oldgroup was NULL we can assume
                that when we add the new group, it will become transient for
                something.
 
@@ -1860,7 +1857,7 @@ void client_update_wmhints(ObClient *self)
                updated.
             */
             if (self->transient &&
-                ((self->transient_for == NULL && oldgroup == NULL) ||
+                ((self->parents == NULL && oldgroup == NULL) ||
                  (self->transient_for == OB_TRAN_GROUP && !self->group)))
                 client_update_transient_for(self);
         }

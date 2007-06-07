@@ -1102,43 +1102,36 @@ static void client_get_desktop(ObClient *self)
             self->desktop = d;
         ob_debug("client requested desktop 0x%x\n", self->desktop); 
     } else {
-        gboolean trdesk = FALSE;
+        GSList *it;
+        gboolean first = TRUE;
+        guint all = screen_num_desktops; /* not a valid value */
 
-        if (self->transient_for) {
-            /* if they are all on one desktop, then open it on the
-               same desktop */
-            GSList *it;
-            gboolean first = TRUE;
-            guint all = screen_num_desktops; /* not a valid value */
+        /* if they are all on one desktop, then open it on the
+           same desktop */
+        for (it = self->parents; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
 
-            for (it = self->parents; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
+            if (c->desktop == DESKTOP_ALL) continue;
 
-                if (c->desktop == DESKTOP_ALL) continue;
-
-                if (first) {
-                    all = c->desktop;
-                    first = FALSE;
-                }
-                else if (all != c->desktop)
-                    all = screen_num_desktops; /* make it invalid */
+            if (first) {
+                all = c->desktop;
+                first = FALSE;
             }
-            if (all != screen_num_desktops) {
-                self->desktop = all;
-                trdesk = TRUE;
-            }
+            else if (all != c->desktop)
+                all = screen_num_desktops; /* make it invalid */
         }
-
-        if (!trdesk) {
-            /* try get from the startup-notification protocol */
-            if (sn_get_desktop(self->startup_id, &self->desktop)) {
-                if (self->desktop >= screen_num_desktops &&
-                    self->desktop != DESKTOP_ALL)
-                    self->desktop = screen_num_desktops - 1;
-            } else
-                /* defaults to the current desktop */
-                self->desktop = screen_desktop;
+        if (all != screen_num_desktops) {
+            self->desktop = all;
         }
+        /* try get from the startup-notification protocol */
+        else if (sn_get_desktop(self->startup_id, &self->desktop)) {
+            if (self->desktop >= screen_num_desktops &&
+                self->desktop != DESKTOP_ALL)
+                self->desktop = screen_num_desktops - 1;
+        }
+        /* defaults to the current desktop */
+        else
+            self->desktop = screen_desktop;
     }
 }
 

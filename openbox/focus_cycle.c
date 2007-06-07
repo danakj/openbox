@@ -44,10 +44,6 @@ static ObClient *focus_find_directional    (ObClient *c,
                                             ObDirection dir,
                                             gboolean dock_windows,
                                             gboolean desktop_windows);
-static ObClient *focus_find_directional    (ObClient *c,
-                                            ObDirection dir,
-                                            gboolean dock_windows,
-                                            gboolean desktop_windows);
 
 void focus_cycle_startup(gboolean reconfig)
 {

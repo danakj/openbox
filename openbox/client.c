@@ -2047,18 +2047,19 @@ void client_update_icons(ObClient *self)
 
         if ((hints = XGetWMHints(ob_display, self->window))) {
             if (hints->flags & IconPixmapHint) {
-                self->nicons++;
+                self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
                 xerror_set_ignore(TRUE);
                 if (!RrPixmapToRGBA(ob_rr_inst,
                                     hints->icon_pixmap,
                                     (hints->flags & IconMaskHint ?
                                      hints->icon_mask : None),
-                                    &self->icons[self->nicons-1].width,
-                                    &self->icons[self->nicons-1].height,
-                                    &self->icons[self->nicons-1].data)){
-                    /*g_free(&self->icons[self->nicons-1]);*/
-                    self->nicons--;
+                                    &self->icons[0].width,
+                                    &self->icons[0].height,
+                                    &self->icons[0].data))
+                {
+                    g_free(self->icons);
+                    self->nicons = 0;
                 }
                 xerror_set_ignore(FALSE);
             }

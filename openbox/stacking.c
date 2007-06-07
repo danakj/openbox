@@ -169,7 +169,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
     GList *modals = NULL;
     GList *trans = NULL;
 
-    if (!raise && selected->transient_for) {
+    if (!raise && selected->parents) {
         GSList *top, *top_it;
         GSList *top_reorder = NULL;
         
@@ -371,7 +371,7 @@ static GList *find_highest_relative(ObClient *client)
 {    
     GList *ret = NULL;
 
-    if (client->transient_for) {
+    if (client->parents) {
         GList *it;
         GSList *top;
 

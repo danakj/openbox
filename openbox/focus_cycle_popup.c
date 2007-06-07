@@ -211,31 +211,26 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 static gchar *popup_get_name(ObClient *c)
 {
     ObClient *p;
-    gchar *title = NULL;
+    gchar *title;
     const gchar *desk = NULL;
     gchar *ret;
 
-    /* find our highest direct parent, including non-normal windows */
-    for (p = c; p->transient_for && p->transient_for != OB_TRAN_GROUP;
-         p = p->transient_for);
+    /* find our highest direct parent */
+    p = client_search_top_direct_parent(c);
 
     if (c->desktop != DESKTOP_ALL && c->desktop != screen_desktop)
         desk = screen_desktop_names[c->desktop];
 
-    /* use the transient's parent's title/icon if we don't have one */
-    if (p != c && !strcmp("", (c->iconic ? c->icon_title : c->title)))
-        title = g_strdup(p->iconic ? p->icon_title : p->title);
+    title = c->iconic ? c->icon_title : c->title;
 
-    if (title == NULL)
-        title = g_strdup(c->iconic ? c->icon_title : c->title);
+    /* use the transient's parent's title/icon if we don't have one */
+    if (p != c && title[0] == '\0')
+        title = p->iconic ? p->icon_title : p->title;
 
     if (desk)
         ret = g_strdup_printf("%s [%s]", title, desk);
-    else {
-        ret = title;
-        title = NULL;
-    }
-    g_free(title);
+    else
+        ret = g_strdup(title);
 
     return ret;
 }

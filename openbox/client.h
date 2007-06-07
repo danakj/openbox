@@ -103,6 +103,8 @@ struct _ObClient
       case.
      */
     ObClient *transient_for;
+    /*! The client which are parents of this client */
+    GSList *parents;
     /*! The clients which are transients (children) of this client */
     GSList *transients;
     /*! The desktop on which the window resides (0xffffffff for all
@@ -659,10 +661,15 @@ GSList *client_search_all_top_parents(ObClient *self);
 */
 GSList *client_search_all_top_parents_layer(ObClient *self);
 
+/*! Returns the client's parent when it is transient for a direct window
+  rather than a group. If it has no parents, or is transient for the
+  group, this returns null */
+ObClient *client_direct_parent(ObClient *self);
+
 /*! Returns a window's top level parent. This only counts direct parents,
   not groups if it is transient for its group.
 */
-ObClient *client_search_top_normal_parent(ObClient *self);
+ObClient *client_search_top_direct_parent(ObClient *self);
 
 /*! Is one client a direct child of another (i.e. not through the group.) */
 gboolean client_is_direct_child(ObClient *parent, ObClient *child);

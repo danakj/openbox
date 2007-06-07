@@ -505,7 +505,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
         g_assert(popup.targets == NULL);
 
         /* position the popup */
-        a = screen_physical_area_monitor(0);
+        a = screen_physical_area_monitor_active();
         icon_popup_position(single_popup, CenterGravity,
                             a->x + a->width / 2, a->y + a->height / 2);
         icon_popup_height(single_popup, POPUP_HEIGHT);

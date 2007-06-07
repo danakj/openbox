@@ -2057,7 +2057,7 @@ void client_update_icons(ObClient *self)
                                     &self->icons[self->nicons-1].width,
                                     &self->icons[self->nicons-1].height,
                                     &self->icons[self->nicons-1].data)){
-                    //g_free(&self->icons[self->nicons-1]);
+                    /*g_free(&self->icons[self->nicons-1]);*/
                     self->nicons--;
                 }
                 xerror_set_ignore(FALSE);

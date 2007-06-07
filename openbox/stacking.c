@@ -169,7 +169,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
     GList *modals = NULL;
     GList *trans = NULL;
 
-    if (!raise && selected->transient_for) {
+    if (!raise && selected->parents) {
         GSList *top, *top_it;
         GSList *top_reorder = NULL;
         
@@ -179,6 +179,11 @@ static void restack_windows(ObClient *selected, gboolean raise)
 
         /* that is, if it has any parents */
         if (!(top->data == selected && top->next == NULL)) {
+            /* place the window being lowered on the bottom so it'll be
+               below any of its peers that it can */
+            stacking_list = g_list_remove(stacking_list, selected);
+            stacking_list = g_list_append(stacking_list, selected);
+
             /* go thru stacking list backwards so we can use g_slist_prepend */
             for (it = g_list_last(stacking_list); it && top;
                  it = g_list_previous(it))
@@ -233,7 +238,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
     wins = g_list_append(wins, selected);
 
     /* if selected window is transient for group then raise it above others */
-    if (selected->transient_for == OB_TRAN_GROUP) {
+    if (selected->transient_for_group) {
         /* if it's modal, raise it above those also */
         if (selected->modal) {
             wins = g_list_concat(wins, group_modals);
@@ -371,7 +376,7 @@ static GList *find_highest_relative(ObClient *client)
 {    
     GList *ret = NULL;
 
-    if (client->transient_for) {
+    if (client->parents) {
         GList *it;
         GSList *top;
 

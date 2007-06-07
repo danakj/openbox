@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-05-23 16:20+0200\n"
+"POT-Creation-Date: 2007-06-07 14:18+0200\n"
 "PO-Revision-Date: 2007-05-24 19:41+0100\n"
 "Last-Translator: Pavel Shevchuk <stlwrt@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -15,32 +15,32 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:954
+#: openbox/action.c:957
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Запрошено некорректное действие '%s'. Нет такого действия."
 
-#: openbox/action.c:957
+#: openbox/action.c:960
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 "Некорректное использование действия '%s'. Действие будет проигнорировано."
 
-#: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
+#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Не удалось запустить '%s': %s"
 
-#: openbox/action.c:1265
+#: openbox/action.c:1266
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Не удалось сконвертировать путь '%s' из utf8"
 
-#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:104
+#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
 msgid "Go there..."
 msgstr "Перейти..."
 
-#: openbox/client_list_combined_menu.c:148
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "Окна"
 
@@ -48,67 +48,67 @@ msgstr "Окна"
 msgid "Desktops"
 msgstr "Рабочие столы"
 
-#: openbox/client_menu.c:246
+#: openbox/client_menu.c:258
 msgid "All desktops"
 msgstr "Все рабочие столы"
 
-#: openbox/client_menu.c:351
+#: openbox/client_menu.c:363
 msgid "&Layer"
 msgstr "Слой(&L)"
 
-#: openbox/client_menu.c:356
+#: openbox/client_menu.c:368
 msgid "Always on &top"
 msgstr "Поверх всех окон(&T)"
 
-#: openbox/client_menu.c:357
+#: openbox/client_menu.c:369
 msgid "&Normal"
 msgstr "Обычное поведение(&N)"
 
-#: openbox/client_menu.c:358
+#: openbox/client_menu.c:370
 msgid "Always on &bottom"
 msgstr "Под всеми окнами(&B)"
 
-#: openbox/client_menu.c:361
+#: openbox/client_menu.c:373
 msgid "&Send to desktop"
 msgstr "Отправить на рабочий стол(&S)"
 
-#: openbox/client_menu.c:365
+#: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Меню клиентов"
 
-#: openbox/client_menu.c:371
+#: openbox/client_menu.c:383
 msgid "R&estore"
 msgstr "Восстановить(&E)"
 
-#: openbox/client_menu.c:379
+#: openbox/client_menu.c:391
 msgid "&Move"
 msgstr "Переместить(&M)"
 
-#: openbox/client_menu.c:381
+#: openbox/client_menu.c:393
 msgid "Resi&ze"
 msgstr "Изменить размер(&Z)"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:395
 msgid "Ico&nify"
 msgstr "Свернуть(&N)"
 
-#: openbox/client_menu.c:391
+#: openbox/client_menu.c:403
 msgid "Ma&ximize"
 msgstr "Развернуть(&X)"
 
-#: openbox/client_menu.c:399
+#: openbox/client_menu.c:411
 msgid "&Roll up/down"
 msgstr "Скрутить/Раскрутить(&R)"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:413
 msgid "Un/&Decorate"
 msgstr "(От)декорировать(&D)"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:423
 msgid "&Close"
 msgstr "Закрыть(&C)"
 
-#: openbox/config.c:701
+#: openbox/config.c:704
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Некорректная клавиша '%s' упомянута в конфигурационном файле"
@@ -117,27 +117,27 @@ msgstr "Некорректная клавиша '%s' упомянута в ко�
 msgid "Conflict with key binding in config file"
 msgstr "Конфликт привязок клавиш в конфигурационном файле"
 
-#: openbox/menu.c:98 openbox/menu.c:106
+#: openbox/menu.c:100 openbox/menu.c:108
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Не могу найти корректный файл меню '%s'"
 
-#: openbox/menu.c:149
+#: openbox/menu.c:151
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Не могу запустить команду pipe-меню '%s': %s"
 
-#: openbox/menu.c:166
+#: openbox/menu.c:168
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Некорректный вывод pipe-меню '%s'"
 
-#: openbox/menu.c:179
+#: openbox/menu.c:181
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Попытка доступа к несуществующему меню '%s'."
 
-#: openbox/menu.c:331 openbox/menu.c:332
+#: openbox/menu.c:342 openbox/menu.c:343
 msgid "More..."
 msgstr "Больше..."
 
@@ -182,20 +182,20 @@ msgstr ""
 msgid "Unable to load a theme."
 msgstr "Не могу загрузить тему."
 
-#: openbox/openbox.c:394
+#: openbox/openbox.c:401
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "При перезапуске не удалось запустить исполняемый файл '%s': %s"
 
-#: openbox/openbox.c:464 openbox/openbox.c:466
+#: openbox/openbox.c:471 openbox/openbox.c:473
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:475
+#: openbox/openbox.c:482
 msgid "Syntax: openbox [options]\n"
 msgstr "Синтаксис: openbox [параметры]\n"
 
-#: openbox/openbox.c:476
+#: openbox/openbox.c:483
 msgid ""
 "\n"
 "Options:\n"
@@ -203,23 +203,23 @@ msgstr ""
 "\n"
 "Параметры:\n"
 
-#: openbox/openbox.c:477
+#: openbox/openbox.c:484
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Показать эту справку и выйти\n"
 
-#: openbox/openbox.c:478
+#: openbox/openbox.c:485
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Показать версию и выйти\n"
 
-#: openbox/openbox.c:479
+#: openbox/openbox.c:486
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Заменить текущий менеджер окон\n"
 
-#: openbox/openbox.c:480
+#: openbox/openbox.c:487
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Не соединяться с менеджером сессий\n"
 
-#: openbox/openbox.c:481
+#: openbox/openbox.c:488
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -227,15 +227,15 @@ msgstr ""
 "\n"
 "Передаю сообщения запущенной инстанции Openbox:\n"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:489
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Перезагрузить конфигурацию Openbox\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:490
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Перезапустить Openbox\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:491
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -243,25 +243,25 @@ msgstr ""
 "\n"
 "Отладочные параметры:\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:492
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Запустить в синхронном режиме\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:493
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Отображать отладочную информацию\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:494
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Отображать отладочную информацию об управлении "
 "фокусом\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:495
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Разбить экран на фальшивые экраны xinerama\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:496
 #, c-format
 msgid ""
 "\n"
@@ -270,27 +270,27 @@ msgstr ""
 "\n"
 "Пожалуйста, сообщайте об ошибках на %s\n"
 
-#: openbox/openbox.c:586
+#: openbox/openbox.c:593
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Некорректный командный параметр '%s'\n"
 
-#: openbox/screen.c:88 openbox/screen.c:189
+#: openbox/screen.c:89 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "На экране %d уже запущен менеджер окон"
 
-#: openbox/screen.c:125
+#: openbox/screen.c:126
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Не могу получить выбор менеджера окон на экране %d"
 
-#: openbox/screen.c:146
+#: openbox/screen.c:147
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Менеджер окон на экране %d не завершается"
 
-#: openbox/screen.c:939
+#: openbox/screen.c:991
 #, c-format
 msgid "desktop %i"
 msgstr "рабочий стол %i"

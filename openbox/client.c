@@ -85,6 +85,7 @@ static gboolean client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
 static void client_update_transient_tree(ObClient *self,
                                          ObGroup *oldgroup, ObGroup *newgroup,
+                                         gboolean oldgtran, gboolean newgtran,
                                          ObClient* oldparent,
                                          ObClient *newparent);
 static void client_present(ObClient *self, gboolean here, gboolean raise);
@@ -92,6 +93,7 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
 static void client_call_notifies(ObClient *self, GSList *list);
+
 
 void client_startup(gboolean reconfig)
 {
@@ -161,37 +163,6 @@ void client_set_list()
 
     stacking_set_list();
 }
-
-/*
-  void client_foreach_transient(ObClient *self, ObClientForeachFunc func, gpointer data)
-  {
-  GSList *it;
-
-  for (it = self->transients; it; it = g_slist_next(it)) {
-  if (!func(it->data, data)) return;
-  client_foreach_transient(it->data, func, data);
-  }
-  }
-
-  void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, gpointer data)
-  {
-  if (self->transient_for) {
-  if (self->transient_for != OB_TRAN_GROUP) {
-  if (!func(self->transient_for, data)) return;
-  client_foreach_ancestor(self->transient_for, func, data);
-  } else {
-  GSList *it;
-
-  for (it = self->group->members; it; it = g_slist_next(it))
-  if (it->data != self &&
-  !((ObClient*)it->data)->transient_for) {
-  if (!func(it->data, data)) return;
-  client_foreach_ancestor(it->data, func, data);
-  }
-  }
-  }
-  }
-*/
 
 void client_manage_all()
 {
@@ -489,7 +460,8 @@ void client_manage(Window window)
                           "desktop\n");
         }
         /* If something is focused, and it's not our relative... */
-        else if (focus_client && client_search_focus_tree_full(self) == NULL)
+        else if (focus_client && client_search_focus_tree_full(self) == NULL &&
+                 client_search_focus_group_full(self) == NULL)
         {
             /* If time stamp is old, don't steal focus */
             if (self->user_time && last_time &&
@@ -681,22 +653,16 @@ void client_unmanage(ObClient *self)
     client_call_notifies(self, client_destroy_notifies);
 
     /* tell our parent(s) that we're gone */
-    if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
-        for (it = self->group->members; it; it = g_slist_next(it))
-            if (it->data != self)
-                ((ObClient*)it->data)->transients =
-                    g_slist_remove(((ObClient*)it->data)->transients,self);
-    } else if (self->transient_for) {        /* transient of window */
-        self->transient_for->transients =
-            g_slist_remove(self->transient_for->transients, self);
-    }
+    for (it = self->parents; it; it = g_slist_next(it))
+        ((ObClient*)it->data)->transients =
+            g_slist_remove(((ObClient*)it->data)->transients,self);
 
     /* tell our transients that we're gone */
     for (it = self->transients; it; it = g_slist_next(it)) {
-        if (((ObClient*)it->data)->transient_for != OB_TRAN_GROUP) {
-            ((ObClient*)it->data)->transient_for = NULL;
-            client_calc_layer(it->data);
-        }
+        ((ObClient*)it->data)->parents =
+            g_slist_remove(((ObClient*)it->data)->parents, self);
+        /* we could be keeping our children in a higher layer */
+        client_calc_layer(it->data);
     }
 
     /* remove from its group */
@@ -1073,7 +1039,7 @@ static void client_get_all(ObClient *self, gboolean real)
 
     client_update_wmhints(self);
     /* this may have already been called from client_update_wmhints */
-    if (self->transient_for == NULL)
+    if (!self->parents && !self->transient_for_group)
         client_update_transient_for(self);
 
     client_get_startup_id(self);
@@ -1137,50 +1103,43 @@ static void client_get_desktop(ObClient *self)
             self->desktop = d;
         ob_debug("client requested desktop 0x%x\n", self->desktop); 
     } else {
-        gboolean trdesk = FALSE;
+        GSList *it;
+        gboolean first = TRUE;
+        guint all = screen_num_desktops; /* not a valid value */
 
-        if (self->transient_for) {
-            if (self->transient_for != OB_TRAN_GROUP) {
-                if (self->transient_for->desktop != DESKTOP_ALL) {
-                    self->desktop = self->transient_for->desktop;
-                    trdesk = TRUE;
-                }
-            } else {
-                /* if all the group is on one desktop, then open it on the
-                   same desktop */
-                GSList *it;
-                gboolean first = TRUE;
-                guint all = screen_num_desktops; /* not a valid value */
+        /* if they are all on one desktop, then open it on the
+           same desktop */
+        for (it = self->parents; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
 
-                for (it = self->group->members; it; it = g_slist_next(it)) {
-                    ObClient *c = it->data;
+            if (c->desktop == DESKTOP_ALL) continue;
 
-                    if (c->desktop == DESKTOP_ALL) continue;
-
-                    if (c != self) {
-                        if (first) {
-                            all = c->desktop;
-                            first = FALSE;
-                        }
-                        else if (all != c->desktop)
-                            all = screen_num_desktops; /* make it invalid */
-                    }
-                }
-                if (all != screen_num_desktops) {
-                    self->desktop = all;
-                    trdesk = TRUE;
-                }
+            if (first) {
+                all = c->desktop;
+                first = FALSE;
             }
+            else if (all != c->desktop)
+                all = screen_num_desktops; /* make it invalid */
         }
-        if (!trdesk) {
-            /* try get from the startup-notification protocol */
-            if (sn_get_desktop(self->startup_id, &self->desktop)) {
-                if (self->desktop >= screen_num_desktops &&
-                    self->desktop != DESKTOP_ALL)
-                    self->desktop = screen_num_desktops - 1;
-            } else
-                /* defaults to the current desktop */
-                self->desktop = screen_desktop;
+        if (all != screen_num_desktops) {
+            self->desktop = all;
+
+            ob_debug("client desktop set from parents: 0x%x\n",
+                     self->desktop);
+        }
+        /* try get from the startup-notification protocol */
+        else if (sn_get_desktop(self->startup_id, &self->desktop)) {
+            if (self->desktop >= screen_num_desktops &&
+                self->desktop != DESKTOP_ALL)
+                self->desktop = screen_num_desktops - 1;
+            ob_debug("client desktop set from startup-notification: 0x%x\n",
+                     self->desktop);
+        }
+        /* defaults to the current desktop */
+        else {
+            self->desktop = screen_desktop;
+            ob_debug("client desktop set to the current desktop: %d\n",
+                     self->desktop);
         }
     }
 }
@@ -1246,6 +1205,7 @@ void client_update_transient_for(ObClient *self)
 {
     Window t = None;
     ObClient *target = NULL;
+    gboolean trangroup = FALSE;
 
     if (XGetTransientForHint(ob_display, self->window, &t)) {
         if (t != self->window) { /* cant be transient to itself! */
@@ -1257,49 +1217,40 @@ void client_update_transient_for(ObClient *self)
                    a dockapp, for example */
                 target = NULL;
             }
-
-            /* THIS IS SO ANNOYING ! ! ! ! Let me explain.... have a seat..
-
-               Setting the transient_for to Root is actually illegal, however
-               applications from time have done this to specify transient for
-               their group.
-
-               Now you can do that by being a TYPE_DIALOG and not setting
-               the transient_for hint at all on your window. But people still
-               use Root, and Kwin is very strange in this regard.
-
-               KWin 3.0 will not consider windows with transient_for set to
-               Root as transient for their group *UNLESS* they are also modal.
-               In that case, it will make them transient for the group. This
-               leads to all sorts of weird behavior from KDE apps which are
-               only tested in KWin. I'd like to follow their behavior just to
-               make this work right with KDE stuff, but that seems wrong.
-            */
-            if (!target && self->group) {
-                /* not transient to a client, see if it is transient for a
-                   group */
-                if (t == RootWindow(ob_display, ob_screen)) {
-                    /* window is a transient for its group! */
-                    target = OB_TRAN_GROUP;
-                }
-            }
         }
-    } else if (self->transient && self->group)
-        target = OB_TRAN_GROUP;
+
+        /* Setting the transient_for to Root is actually illegal, however
+           applications from time have done this to specify transient for
+           their group */
+        if (!target && self->group && t == RootWindow(ob_display, ob_screen))
+            trangroup = TRUE;
+    } else if (self->group && self->transient)
+        trangroup = TRUE;
 
     client_update_transient_tree(self, self->group, self->group,
-                                 self->transient_for, target);
-    self->transient_for = target;
+                                 self->transient_for_group, trangroup,
+                                 client_direct_parent(self), target);
+    self->transient_for_group = trangroup;
                           
 }
 
 static void client_update_transient_tree(ObClient *self,
                                          ObGroup *oldgroup, ObGroup *newgroup,
+                                         gboolean oldgtran, gboolean newgtran,
                                          ObClient* oldparent,
                                          ObClient *newparent)
 {
     GSList *it, *next;
     ObClient *c;
+
+    g_assert(!oldgtran || oldgroup);
+    g_assert(!newgtran || newgroup);
+    g_assert((!oldgtran && !oldparent) ||
+             (oldgtran && !oldparent) ||
+             (!oldgtran && oldparent));
+    g_assert((!newgtran && !newparent) ||
+             (newgtran && !newparent) ||
+             (!newgtran && newparent));
 
     /* * *
       Group transient windows are not allowed to have other group
@@ -1308,7 +1259,9 @@ static void client_update_transient_tree(ObClient *self,
 
 
     /* No change has occured */
-    if (oldgroup == newgroup && oldparent == newparent) return;
+    if (oldgroup == newgroup &&
+        oldgtran == newgtran &&
+        oldparent == newparent) return;
 
     /** Remove the client from the transient tree wherever it has changed **/
 
@@ -1320,15 +1273,13 @@ static void client_update_transient_tree(ObClient *self,
        we could have any number of direct parents above up, any of which could
        be transient for the group, and we need to remove it from our children.
     */
-    if (oldparent != newparent &&
-        newparent != NULL && newparent != OB_TRAN_GROUP &&
-        newgroup != NULL && newgroup == oldgroup)
+    if (!oldgtran && oldparent != newparent && newparent != NULL &&
+        newgroup != NULL && newgroup == oldgroup &&
+        client_normal(newparent))
     {
-        ObClient *look = newparent;
-        do {
-            self->transients = g_slist_remove(self->transients, look);
-            look = look->transient_for;
-        } while (look != NULL && look != OB_TRAN_GROUP);
+        ObClient *look = client_search_top_direct_parent(newparent);
+        self->transients = g_slist_remove(self->transients, look);
+        look->parents = g_slist_remove(look->parents, self);
     }
             
 
@@ -1336,50 +1287,55 @@ static void client_update_transient_tree(ObClient *self,
        group, then we need to remove any old group transient windows
        from our children. But if we were already transient for the group, then
        other group transients are not our children. */
-    if ((oldgroup != newgroup ||
-         (newparent == OB_TRAN_GROUP && oldparent != newparent)) &&
-        oldgroup != NULL && oldparent != OB_TRAN_GROUP)
+    if ((oldgroup != newgroup || (newgtran && oldgtran != newgtran)) &&
+        oldgroup != NULL && !oldgtran)
     {
         for (it = self->transients; it; it = next) {
             next = g_slist_next(it);
             c = it->data;
-            if (c->group == oldgroup)
+            if (c->group == oldgroup && client_normal(self)) {
                 self->transients = g_slist_delete_link(self->transients, it);
+                c->parents = g_slist_remove(c->parents, self);
+            }
         }
     }
 
     /* If we used to be transient for a group and now we are not, or we're
        transient for a new group, then we need to remove ourselves from all
        our ex-parents */
-    if (oldparent == OB_TRAN_GROUP && (oldgroup != newgroup ||
-                                       oldparent != newparent))
+    if (oldgtran && (oldgroup != newgroup || oldgtran != newgtran))
     {
-        for (it = oldgroup->members; it; it = g_slist_next(it)) {
+        for (it = self->parents; it; it = next) {
+            next = g_slist_next(it);
             c = it->data;
-            if (c != self && (!c->transient_for ||
-                              c->transient_for != OB_TRAN_GROUP))
+            if (!c->transient_for_group && client_normal(c)) {
                 c->transients = g_slist_remove(c->transients, self);
+                self->parents = g_slist_delete_link(self->parents, it);
+            }
         }
     }
     /* If we used to be transient for a single window and we are no longer
        transient for it, then we need to remove ourself from its children */
-    else if (oldparent != NULL && oldparent != OB_TRAN_GROUP &&
-             oldparent != newparent)
+    else if (oldparent && oldparent != newparent &&
+             client_normal(oldparent))
+    {
         oldparent->transients = g_slist_remove(oldparent->transients, self);
-
+        self->parents = g_slist_remove(self->parents, oldparent);
+    }
 
     /** Re-add the client to the transient tree wherever it has changed **/
 
     /* If we're now transient for a group and we weren't transient for it
        before then we need to add ourselves to all our new parents */
-    if (newparent == OB_TRAN_GROUP && (oldgroup != newgroup ||
-                                       oldparent != newparent))
+    if (newgtran && (oldgroup != newgroup || oldgtran != newgtran))
     {
         for (it = oldgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
-            if (c != self && (!c->transient_for ||
-                              c->transient_for != OB_TRAN_GROUP))
+            if (c != self && !c->transient_for_group && client_normal(c))
+            {
                 c->transients = g_slist_prepend(c->transients, self);
+                self->parents = g_slist_prepend(self->parents, c);
+            }
         }
     }
     /* If we are now transient for a single window which we weren't before,
@@ -1388,11 +1344,14 @@ static void client_update_transient_tree(ObClient *self,
        WARNING: Cyclical transient ness is possible if two windows are
        transient for eachother.
     */
-    else if (newparent != NULL && newparent != OB_TRAN_GROUP &&
-             newparent != oldparent &&
+    else if (newparent && newparent != oldparent &&
              /* don't make ourself its child if it is already our child */
-             !client_is_direct_child(self, newparent))
+             !client_is_direct_child(self, newparent) &&
+             client_normal(newparent))
+    {
         newparent->transients = g_slist_prepend(newparent->transients, self);
+        self->parents = g_slist_prepend(self->parents, newparent);
+    }
 
     /* If the group changed then we need to add any new group transient
        windows to our children. But if we're transient for the group, then
@@ -1404,16 +1363,17 @@ static void client_update_transient_tree(ObClient *self,
        C is transient for B
        A can't be transient for C or we have a cycle
     */
-    if (oldgroup != newgroup && newgroup != NULL &&
-        newparent != OB_TRAN_GROUP)
+    if (oldgroup != newgroup && newgroup != NULL && !newgtran &&
+        client_normal(self))
     {
         for (it = newgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
-            if (c != self && c->transient_for == OB_TRAN_GROUP &&
+            if (c != self && c->transient_for_group &&
                 /* Don't make it our child if it is already our parent */
                 !client_is_direct_child(c, self))
             {
                 self->transients = g_slist_prepend(self->transients, c);
+                c->parents = g_slist_prepend(c->parents, self);
             }
         }
     }
@@ -1884,8 +1844,10 @@ void client_update_wmhints(ObClient *self)
             /* Put ourselves into the new group's transient tree, and remove
                ourselves from the old group's */
             client_update_transient_tree(self, oldgroup, self->group,
-                                         self->transient_for,
-                                         self->transient_for);
+                                         self->transient_for_group,
+                                         self->transient_for_group,
+                                         client_direct_parent(self),
+                                         client_direct_parent(self));
 
             /* Lastly, being in a group, or not, can change if the window is
                transient for anything.
@@ -1895,11 +1857,11 @@ void client_update_wmhints(ObClient *self)
                transient for something, even if transient_for was NULL because
                it wasn't in a group before.
 
-               If transient_for was NULL and oldgroup was NULL we can assume
+               If parents was NULL and oldgroup was NULL we can assume
                that when we add the new group, it will become transient for
                something.
 
-               If transient_for was OB_TRAN_GROUP, then it must have already
+               If transient_for_group is TRUE, then it must have already
                had a group. If it is getting a new group, the above call to
                client_update_transient_tree has already taken care of
                everything ! If it is losing all group status then it will
@@ -1907,8 +1869,8 @@ void client_update_wmhints(ObClient *self)
                updated.
             */
             if (self->transient &&
-                ((self->transient_for == NULL && oldgroup == NULL) ||
-                 (self->transient_for == OB_TRAN_GROUP && !self->group)))
+                ((self->parents == NULL && oldgroup == NULL) ||
+                 (self->transient_for_group && !self->group)))
                 client_update_transient_for(self);
         }
 
@@ -2085,18 +2047,19 @@ void client_update_icons(ObClient *self)
 
         if ((hints = XGetWMHints(ob_display, self->window))) {
             if (hints->flags & IconPixmapHint) {
-                self->nicons++;
+                self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
                 xerror_set_ignore(TRUE);
                 if (!RrPixmapToRGBA(ob_rr_inst,
                                     hints->icon_pixmap,
                                     (hints->flags & IconMaskHint ?
                                      hints->icon_mask : None),
-                                    &self->icons[self->nicons-1].width,
-                                    &self->icons[self->nicons-1].height,
-                                    &self->icons[self->nicons-1].data)){
-                    g_free(&self->icons[self->nicons-1]);
-                    self->nicons--;
+                                    &self->icons[0].width,
+                                    &self->icons[0].height,
+                                    &self->icons[0].data))
+                {
+                    g_free(self->icons);
+                    self->nicons = 0;
                 }
                 xerror_set_ignore(FALSE);
             }
@@ -2367,47 +2330,44 @@ ObClient *client_search_focus_tree(ObClient *self)
 
 ObClient *client_search_focus_tree_full(ObClient *self)
 {
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            return client_search_focus_tree_full(self->transient_for);
-        } else {
-            GSList *it;
-        
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                if (it->data != self) {
-                    ObClient *c = it->data;
+    if (self->parents) {
+        GSList *it;
 
-                    if (client_focused(c)) return c;
-                    if ((c = client_search_focus_tree(it->data))) return c;
-                }
-            }
+        for (it = self->parents; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
+            if ((c = client_search_focus_tree_full(it->data))) return c;
         }
-    }
 
-    /* this function checks the whole tree, the client_search_focus_tree
-       does not, so we need to check this window */
-    if (client_focused(self))
-        return self;
-    return client_search_focus_tree(self);
+        return NULL;
+    }
+    else {
+        /* this function checks the whole tree, the client_search_focus_tree
+           does not, so we need to check this window */
+        if (client_focused(self))
+            return self;
+        return client_search_focus_tree(self);
+    }
+}
+
+ObClient *client_search_focus_group_full(ObClient *self)
+{
+    GSList *it;
+
+    if (self->group) {
+        for (it = self->group->members; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
+
+            if (client_focused(c)) return c;
+            if ((c = client_search_focus_tree(it->data))) return c;
+        }
+    } else
+        if (client_focused(self)) return self;
+    return NULL;
 }
 
 gboolean client_has_parent(ObClient *self)
 {
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            if (client_normal(self->transient_for))
-                return TRUE;
-        }
-        else if (self->group) {
-            GSList *it;
-
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                if (it->data != self && client_normal(it->data))
-                    return TRUE;
-            }
-        }
-    }
-    return FALSE;
+    return self->parents != NULL;
 }
 
 static ObStackingLayer calc_layer(ObClient *self)
@@ -3081,7 +3041,7 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
 {
     if (self->functions & OB_CLIENT_FUNC_ICONIFY || !iconic) {
         /* move up the transient chain as far as possible first */
-        self = client_search_top_normal_parent(self);
+        self = client_search_top_direct_parent(self);
         client_iconify_recursive(self, iconic, curdesk, hide_animation);
     }
 }
@@ -3257,15 +3217,13 @@ void client_set_desktop_recursive(ObClient *self,
 
 void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
-    self = client_search_top_normal_parent(self);
+    self = client_search_top_direct_parent(self);
     client_set_desktop_recursive(self, target, donthide);
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
 {
-    while (child != parent &&
-           child->transient_for && child->transient_for != OB_TRAN_GROUP)
-        child = child->transient_for;
+    while (child != parent && (child = client_direct_parent(child)));
     return child == parent;
 }
 
@@ -3683,20 +3641,12 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
 
     if (!self->nicons) {
         ObClientIcon *parent = NULL;
+        GSList *it;
 
-        if (self->transient_for) {
-            if (self->transient_for != OB_TRAN_GROUP)
-                parent = client_icon_recursive(self->transient_for, w, h);
-            else {
-                GSList *it;
-                for (it = self->group->members; it; it = g_slist_next(it)) {
-                    ObClient *c = it->data;
-                    if (c != self && !c->transient_for) {
-                        if ((parent = client_icon_recursive(c, w, h)))
-                            break;
-                    }
-                }
-            }
+        for (it = self->parents; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
+            if ((parent = client_icon_recursive(c, w, h)))
+                break;
         }
         
         return parent;
@@ -3767,11 +3717,17 @@ guint client_monitor(ObClient *self)
     return screen_find_monitor(&self->frame->area);
 }
 
-ObClient *client_search_top_normal_parent(ObClient *self)
+ObClient *client_direct_parent(ObClient *self)
 {
-    while (self->transient_for && self->transient_for != OB_TRAN_GROUP &&
-           client_normal(self->transient_for))
-        self = self->transient_for;
+    if (!self->parents) return NULL;
+    if (self->transient_for_group) return NULL;
+    return self->parents->data;
+}                        
+
+ObClient *client_search_top_direct_parent(ObClient *self)
+{
+    ObClient *p;
+    while ((p = client_direct_parent(self))) self = p;
     return self;
 }
 
@@ -3779,34 +3735,18 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer)
 {
-    GSList *ret = NULL;
+    GSList *ret;
+    ObClient *p;
     
     /* move up the direct transient chain as far as possible */
-    while (self->transient_for && self->transient_for != OB_TRAN_GROUP &&
-           (!bylayer || self->transient_for->layer == layer) &&
-           client_normal(self->transient_for))
-        self = self->transient_for;
+    while ((p = client_direct_parent(self)) &&
+           (!bylayer || p->layer == layer))
+        self = p;
 
-    if (!self->transient_for)
-        ret = g_slist_prepend(ret, self);
-    else {
-            GSList *it;
-
-            g_assert(self->group);
-
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
-
-                if (!c->transient_for && client_normal(c) &&
-                    (!bylayer || c->layer == layer))
-                {
-                    ret = g_slist_prepend(ret, c);
-                }
-            }
-
-            if (ret == NULL) /* no group parents */
-                ret = g_slist_prepend(ret, self);
-    }
+    if (!self->parents)
+        ret = g_slist_prepend(NULL, self);
+    else
+        ret = g_slist_copy(self->parents);
 
     return ret;
 }
@@ -3823,46 +3763,20 @@ GSList *client_search_all_top_parents_layer(ObClient *self)
 
 ObClient *client_search_focus_parent(ObClient *self)
 {
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            if (client_focused(self->transient_for))
-                return self->transient_for;
-        } else {
-            GSList *it;
+    GSList *it;
 
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
-
-                /* checking transient_for prevents infinate loops! */
-                if (c != self && !c->transient_for)
-                    if (client_focused(c))
-                        return c;
-            }
-        }
-    }
+    for (it = self->parents; it; it = g_slist_next(it))
+        if (client_focused(it->data)) return it->data;
 
     return NULL;
 }
 
 ObClient *client_search_parent(ObClient *self, ObClient *search)
 {
-    if (self->transient_for) {
-        if (self->transient_for != OB_TRAN_GROUP) {
-            if (self->transient_for == search)
-                return search;
-        } else {
-            GSList *it;
+    GSList *it;
 
-            for (it = self->group->members; it; it = g_slist_next(it)) {
-                ObClient *c = it->data;
-
-                /* checking transient_for prevents infinate loops! */
-                if (c != self && !c->transient_for)
-                    if (c == search)
-                        return search;
-            }
-        }
-    }
+    for (it = self->parents; it; it = g_slist_next(it))
+        if (it->data == search) return search;
 
     return NULL;
 }

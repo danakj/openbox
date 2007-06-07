@@ -332,7 +332,7 @@ gint main(gint argc, gchar **argv)
                     ObClient *c = it->data;
 
                     /* the new config can change the window's decorations */
-                    client_setup_decor_and_functions(c, TRUE);
+                    client_setup_decor_and_functions(c, FALSE);
                     /* redraw the frames */
                     frame_adjust_area(c->frame, TRUE, TRUE, FALSE);
                     /* the decor sizes may have changed, so the windows may

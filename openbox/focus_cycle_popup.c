@@ -211,31 +211,26 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 static gchar *popup_get_name(ObClient *c)
 {
     ObClient *p;
-    gchar *title = NULL;
+    gchar *title;
     const gchar *desk = NULL;
     gchar *ret;
 
-    /* find our highest direct parent, including non-normal windows */
-    for (p = c; p->transient_for && p->transient_for != OB_TRAN_GROUP;
-         p = p->transient_for);
+    /* find our highest direct parent */
+    p = client_search_top_direct_parent(c);
 
     if (c->desktop != DESKTOP_ALL && c->desktop != screen_desktop)
         desk = screen_desktop_names[c->desktop];
 
-    /* use the transient's parent's title/icon if we don't have one */
-    if (p != c && !strcmp("", (c->iconic ? c->icon_title : c->title)))
-        title = g_strdup(p->iconic ? p->icon_title : p->title);
+    title = c->iconic ? c->icon_title : c->title;
 
-    if (title == NULL)
-        title = g_strdup(c->iconic ? c->icon_title : c->title);
+    /* use the transient's parent's title/icon if we don't have one */
+    if (p != c && title[0] == '\0')
+        title = p->iconic ? p->icon_title : p->title;
 
     if (desk)
         ret = g_strdup_printf("%s [%s]", title, desk);
-    else {
-        ret = title;
-        title = NULL;
-    }
-    g_free(title);
+    else
+        ret = g_strdup(title);
 
     return ret;
 }
@@ -245,7 +240,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint ml, mt, mr, mb;
     gint l, t, r, b;
     gint x, y, w, h;
-    Rect *screen_area;
+    Rect *screen_area = NULL;
     gint icons_per_row;
     gint icon_rows;
     gint textx, texty, textw, texth;
@@ -257,8 +252,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     const ObFocusCyclePopupTarget *newtarget;
     gint newtargetx, newtargety;
 
-    /* XXX find the middle monitor? */
-    screen_area = screen_physical_area_monitor(0);
+    screen_area = screen_physical_area_monitor_active();
 
     /* get the outside margins */
     RrMargins(p->a_bg, &ml, &mt, &mr, &mb);
@@ -511,7 +505,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
         g_assert(popup.targets == NULL);
 
         /* position the popup */
-        a = screen_physical_area_monitor(0);
+        a = screen_physical_area_monitor_active();
         icon_popup_position(single_popup, CenterGravity,
                             a->x + a->width / 2, a->y + a->height / 2);
         icon_popup_height(single_popup, POPUP_HEIGHT);

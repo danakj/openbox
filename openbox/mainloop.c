@@ -314,7 +314,7 @@ void ob_main_loop_run(ObMainLoop *loop)
                     ObMainLoopXHandlerType *h = it->data;
                     h->func(&e, h->data);
                 }
-            } while (XPending(loop->display));
+            } while (XPending(loop->display) && loop->run);
         } else if (loop->action_queue) {
             /* only fire off one action at a time, then go back for more
                X events, since the action might cause some X events (like
@@ -331,7 +331,7 @@ void ob_main_loop_run(ObMainLoop *loop)
                     action_unref(act);
                     act = NULL;
                 }
-            } while (!act && loop->action_queue);
+            } while (!act && loop->action_queue && loop->run);
 
             if  (act) {
                 event_curtime = act->data.any.time;

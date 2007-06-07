@@ -62,6 +62,7 @@ static Rect **pick_head(ObClient *c)
     guint *choice;
     guint i;
     gint px, py;
+    ObClient *p;
 
     area = g_new(Rect*, screen_num_monitors);
     choice = g_new(guint, screen_num_monitors);
@@ -69,12 +70,10 @@ static Rect **pick_head(ObClient *c)
         choice[i] = screen_num_monitors; /* make them all invalid to start */
 
     /* try direct parent first */
-    if (c->transient_for && c->transient_for != OB_TRAN_GROUP &&
-        client_normal(c->transient_for))
-    {
-        add_choice(choice, client_monitor(c->transient_for));
+    if ((p = client_direct_parent(c))) {
+        add_choice(choice, client_monitor(p));
         ob_debug("placement adding choice %d for parent\n",
-                 client_monitor(c->transient_for));
+                 client_monitor(p));
     }
 
     /* more than one window in its group (more than just this window) */
@@ -446,42 +445,24 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 
 static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 {
-    if (client->transient_for && client->type == OB_CLIENT_TYPE_DIALOG) {
-        if (client->transient_for != OB_TRAN_GROUP &&
-            client_normal(client->transient_for) &&
-            !client->iconic)
-        {
-            ObClient *c = client;
-            ObClient *p = client->transient_for;
-
-            if (client_normal(p)) {
-                *x = (p->frame->area.width - c->frame->area.width) / 2 +
-                    p->frame->area.x;
-                *y = (p->frame->area.height - c->frame->area.height) / 2 +
-                    p->frame->area.y;
-                return TRUE;
-            }
-        } else {
-            GSList *it;
-            gboolean first = TRUE;
-            gint l, r, t, b;
-            for (it = client->group->members; it; it = g_slist_next(it)) {
-                ObClient *m = it->data;
-                if (!(m == client || m->transient_for) && client_normal(m) &&
-                    !m->iconic)
-                {
-                    if (first) {
-                        l = RECT_LEFT(m->frame->area);
-                        t = RECT_TOP(m->frame->area);
-                        r = RECT_RIGHT(m->frame->area);
-                        b = RECT_BOTTOM(m->frame->area);
-                        first = FALSE;
-                    } else {
-                        l = MIN(l, RECT_LEFT(m->frame->area));
-                        t = MIN(t, RECT_TOP(m->frame->area));
-                        r = MAX(r, RECT_RIGHT(m->frame->area));
-                        b = MAX(b, RECT_BOTTOM(m->frame->area));
-                    }
+    if (client->type == OB_CLIENT_TYPE_DIALOG) {
+        GSList *it;
+        gboolean first = TRUE;
+        gint l, r, t, b;
+        for (it = client->parents; it; it = g_slist_next(it)) {
+            ObClient *m = it->data;
+            if (!m->iconic) {
+                if (first) {
+                    l = RECT_LEFT(m->frame->area);
+                    t = RECT_TOP(m->frame->area);
+                    r = RECT_RIGHT(m->frame->area);
+                    b = RECT_BOTTOM(m->frame->area);
+                    first = FALSE;
+                } else {
+                    l = MIN(l, RECT_LEFT(m->frame->area));
+                    t = MIN(t, RECT_TOP(m->frame->area));
+                    r = MAX(r, RECT_RIGHT(m->frame->area));
+                    b = MAX(b, RECT_BOTTOM(m->frame->area));
                 }
             }
             if (!first) {
@@ -492,8 +473,8 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         }
     }
 
-    if ((client->transient && client->type == OB_CLIENT_TYPE_DIALOG)
-        || client->type == OB_CLIENT_TYPE_SPLASH)
+    if (client->type == OB_CLIENT_TYPE_DIALOG ||
+        client->type == OB_CLIENT_TYPE_SPLASH)
     {
         Rect **areas;
 

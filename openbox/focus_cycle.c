@@ -44,10 +44,6 @@ static ObClient *focus_find_directional    (ObClient *c,
                                             ObDirection dir,
                                             gboolean dock_windows,
                                             gboolean desktop_windows);
-static ObClient *focus_find_directional    (ObClient *c,
-                                            ObDirection dir,
-                                            gboolean dock_windows,
-                                            gboolean desktop_windows);
 
 void focus_cycle_startup(gboolean reconfig)
 {
@@ -406,15 +402,14 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
             focus_cycle_draw_indicator(ft);
         }
     }
-    if (focus_cycle_target && dialog) {
+    if (focus_cycle_target && dialog)
         /* same arguments as focus_target_valid */
         focus_cycle_popup_single_show(focus_cycle_target,
                                       focus_cycle_iconic_windows,
                                       focus_cycle_all_desktops,
                                       focus_cycle_dock_windows,
                                       focus_cycle_desktop_windows);
-        return;
-    }
+    return;
 
 done_cycle:
     if (done && focus_cycle_target)

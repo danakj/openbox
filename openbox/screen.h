@@ -98,6 +98,8 @@ Rect *screen_physical_area();
 
 Rect *screen_physical_area_monitor(guint head);
 
+Rect *screen_physical_area_monitor_active();
+
 Rect *screen_area(guint desktop);
 
 Rect *screen_area_monitor(guint desktop, guint head);

@@ -41,6 +41,11 @@ static gint min_keycode, max_keycode, keysyms_per_keycode;
 /* This is a bitmask of the different masks for each modifier key */
 static guchar modkeys_keys[OB_MODKEY_NUM_KEYS];
 
+static gboolean alt_l = FALSE;
+static gboolean meta_l = FALSE;
+static gboolean super_l = FALSE;
+static gboolean hyper_l = FALSE;
+
 void modkeys_startup(gboolean reconfigure)
 {
     gint i, j, k;
@@ -56,6 +61,8 @@ void modkeys_startup(gboolean reconfigure)
     keymap = XGetKeyboardMapping(ob_display, min_keycode,
                                  max_keycode - min_keycode + 1,
                                  &keysyms_per_keycode);
+
+    alt_l = meta_l = super_l = hyper_l = FALSE;
 
     /* go through each of the modifier masks (eg ShiftMask, CapsMask...) */
     for (i = 0; i < NUM_MASKS; ++i) {
@@ -135,14 +142,37 @@ static void set_modkey_mask(guchar mask, KeySym sym)
         modkeys_keys[OB_MODKEY_KEY_NUMLOCK] |= mask;
     else if (sym == XK_Scroll_Lock)
         modkeys_keys[OB_MODKEY_KEY_SCROLLLOCK] |= mask;
-    else if (sym == XK_Super_L || sym == XK_Super_R)
+
+    else if (sym == XK_Super_L && super_l)
         modkeys_keys[OB_MODKEY_KEY_SUPER] |= mask;
-    else if (sym == XK_Hyper_L || sym == XK_Hyper_R)
+    else if (sym == XK_Super_L && !super_l)
+        /* left takes precident over right, so erase any masks the right
+           key may have set */
+        modkeys_keys[OB_MODKEY_KEY_SUPER] = mask, super_l = TRUE;
+    else if (sym == XK_Super_R && !super_l)
+        modkeys_keys[OB_MODKEY_KEY_SUPER] |= mask;
+
+    else if (sym == XK_Hyper_L && hyper_l)
         modkeys_keys[OB_MODKEY_KEY_HYPER] |= mask;
-    else if (sym == XK_Alt_L || sym == XK_Alt_R)
+    else if (sym == XK_Hyper_L && !hyper_l)
+        modkeys_keys[OB_MODKEY_KEY_HYPER] = mask, hyper_l = TRUE;
+    else if (sym == XK_Hyper_R && !hyper_l)
+        modkeys_keys[OB_MODKEY_KEY_HYPER] |= mask;
+
+    else if (sym == XK_Alt_L && alt_l)
         modkeys_keys[OB_MODKEY_KEY_ALT] |= mask;
-    else if (sym == XK_Meta_L || sym == XK_Meta_R)
+    else if (sym == XK_Alt_L && !alt_l)
+        modkeys_keys[OB_MODKEY_KEY_ALT] = mask, alt_l = TRUE;
+    else if (sym == XK_Alt_R && !alt_l)
+        modkeys_keys[OB_MODKEY_KEY_ALT] |= mask;
+
+    else if (sym == XK_Meta_L && meta_l)
         modkeys_keys[OB_MODKEY_KEY_META] |= mask;
+    else if (sym == XK_Meta_L && !meta_l)
+        modkeys_keys[OB_MODKEY_KEY_META] = mask, meta_l = TRUE;
+    else if (sym == XK_Meta_R && !meta_l)
+        modkeys_keys[OB_MODKEY_KEY_META] |= mask;
+
     /* CapsLock, Shift, and Control are special and hard-coded */
 }
 

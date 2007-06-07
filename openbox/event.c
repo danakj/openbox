@@ -499,7 +499,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
             focus_left_screen = FALSE;
 
-            focus_fallback(FALSE, FALSE, TRUE);
+            focus_fallback(FALSE, config_focus_under_mouse, TRUE);
 
             /* We don't get a FocusOut for this case, because it's just moving
                from our Inferior up to us. This happens when iconifying a
@@ -551,7 +551,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 */
 
                 if (!focus_left_screen)
-                    focus_fallback(FALSE, FALSE, TRUE);
+                    focus_fallback(FALSE, config_focus_under_mouse, TRUE);
             }
         }
         else if (!client)
@@ -607,7 +607,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to an unmanaged window 0x%x !\n",
                               ce.xfocus.window);
-                focus_fallback(TRUE, FALSE, TRUE);
+                focus_fallback(TRUE, config_focus_under_mouse, TRUE);
             }
         }
 
@@ -723,6 +723,7 @@ static void event_handle_root(XEvent *e)
         } else if (msgtype == prop_atoms.net_showing_desktop) {
             screen_show_desktop(e->xclient.data.l[0] != 0, NULL);
         } else if (msgtype == prop_atoms.ob_control) {
+            ob_debug("OB_CONTROL: %d\n", e->xclient.data.l[0]);
             if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();
             else if (e->xclient.data.l[0] == 2)
@@ -730,8 +731,10 @@ static void event_handle_root(XEvent *e)
         }
         break;
     case PropertyNotify:
-        if (e->xproperty.atom == prop_atoms.net_desktop_names)
+        if (e->xproperty.atom == prop_atoms.net_desktop_names) {
+            ob_debug("UPDATE DESKTOP NAMES\n");
             screen_update_desktop_names();
+        }
         else if (e->xproperty.atom == prop_atoms.net_desktop_layout)
             screen_update_layout();
         break;
@@ -1875,11 +1878,9 @@ void event_end_ignore_all_enters(gulong start)
     r->start = start;
     r->end = LastKnownRequestProcessed(ob_display);
     ignore_serials = g_slist_prepend(ignore_serials, r);
-    ob_debug("ignoring serials %u-%u\n", r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
     XSync(ob_display, FALSE);
-    ob_debug("now last serial %u\n", LastKnownRequestProcessed(ob_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
@@ -1891,14 +1892,11 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
                e->xcrossing.mode == NotifyUngrab ||
                e->xcrossing.detail == NotifyInferior));
 
-    ob_debug("checking serial %u\n", e->xany.serial);
     for (it = ignore_serials; it; it = next) {
         ObSerialRange *r = it->data;
 
         next = g_slist_next(it);
 
-        /* XXX wraparound... */
-        ob_debug("  ignore range %u-%u\n", r->start, r->end);
         if ((glong)(e->xany.serial - r->end) > 0) {
             /* past the end */
             ignore_serials = g_slist_delete_link(ignore_serials, it);

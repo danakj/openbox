@@ -36,10 +36,6 @@ struct _ObSessionState;
 typedef struct _ObClient      ObClient;
 typedef struct _ObClientIcon  ObClientIcon;
 
-/* The value in client.transient_for indicating it is a transient for its
-   group instead of for a single window */
-#define OB_TRAN_GROUP ((void*)~0l)
-
 /*! Holds an icon in ARGB format */
 struct _ObClientIcon
 {
@@ -93,16 +89,13 @@ struct _ObClient
     /*! Saved session data to apply to this client */
     struct _ObSessionState *session;
 
-    /*! Whether or not the client is a transient window. This is guaranteed to 
-      be TRUE if transient_for != NULL, but not guaranteed to be FALSE if
-      transient_for == NULL. */
+    /*! Whether or not the client is a transient window. It may or may not
+      have parents when this is true. */
     gboolean transient;
-    /*! The client which this client is a transient (child) for.
-      A value of TRAN_GROUP signifies that the window is a transient for all
-      members of its ObGroup, and is not a valid pointer to be followed in this
-      case.
-     */
-    ObClient *transient_for;
+    /*! Whether or not the client is transient for its group */
+    gboolean transient_for_group;
+    /*! The client which are parents of this client */
+    GSList *parents;
     /*! The clients which are transients (children) of this client */
     GSList *transients;
     /*! The desktop on which the window resides (0xffffffff for all
@@ -635,6 +628,11 @@ ObClient *client_search_focus_tree(ObClient *self);
 */
 ObClient *client_search_focus_tree_full(ObClient *self);
 
+/*! Searches a client's group and each member's transients for a focused
+  window.  This doesn't go up the window's transient tree at all. If no
+  focused client is found, NULL is returned. */
+ObClient *client_search_focus_group_full(ObClient *self);
+
 /*! Return a modal child of the client window that can be focused.
     @return A modal child of the client window that can be focused, or 0 if
             none was found.
@@ -654,10 +652,15 @@ GSList *client_search_all_top_parents(ObClient *self);
 */
 GSList *client_search_all_top_parents_layer(ObClient *self);
 
+/*! Returns the client's parent when it is transient for a direct window
+  rather than a group. If it has no parents, or is transient for the
+  group, this returns null */
+ObClient *client_direct_parent(ObClient *self);
+
 /*! Returns a window's top level parent. This only counts direct parents,
   not groups if it is transient for its group.
 */
-ObClient *client_search_top_normal_parent(ObClient *self);
+ObClient *client_search_top_direct_parent(ObClient *self);
 
 /*! Is one client a direct child of another (i.e. not through the group.) */
 gboolean client_is_direct_child(ObClient *parent, ObClient *child);

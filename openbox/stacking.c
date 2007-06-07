@@ -179,6 +179,11 @@ static void restack_windows(ObClient *selected, gboolean raise)
 
         /* that is, if it has any parents */
         if (!(top->data == selected && top->next == NULL)) {
+            /* place the window being lowered on the bottom so it'll be
+               below any of its peers that it can */
+            stacking_list = g_list_remove(stacking_list, selected);
+            stacking_list = g_list_append(stacking_list, selected);
+
             /* go thru stacking list backwards so we can use g_slist_prepend */
             for (it = g_list_last(stacking_list); it && top;
                  it = g_list_previous(it))

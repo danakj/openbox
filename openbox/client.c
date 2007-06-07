@@ -1260,12 +1260,9 @@ static void client_update_transient_tree(ObClient *self,
         newparent != NULL && newparent != OB_TRAN_GROUP &&
         newgroup != NULL && newgroup == oldgroup && client_normal(newparent))
     {
-        ObClient *look = newparent;
-        do {
-            self->transients = g_slist_remove(self->transients, look);
-            look->parents = g_slist_remove(look->parents, self);
-            look = look->transient_for;
-        } while (look != NULL && look != OB_TRAN_GROUP && client_normal(look));
+        ObClient *look = client_search_top_direct_parent(newparent);
+        self->transients = g_slist_remove(self->transients, look);
+        look->parents = g_slist_remove(look->parents, self);
     }
             
 

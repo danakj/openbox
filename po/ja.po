@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.0\n"
+"Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-06-07 14:18+0200\n"
 "PO-Revision-Date: 2007-06-07 14:49+0200\n"

@@ -723,6 +723,7 @@ static void event_handle_root(XEvent *e)
         } else if (msgtype == prop_atoms.net_showing_desktop) {
             screen_show_desktop(e->xclient.data.l[0] != 0, NULL);
         } else if (msgtype == prop_atoms.ob_control) {
+            ob_debug("OB_CONTROL: %d\n", e->xclient.data.l[0]);
             if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();
             else if (e->xclient.data.l[0] == 2)
@@ -730,8 +731,10 @@ static void event_handle_root(XEvent *e)
         }
         break;
     case PropertyNotify:
-        if (e->xproperty.atom == prop_atoms.net_desktop_names)
+        if (e->xproperty.atom == prop_atoms.net_desktop_names) {
+            ob_debug("UPDATE DESKTOP NAMES\n");
             screen_update_desktop_names();
+        }
         else if (e->xproperty.atom == prop_atoms.net_desktop_layout)
             screen_update_layout();
         break;

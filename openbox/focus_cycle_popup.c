@@ -240,7 +240,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint ml, mt, mr, mb;
     gint l, t, r, b;
     gint x, y, w, h;
-    Rect *screen_area;
+    Rect *screen_area = NULL;
     gint icons_per_row;
     gint icon_rows;
     gint textx, texty, textw, texth;
@@ -252,8 +252,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     const ObFocusCyclePopupTarget *newtarget;
     gint newtargetx, newtargety;
 
-    /* XXX find the middle monitor? */
-    screen_area = screen_physical_area_monitor(0);
+    screen_area = screen_physical_area_monitor_active();
 
     /* get the outside margins */
     RrMargins(p->a_bg, &ml, &mt, &mr, &mb);

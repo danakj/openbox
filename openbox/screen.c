@@ -731,7 +731,7 @@ void screen_desktop_popup(guint d, gboolean show)
     if (!show) {
         pager_popup_hide(desktop_cycle_popup);
     } else {
-        a = screen_physical_area_monitor(0);
+        a = screen_physical_area_monitor_active();
         pager_popup_position(desktop_cycle_popup, CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
         pager_popup_icon_size_multiplier(desktop_cycle_popup,
@@ -1363,6 +1363,24 @@ Rect *screen_physical_area_monitor(guint head)
     if (head > screen_num_monitors)
         return NULL;
     return &monitor_area[head];
+}
+
+Rect *screen_physical_area_monitor_active()
+{
+    Rect *a;
+    gint x, y;
+
+    if (focus_client)
+        a = screen_physical_area_monitor(client_monitor(focus_client));
+    else {
+        Rect mon;
+        if (screen_pointer_pos(&x, &y))
+            RECT_SET(mon, x, y, 1, 1);
+        else
+            RECT_SET(mon, 0, 0, 1, 1);
+        a = screen_physical_area_monitor(screen_find_monitor(&mon));
+    }
+    return a;
 }
 
 void screen_set_root_cursor()

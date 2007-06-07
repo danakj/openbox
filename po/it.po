@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-04 00:51+0200\n"
+"POT-Creation-Date: 2007-06-07 14:18+0200\n"
 "PO-Revision-Date: 2007-06-04 03:06+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -184,20 +184,20 @@ msgstr ""
 msgid "Unable to load a theme."
 msgstr "Impossibile caricare un tema."
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:401
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Non è stato possibile riavviare il nuovo eseguibile '%s': %s"
 
-#: openbox/openbox.c:472 openbox/openbox.c:474
+#: openbox/openbox.c:471 openbox/openbox.c:473
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:482
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintassi: openbox [opzioni]\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:483
 msgid ""
 "\n"
 "Options:\n"
@@ -205,23 +205,23 @@ msgstr ""
 "\n"
 "Opzioni:\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:484
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Mostra questo messaggio di aiuto ed esce\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:485
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Mostra il numero di versione ed esce\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:486
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Sostituisce l'attuale window manager attivo\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:487
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Disabilita la connessione al session manager\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:488
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -229,15 +229,15 @@ msgstr ""
 "\n"
 "Inviare messaggi ad un'istanza di openbox attiva:\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:489
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ricarica la configurazione di Openbox\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:490
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Riavvia Openbox\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:491
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -245,25 +245,25 @@ msgstr ""
 "\n"
 "Opzioni di debug:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:492
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Esegui in modalità sincrona\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:493
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Mostra le informazioni di debug\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:494
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Mostra le informazioni di debug sulla gestione del "
 "focus\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:495
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Dividi lo schermo per simulare xinerama\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:496
 #, c-format
 msgid ""
 "\n"
@@ -272,7 +272,7 @@ msgstr ""
 "\n"
 "Per piacere inviate i bug a %s\n"
 
-#: openbox/openbox.c:594
+#: openbox/openbox.c:593
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Argomento da linea di comando non valido '%s'\n"

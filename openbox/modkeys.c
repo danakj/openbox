@@ -135,13 +135,17 @@ static void set_modkey_mask(guchar mask, KeySym sym)
         modkeys_keys[OB_MODKEY_KEY_NUMLOCK] |= mask;
     else if (sym == XK_Scroll_Lock)
         modkeys_keys[OB_MODKEY_KEY_SCROLLLOCK] |= mask;
-    else if (sym == XK_Super_L || sym == XK_Super_R)
+    else if (sym == XK_Super_L ||
+             (sym == XK_Super_R && !modkeys_keys[OB_MODKEY_KEY_SUPER]))
         modkeys_keys[OB_MODKEY_KEY_SUPER] |= mask;
-    else if (sym == XK_Hyper_L || sym == XK_Hyper_R)
+    else if (sym == XK_Hyper_L ||
+             (sym == XK_Hyper_R && !modkeys_keys[OB_MODKEY_KEY_HYPER]))
         modkeys_keys[OB_MODKEY_KEY_HYPER] |= mask;
-    else if (sym == XK_Alt_L || sym == XK_Alt_R)
+    else if (sym == XK_Alt_L ||
+             (sym == XK_Alt_R && !modkeys_keys[OB_MODKEY_KEY_ALT]))
         modkeys_keys[OB_MODKEY_KEY_ALT] |= mask;
-    else if (sym == XK_Meta_L || sym == XK_Meta_R)
+    else if (sym == XK_Meta_L ||
+             (sym == XK_Meta_R && !modkeys_keys[OB_MODKEY_KEY_META]))
         modkeys_keys[OB_MODKEY_KEY_META] |= mask;
     /* CapsLock, Shift, and Control are special and hard-coded */
 }

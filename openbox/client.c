@@ -1123,16 +1123,24 @@ static void client_get_desktop(ObClient *self)
         }
         if (all != screen_num_desktops) {
             self->desktop = all;
+
+            ob_debug("client desktop set from parents: 0x%x\n",
+                     self->desktop);
         }
         /* try get from the startup-notification protocol */
         else if (sn_get_desktop(self->startup_id, &self->desktop)) {
             if (self->desktop >= screen_num_desktops &&
                 self->desktop != DESKTOP_ALL)
                 self->desktop = screen_num_desktops - 1;
+            ob_debug("client desktop set from startup-notification: 0x%x\n",
+                     self->desktop);
         }
         /* defaults to the current desktop */
-        else
+        else {
             self->desktop = screen_desktop;
+            ob_debug("client desktop set to the current desktop: %d\n",
+                     self->desktop);
+        }
     }
 }
 

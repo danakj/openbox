@@ -36,10 +36,6 @@ struct _ObSessionState;
 typedef struct _ObClient      ObClient;
 typedef struct _ObClientIcon  ObClientIcon;
 
-/* The value in client.transient_for indicating it is a transient for its
-   group instead of for a single window */
-#define OB_TRAN_GROUP ((void*)~0l)
-
 /*! Holds an icon in ARGB format */
 struct _ObClientIcon
 {
@@ -93,16 +89,11 @@ struct _ObClient
     /*! Saved session data to apply to this client */
     struct _ObSessionState *session;
 
-    /*! Whether or not the client is a transient window. This is guaranteed to 
-      be TRUE if transient_for != NULL, but not guaranteed to be FALSE if
-      transient_for == NULL. */
+    /*! Whether or not the client is a transient window. It may or may not
+      have parents when this is true. */
     gboolean transient;
-    /*! The client which this client is a transient (child) for.
-      A value of TRAN_GROUP signifies that the window is a transient for all
-      members of its ObGroup, and is not a valid pointer to be followed in this
-      case.
-     */
-    ObClient *transient_for;
+    /*! Whether or not the client is transient for its group */
+    gboolean transient_for_group;
     /*! The client which are parents of this client */
     GSList *parents;
     /*! The clients which are transients (children) of this client */

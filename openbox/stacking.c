@@ -233,7 +233,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
     wins = g_list_append(wins, selected);
 
     /* if selected window is transient for group then raise it above others */
-    if (selected->transient_for == OB_TRAN_GROUP) {
+    if (selected->transient_for_group) {
         /* if it's modal, raise it above those also */
         if (selected->modal) {
             wins = g_list_concat(wins, group_modals);

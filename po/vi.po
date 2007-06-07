@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-06-06 10:29-0500\n"
-"PO-Revision-Date: 2007-06-06 16:29-0500\n"
+"PO-Revision-Date: 2007-06-07 06:50-0500\n"
 "Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr "Sự dùng hành động '%s' sai rồi. Không làm hành động đó.
 #: openbox/action.c:1226 openbox/action.c:1244 openbox/action.c:1257
 #, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Làm không được '%s':%s"
+msgstr "Làm không được '%s': %s"
 
 #: openbox/action.c:1265
 #, c-format
@@ -124,7 +124,7 @@ msgstr "Không có thể tìm vững chắc thực đơn '%s'"
 #: openbox/menu.c:149
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Không có thể chạy lệnh cho ống-thực đơn '%s':%s"
+msgstr "Không có thể chạy lệnh cho ống-thực đơn '%s': %s"
 
 #: openbox/menu.c:166
 #, c-format
@@ -134,7 +134,7 @@ msgstr "Vô hiệu sản xuất của ống-thực đơn '%s'"
 #: openbox/menu.c:179
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Thử mở thực đơn '%s' nhưng mà cái đó không có '%s'"
+msgstr "Thử mở thực đơn '%s' nhưng mà cái đó không có"
 
 #: openbox/menu.c:331 openbox/menu.c:332
 msgid "More..."

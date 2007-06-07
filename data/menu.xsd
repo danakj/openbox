@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- XML Schema for the Openbox windowm anager menu file -->
+<!-- XML Schema for the Openbox window manager menu file -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openbox.org/4.0/menu"
-    xmlns:ob="http://openbox.org/4.0/menu"
+    targetNamespace="http://openbox.org/3.4/menu"
+    xmlns:ob="http://openbox.org/3.4/menu"
     elementFormDefault="qualified">
     <!--
          root node

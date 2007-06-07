@@ -36,9 +36,6 @@ nodist_bin_SCRIPTS = \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session
 
-noinst_PROGRAMS = \
-	tools/themetoxml/themetoxml
-
 ## render ##
 
 render_rendertest_CPPFLAGS = \
@@ -234,21 +231,6 @@ openbox_openbox_SOURCES = \
 	openbox/xerror.h
 
 
-## themetoxml ##
-
-tools_themetoxml_themetoxml_CPPFLAGS = \
-	$(X_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(XML_CFLAGS)
-tools_themetoxml_themetoxml_LDADD = \
-	$(X_LIBS) \
-	$(GLIB_LIBS) \
-	$(XML_LIBS)
-tools_themetoxml_themetoxml_SOURCES = \
-	tools/themetoxml/themetoxml.c \
-	tools/themetoxml/rgb.h
-
-
 ## gnome-panel-control ##
 
 tools_gnome_panel_control_gnome_panel_control_CPPFLAGS = \
@@ -276,11 +258,11 @@ dist_docxbm_DATA = \
 
 clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
 dist_clearlooks_theme_DATA= \
-	themes/Clearlooks/openbox-3/themerc.xml
+	themes/Clearlooks/openbox-3/themerc
 
 clearlooksolive_themedir = $(themedir)/Clearlooks-Olive/openbox-3
 dist_clearlooksolive_theme_DATA= \
-	themes/Clearlooks-Olive/openbox-3/themerc.xml
+	themes/Clearlooks-Olive/openbox-3/themerc
 
 mikachu_themedir = $(themedir)/Mikachu/openbox-3
 dist_mikachu_theme_DATA= \
@@ -289,7 +271,7 @@ dist_mikachu_theme_DATA= \
 	themes/Mikachu/openbox-3/desk.xbm \
 	themes/Mikachu/openbox-3/iconify.xbm \
 	themes/Mikachu/openbox-3/max.xbm \
-	themes/Mikachu/openbox-3/themerc.xml
+	themes/Mikachu/openbox-3/themerc
 
 
 natura_themedir = $(themedir)/Natura/openbox-3
@@ -306,11 +288,11 @@ dist_natura_theme_DATA= \
 	themes/Natura/openbox-3/max.xbm \
 	themes/Natura/openbox-3/shade.xbm \
 	themes/Natura/openbox-3/shade_hover.xbm \
-	themes/Natura/openbox-3/themerc.xml
+	themes/Natura/openbox-3/themerc
 
 artwizboxed_themedir = $(themedir)/Artwiz-boxed/openbox-3
 dist_artwizboxed_theme_DATA= \
-	themes/Artwiz-boxed/openbox-3/themerc.xml
+	themes/Artwiz-boxed/openbox-3/themerc
 
 bear2_themedir = $(themedir)/Bear2/openbox-3
 dist_bear2_theme_DATA= \
@@ -325,11 +307,11 @@ dist_bear2_theme_DATA= \
 	themes/Bear2/openbox-3/max.xbm \
 	themes/Bear2/openbox-3/shade_pressed.xbm \
 	themes/Bear2/openbox-3/shade.xbm \
-	themes/Bear2/openbox-3/themerc.xml
+	themes/Bear2/openbox-3/themerc
 
 orang_themedir = $(themedir)/Orang/openbox-3
 dist_orang_theme_DATA= \
-	themes/Orang/openbox-3/themerc.xml
+	themes/Orang/openbox-3/themerc
 
 syscrash_themedir = $(themedir)/Syscrash/openbox-3
 dist_syscrash_theme_DATA= \
@@ -337,7 +319,7 @@ dist_syscrash_theme_DATA= \
 	themes/Syscrash/openbox-3/max_pressed.xbm \
 	themes/Syscrash/openbox-3/max_toggled.xbm \
 	themes/Syscrash/openbox-3/max.xbm \
-	themes/Syscrash/openbox-3/themerc.xml
+	themes/Syscrash/openbox-3/themerc
 
 ## public headers ##
 
@@ -403,7 +385,6 @@ dist_noinst_DATA = \
 	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \
-	data/themerc.xsd \
 	data/xsession/openbox.desktop.in \
 	data/xsession/openbox-gnome.desktop.in \
 	data/xsession/openbox-kde.desktop.in \
@@ -446,7 +427,6 @@ dist_doc_DATA = \
 	COPYING \
 	data/rc.xsd \
 	data/menu.xsd \
-	data/themerc.xsd \
 	doc/rc-mouse-focus.xml
 
 nodist_man_MANS = \

@@ -1,7 +1,3 @@
-3.5:
-  * Changed theme format to xml, use the included themetoxml program to convert
-    themes to the new format.
-
 3.4:
   * Add Indian Bengali translation
   * Updated Italian translation

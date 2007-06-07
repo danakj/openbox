@@ -165,6 +165,7 @@ gboolean parse_load(const gchar *path, const gchar *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root)
 {
     struct stat s;
+
     if (stat(path, &s) < 0)
         return FALSE;
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<openbox_menu xmlns="http://openbox.org/4.0/menu">
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
 
 <menu id="games-menu" label="Games">
   <item label="Crack-Attack">

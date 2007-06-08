@@ -1,0 +1,88 @@
+!! Onyx by Dana Jansens
+!! inspired by "Carbon" by p0ng, and the ever so popular Vista glass look
+
+!! Menu background
+menu.items.bg: flat gradient vertical
+menu.items.bg.color: #303030
+menu.items.bg.colorTo: #080808
+
+!! Menu text
+menu.items.text.color: #c0c0c0
+menu.items.justify: left
+menu.items.disabled.text.color: #606060
+
+!! Menu headers
+menu.title.bg: raised splitvertical gradient
+menu.title.bg.color: #303030
+menu.title.bg.colorTo: #181818
+menu.title.text.color: white
+menu.title.text.justify: center
+
+!! Selected menu item
+menu.items.active.bg: raised splitvertical gradient
+menu.items.active.bg.color: #6d95de
+menu.items.active.bg.colorTo: #2b829d
+menu.items.active.text.color: white
+
+!! Titlebar
+window.active.title.bg: raised splitvertical gradient
+window.active.title.bg.color: #303030
+window.active.title.bg.colorTo: #181818
+window.inactive.title.bg: raised splitvertical gradient
+window.inactive.title.bg.color: #303030
+window.inactive.title.bg.colorTo: #181818
+
+!! Titlebar text
+window.label.text.justify: center
+window.active.label.bg: parentrelative
+window.active.label.text.color: white
+window.inactive.label.bg: parentrelative
+window.inactive.label.text.color: #606060
+
+!! Handle
+window.active.handle.bg: solid flat
+window.active.handle.bg.color: #303030
+window.inactive.handle.bg: raised solid
+window.inactive.handle.bg.color: #303030
+
+!! Grips
+window.active.grip.bg: solid flat
+window.active.grip.bg.color: #303030
+window.inactive.grip.bg: raised solid
+window.inactive.grip.bg.color: #303030
+
+!! Window buttons
+window.*.button.*.bg: parentrelative
+window.*.button.*.image.color: #e0e0e0
+
+window.*.button.*.hover.bg: flat splitvertical gradient border
+window.*.button.*.hover.bg.color: #398dc6
+window.*.button.*.hover.bg.colorTo: #236d83
+window.*.button.*.hover.bg.border.color: #236d83
+
+window.*.button.*.pressed.bg: flat splitvertical gradient border
+window.*.button.*.pressed.bg.color: #235679
+window.*.button.*.pressed.bg.colorTo: #154350
+window.*.button.*.pressed.image.color: #898989
+window.*.button.*.pressed.bg.border.color: #154350
+
+window.inactive.button.*.image.color: #606060
+
+!! Borders
+border.color: #202020
+border.width: 1
+padding.width: 2
+window.handle.width: 1
+window.active.client.color:  #303030
+window.inactive.client.color:  #303030
+window.client.padding.width: 1
+window.client.padding.height: 0
+menu.overlap: 0
+
+!! Font shadows
+menu.items.font:shadow=y:shadowtint=30
+
+!! On-screen displays
+osd.bg: gradient vertical flat
+osd.bg.color: #303030
+osd.bg.colorTo: #080808

@@ -1,3 +1,42 @@
+3.4.1:
+  * Add Vietnamese translation
+  * Add Japanese translation
+  * Keep new transient windows from not getting focus when any related window
+    has focus already
+  * Change behavior of underMouse option - make focus go under the mouse when
+    no window has focus anymore, rather than to the last used window
+  * Make on-screen display dialogs (such as the Alt-Tab dialog) appear on the
+    active monitor when using Xinerama (a.k.a. TwinView)
+  * Fix for window stacking - let you lower sibling transient windows behind
+    eachother
+  * Fix directional focus actions when used without a dialog
+  * Fix race that could prevent ObConf from setting the desktop names correctly
+  * Add new theme options:
+    - window.active.button.toggled.image.color has been split into:
+      - window.active.button.toggled.unpressed.image.color
+      - window.active.button.toggled.pressed.image.color
+      - window.active.button.toggled.hover.image.color 
+    - window.inactive.button.toggled.image.color has been split into:
+      - window.inactive.button.toggled.unpressed.image.color
+      - window.inactive.button.toggled.pressed.image.color
+      - window.inactive.button.toggled.hover.image.color 
+    - window.active.button.toggled.bg has been split into:
+      - window.active.button.toggled.unpressed.bg
+      - window.active.button.toggled.pressed.bg
+      - window.active.button.toggled.hover.bg 
+    - window.inactive.button.toggled.bg has been split into:
+      - window.inactive.button.toggled.unpressed.bg
+      - window.inactive.button.toggled.pressed.bg
+      - window.inactive.button.toggled.hover.bg 
+  * Add new Onyx and Onyx-Citrus themes
+  * Updated Mikachu theme using new theme options
+  * Improvements to splitvertical gradients - Add a small gradient in the
+    middle between the upper and lower gradients
+  * Fix another emacs event storm, don't configure the window when it sets its
+    WM_NORMAL_HINTS unless we have to
+  * Fix for focus cycling to helper windows - Don't count dialogs as a sibling,
+    so they don't stop you
+
 3.4:
   * Add Indian Bengali translation
   * Updated Italian translation

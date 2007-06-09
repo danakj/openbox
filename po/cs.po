@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-07 14:18+0200\n"
+"POT-Creation-Date: 2007-06-09 17:28-0400\n"
 "PO-Revision-Date: 2007-06-04 12:46+0200\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -115,7 +115,7 @@ msgstr "&Zavřít"
 msgid "Invalid button '%s' specified in config file"
 msgstr "Neplatné tlačítko '%s' v konfiguračním souboru"
 
-#: openbox/keyboard.c:162
+#: openbox/keyboard.c:164
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt klávesových zkratek v konfiguračním souboru"
 

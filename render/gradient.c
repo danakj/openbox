@@ -420,13 +420,14 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
 
 static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 {
-    gint x, y1, y3, r, g, b;
+    gint x, y1, y2, y3, r, g, b;
     RrSurface *sf = &a->surface;
     RrPixel32 *data = sf->pixel_data;
     RrPixel32 current;
     RrColor *primary_light, *secondary_light;
 
     VARS(y1);
+    VARS(y2);
     VARS(y3);
 
     r = sf->primary->r;
@@ -451,17 +452,27 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     if (b > 0xFF) b = 0xFF;
     secondary_light = RrColorNew(a->inst, r, g, b);
 
-    SETUP(y1, primary_light, sf->primary, (h / 2) -1);
-    SETUP(y3, sf->secondary, secondary_light,  (h / 2) -1);
+    SETUP(y1, primary_light, sf->primary, (h / 2) - 1);
+    /* setup to get the colors in between these 2 */
+    SETUP(y2, sf->primary, sf->secondary, h % 2 ? 5 : 4);
+    SETUP(y3, sf->secondary, secondary_light,  (h / 2) - 1);
 
-    for (y1 = h - 1; y1 > (h / 2) -1; --y1) {  /* 0 -> h-1 */
+    for (y1 = (h / 2) - 1; y1 > 0; --y1) {
         current = COLOR(y1);
-        for (x = w - 1; x >= 0; --x)  /* 0 -> w */
+        for (x = w - 1; x >= 0; --x)
             *(data++) = current;
 
         NEXT(y1);
     }
 
+    NEXT(y2); /* skip the first one, its the same as the last of y1 */
+    for (y2 = (h % 2 ? 3 : 2); y2 > 0; --y2) {
+        current = COLOR(y2);
+        for (x = w - 1; x >= 0; --x)
+            *(data++) = current;
+        
+        NEXT(y2);
+    }
     
     for (y3 = (h / 2) - 1; y3 > 0; --y3) {
         current = COLOR(y3);
@@ -470,10 +481,6 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 
         NEXT(y3);
     }
-
-    current = COLOR(y3);
-    for (x = w - 1; x >= 0; --x)  /* 0 -> w */
-        *(data++) = current;
 
     RrColorFree(primary_light);
     RrColorFree(secondary_light);

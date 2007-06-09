@@ -3,8 +3,8 @@
 <!-- XML Schema for the Openbox window manager configuration file -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openbox.org/3.4/rc"
-    xmlns:ob="http://openbox.org/3.4/rc"
+    targetNamespace="http://openbox.org/4.0/rc"
+    xmlns:ob="http://openbox.org/4.0/rc"
     elementFormDefault="qualified">
     <!--
          root node
@@ -353,7 +353,6 @@
             <xsd:enumeration value="Left"/>
             <xsd:enumeration value="Right"/>
             <xsd:enumeration value="Bottom"/>
-            <xsd:enumeration value="Handle"/>
             <xsd:enumeration value="Maximize"/>
             <xsd:enumeration value="AllDesktops"/>
             <xsd:enumeration value="Shade"/>

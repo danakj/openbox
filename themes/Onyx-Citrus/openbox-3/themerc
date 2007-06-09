@@ -89,6 +89,7 @@ window.client.padding.height: 0
 menu.overlap: 0
 
 !! Font shadows
+window.inactive.label.text.font:shadow=y:shadowtint=15
 menu.items.font:shadow=y:shadowtint=30
 
 !! On-screen displays

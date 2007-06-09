@@ -92,6 +92,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_hover_unfocused_max = RrAppearanceNew(inst, 1);
     theme->a_toggled_focused_unpressed_max = RrAppearanceNew(inst, 1);
     theme->a_toggled_unfocused_unpressed_max = RrAppearanceNew(inst, 1);
+    theme->a_toggled_hover_focused_max = RrAppearanceNew(inst, 1);
+    theme->a_toggled_hover_unfocused_max = RrAppearanceNew(inst, 1);
+    theme->a_toggled_focused_pressed_max = RrAppearanceNew(inst, 1);
+    theme->a_toggled_unfocused_pressed_max = RrAppearanceNew(inst, 1);
     theme->a_focused_unpressed_max = RrAppearanceNew(inst, 1);
     theme->a_focused_pressed_max = RrAppearanceNew(inst, 1);
     theme->a_unfocused_unpressed_max = RrAppearanceNew(inst, 1);
@@ -322,6 +326,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                        theme->titlebut_unfocused_unpressed_color->g,
                        theme->titlebut_unfocused_unpressed_color->b);
     if (!read_color(db, inst,
+                    "window.active.button.toggled.unpressed.image.color",
+                    &theme->titlebut_toggled_focused_unpressed_color) &&
+        !read_color(db, inst,
                     "window.active.button.toggled.image.color",
                     &theme->titlebut_toggled_focused_unpressed_color))
         theme->titlebut_toggled_focused_unpressed_color =
@@ -330,9 +337,44 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                        theme->titlebut_focused_pressed_color->g,
                        theme->titlebut_focused_pressed_color->b);
     if (!read_color(db, inst,
+                    "window.inactive.button.toggled.unpressed.image.color",
+                    &theme->titlebut_toggled_unfocused_unpressed_color) &&
+        !read_color(db, inst,
                     "window.inactive.button.toggled.image.color",
                     &theme->titlebut_toggled_unfocused_unpressed_color))
         theme->titlebut_toggled_unfocused_unpressed_color =
+            RrColorNew(inst,
+                       theme->titlebut_unfocused_pressed_color->r,
+                       theme->titlebut_unfocused_pressed_color->g,
+                       theme->titlebut_unfocused_pressed_color->b);
+    if (!read_color(db, inst,
+                    "window.active.button.toggled.hover.image.color",
+                    &theme->titlebut_toggled_hover_focused_color))
+        theme->titlebut_toggled_hover_focused_color =
+            RrColorNew(inst,
+                       theme->titlebut_toggled_focused_unpressed_color->r,
+                       theme->titlebut_toggled_focused_unpressed_color->g,
+                       theme->titlebut_toggled_focused_unpressed_color->b);
+    if (!read_color(db, inst,
+                    "window.inactive.button.toggled.hover.image.color",
+                    &theme->titlebut_toggled_hover_unfocused_color))
+        theme->titlebut_toggled_hover_unfocused_color =
+            RrColorNew(inst,
+                       theme->titlebut_toggled_unfocused_unpressed_color->r,
+                       theme->titlebut_toggled_unfocused_unpressed_color->g,
+                       theme->titlebut_toggled_unfocused_unpressed_color->b);
+    if (!read_color(db, inst,
+                    "window.active.button.toggled.pressed.image.color",
+                    &theme->titlebut_toggled_focused_pressed_color))
+        theme->titlebut_toggled_focused_pressed_color =
+            RrColorNew(inst,
+                       theme->titlebut_focused_pressed_color->r,
+                       theme->titlebut_focused_pressed_color->g,
+                       theme->titlebut_focused_pressed_color->b);
+    if (!read_color(db, inst,
+                    "window.inactive.button.toggled.pressed.image.color",
+                    &theme->titlebut_toggled_unfocused_pressed_color))
+        theme->titlebut_toggled_unfocused_pressed_color =
             RrColorNew(inst,
                        theme->titlebut_unfocused_pressed_color->r,
                        theme->titlebut_unfocused_pressed_color->g,
@@ -359,29 +401,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     "menu.items.active.text.color",
                     &theme->menu_selected_color))
         theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
-
-    /* toggled hover = toggled unpressed (i.e. no change) */
-    theme->titlebut_toggled_hover_focused_color =
-        RrColorNew(inst,
-                   theme->titlebut_toggled_focused_unpressed_color->r,
-                   theme->titlebut_toggled_focused_unpressed_color->g,
-                   theme->titlebut_toggled_focused_unpressed_color->b);
-    theme->titlebut_toggled_hover_unfocused_color =
-        RrColorNew(inst,
-                   theme->titlebut_toggled_unfocused_unpressed_color->r,
-                   theme->titlebut_toggled_unfocused_unpressed_color->g,
-                   theme->titlebut_toggled_unfocused_unpressed_color->b);
-    /* toggled pressed = pressed (which is the toggled unpressed fallback..) */
-    theme->titlebut_toggled_focused_pressed_color =
-        RrColorNew(inst,
-                   theme->titlebut_focused_pressed_color->r,
-                   theme->titlebut_focused_pressed_color->g,
-                   theme->titlebut_focused_pressed_color->b);
-    theme->titlebut_toggled_unfocused_pressed_color =
-        RrColorNew(inst,
-                   theme->titlebut_unfocused_pressed_color->r,
-                   theme->titlebut_unfocused_pressed_color->g,
-                   theme->titlebut_unfocused_pressed_color->b);
     
     /* load the image masks */
 
@@ -636,6 +655,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                          TRUE))
         set_default_appearance(theme->a_unfocused_pressed_max);
     if (!read_appearance(db, inst,
+                         "window.active.button.toggled.unpressed.bg",
+                         theme->a_toggled_focused_unpressed_max,
+                         TRUE) &&
+        !read_appearance(db, inst,
                          "window.active.button.toggled.bg",
                          theme->a_toggled_focused_unpressed_max,
                          TRUE))
@@ -645,12 +668,52 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             RrAppearanceCopy(theme->a_focused_pressed_max);
     }
     if (!read_appearance(db, inst,
+                         "window.inactive.button.toggled.unpressed.bg",
+                         theme->a_toggled_unfocused_unpressed_max,
+                         TRUE) &&
+        !read_appearance(db, inst,
                          "window.inactive.button.toggled.bg",
                          theme->a_toggled_unfocused_unpressed_max,
                          TRUE))
     {
         RrAppearanceFree(theme->a_toggled_unfocused_unpressed_max);
         theme->a_toggled_unfocused_unpressed_max =
+            RrAppearanceCopy(theme->a_unfocused_pressed_max);
+    }
+    if (!read_appearance(db, inst,
+                         "window.active.button.toggled.hover.bg",
+                         theme->a_toggled_hover_focused_max,
+                         TRUE))
+    {
+        RrAppearanceFree(theme->a_toggled_hover_focused_max);
+        theme->a_toggled_hover_focused_max =
+            RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
+    }
+    if (!read_appearance(db, inst,
+                         "window.inactive.button.toggled.hover.bg",
+                         theme->a_toggled_hover_unfocused_max,
+                         TRUE))
+    {
+        RrAppearanceFree(theme->a_toggled_hover_unfocused_max);
+        theme->a_toggled_hover_unfocused_max =
+            RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
+    }
+    if (!read_appearance(db, inst,
+                         "window.active.button.toggled.pressed.bg",
+                         theme->a_toggled_focused_pressed_max,
+                         TRUE))
+    {
+        RrAppearanceFree(theme->a_toggled_focused_pressed_max);
+        theme->a_toggled_focused_pressed_max =
+            RrAppearanceCopy(theme->a_focused_pressed_max);
+    }
+    if (!read_appearance(db, inst,
+                         "window.inactive.button.toggled.pressed.bg",
+                         theme->a_toggled_unfocused_pressed_max,
+                         TRUE))
+    {
+        RrAppearanceFree(theme->a_toggled_unfocused_pressed_max);
+        theme->a_toggled_unfocused_pressed_max =
             RrAppearanceCopy(theme->a_unfocused_pressed_max);
     }
     if (!read_appearance(db, inst,
@@ -681,17 +744,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->a_hover_unfocused_max =
             RrAppearanceCopy(theme->a_unfocused_unpressed_max);
     }
-
-    /* toggled + hover = toggled unpressed (i.e. no change) */
-    theme->a_toggled_hover_focused_max =
-        RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
-    theme->a_toggled_hover_unfocused_max =
-        RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
-    /* toggled + pressed = pressed (which is the toggled fallback..) */
-    theme->a_toggled_focused_pressed_max =
-        RrAppearanceCopy(theme->a_focused_pressed_max);
-    theme->a_toggled_unfocused_pressed_max =
-        RrAppearanceCopy(theme->a_unfocused_pressed_max);
 
     theme->a_disabled_focused_close =
         RrAppearanceCopy(theme->a_disabled_focused_max);

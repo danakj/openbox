@@ -1223,8 +1223,6 @@ ObFrameContext frame_context_from_string(const gchar *name)
         return OB_FRAME_CONTEXT_BRCORNER;
     else if (!g_ascii_strcasecmp("Top", name))
         return OB_FRAME_CONTEXT_TOP;
-    else if (!g_ascii_strcasecmp("Handle", name))
-        return OB_FRAME_CONTEXT_BOTTOM;
     else if (!g_ascii_strcasecmp("Bottom", name))
         return OB_FRAME_CONTEXT_BOTTOM;
     else if (!g_ascii_strcasecmp("Left", name))

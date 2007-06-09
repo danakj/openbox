@@ -14,7 +14,7 @@ menu.items.bg.border.color: #000000
 menu.items.text.color: #000022
 menu.items.disabled.text.color: #711
 
-menu.items.active.bg: raised gradient mirrorhorizontal bevel1
+menu.items.active.bg: raised gradient mirrorhorizontal
 menu.items.active.bg.color: #555577
 menu.items.active.bg.colorTo: #6699CC
 menu.items.active.bg.border.color: #000000
@@ -26,7 +26,7 @@ menu.frame.justify: left
 window.label.text.justify: left
 
 !! focused window settings
-window.active.client.color: #80A080
+window.active.client.color: #8080A0
 
 window.active.title.bg: raised gradient crossdiagonal bevel1
 window.active.title.bg.color: #6699CC
@@ -66,6 +66,12 @@ window.active.button.toggled.bg.color: #6699CC
 window.active.button.toggled.bg.colorTo: #334866
 window.active.button.toggled.bg.border.color: #000000
 window.active.button.toggled.image.color: grey85
+
+window.active.button.toggled.hover.bg: sunken parentrelative bevel2
+window.active.button.toggled.hover.bg.color: #6699CC
+window.active.button.toggled.hover.bg.colorTo: #334866
+window.active.button.toggled.hover.bg.border.color: #000000
+window.active.button.toggled.hover.image.color: #00FF00
 
 window.active.button.disabled.bg: parentrelative
 window.active.button.disabled.bg.color: #000000
@@ -133,11 +139,19 @@ window.inactive.button.toggled.bg.colorTo: grey20
 window.inactive.button.toggled.bg.border.color: #000000
 window.inactive.button.toggled.image.color: grey60
 
+window.inactive.button.toggled.hover.bg: sunken parentrelative bevel2
+window.inactive.button.toggled.hover.bg.color: grey60
+window.inactive.button.toggled.hover.bg.colorTo: grey20
+window.inactive.button.toggled.hover.bg.border.color: #000000
+window.inactive.button.toggled.hover.image.color: #00CC00
+
 window.inactive.button.hover.bg: parentrelative
 window.inactive.button.hover.bg.color: #000000
 window.inactive.button.hover.bg.colorTo: #000000
 window.inactive.button.hover.image.color: #00CC00
 window.inactive.button.hover.bg.border.color: #000000
+
+osd.label.bg: parentrelative sunken
 
 !! Global width settings
 border.width: 1
@@ -151,10 +165,10 @@ focus.outer.color: #0000A0
 !! Miscellaneous settings
 border.color: #223344
 
-!! Font stuff
-window.active.label.text.font:shadow=n
-window.inactive.label.text.font:shadowoffset=3:shadowtint=32:shadow=y
-menu.title.text.font:shadowoffset=2:shadowtint=35:shadow=y
-menu.items.font:shadowoffset=2:shadowtint=15:shadow=y
+!! Font stuff (not used anymore)
+window.active.label.text.font: Candara,sans:size=10:shadow=y:shadowoffset=2:shadowtint=32:weight=0
+window.inactive.label.text.font: Candara,sans:size=10:shadowoffset=3:shadowtint=32:shadow=y:weight=0
+menu.title.text.font: Technical,sans:size=20:shadowoffset=2:shadowtint=35:shadow=y
+menu.items.font: Technical,sans:size=10:shadowoffset=2:shadowtint=15:shadow=y
 
-!menu.overlap: 3
+menu.overlap: -3

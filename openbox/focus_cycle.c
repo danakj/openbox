@@ -85,7 +85,7 @@ static gboolean focus_target_has_siblings(ObClient *ft,
     for (it = ft->group->members; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
-        if (c != ft && !client_helper(c) &&
+        if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
             focus_cycle_target_valid(c, iconic_windows, all_desktops, FALSE,
                                      FALSE))
         {
@@ -127,7 +127,7 @@ gboolean focus_cycle_target_valid(ObClient *ft,
         ok = ok &&
             ((client_normal(ft) && !client_helper(ft))
              ||
-             /* helper windows are valid targets it... */
+             /* helper windows are valid targets if... */
              (client_helper(ft) &&
               /* ...a window in its group already has focus ... */
               ((focus_client && ft->group == focus_client->group) ||

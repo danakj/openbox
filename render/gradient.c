@@ -440,7 +440,7 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     if (r > 0xFF) r = 0xFF;
     if (g > 0xFF) g = 0xFF;
     if (b > 0xFF) b = 0xFF;
-      primary_light = RrColorNew(a->inst, r, g, b);
+    primary_light = RrColorNew(a->inst, r, g, b);
 
     r = sf->secondary->r;
     r += r >> 4;

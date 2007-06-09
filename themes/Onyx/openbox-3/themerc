@@ -53,19 +53,24 @@ window.inactive.grip.bg.color: #a0a0a0
 
 !! Window buttons
 window.*.button.*.bg: parentrelative
-window.*.button.*.image.color: #e0e0e0
-
-window.*.button.*.hover.bg: flat splitvertical gradient border
-window.*.button.*.hover.bg.color: #398dc6
-window.*.button.*.hover.bg.colorTo: #236d83
-window.*.button.*.hover.bg.border.color: #236d83
-
+window.active.button.*.hover.bg: flat splitvertical gradient border
+window.inactive.button.*.hover.bg: parentrelative
 window.*.button.*.pressed.bg: flat splitvertical gradient border
-window.*.button.*.pressed.bg.color: #235679
-window.*.button.*.pressed.bg.colorTo: #154350
-window.*.button.*.pressed.image.color: #898989
-window.*.button.*.pressed.bg.border.color: #154350
 
+window.active.button.*.hover.bg.color: #398dc6
+window.active.button.*.hover.bg.colorTo: #236d83
+window.active.button.*.hover.bg.border.color: #236d83
+
+window.active.button.*.pressed.bg.color: #235679
+window.active.button.*.pressed.bg.colorTo: #154350
+window.active.button.*.pressed.image.color: #898989
+window.active.button.*.pressed.bg.border.color: #154350
+window.inactive.button.*.pressed.bg.color: #b1dcfa
+window.inactive.button.*.pressed.bg.colorTo: #a3c2cc
+window.inactive.button.*.pressed.image.color: #7f7f7f
+window.inactive.button.*.pressed.bg.border.color: #a3c2cc
+
+window.active.button.*.image.color: #e0e0e0
 window.inactive.button.*.image.color: #606060
 
 !! Borders

@@ -425,6 +425,7 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     RrPixel32 *data = sf->pixel_data;
     RrPixel32 current;
     RrColor *primary_light, *secondary_light;
+    gint y1sz, y2sz, y3sz;
 
     VARS(y1);
     VARS(y2);
@@ -452,12 +453,16 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     if (b > 0xFF) b = 0xFF;
     secondary_light = RrColorNew(a->inst, r, g, b);
 
-    SETUP(y1, primary_light, sf->primary, (h / 2) - 1);
-    /* setup to get the colors in between these 2 */
-    SETUP(y2, sf->primary, sf->secondary, h % 2 ? 5 : 4);
-    SETUP(y3, sf->secondary, secondary_light,  (h / 2) - 1);
+    y1sz = MAX(h/2 - 1, 1);
+    /* setup to get the colors _in between_ these other 2 */
+    y2sz = (h < 3 ? 0 : (h % 2 ? 3 : 2));
+    y3sz = MAX(h/2 - 1, 0);
 
-    for (y1 = (h / 2) - 1; y1 > 0; --y1) {
+    SETUP(y1, primary_light, sf->primary, y1sz);
+    SETUP(y2, sf->primary, sf->secondary, y2sz);
+    SETUP(y3, sf->secondary, secondary_light,  y3sz);
+
+    for (y1 = y1sz; y1 > 0; --y1) {
         current = COLOR(y1);
         for (x = w - 1; x >= 0; --x)
             *(data++) = current;
@@ -466,7 +471,7 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     }
 
     NEXT(y2); /* skip the first one, its the same as the last of y1 */
-    for (y2 = (h % 2 ? 3 : 2); y2 > 0; --y2) {
+    for (y2 = y2sz; y2 > 0; --y2) {
         current = COLOR(y2);
         for (x = w - 1; x >= 0; --x)
             *(data++) = current;
@@ -474,7 +479,7 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
         NEXT(y2);
     }
     
-    for (y3 = (h / 2) - 1; y3 > 0; --y3) {
+    for (y3 = y3sz; y3 > 0; --y3) {
         current = COLOR(y3);
         for (x = w - 1; x >= 0; --x)
             *(data++) = current;

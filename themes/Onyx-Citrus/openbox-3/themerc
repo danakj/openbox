@@ -7,7 +7,7 @@ menu.items.bg.color: #303030
 menu.items.bg.colorTo: #080808
 
 !! Menu text
-menu.items.text.color: #c0c0c0
+menu.items.text.color: #b0b0b0
 menu.items.justify: left
 menu.items.disabled.text.color: #606060
 
@@ -28,9 +28,9 @@ menu.items.active.text.color: white
 window.active.title.bg: raised splitvertical gradient
 window.active.title.bg.color: #303030
 window.active.title.bg.colorTo: #181818
-window.inactive.title.bg: raised splitvertical gradient
-window.inactive.title.bg.color: #303030
-window.inactive.title.bg.colorTo: #181818
+window.inactive.title.bg: flat splitvertical gradient
+window.inactive.title.bg.color: #b0b0b0
+window.inactive.title.bg.colorTo: #a0a0a0
 
 !! Titlebar text
 window.label.text.justify: center
@@ -42,14 +42,14 @@ window.inactive.label.text.color: #606060
 !! Handle
 window.active.handle.bg: solid flat
 window.active.handle.bg.color: #303030
-window.inactive.handle.bg: raised solid
-window.inactive.handle.bg.color: #303030
+window.inactive.handle.bg: solid flat
+window.inactive.handle.bg.color: #a0a0a0
 
 !! Grips
 window.active.grip.bg: solid flat
 window.active.grip.bg.color: #303030
-window.inactive.grip.bg: raised solid
-window.inactive.grip.bg.color: #303030
+window.inactive.grip.bg: solid flat
+window.inactive.grip.bg.color: #a0a0a0
 
 !! Window buttons
 window.*.button.*.bg: parentrelative
@@ -69,12 +69,14 @@ window.*.button.*.pressed.bg.border.color: #683913
 window.inactive.button.*.image.color: #606060
 
 !! Borders
-border.color: #202020
+window.active.border.color: #202020
+window.inactive.border.color: #808080
+window.inactive.title.separator.color: #a0a0a0
 border.width: 1
 padding.width: 2
 window.handle.width: 1
 window.active.client.color:  #303030
-window.inactive.client.color:  #303030
+window.inactive.client.color:  #a0a0a0
 window.client.padding.width: 1
 window.client.padding.height: 0
 menu.overlap: 0

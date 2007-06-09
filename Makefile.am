@@ -313,6 +313,14 @@ orang_themedir = $(themedir)/Orang/openbox-3
 dist_orang_theme_DATA= \
 	themes/Orang/openbox-3/themerc
 
+onyx_themedir = $(themedir)/Onyx/openbox-3
+dist_onyx_theme_DATA= \
+	themes/Onyx/openbox-3/themerc
+
+onyxcitrus_themedir = $(themedir)/Onyx-Citrus/openbox-3
+dist_onyxcitrus_theme_DATA= \
+	themes/Onyx-Citrus/openbox-3/themerc
+
 syscrash_themedir = $(themedir)/Syscrash/openbox-3
 dist_syscrash_theme_DATA= \
 	themes/Syscrash/openbox-3/max_disabled.xbm \

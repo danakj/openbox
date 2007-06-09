@@ -459,7 +459,10 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     y3sz = MAX(h/2 - 1, 0);
 
     SETUP(y1, primary_light, sf->primary, y1sz);
-    SETUP(y2, sf->primary, sf->secondary, y2sz);
+    if (y2sz) {
+        SETUP(y2, sf->primary, sf->secondary, y2sz);
+        NEXT(y2); /* skip the first one, its the same as the last of y1 */
+    }
     SETUP(y3, sf->secondary, secondary_light,  y3sz);
 
     for (y1 = y1sz; y1 > 0; --y1) {
@@ -470,7 +473,6 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
         NEXT(y1);
     }
 
-    NEXT(y2); /* skip the first one, its the same as the last of y1 */
     for (y2 = y2sz; y2 > 0; --y2) {
         current = COLOR(y2);
         for (x = w - 1; x >= 0; --x)

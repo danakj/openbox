@@ -40,7 +40,7 @@ window.inactive.label.bg: parentrelative
 window.inactive.label.text.color: #606060
 
 !! Handle
-window.active.handle.bg: solid flat
+window.active.handle.bg: gradient flat splitvertical
 window.active.handle.bg.color: #303030
 window.inactive.handle.bg: solid flat
 window.inactive.handle.bg.color: #b0b0b0

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 17:28-0400\n"
+"POT-Creation-Date: 2007-06-09 21:06-0400\n"
 "PO-Revision-Date: 2007-06-07 06:50-0500\n"
 "Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
 "Language-Team: None\n"
@@ -107,7 +107,7 @@ msgstr "&Trang/Không Trang trí"
 msgid "&Close"
 msgstr "Đón&g"
 
-#: openbox/config.c:704
+#: openbox/config.c:716
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Sai nút '%s' ở trong hình thể"

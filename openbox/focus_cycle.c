@@ -358,9 +358,6 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     static ObClient *first = NULL;
     ObClient *ft = NULL;
 
-    g_print("interactive %d dialog %d done %d cancel %d\n",
-            interactive, dialog, done, cancel);
-
     if (cancel) {
         focus_cycle_target = NULL;
         goto done_cycle;

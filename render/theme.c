@@ -1795,7 +1795,7 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                 value->surface.interlace_color = RrColorNew(inst, 0, 0, 0);
         if (read_int(db, hname, &i) && i >= 0)
             value->surface.bevel_light_adjust = i;
-        if (read_int(db, sname, &i) && i >= 0 && i <= 255)
+        if (read_int(db, sname, &i) && i >= 0 && i <= 256)
             value->surface.bevel_dark_adjust = i;
         ret = TRUE;
     }

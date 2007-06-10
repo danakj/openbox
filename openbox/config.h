@@ -41,6 +41,8 @@ struct _ObAppSettings
     Point position;
     gboolean center_x;
     gboolean center_y;
+    gboolean opposite_x;
+    gboolean opposite_y;
     gboolean pos_given;
 
     guint desktop;

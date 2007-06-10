@@ -132,6 +132,8 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
         dst->pos_given = TRUE;
         dst->center_x = src->center_x;
         dst->center_y = src->center_y;
+        dst->opposite_x = src->opposite_x;
+        dst->opposite_y = src->opposite_y;
         dst->position.x = src->position.x;
         dst->position.y = src->position.y;
         dst->monitor = src->monitor;
@@ -208,7 +210,12 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                             settings->center_x = TRUE;
                             x_pos_given = TRUE;
                         } else {
-                            settings->position.x = parse_int(doc, c);
+                            if (s[0] == '-')
+                                settings->opposite_x = TRUE;
+                            if (s[0] == '-' || s[0] == '+')
+                                settings->position.x = atoi(s+1);
+                            else
+                                settings->position.x = atoi(s);
                             x_pos_given = TRUE;
                         }
                         g_free(s);
@@ -221,7 +228,12 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                             settings->center_y = TRUE;
                             settings->pos_given = TRUE;
                         } else {
-                            settings->position.y = parse_int(doc, c);
+                            if (s[0] == '-')
+                                settings->opposite_y = TRUE;
+                            if (s[0] == '-' || s[0] == '+')
+                                settings->position.y = atoi(s+1);
+                            else
+                                settings->position.y = atoi(s);
                             settings->pos_given = TRUE;
                         }
                         g_free(s);

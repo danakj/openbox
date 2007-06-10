@@ -3986,6 +3986,11 @@ ObClient* client_under_pointer()
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
                 if (c->frame->visible &&
+                    /* check the desktop, this is done during desktop
+                       switching and windows are shown/hidden status is not
+                       reliable */
+                    (c->desktop == screen_desktop ||
+                     c->desktop == DESKTOP_ALL) &&
                     /* ignore all animating windows */
                     !frame_iconify_animating(c->frame) &&
                     RECT_CONTAINS(c->frame->area, x, y))

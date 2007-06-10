@@ -1630,10 +1630,11 @@ void frame_end_iconify_animation(ObFrame *self)
 
     if (!self->visible)
         XUnmapWindow(ob_display, self->window);
-    else
+    else {
         /* Send a ConfigureNotify when the animation is done, this fixes
            KDE's pager showing the window in the wrong place. */
         client_reconfigure(self->client);
+    }
 
     /* we're not animating any more ! */
     self->iconify_animation_going = 0;
@@ -1641,6 +1642,8 @@ void frame_end_iconify_animation(ObFrame *self)
     XMoveResizeWindow(ob_display, self->window,
                       self->area.x, self->area.y,
                       self->area.width, self->area.height);
+    /* we delay re-rendering until after we're done animating */
+    framerender_frame(self);
     XFlush(ob_display);
 }
 

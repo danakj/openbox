@@ -1831,7 +1831,6 @@ void action_directional_focus(union ActionData *data)
        on us */
     event_halt_focus_delay();
 
-    g_print("action\n");
     focus_directional_cycle(data->interdiraction.direction,
                             data->interdiraction.dock_windows,
                             data->interdiraction.desktop_windows,

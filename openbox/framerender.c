@@ -34,6 +34,9 @@ static void framerender_close(ObFrame *self, RrAppearance *a);
 
 void framerender_frame(ObFrame *self)
 {
+    if (frame_iconify_animating(self))
+        return; /* delay redrawing until the animation is done */
+
     {
         gulong px;
 

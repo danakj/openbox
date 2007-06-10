@@ -358,13 +358,13 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     static ObClient *first = NULL;
     ObClient *ft = NULL;
 
-    if (!interactive)
-        return;
+    g_print("interactive %d dialog %d done %d cancel %d\n",
+            interactive, dialog, done, cancel);
 
     if (cancel) {
         focus_cycle_target = NULL;
         goto done_cycle;
-    } else if (done)
+    } else if (done && interactive)
         goto done_cycle;
 
     if (!focus_order)
@@ -396,11 +396,11 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                 ft = it->data;
     }
         
-    if (ft) {
-        if (ft != focus_cycle_target) {/* prevents flicker */
-            focus_cycle_target = ft;
-            focus_cycle_draw_indicator(ft);
-        }
+    if (ft && ft != focus_cycle_target) {/* prevents flicker */
+        focus_cycle_target = ft;
+        if (!interactive)
+            goto done_cycle;
+        focus_cycle_draw_indicator(ft);
     }
     if (focus_cycle_target && dialog)
         /* same arguments as focus_target_valid */

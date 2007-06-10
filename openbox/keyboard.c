@@ -145,7 +145,6 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
-    gboolean mods = TRUE;
 
     g_assert(keylist != NULL);
     g_assert(action != NULL);
@@ -166,17 +165,13 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
         return FALSE;
     }
 
-    /* find if every key in this chain has modifiers, and also find the
-       bottom node of the tree */
-    while (t->first_child) {
-        if (!t->state)
-            mods = FALSE;
-        t = t->first_child;
-    }
+    /* find the bottom node */
+    for (; t->first_child; t = t->first_child);
 
     /* when there are no modifiers in the binding, then the action cannot
        be interactive */
-    if (!mods && action->data.any.interactive) {
+    if (!t->state && action->data.any.interactive) {
+        g_print("not interactive\n");
         action->data.any.interactive = FALSE;
         action->data.inter.final = TRUE;
     }
@@ -208,6 +203,8 @@ static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
     alist = g_slist_append(NULL, istate.action);
     action_run_interactive(alist, istate.client, state, time, cancel, TRUE);
     g_slist_free(alist);
+
+    keyboard_reset_chains(0);
 }
 
 static void keyboard_interactive_end_client(ObClient *client, gpointer data)
@@ -311,7 +308,14 @@ void keyboard_event(ObClient *client, const XEvent *e)
             } else if (p->chroot)         /* an empty chroot */
                 set_curpos(p);
             else {
-                keyboard_reset_chains(0);
+                GSList *it;
+                gboolean inter = FALSE;
+
+                for (it = p->actions; it && !inter; it = g_slist_next(it))
+                    if (((ObAction*)it->data)->data.any.interactive)
+                        inter = TRUE;
+                if (!inter) /* don't reset if the action is interactive */
+                    keyboard_reset_chains(0);
 
                 action_run_key(p->actions, client, e->xkey.state,
                                e->xkey.x_root, e->xkey.y_root,

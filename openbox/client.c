@@ -3570,17 +3570,19 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
     guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
     gboolean allow = FALSE;
 
-    /* if the request came from the user, or if nothing is focused, then grant
-       the request.
-       if the currently focused app doesn't set a user_time, then it can't
+    /* if the currently focused app doesn't set a user_time, then it can't
        benefit from any focus stealing prevention.
+
+       if the timestamp is missing in the request then let it go through
+       even if it is source=app, because EVERY APPLICATION DOES THIS because
+       GTK IS VERY BUGGY AND HARDCODES source=application... WHY!?
     */
-    if (user || !focus_client || !last_time)
+    if (!last_time || !event_curtime)
         allow = TRUE;
     /* otherwise, if they didn't give a time stamp or if it is too old, they
        don't get focus */
     else
-        allow = event_curtime && event_time_after(event_curtime, last_time);
+        allow = event_time_after(event_curtime, last_time);
 
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Want to activate window 0x%x with time %u (last time %u), "

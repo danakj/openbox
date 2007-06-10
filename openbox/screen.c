@@ -543,6 +543,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     GList *it;
     guint old;
     gulong ignore_start;
+    gboolean allow_omni;
      
     g_assert(num < screen_num_desktops);
 
@@ -574,10 +575,11 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    if (focus_client && ((client_normal(focus_client) &&
-                          focus_client->desktop == DESKTOP_ALL) ||
-                         focus_client->desktop == screen_desktop))
-        dofocus = FALSE;
+    /* only allow omnipresent windows to get focus on desktop change if
+       an omnipresent window is already focused (it'll keep focus probably, but
+       maybe not depending on mouse-focus options) */
+    allow_omni = focus_client && (client_normal(focus_client) &&
+                                  focus_client->desktop == DESKTOP_ALL);
 
     /* have to try focus here because when you leave an empty desktop
        there is no focus out to watch for. also, we have different rules
@@ -587,7 +589,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last, FALSE)))
+    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last, allow_omni)))
     {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is

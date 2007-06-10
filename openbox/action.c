@@ -1466,21 +1466,21 @@ void action_move_relative(union ActionData *data)
 void action_resize_relative(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
-    gint x, y, ow, w, oh, h, lw, lh;
+    gint x, y, w1, w2, h1, h2, lw, lh;
 
     client_action_start(data);
 
     x = c->area.x;
     y = c->area.y;
-    ow = c->area.width;
-    w = ow + data->relative.deltax * c->size_inc.width
+    w1 = c->area.width + data->relative.deltax * c->size_inc.width;
+    w2 = c->area.width + data->relative.deltax * c->size_inc.width
         + data->relative.deltaxl * c->size_inc.width;
-    oh = c->area.height;
-    h = oh + data->relative.deltay * c->size_inc.height
+    h1 = c->area.height + data->relative.deltay * c->size_inc.width;
+    h2 = c->area.height + data->relative.deltay * c->size_inc.height
         + data->relative.deltayu * c->size_inc.height;
     
-    client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
-    client_move_resize(c, x + (ow - w), y + (oh - h), w, h);
+    client_try_configure(c, &x, &y, &w2, &h2, &lw, &lh, TRUE);
+    client_move_resize(c, x + (w1 - w2), y + (h1 - h2), w2, h2);
     client_action_end(data, FALSE);
 }
 

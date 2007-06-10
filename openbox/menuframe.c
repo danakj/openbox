@@ -1058,6 +1058,8 @@ void menu_frame_hide_all()
     }
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
+
+    menu_clear_pipe_caches();
 }
 
 void menu_frame_hide_all_client(ObClient *client)
@@ -1068,6 +1070,8 @@ void menu_frame_hide_all_client(ObClient *client)
         if (f->client == client)
             menu_frame_hide(f);
     }
+
+    menu_clear_pipe_caches();
 }
 
 

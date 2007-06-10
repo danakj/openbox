@@ -134,7 +134,22 @@ void menu_shutdown(gboolean reconfig)
 static gboolean menu_pipe_submenu(gpointer key, gpointer val, gpointer data)
 {
     ObMenu *menu = val;
-    return menu->pipe_creator == data;
+    return menu->pipe_creator != NULL;
+}
+
+static void clear_cache(gpointer key, gpointer val, gpointer data)
+{
+    ObMenu *menu = val;
+    if (menu->execute)
+        menu_clear_entries(menu);
+}
+
+void menu_clear_pipe_caches()
+{
+    /* delete any pipe menus' submenus */
+    g_hash_table_foreach_remove(menu_hash, menu_pipe_submenu, NULL);
+    /* empty the top level pipe menus */
+    g_hash_table_foreach(menu_hash, clear_cache, NULL);
 }
 
 void menu_pipe_execute(ObMenu *self)
@@ -145,6 +160,8 @@ void menu_pipe_execute(ObMenu *self)
     GError *err = NULL;
 
     if (!self->execute)
+        return;
+    if (self->entries) /* the entries are already created and cached */
         return;
 
     if (!g_spawn_command_line_sync(self->execute, &output, NULL, NULL, &err)) {
@@ -157,9 +174,6 @@ void menu_pipe_execute(ObMenu *self)
     if (parse_load_mem(output, strlen(output),
                        "openbox_pipe_menu", &doc, &node))
     {
-        g_hash_table_foreach_remove(menu_hash, menu_pipe_submenu, self);
-        menu_clear_entries(self);
-
         menu_parse_state.pipe_creator = self;
         menu_parse_state.parent = self;
         parse_tree(menu_parse_inst, doc, node->children);

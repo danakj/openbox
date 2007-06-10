@@ -424,6 +424,9 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
 
     menu_frame_hide_all();
 
+    /* clear the pipe menus when showing a new menu */
+    menu_clear_pipe_caches();
+
     frame = menu_frame_new(self, 0, client);
     if (!menu_frame_show_topmenu(frame, x, y, button))
         menu_frame_free(frame);

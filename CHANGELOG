@@ -36,6 +36,10 @@
     WM_NORMAL_HINTS unless we have to
   * Fix for focus cycling to helper windows - Don't count dialogs as a sibling,
     so they don't stop you
+  * Allow the use of negative numbers in per-app settings position to place a
+    window relative to the right/bottom edges of your monitor (taking the
+    struts (panels) into account)
+  * Fix focus moving irrationally when focusLast was off
 
 3.4:
   * Add Indian Bengali translation

@@ -1475,7 +1475,7 @@ void action_resize_relative(union ActionData *data)
     w1 = c->area.width + data->relative.deltax * c->size_inc.width;
     w2 = c->area.width + data->relative.deltax * c->size_inc.width
         + data->relative.deltaxl * c->size_inc.width;
-    h1 = c->area.height + data->relative.deltay * c->size_inc.width;
+    h1 = c->area.height + data->relative.deltay * c->size_inc.height;
     h2 = c->area.height + data->relative.deltay * c->size_inc.height
         + data->relative.deltayu * c->size_inc.height;
     

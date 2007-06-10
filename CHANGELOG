@@ -1,3 +1,21 @@
+3.4.2:
+  * Add ability to set the bevel strength in themes
+  * Fix for focusLast with omnipresent windows
+  * Cache pipe menus while the menus are open
+  * Allow non-interactive directional focus key bindings
+  * Change how nested interactive key bindings work (it stays in the key chain,
+    like chroot, until you end the interactive action)
+  * Fix for gtk apps trying to get focus - mostly nullify focus stealing
+    prevention (Fixes Tilda)
+  * Send ConfigureNotify always on ConfigureRequest (Previous emacs fix
+    makes this possible now)
+  * Fix RelativeResize action for right/bottom edges
+  * Remove SCIM from the default autostart.sh - it has caused problems with
+    some (buggy) panels, such as pypanel
+  * Fix the titlebar changing to non-focused when iconifying a window with
+    animation
+  * Use the new osd theme hints for the dock, rather than the titlebar hints
+
 3.4.1:
   * Add Vietnamese translation
   * Add Japanese translation

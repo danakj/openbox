@@ -1466,21 +1466,30 @@ void action_move_relative(union ActionData *data)
 void action_resize_relative(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
-    gint x, y, w1, w2, h1, h2, lw, lh;
+    gint x, y, ow, xoff, nw, oh, yoff, nh, lw, lh;
 
     client_action_start(data);
 
     x = c->area.x;
     y = c->area.y;
-    w1 = c->area.width + data->relative.deltax * c->size_inc.width;
-    w2 = c->area.width + data->relative.deltax * c->size_inc.width
+    ow = c->area.width;
+    xoff = -data->relative.deltaxl * c->size_inc.width;
+    nw = ow + data->relative.deltax * c->size_inc.width
         + data->relative.deltaxl * c->size_inc.width;
-    h1 = c->area.height + data->relative.deltay * c->size_inc.height;
-    h2 = c->area.height + data->relative.deltay * c->size_inc.height
+    oh = c->area.height;
+    yoff = -data->relative.deltayu * c->size_inc.height;
+    nh = oh + data->relative.deltay * c->size_inc.height
         + data->relative.deltayu * c->size_inc.height;
+
+    g_print("deltax %d %d x %d ow %d xoff %d nw %d\n",
+            data->relative.deltax, 
+            data->relative.deltaxl, 
+            x, ow, xoff, nw);
     
-    client_try_configure(c, &x, &y, &w2, &h2, &lw, &lh, TRUE);
-    client_move_resize(c, x + (w1 - w2), y + (h1 - h2), w2, h2);
+    client_try_configure(c, &x, &y, &nw, &nh, &lw, &lh, TRUE);
+    xoff = xoff == 0 ? 0 : (xoff < 0 ? MAX(xoff, ow-nw) : MIN(xoff, ow-nw));
+    yoff = yoff == 0 ? 0 : (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
+    client_move_resize(c, x + xoff, y + yoff, nw, nh);
     client_action_end(data, FALSE);
 }
 

@@ -23,7 +23,7 @@
 #include "color.h"
 #include <glib.h>
 
-static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised);
+static void highlight(RrSurface *s, RrPixel32 *x, RrPixel32 *y, gboolean raised);
 static void gradient_parentrelative(RrAppearance *a, gint w, gint h);
 static void gradient_solid(RrAppearance *l, gint w, gint h);
 static void gradient_splitvertical(RrAppearance *a, gint w, gint h);
@@ -110,29 +110,29 @@ void RrRender(RrAppearance *a, gint w, gint h)
     if (a->surface.relief != RR_RELIEF_FLAT) {
         if (a->surface.bevel == RR_BEVEL_1) {
             for (off = 1, x = 1; x < w - 1; ++x, off++)
-                highlight(data + off,
+                highlight(&a->surface, data + off,
                           data + off + (h-1) * w,
                           a->surface.relief==RR_RELIEF_RAISED);
             for (off = 0, x = 0; x < h; ++x, off++)
-                highlight(data + off * w,
+                highlight(&a->surface, data + off * w,
                           data + off * w + w - 1,
                           a->surface.relief==RR_RELIEF_RAISED);
         }
 
         if (a->surface.bevel == RR_BEVEL_2) {
             for (off = 2, x = 2; x < w - 2; ++x, off++)
-                highlight(data + off + w,
+                highlight(&a->surface, data + off + w,
                           data + off + (h-2) * w,
                           a->surface.relief==RR_RELIEF_RAISED);
             for (off = 1, x = 1; x < h-1; ++x, off++)
-                highlight(data + off * w + 1,
+                highlight(&a->surface, data + off * w + 1,
                           data + off * w + w - 2,
                           a->surface.relief==RR_RELIEF_RAISED);
         }
     }
 }
 
-static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
+static void highlight(RrSurface *s, RrPixel32 *x, RrPixel32 *y, gboolean raised)
 {
     gint r, g, b;
 
@@ -144,12 +144,13 @@ static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
         up = y;
         down = x;
     }
+
     r = (*up >> RrDefaultRedOffset) & 0xFF;
-    r += r >> 1;
+    r += (r * s->bevel_light_adjust) >> 8;
     g = (*up >> RrDefaultGreenOffset) & 0xFF;
-    g += g >> 1;
+    g += (g * s->bevel_light_adjust) >> 8;
     b = (*up >> RrDefaultBlueOffset) & 0xFF;
-    b += b >> 1;
+    b += (b * s->bevel_light_adjust) >> 8;
     if (r > 0xFF) r = 0xFF;
     if (g > 0xFF) g = 0xFF;
     if (b > 0xFF) b = 0xFF;
@@ -157,11 +158,11 @@ static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
         + (b << RrDefaultBlueOffset);
   
     r = (*down >> RrDefaultRedOffset) & 0xFF;
-    r = (r >> 1) + (r >> 2);
+    r -= (r * s->bevel_dark_adjust) >> 8;
     g = (*down >> RrDefaultGreenOffset) & 0xFF;
-    g = (g >> 1) + (g >> 2);
+    g -= (g * s->bevel_dark_adjust) >> 8;
     b = (*down >> RrDefaultBlueOffset) & 0xFF;
-    b = (b >> 1) + (b >> 2);
+    b -= (b * s->bevel_dark_adjust) >> 8;
     *down = (r << RrDefaultRedOffset) + (g << RrDefaultGreenOffset)
         + (b << RrDefaultBlueOffset);
 }
@@ -172,11 +173,11 @@ static void create_bevel_colors(RrAppearance *l)
 
     /* light color */
     r = l->surface.primary->r;
-    r += r >> 1;
+    r += (r * l->surface.bevel_light_adjust) >> 8;
     g = l->surface.primary->g;
-    g += g >> 1;
+    g += (g * l->surface.bevel_light_adjust) >> 8;
     b = l->surface.primary->b;
-    b += b >> 1;
+    b += (b * l->surface.bevel_light_adjust) >> 8;
     if (r > 0xFF) r = 0xFF;
     if (g > 0xFF) g = 0xFF;
     if (b > 0xFF) b = 0xFF;
@@ -185,11 +186,11 @@ static void create_bevel_colors(RrAppearance *l)
 
     /* dark color */
     r = l->surface.primary->r;
-    r = (r >> 1) + (r >> 2);
+    r -= (r * l->surface.bevel_dark_adjust) >> 8;
     g = l->surface.primary->g;
-    g = (g >> 1) + (g >> 2);
+    g -= (g * l->surface.bevel_dark_adjust) >> 8;
     b = l->surface.primary->b;
-    b = (b >> 1) + (b >> 2);
+    b -= (b * l->surface.bevel_dark_adjust) >> 8;
     g_assert(!l->surface.bevel_dark);
     l->surface.bevel_dark = RrColorNew(l->inst, r, g, b);
 }

@@ -171,6 +171,8 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
   out = g_new0(RrAppearance, 1);
   out->inst = inst;
   out->textures = numtex;
+  out->surface.bevel_light_adjust = 128;
+  out->surface.bevel_dark_adjust = 64;
   if (numtex) out->texture = g_new0(RrTexture, numtex);
 
   return out;
@@ -240,6 +242,8 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     else spc->bevel_light = NULL;
 
     spc->interlaced = spo->interlaced;
+    spc->bevel_light_adjust = spo->bevel_light_adjust;
+    spc->bevel_dark_adjust = spo->bevel_dark_adjust;
     spc->border = spo->border;
     spc->parent = NULL;
     spc->parentx = spc->parenty = 0;

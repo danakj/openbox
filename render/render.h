@@ -117,6 +117,8 @@ struct _RrSurface {
     RrColor *bevel_dark; 
     RrColor *bevel_light;
     RrColor *interlace_color;
+    gint bevel_dark_adjust;  /* 0-255, default is 64 */
+    gint bevel_light_adjust; /* 0-255, default is 128 */
     gboolean interlaced;
     gboolean border;
     RrAppearance *parent;

@@ -1760,14 +1760,17 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 {
     gboolean ret = FALSE;
     gchar *rclass = create_class_name(rname);
-    gchar *cname, *ctoname, *bcname, *icname;
+    gchar *cname, *ctoname, *bcname, *icname, *hname, *sname;
     gchar *rettype;
     XrmValue retvalue;
+    gint i;
 
     cname = g_strconcat(rname, ".color", NULL);
     ctoname = g_strconcat(rname, ".colorTo", NULL);
     bcname = g_strconcat(rname, ".border.color", NULL);
     icname = g_strconcat(rname, ".interlace.color", NULL);
+    hname = g_strconcat(rname, ".highlight", NULL);
+    sname = g_strconcat(rname, ".shadow", NULL);
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
@@ -1790,9 +1793,15 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
             if (!read_color(db, inst, icname,
                             &value->surface.interlace_color))
                 value->surface.interlace_color = RrColorNew(inst, 0, 0, 0);
+        if (read_int(db, hname, &i) && i >= 0)
+            value->surface.bevel_light_adjust = i;
+        if (read_int(db, sname, &i) && i >= 0 && i <= 256)
+            value->surface.bevel_dark_adjust = i;
         ret = TRUE;
     }
 
+    g_free(sname);
+    g_free(hname);
     g_free(icname);
     g_free(bcname);
     g_free(ctoname);

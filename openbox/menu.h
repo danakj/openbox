@@ -165,8 +165,10 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
                  gboolean allow_shortcut_selection, gpointer data);
 void menu_free(ObMenu *menu);
 
-/* Repopulate a pipe-menu by running its command */
+/*! Repopulate a pipe-menu by running its command */
 void menu_pipe_execute(ObMenu *self);
+/*! Clear a pipe-menu's entries */
+void menu_clear_pipe_caches();
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 

@@ -2554,10 +2554,10 @@ static void client_apply_startup_state(ObClient *self,
     */
     client_try_configure(self, &x, &y, &w, &h, &l, &l, FALSE);
     ob_debug("placed window 0x%x at %d, %d with size %d x %d\n",
-             self->window, self->area.x, self->area.y,
-             self->area.width, self->area.height);
-    oldarea = self->area;              /* save the area */
-    RECT_SET(self->area, x, y, w, h);  /* put where it should be for the premax stuff */
+             self->window, x, y, w, h);
+    /* save the area, and make it where it should be for the premax stuff */
+    oldarea = self->area;
+    RECT_SET(self->area, x, y, w, h);
 
     /* apply the states. these are in a carefully crafted order.. */
 

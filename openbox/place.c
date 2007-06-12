@@ -217,11 +217,11 @@ enum {
     IGNORE_FULLSCREEN = 1 << 0,
     IGNORE_MAXIMIZED  = 1 << 1,
     IGNORE_MENUTOOL   = 1 << 2,
-    IGNORE_SHADED     = 1 << 3,
-    IGNORE_NONGROUP   = 1 << 4,
-    IGNORE_BELOW      = 1 << 5,
-    IGNORE_NONFOCUS   = 1 << 6,
-    IGNORE_END        = 1 << 7
+    /*IGNORE_SHADED     = 1 << 3,*/
+    IGNORE_NONGROUP   = 1 << 3,
+    IGNORE_BELOW      = 1 << 4,
+    IGNORE_NONFOCUS   = 1 << 5,
+    IGNORE_END        = 1 << 6
 };
 
 static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
@@ -275,10 +275,12 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                     (test->type == OB_CLIENT_TYPE_MENU ||
                      test->type == OB_CLIENT_TYPE_TOOLBAR) &&
                     client_has_parent(c)) continue;
+                /*
                 if ((ignore & IGNORE_SHADED) &&
                     test->shaded) continue;
+                */
                 if ((ignore & IGNORE_NONGROUP) &&
-                    client_has_group_siblings(test) &&
+                    client_has_group_siblings(c) &&
                     test->group != c->group) continue;
                 if ((ignore & IGNORE_BELOW) &&
                     test->layer < c->layer) continue;

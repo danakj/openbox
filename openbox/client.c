@@ -532,7 +532,16 @@ void client_manage(Window window)
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
     */
-    client_show(self);
+    {
+        gulong ignore_start;
+        if (!config_focus_under_mouse)
+            ignore_start = event_start_ignore_all_enters();
+
+        client_show(self);
+
+        if (!config_focus_under_mouse)
+            event_end_ignore_all_enters(ignore_start);
+    }
 
     if (activate) {
         gboolean stacked = client_restore_session_stacking(self);

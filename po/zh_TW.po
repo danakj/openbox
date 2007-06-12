@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-05-23 16:22+0200\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -113,7 +113,7 @@ msgstr "關閉(&C)"
 msgid "Invalid button '%s' specified in config file"
 msgstr "在配置檔中指定的按鈕「%s」無效"
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "與配置檔中的按鍵組合衝突"
 
@@ -122,22 +122,22 @@ msgstr "與配置檔中的按鍵組合衝突"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "無法找到有效的選單檔案「%s」"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "執行命令於管線選單「%s」時失敗：%s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "從管線選單「%s」的輸出無效"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "試圖存取選單「%s」但是它不存在"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "更多…"
 
@@ -286,7 +286,7 @@ msgstr "無法於螢幕 %d 獲選為視窗管理員"
 msgid "The WM on screen %d is not exiting"
 msgstr "螢幕 %d 中的視窗管理員並未離開"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"

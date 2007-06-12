@@ -1932,8 +1932,7 @@ void event_cancel_all_key_grabs()
            on from the KeyPress. If the grab is left on, and focus
            moves during that time, it will be NotifyWhileGrabbed, and
            applications like to ignore those! */
-        if (!keyboard_interactively_grabbed())
-            XUngrabKeyboard(ob_display, CurrentTime);
+        XUngrabKeyboard(ob_display, CurrentTime);
 
 }
 

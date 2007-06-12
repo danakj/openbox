@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-06-04 12:46+0200\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -115,7 +115,7 @@ msgstr "&Zavřít"
 msgid "Invalid button '%s' specified in config file"
 msgstr "Neplatné tlačítko '%s' v konfiguračním souboru"
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt klávesových zkratek v konfiguračním souboru"
 
@@ -124,23 +124,23 @@ msgstr "Konflikt klávesových zkratek v konfiguračním souboru"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Nepodařilo se najít platný menu soubor '%s'"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Nepodařilo se spustit příkaz pro pipe-menu '%s': %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Neplatný výstup z pipe-menu '%s'"
 
 # TODO: heh
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Pokus o přístup k menu '%s', ale ono neexistuje"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "Víc..."
 
@@ -293,7 +293,7 @@ msgstr "Nepodařilo se získat výseč pro window manager na obrazovce %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Window manager na obrazovce %d ne a ne skončit"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "plochu %i"

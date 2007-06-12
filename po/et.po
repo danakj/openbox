@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-05-21 20:11+0300\n"
 "Last-Translator: Andres Järv <andresjarv@gmail.com>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -114,7 +114,7 @@ msgstr "S&ulge"
 msgid "Invalid button '%s' specified in config file"
 msgstr "Vigane nupp '%s' määratletud konfiguratsioonifailis"
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt kiirklahviga konfiguratsioonifailis"
 
@@ -123,22 +123,22 @@ msgstr "Konflikt kiirklahviga konfiguratsioonifailis"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Ei suudetud leida kehtivat menüüfaili '%s'"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Ei suudetud käivitada torumenüü '%s' käsku: %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Vigane väljund torumenüüst '%s'"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Üritati ligi pääseda menüüle '%s', aga seda pole olemas"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "Rohkem..."
 
@@ -289,7 +289,7 @@ msgstr "Ei suuda hankida aknahaldurite loetelu ekraanil %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Aknahaldur ekraanil %d ei sulgu"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "töölaud %i"

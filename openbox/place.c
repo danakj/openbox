@@ -213,176 +213,114 @@ static GSList* area_remove(GSList *list, Rect *a)
     return result;
 }
 
-static gint area_cmp(gconstpointer p1, gconstpointer p2, gpointer data)
+enum {
+    IGNORE_FULLSCREEN = 1 << 0,
+    IGNORE_MAXIMIZED  = 1 << 1,
+    IGNORE_MENUTOOL   = 1 << 2,
+    /*IGNORE_SHADED     = 1 << 3,*/
+    IGNORE_NONGROUP   = 1 << 3,
+    IGNORE_BELOW      = 1 << 4,
+    IGNORE_NONFOCUS   = 1 << 5,
+    IGNORE_END        = 1 << 6
+};
+
+static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
 {
-    ObClient *c = data;
-    Rect *carea = &c->frame->area;
-    const Rect *a1 = p1, *a2 = p2;
-    gboolean diffhead = FALSE;
-    guint i;
-    Rect *a;
-
-    for (i = 0; i < screen_num_monitors; ++i) {
-        a = screen_physical_area_monitor(i);
-        if (RECT_CONTAINS(*a, a1->x, a1->y) &&
-            !RECT_CONTAINS(*a, a2->x, a2->y))
-        {
-            diffhead = TRUE;
-            break;
-        }
-    }
-
-    /* has to be more than me in the group */
-    if (diffhead && client_has_group_siblings(c)) {
-        guint *num, most;
-        GSList *it;
-
-        /* find how many clients in the group are on each monitor, use the
-           monitor with the most in it */
-        num = g_new0(guint, screen_num_monitors);
-        for (it = c->group->members; it; it = g_slist_next(it))
-            if (it->data != c)
-                ++num[client_monitor(it->data)];
-        most = 0;
-        for (i = 1; i < screen_num_monitors; ++i)
-            if (num[i] > num[most])
-                most = i;
-
-        g_free(num);
-
-        a = screen_physical_area_monitor(most);
-        if (RECT_CONTAINS(*a, a1->x, a1->y))
-            return -1;
-        if (RECT_CONTAINS(*a, a2->x, a2->y))
-            return 1;
-    }
-
-    return MIN((a1->width - carea->width), (a1->height - carea->height)) -
-        MIN((a2->width - carea->width), (a2->height - carea->height));
-}
-
-typedef enum
-{
-    SMART_FULL,
-    SMART_GROUP,
-    SMART_FOCUSED
-} ObSmartType;
-
-#define SMART_IGNORE(placer, c) \
-    (placer == c || c->shaded || !c->frame->visible || \
-     c->type == OB_CLIENT_TYPE_SPLASH || c->type == OB_CLIENT_TYPE_DESKTOP || \
-     ((c->type == OB_CLIENT_TYPE_MENU || c->type == OB_CLIENT_TYPE_TOOLBAR) &&\
-      client_has_parent(c)) || \
-     (c->desktop != DESKTOP_ALL && \
-      c->desktop != (placer->desktop == DESKTOP_ALL ? \
-                     screen_desktop : placer->desktop)))
-
-static gboolean place_smart(ObClient *client, gint *x, gint *y,
-                            ObSmartType type, gboolean ignore_max)
-{
-    gboolean ret = FALSE;
-    GSList *spaces = NULL, *sit;
-    GList *it;
     Rect **areas;
-    guint i;
+    gint ignore;
+    gboolean ret;
+    gint maxsize;
+    GSList *spaces = NULL, *sit, *maxit;
 
-    if (type == SMART_GROUP) {
-        /* has to be more than me in the group */
-        if (!client_has_group_siblings(client))
-            return FALSE;
-    }
+    areas = pick_head(c);
+    ret = FALSE;
+    maxsize = 0;
+    maxit = NULL;
 
-    areas = pick_head(client);
+    /* try ignoring different things to find empty space */
+    for (ignore = 0; ignore < IGNORE_END && !ret; ignore = (ignore << 1) + 1) {
+        guint i;
 
-    for (i = 0; i < screen_num_monitors && !ret; ++i) {
-        spaces = area_add(spaces, areas[i]);
+        /* try all monitors in order of preference */
+        for (i = 0; i < screen_num_monitors && !ret; ++i) {
+            GList *it;
 
-        /* stay out from under windows in higher layers */
-        for (it = stacking_list; it; it = g_list_next(it)) {
-            ObClient *c;
+            /* add the whole monitor */
+            spaces = area_add(spaces, areas[i]);
 
-            if (WINDOW_IS_CLIENT(it->data)) {
-                c = it->data;
-                if (ignore_max &&
-                    (c->fullscreen || (c->max_vert && c->max_horz)))
-                    continue;
-            } else
-                continue;
+            /* go thru all the windows */
+            for (it = client_list; it; it = g_list_next(it)) {
+                ObClient *test = it->data;
 
-            if (c->layer > client->layer) {
-                if (!SMART_IGNORE(client, c))
-                    spaces = area_remove(spaces, &c->frame->area);
-            } else
-                break;
-        }
-
-        if (type == SMART_FULL || type == SMART_FOCUSED) {
-            gboolean found_foc = FALSE, stop = FALSE;
-            ObClient *foc;
-
-            foc = focus_order_find_first(client->desktop == DESKTOP_ALL ?
-                                         screen_desktop : client->desktop);
-
-            for (; it && !stop; it = g_list_next(it)) {
-                ObClient *c;
-
-                if (WINDOW_IS_CLIENT(it->data)) {
-                    c = it->data;
-                    if (ignore_max &&
-                        (c->fullscreen || (c->max_vert && c->max_horz)))
-                        continue;
-                } else
-                    continue;
-
-                if (!SMART_IGNORE(client, c)) {
-                    if (type == SMART_FOCUSED)
-                        if (found_foc)
-                            stop = TRUE;
-                    if (!stop)
-                        spaces = area_remove(spaces, &c->frame->area);
+                /* should we ignore this client? */
+                if (screen_showing_desktop) continue;
+                if (c == test) continue;
+                if (test->iconic) continue;
+                if (c->desktop != DESKTOP_ALL) {
+                    if (test->desktop != c->desktop &&
+                        test->desktop != DESKTOP_ALL) continue;
+                } else {
+                    if (test->desktop != screen_desktop &&
+                        test->desktop != DESKTOP_ALL) continue;
                 }
+                if (test->type == OB_CLIENT_TYPE_SPLASH ||
+                    test->type == OB_CLIENT_TYPE_DESKTOP) continue;
 
-                if (c == foc)
-                    found_foc = TRUE;
+
+                if ((ignore & IGNORE_FULLSCREEN) &&
+                    test->fullscreen) continue;
+                if ((ignore & IGNORE_MAXIMIZED) &&
+                    test->max_horz && test->max_vert) continue;
+                if ((ignore & IGNORE_MENUTOOL) &&
+                    (test->type == OB_CLIENT_TYPE_MENU ||
+                     test->type == OB_CLIENT_TYPE_TOOLBAR) &&
+                    client_has_parent(c)) continue;
+                /*
+                if ((ignore & IGNORE_SHADED) &&
+                    test->shaded) continue;
+                */
+                if ((ignore & IGNORE_NONGROUP) &&
+                    client_has_group_siblings(c) &&
+                    test->group != c->group) continue;
+                if ((ignore & IGNORE_BELOW) &&
+                    test->layer < c->layer) continue;
+                if ((ignore & IGNORE_NONFOCUS) &&
+                    focus_client != test) continue;
+
+                /* don't ignore this window, so remove it from the available
+                   area */
+                spaces = area_remove(spaces, &test->frame->area);
             }
-        } else if (type == SMART_GROUP) {
-            for (sit = client->group->members; sit; sit = g_slist_next(sit)) {
-                ObClient *c = sit->data;
-                if (!SMART_IGNORE(client, c))
-                    spaces = area_remove(spaces, &c->frame->area);
-            }
-        } else
-            g_assert_not_reached();
 
-        spaces = g_slist_sort_with_data(spaces, area_cmp, client);
+            for (sit = spaces; sit; sit = g_slist_next(sit)) {
+                Rect *r = sit->data;
 
-        for (sit = spaces; sit; sit = g_slist_next(sit)) {
-            Rect *r = sit->data;
-
-            if (!ret) {
-                if (r->width >= client->frame->area.width &&
-                    r->height >= client->frame->area.height) {
-                    ret = TRUE;
-                    if (client->type == OB_CLIENT_TYPE_DIALOG ||
-                        type != SMART_FULL)
-                    {
-                        *x = r->x + (r->width - client->frame->area.width)/2;
-                        *y = r->y + (r->height - client->frame->area.height)/2;
-                    } else {
-                        *x = r->x;
-                        *y = r->y;
-                    }
+                if (r->width >= c->frame->area.width &&
+                    r->height >= c->frame->area.height &&
+                    r->width > maxsize)
+                {
+                    maxsize = r->width;
+                    maxit = sit;
                 }
             }
 
-            g_free(r);
+            if (maxit) {
+                Rect *r = maxit->data;
+
+                /* center it in the area */
+                *x = r->x + (r->width - c->frame->area.width) / 2;
+                *y = r->y + (r->height - c->frame->area.height) / 2;
+                ret = TRUE;
+            }
+
+            while (spaces) {
+                g_free(spaces->data);
+                spaces = g_slist_delete_link(spaces, spaces);
+            }
         }
-        g_slist_free(spaces);
-        spaces = NULL;
     }
 
     g_free(areas);
-
     return ret;
 }
 
@@ -392,8 +330,9 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     gint px, py;
     Rect *area;
 
+    if (!screen_pointer_pos(&px, &py))
+        return FALSE;
     area = pick_pointer_head(client);
-    screen_pointer_pos(&px, &py);
 
     l = area->x;
     t = area->y;
@@ -500,22 +439,21 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 gboolean place_client(ObClient *client, gint *x, gint *y,
                       ObAppSettings *settings)
 {
-    gboolean ret = FALSE;
+    gboolean ret;
+
     if (client->positioned)
         return FALSE;
-    if (place_transient_splash(client, x, y))
-        ret = TRUE;
-    else if (!(
+
+    /* try a number of methods */
+    ret = place_transient_splash(client, x, y) ||
         place_per_app_setting(client, x, y, settings) ||
-        ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
-         place_under_mouse(client, x, y) :
-         place_smart(client, x, y, SMART_FULL, FALSE)   ||
-         place_smart(client, x, y, SMART_FULL, TRUE)    ||
-         place_smart(client, x, y, SMART_GROUP, FALSE)  ||
-         place_smart(client, x, y, SMART_GROUP, TRUE)   ||
-         place_smart(client, x, y, SMART_FOCUSED, TRUE) ||
-         place_random(client, x, y))))
-        g_assert_not_reached(); /* the last one better succeed */
+        (config_place_policy == OB_PLACE_POLICY_MOUSE &&
+         place_under_mouse(client, x, y)) ||
+        place_nooverlap(client, x, y) ||
+        place_under_mouse(client, x, y) ||
+        place_random(client, x, y);
+    g_assert(ret);
+
     /* get where the client should be */
     frame_frame_gravity(client->frame, x, y,
                         client->area.width, client->area.height);

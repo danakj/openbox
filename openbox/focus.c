@@ -126,7 +126,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            backup fallback though)
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
-            client_normal(c) &&
+            focus_cycle_target_valid(c, FALSE, FALSE, FALSE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -145,7 +145,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (c->type == OB_CLIENT_TYPE_DESKTOP &&
+        if (focus_cycle_target_valid(c, FALSE, FALSE, FALSE, TRUE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {

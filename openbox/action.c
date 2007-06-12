@@ -60,8 +60,12 @@ static void client_action_end(union ActionData *data, gboolean allow_enters)
                    event will come as a GrabNotify which is ignored, so this
                    makes a fake enter event
                 */
-                if ((c = client_under_pointer()) && c != data->any.c)
+                if ((c = client_under_pointer()) && c != data->any.c) {
+                    ob_debug_type(OB_DEBUG_FOCUS,
+                                  "Generating fake enter because we did a "
+                                  "mouse-event action");
                     event_enter_client(c);
+                }
             }
         }
 }

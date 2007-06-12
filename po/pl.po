@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-05-21 18:09+0100\n"
 "Last-Translator: Paweł Rusinek <p.rusinek@gmail.com>\n"
 "Language-Team: None\n"
@@ -113,7 +113,7 @@ msgstr "Z&amknij"
 msgid "Invalid button '%s' specified in config file"
 msgstr "Niepoprawny klawisz '%s' użyty w pliku konfiguracyjnym"
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt z powiązaniem klawiaturowym w pliku konfiguracyjnym"
 
@@ -122,22 +122,22 @@ msgstr "Konflikt z powiązaniem klawiaturowym w pliku konfiguracyjnym"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Nie można odnaleźć poprawnego pliku menu '%s'"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Nie udało się wykonać polecenia dla pipe-menu '%s': %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Niepoprawny wynik z pipe-menu '%s'"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Plik menu '%s' nie istnieje"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "Więcej..."
 
@@ -292,7 +292,7 @@ msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "pulpit %i"

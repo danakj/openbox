@@ -327,6 +327,7 @@ void client_manage(Window window)
          self->type == OB_CLIENT_TYPE_UTILITY ||
          self->type == OB_CLIENT_TYPE_DIALOG))
     {
+        /* XXX use focus_cycle_valid_target instead... */
         activate = TRUE;
     }
 
@@ -532,7 +533,16 @@ void client_manage(Window window)
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
     */
-    client_show(self);
+    {
+        gulong ignore_start;
+        if (!config_focus_under_mouse)
+            ignore_start = event_start_ignore_all_enters();
+
+        client_show(self);
+
+        if (!config_focus_under_mouse)
+            event_end_ignore_all_enters(ignore_start);
+    }
 
     if (activate) {
         gboolean stacked = client_restore_session_stacking(self);
@@ -616,14 +626,14 @@ void client_unmanage(ObClient *self)
     XSelectInput(ob_display, self->window, NoEventMask);
 
     /* ignore enter events from the unmap so it doesnt mess with the focus */
-    if (!client_focused(self) || !config_focus_under_mouse)
+    if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();
 
     frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
     XFlush(ob_display);
 
-    if (!client_focused(self) || !config_focus_under_mouse)
+    if (!config_focus_under_mouse)
         event_end_ignore_all_enters(ignore_start);
 
     mouse_grab_for_client(self, FALSE);
@@ -1569,7 +1579,16 @@ void client_update_normal_hints(ObClient *self)
     
         if (size.flags & PResizeInc && size.width_inc && size.height_inc)
             SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
+
+        ob_debug("Normal hints: min size (%d %d) max size (%d %d)\n   "
+                 "size inc (%d %d) base size (%d %d)\n",
+                 self->min_size.width, self->min_size.height,
+                 self->max_size.width, self->max_size.height,
+                 self->size_inc.width, self->size_inc.height,
+                 self->base_size.width, self->base_size.height);
     }
+    else
+        ob_debug("Normal hints: not set\n");
 }
 
 void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
@@ -1708,12 +1727,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
 
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */
-    if (self->undecorated) {
-        if (config_theme_keepborder)
-            self->decorations &= OB_FRAME_DECOR_BORDER;
-        else
-            self->decorations = 0;
-    }
+    if (self->undecorated)
+        self->decorations = 0;
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
@@ -2477,6 +2492,19 @@ gboolean client_hide(ObClient *self)
             event_cancel_all_key_grabs();
         }
 
+        /* We don't need to ignore enter events here.
+           The window can hide/iconify in 3 different ways:
+           1 - through an x message. in this case we ignore all enter events
+               caused by responding to the x message (unless underMouse)
+           2 - by a keyboard action. in this case we ignore all enter events
+               caused by the action
+           3 - by a mouse action. in this case they are doing stuff with the
+               mouse and focus _should_ move.
+
+           Also in action_end, we simulate an enter event that can't be ignored
+           so trying to ignore them is futile in case 3 anyways
+        */
+
         frame_hide(self->frame);
         hide = TRUE;
 
@@ -2666,89 +2694,6 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
        the updated frame dimensions. */
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
-    /* work within the prefered sizes given by the window */
-    if (!(*w == self->area.width && *h == self->area.height)) {
-        gint basew, baseh, minw, minh;
-
-        /* base size is substituted with min size if not specified */
-        if (self->base_size.width || self->base_size.height) {
-            basew = self->base_size.width;
-            baseh = self->base_size.height;
-        } else {
-            basew = self->min_size.width;
-            baseh = self->min_size.height;
-        }
-        /* min size is substituted with base size if not specified */
-        if (self->min_size.width || self->min_size.height) {
-            minw = self->min_size.width;
-            minh = self->min_size.height;
-        } else {
-            minw = self->base_size.width;
-            minh = self->base_size.height;
-        }
-
-        /* if this is a user-requested resize, then check against min/max
-           sizes */
-
-        /* smaller than min size or bigger than max size? */
-        if (*w > self->max_size.width) *w = self->max_size.width;
-        if (*w < minw) *w = minw;
-        if (*h > self->max_size.height) *h = self->max_size.height;
-        if (*h < minh) *h = minh;
-
-        *w -= basew;
-        *h -= baseh;
-
-        /* keep to the increments */
-        *w /= self->size_inc.width;
-        *h /= self->size_inc.height;
-
-        /* you cannot resize to nothing */
-        if (basew + *w < 1) *w = 1 - basew;
-        if (baseh + *h < 1) *h = 1 - baseh;
-  
-        /* save the logical size */
-        *logicalw = self->size_inc.width > 1 ? *w : *w + basew;
-        *logicalh = self->size_inc.height > 1 ? *h : *h + baseh;
-
-        *w *= self->size_inc.width;
-        *h *= self->size_inc.height;
-
-        *w += basew;
-        *h += baseh;
-
-        /* adjust the height to match the width for the aspect ratios.
-           for this, min size is not substituted for base size ever. */
-        *w -= self->base_size.width;
-        *h -= self->base_size.height;
-
-        if (!self->fullscreen) {
-            if (self->min_ratio)
-                if (*h * self->min_ratio > *w) {
-                    *h = (gint)(*w / self->min_ratio);
-
-                    /* you cannot resize to nothing */
-                    if (*h < 1) {
-                        *h = 1;
-                        *w = (gint)(*h * self->min_ratio);
-                    }
-                }
-            if (self->max_ratio)
-                if (*h * self->max_ratio < *w) {
-                    *h = (gint)(*w / self->max_ratio);
-
-                    /* you cannot resize to nothing */
-                    if (*h < 1) {
-                        *h = 1;
-                        *w = (gint)(*h * self->min_ratio);
-                    }
-                }
-        }
-
-        *w += self->base_size.width;
-        *h += self->base_size.height;
-    }
-
     /* gets the frame's position */
     frame_client_gravity(self->frame, x, y, *w, *h);
 
@@ -2792,6 +2737,95 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
     /* gets the client's position */
     frame_frame_gravity(self->frame, x, y, *w, *h);
+
+    /* work within the prefered sizes given by the window */
+    if (!(*w == self->area.width && *h == self->area.height)) {
+        gint basew, baseh, minw, minh;
+        gint incw, inch, minratio, maxratio;
+
+        incw = self->fullscreen || self->max_horz ? 1 : self->size_inc.width;
+        inch = self->fullscreen || self->max_vert ? 1 : self->size_inc.height;
+        minratio = self->fullscreen || (self->max_horz && self->max_vert) ?
+            0 : self->min_ratio;
+        maxratio = self->fullscreen || (self->max_horz && self->max_vert) ?
+            0 : self->max_ratio;
+
+        /* base size is substituted with min size if not specified */
+        if (self->base_size.width || self->base_size.height) {
+            basew = self->base_size.width;
+            baseh = self->base_size.height;
+        } else {
+            basew = self->min_size.width;
+            baseh = self->min_size.height;
+        }
+        /* min size is substituted with base size if not specified */
+        if (self->min_size.width || self->min_size.height) {
+            minw = self->min_size.width;
+            minh = self->min_size.height;
+        } else {
+            minw = self->base_size.width;
+            minh = self->base_size.height;
+        }
+
+        /* if this is a user-requested resize, then check against min/max
+           sizes */
+
+        /* smaller than min size or bigger than max size? */
+        if (*w > self->max_size.width) *w = self->max_size.width;
+        if (*w < minw) *w = minw;
+        if (*h > self->max_size.height) *h = self->max_size.height;
+        if (*h < minh) *h = minh;
+
+        *w -= basew;
+        *h -= baseh;
+
+        /* keep to the increments */
+        *w /= incw;
+        *h /= inch;
+
+        /* you cannot resize to nothing */
+        if (basew + *w < 1) *w = 1 - basew;
+        if (baseh + *h < 1) *h = 1 - baseh;
+  
+        /* save the logical size */
+        *logicalw = incw > 1 ? *w : *w + basew;
+        *logicalh = inch > 1 ? *h : *h + baseh;
+
+        *w *= incw;
+        *h *= inch;
+
+        *w += basew;
+        *h += baseh;
+
+        /* adjust the height to match the width for the aspect ratios.
+           for this, min size is not substituted for base size ever. */
+        *w -= self->base_size.width;
+        *h -= self->base_size.height;
+
+        if (minratio)
+            if (*h * minratio > *w) {
+                *h = (gint)(*w / minratio);
+
+                /* you cannot resize to nothing */
+                if (*h < 1) {
+                    *h = 1;
+                    *w = (gint)(*h * minratio);
+                }
+            }
+        if (maxratio)
+            if (*h * maxratio < *w) {
+                *h = (gint)(*w / maxratio);
+
+                /* you cannot resize to nothing */
+                if (*h < 1) {
+                    *h = 1;
+                    *w = (gint)(*h * minratio);
+                }
+            }
+
+        *w += self->base_size.width;
+        *h += self->base_size.height;
+    }
 
     /* these override the above states! if you cant move you can't move! */
     if (user) {
@@ -3204,6 +3238,9 @@ void client_set_desktop_recursive(ObClient *self,
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL)
             stacking_raise(CLIENT_AS_WINDOW(self));
+        /* the new desktop's geometry may be different, so we may need to
+           resize, for example if we are maximized */
+        client_reconfigure(self);
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
     }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-06-07 06:50-0500\n"
 "Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
 "Language-Team: None\n"
@@ -112,7 +112,7 @@ msgstr "Đón&g"
 msgid "Invalid button '%s' specified in config file"
 msgstr "Sai nút '%s' ở trong hình thể"
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "Xung đột với chữ trói ở trong hình thể"
 
@@ -121,22 +121,22 @@ msgstr "Xung đột với chữ trói ở trong hình thể"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Không có thể tìm vững chắc thực đơn '%s'"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Không có thể chạy lệnh cho ống-thực đơn '%s': %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Vô hiệu sản xuất của ống-thực đơn '%s'"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Thử mở thực đơn '%s' nhưng mà cái đó không có"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "Thêm nữa"
 
@@ -287,7 +287,7 @@ msgstr "Không thể lấy được chương trình quản lý cửa sổ ở tr
 msgid "The WM on screen %d is not exiting"
 msgstr "Chương trình quản lý cửa sổ trên màn hình %d không đi ra"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "chỗ làm việc %i"

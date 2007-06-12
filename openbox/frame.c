@@ -335,14 +335,18 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         self->max_horz = self->client->max_horz;
         self->max_vert = self->client->max_vert;
 
-        if (self->decorations & OB_FRAME_DECOR_BORDER) {
+        if (self->decorations & OB_FRAME_DECOR_BORDER ||
+            (self->client->undecorated && config_theme_keepborder))
             self->bwidth = ob_rr_theme->fbwidth;
+        else
+            self->bwidth = 0;
+
+        if (self->decorations & OB_FRAME_DECOR_BORDER) {
             self->cbwidth_l = self->cbwidth_r = ob_rr_theme->cbwidthx;
             self->cbwidth_t = self->cbwidth_b = ob_rr_theme->cbwidthy;
-        } else {
-            self->bwidth = self->cbwidth_l = self->cbwidth_t =
+        } else
+            self->cbwidth_l = self->cbwidth_t =
                 self->cbwidth_r = self->cbwidth_b = 0;
-        }
 
         if (self->max_horz) {
             self->cbwidth_l = self->cbwidth_r = 0;

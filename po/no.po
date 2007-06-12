@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-05-20 18:41+0200\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@switch-case.org>\n"
 "Language-Team: None\n"
@@ -112,7 +112,7 @@ msgstr "&Lukk"
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ugyldig tast '%s' spesifisert i konfigurasjonsfilen"
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt med hurtigtastbinding i konfigurasjonsfilen"
 
@@ -121,22 +121,22 @@ msgstr "Konflikt med hurtigtastbinding i konfigurasjonsfilen"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Kan ikke finne en gyldig menyfil '%s'"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Kunne ikke kjøre kommando for pipe-meny '%s': %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Ugyldig utdata fra pipe-menyen '%s'"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Forsøkte å åpne menyen '%s', men denne finnes ikke"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "Mer..."
 
@@ -285,7 +285,7 @@ msgstr "Kunne ikke hendte vindusbehandlerens markering på skjerm %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Vindusbehandleren på skjerm %d vil ikke avslutte"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "skrivebord %i"

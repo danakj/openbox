@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-09 21:06-0400\n"
+"POT-Creation-Date: 2007-06-10 19:32-0400\n"
 "PO-Revision-Date: 2007-05-28 15:54+0200\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
@@ -112,7 +112,7 @@ msgstr "&Tanca"
 msgid "Invalid button '%s' specified in config file"
 msgstr "El botó especificat al fitxer de configuració '%s' no és vàlid."
 
-#: openbox/keyboard.c:164
+#: openbox/keyboard.c:163
 msgid "Conflict with key binding in config file"
 msgstr "Conflicte amb la tecla vinculada en el fitxer de configuració"
 
@@ -121,23 +121,23 @@ msgstr "Conflicte amb la tecla vinculada en el fitxer de configuració"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "No s'ha pogut trobar un fitxer de menú '%s' vàlid"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr ""
 "S'ha produït un error en executar l'ordre per al menú de conducte '%s': %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "La sortida del menú de conducte '%s' no és vàlida"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "S'ha intentat accedir al menú '%s' ja que no existeix"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:356 openbox/menu.c:357
 msgid "More..."
 msgstr "Més..."
 
@@ -298,7 +298,7 @@ msgstr ""
 msgid "The WM on screen %d is not exiting"
 msgstr "El gestor de finestres de la pantalla %d no està sortint"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:993
 #, c-format
 msgid "desktop %i"
 msgstr "escriptori %i"

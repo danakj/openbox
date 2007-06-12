@@ -2469,7 +2469,6 @@ gboolean client_show(ObClient *self)
 gboolean client_hide(ObClient *self)
 {
     gboolean hide = FALSE;
-    gulong ignore_start;
 
     if (!client_should_show(self)) {
         if (self == focus_client) {
@@ -2483,14 +2482,21 @@ gboolean client_hide(ObClient *self)
             event_cancel_all_key_grabs();
         }
 
-        if (!config_focus_under_mouse)
-            ignore_start = event_start_ignore_all_enters();
+        /* We don't need to ignore enter events here.
+           The window can hide/iconify in 3 different ways:
+           1 - through an x message. in this case we ignore all enter events
+               caused by responding to the x message (unless underMouse)
+           2 - by a keyboard action. in this case we ignore all enter events
+               caused by the action
+           3 - by a mouse action. in this case they are doing stuff with the
+               mouse and focus _should_ move.
+
+           Also in action_end, we simulate an enter event that can't be ignored
+           so trying to ignore them is futile in case 3 anyways
+        */
 
         frame_hide(self->frame);
         hide = TRUE;
-
-        if (!config_focus_under_mouse)
-            event_end_ignore_all_enters(ignore_start);
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
            it needs to be in IconicState. This includes when it is on another

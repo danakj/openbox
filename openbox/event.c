@@ -1828,10 +1828,9 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
                in the case where it is animating before disappearing */
             if (!client || !frame_iconify_animating(client->frame))
                 mouse_event(client, e);
-        } else if (e->type == KeyPress) {
+        } else
             keyboard_event((focus_cycle_target ? focus_cycle_target :
                             (client ? client : focus_client)), e);
-        }
     }
 }
 
@@ -1920,20 +1919,20 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
 
 void event_cancel_all_key_grabs()
 {
-    if (keyboard_interactively_grabbed())
+    if (keyboard_interactively_grabbed()) {
         keyboard_interactive_cancel();
-    else if (menu_frame_visible)
+        ob_debug("KILLED interactive event\n");
+    }
+    else if (menu_frame_visible) {
         menu_frame_hide_all();
-    else if (grab_on_keyboard())
+        ob_debug("KILLED open menus\n");
+    }
+    else if (grab_on_keyboard()) {
         ungrab_keyboard();
+        ob_debug("KILLED active grab on keyboard\n");
+    }
     else
-        /* If we don't have the keyboard grabbed, then ungrab it with
-           XUngrabKeyboard, so that there is not a passive grab left
-           on from the KeyPress. If the grab is left on, and focus
-           moves during that time, it will be NotifyWhileGrabbed, and
-           applications like to ignore those! */
-        XUngrabKeyboard(ob_display, CurrentTime);
-
+        ungrab_passive_key();
 }
 
 gboolean event_time_after(Time t1, Time t2)

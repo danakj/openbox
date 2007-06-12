@@ -276,7 +276,13 @@ void keyboard_event(ObClient *client, const XEvent *e)
 {
     KeyBindingTree *p;
 
+    if (e->type == KeyRelease) {
+        grab_key_passive_count(-1);
+        return;
+    }
+
     g_assert(e->type == KeyPress);
+    grab_key_passive_count(1);
 
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         e->xkey.state == config_keyboard_reset_state)

@@ -22,7 +22,6 @@
 #include "client.h"
 #include "screen.h"
 #include "focus.h"
-#include "focus_cycle.h"
 #include "openbox.h"
 #include "window.h"
 #include "event.h"
@@ -175,11 +174,11 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     for (it = g_list_last(focus_order); it; it = g_list_previous(it)) {
         ObClient *ft = it->data;
 
-        if (focus_cycle_target_valid(ft,
-                                     iconic_windows,
-                                     all_desktops,
-                                     dock_windows,
-                                     desktop_windows))
+        if (focus_valid_target(ft,
+                               iconic_windows,
+                               all_desktops,
+                               dock_windows,
+                               desktop_windows))
         {
             gchar *text = popup_get_name(ft);
 

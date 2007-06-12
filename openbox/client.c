@@ -314,20 +314,13 @@ void client_manage(Window window)
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
         (!self->session || self->session->focused) &&
-        !self->iconic &&
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
          client_search_focus_tree_full(self)) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        /* note the check against type Normal/Dialog/Utility,
-           not client_normal(self), which would also include other types.
-           in this case we want more strict rules for focus */
-        (self->type == OB_CLIENT_TYPE_NORMAL ||
-         self->type == OB_CLIENT_TYPE_UTILITY ||
-         self->type == OB_CLIENT_TYPE_DIALOG))
+        focus_valid_target(self, FALSE, TRUE, FALSE, FALSE))
     {
-        /* XXX use focus_cycle_valid_target instead... */
         activate = TRUE;
     }
 

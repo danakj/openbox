@@ -328,8 +328,9 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     gint px, py;
     Rect *area;
 
+    if (!screen_pointer_pos(&px, &py))
+        return FALSE;
     area = pick_pointer_head(client);
-    screen_pointer_pos(&px, &py);
 
     l = area->x;
     t = area->y;
@@ -447,6 +448,7 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
         place_nooverlap(client, x, y) ||
+        place_under_mouse(client, x, y) ||
         place_random(client, x, y);
     g_assert(ret);
 

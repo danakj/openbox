@@ -49,4 +49,7 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode);
 
 void ungrab_all_keys(Window win);
 
+void grab_key_passive_count(int change);
+void ungrab_passive_key();
+
 #endif

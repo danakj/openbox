@@ -39,6 +39,7 @@ static guint kgrabs = 0;
 static guint pgrabs = 0;
 /*! The time at which the last grab was made */
 static Time  grab_time = CurrentTime;
+static gint passive_count = 0;
 
 static Time ungrab_time()
 {
@@ -78,8 +79,10 @@ gboolean grab_keyboard_full(gboolean grab)
                                 event_curtime) == Success;
             if (!ret)
                 --kgrabs;
-            else
+            else {
+                passive_count = 0;
                 grab_time = event_curtime;
+            }
         } else
             ret = TRUE;
     } else if (kgrabs > 0) {
@@ -206,4 +209,21 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode)
 void ungrab_all_keys(Window win)
 {
     XUngrabKey(ob_display, AnyKey, AnyModifier, win);
+}
+
+void grab_key_passive_count(int change)
+{
+    if (grab_on_keyboard()) return;
+    passive_count += change;
+    if (passive_count < 0) passive_count = 0;
+}
+
+void ungrab_passive_key()
+{
+    ob_debug("ungrabbing %d passive grabs\n", passive_count);
+    if (passive_count) {
+        /* kill out passive grab */
+        XUngrabKeyboard(ob_display, event_curtime);
+        passive_count = 0;
+    }
 }

@@ -2734,7 +2734,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
         gint basew, baseh, minw, minh;
-        gint incw, inch, minratio, maxratio;
+        gint incw, inch;
+        gfloat minratio, maxratio;
 
         incw = self->fullscreen || self->max_horz ? 1 : self->size_inc.width;
         inch = self->fullscreen || self->max_vert ? 1 : self->size_inc.height;

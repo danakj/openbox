@@ -625,14 +625,14 @@ void client_unmanage(ObClient *self)
     XSelectInput(ob_display, self->window, NoEventMask);
 
     /* ignore enter events from the unmap so it doesnt mess with the focus */
-    if (!client_focused(self) || !config_focus_under_mouse)
+    if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();
 
     frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
     XFlush(ob_display);
 
-    if (!client_focused(self) || !config_focus_under_mouse)
+    if (!config_focus_under_mouse)
         event_end_ignore_all_enters(ignore_start);
 
     mouse_grab_for_client(self, FALSE);
@@ -2469,6 +2469,7 @@ gboolean client_show(ObClient *self)
 gboolean client_hide(ObClient *self)
 {
     gboolean hide = FALSE;
+    gulong ignore_start;
 
     if (!client_should_show(self)) {
         if (self == focus_client) {
@@ -2482,8 +2483,14 @@ gboolean client_hide(ObClient *self)
             event_cancel_all_key_grabs();
         }
 
+        if (!config_focus_under_mouse)
+            ignore_start = event_start_ignore_all_enters();
+
         frame_hide(self->frame);
         hide = TRUE;
+
+        if (!config_focus_under_mouse)
+            event_end_ignore_all_enters(ignore_start);
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
            it needs to be in IconicState. This includes when it is on another

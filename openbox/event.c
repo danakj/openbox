@@ -1488,7 +1488,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* normal hints can make a window non-resizable */
             client_setup_decor_and_functions(client, FALSE);
 
-            /* make sure the client's sizes are within its bounds */
+            /* make sure the client's sizes are within its bounds, but only
+               reconfigure the window if it needs to. emacs will update its
+               normal hints every time it receives a conigurenotify */
             RECT_TO_DIMS(client->area, x, y, w, h);
             client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
             if (!RECT_EQUAL_DIMS(client->area, x, y, w, h)) {

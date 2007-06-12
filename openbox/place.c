@@ -220,7 +220,8 @@ enum {
     IGNORE_SHADED     = 1 << 3,
     IGNORE_NONGROUP   = 1 << 4,
     IGNORE_BELOW      = 1 << 5,
-    IGNORE_END        = 1 << 6
+    IGNORE_NONFOCUS   = 1 << 6,
+    IGNORE_END        = 1 << 7
 };
 
 static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
@@ -242,12 +243,14 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
 
         /* try all monitors in order of preference */
         for (i = 0; i < screen_num_monitors && !ret; ++i) {
+            GList *it;
+
             /* add the whole monitor */
             spaces = area_add(spaces, areas[i]);
 
             /* go thru all the windows */
-            for (sit = client_list; sit; sit = g_slist_next(sit)) {
-                ObClient *test = sit->data;
+            for (it = client_list; it; it = g_list_next(it)) {
+                ObClient *test = it->data;
 
                 /* should we ignore this client? */
                 if (screen_showing_desktop) continue;
@@ -279,6 +282,8 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                     test->group != c->group) continue;
                 if ((ignore & IGNORE_BELOW) &&
                     test->layer < c->layer) continue;
+                if ((ignore & IGNORE_NONFOCUS) &&
+                    focus_client != test) continue;
 
                 /* don't ignore this window, so remove it from the available
                    area */

@@ -47,15 +47,13 @@ static Rect *pick_pointer_head(ObClient *c)
      
     for (i = 0; i < screen_num_monitors; ++i) {  
         if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
-            return screen_area_monitor(c->desktop, i);
+            return screen_area_monitor(c->desktop, i, NULL);
         }
     }
     g_assert_not_reached();
 }
 
-/*! Pick a monitor to place a window on.
-  The returned array value should be freed with g_free. The areas within the
-  array should not be freed. */
+/*! Pick a monitor to place a window on. */
 static Rect **pick_head(ObClient *c)
 {
     Rect **area;
@@ -124,7 +122,7 @@ static Rect **pick_head(ObClient *c)
         add_choice(choice, i);
 
     for (i = 0; i < screen_num_monitors; ++i)
-        area[i] = screen_area_monitor(c->desktop, choice[i]);
+        area[i] = screen_area_monitor(c->desktop, choice[i], NULL);
 
     return area;
 }
@@ -148,6 +146,8 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     if (b > t) *y = g_random_int_range(t, b + 1);
     else       *y = areas[i]->y;
 
+    for (i = 0; i < screen_num_monitors; ++i)
+        g_free(areas[i]);
     g_free(areas);
 
     return TRUE;
@@ -231,6 +231,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     gboolean ret;
     gint maxsize;
     GSList *spaces = NULL, *sit, *maxit;
+    guint i;
 
     areas = pick_head(c);
     ret = FALSE;
@@ -320,6 +321,8 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
         }
     }
 
+    for (i = 0; i < screen_num_monitors; ++i)
+        g_free(areas[i]);
     g_free(areas);
     return ret;
 }
@@ -361,12 +364,17 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     else if (settings->monitor > 0 &&
              (guint)settings->monitor <= screen_num_monitors)
         screen = screen_area_monitor(client->desktop,
-                                     (guint)settings->monitor - 1);
+                                     (guint)settings->monitor - 1, NULL);
     else {
-        Rect **all = NULL;
-        all = pick_head(client);
-        screen = all[0];
-        g_free(all); /* the areas themselves don't need to be freed */
+        Rect **areas;
+        guint i;
+
+        areas = pick_head(client);
+        screen = areas[0];
+
+        for (i = 0; i < screen_num_monitors; ++i)
+            g_free(areas[i]);
+        g_free(areas);
     }
 
     if (settings->center_x)
@@ -422,12 +430,15 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         client->type == OB_CLIENT_TYPE_SPLASH)
     {
         Rect **areas;
+        guint i;
 
         areas = pick_head(client);
 
         *x = (areas[0]->width - client->frame->area.width) / 2 + areas[0]->x;
         *y = (areas[0]->height - client->frame->area.height) / 2 + areas[0]->y;
 
+        for (i = 0; i < screen_num_monitors; ++i)
+            g_free(areas[i]);
         g_free(areas);
         return TRUE;
     }

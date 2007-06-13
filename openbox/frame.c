@@ -1492,6 +1492,13 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     }
 }
 
+void frame_rect_to_frame(ObFrame *self, Rect *r)
+{
+    r->width += self->size.left + self->size.right;
+    r->height += self->size.top + self->size.bottom;
+    frame_client_gravity(self, &r->x, &r->y, r->width, r->height);
+}
+
 static void flash_done(gpointer data)
 {
     ObFrame *self = data;

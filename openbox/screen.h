@@ -100,13 +100,14 @@ Rect *screen_physical_area_monitor(guint head);
 
 Rect *screen_physical_area_monitor_active();
 
-Rect *screen_area(guint desktop);
+Rect *screen_area(guint desktop, Rect *search);
 
-Rect *screen_area_monitor(guint desktop, guint head);
+Rect *screen_area_monitor(guint desktop, guint head, Rect *search);
 
 /*! Determines which physical monitor a rectangle is on by calculating the
     area of the part of the rectable on each monitor.  The number of the
-    monitor containing the greatest area of the rectangle is returned.*/
+    monitor containing the greatest area of the rectangle is returned.
+*/
 guint screen_find_monitor(Rect *search);
 
 /*! Sets the root cursor. This function decides which cursor to use, but you

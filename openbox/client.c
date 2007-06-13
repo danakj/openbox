@@ -398,21 +398,27 @@ void client_manage(Window window)
           client_normal(self) &&
           !self->session)))
     {
-        /* make a copy to modify */
-        Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
+        Rect placer;
+
+        RECT_SET(placer, placex, placey, placew, placeh);
+        frame_rect_to_frame(self->frame, &placer);
+
+        Rect *a = screen_area_monitor(self->desktop, client_monitor(self),
+                                      &placer);
 
         /* shrink by the frame's area */
-        a.width -= self->frame->size.left + self->frame->size.right;
-        a.height -= self->frame->size.top + self->frame->size.bottom;
+        a->width -= self->frame->size.left + self->frame->size.right;
+        a->height -= self->frame->size.top + self->frame->size.bottom;
 
         /* fit the window inside the area */
-        if (placew > a.width || self->area.height > a.height) {
-            placew = MIN(self->area.width, a.width);
-            placeh = MIN(self->area.height, a.height);
+        if (placew > a->width || self->area.height > a->height) {
+            placew = MIN(self->area.width, a->width);
+            placeh = MIN(self->area.height, a->height);
 
             ob_debug("setting window size to %dx%d\n",
                      self->area.width, self->area.height);
         }
+        g_free(a);
     }
 
 
@@ -924,8 +930,11 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     Rect desired;
 
     RECT_SET(desired, *x, *y, w, h);
-    all_a = screen_area(self->desktop);
-    mon_a = screen_area_monitor(self->desktop, screen_find_monitor(&desired));
+    frame_rect_to_frame(self->frame, &desired);
+
+    all_a = screen_area(self->desktop, &desired);
+    mon_a = screen_area_monitor(self->desktop, screen_find_monitor(&desired),
+                                &desired);
 
     /* get where the frame would be */
     frame_client_gravity(self->frame, x, y, w, h);
@@ -1010,6 +1019,9 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 
     /* get where the client should be */
     frame_frame_gravity(self->frame, x, y, w, h);
+
+    g_free(all_a);
+    g_free(mon_a);
 
     return ox != *x || oy != *y;
 }
@@ -2680,7 +2692,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                           gint *logicalw, gint *logicalh,
                           gboolean user)
 {
-    Rect desired_area = {*x, *y, *w, *h};
+    Rect desired = {*x, *y, *w, *h};
+    frame_rect_to_frame(self->frame, &desired);
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
@@ -2697,7 +2710,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         Rect *a;
         guint i;
 
-        i = screen_find_monitor(&desired_area);
+        i = screen_find_monitor(&desired);
         a = screen_physical_area_monitor(i);
 
         *x = a->x;
@@ -2711,8 +2724,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         Rect *a;
         guint i;
 
-        i = screen_find_monitor(&desired_area);
-        a = screen_area_monitor(self->desktop, i);
+        i = screen_find_monitor(&desired);
+        a = screen_area_monitor(self->desktop, i, &desired);
 
         /* set the size and position if maximized */
         if (self->max_horz) {
@@ -2726,6 +2739,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
                          is maximizing */
+
+        g_free(a);
     }
 
     /* gets the client's position */
@@ -3857,8 +3872,9 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
     if(!client_list)
         return -1;
 
-    a = screen_area(c->desktop);
-    monitor = screen_area_monitor(c->desktop, client_monitor(c));
+    a = screen_area(c->desktop, &c->frame->area);
+    monitor = screen_area_monitor(c->desktop, client_monitor(c),
+                                  &c->frame->area);
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
@@ -4005,6 +4021,9 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         g_assert_not_reached();
         dest = 0; /* suppress warning */
     }
+
+    g_free(a);
+    g_free(monitor);
     return dest;
 }
 

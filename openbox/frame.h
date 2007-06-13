@@ -231,6 +231,10 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
 */
 void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
 
+/*! Convert a rectangle in client coordinates/sizes to what it would be
+  for the frame, given its current decorations sizes */
+void frame_rect_to_frame(ObFrame *self, Rect *r);
+
 void frame_flash_start(ObFrame *self);
 void frame_flash_stop(ObFrame *self);
 

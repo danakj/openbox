@@ -65,8 +65,12 @@ gchar  **screen_desktop_names;
 Window   screen_support_win;
 Time     screen_desktop_user_time = CurrentTime;
 
-static Rect  **area; /* array of desktop holding array of xinerama areas */
+/*! An array of desktops, holding array of areas per monitor */
 static Rect  *monitor_area;
+static GSList *struts_top;
+static GSList *struts_left;
+static GSList *struts_right;
+static GSList *struts_bottom;
 
 static ObPagerPopup *desktop_cycle_popup;
 
@@ -436,8 +440,6 @@ void screen_startup(gboolean reconfig)
 
 void screen_shutdown(gboolean reconfig)
 {
-    Rect **r;
-
     pager_popup_free(desktop_cycle_popup);
 
     if (reconfig)
@@ -457,11 +459,6 @@ void screen_shutdown(gboolean reconfig)
 
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
-
-    for (r = area; *r; ++r)
-        g_free(*r);
-    g_free(area);
-    area = NULL;
 }
 
 void screen_resize()
@@ -1132,203 +1129,185 @@ screen_area_add_strut_bottom(const StrutPartial *s, const Rect *monitor_area,
 
 void screen_update_areas()
 {
-    guint i, x;
+    guint i, j;
     gulong *dims;
     GList *it;
-    gint o;
+    GSList *sit;
+
+    ob_debug("updating screen areas\n");
 
     g_free(monitor_area);
     extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
 
-    if (area) {
-        for (i = 0; area[i]; ++i)
-            g_free(area[i]);
-        g_free(area);
+    dims = g_new(gulong, 4 * screen_num_desktops * screen_num_monitors);
+
+    g_slist_free(struts_left);   struts_left   = NULL;
+    g_slist_free(struts_top);    struts_top    = NULL;
+    g_slist_free(struts_right);  struts_right  = NULL;
+    g_slist_free(struts_bottom); struts_bottom = NULL;
+
+    /* collect the struts */
+    for (it = client_list; it; it = g_list_next(it)) {
+        ObClient *c = it->data;
+        if (c->strut.left)
+            struts_left = g_slist_prepend(struts_left, &c->strut);
+        if (c->strut.top)
+            struts_top = g_slist_prepend(struts_top, &c->strut);
+        if (c->strut.right)
+            struts_right = g_slist_prepend(struts_right, &c->strut);
+        if (c->strut.bottom)
+            struts_bottom = g_slist_prepend(struts_bottom, &c->strut);
     }
 
-    area = g_new(Rect*, screen_num_desktops + 2);
-    for (i = 0; i < screen_num_desktops + 1; ++i)
-        area[i] = g_new0(Rect, screen_num_monitors + 1);
-    area[i] = NULL;
-     
-    dims = g_new(gulong, 4 * screen_num_desktops);
+    /* set up the work areas to be full screen */
+    for (i = 0; i < screen_num_monitors; ++i)
+        for (j = 0; j < screen_num_desktops; ++j) {
+            dims[i * j + 0] = monitor_area[i].x;
+            dims[i * j + 1] = monitor_area[i].y;
+            dims[i * j + 2] = monitor_area[i].width;
+            dims[i * j + 3] = monitor_area[i].height;
+        }
 
-    for (i = 0; i < screen_num_desktops + 1; ++i) {
-        Strut *struts;
-        gint l, r, t, b;
+    /* calculate the work areas from the struts */
+    for (i = 0; i < screen_num_monitors; ++i)
+        for (j = 0; j < screen_num_desktops; ++j) {
+            gint l = 0, r = 0, t = 0, b = 0;
 
-        struts = g_new0(Strut, screen_num_monitors);
+            /* only add the strut to the area if it touches the monitor */
 
-        /* calc the xinerama areas */
-        for (x = 0; x < screen_num_monitors; ++x) {
-            area[i][x] = monitor_area[x];
-            if (x == 0) {
-                l = monitor_area[x].x;
-                t = monitor_area[x].y;
-                r = monitor_area[x].x + monitor_area[x].width - 1;
-                b = monitor_area[x].y + monitor_area[x].height - 1;
-            } else {
-                l = MIN(l, monitor_area[x].x);
-                t = MIN(t, monitor_area[x].y);
-                r = MAX(r, monitor_area[x].x + monitor_area[x].width - 1);
-                b = MAX(b, monitor_area[x].y + monitor_area[x].height - 1);
+            for (sit = struts_left; sit; sit = g_slist_next(sit)) {
+                StrutPartial *s = sit->data;
+                if (RANGE_INTERSECT
+                    (s->left_start, s->left_end - s->left_start + 1,
+                     monitor_area[i].y, monitor_area[i].height))
+                    l = MAX(l, s->left);
             }
-        }
-        RECT_SET(area[i][x], l, t, r - l + 1, b - t + 1);
-
-        /* apply the struts */
-
-        /* find the left-most xin heads, i do this in 2 loops :| */
-        o = area[i][0].x;
-        for (x = 1; x < screen_num_monitors; ++x)
-            o = MIN(o, area[i][x].x);
-
-        for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = g_list_next(it)) {
-                ObClient *c = it->data;
-                screen_area_add_strut_left(&c->strut,
-                                           &monitor_area[x],
-                                           o + c->strut.left - area[i][x].x,
-                                           &struts[x]);
+            for (sit = struts_top; sit; sit = g_slist_next(sit)) {
+                StrutPartial *s = sit->data;
+                if (RANGE_INTERSECT
+                    (s->top_start, s->top_end - s->top_start + 1,
+                     monitor_area[i].x, monitor_area[i].width))
+                    t = MAX(t, s->top);
             }
-            screen_area_add_strut_left(&dock_strut,
-                                       &monitor_area[x],
-                                       o + dock_strut.left - area[i][x].x,
-                                       &struts[x]);
-
-            area[i][x].x += struts[x].left;
-            area[i][x].width -= struts[x].left;
-        }
-
-        /* find the top-most xin heads, i do this in 2 loops :| */
-        o = area[i][0].y;
-        for (x = 1; x < screen_num_monitors; ++x)
-            o = MIN(o, area[i][x].y);
-
-        for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = g_list_next(it)) {
-                ObClient *c = it->data;
-                screen_area_add_strut_top(&c->strut,
-                                           &monitor_area[x],
-                                           o + c->strut.top - area[i][x].y,
-                                           &struts[x]);
+            for (sit = struts_right; sit; sit = g_slist_next(sit)) {
+                StrutPartial *s = sit->data;
+                if (RANGE_INTERSECT
+                    (s->right_start, s->right_end - s->right_start + 1,
+                     monitor_area[i].y, monitor_area[i].height))
+                    r = MAX(r, s->right);
             }
-            screen_area_add_strut_top(&dock_strut,
-                                      &monitor_area[x],
-                                      o + dock_strut.top - area[i][x].y,
-                                      &struts[x]);
-
-            area[i][x].y += struts[x].top;
-            area[i][x].height -= struts[x].top;
-        }
-
-        /* find the right-most xin heads, i do this in 2 loops :| */
-        o = area[i][0].x + area[i][0].width - 1;
-        for (x = 1; x < screen_num_monitors; ++x)
-            o = MAX(o, area[i][x].x + area[i][x].width - 1);
-
-        for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = g_list_next(it)) {
-                ObClient *c = it->data;
-                screen_area_add_strut_right(&c->strut,
-                                           &monitor_area[x],
-                                           (area[i][x].x +
-                                            area[i][x].width - 1) -
-                                            (o - c->strut.right),
-                                            &struts[x]);
+            for (sit = struts_bottom; sit; sit = g_slist_next(sit)) {
+                StrutPartial *s = sit->data;
+                if (RANGE_INTERSECT
+                    (s->bottom_start, s->bottom_end - s->bottom_start + 1,
+                     monitor_area[i].x, monitor_area[i].width))
+                    b = MAX(b, s->bottom);
             }
-            screen_area_add_strut_right(&dock_strut,
-                                        &monitor_area[x],
-                                        (area[i][x].x +
-                                         area[i][x].width - 1) -
-                                        (o - dock_strut.right),
-                                        &struts[x]);
 
-            area[i][x].width -= struts[x].right;
+            /* based on these margins, set the work area for the
+               monitor/desktop */
+            dims[i * j + 0] += l;
+            dims[i * j + 1] += t;
+            dims[i * j + 2] -= l + r;
+            dims[i * j + 3] -= t + b;
         }
-
-        /* find the bottom-most xin heads, i do this in 2 loops :| */
-        o = area[i][0].y + area[i][0].height - 1;
-        for (x = 1; x < screen_num_monitors; ++x)
-            o = MAX(o, area[i][x].y + area[i][x].height - 1);
-
-        for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = g_list_next(it)) {
-                ObClient *c = it->data;
-                screen_area_add_strut_bottom(&c->strut,
-                                             &monitor_area[x],
-                                             (area[i][x].y +
-                                              area[i][x].height - 1) - \
-                                             (o - c->strut.bottom),
-                                             &struts[x]);
-            }
-            screen_area_add_strut_bottom(&dock_strut,
-                                         &monitor_area[x],
-                                         (area[i][x].y +
-                                          area[i][x].height - 1) - \
-                                         (o - dock_strut.bottom),
-                                         &struts[x]);
-
-            area[i][x].height -= struts[x].bottom;
-        }
-
-        l = RECT_LEFT(area[i][0]);
-        t = RECT_TOP(area[i][0]);
-        r = RECT_RIGHT(area[i][0]);
-        b = RECT_BOTTOM(area[i][0]);
-        for (x = 1; x < screen_num_monitors; ++x) {
-            l = MIN(l, RECT_LEFT(area[i][x]));
-            t = MIN(l, RECT_TOP(area[i][x]));
-            r = MAX(r, RECT_RIGHT(area[i][x]));
-            b = MAX(b, RECT_BOTTOM(area[i][x]));
-        }
-        RECT_SET(area[i][screen_num_monitors], l, t,
-                 r - l + 1, b - t + 1);
-
-        /* XXX optimize when this is run? */
-
-        /* the area has changed, adjust all the maximized 
-           windows */
-        for (it = client_list; it; it = g_list_next(it)) {
-            ObClient *c = it->data; 
-            if (i < screen_num_desktops) {
-                if (c->desktop == i)
-                    client_reconfigure(c);
-            } else if (c->desktop == DESKTOP_ALL)
-                client_reconfigure(c);
-        }
-        if (i < screen_num_desktops) {
-            /* don't set these for the 'all desktops' area */
-            dims[(i * 4) + 0] = area[i][screen_num_monitors].x;
-            dims[(i * 4) + 1] = area[i][screen_num_monitors].y;
-            dims[(i * 4) + 2] = area[i][screen_num_monitors].width;
-            dims[(i * 4) + 3] = area[i][screen_num_monitors].height;
-        }
-
-        g_free(struts);
-    }
 
     PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,
-                dims, 4 * screen_num_desktops);
+                dims, 4 * screen_num_desktops * screen_num_monitors);
+
+    /* the area has changed, adjust all the windows if they need it */
+    for (it = client_list; it; it = g_list_next(it)) {
+        gint x, y, w, h, lw, lh;
+        ObClient *client = it->data;
+
+        RECT_TO_DIMS(client->area, x, y, w, h);
+        client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+        if (!RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
+            gulong ignore_start;
+
+            ignore_start = event_start_ignore_all_enters();
+            client_configure(client, x, y, w, h, FALSE, TRUE);
+            event_end_ignore_all_enters(ignore_start);
+        }
+    }
 
     g_free(dims);
 }
 
-Rect *screen_area(guint desktop)
+Rect* screen_area(guint desktop, Rect *search)
 {
-    return screen_area_monitor(desktop, screen_num_monitors);
+    guint i;
+    Rect *a;
+
+    a = screen_area_monitor(desktop, 0, search);
+
+    /* combine all the monitors together */
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *m = screen_area_monitor(desktop, i, search);
+        gint l, r, t, b;
+
+        l = MIN(RECT_LEFT(*a), RECT_LEFT(*m));
+        t = MIN(RECT_TOP(*a), RECT_TOP(*m));
+        r = MAX(RECT_RIGHT(*a), RECT_RIGHT(*m));
+        b = MAX(RECT_BOTTOM(*a), RECT_BOTTOM(*m));
+
+        RECT_SET(*a, l, t, r - l + 1, b - t + 1);
+
+        g_free(m);
+    }
+        
+    return a;
 }
 
-Rect *screen_area_monitor(guint desktop, guint head)
+Rect* screen_area_monitor(guint desktop, guint head, Rect *search)
 {
-    if (head > screen_num_monitors)
-        return NULL;
-    if (desktop >= screen_num_desktops) {
-        if (desktop == DESKTOP_ALL)
-            return &area[screen_num_desktops][head];
-        return NULL;
+    Rect *a;
+    GSList *it;
+    gint l, r, t, b;
+
+    g_assert(head < screen_num_monitors);
+
+    /* get the base area for the monitor */
+    a = g_new(Rect, 1);
+    *a = monitor_area[head];
+
+    /* remove any struts which will be affecting the search area */
+    l = t = r = b = 0;
+    for (it = struts_left; it; it = g_slist_next(it)) {
+        StrutPartial *s = it->data;
+        if (!search ||
+            RANGE_INTERSECT(search->y, search->height,
+                            s->left_start, s->left_end - s->left_start + 1))
+            l = MAX(l, s->left);
     }
-    return &area[desktop][head];
+    for (it = struts_right; it; it = g_slist_next(it)) {
+        StrutPartial *s = it->data;
+        if (!search == 0 ||
+            RANGE_INTERSECT(search->y, search->height,
+                            s->right_start, s->right_end - s->right_start + 1))
+            r = MAX(r, s->right);
+    }
+    for (it = struts_top; it; it = g_slist_next(it)) {
+        StrutPartial *s = it->data;
+        if (!search == 0 ||
+            RANGE_INTERSECT(search->x, search->width,
+                            s->top_start, s->top_end - s->top_start + 1))
+            t = MAX(t, s->top);
+    }
+    for (it = struts_bottom; it; it = g_slist_next(it)) {
+        StrutPartial *s = it->data;
+        if (search->width == 0 ||
+            RANGE_INTERSECT(search->x, search->width,
+                            s->bottom_start,
+                            s->bottom_end - s->bottom_start + 1))
+            b = MAX(b, s->bottom);
+    }
+
+    a->x += l;
+    a->y += t;
+    a->width -= l + r;
+    a->height -= t + b;
+    return a;
 }
 
 guint screen_find_monitor(Rect *search)
@@ -1351,23 +1330,27 @@ guint screen_find_monitor(Rect *search)
                 most = i;
             }
         }
+        g_free(area);
     }
     return most;
 }
 
-Rect *screen_physical_area()
+Rect* screen_physical_area()
 {
     return screen_physical_area_monitor(screen_num_monitors);
 }
 
-Rect *screen_physical_area_monitor(guint head)
+Rect* screen_physical_area_monitor(guint head)
 {
-    if (head > screen_num_monitors)
-        return NULL;
-    return &monitor_area[head];
+    Rect *a;
+    g_assert(head <= screen_num_monitors);
+
+    a = g_new(Rect, 1);
+    *a = monitor_area[head];
+    return a;
 }
 
-Rect *screen_physical_area_monitor_active()
+Rect* screen_physical_area_monitor_active()
 {
     Rect *a;
     gint x, y;

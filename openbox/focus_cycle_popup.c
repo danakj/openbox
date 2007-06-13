@@ -433,6 +433,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     RrPaint(p->a_text, p->text, textw, texth);
 
     p->last_target = newtarget;
+
+    g_free(screen_area);
 }
 
 void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
@@ -511,6 +513,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
         icon_popup_min_width(single_popup, POPUP_WIDTH);
         icon_popup_max_width(single_popup, MAX(a->width/3, POPUP_WIDTH));
         icon_popup_text_width(single_popup, popup.maxtextw);
+        g_free(a);
     }
 
     text = popup_get_name(c);

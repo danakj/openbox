@@ -1581,6 +1581,7 @@ static gboolean frame_animate_iconify(gpointer p)
         iconx = self->area.x + self->area.width / 2 + 32;
         icony = a->y + a->width;
         iconw = 64;
+        g_free(a);
     } else {
         iconx = self->client->icon_geometry.x;
         icony = self->client->icon_geometry.y;

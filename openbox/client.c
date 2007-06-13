@@ -1993,6 +1993,7 @@ void client_update_strut(ObClient *self)
                               a->x, a->x + a->width - 1,
                               a->y, a->y + a->height - 1,
                               a->x, a->x + a->width - 1);
+            g_free(a);
         }
         g_free(data);
     }
@@ -2393,6 +2394,9 @@ gboolean client_has_parent(ObClient *self)
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
+    Rect *monitor;
+
+    monitor = screen_physical_area_monitor(client_monitor(self));
 
     if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
@@ -2406,14 +2410,14 @@ static ObStackingLayer calc_layer(ObClient *self)
               */
               (self->decorations == 0 &&
                !(self->max_horz && self->max_vert) &&
-               RECT_EQUAL(self->area,
-                          *screen_physical_area_monitor
-                          (client_monitor(self))))) &&
+               RECT_EQUAL(self->area, *monitor))) &&
              (client_focused(self) || client_search_focus_tree(self)))
         l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
     else l = OB_STACKING_LAYER_NORMAL;
+
+    g_free(monitor);
 
     return l;
 }
@@ -2720,6 +2724,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
                          is fullscreening */
+
+        g_free(a);
     } else if (self->max_horz || self->max_vert) {
         Rect *a;
         guint i;

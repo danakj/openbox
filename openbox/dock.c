@@ -522,6 +522,8 @@ void dock_configure()
     dock->h += ob_rr_theme->obwidth * 2;
 
     screen_update_areas();
+
+    g_free(a);
 }
 
 void dock_app_configure(ObDockApp *app, gint w, gint h)

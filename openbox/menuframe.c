@@ -343,6 +343,8 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
         *dx = MAX(*dx, a->x - x);
         *dy = MAX(*dy, a->y - y);
     }
+
+    g_free(a);
 }
 
 static void menu_entry_frame_render(ObMenuEntryFrame *self)
@@ -888,6 +890,8 @@ static void menu_frame_update(ObMenuFrame *self)
         }
     }
 
+    g_free(a);
+
     menu_frame_render(self);
 }
 
@@ -948,8 +952,10 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
 
     /* find the monitor the menu is on */
     for (i = 0; i < screen_num_monitors; ++i) {
-        Rect *a = screen_physical_area_monitor(i);
-        if (RECT_CONTAINS(*a, x, y)) {
+        Rect a = screen_physical_area_monitor(i);
+        gboolean contains = RECT_CONTAINS(*a, x, y);
+        g_free(a);
+        if (contains) {
             self->monitor = i;
             break;
         }

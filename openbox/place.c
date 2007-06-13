@@ -45,10 +45,12 @@ static Rect *pick_pointer_head(ObClient *c)
 
     screen_pointer_pos(&px, &py);
      
-    for (i = 0; i < screen_num_monitors; ++i) {  
-        if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *monitor = screen_physical_area_monitor(i);
+        gboolean contain = RECT_CONTAINS(*monitor, px, py);
+        g_free(monitor);
+        if (contain)
             return screen_area_monitor(c->desktop, i, NULL);
-        }
     }
     g_assert_not_reached();
 }
@@ -111,7 +113,10 @@ static Rect **pick_head(ObClient *c)
     screen_pointer_pos(&px, &py);
 
     for (i = 0; i < screen_num_monitors; i++)
-        if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
+        Rect *monitor = screen_physical_area_monitor(i);
+        gboolean contain = RECT_CONTAINS(*monitor, px, py);
+        g_free(monitor);
+        if (contain)
             add_choice(choice, i);
             ob_debug("placement adding choice %d for mouse pointer\n", i);
             break;

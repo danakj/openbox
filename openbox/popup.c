@@ -281,6 +281,8 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
             popup_show_timeout(self);
         }
     }
+
+    g_free(area);
 }
 
 void popup_hide(ObPopup *self)

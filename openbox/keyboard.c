@@ -103,6 +103,7 @@ static void set_curpos(KeyBindingTree *newpos)
         /* 1 second delay for the popup to show */
         popup_delay_show(popup, G_USEC_PER_SEC, text);
         g_free(text);
+        g_free(a);
     } else {
         popup_hide(popup);
     }

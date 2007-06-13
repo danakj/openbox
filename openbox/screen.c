@@ -66,12 +66,12 @@ Window   screen_support_win;
 Time     screen_desktop_user_time = CurrentTime;
 
 /*! An array of desktops, holding array of areas per monitor */
-static Rect  *monitor_area;
+static Rect  *monitor_area = NULL;
 /*! An array of desktops, holding an array of struts */
-static GSList **struts_top;
-static GSList **struts_left;
-static GSList **struts_right;
-static GSList **struts_bottom;
+static GSList **struts_top = NULL;
+static GSList **struts_left = NULL;
+static GSList **struts_right = NULL;
+static GSList **struts_bottom = NULL;
 
 static ObPagerPopup *desktop_cycle_popup;
 
@@ -1100,7 +1100,7 @@ void screen_install_colormap(ObClient *client, gboolean install)
 #define RESET_STRUT_LIST(sl) \
     {if (sl) for (i = 0; sl[i]; ++i) g_slist_free(sl[i]); \
      sl = g_renew(GSList*, sl, screen_num_desktops + 1); \
-     memset(sl, NULL, sizeof(GSList*) * screen_num_desktops);}
+     memset(sl, 0, sizeof(GSList*) * screen_num_desktops + 1);}
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
     {for (i = 0; i < screen_num_desktops; ++i) \

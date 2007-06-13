@@ -105,7 +105,7 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
         *nxin = 2;
         *xin_areas = g_new(Rect, *nxin + 1);
         RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
-        RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
+        RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h/2);
     }
     else {
         *nxin = 1;

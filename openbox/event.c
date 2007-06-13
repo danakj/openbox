@@ -1434,7 +1434,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
                     /* send a synthetic ConfigureNotify, cuz this is supposed
                        to be like a ConfigureRequest. */
-                    client_reconfigure(client);
+                    client_reconfigure(client, TRUE);
                 } else
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_RESTACK_WINDOW sent for window %s "
@@ -1481,27 +1481,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         msgtype = e->xproperty.atom;
         if (msgtype == XA_WM_NORMAL_HINTS) {
-            gint x, y, w, h, lw, lh;
-
             ob_debug("Update NORMAL hints\n");
             client_update_normal_hints(client);
             /* normal hints can make a window non-resizable */
             client_setup_decor_and_functions(client, FALSE);
 
-            /* make sure the client's sizes are within its bounds, but only
-               reconfigure the window if it needs to. emacs will update its
-               normal hints every time it receives a conigurenotify */
-            RECT_TO_DIMS(client->area, x, y, w, h);
-            client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
-            if (!RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
-                gulong ignore_start;
-
-                ob_debug("Configuring client x %d y %d w %d h %d\n",
-                         x, y, w, h);
-                ignore_start = event_start_ignore_all_enters();
-                client_configure(client, x, y, w, h, FALSE, TRUE);
-                event_end_ignore_all_enters(ignore_start);
-            }
+            client_reconfigure(client, FALSE);
         } else if (msgtype == XA_WM_HINTS) {
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {

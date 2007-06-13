@@ -427,7 +427,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                       gboolean user, gboolean final);
 
-void client_reconfigure(ObClient *self);
+void client_reconfigure(ObClient *self, gboolean force);
 
 /*! Finds coordinates to keep a client on the screen.
   @param self The client

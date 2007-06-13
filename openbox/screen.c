@@ -1206,20 +1206,8 @@ void screen_update_areas()
                 dims, 4 * screen_num_desktops * screen_num_monitors);
 
     /* the area has changed, adjust all the windows if they need it */
-    for (it = client_list; it; it = g_list_next(it)) {
-        gint x, y, w, h, lw, lh;
-        ObClient *client = it->data;
-
-        RECT_TO_DIMS(client->area, x, y, w, h);
-        client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
-        if (!RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
-            gulong ignore_start;
-
-            ignore_start = event_start_ignore_all_enters();
-            client_configure(client, x, y, w, h, FALSE, TRUE);
-            event_end_ignore_all_enters(ignore_start);
-        }
-    }
+    for (it = client_list; it; it = g_list_next(it))
+        client_reconfigure(it->data, FALSE);
 
     g_free(dims);
 }

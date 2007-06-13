@@ -1749,7 +1749,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     client_change_allowed_actions(self);
 
     if (reconfig)
-        client_reconfigure(self);
+        /* force reconfigure to make sure decorations are updated */
+        client_reconfigure(self, TRUE);
 }
 
 static void client_change_allowed_actions(ObClient *self)
@@ -1807,11 +1808,25 @@ static void client_change_allowed_actions(ObClient *self)
     }
 }
 
-void client_reconfigure(ObClient *self)
+void client_reconfigure(ObClient *self, gboolean force)
 {
-    client_configure(self, self->area.x, self->area.y,
-                     self->area.width, self->area.height,
-                     FALSE, TRUE);
+    gint x, y, w, h, lw, lh;
+
+    /* make sure the client's sizes are within its bounds, but only
+       reconfigure the window if it needs to. emacs will update its
+       normal hints every time it receives a conigurenotify */
+        RECT_TO_DIMS(self->area, x, y, w, h);
+    if (!force)
+        client_try_configure(self, &x, &y, &w, &h, &lw, &lh, FALSE);
+    if (force || !RECT_EQUAL_DIMS(self->area, x, y, w, h)) {
+        gulong ignore_start;
+
+        ob_debug("Reconfiguring client x %d y %d w %d h %d\n",
+                 x, y, w, h);
+        ignore_start = event_start_ignore_all_enters();
+        client_configure(self, x, y, w, h, FALSE, TRUE);
+        event_end_ignore_all_enters(ignore_start);
+    }
 }
 
 void client_update_wmhints(ObClient *self)
@@ -3254,11 +3269,12 @@ void client_set_desktop_recursive(ObClient *self,
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL)
             stacking_raise(CLIENT_AS_WINDOW(self));
-        /* the new desktop's geometry may be different, so we may need to
-           resize, for example if we are maximized */
-        client_reconfigure(self);
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
+        else
+            /* the new desktop's geometry may be different, so we may need to
+               resize, for example if we are maximized */
+            client_reconfigure(self, FALSE);
     }
 
     /* move all transients */

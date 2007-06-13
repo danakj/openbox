@@ -1675,7 +1675,7 @@ void frame_end_iconify_animation(ObFrame *self)
     else {
         /* Send a ConfigureNotify when the animation is done, this fixes
            KDE's pager showing the window in the wrong place. */
-        client_reconfigure(self->client);
+        client_reconfigure(self->client, TRUE);
     }
 
     /* we're not animating any more ! */

@@ -3260,7 +3260,8 @@ void client_set_desktop_recursive(ObClient *self,
         frame_adjust_state(self->frame);
         /* 'move' the window to the new desktop */
         if (!donthide)
-            client_showhide(self);
+            client_hide(self);
+        client_show(self);
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL && !dontraise)
             stacking_raise(CLIENT_AS_WINDOW(self));

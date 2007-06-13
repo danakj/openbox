@@ -1264,7 +1264,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
-                                   FALSE);
+                                   FALSE, FALSE);
         } else if (msgtype == prop_atoms.net_wm_state) {
             gulong ignore_start;
 

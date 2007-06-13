@@ -1437,7 +1437,7 @@ void action_toggle_omnipresent(union ActionData *data)
 { 
     client_set_desktop(data->client.any.c,
                        data->client.any.c->desktop == DESKTOP_ALL ?
-                       screen_desktop : DESKTOP_ALL, FALSE);
+                       screen_desktop : DESKTOP_ALL, FALSE, TRUE);
 }
 
 void action_move_relative_horz(union ActionData *data)
@@ -1611,7 +1611,7 @@ void action_send_to_desktop(union ActionData *data)
 
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, data->sendto.follow);
+        client_set_desktop(c, data->sendto.desk, data->sendto.follow, FALSE);
         if (data->sendto.follow && data->sendto.desk != screen_desktop)
             screen_set_desktop(data->sendto.desk, TRUE);
     }
@@ -1669,7 +1669,7 @@ void action_send_to_desktop_dir(union ActionData *data)
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {
-        client_set_desktop(c, d, data->sendtodir.follow);
+        client_set_desktop(c, d, data->sendtodir.follow, FALSE);
         if (data->sendtodir.follow && d != screen_desktop)
             screen_set_desktop(d, TRUE);
     }
@@ -2045,7 +2045,7 @@ void action_add_desktop(union ActionData *data)
         for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop)
-                client_set_desktop(c, c->desktop+1, FALSE);
+                client_set_desktop(c, c->desktop+1, FALSE, TRUE);
         }
     }
 }
@@ -2061,7 +2061,7 @@ void action_remove_desktop(union ActionData *data)
         for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (c->desktop != DESKTOP_ALL && c->desktop > screen_desktop)
-                client_set_desktop(c, c->desktop-1, FALSE);
+                client_set_desktop(c, c->desktop-1, FALSE, TRUE);
         }
     }
 

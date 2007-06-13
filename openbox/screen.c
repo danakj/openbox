@@ -520,7 +520,7 @@ void screen_set_num_desktops(guint num)
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         if (c->desktop >= num && c->desktop != DESKTOP_ALL)
-            client_set_desktop(c, num - 1, FALSE);
+            client_set_desktop(c, num - 1, FALSE, TRUE);
     }
  
     /* change our struts/area to match (after moving windows) */
@@ -561,7 +561,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ignore_start = event_start_ignore_all_enters();
 
     if (moveresize_client)
-        client_set_desktop(moveresize_client, num, TRUE);
+        client_set_desktop(moveresize_client, num, TRUE, FALSE);
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 

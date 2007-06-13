@@ -496,8 +496,11 @@ void client_kill(ObClient *self);
 /*! Sends the window to the specified desktop
   @param donthide If TRUE, the window will not be shown/hidden after its
                   desktop has been changed. Generally this should be FALSE.
+  @param dontraise If TRUE, the window will not be raised. Generally this should
+                   be FALSE.
 */
-void client_set_desktop(ObClient *self, guint target, gboolean donthide);
+void client_set_desktop(ObClient *self, guint target, gboolean donthide,
+                        gboolean dontraise);
 
 /*! Show the client if it should be shown. Returns if the window is shown. */
 gboolean client_show(ObClient *self);

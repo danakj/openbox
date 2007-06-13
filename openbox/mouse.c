@@ -210,9 +210,6 @@ void mouse_event(ObClient *client, XEvent *e)
         button = e->xbutton.button;
         state = e->xbutton.state;
 
-        if (CLIENT_CONTEXT(context, client))
-            XAllowEvents(ob_display, ReplayPointer, event_curtime);
-
         fire_binding(OB_MOUSE_ACTION_PRESS, context,
                      client, e->xbutton.state,
                      e->xbutton.button,

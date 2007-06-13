@@ -1160,7 +1160,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         {
             gint lw,lh;
-            gulong ignore_start;
 
             client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
 
@@ -1179,9 +1178,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             ob_debug("Granting ConfigureRequest x %d y %d w %d h %d\n",
                      x, y, w, h);
-            ignore_start = event_start_ignore_all_enters();
-            client_configure(client, x, y, w, h, FALSE, TRUE);
-            event_end_ignore_all_enters(ignore_start);
+            client_configure(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
         break;
     }
@@ -1343,7 +1340,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 moveresize_end(TRUE);
         } else if (msgtype == prop_atoms.net_moveresize_window) {
             gint ograv, x, y, w, h;
-            gulong ignore_start;
 
             ograv = client->gravity;
 
@@ -1388,10 +1384,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            /* ignore enter events caused by these like ob actions do */
-            ignore_start = event_start_ignore_all_enters();
-            client_configure(client, x, y, w, h, FALSE, TRUE);
-            event_end_ignore_all_enters(ignore_start);
+            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE);
 
             client->gravity = ograv;
         } else if (msgtype == prop_atoms.net_restack_window) {

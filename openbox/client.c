@@ -1808,24 +1808,6 @@ static void client_change_allowed_actions(ObClient *self)
     }
 }
 
-void client_reconfigure(ObClient *self, gboolean force)
-{
-    gint x, y, w, h, lw, lh;
-
-    RECT_TO_DIMS(self->area, x, y, w, h);
-    if (!force)
-        client_try_configure(self, &x, &y, &w, &h, &lw, &lh, FALSE);
-    if (force || !RECT_EQUAL_DIMS(self->area, x, y, w, h)) {
-        gulong ignore_start;
-
-        ob_debug("Reconfiguring client x %d y %d w %d h %d\n",
-                 x, y, w, h);
-        ignore_start = event_start_ignore_all_enters();
-        client_configure(self, x, y, w, h, FALSE, TRUE);
-        event_end_ignore_all_enters(ignore_start);
-    }
-}
-
 void client_update_wmhints(ObClient *self)
 {
     XWMHints *hints;
@@ -2630,7 +2612,7 @@ static void client_apply_startup_state(ObClient *self,
     /* if the window hasn't been configured yet, then do so now */
     if (!fullscreen && !max_vert && !max_horz) {
         self->area = oldarea;
-        client_configure(self, x, y, w, h, FALSE, TRUE);
+        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
     }
 
     /* set the desktop hint, to make sure that it always exists */
@@ -2873,11 +2855,11 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
 
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
-                      gboolean user, gboolean final)
+                      gboolean user, gboolean final, gboolean force_reply)
 {
     gint oldw, oldh;
     gboolean send_resize_client;
-    gboolean moved = FALSE, resized = FALSE;
+    gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
     gboolean fmoved, fresized;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
@@ -2926,26 +2908,20 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     }
 
     /* adjust the frame */
-    if (fmoved || fresized)
+    if (fmoved || fresized) {
+        gulong ignore_start;
+        if (!user)
+            ignore_start = event_start_ignore_all_enters();
+
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
-    /* This is kinda tricky and should not be changed.. let me explain!
+        if (!user)
+            event_end_ignore_all_enters(ignore_start);
+    }
 
-       When user = FALSE, then the request is coming from the application
-       itself, and we are more strict about when to send a synthetic
-       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
-       in this case.
-
-       When user = TRUE, then the request is coming from "us", like when we
-       maximize a window or sometihng.  In this case we are more lenient.  We
-       used to follow the same rules as above, but _Java_ Swing can't handle
-       this. So just to appease Swing, when user = TRUE, we always send
-       a synthetic ConfigureNotify to give the window its root coordinates.
-    */
-    if ((!user && !resized) || (user && final))
-    {
-        XEvent event;
-
+    if (!user || final) {
+        gint oldrx = self->root_pos.x;
+        gint oldry = self->root_pos.y;
         /* we have reset the client to 0 border width, so don't include
            it in these coords */
         POINT_SET(self->root_pos,
@@ -2953,6 +2929,26 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                   self->border_width,
                   self->frame->area.y + self->frame->size.top -
                   self->border_width);
+        if (self->root_pos.x != oldrx || self->root_pos.y != oldry)
+            rootmoved = TRUE;
+    }
+
+    /* This is kinda tricky and should not be changed.. let me explain!
+
+       When user = FALSE, then the request is coming from the application
+       itself, and we are more strict about when to send a synthetic
+       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
+       in this case (if force_reply is true)
+
+       When user = TRUE, then the request is coming from "us", like when we
+       maximize a window or sometihng.  In this case we are more lenient.  We
+       used to follow the same rules as above, but _Java_ Swing can't handle
+       this. So just to appease Swing, when user = TRUE, we always send
+       a synthetic ConfigureNotify to give the window its root coordinates.
+    */
+    if ((!user && !resized && (rootmoved || force_reply)) || (user && final))
+    {
+        XEvent event;
 
         event.type = ConfigureNotify;
         event.xconfigure.display = ob_display;

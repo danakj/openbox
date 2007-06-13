@@ -32,6 +32,9 @@
 <placement>
   <policy>Smart</policy>
   <!-- 'Smart' or 'UnderMouse' -->
+  <center>yes</center>
+  <!-- whether to place windows in the center of the free area found or
+       the top left corner -->
 </placement>
 
 <theme>

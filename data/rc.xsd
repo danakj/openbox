@@ -53,6 +53,7 @@
             <xsd:documentation>defines how new windows are placed</xsd:documentation>
         </xsd:annotation>
         <xsd:element name="policy" type="ob:placementpolicy"/>
+        <xsd:element name="center" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="theme">
         <xsd:element minOccurs="0" name="name" type="xsd:string"/>

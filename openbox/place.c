@@ -326,8 +326,12 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                 Rect *r = maxit->data;
 
                 /* center it in the area */
-                *x = r->x + (r->width - c->frame->area.width) / 2;
-                *y = r->y + (r->height - c->frame->area.height) / 2;
+                *x = r->x;
+                *y = r->y;
+                if (config_place_center) {
+                    *x += (r->width - c->frame->area.width) / 2;
+                    *y += (r->height - c->frame->area.height) / 2;
+                }
                 ret = TRUE;
             }
 

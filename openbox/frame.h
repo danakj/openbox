@@ -185,6 +185,7 @@ struct _ObFrame
     gboolean  iconify_hover;
 
     gboolean  focused;
+    gboolean  need_render;
 
     gboolean  flashing;
     gboolean  flash_on;

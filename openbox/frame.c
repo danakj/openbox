@@ -248,6 +248,7 @@ void frame_show(ObFrame *self)
 {
     if (!self->visible) {
         self->visible = TRUE;
+        framerender_frame(self);
         XMapWindow(ob_display, self->client->window);
         XMapWindow(ob_display, self->window);
     }
@@ -773,6 +774,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                     self->size.left, self->size.top);
 
         if (resized) {
+            self->need_render = TRUE;
             framerender_frame(self);
             frame_adjust_shape(self);
         }
@@ -871,23 +873,27 @@ void frame_adjust_client_area(ObFrame *self)
 
 void frame_adjust_state(ObFrame *self)
 {
+    self->need_render = TRUE;
     framerender_frame(self);
 }
 
 void frame_adjust_focus(ObFrame *self, gboolean hilite)
 {
     self->focused = hilite;
+    self->need_render = TRUE;
     framerender_frame(self);
     XFlush(ob_display);
 }
 
 void frame_adjust_title(ObFrame *self)
 {
+    self->need_render = TRUE;
     framerender_frame(self);
 }
 
 void frame_adjust_icon(ObFrame *self)
 {
+    self->need_render = TRUE;
     framerender_frame(self);
 }
 

@@ -36,6 +36,11 @@ void framerender_frame(ObFrame *self)
 {
     if (frame_iconify_animating(self))
         return; /* delay redrawing until the animation is done */
+    if (!self->need_render)
+        return;
+    if (!self->visible)
+        return;
+    self->need_render = FALSE;
 
     {
         gulong px;

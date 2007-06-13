@@ -82,4 +82,6 @@ void dock_remove(ObDockApp *app, gboolean reparent);
 void dock_app_drag(ObDockApp *app, XMotionEvent *e);
 void dock_app_configure(ObDockApp *app, gint w, gint h);
 
+void dock_get_area(Rect *a);
+
 #endif

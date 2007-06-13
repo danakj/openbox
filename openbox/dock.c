@@ -637,3 +637,8 @@ void dock_hide(gboolean hide)
         }
     }
 }
+
+void dock_get_area(Rect *a)
+{
+    RECT_SET(*a, dock->x, dock->y, dock->w, dock->h);
+}

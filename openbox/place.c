@@ -23,7 +23,10 @@
 #include "frame.h"
 #include "focus.h"
 #include "config.h"
+#include "dock.h"
 #include "debug.h"
+
+extern ObDock *dock;
 
 static void add_choice(guint *choice, guint mychoice)
 {
@@ -220,14 +223,15 @@ static GSList* area_remove(GSList *list, Rect *a)
 }
 
 enum {
-    IGNORE_FULLSCREEN = 1 << 0,
-    IGNORE_MAXIMIZED  = 1 << 1,
-    IGNORE_MENUTOOL   = 1 << 2,
-    /*IGNORE_SHADED     = 1 << 3,*/
-    IGNORE_NONGROUP   = 1 << 3,
-    IGNORE_BELOW      = 1 << 4,
-    IGNORE_NONFOCUS   = 1 << 5,
-    IGNORE_END        = 1 << 6
+    IGNORE_FULLSCREEN = 1,
+    IGNORE_MAXIMIZED  = 2,
+    IGNORE_MENUTOOL   = 3,
+    /*IGNORE_SHADED     = 3,*/
+    IGNORE_NONGROUP   = 4,
+    IGNORE_BELOW      = 5,
+    /*IGNORE_NONFOCUS   = 1 << 5,*/
+    IGNORE_DOCK       = 6,
+    IGNORE_END        = 7
 };
 
 static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
@@ -245,7 +249,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     maxit = NULL;
 
     /* try ignoring different things to find empty space */
-    for (ignore = 0; ignore < IGNORE_END && !ret; ignore = (ignore << 1) + 1) {
+    for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
         guint i;
 
         /* try all monitors in order of preference */
@@ -274,29 +278,36 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                     test->type == OB_CLIENT_TYPE_DESKTOP) continue;
 
 
-                if ((ignore & IGNORE_FULLSCREEN) &&
+                if ((ignore >= IGNORE_FULLSCREEN) &&
                     test->fullscreen) continue;
-                if ((ignore & IGNORE_MAXIMIZED) &&
+                if ((ignore >= IGNORE_MAXIMIZED) &&
                     test->max_horz && test->max_vert) continue;
-                if ((ignore & IGNORE_MENUTOOL) &&
+                if ((ignore >= IGNORE_MENUTOOL) &&
                     (test->type == OB_CLIENT_TYPE_MENU ||
                      test->type == OB_CLIENT_TYPE_TOOLBAR) &&
                     client_has_parent(c)) continue;
                 /*
-                if ((ignore & IGNORE_SHADED) &&
+                if ((ignore >= IGNORE_SHADED) &&
                     test->shaded) continue;
                 */
-                if ((ignore & IGNORE_NONGROUP) &&
+                if ((ignore >= IGNORE_NONGROUP) &&
                     client_has_group_siblings(c) &&
                     test->group != c->group) continue;
-                if ((ignore & IGNORE_BELOW) &&
+                if ((ignore >= IGNORE_BELOW) &&
                     test->layer < c->layer) continue;
-                if ((ignore & IGNORE_NONFOCUS) &&
+                /*
+                if ((ignore >= IGNORE_NONFOCUS) &&
                     focus_client != test) continue;
-
+                */
                 /* don't ignore this window, so remove it from the available
                    area */
                 spaces = area_remove(spaces, &test->frame->area);
+            }
+
+            if (ignore < IGNORE_DOCK) {
+                Rect a;
+                dock_get_area(&a);
+                spaces = area_remove(spaces, &a);
             }
 
             for (sit = spaces; sit; sit = g_slist_next(sit)) {

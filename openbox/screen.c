@@ -1083,50 +1083,6 @@ void screen_install_colormap(ObClient *client, gboolean install)
     }
 }
 
-static inline void
-screen_area_add_strut_left(const StrutPartial *s, const Rect *monitor_area,
-                           gint edge, Strut *ret)
-{
-    if (s->left &&
-        ((s->left_end <= s->left_start) ||
-         (RECT_TOP(*monitor_area) < s->left_end &&
-          RECT_BOTTOM(*monitor_area) > s->left_start)))
-        ret->left = MAX(ret->left, edge);
-}
-
-static inline void
-screen_area_add_strut_top(const StrutPartial *s, const Rect *monitor_area,
-                          gint edge, Strut *ret)
-{
-    if (s->top &&
-        ((s->top_end <= s->top_start) ||
-         (RECT_LEFT(*monitor_area) < s->top_end &&
-          RECT_RIGHT(*monitor_area) > s->top_start)))
-        ret->top = MAX(ret->top, edge);
-}
-
-static inline void
-screen_area_add_strut_right(const StrutPartial *s, const Rect *monitor_area,
-                            gint edge, Strut *ret)
-{
-    if (s->right &&
-        ((s->right_end <= s->right_start) ||
-         (RECT_TOP(*monitor_area) < s->right_end &&
-          RECT_BOTTOM(*monitor_area) > s->right_start)))
-        ret->right = MAX(ret->right, edge);
-}
-
-static inline void
-screen_area_add_strut_bottom(const StrutPartial *s, const Rect *monitor_area,
-                             gint edge, Strut *ret)
-{
-    if (s->bottom &&
-        ((s->bottom_end <= s->bottom_start) ||
-         (RECT_LEFT(*monitor_area) < s->bottom_end &&
-          RECT_RIGHT(*monitor_area) > s->bottom_start)))
-        ret->bottom = MAX(ret->bottom, edge);
-}
-
 void screen_update_areas()
 {
     guint i, j;
@@ -1158,6 +1114,14 @@ void screen_update_areas()
         if (c->strut.bottom)
             struts_bottom = g_slist_prepend(struts_bottom, &c->strut);
     }
+    if (dock_strut.left)
+        struts_left = g_slist_prepend(struts_left, &dock_strut);
+    if (dock_strut.top)
+        struts_top = g_slist_prepend(struts_top, &dock_strut);
+    if (dock_strut.right)
+        struts_right = g_slist_prepend(struts_right, &dock_strut);
+    if (dock_strut.bottom)
+        struts_bottom = g_slist_prepend(struts_bottom, &dock_strut);
 
     /* set up the work areas to be full screen */
     for (i = 0; i < screen_num_monitors; ++i)

@@ -1812,10 +1812,7 @@ void client_reconfigure(ObClient *self, gboolean force)
 {
     gint x, y, w, h, lw, lh;
 
-    /* make sure the client's sizes are within its bounds, but only
-       reconfigure the window if it needs to. emacs will update its
-       normal hints every time it receives a conigurenotify */
-        RECT_TO_DIMS(self->area, x, y, w, h);
+    RECT_TO_DIMS(self->area, x, y, w, h);
     if (!force)
         client_try_configure(self, &x, &y, &w, &h, &lw, &lh, FALSE);
     if (force || !RECT_EQUAL_DIMS(self->area, x, y, w, h)) {

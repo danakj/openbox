@@ -526,8 +526,9 @@ void screen_set_num_desktops(guint num)
                 client_set_desktop(c, num - 1, FALSE, TRUE);
             /* raise all the windows that are on the current desktop which
                is being merged */
-            else if (c->desktop == DESKTOP_ALL ||
-                     c->desktop == num - 1)
+            else if (screen_desktop == num - 1 &&
+                     (c->desktop == DESKTOP_ALL ||
+                      c->desktop == screen_desktop))
                 stacking_raise(WINDOW_AS_CLIENT(c));
         }
     }

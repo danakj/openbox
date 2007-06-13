@@ -2509,7 +2509,6 @@ gboolean client_hide(ObClient *self)
 
         frame_hide(self->frame);
         hide = TRUE;
-        ob_debug("hiding client %s\n", self->title);
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
            it needs to be in IconicState. This includes when it is on another

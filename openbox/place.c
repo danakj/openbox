@@ -478,7 +478,6 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
         place_nooverlap(client, x, y) ||
-        place_under_mouse(client, x, y) ||
         place_random(client, x, y);
     g_assert(ret);
 

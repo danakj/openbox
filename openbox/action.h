@@ -142,6 +142,11 @@ struct ShowMenu {
     gchar *name;
 };
 
+struct AddRemoveDesktop {
+    struct AnyAction any;
+    gboolean current;
+};
+
 struct CycleWindows {
     struct InteractiveAction inter;
     gboolean linear;
@@ -175,6 +180,7 @@ union ActionData {
     struct CycleWindows cycle;
     struct Layer layer;
     struct Stacking stacking;
+    struct AddRemoveDesktop addremovedesktop;
 };
 
 struct _ObAction {
@@ -356,5 +362,9 @@ void action_show_desktop(union ActionData *data);
 void action_unshow_desktop(union ActionData *data);
 /* Any */
 void action_break_chroot(union ActionData *data);
+/* AddRemoveDesktop */
+void action_add_desktop(union ActionData *data);
+/* AddRemoveDesktop */
+void action_remove_desktop(union ActionData *data);
 
 #endif

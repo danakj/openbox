@@ -470,6 +470,16 @@ void setup_action_showmenu(ObAction **a, ObUserAction uact)
     }
 }
 
+void setup_action_addremove_desktop_current(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.addremovedesktop.current = TRUE;
+}
+
+void setup_action_addremove_desktop_last(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.addremovedesktop.current = FALSE;
+}
+
 void setup_action_focus(ObAction **a, ObUserAction uact)
 {
     (*a)->data.any.client_action = OB_CLIENT_ACTION_OPTIONAL;
@@ -926,6 +936,26 @@ ActionString actionstrings[] =
         "breakchroot",
         action_break_chroot,
         NULL
+    },
+    {
+        "adddesktoplast",
+        action_add_desktop,
+        setup_action_addremove_desktop_last
+    },
+    {
+        "removedesktoplast",
+        action_remove_desktop,
+        setup_action_addremove_desktop_last
+    },
+    {
+        "adddesktopcurrent",
+        action_add_desktop,
+        setup_action_addremove_desktop_current
+    },
+    {
+        "removedesktopcurrent",
+        action_remove_desktop,
+        setup_action_addremove_desktop_current
     },
     {
         NULL,
@@ -2002,4 +2032,38 @@ void action_break_chroot(union ActionData *data)
 {
     /* break out of one chroot */
     keyboard_reset_chains(1);
+}
+
+void action_add_desktop(union ActionData *data)
+{
+    screen_set_num_desktops(screen_num_desktops+1);
+
+    /* move all the clients over */
+    if (data->addremovedesktop.current) {
+        GList *it;
+
+        for (it = client_list; it; it = g_list_next(it)) {
+            ObClient *c = it->data;
+            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop)
+                client_set_desktop(c, c->desktop+1, FALSE);
+        }
+    }
+}
+
+void action_remove_desktop(union ActionData *data)
+{
+    if (screen_num_desktops < 2) return;
+
+    /* move all the clients over */
+    if (data->addremovedesktop.current) {
+        GList *it;
+
+        for (it = client_list; it; it = g_list_next(it)) {
+            ObClient *c = it->data;
+            if (c->desktop != DESKTOP_ALL && c->desktop > screen_desktop)
+                client_set_desktop(c, c->desktop-1, FALSE);
+        }
+    }
+
+    screen_set_num_desktops(screen_num_desktops-1);
 }

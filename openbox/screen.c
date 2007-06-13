@@ -1126,10 +1126,10 @@ void screen_update_areas()
     /* set up the work areas to be full screen */
     for (i = 0; i < screen_num_monitors; ++i)
         for (j = 0; j < screen_num_desktops; ++j) {
-            dims[i * j + 0] = monitor_area[i].x;
-            dims[i * j + 1] = monitor_area[i].y;
-            dims[i * j + 2] = monitor_area[i].width;
-            dims[i * j + 3] = monitor_area[i].height;
+            dims[(i * screen_num_desktops + j) * 4+0] = monitor_area[i].x;
+            dims[(i * screen_num_desktops + j) * 4+1] = monitor_area[i].y;
+            dims[(i * screen_num_desktops + j) * 4+2] = monitor_area[i].width;
+            dims[(i * screen_num_desktops + j) * 4+3] = monitor_area[i].height;
         }
 
     /* calculate the work areas from the struts */
@@ -1170,10 +1170,10 @@ void screen_update_areas()
 
             /* based on these margins, set the work area for the
                monitor/desktop */
-            dims[i * j + 0] += l;
-            dims[i * j + 1] += t;
-            dims[i * j + 2] -= l + r;
-            dims[i * j + 3] -= t + b;
+            dims[(i * screen_num_desktops + j) * 4 + 0] += l;
+            dims[(i * screen_num_desktops + j) * 4 + 1] += t;
+            dims[(i * screen_num_desktops + j) * 4 + 2] -= l + r;
+            dims[(i * screen_num_desktops + j) * 4 + 3] -= t + b;
         }
 
     PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,

@@ -1112,6 +1112,7 @@ typedef struct {
             ObScreenStrut *ss = g_new(ObScreenStrut, 1); \
             ss->desktop = i; \
             ss->strut = s;  \
+            sl = g_slist_prepend(sl, ss); \
         } \
 }
 

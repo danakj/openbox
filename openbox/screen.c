@@ -496,7 +496,7 @@ void screen_set_num_desktops(guint num)
 {
     guint old;
     gulong *viewport;
-    GList *it;
+    GList *it, *stacking_copy;
 
     g_assert(num > 0);
 
@@ -516,11 +516,20 @@ void screen_set_num_desktops(guint num)
     /* the number of rows/columns will differ */
     screen_update_layout();
 
-    /* move windows on desktops that will no longer exist! */
-    for (it = client_list; it; it = g_list_next(it)) {
-        ObClient *c = it->data;
-        if (c->desktop >= num && c->desktop != DESKTOP_ALL)
-            client_set_desktop(c, num - 1, FALSE, TRUE);
+    /* move windows on desktops that will no longer exist!
+       make a copy of the list cuz we're changing it */
+    stacking_copy = g_list_copy(stacking_list);
+    for (it = g_list_last(stacking_copy); it; it = g_list_previous(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = it->data;
+            if (c->desktop != DESKTOP_ALL && c->desktop >= num)
+                client_set_desktop(c, num - 1, FALSE, TRUE);
+            /* raise all the windows that are on the current desktop which
+               is being merged */
+            else if (c->desktop == DESKTOP_ALL ||
+                     c->desktop == num - 1)
+                stacking_raise(WINDOW_AS_CLIENT(c));
+        }
     }
  
     /* change our struts/area to match (after moving windows) */

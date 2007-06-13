@@ -2509,6 +2509,7 @@ gboolean client_hide(ObClient *self)
 
         frame_hide(self->frame);
         hide = TRUE;
+        ob_debug("hiding client %s\n", self->title);
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
            it needs to be in IconicState. This includes when it is on another
@@ -2941,7 +2942,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        in this case (if force_reply is true)
 
        When user = TRUE, then the request is coming from "us", like when we
-       maximize a window or sometihng.  In this case we are more lenient.  We
+       maximize a window or something.  In this case we are more lenient.  We
        used to follow the same rules as above, but _Java_ Swing can't handle
        this. So just to appease Swing, when user = TRUE, we always send
        a synthetic ConfigureNotify to give the window its root coordinates.

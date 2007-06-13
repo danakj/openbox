@@ -579,6 +579,11 @@ void screen_set_desktop(guint num, gboolean dofocus)
     allow_omni = focus_client && (client_normal(focus_client) &&
                                   focus_client->desktop == DESKTOP_ALL);
 
+    /* the client moved there already so don't move focus. prevent flicker
+       on sendtodesktop + follow */
+    if (focus_client && focus_client->desktop == screen_desktop)
+        dofocus = FALSE;
+
     /* have to try focus here because when you leave an empty desktop
        there is no focus out to watch for. also, we have different rules
        here. we always allow it to look under the mouse pointer if

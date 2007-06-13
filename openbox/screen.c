@@ -1107,13 +1107,10 @@ typedef struct {
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
 { \
-    for (i = 0; i < screen_num_desktops; ++i) \
-        if (i == d || d == DESKTOP_ALL) { \
-            ObScreenStrut *ss = g_new(ObScreenStrut, 1); \
-            ss->desktop = i; \
-            ss->strut = s;  \
-            sl = g_slist_prepend(sl, ss); \
-        } \
+    ObScreenStrut *ss = g_new(ObScreenStrut, 1); \
+    ss->desktop = d; \
+    ss->strut = s;  \
+    sl = g_slist_prepend(sl, ss); \
 }
 
 void screen_update_areas()
@@ -1174,22 +1171,26 @@ void screen_update_areas()
 
             for (sit = struts_left; sit; sit = g_slist_next(sit)) {
                 ObScreenStrut *s = sit->data;
-                if (s->desktop == j && STRUT_LEFT_ON_MONITOR(s->strut, i))
+                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
+                    STRUT_LEFT_ON_MONITOR(s->strut, i))
                     l = MAX(l, s->strut->left);
             }
             for (sit = struts_top; sit; sit = g_slist_next(sit)) {
                 ObScreenStrut *s = sit->data;
-                if (s->desktop == j && STRUT_TOP_ON_MONITOR(s->strut, i))
+                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
+                    STRUT_TOP_ON_MONITOR(s->strut, i))
                     t = MAX(t, s->strut->top);
             }
             for (sit = struts_right; sit; sit = g_slist_next(sit)) {
                 ObScreenStrut *s = sit->data;
-                if (s->desktop == j && STRUT_RIGHT_ON_MONITOR(s->strut, i))
+                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
+                    STRUT_RIGHT_ON_MONITOR(s->strut, i))
                     r = MAX(r, s->strut->right);
             }
             for (sit = struts_bottom; sit; sit = g_slist_next(sit)) {
                 ObScreenStrut *s = sit->data;
-                if (s->desktop == j && STRUT_BOTTOM_ON_MONITOR(s->strut, i))
+                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
+                    STRUT_BOTTOM_ON_MONITOR(s->strut, i))
                     b = MAX(b, s->strut->bottom);
             }
 

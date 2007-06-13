@@ -952,7 +952,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
 
     /* find the monitor the menu is on */
     for (i = 0; i < screen_num_monitors; ++i) {
-        Rect a = screen_physical_area_monitor(i);
+        Rect *a = screen_physical_area_monitor(i);
         gboolean contains = RECT_CONTAINS(*a, x, y);
         g_free(a);
         if (contains) {

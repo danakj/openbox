@@ -1980,7 +1980,7 @@ void client_update_strut(ObClient *self)
     if (!got &&
         PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
         if (num == 4) {
-            const Rect *a;
+            Rect *a;
 
             got = TRUE;
 

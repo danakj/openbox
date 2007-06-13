@@ -1100,7 +1100,7 @@ void screen_install_colormap(ObClient *client, gboolean install)
 #define RESET_STRUT_LIST(sl) \
     {if (sl) for (i = 0; sl[i]; ++i) g_slist_free(sl[i]); \
      sl = g_renew(GSList*, sl, screen_num_desktops + 1); \
-     memset(sl, sizeof(GSList*) * screen_num_desktops, NULL);}
+     memset(sl, NULL, sizeof(GSList*) * screen_num_desktops);}
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
     {for (i = 0; i < screen_num_desktops; ++i) \

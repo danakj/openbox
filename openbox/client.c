@@ -2731,7 +2731,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         guint i;
 
         i = screen_find_monitor(&desired);
-        a = screen_area_monitor(self->desktop, i, &desired);
+        /* use all possible struts when maximizing to the full screen */
+        a = screen_area_monitor(self->desktop, i,
+                                (self->max_horz && self->max_vert ?
+                                 NULL : &desired));
 
         /* set the size and position if maximized */
         if (self->max_horz) {

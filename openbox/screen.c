@@ -1264,16 +1264,16 @@ Rect* screen_area_all_monitors(guint desktop)
                       s->bottom_start, s->bottom_end - s->bottom_start + 1))
 
 #define STRUT_LEFT_IGNORE(s, us, search) \
-    (head != SCREEN_AREA_ALL_MONITORS || !us || \
+    (head == SCREEN_AREA_ALL_MONITORS && us && \
      RECT_LEFT(monitor_area[i]) + s->left > RECT_LEFT(*search))
 #define STRUT_RIGHT_IGNORE(s, us, search) \
-    (head != SCREEN_AREA_ALL_MONITORS || !us || \
+    (head == SCREEN_AREA_ALL_MONITORS && us && \
      RECT_RIGHT(monitor_area[i]) - s->right < RECT_RIGHT(*search))
 #define STRUT_TOP_IGNORE(s, us, search) \
-    (head != SCREEN_AREA_ALL_MONITORS || !us || \
+    (head == SCREEN_AREA_ALL_MONITORS && us && \
      RECT_TOP(monitor_area[i]) + s->top > RECT_TOP(*search))
 #define STRUT_BOTTOM_IGNORE(s, us, search) \
-    (head != SCREEN_AREA_ALL_MONITORS || !us || \
+    (head == SCREEN_AREA_ALL_MONITORS && us && \
      RECT_BOTTOM(monitor_area[i]) - s->bottom < RECT_BOTTOM(*search))
 
 Rect* screen_area(guint desktop, guint head, Rect *search)
@@ -1350,7 +1350,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
                 if (s->desktop == d &&
                     STRUT_TOP_IN_SEARCH(s->strut, search) &&
                     !STRUT_TOP_IGNORE(s->strut, us, search))
-                    t = MAX(t, al + s->strut->top);
+                    t = MAX(t, at + s->strut->top);
             }
             for (it = struts_right; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
@@ -1364,7 +1364,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
                 if (s->desktop == d &&
                     STRUT_BOTTOM_IN_SEARCH(s->strut, search) &&
                     !STRUT_BOTTOM_IGNORE(s->strut, us, search))
-                    b = MIN(b, ar - s->strut->bottom);
+                    b = MIN(b, ab - s->strut->bottom);
             }
 
             /* limit to this monitor */

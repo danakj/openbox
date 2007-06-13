@@ -1462,8 +1462,8 @@ void action_move_to_center(union ActionData *data)
     Rect *area;
     area = screen_area(c->desktop, client_monitor(c), NULL);
     client_action_start(data);
-    client_move(c, area->width / 2 - c->area.width / 2,
-                area->height / 2 - c->area.height / 2);
+    client_move(c, area->x + area->width / 2 - c->area.width / 2,
+                area->y + area->height / 2 - c->area.height / 2);
     client_action_end(data, FALSE);
     g_free(area);
 }

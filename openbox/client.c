@@ -2946,7 +2946,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        this. So just to appease Swing, when user = TRUE, we always send
        a synthetic ConfigureNotify to give the window its root coordinates.
     */
-    if ((!user && !resized && (rootmoved || force_reply)) || (user && final))
+    if ((!user && !resized && (rootmoved || force_reply)) ||
+        (user && final && rootmoved))
     {
         XEvent event;
 

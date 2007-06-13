@@ -1246,21 +1246,21 @@ Rect* screen_area_monitor(guint desktop, guint head, Rect *search)
     }
     for (it = struts_right; it; it = g_slist_next(it)) {
         StrutPartial *s = it->data;
-        if (!search == 0 ||
+        if (!search ||
             RANGE_INTERSECT(search->y, search->height,
                             s->right_start, s->right_end - s->right_start + 1))
             r = MAX(r, s->right);
     }
     for (it = struts_top; it; it = g_slist_next(it)) {
         StrutPartial *s = it->data;
-        if (!search == 0 ||
+        if (!search ||
             RANGE_INTERSECT(search->x, search->width,
                             s->top_start, s->top_end - s->top_start + 1))
             t = MAX(t, s->top);
     }
     for (it = struts_bottom; it; it = g_slist_next(it)) {
         StrutPartial *s = it->data;
-        if (search->width == 0 ||
+        if (!search ||
             RANGE_INTERSECT(search->x, search->width,
                             s->bottom_start,
                             s->bottom_end - s->bottom_start + 1))

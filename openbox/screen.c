@@ -68,10 +68,10 @@ Time     screen_desktop_user_time = CurrentTime;
 /*! An array of desktops, holding array of areas per monitor */
 static Rect  *monitor_area = NULL;
 /*! An array of desktops, holding an array of struts */
-static GSList **struts_top = NULL;
-static GSList **struts_left = NULL;
-static GSList **struts_right = NULL;
-static GSList **struts_bottom = NULL;
+static GSList *struts_top = NULL;
+static GSList *struts_left = NULL;
+static GSList *struts_right = NULL;
+static GSList *struts_bottom = NULL;
 
 static ObPagerPopup *desktop_cycle_popup;
 
@@ -1097,15 +1097,23 @@ void screen_install_colormap(ObClient *client, gboolean install)
     (RANGES_INTERSECT(s->bottom_start, s->bottom_end - s->bottom_start + 1, \
                       monitor_area[i].x, monitor_area[i].width))
 
+typedef struct {
+    guint desktop;
+    StrutPartial *strut;
+} ObScreenStrut;
+
 #define RESET_STRUT_LIST(sl) \
-    {if (sl) for (i = 0; sl[i]; ++i) g_slist_free(sl[i]); \
-     sl = g_renew(GSList*, sl, screen_num_desktops + 1); \
-     memset(sl, 0, sizeof(GSList*) * screen_num_desktops + 1);}
+    (g_slist_free(sl), sl = NULL)
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
-    {for (i = 0; i < screen_num_desktops; ++i) \
-         if (i == d || d == DESKTOP_ALL) \
-             sl[i] = g_slist_prepend(sl[i], s);}
+{ \
+    for (i = 0; i < screen_num_desktops; ++i) \
+        if (i == d || d == DESKTOP_ALL) { \
+            ObScreenStrut *ss = g_new(ObScreenStrut, 1); \
+            ss->desktop = i; \
+            ss->strut = s;  \
+        } \
+}
 
 void screen_update_areas()
 {
@@ -1163,25 +1171,25 @@ void screen_update_areas()
 
             /* only add the strut to the area if it touches the monitor */
 
-            for (sit = struts_left[j]; sit; sit = g_slist_next(sit)) {
-                StrutPartial *s = sit->data;
-                if (STRUT_LEFT_ON_MONITOR(s, i))
-                    l = MAX(l, s->left);
+            for (sit = struts_left; sit; sit = g_slist_next(sit)) {
+                ObScreenStrut *s = sit->data;
+                if (s->desktop == j && STRUT_LEFT_ON_MONITOR(s->strut, i))
+                    l = MAX(l, s->strut->left);
             }
-            for (sit = struts_top[j]; sit; sit = g_slist_next(sit)) {
-                StrutPartial *s = sit->data;
-                if (STRUT_TOP_ON_MONITOR(s, i))
-                    t = MAX(t, s->top);
+            for (sit = struts_top; sit; sit = g_slist_next(sit)) {
+                ObScreenStrut *s = sit->data;
+                if (s->desktop == j && STRUT_TOP_ON_MONITOR(s->strut, i))
+                    t = MAX(t, s->strut->top);
             }
-            for (sit = struts_right[j]; sit; sit = g_slist_next(sit)) {
-                StrutPartial *s = sit->data;
-                if (STRUT_RIGHT_ON_MONITOR(s, i))
-                    r = MAX(r, s->right);
+            for (sit = struts_right; sit; sit = g_slist_next(sit)) {
+                ObScreenStrut *s = sit->data;
+                if (s->desktop == j && STRUT_RIGHT_ON_MONITOR(s->strut, i))
+                    r = MAX(r, s->strut->right);
             }
-            for (sit = struts_bottom[j]; sit; sit = g_slist_next(sit)) {
-                StrutPartial *s = sit->data;
-                if (STRUT_BOTTOM_ON_MONITOR(s, i))
-                    b = MAX(b, s->bottom);
+            for (sit = struts_bottom; sit; sit = g_slist_next(sit)) {
+                ObScreenStrut *s = sit->data;
+                if (s->desktop == j && STRUT_BOTTOM_ON_MONITOR(s->strut, i))
+                    b = MAX(b, s->strut->bottom);
             }
 
             /* based on these margins, set the work area for the
@@ -1302,16 +1310,18 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
         ar = r = RECT_LEFT(monitor_area[screen_num_monitors]);
         ab = b = RECT_TOP(monitor_area[screen_num_monitors]);
         for (i = 0; i < screen_num_monitors; ++i) {
+            /* add the monitor if applicable */
             if (RANGES_INTERSECT(search->x, search->width,
-                                 monitor_area[i].x, monitor_area[i].width) ||
-                RANGES_INTERSECT(search->y, search->height,
+                                 monitor_area[i].x, monitor_area[i].width))
+            {
+                at = t = MIN(t, RECT_TOP(monitor_area[i]));
+                ab = b = MAX(b, RECT_BOTTOM(monitor_area[i]));
+            }
+            if (RANGES_INTERSECT(search->y, search->height,
                                  monitor_area[i].y, monitor_area[i].height))
             {
-                /* add the monitor */
                 al = l = MIN(l, RECT_LEFT(monitor_area[i]));
-                at = t = MIN(t, RECT_TOP(monitor_area[i]));
                 ar = r = MAX(r, RECT_RIGHT(monitor_area[i]));
-                ab = b = MAX(b, RECT_BOTTOM(monitor_area[i]));
             }
         }
     } else {
@@ -1327,29 +1337,33 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
         for (i = 0; i < screen_num_monitors; ++i) {
             if (head != SCREEN_AREA_ALL_MONITORS && head != i) continue;
 
-            for (it = struts_left[d]; it; it = g_slist_next(it)) {
-                StrutPartial *s = it->data;
-                if (STRUT_LEFT_IN_SEARCH(s, search) &&
-                    !STRUT_LEFT_IGNORE(s, us, search))
-                    l = MAX(l, al + s->left);
+            for (it = struts_left; it; it = g_slist_next(it)) {
+                ObScreenStrut *s = it->data;
+                if (s->desktop == d &&
+                    STRUT_LEFT_IN_SEARCH(s->strut, search) &&
+                    !STRUT_LEFT_IGNORE(s->strut, us, search))
+                    l = MAX(l, al + s->strut->left);
             }
-            for (it = struts_top[d]; it; it = g_slist_next(it)) {
-                StrutPartial *s = it->data;
-                if (STRUT_TOP_IN_SEARCH(s, search) &&
-                    !STRUT_TOP_IGNORE(s, us, search))
-                    t = MAX(t, al + s->top);
+            for (it = struts_top; it; it = g_slist_next(it)) {
+                ObScreenStrut *s = it->data;
+                if (s->desktop == d &&
+                    STRUT_TOP_IN_SEARCH(s->strut, search) &&
+                    !STRUT_TOP_IGNORE(s->strut, us, search))
+                    t = MAX(t, al + s->strut->top);
             }
-            for (it = struts_right[d]; it; it = g_slist_next(it)) {
-                StrutPartial *s = it->data;
-                if (STRUT_RIGHT_IN_SEARCH(s, search) &&
-                    !STRUT_RIGHT_IGNORE(s, us, search))
-                    r = MIN(r, ar - s->right);
+            for (it = struts_right; it; it = g_slist_next(it)) {
+                ObScreenStrut *s = it->data;
+                if (s->desktop == d &&
+                    STRUT_RIGHT_IN_SEARCH(s->strut, search) &&
+                    !STRUT_RIGHT_IGNORE(s->strut, us, search))
+                    r = MIN(r, ar - s->strut->right);
             }
-            for (it = struts_bottom[d]; it; it = g_slist_next(it)) {
-                StrutPartial *s = it->data;
-                if (STRUT_BOTTOM_IN_SEARCH(s, search) &&
-                    !STRUT_BOTTOM_IGNORE(s, us, search))
-                    b = MIN(b, ar - s->bottom);
+            for (it = struts_bottom; it; it = g_slist_next(it)) {
+                ObScreenStrut *s = it->data;
+                if (s->desktop == d &&
+                    STRUT_BOTTOM_IN_SEARCH(s->strut, search) &&
+                    !STRUT_BOTTOM_IGNORE(s->strut, us, search))
+                    b = MIN(b, ar - s->strut->bottom);
             }
 
             /* limit to this monitor */

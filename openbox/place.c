@@ -53,7 +53,7 @@ static Rect *pick_pointer_head(ObClient *c)
         gboolean contain = RECT_CONTAINS(*monitor, px, py);
         g_free(monitor);
         if (contain)
-            return screen_area_monitor(c->desktop, i, NULL);
+            return screen_area(c->desktop, i, NULL);
     }
     g_assert_not_reached();
 }
@@ -131,7 +131,7 @@ static Rect **pick_head(ObClient *c)
         add_choice(choice, i);
 
     for (i = 0; i < screen_num_monitors; ++i)
-        area[i] = screen_area_monitor(c->desktop, choice[i], NULL);
+        area[i] = screen_area(c->desktop, choice[i], NULL);
 
     return area;
 }
@@ -380,8 +380,8 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
         screen = pick_pointer_head(client);
     else if (settings->monitor > 0 &&
              (guint)settings->monitor <= screen_num_monitors)
-        screen = screen_area_monitor(client->desktop,
-                                     (guint)settings->monitor - 1, NULL);
+        screen = screen_area(client->desktop, (guint)settings->monitor - 1,
+                             NULL);
     else {
         Rect **areas;
         guint i;

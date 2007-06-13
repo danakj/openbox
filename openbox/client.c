@@ -403,8 +403,7 @@ void client_manage(Window window)
         RECT_SET(placer, placex, placey, placew, placeh);
         frame_rect_to_frame(self->frame, &placer);
 
-        Rect *a = screen_area_monitor(self->desktop, client_monitor(self),
-                                      &placer);
+        Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &placer);
 
         /* shrink by the frame's area */
         a->width -= self->frame->size.left + self->frame->size.right;
@@ -923,18 +922,14 @@ void client_move_onscreen(ObClient *self, gboolean rude)
 gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
                               gboolean rude)
 {
-    Rect *mon_a, *all_a;
     gint ox = *x, oy = *y;
     gboolean rudel = rude, ruder = rude, rudet = rude, rudeb = rude;
     gint fw, fh;
     Rect desired;
+    guint i;
 
     RECT_SET(desired, *x, *y, w, h);
     frame_rect_to_frame(self->frame, &desired);
-
-    all_a = screen_area(self->desktop, &desired);
-    mon_a = screen_area_monitor(self->desktop, screen_find_monitor(&desired),
-                                &desired);
 
     /* get where the frame would be */
     frame_client_gravity(self->frame, x, y, w, h);
@@ -943,30 +938,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     fw = self->frame->size.left + w + self->frame->size.right;
     fh = self->frame->size.top + h + self->frame->size.bottom;
 
-    /* This makes sure windows aren't entirely outside of the screen so you
-       can't see them at all.
-       It makes sure 10% of the window is on the screen at least. At don't let
-       it move itself off the top of the screen, which would hide the titlebar
-       on you. (The user can still do this if they want too, it's only limiting
-       the application.
-
-       XXX watch for xinerama dead areas...
-    */
-    if (client_normal(self)) {
-        if (!self->strut.right && *x + fw/10 >= all_a->x + all_a->width - 1)
-            *x = all_a->x + all_a->width - fw/10;
-        if (!self->strut.bottom && *y + fh/10 >= all_a->y + all_a->height - 1)
-            *y = all_a->y + all_a->height - fh/10;
-        if (!self->strut.left && *x + fw*9/10 - 1 < all_a->x)
-            *x = all_a->x - fw*9/10;
-        if (!self->strut.top && *y + fh*9/10 - 1 < all_a->y)
-            *y = all_a->y - fw*9/10;
-    }
-
-    /* If rudeness wasn't requested, then figure out of the client is currently
-       entirely on the screen. If it is, and the position isn't changing by
-       request, and it is enlarging, then be rude even though it wasn't
-       requested */
+    /* If rudeness wasn't requested, then still be rude in a given direction
+       if the client is not moving, only resizing in that direction */
     if (!rude) {
         Point oldtl, oldtr, oldbl, oldbr;
         Point newtl, newtr, newbl, newbr;
@@ -1003,25 +976,51 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             rudeb = TRUE;
     }
 
-    /* This here doesn't let windows even a pixel outside the struts/screen.
-     * When called from client_manage, programs placing themselves are
-     * forced completely onscreen, while things like
-     * xterm -geometry resolution-width/2 will work fine. Trying to
-     * place it completely offscreen will be handled in the above code.
-     * Sorry for this confused comment, i am tired. */
-    if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
-    if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
-        *x = mon_a->x + MAX(0, mon_a->width - fw);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *a;
 
-    if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
-    if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
-        *y = mon_a->y + MAX(0, mon_a->height - fh);
+        if (!screen_physical_area_monitor_contains(i, &desired))
+            continue;
+
+        a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
+
+        /* This makes sure windows aren't entirely outside of the screen so you
+           can't see them at all.
+           It makes sure 10% of the window is on the screen at least. At don't
+           let it move itself off the top of the screen, which would hide the
+           titlebar on you. (The user can still do this if they want too, it's
+           only limiting the application.
+        */
+        if (client_normal(self)) {
+            if (!self->strut.right && *x + fw/10 >= a->x + a->width - 1)
+                *x = a->x + a->width - fw/10;
+            if (!self->strut.bottom && *y + fh/10 >= a->y + a->height - 1)
+                *y = a->y + a->height - fh/10;
+            if (!self->strut.left && *x + fw*9/10 - 1 < a->x)
+                *x = a->x - fw*9/10;
+            if (!self->strut.top && *y + fh*9/10 - 1 < a->y)
+                *y = a->y - fw*9/10;
+        }
+
+        /* This here doesn't let windows even a pixel outside the
+           struts/screen. When called from client_manage, programs placing
+           themselves are forced completely onscreen, while things like
+           xterm -geometry resolution-width/2 will work fine. Trying to
+           place it completely offscreen will be handled in the above code.
+           Sorry for this confused comment, i am tired. */
+        if (rudel && !self->strut.left && *x < a->x) *x = a->x;
+        if (ruder && !self->strut.right && *x + fw > a->x + a->width)
+            *x = a->x + MAX(0, a->width - fw);
+
+        if (rudet && !self->strut.top && *y < a->y) *y = a->y;
+        if (rudeb && !self->strut.bottom && *y + fh > a->y + a->height)
+            *y = a->y + MAX(0, a->height - fh);
+
+        g_free(a);
+    }
 
     /* get where the client should be */
     frame_frame_gravity(self->frame, x, y, w, h);
-
-    g_free(all_a);
-    g_free(mon_a);
 
     return ox != *x || oy != *y;
 }
@@ -1985,7 +1984,7 @@ void client_update_strut(ObClient *self)
             got = TRUE;
 
             /* use the screen's width/height */
-            a = screen_physical_area();
+            a = screen_physical_area_all_monitors();
 
             STRUT_PARTIAL_SET(strut,
                               data[0], data[2], data[1], data[3],
@@ -2730,11 +2729,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         Rect *a;
         guint i;
 
-        i = screen_find_monitor(&desired);
         /* use all possible struts when maximizing to the full screen */
-        a = screen_area_monitor(self->desktop, i,
-                                (self->max_horz && self->max_vert ?
-                                 NULL : &desired));
+        i = screen_find_monitor(&desired);
+        a = screen_area(self->desktop, i,
+                        (self->max_horz && self->max_vert ? NULL : &desired));
 
         /* set the size and position if maximized */
         if (self->max_horz) {
@@ -3876,14 +3874,13 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
     gint dest, monitor_dest;
     gint my_edge_start, my_edge_end, my_offset;
     GList *it;
-    Rect *a, *monitor;
+    Rect *a, *mon;
     
     if(!client_list)
         return -1;
 
-    a = screen_area(c->desktop, &c->frame->area);
-    monitor = screen_area_monitor(c->desktop, client_monitor(c),
-                                  &c->frame->area);
+    a = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS, &c->frame->area);
+    mon = screen_area(c->desktop, SCREEN_AREA_ONE_MONITOR, &c->frame->area);
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
@@ -3893,7 +3890,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         
         /* default: top of screen */
         dest = a->y + (hang ? c->frame->area.height : 0);
-        monitor_dest = monitor->y + (hang ? c->frame->area.height : 0);
+        monitor_dest = mon->y + (hang ? c->frame->area.height : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
         if (monitor_dest != dest && my_offset > monitor_dest)
@@ -3926,7 +3923,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
         /* default: bottom of screen */
         dest = a->y + a->height - (hang ? c->frame->area.height : 0);
-        monitor_dest = monitor->y + monitor->height -
+        monitor_dest = mon->y + mon->height -
                        (hang ? c->frame->area.height : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
@@ -3961,7 +3958,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
         /* default: leftmost egde of screen */
         dest = a->x + (hang ? c->frame->area.width : 0);
-        monitor_dest = monitor->x + (hang ? c->frame->area.width : 0);
+        monitor_dest = mon->x + (hang ? c->frame->area.width : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
         if (monitor_dest != dest && my_offset > monitor_dest)
@@ -3994,7 +3991,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         
         /* default: rightmost edge of screen */
         dest = a->x + a->width - (hang ? c->frame->area.width : 0);
-        monitor_dest = monitor->x + monitor->width -
+        monitor_dest = mon->x + mon->width -
                        (hang ? c->frame->area.width : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
@@ -4032,7 +4029,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
     }
 
     g_free(a);
-    g_free(monitor);
+    g_free(mon);
     return dest;
 }
 

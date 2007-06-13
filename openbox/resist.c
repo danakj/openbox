@@ -152,7 +152,8 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
             continue;
         }
 
-        area = screen_area_monitor(c->desktop, i, &desired_area);
+        area = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS,
+                           &desired_area);
 
         al = RECT_LEFT(*area);
         at = RECT_TOP(*area);
@@ -307,7 +308,8 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             continue;
         }
 
-        area = screen_area_monitor(c->desktop, i, &desired_area);
+        area = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS,
+                           &desired_area);
 
         /* get the screen boundaries */
         al = RECT_LEFT(*area);

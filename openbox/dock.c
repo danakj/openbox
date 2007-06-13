@@ -272,7 +272,7 @@ void dock_configure()
     dock->w += ob_rr_theme->obwidth * 2;
     dock->h += ob_rr_theme->obwidth * 2;
 
-    a = screen_physical_area();
+    a = screen_physical_area_all_monitors();
 
     /* calculate position */
     if (config_dock_floating) {

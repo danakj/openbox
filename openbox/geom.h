@@ -142,7 +142,7 @@ typedef struct _StrutPartial {
      (s1).bottom_start == (s2).bottom_start && \
      (s1).bottom_end == (s2).bottom_end)
 
-#define RANGE_INTERSECT(r1x, r1w, r2x, r2w) \
+#define RANGES_INTERSECT(r1x, r1w, r2x, r2w) \
     (r1x < r2x + r2w && r1x + r1w > r2x)
 
 #endif

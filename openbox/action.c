@@ -1430,7 +1430,7 @@ void action_move_to_center(union ActionData *data)
 {
     ObClient *c = data->client.any.c;
     Rect *area;
-    area = screen_area_monitor(c->desktop, 0, NULL);
+    area = screen_area(c->desktop, client_monitor(c), NULL);
     client_action_start(data);
     client_move(c, area->width / 2 - c->area.width / 2,
                 area->height / 2 - c->area.height / 2);
@@ -1898,7 +1898,7 @@ void action_growtoedge(union ActionData *data)
     ObClient *c = data->diraction.any.c;
     Rect *a;
 
-    a = screen_area(c->desktop, NULL);
+    a = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS, &c->frame->area);
     x = c->frame->area.x;
     y = c->frame->area.y;
     /* get the unshaded frame's dimensions..if it is shaded */

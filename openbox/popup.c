@@ -154,9 +154,10 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     gint emptyx, emptyy; /* empty space between elements */
     gint textx, texty, textw, texth;
     gint iconx, icony, iconw, iconh;
-    Rect *area;
+    Rect *area, mon;
 
-    area = screen_physical_area();
+    RECT_SET(mon, self->x, self->y, 1, 1);
+    area = screen_physical_area_monitor(screen_find_monitor(&mon));
 
     /* when there is no icon and the text is not parent relative, then 
        fill the whole dialog with the text appearance, don't use the bg at all

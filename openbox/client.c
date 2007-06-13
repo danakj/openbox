@@ -3174,7 +3174,7 @@ void client_shade(ObClient *self, gboolean shade)
     client_change_state(self);
     client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
-    frame_adjust_area(self->frame, FALSE, FALSE, FALSE);
+    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 }
 
 void client_close(ObClient *self)

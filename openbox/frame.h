@@ -167,6 +167,7 @@ struct _ObFrame
     gint      cbwidth_b;     /* client border width */
     gboolean  max_horz;      /* when maxed some decorations are hidden */
     gboolean  max_vert;      /* when maxed some decorations are hidden */
+    gboolean  shaded;        /* decorations adjust when shaded */
 
     /* the leftmost and rightmost elements in the titlebar */
     ObFrameContext leftmost;

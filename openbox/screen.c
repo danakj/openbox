@@ -1341,28 +1341,28 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
 
             for (it = struts_left; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
-                if (s->desktop == d &&
+                if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_LEFT_IN_SEARCH(s->strut, search) &&
                     !STRUT_LEFT_IGNORE(s->strut, us, search))
                     l = MAX(l, al + s->strut->left);
             }
             for (it = struts_top; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
-                if (s->desktop == d &&
+                if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_TOP_IN_SEARCH(s->strut, search) &&
                     !STRUT_TOP_IGNORE(s->strut, us, search))
                     t = MAX(t, at + s->strut->top);
             }
             for (it = struts_right; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
-                if (s->desktop == d &&
+                if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_RIGHT_IN_SEARCH(s->strut, search) &&
                     !STRUT_RIGHT_IGNORE(s->strut, us, search))
                     r = MIN(r, ar - s->strut->right);
             }
             for (it = struts_bottom; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
-                if (s->desktop == d &&
+                if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_BOTTOM_IN_SEARCH(s->strut, search) &&
                     !STRUT_BOTTOM_IGNORE(s->strut, us, search))
                     b = MIN(b, ab - s->strut->bottom);

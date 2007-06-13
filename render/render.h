@@ -125,6 +125,8 @@ struct _RrSurface {
     RrPixel32 *pixel_data;
     gint bevel_dark_adjust;  /* 0-255, default is 64 */
     gint bevel_light_adjust; /* 0-255, default is 128 */
+    RrColor *split_primary;
+    RrColor *split_secondary;
 };
 
 struct _RrTextureText {

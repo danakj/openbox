@@ -124,6 +124,11 @@ ObFrame *frame_new(ObClient *client)
 
     mask |= CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
+    self->innerleft = createWindow(self->window, NULL, mask, &attrib);
+    self->innertop = createWindow(self->window, NULL, mask, &attrib);
+    self->innerright = createWindow(self->window, NULL, mask, &attrib);
+    self->innerbottom = createWindow(self->window, NULL, mask, &attrib);
+
     self->title = createWindow(self->window, NULL, mask, &attrib);
     self->titleleft = createWindow(self->window, NULL, mask, &attrib);
     self->titletop = createWindow(self->window, NULL, mask, &attrib);
@@ -140,11 +145,6 @@ ObFrame *frame_new(ObClient *client)
 
     self->left = createWindow(self->window, NULL, mask, &attrib);
     self->right = createWindow(self->window, NULL, mask, &attrib);
-
-    self->innerleft = createWindow(self->window, NULL, mask, &attrib);
-    self->innertop = createWindow(self->window, NULL, mask, &attrib);
-    self->innerright = createWindow(self->window, NULL, mask, &attrib);
-    self->innerbottom = createWindow(self->window, NULL, mask, &attrib);
 
     self->label = createWindow(self->title, NULL, mask, &attrib);
     self->max = createWindow(self->title, NULL, mask, &attrib);
@@ -352,7 +352,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         if (self->max_horz) {
             self->cbwidth_l = self->cbwidth_r = 0;
-            self->width = self->client->area.width - self->bwidth * 2;
+            self->width = self->client->area.width;
             if (self->max_vert)
                 self->cbwidth_b = 0;
         } else
@@ -429,9 +429,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 gint titlesides;
 
                 /* height of titleleft and titleright */
-                titlesides = (!self->max_horz ?
-                              ob_rr_theme->grip_width :
-                              self->size.top - self->bwidth);
+                titlesides = (!self->max_horz ? ob_rr_theme->grip_width : 0);
 
                 XMoveResizeWindow(ob_display, self->titletop,
                                   ob_rr_theme->grip_width + self->bwidth, 0,
@@ -476,7 +474,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
                 if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
                     XMoveResizeWindow(ob_display, self->titlebottom,
-                                      self->bwidth,
+                                      (self->max_horz ? 0 : self->bwidth),
                                       ob_rr_theme->title_height + self->bwidth,
                                       self->width,
                                       self->bwidth);
@@ -496,7 +494,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
             if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
                 XMoveResizeWindow(ob_display, self->title,
-                                  self->bwidth, self->bwidth,
+                                  (self->max_horz ? 0 : self->bwidth),
+                                  self->bwidth,
                                   self->width, ob_rr_theme->title_height);
 
                 XMapWindow(ob_display, self->title);
@@ -536,49 +535,63 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             layout_title(self);
 
         if (!fake) {
+            gint sidebwidth = self->max_horz ? 0 : self->bwidth;
+
             if (self->bwidth && self->size.bottom) {
                 XMoveResizeWindow(ob_display, self->handlebottom,
                                   ob_rr_theme->grip_width +
-                                  self->bwidth * 2,
+                                  self->bwidth + sidebwidth,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom - self->bwidth,
                                   self->width - (ob_rr_theme->grip_width +
-                                                 self->bwidth) * 2,
+                                                 sidebwidth) * 2,
                                   self->bwidth);
 
-                XMoveResizeWindow(ob_display, self->lgripleft,
-                                  0,
-                                  self->size.top + self->client->area.height +
-                                  self->size.bottom -
-                                  (!self->max_horz ?
-                                   ob_rr_theme->grip_width :
-                                   self->size.bottom - self->cbwidth_b),
-                                  self->bwidth,
-                                  (!self->max_horz ?
-                                   ob_rr_theme->grip_width :
-                                   self->size.bottom - self->cbwidth_b));
-                XMoveResizeWindow(ob_display, self->rgripright,
-                                  self->size.left + self->client->area.width +
-                                  self->size.right - self->bwidth,
-                                  self->size.top + self->client->area.height +
-                                  self->size.bottom -
-                                  (!self->max_horz ?
-                                   ob_rr_theme->grip_width :
-                                   self->size.bottom - self->cbwidth_b),
-                                  self->bwidth,
-                                  (!self->max_horz ?
-                                   ob_rr_theme->grip_width :
-                                   self->size.bottom - self->cbwidth_b));
+                
+                if (sidebwidth) {
+                    XMoveResizeWindow(ob_display, self->lgripleft,
+                                      0,
+                                      self->size.top +
+                                      self->client->area.height +
+                                      self->size.bottom -
+                                      (!self->max_horz ?
+                                       ob_rr_theme->grip_width :
+                                       self->size.bottom - self->cbwidth_b),
+                                      self->bwidth,
+                                      (!self->max_horz ?
+                                       ob_rr_theme->grip_width :
+                                       self->size.bottom - self->cbwidth_b));
+                    XMoveResizeWindow(ob_display, self->rgripright,
+                                  self->size.left +
+                                      self->client->area.width +
+                                      self->size.right - self->bwidth,
+                                      self->size.top +
+                                      self->client->area.height +
+                                      self->size.bottom -
+                                      (!self->max_horz ?
+                                       ob_rr_theme->grip_width :
+                                       self->size.bottom - self->cbwidth_b),
+                                      self->bwidth,
+                                      (!self->max_horz ?
+                                       ob_rr_theme->grip_width :
+                                       self->size.bottom - self->cbwidth_b));
+
+                    XMapWindow(ob_display, self->lgripleft);
+                    XMapWindow(ob_display, self->rgripright);
+                } else {
+                    XUnmapWindow(ob_display, self->lgripleft);
+                    XUnmapWindow(ob_display, self->rgripright);
+                }
 
                 XMoveResizeWindow(ob_display, self->lgripbottom,
-                                  self->bwidth,
+                                  sidebwidth,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom - self->bwidth,
                                   ob_rr_theme->grip_width + self->bwidth,
                                   self->bwidth);
                 XMoveResizeWindow(ob_display, self->rgripbottom,
                                   self->size.left + self->client->area.width +
-                                  self->size.right - self->bwidth * 2 -
+                                  self->size.right - self->bwidth - sidebwidth -
                                   ob_rr_theme->grip_width,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom - self->bwidth,
@@ -586,8 +599,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->bwidth);
 
                 XMapWindow(ob_display, self->handlebottom);
-                XMapWindow(ob_display, self->lgripleft);
-                XMapWindow(ob_display, self->rgripright);
                 XMapWindow(ob_display, self->lgripbottom);
                 XMapWindow(ob_display, self->rgripbottom);
 
@@ -596,10 +607,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 {
                     XMoveResizeWindow(ob_display, self->handletop,
                                       ob_rr_theme->grip_width +
-                                      self->bwidth * 2,
+                                      self->bwidth + sidebwidth,
                                       FRAME_HANDLE_Y(self),
                                       self->width - (ob_rr_theme->grip_width +
-                                                     self->bwidth) * 2,
+                                                     sidebwidth) * 2,
                                       self->bwidth);
                     XMapWindow(ob_display, self->handletop);
 
@@ -618,7 +629,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                           ob_rr_theme->handle_height);
 
                         XMoveResizeWindow(ob_display, self->lgriptop,
-                                          self->bwidth,
+                                          sidebwidth,
                                           FRAME_HANDLE_Y(self),
                                           ob_rr_theme->grip_width +
                                           self->bwidth,
@@ -626,8 +637,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                         XMoveResizeWindow(ob_display, self->rgriptop,
                                           self->size.left +
                                           self->client->area.width +
-                                          self->size.right - self->bwidth * 2 -
-                                          ob_rr_theme->grip_width,
+                                          self->size.right - self->bwidth -
+                                          sidebwidth - ob_rr_theme->grip_width,
                                           FRAME_HANDLE_Y(self),
                                           ob_rr_theme->grip_width +
                                           self->bwidth,
@@ -670,7 +681,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 ob_rr_theme->handle_height > 0)
             {
                 XMoveResizeWindow(ob_display, self->handle,
-                                  self->bwidth,
+                                  sidebwidth,
                                   FRAME_HANDLE_Y(self) + self->bwidth,
                                   self->width, ob_rr_theme->handle_height);
                 XMapWindow(ob_display, self->handle);

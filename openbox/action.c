@@ -2060,6 +2060,9 @@ void action_remove_desktop(union ActionData *data)
 
     client_action_start(data);
 
+    if (screen_desktop == screen_num_desktops - 1)
+        data->addremovedesktop.current = FALSE;
+
     /* move all the clients over */
     if (data->addremovedesktop.current) {
         GList *it, *stacking_copy;

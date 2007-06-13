@@ -1349,7 +1349,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
                 StrutPartial *s = it->data;
                 if (STRUT_BOTTOM_IN_SEARCH(s, search) &&
                     !STRUT_BOTTOM_IGNORE(s, us, search))
-                    r = MIN(r, ar - s->bottom);
+                    b = MIN(b, ar - s->bottom);
             }
 
             /* limit to this monitor */

@@ -169,66 +169,38 @@ static void restack_windows(ObClient *selected, gboolean raise)
     GList *modals = NULL;
     GList *trans = NULL;
 
-    if (!raise && selected->parents) {
-        GSList *top, *top_it;
-        GSList *top_reorder = NULL;
-        
-        /* if it's a transient lowering, lower its parents so that we can lower
-           this window, or it won't move */
-        top = client_search_all_top_parents_layer(selected);
-
-        /* that is, if it has any parents */
-        if (!(top->data == selected && top->next == NULL)) {
-            /* place the window being lowered on the bottom so it'll be
-               below any of its peers that it can */
-            stacking_list = g_list_remove(stacking_list, selected);
-            stacking_list = g_list_append(stacking_list, selected);
-
-            /* go thru stacking list backwards so we can use g_slist_prepend */
-            for (it = g_list_last(stacking_list); it && top;
-                 it = g_list_previous(it))
-                if ((top_it = g_slist_find(top, it->data))) {
-                    top_reorder = g_slist_prepend(top_reorder, top_it->data);
-                    top = g_slist_delete_link(top, top_it);
-                }
-            g_assert(top == NULL);
-
-            /* call restack for each of these to lower them */
-            for (top_it = top_reorder; top_it; top_it = g_slist_next(top_it))
-                restack_windows(top_it->data, raise);
-            return;
-        }
-    }
-
     /* remove first so we can't run into ourself */
     it = g_list_find(stacking_list, selected);
     g_assert(it);
     stacking_list = g_list_delete_link(stacking_list, it);
 
-    /* go from the bottom of the stacking list up */
-    for (it = g_list_last(stacking_list); it; it = next) {
-        next = g_list_previous(it);
+    /* go from the bottom of the stacking list up. don't move any other windows
+       when lowering, we call this for each window independently */
+    if (raise) {
+        for (it = g_list_last(stacking_list); it; it = next) {
+            next = g_list_previous(it);
 
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *ch = it->data;
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *ch = it->data;
 
-            /* only move windows in the same stacking layer */
-            if (ch->layer == selected->layer &&
-                client_search_transient(selected, ch))
-            {
-                if (client_is_direct_child(selected, ch)) {
-                    if (ch->modal)
-                        modals = g_list_prepend(modals, ch);
-                    else
-                        trans = g_list_prepend(trans, ch);
+                /* only move windows in the same stacking layer */
+                if (ch->layer == selected->layer &&
+                    client_search_transient(selected, ch))
+                {
+                    if (client_is_direct_child(selected, ch)) {
+                        if (ch->modal)
+                            modals = g_list_prepend(modals, ch);
+                        else
+                            trans = g_list_prepend(trans, ch);
+                    }
+                    else {
+                        if (ch->modal)
+                            group_modals = g_list_prepend(group_modals, ch);
+                        else
+                            group_trans = g_list_prepend(group_trans, ch);
+                    }
+                    stacking_list = g_list_delete_link(stacking_list, it);
                 }
-                else {
-                    if (ch->modal)
-                        group_modals = g_list_prepend(group_modals, ch);
-                    else
-                        group_trans = g_list_prepend(group_trans, ch);
-                }
-                stacking_list = g_list_delete_link(stacking_list, it);
             }
         }
     }
@@ -317,6 +289,27 @@ static void restack_windows(ObClient *selected, gboolean raise)
 
     do_restack(wins, below);
     g_list_free(wins);
+
+    /* lower our parents after us, so they go below us */
+    if (!raise && selected->parents) {
+        GSList *parents_copy, *sit;
+        GSList *reorder = NULL;
+
+        parents_copy = g_slist_copy(selected->parents);
+
+        /* go thru stacking list backwards so we can use g_slist_prepend */
+        for (it = g_list_last(stacking_list); it && parents_copy;
+             it = g_list_previous(it))
+            if ((sit = g_slist_find(parents_copy, it->data))) {
+                reorder = g_slist_prepend(reorder, sit->data);
+                parents_copy = g_slist_delete_link(parents_copy, sit);
+            }
+        g_assert(parents_copy == NULL);
+
+        /* call restack for each of these to lower them */
+        for (sit = reorder; sit; sit = g_slist_next(sit))
+            restack_windows(sit->data, raise);
+    }
 }
 
 void stacking_raise(ObWindow *window)

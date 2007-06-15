@@ -59,7 +59,9 @@ window.inactive.button.*.pressed.image.color: #b7fdef
 window.inactive.button.*.pressed.bg.border.color: #38b3d6
 
 window.active.button.*.image.color: #e0e0e0
+window.active.button.disabled.image.color: #707070
 window.inactive.button.*.image.color: #747474
+window.inactive.button.disabled.image.color: #c0c0c0
 
 !! Borders
 window.active.border.color: #181818

@@ -2084,8 +2084,11 @@ void client_update_icons(ObClient *self)
     /* set the default icon onto the window
        in theory, this could be a race, but if a window doesn't set an icon
        or removes it entirely, it's not very likely it is going to set one
-       right away afterwards */
-    if (self->nicons == 0) {
+       right away afterwards
+
+       if it has parents, then one of them will have an icon already 
+    */
+    if (self->nicons == 0 && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
         gulong *data;
 

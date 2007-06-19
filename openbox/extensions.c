@@ -33,6 +33,8 @@ gboolean extensions_randr     = FALSE;
 gint     extensions_randr_event_basep;
 gboolean extensions_sync      = FALSE;
 gint     extensions_sync_event_basep;
+gboolean extensions_comp      = FALSE;
+gint     extensions_comp_event_basep;
 
 void extensions_query_all()
 {
@@ -79,6 +81,14 @@ void extensions_query_all()
     if (!extensions_sync)
         ob_debug("X Sync extension is not present on the server or is an "
                  "incompatible version\n");
+#endif
+
+#ifdef USE_XCOMPOSITE
+    extensions_comp =
+        XRRQueryExtension(ob_display, &extensions_comp_event_basep,
+                          &junk);
+    if (!extensions_comp)
+        ob_debug("X Composite extension is not present on the server\n");
 #endif
 }
 

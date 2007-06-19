@@ -365,10 +365,12 @@ void screen_startup(gboolean reconfig)
     }
 
 #ifdef USE_XCOMPOSITE
-    /* Redirect window contents to offscreen pixmaps */
-    XCompositeRedirectSubwindows(ob_display,
-                                 RootWindow(ob_display, ob_screen),
-                                 CompositeRedirectAutomatic);
+    if (extensions_comp) {
+        /* Redirect window contents to offscreen pixmaps */
+        XCompositeRedirectSubwindows(ob_display,
+                                     RootWindow(ob_display, ob_screen),
+                                     CompositeRedirectAutomatic);
+    }
 #endif
 
     /* get the initial size */

@@ -146,12 +146,32 @@ AC_ARG_ENABLE(xcomposite,
 )
 
 if test "$enable_xcomposite" = yes; then
-PKG_CHECK_MODULES(XCOMPOSITE, [xcomposite],
+PKG_CHECK_MODULES(XRENDER, [xrender],
   [
-    AC_DEFINE(USE_XCOMPOSITE, [1], [Use X Composite library])
-    AC_SUBST(XCOMPOSITE_CFLAGS)
-    AC_SUBST(XCOMPOSITE_LIBS)
-    xcomposite_found=yes
+    AC_DEFINE(USE_XRENDER, [1], [Use X Render library])
+    AC_SUBST(XRENDER_CFLAGS)
+    AC_SUBST(XRENDER_LIBS)
+    PKG_CHECK_MODULES(XDAMAGE, [xdamage],
+      [
+        AC_DEFINE(USE_XDAMAGE, [1], [Use X Damage library])
+        AC_SUBST(XDAMAGE_CFLAGS)
+        AC_SUBST(XDAMAGE_LIBS)
+        PKG_CHECK_MODULES(XCOMPOSITE, [xcomposite],
+          [ 
+            AC_DEFINE(USE_XCOMPOSITE, [1], [Use X Composite library])	
+            AC_SUBST(XCOMPOSITE_CFLAGS)	   
+            AC_SUBST(XCOMPOSITE_LIBS)
+            xcomposite_found=yes
+          ],
+          [
+            xcomposite_found=no
+          ]
+        )
+      ],
+      [
+        xcomposite_found=no
+      ]
+    )
   ],
   [
     xcomposite_found=no

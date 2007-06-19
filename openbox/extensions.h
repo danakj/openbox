@@ -39,6 +39,11 @@
 #ifdef    SYNC
 #include <X11/extensions/sync.h>
 #endif
+#ifdef    USE_XCOMPOSITE
+#include <X11/extensions/Xcomposite.h>
+#include <X11/extensions/Xdamage.h>
+#include <X11/extensions/Xrender.h>
+#endif
 
 #include <glib.h>
 

@@ -529,7 +529,7 @@ void screen_set_num_desktops(guint num)
             else if (screen_desktop == num - 1 &&
                      (c->desktop == DESKTOP_ALL ||
                       c->desktop == screen_desktop))
-                stacking_raise(WINDOW_AS_CLIENT(c));
+                stacking_raise(CLIENT_AS_WINDOW(c));
         }
     }
  

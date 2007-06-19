@@ -364,6 +364,13 @@ void screen_startup(gboolean reconfig)
         return;
     }
 
+#ifdef USE_XCOMPOSITE
+    /* Redirect window contents to offscreen pixmaps */
+    XCompositeRedirectSubwindows(ob_display,
+                                 RootWindow(ob_display, ob_screen),
+                                 CompositeRedirectAutomatic);
+#endif
+
     /* get the initial size */
     screen_resize();
 

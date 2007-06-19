@@ -32,6 +32,9 @@
 <placement>
   <policy>Smart</policy>
   <!-- 'Smart' or 'UnderMouse' -->
+  <center>yes</center>
+  <!-- whether to place windows in the center of the free area found or
+       the top left corner -->
 </placement>
 
 <theme>
@@ -282,9 +285,6 @@
       <action name="Focus"/>
       <action name="Raise"/>
     </mousebind>
-    <mousebind button="Left" action="Click">
-      <action name="Unshade"/>
-    </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Move"/>
     </mousebind>
@@ -302,9 +302,11 @@
       <action name="Shade"/>
       <action name="FocusToBottom"/>
       <action name="Unfocus"/>
+      <action name="Lower"/>
     </mousebind>
     <mousebind button="Down" action="Click">
       <action name="Unshade"/>
+      <action name="Raise"/>
     </mousebind>
 
     <mousebind button="Right" action="Press">

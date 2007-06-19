@@ -314,20 +314,13 @@ void client_manage(Window window)
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
         (!self->session || self->session->focused) &&
-        !self->iconic &&
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
          client_search_focus_tree_full(self)) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        /* note the check against type Normal/Dialog/Utility,
-           not client_normal(self), which would also include other types.
-           in this case we want more strict rules for focus */
-        (self->type == OB_CLIENT_TYPE_NORMAL ||
-         self->type == OB_CLIENT_TYPE_UTILITY ||
-         self->type == OB_CLIENT_TYPE_DIALOG))
+        focus_valid_target(self, FALSE, TRUE, FALSE, FALSE))
     {
-        /* XXX use focus_cycle_valid_target instead... */
         activate = TRUE;
     }
 
@@ -401,25 +394,30 @@ void client_manage(Window window)
     */
     if (ob_state() == OB_STATE_RUNNING &&
         (transient ||
-         (!(self->sized & USSize) &&
+         (!(self->sized & USSize || self->positioned & USPosition) &&
           client_normal(self) &&
           !self->session)))
     {
-        /* make a copy to modify */
-        Rect a = *screen_area_monitor(self->desktop, client_monitor(self));
+        Rect placer;
+
+        RECT_SET(placer, placex, placey, placew, placeh);
+        frame_rect_to_frame(self->frame, &placer);
+
+        Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &placer);
 
         /* shrink by the frame's area */
-        a.width -= self->frame->size.left + self->frame->size.right;
-        a.height -= self->frame->size.top + self->frame->size.bottom;
+        a->width -= self->frame->size.left + self->frame->size.right;
+        a->height -= self->frame->size.top + self->frame->size.bottom;
 
         /* fit the window inside the area */
-        if (placew > a.width || self->area.height > a.height) {
-            placew = MIN(self->area.width, a.width);
-            placeh = MIN(self->area.height, a.height);
+        if (placew > a->width || self->area.height > a->height) {
+            placew = MIN(self->area.width, a->width);
+            placeh = MIN(self->area.height, a->height);
 
             ob_debug("setting window size to %dx%d\n",
                      self->area.width, self->area.height);
         }
+        g_free(a);
     }
 
 
@@ -924,15 +922,14 @@ void client_move_onscreen(ObClient *self, gboolean rude)
 gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
                               gboolean rude)
 {
-    Rect *mon_a, *all_a;
     gint ox = *x, oy = *y;
     gboolean rudel = rude, ruder = rude, rudet = rude, rudeb = rude;
     gint fw, fh;
     Rect desired;
+    guint i;
 
     RECT_SET(desired, *x, *y, w, h);
-    all_a = screen_area(self->desktop);
-    mon_a = screen_area_monitor(self->desktop, screen_find_monitor(&desired));
+    frame_rect_to_frame(self->frame, &desired);
 
     /* get where the frame would be */
     frame_client_gravity(self->frame, x, y, w, h);
@@ -941,30 +938,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     fw = self->frame->size.left + w + self->frame->size.right;
     fh = self->frame->size.top + h + self->frame->size.bottom;
 
-    /* This makes sure windows aren't entirely outside of the screen so you
-       can't see them at all.
-       It makes sure 10% of the window is on the screen at least. At don't let
-       it move itself off the top of the screen, which would hide the titlebar
-       on you. (The user can still do this if they want too, it's only limiting
-       the application.
-
-       XXX watch for xinerama dead areas...
-    */
-    if (client_normal(self)) {
-        if (!self->strut.right && *x + fw/10 >= all_a->x + all_a->width - 1)
-            *x = all_a->x + all_a->width - fw/10;
-        if (!self->strut.bottom && *y + fh/10 >= all_a->y + all_a->height - 1)
-            *y = all_a->y + all_a->height - fh/10;
-        if (!self->strut.left && *x + fw*9/10 - 1 < all_a->x)
-            *x = all_a->x - fw*9/10;
-        if (!self->strut.top && *y + fh*9/10 - 1 < all_a->y)
-            *y = all_a->y - fw*9/10;
-    }
-
-    /* If rudeness wasn't requested, then figure out of the client is currently
-       entirely on the screen. If it is, and the position isn't changing by
-       request, and it is enlarging, then be rude even though it wasn't
-       requested */
+    /* If rudeness wasn't requested, then still be rude in a given direction
+       if the client is not moving, only resizing in that direction */
     if (!rude) {
         Point oldtl, oldtr, oldbl, oldbr;
         Point newtl, newtr, newbl, newbr;
@@ -1001,19 +976,48 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             rudeb = TRUE;
     }
 
-    /* This here doesn't let windows even a pixel outside the struts/screen.
-     * When called from client_manage, programs placing themselves are
-     * forced completely onscreen, while things like
-     * xterm -geometry resolution-width/2 will work fine. Trying to
-     * place it completely offscreen will be handled in the above code.
-     * Sorry for this confused comment, i am tired. */
-    if (rudel && !self->strut.left && *x < mon_a->x) *x = mon_a->x;
-    if (ruder && !self->strut.right && *x + fw > mon_a->x + mon_a->width)
-        *x = mon_a->x + MAX(0, mon_a->width - fw);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *a;
 
-    if (rudet && !self->strut.top && *y < mon_a->y) *y = mon_a->y;
-    if (rudeb && !self->strut.bottom && *y + fh > mon_a->y + mon_a->height)
-        *y = mon_a->y + MAX(0, mon_a->height - fh);
+        if (!screen_physical_area_monitor_contains(i, &desired))
+            continue;
+
+        a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
+
+        /* This makes sure windows aren't entirely outside of the screen so you
+           can't see them at all.
+           It makes sure 10% of the window is on the screen at least. At don't
+           let it move itself off the top of the screen, which would hide the
+           titlebar on you. (The user can still do this if they want too, it's
+           only limiting the application.
+        */
+        if (client_normal(self)) {
+            if (!self->strut.right && *x + fw/10 >= a->x + a->width - 1)
+                *x = a->x + a->width - fw/10;
+            if (!self->strut.bottom && *y + fh/10 >= a->y + a->height - 1)
+                *y = a->y + a->height - fh/10;
+            if (!self->strut.left && *x + fw*9/10 - 1 < a->x)
+                *x = a->x - fw*9/10;
+            if (!self->strut.top && *y + fh*9/10 - 1 < a->y)
+                *y = a->y - fw*9/10;
+        }
+
+        /* This here doesn't let windows even a pixel outside the
+           struts/screen. When called from client_manage, programs placing
+           themselves are forced completely onscreen, while things like
+           xterm -geometry resolution-width/2 will work fine. Trying to
+           place it completely offscreen will be handled in the above code.
+           Sorry for this confused comment, i am tired. */
+        if (rudel && !self->strut.left && *x < a->x) *x = a->x;
+        if (ruder && !self->strut.right && *x + fw > a->x + a->width)
+            *x = a->x + MAX(0, a->width - fw);
+
+        if (rudet && !self->strut.top && *y < a->y) *y = a->y;
+        if (rudeb && !self->strut.bottom && *y + fh > a->y + a->height)
+            *y = a->y + MAX(0, a->height - fh);
+
+        g_free(a);
+    }
 
     /* get where the client should be */
     frame_frame_gravity(self->frame, x, y, w, h);
@@ -1745,7 +1749,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     client_change_allowed_actions(self);
 
     if (reconfig)
-        client_reconfigure(self);
+        /* force reconfigure to make sure decorations are updated */
+        client_reconfigure(self, TRUE);
 }
 
 static void client_change_allowed_actions(ObClient *self)
@@ -1801,13 +1806,6 @@ static void client_change_allowed_actions(ObClient *self)
         if (self->frame) client_maximize(self, FALSE, 0);
         else self->max_vert = self->max_horz = FALSE;
     }
-}
-
-void client_reconfigure(ObClient *self)
-{
-    client_configure(self, self->area.x, self->area.y,
-                     self->area.width, self->area.height,
-                     FALSE, TRUE);
 }
 
 void client_update_wmhints(ObClient *self)
@@ -1975,12 +1973,12 @@ void client_update_strut(ObClient *self)
     if (!got &&
         PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
         if (num == 4) {
-            const Rect *a;
+            Rect *a;
 
             got = TRUE;
 
             /* use the screen's width/height */
-            a = screen_physical_area();
+            a = screen_physical_area_all_monitors();
 
             STRUT_PARTIAL_SET(strut,
                               data[0], data[2], data[1], data[3],
@@ -1988,6 +1986,7 @@ void client_update_strut(ObClient *self)
                               a->x, a->x + a->width - 1,
                               a->y, a->y + a->height - 1,
                               a->x, a->x + a->width - 1);
+            g_free(a);
         }
         g_free(data);
     }
@@ -2085,8 +2084,11 @@ void client_update_icons(ObClient *self)
     /* set the default icon onto the window
        in theory, this could be a race, but if a window doesn't set an icon
        or removes it entirely, it's not very likely it is going to set one
-       right away afterwards */
-    if (self->nicons == 0) {
+       right away afterwards
+
+       if it has parents, then one of them will have an icon already 
+    */
+    if (self->nicons == 0 && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
         gulong *data;
 
@@ -2388,6 +2390,9 @@ gboolean client_has_parent(ObClient *self)
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
+    Rect *monitor;
+
+    monitor = screen_physical_area_monitor(client_monitor(self));
 
     if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
@@ -2401,14 +2406,14 @@ static ObStackingLayer calc_layer(ObClient *self)
               */
               (self->decorations == 0 &&
                !(self->max_horz && self->max_vert) &&
-               RECT_EQUAL(self->area,
-                          *screen_physical_area_monitor
-                          (client_monitor(self))))) &&
+               RECT_EQUAL(self->area, *monitor))) &&
              (client_focused(self) || client_search_focus_tree(self)))
         l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
     else l = OB_STACKING_LAYER_NORMAL;
+
+    g_free(monitor);
 
     return l;
 }
@@ -2610,7 +2615,7 @@ static void client_apply_startup_state(ObClient *self,
     /* if the window hasn't been configured yet, then do so now */
     if (!fullscreen && !max_vert && !max_horz) {
         self->area = oldarea;
-        client_configure(self, x, y, w, h, FALSE, TRUE);
+        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
     }
 
     /* set the desktop hint, to make sure that it always exists */
@@ -2687,7 +2692,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                           gint *logicalw, gint *logicalh,
                           gboolean user)
 {
-    Rect desired_area = {*x, *y, *w, *h};
+    Rect desired = {*x, *y, *w, *h};
+    frame_rect_to_frame(self->frame, &desired);
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
@@ -2704,7 +2710,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         Rect *a;
         guint i;
 
-        i = screen_find_monitor(&desired_area);
+        i = screen_find_monitor(&desired);
         a = screen_physical_area_monitor(i);
 
         *x = a->x;
@@ -2714,12 +2720,16 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
                          is fullscreening */
+
+        g_free(a);
     } else if (self->max_horz || self->max_vert) {
         Rect *a;
         guint i;
 
-        i = screen_find_monitor(&desired_area);
-        a = screen_area_monitor(self->desktop, i);
+        /* use all possible struts when maximizing to the full screen */
+        i = screen_find_monitor(&desired);
+        a = screen_area(self->desktop, i,
+                        (self->max_horz && self->max_vert ? NULL : &desired));
 
         /* set the size and position if maximized */
         if (self->max_horz) {
@@ -2733,6 +2743,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
                          is maximizing */
+
+        g_free(a);
     }
 
     /* gets the client's position */
@@ -2741,7 +2753,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
         gint basew, baseh, minw, minh;
-        gint incw, inch, minratio, maxratio;
+        gint incw, inch;
+        gfloat minratio, maxratio;
 
         incw = self->fullscreen || self->max_horz ? 1 : self->size_inc.width;
         inch = self->fullscreen || self->max_vert ? 1 : self->size_inc.height;
@@ -2845,11 +2858,11 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
 
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
-                      gboolean user, gboolean final)
+                      gboolean user, gboolean final, gboolean force_reply)
 {
     gint oldw, oldh;
     gboolean send_resize_client;
-    gboolean moved = FALSE, resized = FALSE;
+    gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
     gboolean fmoved, fresized;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
@@ -2898,26 +2911,20 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     }
 
     /* adjust the frame */
-    if (fmoved || fresized)
+    if (fmoved || fresized) {
+        gulong ignore_start;
+        if (!user)
+            ignore_start = event_start_ignore_all_enters();
+
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
-    /* This is kinda tricky and should not be changed.. let me explain!
+        if (!user)
+            event_end_ignore_all_enters(ignore_start);
+    }
 
-       When user = FALSE, then the request is coming from the application
-       itself, and we are more strict about when to send a synthetic
-       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
-       in this case.
-
-       When user = TRUE, then the request is coming from "us", like when we
-       maximize a window or sometihng.  In this case we are more lenient.  We
-       used to follow the same rules as above, but _Java_ Swing can't handle
-       this. So just to appease Swing, when user = TRUE, we always send
-       a synthetic ConfigureNotify to give the window its root coordinates.
-    */
-    if ((!user && !resized) || (user && final))
-    {
-        XEvent event;
-
+    if (!user || final) {
+        gint oldrx = self->root_pos.x;
+        gint oldry = self->root_pos.y;
         /* we have reset the client to 0 border width, so don't include
            it in these coords */
         POINT_SET(self->root_pos,
@@ -2925,6 +2932,27 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                   self->border_width,
                   self->frame->area.y + self->frame->size.top -
                   self->border_width);
+        if (self->root_pos.x != oldrx || self->root_pos.y != oldry)
+            rootmoved = TRUE;
+    }
+
+    /* This is kinda tricky and should not be changed.. let me explain!
+
+       When user = FALSE, then the request is coming from the application
+       itself, and we are more strict about when to send a synthetic
+       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
+       in this case (if force_reply is true)
+
+       When user = TRUE, then the request is coming from "us", like when we
+       maximize a window or something.  In this case we are more lenient.  We
+       used to follow the same rules as above, but _Java_ Swing can't handle
+       this. So just to appease Swing, when user = TRUE, we always send
+       a synthetic ConfigureNotify to give the window its root coordinates.
+    */
+    if ((!user && !resized && (rootmoved || force_reply)) ||
+        (user && final && rootmoved))
+    {
+        XEvent event;
 
         event.type = ConfigureNotify;
         event.xconfigure.display = ob_display;
@@ -3043,7 +3071,7 @@ static void client_iconify_recursive(ObClient *self,
 
             if (curdesk && self->desktop != screen_desktop &&
                 self->desktop != DESKTOP_ALL)
-                client_set_desktop(self, screen_desktop, FALSE);
+                client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
             /* this puts it after the current focused window */
             focus_order_remove(self);
@@ -3158,7 +3186,7 @@ void client_shade(ObClient *self, gboolean shade)
     client_change_state(self);
     client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
-    frame_adjust_area(self->frame, FALSE, FALSE, FALSE);
+    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 }
 
 void client_close(ObClient *self)
@@ -3216,7 +3244,8 @@ void client_hilite(ObClient *self, gboolean hilite)
 
 void client_set_desktop_recursive(ObClient *self,
                                   guint target,
-                                  gboolean donthide)
+                                  gboolean donthide,
+                                  gboolean dontraise)
 {
     guint old;
     GSList *it;
@@ -3234,28 +3263,32 @@ void client_set_desktop_recursive(ObClient *self,
         frame_adjust_state(self->frame);
         /* 'move' the window to the new desktop */
         if (!donthide)
-            client_showhide(self);
+            client_hide(self);
+        client_show(self);
         /* raise if it was not already on the desktop */
-        if (old != DESKTOP_ALL)
+        if (old != DESKTOP_ALL && !dontraise)
             stacking_raise(CLIENT_AS_WINDOW(self));
-        /* the new desktop's geometry may be different, so we may need to
-           resize, for example if we are maximized */
-        client_reconfigure(self);
         if (STRUT_EXISTS(self->strut))
             screen_update_areas();
+        else
+            /* the new desktop's geometry may be different, so we may need to
+               resize, for example if we are maximized */
+            client_reconfigure(self, FALSE);
     }
 
     /* move all transients */
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
             if (client_is_direct_child(self, it->data))
-                client_set_desktop_recursive(it->data, target, donthide);
+                client_set_desktop_recursive(it->data, target,
+                                             donthide, dontraise);
 }
 
-void client_set_desktop(ObClient *self, guint target, gboolean donthide)
+void client_set_desktop(ObClient *self, guint target,
+                        gboolean donthide, gboolean dontraise)
 {
     self = client_search_top_direct_parent(self);
-    client_set_desktop_recursive(self, target, donthide);
+    client_set_desktop_recursive(self, target, donthide, dontraise);
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
@@ -3587,7 +3620,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
         self->desktop != screen_desktop)
     {
         if (here)
-            client_set_desktop(self, screen_desktop, FALSE);
+            client_set_desktop(self, screen_desktop, FALSE, TRUE);
         else
             screen_set_desktop(self->desktop, FALSE);
     } else if (!self->frame->visible)
@@ -3654,7 +3687,7 @@ static void client_bring_windows_recursive(ObClient *self,
         if (iconic && self->iconic)
             client_iconify(self, FALSE, TRUE, FALSE);
         else
-            client_set_desktop(self, desktop, FALSE);
+            client_set_desktop(self, desktop, FALSE, FALSE);
     }
 }
 
@@ -3858,13 +3891,13 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
     gint dest, monitor_dest;
     gint my_edge_start, my_edge_end, my_offset;
     GList *it;
-    Rect *a, *monitor;
+    Rect *a, *mon;
     
     if(!client_list)
         return -1;
 
-    a = screen_area(c->desktop);
-    monitor = screen_area_monitor(c->desktop, client_monitor(c));
+    a = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS, &c->frame->area);
+    mon = screen_area(c->desktop, SCREEN_AREA_ONE_MONITOR, &c->frame->area);
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
@@ -3874,7 +3907,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         
         /* default: top of screen */
         dest = a->y + (hang ? c->frame->area.height : 0);
-        monitor_dest = monitor->y + (hang ? c->frame->area.height : 0);
+        monitor_dest = mon->y + (hang ? c->frame->area.height : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
         if (monitor_dest != dest && my_offset > monitor_dest)
@@ -3907,7 +3940,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
         /* default: bottom of screen */
         dest = a->y + a->height - (hang ? c->frame->area.height : 0);
-        monitor_dest = monitor->y + monitor->height -
+        monitor_dest = mon->y + mon->height -
                        (hang ? c->frame->area.height : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
@@ -3942,7 +3975,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
 
         /* default: leftmost egde of screen */
         dest = a->x + (hang ? c->frame->area.width : 0);
-        monitor_dest = monitor->x + (hang ? c->frame->area.width : 0);
+        monitor_dest = mon->x + (hang ? c->frame->area.width : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
         if (monitor_dest != dest && my_offset > monitor_dest)
@@ -3975,7 +4008,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         
         /* default: rightmost edge of screen */
         dest = a->x + a->width - (hang ? c->frame->area.width : 0);
-        monitor_dest = monitor->x + monitor->width -
+        monitor_dest = mon->x + mon->width -
                        (hang ? c->frame->area.width : 0);
         /* if the monitor edge comes before the screen edge, */
         /* use that as the destination instead. (For xinerama) */
@@ -4011,6 +4044,9 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
         g_assert_not_reached();
         dest = 0; /* suppress warning */
     }
+
+    g_free(a);
+    g_free(mon);
     return dest;
 }
 

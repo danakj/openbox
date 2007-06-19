@@ -23,6 +23,7 @@
 #include "grab.h"
 #include "client.h"
 #include "config.h"
+#include "group.h"
 #include "focus_cycle.h"
 #include "screen.h"
 #include "prop.h"
@@ -126,7 +127,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            backup fallback though)
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
-            focus_cycle_target_valid(c, FALSE, FALSE, FALSE, FALSE) &&
+            focus_valid_target(c, FALSE, FALSE, FALSE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -145,7 +146,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (focus_cycle_target_valid(c, FALSE, FALSE, FALSE, TRUE) &&
+        if (focus_valid_target(c, FALSE, FALSE, FALSE, TRUE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -267,3 +268,92 @@ ObClient *focus_order_find_first(guint desktop)
     }
     return NULL;
 }
+
+/*! Returns if a focus target has valid group siblings that can be cycled
+  to in its place */
+static gboolean focus_target_has_siblings(ObClient *ft,
+                                          gboolean iconic_windows,
+                                          gboolean all_desktops)
+                                                         
+{
+    GSList *it;
+
+    if (!ft->group) return FALSE;
+
+    for (it = ft->group->members; it; it = g_slist_next(it)) {
+        ObClient *c = it->data;
+        /* check that it's not a helper window to avoid infinite recursion */
+        if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
+            focus_valid_target(c, iconic_windows, all_desktops, FALSE, FALSE))
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+gboolean focus_valid_target(ObClient *ft,
+                            gboolean iconic_windows,
+                            gboolean all_desktops,
+                            gboolean dock_windows,
+                            gboolean desktop_windows)
+{
+    gboolean ok = FALSE;
+
+    /* it's on this desktop unless you want all desktops.
+
+       do this check first because it will usually filter out the most
+       windows */
+    ok = (all_desktops || ft->desktop == screen_desktop ||
+          ft->desktop == DESKTOP_ALL);
+
+    /* the window can receive focus somehow */
+    ok = ok && (ft->can_focus || ft->focus_notify);
+
+    /* the window is not iconic, or we're allowed to go to iconic ones */
+    ok = ok && (iconic_windows || !ft->iconic);
+
+    /* it's the right type of window */
+    if (dock_windows || desktop_windows)
+        ok = ok && ((dock_windows && ft->type == OB_CLIENT_TYPE_DOCK) ||
+                    (desktop_windows && ft->type == OB_CLIENT_TYPE_DESKTOP));
+    /* modal windows are important and can always get focus if they are
+       visible and stuff, so don't change 'ok' based on their type */ 
+    else if (!ft->modal)
+        /* normal non-helper windows are valid targets */
+        ok = ok &&
+            ((client_normal(ft) && !client_helper(ft))
+             ||
+             /* helper windows are valid targets if... */
+             (client_helper(ft) &&
+              /* ...a window in its group already has focus ... */
+              ((focus_client && ft->group == focus_client->group) ||
+               /* ... or if there are no other windows in its group 
+                  that can be cycled to instead */
+               !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
+
+    /* it's not set to skip the taskbar (unless it is a type that would be
+       expected to set this hint, or modal) */
+    ok = ok && ((ft->type == OB_CLIENT_TYPE_DOCK ||
+                 ft->type == OB_CLIENT_TYPE_DESKTOP ||
+                 ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+                 ft->type == OB_CLIENT_TYPE_MENU ||
+                 ft->type == OB_CLIENT_TYPE_UTILITY) ||
+                ft->modal ||
+                !ft->skip_taskbar);
+
+    /* it's not going to just send focus off somewhere else (modal window),
+       unless that modal window is not one of our valid targets, then let
+       you choose this window and bring the modal one here */
+    {
+        ObClient *cft = client_focus_target(ft);
+        ok = ok && (ft == cft || !focus_valid_target(cft,
+                                                     iconic_windows,
+                                                     all_desktops,
+                                                     dock_windows,
+                                                     desktop_windows));
+    }
+
+    return ok;
+}
+

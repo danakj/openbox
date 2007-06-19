@@ -94,19 +94,29 @@ void screen_install_colormap(struct _ObClient *client, gboolean install);
 
 void screen_update_areas();
 
-Rect *screen_physical_area();
+Rect *screen_physical_area_all_monitors();
 
 Rect *screen_physical_area_monitor(guint head);
 
-Rect *screen_physical_area_monitor_active();
+Rect *screen_physical_area_active();
 
-Rect *screen_area(guint desktop);
+/* doesn't include struts which the search area is already outside of when
+   'search' is not NULL */
+#define SCREEN_AREA_ALL_MONITORS ((unsigned)-1)
+#define SCREEN_AREA_ONE_MONITOR  ((unsigned)-2)
 
-Rect *screen_area_monitor(guint desktop, guint head);
+/*! @param head is the number of the head or one of SCREEN_AREA_ALL_MONITORS,
+           SCREEN_AREA_ONE_MONITOR
+    @param search NULL or the whole monitor(s)
+ */
+Rect* screen_area(guint desktop, guint head, Rect *search);
+
+gboolean screen_physical_area_monitor_contains(guint head, Rect *search);
 
 /*! Determines which physical monitor a rectangle is on by calculating the
     area of the part of the rectable on each monitor.  The number of the
-    monitor containing the greatest area of the rectangle is returned.*/
+    monitor containing the greatest area of the rectangle is returned.
+*/
 guint screen_find_monitor(Rect *search);
 
 /*! Sets the root cursor. This function decides which cursor to use, but you

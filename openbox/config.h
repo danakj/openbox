@@ -76,6 +76,8 @@ extern gboolean config_focus_last;
 extern gboolean config_focus_under_mouse;
 
 extern ObPlacePolicy config_place_policy;
+/*! Place windows in the center of the free area */
+extern gboolean config_place_center;
 
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */

@@ -22,7 +22,6 @@
 #include "client.h"
 #include "screen.h"
 #include "focus.h"
-#include "focus_cycle.h"
 #include "openbox.h"
 #include "window.h"
 #include "event.h"
@@ -175,11 +174,11 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     for (it = g_list_last(focus_order); it; it = g_list_previous(it)) {
         ObClient *ft = it->data;
 
-        if (focus_cycle_target_valid(ft,
-                                     iconic_windows,
-                                     all_desktops,
-                                     dock_windows,
-                                     desktop_windows))
+        if (focus_valid_target(ft,
+                               iconic_windows,
+                               all_desktops,
+                               dock_windows,
+                               desktop_windows))
         {
             gchar *text = popup_get_name(ft);
 
@@ -252,7 +251,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     const ObFocusCyclePopupTarget *newtarget;
     gint newtargetx, newtargety;
 
-    screen_area = screen_physical_area_monitor_active();
+    screen_area = screen_physical_area_active();
 
     /* get the outside margins */
     RrMargins(p->a_bg, &ml, &mt, &mr, &mb);
@@ -434,6 +433,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     RrPaint(p->a_text, p->text, textw, texth);
 
     p->last_target = newtarget;
+
+    g_free(screen_area);
 }
 
 void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
@@ -505,13 +506,14 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
         g_assert(popup.targets == NULL);
 
         /* position the popup */
-        a = screen_physical_area_monitor_active();
+        a = screen_physical_area_active();
         icon_popup_position(single_popup, CenterGravity,
                             a->x + a->width / 2, a->y + a->height / 2);
         icon_popup_height(single_popup, POPUP_HEIGHT);
         icon_popup_min_width(single_popup, POPUP_WIDTH);
         icon_popup_max_width(single_popup, MAX(a->width/3, POPUP_WIDTH));
         icon_popup_text_width(single_popup, popup.maxtextw);
+        g_free(a);
     }
 
     text = popup_get_name(c);

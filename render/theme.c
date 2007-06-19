@@ -1761,6 +1761,7 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
     gboolean ret = FALSE;
     gchar *rclass = create_class_name(rname);
     gchar *cname, *ctoname, *bcname, *icname, *hname, *sname;
+    gchar *csplitname, *ctosplitname;
     gchar *rettype;
     XrmValue retvalue;
     gint i;
@@ -1771,6 +1772,8 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
     icname = g_strconcat(rname, ".interlace.color", NULL);
     hname = g_strconcat(rname, ".highlight", NULL);
     sname = g_strconcat(rname, ".shadow", NULL);
+    csplitname = g_strconcat(rname, ".color.splitTo", NULL);
+    ctosplitname = g_strconcat(rname, ".colorTo.splitTo", NULL);
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
@@ -1797,9 +1800,46 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
             value->surface.bevel_light_adjust = i;
         if (read_int(db, sname, &i) && i >= 0 && i <= 256)
             value->surface.bevel_dark_adjust = i;
+
+        if (value->surface.grad == RR_SURFACE_SPLIT_VERTICAL) {
+            gint r, g, b;
+
+            if (!read_color(db, inst, csplitname,
+                            &value->surface.split_primary))
+            {
+                r = value->surface.primary->r;
+                r += r >> 2;
+                g = value->surface.primary->g;
+                g += g >> 2;
+                b = value->surface.primary->b;
+                b += b >> 2;
+                if (r > 0xFF) r = 0xFF;
+                if (g > 0xFF) g = 0xFF;
+                if (b > 0xFF) b = 0xFF;
+                value->surface.split_primary = RrColorNew(inst, r, g, b);
+            }
+
+            if (!read_color(db, inst, ctosplitname,
+                            &value->surface.split_secondary))
+            {
+                r = value->surface.secondary->r;
+                r += r >> 4;
+                g = value->surface.secondary->g;
+                g += g >> 4;
+                b = value->surface.secondary->b;
+                b += b >> 4;
+                if (r > 0xFF) r = 0xFF;
+                if (g > 0xFF) g = 0xFF;
+                if (b > 0xFF) b = 0xFF;
+                value->surface.split_secondary = RrColorNew(inst, r, g, b);
+            }
+        }
+
         ret = TRUE;
     }
 
+    g_free(ctosplitname);
+    g_free(csplitname);
     g_free(sname);
     g_free(hname);
     g_free(icname);

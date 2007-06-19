@@ -286,7 +286,7 @@ static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
 {
     g_assert(c);
 
-    client_set_desktop(c, e->id, FALSE);
+    client_set_desktop(c, e->id, FALSE, FALSE);
     /* the client won't even be on the screen anymore, so hide the menu */
     if (f)
         menu_frame_hide_all();

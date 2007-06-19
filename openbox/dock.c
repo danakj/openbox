@@ -94,6 +94,10 @@ void dock_startup(gboolean reconfig)
                      RrColorPixel(ob_rr_theme->osd_border_color));
     XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->obwidth);
 
+    /* Setting the window type so xcompmgr can tell what it is */
+    PROP_SET32(dock->frame, net_wm_window_type, atom,
+               prop_atoms.net_wm_window_type_dock);
+
     g_hash_table_insert(window_map, &dock->frame, dock);
     stacking_add(DOCK_AS_WINDOW(dock));
 }
@@ -214,13 +218,13 @@ void dock_remove(ObDockApp *app, gboolean reparent)
 void dock_configure()
 {
     GList *it;
-    gint spot;
+    gint hspot, vspot;
     gint gravity;
-    gint minw, minh;
+    gint l, r, t, b;
     gint strw, strh;
     Rect *a;
 
-    RrMinSize(dock->a_frame, &minw, &minh);
+    RrMargins(dock->a_frame, &l, &t, &r, &b);
 
     dock->w = dock->h = 0;
 
@@ -239,21 +243,25 @@ void dock_configure()
         }
     }
 
-    spot = (config_dock_orient == OB_ORIENTATION_HORZ ? minw : minh) / 2;
+    dock->w += l + r;
+    dock->h += t + b;
+
+    hspot = l;
+    vspot = t;
 
     /* position the apps */
     for (it = dock->dock_apps; it; it = g_list_next(it)) {
         ObDockApp *app = it->data;
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:
-            app->x = spot;
+            app->x = hspot;
             app->y = (dock->h - app->h) / 2;
-            spot += app->w;
+            hspot += app->w;
             break;
         case OB_ORIENTATION_VERT:
             app->x = (dock->w - app->w) / 2;
-            app->y = spot;
-            spot += app->h;
+            app->y = vspot;
+            vspot += app->h;
             break;
         }
 
@@ -264,7 +272,7 @@ void dock_configure()
     dock->w += ob_rr_theme->obwidth * 2;
     dock->h += ob_rr_theme->obwidth * 2;
 
-    a = screen_physical_area();
+    a = screen_physical_area_all_monitors();
 
     /* calculate position */
     if (config_dock_floating) {
@@ -435,8 +443,8 @@ void dock_configure()
             break;
         case OB_DIRECTION_NORTH:
             STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
-                              dock->x, dock->x + dock->w - 1,
-                              0, 0, 0, 0, 0, 0);
+                              0, 0, dock->x, dock->x + dock->w - 1,
+                              0, 0, 0, 0);
             break;
         case OB_DIRECTION_NORTHEAST:
             switch (config_dock_orient) {
@@ -498,9 +506,6 @@ void dock_configure()
         }
     }
 
-    dock->w += minw;
-    dock->h += minh;
-
     /* not used for actually sizing shit */
     dock->w -= ob_rr_theme->obwidth * 2;
     dock->h -= ob_rr_theme->obwidth * 2;
@@ -522,6 +527,8 @@ void dock_configure()
     dock->h += ob_rr_theme->obwidth * 2;
 
     screen_update_areas();
+
+    g_free(a);
 }
 
 void dock_app_configure(ObDockApp *app, gint w, gint h)
@@ -629,4 +636,9 @@ void dock_hide(gboolean hide)
             ob_main_loop_timeout_remove(ob_main_loop, show_timeout);
         }
     }
+}
+
+void dock_get_area(Rect *a)
+{
+    RECT_SET(*a, dock->x, dock->y, dock->w, dock->h);
 }

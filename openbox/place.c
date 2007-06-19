@@ -23,7 +23,10 @@
 #include "frame.h"
 #include "focus.h"
 #include "config.h"
+#include "dock.h"
 #include "debug.h"
+
+extern ObDock *dock;
 
 static void add_choice(guint *choice, guint mychoice)
 {
@@ -45,17 +48,17 @@ static Rect *pick_pointer_head(ObClient *c)
 
     screen_pointer_pos(&px, &py);
      
-    for (i = 0; i < screen_num_monitors; ++i) {  
-        if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
-            return screen_area_monitor(c->desktop, i);
-        }
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *monitor = screen_physical_area_monitor(i);
+        gboolean contain = RECT_CONTAINS(*monitor, px, py);
+        g_free(monitor);
+        if (contain)
+            return screen_area(c->desktop, i, NULL);
     }
     g_assert_not_reached();
 }
 
-/*! Pick a monitor to place a window on.
-  The returned array value should be freed with g_free. The areas within the
-  array should not be freed. */
+/*! Pick a monitor to place a window on. */
 static Rect **pick_head(ObClient *c)
 {
     Rect **area;
@@ -112,19 +115,23 @@ static Rect **pick_head(ObClient *c)
 
     screen_pointer_pos(&px, &py);
 
-    for (i = 0; i < screen_num_monitors; i++)
-        if (RECT_CONTAINS(*screen_physical_area_monitor(i), px, py)) {
+    for (i = 0; i < screen_num_monitors; i++) {
+        Rect *monitor = screen_physical_area_monitor(i);
+        gboolean contain = RECT_CONTAINS(*monitor, px, py);
+        g_free(monitor);
+        if (contain) {
             add_choice(choice, i);
             ob_debug("placement adding choice %d for mouse pointer\n", i);
             break;
         }
+    }
 
     /* add any leftover choices */
     for (i = 0; i < screen_num_monitors; ++i)
         add_choice(choice, i);
 
     for (i = 0; i < screen_num_monitors; ++i)
-        area[i] = screen_area_monitor(c->desktop, choice[i]);
+        area[i] = screen_area(c->desktop, choice[i], NULL);
 
     return area;
 }
@@ -148,6 +155,8 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     if (b > t) *y = g_random_int_range(t, b + 1);
     else       *y = areas[i]->y;
 
+    for (i = 0; i < screen_num_monitors; ++i)
+        g_free(areas[i]);
     g_free(areas);
 
     return TRUE;
@@ -214,14 +223,15 @@ static GSList* area_remove(GSList *list, Rect *a)
 }
 
 enum {
-    IGNORE_FULLSCREEN = 1 << 0,
-    IGNORE_MAXIMIZED  = 1 << 1,
-    IGNORE_MENUTOOL   = 1 << 2,
-    /*IGNORE_SHADED     = 1 << 3,*/
-    IGNORE_NONGROUP   = 1 << 3,
-    IGNORE_BELOW      = 1 << 4,
-    IGNORE_NONFOCUS   = 1 << 5,
-    IGNORE_END        = 1 << 6
+    IGNORE_FULLSCREEN = 1,
+    IGNORE_MAXIMIZED  = 2,
+    IGNORE_MENUTOOL   = 3,
+    /*IGNORE_SHADED     = 3,*/
+    IGNORE_NONGROUP   = 4,
+    IGNORE_BELOW      = 5,
+    /*IGNORE_NONFOCUS   = 1 << 5,*/
+    IGNORE_DOCK       = 6,
+    IGNORE_END        = 7
 };
 
 static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
@@ -231,6 +241,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     gboolean ret;
     gint maxsize;
     GSList *spaces = NULL, *sit, *maxit;
+    guint i;
 
     areas = pick_head(c);
     ret = FALSE;
@@ -238,7 +249,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     maxit = NULL;
 
     /* try ignoring different things to find empty space */
-    for (ignore = 0; ignore < IGNORE_END && !ret; ignore = (ignore << 1) + 1) {
+    for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
         guint i;
 
         /* try all monitors in order of preference */
@@ -267,29 +278,36 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                     test->type == OB_CLIENT_TYPE_DESKTOP) continue;
 
 
-                if ((ignore & IGNORE_FULLSCREEN) &&
+                if ((ignore >= IGNORE_FULLSCREEN) &&
                     test->fullscreen) continue;
-                if ((ignore & IGNORE_MAXIMIZED) &&
+                if ((ignore >= IGNORE_MAXIMIZED) &&
                     test->max_horz && test->max_vert) continue;
-                if ((ignore & IGNORE_MENUTOOL) &&
+                if ((ignore >= IGNORE_MENUTOOL) &&
                     (test->type == OB_CLIENT_TYPE_MENU ||
                      test->type == OB_CLIENT_TYPE_TOOLBAR) &&
                     client_has_parent(c)) continue;
                 /*
-                if ((ignore & IGNORE_SHADED) &&
+                if ((ignore >= IGNORE_SHADED) &&
                     test->shaded) continue;
                 */
-                if ((ignore & IGNORE_NONGROUP) &&
+                if ((ignore >= IGNORE_NONGROUP) &&
                     client_has_group_siblings(c) &&
                     test->group != c->group) continue;
-                if ((ignore & IGNORE_BELOW) &&
+                if ((ignore >= IGNORE_BELOW) &&
                     test->layer < c->layer) continue;
-                if ((ignore & IGNORE_NONFOCUS) &&
+                /*
+                if ((ignore >= IGNORE_NONFOCUS) &&
                     focus_client != test) continue;
-
+                */
                 /* don't ignore this window, so remove it from the available
                    area */
                 spaces = area_remove(spaces, &test->frame->area);
+            }
+
+            if (ignore < IGNORE_DOCK) {
+                Rect a;
+                dock_get_area(&a);
+                spaces = area_remove(spaces, &a);
             }
 
             for (sit = spaces; sit; sit = g_slist_next(sit)) {
@@ -308,8 +326,12 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                 Rect *r = maxit->data;
 
                 /* center it in the area */
-                *x = r->x + (r->width - c->frame->area.width) / 2;
-                *y = r->y + (r->height - c->frame->area.height) / 2;
+                *x = r->x;
+                *y = r->y;
+                if (config_place_center) {
+                    *x += (r->width - c->frame->area.width) / 2;
+                    *y += (r->height - c->frame->area.height) / 2;
+                }
                 ret = TRUE;
             }
 
@@ -320,6 +342,8 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
         }
     }
 
+    for (i = 0; i < screen_num_monitors; ++i)
+        g_free(areas[i]);
     g_free(areas);
     return ret;
 }
@@ -360,13 +384,18 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
         screen = pick_pointer_head(client);
     else if (settings->monitor > 0 &&
              (guint)settings->monitor <= screen_num_monitors)
-        screen = screen_area_monitor(client->desktop,
-                                     (guint)settings->monitor - 1);
+        screen = screen_area(client->desktop, (guint)settings->monitor - 1,
+                             NULL);
     else {
-        Rect **all = NULL;
-        all = pick_head(client);
-        screen = all[0];
-        g_free(all); /* the areas themselves don't need to be freed */
+        Rect **areas;
+        guint i;
+
+        areas = pick_head(client);
+        screen = areas[0];
+
+        for (i = 0; i < screen_num_monitors; ++i)
+            g_free(areas[i]);
+        g_free(areas);
     }
 
     if (settings->center_x)
@@ -422,12 +451,15 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         client->type == OB_CLIENT_TYPE_SPLASH)
     {
         Rect **areas;
+        guint i;
 
         areas = pick_head(client);
 
         *x = (areas[0]->width - client->frame->area.width) / 2 + areas[0]->x;
         *y = (areas[0]->height - client->frame->area.height) / 2 + areas[0]->y;
 
+        for (i = 0; i < screen_num_monitors; ++i)
+            g_free(areas[i]);
         g_free(areas);
         return TRUE;
     }
@@ -450,7 +482,6 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
         place_nooverlap(client, x, y) ||
-        place_under_mouse(client, x, y) ||
         place_random(client, x, y);
     g_assert(ret);
 

@@ -241,6 +241,20 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
                                       spo->bevel_light->b);
     else spc->bevel_light = NULL;
 
+    if (spo->split_primary != NULL)
+        spc->split_primary = RrColorNew(copy->inst,
+                                        spo->split_primary->r,
+                                        spo->split_primary->g,
+                                        spo->split_primary->b);
+    else spc->split_primary = NULL;
+
+    if (spo->split_secondary != NULL)
+        spc->split_secondary = RrColorNew(copy->inst,
+                                        spo->split_secondary->r,
+                                        spo->split_secondary->g,
+                                        spo->split_secondary->b);
+    else spc->split_secondary = NULL;
+
     spc->interlaced = spo->interlaced;
     spc->bevel_light_adjust = spo->bevel_light_adjust;
     spc->bevel_dark_adjust = spo->bevel_dark_adjust;
@@ -284,6 +298,8 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->interlace_color);
         RrColorFree(p->bevel_dark);
         RrColorFree(p->bevel_light);
+        RrColorFree(p->split_primary);
+        RrColorFree(p->split_secondary);
         g_free(p->pixel_data);
         p->pixel_data = NULL;
         g_free(a);

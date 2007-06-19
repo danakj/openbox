@@ -470,6 +470,16 @@ void setup_action_showmenu(ObAction **a, ObUserAction uact)
     }
 }
 
+void setup_action_addremove_desktop_current(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.addremovedesktop.current = TRUE;
+}
+
+void setup_action_addremove_desktop_last(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.addremovedesktop.current = FALSE;
+}
+
 void setup_action_focus(ObAction **a, ObUserAction uact)
 {
     (*a)->data.any.client_action = OB_CLIENT_ACTION_OPTIONAL;
@@ -926,6 +936,26 @@ ActionString actionstrings[] =
         "breakchroot",
         action_break_chroot,
         NULL
+    },
+    {
+        "adddesktoplast",
+        action_add_desktop,
+        setup_action_addremove_desktop_last
+    },
+    {
+        "removedesktoplast",
+        action_remove_desktop,
+        setup_action_addremove_desktop_last
+    },
+    {
+        "adddesktopcurrent",
+        action_add_desktop,
+        setup_action_addremove_desktop_current
+    },
+    {
+        "removedesktopcurrent",
+        action_remove_desktop,
+        setup_action_addremove_desktop_current
     },
     {
         NULL,
@@ -1407,7 +1437,7 @@ void action_toggle_omnipresent(union ActionData *data)
 { 
     client_set_desktop(data->client.any.c,
                        data->client.any.c->desktop == DESKTOP_ALL ?
-                       screen_desktop : DESKTOP_ALL, FALSE);
+                       screen_desktop : DESKTOP_ALL, FALSE, TRUE);
 }
 
 void action_move_relative_horz(union ActionData *data)
@@ -1430,11 +1460,12 @@ void action_move_to_center(union ActionData *data)
 {
     ObClient *c = data->client.any.c;
     Rect *area;
-    area = screen_area_monitor(c->desktop, 0);
+    area = screen_area(c->desktop, client_monitor(c), NULL);
     client_action_start(data);
-    client_move(c, area->width / 2 - c->area.width / 2,
-                area->height / 2 - c->area.height / 2);
+    client_move(c, area->x + area->width / 2 - c->area.width / 2,
+                area->y + area->height / 2 - c->area.height / 2);
     client_action_end(data, FALSE);
+    g_free(area);
 }
 
 void action_resize_relative_horz(union ActionData *data)
@@ -1580,7 +1611,7 @@ void action_send_to_desktop(union ActionData *data)
 
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, data->sendto.follow);
+        client_set_desktop(c, data->sendto.desk, data->sendto.follow, FALSE);
         if (data->sendto.follow && data->sendto.desk != screen_desktop)
             screen_set_desktop(data->sendto.desk, TRUE);
     }
@@ -1638,7 +1669,7 @@ void action_send_to_desktop_dir(union ActionData *data)
     if (!data->sendtodir.inter.any.interactive ||
         (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
     {
-        client_set_desktop(c, d, data->sendtodir.follow);
+        client_set_desktop(c, d, data->sendtodir.follow, FALSE);
         if (data->sendtodir.follow && d != screen_desktop)
             screen_set_desktop(d, TRUE);
     }
@@ -1646,7 +1677,8 @@ void action_send_to_desktop_dir(union ActionData *data)
 
 void action_desktop_last(union ActionData *data)
 {
-    screen_set_desktop(screen_last_desktop, TRUE);
+    if (screen_last_desktop < screen_num_desktops)
+        screen_set_desktop(screen_last_desktop, TRUE);
 }
 
 void action_toggle_decorations(union ActionData *data)
@@ -1897,7 +1929,7 @@ void action_growtoedge(union ActionData *data)
     ObClient *c = data->diraction.any.c;
     Rect *a;
 
-    a = screen_area(c->desktop);
+    a = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS, &c->frame->area);
     x = c->frame->area.x;
     y = c->frame->area.y;
     /* get the unshaded frame's dimensions..if it is shaded */
@@ -1956,6 +1988,7 @@ void action_growtoedge(union ActionData *data)
     client_action_start(data);
     client_move_resize(c, x, y, width, height);
     client_action_end(data, FALSE);
+    g_free(a);
 }
 
 void action_send_to_layer(union ActionData *data)
@@ -2000,4 +2033,77 @@ void action_break_chroot(union ActionData *data)
 {
     /* break out of one chroot */
     keyboard_reset_chains(1);
+}
+
+void action_add_desktop(union ActionData *data)
+{
+    client_action_start(data);
+    screen_set_num_desktops(screen_num_desktops+1);
+
+    /* move all the clients over */
+    if (data->addremovedesktop.current) {
+        GList *it;
+
+        for (it = client_list; it; it = g_list_next(it)) {
+            ObClient *c = it->data;
+            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop)
+                client_set_desktop(c, c->desktop+1, FALSE, TRUE);
+        }
+    }
+
+    client_action_end(data, config_focus_under_mouse);
+}
+
+void action_remove_desktop(union ActionData *data)
+{
+    guint rmdesktop, movedesktop;
+    GList *it, *stacking_copy;
+
+    if (screen_num_desktops < 2) return;
+
+    client_action_start(data);
+
+    /* what desktop are we removing and moving to? */
+    if (data->addremovedesktop.current)
+        rmdesktop = screen_desktop;
+    else
+        rmdesktop = screen_num_desktops - 1;
+    if (rmdesktop < screen_num_desktops - 1)
+        movedesktop = rmdesktop + 1;
+    else
+        movedesktop = rmdesktop;
+
+    /* make a copy of the list cuz we're changing it */
+    stacking_copy = g_list_copy(stacking_list);
+    for (it = g_list_last(stacking_copy); it; it = g_list_previous(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = it->data;
+            guint d = c->desktop;
+            if (d != DESKTOP_ALL && d >= movedesktop) {
+                client_set_desktop(c, c->desktop - 1, TRUE, TRUE);
+                ob_debug("moving window %s\n", c->title);
+            }
+            /* raise all the windows that are on the current desktop which
+               is being merged */
+            if ((screen_desktop == rmdesktop - 1 ||
+                 screen_desktop == rmdesktop) &&
+                (d == DESKTOP_ALL || d == screen_desktop))
+            {
+                stacking_raise(CLIENT_AS_WINDOW(c));
+                ob_debug("raising window %s\n", c->title);
+            }
+        }
+    }
+
+    /* act like we're changing desktops */
+    if (screen_desktop < screen_num_desktops - 1) {
+        gint d = screen_desktop;
+        screen_desktop = screen_last_desktop;
+        screen_set_desktop(d, TRUE);
+        ob_debug("fake desktop change\n");
+    }
+
+    screen_set_num_desktops(screen_num_desktops-1);
+
+    client_action_end(data, config_focus_under_mouse);
 }

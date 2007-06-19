@@ -337,7 +337,7 @@ gint main(gint argc, gchar **argv)
                     frame_adjust_area(c->frame, TRUE, TRUE, FALSE);
                     /* the decor sizes may have changed, so the windows may
                        end up in new positions */
-                    client_reconfigure(c);
+                    client_reconfigure(c, FALSE);
                 }
             }
 

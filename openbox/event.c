@@ -1160,7 +1160,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         {
             gint lw,lh;
-            gulong ignore_start;
 
             client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
 
@@ -1179,9 +1178,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             ob_debug("Granting ConfigureRequest x %d y %d w %d h %d\n",
                      x, y, w, h);
-            ignore_start = event_start_ignore_all_enters();
-            client_configure(client, x, y, w, h, FALSE, TRUE);
-            event_end_ignore_all_enters(ignore_start);
+            client_configure(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
         break;
     }
@@ -1264,7 +1261,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
-                                   FALSE);
+                                   FALSE, FALSE);
         } else if (msgtype == prop_atoms.net_wm_state) {
             gulong ignore_start;
 
@@ -1343,7 +1340,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 moveresize_end(TRUE);
         } else if (msgtype == prop_atoms.net_moveresize_window) {
             gint ograv, x, y, w, h;
-            gulong ignore_start;
 
             ograv = client->gravity;
 
@@ -1388,10 +1384,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            /* ignore enter events caused by these like ob actions do */
-            ignore_start = event_start_ignore_all_enters();
-            client_configure(client, x, y, w, h, FALSE, TRUE);
-            event_end_ignore_all_enters(ignore_start);
+            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE);
 
             client->gravity = ograv;
         } else if (msgtype == prop_atoms.net_restack_window) {
@@ -1434,7 +1427,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
                     /* send a synthetic ConfigureNotify, cuz this is supposed
                        to be like a ConfigureRequest. */
-                    client_reconfigure(client);
+                    client_reconfigure(client, TRUE);
                 } else
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_RESTACK_WINDOW sent for window %s "
@@ -1481,25 +1474,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         msgtype = e->xproperty.atom;
         if (msgtype == XA_WM_NORMAL_HINTS) {
-            gint x, y, w, h, lw, lh;
-
             ob_debug("Update NORMAL hints\n");
             client_update_normal_hints(client);
             /* normal hints can make a window non-resizable */
             client_setup_decor_and_functions(client, FALSE);
 
-            /* make sure the client's sizes are within its bounds */
-            RECT_TO_DIMS(client->area, x, y, w, h);
-            client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
-            if (!RECT_EQUAL_DIMS(client->area, x, y, w, h)) {
-                gulong ignore_start;
-
-                ob_debug("Configuring client x %d y %d w %d h %d\n",
-                         x, y, w, h);
-                ignore_start = event_start_ignore_all_enters();
-                client_configure(client, x, y, w, h, FALSE, TRUE);
-                event_end_ignore_all_enters(ignore_start);
-            }
+            /* make sure the client's sizes are within its bounds, but only
+               reconfigure the window if it needs to. emacs will update its
+               normal hints every time it receives a conigurenotify */
+            client_reconfigure(client, FALSE);
         } else if (msgtype == XA_WM_HINTS) {
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {

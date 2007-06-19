@@ -61,6 +61,8 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 
         /* don't snap to self or non-visibles */
         if (!target->frame->visible || target == c) continue; 
+        /* don't snap to windows set to below and skip_taskbar (desklets) */
+        if (target->below && !c->below && target->skip_taskbar) continue;
 
         tl = RECT_LEFT(target->frame->area) - 1;
         tt = RECT_TOP(target->frame->area) - 1;
@@ -123,6 +125,7 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     gint pl, pt, pr, pb; /* physical screen area edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
+    Rect desired_area;
 
     if (!resist) return;
 
@@ -140,13 +143,19 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     ct = RECT_TOP(c->frame->area);
     cr = RECT_RIGHT(c->frame->area);
     cb = RECT_BOTTOM(c->frame->area);
+
+    RECT_SET(desired_area, *x, *y, c->area.width, c->area.height);
     
     for (i = 0; i < screen_num_monitors; ++i) {
-        area = screen_area_monitor(c->desktop, i);
         parea = screen_physical_area_monitor(i);
 
-        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
+        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area)) {
+            g_free(parea);
             continue;
+        }
+
+        area = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS,
+                           &desired_area);
 
         al = RECT_LEFT(*area);
         at = RECT_TOP(*area);
@@ -174,6 +183,9 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
             *y = pt;
         else if (cb <= pb && b > pb && b < pb + resist)
             *y = pb - h + 1;
+
+        g_free(area);
+        g_free(parea);
     }
 
     frame_frame_gravity(c->frame, x, y, c->area.width, c->area.height);
@@ -207,6 +219,8 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
 
         /* don't snap to invisibles or ourself */
         if (!target->frame->visible || target == c) continue; 
+        /* don't snap to windows set to below and skip_taskbar (desklets) */
+        if (target->below && !c->below && target->skip_taskbar) continue;
 
         tl = RECT_LEFT(target->frame->area);
         tr = RECT_RIGHT(target->frame->area);
@@ -276,6 +290,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     gint pl, pt, pr, pb; /* physical screen boundaries */
     gint incw, inch;
     guint i;
+    Rect desired_area;
 
     if (!resist) return;
 
@@ -287,12 +302,18 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     incw = c->size_inc.width;
     inch = c->size_inc.height;
 
+    RECT_SET(desired_area, c->area.x, c->area.y, *w, *h);
+
     for (i = 0; i < screen_num_monitors; ++i) {
-        area = screen_area_monitor(c->desktop, i);
         parea = screen_physical_area_monitor(i);
 
-        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
+        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area)) {
+            g_free(parea);
             continue;
+        }
+
+        area = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS,
+                           &desired_area);
 
         /* get the screen boundaries */
         al = RECT_LEFT(*area);
@@ -347,5 +368,8 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
                 *h = b - pt + 1;
             break;
         }
+
+        g_free(area);
+        g_free(parea);
     }
 }

@@ -220,7 +220,7 @@ void grab_key_passive_count(int change)
 
 void ungrab_passive_key()
 {
-    ob_debug("ungrabbing %d passive grabs\n", passive_count);
+    /*ob_debug("ungrabbing %d passive grabs\n", passive_count);*/
     if (passive_count) {
         /* kill out passive grab */
         XUngrabKeyboard(ob_display, event_curtime);

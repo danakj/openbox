@@ -167,6 +167,7 @@ struct _ObFrame
     gint      cbwidth_b;     /* client border width */
     gboolean  max_horz;      /* when maxed some decorations are hidden */
     gboolean  max_vert;      /* when maxed some decorations are hidden */
+    gboolean  shaded;        /* decorations adjust when shaded */
 
     /* the leftmost and rightmost elements in the titlebar */
     ObFrameContext leftmost;
@@ -184,6 +185,7 @@ struct _ObFrame
     gboolean  iconify_hover;
 
     gboolean  focused;
+    gboolean  need_render;
 
     gboolean  flashing;
     gboolean  flash_on;
@@ -230,6 +232,10 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
     @return The proper coordinates for the client, based on the frame.
 */
 void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h);
+
+/*! Convert a rectangle in client coordinates/sizes to what it would be
+  for the frame, given its current decorations sizes */
+void frame_rect_to_frame(ObFrame *self, Rect *r);
 
 void frame_flash_start(ObFrame *self);
 void frame_flash_stop(ObFrame *self);

@@ -36,6 +36,7 @@ gboolean config_focus_last;
 gboolean config_focus_under_mouse;
 
 ObPlacePolicy config_place_policy;
+gboolean      config_place_center;
 
 gchar   *config_theme;
 gboolean config_theme_keepborder;
@@ -495,6 +496,8 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("policy", node)))
         if (parse_contains("UnderMouse", doc, n))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
+    if ((n = parse_find_node("center", node)))
+        config_place_center = parse_bool(doc, n);
 }
 
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -869,6 +872,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "focus", parse_focus, NULL);
 
     config_place_policy = OB_PLACE_POLICY_SMART;
+    config_place_center = TRUE;
 
     parse_register(i, "placement", parse_placement, NULL);
 

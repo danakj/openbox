@@ -394,7 +394,7 @@ void client_manage(Window window)
     */
     if (ob_state() == OB_STATE_RUNNING &&
         (transient ||
-         (!(self->sized & USSize) &&
+         (!(self->sized & USSize || self->positioned & USPosition) &&
           client_normal(self) &&
           !self->session)))
     {

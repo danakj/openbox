@@ -364,15 +364,6 @@ void screen_startup(gboolean reconfig)
         return;
     }
 
-#ifdef USE_XCOMPOSITE
-    if (extensions_comp) {
-        /* Redirect window contents to offscreen pixmaps */
-        XCompositeRedirectSubwindows(ob_display,
-                                     RootWindow(ob_display, ob_screen),
-                                     CompositeRedirectAutomatic);
-    }
-#endif
-
     /* get the initial size */
     screen_resize();
 
@@ -499,6 +490,9 @@ void screen_resize()
 
     for (it = client_list; it; it = g_list_next(it))
         client_move_onscreen(it->data, FALSE);
+
+    /* this needs to be setup whenever the root window's size changes */
+    composite_setup_root_window();
 }
 
 void screen_set_num_desktops(guint num)

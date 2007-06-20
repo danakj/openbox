@@ -78,6 +78,10 @@ struct _ObFrame
 
     Window    window;
 
+    Pixmap    pixmap;    /* Offscreen buffer of the frame window's contents
+                            when Composite is enabled */
+    gboolean  has_alpha;
+
     Strut     size;
     Rect      area;
     gboolean  visible;

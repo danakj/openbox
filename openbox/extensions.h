@@ -80,5 +80,5 @@ extern gint extensions_comp_event_basep;
 void extensions_query_all();
 
 void extensions_xinerama_screens(Rect **areas, guint *nxin);
-  
+
 #endif

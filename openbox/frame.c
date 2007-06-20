@@ -27,6 +27,7 @@
 #include "mainloop.h"
 #include "focus_cycle.h"
 #include "focus_cycle_indicator.h"
+#include "composite.h"
 #include "moveresize.h"
 #include "screen.h"
 #include "render/theme.h"
@@ -51,6 +52,8 @@ static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 static gboolean frame_animate_iconify(gpointer self);
 static void frame_adjust_cursors(ObFrame *self);
+static void frame_get_offscreen_buffer(ObFrame *self);
+static void frame_free_offscreen_buffer(ObFrame *self);
 
 static Window createWindow(Window parent, Visual *visual,
                            gulong mask, XSetWindowAttributes *attrib)
@@ -62,58 +65,46 @@ static Window createWindow(Window parent, Visual *visual,
                        
 }
 
-static Visual *check_32bit_client(ObClient *c)
-{
-    XWindowAttributes wattrib;
-    Status ret;
-
-    /* we're already running at 32 bit depth, yay. we don't need to use their
-       visual */
-    if (RrDepth(ob_rr_inst) == 32)
-        return NULL;
-
-    ret = XGetWindowAttributes(ob_display, c->window, &wattrib);
-    g_assert(ret != BadDrawable);
-    g_assert(ret != BadWindow);
-
-    if (wattrib.depth == 32)
-        return wattrib.visual;
-    return NULL;
-}
-
 ObFrame *frame_new(ObClient *client)
 {
     XSetWindowAttributes attrib;
     gulong mask;
     ObFrame *self;
-    Visual *visual;
+    XWindowAttributes wattrib;
+    Status ret;
 
     self = g_new0(ObFrame, 1);
     self->client = client;
 
-    visual = check_32bit_client(client);
+    ret = XGetWindowAttributes(ob_display, client->window, &wattrib);
+    g_assert(ret != BadDrawable);
+    g_assert(ret != BadWindow);
+    self->has_alpha = composite_window_has_alpha(wattrib.visual);
 
     /* create the non-visible decor windows */
 
     mask = 0;
-    if (visual) {
-        /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+    if (self->has_alpha) {
+        /* the colormap/backpixel/borderpixel are required for supporting
+           windows with 32bit visuals */
+        mask = CWColormap | CWBackPixel | CWBorderPixel;
         /* create a colormap with the visual */
         self->colormap = attrib.colormap =
             XCreateColormap(ob_display,
                             RootWindow(ob_display, ob_screen),
-                            visual, AllocNone);
+                            wattrib.visual, AllocNone);
         attrib.background_pixel = BlackPixel(ob_display, ob_screen);
         attrib.border_pixel = BlackPixel(ob_display, ob_screen);
     }
-    self->window = createWindow(RootWindow(ob_display, ob_screen), visual,
+
+    self->window = createWindow(RootWindow(ob_display, ob_screen),
+                                (self->has_alpha ? wattrib.visual : NULL),
                                 mask, &attrib);
 
     /* create the visible decor windows */
 
     mask = 0;
-    if (visual) {
+    if (self->has_alpha) {
         /* client has a 32-bit visual */
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
         attrib.colormap = RrColormap(ob_rr_inst);
@@ -240,6 +231,7 @@ void frame_free(ObFrame *self)
     XDestroyWindow(ob_display, self->window);
     if (self->colormap)
         XFreeColormap(ob_display, self->colormap);
+    frame_free_offscreen_buffer(self);
 
     g_free(self);
 }
@@ -251,6 +243,8 @@ void frame_show(ObFrame *self)
         framerender_frame(self);
         XMapWindow(ob_display, self->client->window);
         XMapWindow(ob_display, self->window);
+
+        frame_get_offscreen_buffer(self);
     }
 }
 
@@ -260,6 +254,7 @@ void frame_hide(ObFrame *self)
         self->visible = FALSE;
         if (!frame_iconify_animating(self))
             XUnmapWindow(ob_display, self->window);
+
         /* we unmap the client itself so that we can get MapRequest
            events, and because the ICCCM tells us to! */
         XUnmapWindow(ob_display, self->client->window);
@@ -317,6 +312,11 @@ void frame_adjust_shape(ObFrame *self)
                                 ShapeBounding, 0, 0, xrect, num,
                                 ShapeUnion, Unsorted);
     }
+
+    if (self->pixmap)
+        XShapeCombineShape(ob_display, self->pixmap, ShapeBounding,
+                           0, 0, self->window, ShapeBounding, ShapeSet);
+
 #endif
 }
 
@@ -788,6 +788,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             self->need_render = TRUE;
             framerender_frame(self);
             frame_adjust_shape(self);
+
+            /* the offscreen buffer is invalid when the window is resized */
+            if (self->visible)
+                frame_get_offscreen_buffer(self);
         }
 
         if (!STRUT_EQUAL(self->size, oldsize)) {
@@ -1676,6 +1680,9 @@ void frame_end_iconify_animation(ObFrame *self)
         /* Send a ConfigureNotify when the animation is done, this fixes
            KDE's pager showing the window in the wrong place. */
         client_reconfigure(self->client, TRUE);
+
+        /* the offscreen buffer is invalid when the window is resized */
+        frame_get_offscreen_buffer(self);
     }
 
     /* we're not animating any more ! */
@@ -1738,5 +1745,28 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
         /* show it during the animation even if it is not "visible" */
         if (!self->visible)
             XMapWindow(ob_display, self->window);
+    }
+}
+
+static void frame_get_offscreen_buffer(ObFrame *self)
+{
+    frame_free_offscreen_buffer(self);
+
+    if (self->visible || frame_iconify_animating(self)) {
+        self->pixmap = composite_get_window_pixmap(self->window);
+        /*
+          self->picture = composite_create_picture(self->window,
+          wattrib.visual,
+          &self->has_alpha);
+        */
+    }
+
+}
+
+static void frame_free_offscreen_buffer(ObFrame *self)
+{
+    if (self->pixmap) {
+        XFreePixmap(ob_display, self->pixmap);
+        self->pixmap = None;
     }
 }

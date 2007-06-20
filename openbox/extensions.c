@@ -84,11 +84,19 @@ void extensions_query_all()
 #endif
 
 #ifdef USE_XCOMPOSITE
-    extensions_comp =
-        XRRQueryExtension(ob_display, &extensions_comp_event_basep,
-                          &junk);
+    if (XCompositeQueryExtension(ob_display, &extensions_comp_event_basep,
+                                 &junk))
+    {
+        gint major = 0, minor = 2;
+        XCompositeQueryVersion(ob_display, &major, &minor);
+        /* Version 0.2 is the first version to have the
+           XCompositeNameWindowPixmap() request. */
+        if (major > 0 || minor >= 2)
+            extensions_comp = TRUE;
+    }
     if (!extensions_comp)
-        ob_debug("X Composite extension is not present on the server\n");
+        ob_debug("X Composite extension is not present on the server or is an "
+                 "incompatible version\n");
 #endif
 }
 
@@ -138,3 +146,10 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
     }
     RECT_SET((*xin_areas)[*nxin], l, t, r - l + 1, b - t + 1);
 }
+
+#ifdef USE_XCOMPOSITE
+Picture extensions_create_composite_picture(Window win, Visual *vis,
+                                            gboolean *has_alpha)
+{
+}
+#endif

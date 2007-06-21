@@ -288,6 +288,12 @@ void frame_adjust_shape(ObFrame *self)
                            self->client->window,
                            ShapeBounding, ShapeSet);
 
+        /* shape the offscreen buffer to match the window */
+        if (self->pixmap)
+            XShapeCombineShape(ob_display, self->pixmap, ShapeBounding,
+                               0, 0, self->client->window,
+                               ShapeBounding, ShapeSet);
+
         num = 0;
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
             xrect[0].x = 0;
@@ -312,10 +318,6 @@ void frame_adjust_shape(ObFrame *self)
                                 ShapeBounding, 0, 0, xrect, num,
                                 ShapeUnion, Unsorted);
     }
-
-    if (self->pixmap)
-        XShapeCombineShape(ob_display, self->pixmap, ShapeBounding,
-                           0, 0, self->window, ShapeBounding, ShapeSet);
 
 #endif
 }
@@ -922,6 +924,9 @@ void frame_grab_client(ObFrame *self)
 
     /* reparent the client to the frame */
     XReparentWindow(ob_display, self->client->window, self->window, 0, 0);
+
+    /* enable the offscreen composite buffer for the client window */
+    composite_enable_for_window(self->client->window);
 
     /*
       When reparenting the client window, it is usually not mapped yet, since
@@ -1754,7 +1759,7 @@ static void frame_get_offscreen_buffer(ObFrame *self)
     frame_free_offscreen_buffer(self);
 
     if (self->visible || frame_iconify_animating(self)) {
-        self->pixmap = composite_get_window_pixmap(self->window);
+        self->pixmap = composite_get_window_pixmap(self->client->window);
         /*
           self->picture = composite_create_picture(self->window,
           wattrib.visual,

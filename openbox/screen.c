@@ -27,6 +27,7 @@
 #include "moveresize.h"
 #include "config.h"
 #include "screen.h"
+#include "composite.h"
 #include "client.h"
 #include "session.h"
 #include "frame.h"

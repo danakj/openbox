@@ -8,6 +8,8 @@ void composite_shutdown(gboolean reconfig) {}
 gboolean composite_window_has_alpha(Visual *vis) { return FALSE; }
 XID composite_get_window_picture(Window win, Visual *vis) { return None; }
 Pixmap composite_get_window_pixmap(Window win) { return None; }
+void composite_setup_root_window() {}
+void composite_enable_for_window(Window win) {}
 #else
 
 static Picture root_picture = None;
@@ -16,13 +18,6 @@ void composite_startup(gboolean reconfig)
 {
     if (reconfig) return;
     if (!extensions_comp) return;
-
-    /* Redirect window contents to offscreen pixmaps */
-/*
-    XCompositeRedirectSubwindows(ob_display,
-                                 RootWindow(ob_display, ob_screen),
-                                 CompositeRedirectAutomatic);
-*/
 }
 
 void composite_shutdown(gboolean reconfig)
@@ -69,6 +64,12 @@ Pixmap composite_get_window_pixmap(Window win)
     if (!extensions_comp) return None;
 
     return XCompositeNameWindowPixmap(ob_display, win);
+}
+
+void composite_enable_for_window(Window win)
+{
+    /* Redirect window contents to offscreen pixmaps */
+    XCompositeRedirectWindow(ob_display, win, CompositeRedirectAutomatic);
 }
 
 #endif

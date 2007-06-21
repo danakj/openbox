@@ -397,7 +397,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
            they can pick up the hilite changes in the backgroud */
         if (!p->mapped || newtarget == target || p->last_target == target) {
             const ObClientIcon *icon;
-            ObClientIcon *thumb;
             const gint row = i / icons_per_row; /* starting from 0 */
             const gint col = i % icons_per_row; /* starting from 0 */
             gint innerx, innery;
@@ -413,27 +412,17 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               innerx, innery, innerw, innerh);
 
             /* get the icon from the client */
-            if ((thumb = client_thumbnail(target->client, innerw, innerh))) {
-                p->a_icon->texture[0].data.rgba.width = thumb->width;
-                p->a_icon->texture[0].data.rgba.height = thumb->height;
-                p->a_icon->texture[0].data.rgba.alpha =
-                    target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
-                p->a_icon->texture[0].data.rgba.data = thumb->data;
-            } else {
-                icon = client_icon(target->client, innerw, innerh);
-                p->a_icon->texture[0].data.rgba.width = icon->width;
-                p->a_icon->texture[0].data.rgba.height = icon->height;
-                p->a_icon->texture[0].data.rgba.alpha =
-                    target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
-                p->a_icon->texture[0].data.rgba.data = icon->data;
-            }
+            icon = client_icon(target->client, innerw, innerh);
+            p->a_icon->texture[0].data.rgba.width = icon->width;
+            p->a_icon->texture[0].data.rgba.height = icon->height;
+            p->a_icon->texture[0].data.rgba.alpha =
+                target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
+            p->a_icon->texture[0].data.rgba.data = icon->data;
 
             /* draw the icon */
             p->a_icon->surface.parentx = innerx;
             p->a_icon->surface.parenty = innery;
             RrPaint(p->a_icon, target->win, innerw, innerh);
-
-            clienticon_free(thumb);
         }
     }
 

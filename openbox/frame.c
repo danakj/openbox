@@ -51,6 +51,7 @@ static void layout_title(ObFrame *self);
 static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 static gboolean frame_animate_iconify(gpointer self);
+static void frame_adjust_shape(ObFrame *self);
 static void frame_adjust_cursors(ObFrame *self);
 static void frame_get_offscreen_buffer(ObFrame *self);
 static void frame_free_offscreen_buffer(ObFrame *self);
@@ -313,9 +314,6 @@ void frame_adjust_shape(ObFrame *self)
                                 ShapeUnion, Unsorted);
     }
 #endif
-
-    /* the offscreen buffer's shape needs to match */
-    frame_get_offscreen_buffer(self);
 }
 
 void frame_adjust_area(ObFrame *self, gboolean moved,
@@ -786,8 +784,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (resized) {
             self->need_render = TRUE;
             framerender_frame(self);
-            /* this also updates the offscreen buffer */
             frame_adjust_shape(self);
+
+            /* the offscreen buffer's shape needs to match */
+            frame_get_offscreen_buffer(self);
         }
 
         if (!STRUT_EQUAL(self->size, oldsize)) {

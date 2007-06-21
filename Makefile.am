@@ -154,8 +154,6 @@ openbox_openbox_LDADD = \
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
 	gettext.h \
-	openbox/action.c \
-	openbox/action.h \
 	openbox/actions.c \
 	openbox/actions.h \
 	openbox/client.c \

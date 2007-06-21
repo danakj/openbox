@@ -20,10 +20,10 @@
 #include "config.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "actions.h"
 #include "prop.h"
 #include "translate.h"
 #include "client.h"
-#include "actions.h"
 #include "screen.h"
 #include "parser/parse.h"
 #include "openbox.h"
@@ -358,7 +358,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
     else if ((n = parse_find_node("action", node->children))) {
         while (n) {
-            ObActionsDefinition *action;
+            ObActionsAct *action;
             
             action = actions_parse(i, doc, n);
             if (action)
@@ -412,9 +412,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
     gchar *contextstr;
-    ObUserAction uact;
     ObMouseAction mact;
-    ObAction *action;
 
     mouse_unbind_all();
 
@@ -434,25 +432,22 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             if (!parse_attr_string("button", nbut, &buttonstr))
                 goto next_nbut;
             if (parse_attr_contains("press", nbut, "action")) {
-                uact = OB_USER_ACTION_MOUSE_PRESS;
                 mact = OB_MOUSE_ACTION_PRESS;
             } else if (parse_attr_contains("release", nbut, "action")) {
-                uact = OB_USER_ACTION_MOUSE_RELEASE;
                 mact = OB_MOUSE_ACTION_RELEASE;
             } else if (parse_attr_contains("click", nbut, "action")) {
-                uact = OB_USER_ACTION_MOUSE_CLICK;
                 mact = OB_MOUSE_ACTION_CLICK;
             } else if (parse_attr_contains("doubleclick", nbut,"action")) {
-                uact = OB_USER_ACTION_MOUSE_DOUBLE_CLICK;
                 mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
             } else if (parse_attr_contains("drag", nbut, "action")) {
-                uact = OB_USER_ACTION_MOUSE_MOTION;
                 mact = OB_MOUSE_ACTION_MOTION;
             } else
                 goto next_nbut;
             nact = parse_find_node("action", nbut->children);
             while (nact) {
-                if ((action = action_parse(i, doc, nact, uact)))
+                ObActionsAct *action;
+
+                if ((action = actions_parse(i, doc, nact)))
                     mouse_bind(buttonstr, contextstr, mact, action);
                 nact = parse_find_node("action", nact->next);
             }
@@ -777,8 +772,8 @@ static void bind_default_keyboard()
 
     for (it = binds; it->key; ++it) {
         GList *l = g_list_append(NULL, g_strdup(it->key));
-        keyboard_bind(l, action_from_string(it->actname,
-                                            OB_USER_ACTION_KEYBOARD_KEY));
+        keyboard_bind(l, actions_parse_string(it->actname));
+        g_list_free(l);
     }
 }
 
@@ -840,25 +835,9 @@ static void bind_default_mouse()
         { NULL, NULL, 0, NULL }
     };
 
-    for (it = binds; it->button; ++it) {
-        ObUserAction uact;
-        switch (it->mact) {
-        case OB_MOUSE_ACTION_PRESS:
-            uact = OB_USER_ACTION_MOUSE_PRESS; break;
-        case OB_MOUSE_ACTION_RELEASE:
-            uact = OB_USER_ACTION_MOUSE_RELEASE; break;
-        case OB_MOUSE_ACTION_CLICK:
-            uact = OB_USER_ACTION_MOUSE_CLICK; break;
-        case OB_MOUSE_ACTION_DOUBLE_CLICK:
-            uact = OB_USER_ACTION_MOUSE_DOUBLE_CLICK; break;
-        case OB_MOUSE_ACTION_MOTION:
-            uact = OB_USER_ACTION_MOUSE_MOTION; break;
-        default:
-            g_assert_not_reached();
-        }
+    for (it = binds; it->button; ++it)
         mouse_bind(it->button, it->context, it->mact,
-                   action_from_string(it->actname, uact));
-    }
+                   actions_parse_string(it->actname));
 }
 
 void config_startup(ObParseInst *i)

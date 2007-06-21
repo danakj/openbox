@@ -106,6 +106,7 @@ gboolean actions_register(const gchar *name,
 ObActionsAct* actions_parse(ObParseInst *i,
                             xmlDocPtr doc,
                             xmlNodePtr node);
+ObActionsAct* actions_parse_string(const gchar *name);
 
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);

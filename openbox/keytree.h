@@ -19,8 +19,6 @@
 #ifndef __plugin_keyboard_tree_h
 #define __plugin_keyboard_tree_h
 
-#include "action.h"
-
 #include <glib.h>
 
 typedef struct KeyBindingTree {

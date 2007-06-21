@@ -100,36 +100,48 @@ static void actions_definition_unref(ObActionsDefinition *def)
     }
 }
 
-ObActionsAct* actions_parse(ObParseInst *i,
-                            xmlDocPtr doc,
-                            xmlNodePtr node)
+ObActionsAct* actions_parse_string(const gchar *name)
 {
     GSList *it;
-    gchar *name;
     ObActionsDefinition *def;
     ObActionsAct *act = NULL;
-
-    if (!parse_attr_string("name", node, &name)) return NULL;
 
     /* find the requested action */
     for (it = registered; it; it = g_slist_next(it)) {
         def = it->data;
         if (!g_ascii_strcasecmp(name, def->name))
             break;
+        def = NULL;
     }
 
     /* if we found the action */
-    if (it != NULL) {
+    if (def) {
         act = g_new(ObActionsAct, 1);
         act->ref = 1;
         act->def = def;
         actions_definition_ref(act->def);
-        act->options = def->setup(i, doc, node->children);
+        act->options = NULL;
     } else
         g_message(_("Invalid action '%s' requested. No such action exists."),
                   name);
 
-    g_free(name);
+    return act;
+}
+
+ObActionsAct* actions_parse(ObParseInst *i,
+                            xmlDocPtr doc,
+                            xmlNodePtr node)
+{
+    gchar *name;
+    ObActionsAct *act = NULL;
+
+    if (parse_attr_string("name", node, &name)) {
+        if ((act = actions_parse_string(name)))
+            /* there is more stuff to parse here */
+            act->options = act->def->setup(i, doc, node->children);
+
+        g_free(name);
+    }
 
     return act;
 }

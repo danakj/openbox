@@ -1077,12 +1077,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     sibling = WINDOW_AS_CLIENT(win);
             }
 
-            /* activate it rather than just focus it */
             if (!config_focus_under_mouse)
                 ignore_start = event_start_ignore_all_enters();
             stacking_restack_request(client, sibling,
-                                     e->xconfigurerequest.detail,
-                                     TRUE);
+                                     e->xconfigurerequest.detail);
             if (!config_focus_under_mouse)
                 event_end_ignore_all_enters(ignore_start);
 
@@ -1420,7 +1418,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                         ignore_start = event_start_ignore_all_enters();
                     /* just raise, don't activate */
                     stacking_restack_request(client, sibling,
-                                             e->xclient.data.l[2], FALSE);
+                                             e->xclient.data.l[2]);
                     if (!config_focus_under_mouse)
                         event_end_ignore_all_enters(ignore_start);
 

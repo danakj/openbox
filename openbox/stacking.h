@@ -65,14 +65,12 @@ void stacking_below(ObWindow *window, ObWindow *below);
   @param sibling Another client to compare to, or NULL to compare to all
                  windows
   @param detail One of Above, Below, TopIf, BottomIf, Opposite
-  @param activate If TRUE, and if the window is going to be raised, it will
-                  be activated instead
   @return TRUE if the client was restacked
   See http://tronche.com/gui/x/xlib/window/configure.html for details on
   how each detail works with and without a sibling.
 */
 gboolean stacking_restack_request(struct _ObClient *client,
                                   struct _ObClient *sibling,
-                                  gint detail, gboolean activate);
+                                  gint detail);
 
 #endif

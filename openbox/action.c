@@ -1368,7 +1368,7 @@ void action_raiselower(union ActionData *data)
     ObClient *c = data->client.any.c;
 
     client_action_start(data);
-    stacking_restack_request(c, NULL, Opposite, FALSE);
+    stacking_restack_request(c, NULL, Opposite);
     client_action_end(data, config_focus_under_mouse);
 }
 

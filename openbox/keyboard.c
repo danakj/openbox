@@ -25,7 +25,7 @@
 #include "event.h"
 #include "grab.h"
 #include "client.h"
-#include "action.h"
+#include "actions.h"
 #include "prop.h"
 #include "menuframe.h"
 #include "config.h"
@@ -42,7 +42,7 @@ typedef struct {
     gboolean active;
     guint state;
     ObClient *client;
-    ObAction *action;
+    ObActionsAct *action;
 } ObInteractiveState;
 
 KeyBindingTree *keyboard_firstnode = NULL;
@@ -142,7 +142,7 @@ void keyboard_chroot(GList *keylist)
     }
 }
 
-gboolean keyboard_bind(GList *keylist, ObAction *action)
+gboolean keyboard_bind(GList *keylist, ObActionsAct *action)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;

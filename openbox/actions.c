@@ -26,7 +26,7 @@ struct _ObActionsDefinition {
     guint ref;
 
     gchar *name;
-    gboolean allow_interactive;
+    ObActionsType type;
 
     ObActionsDataSetupFunc setup;
     ObActionsDataFreeFunc free;
@@ -37,7 +37,6 @@ struct _ObActionsAct {
     guint ref;
 
     ObActionsDefinition *def;
-
     gpointer options;
 };
 
@@ -63,7 +62,7 @@ void actions_shutdown(gboolean reconfig)
 }
 
 gboolean actions_register(const gchar *name,
-                          gboolean allow_interactive,
+                          ObActionsType type,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run)
@@ -80,7 +79,7 @@ gboolean actions_register(const gchar *name,
     def = g_new(ObActionsDefinition, 1);
     def->ref = 1;
     def->name = g_strdup(name);
-    def->allow_interactive = allow_interactive;
+    def->type = type;
     def->setup = setup;
     def->free = free;
     def->run = run;
@@ -159,5 +158,59 @@ void actions_act_unref(ObActionsAct *act)
         /* unref the definition */
         actions_definition_unref(act->def);
         g_free(act);
+    }
+}
+
+static void actions_setup_data(ObActionsData *data,
+                               ObUserAction uact,
+                               Time time,
+                               guint state,
+                               guint button,
+                               gint x,
+                               gint y)
+{
+    data->any.uact = uact;
+    data->any.time = time;
+    data->any.state = state;
+    data->any.button = button;
+    data->any.x = x;
+    data->any.y = y;
+}
+
+void actions_run_acts(GSList *acts,
+                      ObUserAction uact,
+                      Time time,
+                      guint state,
+                      guint button,
+                      gint x,
+                      gint y,
+                      ObFrameContext con,
+                      struct _ObClient *client,
+                      ObActionsInteractiveState interactive)
+{
+    GSList *it;
+
+    for (it = acts; it; it = g_slist_next(it)) {
+        ObActionsData data;
+        ObActionsAct *act = it->data;
+
+        data.type = act->def->type;
+        actions_setup_data(&data, uact, time, state, button, x, y);
+        switch (data.type) {
+        case OB_ACTION_TYPE_GLOBAL:
+            break;
+        case OB_ACTION_TYPE_CLIENT:
+            data.client.context = con;
+            data.client.c = client;
+            break;
+        case OB_ACTION_TYPE_SELECTOR:
+            data.selector.interactive = interactive;
+            break;
+        default:
+            g_assert_not_reached();
+        }
+
+        /* fire the action's run function with this data */
+        act->def->run(&data, act->options);
     }
 }

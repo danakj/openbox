@@ -27,7 +27,7 @@
 #include <X11/Xlib.h>
 
 struct _ObClient;
-struct _ObActionAct;
+struct _ObActionsAct;
 
 extern KeyBindingTree *keyboard_firstnode;
 
@@ -35,7 +35,7 @@ void keyboard_startup(gboolean reconfig);
 void keyboard_shutdown(gboolean reconfig);
 
 void keyboard_chroot(GList *keylist);
-gboolean keyboard_bind(GList *keylist, struct _ObActionAct *action);
+gboolean keyboard_bind(GList *keylist, struct _ObActionsAct *action);
 void keyboard_unbind_all();
 
 void keyboard_event(struct _ObClient *client, const XEvent *e);
@@ -44,7 +44,7 @@ void keyboard_event(struct _ObClient *client, const XEvent *e);
 void keyboard_reset_chains(gint break_chroots);
 
 gboolean keyboard_interactive_grab(guint state, struct _ObClient *client,
-                                   struct _ObActionAct *action);
+                                   struct _ObActionsAct *action);
 gboolean keyboard_process_interactive_grab(const XEvent *e,
                                            struct _ObClient **client);
 gboolean keyboard_interactively_grabbed();

@@ -20,6 +20,7 @@
 #include "frame.h"
 #include "parser/parse.h"
 #include <glib.h>
+#include <X11/Xlib.h>
 
 typedef struct _ObActionsDefinition   ObActionsDefinition;
 typedef struct _ObActionsAct          ObActionsAct;
@@ -56,21 +57,24 @@ typedef enum {
     OB_ACTION_TYPE_SELECTOR
 } ObActionsType;
 
+/* These structures are all castable as eachother */
+
 struct _ObActionsAnyData {
     ObUserAction uact;
+    Time time;
+    guint state;
+    guint button;
     gint x;
     gint y;
-    gint button;
-    Time time;
-
-    ObActionsInteractiveState interactive;
 };
 
 struct _ObActionsGlobalData {
+    ObActionsType type;
     ObActionsAnyData any;
 };
 
 struct _ObActionsClientData {
+    ObActionsType type;
     ObActionsAnyData any;
 
     struct _ObClient *c;
@@ -78,8 +82,10 @@ struct _ObActionsClientData {
 };
 
 struct _ObActionsSelectorData {
+    ObActionsType type;
     ObActionsAnyData any;
 
+    ObActionsInteractiveState interactive;
     GSList *actions;
 };
 
@@ -98,7 +104,7 @@ void actions_startup(gboolean reconfigure);
 void actions_shutdown(gboolean reconfigure);
 
 gboolean actions_register(const gchar *name,
-                          gboolean allow_interactive,
+                          ObActionsType type,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run);
@@ -110,3 +116,15 @@ ObActionsAct* actions_parse_string(const gchar *name);
 
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);
+
+/*! Pass in a GSList of ObActionsAct's to be run */
+void actions_run_acts(GSList *acts,
+                      ObUserAction uact,
+                      Time time,
+                      guint state,
+                      guint button,
+                      gint x,
+                      gint y,
+                      ObFrameContext con,
+                      struct _ObClient *client,
+                      ObActionsInteractiveState interactive);

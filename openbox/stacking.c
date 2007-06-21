@@ -559,7 +559,7 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
 }
 
 gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
-                                  gint detail, gboolean activate)
+                                  gint detail)
 {
     gboolean ret = FALSE;
 
@@ -595,24 +595,14 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
     case Above:
         ob_debug("Restack request Above for client %s sibling %s\n",
                  client->title, sibling ? sibling->title : "(all)");
-        if (activate && !client->iconic && client_normal(client))
-            /* use user=TRUE because it is impossible to get a timestamp
-               for this */
-            client_activate(client, FALSE, TRUE);
-        else
-            stacking_raise(CLIENT_AS_WINDOW(client));
+        stacking_raise(CLIENT_AS_WINDOW(client));
         ret = TRUE;
         break;
     case TopIf:
         ob_debug("Restack request TopIf for client %s sibling %s\n",
                  client->title, sibling ? sibling->title : "(all)");
         if (stacking_occluded(client, sibling)) {
-            if (activate && !client->iconic && client_normal(client))
-                /* use user=TRUE because it is impossible to get a timestamp
-                   for this */
-                client_activate(client, FALSE, TRUE);
-            else
-                stacking_raise(CLIENT_AS_WINDOW(client));
+            stacking_raise(CLIENT_AS_WINDOW(client));
             ret = TRUE;
         }
         break;
@@ -621,12 +611,7 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
                  "%s\n",
                  client->title, sibling ? sibling->title : "(all)");
         if (stacking_occluded(client, sibling)) {
-            if (activate && !client->iconic && client_normal(client))
-                /* use user=TRUE because it is impossible to get a timestamp
-                   for this */
-                client_activate(client, FALSE, TRUE);
-            else
-                stacking_raise(CLIENT_AS_WINDOW(client));
+            stacking_raise(CLIENT_AS_WINDOW(client));
             ret = TRUE;
         }
         else if (stacking_occludes(client, sibling)) {

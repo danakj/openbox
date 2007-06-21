@@ -23,6 +23,7 @@
 #include "prop.h"
 #include "translate.h"
 #include "client.h"
+#include "actions.h"
 #include "screen.h"
 #include "parser/parse.h"
 #include "openbox.h"
@@ -357,9 +358,9 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
     else if ((n = parse_find_node("action", node->children))) {
         while (n) {
-            ObAction *action;
+            ObActionsDefinition *action;
             
-            action = action_parse(i, doc, n, OB_USER_ACTION_KEYBOARD_KEY);
+            action = actions_parse(i, doc, n);
             if (action)
                 keyboard_bind(keylist, action);
             n = parse_find_node("action", n->next);

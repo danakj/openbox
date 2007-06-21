@@ -17,18 +17,28 @@
 */
 
 #include "actions.h"
+#include "gettext.h"
 
-static void actions_unregister(ObActionsDefinition *def);
+static void actions_definition_ref(ObActionsDefinition *def);
+static void actions_definition_unref(ObActionsDefinition *def);
 
 struct _ObActionsDefinition {
-    gchar *name;
-    gboolean interactive;
+    guint ref;
 
-    ObActionsDataParseFunc parse;
+    gchar *name;
+    gboolean allow_interactive;
+
+    ObActionsDataSetupFunc setup;
     ObActionsDataFreeFunc free;
     ObActionsRunFunc run;
+};
 
-    gpointer action_data;
+struct _ObActionsAct {
+    guint ref;
+
+    ObActionsDefinition *def;
+
+    gpointer options;
 };
 
 static GSList *registered = NULL;
@@ -47,15 +57,14 @@ void actions_shutdown(gboolean reconfig)
 
     /* free all the registered actions */
     while (registered) {
-        actions_unregister(registered->data);
+        actions_definition_unref(registered->data);
         registered = g_slist_delete_link(registered, registered);
     }
 }
 
 gboolean actions_register(const gchar *name,
-                          gboolean interactive,
+                          gboolean allow_interactive,
                           ObActionsDataSetupFunc setup,
-                          ObActionsDataParseFunc parse,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run)
 {
@@ -69,20 +78,74 @@ gboolean actions_register(const gchar *name,
     }
 
     def = g_new(ObActionsDefinition, 1);
+    def->ref = 1;
     def->name = g_strdup(name);
-    def->interactive = interactive;
-    def->parse = parse;
+    def->allow_interactive = allow_interactive;
+    def->setup = setup;
     def->free = free;
     def->run = run;
-    def->action_data = setup();
     return TRUE;
 }
 
-static void actions_unregister(ObActionsDefinition *def)
+static void actions_definition_ref(ObActionsDefinition *def)
 {
-    if (def) {
-        def->free(def->action_data);
+    ++def->ref;
+}
+
+static void actions_definition_unref(ObActionsDefinition *def)
+{
+    if (def && --def->ref == 0) {
         g_free(def->name);
         g_free(def);
+    }
+}
+
+ObActionsAct* actions_parse(ObParseInst *i,
+                            xmlDocPtr doc,
+                            xmlNodePtr node)
+{
+    GSList *it;
+    gchar *name;
+    ObActionsDefinition *def;
+    ObActionsAct *act = NULL;
+
+    if (!parse_attr_string("name", node, &name)) return NULL;
+
+    /* find the requested action */
+    for (it = registered; it; it = g_slist_next(it)) {
+        def = it->data;
+        if (!g_ascii_strcasecmp(name, def->name))
+            break;
+    }
+
+    /* if we found the action */
+    if (it != NULL) {
+        act = g_new(ObActionsAct, 1);
+        act->ref = 1;
+        act->def = def;
+        actions_definition_ref(act->def);
+        act->options = def->setup(i, doc, node->children);
+    } else
+        g_message(_("Invalid action '%s' requested. No such action exists."),
+                  name);
+
+    g_free(name);
+
+    return act;
+}
+
+void actions_act_ref(ObActionsAct *act)
+{
+    ++act->ref;
+}
+
+void actions_act_unref(ObActionsAct *act)
+{
+    if (act && --act->ref == 0) {
+        /* free the action specific options */
+        act->def->free(act->options);
+        /* unref the definition */
+        actions_definition_unref(act->def);
+        g_free(act);
     }
 }

@@ -22,6 +22,8 @@
 #include <glib.h>
 
 typedef struct _ObActionsDefinition   ObActionsDefinition;
+typedef struct _ObActionsAct          ObActionsAct;
+typedef struct _ObActionsData         ObActionsData;
 typedef struct _ObActionsAnyData      ObActionsAnyData;
 typedef struct _ObActionsGlobalData   ObActionsGlobalData;
 typedef struct _ObActionsClientData   ObActionsClientData;
@@ -34,13 +36,11 @@ typedef enum {
     OB_NUM_ACTIONS_INTERACTIVE_STATES
 } ObActionsInteractiveState;
 
-typedef gpointer (*ObActionsDataSetupFunc)();
-typedef void     (*ObActionsDataParseFunc)(gpointer action_data,
-                                           ObParseInst *i,
+typedef gpointer (*ObActionsDataSetupFunc)(ObParseInst *i,
                                            xmlDocPtr doc, xmlNodePtr node);
-typedef void     (*ObActionsDataFreeFunc)(gpointer action_data);
-typedef void     (*ObActionsRunFunc)(ObActionsAnyData *data,
-                                     gpointer action_data);
+typedef void     (*ObActionsDataFreeFunc)(gpointer options);
+typedef void     (*ObActionsRunFunc)(ObActionsData *data,
+                                     gpointer options);
 
 /*
   The theory goes:
@@ -49,6 +49,12 @@ typedef void     (*ObActionsRunFunc)(ObActionsAnyData *data,
   06:10 (@dana) global actions, window actions, and selector actions
   06:11 (@dana) eg show menu/exit, raise/focus, and cycling/directional/expose
 */
+
+typedef enum {
+    OB_ACTION_TYPE_GLOBAL,
+    OB_ACTION_TYPE_CLIENT,
+    OB_ACTION_TYPE_SELECTOR
+} ObActionsType;
 
 struct _ObActionsAnyData {
     ObUserAction uact;
@@ -77,12 +83,29 @@ struct _ObActionsSelectorData {
     GSList *actions;
 };
 
+struct _ObActionsData {
+    ObActionsType type;
+
+    union {
+        ObActionsAnyData      any;
+        ObActionsGlobalData   global;
+        ObActionsClientData   client;
+        ObActionsSelectorData selector;
+    };
+};
+
 void actions_startup(gboolean reconfigure);
 void actions_shutdown(gboolean reconfigure);
 
 gboolean actions_register(const gchar *name,
-                          gboolean interactive,
+                          gboolean allow_interactive,
                           ObActionsDataSetupFunc setup,
-                          ObActionsDataParseFunc parse,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run);
+
+ObActionsAct* actions_parse(ObParseInst *i,
+                            xmlDocPtr doc,
+                            xmlNodePtr node);
+
+void actions_act_ref(ObActionsAct *act);
+void actions_act_unref(ObActionsAct *act);

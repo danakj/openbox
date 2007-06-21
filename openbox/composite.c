@@ -18,9 +18,11 @@ void composite_startup(gboolean reconfig)
     if (!extensions_comp) return;
 
     /* Redirect window contents to offscreen pixmaps */
+/*
     XCompositeRedirectSubwindows(ob_display,
                                  RootWindow(ob_display, ob_screen),
                                  CompositeRedirectAutomatic);
+*/
 }
 
 void composite_shutdown(gboolean reconfig)

@@ -156,6 +156,8 @@ openbox_openbox_SOURCES = \
 	gettext.h \
 	openbox/action.c \
 	openbox/action.h \
+	openbox/actions.c \
+	openbox/actions.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \

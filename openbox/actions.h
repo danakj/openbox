@@ -16,6 +16,17 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "misc.h"
+#include "frame.h"
+#include "parser/parse.h"
+#include <glib.h>
+
+typedef struct _ObActionsDefinition   ObActionsDefinition;
+typedef struct _ObActionsAnyData      ObActionsAnyData;
+typedef struct _ObActionsGlobalData   ObActionsGlobalData;
+typedef struct _ObActionsClientData   ObActionsClientData;
+typedef struct _ObActionsSelectorData ObActionsSelectorData;
+
 typedef enum {
     OB_ACTION_DONE,
     OB_ACTION_CANCELLED,
@@ -28,17 +39,16 @@ typedef void     (*ObActionsDataParseFunc)(gpointer action_data,
                                            ObParseInst *i,
                                            xmlDocPtr doc, xmlNodePtr node);
 typedef void     (*ObActionsDataFreeFunc)(gpointer action_data);
-typedef void     (*ObActionsRunFunc)(ObActionsAnyData *data);
+typedef void     (*ObActionsRunFunc)(ObActionsAnyData *data,
+                                     gpointer action_data);
 
-struct _ObActionsDefinition {
-    gchar *name;
-    gboolean interactive;
+/*
+  The theory goes:
 
-    ObActionsDataSetupFunc setup;
-    ObActionsDataParseFunc parse;
-    ObActionsDataFreeFunc free;
-    ObActionsRunFunc run;
-};
+  06:10 (@dana) hm i think there are 3 types of actions
+  06:10 (@dana) global actions, window actions, and selector actions
+  06:11 (@dana) eg show menu/exit, raise/focus, and cycling/directional/expose
+*/
 
 struct _ObActionsAnyData {
     ObUserAction uact;
@@ -48,23 +58,21 @@ struct _ObActionsAnyData {
     Time time;
 
     ObActionsInteractiveState interactive;
-
-    gpointer action_data;
 };
 
 struct _ObActionsGlobalData {
-    ObActionsData any;
+    ObActionsAnyData any;
 };
 
 struct _ObActionsClientData {
-    ObActionsData any;
+    ObActionsAnyData any;
 
     struct _ObClient *c;
     ObFrameContext context;
 };
 
 struct _ObActionsSelectorData {
-    ObActionsData any;
+    ObActionsAnyData any;
 
     GSList *actions;
 };

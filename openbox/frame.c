@@ -368,7 +368,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   self->cbwidth_l + (!self->max_horz ? self->bwidth : 0),
                   self->cbwidth_t + self->bwidth,
                   self->cbwidth_r + (!self->max_horz ? self->bwidth : 0),
-                  self->cbwidth_b + (!self->max_horz || !self->max_vert ? self->bwidth : 0));
+                  self->cbwidth_b + (!self->max_horz || !self->max_vert ?
+                                     self->bwidth : 0));
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
             self->size.top += ob_rr_theme->title_height + self->bwidth;

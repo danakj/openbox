@@ -161,6 +161,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/cyclewindows.c \
 	openbox/actions/debug.c \
 	openbox/actions/directionalcyclewindows.c \
+	openbox/actions/directionaltargetwindow.c \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \

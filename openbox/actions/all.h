@@ -30,5 +30,6 @@ void action_shade_startup();
 void action_kill_startup();
 void action_omnipresent_startup();
 void action_directionalcyclewindows_startup();
+void action_directionaltargetwindow_startup();
 
 #endif

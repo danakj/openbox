@@ -169,14 +169,6 @@ gboolean keyboard_bind(GList *keylist, ObActionsAct *action)
     /* find the bottom node */
     for (; t->first_child; t = t->first_child);
 
-    /* when there are no modifiers in the binding, then the action cannot
-       be interactive */
-    if (!t->state && action->data.any.interactive) {
-        g_print("not interactive\n");
-        action->data.any.interactive = FALSE;
-        action->data.inter.final = TRUE;
-    }
-
     /* set the action */
     t->actions = g_slist_append(t->actions, action);
     /* assimilate this built tree into the main tree. assimilation
@@ -189,6 +181,7 @@ gboolean keyboard_bind(GList *keylist, ObActionsAct *action)
 static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
                                      gboolean ungrab)
 {
+#if 0
     GSList *alist;
 
     g_assert(istate.active);
@@ -206,6 +199,7 @@ static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
     g_slist_free(alist);
 
     keyboard_reset_chains(0);
+#endif
 }
 
 static void keyboard_interactive_end_client(ObClient *client, gpointer data)
@@ -221,8 +215,9 @@ void keyboard_interactive_cancel()
 }
 
 gboolean keyboard_interactive_grab(guint state, ObClient *client,
-                                   ObAction *action)
+                                   ObActionsAct *action)
 {
+#if 0
     g_assert(action->data.any.interactive);
 
     if (!istate.active) {
@@ -237,6 +232,7 @@ gboolean keyboard_interactive_grab(guint state, ObClient *client,
     istate.client = client;
     istate.action = action;
 
+#endif
     return TRUE;
 }
 
@@ -319,7 +315,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 gboolean inter = FALSE;
 
                 for (it = p->actions; it && !inter; it = g_slist_next(it))
-                    if (((ObAction*)it->data)->data.any.interactive)
+                    if (((ObActionsAct*)it->data)->data.any.interactive)
                         inter = TRUE;
                 if (!inter) /* don't reset if the action is interactive */
                     keyboard_reset_chains(0);

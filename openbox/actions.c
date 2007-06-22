@@ -31,6 +31,8 @@ struct _ObActionsDefinition {
     ObActionsDataSetupFunc setup;
     ObActionsDataFreeFunc free;
     ObActionsRunFunc run;
+    ObActionsInteractiveInputFunc i_input;
+    ObActionsInteractiveCancelFunc i_cancel;
 };
 
 struct _ObActionsAct {
@@ -65,7 +67,9 @@ gboolean actions_register(const gchar *name,
                           ObActionsType type,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
-                          ObActionsRunFunc run)
+                          ObActionsRunFunc run,
+                          ObActionsInteractiveInputFunc i_input,
+                          ObActionsInteractiveCancelFunc i_cancel)
 {
     GSList *it;
     ObActionsDefinition *def;
@@ -76,6 +80,8 @@ gboolean actions_register(const gchar *name,
             return FALSE;
     }
 
+    g_assert((i_input == NULL) == (i_cancel == NULL));
+
     def = g_new(ObActionsDefinition, 1);
     def->ref = 1;
     def->name = g_strdup(name);
@@ -83,6 +89,8 @@ gboolean actions_register(const gchar *name,
     def->setup = setup;
     def->free = free;
     def->run = run;
+    def->i_input = i_input;
+    def->i_cancel = i_cancel;
     return TRUE;
 }
 
@@ -145,6 +153,11 @@ ObActionsAct* actions_parse(ObParseInst *i,
     return act;
 }
 
+gboolean actions_act_is_interactive(ObActionsAct *act)
+{
+    return act->def->i_cancel != NULL;
+}
+
 void actions_act_ref(ObActionsAct *act)
 {
     ++act->ref;
@@ -165,14 +178,12 @@ static void actions_setup_data(ObActionsData *data,
                                ObUserAction uact,
                                Time time,
                                guint state,
-                               guint button,
                                gint x,
                                gint y)
 {
     data->any.uact = uact;
     data->any.time = time;
     data->any.state = state;
-    data->any.button = button;
     data->any.x = x;
     data->any.y = y;
 }
@@ -181,12 +192,10 @@ void actions_run_acts(GSList *acts,
                       ObUserAction uact,
                       Time time,
                       guint state,
-                      guint button,
                       gint x,
                       gint y,
                       ObFrameContext con,
-                      struct _ObClient *client,
-                      ObActionsInteractiveState interactive)
+                      struct _ObClient *client)
 {
     GSList *it;
 
@@ -195,16 +204,13 @@ void actions_run_acts(GSList *acts,
         ObActionsAct *act = it->data;
 
         data.type = act->def->type;
-        actions_setup_data(&data, uact, time, state, button, x, y);
+        actions_setup_data(&data, uact, time, state, x, y);
         switch (data.type) {
         case OB_ACTION_TYPE_GLOBAL:
             break;
         case OB_ACTION_TYPE_CLIENT:
             data.client.context = con;
             data.client.c = client;
-            break;
-        case OB_ACTION_TYPE_SELECTOR:
-            data.selector.interactive = interactive;
             break;
         default:
             g_assert_not_reached();

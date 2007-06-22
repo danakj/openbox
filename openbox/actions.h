@@ -30,31 +30,19 @@ typedef struct _ObActionsGlobalData   ObActionsGlobalData;
 typedef struct _ObActionsClientData   ObActionsClientData;
 typedef struct _ObActionsSelectorData ObActionsSelectorData;
 
-typedef enum {
-    OB_ACTION_DONE,
-    OB_ACTION_CANCELLED,
-    OB_ACTION_INTERACTING,
-    OB_NUM_ACTIONS_INTERACTIVE_STATES
-} ObActionsInteractiveState;
-
 typedef gpointer (*ObActionsDataSetupFunc)(ObParseInst *i,
                                            xmlDocPtr doc, xmlNodePtr node);
 typedef void     (*ObActionsDataFreeFunc)(gpointer options);
-typedef void     (*ObActionsRunFunc)(ObActionsData *data,
+typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
-
-/*
-  The theory goes:
-
-  06:10 (@dana) hm i think there are 3 types of actions
-  06:10 (@dana) global actions, window actions, and selector actions
-  06:11 (@dana) eg show menu/exit, raise/focus, and cycling/directional/expose
-*/
+typedef gboolean (*ObActionsInteractiveInputFunc)(guint initial_state,
+                                                  XEvent *e,
+                                                  gpointer options);
+typedef void     (*ObActionsInteractiveCancelFunc)(gpointer options);
 
 typedef enum {
     OB_ACTION_TYPE_GLOBAL,
-    OB_ACTION_TYPE_CLIENT,
-    OB_ACTION_TYPE_SELECTOR
+    OB_ACTION_TYPE_CLIENT
 } ObActionsType;
 
 /* These structures are all castable as eachother */
@@ -63,7 +51,6 @@ struct _ObActionsAnyData {
     ObUserAction uact;
     Time time;
     guint state;
-    guint button;
     gint x;
     gint y;
 };
@@ -81,14 +68,6 @@ struct _ObActionsClientData {
     ObFrameContext context;
 };
 
-struct _ObActionsSelectorData {
-    ObActionsType type;
-    ObActionsAnyData any;
-
-    ObActionsInteractiveState interactive;
-    GSList *actions;
-};
-
 struct _ObActionsData {
     ObActionsType type;
 
@@ -96,35 +75,40 @@ struct _ObActionsData {
         ObActionsAnyData      any;
         ObActionsGlobalData   global;
         ObActionsClientData   client;
-        ObActionsSelectorData selector;
     };
 };
 
 void actions_startup(gboolean reconfigure);
 void actions_shutdown(gboolean reconfigure);
 
+/*! If the action is interactive, then i_input and i_cancel are not NULL.
+  Otherwise, they should both be NULL. */
 gboolean actions_register(const gchar *name,
                           ObActionsType type,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
-                          ObActionsRunFunc run);
+                          ObActionsRunFunc run,
+                          ObActionsInteractiveInputFunc i_input,
+                          ObActionsInteractiveCancelFunc i_cancel);
 
 ObActionsAct* actions_parse(ObParseInst *i,
                             xmlDocPtr doc,
                             xmlNodePtr node);
 ObActionsAct* actions_parse_string(const gchar *name);
 
+gboolean actions_act_is_interactive(ObActionsAct *act);
+
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);
 
-/*! Pass in a GSList of ObActionsAct's to be run */
+/*! Pass in a GSList of ObActionsAct's to be run.
+  @return TRUE if an action is in interactive state, FALSE is none are
+*/
 void actions_run_acts(GSList *acts,
                       ObUserAction uact,
                       Time time,
                       guint state,
-                      guint button,
                       gint x,
                       gint y,
                       ObFrameContext con,
-                      struct _ObClient *client,
-                      ObActionsInteractiveState interactive);
+                      struct _ObClient *client);

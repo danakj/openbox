@@ -773,27 +773,6 @@ void action_send_to_desktop(union ActionData *data)
     }
 }
 
-void action_desktop_dir(union ActionData *data)
-{
-    guint d;
-
-    d = screen_cycle_desktop(data->desktopdir.dir,
-                             data->desktopdir.wrap,
-                             data->desktopdir.linear,
-                             data->desktopdir.inter.any.interactive,
-                             data->desktopdir.inter.final,
-                             data->desktopdir.inter.cancel);
-    /* only move the desktop when the action is complete. if we switch
-       desktops during the interactive action, focus will move but with
-       NotifyWhileGrabbed and applications don't like that. */
-    if (!data->sendtodir.inter.any.interactive ||
-        (data->sendtodir.inter.final && !data->sendtodir.inter.cancel))
-    {
-        if (d != screen_desktop)
-            screen_set_desktop(d, TRUE);
-    }
-}
-
 void action_send_to_desktop_dir(union ActionData *data)
 {
     ObClient *c = data->sendtodir.inter.any.c;

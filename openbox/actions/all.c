@@ -17,4 +17,5 @@ void action_all_startup()
     action_raise_startup();
     action_lower_startup();
     action_raiselower_startup();
+    action_unfocus_startup();
 }

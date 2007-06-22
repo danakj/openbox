@@ -18,5 +18,6 @@ void action_focus_startup();
 void action_raise_startup();
 void action_lower_startup();
 void action_raiselower_startup();
+void action_unfocus_startup();
 
 #endif

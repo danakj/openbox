@@ -455,16 +455,6 @@ ActionString actionstrings[] =
         setup_action_directional_focus_northwest
     },
     {
-        "unfocus",
-        action_unfocus,
-        setup_client_action
-    },
-    {
-        "focustobottom",
-        action_focus_order_to_bottom,
-        setup_client_action
-    },
-    {
         "kill",
         action_kill,
         setup_client_action
@@ -1020,22 +1010,11 @@ void action_run_string(const gchar *name, struct _ObClient *c, Time time)
     action_run(l, c, 0, time);
 }
 
-void action_unfocus (union ActionData *data)
-{
-    if (data->client.any.c == focus_client)
-        focus_fallback(FALSE, FALSE, TRUE);
-}
-
 void action_iconify(union ActionData *data)
 {
     client_action_start(data);
     client_iconify(data->client.any.c, TRUE, TRUE, FALSE);
     client_action_end(data, config_focus_under_mouse);
-}
-
-void action_focus_order_to_bottom(union ActionData *data)
-{
-    focus_order_to_bottom(data->client.any.c);
 }
 
 void action_unshaderaise(union ActionData *data)

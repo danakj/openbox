@@ -83,13 +83,14 @@ gboolean actions_register(const gchar *name,
     GSList *it;
     ObActionsDefinition *def;
 
+    g_assert(run != NULL);
+    g_assert((i_input == NULL) == (i_cancel == NULL));
+
     for (it = registered; it; it = g_slist_next(it)) {
         def = it->data;
         if (!g_ascii_strcasecmp(name, def->name)) /* already registered */
             return FALSE;
     }
-
-    g_assert((i_input == NULL) == (i_cancel == NULL));
 
     def = g_new(ObActionsDefinition, 1);
     def->ref = 1;
@@ -156,7 +157,8 @@ ObActionsAct* actions_parse(ObParseInst *i,
     if (parse_attr_string("name", node, &name)) {
         if ((act = actions_parse_string(name)))
             /* there is more stuff to parse here */
-            act->options = act->def->setup(i, doc, node->xmlChildrenNode);
+            if (act->def->setup)
+                act->options = act->def->setup(i, doc, node->xmlChildrenNode);
 
         g_free(name);
     }
@@ -178,7 +180,8 @@ void actions_act_unref(ObActionsAct *act)
 {
     if (act && --act->ref == 0) {
         /* free the action specific options */
-        act->def->free(act->options);
+        if (act->def->free)
+            act->def->free(act->options);
         /* unref the definition */
         actions_definition_unref(act->def);
         g_free(act);

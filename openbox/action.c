@@ -1005,24 +1005,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     if (parse_attr_string("name", node, &actname)) {
         if ((act = action_from_string(actname, uact))) {
-            if (act->func == action_execute || act->func == action_restart) {
-                if ((n = parse_find_node("execute", node->xmlChildrenNode))) {
-                    gchar *s = parse_string(doc, n);
-                    act->data.execute.path = parse_expand_tilde(s);
-                    g_free(s);
-                }
-                if ((n = parse_find_node("startupnotify", node->xmlChildrenNode))) {
-                    xmlNodePtr m;
-                    if ((m = parse_find_node("enabled", n->xmlChildrenNode)))
-                        act->data.execute.startupnotify = parse_bool(doc, m);
-                    if ((m = parse_find_node("name", n->xmlChildrenNode)))
-                        act->data.execute.name = parse_string(doc, m);
-                    if ((m = parse_find_node("icon", n->xmlChildrenNode)))
-                        act->data.execute.icon_name = parse_string(doc, m);
-                }
-            } else if (act->func == action_debug) {
-                if ((n = parse_find_node("string", node->xmlChildrenNode)))
-                    act->data.debug.string = parse_string(doc, n);
             } else if (act->func == action_showmenu) {
                 if ((n = parse_find_node("menu", node->xmlChildrenNode)))
                     act->data.showmenu.name = parse_string(doc, n);

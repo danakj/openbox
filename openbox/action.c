@@ -1010,13 +1010,6 @@ void action_run_string(const gchar *name, struct _ObClient *c, Time time)
     action_run(l, c, 0, time);
 }
 
-void action_iconify(union ActionData *data)
-{
-    client_action_start(data);
-    client_iconify(data->client.any.c, TRUE, TRUE, FALSE);
-    client_action_end(data, config_focus_under_mouse);
-}
-
 void action_unshaderaise(union ActionData *data)
 {
     if (data->client.any.c->shaded)

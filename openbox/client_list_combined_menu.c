@@ -98,7 +98,7 @@ static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
 {
     if (self->id == -1) {
         if (self->data.normal.data) /* it's set to NULL if its destroyed */
-            client_activate(self->data.normal.data, FALSE, TRUE);
+            client_activate(self->data.normal.data, FALSE, TRUE, TRUE, TRUE);
     }
     else
         screen_set_desktop(self->id, TRUE);

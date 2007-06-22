@@ -499,11 +499,6 @@ ActionString actionstrings[] =
         setup_action_directional_focus_northwest
     },
     {
-        "activate",
-        action_activate,
-        setup_action_focus
-    },
-    {
         "focus",
         action_focus,
         setup_action_focus
@@ -965,9 +960,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.sendtodir.inter.any.interactive =
                         parse_bool(doc, n);
-            } else if (act->func == action_activate) {
-                if ((n = parse_find_node("here", node->xmlChildrenNode)))
-                    act->data.activate.here = parse_bool(doc, n);
             } else if (act->func == action_directional_focus) {
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.interdiraction.dialog = parse_bool(doc, n);
@@ -1116,27 +1108,6 @@ void action_run_string(const gchar *name, struct _ObClient *c, Time time)
     l = g_slist_append(NULL, a);
 
     action_run(l, c, 0, time);
-}
-
-void action_activate(union ActionData *data)
-{
-    if (data->client.any.c) {
-        if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
-            (data->any.context != OB_FRAME_CONTEXT_CLIENT &&
-             data->any.context != OB_FRAME_CONTEXT_FRAME))
-        {
-            /* if using focus_delay, stop the timer now so that focus doesn't
-               go moving on us */
-            event_halt_focus_delay();
-
-            client_activate(data->activate.any.c, data->activate.here, TRUE);
-        }
-    } else {
-        /* focus action on something other than a client, make keybindings
-           work for this openbox instance, but don't focus any specific client
-        */
-        focus_nothing();
-    }
 }
 
 void action_focus(union ActionData *data)

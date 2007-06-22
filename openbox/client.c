@@ -88,7 +88,8 @@ static void client_update_transient_tree(ObClient *self,
                                          gboolean oldgtran, gboolean newgtran,
                                          ObClient* oldparent,
                                          ObClient *newparent);
-static void client_present(ObClient *self, gboolean here, gboolean raise);
+static void client_present(ObClient *self, gboolean here, gboolean raise,
+                           gboolean unshade);
 static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
@@ -544,7 +545,7 @@ void client_manage(Window window)
 
     if (activate) {
         gboolean stacked = client_restore_session_stacking(self);
-        client_present(self, FALSE, !stacked);
+        client_present(self, FALSE, !stacked, TRUE);
     }
 
     /* add to client list/map */
@@ -3561,6 +3562,10 @@ gboolean client_focus(ObClient *self)
                   "Focusing client \"%s\" (0x%x) at time %u\n",
                   self->title, self->window, event_curtime);
 
+    /* if using focus_delay, stop the timer now so that focus doesn't
+       go moving on us */
+    event_halt_focus_delay();
+
     /* if there is a grab going on, then we need to cancel it. if we move
        focus during the grab, applications will get NotifyWhileGrabbed events
        and ignore them !
@@ -3601,17 +3606,9 @@ gboolean client_focus(ObClient *self)
     return !xerror_occured;
 }
 
-/*! Present the client to the user.
-  @param raise If the client should be raised or not. You should only set
-               raise to false if you don't care if the window is completely
-               hidden.
-*/
-static void client_present(ObClient *self, gboolean here, gboolean raise)
+static void client_present(ObClient *self, gboolean here, gboolean raise,
+                           gboolean unshade)
 {
-    /* if using focus_delay, stop the timer now so that focus doesn't
-       go moving on us */
-    event_halt_focus_delay();
-
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE, self);
     if (self->iconic)
@@ -3627,7 +3624,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
         /* if its not visible for other reasons, then don't mess
            with it */
         return;
-    if (self->shaded)
+    if (self->shaded && unshade)
         client_shade(self, FALSE);
     if (raise)
         stacking_raise(CLIENT_AS_WINDOW(self));
@@ -3635,7 +3632,8 @@ static void client_present(ObClient *self, gboolean here, gboolean raise)
     client_focus(self);
 }
 
-void client_activate(ObClient *self, gboolean here, gboolean user)
+void client_activate(ObClient *self, gboolean here, gboolean raise,
+                     gboolean unshade, gboolean user)
 {
     guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
     gboolean allow = FALSE;
@@ -3661,7 +3659,7 @@ void client_activate(ObClient *self, gboolean here, gboolean user)
                   (user ? "user" : "application"), allow);
 
     if (allow)
-        client_present(self, here, TRUE);
+        client_present(self, here, raise, unshade);
     else
         /* don't focus it but tell the user it wants attention */
         client_hilite(self, TRUE);

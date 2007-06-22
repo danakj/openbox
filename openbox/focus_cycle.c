@@ -137,7 +137,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                                            focus_cycle_all_desktops,
                                            focus_cycle_dock_windows,
                                            focus_cycle_desktop_windows);
-                return;
+                return NULL;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
                 done = TRUE;
@@ -258,12 +258,15 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
     return best_client;
 }
 
-void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
-                             gboolean desktop_windows, gboolean interactive,
-                             gboolean dialog, gboolean done, gboolean cancel)
+ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
+                                  gboolean desktop_windows,
+                                  gboolean interactive,
+                                  gboolean dialog,
+                                  gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
     ObClient *ft = NULL;
+    ObClient *ret = NULL;
 
     if (cancel) {
         focus_cycle_target = NULL;
@@ -313,11 +316,10 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                                       focus_cycle_all_desktops,
                                       focus_cycle_dock_windows,
                                       focus_cycle_desktop_windows);
-    return;
+    return NULL;
 
 done_cycle:
-    if (done && focus_cycle_target)
-        client_activate(focus_cycle_target, FALSE, TRUE);
+    if (done && !cancel) ret = focus_cycle_target;
 
     first = NULL;
     focus_cycle_target = NULL;
@@ -325,5 +327,5 @@ done_cycle:
     focus_cycle_draw_indicator(NULL);
     focus_cycle_popup_single_hide();
 
-    return;
+    return ret;
 }

@@ -28,5 +28,6 @@ void action_moveto_startup();
 void action_moverelative_startup();
 void action_shade_startup();
 void action_kill_startup();
+void action_omnipresent_startup();
 
 #endif

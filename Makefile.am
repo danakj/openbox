@@ -173,6 +173,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \
 	openbox/actions/moveto.c \
+	openbox/actions/omnipresent.c \
 	openbox/actions/raise.c \
 	openbox/actions/raiselower.c \
 	openbox/actions/reconfigure.c \

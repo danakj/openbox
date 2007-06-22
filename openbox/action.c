@@ -465,11 +465,6 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "toggleomnipresent",
-        action_toggle_omnipresent,
-        setup_client_action
-    },
-    {
         "resizerelativevert",
         action_resize_relative_vert,
         setup_client_action
@@ -918,13 +913,6 @@ void action_shadelower(union ActionData *data)
         action_lower(data);
     else
         action_shade(data);
-}
-
-void action_toggle_omnipresent(union ActionData *data)
-{ 
-    client_set_desktop(data->client.any.c,
-                       data->client.any.c->desktop == DESKTOP_ALL ?
-                       screen_desktop : DESKTOP_ALL, FALSE, TRUE);
 }
 
 void action_resize_relative_horz(union ActionData *data)

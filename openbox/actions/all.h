@@ -9,5 +9,6 @@ void action_showmenu_startup();
 void action_showdesktop_startup();
 void action_reconfigure_startup();
 void action_exit_startup();
+void action_restart_startup();
 
 #endif

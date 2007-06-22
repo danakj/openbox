@@ -781,16 +781,6 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "restart",
-        action_restart,
-        NULL
-    },
-    {
-        "exit",
-        action_exit,
-        NULL
-    },
-    {
         "sendtotoplayer",
         action_send_to_layer,
         setup_action_top_layer
@@ -1699,15 +1689,6 @@ void action_resize(union ActionData *data)
                              c->frame->size.bottom, c->shaded);
 
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
-}
-
-void action_restart(union ActionData *data)
-{
-    ob_restart_other(data->execute.path);
-}
-
-void action_exit(union ActionData *data)
-{
 }
 
 void action_cycle_windows(union ActionData *data)

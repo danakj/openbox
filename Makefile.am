@@ -160,6 +160,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/reconfigure.c \
+	openbox/actions/restart.c \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions.c \

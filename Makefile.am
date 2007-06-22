@@ -167,6 +167,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions/iconify.c \
 	openbox/actions/lower.c \
 	openbox/actions/maximize.c \
+	openbox/actions/maximizehorizontal.c \
+	openbox/actions/maximizevertical.c \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \
 	openbox/actions/moveto.c \
@@ -174,6 +176,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/raiselower.c \
 	openbox/actions/reconfigure.c \
 	openbox/actions/restart.c \
+	openbox/actions/shade.c \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \

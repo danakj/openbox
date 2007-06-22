@@ -10,9 +10,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_maximize_startup()
+void action_shade_startup()
 {
-    actions_register("Maximize",
+    actions_register("Shade",
                      setup_func,
                      free_func,
                      run_func,
@@ -27,7 +27,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o = g_new0(Options, 1);
     o->toggle = TRUE;
 
-    if ((n = parse_find_node("maximize", node))) {
+    if ((n = parse_find_node("shade", node))) {
         gchar *s = parse_string(doc, n);
         if (g_ascii_strcasecmp(s, "toggle")) {
             o->toggle = FALSE;
@@ -53,14 +53,10 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     if (data->client) {
         actions_client_move(data, TRUE);
-
         if (o->toggle)
-            client_maximize(data->client,
-                            !data->client->max_horz || !data->client->max_vert,
-                            0);
+            client_shade(data->client, !data->client->shaded);
         else
-            client_maximize(data->client, o->on, 0);
-
+            client_shade(data->client, o->on);
         actions_client_move(data, FALSE);
     }
 

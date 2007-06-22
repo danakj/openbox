@@ -470,28 +470,8 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "shade",
-        action_shade,
-        setup_client_action
-    },
-    {
-        "unshade",
-        action_unshade,
-        setup_client_action
-    },
-    {
-        "toggleshade",
-        action_toggle_shade,
-        setup_client_action
-    },
-    {
         "toggleomnipresent",
         action_toggle_omnipresent,
-        setup_client_action
-    },
-    {
-        "moverelativehorz",
-        action_move_relative_horz,
         setup_client_action
     },
     {
@@ -950,27 +930,6 @@ void action_kill(union ActionData *data)
     client_kill(data->client.any.c);
 }
 
-void action_shade(union ActionData *data)
-{
-    client_action_start(data);
-    client_shade(data->client.any.c, TRUE);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_unshade(union ActionData *data)
-{
-    client_action_start(data);
-    client_shade(data->client.any.c, FALSE);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_toggle_shade(union ActionData *data)
-{
-    client_action_start(data);
-    client_shade(data->client.any.c, !data->client.any.c->shaded);
-    client_action_end(data, config_focus_under_mouse);
-}
-
 void action_toggle_omnipresent(union ActionData *data)
 { 
     client_set_desktop(data->client.any.c,
@@ -997,15 +956,6 @@ void action_resize_relative_vert(union ActionData *data)
                       data->relative.deltax * c->size_inc.height);
         client_action_end(data, FALSE);
     }
-}
-
-void action_move_relative(union ActionData *data)
-{
-    ObClient *c = data->relative.any.c;
-    client_action_start(data);
-    client_move(c, c->area.x + data->relative.deltax, c->area.y +
-                data->relative.deltay);
-    client_action_end(data, FALSE);
 }
 
 void action_resize_relative(union ActionData *data)

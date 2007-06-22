@@ -10,9 +10,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_maximize_startup()
+void action_maximizehorizontal_startup()
 {
-    actions_register("Maximize",
+    actions_register("MaximizeHorizontal",
                      setup_func,
                      free_func,
                      run_func,
@@ -55,11 +55,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         actions_client_move(data, TRUE);
 
         if (o->toggle)
-            client_maximize(data->client,
-                            !data->client->max_horz || !data->client->max_vert,
-                            0);
+            client_maximize(data->client, !data->client->max_horz, 1);
         else
-            client_maximize(data->client, o->on, 0);
+            client_maximize(data->client, o->on, 1);
 
         actions_client_move(data, FALSE);
     }

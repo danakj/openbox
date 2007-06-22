@@ -8,13 +8,6 @@ typedef struct {
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
-/*
-static gboolean i_input_func(guint initial_state,
-                             XEvent *e,
-                             gpointer options,
-                             gboolean *used);
-static void     i_cancel_func(gpointer options);
-*/
 
 void action_debug_startup()
 {

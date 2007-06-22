@@ -776,21 +776,6 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "toggleshowdesktop",
-        action_toggle_show_desktop,
-        NULL
-    },
-    {
-        "showdesktop",
-        action_show_desktop,
-        NULL
-    },
-    {
-        "unshowdesktop",
-        action_unshow_desktop,
-        NULL
-    },
-    {
         "desktoplast",
         action_desktop_last,
         NULL
@@ -1893,21 +1878,6 @@ void action_toggle_dockautohide(union ActionData *data)
 {
     config_dock_hide = !config_dock_hide;
     dock_configure();
-}
-
-void action_toggle_show_desktop(union ActionData *data)
-{
-    screen_show_desktop(!screen_showing_desktop, NULL);
-}
-
-void action_show_desktop(union ActionData *data)
-{
-    screen_show_desktop(TRUE, NULL);
-}
-
-void action_unshow_desktop(union ActionData *data)
-{
-    screen_show_desktop(FALSE, NULL);
 }
 
 void action_break_chroot(union ActionData *data)

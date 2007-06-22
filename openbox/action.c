@@ -455,11 +455,6 @@ ActionString actionstrings[] =
         setup_action_directional_focus_northwest
     },
     {
-        "kill",
-        action_kill,
-        setup_client_action
-    },
-    {
         "shadelower",
         action_shadelower,
         setup_client_action
@@ -923,11 +918,6 @@ void action_shadelower(union ActionData *data)
         action_lower(data);
     else
         action_shade(data);
-}
-
-void action_kill(union ActionData *data)
-{
-    client_kill(data->client.any.c);
 }
 
 void action_toggle_omnipresent(union ActionData *data)

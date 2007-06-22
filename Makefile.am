@@ -165,6 +165,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/focus.c \
 	openbox/actions/fullscreen.c \
 	openbox/actions/iconify.c \
+	openbox/actions/kill.c \
 	openbox/actions/lower.c \
 	openbox/actions/maximize.c \
 	openbox/actions/maximizehorizontal.c \

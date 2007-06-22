@@ -12,5 +12,6 @@ void action_exit_startup();
 void action_restart_startup();
 void action_cyclewindows_startup();
 void action_activate_startup();
+void action_breakchroot_startup();
 
 #endif

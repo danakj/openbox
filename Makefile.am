@@ -157,6 +157,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/all.c \
 	openbox/actions/all.h \
 	openbox/actions/activate.c \
+	openbox/actions/breakchroot.c \
 	openbox/actions/cyclewindows.c \
 	openbox/actions/debug.c \
 	openbox/actions/execute.c \

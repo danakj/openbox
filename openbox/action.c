@@ -446,11 +446,6 @@ void setup_action_addremove_desktop_last(ObAction **a, ObUserAction uact)
     (*a)->data.addremovedesktop.current = FALSE;
 }
 
-void setup_action_focus(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.any.client_action = OB_CLIENT_ACTION_OPTIONAL;
-}
-
 void setup_client_action(ObAction **a, ObUserAction uact)
 {
     (*a)->data.any.client_action = OB_CLIENT_ACTION_ALWAYS;
@@ -497,11 +492,6 @@ ActionString actionstrings[] =
         "directionalfocusnorthwest",
         action_directional_focus,
         setup_action_directional_focus_northwest
-    },
-    {
-        "focus",
-        action_focus,
-        setup_action_focus
     },
     {
         "unfocus",
@@ -839,11 +829,6 @@ ActionString actionstrings[] =
         setup_action_growtoedge_east
     },
     {
-        "breakchroot",
-        action_break_chroot,
-        NULL
-    },
-    {
         "adddesktoplast",
         action_add_desktop,
         setup_action_addremove_desktop_last
@@ -1108,27 +1093,6 @@ void action_run_string(const gchar *name, struct _ObClient *c, Time time)
     l = g_slist_append(NULL, a);
 
     action_run(l, c, 0, time);
-}
-
-void action_focus(union ActionData *data)
-{
-    if (data->client.any.c) {
-        if (!data->any.button || client_mouse_focusable(data->client.any.c) ||
-            (data->any.context != OB_FRAME_CONTEXT_CLIENT &&
-             data->any.context != OB_FRAME_CONTEXT_FRAME))
-        {
-            /* if using focus_delay, stop the timer now so that focus doesn't
-               go moving on us */
-            event_halt_focus_delay();
-
-            client_focus(data->client.any.c);
-        }
-    } else {
-        /* focus action on something other than a client, make keybindings
-           work for this openbox instance, but don't focus any specific client
-        */
-        focus_nothing();
-    }
 }
 
 void action_unfocus (union ActionData *data)
@@ -1760,12 +1724,6 @@ void action_toggle_dockautohide(union ActionData *data)
 {
     config_dock_hide = !config_dock_hide;
     dock_configure();
-}
-
-void action_break_chroot(union ActionData *data)
-{
-    /* break out of one chroot */
-    keyboard_reset_chains(1);
 }
 
 void action_add_desktop(union ActionData *data)

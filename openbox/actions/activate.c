@@ -62,10 +62,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             data->context != OB_FRAME_CONTEXT_CLIENT ||
             data->context != OB_FRAME_CONTEXT_FRAME)
         {
-            /* if using focus_delay, stop the timer now so that focus doesn't
-               go moving on us */
-            event_halt_focus_delay();
-
             client_activate(data->client, o->here, o->raise, o->unshade, TRUE);
         }
     } else {

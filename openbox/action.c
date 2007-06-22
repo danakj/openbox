@@ -465,16 +465,6 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "raiselower",
-        action_raiselower,
-        setup_client_action
-    },
-    {
-        "lower",
-        action_lower,
-        setup_client_action
-    },
-    {
         "kill",
         action_kill,
         setup_client_action
@@ -1048,15 +1038,6 @@ void action_focus_order_to_bottom(union ActionData *data)
     focus_order_to_bottom(data->client.any.c);
 }
 
-void action_raiselower(union ActionData *data)
-{
-    ObClient *c = data->client.any.c;
-
-    client_action_start(data);
-    stacking_restack_request(c, NULL, Opposite);
-    client_action_end(data, config_focus_under_mouse);
-}
-
 void action_unshaderaise(union ActionData *data)
 {
     if (data->client.any.c->shaded)
@@ -1071,13 +1052,6 @@ void action_shadelower(union ActionData *data)
         action_lower(data);
     else
         action_shade(data);
-}
-
-void action_lower(union ActionData *data)
-{
-    client_action_start(data);
-    stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
-    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_kill(union ActionData *data)

@@ -43,7 +43,6 @@ typedef void     (*ObActionsInteractiveCancelFunc)(gpointer options);
 
 struct _ObActionsData {
     ObUserAction uact;
-    Time time;
     guint state;
     gint x;
     gint y;
@@ -79,7 +78,6 @@ void actions_act_unref(ObActionsAct *act);
 */
 void actions_run_acts(GSList *acts,
                       ObUserAction uact,
-                      Time time,
                       guint state,
                       gint x,
                       gint y,

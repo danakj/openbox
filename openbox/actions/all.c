@@ -9,4 +9,5 @@ void action_all_startup()
     action_reconfigure_startup();
     action_exit_startup();
     action_restart_startup();
+    action_cyclewindows_startup();
 }

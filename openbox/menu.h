@@ -44,7 +44,7 @@ typedef gboolean (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame,
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry,
                                   struct _ObMenuFrame *frame,
                                   struct _ObClient *client,
-                                  guint state, gpointer data, Time time);
+                                  guint state, gpointer data);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
 /*! @param x is the mouse x coordinate. on return it should be the x coordinate
              for the menu

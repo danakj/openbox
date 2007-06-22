@@ -103,8 +103,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             /* sets up the environment */
             sn_setup_spawn_environment(program, o->sn_name, o->sn_icon,
                                        /* launch it on the current desktop */
-                                       screen_desktop,
-                                       data->time);
+                                       screen_desktop);
         }
 
         if (!g_spawn_async(NULL, argv, NULL,

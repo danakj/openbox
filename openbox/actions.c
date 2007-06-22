@@ -190,7 +190,6 @@ void actions_act_unref(ObActionsAct *act)
 
 static void actions_setup_data(ObActionsData *data,
                                ObUserAction uact,
-                               Time time,
                                guint state,
                                gint x,
                                gint y,
@@ -198,7 +197,6 @@ static void actions_setup_data(ObActionsData *data,
                                struct _ObClient *client)
 {
     data->uact = uact;
-    data->time = time;
     data->state = state;
     data->x = x;
     data->y = y;
@@ -208,7 +206,6 @@ static void actions_setup_data(ObActionsData *data,
 
 void actions_run_acts(GSList *acts,
                       ObUserAction uact,
-                      Time time,
                       guint state,
                       gint x,
                       gint y,
@@ -230,7 +227,7 @@ void actions_run_acts(GSList *acts,
         ObActionsAct *act = it->data;
         gboolean ok = TRUE;
 
-        actions_setup_data(&data, uact, time, state, x, y, con, client);
+        actions_setup_data(&data, uact, state, x, y, con, client);
 
         if (actions_act_is_interactive(act) &&
             (!interactive_act || interactive_act->def != act->def))

@@ -67,15 +67,16 @@ void focus_cycle_stop(ObClient *ifclient)
     }
 }
 
-void focus_cycle(gboolean forward, gboolean all_desktops,
-                 gboolean dock_windows, gboolean desktop_windows,
-                 gboolean linear, gboolean interactive,
-                 gboolean dialog, gboolean done, gboolean cancel)
+ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
+                      gboolean dock_windows, gboolean desktop_windows,
+                      gboolean linear, gboolean interactive,
+                      gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *t = NULL;
     static GList *order = NULL;
     GList *it, *start, *list;
     ObClient *ft = NULL;
+    ObClient *ret = NULL;
 
     if (interactive) {
         if (cancel) {
@@ -146,8 +147,7 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
     } while (it != start);
 
 done_cycle:
-    if (done && focus_cycle_target)
-        client_activate(focus_cycle_target, FALSE, TRUE);
+    if (done && !cancel) ret = focus_cycle_target;
 
     t = NULL;
     focus_cycle_target = NULL;
@@ -159,7 +159,7 @@ done_cycle:
         focus_cycle_popup_hide();
     }
 
-    return;
+    return ret;
 }
 
 /* this be mostly ripped from fvwm */

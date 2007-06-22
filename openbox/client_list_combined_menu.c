@@ -94,8 +94,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 }
 
 static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
-                         ObClient *c, guint state, gpointer data,
-                         Time time)
+                         ObClient *c, guint state, gpointer data)
 {
     if (self->id == -1) {
         if (self->data.normal.data) /* it's set to NULL if its destroyed */

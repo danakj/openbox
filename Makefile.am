@@ -156,6 +156,7 @@ openbox_openbox_SOURCES = \
 	gettext.h \
 	openbox/actions/all.c \
 	openbox/actions/all.h \
+	openbox/actions/cyclewindows.c \
 	openbox/actions/debug.c \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \

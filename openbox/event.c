@@ -1630,7 +1630,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
         if (frame->child)
             menu_frame_select_next(frame->child);
         else if (frame->selected)
-            menu_entry_frame_execute(frame->selected, state, ev->xkey.time);
+            menu_entry_frame_execute(frame->selected, state);
     }
 
     else if (keycode == ob_keycode(OB_KEY_LEFT) && ev->xkey.state == 0) {
@@ -1700,7 +1700,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
                 menu_frame_select(frame, found, TRUE);
                 usleep(50000); /* highlight the item for a short bit so the
                                   user can see what happened */
-                menu_entry_frame_execute(found, state, ev->xkey.time);
+                menu_entry_frame_execute(found, state);
             } else {
                 menu_frame_select(frame, found, TRUE);
                 if (num_found == 1)
@@ -1730,8 +1730,7 @@ static gboolean event_handle_menu(XEvent *ev)
                                             ev->xbutton.y_root)))
             {
                 menu_frame_select(e->frame, e, TRUE);
-                menu_entry_frame_execute(e, ev->xbutton.state,
-                                         ev->xbutton.time);
+                menu_entry_frame_execute(e, ev->xbutton.state);
             }
             else
                 menu_frame_hide_all();

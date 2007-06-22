@@ -182,7 +182,7 @@ static ObUserAction mouse_action_to_user_action(ObMouseAction a)
 
 static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
                              ObClient *c, guint state,
-                             guint button, gint x, gint y, Time time)
+                             guint button, gint x, gint y)
 {
     GSList *it;
     ObMouseBinding *b;
@@ -196,7 +196,7 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     if (it == NULL) return FALSE;
 
     actions_run_acts(b->actions[a], mouse_action_to_user_action(a),
-                     time, state, x, y, context, c);
+                     state, x, y, context, c);
     return TRUE;
 }
 
@@ -228,8 +228,7 @@ void mouse_event(ObClient *client, XEvent *e)
         fire_binding(OB_MOUSE_ACTION_PRESS, context,
                      client, e->xbutton.state,
                      e->xbutton.button,
-                     e->xbutton.x_root, e->xbutton.y_root,
-                     e->xbutton.time);
+                     e->xbutton.x_root, e->xbutton.y_root);
 
         /* if the bindings grab the pointer, there won't be a ButtonRelease
            event for us */
@@ -293,22 +292,19 @@ void mouse_event(ObClient *client, XEvent *e)
                      client, e->xbutton.state,
                      e->xbutton.button,
                      e->xbutton.x_root,
-                     e->xbutton.y_root,
-                     e->xbutton.time);
+                     e->xbutton.y_root);
         if (click)
             fire_binding(OB_MOUSE_ACTION_CLICK, context,
                          client, e->xbutton.state,
                          e->xbutton.button,
                          e->xbutton.x_root,
-                         e->xbutton.y_root,
-                         e->xbutton.time);
+                         e->xbutton.y_root);
         if (dclick)
             fire_binding(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
                          client, e->xbutton.state,
                          e->xbutton.button,
                          e->xbutton.x_root,
-                         e->xbutton.y_root,
-                         e->xbutton.time);
+                         e->xbutton.y_root);
         break;
 
     case MotionNotify:
@@ -329,7 +325,7 @@ void mouse_event(ObClient *client, XEvent *e)
                     break;
 
                 fire_binding(OB_MOUSE_ACTION_MOTION, context,
-                             client, state, button, px, py, e->xmotion.time);
+                             client, state, button, px, py);
                 button = 0;
                 state = 0;
             }

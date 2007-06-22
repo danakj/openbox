@@ -255,8 +255,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
                     keyboard_reset_chains(0);
 
                 actions_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
-                                 e->xkey.time, e->xkey.state,
-                                 e->xkey.x_root, e->xkey.y_root,
+                                 e->xkey.state, e->xkey.x_root, e->xkey.y_root,
                                  OB_FRAME_CONTEXT_NONE, client);
             }
             break;

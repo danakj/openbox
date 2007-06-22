@@ -318,28 +318,6 @@ void setup_action_desktop_down(ObAction **a, ObUserAction uact)
     (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_cycle_windows_next(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.cycle.inter.any.interactive = TRUE;
-    (*a)->data.cycle.linear = FALSE;
-    (*a)->data.cycle.forward = TRUE;
-    (*a)->data.cycle.dialog = TRUE;
-    (*a)->data.cycle.dock_windows = FALSE;
-    (*a)->data.cycle.desktop_windows = FALSE;
-    (*a)->data.cycle.all_desktops = FALSE;
-}
-
-void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.cycle.inter.any.interactive = TRUE;
-    (*a)->data.cycle.linear = FALSE;
-    (*a)->data.cycle.forward = FALSE;
-    (*a)->data.cycle.dialog = TRUE;
-    (*a)->data.cycle.dock_windows = FALSE;
-    (*a)->data.cycle.desktop_windows = FALSE;
-    (*a)->data.cycle.all_desktops = FALSE;
-}
-
 void setup_action_movefromedge_north(ObAction **a, ObUserAction uact)
 {
     (*a)->data.diraction.any.client_action = OB_CLIENT_ACTION_ALWAYS;
@@ -806,16 +784,6 @@ ActionString actionstrings[] =
         setup_action_bottom_layer
     },
     {
-        "nextwindow",
-        action_cycle_windows,
-        setup_action_cycle_windows_next
-    },
-    {
-        "previouswindow",
-        action_cycle_windows,
-        setup_action_cycle_windows_previous
-    },
-    {
         "movefromedgenorth",
         action_movetoedge,
         setup_action_movefromedge_north
@@ -1000,18 +968,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             } else if (act->func == action_activate) {
                 if ((n = parse_find_node("here", node->xmlChildrenNode)))
                     act->data.activate.here = parse_bool(doc, n);
-            } else if (act->func == action_cycle_windows) {
-                if ((n = parse_find_node("linear", node->xmlChildrenNode)))
-                    act->data.cycle.linear = parse_bool(doc, n);
-                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
-                    act->data.cycle.dialog = parse_bool(doc, n);
-                if ((n = parse_find_node("panels", node->xmlChildrenNode)))
-                    act->data.cycle.dock_windows = parse_bool(doc, n);
-                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
-                    act->data.cycle.desktop_windows = parse_bool(doc, n);
-                if ((n = parse_find_node("allDesktops",
-                                         node->xmlChildrenNode)))
-                    act->data.cycle.all_desktops = parse_bool(doc, n);
             } else if (act->func == action_directional_focus) {
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.interdiraction.dialog = parse_bool(doc, n);
@@ -1689,21 +1645,6 @@ void action_resize(union ActionData *data)
                              c->frame->size.bottom, c->shaded);
 
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
-}
-
-void action_cycle_windows(union ActionData *data)
-{
-    /* if using focus_delay, stop the timer now so that focus doesn't go moving
-       on us */
-    event_halt_focus_delay();
-
-    focus_cycle(data->cycle.forward,
-                data->cycle.all_desktops,
-                data->cycle.dock_windows,
-                data->cycle.desktop_windows,
-                data->cycle.linear, data->any.interactive,
-                data->cycle.dialog,
-                data->cycle.inter.final, data->cycle.inter.cancel);
 }
 
 void action_directional_focus(union ActionData *data)

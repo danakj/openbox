@@ -163,6 +163,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/decorations.c \
 	openbox/actions/desktop.c \
 	openbox/actions/directionalcyclewindows.c \
+	openbox/actions/directionaldesktop.c \
 	openbox/actions/directionaltargetwindow.c \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \

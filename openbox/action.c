@@ -391,36 +391,6 @@ ActionString actionstrings[] =
         setup_action_send_to_desktop_down
     },
     {
-        "desktopnext",
-        action_desktop_dir,
-        setup_action_desktop_next
-    },
-    {
-        "desktopprevious",
-        action_desktop_dir,
-        setup_action_desktop_prev
-    },
-    {
-        "desktopright",
-        action_desktop_dir,
-        setup_action_desktop_right
-    },
-    {
-        "desktopleft",
-        action_desktop_dir,
-        setup_action_desktop_left
-    },
-    {
-        "desktopup",
-        action_desktop_dir,
-        setup_action_desktop_up
-    },
-    {
-        "desktopdown",
-        action_desktop_dir,
-        setup_action_desktop_down
-    },
-    {
         "toggledockautohide",
         action_toggle_dockautohide,
         NULL
@@ -607,12 +577,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if (act->data.sendto.desk > 0) act->data.sendto.desk--;
                 if ((n = parse_find_node("follow", node->xmlChildrenNode)))
                     act->data.sendto.follow = parse_bool(doc, n);
-            } else if (act->func == action_desktop_dir) {
-                if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
-                    act->data.desktopdir.wrap = parse_bool(doc, n); 
-                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
-                    act->data.desktopdir.inter.any.interactive =
-                        parse_bool(doc, n);
             } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);

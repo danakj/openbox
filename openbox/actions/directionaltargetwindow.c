@@ -42,17 +42,21 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         o->desktop_windows = parse_bool(doc, n);
     if ((n = parse_find_node("direction", node))) {
         gchar *s = parse_string(doc, n);
-        if (!g_ascii_strcasecmp(s, "north"))
+        if (!g_ascii_strcasecmp(s, "north") ||
+            !g_ascii_strcasecmp(s, "up"))
             o->direction = OB_DIRECTION_NORTH;
         else if (!g_ascii_strcasecmp(s, "northwest"))
             o->direction = OB_DIRECTION_NORTHWEST;
         else if (!g_ascii_strcasecmp(s, "northeast"))
             o->direction = OB_DIRECTION_NORTHEAST;
-        else if (!g_ascii_strcasecmp(s, "west"))
+        else if (!g_ascii_strcasecmp(s, "west") ||
+                 !g_ascii_strcasecmp(s, "left"))
             o->direction = OB_DIRECTION_WEST;
-        else if (!g_ascii_strcasecmp(s, "east"))
+        else if (!g_ascii_strcasecmp(s, "east") ||
+                 !g_ascii_strcasecmp(s, "right"))
             o->direction = OB_DIRECTION_EAST;
-        else if (!g_ascii_strcasecmp(s, "south"))
+        else if (!g_ascii_strcasecmp(s, "south") ||
+                 !g_ascii_strcasecmp(s, "down"))
             o->direction = OB_DIRECTION_NORTH;
         else if (!g_ascii_strcasecmp(s, "southwest"))
             o->direction = OB_DIRECTION_NORTHWEST;

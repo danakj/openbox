@@ -12,7 +12,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_desktop_startup()
 {
-    actions_register("desktop",
+    actions_register("Desktop",
                      setup_func,
                      free_func,
                      run_func,

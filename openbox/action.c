@@ -96,78 +96,6 @@ ObAction* action_copy(const ObAction *src)
     return a;
 }
 
-void setup_action_directional_focus_north(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_NORTH;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_EAST;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTH;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_WEST;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
-void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.interdiraction.inter.any.interactive = TRUE;
-    (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
-    (*a)->data.interdiraction.dialog = TRUE;
-    (*a)->data.interdiraction.dock_windows = FALSE;
-    (*a)->data.interdiraction.desktop_windows = FALSE;
-}
-
 void setup_action_send_to_desktop(ObAction **a, ObUserAction uact)
 {
     (*a)->data.sendto.any.client_action = OB_CLIENT_ACTION_ALWAYS;
@@ -414,46 +342,6 @@ void setup_client_action(ObAction **a, ObUserAction uact)
 
 ActionString actionstrings[] =
 {
-    {
-        "directionalfocusnorth", 
-        action_directional_focus, 
-        setup_action_directional_focus_north
-    },
-    {
-        "directionalfocuseast", 
-        action_directional_focus, 
-        setup_action_directional_focus_east
-    },
-    {
-        "directionalfocussouth", 
-        action_directional_focus, 
-        setup_action_directional_focus_south
-    },
-    {
-        "directionalfocuswest",
-        action_directional_focus,
-        setup_action_directional_focus_west
-    },
-    {
-        "directionalfocusnortheast",
-        action_directional_focus,
-        setup_action_directional_focus_northeast
-    },
-    {
-        "directionalfocussoutheast",
-        action_directional_focus,
-        setup_action_directional_focus_southeast
-    },
-    {
-        "directionalfocussouthwest",
-        action_directional_focus,
-        setup_action_directional_focus_southwest
-    },
-    {
-        "directionalfocusnorthwest",
-        action_directional_focus,
-        setup_action_directional_focus_northwest
-    },
     {
         "shadelower",
         action_shadelower,
@@ -754,14 +642,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     act->data.sendtodir.follow = parse_bool(doc, n);
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.sendtodir.inter.any.interactive =
-                        parse_bool(doc, n);
-            } else if (act->func == action_directional_focus) {
-                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
-                    act->data.interdiraction.dialog = parse_bool(doc, n);
-                if ((n = parse_find_node("panels", node->xmlChildrenNode)))
-                    act->data.interdiraction.dock_windows = parse_bool(doc, n);
-                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
-                    act->data.interdiraction.desktop_windows =
                         parse_bool(doc, n);
             } else if (act->func == action_resize) {
                 if ((n = parse_find_node("edge", node->xmlChildrenNode))) {

@@ -29,5 +29,6 @@ void action_moverelative_startup();
 void action_shade_startup();
 void action_kill_startup();
 void action_omnipresent_startup();
+void action_directionalcyclewindows_startup();
 
 #endif

@@ -21,5 +21,6 @@ void action_raiselower_startup();
 void action_unfocus_startup();
 void action_iconify_startup();
 void action_fullscreen_startup();
+void action_maximize_startup();
 
 #endif

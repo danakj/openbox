@@ -525,21 +525,6 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "maximizefull",
-        action_maximize_full,
-        setup_client_action
-    },
-    {
-        "unmaximizefull",
-        action_unmaximize_full,
-        setup_client_action
-    },
-    {
-        "togglemaximizefull",
-        action_toggle_maximize_full,
-        setup_client_action
-    },
-    {
         "maximizehorz",
         action_maximize_horz,
         setup_client_action
@@ -1140,30 +1125,6 @@ void action_resize_relative(union ActionData *data)
     yoff = yoff == 0 ? 0 : (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
     client_move_resize(c, x + xoff, y + yoff, nw, nh);
     client_action_end(data, FALSE);
-}
-
-void action_maximize_full(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c, TRUE, 0);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_unmaximize_full(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c, FALSE, 0);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_toggle_maximize_full(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c,
-                    !(data->client.any.c->max_horz ||
-                      data->client.any.c->max_vert),
-                    0);
-    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_maximize_horz(union ActionData *data)

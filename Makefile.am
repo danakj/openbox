@@ -166,6 +166,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/fullscreen.c \
 	openbox/actions/iconify.c \
 	openbox/actions/lower.c \
+	openbox/actions/maximize.c \
 	openbox/actions/move.c \
 	openbox/actions/raise.c \
 	openbox/actions/raiselower.c \

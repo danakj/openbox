@@ -20,4 +20,5 @@ void action_all_startup()
     action_unfocus_startup();
     action_iconify_startup();
     action_fullscreen_startup();
+    action_maximize_startup();
 }

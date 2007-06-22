@@ -137,7 +137,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                                            focus_cycle_all_desktops,
                                            focus_cycle_dock_windows,
                                            focus_cycle_desktop_windows);
-                return NULL;
+                return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
                 done = TRUE;
@@ -316,7 +316,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                                       focus_cycle_all_desktops,
                                       focus_cycle_dock_windows,
                                       focus_cycle_desktop_windows);
-    return NULL;
+    return focus_cycle_target;
 
 done_cycle:
     if (done && !cancel) ret = focus_cycle_target;

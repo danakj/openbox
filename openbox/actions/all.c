@@ -10,8 +10,8 @@ void action_all_startup()
     action_exit_startup();
     action_restart_startup();
     action_cyclewindows_startup();
-    action_activate_startup();
     action_breakchroot_startup();
     action_close_startup();
     action_move_startup();
+    action_focus_startup();
 }

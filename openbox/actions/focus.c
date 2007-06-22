@@ -5,17 +5,15 @@
 
 typedef struct {
     gboolean here;
-    gboolean raise;
-    gboolean unshade;
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_activate_startup()
+void action_focus_startup()
 {
-    actions_register("Activate",
+    actions_register("Focus",
                      setup_func,
                      free_func,
                      run_func,
@@ -28,15 +26,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     Options *o;
 
     o = g_new0(Options, 1);
-    o->raise = TRUE;
-    o->unshade = TRUE;
 
     if ((n = parse_find_node("here", node)))
         o->here = parse_bool(doc, n);
-    if ((n = parse_find_node("raise", node)))
-        o->raise = parse_bool(doc, n);
-    if ((n = parse_find_node("unshade", node)))
-        o->unshade = parse_bool(doc, n);
     return o;
 }
 
@@ -57,7 +49,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             data->context != OB_FRAME_CONTEXT_CLIENT ||
             data->context != OB_FRAME_CONTEXT_FRAME)
         {
-            client_activate(data->client, o->here, o->raise, o->unshade, TRUE);
+            client_activate(data->client, o->here, FALSE, FALSE, TRUE);
         }
     } else {
         /* focus action on something other than a client, make keybindings

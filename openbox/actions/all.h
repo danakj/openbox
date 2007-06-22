@@ -11,9 +11,9 @@ void action_reconfigure_startup();
 void action_exit_startup();
 void action_restart_startup();
 void action_cyclewindows_startup();
-void action_activate_startup();
 void action_breakchroot_startup();
 void action_close_startup();
 void action_move_startup();
+void action_focus_startup();
 
 #endif

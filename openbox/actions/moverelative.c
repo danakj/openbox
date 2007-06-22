@@ -61,7 +61,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_try_configure(data->client, &x, &y, &w, &h, &lw, &lh, TRUE);
         client_find_onscreen(data->client, &x, &y, w, h, FALSE);
 
+        actions_client_move(data, TRUE);
         client_configure(data->client, x, y, w, h, TRUE, TRUE, FALSE);
+        actions_client_move(data, FALSE);
     }
 
     return FALSE;

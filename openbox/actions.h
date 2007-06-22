@@ -41,42 +41,15 @@ typedef gboolean (*ObActionsInteractiveInputFunc)(guint initial_state,
                                                   gboolean *used);
 typedef void     (*ObActionsInteractiveCancelFunc)(gpointer options);
 
-typedef enum {
-    OB_ACTION_TYPE_GLOBAL,
-    OB_ACTION_TYPE_CLIENT
-} ObActionsType;
-
-/* These structures are all castable as eachother */
-
-struct _ObActionsAnyData {
+struct _ObActionsData {
     ObUserAction uact;
     Time time;
     guint state;
     gint x;
     gint y;
-};
 
-struct _ObActionsGlobalData {
-    ObActionsType type;
-    ObActionsAnyData any;
-};
-
-struct _ObActionsClientData {
-    ObActionsType type;
-    ObActionsAnyData any;
-
-    struct _ObClient *c;
+    struct _ObClient *client;
     ObFrameContext context;
-};
-
-struct _ObActionsData {
-    ObActionsType type;
-
-    union {
-        ObActionsAnyData      any;
-        ObActionsGlobalData   global;
-        ObActionsClientData   client;
-    };
 };
 
 void actions_startup(gboolean reconfigure);
@@ -85,7 +58,6 @@ void actions_shutdown(gboolean reconfigure);
 /*! If the action is interactive, then i_input and i_cancel are not NULL.
   Otherwise, they should both be NULL. */
 gboolean actions_register(const gchar *name,
-                          ObActionsType type,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run,

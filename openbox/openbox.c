@@ -240,10 +240,10 @@ gint main(gint argc, gchar **argv)
                    of the rc */
                 i = parse_startup();
 
-                /* start up config which sets up with the parser */
-                config_startup(i);
                 /* register all the available actions */
                 actions_startup(reconfigure);
+                /* start up config which sets up with the parser */
+                config_startup(i);
 
                 /* parse/load user options */
                 if (parse_load_rc(NULL, &doc, &node)) {
@@ -376,8 +376,8 @@ gint main(gint argc, gchar **argv)
             sn_shutdown(reconfigure);
             window_shutdown(reconfigure);
             event_shutdown(reconfigure);
-            actions_shutdown(reconfigure);
             config_shutdown();
+            actions_shutdown(reconfigure);
             modkeys_shutdown(reconfigure);
         } while (reconfigure);
     }

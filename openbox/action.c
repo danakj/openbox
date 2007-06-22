@@ -1248,59 +1248,6 @@ void action_debug(union ActionData *data)
 
 void action_execute(union ActionData *data)
 {
-    GError *e = NULL;
-    gchar *cmd, **argv = 0;
-    if (data->execute.path) {
-        cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
-        if (cmd) {
-            /* If there is a keyboard grab going on then we need to cancel
-               it so the application can grab things */
-            event_cancel_all_key_grabs();
-
-            if (!g_shell_parse_argv (cmd, NULL, &argv, &e)) {
-                g_message(_("Failed to execute '%s': %s"),
-                          cmd, e->message);
-                g_error_free(e);
-            } else if (data->execute.startupnotify) {
-                gchar *program;
-                
-                program = g_path_get_basename(argv[0]);
-                /* sets up the environment */
-                sn_setup_spawn_environment(program,
-                                           data->execute.name,
-                                           data->execute.icon_name,
-                                           /* launch it on the current
-                                              desktop */
-                                           screen_desktop,
-                                           data->execute.any.time);
-                if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
-                                   G_SPAWN_DO_NOT_REAP_CHILD,
-                                   NULL, NULL, NULL, &e)) {
-                    g_message(_("Failed to execute '%s': %s"),
-                              cmd, e->message);
-                    g_error_free(e);
-                    sn_spawn_cancel();
-                }
-                unsetenv("DESKTOP_STARTUP_ID");
-                g_free(program);
-                g_strfreev(argv);
-            } else {
-                if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH |
-                                   G_SPAWN_DO_NOT_REAP_CHILD,
-                                   NULL, NULL, NULL, &e))
-                {
-                    g_message(_("Failed to execute '%s': %s"),
-                              cmd, e->message);
-                    g_error_free(e);
-                }
-                g_strfreev(argv);
-            }
-            g_free(cmd);
-        } else {
-            g_message(_("Failed to convert the path '%s' from utf8"),
-                      data->execute.path);
-        }
-    }
 }
 
 void action_activate(union ActionData *data)

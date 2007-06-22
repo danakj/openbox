@@ -764,6 +764,7 @@ static void bind_default_keyboard()
 {
     ObDefKeyBind *it;
     ObDefKeyBind binds[] = {
+        { NULL, NULL },
         { "A-Tab", "NextWindow" },
         { "S-A-Tab", "PreviousWindow" },
         { "A-F4", "Close" },
@@ -789,6 +790,7 @@ static void bind_default_mouse()
 {
     ObDefMouseBind *it;
     ObDefMouseBind binds[] = {
+        { NULL, NULL, 0, NULL },
         { "Left", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Middle", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Right", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },

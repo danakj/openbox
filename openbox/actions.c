@@ -21,6 +21,8 @@
 #include "grab.h"
 #include "screen.h"
 
+#include "actions/all.h"
+
 static void     actions_definition_ref(ObActionsDefinition *def);
 static void     actions_definition_unref(ObActionsDefinition *def);
 static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state);
@@ -33,7 +35,6 @@ struct _ObActionsDefinition {
     guint ref;
 
     gchar *name;
-    ObActionsType type;
 
     ObActionsDataSetupFunc setup;
     ObActionsDataFreeFunc free;
@@ -55,6 +56,8 @@ static GSList *registered = NULL;
 void actions_startup(gboolean reconfig)
 {
     if (reconfig) return;
+
+    action_all_startup();
 }
 
 void actions_shutdown(gboolean reconfig)
@@ -71,7 +74,6 @@ void actions_shutdown(gboolean reconfig)
 }
 
 gboolean actions_register(const gchar *name,
-                          ObActionsType type,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run,
@@ -92,12 +94,14 @@ gboolean actions_register(const gchar *name,
     def = g_new(ObActionsDefinition, 1);
     def->ref = 1;
     def->name = g_strdup(name);
-    def->type = type;
     def->setup = setup;
     def->free = free;
     def->run = run;
     def->i_input = i_input;
     def->i_cancel = i_cancel;
+
+    registered = g_slist_prepend(registered, def);
+
     return TRUE;
 }
 
@@ -117,7 +121,7 @@ static void actions_definition_unref(ObActionsDefinition *def)
 ObActionsAct* actions_parse_string(const gchar *name)
 {
     GSList *it;
-    ObActionsDefinition *def;
+    ObActionsDefinition *def = NULL;
     ObActionsAct *act = NULL;
 
     /* find the requested action */
@@ -152,7 +156,7 @@ ObActionsAct* actions_parse(ObParseInst *i,
     if (parse_attr_string("name", node, &name)) {
         if ((act = actions_parse_string(name)))
             /* there is more stuff to parse here */
-            act->options = act->def->setup(i, doc, node->children);
+            act->options = act->def->setup(i, doc, node->xmlChildrenNode);
 
         g_free(name);
     }
@@ -186,13 +190,17 @@ static void actions_setup_data(ObActionsData *data,
                                Time time,
                                guint state,
                                gint x,
-                               gint y)
+                               gint y,
+                               ObFrameContext con,
+                               struct _ObClient *client)
 {
-    data->any.uact = uact;
-    data->any.time = time;
-    data->any.state = state;
-    data->any.x = x;
-    data->any.y = y;
+    data->uact = uact;
+    data->time = time;
+    data->state = state;
+    data->x = x;
+    data->y = y;
+    data->context = con;
+    data->client = client;
 }
 
 void actions_run_acts(GSList *acts,
@@ -219,18 +227,7 @@ void actions_run_acts(GSList *acts,
         ObActionsAct *act = it->data;
         gboolean ok = TRUE;
 
-        data.type = act->def->type;
-        actions_setup_data(&data, uact, time, state, x, y);
-        switch (data.type) {
-        case OB_ACTION_TYPE_GLOBAL:
-            break;
-        case OB_ACTION_TYPE_CLIENT:
-            data.client.context = con;
-            data.client.c = client;
-            break;
-        default:
-            g_assert_not_reached();
-        }
+        actions_setup_data(&data, uact, time, state, x, y, con, client);
 
         if (actions_act_is_interactive(act) &&
             (!interactive_act || interactive_act->def != act->def))
@@ -242,8 +239,13 @@ void actions_run_acts(GSList *acts,
         if (ok) {
             if (!act->def->run(&data, act->options))
                 actions_interactive_end_act();
-            else
-                break; /* no actions are run after the interactive one */
+            else {
+                /* make sure its interactive if it returned TRUE */
+                g_assert(act->def->i_cancel && act->def->i_input);
+
+                /* no actions are run after the interactive one */
+                break;
+            }
         }
     }
 }

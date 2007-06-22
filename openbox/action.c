@@ -500,11 +500,6 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "movetocenter",
-        action_move_to_center,
-        setup_client_action
-    },
-    {
         "resizerelativehorz",
         action_resize_relative_horz,
         setup_client_action
@@ -522,36 +517,6 @@ ActionString actionstrings[] =
     {
         "resizerelative",
         action_resize_relative,
-        setup_client_action
-    },
-    {
-        "maximizehorz",
-        action_maximize_horz,
-        setup_client_action
-    },
-    {
-        "unmaximizehorz",
-        action_unmaximize_horz,
-        setup_client_action
-    },
-    {
-        "togglemaximizehorz",
-        action_toggle_maximize_horz,
-        setup_client_action
-    },
-    {
-        "maximizevert",
-        action_maximize_vert,
-        setup_client_action
-    },
-    {
-        "unmaximizevert",
-        action_unmaximize_vert,
-        setup_client_action
-    },
-    {
-        "togglemaximizevert",
-        action_toggle_maximize_vert,
         setup_client_action
     },
     {
@@ -1055,18 +1020,6 @@ void action_move_relative_vert(union ActionData *data)
     client_action_end(data, FALSE);
 }
 
-void action_move_to_center(union ActionData *data)
-{
-    ObClient *c = data->client.any.c;
-    Rect *area;
-    area = screen_area(c->desktop, client_monitor(c), NULL);
-    client_action_start(data);
-    client_move(c, area->x + area->width / 2 - c->area.width / 2,
-                area->y + area->height / 2 - c->area.height / 2);
-    client_action_end(data, FALSE);
-    g_free(area);
-}
-
 void action_resize_relative_horz(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
@@ -1125,14 +1078,6 @@ void action_resize_relative(union ActionData *data)
     yoff = yoff == 0 ? 0 : (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
     client_move_resize(c, x + xoff, y + yoff, nw, nh);
     client_action_end(data, FALSE);
-}
-
-void action_toggle_maximize_vert(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c,
-                    !data->client.any.c->max_vert, 2);
-    client_action_end(data, config_focus_under_mouse);
 }
 
 void action_send_to_desktop(union ActionData *data)

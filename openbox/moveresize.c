@@ -105,7 +105,7 @@ static void get_resize_position(gint *x, gint *y, gboolean cancel)
     /* see how much it is actually going to resize */
     {
         gint cx = *x, cy = *y;
-        frame_frame_gravity(moveresize_client->frame, &cx, &cy, w, h);
+        frame_frame_gravity(moveresize_client->frame, &cx, &cy);
         client_try_configure(moveresize_client, &cx, &cy, &w, &h,
                              &lw, &lh, TRUE);
     }
@@ -127,7 +127,7 @@ static void get_resize_position(gint *x, gint *y, gboolean cancel)
         break;
     }
 
-    frame_frame_gravity(moveresize_client->frame, x, y, w, h);
+    frame_frame_gravity(moveresize_client->frame, x, y);
 }
 
 static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)

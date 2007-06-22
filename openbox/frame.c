@@ -755,9 +755,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
            frame_client_gravity. */
         self->area.x = self->client->area.x;
         self->area.y = self->client->area.y;
-        frame_client_gravity(self, &self->area.x, &self->area.y,
-                             self->client->area.width,
-                             self->client->area.height);
+        frame_client_gravity(self, &self->area.x, &self->area.y);
     }
 
     if (!fake) {
@@ -1404,7 +1402,7 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     return OB_FRAME_CONTEXT_NONE;
 }
 
-void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
+void frame_client_gravity(ObFrame *self, gint *x, gint *y)
 {
     /* horizontal */
     switch (self->client->gravity) {
@@ -1467,7 +1465,7 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
     }
 }
 
-void frame_frame_gravity(ObFrame *self, gint *x, gint *y, gint w, gint h)
+void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
 {
     /* horizontal */
     switch (self->client->gravity) {
@@ -1528,7 +1526,7 @@ void frame_rect_to_frame(ObFrame *self, Rect *r)
 {
     r->width += self->size.left + self->size.right;
     r->height += self->size.top + self->size.bottom;
-    frame_client_gravity(self, &r->x, &r->y, r->width, r->height);
+    frame_client_gravity(self, &r->x, &r->y);
 }
 
 static void flash_done(gpointer data)

@@ -933,7 +933,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     frame_rect_to_frame(self->frame, &desired);
 
     /* get where the frame would be */
-    frame_client_gravity(self->frame, x, y, w, h);
+    frame_client_gravity(self->frame, x, y);
 
     /* get the requested size of the window with decorations */
     fw = self->frame->size.left + w + self->frame->size.right;
@@ -1021,7 +1021,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     }
 
     /* get where the client should be */
-    frame_frame_gravity(self->frame, x, y, w, h);
+    frame_frame_gravity(self->frame, x, y);
 
     return ox != *x || oy != *y;
 }
@@ -2702,7 +2702,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
     /* gets the frame's position */
-    frame_client_gravity(self->frame, x, y, *w, *h);
+    frame_client_gravity(self->frame, x, y);
 
     /* these positions are frame positions, not client positions */
 
@@ -2749,7 +2749,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     }
 
     /* gets the client's position */
-    frame_frame_gravity(self->frame, x, y, *w, *h);
+    frame_frame_gravity(self->frame, x, y);
 
     /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {

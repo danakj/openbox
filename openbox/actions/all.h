@@ -22,5 +22,6 @@ void action_unfocus_startup();
 void action_iconify_startup();
 void action_fullscreen_startup();
 void action_maximize_startup();
+void action_moveto_startup();
 
 #endif

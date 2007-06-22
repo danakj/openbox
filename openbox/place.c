@@ -486,7 +486,6 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
     g_assert(ret);
 
     /* get where the client should be */
-    frame_frame_gravity(client->frame, x, y,
-                        client->area.width, client->area.height);
+    frame_frame_gravity(client->frame, x, y);
     return ret;
 }

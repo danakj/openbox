@@ -781,11 +781,6 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "reconfigure",
-        action_reconfigure,
-        NULL
-    },
-    {
         "restart",
         action_restart,
         NULL
@@ -1706,11 +1701,6 @@ void action_resize(union ActionData *data)
     moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
 }
 
-void action_reconfigure(union ActionData *data)
-{
-    ob_reconfigure();
-}
-
 void action_restart(union ActionData *data)
 {
     ob_restart_other(data->execute.path);
@@ -1718,7 +1708,6 @@ void action_restart(union ActionData *data)
 
 void action_exit(union ActionData *data)
 {
-    ob_exit(0);
 }
 
 void action_cycle_windows(union ActionData *data)

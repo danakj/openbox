@@ -1,11 +1,11 @@
 #include "openbox/actions.h"
-#include "openbox/screen.h"
+#include "openbox/openbox.h"
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_showdesktop_startup()
+void action_reconfigure_startup()
 {
-    actions_register("ShowDesktop",
+    actions_register("Reconfigure",
                      NULL, NULL,
                      run_func,
                      NULL, NULL);
@@ -14,7 +14,7 @@ void action_showdesktop_startup()
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
-    screen_show_desktop(!screen_showing_desktop, NULL);
+    ob_reconfigure();
 
     return FALSE;
 }

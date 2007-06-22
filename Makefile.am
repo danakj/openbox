@@ -158,6 +158,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions/all.h \
 	openbox/actions/debug.c \
 	openbox/actions/execute.c \
+	openbox/actions/exit.c \
+	openbox/actions/reconfigure.c \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions.c \

@@ -458,18 +458,6 @@ void setup_action_resize(ObAction **a, ObUserAction uact)
     (*a)->data.moveresize.corner = 0;
 }
 
-void setup_action_showmenu(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.showmenu.any.client_action = OB_CLIENT_ACTION_OPTIONAL;
-    /* you cannot call ShowMenu from inside a menu, cuz the menu code makes
-       assumptions that there is only one menu (and submenus) open at
-       a time! */
-    if (uact == OB_USER_ACTION_MENU_SELECTION) {
-        action_unref(*a);
-        *a = NULL;
-    }
-}
-
 void setup_action_addremove_desktop_current(ObAction **a, ObUserAction uact)
 {
     (*a)->data.addremovedesktop.current = TRUE;
@@ -492,16 +480,6 @@ void setup_client_action(ObAction **a, ObUserAction uact)
 
 ActionString actionstrings[] =
 {
-    {
-        "debug", 
-        action_debug,
-        NULL
-    },
-    {
-        "execute", 
-        action_execute,
-        NULL
-    },
     {
         "directionalfocusnorth", 
         action_directional_focus, 
@@ -833,11 +811,6 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "showmenu",
-        action_showmenu,
-        setup_action_showmenu
-    },
-    {
         "sendtotoplayer",
         action_send_to_layer,
         setup_action_top_layer
@@ -1005,9 +978,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     if (parse_attr_string("name", node, &actname)) {
         if ((act = action_from_string(actname, uact))) {
-            } else if (act->func == action_showmenu) {
-                if ((n = parse_find_node("menu", node->xmlChildrenNode)))
-                    act->data.showmenu.name = parse_string(doc, n);
             } else if (act->func == action_move_relative_horz ||
                        act->func == action_move_relative_vert ||
                        act->func == action_resize_relative_horz ||
@@ -1220,16 +1190,6 @@ void action_run_string(const gchar *name, struct _ObClient *c, Time time)
     l = g_slist_append(NULL, a);
 
     action_run(l, c, 0, time);
-}
-
-void action_debug(union ActionData *data)
-{
-    if (data->debug.string)
-        g_print("%s\n", data->debug.string);
-}
-
-void action_execute(union ActionData *data)
-{
 }
 
 void action_activate(union ActionData *data)
@@ -1774,14 +1734,6 @@ void action_restart(union ActionData *data)
 void action_exit(union ActionData *data)
 {
     ob_exit(0);
-}
-
-void action_showmenu(union ActionData *data)
-{
-    if (data->showmenu.name) {
-        menu_show(data->showmenu.name, data->any.x, data->any.y,
-                  data->any.button, data->showmenu.any.c);
-    }
 }
 
 void action_cycle_windows(union ActionData *data)

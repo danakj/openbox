@@ -941,7 +941,7 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 }
 
 gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
-                                 gint button)
+                                 gboolean mouse)
 {
     gint px, py;
     guint i;
@@ -963,7 +963,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
     }
 
     if (self->menu->place_func)
-        self->menu->place_func(self, &x, &y, button, self->menu->data);
+        self->menu->place_func(self, &x, &y, mouse, self->menu->data);
     else
         menu_frame_place_topmenu(self, &x, &y);
 

@@ -52,7 +52,7 @@ typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
              for the menu
 */
 typedef void (*ObMenuPlaceFunc)(struct _ObMenuFrame *frame, gint *x, gint *y,
-                                gint button, gpointer data);
+                                gboolean mouse, gpointer data);
 
 struct _ObMenu
 {
@@ -174,7 +174,7 @@ void menu_clear_pipe_caches();
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
-void menu_show(gchar *name, gint x, gint y, gint button,
+void menu_show(gchar *name, gint x, gint y, gboolean mouse,
                struct _ObClient *client);
 gboolean menu_hide_delay_reached();
 

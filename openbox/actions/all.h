@@ -5,5 +5,6 @@ void action_all_startup();
 
 void action_execute_startup();
 void action_debug_startup();
+void action_showmenu_startup();
 
 #endif

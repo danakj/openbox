@@ -293,11 +293,11 @@ static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
-                              gint button, gpointer data)
+                              gboolean mouse, gpointer data)
 {
     gint dx, dy;
 
-    if (button == 0 && frame->client) {
+    if (!mouse && frame->client) {
         *x = frame->client->frame->area.x;
 
         /* try below the titlebar */

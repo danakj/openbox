@@ -407,7 +407,7 @@ static gboolean menu_hide_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
-void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
+void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
 {
     ObMenu *self;
     ObMenuFrame *frame;
@@ -429,10 +429,10 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
     menu_clear_pipe_caches();
 
     frame = menu_frame_new(self, 0, client);
-    if (!menu_frame_show_topmenu(frame, x, y, button))
+    if (!menu_frame_show_topmenu(frame, x, y, mouse))
         menu_frame_free(frame);
     else {
-        if (!button) {
+        if (!mouse) {
             /* select the first entry if it's not a submenu and we opened
              * the menu with the keyboard, and skip all headers */
             GList *it = frame->entries;
@@ -449,7 +449,7 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
         }
 
         /* reset the hide timer */
-        if (!button)
+        if (!mouse)
             menu_can_hide = TRUE;
         else {
             menu_can_hide = FALSE;

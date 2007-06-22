@@ -346,16 +346,6 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "resizerelativevert",
-        action_resize_relative_vert,
-        setup_client_action
-    },
-    {
-        "resizerelative",
-        action_resize_relative,
-        setup_client_action
-    },
-    {
         "sendtodesktop",
         action_send_to_desktop,
         setup_action_send_to_desktop
@@ -393,11 +383,6 @@ ActionString actionstrings[] =
     {
         "toggledockautohide",
         action_toggle_dockautohide,
-        NULL
-    },
-    {
-        "desktoplast",
-        action_desktop_last,
         NULL
     },
     {
@@ -553,24 +538,7 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     if (parse_attr_string("name", node, &actname)) {
         if ((act = action_from_string(actname, uact))) {
-            } else if (act->func == action_resize_relative) {
-                if ((n = parse_find_node("left", node->xmlChildrenNode)))
-                    act->data.relative.deltaxl = parse_int(doc, n);
-                if ((n = parse_find_node("up", node->xmlChildrenNode)))
-                    act->data.relative.deltayu = parse_int(doc, n);
-                if ((n = parse_find_node("right", node->xmlChildrenNode)))
-                    act->data.relative.deltax = parse_int(doc, n);
-                if ((n = parse_find_node("down", node->xmlChildrenNode)))
-                    act->data.relative.deltay = parse_int(doc, n);
             } else if (act->func == action_desktop) {
-                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
-                    act->data.desktop.desk = parse_int(doc, n);
-                if (act->data.desktop.desk > 0) act->data.desktop.desk--;
-/*
-                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
-                    act->data.desktop.inter.any.interactive =
-                        parse_bool(doc, n);
-*/
            } else if (act->func == action_send_to_desktop) {
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.sendto.desk = parse_int(doc, n);
@@ -708,55 +676,8 @@ void action_shadelower(union ActionData *data)
         action_shade(data);
 }
 
-void action_resize_relative_horz(union ActionData *data)
-{
-    ObClient *c = data->relative.any.c;
-    client_action_start(data);
-    client_resize(c,
-                  c->area.width + data->relative.deltax * c->size_inc.width,
-                  c->area.height);
-    client_action_end(data, FALSE);
-}
-
-void action_resize_relative_vert(union ActionData *data)
-{
-    ObClient *c = data->relative.any.c;
-    if (!c->shaded) {
-        client_action_start(data);
-        client_resize(c, c->area.width, c->area.height +
-                      data->relative.deltax * c->size_inc.height);
-        client_action_end(data, FALSE);
-    }
-}
-
 void action_resize_relative(union ActionData *data)
 {
-    ObClient *c = data->relative.any.c;
-    gint x, y, ow, xoff, nw, oh, yoff, nh, lw, lh;
-
-    client_action_start(data);
-
-    x = c->area.x;
-    y = c->area.y;
-    ow = c->area.width;
-    xoff = -data->relative.deltaxl * c->size_inc.width;
-    nw = ow + data->relative.deltax * c->size_inc.width
-        + data->relative.deltaxl * c->size_inc.width;
-    oh = c->area.height;
-    yoff = -data->relative.deltayu * c->size_inc.height;
-    nh = oh + data->relative.deltay * c->size_inc.height
-        + data->relative.deltayu * c->size_inc.height;
-
-    g_print("deltax %d %d x %d ow %d xoff %d nw %d\n",
-            data->relative.deltax, 
-            data->relative.deltaxl, 
-            x, ow, xoff, nw);
-    
-    client_try_configure(c, &x, &y, &nw, &nh, &lw, &lh, TRUE);
-    xoff = xoff == 0 ? 0 : (xoff < 0 ? MAX(xoff, ow-nw) : MIN(xoff, ow-nw));
-    yoff = yoff == 0 ? 0 : (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
-    client_move_resize(c, x + xoff, y + yoff, nw, nh);
-    client_action_end(data, FALSE);
 }
 
 void action_send_to_desktop(union ActionData *data)
@@ -795,12 +716,6 @@ void action_send_to_desktop_dir(union ActionData *data)
         if (data->sendtodir.follow && d != screen_desktop)
             screen_set_desktop(d, TRUE);
     }
-}
-
-void action_desktop_last(union ActionData *data)
-{
-    if (screen_last_desktop < screen_num_desktops)
-        screen_set_desktop(screen_last_desktop, TRUE);
 }
 
 void action_directional_focus(union ActionData *data)

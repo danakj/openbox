@@ -184,6 +184,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/raiselower.c \
 	openbox/actions/reconfigure.c \
 	openbox/actions/resize.c \
+	openbox/actions/resizerelative.c \
 	openbox/actions/restart.c \
 	openbox/actions/shade.c \
 	openbox/actions/showdesktop.c \

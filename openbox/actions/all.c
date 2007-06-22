@@ -34,4 +34,5 @@ void action_all_startup()
     action_decorations_startup();
     action_desktop_startup();
     action_directionaldesktop_startup();
+    action_resizerelative_startup();
 }

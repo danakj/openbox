@@ -35,5 +35,6 @@ void action_resize_startup();
 void action_decorations_startup();
 void action_desktop_startup();
 void action_directionaldesktop_startup();
+void action_resizerelative_startup();
 
 #endif

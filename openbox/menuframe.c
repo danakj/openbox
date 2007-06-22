@@ -1203,7 +1203,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
             func(entry, frame, client, state, data);
         else
             actions_run_acts(acts, OB_USER_ACTION_MENU_SELECTION,
-                             state, -1, -1, OB_FRAME_CONTEXT_NONE, client);
+                             state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, client);
     }
 }
 

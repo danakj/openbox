@@ -193,6 +193,7 @@ static void actions_setup_data(ObActionsData *data,
                                guint state,
                                gint x,
                                gint y,
+                               gint button,
                                ObFrameContext con,
                                struct _ObClient *client)
 {
@@ -200,6 +201,7 @@ static void actions_setup_data(ObActionsData *data,
     data->state = state;
     data->x = x;
     data->y = y;
+    data->button = button;
     data->context = con;
     data->client = client;
 }
@@ -209,6 +211,7 @@ void actions_run_acts(GSList *acts,
                       guint state,
                       gint x,
                       gint y,
+                      gint button,
                       ObFrameContext con,
                       struct _ObClient *client)
 {
@@ -227,7 +230,7 @@ void actions_run_acts(GSList *acts,
         ObActionsAct *act = it->data;
         gboolean ok = TRUE;
 
-        actions_setup_data(&data, uact, state, x, y, con, client);
+        actions_setup_data(&data, uact, state, x, y, button, con, client);
 
         if (actions_act_is_interactive(act) &&
             (!interactive_act || interactive_act->def != act->def))

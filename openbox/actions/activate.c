@@ -53,12 +53,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
 
     if (data->client) {
-        gboolean mouse = (data->uact == OB_USER_ACTION_MOUSE_PRESS ||
-                          data->uact == OB_USER_ACTION_MOUSE_RELEASE ||
-                          data->uact == OB_USER_ACTION_MOUSE_CLICK ||
-                          data->uact == OB_USER_ACTION_MOUSE_DOUBLE_CLICK ||
-                          data->uact == OB_USER_ACTION_MOUSE_MOTION);
-        if (!mouse || client_mouse_focusable(data->client) ||
+        if (data->button == 0 || client_mouse_focusable(data->client) ||
             data->context != OB_FRAME_CONTEXT_CLIENT ||
             data->context != OB_FRAME_CONTEXT_FRAME)
         {

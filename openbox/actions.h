@@ -46,6 +46,7 @@ struct _ObActionsData {
     guint state;
     gint x;
     gint y;
+    gint button;
 
     struct _ObClient *client;
     ObFrameContext context;
@@ -81,6 +82,7 @@ void actions_run_acts(GSList *acts,
                       guint state,
                       gint x,
                       gint y,
+                      gint button,
                       ObFrameContext con,
                       struct _ObClient *client);
 

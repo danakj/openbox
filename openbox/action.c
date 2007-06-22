@@ -416,16 +416,6 @@ void setup_action_bottom_layer(ObAction **a, ObUserAction uact)
     (*a)->data.layer.layer = -1;
 }
 
-void setup_action_move(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
-    (*a)->data.moveresize.keyboard =
-        (uact == OB_USER_ACTION_NONE ||
-         uact == OB_USER_ACTION_KEYBOARD_KEY ||
-         uact == OB_USER_ACTION_MENU_SELECTION);
-    (*a)->data.moveresize.corner = 0;
-}
-
 void setup_action_resize(ObAction **a, ObUserAction uact)
 {
     (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
@@ -499,11 +489,6 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "iconify",
-        action_iconify,
-        setup_client_action
-    },
-    {
         "focustobottom",
         action_focus_order_to_bottom,
         setup_client_action
@@ -521,11 +506,6 @@ ActionString actionstrings[] =
     {
         "lower",
         action_lower,
-        setup_client_action
-    },
-    {
-        "close",
-        action_close,
         setup_client_action
     },
     {
@@ -722,11 +702,6 @@ ActionString actionstrings[] =
         "toggledecorations",
         action_toggle_decorations,
         setup_client_action
-    },
-    {
-        "move",
-        action_move,
-        setup_action_move
     },
     {
         "resize",
@@ -1152,11 +1127,6 @@ void action_lower(union ActionData *data)
     client_action_end(data, config_focus_under_mouse);
 }
 
-void action_close(union ActionData *data)
-{
-    client_close(data->client.any.c);
-}
-
 void action_kill(union ActionData *data)
 {
     client_kill(data->client.any.c);
@@ -1543,19 +1513,6 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
 #undef b
 #undef c
 #undef d
-}
-
-void action_move(union ActionData *data)
-{
-    ObClient *c = data->moveresize.any.c;
-    guint32 corner;
-
-    if (data->moveresize.keyboard)
-        corner = prop_atoms.net_wm_moveresize_move_keyboard;
-    else
-        corner = prop_atoms.net_wm_moveresize_move;
-
-    moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
 }
 
 void action_resize(union ActionData *data)

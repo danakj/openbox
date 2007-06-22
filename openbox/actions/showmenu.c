@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/menu.h"
 #include <glib.h>
 
 typedef struct {
@@ -49,13 +50,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (data->uact == OB_USER_ACTION_MENU_SELECTION) return FALSE;
 
     if (o->name) {
-        gboolean mouse = (data->uact == OB_USER_ACTION_MOUSE_PRESS ||
-                          data->uact == OB_USER_ACTION_MOUSE_RELEASE ||
-                          data->uact == OB_USER_ACTION_MOUSE_CLICK ||
-                          data->uact == OB_USER_ACTION_MOUSE_DOUBLE_CLICK ||
-                          data->uact == OB_USER_ACTION_MOUSE_MOTION);
-
-        menu_show(o->name, data->x, data->y, mouse, data->client);
+        menu_show(o->name, data->x, data->y, data->button != 0, data->client);
     }
 
     return FALSE;

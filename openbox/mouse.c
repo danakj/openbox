@@ -196,7 +196,7 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     if (it == NULL) return FALSE;
 
     actions_run_acts(b->actions[a], mouse_action_to_user_action(a),
-                     state, x, y, context, c);
+                     state, x, y, button, context, c);
     return TRUE;
 }
 

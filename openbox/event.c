@@ -22,6 +22,7 @@
 #include "window.h"
 #include "openbox.h"
 #include "dock.h"
+#include "actions.h"
 #include "client.h"
 #include "xerror.h"
 #include "prop.h"

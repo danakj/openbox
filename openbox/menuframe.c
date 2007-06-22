@@ -21,6 +21,7 @@
 #include "client.h"
 #include "menu.h"
 #include "screen.h"
+#include "actions.h"
 #include "grab.h"
 #include "openbox.h"
 #include "mainloop.h"
@@ -1201,7 +1202,9 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state, Time time)
         if (func)
             func(entry, frame, client, state, data, time);
         else
-            action_run(acts, client, state, time);
+            actions_run_acts(acts, OB_USER_ACTION_MENU_SELECTION,
+                             time, state, -1, -1, OB_FRAME_CONTEXT_NONE,
+                             client);
     }
 }
 

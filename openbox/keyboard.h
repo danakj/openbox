@@ -43,12 +43,4 @@ void keyboard_event(struct _ObClient *client, const XEvent *e);
  */
 void keyboard_reset_chains(gint break_chroots);
 
-gboolean keyboard_interactive_grab(guint state, struct _ObClient *client,
-                                   struct _ObActionsAct *action);
-gboolean keyboard_process_interactive_grab(const XEvent *e,
-                                           struct _ObClient **client);
-gboolean keyboard_interactively_grabbed();
-
-void keyboard_interactive_cancel();
-
 #endif

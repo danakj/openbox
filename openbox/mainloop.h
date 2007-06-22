@@ -70,12 +70,6 @@ void ob_main_loop_timeout_remove_data(ObMainLoop *loop,
                                       gpointer data,
                                       gboolean cancel_dest);
 
-struct _ObAction;
-
-/*! Queues an action, which will be run when there are no more X events
-  to process */
-void ob_main_loop_queue_action(ObMainLoop *loop, struct _ObAction *act);
-
 void ob_main_loop_run(ObMainLoop *loop);
 void ob_main_loop_exit(ObMainLoop *loop);
 

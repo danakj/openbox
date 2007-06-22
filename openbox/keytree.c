@@ -19,6 +19,7 @@
 
 #include "keyboard.h"
 #include "translate.h"
+#include "actions.h"
 #include <glib.h>
 
 void tree_destroy(KeyBindingTree *tree)
@@ -35,7 +36,7 @@ void tree_destroy(KeyBindingTree *tree)
                 g_free(it->data);
             g_list_free(tree->keylist);
             for (sit = tree->actions; sit != NULL; sit = sit->next)
-                action_unref(sit->data);
+                actions_act_unref(sit->data);
             g_slist_free(tree->actions);
         }
         g_free(tree);

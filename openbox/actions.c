@@ -19,6 +19,7 @@
 #include "actions.h"
 #include "gettext.h"
 #include "grab.h"
+#include "screen.h"
 
 static void     actions_definition_ref(ObActionsDefinition *def);
 static void     actions_definition_unref(ObActionsDefinition *def);
@@ -54,12 +55,12 @@ static GSList *registered = NULL;
 void actions_startup(gboolean reconfig)
 {
     if (reconfig) return;
-
-    
 }
 
 void actions_shutdown(gboolean reconfig)
 {
+    actions_interactive_cancel_act();
+
     if (reconfig) return;
 
     /* free all the registered actions */
@@ -204,6 +205,14 @@ void actions_run_acts(GSList *acts,
                       struct _ObClient *client)
 {
     GSList *it;
+
+    /* Don't allow saving the initial state when running things from the
+       menu */
+    if (uact == OB_USER_ACTION_MENU_SELECTION)
+        state = 0;
+    /* If x and y are < 0 then use the current pointer position */
+    if (x < 0 && y < 0)
+        screen_pointer_pos(&x, &y);
 
     for (it = acts; it; it = g_slist_next(it)) {
         ObActionsData data;

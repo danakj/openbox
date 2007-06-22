@@ -23,5 +23,6 @@ void action_iconify_startup();
 void action_fullscreen_startup();
 void action_maximize_startup();
 void action_moveto_startup();
+void action_moverelative_startup();
 
 #endif

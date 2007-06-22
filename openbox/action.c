@@ -495,23 +495,8 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
-        "moverelativevert",
-        action_move_relative_vert,
-        setup_client_action
-    },
-    {
-        "resizerelativehorz",
-        action_resize_relative_horz,
-        setup_client_action
-    },
-    {
         "resizerelativevert",
         action_resize_relative_vert,
-        setup_client_action
-    },
-    {
-        "moverelative",
-        action_move_relative,
         setup_client_action
     },
     {
@@ -762,17 +747,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     if (parse_attr_string("name", node, &actname)) {
         if ((act = action_from_string(actname, uact))) {
-            } else if (act->func == action_move_relative_horz ||
-                       act->func == action_move_relative_vert ||
-                       act->func == action_resize_relative_horz ||
-                       act->func == action_resize_relative_vert) {
-                if ((n = parse_find_node("delta", node->xmlChildrenNode)))
-                    act->data.relative.deltax = parse_int(doc, n);
-            } else if (act->func == action_move_relative) {
-                if ((n = parse_find_node("x", node->xmlChildrenNode)))
-                    act->data.relative.deltax = parse_int(doc, n);
-                if ((n = parse_find_node("y", node->xmlChildrenNode)))
-                    act->data.relative.deltay = parse_int(doc, n);
             } else if (act->func == action_resize_relative) {
                 if ((n = parse_find_node("left", node->xmlChildrenNode)))
                     act->data.relative.deltaxl = parse_int(doc, n);
@@ -1002,22 +976,6 @@ void action_toggle_omnipresent(union ActionData *data)
     client_set_desktop(data->client.any.c,
                        data->client.any.c->desktop == DESKTOP_ALL ?
                        screen_desktop : DESKTOP_ALL, FALSE, TRUE);
-}
-
-void action_move_relative_horz(union ActionData *data)
-{
-    ObClient *c = data->relative.any.c;
-    client_action_start(data);
-    client_move(c, c->area.x + data->relative.deltax, c->area.y);
-    client_action_end(data, FALSE);
-}
-
-void action_move_relative_vert(union ActionData *data)
-{
-    ObClient *c = data->relative.any.c;
-    client_action_start(data);
-    client_move(c, c->area.x, c->area.y + data->relative.deltax);
-    client_action_end(data, FALSE);
 }
 
 void action_resize_relative_horz(union ActionData *data)

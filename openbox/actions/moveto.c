@@ -99,9 +99,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         /* force it on screen if its moving to another monitor */
         client_find_onscreen(c, &x, &y, w, h, mon != cmon);
 
-        actions_client_move(data, TRUE);
         client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
-        actions_client_move(data, FALSE);
 
         g_free(area);
         g_free(carea);

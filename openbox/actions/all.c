@@ -22,4 +22,5 @@ void action_all_startup()
     action_fullscreen_startup();
     action_maximize_startup();
     action_moveto_startup();
+    action_moverelative_startup();
 }

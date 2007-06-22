@@ -1127,42 +1127,6 @@ void action_resize_relative(union ActionData *data)
     client_action_end(data, FALSE);
 }
 
-void action_maximize_horz(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c, TRUE, 1);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_unmaximize_horz(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c, FALSE, 1);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_toggle_maximize_horz(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c,
-                    !data->client.any.c->max_horz, 1);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_maximize_vert(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c, TRUE, 2);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_unmaximize_vert(union ActionData *data)
-{
-    client_action_start(data);
-    client_maximize(data->client.any.c, FALSE, 2);
-    client_action_end(data, config_focus_under_mouse);
-}
-
 void action_toggle_maximize_vert(union ActionData *data)
 {
     client_action_start(data);

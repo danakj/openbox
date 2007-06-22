@@ -20,5 +20,6 @@ void action_lower_startup();
 void action_raiselower_startup();
 void action_unfocus_startup();
 void action_iconify_startup();
+void action_fullscreen_startup();
 
 #endif

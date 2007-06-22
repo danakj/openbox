@@ -162,13 +162,6 @@ void setup_action_send_to_desktop_down(ObAction **a, ObUserAction uact)
     (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_desktop(ObAction **a, ObUserAction uact)
-{
-/*
-    (*a)->data.desktop.inter.any.interactive = FALSE;
-*/
-}
-
 void setup_action_desktop_prev(ObAction **a, ObUserAction uact)
 {
     (*a)->data.desktopdir.inter.any.interactive = TRUE;
@@ -396,11 +389,6 @@ ActionString actionstrings[] =
         "sendtodesktopdown",
         action_send_to_desktop_dir,
         setup_action_send_to_desktop_down
-    },
-    {
-        "desktop",
-        action_desktop,
-        setup_action_desktop
     },
     {
         "desktopnext",
@@ -818,19 +806,6 @@ void action_send_to_desktop(union ActionData *data)
         client_set_desktop(c, data->sendto.desk, data->sendto.follow, FALSE);
         if (data->sendto.follow && data->sendto.desk != screen_desktop)
             screen_set_desktop(data->sendto.desk, TRUE);
-    }
-}
-
-void action_desktop(union ActionData *data)
-{
-    /* XXX add the interactive/dialog option back again once the dialog
-       has been made to not use grabs */
-    if (data->desktop.desk < screen_num_desktops ||
-        data->desktop.desk == DESKTOP_ALL)
-    {
-        screen_set_desktop(data->desktop.desk, TRUE);
-        if (data->inter.any.interactive)
-            screen_desktop_popup(data->desktop.desk, TRUE);
     }
 }
 

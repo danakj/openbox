@@ -161,6 +161,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/cyclewindows.c \
 	openbox/actions/debug.c \
 	openbox/actions/decorations.c \
+	openbox/actions/desktop.c \
 	openbox/actions/directionalcyclewindows.c \
 	openbox/actions/directionaltargetwindow.c \
 	openbox/actions/execute.c \
@@ -173,6 +174,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/maximize.c \
 	openbox/actions/maximizehorizontal.c \
 	openbox/actions/maximizevertical.c \
+	openbox/actions/menu.c \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \
 	openbox/actions/moveto.c \
@@ -184,7 +186,6 @@ openbox_openbox_SOURCES = \
 	openbox/actions/restart.c \
 	openbox/actions/shade.c \
 	openbox/actions/showdesktop.c \
-	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \
 	openbox/actions.c \
 	openbox/actions.h \

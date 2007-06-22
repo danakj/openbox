@@ -433,11 +433,6 @@ ActionString actionstrings[] =
         setup_action_desktop_down
     },
     {
-        "toggledecorations",
-        action_toggle_decorations,
-        setup_client_action
-    },
-    {
         "toggledockautohide",
         action_toggle_dockautohide,
         NULL
@@ -889,16 +884,6 @@ void action_desktop_last(union ActionData *data)
     if (screen_last_desktop < screen_num_desktops)
         screen_set_desktop(screen_last_desktop, TRUE);
 }
-
-void action_toggle_decorations(union ActionData *data)
-{
-    ObClient *c = data->client.any.c;
-
-    client_action_start(data);
-    client_set_undecorated(c, !c->undecorated);
-    client_action_end(data, FALSE);
-}
-
 
 void action_directional_focus(union ActionData *data)
 {

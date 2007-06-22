@@ -160,6 +160,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/close.c \
 	openbox/actions/cyclewindows.c \
 	openbox/actions/debug.c \
+	openbox/actions/decorations.c \
 	openbox/actions/directionalcyclewindows.c \
 	openbox/actions/directionaltargetwindow.c \
 	openbox/actions/execute.c \

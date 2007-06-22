@@ -30,4 +30,5 @@ void action_all_startup()
     action_omnipresent_startup();
     action_directionalcyclewindows_startup();
     action_directionaltargetwindow_startup();
+    action_resize_startup();
 }

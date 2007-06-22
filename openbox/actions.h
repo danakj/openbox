@@ -90,3 +90,6 @@ gboolean actions_interactive_act_running();
 void actions_interactive_cancel_act();
 
 gboolean actions_interactive_input_event(XEvent *e);
+
+/*! Function for actions to call when they are moving a client around */
+void actions_client_move(ObActionsData *data, gboolean start);

@@ -164,6 +164,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \
 	openbox/actions/move.c \
+	openbox/actions/raise.c \
 	openbox/actions/reconfigure.c \
 	openbox/actions/restart.c \
 	openbox/actions/showdesktop.c \

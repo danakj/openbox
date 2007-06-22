@@ -39,36 +39,7 @@
 
 #include <glib.h>
 
-static gulong ignore_start = 0;
 
-static void client_action_start(union ActionData *data)
-{
-    ignore_start = event_start_ignore_all_enters();
-}
-
-static void client_action_end(union ActionData *data, gboolean allow_enters)
-{
-    if (config_focus_follow)
-        if (data->any.context != OB_FRAME_CONTEXT_CLIENT) {
-            if (!data->any.button && data->any.c && !allow_enters) {
-                event_end_ignore_all_enters(ignore_start);
-            } else {
-                ObClient *c;
-
-                /* usually this is sorta redundant, but with a press action
-                   that moves windows our from under the cursor, the enter
-                   event will come as a GrabNotify which is ignored, so this
-                   makes a fake enter event
-                */
-                if ((c = client_under_pointer()) && c != data->any.c) {
-                    ob_debug_type(OB_DEBUG_FOCUS,
-                                  "Generating fake enter because we did a "
-                                  "mouse-event action");
-                    event_enter_client(c);
-                }
-            }
-        }
-}
 
 typedef struct
 {
@@ -496,11 +467,6 @@ ActionString actionstrings[] =
     {
         "raiselower",
         action_raiselower,
-        setup_client_action
-    },
-    {
-        "raise",
-        action_raise,
         setup_client_action
     },
     {
@@ -957,12 +923,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                             prop_atoms.net_wm_moveresize_size_bottomright;
                     g_free(s);
                 }
-            } else if (act->func == action_raise ||
-                       act->func == action_lower ||
-                       act->func == action_raiselower ||
-                       act->func == action_shadelower ||
-                       act->func == action_unshaderaise) {
-            }
             INTERACTIVE_LIMIT(act, uact);
         }
         g_free(actname);
@@ -1094,13 +1054,6 @@ void action_raiselower(union ActionData *data)
 
     client_action_start(data);
     stacking_restack_request(c, NULL, Opposite);
-    client_action_end(data, config_focus_under_mouse);
-}
-
-void action_raise(union ActionData *data)
-{
-    client_action_start(data);
-    stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
     client_action_end(data, config_focus_under_mouse);
 }
 

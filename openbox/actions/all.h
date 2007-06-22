@@ -15,5 +15,6 @@ void action_breakchroot_startup();
 void action_close_startup();
 void action_move_startup();
 void action_focus_startup();
+void action_raise_startup();
 
 #endif

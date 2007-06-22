@@ -20,6 +20,10 @@
 #include "gettext.h"
 #include "grab.h"
 #include "screen.h"
+#include "event.h"
+#include "config.h"
+#include "client.h"
+#include "debug.h"
 
 #include "actions/all.h"
 
@@ -306,4 +310,32 @@ gboolean actions_interactive_input_event(XEvent *e)
         }
     }
     return used;
+}
+
+void actions_client_move(ObActionsData *data, gboolean start)
+{
+    static gulong ignore_start = 0;
+    if (start)
+        ignore_start = event_start_ignore_all_enters();
+    else if (config_focus_follow &&
+             data->context != OB_FRAME_CONTEXT_CLIENT)
+    {
+        if (!data->button && data->client && !config_focus_under_mouse)
+            event_end_ignore_all_enters(ignore_start);
+        else {
+            struct _ObClient *c;
+
+            /* usually this is sorta redundant, but with a press action
+               that moves windows our from under the cursor, the enter
+               event will come as a GrabNotify which is ignored, so this
+               makes a fake enter event
+            */
+            if ((c = client_under_pointer()) && c != data->client) {
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Generating fake enter because we did a "
+                              "mouse-event action");
+                event_enter_client(c);
+            }
+        }
+    }
 }

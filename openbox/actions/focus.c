@@ -51,10 +51,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         {
             client_activate(data->client, o->here, FALSE, FALSE, TRUE);
         }
-    } else {
-        /* focus action on something other than a client, make keybindings
-           work for this openbox instance, but don't focus any specific client
-        */
+    } else if (data->context == OB_FRAME_CONTEXT_DESKTOP) {
+        /* focus action on the root window. make keybindings work for this
+           openbox instance, but don't focus any specific client */
         focus_nothing();
     }
 

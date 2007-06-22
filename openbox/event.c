@@ -808,8 +808,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
            want to deal with them
         */
         if (!(e->xbutton.button == 4 || e->xbutton.button == 5) &&
-            !keyboard_interactively_grabbed() &&
-            !menu_frame_visible)
+            !grab_on_keyboard())
         {
             /* use where the press occured */
             con = frame_context(client, e->xbutton.window, px, py);
@@ -956,7 +955,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                           (e->type == EnterNotify ? "Enter" : "Leave"),
                           e->xcrossing.mode,
                           e->xcrossing.detail, (client?client->window:0));
-            if (keyboard_interactively_grabbed())
+            if (grab_on_keyboard())
                 break;
             if (config_focus_follow && config_focus_delay &&
                 /* leave inferior events can happen when the mouse goes onto
@@ -999,7 +998,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (keyboard_interactively_grabbed())
+            if (grab_on_keyboard())
                 break;
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab ||
@@ -1792,9 +1791,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
 
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
-    if (!keyboard_process_interactive_grab(e, &client) &&
-        !(moveresize_in_progress && moveresize_event(e)))
-    {
+    if (!actions_interactive_input_event(e) && !moveresize_event(e)) {
         if (moveresize_in_progress)
             /* make further actions work on the client being
                moved/resized */
@@ -1899,9 +1896,9 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
 
 void event_cancel_all_key_grabs()
 {
-    if (keyboard_interactively_grabbed()) {
-        keyboard_interactive_cancel();
-        ob_debug("KILLED interactive event\n");
+    if (actions_interactive_act_running()) {
+        actions_interactive_cancel_act();
+        ob_debug("KILLED interactive action\n");
     }
     else if (menu_frame_visible) {
         menu_frame_hide_all();

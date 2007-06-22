@@ -416,7 +416,7 @@ gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
 
-    g_assert(moveresize_in_progress);
+    if (!moveresize_in_progress) return FALSE;
 
     if (e->type == ButtonPress) {
         if (!button) {

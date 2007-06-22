@@ -18,9 +18,15 @@
 
 #include "actions.h"
 #include "gettext.h"
+#include "grab.h"
 
-static void actions_definition_ref(ObActionsDefinition *def);
-static void actions_definition_unref(ObActionsDefinition *def);
+static void     actions_definition_ref(ObActionsDefinition *def);
+static void     actions_definition_unref(ObActionsDefinition *def);
+static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state);
+static void     actions_interactive_end_act();
+
+static ObActionsAct *interactive_act = NULL;
+static guint         interactive_initial_state = 0;
 
 struct _ObActionsDefinition {
     guint ref;
@@ -202,6 +208,7 @@ void actions_run_acts(GSList *acts,
     for (it = acts; it; it = g_slist_next(it)) {
         ObActionsData data;
         ObActionsAct *act = it->data;
+        gboolean ok = TRUE;
 
         data.type = act->def->type;
         actions_setup_data(&data, uact, time, state, x, y);
@@ -216,7 +223,73 @@ void actions_run_acts(GSList *acts,
             g_assert_not_reached();
         }
 
+        if (actions_act_is_interactive(act) &&
+            (!interactive_act || interactive_act->def != act->def))
+        {
+            ok = actions_interactive_begin_act(act, state);
+        }
+
         /* fire the action's run function with this data */
-        act->def->run(&data, act->options);
+        if (ok) {
+            if (!act->def->run(&data, act->options))
+                actions_interactive_end_act();
+            else
+                break; /* no actions are run after the interactive one */
+        }
     }
+}
+
+gboolean actions_interactive_act_running()
+{
+    return interactive_act != NULL;
+}
+
+void actions_interactive_cancel_act()
+{
+    if (interactive_act) {
+        interactive_act->def->i_cancel(interactive_act->options);
+        actions_interactive_end_act();
+    }
+}
+
+static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
+{
+    /* cancel the old one */
+    if (interactive_act)
+        actions_interactive_cancel_act();
+
+    if (grab_keyboard()) {
+        interactive_act = act;
+        actions_act_ref(interactive_act);
+
+        interactive_initial_state = state;
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
+static void actions_interactive_end_act()
+{
+    if (interactive_act) {
+        ungrab_keyboard();
+
+        actions_act_unref(interactive_act);
+        interactive_act = NULL;
+    }
+}
+
+gboolean actions_interactive_input_event(XEvent *e)
+{
+    gboolean used = FALSE;
+    if (interactive_act) {
+        if (!interactive_act->def->i_input(interactive_initial_state, e,
+                                           interactive_act->options, &used))
+        {
+            used = TRUE; /* if it cancelled the action then it has to of
+                            been used */
+            actions_interactive_end_act();
+        }
+    }
+    return used;
 }

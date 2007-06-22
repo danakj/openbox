@@ -37,7 +37,8 @@ typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
 typedef gboolean (*ObActionsInteractiveInputFunc)(guint initial_state,
                                                   XEvent *e,
-                                                  gpointer options);
+                                                  gpointer options,
+                                                  gboolean *used);
 typedef void     (*ObActionsInteractiveCancelFunc)(gpointer options);
 
 typedef enum {
@@ -112,3 +113,8 @@ void actions_run_acts(GSList *acts,
                       gint y,
                       ObFrameContext con,
                       struct _ObClient *client);
+
+gboolean actions_interactive_act_running();
+void actions_interactive_cancel_act();
+
+gboolean actions_interactive_input_event(XEvent *e);

@@ -2612,11 +2612,18 @@ static void client_apply_startup_state(ObClient *self,
     else if (max_horz)
         client_maximize(self, TRUE, 1);
 
-    /* if the window hasn't been configured yet, then do so now */
-    if (!fullscreen && !max_vert && !max_horz) {
-        self->area = oldarea;
-        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
-    }
+    /* if the window hasn't been configured yet, then do so now, in fact the
+       x,y,w,h may _not_ be the same as the area rect, which can end up
+       meaning that the client isn't properly moved/resized by the fullscreen
+       function
+       pho can cause this because it maps at size of the screen but not 0,0
+       so openbox moves it on screen to 0,0 (thus x,y=0,0 and area.x,y don't).
+       then fullscreen'ing makes it go to 0,0 which it thinks it already is at
+       cuz thats where the pre-fullscreen will be. however the actual area is
+       not, so this needs to be called even if we have fullscreened/maxed
+    */
+    self->area = oldarea;
+    client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
     PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
@@ -2883,6 +2890,9 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     oldw = self->area.width;
     oldh = self->area.height;
     RECT_SET(self->area, x, y, w, h);
+    ob_debug("Client area %s set to %d %d %d %d\n",
+             self->title, self->area.x, self->area.y,
+             self->area.width, self->area.height);
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when
@@ -3027,6 +3037,9 @@ void client_fullscreen(ObClient *self, gboolean fs)
         h = self->pre_fullscreen_area.height;
         RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
     }
+
+    ob_debug("Window %s going fullscreen (%d)\n",
+             self->title, self->fullscreen);
 
     client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);

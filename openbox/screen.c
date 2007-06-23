@@ -49,7 +49,7 @@
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
                         EnterWindowMask | LeaveWindowMask | \
                         SubstructureRedirectMask | FocusChangeMask | \
-                        ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
+                        ButtonPressMask | ButtonReleaseMask)
 
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm();
@@ -830,22 +830,14 @@ void screen_desktop_popup(guint d, gboolean show)
     }
 }
 
-guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
-                           gboolean dialog, gboolean done, gboolean cancel)
+guint screen_find_desktop(guint from, ObDirection dir,
+                          gboolean wrap, gboolean linear)
 {
     guint r, c;
-    static guint d = (guint)-1;
-    guint ret, oldd;
+    guint d;
 
-    if (d == (guint)-1)
-        d = screen_desktop;
-
-    if ((cancel || done) && dialog)
-        goto show_cycle_dialog;
-
-    oldd = d;
+    d = from;
     get_row_col(d, &r, &c);
-
     if (linear) {
         switch (dir) {
         case OB_DIRECTION_EAST:
@@ -853,16 +845,20 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                 ++d;
             else if (wrap)
                 d = 0;
+            else
+                return from;
             break;
         case OB_DIRECTION_WEST:
             if (d > 0)
                 --d;
             else if (wrap)
                 d = screen_num_desktops - 1;
+            else
+                return from;
             break;
         default:
-            assert(0);
-            return screen_desktop;
+            g_assert_not_reached();
+            return from;
         }
     } else {
         switch (dir) {
@@ -872,16 +868,14 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                 if (wrap)
                     c = 0;
                 else
-                    goto show_cycle_dialog;
+                    return from;
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (wrap) {
+                if (wrap)
                     ++c;
-                } else {
-                    d = oldd;
-                    goto show_cycle_dialog;
-                }
+                else
+                    return from;
             }
             break;
         case OB_DIRECTION_WEST:
@@ -890,16 +884,14 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                 if (wrap)
                     c = screen_desktop_layout.columns - 1;
                 else
-                    goto show_cycle_dialog;
+                    return from;
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (wrap) {
+                if (wrap)
                     --c;
-                } else {
-                    d = oldd;
-                    goto show_cycle_dialog;
-                }
+                else
+                    return from;
             }
             break;
         case OB_DIRECTION_SOUTH:
@@ -908,16 +900,14 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                 if (wrap)
                     r = 0;
                 else
-                    goto show_cycle_dialog;
+                    return from;
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (wrap) {
+                if (wrap)
                     ++r;
-                } else {
-                    d = oldd;
-                    goto show_cycle_dialog;
-                }
+                else
+                    return from;
             }
             break;
         case OB_DIRECTION_NORTH:
@@ -926,30 +916,41 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                 if (wrap)
                     r = screen_desktop_layout.rows - 1;
                 else
-                    goto show_cycle_dialog;
+                    return from;
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (wrap) {
+                if (wrap)
                     --r;
-                } else {
-                    d = oldd;
-                    goto show_cycle_dialog;
-                }
+                else
+                    return from;
             }
             break;
         default:
-            assert(0);
-            return d = screen_desktop;
+            g_assert_not_reached();
+            return from;
         }
 
         d = translate_row_col(r, c);
     }
+    return d;
+}
 
-show_cycle_dialog:
-    if (dialog && !cancel && !done) {
+guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
+                           gboolean dialog, gboolean done, gboolean cancel)
+{
+    static guint d = (guint)-1;
+    guint ret;
+
+    if (d == (guint)-1)
+        d = screen_desktop;
+
+    if ((!cancel && !done) || !dialog)
+        d = screen_find_desktop(d, dir, wrap, linear);
+
+    if (dialog && !cancel && !done)
         screen_desktop_popup(d, TRUE);
-    } else
+    else
         screen_desktop_popup(0, FALSE);
     ret = d;
 

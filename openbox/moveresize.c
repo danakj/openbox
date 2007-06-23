@@ -25,6 +25,7 @@
 #include "frame.h"
 #include "openbox.h"
 #include "resist.h"
+#include "mainloop.h"
 #include "popup.h"
 #include "moveresize.h"
 #include "config.h"
@@ -53,11 +54,15 @@ static gint cur_x, cur_y;
 static guint button;
 static guint32 corner;
 static ObCorner lockcorner;
+static ObDirection edge_warp_dir = -1;
 #ifdef SYNC
 static gboolean waiting_for_sync;
 #endif
 
 static ObPopup *popup = NULL;
+
+static void do_edge_warp(gint x, gint y);
+static void cancel_edge_warp();
 
 static void client_dest(ObClient *client, gpointer data)
 {
@@ -302,6 +307,9 @@ void moveresize_end(gboolean cancel)
                          TRUE, TRUE, FALSE);
     }
 
+    /* dont edge warp after its ended */
+    cancel_edge_warp();
+
     moveresize_in_progress = FALSE;
     moveresize_client = NULL;
 }
@@ -412,6 +420,65 @@ static void calc_resize(gboolean keyboard)
         moveresize_client->frame->size.bottom;
 }
 
+static gboolean edge_warp_delay_func(gpointer data)
+{
+    guint d;
+
+    d = screen_find_desktop(screen_desktop, edge_warp_dir, TRUE, FALSE);
+    if (d != screen_desktop) screen_set_desktop(d, TRUE);
+
+    edge_warp_dir = -1;
+
+    return FALSE; /* don't repeat */
+}
+
+static void do_edge_warp(gint x, gint y)
+{
+    guint i, d;
+    ObDirection dir;
+
+    if (!config_mouse_screenedgetime) return;
+
+    dir = -1;
+
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *a = screen_physical_area_monitor(i);
+        if (x == RECT_LEFT(*a)) dir = OB_DIRECTION_WEST;
+        if (x == RECT_RIGHT(*a)) dir = OB_DIRECTION_EAST;
+        if (y == RECT_TOP(*a)) dir = OB_DIRECTION_NORTH;
+        if (y == RECT_BOTTOM(*a)) dir = OB_DIRECTION_SOUTH;
+
+        /* try check for xinerama boundaries */
+        if ((x + 1 == RECT_LEFT(*a) || x - 1 == RECT_RIGHT(*a)) &&
+            (dir == OB_DIRECTION_WEST || dir == OB_DIRECTION_EAST))
+        {
+            dir = -1;
+        }
+        if ((y + 1 == RECT_TOP(*a) || y - 1 == RECT_BOTTOM(*a)) &&
+            (dir == OB_DIRECTION_NORTH || dir == OB_DIRECTION_SOUTH))
+        {
+            dir = -1;
+        }
+        g_free(a);
+    }
+
+    if (dir != edge_warp_dir) {
+        if (dir == (ObDirection)-1)
+            cancel_edge_warp();
+        else
+            ob_main_loop_timeout_add(ob_main_loop,
+                                     config_mouse_screenedgetime * 1000,
+                                     edge_warp_delay_func,
+                                     NULL, NULL, NULL);
+        edge_warp_dir = dir;
+    }
+}
+
+static void cancel_edge_warp()
+{
+    ob_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
+}
+
 gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
@@ -435,6 +502,7 @@ gboolean moveresize_event(XEvent *e)
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
             do_move(FALSE);
+            do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
         } else {
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
                 cur_x = start_cw - (e->xmotion.x_root - start_x);

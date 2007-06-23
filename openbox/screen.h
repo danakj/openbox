@@ -76,6 +76,9 @@ void screen_remove_desktop(gboolean current);
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel);
 
+guint screen_find_desktop(guint from, ObDirection dir,
+                          gboolean wrap, gboolean linear);
+
 /*! Show/hide the desktop popup (pager) for the given desktop */
 void screen_desktop_popup(guint d, gboolean show);
 

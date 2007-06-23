@@ -38,4 +38,5 @@ void action_all_startup()
     action_addremovedesktop_startup();
     action_dockautohide_startup();
     action_layer_startup();
+    action_movetofromedge_startup();
 }

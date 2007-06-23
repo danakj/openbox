@@ -39,5 +39,6 @@ void action_resizerelative_startup();
 void action_addremovedesktop_startup();
 void action_dockautohide_startup();
 void action_layer_startup();
+void action_movetofromedge_startup();
 
 #endif

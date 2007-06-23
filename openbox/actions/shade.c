@@ -27,7 +27,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o = g_new0(Options, 1);
     o->toggle = TRUE;
 
-    if ((n = parse_find_node("shade", node))) {
+    if ((n = parse_find_node("state", node))) {
         gchar *s = parse_string(doc, n);
         if (g_ascii_strcasecmp(s, "toggle")) {
             o->toggle = FALSE;

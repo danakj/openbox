@@ -38,5 +38,6 @@ void action_directionaldesktop_startup();
 void action_resizerelative_startup();
 void action_addremovedesktop_startup();
 void action_dockautohide_startup();
+void action_layer_startup();
 
 #endif

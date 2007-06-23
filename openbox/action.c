@@ -381,17 +381,6 @@ void action_toggle_layer(union ActionData *data)
     ObClient *c = data->layer.any.c;
 
     client_action_start(data);
-    if (data->layer.layer < 0)
-        client_set_layer(c, c->below ? 0 : -1);
-    else if (data->layer.layer > 0)
-        client_set_layer(c, c->above ? 0 : 1);
     client_action_end(data, config_focus_under_mouse);
 }
 
-void action_toggle_dockautohide(union ActionData *data)
-{
-}
-
-void action_remove_desktop(union ActionData *data)
-{
-}

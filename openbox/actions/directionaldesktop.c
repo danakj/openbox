@@ -1,5 +1,6 @@
 #include "openbox/actions.h"
 #include "openbox/screen.h"
+#include "openbox/client.h"
 #include <glib.h>
 
 typedef struct {

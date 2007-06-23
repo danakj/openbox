@@ -37,7 +37,10 @@
   <menu id="client-list-menu" />
   <separator />
   <item label="ObConf">
-    <action name="Execute"><execute>obconf</execute></action>
+    <action name="Execute">
+      <startupnotify><enabled>yes</enabled><icon>openbox</icon></startupnotiy>
+      <execute>obconf</execute>
+    </action>
   </item>
   <item label="Reconfigure">
     <action name="Reconfigure" />

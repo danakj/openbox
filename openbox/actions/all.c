@@ -35,4 +35,5 @@ void action_all_startup()
     action_desktop_startup();
     action_directionaldesktop_startup();
     action_resizerelative_startup();
+    action_addremovedesktop_startup();
 }

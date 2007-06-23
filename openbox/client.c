@@ -2891,9 +2891,6 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     oldw = self->area.width;
     oldh = self->area.height;
     RECT_SET(self->area, x, y, w, h);
-    ob_debug("Client area %s set to %d %d %d %d\n",
-             self->title, self->area.x, self->area.y,
-             self->area.width, self->area.height);
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when

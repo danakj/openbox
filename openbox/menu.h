@@ -19,7 +19,6 @@
 #ifndef __menu_h
 #define __menu_h
 
-#include "action.h"
 #include "window.h"
 #include "geom.h"
 #include "render/render.h"

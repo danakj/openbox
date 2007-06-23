@@ -96,12 +96,6 @@ ObAction* action_copy(const ObAction *src)
     return a;
 }
 
-void setup_action_send_to_desktop(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.sendto.any.client_action = OB_CLIENT_ACTION_ALWAYS;
-    (*a)->data.sendto.follow = TRUE;
-}
-
 void setup_action_send_to_desktop_prev(ObAction **a, ObUserAction uact)
 {
     (*a)->data.sendtodir.inter.any.client_action = OB_CLIENT_ACTION_ALWAYS;
@@ -308,16 +302,6 @@ void setup_action_bottom_layer(ObAction **a, ObUserAction uact)
     (*a)->data.layer.layer = -1;
 }
 
-void setup_action_resize(ObAction **a, ObUserAction uact)
-{
-    (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
-    (*a)->data.moveresize.keyboard =
-        (uact == OB_USER_ACTION_NONE ||
-         uact == OB_USER_ACTION_KEYBOARD_KEY ||
-         uact == OB_USER_ACTION_MENU_SELECTION);
-    (*a)->data.moveresize.corner = 0;
-}
-
 void setup_action_addremove_desktop_current(ObAction **a, ObUserAction uact)
 {
     (*a)->data.addremovedesktop.current = TRUE;
@@ -344,11 +328,6 @@ ActionString actionstrings[] =
         "unshaderaise",
         action_unshaderaise,
         setup_client_action
-    },
-    {
-        "sendtodesktop",
-        action_send_to_desktop,
-        setup_action_send_to_desktop
     },
     {
         "sendtodesktopnext",
@@ -539,12 +518,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if (parse_attr_string("name", node, &actname)) {
         if ((act = action_from_string(actname, uact))) {
             } else if (act->func == action_desktop) {
-           } else if (act->func == action_send_to_desktop) {
-                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
-                    act->data.sendto.desk = parse_int(doc, n);
-                if (act->data.sendto.desk > 0) act->data.sendto.desk--;
-                if ((n = parse_find_node("follow", node->xmlChildrenNode)))
-                    act->data.sendto.follow = parse_bool(doc, n);
             } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);
@@ -560,105 +533,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     return act;
 }
 
-void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
-                     guint state, guint button, gint x, gint y, Time time,
-                     gboolean cancel, gboolean done)
-{
-    GSList *it;
-    ObAction *a;
-
-    if (!acts)
-        return;
-
-    if (x < 0 && y < 0)
-        screen_pointer_pos(&x, &y);
-
-    for (it = acts; it; it = g_slist_next(it)) {
-        a = it->data;
-
-        if (!(a->data.any.client_action == OB_CLIENT_ACTION_ALWAYS && !c)) {
-            a->data.any.c = a->data.any.client_action ? c : NULL;
-            a->data.any.context = context;
-            a->data.any.x = x;
-            a->data.any.y = y;
-
-            a->data.any.button = button;
-
-            a->data.any.time = time;
-
-            if (a->data.any.interactive) {
-                a->data.inter.cancel = cancel;
-                a->data.inter.final = done;
-                if (!(cancel || done))
-                    if (!keyboard_interactive_grab(state, a->data.any.c, a))
-                        continue;
-            }
-
-            /* XXX UGLY HACK race with motion event starting a move and the
-               button release gettnig processed first. answer: don't queue
-               moveresize starts. UGLY HACK XXX
-
-               XXX ALSO don't queue showmenu events, because on button press
-               events we need to know if a mouse grab is going to take place,
-               and set the button to 0, so that later motion events don't think
-               that a drag is going on. since showmenu grabs the pointer..
-            */
-            if (a->data.any.interactive || a->func == action_move ||
-                a->func == action_resize || a->func == action_showmenu)
-            {
-                /* interactive actions are not queued */
-                a->func(&a->data);
-            } else if (a->func == action_focus ||
-                       a->func == action_activate ||
-                       a->func == action_showmenu)
-            {
-                /* XXX MORE UGLY HACK
-                   actions from clicks on client windows are NOT queued.
-                   this solves the mysterious click-and-drag-doesnt-work
-                   problem. it was because the window gets focused and stuff
-                   after the button event has already been passed through. i
-                   dont really know why it should care but it does and it makes
-                   a difference.
-
-                   however this very bogus ! !
-                   we want to send the button press to the window BEFORE
-                   we do the action because the action might move the windows
-                   (eg change desktops) and then the button press ends up on
-                   the completely wrong window !
-                   so, this is just for that bug, and it will only NOT queue it
-                   if it is a focusing action that can be used with the mouse
-                   pointer. ugh.
-
-                   also with the menus, there is a race going on. if the
-                   desktop wants to pop up a menu, and we do too, we send them
-                   the button before we pop up the menu, so they pop up their
-                   menu first. but not always. if we pop up our menu before
-                   sending them the button press, then the result is
-                   deterministic. yay.
-
-                   XXX further more. focus actions are not queued at all,
-                   because if you bind focus->showmenu, the menu will get
-                   hidden to do the focusing
-                */
-                a->func(&a->data);
-            } else
-                ob_main_loop_queue_action(ob_main_loop, a);
-        }
-    }
-}
-
-void action_run_string(const gchar *name, struct _ObClient *c, Time time)
-{
-    ObAction *a;
-    GSList *l;
-
-    a = action_from_string(name, OB_USER_ACTION_NONE);
-    g_assert(a);
-
-    l = g_slist_append(NULL, a);
-
-    action_run(l, c, 0, time);
-}
 
 void action_unshaderaise(union ActionData *data)
 {
@@ -674,24 +548,6 @@ void action_shadelower(union ActionData *data)
         action_lower(data);
     else
         action_shade(data);
-}
-
-void action_resize_relative(union ActionData *data)
-{
-}
-
-void action_send_to_desktop(union ActionData *data)
-{
-    ObClient *c = data->sendto.any.c;
-
-    if (!client_normal(c)) return;
-
-    if (data->sendto.desk < screen_num_desktops ||
-        data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, data->sendto.follow, FALSE);
-        if (data->sendto.follow && data->sendto.desk != screen_desktop)
-            screen_set_desktop(data->sendto.desk, TRUE);
-    }
 }
 
 void action_send_to_desktop_dir(union ActionData *data)

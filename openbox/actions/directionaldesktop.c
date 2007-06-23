@@ -6,6 +6,8 @@ typedef struct {
     gboolean linear;
     gboolean wrap;
     ObDirection dir;
+    gboolean send;
+    gboolean follow;
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
@@ -29,6 +31,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o = g_new0(Options, 1);
     o->wrap = TRUE;
     o->dir = OB_DIRECTION_EAST;
+    o->follow = TRUE;
 
     if ((n = parse_find_node("wrap", node)))
         o->wrap = parse_bool(doc, n);
@@ -56,6 +59,10 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             o->dir = OB_DIRECTION_EAST;
         g_free(s);
     }
+    if ((n = parse_find_node("send", node)))
+        o->send = parse_bool(doc, n);
+    if ((n = parse_find_node("follow", node)))
+        o->follow = parse_bool(doc, n);
 
     return o;
 }
@@ -77,8 +84,17 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                              o->wrap,
                              o->linear,
                              FALSE, TRUE, FALSE);
-    if (d != screen_desktop)
-        screen_set_desktop(d, TRUE);
+    if (d < screen_num_desktops && d != screen_desktop) {
+        gboolean go = !o->send;
+        if (o->send) {
+            if (data->client && client_normal(data->client)) {
+                client_set_desktop(data->client, d, o->follow, FALSE);
+                go = TRUE;
+            }
+        }
+        if (go)
+            screen_set_desktop(d, TRUE);
+    }
 
     return FALSE;
 }

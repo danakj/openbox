@@ -173,6 +173,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/fullscreen.c \
 	openbox/actions/growtoedge.c \
 	openbox/actions/iconify.c \
+	openbox/actions/if.c \
 	openbox/actions/kill.c \
 	openbox/actions/layer.c \
 	openbox/actions/lower.c \

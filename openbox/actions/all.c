@@ -40,4 +40,5 @@ void action_all_startup()
     action_layer_startup();
     action_movetofromedge_startup();
     action_growtoedge_startup();
+    action_if_startup();
 }

@@ -41,5 +41,6 @@ void action_dockautohide_startup();
 void action_layer_startup();
 void action_movetofromedge_startup();
 void action_growtoedge_startup();
+void action_if_startup();
 
 #endif

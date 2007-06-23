@@ -45,9 +45,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
 
     if (data->client) {
+        ob_debug("button %d focusable %d context %d %d %d\n",
+                 data->button, client_mouse_focusable(data->client),
+                 data->context, 
+                 OB_FRAME_CONTEXT_CLIENT, OB_FRAME_CONTEXT_FRAME);
         if (data->button == 0 || client_mouse_focusable(data->client) ||
-            data->context != OB_FRAME_CONTEXT_CLIENT ||
-            data->context != OB_FRAME_CONTEXT_FRAME)
+            (data->context != OB_FRAME_CONTEXT_CLIENT &&
+             data->context != OB_FRAME_CONTEXT_FRAME))
         {
             client_activate(data->client, o->here, FALSE, FALSE, TRUE);
         }

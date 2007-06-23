@@ -38,7 +38,7 @@
   <separator />
   <item label="ObConf">
     <action name="Execute">
-      <startupnotify><enabled>yes</enabled><icon>openbox</icon></startupnotiy>
+      <startupnotify><enabled>yes</enabled><icon>openbox</icon></startupnotify>
       <execute>obconf</execute>
     </action>
   </item>

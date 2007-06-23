@@ -125,6 +125,8 @@ struct _ObNormalMenuEntry {
     RrColor *mask_selected_color;
     RrColor *mask_disabled_color;
     RrColor *mask_disabled_selected_color;
+
+    gpointer data;
 };
 
 struct _ObSubmenuMenuEntry {

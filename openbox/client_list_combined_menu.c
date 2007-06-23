@@ -20,7 +20,6 @@
 #include "openbox.h"
 #include "menu.h"
 #include "menuframe.h"
-#include "action.h"
 #include "screen.h"
 #include "client.h"
 #include "focus.h"
@@ -38,7 +37,6 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     ObMenu *menu = frame->menu;
     ObMenuEntry *e;
     GList *it;
-    gint i;
     guint desktop;
 
     menu_clear_entries(menu);
@@ -48,33 +46,22 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         gboolean onlyiconic = TRUE;
 
         menu_add_separator(menu, -1, screen_desktop_names[desktop]);
-        for (it = focus_order, i = 0; it; it = g_list_next(it), ++i) {
+        for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (client_normal(c) && (!c->skip_taskbar || c->iconic) &&
                 (c->desktop == desktop || c->desktop == DESKTOP_ALL))
             {
-                GSList *acts = NULL;
-                ObAction* act;
                 const ObClientIcon *icon;
 
                 empty = FALSE;
 
-                act = action_from_string("Activate",
-                                         OB_USER_ACTION_MENU_SELECTION);
-                act->data.activate.any.c = c;
-                acts = g_slist_append(acts, act);
-                act = action_from_string("Desktop",
-                                         OB_USER_ACTION_MENU_SELECTION);
-                act->data.desktop.desk = desktop;
-                acts = g_slist_append(acts, act);
-
                 if (c->iconic) {
                     gchar *title = g_strdup_printf("(%s)", c->icon_title);
-                    e = menu_add_normal(menu, i, title, acts, FALSE);
+                    e = menu_add_normal(menu, -1, title, NULL, FALSE);
                     g_free(title);
                 } else {
                     onlyiconic = FALSE;
-                    e = menu_add_normal(menu, i, c->title, acts, FALSE);
+                    e = menu_add_normal(menu, -1, c->title, NULL, FALSE);
                 }
 
                 if (config_menu_client_list_icons
@@ -85,23 +72,20 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
                     e->data.normal.icon_alpha =
                         c->iconic ? OB_ICONIC_ALPHA : 0xff;
                 }
+
+                e->data.normal.data = c;
             }
         }
 
         if (empty || onlyiconic) {
+            ObMenuEntry *e;
+
             /* no entries or only iconified windows, so add a
              * way to go to this desktop without uniconifying a window */
             if (!empty)
                 menu_add_separator(menu, -1, NULL);
 
-            GSList *acts = NULL;
-            ObAction* act;
-            ObMenuEntry *e;
-
-            act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
-            act->data.desktop.desk = desktop;
-            acts = g_slist_append(acts, act);
-            e = menu_add_normal(menu, 0, _("Go there..."), acts, TRUE);
+            e = menu_add_normal(menu, desktop, _("Go there..."), NULL, TRUE);
             if (desktop == screen_desktop)
                 e->data.normal.enabled = FALSE;
         }
@@ -109,18 +93,16 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* always show the menu */
 }
 
-/* executes it using the client in the actions, since we set that
-   when we make the actions! */
 static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
                          ObClient *c, guint state, gpointer data,
                          Time time)
 {
-    ObAction *a;
-
-    if (self->data.normal.actions) {
-        a = self->data.normal.actions->data;
-        action_run(self->data.normal.actions, a->data.any.c, state, time);
+    if (self->id == -1) {
+        if (self->data.normal.data) /* it's set to NULL if its destroyed */
+            client_activate(self->data.normal.data, FALSE, TRUE);
     }
+    else
+        screen_set_desktop(self->id, TRUE);
 }
 
 static void client_dest(ObClient *client, gpointer data)
@@ -132,12 +114,9 @@ static void client_dest(ObClient *client, gpointer data)
     for (eit = combined_menu->entries; eit; eit = g_list_next(eit)) {
         ObMenuEntry *meit = eit->data;
         if (meit->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-            meit->data.normal.actions)
+            meit->data.normal.data == client)
         {
-            ObAction *a = meit->data.normal.actions->data;
-            ObClient *c = a->data.any.c;
-            if (c == client)
-                a->data.any.c = NULL;
+            meit->data.normal.data = NULL;
         }
     }
 }

@@ -153,6 +153,9 @@ extern gint config_mouse_threshold;
 /*! Number of milliseconds within which 2 clicks must occur to be a
   double-click */
 extern gint config_mouse_dclicktime;
+/*! Number of milliseconds that the mouse has to be on the screen edge before
+  a screen edge event is triggered */
+extern gint config_mouse_screenedgetime;
 
 /*! Number of pixels to resist while crossing another window's edge */
 extern gint config_resist_win;

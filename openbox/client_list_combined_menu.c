@@ -32,6 +32,10 @@
 
 ObMenu *combined_menu;
 
+#define CLIENT -1
+#define ADD_DESKTOP -2
+#define REMOVE_DESKTOP -3
+
 static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
@@ -45,7 +49,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         gboolean empty = TRUE;
         gboolean onlyiconic = TRUE;
 
-        menu_add_separator(menu, -1, screen_desktop_names[desktop]);
+        menu_add_separator(menu, CLIENT, screen_desktop_names[desktop]);
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (client_normal(c) && (!c->skip_taskbar || c->iconic) &&
@@ -57,11 +61,11 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 
                 if (c->iconic) {
                     gchar *title = g_strdup_printf("(%s)", c->icon_title);
-                    e = menu_add_normal(menu, -1, title, NULL, FALSE);
+                    e = menu_add_normal(menu, CLIENT, title, NULL, FALSE);
                     g_free(title);
                 } else {
                     onlyiconic = FALSE;
-                    e = menu_add_normal(menu, -1, c->title, NULL, FALSE);
+                    e = menu_add_normal(menu, CLIENT, c->title, NULL, FALSE);
                 }
 
                 if (config_menu_client_list_icons
@@ -83,13 +87,19 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
             /* no entries or only iconified windows, so add a
              * way to go to this desktop without uniconifying a window */
             if (!empty)
-                menu_add_separator(menu, -1, NULL);
+                menu_add_separator(menu, CLIENT, NULL);
 
             e = menu_add_normal(menu, desktop, _("Go there..."), NULL, TRUE);
             if (desktop == screen_desktop)
                 e->data.normal.enabled = FALSE;
         }
     }
+
+    menu_add_separator(menu, CLIENT, _("Manage desktops"));
+    menu_add_normal(menu, ADD_DESKTOP, _("&Add new desktop"), NULL, TRUE);
+    menu_add_normal(menu, REMOVE_DESKTOP, _("&Remove last desktop"),
+                    NULL, TRUE);
+
     return TRUE; /* always show the menu */
 }
 
@@ -97,9 +107,17 @@ static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
                          ObClient *c, guint state, gpointer data,
                          Time time)
 {
-    if (self->id == -1) {
+    if (self->id == CLIENT) {
         if (self->data.normal.data) /* it's set to NULL if its destroyed */
             client_activate(self->data.normal.data, FALSE, TRUE);
+    }
+    else if (self->id == ADD_DESKTOP) {
+        screen_add_desktop(FALSE);
+        menu_frame_hide_all();
+    }
+    else if (self->id == REMOVE_DESKTOP) {
+        screen_remove_desktop(FALSE);
+        menu_frame_hide_all();
     }
     else
         screen_set_desktop(self->id, TRUE);

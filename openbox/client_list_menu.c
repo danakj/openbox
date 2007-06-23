@@ -37,6 +37,10 @@ typedef struct
     guint desktop;
 } DesktopData;
 
+#define CLIENT -1
+#define ADD_DESKTOP -2
+#define REMOVE_DESKTOP -3
+
 static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
@@ -59,11 +63,11 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 
             if (c->iconic) {
                 gchar *title = g_strdup_printf("(%s)", c->icon_title);
-                e = menu_add_normal(menu, -1, title, NULL, FALSE);
+                e = menu_add_normal(menu, CLIENT, title, NULL, FALSE);
                 g_free(title);
             } else {
                 onlyiconic = FALSE;
-                e = menu_add_normal(menu, -1, c->title, NULL, FALSE);
+                e = menu_add_normal(menu, CLIENT, c->title, NULL, FALSE);
             }
 
             if (config_menu_client_list_icons
@@ -84,12 +88,13 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
         /* no entries or only iconified windows, so add a
          * way to go to this desktop without uniconifying a window */
         if (!empty)
-            menu_add_separator(menu, -1, NULL);
+            menu_add_separator(menu, CLIENT, NULL);
 
         e = menu_add_normal(menu, d->desktop, _("Go there..."), NULL, TRUE);
         if (d->desktop == screen_desktop)
             e->data.normal.enabled = FALSE;
     }
+
     return TRUE; /* always show */
 }
 
@@ -97,7 +102,7 @@ static void desk_menu_execute(ObMenuEntry *self, ObMenuFrame *f,
                               ObClient *c, guint state, gpointer data,
                               Time time)
 {
-    if (self->id == -1) {
+    if (self->id == CLIENT) {
         if (self->data.normal.data) /* it's set to NULL if its destroyed */
             client_activate(self->data.normal.data, FALSE, TRUE);
     }
@@ -144,7 +149,25 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         desktop_menus = g_slist_append(desktop_menus, submenu);
     }
 
+    menu_add_separator(menu, CLIENT, NULL);
+    menu_add_normal(menu, ADD_DESKTOP, _("&Add new desktop"), NULL, TRUE);
+    menu_add_normal(menu, REMOVE_DESKTOP, _("&Remove last desktop"),
+                    NULL, TRUE);
+
     return TRUE; /* always show */
+}
+
+static void self_execute(ObMenuEntry *self, ObMenuFrame *f,
+                         ObClient *c, guint state, gpointer data)
+{
+    if (self->id == ADD_DESKTOP) {
+        screen_add_desktop(FALSE);
+        menu_frame_hide_all();
+    }
+    else if (self->id == REMOVE_DESKTOP) {
+        screen_remove_desktop(FALSE);
+        menu_frame_hide_all();
+    }
 }
 
 static void client_dest(ObClient *client, gpointer data)
@@ -176,6 +199,7 @@ void client_list_menu_startup(gboolean reconfig)
 
     menu = menu_new(MENU_NAME, _("Desktops"), TRUE, NULL);
     menu_set_update_func(menu, self_update);
+    menu_set_execute_func(menu, self_execute);
 }
 
 void client_list_menu_shutdown(gboolean reconfig)

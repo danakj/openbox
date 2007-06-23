@@ -142,6 +142,7 @@
     <xsd:complexType name="mouse">
         <xsd:element minOccurs="0" name="dragThreshold" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="doubleClickTime" type="xsd:integer"/>
+        <xsd:element minOccurs="0" name="screenEdgeWarpTime" type="xsd:integer"/>
         <xsd:element maxOccurs="unbounded" name="context" type="ob:context"/>
     </xsd:complexType>
     <xsd:complexType name="menu">

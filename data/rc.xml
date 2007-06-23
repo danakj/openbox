@@ -232,6 +232,10 @@
   <!-- number of pixels the mouse must move before a drag begins -->
   <doubleClickTime>200</doubleClickTime>
   <!-- in milliseconds (1000 = 1 second) -->
+  <screenEdgeWarpTime>400</screenEdgeWarpTime>
+  <!-- time before changing desktops when the pointer touches the edge of the
+       screen while moving a window, in milliseconds (1000 = 1 second),
+       0 disables warping -->
 
   <context name="Frame">
     <mousebind button="A-Left" action="Press">

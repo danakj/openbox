@@ -78,6 +78,7 @@ guint config_keyboard_reset_state;
 
 gint config_mouse_threshold;
 gint config_mouse_dclicktime;
+gint config_mouse_screenedgetime;
 
 guint    config_menu_hide_delay;
 gboolean config_menu_middle;
@@ -423,6 +424,8 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_mouse_threshold = parse_int(doc, n);
     if ((n = parse_find_node("doubleClickTime", node)))
         config_mouse_dclicktime = parse_int(doc, n);
+    if ((n = parse_find_node("screenEdgeWarpTime", node)))
+        config_mouse_screenedgetime = parse_int(doc, n);
 
     n = parse_find_node("context", node);
     while (n) {
@@ -926,6 +929,7 @@ void config_startup(ObParseInst *i)
 
     config_mouse_threshold = 8;
     config_mouse_dclicktime = 200;
+    config_mouse_screenedgetime = 400;
 
     bind_default_mouse();
 

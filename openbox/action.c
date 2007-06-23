@@ -2038,72 +2038,13 @@ void action_break_chroot(union ActionData *data)
 void action_add_desktop(union ActionData *data)
 {
     client_action_start(data);
-    screen_set_num_desktops(screen_num_desktops+1);
-
-    /* move all the clients over */
-    if (data->addremovedesktop.current) {
-        GList *it;
-
-        for (it = client_list; it; it = g_list_next(it)) {
-            ObClient *c = it->data;
-            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop)
-                client_set_desktop(c, c->desktop+1, FALSE, TRUE);
-        }
-    }
-
+    screen_add_desktop(data->addremovedesktop.current);
     client_action_end(data, config_focus_under_mouse);
 }
 
 void action_remove_desktop(union ActionData *data)
 {
-    guint rmdesktop, movedesktop;
-    GList *it, *stacking_copy;
-
-    if (screen_num_desktops < 2) return;
-
     client_action_start(data);
-
-    /* what desktop are we removing and moving to? */
-    if (data->addremovedesktop.current)
-        rmdesktop = screen_desktop;
-    else
-        rmdesktop = screen_num_desktops - 1;
-    if (rmdesktop < screen_num_desktops - 1)
-        movedesktop = rmdesktop + 1;
-    else
-        movedesktop = rmdesktop;
-
-    /* make a copy of the list cuz we're changing it */
-    stacking_copy = g_list_copy(stacking_list);
-    for (it = g_list_last(stacking_copy); it; it = g_list_previous(it)) {
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *c = it->data;
-            guint d = c->desktop;
-            if (d != DESKTOP_ALL && d >= movedesktop) {
-                client_set_desktop(c, c->desktop - 1, TRUE, TRUE);
-                ob_debug("moving window %s\n", c->title);
-            }
-            /* raise all the windows that are on the current desktop which
-               is being merged */
-            if ((screen_desktop == rmdesktop - 1 ||
-                 screen_desktop == rmdesktop) &&
-                (d == DESKTOP_ALL || d == screen_desktop))
-            {
-                stacking_raise(CLIENT_AS_WINDOW(c));
-                ob_debug("raising window %s\n", c->title);
-            }
-        }
-    }
-
-    /* act like we're changing desktops */
-    if (screen_desktop < screen_num_desktops - 1) {
-        gint d = screen_desktop;
-        screen_desktop = screen_last_desktop;
-        screen_set_desktop(d, TRUE);
-        ob_debug("fake desktop change\n");
-    }
-
-    screen_set_num_desktops(screen_num_desktops-1);
-
+    screen_remove_desktop(data->addremovedesktop.current);
     client_action_end(data, config_focus_under_mouse);
 }

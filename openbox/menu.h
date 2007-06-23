@@ -65,6 +65,8 @@ struct _ObMenu
     gunichar shortcut;
     /*! The shortcut's position in the string */
     guint shortcut_position;
+    /*! If the shortcut was specified by & and should always be drawn */
+    gboolean shortcut_always_show;
 
     /*! If the shortcut key should be shown in menu entries even when it
       is the first character in the string */
@@ -106,6 +108,8 @@ struct _ObNormalMenuEntry {
     gunichar shortcut;
     /*! The shortcut's position in the string */
     guint shortcut_position;
+    /*! If the shortcut was specified by & and should always be drawn */
+    gboolean shortcut_always_show;
 
     /* state */
     gboolean enabled;

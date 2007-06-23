@@ -57,7 +57,8 @@ static void parse_menu_separator(ObParseInst *i,
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data);
 static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
-                               gchar **strippedlabel, guint *position);
+                               gchar **strippedlabel, guint *position,
+                               gboolean *always_show);
 
 
 static void client_dest(ObClient *client, gpointer data)
@@ -202,11 +203,13 @@ static ObMenu* menu_from_name(gchar *name)
                            ((c) >= 'a' && (c) <= 'z'))
 
 static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
-                               gchar **strippedlabel, guint *position)
+                               gchar **strippedlabel, guint *position,
+                               gboolean *always_show)
 {
     gunichar shortcut = 0;
     
     *position = 0;
+    *always_show = FALSE;
 
     g_assert(strippedlabel != NULL);
 
@@ -231,6 +234,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
             if (VALID_SHORTCUT(*(i+1))) {
                 shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
                 *position = i - *strippedlabel;
+                *always_show = TRUE;
 
                 /* remove the & from the string */
                 for (; *i != '\0'; ++i)
@@ -339,7 +343,8 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     self->data = data;
 
     self->shortcut = parse_shortcut(title, allow_shortcut_selection,
-                                    &self->title, &self->shortcut_position);
+                                    &self->title, &self->shortcut_position,
+                                    &self->shortcut_always_show);
 
     g_hash_table_replace(menu_hash, self->name, self);
 
@@ -670,7 +675,8 @@ void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
         g_free(self->data.normal.label);
         self->data.normal.shortcut =
             parse_shortcut(label, allow_shortcut, &self->data.normal.label,
-                           &self->data.normal.shortcut_position);
+                           &self->data.normal.shortcut_position,
+                           &self->data.normal.shortcut_always_show);
         break;
     default:
         g_assert_not_reached();

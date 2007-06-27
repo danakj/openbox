@@ -150,28 +150,28 @@
 
   <!-- Keybindings for desktop switching -->
   <keybind key="C-A-Left">
-    <action name="DesktopLeft"><wrap>no</wrap></action>
+    <action name="DesktopLeft"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Right">
-    <action name="DesktopRight"><wrap>no</wrap></action>
+    <action name="DesktopRight"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Up">
-    <action name="DesktopUp"><wrap>no</wrap></action>
+    <action name="DesktopUp"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Down">
-    <action name="DesktopDown"><wrap>no</wrap></action>
+    <action name="DesktopDown"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Left">
-    <action name="SendToDesktopLeft"><wrap>no</wrap></action>
+    <action name="SendToDesktopLeft"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Right">
-    <action name="SendToDesktopRight"><wrap>no</wrap></action>
+    <action name="SendToDesktopRight"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Up">
-    <action name="SendToDesktopUp"><wrap>no</wrap></action>
+    <action name="SendToDesktopUp"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Down">
-    <action name="SendToDesktopDown"><wrap>no</wrap></action>
+    <action name="SendToDesktopDown"><dialog>no</dialog><wrap>no</wrap></action>
   </keybind>
   <keybind key="W-F1">
     <action name="Desktop"><desktop>1</desktop></action>

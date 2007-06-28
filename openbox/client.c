@@ -3883,179 +3883,161 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
             if (cur->iconic)                                                  \
                 continue;
 
-#define HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end) \
-            if ((his_edge_start >= my_edge_start && \
-                 his_edge_start <= my_edge_end) ||  \
-                (my_edge_start >= his_edge_start && \
-                 my_edge_start <= his_edge_end))    \
-                dest = his_offset;
-
-/* finds the nearest edge in the given direction from the current client
- * note to self: the edge is the -frame- edge (the actual one), not the
- * client edge.
- */
-gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang)
+void client_find_move_directional(ObClient *self, ObDirection dir,
+                                  gint *x, gint *y)
 {
-    gint dest, monitor_dest;
-    gint my_edge_start, my_edge_end, my_offset;
+    gint dest, edge, my_edge_start, my_edge_size, my_pos;
     GList *it;
     Rect *a, *mon;
     
-    if(!client_list)
-        return -1;
+    *x = self->frame->area.x;
+    *y = self->frame->area.y;
 
-    a = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS, &c->frame->area);
-    mon = screen_area(c->desktop, SCREEN_AREA_ONE_MONITOR, &c->frame->area);
+    a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
+                    &self->frame->area);
+    mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
+                      &self->frame->area);
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
-        my_edge_start = c->frame->area.x;
-        my_edge_end = c->frame->area.x + c->frame->area.width;
-        my_offset = c->frame->area.y + (hang ? c->frame->area.height : 0);
-        
-        /* default: top of screen */
-        dest = a->y + (hang ? c->frame->area.height : 0);
-        monitor_dest = mon->y + (hang ? c->frame->area.height : 0);
-        /* if the monitor edge comes before the screen edge, */
-        /* use that as the destination instead. (For xinerama) */
-        if (monitor_dest != dest && my_offset > monitor_dest)
-            dest = monitor_dest; 
-
-        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
-            gint his_edge_start, his_edge_end, his_offset;
-            ObClient *cur = it->data;
-
-            WANT_EDGE(cur, c)
-
-            his_edge_start = cur->frame->area.x;
-            his_edge_end = cur->frame->area.x + cur->frame->area.width;
-            his_offset = cur->frame->area.y + 
-                         (hang ? 0 : cur->frame->area.height);
-
-            if(his_offset + 1 > my_offset)
-                continue;
-
-            if(his_offset < dest)
-                continue;
-
-            HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end)
-        }
-        break;
     case OB_DIRECTION_SOUTH:
-        my_edge_start = c->frame->area.x;
-        my_edge_end = c->frame->area.x + c->frame->area.width;
-        my_offset = c->frame->area.y + (hang ? 0 : c->frame->area.height);
-
-        /* default: bottom of screen */
-        dest = a->y + a->height - (hang ? c->frame->area.height : 0);
-        monitor_dest = mon->y + mon->height -
-                       (hang ? c->frame->area.height : 0);
-        /* if the monitor edge comes before the screen edge, */
-        /* use that as the destination instead. (For xinerama) */
-        if (monitor_dest != dest && my_offset < monitor_dest)
-            dest = monitor_dest; 
-
-        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
-            gint his_edge_start, his_edge_end, his_offset;
-            ObClient *cur = it->data;
-
-            WANT_EDGE(cur, c)
-
-            his_edge_start = cur->frame->area.x;
-            his_edge_end = cur->frame->area.x + cur->frame->area.width;
-            his_offset = cur->frame->area.y +
-                         (hang ? cur->frame->area.height : 0);
-
-
-            if(his_offset - 1 < my_offset)
-                continue;
-            
-            if(his_offset > dest)
-                continue;
-
-            HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end)
-        }
+        my_edge_start = RECT_LEFT(self->frame->area);
+        my_edge_size = self->frame->area.width;
+        my_pos = RECT_TOP(self->frame->area);
         break;
-    case OB_DIRECTION_WEST:
-        my_edge_start = c->frame->area.y;
-        my_edge_end = c->frame->area.y + c->frame->area.height;
-        my_offset = c->frame->area.x + (hang ? c->frame->area.width : 0);
-
-        /* default: leftmost egde of screen */
-        dest = a->x + (hang ? c->frame->area.width : 0);
-        monitor_dest = mon->x + (hang ? c->frame->area.width : 0);
-        /* if the monitor edge comes before the screen edge, */
-        /* use that as the destination instead. (For xinerama) */
-        if (monitor_dest != dest && my_offset > monitor_dest)
-            dest = monitor_dest;            
-
-        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
-            gint his_edge_start, his_edge_end, his_offset;
-            ObClient *cur = it->data;
-
-            WANT_EDGE(cur, c)
-
-            his_edge_start = cur->frame->area.y;
-            his_edge_end = cur->frame->area.y + cur->frame->area.height;
-            his_offset = cur->frame->area.x +
-                         (hang ? 0 : cur->frame->area.width);
-
-            if(his_offset + 1 > my_offset)
-                continue;
-
-            if(his_offset < dest)
-                continue;
-
-            HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end)
-        }
-       break;
     case OB_DIRECTION_EAST:
-        my_edge_start = c->frame->area.y;
-        my_edge_end = c->frame->area.y + c->frame->area.height;
-        my_offset = c->frame->area.x + (hang ? 0 : c->frame->area.width);
-        
-        /* default: rightmost edge of screen */
-        dest = a->x + a->width - (hang ? c->frame->area.width : 0);
-        monitor_dest = mon->x + mon->width -
-                       (hang ? c->frame->area.width : 0);
-        /* if the monitor edge comes before the screen edge, */
-        /* use that as the destination instead. (For xinerama) */
-        if (monitor_dest != dest && my_offset < monitor_dest)
-            dest = monitor_dest;            
-
-        for(it = client_list; it && my_offset != dest; it = g_list_next(it)) {
-            gint his_edge_start, his_edge_end, his_offset;
-            ObClient *cur = it->data;
-
-            WANT_EDGE(cur, c)
-
-            his_edge_start = cur->frame->area.y;
-            his_edge_end = cur->frame->area.y + cur->frame->area.height;
-            his_offset = cur->frame->area.x +
-                         (hang ? cur->frame->area.width : 0);
-
-            if(his_offset - 1 < my_offset)
-                continue;
-            
-            if(his_offset > dest)
-                continue;
-
-            HIT_EDGE(my_edge_start, my_edge_end, his_edge_start, his_edge_end)
-        }
+    case OB_DIRECTION_WEST:
+        my_edge_start = RECT_TOP(self->frame->area);
+        my_edge_size = self->frame->area.height;
+        my_pos = RECT_LEFT(self->frame->area);
         break;
-    case OB_DIRECTION_NORTHEAST:
-    case OB_DIRECTION_SOUTHEAST:
-    case OB_DIRECTION_NORTHWEST:
-    case OB_DIRECTION_SOUTHWEST:
-        /* not implemented */
     default:
         g_assert_not_reached();
-        dest = 0; /* suppress warning */
+    }
+
+    switch(dir) {
+    case OB_DIRECTION_NORTH:
+        if (RECT_TOP(self->frame->area) > RECT_TOP(*mon))
+            edge = RECT_TOP(*mon);
+        else
+            edge = RECT_TOP(*a);
+        break;
+    case OB_DIRECTION_SOUTH:
+        if (RECT_BOTTOM(self->frame->area) < RECT_BOTTOM(*mon))
+            edge = RECT_BOTTOM(*mon) - self->frame->area.height;
+        else
+            edge = RECT_BOTTOM(*a) - self->frame->area.height;
+        break;
+    case OB_DIRECTION_EAST:
+        if (RECT_RIGHT(self->frame->area) < RECT_RIGHT(*mon))
+            edge = RECT_RIGHT(*mon) - self->frame->area.width;
+        else
+            edge = RECT_RIGHT(*a) - self->frame->area.width;
+        break;
+    case OB_DIRECTION_WEST:
+        if (RECT_LEFT(self->frame->area) > RECT_LEFT(*mon))
+            edge = RECT_LEFT(*mon);
+        else
+            edge = RECT_LEFT(*a);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+    /* default to the far edge, then narrow it down */
+    dest = edge;
+
+    for(it = client_list; it && dest != my_pos; it = g_list_next(it)) {
+        ObClient *cur = it->data;
+        gint edge_start, edge_size, head, tail;
+        gboolean skip_head = FALSE, skip_tail = FALSE;
+
+        WANT_EDGE(cur, self); /* skip windows to not bump into */
+
+        switch(dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
+            edge_start = cur->frame->area.x;
+            edge_size = cur->frame->area.width;
+            break;
+        case OB_DIRECTION_EAST:
+        case OB_DIRECTION_WEST:
+            edge_start = cur->frame->area.y;
+            edge_size = cur->frame->area.height;
+            break;
+        default:
+            g_assert_not_reached();
+        }
+
+        /* do we collide with this window? */
+        if (!RANGES_INTERSECT(my_edge_start, my_edge_size,
+                              edge_start, edge_size))
+            continue;
+
+        switch(dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
+            head = RECT_TOP(cur->frame->area) - self->frame->area.height;
+            tail = RECT_BOTTOM(cur->frame->area) + 1;
+            break;
+        case OB_DIRECTION_EAST:
+        case OB_DIRECTION_WEST:
+            head = RECT_LEFT(cur->frame->area) - self->frame->area.width;
+            tail = RECT_RIGHT(cur->frame->area) + 1;
+            break;
+        default:
+            g_assert_not_reached();
+        }
+
+        switch(dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_WEST:
+            if (my_pos <= head)
+                skip_head = TRUE;
+            if (my_pos <= tail)
+                skip_tail = TRUE;
+            if (head < edge)
+                skip_head = TRUE;
+            if (tail < edge)
+                skip_tail = TRUE;
+            break;
+        case OB_DIRECTION_SOUTH:
+        case OB_DIRECTION_EAST:
+            if (my_pos >= head)
+                skip_head = TRUE;
+            if (my_pos >= tail)
+                skip_tail = TRUE;
+            if (head > edge)
+                skip_head = TRUE;
+            if (tail > edge)
+                skip_tail = TRUE;
+            break;
+        default:
+            g_assert_not_reached();
+        }
+
+        if (!skip_head)
+            dest = head;
+        else if (!skip_tail)
+            dest = tail;
+    }
+
+    switch(dir) {
+    case OB_DIRECTION_NORTH:
+    case OB_DIRECTION_SOUTH:
+        *y = dest;
+        break;
+    case OB_DIRECTION_WEST:
+    case OB_DIRECTION_EAST:
+        *x = dest;
+        break;
+    default:
+        g_assert_not_reached();
     }
 
     g_free(a);
     g_free(mon);
-    return dest;
+
+    frame_frame_gravity(self->frame, x, y);
 }
 
 ObClient* client_under_pointer()

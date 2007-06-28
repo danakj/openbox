@@ -26,6 +26,7 @@
 #include "openbox.h"
 #include "resist.h"
 #include "mainloop.h"
+#include "modkeys.h"
 #include "popup.h"
 #include "moveresize.h"
 #include "config.h"
@@ -39,7 +40,7 @@
 #include <glib.h>
 
 /* how far windows move and resize with the keyboard arrows */
-#define KEY_DIST 4
+#define KEY_DIST 8
 
 gboolean moveresize_in_progress = FALSE;
 ObClient *moveresize_client = NULL;
@@ -434,7 +435,7 @@ static gboolean edge_warp_delay_func(gpointer data)
 
 static void do_edge_warp(gint x, gint y)
 {
-    guint i, d;
+    guint i;
     ObDirection dir;
 
     if (!config_mouse_screenedgetime) return;
@@ -597,15 +598,41 @@ gboolean moveresize_event(XEvent *e)
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
                 gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
                 gint opx, px, opy, py;
+                gint dist = KEY_DIST;
 
-                if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                    dx = KEY_DIST;
-                else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                    dx = -KEY_DIST;
-                else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                    dy = KEY_DIST;
-                else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
-                    dy = -KEY_DIST;
+                /* shift means jump to edge */
+                if (e->xkey.state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
+                    gint x, y;
+                    ObDirection dir;
+
+                    if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
+                        dir = OB_DIRECTION_EAST;
+                    else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
+                        dir = OB_DIRECTION_WEST;
+                    else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
+                        dir = OB_DIRECTION_SOUTH;
+                    else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
+                        dir = OB_DIRECTION_NORTH;
+
+                    client_find_move_directional(moveresize_client, dir,
+                                                 &x, &y);
+                    dx = x - moveresize_client->area.x;
+                    dy = y - moveresize_client->area.y;
+                } else {
+                    /* control means fine grained */
+                    if (e->xkey.state &
+                        modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+                        dist = 1;
+
+                    if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
+                        dx = dist;
+                    else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
+                        dx = -dist;
+                    else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
+                        dy = dist;
+                    else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
+                        dy = -dist;
+                }
 
                 cur_x += dx;
                 cur_y += dy;

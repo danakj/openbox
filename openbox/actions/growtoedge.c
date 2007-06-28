@@ -74,11 +74,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         width = c->area.width + c->frame->size.left + c->frame->size.right;
         height = c->area.height + c->frame->size.top + c->frame->size.bottom;
 
+#if 0
+        dest = client_directional_edge_search(c, o->dir);
+
         switch(o->dir) {
         case OB_DIRECTION_NORTH:
             if (c->shaded) break; /* don't allow vertical resize if shaded */
 
-            dest = client_directional_edge_search(c, o->dir, FALSE);
             if (a->y == y)
                 height = height / 2;
             else {
@@ -87,7 +89,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             }
             break;
         case OB_DIRECTION_WEST:
-            dest = client_directional_edge_search(c, o->dir, FALSE);
             if (a->x == x)
                 width = width / 2;
             else {
@@ -98,7 +99,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         case OB_DIRECTION_SOUTH:
             if (c->shaded) break; /* don't allow vertical resize if shaded */
 
-            dest = client_directional_edge_search(c, o->dir, FALSE);
             if (a->y + a->height == y + c->frame->area.height) {
                 height = c->frame->area.height / 2;
                 y = a->y + a->height - height;
@@ -108,7 +108,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             height -= (height - c->frame->area.height) % c->size_inc.height;
             break;
         case OB_DIRECTION_EAST:
-            dest = client_directional_edge_search(c, o->dir, FALSE);
             if (a->x + a->width == x + c->frame->area.width) {
                 width = c->frame->area.width / 2;
                 x = a->x + a->width - width;
@@ -129,6 +128,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_move_resize(c, x, y, width, height);
         actions_client_move(data, TRUE);
 
+#endif
         g_free(a);
     }
 

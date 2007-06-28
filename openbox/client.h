@@ -455,6 +455,11 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 */
 void client_move_onscreen(ObClient *self, gboolean rude);
 
+/*! dir is either North, South, East or West. It can't be, for example,
+  Northwest */
+void client_find_move_directional(ObClient *self, ObDirection dir,
+                                  gint *x, gint *y);
+
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should
             be returned to normal state.
@@ -683,9 +688,6 @@ ObClient *client_search_parent(ObClient *self, ObClient *search);
 /*! Search for a transient of a client. The transient is returned if it is one,
   NULL is returned if the given search is not a transient of the client. */
 ObClient *client_search_transient(ObClient *self, ObClient *search);
-
-/*! Return the closest edge in the given direction */
-gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);
 
 /*! Set a client window to be above/below other clients.
   @layer < 0 indicates the client should be placed below other clients.<br />

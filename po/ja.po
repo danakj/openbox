@@ -42,15 +42,15 @@ msgstr "移動する..."
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "デスクトップを管理"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:153
 msgid "&Add new desktop"
-msgstr ""
+msgstr "新しくデスクトップを追加(&A)"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:154
 msgid "&Remove last desktop"
-msgstr ""
+msgstr "最後のデスクトップを削除(&R)"
 
 #: openbox/client_list_combined_menu.c:147
 msgid "Windows"

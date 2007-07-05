@@ -73,7 +73,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         g_free(s);
     }
 
-    if ((n = parse_find_node("actions", node))) {
+    if ((n = parse_find_node("finalactions", node))) {
         xmlNodePtr m;
 
         m = parse_find_node("action", n->xmlChildrenNode);

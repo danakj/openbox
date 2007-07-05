@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-10 19:32-0400\n"
+"POT-Creation-Date: 2007-07-05 16:02+0200\n"
 "PO-Revision-Date: 2007-06-07 14:49+0200\n"
 "Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -16,35 +16,47 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/action.c:957
+#: openbox/action.c:991
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr ""
 
-#: openbox/action.c:960
+#: openbox/action.c:994
 #, c-format
 msgid "Invalid use of action '%s'. Action will be ignored."
 msgstr ""
 
-#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
+#: openbox/action.c:1261 openbox/action.c:1279 openbox/action.c:1292
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr ""
 
-#: openbox/action.c:1266
+#: openbox/action.c:1300
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
+#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:98
+msgid "Manage desktops"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:153
+msgid "&Add new desktop"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:154
+msgid "&Remove last desktop"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:147
 msgid "Windows"
 msgstr "ウィンドウ"
 
-#: openbox/client_list_menu.c:196
+#: openbox/client_list_menu.c:200
 msgid "Desktops"
 msgstr "デスクトップ"
 
@@ -109,36 +121,36 @@ msgstr "非/装飾(&D)"
 msgid "&Close"
 msgstr "閉じる(&C)"
 
-#: openbox/config.c:716
+#: openbox/config.c:722
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr ""
 
-#: openbox/keyboard.c:163
+#: openbox/keyboard.c:164
 msgid "Conflict with key binding in config file"
 msgstr ""
 
-#: openbox/menu.c:100 openbox/menu.c:108
+#: openbox/menu.c:101 openbox/menu.c:109
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr ""
 
-#: openbox/menu.c:168
+#: openbox/menu.c:169
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr ""
 
-#: openbox/menu.c:182
+#: openbox/menu.c:183
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr ""
 
-#: openbox/menu.c:195
+#: openbox/menu.c:196
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
-#: openbox/menu.c:356 openbox/menu.c:357
+#: openbox/menu.c:361 openbox/menu.c:362
 msgid "More..."
 msgstr ""
 
@@ -264,22 +276,22 @@ msgstr ""
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
 
-#: openbox/screen.c:89 openbox/screen.c:190
+#: openbox/screen.c:94 openbox/screen.c:195
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr ""
 
-#: openbox/screen.c:126
+#: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr ""
 
-#: openbox/screen.c:147
+#: openbox/screen.c:152
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/screen.c:993
+#: openbox/screen.c:1073
 #, c-format
 msgid "desktop %i"
 msgstr ""

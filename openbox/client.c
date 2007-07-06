@@ -274,6 +274,9 @@ void client_manage(Window window)
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
 
+    ob_debug("Window type: %d\n", self->type);
+    ob_debug("Window group: 0x%x\n", self->group?self->group->leader:0);
+
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically */
     XChangeSaveSet(ob_display, window, SetModeInsert);
@@ -320,7 +323,7 @@ void client_manage(Window window)
          client_search_focus_tree_full(self)) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        focus_valid_target(self, FALSE, TRUE, FALSE, FALSE))
+        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE))
     {
         activate = TRUE;
     }

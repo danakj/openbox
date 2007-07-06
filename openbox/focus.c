@@ -126,7 +126,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            3. it is not shaded
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
-            focus_valid_target(c, FALSE, FALSE, FALSE, FALSE) &&
+            focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, FALSE) &&
             !c->shaded &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
@@ -146,7 +146,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (focus_valid_target(c, FALSE, FALSE, FALSE, TRUE) &&
+        if (focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, TRUE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -284,7 +284,8 @@ static gboolean focus_target_has_siblings(ObClient *ft,
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
         if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
-            focus_valid_target(c, iconic_windows, all_desktops, FALSE, FALSE))
+            focus_valid_target(c, TRUE, iconic_windows, all_desktops,
+                               FALSE, FALSE))
         {
             return TRUE;
         }
@@ -293,6 +294,7 @@ static gboolean focus_target_has_siblings(ObClient *ft,
 }
 
 gboolean focus_valid_target(ObClient *ft,
+                            gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
                             gboolean dock_windows,
@@ -326,10 +328,12 @@ gboolean focus_valid_target(ObClient *ft,
              ||
              /* helper windows are valid targets if... */
              (client_helper(ft) &&
-              /* ...a window in its group already has focus ... */
-              ((focus_client && ft->group == focus_client->group) ||
+              /* ...a window in its group already has focus and we want to
+                 include helper windows ... */
+              ((focus_client && ft->group == focus_client->group &&
+                helper_windows) ||
                /* ... or if there are no other windows in its group 
-                  that can be cycled to instead */
+                  that can be focused instead */
                !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 
     /* it's not set to skip the taskbar (unless it is a type that would be
@@ -348,6 +352,7 @@ gboolean focus_valid_target(ObClient *ft,
     {
         ObClient *cft = client_focus_target(ft);
         ok = ok && (ft == cft || !focus_valid_target(cft,
+                                                     TRUE,
                                                      iconic_windows,
                                                      all_desktops,
                                                      dock_windows,

@@ -64,6 +64,7 @@ void focus_order_to_bottom(struct _ObClient *c);
 struct _ObClient *focus_order_find_first(guint desktop);
 
 gboolean focus_valid_target(struct _ObClient *ft,
+                            gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
                             gboolean dock_windows,

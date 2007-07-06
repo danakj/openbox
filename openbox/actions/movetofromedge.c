@@ -2,6 +2,7 @@
 #include "openbox/misc.h"
 #include "openbox/client.h"
 #include "openbox/frame.h"
+#include "openbox/geom.h"
 #include <glib.h>
 
 typedef struct {

@@ -3874,24 +3874,14 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
     return NULL;
 }
 
-#define WANT_EDGE(cur, c) \
-            if (cur == c)                                                     \
-                continue;                                                     \
-            if (c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&  \
-                cur->desktop != screen_desktop)                               \
-                continue;                                                     \
-            if (cur->iconic)                                                  \
-                continue;
-
-void client_find_move_directional(ObClient *self, ObDirection dir,
-                                  gint *x, gint *y)
+void client_find_edge_directional(ObClient *self, ObDirection dir,
+                                  gint my_head, gint my_size,
+                                  gint my_edge_start, gint my_edge_size,
+                                  gint *dest, gboolean *near_edge)
 {
-    gint dest, edge, my_edge_start, my_edge_size, my_pos;
     GList *it;
     Rect *a, *mon;
-    
-    *x = self->frame->area.x;
-    *y = self->frame->area.y;
+    gint edge;
 
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
                     &self->frame->area);
@@ -3900,58 +3890,51 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
-    case OB_DIRECTION_SOUTH:
-        my_edge_start = RECT_LEFT(self->frame->area);
-        my_edge_size = self->frame->area.width;
-        my_pos = RECT_TOP(self->frame->area);
-        break;
-    case OB_DIRECTION_EAST:
-    case OB_DIRECTION_WEST:
-        my_edge_start = RECT_TOP(self->frame->area);
-        my_edge_size = self->frame->area.height;
-        my_pos = RECT_LEFT(self->frame->area);
-        break;
-    default:
-        g_assert_not_reached();
-    }
-
-    switch(dir) {
-    case OB_DIRECTION_NORTH:
-        if (RECT_TOP(self->frame->area) > RECT_TOP(*mon))
-            edge = RECT_TOP(*mon);
+        if (my_head >= RECT_TOP(*mon))
+            edge = RECT_TOP(*mon) - 1;
         else
-            edge = RECT_TOP(*a);
+            edge = RECT_TOP(*a) - 1;
         break;
     case OB_DIRECTION_SOUTH:
-        if (RECT_BOTTOM(self->frame->area) < RECT_BOTTOM(*mon))
-            edge = RECT_BOTTOM(*mon) - self->frame->area.height;
+        if (my_head <= RECT_BOTTOM(*mon))
+            edge = RECT_BOTTOM(*mon) + 1;
         else
-            edge = RECT_BOTTOM(*a) - self->frame->area.height;
+            edge = RECT_BOTTOM(*a) + 1;
         break;
     case OB_DIRECTION_EAST:
-        if (RECT_RIGHT(self->frame->area) < RECT_RIGHT(*mon))
-            edge = RECT_RIGHT(*mon) - self->frame->area.width;
+        if (my_head <= RECT_RIGHT(*mon))
+            edge = RECT_RIGHT(*mon) + 1;
         else
-            edge = RECT_RIGHT(*a) - self->frame->area.width;
+            edge = RECT_RIGHT(*a) + 1;
         break;
     case OB_DIRECTION_WEST:
-        if (RECT_LEFT(self->frame->area) > RECT_LEFT(*mon))
-            edge = RECT_LEFT(*mon);
+        if (my_head >= RECT_LEFT(*mon))
+            edge = RECT_LEFT(*mon) - 1;
         else
-            edge = RECT_LEFT(*a);
+            edge = RECT_LEFT(*a) - 1;
         break;
     default:
         g_assert_not_reached();
     }
     /* default to the far edge, then narrow it down */
-    dest = edge;
+    *dest = edge;
+    *near_edge = TRUE;
 
-    for(it = client_list; it && dest != my_pos; it = g_list_next(it)) {
+    for(it = client_list; it; it = g_list_next(it)) {
         ObClient *cur = it->data;
         gint edge_start, edge_size, head, tail;
         gboolean skip_head = FALSE, skip_tail = FALSE;
 
-        WANT_EDGE(cur, self); /* skip windows to not bump into */
+        /* skip windows to not bump into */
+        if (cur == self)
+            continue;
+        if (cur->iconic)
+            continue;
+        if (self->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&
+            cur->desktop != screen_desktop)
+            continue;
+
+        ob_debug("trying window %s\n", cur->title);
 
         switch(dir) {
         case OB_DIRECTION_NORTH:
@@ -3975,14 +3958,20 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
 
         switch(dir) {
         case OB_DIRECTION_NORTH:
+            head = RECT_BOTTOM(cur->frame->area);
+            tail = RECT_TOP(cur->frame->area);
+            break;
         case OB_DIRECTION_SOUTH:
-            head = RECT_TOP(cur->frame->area) - self->frame->area.height;
-            tail = RECT_BOTTOM(cur->frame->area) + 1;
+            head = RECT_TOP(cur->frame->area);
+            tail = RECT_BOTTOM(cur->frame->area);
             break;
         case OB_DIRECTION_EAST:
+            head = RECT_LEFT(cur->frame->area);
+            tail = RECT_RIGHT(cur->frame->area);
+            break;
         case OB_DIRECTION_WEST:
-            head = RECT_LEFT(cur->frame->area) - self->frame->area.width;
-            tail = RECT_RIGHT(cur->frame->area) + 1;
+            head = RECT_RIGHT(cur->frame->area);
+            tail = RECT_LEFT(cur->frame->area);
             break;
         default:
             g_assert_not_reached();
@@ -3991,52 +3980,109 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
         switch(dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_WEST:
-            if (my_pos <= head)
+            if (my_head <= head + 1)
                 skip_head = TRUE;
-            if (my_pos <= tail)
+            if (my_head + my_size - 1 <= tail + 1)
                 skip_tail = TRUE;
-            if (head < edge)
+            if (head < *dest)
                 skip_head = TRUE;
-            if (tail < edge)
+            if (tail - my_size < *dest)
                 skip_tail = TRUE;
             break;
         case OB_DIRECTION_SOUTH:
         case OB_DIRECTION_EAST:
-            if (my_pos >= head)
+            if (my_head >= head - 1)
                 skip_head = TRUE;
-            if (my_pos >= tail)
+            if (my_head - my_size + 1 >= tail - 1)
                 skip_tail = TRUE;
-            if (head > edge)
+            if (head > *dest)
                 skip_head = TRUE;
-            if (tail > edge)
+            if (tail + my_size > *dest)
                 skip_tail = TRUE;
             break;
         default:
             g_assert_not_reached();
         }
 
-        if (!skip_head)
-            dest = head;
-        else if (!skip_tail)
-            dest = tail;
+        ob_debug("my head %d size %d\n", my_head, my_size);
+        ob_debug("head %d tail %d deest %d\n", head, tail, *dest);
+        if (!skip_head) {
+            ob_debug("using near edge %d\n", head);
+            *dest = head;
+            *near_edge = TRUE;
+        }
+        else if (!skip_tail) {
+            ob_debug("using far edge %d\n", tail);
+            *dest = tail;
+            *near_edge = FALSE;
+        }
     }
+}
 
-    switch(dir) {
-    case OB_DIRECTION_NORTH:
-    case OB_DIRECTION_SOUTH:
-        *y = dest;
+void client_find_move_directional(ObClient *self, ObDirection dir,
+                                  gint *x, gint *y)
+{
+    gint head, size;
+    gint e, e_start, e_size;
+    gboolean near;
+
+    switch (dir) {
+    case OB_DIRECTION_EAST:
+        head = RECT_RIGHT(self->frame->area);
+        size = self->frame->area.width;
+        e_start = RECT_TOP(self->frame->area);
+        e_size = self->frame->area.height;
         break;
     case OB_DIRECTION_WEST:
-    case OB_DIRECTION_EAST:
-        *x = dest;
+        head = RECT_LEFT(self->frame->area);
+        size = self->frame->area.width;
+        e_start = RECT_TOP(self->frame->area);
+        e_size = self->frame->area.height;
+        break;
+    case OB_DIRECTION_NORTH:
+        head = RECT_TOP(self->frame->area);
+        size = self->frame->area.height;
+        e_start = RECT_LEFT(self->frame->area);
+        e_size = self->frame->area.width;
+        break;
+    case OB_DIRECTION_SOUTH:
+        head = RECT_BOTTOM(self->frame->area);
+        size = self->frame->area.height;
+        e_start = RECT_LEFT(self->frame->area);
+        e_size = self->frame->area.width;
         break;
     default:
         g_assert_not_reached();
     }
 
-    g_free(a);
-    g_free(mon);
-
+    client_find_edge_directional(self, dir, head, size,
+                                 e_start, e_size, &e, &near);
+    *x = self->frame->area.x;
+    *y = self->frame->area.y;
+    switch (dir) {
+    case OB_DIRECTION_EAST:
+        if (near) e -= self->frame->area.width;
+        else      e++;
+        *x = e;
+        break;
+    case OB_DIRECTION_WEST:
+        if (near) e++;
+        else      e -= self->frame->area.width;
+        *x = e;
+        break;
+    case OB_DIRECTION_NORTH:
+        if (near) e++;
+        else      e -= self->frame->area.height;
+        *y = e;
+        break;
+    case OB_DIRECTION_SOUTH:
+        if (near) e -= self->frame->area.height;
+        else      e++;
+        *y = e;
+        break;
+    default:
+        g_assert_not_reached();
+    }
     frame_frame_gravity(self->frame, x, y);
 }
 

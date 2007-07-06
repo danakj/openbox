@@ -457,6 +457,10 @@ void client_move_onscreen(ObClient *self, gboolean rude);
 
 /*! dir is either North, South, East or West. It can't be, for example,
   Northwest */
+void client_find_edge_directional(ObClient *self, ObDirection dir,
+                                  gint my_head, gint my_tail,
+                                  gint my_edge_start, gint my_edge_size,
+                                  gint *dest, gboolean *near_edge);
 void client_find_move_directional(ObClient *self, ObDirection dir,
                                   gint *x, gint *y);
 

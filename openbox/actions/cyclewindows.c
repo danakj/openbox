@@ -14,6 +14,8 @@ typedef struct {
     GSList *actions;
 } Options;
 
+static gboolean cycling = FALSE;
+
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
@@ -92,6 +94,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                 TRUE,
                 o->dialog,
                 FALSE, FALSE);
+    cycling = TRUE;
 
     return TRUE;
 }
@@ -129,7 +132,10 @@ static gboolean i_input_func(guint initial_state,
 
 static void i_cancel_func(gpointer options)
 {
-    end_cycle(TRUE, 0, options);
+    /* we get cancelled when we move focus, but we're not cycling anymore, so
+       just ignore that */
+    if (cycling)
+        end_cycle(TRUE, 0, options);
 }
 
 static void end_cycle(gboolean cancel, guint state, Options *o)
@@ -149,4 +155,5 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
         actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
                          state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
     }
+    cycling = FALSE;
 }

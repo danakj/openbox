@@ -236,10 +236,12 @@ void actions_run_acts(GSList *acts,
 
         actions_setup_data(&data, uact, state, x, y, button, con, client);
 
-        if (actions_act_is_interactive(act) &&
-            (!interactive_act || interactive_act->def != act->def))
-        {
-            ok = actions_interactive_begin_act(act, state);
+        if (!interactive_act || interactive_act->def != act->def) {
+            /* cancel the old one */
+            if (interactive_act)
+                actions_interactive_cancel_act();
+            if (actions_act_is_interactive(act))
+                ok = actions_interactive_begin_act(act, state);
         }
 
         /* fire the action's run function with this data */
@@ -272,10 +274,6 @@ void actions_interactive_cancel_act()
 
 static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
 {
-    /* cancel the old one */
-    if (interactive_act)
-        actions_interactive_cancel_act();
-
     if (grab_keyboard()) {
         interactive_act = act;
         actions_act_ref(interactive_act);

@@ -463,6 +463,9 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
                                   gint *dest, gboolean *near_edge);
 void client_find_move_directional(ObClient *self, ObDirection dir,
                                   gint *x, gint *y);
+void client_find_resize_directional(ObClient *self, ObDirection side,
+                                    gboolean grow,
+                                    gint *x, gint *y, gint *w, gint *h);
 
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should

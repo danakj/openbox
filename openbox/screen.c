@@ -1284,8 +1284,10 @@ void screen_update_areas()
             dims[(i * screen_num_desktops + j) * 4 + 3] -= t + b;
         }
 
+    /* all the work areas are not used here, only the ones for the first
+       monitor are */
     PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,
-                dims, 4 * screen_num_desktops * screen_num_monitors);
+                dims, 4 * screen_num_desktops);
 
     /* the area has changed, adjust all the windows if they need it */
     for (it = client_list; it; it = g_list_next(it))

@@ -374,23 +374,34 @@ static gboolean sync_timeout_func(gpointer data)
 static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
                         ObCorner cor)
 {
-    gint resist, ow, oh, nw, nh;
+    gint resist, x, y, lw, lh, ow, oh, nw, nh;
 
+    ow = cur_w;
+    oh = cur_h;
     /* resist_size_* needs the frame size */
-    ow = cur_w +
+    nw = ow + *dw +
         moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
-    oh = cur_h +
+    nh = oh + *dh +
         moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
-    nw = ow + *dw;
-    nh = oh + *dh;
 
     if (keyboard) resist = keydist - 1; /* resist for one key press */
     else resist = config_resist_win;
     resist_size_windows(moveresize_client, resist, &nw, &nh, cor);
     if (!keyboard) resist = config_resist_edge;
     resist_size_monitors(moveresize_client, resist, &nw, &nh, cor);
+
+    nw -= moveresize_client->frame->size.left +
+        moveresize_client->frame->size.right;
+    nh -= moveresize_client->frame->size.top +
+        moveresize_client->frame->size.bottom;
+
+    /* see its actual size */
+    x = 0;
+    y = 0;
+    client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
+
 
     *dw = nw - ow;
     *dh = nh - oh;
@@ -742,6 +753,7 @@ gboolean moveresize_event(XEvent *e)
 
             dw -= cur_w - start_cw;
             dh -= cur_h - start_ch;
+            ob_debug("dw %d\n", dw);
 
             calc_resize(FALSE, 0, &dw, &dh, lockcorner);
             cur_w += dw;

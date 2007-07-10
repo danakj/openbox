@@ -341,7 +341,7 @@ static void do_resize()
         waiting_for_sync = TRUE;
 
         ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
-        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC / 2,
+        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC,
                                  sync_timeout_func,
                                  NULL, NULL, NULL);
     }

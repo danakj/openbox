@@ -65,6 +65,9 @@ static ObPopup *popup = NULL;
 
 static void do_edge_warp(gint x, gint y);
 static void cancel_edge_warp();
+#ifdef SYNC
+static gboolean sync_timeout_func(gpointer data);
+#endif
 
 static void client_dest(ObClient *client, gpointer data)
 {
@@ -251,6 +254,8 @@ void moveresize_end(gboolean cancel)
             XSyncDestroyAlarm(ob_display, moveresize_alarm);
             moveresize_alarm = None;
         }
+
+        ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
 #endif
 
         client_configure(moveresize_client,
@@ -285,6 +290,7 @@ static void do_move(gboolean keyboard, gint keydist)
                      moveresize_client->frame->area.x,
                      moveresize_client->frame->area.y);
 }
+
 
 static void do_resize()
 {
@@ -333,6 +339,11 @@ static void do_resize()
                    NoEventMask, &ce);
 
         waiting_for_sync = TRUE;
+
+        ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
+        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC / 2,
+                                 sync_timeout_func,
+                                 NULL, NULL, NULL);
     }
 #endif
 
@@ -349,6 +360,16 @@ static void do_resize()
                      moveresize_client->logical_size.width,
                      moveresize_client->logical_size.height);
 }
+
+#ifdef SYNC
+static gboolean sync_timeout_func(gpointer data)
+{
+    waiting_for_sync = FALSE; /* we timed out waiting for our sync... */
+    do_resize(); /* ...so let any pending resizes through */
+
+    return FALSE; /* don't repeat */
+}
+#endif
 
 static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
                         ObCorner cor)

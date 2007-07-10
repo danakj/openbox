@@ -149,8 +149,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     }
 
     menu_add_separator(menu, CLIENT, NULL);
-    menu_add_normal(menu, ADD_DESKTOP, _("&Add new desktop"), NULL, TRUE);
-    menu_add_normal(menu, REMOVE_DESKTOP, _("&Remove last desktop"),
+    menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, TRUE);
+    menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove last desktop"),
                     NULL, TRUE);
 
     return TRUE; /* always show */

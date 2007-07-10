@@ -53,60 +53,60 @@ msgid "All desktops"
 msgstr "Tous les bureaux"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "Disp&osition"
+msgid "_Layer"
+msgstr "Disp_osition"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Toujours au &premier plan"
+msgid "Always on _top"
+msgstr "Toujours au _premier plan"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Normal"
+msgid "_Normal"
+msgstr "_Normal"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Toujours en &arrière plan"
+msgid "Always on _bottom"
+msgstr "Toujours en _arrière plan"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "Envoyer vers le &bureau"
+msgid "_Send to desktop"
+msgstr "Envoyer vers le _bureau"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Menu de la fenêtre"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "R&estaurer"
+msgid "R_estore"
+msgstr "R_estaurer"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "&Déplacer"
+msgid "_Move"
+msgstr "_Déplacer"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Redimen&sionner"
+msgid "Resi_ze"
+msgstr "Redimen_sionner"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Ico&nifier"
+msgid "Ico_nify"
+msgstr "Ico_nifier"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ximiser"
+msgid "Ma_ximize"
+msgstr "Ma_ximiser"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "En/Dé&rouler"
+msgid "_Roll up/down"
+msgstr "En/Dé_rouler"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "Ne pas/Dé&corer"
+msgid "Un/_Decorate"
+msgstr "Ne pas/Dé_corer"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "&Fermer"
+msgid "_Close"
+msgstr "_Fermer"
 
 #: openbox/config.c:704
 #, c-format

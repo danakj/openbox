@@ -36,12 +36,12 @@ msgid "Manage desktops"
 msgstr "デスクトップを管理"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
-msgid "&Add new desktop"
-msgstr "新しくデスクトップを追加(&A)"
+msgid "_Add new desktop"
+msgstr "新しくデスクトップを追加(_A)"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
-msgid "&Remove last desktop"
-msgstr "最後のデスクトップを削除(&R)"
+msgid "_Remove last desktop"
+msgstr "最後のデスクトップを削除(_R)"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"
@@ -53,64 +53,64 @@ msgstr "デスクトップ"
 
 #: openbox/client_menu.c:256
 msgid "All desktops"
-msgstr "すべてのデスクトップ(&A)"
+msgstr "すべてのデスクトップ(_A)"
 
 #: openbox/client_menu.c:360
-msgid "&Layer"
-msgstr "階層(&L)"
+msgid "_Layer"
+msgstr "階層(_L)"
 
 #: openbox/client_menu.c:365
-msgid "Always on &top"
-msgstr "常に最上位にする(&T)"
+msgid "Always on _top"
+msgstr "常に最上位にする(_T)"
 
 #: openbox/client_menu.c:366
-msgid "&Normal"
-msgstr "通常(&N)"
+msgid "_Normal"
+msgstr "通常(_N)"
 
 #: openbox/client_menu.c:367
-msgid "Always on &bottom"
-msgstr "常に最下位にする(&B)"
+msgid "Always on _bottom"
+msgstr "常に最下位にする(_B)"
 
 #: openbox/client_menu.c:370
-msgid "&Send to desktop"
-msgstr "デスクトップに送る(&S)"
+msgid "_Send to desktop"
+msgstr "デスクトップに送る(_S)"
 
 #: openbox/client_menu.c:374
 msgid "Client menu"
 msgstr "クライアントメニュー"
 
 #: openbox/client_menu.c:380
-msgid "R&estore"
-msgstr "復元(&E)"
+msgid "R_estore"
+msgstr "復元(_E)"
 
 #: openbox/client_menu.c:388
-msgid "&Move"
-msgstr "移動(&M)"
+msgid "_Move"
+msgstr "移動(_M)"
 
 #: openbox/client_menu.c:390
-msgid "Resi&ze"
-msgstr "サイズの変更(&Z)"
+msgid "Resi_ze"
+msgstr "サイズの変更(_Z)"
 
 #: openbox/client_menu.c:392
-msgid "Ico&nify"
-msgstr "アイコン化(&N)"
+msgid "Ico_nify"
+msgstr "アイコン化(_N)"
 
 #: openbox/client_menu.c:400
-msgid "Ma&ximize"
-msgstr "最大化(&X)"
+msgid "Ma_ximize"
+msgstr "最大化(_X)"
 
 #: openbox/client_menu.c:408
-msgid "&Roll up/down"
-msgstr "巻き上げ/展開(&R)"
+msgid "_Roll up/down"
+msgstr "巻き上げ/展開(_R)"
 
 # not sure about this one
 #: openbox/client_menu.c:410
-msgid "Un/&Decorate"
-msgstr "非/装飾(&D)"
+msgid "Un/_Decorate"
+msgstr "非/装飾(_D)"
 
 #: openbox/client_menu.c:420
-msgid "&Close"
-msgstr "閉じる(&C)"
+msgid "_Close"
+msgstr "閉じる(_C)"
 
 #: openbox/config.c:718
 #, c-format

@@ -54,60 +54,60 @@ msgid "All desktops"
 msgstr "Kõik töölauad"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "&Kiht"
+msgid "_Layer"
+msgstr "_Kiht"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Aken teiste &peal"
+msgid "Always on _top"
+msgstr "Aken teiste _peal"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Normaalne"
+msgid "_Normal"
+msgstr "_Normaalne"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Aken teiste &all"
+msgid "Always on _bottom"
+msgstr "Aken teiste _all"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "&Saada töölauale"
+msgid "_Send to desktop"
+msgstr "_Saada töölauale"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Kliendi menüü"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "&Taasta"
+msgid "R_estore"
+msgstr "_Taasta"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "&Liiguta"
+msgid "_Move"
+msgstr "_Liiguta"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Muuda &suurust"
+msgid "Resi_ze"
+msgstr "Muuda _suurust"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Muuda &ikooniks"
+msgid "Ico_nify"
+msgstr "Muuda _ikooniks"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ksimeeri"
+msgid "Ma_ximize"
+msgstr "Ma_ksimeeri"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "&Rulli üles/alla"
+msgid "_Roll up/down"
+msgstr "_Rulli üles/alla"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "Äär&ed sisse/välja"
+msgid "Un/_Decorate"
+msgstr "Äär_ed sisse/välja"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "S&ulge"
+msgid "_Close"
+msgstr "S_ulge"
 
 #: openbox/config.c:704
 #, c-format

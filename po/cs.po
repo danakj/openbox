@@ -53,62 +53,62 @@ msgstr "Všechny plochy"
 
 # TODO: standart pro klavesy?
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "V&rstva"
+msgid "_Layer"
+msgstr "V_rstva"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Vždy na&vrchu"
+msgid "Always on _top"
+msgstr "Vždy na_vrchu"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Normální"
+msgid "_Normal"
+msgstr "_Normální"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Vždy ve&spodu"
+msgid "Always on _bottom"
+msgstr "Vždy ve_spodu"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "&Poslat na plochu"
+msgid "_Send to desktop"
+msgstr "_Poslat na plochu"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Menu klienta"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "&Obnovit"
+msgid "R_estore"
+msgstr "_Obnovit"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "Přes&unout"
+msgid "_Move"
+msgstr "Přes_unout"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Veli&kost"
+msgid "Resi_ze"
+msgstr "Veli_kost"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Mi&nimalizovat"
+msgid "Ico_nify"
+msgstr "Mi_nimalizovat"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ximalizovat"
+msgid "Ma_ximize"
+msgstr "Ma_ximalizovat"
 
 # TODO: zavedeny termin?
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "S&rolovat/Vyrolovat"
+msgid "_Roll up/down"
+msgstr "S_rolovat/Vyrolovat"
 
 # TODO: ditto
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "Oz&dobit/Odzdobit"
+msgid "Un/_Decorate"
+msgstr "Oz_dobit/Odzdobit"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "&Zavřít"
+msgid "_Close"
+msgstr "_Zavřít"
 
 #: openbox/config.c:704
 #, c-format

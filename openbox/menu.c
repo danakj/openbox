@@ -222,28 +222,34 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
 
         *strippedlabel = g_strdup(label);
 
-        /* if allow_shortcut is false, then you can't use the &, instead you
+        /* if allow_shortcut is false, then you can't use the '_', instead you
            have to just use the first valid character
         */
 
-        i = strchr(*strippedlabel, '&');
+        i = strchr(*strippedlabel, '_');
         if (allow_shortcut && i != NULL) {
-            /* there is an ampersand in the string */
+            /* there is an underscore in the string */
 
             /* you have to use a printable ascii character for shortcuts
-               don't allow space either, so you can have like "a & b"
+               don't allow space either, so you can have like "a _ b"
             */
             if (VALID_SHORTCUT(*(i+1))) {
                 shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
                 *position = i - *strippedlabel;
                 *always_show = TRUE;
 
-                /* remove the & from the string */
+                /* remove the '_' from the string */
                 for (; *i != '\0'; ++i)
                     *i = *(i+1);
+            } else if (*(i+1) == '\0') {
+                /* no default shortcut if the '_' is the last character
+                   (eg. "Exit_") for menu entries that you don't want
+                   to be executed by mistake
+                */
+                    *i = '\0';
             }
         } else {
-            /* there is no ampersand, so find the first valid character to use
+            /* there is no underscore, so find the first valid character to use
                instead */
 
             for (i = *strippedlabel; *i != '\0'; ++i)
@@ -273,7 +279,7 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                     if (a)
                         acts = g_slist_append(acts, a);
                 }
-            menu_add_normal(state->parent, -1, label, acts, FALSE);
+            menu_add_normal(state->parent, -1, label, acts, TRUE);
             g_free(label);
         }
     }
@@ -310,7 +316,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         if (!parse_attr_string("label", node, &title))
             goto parse_menu_fail;
 
-        if ((menu = menu_new(name, title, FALSE, NULL))) {
+        if ((menu = menu_new(name, title, TRUE, NULL))) {
             menu->pipe_creator = state->pipe_creator;
             if (parse_attr_string("execute", node, &script)) {
                 menu->execute = parse_expand_tilde(script);

@@ -357,17 +357,17 @@ void client_menu_startup()
     ObMenu *menu;
     ObMenuEntry *e;
 
-    menu = menu_new(LAYER_MENU_NAME, _("&Layer"), TRUE, NULL);
+    menu = menu_new(LAYER_MENU_NAME, _("_Layer"), TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, layer_menu_update);
     menu_set_execute_func(menu, layer_menu_execute);
 
-    menu_add_normal(menu, LAYER_TOP, _("Always on &top"), NULL, TRUE);
-    menu_add_normal(menu, LAYER_NORMAL, _("&Normal"), NULL, TRUE);
-    menu_add_normal(menu, LAYER_BOTTOM, _("Always on &bottom"),NULL, TRUE);
+    menu_add_normal(menu, LAYER_TOP, _("Always on _top"), NULL, TRUE);
+    menu_add_normal(menu, LAYER_NORMAL, _("_Normal"), NULL, TRUE);
+    menu_add_normal(menu, LAYER_BOTTOM, _("Always on _bottom"),NULL, TRUE);
 
 
-    menu = menu_new(SEND_TO_MENU_NAME, _("&Send to desktop"), TRUE, NULL);
+    menu = menu_new(SEND_TO_MENU_NAME, _("_Send to desktop"), TRUE, NULL);
     menu_set_update_func(menu, send_to_menu_update);
     menu_set_execute_func(menu, send_to_menu_execute);
 
@@ -377,7 +377,7 @@ void client_menu_startup()
     menu_set_place_func(menu, client_menu_place);
     menu_set_execute_func(menu, client_menu_execute);
 
-    e = menu_add_normal(menu, CLIENT_RESTORE, _("R&estore"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_toggled_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -385,11 +385,11 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    menu_add_normal(menu, CLIENT_MOVE, _("&Move"), NULL, TRUE);
+    menu_add_normal(menu, CLIENT_MOVE, _("_Move"), NULL, TRUE);
 
-    menu_add_normal(menu, CLIENT_RESIZE, _("Resi&ze"), NULL, TRUE);
+    menu_add_normal(menu, CLIENT_RESIZE, _("Resi_ze"), NULL, TRUE);
 
-    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico&nify"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico_nify"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->iconify_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -397,7 +397,7 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma&ximize"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
@@ -405,9 +405,9 @@ void client_menu_startup()
     e->data.normal.mask_disabled_selected_color =
         ob_rr_theme->menu_disabled_selected_color;
 
-    menu_add_normal(menu, CLIENT_SHADE, _("&Roll up/down"), NULL, TRUE);
+    menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
 
-    menu_add_normal(menu, CLIENT_DECORATE, _("Un/&Decorate"), NULL, TRUE);
+    menu_add_normal(menu, CLIENT_DECORATE, _("Un/_Decorate"), NULL, TRUE);
 
     menu_add_separator(menu, -1, NULL);
 
@@ -417,7 +417,7 @@ void client_menu_startup()
 
     menu_add_separator(menu, -1, NULL);
 
-    e = menu_add_normal(menu, CLIENT_CLOSE, _("&Close"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_CLOSE, _("_Close"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->close_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;

@@ -55,60 +55,60 @@ msgid "All desktops"
 msgstr "كل أسطح المكتب"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "طبقة (&L)"
+msgid "_Layer"
+msgstr "طبقة (_L)"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "دائما على السطح (&T)"
+msgid "Always on _top"
+msgstr "دائما على السطح (_T)"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "طبيعي (&N)"
+msgid "_Normal"
+msgstr "طبيعي (_N)"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "دائما في القاع (&B)"
+msgid "Always on _bottom"
+msgstr "دائما في القاع (_B)"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "أرسِل إلى سطح المكتب (&S)"
+msgid "_Send to desktop"
+msgstr "أرسِل إلى سطح المكتب (_S)"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "قائمة العميل"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "استعِد (&E)"
+msgid "R_estore"
+msgstr "استعِد (_E)"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "انقل (&M)"
+msgid "_Move"
+msgstr "انقل (_M)"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "حجِّم (&Z)"
+msgid "Resi_ze"
+msgstr "حجِّم (_Z)"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "صغّر (&N)"
+msgid "Ico_nify"
+msgstr "صغّر (_N)"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "كبّر (&X)"
+msgid "Ma_ximize"
+msgstr "كبّر (_X)"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "لُف لأعلى/لأسفل (&R)"
+msgid "_Roll up/down"
+msgstr "لُف لأعلى/لأسفل (_R)"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "ضع/أزل الحواف (&D)"
+msgid "Un/_Decorate"
+msgstr "ضع/أزل الحواف (_D)"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "أغلق (&C)"
+msgid "_Close"
+msgstr "أغلق (_C)"
 
 #: openbox/config.c:704
 #, c-format

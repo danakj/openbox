@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "Всі стільниці"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "Шар(&L)"
+msgid "_Layer"
+msgstr "Шар(_L)"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Зверху всіх вікон(&T)"
+msgid "Always on _top"
+msgstr "Зверху всіх вікон(_T)"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "Звичайне положення(&N)"
+msgid "_Normal"
+msgstr "Звичайне положення(_N)"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Знизу всіх вікон(&B)"
+msgid "Always on _bottom"
+msgstr "Знизу всіх вікон(_B)"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "Відправити на стільницю(&S)"
+msgid "_Send to desktop"
+msgstr "Відправити на стільницю(_S)"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Меню клієнтів"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "Відновити(&E)"
+msgid "R_estore"
+msgstr "Відновити(_E)"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "Перемістити(&M)"
+msgid "_Move"
+msgstr "Перемістити(_M)"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Змінити розмір(&Z)"
+msgid "Resi_ze"
+msgstr "Змінити розмір(_Z)"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Згорнути(&N)"
+msgid "Ico_nify"
+msgstr "Згорнути(_N)"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Розгорнути(&X)"
+msgid "Ma_ximize"
+msgstr "Розгорнути(_X)"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "Скрутити/Розкрутити(&R)"
+msgid "_Roll up/down"
+msgstr "Скрутити/Розкрутити(_R)"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "(Від)декорувати(&D)"
+msgid "Un/_Decorate"
+msgstr "(Від)декорувати(_D)"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "Закрити(&C)"
+msgid "_Close"
+msgstr "Закрити(_C)"
 
 #: openbox/config.c:719
 #, c-format

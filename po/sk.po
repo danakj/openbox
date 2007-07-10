@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "Všetky plochy"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "&Vrstva"
+msgid "_Layer"
+msgstr "_Vrstva"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Vždy &navrchu"
+msgid "Always on _top"
+msgstr "Vždy _navrchu"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "Nor&málna"
+msgid "_Normal"
+msgstr "Nor_málna"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Vždy &dole"
+msgid "Always on _bottom"
+msgstr "Vždy _dole"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "&Poslať na plochu"
+msgid "_Send to desktop"
+msgstr "_Poslať na plochu"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Menu klienta"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "&Obnoviť"
+msgid "R_estore"
+msgstr "_Obnoviť"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "Pre&sunúť"
+msgid "_Move"
+msgstr "Pre_sunúť"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Z&mena veľkosti"
+msgid "Resi_ze"
+msgstr "Z_mena veľkosti"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Do iko&ny"
+msgid "Ico_nify"
+msgstr "Do iko_ny"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ximalizovať"
+msgid "Ma_ximize"
+msgstr "Ma_ximalizovať"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "Ro/&Zvinúť"
+msgid "_Roll up/down"
+msgstr "Ro/_Zvinúť"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "(Ne)&Dekorovať"
+msgid "Un/_Decorate"
+msgstr "(Ne)_Dekorovať"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "Z&avrieť"
+msgid "_Close"
+msgstr "Z_avrieť"
 
 #: openbox/config.c:704
 #, c-format

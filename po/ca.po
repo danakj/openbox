@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "Tots els escriptoris"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "&Capa"
+msgid "_Layer"
+msgstr "_Capa"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Sempre a so&bre"
+msgid "Always on _top"
+msgstr "Sempre a so_bre"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Normal"
+msgid "_Normal"
+msgstr "_Normal"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Sempre a so&ta"
+msgid "Always on _bottom"
+msgstr "Sempre a so_ta"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "A l'&escriptori"
+msgid "_Send to desktop"
+msgstr "A l'_escriptori"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Menú del client"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "Restaur&a"
+msgid "R_estore"
+msgstr "Restaur_a"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "&Mou"
+msgid "_Move"
+msgstr "_Mou"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Redimen&siona"
+msgid "Resi_ze"
+msgstr "Redimen_siona"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Mi&nimitza"
+msgid "Ico_nify"
+msgstr "Mi_nimitza"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ximitza"
+msgid "Ma_ximize"
+msgstr "Ma_ximitza"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "En/Desen&rotlla"
+msgid "_Roll up/down"
+msgstr "En/Desen_rotlla"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "Sense/Amb &decoració"
+msgid "Un/_Decorate"
+msgstr "Sense/Amb _decoració"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "&Tanca"
+msgid "_Close"
+msgstr "_Tanca"
 
 #: openbox/config.c:704
 #, c-format

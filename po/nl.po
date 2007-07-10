@@ -53,60 +53,60 @@ msgid "All desktops"
 msgstr "Alle bureaubladen"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "&Laag"
+msgid "_Layer"
+msgstr "_Laag"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Altijd &bovenop"
+msgid "Always on _top"
+msgstr "Altijd _bovenop"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Normaal"
+msgid "_Normal"
+msgstr "_Normaal"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Altijd &onderop"
+msgid "Always on _bottom"
+msgstr "Altijd _onderop"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "Verplaats &naar bureaublad"
+msgid "_Send to desktop"
+msgstr "Verplaats _naar bureaublad"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Venster menu"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "&Herstellen"
+msgid "R_estore"
+msgstr "_Herstellen"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "&Verplaatsen"
+msgid "_Move"
+msgstr "_Verplaatsen"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "&Grootte aanpassen"
+msgid "Resi_ze"
+msgstr "_Grootte aanpassen"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "&Iconificeren"
+msgid "Ico_nify"
+msgstr "_Iconificeren"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "&Maximaliseren"
+msgid "Ma_ximize"
+msgstr "_Maximaliseren"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "&Op/neerklappen"
+msgid "_Roll up/down"
+msgstr "_Op/neerklappen"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "&Vensterrand weghalen/toevoegen"
+msgid "Un/_Decorate"
+msgstr "_Vensterrand weghalen/toevoegen"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "&Sluiten"
+msgid "_Close"
+msgstr "_Sluiten"
 
 #: openbox/config.c:704
 #, c-format

@@ -51,11 +51,12 @@ XSyncAlarm moveresize_alarm = None;
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
 static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
-static gint cur_x, cur_y;
+static gint cur_x, cur_y, cur_w, cur_h;
 static guint button;
 static guint32 corner;
 static ObCorner lockcorner;
 static ObDirection edge_warp_dir = -1;
+static ObDirection key_resize_edge = -1;
 #ifdef SYNC
 static gboolean waiting_for_sync;
 #endif
@@ -90,50 +91,6 @@ void moveresize_shutdown(gboolean reconfig)
 
     popup_free(popup);
     popup = NULL;
-}
-
-static void get_resize_position(gint *x, gint *y, gboolean cancel)
-{
-    gint dw, dh;
-    gint w, h, lw, lh;
-
-    *x = moveresize_client->frame->area.x;
-    *y = moveresize_client->frame->area.y;
-
-    if (cancel) {
-        w = start_cw;
-        h = start_ch;
-    } else {
-        w = cur_x;
-        h = cur_y;
-    }
-
-    /* see how much it is actually going to resize */
-    {
-        gint cx = *x, cy = *y;
-        frame_frame_gravity(moveresize_client->frame, &cx, &cy);
-        client_try_configure(moveresize_client, &cx, &cy, &w, &h,
-                             &lw, &lh, TRUE);
-    }
-    dw = w - moveresize_client->area.width;
-    dh = h - moveresize_client->area.height;
-
-    switch (lockcorner) {
-    case OB_CORNER_TOPLEFT:
-        break;
-    case OB_CORNER_TOPRIGHT:
-        *x -= dw;
-        break;
-    case OB_CORNER_BOTTOMLEFT:
-        *y -= dh;
-        break;
-    case OB_CORNER_BOTTOMRIGHT:
-        *x -= dw;
-        *y -= dh;
-        break;
-    }
-
-    frame_frame_gravity(moveresize_client->frame, x, y);
 }
 
 static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
@@ -210,14 +167,14 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     /* these adjustments for the size_inc make resizing a terminal more
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
-       either way instead of a full increment one and 1 px the other. and this
-       is one large mother fucking comment. */
+       either way instead of a full increment one and 1 px the other. */
     start_cw = c->area.width + c->size_inc.width / 2;
     start_ch = c->area.height + c->size_inc.height / 2;
     start_x = x;
     start_y = y;
     corner = cnr;
     button = b;
+    key_resize_edge = -1;
 
     /*
       have to change start_cx and start_cy if going to do this..
@@ -227,13 +184,10 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
                      c->area.width / 2, c->area.height / 2);
     */
 
-    if (moving) {
-        cur_x = start_cx;
-        cur_y = start_cy;
-    } else {
-        cur_x = start_cw;
-        cur_y = start_ch;
-    }
+    cur_x = start_cx;
+    cur_y = start_cy;
+    cur_w = start_cw;
+    cur_h = start_ch;
 
     moveresize_in_progress = TRUE;
 
@@ -281,8 +235,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 
 void moveresize_end(gboolean cancel)
 {
-    gint x, y;
-
     ungrab_keyboard();
     ungrab_pointer();
 
@@ -301,10 +253,11 @@ void moveresize_end(gboolean cancel)
         }
 #endif
 
-        get_resize_position(&x, &y, cancel);
-        client_configure(moveresize_client, x, y,
-                         (cancel ? start_cw : cur_x),
-                         (cancel ? start_ch : cur_y),
+        client_configure(moveresize_client,
+                         (cancel ? start_cx : cur_x),
+                         (cancel ? start_cy : cur_y),
+                         (cancel ? start_cw : cur_w),
+                         (cancel ? start_ch : cur_h),
                          TRUE, TRUE, FALSE);
     }
 
@@ -325,9 +278,7 @@ static void do_move(gboolean keyboard, gint keydist)
     if (!keyboard) resist = config_resist_edge;
     resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
 
-    client_configure(moveresize_client, cur_x, cur_y,
-                     moveresize_client->area.width,
-                     moveresize_client->area.height,
+    client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
                      TRUE, FALSE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
         popup_coords(moveresize_client, "%d x %d",
@@ -342,8 +293,8 @@ static void do_resize()
     /* see if it is actually going to resize */
     x = 0;
     y = 0;
-    w = cur_x;
-    h = cur_y;
+    w = cur_w;
+    h = cur_h;
     client_try_configure(moveresize_client, &x, &y, &w, &h,
                          &lw, &lh, TRUE);
     if (w == moveresize_client->area.width &&
@@ -385,8 +336,8 @@ static void do_resize()
     }
 #endif
 
-    get_resize_position(&x, &y, FALSE);
-    client_configure(moveresize_client, x, y, cur_x, cur_y, TRUE, FALSE, FALSE);
+    client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
+                     TRUE, FALSE, FALSE);
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */
@@ -399,26 +350,29 @@ static void do_resize()
                      moveresize_client->logical_size.height);
 }
 
-static void calc_resize(gboolean keyboard)
+static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
+                        ObCorner cor)
 {
-    gint resist;
+    gint resist, ow, oh, nw, nh;
 
     /* resist_size_* needs the frame size */
-    cur_x += moveresize_client->frame->size.left +
+    ow = cur_w +
+        moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
-    cur_y += moveresize_client->frame->size.top +
+    oh = cur_h +
+        moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
+    nw = ow + *dw;
+    nh = oh + *dh;
 
-    if (keyboard) resist = KEY_DIST - 1; /* resist for one key press */
+    if (keyboard) resist = keydist - 1; /* resist for one key press */
     else resist = config_resist_win;
-    resist_size_windows(moveresize_client, resist, &cur_x, &cur_y, lockcorner);
+    resist_size_windows(moveresize_client, resist, &nw, &nh, cor);
     if (!keyboard) resist = config_resist_edge;
-    resist_size_monitors(moveresize_client, resist, &cur_x, &cur_y,lockcorner);
+    resist_size_monitors(moveresize_client, resist, &nw, &nh, cor);
 
-    cur_x -= moveresize_client->frame->size.left +
-        moveresize_client->frame->size.right;
-    cur_y -= moveresize_client->frame->size.top +
-        moveresize_client->frame->size.bottom;
+    *dw = nw - ow;
+    *dh = nh - oh;
 }
 
 static gboolean edge_warp_delay_func(gpointer data)
@@ -542,6 +496,161 @@ static void move_with_keys(gint keycode, gint state)
     start_y += (py - opy) - (cur_y - oy);
 }
 
+static void resize_with_keys(gint keycode, gint state)
+{
+    gint dw = 0, dh = 0, pdx = 0, pdy = 0, opx, opy, px, py;
+    gint dist = 0;
+    ObDirection dir;
+    ObCorner cor;
+
+    /* pick the edge if it needs to move */
+    if (keycode == ob_keycode(OB_KEY_RIGHT)) {
+        dir = OB_DIRECTION_EAST;
+        if (key_resize_edge != OB_DIRECTION_WEST &&
+            key_resize_edge != OB_DIRECTION_EAST)
+        {
+            key_resize_edge = OB_DIRECTION_EAST;
+            return;
+        }
+    }
+    if (keycode == ob_keycode(OB_KEY_LEFT)) {
+        dir = OB_DIRECTION_WEST;
+        if (key_resize_edge != OB_DIRECTION_WEST &&
+            key_resize_edge != OB_DIRECTION_EAST)
+        {
+            key_resize_edge = OB_DIRECTION_WEST;
+            return;
+        }
+    }
+    if (keycode == ob_keycode(OB_KEY_UP)) {
+        dir = OB_DIRECTION_NORTH;
+        if (key_resize_edge != OB_DIRECTION_NORTH &&
+            key_resize_edge != OB_DIRECTION_SOUTH)
+        {
+            key_resize_edge = OB_DIRECTION_NORTH;
+            return;
+        }
+    }
+    if (keycode == ob_keycode(OB_KEY_DOWN)) {
+        dir = OB_DIRECTION_SOUTH;
+        if (key_resize_edge != OB_DIRECTION_NORTH &&
+            key_resize_edge != OB_DIRECTION_SOUTH)
+        {
+            key_resize_edge = OB_DIRECTION_SOUTH;
+            return;
+        }
+    }
+
+    /* shift means jump to edge */
+    if (state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
+        gint x, y, w, h;
+
+        if (keycode == ob_keycode(OB_KEY_RIGHT))
+            dir = OB_DIRECTION_EAST;
+        else if (keycode == ob_keycode(OB_KEY_LEFT))
+            dir = OB_DIRECTION_WEST;
+        else if (keycode == ob_keycode(OB_KEY_DOWN))
+            dir = OB_DIRECTION_SOUTH;
+        else /* if (keycode == ob_keycode(OB_KEY_UP)) */
+            dir = OB_DIRECTION_NORTH;
+
+        client_find_resize_directional(moveresize_client, key_resize_edge,
+                                       key_resize_edge == dir,
+                                       &x, &y, &w, &h);
+        dw = w - moveresize_client->area.width;
+        dh = h - moveresize_client->area.height;
+    } else {
+        gint distw, disth;
+
+        /* control means fine grained */
+        if (moveresize_client->size_inc.width > 1)
+            distw = moveresize_client->size_inc.width;
+        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+            distw = 1;
+        else
+            distw = KEY_DIST;
+        if (moveresize_client->size_inc.height > 1)
+            disth = moveresize_client->size_inc.height;
+        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+            disth = 1;
+        else
+            disth = KEY_DIST;
+
+        if (key_resize_edge == OB_DIRECTION_WEST) {
+            if (dir == OB_DIRECTION_WEST)
+                dw = (dist = distw);
+            else
+                dw = -(dist = distw);
+        }
+        else if (key_resize_edge == OB_DIRECTION_EAST) {
+            if (dir == OB_DIRECTION_EAST)
+                dw = (dist = distw);
+            else
+                dw = -(dist = distw);
+        }
+        else if (key_resize_edge == OB_DIRECTION_NORTH) {
+            if (dir == OB_DIRECTION_NORTH)
+                dh = (dist = disth);
+            else
+                dh = -(dist = disth);
+        }
+        else /*if (key_resize_edge == OB_DIRECTION_SOUTH)*/ {
+            if (dir == OB_DIRECTION_SOUTH)
+                dh = (dist = disth);
+            else
+                dh = -(dist = disth);
+        }
+    }
+
+    /* which corner is locked, for resistance */
+    if (key_resize_edge == OB_DIRECTION_WEST)
+        cor = OB_CORNER_TOPRIGHT;
+    else if (key_resize_edge == OB_DIRECTION_EAST)
+        cor = OB_CORNER_TOPLEFT;
+    else if (key_resize_edge == OB_DIRECTION_NORTH)
+        cor = OB_CORNER_BOTTOMLEFT;
+    else if (key_resize_edge == OB_DIRECTION_SOUTH)
+        cor = OB_CORNER_TOPLEFT;
+
+    calc_resize(TRUE, dist, &dw, &dh, cor);
+    if (key_resize_edge == OB_DIRECTION_WEST)
+        cur_x -= dw;
+    else if (key_resize_edge == OB_DIRECTION_NORTH)
+        cur_y -= dh;
+    cur_w += dw;
+    cur_h += dh;
+
+    /* how to move the pointer to keep up with the change */
+    if (key_resize_edge == OB_DIRECTION_WEST)
+        pdx = -dw;
+    else if (key_resize_edge == OB_DIRECTION_EAST)
+        pdx = dw;
+    else if (key_resize_edge == OB_DIRECTION_NORTH)
+        pdy = -dh;
+    else if (key_resize_edge == OB_DIRECTION_SOUTH)
+        pdy = dh;
+    
+    screen_pointer_pos(&opx, &opy);
+    XWarpPointer(ob_display, None, None, 0, 0, 0, 0, pdx, pdy);
+    /* steal the motion events this causes */
+    XSync(ob_display, FALSE);
+    {
+        XEvent ce;
+        while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
+    }
+    screen_pointer_pos(&px, &py);
+
+    do_resize();
+
+    /* because the cursor moves even though the window does
+       not nessesarily (resistance), this adjusts where the cursor
+       thinks it started so that it keeps up with where the window
+       actually is */
+    start_x += (px - opx) - dw;
+    start_y += (py - opy) - dh;
+
+}
+
 gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
@@ -567,48 +676,69 @@ gboolean moveresize_event(XEvent *e)
             do_move(FALSE, 0);
             do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
         } else {
+            gint dw, dh;
+
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
-                cur_x = start_cw - (e->xmotion.x_root - start_x);
-                cur_y = start_ch - (e->xmotion.y_root - start_y);
+                dw = -(e->xmotion.x_root - start_x);
+                dh = -(e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_BOTTOMRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_top) {
-                cur_x = start_cw;
-                cur_y = start_ch - (e->xmotion.y_root - start_y);
+                dw = 0;
+                dh = (e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_BOTTOMRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_topright) {
-                cur_x = start_cw + (e->xmotion.x_root - start_x);
-                cur_y = start_ch - (e->xmotion.y_root - start_y);
+                dw = (e->xmotion.x_root - start_x);
+                dh = -(e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_BOTTOMLEFT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_right) { 
-                cur_x = start_cw + (e->xmotion.x_root - start_x);
-                cur_y = start_ch;
+                dw = (e->xmotion.x_root - start_x);
+                dh = 0;
                 lockcorner = OB_CORNER_BOTTOMLEFT;
             } else if (corner ==
                        prop_atoms.net_wm_moveresize_size_bottomright) {
-                cur_x = start_cw + (e->xmotion.x_root - start_x);
-                cur_y = start_ch + (e->xmotion.y_root - start_y);
+                dw = (e->xmotion.x_root - start_x);
+                dh = (e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_TOPLEFT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_bottom) {
-                cur_x = start_cw;
-                cur_y = start_ch + (e->xmotion.y_root - start_y);
+                dw = 0;
+                dh = (e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_TOPLEFT;
             } else if (corner ==
                        prop_atoms.net_wm_moveresize_size_bottomleft) {
-                cur_x = start_cw - (e->xmotion.x_root - start_x);
-                cur_y = start_ch + (e->xmotion.y_root - start_y);
+                dw = -(e->xmotion.x_root - start_x);
+                dh = (e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_TOPRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_left) {
-                cur_x = start_cw - (e->xmotion.x_root - start_x);
-                cur_y = start_ch;
+                dw = -(e->xmotion.x_root - start_x);
+                dh = 0;
                 lockcorner = OB_CORNER_TOPRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
-                cur_x = start_cw + (e->xmotion.x_root - start_x);
-                cur_y = start_ch + (e->xmotion.y_root - start_y);
+                dw = (e->xmotion.x_root - start_x);
+                dh = (e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_TOPLEFT;
             } else
                 g_assert_not_reached();
 
-            calc_resize(FALSE);
+            dw -= cur_w - start_cw;
+            dh -= cur_h - start_ch;
+
+            calc_resize(FALSE, 0, &dw, &dh, lockcorner);
+            cur_w += dw;
+            cur_h += dh;
+
+            if (corner == prop_atoms.net_wm_moveresize_size_topleft ||
+                corner == prop_atoms.net_wm_moveresize_size_left ||
+                corner == prop_atoms.net_wm_moveresize_size_bottomleft)
+            {
+                cur_x -= dw;
+            }
+            if (corner == prop_atoms.net_wm_moveresize_size_topleft ||
+                corner == prop_atoms.net_wm_moveresize_size_top ||
+                corner == prop_atoms.net_wm_moveresize_size_topright)
+            {
+                cur_y -= dh;
+            }
+
             do_resize();
         }
         used = TRUE;
@@ -625,37 +755,7 @@ gboolean moveresize_event(XEvent *e)
                    e->xkey.keycode == ob_keycode(OB_KEY_UP))
         {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
-                gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
-
-                if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                    dx = MAX(KEY_DIST, moveresize_client->size_inc.width);
-                else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                    dx = -MAX(KEY_DIST, moveresize_client->size_inc.width);
-                else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                    dy = MAX(KEY_DIST, moveresize_client->size_inc.height);
-                else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
-                    dy = -MAX(KEY_DIST, moveresize_client->size_inc.height);
-
-                cur_x += dx;
-                cur_y += dy;
-                XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
-                /* steal the motion events this causes */
-                XSync(ob_display, FALSE);
-                {
-                    XEvent ce;
-                    while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
-                }
-
-                calc_resize(TRUE);
-                do_resize();
-
-                /* because the cursor moves even though the window does
-                   not nessesarily (resistance), this adjusts where the curor
-                   thinks it started so that it keeps up with where the window
-                   actually is */
-                start_x += dx - (cur_x - ox);
-                start_y += dy - (cur_y - oy);
-
+                resize_with_keys(e->xkey.keycode, e->xkey.state);
                 used = TRUE;
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
                 move_with_keys(e->xkey.keycode, e->xkey.state);

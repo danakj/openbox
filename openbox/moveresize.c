@@ -195,7 +195,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     moveresize_in_progress = TRUE;
 
 #ifdef SYNC
-    if (config_resize_redraw && !moving && extensions_shape &&
+    if (config_resize_redraw && !moving && extensions_sync &&
         moveresize_client->sync_request && moveresize_client->sync_counter)
     {
         /* Initialize values for the resize syncing, and create an alarm for
@@ -341,7 +341,7 @@ static void do_resize()
         waiting_for_sync = TRUE;
 
         ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
-        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC,
+        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
                                  sync_timeout_func,
                                  NULL, NULL, NULL);
     }

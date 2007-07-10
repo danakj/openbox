@@ -315,11 +315,11 @@ void moveresize_end(gboolean cancel)
     moveresize_client = NULL;
 }
 
-static void do_move(gboolean keyboard)
+static void do_move(gboolean keyboard, gint keydist)
 {
     gint resist;
 
-    if (keyboard) resist = KEY_DIST - 1; /* resist for one key press */
+    if (keyboard) resist = keydist - 1; /* resist for one key press */
     else resist = config_resist_win;
     resist_move_windows(moveresize_client, resist, &cur_x, &cur_y);
     if (!keyboard) resist = config_resist_edge;
@@ -480,6 +480,68 @@ static void cancel_edge_warp()
     ob_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
 }
 
+static void move_with_keys(gint keycode, gint state)
+{
+    gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
+    gint opx, px, opy, py;
+    gint dist = 0;
+
+    /* shift means jump to edge */
+    if (state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
+        gint x, y;
+        ObDirection dir;
+
+        if (keycode == ob_keycode(OB_KEY_RIGHT))
+            dir = OB_DIRECTION_EAST;
+        else if (keycode == ob_keycode(OB_KEY_LEFT))
+            dir = OB_DIRECTION_WEST;
+        else if (keycode == ob_keycode(OB_KEY_DOWN))
+            dir = OB_DIRECTION_SOUTH;
+        else /* if (keycode == ob_keycode(OB_KEY_UP)) */
+            dir = OB_DIRECTION_NORTH;
+
+        client_find_move_directional(moveresize_client, dir, &x, &y);
+        dx = x - moveresize_client->area.x;
+        dy = y - moveresize_client->area.y;
+    } else {
+        /* control means fine grained */
+        if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+            dist = 1;
+        else
+            dist = KEY_DIST;
+
+        if (keycode == ob_keycode(OB_KEY_RIGHT))
+            dx = dist;
+        else if (keycode == ob_keycode(OB_KEY_LEFT))
+            dx = -dist;
+        else if (keycode == ob_keycode(OB_KEY_DOWN))
+            dy = dist;
+        else /* if (keycode == ob_keycode(OB_KEY_UP)) */
+            dy = -dist;
+    }
+
+    screen_pointer_pos(&opx, &opy);
+    XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
+    /* steal the motion events this causes */
+    XSync(ob_display, FALSE);
+    {
+        XEvent ce;
+        while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
+    }
+    screen_pointer_pos(&px, &py);
+
+    cur_x += dx;
+    cur_y += dy;
+    do_move(TRUE, dist);
+
+    /* because the cursor moves even though the window does
+       not nessesarily (resistance), this adjusts where the curor
+       thinks it started so that it keeps up with where the window
+       actually is */
+    start_x += (px - opx) - (cur_x - ox);
+    start_y += (py - opy) - (cur_y - oy);
+}
+
 gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
@@ -502,7 +564,7 @@ gboolean moveresize_event(XEvent *e)
         if (moving) {
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
-            do_move(FALSE);
+            do_move(FALSE, 0);
             do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
         } else {
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
@@ -596,65 +658,7 @@ gboolean moveresize_event(XEvent *e)
 
                 used = TRUE;
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
-                gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
-                gint opx, px, opy, py;
-                gint dist = KEY_DIST;
-
-                /* shift means jump to edge */
-                if (e->xkey.state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
-                    gint x, y;
-                    ObDirection dir;
-
-                    if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                        dir = OB_DIRECTION_EAST;
-                    else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                        dir = OB_DIRECTION_WEST;
-                    else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                        dir = OB_DIRECTION_SOUTH;
-                    else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
-                        dir = OB_DIRECTION_NORTH;
-
-                    client_find_move_directional(moveresize_client, dir,
-                                                 &x, &y);
-                    dx = x - moveresize_client->area.x;
-                    dy = y - moveresize_client->area.y;
-                } else {
-                    /* control means fine grained */
-                    if (e->xkey.state &
-                        modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
-                        dist = 1;
-
-                    if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                        dx = dist;
-                    else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                        dx = -dist;
-                    else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                        dy = dist;
-                    else /* if (e->xkey.keycode == ob_keycode(OB_KEY_UP)) */
-                        dy = -dist;
-                }
-
-                cur_x += dx;
-                cur_y += dy;
-                screen_pointer_pos(&opx, &opy);
-                XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
-                /* steal the motion events this causes */
-                XSync(ob_display, FALSE);
-                {
-                    XEvent ce;
-                    while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
-                }
-                screen_pointer_pos(&px, &py);
-
-                do_move(TRUE);
-
-                /* because the cursor moves even though the window does
-                   not nessesarily (resistance), this adjusts where the curor
-                   thinks it started so that it keeps up with where the window
-                   actually is */
-                start_x += (px - opx) - (cur_x - ox);
-                start_y += (py - opy) - (cur_y - oy);
-
+                move_with_keys(e->xkey.keycode, e->xkey.state);
                 used = TRUE;
             }
         }

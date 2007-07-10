@@ -36,7 +36,6 @@
 #include "propwin.h"
 #include "mouse.h"
 #include "mainloop.h"
-#include "framerender.h"
 #include "focus.h"
 #include "focus_cycle.h"
 #include "moveresize.h"
@@ -823,23 +822,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             switch (con) {
             case OB_FRAME_CONTEXT_MAXIMIZE:
                 client->frame->max_press = (e->type == ButtonPress);
-                framerender_frame(client->frame);
+                frame_adjust_state(client->frame);
                 break;
             case OB_FRAME_CONTEXT_CLOSE:
                 client->frame->close_press = (e->type == ButtonPress);
-                framerender_frame(client->frame);
+                frame_adjust_state(client->frame);
                 break;
             case OB_FRAME_CONTEXT_ICONIFY:
                 client->frame->iconify_press = (e->type == ButtonPress);
-                framerender_frame(client->frame);
+                frame_adjust_state(client->frame);
                 break;
             case OB_FRAME_CONTEXT_ALLDESKTOPS:
                 client->frame->desk_press = (e->type == ButtonPress);
-                framerender_frame(client->frame);
+                frame_adjust_state(client->frame);
                 break; 
             case OB_FRAME_CONTEXT_SHADE:
                 client->frame->shade_press = (e->type == ButtonPress);
-                framerender_frame(client->frame);
+                frame_adjust_state(client->frame);
                 break;
             default:
                 /* nothing changes with clicks for any other contexts */

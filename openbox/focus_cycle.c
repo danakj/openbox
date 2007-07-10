@@ -56,7 +56,7 @@ void focus_cycle_stop(ObClient *ifclient)
     /* stop focus cycling if the given client is a valid focus target,
        and so the cycling is being disrupted */
     if (focus_cycle_target && ifclient &&
-        focus_valid_target(ifclient,
+        focus_valid_target(ifclient, TRUE,
                            focus_cycle_iconic_windows,
                            focus_cycle_all_desktops,
                            focus_cycle_dock_windows,
@@ -118,7 +118,7 @@ void focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (focus_valid_target(ft,
+        if (focus_valid_target(ft, TRUE,
                                focus_cycle_iconic_windows,
                                focus_cycle_all_desktops,
                                focus_cycle_dock_windows,
@@ -190,7 +190,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if (cur == c)
             continue;
-        if (!focus_valid_target(it->data, FALSE, FALSE, dock_windows,
+        if (!focus_valid_target(it->data, TRUE, FALSE, FALSE, dock_windows,
                                 desktop_windows))
             continue;
 
@@ -292,7 +292,7 @@ void focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_valid_target(it->data,
+            if (focus_valid_target(it->data, TRUE,
                                    focus_cycle_iconic_windows,
                                    focus_cycle_all_desktops,
                                    focus_cycle_dock_windows,

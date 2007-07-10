@@ -1676,7 +1676,10 @@ void frame_end_iconify_animation(ObFrame *self)
         XUnmapWindow(ob_display, self->window);
     else {
         /* Send a ConfigureNotify when the animation is done, this fixes
-           KDE's pager showing the window in the wrong place. */
+           KDE's pager showing the window in the wrong place.  since the
+           window is mapped at a different location and is then moved, we
+           need to send the synthetic configurenotify, since apps may have
+           read the position when the client mapped, apparently. */
         client_reconfigure(self->client, TRUE);
     }
 

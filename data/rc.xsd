@@ -55,6 +55,15 @@
         <xsd:element name="policy" type="ob:placementpolicy"/>
         <xsd:element name="center" type="ob:bool"/>
     </xsd:complexType>
+    <xsd:complexType name="margins">
+        <xsd:annotation>
+            <xsd:documentation>defines desktop margins</xsd:documentation>
+        </xsd:annotation>
+        <xsd:element minOccurs="0" name="top" type="xsd:integer"/>
+        <xsd:element minOccurs="0" name="left" type="xsd:integer"/>
+        <xsd:element minOccurs="0" name="right" type="xsd:integer"/>
+        <xsd:element minOccurs="0" name="bottom" type="xsd:integer"/>
+    </xsd:complexType>              
     <xsd:complexType name="theme">
         <xsd:element minOccurs="0" name="name" type="xsd:string"/>
         <xsd:element minOccurs="0" name="titleLayout" type="xsd:string"/>

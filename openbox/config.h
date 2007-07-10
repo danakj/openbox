@@ -79,6 +79,9 @@ extern ObPlacePolicy config_place_policy;
 /*! Place windows in the center of the free area */
 extern gboolean config_place_center;
 
+/*! User-specified margins around the edge of the screen(s) */
+extern StrutPartial config_margins;
+
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */
 extern gboolean config_resize_redraw;

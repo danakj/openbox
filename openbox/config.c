@@ -39,6 +39,8 @@ gboolean config_focus_under_mouse;
 ObPlacePolicy config_place_policy;
 gboolean      config_place_center;
 
+StrutPartial config_margins;
+
 gchar   *config_theme;
 gboolean config_theme_keepborder;
 
@@ -499,6 +501,23 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_place_center = parse_bool(doc, n);
 }
 
+static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                          gpointer d)
+{
+    xmlNodePtr n;
+
+    node = node->children;
+    
+    if ((n = parse_find_node("top", node)))
+        config_margins.top = MAX(0, parse_int(doc, n));
+    if ((n = parse_find_node("left", node)))
+        config_margins.left = MAX(0, parse_int(doc, n));
+    if ((n = parse_find_node("right", node)))
+        config_margins.right = MAX(0, parse_int(doc, n));
+    if ((n = parse_find_node("bottom", node)))
+        config_margins.bottom = MAX(0, parse_int(doc, n));
+}
+
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                         gpointer d)
 {
@@ -841,6 +860,10 @@ void config_startup(ObParseInst *i)
     config_place_center = TRUE;
 
     parse_register(i, "placement", parse_placement, NULL);
+
+    STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    parse_register(i, "margins", parse_margins, NULL);
 
     config_theme = NULL;
 

@@ -611,9 +611,10 @@
       # the position is only used if both an x and y coordinate are provided
       # (and not set to 'default')
       <x>center</x>
-      # a number like 50, or 'center' to center on screen
+      # a number like 50, or 'center' to center on screen. use a negative number
+      # to start from the right (or bottom for <y>), ie -50 is 50 pixels from the
+      # right edge (or bottom).
       <y>200</y>
-      # a number like 50, or 'center' to center on screen
       <monitor>1</monitor>
       # specifies the monitor in a xinerama setup.
       # 1 is the first head, or 'mouse' for wherever the mouse is

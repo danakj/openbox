@@ -431,15 +431,24 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     VARS(y2);
     VARS(y3);
 
-
-    y1sz = MAX(h/2 - 1, 1);
-    /* setup to get the colors _in between_ these other 2 */
-    y2sz = (h < 3 ? 0 : (h % 2 ? 3 : 2));
-    y3sz = MAX(h/2 - 1, 0);
+    /* if h <= 5, then a 0 or 1px middle gradient.
+       if h > 5, then always a 1px middle gradient.
+    */
+    if (h <= 5) {
+        y1sz = MAX(h/2, 0);
+        y2sz = (h < 3 ? 0 : h % 2);
+        y3sz = MAX(h/2, 1);
+    }
+    else {
+        y1sz = h/2 - (1 - (h % 2));
+        y2sz = 1;
+        y3sz = h/2;
+    }
 
     SETUP(y1, sf->split_primary, sf->primary, y1sz);
     if (y2sz) {
-        SETUP(y2, sf->primary, sf->secondary, y2sz);
+        /* setup to get the colors _in between_ these other 2 */
+        SETUP(y2, sf->primary, sf->secondary, y2sz + 2);
         NEXT(y2); /* skip the first one, its the same as the last of y1 */
     }
     SETUP(y3, sf->secondary, sf->split_secondary,  y3sz);

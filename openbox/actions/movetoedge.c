@@ -67,9 +67,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         client_find_move_directional(data->client, o->dir, &x, &y);
         if (x != data->client->area.x || y != data->client->area.y) {
-            actions_client_move(data, FALSE);
-            client_move(data->client, x, y);
             actions_client_move(data, TRUE);
+            client_move(data->client, x, y);
+            actions_client_move(data, FALSE);
         }
     }
 

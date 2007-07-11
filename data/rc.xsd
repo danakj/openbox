@@ -245,8 +245,6 @@
             <xsd:enumeration value="Reconfigure"/>
             <xsd:enumeration value="Resize"/>
             <xsd:enumeration value="ResizeRelative"/>
-            <xsd:enumeration value="ResizeRelativeHorz"/>
-            <xsd:enumeration value="ResizeRelativeVert"/>
             <xsd:enumeration value="Restart"/>
             <xsd:enumeration value="SendToBottomLayer"/>
             <xsd:enumeration value="SendToDesktop"/>

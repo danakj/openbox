@@ -7,6 +7,8 @@
 typedef struct {
     gboolean xcenter;
     gboolean ycenter;
+    gboolean xopposite;
+    gboolean yopposite;
     gint x;
     gint y;
     gint monitor;
@@ -39,8 +41,14 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         gchar *s = parse_string(doc, n);
         if (!g_ascii_strcasecmp(s, "center"))
             o->xcenter = TRUE;
-        else
-            o->x = atoi(s);
+        else {
+            if (s[0] == '-')
+                o->xopposite = TRUE;
+            if (s[0] == '-' || s[0] == '+')
+                o->x = atoi(s+1);
+            else
+                o->x = atoi(s);
+        }
         g_free(s);
     }
 
@@ -48,8 +56,14 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         gchar *s = parse_string(doc, n);
         if (!g_ascii_strcasecmp(s, "center"))
             o->ycenter = TRUE;
-        else
-            o->y = atoi(s);
+        else {
+            if (s[0] == '-')
+                o->yopposite = TRUE;
+            if (s[0] == '-' || s[0] == '+')
+                o->y = atoi(s+1);
+            else
+                o->y = atoi(s);
+        }
         g_free(s);
     }
 
@@ -83,14 +97,19 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         if (mon < 0) mon = cmon;
         area = screen_area(c->desktop, mon, NULL);
         carea = screen_area(c->desktop, cmon, NULL);
+
         x = o->x;
-        if (x == G_MININT) x = c->frame->area.x - carea->x;
         if (o->xcenter) x = (area->width - c->frame->area.width) / 2;
+        else if (x == G_MININT) x = c->frame->area.x - carea->x;
+        else if (o->xopposite) x = area->width - c->frame->area.width;
         x += area->x;
+
         y = o->y;
-        if (y == G_MININT) y = c->frame->area.y - carea->y;
         if (o->ycenter) y = (area->height - c->frame->area.height) / 2;
+        else if (y == G_MININT) y = c->frame->area.y - carea->y;
+        else if (o->yopposite) y = area->height - c->frame->area.height;
         y += area->y;
+
         w = c->area.width;
         h = c->area.height;
 

@@ -31,6 +31,7 @@ static void     actions_definition_ref(ObActionsDefinition *def);
 static void     actions_definition_unref(ObActionsDefinition *def);
 static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state);
 static void     actions_interactive_end_act();
+static ObActionsAct* actions_build_act_from_string(const gchar *name);
 
 static ObActionsAct *interactive_act = NULL;
 static guint         interactive_initial_state = 0;
@@ -123,7 +124,7 @@ static void actions_definition_unref(ObActionsDefinition *def)
     }
 }
 
-ObActionsAct* actions_parse_string(const gchar *name)
+ObActionsAct* actions_build_act_from_string(const gchar *name)
 {
     GSList *it;
     ObActionsDefinition *def = NULL;
@@ -151,6 +152,17 @@ ObActionsAct* actions_parse_string(const gchar *name)
     return act;
 }
 
+ObActionsAct* actions_parse_string(const gchar *name)
+{
+    ObActionsAct *act = NULL;
+
+    if ((act = actions_build_act_from_string(name)))
+        if (act->def->setup)
+            act->options = act->def->setup(NULL, NULL, NULL);
+
+    return act;
+}
+
 ObActionsAct* actions_parse(ObParseInst *i,
                             xmlDocPtr doc,
                             xmlNodePtr node)
@@ -159,7 +171,7 @@ ObActionsAct* actions_parse(ObParseInst *i,
     ObActionsAct *act = NULL;
 
     if (parse_attr_string("name", node, &name)) {
-        if ((act = actions_parse_string(name)))
+        if ((act = actions_build_act_from_string(name)))
             /* there is more stuff to parse here */
             if (act->def->setup)
                 act->options = act->def->setup(i, doc, node->xmlChildrenNode);

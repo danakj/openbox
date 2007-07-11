@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "Sve radne površine"
 
 #: openbox/client_menu.c:351
-msgid "&Layer"
+msgid "_Layer"
 msgstr ""
 
 #: openbox/client_menu.c:356
-msgid "Always on &top"
-msgstr "Uvijek na &vrhu"
+msgid "Always on _top"
+msgstr "Uvijek na _vrhu"
 
 #: openbox/client_menu.c:357
-msgid "&Normal"
-msgstr "&Normalno"
+msgid "_Normal"
+msgstr "_Normalno"
 
 #: openbox/client_menu.c:358
-msgid "Always on &bottom"
-msgstr "Uvijek na &dnu"
+msgid "Always on _bottom"
+msgstr "Uvijek na _dnu"
 
 #: openbox/client_menu.c:361
-msgid "&Send to desktop"
-msgstr "&Pošalji na radnu površinu"
+msgid "_Send to desktop"
+msgstr "_Pošalji na radnu površinu"
 
 #: openbox/client_menu.c:365
 msgid "Client menu"
 msgstr "Meni klijenta"
 
 #: openbox/client_menu.c:371
-msgid "R&estore"
-msgstr "Ponovno uspostav&i"
+msgid "R_estore"
+msgstr "Ponovno uspostav_i"
 
 #: openbox/client_menu.c:379
-msgid "&Move"
-msgstr "Po&makni"
+msgid "_Move"
+msgstr "Po_makni"
 
 #: openbox/client_menu.c:381
-msgid "Resi&ze"
-msgstr "Prom&jeni veličinu"
+msgid "Resi_ze"
+msgstr "Prom_jeni veličinu"
 
 #: openbox/client_menu.c:383
-msgid "Ico&nify"
-msgstr "Iko&nificiraj"
+msgid "Ico_nify"
+msgstr "Iko_nificiraj"
 
 #: openbox/client_menu.c:391
-msgid "Ma&ximize"
-msgstr "M&aksimiziraj"
+msgid "Ma_ximize"
+msgstr "M_aksimiziraj"
 
 #: openbox/client_menu.c:399
-msgid "&Roll up/down"
+msgid "_Roll up/down"
 msgstr ""
 
 #: openbox/client_menu.c:401
-msgid "Un/&Decorate"
+msgid "Un/_Decorate"
 msgstr ""
 
 #: openbox/client_menu.c:411
-msgid "&Close"
-msgstr "&Zatvori"
+msgid "_Close"
+msgstr "_Zatvori"
 
 #: openbox/config.c:701
 #, c-format

@@ -165,8 +165,6 @@ void menu_shutdown(gboolean reconfig);
 void menu_entry_ref(ObMenuEntry *self);
 void menu_entry_unref(ObMenuEntry *self);
 
-/*! @param allow_shortcut this should be false when the label is coming from
-           outside data like window or desktop titles */
 ObMenu* menu_new(const gchar *name, const gchar *title,
                  gboolean allow_shortcut_selection, gpointer data);
 void menu_free(ObMenu *menu);

@@ -53,60 +53,60 @@ msgid "All desktops"
 msgstr "Kaikkiin työtiloihin"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "&Kerros"
+msgid "_Layer"
+msgstr "_Kerros"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Aina &päällimmäinen"
+msgid "Always on _top"
+msgstr "Aina _päällimmäinen"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Tavallinen"
+msgid "_Normal"
+msgstr "_Tavallinen"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Aina &alimmainen"
+msgid "Always on _bottom"
+msgstr "Aina _alimmainen"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "&Lähetä työtilaan"
+msgid "_Send to desktop"
+msgstr "_Lähetä työtilaan"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Ikkunan valikko"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "&Palauta"
+msgid "R_estore"
+msgstr "_Palauta"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "S&iirrä"
+msgid "_Move"
+msgstr "S_iirrä"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "&Muuta kokoa"
+msgid "Resi_ze"
+msgstr "_Muuta kokoa"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Pie&nennä"
+msgid "Ico_nify"
+msgstr "Pie_nennä"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Suurenn&a"
+msgid "Ma_ximize"
+msgstr "Suurenn_a"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
+msgid "_Roll up/down"
 msgstr "Rullaa ylös/alas"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
+msgid "Un/_Decorate"
 msgstr "(Epä)reunusta"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "&Sulje"
+msgid "_Close"
+msgstr "_Sulje"
 
 #: openbox/config.c:716
 #, c-format

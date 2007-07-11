@@ -53,60 +53,60 @@ msgid "All desktops"
 msgstr "Все рабочие столы"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "Слой(&L)"
+msgid "_Layer"
+msgstr "Слой(_L)"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Поверх всех окон(&T)"
+msgid "Always on _top"
+msgstr "Поверх всех окон(_T)"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "Обычное поведение(&N)"
+msgid "_Normal"
+msgstr "Обычное поведение(_N)"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Под всеми окнами(&B)"
+msgid "Always on _bottom"
+msgstr "Под всеми окнами(_B)"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "Отправить на рабочий стол(&S)"
+msgid "_Send to desktop"
+msgstr "Отправить на рабочий стол(_S)"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Меню клиентов"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "Восстановить(&E)"
+msgid "R_estore"
+msgstr "Восстановить(_E)"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "Переместить(&M)"
+msgid "_Move"
+msgstr "Переместить(_M)"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Изменить размер(&Z)"
+msgid "Resi_ze"
+msgstr "Изменить размер(_Z)"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Свернуть(&N)"
+msgid "Ico_nify"
+msgstr "Свернуть(_N)"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Развернуть(&X)"
+msgid "Ma_ximize"
+msgstr "Развернуть(_X)"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "Скрутить/Раскрутить(&R)"
+msgid "_Roll up/down"
+msgstr "Скрутить/Раскрутить(_R)"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "(От)декорировать(&D)"
+msgid "Un/_Decorate"
+msgstr "(От)декорировать(_D)"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "Закрыть(&C)"
+msgid "_Close"
+msgstr "Закрыть(_C)"
 
 #: openbox/config.c:716
 #, c-format

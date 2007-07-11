@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "所有桌面"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "层(&L)"
+msgid "_Layer"
+msgstr "层(_L)"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "总在最上层(&T)"
+msgid "Always on _top"
+msgstr "总在最上层(_T)"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "常规(&N)"
+msgid "_Normal"
+msgstr "常规(_N)"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "总在最底层(&B)"
+msgid "Always on _bottom"
+msgstr "总在最底层(_B)"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "发送到桌面(&S)"
+msgid "_Send to desktop"
+msgstr "发送到桌面(_S)"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "客户端菜单"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "还原(&E)"
+msgid "R_estore"
+msgstr "还原(_E)"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "移动(&M)"
+msgid "_Move"
+msgstr "移动(_M)"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "调整大小(&Z)"
+msgid "Resi_ze"
+msgstr "调整大小(_Z)"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "最小化(&N)"
+msgid "Ico_nify"
+msgstr "最小化(_N)"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "最大化(&X)"
+msgid "Ma_ximize"
+msgstr "最大化(_X)"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "卷起/放下(&R)"
+msgid "_Roll up/down"
+msgstr "卷起/放下(_R)"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "去除装饰(&D)"
+msgid "Un/_Decorate"
+msgstr "去除装饰(_D)"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "关闭(&C)"
+msgid "_Close"
+msgstr "关闭(_C)"
 
 #: openbox/config.c:716
 #, c-format

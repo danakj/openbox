@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "Alle skrivebord"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "La&g"
+msgid "_Layer"
+msgstr "La_g"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Alltid ø&verst"
+msgid "Always on _top"
+msgstr "Alltid ø_verst"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "Nor&mal"
+msgid "_Normal"
+msgstr "Nor_mal"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Alltid &nederst"
+msgid "Always on _bottom"
+msgstr "Alltid _nederst"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "&Send til"
+msgid "_Send to desktop"
+msgstr "_Send til"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Klient-meny"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "Tilbak&estill"
+msgid "R_estore"
+msgstr "Tilbak_estill"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "&Flytt"
+msgid "_Move"
+msgstr "_Flytt"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Endre s&tørrelse"
+msgid "Resi_ze"
+msgstr "Endre s_tørrelse"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "&Minimer"
+msgid "Ico_nify"
+msgstr "_Minimer"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ximer"
+msgid "Ma_ximize"
+msgstr "Ma_ximer"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "&Rull opp/ned"
+msgid "_Roll up/down"
+msgstr "_Rull opp/ned"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "Fjern/Legg til &dekorasjon"
+msgid "Un/_Decorate"
+msgstr "Fjern/Legg til _dekorasjon"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "&Lukk"
+msgid "_Close"
+msgstr "_Lukk"
 
 #: openbox/config.c:716
 #, c-format

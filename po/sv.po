@@ -44,12 +44,12 @@ msgid "Manage desktops"
 msgstr "Hantera skrivbord"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:153
-msgid "&Add new desktop"
-msgstr "&Lägg till nytt skrivbord"
+msgid "_Add new desktop"
+msgstr "_Lägg till nytt skrivbord"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:154
-msgid "&Remove last desktop"
-msgstr "&Ta bord sista skrivbordet"
+msgid "_Remove last desktop"
+msgstr "_Ta bort sista skrivbordet"
 
 #: openbox/client_list_combined_menu.c:147
 msgid "Windows"
@@ -64,60 +64,60 @@ msgid "All desktops"
 msgstr "Alla skrivbord"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "&Lager"
+msgid "_Layer"
+msgstr "_Lager"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Alltid ö&verst"
+msgid "Always on _top"
+msgstr "Alltid ö_verst"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Normal"
+msgid "_Normal"
+msgstr "_Normal"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Alltid &underst"
+msgid "Always on _bottom"
+msgstr "Alltid _underst"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "&Skicka till skrivbord"
+msgid "_Send to desktop"
+msgstr "_Skicka till skrivbord"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Klientmeny"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "Åt&erställ"
+msgid "R_estore"
+msgstr "Åt_erställ"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "&Flytta"
+msgid "_Move"
+msgstr "_Flytta"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Ändra s&torlek"
+msgid "Resi_ze"
+msgstr "Ändra s_torlek"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Mi&nimera"
+msgid "Ico_nify"
+msgstr "Mi_nimera"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Ma&ximera"
+msgid "Ma_ximize"
+msgstr "Ma_ximera"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "&Rulla upp/ner"
+msgid "_Roll up/down"
+msgstr "_Rulla upp/ner"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "&Dekorationer"
+msgid "Un/_Decorate"
+msgstr "_Dekorationer"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "Stän&g"
+msgid "_Close"
+msgstr "Stän_g"
 
 #: openbox/config.c:722
 #, c-format

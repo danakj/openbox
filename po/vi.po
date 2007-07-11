@@ -52,60 +52,60 @@ msgid "All desktops"
 msgstr "Tất cả chỗ làm việc"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "Lớ&p"
+msgid "_Layer"
+msgstr "Lớ_p"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "Luôn luôn ở &trên"
+msgid "Always on _top"
+msgstr "Luôn luôn ở _trên"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "&Bình thường"
+msgid "_Normal"
+msgstr "_Bình thường"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "Luôn luôn ở &dưới"
+msgid "Always on _bottom"
+msgstr "Luôn luôn ở _dưới"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "Gửi đến chỗ làm &việc"
+msgid "_Send to desktop"
+msgstr "Gửi đến chỗ làm _việc"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Khách thực đơn"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "&Hoàn lại"
+msgid "R_estore"
+msgstr "_Hoàn lại"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "Chu&yển đi"
+msgid "_Move"
+msgstr "Chu_yển đi"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "Làm &nhỏ hơn/lớn hơn"
+msgid "Resi_ze"
+msgstr "Làm _nhỏ hơn/lớn hơn"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "Biến &xuống"
+msgid "Ico_nify"
+msgstr "Biến _xuống"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "Biến &lớn nhất"
+msgid "Ma_ximize"
+msgstr "Biến _lớn nhất"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "&Cuốn lên/xuống"
+msgid "_Roll up/down"
+msgstr "_Cuốn lên/xuống"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "&Trang/Không Trang trí"
+msgid "Un/_Decorate"
+msgstr "_Trang/Không Trang trí"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "Đón&g"
+msgid "_Close"
+msgstr "Đón_g"
 
 #: openbox/config.c:716
 #, c-format

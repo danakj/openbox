@@ -55,60 +55,60 @@ msgid "All desktops"
 msgstr "সর্বপ্রকার ডেস্কটপ"
 
 #: openbox/client_menu.c:363
-msgid "&Layer"
-msgstr "স্তর (&L)"
+msgid "_Layer"
+msgstr "স্তর (_L)"
 
 #: openbox/client_menu.c:368
-msgid "Always on &top"
-msgstr "সর্বদা উপরে (&t)"
+msgid "Always on _top"
+msgstr "সর্বদা উপরে (_t)"
 
 #: openbox/client_menu.c:369
-msgid "&Normal"
-msgstr "স্বাভাবিক (&N)"
+msgid "_Normal"
+msgstr "স্বাভাবিক (_N)"
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
-msgstr "সর্বদা নীচে (&b)"
+msgid "Always on _bottom"
+msgstr "সর্বদা নীচে (_b)"
 
 #: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr "ডেস্কটপে পাঠানো হবে (&S)"
+msgid "_Send to desktop"
+msgstr "ডেস্কটপে পাঠানো হবে (_S)"
 
 #: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "ক্লায়েন্ট মেনু"
 
 #: openbox/client_menu.c:383
-msgid "R&estore"
-msgstr "পুনরুদ্ধার (&e)"
+msgid "R_estore"
+msgstr "পুনরুদ্ধার (_e)"
 
 #: openbox/client_menu.c:391
-msgid "&Move"
-msgstr "স্থানান্তরণ (&M)"
+msgid "_Move"
+msgstr "স্থানান্তরণ (_M)"
 
 #: openbox/client_menu.c:393
-msgid "Resi&ze"
-msgstr "মাপ পরিবর্তন (&z)"
+msgid "Resi_ze"
+msgstr "মাপ পরিবর্তন (_z)"
 
 #: openbox/client_menu.c:395
-msgid "Ico&nify"
-msgstr "আইকন রূপে প্রদর্শন (&n)"
+msgid "Ico_nify"
+msgstr "আইকন রূপে প্রদর্শন (_n)"
 
 #: openbox/client_menu.c:403
-msgid "Ma&ximize"
-msgstr "বড় করুন (&x)"
+msgid "Ma_ximize"
+msgstr "বড় করুন (_x)"
 
 #: openbox/client_menu.c:411
-msgid "&Roll up/down"
-msgstr "উপরে/নীচে গুটিয়ে নিন (&R)"
+msgid "_Roll up/down"
+msgstr "উপরে/নীচে গুটিয়ে নিন (_R)"
 
 #: openbox/client_menu.c:413
-msgid "Un/&Decorate"
-msgstr "বিন্যাস পরিবর্তন (&D)"
+msgid "Un/_Decorate"
+msgstr "বিন্যাস পরিবর্তন (_D)"
 
 #: openbox/client_menu.c:423
-msgid "&Close"
-msgstr "বন্ধ করুন (&C)"
+msgid "_Close"
+msgstr "বন্ধ করুন (_C)"
 
 #: openbox/config.c:716
 #, c-format

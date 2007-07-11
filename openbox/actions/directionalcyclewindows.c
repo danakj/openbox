@@ -65,11 +65,11 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             o->direction = OB_DIRECTION_EAST;
         else if (!g_ascii_strcasecmp(s, "south") ||
                  !g_ascii_strcasecmp(s, "down"))
-            o->direction = OB_DIRECTION_NORTH;
+            o->direction = OB_DIRECTION_SOUTH;
         else if (!g_ascii_strcasecmp(s, "southwest"))
-            o->direction = OB_DIRECTION_NORTHWEST;
+            o->direction = OB_DIRECTION_SOUTHWEST;
         else if (!g_ascii_strcasecmp(s, "southeast"))
-            o->direction = OB_DIRECTION_NORTHEAST;
+            o->direction = OB_DIRECTION_SOUTHEAST;
         g_free(s);
     }
 

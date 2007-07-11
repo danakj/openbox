@@ -259,9 +259,10 @@ void actions_run_acts(GSList *acts,
 
         /* fire the action's run function with this data */
         if (ok) {
-            if (!act->def->run(&data, act->options))
-                actions_interactive_end_act();
-            else {
+            if (!act->def->run(&data, act->options)) {
+                if (actions_act_is_interactive(act))
+                    actions_interactive_end_act();
+            } else {
                 /* make sure its interactive if it returned TRUE */
                 g_assert(act->def->i_cancel && act->def->i_input);
 

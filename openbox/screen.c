@@ -1195,6 +1195,15 @@ typedef struct {
     sl = g_slist_prepend(sl, ss); \
 }
 
+#define VALIDATE_STRUTS(sl, side, max) \
+{ \
+    GSList *it; \
+    for (it = sl; it; it = g_slist_next(it)) { \
+      ObScreenStrut *ss = it->data; \
+      ss->strut->side = MIN(max, ss->strut->side); \
+    } \
+}
+
 void screen_update_areas()
 {
     guint i, j;
@@ -1202,10 +1211,18 @@ void screen_update_areas()
     GList *it;
     GSList *sit;
 
-    ob_debug("updating screen areas\n");
-
     g_free(monitor_area);
     extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
+
+    /* set up the user-specified margins */
+    config_margins.top_start = RECT_LEFT(monitor_area[screen_num_monitors]);
+    config_margins.top_end = RECT_RIGHT(monitor_area[screen_num_monitors]);
+    config_margins.bottom_start = RECT_LEFT(monitor_area[screen_num_monitors]);
+    config_margins.bottom_end = RECT_RIGHT(monitor_area[screen_num_monitors]);
+    config_margins.left_start = RECT_TOP(monitor_area[screen_num_monitors]);
+    config_margins.left_end = RECT_BOTTOM(monitor_area[screen_num_monitors]);
+    config_margins.right_start = RECT_TOP(monitor_area[screen_num_monitors]);
+    config_margins.right_end = RECT_BOTTOM(monitor_area[screen_num_monitors]);
 
     dims = g_new(gulong, 4 * screen_num_desktops * screen_num_monitors);
 
@@ -1234,6 +1251,24 @@ void screen_update_areas()
         ADD_STRUT_TO_LIST(struts_right, DESKTOP_ALL, &dock_strut);
     if (dock_strut.bottom)
         ADD_STRUT_TO_LIST(struts_bottom, DESKTOP_ALL, &dock_strut);
+
+    if (config_margins.left)
+        ADD_STRUT_TO_LIST(struts_left, DESKTOP_ALL, &config_margins);
+    if (config_margins.top)
+        ADD_STRUT_TO_LIST(struts_top, DESKTOP_ALL, &config_margins);
+    if (config_margins.right)
+        ADD_STRUT_TO_LIST(struts_right, DESKTOP_ALL, &config_margins);
+    if (config_margins.bottom)
+        ADD_STRUT_TO_LIST(struts_bottom, DESKTOP_ALL, &config_margins);
+
+    VALIDATE_STRUTS(struts_left, left,
+                    monitor_area[screen_num_monitors].width / 2);
+    VALIDATE_STRUTS(struts_right, right,
+                    monitor_area[screen_num_monitors].width / 2);
+    VALIDATE_STRUTS(struts_top, top,
+                    monitor_area[screen_num_monitors].height / 2);
+    VALIDATE_STRUTS(struts_bottom, bottom,
+                    monitor_area[screen_num_monitors].height / 2);
 
     /* set up the work areas to be full screen */
     for (i = 0; i < screen_num_monitors; ++i)

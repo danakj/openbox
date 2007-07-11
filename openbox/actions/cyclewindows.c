@@ -44,6 +44,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     o = g_new0(Options, 1);
     o->dialog = TRUE;
+    o->forward = TRUE;
 
     if ((n = parse_find_node("forward", node)))
         o->forward = parse_bool(doc, n);

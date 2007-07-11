@@ -249,11 +249,12 @@ void actions_run_acts(GSList *acts,
         actions_setup_data(&data, uact, state, x, y, button, con, client);
 
         if (!interactive_act || interactive_act->def != act->def) {
-            /* cancel the old one */
-            if (interactive_act)
-                actions_interactive_cancel_act();
-            if (actions_act_is_interactive(act))
+            if (actions_act_is_interactive(act)) {
+                /* cancel the old one */
+                if (interactive_act)
+                    actions_interactive_cancel_act();
                 ok = actions_interactive_begin_act(act, state);
+            }
         }
 
         /* fire the action's run function with this data */

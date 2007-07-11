@@ -16,6 +16,8 @@ typedef struct {
     gboolean maxfull_off;
     gboolean iconic_on;
     gboolean iconic_off;
+    gboolean focused;
+    gboolean unfocused;
     GSList *thenacts;
     GSList *elseacts;
 } Options;
@@ -70,6 +72,12 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         else
             o->iconic_off = TRUE;
     }
+    if ((n = parse_find_node("focused", node))) {
+        if (parse_bool(doc, n))
+            o->focused = TRUE;
+        else
+            o->unfocused = TRUE;
+    }
 
     if ((n = parse_find_node("then", node))) {
         xmlNodePtr m;
@@ -118,7 +126,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         (!o->maxvert_on || (c && c->max_vert)) &&
         (!o->maxvert_off || (c && !c->max_vert)) &&
         (!o->maxfull_on || (c && c->max_vert && c->max_horz)) &&
-        (!o->maxfull_off || (c && !(c->max_vert && c->max_horz))))
+        (!o->maxfull_off || (c && !(c->max_vert && c->max_horz))) &&
+        (!o->focused || (c && !(c == focus_client))) &&
+        (!o->unfocused || (c && !(c != focus_client))))
     {
         acts = o->thenacts;
     }

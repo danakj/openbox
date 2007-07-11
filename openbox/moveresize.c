@@ -753,7 +753,6 @@ gboolean moveresize_event(XEvent *e)
 
             dw -= cur_w - start_cw;
             dh -= cur_h - start_ch;
-            ob_debug("dw %d\n", dw);
 
             calc_resize(FALSE, 0, &dw, &dh, lockcorner);
             cur_w += dw;

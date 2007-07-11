@@ -3957,7 +3957,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
         case OB_DIRECTION_WEST:
             if (my_head <= head + 1)
                 skip_head = TRUE;
-            if (my_head + my_size - 1 <= tail + 1)
+            if (my_head + my_size - 1 <= tail)
                 skip_tail = TRUE;
             if (head < *dest)
                 skip_head = TRUE;
@@ -3968,7 +3968,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
         case OB_DIRECTION_EAST:
             if (my_head >= head - 1)
                 skip_head = TRUE;
-            if (my_head - my_size + 1 >= tail - 1)
+            if (my_head - my_size + 1 >= tail)
                 skip_tail = TRUE;
             if (head > *dest)
                 skip_head = TRUE;
@@ -4065,36 +4065,36 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
                                     gboolean grow,
                                     gint *x, gint *y, gint *w, gint *h)
 {
-    gint head, size;
+    gint head;
     gint e, e_start, e_size, delta;
     gboolean near;
     ObDirection dir;
 
     switch (side) {
     case OB_DIRECTION_EAST:
-        head = RECT_RIGHT(self->frame->area) + (self->size_inc.width - 1);
-        size = self->frame->area.width;
+        head = RECT_RIGHT(self->frame->area) +
+            (self->size_inc.width - 1) * (grow ? 1 : -1);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
-        head = RECT_LEFT(self->frame->area) - (self->size_inc.width - 1);
-        size = self->frame->area.width;
+        head = RECT_LEFT(self->frame->area) -
+            (self->size_inc.width - 1) * (grow ? 1 : -1);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
-        head = RECT_TOP(self->frame->area) - (self->size_inc.height - 1);
-        size = self->frame->area.height;
+        head = RECT_TOP(self->frame->area) -
+            (self->size_inc.height - 1) * (grow ? 1 : -1);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
-        head = RECT_BOTTOM(self->frame->area) + (self->size_inc.height - 1);
-        size = self->frame->area.height;
+        head = RECT_BOTTOM(self->frame->area) +
+            (self->size_inc.height - 1) * (grow ? 1 : -1);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;
@@ -4103,32 +4103,34 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
         g_assert_not_reached();
     }
 
-    client_find_edge_directional(self, dir, head, size,
+    ob_debug("head %d dir %d\n", head, dir);
+    client_find_edge_directional(self, dir, head, 1,
                                  e_start, e_size, &e, &near);
+    ob_debug("edge %d\n", e);
     *x = self->frame->area.x;
     *y = self->frame->area.y;
     *w = self->frame->area.width;
     *h = self->frame->area.height;
     switch (side) {
     case OB_DIRECTION_EAST:
-        if (near) --e;
+        if (grow == near) --e;
         delta = e - RECT_RIGHT(self->frame->area);
         *w += delta;
         break;
     case OB_DIRECTION_WEST:
-        if (near) ++e;
+        if (grow == near) ++e;
         delta = RECT_LEFT(self->frame->area) - e;
         *x -= delta;
         *w += delta;
         break;
     case OB_DIRECTION_NORTH:
-        if (near) ++e;
+        if (grow == near) ++e;
         delta = RECT_TOP(self->frame->area) - e;
         *y -= delta;
         *h += delta;
         break;
     case OB_DIRECTION_SOUTH:
-        if (near) --e;
+        if (grow == near) --e;
         delta = e - RECT_BOTTOM(self->frame->area);
         *h += delta;
         break;

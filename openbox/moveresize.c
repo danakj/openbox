@@ -167,14 +167,14 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     moveresize_client = c;
     start_cx = c->area.x;
     start_cy = c->area.y;
+    start_cw = c->area.width;
+    start_ch = c->area.height;
     /* these adjustments for the size_inc make resizing a terminal more
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
        either way instead of a full increment one and 1 px the other. */
-    start_cw = c->area.width + c->size_inc.width / 2;
-    start_ch = c->area.height + c->size_inc.height / 2;
-    start_x = x;
-    start_y = y;
+    start_x = x - c->size_inc.width / 2;
+    start_y = y - c->size_inc.height / 2;
     corner = cnr;
     button = b;
     key_resize_edge = -1;

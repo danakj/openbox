@@ -716,7 +716,7 @@ gboolean moveresize_event(XEvent *e)
                 lockcorner = OB_CORNER_BOTTOMRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_top) {
                 dw = 0;
-                dh = (e->xmotion.y_root - start_y);
+                dh = -(e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_BOTTOMRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_topright) {
                 dw = (e->xmotion.x_root - start_x);

@@ -167,7 +167,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         RrPaint(a_focus_indicator, focus_indicator.top.win,
                 w, h);
 
-        x = c->area.x;
+        x = c->frame->area.x;
         y = c->frame->area.y;
         w = wl;
         h = c->frame->area.height;

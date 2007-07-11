@@ -493,15 +493,6 @@ nodist_man_MANS = \
 	doc/openbox-kde-session.1
 
 EXTRA_DIST = \
-	debian/changelog.in \
-	debian/compat \
-	debian/conffiles \
-	debian/control \
-	debian/copyright \
-	debian/menu \
-	debian/postinst \
-	debian/postrm \
-	debian/rules \
 	config.rpath \
 	mkinstalldirs
 

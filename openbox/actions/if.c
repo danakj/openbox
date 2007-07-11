@@ -128,8 +128,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         (!o->maxvert_off || (c && !c->max_vert)) &&
         (!o->maxfull_on || (c && c->max_vert && c->max_horz)) &&
         (!o->maxfull_off || (c && !(c->max_vert && c->max_horz))) &&
-        (!o->focused || (c && !(c == focus_client))) &&
-        (!o->unfocused || (c && !(c != focus_client))))
+        (!o->focused || (c && (c == focus_client))) &&
+        (!o->unfocused || (c && !(c == focus_client))))
     {
         acts = o->thenacts;
     }

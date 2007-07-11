@@ -492,7 +492,8 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
             ObClient *c = it->data;
             if (found && !c->iconic &&
                 (c->desktop == DESKTOP_ALL || client->desktop == DESKTOP_ALL ||
-                 c->desktop == client->desktop))
+                 c->desktop == client->desktop) &&
+                !client_search_transient(client, c))
             {
                 if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
                 {
@@ -534,7 +535,8 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
             ObClient *c = it->data;
             if (found && !c->iconic &&
                 (c->desktop == DESKTOP_ALL || client->desktop == DESKTOP_ALL ||
-                 c->desktop == client->desktop))
+                 c->desktop == client->desktop) &&
+                !client_search_transient(c, client))
             {
                 if (RECT_INTERSECTS_RECT(c->frame->area, client->frame->area))
                 {

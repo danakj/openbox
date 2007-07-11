@@ -183,8 +183,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions/menu.c \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \
-	openbox/actions/moveto.c \
-	openbox/actions/movetofromedge.c \
+	openbox/actions/moveresizeto.c \
+	openbox/actions/movetoedge.c \
 	openbox/actions/omnipresent.c \
 	openbox/actions/raise.c \
 	openbox/actions/raiselower.c \

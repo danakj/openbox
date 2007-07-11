@@ -74,14 +74,14 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
 
-    actions_client_move(data, FALSE);
+    actions_client_move(data, TRUE);
 
     if (o->add)
         screen_add_desktop(o->current);
     else
         screen_remove_desktop(o->current);
 
-    actions_client_move(data, TRUE);
+    actions_client_move(data, FALSE);
 
     return FALSE;
 }

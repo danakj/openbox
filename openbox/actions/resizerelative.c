@@ -76,9 +76,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         yoff = yoff == 0 ? 0 :
             (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
 
-        actions_client_move(data, FALSE);
-        client_move_resize(c, x + xoff, y + yoff, nw, nh);
         actions_client_move(data, TRUE);
+        client_move_resize(c, x + xoff, y + yoff, nw, nh);
+        actions_client_move(data, FALSE);
     }
 
     return FALSE;

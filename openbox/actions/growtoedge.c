@@ -75,9 +75,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                 w != data->client->area.width ||
                 h != data->client->area.height)
             {
-                actions_client_move(data, FALSE);
-                client_move_resize(data->client, x, y, w, h);
                 actions_client_move(data, TRUE);
+                client_move_resize(data->client, x, y, w, h);
+                actions_client_move(data, FALSE);
             }
         }
     }

@@ -3,6 +3,7 @@
 #include "openbox/client.h"
 #include "openbox/frame.h"
 #include "openbox/screen.h"
+#include "openbox/focus.h"
 #include <glib.h>
 
 typedef struct {

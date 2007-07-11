@@ -29,6 +29,23 @@ void action_moveresizeto_startup()
                      NULL, NULL);
 }
 
+static void parse_coord(xmlDocPtr doc, xmlNodePtr n, gint *pos,
+                        gboolean *opposite, gboolean *center)
+{
+    gchar *s = parse_string(doc, n);
+    if (!g_ascii_strcasecmp(s, "center"))
+        *center = TRUE;
+    else {
+        if (s[0] == '-')
+            *opposite = TRUE;
+        if (s[0] == '-' || s[0] == '+')
+            *pos = atoi(s+1);
+        else
+            *pos = atoi(s);
+    }
+    g_free(s);
+}
+
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 {
     xmlNodePtr n;
@@ -41,35 +58,11 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o->h = G_MININT;
     o->monitor = -1;
 
-    if ((n = parse_find_node("x", node))) {
-        gchar *s = parse_string(doc, n);
-        if (!g_ascii_strcasecmp(s, "center"))
-            o->xcenter = TRUE;
-        else {
-            if (s[0] == '-')
-                o->xopposite = TRUE;
-            if (s[0] == '-' || s[0] == '+')
-                o->x = atoi(s+1);
-            else
-                o->x = atoi(s);
-        }
-        g_free(s);
-    }
+    if ((n = parse_find_node("x", node)))
+        parse_coord(doc, n, &o->x, &o->xopposite, &o->xcenter);
 
-    if ((n = parse_find_node("y", node))) {
-        gchar *s = parse_string(doc, n);
-        if (!g_ascii_strcasecmp(s, "center"))
-            o->ycenter = TRUE;
-        else {
-            if (s[0] == '-')
-                o->yopposite = TRUE;
-            if (s[0] == '-' || s[0] == '+')
-                o->y = atoi(s+1);
-            else
-                o->y = atoi(s);
-        }
-        g_free(s);
-    }
+    if ((n = parse_find_node("y", node)))
+        parse_coord(doc, n, &o->y, &o->yopposite, &o->ycenter);
 
     if ((n = parse_find_node("width", node)))
         o->w = parse_int(doc, n) - 1;

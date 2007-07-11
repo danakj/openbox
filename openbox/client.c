@@ -1356,7 +1356,8 @@ static void client_update_transient_tree(ObClient *self,
 
     /** If we change our group transient-ness, our children change their
         effect group transient-ness, which affects how they relate to other
-        group windows */
+        group windows **/
+
     for (it = self->transients; it; it = g_slist_next(it)) {
         c = it->data;
         if (!c->transient_for_group)

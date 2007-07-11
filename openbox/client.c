@@ -1280,88 +1280,45 @@ static void client_update_transient_tree(ObClient *self,
         oldgtran == newgtran &&
         oldparent == newparent) return;
 
-    /** Remove the client from the transient tree wherever it has changed **/
+    /** Remove the client from the transient tree **/
 
-    /* If the window is becoming a direct transient for a window in its group
-       then any group transients which were our children and are now becoming
-       our parents need to stop being our children.
-
-       Group transients can't be children of group transients already, but
-       we could have any number of direct parents above up, any of which could
-       be transient for the group, and we need to remove it from our children.
-    */
-    if (!oldgtran && oldparent != newparent && newparent != NULL &&
-        newgroup != NULL && newgroup == oldgroup &&
-        client_normal(newparent))
-    {
-        ObClient *look = client_search_top_direct_parent(newparent);
-        self->transients = g_slist_remove(self->transients, look);
-        look->parents = g_slist_remove(look->parents, self);
+    for (it = self->transients; it; it = next) {
+        next = g_slist_next(it);
+        c = it->data;
+        self->transients = g_slist_delete_link(self->transients, it);
+        c->parents = g_slist_remove(c->parents, self);
     }
-            
+    for (it = self->parents; it; it = next) {
+        next = g_slist_next(it);
+        c = it->data;
+        self->parents = g_slist_delete_link(self->parents, it);
+        c->transients = g_slist_remove(c->transients, self);
+    }
 
-    /* If the group changed, or if we are just becoming transient for the
-       group, then we need to remove any old group transient windows
-       from our children. But if we were already transient for the group, then
-       other group transients are not our children. */
-    if ((oldgroup != newgroup || (newgtran && oldgtran != newgtran)) &&
-        oldgroup != NULL && !oldgtran)
-    {
-        for (it = self->transients; it; it = next) {
-            next = g_slist_next(it);
+    /** Re-add the client to the transient tree **/
+
+    /* If we're transient for a group then we need to add ourselves to all our
+       parents */
+    if (newgtran) {
+        for (it = newgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
-            if (c->group == oldgroup && client_normal(self)) {
-                self->transients = g_slist_delete_link(self->transients, it);
-                c->parents = g_slist_remove(c->parents, self);
-            }
-        }
-    }
-
-    /* If we used to be transient for a group and now we are not, or we're
-       transient for a new group, then we need to remove ourselves from all
-       our ex-parents */
-    if (oldgtran && (oldgroup != newgroup || oldgtran != newgtran))
-    {
-        for (it = self->parents; it; it = next) {
-            next = g_slist_next(it);
-            c = it->data;
-            if (!c->transient_for_group && client_normal(c)) {
-                c->transients = g_slist_remove(c->transients, self);
-                self->parents = g_slist_delete_link(self->parents, it);
-            }
-        }
-    }
-    /* If we used to be transient for a single window and we are no longer
-       transient for it, then we need to remove ourself from its children */
-    else if (oldparent && oldparent != newparent &&
-             client_normal(oldparent))
-    {
-        oldparent->transients = g_slist_remove(oldparent->transients, self);
-        self->parents = g_slist_remove(self->parents, oldparent);
-    }
-
-    /** Re-add the client to the transient tree wherever it has changed **/
-
-    /* If we're now transient for a group and we weren't transient for it
-       before then we need to add ourselves to all our new parents */
-    if (newgtran && (oldgroup != newgroup || oldgtran != newgtran))
-    {
-        for (it = oldgroup->members; it; it = g_slist_next(it)) {
-            c = it->data;
-            if (c != self && !c->transient_for_group && client_normal(c))
+            if (c != self &&
+                !client_search_top_direct_parent(c)->transient_for_group &&
+                client_normal(c))
             {
                 c->transients = g_slist_prepend(c->transients, self);
                 self->parents = g_slist_prepend(self->parents, c);
             }
         }
     }
-    /* If we are now transient for a single window which we weren't before,
-       we need to add ourselves to its children
+
+    /* If we are now transient for a single window we need to add ourselves to
+       its children
 
        WARNING: Cyclical transient ness is possible if two windows are
        transient for eachother.
     */
-    else if (newparent && newparent != oldparent &&
+    else if (newparent &&
              /* don't make ourself its child if it is already our child */
              !client_is_direct_child(self, newparent) &&
              client_normal(newparent))
@@ -1370,9 +1327,8 @@ static void client_update_transient_tree(ObClient *self,
         self->parents = g_slist_prepend(self->parents, newparent);
     }
 
-    /* If the group changed then we need to add any new group transient
-       windows to our children. But if we're transient for the group, then
-       other group transients are not our children.
+    /* Add any group transient windows to our children. But if we're transient
+       for the group, then other group transients are not our children.
 
        WARNING: Cyclical transient-ness is possible. For e.g. if:
        A is transient for the group
@@ -1380,7 +1336,9 @@ static void client_update_transient_tree(ObClient *self,
        C is transient for B
        A can't be transient for C or we have a cycle
     */
-    if (oldgroup != newgroup && newgroup != NULL && !newgtran &&
+    if (!newgtran &&
+        (!newparent ||
+         !client_search_top_direct_parent(newparent)->transient_for_group) &&
         client_normal(self))
     {
         for (it = newgroup->members; it; it = g_slist_next(it)) {
@@ -1393,6 +1351,20 @@ static void client_update_transient_tree(ObClient *self,
                 c->parents = g_slist_prepend(c->parents, self);
             }
         }
+    }
+
+    /** If we change our group transient-ness, our children change their
+        effect group transient-ness, which affects how they relate to other
+        group windows **/
+
+    for (it = self->transients; it; it = g_slist_next(it)) {
+        c = it->data;
+        if (!c->transient_for_group)
+            client_update_transient_tree(c, c->group, c->group,
+                                         c->transient_for_group,
+                                         c->transient_for_group,
+                                         client_direct_parent(c),
+                                         client_direct_parent(c));
     }
 }
 

@@ -23,7 +23,7 @@ void action_all_startup()
     action_maximize_startup();
     action_maximizehorizontal_startup();
     action_maximizevertical_startup();
-    action_moveto_startup();
+    action_moveresizeto_startup();
     action_moverelative_startup();
     action_shade_startup();
     action_kill_startup();
@@ -38,7 +38,7 @@ void action_all_startup()
     action_addremovedesktop_startup();
     action_dockautohide_startup();
     action_layer_startup();
-    action_movetofromedge_startup();
+    action_movetoedge_startup();
     action_growtoedge_startup();
     action_if_startup();
 }

@@ -13,7 +13,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_movetofromedge_startup()
+void action_movetoedge_startup()
 {
     actions_register("MoveToEdge",
                      setup_func,

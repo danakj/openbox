@@ -39,11 +39,6 @@
 #ifdef    SYNC
 #include <X11/extensions/sync.h>
 #endif
-#ifdef    USE_XCOMPOSITE
-#include <X11/extensions/Xcomposite.h>
-#include <X11/extensions/Xdamage.h>
-#include <X11/extensions/Xrender.h>
-#endif
 
 #include <glib.h>
 
@@ -72,13 +67,8 @@ extern gboolean extensions_sync;
 /*! Base for events for the Sync extension */
 extern gint extensions_sync_event_basep;
 
-/*! Does the display have the Composite extension? */
-extern gboolean extensions_comp;
-/*! Base for events for the Composite extension */
-extern gint extensions_comp_event_basep;
-
 void extensions_query_all();
 
 void extensions_xinerama_screens(Rect **areas, guint *nxin);
-
+  
 #endif

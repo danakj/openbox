@@ -626,8 +626,6 @@ void client_get_type_and_transientness(ObClient *self);
 
 const ObClientIcon *client_icon(ObClient *self, gint w, gint h);
 
-ObClientIcon *client_thumbnail(ObClient *self, gint w, gint h);
-
 /*! Return TRUE if the client is transient for some other window. Return
   FALSE if it's not transient or there is no window for it to be
   transient for */
@@ -708,7 +706,5 @@ guint client_monitor(ObClient *self);
 ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
-
-void clienticon_free(ObClientIcon *ci);
 
 #endif

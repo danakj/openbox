@@ -78,10 +78,6 @@ struct _ObFrame
 
     Window    window;
 
-    Pixmap    pixmap;    /* Offscreen buffer of the frame window's contents
-                            when Composite is enabled */
-    gboolean  has_alpha;
-
     Strut     size;
     Rect      area;
     gboolean  visible;
@@ -209,6 +205,7 @@ void frame_free(ObFrame *self);
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);
 void frame_adjust_theme(ObFrame *self);
+void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);
 void frame_adjust_client_area(ObFrame *self);

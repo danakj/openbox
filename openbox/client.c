@@ -4175,30 +4175,3 @@ gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
 }
-
-ObClientIcon *client_thumbnail(ObClient *self, gint wantw, gint wanth)
-{
-    ObClientIcon *ret;
-    RrPixel32 *data;
-    gint w, h;
-
-    if (!self->frame->pixmap) return NULL;
-    if (!RrPixmapToRGBA(ob_rr_inst, self->frame->pixmap, None, &w, &h, &data))
-        return NULL;
-
-    /* resize the thumbnail (within aspect ratio) to the given sizes */
-
-    ret = g_new(ObClientIcon, 1);
-    ret->data = data;
-    ret->width = w;
-    ret->height = h;
-    return ret;
-}
-
-void clienticon_free(ObClientIcon *ci)
-{
-    if (ci) {
-        g_free(ci->data);
-        g_free(ci);
-    }
-}

@@ -35,7 +35,6 @@
 #include "focus_cycle_indicator.h"
 #include "focus_cycle_popup.h"
 #include "moveresize.h"
-#include "composite.h"
 #include "frame.h"
 #include "keyboard.h"
 #include "mouse.h"
@@ -301,7 +300,6 @@ gint main(gint argc, gchar **argv)
             window_startup(reconfigure);
             sn_startup(reconfigure);
             screen_startup(reconfigure);
-            composite_startup(reconfigure);
             grab_startup(reconfigure);
             propwin_startup(reconfigure);
             group_startup(reconfigure);
@@ -367,7 +365,6 @@ gint main(gint argc, gchar **argv)
             group_shutdown(reconfigure);
             propwin_shutdown(reconfigure);
             grab_shutdown(reconfigure);
-            composite_shutdown(reconfigure);
             screen_shutdown(reconfigure);
             focus_cycle_popup_shutdown(reconfigure);
             focus_cycle_indicator_shutdown(reconfigure);

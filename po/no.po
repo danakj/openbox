@@ -5,9 +5,9 @@
 # Michael Kjelbergvik Thung <postlogic@switch-case.org>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.4.2\n"
+"Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 12:58+0200\n"
+"POT-Creation-Date: 2007-06-07 14:18+0200\n"
 "PO-Revision-Date: 2007-05-20 18:41+0200\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@switch-case.org>\n"
 "Language-Team: None\n"
@@ -15,186 +15,184 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions/execute.c:86
+#: openbox/action.c:957
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr "Feil ved konvertering av '%s' fra utf8 "
+msgid "Invalid action '%s' requested. No such action exists."
+msgstr "Ugyldig operasjon '%s' etterspurt. Operasjonen finnes ikke."
 
-#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#: openbox/action.c:960
+#, c-format
+msgid "Invalid use of action '%s'. Action will be ignored."
+msgstr "Ugyldig bruk av aksjonen '%s'. Aksjonen vil bli ignorert."
+
+#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Kunne ikke kjøre '%s': %s"
 
-#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
+#: openbox/action.c:1266
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr "Feil ved konvertering av '%s' fra utf8 "
+
+#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
 msgid "Go there..."
 msgstr "Gå dit..."
 
-#: openbox/client_list_combined_menu.c:98
-msgid "Manage desktops"
-msgstr ""
-
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
-msgid "_Add new desktop"
-msgstr ""
-
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
-msgid "_Remove last desktop"
-msgstr ""
-
-#: openbox/client_list_combined_menu.c:146
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "Vinduer"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:196
 msgid "Desktops"
 msgstr "Skrivebord"
 
-#: openbox/client_menu.c:256
+#: openbox/client_menu.c:258
 msgid "All desktops"
 msgstr "Alle skrivebord"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:363
 msgid "_Layer"
 msgstr "La_g"
 
-#: openbox/client_menu.c:365
+#: openbox/client_menu.c:368
 msgid "Always on _top"
 msgstr "Alltid ø_verst"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:369
 msgid "_Normal"
 msgstr "Nor_mal"
 
-#: openbox/client_menu.c:367
+#: openbox/client_menu.c:370
 msgid "Always on _bottom"
 msgstr "Alltid _nederst"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:373
 msgid "_Send to desktop"
 msgstr "_Send til"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:377
 msgid "Client menu"
 msgstr "Klient-meny"
 
-#: openbox/client_menu.c:380
+#: openbox/client_menu.c:383
 msgid "R_estore"
 msgstr "Tilbak_estill"
 
-#: openbox/client_menu.c:388
+#: openbox/client_menu.c:391
 msgid "_Move"
 msgstr "_Flytt"
 
-#: openbox/client_menu.c:390
+#: openbox/client_menu.c:393
 msgid "Resi_ze"
 msgstr "Endre s_tørrelse"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:395
 msgid "Ico_nify"
 msgstr "_Minimer"
 
-#: openbox/client_menu.c:400
+#: openbox/client_menu.c:403
 msgid "Ma_ximize"
 msgstr "Ma_ximer"
 
-#: openbox/client_menu.c:408
+#: openbox/client_menu.c:411
 msgid "_Roll up/down"
 msgstr "_Rull opp/ned"
 
-#: openbox/client_menu.c:410
+#: openbox/client_menu.c:413
 msgid "Un/_Decorate"
 msgstr "Fjern/Legg til _dekorasjon"
 
-#: openbox/client_menu.c:420
+#: openbox/client_menu.c:423
 msgid "_Close"
 msgstr "_Lukk"
 
-#: openbox/config.c:737
+#: openbox/config.c:704
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ugyldig tast '%s' spesifisert i konfigurasjonsfilen"
 
-#: openbox/keyboard.c:156
+#: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt med hurtigtastbinding i konfigurasjonsfilen"
 
-#: openbox/menu.c:103 openbox/menu.c:111
+#: openbox/menu.c:100 openbox/menu.c:108
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Kan ikke finne en gyldig menyfil '%s'"
 
-#: openbox/menu.c:171
+#: openbox/menu.c:151
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Kunne ikke kjøre kommando for pipe-meny '%s': %s"
 
-#: openbox/menu.c:185
+#: openbox/menu.c:168
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Ugyldig utdata fra pipe-menyen '%s'"
 
-#: openbox/menu.c:198
+#: openbox/menu.c:181
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Forsøkte å åpne menyen '%s', men denne finnes ikke"
 
-#: openbox/menu.c:368 openbox/menu.c:369
+#: openbox/menu.c:342 openbox/menu.c:343
 msgid "More..."
 msgstr "Mer..."
 
-#: openbox/mouse.c:349
+#: openbox/mouse.c:338
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr "Ugyldig knapp '%s' i binding for mus"
 
-#: openbox/mouse.c:355
+#: openbox/mouse.c:344
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Ugyldig innhold '%s' i binding for mus"
 
-#: openbox/openbox.c:131
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Kan ikke endre til hjemmekatalogen '%s': %s"
 
-#: openbox/openbox.c:151
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Kunne ikke åpne displayet fra DISPLAY-miljøvariabelen"
 
-#: openbox/openbox.c:182
+#: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
 msgstr "Kunne ikke starte obrender-biblioteket."
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "X-serveren støtter ikke lokalisering."
 
-#: openbox/openbox.c:190
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Kan ikke stille inn lokaliseringsmodifikatorene for X-serveren."
 
-#: openbox/openbox.c:253
+#: openbox/openbox.c:249
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "Kunne ikke finne en gyldig konfigurasjonsfil, bruker standardverdier"
 
-#: openbox/openbox.c:279
+#: openbox/openbox.c:275
 msgid "Unable to load a theme."
 msgstr "Kan ikke laste et tema."
 
-#: openbox/openbox.c:408
+#: openbox/openbox.c:401
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Restart kunne ikke starte nytt program '%s': %s"
 
-#: openbox/openbox.c:478 openbox/openbox.c:480
+#: openbox/openbox.c:471 openbox/openbox.c:473
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:482
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [alternativer\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:483
 msgid ""
 "\n"
 "Options:\n"
@@ -202,23 +200,23 @@ msgstr ""
 "\n"
 "Alternativ:\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:484
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Vise denne hjelpeteksten og avslutt\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:485
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Vis versjonsnummeret og avslutt\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:486
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Erstatt den kjørende vindusbehandleren\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:487
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Deaktiver tilkobling til sesjonsbehandleren\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:488
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -226,15 +224,15 @@ msgstr ""
 "\n"
 "Sender beskjeder til en kjørende Openbox-instans:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:489
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Oppdater Openbox' konfigurasjon\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:490
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Start Openbox på nytt\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:491
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -242,23 +240,23 @@ msgstr ""
 "\n"
 "Debug-alternativ:\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:492
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Kjør i synkron-modus\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:493
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Vis debuggingsinformasjon\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:494
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Vis debuggingsinformasjon for fokus-håndtering\n"
 
-#: openbox/openbox.c:502
+#: openbox/openbox.c:495
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  -debug-xinerama    Splitt displayet for falske xinerama-skjermer\n"
 
-#: openbox/openbox.c:503
+#: openbox/openbox.c:496
 #, c-format
 msgid ""
 "\n"
@@ -267,27 +265,27 @@ msgstr ""
 "\n"
 "Vennligst rapporter bugs til %s\n"
 
-#: openbox/openbox.c:600
+#: openbox/openbox.c:593
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Ugyldig kommandolinje-argument '%s'\n"
 
-#: openbox/screen.c:95 openbox/screen.c:196
+#: openbox/screen.c:89 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "En vindusbehandler kjører allerede på skjerm %d"
 
-#: openbox/screen.c:132
+#: openbox/screen.c:126
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Kunne ikke hendte vindusbehandlerens markering på skjerm %d"
 
-#: openbox/screen.c:153
+#: openbox/screen.c:147
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Vindusbehandleren på skjerm %d vil ikke avslutte"
 
-#: openbox/screen.c:1077
+#: openbox/screen.c:991
 #, c-format
 msgid "desktop %i"
 msgstr "skrivebord %i"
@@ -336,9 +334,3 @@ msgstr "Ønsket tast '%s' eksisterer ikke i displayet"
 #, c-format
 msgid "X Error: %s"
 msgstr "Feil i X: %s"
-
-#~ msgid "Invalid action '%s' requested. No such action exists."
-#~ msgstr "Ugyldig operasjon '%s' etterspurt. Operasjonen finnes ikke."
-
-#~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "Ugyldig bruk av aksjonen '%s'. Aksjonen vil bli ignorert."

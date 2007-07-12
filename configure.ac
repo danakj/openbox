@@ -136,51 +136,6 @@ else
   xcursor_found=no
 fi
 
-AC_ARG_ENABLE(xcomposite,
-  AC_HELP_STRING(
-    [--disable-xcomposite],
-    [disable use of the X Composite library. [[default=enabled]]]
-  ),
-  [enable_xcomposite=$enableval],
-  [enable_xcomposite=yes]
-)
-
-if test "$enable_xcomposite" = yes; then
-PKG_CHECK_MODULES(XRENDER, [xrender],
-  [
-    AC_DEFINE(USE_XRENDER, [1], [Use X Render library])
-    AC_SUBST(XRENDER_CFLAGS)
-    AC_SUBST(XRENDER_LIBS)
-    PKG_CHECK_MODULES(XDAMAGE, [xdamage],
-      [
-        AC_DEFINE(USE_XDAMAGE, [1], [Use X Damage library])
-        AC_SUBST(XDAMAGE_CFLAGS)
-        AC_SUBST(XDAMAGE_LIBS)
-        PKG_CHECK_MODULES(XCOMPOSITE, [xcomposite],
-          [ 
-            AC_DEFINE(USE_XCOMPOSITE, [1], [Use X Composite library])	
-            AC_SUBST(XCOMPOSITE_CFLAGS)	   
-            AC_SUBST(XCOMPOSITE_LIBS)
-            xcomposite_found=yes
-          ],
-          [
-            xcomposite_found=no
-          ]
-        )
-      ],
-      [
-        xcomposite_found=no
-      ]
-    )
-  ],
-  [
-    xcomposite_found=no
-  ]
-)
-else
-  xcomposite_found=no
-fi
-
 dnl Check for session management
 X11_SM
 
@@ -215,7 +170,6 @@ AC_MSG_RESULT
 AC_MSG_RESULT([Compiling with these options:
                Startup Notification... $sn_found
                X Cursor Library... $xcursor_found
-               X Composite Library... $xcomposite_found
                Session Management... $SM
                ])
 AC_MSG_RESULT([configure complete, now type "make"])

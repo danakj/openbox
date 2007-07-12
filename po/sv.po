@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.4.3\n"
+"Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 12:58+0200\n"
+"POT-Creation-Date: 2007-07-05 16:00+0200\n"
 "PO-Revision-Date: 2007-05-22 00:29+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -109,7 +109,7 @@ msgstr "_Dekorationer"
 msgid "_Close"
 msgstr "Stän_g"
 
-#: openbox/config.c:737
+#: openbox/config.c:718
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ogiltig knapp '%s' angiven i konfigurationsfilen"
@@ -138,7 +138,7 @@ msgstr "Ogiltig utdata från pipe-menyn '%s'"
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Försökte öppna menyn '%s', men den finns inte"
 
-#: openbox/menu.c:368 openbox/menu.c:369
+#: openbox/menu.c:362 openbox/menu.c:363
 msgid "More..."
 msgstr "Mer..."
 

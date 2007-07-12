@@ -5,9 +5,9 @@
 # Runa Bhattacharjee <runabh@gmail.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4\n"
+"Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 03:20-0400\n"
+"POT-Creation-Date: 2007-07-12 12:58+0200\n"
 "PO-Revision-Date: 2007-06-01 19:02+0530\n"
 "Last-Translator: Runa Bhattacharjee <runabh@gmail.com>\n"
 "Language-Team: Bengali (India) <en@li.org>\n"
@@ -32,19 +32,16 @@ msgid "Go there..."
 msgstr "চিহ্নিত স্থানে চলুন..."
 
 #: openbox/client_list_combined_menu.c:98
-#, fuzzy
 msgid "Manage desktops"
-msgstr "সর্বপ্রকার ডেস্কটপ"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
-#, fuzzy
 msgid "_Add new desktop"
-msgstr "ডেস্কটপে পাঠানো হবে (_S)"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
-#, fuzzy
 msgid "_Remove last desktop"
-msgstr "ডেস্কটপে পাঠানো হবে (_S)"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"
@@ -157,49 +154,49 @@ msgstr "মাউস বাইন্ডিং সংক্রান্ত অব
 msgid "Invalid context '%s' in mouse binding"
 msgstr "মাউস বাইন্ডিং সংক্রান্ত অবৈধ কনটেক্সট '%s'"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:131
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "ব্যক্তিগত ডিরেক্টরি '%s'-তে পরিবর্তন করতে ব্যর্থ: %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:151
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "DISPLAY এনভাশরনমেন্ট ভেরিয়েবলের মান প্রয়োগ করে প্রদর্শন আরম্ভ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "obrender লাইব্রেরি আরম্ভ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "X server does not support locale."
 msgstr "X সার্ভার দ্বারা লোকেইল সমর্থিতত হয় না।"
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr "X সার্ভারের জন্য লোকেইল মডিফায়ার নির্ধারণ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "বৈধ কনফিগ ফাইল সনাক্ত করতে ব্যর্থ, কয়েকটি সাধারণ ডিফল্ট মান প্রয়োগ করা হবে।"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:279
 msgid "Unable to load a theme."
 msgstr "থিম লোড করতে ব্যর্থ।"
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:408
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "পুনরাম্ভের পরে নতুন এক্সেকিউটেবল '%s' সঞ্চালন করতে ব্যর্থ: %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:478 openbox/openbox.c:480
 msgid "Copyright (c)"
 msgstr "স্বত্বাধিকার (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:489
 msgid "Syntax: openbox [options]\n"
 msgstr "ব্যবহারপ্রণালী: openbox [বিকল্প]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:490
 msgid ""
 "\n"
 "Options:\n"
@@ -207,25 +204,25 @@ msgstr ""
 "\n"
 "বিবিধ বিকল্প:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:491
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              সহায়তা বার্তা প্রদর্শন করে প্রস্থান\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:492
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           সংস্করণ প্রদর্শন করে প্রস্থান\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:493
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           বর্তমানে চলমান উইন্ডো পরিচালন ব্যবস্থা পরিবর্তন করা হবে\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:494
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 "  --sm-disable        সেশান পরিচালন ব্যবস্থার সাথে সংযোগ নিষ্ক্রিয় করা হবে\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -233,15 +230,15 @@ msgstr ""
 "\n"
 "চলমান Openbox ইনস্ট্যান্সে বার্তা প্রেরণ:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:496
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox-র কনফিগারেশন পুনরায় লোড করে\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:497
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openbox পুনরারম্ভ\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:498
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -249,24 +246,24 @@ msgstr ""
 "\n"
 "ডিবাগ করার বিভিন্ন বিকল্প:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:499
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              সিঙ্ক্রোনাস মোডে সঞ্চালিত হবে\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:500
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             ডিবাগ-এর ফলাফল প্রদর্শন করে\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:501
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       ফোকাস হ্যান্ডলিং সংক্রান্ত ডিবাগের ফলাফল প্রদর্শন করে\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:502
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    প্রদর্শন ক্ষেত্রটি নকল xinerama পর্দায় ভাগ করা হবে\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:503
 #, c-format
 msgid ""
 "\n"
@@ -275,27 +272,27 @@ msgstr ""
 "\n"
 "অনুগ্রহ করে %s-এ বাগ সংক্রান্ত সূচনা দায়ের করুন\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:600
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "অবৈধ কমান্ড-লাইন আর্গুমেন্ট '%s'\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:95 openbox/screen.c:196
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "একটি উইন্ডো পরিচালন ব্যবস্থা বর্তমানে %d-এ চলছে"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:132
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "পর্দা %d-এ উইন্ডো পরিচালন ব্যবস্থার নির্বাচিত অংশ প্রাপ্ত করতে ব্যর্থ"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:153
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "পর্দা %d-র উপর চলমান উইন্ডো পরিচালন ব্যবস্থাটি বন্ধ করতে ব্যর্থ"
 
-#: openbox/screen.c:1073
+#: openbox/screen.c:1077
 #, c-format
 msgid "desktop %i"
 msgstr "desktop %i"

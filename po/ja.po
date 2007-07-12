@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4\n"
+"Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 03:20-0400\n"
+"POT-Creation-Date: 2007-07-12 12:58+0200\n"
 "PO-Revision-Date: 2007-06-07 14:49+0200\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -155,134 +155,134 @@ msgstr "マウス割り当てに於いて不正なボタン '%s'"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "マウス割り当てに於いて不正なコンテクスト '%s'"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:131
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "ホームディレクトリ'%s'に移動できません: %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:151
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "環境変数 DISPLAY からディスプレイを開くのに失敗しました。"
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "obrender ライブラリの初期化に失敗しました。"
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "X server does not support locale."
 msgstr "Xサーバはロケールをサポートしていません。"
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Xサーバの為のロケール修飾子を設定できません。"
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "正当な設定ファイルを見つけられません。単純な初期設定を使います。"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:279
 msgid "Unable to load a theme."
 msgstr "テーマを読み込めません。"
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:408
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "再起動の際新しい実行ファイル'%s'の実行に失敗しました: %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:478 openbox/openbox.c:480
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:489
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:490
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:491
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:492
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:493
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:491
-msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
-
-#: openbox/openbox.c:492
-msgid ""
-"\n"
-"Passing messages to a running Openbox instance:\n"
-msgstr ""
-
-#: openbox/openbox.c:493
-msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr ""
-
 #: openbox/openbox.c:494
-msgid "  --restart           Restart Openbox\n"
+msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
 #: openbox/openbox.c:495
 msgid ""
 "\n"
-"Debugging options:\n"
+"Passing messages to a running Openbox instance:\n"
 msgstr ""
 
 #: openbox/openbox.c:496
-msgid "  --sync              Run in synchronous mode\n"
+msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
 #: openbox/openbox.c:497
-msgid "  --debug             Display debugging output\n"
+msgid "  --restart           Restart Openbox\n"
 msgstr ""
 
 #: openbox/openbox.c:498
-msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgid ""
+"\n"
+"Debugging options:\n"
 msgstr ""
 
 #: openbox/openbox.c:499
-msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
 #: openbox/openbox.c:500
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:501
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+
+#: openbox/openbox.c:502
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+
+#: openbox/openbox.c:503
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:600
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "不正なコマンドライン引数 '%s'\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:95 openbox/screen.c:196
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "スクリーン%dでウィンドウマネージャが既に起動しています。"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:132
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "スクリーン%dでウィンドウマネージャの選択を取得できませんでした。"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:153
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "スクリーン%dのWMが終了しません。"
 
-#: openbox/screen.c:1073
+#: openbox/screen.c:1077
 #, c-format
 msgid "desktop %i"
 msgstr "デスクトップ%i"

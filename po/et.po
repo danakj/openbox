@@ -5,9 +5,9 @@
 # Andres Järv <andresjarv@gmail.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4\n"
+"Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 03:20-0400\n"
+"POT-Creation-Date: 2007-07-12 12:58+0200\n"
 "PO-Revision-Date: 2007-05-21 20:11+0300\n"
 "Last-Translator: Andres Järv <andresjarv@gmail.com>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -32,19 +32,16 @@ msgid "Go there..."
 msgstr "Mine sinna..."
 
 #: openbox/client_list_combined_menu.c:98
-#, fuzzy
 msgid "Manage desktops"
-msgstr "Kõik töölauad"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
-#, fuzzy
 msgid "_Add new desktop"
-msgstr "_Saada töölauale"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
-#, fuzzy
 msgid "_Remove last desktop"
-msgstr "_Saada töölauale"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"
@@ -157,51 +154,51 @@ msgstr "Vigane nupp '%s' hiire kiirklahvides"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Vigane kontekst '%s' hiire kiirklahvides"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:131
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Ei suudetud siseneda kodukataloogi '%s': %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:151
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "DISPLAY keskkonnamuutujas oleva ekraani avamine ebaõnnestus."
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "Obrender-damisteegi käivitamine ebaõnnestus."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "X server does not support locale."
 msgstr "X server ei toeta lokaati."
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Ei suudetud sättida lokaadimuutujaid X serveri jaoks."
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Ei suudetud leida kehtivat konfiguratsioonifaili, kasutatakse lihtsaid "
 "vaikimisi seadeid"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:279
 msgid "Unable to load a theme."
 msgstr "Ei suudetud laadida teemat."
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:408
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Taaskäivitusel ebaõnnestus uue käivitusfaili '%s' käivitamine: %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:478 openbox/openbox.c:480
 msgid "Copyright (c)"
 msgstr "Autoriõigused (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:489
 msgid "Syntax: openbox [options]\n"
 msgstr "Süntaks: openbox [seaded]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:490
 msgid ""
 "\n"
 "Options:\n"
@@ -209,23 +206,23 @@ msgstr ""
 "\n"
 "Seaded:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:491
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Selle abi kuvamine ja väljumine\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:492
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Versiooni kuvamine ja väljumine\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:493
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Hetkel töötava aknahalduri asendamine\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:494
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Seansihalduriga ühenduse keelamine\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -233,15 +230,15 @@ msgstr ""
 "\n"
 "Jooksvale Openboxi seansile sõnumite edastamine:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:496
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openboxi konfiguratsioon uuesti laadimine\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:497
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openboxi taaskäivitamine\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:498
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -249,23 +246,23 @@ msgstr ""
 "\n"
 "Silumise seaded:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:499
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Sünkroonselt jooksutamine\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:500
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Silumisväljundi kuvamine\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:501
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Fookusekäsitluse siluriväljundi kuvamine\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:502
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Ekraani võlts-Xinerama ekraanideks jagamine\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:503
 #, c-format
 msgid ""
 "\n"
@@ -274,27 +271,27 @@ msgstr ""
 "\n"
 "Palun teata vigadest siia %s\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:600
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Vigane käsurea argument '%s'\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:95 openbox/screen.c:196
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Ekraanil %d juba jookseb aknahaldur"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:132
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Ei suuda hankida aknahaldurite loetelu ekraanil %d"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:153
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Aknahaldur ekraanil %d ei sulgu"
 
-#: openbox/screen.c:1073
+#: openbox/screen.c:1077
 #, c-format
 msgid "desktop %i"
 msgstr "töölaud %i"

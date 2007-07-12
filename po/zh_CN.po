@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4\n"
+"Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-07 14:18+0200\n"
+"POT-Creation-Date: 2007-07-12 12:58+0200\n"
 "PO-Revision-Date: 2007-05-28 13:00+0800\n"
 "Last-Translator: Xiaoyu PENG <peng.xiaoyu@gmail.com>\n"
 "Language-Team: None\n"
@@ -15,184 +15,186 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:957
-#, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "请求的动作 '%s' 无效。该动作不存在。"
-
-#: openbox/action.c:960
-#, c-format
-msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr "使用的动作 '%s' 无效。动作将被忽略。"
-
-#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
-#, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "执行 '%s' 时失败: %s"
-
-#: openbox/action.c:1266
+#: openbox/actions/execute.c:86
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "从 utf8 转换路径 '%s' 时失败"
 
-#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
+#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "执行 '%s' 时失败: %s"
+
+#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "跳转到..."
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:98
+msgid "Manage desktops"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+msgid "_Add new desktop"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+msgid "_Remove last desktop"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:146
 msgid "Windows"
 msgstr "窗口"
 
-#: openbox/client_list_menu.c:196
+#: openbox/client_list_menu.c:199
 msgid "Desktops"
 msgstr "桌面"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:256
 msgid "All desktops"
 msgstr "所有桌面"
 
-#: openbox/client_menu.c:363
+#: openbox/client_menu.c:360
 msgid "_Layer"
 msgstr "层(_L)"
 
-#: openbox/client_menu.c:368
+#: openbox/client_menu.c:365
 msgid "Always on _top"
 msgstr "总在最上层(_T)"
 
-#: openbox/client_menu.c:369
+#: openbox/client_menu.c:366
 msgid "_Normal"
 msgstr "常规(_N)"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:367
 msgid "Always on _bottom"
 msgstr "总在最底层(_B)"
 
-#: openbox/client_menu.c:373
+#: openbox/client_menu.c:370
 msgid "_Send to desktop"
 msgstr "发送到桌面(_S)"
 
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:374
 msgid "Client menu"
 msgstr "客户端菜单"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:380
 msgid "R_estore"
 msgstr "还原(_E)"
 
-#: openbox/client_menu.c:391
+#: openbox/client_menu.c:388
 msgid "_Move"
 msgstr "移动(_M)"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:390
 msgid "Resi_ze"
 msgstr "调整大小(_Z)"
 
-#: openbox/client_menu.c:395
+#: openbox/client_menu.c:392
 msgid "Ico_nify"
 msgstr "最小化(_N)"
 
-#: openbox/client_menu.c:403
+#: openbox/client_menu.c:400
 msgid "Ma_ximize"
 msgstr "最大化(_X)"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:408
 msgid "_Roll up/down"
 msgstr "卷起/放下(_R)"
 
-#: openbox/client_menu.c:413
+#: openbox/client_menu.c:410
 msgid "Un/_Decorate"
 msgstr "去除装饰(_D)"
 
-#: openbox/client_menu.c:423
+#: openbox/client_menu.c:420
 msgid "_Close"
 msgstr "关闭(_C)"
 
-#: openbox/config.c:704
+#: openbox/config.c:737
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "配置文件中指定的按钮 '%s' 无效"
 
-#: openbox/keyboard.c:162
+#: openbox/keyboard.c:156
 msgid "Conflict with key binding in config file"
 msgstr "配置文件中的组合键冲突"
 
-#: openbox/menu.c:100 openbox/menu.c:108
+#: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr "无法找到有效的菜单文件 '%s'"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:171
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "执行管道菜单的命令 '%s' 时失败: %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:185
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "无效的管道菜单输出 '%s'"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "尝试读取菜单 '%s'，但是它不存在"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
 msgstr "更多..."
 
-#: openbox/mouse.c:338
+#: openbox/mouse.c:349
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr "鼠标绑定中的无效按键 '%s'"
 
-#: openbox/mouse.c:344
+#: openbox/mouse.c:355
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr "鼠标绑定中无效的上下文 '%s'"
 
-#: openbox/openbox.c:129
+#: openbox/openbox.c:131
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "无法切换到主目录 '%s': %s"
 
-#: openbox/openbox.c:149
+#: openbox/openbox.c:151
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "在打开DISPLAY环境变量所指定的X显示时失败"
 
-#: openbox/openbox.c:180
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "初始化obrender库时失败"
 
-#: openbox/openbox.c:186
+#: openbox/openbox.c:188
 msgid "X server does not support locale."
 msgstr "X服务器不支持该Locale"
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr "无法设置X服务器的locale修饰项"
 
-#: openbox/openbox.c:249
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "无法找到有效的配置文件，使用一些简单的默认值"
 
-#: openbox/openbox.c:275
+#: openbox/openbox.c:279
 msgid "Unable to load a theme."
 msgstr "无法读入主题"
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:408
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "重新启动以执行新的可执行文件 '%s' 时失败: %s"
 
-#: openbox/openbox.c:471 openbox/openbox.c:473
+#: openbox/openbox.c:478 openbox/openbox.c:480
 msgid "Copyright (c)"
 msgstr "版权 (c)"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:489
 msgid "Syntax: openbox [options]\n"
 msgstr "用法: openbox [选项]\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:490
 msgid ""
 "\n"
 "Options:\n"
@@ -200,23 +202,23 @@ msgstr ""
 "\n"
 "选项： \n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:491
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              显示帮助选项后退出\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:492
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           显示版本号后退出\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:493
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           替换当前运行的窗口管理器\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:494
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        禁止与会话管理器的连接\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -224,15 +226,15 @@ msgstr ""
 "\n"
 "传递信息给运行中的Openbox实例：\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:496
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       重新读入Openbox的配置\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:497
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           重新启动Openbox\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:498
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -240,23 +242,23 @@ msgstr ""
 "\n"
 "调试选项：\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:499
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              在同步模式中运行\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:500
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug            显示调试输出\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:501
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       显示焦点处理的调试输出\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:502
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    分割显示到伪造的 xinerama 屏幕中\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:503
 #, c-format
 msgid ""
 "\n"
@@ -265,27 +267,27 @@ msgstr ""
 "\n"
 "请向 %s 报告错误\n"
 
-#: openbox/openbox.c:593
+#: openbox/openbox.c:600
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "无效的命令行参数 '%s'\n"
 
-#: openbox/screen.c:89 openbox/screen.c:190
+#: openbox/screen.c:95 openbox/screen.c:196
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "已经有窗口管理器运行在屏幕 %d"
 
-#: openbox/screen.c:126
+#: openbox/screen.c:132
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "在屏幕 %d 无法被选为窗口管理器"
 
-#: openbox/screen.c:147
+#: openbox/screen.c:153
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "屏幕 %d 的窗口管理器没有退出"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:1077
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"
@@ -334,3 +336,9 @@ msgstr "请求的按键 '%s' 在显示中不存在"
 #, c-format
 msgid "X Error: %s"
 msgstr "X 错误： %s"
+
+#~ msgid "Invalid action '%s' requested. No such action exists."
+#~ msgstr "请求的动作 '%s' 无效。该动作不存在。"
+
+#~ msgid "Invalid use of action '%s'. Action will be ignored."
+#~ msgstr "使用的动作 '%s' 无效。动作将被忽略。"

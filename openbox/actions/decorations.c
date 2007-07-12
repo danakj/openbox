@@ -7,6 +7,8 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_toggle_func(ObParseInst *i,
+                                  xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -14,6 +16,11 @@ void action_decorations_startup()
 {
     actions_register("Decorations",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("ToggleDecorations",
+                     setup_toggle_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -36,6 +43,14 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         g_free(s);
     }
 
+    return o;
+}
+
+static gpointer setup_toggle_func(ObParseInst *i,
+                                  xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->toggle = TRUE;
     return o;
 }
 

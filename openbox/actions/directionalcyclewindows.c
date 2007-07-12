@@ -2,6 +2,7 @@
 #include "openbox/event.h"
 #include "openbox/focus_cycle.h"
 #include "openbox/openbox.h"
+#include "openbox/client.h"
 #include "openbox/misc.h"
 #include "gettext.h"
 
@@ -14,6 +15,22 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_north_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_south_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_east_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_west_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_northwest_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_northeast_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_southwest_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_southeast_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -28,6 +45,54 @@ void action_directionalcyclewindows_startup()
 {
     actions_register("DirectionalCycleWindows",
                      setup_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusNorth",
+                     setup_north_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusSouth",
+                     setup_south_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusWest",
+                     setup_west_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusEast",
+                     setup_east_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusNorthWest",
+                     setup_northwest_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusNorthEast",
+                     setup_northeast_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusSouthWest",
+                     setup_southwest_func,
+                     free_func,
+                     run_func,
+                     i_input_func,
+                     i_cancel_func);
+    actions_register("DirectionalFocusSouthEast",
+                     setup_southeast_func,
                      free_func,
                      run_func,
                      i_input_func,
@@ -83,6 +148,66 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             m = parse_find_node("action", m->next);
         }
     }
+    return o;
+}
+
+static gpointer setup_north_func(ObParseInst *i, xmlDocPtr doc,xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_NORTH;
+    return o;
+}
+
+static gpointer setup_south_func(ObParseInst *i, xmlDocPtr doc,xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_SOUTH;
+    return o;
+}
+
+static gpointer setup_west_func(ObParseInst *i, xmlDocPtr doc,xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_WEST;
+    return o;
+}
+
+static gpointer setup_east_func(ObParseInst *i, xmlDocPtr doc,xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_northwest_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_NORTHWEST;
+    return o;
+}
+
+static gpointer setup_northeast_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_NORTHEAST;
+    return o;
+}
+
+static gpointer setup_southwest_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_SOUTHWEST;
+    return o;
+}
+
+static gpointer setup_southeast_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->direction = OB_DIRECTION_SOUTHEAST;
     return o;
 }
 
@@ -159,7 +284,10 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
                                  TRUE, cancel);
 
     if (ft) {
-        actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
-                         state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
+        if (o->actions)
+            actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
+                             state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
+        else
+            client_activate(ft, FALSE, TRUE, TRUE, TRUE);
     }
 }

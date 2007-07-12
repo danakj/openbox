@@ -24,7 +24,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     Options *o;
 
     o = g_new0(Options, 1);
-    o->tobottom = TRUE;
+    o->tobottom = FALSE;
 
     if ((n = parse_find_node("tobottom", node)))
         o->tobottom = parse_bool(doc, n);

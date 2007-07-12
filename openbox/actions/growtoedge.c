@@ -10,6 +10,14 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_north_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_south_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_east_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_west_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -17,6 +25,26 @@ void action_growtoedge_startup()
 {
     actions_register("GrowToEdge",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeNorth",
+                     setup_north_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeSouth",
+                     setup_south_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeEast",
+                     setup_east_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeWest",
+                     setup_west_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -47,6 +75,38 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         g_free(s);
     }
 
+    return o;
+}
+
+static gpointer setup_north_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = OB_DIRECTION_NORTH;
+    return o;
+}
+
+static gpointer setup_south_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = OB_DIRECTION_SOUTH;
+    return o;
+}
+
+static gpointer setup_east_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_west_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = OB_DIRECTION_WEST;
     return o;
 }
 

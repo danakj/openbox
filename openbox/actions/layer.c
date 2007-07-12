@@ -8,6 +8,16 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_toggletop_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_togglebottom_func(ObParseInst *i,
+                                        xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendtop_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendbottom_func(ObParseInst *i,
+                                        xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendnormal_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -15,6 +25,31 @@ void action_layer_startup()
 {
     actions_register("Layer",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("ToggleAlwaysOnTop",
+                     setup_toggletop_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("ToggleAlwaysOnBottom",
+                     setup_togglebottom_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToTopLayer",
+                     setup_sendtop_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToBottomLayer",
+                     setup_sendbottom_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToNormalLayer",
+                     setup_sendnormal_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -50,6 +85,51 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         g_free(s);
     }
 
+    return o;
+}
+
+static gpointer setup_toggletop_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->toggle = TRUE;
+    o->layer = 1;
+    return o;
+}
+
+static gpointer setup_togglebottom_func(ObParseInst *i,
+                                        xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->toggle = TRUE;
+    o->layer = -1;
+    return o;
+}
+
+static gpointer setup_sendtop_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->on = TRUE;
+    o->layer = 1;
+    return o;
+}
+
+static gpointer setup_sendbottom_func(ObParseInst *i,
+                                        xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->on = TRUE;
+    o->layer = -1;
+    return o;
+}
+
+static gpointer setup_sendnormal_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->on = TRUE;
+    o->layer = 0;
     return o;
 }
 

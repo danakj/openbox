@@ -101,9 +101,14 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                                  o->dialog,
                                  TRUE, FALSE);
 
-    if (ft)
-        actions_run_acts(o->actions, data->uact, data->state,
-                         data->x, data->y, data->button, data->context, ft);
+    if (ft) {
+        if (o->actions)
+            actions_run_acts(o->actions, data->uact, data->state,
+                             data->x, data->y, data->button, data->context,
+                             ft);
+        else
+            client_activate(ft, FALSE, TRUE, TRUE, TRUE);
+    }
 
     return FALSE;
 }

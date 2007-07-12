@@ -164,6 +164,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \
+	openbox/actions/focustobottom.c \
 	openbox/actions/fullscreen.c \
 	openbox/actions/growtoedge.c \
 	openbox/actions/iconify.c \
@@ -174,7 +175,6 @@ openbox_openbox_SOURCES = \
 	openbox/actions/maximize.c \
 	openbox/actions/maximizehorizontal.c \
 	openbox/actions/maximizevertical.c \
-	openbox/actions/menu.c \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \
 	openbox/actions/moveresizeto.c \
@@ -188,6 +188,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/restart.c \
 	openbox/actions/shade.c \
 	openbox/actions/showdesktop.c \
+	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \
 	openbox/actions.c \
 	openbox/actions.h \

@@ -11,6 +11,14 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static gpointer setup_add_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static gpointer setup_remove_func(ObParseInst *i,
                                   xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_addcurrent_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_addlast_func(ObParseInst *i,
+                                   xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_removecurrent_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_removelast_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -23,6 +31,26 @@ void action_addremovedesktop_startup()
                      NULL, NULL);
     actions_register("RemoveDesktop",
                      setup_remove_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("AddDesktopLast",
+                     setup_addlast_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("RemoveDesktopLast",
+                     setup_removelast_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("AddDesktopCurrent",
+                     setup_addcurrent_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("RemoveDesktopCurrent",
+                     setup_removecurrent_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -59,6 +87,38 @@ static gpointer setup_remove_func(ObParseInst *i,
 {
     Options *o = setup_func(i, doc, node);
     o->add = FALSE;
+    return o;
+}
+
+static gpointer setup_addcurrent_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_add_func(i, doc, node);
+    o->current = TRUE;
+    return o;
+}
+
+static gpointer setup_addlast_func(ObParseInst *i,
+                                   xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_add_func(i, doc, node);
+    o->current = FALSE;
+    return o;
+}
+
+static gpointer setup_removecurrent_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_remove_func(i, doc, node);
+    o->current = TRUE;
+    return o;
+}
+
+static gpointer setup_removelast_func(ObParseInst *i,
+                                      xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_remove_func(i, doc, node);
+    o->current = FALSE;
     return o;
 }
 

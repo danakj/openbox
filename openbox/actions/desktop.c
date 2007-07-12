@@ -11,6 +11,8 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,xmlNodePtr node);
+static gpointer setup_last_func(ObParseInst *i, xmlDocPtr doc,xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -18,6 +20,16 @@ void action_desktop_startup()
 {
     actions_register("Desktop",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopLast",
+                     setup_last_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktop",
+                     setup_send_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -44,6 +56,20 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     if ((n = parse_find_node("follow", node)))
         o->follow = parse_bool(doc, n);
 
+    return o;
+}
+
+static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->send = TRUE;
+    return o;
+}
+
+static gpointer setup_last_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->last = TRUE;
     return o;
 }
 

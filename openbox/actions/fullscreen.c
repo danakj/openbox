@@ -9,6 +9,10 @@ void action_fullscreen_startup()
                      NULL, NULL,
                      run_func,
                      NULL, NULL);
+    actions_register("ToggleFullscreen",
+                     NULL, NULL,
+                     run_func,
+                     NULL, NULL);
 }
 
 /* Always return FALSE because its not interactive */

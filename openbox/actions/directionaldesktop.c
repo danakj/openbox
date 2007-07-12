@@ -12,6 +12,30 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_next_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_prev_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_left_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_right_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_up_func(ObParseInst *i,
+                              xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_down_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendnext_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendprev_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendleft_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendright_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_sendup_func(ObParseInst *i,
+                                  xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_senddown_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -19,6 +43,66 @@ void action_directionaldesktop_startup()
 {
     actions_register("DirectionalDesktop",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopNext",
+                     setup_next_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopPrevious",
+                     setup_prev_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopLeft",
+                     setup_left_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopRight",
+                     setup_right_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopUp",
+                     setup_up_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("DesktopDown",
+                     setup_down_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktopNext",
+                     setup_sendnext_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktopPrevious",
+                     setup_sendprev_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktopLeft",
+                     setup_sendleft_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktopRight",
+                     setup_sendright_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktopUp",
+                     setup_sendup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktopDown",
+                     setup_senddown_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -65,6 +149,108 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     if ((n = parse_find_node("follow", node)))
         o->follow = parse_bool(doc, n);
 
+    return o;
+}
+
+static gpointer setup_next_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->linear = TRUE;
+    o->dir = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_prev_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->linear = TRUE;
+    o->dir = OB_DIRECTION_WEST;
+    return o;
+}
+
+static gpointer setup_right_func(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->linear = FALSE;
+    o->dir = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_left_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->linear = FALSE;
+    o->dir = OB_DIRECTION_WEST;
+    return o;
+}
+
+static gpointer setup_up_func(ObParseInst *i,
+                              xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->linear = FALSE;
+    o->dir = OB_DIRECTION_NORTH;
+    return o;
+}
+
+static gpointer setup_down_func(ObParseInst *i,
+                                xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->linear = FALSE;
+    o->dir = OB_DIRECTION_SOUTH;
+    return o;
+}
+
+static gpointer setup_sendnext_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_next_func(i, doc, node);
+    o->send = TRUE;
+    return o;
+}
+
+static gpointer setup_sendprev_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_prev_func(i, doc, node);
+    o->send = TRUE;
+    return o;
+}
+
+static gpointer setup_sendright_func(ObParseInst *i,
+                                     xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_right_func(i, doc, node);
+    o->send = TRUE;
+    return o;
+}
+
+static gpointer setup_sendleft_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_left_func(i, doc, node);
+    o->send = TRUE;
+    return o;
+}
+
+static gpointer setup_sendup_func(ObParseInst *i,
+                                  xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_up_func(i, doc, node);
+    o->send = TRUE;
+    return o;
+}
+
+static gpointer setup_senddown_func(ObParseInst *i,
+                                    xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = setup_down_func(i, doc, node);
+    o->send = TRUE;
     return o;
 }
 

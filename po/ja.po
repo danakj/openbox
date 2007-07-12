@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4\n"
+"Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-05 16:00+0200\n"
+"POT-Creation-Date: 2007-07-12 12:58+0200\n"
 "PO-Revision-Date: 2007-06-07 14:49+0200\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -112,7 +112,7 @@ msgstr "非/装飾(_D)"
 msgid "_Close"
 msgstr "閉じる(_C)"
 
-#: openbox/config.c:718
+#: openbox/config.c:737
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "不正なボタン'%s'が設定ファイルで指定されています。"
@@ -141,7 +141,7 @@ msgstr "パイプメニュー'%s'からの不正な出力です。"
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "メニュー'%s'へのアクセスを試みましたが、それは存在しません。"
 
-#: openbox/menu.c:362 openbox/menu.c:363
+#: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
 msgstr "もっと..."
 

@@ -22,6 +22,7 @@
 #include "window.h"
 #include "openbox.h"
 #include "dock.h"
+#include "actions.h"
 #include "client.h"
 #include "xerror.h"
 #include "prop.h"
@@ -808,8 +809,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
            want to deal with them
         */
         if (!(e->xbutton.button == 4 || e->xbutton.button == 5) &&
-            !keyboard_interactively_grabbed() &&
-            !menu_frame_visible)
+            !grab_on_keyboard())
         {
             /* use where the press occured */
             con = frame_context(client, e->xbutton.window, px, py);
@@ -956,7 +956,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                           (e->type == EnterNotify ? "Enter" : "Leave"),
                           e->xcrossing.mode,
                           e->xcrossing.detail, (client?client->window:0));
-            if (keyboard_interactively_grabbed())
+            if (grab_on_keyboard())
                 break;
             if (config_focus_follow && config_focus_delay &&
                 /* leave inferior events can happen when the mouse goes onto
@@ -999,7 +999,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (keyboard_interactively_grabbed())
+            if (grab_on_keyboard())
                 break;
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab ||
@@ -1219,7 +1219,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                        it can happen now when the window is on
                                        another desktop, but we still don't
                                        want it! */
-        client_activate(client, FALSE, TRUE);
+        client_activate(client, FALSE, TRUE, TRUE, TRUE);
         break;
     case ClientMessage:
         /* validate cuz we query stuff off the client here */
@@ -1297,7 +1297,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_ACTIVE_WINDOW message for window %s is "
                               "missing source indication\n");
-            client_activate(client, FALSE,
+            client_activate(client, FALSE, TRUE, TRUE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));
         } else if (msgtype == prop_atoms.net_wm_moveresize) {
@@ -1630,7 +1630,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
         if (frame->child)
             menu_frame_select_next(frame->child);
         else if (frame->selected)
-            menu_entry_frame_execute(frame->selected, state, ev->xkey.time);
+            menu_entry_frame_execute(frame->selected, state);
     }
 
     else if (keycode == ob_keycode(OB_KEY_LEFT) && ev->xkey.state == 0) {
@@ -1700,7 +1700,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
                 menu_frame_select(frame, found, TRUE);
                 usleep(50000); /* highlight the item for a short bit so the
                                   user can see what happened */
-                menu_entry_frame_execute(found, state, ev->xkey.time);
+                menu_entry_frame_execute(found, state);
             } else {
                 menu_frame_select(frame, found, TRUE);
                 if (num_found == 1)
@@ -1730,8 +1730,7 @@ static gboolean event_handle_menu(XEvent *ev)
                                             ev->xbutton.y_root)))
             {
                 menu_frame_select(e->frame, e, TRUE);
-                menu_entry_frame_execute(e, ev->xbutton.state,
-                                         ev->xbutton.time);
+                menu_entry_frame_execute(e, ev->xbutton.state);
             }
             else
                 menu_frame_hide_all();
@@ -1792,9 +1791,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
 
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
-    if (!keyboard_process_interactive_grab(e, &client) &&
-        !(moveresize_in_progress && moveresize_event(e)))
-    {
+    if (!actions_interactive_input_event(e) && !moveresize_event(e)) {
         if (moveresize_in_progress)
             /* make further actions work on the client being
                moved/resized */
@@ -1899,9 +1896,9 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
 
 void event_cancel_all_key_grabs()
 {
-    if (keyboard_interactively_grabbed()) {
-        keyboard_interactive_cancel();
-        ob_debug("KILLED interactive event\n");
+    if (actions_interactive_act_running()) {
+        actions_interactive_cancel_act();
+        ob_debug("KILLED interactive action\n");
     }
     else if (menu_frame_visible) {
         menu_frame_hide_all();

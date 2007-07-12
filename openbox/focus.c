@@ -122,12 +122,12 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            1. it is on the current desktop. this ignores omnipresent
            windows, which are problematic in their own rite, unless they are
            specifically allowed
-           2. it is a normal type window, don't fall back onto a dock or
-           a splashscreen or a desktop window (save the desktop as a
-           backup fallback though)
+           2. it is a valid auto-focus target
+           3. it is not shaded
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
             focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, FALSE) &&
+            !c->shaded &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {

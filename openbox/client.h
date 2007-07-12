@@ -455,6 +455,18 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 */
 void client_move_onscreen(ObClient *self, gboolean rude);
 
+/*! dir is either North, South, East or West. It can't be, for example,
+  Northwest */
+void client_find_edge_directional(ObClient *self, ObDirection dir,
+                                  gint my_head, gint my_tail,
+                                  gint my_edge_start, gint my_edge_size,
+                                  gint *dest, gboolean *near_edge);
+void client_find_move_directional(ObClient *self, ObDirection dir,
+                                  gint *x, gint *y);
+void client_find_resize_directional(ObClient *self, ObDirection side,
+                                    gboolean grow,
+                                    gint *x, gint *y, gint *w, gint *h);
+
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should
             be returned to normal state.
@@ -550,10 +562,13 @@ gboolean client_focus(ObClient *self);
   when the user deliberately selects a window for use.
   @param here If true, then the client is brought to the current desktop;
               otherwise, the desktop is changed to where the client lives.
+  @param raise If true, the client is brought to the front.
+  @param unshade If true, the client is unshaded (if it is shaded)
   @param user If true, then a user action is what requested the activation;
               otherwise, it means an application requested it on its own
 */
-void client_activate(ObClient *self, gboolean here, gboolean user);
+void client_activate(ObClient *self, gboolean here, gboolean raise,
+                     gboolean unshade, gboolean user);
 
 /*! Bring all of its helper windows to its desktop. These are the utility and
   stuff windows. */
@@ -678,9 +693,6 @@ ObClient *client_search_parent(ObClient *self, ObClient *search);
 /*! Search for a transient of a client. The transient is returned if it is one,
   NULL is returned if the given search is not a transient of the client. */
 ObClient *client_search_transient(ObClient *self, ObClient *search);
-
-/*! Return the closest edge in the given direction */
-gint client_directional_edge_search(ObClient *c, ObDirection dir, gboolean hang);
 
 /*! Set a client window to be above/below other clients.
   @layer < 0 indicates the client should be placed below other clients.<br />

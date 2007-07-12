@@ -148,8 +148,49 @@ openbox_openbox_LDADD = \
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
 	gettext.h \
-	openbox/action.c \
-	openbox/action.h \
+	openbox/actions/all.c \
+	openbox/actions/all.h \
+	openbox/actions/addremovedesktop.c \
+	openbox/actions/breakchroot.c \
+	openbox/actions/close.c \
+	openbox/actions/cyclewindows.c \
+	openbox/actions/debug.c \
+	openbox/actions/decorations.c \
+	openbox/actions/desktop.c \
+	openbox/actions/dockautohide.c \
+	openbox/actions/directionalcyclewindows.c \
+	openbox/actions/directionaldesktop.c \
+	openbox/actions/directionaltargetwindow.c \
+	openbox/actions/execute.c \
+	openbox/actions/exit.c \
+	openbox/actions/focus.c \
+	openbox/actions/fullscreen.c \
+	openbox/actions/growtoedge.c \
+	openbox/actions/iconify.c \
+	openbox/actions/if.c \
+	openbox/actions/kill.c \
+	openbox/actions/layer.c \
+	openbox/actions/lower.c \
+	openbox/actions/maximize.c \
+	openbox/actions/maximizehorizontal.c \
+	openbox/actions/maximizevertical.c \
+	openbox/actions/menu.c \
+	openbox/actions/move.c \
+	openbox/actions/moverelative.c \
+	openbox/actions/moveresizeto.c \
+	openbox/actions/movetoedge.c \
+	openbox/actions/omnipresent.c \
+	openbox/actions/raise.c \
+	openbox/actions/raiselower.c \
+	openbox/actions/reconfigure.c \
+	openbox/actions/resize.c \
+	openbox/actions/resizerelative.c \
+	openbox/actions/restart.c \
+	openbox/actions/shade.c \
+	openbox/actions/showdesktop.c \
+	openbox/actions/unfocus.c \
+	openbox/actions.c \
+	openbox/actions.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \

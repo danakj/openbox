@@ -22,8 +22,10 @@
 #include "openbox.h"
 #include "mainloop.h"
 #include "stacking.h"
+#include "grab.h"
 #include "client.h"
 #include "config.h"
+#include "actions.h"
 #include "screen.h"
 #include "menuframe.h"
 #include "keyboard.h"
@@ -273,8 +275,7 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
             for (node = node->children; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action")) {
-                    ObAction *a = action_parse
-                        (i, doc, node, OB_USER_ACTION_MENU_SELECTION);
+                    ObActionsAct *a = actions_parse(i, doc, node);
                     if (a)
                         acts = g_slist_append(acts, a);
                 }
@@ -417,13 +418,13 @@ static gboolean menu_hide_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
-void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
+void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
 {
     ObMenu *self;
     ObMenuFrame *frame;
 
-    if (!(self = menu_from_name(name))
-        || keyboard_interactively_grabbed()) return;
+    if (!(self = menu_from_name(name)) ||
+        grab_on_keyboard() || grab_on_pointer()) return;
 
     /* if the requested menu is already the top visible menu, then don't
        bother */
@@ -439,32 +440,35 @@ void menu_show(gchar *name, gint x, gint y, gint button, ObClient *client)
     menu_clear_pipe_caches();
 
     frame = menu_frame_new(self, 0, client);
-    if (!menu_frame_show_topmenu(frame, x, y, button))
+    if (!menu_frame_show_topmenu(frame, x, y, mouse))
         menu_frame_free(frame);
-    else if (!button) {
-        /* select the first entry if it's not a submenu and we opened
-         * the menu with the keyboard, and skip all headers */
-        GList *it = frame->entries;
-        while (it) {
-            ObMenuEntryFrame *e = it->data;
-            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
-                menu_frame_select(frame, e, FALSE);
-                break;
-            } else if (e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
-                it = g_list_next(it);
-            else
-                break;
-        }
-    }
-
-    if (!button)
-        menu_can_hide = TRUE;
     else {
-        menu_can_hide = FALSE;
-        ob_main_loop_timeout_add(ob_main_loop,
-                                 config_menu_hide_delay * 1000,
-                                 menu_hide_delay_func,
-                                 NULL, g_direct_equal, NULL);
+        if (!mouse) {
+            /* select the first entry if it's not a submenu and we opened
+             * the menu with the keyboard, and skip all headers */
+            GList *it = frame->entries;
+            while (it) {
+                ObMenuEntryFrame *e = it->data;
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+                    menu_frame_select(frame, e, FALSE);
+                    break;
+                } else if (e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
+                    it = g_list_next(it);
+                else
+                    break;
+            }
+        }
+
+        /* reset the hide timer */
+        if (!mouse)
+            menu_can_hide = TRUE;
+        else {
+            menu_can_hide = FALSE;
+            ob_main_loop_timeout_add(ob_main_loop,
+                                     config_menu_hide_delay * 1000,
+                                     menu_hide_delay_func,
+                                     NULL, g_direct_equal, NULL);
+        }
     }
 }
 
@@ -509,7 +513,7 @@ void menu_entry_unref(ObMenuEntry *self)
         case OB_MENU_ENTRY_TYPE_NORMAL:
             g_free(self->data.normal.label);
             while (self->data.normal.actions) {
-                action_unref(self->data.normal.actions->data);
+                actions_act_unref(self->data.normal.actions->data);
                 self->data.normal.actions =
                     g_slist_delete_link(self->data.normal.actions,
                                         self->data.normal.actions);

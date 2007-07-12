@@ -103,8 +103,7 @@ static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
 }
 
 static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
-                                ObClient *c, guint state, gpointer data,
-                                Time time)
+                                ObClient *c, guint state, gpointer data)
 {
     gint x, y;
     gulong ignore_start;
@@ -202,8 +201,7 @@ static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
 }
 
 static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
-                               ObClient *c, guint state, gpointer data,
-                               Time time)
+                               ObClient *c, guint state, gpointer data)
 {
     gulong ignore_start;
 
@@ -281,8 +279,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
 }
 
 static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
-                                 ObClient *c, guint state, gpointer data,
-                                 Time time)
+                                 ObClient *c, guint state, gpointer data)
 {
     g_assert(c);
 
@@ -293,11 +290,11 @@ static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
-                              gint button, gpointer data)
+                              gboolean mouse, gpointer data)
 {
     gint dx, dy;
 
-    if (button == 0 && frame->client) {
+    if (!mouse && frame->client) {
         *x = frame->client->frame->area.x;
 
         /* try below the titlebar */

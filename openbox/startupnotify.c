@@ -19,6 +19,7 @@
 
 #include "startupnotify.h"
 #include "gettext.h"
+#include "event.h"
 
 #include <stdlib.h>
 
@@ -228,8 +229,7 @@ static gboolean sn_launch_wait_timeout(gpointer data)
 }
 
 void sn_setup_spawn_environment(gchar *program, gchar *name,
-                                gchar *icon_name, gint desktop,
-                                Time time)
+                                gchar *icon_name, gint desktop)
 {
     gchar *desc;
     const char *id;
@@ -247,7 +247,8 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
     sn_launcher_context_set_binary_name(sn_launcher, program);
     if (desktop >= 0 && (unsigned) desktop < screen_num_desktops)
         sn_launcher_context_set_workspace(sn_launcher, (signed) desktop);
-    sn_launcher_context_initiate(sn_launcher, "openbox", program, time);
+    sn_launcher_context_initiate(sn_launcher, "openbox", program,
+                                 event_curtime);
     id = sn_launcher_context_get_startup_id(sn_launcher);
 
     /* 20 second timeout for apps to start */

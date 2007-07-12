@@ -782,22 +782,6 @@ typedef struct
     const gchar *actname;
 } ObDefKeyBind;
 
-static void bind_default_keyboard()  
-{  
-    ObDefKeyBind *it;  
-    ObDefKeyBind binds[] = {  
-        { "A-Tab", "NextWindow" },  
-        { "S-A-Tab", "PreviousWindow" },  
-        { "A-F4", "Close" },  
-        { NULL, NULL }  
-    };  
-     
-    for (it = binds; it->key; ++it) {  
-        GList *l = g_list_append(NULL, g_strdup(it->key));  
-        keyboard_bind(l, actions_parse_string(it->actname));
-    }  
-}  
- 
 typedef struct
 {
     const gchar *button;
@@ -842,14 +826,18 @@ static void bind_default_mouse()
         { "Left", "AllDesktops", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Left", "Shade", OB_MOUSE_ACTION_CLICK, "Raise" },
         { "Left", "Close", OB_MOUSE_ACTION_CLICK, "Close" },
-        { "Left", "Maximize", OB_MOUSE_ACTION_CLICK, "ToggleMaximizeFull" },
+        { "Left", "Maximize", OB_MOUSE_ACTION_CLICK, "Maximize" },
         { "Left", "Iconify", OB_MOUSE_ACTION_CLICK, "Iconify" },
-        { "Left", "AllDesktops", OB_MOUSE_ACTION_CLICK, "ToggleOmnipresent" },
-        { "Left", "Shade", OB_MOUSE_ACTION_CLICK, "ToggleShade" },
+        { "Left", "AllDesktops", OB_MOUSE_ACTION_CLICK, "Omnipresent" },
+        { "Left", "Shade", OB_MOUSE_ACTION_CLICK, "Shade" },
         { "Left", "TLCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
         { "Left", "TRCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
         { "Left", "BLCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
         { "Left", "BRCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "Top", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "Bottom", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "Left", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "Right", OB_MOUSE_ACTION_MOTION, "Resize" },
         { "Left", "Titlebar", OB_MOUSE_ACTION_MOTION, "Move" },
         { "A-Left", "Frame", OB_MOUSE_ACTION_MOTION, "Move" },
         { "A-Middle", "Frame", OB_MOUSE_ACTION_MOTION, "Resize" },
@@ -924,8 +912,6 @@ void config_startup(ObParseInst *i)
 
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
-
-    bind_default_keyboard();
 
     parse_register(i, "keyboard", parse_keyboard, NULL);
 

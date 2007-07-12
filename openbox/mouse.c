@@ -20,7 +20,7 @@
 #include "openbox.h"
 #include "config.h"
 #include "xerror.h"
-#include "action.h"
+#include "actions.h"
 #include "event.h"
 #include "client.h"
 #include "prop.h"
@@ -156,7 +156,7 @@ void mouse_unbind_all()
                 GSList *it;
 
                 for (it = b->actions[j]; it; it = g_slist_next(it))
-                    action_unref(it->data);
+                    actions_act_unref(it->data);
                 g_slist_free(b->actions[j]);
             }
             g_free(b);
@@ -166,9 +166,23 @@ void mouse_unbind_all()
     }
 }
 
+static ObUserAction mouse_action_to_user_action(ObMouseAction a)
+{
+    switch (a) {
+    case OB_MOUSE_ACTION_PRESS: return OB_USER_ACTION_MOUSE_PRESS;
+    case OB_MOUSE_ACTION_RELEASE: return OB_USER_ACTION_MOUSE_RELEASE;
+    case OB_MOUSE_ACTION_CLICK: return OB_USER_ACTION_MOUSE_CLICK;
+    case OB_MOUSE_ACTION_DOUBLE_CLICK:
+        return OB_USER_ACTION_MOUSE_DOUBLE_CLICK;
+    case OB_MOUSE_ACTION_MOTION: return OB_USER_ACTION_MOUSE_MOTION;
+    default:
+        g_assert_not_reached();
+    }
+}
+
 static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
                              ObClient *c, guint state,
-                             guint button, gint x, gint y, Time time)
+                             guint button, gint x, gint y)
 {
     GSList *it;
     ObMouseBinding *b;
@@ -181,7 +195,8 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     /* if not bound, then nothing to do! */
     if (it == NULL) return FALSE;
 
-    action_run_mouse(b->actions[a], c, context, state, button, x, y, time);
+    actions_run_acts(b->actions[a], mouse_action_to_user_action(a),
+                     state, x, y, button, context, c);
     return TRUE;
 }
 
@@ -213,8 +228,7 @@ void mouse_event(ObClient *client, XEvent *e)
         fire_binding(OB_MOUSE_ACTION_PRESS, context,
                      client, e->xbutton.state,
                      e->xbutton.button,
-                     e->xbutton.x_root, e->xbutton.y_root,
-                     e->xbutton.time);
+                     e->xbutton.x_root, e->xbutton.y_root);
 
         /* if the bindings grab the pointer, there won't be a ButtonRelease
            event for us */
@@ -278,22 +292,19 @@ void mouse_event(ObClient *client, XEvent *e)
                      client, e->xbutton.state,
                      e->xbutton.button,
                      e->xbutton.x_root,
-                     e->xbutton.y_root,
-                     e->xbutton.time);
+                     e->xbutton.y_root);
         if (click)
             fire_binding(OB_MOUSE_ACTION_CLICK, context,
                          client, e->xbutton.state,
                          e->xbutton.button,
                          e->xbutton.x_root,
-                         e->xbutton.y_root,
-                         e->xbutton.time);
+                         e->xbutton.y_root);
         if (dclick)
             fire_binding(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
                          client, e->xbutton.state,
                          e->xbutton.button,
                          e->xbutton.x_root,
-                         e->xbutton.y_root,
-                         e->xbutton.time);
+                         e->xbutton.y_root);
         break;
 
     case MotionNotify:
@@ -314,7 +325,7 @@ void mouse_event(ObClient *client, XEvent *e)
                     break;
 
                 fire_binding(OB_MOUSE_ACTION_MOTION, context,
-                             client, state, button, px, py, e->xmotion.time);
+                             client, state, button, px, py);
                 button = 0;
                 state = 0;
             }
@@ -327,7 +338,7 @@ void mouse_event(ObClient *client, XEvent *e)
 }
 
 gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
-                    ObMouseAction mact, ObAction *action)
+                    ObMouseAction mact, ObActionsAct *action)
 {
     guint state, button;
     ObFrameContext context;
@@ -351,13 +362,6 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
             b->actions[mact] = g_slist_append(b->actions[mact], action);
             return TRUE;
         }
-    }
-
-    /* when there are no modifiers in the binding, then the action cannot
-       be interactive */
-    if (!state && action->data.any.interactive) {
-        action->data.any.interactive = FALSE;
-        action->data.inter.final = TRUE;
     }
 
     /* add the binding */

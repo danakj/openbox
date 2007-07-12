@@ -19,17 +19,18 @@
 #ifndef ob__mouse_h
 #define ob__mouse_h
 
-#include "action.h"
 #include "frame.h"
 #include "misc.h"
 
 #include <X11/Xlib.h>
 
+struct _ObActionsAct;
+
 void mouse_startup(gboolean reconfig);
 void mouse_shutdown(gboolean reconfig);
 
 gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
-                    ObMouseAction mact, ObAction *action);
+                    ObMouseAction mact, struct _ObActionsAct *action);
 void mouse_unbind_all();
 
 void mouse_event(struct _ObClient *client, XEvent *e);

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-10 19:32-0400\n"
+"POT-Creation-Date: 2007-06-07 14:18+0200\n"
 "PO-Revision-Date: 2007-05-21 00:06+0200\n"
 "Last-Translator: Lauri Hakko\n"
 "Language-Team: None\n"
@@ -108,12 +108,12 @@ msgstr "(Epä)reunusta"
 msgid "_Close"
 msgstr "_Sulje"
 
-#: openbox/config.c:716
+#: openbox/config.c:704
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Virheellinen painike '%s' määritelty konfiguraatio tiedostossa"
 
-#: openbox/keyboard.c:163
+#: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
 msgstr "Päällekäisiä key bindejä konfiguraatio tiedostossa"
 
@@ -122,22 +122,22 @@ msgstr "Päällekäisiä key bindejä konfiguraatio tiedostossa"
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Toimivaa menu tiedostoa ei löytynyt '%s'"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:151
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Putki-menun komennon suorittaminen epäonnistui '%s': %s"
 
-#: openbox/menu.c:182
+#: openbox/menu.c:168
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Virheellinen tulos putki-menusta '%s'"
 
-#: openbox/menu.c:195
+#: openbox/menu.c:181
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Menun '%s' lukemista yritettiin mutta sitä ei ole olemassa"
 
-#: openbox/menu.c:356 openbox/menu.c:357
+#: openbox/menu.c:342 openbox/menu.c:343
 msgid "More..."
 msgstr "Lisää..."
 
@@ -286,7 +286,7 @@ msgstr ""
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/screen.c:993
+#: openbox/screen.c:991
 #, c-format
 msgid "desktop %i"
 msgstr "työtila %i"

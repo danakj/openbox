@@ -18,8 +18,6 @@
 */
 
 #include "mainloop.h"
-#include "action.h"
-#include "client.h"
 #include "event.h"
 
 #include <stdio.h>
@@ -90,8 +88,6 @@ struct _ObMainLoop
     gboolean signal_fired;
     guint signals_fired[NUM_SIGNALS];
     GSList *signal_handlers[NUM_SIGNALS];
-
-    GSList *action_queue;
 };
 
 struct _ObMainLoopTimer
@@ -182,8 +178,6 @@ ObMainLoop *ob_main_loop_new(Display *display)
 
     all_loops = g_slist_prepend(all_loops, loop);
 
-    loop->action_queue = NULL;
-
     return loop;
 }
 
@@ -234,10 +228,6 @@ void ob_main_loop_destroy(ObMainLoop *loop)
             }
         }
 
-        for (it = loop->action_queue; it; it = g_slist_next(it))
-            action_unref(it->data);
-        g_slist_free(loop->action_queue);
-
         g_free(loop);
     }
 }
@@ -253,36 +243,15 @@ static void fd_handle_foreach(gpointer key,
         h->func(h->fd, h->data);
 }
 
-void ob_main_loop_queue_action(ObMainLoop *loop, ObAction *act)
-{
-    loop->action_queue = g_slist_append(loop->action_queue, action_copy(act));
-}
-
-static void ob_main_loop_client_destroy(ObClient *client, gpointer data)
-{
-    ObMainLoop *loop = data;
-    GSList *it;
-
-    for (it = loop->action_queue; it; it = g_slist_next(it)) {
-        ObAction *act = it->data;
-
-        if (act->data.any.c == client)
-            act->data.any.c = NULL;
-    }
-}
-
 void ob_main_loop_run(ObMainLoop *loop)
 {
     XEvent e;
     struct timeval *wait;
     fd_set selset;
     GSList *it;
-    ObAction *act;
 
     loop->run = TRUE;
     loop->running = TRUE;
-
-    client_add_destroy_notify(ob_main_loop_client_destroy, loop);
 
     while (loop->run) {
         if (loop->signal_fired) {
@@ -315,33 +284,6 @@ void ob_main_loop_run(ObMainLoop *loop)
                     h->func(&e, h->data);
                 }
             } while (XPending(loop->display) && loop->run);
-        } else if (loop->action_queue) {
-            /* only fire off one action at a time, then go back for more
-               X events, since the action might cause some X events (like
-               FocusIn :) */
-
-            do {
-                act = loop->action_queue->data;
-                if (act->data.any.client_action == OB_CLIENT_ACTION_ALWAYS &&
-                    !act->data.any.c)
-                {
-                    loop->action_queue =
-                        g_slist_delete_link(loop->action_queue,
-                                            loop->action_queue);
-                    action_unref(act);
-                    act = NULL;
-                }
-            } while (!act && loop->action_queue && loop->run);
-
-            if  (act) {
-                event_curtime = act->data.any.time;
-                act->func(&act->data);
-                event_curtime = CurrentTime;
-                loop->action_queue =
-                    g_slist_delete_link(loop->action_queue,
-                                        loop->action_queue);
-                action_unref(act);
-            }
         } else {
             /* this only runs if there were no x events received */
 
@@ -364,8 +306,6 @@ void ob_main_loop_run(ObMainLoop *loop)
                                  fd_handle_foreach, &selset);
         }
     }
-
-    client_remove_destroy_notify(ob_main_loop_client_destroy);
 
     loop->running = FALSE;
 }

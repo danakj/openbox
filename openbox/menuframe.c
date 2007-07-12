@@ -21,6 +21,7 @@
 #include "client.h"
 #include "menu.h"
 #include "screen.h"
+#include "actions.h"
 #include "grab.h"
 #include "openbox.h"
 #include "mainloop.h"
@@ -942,7 +943,7 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 }
 
 gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
-                                 gint button)
+                                 gboolean mouse)
 {
     gint px, py;
     guint i;
@@ -964,7 +965,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
     }
 
     if (self->menu->place_func)
-        self->menu->place_func(self, &x, &y, button, self->menu->data);
+        self->menu->place_func(self, &x, &y, mouse, self->menu->data);
     else
         menu_frame_place_topmenu(self, &x, &y);
 
@@ -1180,7 +1181,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     menu_frame_show_submenu(f, self->frame, self);
 }
 
-void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state, Time time)
+void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
 {
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.enabled)
@@ -1201,9 +1202,10 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state, Time time)
         }
 
         if (func)
-            func(entry, frame, client, state, data, time);
+            func(entry, frame, client, state, data);
         else
-            action_run(acts, client, state, time);
+            actions_run_acts(acts, OB_USER_ACTION_MENU_SELECTION,
+                             state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, client);
     }
 }
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-10 19:32-0400\n"
+"POT-Creation-Date: 2007-06-07 14:18+0200\n"
 "PO-Revision-Date: 2007-05-24 19:41+0100\n"
 "Last-Translator: Pavel Shevchuk <stlwrt@gmail.com>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -108,12 +108,12 @@ msgstr "(От)декорировать(_D)"
 msgid "_Close"
 msgstr "Закрыть(_C)"
 
-#: openbox/config.c:716
+#: openbox/config.c:704
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Некорректная клавиша '%s' упомянута в конфигурационном файле"
 
-#: openbox/keyboard.c:163
+#: openbox/keyboard.c:162
 msgid "Conflict with key binding in config file"
 msgstr "Конфликт привязок клавиш в конфигурационном файле"
 
@@ -122,22 +122,22 @@ msgstr "Конфликт привязок клавиш в конфигураци
 msgid "Unable to find a valid menu file '%s'"
 msgstr "Не могу найти корректный файл меню '%s'"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:151
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr "Не могу запустить команду pipe-меню '%s': %s"
 
-#: openbox/menu.c:182
+#: openbox/menu.c:168
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Некорректный вывод pipe-меню '%s'"
 
-#: openbox/menu.c:195
+#: openbox/menu.c:181
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "Попытка доступа к несуществующему меню '%s'."
 
-#: openbox/menu.c:356 openbox/menu.c:357
+#: openbox/menu.c:342 openbox/menu.c:343
 msgid "More..."
 msgstr "Больше..."
 
@@ -290,7 +290,7 @@ msgstr "Не могу получить выбор менеджера окон н
 msgid "The WM on screen %d is not exiting"
 msgstr "Менеджер окон на экране %d не завершается"
 
-#: openbox/screen.c:993
+#: openbox/screen.c:991
 #, c-format
 msgid "desktop %i"
 msgstr "рабочий стол %i"

@@ -19,7 +19,6 @@
 #ifndef __menu_h
 #define __menu_h
 
-#include "action.h"
 #include "window.h"
 #include "geom.h"
 #include "render/render.h"
@@ -44,7 +43,7 @@ typedef gboolean (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame,
 typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry,
                                   struct _ObMenuFrame *frame,
                                   struct _ObClient *client,
-                                  guint state, gpointer data, Time time);
+                                  guint state, gpointer data);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
 /*! @param x is the mouse x coordinate. on return it should be the x coordinate
              for the menu
@@ -52,7 +51,7 @@ typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
              for the menu
 */
 typedef void (*ObMenuPlaceFunc)(struct _ObMenuFrame *frame, gint *x, gint *y,
-                                gint button, gpointer data);
+                                gboolean mouse, gpointer data);
 
 struct _ObMenu
 {
@@ -176,7 +175,7 @@ void menu_clear_pipe_caches();
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
-void menu_show(gchar *name, gint x, gint y, gint button,
+void menu_show(gchar *name, gint x, gint y, gboolean mouse,
                struct _ObClient *client);
 gboolean menu_hide_delay_reached();
 

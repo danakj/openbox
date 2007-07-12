@@ -1,5 +1,5 @@
 # List of source files containing translatable strings.
-openbox/action.c
+openbox/actions/execute.c
 openbox/client_list_combined_menu.c
 openbox/client_list_menu.c
 openbox/client_menu.c

@@ -25,7 +25,7 @@
 #include "event.h"
 #include "grab.h"
 #include "client.h"
-#include "action.h"
+#include "actions.h"
 #include "prop.h"
 #include "menuframe.h"
 #include "config.h"
@@ -38,16 +38,8 @@
 
 #include <glib.h>
 
-typedef struct {
-    gboolean active;
-    guint state;
-    ObClient *client;
-    ObAction *action;
-} ObInteractiveState;
-
 KeyBindingTree *keyboard_firstnode = NULL;
 static ObPopup *popup = NULL;
-static ObInteractiveState istate;
 static KeyBindingTree *curpos;
 
 static void grab_keys(gboolean grab)
@@ -142,7 +134,7 @@ void keyboard_chroot(GList *keylist)
     }
 }
 
-gboolean keyboard_bind(GList *keylist, ObAction *action)
+gboolean keyboard_bind(GList *keylist, ObActionsAct *action)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
@@ -169,14 +161,6 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
     /* find the bottom node */
     for (; t->first_child; t = t->first_child);
 
-    /* when there are no modifiers in the binding, then the action cannot
-       be interactive */
-    if (!t->state && action->data.any.interactive) {
-        g_print("not interactive\n");
-        action->data.any.interactive = FALSE;
-        action->data.inter.final = TRUE;
-    }
-
     /* set the action */
     t->actions = g_slist_append(t->actions, action);
     /* assimilate this built tree into the main tree. assimilation
@@ -186,60 +170,7 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
     return TRUE;
 }
 
-static void keyboard_interactive_end(guint state, gboolean cancel, Time time,
-                                     gboolean ungrab)
-{
-    GSList *alist;
-
-    g_assert(istate.active);
-
-    /* ungrab first so they won't be NotifyWhileGrabbed */
-    if (ungrab)
-        ungrab_keyboard();
-
-    /* set this before running the actions so they know the keyboard is not
-       grabbed */
-    istate.active = FALSE;
-
-    alist = g_slist_append(NULL, istate.action);
-    action_run_interactive(alist, istate.client, state, time, cancel, TRUE);
-    g_slist_free(alist);
-
-    keyboard_reset_chains(0);
-}
-
-static void keyboard_interactive_end_client(ObClient *client, gpointer data)
-{
-    if (istate.active && istate.client == client)
-        istate.client = NULL;
-}
-
-
-void keyboard_interactive_cancel()
-{
-    keyboard_interactive_end(0, TRUE, event_curtime, TRUE);
-}
-
-gboolean keyboard_interactive_grab(guint state, ObClient *client,
-                                   ObAction *action)
-{
-    g_assert(action->data.any.interactive);
-
-    if (!istate.active) {
-        if (!grab_keyboard())
-            return FALSE;
-    } else if (action->func != istate.action->func) {
-        keyboard_interactive_end(state, TRUE, action->data.any.time, FALSE);
-    }
-
-    istate.active = TRUE;
-    istate.state = state;
-    istate.client = client;
-    istate.action = action;
-
-    return TRUE;
-}
-
+#if 0
 gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
 {
     gboolean handled = FALSE;
@@ -272,6 +203,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
 
     return handled;
 }
+#endif
 
 void keyboard_event(ObClient *client, const XEvent *e)
 {
@@ -316,17 +248,15 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 set_curpos(p);
             else {
                 GSList *it;
-                gboolean inter = FALSE;
 
-                for (it = p->actions; it && !inter; it = g_slist_next(it))
-                    if (((ObAction*)it->data)->data.any.interactive)
-                        inter = TRUE;
-                if (!inter) /* don't reset if the action is interactive */
+                for (it = p->actions; it; it = g_slist_next(it))
+                    if (actions_act_is_interactive(it->data)) break;
+                if (it == NULL) /* reset if the actions are not interactive */
                     keyboard_reset_chains(0);
 
-                action_run_key(p->actions, client, e->xkey.state,
-                               e->xkey.x_root, e->xkey.y_root,
-                               e->xkey.time);
+                actions_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
+                                 e->xkey.state, e->xkey.x_root, e->xkey.y_root,
+                                 0, OB_FRAME_CONTEXT_NONE, client);
             }
             break;
         }
@@ -334,29 +264,15 @@ void keyboard_event(ObClient *client, const XEvent *e)
     }
 }
 
-gboolean keyboard_interactively_grabbed()
-{
-    return istate.active;
-}
-
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
     popup = popup_new(FALSE);
     popup_set_text_align(popup, RR_JUSTIFY_CENTER);
-
-    if (!reconfig)
-        client_add_destroy_notify(keyboard_interactive_end_client, NULL);
 }
 
 void keyboard_shutdown(gboolean reconfig)
 {
-    if (!reconfig)
-        client_remove_destroy_notify(keyboard_interactive_end_client);
-
-    if (istate.active)
-        keyboard_interactive_cancel();
-
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 
     keyboard_unbind_all();

@@ -99,12 +99,11 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 }
 
 static void desk_menu_execute(ObMenuEntry *self, ObMenuFrame *f,
-                              ObClient *c, guint state, gpointer data,
-                              Time time)
+                              ObClient *c, guint state, gpointer data)
 {
     if (self->id == CLIENT) {
         if (self->data.normal.data) /* it's set to NULL if its destroyed */
-            client_activate(self->data.normal.data, FALSE, TRUE);
+            client_activate(self->data.normal.data, FALSE, TRUE, TRUE, TRUE);
     }
     else
         screen_set_desktop(self->id, TRUE);

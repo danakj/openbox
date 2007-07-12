@@ -28,6 +28,7 @@
 #include "xerror.h"
 #include "prop.h"
 #include "screen.h"
+#include "actions.h"
 #include "startupnotify.h"
 #include "focus.h"
 #include "focus_cycle.h"
@@ -238,6 +239,8 @@ gint main(gint argc, gchar **argv)
                    of the rc */
                 i = parse_startup();
 
+                /* register all the available actions */
+                actions_startup(reconfigure);
                 /* start up config which sets up with the parser */
                 config_startup(i);
 
@@ -371,6 +374,7 @@ gint main(gint argc, gchar **argv)
             window_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
+            actions_shutdown(reconfigure);
             modkeys_shutdown(reconfigure);
         } while (reconfigure);
     }

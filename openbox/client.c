@@ -1337,7 +1337,7 @@ static void client_update_transient_tree(ObClient *self,
        C is transient for B
        A can't be transient for C or we have a cycle
     */
-    if (!newgtran &&
+    if (!newgtran && newgroup &&
         (!newparent ||
          !client_search_top_direct_parent(newparent)->transient_for_group) &&
         client_normal(self))

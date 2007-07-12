@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-07 14:18+0200\n"
+"POT-Creation-Date: 2007-07-12 03:20-0400\n"
 "PO-Revision-Date: 2007-05-28 15:54+0200\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
@@ -15,189 +15,194 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:957
-#, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "L'acció sol·licitada '%s' no és vàlida. Aquesta acció no existeix."
-
-#: openbox/action.c:960
-#, c-format
-msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr "L'ús de l'acció '%s' no és vàlid. S'ignorarà aquesta acció."
-
-#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
-#, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "No s'ha pogut executar '%s': %s"
-
-#: openbox/action.c:1266
+#: openbox/actions/execute.c:86
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "No s'ha pogut convertir el camí '%s' des de utf8"
 
-#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
+#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "No s'ha pogut executar '%s': %s"
+
+#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "Vés aquí..."
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:98
+#, fuzzy
+msgid "Manage desktops"
+msgstr "Tots els escriptoris"
+
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+#, fuzzy
+msgid "_Add new desktop"
+msgstr "A l'_escriptori"
+
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+#, fuzzy
+msgid "_Remove last desktop"
+msgstr "A l'_escriptori"
+
+#: openbox/client_list_combined_menu.c:146
 msgid "Windows"
 msgstr "Finestres"
 
-#: openbox/client_list_menu.c:196
+#: openbox/client_list_menu.c:199
 msgid "Desktops"
 msgstr "Escriptoris"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:256
 msgid "All desktops"
 msgstr "Tots els escriptoris"
 
-#: openbox/client_menu.c:363
+#: openbox/client_menu.c:360
 msgid "_Layer"
 msgstr "_Capa"
 
-#: openbox/client_menu.c:368
+#: openbox/client_menu.c:365
 msgid "Always on _top"
 msgstr "Sempre a so_bre"
 
-#: openbox/client_menu.c:369
+#: openbox/client_menu.c:366
 msgid "_Normal"
 msgstr "_Normal"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:367
 msgid "Always on _bottom"
 msgstr "Sempre a so_ta"
 
-#: openbox/client_menu.c:373
+#: openbox/client_menu.c:370
 msgid "_Send to desktop"
 msgstr "A l'_escriptori"
 
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:374
 msgid "Client menu"
 msgstr "Menú del client"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:380
 msgid "R_estore"
 msgstr "Restaur_a"
 
-#: openbox/client_menu.c:391
+#: openbox/client_menu.c:388
 msgid "_Move"
 msgstr "_Mou"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:390
 msgid "Resi_ze"
 msgstr "Redimen_siona"
 
-#: openbox/client_menu.c:395
+#: openbox/client_menu.c:392
 msgid "Ico_nify"
 msgstr "Mi_nimitza"
 
-#: openbox/client_menu.c:403
+#: openbox/client_menu.c:400
 msgid "Ma_ximize"
 msgstr "Ma_ximitza"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:408
 msgid "_Roll up/down"
 msgstr "En/Desen_rotlla"
 
-#: openbox/client_menu.c:413
+#: openbox/client_menu.c:410
 msgid "Un/_Decorate"
 msgstr "Sense/Amb _decoració"
 
-#: openbox/client_menu.c:423
+#: openbox/client_menu.c:420
 msgid "_Close"
 msgstr "_Tanca"
 
-#: openbox/config.c:704
+#: openbox/config.c:737
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "El botó especificat al fitxer de configuració '%s' no és vàlid."
 
-#: openbox/keyboard.c:162
+#: openbox/keyboard.c:156
 msgid "Conflict with key binding in config file"
 msgstr "Conflicte amb la tecla vinculada en el fitxer de configuració"
 
-#: openbox/menu.c:100 openbox/menu.c:108
+#: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr "No s'ha pogut trobar un fitxer de menú '%s' vàlid"
 
-#: openbox/menu.c:151
+#: openbox/menu.c:171
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr ""
 "S'ha produït un error en executar l'ordre per al menú de conducte '%s': %s"
 
-#: openbox/menu.c:168
+#: openbox/menu.c:185
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "La sortida del menú de conducte '%s' no és vàlida"
 
-#: openbox/menu.c:181
+#: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr "S'ha intentat accedir al menú '%s' ja que no existeix"
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
 msgstr "Més..."
 
-#: openbox/mouse.c:338
+#: openbox/mouse.c:349
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr "El botó '%s' no és vàlid en la vinculació del ratolí"
 
-#: openbox/mouse.c:344
+#: openbox/mouse.c:355
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr "El context '%s' no és vàlid en la vinculació del ratolí"
 
-#: openbox/openbox.c:129
+#: openbox/openbox.c:130
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "No s'ha pogut canviar al directori de l'usuari '%s': %s"
 
-#: openbox/openbox.c:149
+#: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "No s'ha pogut obrir la pantalla des de la variable d'entorn DISPLAY"
 
-#: openbox/openbox.c:180
+#: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
 msgstr "S'ha produït un error en inicialitza la llibreria obrender."
 
-#: openbox/openbox.c:186
+#: openbox/openbox.c:187
 msgid "X server does not support locale."
 msgstr "El servidor X no te suport per a idiomes"
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
 msgstr "No s'ha pogut assignar els modificadors del locale per al servidor X."
 
-#: openbox/openbox.c:249
+#: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "No s'ha pogut trobat un fitxer de configuració vàlid, s'utilitzaran alguns "
 "valors predeterminats"
 
-#: openbox/openbox.c:275
+#: openbox/openbox.c:278
 msgid "Unable to load a theme."
 msgstr "No s'ha pogut carregar el tema."
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 "S'ha produït un error en tornar a iniciar i executar el nou executable '%s': "
 "%s"
 
-#: openbox/openbox.c:471 openbox/openbox.c:473
+#: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:486
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintaxis: openbox [opcions]\n"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:487
 msgid ""
 "\n"
 "Options:\n"
@@ -205,25 +210,25 @@ msgstr ""
 "\n"
 "Opcions:\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:488
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Visualitza aquesta ajuda i surt\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:489
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Visualitza la versió i surt\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:490
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           Reemplaça el gestor de finestres que s'està executant "
 "actualment\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:491
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Inhabilita la connexió amb gestor de sessió\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:492
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -232,15 +237,15 @@ msgstr ""
 "S'està transferint missatges a la instància del Openbox que s'està "
 "executant:\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:493
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Torna a carregar la configuració de Openbox\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:494
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Torna a iniciar Openbox\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -248,27 +253,27 @@ msgstr ""
 "\n"
 "Opcions de depuració:\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:496
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Executa en mode sincronitzat\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:497
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Mostra la sortida de depuració\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:498
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Mostra la sortida de depuració per a la gestió del "
 "focus\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:499
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 "  --debug-xinerama    Divideix la visualització en pantalles xinerama "
 "falses\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:500
 #, c-format
 msgid ""
 "\n"
@@ -277,28 +282,28 @@ msgstr ""
 "\n"
 "Informeu dels errors a %s\n"
 
-#: openbox/openbox.c:593
+#: openbox/openbox.c:597
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Opció '%s' no vàlida a la línia d'ordres\n"
 
-#: openbox/screen.c:89 openbox/screen.c:190
+#: openbox/screen.c:94 openbox/screen.c:195
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Encara s'està executant un gestor de finestres a la pantalla %d"
 
-#: openbox/screen.c:126
+#: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr ""
 "No s'ha pogut adquirir la selecció del gestor de finestres en la pantalla %d"
 
-#: openbox/screen.c:147
+#: openbox/screen.c:152
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "El gestor de finestres de la pantalla %d no està sortint"
 
-#: openbox/screen.c:991
+#: openbox/screen.c:1073
 #, c-format
 msgid "desktop %i"
 msgstr "escriptori %i"
@@ -348,3 +353,9 @@ msgstr "La tecla seleccionada '%s' no existeix a la pantalla"
 #, c-format
 msgid "X Error: %s"
 msgstr "Error d'X: %s"
+
+#~ msgid "Invalid action '%s' requested. No such action exists."
+#~ msgstr "L'acció sol·licitada '%s' no és vàlida. Aquesta acció no existeix."
+
+#~ msgid "Invalid use of action '%s'. Action will be ignored."
+#~ msgstr "L'ús de l'acció '%s' no és vàlid. S'ignorarà aquesta acció."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-06-07 14:18+0200\n"
+"POT-Creation-Date: 2007-07-12 03:20-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,269 +16,271 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/action.c:957
-#, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr ""
-
-#: openbox/action.c:960
-#, c-format
-msgid "Invalid use of action '%s'. Action will be ignored."
-msgstr ""
-
-#: openbox/action.c:1227 openbox/action.c:1245 openbox/action.c:1258
-#, c-format
-msgid "Failed to execute '%s': %s"
-msgstr ""
-
-#: openbox/action.c:1266
+#: openbox/actions/execute.c:86
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:104 openbox/client_list_menu.c:105
+#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:98
+msgid "Manage desktops"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+msgid "_Add new desktop"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+msgid "_Remove last desktop"
+msgstr ""
+
+#: openbox/client_list_combined_menu.c:146
 msgid "Windows"
 msgstr ""
 
-#: openbox/client_list_menu.c:196
+#: openbox/client_list_menu.c:199
 msgid "Desktops"
 msgstr ""
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:256
 msgid "All desktops"
 msgstr ""
 
-#: openbox/client_menu.c:363
-msgid "&Layer"
+#: openbox/client_menu.c:360
+msgid "_Layer"
 msgstr ""
 
-#: openbox/client_menu.c:368
-msgid "Always on &top"
+#: openbox/client_menu.c:365
+msgid "Always on _top"
 msgstr ""
 
-#: openbox/client_menu.c:369
-msgid "&Normal"
+#: openbox/client_menu.c:366
+msgid "_Normal"
+msgstr ""
+
+#: openbox/client_menu.c:367
+msgid "Always on _bottom"
 msgstr ""
 
 #: openbox/client_menu.c:370
-msgid "Always on &bottom"
+msgid "_Send to desktop"
 msgstr ""
 
-#: openbox/client_menu.c:373
-msgid "&Send to desktop"
-msgstr ""
-
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:374
 msgid "Client menu"
 msgstr ""
 
-#: openbox/client_menu.c:383
-msgid "R&estore"
+#: openbox/client_menu.c:380
+msgid "R_estore"
 msgstr ""
 
-#: openbox/client_menu.c:391
-msgid "&Move"
+#: openbox/client_menu.c:388
+msgid "_Move"
 msgstr ""
 
-#: openbox/client_menu.c:393
-msgid "Resi&ze"
+#: openbox/client_menu.c:390
+msgid "Resi_ze"
 msgstr ""
 
-#: openbox/client_menu.c:395
-msgid "Ico&nify"
+#: openbox/client_menu.c:392
+msgid "Ico_nify"
 msgstr ""
 
-#: openbox/client_menu.c:403
-msgid "Ma&ximize"
+#: openbox/client_menu.c:400
+msgid "Ma_ximize"
 msgstr ""
 
-#: openbox/client_menu.c:411
-msgid "&Roll up/down"
+#: openbox/client_menu.c:408
+msgid "_Roll up/down"
 msgstr ""
 
-#: openbox/client_menu.c:413
-msgid "Un/&Decorate"
+#: openbox/client_menu.c:410
+msgid "Un/_Decorate"
 msgstr ""
 
-#: openbox/client_menu.c:423
-msgid "&Close"
+#: openbox/client_menu.c:420
+msgid "_Close"
 msgstr ""
 
-#: openbox/config.c:704
+#: openbox/config.c:737
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr ""
 
-#: openbox/keyboard.c:162
+#: openbox/keyboard.c:156
 msgid "Conflict with key binding in config file"
 msgstr ""
 
-#: openbox/menu.c:100 openbox/menu.c:108
+#: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
 msgstr ""
 
-#: openbox/menu.c:151
+#: openbox/menu.c:171
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
 msgstr ""
 
-#: openbox/menu.c:168
+#: openbox/menu.c:185
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
 msgstr ""
 
-#: openbox/menu.c:181
+#: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
 msgstr ""
 
-#: openbox/menu.c:342 openbox/menu.c:343
+#: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
 msgstr ""
 
-#: openbox/mouse.c:338
+#: openbox/mouse.c:349
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr ""
 
-#: openbox/mouse.c:344
+#: openbox/mouse.c:355
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr ""
 
-#: openbox/openbox.c:129
+#: openbox/openbox.c:130
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:149
+#: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr ""
 
-#: openbox/openbox.c:180
+#: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
 msgstr ""
 
-#: openbox/openbox.c:186
+#: openbox/openbox.c:187
 msgid "X server does not support locale."
 msgstr ""
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 
-#: openbox/openbox.c:249
+#: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 
-#: openbox/openbox.c:275
+#: openbox/openbox.c:278
 msgid "Unable to load a theme."
 msgstr ""
 
-#: openbox/openbox.c:401
+#: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 
-#: openbox/openbox.c:471 openbox/openbox.c:473
+#: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:482
+#: openbox/openbox.c:486
 msgid "Syntax: openbox [options]\n"
 msgstr ""
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:487
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:488
 msgid "  --help              Display this help and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:489
 msgid "  --version           Display the version and exit\n"
 msgstr ""
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:490
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:491
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:492
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:493
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr ""
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:494
 msgid "  --restart           Restart Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:496
 msgid "  --sync              Run in synchronous mode\n"
 msgstr ""
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:497
 msgid "  --debug             Display debugging output\n"
 msgstr ""
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:498
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:499
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:500
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:593
+#: openbox/openbox.c:597
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr ""
 
-#: openbox/screen.c:89 openbox/screen.c:190
+#: openbox/screen.c:94 openbox/screen.c:195
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr ""
 
-#: openbox/screen.c:126
+#: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr ""
 
-#: openbox/screen.c:147
+#: openbox/screen.c:152
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/screen.c:991
+#: openbox/screen.c:1073
 #, c-format
 msgid "desktop %i"
 msgstr ""

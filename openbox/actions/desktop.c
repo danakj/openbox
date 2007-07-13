@@ -3,55 +3,115 @@
 #include "openbox/client.h"
 #include <glib.h>
 
+typedef enum {
+    LAST,
+    RELATIVE,
+    ABSOLUTE
+} SwitchType;
+
 typedef struct {
-    gboolean last;
-    guint desktop;
+    SwitchType type;
+    union {
+        struct {
+            guint desktop;
+        } abs;
+
+        struct {
+            gboolean linear;
+            gboolean wrap;
+            ObDirection dir;
+        } rel;
+    }
     gboolean send;
     gboolean follow;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_switch_func(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node);
+static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
+                                xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_desktop_startup()
 {
-    actions_register("Desktop",
-                     setup_func,
-                     free_func,
-                     run_func,
+    actions_register("SwitchToDesktop", setup_switch_func, g_free, run_func,
+                     NULL, NULL);
+    actions_register("SendToDesktop", setup_send_func, g_free, run_func,
                      NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_switch_func(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
-    o->follow = TRUE;
+    /* don't go anywhere if theres no options given */
+    o->type = ABSOLUTE;
+    o->abs.desktop = screen_desktop;
+    /* wrap by default - it's handy! */
+    o->rel.wrap = TRUE;
 
-    if ((n = parse_find_node("desktop", node))) {
+    if ((n = parse_find_node("to", node))) {
         gchar *s = parse_string(doc, n);
-        if (!g_ascii_strcasecmp(s, "last"))
-            o->last = TRUE;
-        else
-            o->desktop = parse_int(doc, n) - 1;
+        if (!g_ascii_strcasecmp(s, "last") ||
+            !g_ascii_strcasecmp(s, "previous"))
+            o->type = LAST;
+        else if (!g_ascii_strcasecmp(s, "next")) {
+            o->type = RELATIVE;
+            o->rel.linear = TRUE;
+            o->rel.dir = OB_DIRECTION_EAST;
+        }
+        else if (!g_ascii_strcasecmp(s, "previous")) {
+            o->type = RELATIVE;
+            o->rel.linear = TRUE;
+            o->rel.dir = OB_DIRECTION_WEST;
+        }
+        else if (!g_ascii_strcasecmp(s, "north") ||
+                 !g_ascii_strcasecmp(s, "up")) {
+            o->type = RELATIVE;
+            o->rel.dir = OB_DIRECTION_NORTH;
+        }
+        else if (!g_ascii_strcasecmp(s, "south") ||
+                 !g_ascii_strcasecmp(s, "down")) {
+            o->type = RELATIVE;
+            o->rel.dir = OB_DIRECTION_SOUTH;
+        }
+        else if (!g_ascii_strcasecmp(s, "west") ||
+                 !g_ascii_strcasecmp(s, "left")) {
+            o->type = RELATIVE;
+            o->rel.dir = OB_DIRECTION_WEST;
+        }
+        else if (!g_ascii_strcasecmp(s, "east") ||
+                 !g_ascii_strcasecmp(s, "right")) {
+            o->type = RELATIVE;
+            o->rel.dir = OB_DIRECTION_EAST;
+        }
+        else {
+            o->type = ABSOLUTE;
+            o->abs.desktop = parse_int(doc, n) - 1;
+        }
         g_free(s);
     }
-    if ((n = parse_find_node("send", node)))
-        o->send = parse_bool(doc, n);
-    if ((n = parse_find_node("follow", node)))
-        o->follow = parse_bool(doc, n);
+
+    if ((n = parse_find_node("wrap", node)))
+        o->rel.wrap = parse_bool(doc, n);
 
     return o;
 }
 
-static void free_func(gpointer options)
+static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
+                                xmlNodePtr node)
 {
-    Options *o = options;
+    Options *o = setup_switch_func(i, doc, node);
+    o->send = TRUE;
+    o->follow = TRUE;
 
-    g_free(o);
+    if ((n = parse_find_node("follow", node)))
+        o->follow = parse_bool(doc, n);
+
+    return o;
 }
 
 /* Always return FALSE because its not interactive */
@@ -60,21 +120,32 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
     guint d;
 
-    if (o->last)
+    
+
+    switch (o->type) {
+    case LAST:
         d = screen_last_desktop;
-    else
-        d = o->desktop;
+        break;
+    case ABSOLUTE:
+        d = o->abs.desktop;
+        break;
+    case RELATIVE:
+        d = screen_cycle_desktop(o->abs.dir,
+                                 o->abs.wrap,
+                                 o->abs.linear,
+                                 FALSE, TRUE, FALSE);
+        break;
+    }
 
     if (d < screen_num_desktops && d != screen_desktop) {
-        gboolean go = !o->send;
-        if (o->send) {
-            if (data->client && client_normal(data->client)) {
-                client_set_desktop(data->client, d, o->follow, FALSE);
-                go = TRUE;
-            }
+        gboolean go = TRUE;
+
+        if (o->send && data->client && client_normal(data->client)) {
+            client_set_desktop(data->client, d, o->follow, FALSE);
+            go = o->follow;
         }
-        if (go)
-            screen_set_desktop(d, TRUE);
+
+        if (go) screen_set_desktop(d, TRUE);
     }
     return FALSE;
 }

@@ -22,8 +22,6 @@ void action_unfocus_startup();
 void action_iconify_startup();
 void action_fullscreen_startup();
 void action_maximize_startup();
-void action_maximizehorizontal_startup();
-void action_maximizevertical_startup();
 void action_moveresizeto_startup();
 void action_moverelative_startup();
 void action_shade_startup();

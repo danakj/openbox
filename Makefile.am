@@ -172,8 +172,6 @@ openbox_openbox_SOURCES = \
 	openbox/actions/layer.c \
 	openbox/actions/lower.c \
 	openbox/actions/maximize.c \
-	openbox/actions/maximizehorizontal.c \
-	openbox/actions/maximizevertical.c \
 	openbox/actions/menu.c \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \

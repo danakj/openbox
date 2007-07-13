@@ -6,6 +6,7 @@
 #include "gettext.h"
 
 typedef struct {
+    gboolean interactive;
     gboolean dialog;
     gboolean dock_windows;
     gboolean desktop_windows;
@@ -13,7 +14,13 @@ typedef struct {
     GSList *actions;
 } Options;
 
+static gboolean cycling = FALSE;
+
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_cycle_func(ObParseInst *i, xmlDocPtr doc,
+                                 xmlNodePtr node);
+static gpointer setup_target_func(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -24,14 +31,12 @@ static void     i_cancel_func(gpointer options);
 
 static void     end_cycle(gboolean cancel, guint state, Options *o);
 
-void action_directionalcyclewindows_startup()
+void action_directionalwindows_startup()
 {
-    actions_register("DirectionalCycleWindows",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     i_input_func,
-                     i_cancel_func);
+    actions_register("DirectionalCycleWindows", setup_cycle_func, free_func,
+                     run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetWindow", setup_target_func, free_func,
+                     run_func, NULL, NULL);
 }
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
@@ -83,12 +88,42 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             m = parse_find_node("action", m->next);
         }
     }
+    else {
+        o->actions = g_slist_prepend(o->actions,
+                                     actions_parse_string("Focus"));
+        o->actions = g_slist_prepend(o->actions,
+                                     actions_parse_string("Raise"));
+        o->actions = g_slist_prepend(o->actions,
+                                     actions_parse_string("Unshade"));
+    }
+
+    return o;
+}
+
+static gpointer setup_cycle_func(ObParseInst *i, xmlDocPtr doc,
+                                 xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->interactive = TRUE;
+    return o;
+}
+
+static gpointer setup_target_func(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->interactive = FALSE;
     return o;
 }
 
 static void free_func(gpointer options)
 {
     Options *o = options;
+
+    while (o->actions) {
+        actions_act_unref(o->actions->data);
+        o->actions = g_slist_delete_link(o->actions, o->actions);
+    }
 
     g_free(o);
 }
@@ -97,18 +132,19 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
 
-    /* if using focus_delay, stop the timer now so that focus doesn't go moving
-       on us */
-    event_halt_focus_delay();
-    
-    focus_directional_cycle(o->direction,
-                            o->dock_windows,
-                            o->desktop_windows,
-                            TRUE,
-                            o->dialog,
-                            FALSE, FALSE);
+    if (o->interactive)
+        end_cycle(FALSE, data->state, o);
+    else {
+        focus_directional_cycle(o->direction,
+                                o->dock_windows,
+                                o->desktop_windows,
+                                TRUE,
+                                o->dialog,
+                                FALSE, FALSE);
+        cycling = TRUE;
+    }
 
-    return TRUE;
+    return o->interactive;
 }
 
 static gboolean i_input_func(guint initial_state,
@@ -144,7 +180,10 @@ static gboolean i_input_func(guint initial_state,
 
 static void i_cancel_func(gpointer options)
 {
-    end_cycle(TRUE, 0, options);
+    /* we get cancelled when we move focus, but we're not cycling anymore, so
+       just ignore that */
+    if (cycling)
+        end_cycle(TRUE, 0, options);
 }
 
 static void end_cycle(gboolean cancel, guint state, Options *o)
@@ -157,6 +196,7 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
                                  TRUE,
                                  o->dialog,
                                  TRUE, cancel);
+    cycling = FALSE;
 
     if (ft) {
         actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,

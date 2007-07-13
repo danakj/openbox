@@ -158,8 +158,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/decorations.c \
 	openbox/actions/desktop.c \
 	openbox/actions/dockautohide.c \
-	openbox/actions/directionalcyclewindows.c \
-	openbox/actions/directionaltargetwindow.c \
+	openbox/actions/directionalwindows.c \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \

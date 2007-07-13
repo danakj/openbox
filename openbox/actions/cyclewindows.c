@@ -112,10 +112,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
 
-    /* if using focus_delay, stop the timer now so that focus doesn't go moving
-       on us */
-    event_halt_focus_delay();
-    
     focus_cycle(o->forward,
                 o->all_desktops,
                 o->dock_windows,
@@ -180,10 +176,10 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
                      TRUE,
                      o->dialog,
                      TRUE, cancel);
+    cycling = FALSE;
 
     if (ft) {
         actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
                          state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
     }
-    cycling = FALSE;
 }

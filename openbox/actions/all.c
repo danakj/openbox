@@ -26,8 +26,7 @@ void action_all_startup()
     action_shade_startup();
     action_kill_startup();
     action_omnipresent_startup();
-    action_directionalcyclewindows_startup();
-    action_directionaltargetwindow_startup();
+    action_directionalwindows_startup();
     action_resize_startup();
     action_decorations_startup();
     action_desktop_startup();

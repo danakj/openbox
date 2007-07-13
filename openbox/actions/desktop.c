@@ -21,12 +21,12 @@ typedef struct {
             gboolean wrap;
             ObDirection dir;
         } rel;
-    }
+    };
     gboolean send;
     gboolean follow;
 } Options;
 
-static gpointer setup_switch_func(ObParseInst *i, xmlDocPtr doc,
+static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
                                   xmlNodePtr node);
 static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
                                 xmlNodePtr node);
@@ -34,13 +34,13 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_desktop_startup()
 {
-    actions_register("SwitchToDesktop", setup_switch_func, g_free, run_func,
+    actions_register("GoToDesktop", setup_go_func, g_free, run_func,
                      NULL, NULL);
     actions_register("SendToDesktop", setup_send_func, g_free, run_func,
                      NULL, NULL);
 }
 
-static gpointer setup_switch_func(ObParseInst *i, xmlDocPtr doc,
+static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
                                   xmlNodePtr node)
 {
     xmlNodePtr n;
@@ -104,7 +104,10 @@ static gpointer setup_switch_func(ObParseInst *i, xmlDocPtr doc,
 static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
                                 xmlNodePtr node)
 {
-    Options *o = setup_switch_func(i, doc, node);
+    xmlNodePtr n;
+    Options *o;
+
+    o = setup_go_func(i, doc, node);
     o->send = TRUE;
     o->follow = TRUE;
 
@@ -130,9 +133,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         d = o->abs.desktop;
         break;
     case RELATIVE:
-        d = screen_cycle_desktop(o->abs.dir,
-                                 o->abs.wrap,
-                                 o->abs.linear,
+        d = screen_cycle_desktop(o->rel.dir,
+                                 o->rel.wrap,
+                                 o->rel.linear,
                                  FALSE, TRUE, FALSE);
         break;
     }

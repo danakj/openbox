@@ -35,9 +35,11 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         o->left = parse_int(doc, n);
     if ((n = parse_find_node("right", node)))
         o->right = parse_int(doc, n);
-    if ((n = parse_find_node("top", node)))
+    if ((n = parse_find_node("top", node)) ||
+        (n = parse_find_node("up", node)))
         o->top = parse_int(doc, n);
-    if ((n = parse_find_node("bottom", node)))
+    if ((n = parse_find_node("bottom", node)) ||
+        (n = parse_find_node("down", node)))
         o->bottom = parse_int(doc, n);
 
     return o;

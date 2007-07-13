@@ -782,6 +782,21 @@ typedef struct
     const gchar *actname;
 } ObDefKeyBind;
 
+static void bind_default_keyboard()
+{
+    ObDefKeyBind *it;
+    ObDefKeyBind binds[] = {
+        { "A-Tab", "NextWindow" },
+        { "S-A-Tab", "PreviousWindow" },
+        { "A-F4", "Close" },
+        { NULL, NULL }
+    };
+    for (it = binds; it->key; ++it) {
+        GList *l = g_list_append(NULL, g_strdup(it->key));
+        keyboard_bind(l, actions_parse_string(it->actname));
+    }
+}
+
 typedef struct
 {
     const gchar *button;
@@ -912,6 +927,8 @@ void config_startup(ObParseInst *i)
 
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
+
+    void bind_default_keyboard()
 
     parse_register(i, "keyboard", parse_keyboard, NULL);
 

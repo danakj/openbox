@@ -4,23 +4,42 @@
 typedef struct {
     gint layer; /*!< -1 for below, 0 for normal, and 1 for above */
     gboolean toggle;
-    gboolean on;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func_top(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_func_bottom(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node);
+static gpointer setup_func_send(ObParseInst *i, xmlDocPtr doc,
+                                xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_layer_startup()
 {
-    actions_register("Layer",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("ToggleAlwaysOnTop", setup_func_top, g_free,
+                     run_func_toggle, NULL, NULL);
+    actions_register("ToggleAlwaysOnBottom", setup_func_bottom, g_free,
+                     run_func_toggle, NULL, NULL);
+    actions_register("SendToLayer", setup_func_send, g_free,
+                     run_func_send, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func_top(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->layer = 1;
+    return o;
+}
+
+static gpointer setup_func_bottom(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->layer = -1;
+    return o;
+}
+
+static gpointer setup_func_send(ObParseInst *i, xmlDocPtr doc,
+                                xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -41,23 +60,8 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             o->layer = 0;
         g_free(s);
     }
-    if ((n = parse_find_node("state", node))) {
-        gchar *s = parse_string(doc, n);
-        if (g_ascii_strcasecmp(s, "toggle")) {
-            o->toggle = FALSE;
-            o->on = parse_bool(doc, n);
-        }
-        g_free(s);
-    }
 
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -71,17 +75,15 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         actions_client_move(data, TRUE);
 
         if (o->layer < 0) {
-            if (o->toggle || c->below != o->on)
+            if (o->toggle || !c->below)
                 client_set_layer(c, c->below ? 0 : -1);
         }
         else if (o->layer > 0) {
-            if (o->toggle || c->above != o->on)
+            if (o->toggle || !c->above)
                 client_set_layer(c, c->above ? 0 : 1);
         }
-        else {
-            if ((o->toggle || o->on) && (c->above || c->below))
-                client_set_layer(c, 0);
-        }
+        else if (c->above || c->below)
+            client_set_layer(c, 0);
 
         actions_client_move(data, FALSE);
     }

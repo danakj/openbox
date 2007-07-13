@@ -928,7 +928,7 @@ void config_startup(ObParseInst *i)
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
 
-    bind_default_keyboard()
+    bind_default_keyboard();
 
     parse_register(i, "keyboard", parse_keyboard, NULL);
 

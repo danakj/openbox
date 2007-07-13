@@ -31,7 +31,7 @@
                          EnterWindowMask | LeaveWindowMask)
 #define DOCKAPP_EVENT_MASK (StructureNotifyMask)
 
-ObDock *dock;
+static ObDock *dock;
 
 StrutPartial dock_strut;
 

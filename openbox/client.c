@@ -64,8 +64,6 @@ typedef struct
 
 GList            *client_list          = NULL;
 
-extern ObDock *dock;
-
 static GSList *client_destroy_notifies = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
@@ -3948,6 +3946,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 {
     GList *it;
     Rect *a, *mon;
+    Rect dock_area;
     gint edge;
 
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
@@ -4004,7 +4003,8 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
         detect_edge(cur->frame->area, dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
     }
-    detect_edge(dock->area, dir, my_head, my_size, my_edge_start,
+    dock_get_area(&dock_area);
+    detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
                 my_edge_size, dest, near_edge);
 }
 

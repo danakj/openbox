@@ -16,17 +16,18 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 void action_layer_startup()
 {
     actions_register("ToggleAlwaysOnTop", setup_func_top, g_free,
-                     run_func_toggle, NULL, NULL);
+                     run_func, NULL, NULL);
     actions_register("ToggleAlwaysOnBottom", setup_func_bottom, g_free,
-                     run_func_toggle, NULL, NULL);
+                     run_func, NULL, NULL);
     actions_register("SendToLayer", setup_func_send, g_free,
-                     run_func_send, NULL, NULL);
+                     run_func, NULL, NULL);
 }
 
 static gpointer setup_func_top(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 {
     Options *o = g_new0(Options, 1);
     o->layer = 1;
+    o->toggle = TRUE;
     return o;
 }
 
@@ -35,6 +36,7 @@ static gpointer setup_func_bottom(ObParseInst *i, xmlDocPtr doc,
 {
     Options *o = g_new0(Options, 1);
     o->layer = -1;
+    o->toggle = TRUE;
     return o;
 }
 
@@ -45,7 +47,6 @@ static gpointer setup_func_send(ObParseInst *i, xmlDocPtr doc,
     Options *o;
 
     o = g_new0(Options, 1);
-    o->toggle = TRUE;
 
     if ((n = parse_find_node("layer", node))) {
         gchar *s = parse_string(doc, n);

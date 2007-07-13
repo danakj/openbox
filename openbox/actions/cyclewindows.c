@@ -17,6 +17,10 @@ typedef struct {
 static gboolean cycling = FALSE;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_forward_func(ObParseInst *i, xmlDocPtr doc,
+                                   xmlNodePtr node);
+static gpointer setup_backward_func(ObParseInst *i, xmlDocPtr doc,
+                                    xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -29,12 +33,10 @@ static void     end_cycle(gboolean cancel, guint state, Options *o);
 
 void action_cyclewindows_startup()
 {
-    actions_register("CycleWindows",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     i_input_func,
-                     i_cancel_func);
+    actions_register("NextWindow", setup_forward_func, free_func,
+                     run_func, i_input_func, i_cancel_func);
+    actions_register("PreviousWindow", setup_backward_func, free_func,
+                     run_func, i_input_func, i_cancel_func);
 }
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
@@ -44,10 +46,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     o = g_new0(Options, 1);
     o->dialog = TRUE;
-    o->forward = TRUE;
 
-    if ((n = parse_find_node("forward", node)))
-        o->forward = parse_bool(doc, n);
     if ((n = parse_find_node("linear", node)))
         o->linear = parse_bool(doc, n);
     if ((n = parse_find_node("dialog", node)))
@@ -69,12 +68,42 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             m = parse_find_node("action", m->next);
         }
     }
+    else {
+        o->actions = g_slist_prepend(o->actions,
+                                     actions_parse_string("Focus"));
+        o->actions = g_slist_prepend(o->actions,
+                                     actions_parse_string("Raise"));
+        o->actions = g_slist_prepend(o->actions,
+                                     actions_parse_string("Unshade"));
+    }
+
+    return o;
+}
+
+static gpointer setup_forward_func(ObParseInst *i, xmlDocPtr doc,
+                                   xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->forward = TRUE;
+    return o;
+}
+
+static gpointer setup_backward_func(ObParseInst *i, xmlDocPtr doc,
+                                    xmlNodePtr node)
+{
+    Options *o = setup_func(i, doc, node);
+    o->forward = FALSE;
     return o;
 }
 
 static void free_func(gpointer options)
 {
     Options *o = options;
+
+    while (o->actions) {
+        actions_act_unref(o->actions->data);
+        o->actions = g_slist_delete_link(o->actions, o->actions);
+    }
 
     g_free(o);
 }

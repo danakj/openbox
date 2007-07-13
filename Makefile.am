@@ -118,6 +118,7 @@ openbox_openbox_CPPFLAGS = \
 	$(XRANDR_CFLAGS) \
 	$(XSHAPE_CFLAGS) \
 	$(XSYNC_CFLAGS) \
+	$(GL_CFLAGS) \
 	$(XRENDER_CFLAGS) \
 	$(XDAMAGE_CFLAGS) \
 	$(XCOMPOSITE_CFLAGS) \
@@ -140,6 +141,7 @@ openbox_openbox_LDADD = \
 	$(XSHAPE_LIBS) \
 	$(XSYNC_LIBS) \
 	$(GLIB_LIBS) \
+	$(GL_LIBS) \
 	$(XRENDER_LIBS) \
 	$(XDAMAGE_LIBS) \
 	$(XCOMPOSITE_LIBS) \

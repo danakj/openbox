@@ -23,6 +23,7 @@ static gboolean run_func_on(ObActionsData *data, gpointer options)
     return FALSE;
 }
 
+/* Always return FALSE because its not interactive */
 static gboolean run_func_off(ObActionsData *data, gpointer options)
 {
     if (data->client) {
@@ -33,6 +34,7 @@ static gboolean run_func_off(ObActionsData *data, gpointer options)
     return FALSE;
 }
 
+/* Always return FALSE because its not interactive */
 static gboolean run_func_toggle(ObActionsData *data, gpointer options)
 {
     if (data->client) {

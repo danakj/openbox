@@ -132,7 +132,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
 
-    if (o->interactive)
+    if (!o->interactive)
         end_cycle(FALSE, data->state, o);
     else {
         focus_directional_cycle(o->direction,
@@ -193,7 +193,7 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
     ft = focus_directional_cycle(o->direction,
                                  o->dock_windows,
                                  o->desktop_windows,
-                                 TRUE,
+                                 o->interactive,
                                  o->dialog,
                                  TRUE, cancel);
     cycling = FALSE;

@@ -226,25 +226,25 @@ void dock_configure()
 
     RrMargins(dock->a_frame, &l, &t, &r, &b);
 
-    dock->w = dock->h = 0;
+    dock->area.width = dock->area.height = 0;
 
     /* get the size */
     for (it = dock->dock_apps; it; it = g_list_next(it)) {
         ObDockApp *app = it->data;
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:
-            dock->w += app->w;
-            dock->h = MAX(dock->h, app->h);
+            dock->area.width += app->w;
+            dock->area.height = MAX(dock->area.height, app->h);
             break;
         case OB_ORIENTATION_VERT:
-            dock->w = MAX(dock->w, app->w);
-            dock->h += app->h;
+            dock->area.width = MAX(dock->area.width, app->w);
+            dock->area.height += app->h;
             break;
         }
     }
 
-    dock->w += l + r;
-    dock->h += t + b;
+    dock->area.width += l + r;
+    dock->area.height += t + b;
 
     hspot = l;
     vspot = t;
@@ -255,11 +255,11 @@ void dock_configure()
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:
             app->x = hspot;
-            app->y = (dock->h - app->h) / 2;
+            app->y = (dock->area.height - app->h) / 2;
             hspot += app->w;
             break;
         case OB_ORIENTATION_VERT:
-            app->x = (dock->w - app->w) / 2;
+            app->x = (dock->area.width - app->w) / 2;
             app->y = vspot;
             vspot += app->h;
             break;
@@ -269,56 +269,56 @@ void dock_configure()
     }
 
     /* used for calculating offsets */
-    dock->w += ob_rr_theme->obwidth * 2;
-    dock->h += ob_rr_theme->obwidth * 2;
+    dock->area.width += ob_rr_theme->obwidth * 2;
+    dock->area.height += ob_rr_theme->obwidth * 2;
 
     a = screen_physical_area_all_monitors();
 
     /* calculate position */
     if (config_dock_floating) {
-        dock->x = config_dock_x;
-        dock->y = config_dock_y;
+        dock->area.x = config_dock_x;
+        dock->area.y = config_dock_y;
         gravity = NorthWestGravity;
     } else {
         switch (config_dock_pos) {
         case OB_DIRECTION_NORTHWEST:
-            dock->x = 0;
-            dock->y = 0;
+            dock->area.x = 0;
+            dock->area.y = 0;
             gravity = NorthWestGravity;
             break;
         case OB_DIRECTION_NORTH:
-            dock->x = a->width / 2;
-            dock->y = 0;
+            dock->area.x = a->width / 2;
+            dock->area.y = 0;
             gravity = NorthGravity;
             break;
         case OB_DIRECTION_NORTHEAST:
-            dock->x = a->width;
-            dock->y = 0;
+            dock->area.x = a->width;
+            dock->area.y = 0;
             gravity = NorthEastGravity;
             break;
         case OB_DIRECTION_WEST:
-            dock->x = 0;
-            dock->y = a->height / 2;
+            dock->area.x = 0;
+            dock->area.y = a->height / 2;
             gravity = WestGravity;
             break;
         case OB_DIRECTION_EAST:
-            dock->x = a->width;
-            dock->y = a->height / 2;
+            dock->area.x = a->width;
+            dock->area.y = a->height / 2;
             gravity = EastGravity;
             break;
         case OB_DIRECTION_SOUTHWEST:
-            dock->x = 0;
-            dock->y = a->height;
+            dock->area.x = 0;
+            dock->area.y = a->height;
             gravity = SouthWestGravity;
             break;
         case OB_DIRECTION_SOUTH:
-            dock->x = a->width / 2;
-            dock->y = a->height;
+            dock->area.x = a->width / 2;
+            dock->area.y = a->height;
             gravity = SouthGravity;
             break;
         case OB_DIRECTION_SOUTHEAST:
-            dock->x = a->width;
-            dock->y = a->height;
+            dock->area.x = a->width;
+            dock->area.y = a->height;
             gravity = SouthEastGravity;
             break;
         default:
@@ -330,24 +330,24 @@ void dock_configure()
     case NorthGravity:
     case CenterGravity:
     case SouthGravity:
-        dock->x -= dock->w / 2;
+        dock->area.x -= dock->area.width / 2;
         break;
     case NorthEastGravity:
     case EastGravity:
     case SouthEastGravity:
-        dock->x -= dock->w;
+        dock->area.x -= dock->area.width;
         break;
     }
     switch(gravity) {
     case WestGravity:
     case CenterGravity:
     case EastGravity:
-        dock->y -= dock->h / 2;
+        dock->area.y -= dock->area.height / 2;
         break;
     case SouthWestGravity:
     case SouthGravity:
     case SouthEastGravity:
-        dock->y -= dock->h;
+        dock->area.y -= dock->area.height;
         break;
     }
 
@@ -357,51 +357,51 @@ void dock_configure()
             case OB_DIRECTION_NORTHWEST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y -= dock->h - ob_rr_theme->obwidth;
+                    dock->area.y -= dock->area.height - ob_rr_theme->obwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x -= dock->w - ob_rr_theme->obwidth;
+                    dock->area.x -= dock->area.width - ob_rr_theme->obwidth;
                     break;
                 }
                 break;
             case OB_DIRECTION_NORTH:
-                dock->y -= dock->h - ob_rr_theme->obwidth;
+                dock->area.y -= dock->area.height - ob_rr_theme->obwidth;
                 break;
             case OB_DIRECTION_NORTHEAST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y -= dock->h - ob_rr_theme->obwidth;
+                    dock->area.y -= dock->area.height - ob_rr_theme->obwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x += dock->w - ob_rr_theme->obwidth;
+                    dock->area.x += dock->area.width - ob_rr_theme->obwidth;
                     break;
                 }
                 break;
             case OB_DIRECTION_WEST:
-                dock->x -= dock->w - ob_rr_theme->obwidth;
+                dock->area.x -= dock->area.width - ob_rr_theme->obwidth;
                 break;
             case OB_DIRECTION_EAST:
-                dock->x += dock->w - ob_rr_theme->obwidth;
+                dock->area.x += dock->area.width - ob_rr_theme->obwidth;
                 break;
             case OB_DIRECTION_SOUTHWEST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y += dock->h - ob_rr_theme->obwidth;
+                    dock->area.y += dock->area.height - ob_rr_theme->obwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x -= dock->w - ob_rr_theme->obwidth;
+                    dock->area.x -= dock->area.width - ob_rr_theme->obwidth;
                     break;
                 } break;
             case OB_DIRECTION_SOUTH:
-                dock->y += dock->h - ob_rr_theme->obwidth;
+                dock->area.y += dock->area.height - ob_rr_theme->obwidth;
                 break;
             case OB_DIRECTION_SOUTHEAST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->y += dock->h - ob_rr_theme->obwidth;
+                    dock->area.y += dock->area.height - ob_rr_theme->obwidth;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->x += dock->w - ob_rr_theme->obwidth;
+                    dock->area.x += dock->area.width - ob_rr_theme->obwidth;
                     break;
                 }
                 break;
@@ -413,8 +413,8 @@ void dock_configure()
         strw = ob_rr_theme->obwidth;
         strh = ob_rr_theme->obwidth;
     } else {
-        strw = dock->w;
-        strh = dock->h;
+        strw = dock->area.width;
+        strh = dock->area.height;
     }
 
     /* set the strut */
@@ -431,55 +431,55 @@ void dock_configure()
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
                 STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
-                                  0, 0, dock->x, dock->x + dock->w - 1,
+                                  0, 0, dock->area.x, dock->area.x + dock->area.width - 1,
                                   0, 0, 0, 0);
                 break;
             case OB_ORIENTATION_VERT:
                 STRUT_PARTIAL_SET(dock_strut, strw, 0, 0, 0,
-                                  dock->y, dock->y + dock->h - 1,
+                                  dock->area.y, dock->area.y + dock->area.height - 1,
                                   0, 0, 0, 0, 0, 0);
                 break;
             }
             break;
         case OB_DIRECTION_NORTH:
             STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
-                              0, 0, dock->x, dock->x + dock->w - 1,
+                              0, 0, dock->area.x, dock->area.x + dock->area.width - 1,
                               0, 0, 0, 0);
             break;
         case OB_DIRECTION_NORTHEAST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
                 STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
-                                  0, 0, dock->x, dock->x + dock->w -1,
+                                  0, 0, dock->area.x, dock->area.x + dock->area.width -1,
                                   0, 0, 0, 0);
                 break;
             case OB_ORIENTATION_VERT:
                 STRUT_PARTIAL_SET(dock_strut, 0, 0, strw, 0,
                                   0, 0, 0, 0,
-                                  dock->y, dock->y + dock->h - 1, 0, 0);
+                                  dock->area.y, dock->area.y + dock->area.height - 1, 0, 0);
                 break;
             }
             break;
         case OB_DIRECTION_WEST:
             STRUT_PARTIAL_SET(dock_strut, strw, 0, 0, 0,
-                              dock->y, dock->y + dock->h - 1,
+                              dock->area.y, dock->area.y + dock->area.height - 1,
                               0, 0, 0, 0, 0, 0);
             break;
         case OB_DIRECTION_EAST:
             STRUT_PARTIAL_SET(dock_strut, 0, 0, strw, 0,
                               0, 0, 0, 0,
-                              dock->y, dock->y + dock->h - 1, 0, 0);
+                              dock->area.y, dock->area.y + dock->area.height - 1, 0, 0);
             break;
         case OB_DIRECTION_SOUTHWEST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
                 STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, strh,
                                   0, 0, 0, 0, 0, 0,
-                                  dock->x, dock->x + dock->w - 1);
+                                  dock->area.x, dock->area.x + dock->area.width - 1);
                 break;
             case OB_ORIENTATION_VERT:
                 STRUT_PARTIAL_SET(dock_strut, strw, 0, 0, 0,
-                                  dock->y, dock->y + dock->h - 1,
+                                  dock->area.y, dock->area.y + dock->area.height - 1,
                                   0, 0, 0, 0, 0, 0);
                 break;
             }
@@ -487,19 +487,19 @@ void dock_configure()
         case OB_DIRECTION_SOUTH:
             STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, strh,
                               0, 0, 0, 0, 0, 0,
-                              dock->x, dock->x + dock->w - 1);
+                              dock->area.x, dock->area.x + dock->area.width - 1);
             break;
         case OB_DIRECTION_SOUTHEAST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
                 STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, strh,
                                   0, 0, 0, 0, 0, 0,
-                                  dock->x, dock->x + dock->w - 1);
+                                  dock->area.x, dock->area.x + dock->area.width - 1);
                 break;
             case OB_ORIENTATION_VERT:
                 STRUT_PARTIAL_SET(dock_strut, 0, 0, strw, 0,
                                   0, 0, 0, 0,
-                                  dock->y, dock->y + dock->h - 1, 0, 0);
+                                  dock->area.y, dock->area.y + dock->area.height - 1, 0, 0);
                 break;
             }
             break;
@@ -507,24 +507,24 @@ void dock_configure()
     }
 
     /* not used for actually sizing shit */
-    dock->w -= ob_rr_theme->obwidth * 2;
-    dock->h -= ob_rr_theme->obwidth * 2;
+    dock->area.width -= ob_rr_theme->obwidth * 2;
+    dock->area.height -= ob_rr_theme->obwidth * 2;
 
     if (dock->dock_apps) {
-        g_assert(dock->w > 0);
-        g_assert(dock->h > 0);
+        g_assert(dock->area.width > 0);
+        g_assert(dock->area.height > 0);
 
         XMoveResizeWindow(ob_display, dock->frame,
-                          dock->x, dock->y, dock->w, dock->h);
+                          dock->area.x, dock->area.y, dock->area.width, dock->area.height);
 
-        RrPaint(dock->a_frame, dock->frame, dock->w, dock->h);
+        RrPaint(dock->a_frame, dock->frame, dock->area.width, dock->area.height);
         XMapWindow(ob_display, dock->frame);
     } else
         XUnmapWindow(ob_display, dock->frame);
 
     /* but they are useful outside of this function! */
-    dock->w += ob_rr_theme->obwidth * 2;
-    dock->h += ob_rr_theme->obwidth * 2;
+    dock->area.width += ob_rr_theme->obwidth * 2;
+    dock->area.height += ob_rr_theme->obwidth * 2;
 
     screen_update_areas();
 
@@ -550,14 +550,14 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     y = e->y_root;
 
     /* are we on top of the dock? */
-    if (!(x >= dock->x &&
-          y >= dock->y &&
-          x < dock->x + dock->w &&
-          y < dock->y + dock->h))
+    if (!(x >= dock->area.x &&
+          y >= dock->area.y &&
+          x < dock->area.x + dock->area.width &&
+          y < dock->area.y + dock->area.height))
         return;
 
-    x -= dock->x;
-    y -= dock->y;
+    x -= dock->area.x;
+    y -= dock->area.y;
 
     /* which dock app are we on top of? */
     stop = FALSE;
@@ -640,5 +640,5 @@ void dock_hide(gboolean hide)
 
 void dock_get_area(Rect *a)
 {
-    RECT_SET(*a, dock->x, dock->y, dock->w, dock->h);
+    RECT_SET(*a, dock->area.x, dock->area.y, dock->area.width, dock->area.height);
 }

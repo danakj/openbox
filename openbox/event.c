@@ -1529,7 +1529,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 #ifdef SHAPE
         if (extensions_shape && e->type == extensions_shape_event_basep) {
             client->shaped = ((XShapeEvent*)e)->shaped;
-            frame_adjust_shape(client->frame);
+            frame_adjust_area(client->frame, FALSE, TRUE, FALSE);
         }
 #endif
     }

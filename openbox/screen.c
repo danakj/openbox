@@ -27,6 +27,7 @@
 #include "moveresize.h"
 #include "config.h"
 #include "screen.h"
+#include "composite.h"
 #include "client.h"
 #include "session.h"
 #include "frame.h"
@@ -490,6 +491,9 @@ void screen_resize()
 
     for (it = client_list; it; it = g_list_next(it))
         client_move_onscreen(it->data, FALSE);
+
+    /* this needs to be setup whenever the root window's size changes */
+    composite_setup_root_window();
 }
 
 void screen_set_num_desktops(guint num)

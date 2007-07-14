@@ -158,9 +158,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/decorations.c \
 	openbox/actions/desktop.c \
 	openbox/actions/dockautohide.c \
-	openbox/actions/directionalcyclewindows.c \
-	openbox/actions/directionaldesktop.c \
-	openbox/actions/directionaltargetwindow.c \
+	openbox/actions/directionalwindows.c \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \
@@ -173,8 +171,6 @@ openbox_openbox_SOURCES = \
 	openbox/actions/layer.c \
 	openbox/actions/lower.c \
 	openbox/actions/maximize.c \
-	openbox/actions/maximizehorizontal.c \
-	openbox/actions/maximizevertical.c \
 	openbox/actions/move.c \
 	openbox/actions/moverelative.c \
 	openbox/actions/moveresizeto.c \

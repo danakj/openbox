@@ -791,7 +791,6 @@ static void bind_default_keyboard()
         { "A-F4", "Close" },
         { NULL, NULL }
     };
-
     for (it = binds; it->key; ++it) {
         GList *l = g_list_append(NULL, g_strdup(it->key));
         keyboard_bind(l, actions_parse_string(it->actname));

@@ -3849,6 +3849,96 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
     return NULL;
 }
 
+static void detect_edge(Rect area, ObDirection dir,
+                        gint my_head, gint my_size,
+                        gint my_edge_start, gint my_edge_size,
+                        gint *dest, gboolean *near_edge)
+{
+    gint edge_start, edge_size, head, tail;
+    gboolean skip_head = FALSE, skip_tail = FALSE;
+
+    switch(dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
+            edge_start = area.x;
+            edge_size = area.width;
+            break;
+        case OB_DIRECTION_EAST:
+        case OB_DIRECTION_WEST:
+            edge_start = area.y;
+            edge_size = area.height;
+            break;
+        default:
+            g_assert_not_reached();
+    }
+
+    /* do we collide with this window? */
+    if (!RANGES_INTERSECT(my_edge_start, my_edge_size,
+                edge_start, edge_size))
+        return;
+
+    switch(dir) {
+        case OB_DIRECTION_NORTH:
+            head = RECT_BOTTOM(area);
+            tail = RECT_TOP(area);
+            break;
+        case OB_DIRECTION_SOUTH:
+            head = RECT_TOP(area);
+            tail = RECT_BOTTOM(area);
+            break;
+        case OB_DIRECTION_EAST:
+            head = RECT_LEFT(area);
+            tail = RECT_RIGHT(area);
+            break;
+        case OB_DIRECTION_WEST:
+            head = RECT_RIGHT(area);
+            tail = RECT_LEFT(area);
+            break;
+        default:
+            g_assert_not_reached();
+    }
+    switch(dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_WEST:
+            if (my_head <= head + 1)
+                skip_head = TRUE;
+            if (my_head + my_size - 1 <= tail)
+                skip_tail = TRUE;
+            if (head < *dest)
+                skip_head = TRUE;
+            if (tail - my_size < *dest)
+                skip_tail = TRUE;
+            break;
+        case OB_DIRECTION_SOUTH:
+        case OB_DIRECTION_EAST:
+            if (my_head >= head - 1)
+                skip_head = TRUE;
+            if (my_head - my_size + 1 >= tail)
+                skip_tail = TRUE;
+            if (head > *dest)
+                skip_head = TRUE;
+            if (tail + my_size > *dest)
+                skip_tail = TRUE;
+            break;
+        default:
+            g_assert_not_reached();
+    }
+
+    ob_debug("my head %d size %d\n", my_head, my_size);
+    ob_debug("head %d tail %d deest %d\n", head, tail, *dest);
+    if (!skip_head) {
+        ob_debug("using near edge %d\n", head);
+        *dest = head;
+        *near_edge = TRUE;
+    }
+    else if (!skip_tail) {
+        ob_debug("using far edge %d\n", tail);
+        *dest = tail;
+        *near_edge = FALSE;
+    }
+
+}
+
 void client_find_edge_directional(ObClient *self, ObDirection dir,
                                   gint my_head, gint my_size,
                                   gint my_edge_start, gint my_edge_size,
@@ -3856,6 +3946,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 {
     GList *it;
     Rect *a, *mon;
+    Rect dock_area;
     gint edge;
 
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
@@ -3897,8 +3988,6 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 
     for(it = client_list; it; it = g_list_next(it)) {
         ObClient *cur = it->data;
-        gint edge_start, edge_size, head, tail;
-        gboolean skip_head = FALSE, skip_tail = FALSE;
 
         /* skip windows to not bump into */
         if (cur == self)
@@ -3911,87 +4000,12 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 
         ob_debug("trying window %s\n", cur->title);
 
-        switch(dir) {
-        case OB_DIRECTION_NORTH:
-        case OB_DIRECTION_SOUTH:
-            edge_start = cur->frame->area.x;
-            edge_size = cur->frame->area.width;
-            break;
-        case OB_DIRECTION_EAST:
-        case OB_DIRECTION_WEST:
-            edge_start = cur->frame->area.y;
-            edge_size = cur->frame->area.height;
-            break;
-        default:
-            g_assert_not_reached();
-        }
-
-        /* do we collide with this window? */
-        if (!RANGES_INTERSECT(my_edge_start, my_edge_size,
-                              edge_start, edge_size))
-            continue;
-
-        switch(dir) {
-        case OB_DIRECTION_NORTH:
-            head = RECT_BOTTOM(cur->frame->area);
-            tail = RECT_TOP(cur->frame->area);
-            break;
-        case OB_DIRECTION_SOUTH:
-            head = RECT_TOP(cur->frame->area);
-            tail = RECT_BOTTOM(cur->frame->area);
-            break;
-        case OB_DIRECTION_EAST:
-            head = RECT_LEFT(cur->frame->area);
-            tail = RECT_RIGHT(cur->frame->area);
-            break;
-        case OB_DIRECTION_WEST:
-            head = RECT_RIGHT(cur->frame->area);
-            tail = RECT_LEFT(cur->frame->area);
-            break;
-        default:
-            g_assert_not_reached();
-        }
-
-        switch(dir) {
-        case OB_DIRECTION_NORTH:
-        case OB_DIRECTION_WEST:
-            if (my_head <= head + 1)
-                skip_head = TRUE;
-            if (my_head + my_size - 1 <= tail)
-                skip_tail = TRUE;
-            if (head < *dest)
-                skip_head = TRUE;
-            if (tail - my_size < *dest)
-                skip_tail = TRUE;
-            break;
-        case OB_DIRECTION_SOUTH:
-        case OB_DIRECTION_EAST:
-            if (my_head >= head - 1)
-                skip_head = TRUE;
-            if (my_head - my_size + 1 >= tail)
-                skip_tail = TRUE;
-            if (head > *dest)
-                skip_head = TRUE;
-            if (tail + my_size > *dest)
-                skip_tail = TRUE;
-            break;
-        default:
-            g_assert_not_reached();
-        }
-
-        ob_debug("my head %d size %d\n", my_head, my_size);
-        ob_debug("head %d tail %d deest %d\n", head, tail, *dest);
-        if (!skip_head) {
-            ob_debug("using near edge %d\n", head);
-            *dest = head;
-            *near_edge = TRUE;
-        }
-        else if (!skip_tail) {
-            ob_debug("using far edge %d\n", tail);
-            *dest = tail;
-            *near_edge = FALSE;
-        }
+        detect_edge(cur->frame->area, dir, my_head, my_size, my_edge_start,
+                    my_edge_size, dest, near_edge);
     }
+    dock_get_area(&dock_area);
+    detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
+                my_edge_size, dest, near_edge);
 }
 
 void client_find_move_directional(ObClient *self, ObDirection dir,

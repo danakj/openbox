@@ -39,10 +39,7 @@ struct _ObDock
     RrAppearance *a_frame;
 
     /* actual position (when not auto-hidden) */
-    gint x;
-    gint y;
-    gint w;
-    gint h;
+    Rect area;
 
     gboolean hidden;
 

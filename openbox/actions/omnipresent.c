@@ -2,76 +2,23 @@
 #include "openbox/client.h"
 #include "openbox/screen.h"
 
-typedef struct {
-    gboolean toggle;
-    gboolean on;
-} Options;
-
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static gpointer setup_toggle_func(ObParseInst *i,
-                                  xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func_toggle(ObActionsData *data, gpointer options);
 
 void action_omnipresent_startup()
 {
-    actions_register("Omnipresent",
-                     setup_func,
-                     free_func,
-                     run_func,
+    actions_register("ToggleOmnipresent", NULL, NULL, run_func_toggle,
                      NULL, NULL);
-    actions_register("ToggleOmnipresent",
-                     setup_toggle_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
-}
-
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
-{
-    xmlNodePtr n;
-    Options *o;
-
-    o = g_new0(Options, 1);
-    o->toggle = TRUE;
-
-    if ((n = parse_find_node("state", node))) {
-        gchar *s = parse_string(doc, n);
-        if (g_ascii_strcasecmp(s, "toggle")) {
-            o->toggle = FALSE;
-            o->on = parse_bool(doc, n);
-        }
-        g_free(s);
-    }
-
-    return o;
-}
-
-static gpointer setup_toggle_func(ObParseInst *i,
-                                  xmlDocPtr doc, xmlNodePtr node)
-{
-    Options *o = g_new0(Options, 1);
-    o->toggle = TRUE;
-    return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func_toggle(ObActionsData *data, gpointer options)
 {
-    Options *o = options;
-
-    if (data->client)
-        if (o->toggle || (o->on != (data->client->desktop == DESKTOP_ALL)))
-            client_set_desktop(data->client,
-                               data->client->desktop == DESKTOP_ALL ?
-                               screen_desktop : DESKTOP_ALL, FALSE, TRUE);
-
+    if (data->client) {
+        actions_client_move(data, TRUE);
+        client_set_desktop(data->client,
+                           data->client->desktop == DESKTOP_ALL ?
+                           screen_desktop : DESKTOP_ALL, FALSE, TRUE);
+        actions_client_move(data, FALSE);
+    }
     return FALSE;
 }

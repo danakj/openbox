@@ -3,15 +3,15 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_unfocus_startup()
+void action_focustobottom_startup()
 {
-    actions_register("Unfocus", NULL, NULL, run_func, NULL, NULL);
+    actions_register("FocusToBottom", NULL, NULL, run_func, NULL, NULL);
 }
 
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
-    if (data->client && data->client == focus_client)
-        focus_fallback(FALSE, FALSE, TRUE);
+    if (data->client)
+        focus_order_to_bottom(data->client);
     return FALSE;
 }

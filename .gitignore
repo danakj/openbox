@@ -30,7 +30,6 @@ m4/*.m4
 *.la
 missing
 .dirstamp
-openbox/actions/focustobottom.c
 openbox/openbox
 parser/obparser-3.0.pc
 po/Makefile.in.in

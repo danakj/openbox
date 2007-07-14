@@ -55,8 +55,7 @@ static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
 
     if ((n = parse_find_node("to", node))) {
         gchar *s = parse_string(doc, n);
-        if (!g_ascii_strcasecmp(s, "last") ||
-            !g_ascii_strcasecmp(s, "previous"))
+        if (!g_ascii_strcasecmp(s, "last"))
             o->type = LAST;
         else if (!g_ascii_strcasecmp(s, "next")) {
             o->type = RELATIVE;

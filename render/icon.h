@@ -22,7 +22,9 @@
 #define OB_DEFAULT_ICON_HEIGHT (48)
 #define OB_DEFAULT_ICON_BYTES_PER_PIXEL (4) /* 3:RGB, 4:RGBA */
 #define OB_DEFAULT_ICON_COMMENT \
-  "To recreate this file, save an image as \"C-Source\" in The Gimp. Use \"ob_default_icon\" as the Prefixed Name. Enable Glib Types. Enable Save Alpha Channel. Enable Use Macros instead of Struct."
+  "To recreate this file, save an image as \"C-Source\" in The Gimp. " \
+   "Use \"ob_default_icon\" as the Prefixed Name. Enable Glib Types. " \
+   "Enable Save Alpha Channel. Enable Use Macros instead of Struct."
 #define OB_DEFAULT_ICON_PIXEL_DATA ((guint8*) OB_DEFAULT_ICON_pixel_data)
 static const guint8 OB_DEFAULT_ICON_pixel_data[48 * 48 * 4 + 1] =
  "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

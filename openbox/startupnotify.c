@@ -243,7 +243,8 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
 
     sn_launcher_context_set_name(sn_launcher, name ? name : program);
     sn_launcher_context_set_description(sn_launcher, desc);
-    sn_launcher_context_set_icon_name(sn_launcher, icon_name ? icon_name : program);
+    sn_launcher_context_set_icon_name(sn_launcher, icon_name ?
+                                      icon_name : program);
     sn_launcher_context_set_binary_name(sn_launcher, program);
     if (desktop >= 0 && (unsigned) desktop < screen_num_desktops)
         sn_launcher_context_set_workspace(sn_launcher, (signed) desktop);

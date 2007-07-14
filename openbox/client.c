@@ -1884,10 +1884,10 @@ void client_update_title(ObClient *self)
         if (!(PROP_GETS(self->window, wm_name, locale, &data)
               || PROP_GETS(self->window, wm_name, utf8, &data))) {
             if (self->transient) {
-                /*
-                  GNOME alert windows are not given titles:
-                  http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-                */
+    /*
+    GNOME alert windows are not given titles:
+    http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+    */
                 data = g_strdup("");
             } else
                 data = g_strdup("Unnamed Window");

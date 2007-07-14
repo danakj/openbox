@@ -147,7 +147,8 @@ gint main(gint argc, gchar **argv)
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
-        ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
+        ob_exit_with_error(_("Failed to open the display from the DISPLAY "
+                             "environment variable."));
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec");
 
@@ -249,7 +250,8 @@ gint main(gint argc, gchar **argv)
                     parse_tree(i, doc, node->xmlChildrenNode);
                     parse_close(doc);
                 } else
-                    g_message(_("Unable to find a valid config file, using some simple defaults"));
+                    g_message(_("Unable to find a valid config file, "
+                                "using some simple defaults"));
 
 /*
                 if (config_type != NULL)
@@ -487,16 +489,20 @@ static void print_help()
     g_print(_("\nOptions:\n"));
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
-    g_print(_("  --replace           Replace the currently running window manager\n"));
-    g_print(_("  --sm-disable        Disable connection to the session manager\n"));
+    g_print(_("  --replace           Replace the currently running "
+                                     "window manager\n"));
+    g_print(_("  --sm-disable        Disable connection to the "
+                                     "session manager\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
     g_print(_("  --restart           Restart Openbox\n"));
     g_print(_("\nDebugging options:\n"));
     g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
-    g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
-    g_print(_("  --debug-xinerama    Split the display into fake xinerama screens\n"));
+    g_print(_("  --debug-focus       Display debugging output for "
+                                     "focus handling\n"));
+    g_print(_("  --debug-xinerama    Split the display into fake "
+                                     "xinerama screens\n"));
     g_print(_("\nPlease report bugs at %s\n"), PACKAGE_BUGREPORT);
 }
 

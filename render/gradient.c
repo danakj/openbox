@@ -23,7 +23,8 @@
 #include "color.h"
 #include <glib.h>
 
-static void highlight(RrSurface *s, RrPixel32 *x, RrPixel32 *y, gboolean raised);
+static void highlight(RrSurface *s, RrPixel32 *x, RrPixel32 *y,
+                      gboolean raised);
 static void gradient_parentrelative(RrAppearance *a, gint w, gint h);
 static void gradient_solid(RrAppearance *l, gint w, gint h);
 static void gradient_splitvertical(RrAppearance *a, gint w, gint h);

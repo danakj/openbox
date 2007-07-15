@@ -161,40 +161,40 @@
 
   <!-- Keybindings for desktop switching -->
   <keybind key="C-A-Left">
-    <action name="DesktopLeft"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="GoToDesktop"><to>left</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Right">
-    <action name="DesktopRight"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="GoToDesktop"><to>right</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Up">
-    <action name="DesktopUp"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="GoToDesktop"><to>up</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Down">
-    <action name="DesktopDown"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="GoToDesktop"><to>down</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Left">
-    <action name="SendToDesktopLeft"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="SendToDesktop"><to>left</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Right">
-    <action name="SendToDesktopRight"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="SendToDesktop"><to>right</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Up">
-    <action name="SendToDesktopUp"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="SendToDesktop"><to>up</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Down">
-    <action name="SendToDesktopDown"><dialog>no</dialog><wrap>no</wrap></action>
+    <action name="SendToDesktop"><to>down</to><wrap>no</wrap></action>
   </keybind>
   <keybind key="W-F1">
-    <action name="Desktop"><desktop>1</desktop></action>
+    <action name="GoToDesktop"><to>1</to></action>
   </keybind>
   <keybind key="W-F2">
-    <action name="Desktop"><desktop>2</desktop></action>
+    <action name="GoToDesktop"><to>2</to></action>
   </keybind>
   <keybind key="W-F3">
-    <action name="Desktop"><desktop>3</desktop></action>
+    <action name="GoToDesktop"><to>3</to></action>
   </keybind>
   <keybind key="W-F4">
-    <action name="Desktop"><desktop>4</desktop></action>
+    <action name="GoToDesktop"><to>4</to></action>
   </keybind>
   <keybind key="W-d">
     <action name="ToggleShowDesktop"/>
@@ -215,14 +215,31 @@
 
   <!-- Keybindings for window switching -->
   <keybind key="A-Tab">
-    <action name="NextWindow"/>
+    <action name="NextWindow">
+      <finalactions>
+        <action name="Focus"/>
+        <action name="Raise"/>
+        <action name="Unshade"/>
+      </finalactions>
+    </action>
   </keybind>
   <keybind key="A-S-Tab">
-    <action name="PreviousWindow"/>
+    <action name="PreviousWindow">
+      <finalactions>
+        <action name="Focus"/>
+        <action name="Raise"/>
+        <action name="Unshade"/>
+      </finalactions>
+    </action>
   </keybind>
   <keybind key="C-A-Tab">
     <action name="NextWindow">
       <panels>yes</panels><desktop>yes</desktop>
+      <finalactions>
+        <action name="Focus"/>
+        <action name="Raise"/>
+        <action name="Unshade"/>
+      </finalactions>
     </action>
   </keybind>
 
@@ -233,7 +250,7 @@
         <enabled>true</enabled>
         <name>Konqueror</name>
       </startupnotify>
-      <execute>kfmclient openProfile filemanagement</execute>
+      <command>kfmclient openProfile filemanagement</command>
     </action>
   </keybind>
 </keyboard>
@@ -276,22 +293,22 @@
     </mousebind>
 
     <mousebind button="A-Up" action="Click">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="A-Down" action="Click">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
     <mousebind button="C-A-Up" action="Click">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="C-A-Down" action="Click">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
     <mousebind button="A-S-Up" action="Click">
-      <action name="SendToDesktopPrevious"/>
+      <action name="SendToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="A-S-Down" action="Click">
-      <action name="SendToDesktopNext"/>
+      <action name="SendToDesktop"><to>next</to></action>
     </mousebind>
   </context>
 
@@ -304,7 +321,7 @@
       <action name="Move"/>
     </mousebind>
     <mousebind button="Left" action="DoubleClick">
-      <action name="ToggleMaximizeFull"/>
+      <action name="ToggleMaximize"/>
     </mousebind>
 
     <mousebind button="Middle" action="Press">
@@ -390,7 +407,7 @@
       <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
-      <action name="Resize"/>
+      <action name="Resize"><edge>bottomleft</edge></action>
     </mousebind>
   </context>
 
@@ -400,7 +417,7 @@
       <action name="Raise"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
-      <action name="Resize"/>
+      <action name="Resize"><edge>bottomright</edge></action>
     </mousebind>
   </context>
 
@@ -411,7 +428,7 @@
       <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
-      <action name="Resize"/>
+      <action name="Resize"><edge>topleft</edge></action>
     </mousebind>
   </context>
 
@@ -422,7 +439,7 @@
       <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Drag">
-      <action name="Resize"/>
+      <action name="Resize"><edge>topright</edge></action>
     </mousebind>
   </context>
 
@@ -503,13 +520,13 @@
       <action name="Unshade"/>
     </mousebind>
     <mousebind button="Left" action="Click">
-      <action name="ToggleMaximizeFull"/>
+      <action name="ToggleMaximize"/>
     </mousebind>
     <mousebind button="Middle" action="Click">
-      <action name="ToggleMaximizeVert"/>
+      <action name="ToggleMaximize"><direction>vertical</direction></action>
     </mousebind>
     <mousebind button="Right" action="Click">
-      <action name="ToggleMaximizeHorz"/>
+      <action name="ToggleMaximize"><direction>horizontal</direction></action>
     </mousebind>
   </context>
 
@@ -526,23 +543,23 @@
 
   <context name="Desktop">
     <mousebind button="Up" action="Press">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="Down" action="Press">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
 
     <mousebind button="A-Up" action="Press">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="A-Down" action="Press">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
     <mousebind button="C-A-Up" action="Press">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="C-A-Down" action="Press">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
 
     <mousebind button="Left" action="Press">
@@ -563,16 +580,16 @@
 
   <context name="MoveResize">
     <mousebind button="Up" action="Press">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="Down" action="Press">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
     <mousebind button="A-Up" action="Press">
-      <action name="DesktopPrevious"/>
+      <action name="GoToDesktop"><to>previous</to></action>
     </mousebind>
     <mousebind button="A-Down" action="Press">
-      <action name="DesktopNext"/>
+      <action name="GoToDesktop"><to>next</to></action>
     </mousebind>
   </context>
 </mouse>

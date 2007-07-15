@@ -46,16 +46,17 @@ static Rect *pick_pointer_head(ObClient *c)
     guint i;
     gint px, py;
 
-    screen_pointer_pos(&px, &py);
-     
-    for (i = 0; i < screen_num_monitors; ++i) {
-        Rect *monitor = screen_physical_area_monitor(i);
-        gboolean contain = RECT_CONTAINS(*monitor, px, py);
-        g_free(monitor);
-        if (contain)
-            return screen_area(c->desktop, i, NULL);
-    }
-    g_assert_not_reached();
+    if (screen_pointer_pos(&px, &py)) {
+        for (i = 0; i < screen_num_monitors; ++i) {
+            Rect *monitor = screen_physical_area_monitor(i);
+            gboolean contain = RECT_CONTAINS(*monitor, px, py);
+            g_free(monitor);
+            if (contain)
+                return screen_area(c->desktop, i, NULL);
+        }
+        g_assert_not_reached();
+    } else
+        return NULL;
 }
 
 /*! Pick a monitor to place a window on. */
@@ -381,19 +382,23 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 
     /* Find which head the pointer is on */
     if (settings->monitor == 0)
+        /* this can return NULL */
         screen = pick_pointer_head(client);
     else if (settings->monitor > 0 &&
              (guint)settings->monitor <= screen_num_monitors)
         screen = screen_area(client->desktop, (guint)settings->monitor - 1,
                              NULL);
-    else {
+
+    /* if we have't found a screen yet.. */
+    if (!screen) {
         Rect **areas;
         guint i;
 
         areas = pick_head(client);
         screen = areas[0];
 
-        for (i = 0; i < screen_num_monitors; ++i)
+        /* don't free the first one, it's being set as "screen" */
+        for (i = 1; i < screen_num_monitors; ++i)
             g_free(areas[i]);
         g_free(areas);
     }
@@ -406,6 +411,8 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     else
         *x = screen->x + settings->position.x;
 
+    ob_debug("x %d settings %d\n", *x, settings->position.x);
+
     if (settings->center_y)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
     else if (settings->opposite_y)
@@ -414,6 +421,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     else
         *y = screen->y + settings->position.y;
 
+    g_free(screen);
     return TRUE;
 }
 
@@ -476,8 +484,8 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
     /* per-app settings override program specified position
      * but not user specified */
     if ((client->positioned & USPosition) ||
-        ((client->positioned & PPosition) && !(settings && settings->pos_given))
-        )
+        ((client->positioned & PPosition) &&
+         !(settings && settings->pos_given)))
         return FALSE;
 
     /* try a number of methods */

@@ -1003,7 +1003,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             if (!self->strut.left && *x + fw*9/10 - 1 < a->x)
                 *x = a->x - fw*9/10;
             if (!self->strut.top && *y + fh*9/10 - 1 < a->y)
-                *y = a->y - fw*9/10;
+                *y = a->y - fh*9/10;
         }
 
         /* This here doesn't let windows even a pixel outside the

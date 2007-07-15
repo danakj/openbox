@@ -117,7 +117,8 @@ int main () {
             case NotifyVirtual: detail = "NotifyVirtual"; break;
             case NotifyInferior: detail = "NotifyInferior"; break;
             case NotifyNonlinear: detail = "NotifyNonlinear"; break;
-            case NotifyNonlinearVirtual: detail = "NotifyNonlinearVirtual"; break;
+            case NotifyNonlinearVirtual:
+                detail = "NotifyNonlinearVirtual"; break;
             case NotifyPointer: detail = "NotifyPointer"; break;
             case NotifyPointerRoot: detail = "NotifyPointerRoot"; break;
             case NotifyDetailNone: detail = "NotifyDetailNone"; break;
@@ -144,7 +145,8 @@ int main () {
             case NotifyVirtual: detail = "NotifyVirtual"; break;
             case NotifyInferior: detail = "NotifyInferior"; break;
             case NotifyNonlinear: detail = "NotifyNonlinear"; break;
-            case NotifyNonlinearVirtual: detail = "NotifyNonlinearVirtual"; break;
+            case NotifyNonlinearVirtual:
+                detail = "NotifyNonlinearVirtual"; break;
             case NotifyPointer: detail = "NotifyPointer"; break;
             case NotifyPointerRoot: detail = "NotifyPointerRoot"; break;
             case NotifyDetailNone: detail = "NotifyDetailNone"; break;
@@ -171,7 +173,8 @@ int main () {
             case NotifyVirtual: detail = "NotifyVirtual"; break;
             case NotifyInferior: detail = "NotifyInferior"; break;
             case NotifyNonlinear: detail = "NotifyNonlinear"; break;
-            case NotifyNonlinearVirtual: detail = "NotifyNonlinearVirtual"; break;
+            case NotifyNonlinearVirtual:
+                detail = "NotifyNonlinearVirtual"; break;
             case NotifyPointer: detail = "NotifyPointer"; break;
             case NotifyPointerRoot: detail = "NotifyPointerRoot"; break;
             case NotifyDetailNone: detail = "NotifyDetailNone"; break;
@@ -198,7 +201,8 @@ int main () {
             case NotifyVirtual: detail = "NotifyVirtual"; break;
             case NotifyInferior: detail = "NotifyInferior"; break;
             case NotifyNonlinear: detail = "NotifyNonlinear"; break;
-            case NotifyNonlinearVirtual: detail = "NotifyNonlinearVirtual"; break;
+            case NotifyNonlinearVirtual:
+                detail = "NotifyNonlinearVirtual"; break;
             case NotifyPointer: detail = "NotifyPointer"; break;
             case NotifyPointerRoot: detail = "NotifyPointerRoot"; break;
             case NotifyDetailNone: detail = "NotifyDetailNone"; break;

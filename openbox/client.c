@@ -382,7 +382,8 @@ void client_manage(Window window)
                              */
                              ob_state() == OB_STATE_RUNNING &&
                              (transient ||
-                              (!(self->positioned & USPosition) &&
+                              (!((self->positioned & USPosition) ||
+                                 (settings && settings->pos_given)) &&
                                client_normal(self) &&
                                !self->session)));
     }
@@ -983,10 +984,15 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *a;
 
-        if (!screen_physical_area_monitor_contains(i, &desired))
-            continue;
+        if (!screen_physical_area_monitor_contains(i, &desired)) {
+            if (i < screen_num_monitors - 1)
+                continue;
 
-        a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
+            /* the window is not inside any monitor! so just use the first
+               one */
+            a = screen_area(self->desktop, 0, NULL);
+        } else
+            a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
 
         /* This makes sure windows aren't entirely outside of the screen so you
            can't see them at all.
@@ -1003,7 +1009,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             if (!self->strut.left && *x + fw*9/10 - 1 < a->x)
                 *x = a->x - fw*9/10;
             if (!self->strut.top && *y + fh*9/10 - 1 < a->y)
-                *y = a->y - fw*9/10;
+                *y = a->y - fh*9/10;
         }
 
         /* This here doesn't let windows even a pixel outside the
@@ -1884,10 +1890,10 @@ void client_update_title(ObClient *self)
         if (!(PROP_GETS(self->window, wm_name, locale, &data)
               || PROP_GETS(self->window, wm_name, utf8, &data))) {
             if (self->transient) {
-                /*
-                  GNOME alert windows are not given titles:
-                  http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-                */
+    /*
+    GNOME alert windows are not given titles:
+    http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+    */
                 data = g_strdup("");
             } else
                 data = g_strdup("Unnamed Window");

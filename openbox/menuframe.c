@@ -694,7 +694,8 @@ void menu_frame_render(ObMenuFrame *self)
         }
 
         RECT_SET_POINT(e->area, 0, h+e->border);
-        XMoveWindow(ob_display, e->window, e->area.x-e->border, e->area.y-e->border);
+        XMoveWindow(ob_display, e->window,
+                    e->area.x-e->border, e->area.y-e->border);
         XSetWindowBorderWidth(ob_display, e->window, e->border);
         XSetWindowBorder(ob_display, e->window,
                          RrColorPixel(ob_rr_theme->menu_border_color));

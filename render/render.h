@@ -246,8 +246,8 @@ RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
 
-RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name, gint size,
-                             RrFontWeight weight, RrFontSlant slant);
+RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
+                             gint size, RrFontWeight weight, RrFontSlant slant);
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,

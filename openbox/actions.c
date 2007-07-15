@@ -248,7 +248,9 @@ void actions_run_acts(GSList *acts,
 
         actions_setup_data(&data, uact, state, x, y, button, con, client);
 
-        if (!interactive_act || interactive_act->def != act->def) {
+        /* if they have the same run function, then we'll assume they are
+           cooperating and not cancel eachother out */
+        if (!interactive_act || interactive_act->def->run != act->def->run) {
             if (actions_act_is_interactive(act)) {
                 /* cancel the old one */
                 if (interactive_act)

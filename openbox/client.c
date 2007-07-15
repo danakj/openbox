@@ -382,7 +382,8 @@ void client_manage(Window window)
                              */
                              ob_state() == OB_STATE_RUNNING &&
                              (transient ||
-                              (!(self->positioned & USPosition) &&
+                              (!((self->positioned & USPosition) ||
+                                 (settings && settings->pos_given)) &&
                                client_normal(self) &&
                                !self->session)));
     }
@@ -983,10 +984,15 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *a;
 
-        if (!screen_physical_area_monitor_contains(i, &desired))
-            continue;
+        if (!screen_physical_area_monitor_contains(i, &desired)) {
+            if (i < screen_num_monitors - 1)
+                continue;
 
-        a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
+            /* the window is not inside any monitor! so just use the first
+               one */
+            a = screen_area(self->desktop, 0, NULL);
+        } else
+            a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
 
         /* This makes sure windows aren't entirely outside of the screen so you
            can't see them at all.

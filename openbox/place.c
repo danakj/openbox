@@ -411,8 +411,6 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     else
         *x = screen->x + settings->position.x;
 
-    ob_debug("x %d settings %d\n", *x, settings->position.x);
-
     if (settings->center_y)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
     else if (settings->opposite_y)
@@ -480,6 +478,7 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
                       ObAppSettings *settings)
 {
     gboolean ret;
+    gboolean userplaced = FALSE;
 
     /* per-app settings override program specified position
      * but not user specified */
@@ -490,7 +489,7 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
 
     /* try a number of methods */
     ret = place_transient_splash(client, x, y) ||
-        place_per_app_setting(client, x, y, settings) ||
+        (userplaced = place_per_app_setting(client, x, y, settings)) ||
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
         place_nooverlap(client, x, y) ||
@@ -499,5 +498,5 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
 
     /* get where the client should be */
     frame_frame_gravity(client->frame, x, y);
-    return ret;
+    return !userplaced;
 }

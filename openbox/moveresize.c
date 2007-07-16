@@ -173,8 +173,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
        either way instead of a full increment one and 1 px the other. */
-    start_x = x - c->size_inc.width / 2;
-    start_y = y - c->size_inc.height / 2;
+    start_x = x - (mv ? 0 : c->size_inc.width / 2);
+    start_y = y - (mv ? 0 : c->size_inc.height / 2);
     corner = cnr;
     button = b;
     key_resize_edge = -1;

@@ -1,5 +1,5 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
-   
+
    client.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003-2007   Dana Jansens
@@ -237,7 +237,7 @@ void client_manage(Window window)
         grab_server(FALSE);
         return; /* don't manage it */
     }
-  
+
     /* is the window a docking app */
     if ((wmhint = XGetWMHints(ob_display, window))) {
         if ((wmhint->flags & StateHint) &&
@@ -597,7 +597,7 @@ ObClient *client_fake_manage(Window window)
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
     ob_debug("gave extents left %d right %d top %d bottom %d\n",
-             self->frame->size.left, self->frame->size.right, 
+             self->frame->size.left, self->frame->size.right,
              self->frame->size.top, self->frame->size.bottom);
 
     /* free the ObAppSettings shallow copy */
@@ -1078,7 +1078,7 @@ static void client_get_all(ObClient *self, gboolean real)
         if (self->type == OB_CLIENT_TYPE_DESKTOP)
             self->desktop = DESKTOP_ALL;
     }
-  
+
 #ifdef SYNC
     client_update_sync_request_counter(self);
 #endif
@@ -1104,7 +1104,7 @@ static void client_get_area(ObClient *self)
 {
     XWindowAttributes wattrib;
     Status ret;
-  
+
     ret = XGetWindowAttributes(ob_display, self->window, &wattrib);
     g_assert(ret != BadWindow);
 
@@ -1125,7 +1125,7 @@ static void client_get_desktop(ObClient *self)
             self->desktop = screen_num_desktops - 1;
         else
             self->desktop = d;
-        ob_debug("client requested desktop 0x%x\n", self->desktop); 
+        ob_debug("client requested desktop 0x%x\n", self->desktop);
     } else {
         GSList *it;
         gboolean first = TRUE;
@@ -1172,7 +1172,7 @@ static void client_get_state(ObClient *self)
 {
     guint32 *state;
     guint num;
-  
+
     if (PROP_GETA32(self->window, net_wm_state, atom, &state, &num)) {
         gulong i;
         for (i = 0; i < num; ++i) {
@@ -1255,7 +1255,7 @@ void client_update_transient_for(ObClient *self)
                                  self->transient_for_group, trangroup,
                                  client_direct_parent(self), target);
     self->transient_for_group = trangroup;
-                          
+
 }
 
 static void client_update_transient_tree(ObClient *self,
@@ -1401,7 +1401,7 @@ void client_get_type_and_transientness(ObClient *self)
 
     self->type = -1;
     self->transient = FALSE;
-  
+
     if (PROP_GETA32(self->window, net_wm_window_type, atom, &val, &num)) {
         /* use the first value that we know about in the array */
         for (i = 0; i < num; ++i) {
@@ -1437,7 +1437,7 @@ void client_get_type_and_transientness(ObClient *self)
 
     if (XGetTransientForHint(ob_display, self->window, &t))
         self->transient = TRUE;
-            
+
     if (self->type == (ObClientType) -1) {
         /*the window type hint was not set, which means we either classify
           ourself as a normal window or a dialog, depending on if we are a
@@ -1476,7 +1476,7 @@ void client_update_protocols(ObClient *self)
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
 #ifdef SYNC
-            else if (proto[i] == prop_atoms.net_wm_sync_request) 
+            else if (proto[i] == prop_atoms.net_wm_sync_request)
                 /* if this protocol is requested, then resizing the
                    window will be synchronized between the frame and the
                    client */
@@ -1556,13 +1556,13 @@ void client_update_normal_hints(ObClient *self)
 
         if (size.flags & PMinSize)
             SIZE_SET(self->min_size, size.min_width, size.min_height);
-    
+
         if (size.flags & PMaxSize)
             SIZE_SET(self->max_size, size.max_width, size.max_height);
-    
+
         if (size.flags & PBaseSize)
             SIZE_SET(self->base_size, size.base_width, size.base_height);
-    
+
         if (size.flags & PResizeInc && size.width_inc && size.height_inc)
             SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
 
@@ -1796,7 +1796,7 @@ void client_update_wmhints(ObClient *self)
 
     /* assume a window takes input if it doesnt specify */
     self->can_focus = TRUE;
-  
+
     if ((hints = XGetWMHints(ob_display, self->window)) != NULL) {
         gboolean ur;
 
@@ -1883,7 +1883,7 @@ void client_update_title(ObClient *self)
     gchar *visible = NULL;
 
     g_free(self->title);
-     
+
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
         /* try old x stuff */
@@ -2011,7 +2011,7 @@ void client_update_icons(ObClient *self)
         }
 
         self->icons = g_new(ObClientIcon, self->nicons);
-    
+
         /* store the icons */
         i = 0;
         for (j = 0; j < self->nicons; ++j) {
@@ -2068,7 +2068,7 @@ void client_update_icons(ObClient *self)
        or removes it entirely, it's not very likely it is going to set one
        right away afterwards
 
-       if it has parents, then one of them will have an icon already 
+       if it has parents, then one of them will have an icon already
     */
     if (self->nicons == 0 && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
@@ -2442,7 +2442,7 @@ gboolean client_should_show(ObClient *self)
         return FALSE;
     if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
         return TRUE;
-    
+
     return FALSE;
 }
 
@@ -2586,7 +2586,7 @@ static void client_apply_startup_state(ObClient *self,
         client_shade(self, TRUE);
     if (demands_attention)
         client_hilite(self, TRUE);
-  
+
     if (max_vert && max_horz)
         client_maximize(self, TRUE, 0);
     else if (max_vert)
@@ -2788,7 +2788,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         /* you cannot resize to nothing */
         if (basew + *w < 1) *w = 1 - basew;
         if (baseh + *h < 1) *h = 1 - baseh;
-  
+
         /* save the logical size */
         *logicalw = incw > 1 ? *w : *w + basew;
         *logicalh = inch > 1 ? *h : *h + baseh;
@@ -3103,7 +3103,7 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
 void client_maximize(ObClient *self, gboolean max, gint dir)
 {
     gint x, y, w, h;
-     
+
     g_assert(dir == 0 || dir == 1 || dir == 2);
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
 
@@ -3191,7 +3191,7 @@ void client_close(ObClient *self)
        close, we just kill it */
     if (!self->delete_window)
         client_kill(self);
-    
+
     /*
       XXX: itd be cool to do timeouts and shit here for killing the client's
       process off
@@ -3293,7 +3293,7 @@ ObClient *client_search_modal_child(ObClient *self)
 {
     GSList *it;
     ObClient *ret;
-  
+
     for (it = self->transients; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
         if ((ret = client_search_modal_child(c))) return ret;
@@ -3304,7 +3304,7 @@ ObClient *client_search_modal_child(ObClient *self)
 
 gboolean client_validate(ObClient *self)
 {
-    XEvent e; 
+    XEvent e;
 
     XSync(ob_display, FALSE); /* get all events on the server */
 
@@ -3320,7 +3320,7 @@ gboolean client_validate(ObClient *self)
 void client_set_wm_state(ObClient *self, glong state)
 {
     if (state == self->wmstate) return; /* no change */
-  
+
     switch (state) {
     case IconicState:
         client_iconify(self, TRUE, TRUE, FALSE);
@@ -3349,11 +3349,11 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
           action == prop_atoms.net_wm_state_remove ||
           action == prop_atoms.net_wm_state_toggle))
         /* an invalid action was passed to the client message, ignore it */
-        return; 
+        return;
 
     for (i = 0; i < 2; ++i) {
         Atom state = i == 0 ? data1 : data2;
-    
+
         if (!state) continue;
 
         /* if toggling, then pick whether we're adding or removing */
@@ -3400,7 +3400,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 action = undecorated ? prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
         }
-    
+
         if (action == prop_atoms.net_wm_state_add) {
             if (state == prop_atoms.net_wm_state_modal) {
                 modal = TRUE;
@@ -3709,7 +3709,7 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
             if ((parent = client_icon_recursive(c, w, h)))
                 break;
         }
-        
+
         return parent;
     }
 
@@ -3763,7 +3763,7 @@ void client_set_layer(ObClient *self, gint layer)
 void client_set_undecorated(ObClient *self, gboolean undecorated)
 {
     if (self->undecorated != undecorated &&
-        /* don't let it undecorate if the function is missing, but let 
+        /* don't let it undecorate if the function is missing, but let
            it redecorate */
         (self->functions & OB_CLIENT_FUNC_UNDECORATE || !undecorated))
     {
@@ -3783,7 +3783,7 @@ ObClient *client_direct_parent(ObClient *self)
     if (!self->parents) return NULL;
     if (self->transient_for_group) return NULL;
     return self->parents->data;
-}                        
+}
 
 ObClient *client_search_top_direct_parent(ObClient *self)
 {
@@ -3798,7 +3798,7 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
 {
     GSList *ret;
     ObClient *p;
-    
+
     /* move up the direct transient chain as far as possible */
     while ((p = client_direct_parent(self)) &&
            (!bylayer || p->layer == layer))

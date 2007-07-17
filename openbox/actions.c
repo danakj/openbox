@@ -299,7 +299,7 @@ static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
         /* if using focus_delay, stop the timer now so that focus doesn't go
            moving on us, which would kill the action */
         event_halt_focus_delay();
-    
+
         return TRUE;
     }
     else

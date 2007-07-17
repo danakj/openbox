@@ -366,7 +366,7 @@ void stacking_add(ObWindow *win)
 }
 
 static GList *find_highest_relative(ObClient *client)
-{    
+{
     GList *ret = NULL;
 
     if (client->parents) {
@@ -383,7 +383,7 @@ static GList *find_highest_relative(ObClient *client)
                 /* only look at windows in the same layer and that are
                    visible */
                 if (c->layer == client->layer &&
-                    !c->iconic && 
+                    !c->iconic &&
                     (c->desktop == client->desktop ||
                      c->desktop == DESKTOP_ALL ||
                      client->desktop == DESKTOP_ALL))

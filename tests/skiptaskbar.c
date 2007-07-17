@@ -42,7 +42,7 @@ int main () {
                       x, y, w, h, 10, CopyFromParent, CopyFromParent,
 			 CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0));
 
   XChangeProperty(display, win, state, XA_ATOM, 32,
 		  PropModeReplace, (unsigned char*)&skip, 1);

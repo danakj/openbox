@@ -165,7 +165,7 @@ done_cycle:
 /* this be mostly ripped from fvwm */
 static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
                                         gboolean dock_windows,
-                                        gboolean desktop_windows) 
+                                        gboolean desktop_windows)
 {
     gint my_cx, my_cy, his_cx, his_cy;
     gint offset = 0;
@@ -302,7 +302,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                                    focus_cycle_desktop_windows))
                 ft = it->data;
     }
-        
+
     if (ft && ft != focus_cycle_target) {/* prevents flicker */
         focus_cycle_target = ft;
         if (!interactive)

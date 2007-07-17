@@ -662,7 +662,7 @@ static void event_process(const XEvent *ec, gpointer data)
         xwc.border_width = e->xconfigurerequest.border_width;
         xwc.sibling = e->xconfigurerequest.above;
         xwc.stack_mode = e->xconfigurerequest.detail;
-       
+
         /* we are not to be held responsible if someone sends us an
            invalid request! */
         xerror_set_ignore(TRUE);
@@ -695,7 +695,7 @@ static void event_process(const XEvent *ec, gpointer data)
 static void event_handle_root(XEvent *e)
 {
     Atom msgtype;
-     
+
     switch(e->type) {
     case SelectionClear:
         ob_debug("Another WM has requested to replace us. Exiting.\n");
@@ -792,7 +792,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     ObFrameContext con;
     static gint px = -1, py = -1;
     static guint pb = 0;
-     
+
     switch (e->type) {
     case ButtonPress:
         /* save where the press occured for the first button pressed */
@@ -835,7 +835,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             case OB_FRAME_CONTEXT_ALLDESKTOPS:
                 client->frame->desk_press = (e->type == ButtonPress);
                 frame_adjust_state(client->frame);
-                break; 
+                break;
             case OB_FRAME_CONTEXT_SHADE:
                 client->frame->shade_press = (e->type == ButtonPress);
                 frame_adjust_state(client->frame);
@@ -1208,7 +1208,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* we don't want the reparent event, put it back on the stack for the
            X server to deal with after we unmanage the window */
         XPutBackEvent(ob_display, e);
-     
+
         ob_debug("ReparentNotify for window 0x%x\n", client->window);
         client_unmanage(client);
         break;
@@ -1436,7 +1436,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case PropertyNotify:
         /* validate cuz we query stuff off the client here */
         if (!client_validate(client)) break;
-  
+
         /* compress changes to a single property into a single change */
         while (XCheckTypedWindowEvent(ob_display, client->window,
                                       e->type, &ce)) {
@@ -1759,8 +1759,8 @@ static gboolean event_handle_menu(XEvent *ev)
             menu_frame_select(e->frame, NULL, FALSE);
         }
         break;
-    case MotionNotify:   
-        if ((e = menu_entry_frame_under(ev->xmotion.x_root,   
+    case MotionNotify:
+        if ((e = menu_entry_frame_under(ev->xmotion.x_root,
                                         ev->xmotion.y_root)))
             if (!(f = find_active_menu()) ||
                 f == e->frame ||

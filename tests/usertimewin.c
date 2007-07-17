@@ -46,8 +46,8 @@ int main () {
                        x, y, w/2, h/2, 10, CopyFromParent, CopyFromParent,
                        CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
-  
+  XSetWindowBackground(display,win,WhitePixel(display,0));
+
   XMapWindow(display, win);
   XFlush(display);
 

@@ -130,7 +130,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         /* get the client's size back */
         w -= c->frame->size.left + c->frame->size.right;
-        h -= c->frame->size.top + c->frame->size.bottom;        
+        h -= c->frame->size.top + c->frame->size.bottom;
 
         frame_frame_gravity(c->frame, &x, &y); /* get the client coords */
         client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);

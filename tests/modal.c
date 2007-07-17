@@ -45,13 +45,13 @@ int main () {
 			x, y, w/2, h/2, 10, CopyFromParent, CopyFromParent,
 			CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,parent,WhitePixel(display,0)); 
-  XSetWindowBackground(display,child,BlackPixel(display,0)); 
+  XSetWindowBackground(display,parent,WhitePixel(display,0));
+  XSetWindowBackground(display,child,BlackPixel(display,0));
 
   XSetTransientForHint(display, child, parent);
   XChangeProperty(display, child, state, XA_ATOM, 32,
 		  PropModeReplace, (unsigned char*)&modal, 1);
-  
+
   XMapWindow(display, parent);
   XMapWindow(display, child);
   XFlush(display);

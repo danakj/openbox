@@ -29,9 +29,9 @@ typedef struct KeyBindingTree {
     gboolean chroot;
 
     /* the level up in the tree */
-    struct KeyBindingTree *parent; 
+    struct KeyBindingTree *parent;
     /* the next binding in the tree at the same level */
-    struct KeyBindingTree *next_sibling; 
+    struct KeyBindingTree *next_sibling;
     /* the first child of this binding (next binding in a chained sequence).*/
     struct KeyBindingTree *first_child;
 } KeyBindingTree;

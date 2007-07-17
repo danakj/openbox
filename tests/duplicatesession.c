@@ -47,8 +47,8 @@ int main (int argc, char **argv) {
                        x, y, w, h, 10, CopyFromParent, CopyFromParent,
                        CopyFromParent, 0, NULL);
 
-  XSetWindowBackground(display,win1,WhitePixel(display,0)); 
-  XSetWindowBackground(display,win2,BlackPixel(display,0)); 
+  XSetWindowBackground(display,win1,WhitePixel(display,0));
+  XSetWindowBackground(display,win2,BlackPixel(display,0));
 
   XChangeProperty(display, win1, sm_id, enc, 8,
                   PropModeAppend, "abcdefg", strlen("abcdefg"));

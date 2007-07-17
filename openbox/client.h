@@ -43,7 +43,7 @@ struct _ObClientIcon
     gint height;
     RrPixel32 *data;
 };
-     
+
 /*! Possible window types */
 typedef enum
 {
@@ -147,7 +147,7 @@ struct _ObClient
       window placement. In theory, where this window exists.
     */
     StrutPartial strut;
-     
+
     /*! The logical size of the window
       The "logical" size of the window is refers to the user's perception of
       the size of the window, and is the value that should be displayed to the
@@ -170,7 +170,7 @@ struct _ObClient
       A value of 0 means this is ignored.
     */
     gfloat max_ratio;
-  
+
     /*! The minimum size of the client window
       If the min is > the max, then the window is not resizable
     */
@@ -192,7 +192,7 @@ struct _ObClient
 
     /*! The client's specified colormap */
     Colormap colormap;
-  
+
     /*! Where to place the decorated window in relation to the undecorated
       window */
     gint gravity;
@@ -203,7 +203,7 @@ struct _ObClient
 
     /*! True if the client supports the delete_window protocol */
     gboolean delete_window;
-  
+
     /*! Was the window's position requested by the application or the user?
       if by the application, we force it completely onscreen, if by the user
       we only force it if it tries to go completely offscreen, if neither, we
@@ -213,7 +213,7 @@ struct _ObClient
     /*! Was the window's size requested by the application or the user?
       If by the application we don't let it go outside the available area */
     guint sized;
-  
+
     /*! Can the window receive input focus? */
     gboolean can_focus;
     /*! Notify the window when it receives focus? */

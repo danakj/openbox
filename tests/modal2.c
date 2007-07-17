@@ -46,11 +46,11 @@ int main () {
 			x, y, w/2, h/2, 10, CopyFromParent, CopyFromParent,
 			CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,parent,WhitePixel(display,0)); 
-  XSetWindowBackground(display,child,BlackPixel(display,0)); 
+  XSetWindowBackground(display,parent,WhitePixel(display,0));
+  XSetWindowBackground(display,child,BlackPixel(display,0));
 
   XSetTransientForHint(display, child, parent);
-  
+
   XMapWindow(display, parent);
   XMapWindow(display, child);
   XFlush(display);
@@ -65,7 +65,7 @@ int main () {
   ce.xclient.data.l[2] = 0;
   XSendEvent(display, RootWindow(display, DefaultScreen(display)),
 	     False, SubstructureNotifyMask | SubstructureRedirectMask, &ce);
-  
+
   while (1) {
     XNextEvent(display, &report);
   }

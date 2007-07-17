@@ -189,7 +189,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
         if (class_set || name_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
-            
+
             if (name_set)
                 settings->name = g_pattern_spec_new(name);
 
@@ -320,7 +320,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             config_per_app_settings = g_slist_append(config_per_app_settings,
                                               (gpointer) settings);
         }
-        
+
         app = parse_find_node("application", app->next);
     }
 
@@ -362,7 +362,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     else if ((n = parse_find_node("action", node->children))) {
         while (n) {
             ObActionsAct *action;
-            
+
             action = actions_parse(i, doc, n);
             if (action)
                 keyboard_bind(keylist, action);
@@ -401,7 +401,7 @@ static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
 /*
 
-<context name="Titlebar"> 
+<context name="Titlebar">
   <mousebind button="Left" action="Press">
     <action name="Raise"></action>
   </mousebind>
@@ -420,7 +420,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     mouse_unbind_all();
 
     node = node->children;
-    
+
     if ((n = parse_find_node("dragThreshold", node)))
         config_mouse_threshold = parse_int(doc, n);
     if ((n = parse_find_node("doubleClickTime", node)))
@@ -472,7 +472,7 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n;
 
     node = node->children;
-    
+
     if ((n = parse_find_node("focusNew", node)))
         config_focus_new = parse_bool(doc, n);
     if ((n = parse_find_node("followMouse", node)))
@@ -493,7 +493,7 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n;
 
     node = node->children;
-    
+
     if ((n = parse_find_node("policy", node)))
         if (parse_contains("UnderMouse", doc, n))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
@@ -507,7 +507,7 @@ static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n;
 
     node = node->children;
-    
+
     if ((n = parse_find_node("top", node)))
         config_margins.top = MAX(0, parse_int(doc, n));
     if ((n = parse_find_node("left", node)))
@@ -607,7 +607,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n;
 
     node = node->children;
-    
+
     if ((n = parse_find_node("number", node))) {
         gint d = parse_int(doc, n);
         if (d > 0)
@@ -642,7 +642,7 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n;
 
     node = node->children;
-    
+
     if ((n = parse_find_node("drawContents", node)))
         config_resize_redraw = parse_bool(doc, n);
     if ((n = parse_find_node("popupShow", node))) {
@@ -763,8 +763,8 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_menu_client_list_icons = parse_bool(doc, n);
     }
 }
-   
-static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, 
+
+static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                              gpointer d)
 {
     xmlNodePtr n;

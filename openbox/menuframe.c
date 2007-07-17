@@ -605,7 +605,7 @@ static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
         if (self->entry->data.separator.label != NULL) {
             h += ob_rr_theme->menu_title_height +
                 (ob_rr_theme->mbwidth - PADDING) * 2;
- 
+
             /* if the first entry is a labeled separator, then make its border
                overlap with the menu's outside border */
             if (first_entry)
@@ -888,7 +888,7 @@ static void menu_frame_update(ObMenuFrame *self)
             more_frame = menu_entry_frame_new(more_entry, self);
             /* make it get deleted when the menu frame goes away */
             menu_entry_unref(more_entry);
-                                       
+
             /* add our More... entry to the frame */
             self->entries = g_list_append(self->entries, more_frame);
         }
@@ -1135,8 +1135,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         entry = old;
 
     if (old == entry) return;
-   
-    if (config_submenu_show_delay) { 
+
+    if (config_submenu_show_delay) {
         /* remove any submenu open requests */
         ob_main_loop_timeout_remove(ob_main_loop,
                                     menu_entry_frame_submenu_timeout);

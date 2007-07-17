@@ -274,7 +274,7 @@ ObClient *focus_order_find_first(guint desktop)
 static gboolean focus_target_has_siblings(ObClient *ft,
                                           gboolean iconic_windows,
                                           gboolean all_desktops)
-                                                         
+
 {
     GSList *it;
 
@@ -320,7 +320,7 @@ gboolean focus_valid_target(ObClient *ft,
         ok = ok && ((dock_windows && ft->type == OB_CLIENT_TYPE_DOCK) ||
                     (desktop_windows && ft->type == OB_CLIENT_TYPE_DESKTOP));
     /* modal windows are important and can always get focus if they are
-       visible and stuff, so don't change 'ok' based on their type */ 
+       visible and stuff, so don't change 'ok' based on their type */
     else if (!ft->modal)
         /* normal non-helper windows are valid targets */
         ok = ok &&
@@ -332,7 +332,7 @@ gboolean focus_valid_target(ObClient *ft,
                  include helper windows ... */
               ((focus_client && ft->group == focus_client->group &&
                 helper_windows) ||
-               /* ... or if there are no other windows in its group 
+               /* ... or if there are no other windows in its group
                   that can be focused instead */
                !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 

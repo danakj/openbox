@@ -38,7 +38,7 @@ int main (int argc, char **argv) {
     win = XCreateWindow(display, RootWindow(display, 0),
                         x, y, w, h, 0, CopyFromParent, CopyFromParent,
                         CopyFromParent, 0, NULL);
-    XSetWindowBackground(display,win,WhitePixel(display,0)); 
+    XSetWindowBackground(display,win,WhitePixel(display,0));
 
     size = XAllocSizeHints();
     size->flags = PPosition;

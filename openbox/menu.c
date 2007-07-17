@@ -111,7 +111,7 @@ void menu_startup(gboolean reconfig)
             g_message(_("Unable to find a valid menu file '%s'"),
                       "menu.xml");
     }
-    
+
     g_assert(menu_parse_state.parent == NULL);
 
     if (!reconfig)
@@ -198,7 +198,7 @@ static ObMenu* menu_from_name(gchar *name)
         g_message(_("Attempted to access menu '%s' but it does not exist"),
                   name);
     return self;
-}  
+}
 
 #define VALID_SHORTCUT(c) (((c) >= '0' && (c) <= '9') || \
                            ((c) >= 'A' && (c) <= 'Z') || \
@@ -209,7 +209,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                                gboolean *always_show)
 {
     gunichar shortcut = 0;
-    
+
     *position = 0;
     *always_show = FALSE;
 
@@ -268,7 +268,7 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 {
     ObMenuParseState *state = data;
     gchar *label;
-    
+
     if (state->parent) {
         if (parse_attr_string("label", node, &label)) {
             GSList *acts = NULL;

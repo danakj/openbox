@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
 		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
 		      CopyFromParent, 0, NULL);
 
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0));
 
 //  XStringListToTextProperty(&argv[1], 1, &name);
 //  XSetWMName(display, win, &name);

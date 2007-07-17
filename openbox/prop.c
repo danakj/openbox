@@ -37,7 +37,7 @@ void prop_startup()
     CREATE(utf8, "UTF8_STRING");
 
     CREATE(manager, "MANAGER");
-     
+
     CREATE(wm_colormap_windows, "WM_COLORMAP_WINDOWS");
     CREATE(wm_protocols, "WM_PROTOCOLS");
     CREATE(wm_state, "WM_STATE");
@@ -150,7 +150,7 @@ void prop_startup()
     CREATE(net_wm_state_above, "_NET_WM_STATE_ABOVE");
     CREATE(net_wm_state_below, "_NET_WM_STATE_BELOW");
     CREATE(net_wm_state_demands_attention, "_NET_WM_STATE_DEMANDS_ATTENTION");
-  
+
     prop_atoms.net_wm_state_add = 1;
     prop_atoms.net_wm_state_remove = 0;
     prop_atoms.net_wm_state_toggle = 2;
@@ -362,7 +362,7 @@ gboolean prop_get_string_utf8(Window win, Atom prop, gchar **ret)
     gchar *raw;
     gchar *str;
     guint num;
-     
+
     if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
         str = g_strndup(raw, num); /* grab the first string from the list */
         g_free(raw);

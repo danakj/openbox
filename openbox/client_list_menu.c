@@ -129,7 +129,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         menu_free(desktop_menus->data);
         desktop_menus = g_slist_delete_link(desktop_menus, desktop_menus);
     }
-    
+
     for (i = 0; i < screen_num_desktops; ++i) {
         ObMenu *submenu;
         gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);

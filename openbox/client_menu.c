@@ -378,7 +378,7 @@ void client_menu_startup()
     menu_set_execute_func(menu, client_menu_execute);
 
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->max_toggled_mask; 
+    e->data.normal.mask = ob_rr_theme->max_toggled_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -398,7 +398,7 @@ void client_menu_startup()
         ob_rr_theme->menu_disabled_selected_color;
 
     e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->max_mask; 
+    e->data.normal.mask = ob_rr_theme->max_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;

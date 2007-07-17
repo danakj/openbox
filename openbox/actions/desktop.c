@@ -122,7 +122,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
     guint d;
 
-    
+
 
     switch (o->type) {
     case LAST:

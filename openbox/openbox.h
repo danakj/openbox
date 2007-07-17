@@ -35,7 +35,7 @@ extern RrTheme    *ob_rr_theme;
 extern struct _ObMainLoop *ob_main_loop;
 
 /*! The X display */
-extern Display *ob_display; 
+extern Display *ob_display;
 
 /*! The number of the screen on which we're running */
 extern gint     ob_screen;

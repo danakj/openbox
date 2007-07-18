@@ -249,8 +249,13 @@ void frame_show(ObFrame *self)
     if (!self->visible) {
         self->visible = TRUE;
         framerender_frame(self);
+        /* Grab the server to make sure that the frame window is mapped before
+           the client gets its MapNotify, i.e. to make sure the client is
+           _visible_ when it gets MapNotify. */
+        grab_server(TRUE);
         XMapWindow(ob_display, self->client->window);
         XMapWindow(ob_display, self->window);
+        grab_server(FALSE);
     }
 }
 

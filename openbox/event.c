@@ -1067,6 +1067,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (e->xconfigurerequest.value_mask & CWStackMode) {
             ObClient *sibling = NULL;
             gulong ignore_start;
+            gboolean ok = TRUE;
 
             /* get the sibling */
             if (e->xconfigurerequest.value_mask & CWSibling) {
@@ -1078,16 +1079,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 {
                     sibling = WINDOW_AS_CLIENT(win);
                 }
+                else
+                    /* an invalid sibling was specified so don't restack at
+                       all, it won't make sense no matter what we do */
+                    ok = FALSE;
             }
 
-            if (!config_focus_under_mouse)
-                ignore_start = event_start_ignore_all_enters();
-            stacking_restack_request(client, sibling,
-                                     e->xconfigurerequest.detail);
-            if (!config_focus_under_mouse)
-                event_end_ignore_all_enters(ignore_start);
+            if (ok) {
+                if (!config_focus_under_mouse)
+                    ignore_start = event_start_ignore_all_enters();
+                stacking_restack_request(client, sibling,
+                                         e->xconfigurerequest.detail);
+                if (!config_focus_under_mouse)
+                    event_end_ignore_all_enters(ignore_start);
+            }
 
-            /* if a stacking change moves the window without resizing */
+            /* a stacking change moves the window without resizing */
             move = TRUE;
         }
 

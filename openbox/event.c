@@ -1073,8 +1073,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 ObWindow *win;
                 win = g_hash_table_lookup(window_map,
                                           &e->xconfigurerequest.above);
-                if (WINDOW_IS_CLIENT(win) && WINDOW_AS_CLIENT(win) != client)
+                if (win && WINDOW_IS_CLIENT(win) &&
+                    WINDOW_AS_CLIENT(win) != client)
+                {
                     sibling = WINDOW_AS_CLIENT(win);
+                }
             }
 
             if (!config_focus_under_mouse)

@@ -63,7 +63,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
 
     if (data->client) {
-        gint x, y, w, h;
+        gint x, y, w, h, realw, realh, lw, lh;
 
         /* don't allow vertical resize if shaded */
         if (o->dir != OB_DIRECTION_NORTH || o->dir != OB_DIRECTION_SOUTH ||
@@ -71,12 +71,21 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         {
             client_find_resize_directional(data->client, o->dir, TRUE,
                                            &x, &y, &w, &h);
+            realw = w;
+            realh = h;
+            client_try_configure(data->client, &x, &y, &realw, &realh,
+                                 &lw, &lh, TRUE);
+            /* if it's going to be resized smaller than it intended, don't
+               move the window over */
+            if (x != data->client->area.x) x += w - realw;
+            if (y != data->client->area.y) y += h - realh;
+
             if (x != data->client->area.x || y != data->client->area.y ||
                 w != data->client->area.width ||
                 h != data->client->area.height)
             {
                 actions_client_move(data, TRUE);
-                client_move_resize(data->client, x, y, w, h);
+                client_move_resize(data->client, x, y, realw, realh);
                 actions_client_move(data, FALSE);
             }
         }

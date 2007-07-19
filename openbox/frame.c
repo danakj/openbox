@@ -22,6 +22,7 @@
 #include "openbox.h"
 #include "extensions.h"
 #include "prop.h"
+#include "grab.h"
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"

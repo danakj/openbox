@@ -72,7 +72,7 @@ static gboolean sync_timeout_func(gpointer data);
 static void client_dest(ObClient *client, gpointer data)
 {
     if (moveresize_client == client)
-        moveresize_end(TRUE);    
+        moveresize_end(TRUE);
 }
 
 void moveresize_startup(gboolean reconfig)
@@ -173,8 +173,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
        either way instead of a full increment one and 1 px the other. */
-    start_x = x - c->size_inc.width / 2;
-    start_y = y - c->size_inc.height / 2;
+    start_x = x - (mv ? 0 : c->size_inc.width / 2);
+    start_y = y - (mv ? 0 : c->size_inc.height / 2);
     corner = cnr;
     button = b;
     key_resize_edge = -1;
@@ -661,7 +661,7 @@ static void resize_with_keys(gint keycode, gint state)
         pdy = -dh;
     else if (key_resize_edge == OB_DIRECTION_SOUTH)
         pdy = dh;
-    
+
     screen_pointer_pos(&opx, &opy);
     XWarpPointer(ob_display, None, None, 0, 0, 0, 0, pdx, pdy);
     /* steal the motion events this causes */
@@ -722,7 +722,7 @@ gboolean moveresize_event(XEvent *e)
                 dw = (e->xmotion.x_root - start_x);
                 dh = -(e->xmotion.y_root - start_y);
                 lockcorner = OB_CORNER_BOTTOMLEFT;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_right) { 
+            } else if (corner == prop_atoms.net_wm_moveresize_size_right) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = 0;
                 lockcorner = OB_CORNER_BOTTOMLEFT;

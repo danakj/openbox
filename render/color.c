@@ -140,7 +140,7 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
                 }
                 data += im->width;
                 p32 += im->width;
-            } 
+            }
         } else im->data = (gchar*) data;
         break;
     case 16:
@@ -192,11 +192,11 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         break;
     default:
         g_error("Your bit depth is currently unhandled\n");
-        
+
     }
 }
 
-XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b) 
+XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b)
 {
   r = (r & 0xff) >> (8-RrPseudoBPC(inst));
   g = (g & 0xff) >> (8-RrPseudoBPC(inst));

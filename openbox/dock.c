@@ -138,12 +138,12 @@ void dock_add(Window win, XWMHints *wmhints)
             if (data[1])
                 app->class = g_strdup(data[1]);
         }
-        g_strfreev(data);     
+        g_strfreev(data);
     }
 
     if (app->name == NULL) app->name = g_strdup("");
     if (app->class == NULL) app->class = g_strdup("");
-    
+
     if (XGetWindowAttributes(ob_display, app->icon_win, &attrib)) {
         app->w = attrib.width;
         app->h = attrib.height;
@@ -405,7 +405,7 @@ void dock_configure()
                     break;
                 }
                 break;
-            }    
+            }
         }
     }
 

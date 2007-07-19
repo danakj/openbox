@@ -44,7 +44,7 @@ int main () {
   XSetWMNormalHints(display, win, hints);
   XFree(hints);
 
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0));
 
   XMapWindow(display, win);
   XFlush(display);

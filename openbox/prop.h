@@ -62,7 +62,7 @@ typedef struct Atoms {
 
     /* Atoms that are used inside messages - these don't go in net_supported */
 
-    Atom net_wm_moveresize_size_topleft; 
+    Atom net_wm_moveresize_size_topleft;
     Atom net_wm_moveresize_size_top;
     Atom net_wm_moveresize_size_topright;
     Atom net_wm_moveresize_size_right;
@@ -189,7 +189,7 @@ typedef struct Atoms {
 */
 
     /* Openbox specific atoms */
-     
+
     Atom ob_wm_action_undecorate;
     Atom ob_wm_state_undecorated;
     Atom openbox_pid; /* this is depreecated in favour of ob_control */

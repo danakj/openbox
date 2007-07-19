@@ -53,7 +53,7 @@ struct _ObPopup
     guint iconhm; /* icon height multiplier. multipled by the normal height */
     gboolean mapped;
     gboolean delay_mapped;
- 
+
     void (*draw_icon)(gint x, gint y, gint w, gint h, gpointer data);
     gpointer draw_icon_data;
 };

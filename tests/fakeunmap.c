@@ -38,7 +38,7 @@ int main () {
   win = XCreateWindow(display, RootWindow(display, 0),
                       x, y, w, h, 10, CopyFromParent, CopyFromParent,
                       CopyFromParent, 0, NULL);
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0));
 
   XMapWindow(display, win);
   XFlush(display);
@@ -52,7 +52,7 @@ int main () {
   XSendEvent(display, RootWindow(display, DefaultScreen(display)), False,
              SubstructureRedirectMask|SubstructureNotifyMask, &msg);
   usleep(10000);
-  
+
   XUnmapWindow(display, win);
   XSync(display, False);
 

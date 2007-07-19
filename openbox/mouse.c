@@ -146,7 +146,7 @@ void mouse_unbind_all()
 {
     gint i;
     GSList *it;
-    
+
     for(i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i) {
         for (it = bound_contexts[i]; it; it = g_slist_next(it)) {
             ObMouseBinding *b = it->data;

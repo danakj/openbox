@@ -74,7 +74,7 @@ void RrRender(RrAppearance *a, gint w, gint h)
         g_assert_not_reached(); /* unhandled gradient */
         return;
     }
-  
+
     if (a->surface.interlaced) {
         gint i;
         RrPixel32 *p;
@@ -157,7 +157,7 @@ static void highlight(RrSurface *s, RrPixel32 *x, RrPixel32 *y, gboolean raised)
     if (b > 0xFF) b = 0xFF;
     *up = (r << RrDefaultRedOffset) + (g << RrDefaultGreenOffset)
         + (b << RrDefaultBlueOffset);
-  
+
     r = (*down >> RrDefaultRedOffset) & 0xFF;
     r -= (r * s->bevel_dark_adjust) >> 8;
     g = (*down >> RrDefaultGreenOffset) & 0xFF;
@@ -247,7 +247,7 @@ static void gradient_parentrelative(RrAppearance *a, gint w, gint h)
     }
 }
 
-static void gradient_solid(RrAppearance *l, gint w, gint h) 
+static void gradient_solid(RrAppearance *l, gint w, gint h)
 {
     gint i;
     RrPixel32 pix;
@@ -279,7 +279,7 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
                       left, bottom, right, bottom);
             XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       right, bottom, right, top);
-                
+
             XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left, top, right, top);
             XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
@@ -310,7 +310,7 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
                       left, bottom, right, bottom);
             XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       right, bottom, right, top);
-      
+
             XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left, top, right, top);
             XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
@@ -338,7 +338,7 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
                            left, top, right, bottom);
         }
         break;
-    default:  
+    default:
         g_assert_not_reached(); /* unhandled ReliefType */
     }
 }
@@ -466,10 +466,10 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
         current = COLOR(y2);
         for (x = w - 1; x >= 0; --x)
             *(data++) = current;
-        
+
         NEXT(y2);
     }
-    
+
     for (y3 = y3sz; y3 > 0; --y3) {
         current = COLOR(y3);
         for (x = w - 1; x >= 0; --x)
@@ -606,7 +606,7 @@ static void gradient_diagonal(RrSurface *sf, gint w, gint h)
 
     for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
         *(data++) = COLOR(x);
-        
+
         NEXT(x);
     }
     *data = COLOR(x);
@@ -653,7 +653,7 @@ static void gradient_crossdiagonal(RrSurface *sf, gint w, gint h)
 
     for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
         *(data++) = COLOR(x);
-        
+
         NEXT(x);
     }
     *data = COLOR(x);
@@ -717,7 +717,7 @@ static void gradient_pyramid(RrSurface *sf, gint inw, gint inh)
         *(data+inw-x) = current;
         *(end-x) = current;
         *(end-(inw-x)) = current;
-        
+
         NEXT(x);
     }
     current = COLOR(x);

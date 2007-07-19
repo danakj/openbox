@@ -505,7 +505,7 @@ static glong timecompare(GTimeVal *a, GTimeVal *b)
 
     if ((r = b->tv_sec - a->tv_sec)) return r;
     return b->tv_usec - a->tv_usec;
-    
+
 }
 
 static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
@@ -601,7 +601,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 
     for (it = loop->timers; it; it = next) {
         ObMainLoopTimer *curr;
-        
+
         next = g_slist_next(it);
 
         curr = it->data;
@@ -611,14 +611,14 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
         */
         if (curr->del_me) {
             /* delete the top */
-            loop->timers = g_slist_delete_link(loop->timers, it); 
+            loop->timers = g_slist_delete_link(loop->timers, it);
             if (curr->destroy)
                 curr->destroy(curr->data);
             g_free(curr);
             continue;
         }
 
-        /* the queue is sorted, so if this timer shouldn't fire, none are 
+        /* the queue is sorted, so if this timer shouldn't fire, none are
            ready */
         if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) < 0)
             break;

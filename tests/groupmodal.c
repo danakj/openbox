@@ -49,8 +49,8 @@ int main () {
                       0,0,100,100, 10, CopyFromParent, CopyFromParent,
                       CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,one,WhitePixel(display,0)); 
-  XSetWindowBackground(display,two,BlackPixel(display,0)); 
+  XSetWindowBackground(display,one,WhitePixel(display,0));
+  XSetWindowBackground(display,two,BlackPixel(display,0));
 
   XSetTransientForHint(display, two, RootWindow(display,0));
   XChangeProperty(display, two, state, XA_ATOM, 32,
@@ -65,7 +65,7 @@ int main () {
   XSetWMHints(display, two, wmhints);
 
   XFree(wmhints);
-  
+
   XMapWindow(display, one);
   XFlush(display);
   sleep(1);

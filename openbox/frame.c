@@ -59,7 +59,7 @@ static Window createWindow(Window parent, Visual *visual,
                          (visual ? 32 : RrDepth(ob_rr_inst)), InputOutput,
                          (visual ? visual : RrVisual(ob_rr_inst)),
                          mask, attrib);
-                       
+
 }
 
 static Visual *check_32bit_client(ObClient *c)
@@ -156,7 +156,7 @@ ObFrame *frame_new(ObClient *client)
 
     self->handle = createWindow(self->window, NULL, mask, &attrib);
     self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
-    self->rgrip = createWindow(self->handle, NULL, mask, &attrib); 
+    self->rgrip = createWindow(self->handle, NULL, mask, &attrib);
 
     self->handleleft = createWindow(self->handle, NULL, mask, &attrib);
     self->handleright = createWindow(self->handle, NULL, mask, &attrib);
@@ -177,9 +177,9 @@ ObFrame *frame_new(ObClient *client)
     XMapWindow(ob_display, self->backback);
     XMapWindow(ob_display, self->backfront);
 
-    self->max_press = self->close_press = self->desk_press = 
+    self->max_press = self->close_press = self->desk_press =
         self->iconify_press = self->shade_press = FALSE;
-    self->max_hover = self->close_hover = self->desk_hover = 
+    self->max_hover = self->close_hover = self->desk_hover =
         self->iconify_hover = self->shade_hover = FALSE;
 
     set_theme_statics(self);
@@ -224,7 +224,7 @@ static void set_theme_statics(ObFrame *self)
 
 static void free_theme_statics(ObFrame *self)
 {
-    RrAppearanceFree(self->a_unfocused_title); 
+    RrAppearanceFree(self->a_unfocused_title);
     RrAppearanceFree(self->a_focused_title);
     RrAppearanceFree(self->a_unfocused_label);
     RrAppearanceFree(self->a_focused_label);
@@ -249,8 +249,13 @@ void frame_show(ObFrame *self)
     if (!self->visible) {
         self->visible = TRUE;
         framerender_frame(self);
+        /* Grab the server to make sure that the frame window is mapped before
+           the client gets its MapNotify, i.e. to make sure the client is
+           _visible_ when it gets MapNotify. */
+        grab_server(TRUE);
         XMapWindow(ob_display, self->client->window);
         XMapWindow(ob_display, self->window);
+        grab_server(FALSE);
     }
 }
 
@@ -378,7 +383,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         {
             self->size.bottom += ob_rr_theme->handle_height + self->bwidth;
         }
-  
+
         /* position/size and map/unmap all the windows */
 
         if (!fake) {
@@ -548,7 +553,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                                  sidebwidth) * 2,
                                   self->bwidth);
 
-                
+
                 if (sidebwidth) {
                     XMoveResizeWindow(ob_display, self->lgripleft,
                                       0,
@@ -766,7 +771,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (!frame_iconify_animating(self))
             /* move and resize the top level frame.
                shading can change without being moved or resized.
-               
+
                but don't do this during an iconify animation. it will be
                reflected afterwards.
             */
@@ -1573,7 +1578,7 @@ void frame_flash_start(ObFrame *self)
                                  flash_done);
     g_get_current_time(&self->flash_end);
     g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
-    
+
     self->flashing = TRUE;
 }
 
@@ -1624,7 +1629,7 @@ static gboolean frame_animate_iconify(gpointer p)
     /* how far do we have left to go ? */
     g_get_current_time(&now);
     time = frame_animate_iconify_time_left(self, &now);
-    
+
     if (time == 0 || iconifying) {
         /* start where the frame is supposed to be */
         x = self->area.x;

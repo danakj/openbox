@@ -436,7 +436,7 @@ static void sm_save_complete(SmcConn conn, SmPointer data)
 
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 {
-    ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled\n");    
+    ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled\n");
 }
 
 static gboolean session_save_to_file(const ObSMSaveData *savedata)
@@ -747,7 +747,7 @@ static void session_load_file(const gchar *path)
             parse_find_node("undecorated", node->children) != NULL;
         state->focused =
             parse_find_node("focused", node->children) != NULL;
-        
+
         /* save this. they are in the file in stacking order, so preserve
            that order here */
         session_saved_state = g_list_append(session_saved_state, state);

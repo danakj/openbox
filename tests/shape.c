@@ -50,7 +50,7 @@ int main () {
                           ShapeBounding, 0, 0, &xrect, 1,
                           ShapeSet, Unsorted);
 
-  XSetWindowBackground(display,win,BlackPixel(display,0)); 
+  XSetWindowBackground(display,win,BlackPixel(display,0));
 
   XMapWindow(display, win);
   XFlush(display);

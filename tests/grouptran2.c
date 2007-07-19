@@ -48,9 +48,9 @@ int main () {
                         20,20,60,60, 10, CopyFromParent, CopyFromParent,
                         CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,main,WhitePixel(display,0)); 
-  XSetWindowBackground(display,grouptran,BlackPixel(display,0)); 
-  XSetWindowBackground(display,child,WhitePixel(display,0)); 
+  XSetWindowBackground(display,main,WhitePixel(display,0));
+  XSetWindowBackground(display,grouptran,BlackPixel(display,0));
+  XSetWindowBackground(display,child,WhitePixel(display,0));
 
   XSetTransientForHint(display, grouptran, RootWindow(display,0));
   XSetTransientForHint(display, child, grouptran);
@@ -65,7 +65,7 @@ int main () {
   XSetWMHints(display, child, wmhints);
 
   XFree(wmhints);
-  
+
   XMapWindow(display, main);
   XMapWindow(display, grouptran);
   XMapWindow(display, child);

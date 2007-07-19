@@ -40,8 +40,8 @@ int main () {
                       0,0,150,150, 10, CopyFromParent, CopyFromParent,
                       CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,one,WhitePixel(display,0)); 
-  XSetWindowBackground(display,two,BlackPixel(display,0)); 
+  XSetWindowBackground(display,one,WhitePixel(display,0));
+  XSetWindowBackground(display,two,BlackPixel(display,0));
 
   XSetTransientForHint(display, two, one);
 

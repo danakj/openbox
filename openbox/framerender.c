@@ -126,12 +126,12 @@ void framerender_frame(ObFrame *self)
                   (self->max_press ?
                    ob_rr_theme->a_toggled_focused_pressed_max :
                    (self->max_hover ?
-                    ob_rr_theme->a_toggled_hover_focused_max : 
+                    ob_rr_theme->a_toggled_hover_focused_max :
                     ob_rr_theme->a_toggled_focused_unpressed_max)) :
                   (self->max_press ?
                    ob_rr_theme->a_focused_pressed_max :
                    (self->max_hover ?
-                    ob_rr_theme->a_hover_focused_max : 
+                    ob_rr_theme->a_hover_focused_max :
                     ob_rr_theme->a_focused_unpressed_max))));
             n = self->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
@@ -139,7 +139,7 @@ void framerender_frame(ObFrame *self)
                  (self->iconify_press ?
                   ob_rr_theme->a_focused_pressed_iconify :
                   (self->iconify_hover ?
-                   ob_rr_theme->a_hover_focused_iconify : 
+                   ob_rr_theme->a_hover_focused_iconify :
                    ob_rr_theme->a_focused_unpressed_iconify)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
                  ob_rr_theme->a_disabled_focused_desk :
@@ -147,12 +147,12 @@ void framerender_frame(ObFrame *self)
                   (self->desk_press ?
                    ob_rr_theme->a_toggled_focused_pressed_desk :
                    (self->desk_hover ?
-                    ob_rr_theme->a_toggled_hover_focused_desk : 
+                    ob_rr_theme->a_toggled_hover_focused_desk :
                     ob_rr_theme->a_toggled_focused_unpressed_desk)) :
                   (self->desk_press ?
                    ob_rr_theme->a_focused_pressed_desk :
                    (self->desk_hover ?
-                    ob_rr_theme->a_hover_focused_desk : 
+                    ob_rr_theme->a_hover_focused_desk :
                     ob_rr_theme->a_focused_unpressed_desk))));
             s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
                  ob_rr_theme->a_disabled_focused_shade :
@@ -160,19 +160,19 @@ void framerender_frame(ObFrame *self)
                   (self->shade_press ?
                    ob_rr_theme->a_toggled_focused_pressed_shade :
                    (self->shade_hover ?
-                    ob_rr_theme->a_toggled_hover_focused_shade : 
+                    ob_rr_theme->a_toggled_hover_focused_shade :
                     ob_rr_theme->a_toggled_focused_unpressed_shade)) :
                   (self->shade_press ?
                    ob_rr_theme->a_focused_pressed_shade :
                    (self->shade_hover ?
-                    ob_rr_theme->a_hover_focused_shade : 
+                    ob_rr_theme->a_hover_focused_shade :
                     ob_rr_theme->a_focused_unpressed_shade))));
             c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
                  ob_rr_theme->a_disabled_focused_close :
                  (self->close_press ?
                   ob_rr_theme->a_focused_pressed_close :
                   (self->close_hover ?
-                   ob_rr_theme->a_hover_focused_close : 
+                   ob_rr_theme->a_hover_focused_close :
                    ob_rr_theme->a_focused_unpressed_close)));
         } else {
             t = self->a_unfocused_title;
@@ -183,12 +183,12 @@ void framerender_frame(ObFrame *self)
                   (self->max_press ?
                    ob_rr_theme->a_toggled_unfocused_pressed_max :
                    (self->max_hover ?
-                    ob_rr_theme->a_toggled_hover_unfocused_max : 
+                    ob_rr_theme->a_toggled_hover_unfocused_max :
                     ob_rr_theme->a_toggled_unfocused_unpressed_max)) :
                   (self->max_press ?
                    ob_rr_theme->a_unfocused_pressed_max :
                    (self->max_hover ?
-                    ob_rr_theme->a_hover_unfocused_max : 
+                    ob_rr_theme->a_hover_unfocused_max :
                     ob_rr_theme->a_unfocused_unpressed_max))));
             n = self->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
@@ -196,7 +196,7 @@ void framerender_frame(ObFrame *self)
                  (self->iconify_press ?
                   ob_rr_theme->a_unfocused_pressed_iconify :
                   (self->iconify_hover ?
-                   ob_rr_theme->a_hover_unfocused_iconify : 
+                   ob_rr_theme->a_hover_unfocused_iconify :
                    ob_rr_theme->a_unfocused_unpressed_iconify)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
                  ob_rr_theme->a_disabled_unfocused_desk :
@@ -204,12 +204,12 @@ void framerender_frame(ObFrame *self)
                   (self->desk_press ?
                    ob_rr_theme->a_toggled_unfocused_pressed_desk :
                    (self->desk_hover ?
-                    ob_rr_theme->a_toggled_hover_unfocused_desk : 
+                    ob_rr_theme->a_toggled_hover_unfocused_desk :
                     ob_rr_theme->a_toggled_unfocused_unpressed_desk)) :
                   (self->desk_press ?
                    ob_rr_theme->a_unfocused_pressed_desk :
                    (self->desk_hover ?
-                    ob_rr_theme->a_hover_unfocused_desk : 
+                    ob_rr_theme->a_hover_unfocused_desk :
                     ob_rr_theme->a_unfocused_unpressed_desk))));
             s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
                  ob_rr_theme->a_disabled_unfocused_shade :
@@ -217,19 +217,19 @@ void framerender_frame(ObFrame *self)
                   (self->shade_press ?
                    ob_rr_theme->a_toggled_unfocused_pressed_shade :
                    (self->shade_hover ?
-                    ob_rr_theme->a_toggled_hover_unfocused_shade : 
+                    ob_rr_theme->a_toggled_hover_unfocused_shade :
                     ob_rr_theme->a_toggled_unfocused_unpressed_shade)) :
                   (self->shade_press ?
                    ob_rr_theme->a_unfocused_pressed_shade :
                    (self->shade_hover ?
-                    ob_rr_theme->a_hover_unfocused_shade : 
+                    ob_rr_theme->a_hover_unfocused_shade :
                     ob_rr_theme->a_unfocused_unpressed_shade))));
             c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
                  ob_rr_theme->a_disabled_unfocused_close :
                  (self->close_press ?
                   ob_rr_theme->a_unfocused_pressed_close :
                   (self->close_hover ?
-                   ob_rr_theme->a_hover_unfocused_close : 
+                   ob_rr_theme->a_hover_unfocused_close :
                    ob_rr_theme->a_unfocused_unpressed_close)));
         }
         clear = ob_rr_theme->a_clear;

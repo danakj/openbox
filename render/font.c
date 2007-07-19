@@ -244,7 +244,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     pango_layout_get_pixel_extents(t->font->layout, NULL, &rect);
     mw = rect.width;
 
-    /* pango_layout_set_alignment doesn't work with 
+    /* pango_layout_set_alignment doesn't work with
        pango_xft_render_layout_line */
     switch (t->justify) {
     case RR_JUSTIFY_LEFT:

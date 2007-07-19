@@ -48,8 +48,8 @@ int main () {
                          x, y, w/2, h/2, 10, CopyFromParent, CopyFromParent,
                          CopyFromParent, 0, 0);
 
-  XSetWindowBackground(display,parent,WhitePixel(display,0)); 
-  XSetWindowBackground(display,child1,BlackPixel(display,0)); 
+  XSetWindowBackground(display,parent,WhitePixel(display,0));
+  XSetWindowBackground(display,child1,BlackPixel(display,0));
   XSetWindowBackground(display,child2,WhitePixel(display,0));
 
   hints = XAllocWMHints();
@@ -63,7 +63,7 @@ int main () {
   XSetTransientForHint(display, child1,
                        RootWindow(display, DefaultScreen(display)));
   XSetTransientForHint(display, child2, parent);
-  
+
   XMapWindow(display, parent);
   XFlush(display);
   sleep(3);

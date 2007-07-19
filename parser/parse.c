@@ -412,7 +412,7 @@ void parse_paths_startup()
     xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
                                           g_strdup(xdg_config_home_path),
                                           (GSListFunc) g_slist_prepend);
-    
+
     path = g_getenv("XDG_DATA_DIRS");
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_data_dir_paths = split_paths(path);

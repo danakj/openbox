@@ -68,7 +68,7 @@ gboolean translate_button(const gchar *str, guint *state, guint *button)
     gboolean ret = FALSE;
 
     parsed = g_strsplit(str, "-", -1);
-    
+
     /* first, find the button (last token) */
     l = NULL;
     for (i = 0; parsed[i] != NULL; ++i)
@@ -110,7 +110,7 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
     KeySym sym;
 
     parsed = g_strsplit(str, "-", -1);
-    
+
     /* first, find the key (last token) */
     l = NULL;
     for (i = 0; parsed[i] != NULL; ++i)
@@ -145,7 +145,7 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
         *keycode = XKeysymToKeycode(ob_display, sym);
     }
     if (!*keycode) {
-        g_message(_("Requested key '%s' does not exist on the display"), l); 
+        g_message(_("Requested key '%s' does not exist on the display"), l);
         goto translation_fail;
     }
 

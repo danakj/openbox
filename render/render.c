@@ -86,8 +86,8 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
     {
         gint l, t, r, b;
         RrMargins(a, &l, &t, &r, &b);
-        RECT_SET(tarea, l, t, w - l - r, h - t - b); 
-    }       
+        RECT_SET(tarea, l, t, w - l - r, h - t - b);
+    }
 
     for (i = 0; i < a->textures; i++) {
         switch (a->texture[i].type) {
@@ -101,7 +101,7 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
                     pixel_data_to_pixmap(a, 0, 0, w, h);
             }
             if (a->xftdraw == NULL) {
-                a->xftdraw = XftDrawCreate(RrDisplay(a->inst), a->pixmap, 
+                a->xftdraw = XftDrawCreate(RrDisplay(a->inst), a->pixmap,
                                            RrVisual(a->inst),
                                            RrColormap(a->inst));
             }
@@ -202,7 +202,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     if (spo->primary != NULL)
         spc->primary = RrColorNew(copy->inst,
                                   spo->primary->r,
-                                  spo->primary->g, 
+                                  spo->primary->g,
                                   spo->primary->b);
     else spc->primary = NULL;
 
@@ -376,7 +376,7 @@ gint RrMinWidth(RrAppearance *a)
             break;
         case RR_TEXTURE_TEXT:
             m = RrFontMeasureString(a->texture[i].data.text.font,
-                                    a->texture[i].data.text.string, 
+                                    a->texture[i].data.text.string,
                                     a->texture[i].data.text.shadow_offset_x,
                                     a->texture[i].data.text.shadow_offset_y);
             w = MAX(w, m->width);

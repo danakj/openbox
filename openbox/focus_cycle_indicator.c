@@ -46,7 +46,7 @@ static Window create_window(Window parent, gulong mask,
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
                          RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
-                       
+
 }
 
 void focus_cycle_indicator_startup(gboolean reconfig)

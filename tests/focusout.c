@@ -44,8 +44,8 @@ int main () {
                         10, 10, w-20, h-20, 0, CopyFromParent, CopyFromParent,
                         CopyFromParent, 0, NULL);
 
-    XSetWindowBackground(display,win,WhitePixel(display,0)); 
-    XSetWindowBackground(display,child,BlackPixel(display,0)); 
+    XSetWindowBackground(display,win,WhitePixel(display,0));
+    XSetWindowBackground(display,child,BlackPixel(display,0));
 
     XSelectInput(display, win,
                  FocusChangeMask|EnterWindowMask|LeaveWindowMask);

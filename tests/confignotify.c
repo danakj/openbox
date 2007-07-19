@@ -38,7 +38,7 @@ int main () {
                         x, y, w, h, 0, CopyFromParent, CopyFromParent,
                         CopyFromParent, 0, NULL);
 
-    XSetWindowBackground(display,win,WhitePixel(display,0)); 
+    XSetWindowBackground(display,win,WhitePixel(display,0));
 
     XSelectInput(display, win, (ExposureMask | StructureNotifyMask |
                                 GravityNotify));

@@ -86,7 +86,7 @@ static Rect **pick_head(ObClient *c)
 
         /* try on the client's desktop */
         for (it = c->group->members; it; it = g_slist_next(it)) {
-            ObClient *itc = it->data;            
+            ObClient *itc = it->data;
             if (itc != c &&
                 (itc->desktop == c->desktop ||
                  itc->desktop == DESKTOP_ALL || c->desktop == DESKTOP_ALL))
@@ -99,7 +99,7 @@ static Rect **pick_head(ObClient *c)
 
         /* try on all desktops */
         for (it = c->group->members; it; it = g_slist_next(it)) {
-            ObClient *itc = it->data;            
+            ObClient *itc = it->data;
             if (itc != c) {
                 add_choice(choice, client_monitor(it->data));
                 ob_debug("placement adding choice %d for group sibling on "
@@ -446,7 +446,7 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
                 }
             }
             if (!first) {
-                *x = ((r + 1 - l) - client->frame->area.width) / 2 + l; 
+                *x = ((r + 1 - l) - client->frame->area.width) / 2 + l;
                 *y = ((b + 1 - t) - client->frame->area.height) / 2 + t;
                 return TRUE;
             }

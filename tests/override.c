@@ -41,7 +41,7 @@ int main () {
 		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
 		      CopyFromParent, xswamask, &xswa);
 
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0));
 
   XMapWindow(display, win);
   XFlush(display);

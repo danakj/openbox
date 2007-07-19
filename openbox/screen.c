@@ -532,7 +532,7 @@ void screen_set_num_desktops(guint num)
                 stacking_raise(CLIENT_AS_WINDOW(c));
         }
     }
- 
+
     /* change our struts/area to match (after moving windows) */
     screen_update_areas();
 
@@ -552,7 +552,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     guint old;
     gulong ignore_start;
     gboolean allow_omni;
-     
+
     g_assert(num < screen_num_desktops);
 
     old = screen_desktop;
@@ -1008,7 +1008,7 @@ void screen_update_layout()
     if (PROP_GETA32(RootWindow(ob_display, ob_screen),
                     net_desktop_layout, cardinal, &data, &num)) {
         if (num == 3 || num == 4) {
-            
+
             if (data[0] == prop_atoms.net_wm_orientation_vert)
                 l.orientation = OB_ORIENTATION_VERT;
             else if (data[0] == prop_atoms.net_wm_orientation_horz)
@@ -1090,7 +1090,7 @@ void screen_update_desktop_names()
 void screen_show_desktop(gboolean show, ObClient *show_only)
 {
     GList *it;
-     
+
     if (show == screen_showing_desktop) return; /* no change */
 
     screen_showing_desktop = show;
@@ -1353,7 +1353,7 @@ Rect* screen_area_all_monitors(guint desktop)
 
         g_free(m);
     }
-        
+
     return a;
 }
 #endif

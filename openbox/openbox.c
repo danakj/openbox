@@ -129,7 +129,7 @@ gint main(gint argc, gchar **argv)
     if (chdir(g_get_home_dir()) == -1)
         g_message(_("Unable to change to home directory '%s': %s"),
                   g_get_home_dir(), g_strerror(errno));
-     
+
     /* parse the command line args, which can change the argv[0] */
     parse_args(&argc, argv);
     /* parse the environment variables */
@@ -155,7 +155,7 @@ gint main(gint argc, gchar **argv)
         prop_startup();
 
         /* Send client message telling the OB process to:
-         * remote_control = 1 -> reconfigure 
+         * remote_control = 1 -> reconfigure
          * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
                  ob_control, remote_control, 0, 0, 0);
@@ -443,7 +443,7 @@ gint main(gint argc, gchar **argv)
     g_free(ob_sm_save_file);
     g_free(ob_sm_id);
     g_free(program_name);
-     
+
     return exitcode;
 }
 
@@ -456,7 +456,7 @@ static void signal_handler(gint signal, gpointer data)
         break;
     case SIGUSR2:
         ob_debug("Caught signal %d. Reconfiguring.\n", signal);
-        ob_reconfigure(); 
+        ob_reconfigure();
         break;
     case SIGCHLD:
         /* reap children */

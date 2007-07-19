@@ -55,7 +55,7 @@ gint main()
     ob_root = RootWindow(ob_display, ob_screen);
     win =
         XCreateWindow(ob_display, RootWindow(ob_display, 0),
-                      10, 10, w, h, 10, 
+                      10, 10, w, h, 10,
                       CopyFromParent,    /* depth */
                       CopyFromParent,    /* class */
                       CopyFromParent,    /* visual */

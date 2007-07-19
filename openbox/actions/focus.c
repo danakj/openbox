@@ -64,7 +64,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 /*
         ob_debug("button %d focusable %d context %d %d %d\n",
                  data->button, client_mouse_focusable(data->client),
-                 data->context, 
+                 data->context,
                  OB_FRAME_CONTEXT_CLIENT, OB_FRAME_CONTEXT_FRAME);
 */
         if (data->button == 0 || client_mouse_focusable(data->client) ||

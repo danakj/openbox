@@ -44,7 +44,7 @@ Window findClient(Display *d, Window win)
     XGetWindowProperty(d, win, state, 0, 1,
                        False, state, &ret_type, &ret_format,
                        &ret_items, &ret_bytesleft,
-                       (unsigned char**) &prop_return); 
+                       (unsigned char**) &prop_return);
     if (ret_type == None || ret_items < 1)
         return None;
     return win; // found it!
@@ -69,9 +69,9 @@ int main(int argc, char **argv)
     Pixmap p;
     Cursor cur;
     XEvent ev;
-  
+
     printf("Click on a window with an icon...\n");
-  
+
     //int id = strtol(argv[1], NULL, 16);
     XUngrabPointer(d, CurrentTime);
     cur = XCreateFontCursor(d, XC_crosshair);
@@ -87,10 +87,10 @@ int main(int argc, char **argv)
     }
 
     printf("Using window 0x%lx\n", id);
-  
+
     do {
         unsigned int w, h;
-    
+
         XGetWindowProperty(d, id, net_wm_icon, offset++, 1,
                            False, XA_CARDINAL, &ret_type, &ret_format,
                            &ret_items, &ret_bytesleft,
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
         offset += w*h;
 
         printf("Found icon with size %dx%d\n", w, h);
-  
+
         i[image] = XCreateImage(d, DefaultVisual(d, s), DefaultDepth(d, s),
                                 ZPixmap, 0, NULL, w, h, 32, 0);
         assert(i[image]);
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
             unsigned char bgr = 0;
             unsigned char bgg = 0;
             unsigned char bgb = 0;
-      
+
             r = bgr + (r - bgr) * alpha / 256;
             g = bgg + (g - bgg) * alpha / 256;
             b = bgb + (b - bgb) * alpha / 256;
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
         x += i[j]->width;
         XDestroyImage(i[j]);
     }
-    
+
     XSetWindowBackgroundPixmap(d, win, p);
     XClearWindow(d, win);
 

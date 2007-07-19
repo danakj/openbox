@@ -43,7 +43,7 @@ int main () {
 		      x, y, w, h, 0, CopyFromParent, CopyFromParent,
 		      CopyFromParent, xswamask, &xswa);
 
-  XSetWindowBackground(display,win,WhitePixel(display,0)); 
+  XSetWindowBackground(display,win,WhitePixel(display,0));
 
   size.flags = PMinSize | PMaxSize;
   size.max_width = 0;
@@ -51,7 +51,7 @@ int main () {
   size.max_height = 0;
   size.min_height = h;
   XSetWMNormalHints(display, win, &size);
-  
+
   XSelectInput(display, win, ExposureMask | StructureNotifyMask);
 
   XMapWindow(display, win);

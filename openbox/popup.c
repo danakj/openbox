@@ -46,7 +46,7 @@ ObPopup *popup_new()
                              0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                              InputOutput, RrVisual(ob_rr_inst),
                              CWOverrideRedirect, &attrib);
-    
+
     self->text = XCreateWindow(ob_display, self->bg,
                                0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                                InputOutput, RrVisual(ob_rr_inst), 0, NULL);
@@ -110,7 +110,7 @@ void popup_text_width_to_string(ObPopup *self, gchar *text)
         self->a_text->texture[0].data.text.string = text;
         self->textw = RrMinWidth(self->a_text);
     } else
-        self->textw = 0;    
+        self->textw = 0;
 }
 
 void popup_height_to_string(ObPopup *self, gchar *text)
@@ -138,7 +138,7 @@ void popup_set_text_align(ObPopup *self, RrJustify align)
 static gboolean popup_show_timeout(gpointer data)
 {
     ObPopup *self = data;
-    
+
     XMapWindow(ob_display, self->bg);
     stacking_raise(INTERNAL_AS_WINDOW(self));
     self->mapped = TRUE;
@@ -159,7 +159,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     RECT_SET(mon, self->x, self->y, 1, 1);
     area = screen_physical_area_monitor(screen_find_monitor(&mon));
 
-    /* when there is no icon and the text is not parent relative, then 
+    /* when there is no icon and the text is not parent relative, then
        fill the whole dialog with the text appearance, don't use the bg at all
     */
     if (self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
@@ -248,10 +248,10 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
     x=MAX(MIN(x, area->width-w),0);
     y=MAX(MIN(y, area->height-h),0);
-    
+
     /* set the windows/appearances up */
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
-    /* when there is no icon and the text is not parent relative, then 
+    /* when there is no icon and the text is not parent relative, then
        fill the whole dialog with the text appearance, don't use the bg at all
     */
     if (self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
@@ -523,7 +523,7 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
         for (i = self->desks; i < screen_num_desktops; ++i) {
             XSetWindowAttributes attr;
 
-            attr.border_pixel = 
+            attr.border_pixel =
                 RrColorPixel(ob_rr_theme->osd_border_color);
             self->wins[i] = XCreateWindow(ob_display, self->popup->bg,
                                           0, 0, 1, 1, ob_rr_theme->obwidth,

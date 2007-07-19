@@ -34,24 +34,24 @@ static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
     gulong dstX, dstY, srcX, srcY;
     gulong srcX1, srcX2, srcY1, srcY2;
     gulong ratioX, ratioY;
-    
+
     ratioX = (srcW << FRACTION) / dstW;
     ratioY = (srcH << FRACTION) / dstH;
-    
+
     srcY2 = 0;
     for (dstY = 0; dstY < dstH; dstY++) {
         srcY1 = srcY2;
         srcY2 += ratioY;
-        
+
         srcX2 = 0;
         for (dstX = 0; dstX < dstW; dstX++) {
             gulong red = 0, green = 0, blue = 0, alpha = 0;
             gulong portionX, portionY, portionXY, sumXY = 0;
             RrPixel32 pixel;
-            
+
             srcX1 = srcX2;
             srcX2 += ratioX;
-            
+
             for (srcY = srcY1; srcY < srcY2; srcY += (1UL << FRACTION)) {
                 if (srcY == srcY1) {
                     srcY = FLOOR(srcY);
@@ -63,7 +63,7 @@ static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
                     portionY = srcY2 - srcY;
                 else
                     portionY = (1UL << FRACTION);
-                
+
                 for (srcX = srcX1; srcX < srcX2; srcX += (1UL << FRACTION)) {
                     if (srcX == srcX1) {
                         srcX = FLOOR(srcX);
@@ -75,10 +75,10 @@ static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
                         portionX = srcX2 - srcX;
                     else
                         portionX = (1UL << FRACTION);
-                    
+
                     portionXY = (portionX * portionY) >> FRACTION;
                     sumXY += portionXY;
-                    
+
                     pixel = *(src + (srcY >> FRACTION) * srcW
                             + (srcX >> FRACTION));
                     red   += ((pixel >> RrDefaultRedOffset)   & 0xFF)
@@ -91,13 +91,13 @@ static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
                              * portionXY;
                 }
             }
-            
+
             g_assert(sumXY != 0);
             red   /= sumXY;
             green /= sumXY;
             blue  /= sumXY;
             alpha /= sumXY;
-            
+
             *dst++ = (red   << RrDefaultRedOffset)   |
                      (green << RrDefaultGreenOffset) |
                      (blue  << RrDefaultBlueOffset)  |

@@ -1778,7 +1778,7 @@ static gboolean event_handle_menu(XEvent *ev)
                 f->child == e->frame)
                 menu_frame_select(e->frame, e, FALSE);
         break;
-    case KeyPress:
+    case KeyRelease:
         ret = event_handle_menu_keyboard(ev);
         break;
     }

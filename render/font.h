@@ -28,7 +28,8 @@ struct _RrFont {
     gint ref;
     PangoFontDescription *font_desc;
     PangoLayout *layout; /*!< Used for measuring and rendering strings */
-    PangoAttribute *shortcut_underline; /*< For underlining the shortcut key */
+    PangoAttribute *shortcut_underline; /*!< For underlining shortcuts */
+    PangoAttrList  *underline_attrlist; /*!< For underlining shortcuts */
     gint ascent; /*!< The font's ascent in pango-units */
     gint descent; /*!< The font's descent in pango-units */
 };
@@ -38,5 +39,10 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *position);
 /*! Increment the references for this font, RrFontClose will decrement until 0
   and then really close it */
 void RrFontRef(RrFont *f);
+
+void RrFontSetShortcutNormalColor(RrFont *f, RrColor *c);
+void RrFontSetShortcutDisabledColor(RrFont *f, RrColor *c);
+void RrFontSetShortcutSelectedColor(RrFont *f, RrColor *c);
+void RrFontSetShortcutDisabledSelectedColor(RrFont *f, RrColor *c);
 
 #endif /* __font_h */

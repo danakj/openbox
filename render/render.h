@@ -25,6 +25,7 @@
 #include "version.h"
 
 #include <X11/Xlib.h> /* some platforms dont include this as needed for Xft */
+#include <pango/pango.h>
 #include <pango/pangoxft.h>
 #include <glib.h>
 
@@ -138,8 +139,9 @@ struct _RrTextureText {
     gint shadow_offset_y;
     RrColor *shadow_color;
     guchar shadow_alpha;
-    gboolean shortcut; /*!< Underline a character */
-    guint shortcut_pos; /*!< Position in bytes of the character to underline */
+    gboolean shortcut; /*!< Underline/hilight a character */
+    guint shortcut_pos; /*!< Position in bytes of the character to hilight */
+    RrColor *shortcut_color; /*!< Color for the hilighted character, or NULL */
     RrEllipsizeMode ellipsize;
 };
 
@@ -247,7 +249,8 @@ void          RrAppearanceFree (RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
-                             gint size, RrFontWeight weight, RrFontSlant slant);
+                             gint size, RrFontWeight weight,
+                             RrFontSlant slant);
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,

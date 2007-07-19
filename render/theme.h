@@ -87,6 +87,10 @@ struct _RrTheme {
     RrColor *menu_selected_color;
     RrColor *menu_disabled_color;
     RrColor *menu_disabled_selected_color;
+    RrColor *menu_shortcut_color;
+    RrColor *menu_selected_shortcut_color;
+    RrColor *menu_disabled_shortcut_color;
+    RrColor *menu_disabled_selected_shortcut_color;
     RrColor *title_focused_shadow_color;
     gchar    title_focused_shadow_alpha;
     RrColor *title_unfocused_shadow_color;

@@ -401,6 +401,37 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     "menu.items.active.text.color",
                     &theme->menu_selected_color))
         theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "menu.items.text.shortcut.color",
+                    &theme->menu_shortcut_color))
+        theme->menu_shortcut_color = NULL;
+    if (!read_color(db, inst,
+                    "menu.items.disabled.text.shortcut.color",
+                    &theme->menu_disabled_shortcut_color))
+        theme->menu_disabled_shortcut_color =
+            theme->menu_shortcut_color == NULL ? NULL :
+            RrColorNew(inst,
+                       theme->menu_shortcut_color->r,
+                       theme->menu_shortcut_color->g,
+                       theme->menu_shortcut_color->b);
+    if (!read_color(db, inst,
+                    "menu.items.disabled.text.shortcut.color",
+                    &theme->menu_disabled_selected_shortcut_color))
+        theme->menu_disabled_selected_shortcut_color =
+            theme->menu_shortcut_color == NULL ? NULL :
+            RrColorNew(inst,
+                       theme->menu_shortcut_color->r,
+                       theme->menu_shortcut_color->g,
+                       theme->menu_shortcut_color->b);
+    if (!read_color(db, inst,
+                    "menu.items.active.text.shortcut.color",
+                    &theme->menu_selected_shortcut_color))
+        theme->menu_selected_shortcut_color =
+            theme->menu_shortcut_color == NULL ? NULL :
+            RrColorNew(inst,
+                       theme->menu_shortcut_color->r,
+                       theme->menu_shortcut_color->g,
+                       theme->menu_shortcut_color->b);
 
     /* load the image masks */
 
@@ -1034,12 +1065,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->a_menu_text_disabled_selected->texture[0].data.text.font =
         theme->menu_font;
     theme->a_menu_text_normal->texture[0].data.text.color = theme->menu_color;
+    theme->a_menu_text_normal->texture[0].data.text.shortcut_color =
+        theme->menu_shortcut_color;
     theme->a_menu_text_selected->texture[0].data.text.color =
         theme->menu_selected_color;
+    theme->a_menu_text_selected->texture[0].data.text.shortcut_color =
+        theme->menu_selected_shortcut_color;
     theme->a_menu_text_disabled->texture[0].data.text.color =
         theme->menu_disabled_color;
+    theme->a_menu_text_disabled->texture[0].data.text.shortcut_color =
+        theme->menu_disabled_shortcut_color;
     theme->a_menu_text_disabled_selected->texture[0].data.text.color =
         theme->menu_disabled_selected_color;
+    theme->a_menu_text_disabled_selected->texture[0].data.text.shortcut_color =
+        theme->menu_disabled_selected_shortcut_color;
 
     if (read_string(db, "menu.items.font", &str)) {
         char *p;
@@ -1421,6 +1460,10 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_selected_color);
         RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_disabled_selected_color);
+        RrColorFree(theme->menu_shortcut_color);
+        RrColorFree(theme->menu_selected_shortcut_color);
+        RrColorFree(theme->menu_disabled_shortcut_color);
+        RrColorFree(theme->menu_disabled_selected_shortcut_color);
         RrColorFree(theme->title_focused_shadow_color);
         RrColorFree(theme->title_unfocused_shadow_color);
         RrColorFree(theme->osd_color);

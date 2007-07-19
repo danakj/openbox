@@ -17,6 +17,8 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_center_func(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -24,6 +26,11 @@ void action_moveresizeto_startup()
 {
     actions_register("MoveResizeTo",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+    actions_register("MoveToCenter",
+                     setup_center_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -72,6 +79,23 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     if ((n = parse_find_node("monitor", node)))
         o->monitor = parse_int(doc, n) - 1;
 
+    return o;
+}
+
+static gpointer setup_center_func(ObParseInst *i, xmlDocPtr doc,
+                                  xmlNodePtr node)
+{
+    xmlNodePtr n;
+    Options *o;
+
+    o = g_new0(Options, 1);
+    o->x = G_MININT;
+    o->y = G_MININT;
+    o->w = G_MININT;
+    o->h = G_MININT;
+    o->monitor = -1;
+    o->xcenter = TRUE;
+    o->ycenter = TRUE;
     return o;
 }
 

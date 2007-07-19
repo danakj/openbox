@@ -1,3 +1,123 @@
+3.4.3:
+  * Add Ukrainian translation
+  * Updated Japanese translation
+  * Updated Dutch translation
+  * Updated Polish translation
+  * Updated Italian translation
+  * New strings for the Swedish translation
+  * Improve focus fallback - don't fallback to windows you can't focus cycle
+    (Alt-Tab) to
+  * Don't show the client border for undecorated windows when keepBorder is on,
+    just the outer border
+  * Some improvements in the smart placement to help it find a place more
+    often.  This needs more work still.
+  * Don't focus windows that appear under the mouse in mouse-focus mode unless
+    underMouse is enabled
+  * Don't move focus when the window under the pointer iconifies unless
+    underMouse is enabled
+  * Respect min/max window sizes when a window is fullscreened or maximized.
+    This fixes problems experienced with maximizing vnc windows
+  * Don't XUngrabKeyboard unless we need to
+  * Correct calculations for the menu header width, so that they are not
+    ellisized unnecessarily
+  * Advanced support for partial struts.  When you maximize a window it will
+    now only use the struts it needs to.  This can greatly improve
+    xinerama functionality.
+  * Fixes for how the dock is placed in certain positions on screen (off by 1
+    errors)
+  * New default bindings:
+    - don't unshade when clicking on the titlebar
+  * Don't show the top resize area in the titlebar when a window is shaded
+  * Optimize rendering of window decorations
+  * Optimize splitvertical gradients - no more malloc/free during render
+  * Let the theme specify all colors for a splitvertical gradient with the new
+    .splitTo theme elements
+  * Improve decorations for maximized windows.  Don't draw the side borders in
+    the titlebar.
+  * Don't resist against desklet windows (below layer + skip taskbar)
+  * New actions for dynamically adjusting your desktop workspaces:
+    - AddDesktopLast, RemoveDesktopLast
+    - AddDesktopCurrent, RemoveDestopCurrent
+  * New <center> option for smart placement (default is on)
+  * Fix MoveToCenter in Xinerama (TwinView) setups
+  * Let you lower a window without lowering its children or siblings
+  * Don't set the default Openbox icon on child windows, let them inherit the
+    icon from their parents
+  * Fix Onyx themes - fade out disabled buttons
+  * Don't auto-resize windows to fit on screen if they are UserSpecified
+    Size or Position
+  * Don't activate windows which raise themselves anymore. It was a nice
+    thought, but it caused too much problems
+  * Rewrite of the actions subsystem
+  * Removed deprecated actions:
+    - ShowDesktop, UnshowDesktop (Use ToggleShowDesktop)
+    - ResizeRelativeVert, ResizeRelativeHorz (Use ResizeRelative)
+  * Combined the MoveFromEdge* actions with MoveToEdge* actions, and removed
+    the MoveFromEdge* action names.
+  * Switch desktops when moving a window and you drag it to the edge of the
+    screen (added the <screenEdgeWarpTime> option for this)
+  * Add actions to add/remove the last desktop in the client list menus
+  * Use startup notification when launching ObConf in the default root menu
+  * Remove the desktop switching dialog, as it confuses people and they don't
+    know how to turn it off to switch desktops instantly.  Some other
+    incarnation may return in the future.
+  * Add optional <finalactions> option for NextWindow, PreviousWindow,
+    DirectionalFocus*, and DirectionalTarget* actions
+  * Don't focus new helper windows unless they are alone in their group.  This
+    fixes gucharmap
+  * Fancy keyboard window moving:
+    - Shift-arrow will move the window to the next edge
+    - Control-arrow will move the window by only 1 pixel
+    - Arrow will move the window by a larger number of pixels
+  * Fancy keyboard window resizing:
+    - The first arrow will choose an edge to resize (then you can grow or
+      shrink the window on that edge)
+    - Hitting an arrow perpendicular to your selected edge will choose a
+      different edge to resize
+    - Shift-arrow will grow/shrink the window to the next edge
+    - Control arrow will grow/shrink the window by only 1 pixel
+    - Arrow will grow/shrink the window by a larger number of pixel
+  * Timeout when synchronously resizing a window so you can still resize busy
+    or dead application windows
+  * Let you specify keyboard shortcuts in your root menus with _. Such as
+    label="XTe_rm" would make 'r' the shortcut key.
+  * Fixes for placing windows with per-app settings:
+    - fix bug with windows being placed far off-screen occasionally
+    - allow you to place windows partially outside of the screen
+    - let per-app settings override program-specified positions (but not if it
+      is user-specified)
+  * Add user-specified margins to the configuration file
+  * Fix for transient windows in groups with transient windows of the group
+    transients.  That wasn't supposed to be legible.  i.e. 2 group transients
+    and 1 direct transient for one of the group transients.
+  * Don't include child/parent windows in tests for being occluded or occluding
+    other windows, since you can't raise/lower above/below them.  This fixes
+    the raiselower action for windows which have children.
+  * Reduce the size of the middle gradient in splitvertical gradients.  This
+    makes the split harder than it was in 3.4.2
+  * Don't include debian/ dir in releases
+  * Add resize bindings for the edges to the default hardcoded bindings
+  * Fix focus cycle indicator positioning for some windows (i.e. OpenOffice)
+  * Add the MoveResizeTo action.  This is very xinerama aware!  It also lets
+    you move a window to any edge of any screen.
+  * Make actions that look for edges include the dock's edges (e.g. MoveToEdge)
+  * New preferred option for the Execute action is <command> instead of
+    <execute> but the old one will still work.
+  * Fix for moving windows partially offsceen causing them to jump far away
+  * Fix for windows which are not on any monitor, to keep them on screen
+    partically too
+  * Require libstartupnotification 0.8 in configure (we use stuff that was not
+    around in some earlier versions)
+  * Grab the server when mapping windows to avoid race conditions in other
+    programs (getting MapNotify before you are visible)
+  * Handle case gracefully when ConfigureRequent for restacking specifies
+    a siblig which we aren't managing
+  * Use KeyRelease to run things from Openbox menus, so that the release
+    does not go to the focused window (causing the new window to not get
+    focus)
+  * Add new actions for controlling window decorations:
+    - Decorate, Undecorate
+
 3.4.2:
   * Add ability to set the bevel strength in themes
   * Fix for focusLast with omnipresent windows

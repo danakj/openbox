@@ -1619,7 +1619,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
     guint keycode, state;
     gunichar unikey;
     ObMenuFrame *frame;
-    gboolean ret = TRUE;
+    gboolean ret = FALSE;
 
     keycode = ev->xkey.keycode;
     state = ev->xkey.state;
@@ -1627,100 +1627,109 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
     frame = find_active_or_last_menu();
     if (frame == NULL)
-        ret = FALSE;
+        g_assert_not_reached(); /* there is no active menu */
 
-    else if (keycode == ob_keycode(OB_KEY_ESCAPE) && state == 0)
-        menu_frame_hide_all();
-
-    else if (keycode == ob_keycode(OB_KEY_RETURN) && (state == 0 ||
-                                                      state == ControlMask))
-    {
-        /* Enter runs the active item or goes into the submenu.
-           Control-Enter runs it without closing the menu. */
-        if (frame->child)
-            menu_frame_select_next(frame->child);
-        else if (frame->selected)
-            menu_entry_frame_execute(frame->selected, state);
-    }
-
-    else if (keycode == ob_keycode(OB_KEY_LEFT) && ev->xkey.state == 0) {
-        /* Left goes to the parent menu */
-        menu_frame_select(frame, NULL, TRUE);
-    }
-
-    else if (keycode == ob_keycode(OB_KEY_RIGHT) && ev->xkey.state == 0) {
-        /* Right goes to the selected submenu */
-        if (frame->child) menu_frame_select_next(frame->child);
-    }
-
-    else if (keycode == ob_keycode(OB_KEY_UP) && state == 0) {
-        menu_frame_select_previous(frame);
-    }
-
-    else if (keycode == ob_keycode(OB_KEY_DOWN) && state == 0) {
-        menu_frame_select_next(frame);
-    }
-
-    /* keyboard accelerator shortcuts. (allow controlmask) */
-    else if ((ev->xkey.state & ~ControlMask) == 0 &&
-             /* was it a valid key? */
-             unikey != 0 &&
-             /* don't bother if the menu is empty. */
-             frame->entries)
-    {
-        GList *start;
-        GList *it;
-        ObMenuEntryFrame *found = NULL;
-        guint num_found = 0;
-
-        /* start after the selected one */
-        start = frame->entries;
-        if (frame->selected) {
-            for (it = start; frame->selected != it->data; it = g_list_next(it))
-                g_assert(it != NULL); /* nothing was selected? */
-            /* next with wraparound */
-            start = g_list_next(it);
-            if (start == NULL) start = frame->entries;
+    else if (ev->type == KeyPress) {
+        if (keycode == ob_keycode(OB_KEY_ESCAPE) && state == 0) {
+            menu_frame_hide_all();
+            ret = TRUE;
         }
 
-        it = start;
-        do {
-            ObMenuEntryFrame *e = it->data;
-            gunichar entrykey = 0;
+        else if (keycode == ob_keycode(OB_KEY_LEFT) && ev->xkey.state == 0) {
+            /* Left goes to the parent menu */
+            menu_frame_select(frame, NULL, TRUE);
+            ret = TRUE;
+        }
 
-            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
-                entrykey = e->entry->data.normal.shortcut;
-            else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
-                entrykey = e->entry->data.submenu.submenu->shortcut;
+        else if (keycode == ob_keycode(OB_KEY_RIGHT) && ev->xkey.state == 0) {
+            /* Right goes to the selected submenu */
+            if (frame->child) menu_frame_select_next(frame->child);
+            ret = TRUE;
+        }
 
-            if (unikey == entrykey) {
-                if (found == NULL) found = e;
-                ++num_found;
-            }
+        else if (keycode == ob_keycode(OB_KEY_UP) && state == 0) {
+            menu_frame_select_previous(frame);
+            ret = TRUE;
+        }
 
-            /* next with wraparound */
-            it = g_list_next(it);
-            if (it == NULL) it = frame->entries;
-        } while (it != start);
-
-        if (found) {
-            if (found->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-                num_found == 1)
-            {
-                menu_frame_select(frame, found, TRUE);
-                usleep(50000); /* highlight the item for a short bit so the
-                                  user can see what happened */
-                menu_entry_frame_execute(found, state);
-            } else {
-                menu_frame_select(frame, found, TRUE);
-                if (num_found == 1)
-                    menu_frame_select_next(frame->child);
-            }
-        } else
-            ret = FALSE;
+        else if (keycode == ob_keycode(OB_KEY_DOWN) && state == 0) {
+            menu_frame_select_next(frame);
+            ret = TRUE;
+        }
     }
-    else
-        ret = FALSE;
+
+    /* Use KeyRelease events for running things so that the key release doesn't
+       get sent to the focused application.
+
+       Allow ControlMask only, and don't bother if the menu is empty */
+    else if ((ev->xkey.state & ~ControlMask) == 0 && frame->entries) {
+        if (keycode == ob_keycode(OB_KEY_RETURN)) {
+            /* Enter runs the active item or goes into the submenu.
+               Control-Enter runs it without closing the menu. */
+            if (frame->child)
+                menu_frame_select_next(frame->child);
+            else if (frame->selected)
+                menu_entry_frame_execute(frame->selected, state);
+
+            ret = TRUE;
+        }
+
+        /* keyboard accelerator shortcuts. (if it was a valid key) */
+        else if (unikey != 0) {
+            GList *start;
+            GList *it;
+            ObMenuEntryFrame *found = NULL;
+            guint num_found = 0;
+
+            /* start after the selected one */
+            start = frame->entries;
+            if (frame->selected) {
+                for (it = start; frame->selected != it->data;
+                     it = g_list_next(it))
+                    g_assert(it != NULL); /* nothing was selected? */
+                /* next with wraparound */
+                start = g_list_next(it);
+                if (start == NULL) start = frame->entries;
+            }
+
+            it = start;
+            do {
+                ObMenuEntryFrame *e = it->data;
+                gunichar entrykey = 0;
+
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
+                    entrykey = e->entry->data.normal.shortcut;
+                else if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                    entrykey = e->entry->data.submenu.submenu->shortcut;
+
+                if (unikey == entrykey) {
+                    if (found == NULL) found = e;
+                    ++num_found;
+                }
+
+                /* next with wraparound */
+                it = g_list_next(it);
+                if (it == NULL) it = frame->entries;
+            } while (it != start);
+
+            if (found) {
+                if (found->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                    num_found == 1)
+                {
+                    menu_frame_select(frame, found, TRUE);
+                    usleep(50000); /* highlight the item for a short bit so the
+                                      user can see what happened */
+                    menu_entry_frame_execute(found, state);
+                } else {
+                    menu_frame_select(frame, found, TRUE);
+                    if (num_found == 1)
+                        menu_frame_select_next(frame->child);
+                }
+
+                ret = TRUE;
+            }
+        }
+    }
 
     return ret;
 }
@@ -1778,6 +1787,7 @@ static gboolean event_handle_menu(XEvent *ev)
                 f->child == e->frame)
                 menu_frame_select(e->frame, e, FALSE);
         break;
+    case KeyPress:
     case KeyRelease:
         ret = event_handle_menu_keyboard(ev);
         break;

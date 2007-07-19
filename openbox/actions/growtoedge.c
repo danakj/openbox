@@ -17,7 +17,6 @@ static gpointer setup_east_func(ObParseInst *i,
                                 xmlDocPtr doc, xmlNodePtr node);
 static gpointer setup_west_func(ObParseInst *i,
                                 xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_growtoedge_startup()

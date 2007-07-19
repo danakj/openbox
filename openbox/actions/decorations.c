@@ -18,7 +18,7 @@ static gboolean run_func_on(ObActionsData *data, gpointer options)
 {
     if (data->client) {
         actions_client_move(data, TRUE);
-        client_set_undecorated(data->client, TRUE);
+        client_set_undecorated(data->client, FALSE);
         actions_client_move(data, FALSE);
     }
     return FALSE;
@@ -29,7 +29,7 @@ static gboolean run_func_off(ObActionsData *data, gpointer options)
 {
     if (data->client) {
         actions_client_move(data, TRUE);
-        client_set_undecorated(data->client, FALSE);
+        client_set_undecorated(data->client, TRUE);
         actions_client_move(data, FALSE);
     }
     return FALSE;

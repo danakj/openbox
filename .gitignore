@@ -48,3 +48,5 @@ po/stamp-po
 render/obrender-3.0.pc
 tools/gnome-panel-control/gnome-panel-control
 version.h
+.libs
+.deps

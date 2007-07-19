@@ -38,5 +38,6 @@ void action_layer_startup();
 void action_movetoedge_startup();
 void action_growtoedge_startup();
 void action_focustobottom_startup();
+void action_shadelowerraise_startup();
 
 #endif

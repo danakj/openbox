@@ -37,4 +37,5 @@ void action_all_startup()
     action_movetoedge_startup();
     action_growtoedge_startup();
     action_focustobottom_startup();
+    action_shadelowerraise_startup();
 }

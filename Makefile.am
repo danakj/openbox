@@ -182,6 +182,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/resizerelative.c \
 	openbox/actions/restart.c \
 	openbox/actions/shade.c \
+	openbox/actions/shadelowerraise.c \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \

@@ -531,7 +531,7 @@ static void move_with_keys(gint keycode, gint state)
 static void resize_with_keys(gint keycode, gint state)
 {
     gint dw = 0, dh = 0, pdx = 0, pdy = 0, opx, opy, px, py;
-    gint dist = 0;
+    gint dist = 0, resist = 0;
     ObDirection dir;
     ObCorner cor;
 
@@ -595,18 +595,30 @@ static void resize_with_keys(gint keycode, gint state)
         gint distw, disth;
 
         /* control means fine grained */
-        if (moveresize_client->size_inc.width > 1)
+        if (moveresize_client->size_inc.width > 1) {
             distw = moveresize_client->size_inc.width;
-        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+            resist = 1;
+        }
+        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL)) {
             distw = 1;
-        else
+            resist = 1;
+        }
+        else {
             distw = KEY_DIST;
-        if (moveresize_client->size_inc.height > 1)
+            resist = KEY_DIST;
+        }
+        if (moveresize_client->size_inc.height > 1) {
             disth = moveresize_client->size_inc.height;
-        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+            resist = 1;
+        }
+        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL)) {
             disth = 1;
-        else
+            resist = 1;
+        }
+        else {
             disth = KEY_DIST;
+            resist = KEY_DIST;
+        }
 
         if (key_resize_edge == OB_DIRECTION_WEST) {
             if (dir == OB_DIRECTION_WEST)
@@ -644,7 +656,7 @@ static void resize_with_keys(gint keycode, gint state)
     else if (key_resize_edge == OB_DIRECTION_SOUTH)
         cor = OB_CORNER_TOPLEFT;
 
-    calc_resize(TRUE, dist, &dw, &dh, cor);
+    calc_resize(TRUE, resist, &dw, &dh, cor);
     if (key_resize_edge == OB_DIRECTION_WEST)
         cur_x -= dw;
     else if (key_resize_edge == OB_DIRECTION_NORTH)

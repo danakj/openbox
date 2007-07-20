@@ -9,17 +9,17 @@ msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-07-12 12:58+0200\n"
-"PO-Revision-Date: 2007-07-15 15:59+0200\n"
+"PO-Revision-Date: 2007-07-20 15:18+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
 #: openbox/actions/execute.c:86
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
-msgstr "Impossibile convertire il percorso '%s' da utf8"
+msgstr "Impossibile convertire il percorso utf8 '%s'"
 
 #: openbox/actions/execute.c:95 openbox/actions/execute.c:113
 #, c-format
@@ -76,7 +76,7 @@ msgstr "Invia al _desktop"
 
 #: openbox/client_menu.c:374
 msgid "Client menu"
-msgstr "Menù della finestra"
+msgstr "MenÃ¹ della finestra"
 
 #: openbox/client_menu.c:380
 msgid "R_estore"
@@ -88,7 +88,7 @@ msgstr "_Muovi"
 
 #: openbox/client_menu.c:390
 msgid "Resi_ze"
-msgstr "Ridime_nsiona"
+msgstr "R_idimensiona"
 
 #: openbox/client_menu.c:392
 msgid "Ico_nify"
@@ -113,33 +113,32 @@ msgstr "_Chiudi"
 #: openbox/config.c:737
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr "Il pulsante '%s' specificato nel file di configurazione non è valido"
+msgstr "Il pulsante '%s' specificato nel file di configurazione non Ã¨ valido"
 
 #: openbox/keyboard.c:156
 msgid "Conflict with key binding in config file"
-msgstr ""
-"Conflitto con la scorciatoia da tastiera specificata nel file di "
+msgstr "Conflitto con la scorciatoia da tastiera specificata nel file di "
 "configurazione"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr "Impossibile trovare il file di menù '%s'"
+msgstr "Impossibile trovare il file di menÃ¹ '%s'"
 
 #: openbox/menu.c:171
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Impossibile eseguire il comando nel pipe-menù '%s': %s"
+msgstr "Impossibile eseguire il comando nel pipe-menÃ¹ '%s': %s"
 
 #: openbox/menu.c:185
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr "Output del pipe-menù '%s' non valido"
+msgstr "Output del pipe-menÃ¹ '%s' non valido"
 
 #: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Tentativo di accedere al menù '%s'. Il menù non esiste"
+msgstr "Tentativo di accedere al menÃ¹ '%s'. Il menÃ¹ non esiste"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -148,12 +147,12 @@ msgstr "Altri..."
 #: openbox/mouse.c:349
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr "Il pulsante del mouse '%s' specificato non è valido"
+msgstr "Il pulsante '%s' specificato nelle associazioni mouse non Ã¨ valido"
 
 #: openbox/mouse.c:355
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr "Il contesto del mouse '%s' specificato non è valido"
+msgstr "Il contesto '%s' specificato nelle associazioni mouse non Ã¨ valido"
 
 #: openbox/openbox.c:131
 #, c-format
@@ -174,9 +173,7 @@ msgstr "Il server X non ha il supporto per la localizzazione."
 
 #: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
-msgstr ""
-"Impossibile impostare la localizzazione dei tasti modificatori per il server "
-"X."
+msgstr "Impossibile impostare la localizzazione dei tasti modificatori per il server X."
 
 #: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
@@ -189,11 +186,11 @@ msgstr "Impossibile caricare un tema."
 #: openbox/openbox.c:408
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Non è stato possibile riavviare il nuovo eseguibile '%s': %s"
+msgstr "Non Ã¨ stato possibile riavviare il nuovo eseguibile '%s': %s"
 
 #: openbox/openbox.c:478 openbox/openbox.c:480
 msgid "Copyright (c)"
-msgstr "Copyright (c)"
+msgstr ""
 
 #: openbox/openbox.c:489
 msgid "Syntax: openbox [options]\n"
@@ -229,7 +226,7 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Inviare messaggi ad un'istanza di openbox attiva:\n"
+"Inviare messaggi ad un'istanza di Openbox attiva:\n"
 
 #: openbox/openbox.c:496
 msgid "  --reconfigure       Reload Openbox's configuration\n"
@@ -249,7 +246,7 @@ msgstr ""
 
 #: openbox/openbox.c:499
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Esegue in modalità sincrona\n"
+msgstr "  --sync              Esegue in modalitÃ  sincrona\n"
 
 #: openbox/openbox.c:500
 msgid "  --debug             Display debugging output\n"
@@ -257,8 +254,7 @@ msgstr "  --debug             Mostra le informazioni di debug\n"
 
 #: openbox/openbox.c:501
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
-"  --debug-focus       Mostra le informazioni di debug sulla gestione del "
+msgstr "  --debug-focus       Mostra le informazioni di debug sulla gestione del "
 "focus\n"
 
 #: openbox/openbox.c:502
@@ -272,7 +268,7 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Per piacere inviate i bug a %s\n"
+"Segnalate eventuali bug a %s\n"
 
 #: openbox/openbox.c:600
 #, c-format
@@ -282,7 +278,7 @@ msgstr "Argomento da linea di comando non valido '%s'\n"
 #: openbox/screen.c:95 openbox/screen.c:196
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Un window manager è già attivo sullo schermo %d"
+msgstr "Un window manager Ã¨ giÃ  attivo sullo schermo %d"
 
 #: openbox/screen.c:132
 #, c-format
@@ -292,7 +288,7 @@ msgstr "Impossibile acquisire la selezione del window manager sullo schermo %d"
 #: openbox/screen.c:153
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "Il WM sullo schermo %d non sta terminando"
+msgstr "Il WM sullo schermo %d non Ã¨ terminato"
 
 #: openbox/screen.c:1077
 #, c-format
@@ -322,24 +318,22 @@ msgstr "Sto eseguendo %s\n"
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr ""
-"La chiave '%s' nelle gestione delle scorciatoie di mouse/tastiera non è "
-"valida"
+msgstr "Il nome del tasto '%s' specificato nelle associazioni di mouse/tastiera non Ã¨ valido"
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "La scorciatoia da tastiera '%s' non è valida"
+msgstr "Il codice tastiera '%s' specificato nelle associazioni di mouse/tastiera non Ã¨ valido"
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Il nome della chiave '%s' per le scorciatoie da tastiera non è valido"
+msgstr "Il nome del tasto '%s' specificato nelle associazioni di mouse/tastiera non Ã¨ valido"
 
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
-msgstr "La chiave richiesta '%s' non esiste sul display"
+msgstr "Il tasto richiesto '%s' non esiste sul display"
 
 #: openbox/xerror.c:39
 #, c-format

@@ -27,6 +27,8 @@
     errors)
   * New default bindings:
     - don't unshade when clicking on the titlebar
+    - raise when unshading with the scrollwheel
+    - lower when shading with the scrollwheel
   * Don't show the top resize area in the titlebar when a window is shaded
   * Optimize rendering of window decorations
   * Optimize splitvertical gradients - no more malloc/free during render

@@ -717,7 +717,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XUnmapWindow(ob_display, self->handle);
             }
 
-            if (self->bwidth && !self->max_horz) {
+            if (self->bwidth && !self->max_horz &&
+                (self->client->area.height + self->size.top +
+                 self->size.bottom) > ob_rr_theme->grip_width * 2)
+            {
                 XMoveResizeWindow(ob_display, self->left,
                                   0,
                                   self->bwidth + ob_rr_theme->grip_width,
@@ -730,7 +733,10 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->left);
 
-            if (self->bwidth && !self->max_horz) {
+            if (self->bwidth && !self->max_horz &&
+                (self->client->area.height + self->size.top +
+                 self->size.bottom) > ob_rr_theme->grip_width * 2)
+            {
                 XMoveResizeWindow(ob_display, self->right,
                                   self->client->area.width + self->cbwidth_l +
                                   self->cbwidth_r + self->bwidth,

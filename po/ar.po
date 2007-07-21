@@ -1,14 +1,14 @@
-# translation of openbox.po to Arabic
+# translation of openbox.pot to Arabic
 # Copyright (C) 2007 Dana Jansens
 # This file is distributed under the same license as the Openbox package.
 #
 # Khaled Hosny <khaledhosny@eglug.org>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.2\n"
+"Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-07-12 12:58+0200\n"
-"PO-Revision-Date: 2007-05-26 03:11+0300\n"
+"PO-Revision-Date: 2007-07-21 14:43+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
 "MIME-Version: 1.0\n"
@@ -34,15 +34,15 @@ msgstr "اذهب هناك..."
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "أدِر أسطح المكتب"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr ""
+msgstr "أضِف سطح مكتب جديد (_A)"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "احذف آخر سطح مكتب (_R)"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"
@@ -340,8 +340,3 @@ msgstr "المفتاح المطلوب '%s' لا وجود له في العرض"
 msgid "X Error: %s"
 msgstr "خطأ إكس: %s"
 
-#~ msgid "Invalid action '%s' requested. No such action exists."
-#~ msgstr "طُلِب إجراء '%s' غير سليم. لا يوجد إجراء كهذا."
-
-#~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "استخدام غير سليم للإجراء '%s'. سيُتَجاهل هذا الإجراء."

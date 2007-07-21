@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.2\n"
+"Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-07-12 12:58+0200\n"
-"PO-Revision-Date: 2007-06-07 06:50-0500\n"
+"PO-Revision-Date: 2007-07-20 16:48+0200\n"
 "Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -31,15 +31,15 @@ msgstr "Đi đến chỗ đó"
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "Quản lý chỗ làm việc"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr ""
+msgstr "_Cộng thêm chỗ làm việc"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "_Bỏ lát chỗ làm việc"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"

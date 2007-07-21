@@ -211,7 +211,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                 if ((c = parse_find_node("x", n->children)))
                     if (!parse_contains("default", doc, c)) {
                         gchar *s = parse_string(doc, c);
-                        if (!strcmp(s, "center")) {
+                        if (!g_ascii_strcasecmp(s, "center")) {
                             settings->center_x = TRUE;
                             x_pos_given = TRUE;
                         } else {
@@ -229,7 +229,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                 if (x_pos_given && (c = parse_find_node("y", n->children)))
                     if (!parse_contains("default", doc, c)) {
                         gchar *s = parse_string(doc, c);
-                        if (!strcmp(s, "center")) {
+                        if (!g_ascii_strcasecmp(s, "center")) {
                             settings->center_y = TRUE;
                             settings->pos_given = TRUE;
                         } else {
@@ -248,7 +248,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
                     (c = parse_find_node("monitor", n->children)))
                     if (!parse_contains("default", doc, c)) {
                         gchar *s = parse_string(doc, c);
-                        if (!strcmp(s, "mouse"))
+                        if (!g_ascii_strcasecmp(s, "mouse"))
                             settings->monitor = 0;
                         else
                             settings->monitor = parse_int(doc, c) + 1;
@@ -263,7 +263,7 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             if ((n = parse_find_node("desktop", app->children))) {
                 if (!parse_contains("default", doc, n)) {
                     gchar *s = parse_string(doc, n);
-                    if (!strcmp(s, "all"))
+                    if (!g_ascii_strcasecmp(s, "all"))
                         settings->desktop = DESKTOP_ALL;
                     else {
                         gint i = parse_int(doc, n);
@@ -277,9 +277,9 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             if ((n = parse_find_node("layer", app->children)))
                 if (!parse_contains("default", doc, n)) {
                     gchar *s = parse_string(doc, n);
-                    if (!strcmp(s, "above"))
+                    if (!g_ascii_strcasecmp(s, "above"))
                         settings->layer = 1;
-                    else if (!strcmp(s, "below"))
+                    else if (!g_ascii_strcasecmp(s, "below"))
                         settings->layer = -1;
                     else
                         settings->layer = 0;
@@ -305,10 +305,10 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
             if ((n = parse_find_node("maximized", app->children)))
                 if (!parse_contains("default", doc, n)) {
                     gchar *s = parse_string(doc, n);
-                    if (!strcmp(s, "horizontal")) {
+                    if (!g_ascii_strcasecmp(s, "horizontal")) {
                         settings->max_horz = TRUE;
                         settings->max_vert = FALSE;
-                    } else if (!strcmp(s, "vertical")) {
+                    } else if (!g_ascii_strcasecmp(s, "vertical")) {
                         settings->max_horz = FALSE;
                         settings->max_vert = TRUE;
                     } else

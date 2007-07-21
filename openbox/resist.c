@@ -192,7 +192,7 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
 }
 
 void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
-                         ObCorner corn)
+                         ObDirection dir)
 {
     GList *it;
     ObClient *target; /* target */
@@ -230,17 +230,21 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
         if (snapx == NULL) {
             /* horizontal snapping */
             if (t < tb && b > tt) {
-                switch (corn) {
-                case OB_CORNER_TOPLEFT:
-                case OB_CORNER_BOTTOMLEFT:
+                switch (dir) {
+                case OB_DIRECTION_EAST:
+                case OB_DIRECTION_NORTHEAST:
+                case OB_DIRECTION_SOUTHEAST:
+                case OB_DIRECTION_NORTH:
+                case OB_DIRECTION_SOUTH:
                     dlt = l;
                     drb = r + *w - c->frame->area.width;
                     if (r < tl && drb >= tl &&
                         drb < tl + resist)
                         *w = tl - l, snapx = target;
                     break;
-                case OB_CORNER_TOPRIGHT:
-                case OB_CORNER_BOTTOMRIGHT:
+                case OB_DIRECTION_WEST:
+                case OB_DIRECTION_NORTHWEST:
+                case OB_DIRECTION_SOUTHWEST:
                     dlt = l - *w + c->frame->area.width;
                     drb = r;
                     if (l > tr && dlt <= tr &&
@@ -254,17 +258,21 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
         if (snapy == NULL) {
             /* vertical snapping */
             if (l < tr && r > tl) {
-                switch (corn) {
-                case OB_CORNER_TOPLEFT:
-                case OB_CORNER_TOPRIGHT:
+                switch (dir) {
+                case OB_DIRECTION_SOUTH:
+                case OB_DIRECTION_SOUTHWEST:
+                case OB_DIRECTION_SOUTHEAST:
+                case OB_DIRECTION_EAST:
+                case OB_DIRECTION_WEST:
                     dlt = t;
                     drb = b + *h - c->frame->area.height;
                     if (b < tt && drb >= tt &&
                         drb < tt + resist)
                         *h = tt - t, snapy = target;
                     break;
-                case OB_CORNER_BOTTOMLEFT:
-                case OB_CORNER_BOTTOMRIGHT:
+                case OB_DIRECTION_NORTH:
+                case OB_DIRECTION_NORTHWEST:
+                case OB_DIRECTION_NORTHEAST:
                     dlt = t - *h + c->frame->area.height;
                     drb = b;
                     if (t > tb && dlt <= tb &&
@@ -281,7 +289,7 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
 }
 
 void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
-                          ObCorner corn)
+                          ObDirection dir)
 {
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint dlt, drb; /* my destination left/top and right/bottom sides */
@@ -326,9 +334,12 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         pb = RECT_BOTTOM(*parea);
 
         /* horizontal snapping */
-        switch (corn) {
-        case OB_CORNER_TOPLEFT:
-        case OB_CORNER_BOTTOMLEFT:
+        switch (dir) {
+        case OB_DIRECTION_EAST:
+        case OB_DIRECTION_NORTHEAST:
+        case OB_DIRECTION_SOUTHEAST:
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
             dlt = l;
             drb = r + *w - c->frame->area.width;
             if (r <= ar && drb > ar && drb <= ar + resist)
@@ -336,8 +347,9 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             else if (r <= pr && drb > pr && drb <= pr + resist)
                 *w = pr - l + 1;
             break;
-        case OB_CORNER_TOPRIGHT:
-        case OB_CORNER_BOTTOMRIGHT:
+        case OB_DIRECTION_WEST:
+        case OB_DIRECTION_NORTHWEST:
+        case OB_DIRECTION_SOUTHWEST:
             dlt = l - *w + c->frame->area.width;
             drb = r;
             if (l >= al && dlt < al && dlt >= al - resist)
@@ -348,9 +360,12 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         }
 
         /* vertical snapping */
-        switch (corn) {
-        case OB_CORNER_TOPLEFT:
-        case OB_CORNER_TOPRIGHT:
+        switch (dir) {
+        case OB_DIRECTION_SOUTH:
+        case OB_DIRECTION_SOUTHWEST:
+        case OB_DIRECTION_SOUTHEAST:
+        case OB_DIRECTION_WEST:
+        case OB_DIRECTION_EAST:
             dlt = t;
             drb = b + *h - c->frame->area.height;
             if (b <= ab && drb > ab && drb <= ab + resist)
@@ -358,8 +373,9 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             else if (b <= pb && drb > pb && drb <= pb + resist)
                 *h = pb - t + 1;
             break;
-        case OB_CORNER_BOTTOMLEFT:
-        case OB_CORNER_BOTTOMRIGHT:
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_NORTHWEST:
+        case OB_DIRECTION_NORTHEAST:
             dlt = t - *h + c->frame->area.height;
             drb = b;
             if (t >= at && dlt < at && dlt >= at - resist)

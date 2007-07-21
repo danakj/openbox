@@ -641,8 +641,14 @@ void screen_add_desktop(gboolean current)
 
         for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data;
-            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop)
+            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop &&
+                /* don't move direct children, they'll be moved with their
+                   parent - which will have to be on the same desktop */
+                !client_direct_parent(c))
+            {
+                ob_debug("moving window %s\n", c->title);
                 client_set_desktop(c, c->desktop+1, FALSE, TRUE);
+            }
         }
     }
 }
@@ -670,9 +676,13 @@ void screen_remove_desktop(gboolean current)
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             guint d = c->desktop;
-            if (d != DESKTOP_ALL && d >= movedesktop) {
-                client_set_desktop(c, c->desktop - 1, TRUE, TRUE);
+            if (d != DESKTOP_ALL && d >= movedesktop &&
+                /* don't move direct children, they'll be moved with their
+                   parent - which will have to be on the same desktop */
+                !client_direct_parent(c))
+            {
                 ob_debug("moving window %s\n", c->title);
+                client_set_desktop(c, c->desktop - 1, TRUE, TRUE);
             }
             /* raise all the windows that are on the current desktop which
                is being merged */

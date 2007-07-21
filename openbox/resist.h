@@ -32,8 +32,8 @@ void resist_move_windows(struct _ObClient *c, gint resist, gint *x, gint *y);
 */
 void resist_move_monitors(struct _ObClient *c, gint resist, gint *x, gint *y);
 void resist_size_windows(struct _ObClient *c, gint resist, gint *w, gint *h,
-                         ObCorner corn);
+                         ObDirection dir);
 void resist_size_monitors(struct _ObClient *c, gint resist, gint *w, gint *h,
-                          ObCorner corn);
+                          ObDirection dir);
 
 #endif

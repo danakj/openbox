@@ -54,7 +54,6 @@ static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
 static gint cur_x, cur_y, cur_w, cur_h;
 static guint button;
 static guint32 corner;
-static ObCorner lockcorner;
 static ObDirection edge_warp_dir = -1;
 static ObDirection key_resize_edge = -1;
 #ifdef SYNC
@@ -372,36 +371,37 @@ static gboolean sync_timeout_func(gpointer data)
 #endif
 
 static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
-                        ObCorner cor)
+                        ObDirection dir)
 {
-    gint resist, x, y, lw, lh, ow, oh, nw, nh;
+    gint resist, x = 0, y = 0, lw, lh, ow, oh, nw, nh;
 
     ow = cur_w;
     oh = cur_h;
+    nw = ow + *dw;
+    nh = oh + *dh;
+
     /* resist_size_* needs the frame size */
-    nw = ow + *dw +
-        moveresize_client->frame->size.left +
+    nw += moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
-    nh = oh + *dh +
-        moveresize_client->frame->size.top +
+    nh += moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
 
     if (keyboard) resist = keydist - 1; /* resist for one key press */
     else resist = config_resist_win;
-    resist_size_windows(moveresize_client, resist, &nw, &nh, cor);
+    resist_size_windows(moveresize_client, resist, &nw, &nh, dir);
     if (!keyboard) resist = config_resist_edge;
-    resist_size_monitors(moveresize_client, resist, &nw, &nh, cor);
+    resist_size_monitors(moveresize_client, resist, &nw, &nh, dir);
 
     nw -= moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
     nh -= moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
 
-    /* see its actual size */
-    x = 0;
-    y = 0;
-    client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
+    *dw = nw - ow;
+    *dh = nh - oh;
 
+    /* make sure it's a valid size */
+    client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
 
     *dw = nw - ow;
     *dh = nh - oh;
@@ -533,7 +533,6 @@ static void resize_with_keys(gint keycode, gint state)
     gint dw = 0, dh = 0, pdx = 0, pdy = 0, opx, opy, px, py;
     gint dist = 0, resist = 0;
     ObDirection dir;
-    ObCorner cor;
 
     /* pick the edge if it needs to move */
     if (keycode == ob_keycode(OB_KEY_RIGHT)) {
@@ -646,17 +645,7 @@ static void resize_with_keys(gint keycode, gint state)
         }
     }
 
-    /* which corner is locked, for resistance */
-    if (key_resize_edge == OB_DIRECTION_WEST)
-        cor = OB_CORNER_TOPRIGHT;
-    else if (key_resize_edge == OB_DIRECTION_EAST)
-        cor = OB_CORNER_TOPLEFT;
-    else if (key_resize_edge == OB_DIRECTION_NORTH)
-        cor = OB_CORNER_BOTTOMLEFT;
-    else if (key_resize_edge == OB_DIRECTION_SOUTH)
-        cor = OB_CORNER_TOPLEFT;
-
-    calc_resize(TRUE, resist, &dw, &dh, cor);
+    calc_resize(TRUE, resist, &dw, &dh, dir);
     if (key_resize_edge == OB_DIRECTION_WEST)
         cur_x -= dw;
     else if (key_resize_edge == OB_DIRECTION_NORTH)
@@ -721,52 +710,53 @@ gboolean moveresize_event(XEvent *e)
             do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
         } else {
             gint dw, dh;
+            ObDirection dir;
 
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
                 dw = -(e->xmotion.x_root - start_x);
                 dh = -(e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_BOTTOMRIGHT;
+                dir = OB_DIRECTION_NORTHWEST;
             } else if (corner == prop_atoms.net_wm_moveresize_size_top) {
                 dw = 0;
                 dh = -(e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_BOTTOMRIGHT;
+                dir = OB_DIRECTION_NORTH;
             } else if (corner == prop_atoms.net_wm_moveresize_size_topright) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = -(e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_BOTTOMLEFT;
+                dir = OB_DIRECTION_NORTHEAST;
             } else if (corner == prop_atoms.net_wm_moveresize_size_right) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = 0;
-                lockcorner = OB_CORNER_BOTTOMLEFT;
+                dir = OB_DIRECTION_EAST;
             } else if (corner ==
                        prop_atoms.net_wm_moveresize_size_bottomright) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = (e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_TOPLEFT;
+                dir = OB_DIRECTION_SOUTHEAST;
             } else if (corner == prop_atoms.net_wm_moveresize_size_bottom) {
                 dw = 0;
                 dh = (e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_TOPLEFT;
+                dir = OB_DIRECTION_SOUTH;
             } else if (corner ==
                        prop_atoms.net_wm_moveresize_size_bottomleft) {
                 dw = -(e->xmotion.x_root - start_x);
                 dh = (e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_TOPRIGHT;
+                dir = OB_DIRECTION_SOUTHWEST;
             } else if (corner == prop_atoms.net_wm_moveresize_size_left) {
                 dw = -(e->xmotion.x_root - start_x);
                 dh = 0;
-                lockcorner = OB_CORNER_TOPRIGHT;
+                dir = OB_DIRECTION_WEST;
             } else if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = (e->xmotion.y_root - start_y);
-                lockcorner = OB_CORNER_TOPLEFT;
+                dir = OB_DIRECTION_SOUTHEAST;
             } else
                 g_assert_not_reached();
 
             dw -= cur_w - start_cw;
             dh -= cur_h - start_ch;
 
-            calc_resize(FALSE, 0, &dw, &dh, lockcorner);
+            calc_resize(FALSE, 0, &dw, &dh, dir);
             cur_w += dw;
             cur_h += dh;
 

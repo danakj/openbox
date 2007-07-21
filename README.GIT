@@ -1,4 +1,4 @@
-To build Openbox from SVN you need:
+To build Openbox from git you need:
 
 A C Compiler (GNU GCC 3.2+ suggested)
 GNU Gettext 0.14.4
@@ -12,22 +12,30 @@ libxml2 2.0+ library/headers (devel package)
 Pango 1.10+ library/headers (devel package)
 cvs
 
-Optionally you may way:
+Optionally you may want:
 X Cursor library/headers (devel package)
-Startup Notification library/headers (devel package)
+Startup Notification library/headers 0.8+ (devel package)
 
-I recommend the latest version of all these packages.
+We recommend the latest versions of all these packages.
 
-Do the following to build and install Openbox in CVS:
+Do the following to build and install Openbox in git:
 
 % ./bootstrap
 % ./configure
-% make all install
+% make
+su to root and
+% make install
+or
+% sudo make install
 
 Don't try running it from the openbox/ directory without installing, it won't work.
 It needs to be installed before it is run.
 
-The installed binary is 'openbox'.
+The following commands will be available: openbox-session,
+  openbox-gnome-session, openbox-kde-session, and openbox.
+
+See the man pages for details about them.  If you want to run Openbox on its
+  own, you probably want to run "openbox-session".
 
 
 

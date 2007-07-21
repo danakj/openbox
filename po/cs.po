@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.2\n"
-"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"Project-Id-Version: Openbox 3.4.3\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org/\n"
 "POT-Creation-Date: 2007-07-12 12:58+0200\n"
-"PO-Revision-Date: 2007-06-04 12:46+0200\n"
+"PO-Revision-Date: 2007-07-21 00:15+0200\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -31,15 +31,15 @@ msgstr "Jdi tam..."
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "Spravovat plochy"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr ""
+msgstr "_Přidat novou plochu"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "_Odstranit poslední plochu"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"
@@ -53,7 +53,6 @@ msgstr "Plochy"
 msgid "All desktops"
 msgstr "Všechny plochy"
 
-# TODO: standart pro klavesy?
 #: openbox/client_menu.c:360
 msgid "_Layer"
 msgstr "V_rstva"
@@ -98,12 +97,10 @@ msgstr "Mi_nimalizovat"
 msgid "Ma_ximize"
 msgstr "Ma_ximalizovat"
 
-# TODO: zavedeny termin?
 #: openbox/client_menu.c:408
 msgid "_Roll up/down"
 msgstr "S_rolovat/Vyrolovat"
 
-# TODO: ditto
 #: openbox/client_menu.c:410
 msgid "Un/_Decorate"
 msgstr "Oz_dobit/Odzdobit"
@@ -136,7 +133,6 @@ msgstr "Nepodařilo se spustit příkaz pro pipe-menu '%s': %s"
 msgid "Invalid output from pipe-menu '%s'"
 msgstr "Neplatný výstup z pipe-menu '%s'"
 
-# TODO: heh
 #: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
@@ -173,7 +169,6 @@ msgstr "Nepodařilo se inicializovat knihovnu obrender."
 msgid "X server does not support locale."
 msgstr "X server nepodporuje lokalizaci."
 
-# TODO: uff, fixme?
 #: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Nelze nastavit modifikátory lokalizace pro X server."
@@ -257,7 +252,6 @@ msgstr "  --sync              Spustit v synchronním módu\n"
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Zobrazit ladící výstup\n"
 
-# TODO: fixme
 #: openbox/openbox.c:501
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Zobrazit ladící výstup pro správu oken\n"
@@ -335,7 +329,6 @@ msgstr "Neplatný kód klávesy '%s' v nastevení"
 msgid "Invalid key name '%s' in key binding"
 msgstr "Neplatné jméno klávesy '%s' v nastavení"
 
-# TODO: fixme
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"

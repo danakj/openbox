@@ -31,7 +31,11 @@ or
 Don't try running it from the openbox/ directory without installing, it won't work.
 It needs to be installed before it is run.
 
-The installed binary is 'openbox'.
+The following commands will be available: openbox-session,
+  openbox-gnome-session, openbox-kde-session, and openbox.
+
+See the man pages for details about them.  If you want to run Openbox on its
+  own, you probably want to run "openbox-session".
 
 
 

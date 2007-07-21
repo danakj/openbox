@@ -1629,30 +1629,31 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
     if (frame == NULL)
         g_assert_not_reached(); /* there is no active menu */
 
-    else if (ev->type == KeyPress) {
-        if (keycode == ob_keycode(OB_KEY_ESCAPE) && state == 0) {
+    /* Allow control while going thru the menu */
+    else if (ev->type == KeyPress && (state & ~ControlMask) == 0) {
+        if (keycode == ob_keycode(OB_KEY_ESCAPE)) {
             menu_frame_hide_all();
             ret = TRUE;
         }
 
-        else if (keycode == ob_keycode(OB_KEY_LEFT) && ev->xkey.state == 0) {
+        else if (keycode == ob_keycode(OB_KEY_LEFT)) {
             /* Left goes to the parent menu */
             menu_frame_select(frame, NULL, TRUE);
             ret = TRUE;
         }
 
-        else if (keycode == ob_keycode(OB_KEY_RIGHT) && ev->xkey.state == 0) {
+        else if (keycode == ob_keycode(OB_KEY_RIGHT)) {
             /* Right goes to the selected submenu */
             if (frame->child) menu_frame_select_next(frame->child);
             ret = TRUE;
         }
 
-        else if (keycode == ob_keycode(OB_KEY_UP) && state == 0) {
+        else if (keycode == ob_keycode(OB_KEY_UP)) {
             menu_frame_select_previous(frame);
             ret = TRUE;
         }
 
-        else if (keycode == ob_keycode(OB_KEY_DOWN) && state == 0) {
+        else if (keycode == ob_keycode(OB_KEY_DOWN)) {
             menu_frame_select_next(frame);
             ret = TRUE;
         }
@@ -1662,7 +1663,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
        get sent to the focused application.
 
        Allow ControlMask only, and don't bother if the menu is empty */
-    else if ((ev->xkey.state & ~ControlMask) == 0 && frame->entries) {
+    else if ((state & ~ControlMask) == 0 && frame->entries) {
         if (keycode == ob_keycode(OB_KEY_RETURN)) {
             /* Enter runs the active item or goes into the submenu.
                Control-Enter runs it without closing the menu. */

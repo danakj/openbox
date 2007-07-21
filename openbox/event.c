@@ -1663,7 +1663,9 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
        get sent to the focused application.
 
        Allow ControlMask only, and don't bother if the menu is empty */
-    else if ((state & ~ControlMask) == 0 && frame->entries) {
+    else if (ev->type == KeyRelease && (state & ~ControlMask) == 0 &&
+             frame->entries)
+    {
         if (keycode == ob_keycode(OB_KEY_RETURN)) {
             /* Enter runs the active item or goes into the submenu.
                Control-Enter runs it without closing the menu. */

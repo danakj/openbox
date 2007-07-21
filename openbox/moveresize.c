@@ -381,7 +381,9 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     nw = ow + *dw;
     nh = oh + *dh;
 
-    if (moveresize_client->max_ratio || moveresize_client->min_ratio) {
+    if (!keyboard &&
+        (moveresize_client->max_ratio || moveresize_client->min_ratio))
+    {
         switch (dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_SOUTH:
@@ -407,12 +409,13 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
             }
             break;
         }
-    }
 
-    /* see its actual size (apply aspect ratios) */
-    client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
-    trydw = nw - ow;
-    trydh = nh - oh;
+        /* see its actual size (apply aspect ratios) */
+        client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh,
+                             TRUE);
+        trydw = nw - ow;
+        trydh = nh - oh;
+    }
 
     /* resist_size_* needs the frame size */
     nw += moveresize_client->frame->size.left +
@@ -435,26 +438,30 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     *dh = nh - oh;
 
     /* take aspect ratios into account for resistance */
-    if (*dh != trydh) { /* got resisted */
-        /* resize the width based on the height */
-        if (moveresize_client->min_ratio) {
-            if (nh * moveresize_client->min_ratio > nw)
-                nw = (gint)(nh * moveresize_client->min_ratio);
+    if (!keyboard &&
+        (moveresize_client->max_ratio || moveresize_client->min_ratio))
+    {
+        if (*dh != trydh) { /* got resisted */
+            /* resize the width based on the height */
+            if (moveresize_client->min_ratio) {
+                if (nh * moveresize_client->min_ratio > nw)
+                    nw = (gint)(nh * moveresize_client->min_ratio);
+            }
+            if (moveresize_client->max_ratio) {
+                if (nh * moveresize_client->max_ratio < nw)
+                    nw = (gint)(nh * moveresize_client->max_ratio);
+            }
         }
-        if (moveresize_client->max_ratio) {
-            if (nh * moveresize_client->max_ratio < nw)
-                nw = (gint)(nh * moveresize_client->max_ratio);
-        }
-    }
-    if (*dw != trydw) { /* got resisted */
-        /* resize the height based on the width */
-        if (moveresize_client->min_ratio) {
-            if (nh * moveresize_client->min_ratio > nw)
-                nh = (gint)(nw / moveresize_client->min_ratio);
-        }
-        if (moveresize_client->max_ratio) {
-            if (nh * moveresize_client->max_ratio < nw)
-                nh = (gint)(nw / moveresize_client->max_ratio);
+        if (*dw != trydw) { /* got resisted */
+            /* resize the height based on the width */
+            if (moveresize_client->min_ratio) {
+                if (nh * moveresize_client->min_ratio > nw)
+                    nh = (gint)(nw / moveresize_client->min_ratio);
+            }
+            if (moveresize_client->max_ratio) {
+                if (nh * moveresize_client->max_ratio < nw)
+                    nh = (gint)(nw / moveresize_client->max_ratio);
+            }
         }
     }
 

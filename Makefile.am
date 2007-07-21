@@ -482,8 +482,7 @@ nodist_man_MANS = \
 	doc/openbox-kde-session.1
 
 EXTRA_DIST = \
-	config.rpath \
-	mkinstalldirs
+	config.rpath
 
 # make clean doesn't delete these for some reason, even though they are
 # built by make

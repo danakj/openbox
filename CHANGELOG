@@ -4,6 +4,11 @@
   * Updated Dutch translation
   * Updated Polish translation
   * Updated Italian translation
+  * Updated Estonian translation
+  * Updated German translation
+  * Updated Portuguese translation
+  * Updated Vietnamese translation
+  * Updated Finnish translation
   * New strings for the Swedish translation
   * Improve focus fallback - don't fallback to windows you can't focus cycle
     (Alt-Tab) to
@@ -119,6 +124,10 @@
     focus)
   * Add new actions for controlling window decorations:
     - Decorate, Undecorate
+  * Fix so that the values for per-app settings are not case sensitive
+  * Fix crash with very small windows
+  * Fix resize resistance for windows with aspect ratio limits
+  * Let you resize windows with aspect ratio limits in the vertical directions
 
 3.4.2:
   * Add ability to set the bevel strength in themes

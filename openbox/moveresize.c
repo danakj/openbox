@@ -413,7 +413,6 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
     trydw = nw - ow;
     trydh = nh - oh;
-    g_print("trydw %d trydh %d\n", trydw, trydh);
 
     /* resist_size_* needs the frame size */
     nw += moveresize_client->frame->size.left +

@@ -3,17 +3,19 @@
 # This file is distributed under the same license as the openbox package.
 # Miguel Calleja Gómez <mcg79@lycos.es>, 2005.
 # Gustavo Varela <gustavo.varela [en] gmail [punto] com>, 2007
+# David Merino <rastiazul at yahoo . com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.2\n"
+"Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-07-12 12:58+0200\n"
-"PO-Revision-Date: 2007-05-22 20:48+0200\n"
-"Last-Translator:  Gustavo Varela <gustavo.varela [en] gmail [punto] com>\n"
+"PO-Revision-Date: 2007-07-21 21:26+0200\n"
+"Last-Translator: David Merino <rastiazul at yahoo . com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #: openbox/actions/execute.c:86
 #, c-format
@@ -31,15 +33,15 @@ msgstr "Ir ahí..."
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "Administrar escritorios"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr ""
+msgstr "_Añadir un nuevo escritorio"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "_Remover el último escritorio"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"

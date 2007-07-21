@@ -1,17 +1,8 @@
 3.4.3:
   * Add Ukrainian translation
-  * Updated Japanese translation
-  * Updated Dutch translation
-  * Updated Polish translation
-  * Updated Italian translation
-  * Updated Estonian translation
-  * Updated German translation
-  * Updated Portuguese translation
-  * Updated Vietnamese translation
-  * Updated Finnish translation
-  * Updated Czech translation
-  * Updated Arabic translation
-  * New strings for the Swedish translation
+  * Updated translations:
+    - Japanese, Dutch, Polish, Italian, Estonian, German, Portuguese, Vietnamese
+      Finnish, Czech, Arabic, Spanish, Swedish.
   * Improve focus fallback - don't fallback to windows you can't focus cycle
     (Alt-Tab) to
   * Don't show the client border for undecorated windows when keepBorder is on,

@@ -374,11 +374,46 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
                         ObDirection dir)
 {
     gint resist, x = 0, y = 0, lw, lh, ow, oh, nw, nh;
+    gint trydw, trydh;
 
     ow = cur_w;
     oh = cur_h;
     nw = ow + *dw;
     nh = oh + *dh;
+
+    if (moveresize_client->max_ratio || moveresize_client->min_ratio) {
+        switch (dir) {
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
+            /* resize the width based on the height */
+            if (moveresize_client->min_ratio) {
+                if (nh * moveresize_client->min_ratio > nw)
+                    nw = (gint)(nh * moveresize_client->min_ratio);
+            }
+            if (moveresize_client->max_ratio) {
+                if (nh * moveresize_client->max_ratio < nw)
+                    nw = (gint)(nh * moveresize_client->max_ratio);
+            }
+            break;
+        default:
+            /* resize the height based on the width */
+            if (moveresize_client->min_ratio) {
+                if (nh * moveresize_client->min_ratio > nw)
+                    nh = (gint)(nw / moveresize_client->min_ratio);
+            }
+            if (moveresize_client->max_ratio) {
+                if (nh * moveresize_client->max_ratio < nw)
+                    nh = (gint)(nw / moveresize_client->max_ratio);
+            }
+            break;
+        }
+    }
+
+    /* see its actual size (apply aspect ratios) */
+    client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
+    trydw = nw - ow;
+    trydh = nh - oh;
+    g_print("trydw %d trydh %d\n", trydw, trydh);
 
     /* resist_size_* needs the frame size */
     nw += moveresize_client->frame->size.left +
@@ -400,7 +435,31 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     *dw = nw - ow;
     *dh = nh - oh;
 
-    /* make sure it's a valid size */
+    /* take aspect ratios into account for resistance */
+    if (*dh != trydh) { /* got resisted */
+        /* resize the width based on the height */
+        if (moveresize_client->min_ratio) {
+            if (nh * moveresize_client->min_ratio > nw)
+                nw = (gint)(nh * moveresize_client->min_ratio);
+        }
+        if (moveresize_client->max_ratio) {
+            if (nh * moveresize_client->max_ratio < nw)
+                nw = (gint)(nh * moveresize_client->max_ratio);
+        }
+    }
+    if (*dw != trydw) { /* got resisted */
+        /* resize the height based on the width */
+        if (moveresize_client->min_ratio) {
+            if (nh * moveresize_client->min_ratio > nw)
+                nh = (gint)(nw / moveresize_client->min_ratio);
+        }
+        if (moveresize_client->max_ratio) {
+            if (nh * moveresize_client->max_ratio < nw)
+                nh = (gint)(nw / moveresize_client->max_ratio);
+        }
+    }
+
+    /* make sure it's all valid */
     client_try_configure(moveresize_client, &x, &y, &nw, &nh, &lw, &lh, TRUE);
 
     *dw = nw - ow;

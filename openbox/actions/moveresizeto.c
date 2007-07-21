@@ -72,9 +72,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         parse_coord(doc, n, &o->y, &o->yopposite, &o->ycenter);
 
     if ((n = parse_find_node("width", node)))
-        o->w = parse_int(doc, n) - 1;
+        o->w = parse_int(doc, n);
     if ((n = parse_find_node("height", node)))
-        o->h = parse_int(doc, n) - 1;
+        o->h = parse_int(doc, n);
 
     if ((n = parse_find_node("monitor", node)))
         o->monitor = parse_int(doc, n) - 1;

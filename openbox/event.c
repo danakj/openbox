@@ -257,12 +257,6 @@ static void event_hack_mods(XEvent *e)
         break;
     case KeyRelease:
         e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
-#ifdef XKB
-        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success) {
-            e->xkey.state = xkb_state.compat_state;
-            break;
-        }
-#endif
         /* remove from the state the mask of the modifier key being released,
            if it is a modifier key being released that is */
         e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);

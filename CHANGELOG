@@ -2,7 +2,7 @@
   * Add Ukrainian translation
   * Updated translations:
     - Japanese, Dutch, Polish, Italian, Estonian, German, Portuguese,
-      Vietnamese, Finnish, Czech, Arabic, Spanish, Swedish
+      Vietnamese, Finnish, Czech, Arabic, Spanish, Swedish, French
   * Improve focus fallback - don't fallback to windows you can't focus cycle
     (Alt-Tab) to
   * Don't show the client border for undecorated windows when keepBorder is on,
@@ -82,6 +82,9 @@
   * Let you specify keyboard shortcuts in your root menus with _. Such as
     label="XTe_rm" would make 'r' the shortcut key.
   * Fixes for placing windows with per-app settings:
+    - you can now place windows relative to any edge of the screen instead of
+      only the top left. (-0 uses the far edge, +0 uses the near edge.  You can
+      use --0 and +-0 to specify negative numbers.)
     - fix bug with windows being placed far off-screen occasionally
     - allow you to place windows partially outside of the screen
     - let per-app settings override program-specified positions (but not if it

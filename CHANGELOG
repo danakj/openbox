@@ -1,8 +1,8 @@
 3.4.3:
   * Add Ukrainian translation
   * Updated translations:
-    - Japanese, Dutch, Polish, Italian, Estonian, German, Portuguese, Vietnamese
-      Finnish, Czech, Arabic, Spanish, Swedish.
+    - Japanese, Dutch, Polish, Italian, Estonian, German, Portuguese,
+      Vietnamese, Finnish, Czech, Arabic, Spanish, Swedish
   * Improve focus fallback - don't fallback to windows you can't focus cycle
     (Alt-Tab) to
   * Don't show the client border for undecorated windows when keepBorder is on,
@@ -139,6 +139,11 @@
   * Fix the titlebar changing to non-focused when iconifying a window with
     animation
   * Use the new osd theme hints for the dock, rather than the titlebar hints
+  * Fix rare crash when menu is hidden while browsing it
+  * End move/resize more cleanly when focus moves during a move/resize
+  * Don't focus new windows when browsing a menu or moving/resizing a window,
+    just flash the window instead, so that the menu/move/resize doesn't have to
+    cancel.
 
 3.4.1:
   * Add Vietnamese translation

@@ -1921,6 +1921,10 @@ void event_cancel_all_key_grabs()
         menu_frame_hide_all();
         ob_debug("KILLED open menus\n");
     }
+    else if (moveresize_in_progress) {
+        moveresize_end(TRUE);
+        ob_debug("KILLED interactive moveresize\n");
+    }
     else if (grab_on_keyboard()) {
         ungrab_keyboard();
         ob_debug("KILLED active grab on keyboard\n");

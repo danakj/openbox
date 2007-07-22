@@ -243,10 +243,6 @@ static void event_set_curtime(XEvent *e)
 
 static void event_hack_mods(XEvent *e)
 {
-#ifdef XKB
-    XkbStateRec xkb_state;
-#endif
-
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:

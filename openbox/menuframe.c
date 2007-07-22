@@ -1075,8 +1075,14 @@ void menu_frame_hide_all_client(ObClient *client)
     GList *it = g_list_last(menu_frame_visible);
     if (it) {
         ObMenuFrame *f = it->data;
-        if (f->client == client)
+        if (f->client == client) {
+            if (config_submenu_show_delay) {
+                /* remove any submenu open requests */
+                ob_main_loop_timeout_remove(ob_main_loop,
+                                            menu_entry_frame_submenu_timeout);
+            }
             menu_frame_hide(f);
+        }
     }
 }
 
@@ -1121,6 +1127,7 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
 
 static gboolean menu_entry_frame_submenu_timeout(gpointer data)
 {
+    g_assert(menu_frame_visible);
     menu_entry_frame_show_submenu((ObMenuEntryFrame*)data);
     return FALSE;
 }

@@ -40,15 +40,17 @@ static void parse_coord(xmlDocPtr doc, xmlNodePtr n, gint *pos,
                         gboolean *opposite, gboolean *center)
 {
     gchar *s = parse_string(doc, n);
-    if (!g_ascii_strcasecmp(s, "center"))
-        *center = TRUE;
-    else {
-        if (s[0] == '-')
-            *opposite = TRUE;
-        if (s[0] == '-' || s[0] == '+')
-            *pos = atoi(s+1);
-        else
-            *pos = atoi(s);
+    if (g_ascii_strcasecmp(s, "current") != 0) {
+        if (!g_ascii_strcasecmp(s, "center"))
+            *center = TRUE;
+        else {
+            if (s[0] == '-')
+                *opposite = TRUE;
+            if (s[0] == '-' || s[0] == '+')
+                *pos = atoi(s+1);
+            else
+                *pos = atoi(s);
+        }
     }
     g_free(s);
 }
@@ -71,13 +73,25 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     if ((n = parse_find_node("y", node)))
         parse_coord(doc, n, &o->y, &o->yopposite, &o->ycenter);
 
-    if ((n = parse_find_node("width", node)))
-        o->w = parse_int(doc, n);
-    if ((n = parse_find_node("height", node)))
-        o->h = parse_int(doc, n);
+    if ((n = parse_find_node("width", node))) {
+        gchar *s = parse_string(doc, n);
+        if (g_ascii_strcasecmp(s, "current") != 0)
+            o->w = parse_int(doc, n);
+        g_free(s);
+    }
+    if ((n = parse_find_node("height", node))) {
+        gchar *s = parse_string(doc, n);
+        if (g_ascii_strcasecmp(s, "current") != 0)
+            o->h = parse_int(doc, n);
+        g_free(s);
+    }
 
-    if ((n = parse_find_node("monitor", node)))
-        o->monitor = parse_int(doc, n) - 1;
+    if ((n = parse_find_node("monitor", node))) {
+        gchar *s = parse_string(doc, n);
+        if (g_ascii_strcasecmp(s, "current") != 0)
+            o->monitor = parse_int(doc, n) - 1;
+        g_free(s);
+    }
 
     return o;
 }

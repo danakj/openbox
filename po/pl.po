@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 12:58+0200\n"
+"POT-Creation-Date: 2007-07-22 08:25-0400\n"
 "PO-Revision-Date: 2007-07-14 00:43+0200\n"
 "Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions/execute.c:86
+#: openbox/actions/execute.c:88
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Nie można przekonwertować ścieżki '%s' z UTF-8"
 
-#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Wykonanie '%s' nie powiodło się: %s"
@@ -154,53 +154,53 @@ msgstr "Nieprawidłowy klawisz '%s' w skrócie myszy"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Nieprawidłowy kontekst '%s' w skrócie myszy"
 
-#: openbox/openbox.c:131
+#: openbox/openbox.c:130
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Nie można przejść do katalogu domowego '%s': %s"
 
-#: openbox/openbox.c:151
+#: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Otwarcie ekranu ze zmiennej środowiskowej DISPLAY nie powiodło się."
 
-#: openbox/openbox.c:182
+#: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
 msgstr "Zainicjowanie biblioteki obrender nie powiodło się."
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:187
 msgid "X server does not support locale."
 msgstr "Serwer X nie obsługuje ustawień lokalnych."
 
-#: openbox/openbox.c:190
+#: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Nie można ustawić modyfikatorów lokalnych dla serwera X."
 
-#: openbox/openbox.c:253
+#: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Nie można znaleźć prawidłowego pliku konfiguracyjnego, używanie domyślnych"
-"wartości"
+"Nie można znaleźć prawidłowego pliku konfiguracyjnego, używanie "
+"domyślnychwartości"
 
-#: openbox/openbox.c:279
+#: openbox/openbox.c:278
 msgid "Unable to load a theme."
 msgstr "Nie można wczytać motywu."
 
-#: openbox/openbox.c:408
+#: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
-"Wykonanie nowego pliku wykonywalnego '%s' podczas ponownego uruchomienia"
-"nie powiodło się: %s"
+"Wykonanie nowego pliku wykonywalnego '%s' podczas ponownego uruchomienianie "
+"powiodło się: %s"
 
-#: openbox/openbox.c:478 openbox/openbox.c:480
+#: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:486
 msgid "Syntax: openbox [options]\n"
 msgstr "Składnia: openbox [opcje]\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:487
 msgid ""
 "\n"
 "Options:\n"
@@ -208,23 +208,23 @@ msgstr ""
 "\n"
 "Opcje:\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:488
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Wyświetla tę pomoc i kończy\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:489
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Wyświetla wersję i kończy\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:490
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Zastępuje aktualnie działający menedżer okien\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:491
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Nie tworzy połączenia z menedżerem sesji\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:492
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -232,15 +232,15 @@ msgstr ""
 "\n"
 "Przekazywanie komunikatów do działającej instancji Openboksa:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:493
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ponownie wczytuje pliki konfiguracyjne\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:494
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Ponownie uruchamia Openboksa\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -248,24 +248,24 @@ msgstr ""
 "\n"
 "Opcje debugowania:\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:496
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Uruchamia w trybie synchronicznym\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:497
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Wyświetla informacje o debugowaniu\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:498
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Wyświetla wyjście debugowania obsługi aktywacji\n"
 
-#: openbox/openbox.c:502
+#: openbox/openbox.c:499
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Dzieli ekran na sztuczne ekrany xineramy\n"
 
-#: openbox/openbox.c:503
+#: openbox/openbox.c:500
 #, c-format
 msgid ""
 "\n"
@@ -274,27 +274,27 @@ msgstr ""
 "\n"
 "Proszę zgłaszać błędy (w języku angielskim) pod adresem %s\n"
 
-#: openbox/openbox.c:600
+#: openbox/openbox.c:597
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Nieprawidłowy argument wiersza poleceń '%s'\n"
 
-#: openbox/screen.c:95 openbox/screen.c:196
+#: openbox/screen.c:94 openbox/screen.c:195
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Menedżer okien jest już uruchomiony na ekranie %d"
 
-#: openbox/screen.c:132
+#: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 
-#: openbox/screen.c:153
+#: openbox/screen.c:152
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
 
-#: openbox/screen.c:1077
+#: openbox/screen.c:1083
 #, c-format
 msgid "desktop %i"
 msgstr "pulpit %i"
@@ -344,4 +344,3 @@ msgstr "Żądany klawisz '%s' nie istnieje na ekranie"
 #, c-format
 msgid "X Error: %s"
 msgstr "Błąd X: %s"
-

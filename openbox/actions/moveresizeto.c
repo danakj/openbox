@@ -4,6 +4,11 @@
 #include "openbox/frame.h"
 #include <stdlib.h> /* for atoi */
 
+enum {
+    CURRENT_MONITOR = -1,
+    ALL_MONITORS = -2
+};
+
 typedef struct {
     gboolean xcenter;
     gboolean ycenter;
@@ -65,7 +70,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o->y = G_MININT;
     o->w = G_MININT;
     o->h = G_MININT;
-    o->monitor = -1;
+    o->monitor = CURRENT_MONITOR;
 
     if ((n = parse_find_node("x", node)))
         parse_coord(doc, n, &o->x, &o->xopposite, &o->xcenter);
@@ -88,8 +93,12 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     if ((n = parse_find_node("monitor", node))) {
         gchar *s = parse_string(doc, n);
-        if (g_ascii_strcasecmp(s, "current") != 0)
-            o->monitor = parse_int(doc, n) - 1;
+        if (g_ascii_strcasecmp(s, "current") != 0) {
+            if (!g_ascii_strcasecmp(s, "all"))
+                o->monitor = ALL_MONITORS;
+            else
+                o->monitor = parse_int(doc, n) - 1;
+        }
         g_free(s);
     }
 
@@ -134,7 +143,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         c = data->client;
         mon = o->monitor;
         cmon = client_monitor(c);
-        if (mon < 0) mon = cmon;
+        if (mon == CURRENT_MONITOR) mon = cmon;
+        else if (mon == ALL_MONITORS) mon = SCREEN_AREA_ALL_MONITORS;
         area = screen_area(c->desktop, mon, NULL);
         carea = screen_area(c->desktop, cmon, NULL);
 

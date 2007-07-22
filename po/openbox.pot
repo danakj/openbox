@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 03:20-0400\n"
+"POT-Creation-Date: 2007-07-22 08:25-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,12 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions/execute.c:86
+#: openbox/actions/execute.c:88
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr ""
 
-#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr ""
@@ -280,7 +280,7 @@ msgstr ""
 msgid "The WM on screen %d is not exiting"
 msgstr ""
 
-#: openbox/screen.c:1073
+#: openbox/screen.c:1083
 #, c-format
 msgid "desktop %i"
 msgstr ""

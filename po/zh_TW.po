@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-12 12:58+0200\n"
+"POT-Creation-Date: 2007-07-22 08:25-0400\n"
 "PO-Revision-Date: 2007-05-23 16:22+0200\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -16,12 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/actions/execute.c:86
+#: openbox/actions/execute.c:88
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "從 utf8 轉換路徑「%s」時失敗"
 
-#: openbox/actions/execute.c:95 openbox/actions/execute.c:113
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "執行「%s」時失敗：%s"
@@ -153,49 +153,49 @@ msgstr "與滑鼠組合的按鈕「%s」無效"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "與滑鼠組合的上下文「%s」無效"
 
-#: openbox/openbox.c:131
+#: openbox/openbox.c:130
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "無法變更到主目錄「%s」：%s"
 
-#: openbox/openbox.c:151
+#: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "開啟依 DISPLAY 環境變數所指的顯示時失敗。"
 
-#: openbox/openbox.c:182
+#: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
 msgstr "初始化 obrender 函式庫時失敗。"
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:187
 msgid "X server does not support locale."
 msgstr "X 伺服器不支援語區。"
 
-#: openbox/openbox.c:190
+#: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
 msgstr "無法設定用於 X 伺服器的語區修飾項。"
 
-#: openbox/openbox.c:253
+#: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "無法找到有效的配置檔案，而使用某些簡單的預設值"
 
-#: openbox/openbox.c:279
+#: openbox/openbox.c:278
 msgid "Unable to load a theme."
 msgstr "無法載入佈景主題。"
 
-#: openbox/openbox.c:408
+#: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "重新啟動以執行新的可執行檔「%s」時失敗：%s"
 
-#: openbox/openbox.c:478 openbox/openbox.c:480
+#: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
 msgstr "著作權 (c)"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:486
 msgid "Syntax: openbox [options]\n"
 msgstr "語法：openbox [選項]\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:487
 msgid ""
 "\n"
 "Options:\n"
@@ -203,23 +203,23 @@ msgstr ""
 "\n"
 "選項：\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:488
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              顯示此說明然後離開\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:489
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           顯示版本然後離開\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:490
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           替換目前執行的視窗管理員\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:491
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        停用與執行階段管理程式的連結\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:492
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -227,15 +227,15 @@ msgstr ""
 "\n"
 "傳遞訊息到執行中的 Openbox 實體：\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:493
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       重新載入 Openbox 配置\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:494
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           重新啟動 Openbox\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -243,23 +243,23 @@ msgstr ""
 "\n"
 "偵錯選項：\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:496
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              在同步模式中運行\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:497
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             顯示偵錯輸出\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:498
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       顯示焦點處理的偵錯輸出\n"
 
-#: openbox/openbox.c:502
+#: openbox/openbox.c:499
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    分割顯示以進入假造的 xinerama 螢幕\n"
 
-#: openbox/openbox.c:503
+#: openbox/openbox.c:500
 #, c-format
 msgid ""
 "\n"
@@ -268,27 +268,27 @@ msgstr ""
 "\n"
 "請向 %s 報告錯誤\n"
 
-#: openbox/openbox.c:600
+#: openbox/openbox.c:597
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "無效的命令列引數「%s」\n"
 
-#: openbox/screen.c:95 openbox/screen.c:196
+#: openbox/screen.c:94 openbox/screen.c:195
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "螢幕 %d 中已經有視窗管理員在運行"
 
-#: openbox/screen.c:132
+#: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "無法於螢幕 %d 獲選為視窗管理員"
 
-#: openbox/screen.c:153
+#: openbox/screen.c:152
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "螢幕 %d 中的視窗管理員並未離開"
 
-#: openbox/screen.c:1077
+#: openbox/screen.c:1083
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"

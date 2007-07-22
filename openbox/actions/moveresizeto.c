@@ -33,15 +33,17 @@ static void parse_coord(xmlDocPtr doc, xmlNodePtr n, gint *pos,
                         gboolean *opposite, gboolean *center)
 {
     gchar *s = parse_string(doc, n);
-    if (!g_ascii_strcasecmp(s, "center"))
-        *center = TRUE;
-    else {
-        if (s[0] == '-')
-            *opposite = TRUE;
-        if (s[0] == '-' || s[0] == '+')
-            *pos = atoi(s+1);
-        else
-            *pos = atoi(s);
+    if (g_ascii_strcasecmp(s, "current") != 0) {
+        if (!g_ascii_strcasecmp(s, "center"))
+            *center = TRUE;
+        else {
+            if (s[0] == '-')
+                *opposite = TRUE;
+            if (s[0] == '-' || s[0] == '+')
+                *pos = atoi(s+1);
+            else
+                *pos = atoi(s);
+        }
     }
     g_free(s);
 }

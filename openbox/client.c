@@ -452,9 +452,18 @@ void client_manage(Window window)
                       "(last time %u)\n",
                       self->window, self->user_time, last_time);
 
+        if (menu_frame_visible || moveresize_in_progress) {
+            activate = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because the user is inside "
+                          "an Openbox menu or is move/resizing a window and "
+                          "we don't want to interrupt them\n");
+        }
+
         /* if it's on another desktop */
-        if (!(self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
-            && /* the timestamp is from before you changed desktops */
+        else if (!(self->desktop == screen_desktop ||
+              self->desktop == DESKTOP_ALL) &&
+            /* the timestamp is from before you changed desktops */
             self->user_time && screen_desktop_user_time &&
             !event_time_after(self->user_time, screen_desktop_user_time))
         {

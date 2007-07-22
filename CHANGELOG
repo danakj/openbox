@@ -2,7 +2,7 @@
   * Add Ukrainian translation
   * Updated translations:
     - Japanese, Dutch, Polish, Italian, Estonian, German, Portuguese,
-      Vietnamese, Finnish, Czech, Arabic, Spanish, Swedish
+      Vietnamese, Finnish, Czech, Arabic, Spanish, Swedish, French
   * Improve focus fallback - don't fallback to windows you can't focus cycle
     (Alt-Tab) to
   * Don't show the client border for undecorated windows when keepBorder is on,

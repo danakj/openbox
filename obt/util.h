@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   obt.h for the Openbox window manager
+   obt/util.h for the Openbox window manager
    Copyright (c) 2007        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -16,10 +16,22 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __obt_h
-#define __obt_h
+#ifndef __obt_util_h
+#define __obt_util_h
 
-#include "obt/instance.h"
-#include "obt/util.h"
+#include <glib.h>
 
-#endif /*__obt_h*/
+#ifdef HAVE_STRING_H
+#  include <string.h> /* for memset() */
+#endif
+
+G_BEGIN_DECLS
+
+/* Util funcs */
+#define obt_free g_free
+#define obt_free0(p, type, num) memset((p), 0, sizeof(type) * (num)), g_free(p)
+
+G_END_DECLS
+
+
+#endif /*__obt_util_h*/

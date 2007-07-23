@@ -126,7 +126,9 @@ obt_libobt_la_LIBADD = \
 	$(XML_LIBS)
 obt_libobt_la_SOURCES = \
 	obt/obt.h \
-	obt/instance.c
+	obt/instance.h \
+	obt/instance.c \
+	obt/util.h
 
 ## openbox ##
 
@@ -400,7 +402,9 @@ pubinclude_HEADERS = \
 	render/render.h \
 	render/theme.h \
 	parser/parse.h \
-	obt/obt.h
+	obt/obt.h \
+	obt/instance.h \
+	obt/util.h
 
 nodist_pubinclude_HEADERS = \
 	version.h

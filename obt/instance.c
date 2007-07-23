@@ -16,7 +16,8 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "obt/obt.h"
+#include "obt/instance.h"
+#include "obt/util.h"
 
 #ifdef HAVE_STRING_H
 #  include <string.h>

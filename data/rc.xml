@@ -331,14 +331,24 @@
     </mousebind>
 
     <mousebind button="Up" action="Click">
-      <action name="Shade"/>
-      <action name="FocusToBottom"/>
-      <action name="Unfocus"/>
-      <action name="Lower"/>
+      <action name="if">
+        <shaded>no</shaded>
+        <then>
+          <action name="Shade"/>
+          <action name="FocusToBottom"/>
+          <action name="Unfocus"/>
+          <action name="Lower"/>
+        </then>
+      </action>
     </mousebind>
     <mousebind button="Down" action="Click">
-      <action name="Unshade"/>
-      <action name="Raise"/>
+      <action name="if">
+        <shaded>yes</shaded>
+        <then>
+          <action name="Unshade"/>
+          <action name="Raise"/>
+        </then>
+      </action>
     </mousebind>
 
     <mousebind button="Right" action="Press">

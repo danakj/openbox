@@ -443,6 +443,7 @@ void client_manage(Window window)
     client_apply_startup_state(self, placex, placey, placew, placeh);
 
     if (activate) {
+        gboolean raise = FALSE;
         guint32 last_time = focus_client ?
             focus_client->user_time : CurrentTime;
 
@@ -454,6 +455,7 @@ void client_manage(Window window)
 
         if (menu_frame_visible || moveresize_in_progress) {
             activate = FALSE;
+            raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Not focusing the window because the user is inside "
                           "an Openbox menu or is move/resizing a window and "
@@ -468,6 +470,7 @@ void client_manage(Window window)
             !event_time_after(self->user_time, screen_desktop_user_time))
         {
             activate = FALSE;
+            raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Not focusing the window because its on another "
                           "desktop\n");
@@ -512,6 +515,7 @@ void client_manage(Window window)
                anyway */
             else if (client_focus_target(self) != self) {
                 activate = FALSE;
+                raise = TRUE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because another window "
                               "would get the focus anyway\n");
@@ -526,6 +530,9 @@ void client_manage(Window window)
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);
+            /* we may want to raise it even tho we're not activating it */
+            if (raise && !client_restore_session_stacking(self))
+                stacking_raise(CLIENT_AS_WINDOW(self));
         }
     }
     else {

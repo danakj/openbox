@@ -49,6 +49,7 @@
 #include "parser/parse.h"
 #include "render/render.h"
 #include "render/theme.h"
+#include "obt/obt.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -83,18 +84,18 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
-
-RrInstance *ob_rr_inst;
-RrTheme    *ob_rr_theme;
-ObMainLoop *ob_main_loop;
-Display    *ob_display;
-gint        ob_screen;
-gboolean    ob_replace_wm = FALSE;
-gboolean    ob_sm_use = TRUE;
-gchar      *ob_sm_id = NULL;
-gchar      *ob_sm_save_file = NULL;
-gboolean    ob_sm_restore = TRUE;
-gboolean    ob_debug_xinerama = FALSE;
+ObtInstance *obt_inst;
+RrInstance  *ob_rr_inst;
+RrTheme     *ob_rr_theme;
+ObMainLoop  *ob_main_loop;
+Display     *ob_display;
+gint         ob_screen;
+gboolean     ob_replace_wm = FALSE;
+gboolean     ob_sm_use = TRUE;
+gchar       *ob_sm_id = NULL;
+gchar       *ob_sm_save_file = NULL;
+gboolean     ob_sm_restore = TRUE;
+gboolean     ob_debug_xinerama = FALSE;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -144,12 +145,10 @@ gint main(gint argc, gchar **argv)
         session_startup(argc, argv);
     }
 
-
-    ob_display = XOpenDisplay(NULL);
-    if (ob_display == NULL)
+    obt_inst = obt_instance_new(NULL);
+    if (obt_inst == NULL)
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
-    if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
-        ob_exit_with_error("Failed to set display as close-on-exec");
+    ob_display = obt_display(obt_inst);
 
     if (remote_control) {
         prop_startup();
@@ -159,7 +158,7 @@ gint main(gint argc, gchar **argv)
          * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
                  ob_control, remote_control, 0, 0, 0);
-        XCloseDisplay(ob_display);
+        obt_instance_unref(obt_inst);
         exit(EXIT_SUCCESS);
     }
 
@@ -386,7 +385,7 @@ gint main(gint argc, gchar **argv)
 
     session_shutdown(being_replaced);
 
-    XCloseDisplay(ob_display);
+    obt_instance_unref(obt_inst);
 
     parse_paths_shutdown();
 

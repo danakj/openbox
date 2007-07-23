@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+xcflags=@X_CFLAGS@
+xlibs=@X_LIBS@
+
+Name: ObRender
+Description: Openbox Toolkit Library
+Version: @VERSION@
+Requires: glib-2.0
+Libs: -L${libdir} -lobrender ${xlibs}
+Cflags: -I${includedir}/openbox/@OB_VERSION@ ${xcflags}

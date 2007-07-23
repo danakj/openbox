@@ -25,7 +25,8 @@ check_PROGRAMS = \
 
 lib_LTLIBRARIES = \
 	parser/libobparser.la \
-	render/libobrender.la
+	render/libobrender.la \
+	obt/libobt.la
 
 bin_PROGRAMS = \
 	openbox/openbox \
@@ -109,6 +110,24 @@ parser_libobparser_la_SOURCES = \
 	parser/parse.h \
 	parser/parse.c
 
+## obt ##
+
+obt_libobt_la_CPPFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(XML_CFLAGS) \
+	-DG_LOG_DOMAIN=\"Obt\" \
+	-DLOCALEDIR=\"$(localedir)\" \
+	-DDATADIR=\"$(datadir)\" \
+	-DCONFIGDIR=\"$(configdir)\"
+obt_libobt_la_LDFLAGS = \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+obt_libobt_la_LIBADD = \
+	$(GLIB_LIBS) \
+	$(XML_LIBS)
+obt_libobt_la_SOURCES = \
+	obt/obt.h \
+	obt/instance.c
+
 ## openbox ##
 
 openbox_openbox_CPPFLAGS = \
@@ -144,7 +163,8 @@ openbox_openbox_LDADD = \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \
 	render/libobrender.la \
-	parser/libobparser.la
+	parser/libobparser.la \
+	obt/libobt.la
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
 	gettext.h \
@@ -379,14 +399,16 @@ pubinclude_HEADERS = \
 	render/mask.h \
 	render/render.h \
 	render/theme.h \
-	parser/parse.h
+	parser/parse.h \
+	obt/obt.h
 
 nodist_pubinclude_HEADERS = \
 	version.h
 
 nodist_pkgconfig_DATA = \
 	render/obrender-3.0.pc \
-	parser/obparser-3.0.pc
+	parser/obparser-3.0.pc \
+	obt/obt-4.0.pc
 
 ## data ##
 
@@ -447,6 +469,7 @@ dist_noinst_DATA = \
 	doc/openbox-kde-session.1.in \
 	render/obrender-3.0.pc.in \
 	parser/obparser-3.0.pc.in \
+	obt/obt-4.0.pc.in \
 	tools/themeupdate/themeupdate.py \
 	tests/hideshow.py \
 	tests/Makefile \
@@ -502,7 +525,7 @@ CLEANFILES = \
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc
 
 distclean-local:
-	for d in . m4 po render; do \
+	for d in . m4 po render parser obt openbox; do \
 		for p in core core.* gmon.out *\~ *.orig *.rej .\#*; do \
 			rm -f "$$d/$$p"; \
 		done \

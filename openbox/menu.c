@@ -20,7 +20,6 @@
 #include "debug.h"
 #include "menu.h"
 #include "openbox.h"
-#include "mainloop.h"
 #include "stacking.h"
 #include "grab.h"
 #include "client.h"
@@ -457,10 +456,10 @@ void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
             menu_can_hide = TRUE;
         else {
             menu_can_hide = FALSE;
-            ob_main_loop_timeout_add(ob_main_loop,
-                                     config_menu_hide_delay * 1000,
-                                     menu_hide_delay_func,
-                                     NULL, g_direct_equal, NULL);
+            obt_main_loop_timeout_add(ob_main_loop,
+                                      config_menu_hide_delay * 1000,
+                                      menu_hide_delay_func,
+                                      NULL, g_direct_equal, NULL);
         }
     }
 }

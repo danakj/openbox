@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   obt/instance.c for the Openbox window manager
+   obt/display.c for the Openbox window manager
    Copyright (c) 2007        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "obt/instance.h"
+#include "obt/display.h"
 #include "obt/util.h"
 
 #ifdef HAVE_STRING_H
@@ -29,47 +29,23 @@
 #  include <unistd.h>
 #endif
 
-struct _ObtInstance
-{
-    gint ref;
-    Display *d;
-};
-
-ObtInstance* obt_instance_new(const char *display_name)
+Display* obt_display_open(const char *display_name)
 {
     gchar *n;
-    Display *d;
-    ObtInstance *inst = NULL;
+    Display *d = NULL;
 
     n = display_name ? g_strdup(display_name) : NULL;
     d = XOpenDisplay(n);
     if (d) {
         if (fcntl(ConnectionNumber(d), F_SETFD, 1) == -1)
             g_message("Failed to set display as close-on-exec");
-
-        inst = g_new(ObtInstance, 1);
-        inst->ref = 1;
-        inst->d = d;
     }
     g_free(n);
 
-    return inst;
+    return d;
 }
 
-void obt_instance_ref(ObtInstance *inst)
+void obt_display_close(Display *d)
 {
-    ++inst->ref;
-}
-
-void obt_instance_unref(ObtInstance *inst)
-{
-    if (inst && --inst->ref == 0) {
-        XCloseDisplay(inst->d);
-        obt_free0(inst, ObtInstance, 1);
-    }
-}
-
-Display* obt_display(const ObtInstance *inst)
-{
-    return inst->d;
+    if (d) XCloseDisplay(d);
 }

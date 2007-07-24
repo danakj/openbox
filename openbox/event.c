@@ -35,7 +35,6 @@
 #include "keyboard.h"
 #include "modkeys.h"
 #include "mouse.h"
-#include "mainloop.h"
 #include "focus.h"
 #include "focus_cycle.h"
 #include "moveresize.h"
@@ -123,9 +122,9 @@ static void ice_watch(IceConn conn, IcePointer data, Bool opening,
 
     if (opening) {
         fd = IceConnectionNumber(conn);
-        ob_main_loop_fd_add(ob_main_loop, fd, ice_handler, conn, NULL);
+        obt_main_loop_fd_add(ob_main_loop, fd, ice_handler, conn, NULL);
     } else {
-        ob_main_loop_fd_remove(ob_main_loop, fd);
+        obt_main_loop_fd_remove(ob_main_loop, fd);
         fd = -1;
     }
 }
@@ -135,7 +134,7 @@ void event_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    ob_main_loop_x_add(ob_main_loop, event_process, NULL, NULL);
+    obt_main_loop_x_add(ob_main_loop, event_process, NULL, NULL);
 
 #ifdef USE_SM
     IceAddConnectionWatch(ice_watch, NULL);
@@ -800,17 +799,17 @@ void event_enter_client(ObClient *client)
         if (config_focus_delay) {
             ObFocusDelayData *data;
 
-            ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+            obt_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 
             data = g_new(ObFocusDelayData, 1);
             data->client = client;
             data->time = event_curtime;
             data->serial = event_curserial;
 
-            ob_main_loop_timeout_add(ob_main_loop,
-                                     config_focus_delay * 1000,
-                                     focus_delay_func,
-                                     data, focus_delay_cmp, focus_delay_dest);
+            obt_main_loop_timeout_add(ob_main_loop,
+                                      config_focus_delay * 1000,
+                                      focus_delay_func,
+                                      data, focus_delay_cmp, focus_delay_dest);
         } else {
             ObFocusDelayData data;
             data.client = client;
@@ -1000,9 +999,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                    delay is up */
                 e->xcrossing.detail != NotifyInferior)
             {
-                ob_main_loop_timeout_remove_data(ob_main_loop,
-                                                 focus_delay_func,
-                                                 client, FALSE);
+                obt_main_loop_timeout_remove_data(ob_main_loop,
+                                                  focus_delay_func,
+                                                  client, FALSE);
             }
             break;
         default:
@@ -1914,15 +1913,15 @@ static gboolean focus_delay_func(gpointer data)
 
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
-                                     client, FALSE);
+    obt_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
+                                      client, FALSE);
 }
 
 void event_halt_focus_delay(void)
 {
     /* ignore all enter events up till the event which caused this to occur */
     if (event_curserial) event_ignore_enter_range(1, event_curserial);
-    ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+    obt_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
 gulong event_start_ignore_all_enters(void)

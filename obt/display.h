@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   obt/instance.h for the Openbox window manager
+   obt/display.h for the Openbox window manager
    Copyright (c) 2007        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -24,14 +24,8 @@
 
 G_BEGIN_DECLS
 
-typedef struct _ObtInstance ObtInstance;
-
-/* Instance funcs */
-ObtInstance* obt_instance_new   (const char *display_name);
-void         obt_instance_ref   (ObtInstance *inst);
-void         obt_instance_unref (ObtInstance *inst);
-
-Display*     obt_display        (const ObtInstance *inst);
+Display* obt_display_open(const char *display_name);
+void     obt_display_close(Display *d);
 
 G_END_DECLS
 

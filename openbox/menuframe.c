@@ -24,7 +24,6 @@
 #include "actions.h"
 #include "grab.h"
 #include "openbox.h"
-#include "mainloop.h"
 #include "config.h"
 #include "render/theme.h"
 
@@ -1063,8 +1062,8 @@ void menu_frame_hide_all(void)
 
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
-        ob_main_loop_timeout_remove(ob_main_loop,
-                                    menu_entry_frame_submenu_timeout);
+        obt_main_loop_timeout_remove(ob_main_loop,
+                                     menu_entry_frame_submenu_timeout);
     }
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
@@ -1078,8 +1077,8 @@ void menu_frame_hide_all_client(ObClient *client)
         if (f->client == client) {
             if (config_submenu_show_delay) {
                 /* remove any submenu open requests */
-                ob_main_loop_timeout_remove(ob_main_loop,
-                                            menu_entry_frame_submenu_timeout);
+                obt_main_loop_timeout_remove(ob_main_loop,
+                                             menu_entry_frame_submenu_timeout);
             }
             menu_frame_hide(f);
         }
@@ -1145,8 +1144,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
 
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
-        ob_main_loop_timeout_remove(ob_main_loop,
-                                    menu_entry_frame_submenu_timeout);
+        obt_main_loop_timeout_remove(ob_main_loop,
+                                     menu_entry_frame_submenu_timeout);
     }
 
     self->selected = entry;
@@ -1162,11 +1161,11 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
             if (config_submenu_show_delay && !immediate) {
                 /* initiate a new submenu open request */
-                ob_main_loop_timeout_add(ob_main_loop,
-                                         config_submenu_show_delay * 1000,
-                                         menu_entry_frame_submenu_timeout,
-                                         self->selected, g_direct_equal,
-                                         NULL);
+                obt_main_loop_timeout_add(ob_main_loop,
+                                          config_submenu_show_delay * 1000,
+                                          menu_entry_frame_submenu_timeout,
+                                          self->selected, g_direct_equal,
+                                          NULL);
             } else {
                 menu_entry_frame_show_submenu(self->selected);
             }

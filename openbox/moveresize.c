@@ -25,7 +25,6 @@
 #include "frame.h"
 #include "openbox.h"
 #include "resist.h"
-#include "mainloop.h"
 #include "modkeys.h"
 #include "popup.h"
 #include "moveresize.h"
@@ -311,7 +310,7 @@ void moveresize_end(gboolean cancel)
             moveresize_alarm = None;
         }
 
-        ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
+        obt_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
 #endif
 
         client_configure(moveresize_client,
@@ -396,10 +395,10 @@ static void do_resize(void)
 
         waiting_for_sync = TRUE;
 
-        ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
-        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
-                                 sync_timeout_func,
-                                 NULL, NULL, NULL);
+        obt_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
+        obt_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
+                                  sync_timeout_func,
+                                  NULL, NULL, NULL);
     }
 #endif
 
@@ -578,10 +577,10 @@ static void do_edge_warp(gint x, gint y)
         cancel_edge_warp();
         if (dir != (ObDirection)-1) {
             edge_warp_odd = TRUE; /* switch on the first timeout */
-            ob_main_loop_timeout_add(ob_main_loop,
-                                     config_mouse_screenedgetime * 1000,
-                                     edge_warp_delay_func,
-                                     NULL, NULL, NULL);
+            obt_main_loop_timeout_add(ob_main_loop,
+                                      config_mouse_screenedgetime * 1000,
+                                      edge_warp_delay_func,
+                                      NULL, NULL, NULL);
         }
         edge_warp_dir = dir;
     }
@@ -589,7 +588,7 @@ static void do_edge_warp(gint x, gint y)
 
 static void cancel_edge_warp(void)
 {
-    ob_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
+    obt_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
 }
 
 static void move_with_keys(gint keycode, gint state)

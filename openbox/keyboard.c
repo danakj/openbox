@@ -17,7 +17,6 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "mainloop.h"
 #include "focus.h"
 #include "screen.h"
 #include "frame.h"
@@ -221,7 +220,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         e->xkey.state == config_keyboard_reset_state)
     {
-        ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+        obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
         keyboard_reset_chains(-1);
         return;
     }
@@ -239,11 +238,11 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 menu_frame_hide_all();
 
             if (p->first_child != NULL) { /* part of a chain */
-                ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+                obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
                 /* 3 second timeout for chains */
-                ob_main_loop_timeout_add(ob_main_loop, 3 * G_USEC_PER_SEC,
-                                         chain_timeout, NULL,
-                                         g_direct_equal, NULL);
+                obt_main_loop_timeout_add(ob_main_loop, 3 * G_USEC_PER_SEC,
+                                          chain_timeout, NULL,
+                                          g_direct_equal, NULL);
                 set_curpos(p);
             } else if (p->chroot)         /* an empty chroot */
                 set_curpos(p);
@@ -280,7 +279,7 @@ void keyboard_startup(gboolean reconfig)
 
 void keyboard_shutdown(gboolean reconfig)
 {
-    ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+    obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 
     keyboard_unbind_all();
     set_curpos(NULL);

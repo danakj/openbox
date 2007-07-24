@@ -126,8 +126,10 @@ obt_libobt_la_LIBADD = \
 	$(XML_LIBS)
 obt_libobt_la_SOURCES = \
 	obt/obt.h \
-	obt/instance.h \
-	obt/instance.c \
+	obt/display.h \
+	obt/display.c \
+	obt/mainloop.h \
+	obt/mainloop.c \
 	obt/util.h
 
 ## openbox ##
@@ -249,8 +251,6 @@ openbox_openbox_SOURCES = \
 	openbox/keyboard.h \
 	openbox/keytree.c \
 	openbox/keytree.h \
-	openbox/mainloop.c \
-	openbox/mainloop.h \
 	openbox/menuframe.c \
 	openbox/menuframe.h \
 	openbox/menu.c \
@@ -403,7 +403,8 @@ pubinclude_HEADERS = \
 	render/theme.h \
 	parser/parse.h \
 	obt/obt.h \
-	obt/instance.h \
+	obt/display.h \
+	obt/mainloop.h \
 	obt/util.h
 
 nodist_pubinclude_HEADERS = \

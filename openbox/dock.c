@@ -19,7 +19,6 @@
 
 #include "debug.h"
 #include "dock.h"
-#include "mainloop.h"
 #include "screen.h"
 #include "prop.h"
 #include "config.h"
@@ -630,19 +629,21 @@ void dock_hide(gboolean hide)
 {
     if (!hide) {
         if (dock->hidden && config_dock_hide) {
-            ob_main_loop_timeout_add(ob_main_loop,
-                                     config_dock_show_delay * 1000,
-                                     show_timeout, NULL, g_direct_equal, NULL);
+            obt_main_loop_timeout_add(ob_main_loop,
+                                      config_dock_show_delay * 1000,
+                                      show_timeout, NULL,
+                                      g_direct_equal, NULL);
         } else if (!dock->hidden && config_dock_hide) {
-            ob_main_loop_timeout_remove(ob_main_loop, hide_timeout);
+            obt_main_loop_timeout_remove(ob_main_loop, hide_timeout);
         }
     } else {
         if (!dock->hidden && config_dock_hide) {
-            ob_main_loop_timeout_add(ob_main_loop,
-                                     config_dock_hide_delay * 1000,
-                                     hide_timeout, NULL, g_direct_equal, NULL);
+            obt_main_loop_timeout_add(ob_main_loop,
+                                      config_dock_hide_delay * 1000,
+                                      hide_timeout, NULL,
+                                      g_direct_equal, NULL);
         } else if (dock->hidden && config_dock_hide) {
-            ob_main_loop_timeout_remove(ob_main_loop, show_timeout);
+            obt_main_loop_timeout_remove(ob_main_loop, show_timeout);
         }
     }
 }

@@ -25,7 +25,6 @@
 #include "stacking.h"
 #include "event.h"
 #include "screen.h"
-#include "mainloop.h"
 #include "render/render.h"
 #include "render/theme.h"
 
@@ -292,9 +291,9 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         if (usec) {
             /* don't kill previous show timers */
             if (!self->delay_mapped) {
-                ob_main_loop_timeout_add(ob_main_loop, usec,
-                                         popup_show_timeout, self,
-                                         g_direct_equal, NULL);
+                obt_main_loop_timeout_add(ob_main_loop, usec,
+                                          popup_show_timeout, self,
+                                          g_direct_equal, NULL);
                 self->delay_mapped = TRUE;
             }
         } else {
@@ -318,7 +317,7 @@ void popup_hide(ObPopup *self)
 
         event_end_ignore_all_enters(ignore_start);
     } else if (self->delay_mapped) {
-        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+        obt_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
         self->delay_mapped = FALSE;
     }
 }

@@ -25,7 +25,6 @@
 #include "grab.h"
 #include "config.h"
 #include "framerender.h"
-#include "mainloop.h"
 #include "focus_cycle.h"
 #include "focus_cycle_indicator.h"
 #include "moveresize.h"
@@ -1053,8 +1052,8 @@ void frame_release_client(ObFrame *self)
     gboolean reparent = TRUE;
 
     /* if there was any animation going on, kill it */
-    ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
-                                     self, FALSE);
+    obt_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
+                                      self, FALSE);
 
     /* check if the app has already reparented its window away */
     while (XCheckTypedWindowEvent(ob_display, self->client->window,
@@ -1130,7 +1129,7 @@ void frame_release_client(ObFrame *self)
     g_hash_table_remove(window_map, &self->rgriptop);
     g_hash_table_remove(window_map, &self->rgripbottom);
 
-    ob_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
+    obt_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
 }
 
 /* is there anything present between us and the label? */
@@ -1651,12 +1650,12 @@ void frame_flash_start(ObFrame *self)
     self->flash_on = self->focused;
 
     if (!self->flashing)
-        ob_main_loop_timeout_add(ob_main_loop,
-                                 G_USEC_PER_SEC * 0.6,
-                                 flash_timeout,
-                                 self,
-                                 g_direct_equal,
-                                 flash_done);
+        obt_main_loop_timeout_add(ob_main_loop,
+                                  G_USEC_PER_SEC * 0.6,
+                                  flash_timeout,
+                                  self,
+                                  g_direct_equal,
+                                  flash_done);
     g_get_current_time(&self->flash_end);
     g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
 
@@ -1815,12 +1814,12 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
     }
 
     if (new_anim) {
-        ob_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
-                                         self, FALSE);
-        ob_main_loop_timeout_add(ob_main_loop,
-                                 FRAME_ANIMATE_ICONIFY_STEP_TIME,
-                                 frame_animate_iconify, self,
-                                 g_direct_equal, NULL);
+        obt_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
+                                          self, FALSE);
+        obt_main_loop_timeout_add(ob_main_loop,
+                                  FRAME_ANIMATE_ICONIFY_STEP_TIME,
+                                  frame_animate_iconify, self,
+                                  g_direct_equal, NULL);
 
         /* do the first step */
         frame_animate_iconify(self);

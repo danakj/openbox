@@ -23,16 +23,15 @@
 
 #include "render/render.h"
 #include "render/theme.h"
+#include "obt/mainloop.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
 
-struct _ObMainLoop;
-
 extern RrInstance *ob_rr_inst;
 extern RrTheme    *ob_rr_theme;
 
-extern struct _ObMainLoop *ob_main_loop;
+extern ObtMainLoop *ob_main_loop;
 
 /*! The X display */
 extern Display *ob_display;

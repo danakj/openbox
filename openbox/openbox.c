@@ -49,7 +49,7 @@
 #include "parser/parse.h"
 #include "render/render.h"
 #include "render/theme.h"
-#include "obt/obt.h"
+#include "obt/display.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -84,10 +84,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
-ObtInstance *obt_inst;
 RrInstance  *ob_rr_inst;
 RrTheme     *ob_rr_theme;
-ObMainLoop  *ob_main_loop;
+ObtMainLoop *ob_main_loop;
 Display     *ob_display;
 gint         ob_screen;
 gboolean     ob_replace_wm = FALSE;
@@ -145,10 +144,9 @@ gint main(gint argc, gchar **argv)
         session_startup(argc, argv);
     }
 
-    obt_inst = obt_instance_new(NULL);
-    if (obt_inst == NULL)
+    ob_display = obt_display_open(NULL);
+    if (ob_display == NULL)
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
-    ob_display = obt_display(obt_inst);
 
     if (remote_control) {
         prop_startup();
@@ -158,20 +156,20 @@ gint main(gint argc, gchar **argv)
          * remote_control = 2 -> restart */
         PROP_MSG(RootWindow(ob_display, ob_screen),
                  ob_control, remote_control, 0, 0, 0);
-        obt_instance_unref(obt_inst);
+        obt_display_close(ob_display);
         exit(EXIT_SUCCESS);
     }
 
-    ob_main_loop = ob_main_loop_new(ob_display);
+    ob_main_loop = obt_main_loop_new(ob_display);
 
     /* set up signal handler */
-    ob_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL, NULL);
-    ob_main_loop_signal_add(ob_main_loop, SIGUSR2, signal_handler, NULL, NULL);
-    ob_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL, NULL);
-    ob_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler, NULL, NULL);
-    ob_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler, NULL, NULL);
-    ob_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL, NULL);
-    ob_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL, NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGUSR2, signal_handler, NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler,  NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler,  NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL,NULL);
 
     ob_screen = DefaultScreen(ob_display);
 
@@ -346,7 +344,7 @@ gint main(gint argc, gchar **argv)
             reconfigure = FALSE;
 
             state = OB_STATE_RUNNING;
-            ob_main_loop_run(ob_main_loop);
+            obt_main_loop_run(ob_main_loop);
             state = OB_STATE_EXITING;
 
             if (!reconfigure) {
@@ -385,7 +383,7 @@ gint main(gint argc, gchar **argv)
 
     session_shutdown(being_replaced);
 
-    obt_instance_unref(obt_inst);
+    obt_display_close(ob_display);
 
     parse_paths_shutdown();
 
@@ -646,14 +644,14 @@ void ob_reconfigure()
 void ob_exit(gint code)
 {
     exitcode = code;
-    ob_main_loop_exit(ob_main_loop);
+    obt_main_loop_exit(ob_main_loop);
 }
 
 void ob_exit_replace()
 {
     exitcode = 0;
     being_replaced = TRUE;
-    ob_main_loop_exit(ob_main_loop);
+    obt_main_loop_exit(ob_main_loop);
 }
 
 Cursor ob_cursor(ObCursor cursor)

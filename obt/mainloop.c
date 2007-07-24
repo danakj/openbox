@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   mainloop.c for the Openbox window manager
+   obt/mainloop.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003-2007   Dana Jansens
 
@@ -17,25 +17,26 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "mainloop.h"
-#include "event.h"
+#include "obt/mainloop.h"
+#include "obt/util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/select.h>
 #include <signal.h>
 
-typedef struct _ObMainLoopTimer             ObMainLoopTimer;
-typedef struct _ObMainLoopSignal            ObMainLoopSignal;
-typedef struct _ObMainLoopSignalHandlerType ObMainLoopSignalHandlerType;
-typedef struct _ObMainLoopXHandlerType      ObMainLoopXHandlerType;
-typedef struct _ObMainLoopFdHandlerType     ObMainLoopFdHandlerType;
+typedef struct _ObtMainLoopTimer             ObtMainLoopTimer;
+typedef struct _ObtMainLoopSignal            ObtMainLoopSignal;
+typedef struct _ObtMainLoopSignalHandlerType ObtMainLoopSignalHandlerType;
+typedef struct _ObtMainLoopXHandlerType      ObtMainLoopXHandlerType;
+typedef struct _ObtMainLoopFdHandlerType     ObtMainLoopFdHandlerType;
 
 /* this should be more than the number of possible signals on any
    architecture... */
 #define NUM_SIGNALS 99
 
-/* all created ObMainLoops. Used by the signal handler to pass along signals */
+/* all created ObtMainLoops. Used by the signal handler to pass along
+   signals */
 static GSList *all_loops;
 
 /* signals are global to all loops */
@@ -64,11 +65,12 @@ static gint core_signals[] =
 #define NUM_CORE_SIGNALS (sizeof(core_signals) / sizeof(core_signals[0]))
 
 static void sighandler(gint sig);
-static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait);
+static void timer_dispatch(ObtMainLoop *loop, GTimeVal **wait);
 static void fd_handler_destroy(gpointer data);
 
-struct _ObMainLoop
+struct _ObtMainLoop
 {
+    gint ref;
     Display *display;
 
     gboolean run;     /* do keep running */
@@ -90,7 +92,7 @@ struct _ObMainLoop
     GSList *signal_handlers[NUM_SIGNALS];
 };
 
-struct _ObMainLoopTimer
+struct _ObtMainLoopTimer
 {
     gulong delay;
     GSourceFunc func;
@@ -110,37 +112,38 @@ struct _ObMainLoopTimer
     gboolean fired;
 };
 
-struct _ObMainLoopSignalHandlerType
+struct _ObtMainLoopSignalHandlerType
 {
-    ObMainLoop *loop;
+    ObtMainLoop *loop;
     gint signal;
     gpointer data;
-    ObMainLoopSignalHandler func;
+    ObtMainLoopSignalHandler func;
     GDestroyNotify destroy;
 };
 
-struct _ObMainLoopXHandlerType
+struct _ObtMainLoopXHandlerType
 {
-    ObMainLoop *loop;
+    ObtMainLoop *loop;
     gpointer data;
-    ObMainLoopXHandler func;
+    ObtMainLoopXHandler func;
     GDestroyNotify destroy;
 };
 
-struct _ObMainLoopFdHandlerType
+struct _ObtMainLoopFdHandlerType
 {
-    ObMainLoop *loop;
+    ObtMainLoop *loop;
     gint fd;
     gpointer data;
-    ObMainLoopFdHandler func;
+    ObtMainLoopFdHandler func;
     GDestroyNotify destroy;
 };
 
-ObMainLoop *ob_main_loop_new(Display *display)
+ObtMainLoop *obt_main_loop_new(Display *display)
 {
-    ObMainLoop *loop;
+    ObtMainLoop *loop;
 
-    loop = g_new0(ObMainLoop, 1);
+    loop = g_new0(ObtMainLoop, 1);
+    loop->ref = 1;
     loop->display = display;
     loop->fd_x = ConnectionNumber(display);
     FD_ZERO(&loop->fd_set);
@@ -185,24 +188,29 @@ ObMainLoop *ob_main_loop_new(Display *display)
     return loop;
 }
 
-void ob_main_loop_destroy(ObMainLoop *loop)
+void obt_main_loop_ref(ObtMainLoop *loop)
+{
+    ++loop->ref;
+}
+
+void obt_main_loop_unref(ObtMainLoop *loop)
 {
     guint i;
     GSList *it, *next;
 
-    if (loop) {
+    if (loop && --loop->ref == 0) {
         g_assert(loop->running == FALSE);
 
         for (it = loop->x_handlers; it; it = next) {
-            ObMainLoopXHandlerType *h = it->data;
+            ObtMainLoopXHandlerType *h = it->data;
             next = g_slist_next(it);
-            ob_main_loop_x_remove(loop, h->func);
+            obt_main_loop_x_remove(loop, h->func);
         }
 
         g_hash_table_destroy(loop->fd_handlers);
 
         for (it = loop->timers; it; it = g_slist_next(it)) {
-            ObMainLoopTimer *t = it->data;
+            ObtMainLoopTimer *t = it->data;
             if (t->destroy) t->destroy(t->data);
             g_free(t);
         }
@@ -211,9 +219,9 @@ void ob_main_loop_destroy(ObMainLoop *loop)
 
         for (i = 0; i < NUM_SIGNALS; ++i)
             for (it = loop->signal_handlers[i]; it; it = next) {
-                ObMainLoopSignalHandlerType *h = it->data;
+                ObtMainLoopSignalHandlerType *h = it->data;
                 next = g_slist_next(it);
-                ob_main_loop_signal_remove(loop, h->func);
+                obt_main_loop_signal_remove(loop, h->func);
             }
 
         all_loops = g_slist_remove(all_loops, loop);
@@ -230,7 +238,7 @@ void ob_main_loop_destroy(ObMainLoop *loop)
             }
         }
 
-        g_free(loop);
+        obt_free0(loop, ObtMainLoop, 1);
     }
 }
 
@@ -238,14 +246,14 @@ static void fd_handle_foreach(gpointer key,
                               gpointer value,
                               gpointer data)
 {
-    ObMainLoopFdHandlerType *h = value;
+    ObtMainLoopFdHandlerType *h = value;
     fd_set *set = data;
 
     if (FD_ISSET(h->fd, set))
         h->func(h->fd, h->data);
 }
 
-void ob_main_loop_run(ObMainLoop *loop)
+void obt_main_loop_run(ObtMainLoop *loop)
 {
     XEvent e;
     struct timeval *wait;
@@ -268,7 +276,7 @@ void ob_main_loop_run(ObMainLoop *loop)
                 while (loop->signals_fired[i]) {
                     for (it = loop->signal_handlers[i];
                             it; it = g_slist_next(it)) {
-                        ObMainLoopSignalHandlerType *h = it->data;
+                        ObtMainLoopSignalHandlerType *h = it->data;
                         h->func(i, h->data);
                     }
                     loop->signals_fired[i]--;
@@ -277,12 +285,12 @@ void ob_main_loop_run(ObMainLoop *loop)
             loop->signal_fired = FALSE;
 
             sigprocmask(SIG_SETMASK, &oldset, NULL);
-        } else if (XPending(loop->display)) {
+        } else if (loop->display && XPending(loop->display)) {
             do {
                 XNextEvent(loop->display, &e);
 
                 for (it = loop->x_handlers; it; it = g_slist_next(it)) {
-                    ObMainLoopXHandlerType *h = it->data;
+                    ObtMainLoopXHandlerType *h = it->data;
                     h->func(&e, h->data);
                 }
             } while (XPending(loop->display) && loop->run);
@@ -312,21 +320,21 @@ void ob_main_loop_run(ObMainLoop *loop)
     loop->running = FALSE;
 }
 
-void ob_main_loop_exit(ObMainLoop *loop)
+void obt_main_loop_exit(ObtMainLoop *loop)
 {
     loop->run = FALSE;
 }
 
 /*** XEVENT WATCHERS ***/
 
-void ob_main_loop_x_add(ObMainLoop *loop,
-                        ObMainLoopXHandler handler,
-                        gpointer data,
-                        GDestroyNotify notify)
+void obt_main_loop_x_add(ObtMainLoop *loop,
+                         ObtMainLoopXHandler handler,
+                         gpointer data,
+                         GDestroyNotify notify)
 {
-    ObMainLoopXHandlerType *h;
+    ObtMainLoopXHandlerType *h;
 
-    h = g_new(ObMainLoopXHandlerType, 1);
+    h = g_new(ObtMainLoopXHandlerType, 1);
     h->loop = loop;
     h->func = handler;
     h->data = data;
@@ -334,13 +342,13 @@ void ob_main_loop_x_add(ObMainLoop *loop,
     loop->x_handlers = g_slist_prepend(loop->x_handlers, h);
 }
 
-void ob_main_loop_x_remove(ObMainLoop *loop,
-                           ObMainLoopXHandler handler)
+void obt_main_loop_x_remove(ObtMainLoop *loop,
+                           ObtMainLoopXHandler handler)
 {
     GSList *it, *next;
 
     for (it = loop->x_handlers; it; it = next) {
-        ObMainLoopXHandlerType *h = it->data;
+        ObtMainLoopXHandlerType *h = it->data;
         next = g_slist_next(it);
         if (h->func == handler) {
             loop->x_handlers = g_slist_delete_link(loop->x_handlers, it);
@@ -372,23 +380,23 @@ static void sighandler(gint sig)
         }
 
     for (it = all_loops; it; it = g_slist_next(it)) {
-        ObMainLoop *loop = it->data;
+        ObtMainLoop *loop = it->data;
         loop->signal_fired = TRUE;
         loop->signals_fired[sig]++;
     }
 }
 
-void ob_main_loop_signal_add(ObMainLoop *loop,
-                             gint signal,
-                             ObMainLoopSignalHandler handler,
-                             gpointer data,
-                             GDestroyNotify notify)
+void obt_main_loop_signal_add(ObtMainLoop *loop,
+                              gint signal,
+                              ObtMainLoopSignalHandler handler,
+                              gpointer data,
+                              GDestroyNotify notify)
 {
-    ObMainLoopSignalHandlerType *h;
+    ObtMainLoopSignalHandlerType *h;
 
     g_return_if_fail(signal < NUM_SIGNALS);
 
-    h = g_new(ObMainLoopSignalHandlerType, 1);
+    h = g_new(ObtMainLoopSignalHandlerType, 1);
     h->loop = loop;
     h->signal = signal;
     h->func = handler;
@@ -412,15 +420,15 @@ void ob_main_loop_signal_add(ObMainLoop *loop,
     all_signals[signal].installed++;
 }
 
-void ob_main_loop_signal_remove(ObMainLoop *loop,
-                                ObMainLoopSignalHandler handler)
+void obt_main_loop_signal_remove(ObtMainLoop *loop,
+                                 ObtMainLoopSignalHandler handler)
 {
     guint i;
     GSList *it, *next;
 
     for (i = 0; i < NUM_SIGNALS; ++i) {
         for (it = loop->signal_handlers[i]; it; it = next) {
-            ObMainLoopSignalHandlerType *h = it->data;
+            ObtMainLoopSignalHandlerType *h = it->data;
 
             next = g_slist_next(it);
 
@@ -447,28 +455,28 @@ void ob_main_loop_signal_remove(ObMainLoop *loop,
 
 static void max_fd_func(gpointer key, gpointer value, gpointer data)
 {
-    ObMainLoop *loop = data;
+    ObtMainLoop *loop = data;
 
     /* key is the fd */
     loop->fd_max = MAX(loop->fd_max, *(gint*)key);
 }
 
-static void calc_max_fd(ObMainLoop *loop)
+static void calc_max_fd(ObtMainLoop *loop)
 {
     loop->fd_max = loop->fd_x;
 
     g_hash_table_foreach(loop->fd_handlers, max_fd_func, loop);
 }
 
-void ob_main_loop_fd_add(ObMainLoop *loop,
-                         gint fd,
-                         ObMainLoopFdHandler handler,
-                         gpointer data,
-                         GDestroyNotify notify)
+void obt_main_loop_fd_add(ObtMainLoop *loop,
+                          gint fd,
+                          ObtMainLoopFdHandler handler,
+                          gpointer data,
+                          GDestroyNotify notify)
 {
-    ObMainLoopFdHandlerType *h;
+    ObtMainLoopFdHandlerType *h;
 
-    h = g_new(ObMainLoopFdHandlerType, 1);
+    h = g_new(ObtMainLoopFdHandlerType, 1);
     h->loop = loop;
     h->fd = fd;
     h->func = handler;
@@ -482,7 +490,7 @@ void ob_main_loop_fd_add(ObMainLoop *loop,
 
 static void fd_handler_destroy(gpointer data)
 {
-    ObMainLoopFdHandlerType *h = data;
+    ObtMainLoopFdHandlerType *h = data;
 
     FD_CLR(h->fd, &h->loop->fd_set);
 
@@ -490,8 +498,8 @@ static void fd_handler_destroy(gpointer data)
         h->destroy(h->data);
 }
 
-void ob_main_loop_fd_remove(ObMainLoop *loop,
-                            gint fd)
+void obt_main_loop_fd_remove(ObtMainLoop *loop,
+                             gint fd)
 {
     g_hash_table_remove(loop->fd_handlers, &fd);
 }
@@ -499,7 +507,7 @@ void ob_main_loop_fd_remove(ObMainLoop *loop,
 /*** TIMEOUTS ***/
 
 #define NEAREST_TIMEOUT(loop) \
-    (((ObMainLoopTimer*)(loop)->timers->data)->timeout)
+    (((ObtMainLoopTimer*)(loop)->timers->data)->timeout)
 
 static glong timecompare(GTimeVal *a, GTimeVal *b)
 {
@@ -508,7 +516,7 @@ static glong timecompare(GTimeVal *a, GTimeVal *b)
     return a->tv_usec - b->tv_usec;
 }
 
-static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
+static void insert_timer(ObtMainLoop *loop, ObtMainLoopTimer *ins)
 {
     GSList *it;
     for (it = loop->timers; it; it = g_slist_next(it)) {
@@ -522,12 +530,12 @@ static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
         loop->timers = g_slist_append(loop->timers, ins);
 }
 
-void ob_main_loop_timeout_add(ObMainLoop *loop,
-                              gulong microseconds,
-                              GSourceFunc handler,
-                              gpointer data,
-                              GEqualFunc cmp,
-                              GDestroyNotify notify)
+void obt_main_loop_timeout_add(ObtMainLoop *loop,
+                               gulong microseconds,
+                               GSourceFunc handler,
+                               gpointer data,
+                               GEqualFunc cmp,
+                               GDestroyNotify notify)
 {
     ObMainLoopTimer *t = g_new(ObMainLoopTimer, 1);
 
@@ -546,25 +554,25 @@ void ob_main_loop_timeout_add(ObMainLoop *loop,
     insert_timer(loop, t);
 }
 
-void ob_main_loop_timeout_remove(ObMainLoop *loop,
-                                 GSourceFunc handler)
+void obt_main_loop_timeout_remove(ObtMainLoop *loop,
+                                  GSourceFunc handler)
 {
     GSList *it;
 
     for (it = loop->timers; it; it = g_slist_next(it)) {
-        ObMainLoopTimer *t = it->data;
+        ObtMainLoopTimer *t = it->data;
         if (t->func == handler)
             t->del_me = TRUE;
     }
 }
 
-void ob_main_loop_timeout_remove_data(ObMainLoop *loop, GSourceFunc handler,
-                                      gpointer data, gboolean cancel_dest)
+void obt_main_loop_timeout_remove_data(ObtMainLoop *loop, GSourceFunc handler,
+                                       gpointer data, gboolean cancel_dest)
 {
     GSList *it;
 
     for (it = loop->timers; it; it = g_slist_next(it)) {
-        ObMainLoopTimer *t = it->data;
+        ObtMainLoopTimer *t = it->data;
         if (t->func == handler && t->equal(t->data, data)) {
             t->del_me = TRUE;
             if (cancel_dest)
@@ -574,7 +582,7 @@ void ob_main_loop_timeout_remove_data(ObMainLoop *loop, GSourceFunc handler,
 }
 
 /* find the time to wait for the nearest timeout */
-static gboolean nearest_timeout_wait(ObMainLoop *loop, GTimeVal *tm)
+static gboolean nearest_timeout_wait(ObtMainLoop *loop, GTimeVal *tm)
 {
   if (loop->timers == NULL)
     return FALSE;
@@ -594,7 +602,7 @@ static gboolean nearest_timeout_wait(ObMainLoop *loop, GTimeVal *tm)
   return TRUE;
 }
 
-static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
+static void timer_dispatch(ObtMainLoop *loop, GTimeVal **wait)
 {
     GSList *it, *next;
 
@@ -603,7 +611,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
     g_get_current_time(&loop->now);
 
     for (it = loop->timers; it; it = next) {
-        ObMainLoopTimer *curr;
+        ObtMainLoopTimer *curr;
 
         next = g_slist_next(it);
 

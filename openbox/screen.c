@@ -1555,7 +1555,9 @@ Rect* screen_physical_area_active()
     Rect *a;
     gint x, y;
 
-    if (focus_client)
+    if (moveresize_client)
+        a = screen_physical_area_monitor(client_monitor(focus_client));
+    else if (focus_client)
         a = screen_physical_area_monitor(client_monitor(focus_client));
     else {
         Rect mon;

@@ -180,7 +180,7 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
         XGrabButton(ob_display, button, state | mask_list[i], win, False, mask,
                     pointer_mode, GrabModeAsync, None, ob_cursor(cur));
     obt_display_ignore_errors(ob_display, FALSE);
-    if (obt_display_error_occured())
+    if (obt_display_error_occured)
         ob_debug("Failed to grab button %d modifiers %d", button, state);
 }
 
@@ -202,7 +202,7 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode)
         XGrabKey(ob_display, keycode, state | mask_list[i], win, FALSE,
                  GrabModeAsync, keyboard_mode);
     obt_display_ignore_errors(ob_display, FALSE);
-    if (obt_display_error_occured())
+    if (obt_display_error_occured)
         ob_debug("Failed to grab keycode %d modifiers %d", keycode, state);
 }
 

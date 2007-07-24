@@ -113,8 +113,12 @@ parser_libobparser_la_SOURCES = \
 ## obt ##
 
 obt_libobt_la_CPPFLAGS = \
+	$(XINERAMA_CFLAGS) \
+	$(XKB_CFLAGS) \
+	$(XRANDR_CFLAGS) \
+	$(XSHAPE_CFLAGS) \
+	$(XSYNC_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	$(XML_CFLAGS) \
 	-DG_LOG_DOMAIN=\"Obt\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DDATADIR=\"$(datadir)\" \
@@ -122,10 +126,13 @@ obt_libobt_la_CPPFLAGS = \
 obt_libobt_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 obt_libobt_la_LIBADD = \
-	$(GLIB_LIBS) \
-	$(XML_LIBS)
+	$(XINERAMA_LIBS) \
+	$(XKB_LIBS) \
+	$(XRANDR_LIBS) \
+	$(XSHAPE_LIBS) \
+	$(XSYNC_LIBS) \
+	$(GLIB_LIBS)
 obt_libobt_la_SOURCES = \
-	obt/obt.h \
 	obt/display.h \
 	obt/display.c \
 	obt/mainloop.h \
@@ -136,11 +143,6 @@ obt_libobt_la_SOURCES = \
 
 openbox_openbox_CPPFLAGS = \
 	$(SM_CFLAGS) \
-	$(XINERAMA_CFLAGS) \
-	$(XKB_CFLAGS) \
-	$(XRANDR_CFLAGS) \
-	$(XSHAPE_CFLAGS) \
-	$(XSYNC_CFLAGS) \
 	$(X_CFLAGS) \
 	$(XCURSOR_CFLAGS) \
 	$(SM_CFLAGS) \
@@ -154,11 +156,6 @@ openbox_openbox_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"Openbox\"
 openbox_openbox_LDADD = \
 	$(SM_LIBS) \
-	$(XINERAMA_LIBS) \
-	$(XKB_LIBS) \
-	$(XRANDR_LIBS) \
-	$(XSHAPE_LIBS) \
-	$(XSYNC_LIBS) \
 	$(GLIB_LIBS) \
 	$(X_LIBS) \
 	$(XCURSOR_LIBS) \
@@ -228,8 +225,6 @@ openbox_openbox_SOURCES = \
 	openbox/dock.h \
 	openbox/event.c \
 	openbox/event.h \
-	openbox/extensions.c \
-	openbox/extensions.h \
 	openbox/focus.c \
 	openbox/focus.h \
 	openbox/focus_cycle.c \
@@ -399,7 +394,6 @@ pubinclude_HEADERS = \
 	render/render.h \
 	render/theme.h \
 	parser/parse.h \
-	obt/obt.h \
 	obt/display.h \
 	obt/mainloop.h \
 	obt/util.h

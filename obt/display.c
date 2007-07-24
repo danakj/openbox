@@ -28,10 +28,22 @@
 #  include <unistd.h>
 #endif
 
+gboolean obt_display_error_occured = FALSE;
+
+gboolean obt_display_extension_xkb       = FALSE;
+gint     obt_display_extension_xkb_basep;
+gboolean obt_display_extension_shape     = FALSE;
+gint     obt_display_extension_shape_basep;
+gboolean obt_display_extension_xinerama  = FALSE;
+gint     obt_display_extension_xinerama_basep;
+gboolean obt_display_extension_randr     = FALSE;
+gint     obt_display_extension_randr_basep;
+gboolean obt_display_extension_sync      = FALSE;
+gint     obt_display_extension_sync_basep;
+
 static gint xerror_handler(Display *d, XErrorEvent *e);
 
 static gboolean xerror_ignore = FALSE;
-static gboolean xerror_occured = FALSE;
 
 Display* obt_display_open(const char *display_name)
 {
@@ -41,9 +53,56 @@ Display* obt_display_open(const char *display_name)
     n = display_name ? g_strdup(display_name) : NULL;
     d = XOpenDisplay(n);
     if (d) {
+        gint junk;
+        (void)junk;
+
         if (fcntl(ConnectionNumber(d), F_SETFD, 1) == -1)
             g_message("Failed to set display as close-on-exec");
         XSetErrorHandler(xerror_handler);
+
+        /* read what extensions are present */
+#ifdef XKB
+        obt_display_extension_xkb =
+            XkbQueryExtension(d, &junk,
+                              &obt_display_extension_xkb_basep, &junk,
+                              NULL, NULL);
+        if (!obt_display_extension_xkb)
+            g_message("XKB extension is not present on the server");
+#endif
+
+#ifdef SHAPE
+        obt_display_extension_shape =
+            XShapeQueryExtension(d, &obt_display_extension_shape_basep,
+                                 &junk);
+        if (!obt_display_extension_shape)
+            g_message("X Shape extension is not present on the server");
+#endif
+
+#ifdef XINERAMA
+        obt_display_extension_xinerama =
+            XineramaQueryExtension(d,
+                                   &obt_display_extension_xinerama_basep,
+                                   &junk) && XineramaIsActive(d);
+        if (!obt_display_extension_xinerama)
+            g_message("Xinerama extension is not present on the server");
+#endif
+
+#ifdef XRANDR
+        obt_display_extension_randr =
+            XRRQueryExtension(d, &obt_display_extension_randr_basep,
+                              &junk);
+        if (!obt_display_extension_randr)
+            g_message("XRandR extension is not present on the server");
+#endif
+
+#ifdef SYNC
+        obt_display_extension_sync =
+            XSyncQueryExtension(d, &obt_display_extension_sync_basep,
+                                &junk) && XSyncInitialize(d, &junk, &junk);
+        if (!obt_display_extension_sync)
+            g_message("X Sync extension is not present on the server or is an "
+                      "incompatible version");
+#endif
     }
     g_free(n);
 
@@ -72,7 +131,7 @@ static gint xerror_handler(Display *d, XErrorEvent *e)
     (void)d; (void)e;
 #endif
 
-    xerror_occured = TRUE;
+    obt_display_error_occured = TRUE;
     return 0;
 }
 
@@ -80,10 +139,5 @@ void obt_display_ignore_errors(Display *d, gboolean ignore)
 {
     XSync(d, FALSE);
     xerror_ignore = ignore;
-    if (ignore) xerror_occured = FALSE;
-}
-
-gboolean obt_display_error_occured()
-{
-    return xerror_occured;
+    if (ignore) obt_display_error_occured = FALSE;
 }

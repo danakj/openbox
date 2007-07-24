@@ -16,20 +16,49 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __obt_instance_h
-#define __obt_instance_h
+#ifndef __obt_display_h
+#define __obt_display_h
 
 #include <X11/Xlib.h>
 #include <glib.h>
 
+#include <X11/Xutil.h> /* shape.h uses Region which is in here */
+#ifdef    XKB
+#include <X11/XKBlib.h>
+#endif
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif
+#ifdef    XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
+#ifdef    XRANDR
+#include <X11/extensions/Xrandr.h>
+#endif
+#ifdef    SYNC
+#include <X11/extensions/sync.h>
+#endif
+
 G_BEGIN_DECLS
+
+extern gboolean obt_display_error_occured;
+
+extern gboolean obt_display_extension_xkb;
+extern gint     obt_display_extension_xkb_basep;
+extern gboolean obt_display_extension_shape;
+extern gint     obt_display_extension_shape_basep;
+extern gboolean obt_display_extension_xinerama;
+extern gint     obt_display_extension_xinerama_basep;
+extern gboolean obt_display_extension_randr;
+extern gint     obt_display_extension_randr_basep;
+extern gboolean obt_display_extension_sync;
+extern gint     obt_display_extension_sync_basep;
 
 Display* obt_display_open(const char *display_name);
 void     obt_display_close(Display *d);
 
 void     obt_display_ignore_errors(Display *d, gboolean ignore);
-gboolean obt_display_error_occured();
 
 G_END_DECLS
 
-#endif /*__obt_instance_h*/
+#endif /*__obt_display_h*/

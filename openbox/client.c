@@ -26,7 +26,6 @@
 #include "ping.h"
 #include "place.h"
 #include "prop.h"
-#include "extensions.h"
 #include "frame.h"
 #include "session.h"
 #include "event.h"
@@ -1262,7 +1261,7 @@ static void client_get_shaped(ObClient *self)
 {
     self->shaped = FALSE;
 #ifdef   SHAPE
-    if (extensions_shape) {
+    if (obt_display_extension_shape) {
         gint foo;
         guint ufoo;
         gint s;
@@ -3639,8 +3638,8 @@ gboolean client_focus(ObClient *self)
     obt_display_ignore_errors(ob_display, FALSE);
 
     ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n",
-                  obt_display_error_occured());
-    return !obt_display_error_occured();
+                  obt_display_error_occured);
+    return !obt_display_error_occured;
 }
 
 static void client_present(ObClient *self, gboolean here, gboolean raise,

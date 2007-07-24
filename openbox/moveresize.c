@@ -31,9 +31,9 @@
 #include "config.h"
 #include "event.h"
 #include "debug.h"
-#include "extensions.h"
 #include "render/render.h"
 #include "render/theme.h"
+#include "obt/display.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -250,7 +250,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     moveresize_in_progress = TRUE;
 
 #ifdef SYNC
-    if (config_resize_redraw && !moving && extensions_sync &&
+    if (config_resize_redraw && !moving && obt_display_extension_sync &&
         moveresize_client->sync_request && moveresize_client->sync_counter)
     {
         /* Initialize values for the resize syncing, and create an alarm for
@@ -365,7 +365,7 @@ static void do_resize(void)
     }
 
 #ifdef SYNC
-    if (config_resize_redraw && extensions_sync &&
+    if (config_resize_redraw && obt_display_extension_sync &&
         moveresize_client->sync_request && moveresize_client->sync_counter)
     {
         XEvent ce;
@@ -923,7 +923,7 @@ gboolean moveresize_event(XEvent *e)
         }
     }
 #ifdef SYNC
-    else if (e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+    else if (e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
     {
         waiting_for_sync = FALSE; /* we got our sync... */
         do_resize(); /* ...so try resize if there is more change pending */

@@ -37,7 +37,6 @@
 #include "frame.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "extensions.h"
 #include "menuframe.h"
 #include "grab.h"
 #include "group.h"
@@ -207,9 +206,7 @@ gint main(gint argc, gchar **argv)
     cursors[OB_CURSOR_NORTHWEST] = load_cursor("top_left_corner",
                                                XC_top_left_corner);
 
-
     prop_startup(); /* get atoms values for the display */
-    extensions_query_all(); /* find which extensions are present */
 
     if (screen_annex()) { /* it will be ours! */
         do {

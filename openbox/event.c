@@ -39,7 +39,6 @@
 #include "moveresize.h"
 #include "group.h"
 #include "stacking.h"
-#include "extensions.h"
 #include "translate.h"
 #include "ping.h"
 #include "obt/display.h"
@@ -180,7 +179,9 @@ static Window event_get_window(XEvent *e)
         break;
     default:
 #ifdef XKB
-        if (extensions_xkb && e->type == extensions_xkb_event_basep) {
+        if (obt_display_extension_xkb &&
+            e->type == obt_display_extension_xkb_basep)
+        {
             switch (((XkbAnyEvent*)e)->xkb_type) {
             case XkbBellNotify:
                 window = ((XkbBellNotifyEvent*)e)->window;
@@ -190,8 +191,8 @@ static Window event_get_window(XEvent *e)
         } else
 #endif
 #ifdef SYNC
-        if (extensions_sync &&
-            e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+        if (obt_display_extension_sync &&
+            e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
         {
             window = None;
         } else
@@ -229,8 +230,8 @@ static void event_set_curtime(XEvent *e)
         break;
     default:
 #ifdef SYNC
-        if (extensions_sync &&
-            e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+        if (obt_display_extension_sync &&
+            e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
         {
             t = ((XSyncAlarmNotifyEvent*)e)->time;
         }
@@ -690,8 +691,8 @@ static void event_process(const XEvent *ec, gpointer data)
         obt_display_ignore_errors(ob_display, FALSE);
     }
 #ifdef SYNC
-    else if (extensions_sync &&
-        e->type == extensions_sync_event_basep + XSyncAlarmNotify)
+    else if (obt_display_extension_sync &&
+             e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
     {
         XSyncAlarmNotifyEvent *se = (XSyncAlarmNotifyEvent*)e;
         if (se->alarm == moveresize_alarm && moveresize_in_progress)
@@ -1585,7 +1586,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
     default:
         ;
 #ifdef SHAPE
-        if (extensions_shape && e->type == extensions_shape_event_basep) {
+        if (obt_display_extension_shape &&
+            e->type == obt_display_extension_shape_basep)
+        {
             client->shaped = ((XShapeEvent*)e)->shaped;
             frame_adjust_shape(client->frame);
         }

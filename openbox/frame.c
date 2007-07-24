@@ -20,7 +20,6 @@
 #include "frame.h"
 #include "client.h"
 #include "openbox.h"
-#include "extensions.h"
 #include "prop.h"
 #include "grab.h"
 #include "config.h"
@@ -30,6 +29,7 @@
 #include "moveresize.h"
 #include "screen.h"
 #include "render/theme.h"
+#include "obt/display.h"
 
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask | \

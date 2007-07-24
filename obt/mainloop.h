@@ -23,6 +23,8 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 typedef struct _ObtMainLoop ObtMainLoop;
 
 ObtMainLoop *obt_main_loop_new(Display *display);
@@ -73,5 +75,7 @@ void obt_main_loop_timeout_remove_data(ObtMainLoop *loop,
 
 void obt_main_loop_run(ObtMainLoop *loop);
 void obt_main_loop_exit(ObtMainLoop *loop);
+
+G_END_DECLS
 
 #endif

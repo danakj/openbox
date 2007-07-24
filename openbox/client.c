@@ -3978,25 +3978,25 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 
     switch(dir) {
     case OB_DIRECTION_NORTH:
-        if (my_head >= RECT_TOP(*mon))
+        if (my_head >= RECT_TOP(*mon) + 1)
             edge = RECT_TOP(*mon) - 1;
         else
             edge = RECT_TOP(*a) - 1;
         break;
     case OB_DIRECTION_SOUTH:
-        if (my_head <= RECT_BOTTOM(*mon))
+        if (my_head <= RECT_BOTTOM(*mon) - 1)
             edge = RECT_BOTTOM(*mon) + 1;
         else
             edge = RECT_BOTTOM(*a) + 1;
         break;
     case OB_DIRECTION_EAST:
-        if (my_head <= RECT_RIGHT(*mon))
+        if (my_head <= RECT_RIGHT(*mon) - 1)
             edge = RECT_RIGHT(*mon) + 1;
         else
             edge = RECT_RIGHT(*a) + 1;
         break;
     case OB_DIRECTION_WEST:
-        if (my_head >= RECT_LEFT(*mon))
+        if (my_head >= RECT_LEFT(*mon) + 1)
             edge = RECT_LEFT(*mon) - 1;
         else
             edge = RECT_LEFT(*a) - 1;

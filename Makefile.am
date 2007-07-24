@@ -286,10 +286,7 @@ openbox_openbox_SOURCES = \
 	openbox/translate.c \
 	openbox/translate.h \
 	openbox/window.c \
-	openbox/window.h \
-	openbox/xerror.c \
-	openbox/xerror.h
-
+	openbox/window.h
 
 ## gnome-panel-control ##
 

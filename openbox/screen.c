@@ -20,7 +20,6 @@
 #include "debug.h"
 #include "openbox.h"
 #include "dock.h"
-#include "xerror.h"
 #include "prop.h"
 #include "grab.h"
 #include "startupnotify.h"
@@ -37,6 +36,7 @@
 #include "extensions.h"
 #include "render/render.h"
 #include "gettext.h"
+#include "obt/display.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -103,15 +103,14 @@ static gboolean replace_wm(void)
                       ob_screen);
             return FALSE;
         }
-        xerror_set_ignore(TRUE);
-        xerror_occured = FALSE;
+        obt_display_ignore_errors(ob_display, TRUE);
 
         /* We want to find out when the current selection owner dies */
         XSelectInput(ob_display, current_wm_sn_owner, StructureNotifyMask);
         XSync(ob_display, FALSE);
 
-        xerror_set_ignore(FALSE);
-        if (xerror_occured)
+        obt_display_ignore_errors(ob_display, FALSE);
+        if (obt_display_error_occured())
             current_wm_sn_owner = None;
     }
 
@@ -181,12 +180,11 @@ gboolean screen_annex(void)
         return FALSE;
     }
 
-    xerror_set_ignore(TRUE);
-    xerror_occured = FALSE;
+    obt_display_ignore_errors(ob_display, TRUE);
     XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
                  ROOT_EVENTMASK);
-    xerror_set_ignore(FALSE);
-    if (xerror_occured) {
+    obt_display_ignore_errors(ob_display, FALSE);
+    if (obt_display_error_occured()) {
         g_message(_("A window manager is already running on screen %d"),
                   ob_screen);
 
@@ -1246,12 +1244,12 @@ void screen_install_colormap(ObClient *client, gboolean install)
         else
             XUninstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
     } else {
-        xerror_set_ignore(TRUE);
+        obt_display_ignore_errors(ob_display, TRUE);
         if (install)
             XInstallColormap(RrDisplay(ob_rr_inst), client->colormap);
         else
             XUninstallColormap(RrDisplay(ob_rr_inst), client->colormap);
-        xerror_set_ignore(FALSE);
+        obt_display_ignore_errors(ob_display, FALSE);
     }
 }
 

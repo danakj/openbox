@@ -21,7 +21,6 @@
 #include "debug.h"
 #include "startupnotify.h"
 #include "dock.h"
-#include "xerror.h"
 #include "screen.h"
 #include "moveresize.h"
 #include "ping.h"
@@ -42,6 +41,7 @@
 #include "mouse.h"
 #include "render/render.h"
 #include "gettext.h"
+#include "obt/display.h"
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
@@ -2124,7 +2124,7 @@ void client_update_icons(ObClient *self)
             if (hints->flags & IconPixmapHint) {
                 self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
-                xerror_set_ignore(TRUE);
+                obt_display_ignore_errors(ob_display, TRUE);
                 if (!RrPixmapToRGBA(ob_rr_inst,
                                     hints->icon_pixmap,
                                     (hints->flags & IconMaskHint ?
@@ -2136,7 +2136,7 @@ void client_update_icons(ObClient *self)
                     g_free(self->icons);
                     self->nicons = 0;
                 }
-                xerror_set_ignore(FALSE);
+                obt_display_ignore_errors(ob_display, FALSE);
             }
             XFree(hints);
         }
@@ -3612,8 +3612,7 @@ gboolean client_focus(ObClient *self)
     */
     event_cancel_all_key_grabs();
 
-    xerror_set_ignore(TRUE);
-    xerror_occured = FALSE;
+    obt_display_ignore_errors(ob_display, TRUE);
 
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
@@ -3637,10 +3636,11 @@ gboolean client_focus(ObClient *self)
         XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    xerror_set_ignore(FALSE);
+    obt_display_ignore_errors(ob_display, FALSE);
 
-    ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n", xerror_occured);
-    return !xerror_occured;
+    ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n",
+                  obt_display_error_occured());
+    return !obt_display_error_occured();
 }
 
 static void client_present(ObClient *self, gboolean here, gboolean raise,

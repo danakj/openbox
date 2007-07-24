@@ -25,7 +25,6 @@
 #include "event.h"
 #include "menu.h"
 #include "client.h"
-#include "xerror.h"
 #include "prop.h"
 #include "screen.h"
 #include "actions.h"
@@ -184,9 +183,6 @@ gint main(gint argc, gchar **argv)
         g_message(_("X server does not support locale."));
     if (!XSetLocaleModifiers(""))
         g_message(_("Cannot set locale modifiers for the X server."));
-
-    /* set our error handler */
-    XSetErrorHandler(xerror_handler);
 
     /* set the DISPLAY environment variable for any lauched children, to the
        display we're using, so they open in the right place. */

@@ -19,7 +19,6 @@
 
 #include "openbox.h"
 #include "config.h"
-#include "xerror.h"
 #include "actions.h"
 #include "event.h"
 #include "client.h"
@@ -29,6 +28,7 @@
 #include "translate.h"
 #include "mouse.h"
 #include "gettext.h"
+#include "obt/display.h"
 
 #include <glib.h>
 
@@ -257,10 +257,10 @@ void mouse_event(ObClient *client, XEvent *e)
             Window wjunk;
             guint ujunk, b, w, h;
             /* this can cause errors to occur when the window closes */
-            xerror_set_ignore(TRUE);
+            obt_display_ignore_errors(ob_display, TRUE);
             junk1 = XGetGeometry(ob_display, e->xbutton.window,
                                  &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
-            xerror_set_ignore(FALSE);
+            obt_display_ignore_errors(ob_display, FALSE);
             if (junk1) {
                 if (e->xbutton.x >= (signed)-b &&
                     e->xbutton.y >= (signed)-b &&

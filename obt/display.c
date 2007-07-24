@@ -17,7 +17,6 @@
 */
 
 #include "obt/display.h"
-#include "obt/util.h"
 
 #ifdef HAVE_STRING_H
 #  include <string.h>
@@ -29,6 +28,11 @@
 #  include <unistd.h>
 #endif
 
+static gint xerror_handler(Display *d, XErrorEvent *e);
+
+static gboolean xerror_ignore = FALSE;
+static gboolean xerror_occured = FALSE;
+
 Display* obt_display_open(const char *display_name)
 {
     gchar *n;
@@ -39,6 +43,7 @@ Display* obt_display_open(const char *display_name)
     if (d) {
         if (fcntl(ConnectionNumber(d), F_SETFD, 1) == -1)
             g_message("Failed to set display as close-on-exec");
+        XSetErrorHandler(xerror_handler);
     }
     g_free(n);
 
@@ -48,4 +53,37 @@ Display* obt_display_open(const char *display_name)
 void obt_display_close(Display *d)
 {
     if (d) XCloseDisplay(d);
+}
+
+static gint xerror_handler(Display *d, XErrorEvent *e)
+{
+#ifdef DEBUG
+    gchar errtxt[128];
+
+    XGetErrorText(d, e->error_code, errtxt, 127);
+    if (!xerror_ignore) {
+        if (e->error_code == BadWindow)
+            /*g_message(_("X Error: %s\n"), errtxt)*/;
+        else
+            g_error("X Error: %s", errtxt);
+    } else
+        g_message("XError code %d '%s'", e->error_code, errtxt);
+#else
+    (void)d; (void)e;
+#endif
+
+    xerror_occured = TRUE;
+    return 0;
+}
+
+void obt_display_ignore_errors(Display *d, gboolean ignore)
+{
+    XSync(d, FALSE);
+    xerror_ignore = ignore;
+    if (ignore) xerror_occured = FALSE;
+}
+
+gboolean obt_display_error_occured()
+{
+    return xerror_occured;
 }

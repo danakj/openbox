@@ -27,6 +27,9 @@ G_BEGIN_DECLS
 Display* obt_display_open(const char *display_name);
 void     obt_display_close(Display *d);
 
+void     obt_display_ignore_errors(Display *d, gboolean ignore);
+gboolean obt_display_error_occured();
+
 G_END_DECLS
 
 #endif /*__obt_instance_h*/

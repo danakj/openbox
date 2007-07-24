@@ -24,7 +24,6 @@
 #include "dock.h"
 #include "actions.h"
 #include "client.h"
-#include "xerror.h"
 #include "prop.h"
 #include "config.h"
 #include "screen.h"
@@ -43,6 +42,7 @@
 #include "extensions.h"
 #include "translate.h"
 #include "ping.h"
+#include "obt/display.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -594,7 +594,7 @@ static void event_process(const XEvent *ec, gpointer data)
             Window win, root;
             gint i;
             guint u;
-            xerror_set_ignore(TRUE);
+            obt_display_ignore_errors(ob_display, TRUE);
             if (XGetInputFocus(ob_display, &win, &i) != 0 &&
                 XGetGeometry(ob_display, win, &root, &i,&i,&u,&u,&u,&u) != 0 &&
                 root != RootWindow(ob_display, ob_screen))
@@ -606,7 +606,7 @@ static void event_process(const XEvent *ec, gpointer data)
             else
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to a black hole !\n");
-            xerror_set_ignore(FALSE);
+            obt_display_ignore_errors(ob_display, FALSE);
             /* nothing is focused */
             focus_set_client(NULL);
         } else {
@@ -684,10 +684,10 @@ static void event_process(const XEvent *ec, gpointer data)
 
         /* we are not to be held responsible if someone sends us an
            invalid request! */
-        xerror_set_ignore(TRUE);
+        obt_display_ignore_errors(ob_display, TRUE);
         XConfigureWindow(ob_display, window,
                          e->xconfigurerequest.value_mask, &xwc);
-        xerror_set_ignore(FALSE);
+        obt_display_ignore_errors(ob_display, FALSE);
     }
 #ifdef SYNC
     else if (extensions_sync &&

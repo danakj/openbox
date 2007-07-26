@@ -63,7 +63,7 @@ render_libobrender_la_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 render_libobrender_la_LIBADD = \
 	parser/libobparser.la \
 	$(X_LIBS) \
@@ -102,7 +102,7 @@ parser_libobparser_la_CPPFLAGS = \
 	-DDATADIR=\"$(datadir)\" \
 	-DCONFIGDIR=\"$(configdir)\"
 parser_libobparser_la_LDFLAGS = \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 parser_libobparser_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(XML_LIBS) 
@@ -124,7 +124,7 @@ obt_libobt_la_CPPFLAGS = \
 	-DDATADIR=\"$(datadir)\" \
 	-DCONFIGDIR=\"$(configdir)\"
 obt_libobt_la_LDFLAGS = \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+	-version-info $(OBT_CURRENT):$(OBT_REVISION):$(OBT_AGE)
 obt_libobt_la_LIBADD = \
 	$(XINERAMA_LIBS) \
 	$(XKB_LIBS) \
@@ -402,8 +402,8 @@ nodist_pubinclude_HEADERS = \
 	version.h
 
 nodist_pkgconfig_DATA = \
-	render/obrender-3.0.pc \
-	parser/obparser-3.0.pc \
+	render/obrender-4.0.pc \
+	parser/obparser-4.0.pc \
 	obt/obt-4.0.pc
 
 ## data ##
@@ -463,8 +463,8 @@ dist_noinst_DATA = \
 	doc/openbox-gnome-session.1.in \
 	doc/openbox-kde-session.1.sgml \
 	doc/openbox-kde-session.1.in \
-	render/obrender-3.0.pc.in \
-	parser/obparser-3.0.pc.in \
+	render/obrender-4.0.pc.in \
+	parser/obparser-4.0.pc.in \
 	obt/obt-4.0.pc.in \
 	tools/themeupdate/themeupdate.py \
 	tests/hideshow.py \

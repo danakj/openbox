@@ -972,9 +972,13 @@ void frame_grab_client(ObFrame *self)
       this occurs from a MapRequest. However, in the case where Openbox is
       starting up, the window is already mapped, so we'll see an unmap event
       for it.
+
+      We also have to ignore a second UnmapNotify because we have
+      selected for SubstructureNotify on root.  For whatever good reason, this
+      means we get 2 UnmapNotify events.
     */
     if (ob_state() == OB_STATE_STARTING)
-        ++self->client->ignore_unmaps;
+        self->client->ignore_unmaps += 2;
 
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */

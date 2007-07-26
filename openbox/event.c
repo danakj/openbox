@@ -1234,10 +1234,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     }
     case UnmapNotify:
+        /* Don't care about the frame window unmapping */
+        if (e->xunmap.window != client->window) break;
+
+        /*
         ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
                  "ignores left %d",
                  client->window, e->xunmap.event, e->xunmap.from_configure,
                  client->ignore_unmaps);
+        */
         if (client->ignore_unmaps) {
             client->ignore_unmaps--;
             break;

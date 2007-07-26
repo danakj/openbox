@@ -48,7 +48,8 @@
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
                         EnterWindowMask | LeaveWindowMask | \
                         SubstructureRedirectMask | FocusChangeMask | \
-                        ButtonPressMask | ButtonReleaseMask)
+                        ButtonPressMask | ButtonReleaseMask | \
+                        SubstructureNotifyMask)
 
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm(void);

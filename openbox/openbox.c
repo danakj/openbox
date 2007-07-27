@@ -142,9 +142,9 @@ gint main(gint argc, gchar **argv)
         session_startup(argc, argv);
     }
 
-    ob_display = obt_display_open(NULL);
-    if (ob_display == NULL)
+    if (!obt_display_open(NULL))
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
+    ob_display = obt_display;
 
     if (remote_control) {
         prop_startup();

@@ -595,7 +595,7 @@ static void event_process(const XEvent *ec, gpointer data)
             Window win, root;
             gint i;
             guint u;
-            obt_display_ignore_errors(ob_display, TRUE);
+            obt_display_ignore_errors(TRUE);
             if (XGetInputFocus(ob_display, &win, &i) != 0 &&
                 XGetGeometry(ob_display, win, &root, &i,&i,&u,&u,&u,&u) != 0 &&
                 root != RootWindow(ob_display, ob_screen))
@@ -607,7 +607,7 @@ static void event_process(const XEvent *ec, gpointer data)
             else
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to a black hole !\n");
-            obt_display_ignore_errors(ob_display, FALSE);
+            obt_display_ignore_errors(FALSE);
             /* nothing is focused */
             focus_set_client(NULL);
         } else {
@@ -685,10 +685,10 @@ static void event_process(const XEvent *ec, gpointer data)
 
         /* we are not to be held responsible if someone sends us an
            invalid request! */
-        obt_display_ignore_errors(ob_display, TRUE);
+        obt_display_ignore_errors(TRUE);
         XConfigureWindow(ob_display, window,
                          e->xconfigurerequest.value_mask, &xwc);
-        obt_display_ignore_errors(ob_display, FALSE);
+        obt_display_ignore_errors(FALSE);
     }
 #ifdef SYNC
     else if (obt_display_extension_sync &&

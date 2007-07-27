@@ -102,13 +102,13 @@ static gboolean replace_wm(void)
                       ob_screen);
             return FALSE;
         }
-        obt_display_ignore_errors(ob_display, TRUE);
+        obt_display_ignore_errors(TRUE);
 
         /* We want to find out when the current selection owner dies */
         XSelectInput(ob_display, current_wm_sn_owner, StructureNotifyMask);
         XSync(ob_display, FALSE);
 
-        obt_display_ignore_errors(ob_display, FALSE);
+        obt_display_ignore_errors(FALSE);
         if (obt_display_error_occured)
             current_wm_sn_owner = None;
     }
@@ -179,10 +179,10 @@ gboolean screen_annex(void)
         return FALSE;
     }
 
-    obt_display_ignore_errors(ob_display, TRUE);
+    obt_display_ignore_errors(TRUE);
     XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
                  ROOT_EVENTMASK);
-    obt_display_ignore_errors(ob_display, FALSE);
+    obt_display_ignore_errors(FALSE);
     if (obt_display_error_occured) {
         g_message(_("A window manager is already running on screen %d"),
                   ob_screen);
@@ -1239,16 +1239,16 @@ void screen_install_colormap(ObClient *client, gboolean install)
 {
     if (client == NULL || client->colormap == None) {
         if (install)
-            XInstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
+            XInstallColormap(ob_display, RrColormap(ob_rr_inst));
         else
-            XUninstallColormap(RrDisplay(ob_rr_inst), RrColormap(ob_rr_inst));
+            XUninstallColormap(ob_display, RrColormap(ob_rr_inst));
     } else {
-        obt_display_ignore_errors(ob_display, TRUE);
+        obt_display_ignore_errors(TRUE);
         if (install)
-            XInstallColormap(RrDisplay(ob_rr_inst), client->colormap);
+            XInstallColormap(ob_display, client->colormap);
         else
-            XUninstallColormap(RrDisplay(ob_rr_inst), client->colormap);
-        obt_display_ignore_errors(ob_display, FALSE);
+            XUninstallColormap(ob_display, client->colormap);
+        obt_display_ignore_errors(FALSE);
     }
 }
 

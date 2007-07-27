@@ -17,6 +17,7 @@
 */
 
 #include "obt/display.h"
+#include "obt/prop.h"
 
 #ifdef HAVE_STRING_H
 #  include <string.h>
@@ -27,6 +28,8 @@
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
+
+Display* obt_display = NULL;
 
 gboolean obt_display_error_occured = FALSE;
 
@@ -45,13 +48,13 @@ static gint xerror_handler(Display *d, XErrorEvent *e);
 
 static gboolean xerror_ignore = FALSE;
 
-Display* obt_display_open(const char *display_name)
+gboolean obt_display_open(const char *display_name)
 {
     gchar *n;
     Display *d = NULL;
 
     n = display_name ? g_strdup(display_name) : NULL;
-    d = XOpenDisplay(n);
+    obt_display = d = XOpenDisplay(n);
     if (d) {
         gint junk;
         (void)junk;
@@ -103,15 +106,17 @@ Display* obt_display_open(const char *display_name)
             g_message("X Sync extension is not present on the server or is an "
                       "incompatible version");
 #endif
+
+        obt_prop_startup();
     }
     g_free(n);
 
-    return d;
+    return obt_display != NULL;
 }
 
-void obt_display_close(Display *d)
+void obt_display_close()
 {
-    if (d) XCloseDisplay(d);
+    if (obt_display) XCloseDisplay(obt_display);
 }
 
 static gint xerror_handler(Display *d, XErrorEvent *e)
@@ -135,9 +140,9 @@ static gint xerror_handler(Display *d, XErrorEvent *e)
     return 0;
 }
 
-void obt_display_ignore_errors(Display *d, gboolean ignore)
+void obt_display_ignore_errors(gboolean ignore)
 {
-    XSync(d, FALSE);
+    XSync(obt_display, FALSE);
     xerror_ignore = ignore;
     if (ignore) obt_display_error_occured = FALSE;
 }

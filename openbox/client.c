@@ -2123,7 +2123,7 @@ void client_update_icons(ObClient *self)
             if (hints->flags & IconPixmapHint) {
                 self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
-                obt_display_ignore_errors(ob_display, TRUE);
+                obt_display_ignore_errors(TRUE);
                 if (!RrPixmapToRGBA(ob_rr_inst,
                                     hints->icon_pixmap,
                                     (hints->flags & IconMaskHint ?
@@ -2135,7 +2135,7 @@ void client_update_icons(ObClient *self)
                     g_free(self->icons);
                     self->nicons = 0;
                 }
-                obt_display_ignore_errors(ob_display, FALSE);
+                obt_display_ignore_errors(FALSE);
             }
             XFree(hints);
         }
@@ -3611,7 +3611,7 @@ gboolean client_focus(ObClient *self)
     */
     event_cancel_all_key_grabs();
 
-    obt_display_ignore_errors(ob_display, TRUE);
+    obt_display_ignore_errors(TRUE);
 
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
@@ -3635,7 +3635,7 @@ gboolean client_focus(ObClient *self)
         XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    obt_display_ignore_errors(ob_display, FALSE);
+    obt_display_ignore_errors(FALSE);
 
     ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n",
                   obt_display_error_occured);

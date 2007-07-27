@@ -137,6 +137,8 @@ obt_libobt_la_SOURCES = \
 	obt/display.c \
 	obt/mainloop.h \
 	obt/mainloop.c \
+	obt/prop.h \
+	obt/prop.c \
 	obt/util.h
 
 ## openbox ##

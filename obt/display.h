@@ -54,10 +54,12 @@ extern gint     obt_display_extension_randr_basep;
 extern gboolean obt_display_extension_sync;
 extern gint     obt_display_extension_sync_basep;
 
-Display* obt_display_open(const char *display_name);
-void     obt_display_close(Display *d);
+extern Display* obt_display;
 
-void     obt_display_ignore_errors(Display *d, gboolean ignore);
+gboolean obt_display_open(const char *display_name);
+void     obt_display_close();
+
+void     obt_display_ignore_errors(gboolean ignore);
 
 G_END_DECLS
 

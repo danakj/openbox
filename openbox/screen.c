@@ -385,7 +385,7 @@ void screen_startup(gboolean reconfig)
 
         /* set the root window property */
         OBT_PROP_SETSS(RootWindow(obt_display, ob_screen),
-                       NET_DESKTOP_NAMES, utf8, names);
+                       NET_DESKTOP_NAMES, utf8, (const gchar**)names);
 
         g_strfreev(names);
     }
@@ -1162,7 +1162,7 @@ void screen_update_desktop_names(void)
         /* if we changed any names, then set the root property so we can
            all agree on the names */
         OBT_PROP_SETSS(RootWindow(obt_display, ob_screen), NET_DESKTOP_NAMES,
-                       utf8, screen_desktop_names);
+                       utf8, (const gchar**)screen_desktop_names);
     }
 
     /* resize the pager for these names */

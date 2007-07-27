@@ -414,7 +414,7 @@ void obt_prop_set_string_locale(Window win, Atom prop, const gchar *val)
     obt_prop_set_strings_locale(win, prop, s);
 }
 
-void obt_prop_set_strings_locale(Window win, Atom prop, gchar const **strs)
+void obt_prop_set_strings_locale(Window win, Atom prop, const gchar **strs)
 {
     gint i, count;
     gchar **lstrs;
@@ -444,7 +444,7 @@ void obt_prop_set_string_utf8(Window win, Atom prop, const gchar *val)
                     PropModeReplace, (const guchar*)val, strlen(val));
 }
 
-void obt_prop_set_strings_utf8(Window win, Atom prop, gchar const **strs)
+void obt_prop_set_strings_utf8(Window win, Atom prop, const gchar **strs)
 {
     GString *str;
     gchar const **s;

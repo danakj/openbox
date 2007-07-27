@@ -225,8 +225,12 @@ gboolean obt_prop_get_strings_utf8(Window win, Atom prop, gchar ***ret);
 void obt_prop_set32(Window win, Atom prop, Atom type, gulong val);
 void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                           guint num);
+void obt_prop_set_string_locale(Window win, Atom prop, const gchar *val);
 void obt_prop_set_string_utf8(Window win, Atom prop, const gchar *val);
-void obt_prop_set_strings_utf8(Window win, Atom prop, gchar **strs);
+void obt_prop_set_strings_locale(Window win, Atom prop,
+                                 const gchar **strs);
+void obt_prop_set_strings_utf8(Window win, Atom prop,
+                               const gchar **strs);
 
 void obt_prop_erase(Window win, Atom prop);
 
@@ -254,10 +258,10 @@ void obt_prop_message_to(Window to, Window about, Atom messagetype,
 #define OBT_PROP_SETA32(win, prop, type, val, num) \
     (obt_prop_set_array32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), \
                           val, num))
-#define OBT_PROP_SETS(win, prop, val) \
-    (obt_prop_set_string_utf8(win, OBT_PROP_ATOM(prop), val))
-#define OBT_PROP_SETSS(win, prop, strs) \
-    (obt_prop_set_strings_utf8(win, OBT_PROP_ATOM(prop), strs))
+#define OBT_PROP_SETS(win, prop, type, val) \
+    (obt_prop_set_string_##type(win, OBT_PROP_ATOM(prop), val))
+#define OBT_PROP_SETSS(win, prop, type, strs) \
+    (obt_prop_set_strings_##type(win, OBT_PROP_ATOM(prop), strs))
 
 #define OBT_PROP_ERASE(win, prop) (obt_prop_erase(win, OBT_PROP_ATOM(prop)))
 

@@ -262,7 +262,7 @@ gint main(gint argc, gchar **argv)
                     ob_exit_with_error(_("Unable to load a theme."));
 
                 OBT_PROP_SETS(RootWindow(obt_display, ob_screen),
-                              OB_THEME, ob_rr_theme->name);
+                              OB_THEME, utf8, ob_rr_theme->name);
             }
 
             if (reconfigure) {

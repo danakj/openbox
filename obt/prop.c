@@ -318,7 +318,7 @@ gboolean obt_prop_get_strings_locale(Window win, Atom prop, gchar ***ret)
     gchar *raw, *p;
     guint num, i, count = 0;
 
-    if (get_all(win, prop, obt_prop_atom(OBT_PROP_STRING), 8,
+    if (get_all(win, prop, OBT_PROP_ATOM(STRING), 8,
                 (guchar**)&raw, &num))
     {
         p = raw;
@@ -350,7 +350,7 @@ gboolean obt_prop_get_string_utf8(Window win, Atom prop, gchar **ret)
     gchar *str;
     guint num;
 
-    if (get_all(win, prop, obt_prop_atom(OBT_PROP_UTF8), 8,
+    if (get_all(win, prop, OBT_PROP_ATOM(UTF8), 8,
                 (guchar**)&raw, &num))
     {
         str = g_strndup(raw, num); /* grab the first string from the list */
@@ -370,7 +370,7 @@ gboolean obt_prop_get_strings_utf8(Window win, Atom prop, gchar ***ret)
     gchar *raw, *p;
     guint num, i, count = 0;
 
-    if (get_all(win, prop, obt_prop_atom(OBT_PROP_UTF8), 8,
+    if (get_all(win, prop, OBT_PROP_ATOM(UTF8), 8,
                 (guchar**)&raw, &num))
     {
         p = raw;
@@ -408,16 +408,47 @@ void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                     (guchar*)val, num);
 }
 
+void obt_prop_set_string_locale(Window win, Atom prop, const gchar *val)
+{
+    const gchar *s[2] = { val, NULL };
+    obt_prop_set_strings_locale(win, prop, s);
+}
+
+void obt_prop_set_strings_locale(Window win, Atom prop,
+                                 const gchar **strs)
+{
+    gint i, count;
+    gchar **lstrs;
+    XTextProperty tprop;
+
+    /* count the strings in strs, and convert them to the locale format */
+    for (count = 0; strs[count]; ++count);
+    lstrs = g_new0(char*, count);
+    for (i = 0; i < count; ++i) {
+        lstrs[i] = g_locale_from_utf8(strs[i], -1, NULL, NULL, NULL);
+        if (!lstrs[i]) {
+            lstrs[i] = g_strdup(""); /* make it an empty string */
+            g_warning("Unable to translate string '%s' from UTF8 to locale "
+                      "format", strs[i]);
+        }
+    }
+
+
+    XStringListToTextProperty(lstrs, count, &tprop);
+    XSetTextProperty(obt_display, win, &tprop, prop);
+    XFree(tprop.value);
+}
+
 void obt_prop_set_string_utf8(Window win, Atom prop, const gchar *val)
 {
-    XChangeProperty(obt_display, win, prop, obt_prop_atom(OBT_PROP_UTF8), 8,
+    XChangeProperty(obt_display, win, prop, OBT_PROP_ATOM(UTF8), 8,
                     PropModeReplace, (const guchar*)val, strlen(val));
 }
 
-void obt_prop_set_strings_utf8(Window win, Atom prop, gchar **strs)
+void obt_prop_set_strings_utf8(Window win, Atom prop, const gchar **strs)
 {
     GString *str;
-    gchar **s;
+    const gchar **s;
 
     str = g_string_sized_new(0);
     for (s = strs; *s; ++s) {

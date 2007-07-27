@@ -1978,7 +1978,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, visible);
+    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, utf8, visible);
     self->title = visible;
 
     if (self->frame)
@@ -2010,7 +2010,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_ICON_NAME, visible);
+    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_ICON_NAME, utf8, visible);
     self->icon_title = visible;
 }
 

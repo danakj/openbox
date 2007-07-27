@@ -203,7 +203,7 @@ gboolean screen_annex(void)
                    NET_SUPPORTING_WM_CHECK, WINDOW, screen_support_win);
 
     /* set properties on the supporting window */
-    OBT_PROP_SETS(screen_support_win, NET_WM_NAME, "Openbox");
+    OBT_PROP_SETS(screen_support_win, NET_WM_NAME, utf8, "Openbox");
     OBT_PROP_SET32(screen_support_win, NET_SUPPORTING_WM_CHECK,
                    WINDOW, screen_support_win);
 
@@ -385,7 +385,7 @@ void screen_startup(gboolean reconfig)
 
         /* set the root window property */
         OBT_PROP_SETSS(RootWindow(obt_display, ob_screen),
-                       NET_DESKTOP_NAMES, names);
+                       NET_DESKTOP_NAMES, utf8, names);
 
         g_strfreev(names);
     }
@@ -1162,7 +1162,7 @@ void screen_update_desktop_names(void)
         /* if we changed any names, then set the root property so we can
            all agree on the names */
         OBT_PROP_SETSS(RootWindow(obt_display, ob_screen), NET_DESKTOP_NAMES,
-                       screen_desktop_names);
+                       utf8, screen_desktop_names);
     }
 
     /* resize the pager for these names */

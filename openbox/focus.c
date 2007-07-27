@@ -26,10 +26,10 @@
 #include "group.h"
 #include "focus_cycle.h"
 #include "screen.h"
-#include "prop.h"
 #include "keyboard.h"
 #include "focus.h"
 #include "stacking.h"
+#include "obt/prop.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -91,8 +91,8 @@ void focus_set_client(ObClient *client)
     /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
     if (ob_state() != OB_STATE_EXITING) {
         active = client ? client->window : None;
-        PROP_SET32(RootWindow(obt_display, ob_screen),
-                   net_active_window, window, active);
+        OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                       NET_ACTIVE_WINDOW, WINDOW, active);
     }
 }
 

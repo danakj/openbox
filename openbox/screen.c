@@ -20,7 +20,6 @@
 #include "debug.h"
 #include "openbox.h"
 #include "dock.h"
-#include "prop.h"
 #include "grab.h"
 #include "startupnotify.h"
 #include "moveresize.h"
@@ -36,6 +35,7 @@
 #include "render/render.h"
 #include "gettext.h"
 #include "obt/display.h"
+#include "obt/prop.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -146,9 +146,10 @@ static gboolean replace_wm(void)
     }
 
     /* Send client message indicating that we are now the WM */
-    prop_message(RootWindow(obt_display, ob_screen), prop_atoms.manager,
-                 timestamp, wm_sn_atom, screen_support_win, 0,
-                 SubstructureNotifyMask);
+    obt_prop_message(ob_screen, RootWindow(obt_display, ob_screen),
+                     OBT_PROP_ATOM(MANAGER),
+                     timestamp, wm_sn_atom, screen_support_win, 0, 0,
+                     SubstructureNotifyMask);
 
     return TRUE;
 }
@@ -158,7 +159,6 @@ gboolean screen_annex(void)
     XSetWindowAttributes attrib;
     pid_t pid;
     gint i, num_support;
-    Atom *prop_atoms_start, *wm_supported_pos;
     gulong *supported;
 
     /* create the netwm support window */
@@ -195,113 +195,110 @@ gboolean screen_annex(void)
 
     /* set the OPENBOX_PID hint */
     pid = getpid();
-    PROP_SET32(RootWindow(obt_display, ob_screen),
-               openbox_pid, cardinal, pid);
+    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                   OPENBOX_PID, CARDINAL, pid);
 
     /* set supporting window */
-    PROP_SET32(RootWindow(obt_display, ob_screen),
-               net_supporting_wm_check, window, screen_support_win);
+    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                   NET_SUPPORTING_WM_CHECK, WINDOW, screen_support_win);
 
     /* set properties on the supporting window */
-    PROP_SETS(screen_support_win, net_wm_name, "Openbox");
-    PROP_SET32(screen_support_win, net_supporting_wm_check,
-               window, screen_support_win);
+    OBT_PROP_SETS(screen_support_win, NET_WM_NAME, "Openbox");
+    OBT_PROP_SET32(screen_support_win, NET_SUPPORTING_WM_CHECK,
+                   WINDOW, screen_support_win);
 
     /* set the _NET_SUPPORTED_ATOMS hint */
 
-    /* this is all the atoms after net_supported in the prop_atoms struct */
-    prop_atoms_start = (Atom*)&prop_atoms;
-    wm_supported_pos = (Atom*)&(prop_atoms.net_supported);
-    num_support = sizeof(prop_atoms) / sizeof(Atom) -
-        (wm_supported_pos - prop_atoms_start) - 1;
+    /* this is all the atoms after NET_SUPPORTED in the ObtPropAtoms enum */
+    num_support = OBT_PROP_NUM_ATOMS - OBT_PROP_NET_SUPPORTED - 1;
     i = 0;
     supported = g_new(gulong, num_support);
-    supported[i++] = prop_atoms.net_supporting_wm_check;
-    supported[i++] = prop_atoms.net_wm_full_placement;
-    supported[i++] = prop_atoms.net_current_desktop;
-    supported[i++] = prop_atoms.net_number_of_desktops;
-    supported[i++] = prop_atoms.net_desktop_geometry;
-    supported[i++] = prop_atoms.net_desktop_viewport;
-    supported[i++] = prop_atoms.net_active_window;
-    supported[i++] = prop_atoms.net_workarea;
-    supported[i++] = prop_atoms.net_client_list;
-    supported[i++] = prop_atoms.net_client_list_stacking;
-    supported[i++] = prop_atoms.net_desktop_names;
-    supported[i++] = prop_atoms.net_close_window;
-    supported[i++] = prop_atoms.net_desktop_layout;
-    supported[i++] = prop_atoms.net_showing_desktop;
-    supported[i++] = prop_atoms.net_wm_name;
-    supported[i++] = prop_atoms.net_wm_visible_name;
-    supported[i++] = prop_atoms.net_wm_icon_name;
-    supported[i++] = prop_atoms.net_wm_visible_icon_name;
-    supported[i++] = prop_atoms.net_wm_desktop;
-    supported[i++] = prop_atoms.net_wm_strut;
-    supported[i++] = prop_atoms.net_wm_strut_partial;
-    supported[i++] = prop_atoms.net_wm_icon;
-    supported[i++] = prop_atoms.net_wm_icon_geometry;
-    supported[i++] = prop_atoms.net_wm_window_type;
-    supported[i++] = prop_atoms.net_wm_window_type_desktop;
-    supported[i++] = prop_atoms.net_wm_window_type_dock;
-    supported[i++] = prop_atoms.net_wm_window_type_toolbar;
-    supported[i++] = prop_atoms.net_wm_window_type_menu;
-    supported[i++] = prop_atoms.net_wm_window_type_utility;
-    supported[i++] = prop_atoms.net_wm_window_type_splash;
-    supported[i++] = prop_atoms.net_wm_window_type_dialog;
-    supported[i++] = prop_atoms.net_wm_window_type_normal;
-    supported[i++] = prop_atoms.net_wm_allowed_actions;
-    supported[i++] = prop_atoms.net_wm_action_move;
-    supported[i++] = prop_atoms.net_wm_action_resize;
-    supported[i++] = prop_atoms.net_wm_action_minimize;
-    supported[i++] = prop_atoms.net_wm_action_shade;
-    supported[i++] = prop_atoms.net_wm_action_maximize_horz;
-    supported[i++] = prop_atoms.net_wm_action_maximize_vert;
-    supported[i++] = prop_atoms.net_wm_action_fullscreen;
-    supported[i++] = prop_atoms.net_wm_action_change_desktop;
-    supported[i++] = prop_atoms.net_wm_action_close;
-    supported[i++] = prop_atoms.net_wm_action_above;
-    supported[i++] = prop_atoms.net_wm_action_below;
-    supported[i++] = prop_atoms.net_wm_state;
-    supported[i++] = prop_atoms.net_wm_state_modal;
-    supported[i++] = prop_atoms.net_wm_state_maximized_vert;
-    supported[i++] = prop_atoms.net_wm_state_maximized_horz;
-    supported[i++] = prop_atoms.net_wm_state_shaded;
-    supported[i++] = prop_atoms.net_wm_state_skip_taskbar;
-    supported[i++] = prop_atoms.net_wm_state_skip_pager;
-    supported[i++] = prop_atoms.net_wm_state_hidden;
-    supported[i++] = prop_atoms.net_wm_state_fullscreen;
-    supported[i++] = prop_atoms.net_wm_state_above;
-    supported[i++] = prop_atoms.net_wm_state_below;
-    supported[i++] = prop_atoms.net_wm_state_demands_attention;
-    supported[i++] = prop_atoms.net_moveresize_window;
-    supported[i++] = prop_atoms.net_wm_moveresize;
-    supported[i++] = prop_atoms.net_wm_user_time;
+    supported[i++] = OBT_PROP_ATOM(NET_SUPPORTING_WM_CHECK);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_FULL_PLACEMENT);
+    supported[i++] = OBT_PROP_ATOM(NET_CURRENT_DESKTOP);
+    supported[i++] = OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS);
+    supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_GEOMETRY);
+    supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_VIEWPORT);
+    supported[i++] = OBT_PROP_ATOM(NET_ACTIVE_WINDOW);
+    supported[i++] = OBT_PROP_ATOM(NET_WORKAREA);
+    supported[i++] = OBT_PROP_ATOM(NET_CLIENT_LIST);
+    supported[i++] = OBT_PROP_ATOM(NET_CLIENT_LIST_STACKING);
+    supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_NAMES);
+    supported[i++] = OBT_PROP_ATOM(NET_CLOSE_WINDOW);
+    supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_LAYOUT);
+    supported[i++] = OBT_PROP_ATOM(NET_SHOWING_DESKTOP);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_NAME);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_VISIBLE_NAME);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ICON_NAME);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_VISIBLE_ICON_NAME);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_DESKTOP);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STRUT);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STRUT_PARTIAL);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ICON);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ICON_GEOMETRY);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DESKTOP);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_TOOLBAR);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_MENU);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_UTILITY);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_SPLASH);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_NORMAL);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ALLOWED_ACTIONS);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_MOVE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_RESIZE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_MINIMIZE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_SHADE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_MAXIMIZE_HORZ);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_MAXIMIZE_VERT);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_FULLSCREEN);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_CHANGE_DESKTOP);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_CLOSE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_ABOVE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_BELOW);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_MODAL);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_SHADED);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_HIDDEN);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_ABOVE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_BELOW);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION);
+    supported[i++] = OBT_PROP_ATOM(NET_MOVERESIZE_WINDOW);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_MOVERESIZE);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_USER_TIME);
 /*
-    supported[i++] = prop_atoms.net_wm_user_time_window;
+    supported[i++] = OBT_PROP_ATOM(NET_WM_USER_TIME_WINDOW);
 */
-    supported[i++] = prop_atoms.net_frame_extents;
-    supported[i++] = prop_atoms.net_request_frame_extents;
-    supported[i++] = prop_atoms.net_restack_window;
-    supported[i++] = prop_atoms.net_startup_id;
+    supported[i++] = OBT_PROP_ATOM(NET_FRAME_EXTENTS);
+    supported[i++] = OBT_PROP_ATOM(NET_REQUEST_FRAME_EXTENTS);
+    supported[i++] = OBT_PROP_ATOM(NET_RESTACK_WINDOW);
+    supported[i++] = OBT_PROP_ATOM(NET_STARTUP_ID);
 #ifdef SYNC
-    supported[i++] = prop_atoms.net_wm_sync_request;
-    supported[i++] = prop_atoms.net_wm_sync_request_counter;
+    supported[i++] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER);
 #endif
-    supported[i++] = prop_atoms.net_wm_pid;
-    supported[i++] = prop_atoms.net_wm_ping;
+    supported[i++] = OBT_PROP_ATOM(NET_WM_PID);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_PING);
 
-    supported[i++] = prop_atoms.kde_wm_change_state;
-    supported[i++] = prop_atoms.kde_net_wm_frame_strut;
-    supported[i++] = prop_atoms.kde_net_wm_window_type_override;
+    supported[i++] = OBT_PROP_ATOM(KDE_WM_CHANGE_STATE);
+    supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_FRAME_STRUT);
+    supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE);
 
-    supported[i++] = prop_atoms.ob_wm_action_undecorate;
-    supported[i++] = prop_atoms.ob_wm_state_undecorated;
-    supported[i++] = prop_atoms.openbox_pid;
-    supported[i++] = prop_atoms.ob_theme;
-    supported[i++] = prop_atoms.ob_control;
+    supported[i++] = OBT_PROP_ATOM(OB_WM_ACTION_UNDECORATE);
+    supported[i++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
+    supported[i++] = OBT_PROP_ATOM(OPENBOX_PID);
+    supported[i++] = OBT_PROP_ATOM(OB_THEME);
+    supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
     g_assert(i == num_support);
 
-    PROP_SETA32(RootWindow(obt_display, ob_screen),
-                net_supported, atom, supported, num_support);
+    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+                    NET_SUPPORTED, ATOM, supported, num_support);
     g_free(supported);
 
     screen_tell_ksplash();
@@ -364,8 +361,8 @@ void screen_startup(gboolean reconfig)
     screen_resize();
 
     /* have names already been set for the desktops? */
-    if (PROP_GETSS(RootWindow(obt_display, ob_screen),
-                   net_desktop_names, utf8, &names))
+    if (OBT_PROP_GETSS(RootWindow(obt_display, ob_screen),
+                       NET_DESKTOP_NAMES, utf8, &names))
     {
         g_strfreev(names);
         namesexist = TRUE;
@@ -387,8 +384,8 @@ void screen_startup(gboolean reconfig)
             names[i] = g_strdup(it->data);
 
         /* set the root window property */
-        PROP_SETSS(RootWindow(obt_display, ob_screen),
-                   net_desktop_names,names);
+        OBT_PROP_SETSS(RootWindow(obt_display, ob_screen),
+                       NET_DESKTOP_NAMES, names);
 
         g_strfreev(names);
     }
@@ -398,8 +395,8 @@ void screen_startup(gboolean reconfig)
        this will also set the default names from the config file up for
        desktops that don't have names yet */
     screen_num_desktops = 0;
-    if (PROP_GET32(RootWindow(obt_display, ob_screen),
-                   net_number_of_desktops, cardinal, &d))
+    if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
+                       NET_NUMBER_OF_DESKTOPS, CARDINAL, &d))
         screen_set_num_desktops(d);
     /* restore from session if possible */
     else if (session_num_desktops)
@@ -409,8 +406,8 @@ void screen_startup(gboolean reconfig)
 
     screen_desktop = screen_num_desktops;  /* something invalid */
     /* start on the current desktop when a wm was already running */
-    if (PROP_GET32(RootWindow(obt_display, ob_screen),
-                   net_current_desktop, cardinal, &d) &&
+    if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
+                       NET_CURRENT_DESKTOP, CARDINAL, &d) &&
         d < screen_num_desktops)
     {
         screen_set_desktop(d, FALSE);
@@ -424,8 +421,8 @@ void screen_startup(gboolean reconfig)
 
     /* don't start in showing-desktop mode */
     screen_showing_desktop = FALSE;
-    PROP_SET32(RootWindow(obt_display, ob_screen),
-               net_showing_desktop, cardinal, screen_showing_desktop);
+    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                   NET_SHOWING_DESKTOP, CARDINAL, screen_showing_desktop);
 
     if (session_desktop_layout_present &&
         screen_validate_layout(&session_desktop_layout))
@@ -447,11 +444,11 @@ void screen_shutdown(gboolean reconfig)
                  NoEventMask);
 
     /* we're not running here no more! */
-    PROP_ERASE(RootWindow(obt_display, ob_screen), openbox_pid);
+    OBT_PROP_ERASE(RootWindow(obt_display, ob_screen), OPENBOX_PID);
     /* not without us */
-    PROP_ERASE(RootWindow(obt_display, ob_screen), net_supported);
+    OBT_PROP_ERASE(RootWindow(obt_display, ob_screen), NET_SUPPORTED);
     /* don't keep this mode */
-    PROP_ERASE(RootWindow(obt_display, ob_screen), net_showing_desktop);
+    OBT_PROP_ERASE(RootWindow(obt_display, ob_screen), NET_SHOWING_DESKTOP);
 
     XDestroyWindow(obt_display, screen_support_win);
 
@@ -476,8 +473,8 @@ void screen_resize(void)
     /* Set the _NET_DESKTOP_GEOMETRY hint */
     screen_physical_size.width = geometry[0] = w;
     screen_physical_size.height = geometry[1] = h;
-    PROP_SETA32(RootWindow(obt_display, ob_screen),
-                net_desktop_geometry, cardinal, geometry, 2);
+    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+                    NET_DESKTOP_GEOMETRY, CARDINAL, geometry, 2);
 
     if (ob_state() == OB_STATE_STARTING)
         return;
@@ -501,13 +498,13 @@ void screen_set_num_desktops(guint num)
 
     old = screen_num_desktops;
     screen_num_desktops = num;
-    PROP_SET32(RootWindow(obt_display, ob_screen),
-               net_number_of_desktops, cardinal, num);
+    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                   NET_NUMBER_OF_DESKTOPS, CARDINAL, num);
 
     /* set the viewport hint */
     viewport = g_new0(gulong, num * 2);
-    PROP_SETA32(RootWindow(obt_display, ob_screen),
-                net_desktop_viewport, cardinal, viewport, num * 2);
+    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+                    NET_DESKTOP_VIEWPORT, CARDINAL, viewport, num * 2);
     g_free(viewport);
 
     /* the number of rows/columns will differ */
@@ -602,8 +599,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     if (previous == num) return;
 
-    PROP_SET32(RootWindow(obt_display, ob_screen),
-               net_current_desktop, cardinal, num);
+    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                   NET_CURRENT_DESKTOP, CARDINAL, num);
 
     /* This whole thing decides when/how to save the screen_last_desktop so
        that it can be restored later if you want */
@@ -1092,13 +1089,13 @@ void screen_update_layout(void)
     screen_desktop_layout.rows = 1;
     screen_desktop_layout.columns = screen_num_desktops;
 
-    if (PROP_GETA32(RootWindow(obt_display, ob_screen),
-                    net_desktop_layout, cardinal, &data, &num)) {
+    if (OBT_PROP_GETA32(RootWindow(obt_display, ob_screen),
+                        NET_DESKTOP_LAYOUT, CARDINAL, &data, &num)) {
         if (num == 3 || num == 4) {
 
-            if (data[0] == prop_atoms.net_wm_orientation_vert)
+            if (data[0] == OBT_PROP_ATOM(NET_WM_ORIENTATION_VERT))
                 l.orientation = OB_ORIENTATION_VERT;
-            else if (data[0] == prop_atoms.net_wm_orientation_horz)
+            else if (data[0] == OBT_PROP_ATOM(NET_WM_ORIENTATION_HORZ))
                 l.orientation = OB_ORIENTATION_HORZ;
             else
                 return;
@@ -1106,13 +1103,13 @@ void screen_update_layout(void)
             if (num < 4)
                 l.start_corner = OB_CORNER_TOPLEFT;
             else {
-                if (data[3] == prop_atoms.net_wm_topleft)
+                if (data[3] == OBT_PROP_ATOM(NET_WM_TOPLEFT))
                     l.start_corner = OB_CORNER_TOPLEFT;
-                else if (data[3] == prop_atoms.net_wm_topright)
+                else if (data[3] == OBT_PROP_ATOM(NET_WM_TOPRIGHT))
                     l.start_corner = OB_CORNER_TOPRIGHT;
-                else if (data[3] == prop_atoms.net_wm_bottomright)
+                else if (data[3] == OBT_PROP_ATOM(NET_WM_BOTTOMRIGHT))
                     l.start_corner = OB_CORNER_BOTTOMRIGHT;
-                else if (data[3] == prop_atoms.net_wm_bottomleft)
+                else if (data[3] == OBT_PROP_ATOM(NET_WM_BOTTOMLEFT))
                     l.start_corner = OB_CORNER_BOTTOMLEFT;
                 else
                     return;
@@ -1137,8 +1134,8 @@ void screen_update_desktop_names(void)
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
 
-    if (PROP_GETSS(RootWindow(obt_display, ob_screen),
-                   net_desktop_names, utf8, &screen_desktop_names))
+    if (OBT_PROP_GETSS(RootWindow(obt_display, ob_screen),
+                       NET_DESKTOP_NAMES, utf8, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
         i = 0;
@@ -1164,8 +1161,8 @@ void screen_update_desktop_names(void)
 
         /* if we changed any names, then set the root property so we can
            all agree on the names */
-        PROP_SETSS(RootWindow(obt_display, ob_screen), net_desktop_names,
-                   screen_desktop_names);
+        OBT_PROP_SETSS(RootWindow(obt_display, ob_screen), NET_DESKTOP_NAMES,
+                       screen_desktop_names);
     }
 
     /* resize the pager for these names */
@@ -1232,8 +1229,8 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     }
 
     show = !!show; /* make it boolean */
-    PROP_SET32(RootWindow(obt_display, ob_screen),
-               net_showing_desktop, cardinal, show);
+    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+                   NET_SHOWING_DESKTOP, CARDINAL, show);
 }
 
 void screen_install_colormap(ObClient *client, gboolean install)
@@ -1457,8 +1454,8 @@ void screen_update_areas(void)
 
     /* all the work areas are not used here, only the ones for the first
        monitor are */
-    PROP_SETA32(RootWindow(obt_display, ob_screen), net_workarea, cardinal,
-                dims, 4 * screen_num_desktops);
+    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen), NET_WORKAREA, CARDINAL,
+                    dims, 4 * screen_num_desktops);
 
     /* the area has changed, adjust all the windows if they need it */
     for (it = client_list; it; it = g_list_next(it))

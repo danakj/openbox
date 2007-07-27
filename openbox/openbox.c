@@ -25,7 +25,6 @@
 #include "event.h"
 #include "menu.h"
 #include "client.h"
-#include "prop.h"
 #include "screen.h"
 #include "actions.h"
 #include "startupnotify.h"
@@ -48,6 +47,7 @@
 #include "render/render.h"
 #include "render/theme.h"
 #include "obt/display.h"
+#include "obt/prop.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -145,13 +145,11 @@ gint main(gint argc, gchar **argv)
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
 
     if (remote_control) {
-        prop_startup();
-
         /* Send client message telling the OB process to:
          * remote_control = 1 -> reconfigure
          * remote_control = 2 -> restart */
-        PROP_MSG(RootWindow(obt_display, ob_screen),
-                 ob_control, remote_control, 0, 0, 0);
+        OBT_PROP_MSG(ob_screen, RootWindow(obt_display, ob_screen),
+                     OB_CONTROL, remote_control, 0, 0, 0, 0);
         obt_display_close(obt_display);
         exit(EXIT_SUCCESS);
     }
@@ -203,8 +201,6 @@ gint main(gint argc, gchar **argv)
     cursors[OB_CURSOR_WEST] = load_cursor("left_side", XC_left_side);
     cursors[OB_CURSOR_NORTHWEST] = load_cursor("top_left_corner",
                                                XC_top_left_corner);
-
-    prop_startup(); /* get atoms values for the display */
 
     if (screen_annex()) { /* it will be ours! */
         do {
@@ -265,8 +261,8 @@ gint main(gint argc, gchar **argv)
                 if (ob_rr_theme == NULL)
                     ob_exit_with_error(_("Unable to load a theme."));
 
-                PROP_SETS(RootWindow(obt_display, ob_screen),
-                          ob_theme, ob_rr_theme->name);
+                OBT_PROP_SETS(RootWindow(obt_display, ob_screen),
+                              OB_THEME, ob_rr_theme->name);
             }
 
             if (reconfigure) {
@@ -308,8 +304,8 @@ gint main(gint argc, gchar **argv)
                 focus_nothing();
 
                 /* focus what was focused if a wm was already running */
-                if (PROP_GET32(RootWindow(obt_display, ob_screen),
-                               net_active_window, window, &xid) &&
+                if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
+                                   NET_ACTIVE_WINDOW, WINDOW, &xid) &&
                     (w = g_hash_table_lookup(window_map, &xid)) &&
                     WINDOW_IS_CLIENT(w))
                 {

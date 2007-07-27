@@ -20,11 +20,11 @@
 #include "debug.h"
 #include "dock.h"
 #include "screen.h"
-#include "prop.h"
 #include "config.h"
 #include "grab.h"
 #include "openbox.h"
 #include "render/theme.h"
+#include "obt/prop.h"
 
 #define DOCK_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \
                          EnterWindowMask | LeaveWindowMask)
@@ -99,8 +99,8 @@ void dock_startup(gboolean reconfig)
     XSetWindowBorderWidth(obt_display, dock->frame, ob_rr_theme->obwidth);
 
     /* Setting the window type so xcompmgr can tell what it is */
-    PROP_SET32(dock->frame, net_wm_window_type, atom,
-               prop_atoms.net_wm_window_type_dock);
+    OBT_PROP_SET32(dock->frame, NET_WM_WINDOW_TYPE, ATOM,
+                   OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK));
 
     g_hash_table_insert(window_map, &dock->frame, dock);
     stacking_add(DOCK_AS_WINDOW(dock));
@@ -136,7 +136,7 @@ void dock_add(Window win, XWMHints *wmhints)
     app->icon_win = (wmhints->flags & IconWindowHint) ?
         wmhints->icon_window : win;
 
-    if (PROP_GETSS(app->win, wm_class, locale, &data)) {
+    if (OBT_PROP_GETSS(app->win, WM_CLASS, locale, &data)) {
         if (data[0]) {
             app->name = g_strdup(data[0]);
             if (data[1])

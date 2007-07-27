@@ -38,7 +38,6 @@ GList* session_state_find(struct _ObClient *c) { return NULL; }
 #include "debug.h"
 #include "openbox.h"
 #include "client.h"
-#include "prop.h"
 #include "focus.h"
 #include "gettext.h"
 #include "parser/parse.h"

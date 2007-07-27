@@ -25,7 +25,6 @@
 #include "moveresize.h"
 #include "ping.h"
 #include "place.h"
-#include "prop.h"
 #include "frame.h"
 #include "session.h"
 #include "event.h"
@@ -41,6 +40,7 @@
 #include "render/render.h"
 #include "gettext.h"
 #include "obt/display.h"
+#include "obt/prop.h"
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
@@ -165,8 +165,8 @@ void client_set_list(void)
     } else
         windows = NULL;
 
-    PROP_SETA32(RootWindow(obt_display, ob_screen),
-                net_client_list, window, (gulong*)windows, size);
+    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+                    NET_CLIENT_LIST, WINDOW, (gulong*)windows, size);
 
     if (windows)
         g_free(windows);
@@ -771,9 +771,9 @@ void client_unmanage(ObClient *self)
     if (ob_state() != OB_STATE_EXITING) {
         /* these values should not be persisted across a window
            unmapping/mapping */
-        PROP_ERASE(self->window, net_wm_desktop);
-        PROP_ERASE(self->window, net_wm_state);
-        PROP_ERASE(self->window, wm_state);
+        OBT_PROP_ERASE(self->window, NET_WM_DESKTOP);
+        OBT_PROP_ERASE(self->window, NET_WM_STATE);
+        OBT_PROP_ERASE(self->window, WM_STATE);
     } else {
         /* if we're left in an unmapped state, the client wont be mapped.
            this is bad, since we will no longer be managing the window on
@@ -927,7 +927,7 @@ static void client_restore_session_state(ObClient *self)
     self->desktop = (self->session->desktop == DESKTOP_ALL ?
                      self->session->desktop :
                      MIN(screen_num_desktops - 1, self->session->desktop));
-    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
+    OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     self->shaded = self->session->shaded;
     self->iconic = self->session->iconic;
@@ -1145,10 +1145,11 @@ static void client_get_all(ObClient *self, gboolean real)
 
 static void client_get_startup_id(ObClient *self)
 {
-    if (!(PROP_GETS(self->window, net_startup_id, utf8, &self->startup_id)))
+    if (!(OBT_PROP_GETS(self->window, NET_STARTUP_ID, utf8,
+                        &self->startup_id)))
         if (self->group)
-            PROP_GETS(self->group->leader,
-                      net_startup_id, utf8, &self->startup_id);
+            OBT_PROP_GETS(self->group->leader,
+                          NET_STARTUP_ID, utf8, &self->startup_id);
 }
 
 static void client_get_area(ObClient *self)
@@ -1171,7 +1172,7 @@ static void client_get_desktop(ObClient *self)
 {
     guint32 d = screen_num_desktops; /* an always-invalid value */
 
-    if (PROP_GET32(self->window, net_wm_desktop, cardinal, &d)) {
+    if (OBT_PROP_GET32(self->window, NET_WM_DESKTOP, CARDINAL, &d)) {
         if (d >= screen_num_desktops && d != DESKTOP_ALL)
             self->desktop = screen_num_desktops - 1;
         else
@@ -1224,32 +1225,32 @@ static void client_get_state(ObClient *self)
     guint32 *state;
     guint num;
 
-    if (PROP_GETA32(self->window, net_wm_state, atom, &state, &num)) {
+    if (OBT_PROP_GETA32(self->window, NET_WM_STATE, ATOM, &state, &num)) {
         gulong i;
         for (i = 0; i < num; ++i) {
-            if (state[i] == prop_atoms.net_wm_state_modal)
+            if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MODAL))
                 self->modal = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_shaded)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_SHADED))
                 self->shaded = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_hidden)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN))
                 self->iconic = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_skip_taskbar)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR))
                 self->skip_taskbar = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_skip_pager)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER))
                 self->skip_pager = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_fullscreen)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN))
                 self->fullscreen = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_maximized_vert)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT))
                 self->max_vert = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_maximized_horz)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ))
                 self->max_horz = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_above)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_ABOVE))
                 self->above = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_below)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_BELOW))
                 self->below = TRUE;
-            else if (state[i] == prop_atoms.net_wm_state_demands_attention)
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION))
                 self->demands_attention = TRUE;
-            else if (state[i] == prop_atoms.ob_wm_state_undecorated)
+            else if (state[i] == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED))
                 self->undecorated = TRUE;
         }
 
@@ -1433,8 +1434,8 @@ static void client_get_mwm_hints(ObClient *self)
 
     self->mwmhints.flags = 0; /* default to none */
 
-    if (PROP_GETA32(self->window, motif_wm_hints, motif_wm_hints,
-                    &hints, &num)) {
+    if (OBT_PROP_GETA32(self->window, MOTIF_WM_HINTS, MOTIF_WM_HINTS,
+                        &hints, &num)) {
         if (num >= OB_MWM_ELEMENTS) {
             self->mwmhints.flags = hints[0];
             self->mwmhints.functions = hints[1];
@@ -1453,26 +1454,27 @@ void client_get_type_and_transientness(ObClient *self)
     self->type = -1;
     self->transient = FALSE;
 
-    if (PROP_GETA32(self->window, net_wm_window_type, atom, &val, &num)) {
+    if (OBT_PROP_GETA32(self->window, NET_WM_WINDOW_TYPE, ATOM, &val, &num)) {
         /* use the first value that we know about in the array */
         for (i = 0; i < num; ++i) {
-            if (val[i] == prop_atoms.net_wm_window_type_desktop)
+            if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DESKTOP))
                 self->type = OB_CLIENT_TYPE_DESKTOP;
-            else if (val[i] == prop_atoms.net_wm_window_type_dock)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK))
                 self->type = OB_CLIENT_TYPE_DOCK;
-            else if (val[i] == prop_atoms.net_wm_window_type_toolbar)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_TOOLBAR))
                 self->type = OB_CLIENT_TYPE_TOOLBAR;
-            else if (val[i] == prop_atoms.net_wm_window_type_menu)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_MENU))
                 self->type = OB_CLIENT_TYPE_MENU;
-            else if (val[i] == prop_atoms.net_wm_window_type_utility)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_UTILITY))
                 self->type = OB_CLIENT_TYPE_UTILITY;
-            else if (val[i] == prop_atoms.net_wm_window_type_splash)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_SPLASH))
                 self->type = OB_CLIENT_TYPE_SPLASH;
-            else if (val[i] == prop_atoms.net_wm_window_type_dialog)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG))
                 self->type = OB_CLIENT_TYPE_DIALOG;
-            else if (val[i] == prop_atoms.net_wm_window_type_normal)
+            else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_NORMAL))
                 self->type = OB_CLIENT_TYPE_NORMAL;
-            else if (val[i] == prop_atoms.kde_net_wm_window_type_override) {
+            else if (val[i] == OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE))
+            {
                 /* prevent this window from getting any decor or
                    functionality */
                 self->mwmhints.flags &= (OB_MWM_FLAG_FUNCTIONS |
@@ -1512,17 +1514,17 @@ void client_get_type_and_transientness(ObClient *self)
 void client_update_protocols(ObClient *self)
 {
     guint32 *proto;
-    guint num_return, i;
+    guint num_ret, i;
 
     self->focus_notify = FALSE;
     self->delete_window = FALSE;
 
-    if (PROP_GETA32(self->window, wm_protocols, atom, &proto, &num_return)) {
-        for (i = 0; i < num_return; ++i) {
-            if (proto[i] == prop_atoms.wm_delete_window)
+    if (OBT_PROP_GETA32(self->window, WM_PROTOCOLS, ATOM, &proto, &num_ret)) {
+        for (i = 0; i < num_ret; ++i) {
+            if (proto[i] == OBT_PROP_ATOM(WM_DELETE_WINDOW))
                 /* this means we can request the window to close */
                 self->delete_window = TRUE;
-            else if (proto[i] == prop_atoms.wm_take_focus)
+            else if (proto[i] == OBT_PROP_ATOM(WM_TAKE_FOCUS))
                 /* if this protocol is requested, then the window will be
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
@@ -1531,7 +1533,7 @@ void client_update_protocols(ObClient *self)
                    pings to determine if it is still alive */
                 self->ping = TRUE;
 #ifdef SYNC
-            else if (proto[i] == prop_atoms.net_wm_sync_request)
+            else if (proto[i] == OBT_PROP_ATOM(NET_WM_SYNC_REQUEST))
                 /* if this protocol is requested, then resizing the
                    window will be synchronized between the frame and the
                    client */
@@ -1547,7 +1549,8 @@ void client_update_sync_request_counter(ObClient *self)
 {
     guint32 i;
 
-    if (PROP_GET32(self->window, net_wm_sync_request_counter, cardinal, &i)) {
+    if (OBT_PROP_GET32(self->window, NET_WM_SYNC_REQUEST_COUNTER, CARDINAL,&i))
+    {
         self->sync_counter = i;
     } else
         self->sync_counter = None;
@@ -1802,32 +1805,32 @@ static void client_change_allowed_actions(ObClient *self)
 
     /* desktop windows are kept on all desktops */
     if (self->type != OB_CLIENT_TYPE_DESKTOP)
-        actions[num++] = prop_atoms.net_wm_action_change_desktop;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_CHANGE_DESKTOP);
 
     if (self->functions & OB_CLIENT_FUNC_SHADE)
-        actions[num++] = prop_atoms.net_wm_action_shade;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_SHADE);
     if (self->functions & OB_CLIENT_FUNC_CLOSE)
-        actions[num++] = prop_atoms.net_wm_action_close;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_CLOSE);
     if (self->functions & OB_CLIENT_FUNC_MOVE)
-        actions[num++] = prop_atoms.net_wm_action_move;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_MOVE);
     if (self->functions & OB_CLIENT_FUNC_ICONIFY)
-        actions[num++] = prop_atoms.net_wm_action_minimize;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_MINIMIZE);
     if (self->functions & OB_CLIENT_FUNC_RESIZE)
-        actions[num++] = prop_atoms.net_wm_action_resize;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_RESIZE);
     if (self->functions & OB_CLIENT_FUNC_FULLSCREEN)
-        actions[num++] = prop_atoms.net_wm_action_fullscreen;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_FULLSCREEN);
     if (self->functions & OB_CLIENT_FUNC_MAXIMIZE) {
-        actions[num++] = prop_atoms.net_wm_action_maximize_horz;
-        actions[num++] = prop_atoms.net_wm_action_maximize_vert;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_MAXIMIZE_HORZ);
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_MAXIMIZE_VERT);
     }
     if (self->functions & OB_CLIENT_FUNC_ABOVE)
-        actions[num++] = prop_atoms.net_wm_action_above;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_ABOVE);
     if (self->functions & OB_CLIENT_FUNC_BELOW)
-        actions[num++] = prop_atoms.net_wm_action_below;
+        actions[num++] = OBT_PROP_ATOM(NET_WM_ACTION_BELOW);
     if (self->functions & OB_CLIENT_FUNC_UNDECORATE)
-        actions[num++] = prop_atoms.ob_wm_action_undecorate;
+        actions[num++] = OBT_PROP_ATOM(OB_WM_ACTION_UNDECORATE);
 
-    PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
+    OBT_PROP_SETA32(self->window, NET_WM_ALLOWED_ACTIONS, ATOM, actions, num);
 
     /* make sure the window isn't breaking any rules now */
 
@@ -1945,10 +1948,10 @@ void client_update_title(ObClient *self)
     g_free(self->title);
 
     /* try netwm */
-    if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
+    if (!OBT_PROP_GETS(self->window, NET_WM_NAME, utf8, &data)) {
         /* try old x stuff */
-        if (!(PROP_GETS(self->window, wm_name, locale, &data)
-              || PROP_GETS(self->window, wm_name, utf8, &data))) {
+        if (!(OBT_PROP_GETS(self->window, WM_NAME, locale, &data)
+              || OBT_PROP_GETS(self->window, WM_NAME, utf8, &data))) {
             if (self->transient) {
     /*
     GNOME alert windows are not given titles:
@@ -1975,7 +1978,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    PROP_SETS(self->window, net_wm_visible_name, visible);
+    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, visible);
     self->title = visible;
 
     if (self->frame)
@@ -1986,10 +1989,10 @@ void client_update_title(ObClient *self)
     g_free(self->icon_title);
 
     /* try netwm */
-    if (!PROP_GETS(self->window, net_wm_icon_name, utf8, &data))
+    if (!OBT_PROP_GETS(self->window, NET_WM_ICON_NAME, utf8, &data))
         /* try old x stuff */
-        if (!(PROP_GETS(self->window, wm_icon_name, locale, &data) ||
-              PROP_GETS(self->window, wm_icon_name, utf8, &data)))
+        if (!(OBT_PROP_GETS(self->window, WM_ICON_NAME, locale, &data) ||
+              OBT_PROP_GETS(self->window, WM_ICON_NAME, utf8, &data)))
             data = g_strdup(self->title);
 
     if (self->client_machine) {
@@ -2007,7 +2010,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    PROP_SETS(self->window, net_wm_visible_icon_name, visible);
+    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_ICON_NAME, visible);
     self->icon_title = visible;
 }
 
@@ -2018,8 +2021,9 @@ void client_update_strut(ObClient *self)
     gboolean got = FALSE;
     StrutPartial strut;
 
-    if (PROP_GETA32(self->window, net_wm_strut_partial, cardinal,
-                    &data, &num)) {
+    if (OBT_PROP_GETA32(self->window, NET_WM_STRUT_PARTIAL, CARDINAL,
+                        &data, &num))
+    {
         if (num == 12) {
             got = TRUE;
             STRUT_PARTIAL_SET(strut,
@@ -2031,7 +2035,7 @@ void client_update_strut(ObClient *self)
     }
 
     if (!got &&
-        PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
+        OBT_PROP_GETA32(self->window, NET_WM_STRUT, CARDINAL, &data, &num)) {
         if (num == 4) {
             Rect *a;
 
@@ -2077,7 +2081,7 @@ void client_update_icons(ObClient *self)
         g_free(self->icons);
     self->nicons = 0;
 
-    if (PROP_GETA32(self->window, net_wm_icon, cardinal, &data, &num)) {
+    if (OBT_PROP_GETA32(self->window, NET_WM_ICON, CARDINAL, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
         while (num - i > 2) {
@@ -2159,7 +2163,7 @@ void client_update_icons(ObClient *self)
                 (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
                 (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
                 (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
-        PROP_SETA32(self->window, net_wm_icon, cardinal, data, 48*48+2);
+        OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, data, 48*48+2);
         g_free(data);
     } else if (self->frame)
         /* don't draw the icon empty if we're just setting one now anyways,
@@ -2174,8 +2178,8 @@ void client_update_icon_geometry(ObClient *self)
 
     RECT_SET(self->icon_geometry, 0, 0, 0, 0);
 
-    if (PROP_GETA32(self->window, net_wm_icon_geometry, cardinal, &data, &num)
-        && num == 4)
+    if (OBT_PROP_GETA32(self->window, NET_WM_ICON_GEOMETRY, CARDINAL,
+                        &data, &num) && num == 4)
     {
         /* don't let them set it with an area < 0 */
         RECT_SET(self->icon_geometry, data[0], data[1],
@@ -2190,23 +2194,23 @@ static void client_get_session_ids(ObClient *self)
     gchar *s;
     gchar **ss;
 
-    if (!PROP_GET32(self->window, wm_client_leader, window, &leader))
+    if (!OBT_PROP_GET32(self->window, WM_CLIENT_LEADER, WINDOW, &leader))
         leader = None;
 
     /* get the SM_CLIENT_ID */
     got = FALSE;
     if (leader)
-        got = PROP_GETS(leader, sm_client_id, locale, &self->sm_client_id);
+        got = OBT_PROP_GETS(leader, SM_CLIENT_ID, locale, &self->sm_client_id);
     if (!got)
-        PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id);
+        OBT_PROP_GETS(self->window, SM_CLIENT_ID, locale, &self->sm_client_id);
 
     /* get the WM_CLASS (name and class). make them "" if they are not
        provided */
     got = FALSE;
     if (leader)
-        got = PROP_GETSS(leader, wm_class, locale, &ss);
+        got = OBT_PROP_GETSS(leader, WM_CLASS, locale, &ss);
     if (!got)
-        got = PROP_GETSS(self->window, wm_class, locale, &ss);
+        got = OBT_PROP_GETSS(self->window, WM_CLASS, locale, &ss);
 
     if (got) {
         if (ss[0]) {
@@ -2223,9 +2227,9 @@ static void client_get_session_ids(ObClient *self)
     /* get the WM_WINDOW_ROLE. make it "" if it is not provided */
     got = FALSE;
     if (leader)
-        got = PROP_GETS(leader, wm_window_role, locale, &s);
+        got = OBT_PROP_GETS(leader, WM_WINDOW_ROLE, locale, &s);
     if (!got)
-        got = PROP_GETS(self->window, wm_window_role, locale, &s);
+        got = OBT_PROP_GETS(self->window, WM_WINDOW_ROLE, locale, &s);
 
     if (got)
         self->role = s;
@@ -2236,9 +2240,9 @@ static void client_get_session_ids(ObClient *self)
     got = FALSE;
 
     if (leader)
-        got = PROP_GETSS(leader, wm_command, locale, &ss);
+        got = OBT_PROP_GETSS(leader, WM_COMMAND, locale, &ss);
     if (!got)
-        got = PROP_GETSS(self->window, wm_command, locale, &ss);
+        got = OBT_PROP_GETSS(self->window, WM_COMMAND, locale, &ss);
 
     if (got) {
         /* merge/mash them all together */
@@ -2261,9 +2265,9 @@ static void client_get_session_ids(ObClient *self)
     /* get the WM_CLIENT_MACHINE */
     got = FALSE;
     if (leader)
-        got = PROP_GETS(leader, wm_client_machine, locale, &s);
+        got = OBT_PROP_GETS(leader, WM_CLIENT_MACHINE, locale, &s);
     if (!got)
-        got = PROP_GETS(self->window, wm_client_machine, locale, &s);
+        got = OBT_PROP_GETS(self->window, WM_CLIENT_MACHINE, locale, &s);
 
     if (got) {
         gchar localhost[128];
@@ -2298,12 +2302,12 @@ static void client_change_wm_state(ObClient *self)
         self->wmstate = NormalState;
 
     if (old != self->wmstate) {
-        PROP_MSG(self->window, kde_wm_change_state,
-                 self->wmstate, 1, 0, 0);
+        OBT_PROP_MSG(ob_screen, self->window, KDE_WM_CHANGE_STATE,
+                     self->wmstate, 1, 0, 0, 0);
 
         state[0] = self->wmstate;
         state[1] = None;
-        PROP_SETA32(self->window, wm_state, wm_state, state, 2);
+        OBT_PROP_SETA32(self->window, WM_STATE, WM_STATE, state, 2);
     }
 }
 
@@ -2314,30 +2318,30 @@ static void client_change_state(ObClient *self)
 
     num = 0;
     if (self->modal)
-        netstate[num++] = prop_atoms.net_wm_state_modal;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_MODAL);
     if (self->shaded)
-        netstate[num++] = prop_atoms.net_wm_state_shaded;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_SHADED);
     if (self->iconic)
-        netstate[num++] = prop_atoms.net_wm_state_hidden;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_HIDDEN);
     if (self->skip_taskbar)
-        netstate[num++] = prop_atoms.net_wm_state_skip_taskbar;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR);
     if (self->skip_pager)
-        netstate[num++] = prop_atoms.net_wm_state_skip_pager;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER);
     if (self->fullscreen)
-        netstate[num++] = prop_atoms.net_wm_state_fullscreen;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN);
     if (self->max_vert)
-        netstate[num++] = prop_atoms.net_wm_state_maximized_vert;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT);
     if (self->max_horz)
-        netstate[num++] = prop_atoms.net_wm_state_maximized_horz;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ);
     if (self->above)
-        netstate[num++] = prop_atoms.net_wm_state_above;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_ABOVE);
     if (self->below)
-        netstate[num++] = prop_atoms.net_wm_state_below;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_BELOW);
     if (self->demands_attention)
-        netstate[num++] = prop_atoms.net_wm_state_demands_attention;
+        netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION);
     if (self->undecorated)
-        netstate[num++] = prop_atoms.ob_wm_state_undecorated;
-    PROP_SETA32(self->window, net_wm_state, atom, netstate, num);
+        netstate[num++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
+    OBT_PROP_SETA32(self->window, NET_WM_STATE, ATOM, netstate, num);
 
     if (self->frame)
         frame_adjust_state(self->frame);
@@ -2636,7 +2640,7 @@ static void client_apply_startup_state(ObClient *self,
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
-    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
+    OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     /* nothing to do for the other states:
        skip_taskbar
@@ -3235,9 +3239,9 @@ void client_close(ObClient *self)
         client_kill(self);
     else
         /* request the client to close with WM_DELETE_WINDOW */
-        PROP_MSG_TO(self->window, self->window, wm_protocols,
-                    prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
-                    NoEventMask);
+        OBT_PROP_MSG_TO(self->window, self->window, WM_PROTOCOLS,
+                        OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime, 0, 0,
+                        NoEventMask);
 }
 
 void client_kill(ObClient *self)
@@ -3295,7 +3299,7 @@ static void client_set_desktop_recursive(ObClient *self,
 
         old = self->desktop;
         self->desktop = target;
-        PROP_SET32(self->window, net_wm_desktop, cardinal, target);
+        OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, target);
         /* the frame can display the current desktop state */
         frame_adjust_state(self->frame);
         /* 'move' the window to the new desktop */
@@ -3391,9 +3395,9 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     gboolean below = self->below;
     gint i;
 
-    if (!(action == prop_atoms.net_wm_state_add ||
-          action == prop_atoms.net_wm_state_remove ||
-          action == prop_atoms.net_wm_state_toggle))
+    if (!(action == OBT_PROP_ATOM(NET_WM_STATE_ADD) ||
+          action == OBT_PROP_ATOM(NET_WM_STATE_REMOVE) ||
+          action == OBT_PROP_ATOM(NET_WM_STATE_TOGGLE)))
         /* an invalid action was passed to the client message, ignore it */
         return;
 
@@ -3403,103 +3407,103 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         if (!state) continue;
 
         /* if toggling, then pick whether we're adding or removing */
-        if (action == prop_atoms.net_wm_state_toggle) {
-            if (state == prop_atoms.net_wm_state_modal)
-                action = modal ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_maximized_vert)
-                action = self->max_vert ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_maximized_horz)
-                action = self->max_horz ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_shaded)
-                action = shaded ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_skip_taskbar)
+        if (action == OBT_PROP_ATOM(NET_WM_STATE_TOGGLE)) {
+            if (state == OBT_PROP_ATOM(NET_WM_STATE_MODAL))
+                action = modal ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT))
+                action = self->max_vert ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ))
+                action = self->max_horz ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED))
+                action = shaded ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR))
                 action = self->skip_taskbar ?
-                    prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_skip_pager)
+                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER))
                 action = self->skip_pager ?
-                    prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_hidden)
+                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN))
                 action = self->iconic ?
-                    prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_fullscreen)
+                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN))
                 action = fullscreen ?
-                    prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_above)
-                action = self->above ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_below)
-                action = self->below ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.net_wm_state_demands_attention)
+                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE))
+                action = self->above ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW))
+                action = self->below ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION))
                 action = self->demands_attention ?
-                    prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
-            else if (state == prop_atoms.ob_wm_state_undecorated)
-                action = undecorated ? prop_atoms.net_wm_state_remove :
-                    prop_atoms.net_wm_state_add;
+                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+            else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED))
+                action = undecorated ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
+                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
         }
 
-        if (action == prop_atoms.net_wm_state_add) {
-            if (state == prop_atoms.net_wm_state_modal) {
+        if (action == OBT_PROP_ATOM(NET_WM_STATE_ADD)) {
+            if (state == OBT_PROP_ATOM(NET_WM_STATE_MODAL)) {
                 modal = TRUE;
-            } else if (state == prop_atoms.net_wm_state_maximized_vert) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
                 max_vert = TRUE;
-            } else if (state == prop_atoms.net_wm_state_maximized_horz) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
                 max_horz = TRUE;
-            } else if (state == prop_atoms.net_wm_state_shaded) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED)) {
                 shaded = TRUE;
-            } else if (state == prop_atoms.net_wm_state_skip_taskbar) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR)) {
                 self->skip_taskbar = TRUE;
-            } else if (state == prop_atoms.net_wm_state_skip_pager) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER)) {
                 self->skip_pager = TRUE;
-            } else if (state == prop_atoms.net_wm_state_hidden) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN)) {
                 iconic = TRUE;
-            } else if (state == prop_atoms.net_wm_state_fullscreen) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN)) {
                 fullscreen = TRUE;
-            } else if (state == prop_atoms.net_wm_state_above) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE)) {
                 above = TRUE;
                 below = FALSE;
-            } else if (state == prop_atoms.net_wm_state_below) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW)) {
                 above = FALSE;
                 below = TRUE;
-            } else if (state == prop_atoms.net_wm_state_demands_attention) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION)){
                 demands_attention = TRUE;
-            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+            } else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED)) {
                 undecorated = TRUE;
             }
 
-        } else { /* action == prop_atoms.net_wm_state_remove */
-            if (state == prop_atoms.net_wm_state_modal) {
+        } else { /* action == OBT_PROP_ATOM(NET_WM_STATE_REMOVE) */
+            if (state == OBT_PROP_ATOM(NET_WM_STATE_MODAL)) {
                 modal = FALSE;
-            } else if (state == prop_atoms.net_wm_state_maximized_vert) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
                 max_vert = FALSE;
-            } else if (state == prop_atoms.net_wm_state_maximized_horz) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
                 max_horz = FALSE;
-            } else if (state == prop_atoms.net_wm_state_shaded) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED)) {
                 shaded = FALSE;
-            } else if (state == prop_atoms.net_wm_state_skip_taskbar) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR)) {
                 self->skip_taskbar = FALSE;
-            } else if (state == prop_atoms.net_wm_state_skip_pager) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER)) {
                 self->skip_pager = FALSE;
-            } else if (state == prop_atoms.net_wm_state_hidden) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN)) {
                 iconic = FALSE;
-            } else if (state == prop_atoms.net_wm_state_fullscreen) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN)) {
                 fullscreen = FALSE;
-            } else if (state == prop_atoms.net_wm_state_above) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE)) {
                 above = FALSE;
-            } else if (state == prop_atoms.net_wm_state_below) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW)) {
                 below = FALSE;
-            } else if (state == prop_atoms.net_wm_state_demands_attention) {
+            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION)){
                 demands_attention = FALSE;
-            } else if (state == prop_atoms.ob_wm_state_undecorated) {
+            } else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED)) {
                 undecorated = FALSE;
             }
         }
@@ -3624,11 +3628,11 @@ gboolean client_focus(ObClient *self)
     if (self->focus_notify) {
         XEvent ce;
         ce.xclient.type = ClientMessage;
-        ce.xclient.message_type = prop_atoms.wm_protocols;
+        ce.xclient.message_type = OBT_PROP_ATOM(WM_PROTOCOLS);
         ce.xclient.display = obt_display;
         ce.xclient.window = self->window;
         ce.xclient.format = 32;
-        ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
+        ce.xclient.data.l[0] = OBT_PROP_ATOM(WM_TAKE_FOCUS);
         ce.xclient.data.l[1] = event_curtime;
         ce.xclient.data.l[2] = 0l;
         ce.xclient.data.l[3] = 0l;

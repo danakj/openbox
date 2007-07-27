@@ -1,6 +1,6 @@
 #include "openbox/actions.h"
-#include "openbox/prop.h"
 #include "openbox/moveresize.h"
+#include "obt/prop.h"
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -19,8 +19,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         guint32 corner;
 
         corner = data->button != 0 ?
-            prop_atoms.net_wm_moveresize_move :
-            prop_atoms.net_wm_moveresize_move_keyboard;
+            OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE) :
+            OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD);
 
         moveresize_start(data->client, data->x, data->y, data->button, corner);
     }

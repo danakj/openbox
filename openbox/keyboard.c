@@ -25,7 +25,6 @@
 #include "grab.h"
 #include "client.h"
 #include "actions.h"
-#include "prop.h"
 #include "menuframe.h"
 #include "config.h"
 #include "keytree.h"

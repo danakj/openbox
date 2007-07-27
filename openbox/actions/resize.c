@@ -1,8 +1,8 @@
 #include "openbox/actions.h"
-#include "openbox/prop.h"
 #include "openbox/moveresize.h"
 #include "openbox/client.h"
 #include "openbox/frame.h"
+#include "obt/prop.h"
 
 typedef struct {
     gboolean corner_specified;
@@ -37,21 +37,21 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
         o->corner_specified = TRUE;
         if (!g_ascii_strcasecmp(s, "top"))
-            o->corner = prop_atoms.net_wm_moveresize_size_top;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOP);
         else if (!g_ascii_strcasecmp(s, "bottom"))
-            o->corner = prop_atoms.net_wm_moveresize_size_bottom;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOM);
         else if (!g_ascii_strcasecmp(s, "left"))
-            o->corner = prop_atoms.net_wm_moveresize_size_left;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT);
         else if (!g_ascii_strcasecmp(s, "right"))
-            o->corner = prop_atoms.net_wm_moveresize_size_right;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT);
         else if (!g_ascii_strcasecmp(s, "topleft"))
-            o->corner = prop_atoms.net_wm_moveresize_size_topleft;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT);
         else if (!g_ascii_strcasecmp(s, "topright"))
-            o->corner = prop_atoms.net_wm_moveresize_size_topright;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPRIGHT);
         else if (!g_ascii_strcasecmp(s, "bottomleft"))
-            o->corner = prop_atoms.net_wm_moveresize_size_bottomleft;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT);
         else if (!g_ascii_strcasecmp(s, "bottomright"))
-            o->corner = prop_atoms.net_wm_moveresize_size_bottomright;
+            o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT);
         else
             o->corner_specified = FALSE;
 
@@ -77,7 +77,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         guint32 corner;
 
         if (!data->button)
-            corner = prop_atoms.net_wm_moveresize_size_keyboard;
+            corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD);
         else if (o->corner_specified)
             corner = o->corner; /* it was specified in the binding */
         else
@@ -163,30 +163,30 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
     if (shaded) {
         /* for shaded windows, you can only resize west/east and move */
         if (b)
-            return prop_atoms.net_wm_moveresize_size_left;
+            return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT);
         if (c)
-            return prop_atoms.net_wm_moveresize_size_right;
-        return prop_atoms.net_wm_moveresize_move;
+            return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT);
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE);
     }
 
     if (y < A && y >= C)
-        return prop_atoms.net_wm_moveresize_size_topleft;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT);
     else if (y >= A && y >= B && a)
-        return prop_atoms.net_wm_moveresize_size_top;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOP);
     else if (y < B && y >= D)
-        return prop_atoms.net_wm_moveresize_size_topright;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPRIGHT);
     else if (y < C && y >= E && b)
-        return prop_atoms.net_wm_moveresize_size_left;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT);
     else if (y < D && y >= F && c)
-        return prop_atoms.net_wm_moveresize_size_right;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT);
     else if (y < E && y >= G)
-        return prop_atoms.net_wm_moveresize_size_bottomleft;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT);
     else if (y < G && y < H && d)
-        return prop_atoms.net_wm_moveresize_size_bottom;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOM);
     else if (y >= H && y < F)
-        return prop_atoms.net_wm_moveresize_size_bottomright;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT);
     else
-        return prop_atoms.net_wm_moveresize_move;
+        return OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE);
 
 #undef X
 #undef A

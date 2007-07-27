@@ -22,7 +22,6 @@
 #include "actions.h"
 #include "event.h"
 #include "client.h"
-#include "prop.h"
 #include "grab.h"
 #include "frame.h"
 #include "translate.h"

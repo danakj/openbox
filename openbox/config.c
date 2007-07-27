@@ -21,7 +21,6 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "actions.h"
-#include "prop.h"
 #include "translate.h"
 #include "client.h"
 #include "screen.h"

@@ -268,8 +268,6 @@ openbox_openbox_SOURCES = \
 	openbox/place.h \
 	openbox/popup.c \
 	openbox/popup.h \
-	openbox/prop.c \
-	openbox/prop.h \
 	openbox/resist.c \
 	openbox/resist.h \
 	openbox/screen.c \

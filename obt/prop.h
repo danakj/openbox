@@ -84,6 +84,19 @@ typedef enum {
     OBT_PROP_NET_WM_BOTTOMRIGHT,
     OBT_PROP_NET_WM_BOTTOMLEFT,
 
+    OBT_PROP_PRIVATE_PADDING1,
+    OBT_PROP_PRIVATE_PADDING2,
+    OBT_PROP_PRIVATE_PADDING3,
+    OBT_PROP_PRIVATE_PADDING4,
+    OBT_PROP_PRIVATE_PADDING5,
+    OBT_PROP_PRIVATE_PADDING6,
+    OBT_PROP_PRIVATE_PADDING7,
+    OBT_PROP_PRIVATE_PADDING8,
+    OBT_PROP_PRIVATE_PADDING9,
+    OBT_PROP_PRIVATE_PADDING10,
+    OBT_PROP_PRIVATE_PADDING11,
+    OBT_PROP_PRIVATE_PADDING12,
+
     /* Everything below here must go in net_supported on the root window */
 
     /* root window properties */
@@ -127,14 +140,14 @@ typedef enum {
     OBT_PROP_NET_WM_STRUT_PARTIAL,
     OBT_PROP_NET_WM_ICON,
     OBT_PROP_NET_WM_ICON_GEOMETRY,
-/*  OBT_PROP_NET_WM_PID, */
+    OBT_PROP_NET_WM_PID,
     OBT_PROP_NET_WM_ALLOWED_ACTIONS,
     OBT_PROP_NET_WM_USER_TIME,
-    OBT_PROP_NET_WM_USER_TIME_WINDOW,
+/*  OBT_PROP_NET_WM_USER_TIME_WINDOW, */
     OBT_PROP_NET_FRAME_EXTENTS,
 
     /* application protocols */
-/*  OBT_PROP_NET_WM_PING, */
+    OBT_PROP_NET_WM_PING,
 #ifdef SYNC
     OBT_PROP_NET_WM_SYNC_REQUEST,
     OBT_PROP_NET_WM_SYNC_REQUEST_COUNTER,
@@ -197,8 +210,6 @@ typedef enum {
     OBT_PROP_NUM_ATOMS
 } ObtPropAtom;
 
-#define OB_PROP_NUM_PUBLIC_ATOMS (OB_PROP_NUM_ATOMS - OB_PROP_NET_SUPPORTED)
-
 void obt_prop_startup();
 
 Atom obt_prop_atom(ObtPropAtom a);
@@ -222,34 +233,44 @@ void obt_prop_erase(Window win, Atom prop);
 void obt_prop_message(gint screen, Window about, Atom messagetype,
                       glong data0, glong data1, glong data2, glong data3,
                       glong data4, glong mask);
+void obt_prop_message_to(Window to, Window about, Atom messagetype,
+                         glong data0, glong data1, glong data2, glong data3,
+                         glong data4, glong mask);
 
-#define PROP_GET32(win, prop, type, ret) \
-    (prop_get32(win, obt_prop_atom(OB_PROP_##prop), prop_atoms.type, ret))
-#define PROP_GETA32(win, prop, type, ret, nret) \
-    (prop_get_array32(win, obt_prop_atom(OB_PROP_##prop), prop_atoms.type, \
-                      ret, nret))
-#define PROP_GETS(win, prop, type, ret) \
-    (prop_get_string_##type(win, obt_prop_atom(OB_PROP_##prop), ret))
-#define PROP_GETSS(win, prop, type, ret) \
-    (prop_get_strings_##type(win, obt_prop_atom(OB_PROP_##prop), ret))
+#define OBT_PROP_ATOM(prop) obt_prop_atom(OBT_PROP_##prop)
 
-#define PROP_SET32(win, prop, type, val) \
-    prop_set32(win, obt_prop_atom(OB_PROP_##prop), \
-               obt_prop_atom(OB_PROP_##type), val)
-#define PROP_SETA32(win, prop, type, val, num) \
-    prop_set_array32(win, obt_prop_atom(OB_PROP_##prop), \
-                     obt_prop_atom(OB_PROP_##type), val, num)
-#define PROP_SETS(win, prop, val) \
-    prop_set_string_utf8(win, obt_prop_atom(OB_PROP_##prop), val)
-#define PROP_SETSS(win, prop, strs) \
-    prop_set_strings_utf8(win, obt_prop_atom(OB_PROP_##prop), strs)
+#define OBT_PROP_GET32(win, prop, type, ret) \
+    (obt_prop_get32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), ret))
+#define OBT_PROP_GETA32(win, prop, type, ret, nret) \
+    (obt_prop_get_array32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), \
+                          ret, nret))
+#define OBT_PROP_GETS(win, prop, type, ret) \
+    (obt_prop_get_string_##type(win, OBT_PROP_ATOM(prop), ret))
+#define OBT_PROP_GETSS(win, prop, type, ret) \
+    (obt_prop_get_strings_##type(win, OBT_PROP_ATOM(prop), ret))
 
-#define PROP_ERASE(win, prop) prop_erase(win, obt_prop_atom(OB_PROP_##prop))
+#define OBT_PROP_SET32(win, prop, type, val) \
+    (obt_prop_set32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), val))
+#define OBT_PROP_SETA32(win, prop, type, val, num) \
+    (obt_prop_set_array32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), \
+                          val, num))
+#define OBT_PROP_SETS(win, prop, val) \
+    (obt_prop_set_string_utf8(win, OBT_PROP_ATOM(prop), val))
+#define OBT_PROP_SETSS(win, prop, strs) \
+    (obt_prop_set_strings_utf8(win, OBT_PROP_ATOM(prop), strs))
 
-#define PROP_MSG(screen, about, msgtype, data0, data1, data2, data3, data4) \
-  (prop_message(screen, about, obt_prop_atom(OB_PROP_##msgtype), \
-                data0, data1, data2, data3, data4, \
-                SubstructureNotifyMask | SubstructureRedirectMask))
+#define OBT_PROP_ERASE(win, prop) (obt_prop_erase(win, OBT_PROP_ATOM(prop)))
+
+#define OBT_PROP_MSG(screen, about, msgtype, data0, data1, data2, data3, \
+                     data4) \
+    (obt_prop_message(screen, about, OBT_PROP_ATOM(msgtype), \
+                      data0, data1, data2, data3, data4, \
+                      SubstructureNotifyMask | SubstructureRedirectMask))
+
+#define OBT_PROP_MSG(to, about, msgtype, data0, data1, data2, data3, \
+                     data4, mask) \
+    (obt_prop_message_to(to, OBT_PROP_ATOM(msgtype), \
+                      data0, data1, data2, data3, data4, mask))
 
 G_END_DECLS
 

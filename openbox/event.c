@@ -24,7 +24,6 @@
 #include "dock.h"
 #include "actions.h"
 #include "client.h"
-#include "prop.h"
 #include "config.h"
 #include "screen.h"
 #include "frame.h"
@@ -42,6 +41,7 @@
 #include "translate.h"
 #include "ping.h"
 #include "obt/display.h"
+#include "obt/prop.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -652,7 +652,9 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == ClientMessage) {
         /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for
            windows that are not managed yet. */
-        if (e->xclient.message_type == prop_atoms.net_request_frame_extents) {
+        if (e->xclient.message_type ==
+            OBT_PROP_ATOM(NET_REQUEST_FRAME_EXTENTS))
+        {
             /* Pretend to manage the client, getting information used to
                determine its decorations */
             ObClient *c = client_fake_manage(e->xclient.window);
@@ -663,8 +665,8 @@ static void event_process(const XEvent *ec, gpointer data)
             vals[1] = c->frame->size.right;
             vals[2] = c->frame->size.top;
             vals[3] = c->frame->size.bottom;
-            PROP_SETA32(e->xclient.window, net_frame_extents,
-                        cardinal, vals, 4);
+            OBT_PROP_SETA32(e->xclient.window, NET_FRAME_EXTENTS,
+                            CARDINAL, vals, 4);
 
             /* Free the pretend client */
             client_fake_unmanage(c);
@@ -744,7 +746,7 @@ static void event_handle_root(XEvent *e)
         if (e->xclient.format != 32) break;
 
         msgtype = e->xclient.message_type;
-        if (msgtype == prop_atoms.net_current_desktop) {
+        if (msgtype == OBT_PROP_ATOM(NET_CURRENT_DESKTOP)) {
             guint d = e->xclient.data.l[0];
             if (d < screen_num_desktops) {
                 event_curtime = e->xclient.data.l[1];
@@ -754,13 +756,13 @@ static void event_handle_root(XEvent *e)
                                   "a timestamp\n");
                 screen_set_desktop(d, TRUE);
             }
-        } else if (msgtype == prop_atoms.net_number_of_desktops) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS)) {
             guint d = e->xclient.data.l[0];
             if (d > 0 && d <= 1000)
                 screen_set_num_desktops(d);
-        } else if (msgtype == prop_atoms.net_showing_desktop) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_SHOWING_DESKTOP)) {
             screen_show_desktop(e->xclient.data.l[0] != 0, NULL);
-        } else if (msgtype == prop_atoms.ob_control) {
+        } else if (msgtype == OBT_PROP_ATOM(OB_CONTROL)) {
             ob_debug("OB_CONTROL: %d\n", e->xclient.data.l[0]);
             if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();
@@ -774,11 +776,11 @@ static void event_handle_root(XEvent *e)
         }
         break;
     case PropertyNotify:
-        if (e->xproperty.atom == prop_atoms.net_desktop_names) {
+        if (e->xproperty.atom == OBT_PROP_ATOM(NET_DESKTOP_NAMES)) {
             ob_debug("UPDATE DESKTOP NAMES\n");
             screen_update_desktop_names();
         }
-        else if (e->xproperty.atom == prop_atoms.net_desktop_layout)
+        else if (e->xproperty.atom == OBT_PROP_ATOM(NET_DESKTOP_LAYOUT))
             screen_update_layout();
         break;
     case ConfigureNotify:
@@ -1279,7 +1281,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (e->xclient.format != 32) return;
 
         msgtype = e->xclient.message_type;
-        if (msgtype == prop_atoms.wm_change_state) {
+        if (msgtype == OBT_PROP_ATOM(WM_CHANGE_STATE)) {
             /* compress changes into a single change */
             while (XCheckTypedWindowEvent(obt_display, client->window,
                                           e->type, &ce)) {
@@ -1293,7 +1295,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 e->xclient = ce.xclient;
             }
             client_set_wm_state(client, e->xclient.data.l[0]);
-        } else if (msgtype == prop_atoms.net_wm_desktop) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_WM_DESKTOP)) {
             /* compress changes into a single change */
             while (XCheckTypedWindowEvent(obt_display, client->window,
                                           e->type, &ce)) {
@@ -1310,7 +1312,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
                                    FALSE, FALSE);
-        } else if (msgtype == prop_atoms.net_wm_state) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_WM_STATE)) {
             gulong ignore_start;
 
             /* can't compress these */
@@ -1328,10 +1330,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                              e->xclient.data.l[1], e->xclient.data.l[2]);
             if (!config_focus_under_mouse)
                 event_end_ignore_all_enters(ignore_start);
-        } else if (msgtype == prop_atoms.net_close_window) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_CLOSE_WINDOW)) {
             ob_debug("net_close_window for 0x%lx\n", client->window);
             client_close(client);
-        } else if (msgtype == prop_atoms.net_active_window) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_ACTIVE_WINDOW)) {
             ob_debug("net_active_window for 0x%lx source=%s\n",
                      client->window,
                      (e->xclient.data.l[0] == 0 ? "unknown" :
@@ -1354,42 +1356,42 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_activate(client, FALSE, TRUE, TRUE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));
-        } else if (msgtype == prop_atoms.net_wm_moveresize) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_WM_MOVERESIZE)) {
             ob_debug("net_wm_moveresize for 0x%lx direction %d\n",
                      client->window, e->xclient.data.l[2]);
             if ((Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_topleft ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_top ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOP) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_topright ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPRIGHT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_right ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_right ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_bottomright ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_bottom ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOM) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_bottomleft ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_left ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_move ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_size_keyboard ||
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD) ||
                 (Atom)e->xclient.data.l[2] ==
-                prop_atoms.net_wm_moveresize_move_keyboard) {
-
+                OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD))
+            {
                 moveresize_start(client, e->xclient.data.l[0],
                                  e->xclient.data.l[1], e->xclient.data.l[3],
                                  e->xclient.data.l[2]);
             }
             else if ((Atom)e->xclient.data.l[2] ==
-                     prop_atoms.net_wm_moveresize_cancel)
+                     OBT_PROP_ATOM(NET_WM_MOVERESIZE_CANCEL))
                 moveresize_end(TRUE);
-        } else if (msgtype == prop_atoms.net_moveresize_window) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_MOVERESIZE_WINDOW)) {
             gint ograv, x, y, w, h;
 
             ograv = client->gravity;
@@ -1438,7 +1440,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_configure(client, x, y, w, h, FALSE, TRUE, FALSE);
 
             client->gravity = ograv;
-        } else if (msgtype == prop_atoms.net_restack_window) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_RESTACK_WINDOW)) {
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_RESTACK_WINDOW sent for window %s with "
@@ -1504,19 +1506,19 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             if (a == b)
                 continue;
-            if ((a == prop_atoms.net_wm_name ||
-                 a == prop_atoms.wm_name ||
-                 a == prop_atoms.net_wm_icon_name ||
-                 a == prop_atoms.wm_icon_name)
+            if ((a == OBT_PROP_ATOM(NET_WM_NAME) ||
+                 a == OBT_PROP_ATOM(WM_NAME) ||
+                 a == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
+                 a == OBT_PROP_ATOM(WM_ICON_NAME))
                 &&
-                (b == prop_atoms.net_wm_name ||
-                 b == prop_atoms.wm_name ||
-                 b == prop_atoms.net_wm_icon_name ||
-                 b == prop_atoms.wm_icon_name)) {
+                (b == OBT_PROP_ATOM(NET_WM_NAME) ||
+                 b == OBT_PROP_ATOM(WM_NAME) ||
+                 b == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
+                 b == OBT_PROP_ATOM(WM_ICON_NAME))) {
                 continue;
             }
-            if (a == prop_atoms.net_wm_icon &&
-                b == prop_atoms.net_wm_icon)
+            if (a == OBT_PROP_ATOM(NET_WM_ICON) &&
+                b == OBT_PROP_ATOM(NET_WM_ICON))
                 continue;
 
             XPutBackEvent(obt_display, &ce);
@@ -1542,32 +1544,32 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* type may have changed, so update the layer */
             client_calc_layer(client);
             client_setup_decor_and_functions(client, TRUE);
-        } else if (msgtype == prop_atoms.net_wm_name ||
-                   msgtype == prop_atoms.wm_name ||
-                   msgtype == prop_atoms.net_wm_icon_name ||
-                   msgtype == prop_atoms.wm_icon_name) {
+        } else if (msgtype == OBT_PROP_ATOM(NET_WM_NAME) ||
+                   msgtype == OBT_PROP_ATOM(WM_NAME) ||
+                   msgtype == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
+                   msgtype == OBT_PROP_ATOM(WM_ICON_NAME)) {
             client_update_title(client);
-        } else if (msgtype == prop_atoms.wm_protocols) {
+        } else if (msgtype == OBT_PROP_ATOM(WM_PROTOCOLS)) {
             client_update_protocols(client);
             client_setup_decor_and_functions(client, TRUE);
         }
-        else if (msgtype == prop_atoms.net_wm_strut) {
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_STRUT)) {
             client_update_strut(client);
         }
-        else if (msgtype == prop_atoms.net_wm_strut_partial) {
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_STRUT_PARTIAL)) {
             client_update_strut(client);
         }
-        else if (msgtype == prop_atoms.net_wm_icon) {
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_ICON)) {
             client_update_icons(client);
         }
-        else if (msgtype == prop_atoms.net_wm_icon_geometry) {
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_ICON_GEOMETRY)) {
             client_update_icon_geometry(client);
         }
-        else if (msgtype == prop_atoms.net_wm_user_time) {
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_USER_TIME)) {
             guint32 t;
             if (client == focus_client &&
-                PROP_GET32(client->window, net_wm_user_time, cardinal, &t) &&
-                t && !event_time_after(t, e->xproperty.time) &&
+                OBT_PROP_GET32(client->window, NET_WM_USER_TIME, CARDINAL, &t)
+                && t && !event_time_after(t, e->xproperty.time) &&
                 (!event_last_user_time ||
                  event_time_after(t, event_last_user_time)))
             {
@@ -1575,7 +1577,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
         }
 #ifdef SYNC
-        else if (msgtype == prop_atoms.net_wm_sync_request_counter) {
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER)) {
             client_update_sync_request_counter(client);
         }
 #endif
@@ -2038,7 +2040,7 @@ Time event_get_server_time(void)
     XEvent event;
 
     XChangeProperty(obt_display, screen_support_win,
-                    prop_atoms.wm_class, prop_atoms.string,
+                    OBT_PROP_ATOM(WM_CLASS), OBT_PROP_ATOM(STRING),
                     8, PropModeAppend, NULL, 0);
     XWindowEvent(obt_display, screen_support_win, PropertyChangeMask, &event);
     return event.xproperty.time;

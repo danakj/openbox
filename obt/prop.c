@@ -100,14 +100,14 @@ void obt_prop_startup()
     CREATE(NET_WM_STRUT_PARTIAL, "_NET_WM_STRUT_PARTIAL");
     CREATE(NET_WM_ICON, "_NET_WM_ICON");
     CREATE(NET_WM_ICON_GEOMETRY, "_NET_WM_ICON_GEOMETRY");
-/*   CREATE(NET_WM_PId, "_NET_WM_PID"); */
+    CREATE(NET_WM_PID, "_NET_WM_PID");
     CREATE(NET_WM_ALLOWED_ACTIONS, "_NET_WM_ALLOWED_ACTIONS");
     CREATE(NET_WM_USER_TIME, "_NET_WM_USER_TIME");
-    CREATE(NET_WM_USER_TIME_WINDOW, "_NET_WM_USER_TIME_WINDOW");
+/*  CREATE(NET_WM_USER_TIME_WINDOW, "_NET_WM_USER_TIME_WINDOW"); */
     CREATE(KDE_NET_WM_FRAME_STRUT, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(NET_FRAME_EXTENTS, "_NET_FRAME_EXTENTS");
 
-/*   CREATE(NET_WM_PING, "_NET_WM_PING"); */
+    CREATE(NET_WM_PING, "_NET_WM_PING");
 #ifdef SYNC
     CREATE(NET_WM_SYNC_REQUEST, "_NET_WM_SYNC_REQUEST");
     CREATE(NET_WM_SYNC_REQUEST_COUNTER, "_NET_WM_SYNC_REQUEST_COUNTER");
@@ -438,6 +438,15 @@ void obt_prop_message(gint screen, Window about, Atom messagetype,
                       glong data0, glong data1, glong data2, glong data3,
                       glong data4, glong mask)
 {
+    obt_prop_message_to(RootWindow(obt_display, screen), about, messagetype,
+                        data0, data1, data2, data3, data4, mask);
+}
+
+void obt_prop_message_to(Window to, Window about,
+                         Atom messagetype,
+                         glong data0, glong data1, glong data2, glong data3,
+                         glong data4, glong mask)
+{
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type = messagetype;
@@ -449,6 +458,5 @@ void obt_prop_message(gint screen, Window about, Atom messagetype,
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
     ce.xclient.data.l[4] = data4;
-    XSendEvent(obt_display, RootWindow(obt_display, screen), FALSE,
-               mask, &ce);
+    XSendEvent(obt_display, to, FALSE, mask, &ce);
 }

@@ -20,7 +20,6 @@
 #include "grab.h"
 #include "framerender.h"
 #include "screen.h"
-#include "prop.h"
 #include "client.h"
 #include "frame.h"
 #include "openbox.h"
@@ -34,6 +33,7 @@
 #include "render/render.h"
 #include "render/theme.h"
 #include "obt/display.h"
+#include "obt/prop.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -167,8 +167,8 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 {
     ObCursor cur;
-    gboolean mv = (cnr == prop_atoms.net_wm_moveresize_move ||
-                   cnr == prop_atoms.net_wm_moveresize_move_keyboard);
+    gboolean mv = (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE) ||
+                   cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD));
     gint up = 1;
     gint left = 1;
 
@@ -178,32 +178,37 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
 
-    if (cnr == prop_atoms.net_wm_moveresize_size_topleft) {
+    if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT)) {
         cur = OB_CURSOR_NORTHWEST;
         up = left = -1;
-    } else if (cnr == prop_atoms.net_wm_moveresize_size_top) {
+    }
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOP)) {
         cur = OB_CURSOR_NORTH;
         up = -1;
-    } else if (cnr == prop_atoms.net_wm_moveresize_size_topright) {
+    }
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPRIGHT)) {
         cur = OB_CURSOR_NORTHEAST;
         up = -1;
-    } else if (cnr == prop_atoms.net_wm_moveresize_size_right)
+    }
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT))
         cur = OB_CURSOR_EAST;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_bottomright)
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT))
         cur = OB_CURSOR_SOUTHEAST;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_bottom)
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOM))
         cur = OB_CURSOR_SOUTH;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_bottomleft) {
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT)) {
         cur = OB_CURSOR_SOUTHWEST;
         left = -1;
-    } else if (cnr == prop_atoms.net_wm_moveresize_size_left) {
+    }
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT)) {
         cur = OB_CURSOR_WEST;
         left = -1;
-    } else if (cnr == prop_atoms.net_wm_moveresize_size_keyboard)
+    }
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD))
         cur = OB_CURSOR_SOUTHEAST;
-    else if (cnr == prop_atoms.net_wm_moveresize_move)
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE))
         cur = OB_CURSOR_MOVE;
-    else if (cnr == prop_atoms.net_wm_moveresize_move_keyboard)
+    else if (cnr == OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD))
         cur = OB_CURSOR_MOVE;
     else
         g_assert_not_reached();
@@ -381,11 +386,11 @@ static void do_resize(void)
 
         /* tell the client what we're waiting for */
         ce.xclient.type = ClientMessage;
-        ce.xclient.message_type = prop_atoms.wm_protocols;
+        ce.xclient.message_type = OBT_PROP_ATOM(WM_PROTOCOLS);
         ce.xclient.display = obt_display;
         ce.xclient.window = moveresize_client->window;
         ce.xclient.format = 32;
-        ce.xclient.data.l[0] = prop_atoms.net_wm_sync_request;
+        ce.xclient.data.l[0] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST);
         ce.xclient.data.l[1] = event_curtime;
         ce.xclient.data.l[2] = XSyncValueLow32(val);
         ce.xclient.data.l[3] = XSyncValueHigh32(val);
@@ -837,41 +842,44 @@ gboolean moveresize_event(XEvent *e)
             gint dw, dh;
             ObDirection dir;
 
-            if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
+            if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT)) {
                 dw = -(e->xmotion.x_root - start_x);
                 dh = -(e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_NORTHWEST;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_top) {
+            } else if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOP)) {
                 dw = 0;
                 dh = -(e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_NORTH;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_topright) {
+            } else if (corner ==
+                       OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPRIGHT)) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = -(e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_NORTHEAST;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_right) {
+            } else if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_RIGHT)) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = 0;
                 dir = OB_DIRECTION_EAST;
             } else if (corner ==
-                       prop_atoms.net_wm_moveresize_size_bottomright) {
+                       OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT)) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = (e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_SOUTHEAST;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_bottom) {
+            } else if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOM))
+            {
                 dw = 0;
                 dh = (e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_SOUTH;
             } else if (corner ==
-                       prop_atoms.net_wm_moveresize_size_bottomleft) {
+                       OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT)) {
                 dw = -(e->xmotion.x_root - start_x);
                 dh = (e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_SOUTHWEST;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_left) {
+            } else if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT)) {
                 dw = -(e->xmotion.x_root - start_x);
                 dh = 0;
                 dir = OB_DIRECTION_WEST;
-            } else if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
+            } else if (corner ==
+                       OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD)) {
                 dw = (e->xmotion.x_root - start_x);
                 dh = (e->xmotion.y_root - start_y);
                 dir = OB_DIRECTION_SOUTHEAST;
@@ -885,15 +893,15 @@ gboolean moveresize_event(XEvent *e)
             cur_w += dw;
             cur_h += dh;
 
-            if (corner == prop_atoms.net_wm_moveresize_size_topleft ||
-                corner == prop_atoms.net_wm_moveresize_size_left ||
-                corner == prop_atoms.net_wm_moveresize_size_bottomleft)
+            if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT) ||
+                corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_LEFT) ||
+                corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT))
             {
                 cur_x -= dw;
             }
-            if (corner == prop_atoms.net_wm_moveresize_size_topleft ||
-                corner == prop_atoms.net_wm_moveresize_size_top ||
-                corner == prop_atoms.net_wm_moveresize_size_topright)
+            if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT) ||
+                corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOP) ||
+                corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPRIGHT))
             {
                 cur_y -= dh;
             }
@@ -913,10 +921,12 @@ gboolean moveresize_event(XEvent *e)
                    e->xkey.keycode == ob_keycode(OB_KEY_DOWN) ||
                    e->xkey.keycode == ob_keycode(OB_KEY_UP))
         {
-            if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
+            if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD)) {
                 resize_with_keys(e->xkey.keycode, e->xkey.state);
                 used = TRUE;
-            } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
+            } else if (corner ==
+                       OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD))
+            {
                 move_with_keys(e->xkey.keycode, e->xkey.state);
                 used = TRUE;
             }

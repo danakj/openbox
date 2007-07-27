@@ -18,7 +18,6 @@
 */
 
 #include "openbox.h"
-#include "prop.h"
 #include "screen.h"
 #include "focus.h"
 #include "client.h"
@@ -26,6 +25,7 @@
 #include "frame.h"
 #include "window.h"
 #include "debug.h"
+#include "obt/prop.h"
 
 GList  *stacking_list = NULL;
 /*! When true, stacking changes will not be reflected on the screen.  This is
@@ -54,8 +54,8 @@ void stacking_set_list(void)
         }
     }
 
-    PROP_SETA32(RootWindow(obt_display, ob_screen),
-                net_client_list_stacking, window, (gulong*)windows, i);
+    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+                    NET_CLIENT_LIST_STACKING, WINDOW, (gulong*)windows, i);
 
     g_free(windows);
 }

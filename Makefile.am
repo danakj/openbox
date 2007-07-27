@@ -119,6 +119,7 @@ obt_libobt_la_CPPFLAGS = \
 	$(XSHAPE_CFLAGS) \
 	$(XSYNC_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(XML_CFLAGS) \
 	-DG_LOG_DOMAIN=\"Obt\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DDATADIR=\"$(datadir)\" \
@@ -131,7 +132,8 @@ obt_libobt_la_LIBADD = \
 	$(XRANDR_LIBS) \
 	$(XSHAPE_LIBS) \
 	$(XSYNC_LIBS) \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	$(XML_LIBS)
 obt_libobt_la_SOURCES = \
 	obt/display.h \
 	obt/display.c \
@@ -140,6 +142,8 @@ obt_libobt_la_SOURCES = \
 	obt/keyboard.c \
 	obt/mainloop.h \
 	obt/mainloop.c \
+	obt/parse.h \
+	obt/parse.c \
 	obt/prop.h \
 	obt/prop.c \
 	obt/util.h

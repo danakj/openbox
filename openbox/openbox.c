@@ -21,7 +21,6 @@
 #include "openbox.h"
 #include "session.h"
 #include "dock.h"
-#include "modkeys.h"
 #include "event.h"
 #include "menu.h"
 #include "client.h"
@@ -204,7 +203,7 @@ gint main(gint argc, gchar **argv)
 
     if (screen_annex()) { /* it will be ours! */
         do {
-            modkeys_startup(reconfigure);
+            if (reconfigure) obt_keyboard_reload();
 
             /* get the keycodes for keys we use */
             keys[OB_KEY_RETURN] = modkeys_sym_to_code(XK_Return);
@@ -359,7 +358,6 @@ gint main(gint argc, gchar **argv)
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);
-            modkeys_shutdown(reconfigure);
         } while (reconfigure);
     }
 

@@ -135,6 +135,9 @@ obt_libobt_la_LIBADD = \
 obt_libobt_la_SOURCES = \
 	obt/display.h \
 	obt/display.c \
+	obt/internal.h \
+	obt/keyboard.h \
+	obt/keyboard.c \
 	obt/mainloop.h \
 	obt/mainloop.c \
 	obt/prop.h \

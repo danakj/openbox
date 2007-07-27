@@ -210,8 +210,6 @@ typedef enum {
     OBT_PROP_NUM_ATOMS
 } ObtPropAtom;
 
-void obt_prop_startup();
-
 Atom obt_prop_atom(ObtPropAtom a);
 
 gboolean obt_prop_get32(Window win, Atom prop, Atom type, guint32 *ret);

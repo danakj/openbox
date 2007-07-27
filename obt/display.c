@@ -18,6 +18,8 @@
 
 #include "obt/display.h"
 #include "obt/prop.h"
+#include "obt/internal.h"
+#include "obt/keyboard.h"
 
 #ifdef HAVE_STRING_H
 #  include <string.h>
@@ -108,6 +110,7 @@ gboolean obt_display_open(const char *display_name)
 #endif
 
         obt_prop_startup();
+        obt_keyboard_reload();
     }
     g_free(n);
 
@@ -116,6 +119,7 @@ gboolean obt_display_open(const char *display_name)
 
 void obt_display_close()
 {
+    obt_keyboard_shutdown();
     if (obt_display) XCloseDisplay(obt_display);
 }
 

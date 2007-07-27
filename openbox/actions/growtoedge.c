@@ -10,27 +10,19 @@ typedef struct {
     gboolean shrink;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static gpointer setup_shrink_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_shrink_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_growtoedge_startup(void)
 {
-    actions_register("GrowToEdge",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
-
-    actions_register("ShrinkToEdge",
-                     setup_shrink_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("GrowToEdge", setup_func,
+                     g_free, run_func, NULL, NULL);
+    actions_register("ShrinkToEdge", setup_shrink_func,
+                     g_free, run_func, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -39,8 +31,8 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o->dir = OB_DIRECTION_NORTH;
     o->shrink = FALSE;
 
-    if ((n = parse_find_node("direction", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "direction"))) {
+        gchar *s = obt_parse_node_string(n);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->dir = OB_DIRECTION_NORTH;
@@ -59,21 +51,14 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_shrink_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_shrink_func(xmlNodePtr node)
 {
     Options *o;
 
-    o = setup_func(i, doc, node);
+    o = setup_func(node);
     o->shrink = TRUE;
 
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 static gboolean do_grow(ObActionsData *data, gint x, gint y, gint w, gint h)

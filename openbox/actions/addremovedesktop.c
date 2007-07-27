@@ -7,36 +7,28 @@ typedef struct {
     gboolean add;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static gpointer setup_add_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static gpointer setup_remove_func(ObParseInst *i,
-                                  xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_add_func(xmlNodePtr node);
+static gpointer setup_remove_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_addremovedesktop_startup(void)
 {
-    actions_register("AddDesktop",
-                     setup_add_func,
-                     free_func,
-                     run_func,
+    actions_register("AddDesktop", setup_add_func, g_free, run_func,
                      NULL, NULL);
-    actions_register("RemoveDesktop",
-                     setup_remove_func,
-                     free_func,
-                     run_func,
+    actions_register("RemoveDesktop", setup_remove_func, g_free, run_func,
                      NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("where", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "where"))) {
+        gchar *s = obt_parse_node_string(n);
         if (!g_ascii_strcasecmp(s, "last"))
             o->current = FALSE;
         else if (!g_ascii_strcasecmp(s, "current"))
@@ -47,26 +39,18 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_add_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_add_func(xmlNodePtr node)
 {
-    Options *o = setup_func(i, doc, node);
+    Options *o = setup_func(node);
     o->add = TRUE;
     return o;
 }
 
-static gpointer setup_remove_func(ObParseInst *i,
-                                  xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_remove_func(xmlNodePtr node)
 {
-    Options *o = setup_func(i, doc, node);
+    Options *o = setup_func(node);
     o->add = FALSE;
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

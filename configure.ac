@@ -179,7 +179,6 @@ AC_CONFIG_FILES([
   m4/Makefile
   po/Makefile.in
   render/obrender-4.0.pc
-  parser/obparser-4.0.pc
   obt/obt-4.0.pc
   version.h
 ])

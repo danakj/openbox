@@ -23,81 +23,77 @@ typedef struct {
     GSList *elseacts;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_func(xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_if_startup(void)
 {
-    actions_register("If",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("If", setup_func, free_func, run_func, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("shaded", node))) {
-        if (parse_bool(doc, n))
+    if ((n = obt_parse_find_node(node, "shaded"))) {
+        if (obt_parse_node_bool(n))
             o->shaded_on = TRUE;
         else
             o->shaded_off = TRUE;
     }
-    if ((n = parse_find_node("maximized", node))) {
-        if (parse_bool(doc, n))
+    if ((n = obt_parse_find_node(node, "maximized"))) {
+        if (obt_parse_node_bool(n))
             o->maxfull_on = TRUE;
         else
             o->maxfull_off = TRUE;
     }
-    if ((n = parse_find_node("maximizedhorizontal", node))) {
-        if (parse_bool(doc, n))
+    if ((n = obt_parse_find_node(node, "maximizedhorizontal"))) {
+        if (obt_parse_node_bool(n))
             o->maxhorz_on = TRUE;
         else
             o->maxhorz_off = TRUE;
     }
-    if ((n = parse_find_node("maximizedvertical", node))) {
-        if (parse_bool(doc, n))
+    if ((n = obt_parse_find_node(node, "maximizedvertical"))) {
+        if (obt_parse_node_bool(n))
             o->maxvert_on = TRUE;
         else
             o->maxvert_off = TRUE;
     }
-    if ((n = parse_find_node("iconified", node))) {
-        if (parse_bool(doc, n))
+    if ((n = obt_parse_find_node(node, "iconified"))) {
+        if (obt_parse_node_bool(n))
             o->iconic_on = TRUE;
         else
             o->iconic_off = TRUE;
     }
-    if ((n = parse_find_node("focused", node))) {
-        if (parse_bool(doc, n))
+    if ((n = obt_parse_find_node(node, "focused"))) {
+        if (obt_parse_node_bool(n))
             o->focused = TRUE;
         else
             o->unfocused = TRUE;
     }
 
-    if ((n = parse_find_node("then", node))) {
+    if ((n = obt_parse_find_node(node, "then"))) {
         xmlNodePtr m;
 
-        m = parse_find_node("action", n->xmlChildrenNode);
+        m = obt_parse_find_node(n->xmlChildrenNode, "action");
         while (m) {
-            ObActionsAct *action = actions_parse(i, doc, m);
+            ObActionsAct *action = actions_parse(m);
             if (action) o->thenacts = g_slist_prepend(o->thenacts, action);
-            m = parse_find_node("action", m->next);
+            m = obt_parse_find_node(m->next, "action");
         }
     }
-    if ((n = parse_find_node("else", node))) {
+    if ((n = obt_parse_find_node(node, "else"))) {
         xmlNodePtr m;
 
-        m = parse_find_node("action", n->xmlChildrenNode);
+        m = obt_parse_find_node(n->xmlChildrenNode, "action");
         while (m) {
-            ObActionsAct *action = actions_parse(i, doc, m);
+            ObActionsAct *action = actions_parse(m);
             if (action) o->elseacts = g_slist_prepend(o->elseacts, action);
-            m = parse_find_node("action", m->next);
+            m = obt_parse_find_node(m->next, "action");
         }
     }
 
@@ -107,6 +103,15 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 static void free_func(gpointer options)
 {
     Options *o = options;
+
+    while (o->thenacts) {
+        actions_act_unref(o->thenacts->data);
+        o->thenacts = g_slist_delete_link(o->thenacts, o->thenacts);
+    }
+    while (o->elseacts) {
+        actions_act_unref(o->elseacts->data);
+        o->elseacts = g_slist_delete_link(o->elseacts, o->elseacts);
+    }
 
     g_free(o);
 }

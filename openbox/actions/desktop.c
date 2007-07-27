@@ -26,10 +26,8 @@ typedef struct {
     gboolean follow;
 } Options;
 
-static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
-                                  xmlNodePtr node);
-static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
-                                xmlNodePtr node);
+static gpointer setup_go_func(xmlNodePtr node);
+static gpointer setup_send_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_desktop_startup(void)
@@ -40,8 +38,7 @@ void action_desktop_startup(void)
                      NULL, NULL);
 }
 
-static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
-                                  xmlNodePtr node)
+static gpointer setup_go_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -53,8 +50,8 @@ static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
     /* wrap by default - it's handy! */
     o->rel.wrap = TRUE;
 
-    if ((n = parse_find_node("to", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "to"))) {
+        gchar *s = obt_parse_node_string(n);
         if (!g_ascii_strcasecmp(s, "last"))
             o->type = LAST;
         else if (!g_ascii_strcasecmp(s, "next")) {
@@ -89,29 +86,28 @@ static gpointer setup_go_func(ObParseInst *i, xmlDocPtr doc,
         }
         else {
             o->type = ABSOLUTE;
-            o->abs.desktop = parse_int(doc, n) - 1;
+            o->abs.desktop = obt_parse_node_int(n) - 1;
         }
         g_free(s);
     }
 
-    if ((n = parse_find_node("wrap", node)))
-        o->rel.wrap = parse_bool(doc, n);
+    if ((n = obt_parse_find_node(node, "wrap")))
+        o->rel.wrap = obt_parse_node_bool(n);
 
     return o;
 }
 
-static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
-                                xmlNodePtr node)
+static gpointer setup_send_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
-    o = setup_go_func(i, doc, node);
+    o = setup_go_func(node);
     o->send = TRUE;
     o->follow = TRUE;
 
-    if ((n = parse_find_node("follow", node)))
-        o->follow = parse_bool(doc, n);
+    if ((n = obt_parse_find_node(node, "follow")))
+        o->follow = obt_parse_node_bool(n);
 
     return o;
 }

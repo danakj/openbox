@@ -24,7 +24,6 @@ check_PROGRAMS = \
 	render/rendertest
 
 lib_LTLIBRARIES = \
-	parser/libobparser.la \
 	render/libobrender.la \
 	obt/libobt.la
 
@@ -45,7 +44,7 @@ render_rendertest_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"RenderTest\"
 render_rendertest_LDADD = \
-	parser/libobparser.la \
+	obt/libobt.la \
 	render/libobrender.la \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
@@ -65,7 +64,7 @@ render_libobrender_la_CPPFLAGS = \
 render_libobrender_la_LDFLAGS = \
 	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 render_libobrender_la_LIBADD = \
-	parser/libobparser.la \
+	obt/libobt.la \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
 	$(XFT_LIBS) \
@@ -91,24 +90,6 @@ render_libobrender_la_SOURCES = \
 	render/render.c \
 	render/theme.h \
 	render/theme.c
-
-## parser ##
-
-parser_libobparser_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DG_LOG_DOMAIN=\"ObParser\" \
-	-DLOCALEDIR=\"$(localedir)\" \
-	-DDATADIR=\"$(datadir)\" \
-	-DCONFIGDIR=\"$(configdir)\"
-parser_libobparser_la_LDFLAGS = \
-	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
-parser_libobparser_la_LIBADD = \
-	$(GLIB_LIBS) \
-	$(XML_LIBS) 
-parser_libobparser_la_SOURCES = \
-	parser/parse.h \
-	parser/parse.c
 
 ## obt ##
 
@@ -173,7 +154,6 @@ openbox_openbox_LDADD = \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \
 	render/libobrender.la \
-	parser/libobparser.la \
 	obt/libobt.la
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
@@ -398,9 +378,16 @@ pubinclude_HEADERS = \
 	render/mask.h \
 	render/render.h \
 	render/theme.h \
-	parser/parse.h \
 	obt/display.h \
+	obt/display.c \
+	obt/keyboard.h \
+	obt/keyboard.c \
 	obt/mainloop.h \
+	obt/mainloop.c \
+	obt/parse.h \
+	obt/parse.c \
+	obt/prop.h \
+	obt/prop.c \
 	obt/util.h
 
 nodist_pubinclude_HEADERS = \
@@ -408,7 +395,6 @@ nodist_pubinclude_HEADERS = \
 
 nodist_pkgconfig_DATA = \
 	render/obrender-4.0.pc \
-	parser/obparser-4.0.pc \
 	obt/obt-4.0.pc
 
 ## data ##
@@ -469,7 +455,6 @@ dist_noinst_DATA = \
 	doc/openbox-kde-session.1.sgml \
 	doc/openbox-kde-session.1.in \
 	render/obrender-4.0.pc.in \
-	parser/obparser-4.0.pc.in \
 	obt/obt-4.0.pc.in \
 	tools/themeupdate/themeupdate.py \
 	tests/hideshow.py \

@@ -6,11 +6,9 @@ typedef struct {
     gboolean toggle;
 } Options;
 
-static gpointer setup_func_top(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static gpointer setup_func_bottom(ObParseInst *i, xmlDocPtr doc,
-                                  xmlNodePtr node);
-static gpointer setup_func_send(ObParseInst *i, xmlDocPtr doc,
-                                xmlNodePtr node);
+static gpointer setup_func_top(xmlNodePtr node);
+static gpointer setup_func_bottom(xmlNodePtr node);
+static gpointer setup_func_send(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_layer_startup(void)
@@ -23,7 +21,7 @@ void action_layer_startup(void)
                      run_func, NULL, NULL);
 }
 
-static gpointer setup_func_top(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func_top(xmlNodePtr node)
 {
     Options *o = g_new0(Options, 1);
     o->layer = 1;
@@ -31,8 +29,7 @@ static gpointer setup_func_top(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_func_bottom(ObParseInst *i, xmlDocPtr doc,
-                                  xmlNodePtr node)
+static gpointer setup_func_bottom(xmlNodePtr node)
 {
     Options *o = g_new0(Options, 1);
     o->layer = -1;
@@ -40,16 +37,15 @@ static gpointer setup_func_bottom(ObParseInst *i, xmlDocPtr doc,
     return o;
 }
 
-static gpointer setup_func_send(ObParseInst *i, xmlDocPtr doc,
-                                xmlNodePtr node)
+static gpointer setup_func_send(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("layer", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "layer"))) {
+        gchar *s = obt_parse_node_string(n);
         if (!g_ascii_strcasecmp(s, "above") ||
             !g_ascii_strcasecmp(s, "top"))
             o->layer = 1;

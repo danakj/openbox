@@ -158,23 +158,21 @@ ObActionsAct* actions_parse_string(const gchar *name)
 
     if ((act = actions_build_act_from_string(name)))
         if (act->def->setup)
-            act->options = act->def->setup(NULL, NULL, NULL);
+            act->options = act->def->setup(NULL);
 
     return act;
 }
 
-ObActionsAct* actions_parse(ObParseInst *i,
-                            xmlDocPtr doc,
-                            xmlNodePtr node)
+ObActionsAct* actions_parse(xmlNodePtr node)
 {
     gchar *name;
     ObActionsAct *act = NULL;
 
-    if (parse_attr_string("name", node, &name)) {
+    if (obt_parse_attr_string(node, "name", &name)) {
         if ((act = actions_build_act_from_string(name)))
             /* there is more stuff to parse here */
             if (act->def->setup)
-                act->options = act->def->setup(i, doc, node->xmlChildrenNode);
+                act->options = act->def->setup(node->xmlChildrenNode);
 
         g_free(name);
     }

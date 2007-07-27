@@ -28,13 +28,15 @@ G_BEGIN_DECLS
 
 typedef struct _ObtParseInst ObtParseInst;
 
-typedef void (*ObtParseCallback)(ObtParseInst *i, xmlDocPtr doc,
-                                 xmlNodePtr node, gpointer data);
+typedef void (*ObtParseCallback)(xmlNodePtr node, gpointer data);
 
 ObtParseInst* obt_parse_instance_new();
 void obt_parse_instance_ref(ObtParseInst *inst);
 void obt_parse_instance_unref(ObtParseInst *inst);
 
+gboolean obt_parse_load_file(ObtParseInst *inst,
+                             const gchar *path,
+                             const gchar *root_node);
 gboolean obt_parse_load_config_file(ObtParseInst *inst,
                                     const gchar *domain,
                                     const gchar *filename,
@@ -51,6 +53,9 @@ gboolean obt_parse_load_theme_file(ObtParseInst *inst,
 gboolean obt_parse_load_mem(ObtParseInst *inst,
                             gpointer data, guint len, const gchar *root_node);
 
+xmlDocPtr obt_parse_instance_doc(ObtParseInst *inst);
+xmlNodePtr obt_parse_instance_root(ObtParseInst *inst);
+
 void obt_parse_close(ObtParseInst *inst);
 
 void obt_parse_register(ObtParseInst *inst, const gchar *tag,
@@ -60,7 +65,7 @@ void obt_parse_tree(ObtParseInst *i, xmlNodePtr node);
 
 /* helpers */
 
-xmlNodePtr obt_parse_find_node(xmlNodePtr node, const gchar *tag);
+xmlNodePtr obt_parse_find_node(xmlNodePtr node, const gchar *name);
 
 gboolean obt_parse_node_contains (xmlNodePtr node, const gchar *val);
 gchar   *obt_parse_node_string   (xmlNodePtr node);

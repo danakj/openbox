@@ -11,45 +11,34 @@ typedef struct {
     gint bottom;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_resizerelative_startup(void)
 {
-    actions_register("ResizeRelative",
-                     setup_func,
-                     free_func,
-                     run_func,
+    actions_register("ResizeRelative", setup_func, g_free, run_func,
                      NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("left", node)))
-        o->left = parse_int(doc, n);
-    if ((n = parse_find_node("right", node)))
-        o->right = parse_int(doc, n);
-    if ((n = parse_find_node("top", node)) ||
-        (n = parse_find_node("up", node)))
-        o->top = parse_int(doc, n);
-    if ((n = parse_find_node("bottom", node)) ||
-        (n = parse_find_node("down", node)))
-        o->bottom = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "left")))
+        o->left = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "right")))
+        o->right = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "top")) ||
+        (n = obt_parse_find_node(node, "up")))
+        o->top = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "bottom")) ||
+        (n = obt_parse_find_node(node, "down")))
+        o->bottom = obt_parse_node_int(n);
 
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

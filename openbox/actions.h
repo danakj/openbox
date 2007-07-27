@@ -18,7 +18,8 @@
 
 #include "misc.h"
 #include "frame.h"
-#include "parser/parse.h"
+#include "obt/parse.h"
+
 #include <glib.h>
 #include <X11/Xlib.h>
 
@@ -30,8 +31,7 @@ typedef struct _ObActionsGlobalData   ObActionsGlobalData;
 typedef struct _ObActionsClientData   ObActionsClientData;
 typedef struct _ObActionsSelectorData ObActionsSelectorData;
 
-typedef gpointer (*ObActionsDataSetupFunc)(ObParseInst *i,
-                                           xmlDocPtr doc, xmlNodePtr node);
+typedef gpointer (*ObActionsDataSetupFunc)(xmlNodePtr node);
 typedef void     (*ObActionsDataFreeFunc)(gpointer options);
 typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
@@ -64,9 +64,7 @@ gboolean actions_register(const gchar *name,
                           ObActionsInteractiveInputFunc i_input,
                           ObActionsInteractiveCancelFunc i_cancel);
 
-ObActionsAct* actions_parse(ObParseInst *i,
-                            xmlDocPtr doc,
-                            xmlNodePtr node);
+ObActionsAct* actions_parse(xmlNodePtr node);
 ObActionsAct* actions_parse_string(const gchar *name);
 
 gboolean actions_act_is_interactive(ObActionsAct *act);

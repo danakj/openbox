@@ -40,7 +40,7 @@ GList* session_state_find(struct _ObClient *c) { return NULL; }
 #include "client.h"
 #include "focus.h"
 #include "gettext.h"
-#include "parser/parse.h"
+#include "obt/parse.h"
 
 #include <time.h>
 #include <errno.h>
@@ -651,101 +651,106 @@ GList* session_state_find(ObClient *c)
 
 static void session_load_file(const gchar *path)
 {
-    xmlDocPtr doc;
+    ObtParseInst *i;
     xmlNodePtr node, n, m;
     GList *it, *inext;
 
-    if (!parse_load(path, "openbox_session", &doc, &node))
+    i = obt_parse_instance_new();
+
+    if (!obt_parse_load_file(i, path, "openbox_session")) {
+        obt_parse_instance_unref(i);
         return;
+    }
+    node = obt_parse_instance_root(i);
 
-    if ((n = parse_find_node("desktop", node->children)))
-        session_desktop = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node->children, "desktop")))
+        session_desktop = obt_parse_node_int(n);
 
-    if ((n = parse_find_node("numdesktops", node->children)))
-        session_num_desktops = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node->children, "numdesktops")))
+        session_num_desktops = obt_parse_node_int(n);
 
-    if ((n = parse_find_node("desktoplayout", node->children))) {
+    if ((n = obt_parse_find_node(node->children, "desktoplayout"))) {
         /* make sure they are all there for it to be valid */
-        if ((m = parse_find_node("orientation", n->children)))
-            session_desktop_layout.orientation = parse_int(doc, m);
-        if (m && (m = parse_find_node("startcorner", n->children)))
-            session_desktop_layout.start_corner = parse_int(doc, m);
-        if (m && (m = parse_find_node("columns", n->children)))
-            session_desktop_layout.columns = parse_int(doc, m);
-        if (m && (m = parse_find_node("rows", n->children)))
-            session_desktop_layout.rows = parse_int(doc, m);
+        if ((m = obt_parse_find_node(n->children, "orientation")))
+            session_desktop_layout.orientation = obt_parse_node_int(m);
+        if (m && (m = obt_parse_find_node(n->children, "startcorner")))
+            session_desktop_layout.start_corner = obt_parse_node_int(m);
+        if (m && (m = obt_parse_find_node(n->children, "columns")))
+            session_desktop_layout.columns = obt_parse_node_int(m);
+        if (m && (m = obt_parse_find_node(n->children, "rows")))
+            session_desktop_layout.rows = obt_parse_node_int(m);
         session_desktop_layout_present = m != NULL;
     }
 
-    if ((n = parse_find_node("desktopnames", node->children))) {
-        for (m = parse_find_node("name", n->children); m;
-             m = parse_find_node("name", m->next))
+    if ((n = obt_parse_find_node(node->children, "desktopnames"))) {
+        for (m = obt_parse_find_node(n->children, "name"); m;
+             m = obt_parse_find_node(m->next, "name"))
         {
             session_desktop_names = g_slist_append(session_desktop_names,
-                                                   parse_string(doc, m));
+                                                   obt_parse_node_string(m));
         }
     }
 
-    for (node = parse_find_node("window", node->children); node != NULL;
-         node = parse_find_node("window", node->next))
+    for (node = obt_parse_find_node(node->children, "window"); node != NULL;
+         node = obt_parse_find_node(node->next, "window"))
     {
         ObSessionState *state;
 
         state = g_new0(ObSessionState, 1);
 
-        if (!parse_attr_string("id", node, &state->id))
-            if (!parse_attr_string("command", node, &state->command))
+        if (!obt_parse_attr_string(node, "id", &state->id))
+            if (!obt_parse_attr_string(node, "command", &state->command))
             goto session_load_bail;
-        if (!(n = parse_find_node("name", node->children)))
+        if (!(n = obt_parse_find_node(node->children, "name")))
             goto session_load_bail;
-        state->name = parse_string(doc, n);
-        if (!(n = parse_find_node("class", node->children)))
+        state->name = obt_parse_node_string(n);
+        if (!(n = obt_parse_find_node(node->children, "class")))
             goto session_load_bail;
-        state->class = parse_string(doc, n);
-        if (!(n = parse_find_node("role", node->children)))
+        state->class = obt_parse_node_string(n);
+        if (!(n = obt_parse_find_node(node->children, "role")))
             goto session_load_bail;
-        state->role = parse_string(doc, n);
-        if (!(n = parse_find_node("windowtype", node->children)))
+        state->role = obt_parse_node_string(n);
+        if (!(n = obt_parse_find_node(node->children, "windowtype")))
             goto session_load_bail;
-        state->type = parse_int(doc, n);
-        if (!(n = parse_find_node("desktop", node->children)))
+        state->type = obt_parse_node_int(n);
+        if (!(n = obt_parse_find_node(node->children, "desktop")))
             goto session_load_bail;
-        state->desktop = parse_int(doc, n);
-        if (!(n = parse_find_node("x", node->children)))
+        state->desktop = obt_parse_node_int(n);
+        if (!(n = obt_parse_find_node(node->children, "x")))
             goto session_load_bail;
-        state->x = parse_int(doc, n);
-        if (!(n = parse_find_node("y", node->children)))
+        state->x = obt_parse_node_int(n);
+        if (!(n = obt_parse_find_node(node->children, "y")))
             goto session_load_bail;
-        state->y = parse_int(doc, n);
-        if (!(n = parse_find_node("width", node->children)))
+        state->y = obt_parse_node_int(n);
+        if (!(n = obt_parse_find_node(node->children, "width")))
             goto session_load_bail;
-        state->w = parse_int(doc, n);
-        if (!(n = parse_find_node("height", node->children)))
+        state->w = obt_parse_node_int(n);
+        if (!(n = obt_parse_find_node(node->children, "height")))
             goto session_load_bail;
-        state->h = parse_int(doc, n);
+        state->h = obt_parse_node_int(n);
 
         state->shaded =
-            parse_find_node("shaded", node->children) != NULL;
+            obt_parse_find_node(node->children, "shaded") != NULL;
         state->iconic =
-            parse_find_node("iconic", node->children) != NULL;
+            obt_parse_find_node(node->children, "iconic") != NULL;
         state->skip_pager =
-            parse_find_node("skip_pager", node->children) != NULL;
+            obt_parse_find_node(node->children, "skip_pager") != NULL;
         state->skip_taskbar =
-            parse_find_node("skip_taskbar", node->children) != NULL;
+            obt_parse_find_node(node->children, "skip_taskbar") != NULL;
         state->fullscreen =
-            parse_find_node("fullscreen", node->children) != NULL;
+            obt_parse_find_node(node->children, "fullscreen") != NULL;
         state->above =
-            parse_find_node("above", node->children) != NULL;
+            obt_parse_find_node(node->children, "above") != NULL;
         state->below =
-            parse_find_node("below", node->children) != NULL;
+            obt_parse_find_node(node->children, "below") != NULL;
         state->max_horz =
-            parse_find_node("max_horz", node->children) != NULL;
+            obt_parse_find_node(node->children, "max_horz") != NULL;
         state->max_vert =
-            parse_find_node("max_vert", node->children) != NULL;
+            obt_parse_find_node(node->children, "max_vert") != NULL;
         state->undecorated =
-            parse_find_node("undecorated", node->children) != NULL;
+            obt_parse_find_node(node->children, "undecorated") != NULL;
         state->focused =
-            parse_find_node("focused", node->children) != NULL;
+            obt_parse_find_node(node->children, "focused") != NULL;
 
         /* save this. they are in the file in stacking order, so preserve
            that order here */
@@ -800,7 +805,7 @@ static void session_load_file(const gchar *path)
         }
     }
 
-    xmlFreeDoc(doc);
+    obt_parse_instance_unref(i);
 }
 
 #endif

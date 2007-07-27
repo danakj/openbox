@@ -12,7 +12,7 @@ typedef struct {
     MaxDirection dir;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func_on(ObActionsData *data, gpointer options);
 static gboolean run_func_off(ObActionsData *data, gpointer options);
 static gboolean run_func_toggle(ObActionsData *data, gpointer options);
@@ -27,7 +27,7 @@ void action_maximize_startup(void)
                      NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -35,8 +35,8 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o = g_new0(Options, 1);
     o->dir = BOTH;
 
-    if ((n = parse_find_node("direction", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "direction"))) {
+        gchar *s = obt_parse_node_string(n);
         if (!g_ascii_strcasecmp(s, "vertical") ||
             !g_ascii_strcasecmp(s, "vert"))
             o->dir = VERT;

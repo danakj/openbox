@@ -9,39 +9,27 @@ typedef struct {
     gint y;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_moverelative_startup(void)
 {
-    actions_register("MoveRelative",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("MoveRelative", setup_func, g_free, run_func, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("x", node)))
-        o->x = parse_int(doc, n);
-    if ((n = parse_find_node("y", node)))
-        o->y = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "x")))
+        o->x = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "y")))
+        o->y = obt_parse_node_int(n);
 
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

@@ -26,10 +26,9 @@
 #include "geom.h"
 #include "moveresize.h"
 #include "render/render.h"
+#include "obt/parse.h"
 
 #include <glib.h>
-
-struct _ObParseInst;
 
 typedef struct _ObAppSettings ObAppSettings;
 
@@ -183,7 +182,7 @@ extern GSList *config_menu_files;
 /*! Per app settings */
 extern GSList *config_per_app_settings;
 
-void config_startup(struct _ObParseInst *i);
+void config_startup(ObtParseInst *i);
 void config_shutdown();
 
 /*! Create an ObAppSettings structure with the default values */

@@ -42,11 +42,12 @@
 #include "ping.h"
 #include "mainloop.h"
 #include "gettext.h"
-#include "parser/parse.h"
 #include "render/render.h"
 #include "render/theme.h"
 #include "obt/display.h"
 #include "obt/prop.h"
+#include "obt/keyboard.h"
+#include "obt/parse.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -214,13 +215,11 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_DOWN] = obt_keyboard_keysym_to_keycode(XK_Down);
 
             {
-                ObParseInst *i;
-                xmlDocPtr doc;
-                xmlNodePtr node;
+                ObtParseInst *i;
 
                 /* startup the parsing so everything can register sections
                    of the rc */
-                i = parse_startup();
+                i = obt_parse_instance_new();
 
                 /* register all the available actions */
                 actions_startup(reconfigure);
@@ -228,9 +227,11 @@ gint main(gint argc, gchar **argv)
                 config_startup(i);
 
                 /* parse/load user options */
-                if (parse_load_rc(NULL, &doc, &node)) {
-                    parse_tree(i, doc, node->xmlChildrenNode);
-                    parse_close(doc);
+                if (obt_parse_load_config_file(i, "openbox", "rc.xml",
+                                               "openbox_config"))
+                {
+                    obt_parse_tree(i, obt_parse_instance_root(i)->children);
+                    obt_parse_close(i);
                 } else
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
 
@@ -241,7 +242,7 @@ gint main(gint argc, gchar **argv)
 */
 
                 /* we're done with parsing now, kill it */
-                parse_shutdown(i);
+                obt_parse_instance_unref(i);
             }
 
             /* load the theme specified in the rc file */

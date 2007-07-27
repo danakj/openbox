@@ -9,8 +9,7 @@ typedef struct {
     guint32 corner;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
@@ -18,22 +17,18 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
 
 void action_resize_startup(void)
 {
-    actions_register("Resize",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("Resize", setup_func, g_free, run_func, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("edge", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "edge"))) {
+        gchar *s = obt_parse_node_string(n);
 
         o->corner_specified = TRUE;
         if (!g_ascii_strcasecmp(s, "top"))
@@ -58,13 +53,6 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         g_free(s);
     }
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

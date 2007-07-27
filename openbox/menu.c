@@ -34,7 +34,7 @@
 #include "client_list_menu.h"
 #include "client_list_combined_menu.h"
 #include "gettext.h"
-#include "parser/parse.h"
+#include "obt/parse.h"
 
 typedef struct _ObMenuParseState ObMenuParseState;
 
@@ -45,18 +45,14 @@ struct _ObMenuParseState
 };
 
 static GHashTable *menu_hash = NULL;
-static ObParseInst *menu_parse_inst;
+static ObtParseInst *menu_parse_inst;
 static ObMenuParseState menu_parse_state;
 static gboolean menu_can_hide = FALSE;
 
 static void menu_destroy_hash_value(ObMenu *self);
-static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                            gpointer data);
-static void parse_menu_separator(ObParseInst *i,
-                                 xmlDocPtr doc, xmlNodePtr node,
-                                 gpointer data);
-static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                       gpointer data);
+static void parse_menu_item(xmlNodePtr node, gpointer data);
+static void parse_menu_separator(xmlNodePtr node, gpointer data);
+static void parse_menu(xmlNodePtr node, gpointer data);
 static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                                gchar **strippedlabel, guint *position,
                                gboolean *always_show);
@@ -71,8 +67,6 @@ static void client_dest(ObClient *client, gpointer data)
 
 void menu_startup(gboolean reconfig)
 {
-    xmlDocPtr doc;
-    xmlNodePtr node;
     gboolean loaded = FALSE;
     GSList *it;
 
@@ -83,29 +77,39 @@ void menu_startup(gboolean reconfig)
     client_list_combined_menu_startup(reconfig);
     client_menu_startup();
 
-    menu_parse_inst = parse_startup();
+    menu_parse_inst = obt_parse_instance_new();
 
     menu_parse_state.parent = NULL;
     menu_parse_state.pipe_creator = NULL;
-    parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
-    parse_register(menu_parse_inst, "item", parse_menu_item,
-                   &menu_parse_state);
-    parse_register(menu_parse_inst, "separator",
-                   parse_menu_separator, &menu_parse_state);
+    obt_parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
+    obt_parse_register(menu_parse_inst, "item", parse_menu_item,
+                       &menu_parse_state);
+    obt_parse_register(menu_parse_inst, "separator",
+                       parse_menu_separator, &menu_parse_state);
 
     for (it = config_menu_files; it; it = g_slist_next(it)) {
-        if (parse_load_menu(it->data, &doc, &node)) {
+        if (obt_parse_load_config_file(menu_parse_inst,
+                                       "openbox",
+                                       it->data,
+                                       "openbox_menu"))
+        {
             loaded = TRUE;
-            parse_tree(menu_parse_inst, doc, node->children);
-            xmlFreeDoc(doc);
+            obt_parse_tree(menu_parse_inst,
+                           obt_parse_instance_root(menu_parse_inst)->children);
+            obt_parse_close(menu_parse_inst);
         } else
             g_message(_("Unable to find a valid menu file '%s'"),
                       (const gchar*)it->data);
     }
     if (!loaded) {
-        if (parse_load_menu("menu.xml", &doc, &node)) {
-            parse_tree(menu_parse_inst, doc, node->children);
-            xmlFreeDoc(doc);
+        if (obt_parse_load_config_file(menu_parse_inst,
+                                       "openbox",
+                                       "menu.xml",
+                                       "openbox_menu"))
+        {
+            obt_parse_tree(menu_parse_inst,
+                           obt_parse_instance_root(menu_parse_inst)->children);
+            obt_parse_close(menu_parse_inst);
         } else
             g_message(_("Unable to find a valid menu file '%s'"),
                       "menu.xml");
@@ -122,7 +126,7 @@ void menu_shutdown(gboolean reconfig)
     if (!reconfig)
         client_remove_destroy_notify(client_dest);
 
-    parse_shutdown(menu_parse_inst);
+    obt_parse_instance_unref(menu_parse_inst);
     menu_parse_inst = NULL;
 
     client_list_menu_shutdown(reconfig);
@@ -156,7 +160,6 @@ void menu_clear_pipe_caches(void)
 
 void menu_pipe_execute(ObMenu *self)
 {
-    xmlDocPtr doc;
     xmlNodePtr node;
     gchar *output;
     GError *err = NULL;
@@ -173,13 +176,13 @@ void menu_pipe_execute(ObMenu *self)
         return;
     }
 
-    if (parse_load_mem(output, strlen(output),
-                       "openbox_pipe_menu", &doc, &node))
+    if (obt_parse_load_mem(menu_parse_inst, output, strlen(output),
+                           "openbox_pipe_menu"))
     {
         menu_parse_state.pipe_creator = self;
         menu_parse_state.parent = self;
-        parse_tree(menu_parse_inst, doc, node->children);
-        xmlFreeDoc(doc);
+        obt_parse_tree(menu_parse_inst, node->children);
+        obt_parse_close(menu_parse_inst);
     } else {
         g_message(_("Invalid output from pipe-menu '%s'"), self->execute);
     }
@@ -262,19 +265,18 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
     return shortcut;
 }
 
-static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                            gpointer data)
+static void parse_menu_item(xmlNodePtr node,  gpointer data)
 {
     ObMenuParseState *state = data;
     gchar *label;
 
     if (state->parent) {
-        if (parse_attr_string("label", node, &label)) {
+        if (obt_parse_attr_string(node, "label", &label)) {
             GSList *acts = NULL;
 
             for (node = node->children; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action")) {
-                    ObActionsAct *a = actions_parse(i, doc, node);
+                    ObActionsAct *a = actions_parse(node);
                     if (a)
                         acts = g_slist_append(acts, a);
                 }
@@ -284,16 +286,14 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
 }
 
-static void parse_menu_separator(ObParseInst *i,
-                                 xmlDocPtr doc, xmlNodePtr node,
-                                 gpointer data)
+static void parse_menu_separator(xmlNodePtr node, gpointer data)
 {
     ObMenuParseState *state = data;
 
     if (state->parent) {
         gchar *label;
 
-        if (!parse_attr_string("label", node, &label))
+        if (!obt_parse_attr_string(node, "label", &label))
             label = NULL;
 
         menu_add_separator(state->parent, -1, label);
@@ -301,30 +301,29 @@ static void parse_menu_separator(ObParseInst *i,
     }
 }
 
-static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                       gpointer data)
+static void parse_menu(xmlNodePtr node, gpointer data)
 {
     ObMenuParseState *state = data;
     gchar *name = NULL, *title = NULL, *script = NULL;
     ObMenu *menu;
 
-    if (!parse_attr_string("id", node, &name))
+    if (!obt_parse_attr_string(node, "id", &name))
         goto parse_menu_fail;
 
     if (!g_hash_table_lookup(menu_hash, name)) {
-        if (!parse_attr_string("label", node, &title))
+        if (!obt_parse_attr_string(node, "label", &title))
             goto parse_menu_fail;
 
         if ((menu = menu_new(name, title, TRUE, NULL))) {
             menu->pipe_creator = state->pipe_creator;
-            if (parse_attr_string("execute", node, &script)) {
+            if (obt_parse_attr_string(node, "execute", &script)) {
                 menu->execute = parse_expand_tilde(script);
             } else {
                 ObMenu *old;
 
                 old = state->parent;
                 state->parent = menu;
-                parse_tree(i, doc, node->children);
+                obt_parse_tree(menu_parse_inst, node->children);
                 state->parent = old;
             }
         }

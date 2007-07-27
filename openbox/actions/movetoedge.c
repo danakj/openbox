@@ -9,20 +9,15 @@ typedef struct {
     ObDirection dir;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_movetoedge_startup(void)
 {
-    actions_register("MoveToEdge",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("MoveToEdge", setup_func, g_free, run_func, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -30,8 +25,8 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o = g_new0(Options, 1);
     o->dir = OB_DIRECTION_NORTH;
 
-    if ((n = parse_find_node("direction", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "direction"))) {
+        gchar *s = obt_parse_node_string(n);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->dir = OB_DIRECTION_NORTH;
@@ -48,13 +43,6 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     }
 
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

@@ -23,7 +23,7 @@
 #include "mask.h"
 #include "theme.h"
 #include "icon.h"
-#include "parser/parse.h"
+#include "obt/parse.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>

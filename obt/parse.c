@@ -62,7 +62,7 @@ static void destfunc(struct Callback *c)
     g_free(c);
 }
 
-ObtParseInst* obt_parse_instance_new()
+ObtParseInst* obt_parse_instance_new(void)
 {
     ObtParseInst *i = g_new(ObtParseInst, 1);
     i->ref = 1;
@@ -87,8 +87,20 @@ void obt_parse_instance_unref(ObtParseInst *i)
     }
 }
 
-void parse_register(ObtParseInst *i, const gchar *tag,
-                    ObtParseCallback func, gpointer data)
+xmlDocPtr obt_parse_instance_doc(ObtParseInst *i)
+{
+    g_assert(i->doc); /* a doc is open? */
+    return i->doc;
+}
+
+xmlNodePtr obt_parse_instance_root(ObtParseInst *i)
+{
+    g_assert(i->doc); /* a doc is open? */
+    return i->root;
+}
+
+void obt_parse_register(ObtParseInst *i, const gchar *tag,
+                        ObtParseCallback func, gpointer data)
 {
     struct Callback *c;
 
@@ -119,7 +131,10 @@ static gboolean load_file(ObtParseInst *i,
         gchar *path;
         struct stat s;
 
-        path = g_build_filename(it->data, domain, filename, NULL);
+        if (!domain && !filename) /* given a full path to the file */
+            path = g_strdup(it->data);
+        else
+            path = g_build_filename(it->data, domain, filename, NULL);
 
         if (stat(path, &s) >= 0) {
             /* XML_PARSE_BLANKS is needed apparently, or the tree can end up
@@ -151,6 +166,24 @@ static gboolean load_file(ObtParseInst *i,
         g_free(path);
     }
 
+    return r;
+}
+
+gboolean obt_parse_load_file(ObtParseInst *i,
+                             const gchar *path,
+                             const gchar *root_node)
+{
+    GSList *paths;
+    gboolean r;
+
+    paths = g_slist_append(NULL, g_strdup(path));
+
+    r = load_file(i, NULL, NULL, root_node, paths);
+
+    while (paths) {
+        g_free(paths->data);
+        paths = g_slist_delete_link(paths, paths);
+    }
     return r;
 }
 
@@ -266,7 +299,7 @@ void obt_parse_tree(ObtParseInst *i, xmlNodePtr node)
 
     while (node) {
         struct Callback *c = g_hash_table_lookup(i->callbacks, node->name);
-        if (c) c->func(i, i->doc, node, c->data);
+        if (c) c->func(node, c->data);
         node = node->next;
     }
 }
@@ -415,7 +448,7 @@ static GSList* split_paths(const gchar *paths)
     return list;
 }
 
-void parse_paths_startup()
+void parse_paths_startup(void)
 {
     const gchar *path;
 
@@ -477,7 +510,7 @@ void parse_paths_startup()
                                         (GSListFunc) g_slist_prepend);
 }
 
-void parse_paths_shutdown()
+void parse_paths_shutdown(void)
 {
     GSList *it;
 
@@ -553,22 +586,22 @@ gboolean parse_mkdir_path(const gchar *path, gint mode)
     return ret;
 }
 
-const gchar* parse_xdg_config_home_path()
+const gchar* parse_xdg_config_home_path(void)
 {
     return xdg_config_home_path;
 }
 
-const gchar* parse_xdg_data_home_path()
+const gchar* parse_xdg_data_home_path(void)
 {
     return xdg_data_home_path;
 }
 
-GSList* parse_xdg_config_dir_paths()
+GSList* parse_xdg_config_dir_paths(void)
 {
     return xdg_config_dir_paths;
 }
 
-GSList* parse_xdg_data_dir_paths()
+GSList* parse_xdg_data_dir_paths(void)
 {
     return xdg_data_dir_paths;
 }

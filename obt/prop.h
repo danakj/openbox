@@ -225,10 +225,8 @@ void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                           guint num);
 void obt_prop_set_string_locale(Window win, Atom prop, const gchar *val);
 void obt_prop_set_string_utf8(Window win, Atom prop, const gchar *val);
-void obt_prop_set_strings_locale(Window win, Atom prop,
-                                 const gchar **strs);
-void obt_prop_set_strings_utf8(Window win, Atom prop,
-                               const gchar **strs);
+void obt_prop_set_strings_locale(Window win, Atom prop, gchar const **strs);
+void obt_prop_set_strings_utf8(Window win, Atom prop, gchar const **strs);
 
 void obt_prop_erase(Window win, Atom prop);
 

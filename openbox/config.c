@@ -24,7 +24,6 @@
 #include "translate.h"
 #include "client.h"
 #include "screen.h"
-#include "parser/parse.h"
 #include "openbox.h"
 #include "gettext.h"
 
@@ -141,10 +140,9 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     }
 }
 
-static void config_parse_gravity_coord(xmlDocPtr doc, xmlNodePtr node,
-                                       GravityCoord *c)
+static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 {
-    gchar *s = parse_string(doc, node);
+    gchar *s = obt_parse_node_string(node);
     if (!g_ascii_strcasecmp(s, "center"))
         c->center = TRUE;
     else {
@@ -186,10 +184,9 @@ static void config_parse_gravity_coord(xmlDocPtr doc, xmlNodePtr node,
    the monitor, so <position><x>center</x></position><monitor>2</monitor>
    will center the window on the second monitor.
 */
-static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
-                                   xmlNodePtr node, gpointer data)
+static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
-    xmlNodePtr app = parse_find_node("application", node->children);
+    xmlNodePtr app = obt_parse_find_node(node->children, "application");
     gchar *name = NULL, *class = NULL, *role = NULL;
     gboolean name_set, class_set;
     gboolean x_pos_given;
@@ -197,8 +194,8 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
     while (app) {
         name_set = class_set = x_pos_given = FALSE;
 
-        class_set = parse_attr_string("class", app, &class);
-        name_set = parse_attr_string("name", app, &name);
+        class_set = obt_parse_attr_string(app, "class", &class);
+        name_set = obt_parse_attr_string(app, "name", &name);
         if (class_set || name_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
@@ -209,55 +206,53 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
             if (class_set)
                 settings->class = g_pattern_spec_new(class);
 
-            if (parse_attr_string("role", app, &role))
+            if (obt_parse_attr_string(app, "role", &role))
                 settings->role = g_pattern_spec_new(role);
 
-            if ((n = parse_find_node("decor", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->decor = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "decor")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->decor = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("shade", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->shade = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "shade")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->shade = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("position", app->children))) {
-                if ((c = parse_find_node("x", n->children)))
-                    if (!parse_contains("default", doc, c)) {
-                        config_parse_gravity_coord(doc, c,
-                                                   &settings->position.x);
+            if ((n = obt_parse_find_node(app->children, "position"))) {
+                if ((c = obt_parse_find_node(n->children, "x")))
+                    if (!obt_parse_node_contains(c, "default")) {
+                        config_parse_gravity_coord(c, &settings->position.x);
                         x_pos_given = TRUE;
                     }
 
-                if (x_pos_given && (c = parse_find_node("y", n->children)))
-                    if (!parse_contains("default", doc, c)) {
-                        config_parse_gravity_coord(doc, c,
-                                                   &settings->position.y);
+                if (x_pos_given && (c = obt_parse_find_node(n->children, "y")))
+                    if (!obt_parse_node_contains("default", doc, c)) {
+                        config_parse_gravity_coord(c, &settings->position.y);
                         settings->pos_given = TRUE;
                     }
 
                 if (settings->pos_given &&
-                    (c = parse_find_node("monitor", n->children)))
-                    if (!parse_contains("default", doc, c)) {
-                        gchar *s = parse_string(doc, c);
+                    (c = obt_parse_find_node(n->children, "monitor")))
+                    if (!obt_parse_node_contains(c, "default")) {
+                        gchar *s = obt_parse_node_string(c);
                         if (!g_ascii_strcasecmp(s, "mouse"))
                             settings->monitor = 0;
                         else
-                            settings->monitor = parse_int(doc, c) + 1;
+                            settings->monitor = obt_parse_node_int(c) + 1;
                         g_free(s);
                     }
             }
 
-            if ((n = parse_find_node("focus", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->focus = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "focus")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->focus = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("desktop", app->children))) {
-                if (!parse_contains("default", doc, n)) {
-                    gchar *s = parse_string(doc, n);
+            if ((n = obt_parse_find_node(app->children, "desktop"))) {
+                if (!obt_parse_node_contains(n, "default")) {
+                    gchar *s = obt_parse_node_string(n);
                     if (!g_ascii_strcasecmp(s, "all"))
                         settings->desktop = DESKTOP_ALL;
                     else {
-                        gint i = parse_int(doc, n);
+                        gint i = obt_parse_node_int(n);
                         if (i > 0)
                             settings->desktop = i;
                     }
@@ -265,9 +260,9 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
                 }
             }
 
-            if ((n = parse_find_node("layer", app->children)))
-                if (!parse_contains("default", doc, n)) {
-                    gchar *s = parse_string(doc, n);
+            if ((n = obt_parse_find_node(app->children, "layer")))
+                if (!obt_parse_node_contains(n, "default")) {
+                    gchar *s = obt_parse_node_string(n);
                     if (!g_ascii_strcasecmp(s, "above"))
                         settings->layer = 1;
                     else if (!g_ascii_strcasecmp(s, "below"))
@@ -277,25 +272,25 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
                     g_free(s);
                 }
 
-            if ((n = parse_find_node("iconic", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->iconic = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "iconic")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->iconic = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("skip_pager", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->skip_pager = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "skip_pager")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->skip_pager = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("skip_taskbar", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->skip_taskbar = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "skip_taskbar")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->skip_taskbar = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("fullscreen", app->children)))
-                if (!parse_contains("default", doc, n))
-                    settings->fullscreen = parse_bool(doc, n);
+            if ((n = obt_parse_find_node(app->children, "fullscreen")))
+                if (!obt_parse_node_contains(n, "default"))
+                    settings->fullscreen = obt_parse_node_bool(n);
 
-            if ((n = parse_find_node("maximized", app->children)))
-                if (!parse_contains("default", doc, n)) {
-                    gchar *s = parse_string(doc, n);
+            if ((n = obt_parse_find_node(app->children, "maximized")))
+                if (!obt_parse_node_contains(n, "default")) {
+                    gchar *s = obt_parse_node_string(n);
                     if (!g_ascii_strcasecmp(s, "horizontal")) {
                         settings->max_horz = TRUE;
                         settings->max_vert = FALSE;
@@ -304,7 +299,7 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
                         settings->max_vert = TRUE;
                     } else
                         settings->max_horz = settings->max_vert =
-                            parse_bool(doc, n);
+                            obt_parse_node_bool(n);
                     g_free(s);
                 }
 
@@ -316,7 +311,7 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
             name = class = role = NULL;
         }
 
-        app = parse_find_node("application", app->next);
+        app = obt_parse_find_node(app->next, "application");
     }
 }
 
@@ -330,34 +325,33 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
 
 */
 
-static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                      GList *keylist)
+static void parse_key(xmlNodePtr node, GList *keylist)
 {
     gchar *key;
     xmlNodePtr n;
     gboolean is_chroot = FALSE;
 
-    if (!parse_attr_string("key", node, &key))
+    if (!obt_parse_attr_string(node, "key", &key))
         return;
 
-    parse_attr_bool("chroot", node, &is_chroot);
+    obt_parse_attr_bool(node, "chroot", &is_chroot);
 
     keylist = g_list_append(keylist, key);
 
-    if ((n = parse_find_node("keybind", node->children))) {
+    if ((n = obt_parse_find_node(node->children, "keybind"))) {
         while (n) {
-            parse_key(i, doc, n, keylist);
-            n = parse_find_node("keybind", n->next);
+            parse_key(n, keylist);
+            n = obt_parse_find_node(n->next, "keybind");
         }
     }
-    else if ((n = parse_find_node("action", node->children))) {
+    else if ((n = obt_parse_find_node(node->children, "action"))) {
         while (n) {
             ObActionsAct *action;
 
-            action = actions_parse(i, doc, n);
+            action = actions_parse(n);
             if (action)
                 keyboard_bind(keylist, action);
-            n = parse_find_node("action", n->next);
+            n = obt_parse_find_node(n->next, "action");
         }
     }
 
@@ -368,25 +362,24 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     keylist = g_list_delete_link(keylist, g_list_last(keylist));
 }
 
-static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                           gpointer data)
+static void parse_keyboard(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
     gchar *key;
 
     keyboard_unbind_all();
 
-    if ((n = parse_find_node("chainQuitKey", node->children))) {
-        key = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node->children, "chainQuitKey"))) {
+        key = obt_parse_node_string(n);
         translate_key(key, &config_keyboard_reset_state,
                       &config_keyboard_reset_keycode);
         g_free(key);
     }
 
-    if ((n = parse_find_node("keybind", node->children)))
+    if ((n = obt_parse_find_node(node->children, "keybind")))
         while (n) {
-            parse_key(i, doc, n, NULL);
-            n = parse_find_node("keybind", n->next);
+            parse_key(n, NULL);
+            n = obt_parse_find_node(n->next, "keybind");
         }
 }
 
@@ -400,8 +393,7 @@ static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
 */
 
-static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        gpointer data)
+static void parse_mouse(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
@@ -412,137 +404,133 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     node = node->children;
 
-    if ((n = parse_find_node("dragThreshold", node)))
-        config_mouse_threshold = parse_int(doc, n);
-    if ((n = parse_find_node("doubleClickTime", node)))
-        config_mouse_dclicktime = parse_int(doc, n);
-    if ((n = parse_find_node("screenEdgeWarpTime", node)))
-        config_mouse_screenedgetime = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "dragThreshold")))
+        config_mouse_threshold = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "doubleClickTime")))
+        config_mouse_dclicktime = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "screenEdgeWarpTime")))
+        config_mouse_screenedgetime = obt_parse_node_int(n);
 
-    n = parse_find_node("context", node);
+    n = obt_parse_find_node(node, "context");
     while (n) {
-        if (!parse_attr_string("name", n, &contextstr))
+        if (!obt_parse_attr_string(n, "name", &contextstr))
             goto next_n;
-        nbut = parse_find_node("mousebind", n->children);
+        nbut = obt_parse_find_node(n->children, "mousebind");
         while (nbut) {
-            if (!parse_attr_string("button", nbut, &buttonstr))
+            if (!obt_parse_attr_string(nbut, "button", &buttonstr))
                 goto next_nbut;
-            if (parse_attr_contains("press", nbut, "action")) {
+            if (obt_parse_attr_contains(nbut, "action", "press")) {
                 mact = OB_MOUSE_ACTION_PRESS;
-            } else if (parse_attr_contains("release", nbut, "action")) {
+            } else if (obt_parse_attr_contains(nbut, "action", "release")) {
                 mact = OB_MOUSE_ACTION_RELEASE;
-            } else if (parse_attr_contains("click", nbut, "action")) {
+            } else if (obt_parse_attr_contains(nbut, "action", "click")) {
                 mact = OB_MOUSE_ACTION_CLICK;
-            } else if (parse_attr_contains("doubleclick", nbut,"action")) {
+            } else if (obt_parse_attr_contains(nbut, "action","doubleclick")) {
                 mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
-            } else if (parse_attr_contains("drag", nbut, "action")) {
+            } else if (obt_parse_attr_contains(nbut, "action", "drag")) {
                 mact = OB_MOUSE_ACTION_MOTION;
             } else
                 goto next_nbut;
-            nact = parse_find_node("action", nbut->children);
+            nact = obt_parse_find_node(nbut->children, "action");
             while (nact) {
                 ObActionsAct *action;
 
-                if ((action = actions_parse(i, doc, nact)))
+                if ((action = actions_parse(nact)))
                     mouse_bind(buttonstr, contextstr, mact, action);
-                nact = parse_find_node("action", nact->next);
+                nact = obt_parse_find_node(nact->next, "action");
             }
             g_free(buttonstr);
         next_nbut:
-            nbut = parse_find_node("mousebind", nbut->next);
+            nbut = obt_parse_find_node(nbut->next, "mousebind");
         }
         g_free(contextstr);
     next_n:
-        n = parse_find_node("context", n->next);
+        n = obt_parse_find_node(n->next, "context");
     }
 }
 
-static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        gpointer data)
+static void parse_focus(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("focusNew", node)))
-        config_focus_new = parse_bool(doc, n);
-    if ((n = parse_find_node("followMouse", node)))
-        config_focus_follow = parse_bool(doc, n);
-    if ((n = parse_find_node("focusDelay", node)))
-        config_focus_delay = parse_int(doc, n);
-    if ((n = parse_find_node("raiseOnFocus", node)))
-        config_focus_raise = parse_bool(doc, n);
-    if ((n = parse_find_node("focusLast", node)))
-        config_focus_last = parse_bool(doc, n);
-    if ((n = parse_find_node("underMouse", node)))
-        config_focus_under_mouse = parse_bool(doc, n);
+    if ((n = obt_parse_find_node(node, "focusNew")))
+        config_focus_new = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "followMouse")))
+        config_focus_follow = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "focusDelay")))
+        config_focus_delay = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "raiseOnFocus")))
+        config_focus_raise = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "focusLast")))
+        config_focus_last = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "underMouse")))
+        config_focus_under_mouse = obt_parse_node_bool(n);
 }
 
-static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                            gpointer data)
+static void parse_placement(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("policy", node)))
-        if (parse_contains("UnderMouse", doc, n))
+    if ((n = obt_parse_find_node(node, "policy")))
+        if (obt_parse_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
-    if ((n = parse_find_node("center", node)))
-        config_place_center = parse_bool(doc, n);
-    if ((n = parse_find_node("active", node)))
-        config_place_active = parse_bool(doc, n);
+    if ((n = obt_parse_find_node(node, "center")))
+        config_place_center = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "active")))
+        config_place_active = obt_parse_node_bool(n);
 }
 
-static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                          gpointer data)
+static void parse_margins(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("top", node)))
-        config_margins.top = MAX(0, parse_int(doc, n));
-    if ((n = parse_find_node("left", node)))
-        config_margins.left = MAX(0, parse_int(doc, n));
-    if ((n = parse_find_node("right", node)))
-        config_margins.right = MAX(0, parse_int(doc, n));
-    if ((n = parse_find_node("bottom", node)))
-        config_margins.bottom = MAX(0, parse_int(doc, n));
+    if ((n = obt_parse_find_node(node, "top")))
+        config_margins.top = MAX(0, obt_parse_node_int(n));
+    if ((n = obt_parse_find_node(node, "left")))
+        config_margins.left = MAX(0, obt_parse_node_int(n));
+    if ((n = obt_parse_find_node(node, "right")))
+        config_margins.right = MAX(0, obt_parse_node_int(n));
+    if ((n = obt_parse_find_node(node, "bottom")))
+        config_margins.bottom = MAX(0, obt_parse_node_int(n));
 }
 
-static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        gpointer data)
+static void parse_theme(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("name", node))) {
+    if ((n = obt_parse_find_node(node, "name"))) {
         gchar *c;
 
         g_free(config_theme);
-        c = parse_string(doc, n);
+        c = obt_parse_node_string(n);
         config_theme = parse_expand_tilde(c);
         g_free(c);
     }
-    if ((n = parse_find_node("titleLayout", node))) {
+    if ((n = obt_parse_find_node(node, "titleLayout"))) {
         gchar *c, *d;
 
         g_free(config_title_layout);
-        config_title_layout = parse_string(doc, n);
+        config_title_layout = obt_parse_node_string(n);
 
         /* replace duplicates with spaces */
         for (c = config_title_layout; *c != '\0'; ++c)
             for (d = c+1; *d != '\0'; ++d)
                 if (*c == *d) *d = ' ';
     }
-    if ((n = parse_find_node("keepBorder", node)))
-        config_theme_keepborder = parse_bool(doc, n);
-    if ((n = parse_find_node("animateIconify", node)))
-        config_animate_iconify = parse_bool(doc, n);
+    if ((n = obt_parse_find_node(node, "keepBorder")))
+        config_theme_keepborder = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "animateIconify")))
+        config_animate_iconify = obt_parse_node_bool(n);
 
-    n = parse_find_node("font", node);
+    n = obt_parse_find_node(node, "font");
     while (n) {
         xmlNodePtr   fnode;
         RrFont     **font;
@@ -551,35 +539,35 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         RrFontWeight weight = RrDefaultFontWeight;
         RrFontSlant  slant = RrDefaultFontSlant;
 
-        if (parse_attr_contains("ActiveWindow", n, "place"))
+        if (obt_parse_attr_contains(n, "place", "ActiveWindow"))
             font = &config_font_activewindow;
-        else if (parse_attr_contains("InactiveWindow", n, "place"))
+        else if (obt_parse_attr_contains(n, "place", "InactiveWindow"))
             font = &config_font_inactivewindow;
-        else if (parse_attr_contains("MenuHeader", n, "place"))
+        else if (obt_parse_attr_contains(n, "place", "MenuHeader"))
             font = &config_font_menutitle;
-        else if (parse_attr_contains("MenuItem", n, "place"))
+        else if (obt_parse_attr_contains(n, "place", "MenuItem"))
             font = &config_font_menuitem;
-        else if (parse_attr_contains("OnScreenDisplay", n, "place"))
+        else if (obt_parse_attr_contains(n, "place", "OnScreenDisplay"))
             font = &config_font_osd;
         else
             goto next_font;
 
-        if ((fnode = parse_find_node("name", n->children))) {
+        if ((fnode = obt_parse_find_node(n->children, "name"))) {
             g_free(name);
-            name = parse_string(doc, fnode);
+            name = obt_parse_node_string(fnode);
         }
-        if ((fnode = parse_find_node("size", n->children))) {
-            int s = parse_int(doc, fnode);
+        if ((fnode = obt_parse_find_node(n->children, "size"))) {
+            int s = obt_parse_node_int(fnode);
             if (s > 0) size = s;
         }
-        if ((fnode = parse_find_node("weight", n->children))) {
-            gchar *w = parse_string(doc, fnode);
+        if ((fnode = obt_parse_find_node(n->children, "weight"))) {
+            gchar *w = obt_parse_node_string(fnode);
             if (!g_ascii_strcasecmp(w, "Bold"))
                 weight = RR_FONTWEIGHT_BOLD;
             g_free(w);
         }
-        if ((fnode = parse_find_node("slant", n->children))) {
-            gchar *s = parse_string(doc, fnode);
+        if ((fnode = obt_parse_find_node(n->children, "slant"))) {
+            gchar *s = obt_parse_node_string(fnode);
             if (!g_ascii_strcasecmp(s, "Italic"))
                 slant = RR_FONTSLANT_ITALIC;
             if (!g_ascii_strcasecmp(s, "Oblique"))
@@ -590,28 +578,27 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
         g_free(name);
     next_font:
-        n = parse_find_node("font", n->next);
+        n = obt_parse_find_node(n->next, "font");
     }
 }
 
-static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                           gpointer data)
+static void parse_desktops(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("number", node))) {
-        gint d = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "number"))) {
+        gint d = obt_parse_node_int(n);
         if (d > 0)
             config_desktops_num = d;
     }
-    if ((n = parse_find_node("firstdesk", node))) {
-        gint d = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "firstdesk"))) {
+        gint d = obt_parse_node_int(n);
         if (d > 0)
             config_screen_firstdesk = (unsigned) d;
     }
-    if ((n = parse_find_node("names", node))) {
+    if ((n = obt_parse_find_node(node, "names"))) {
         GSList *it;
         xmlNodePtr nname;
 
@@ -620,123 +607,122 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         g_slist_free(config_desktops_names);
         config_desktops_names = NULL;
 
-        nname = parse_find_node("name", n->children);
+        nname = obt_parse_find_node(n->children, "name");
         while (nname) {
-            config_desktops_names = g_slist_append(config_desktops_names,
-                                                   parse_string(doc, nname));
-            nname = parse_find_node("name", nname->next);
+            config_desktops_names =
+                g_slist_append(config_desktops_names,
+                               obt_parse_node_string(nname));
+            nname = obt_parse_find_node(nname->next, "name");
         }
     }
-    if ((n = parse_find_node("popupTime", node)))
-        config_desktop_popup_time = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "popupTime")))
+        config_desktop_popup_time = obt_parse_node_int(n);
 }
 
-static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                         gpointer data)
+static void parse_resize(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("drawContents", node)))
-        config_resize_redraw = parse_bool(doc, n);
-    if ((n = parse_find_node("popupShow", node))) {
-        config_resize_popup_show = parse_int(doc, n);
-        if (parse_contains("Always", doc, n))
+    if ((n = obt_parse_find_node(node, "drawContents")))
+        config_resize_redraw = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "popupShow"))) {
+        config_resize_popup_show = obt_parse_node_int(n);
+        if (obt_parse_node_contains(n, "Always"))
             config_resize_popup_show = 2;
-        else if (parse_contains("Never", doc, n))
+        else if (obt_parse_node_contains(n, "Never"))
             config_resize_popup_show = 0;
-        else if (parse_contains("Nonpixel", doc, n))
+        else if (obt_parse_node_contains(n, "Nonpixel"))
             config_resize_popup_show = 1;
     }
-    if ((n = parse_find_node("popupPosition", node))) {
-        if (parse_contains("Top", doc, n))
+    if ((n = obt_parse_find_node(node, "popupPosition"))) {
+        if (obt_parse_node_contains(n, "Top"))
             config_resize_popup_pos = OB_RESIZE_POS_TOP;
-        else if (parse_contains("Center", doc, n))
+        else if (obt_parse_node_contains(n, "Center"))
             config_resize_popup_pos = OB_RESIZE_POS_CENTER;
-        else if (parse_contains("Fixed", doc, n)) {
+        else if (obt_parse_node_contains(n, "Fixed")) {
             config_resize_popup_pos = OB_RESIZE_POS_FIXED;
 
-            if ((n = parse_find_node("popupFixedPosition", node))) {
+            if ((n = obt_parse_find_node(node, "popupFixedPosition"))) {
                 xmlNodePtr n2;
 
-                if ((n2 = parse_find_node("x", n->children)))
-                    config_parse_gravity_coord(doc, n2,
+                if ((n2 = obt_parse_find_node(n->children, "x")))
+                    config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.x);
-                if ((n2 = parse_find_node("y", n->children)))
-                    config_parse_gravity_coord(doc, n2,
+                if ((n2 = obt_parse_find_node(n->children, "y")))
+                    config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.y);
             }
         }
     }
 }
 
-static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                       gpointer data)
+static void parse_dock(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
 
-    if ((n = parse_find_node("position", node))) {
-        if (parse_contains("TopLeft", doc, n))
+    if ((n = obt_parse_find_node(node, "position"))) {
+        if (obt_parse_node_contains(n, "TopLeft"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTHWEST;
-        else if (parse_contains("Top", doc, n))
+        else if (obt_parse_node_contains(n, "Top"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTH;
-        else if (parse_contains("TopRight", doc, n))
+        else if (obt_parse_node_contains(n, "TopRight"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTHEAST;
-        else if (parse_contains("Right", doc, n))
+        else if (obt_parse_node_contains(n, "Right"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_EAST;
-        else if (parse_contains("BottomRight", doc, n))
+        else if (obt_parse_node_contains(n, "BottomRight"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_SOUTHEAST;
-        else if (parse_contains("Bottom", doc, n))
+        else if (obt_parse_node_contains(n, "Bottom"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_SOUTH;
-        else if (parse_contains("BottomLeft", doc, n))
+        else if (obt_parse_node_contains(n, "BottomLeft"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_SOUTHWEST;
-        else if (parse_contains("Left", doc, n))
+        else if (obt_parse_node_contains(n, "Left"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_WEST;
-        else if (parse_contains("Floating", doc, n))
+        else if (obt_parse_node_contains(n, "Floating"))
             config_dock_floating = TRUE;
     }
     if (config_dock_floating) {
-        if ((n = parse_find_node("floatingX", node)))
-            config_dock_x = parse_int(doc, n);
-        if ((n = parse_find_node("floatingY", node)))
-            config_dock_y = parse_int(doc, n);
+        if ((n = obt_parse_find_node(node, "floatingX")))
+            config_dock_x = obt_parse_node_int(n);
+        if ((n = obt_parse_find_node(node, "floatingY")))
+            config_dock_y = obt_parse_node_int(n);
     } else {
-        if ((n = parse_find_node("noStrut", node)))
-            config_dock_nostrut = parse_bool(doc, n);
+        if ((n = obt_parse_find_node(node, "noStrut")))
+            config_dock_nostrut = obt_parse_node_bool(n);
     }
-    if ((n = parse_find_node("stacking", node))) {
-        if (parse_contains("above", doc, n))
-            config_dock_layer = OB_STACKING_LAYER_ABOVE;
-        else if (parse_contains("normal", doc, n))
+    if ((n = obt_parse_find_node(node, "stacking"))) {
+        if (obt_parse_node_contains(n, "normal"))
             config_dock_layer = OB_STACKING_LAYER_NORMAL;
-        else if (parse_contains("below", doc, n))
+        else if (obt_parse_node_contains(n, "below"))
             config_dock_layer = OB_STACKING_LAYER_BELOW;
+        else if (obt_parse_node_contains(n, "above"))
+            config_dock_layer = OB_STACKING_LAYER_ABOVE;
     }
-    if ((n = parse_find_node("direction", node))) {
-        if (parse_contains("horizontal", doc, n))
+    if ((n = obt_parse_find_node(node, "direction"))) {
+        if (obt_parse_node_contains(n, "horizontal"))
             config_dock_orient = OB_ORIENTATION_HORZ;
-        else if (parse_contains("vertical", doc, n))
+        else if (obt_parse_node_contains(n, "vertical"))
             config_dock_orient = OB_ORIENTATION_VERT;
     }
-    if ((n = parse_find_node("autoHide", node)))
-        config_dock_hide = parse_bool(doc, n);
-    if ((n = parse_find_node("hideDelay", node)))
-        config_dock_hide_delay = parse_int(doc, n);
-    if ((n = parse_find_node("showDelay", node)))
-        config_dock_show_delay = parse_int(doc, n);
-    if ((n = parse_find_node("moveButton", node))) {
-        gchar *str = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "autoHide")))
+        config_dock_hide = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "hideDelay")))
+        config_dock_hide_delay = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "showDelay")))
+        config_dock_show_delay = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "moveButton"))) {
+        gchar *str = obt_parse_node_string(n);
         guint b, s;
         if (translate_button(str, &s, &b)) {
             config_dock_app_move_button = b;
@@ -748,40 +734,38 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
 }
 
-static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                       gpointer data)
+static void parse_menu(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
     for (node = node->children; node; node = node->next) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "file")) {
             gchar *c;
 
-            c = parse_string(doc, node);
+            c = obt_parse_node_string(node);
             config_menu_files = g_slist_append(config_menu_files,
                                                parse_expand_tilde(c));
             g_free(c);
         }
-        if ((n = parse_find_node("hideDelay", node)))
-            config_menu_hide_delay = parse_int(doc, n);
-        if ((n = parse_find_node("middle", node)))
-            config_menu_middle = parse_bool(doc, n);
-        if ((n = parse_find_node("submenuShowDelay", node)))
-            config_submenu_show_delay = parse_int(doc, n);
-        if ((n = parse_find_node("applicationIcons", node)))
-            config_menu_client_list_icons = parse_bool(doc, n);
+        if ((n = obt_parse_find_node(node, "hideDelay")))
+            config_menu_hide_delay = obt_parse_node_int(n);
+        if ((n = obt_parse_find_node(node, "middle")))
+            config_menu_middle = obt_parse_node_bool(n);
+        if ((n = obt_parse_find_node(node, "submenuShowDelay")))
+            config_submenu_show_delay = obt_parse_node_int(n);
+        if ((n = obt_parse_find_node(node, "applicationIcons")))
+            config_menu_client_list_icons = obt_parse_node_bool(n);
     }
 }
 
-static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                             gpointer data)
+static void parse_resistance(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
     node = node->children;
-    if ((n = parse_find_node("strength", node)))
-        config_resist_win = parse_int(doc, n);
-    if ((n = parse_find_node("screen_edge_strength", node)))
-        config_resist_edge = parse_int(doc, n);
+    if ((n = obt_parse_find_node(node, "strength")))
+        config_resist_win = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "screen_edge_strength")))
+        config_resist_edge = obt_parse_node_int(n);
 }
 
 typedef struct
@@ -872,7 +856,7 @@ static void bind_default_mouse(void)
                    actions_parse_string(it->actname));
 }
 
-void config_startup(ObParseInst *i)
+void config_startup(ObtParseInst *i)
 {
     config_focus_new = TRUE;
     config_focus_follow = FALSE;
@@ -881,17 +865,17 @@ void config_startup(ObParseInst *i)
     config_focus_last = TRUE;
     config_focus_under_mouse = FALSE;
 
-    parse_register(i, "focus", parse_focus, NULL);
+    obt_parse_register(i, "focus", parse_focus, NULL);
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
     config_place_active = FALSE;
 
-    parse_register(i, "placement", parse_placement, NULL);
+    obt_parse_register(i, "placement", parse_placement, NULL);
 
     STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    parse_register(i, "margins", parse_margins, NULL);
+    obt_parse_register(i, "margins", parse_margins, NULL);
 
     config_theme = NULL;
 
@@ -904,14 +888,14 @@ void config_startup(ObParseInst *i)
     config_font_menuitem = NULL;
     config_font_menutitle = NULL;
 
-    parse_register(i, "theme", parse_theme, NULL);
+    obt_parse_register(i, "theme", parse_theme, NULL);
 
     config_desktops_num = 4;
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
     config_desktop_popup_time = 875;
 
-    parse_register(i, "desktops", parse_desktops, NULL);
+    obt_parse_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
     config_resize_popup_show = 1; /* nonpixel increments */
@@ -919,7 +903,7 @@ void config_startup(ObParseInst *i)
     GRAVITY_COORD_SET(config_resize_popup_fixed.x, 0, FALSE, FALSE);
     GRAVITY_COORD_SET(config_resize_popup_fixed.y, 0, FALSE, FALSE);
 
-    parse_register(i, "resize", parse_resize, NULL);
+    obt_parse_register(i, "resize", parse_resize, NULL);
 
     config_dock_layer = OB_STACKING_LAYER_ABOVE;
     config_dock_pos = OB_DIRECTION_NORTHEAST;
@@ -934,14 +918,14 @@ void config_startup(ObParseInst *i)
     config_dock_app_move_button = 2; /* middle */
     config_dock_app_move_modifiers = 0;
 
-    parse_register(i, "dock", parse_dock, NULL);
+    obt_parse_register(i, "dock", parse_dock, NULL);
 
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
 
     bind_default_keyboard();
 
-    parse_register(i, "keyboard", parse_keyboard, NULL);
+    obt_parse_register(i, "keyboard", parse_keyboard, NULL);
 
     config_mouse_threshold = 8;
     config_mouse_dclicktime = 200;
@@ -949,12 +933,12 @@ void config_startup(ObParseInst *i)
 
     bind_default_mouse();
 
-    parse_register(i, "mouse", parse_mouse, NULL);
+    obt_parse_register(i, "mouse", parse_mouse, NULL);
 
     config_resist_win = 10;
     config_resist_edge = 20;
 
-    parse_register(i, "resistance", parse_resistance, NULL);
+    obt_parse_register(i, "resistance", parse_resistance, NULL);
 
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
@@ -962,11 +946,11 @@ void config_startup(ObParseInst *i)
     config_menu_client_list_icons = TRUE;
     config_menu_files = NULL;
 
-    parse_register(i, "menu", parse_menu, NULL);
+    obt_parse_register(i, "menu", parse_menu, NULL);
 
     config_per_app_settings = NULL;
 
-    parse_register(i, "applications", parse_per_app_settings, NULL);
+    obt_parse_register(i, "applications", parse_per_app_settings, NULL);
 }
 
 void config_shutdown(void)

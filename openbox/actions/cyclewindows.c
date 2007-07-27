@@ -20,11 +20,9 @@ typedef struct {
 
 static gboolean cycling = FALSE;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static gpointer setup_forward_func(ObParseInst *i, xmlDocPtr doc,
-                                   xmlNodePtr node);
-static gpointer setup_backward_func(ObParseInst *i, xmlDocPtr doc,
-                                    xmlNodePtr node);
+static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_forward_func(xmlNodePtr node);
+static gpointer setup_backward_func(xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -43,7 +41,7 @@ void action_cyclewindows_startup(void)
                      run_func, i_input_func, i_cancel_func);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -52,29 +50,29 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o->dialog = TRUE;
     o->bar = TRUE;
 
-    if ((n = parse_find_node("linear", node)))
-        o->linear = parse_bool(doc, n);
-    if ((n = parse_find_node("dialog", node)))
-        o->dialog = parse_bool(doc, n);
-    if ((n = parse_find_node("bar", node)))
-        o->bar = parse_bool(doc, n);
-    if ((n = parse_find_node("raise", node)))
-        o->raise = parse_bool(doc, n);
-    if ((n = parse_find_node("panels", node)))
-        o->dock_windows = parse_bool(doc, n);
-    if ((n = parse_find_node("desktop", node)))
-        o->desktop_windows = parse_bool(doc, n);
-    if ((n = parse_find_node("allDesktops", node)))
-        o->all_desktops = parse_bool(doc, n);
+    if ((n = obt_parse_find_node(node, "linear")))
+        o->linear = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "dialog")))
+        o->dialog = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "bar")))
+        o->bar = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "raise")))
+        o->raise = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "panels")))
+        o->dock_windows = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "desktop")))
+        o->desktop_windows = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "allDesktops")))
+        o->all_desktops = obt_parse_node_bool(n);
 
-    if ((n = parse_find_node("finalactions", node))) {
+    if ((n = obt_parse_find_node(node, "finalactions"))) {
         xmlNodePtr m;
 
-        m = parse_find_node("action", n->xmlChildrenNode);
+        m = obt_parse_find_node(n->xmlChildrenNode, "action");
         while (m) {
-            ObActionsAct *action = actions_parse(i, doc, m);
+            ObActionsAct *action = actions_parse(m);
             if (action) o->actions = g_slist_prepend(o->actions, action);
-            m = parse_find_node("action", m->next);
+            m = obt_parse_find_node(m->next, "action");
         }
     }
     else {
@@ -89,18 +87,16 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_forward_func(ObParseInst *i, xmlDocPtr doc,
-                                   xmlNodePtr node)
+static gpointer setup_forward_func(xmlNodePtr node)
 {
-    Options *o = setup_func(i, doc, node);
+    Options *o = setup_func(node);
     o->forward = TRUE;
     return o;
 }
 
-static gpointer setup_backward_func(ObParseInst *i, xmlDocPtr doc,
-                                    xmlNodePtr node)
+static gpointer setup_backward_func(xmlNodePtr node)
 {
-    Options *o = setup_func(i, doc, node);
+    Options *o = setup_func(node);
     o->forward = FALSE;
     return o;
 }

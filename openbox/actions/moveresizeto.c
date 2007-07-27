@@ -21,23 +21,18 @@ typedef struct {
     gint monitor;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
-static void     free_func(gpointer options);
+static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_moveresizeto_startup(void)
 {
-    actions_register("MoveResizeTo",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("MoveResizeTo", setup_func, g_free, run_func, NULL, NULL);
 }
 
-static void parse_coord(xmlDocPtr doc, xmlNodePtr n, gint *pos,
+static void parse_coord(xmlNodePtr n, gint *pos,
                         gboolean *opposite, gboolean *center)
 {
-    gchar *s = parse_string(doc, n);
+    gchar *s = obt_parse_node_string(n);
     if (g_ascii_strcasecmp(s, "current") != 0) {
         if (!g_ascii_strcasecmp(s, "center"))
             *center = TRUE;
@@ -53,7 +48,7 @@ static void parse_coord(xmlDocPtr doc, xmlNodePtr n, gint *pos,
     g_free(s);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -65,44 +60,37 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     o->h = G_MININT;
     o->monitor = CURRENT_MONITOR;
 
-    if ((n = parse_find_node("x", node)))
-        parse_coord(doc, n, &o->x, &o->xopposite, &o->xcenter);
+    if ((n = obt_parse_find_node(node, "x")))
+        parse_coord(n, &o->x, &o->xopposite, &o->xcenter);
 
-    if ((n = parse_find_node("y", node)))
-        parse_coord(doc, n, &o->y, &o->yopposite, &o->ycenter);
+    if ((n = obt_parse_find_node(node, "y")))
+        parse_coord(n, &o->y, &o->yopposite, &o->ycenter);
 
-    if ((n = parse_find_node("width", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "width"))) {
+        gchar *s = obt_parse_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
-            o->w = parse_int(doc, n);
+            o->w = obt_parse_node_int(n);
         g_free(s);
     }
-    if ((n = parse_find_node("height", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "height"))) {
+        gchar *s = obt_parse_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
-            o->h = parse_int(doc, n);
+            o->h = obt_parse_node_int(n);
         g_free(s);
     }
 
-    if ((n = parse_find_node("monitor", node))) {
-        gchar *s = parse_string(doc, n);
+    if ((n = obt_parse_find_node(node, "monitor"))) {
+        gchar *s = obt_parse_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0) {
             if (!g_ascii_strcasecmp(s, "all"))
                 o->monitor = ALL_MONITORS;
             else
-                o->monitor = parse_int(doc, n) - 1;
+                o->monitor = obt_parse_node_int(n) - 1;
         }
         g_free(s);
     }
 
     return o;
-}
-
-static void free_func(gpointer options)
-{
-    Options *o = options;
-
-    g_free(o);
 }
 
 /* Always return FALSE because its not interactive */

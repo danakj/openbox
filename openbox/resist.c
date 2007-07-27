@@ -17,14 +17,13 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "resist.h"
 #include "client.h"
 #include "frame.h"
 #include "stacking.h"
 #include "screen.h"
 #include "dock.h"
 #include "config.h"
-#include "resist.h"
-#include "parser/parse.h"
 
 #include <glib.h>
 

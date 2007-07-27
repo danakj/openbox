@@ -12,7 +12,7 @@ typedef struct {
     gchar   *sn_wmclass;
 } Options;
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_func(xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /*
@@ -25,38 +25,34 @@ static void     i_cancel_func(gpointer options);
 
 void action_execute_startup(void)
 {
-    actions_register("Execute",
-                     setup_func,
-                     free_func,
-                     run_func,
-                     NULL, NULL);
+    actions_register("Execute", setup_func, free_func, run_func, NULL, NULL);
 }
 
-static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("command", node)) ||
-        (n = parse_find_node("execute", node)))
+    if ((n = obt_parse_find_node(node, "command")) ||
+        (n = obt_parse_find_node(node, "execute")))
     {
-        gchar *s = parse_string(doc, n);
+        gchar *s = obt_parse_node_string(n);
         o->cmd = parse_expand_tilde(s);
         g_free(s);
     }
 
-    if ((n = parse_find_node("startupnotify", node))) {
+    if ((n = obt_parse_find_node(node, "startupnotify"))) {
         xmlNodePtr m;
-        if ((m = parse_find_node("enabled", n->xmlChildrenNode)))
-            o->sn = parse_bool(doc, m);
-        if ((m = parse_find_node("name", n->xmlChildrenNode)))
-            o->sn_name = parse_string(doc, m);
-        if ((m = parse_find_node("icon", n->xmlChildrenNode)))
-            o->sn_icon = parse_string(doc, m);
-        if ((m = parse_find_node("wmclass", n->xmlChildrenNode)))
-            o->sn_wmclass = parse_string(doc, m);
+        if ((m = obt_parse_find_node(n->xmlChildrenNode, "enabled")))
+            o->sn = obt_parse_node_bool(m);
+        if ((m = obt_parse_find_node(n->xmlChildrenNode, "name")))
+            o->sn_name = obt_parse_node_string(m);
+        if ((m = obt_parse_find_node(n->xmlChildrenNode, "icon")))
+            o->sn_icon = obt_parse_node_string(m);
+        if ((m = obt_parse_find_node(n->xmlChildrenNode, "wmclass")))
+            o->sn_wmclass = obt_parse_node_string(m);
     }
     return o;
 }

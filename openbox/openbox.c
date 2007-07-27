@@ -206,12 +206,12 @@ gint main(gint argc, gchar **argv)
             if (reconfigure) obt_keyboard_reload();
 
             /* get the keycodes for keys we use */
-            keys[OB_KEY_RETURN] = modkeys_sym_to_code(XK_Return);
-            keys[OB_KEY_ESCAPE] = modkeys_sym_to_code(XK_Escape);
-            keys[OB_KEY_LEFT] = modkeys_sym_to_code(XK_Left);
-            keys[OB_KEY_RIGHT] = modkeys_sym_to_code(XK_Right);
-            keys[OB_KEY_UP] = modkeys_sym_to_code(XK_Up);
-            keys[OB_KEY_DOWN] = modkeys_sym_to_code(XK_Down);
+            keys[OB_KEY_RETURN] = obt_keyboard_keysym_to_keycode(XK_Return);
+            keys[OB_KEY_ESCAPE] = obt_keyboard_keysym_to_keycode(XK_Escape);
+            keys[OB_KEY_LEFT] = obt_keyboard_keysym_to_keycode(XK_Left);
+            keys[OB_KEY_RIGHT] = obt_keyboard_keysym_to_keycode(XK_Right);
+            keys[OB_KEY_UP] = obt_keyboard_keysym_to_keycode(XK_Up);
+            keys[OB_KEY_DOWN] = obt_keyboard_keysym_to_keycode(XK_Down);
 
             {
                 ObParseInst *i;

@@ -31,17 +31,16 @@
 #include "menu.h"
 #include "menuframe.h"
 #include "keyboard.h"
-#include "modkeys.h"
 #include "mouse.h"
 #include "focus.h"
 #include "focus_cycle.h"
 #include "moveresize.h"
 #include "group.h"
 #include "stacking.h"
-#include "translate.h"
 #include "ping.h"
 #include "obt/display.h"
 #include "obt/prop.h"
+#include "obt/keyboard.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -259,10 +258,10 @@ static void event_hack_mods(XEvent *e)
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
-        e->xbutton.state = modkeys_only_modifier_masks(e->xbutton.state);
+        e->xbutton.state = obt_keyboard_only_modmasks(e->xbutton.state);
         break;
     case KeyPress:
-        e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
+        e->xkey.state = obt_keyboard_only_modmasks(e->xkey.state);
         break;
     case KeyRelease:
 #ifdef XKB
@@ -274,14 +273,14 @@ static void event_hack_mods(XEvent *e)
         else
 #endif
         {
-            e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
+            e->xkey.state = obt_keyboard_only_modmasks(e->xkey.state);
             /* remove from the state the mask of the modifier key being
                released, if it is a modifier key being released that is */
-            e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);
+            e->xkey.state &= ~obt_keyboard_keycode_to_modmask(e->xkey.keycode);
         }
         break;
     case MotionNotify:
-        e->xmotion.state = modkeys_only_modifier_masks(e->xmotion.state);
+        e->xmotion.state = obt_keyboard_only_modmasks(e->xmotion.state);
         /* compress events */
         {
             XEvent ce;
@@ -1676,7 +1675,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
     keycode = ev->xkey.keycode;
     state = ev->xkey.state;
-    unikey = translate_unichar(keycode);
+    unikey = obt_keyboard_keycode_to_unichar(keycode);
 
     frame = find_active_or_last_menu();
     if (frame == NULL)

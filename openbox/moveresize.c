@@ -24,7 +24,6 @@
 #include "frame.h"
 #include "openbox.h"
 #include "resist.h"
-#include "modkeys.h"
 #include "popup.h"
 #include "moveresize.h"
 #include "config.h"
@@ -34,6 +33,7 @@
 #include "render/theme.h"
 #include "obt/display.h"
 #include "obt/prop.h"
+#include "obt/keyboard.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -603,7 +603,7 @@ static void move_with_keys(gint keycode, gint state)
     gint dist = 0;
 
     /* shift means jump to edge */
-    if (state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
+    if (state & obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT)) {
         gint x, y;
         ObDirection dir;
 
@@ -621,8 +621,11 @@ static void move_with_keys(gint keycode, gint state)
         dy = y - moveresize_client->area.y;
     } else {
         /* control means fine grained */
-        if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL))
+        if (state &
+            obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_CONTROL))
+        {
             dist = 1;
+        }
         else
             dist = KEY_DIST;
 
@@ -703,7 +706,7 @@ static void resize_with_keys(gint keycode, gint state)
     }
 
     /* shift means jump to edge */
-    if (state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
+    if (state & obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT)) {
         gint x, y, w, h;
 
         if (keycode == ob_keycode(OB_KEY_RIGHT))
@@ -728,7 +731,9 @@ static void resize_with_keys(gint keycode, gint state)
             distw = moveresize_client->size_inc.width;
             resist = 1;
         }
-        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL)) {
+        else if (state &
+                 obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_CONTROL))
+        {
             distw = 1;
             resist = 1;
         }
@@ -740,7 +745,9 @@ static void resize_with_keys(gint keycode, gint state)
             disth = moveresize_client->size_inc.height;
             resist = 1;
         }
-        else if (state & modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL)) {
+        else if (state &
+                 obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_CONTROL))
+        {
             disth = 1;
             resist = 1;
         }

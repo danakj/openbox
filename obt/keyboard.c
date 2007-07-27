@@ -40,7 +40,7 @@ static XModifierKeymap *modmap;
 static KeySym *keymap;
 static gint min_keycode, max_keycode, keysyms_per_keycode;
 /* This is a bitmask of the different masks for each modifier key */
-static guchar modkeys_keys[OBT_MODKEY_NUM_KEYS];
+static guchar modkeys_keys[OBT_KEYBOARD_NUM_MODKEYS];
 
 static gboolean alt_l = FALSE;
 static gboolean meta_l = FALSE;
@@ -57,7 +57,7 @@ void obt_keyboard_reload()
     started = TRUE;
 
     /* reset the keys to not be bound to any masks */
-    for (i = 0; i < OBT_MODKEY_NUM_KEYS; ++i)
+    for (i = 0; i < OBT_KEYBOARD_NUM_MODKEYS; ++i)
         modkeys_keys[i] = 0;
 
     modmap = XGetModifierMapping(obt_display);
@@ -92,9 +92,9 @@ void obt_keyboard_reload()
     }
 
     /* CapsLock, Shift, and Control are special and hard-coded */
-    modkeys_keys[OBT_MODKEY_KEY_CAPSLOCK] = LockMask;
-    modkeys_keys[OBT_MODKEY_KEY_SHIFT] = ShiftMask;
-    modkeys_keys[OBT_MODKEY_KEY_CONTROL] = ControlMask;
+    modkeys_keys[OBT_KEYBOARD_MODKEY_CAPSLOCK] = LockMask;
+    modkeys_keys[OBT_KEYBOARD_MODKEY_SHIFT] = ShiftMask;
+    modkeys_keys[OBT_KEYBOARD_MODKEY_CONTROL] = ControlMask;
 }
 
 void obt_keyboard_shutdown()
@@ -133,8 +133,8 @@ guint obt_keyboard_only_modmasks(guint mask)
                           because you could bind it to something else and it
                           should work as that modifier then. i think capslock
                           is weird in xkb. */
-    mask &= ~obt_keyboard_modkey_to_modmask(OBT_MODKEY_KEY_NUMLOCK);
-    mask &= ~obt_keyboard_modkey_to_modmask(OBT_MODKEY_KEY_SCROLLLOCK);
+    mask &= ~obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_NUMLOCK);
+    mask &= ~obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SCROLLLOCK);
     return mask;
 }
 
@@ -148,39 +148,39 @@ static void set_modkey_mask(guchar mask, KeySym sym)
     /* find what key this is, and bind it to the mask */
 
     if (sym == XK_Num_Lock)
-        modkeys_keys[OBT_MODKEY_KEY_NUMLOCK] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_NUMLOCK] |= mask;
     else if (sym == XK_Scroll_Lock)
-        modkeys_keys[OBT_MODKEY_KEY_SCROLLLOCK] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_SCROLLLOCK] |= mask;
 
     else if (sym == XK_Super_L && super_l)
-        modkeys_keys[OBT_MODKEY_KEY_SUPER] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_SUPER] |= mask;
     else if (sym == XK_Super_L && !super_l)
         /* left takes precident over right, so erase any masks the right
            key may have set */
-        modkeys_keys[OBT_MODKEY_KEY_SUPER] = mask, super_l = TRUE;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_SUPER] = mask, super_l = TRUE;
     else if (sym == XK_Super_R && !super_l)
-        modkeys_keys[OBT_MODKEY_KEY_SUPER] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_SUPER] |= mask;
 
     else if (sym == XK_Hyper_L && hyper_l)
-        modkeys_keys[OBT_MODKEY_KEY_HYPER] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_HYPER] |= mask;
     else if (sym == XK_Hyper_L && !hyper_l)
-        modkeys_keys[OBT_MODKEY_KEY_HYPER] = mask, hyper_l = TRUE;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_HYPER] = mask, hyper_l = TRUE;
     else if (sym == XK_Hyper_R && !hyper_l)
-        modkeys_keys[OBT_MODKEY_KEY_HYPER] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_HYPER] |= mask;
 
     else if (sym == XK_Alt_L && alt_l)
-        modkeys_keys[OBT_MODKEY_KEY_ALT] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_ALT] |= mask;
     else if (sym == XK_Alt_L && !alt_l)
-        modkeys_keys[OBT_MODKEY_KEY_ALT] = mask, alt_l = TRUE;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_ALT] = mask, alt_l = TRUE;
     else if (sym == XK_Alt_R && !alt_l)
-        modkeys_keys[OBT_MODKEY_KEY_ALT] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_ALT] |= mask;
 
     else if (sym == XK_Meta_L && meta_l)
-        modkeys_keys[OBT_MODKEY_KEY_META] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_META] |= mask;
     else if (sym == XK_Meta_L && !meta_l)
-        modkeys_keys[OBT_MODKEY_KEY_META] = mask, meta_l = TRUE;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_META] = mask, meta_l = TRUE;
     else if (sym == XK_Meta_R && !meta_l)
-        modkeys_keys[OBT_MODKEY_KEY_META] |= mask;
+        modkeys_keys[OBT_KEYBOARD_MODKEY_META] |= mask;
 
     /* CapsLock, Shift, and Control are special and hard-coded */
 }
@@ -220,5 +220,6 @@ gunichar obt_keyboard_keycode_to_unichar(guint keycode)
         if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
             unikey = 0;
     }
+    g_free(key);
     return unikey;
 }

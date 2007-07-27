@@ -19,9 +19,9 @@
 
 #include "openbox.h"
 #include "mouse.h"
-#include "modkeys.h"
-#include "translate.h"
 #include "gettext.h"
+#include "obt/keyboard.h"
+
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,23 +38,23 @@ static guint translate_modifier(gchar *str)
 
     else if (!g_ascii_strcasecmp("Control", str) ||
              !g_ascii_strcasecmp("C", str))
-        mask = modkeys_key_to_mask(OB_MODKEY_KEY_CONTROL);
+        mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_CONTROL);
     else if (!g_ascii_strcasecmp("Alt", str) ||
              !g_ascii_strcasecmp("A", str))
-        mask = modkeys_key_to_mask(OB_MODKEY_KEY_ALT);
+        mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_ALT);
     else if (!g_ascii_strcasecmp("Meta", str) ||
              !g_ascii_strcasecmp("M", str))
-        mask = modkeys_key_to_mask(OB_MODKEY_KEY_META);
+        mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_META);
     /* W = windows key, is linked to the Super_L/R buttons */
     else if (!g_ascii_strcasecmp("Super", str) ||
              !g_ascii_strcasecmp("W", str))
-        mask = modkeys_key_to_mask(OB_MODKEY_KEY_SUPER);
+        mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SUPER);
     else if (!g_ascii_strcasecmp("Shift", str) ||
              !g_ascii_strcasecmp("S", str))
-        mask = modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT);
+        mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT);
     else if (!g_ascii_strcasecmp("Hyper", str) ||
              !g_ascii_strcasecmp("H", str))
-        mask = modkeys_key_to_mask(OB_MODKEY_KEY_HYPER);
+        mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_HYPER);
     else
         g_message(_("Invalid modifier key '%s' in key/mouse binding"), str);
 
@@ -157,31 +157,4 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
 translation_fail:
     g_strfreev(parsed);
     return ret;
-}
-
-gchar *translate_keycode(guint keycode)
-{
-    KeySym sym;
-    const gchar *ret = NULL;
-
-    if ((sym = XKeycodeToKeysym(obt_display, keycode, 0)) != NoSymbol)
-        ret = XKeysymToString(sym);
-    return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
-}
-
-gunichar translate_unichar(guint keycode)
-{
-    gunichar unikey = 0;
-
-    char *key;
-    if ((key = translate_keycode(keycode)) != NULL &&
-        /* don't accept keys that aren't a single letter, like "space" */
-        key[1] == '\0')
-    {
-        unikey = g_utf8_get_char_validated(key, -1);
-        if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
-            unikey = 0;
-    }
-    g_free(key);
-    return unikey;
 }

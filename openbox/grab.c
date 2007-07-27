@@ -18,12 +18,12 @@
 */
 
 #include "grab.h"
-#include "modkeys.h"
 #include "openbox.h"
 #include "event.h"
 #include "screen.h"
 #include "debug.h"
 #include "obt/display.h"
+#include "obt/keyboard.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -146,9 +146,9 @@ void grab_startup(gboolean reconfig)
     guint i = 0;
     guint num, caps, scroll;
 
-    num = modkeys_key_to_mask(OB_MODKEY_KEY_NUMLOCK);
-    caps = modkeys_key_to_mask(OB_MODKEY_KEY_CAPSLOCK);
-    scroll = modkeys_key_to_mask(OB_MODKEY_KEY_SCROLLLOCK);
+    num = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_NUMLOCK);
+    caps = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_CAPSLOCK);
+    scroll = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SCROLLLOCK);
 
     mask_list[i++] = 0;
     mask_list[i++] = num;

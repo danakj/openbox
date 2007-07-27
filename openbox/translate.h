@@ -24,10 +24,4 @@
 gboolean translate_button(const gchar *str, guint *state, guint *keycode);
 gboolean translate_key(const gchar *str, guint *state, guint *keycode);
 
-/*! Give the string form of a keycode */
-gchar *translate_keycode(guint keycode);
-
-/*! Translate a keycode to the unicode character it represents */
-gunichar translate_unichar(guint keycode);
-
 #endif

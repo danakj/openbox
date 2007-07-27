@@ -85,7 +85,6 @@
 RrInstance  *ob_rr_inst;
 RrTheme     *ob_rr_theme;
 ObtMainLoop *ob_main_loop;
-Display     *ob_display;
 gint         ob_screen;
 gboolean     ob_replace_wm = FALSE;
 gboolean     ob_sm_use = TRUE;
@@ -144,7 +143,6 @@ gint main(gint argc, gchar **argv)
 
     if (!obt_display_open(NULL))
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
-    ob_display = obt_display;
 
     if (remote_control) {
         prop_startup();
@@ -152,13 +150,13 @@ gint main(gint argc, gchar **argv)
         /* Send client message telling the OB process to:
          * remote_control = 1 -> reconfigure
          * remote_control = 2 -> restart */
-        PROP_MSG(RootWindow(ob_display, ob_screen),
+        PROP_MSG(RootWindow(obt_display, ob_screen),
                  ob_control, remote_control, 0, 0, 0);
-        obt_display_close(ob_display);
+        obt_display_close(obt_display);
         exit(EXIT_SUCCESS);
     }
 
-    ob_main_loop = obt_main_loop_new(ob_display);
+    ob_main_loop = obt_main_loop_new(obt_display);
 
     /* set up signal handler */
     obt_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL,NULL);
@@ -169,13 +167,13 @@ gint main(gint argc, gchar **argv)
     obt_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL,NULL);
     obt_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL,NULL);
 
-    ob_screen = DefaultScreen(ob_display);
+    ob_screen = DefaultScreen(obt_display);
 
-    ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
+    ob_rr_inst = RrInstanceNew(obt_display, ob_screen);
     if (ob_rr_inst == NULL)
         ob_exit_with_error(_("Failed to initialize the obrender library."));
 
-    XSynchronize(ob_display, xsync);
+    XSynchronize(obt_display, xsync);
 
     /* check for locale support */
     if (!XSupportsLocale())
@@ -185,7 +183,7 @@ gint main(gint argc, gchar **argv)
 
     /* set the DISPLAY environment variable for any lauched children, to the
        display we're using, so they open in the right place. */
-    putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
+    putenv(g_strdup_printf("DISPLAY=%s", DisplayString(obt_display)));
 
     /* create available cursors */
     cursors[OB_CURSOR_NONE] = None;
@@ -243,7 +241,7 @@ gint main(gint argc, gchar **argv)
 
 /*
                 if (config_type != NULL)
-                    PROP_SETS(RootWindow(ob_display, ob_screen),
+                    PROP_SETS(RootWindow(obt_display, ob_screen),
                               ob_config, config_type);
 */
 
@@ -267,7 +265,7 @@ gint main(gint argc, gchar **argv)
                 if (ob_rr_theme == NULL)
                     ob_exit_with_error(_("Unable to load a theme."));
 
-                PROP_SETS(RootWindow(ob_display, ob_screen),
+                PROP_SETS(RootWindow(obt_display, ob_screen),
                           ob_theme, ob_rr_theme->name);
             }
 
@@ -310,7 +308,7 @@ gint main(gint argc, gchar **argv)
                 focus_nothing();
 
                 /* focus what was focused if a wm was already running */
-                if (PROP_GET32(RootWindow(ob_display, ob_screen),
+                if (PROP_GET32(RootWindow(obt_display, ob_screen),
                                net_active_window, window, &xid) &&
                     (w = g_hash_table_lookup(window_map, &xid)) &&
                     WINDOW_IS_CLIENT(w))
@@ -369,14 +367,14 @@ gint main(gint argc, gchar **argv)
         } while (reconfigure);
     }
 
-    XSync(ob_display, FALSE);
+    XSync(obt_display, FALSE);
 
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
     session_shutdown(being_replaced);
 
-    obt_display_close(ob_display);
+    obt_display_close(obt_display);
 
     parse_paths_shutdown();
 
@@ -602,10 +600,10 @@ static Cursor load_cursor(const gchar *name, guint fontval)
     Cursor c = None;
 
 #if USE_XCURSOR
-    c = XcursorLibraryLoadCursor(ob_display, name);
+    c = XcursorLibraryLoadCursor(obt_display, name);
 #endif
     if (c == None)
-        c = XCreateFontCursor(ob_display, fontval);
+        c = XCreateFontCursor(obt_display, fontval);
     return c;
 }
 

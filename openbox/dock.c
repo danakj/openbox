@@ -57,9 +57,9 @@ void dock_startup(gboolean reconfig)
     if (reconfig) {
         GList *it;
 
-        XSetWindowBorder(ob_display, dock->frame,
+        XSetWindowBorder(obt_display, dock->frame,
                          RrColorPixel(ob_rr_theme->osd_border_color));
-        XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->obwidth);
+        XSetWindowBorderWidth(obt_display, dock->frame, ob_rr_theme->obwidth);
 
         RrAppearanceFree(dock->a_frame);
         dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
@@ -85,7 +85,8 @@ void dock_startup(gboolean reconfig)
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
     attrib.do_not_propagate_mask = DOCK_NOPROPAGATEMASK;
-    dock->frame = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
+    dock->frame = XCreateWindow(obt_display,
+                                RootWindow(obt_display, ob_screen),
                                 0, 0, 1, 1, 0,
                                 RrDepth(ob_rr_inst), InputOutput,
                                 RrVisual(ob_rr_inst),
@@ -93,9 +94,9 @@ void dock_startup(gboolean reconfig)
                                 CWDontPropagate,
                                 &attrib);
     dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
-    XSetWindowBorder(ob_display, dock->frame,
+    XSetWindowBorder(obt_display, dock->frame,
                      RrColorPixel(ob_rr_theme->osd_border_color));
-    XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->obwidth);
+    XSetWindowBorderWidth(obt_display, dock->frame, ob_rr_theme->obwidth);
 
     /* Setting the window type so xcompmgr can tell what it is */
     PROP_SET32(dock->frame, net_wm_window_type, atom,
@@ -117,7 +118,7 @@ void dock_shutdown(gboolean reconfig)
         return;
     }
 
-    XDestroyWindow(ob_display, dock->frame);
+    XDestroyWindow(obt_display, dock->frame);
     RrAppearanceFree(dock->a_frame);
     g_hash_table_remove(window_map, &dock->frame);
     stacking_remove(dock);
@@ -147,7 +148,7 @@ void dock_add(Window win, XWMHints *wmhints)
     if (app->name == NULL) app->name = g_strdup("");
     if (app->class == NULL) app->class = g_strdup("");
 
-    if (XGetWindowAttributes(ob_display, app->icon_win, &attrib)) {
+    if (XGetWindowAttributes(obt_display, app->icon_win, &attrib)) {
         app->w = attrib.width;
         app->h = attrib.height;
     } else {
@@ -157,7 +158,7 @@ void dock_add(Window win, XWMHints *wmhints)
     dock->dock_apps = g_list_append(dock->dock_apps, app);
     dock_configure();
 
-    XReparentWindow(ob_display, app->icon_win, dock->frame, app->x, app->y);
+    XReparentWindow(obt_display, app->icon_win, dock->frame, app->x, app->y);
     /*
       This is the same case as in frame.c for client windows. When Openbox is
       starting, the window is already mapped so we see unmap events occur for
@@ -170,16 +171,16 @@ void dock_add(Window win, XWMHints *wmhints)
 
     if (app->win != app->icon_win) {
         /* have to map it so that it can be re-managed on a restart */
-        XMoveWindow(ob_display, app->win, -1000, -1000);
-        XMapWindow(ob_display, app->win);
+        XMoveWindow(obt_display, app->win, -1000, -1000);
+        XMapWindow(obt_display, app->win);
     }
-    XMapWindow(ob_display, app->icon_win);
-    XSync(ob_display, False);
+    XMapWindow(obt_display, app->icon_win);
+    XSync(obt_display, False);
 
     /* specify that if we exit, the window should not be destroyed and should
        be reparented back to root automatically */
-    XChangeSaveSet(ob_display, app->icon_win, SetModeInsert);
-    XSelectInput(ob_display, app->icon_win, DOCKAPP_EVENT_MASK);
+    XChangeSaveSet(obt_display, app->icon_win, SetModeInsert);
+    XSelectInput(obt_display, app->icon_win, DOCKAPP_EVENT_MASK);
 
     dock_app_grab_button(app, TRUE);
 
@@ -197,16 +198,16 @@ void dock_remove_all(void)
 void dock_remove(ObDockApp *app, gboolean reparent)
 {
     dock_app_grab_button(app, FALSE);
-    XSelectInput(ob_display, app->icon_win, NoEventMask);
+    XSelectInput(obt_display, app->icon_win, NoEventMask);
     /* remove the window from our save set */
-    XChangeSaveSet(ob_display, app->icon_win, SetModeDelete);
-    XSync(ob_display, False);
+    XChangeSaveSet(obt_display, app->icon_win, SetModeDelete);
+    XSync(obt_display, False);
 
     g_hash_table_remove(window_map, &app->icon_win);
 
     if (reparent)
-        XReparentWindow(ob_display, app->icon_win,
-                        RootWindow(ob_display, ob_screen), app->x, app->y);
+        XReparentWindow(obt_display, app->icon_win,
+                        RootWindow(obt_display, ob_screen), app->x, app->y);
 
     dock->dock_apps = g_list_remove(dock->dock_apps, app);
     dock_configure();
@@ -270,7 +271,7 @@ void dock_configure(void)
             break;
         }
 
-        XMoveWindow(ob_display, app->icon_win, app->x, app->y);
+        XMoveWindow(obt_display, app->icon_win, app->x, app->y);
     }
 
     /* used for calculating offsets */
@@ -519,14 +520,14 @@ void dock_configure(void)
         g_assert(dock->area.width > 0);
         g_assert(dock->area.height > 0);
 
-        XMoveResizeWindow(ob_display, dock->frame, dock->area.x, dock->area.y,
+        XMoveResizeWindow(obt_display, dock->frame, dock->area.x, dock->area.y,
                           dock->area.width, dock->area.height);
 
         RrPaint(dock->a_frame, dock->frame, dock->area.width,
                 dock->area.height);
-        XMapWindow(ob_display, dock->frame);
+        XMapWindow(obt_display, dock->frame);
     } else
-        XUnmapWindow(ob_display, dock->frame);
+        XUnmapWindow(obt_display, dock->frame);
 
     /* but they are useful outside of this function! */
     dock->area.width += ob_rr_theme->obwidth * 2;

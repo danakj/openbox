@@ -165,7 +165,7 @@ void client_set_list(void)
     } else
         windows = NULL;
 
-    PROP_SETA32(RootWindow(ob_display, ob_screen),
+    PROP_SETA32(RootWindow(obt_display, ob_screen),
                 net_client_list, window, (gulong*)windows, size);
 
     if (windows)
@@ -181,13 +181,13 @@ void client_manage_all(void)
     XWMHints *wmhints;
     XWindowAttributes attrib;
 
-    XQueryTree(ob_display, RootWindow(ob_display, ob_screen),
+    XQueryTree(obt_display, RootWindow(obt_display, ob_screen),
                &w, &w, &children, &nchild);
 
     /* remove all icon windows from the list */
     for (i = 0; i < nchild; i++) {
         if (children[i] == None) continue;
-        wmhints = XGetWMHints(ob_display, children[i]);
+        wmhints = XGetWMHints(obt_display, children[i]);
         if (wmhints) {
             if ((wmhints->flags & IconWindowHint) &&
                 (wmhints->icon_window != children[i]))
@@ -203,7 +203,7 @@ void client_manage_all(void)
     for (i = 0; i < nchild; ++i) {
         if (children[i] == None)
             continue;
-        if (XGetWindowAttributes(ob_display, children[i], &attrib)) {
+        if (XGetWindowAttributes(obt_display, children[i], &attrib)) {
             if (attrib.override_redirect) continue;
 
             if (attrib.map_state != IsUnmapped)
@@ -230,10 +230,10 @@ void client_manage(Window window)
 
     /* check if it has already been unmapped by the time we started
        mapping. the grab does a sync so we don't have to here */
-    if (XCheckTypedWindowEvent(ob_display, window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e))
+    if (XCheckTypedWindowEvent(obt_display, window, DestroyNotify, &e) ||
+        XCheckTypedWindowEvent(obt_display, window, UnmapNotify, &e))
     {
-        XPutBackEvent(ob_display, &e);
+        XPutBackEvent(obt_display, &e);
 
         ob_debug("Trying to manage unmapped window. Aborting that.\n");
         grab_server(FALSE);
@@ -241,7 +241,7 @@ void client_manage(Window window)
     }
 
     /* make sure it isn't an override-redirect window */
-    if (!XGetWindowAttributes(ob_display, window, &attrib) ||
+    if (!XGetWindowAttributes(obt_display, window, &attrib) ||
         attrib.override_redirect)
     {
         grab_server(FALSE);
@@ -249,7 +249,7 @@ void client_manage(Window window)
     }
 
     /* is the window a docking app */
-    if ((wmhint = XGetWMHints(ob_display, window))) {
+    if ((wmhint = XGetWMHints(obt_display, window))) {
         if ((wmhint->flags & StateHint) &&
             wmhint->initial_state == WithdrawnState)
         {
@@ -268,7 +268,7 @@ void client_manage(Window window)
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
-    XChangeWindowAttributes(ob_display, window,
+    XChangeWindowAttributes(obt_display, window,
                             CWEventMask|CWDontPropagate, &attrib_set);
 
     /* create the ObClient struct, and populate it from the hints on the
@@ -290,7 +290,7 @@ void client_manage(Window window)
 
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically */
-    XChangeSaveSet(ob_display, window, SetModeInsert);
+    XChangeSaveSet(obt_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
@@ -338,7 +338,7 @@ void client_manage(Window window)
     }
 
     /* remove the client's border */
-    XSetWindowBorderWidth(ob_display, self->window, 0);
+    XSetWindowBorderWidth(obt_display, self->window, 0);
 
     /* adjust the frame to the client's size before showing or placing
        the window */
@@ -678,7 +678,7 @@ void client_unmanage(ObClient *self)
 
     /* we dont want events no more. do this before hiding the frame so we
        don't generate more events */
-    XSelectInput(ob_display, self->window, NoEventMask);
+    XSelectInput(obt_display, self->window, NoEventMask);
 
     /* ignore enter events from the unmap so it doesnt mess with the focus */
     if (!config_focus_under_mouse)
@@ -686,7 +686,7 @@ void client_unmanage(ObClient *self)
 
     frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
-    XFlush(ob_display);
+    XFlush(obt_display);
 
     if (!config_focus_under_mouse)
         event_end_ignore_all_enters(ignore_start);
@@ -694,7 +694,7 @@ void client_unmanage(ObClient *self)
     mouse_grab_for_client(self, FALSE);
 
     /* remove the window from our save set */
-    XChangeSaveSet(ob_display, self->window, SetModeDelete);
+    XChangeSaveSet(obt_display, self->window, SetModeDelete);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -758,7 +758,7 @@ void client_unmanage(ObClient *self)
         self->decorations = 0; /* unmanaged windows have no decor */
 
         /* give the client its border back */
-        XSetWindowBorderWidth(ob_display, self->window, self->border_width);
+        XSetWindowBorderWidth(obt_display, self->window, self->border_width);
 
         client_move_resize(self, a.x, a.y, a.width, a.height);
     }
@@ -778,7 +778,7 @@ void client_unmanage(ObClient *self)
         /* if we're left in an unmapped state, the client wont be mapped.
            this is bad, since we will no longer be managing the window on
            restart */
-        XMapWindow(ob_display, self->window);
+        XMapWindow(obt_display, self->window);
     }
 
     /* these should not be left on the window ever.  other window managers
@@ -921,7 +921,7 @@ static void client_restore_session_state(ObClient *self)
         self->area.width = self->session->w;
     if (self->session->h > 0)
         self->area.height = self->session->h;
-    XResizeWindow(ob_display, self->window,
+    XResizeWindow(obt_display, self->window,
                   self->area.width, self->area.height);
 
     self->desktop = (self->session->desktop == DESKTOP_ALL ?
@@ -1156,7 +1156,7 @@ static void client_get_area(ObClient *self)
     XWindowAttributes wattrib;
     Status ret;
 
-    ret = XGetWindowAttributes(ob_display, self->window, &wattrib);
+    ret = XGetWindowAttributes(obt_display, self->window, &wattrib);
     g_assert(ret != BadWindow);
 
     RECT_SET(self->area, wattrib.x, wattrib.y, wattrib.width, wattrib.height);
@@ -1266,9 +1266,9 @@ static void client_get_shaped(ObClient *self)
         guint ufoo;
         gint s;
 
-        XShapeSelectInput(ob_display, self->window, ShapeNotifyMask);
+        XShapeSelectInput(obt_display, self->window, ShapeNotifyMask);
 
-        XShapeQueryExtents(ob_display, self->window, &s, &foo,
+        XShapeQueryExtents(obt_display, self->window, &s, &foo,
                            &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
                            &ufoo);
         self->shaped = (s != 0);
@@ -1282,7 +1282,7 @@ void client_update_transient_for(ObClient *self)
     ObClient *target = NULL;
     gboolean trangroup = FALSE;
 
-    if (XGetTransientForHint(ob_display, self->window, &t)) {
+    if (XGetTransientForHint(obt_display, self->window, &t)) {
         if (t != self->window) { /* cant be transient to itself! */
             target = g_hash_table_lookup(window_map, &t);
             /* if this happens then we need to check for it*/
@@ -1297,7 +1297,7 @@ void client_update_transient_for(ObClient *self)
         /* Setting the transient_for to Root is actually illegal, however
            applications from time have done this to specify transient for
            their group */
-        if (!target && self->group && t == RootWindow(ob_display, ob_screen))
+        if (!target && self->group && t == RootWindow(obt_display, ob_screen))
             trangroup = TRUE;
     } else if (self->group && self->transient)
         trangroup = TRUE;
@@ -1486,7 +1486,7 @@ void client_get_type_and_transientness(ObClient *self)
         g_free(val);
     }
 
-    if (XGetTransientForHint(ob_display, self->window, &t))
+    if (XGetTransientForHint(obt_display, self->window, &t))
         self->transient = TRUE;
 
     if (self->type == (ObClientType) -1) {
@@ -1558,7 +1558,7 @@ static void client_get_colormap(ObClient *self)
 {
     XWindowAttributes wa;
 
-    if (XGetWindowAttributes(ob_display, self->window, &wa))
+    if (XGetWindowAttributes(obt_display, self->window, &wa))
         client_update_colormap(self, wa.colormap);
 }
 
@@ -1590,7 +1590,7 @@ void client_update_normal_hints(ObClient *self)
     SIZE_SET(self->max_size, G_MAXINT, G_MAXINT);
 
     /* get the hints from the window */
-    if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
+    if (XGetWMNormalHints(obt_display, self->window, &size, &ret)) {
         /* normal windows can't request placement! har har
         if (!client_normal(self))
         */
@@ -1857,7 +1857,7 @@ void client_update_wmhints(ObClient *self)
     /* assume a window takes input if it doesnt specify */
     self->can_focus = TRUE;
 
-    if ((hints = XGetWMHints(ob_display, self->window)) != NULL) {
+    if ((hints = XGetWMHints(obt_display, self->window)) != NULL) {
         gboolean ur;
 
         if (hints->flags & InputHint)
@@ -2119,7 +2119,7 @@ void client_update_icons(ObClient *self)
     } else {
         XWMHints *hints;
 
-        if ((hints = XGetWMHints(ob_display, self->window))) {
+        if ((hints = XGetWMHints(obt_display, self->window))) {
             if (hints->flags & IconPixmapHint) {
                 self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
@@ -2910,7 +2910,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XMoveResizeWindow(ob_display, self->window,
+        XMoveResizeWindow(obt_display, self->window,
                           self->frame->size.left, self->frame->size.top,
                           MAX(w, oldw), MAX(h, oldh));
         frame_adjust_client_area(self->frame);
@@ -2972,7 +2972,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         XEvent event;
 
         event.type = ConfigureNotify;
-        event.xconfigure.display = ob_display;
+        event.xconfigure.display = obt_display;
         event.xconfigure.event = self->window;
         event.xconfigure.window = self->window;
 
@@ -2998,11 +2998,11 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
      */
     if (send_resize_client && (w <= oldw || h <= oldh)) {
         frame_adjust_client_area(self->frame);
-        XMoveResizeWindow(ob_display, self->window,
+        XMoveResizeWindow(obt_display, self->window,
                           self->frame->size.left, self->frame->size.top, w, h);
     }
 
-    XFlush(ob_display);
+    XFlush(obt_display);
 }
 
 void client_fullscreen(ObClient *self, gboolean fs)
@@ -3230,7 +3230,7 @@ void client_close(ObClient *self)
     if (!self->delete_window)
         /* don't use client_kill(), we should only kill based on PID in
            response to a lack of PING replies */
-        XKillClient(ob_display, self->window);
+        XKillClient(obt_display, self->window);
     else if (self->not_responding)
         client_kill(self);
     else
@@ -3260,7 +3260,7 @@ void client_kill(ObClient *self)
         }
     }
     else
-        XKillClient(ob_display, self->window);
+        XKillClient(obt_display, self->window);
 }
 
 void client_hilite(ObClient *self, gboolean hilite)
@@ -3351,11 +3351,12 @@ gboolean client_validate(ObClient *self)
 {
     XEvent e;
 
-    XSync(ob_display, FALSE); /* get all events on the server */
+    XSync(obt_display, FALSE); /* get all events on the server */
 
-    if (XCheckTypedWindowEvent(ob_display, self->window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(ob_display, self->window, UnmapNotify, &e)) {
-        XPutBackEvent(ob_display, &e);
+    if (XCheckTypedWindowEvent(obt_display, self->window, DestroyNotify, &e) ||
+        XCheckTypedWindowEvent(obt_display, self->window, UnmapNotify, &e))
+    {
+        XPutBackEvent(obt_display, &e);
         return FALSE;
     }
 
@@ -3616,7 +3617,7 @@ gboolean client_focus(ObClient *self)
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
            passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
-        XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
+        XSetInputFocus(obt_display, self->window, RevertToPointerRoot,
                        event_curtime);
     }
 
@@ -3624,7 +3625,7 @@ gboolean client_focus(ObClient *self)
         XEvent ce;
         ce.xclient.type = ClientMessage;
         ce.xclient.message_type = prop_atoms.wm_protocols;
-        ce.xclient.display = ob_display;
+        ce.xclient.display = obt_display;
         ce.xclient.window = self->window;
         ce.xclient.format = 32;
         ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
@@ -3632,7 +3633,7 @@ gboolean client_focus(ObClient *self)
         ce.xclient.data.l[2] = 0l;
         ce.xclient.data.l[3] = 0l;
         ce.xclient.data.l[4] = 0l;
-        XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
+        XSendEvent(obt_display, self->window, FALSE, NoEventMask, &ce);
     }
 
     obt_display_ignore_errors(FALSE);

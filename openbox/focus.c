@@ -52,7 +52,7 @@ void focus_shutdown(gboolean reconfig)
     if (reconfig) return;
 
     /* reset focus to root */
-    XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
+    XSetInputFocus(obt_display, PointerRoot, RevertToNone, CurrentTime);
 }
 
 static void push_to_top(ObClient *client)
@@ -91,7 +91,7 @@ void focus_set_client(ObClient *client)
     /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
     if (ob_state() != OB_STATE_EXITING) {
         active = client ? client->window : None;
-        PROP_SET32(RootWindow(ob_display, ob_screen),
+        PROP_SET32(RootWindow(obt_display, ob_screen),
                    net_active_window, window, active);
     }
 }
@@ -199,7 +199,7 @@ void focus_nothing(void)
     event_cancel_all_key_grabs();
 
     /* when nothing will be focused, send focus to the backup target */
-    XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,
+    XSetInputFocus(obt_display, screen_support_win, RevertToPointerRoot,
                    event_curtime);
 }
 

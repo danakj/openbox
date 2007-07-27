@@ -45,20 +45,20 @@ static void grab_keys(gboolean grab)
 {
     KeyBindingTree *p;
 
-    ungrab_all_keys(RootWindow(ob_display, ob_screen));
+    ungrab_all_keys(RootWindow(obt_display, ob_screen));
 
     if (grab) {
         p = curpos ? curpos->first_child : keyboard_firstnode;
         while (p) {
             if (p->key)
-                grab_key(p->key, p->state, RootWindow(ob_display, ob_screen),
+                grab_key(p->key, p->state, RootWindow(obt_display, ob_screen),
                          GrabModeAsync);
             p = p->next_sibling;
         }
         if (curpos)
             grab_key(config_keyboard_reset_keycode,
                      config_keyboard_reset_state,
-                     RootWindow(ob_display, ob_screen), GrabModeAsync);
+                     RootWindow(obt_display, ob_screen), GrabModeAsync);
     }
 }
 

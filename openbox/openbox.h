@@ -24,6 +24,7 @@
 #include "render/render.h"
 #include "render/theme.h"
 #include "obt/mainloop.h"
+#include "obt/display.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -32,9 +33,6 @@ extern RrInstance *ob_rr_inst;
 extern RrTheme    *ob_rr_theme;
 
 extern ObtMainLoop *ob_main_loop;
-
-/*! The X display */
-extern Display *ob_display;
 
 /*! The number of the screen on which we're running */
 extern gint     ob_screen;

@@ -237,7 +237,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
         if (CLIENT_CONTEXT(context, client)) {
             /* Replay the event, so it goes to the client*/
-            XAllowEvents(ob_display, ReplayPointer, event_curtime);
+            XAllowEvents(obt_display, ReplayPointer, event_curtime);
             /* Fall through to the release case! */
         } else
             break;
@@ -258,7 +258,7 @@ void mouse_event(ObClient *client, XEvent *e)
             guint ujunk, b, w, h;
             /* this can cause errors to occur when the window closes */
             obt_display_ignore_errors(TRUE);
-            junk1 = XGetGeometry(ob_display, e->xbutton.window,
+            junk1 = XGetGeometry(obt_display, e->xbutton.window,
                                  &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
             obt_display_ignore_errors(FALSE);
             if (junk1) {

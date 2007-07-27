@@ -49,67 +49,67 @@ void framerender_frame(ObFrame *self)
               RrColorPixel(ob_rr_theme->cb_focused_color) :
               RrColorPixel(ob_rr_theme->cb_unfocused_color));
 
-        XSetWindowBackground(ob_display, self->backback, px);
-        XClearWindow(ob_display, self->backback);
-        XSetWindowBackground(ob_display, self->innerleft, px);
-        XClearWindow(ob_display, self->innerleft);
-        XSetWindowBackground(ob_display, self->innertop, px);
-        XClearWindow(ob_display, self->innertop);
-        XSetWindowBackground(ob_display, self->innerright, px);
-        XClearWindow(ob_display, self->innerright);
-        XSetWindowBackground(ob_display, self->innerbottom, px);
-        XClearWindow(ob_display, self->innerbottom);
-        XSetWindowBackground(ob_display, self->innerbll, px);
-        XClearWindow(ob_display, self->innerbll);
-        XSetWindowBackground(ob_display, self->innerbrr, px);
-        XClearWindow(ob_display, self->innerbrr);
-        XSetWindowBackground(ob_display, self->innerblb, px);
-        XClearWindow(ob_display, self->innerblb);
-        XSetWindowBackground(ob_display, self->innerbrb, px);
-        XClearWindow(ob_display, self->innerbrb);
+        XSetWindowBackground(obt_display, self->backback, px);
+        XClearWindow(obt_display, self->backback);
+        XSetWindowBackground(obt_display, self->innerleft, px);
+        XClearWindow(obt_display, self->innerleft);
+        XSetWindowBackground(obt_display, self->innertop, px);
+        XClearWindow(obt_display, self->innertop);
+        XSetWindowBackground(obt_display, self->innerright, px);
+        XClearWindow(obt_display, self->innerright);
+        XSetWindowBackground(obt_display, self->innerbottom, px);
+        XClearWindow(obt_display, self->innerbottom);
+        XSetWindowBackground(obt_display, self->innerbll, px);
+        XClearWindow(obt_display, self->innerbll);
+        XSetWindowBackground(obt_display, self->innerbrr, px);
+        XClearWindow(obt_display, self->innerbrr);
+        XSetWindowBackground(obt_display, self->innerblb, px);
+        XClearWindow(obt_display, self->innerblb);
+        XSetWindowBackground(obt_display, self->innerbrb, px);
+        XClearWindow(obt_display, self->innerbrb);
 
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->frame_focused_border_color) :
               RrColorPixel(ob_rr_theme->frame_unfocused_border_color));
 
-        XSetWindowBackground(ob_display, self->left, px);
-        XClearWindow(ob_display, self->left);
-        XSetWindowBackground(ob_display, self->right, px);
-        XClearWindow(ob_display, self->right);
+        XSetWindowBackground(obt_display, self->left, px);
+        XClearWindow(obt_display, self->left);
+        XSetWindowBackground(obt_display, self->right, px);
+        XClearWindow(obt_display, self->right);
 
-        XSetWindowBackground(ob_display, self->titleleft, px);
-        XClearWindow(ob_display, self->titleleft);
-        XSetWindowBackground(ob_display, self->titletop, px);
-        XClearWindow(ob_display, self->titletop);
-        XSetWindowBackground(ob_display, self->titletopleft, px);
-        XClearWindow(ob_display, self->titletopleft);
-        XSetWindowBackground(ob_display, self->titletopright, px);
-        XClearWindow(ob_display, self->titletopright);
-        XSetWindowBackground(ob_display, self->titleright, px);
-        XClearWindow(ob_display, self->titleright);
+        XSetWindowBackground(obt_display, self->titleleft, px);
+        XClearWindow(obt_display, self->titleleft);
+        XSetWindowBackground(obt_display, self->titletop, px);
+        XClearWindow(obt_display, self->titletop);
+        XSetWindowBackground(obt_display, self->titletopleft, px);
+        XClearWindow(obt_display, self->titletopleft);
+        XSetWindowBackground(obt_display, self->titletopright, px);
+        XClearWindow(obt_display, self->titletopright);
+        XSetWindowBackground(obt_display, self->titleright, px);
+        XClearWindow(obt_display, self->titleright);
 
-        XSetWindowBackground(ob_display, self->handleleft, px);
-        XClearWindow(ob_display, self->handleleft);
-        XSetWindowBackground(ob_display, self->handletop, px);
-        XClearWindow(ob_display, self->handletop);
-        XSetWindowBackground(ob_display, self->handleright, px);
-        XClearWindow(ob_display, self->handleright);
-        XSetWindowBackground(ob_display, self->handlebottom, px);
-        XClearWindow(ob_display, self->handlebottom);
+        XSetWindowBackground(obt_display, self->handleleft, px);
+        XClearWindow(obt_display, self->handleleft);
+        XSetWindowBackground(obt_display, self->handletop, px);
+        XClearWindow(obt_display, self->handletop);
+        XSetWindowBackground(obt_display, self->handleright, px);
+        XClearWindow(obt_display, self->handleright);
+        XSetWindowBackground(obt_display, self->handlebottom, px);
+        XClearWindow(obt_display, self->handlebottom);
 
-        XSetWindowBackground(ob_display, self->lgripleft, px);
-        XClearWindow(ob_display, self->lgripleft);
-        XSetWindowBackground(ob_display, self->lgriptop, px);
-        XClearWindow(ob_display, self->lgriptop);
-        XSetWindowBackground(ob_display, self->lgripbottom, px);
-        XClearWindow(ob_display, self->lgripbottom);
+        XSetWindowBackground(obt_display, self->lgripleft, px);
+        XClearWindow(obt_display, self->lgripleft);
+        XSetWindowBackground(obt_display, self->lgriptop, px);
+        XClearWindow(obt_display, self->lgriptop);
+        XSetWindowBackground(obt_display, self->lgripbottom, px);
+        XClearWindow(obt_display, self->lgripbottom);
 
-        XSetWindowBackground(ob_display, self->rgripright, px);
-        XClearWindow(ob_display, self->rgripright);
-        XSetWindowBackground(ob_display, self->rgriptop, px);
-        XClearWindow(ob_display, self->rgriptop);
-        XSetWindowBackground(ob_display, self->rgripbottom, px);
-        XClearWindow(ob_display, self->rgripbottom);
+        XSetWindowBackground(obt_display, self->rgripright, px);
+        XClearWindow(obt_display, self->rgripright);
+        XSetWindowBackground(obt_display, self->rgriptop, px);
+        XClearWindow(obt_display, self->rgriptop);
+        XSetWindowBackground(obt_display, self->rgripbottom, px);
+        XClearWindow(obt_display, self->rgripbottom);
 
         /* don't use the separator color for shaded windows */
         if (!self->client->shaded)
@@ -117,8 +117,8 @@ void framerender_frame(ObFrame *self)
                   RrColorPixel(ob_rr_theme->title_separator_focused_color) :
                   RrColorPixel(ob_rr_theme->title_separator_unfocused_color));
 
-        XSetWindowBackground(ob_display, self->titlebottom, px);
-        XClearWindow(ob_display, self->titlebottom);
+        XSetWindowBackground(obt_display, self->titlebottom, px);
+        XClearWindow(obt_display, self->titlebottom);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
@@ -343,7 +343,7 @@ void framerender_frame(ObFrame *self)
         }
     }
 
-    XFlush(ob_display);
+    XFlush(obt_display);
 }
 
 static void framerender_label(ObFrame *self, RrAppearance *a)

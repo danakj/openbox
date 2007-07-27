@@ -160,7 +160,7 @@ static Window event_get_window(XEvent *e)
     /* pick a window */
     switch (e->type) {
     case SelectionClear:
-        window = RootWindow(ob_display, ob_screen);
+        window = RootWindow(obt_display, ob_screen);
         break;
     case MapRequest:
         window = e->xmap.window;
@@ -269,7 +269,7 @@ static void event_hack_mods(XEvent *e)
         /* If XKB is present, then the modifiers are all strange from its
            magic.  Our X core protocol stuff won't work, so we use this to
            find what the modifier state is instead. */
-        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success)
+        if (XkbGetState(obt_display, XkbUseCoreKbd, &xkb_state) == Success)
             e->xkey.state = xkb_state.compat_state;
         else
 #endif
@@ -285,7 +285,7 @@ static void event_hack_mods(XEvent *e)
         /* compress events */
         {
             XEvent ce;
-            while (XCheckTypedWindowEvent(ob_display, e->xmotion.window,
+            while (XCheckTypedWindowEvent(obt_display, e->xmotion.window,
                                           e->type, &ce)) {
                 e->xmotion.x = ce.xmotion.x;
                 e->xmotion.y = ce.xmotion.y;
@@ -315,7 +315,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
 
         /* These are the ones we want.. */
 
-        if (win == RootWindow(ob_display, ob_screen)) {
+        if (win == RootWindow(obt_display, ob_screen)) {
             /* If looking for a focus in on a client, then always return
                FALSE for focus in's to the root window */
             if (in_client_only)
@@ -369,7 +369,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
             return FALSE;
 
         /* Focus left the root window revertedto state */
-        if (win == RootWindow(ob_display, ob_screen))
+        if (win == RootWindow(obt_display, ob_screen))
             return FALSE;
 
         /* These are the ones we want.. */
@@ -549,10 +549,10 @@ static void event_process(const XEvent *ec, gpointer data)
                But if the other focus in is something like PointerRoot then we
                still want to fall back.
             */
-            if (XCheckIfEvent(ob_display, &ce, event_look_for_focusin_client,
+            if (XCheckIfEvent(obt_display, &ce, event_look_for_focusin_client,
                               NULL))
             {
-                XPutBackEvent(ob_display, &ce);
+                XPutBackEvent(obt_display, &ce);
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "  but another FocusIn is coming\n");
             } else {
@@ -589,16 +589,16 @@ static void event_process(const XEvent *ec, gpointer data)
         XEvent ce;
 
         /* Look for the followup FocusIn */
-        if (!XCheckIfEvent(ob_display, &ce, event_look_for_focusin, NULL)) {
+        if (!XCheckIfEvent(obt_display, &ce, event_look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
                is not being managed, or a window on another screen. */
             Window win, root;
             gint i;
             guint u;
             obt_display_ignore_errors(TRUE);
-            if (XGetInputFocus(ob_display, &win, &i) != 0 &&
-                XGetGeometry(ob_display, win, &root, &i,&i,&u,&u,&u,&u) != 0 &&
-                root != RootWindow(ob_display, ob_screen))
+            if (XGetInputFocus(obt_display, &win, &i) &&
+                XGetGeometry(obt_display, win, &root, &i,&i,&u,&u,&u,&u) &&
+                root != RootWindow(obt_display, ob_screen))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to another screen !\n");
@@ -637,7 +637,7 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_dockapp(dockapp, e);
     else if (dock)
         event_handle_dock(dock, e);
-    else if (window == RootWindow(ob_display, ob_screen))
+    else if (window == RootWindow(obt_display, ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
         client_manage(window);
@@ -686,7 +686,7 @@ static void event_process(const XEvent *ec, gpointer data)
         /* we are not to be held responsible if someone sends us an
            invalid request! */
         obt_display_ignore_errors(TRUE);
-        XConfigureWindow(ob_display, window,
+        XConfigureWindow(obt_display, window,
                          e->xconfigurerequest.value_mask, &xwc);
         obt_display_ignore_errors(FALSE);
     }
@@ -703,7 +703,7 @@ static void event_process(const XEvent *ec, gpointer data)
     if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
            on the root window, the process it */
-        if (window != RootWindow(ob_display, ob_screen) ||
+        if (window != RootWindow(obt_display, ob_screen) ||
             e->xbutton.subwindow == None)
         {
             event_handle_user_input(client, e);
@@ -1258,7 +1258,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         /* we don't want the reparent event, put it back on the stack for the
            X server to deal with after we unmanage the window */
-        XPutBackEvent(ob_display, e);
+        XPutBackEvent(obt_display, e);
 
         ob_debug("ReparentNotify for window 0x%x\n", client->window);
         client_unmanage(client);
@@ -1281,13 +1281,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
         msgtype = e->xclient.message_type;
         if (msgtype == prop_atoms.wm_change_state) {
             /* compress changes into a single change */
-            while (XCheckTypedWindowEvent(ob_display, client->window,
+            while (XCheckTypedWindowEvent(obt_display, client->window,
                                           e->type, &ce)) {
                 /* XXX: it would be nice to compress ALL messages of a
                    type, not just messages in a row without other
                    message types between. */
                 if (ce.xclient.message_type != msgtype) {
-                    XPutBackEvent(ob_display, &ce);
+                    XPutBackEvent(obt_display, &ce);
                     break;
                 }
                 e->xclient = ce.xclient;
@@ -1295,13 +1295,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_set_wm_state(client, e->xclient.data.l[0]);
         } else if (msgtype == prop_atoms.net_wm_desktop) {
             /* compress changes into a single change */
-            while (XCheckTypedWindowEvent(ob_display, client->window,
+            while (XCheckTypedWindowEvent(obt_display, client->window,
                                           e->type, &ce)) {
                 /* XXX: it would be nice to compress ALL messages of a
                    type, not just messages in a row without other
                    message types between. */
                 if (ce.xclient.message_type != msgtype) {
-                    XPutBackEvent(ob_display, &ce);
+                    XPutBackEvent(obt_display, &ce);
                     break;
                 }
                 e->xclient = ce.xclient;
@@ -1492,7 +1492,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (!client_validate(client)) break;
 
         /* compress changes to a single property into a single change */
-        while (XCheckTypedWindowEvent(ob_display, client->window,
+        while (XCheckTypedWindowEvent(obt_display, client->window,
                                       e->type, &ce)) {
             Atom a, b;
 
@@ -1519,7 +1519,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 b == prop_atoms.net_wm_icon)
                 continue;
 
-            XPutBackEvent(ob_display, &ce);
+            XPutBackEvent(obt_display, &ce);
             break;
         }
 
@@ -1929,8 +1929,8 @@ void event_halt_focus_delay(void)
 
 gulong event_start_ignore_all_enters(void)
 {
-    XSync(ob_display, FALSE);
-    return LastKnownRequestProcessed(ob_display);
+    XSync(obt_display, FALSE);
+    return LastKnownRequestProcessed(obt_display);
 }
 
 static void event_ignore_enter_range(gulong start, gulong end)
@@ -1949,13 +1949,13 @@ static void event_ignore_enter_range(gulong start, gulong end)
                   r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
-    XSync(ob_display, FALSE);
+    XSync(obt_display, FALSE);
 }
 
 void event_end_ignore_all_enters(gulong start)
 {
-    XSync(ob_display, FALSE);
-    event_ignore_enter_range(start, LastKnownRequestProcessed(ob_display));
+    XSync(obt_display, FALSE);
+    event_ignore_enter_range(start, LastKnownRequestProcessed(obt_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
@@ -2004,7 +2004,7 @@ void event_cancel_all_key_grabs(void)
     else
         ungrab_passive_key();
 
-    XSync(ob_display, FALSE);
+    XSync(obt_display, FALSE);
 }
 
 gboolean event_time_after(Time t1, Time t2)
@@ -2037,9 +2037,9 @@ Time event_get_server_time(void)
     /* Generate a timestamp */
     XEvent event;
 
-    XChangeProperty(ob_display, screen_support_win,
+    XChangeProperty(obt_display, screen_support_win,
                     prop_atoms.wm_class, prop_atoms.string,
                     8, PropModeAppend, NULL, 0);
-    XWindowEvent(ob_display, screen_support_win, PropertyChangeMask, &event);
+    XWindowEvent(obt_display, screen_support_win, PropertyChangeMask, &event);
     return event.xproperty.time;
 }

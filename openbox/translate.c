@@ -145,7 +145,7 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
             g_message(_("Invalid key name '%s' in key binding"), l);
             goto translation_fail;
         }
-        *keycode = XKeysymToKeycode(ob_display, sym);
+        *keycode = XKeysymToKeycode(obt_display, sym);
     }
     if (!*keycode) {
         g_message(_("Requested key '%s' does not exist on the display"), l);
@@ -164,7 +164,7 @@ gchar *translate_keycode(guint keycode)
     KeySym sym;
     const gchar *ret = NULL;
 
-    if ((sym = XKeycodeToKeysym(ob_display, keycode, 0)) != NoSymbol)
+    if ((sym = XKeycodeToKeysym(obt_display, keycode, 0)) != NoSymbol)
         ret = XKeysymToString(sym);
     return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
 }

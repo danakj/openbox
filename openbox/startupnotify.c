@@ -66,7 +66,7 @@ void sn_startup(gboolean reconfig)
     putenv(s);
     g_free(s);
 
-    sn_display = sn_display_new(ob_display, NULL, NULL);
+    sn_display = sn_display_new(obt_display, NULL, NULL);
     sn_context = sn_monitor_context_new(sn_display, ob_screen,
                                         sn_event_func, NULL, NULL);
     sn_launcher = sn_launcher_context_new(sn_display, ob_screen);

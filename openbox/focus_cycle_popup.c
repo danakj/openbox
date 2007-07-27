@@ -87,7 +87,7 @@ static void   popup_render   (ObFocusCyclePopup *p,
 static Window create_window(Window parent, guint bwidth, gulong mask,
                             XSetWindowAttributes *attr)
 {
-    return XCreateWindow(ob_display, parent, 0, 0, 1, 1, bwidth,
+    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, bwidth,
                          RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attr);
 }
@@ -113,7 +113,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
-    popup.bg = create_window(RootWindow(ob_display, ob_screen),
+    popup.bg = create_window(RootWindow(obt_display, ob_screen),
                              ob_rr_theme->obwidth,
                              CWOverrideRedirect | CWBorderPixel, &attrib);
 
@@ -125,7 +125,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     popup.hilite_rgba = NULL;
 
-    XMapWindow(ob_display, popup.text);
+    XMapWindow(obt_display, popup.text);
 
     stacking_add(INTERNAL_AS_WINDOW(&popup));
     g_hash_table_insert(window_map, &popup.bg, &popup);
@@ -142,7 +142,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
         ObFocusCyclePopupTarget *t = popup.targets->data;
 
         g_free(t->text);
-        XDestroyWindow(ob_display, t->win);
+        XDestroyWindow(obt_display, t->win);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
@@ -150,8 +150,8 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     g_free(popup.hilite_rgba);
     popup.hilite_rgba = NULL;
 
-    XDestroyWindow(ob_display, popup.text);
-    XDestroyWindow(ob_display, popup.bg);
+    XDestroyWindow(obt_display, popup.text);
+    XDestroyWindow(obt_display, popup.bg);
 
     RrAppearanceFree(popup.a_icon);
     RrAppearanceFree(popup.a_text);
@@ -198,7 +198,7 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                 t->text = text;
                 t->win = create_window(p->bg, 0, 0, NULL);
 
-                XMapWindow(ob_display, t->win);
+                XMapWindow(obt_display, t->win);
 
                 p->targets = g_list_prepend(p->targets, t);
                 ++n;
@@ -313,7 +313,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     if (!p->mapped) {
         /* position the background but don't draw it*/
-        XMoveResizeWindow(ob_display, p->bg, x, y, w, h);
+        XMoveResizeWindow(obt_display, p->bg, x, y, w, h);
 
         /* set up the hilite texture for the background */
         p->a_bg->texture[0].data.rgba.width = rgbaw;
@@ -323,7 +323,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         p->a_bg->texture[0].data.rgba.data = p->hilite_rgba;
 
         /* position the text, but don't draw it */
-        XMoveResizeWindow(ob_display, p->text, textx, texty, textw, texth);
+        XMoveResizeWindow(obt_display, p->text, textx, texty, textw, texth);
         p->a_text->surface.parentx = textx;
         p->a_text->surface.parenty = texty;
     }
@@ -411,7 +411,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             innery += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
 
             /* move the icon */
-            XMoveResizeWindow(ob_display, target->win,
+            XMoveResizeWindow(obt_display, target->win,
                               innerx, innery, innerw, innerh);
 
             /* get the icon from the client */
@@ -456,8 +456,8 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
 
     if (!popup.mapped) {
         /* show the dialog */
-        XMapWindow(ob_display, popup.bg);
-        XFlush(ob_display);
+        XMapWindow(obt_display, popup.bg);
+        XFlush(obt_display);
         popup.mapped = TRUE;
         screen_hide_desktop_popup();
     }
@@ -469,8 +469,8 @@ void focus_cycle_popup_hide(void)
 
     ignore_start = event_start_ignore_all_enters();
 
-    XUnmapWindow(ob_display, popup.bg);
-    XFlush(ob_display);
+    XUnmapWindow(obt_display, popup.bg);
+    XFlush(obt_display);
 
     event_end_ignore_all_enters(ignore_start);
 
@@ -480,7 +480,7 @@ void focus_cycle_popup_hide(void)
         ObFocusCyclePopupTarget *t = popup.targets->data;
 
         g_free(t->text);
-        XDestroyWindow(ob_display, t->win);
+        XDestroyWindow(obt_display, t->win);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }

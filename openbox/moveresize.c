@@ -261,7 +261,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 
         /* set the counter to an initial value */
         XSyncIntToValue(&val, 0);
-        XSyncSetCounter(ob_display, moveresize_client->sync_counter, val);
+        XSyncSetCounter(obt_display, moveresize_client->sync_counter, val);
 
         /* this will be incremented when we tell the client what we're
            looking for */
@@ -277,7 +277,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         aa.trigger.test_type = XSyncPositiveTransition;
         aa.events = True;
         XSyncIntToValue(&aa.delta, 1);
-        moveresize_alarm = XSyncCreateAlarm(ob_display,
+        moveresize_alarm = XSyncCreateAlarm(obt_display,
                                             XSyncCACounter |
                                             XSyncCAValue |
                                             XSyncCAValueType |
@@ -306,7 +306,7 @@ void moveresize_end(gboolean cancel)
 #ifdef SYNC
         /* turn off the alarm */
         if (moveresize_alarm != None) {
-            XSyncDestroyAlarm(ob_display, moveresize_alarm);
+            XSyncDestroyAlarm(obt_display, moveresize_alarm);
             moveresize_alarm = None;
         }
 
@@ -382,7 +382,7 @@ static void do_resize(void)
         /* tell the client what we're waiting for */
         ce.xclient.type = ClientMessage;
         ce.xclient.message_type = prop_atoms.wm_protocols;
-        ce.xclient.display = ob_display;
+        ce.xclient.display = obt_display;
         ce.xclient.window = moveresize_client->window;
         ce.xclient.format = 32;
         ce.xclient.data.l[0] = prop_atoms.net_wm_sync_request;
@@ -390,7 +390,7 @@ static void do_resize(void)
         ce.xclient.data.l[2] = XSyncValueLow32(val);
         ce.xclient.data.l[3] = XSyncValueHigh32(val);
         ce.xclient.data.l[4] = 0l;
-        XSendEvent(ob_display, moveresize_client->window, FALSE,
+        XSendEvent(obt_display, moveresize_client->window, FALSE,
                    NoEventMask, &ce);
 
         waiting_for_sync = TRUE;
@@ -632,12 +632,12 @@ static void move_with_keys(gint keycode, gint state)
     }
 
     screen_pointer_pos(&opx, &opy);
-    XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
+    XWarpPointer(obt_display, None, None, 0, 0, 0, 0, dx, dy);
     /* steal the motion events this causes */
-    XSync(ob_display, FALSE);
+    XSync(obt_display, FALSE);
     {
         XEvent ce;
-        while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
+        while (XCheckTypedEvent(obt_display, MotionNotify, &ce));
     }
     screen_pointer_pos(&px, &py);
 
@@ -789,12 +789,12 @@ static void resize_with_keys(gint keycode, gint state)
         pdy = dh;
 
     screen_pointer_pos(&opx, &opy);
-    XWarpPointer(ob_display, None, None, 0, 0, 0, 0, pdx, pdy);
+    XWarpPointer(obt_display, None, None, 0, 0, 0, 0, pdx, pdy);
     /* steal the motion events this causes */
-    XSync(ob_display, FALSE);
+    XSync(obt_display, FALSE);
     {
         XEvent ce;
-        while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
+        while (XCheckTypedEvent(obt_display, MotionNotify, &ce));
     }
     screen_pointer_pos(&px, &py);
 

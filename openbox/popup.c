@@ -41,20 +41,20 @@ ObPopup *popup_new(void)
     self->iconwm = self->iconhm = 1;
 
     attrib.override_redirect = True;
-    self->bg = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
+    self->bg = XCreateWindow(obt_display, RootWindow(obt_display, ob_screen),
                              0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                              InputOutput, RrVisual(ob_rr_inst),
                              CWOverrideRedirect, &attrib);
 
-    self->text = XCreateWindow(ob_display, self->bg,
+    self->text = XCreateWindow(obt_display, self->bg,
                                0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                                InputOutput, RrVisual(ob_rr_inst), 0, NULL);
 
-    XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->obwidth);
-    XSetWindowBorder(ob_display, self->bg,
+    XSetWindowBorderWidth(obt_display, self->bg, ob_rr_theme->obwidth);
+    XSetWindowBorder(obt_display, self->bg,
                      RrColorPixel(ob_rr_theme->osd_border_color));
 
-    XMapWindow(ob_display, self->text);
+    XMapWindow(obt_display, self->text);
 
     stacking_add(INTERNAL_AS_WINDOW(self));
     g_hash_table_insert(window_map, &self->bg, self);
@@ -64,8 +64,8 @@ ObPopup *popup_new(void)
 void popup_free(ObPopup *self)
 {
     if (self) {
-        XDestroyWindow(ob_display, self->bg);
-        XDestroyWindow(ob_display, self->text);
+        XDestroyWindow(obt_display, self->bg);
+        XDestroyWindow(obt_display, self->text);
         RrAppearanceFree(self->a_bg);
         RrAppearanceFree(self->a_text);
         g_hash_table_remove(window_map, &self->bg);
@@ -140,7 +140,7 @@ static gboolean popup_show_timeout(gpointer data)
 {
     ObPopup *self = data;
 
-    XMapWindow(ob_display, self->bg);
+    XMapWindow(obt_display, self->bg);
     stacking_raise(INTERNAL_AS_WINDOW(self));
     self->mapped = TRUE;
     self->delay_mapped = FALSE;
@@ -268,7 +268,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     }
 
     /* set the windows/appearances up */
-    XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
+    XMoveResizeWindow(obt_display, self->bg, x, y, w, h);
     /* when there is no icon and the text is not parent relative, then
        fill the whole dialog with the text appearance, don't use the bg at all
     */
@@ -279,7 +279,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         self->a_text->surface.parent = self->a_bg;
         self->a_text->surface.parentx = textx;
         self->a_text->surface.parenty = texty;
-        XMoveResizeWindow(ob_display, self->text, textx, texty, textw, texth);
+        XMoveResizeWindow(obt_display, self->text, textx, texty, textw, texth);
         RrPaint(self->a_text, self->text, textw, texth);
     }
 
@@ -312,7 +312,7 @@ void popup_hide(ObPopup *self)
         /* kill enter events cause by this unmapping */
         ignore_start = event_start_ignore_all_enters();
 
-        XUnmapWindow(ob_display, self->bg);
+        XUnmapWindow(obt_display, self->bg);
         self->mapped = FALSE;
 
         event_end_ignore_all_enters(ignore_start);
@@ -329,7 +329,7 @@ static void icon_popup_draw_icon(gint x, gint y, gint w, gint h, gpointer data)
     self->a_icon->surface.parent = self->popup->a_bg;
     self->a_icon->surface.parentx = x;
     self->a_icon->surface.parenty = y;
-    XMoveResizeWindow(ob_display, self->icon, x, y, w, h);
+    XMoveResizeWindow(obt_display, self->icon, x, y, w, h);
     RrPaint(self->a_icon, self->icon, w, h);
 }
 
@@ -340,11 +340,11 @@ ObIconPopup *icon_popup_new(void)
     self = g_new0(ObIconPopup, 1);
     self->popup = popup_new();
     self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
-    self->icon = XCreateWindow(ob_display, self->popup->bg,
+    self->icon = XCreateWindow(obt_display, self->popup->bg,
                                0, 0, 1, 1, 0,
                                RrDepth(ob_rr_inst), InputOutput,
                                RrVisual(ob_rr_inst), 0, NULL);
-    XMapWindow(ob_display, self->icon);
+    XMapWindow(obt_display, self->icon);
 
     self->popup->hasicon = TRUE;
     self->popup->draw_icon = icon_popup_draw_icon;
@@ -356,7 +356,7 @@ ObIconPopup *icon_popup_new(void)
 void icon_popup_free(ObIconPopup *self)
 {
     if (self) {
-        XDestroyWindow(ob_display, self->icon);
+        XDestroyWindow(obt_display, self->icon);
         RrAppearanceFree(self->a_icon);
         popup_free(self->popup);
         g_free(self);
@@ -481,7 +481,7 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
                 a->surface.parent = self->popup->a_bg;
                 a->surface.parentx = x + px;
                 a->surface.parenty = y + py;
-                XMoveResizeWindow(ob_display, self->wins[n],
+                XMoveResizeWindow(obt_display, self->wins[n],
                                   x + px, y + py, eachw, eachh);
                 RrPaint(a, self->wins[n], eachw, eachh);
             }
@@ -516,7 +516,7 @@ void pager_popup_free(ObPagerPopup *self)
         guint i;
 
         for (i = 0; i < self->desks; ++i)
-            XDestroyWindow(ob_display, self->wins[i]);
+            XDestroyWindow(obt_display, self->wins[i]);
         g_free(self->wins);
         RrAppearanceFree(self->hilight);
         RrAppearanceFree(self->unhilight);
@@ -532,7 +532,7 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
 
     if (screen_num_desktops < self->desks)
         for (i = screen_num_desktops; i < self->desks; ++i)
-            XDestroyWindow(ob_display, self->wins[i]);
+            XDestroyWindow(obt_display, self->wins[i]);
 
     if (screen_num_desktops != self->desks)
         self->wins = g_renew(Window, self->wins, screen_num_desktops);
@@ -543,12 +543,12 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
 
             attr.border_pixel =
                 RrColorPixel(ob_rr_theme->osd_border_color);
-            self->wins[i] = XCreateWindow(ob_display, self->popup->bg,
+            self->wins[i] = XCreateWindow(obt_display, self->popup->bg,
                                           0, 0, 1, 1, ob_rr_theme->obwidth,
                                           RrDepth(ob_rr_inst), InputOutput,
                                           RrVisual(ob_rr_inst), CWBorderPixel,
                                           &attr);
-            XMapWindow(ob_display, self->wins[i]);
+            XMapWindow(obt_display, self->wins[i]);
         }
 
     self->desks = screen_num_desktops;

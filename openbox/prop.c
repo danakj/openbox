@@ -25,7 +25,7 @@
 Atoms prop_atoms;
 
 #define CREATE(var, name) (prop_atoms.var = \
-                           XInternAtom(ob_display, name, FALSE))
+                           XInternAtom(obt_display, name, FALSE))
 
 void prop_startup(void)
 {
@@ -218,7 +218,7 @@ static gboolean get_prealloc(Window win, Atom prop, Atom type, gint size,
     gulong ret_items, bytes_left;
     glong num32 = 32 / size * num; /* num in 32-bit elements */
 
-    res = XGetWindowProperty(ob_display, win, prop, 0l, num32,
+    res = XGetWindowProperty(obt_display, win, prop, 0l, num32,
                              FALSE, type, &ret_type, &ret_size,
                              &ret_items, &bytes_left, &xdata);
     if (res == Success && ret_items && xdata) {
@@ -255,7 +255,7 @@ static gboolean get_all(Window win, Atom prop, Atom type, gint size,
     gint ret_size;
     gulong ret_items, bytes_left;
 
-    res = XGetWindowProperty(ob_display, win, prop, 0l, G_MAXLONG,
+    res = XGetWindowProperty(obt_display, win, prop, 0l, G_MAXLONG,
                              FALSE, type, &ret_type, &ret_size,
                              &ret_items, &bytes_left, &xdata);
     if (res == Success) {
@@ -290,7 +290,7 @@ static gboolean get_stringlist(Window win, Atom prop, gchar ***list, gint *nstr)
     XTextProperty tprop;
     gboolean ret = FALSE;
 
-    if (XGetTextProperty(ob_display, win, &tprop, prop) && tprop.nitems) {
+    if (XGetTextProperty(obt_display, win, &tprop, prop) && tprop.nitems) {
         if (XTextPropertyToStringList(&tprop, list, nstr))
             ret = TRUE;
         XFree(tprop.value);
@@ -407,20 +407,20 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, gchar ***ret)
 
 void prop_set32(Window win, Atom prop, Atom type, gulong val)
 {
-    XChangeProperty(ob_display, win, prop, type, 32, PropModeReplace,
+    XChangeProperty(obt_display, win, prop, type, 32, PropModeReplace,
                     (guchar*)&val, 1);
 }
 
 void prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                       guint num)
 {
-    XChangeProperty(ob_display, win, prop, type, 32, PropModeReplace,
+    XChangeProperty(obt_display, win, prop, type, 32, PropModeReplace,
                     (guchar*)val, num);
 }
 
 void prop_set_string_utf8(Window win, Atom prop, const gchar *val)
 {
-    XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,
+    XChangeProperty(obt_display, win, prop, prop_atoms.utf8, 8,
                     PropModeReplace, (const guchar*)val, strlen(val));
 }
 
@@ -434,20 +434,20 @@ void prop_set_strings_utf8(Window win, Atom prop, gchar **strs)
         str = g_string_append(str, *s);
         str = g_string_append_c(str, '\0');
     }
-    XChangeProperty(ob_display, win, prop, prop_atoms.utf8, 8,
+    XChangeProperty(obt_display, win, prop, prop_atoms.utf8, 8,
                     PropModeReplace, (guchar*)str->str, str->len);
     g_string_free(str, TRUE);
 }
 
 void prop_erase(Window win, Atom prop)
 {
-    XDeleteProperty(ob_display, win, prop);
+    XDeleteProperty(obt_display, win, prop);
 }
 
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
                   glong data2, glong data3, glong mask)
 {
-    prop_message_to(RootWindow(ob_display, ob_screen), about, messagetype,
+    prop_message_to(RootWindow(obt_display, ob_screen), about, messagetype,
                     data0, data1, data2, data3, 0, mask);
 }
 
@@ -458,7 +458,7 @@ void prop_message_to(Window to, Window about, Atom messagetype,
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type = messagetype;
-    ce.xclient.display = ob_display;
+    ce.xclient.display = obt_display;
     ce.xclient.window = about;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = data0;
@@ -466,5 +466,5 @@ void prop_message_to(Window to, Window about, Atom messagetype,
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
     ce.xclient.data.l[4] = data4;
-    XSendEvent(ob_display, to, FALSE, mask, &ce);
+    XSendEvent(obt_display, to, FALSE, mask, &ce);
 }

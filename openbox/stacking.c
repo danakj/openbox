@@ -54,7 +54,7 @@ void stacking_set_list(void)
         }
     }
 
-    PROP_SETA32(RootWindow(ob_display, ob_screen),
+    PROP_SETA32(RootWindow(obt_display, ob_screen),
                 net_client_list_stacking, window, (gulong*)windows, i);
 
     g_free(windows);
@@ -104,7 +104,7 @@ static void do_restack(GList *wins, GList *before)
 #endif
 
     if (!pause_changes)
-        XRestackWindows(ob_display, win, i);
+        XRestackWindows(obt_display, win, i);
     g_free(win);
 
     stacking_set_list();

@@ -50,7 +50,7 @@ static void menu_frame_hide(ObMenuFrame *self);
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
 {
-    return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
+    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0,
                          RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
@@ -85,11 +85,11 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     self->show_from = show_from;
 
     attr.event_mask = FRAME_EVENTMASK;
-    self->window = createWindow(RootWindow(ob_display, ob_screen),
+    self->window = createWindow(RootWindow(obt_display, ob_screen),
                                 CWEventMask, &attr);
 
-    XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
-    XSetWindowBorder(ob_display, self->window,
+    XSetWindowBorderWidth(obt_display, self->window, ob_rr_theme->mbwidth);
+    XSetWindowBorder(obt_display, self->window,
                      RrColorPixel(ob_rr_theme->menu_border_color));
 
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
@@ -110,7 +110,7 @@ void menu_frame_free(ObMenuFrame *self)
 
         stacking_remove(MENU_AS_WINDOW(self));
 
-        XDestroyWindow(ob_display, self->window);
+        XDestroyWindow(obt_display, self->window);
 
         RrAppearanceFree(self->a_items);
         RrAppearanceFree(self->a_title);
@@ -145,8 +145,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
         g_hash_table_insert(menu_frame_map, &self->bullet, self);
     }
 
-    XMapWindow(ob_display, self->window);
-    XMapWindow(ob_display, self->text);
+    XMapWindow(obt_display, self->window);
+    XMapWindow(obt_display, self->text);
 
     self->a_normal = RrAppearanceCopy(ob_rr_theme->a_menu_normal);
     self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_selected);
@@ -187,16 +187,16 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
     if (self) {
         menu_entry_unref(self->entry);
 
-        XDestroyWindow(ob_display, self->text);
-        XDestroyWindow(ob_display, self->window);
+        XDestroyWindow(obt_display, self->text);
+        XDestroyWindow(obt_display, self->window);
         g_hash_table_remove(menu_frame_map, &self->text);
         g_hash_table_remove(menu_frame_map, &self->window);
         if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
-            XDestroyWindow(ob_display, self->icon);
+            XDestroyWindow(obt_display, self->icon);
             g_hash_table_remove(menu_frame_map, &self->icon);
         }
         if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
-            XDestroyWindow(ob_display, self->bullet);
+            XDestroyWindow(obt_display, self->bullet);
             g_hash_table_remove(menu_frame_map, &self->bullet);
         }
 
@@ -223,7 +223,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
 void menu_frame_move(ObMenuFrame *self, gint x, gint y)
 {
     RECT_SET_POINT(self->area, x, y);
-    XMoveWindow(ob_display, self->window, self->area.x, self->area.y);
+    XMoveWindow(obt_display, self->window, self->area.x, self->area.y);
 }
 
 static void menu_frame_place_topmenu(ObMenuFrame *self, gint *x, gint *y)
@@ -380,7 +380,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         g_assert_not_reached();
     }
     RECT_SET_SIZE(self->area, self->frame->inner_w, th);
-    XResizeWindow(ob_display, self->window,
+    XResizeWindow(obt_display, self->window,
                   self->area.width, self->area.height);
     item_a->surface.parent = self->frame->a_items;
     item_a->surface.parentx = self->area.x;
@@ -434,7 +434,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
-        XMoveResizeWindow(ob_display, self->text,
+        XMoveResizeWindow(obt_display, self->text,
                           self->frame->text_x, PADDING,
                           self->frame->text_w,
                           ITEM_HEIGHT - 2*PADDING);
@@ -445,7 +445,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 ITEM_HEIGHT - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
-        XMoveResizeWindow(ob_display, self->text,
+        XMoveResizeWindow(obt_display, self->text,
                           self->frame->text_x, PADDING,
                           self->frame->text_w - ITEM_HEIGHT,
                           ITEM_HEIGHT - 2*PADDING);
@@ -458,7 +458,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label != NULL) {
             /* labeled separator */
-            XMoveResizeWindow(ob_display, self->text,
+            XMoveResizeWindow(obt_display, self->text,
                               ob_rr_theme->paddingx, ob_rr_theme->paddingy,
                               self->area.width - 2*ob_rr_theme->paddingx,
                               ob_rr_theme->menu_title_height -
@@ -472,7 +472,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                     2*ob_rr_theme->paddingy);
         } else {
             /* unlabeled separaator */
-            XMoveResizeWindow(ob_display, self->text, PADDING, PADDING,
+            XMoveResizeWindow(obt_display, self->text, PADDING, PADDING,
                               self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
             self->a_separator->surface.parent = item_a;
             self->a_separator->surface.parentx = PADDING;
@@ -493,7 +493,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.icon_data)
     {
-        XMoveResizeWindow(ob_display, self->icon,
+        XMoveResizeWindow(obt_display, self->icon,
                           PADDING, frame->item_margin.top,
                           ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom,
@@ -515,13 +515,13 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 - frame->item_margin.bottom,
                 ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom);
-        XMapWindow(ob_display, self->icon);
+        XMapWindow(obt_display, self->icon);
     } else if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                self->entry->data.normal.mask)
     {
         RrColor *c;
 
-        XMoveResizeWindow(ob_display, self->icon,
+        XMoveResizeWindow(obt_display, self->icon,
                           PADDING, frame->item_margin.top,
                           ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom,
@@ -550,13 +550,13 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 - frame->item_margin.bottom,
                 ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom);
-        XMapWindow(ob_display, self->icon);
+        XMapWindow(obt_display, self->icon);
     } else
-        XUnmapWindow(ob_display, self->icon);
+        XUnmapWindow(obt_display, self->icon);
 
     if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
         RrAppearance *bullet_a;
-        XMoveResizeWindow(ob_display, self->bullet,
+        XMoveResizeWindow(obt_display, self->bullet,
                           self->frame->text_x + self->frame->text_w -
                           ITEM_HEIGHT + PADDING, PADDING,
                           ITEM_HEIGHT - 2*PADDING,
@@ -571,11 +571,11 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         RrPaint(bullet_a, self->bullet,
                 ITEM_HEIGHT - 2*PADDING,
                 ITEM_HEIGHT - 2*PADDING);
-        XMapWindow(ob_display, self->bullet);
+        XMapWindow(obt_display, self->bullet);
     } else
-        XUnmapWindow(ob_display, self->bullet);
+        XUnmapWindow(obt_display, self->bullet);
 
-    XFlush(ob_display);
+    XFlush(obt_display);
 }
 
 /*! this code is taken from the menu_frame_render. if that changes, this won't
@@ -693,10 +693,10 @@ void menu_frame_render(ObMenuFrame *self)
         }
 
         RECT_SET_POINT(e->area, 0, h+e->border);
-        XMoveWindow(ob_display, e->window,
+        XMoveWindow(obt_display, e->window,
                     e->area.x-e->border, e->area.y-e->border);
-        XSetWindowBorderWidth(ob_display, e->window, e->border);
-        XSetWindowBorder(ob_display, e->window,
+        XSetWindowBorderWidth(obt_display, e->window, e->border);
+        XSetWindowBorder(obt_display, e->window,
                          RrColorPixel(ob_rr_theme->menu_border_color));
 
 
@@ -775,7 +775,7 @@ void menu_frame_render(ObMenuFrame *self)
     if (!w) w = 10;
     if (!h) h = 3;
 
-    XResizeWindow(ob_display, self->window, w, h);
+    XResizeWindow(obt_display, self->window, w, h);
 
     self->inner_w = w;
 
@@ -789,7 +789,7 @@ void menu_frame_render(ObMenuFrame *self)
 
     RECT_SET_SIZE(self->area, w, h);
 
-    XFlush(ob_display);
+    XFlush(obt_display);
 }
 
 static void menu_frame_update(ObMenuFrame *self)
@@ -971,7 +971,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
 
     menu_frame_move(self, x, y);
 
-    XMapWindow(ob_display, self->window);
+    XMapWindow(obt_display, self->window);
 
     if (screen_pointer_pos(&px, &py)) {
         ObMenuEntryFrame *e = menu_entry_frame_under(px, py);
@@ -1014,7 +1014,7 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     }
     menu_frame_move(self, x + dx, y + dy);
 
-    XMapWindow(ob_display, self->window);
+    XMapWindow(obt_display, self->window);
 
     if (screen_pointer_pos(&px, &py)) {
         ObMenuEntryFrame *e = menu_entry_frame_under(px, py);
@@ -1051,7 +1051,7 @@ static void menu_frame_hide(ObMenuFrame *self)
         ungrab_keyboard();
     }
 
-    XUnmapWindow(ob_display, self->window);
+    XUnmapWindow(obt_display, self->window);
 
     menu_frame_free(self);
 }

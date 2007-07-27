@@ -54,11 +54,11 @@ void modkeys_startup(gboolean reconfigure)
     for (i = 0; i < OB_MODKEY_NUM_KEYS; ++i)
         modkeys_keys[i] = 0;
 
-    modmap = XGetModifierMapping(ob_display);
+    modmap = XGetModifierMapping(obt_display);
     g_assert(modmap->max_keypermod > 0);
 
-    XDisplayKeycodes(ob_display, &min_keycode, &max_keycode);
-    keymap = XGetKeyboardMapping(ob_display, min_keycode,
+    XDisplayKeycodes(obt_display, &min_keycode, &max_keycode);
+    keymap = XGetKeyboardMapping(obt_display, min_keycode,
                                  max_keycode - min_keycode + 1,
                                  &keysyms_per_keycode);
 

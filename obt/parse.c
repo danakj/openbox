@@ -304,6 +304,11 @@ void obt_parse_tree(ObtParseInst *i, xmlNodePtr node)
     }
 }
 
+void obt_parse_tree_from_root(ObtParseInst *i)
+{
+    obt_parse_tree(i, i->root->children);
+}
+
 gchar *obt_parse_node_string(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);

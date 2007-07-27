@@ -61,6 +61,7 @@ void obt_parse_close(ObtParseInst *inst);
 void obt_parse_register(ObtParseInst *inst, const gchar *tag,
                         ObtParseCallback func, gpointer data);
 void obt_parse_tree(ObtParseInst *i, xmlNodePtr node);
+void obt_parse_tree_from_root(ObtParseInst *i);
 
 
 /* helpers */

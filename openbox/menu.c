@@ -94,8 +94,7 @@ void menu_startup(gboolean reconfig)
                                        "openbox_menu"))
         {
             loaded = TRUE;
-            obt_parse_tree(menu_parse_inst,
-                           obt_parse_instance_root(menu_parse_inst)->children);
+            obt_parse_tree_from_root(menu_parse_inst);
             obt_parse_close(menu_parse_inst);
         } else
             g_message(_("Unable to find a valid menu file '%s'"),
@@ -107,8 +106,7 @@ void menu_startup(gboolean reconfig)
                                        "menu.xml",
                                        "openbox_menu"))
         {
-            obt_parse_tree(menu_parse_inst,
-                           obt_parse_instance_root(menu_parse_inst)->children);
+            obt_parse_tree_from_root(menu_parse_inst);
             obt_parse_close(menu_parse_inst);
         } else
             g_message(_("Unable to find a valid menu file '%s'"),

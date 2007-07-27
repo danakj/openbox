@@ -230,7 +230,7 @@ gint main(gint argc, gchar **argv)
                 if (obt_parse_load_config_file(i, "openbox", "rc.xml",
                                                "openbox_config"))
                 {
-                    obt_parse_tree(i, obt_parse_instance_root(i)->children);
+                    obt_parse_tree_from_root(i);
                     obt_parse_close(i);
                 } else
                     g_message(_("Unable to find a valid config file, using some simple defaults"));

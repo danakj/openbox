@@ -79,7 +79,7 @@ static gpointer setup_func(xmlNodePtr node)
     if ((n = obt_parse_find_node(node, "then"))) {
         xmlNodePtr m;
 
-        m = obt_parse_find_node(n->xmlChildrenNode, "action");
+        m = obt_parse_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
             if (action) o->thenacts = g_slist_prepend(o->thenacts, action);
@@ -89,7 +89,7 @@ static gpointer setup_func(xmlNodePtr node)
     if ((n = obt_parse_find_node(node, "else"))) {
         xmlNodePtr m;
 
-        m = obt_parse_find_node(n->xmlChildrenNode, "action");
+        m = obt_parse_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
             if (action) o->elseacts = g_slist_prepend(o->elseacts, action);

@@ -172,7 +172,7 @@ ObActionsAct* actions_parse(xmlNodePtr node)
         if ((act = actions_build_act_from_string(name)))
             /* there is more stuff to parse here */
             if (act->def->setup)
-                act->options = act->def->setup(node->xmlChildrenNode);
+                act->options = act->def->setup(node->children);
 
         g_free(name);
     }

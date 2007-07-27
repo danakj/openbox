@@ -45,13 +45,13 @@ static gpointer setup_func(xmlNodePtr node)
 
     if ((n = obt_parse_find_node(node, "startupnotify"))) {
         xmlNodePtr m;
-        if ((m = obt_parse_find_node(n->xmlChildrenNode, "enabled")))
+        if ((m = obt_parse_find_node(n->children, "enabled")))
             o->sn = obt_parse_node_bool(m);
-        if ((m = obt_parse_find_node(n->xmlChildrenNode, "name")))
+        if ((m = obt_parse_find_node(n->children, "name")))
             o->sn_name = obt_parse_node_string(m);
-        if ((m = obt_parse_find_node(n->xmlChildrenNode, "icon")))
+        if ((m = obt_parse_find_node(n->children, "icon")))
             o->sn_icon = obt_parse_node_string(m);
-        if ((m = obt_parse_find_node(n->xmlChildrenNode, "wmclass")))
+        if ((m = obt_parse_find_node(n->children, "wmclass")))
             o->sn_wmclass = obt_parse_node_string(m);
     }
     return o;

@@ -158,7 +158,6 @@ void menu_clear_pipe_caches(void)
 
 void menu_pipe_execute(ObMenu *self)
 {
-    xmlNodePtr node;
     gchar *output;
     GError *err = NULL;
 
@@ -179,7 +178,7 @@ void menu_pipe_execute(ObMenu *self)
     {
         menu_parse_state.pipe_creator = self;
         menu_parse_state.parent = self;
-        obt_parse_tree(menu_parse_inst, node->children);
+        obt_parse_tree_from_root(menu_parse_inst);
         obt_parse_close(menu_parse_inst);
     } else {
         g_message(_("Invalid output from pipe-menu '%s'"), self->execute);

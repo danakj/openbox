@@ -125,6 +125,8 @@ obt_libobt_la_SOURCES = \
 	obt/mainloop.c \
 	obt/parse.h \
 	obt/parse.c \
+	obt/paths.h \
+	obt/paths.c \
 	obt/prop.h \
 	obt/prop.c \
 	obt/util.h
@@ -386,6 +388,8 @@ pubinclude_HEADERS = \
 	obt/mainloop.c \
 	obt/parse.h \
 	obt/parse.c \
+	obt/paths.h \
+	obt/paths.c \
 	obt/prop.h \
 	obt/prop.c \
 	obt/util.h

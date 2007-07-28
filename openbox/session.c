@@ -41,6 +41,7 @@ GList* session_state_find(struct _ObClient *c) { return NULL; }
 #include "focus.h"
 #include "gettext.h"
 #include "obt/parse.h"
+#include "obt/paths.h"
 
 #include <time.h>
 #include <errno.h>
@@ -90,15 +91,18 @@ static void session_state_free(ObSessionState *state);
 void session_startup(gint argc, gchar **argv)
 {
     gchar *dir;
+    ObtPaths *p;
 
     if (!ob_sm_use) return;
 
     sm_argc = argc;
     sm_argv = argv;
 
-    dir = g_build_filename(parse_xdg_data_home_path(),
-                           "openbox", "sessions", NULL);
-    if (!parse_mkdir_path(dir, 0700)) {
+    p = obt_paths_new();
+    dir = g_build_filename(obt_paths_data_home(p), "openbox", "sessions",NULL);
+    obt_paths_unref(p), p = NULL;
+
+    if (!obt_paths_mkdir_path(dir, 0700)) {
         g_message(_("Unable to make directory '%s': %s"),
                   dir, g_strerror(errno));
     }

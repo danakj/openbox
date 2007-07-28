@@ -2,6 +2,7 @@
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
 #include "openbox/screen.h"
+#include "obt/paths.h"
 #include "gettext.h"
 
 typedef struct {
@@ -39,7 +40,7 @@ static gpointer setup_func(xmlNodePtr node)
         (n = obt_parse_find_node(node, "execute")))
     {
         gchar *s = obt_parse_node_string(n);
-        o->cmd = parse_expand_tilde(s);
+        o->cmd = obt_paths_expand_tilde(s);
         g_free(s);
     }
 

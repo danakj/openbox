@@ -1,5 +1,6 @@
 #include "openbox/actions.h"
 #include "openbox/openbox.h"
+#include "obt/paths.h"
 
 typedef struct {
     gchar   *cmd;
@@ -25,7 +26,7 @@ static gpointer setup_func(xmlNodePtr node)
         (n = obt_parse_find_node(node, "execute")))
     {
         gchar *s = obt_parse_node_string(n);
-        o->cmd = parse_expand_tilde(s);
+        o->cmd = obt_paths_expand_tilde(s);
         g_free(s);
     }
     return o;

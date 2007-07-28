@@ -82,24 +82,6 @@ gboolean obt_parse_attr_int      (xmlNodePtr node, const gchar *name,
 gboolean obt_parse_attr_bool     (xmlNodePtr node, const gchar *name,
                                   gboolean *value);
 
-/* paths */
-
-void parse_paths_startup();
-void parse_paths_shutdown();
-
-const gchar* parse_xdg_config_home_path();
-const gchar* parse_xdg_data_home_path();
-GSList* parse_xdg_config_dir_paths();
-GSList* parse_xdg_data_dir_paths();
-
-/*! Expands the ~ character to the home directory throughout the given
-  string */
-gchar *parse_expand_tilde(const gchar *f);
-/*! Makes a directory */
-gboolean parse_mkdir(const gchar *path, gint mode);
-/*! Makes a directory and all its parents */
-gboolean parse_mkdir_path(const gchar *path, gint mode);
-
 G_END_DECLS
 
 #endif

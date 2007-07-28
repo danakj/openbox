@@ -135,11 +135,8 @@ gint main(gint argc, gchar **argv)
     program_name = g_path_get_basename(argv[0]);
     g_set_prgname(program_name);
 
-    if (!remote_control) {
-        parse_paths_startup();
-
+    if (!remote_control)
         session_startup(argc, argv);
-    }
 
     if (!obt_display_open(NULL))
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
@@ -370,8 +367,6 @@ gint main(gint argc, gchar **argv)
     session_shutdown(being_replaced);
 
     obt_display_close(obt_display);
-
-    parse_paths_shutdown();
 
     if (restart) {
         if (restart_path != NULL) {

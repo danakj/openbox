@@ -35,6 +35,7 @@
 #include "client_list_combined_menu.h"
 #include "gettext.h"
 #include "obt/parse.h"
+#include "obt/paths.h"
 
 typedef struct _ObMenuParseState ObMenuParseState;
 
@@ -314,7 +315,7 @@ static void parse_menu(xmlNodePtr node, gpointer data)
         if ((menu = menu_new(name, title, TRUE, NULL))) {
             menu->pipe_creator = state->pipe_creator;
             if (obt_parse_attr_string(node, "execute", &script)) {
-                menu->execute = parse_expand_tilde(script);
+                menu->execute = obt_paths_expand_tilde(script);
             } else {
                 ObMenu *old;
 

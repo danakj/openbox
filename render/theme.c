@@ -23,7 +23,7 @@
 #include "mask.h"
 #include "theme.h"
 #include "icon.h"
-#include "obt/parse.h"
+#include "obt/paths.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
@@ -1559,6 +1559,10 @@ static XrmDatabase loaddb(const gchar *name, gchar **path)
             *path = g_path_get_dirname(s);
         g_free(s);
     } else {
+        ObtPaths *p;
+
+        p = obt_paths_new();
+
         /* XXX backwards compatibility, remove me sometime later */
         s = g_build_filename(g_get_home_dir(), ".themes", name,
                              "openbox-3", "themerc", NULL);
@@ -1566,8 +1570,7 @@ static XrmDatabase loaddb(const gchar *name, gchar **path)
             *path = g_path_get_dirname(s);
         g_free(s);
 
-        for (it = parse_xdg_data_dir_paths(); !db && it;
-             it = g_slist_next(it))
+        for (it = obt_paths_data_dirs(p); !db && it; it = g_slist_next(it))
         {
             s = g_build_filename(it->data, "themes", name,
                                  "openbox-3", "themerc", NULL);
@@ -1575,6 +1578,8 @@ static XrmDatabase loaddb(const gchar *name, gchar **path)
                 *path = g_path_get_dirname(s);
             g_free(s);
         }
+
+        obt_paths_unref(p);
     }
 
     if (db == NULL) {

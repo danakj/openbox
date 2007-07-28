@@ -26,6 +26,7 @@
 #include "screen.h"
 #include "openbox.h"
 #include "gettext.h"
+#include "obt/paths.h"
 
 gboolean config_focus_new;
 gboolean config_focus_follow;
@@ -511,7 +512,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
 
         g_free(config_theme);
         c = obt_parse_node_string(n);
-        config_theme = parse_expand_tilde(c);
+        config_theme = obt_paths_expand_tilde(c);
         g_free(c);
     }
     if ((n = obt_parse_find_node(node, "titleLayout"))) {
@@ -743,7 +744,7 @@ static void parse_menu(xmlNodePtr node, gpointer d)
 
             c = obt_parse_node_string(node);
             config_menu_files = g_slist_append(config_menu_files,
-                                               parse_expand_tilde(c));
+                                               obt_paths_expand_tilde(c));
             g_free(c);
         }
         if ((n = obt_parse_find_node(node, "hideDelay")))

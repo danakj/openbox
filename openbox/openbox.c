@@ -151,7 +151,7 @@ gint main(gint argc, gchar **argv)
         exit(EXIT_SUCCESS);
     }
 
-    ob_main_loop = obt_main_loop_new(obt_display);
+    ob_main_loop = obt_main_loop_new();
 
     /* set up signal handler */
     obt_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL,NULL);

@@ -18,6 +18,7 @@
 */
 
 #include "obt/mainloop.h"
+#include "obt/display.h"
 #include "obt/util.h"
 
 #include <stdio.h>
@@ -67,6 +68,7 @@ static gint core_signals[] =
 static void sighandler(gint sig);
 static void timer_dispatch(ObtMainLoop *loop, GTimeVal **wait);
 static void fd_handler_destroy(gpointer data);
+static void calc_max_fd(ObtMainLoop *loop);
 
 struct _ObtMainLoop
 {
@@ -138,17 +140,15 @@ struct _ObtMainLoopFdHandlerType
     GDestroyNotify destroy;
 };
 
-ObtMainLoop *obt_main_loop_new(Display *display)
+ObtMainLoop *obt_main_loop_new()
 {
     ObtMainLoop *loop;
 
     loop = g_new0(ObtMainLoop, 1);
     loop->ref = 1;
-    loop->display = display;
-    loop->fd_x = ConnectionNumber(display);
     FD_ZERO(&loop->fd_set);
-    FD_SET(loop->fd_x, &loop->fd_set);
-    loop->fd_max = loop->fd_x;
+    loop->fd_x = -1;
+    loop->fd_max = -1;
 
     loop->fd_handlers = g_hash_table_new_full(g_int_hash, g_int_equal,
                                               NULL, fd_handler_destroy);
@@ -339,11 +339,21 @@ void obt_main_loop_x_add(ObtMainLoop *loop,
     h->func = handler;
     h->data = data;
     h->destroy = notify;
+
+    if (!loop->x_handlers) {
+        g_assert(obt_display); /* is the display open? */
+
+        loop->display = obt_display;
+        loop->fd_x = ConnectionNumber(loop->display);
+        FD_SET(loop->fd_x, &loop->fd_set);
+        calc_max_fd(loop);
+    }
+
     loop->x_handlers = g_slist_prepend(loop->x_handlers, h);
 }
 
 void obt_main_loop_x_remove(ObtMainLoop *loop,
-                           ObtMainLoopXHandler handler)
+                            ObtMainLoopXHandler handler)
 {
     GSList *it, *next;
 
@@ -355,6 +365,11 @@ void obt_main_loop_x_remove(ObtMainLoop *loop,
             if (h->destroy) h->destroy(h->data);
             g_free(h);
         }
+    }
+
+    if (!loop->x_handlers) {
+        FD_CLR(loop->fd_x, &loop->fd_set);
+        calc_max_fd(loop);
     }
 }
 
@@ -502,6 +517,7 @@ void obt_main_loop_fd_remove(ObtMainLoop *loop,
                              gint fd)
 {
     g_hash_table_remove(loop->fd_handlers, &fd);
+    calc_max_fd(loop);
 }
 
 /*** TIMEOUTS ***/

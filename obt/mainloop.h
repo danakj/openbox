@@ -27,7 +27,7 @@ G_BEGIN_DECLS
 
 typedef struct _ObtMainLoop ObtMainLoop;
 
-ObtMainLoop *obt_main_loop_new(Display *display);
+ObtMainLoop *obt_main_loop_new();
 void        obt_main_loop_ref(ObtMainLoop *loop);
 void        obt_main_loop_unref(ObtMainLoop *loop);
 

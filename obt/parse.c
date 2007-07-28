@@ -87,13 +87,13 @@ void obt_parse_instance_unref(ObtParseInst *i)
     }
 }
 
-xmlDocPtr obt_parse_instance_doc(ObtParseInst *i)
+xmlDocPtr obt_parse_doc(ObtParseInst *i)
 {
     g_assert(i->doc); /* a doc is open? */
     return i->doc;
 }
 
-xmlNodePtr obt_parse_instance_root(ObtParseInst *i)
+xmlNodePtr obt_parse_root(ObtParseInst *i)
 {
     g_assert(i->doc); /* a doc is open? */
     return i->root;

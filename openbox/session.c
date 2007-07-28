@@ -661,7 +661,7 @@ static void session_load_file(const gchar *path)
         obt_parse_instance_unref(i);
         return;
     }
-    node = obt_parse_instance_root(i);
+    node = obt_parse_root(i);
 
     if ((n = obt_parse_find_node(node->children, "desktop")))
         session_desktop = obt_parse_node_int(n);

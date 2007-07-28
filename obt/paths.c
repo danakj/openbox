@@ -79,7 +79,7 @@ ObtPaths* obt_paths_new(void)
     ObtPaths *p;
     const gchar *path;
 
-    p = g_new(ObtPaths, 1);
+    p = g_new0(ObtPaths, 1);
     p->ref = 1;
 
     path = g_getenv("XDG_CONFIG_HOME");

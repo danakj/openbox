@@ -18,6 +18,7 @@
 
 #include "obt/xevent.h"
 #include "obt/mainloop.h"
+#include "obt/util.h"
 
 typedef struct _ObtXEventBinding ObtXEventBinding;
 
@@ -26,9 +27,10 @@ struct _ObtXEventHandler
     gint ref;
     ObtMainLoop *loop;
 
-    /* A hash table where the key is the window, and the value is the
-       ObtXEventBinding */
-    GHashTable *bindings[LASTEvent]; /* LASTEvent comes from X.h */
+    /* An array of hash tables where the key is the window, and the value is
+       the ObtXEventBinding */
+    GHashTable **bindings;
+    gint num_event_types; /* the length of the bindings array */
 };
 
 struct _ObtXEventBinding
@@ -45,14 +47,10 @@ static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
 ObtXEventHandler* xevent_new()
 {
     ObtXEventHandler *h;
-    gint i;
 
-    h = g_new(ObtXEventHandler, 1);
+    h = g_new0(ObtXEventHandler, 1);
     h->ref = 1;
-    for (i = 0; i < LASTEvent; ++i)
-        h->bindings[i] = g_hash_table_new_full((GHashFunc)window_hash,
-                                               (GEqualFunc)window_comp,
-                                               NULL, g_free);
+
     return h;
 }
 
@@ -64,8 +62,15 @@ void xevent_ref(ObtXEventHandler *h)
 void xevent_unref(ObtXEventHandler *h)
 {
     if (h && --h->ref == 0) {
+        gint i;
+
         if (h->loop)
             obt_main_loop_x_remove(h->loop, xevent_handler);
+        for (i = 0; i < h->num_event_types; ++i)
+            g_hash_table_destroy(h->bindings[i]);
+        g_free(h->bindings);
+
+        obt_free0(h, ObtXEventHandler, 1);
     }
 }
 
@@ -80,9 +85,19 @@ void xevent_set_handler(ObtXEventHandler *h, gint type, Window win,
 {
     ObtXEventBinding *b;
 
-    g_assert(type < LASTEvent);
     g_assert(win);
     g_assert(func);
+
+    /* make sure we have a spot for the event */
+    if (type + 1 < h->num_event_types) {
+        gint i;
+        h->bindings = g_renew(GHashTable*, h->bindings, type + 1);
+        for (i = h->num_event_types; i < type + 1; ++i)
+            h->bindings[i] = g_hash_table_new_full((GHashFunc)window_hash,
+                                                   (GEqualFunc)window_comp,
+                                                   NULL, g_free);
+        h->num_event_types = type + 1;
+    }
 
     b = g_new(ObtXEventBinding, 1);
     b->win = win;
@@ -93,7 +108,7 @@ void xevent_set_handler(ObtXEventHandler *h, gint type, Window win,
 
 void xevent_remove_handler(ObtXEventHandler *h, gint type, Window win)
 {
-    g_assert(type < LASTEvent);
+    g_assert(type < h->num_event_types);
     g_assert(win);
 
     g_hash_table_remove(h->bindings[type], &win);
@@ -104,7 +119,11 @@ static void xevent_handler(const XEvent *e, gpointer data)
     ObtXEventHandler *h;
     ObtXEventBinding *b;
 
-    h = data;
-    b = g_hash_table_lookup(h->bindings[e->xany.type], &e->xany.window);
-    if (b) b->func(e, b->data);
+    if (e->type < h->num_event_types) {
+        h = data;
+        b = g_hash_table_lookup(h->bindings[e->xany.type], &e->xany.window);
+        if (b) b->func(e, b->data);
+    }
+    else
+        g_message("Unhandled X Event type %d", e->xany.type);
 }

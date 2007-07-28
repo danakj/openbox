@@ -129,7 +129,9 @@ obt_libobt_la_SOURCES = \
 	obt/paths.c \
 	obt/prop.h \
 	obt/prop.c \
-	obt/util.h
+	obt/util.h \
+	obt/xevent.h \
+	obt/xevent.c
 
 ## openbox ##
 
@@ -392,7 +394,9 @@ pubinclude_HEADERS = \
 	obt/paths.c \
 	obt/prop.h \
 	obt/prop.c \
-	obt/util.h
+	obt/util.h \
+	obt/xevent.h \
+	obt/xevent.c
 
 nodist_pubinclude_HEADERS = \
 	version.h

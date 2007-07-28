@@ -85,7 +85,6 @@ void xevent_set_handler(ObtXEventHandler *h, gint type, Window win,
 {
     ObtXEventBinding *b;
 
-    g_assert(win);
     g_assert(func);
 
     /* make sure we have a spot for the event */
@@ -119,8 +118,14 @@ static void xevent_handler(const XEvent *e, gpointer data)
     ObtXEventHandler *h;
     ObtXEventBinding *b;
 
+    h = data;
+
     if (e->type < h->num_event_types) {
-        h = data;
+        const gint all = OBT_XEVENT_ALL_WINDOWS;
+        /* run the all_windows handler first */
+        b = g_hash_table_lookup(h->bindings[e->xany.type], &all);
+        if (b) b->func(e, b->data);
+        /* then run the per-window handler */
         b = g_hash_table_lookup(h->bindings[e->xany.type], &e->xany.window);
         if (b) b->func(e, b->data);
     }

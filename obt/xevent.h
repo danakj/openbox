@@ -37,6 +37,7 @@ void              xevent_unref(ObtXEventHandler *h);
 void              xevent_register(ObtXEventHandler *h,
                                   struct _ObtMainLoop *loop);
 
+#define OBT_XEVENT_ALL_WINDOWS None
 
 void xevent_set_handler(ObtXEventHandler *h, gint type, Window win,
                         ObtXEventCallback func, gpointer data);

@@ -30,6 +30,8 @@
 #define DOCK_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \
                          EnterWindowMask | LeaveWindowMask)
 #define DOCKAPP_EVENT_MASK (StructureNotifyMask)
+#define DOCK_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
+                              ButtonMotionMask)
 
 static ObDock *dock;
 
@@ -83,11 +85,13 @@ void dock_startup(gboolean reconfig)
 
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
+    attrib.do_not_propagate_mask = DOCK_NOPROPAGATEMASK;
     dock->frame = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
                                 0, 0, 1, 1, 0,
                                 RrDepth(ob_rr_inst), InputOutput,
                                 RrVisual(ob_rr_inst),
-                                CWOverrideRedirect | CWEventMask,
+                                CWOverrideRedirect | CWEventMask |
+                                CWDontPropagate,
                                 &attrib);
     dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
     XSetWindowBorder(ob_display, dock->frame,

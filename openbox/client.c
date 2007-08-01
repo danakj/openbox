@@ -213,8 +213,8 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
-    gint placex, placey, placew, placeh;
     gboolean transient = FALSE;
+    Rect place, *monitor;
 
     grab_server(TRUE);
 
@@ -337,10 +337,8 @@ void client_manage(Window window)
     frame_adjust_client_area(self->frame);
 
     /* where the frame was placed is where the window was originally */
-    placex = self->area.x;
-    placey = self->area.y;
-    placew = self->area.width;
-    placeh = self->area.height;
+    place = self->area;
+    monitor = screen_physical_area_monitor(screen_find_monitor(&place));
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
@@ -350,7 +348,7 @@ void client_manage(Window window)
                    (self->positioned == USPosition ? "user specified" :
                     (self->positioned == (PPosition | USPosition) ?
                      "program + user specified" :
-                     "BADNESS !?")))), placex, placey);
+                     "BADNESS !?")))), place.x, place.y);
 
         ob_debug("Sized: %s @ %d %d\n",
                  (!self->sized ? "no" :
@@ -358,14 +356,15 @@ void client_manage(Window window)
                    (self->sized == USSize ? "user specified" :
                     (self->sized == (PSize | USSize) ?
                      "program + user specified" :
-                     "BADNESS !?")))), placew, placeh);
+                     "BADNESS !?")))), place.width, place.height);
 
         /* splash screens are also returned as TRUE for transient,
            and so will be forced on screen below */
-        transient = place_client(self, &placex, &placey, settings);
+        transient = place_client(self, &place.x, &place.y, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &placex, &placey, placew, placeh,
+        client_find_onscreen(self, &place.x, &place.y,
+                             place.width, place.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
                                 session do also. we can assume you want
@@ -385,7 +384,13 @@ void client_manage(Window window)
                               (!((self->positioned & USPosition) ||
                                  (settings && settings->pos_given)) &&
                                client_normal(self) &&
-                               !self->session)));
+                               !self->session &&
+                               /* don't move oldschool fullscreen windows to
+                                  fit inside the struts (fixes Acroread, which
+                                  makes its fullscreen window fit the screen
+                                  but it is not USSize'd or USPosition'd) */
+                               !(self->decorations == 0 &&
+                                 RECT_EQUAL(place, *monitor)))));
     }
 
     /* if the window isn't user-sized, then make it fit inside
@@ -401,41 +406,34 @@ void client_manage(Window window)
         (transient ||
          (!(self->sized & USSize || self->positioned & USPosition) &&
           client_normal(self) &&
-          !self->session)))
+          !self->session &&
+          /* don't shrink oldschool fullscreen windows to fit inside the
+             struts (fixes Acroread, which makes its fullscreen window
+             fit the screen but it is not USSize'd or USPosition'd) */
+          !(self->decorations == 0 && RECT_EQUAL(place, *monitor)))))
     {
-        Rect *monitor, *a, placer;
+        Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
-        monitor = screen_physical_area_monitor(client_monitor(self));
+        /* get the size of the frame */
+        place.width += self->frame->size.left + self->frame->size.right;
+        place.height += self->frame->size.top + self->frame->size.bottom;
 
-        RECT_SET(placer, placex, placey, placew, placeh);
-        frame_rect_to_frame(self->frame, &placer);
+        /* fit the window inside the area */
+        place.width = MIN(place.width, a->width);
+        place.height = MIN(place.height, a->height);
 
-        a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &placer);
+        ob_debug("setting window size to %dx%d\n", place.width, place.height);
 
-        /* shrink by the frame's area */
-        a->width -= self->frame->size.left + self->frame->size.right;
-        a->height -= self->frame->size.top + self->frame->size.bottom;
+        /* get the size of the client back */
+        place.width -= self->frame->size.left + self->frame->size.right;
+        place.height -= self->frame->size.top + self->frame->size.bottom;
 
-        /* fit the window inside the area
-           but, don't shrink oldschool fullscreen windows to fit inside the
-           struts (fixes Acroread, which makes its fullscreen window
-           fit the screen but it is not USSize'd or USPosition'd) */
-        if ((placew > a->width || self->area.height > a->height) &&
-            !(self->decorations == 0 && RECT_EQUAL(placer, *monitor)))
-        {
-            placew = MIN(self->area.width, a->width);
-            placeh = MIN(self->area.height, a->height);
-
-            ob_debug("setting window size to %dx%d\n", placew, placeh);
-        }
         g_free(a);
-        g_free(monitor);
     }
-
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
              "some restrictions may apply\n",
-             self->window, placex, placey, placew, placeh);
+             self->window, place.x, place.y, place.width, place.height);
     if (self->session)
         ob_debug("  but session requested %d, %d  %d x %d instead, "
                  "overriding\n",
@@ -447,7 +445,11 @@ void client_manage(Window window)
 
        this also places the window
     */
-    client_apply_startup_state(self, placex, placey, placew, placeh);
+    client_apply_startup_state(self, place.x, place.y,
+                               place.width, place.height);
+
+    g_free(monitor);
+    monitor = NULL;
 
     if (activate) {
         gboolean raise = FALSE;

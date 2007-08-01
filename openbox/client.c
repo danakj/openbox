@@ -403,26 +403,33 @@ void client_manage(Window window)
           client_normal(self) &&
           !self->session)))
     {
-        Rect placer;
+        Rect *monitor, *a, placer;
+
+        monitor = screen_physical_area_monitor(client_monitor(self));
 
         RECT_SET(placer, placex, placey, placew, placeh);
         frame_rect_to_frame(self->frame, &placer);
 
-        Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &placer);
+        a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &placer);
 
         /* shrink by the frame's area */
         a->width -= self->frame->size.left + self->frame->size.right;
         a->height -= self->frame->size.top + self->frame->size.bottom;
 
-        /* fit the window inside the area */
-        if (placew > a->width || self->area.height > a->height) {
+        /* fit the window inside the area
+           but, don't shrink oldschool fullscreen windows to fit inside the
+           struts (fixes Acroread, which makes its fullscreen window
+           fit the screen but it is not USSize'd or USPosition'd) */
+        if ((placew > a->width || self->area.height > a->height) &&
+            !(self->decorations == 0 && RECT_EQUAL(placer, *monitor)))
+        {
             placew = MIN(self->area.width, a->width);
             placeh = MIN(self->area.height, a->height);
 
-            ob_debug("setting window size to %dx%d\n",
-                     self->area.width, self->area.height);
+            ob_debug("setting window size to %dx%d\n", placew, placeh);
         }
         g_free(a);
+        g_free(monitor);
     }
 
 

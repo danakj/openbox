@@ -34,7 +34,6 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "modkeys.h"
-#include "propwin.h"
 #include "mouse.h"
 #include "mainloop.h"
 #include "focus.h"
@@ -90,7 +89,6 @@ static gboolean event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void event_handle_user_time_window_clients(GSList *l, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
 static gboolean is_enter_focus_event_ignored(XEvent *e);
 
@@ -433,7 +431,6 @@ static void event_process(const XEvent *ec, gpointer data)
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
-    GSList *timewinclients = NULL;
     XEvent ee, *e;
     ObEventData *ed = data;
 
@@ -442,27 +439,24 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
-    if (e->type != PropertyNotify ||
-        !(timewinclients = propwin_get_clients(window,
-                                               OB_PROPWIN_USER_TIME)))
-        if ((obwin = g_hash_table_lookup(window_map, &window))) {
-            switch (obwin->type) {
-            case Window_Dock:
-                dock = WINDOW_AS_DOCK(obwin);
-                break;
-            case Window_DockApp:
-                dockapp = WINDOW_AS_DOCKAPP(obwin);
-                break;
-            case Window_Client:
-                client = WINDOW_AS_CLIENT(obwin);
-                break;
-            case Window_Menu:
-            case Window_Internal:
-                /* not to be used for events */
-                g_assert_not_reached();
-                break;
-            }
+    if ((obwin = g_hash_table_lookup(window_map, &window))) {
+        switch (obwin->type) {
+        case Window_Dock:
+            dock = WINDOW_AS_DOCK(obwin);
+            break;
+        case Window_DockApp:
+            dockapp = WINDOW_AS_DOCKAPP(obwin);
+            break;
+        case Window_Client:
+            client = WINDOW_AS_CLIENT(obwin);
+            break;
+        case Window_Menu:
+        case Window_Internal:
+            /* not to be used for events */
+            g_assert_not_reached();
+            break;
         }
+    }
 
     event_set_curtime(e);
     event_hack_mods(e);
@@ -607,8 +601,7 @@ static void event_process(const XEvent *ec, gpointer data)
                section or by focus_fallback */
             client_calc_layer(client);
         }
-    } else if (timewinclients)
-        event_handle_user_time_window_clients(timewinclients, e);
+    }
     else if (client)
         event_handle_client(client, e);
     else if (dockapp)
@@ -763,15 +756,6 @@ void event_enter_client(ObClient *client)
             data.time = event_curtime;
             focus_delay_func(&data);
         }
-    }
-}
-
-static void event_handle_user_time_window_clients(GSList *l, XEvent *e)
-{
-    g_assert(e->type == PropertyNotify);
-    if (e->xproperty.atom == prop_atoms.net_wm_user_time) {
-        for (; l; l = g_slist_next(l))
-            client_update_user_time(l->data);
     }
 }
 
@@ -1288,8 +1272,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
             /* XXX make use of data.l[2] !? */
             if (e->xclient.data.l[0] == 1 || e->xclient.data.l[0] == 2) {
-                event_curtime = e->xclient.data.l[1];
-                if (event_curtime == 0)
+                /* don't use the user's timestamp for client_focus, cuz if it's
+                   an old broken timestamp (happens all the time) then focus
+                   won't move even though we're trying to move it
+                  event_curtime = e->xclient.data.l[1];*/
+                if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_ACTIVE_WINDOW message for window %s is"
                                   " missing a timestamp\n", client->title);
@@ -1508,12 +1495,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         else if (msgtype == prop_atoms.net_wm_icon_geometry) {
             client_update_icon_geometry(client);
-        }
-        else if (msgtype == prop_atoms.net_wm_user_time) {
-            client_update_user_time(client);
-        }
-        else if (msgtype == prop_atoms.net_wm_user_time_window) {
-            client_update_user_time_window(client);
         }
 #ifdef SYNC
         else if (msgtype == prop_atoms.net_wm_sync_request_counter) {

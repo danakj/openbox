@@ -32,7 +32,6 @@
 #include "event.h"
 #include "grab.h"
 #include "focus.h"
-#include "propwin.h"
 #include "stacking.h"
 #include "openbox.h"
 #include "group.h"
@@ -215,6 +214,7 @@ void client_manage(Window window)
     ObAppSettings *settings;
     gboolean transient = FALSE;
     Rect place, *monitor;
+    Time map_time;
 
     grab_server(TRUE);
 
@@ -269,7 +269,6 @@ void client_manage(Window window)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->gravity = NorthWestGravity;
     self->desktop = screen_num_desktops; /* always an invalid value */
-    self->user_time = focus_client ? focus_client->user_time : CurrentTime;
 
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
@@ -300,10 +299,8 @@ void client_manage(Window window)
     /* now we have all of the window's information so we can set this up */
     client_setup_decor_and_functions(self, FALSE);
 
-    {
-        Time t = sn_app_started(self->startup_id, self->class);
-        if (t) self->user_time = t;
-    }
+    /* tell startup notification that this app started */
+    map_time = sn_app_started(self->startup_id, self->class);
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
@@ -453,14 +450,6 @@ void client_manage(Window window)
 
     if (activate) {
         gboolean raise = FALSE;
-        guint32 last_time = focus_client ?
-            focus_client->user_time : CurrentTime;
-
-        /* This is focus stealing prevention */
-        ob_debug_type(OB_DEBUG_FOCUS,
-                      "Want to focus new window 0x%x with time %u "
-                      "(last time %u)\n",
-                      self->window, self->user_time, last_time);
 
         if (menu_frame_visible || moveresize_in_progress) {
             activate = FALSE;
@@ -475,8 +464,8 @@ void client_manage(Window window)
         else if (!(self->desktop == screen_desktop ||
               self->desktop == DESKTOP_ALL) &&
             /* the timestamp is from before you changed desktops */
-            self->user_time && screen_desktop_user_time &&
-            !event_time_after(self->user_time, screen_desktop_user_time))
+            map_time && screen_desktop_user_time &&
+            !event_time_after(map_time, screen_desktop_user_time))
         {
             activate = FALSE;
             raise = TRUE;
@@ -488,26 +477,15 @@ void client_manage(Window window)
         else if (focus_client && client_search_focus_tree_full(self) == NULL &&
                  client_search_focus_group_full(self) == NULL)
         {
-            /* If time stamp is old, don't steal focus */
-            if (self->user_time && last_time &&
-                !event_time_after(self->user_time, last_time))
-            {
-                activate = FALSE;
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because the time is "
-                              "too old\n");
-            }
             /* If its a transient (and parents aren't focused) and the time
                is ambiguous (either the current focus target doesn't have
                a timestamp, or they are the same (we probably inherited it
                from them) */
-            else if (client_has_parent(self) &&
-                     (!last_time || self->user_time == last_time))
-            {
+            if (client_has_parent(self)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because it is a "
-                              "transient, and the time is very ambiguous\n");
+                              "transient, and its relatives aren't focused\n");
             }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
@@ -532,10 +510,6 @@ void client_manage(Window window)
         }
 
         if (!activate) {
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus stealing prevention activated for %s with "
-                          "time %u (last time %u)\n",
-                          self->title, self->user_time, last_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);
@@ -668,9 +642,6 @@ void client_unmanage(ObClient *self)
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
-
-    /* kill the property windows */
-    propwin_remove(self->user_time_window, OB_PROPWIN_USER_TIME, self);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -1111,9 +1082,6 @@ static void client_get_all(ObClient *self, gboolean real)
     client_get_colormap(self);
     client_update_strut(self);
     client_update_icons(self);
-    client_update_user_time_window(self);
-    if (!self->user_time_window) /* check if this would have been called */
-        client_update_user_time(self);
     client_update_icon_geometry(self);
 }
 
@@ -2112,62 +2080,6 @@ void client_update_icons(ObClient *self)
         /* don't draw the icon empty if we're just setting one now anyways,
            we'll get the property change any second */
         frame_adjust_icon(self->frame);
-}
-
-void client_update_user_time(ObClient *self)
-{
-    guint32 time;
-    gboolean got = FALSE;
-
-    if (self->user_time_window)
-        got = PROP_GET32(self->user_time_window,
-                         net_wm_user_time, cardinal, &time);
-    if (!got)
-        got = PROP_GET32(self->window, net_wm_user_time, cardinal, &time);
-
-    if (got) {
-        /* we set this every time, not just when it grows, because in practice
-           sometimes time goes backwards! (ntpdate.. yay....) so.. if it goes
-           backward we don't want all windows to stop focusing. we'll just
-           assume noone is setting times older than the last one, cuz that
-           would be pretty stupid anyways
-        */
-        self->user_time = time;
-
-        /*ob_debug("window %s user time %u\n", self->title, time);*/
-    }
-}
-
-void client_update_user_time_window(ObClient *self)
-{
-    guint32 w;
-
-    if (!PROP_GET32(self->window, net_wm_user_time_window, window, &w))
-        w = None;
-
-    if (w != self->user_time_window) {
-        /* remove the old window */
-        propwin_remove(self->user_time_window, OB_PROPWIN_USER_TIME, self);
-        self->user_time_window = None;
-
-        if (self->group && self->group->leader == w) {
-            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
-                          "_NET_WM_USER_TYPE_WINDOW to its group leader\n");
-            /* do it anyways..? */
-        }
-        else if (w == self->window) {
-            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
-                          "_NET_WM_USER_TIME_WINDOW to itself\n");
-            w = None; /* don't do it */
-        }
-
-        /* add the new window */
-        propwin_add(w, OB_PROPWIN_USER_TIME, self);
-        self->user_time_window = w;
-
-        /* and update from it */
-        client_update_user_time(self);
-    }
 }
 
 void client_update_icon_geometry(ObClient *self)
@@ -3651,34 +3563,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 void client_activate(ObClient *self, gboolean here, gboolean raise,
                      gboolean unshade, gboolean user)
 {
-    guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
-    gboolean allow = FALSE;
-
-    /* if the currently focused app doesn't set a user_time, then it can't
-       benefit from any focus stealing prevention.
-
-       if the timestamp is missing in the request then let it go through
-       even if it is source=app, because EVERY APPLICATION DOES THIS because
-       GTK IS VERY BUGGY AND HARDCODES source=application... WHY!?
-    */
-    if (!last_time || !event_curtime)
-        allow = TRUE;
-    /* otherwise, if they didn't give a time stamp or if it is too old, they
-       don't get focus */
-    else
-        allow = event_time_after(event_curtime, last_time);
-
-    ob_debug_type(OB_DEBUG_FOCUS,
-                  "Want to activate window 0x%x with time %u (last time %u), "
-                  "source=%s allowing? %d\n",
-                  self->window, event_curtime, last_time,
-                  (user ? "user" : "application"), allow);
-
-    if (allow)
-        client_present(self, here, raise, unshade);
-    else
-        /* don't focus it but tell the user it wants attention */
-        client_hilite(self, TRUE);
+    client_present(self, here, raise, unshade);
 }
 
 static void client_bring_windows_recursive(ObClient *self,

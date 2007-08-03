@@ -120,6 +120,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     ObCursor cur;
     gboolean mv = (cnr == prop_atoms.net_wm_moveresize_move ||
                    cnr == prop_atoms.net_wm_moveresize_move_keyboard);
+    gint up = 1;
+    gint left = 1;
 
     if (moveresize_in_progress || !c->frame->visible ||
         !(mv ?
@@ -127,23 +129,28 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
 
-    if (cnr == prop_atoms.net_wm_moveresize_size_topleft)
+    if (cnr == prop_atoms.net_wm_moveresize_size_topleft) {
         cur = OB_CURSOR_NORTHWEST;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_top)
+        up = left = -1;
+    } else if (cnr == prop_atoms.net_wm_moveresize_size_top) {
         cur = OB_CURSOR_NORTH;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_topright)
+        up = -1;
+    } else if (cnr == prop_atoms.net_wm_moveresize_size_topright) {
         cur = OB_CURSOR_NORTHEAST;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_right)
+        up = -1;
+    } else if (cnr == prop_atoms.net_wm_moveresize_size_right)
         cur = OB_CURSOR_EAST;
     else if (cnr == prop_atoms.net_wm_moveresize_size_bottomright)
         cur = OB_CURSOR_SOUTHEAST;
     else if (cnr == prop_atoms.net_wm_moveresize_size_bottom)
         cur = OB_CURSOR_SOUTH;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_bottomleft)
+    else if (cnr == prop_atoms.net_wm_moveresize_size_bottomleft) {
         cur = OB_CURSOR_SOUTHWEST;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_left)
+        left = -1;
+    } else if (cnr == prop_atoms.net_wm_moveresize_size_left) {
         cur = OB_CURSOR_WEST;
-    else if (cnr == prop_atoms.net_wm_moveresize_size_keyboard)
+        left = -1;
+    } else if (cnr == prop_atoms.net_wm_moveresize_size_keyboard)
         cur = OB_CURSOR_SOUTHEAST;
     else if (cnr == prop_atoms.net_wm_moveresize_move)
         cur = OB_CURSOR_MOVE;
@@ -172,8 +179,8 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
        either way instead of a full increment one and 1 px the other. */
-    start_x = x - (mv ? 0 : c->size_inc.width / 2);
-    start_y = y - (mv ? 0 : c->size_inc.height / 2);
+    start_x = x - (mv ? 0 : left * c->size_inc.width / 2);
+    start_y = y - (mv ? 0 : up * c->size_inc.height / 2);
     corner = cnr;
     button = b;
     key_resize_edge = -1;

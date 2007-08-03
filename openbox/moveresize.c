@@ -55,6 +55,7 @@ static gint cur_x, cur_y, cur_w, cur_h;
 static guint button;
 static guint32 corner;
 static ObDirection edge_warp_dir = -1;
+static gboolean edge_warp_odd = FALSE;
 static ObDirection key_resize_edge = -1;
 #ifdef SYNC
 static gboolean waiting_for_sync;
@@ -483,12 +484,15 @@ static gboolean edge_warp_delay_func(gpointer data)
 {
     guint d;
 
-    d = screen_find_desktop(screen_desktop, edge_warp_dir, TRUE, FALSE);
-    if (d != screen_desktop) screen_set_desktop(d, TRUE);
+    /* only fire every second time. so it's fast the first time, but slower
+       after that */
+    if (edge_warp_odd) {
+        d = screen_find_desktop(screen_desktop, edge_warp_dir, TRUE, FALSE);
+        if (d != screen_desktop) screen_set_desktop(d, TRUE);
+    }
+    edge_warp_odd = !edge_warp_odd;
 
-    edge_warp_dir = -1;
-
-    return FALSE; /* don't repeat */
+    return TRUE; /* do repeat ! */
 }
 
 static void do_edge_warp(gint x, gint y)
@@ -524,11 +528,13 @@ static void do_edge_warp(gint x, gint y)
     if (dir != edge_warp_dir) {
         if (dir == (ObDirection)-1)
             cancel_edge_warp();
-        else
+        else {
+            edge_warp_odd = TRUE; /* switch on the first timeout */
             ob_main_loop_timeout_add(ob_main_loop,
                                      config_mouse_screenedgetime * 1000,
                                      edge_warp_delay_func,
                                      NULL, NULL, NULL);
+        }
         edge_warp_dir = dir;
     }
 }

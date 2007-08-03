@@ -1837,6 +1837,9 @@ static gboolean focus_delay_func(gpointer data)
     ObFocusDelayData *d = data;
     Time old = event_curtime;
 
+    /* don't move focus and kill the menu or the move/resize */
+    if (menu_frame_visible || moveresize_in_progress) return FALSE;
+
     event_curtime = d->time;
     if (focus_client != d->client) {
         if (client_focus(d->client) && config_focus_raise)

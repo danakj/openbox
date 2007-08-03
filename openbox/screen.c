@@ -107,22 +107,7 @@ static gboolean replace_wm()
             current_wm_sn_owner = None;
     }
 
-    {
-        /* Generate a timestamp */
-        XEvent event;
-
-        XSelectInput(ob_display, screen_support_win, PropertyChangeMask);
-
-        XChangeProperty(ob_display, screen_support_win,
-                        prop_atoms.wm_class, prop_atoms.string,
-                        8, PropModeAppend, NULL, 0);
-        XWindowEvent(ob_display, screen_support_win,
-                     PropertyChangeMask, &event);
-
-        XSelectInput(ob_display, screen_support_win, NoEventMask);
-
-        timestamp = event.xproperty.time;
-    }
+    timestamp = event_get_server_time();
 
     XSetSelectionOwner(ob_display, wm_sn_atom, screen_support_win,
                        timestamp);
@@ -172,12 +157,14 @@ gboolean screen_annex()
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
+    attrib.event_mask = PropertyChangeMask;
     screen_support_win = XCreateWindow(ob_display,
                                        RootWindow(ob_display, ob_screen),
                                        -100, -100, 1, 1, 0,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
-                                       CWOverrideRedirect, &attrib);
+                                       CWEventMask | CWOverrideRedirect,
+                                       &attrib);
     XMapWindow(ob_display, screen_support_win);
     XLowerWindow(ob_display, screen_support_win);
 
@@ -282,8 +269,8 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_state_demands_attention;
     supported[i++] = prop_atoms.net_moveresize_window;
     supported[i++] = prop_atoms.net_wm_moveresize;
-/*
     supported[i++] = prop_atoms.net_wm_user_time;
+/*
     supported[i++] = prop_atoms.net_wm_user_time_window;
 */
     supported[i++] = prop_atoms.net_frame_extents;

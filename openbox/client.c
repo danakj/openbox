@@ -214,7 +214,7 @@ void client_manage(Window window)
     ObAppSettings *settings;
     gboolean transient = FALSE;
     Rect place, *monitor;
-    Time map_time;
+    Time launch_time, map_time;
 
     grab_server(TRUE);
 
@@ -252,6 +252,8 @@ void client_manage(Window window)
     }
 
     ob_debug("Managing window: 0x%lx\n", window);
+
+    map_time = event_get_server_time();
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
@@ -300,7 +302,7 @@ void client_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* tell startup notification that this app started */
-    map_time = sn_app_started(self->startup_id, self->class);
+    launch_time = sn_app_started(self->startup_id, self->class);
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
@@ -451,6 +453,13 @@ void client_manage(Window window)
     if (activate) {
         gboolean raise = FALSE;
 
+        /* This is focus stealing prevention */
+        ob_debug_type(OB_DEBUG_FOCUS,
+                      "Want to focus new window 0x%x at time %u "
+                      "launched at %u (last user interaction time %u)\n",
+                      self->window, map_time, launch_time,
+                      event_last_user_time);
+
         if (menu_frame_visible || moveresize_in_progress) {
             activate = FALSE;
             raise = TRUE;
@@ -464,8 +473,8 @@ void client_manage(Window window)
         else if (!(self->desktop == screen_desktop ||
               self->desktop == DESKTOP_ALL) &&
             /* the timestamp is from before you changed desktops */
-            map_time && screen_desktop_user_time &&
-            !event_time_after(map_time, screen_desktop_user_time))
+            launch_time && screen_desktop_user_time &&
+            !event_time_after(launch_time, screen_desktop_user_time))
         {
             activate = FALSE;
             raise = TRUE;
@@ -477,11 +486,21 @@ void client_manage(Window window)
         else if (focus_client && client_search_focus_tree_full(self) == NULL &&
                  client_search_focus_group_full(self) == NULL)
         {
-            /* If its a transient (and parents aren't focused) and the time
-               is ambiguous (either the current focus target doesn't have
-               a timestamp, or they are the same (we probably inherited it
-               from them) */
-            if (client_has_parent(self)) {
+            /* If the user is working in another window right now, then don't
+               steal focus */
+            if (event_last_user_time && launch_time &&
+                event_time_after(event_last_user_time, launch_time) &&
+                event_last_user_time != launch_time &&
+                event_time_after(event_last_user_time,
+                                 map_time - OB_EVENT_USER_TIME_DELAY))
+            {
+                activate = FALSE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because the user is "
+                              "working in another window\n");
+            }
+            /* If its a transient (and its parents aren't focused) */
+            else if (client_has_parent(self)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because it is a "
@@ -510,6 +529,10 @@ void client_manage(Window window)
         }
 
         if (!activate) {
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Focus stealing prevention activated for %s at "
+                          "time %u (last user interactioon time %u)\n",
+                          self->title, map_time, event_last_user_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);

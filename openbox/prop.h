@@ -131,7 +131,7 @@ typedef struct Atoms {
     Atom net_wm_icon_geometry;
 /*  Atom net_wm_pid; */
     Atom net_wm_allowed_actions;
-/*  Atom net_wm_user_time; */
+    Atom net_wm_user_time;
 /*  Atom net_wm_user_time_window; */
     Atom net_frame_extents;
 

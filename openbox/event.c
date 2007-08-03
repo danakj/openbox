@@ -97,8 +97,8 @@ static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
-/* The time for the current event being processed */
 Time event_curtime = CurrentTime;
+Time event_last_user_time = CurrentTime;
 
 static gboolean focus_left_screen = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
@@ -235,6 +235,12 @@ static void event_set_curtime(XEvent *e)
            explicitly */
         break;
     }
+
+    /* watch that if we get an event earlier than the last specified user_time,
+       which can happen if the clock goes backwards, we erase the last
+       specified user_time */
+    if (t && event_last_user_time && event_time_after(event_last_user_time, t))
+        event_last_user_time = CurrentTime;
 
     event_curtime = t;
 }
@@ -1496,6 +1502,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == prop_atoms.net_wm_icon_geometry) {
             client_update_icon_geometry(client);
         }
+        else if (msgtype == prop_atoms.net_wm_user_time) {
+            guint32 t;
+            if (PROP_GET32(client->window, net_wm_user_time, cardinal, &t) &&
+                t && !event_time_after(t, e->xproperty.time) &&
+                (!event_last_user_time ||
+                 event_time_after(t, event_last_user_time)))
+            {
+                event_last_user_time = t;
+            }
+        }
 #ifdef SYNC
         else if (msgtype == prop_atoms.net_wm_sync_request_counter) {
             client_update_sync_request_counter(client);
@@ -1933,4 +1949,16 @@ gboolean event_time_after(Time t1, Time t2)
     else
         /* t2 is in the first half so t1 has to come after it */
         return t1 >= t2 && t1 < (t2 + TIME_HALF);
+}
+
+Time event_get_server_time()
+{
+    /* Generate a timestamp */
+    XEvent event;
+
+    XChangeProperty(ob_display, screen_support_win,
+                    prop_atoms.wm_class, prop_atoms.string,
+                    8, PropModeAppend, NULL, 0);
+    XWindowEvent(ob_display, screen_support_win, PropertyChangeMask, &event);
+    return event.xproperty.time;
 }

@@ -34,7 +34,6 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "modkeys.h"
-#include "propwin.h"
 #include "mouse.h"
 #include "mainloop.h"
 #include "focus.h"
@@ -90,7 +89,6 @@ static gboolean event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void event_handle_user_time_window_clients(GSList *l, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
 static gboolean is_enter_focus_event_ignored(XEvent *e);
 
@@ -99,8 +97,8 @@ static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
-/* The time for the current event being processed */
 Time event_curtime = CurrentTime;
+Time event_last_user_time = CurrentTime;
 
 static gboolean focus_left_screen = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
@@ -238,15 +236,17 @@ static void event_set_curtime(XEvent *e)
         break;
     }
 
+    /* watch that if we get an event earlier than the last specified user_time,
+       which can happen if the clock goes backwards, we erase the last
+       specified user_time */
+    if (t && event_last_user_time && event_time_after(event_last_user_time, t))
+        event_last_user_time = CurrentTime;
+
     event_curtime = t;
 }
 
 static void event_hack_mods(XEvent *e)
 {
-#ifdef XKB
-    XkbStateRec xkb_state;
-#endif
-
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
@@ -437,7 +437,6 @@ static void event_process(const XEvent *ec, gpointer data)
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
-    GSList *timewinclients = NULL;
     XEvent ee, *e;
     ObEventData *ed = data;
 
@@ -446,27 +445,24 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
-    if (e->type != PropertyNotify ||
-        !(timewinclients = propwin_get_clients(window,
-                                               OB_PROPWIN_USER_TIME)))
-        if ((obwin = g_hash_table_lookup(window_map, &window))) {
-            switch (obwin->type) {
-            case Window_Dock:
-                dock = WINDOW_AS_DOCK(obwin);
-                break;
-            case Window_DockApp:
-                dockapp = WINDOW_AS_DOCKAPP(obwin);
-                break;
-            case Window_Client:
-                client = WINDOW_AS_CLIENT(obwin);
-                break;
-            case Window_Menu:
-            case Window_Internal:
-                /* not to be used for events */
-                g_assert_not_reached();
-                break;
-            }
+    if ((obwin = g_hash_table_lookup(window_map, &window))) {
+        switch (obwin->type) {
+        case Window_Dock:
+            dock = WINDOW_AS_DOCK(obwin);
+            break;
+        case Window_DockApp:
+            dockapp = WINDOW_AS_DOCKAPP(obwin);
+            break;
+        case Window_Client:
+            client = WINDOW_AS_CLIENT(obwin);
+            break;
+        case Window_Menu:
+        case Window_Internal:
+            /* not to be used for events */
+            g_assert_not_reached();
+            break;
         }
+    }
 
     event_set_curtime(e);
     event_hack_mods(e);
@@ -493,7 +489,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
             focus_left_screen = FALSE;
 
-            focus_fallback(FALSE, config_focus_under_mouse, TRUE);
+            focus_fallback(FALSE, config_focus_under_mouse, TRUE, TRUE);
 
             /* We don't get a FocusOut for this case, because it's just moving
                from our Inferior up to us. This happens when iconifying a
@@ -502,10 +498,10 @@ static void event_process(const XEvent *ec, gpointer data)
             /* focus_set_client(NULL) has already been called */
             client_calc_layer(client);
         }
-        if (e->xfocus.detail == NotifyPointerRoot ||
-            e->xfocus.detail == NotifyDetailNone ||
-            e->xfocus.detail == NotifyInferior ||
-            e->xfocus.detail == NotifyNonlinear)
+        else if (e->xfocus.detail == NotifyPointerRoot ||
+                 e->xfocus.detail == NotifyDetailNone ||
+                 e->xfocus.detail == NotifyInferior ||
+                 e->xfocus.detail == NotifyNonlinear)
         {
             XEvent ce;
 
@@ -545,7 +541,8 @@ static void event_process(const XEvent *ec, gpointer data)
                 */
 
                 if (!focus_left_screen)
-                    focus_fallback(FALSE, config_focus_under_mouse, TRUE);
+                    focus_fallback(FALSE, config_focus_under_mouse,
+                                   TRUE, TRUE);
             }
         }
         else if (!client)
@@ -601,7 +598,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to an unmanaged window 0x%x !\n",
                               ce.xfocus.window);
-                focus_fallback(TRUE, config_focus_under_mouse, TRUE);
+                focus_fallback(TRUE, config_focus_under_mouse, TRUE, TRUE);
             }
         }
 
@@ -611,8 +608,7 @@ static void event_process(const XEvent *ec, gpointer data)
                section or by focus_fallback */
             client_calc_layer(client);
         }
-    } else if (timewinclients)
-        event_handle_user_time_window_clients(timewinclients, e);
+    }
     else if (client)
         event_handle_client(client, e);
     else if (dockapp)
@@ -758,7 +754,7 @@ void event_enter_client(ObClient *client)
             data->time = event_curtime;
 
             ob_main_loop_timeout_add(ob_main_loop,
-                                     config_focus_delay,
+                                     config_focus_delay * 1000,
                                      focus_delay_func,
                                      data, focus_delay_cmp, focus_delay_dest);
         } else {
@@ -767,15 +763,6 @@ void event_enter_client(ObClient *client)
             data.time = event_curtime;
             focus_delay_func(&data);
         }
-    }
-}
-
-static void event_handle_user_time_window_clients(GSList *l, XEvent *e)
-{
-    g_assert(e->type == PropertyNotify);
-    if (e->xproperty.atom == prop_atoms.net_wm_user_time) {
-        for (; l; l = g_slist_next(l))
-            client_update_user_time(l->data);
     }
 }
 
@@ -1292,8 +1279,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
             /* XXX make use of data.l[2] !? */
             if (e->xclient.data.l[0] == 1 || e->xclient.data.l[0] == 2) {
-                event_curtime = e->xclient.data.l[1];
-                if (event_curtime == 0)
+                /* don't use the user's timestamp for client_focus, cuz if it's
+                   an old broken timestamp (happens all the time) then focus
+                   won't move even though we're trying to move it
+                  event_curtime = e->xclient.data.l[1];*/
+                if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_ACTIVE_WINDOW message for window %s is"
                                   " missing a timestamp\n", client->title);
@@ -1514,10 +1504,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_icon_geometry(client);
         }
         else if (msgtype == prop_atoms.net_wm_user_time) {
-            client_update_user_time(client);
-        }
-        else if (msgtype == prop_atoms.net_wm_user_time_window) {
-            client_update_user_time_window(client);
+            guint32 t;
+            if (client == focus_client &&
+                PROP_GET32(client->window, net_wm_user_time, cardinal, &t) &&
+                t && !event_time_after(t, e->xproperty.time) &&
+                (!event_last_user_time ||
+                 event_time_after(t, event_last_user_time)))
+            {
+                event_last_user_time = t;
+            }
         }
 #ifdef SYNC
         else if (msgtype == prop_atoms.net_wm_sync_request_counter) {
@@ -1844,6 +1839,9 @@ static gboolean focus_delay_func(gpointer data)
     ObFocusDelayData *d = data;
     Time old = event_curtime;
 
+    /* don't move focus and kill the menu or the move/resize */
+    if (menu_frame_visible || moveresize_in_progress) return FALSE;
+
     event_curtime = d->time;
     if (focus_client != d->client) {
         if (client_focus(d->client) && config_focus_raise)
@@ -1956,4 +1954,16 @@ gboolean event_time_after(Time t1, Time t2)
     else
         /* t2 is in the first half so t1 has to come after it */
         return t1 >= t2 && t1 < (t2 + TIME_HALF);
+}
+
+Time event_get_server_time()
+{
+    /* Generate a timestamp */
+    XEvent event;
+
+    XChangeProperty(ob_display, screen_support_win,
+                    prop_atoms.wm_class, prop_atoms.string,
+                    8, PropModeAppend, NULL, 0);
+    XWindowEvent(ob_display, screen_support_win, PropertyChangeMask, &event);
+    return event.xproperty.time;
 }

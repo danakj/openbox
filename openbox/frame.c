@@ -130,6 +130,11 @@ ObFrame *frame_new(ObClient *client)
     self->innerright = createWindow(self->window, NULL, mask, &attrib);
     self->innerbottom = createWindow(self->window, NULL, mask, &attrib);
 
+    self->innerblb = createWindow(self->innerbottom, NULL, mask, &attrib);
+    self->innerbrb = createWindow(self->innerbottom, NULL, mask, &attrib);
+    self->innerbll = createWindow(self->innerleft, NULL, mask, &attrib);
+    self->innerbrr = createWindow(self->innerright, NULL, mask, &attrib);
+
     self->title = createWindow(self->window, NULL, mask, &attrib);
     self->titleleft = createWindow(self->window, NULL, mask, &attrib);
     self->titletop = createWindow(self->window, NULL, mask, &attrib);
@@ -388,6 +393,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* position/size and map/unmap all the windows */
 
         if (!fake) {
+            gint innercornerheight =
+                ob_rr_theme->grip_width - self->size.bottom;
+
             if (self->cbwidth_l) {
                 XMoveResizeWindow(ob_display, self->innerleft,
                                   self->size.left - self->cbwidth_l,
@@ -398,6 +406,19 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             } else
                 XUnmapWindow(ob_display, self->innerleft);
 
+            if (self->cbwidth_l && innercornerheight > 0) {
+                XMoveResizeWindow(ob_display, self->innerbll,
+                                  0,
+                                  self->client->area.height - 
+                                  (ob_rr_theme->grip_width -
+                                   self->size.bottom),
+                                  self->cbwidth_l,
+                                  ob_rr_theme->grip_width - self->size.bottom);
+
+                XMapWindow(ob_display, self->innerbll);
+            } else
+                XUnmapWindow(ob_display, self->innerbll);
+
             if (self->cbwidth_r) {
                 XMoveResizeWindow(ob_display, self->innerright,
                                   self->size.left + self->client->area.width,
@@ -407,6 +428,19 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(ob_display, self->innerright);
             } else
                 XUnmapWindow(ob_display, self->innerright);
+
+            if (self->cbwidth_r && innercornerheight > 0) {
+                XMoveResizeWindow(ob_display, self->innerbrr,
+                                  0,
+                                  self->client->area.height - 
+                                  (ob_rr_theme->grip_width -
+                                   self->size.bottom),
+                                  self->cbwidth_r,
+                                  ob_rr_theme->grip_width - self->size.bottom);
+
+                XMapWindow(ob_display, self->innerbrr);
+            } else
+                XUnmapWindow(ob_display, self->innerbrr);
 
             if (self->cbwidth_t) {
                 XMoveResizeWindow(ob_display, self->innertop,
@@ -428,9 +462,26 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->cbwidth_l + self->cbwidth_r,
                                   self->cbwidth_b);
 
+                XMoveResizeWindow(ob_display, self->innerblb,
+                                  0, 0,
+                                  ob_rr_theme->grip_width + self->bwidth,
+                                  self->cbwidth_b);
+                XMoveResizeWindow(ob_display, self->innerbrb,
+                                  self->client->area.width +
+                                  self->cbwidth_l + self->cbwidth_r -
+                                  (ob_rr_theme->grip_width + self->bwidth),
+                                  0,
+                                  ob_rr_theme->grip_width + self->bwidth,
+                                  self->cbwidth_b);
+
                 XMapWindow(ob_display, self->innerbottom);
-            } else
+                XMapWindow(ob_display, self->innerblb);
+                XMapWindow(ob_display, self->innerbrb);
+            } else {
                 XUnmapWindow(ob_display, self->innerbottom);
+                XUnmapWindow(ob_display, self->innerblb);
+                XUnmapWindow(ob_display, self->innerbrb);
+            }
 
             if (self->bwidth) {
                 gint titlesides;
@@ -598,7 +649,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->bwidth);
                 XMoveResizeWindow(ob_display, self->rgripbottom,
                                   self->size.left + self->client->area.width +
-                                  self->size.right - self->bwidth - sidebwidth -
+                                  self->size.right - self->bwidth - sidebwidth-
                                   ob_rr_theme->grip_width,
                                   self->size.top + self->client->area.height +
                                   self->size.bottom - self->bwidth,
@@ -876,12 +927,16 @@ static void frame_adjust_cursors(ObFrame *self)
         XChangeWindowAttributes(ob_display, self->lgripleft, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->lgriptop, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->lgripbottom, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerbll, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerblb, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHEAST : OB_CURSOR_NONE);
         XChangeWindowAttributes(ob_display, self->rgrip, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->handleright, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->rgripright, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->rgriptop, CWCursor, &a);
         XChangeWindowAttributes(ob_display, self->rgripbottom, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerbrr, CWCursor, &a);
+        XChangeWindowAttributes(ob_display, self->innerbrb, CWCursor, &a);
     }
 }
 
@@ -1539,6 +1594,13 @@ void frame_rect_to_frame(ObFrame *self, Rect *r)
     r->width += self->size.left + self->size.right;
     r->height += self->size.top + self->size.bottom;
     frame_client_gravity(self, &r->x, &r->y);
+}
+
+void frame_rect_to_client(ObFrame *self, Rect *r)
+{
+    r->width -= self->size.left + self->size.right;
+    r->height -= self->size.top + self->size.bottom;
+    frame_frame_gravity(self, &r->x, &r->y);
 }
 
 static void flash_done(gpointer data)

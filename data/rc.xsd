@@ -89,6 +89,7 @@
                 <xsd:element maxOccurs="unbounded" name="name" type="xsd:string"/>
             </xsd:complexType>
         </xsd:element>
+        <xsd:element minOccurs="0" name="popupTime" type="xsd:integer"/>
     </xsd:complexType>
     <xsd:complexType name="resize">
         <xsd:element minOccurs="0" name="drawContents" type="ob:bool"/>

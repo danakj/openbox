@@ -21,97 +21,114 @@
 #include "frame.h"
 #include "stacking.h"
 #include "screen.h"
+#include "dock.h"
 #include "config.h"
 #include "parser/parse.h"
 
 #include <glib.h>
 
-void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
+static gboolean resist_move_window(Rect window,
+                                   Rect target, gint resist,
+                                   gint *x, gint *y)
 {
-    GList *it;
     gint l, t, r, b; /* requested edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
-    ObClient *snapx = NULL, *snapy = NULL;
+    gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
+    gboolean snapx = 0, snapy = 0;
 
-    if (!resist) return;
-
-    frame_client_gravity(c->frame, x, y);
-
-    w = c->frame->area.width;
-    h = c->frame->area.height;
+    w = window.width;
+    h = window.height;
 
     l = *x;
     t = *y;
     r = l + w - 1;
     b = t + h - 1;
 
-    cl = RECT_LEFT(c->frame->area);
-    ct = RECT_TOP(c->frame->area);
-    cr = RECT_RIGHT(c->frame->area);
-    cb = RECT_BOTTOM(c->frame->area);
+    cl = RECT_LEFT(window);
+    ct = RECT_TOP(window);
+    cr = RECT_RIGHT(window);
+    cb = RECT_BOTTOM(window);
+
+    tl = RECT_LEFT(target) - 1;
+    tt = RECT_TOP(target) - 1;
+    tr = RECT_RIGHT(target) + 1;
+    tb = RECT_BOTTOM(target) + 1;
+
+    /* snapx and snapy ensure that the window snaps to the top-most
+       window edge available, without going all the way from
+       bottom-to-top in the stacking list
+    */
+    if (!snapx) {
+        if (ct < tb && cb > tt) {
+            if (cl >= tr && l < tr && l >= tr - resist)
+                *x = tr, snapx = TRUE;
+            else if (cr <= tl && r > tl &&
+                     r <= tl + resist)
+                *x = tl - w + 1, snapx = TRUE;
+            if (snapx) {
+                /* try to corner snap to the window */
+                if (ct > tt && t <= tt &&
+                    t > tt - resist)
+                    *y = tt + 1, snapy = TRUE;
+                else if (cb < tb && b >= tb &&
+                         b < tb + resist)
+                    *y = tb - h, snapy = TRUE;
+            }
+        }
+    }
+    if (!snapy) {
+        if (cl < tr && cr > tl) {
+            if (ct >= tb && t < tb && t >= tb - resist)
+                *y = tb, snapy = TRUE;
+            else if (cb <= tt && b > tt &&
+                     b <= tt + resist)
+                *y = tt - h + 1, snapy = TRUE;
+            if (snapy) {
+                /* try to corner snap to the window */
+                if (cl > tl && l <= tl &&
+                    l > tl - resist)
+                    *x = tl + 1, snapx = TRUE;
+                else if (cr < tr && r >= tr &&
+                         r < tr + resist)
+                    *x = tr - w, snapx = TRUE;
+            }
+        }
+    }
+
+    return snapx && snapy;
+}
+
+void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
+{
+    GList *it;
+    Rect dock_area;
+
+    if (!resist) return;
+
+    frame_client_gravity(c->frame, x, y);
+
 
     for (it = stacking_list; it; it = g_list_next(it)) {
         ObClient *target;
-        gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
         if (!WINDOW_IS_CLIENT(it->data))
             continue;
         target = it->data;
 
         /* don't snap to self or non-visibles */
-        if (!target->frame->visible || target == c) continue;
+        if (!target->frame->visible || target == c)
+            continue;
         /* don't snap to windows set to below and skip_taskbar (desklets) */
-        if (target->below && !c->below && target->skip_taskbar) continue;
+        if (target->below && !c->below && target->skip_taskbar)
+            continue;
 
-        tl = RECT_LEFT(target->frame->area) - 1;
-        tt = RECT_TOP(target->frame->area) - 1;
-        tr = RECT_RIGHT(target->frame->area) + 1;
-        tb = RECT_BOTTOM(target->frame->area) + 1;
-
-        /* snapx and snapy ensure that the window snaps to the top-most
-           window edge available, without going all the way from
-           bottom-to-top in the stacking list
-        */
-        if (snapx == NULL) {
-            if (ct < tb && cb > tt) {
-                if (cl >= tr && l < tr && l >= tr - resist)
-                    *x = tr, snapx = target;
-                else if (cr <= tl && r > tl &&
-                         r <= tl + resist)
-                    *x = tl - w + 1, snapx = target;
-                if (snapx != NULL) {
-                    /* try to corner snap to the window */
-                    if (ct > tt && t <= tt &&
-                        t > tt - resist)
-                        *y = tt + 1, snapy = target;
-                    else if (cb < tb && b >= tb &&
-                             b < tb + resist)
-                        *y = tb - h, snapy = target;
-                }
-            }
-        }
-        if (snapy == NULL) {
-            if (cl < tr && cr > tl) {
-                if (ct >= tb && t < tb && t >= tb - resist)
-                    *y = tb, snapy = target;
-                else if (cb <= tt && b > tt &&
-                         b <= tt + resist)
-                    *y = tt - h + 1, snapy = target;
-                if (snapy != NULL) {
-                    /* try to corner snap to the window */
-                    if (cl > tl && l <= tl &&
-                        l > tl - resist)
-                        *x = tl + 1, snapx = target;
-                    else if (cr < tr && r >= tr &&
-                             r < tr + resist)
-                        *x = tr - w, snapx = target;
-                }
-            }
-        }
-
-        if (snapx && snapy) break;
+        if (resist_move_window(c->frame->area, target->frame->area,
+                               resist, x, y))
+            break;
     }
+    dock_get_area(&dock_area);
+    resist_move_window(c->frame->area, dock_area, resist, x, y);
 
     frame_frame_gravity(c->frame, x, y);
 }
@@ -191,26 +208,96 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     frame_frame_gravity(c->frame, x, y);
 }
 
+static gboolean resist_size_window(Rect window, Rect target, gint resist,
+                                   gint *w, gint *h, ObDirection dir)
+{
+    gint l, t, r, b; /* my left, top, right and bottom sides */
+    gint tl, tt, tr, tb; /* target's left, top, right and bottom bottom sides*/
+    gint dlt, drb; /* my destination left/top and right/bottom sides */
+    gboolean snapx = 0, snapy = 0;
+    gint orgw, orgh;
+
+    l = RECT_LEFT(window);
+    t = RECT_TOP(window);
+    r = RECT_RIGHT(window);
+    b = RECT_BOTTOM(window);
+
+    orgw = window.width;
+    orgh = window.height;
+
+    tl = RECT_LEFT(target);
+    tt = RECT_TOP(target);
+    tr = RECT_RIGHT(target);
+    tb = RECT_BOTTOM(target);
+
+    if (!snapx) {
+        /* horizontal snapping */
+        if (t < tb && b > tt) {
+            switch (dir) {
+            case OB_DIRECTION_EAST:
+            case OB_DIRECTION_NORTHEAST:
+            case OB_DIRECTION_SOUTHEAST:
+            case OB_DIRECTION_NORTH:
+            case OB_DIRECTION_SOUTH:
+                dlt = l;
+                drb = r + *w - orgw;
+                if (r < tl && drb >= tl &&
+                    drb < tl + resist)
+                    *w = tl - l, snapx = TRUE;
+                break;
+            case OB_DIRECTION_WEST:
+            case OB_DIRECTION_NORTHWEST:
+            case OB_DIRECTION_SOUTHWEST:
+                dlt = l - *w + orgw;
+                drb = r;
+                if (l > tr && dlt <= tr &&
+                    dlt > tr - resist)
+                    *w = r - tr, snapx = TRUE;
+                break;
+            }
+        }
+    }
+
+    if (!snapy) {
+        /* vertical snapping */
+        if (l < tr && r > tl) {
+            switch (dir) {
+            case OB_DIRECTION_SOUTH:
+            case OB_DIRECTION_SOUTHWEST:
+            case OB_DIRECTION_SOUTHEAST:
+            case OB_DIRECTION_EAST:
+            case OB_DIRECTION_WEST:
+                dlt = t;
+                drb = b + *h - orgh;
+                if (b < tt && drb >= tt &&
+                    drb < tt + resist)
+                    *h = tt - t, snapy = TRUE;
+                break;
+            case OB_DIRECTION_NORTH:
+            case OB_DIRECTION_NORTHWEST:
+            case OB_DIRECTION_NORTHEAST:
+                dlt = t - *h + orgh;
+                drb = b;
+                if (t > tb && dlt <= tb &&
+                    dlt > tb - resist)
+                    *h = b - tb, snapy = TRUE;
+                break;
+            }
+        }
+    }
+
+    /* snapped both ways */
+    return snapx && snapy;
+}
+
 void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
                          ObDirection dir)
 {
     GList *it;
     ObClient *target; /* target */
-    gint l, t, r, b; /* my left, top, right and bottom sides */
-    gint dlt, drb; /* my destination left/top and right/bottom sides */
-    gint tl, tt, tr, tb; /* target's left, top, right and bottom bottom sides*/
-    gint incw, inch;
-    ObClient *snapx = NULL, *snapy = NULL;
+    Rect dock_area;
 
     if (!resist) return;
-
-    incw = c->size_inc.width;
-    inch = c->size_inc.height;
-
-    l = RECT_LEFT(c->frame->area);
-    r = RECT_RIGHT(c->frame->area);
-    t = RECT_TOP(c->frame->area);
-    b = RECT_BOTTOM(c->frame->area);
 
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (!WINDOW_IS_CLIENT(it->data))
@@ -218,74 +305,19 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
         target = it->data;
 
         /* don't snap to invisibles or ourself */
-        if (!target->frame->visible || target == c) continue;
+        if (!target->frame->visible || target == c)
+            continue;
         /* don't snap to windows set to below and skip_taskbar (desklets) */
-        if (target->below && !c->below && target->skip_taskbar) continue;
+        if (target->below && !c->below && target->skip_taskbar)
+            continue;
 
-        tl = RECT_LEFT(target->frame->area);
-        tr = RECT_RIGHT(target->frame->area);
-        tt = RECT_TOP(target->frame->area);
-        tb = RECT_BOTTOM(target->frame->area);
-
-        if (snapx == NULL) {
-            /* horizontal snapping */
-            if (t < tb && b > tt) {
-                switch (dir) {
-                case OB_DIRECTION_EAST:
-                case OB_DIRECTION_NORTHEAST:
-                case OB_DIRECTION_SOUTHEAST:
-                case OB_DIRECTION_NORTH:
-                case OB_DIRECTION_SOUTH:
-                    dlt = l;
-                    drb = r + *w - c->frame->area.width;
-                    if (r < tl && drb >= tl &&
-                        drb < tl + resist)
-                        *w = tl - l, snapx = target;
-                    break;
-                case OB_DIRECTION_WEST:
-                case OB_DIRECTION_NORTHWEST:
-                case OB_DIRECTION_SOUTHWEST:
-                    dlt = l - *w + c->frame->area.width;
-                    drb = r;
-                    if (l > tr && dlt <= tr &&
-                        dlt > tr - resist)
-                        *w = r - tr, snapx = target;
-                    break;
-                }
-            }
-        }
-
-        if (snapy == NULL) {
-            /* vertical snapping */
-            if (l < tr && r > tl) {
-                switch (dir) {
-                case OB_DIRECTION_SOUTH:
-                case OB_DIRECTION_SOUTHWEST:
-                case OB_DIRECTION_SOUTHEAST:
-                case OB_DIRECTION_EAST:
-                case OB_DIRECTION_WEST:
-                    dlt = t;
-                    drb = b + *h - c->frame->area.height;
-                    if (b < tt && drb >= tt &&
-                        drb < tt + resist)
-                        *h = tt - t, snapy = target;
-                    break;
-                case OB_DIRECTION_NORTH:
-                case OB_DIRECTION_NORTHWEST:
-                case OB_DIRECTION_NORTHEAST:
-                    dlt = t - *h + c->frame->area.height;
-                    drb = b;
-                    if (t > tb && dlt <= tb &&
-                        dlt > tb - resist)
-                        *h = b - tb, snapy = target;
-                    break;
-                }
-            }
-        }
-
-        /* snapped both ways */
-        if (snapx && snapy) break;
+        if (resist_size_window(c->frame->area, target->frame->area,
+                               resist, w, h, dir))
+            break;
     }
+    dock_get_area(&dock_area);
+    resist_size_window(c->frame->area, dock_area,
+                       resist, w, h, dir);
 }
 
 void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,

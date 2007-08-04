@@ -316,9 +316,9 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
 
                 if (r->width >= c->frame->area.width &&
                     r->height >= c->frame->area.height &&
-                    r->width > maxsize)
+                    r->width * r->height > maxsize)
                 {
-                    maxsize = r->width;
+                    maxsize = r->width * r->height;
                     maxit = sit;
                 }
             }

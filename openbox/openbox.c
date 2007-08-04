@@ -42,7 +42,6 @@
 #include "menuframe.h"
 #include "grab.h"
 #include "group.h"
-#include "propwin.h"
 #include "config.h"
 #include "mainloop.h"
 #include "gettext.h"
@@ -301,7 +300,6 @@ gint main(gint argc, gchar **argv)
             sn_startup(reconfigure);
             screen_startup(reconfigure);
             grab_startup(reconfigure);
-            propwin_startup(reconfigure);
             group_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
@@ -363,7 +361,6 @@ gint main(gint argc, gchar **argv)
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
             group_shutdown(reconfigure);
-            propwin_shutdown(reconfigure);
             grab_shutdown(reconfigure);
             screen_shutdown(reconfigure);
             focus_cycle_popup_shutdown(reconfigure);

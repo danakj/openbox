@@ -120,6 +120,10 @@ struct _ObFrame
     Window    innertop;     /*!< For drawing the inner client border */
     Window    innerright;   /*!< For drawing the inner client border */
     Window    innerbottom;  /*!< For drawing the inner client border */
+    Window    innerblb;
+    Window    innerbll;
+    Window    innerbrb;
+    Window    innerbrr;
     Window    backback;     /*!< A colored window shown while resizing */
     Window    backfront;    /*!< An undrawn-in window, to prevent flashing on
                                  unmap */

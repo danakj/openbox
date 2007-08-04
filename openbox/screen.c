@@ -560,7 +560,9 @@ static void screen_fallback_focus()
        do this before hiding the windows so if helper windows are coming
        with us, they don't get hidden
     */
-    if ((c = focus_fallback(TRUE, !config_focus_last, allow_omni))) {
+    if ((c = focus_fallback(TRUE, !config_focus_last, allow_omni,
+                            !allow_omni)))
+    {
         /* only do the flicker reducing stuff ahead of time if we are going
            to call xsetinputfocus on the window ourselves. otherwise there is
            no guarantee the window will actually take focus.. */
@@ -1137,7 +1139,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     else if (!show_only) {
         ObClient *c;
 
-        if ((c = focus_fallback(TRUE, FALSE, TRUE))) {
+        if ((c = focus_fallback(TRUE, FALSE, TRUE, FALSE))) {
             /* only do the flicker reducing stuff ahead of time if we are going
                to call xsetinputfocus on the window ourselves. otherwise there
                is no guarantee the window will actually take focus.. */

@@ -37,7 +37,7 @@ typedef struct
     guint desktop;
 } DesktopData;
 
-#define CLIENT -1
+#define SEPARATOR -1
 #define ADD_DESKTOP -2
 #define REMOVE_DESKTOP -3
 
@@ -63,11 +63,11 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 
             if (c->iconic) {
                 gchar *title = g_strdup_printf("(%s)", c->icon_title);
-                e = menu_add_normal(menu, CLIENT, title, NULL, FALSE);
+                e = menu_add_normal(menu, d->desktop, title, NULL, FALSE);
                 g_free(title);
             } else {
                 onlyiconic = FALSE;
-                e = menu_add_normal(menu, CLIENT, c->title, NULL, FALSE);
+                e = menu_add_normal(menu, d->desktop, c->title, NULL, FALSE);
             }
 
             if (config_menu_client_list_icons
@@ -88,7 +88,7 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
         /* no entries or only iconified windows, so add a
          * way to go to this desktop without uniconifying a window */
         if (!empty)
-            menu_add_separator(menu, CLIENT, NULL);
+            menu_add_separator(menu, SEPARATOR, NULL);
 
         e = menu_add_normal(menu, d->desktop, _("Go there..."), NULL, TRUE);
         if (d->desktop == screen_desktop)
@@ -101,9 +101,13 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 static void desk_menu_execute(ObMenuEntry *self, ObMenuFrame *f,
                               ObClient *c, guint state, gpointer data)
 {
-    if (self->id == CLIENT) {
-        if (self->data.normal.data) /* it's set to NULL if its destroyed */
-            client_activate(self->data.normal.data, FALSE, TRUE, TRUE, TRUE);
+    ObClient *t = self->data.normal.data;
+    if (t) { /* it's set to NULL if its destroyed */
+        client_activate(t, FALSE, TRUE, TRUE, TRUE);
+        /* if the window is omnipresent then we need to go to its
+           desktop */
+        if (t->desktop == DESKTOP_ALL)
+            screen_set_desktop(self->id, FALSE);
     }
     else
         screen_set_desktop(self->id, TRUE);
@@ -148,7 +152,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         desktop_menus = g_slist_append(desktop_menus, submenu);
     }
 
-    menu_add_separator(menu, CLIENT, NULL);
+    menu_add_separator(menu, SEPARATOR, NULL);
     menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, TRUE);
     menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove last desktop"),
                     NULL, TRUE);

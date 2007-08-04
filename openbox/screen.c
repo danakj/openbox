@@ -26,6 +26,7 @@
 #include "startupnotify.h"
 #include "moveresize.h"
 #include "config.h"
+#include "mainloop.h"
 #include "screen.h"
 #include "client.h"
 #include "session.h"
@@ -73,7 +74,7 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup *desktop_cycle_popup;
+static ObPagerPopup *desktop_popup;
 
 static gboolean replace_wm()
 {
@@ -342,12 +343,12 @@ void screen_startup(gboolean reconfig)
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_cycle_popup = pager_popup_new(FALSE);
-    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
+    desktop_popup = pager_popup_new(FALSE);
+    pager_popup_height(desktop_popup, POPUP_HEIGHT);
 
     if (reconfig) {
         /* update the pager popup's width */
-        pager_popup_text_width_to_strings(desktop_cycle_popup,
+        pager_popup_text_width_to_strings(desktop_popup,
                                           screen_desktop_names,
                                           screen_num_desktops);
         return;
@@ -430,7 +431,7 @@ void screen_startup(gboolean reconfig)
 
 void screen_shutdown(gboolean reconfig)
 {
-    pager_popup_free(desktop_cycle_popup);
+    pager_popup_free(desktop_popup);
 
     if (reconfig)
         return;
@@ -618,6 +619,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;
+
+    if (ob_state() == OB_STATE_RUNNING)
+        screen_show_desktop_popup(screen_desktop);
 }
 
 void screen_add_desktop(gboolean current)
@@ -804,25 +808,34 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-void screen_desktop_popup(guint d, gboolean show)
+static gboolean hide_desktop_popup_func(gpointer data)
+{
+    pager_popup_hide(desktop_popup);
+    return FALSE; /* don't repeat */
+}
+
+void screen_show_desktop_popup(guint d)
 {
     Rect *a;
 
-    if (!show) {
-        pager_popup_hide(desktop_cycle_popup);
-    } else {
-        a = screen_physical_area_active();
-        pager_popup_position(desktop_cycle_popup, CenterGravity,
-                             a->x + a->width / 2, a->y + a->height / 2);
-        pager_popup_icon_size_multiplier(desktop_cycle_popup,
-                                         (screen_desktop_layout.columns /
-                                          screen_desktop_layout.rows) / 2,
-                                         (screen_desktop_layout.rows/
-                                          screen_desktop_layout.columns) / 2);
-        pager_popup_max_width(desktop_cycle_popup,
-                              MAX(a->width/3, POPUP_WIDTH));
-        pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
-    }
+    /* 0 means don't show the popup */
+    if (!config_desktop_popup_time) return;
+
+    a = screen_physical_area_active();
+    pager_popup_position(desktop_popup, CenterGravity,
+                         a->x + a->width / 2, a->y + a->height / 2);
+    pager_popup_icon_size_multiplier(desktop_popup,
+                                     (screen_desktop_layout.columns /
+                                      screen_desktop_layout.rows) / 2,
+                                     (screen_desktop_layout.rows/
+                                      screen_desktop_layout.columns) / 2);
+    pager_popup_max_width(desktop_popup,
+                          MAX(a->width/3, POPUP_WIDTH));
+    pager_popup_show(desktop_popup, screen_desktop_names[d], d);
+
+    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
+                             hide_desktop_popup_func, NULL, NULL, NULL);
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,
@@ -929,30 +942,6 @@ guint screen_find_desktop(guint from, ObDirection dir,
         d = translate_row_col(r, c);
     }
     return d;
-}
-
-guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
-                           gboolean dialog, gboolean done, gboolean cancel)
-{
-    static guint d = (guint)-1;
-    guint ret;
-
-    if (d == (guint)-1)
-        d = screen_desktop;
-
-    if ((!cancel && !done) || !dialog)
-        d = screen_find_desktop(d, dir, wrap, linear);
-
-    if (dialog && !cancel && !done)
-        screen_desktop_popup(d, TRUE);
-    else
-        screen_desktop_popup(0, FALSE);
-    ret = d;
-
-    if (!dialog || cancel || done)
-        d = (guint)-1;
-
-    return ret;
 }
 
 static gboolean screen_validate_layout(ObDesktopLayout *l)
@@ -1081,7 +1070,7 @@ void screen_update_desktop_names()
     }
 
     /* resize the pager for these names */
-    pager_popup_text_width_to_strings(desktop_cycle_popup,
+    pager_popup_text_width_to_strings(desktop_popup,
                                       screen_desktop_names,
                                       screen_num_desktops);
 }

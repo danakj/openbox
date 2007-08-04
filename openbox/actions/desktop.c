@@ -132,10 +132,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         d = o->abs.desktop;
         break;
     case RELATIVE:
-        d = screen_cycle_desktop(o->rel.dir,
-                                 o->rel.wrap,
-                                 o->rel.linear,
-                                 FALSE, TRUE, FALSE);
+        d = screen_find_desktop(screen_desktop,
+                                o->rel.dir, o->rel.wrap, o->rel.linear);
         break;
     }
 

@@ -57,6 +57,7 @@ RrFont *config_font_osd;
 gint    config_desktops_num;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
+guint   config_desktop_popup_time;
 
 gboolean config_resize_redraw;
 gboolean config_resize_four_corners;
@@ -478,7 +479,7 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("followMouse", node)))
         config_focus_follow = parse_bool(doc, n);
     if ((n = parse_find_node("focusDelay", node)))
-        config_focus_delay = parse_int(doc, n) * 1000;
+        config_focus_delay = parse_int(doc, n);
     if ((n = parse_find_node("raiseOnFocus", node)))
         config_focus_raise = parse_bool(doc, n);
     if ((n = parse_find_node("focusLast", node)))
@@ -634,6 +635,8 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             nname = parse_find_node("name", nname->next);
         }
     }
+    if ((n = parse_find_node("popupTime", node)))
+        config_desktop_popup_time = parse_int(doc, n);
 }
 
 static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -724,9 +727,9 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("autoHide", node)))
         config_dock_hide = parse_bool(doc, n);
     if ((n = parse_find_node("hideDelay", node)))
-        config_dock_hide_delay = parse_int(doc, n) * 1000;
+        config_dock_hide_delay = parse_int(doc, n);
     if ((n = parse_find_node("showDelay", node)))
-        config_dock_show_delay = parse_int(doc, n) * 1000;
+        config_dock_show_delay = parse_int(doc, n);
     if ((n = parse_find_node("moveButton", node))) {
         gchar *str = parse_string(doc, n);
         guint b, s;
@@ -900,6 +903,7 @@ void config_startup(ObParseInst *i)
     config_desktops_num = 4;
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
+    config_desktop_popup_time = 500;
 
     parse_register(i, "desktops", parse_desktops, NULL);
 

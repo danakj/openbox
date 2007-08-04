@@ -753,7 +753,7 @@ void event_enter_client(ObClient *client)
             data->time = event_curtime;
 
             ob_main_loop_timeout_add(ob_main_loop,
-                                     config_focus_delay,
+                                     config_focus_delay * 1000,
                                      focus_delay_func,
                                      data, focus_delay_cmp, focus_delay_dest);
         } else {

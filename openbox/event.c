@@ -1504,7 +1504,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         else if (msgtype == prop_atoms.net_wm_user_time) {
             guint32 t;
-            if (PROP_GET32(client->window, net_wm_user_time, cardinal, &t) &&
+            if (client == focus_client &&
+                PROP_GET32(client->window, net_wm_user_time, cardinal, &t) &&
                 t && !event_time_after(t, e->xproperty.time) &&
                 (!event_last_user_time ||
                  event_time_after(t, event_last_user_time)))

@@ -526,9 +526,8 @@ static void do_edge_warp(gint x, gint y)
     }
 
     if (dir != edge_warp_dir) {
-        if (dir == (ObDirection)-1)
-            cancel_edge_warp();
-        else {
+        cancel_edge_warp();
+        if (dir != (ObDirection)-1) {
             edge_warp_odd = TRUE; /* switch on the first timeout */
             ob_main_loop_timeout_add(ob_main_loop,
                                      config_mouse_screenedgetime * 1000,

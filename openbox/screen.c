@@ -54,6 +54,7 @@
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm();
 static void     screen_tell_ksplash();
+static void     screen_fallback_focus();
 
 guint    screen_num_desktops;
 guint    screen_num_monitors;
@@ -535,13 +536,50 @@ void screen_set_num_desktops(guint num)
         screen_set_desktop(num - 1, TRUE);
 }
 
-void screen_set_desktop(guint num, gboolean dofocus)
+static void screen_fallback_focus()
 {
     ObClient *c;
+    gboolean allow_omni;
+
+    /* only allow omnipresent windows to get focus on desktop change if
+       an omnipresent window is already focused (it'll keep focus probably, but
+       maybe not depending on mouse-focus options) */
+    allow_omni = focus_client && (client_normal(focus_client) &&
+                                  focus_client->desktop == DESKTOP_ALL);
+
+    /* the client moved there already so don't move focus. prevent flicker
+       on sendtodesktop + follow */
+    if (focus_client && focus_client->desktop == screen_desktop)
+        return;
+
+    /* have to try focus here because when you leave an empty desktop
+       there is no focus out to watch for. also, we have different rules
+       here. we always allow it to look under the mouse pointer if
+       config_focus_last is FALSE
+
+       do this before hiding the windows so if helper windows are coming
+       with us, they don't get hidden
+    */
+    if ((c = focus_fallback(TRUE, !config_focus_last, allow_omni))) {
+        /* only do the flicker reducing stuff ahead of time if we are going
+           to call xsetinputfocus on the window ourselves. otherwise there is
+           no guarantee the window will actually take focus.. */
+        if (c->can_focus) {
+            /* reduce flicker by hiliting now rather than waiting for the
+               server FocusIn event */
+            frame_adjust_focus(c->frame, TRUE);
+            /* do this here so that if you switch desktops to a window with
+               helper windows then the helper windows won't flash */
+            client_bring_helper_windows(c);
+        }
+    }
+}
+
+void screen_set_desktop(guint num, gboolean dofocus)
+{
     GList *it;
     guint old;
     gulong ignore_start;
-    gboolean allow_omni;
 
     g_assert(num < screen_num_desktops);
 
@@ -573,39 +611,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    /* only allow omnipresent windows to get focus on desktop change if
-       an omnipresent window is already focused (it'll keep focus probably, but
-       maybe not depending on mouse-focus options) */
-    allow_omni = focus_client && (client_normal(focus_client) &&
-                                  focus_client->desktop == DESKTOP_ALL);
-
-    /* the client moved there already so don't move focus. prevent flicker
-       on sendtodesktop + follow */
-    if (focus_client && focus_client->desktop == screen_desktop)
-        dofocus = FALSE;
-
-    /* have to try focus here because when you leave an empty desktop
-       there is no focus out to watch for. also, we have different rules
-       here. we always allow it to look under the mouse pointer if
-       config_focus_last is FALSE
-
-       do this before hiding the windows so if helper windows are coming
-       with us, they don't get hidden
-    */
-    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last, allow_omni)))
-    {
-        /* only do the flicker reducing stuff ahead of time if we are going
-           to call xsetinputfocus on the window ourselves. otherwise there is
-           no guarantee the window will actually take focus.. */
-        if (c->can_focus) {
-            /* reduce flicker by hiliting now rather than waiting for the
-               server FocusIn event */
-            frame_adjust_focus(c->frame, TRUE);
-            /* do this here so that if you switch desktops to a window with
-               helper windows then the helper windows won't flash */
-            client_bring_helper_windows(c);
-        }
-    }
+    if (dofocus) screen_fallback_focus();
 
     /* hide windows from bottom to top */
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
@@ -626,6 +632,11 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
 void screen_add_desktop(gboolean current)
 {
+    gulong ignore_start;
+
+    /* ignore enter events caused by this */
+    ignore_start = event_start_ignore_all_enters();
+
     screen_set_num_desktops(screen_num_desktops+1);
 
     /* move all the clients over */
@@ -644,14 +655,20 @@ void screen_add_desktop(gboolean current)
             }
         }
     }
+
+    event_end_ignore_all_enters(ignore_start);
 }
 
 void screen_remove_desktop(gboolean current)
 {
     guint rmdesktop, movedesktop;
     GList *it, *stacking_copy;
+    gulong ignore_start;
 
     if (screen_num_desktops <= 1) return;
+
+    /* ignore enter events caused by this */
+    ignore_start = event_start_ignore_all_enters();
 
     /* what desktop are we removing and moving to? */
     if (current)
@@ -689,15 +706,15 @@ void screen_remove_desktop(gboolean current)
         }
     }
 
-    /* act like we're changing desktops */
+    /* fallback focus like we're changing desktops */
     if (screen_desktop < screen_num_desktops - 1) {
-        gint d = screen_desktop;
-        screen_desktop = screen_last_desktop;
-        screen_set_desktop(d, TRUE);
+        screen_fallback_focus();
         ob_debug("fake desktop change\n");
     }
 
     screen_set_num_desktops(screen_num_desktops-1);
+
+    event_end_ignore_all_enters(ignore_start);
 }
 
 static void get_row_col(guint d, guint *r, guint *c)

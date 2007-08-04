@@ -377,6 +377,10 @@ void client_menu_startup()
     menu_set_place_func(menu, client_menu_place);
     menu_set_execute_func(menu, client_menu_execute);
 
+    menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
+
+    menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
+
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_toggled_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
@@ -408,12 +412,6 @@ void client_menu_startup()
     menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
 
     menu_add_normal(menu, CLIENT_DECORATE, _("Un/_Decorate"), NULL, TRUE);
-
-    menu_add_separator(menu, -1, NULL);
-
-    menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
-
-    menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
     menu_add_separator(menu, -1, NULL);
 

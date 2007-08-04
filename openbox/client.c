@@ -471,10 +471,10 @@ void client_manage(Window window)
 
         /* if it's on another desktop */
         else if (!(self->desktop == screen_desktop ||
-              self->desktop == DESKTOP_ALL) &&
-            /* the timestamp is from before you changed desktops */
-            launch_time && screen_desktop_user_time &&
-            !event_time_after(launch_time, screen_desktop_user_time))
+                   self->desktop == DESKTOP_ALL) &&
+                 /* the timestamp is from before you changed desktops */
+                 launch_time && screen_desktop_user_time &&
+                 !event_time_after(launch_time, screen_desktop_user_time))
         {
             activate = FALSE;
             raise = TRUE;
@@ -525,6 +525,15 @@ void client_manage(Window window)
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because another window "
                               "would get the focus anyway\n");
+            }
+            else if (!(self->desktop == screen_desktop ||
+                       self->desktop == DESKTOP_ALL))
+            {
+                activate = FALSE;
+                raise = TRUE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because it is on "
+                              "another desktop and no relatives are focused ");
             }
         }
 

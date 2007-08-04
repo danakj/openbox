@@ -116,7 +116,7 @@
     <name>desktop 2</name>
     -->
   </names>
-  <popupTime>500</popupTime>
+  <popupTime>875</popupTime>
   <!-- The number of milliseconds to show the popup for when switching
        desktops.  Set this to 0 to disable the popup. -->
 </desktops>

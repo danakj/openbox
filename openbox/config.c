@@ -903,7 +903,7 @@ void config_startup(ObParseInst *i)
     config_desktops_num = 4;
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
-    config_desktop_popup_time = 500;
+    config_desktop_popup_time = 875;
 
     parse_register(i, "desktops", parse_desktops, NULL);
 

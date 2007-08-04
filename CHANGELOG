@@ -1,3 +1,43 @@
+3.4.4:
+  * Updated Traditional Chinese translation
+  * Updated Norwegian translation
+  * Let you specify the vertical and horizontal padding independently in themes
+  * Fix so that if you select an omnipresent window on another desktop in the
+    client list menus, it will go to that desktop
+  * Make the GrowToEdge action shrink once there is no more room to grow,
+    similar to in 3.4.2, but shrinking to edges as well
+  * Move the Send To and Layers submenus to the top of the client menu
+  * Fix race causing omnipresent windows to lose focus when switching desktops
+    very quickly
+  * Don't focus new windows on other desktops if they aren't related to the
+    currently focused window
+  * Add corner resizing areas in the inner client border (Fixes themes such
+    as Onyx)
+  * New focus stealing prevention that is smart and not intrusive and not
+    annoying
+  * Revert a small change in 3.4.3 that caused windows to be placed funny in
+    Smart placement when there was a dock or something on the side of the
+    screen
+  * Show a notification when switching desktops
+  * Fix for delayed focus-follows-mouse interrupting move/resize or menus
+  * Make screen edge warp keep warping without having the move the mouse 1
+    pixel
+  * Fix for resizing terminals in the top/left sides getting a little confused
+  * Fix to keep oldschool (Non-EWMH) fullscreen windows from being moved and
+    resized inside of the struts (Fixes Acroread)
+  * Accept the <command> option for the Restart command, similar to the Execute
+    action
+  * Don't make clicking on dock apps sometimes act like clicking on the root
+    window (Don't propogate button events up)
+  * Fix a bug introduced in 3.4.3 which caused the Windows key as a modifier
+    for bindings to not work properly
+  * Let windows skip across monitors in a Xinerama setup when using MoveToEdge
+    or Shift-arrow in an interactive move
+  * Make move and resize take the dock into account for resistance
+  * Raise new windows when it makes sense, when they aren't being focused
+  * Change default config to use click events for mouse wheel bindings instead
+    of presses
+
 3.4.3:
   * Add Ukrainian translation
   * Updated translations:

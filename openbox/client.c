@@ -3805,7 +3805,7 @@ static void detect_edge(Rect area, ObDirection dir,
     gint edge_start, edge_size, head, tail;
     gboolean skip_head = FALSE, skip_tail = FALSE;
 
-    switch(dir) {
+    switch (dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_SOUTH:
             edge_start = area.x;
@@ -3825,7 +3825,7 @@ static void detect_edge(Rect area, ObDirection dir,
                 edge_start, edge_size))
         return;
 
-    switch(dir) {
+    switch (dir) {
         case OB_DIRECTION_NORTH:
             head = RECT_BOTTOM(area);
             tail = RECT_TOP(area);
@@ -3834,38 +3834,54 @@ static void detect_edge(Rect area, ObDirection dir,
             head = RECT_TOP(area);
             tail = RECT_BOTTOM(area);
             break;
-        case OB_DIRECTION_EAST:
-            head = RECT_LEFT(area);
-            tail = RECT_RIGHT(area);
-            break;
         case OB_DIRECTION_WEST:
             head = RECT_RIGHT(area);
             tail = RECT_LEFT(area);
             break;
+        case OB_DIRECTION_EAST:
+            head = RECT_LEFT(area);
+            tail = RECT_RIGHT(area);
+            break;
         default:
             g_assert_not_reached();
     }
-    switch(dir) {
+    switch (dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_WEST:
+            /* check if our window is past the head of this window */
             if (my_head <= head + 1)
                 skip_head = TRUE;
+            /* check if our window's tail is past the tail of this window */
             if (my_head + my_size - 1 <= tail)
                 skip_tail = TRUE;
-            if (head < *dest)
+            /* check if the head of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a tail, not a head) */
+            if (head + (*near_edge ? 0 : my_size) < *dest)
                 skip_head = TRUE;
-            if (tail - my_size < *dest)
+            /* check if the tail of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a head, not a tail) */
+            if (tail - (!*near_edge ? 0 : my_size) < *dest)
                 skip_tail = TRUE;
             break;
         case OB_DIRECTION_SOUTH:
         case OB_DIRECTION_EAST:
+            /* check if our window is past the head of this window */
             if (my_head >= head - 1)
                 skip_head = TRUE;
+            /* check if our window's tail is past the tail of this window */
             if (my_head - my_size + 1 >= tail)
                 skip_tail = TRUE;
-            if (head > *dest)
+            /* check if the head of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a tail, not a head) */
+            if (head - (*near_edge ? 0 : my_size) > *dest)
                 skip_head = TRUE;
-            if (tail + my_size > *dest)
+            /* check if the tail of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a head, not a tail) */
+            if (tail + (!*near_edge ? 0 : my_size) > *dest)
                 skip_tail = TRUE;
             break;
         default:
@@ -3884,7 +3900,6 @@ static void detect_edge(Rect area, ObDirection dir,
         *dest = tail;
         *near_edge = FALSE;
     }
-
 }
 
 void client_find_edge_directional(ObClient *self, ObDirection dir,
@@ -3902,7 +3917,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
                       &self->frame->area);
 
-    switch(dir) {
+    switch (dir) {
     case OB_DIRECTION_NORTH:
         if (my_head >= RECT_TOP(*mon) + 1)
             edge = RECT_TOP(*mon) - 1;
@@ -3934,7 +3949,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     *dest = edge;
     *near_edge = TRUE;
 
-    for(it = client_list; it; it = g_list_next(it)) {
+    for (it = client_list; it; it = g_list_next(it)) {
         ObClient *cur = it->data;
 
         /* skip windows to not bump into */

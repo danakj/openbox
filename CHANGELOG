@@ -1,6 +1,7 @@
 3.4.4:
   * Updated Traditional Chinese translation
   * Updated Norwegian translation
+  * Fix for MoveToEdge skipping edges sometimes
   * Let you specify the vertical and horizontal padding independently in themes
   * Fix so that if you select an omnipresent window on another desktop in the
     client list menus, it will go to that desktop

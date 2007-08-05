@@ -1859,6 +1859,8 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
 
 void event_halt_focus_delay()
 {
+    /* ignore all enter events up till now */
+    event_end_ignore_all_enters(1);
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 

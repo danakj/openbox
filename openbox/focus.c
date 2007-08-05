@@ -159,7 +159,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
 }
 
 ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer,
-                         gboolean allow_omnipresent)
+                         gboolean allow_omnipresent, gboolean focus_lost)
 {
     ObClient *new;
     ObClient *old = focus_client;
@@ -167,7 +167,8 @@ ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer,
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when we try focus them, we won't get a FocusIn
        event at all for them. */
-    focus_nothing();
+    if (focus_lost)
+        focus_nothing();
 
     new = focus_fallback_target(allow_refocus, allow_pointer,
                                 allow_omnipresent, old);

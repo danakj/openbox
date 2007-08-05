@@ -25,7 +25,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     o = g_new0(Options, 1);
 
-    if ((n = parse_find_node("execute", node))) {
+    if ((n = parse_find_node("command", node)) ||
+        (n = parse_find_node("execute", node)))
+    {
         gchar *s = parse_string(doc, n);
         o->cmd = parse_expand_tilde(s);
         g_free(s);

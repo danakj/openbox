@@ -72,15 +72,11 @@ void screen_add_desktop(gboolean current);
 /*! Remove a desktop, either at the end or the current desktop */
 void screen_remove_desktop(gboolean current);
 
-/*! Interactively change desktops */
-guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
-                           gboolean dialog, gboolean done, gboolean cancel);
-
 guint screen_find_desktop(guint from, ObDirection dir,
                           gboolean wrap, gboolean linear);
 
-/*! Show/hide the desktop popup (pager) for the given desktop */
-void screen_desktop_popup(guint d, gboolean show);
+/*! Show the desktop popup/notification */
+void screen_show_desktop_popup(guint d);
 
 /*! Shows and focuses the desktop and hides all the client windows, or
   returns to the normal state, showing client windows.

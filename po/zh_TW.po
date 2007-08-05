@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.4.2\n"
+"Project-Id-Version: openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-07-22 08:25-0400\n"
-"PO-Revision-Date: 2007-05-23 16:22+0200\n"
+"PO-Revision-Date: 2007-07-23 23:22+0200\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: openbox/actions/execute.c:88
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
-msgstr "從 utf8 轉換路徑「%s」時失敗"
+msgstr "轉換路徑「%s」自 utf8 時失敗"
 
 #: openbox/actions/execute.c:97 openbox/actions/execute.c:115
 #, c-format
@@ -32,15 +32,15 @@ msgstr "到那裏去…"
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "管理桌面"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr ""
+msgstr "加入新桌面(_A)"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "移除尾端桌面(_R)"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"

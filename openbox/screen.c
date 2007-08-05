@@ -26,6 +26,7 @@
 #include "startupnotify.h"
 #include "moveresize.h"
 #include "config.h"
+#include "mainloop.h"
 #include "screen.h"
 #include "client.h"
 #include "session.h"
@@ -53,6 +54,7 @@
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm();
 static void     screen_tell_ksplash();
+static void     screen_fallback_focus();
 
 guint    screen_num_desktops;
 guint    screen_num_monitors;
@@ -73,7 +75,7 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup *desktop_cycle_popup;
+static ObPagerPopup *desktop_popup;
 
 static gboolean replace_wm()
 {
@@ -107,22 +109,7 @@ static gboolean replace_wm()
             current_wm_sn_owner = None;
     }
 
-    {
-        /* Generate a timestamp */
-        XEvent event;
-
-        XSelectInput(ob_display, screen_support_win, PropertyChangeMask);
-
-        XChangeProperty(ob_display, screen_support_win,
-                        prop_atoms.wm_class, prop_atoms.string,
-                        8, PropModeAppend, NULL, 0);
-        XWindowEvent(ob_display, screen_support_win,
-                     PropertyChangeMask, &event);
-
-        XSelectInput(ob_display, screen_support_win, NoEventMask);
-
-        timestamp = event.xproperty.time;
-    }
+    timestamp = event_get_server_time();
 
     XSetSelectionOwner(ob_display, wm_sn_atom, screen_support_win,
                        timestamp);
@@ -172,12 +159,14 @@ gboolean screen_annex()
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
+    attrib.event_mask = PropertyChangeMask;
     screen_support_win = XCreateWindow(ob_display,
                                        RootWindow(ob_display, ob_screen),
                                        -100, -100, 1, 1, 0,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
-                                       CWOverrideRedirect, &attrib);
+                                       CWEventMask | CWOverrideRedirect,
+                                       &attrib);
     XMapWindow(ob_display, screen_support_win);
     XLowerWindow(ob_display, screen_support_win);
 
@@ -283,7 +272,9 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_moveresize_window;
     supported[i++] = prop_atoms.net_wm_moveresize;
     supported[i++] = prop_atoms.net_wm_user_time;
+/*
     supported[i++] = prop_atoms.net_wm_user_time_window;
+*/
     supported[i++] = prop_atoms.net_frame_extents;
     supported[i++] = prop_atoms.net_request_frame_extents;
     supported[i++] = prop_atoms.net_restack_window;
@@ -353,12 +344,12 @@ void screen_startup(gboolean reconfig)
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_cycle_popup = pager_popup_new(FALSE);
-    pager_popup_height(desktop_cycle_popup, POPUP_HEIGHT);
+    desktop_popup = pager_popup_new(FALSE);
+    pager_popup_height(desktop_popup, POPUP_HEIGHT);
 
     if (reconfig) {
         /* update the pager popup's width */
-        pager_popup_text_width_to_strings(desktop_cycle_popup,
+        pager_popup_text_width_to_strings(desktop_popup,
                                           screen_desktop_names,
                                           screen_num_desktops);
         return;
@@ -441,7 +432,7 @@ void screen_startup(gboolean reconfig)
 
 void screen_shutdown(gboolean reconfig)
 {
-    pager_popup_free(desktop_cycle_popup);
+    pager_popup_free(desktop_popup);
 
     if (reconfig)
         return;
@@ -545,13 +536,52 @@ void screen_set_num_desktops(guint num)
         screen_set_desktop(num - 1, TRUE);
 }
 
-void screen_set_desktop(guint num, gboolean dofocus)
+static void screen_fallback_focus()
 {
     ObClient *c;
+    gboolean allow_omni;
+
+    /* only allow omnipresent windows to get focus on desktop change if
+       an omnipresent window is already focused (it'll keep focus probably, but
+       maybe not depending on mouse-focus options) */
+    allow_omni = focus_client && (client_normal(focus_client) &&
+                                  focus_client->desktop == DESKTOP_ALL);
+
+    /* the client moved there already so don't move focus. prevent flicker
+       on sendtodesktop + follow */
+    if (focus_client && focus_client->desktop == screen_desktop)
+        return;
+
+    /* have to try focus here because when you leave an empty desktop
+       there is no focus out to watch for. also, we have different rules
+       here. we always allow it to look under the mouse pointer if
+       config_focus_last is FALSE
+
+       do this before hiding the windows so if helper windows are coming
+       with us, they don't get hidden
+    */
+    if ((c = focus_fallback(TRUE, !config_focus_last, allow_omni,
+                            !allow_omni)))
+    {
+        /* only do the flicker reducing stuff ahead of time if we are going
+           to call xsetinputfocus on the window ourselves. otherwise there is
+           no guarantee the window will actually take focus.. */
+        if (c->can_focus) {
+            /* reduce flicker by hiliting now rather than waiting for the
+               server FocusIn event */
+            frame_adjust_focus(c->frame, TRUE);
+            /* do this here so that if you switch desktops to a window with
+               helper windows then the helper windows won't flash */
+            client_bring_helper_windows(c);
+        }
+    }
+}
+
+void screen_set_desktop(guint num, gboolean dofocus)
+{
     GList *it;
     guint old;
     gulong ignore_start;
-    gboolean allow_omni;
 
     g_assert(num < screen_num_desktops);
 
@@ -583,39 +613,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
 
-    /* only allow omnipresent windows to get focus on desktop change if
-       an omnipresent window is already focused (it'll keep focus probably, but
-       maybe not depending on mouse-focus options) */
-    allow_omni = focus_client && (client_normal(focus_client) &&
-                                  focus_client->desktop == DESKTOP_ALL);
-
-    /* the client moved there already so don't move focus. prevent flicker
-       on sendtodesktop + follow */
-    if (focus_client && focus_client->desktop == screen_desktop)
-        dofocus = FALSE;
-
-    /* have to try focus here because when you leave an empty desktop
-       there is no focus out to watch for. also, we have different rules
-       here. we always allow it to look under the mouse pointer if
-       config_focus_last is FALSE
-
-       do this before hiding the windows so if helper windows are coming
-       with us, they don't get hidden
-    */
-    if (dofocus && (c = focus_fallback(TRUE, !config_focus_last, allow_omni)))
-    {
-        /* only do the flicker reducing stuff ahead of time if we are going
-           to call xsetinputfocus on the window ourselves. otherwise there is
-           no guarantee the window will actually take focus.. */
-        if (c->can_focus) {
-            /* reduce flicker by hiliting now rather than waiting for the
-               server FocusIn event */
-            frame_adjust_focus(c->frame, TRUE);
-            /* do this here so that if you switch desktops to a window with
-               helper windows then the helper windows won't flash */
-            client_bring_helper_windows(c);
-        }
-    }
+    if (dofocus) screen_fallback_focus();
 
     /* hide windows from bottom to top */
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
@@ -629,10 +627,18 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;
+
+    if (ob_state() == OB_STATE_RUNNING)
+        screen_show_desktop_popup(screen_desktop);
 }
 
 void screen_add_desktop(gboolean current)
 {
+    gulong ignore_start;
+
+    /* ignore enter events caused by this */
+    ignore_start = event_start_ignore_all_enters();
+
     screen_set_num_desktops(screen_num_desktops+1);
 
     /* move all the clients over */
@@ -651,14 +657,20 @@ void screen_add_desktop(gboolean current)
             }
         }
     }
+
+    event_end_ignore_all_enters(ignore_start);
 }
 
 void screen_remove_desktop(gboolean current)
 {
     guint rmdesktop, movedesktop;
     GList *it, *stacking_copy;
+    gulong ignore_start;
 
     if (screen_num_desktops <= 1) return;
+
+    /* ignore enter events caused by this */
+    ignore_start = event_start_ignore_all_enters();
 
     /* what desktop are we removing and moving to? */
     if (current)
@@ -696,15 +708,15 @@ void screen_remove_desktop(gboolean current)
         }
     }
 
-    /* act like we're changing desktops */
+    /* fallback focus like we're changing desktops */
     if (screen_desktop < screen_num_desktops - 1) {
-        gint d = screen_desktop;
-        screen_desktop = screen_last_desktop;
-        screen_set_desktop(d, TRUE);
+        screen_fallback_focus();
         ob_debug("fake desktop change\n");
     }
 
     screen_set_num_desktops(screen_num_desktops-1);
+
+    event_end_ignore_all_enters(ignore_start);
 }
 
 static void get_row_col(guint d, guint *r, guint *c)
@@ -815,25 +827,34 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-void screen_desktop_popup(guint d, gboolean show)
+static gboolean hide_desktop_popup_func(gpointer data)
+{
+    pager_popup_hide(desktop_popup);
+    return FALSE; /* don't repeat */
+}
+
+void screen_show_desktop_popup(guint d)
 {
     Rect *a;
 
-    if (!show) {
-        pager_popup_hide(desktop_cycle_popup);
-    } else {
-        a = screen_physical_area_active();
-        pager_popup_position(desktop_cycle_popup, CenterGravity,
-                             a->x + a->width / 2, a->y + a->height / 2);
-        pager_popup_icon_size_multiplier(desktop_cycle_popup,
-                                         (screen_desktop_layout.columns /
-                                          screen_desktop_layout.rows) / 2,
-                                         (screen_desktop_layout.rows/
-                                          screen_desktop_layout.columns) / 2);
-        pager_popup_max_width(desktop_cycle_popup,
-                              MAX(a->width/3, POPUP_WIDTH));
-        pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
-    }
+    /* 0 means don't show the popup */
+    if (!config_desktop_popup_time) return;
+
+    a = screen_physical_area_active();
+    pager_popup_position(desktop_popup, CenterGravity,
+                         a->x + a->width / 2, a->y + a->height / 2);
+    pager_popup_icon_size_multiplier(desktop_popup,
+                                     (screen_desktop_layout.columns /
+                                      screen_desktop_layout.rows) / 2,
+                                     (screen_desktop_layout.rows/
+                                      screen_desktop_layout.columns) / 2);
+    pager_popup_max_width(desktop_popup,
+                          MAX(a->width/3, POPUP_WIDTH));
+    pager_popup_show(desktop_popup, screen_desktop_names[d], d);
+
+    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
+                             hide_desktop_popup_func, NULL, NULL, NULL);
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,
@@ -940,30 +961,6 @@ guint screen_find_desktop(guint from, ObDirection dir,
         d = translate_row_col(r, c);
     }
     return d;
-}
-
-guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
-                           gboolean dialog, gboolean done, gboolean cancel)
-{
-    static guint d = (guint)-1;
-    guint ret;
-
-    if (d == (guint)-1)
-        d = screen_desktop;
-
-    if ((!cancel && !done) || !dialog)
-        d = screen_find_desktop(d, dir, wrap, linear);
-
-    if (dialog && !cancel && !done)
-        screen_desktop_popup(d, TRUE);
-    else
-        screen_desktop_popup(0, FALSE);
-    ret = d;
-
-    if (!dialog || cancel || done)
-        d = (guint)-1;
-
-    return ret;
 }
 
 static gboolean screen_validate_layout(ObDesktopLayout *l)
@@ -1092,7 +1089,7 @@ void screen_update_desktop_names()
     }
 
     /* resize the pager for these names */
-    pager_popup_text_width_to_strings(desktop_cycle_popup,
+    pager_popup_text_width_to_strings(desktop_popup,
                                       screen_desktop_names,
                                       screen_num_desktops);
 }
@@ -1142,7 +1139,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     else if (!show_only) {
         ObClient *c;
 
-        if ((c = focus_fallback(TRUE, FALSE, TRUE))) {
+        if ((c = focus_fallback(TRUE, FALSE, TRUE, FALSE))) {
             /* only do the flicker reducing stuff ahead of time if we are going
                to call xsetinputfocus on the window ourselves. otherwise there
                is no guarantee the window will actually take focus.. */
@@ -1555,7 +1552,9 @@ Rect* screen_physical_area_active()
     Rect *a;
     gint x, y;
 
-    if (focus_client)
+    if (moveresize_client)
+        a = screen_physical_area_monitor(client_monitor(focus_client));
+    else if (focus_client)
         a = screen_physical_area_monitor(client_monitor(focus_client));
     else {
         Rect mon;

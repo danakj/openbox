@@ -120,6 +120,10 @@ struct _ObFrame
     Window    innertop;     /*!< For drawing the inner client border */
     Window    innerright;   /*!< For drawing the inner client border */
     Window    innerbottom;  /*!< For drawing the inner client border */
+    Window    innerblb;
+    Window    innerbll;
+    Window    innerbrb;
+    Window    innerbrr;
     Window    backback;     /*!< A colored window shown while resizing */
     Window    backfront;    /*!< An undrawn-in window, to prevent flashing on
                                  unmap */
@@ -236,6 +240,10 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y);
 /*! Convert a rectangle in client coordinates/sizes to what it would be
   for the frame, given its current decorations sizes */
 void frame_rect_to_frame(ObFrame *self, Rect *r);
+
+/*! Convert a rectangle in frame coordinates/sizes to what it would be for the
+  client, given its current decorations sizes */
+void frame_rect_to_client(ObFrame *self, Rect *r);
 
 void frame_flash_start(ObFrame *self);
 void frame_flash_stop(ObFrame *self);

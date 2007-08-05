@@ -24,8 +24,14 @@
 
 struct _ObClient;
 
+/*! The amount of time before a window appears that is checked for user input
+  to determine if the user is working in another window */
+#define OB_EVENT_USER_TIME_DELAY (500) /* 0.5 seconds */
+
 /*! Time at which the last event with a timestamp occured. */
 extern Time event_curtime;
+/*! The last user-interaction time, as given by the clients */
+extern Time event_last_user_time;
 
 void event_startup(gboolean reconfig);
 void event_shutdown(gboolean reconfig);
@@ -49,5 +55,7 @@ void event_halt_focus_delay();
 /*! Compare t1 and t2, taking into account wraparound. True if t1
   comes at the same time or later than t2. */
 gboolean event_time_after(Time t1, Time t2);
+
+Time event_get_server_time();
 
 #endif

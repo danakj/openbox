@@ -186,7 +186,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!read_int(db, "padding.width", &theme->paddingx) ||
         theme->paddingx < 0 || theme->paddingx > 100)
         theme->paddingx = 3;
-    theme->paddingy = theme->paddingx;
+    if (!read_int(db, "padding.height", &theme->paddingy) ||
+        theme->paddingy < 0 || theme->paddingy > 100)
+        theme->paddingy = theme->paddingx;
     if (!read_int(db, "border.width", &theme->fbwidth) ||
         theme->fbwidth < 0 || theme->fbwidth > 100)
         theme->fbwidth = 1;

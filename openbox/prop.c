@@ -94,7 +94,7 @@ void prop_startup()
 /*   CREATE(net_wm_pid, "_NET_WM_PID"); */
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");
     CREATE(net_wm_user_time, "_NET_WM_USER_TIME");
-    CREATE(net_wm_user_time_window, "_NET_WM_USER_TIME_WINDOW");
+/*    CREATE(net_wm_user_time_window, "_NET_WM_USER_TIME_WINDOW"); */
     CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
 

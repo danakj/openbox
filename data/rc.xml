@@ -116,6 +116,9 @@
     <name>desktop 2</name>
     -->
   </names>
+  <popupTime>875</popupTime>
+  <!-- The number of milliseconds to show the popup for when switching
+       desktops.  Set this to 0 to disable the popup. -->
 </desktops>
 
 <resize>
@@ -261,9 +264,9 @@
   <doubleClickTime>200</doubleClickTime>
   <!-- in milliseconds (1000 = 1 second) -->
   <screenEdgeWarpTime>400</screenEdgeWarpTime>
-  <!-- time before changing desktops when the pointer touches the edge of the
-       screen while moving a window, in milliseconds (1000 = 1 second),
-       0 disables warping -->
+  <!-- Time before changing desktops when the pointer touches the edge of the
+       screen while moving a window, in milliseconds (1000 = 1 second).
+       Set this to 0 to disable warping -->
 
   <context name="Frame">
     <mousebind button="A-Left" action="Press">

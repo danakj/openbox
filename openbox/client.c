@@ -32,7 +32,6 @@
 #include "event.h"
 #include "grab.h"
 #include "focus.h"
-#include "propwin.h"
 #include "stacking.h"
 #include "openbox.h"
 #include "group.h"
@@ -213,8 +212,9 @@ void client_manage(Window window)
     XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
-    gint placex, placey, placew, placeh;
     gboolean transient = FALSE;
+    Rect place, *monitor;
+    Time launch_time, map_time;
 
     grab_server(TRUE);
 
@@ -253,6 +253,8 @@ void client_manage(Window window)
 
     ob_debug("Managing window: 0x%lx\n", window);
 
+    map_time = event_get_server_time();
+
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
@@ -269,7 +271,6 @@ void client_manage(Window window)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->gravity = NorthWestGravity;
     self->desktop = screen_num_desktops; /* always an invalid value */
-    self->user_time = focus_client ? focus_client->user_time : CurrentTime;
 
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
@@ -300,10 +301,8 @@ void client_manage(Window window)
     /* now we have all of the window's information so we can set this up */
     client_setup_decor_and_functions(self, FALSE);
 
-    {
-        Time t = sn_app_started(self->startup_id, self->class);
-        if (t) self->user_time = t;
-    }
+    /* tell startup notification that this app started */
+    launch_time = sn_app_started(self->startup_id, self->class);
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
@@ -337,10 +336,8 @@ void client_manage(Window window)
     frame_adjust_client_area(self->frame);
 
     /* where the frame was placed is where the window was originally */
-    placex = self->area.x;
-    placey = self->area.y;
-    placew = self->area.width;
-    placeh = self->area.height;
+    place = self->area;
+    monitor = screen_physical_area_monitor(screen_find_monitor(&place));
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
@@ -350,7 +347,7 @@ void client_manage(Window window)
                    (self->positioned == USPosition ? "user specified" :
                     (self->positioned == (PPosition | USPosition) ?
                      "program + user specified" :
-                     "BADNESS !?")))), placex, placey);
+                     "BADNESS !?")))), place.x, place.y);
 
         ob_debug("Sized: %s @ %d %d\n",
                  (!self->sized ? "no" :
@@ -358,14 +355,15 @@ void client_manage(Window window)
                    (self->sized == USSize ? "user specified" :
                     (self->sized == (PSize | USSize) ?
                      "program + user specified" :
-                     "BADNESS !?")))), placew, placeh);
+                     "BADNESS !?")))), place.width, place.height);
 
         /* splash screens are also returned as TRUE for transient,
            and so will be forced on screen below */
-        transient = place_client(self, &placex, &placey, settings);
+        transient = place_client(self, &place.x, &place.y, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &placex, &placey, placew, placeh,
+        client_find_onscreen(self, &place.x, &place.y,
+                             place.width, place.height,
                              /* non-normal clients has less rules, and
                                 windows that are being restored from a
                                 session do also. we can assume you want
@@ -385,7 +383,13 @@ void client_manage(Window window)
                               (!((self->positioned & USPosition) ||
                                  (settings && settings->pos_given)) &&
                                client_normal(self) &&
-                               !self->session)));
+                               !self->session &&
+                               /* don't move oldschool fullscreen windows to
+                                  fit inside the struts (fixes Acroread, which
+                                  makes its fullscreen window fit the screen
+                                  but it is not USSize'd or USPosition'd) */
+                               !(self->decorations == 0 &&
+                                 RECT_EQUAL(place, *monitor)))));
     }
 
     /* if the window isn't user-sized, then make it fit inside
@@ -401,34 +405,34 @@ void client_manage(Window window)
         (transient ||
          (!(self->sized & USSize || self->positioned & USPosition) &&
           client_normal(self) &&
-          !self->session)))
+          !self->session &&
+          /* don't shrink oldschool fullscreen windows to fit inside the
+             struts (fixes Acroread, which makes its fullscreen window
+             fit the screen but it is not USSize'd or USPosition'd) */
+          !(self->decorations == 0 && RECT_EQUAL(place, *monitor)))))
     {
-        Rect placer;
+        Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
-        RECT_SET(placer, placex, placey, placew, placeh);
-        frame_rect_to_frame(self->frame, &placer);
-
-        Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &placer);
-
-        /* shrink by the frame's area */
-        a->width -= self->frame->size.left + self->frame->size.right;
-        a->height -= self->frame->size.top + self->frame->size.bottom;
+        /* get the size of the frame */
+        place.width += self->frame->size.left + self->frame->size.right;
+        place.height += self->frame->size.top + self->frame->size.bottom;
 
         /* fit the window inside the area */
-        if (placew > a->width || self->area.height > a->height) {
-            placew = MIN(self->area.width, a->width);
-            placeh = MIN(self->area.height, a->height);
+        place.width = MIN(place.width, a->width);
+        place.height = MIN(place.height, a->height);
 
-            ob_debug("setting window size to %dx%d\n",
-                     self->area.width, self->area.height);
-        }
+        ob_debug("setting window size to %dx%d\n", place.width, place.height);
+
+        /* get the size of the client back */
+        place.width -= self->frame->size.left + self->frame->size.right;
+        place.height -= self->frame->size.top + self->frame->size.bottom;
+
         g_free(a);
     }
 
-
     ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
              "some restrictions may apply\n",
-             self->window, placex, placey, placew, placeh);
+             self->window, place.x, place.y, place.width, place.height);
     if (self->session)
         ob_debug("  but session requested %d, %d  %d x %d instead, "
                  "overriding\n",
@@ -440,20 +444,25 @@ void client_manage(Window window)
 
        this also places the window
     */
-    client_apply_startup_state(self, placex, placey, placew, placeh);
+    client_apply_startup_state(self, place.x, place.y,
+                               place.width, place.height);
+
+    g_free(monitor);
+    monitor = NULL;
 
     if (activate) {
-        guint32 last_time = focus_client ?
-            focus_client->user_time : CurrentTime;
+        gboolean raise = FALSE;
 
         /* This is focus stealing prevention */
         ob_debug_type(OB_DEBUG_FOCUS,
-                      "Want to focus new window 0x%x with time %u "
-                      "(last time %u)\n",
-                      self->window, self->user_time, last_time);
+                      "Want to focus new window 0x%x at time %u "
+                      "launched at %u (last user interaction time %u)\n",
+                      self->window, map_time, launch_time,
+                      event_last_user_time);
 
         if (menu_frame_visible || moveresize_in_progress) {
             activate = FALSE;
+            raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Not focusing the window because the user is inside "
                           "an Openbox menu or is move/resizing a window and "
@@ -462,12 +471,13 @@ void client_manage(Window window)
 
         /* if it's on another desktop */
         else if (!(self->desktop == screen_desktop ||
-              self->desktop == DESKTOP_ALL) &&
-            /* the timestamp is from before you changed desktops */
-            self->user_time && screen_desktop_user_time &&
-            !event_time_after(self->user_time, screen_desktop_user_time))
+                   self->desktop == DESKTOP_ALL) &&
+                 /* the timestamp is from before you changed desktops */
+                 launch_time && screen_desktop_user_time &&
+                 !event_time_after(launch_time, screen_desktop_user_time))
         {
             activate = FALSE;
+            raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Not focusing the window because its on another "
                           "desktop\n");
@@ -476,26 +486,25 @@ void client_manage(Window window)
         else if (focus_client && client_search_focus_tree_full(self) == NULL &&
                  client_search_focus_group_full(self) == NULL)
         {
-            /* If time stamp is old, don't steal focus */
-            if (self->user_time && last_time &&
-                !event_time_after(self->user_time, last_time))
+            /* If the user is working in another window right now, then don't
+               steal focus */
+            if (event_last_user_time && launch_time &&
+                event_time_after(event_last_user_time, launch_time) &&
+                event_last_user_time != launch_time &&
+                event_time_after(event_last_user_time,
+                                 map_time - OB_EVENT_USER_TIME_DELAY))
             {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because the time is "
-                              "too old\n");
+                              "Not focusing the window because the user is "
+                              "working in another window\n");
             }
-            /* If its a transient (and parents aren't focused) and the time
-               is ambiguous (either the current focus target doesn't have
-               a timestamp, or they are the same (we probably inherited it
-               from them) */
-            else if (client_has_parent(self) &&
-                     (!last_time || self->user_time == last_time))
-            {
+            /* If its a transient (and its parents aren't focused) */
+            else if (client_has_parent(self)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because it is a "
-                              "transient, and the time is very ambiguous\n");
+                              "transient, and its relatives aren't focused\n");
             }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
@@ -512,20 +521,33 @@ void client_manage(Window window)
                anyway */
             else if (client_focus_target(self) != self) {
                 activate = FALSE;
+                raise = TRUE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because another window "
                               "would get the focus anyway\n");
+            }
+            else if (!(self->desktop == screen_desktop ||
+                       self->desktop == DESKTOP_ALL))
+            {
+                activate = FALSE;
+                raise = TRUE;
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Not focusing the window because it is on "
+                              "another desktop and no relatives are focused ");
             }
         }
 
         if (!activate) {
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus stealing prevention activated for %s with "
-                          "time %u (last time %u)\n",
-                          self->title, self->user_time, last_time);
+                          "Focus stealing prevention activated for %s at "
+                          "time %u (last user interactioon time %u)\n",
+                          self->title, map_time, event_last_user_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
             client_hilite(self, TRUE);
+            /* we may want to raise it even tho we're not activating it */
+            if (raise && !client_restore_session_stacking(self))
+                stacking_raise(CLIENT_AS_WINDOW(self));
         }
     }
     else {
@@ -652,9 +674,6 @@ void client_unmanage(ObClient *self)
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
-
-    /* kill the property windows */
-    propwin_remove(self->user_time_window, OB_PROPWIN_USER_TIME, self);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -1095,9 +1114,6 @@ static void client_get_all(ObClient *self, gboolean real)
     client_get_colormap(self);
     client_update_strut(self);
     client_update_icons(self);
-    client_update_user_time_window(self);
-    if (!self->user_time_window) /* check if this would have been called */
-        client_update_user_time(self);
     client_update_icon_geometry(self);
 }
 
@@ -2096,62 +2112,6 @@ void client_update_icons(ObClient *self)
         /* don't draw the icon empty if we're just setting one now anyways,
            we'll get the property change any second */
         frame_adjust_icon(self->frame);
-}
-
-void client_update_user_time(ObClient *self)
-{
-    guint32 time;
-    gboolean got = FALSE;
-
-    if (self->user_time_window)
-        got = PROP_GET32(self->user_time_window,
-                         net_wm_user_time, cardinal, &time);
-    if (!got)
-        got = PROP_GET32(self->window, net_wm_user_time, cardinal, &time);
-
-    if (got) {
-        /* we set this every time, not just when it grows, because in practice
-           sometimes time goes backwards! (ntpdate.. yay....) so.. if it goes
-           backward we don't want all windows to stop focusing. we'll just
-           assume noone is setting times older than the last one, cuz that
-           would be pretty stupid anyways
-        */
-        self->user_time = time;
-
-        /*ob_debug("window %s user time %u\n", self->title, time);*/
-    }
-}
-
-void client_update_user_time_window(ObClient *self)
-{
-    guint32 w;
-
-    if (!PROP_GET32(self->window, net_wm_user_time_window, window, &w))
-        w = None;
-
-    if (w != self->user_time_window) {
-        /* remove the old window */
-        propwin_remove(self->user_time_window, OB_PROPWIN_USER_TIME, self);
-        self->user_time_window = None;
-
-        if (self->group && self->group->leader == w) {
-            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
-                          "_NET_WM_USER_TYPE_WINDOW to its group leader\n");
-            /* do it anyways..? */
-        }
-        else if (w == self->window) {
-            ob_debug_type(OB_DEBUG_APP_BUGS, "Window is setting its "
-                          "_NET_WM_USER_TIME_WINDOW to itself\n");
-            w = None; /* don't do it */
-        }
-
-        /* add the new window */
-        propwin_add(w, OB_PROPWIN_USER_TIME, self);
-        self->user_time_window = w;
-
-        /* and update from it */
-        client_update_user_time(self);
-    }
 }
 
 void client_update_icon_geometry(ObClient *self)
@@ -3635,34 +3595,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 void client_activate(ObClient *self, gboolean here, gboolean raise,
                      gboolean unshade, gboolean user)
 {
-    guint32 last_time = focus_client ? focus_client->user_time : CurrentTime;
-    gboolean allow = FALSE;
-
-    /* if the currently focused app doesn't set a user_time, then it can't
-       benefit from any focus stealing prevention.
-
-       if the timestamp is missing in the request then let it go through
-       even if it is source=app, because EVERY APPLICATION DOES THIS because
-       GTK IS VERY BUGGY AND HARDCODES source=application... WHY!?
-    */
-    if (!last_time || !event_curtime)
-        allow = TRUE;
-    /* otherwise, if they didn't give a time stamp or if it is too old, they
-       don't get focus */
-    else
-        allow = event_time_after(event_curtime, last_time);
-
-    ob_debug_type(OB_DEBUG_FOCUS,
-                  "Want to activate window 0x%x with time %u (last time %u), "
-                  "source=%s allowing? %d\n",
-                  self->window, event_curtime, last_time,
-                  (user ? "user" : "application"), allow);
-
-    if (allow)
-        client_present(self, here, raise, unshade);
-    else
-        /* don't focus it but tell the user it wants attention */
-        client_hilite(self, TRUE);
+    client_present(self, here, raise, unshade);
 }
 
 static void client_bring_windows_recursive(ObClient *self,
@@ -3872,7 +3805,7 @@ static void detect_edge(Rect area, ObDirection dir,
     gint edge_start, edge_size, head, tail;
     gboolean skip_head = FALSE, skip_tail = FALSE;
 
-    switch(dir) {
+    switch (dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_SOUTH:
             edge_start = area.x;
@@ -3892,7 +3825,7 @@ static void detect_edge(Rect area, ObDirection dir,
                 edge_start, edge_size))
         return;
 
-    switch(dir) {
+    switch (dir) {
         case OB_DIRECTION_NORTH:
             head = RECT_BOTTOM(area);
             tail = RECT_TOP(area);
@@ -3901,38 +3834,54 @@ static void detect_edge(Rect area, ObDirection dir,
             head = RECT_TOP(area);
             tail = RECT_BOTTOM(area);
             break;
-        case OB_DIRECTION_EAST:
-            head = RECT_LEFT(area);
-            tail = RECT_RIGHT(area);
-            break;
         case OB_DIRECTION_WEST:
             head = RECT_RIGHT(area);
             tail = RECT_LEFT(area);
             break;
+        case OB_DIRECTION_EAST:
+            head = RECT_LEFT(area);
+            tail = RECT_RIGHT(area);
+            break;
         default:
             g_assert_not_reached();
     }
-    switch(dir) {
+    switch (dir) {
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_WEST:
+            /* check if our window is past the head of this window */
             if (my_head <= head + 1)
                 skip_head = TRUE;
+            /* check if our window's tail is past the tail of this window */
             if (my_head + my_size - 1 <= tail)
                 skip_tail = TRUE;
-            if (head < *dest)
+            /* check if the head of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a tail, not a head) */
+            if (head + (*near_edge ? 0 : my_size) < *dest)
                 skip_head = TRUE;
-            if (tail - my_size < *dest)
+            /* check if the tail of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a head, not a tail) */
+            if (tail - (!*near_edge ? 0 : my_size) < *dest)
                 skip_tail = TRUE;
             break;
         case OB_DIRECTION_SOUTH:
         case OB_DIRECTION_EAST:
+            /* check if our window is past the head of this window */
             if (my_head >= head - 1)
                 skip_head = TRUE;
+            /* check if our window's tail is past the tail of this window */
             if (my_head - my_size + 1 >= tail)
                 skip_tail = TRUE;
-            if (head > *dest)
+            /* check if the head of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a tail, not a head) */
+            if (head - (*near_edge ? 0 : my_size) > *dest)
                 skip_head = TRUE;
-            if (tail + my_size > *dest)
+            /* check if the tail of this window is closer than the previously
+               chosen edge (take into account that the previously chosen
+               edge might have been a head, not a tail) */
+            if (tail + (!*near_edge ? 0 : my_size) > *dest)
                 skip_tail = TRUE;
             break;
         default:
@@ -3951,7 +3900,6 @@ static void detect_edge(Rect area, ObDirection dir,
         *dest = tail;
         *near_edge = FALSE;
     }
-
 }
 
 void client_find_edge_directional(ObClient *self, ObDirection dir,
@@ -3969,27 +3917,27 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
                       &self->frame->area);
 
-    switch(dir) {
+    switch (dir) {
     case OB_DIRECTION_NORTH:
-        if (my_head >= RECT_TOP(*mon))
+        if (my_head >= RECT_TOP(*mon) + 1)
             edge = RECT_TOP(*mon) - 1;
         else
             edge = RECT_TOP(*a) - 1;
         break;
     case OB_DIRECTION_SOUTH:
-        if (my_head <= RECT_BOTTOM(*mon))
+        if (my_head <= RECT_BOTTOM(*mon) - 1)
             edge = RECT_BOTTOM(*mon) + 1;
         else
             edge = RECT_BOTTOM(*a) + 1;
         break;
     case OB_DIRECTION_EAST:
-        if (my_head <= RECT_RIGHT(*mon))
+        if (my_head <= RECT_RIGHT(*mon) - 1)
             edge = RECT_RIGHT(*mon) + 1;
         else
             edge = RECT_RIGHT(*a) + 1;
         break;
     case OB_DIRECTION_WEST:
-        if (my_head >= RECT_LEFT(*mon))
+        if (my_head >= RECT_LEFT(*mon) + 1)
             edge = RECT_LEFT(*mon) - 1;
         else
             edge = RECT_LEFT(*a) - 1;
@@ -4001,7 +3949,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     *dest = edge;
     *near_edge = TRUE;
 
-    for(it = client_list; it; it = g_list_next(it)) {
+    for (it = client_list; it; it = g_list_next(it)) {
         ObClient *cur = it->data;
 
         /* skip windows to not bump into */

@@ -64,7 +64,7 @@ struct _ObAppSettings
 extern gboolean config_focus_new;
 /*! Focus windows when the mouse enters them */
 extern gboolean config_focus_follow;
-/*! Timeout for focusing windows on focus follows mouse, in microseconds */
+/*! Timeout for focusing windows on focus follows mouse, in milliseconds */
 extern guint    config_focus_delay;
 /*! If windows should automatically be raised when they are focused in
  focus follows mouse */
@@ -109,9 +109,9 @@ extern gint config_dock_y;
 extern ObOrientation config_dock_orient;
 /*! Whether to auto-hide the dock when the pointer is not over it */
 extern gboolean config_dock_hide;
-/*! The number of microseconds to wait before hiding the dock */
+/*! The number of milliseconds to wait before hiding the dock */
 extern guint config_dock_hide_delay;
-/*! The number of microseconds to wait before showing the dock */
+/*! The number of milliseconds to wait before showing the dock */
 extern guint config_dock_show_delay;
 /*! The mouse button to be used to move dock apps */
 extern guint config_dock_app_move_button;
@@ -145,6 +145,8 @@ extern gint config_desktops_num;
 extern guint config_screen_firstdesk;
 /*! Names for the desktops */
 extern GSList *config_desktops_names;
+/*! Amount of time to show the desktop switch dialog */
+extern guint config_desktop_popup_time;
 
 /*! The keycode of the key combo which resets the keybaord chains */
 extern guint config_keyboard_reset_keycode;
@@ -165,11 +167,11 @@ extern gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
 extern gint config_resist_edge;
 
-/*! delay for hiding menu when opening */
+/*! Delay for hiding menu when opening in milliseconds */
 extern guint    config_menu_hide_delay;
 /*! Center menus vertically about the parent entry */
 extern gboolean config_menu_middle;
-/*! delay before opening a submenu */
+/*! Delay before opening a submenu in milliseconds */
 extern guint    config_submenu_show_delay;
 /*! show icons in client_list_menu */
 extern gboolean config_menu_client_list_icons;

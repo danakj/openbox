@@ -115,6 +115,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_menu_normal = RrAppearanceNew(inst, 0);
     theme->a_menu_selected = RrAppearanceNew(inst, 0);
     theme->a_menu_disabled = RrAppearanceNew(inst, 0);
+    /* a_menu_disabled_selected is copied from a_menu_selected */
     theme->a_menu_text_normal = RrAppearanceNew(inst, 1);
     theme->a_menu_text_selected = RrAppearanceNew(inst, 1);
     theme->a_menu_text_disabled = RrAppearanceNew(inst, 1);

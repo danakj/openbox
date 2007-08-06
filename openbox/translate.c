@@ -179,5 +179,6 @@ gunichar translate_unichar(guint keycode)
         if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
             unikey = 0;
     }
+    g_free(key);
     return unikey;
 }

@@ -320,14 +320,14 @@ static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
 
             config_per_app_settings = g_slist_append(config_per_app_settings,
                                               (gpointer) settings);
+            g_free(name);
+            g_free(class);
+            g_free(role);
+            name = class = role = NULL;
         }
 
         app = parse_find_node("application", app->next);
     }
-
-    g_free(name);
-    g_free(class);
-    g_free(role);
 }
 
 /*

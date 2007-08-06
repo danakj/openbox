@@ -115,7 +115,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_menu_normal = RrAppearanceNew(inst, 0);
     theme->a_menu_selected = RrAppearanceNew(inst, 0);
     theme->a_menu_disabled = RrAppearanceNew(inst, 0);
-    theme->a_menu_disabled_selected = RrAppearanceNew(inst, 0);
     theme->a_menu_text_normal = RrAppearanceNew(inst, 1);
     theme->a_menu_text_selected = RrAppearanceNew(inst, 1);
     theme->a_menu_text_disabled = RrAppearanceNew(inst, 1);
@@ -542,21 +541,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
                                        OB_DEFAULT_ICON_HEIGHT,
                                        OB_DEFAULT_ICON_pixel_data);
-
-    /* the toggled hover mask = the toggled unpressed mask (i.e. no change) */
-    theme->max_toggled_hover_mask =
-        RrPixmapMaskCopy(theme->max_toggled_mask);
-    theme->desk_toggled_hover_mask =
-        RrPixmapMaskCopy(theme->desk_toggled_mask);
-    theme->shade_toggled_hover_mask =
-        RrPixmapMaskCopy(theme->shade_toggled_mask);
-    /* the toggled pressed mask = the toggled unpressed mask (i.e. no change)*/
-    theme->max_toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->max_toggled_mask);
-    theme->desk_toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->desk_toggled_mask);
-    theme->shade_toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->shade_toggled_mask);
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,

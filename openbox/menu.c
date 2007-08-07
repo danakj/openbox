@@ -523,6 +523,7 @@ void menu_entry_unref(ObMenuEntry *self)
             g_free(self->data.submenu.name);
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
+            g_free(self->data.separator.label);
             break;
         }
 

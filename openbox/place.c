@@ -134,6 +134,8 @@ static Rect **pick_head(ObClient *c)
     for (i = 0; i < screen_num_monitors; ++i)
         area[i] = screen_area(c->desktop, choice[i], NULL);
 
+    g_free(choice);
+
     return area;
 }
 

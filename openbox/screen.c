@@ -855,6 +855,7 @@ void screen_show_desktop_popup(guint d)
     ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
     ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
                              hide_desktop_popup_func, NULL, NULL, NULL);
+    g_free(a);
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,

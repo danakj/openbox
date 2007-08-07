@@ -3969,6 +3969,8 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     dock_get_area(&dock_area);
     detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
                 my_edge_size, dest, near_edge);
+    g_free(a);
+    g_free(mon);
 }
 
 void client_find_move_directional(ObClient *self, ObDirection dir,

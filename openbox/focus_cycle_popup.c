@@ -456,6 +456,7 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
         XMapWindow(ob_display, popup.bg);
         XFlush(ob_display);
         popup.mapped = TRUE;
+        screen_hide_desktop_popup();
     }
 }
 

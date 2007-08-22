@@ -858,6 +858,12 @@ void screen_show_desktop_popup(guint d)
     g_free(a);
 }
 
+void screen_hide_desktop_popup()
+{
+    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    pager_popup_hide(desktop_popup);
+}
+
 guint screen_find_desktop(guint from, ObDirection dir,
                           gboolean wrap, gboolean linear)
 {

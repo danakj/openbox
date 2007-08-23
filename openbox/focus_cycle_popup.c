@@ -520,6 +520,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     text = popup_get_name(c);
     icon_popup_show(single_popup, text, client_icon(c, ICON_SIZE, ICON_SIZE));
     g_free(text);
+    screen_hide_desktop_popup();
 }
 
 void focus_cycle_popup_single_hide()

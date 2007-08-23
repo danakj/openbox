@@ -3,13 +3,15 @@
 # This file is distributed under the same license as the openbox package.
 # Sebastian Vahl <svahl@web.de>, 2006.
 # Simon A. Wilper <simonaw@openoffice.org>, Apr 2007
+# Peter Schwindt <schwindt@ba-loerrach.de>
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-07-22 08:25-0400\n"
-"PO-Revision-Date: 2007-07-20 16:44+0200\n"
-"Last-Translator: Sebastian Sareyko <public@nooms.de>\n"
+"PO-Revision-Date: 2007-08-23 15:00+0200\n"
+"Last-Translator: Peter Schwindt <schwindt@ba-loerrach.de>\n"
 "Language-Team:  <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -35,11 +37,11 @@ msgstr "Desktops verwalten"
 
 #: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr "_Neuen desktop hinzufügen"
+msgstr "_Neuen Desktop hinzufügen"
 
 #: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr "_Letzten desktop entfernen"
+msgstr "_Letzten Desktop entfernen"
 
 #: openbox/client_list_combined_menu.c:146
 msgid "Windows"
@@ -159,7 +161,7 @@ msgstr "Konnte nicht in das Heimatverzeichnis '%s' wechseln: %s"
 
 #: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Konnte das display aus der Umgebungsvariable DISPLAY nicht öffnen."
+msgstr "Konnte das Display aus der Umgebungsvariable DISPLAY nicht öffnen."
 
 #: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
@@ -256,12 +258,12 @@ msgstr "  --debug             Debugging-Informationen anzeigen\n"
 #: openbox/openbox.c:498
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
-"  --debug-focus       Debugging-Informationen fürs Fokus-Handling anzeigen\n"
+"  --debug-focus       Debugging-Informationen für's Fokus-Handling anzeigen\n"
 
 #: openbox/openbox.c:499
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
-"  --debug-xinerama    Anzeige in künstliche Xinerama Bildschirme aufteilen\n"
+"  --debug-xinerama    Anzeige in künstliche Xinerama-Bildschirme aufteilen\n"
 
 #: openbox/openbox.c:500
 #, c-format
@@ -285,7 +287,7 @@ msgstr "Ein Fenstermanager läuft bereits auf Bildschirm %d"
 #: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Konnte die Fenstermanager auswahl auf Bildschirm %d nicht reservieren"
+msgstr "Konnte die Fenstermanagerauswahl auf Bildschirm %d nicht reservieren"
 
 #: openbox/screen.c:152
 #, c-format

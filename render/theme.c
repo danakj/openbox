@@ -46,6 +46,11 @@ static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
+#define READ_INT(x_resstr, x_var, x_min, x_max, x_def) \
+    if (!read_int(db, x_resstr, & x_var) || \
+            x_var < x_min || x_var > x_max) \
+        x_var = x_def;
+
 RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
@@ -177,35 +182,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->osd_font = RrFontOpenDefault(inst);
 
     /* load direct dimensions */
-    if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
-        theme->menu_overlap < -100 || theme->menu_overlap > 100)
-        theme->menu_overlap = 0;
-    if (!read_int(db, "window.handle.width", &theme->handle_height) ||
-        theme->handle_height < 0 || theme->handle_height > 100)
-        theme->handle_height = 6;
-    if (!read_int(db, "padding.width", &theme->paddingx) ||
-        theme->paddingx < 0 || theme->paddingx > 100)
-        theme->paddingx = 3;
-    if (!read_int(db, "padding.height", &theme->paddingy) ||
-        theme->paddingy < 0 || theme->paddingy > 100)
-        theme->paddingy = theme->paddingx;
-    if (!read_int(db, "border.width", &theme->fbwidth) ||
-        theme->fbwidth < 0 || theme->fbwidth > 100)
-        theme->fbwidth = 1;
-    /* menu border width inherits from the frame border width */
-    if (!read_int(db, "menu.border.width", &theme->mbwidth) ||
-        theme->mbwidth < 0 || theme->mbwidth > 100)
-        theme->mbwidth = theme->fbwidth;
-    /* osd border width inherits from the frame border width */
-    if (!read_int(db, "osd.border.width", &theme->obwidth) ||
-        theme->obwidth < 0 || theme->obwidth > 100)
-        theme->obwidth = theme->fbwidth;
-    if (!read_int(db, "window.client.padding.width", &theme->cbwidthx) ||
-        theme->cbwidthx < 0 || theme->cbwidthx > 100)
-        theme->cbwidthx = theme->paddingx;
-    if (!read_int(db, "window.client.padding.height", &theme->cbwidthy) ||
-        theme->cbwidthy < 0 || theme->cbwidthy > 100)
-        theme->cbwidthy = theme->cbwidthx;
+    READ_INT("menu.overlap", theme->menu_overlap, -100, 100, 0);  
+    READ_INT("window.handle.width", theme->handle_height, 0, 100, 6);
+    READ_INT("padding.width", theme->paddingx, 0, 100, 3);
+    READ_INT("padding.height", theme->paddingy, 0, 100, theme->paddingx);
+    READ_INT("border.width", theme->fbwidth, 0, 100, 1);
+    READ_INT("menu.border.width", theme->mbwidth, 0, 100, theme->fbwidth);
+    READ_INT("osd.border.width", theme->obwidth, 0, 100, theme->fbwidth);
+    READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100, theme->paddingx);
+    READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100, theme->cbwidthx);
 
     /* load colors */
     if (!read_color(db, inst,

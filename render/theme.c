@@ -60,6 +60,25 @@ static void set_default_appearance(RrAppearance *a);
         !read_color(db, inst, x_res2, & x_var)) \
         x_var = x_def;
 
+#define READ_MASK_COPY(x_file, x_var, x_copysrc) \
+    if (!read_mask(inst, path, theme, x_file, & x_var)) \
+        x_var = RrPixmapMaskCopy(x_copysrc);
+
+#define READ_APPEARANCE(x_resstr, x_var, x_parrel) \
+    if (!read_appearance(db, inst, x_resstr, x_var, x_parrel)) \
+        set_default_appearance(x_var);
+
+#define READ_APPEARANCE_COPY(x_resstr, x_var, x_parrel, x_defval) \
+    if (!read_appearance(db, inst, x_resstr, x_var, x_parrel)) {\
+        RrAppearanceFree(x_var); \
+        x_var = RrAppearanceCopy(x_defval); }
+
+#define READ_APPEARANCE_(x_res1, x_res2, x_var, x_parrel, x_defval) \
+    if (!read_appearance(db, inst, x_res1, x_var, x_parrel) && \
+        !read_appearance(db, inst, x_res2, x_var, x_parrel)) {\
+        RrAppearanceFree(x_var); \
+        x_var = RrAppearanceCopy(x_defval); }
+
 RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
@@ -339,38 +358,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->max_toggled_mask = RrPixmapMaskNew(inst, 6, 6,(gchar*)data);
         }
     }
-    if (!read_mask(inst, path, theme, "max_pressed.xbm",
-                   &theme->max_pressed_mask))
-        theme->max_pressed_mask = RrPixmapMaskCopy(theme->max_mask);
-    if (!read_mask(inst,path,theme,"max_disabled.xbm",
-                   &theme->max_disabled_mask))
-        theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_mask);
-    if (!read_mask(inst, path, theme, "max_hover.xbm", &theme->max_hover_mask))
-        theme->max_hover_mask = RrPixmapMaskCopy(theme->max_mask);
-    if (!read_mask(inst, path, theme, "max_toggled_pressed.xbm",
-                   &theme->max_toggled_pressed_mask))
-        theme->max_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->max_toggled_mask);
-    if (!read_mask(inst, path, theme, "max_toggled_hover.xbm",
-                   &theme->max_toggled_hover_mask))
-        theme->max_toggled_hover_mask =
-            RrPixmapMaskCopy(theme->max_toggled_mask);
-
+    READ_MASK_COPY("max_pressed.xbm", theme->max_pressed_mask, theme->max_mask);
+    READ_MASK_COPY("max_disabled.xbm", theme->max_disabled_mask, theme->max_mask);
+    READ_MASK_COPY("max_hover.xbm", theme->max_hover_mask, theme->max_mask);
+    READ_MASK_COPY("max_toggled_pressed.xbm", theme->max_toggled_pressed_mask, theme->max_toggled_mask);
+    READ_MASK_COPY("max_toggled_hover.xbm", theme->max_toggled_hover_mask, theme->max_toggled_mask);
+  
     /* iconify button masks */
     if (!read_mask(inst, path, theme, "iconify.xbm", &theme->iconify_mask)) {
         guchar data[] = { 0x00, 0x00, 0x00, 0x00, 0x3f, 0x3f };
         theme->iconify_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-    if (!read_mask(inst, path, theme, "iconify_pressed.xbm",
-                   &theme->iconify_pressed_mask))
-        theme->iconify_pressed_mask = RrPixmapMaskCopy(theme->iconify_mask);
-    if (!read_mask(inst, path, theme, "iconify_disabled.xbm",
-                   &theme->iconify_disabled_mask))
-        theme->iconify_disabled_mask = RrPixmapMaskCopy(theme->iconify_mask);
-    if (!read_mask(inst, path, theme, "iconify_hover.xbm",
-                   &theme->iconify_hover_mask))
-        theme->iconify_hover_mask = RrPixmapMaskCopy(theme->iconify_mask);
-
+    READ_MASK_COPY("iconify_pressed.xbm", theme->iconify_pressed_mask, theme->iconify_mask);
+    READ_MASK_COPY("iconify_disabled.xbm", theme->iconify_disabled_mask, theme->iconify_mask);
+    READ_MASK_COPY("iconify_hover.xbm", theme->iconify_hover_mask, theme->iconify_mask);
+   
     /* all desktops button masks */
     userdef = TRUE;
     if (!read_mask(inst, path, theme, "desk.xbm", &theme->desk_mask)) {
@@ -388,64 +390,32 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                 RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
         }
     }
-    if (!read_mask(inst, path, theme, "desk_pressed.xbm",
-                   &theme->desk_pressed_mask))
-        theme->desk_pressed_mask = RrPixmapMaskCopy(theme->desk_mask);
-    if (!read_mask(inst, path, theme, "desk_disabled.xbm",
-                   &theme->desk_disabled_mask))
-        theme->desk_disabled_mask = RrPixmapMaskCopy(theme->desk_mask);
-    if (!read_mask(inst, path, theme, "desk_hover.xbm",
-                   &theme->desk_hover_mask))
-        theme->desk_hover_mask = RrPixmapMaskCopy(theme->desk_mask);
-    if (!read_mask(inst, path, theme, "desk_toggled_pressed.xbm",
-                   &theme->desk_toggled_pressed_mask))
-        theme->desk_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->desk_toggled_mask);
-    if (!read_mask(inst, path, theme, "desk_toggled_hover.xbm",
-                   &theme->desk_toggled_hover_mask))
-        theme->desk_toggled_hover_mask =
-            RrPixmapMaskCopy(theme->desk_toggled_mask);
-
+    READ_MASK_COPY("desk_pressed.xbm", theme->desk_pressed_mask, theme->desk_mask);
+    READ_MASK_COPY("desk_disabled.xbm", theme->desk_disabled_mask, theme->desk_mask);
+    READ_MASK_COPY("desk_hover.xbm", theme->desk_hover_mask, theme->desk_mask);
+    READ_MASK_COPY("desk_toggled_pressed.xbm", theme->desk_toggled_pressed_mask, theme->desk_toggled_mask);
+    READ_MASK_COPY("desk_toggled_hover.xbm", theme->desk_toggled_hover_mask, theme->desk_toggled_mask);
+   
     /* shade button masks */
     if (!read_mask(inst, path, theme, "shade.xbm", &theme->shade_mask)) {
         guchar data[] = { 0x3f, 0x3f, 0x00, 0x00, 0x00, 0x00 };
         theme->shade_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-    if (!read_mask(inst, path, theme, "shade_toggled.xbm",
-                  &theme->shade_toggled_mask))
-        theme->shade_toggled_mask = RrPixmapMaskCopy(theme->shade_mask);
-    if (!read_mask(inst, path, theme, "shade_pressed.xbm",
-                   &theme->shade_pressed_mask))
-        theme->shade_pressed_mask = RrPixmapMaskCopy(theme->shade_mask);
-    if (!read_mask(inst, path, theme, "shade_disabled.xbm",
-                   &theme->shade_disabled_mask))
-        theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_mask);
-    if (!read_mask(inst, path, theme, "shade_hover.xbm",
-                   &theme->shade_hover_mask))
-        theme->shade_hover_mask = RrPixmapMaskCopy(theme->shade_mask);
-    if (!read_mask(inst, path, theme, "shade_toggled_pressed.xbm",
-                   &theme->shade_toggled_pressed_mask))
-        theme->shade_toggled_pressed_mask =
-            RrPixmapMaskCopy(theme->shade_toggled_mask);
-    if (!read_mask(inst, path, theme, "shade_toggled_hover.xbm",
-                   &theme->shade_toggled_hover_mask))
-        theme->shade_toggled_hover_mask =
-            RrPixmapMaskCopy(theme->shade_toggled_mask);
+    READ_MASK_COPY("shade_toggled.xbm", theme->shade_toggled_mask, theme->shade_mask);
+    READ_MASK_COPY("shade_pressed.xbm", theme->shade_pressed_mask, theme->shade_mask);
+    READ_MASK_COPY("shade_disabled.xbm", theme->shade_disabled_mask, theme->shade_mask);
+    READ_MASK_COPY("shade_hover.xbm", theme->shade_hover_mask, theme->shade_mask);
+    READ_MASK_COPY("shade_toggled_pressed.xbm", theme->shade_toggled_pressed_mask, theme->shade_toggled_mask);
+    READ_MASK_COPY("shade_toggled_hover.xbm", theme->shade_toggled_hover_mask, theme->shade_toggled_mask);
 
     /* close button masks */
     if (!read_mask(inst, path, theme, "close.xbm", &theme->close_mask)) {
         guchar data[] = { 0x33, 0x3f, 0x1e, 0x1e, 0x3f, 0x33 };
         theme->close_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-    if (!read_mask(inst, path, theme, "close_pressed.xbm",
-                   &theme->close_pressed_mask))
-        theme->close_pressed_mask = RrPixmapMaskCopy(theme->close_mask);
-    if (!read_mask(inst, path, theme, "close_disabled.xbm",
-                   &theme->close_disabled_mask))
-        theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
-    if (!read_mask(inst, path, theme, "close_hover.xbm",
-                   &theme->close_hover_mask))
-        theme->close_hover_mask = RrPixmapMaskCopy(theme->close_mask);
+    READ_MASK_COPY("close_pressed.xbm", theme->close_pressed_mask, theme->close_mask);
+    READ_MASK_COPY("close_disabled.xbm", theme->close_disabled_mask, theme->close_mask);
+    READ_MASK_COPY("close_hover.xbm", theme->close_hover_mask, theme->close_mask);
 
     /* submenu bullet mask */
     if (!read_mask(inst, path, theme, "bullet.xbm", &theme->menu_bullet_mask))
@@ -460,50 +430,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                                        OB_DEFAULT_ICON_pixel_data);
 
     /* read the decoration textures */
-    if (!read_appearance(db, inst,
-                         "window.active.title.bg", theme->a_focused_title,
-                         FALSE))
-        set_default_appearance(theme->a_focused_title);
-    if (!read_appearance(db, inst,
-                         "window.inactive.title.bg", theme->a_unfocused_title,
-                         FALSE))
-        set_default_appearance(theme->a_unfocused_title);
-    if (!read_appearance(db, inst,
-                         "window.active.label.bg", theme->a_focused_label,
-                         TRUE))
-        set_default_appearance(theme->a_focused_label);
-    if (!read_appearance(db, inst,
-                         "window.inactive.label.bg", theme->a_unfocused_label,
-                         TRUE))
-        set_default_appearance(theme->a_unfocused_label);
-    if (!read_appearance(db, inst,
-                         "window.active.handle.bg", theme->a_focused_handle,
-                         FALSE))
-        set_default_appearance(theme->a_focused_handle);
-    if (!read_appearance(db, inst,
-                         "window.inactive.handle.bg",theme->a_unfocused_handle,
-                         FALSE))
-        set_default_appearance(theme->a_unfocused_handle);
-    if (!read_appearance(db, inst,
-                         "window.active.grip.bg", theme->a_focused_grip,
-                         TRUE))
-        set_default_appearance(theme->a_focused_grip);
-    if (!read_appearance(db, inst,
-                         "window.inactive.grip.bg", theme->a_unfocused_grip,
-                         TRUE))
-        set_default_appearance(theme->a_unfocused_grip);
-    if (!read_appearance(db, inst,
-                         "menu.items.bg", theme->a_menu,
-                         FALSE))
-        set_default_appearance(theme->a_menu);
-    if (!read_appearance(db, inst,
-                         "menu.title.bg", theme->a_menu_title,
-                         TRUE))
-        set_default_appearance(theme->a_menu_title);
-    if (!read_appearance(db, inst,
-                         "menu.items.active.bg", theme->a_menu_selected,
-                         TRUE))
-        set_default_appearance(theme->a_menu_selected);
+    READ_APPEARANCE("window.active.title.bg", theme->a_focused_title, FALSE);
+    READ_APPEARANCE("window.inactive.title.bg", theme->a_unfocused_title, 
+                    FALSE);
+    READ_APPEARANCE("window.active.label.bg", theme->a_focused_label, TRUE);
+    READ_APPEARANCE("window.inactive.label.bg", theme->a_unfocused_label, 
+                    TRUE);
+    READ_APPEARANCE("window.active.handle.bg", theme->a_focused_handle, FALSE);
+    READ_APPEARANCE("window.inactive.handle.bg",theme->a_unfocused_handle, 
+                    FALSE);
+    READ_APPEARANCE("window.active.grip.bg", theme->a_focused_grip, TRUE);
+    READ_APPEARANCE("window.inactive.grip.bg", theme->a_unfocused_grip, TRUE);
+    READ_APPEARANCE("menu.items.bg", theme->a_menu, FALSE);
+    READ_APPEARANCE("menu.title.bg", theme->a_menu_title, TRUE);
+    READ_APPEARANCE("menu.items.active.bg", theme->a_menu_selected, TRUE);
+    
     theme->a_menu_disabled_selected =
         RrAppearanceCopy(theme->a_menu_selected);
 
@@ -537,117 +478,50 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     }
 
     /* read buttons textures */
-    if (!read_appearance(db, inst,
-                         "window.active.button.disabled.bg",
-                         theme->a_disabled_focused_max,
-                         TRUE))
-        set_default_appearance(theme->a_disabled_focused_max);
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.disabled.bg",
-                         theme->a_disabled_unfocused_max,
-                         TRUE))
-        set_default_appearance(theme->a_disabled_unfocused_max);
-    if (!read_appearance(db, inst,
-                         "window.active.button.pressed.bg",
-                         theme->a_focused_pressed_max,
-                         TRUE))
-        set_default_appearance(theme->a_focused_pressed_max);
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.pressed.bg",
-                         theme->a_unfocused_pressed_max,
-                         TRUE))
-        set_default_appearance(theme->a_unfocused_pressed_max);
-    if (!read_appearance(db, inst,
-                         "window.active.button.toggled.unpressed.bg",
-                         theme->a_toggled_focused_unpressed_max,
-                         TRUE) &&
-        !read_appearance(db, inst,
-                         "window.active.button.toggled.bg",
-                         theme->a_toggled_focused_unpressed_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_toggled_focused_unpressed_max);
-        theme->a_toggled_focused_unpressed_max =
-            RrAppearanceCopy(theme->a_focused_pressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.toggled.unpressed.bg",
-                         theme->a_toggled_unfocused_unpressed_max,
-                         TRUE) &&
-        !read_appearance(db, inst,
-                         "window.inactive.button.toggled.bg",
-                         theme->a_toggled_unfocused_unpressed_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_toggled_unfocused_unpressed_max);
-        theme->a_toggled_unfocused_unpressed_max =
-            RrAppearanceCopy(theme->a_unfocused_pressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.active.button.toggled.hover.bg",
-                         theme->a_toggled_hover_focused_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_toggled_hover_focused_max);
-        theme->a_toggled_hover_focused_max =
-            RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.toggled.hover.bg",
-                         theme->a_toggled_hover_unfocused_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_toggled_hover_unfocused_max);
-        theme->a_toggled_hover_unfocused_max =
-            RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.active.button.toggled.pressed.bg",
-                         theme->a_toggled_focused_pressed_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_toggled_focused_pressed_max);
-        theme->a_toggled_focused_pressed_max =
-            RrAppearanceCopy(theme->a_focused_pressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.toggled.pressed.bg",
-                         theme->a_toggled_unfocused_pressed_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_toggled_unfocused_pressed_max);
-        theme->a_toggled_unfocused_pressed_max =
-            RrAppearanceCopy(theme->a_unfocused_pressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.active.button.unpressed.bg",
-                         theme->a_focused_unpressed_max,
-                         TRUE))
-        set_default_appearance(theme->a_focused_unpressed_max);
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.unpressed.bg",
-                         theme->a_unfocused_unpressed_max,
-                         TRUE))
-        set_default_appearance(theme->a_unfocused_unpressed_max);
-    if (!read_appearance(db, inst,
-                         "window.active.button.hover.bg",
-                         theme->a_hover_focused_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_hover_focused_max);
-        theme->a_hover_focused_max =
-            RrAppearanceCopy(theme->a_focused_unpressed_max);
-    }
-    if (!read_appearance(db, inst,
-                         "window.inactive.button.hover.bg",
-                         theme->a_hover_unfocused_max,
-                         TRUE))
-    {
-        RrAppearanceFree(theme->a_hover_unfocused_max);
-        theme->a_hover_unfocused_max =
-            RrAppearanceCopy(theme->a_unfocused_unpressed_max);
-    }
+    READ_APPEARANCE("window.active.button.disabled.bg", 
+                    theme->a_disabled_focused_max, TRUE);
+    READ_APPEARANCE("window.inactive.button.disabled.bg", 
+                    theme->a_disabled_unfocused_max, TRUE);
+    READ_APPEARANCE("window.active.button.pressed.bg", 
+                    theme->a_focused_pressed_max, TRUE);
+    READ_APPEARANCE("window.inactive.button.pressed.bg", 
+                    theme->a_unfocused_pressed_max, TRUE);
 
+    READ_APPEARANCE_("window.active.button.toggled.unpressed.bg", 
+                     "window.active.button.toggled.bg", 
+                     theme->a_toggled_focused_unpressed_max, TRUE, 
+                     theme->a_focused_pressed_max);
+    READ_APPEARANCE_("window.inactive.button.toggled.unpressed.bg", 
+                     "window.inactive.button.toggled.bg", 
+                     theme->a_toggled_unfocused_unpressed_max, TRUE, 
+                     theme->a_unfocused_pressed_max);
+
+    READ_APPEARANCE_COPY("window.active.button.toggled.hover.bg", 
+                         theme->a_toggled_hover_focused_max, TRUE, 
+                         theme->a_toggled_focused_unpressed_max);
+    READ_APPEARANCE_COPY("window.inactive.button.toggled.hover.bg", 
+                         theme->a_toggled_hover_unfocused_max, TRUE, 
+                         theme->a_toggled_unfocused_unpressed_max);
+
+    READ_APPEARANCE_COPY("window.active.button.toggled.pressed.bg", 
+                         theme->a_toggled_focused_pressed_max, TRUE, 
+                         theme->a_focused_pressed_max);
+    READ_APPEARANCE_COPY("window.inactive.button.toggled.pressed.bg", 
+                         theme->a_toggled_unfocused_pressed_max, TRUE, 
+                         theme->a_unfocused_pressed_max);
+
+    READ_APPEARANCE("window.active.button.unpressed.bg", 
+                    theme->a_focused_unpressed_max, TRUE);
+    READ_APPEARANCE("window.inactive.button.unpressed.bg", 
+                    theme->a_unfocused_unpressed_max, TRUE);
+
+    READ_APPEARANCE_COPY("window.active.button.hover.bg", 
+                         theme->a_hover_focused_max, TRUE, 
+                         theme->a_focused_unpressed_max);
+    READ_APPEARANCE_COPY("window.inactive.button.hover.bg", 
+                         theme->a_hover_unfocused_max, TRUE, 
+                         theme->a_unfocused_unpressed_max);
+   
     theme->a_disabled_focused_close =
         RrAppearanceCopy(theme->a_disabled_focused_max);
     theme->a_disabled_unfocused_close =

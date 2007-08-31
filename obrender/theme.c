@@ -221,8 +221,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_INT("border.width", theme->fbwidth, 0, 100, 1);
     READ_INT("menu.border.width", theme->mbwidth, 0, 100, theme->fbwidth);
     READ_INT("osd.border.width", theme->obwidth, 0, 100, theme->fbwidth);
-    READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100, theme->paddingx);
-    READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100, theme->cbwidthx);
     READ_INT("menu.separator.width", theme->menu_sep_width, 1, 100, 1);
     READ_INT("menu.separator.padding.width", theme->menu_sep_paddingx, 0, 100, 6);
     READ_INT("menu.separator.padding.height", theme->menu_sep_paddingy, 0, 100, 3);
@@ -357,7 +355,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     READ_COLOR("menu.separator.color", theme->menu_sep_color,
                RrColorCopy(theme->menu_color));
-   
+
     /* load the image masks */
 
     /* maximize button masks */

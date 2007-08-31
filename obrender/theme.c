@@ -68,6 +68,15 @@ static RrFont *get_font(RrFont *target, RrFont **default_font,
             x_var < x_min || x_var > x_max) \
         x_var = x_def;
 
+#define READ_COLOR(x_resstr, x_var, x_def) \
+    if (!read_color(db, inst, x_resstr, & x_var)) \
+        x_var = x_def;
+
+#define READ_COLOR_(x_res1, x_res2, x_var, x_def) \
+    if (!read_color(db, inst, x_res1, & x_var) && \
+        !read_color(db, inst, x_res2, & x_var)) \
+        x_var = x_def;
+
 RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
@@ -198,221 +207,134 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_INT("menu.separator.width", theme->menu_sep_width, 1, 100, 1);
     READ_INT("menu.separator.padding.width", theme->menu_sep_paddingx, 0, 100, 6);
     READ_INT("menu.separator.padding.height", theme->menu_sep_paddingy, 0, 100, 3);
+    READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100, 
+             theme->paddingx);
+    READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100, 
+             theme->cbwidthx);
 
     /* load colors */
-    if (!read_color(db, inst,
-                    "window.active.border.color",
-                    &theme->frame_focused_border_color) &&
-        !read_color(db, inst,
-                    "border.color",
-                    &theme->frame_focused_border_color))
-        theme->frame_focused_border_color = RrColorNew(inst, 0, 0, 0);
+    READ_COLOR_("window.active.border.color", "border.color", 
+                theme->frame_focused_border_color, RrColorNew(inst, 0, 0, 0));
+
     /* title separator focused color inherits from focused border color */
-    if (!read_color(db, inst,
-                    "window.active.title.separator.color",
-                    &theme->title_separator_focused_color))
-        theme->title_separator_focused_color =
-            RrColorNew(inst,
-                       theme->frame_focused_border_color->r,
-                       theme->frame_focused_border_color->g,
-                       theme->frame_focused_border_color->b);
+    READ_COLOR("window.active.title.separator.color", 
+               theme->title_separator_focused_color,
+               RrColorCopy(theme->frame_focused_border_color));
+
     /* unfocused border color inherits from frame focused border color */
-    if (!read_color(db, inst,
-                    "window.inactive.border.color",
-                    &theme->frame_unfocused_border_color))
-        theme->frame_unfocused_border_color =
-            RrColorNew(inst, theme->frame_focused_border_color->r,
-                       theme->frame_focused_border_color->g,
-                       theme->frame_focused_border_color->b);
+    READ_COLOR("window.inactive.border.color", 
+               theme->frame_unfocused_border_color, 
+               RrColorCopy(theme->frame_focused_border_color));
+
     /* title separator unfocused color inherits from unfocused border color */
-    if (!read_color(db, inst,
-                    "window.inactive.title.separator.color",
-                    &theme->title_separator_unfocused_color))
-        theme->title_separator_unfocused_color =
-            RrColorNew(inst,
-                       theme->frame_unfocused_border_color->r,
-                       theme->frame_unfocused_border_color->g,
-                       theme->frame_unfocused_border_color->b);
+    READ_COLOR("window.inactive.title.separator.color", 
+               theme->title_separator_unfocused_color,
+               RrColorCopy(theme->frame_unfocused_border_color));
 
     /* menu border color inherits from frame focused border color */
-    if (!read_color(db, inst, "menu.border.color", &theme->menu_border_color))
-        theme->menu_border_color =
-            RrColorNew(inst,
-                       theme->frame_focused_border_color->r,
-                       theme->frame_focused_border_color->g,
-                       theme->frame_focused_border_color->b);
-    /* osd border color inherits from frame focused border color */
-    if (!read_color(db, inst, "osd.border.color", &theme->osd_border_color))
-        theme->osd_border_color =
-            RrColorNew(inst,
-                       theme->frame_focused_border_color->r,
-                       theme->frame_focused_border_color->g,
-                       theme->frame_focused_border_color->b);
-    if (!read_color(db, inst,
-                    "window.active.client.color",
-                    &theme->cb_focused_color))
-        theme->cb_focused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
-    if (!read_color(db, inst,
-                    "window.inactive.client.color",
-                    &theme->cb_unfocused_color))
-        theme->cb_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
-    if (!read_color(db, inst,
-                    "window.active.label.text.color",
-                    &theme->title_focused_color))
-        theme->title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
-    if (!read_color(db, inst, "osd.active.label.text.color",
-                    &theme->osd_text_active_color) &&
-        !read_color(db, inst, "osd.label.text.color",
-                    &theme->osd_text_active_color))
-        theme->osd_text_active_color =
-            RrColorNew(inst,
-                       theme->title_focused_color->r,
-                       theme->title_focused_color->g,
-                       theme->title_focused_color->b);
-    if (!read_color(db, inst,
-                    "window.inactive.label.text.color",
-                    &theme->title_unfocused_color))
-        theme->title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
-    if (!read_color(db, inst, "osd.inactive.label.text.color",
-                    &theme->osd_text_inactive_color))
-        theme->osd_text_inactive_color =
-            RrColorNew(inst,
-                       theme->title_unfocused_color->r,
-                       theme->title_unfocused_color->g,
-                       theme->title_unfocused_color->b);
-    if (!read_color(db, inst,
-                    "window.active.button.unpressed.image.color",
-                    &theme->titlebut_focused_unpressed_color))
-        theme->titlebut_focused_unpressed_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "window.inactive.button.unpressed.image.color",
-                    &theme->titlebut_unfocused_unpressed_color))
-        theme->titlebut_unfocused_unpressed_color =
-            RrColorNew(inst, 0xff, 0xff, 0xff);
-    if (!read_color(db, inst,
-                    "window.active.button.pressed.image.color",
-                    &theme->titlebut_focused_pressed_color))
-        theme->titlebut_focused_pressed_color =
-            RrColorNew(inst,
-                       theme->titlebut_focused_unpressed_color->r,
-                       theme->titlebut_focused_unpressed_color->g,
-                       theme->titlebut_focused_unpressed_color->b);
-    if (!read_color(db, inst,
-                    "window.inactive.button.pressed.image.color",
-                    &theme->titlebut_unfocused_pressed_color))
-        theme->titlebut_unfocused_pressed_color =
-            RrColorNew(inst,
-                       theme->titlebut_unfocused_unpressed_color->r,
-                       theme->titlebut_unfocused_unpressed_color->g,
-                       theme->titlebut_unfocused_unpressed_color->b);
-    if (!read_color(db, inst,
-                    "window.active.button.disabled.image.color",
-                    &theme->titlebut_disabled_focused_color))
-        theme->titlebut_disabled_focused_color =
-            RrColorNew(inst, 0xff, 0xff, 0xff);
-    if (!read_color(db, inst,
-                    "window.inactive.button.disabled.image.color",
-                    &theme->titlebut_disabled_unfocused_color))
-        theme->titlebut_disabled_unfocused_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "window.active.button.hover.image.color",
-                    &theme->titlebut_hover_focused_color))
-        theme->titlebut_hover_focused_color =
-            RrColorNew(inst,
-                       theme->titlebut_focused_unpressed_color->r,
-                       theme->titlebut_focused_unpressed_color->g,
-                       theme->titlebut_focused_unpressed_color->b);
-    if (!read_color(db, inst,
-                    "window.inactive.button.hover.image.color",
-                    &theme->titlebut_hover_unfocused_color))
-        theme->titlebut_hover_unfocused_color =
-            RrColorNew(inst,
-                       theme->titlebut_unfocused_unpressed_color->r,
-                       theme->titlebut_unfocused_unpressed_color->g,
-                       theme->titlebut_unfocused_unpressed_color->b);
-    if (!read_color(db, inst,
-                    "window.active.button.toggled.unpressed.image.color",
-                    &theme->titlebut_toggled_focused_unpressed_color) &&
-        !read_color(db, inst,
-                    "window.active.button.toggled.image.color",
-                    &theme->titlebut_toggled_focused_unpressed_color))
-        theme->titlebut_toggled_focused_unpressed_color =
-            RrColorNew(inst,
-                       theme->titlebut_focused_pressed_color->r,
-                       theme->titlebut_focused_pressed_color->g,
-                       theme->titlebut_focused_pressed_color->b);
-    if (!read_color(db, inst,
-                    "window.inactive.button.toggled.unpressed.image.color",
-                    &theme->titlebut_toggled_unfocused_unpressed_color) &&
-        !read_color(db, inst,
-                    "window.inactive.button.toggled.image.color",
-                    &theme->titlebut_toggled_unfocused_unpressed_color))
-        theme->titlebut_toggled_unfocused_unpressed_color =
-            RrColorNew(inst,
-                       theme->titlebut_unfocused_pressed_color->r,
-                       theme->titlebut_unfocused_pressed_color->g,
-                       theme->titlebut_unfocused_pressed_color->b);
-    if (!read_color(db, inst,
-                    "window.active.button.toggled.hover.image.color",
-                    &theme->titlebut_toggled_hover_focused_color))
-        theme->titlebut_toggled_hover_focused_color =
-            RrColorNew(inst,
-                       theme->titlebut_toggled_focused_unpressed_color->r,
-                       theme->titlebut_toggled_focused_unpressed_color->g,
-                       theme->titlebut_toggled_focused_unpressed_color->b);
-    if (!read_color(db, inst,
-                    "window.inactive.button.toggled.hover.image.color",
-                    &theme->titlebut_toggled_hover_unfocused_color))
-        theme->titlebut_toggled_hover_unfocused_color =
-            RrColorNew(inst,
-                       theme->titlebut_toggled_unfocused_unpressed_color->r,
-                       theme->titlebut_toggled_unfocused_unpressed_color->g,
-                       theme->titlebut_toggled_unfocused_unpressed_color->b);
-    if (!read_color(db, inst,
-                    "window.active.button.toggled.pressed.image.color",
-                    &theme->titlebut_toggled_focused_pressed_color))
-        theme->titlebut_toggled_focused_pressed_color =
-            RrColorNew(inst,
-                       theme->titlebut_focused_pressed_color->r,
-                       theme->titlebut_focused_pressed_color->g,
-                       theme->titlebut_focused_pressed_color->b);
-    if (!read_color(db, inst,
-                    "window.inactive.button.toggled.pressed.image.color",
-                    &theme->titlebut_toggled_unfocused_pressed_color))
-        theme->titlebut_toggled_unfocused_pressed_color =
-            RrColorNew(inst,
-                       theme->titlebut_unfocused_pressed_color->r,
-                       theme->titlebut_unfocused_pressed_color->g,
-                       theme->titlebut_unfocused_pressed_color->b);
-    if (!read_color(db, inst,
-                    "menu.title.text.color", &theme->menu_title_color))
-        theme->menu_title_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "menu.items.text.color", &theme->menu_color))
-        theme->menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
-    if (!read_color(db, inst,
-                    "menu.items.disabled.text.color",
-                    &theme->menu_disabled_color))
-        theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "menu.items.active.disabled.text.color",
-                    &theme->menu_disabled_selected_color))
-        theme->menu_disabled_selected_color =
-            RrColorNew(inst,
-                       theme->menu_disabled_color->r,
-                       theme->menu_disabled_color->g,
-                       theme->menu_disabled_color->b);
-    if (!read_color(db, inst,
-                    "menu.items.active.text.color",
-                    &theme->menu_selected_color))
-        theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
-                    "menu.separator.color", &theme->menu_sep_color))
-        theme->menu_sep_color = RrColorNew(inst,
-                                           theme->menu_color->r,
-                                           theme->menu_color->g,
-                                           theme->menu_color->b);
+    READ_COLOR("menu.border.color", theme->menu_border_color, 
+               RrColorCopy(theme->frame_focused_border_color));
 
+    /* osd border color inherits from frame focused border color */
+    READ_COLOR("osd.border.color", theme->osd_border_color, 
+               RrColorCopy(theme->frame_focused_border_color));
+
+    READ_COLOR("window.active.client.color", theme->cb_focused_color, 
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.inactive.client.color", theme->cb_unfocused_color, 
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.active.label.text.color", theme->title_focused_color, 
+               RrColorNew(inst, 0x0, 0x0, 0x0));
+
+    READ_COLOR_("osd.active.label.text.color",
+                "osd.label.text.color",
+                theme->osd_color, RrColorCopy(theme->title_focused_color));
+
+    READ_COLOR("window.inactive.label.text.color", theme->title_unfocused_color, 
+               RrColorCopy(theme->title_unfocused_color));
+
+    READ_COLOR("osd.inactive.label.text.color", theme->osd_text_inactive_color,
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.active.button.unpressed.image.color", 
+               theme->titlebut_focused_unpressed_color, 
+               RrColorNew(inst, 0, 0, 0));
+
+    READ_COLOR("window.inactive.button.unpressed.image.color", 
+               theme->titlebut_unfocused_unpressed_color, 
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.active.button.pressed.image.color", 
+               theme->titlebut_focused_pressed_color, 
+               RrColorCopy(theme->titlebut_focused_unpressed_color));
+
+    READ_COLOR("window.inactive.button.pressed.image.color", 
+               theme->titlebut_unfocused_pressed_color, 
+               RrColorCopy(theme->titlebut_unfocused_unpressed_color));
+
+    READ_COLOR("window.active.button.disabled.image.color", 
+               theme->titlebut_disabled_focused_color, 
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.inactive.button.disabled.image.color", 
+               theme->titlebut_disabled_unfocused_color, 
+               RrColorNew(inst, 0, 0, 0));
+
+    READ_COLOR("window.active.button.hover.image.color", 
+               theme->titlebut_hover_focused_color, 
+               RrColorCopy(theme->titlebut_focused_unpressed_color));
+
+    READ_COLOR("window.inactive.button.hover.image.color", 
+               theme->titlebut_hover_unfocused_color, 
+               RrColorCopy(theme->titlebut_unfocused_unpressed_color));
+
+    READ_COLOR_("window.active.button.toggled.unpressed.image.color", 
+                "window.active.button.toggled.image.color", 
+                theme->titlebut_toggled_focused_unpressed_color, 
+                RrColorCopy(theme->titlebut_focused_pressed_color));
+
+    READ_COLOR_("window.inactive.button.toggled.unpressed.image.color", 
+                "window.inactive.button.toggled.image.color", 
+                theme->titlebut_toggled_unfocused_unpressed_color, 
+                RrColorCopy(theme->titlebut_unfocused_pressed_color));
+
+    READ_COLOR("window.active.button.toggled.hover.image.color", 
+               theme->titlebut_toggled_hover_focused_color, 
+               RrColorCopy(theme->titlebut_toggled_focused_unpressed_color));
+    
+    READ_COLOR("window.inactive.button.toggled.hover.image.color", 
+               theme->titlebut_toggled_hover_unfocused_color, 
+               RrColorCopy(theme->titlebut_toggled_unfocused_unpressed_color));
+   
+    READ_COLOR("window.active.button.toggled.pressed.image.color", 
+               theme->titlebut_toggled_focused_pressed_color, 
+               RrColorCopy(theme->titlebut_focused_pressed_color));
+
+    READ_COLOR("window.inactive.button.toggled.pressed.image.color", 
+               theme->titlebut_toggled_unfocused_pressed_color, 
+               RrColorCopy(theme->titlebut_unfocused_pressed_color));
+
+    READ_COLOR("menu.title.text.color", theme->menu_title_color, 
+               RrColorNew(inst, 0, 0, 0));
+    
+    READ_COLOR("menu.items.text.color", theme->menu_color, 
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+  
+    READ_COLOR("menu.items.disabled.text.color", theme->menu_disabled_color, 
+               RrColorNew(inst, 0, 0, 0));
+
+    READ_COLOR("menu.items.active.disabled.text.color", 
+               theme->menu_disabled_selected_color, 
+               RrColorCopy(theme->menu_disabled_color));
+
+    READ_COLOR("menu.items.active.text.color", theme->menu_selected_color, 
+               RrColorNew(inst, 0, 0, 0));
+
+    READ_COLOR("menu.separator.color", theme->menu_sep_color,
+               RrColorCopy(inst, theme->menu_color));
+   
     /* load the image masks */
 
     /* maximize button masks */

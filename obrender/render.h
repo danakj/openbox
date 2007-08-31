@@ -303,6 +303,7 @@ gint     RrGreenMask    (const RrInstance *inst);
 gint     RrBlueMask     (const RrInstance *inst);
 
 RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
+RrColor *RrColorCopy  (RrColor *c);
 RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);
 void     RrColorFree  (RrColor *in);
 

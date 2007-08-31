@@ -1,3 +1,10 @@
+3.4.5:
+  * Updated Finnish, Russian, German and French translations
+  * Fixed some very minor memory leaks
+  * Hide the desktop popup when showing the focus popup
+  * Fix a crash when trying to access the More... menu of
+    client-list-combined-menu
+
 3.4.4:
   * Updated Traditional Chinese translation
   * Updated Norwegian translation

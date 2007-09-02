@@ -30,9 +30,11 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-#define ICON_SIZE 40
-#define ICON_HILITE_WIDTH 2
-#define ICON_HILITE_MARGIN 1
+#define HILITE_SIZE 40
+#define HILITE_WIDTH 2
+#define HILITE_MARGIN 1
+#define HILITE_OFFSET (HILITE_WIDTH + HILITE_MARGIN)
+#define ICON_SIZE (HILITE_SIZE - 2*HILITE_OFFSET)
 #define OUTSIDE_BORDER 3
 #define TEXT_BORDER 2
 
@@ -118,10 +120,10 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.last_target = NULL;
 
     /* set up the hilite texture for the icon */
-    popup.a_icon->texture[1].data.rgba.width = ICON_SIZE;
-    popup.a_icon->texture[1].data.rgba.height = ICON_SIZE;
+    popup.a_icon->texture[1].data.rgba.width = HILITE_SIZE;
+    popup.a_icon->texture[1].data.rgba.height = HILITE_SIZE;
     popup.a_icon->texture[1].data.rgba.alpha = 0xff;
-    p = g_new(RrPixel32, ICON_SIZE * ICON_SIZE);
+    p = g_new(RrPixel32, HILITE_SIZE * HILITE_SIZE);
     popup.a_icon->texture[1].data.rgba.data = p;
 
     /* create the hilite under the target icon */
@@ -134,14 +136,14 @@ void focus_cycle_popup_startup(gboolean reconfig)
             ((ob_rr_theme->osd_color->b & 0xff) << RrDefaultBlueOffset);
 
         o = 0;
-        for (x = 0; x < ICON_SIZE; x++)
-            for (y = 0; y < ICON_SIZE; y++) {
+        for (x = 0; x < HILITE_SIZE; x++)
+            for (y = 0; y < HILITE_SIZE; y++) {
                 guchar a;
 
-                if (x < ICON_HILITE_WIDTH ||
-                    x >= ICON_SIZE - ICON_HILITE_WIDTH ||
-                    y < ICON_HILITE_WIDTH ||
-                    y >= ICON_SIZE - ICON_HILITE_WIDTH)
+                if (x < HILITE_WIDTH ||
+                    x >= HILITE_SIZE - HILITE_WIDTH ||
+                    y < HILITE_WIDTH ||
+                    y >= HILITE_SIZE - HILITE_WIDTH)
                 {
                     /* the border of the target */
                     a = 0x88;
@@ -271,7 +273,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint x, y, w, h;
     Rect *screen_area = NULL;
     gint rgbax, rgbay, rgbaw, rgbah;
-    gint innerw, innerh;
     gint i;
     GList *it;
     const ObFocusCyclePopupTarget *newtarget;
@@ -288,10 +289,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     t = mt + OUTSIDE_BORDER;
     b = mb + OUTSIDE_BORDER;
 
-    /* get the icon pictures' sizes */
-    innerw = ICON_SIZE - (ICON_HILITE_WIDTH + ICON_HILITE_MARGIN) * 2;
-    innerh = ICON_SIZE - (ICON_HILITE_WIDTH + ICON_HILITE_MARGIN) * 2;
-
     /* get the width from the text and keep it within limits */
     w = l + r + p->maxtextw;
     w = MIN(w, MAX(screen_area->width/3, POPUP_WIDTH)); /* max width */
@@ -299,7 +296,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* find the height of the dialog */
 #warning limit the height and scroll entries somehow
-    h = t + b + (p->n_targets * ICON_SIZE) + OUTSIDE_BORDER;
+    h = t + b + (p->n_targets * HILITE_SIZE);
 
     /* find the position for the popup (include the outer borders) */
     x = screen_area->x + (screen_area->width -
@@ -326,7 +323,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             /* save the target */
             newtarget = target;
             newtargetx = l;
-            newtargety = t + i * ICON_SIZE;
+            newtargety = t + i * HILITE_SIZE;
 
             if (!p->mapped)
                 break; /* if we're not dimensioning, then we're done */
@@ -345,50 +342,59 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
         const ObFocusCyclePopupTarget *target = it->data;
 
-        /* have to redraw the targetted icon and last targetted icon,
-           they can pick up the hilite changes in the backgroud */
+        /* have to redraw the targetted icon and last targetted icon
+         * to update the hilite */
         if (!p->mapped || newtarget == target || p->last_target == target) {
             const ObClientIcon *icon;
-            gint innerx, innery;
+            gint innerx, innery, textx, texty;
+            gint textw /* texth = ICON_SIZE */;
 
             /* find the dimensions of the icon inside it */
             innerx = l;
-            innerx += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
-            innery = t + i * ICON_SIZE;
-            innery += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
+            innery = t + i * HILITE_SIZE;
+
+            /* find the dimensions of the text box */
+            textx = innerx + HILITE_SIZE + TEXT_BORDER;
+            texty = innery + HILITE_OFFSET;
+            textw = w
+                    /* left edge */  - innerx - HILITE_SIZE - TEXT_BORDER
+                    /* right edge */ - OUTSIDE_BORDER - TEXT_BORDER;
 
             /* move the icon */
             XMoveResizeWindow(obt_display, target->iconwin,
-                              innerx, innery, innerw, innerh);
+                              innerx, innery, HILITE_SIZE, HILITE_SIZE);
 
             /* move the text */
             XMoveResizeWindow(obt_display, target->textwin,
-                              innerx + ICON_SIZE, innery,
-                              w - innerx - ICON_SIZE - OUTSIDE_BORDER, innerh);
+                              textx, texty,
+                              textw, ICON_SIZE);
 
             /* get the icon from the client */
-            icon = client_icon(target->client, innerw, innerh);
+            icon = client_icon(target->client, ICON_SIZE, ICON_SIZE);
             p->a_icon->texture[0].data.rgba.width = icon->width;
             p->a_icon->texture[0].data.rgba.height = icon->height;
+            p->a_icon->texture[0].data.rgba.twidth = ICON_SIZE;
+            p->a_icon->texture[0].data.rgba.theight = ICON_SIZE;
+            p->a_icon->texture[0].data.rgba.tx = HILITE_OFFSET;
+            p->a_icon->texture[0].data.rgba.ty = HILITE_OFFSET;
             p->a_icon->texture[0].data.rgba.alpha =
                 target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
             p->a_icon->texture[0].data.rgba.data = icon->data;
 
             /* Draw the hilite? */
-#warning do i have to add more obrender interface thingers to get it to draw the icon inside the hilight? sigh
             p->a_icon->texture[1].type = (target == newtarget) ?
                                          RR_TEXTURE_RGBA : RR_TEXTURE_NONE;
 
             /* draw the icon */
             p->a_icon->surface.parentx = innerx;
             p->a_icon->surface.parenty = innery;
-            RrPaint(p->a_icon, target->iconwin, innerw, innerh);
+            RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
 
             /* draw the text */
             p->a_text->texture[0].data.text.string = target->text;
-            p->a_text->surface.parentx = innerx + ICON_SIZE;
-            p->a_text->surface.parenty = innery;
-            RrPaint(p->a_text, target->textwin, w - innerx - ICON_SIZE - OUTSIDE_BORDER, innerh);
+            p->a_text->surface.parentx = textx;
+            p->a_text->surface.parenty = texty;
+            RrPaint(p->a_text, target->textwin, textw, ICON_SIZE);
         }
     }
 
@@ -477,7 +483,8 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     }
 
     text = popup_get_name(c);
-    icon_popup_show(single_popup, text, client_icon(c, ICON_SIZE, ICON_SIZE));
+    icon_popup_show(single_popup, text, client_icon(c, HILITE_SIZE,
+                                                    HILITE_SIZE));
     g_free(text);
     screen_hide_desktop_popup();
 }

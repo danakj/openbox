@@ -132,10 +132,20 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
             break;
         case RR_TEXTURE_RGBA:
             g_assert(!transferred);
-            RrImageDraw(a->surface.pixel_data,
-                        &a->texture[i].data.rgba,
-                        a->w, a->h,
-                        &tarea);
+            {
+                RrRect narea = tarea;
+                RrTextureRGBA *rgb = &a->texture[i].data.rgba;
+                if (rgb->twidth)
+                    narea.width = MIN(tarea.width, rgb->twidth);
+                if (rgb->theight)
+                    narea.height = MIN(tarea.height, rgb->theight);
+                narea.x += rgb->tx;
+                narea.y += rgb->ty;
+                RrImageDraw(a->surface.pixel_data,
+                            &a->texture[i].data.rgba,
+                            a->w, a->h,
+                            &narea);
+            }
             force_transfer = 1;
         break;
         }

@@ -107,7 +107,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     RrAppearanceAddTextures(popup.a_icon, 2);
 
-    popup.a_icon->texture[1].type = RR_TEXTURE_RGBA;
+    popup.a_icon->texture[0].type = RR_TEXTURE_RGBA;
 
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
@@ -118,7 +118,45 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.n_targets = 0;
     popup.last_target = NULL;
 
-    popup.hilite_rgba = NULL;
+    /* set up the hilite texture for the icon */
+    popup.a_icon->texture[1].data.rgba.width = ICON_SIZE;
+    popup.a_icon->texture[1].data.rgba.height = ICON_SIZE;
+    popup.a_icon->texture[1].data.rgba.alpha = 0xff;
+    popup.hilite_rgba = g_new(RrPixel32, ICON_SIZE * ICON_SIZE);
+    popup.a_icon->texture[1].data.rgba.data = popup.hilite_rgba;
+
+    /* create the hilite under the target icon */
+    {
+        RrPixel32 color;
+        gint x, y, o;
+
+        color = ((ob_rr_theme->osd_color->r & 0xff) << RrDefaultRedOffset) +
+            ((ob_rr_theme->osd_color->g & 0xff) << RrDefaultGreenOffset) +
+            ((ob_rr_theme->osd_color->b & 0xff) << RrDefaultBlueOffset);
+
+        o = 0;
+        for (x = 0; x < ICON_SIZE; x++)
+            for (y = 0; y < ICON_SIZE; y++) {
+                guchar a;
+
+                if (x < ICON_HILITE_WIDTH ||
+                    x >= ICON_SIZE - ICON_HILITE_WIDTH ||
+                    y < ICON_HILITE_WIDTH ||
+                    y >= ICON_SIZE - ICON_HILITE_WIDTH)
+                {
+                    /* the border of the target */
+                    a = 0x88;
+                }
+                else {
+                    /* the background of the target */
+                    a = 0x22;
+                }
+
+                popup.hilite_rgba[o++] =
+                    color + (a << RrDefaultAlphaOffset);
+            }
+    }
+
 
     stacking_add(INTERNAL_AS_WINDOW(&popup));
     window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
@@ -284,13 +322,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     if (!p->mapped) {
         /* position the background but don't draw it*/
         XMoveResizeWindow(obt_display, p->bg, x, y, w, h);
-
-        /* set up the hilite texture for the icon */
-        p->a_icon->texture[0].data.rgba.width = ICON_SIZE;
-        p->a_icon->texture[0].data.rgba.height = ICON_SIZE;
-        p->a_icon->texture[0].data.rgba.alpha = 0xff;
-        p->hilite_rgba = g_new(RrPixel32, ICON_SIZE * ICON_SIZE);
-        p->a_icon->texture[0].data.rgba.data = p->hilite_rgba;
     }
 
     /* find the focused target */
@@ -309,38 +340,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     }
 
     g_assert(newtarget != NULL);
-
-    /* create the hilite under the target icon */
-    {
-        RrPixel32 color;
-        gint i, j, o;
-
-        color = ((ob_rr_theme->osd_color->r & 0xff) << RrDefaultRedOffset) +
-            ((ob_rr_theme->osd_color->g & 0xff) << RrDefaultGreenOffset) +
-            ((ob_rr_theme->osd_color->b & 0xff) << RrDefaultBlueOffset);
-
-        o = 0;
-        for (x = 0; x < ICON_SIZE; x++)
-            for (y = 0; y < ICON_SIZE; y++) {
-                guchar a;
-
-                if (x < ICON_HILITE_WIDTH ||
-                    x >= ICON_SIZE - ICON_HILITE_WIDTH ||
-                    y < ICON_HILITE_WIDTH ||
-                    y >= ICON_SIZE - ICON_HILITE_WIDTH)
-                {
-                    /* the border of the target */
-                    a = 0x88;
-                }
-                else {
-                    /* the background of the target */
-                    a = 0x22;
-                }
-
-                p->hilite_rgba[o++] =
-                    color + (a << RrDefaultAlphaOffset);
-            }
-    }
 
     /* * * draw everything * * */
 
@@ -375,15 +374,15 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
             /* get the icon from the client */
             icon = client_icon(target->client, innerw, innerh);
-            p->a_icon->texture[1].data.rgba.width = icon->width;
-            p->a_icon->texture[1].data.rgba.height = icon->height;
-            p->a_icon->texture[1].data.rgba.alpha =
+            p->a_icon->texture[0].data.rgba.width = icon->width;
+            p->a_icon->texture[0].data.rgba.height = icon->height;
+            p->a_icon->texture[0].data.rgba.alpha =
                 target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
-            p->a_icon->texture[1].data.rgba.data = icon->data;
+            p->a_icon->texture[0].data.rgba.data = icon->data;
 
             /* Draw the hilite? */
 #warning do i have to add more obrender interface thingers to get it to draw the icon inside the hilight? sigh
-            p->a_icon->texture[0].type = (target == newtarget) ?
+            p->a_icon->texture[1].type = (target == newtarget) ?
                                          RR_TEXTURE_RGBA : RR_TEXTURE_NONE;
 
             /* draw the icon */
@@ -452,9 +451,6 @@ void focus_cycle_popup_hide(void)
     }
     popup.n_targets = 0;
     popup.last_target = NULL;
-
-    g_free(popup.hilite_rgba);
-    popup.hilite_rgba = NULL;
 }
 
 void focus_cycle_popup_single_show(struct _ObClient *c,

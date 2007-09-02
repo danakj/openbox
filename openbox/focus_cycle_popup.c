@@ -63,8 +63,6 @@ struct _ObFocusCyclePopup
     RrAppearance *a_text;
     RrAppearance *a_icon;
 
-    RrPixel32 *hilite_rgba;
-
     gboolean mapped;
 };
 
@@ -94,6 +92,7 @@ static Window create_window(Window parent, guint bwidth, gulong mask,
 void focus_cycle_popup_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
+    RrPixel32 *p;
 
     single_popup = icon_popup_new();
 
@@ -122,8 +121,8 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.a_icon->texture[1].data.rgba.width = ICON_SIZE;
     popup.a_icon->texture[1].data.rgba.height = ICON_SIZE;
     popup.a_icon->texture[1].data.rgba.alpha = 0xff;
-    popup.hilite_rgba = g_new(RrPixel32, ICON_SIZE * ICON_SIZE);
-    popup.a_icon->texture[1].data.rgba.data = popup.hilite_rgba;
+    p = g_new(RrPixel32, ICON_SIZE * ICON_SIZE);
+    popup.a_icon->texture[1].data.rgba.data = p;
 
     /* create the hilite under the target icon */
     {
@@ -152,11 +151,9 @@ void focus_cycle_popup_startup(gboolean reconfig)
                     a = 0x22;
                 }
 
-                popup.hilite_rgba[o++] =
-                    color + (a << RrDefaultAlphaOffset);
+                p[o++] = color + (a << RrDefaultAlphaOffset);
             }
     }
-
 
     stacking_add(INTERNAL_AS_WINDOW(&popup));
     window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
@@ -178,9 +175,6 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
-
-    g_free(popup.hilite_rgba);
-    popup.hilite_rgba = NULL;
 
     XDestroyWindow(obt_display, popup.bg);
 

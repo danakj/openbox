@@ -43,15 +43,14 @@ struct _ObFocusCyclePopupTarget
 {
     ObClient *client;
     gchar *text;
-    Window win;
+    Window iconwin;
+    Window textwin;
 };
 
 struct _ObFocusCyclePopup
 {
     ObWindow obwin;
     Window bg;
-
-    Window text;
 
     GList *targets;
     gint n_targets;
@@ -116,15 +115,11 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.bg = create_window(obt_root(ob_screen), ob_rr_theme->obwidth,
                              CWOverrideRedirect | CWBorderPixel, &attrib);
 
-    popup.text = create_window(popup.bg, 0, 0, NULL);
-
     popup.targets = NULL;
     popup.n_targets = 0;
     popup.last_target = NULL;
 
     popup.hilite_rgba = NULL;
-
-    XMapWindow(obt_display, popup.text);
 
     stacking_add(INTERNAL_AS_WINDOW(&popup));
     window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
@@ -141,7 +136,8 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
         ObFocusCyclePopupTarget *t = popup.targets->data;
 
         g_free(t->text);
-        XDestroyWindow(obt_display, t->win);
+        XDestroyWindow(obt_display, t->iconwin);
+        XDestroyWindow(obt_display, t->textwin);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
@@ -149,7 +145,6 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     g_free(popup.hilite_rgba);
     popup.hilite_rgba = NULL;
 
-    XDestroyWindow(obt_display, popup.text);
     XDestroyWindow(obt_display, popup.bg);
 
     RrAppearanceFree(popup.a_icon);
@@ -195,9 +190,11 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 
                 t->client = ft;
                 t->text = text;
-                t->win = create_window(p->bg, 0, 0, NULL);
+                t->iconwin = create_window(p->bg, 0, 0, NULL);
+                t->textwin = create_window(p->bg, 0, 0, NULL);
 
-                XMapWindow(obt_display, t->win);
+                XMapWindow(obt_display, t->iconwin);
+                XMapWindow(obt_display, t->textwin);
 
                 p->targets = g_list_prepend(p->targets, t);
                 ++n;
@@ -242,11 +239,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint l, t, r, b;
     gint x, y, w, h;
     Rect *screen_area = NULL;
-    gint icons_per_row;
-    gint icon_rows;
-    gint textx, texty, textw, texth;
     gint rgbax, rgbay, rgbaw, rgbah;
-    gint icons_center_x;
     gint innerw, innerh;
     gint i;
     GList *it;
@@ -273,24 +266,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     w = MIN(w, MAX(screen_area->width/3, POPUP_WIDTH)); /* max width */
     w = MAX(w, POPUP_WIDTH); /* min width */
 
-    /* how many icons will fit in that row? make the width fit that */
-    w -= l + r;
-    icons_per_row = (w + ICON_SIZE - 1) / ICON_SIZE;
-    w = icons_per_row * ICON_SIZE + l + r;
-
-    /* how many rows do we need? */
-    icon_rows = (p->n_targets-1) / icons_per_row + 1;
-
-    /* get the text dimensions */
-    textw = w - l - r;
-    texth = RrMinHeight(p->a_text) + TEXT_BORDER * 2;
-
     /* find the height of the dialog */
-    h = t + b + (icon_rows * ICON_SIZE) + (OUTSIDE_BORDER + texth);
-
-    /* get the position of the text */
-    textx = l;
-    texty = h - texth - b;
+    h = t + b + (p->n_targets * ICON_SIZE) + OUTSIDE_BORDER;
 
     /* find the position for the popup (include the outer borders) */
     x = screen_area->x + (screen_area->width -
@@ -304,12 +281,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     rgbaw = w - ml - mr;
     rgbah = h - mt - mb;
 
-    /* center the icons if there is less than one row */
-    if (icon_rows == 1)
-        icons_center_x = (w - p->n_targets * ICON_SIZE) / 2;
-    else
-        icons_center_x = 0;
-
     if (!p->mapped) {
         /* position the background but don't draw it*/
         XMoveResizeWindow(obt_display, p->bg, x, y, w, h);
@@ -320,24 +291,17 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         p->a_bg->texture[0].data.rgba.alpha = 0xff;
         p->hilite_rgba = g_new(RrPixel32, rgbaw * rgbah);
         p->a_bg->texture[0].data.rgba.data = p->hilite_rgba;
-
-        /* position the text, but don't draw it */
-        XMoveResizeWindow(obt_display, p->text, textx, texty, textw, texth);
-        p->a_text->surface.parentx = textx;
-        p->a_text->surface.parenty = texty;
     }
 
     /* find the focused target */
     for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
         const ObFocusCyclePopupTarget *target = it->data;
-        const gint row = i / icons_per_row; /* starting from 0 */
-        const gint col = i % icons_per_row; /* starting from 0 */
 
         if (target->client == c) {
             /* save the target */
             newtarget = target;
-            newtargetx = icons_center_x + l + (col * ICON_SIZE);
-            newtargety = t + (row * ICON_SIZE);
+            newtargetx = l;
+            newtargety = t + i * ICON_SIZE;
 
             if (!p->mapped)
                 break; /* if we're not dimensioning, then we're done */
@@ -391,7 +355,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     /* draw the background */
     RrPaint(p->a_bg, p->bg, w, h);
 
-    /* draw the icons */
+    /* draw the icons and text */
     for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
         const ObFocusCyclePopupTarget *target = it->data;
 
@@ -399,19 +363,22 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
            they can pick up the hilite changes in the backgroud */
         if (!p->mapped || newtarget == target || p->last_target == target) {
             const ObClientIcon *icon;
-            const gint row = i / icons_per_row; /* starting from 0 */
-            const gint col = i % icons_per_row; /* starting from 0 */
             gint innerx, innery;
 
             /* find the dimensions of the icon inside it */
-            innerx = icons_center_x + l + (col * ICON_SIZE);
+            innerx = l;
             innerx += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
-            innery = t + (row * ICON_SIZE);
+            innery = t + i * ICON_SIZE;
             innery += ICON_HILITE_WIDTH + ICON_HILITE_MARGIN;
 
             /* move the icon */
-            XMoveResizeWindow(obt_display, target->win,
+            XMoveResizeWindow(obt_display, target->iconwin,
                               innerx, innery, innerw, innerh);
+
+            /* move the text */
+            XMoveResizeWindow(obt_display, target->textwin,
+                              innerx + ICON_SIZE, innery,
+                              w - innerx - ICON_SIZE - OUTSIDE_BORDER, innerh);
 
             /* get the icon from the client */
             icon = client_icon(target->client, innerw, innerh);
@@ -424,15 +391,15 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             /* draw the icon */
             p->a_icon->surface.parentx = innerx;
             p->a_icon->surface.parenty = innery;
-            RrPaint(p->a_icon, target->win, innerw, innerh);
+            RrPaint(p->a_icon, target->iconwin, innerw, innerh);
+
+            /* draw the text */
+            p->a_text->texture[0].data.text.string = target->text;
+            p->a_text->surface.parentx = innerx + ICON_SIZE;
+            p->a_text->surface.parenty = innery;
+            RrPaint(p->a_text, target->textwin, w - innerx - ICON_SIZE - OUTSIDE_BORDER, innerh);
         }
     }
-
-    /* draw the text */
-    p->a_text->texture[0].data.text.string = newtarget->text;
-    p->a_text->surface.parentx = textx;
-    p->a_text->surface.parenty = texty;
-    RrPaint(p->a_text, p->text, textw, texth);
 
     p->last_target = newtarget;
 
@@ -479,7 +446,8 @@ void focus_cycle_popup_hide(void)
         ObFocusCyclePopupTarget *t = popup.targets->data;
 
         g_free(t->text);
-        XDestroyWindow(obt_display, t->win);
+        XDestroyWindow(obt_display, t->iconwin);
+        XDestroyWindow(obt_display, t->textwin);
         g_free(t);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);

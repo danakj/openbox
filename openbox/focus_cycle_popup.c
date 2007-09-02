@@ -63,6 +63,7 @@ struct _ObFocusCyclePopup
 
     RrAppearance *a_bg;
     RrAppearance *a_text;
+    RrAppearance *a_hilite_text;
     RrAppearance *a_icon;
 
     gboolean mapped;
@@ -100,9 +101,11 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     popup.obwin.type = OB_WINDOW_CLASS_INTERNAL;
     popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
-    popup.a_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
+    popup.a_hilite_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
+    popup.a_text = RrAppearanceCopy(ob_rr_theme->a_unfocused_label);
     popup.a_icon = RrAppearanceCopy(ob_rr_theme->a_clear);
 
+    popup.a_hilite_text->surface.parent = popup.a_bg;
     popup.a_text->surface.parent = popup.a_bg;
     popup.a_icon->surface.parent = popup.a_bg;
 
@@ -181,6 +184,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     XDestroyWindow(obt_display, popup.bg);
 
     RrAppearanceFree(popup.a_icon);
+    RrAppearanceFree(popup.a_hilite_text);
     RrAppearanceFree(popup.a_text);
     RrAppearanceFree(popup.a_bg);
 }
@@ -348,6 +352,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             const ObClientIcon *icon;
             gint innerx, innery, textx, texty;
             gint textw /* texth = ICON_SIZE */;
+            RrAppearance *text;
 
             /* find the dimensions of the icon inside it */
             innerx = l;
@@ -391,10 +396,11 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
 
             /* draw the text */
-            p->a_text->texture[0].data.text.string = target->text;
-            p->a_text->surface.parentx = textx;
-            p->a_text->surface.parenty = texty;
-            RrPaint(p->a_text, target->textwin, textw, ICON_SIZE);
+            text = (target == newtarget) ? p->a_hilite_text : p->a_text;
+            text->texture[0].data.text.string = target->text;
+            text->surface.parentx = textx;
+            text->surface.parenty = texty;
+            RrPaint(text, target->textwin, textw, ICON_SIZE);
         }
     }
 

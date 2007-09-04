@@ -278,11 +278,11 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     c.pixel = t->color->pixel;
 
     if (t->shortcut) {
-        const gchar *c = t->string + t->shortcut_pos;
+        const gchar *s = t->string + t->shortcut_pos;
 
         t->font->shortcut_underline->start_index = t->shortcut_pos;
         t->font->shortcut_underline->end_index = t->shortcut_pos +
-            (g_utf8_next_char(c) - c);
+            (g_utf8_next_char(s) - s);
 
         /* the attributes are owned by the layout.
            re-add the attributes to the layout after changing the

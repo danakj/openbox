@@ -254,8 +254,6 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
 
     /* try ignoring different things to find empty space */
     for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
-        guint i;
-
         /* try all monitors in order of preference */
         for (i = 0; i < screen_num_monitors && !ret; ++i) {
             GList *it;

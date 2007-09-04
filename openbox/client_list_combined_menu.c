@@ -82,8 +82,6 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         }
 
         if (empty || onlyiconic) {
-            ObMenuEntry *e;
-
             /* no entries or only iconified windows, so add a
              * way to go to this desktop without uniconifying a window */
             if (!empty)

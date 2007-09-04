@@ -174,8 +174,8 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
    the monitor, so <position><x>center</x></position><monitor>2</monitor>
    will center the window on the second monitor.
 */
-static void parse_per_app_settings(ObParseInst *i, xmlDocPtr doc,
-                                   xmlNodePtr node, gpointer d)
+static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
+                                   xmlNodePtr node, gpointer data)
 {
     xmlNodePtr app = parse_find_node("application", node->children);
     gchar *name = NULL, *class = NULL, *role = NULL;
@@ -379,7 +379,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                           gpointer d)
+                           gpointer data)
 {
     xmlNodePtr n;
     gchar *key;
@@ -411,7 +411,7 @@ static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 */
 
 static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        gpointer d)
+                        gpointer data)
 {
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
@@ -468,7 +468,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        gpointer d)
+                        gpointer data)
 {
     xmlNodePtr n;
 
@@ -489,7 +489,7 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                            gpointer d)
+                            gpointer data)
 {
     xmlNodePtr n;
 
@@ -503,7 +503,7 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                          gpointer d)
+                          gpointer data)
 {
     xmlNodePtr n;
 
@@ -520,7 +520,7 @@ static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        gpointer d)
+                        gpointer data)
 {
     xmlNodePtr n;
 
@@ -603,7 +603,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                           gpointer d)
+                           gpointer data)
 {
     xmlNodePtr n;
 
@@ -640,7 +640,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                         gpointer d)
+                         gpointer data)
 {
     xmlNodePtr n;
 
@@ -667,7 +667,7 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                       gpointer d)
+                       gpointer data)
 {
     xmlNodePtr n;
 
@@ -744,7 +744,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                       gpointer d)
+                       gpointer data)
 {
     xmlNodePtr n;
     for (node = node->children; node; node = node->next) {
@@ -768,7 +768,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                             gpointer d)
+                             gpointer data)
 {
     xmlNodePtr n;
 

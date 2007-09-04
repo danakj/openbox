@@ -267,7 +267,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
-    popup = popup_new(FALSE);
+    popup = popup_new();
     popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 }
 

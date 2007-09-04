@@ -344,7 +344,7 @@ void screen_startup(gboolean reconfig)
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_popup = pager_popup_new(FALSE);
+    desktop_popup = pager_popup_new();
     pager_popup_height(desktop_popup, POPUP_HEIGHT);
 
     if (reconfig) {

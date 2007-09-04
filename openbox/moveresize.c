@@ -77,7 +77,7 @@ static void client_dest(ObClient *client, gpointer data)
 
 void moveresize_startup(gboolean reconfig)
 {
-    popup = popup_new(FALSE);
+    popup = popup_new();
     popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 
     if (!reconfig)

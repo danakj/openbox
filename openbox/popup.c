@@ -320,7 +320,7 @@ ObIconPopup *icon_popup_new()
     ObIconPopup *self;
 
     self = g_new0(ObIconPopup, 1);
-    self->popup = popup_new(TRUE);
+    self->popup = popup_new();
     self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
     self->icon = XCreateWindow(ob_display, self->popup->bg,
                                0, 0, 1, 1, 0,
@@ -478,7 +478,7 @@ ObPagerPopup *pager_popup_new()
     ObPagerPopup *self;
 
     self = g_new(ObPagerPopup, 1);
-    self->popup = popup_new(TRUE);
+    self->popup = popup_new();
 
     self->desks = 0;
     self->wins = g_new(Window, self->desks);

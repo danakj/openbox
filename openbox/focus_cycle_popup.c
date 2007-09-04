@@ -96,7 +96,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
 
-    single_popup = icon_popup_new(TRUE);
+    single_popup = icon_popup_new();
 
     popup.obwin.type = Window_Internal;
     popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);

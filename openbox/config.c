@@ -96,7 +96,7 @@ gint     config_resist_edge;
 
 GSList *config_per_app_settings;
 
-ObAppSettings* config_create_app_settings()
+ObAppSettings* config_create_app_settings(void)
 {
     ObAppSettings *settings = g_new0(ObAppSettings, 1);
     settings->decor = -1;
@@ -785,7 +785,7 @@ typedef struct
     const gchar *actname;
 } ObDefKeyBind;
 
-static void bind_default_keyboard()
+static void bind_default_keyboard(void)
 {
     ObDefKeyBind *it;
     ObDefKeyBind binds[] = {
@@ -808,7 +808,7 @@ typedef struct
     const gchar *actname;
 } ObDefMouseBind;
 
-static void bind_default_mouse()
+static void bind_default_mouse(void)
 {
     ObDefMouseBind *it;
     ObDefMouseBind binds[] = {
@@ -962,7 +962,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "applications", parse_per_app_settings, NULL);
 }
 
-void config_shutdown()
+void config_shutdown(void)
 {
     GSList *it;
 

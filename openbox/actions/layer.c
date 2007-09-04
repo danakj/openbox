@@ -13,7 +13,7 @@ static gpointer setup_func_send(ObParseInst *i, xmlDocPtr doc,
                                 xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_layer_startup()
+void action_layer_startup(void)
 {
     actions_register("ToggleAlwaysOnTop", setup_func_top, g_free,
                      run_func, NULL, NULL);

@@ -106,7 +106,7 @@ static SnStartupSequence* sequence_find(const gchar *id)
     return ret;
 }
 
-gboolean sn_app_starting()
+gboolean sn_app_starting(void)
 {
     return sn_waits != NULL;
 }
@@ -264,7 +264,7 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
     g_free(desc);
 }
 
-void sn_spawn_cancel()
+void sn_spawn_cancel(void)
 {
     sn_launcher_context_complete(sn_launcher);
 }

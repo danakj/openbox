@@ -1,6 +1,6 @@
 #include "all.h"
 
-void action_all_startup()
+void action_all_startup(void)
 {
     action_execute_startup();
     action_debug_startup();

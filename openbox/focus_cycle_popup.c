@@ -460,7 +460,7 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
     }
 }
 
-void focus_cycle_popup_hide()
+void focus_cycle_popup_hide(void)
 {
     gulong ignore_start;
 
@@ -523,7 +523,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     screen_hide_desktop_popup();
 }
 
-void focus_cycle_popup_single_hide()
+void focus_cycle_popup_single_hide(void)
 {
     icon_popup_hide(single_popup);
 }

@@ -29,7 +29,7 @@
 #include "render/render.h"
 #include "render/theme.h"
 
-ObPopup *popup_new()
+ObPopup *popup_new(void)
 {
     XSetWindowAttributes attrib;
     ObPopup *self = g_new0(ObPopup, 1);
@@ -315,7 +315,7 @@ static void icon_popup_draw_icon(gint x, gint y, gint w, gint h, gpointer data)
     RrPaint(self->a_icon, self->icon, w, h);
 }
 
-ObIconPopup *icon_popup_new()
+ObIconPopup *icon_popup_new(void)
 {
     ObIconPopup *self;
 
@@ -473,7 +473,7 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
     }
 }
 
-ObPagerPopup *pager_popup_new()
+ObPagerPopup *pager_popup_new(void)
 {
     ObPagerPopup *self;
 

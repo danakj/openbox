@@ -29,7 +29,7 @@
 
 GList  *stacking_list = NULL;
 
-void stacking_set_list()
+void stacking_set_list(void)
 {
     Window *windows = NULL;
     GList *it;

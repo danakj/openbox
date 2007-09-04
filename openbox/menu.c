@@ -147,7 +147,7 @@ static void clear_cache(gpointer key, gpointer val, gpointer data)
         menu_clear_entries(menu);
 }
 
-void menu_clear_pipe_caches()
+void menu_clear_pipe_caches(void)
 {
     /* delete any pipe menus' submenus */
     g_hash_table_foreach_remove(menu_hash, menu_pipe_submenu, NULL);
@@ -465,7 +465,7 @@ void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
     }
 }
 
-gboolean menu_hide_delay_reached()
+gboolean menu_hide_delay_reached(void)
 {
     return menu_can_hide;
 }

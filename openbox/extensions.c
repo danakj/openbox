@@ -34,7 +34,7 @@ gint     extensions_randr_event_basep;
 gboolean extensions_sync      = FALSE;
 gint     extensions_sync_event_basep;
 
-void extensions_query_all()
+void extensions_query_all(void)
 {
     gint junk;
     (void)junk;

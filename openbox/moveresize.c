@@ -299,7 +299,7 @@ static void do_move(gboolean keyboard, gint keydist)
 }
 
 
-static void do_resize()
+static void do_resize(void)
 {
     gint x, y, w, h, lw, lh;
 
@@ -538,7 +538,7 @@ static void do_edge_warp(gint x, gint y)
     }
 }
 
-static void cancel_edge_warp()
+static void cancel_edge_warp(void)
 {
     ob_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
 }

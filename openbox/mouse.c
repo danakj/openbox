@@ -142,7 +142,7 @@ static void grab_all_clients(gboolean grab)
         mouse_grab_for_client(it->data, grab);
 }
 
-void mouse_unbind_all()
+void mouse_unbind_all(void)
 {
     gint i;
     GSList *it;

@@ -140,7 +140,7 @@ void client_remove_destroy_notify(ObClientCallback func)
     }
 }
 
-void client_set_list()
+void client_set_list(void)
 {
     Window *windows, *win_it;
     GList *it;
@@ -164,7 +164,7 @@ void client_set_list()
     stacking_set_list();
 }
 
-void client_manage_all()
+void client_manage_all(void)
 {
     guint i, j, nchild;
     Window w, *children;
@@ -637,7 +637,7 @@ ObClient *client_fake_manage(Window window)
     return self;
 }
 
-void client_unmanage_all()
+void client_unmanage_all(void)
 {
     while (client_list != NULL)
         client_unmanage(client_list->data);
@@ -4121,7 +4121,7 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     *h -= self->frame->size.top + self->frame->size.bottom;
 }
 
-ObClient* client_under_pointer()
+ObClient* client_under_pointer(void)
 {
     gint x, y;
     GList *it;

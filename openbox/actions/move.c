@@ -4,7 +4,7 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_move_startup()
+void action_move_startup(void)
 {
     actions_register("Move",
                      NULL, NULL,

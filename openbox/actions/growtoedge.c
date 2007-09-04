@@ -13,7 +13,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_growtoedge_startup()
+void action_growtoedge_startup(void)
 {
     actions_register("GrowToEdge",
                      setup_func,

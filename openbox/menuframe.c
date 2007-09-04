@@ -1057,7 +1057,7 @@ static void menu_frame_hide(ObMenuFrame *self)
     menu_frame_free(self);
 }
 
-void menu_frame_hide_all()
+void menu_frame_hide_all(void)
 {
     GList *it;
 

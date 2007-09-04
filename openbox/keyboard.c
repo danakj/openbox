@@ -115,7 +115,7 @@ void keyboard_reset_chains(gint break_chroots)
     set_curpos(p);
 }
 
-void keyboard_unbind_all()
+void keyboard_unbind_all(void)
 {
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;

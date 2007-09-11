@@ -211,10 +211,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_font_unhilite = get_font(inactive_osd_font, &default_font,inst);
 
     /* load direct dimensions */
-
     /* TODO: Need fallback for menu.overlap */
-    READ_INT("menu.overlap.x", theme->menu_overlap_x, -100, 100, 0);  
-    READ_INT("menu.overlap.y", theme->menu_overlap_y, -100, 100, 0);  
+    READ_INT("menu.overlap.x", theme->menu_overlap_x, -100, 100, 0);
+    READ_INT("menu.overlap.y", theme->menu_overlap_y, -100, 100, 0);
+    /*READ_INT("menu.overlap", theme->menu_overlap, -100, 100, 0);*/
     READ_INT("window.handle.width", theme->handle_height, 0, 100, 6);
     READ_INT("padding.width", theme->paddingx, 0, 100, 3);
     READ_INT("padding.height", theme->paddingy, 0, 100, theme->paddingx);
@@ -226,129 +226,133 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_INT("menu.separator.width", theme->menu_sep_width, 1, 100, 1);
     READ_INT("menu.separator.padding.width", theme->menu_sep_paddingx, 0, 100, 6);
     READ_INT("menu.separator.padding.height", theme->menu_sep_paddingy, 0, 100, 3);
-    READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100, 
+    READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100,
              theme->paddingx);
-    READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100, 
+    READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100,
              theme->cbwidthx);
 
     /* load colors */
-    READ_COLOR_("window.active.border.color", "border.color", 
+    READ_COLOR_("window.active.border.color", "border.color",
                 theme->frame_focused_border_color, RrColorNew(inst, 0, 0, 0));
 
     /* title separator focused color inherits from focused border color */
-    READ_COLOR("window.active.title.separator.color", 
+    READ_COLOR("window.active.title.separator.color",
                theme->title_separator_focused_color,
                RrColorCopy(theme->frame_focused_border_color));
 
     /* unfocused border color inherits from frame focused border color */
-    READ_COLOR("window.inactive.border.color", 
-               theme->frame_unfocused_border_color, 
+    READ_COLOR("window.inactive.border.color",
+               theme->frame_unfocused_border_color,
                RrColorCopy(theme->frame_focused_border_color));
 
     /* title separator unfocused color inherits from unfocused border color */
-    READ_COLOR("window.inactive.title.separator.color", 
+    READ_COLOR("window.inactive.title.separator.color",
                theme->title_separator_unfocused_color,
                RrColorCopy(theme->frame_unfocused_border_color));
 
     /* menu border color inherits from frame focused border color */
-    READ_COLOR("menu.border.color", theme->menu_border_color, 
+    READ_COLOR("menu.border.color", theme->menu_border_color,
                RrColorCopy(theme->frame_focused_border_color));
 
     /* osd border color inherits from frame focused border color */
-    READ_COLOR("osd.border.color", theme->osd_border_color, 
+    READ_COLOR("osd.border.color", theme->osd_border_color,
                RrColorCopy(theme->frame_focused_border_color));
 
-    READ_COLOR("window.active.client.color", theme->cb_focused_color, 
+    READ_COLOR("window.active.client.color", theme->cb_focused_color,
                RrColorNew(inst, 0xff, 0xff, 0xff));
 
-    READ_COLOR("window.inactive.client.color", theme->cb_unfocused_color, 
+    READ_COLOR("window.inactive.client.color", theme->cb_unfocused_color,
                RrColorNew(inst, 0xff, 0xff, 0xff));
 
-    READ_COLOR("window.active.label.text.color", theme->title_focused_color, 
+    READ_COLOR("window.active.label.text.color", theme->title_focused_color,
                RrColorNew(inst, 0x0, 0x0, 0x0));
 
     READ_COLOR_("osd.active.label.text.color",
                 "osd.label.text.color",
                 theme->osd_color, RrColorCopy(theme->title_focused_color));
 
-    READ_COLOR("window.inactive.label.text.color", theme->title_unfocused_color, 
+    READ_COLOR("window.inactive.label.text.color", theme->title_unfocused_color,
                RrColorCopy(theme->title_unfocused_color));
 
     READ_COLOR("osd.inactive.label.text.color", theme->osd_text_inactive_color,
                RrColorNew(inst, 0xff, 0xff, 0xff));
 
-    READ_COLOR("window.active.button.unpressed.image.color", 
-               theme->titlebut_focused_unpressed_color, 
-               RrColorNew(inst, 0, 0, 0));
-
-    READ_COLOR("window.inactive.button.unpressed.image.color", 
-               theme->titlebut_unfocused_unpressed_color, 
+    READ_COLOR("window.inactive.label.text.color",
+               theme->title_unfocused_color,
                RrColorNew(inst, 0xff, 0xff, 0xff));
 
-    READ_COLOR("window.active.button.pressed.image.color", 
-               theme->titlebut_focused_pressed_color, 
-               RrColorCopy(theme->titlebut_focused_unpressed_color));
-
-    READ_COLOR("window.inactive.button.pressed.image.color", 
-               theme->titlebut_unfocused_pressed_color, 
-               RrColorCopy(theme->titlebut_unfocused_unpressed_color));
-
-    READ_COLOR("window.active.button.disabled.image.color", 
-               theme->titlebut_disabled_focused_color, 
-               RrColorNew(inst, 0xff, 0xff, 0xff));
-
-    READ_COLOR("window.inactive.button.disabled.image.color", 
-               theme->titlebut_disabled_unfocused_color, 
+    READ_COLOR("window.active.button.unpressed.image.color",
+               theme->titlebut_focused_unpressed_color,
                RrColorNew(inst, 0, 0, 0));
 
-    READ_COLOR("window.active.button.hover.image.color", 
-               theme->titlebut_hover_focused_color, 
+    READ_COLOR("window.inactive.button.unpressed.image.color",
+               theme->titlebut_unfocused_unpressed_color,
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.active.button.pressed.image.color",
+               theme->titlebut_focused_pressed_color,
                RrColorCopy(theme->titlebut_focused_unpressed_color));
 
-    READ_COLOR("window.inactive.button.hover.image.color", 
-               theme->titlebut_hover_unfocused_color, 
+    READ_COLOR("window.inactive.button.pressed.image.color",
+               theme->titlebut_unfocused_pressed_color,
                RrColorCopy(theme->titlebut_unfocused_unpressed_color));
 
-    READ_COLOR_("window.active.button.toggled.unpressed.image.color", 
-                "window.active.button.toggled.image.color", 
-                theme->titlebut_toggled_focused_unpressed_color, 
+    READ_COLOR("window.active.button.disabled.image.color",
+               theme->titlebut_disabled_focused_color,
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.inactive.button.disabled.image.color",
+               theme->titlebut_disabled_unfocused_color,
+               RrColorNew(inst, 0, 0, 0));
+
+    READ_COLOR("window.active.button.hover.image.color",
+               theme->titlebut_hover_focused_color,
+               RrColorCopy(theme->titlebut_focused_unpressed_color));
+
+    READ_COLOR("window.inactive.button.hover.image.color",
+               theme->titlebut_hover_unfocused_color,
+               RrColorCopy(theme->titlebut_unfocused_unpressed_color));
+
+    READ_COLOR_("window.active.button.toggled.unpressed.image.color",
+                "window.active.button.toggled.image.color",
+                theme->titlebut_toggled_focused_unpressed_color,
                 RrColorCopy(theme->titlebut_focused_pressed_color));
 
-    READ_COLOR_("window.inactive.button.toggled.unpressed.image.color", 
-                "window.inactive.button.toggled.image.color", 
-                theme->titlebut_toggled_unfocused_unpressed_color, 
+    READ_COLOR_("window.inactive.button.toggled.unpressed.image.color",
+                "window.inactive.button.toggled.image.color",
+                theme->titlebut_toggled_unfocused_unpressed_color,
                 RrColorCopy(theme->titlebut_unfocused_pressed_color));
 
-    READ_COLOR("window.active.button.toggled.hover.image.color", 
-               theme->titlebut_toggled_hover_focused_color, 
+    READ_COLOR("window.active.button.toggled.hover.image.color",
+               theme->titlebut_toggled_hover_focused_color,
                RrColorCopy(theme->titlebut_toggled_focused_unpressed_color));
-    
-    READ_COLOR("window.inactive.button.toggled.hover.image.color", 
-               theme->titlebut_toggled_hover_unfocused_color, 
+
+    READ_COLOR("window.inactive.button.toggled.hover.image.color",
+               theme->titlebut_toggled_hover_unfocused_color,
                RrColorCopy(theme->titlebut_toggled_unfocused_unpressed_color));
-   
-    READ_COLOR("window.active.button.toggled.pressed.image.color", 
-               theme->titlebut_toggled_focused_pressed_color, 
+
+    READ_COLOR("window.active.button.toggled.pressed.image.color",
+               theme->titlebut_toggled_focused_pressed_color,
                RrColorCopy(theme->titlebut_focused_pressed_color));
 
-    READ_COLOR("window.inactive.button.toggled.pressed.image.color", 
-               theme->titlebut_toggled_unfocused_pressed_color, 
+    READ_COLOR("window.inactive.button.toggled.pressed.image.color",
+               theme->titlebut_toggled_unfocused_pressed_color,
                RrColorCopy(theme->titlebut_unfocused_pressed_color));
 
-    READ_COLOR("menu.title.text.color", theme->menu_title_color, 
-               RrColorNew(inst, 0, 0, 0));
-    
-    READ_COLOR("menu.items.text.color", theme->menu_color, 
-               RrColorNew(inst, 0xff, 0xff, 0xff));
-  
-    READ_COLOR("menu.items.disabled.text.color", theme->menu_disabled_color, 
+    READ_COLOR("menu.title.text.color", theme->menu_title_color,
                RrColorNew(inst, 0, 0, 0));
 
-    READ_COLOR("menu.items.active.disabled.text.color", 
-               theme->menu_disabled_selected_color, 
+    READ_COLOR("menu.items.text.color", theme->menu_color,
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("menu.items.disabled.text.color", theme->menu_disabled_color,
+               RrColorNew(inst, 0, 0, 0));
+
+    READ_COLOR("menu.items.active.disabled.text.color",
+               theme->menu_disabled_selected_color,
                RrColorCopy(theme->menu_disabled_color));
 
-    READ_COLOR("menu.items.active.text.color", theme->menu_selected_color, 
+    READ_COLOR("menu.items.active.text.color", theme->menu_selected_color,
                RrColorNew(inst, 0, 0, 0));
 
     READ_COLOR("menu.separator.color", theme->menu_sep_color,
@@ -373,21 +377,28 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->max_toggled_mask = RrPixmapMaskNew(inst, 6, 6,(gchar*)data);
         }
     }
-    READ_MASK_COPY("max_pressed.xbm", theme->max_pressed_mask, theme->max_mask);
-    READ_MASK_COPY("max_disabled.xbm", theme->max_disabled_mask, theme->max_mask);
+    READ_MASK_COPY("max_pressed.xbm", theme->max_pressed_mask,
+                   theme->max_mask);
+    READ_MASK_COPY("max_disabled.xbm", theme->max_disabled_mask,
+                   theme->max_mask);
     READ_MASK_COPY("max_hover.xbm", theme->max_hover_mask, theme->max_mask);
-    READ_MASK_COPY("max_toggled_pressed.xbm", theme->max_toggled_pressed_mask, theme->max_toggled_mask);
-    READ_MASK_COPY("max_toggled_hover.xbm", theme->max_toggled_hover_mask, theme->max_toggled_mask);
-  
+    READ_MASK_COPY("max_toggled_pressed.xbm", theme->max_toggled_pressed_mask,
+                   theme->max_toggled_mask);
+    READ_MASK_COPY("max_toggled_hover.xbm", theme->max_toggled_hover_mask,
+                   theme->max_toggled_mask);
+
     /* iconify button masks */
     if (!read_mask(inst, path, theme, "iconify.xbm", &theme->iconify_mask)) {
         guchar data[] = { 0x00, 0x00, 0x00, 0x00, 0x3f, 0x3f };
         theme->iconify_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-    READ_MASK_COPY("iconify_pressed.xbm", theme->iconify_pressed_mask, theme->iconify_mask);
-    READ_MASK_COPY("iconify_disabled.xbm", theme->iconify_disabled_mask, theme->iconify_mask);
-    READ_MASK_COPY("iconify_hover.xbm", theme->iconify_hover_mask, theme->iconify_mask);
-   
+    READ_MASK_COPY("iconify_pressed.xbm", theme->iconify_pressed_mask,
+                   theme->iconify_mask);
+    READ_MASK_COPY("iconify_disabled.xbm", theme->iconify_disabled_mask,
+                   theme->iconify_mask);
+    READ_MASK_COPY("iconify_hover.xbm", theme->iconify_hover_mask,
+                   theme->iconify_mask);
+
     /* all desktops button masks */
     userdef = TRUE;
     if (!read_mask(inst, path, theme, "desk.xbm", &theme->desk_mask)) {
@@ -405,32 +416,46 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                 RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
         }
     }
-    READ_MASK_COPY("desk_pressed.xbm", theme->desk_pressed_mask, theme->desk_mask);
-    READ_MASK_COPY("desk_disabled.xbm", theme->desk_disabled_mask, theme->desk_mask);
+    READ_MASK_COPY("desk_pressed.xbm", theme->desk_pressed_mask,
+                   theme->desk_mask);
+    READ_MASK_COPY("desk_disabled.xbm", theme->desk_disabled_mask,
+                   theme->desk_mask);
     READ_MASK_COPY("desk_hover.xbm", theme->desk_hover_mask, theme->desk_mask);
-    READ_MASK_COPY("desk_toggled_pressed.xbm", theme->desk_toggled_pressed_mask, theme->desk_toggled_mask);
-    READ_MASK_COPY("desk_toggled_hover.xbm", theme->desk_toggled_hover_mask, theme->desk_toggled_mask);
-   
+    READ_MASK_COPY("desk_toggled_pressed.xbm",
+                   theme->desk_toggled_pressed_mask, theme->desk_toggled_mask);
+    READ_MASK_COPY("desk_toggled_hover.xbm", theme->desk_toggled_hover_mask,
+                   theme->desk_toggled_mask);
+
     /* shade button masks */
     if (!read_mask(inst, path, theme, "shade.xbm", &theme->shade_mask)) {
         guchar data[] = { 0x3f, 0x3f, 0x00, 0x00, 0x00, 0x00 };
         theme->shade_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-    READ_MASK_COPY("shade_toggled.xbm", theme->shade_toggled_mask, theme->shade_mask);
-    READ_MASK_COPY("shade_pressed.xbm", theme->shade_pressed_mask, theme->shade_mask);
-    READ_MASK_COPY("shade_disabled.xbm", theme->shade_disabled_mask, theme->shade_mask);
-    READ_MASK_COPY("shade_hover.xbm", theme->shade_hover_mask, theme->shade_mask);
-    READ_MASK_COPY("shade_toggled_pressed.xbm", theme->shade_toggled_pressed_mask, theme->shade_toggled_mask);
-    READ_MASK_COPY("shade_toggled_hover.xbm", theme->shade_toggled_hover_mask, theme->shade_toggled_mask);
+    READ_MASK_COPY("shade_toggled.xbm", theme->shade_toggled_mask,
+                   theme->shade_mask);
+    READ_MASK_COPY("shade_pressed.xbm", theme->shade_pressed_mask,
+                   theme->shade_mask);
+    READ_MASK_COPY("shade_disabled.xbm", theme->shade_disabled_mask,
+                   theme->shade_mask);
+    READ_MASK_COPY("shade_hover.xbm", theme->shade_hover_mask,
+                   theme->shade_mask);
+    READ_MASK_COPY("shade_toggled_pressed.xbm",
+                   theme->shade_toggled_pressed_mask,
+                   theme->shade_toggled_mask);
+    READ_MASK_COPY("shade_toggled_hover.xbm",
+                   theme->shade_toggled_hover_mask, theme->shade_toggled_mask);
 
     /* close button masks */
     if (!read_mask(inst, path, theme, "close.xbm", &theme->close_mask)) {
         guchar data[] = { 0x33, 0x3f, 0x1e, 0x1e, 0x3f, 0x33 };
         theme->close_mask = RrPixmapMaskNew(inst, 6, 6, (gchar*)data);
     }
-    READ_MASK_COPY("close_pressed.xbm", theme->close_pressed_mask, theme->close_mask);
-    READ_MASK_COPY("close_disabled.xbm", theme->close_disabled_mask, theme->close_mask);
-    READ_MASK_COPY("close_hover.xbm", theme->close_hover_mask, theme->close_mask);
+    READ_MASK_COPY("close_pressed.xbm", theme->close_pressed_mask,
+                   theme->close_mask);
+    READ_MASK_COPY("close_disabled.xbm", theme->close_disabled_mask,
+                   theme->close_mask);
+    READ_MASK_COPY("close_hover.xbm", theme->close_hover_mask,
+                   theme->close_mask);
 
     /* submenu bullet mask */
     if (!read_mask(inst, path, theme, "bullet.xbm", &theme->menu_bullet_mask))
@@ -458,20 +483,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     /* read the decoration textures */
     READ_APPEARANCE("window.active.title.bg", theme->a_focused_title, FALSE);
-    READ_APPEARANCE("window.inactive.title.bg", theme->a_unfocused_title, 
+    READ_APPEARANCE("window.inactive.title.bg", theme->a_unfocused_title,
                     FALSE);
     READ_APPEARANCE("window.active.label.bg", theme->a_focused_label, TRUE);
-    READ_APPEARANCE("window.inactive.label.bg", theme->a_unfocused_label, 
+    READ_APPEARANCE("window.inactive.label.bg", theme->a_unfocused_label,
                     TRUE);
     READ_APPEARANCE("window.active.handle.bg", theme->a_focused_handle, FALSE);
-    READ_APPEARANCE("window.inactive.handle.bg",theme->a_unfocused_handle, 
+    READ_APPEARANCE("window.inactive.handle.bg",theme->a_unfocused_handle,
                     FALSE);
     READ_APPEARANCE("window.active.grip.bg", theme->a_focused_grip, TRUE);
     READ_APPEARANCE("window.inactive.grip.bg", theme->a_unfocused_grip, TRUE);
     READ_APPEARANCE("menu.items.bg", theme->a_menu, FALSE);
     READ_APPEARANCE("menu.title.bg", theme->a_menu_title, TRUE);
     READ_APPEARANCE("menu.items.active.bg", theme->a_menu_selected, TRUE);
-    
+
     theme->a_menu_disabled_selected =
         RrAppearanceCopy(theme->a_menu_selected);
 
@@ -512,50 +537,50 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     }
 
     /* read buttons textures */
-    READ_APPEARANCE("window.active.button.disabled.bg", 
+    READ_APPEARANCE("window.active.button.disabled.bg",
                     theme->a_disabled_focused_max, TRUE);
-    READ_APPEARANCE("window.inactive.button.disabled.bg", 
+    READ_APPEARANCE("window.inactive.button.disabled.bg",
                     theme->a_disabled_unfocused_max, TRUE);
-    READ_APPEARANCE("window.active.button.pressed.bg", 
+    READ_APPEARANCE("window.active.button.pressed.bg",
                     theme->a_focused_pressed_max, TRUE);
-    READ_APPEARANCE("window.inactive.button.pressed.bg", 
+    READ_APPEARANCE("window.inactive.button.pressed.bg",
                     theme->a_unfocused_pressed_max, TRUE);
 
-    READ_APPEARANCE_("window.active.button.toggled.unpressed.bg", 
-                     "window.active.button.toggled.bg", 
-                     theme->a_toggled_focused_unpressed_max, TRUE, 
+    READ_APPEARANCE_("window.active.button.toggled.unpressed.bg",
+                     "window.active.button.toggled.bg",
+                     theme->a_toggled_focused_unpressed_max, TRUE,
                      theme->a_focused_pressed_max);
-    READ_APPEARANCE_("window.inactive.button.toggled.unpressed.bg", 
-                     "window.inactive.button.toggled.bg", 
-                     theme->a_toggled_unfocused_unpressed_max, TRUE, 
+    READ_APPEARANCE_("window.inactive.button.toggled.unpressed.bg",
+                     "window.inactive.button.toggled.bg",
+                     theme->a_toggled_unfocused_unpressed_max, TRUE,
                      theme->a_unfocused_pressed_max);
 
-    READ_APPEARANCE_COPY("window.active.button.toggled.hover.bg", 
-                         theme->a_toggled_hover_focused_max, TRUE, 
+    READ_APPEARANCE_COPY("window.active.button.toggled.hover.bg",
+                         theme->a_toggled_hover_focused_max, TRUE,
                          theme->a_toggled_focused_unpressed_max);
-    READ_APPEARANCE_COPY("window.inactive.button.toggled.hover.bg", 
-                         theme->a_toggled_hover_unfocused_max, TRUE, 
+    READ_APPEARANCE_COPY("window.inactive.button.toggled.hover.bg",
+                         theme->a_toggled_hover_unfocused_max, TRUE,
                          theme->a_toggled_unfocused_unpressed_max);
 
-    READ_APPEARANCE_COPY("window.active.button.toggled.pressed.bg", 
-                         theme->a_toggled_focused_pressed_max, TRUE, 
+    READ_APPEARANCE_COPY("window.active.button.toggled.pressed.bg",
+                         theme->a_toggled_focused_pressed_max, TRUE,
                          theme->a_focused_pressed_max);
-    READ_APPEARANCE_COPY("window.inactive.button.toggled.pressed.bg", 
-                         theme->a_toggled_unfocused_pressed_max, TRUE, 
+    READ_APPEARANCE_COPY("window.inactive.button.toggled.pressed.bg",
+                         theme->a_toggled_unfocused_pressed_max, TRUE,
                          theme->a_unfocused_pressed_max);
 
-    READ_APPEARANCE("window.active.button.unpressed.bg", 
+    READ_APPEARANCE("window.active.button.unpressed.bg",
                     theme->a_focused_unpressed_max, TRUE);
-    READ_APPEARANCE("window.inactive.button.unpressed.bg", 
+    READ_APPEARANCE("window.inactive.button.unpressed.bg",
                     theme->a_unfocused_unpressed_max, TRUE);
 
-    READ_APPEARANCE_COPY("window.active.button.hover.bg", 
-                         theme->a_hover_focused_max, TRUE, 
+    READ_APPEARANCE_COPY("window.active.button.hover.bg",
+                         theme->a_hover_focused_max, TRUE,
                          theme->a_focused_unpressed_max);
-    READ_APPEARANCE_COPY("window.inactive.button.hover.bg", 
-                         theme->a_hover_unfocused_max, TRUE, 
+    READ_APPEARANCE_COPY("window.inactive.button.hover.bg",
+                         theme->a_hover_unfocused_max, TRUE,
                          theme->a_unfocused_unpressed_max);
-   
+
     theme->a_disabled_focused_close =
         RrAppearanceCopy(theme->a_disabled_focused_max);
     theme->a_disabled_unfocused_close =

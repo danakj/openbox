@@ -663,10 +663,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_APPEARANCE_COPY("window.inactive.button-max.disabled.bg",
                          theme->a_disabled_unfocused_max, TRUE,
                          a_disabled_unfocused_tmp);
-    READ_APPEARANCE_COPY("window.active.button-max.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button-max.hover.bg",
                          theme->a_hover_focused_max, TRUE,
                          a_hover_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-max.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button-max.hover.bg",
                          theme->a_hover_unfocused_max, TRUE,
                          a_hover_unfocused_tmp);
     READ_APPEARANCE_COPY("window.active.button-max.unpressed.bg",
@@ -733,10 +733,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_APPEARANCE_COPY("window.inactive.button-desk.disabled.bg",
                          theme->a_disabled_unfocused_desk, TRUE,
                          a_disabled_unfocused_tmp);
-    READ_APPEARANCE_COPY("window.active.button-desk.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button-desk.hover.bg",
                          theme->a_hover_focused_desk, TRUE,
                          a_hover_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button-desk.hover.bg",
                          theme->a_hover_unfocused_desk, TRUE,
                          a_hover_unfocused_tmp);
     READ_APPEARANCE_COPY("window.active.button-desk.unpressed.bg",
@@ -777,10 +777,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_APPEARANCE_COPY("window.inactive.button-shade.disabled.bg",
                          theme->a_disabled_unfocused_shade, TRUE,
                          a_disabled_unfocused_tmp);
-    READ_APPEARANCE_COPY("window.active.button-shade.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button-shade.hover.bg",
                          theme->a_hover_focused_shade, TRUE,
                          a_hover_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button-shade.hover.bg",
                          theme->a_hover_unfocused_shade, TRUE,
                          a_hover_unfocused_tmp);
     READ_APPEARANCE_COPY("window.active.button-shade.unpressed.bg",

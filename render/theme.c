@@ -91,6 +91,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     RrTheme *theme;
     gchar *path;
     gboolean userdef;
+    RrAppearance *a_disabled_focused_tmp;
+    RrAppearance *a_disabled_unfocused_tmp;
+    RrAppearance *a_hover_focused_tmp;
+    RrAppearance *a_hover_unfocused_tmp;
+    RrAppearance *a_focused_unpressed_tmp;
+    RrAppearance *a_focused_pressed_tmp;
+    RrAppearance *a_unfocused_unpressed_tmp;
+    RrAppearance *a_unfocused_pressed_tmp;
+    RrAppearance *a_toggled_hover_focused_tmp;
+    RrAppearance *a_toggled_hover_unfocused_tmp;
+    RrAppearance *a_toggled_focused_unpressed_tmp;
+    RrAppearance *a_toggled_focused_pressed_tmp;
+    RrAppearance *a_toggled_unfocused_unpressed_tmp;
+    RrAppearance *a_toggled_unfocused_pressed_tmp;
 
     if (name) {
         db = loaddb(name, &path);
@@ -114,6 +128,23 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             return NULL;
     }
 
+    /* initialize temp reading textures */
+    a_disabled_focused_tmp = RrAppearanceNew(inst, 1);
+    a_disabled_unfocused_tmp = RrAppearanceNew(inst, 1);
+    a_hover_focused_tmp = RrAppearanceNew(inst, 1);
+    a_hover_unfocused_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_focused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_unfocused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_hover_focused_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_hover_unfocused_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_focused_pressed_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_unfocused_pressed_tmp = RrAppearanceNew(inst, 1);
+    a_focused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_focused_pressed_tmp = RrAppearanceNew(inst, 1);
+    a_unfocused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_unfocused_pressed_tmp = RrAppearanceNew(inst, 1);
+
+    /* initialize theme */
     theme = g_new0(RrTheme, 1);
 
     theme->inst = inst;
@@ -1182,6 +1213,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     }
     theme->button_size = theme->label_height - 2;
     theme->grip_width = 25;
+
+    RrAppearanceFree(a_disabled_focused_tmp);
+    RrAppearanceFree(a_disabled_unfocused_tmp);
+    RrAppearanceFree(a_hover_focused_tmp);
+    RrAppearanceFree(a_hover_unfocused_tmp);
+    RrAppearanceFree(a_focused_unpressed_tmp);
+    RrAppearanceFree(a_focused_pressed_tmp);
+    RrAppearanceFree(a_unfocused_unpressed_tmp);
+    RrAppearanceFree(a_unfocused_pressed_tmp);
+    RrAppearanceFree(a_toggled_hover_focused_tmp);
+    RrAppearanceFree(a_toggled_hover_unfocused_tmp);
+    RrAppearanceFree(a_toggled_focused_unpressed_tmp);
+    RrAppearanceFree(a_toggled_focused_pressed_tmp);
+    RrAppearanceFree(a_toggled_unfocused_unpressed_tmp);
+    RrAppearanceFree(a_toggled_unfocused_pressed_tmp);
 
     return theme;
 }

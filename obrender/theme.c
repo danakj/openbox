@@ -567,137 +567,153 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     /* read buttons textures */
     READ_APPEARANCE("window.active.button.disabled.bg",
-                    theme->a_disabled_focused_max, TRUE);
+                    a_disabled_focused_tmp, TRUE);
     READ_APPEARANCE("window.inactive.button.disabled.bg",
-                    theme->a_disabled_unfocused_max, TRUE);
+                    a_disabled_unfocused_tmp, TRUE);
     READ_APPEARANCE("window.active.button.pressed.bg",
-                    theme->a_focused_pressed_max, TRUE);
+                    a_focused_pressed_tmp, TRUE);
     READ_APPEARANCE("window.inactive.button.pressed.bg",
-                    theme->a_unfocused_pressed_max, TRUE);
+                    a_unfocused_pressed_tmp, TRUE);
 
     READ_APPEARANCE_("window.active.button.toggled.unpressed.bg",
                      "window.active.button.toggled.bg",
-                     theme->a_toggled_focused_unpressed_max, TRUE,
-                     theme->a_focused_pressed_max);
+                     a_toggled_focused_unpressed_tmp, TRUE,
+                     a_focused_pressed_tmp);
     READ_APPEARANCE_("window.inactive.button.toggled.unpressed.bg",
                      "window.inactive.button.toggled.bg",
-                     theme->a_toggled_unfocused_unpressed_max, TRUE,
-                     theme->a_unfocused_pressed_max);
+                     a_toggled_unfocused_unpressed_tmp, TRUE,
+                     a_unfocused_pressed_tmp);
 
     READ_APPEARANCE_COPY("window.active.button.toggled.hover.bg",
-                         theme->a_toggled_hover_focused_max, TRUE,
-                         theme->a_toggled_focused_unpressed_max);
+                         a_toggled_hover_focused_tmp, TRUE,
+                         a_toggled_focused_unpressed_tmp);
     READ_APPEARANCE_COPY("window.inactive.button.toggled.hover.bg",
-                         theme->a_toggled_hover_unfocused_max, TRUE,
-                         theme->a_toggled_unfocused_unpressed_max);
+                         a_toggled_hover_unfocused_tmp, TRUE,
+                         a_toggled_unfocused_unpressed_tmp);
 
     READ_APPEARANCE_COPY("window.active.button.toggled.pressed.bg",
-                         theme->a_toggled_focused_pressed_max, TRUE,
-                         theme->a_focused_pressed_max);
+                         a_toggled_focused_pressed_tmp, TRUE,
+                         a_focused_pressed_tmp);
     READ_APPEARANCE_COPY("window.inactive.button.toggled.pressed.bg",
-                         theme->a_toggled_unfocused_pressed_max, TRUE,
-                         theme->a_unfocused_pressed_max);
+                         a_toggled_unfocused_pressed_tmp, TRUE,
+                         a_unfocused_pressed_tmp);
 
     READ_APPEARANCE("window.active.button.unpressed.bg",
-                    theme->a_focused_unpressed_max, TRUE);
+                    a_focused_unpressed_tmp, TRUE);
     READ_APPEARANCE("window.inactive.button.unpressed.bg",
-                    theme->a_unfocused_unpressed_max, TRUE);
+                    a_unfocused_unpressed_tmp, TRUE);
 
     READ_APPEARANCE_COPY("window.active.button.hover.bg",
-                         theme->a_hover_focused_max, TRUE,
-                         theme->a_focused_unpressed_max);
+                         a_hover_focused_tmp, TRUE,
+                         a_focused_unpressed_tmp);
     READ_APPEARANCE_COPY("window.inactive.button.hover.bg",
-                         theme->a_hover_unfocused_max, TRUE,
-                         theme->a_unfocused_unpressed_max);
+                         a_hover_unfocused_tmp, TRUE,
+                         a_unfocused_unpressed_tmp);
 
+    theme->a_disabled_focused_max =
+        RrAppearanceCopy(a_disabled_focused_tmp);
+    theme->a_disabled_unfocused_max =
+        RrAppearanceCopy(a_disabled_unfocused_tmp);
+    theme->a_hover_focused_max =
+        RrAppearanceCopy(a_hover_focused_tmp);
+    theme->a_hover_unfocused_max =
+        RrAppearanceCopy(a_hover_unfocused_tmp);
+    theme->a_unfocused_unpressed_max =
+        RrAppearanceCopy(a_unfocused_unpressed_tmp);
+    theme->a_unfocused_pressed_max =
+        RrAppearanceCopy(a_unfocused_pressed_tmp);
+    theme->a_focused_unpressed_max =
+        RrAppearanceCopy(a_focused_unpressed_tmp);
+    theme->a_focused_pressed_max =
+        RrAppearanceCopy(a_focused_pressed_tmp);
     theme->a_disabled_focused_close =
-        RrAppearanceCopy(theme->a_disabled_focused_max);
+        RrAppearanceCopy(a_disabled_focused_tmp);
     theme->a_disabled_unfocused_close =
-        RrAppearanceCopy(theme->a_disabled_unfocused_max);
+        RrAppearanceCopy(a_disabled_unfocused_tmp);
     theme->a_hover_focused_close =
-        RrAppearanceCopy(theme->a_hover_focused_max);
+        RrAppearanceCopy(a_hover_focused_tmp);
     theme->a_hover_unfocused_close =
-        RrAppearanceCopy(theme->a_hover_unfocused_max);
+        RrAppearanceCopy(a_hover_unfocused_tmp);
     theme->a_unfocused_unpressed_close =
-        RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+        RrAppearanceCopy(a_unfocused_unpressed_tmp);
     theme->a_unfocused_pressed_close =
-        RrAppearanceCopy(theme->a_unfocused_pressed_max);
+        RrAppearanceCopy(a_unfocused_pressed_tmp);
     theme->a_focused_unpressed_close =
-        RrAppearanceCopy(theme->a_focused_unpressed_max);
+        RrAppearanceCopy(a_focused_unpressed_tmp);
     theme->a_focused_pressed_close =
-        RrAppearanceCopy(theme->a_focused_pressed_max);
+        RrAppearanceCopy(a_focused_pressed_tmp);
     theme->a_disabled_focused_desk =
-        RrAppearanceCopy(theme->a_disabled_focused_max);
+        RrAppearanceCopy(a_disabled_focused_tmp);
     theme->a_disabled_unfocused_desk =
-        RrAppearanceCopy(theme->a_disabled_unfocused_max);
+        RrAppearanceCopy(a_disabled_unfocused_tmp);
     theme->a_hover_focused_desk =
-        RrAppearanceCopy(theme->a_hover_focused_max);
+        RrAppearanceCopy(a_hover_focused_tmp);
     theme->a_hover_unfocused_desk =
-        RrAppearanceCopy(theme->a_hover_unfocused_max);
+        RrAppearanceCopy(a_hover_unfocused_tmp);
     theme->a_toggled_hover_focused_desk =
-        RrAppearanceCopy(theme->a_toggled_hover_focused_max);
+        RrAppearanceCopy(a_toggled_hover_focused_tmp);
     theme->a_toggled_hover_unfocused_desk =
-        RrAppearanceCopy(theme->a_toggled_hover_unfocused_max);
+        RrAppearanceCopy(a_toggled_hover_unfocused_tmp);
     theme->a_toggled_focused_unpressed_desk =
-        RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
+        RrAppearanceCopy(a_toggled_focused_unpressed_tmp);
     theme->a_toggled_unfocused_unpressed_desk =
-        RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
+        RrAppearanceCopy(a_toggled_unfocused_unpressed_tmp);
     theme->a_toggled_focused_pressed_desk =
-        RrAppearanceCopy(theme->a_toggled_focused_pressed_max);
+        RrAppearanceCopy(a_toggled_focused_pressed_tmp);
     theme->a_toggled_unfocused_pressed_desk =
-        RrAppearanceCopy(theme->a_toggled_unfocused_pressed_max);
+        RrAppearanceCopy(a_toggled_unfocused_pressed_tmp);
     theme->a_unfocused_unpressed_desk =
-        RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+        RrAppearanceCopy(a_unfocused_unpressed_tmp);
     theme->a_unfocused_pressed_desk =
-        RrAppearanceCopy(theme->a_unfocused_pressed_max);
+        RrAppearanceCopy(a_unfocused_pressed_tmp);
     theme->a_focused_unpressed_desk =
-        RrAppearanceCopy(theme->a_focused_unpressed_max);
+        RrAppearanceCopy(a_focused_unpressed_tmp);
     theme->a_focused_pressed_desk =
-        RrAppearanceCopy(theme->a_focused_pressed_max);
+        RrAppearanceCopy(a_focused_pressed_tmp);
     theme->a_disabled_focused_shade =
-        RrAppearanceCopy(theme->a_disabled_focused_max);
+        RrAppearanceCopy(a_disabled_focused_tmp);
     theme->a_disabled_unfocused_shade =
-        RrAppearanceCopy(theme->a_disabled_unfocused_max);
+        RrAppearanceCopy(a_disabled_unfocused_tmp);
     theme->a_hover_focused_shade =
-        RrAppearanceCopy(theme->a_hover_focused_max);
+        RrAppearanceCopy(a_hover_focused_tmp);
     theme->a_hover_unfocused_shade =
-        RrAppearanceCopy(theme->a_hover_unfocused_max);
+        RrAppearanceCopy(a_hover_unfocused_tmp);
     theme->a_toggled_hover_focused_shade =
-        RrAppearanceCopy(theme->a_toggled_hover_focused_max);
+        RrAppearanceCopy(a_toggled_hover_focused_tmp);
     theme->a_toggled_hover_unfocused_shade =
-        RrAppearanceCopy(theme->a_toggled_hover_unfocused_max);
+        RrAppearanceCopy(a_toggled_hover_unfocused_tmp);
     theme->a_toggled_focused_unpressed_shade =
-        RrAppearanceCopy(theme->a_toggled_focused_unpressed_max);
+        RrAppearanceCopy(a_toggled_focused_unpressed_tmp);
     theme->a_toggled_unfocused_unpressed_shade =
-        RrAppearanceCopy(theme->a_toggled_unfocused_unpressed_max);
+        RrAppearanceCopy(a_toggled_unfocused_unpressed_tmp);
     theme->a_toggled_focused_pressed_shade =
-        RrAppearanceCopy(theme->a_toggled_focused_pressed_max);
+        RrAppearanceCopy(a_toggled_focused_pressed_tmp);
     theme->a_toggled_unfocused_pressed_shade =
-        RrAppearanceCopy(theme->a_toggled_unfocused_pressed_max);
+        RrAppearanceCopy(a_toggled_unfocused_pressed_tmp);
     theme->a_unfocused_unpressed_shade =
-        RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+        RrAppearanceCopy(a_unfocused_unpressed_tmp);
     theme->a_unfocused_pressed_shade =
-        RrAppearanceCopy(theme->a_unfocused_pressed_max);
+        RrAppearanceCopy(a_unfocused_pressed_tmp);
     theme->a_focused_unpressed_shade =
-        RrAppearanceCopy(theme->a_focused_unpressed_max);
+        RrAppearanceCopy(a_focused_unpressed_tmp);
     theme->a_focused_pressed_shade =
-        RrAppearanceCopy(theme->a_focused_pressed_max);
+        RrAppearanceCopy(a_focused_pressed_tmp);
     theme->a_disabled_focused_iconify =
-        RrAppearanceCopy(theme->a_disabled_focused_max);
+        RrAppearanceCopy(a_disabled_focused_tmp);
     theme->a_disabled_unfocused_iconify =
-        RrAppearanceCopy(theme->a_disabled_focused_max);
+        RrAppearanceCopy(a_disabled_focused_tmp);
     theme->a_hover_focused_iconify =
-        RrAppearanceCopy(theme->a_hover_focused_max);
+        RrAppearanceCopy(a_hover_focused_tmp);
     theme->a_hover_unfocused_iconify =
-        RrAppearanceCopy(theme->a_hover_unfocused_max);
+        RrAppearanceCopy(a_hover_unfocused_tmp);
     theme->a_unfocused_unpressed_iconify =
-        RrAppearanceCopy(theme->a_unfocused_unpressed_max);
+        RrAppearanceCopy(a_unfocused_unpressed_tmp);
     theme->a_unfocused_pressed_iconify =
-        RrAppearanceCopy(theme->a_unfocused_pressed_max);
+        RrAppearanceCopy(a_unfocused_pressed_tmp);
     theme->a_focused_unpressed_iconify =
-        RrAppearanceCopy(theme->a_focused_unpressed_max);
+        RrAppearanceCopy(a_focused_unpressed_tmp);
     theme->a_focused_pressed_iconify =
-        RrAppearanceCopy(theme->a_focused_pressed_max);
+        RrAppearanceCopy(a_focused_pressed_tmp);
 
     theme->a_icon->surface.grad =
         theme->a_clear->surface.grad =

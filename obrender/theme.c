@@ -110,6 +110,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     gchar *path;
     gboolean userdef;
     gint menu_overlap = 0;
+    RrAppearance *a_disabled_focused_tmp;
+    RrAppearance *a_disabled_unfocused_tmp;
+    RrAppearance *a_hover_focused_tmp;
+    RrAppearance *a_hover_unfocused_tmp;
+    RrAppearance *a_focused_unpressed_tmp;
+    RrAppearance *a_focused_pressed_tmp;
+    RrAppearance *a_unfocused_unpressed_tmp;
+    RrAppearance *a_unfocused_pressed_tmp;
+    RrAppearance *a_toggled_hover_focused_tmp;
+    RrAppearance *a_toggled_hover_unfocused_tmp;
+    RrAppearance *a_toggled_focused_unpressed_tmp;
+    RrAppearance *a_toggled_focused_pressed_tmp;
+    RrAppearance *a_toggled_unfocused_unpressed_tmp;
+    RrAppearance *a_toggled_unfocused_pressed_tmp;
 
     if (name) {
         db = loaddb(name, &path);
@@ -133,7 +147,24 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             return NULL;
     }
 
-    theme = g_slice_new0(RrTheme);
+    /* initialize temp reading textures */
+    a_disabled_focused_tmp = RrAppearanceNew(inst, 1);
+    a_disabled_unfocused_tmp = RrAppearanceNew(inst, 1);
+    a_hover_focused_tmp = RrAppearanceNew(inst, 1);
+    a_hover_unfocused_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_focused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_unfocused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_hover_focused_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_hover_unfocused_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_focused_pressed_tmp = RrAppearanceNew(inst, 1);
+    a_toggled_unfocused_pressed_tmp = RrAppearanceNew(inst, 1);
+    a_focused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_focused_pressed_tmp = RrAppearanceNew(inst, 1);
+    a_unfocused_unpressed_tmp = RrAppearanceNew(inst, 1);
+    a_unfocused_pressed_tmp = RrAppearanceNew(inst, 1);
+
+    /* initialize theme */
+    theme = g_slice_new0(RrTheme, 1);
 
     theme->inst = inst;
     theme->name = g_strdup(name ? name : DEFAULT_THEME);
@@ -1271,6 +1302,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     }
     theme->button_size = theme->label_height - 2;
     theme->grip_width = 25;
+
+    RrAppearanceFree(a_disabled_focused_tmp);
+    RrAppearanceFree(a_disabled_unfocused_tmp);
+    RrAppearanceFree(a_hover_focused_tmp);
+    RrAppearanceFree(a_hover_unfocused_tmp);
+    RrAppearanceFree(a_focused_unpressed_tmp);
+    RrAppearanceFree(a_focused_pressed_tmp);
+    RrAppearanceFree(a_unfocused_unpressed_tmp);
+    RrAppearanceFree(a_unfocused_pressed_tmp);
+    RrAppearanceFree(a_toggled_hover_focused_tmp);
+    RrAppearanceFree(a_toggled_hover_unfocused_tmp);
+    RrAppearanceFree(a_toggled_focused_unpressed_tmp);
+    RrAppearanceFree(a_toggled_focused_pressed_tmp);
+    RrAppearanceFree(a_toggled_unfocused_unpressed_tmp);
+    RrAppearanceFree(a_toggled_unfocused_pressed_tmp);
 
     return theme;
 }

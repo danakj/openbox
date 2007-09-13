@@ -610,110 +610,191 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                          a_hover_unfocused_tmp, TRUE,
                          a_unfocused_unpressed_tmp);
 
-    theme->a_disabled_focused_max =
-        RrAppearanceCopy(a_disabled_focused_tmp);
-    theme->a_disabled_unfocused_max =
-        RrAppearanceCopy(a_disabled_unfocused_tmp);
-    theme->a_hover_focused_max =
-        RrAppearanceCopy(a_hover_focused_tmp);
-    theme->a_hover_unfocused_max =
-        RrAppearanceCopy(a_hover_unfocused_tmp);
-    theme->a_unfocused_unpressed_max =
-        RrAppearanceCopy(a_unfocused_unpressed_tmp);
-    theme->a_unfocused_pressed_max =
-        RrAppearanceCopy(a_unfocused_pressed_tmp);
-    theme->a_focused_unpressed_max =
-        RrAppearanceCopy(a_focused_unpressed_tmp);
-    theme->a_focused_pressed_max =
-        RrAppearanceCopy(a_focused_pressed_tmp);
-    theme->a_disabled_focused_close =
-        RrAppearanceCopy(a_disabled_focused_tmp);
-    theme->a_disabled_unfocused_close =
-        RrAppearanceCopy(a_disabled_unfocused_tmp);
-    theme->a_hover_focused_close =
-        RrAppearanceCopy(a_hover_focused_tmp);
-    theme->a_hover_unfocused_close =
-        RrAppearanceCopy(a_hover_unfocused_tmp);
-    theme->a_unfocused_unpressed_close =
-        RrAppearanceCopy(a_unfocused_unpressed_tmp);
-    theme->a_unfocused_pressed_close =
-        RrAppearanceCopy(a_unfocused_pressed_tmp);
-    theme->a_focused_unpressed_close =
-        RrAppearanceCopy(a_focused_unpressed_tmp);
-    theme->a_focused_pressed_close =
-        RrAppearanceCopy(a_focused_pressed_tmp);
-    theme->a_disabled_focused_desk =
-        RrAppearanceCopy(a_disabled_focused_tmp);
-    theme->a_disabled_unfocused_desk =
-        RrAppearanceCopy(a_disabled_unfocused_tmp);
-    theme->a_hover_focused_desk =
-        RrAppearanceCopy(a_hover_focused_tmp);
-    theme->a_hover_unfocused_desk =
-        RrAppearanceCopy(a_hover_unfocused_tmp);
-    theme->a_toggled_hover_focused_desk =
-        RrAppearanceCopy(a_toggled_hover_focused_tmp);
-    theme->a_toggled_hover_unfocused_desk =
-        RrAppearanceCopy(a_toggled_hover_unfocused_tmp);
-    theme->a_toggled_focused_unpressed_desk =
-        RrAppearanceCopy(a_toggled_focused_unpressed_tmp);
-    theme->a_toggled_unfocused_unpressed_desk =
-        RrAppearanceCopy(a_toggled_unfocused_unpressed_tmp);
-    theme->a_toggled_focused_pressed_desk =
-        RrAppearanceCopy(a_toggled_focused_pressed_tmp);
-    theme->a_toggled_unfocused_pressed_desk =
-        RrAppearanceCopy(a_toggled_unfocused_pressed_tmp);
-    theme->a_unfocused_unpressed_desk =
-        RrAppearanceCopy(a_unfocused_unpressed_tmp);
-    theme->a_unfocused_pressed_desk =
-        RrAppearanceCopy(a_unfocused_pressed_tmp);
-    theme->a_focused_unpressed_desk =
-        RrAppearanceCopy(a_focused_unpressed_tmp);
-    theme->a_focused_pressed_desk =
-        RrAppearanceCopy(a_focused_pressed_tmp);
-    theme->a_disabled_focused_shade =
-        RrAppearanceCopy(a_disabled_focused_tmp);
-    theme->a_disabled_unfocused_shade =
-        RrAppearanceCopy(a_disabled_unfocused_tmp);
-    theme->a_hover_focused_shade =
-        RrAppearanceCopy(a_hover_focused_tmp);
-    theme->a_hover_unfocused_shade =
-        RrAppearanceCopy(a_hover_unfocused_tmp);
-    theme->a_toggled_hover_focused_shade =
-        RrAppearanceCopy(a_toggled_hover_focused_tmp);
-    theme->a_toggled_hover_unfocused_shade =
-        RrAppearanceCopy(a_toggled_hover_unfocused_tmp);
-    theme->a_toggled_focused_unpressed_shade =
-        RrAppearanceCopy(a_toggled_focused_unpressed_tmp);
-    theme->a_toggled_unfocused_unpressed_shade =
-        RrAppearanceCopy(a_toggled_unfocused_unpressed_tmp);
-    theme->a_toggled_focused_pressed_shade =
-        RrAppearanceCopy(a_toggled_focused_pressed_tmp);
-    theme->a_toggled_unfocused_pressed_shade =
-        RrAppearanceCopy(a_toggled_unfocused_pressed_tmp);
-    theme->a_unfocused_unpressed_shade =
-        RrAppearanceCopy(a_unfocused_unpressed_tmp);
-    theme->a_unfocused_pressed_shade =
-        RrAppearanceCopy(a_unfocused_pressed_tmp);
-    theme->a_focused_unpressed_shade =
-        RrAppearanceCopy(a_focused_unpressed_tmp);
-    theme->a_focused_pressed_shade =
-        RrAppearanceCopy(a_focused_pressed_tmp);
-    theme->a_disabled_focused_iconify =
-        RrAppearanceCopy(a_disabled_focused_tmp);
-    theme->a_disabled_unfocused_iconify =
-        RrAppearanceCopy(a_disabled_focused_tmp);
-    theme->a_hover_focused_iconify =
-        RrAppearanceCopy(a_hover_focused_tmp);
-    theme->a_hover_unfocused_iconify =
-        RrAppearanceCopy(a_hover_unfocused_tmp);
-    theme->a_unfocused_unpressed_iconify =
-        RrAppearanceCopy(a_unfocused_unpressed_tmp);
-    theme->a_unfocused_pressed_iconify =
-        RrAppearanceCopy(a_unfocused_pressed_tmp);
-    theme->a_focused_unpressed_iconify =
-        RrAppearanceCopy(a_focused_unpressed_tmp);
-    theme->a_focused_pressed_iconify =
-        RrAppearanceCopy(a_focused_pressed_tmp);
+    /* now do individual buttons, if specified */
+
+    /* max button */
+    READ_APPEARANCE_COPY("window.active.button.max.disabled.bg",
+                         theme->a_disabled_focused_max, TRUE,
+                         a_disabled_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.disabled.bg",
+                         theme->a_disabled_unfocused_max, TRUE,
+                         a_disabled_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.max.pressed.bg",
+                         theme->a_hover_focused_max, TRUE,
+                         a_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.pressed.bg",
+                         theme->a_hover_unfocused_max, TRUE,
+                         a_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.max.unpressed.bg",
+                         theme->a_focused_unpressed_max, TRUE,
+                         a_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.max.pressed.bg",
+                         theme->a_focused_pressed_max, TRUE,
+                         a_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.unpressed.bg",
+                         theme->a_unfocused_unpressed_max, TRUE,
+                         a_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.pressed.bg",
+                         theme->a_unfocused_pressed_max, TRUE,
+                         a_unfocused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.max.toggled.hover.bg",
+                         theme->a_toggled_hover_focused_max, TRUE,
+                         a_toggled_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.toggled.hover.bg",
+                         theme->a_toggled_hover_unfocused_max, TRUE,
+                         a_toggled_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.max.toggled.unpressed.bg",
+                         theme->a_toggled_focused_unpressed_max, TRUE,
+                         a_toggled_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.max.toggled.pressed.bg",
+                         theme->a_toggled_focused_pressed_max, TRUE,
+                         a_toggled_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.toggled.unpressed.bg",
+                         theme->a_toggled_unfocused_unpressed_max, TRUE,
+                         a_toggled_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.max.toggled.pressed.bg",
+                         theme->a_toggled_unfocused_pressed_max, TRUE,
+                         a_toggled_unfocused_pressed_tmp);
+
+    /* close button */
+    READ_APPEARANCE_COPY("window.active.button.close.disabled.bg",
+                         theme->a_disabled_focused_close, TRUE,
+                         a_disabled_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.close.disabled.bg",
+                         theme->a_disabled_unfocused_close, TRUE,
+                         a_disabled_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.close.hover.bg",
+                         theme->a_hover_focused_close, TRUE,
+                         a_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.close.hover.bg",
+                         theme->a_hover_unfocused_close, TRUE,
+                         a_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.close.unpressed.bg",
+                         theme->a_focused_unpressed_close, TRUE,
+                         a_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.close.pressed.bg",
+                         theme->a_focused_pressed_close, TRUE,
+                         a_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.close.unpressed.bg",
+                         theme->a_unfocused_unpressed_close, TRUE,
+                         a_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.close.pressed.bg",
+                         theme->a_unfocused_pressed_close, TRUE,
+                         a_unfocused_pressed_tmp);
+
+    /* desk button */
+    READ_APPEARANCE_COPY("window.active.button.desk.disabled.bg",
+                         theme->a_disabled_focused_desk, TRUE,
+                         a_disabled_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.disabled.bg",
+                         theme->a_disabled_unfocused_desk, TRUE,
+                         a_disabled_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.desk.pressed.bg",
+                         theme->a_hover_focused_desk, TRUE,
+                         a_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.pressed.bg",
+                         theme->a_hover_unfocused_desk, TRUE,
+                         a_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.desk.unpressed.bg",
+                         theme->a_focused_unpressed_desk, TRUE,
+                         a_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.desk.pressed.bg",
+                         theme->a_focused_pressed_desk, TRUE,
+                         a_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.unpressed.bg",
+                         theme->a_unfocused_unpressed_desk, TRUE,
+                         a_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.pressed.bg",
+                         theme->a_unfocused_pressed_desk, TRUE,
+                         a_unfocused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.desk.toggled.hover.bg",
+                         theme->a_toggled_hover_focused_desk, TRUE,
+                         a_toggled_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.toggled.hover.bg",
+                         theme->a_toggled_hover_unfocused_desk, TRUE,
+                         a_toggled_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.desk.toggled.unpressed.bg",
+                         theme->a_toggled_focused_unpressed_desk, TRUE,
+                         a_toggled_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.desk.toggled.pressed.bg",
+                         theme->a_toggled_focused_pressed_desk, TRUE,
+                         a_toggled_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.toggled.unpressed.bg",
+                         theme->a_toggled_unfocused_unpressed_desk, TRUE,
+                         a_toggled_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.desk.toggled.pressed.bg",
+                         theme->a_toggled_unfocused_pressed_desk, TRUE,
+                         a_toggled_unfocused_pressed_tmp);
+
+    /* shade button */
+    READ_APPEARANCE_COPY("window.active.button.shade.disabled.bg",
+                         theme->a_disabled_focused_shade, TRUE,
+                         a_disabled_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.disabled.bg",
+                         theme->a_disabled_unfocused_shade, TRUE,
+                         a_disabled_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.shade.pressed.bg",
+                         theme->a_hover_focused_shade, TRUE,
+                         a_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.pressed.bg",
+                         theme->a_hover_unfocused_shade, TRUE,
+                         a_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.shade.unpressed.bg",
+                         theme->a_focused_unpressed_shade, TRUE,
+                         a_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.shade.pressed.bg",
+                         theme->a_focused_pressed_shade, TRUE,
+                         a_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.unpressed.bg",
+                         theme->a_unfocused_unpressed_shade, TRUE,
+                         a_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.pressed.bg",
+                         theme->a_unfocused_pressed_shade, TRUE,
+                         a_unfocused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.shade.toggled.hover.bg",
+                         theme->a_toggled_hover_focused_shade, TRUE,
+                         a_toggled_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.toggled.hover.bg",
+                         theme->a_toggled_hover_unfocused_shade, TRUE,
+                         a_toggled_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.shade.toggled.unpressed.bg",
+                         theme->a_toggled_focused_unpressed_shade, TRUE,
+                         a_toggled_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.shade.toggled.pressed.bg",
+                         theme->a_toggled_focused_pressed_shade, TRUE,
+                         a_toggled_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.toggled.unpressed.bg",
+                         theme->a_toggled_unfocused_unpressed_shade, TRUE,
+                         a_toggled_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.shade.toggled.pressed.bg",
+                         theme->a_toggled_unfocused_pressed_shade, TRUE,
+                         a_toggled_unfocused_pressed_tmp);
+
+    /* iconify button */
+    READ_APPEARANCE_COPY("window.active.button.iconify.disabled.bg",
+                         theme->a_disabled_focused_iconify, TRUE,
+                         a_disabled_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.disabled.bg",
+                         theme->a_disabled_unfocused_iconify, TRUE,
+                         a_disabled_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.iconify.hover.bg",
+                         theme->a_hover_focused_iconify, TRUE,
+                         a_hover_focused_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.hover.bg",
+                         theme->a_hover_unfocused_iconify, TRUE,
+                         a_hover_unfocused_tmp);
+    READ_APPEARANCE_COPY("window.active.button.iconify.unpressed.bg",
+                         theme->a_focused_unpressed_iconify, TRUE,
+                         a_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.active.button.iconify.pressed.bg",
+                         theme->a_focused_pressed_iconify, TRUE,
+                         a_focused_pressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.unpressed.bg",
+                         theme->a_unfocused_unpressed_iconify, TRUE,
+                         a_unfocused_unpressed_tmp);
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.pressed.bg",
+                         theme->a_unfocused_pressed_iconify, TRUE,
+                         a_unfocused_pressed_tmp);
 
     theme->a_icon->surface.grad =
         theme->a_clear->surface.grad =

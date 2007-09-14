@@ -658,12 +658,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                          theme->a_unfocused_unpressed_max);
 
     /* toggled unpressed */
-    READ_APPEARANCE_COPY("window.active.button-max.toggled.unpressed.bg",
-                         theme->a_toggled_focused_unpressed_max, TRUE,
-                         theme->a_focused_pressed_max);
-    READ_APPEARANCE_COPY("window.inactive.button-max.toggled.unpressed.bg",
-                         theme->a_toggled_unfocused_unpressed_max, TRUE,
-                         theme->a_unfocused_pressed_max);
+    READ_APPEARANCE_("window.active.button-max.toggled.unpressed.bg",
+                     "window.active.button-max.toggled.bg",
+                     theme->a_toggled_focused_unpressed_max, TRUE,
+                     theme->a_focused_pressed_max);
+    READ_APPEARANCE_("window.inactive.button-max.toggled.unpressed.bg",
+                     "window.inactive.button-max.toggled.bg",
+                     theme->a_toggled_unfocused_unpressed_max, TRUE,
+                     theme->a_unfocused_pressed_max);
 
     /* toggled pressed */
     READ_APPEARANCE_COPY("window.active.button-max.toggled.pressed.bg",
@@ -738,12 +740,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                          theme->a_unfocused_unpressed_desk);
 
     /* toggled unpressed */
-    READ_APPEARANCE_COPY("window.active.button-desk.toggled.unpressed.bg",
-                         theme->a_toggled_focused_unpressed_desk, TRUE,
-                         theme->a_focused_pressed_desk);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.toggled.unpressed.bg",
-                         theme->a_toggled_unfocused_unpressed_desk, TRUE,
-                         theme->a_unfocused_pressed_desk);
+    READ_APPEARANCE_("window.active.button-desk.toggled.unpressed.bg",
+                     "window.active.button-desk.toggled.bg",
+                     theme->a_toggled_focused_unpressed_desk, TRUE,
+                     theme->a_focused_pressed_desk);
+    READ_APPEARANCE_("window.inactive.button-desk.toggled.unpressed.bg",
+                     "window.inactive.button-desk.toggled.bg",
+                     theme->a_toggled_unfocused_unpressed_desk, TRUE,
+                     theme->a_unfocused_pressed_desk);
 
     /* toggled pressed */
     READ_APPEARANCE_COPY("window.active.button-desk.toggled.pressed.bg",
@@ -792,12 +796,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                          theme->a_unfocused_unpressed_shade);
 
     /* toggled unpressed */
-    READ_APPEARANCE_COPY("window.active.button-shade.toggled.unpressed.bg",
-                         theme->a_toggled_focused_unpressed_shade, TRUE,
-                         theme->a_focused_pressed_shade);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.toggled.unpressed.bg",
-                         theme->a_toggled_unfocused_unpressed_shade, TRUE,
-                         theme->a_unfocused_pressed_shade);
+    READ_APPEARANCE_("window.active.button-shade.toggled.unpressed.bg",
+                     "window.active.button-shade.toggled.bg",
+                     theme->a_toggled_focused_unpressed_shade, TRUE,
+                     theme->a_focused_pressed_shade);
+    READ_APPEARANCE_("window.inactive.button-shade.toggled.unpressed.bg",
+                     "window.inactive.button-shade.toggled.bg",
+                     theme->a_toggled_unfocused_unpressed_shade, TRUE,
+                     theme->a_unfocused_pressed_shade);
 
     /* toggled pressed */
     READ_APPEARANCE_COPY("window.active.button-shade.toggled.pressed.bg",

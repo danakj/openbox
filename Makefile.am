@@ -72,6 +72,8 @@ render_libobrender_la_LIBADD = \
 	$(XML_LIBS)
 render_libobrender_la_SOURCES = \
 	gettext.h \
+	render/button.h \
+	render/button.c \
 	render/color.h \
 	render/color.c \
 	render/font.h \

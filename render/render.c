@@ -170,6 +170,7 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
 
   out = g_new0(RrAppearance, 1);
   out->inst = inst;
+  out->ref = 1;
   out->textures = numtex;
   out->surface.bevel_light_adjust = 128;
   out->surface.bevel_dark_adjust = 64;
@@ -186,6 +187,15 @@ void RrAppearanceAddTextures(RrAppearance *a, gint numtex)
     if (numtex) a->texture = g_new0(RrTexture, numtex);
 }
 
+/* shallow copy means up the ref count and return it */
+RrAppearance *RrAppearanceCopyShallow(RrAppearance *orig)
+{
+    orig->ref++;
+    return orig;
+}
+
+/* deep copy of orig, means reset ref to 1 on copy
+ * and copy each thing memwise. */
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
@@ -193,6 +203,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     gint i;
 
     copy->inst = orig->inst;
+    copy->ref = 1;
 
     spo = &(orig->surface);
     spc = &(copy->surface);
@@ -276,34 +287,43 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     return copy;
 }
 
+/* now decrements ref counter, and frees only if ref <= 0 */
 void RrAppearanceFree(RrAppearance *a)
 {
     gint i;
 
-    if (a) {
-        RrSurface *p;
-        if (a->pixmap != None) XFreePixmap(RrDisplay(a->inst), a->pixmap);
-        if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
-        for (i = 0; i < a->textures; ++i)
-            if (a->texture[i].type == RR_TEXTURE_RGBA) {
-                g_free(a->texture[i].data.rgba.cache);
-                a->texture[i].data.rgba.cache = NULL;
-            }
-        if (a->textures)
-            g_free(a->texture);
-        p = &a->surface;
-        RrColorFree(p->primary);
-        RrColorFree(p->secondary);
-        RrColorFree(p->border_color);
-        RrColorFree(p->interlace_color);
-        RrColorFree(p->bevel_dark);
-        RrColorFree(p->bevel_light);
-        RrColorFree(p->split_primary);
-        RrColorFree(p->split_secondary);
-        g_free(p->pixel_data);
-        p->pixel_data = NULL;
-        g_free(a);
-    }
+    if (!a) return;
+
+    /* decrement ref counter */
+    if (a->ref-- > 0) 
+        return;
+
+    /* if we're here we have no more refs to this appearance, free it */   
+    RrSurface *p;
+    if (a->pixmap != None) XFreePixmap(RrDisplay(a->inst), a->pixmap);
+    if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
+    for (i = 0; i < a->textures; ++i)
+        if (a->texture[i].type == RR_TEXTURE_RGBA) {
+            g_free(a->texture[i].data.rgba.cache);
+            a->texture[i].data.rgba.cache = NULL;
+        }
+    if (a->textures)
+        g_free(a->texture);
+    p = &a->surface;
+    RrColorFree(p->primary);
+    RrColorFree(p->secondary);
+    RrColorFree(p->border_color);
+    RrColorFree(p->interlace_color);
+    RrColorFree(p->bevel_dark);
+    RrColorFree(p->bevel_light);
+    RrColorFree(p->split_primary);
+    RrColorFree(p->split_secondary);
+    g_free(p->pixel_data);
+    p->pixel_data = NULL;
+    g_free(a);
+
+    /* set a to NULL so its testable afterwards if it still exists */
+    a = NULL;
 }
 
 

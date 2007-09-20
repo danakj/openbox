@@ -42,6 +42,7 @@ typedef struct _RrTextureLineArt   RrTextureLineArt;
 typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
 typedef struct _RrColor            RrColor;
+typedef struct _RrButton           RrButton;
 
 typedef guint32 RrPixel32;
 typedef guint16 RrPixel16;
@@ -189,6 +190,8 @@ struct _RrTexture {
 
 struct _RrAppearance {
     const RrInstance *inst;
+    
+    gint ref;
 
     RrSurface surface;
     gint textures;
@@ -243,9 +246,13 @@ gulong   RrColorPixel (const RrColor *c);
 GC       RrColorGC    (RrColor *c);
 
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
+RrAppearance *RrAppearanceCopyShallow (RrAppearance *a);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
+
+RrButton *RrButtonNew (const RrInstance *inst);
+void      RrButtonFree(RrButton *b);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
                              gint size, RrFontWeight weight, RrFontSlant slant);

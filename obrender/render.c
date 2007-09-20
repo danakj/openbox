@@ -204,6 +204,7 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
 
   out = g_slice_new0(RrAppearance);
   out->inst = inst;
+  out->ref = 1;
   out->textures = numtex;
   out->surface.bevel_light_adjust = 128;
   out->surface.bevel_dark_adjust = 64;
@@ -231,12 +232,22 @@ void RrAppearanceClearTextures(RrAppearance *a)
     memset(a->texture, 0, a->textures * sizeof(RrTexture));
 }
 
+/* shallow copy means up the ref count and return it */
+RrAppearance *RrAppearanceCopyShallow(RrAppearance *orig)
+{
+    orig->ref++;
+    return orig;
+}
+
+/* deep copy of orig, means reset ref to 1 on copy
+ * and copy each thing memwise. */
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
     RrAppearance *copy = g_slice_new(RrAppearance);
 
     copy->inst = orig->inst;
+    copy->ref = 1;
 
     spo = &(orig->surface);
     spc = &(copy->surface);
@@ -316,6 +327,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     return copy;
 }
 
+/* now decrements ref counter, and frees only if ref <= 0 */
 void RrAppearanceFree(RrAppearance *a)
 {
     if (a) {

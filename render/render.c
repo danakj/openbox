@@ -170,7 +170,6 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
 
   out = g_new0(RrAppearance, 1);
   out->inst = inst;
-  out->ref = 1;
   out->textures = numtex;
   out->surface.bevel_light_adjust = 128;
   out->surface.bevel_dark_adjust = 64;
@@ -187,15 +186,6 @@ void RrAppearanceAddTextures(RrAppearance *a, gint numtex)
     if (numtex) a->texture = g_new0(RrTexture, numtex);
 }
 
-/* shallow copy means up the ref count and return it */
-RrAppearance *RrAppearanceCopyShallow(RrAppearance *orig)
-{
-    orig->ref++;
-    return orig;
-}
-
-/* deep copy of orig, means reset ref to 1 on copy
- * and copy each thing memwise. */
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
@@ -203,7 +193,6 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     gint i;
 
     copy->inst = orig->inst;
-    copy->ref = 1;
 
     spo = &(orig->surface);
     spc = &(copy->surface);
@@ -294,11 +283,6 @@ void RrAppearanceFree(RrAppearance *a)
 
     if (!a) return;
 
-    /* decrement ref counter */
-    if (a->ref-- > 0) 
-        return;
-
-    /* if we're here we have no more refs to this appearance, free it */   
     RrSurface *p;
     if (a->pixmap != None) XFreePixmap(RrDisplay(a->inst), a->pixmap);
     if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);

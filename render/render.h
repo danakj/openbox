@@ -191,8 +191,6 @@ struct _RrTexture {
 struct _RrAppearance {
     const RrInstance *inst;
     
-    gint ref;
-
     RrSurface surface;
     gint textures;
     RrTexture *texture;
@@ -246,7 +244,6 @@ gulong   RrColorPixel (const RrColor *c);
 GC       RrColorGC    (RrColor *c);
 
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
-RrAppearance *RrAppearanceCopyShallow (RrAppearance *a);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);

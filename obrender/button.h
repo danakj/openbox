@@ -10,9 +10,6 @@
 struct _RrButton {
     const RrInstance *inst;
 
-    /* reference count */
-    gint ref;
-
     /* colors */
     RrColor *focused_unpressed_color;
     RrColor *unfocused_unpressed_color;

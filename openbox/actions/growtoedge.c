@@ -7,9 +7,11 @@
 
 typedef struct {
     ObDirection dir;
+    gboolean shrink;
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+static gpointer setup_shrink_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -17,6 +19,12 @@ void action_growtoedge_startup()
 {
     actions_register("GrowToEdge",
                      setup_func,
+                     free_func,
+                     run_func,
+                     NULL, NULL);
+
+    actions_register("ShrinkToEdge",
+                     setup_shrink_func,
                      free_func,
                      run_func,
                      NULL, NULL);
@@ -29,6 +37,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     o = g_new0(Options, 1);
     o->dir = OB_DIRECTION_NORTH;
+    o->shrink = FALSE;
 
     if ((n = parse_find_node("direction", node))) {
         gchar *s = parse_string(doc, n);
@@ -46,6 +55,16 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             o->dir = OB_DIRECTION_EAST;
         g_free(s);
     }
+
+    return o;
+}
+
+static gpointer setup_shrink_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+{
+    Options *o;
+
+    o = setup_func(i, doc, node);
+    o->shrink = TRUE;
 
     return o;
 }
@@ -98,11 +117,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         return FALSE;
     }
 
-    /* try grow */
-    client_find_resize_directional(data->client, o->dir, TRUE,
-                                   &x, &y, &w, &h);
-    if (do_grow(data, x, y, w, h))
-        return FALSE;
+    if (!o->shrink) {
+        /* try grow */
+        client_find_resize_directional(data->client, o->dir, TRUE,
+                                       &x, &y, &w, &h);
+        if (do_grow(data, x, y, w, h))
+            return FALSE;
+    }
 
     /* we couldn't grow, so try shrink! */
     opp = (o->dir == OB_DIRECTION_NORTH ? OB_DIRECTION_SOUTH :

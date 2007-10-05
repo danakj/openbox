@@ -1,4 +1,4 @@
-# Finnish messages for openbox
+# openbox Finnish translation.
 # Copyright (C) 2007  Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
 # Pauli Virtanen <pauli.virtanen@hut.fi>, 2005.
@@ -7,10 +7,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-08-06 19:45+0200\n"
-"PO-Revision-Date: 2007-08-06 19:49+0200\n"
+"POT-Creation-Date: 2007-07-22 08:25-0400\n"
+"PO-Revision-Date: 2007-10-22 15:58+0200\n"
 "Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -33,27 +33,27 @@ msgstr "Näytä tämä..."
 
 #: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr "Hallitse työpöytiä"
+msgstr "Työtilojen hallinta"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
 msgid "_Add new desktop"
-msgstr "_Lisää uusi työpöytä"
+msgstr "_Lisää työtila"
 
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:157
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
 msgid "_Remove last desktop"
-msgstr "_Poista viimeisin työpöytä"
+msgstr "_Poista viimeisin työtila"
 
-#: openbox/client_list_combined_menu.c:152
+#: openbox/client_list_combined_menu.c:146
 msgid "Windows"
 msgstr "Ikkunat"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:199
 msgid "Desktops"
-msgstr "Työpöydät"
+msgstr "Työtilat"
 
 #: openbox/client_menu.c:256
 msgid "All desktops"
-msgstr "Kaikkiin työpöytiin"
+msgstr "Kaikkiin työtiloihin"
 
 #: openbox/client_menu.c:360
 msgid "_Layer"
@@ -61,7 +61,7 @@ msgstr "_Kerros"
 
 #: openbox/client_menu.c:365
 msgid "Always on _top"
-msgstr "Aina _päällimmäinen"
+msgstr "Aina _päällimmäisenä"
 
 #: openbox/client_menu.c:366
 msgid "_Normal"
@@ -69,7 +69,7 @@ msgstr "_Tavallinen"
 
 #: openbox/client_menu.c:367
 msgid "Always on _bottom"
-msgstr "Aina _alimmainen"
+msgstr "Aina _alimmaisena"
 
 #: openbox/client_menu.c:370
 msgid "_Send to desktop"
@@ -79,42 +79,42 @@ msgstr "_Lähetä työtilaan"
 msgid "Client menu"
 msgstr "Ikkunan valikko"
 
-#: openbox/client_menu.c:384
+#: openbox/client_menu.c:380
 msgid "R_estore"
 msgstr "_Palauta"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:388
 msgid "_Move"
 msgstr "S_iirrä"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:390
 msgid "Resi_ze"
 msgstr "_Muuta kokoa"
 
-#: openbox/client_menu.c:396
+#: openbox/client_menu.c:392
 msgid "Ico_nify"
 msgstr "Pie_nennä"
 
-#: openbox/client_menu.c:404
+#: openbox/client_menu.c:400
 msgid "Ma_ximize"
 msgstr "Suurenn_a"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:408
 msgid "_Roll up/down"
-msgstr "Rullaa ylös/alas"
+msgstr "Rullaa _ylös/alas"
 
-#: openbox/client_menu.c:414
+#: openbox/client_menu.c:410
 msgid "Un/_Decorate"
-msgstr "(Epä)reunusta"
+msgstr "(Epä)_reunusta"
 
-#: openbox/client_menu.c:418
+#: openbox/client_menu.c:420
 msgid "_Close"
 msgstr "_Sulje"
 
-#: openbox/config.c:740
+#: openbox/config.c:737
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr "Virheellinen painike '%s' määritelty asetustiedostossa"
+msgstr "Virheellinen painike '%s' määritetty asetustiedostossa"
 
 #: openbox/keyboard.c:156
 msgid "Conflict with key binding in config file"
@@ -123,7 +123,7 @@ msgstr "Päällekäisiä näppäinsidontoja asetustiedostossa"
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr "Ei löydetty toimivaa valikkotiedostoa '%s'"
+msgstr "Toimivaa valikkotiedostoa ei löytynyt '%s'"
 
 #: openbox/menu.c:171
 #, c-format
@@ -138,7 +138,7 @@ msgstr "Virheellinen tulos putkivalikosta '%s'"
 #: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Valikon kohtaa'%s' lukemista yritettiin, mutta sitä ei ole olemassa"
+msgstr "Valikon '%s' lukemista yritettiin, mutta sitä ei ole olemassa"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -147,122 +147,121 @@ msgstr "Lisää..."
 #: openbox/mouse.c:349
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr "Hiireen sidottu nappi '%s' on virheellinen"
+msgstr "Virheellinen nappi '%s' hiirisidonnoissa"
 
 #: openbox/mouse.c:355
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr "Hiireen sidottu tapahtuma '%s' on virheellinen"
+msgstr "Virheellinen asiayhteys '%s' hiirisidonnoissa"
 
-#: openbox/openbox.c:129
+#: openbox/openbox.c:130
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
-msgstr "Ei voitu vaihtaa kotihakemistoon '%s': '%s'"
+msgstr "Kotihakemistoon '%s' vaihtaminen epäonnistui: '%s'"
 
-#: openbox/openbox.c:149
+#: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Näytön avaaminen epäonnistui DISPLAY-ympäristömuuttujasta."
+msgstr "Näytön avaaminen DISPLAY-muuttujasta epäonnistui."
 
-#: openbox/openbox.c:180
+#: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
-msgstr "Obrender kirjaston käynnistäminen epäonnistui"
+msgstr "Obrender kirjaston käynnistäminen epäonnistui."
 
-#: openbox/openbox.c:186
+#: openbox/openbox.c:187
 msgid "X server does not support locale."
-msgstr "X-palvelin ei tue kieliasetusta."
+msgstr "X-palvelin ei tue kieliasetusta"
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Ei voida asettaa kielimäärityksiä X-palvelimelle. "
+msgstr "Lokaalimuttujia ei voitu tehdä X-palvelimelle."
 
-#: openbox/openbox.c:251
+#: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr ""
-"Oikeanlaista asetustiedostoa ei löytynyt, käytetään jotain yksinkertaista "
-"oletusta"
+msgstr "Validia asetustiedostoa ei löytynyt, käytetään joitain "
+"yksinkertaisia oletusarvoja"
 
-#: openbox/openbox.c:277
+#: openbox/openbox.c:278
 msgid "Unable to load a theme."
-msgstr "Teeman lataaminen epäonnistui."
+msgstr "Teeman lataaminen epäonnistui"
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Uudelleenkäynnistys epäonnistui käynnistämään uutta ohjelmaa '%s': %s"
+msgstr "Uudelleenkäynnistyi epäonnistui käynnistämään uutta ohjelmaa '%s': %s"
 
-#: openbox/openbox.c:472 openbox/openbox.c:474
+#: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
 msgstr "Tekijänoikeudet (c)"
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:486
 msgid "Syntax: openbox [options]\n"
-msgstr "Syntaksi: openbox [valinnat]\n"
+msgstr "Syntaksi: openbox [valitsin]\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:487
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 "\n"
-"Valinnat:\n"
-
-#: openbox/openbox.c:485
-msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Näytä tämä ohje ja poistu\n"
-
-#: openbox/openbox.c:486
-msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Näytä versio ja poistu\n"
-
-#: openbox/openbox.c:487
-msgid "  --replace           Replace the currently running window manager\n"
-msgstr "  --replace           Korvaa päällä oleva ikkunakäsittelijä\n"
+"Käyttö:\n"
 
 #: openbox/openbox.c:488
-msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Estä yhteys istunnon hallintaan\n"
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Näytä tämä ohje ja sulje\n"
 
 #: openbox/openbox.c:489
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Näytä versio ja sulje\n"
+
+#: openbox/openbox.c:490
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr "  --replace           Korvaa käynnissä oleva ikkunakäsittelijä\n"
+
+#: openbox/openbox.c:491
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr "  --sm-disable        Estä yhteys istuntojen hallintaan\n"
+
+#: openbox/openbox.c:492
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Lähetetään viestejä päällä olevaan Openboxiin\n"
+"Anna viestejä käynnissä olevalle Openboxille:\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:493
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Lataa Openboxin asetukset uudelleen\n"
+msgstr "  --reconfigure       Lataa Openboxin asetustiedosto uudelleen\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:494
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Käynnistä Openbox uudelleen\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:495
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Vianjäljityksen asetukset\n"
-
-#: openbox/openbox.c:493
-msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Aja synkronisessa tilassa\n"
-
-#: openbox/openbox.c:494
-msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Näytä vianjäljitystuloste\n"
-
-#: openbox/openbox.c:495
-msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr "  --debug-focus       Näytä vianjäljitystuloste tarkennettuna\n"
+"Virheenjäljitysasetukset:\n"
 
 #: openbox/openbox.c:496
-msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Jaa näyttö xinerama-ruutuihin.\n"
+msgid "  --sync              Run in synchronous mode\n"
+msgstr "  --sync              Aja synkronisointi-tilassa\n"
 
 #: openbox/openbox.c:497
+msgid "  --debug             Display debugging output\n"
+msgstr "  --debug             Näytä vianjäljitystuloste"
+
+#: openbox/openbox.c:498
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+
+#: openbox/openbox.c:499
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+
+#: openbox/openbox.c:500
 #, c-format
 msgid ""
 "\n"
@@ -271,30 +270,30 @@ msgstr ""
 "\n"
 "Ilmoita virheistä: %s\n"
 
-#: openbox/openbox.c:594
+#: openbox/openbox.c:597
 #, c-format
 msgid "Invalid command line argument '%s'\n"
-msgstr "Virheellinen komentorivikäsky '%s'\n"
+msgstr "Virheellinen valitsin '%s'\n"
 
-#: openbox/screen.c:96 openbox/screen.c:184
+#: openbox/screen.c:94 openbox/screen.c:195
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Ikkunakäsittelijä on jo käynnissä ruudulla %d"
+msgstr "Ikkunakäsittelijä on jo käynnissä näytöllä %d"
 
-#: openbox/screen.c:118
+#: openbox/screen.c:131
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Ei voitu saavuttaa ikkunakäsittelijän valintaa näytöllä %d"
+msgstr ""
 
-#: openbox/screen.c:139
+#: openbox/screen.c:152
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "Ikkunakäsittelijää näytöllä %d ei ole"
+msgstr ""
 
-#: openbox/screen.c:1080
+#: openbox/screen.c:1083
 #, c-format
 msgid "desktop %i"
-msgstr "työpöytä %i"
+msgstr "työtila %i"
 
 #: openbox/session.c:103
 #, c-format
@@ -304,39 +303,40 @@ msgstr "Hakemiston '%s' luonti epäonnistui: %s"
 #: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Istuntoa ei voitu tallentaa hakemistoon '%s':%s"
+msgstr "Istuntoa ei voitu tallentaa hakemistoo '%s': %s"
 
 #: openbox/session.c:583
 #, c-format
 msgid "Error while saving the session to '%s': %s"
-msgstr "Tapahtui virhe tallentaessa istuntoa hakemistoon '%s': %s"
+msgstr "Virhe tallennettaessa istuntoa hakemistoon '%s': %s"
 
 #: openbox/startupnotify.c:237
 #, c-format
 msgid "Running %s\n"
-msgstr "Ajetaan %s\n"
+msgstr "Suoritetaan %s\n"
 
 #: openbox/translate.c:58
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Näppäimeen tai hiireen sidottu määritys '%s' ei kelpaa"
+msgstr ""
 
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "Näppäimeen sidottu koodi '%s' on virheellinen"
+msgstr ""
 
 #: openbox/translate.c:142
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Näppäimeen sidottu nimi '%s' on virheellinen"
+msgstr "Virheellinen näppäin '%s' pikanäppäimissä"
 
 #: openbox/translate.c:148
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
-msgstr "Näppäintä '%s' ei ole olemassa."
+msgstr ""
 
 #: openbox/xerror.c:39
 #, c-format
 msgid "X Error: %s"
-msgstr "X virhe: %s"
+msgstr "X-virhe: %s"
+

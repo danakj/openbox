@@ -511,7 +511,7 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 static void parse_env()
 {
     /* unset this so we don't pass it on unknowingly */
-    unsetenv("DESKTOP_STARTUP_ID");
+    putenv("DESKTOP_STARTUP_ID");
 }
 
 static void parse_args(gint *argc, gchar **argv)

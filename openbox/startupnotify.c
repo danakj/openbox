@@ -61,7 +61,7 @@ void sn_startup(gboolean reconfig)
     if (reconfig) return;
 
     /* unset this so we don't pass it on unknowingly */
-    unsetenv("DESKTOP_STARTUP_ID");
+    putenv("DESKTOP_STARTUP_ID");
 
     sn_display = sn_display_new(ob_display, NULL, NULL);
     sn_context = sn_monitor_context_new(sn_display, ob_screen,
@@ -259,7 +259,7 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
                              g_direct_equal,
                              (GDestroyNotify)sn_launcher_context_unref);
 
-    setenv("DESKTOP_STARTUP_ID", id, TRUE);
+    putenv(g_strdup_printf("DESKTOP_STARTUP_ID=%s", id));
 
     g_free(desc);
 }

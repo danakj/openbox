@@ -1510,7 +1510,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
 guint screen_find_monitor(Rect *search)
 {
     guint i;
-    guint most = 0;
+    guint most = screen_num_monitors;
     guint mostv = 0;
 
     for (i = 0; i < screen_num_monitors; ++i) {

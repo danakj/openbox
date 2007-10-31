@@ -151,13 +151,11 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 {
     gint l, t, r, b;
     gint x, y, w, h;
+    guint m;
     gint emptyx, emptyy; /* empty space between elements */
     gint textx, texty, textw, texth;
     gint iconx, icony, iconw, iconh;
     Rect *area, mon;
-
-    RECT_SET(mon, self->x, self->y, 1, 1);
-    area = screen_physical_area_monitor(screen_find_monitor(&mon));
 
     /* when there is no icon and the text is not parent relative, then
        fill the whole dialog with the text appearance, don't use the bg at all
@@ -246,8 +244,27 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         break;
     }
 
-    x=MAX(MIN(x, area->width-w),0);
-    y=MAX(MIN(y, area->height-h),0);
+    /* Find the monitor which contains the biggest part of the popup.
+     * If the popup is completely off screen, limit it to the intersection
+     * of all monitors and then try again. If it's still off screen, put it
+     * on monitor 0. */
+    RECT_SET(mon, x, y, w, h);
+    m = screen_find_monitor(&mon);
+    area = screen_physical_area_monitor(m);
+
+    x=MAX(MIN(x, area->x+area->width-w),area->x);
+    y=MAX(MIN(y, area->y+area->height-h),area->y);
+
+    if (m == screen_num_monitors) {
+        RECT_SET(mon, x, y, w, h);
+        m = screen_find_monitor(&mon);
+        if (m == screen_num_monitors)
+            m = 0;
+        area = screen_physical_area_monitor(m);
+
+        x=MAX(MIN(x, area->x+area->width-w),area->x);
+        y=MAX(MIN(y, area->y+area->height-h),area->y);
+    }
 
     /* set the windows/appearances up */
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);

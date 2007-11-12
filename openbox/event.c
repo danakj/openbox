@@ -718,6 +718,8 @@ static void event_handle_root(XEvent *e)
                 ob_reconfigure();
             else if (e->xclient.data.l[0] == 2)
                 ob_restart();
+            else if (e->xclient.data.l[0] == 3)
+                ob_exit(0);
         }
         break;
     case PropertyNotify:

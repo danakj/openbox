@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox-3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-22 08:25-0400\n"
+"POT-Creation-Date: 2007-11-12 19:12+0100\n"
 "PO-Revision-Date: 2007-05-27 13:43Central Europe Daylight Time\n"
 "Last-Translator: Jozef Riha <jose1711@gmail.com\n"
 "Language-Team: Slovak <LL@li.org>\n"
@@ -25,27 +25,27 @@ msgstr "Nepodarilo sa skonvertovať cestu '%s' z utf8"
 msgid "Failed to execute '%s': %s"
 msgstr "Nepodarilo sa spustiť '%s': %s"
 
-#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "Prejsť na..."
 
-#: openbox/client_list_combined_menu.c:98
+#: openbox/client_list_combined_menu.c:96
 msgid "Manage desktops"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
 msgid "_Add new desktop"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Remove last desktop"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:146
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "Okná"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:203
 msgid "Desktops"
 msgstr "Plochy"
 
@@ -77,39 +77,39 @@ msgstr "_Poslať na plochu"
 msgid "Client menu"
 msgstr "Menu klienta"
 
-#: openbox/client_menu.c:380
+#: openbox/client_menu.c:384
 msgid "R_estore"
 msgstr "_Obnoviť"
 
-#: openbox/client_menu.c:388
+#: openbox/client_menu.c:392
 msgid "_Move"
 msgstr "Pre_sunúť"
 
-#: openbox/client_menu.c:390
+#: openbox/client_menu.c:394
 msgid "Resi_ze"
 msgstr "Z_mena veľkosti"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:396
 msgid "Ico_nify"
 msgstr "Do iko_ny"
 
-#: openbox/client_menu.c:400
+#: openbox/client_menu.c:404
 msgid "Ma_ximize"
 msgstr "Ma_ximalizovať"
 
-#: openbox/client_menu.c:408
+#: openbox/client_menu.c:412
 msgid "_Roll up/down"
 msgstr "Ro/_Zvinúť"
 
-#: openbox/client_menu.c:410
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "(Ne)_Dekorovať"
 
-#: openbox/client_menu.c:420
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "Z_avrieť"
 
-#: openbox/config.c:737
+#: openbox/config.c:740
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Neplatné tlačidlo '%s' špecifikované v konfiguračnom súbore"
@@ -152,51 +152,51 @@ msgstr "Neplatné tlačidlo '%s' v priradení myši"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Neplatný kontext '%s' v priradení myši"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Nepodarilo sa prejsť do domovského adresára '%s': %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Nepodarilo sa otvoriť displej z premennej prostredia DISPLAY"
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
 msgstr "Nepodarilo sa inicializovať knižnicu obrender."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "X server nepodporuje locale."
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Nemôžem nastaviť locale pre X server."
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:251
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Nepodarilo sa nájsť platný konfiguračný súbor, použijem jednoduché "
 "implicitné nastavenia"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:277
 msgid "Unable to load a theme."
 msgstr "Nepodarilo sa nahrať tému."
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:402
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Reštart zlyhal pri spúšťaní novej binárky '%s': %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:472 openbox/openbox.c:474
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:483
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [volby]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:484
 msgid ""
 "\n"
 "Options:\n"
@@ -204,24 +204,24 @@ msgstr ""
 "\n"
 "Volby:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:485
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Zobrazi tuto napovedu a skonci\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:486
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Zobrazi cislo verzie a skonci\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:487
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           Nahradi momentalne beziace sedenie window manazera\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:488
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Vypne spojenie k manazerovi sedenia\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:489
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -229,15 +229,20 @@ msgstr ""
 "\n"
 "Predavanie sprav beziacej instancii Openboxu:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:490
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Opatovne nacita konfiguraciu Openboxu\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:491
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Restartuje Openbox\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:492
+#, fuzzy
+msgid "  --exit              Exit Openbox\n"
+msgstr ""
+
+#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -245,24 +250,24 @@ msgstr ""
 "\n"
 "Volby ladenia:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:494
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Spustit v synchronnom mode\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:495
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Zobrazit ladiaci vystup\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:496
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Zobrazit ladiaci vystup pre manipulaciu s fokusom\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:497
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Rozdelit displej na neprave obrazovky xineramy\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:498
 #, c-format
 msgid ""
 "\n"
@@ -271,27 +276,27 @@ msgstr ""
 "\n"
 "Prosim hlaste chyby na %s\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:599
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Neplatny parameter prikazoveho riadku '%s'\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:96 openbox/screen.c:184
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Okenny manazer uz bezi na obrazovke %d"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:118
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nepodarilo sa získať výber okenného manažéra na obrazovke %d"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:139
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Okenný manažér na obrazovke %d sa neukončuje"
 
-#: openbox/screen.c:1083
+#: openbox/screen.c:1087
 #, c-format
 msgid "desktop %i"
 msgstr "plocha %i"

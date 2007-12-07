@@ -5,12 +5,12 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox-3.4.2\n"
+"Project-Id-Version: Openbox-3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-11-12 19:12+0100\n"
-"PO-Revision-Date: 2007-05-27 13:43Central Europe Daylight Time\n"
+"POT-Creation-Date: 2007-08-04 17:42-0400\n"
+"PO-Revision-Date: 2007-12-7 13:43Central Europe Daylight Time\n"
 "Last-Translator: Jozef Riha <jose1711@gmail.com\n"
-"Language-Team: Slovak <LL@li.org>\n"
+"Language-Team: Slovak <sk@sk.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,23 +25,23 @@ msgstr "Nepodarilo sa skonvertovať cestu '%s' z utf8"
 msgid "Failed to execute '%s': %s"
 msgstr "Nepodarilo sa spustiť '%s': %s"
 
-#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "Prejsť na..."
 
-#: openbox/client_list_combined_menu.c:96
+#: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
-msgstr ""
+msgstr "Správa plôch"
 
-#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:156
 msgid "_Add new desktop"
-msgstr ""
+msgstr "_Pridať novú plochu"
 
-#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:157
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "_Odstrániť poslednú plochu"
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:152
 msgid "Windows"
 msgstr "Okná"
 
@@ -238,11 +238,6 @@ msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Restartuje Openbox\n"
 
 #: openbox/openbox.c:492
-#, fuzzy
-msgid "  --exit              Exit Openbox\n"
-msgstr ""
-
-#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -250,24 +245,24 @@ msgstr ""
 "\n"
 "Volby ladenia:\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:493
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Spustit v synchronnom mode\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:494
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Zobrazit ladiaci vystup\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:495
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Zobrazit ladiaci vystup pre manipulaciu s fokusom\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:496
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Rozdelit displej na neprave obrazovky xineramy\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:497
 #, c-format
 msgid ""
 "\n"
@@ -276,7 +271,7 @@ msgstr ""
 "\n"
 "Prosim hlaste chyby na %s\n"
 
-#: openbox/openbox.c:599
+#: openbox/openbox.c:594
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Neplatny parameter prikazoveho riadku '%s'\n"
@@ -296,7 +291,7 @@ msgstr "Nepodarilo sa získať výber okenného manažéra na obrazovke %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Okenný manažér na obrazovke %d sa neukončuje"
 
-#: openbox/screen.c:1087
+#: openbox/screen.c:1080
 #, c-format
 msgid "desktop %i"
 msgstr "plocha %i"

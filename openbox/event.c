@@ -1701,7 +1701,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
 {
     gboolean ret = FALSE;
 
-    if (ev->type == ButtonRelease) {
+    if (ev->type == ButtonRelease || ev->type == ButtonPress) {
         ObMenuEntryFrame *e;
 
         if (menu_hide_delay_reached() &&
@@ -1710,10 +1710,13 @@ static gboolean event_handle_menu_input(XEvent *ev)
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
             {
+                if (ev->type == ButtonPress && e->frame->child)
+                    menu_frame_select(e->frame->child, NULL, TRUE);
                 menu_frame_select(e->frame, e, TRUE);
-                menu_entry_frame_execute(e, ev->xbutton.state);
+                if (ev->type == ButtonRelease)
+                    menu_entry_frame_execute(e, ev->xbutton.state);
             }
-            else
+            else if (ev->type == ButtonRelease)
                 menu_frame_hide_all();
         }
         ret = TRUE;

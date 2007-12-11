@@ -4,6 +4,8 @@
   * Hide the desktop popup when showing the focus popup
   * Fix a crash when trying to access the More... menu of
     client-list-combined-menu
+  * Fix the coordinate popup only showing up on the first monitor in xinerama
+  * Add --exit to exit the currently running openbox instance
 
 3.4.4:
   * Updated Traditional Chinese translation

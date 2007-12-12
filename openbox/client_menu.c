@@ -262,7 +262,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
         e = menu_add_normal(menu, desk, name, NULL, FALSE);
         e->id = desk;
         if (desk == DESKTOP_ALL) {
-            e->data.normal.mask = ob_rr_theme->desk_mask;
+            e->data.normal.mask = ob_rr_theme->btn_desk->mask;
             e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
             e->data.normal.mask_selected_color =
                 ob_rr_theme->menu_selected_color;
@@ -382,7 +382,7 @@ void client_menu_startup(void)
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->max_toggled_mask;
+    e->data.normal.mask = ob_rr_theme->btn_max->toggled_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -394,7 +394,7 @@ void client_menu_startup(void)
     menu_add_normal(menu, CLIENT_RESIZE, _("Resi_ze"), NULL, TRUE);
 
     e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico_nify"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->iconify_mask;
+    e->data.normal.mask = ob_rr_theme->btn_iconify->mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -402,7 +402,7 @@ void client_menu_startup(void)
         ob_rr_theme->menu_disabled_selected_color;
 
     e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->max_mask;
+    e->data.normal.mask = ob_rr_theme->btn_max->mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -416,7 +416,7 @@ void client_menu_startup(void)
     menu_add_separator(menu, -1, NULL);
 
     e = menu_add_normal(menu, CLIENT_CLOSE, _("_Close"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->close_mask;
+    e->data.normal.mask = ob_rr_theme->btn_close->mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;

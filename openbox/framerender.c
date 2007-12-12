@@ -129,116 +129,116 @@ void framerender_frame(ObFrame *self)
             l = self->a_focused_label;
 
             m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
-                 ob_rr_theme->a_disabled_focused_max :
+                 ob_rr_theme->btn_max->a_disabled_focused :
                  (self->client->max_vert || self->client->max_horz ?
                   (self->max_press ?
-                   ob_rr_theme->a_toggled_focused_pressed_max :
+                   ob_rr_theme->btn_max->a_toggled_focused_pressed :
                    (self->max_hover ?
-                    ob_rr_theme->a_toggled_hover_focused_max :
-                    ob_rr_theme->a_toggled_focused_unpressed_max)) :
+                    ob_rr_theme->btn_max->a_toggled_hover_focused :
+                    ob_rr_theme->btn_max->a_toggled_focused_unpressed)) :
                   (self->max_press ?
-                   ob_rr_theme->a_focused_pressed_max :
+                   ob_rr_theme->btn_max->a_focused_pressed :
                    (self->max_hover ?
-                    ob_rr_theme->a_hover_focused_max :
-                    ob_rr_theme->a_focused_unpressed_max))));
+                    ob_rr_theme->btn_max->a_hover_focused :
+                    ob_rr_theme->btn_max->a_focused_unpressed))));
             n = self->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
-                 ob_rr_theme->a_disabled_focused_iconify :
+                 ob_rr_theme->btn_iconify->a_disabled_focused :
                  (self->iconify_press ?
-                  ob_rr_theme->a_focused_pressed_iconify :
+                  ob_rr_theme->btn_iconify->a_focused_pressed :
                   (self->iconify_hover ?
-                   ob_rr_theme->a_hover_focused_iconify :
-                   ob_rr_theme->a_focused_unpressed_iconify)));
+                   ob_rr_theme->btn_iconify->a_hover_focused :
+                   ob_rr_theme->btn_iconify->a_focused_unpressed)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
-                 ob_rr_theme->a_disabled_focused_desk :
+                 ob_rr_theme->btn_desk->a_disabled_focused :
                  (self->client->desktop == DESKTOP_ALL ?
                   (self->desk_press ?
-                   ob_rr_theme->a_toggled_focused_pressed_desk :
+                   ob_rr_theme->btn_desk->a_toggled_focused_pressed :
                    (self->desk_hover ?
-                    ob_rr_theme->a_toggled_hover_focused_desk :
-                    ob_rr_theme->a_toggled_focused_unpressed_desk)) :
+                    ob_rr_theme->btn_desk->a_toggled_hover_focused :
+                    ob_rr_theme->btn_desk->a_toggled_focused_unpressed)) :
                   (self->desk_press ?
-                   ob_rr_theme->a_focused_pressed_desk :
+                   ob_rr_theme->btn_desk->a_focused_pressed :
                    (self->desk_hover ?
-                    ob_rr_theme->a_hover_focused_desk :
-                    ob_rr_theme->a_focused_unpressed_desk))));
+                    ob_rr_theme->btn_desk->a_hover_focused :
+                    ob_rr_theme->btn_desk->a_focused_unpressed))));
             s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
-                 ob_rr_theme->a_disabled_focused_shade :
+                 ob_rr_theme->btn_shade->a_disabled_focused :
                  (self->client->shaded ?
                   (self->shade_press ?
-                   ob_rr_theme->a_toggled_focused_pressed_shade :
+                   ob_rr_theme->btn_shade->a_toggled_focused_pressed :
                    (self->shade_hover ?
-                    ob_rr_theme->a_toggled_hover_focused_shade :
-                    ob_rr_theme->a_toggled_focused_unpressed_shade)) :
+                    ob_rr_theme->btn_shade->a_toggled_hover_focused :
+                    ob_rr_theme->btn_shade->a_toggled_focused_unpressed)) :
                   (self->shade_press ?
-                   ob_rr_theme->a_focused_pressed_shade :
+                   ob_rr_theme->btn_shade->a_focused_pressed :
                    (self->shade_hover ?
-                    ob_rr_theme->a_hover_focused_shade :
-                    ob_rr_theme->a_focused_unpressed_shade))));
+                    ob_rr_theme->btn_shade->a_hover_focused :
+                    ob_rr_theme->btn_shade->a_focused_unpressed))));
             c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
-                 ob_rr_theme->a_disabled_focused_close :
+                 ob_rr_theme->btn_close->a_disabled_focused :
                  (self->close_press ?
-                  ob_rr_theme->a_focused_pressed_close :
+                  ob_rr_theme->btn_close->a_focused_pressed :
                   (self->close_hover ?
-                   ob_rr_theme->a_hover_focused_close :
-                   ob_rr_theme->a_focused_unpressed_close)));
+                   ob_rr_theme->btn_close->a_hover_focused :
+                   ob_rr_theme->btn_close->a_focused_unpressed)));
         } else {
             t = self->a_unfocused_title;
             l = self->a_unfocused_label;
             m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
-                 ob_rr_theme->a_disabled_unfocused_max :
+                 ob_rr_theme->btn_max->a_disabled_unfocused :
                  (self->client->max_vert || self->client->max_horz ?
                   (self->max_press ?
-                   ob_rr_theme->a_toggled_unfocused_pressed_max :
+                   ob_rr_theme->btn_max->a_toggled_unfocused_pressed :
                    (self->max_hover ?
-                    ob_rr_theme->a_toggled_hover_unfocused_max :
-                    ob_rr_theme->a_toggled_unfocused_unpressed_max)) :
+                    ob_rr_theme->btn_max->a_toggled_hover_unfocused :
+                    ob_rr_theme->btn_max->a_toggled_unfocused_unpressed)) :
                   (self->max_press ?
-                   ob_rr_theme->a_unfocused_pressed_max :
+                   ob_rr_theme->btn_max->a_unfocused_pressed :
                    (self->max_hover ?
-                    ob_rr_theme->a_hover_unfocused_max :
-                    ob_rr_theme->a_unfocused_unpressed_max))));
+                    ob_rr_theme->btn_max->a_hover_unfocused :
+                    ob_rr_theme->btn_max->a_unfocused_unpressed))));
             n = self->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
-                 ob_rr_theme->a_disabled_unfocused_iconify :
+                 ob_rr_theme->btn_iconify->a_disabled_unfocused :
                  (self->iconify_press ?
-                  ob_rr_theme->a_unfocused_pressed_iconify :
+                  ob_rr_theme->btn_iconify->a_unfocused_pressed :
                   (self->iconify_hover ?
-                   ob_rr_theme->a_hover_unfocused_iconify :
-                   ob_rr_theme->a_unfocused_unpressed_iconify)));
+                   ob_rr_theme->btn_iconify->a_hover_unfocused :
+                   ob_rr_theme->btn_iconify->a_unfocused_unpressed)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
-                 ob_rr_theme->a_disabled_unfocused_desk :
+                 ob_rr_theme->btn_desk->a_disabled_unfocused :
                  (self->client->desktop == DESKTOP_ALL ?
                   (self->desk_press ?
-                   ob_rr_theme->a_toggled_unfocused_pressed_desk :
+                   ob_rr_theme->btn_desk->a_toggled_unfocused_pressed :
                    (self->desk_hover ?
-                    ob_rr_theme->a_toggled_hover_unfocused_desk :
-                    ob_rr_theme->a_toggled_unfocused_unpressed_desk)) :
+                    ob_rr_theme->btn_desk->a_toggled_hover_unfocused :
+                    ob_rr_theme->btn_desk->a_toggled_unfocused_unpressed)) :
                   (self->desk_press ?
-                   ob_rr_theme->a_unfocused_pressed_desk :
+                   ob_rr_theme->btn_desk->a_unfocused_pressed :
                    (self->desk_hover ?
-                    ob_rr_theme->a_hover_unfocused_desk :
-                    ob_rr_theme->a_unfocused_unpressed_desk))));
+                    ob_rr_theme->btn_desk->a_hover_unfocused :
+                    ob_rr_theme->btn_desk->a_unfocused_unpressed))));
             s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
-                 ob_rr_theme->a_disabled_unfocused_shade :
+                 ob_rr_theme->btn_shade->a_disabled_unfocused :
                  (self->client->shaded ?
                   (self->shade_press ?
-                   ob_rr_theme->a_toggled_unfocused_pressed_shade :
+                   ob_rr_theme->btn_shade->a_toggled_unfocused_pressed :
                    (self->shade_hover ?
-                    ob_rr_theme->a_toggled_hover_unfocused_shade :
-                    ob_rr_theme->a_toggled_unfocused_unpressed_shade)) :
+                    ob_rr_theme->btn_shade->a_toggled_hover_unfocused :
+                    ob_rr_theme->btn_shade->a_toggled_unfocused_unpressed)) :
                   (self->shade_press ?
-                   ob_rr_theme->a_unfocused_pressed_shade :
+                   ob_rr_theme->btn_shade->a_unfocused_pressed :
                    (self->shade_hover ?
-                    ob_rr_theme->a_hover_unfocused_shade :
-                    ob_rr_theme->a_unfocused_unpressed_shade))));
+                    ob_rr_theme->btn_shade->a_hover_unfocused :
+                    ob_rr_theme->btn_shade->a_unfocused_unpressed))));
             c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
-                 ob_rr_theme->a_disabled_unfocused_close :
+                 ob_rr_theme->btn_close->a_disabled_unfocused :
                  (self->close_press ?
-                  ob_rr_theme->a_unfocused_pressed_close :
+                  ob_rr_theme->btn_close->a_unfocused_pressed :
                   (self->close_hover ?
-                   ob_rr_theme->a_hover_unfocused_close :
-                   ob_rr_theme->a_unfocused_unpressed_close)));
+                   ob_rr_theme->btn_close->a_hover_unfocused :
+                   ob_rr_theme->btn_close->a_unfocused_unpressed)));
         }
         clear = ob_rr_theme->a_clear;
 

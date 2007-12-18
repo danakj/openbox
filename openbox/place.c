@@ -134,6 +134,8 @@ static Rect **pick_head(ObClient *c)
     for (i = 0; i < screen_num_monitors; ++i)
         area[i] = screen_area(c->desktop, choice[i], NULL);
 
+    g_free(choice);
+
     return area;
 }
 
@@ -180,7 +182,7 @@ static GSList* area_remove(GSList *list, Rect *a)
 
         if (!RECT_INTERSECTS_RECT(*r, *a)) {
             result = g_slist_prepend(result, r);
-            r = NULL; /* dont free it */
+            /* dont free r, it's moved to the result list */
         } else {
             Rect isect, extra;
 
@@ -215,9 +217,10 @@ static GSList* area_remove(GSList *list, Rect *a)
                          r->width, RECT_BOTTOM(*r) - RECT_BOTTOM(isect));
                 result = area_add(result, &extra);
             }
-        }
 
-        g_free(r);
+            /* 'r' is not being added to the result list, so free it */
+            g_free(r);
+        }
     }
     g_slist_free(list);
     return result;
@@ -251,8 +254,6 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
 
     /* try ignoring different things to find empty space */
     for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
-        guint i;
-
         /* try all monitors in order of preference */
         for (i = 0; i < screen_num_monitors && !ret; ++i) {
             GList *it;

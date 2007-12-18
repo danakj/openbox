@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-22 08:25-0400\n"
+"POT-Creation-Date: 2007-11-12 19:12+0100\n"
 "PO-Revision-Date: 2007-07-23 23:22+0200\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -26,27 +26,27 @@ msgstr "轉換路徑「%s」自 utf8 時失敗"
 msgid "Failed to execute '%s': %s"
 msgstr "執行「%s」時失敗：%s"
 
-#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "到那裏去…"
 
-#: openbox/client_list_combined_menu.c:98
+#: openbox/client_list_combined_menu.c:96
 msgid "Manage desktops"
 msgstr "管理桌面"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
 msgid "_Add new desktop"
 msgstr "加入新桌面(_A)"
 
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Remove last desktop"
 msgstr "移除尾端桌面(_R)"
 
-#: openbox/client_list_combined_menu.c:146
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "視窗"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:203
 msgid "Desktops"
 msgstr "桌面"
 
@@ -78,39 +78,39 @@ msgstr "傳送到桌面(_S)"
 msgid "Client menu"
 msgstr "客戶端選單"
 
-#: openbox/client_menu.c:380
+#: openbox/client_menu.c:384
 msgid "R_estore"
 msgstr "還原(_E)"
 
-#: openbox/client_menu.c:388
+#: openbox/client_menu.c:392
 msgid "_Move"
 msgstr "移動(_M)"
 
-#: openbox/client_menu.c:390
+#: openbox/client_menu.c:394
 msgid "Resi_ze"
 msgstr "調整大小(_Z)"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:396
 msgid "Ico_nify"
 msgstr "最小化(_N)"
 
-#: openbox/client_menu.c:400
+#: openbox/client_menu.c:404
 msgid "Ma_ximize"
 msgstr "最大化(_X)"
 
-#: openbox/client_menu.c:408
+#: openbox/client_menu.c:412
 msgid "_Roll up/down"
 msgstr "向上/向下捲動(_R)"
 
-#: openbox/client_menu.c:410
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "去除/裝飾(_D)"
 
-#: openbox/client_menu.c:420
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "關閉(_C)"
 
-#: openbox/config.c:737
+#: openbox/config.c:740
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "在配置檔中指定的按鈕「%s」無效"
@@ -153,49 +153,49 @@ msgstr "與滑鼠組合的按鈕「%s」無效"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "與滑鼠組合的上下文「%s」無效"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "無法變更到主目錄「%s」：%s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "開啟依 DISPLAY 環境變數所指的顯示時失敗。"
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
 msgstr "初始化 obrender 函式庫時失敗。"
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "X 伺服器不支援語區。"
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr "無法設定用於 X 伺服器的語區修飾項。"
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:251
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "無法找到有效的配置檔案，而使用某些簡單的預設值"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:277
 msgid "Unable to load a theme."
 msgstr "無法載入佈景主題。"
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:402
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "重新啟動以執行新的可執行檔「%s」時失敗：%s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:472 openbox/openbox.c:474
 msgid "Copyright (c)"
 msgstr "著作權 (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:483
 msgid "Syntax: openbox [options]\n"
 msgstr "語法：openbox [選項]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:484
 msgid ""
 "\n"
 "Options:\n"
@@ -203,23 +203,23 @@ msgstr ""
 "\n"
 "選項：\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:485
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              顯示此說明然後離開\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:486
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           顯示版本然後離開\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:487
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           替換目前執行的視窗管理員\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:488
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        停用與執行階段管理程式的連結\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:489
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -227,15 +227,20 @@ msgstr ""
 "\n"
 "傳遞訊息到執行中的 Openbox 實體：\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:490
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       重新載入 Openbox 配置\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:491
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           重新啟動 Openbox\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:492
+#, fuzzy
+msgid "  --exit              Exit Openbox\n"
+msgstr ""
+
+#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -243,23 +248,23 @@ msgstr ""
 "\n"
 "偵錯選項：\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:494
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              在同步模式中運行\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:495
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             顯示偵錯輸出\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:496
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       顯示焦點處理的偵錯輸出\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:497
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    分割顯示以進入假造的 xinerama 螢幕\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:498
 #, c-format
 msgid ""
 "\n"
@@ -268,27 +273,27 @@ msgstr ""
 "\n"
 "請向 %s 報告錯誤\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:599
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "無效的命令列引數「%s」\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:96 openbox/screen.c:184
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "螢幕 %d 中已經有視窗管理員在運行"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:118
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "無法於螢幕 %d 獲選為視窗管理員"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:139
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "螢幕 %d 中的視窗管理員並未離開"
 
-#: openbox/screen.c:1083
+#: openbox/screen.c:1087
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"

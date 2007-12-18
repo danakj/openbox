@@ -3,7 +3,7 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_reconfigure_startup()
+void action_reconfigure_startup(void)
 {
     actions_register("Reconfigure",
                      NULL, NULL,

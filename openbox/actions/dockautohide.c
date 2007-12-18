@@ -4,7 +4,7 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_dockautohide_startup()
+void action_dockautohide_startup(void)
 {
     actions_register("ToggleDockAutoHide",
                      NULL, NULL,

@@ -489,6 +489,7 @@ static void print_help()
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
     g_print(_("  --restart           Restart Openbox\n"));
+    g_print(_("  --exit              Exit Openbox\n"));
     g_print(_("\nDebugging options:\n"));
     g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
@@ -511,7 +512,7 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 static void parse_env()
 {
     /* unset this so we don't pass it on unknowingly */
-    unsetenv("DESKTOP_STARTUP_ID");
+    putenv("DESKTOP_STARTUP_ID");
 }
 
 static void parse_args(gint *argc, gchar **argv)
@@ -554,8 +555,12 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;
-        } else if (!strcmp(argv[i], "--restart")) {
+        }
+        else if (!strcmp(argv[i], "--restart")) {
             remote_control = 2;
+        }
+        else if (!strcmp(argv[i], "--exit")) {
+            remote_control = 3;
         }
         else if (!strcmp(argv[i], "--sm-save-file")) {
             if (i == *argc - 1) /* no args left */

@@ -147,7 +147,7 @@ static void clear_cache(gpointer key, gpointer val, gpointer data)
         menu_clear_entries(menu);
 }
 
-void menu_clear_pipe_caches()
+void menu_clear_pipe_caches(void)
 {
     /* delete any pipe menus' submenus */
     g_hash_table_foreach_remove(menu_hash, menu_pipe_submenu, NULL);
@@ -370,13 +370,6 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     self->more_menu->data = data;
     self->more_menu->shortcut = g_unichar_tolower(g_utf8_get_char("M"));
 
-    self->more_menu->show_func = self->show_func;
-    self->more_menu->hide_func = self->hide_func;
-    self->more_menu->update_func = self->update_func;
-    self->more_menu->execute_func = self->execute_func;
-    self->more_menu->destroy_func = self->destroy_func;
-    self->more_menu->place_func = self->place_func;
-
     return self;
 }
 
@@ -472,7 +465,7 @@ void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
     }
 }
 
-gboolean menu_hide_delay_reached()
+gboolean menu_hide_delay_reached(void)
 {
     return menu_can_hide;
 }
@@ -523,6 +516,7 @@ void menu_entry_unref(ObMenuEntry *self)
             g_free(self->data.submenu.name);
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
+            g_free(self->data.separator.label);
             break;
         }
 
@@ -612,19 +606,16 @@ ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
 void menu_set_show_func(ObMenu *self, ObMenuShowFunc func)
 {
     self->show_func = func;
-    self->more_menu->show_func = func; /* keep it in sync */
 }
 
 void menu_set_hide_func(ObMenu *self, ObMenuHideFunc func)
 {
     self->hide_func = func;
-    self->more_menu->hide_func = func; /* keep it in sync */
 }
 
 void menu_set_update_func(ObMenu *self, ObMenuUpdateFunc func)
 {
     self->update_func = func;
-    self->more_menu->update_func = func; /* keep it in sync */
 }
 
 void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
@@ -636,13 +627,11 @@ void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
 void menu_set_destroy_func(ObMenu *self, ObMenuDestroyFunc func)
 {
     self->destroy_func = func;
-    self->more_menu->destroy_func = func; /* keep it in sync */
 }
 
 void menu_set_place_func(ObMenu *self, ObMenuPlaceFunc func)
 {
     self->place_func = func;
-    self->more_menu->place_func = func; /* keep it in sync */
 }
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)

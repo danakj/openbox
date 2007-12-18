@@ -52,9 +52,9 @@
                         ButtonPressMask | ButtonReleaseMask)
 
 static gboolean screen_validate_layout(ObDesktopLayout *l);
-static gboolean replace_wm();
-static void     screen_tell_ksplash();
-static void     screen_fallback_focus();
+static gboolean replace_wm(void);
+static void     screen_tell_ksplash(void);
+static void     screen_fallback_focus(void);
 
 guint    screen_num_desktops;
 guint    screen_num_monitors;
@@ -77,7 +77,7 @@ static GSList *struts_bottom = NULL;
 
 static ObPagerPopup *desktop_popup;
 
-static gboolean replace_wm()
+static gboolean replace_wm(void)
 {
     gchar *wm_sn;
     Atom wm_sn_atom;
@@ -149,7 +149,7 @@ static gboolean replace_wm()
     return TRUE;
 }
 
-gboolean screen_annex()
+gboolean screen_annex(void)
 {
     XSetWindowAttributes attrib;
     pid_t pid;
@@ -304,7 +304,7 @@ gboolean screen_annex()
     return TRUE;
 }
 
-static void screen_tell_ksplash()
+static void screen_tell_ksplash(void)
 {
     XEvent e;
     char **argv;
@@ -344,7 +344,7 @@ void screen_startup(gboolean reconfig)
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_popup = pager_popup_new(FALSE);
+    desktop_popup = pager_popup_new();
     pager_popup_height(desktop_popup, POPUP_HEIGHT);
 
     if (reconfig) {
@@ -453,7 +453,7 @@ void screen_shutdown(gboolean reconfig)
     screen_desktop_names = NULL;
 }
 
-void screen_resize()
+void screen_resize(void)
 {
     static gint oldw = 0, oldh = 0;
     gint w, h;
@@ -536,7 +536,7 @@ void screen_set_num_desktops(guint num)
         screen_set_desktop(num - 1, TRUE);
 }
 
-static void screen_fallback_focus()
+static void screen_fallback_focus(void)
 {
     ObClient *c;
     gboolean allow_omni;
@@ -855,6 +855,13 @@ void screen_show_desktop_popup(guint d)
     ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
     ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
                              hide_desktop_popup_func, NULL, NULL, NULL);
+    g_free(a);
+}
+
+void screen_hide_desktop_popup(void)
+{
+    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    pager_popup_hide(desktop_popup);
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,
@@ -1000,7 +1007,7 @@ static gboolean screen_validate_layout(ObDesktopLayout *l)
     return TRUE;
 }
 
-void screen_update_layout()
+void screen_update_layout(void)
 
 {
     ObDesktopLayout l;
@@ -1049,7 +1056,7 @@ void screen_update_layout()
     }
 }
 
-void screen_update_desktop_names()
+void screen_update_desktop_names(void)
 {
     guint i;
 
@@ -1211,7 +1218,7 @@ typedef struct {
     } \
 }
 
-void screen_update_areas()
+void screen_update_areas(void)
 {
     guint i, j;
     gulong *dims;
@@ -1503,7 +1510,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
 guint screen_find_monitor(Rect *search)
 {
     guint i;
-    guint most = 0;
+    guint most = screen_num_monitors;
     guint mostv = 0;
 
     for (i = 0; i < screen_num_monitors; ++i) {
@@ -1525,7 +1532,7 @@ guint screen_find_monitor(Rect *search)
     return most;
 }
 
-Rect* screen_physical_area_all_monitors()
+Rect* screen_physical_area_all_monitors(void)
 {
     return screen_physical_area_monitor(screen_num_monitors);
 }
@@ -1547,7 +1554,7 @@ gboolean screen_physical_area_monitor_contains(guint head, Rect *search)
     return RECT_INTERSECTS_RECT(monitor_area[head], *search);
 }
 
-Rect* screen_physical_area_active()
+Rect* screen_physical_area_active(void)
 {
     Rect *a;
     gint x, y;
@@ -1567,7 +1574,7 @@ Rect* screen_physical_area_active()
     return a;
 }
 
-void screen_set_root_cursor()
+void screen_set_root_cursor(void)
 {
     if (sn_app_starting())
         XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),

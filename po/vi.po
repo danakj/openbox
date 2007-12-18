@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-22 08:25-0400\n"
+"POT-Creation-Date: 2007-11-12 19:12+0100\n"
 "PO-Revision-Date: 2007-07-20 16:48+0200\n"
 "Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
 "Language-Team: None\n"
@@ -25,27 +25,27 @@ msgstr "Không thể chuyển chỗ '%s' từ utf8"
 msgid "Failed to execute '%s': %s"
 msgstr "Làm không được '%s': %s"
 
-#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "Đi đến chỗ đó"
 
-#: openbox/client_list_combined_menu.c:98
+#: openbox/client_list_combined_menu.c:96
 msgid "Manage desktops"
 msgstr "Quản lý chỗ làm việc"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
 msgid "_Add new desktop"
 msgstr "_Cộng thêm chỗ làm việc"
 
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Remove last desktop"
 msgstr "_Bỏ lát chỗ làm việc"
 
-#: openbox/client_list_combined_menu.c:146
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "Cửa sổ"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:203
 msgid "Desktops"
 msgstr "Chỗ làm việc"
 
@@ -77,39 +77,39 @@ msgstr "Gửi đến chỗ làm _việc"
 msgid "Client menu"
 msgstr "Khách thực đơn"
 
-#: openbox/client_menu.c:380
+#: openbox/client_menu.c:384
 msgid "R_estore"
 msgstr "_Hoàn lại"
 
-#: openbox/client_menu.c:388
+#: openbox/client_menu.c:392
 msgid "_Move"
 msgstr "Chu_yển đi"
 
-#: openbox/client_menu.c:390
+#: openbox/client_menu.c:394
 msgid "Resi_ze"
 msgstr "Làm _nhỏ hơn/lớn hơn"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:396
 msgid "Ico_nify"
 msgstr "Biến _xuống"
 
-#: openbox/client_menu.c:400
+#: openbox/client_menu.c:404
 msgid "Ma_ximize"
 msgstr "Biến _lớn nhất"
 
-#: openbox/client_menu.c:408
+#: openbox/client_menu.c:412
 msgid "_Roll up/down"
 msgstr "_Cuốn lên/xuống"
 
-#: openbox/client_menu.c:410
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "_Trang/Không Trang trí"
 
-#: openbox/client_menu.c:420
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "Đón_g"
 
-#: openbox/config.c:737
+#: openbox/config.c:740
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Sai nút '%s' ở trong hình thể"
@@ -152,49 +152,49 @@ msgstr "Vô hiệu nút '%s' ở trong máy chuột đặt"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Vô hiệu văn cảnh '%s' ở trong chuột đặt"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Không thể đổi đến chỗ nhà '%s': %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Không mở hình từ DISPLAY được."
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
 msgstr "Không mở được thư viện obrender."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "Chương trình X không có locale cho tiếng nay."
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Không thể dùng locale cho chương trình X."
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:251
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "Không thể tìm ra hình thể, sẽ dùng bắt đầu hình thể"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:277
 msgid "Unable to load a theme."
 msgstr "Không thể đọc theme."
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:402
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Bắt đầu lại hỏng mở được executable mới '%s': %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:472 openbox/openbox.c:474
 msgid "Copyright (c)"
 msgstr "Bản quyền (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:483
 msgid "Syntax: openbox [options]\n"
 msgstr "Cách dùng: openbox [chọn lựa]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:484
 msgid ""
 "\n"
 "Options:\n"
@@ -202,24 +202,24 @@ msgstr ""
 "\n"
 "Chọn lựa:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:485
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Trưng bày giúp đỡ này và đi ra\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:486
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Trưng bày số của chương trình và đi ra\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:487
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           Thay thế chương trình quản lý cửa sổ cho đến openbox\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:488
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Tắt liên lạc đến session quản lý\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:489
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -227,15 +227,20 @@ msgstr ""
 "\n"
 "Đưa thông báo cho chương trình Openbox:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:490
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Bắt đầu lại Openbox's hình thể\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:491
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Bắt đầu lại Openbox\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:492
+#, fuzzy
+msgid "  --exit              Exit Openbox\n"
+msgstr ""
+
+#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -243,24 +248,24 @@ msgstr ""
 "\n"
 "Debugging chọn lựa:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:494
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Chạy trong cách thức synchronous\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:495
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Trưng bày debugging đoàn chữ\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:496
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Trưng bày debugging đoàn chữ cho điều khiển tập trung\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:497
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Tách trưng bày vào giả xinerama màn\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:498
 #, c-format
 msgid ""
 "\n"
@@ -269,27 +274,27 @@ msgstr ""
 "\n"
 "Làm ơn báo cáo bugs ở chỗ %s\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:599
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Mệnh lệnh viết sai '%s'\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:96 openbox/screen.c:184
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Chương trình quản lý cửa sổ khác đang chạy trên màn hình %d"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:118
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Không thể lấy được chương trình quản lý cửa sổ ở trên màn hình %d"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:139
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Chương trình quản lý cửa sổ trên màn hình %d không đi ra"
 
-#: openbox/screen.c:1083
+#: openbox/screen.c:1087
 #, c-format
 msgid "desktop %i"
 msgstr "chỗ làm việc %i"

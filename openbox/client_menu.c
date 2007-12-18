@@ -352,7 +352,7 @@ static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
     }
 }
 
-void client_menu_startup()
+void client_menu_startup(void)
 {
     ObMenu *menu;
     ObMenuEntry *e;

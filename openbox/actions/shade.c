@@ -5,7 +5,7 @@ static gboolean run_func_on(ObActionsData *data, gpointer options);
 static gboolean run_func_off(ObActionsData *data, gpointer options);
 static gboolean run_func_toggle(ObActionsData *data, gpointer options);
 
-void action_shade_startup()
+void action_shade_startup(void)
 {
     actions_register("Shade", NULL, NULL, run_func_on, NULL, NULL);
     actions_register("Unshade", NULL, NULL, run_func_off, NULL, NULL);

@@ -10,7 +10,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_showmenu_startup()
+void action_showmenu_startup(void)
 {
     actions_register("ShowMenu", setup_func, free_func, run_func,
                      NULL, NULL);

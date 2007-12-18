@@ -27,7 +27,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_if_startup()
+void action_if_startup(void)
 {
     actions_register("If",
                      setup_func,

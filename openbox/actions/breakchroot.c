@@ -3,7 +3,7 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_breakchroot_startup()
+void action_breakchroot_startup(void)
 {
     actions_register("BreakChroot",
                      NULL, NULL,

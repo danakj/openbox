@@ -115,7 +115,7 @@ void keyboard_reset_chains(gint break_chroots)
     set_curpos(p);
 }
 
-void keyboard_unbind_all()
+void keyboard_unbind_all(void)
 {
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;
@@ -267,7 +267,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
-    popup = popup_new(FALSE);
+    popup = popup_new();
     popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 }
 

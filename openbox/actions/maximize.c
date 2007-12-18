@@ -17,7 +17,7 @@ static gboolean run_func_on(ObActionsData *data, gpointer options);
 static gboolean run_func_off(ObActionsData *data, gpointer options);
 static gboolean run_func_toggle(ObActionsData *data, gpointer options);
 
-void action_maximize_startup()
+void action_maximize_startup(void)
 {
     actions_register("Maximize", setup_func, g_free, run_func_on,
                      NULL, NULL);

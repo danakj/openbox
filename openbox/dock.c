@@ -189,7 +189,7 @@ void dock_add(Window win, XWMHints *wmhints)
     ob_debug("Managed Dock App: 0x%lx (%s)\n", app->icon_win, app->class);
 }
 
-void dock_remove_all()
+void dock_remove_all(void)
 {
     while (dock->dock_apps)
         dock_remove(dock->dock_apps->data, TRUE);
@@ -219,7 +219,7 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     g_free(app);
 }
 
-void dock_configure()
+void dock_configure(void)
 {
     GList *it;
     gint hspot, vspot;

@@ -15,7 +15,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
                            gboolean shaded);
 
-void action_resize_startup()
+void action_resize_startup(void)
 {
     actions_register("Resize",
                      setup_func,

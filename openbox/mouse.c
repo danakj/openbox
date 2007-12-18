@@ -142,7 +142,7 @@ static void grab_all_clients(gboolean grab)
         mouse_grab_for_client(it->data, grab);
 }
 
-void mouse_unbind_all()
+void mouse_unbind_all(void)
 {
     gint i;
     GSList *it;
@@ -153,10 +153,10 @@ void mouse_unbind_all()
             gint j;
 
             for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j) {
-                GSList *it;
+                GSList *jt;
 
-                for (it = b->actions[j]; it; it = g_slist_next(it))
-                    actions_act_unref(it->data);
+                for (jt = b->actions[j]; jt; jt = g_slist_next(jt))
+                    actions_act_unref(jt->data);
                 g_slist_free(b->actions[j]);
             }
             g_free(b);

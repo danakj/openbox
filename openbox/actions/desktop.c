@@ -32,7 +32,7 @@ static gpointer setup_send_func(ObParseInst *i, xmlDocPtr doc,
                                 xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_desktop_startup()
+void action_desktop_startup(void)
 {
     actions_register("GoToDesktop", setup_go_func, g_free, run_func,
                      NULL, NULL);

@@ -46,7 +46,7 @@ static void destfunc(struct Callback *c)
     g_free(c);
 }
 
-ObParseInst* parse_startup()
+ObParseInst* parse_startup(void)
 {
     ObParseInst *i = g_new(ObParseInst, 1);
     i->callbacks = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
@@ -374,7 +374,7 @@ static GSList* split_paths(const gchar *paths)
     return list;
 }
 
-void parse_paths_startup()
+void parse_paths_startup(void)
 {
     const gchar *path;
 
@@ -436,7 +436,7 @@ void parse_paths_startup()
                                         (GSListFunc) g_slist_prepend);
 }
 
-void parse_paths_shutdown()
+void parse_paths_shutdown(void)
 {
     GSList *it;
 
@@ -512,22 +512,22 @@ gboolean parse_mkdir_path(const gchar *path, gint mode)
     return ret;
 }
 
-const gchar* parse_xdg_config_home_path()
+const gchar* parse_xdg_config_home_path(void)
 {
     return xdg_config_home_path;
 }
 
-const gchar* parse_xdg_data_home_path()
+const gchar* parse_xdg_data_home_path(void)
 {
     return xdg_data_home_path;
 }
 
-GSList* parse_xdg_config_dir_paths()
+GSList* parse_xdg_config_dir_paths(void)
 {
     return xdg_config_dir_paths;
 }
 
-GSList* parse_xdg_data_dir_paths()
+GSList* parse_xdg_data_dir_paths(void)
 {
     return xdg_data_dir_paths;
 }

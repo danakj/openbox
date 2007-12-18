@@ -96,7 +96,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
 
-    single_popup = icon_popup_new(TRUE);
+    single_popup = icon_popup_new();
 
     popup.obwin.type = Window_Internal;
     popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
@@ -456,10 +456,11 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
         XMapWindow(ob_display, popup.bg);
         XFlush(ob_display);
         popup.mapped = TRUE;
+        screen_hide_desktop_popup();
     }
 }
 
-void focus_cycle_popup_hide()
+void focus_cycle_popup_hide(void)
 {
     gulong ignore_start;
 
@@ -519,9 +520,10 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     text = popup_get_name(c);
     icon_popup_show(single_popup, text, client_icon(c, ICON_SIZE, ICON_SIZE));
     g_free(text);
+    screen_hide_desktop_popup();
 }
 
-void focus_cycle_popup_single_hide()
+void focus_cycle_popup_single_hide(void)
 {
     icon_popup_hide(single_popup);
 }

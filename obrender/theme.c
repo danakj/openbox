@@ -371,6 +371,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("menu.items.text.color", theme->menu_color,
                RrColorNew(inst, 0xff, 0xff, 0xff));
 
+    READ_COLOR("menu.bullet.image.color", theme->menu_bullet_color,
+               RrColorCopy(theme->menu_color));
+   
     READ_COLOR("menu.items.disabled.text.color", theme->menu_disabled_color,
                RrColorNew(inst, 0, 0, 0));
 
@@ -383,7 +386,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     READ_COLOR("menu.separator.color", theme->menu_sep_color,
                RrColorCopy(theme->menu_color));
-
+    
+    READ_COLOR("menu.bullet.selected.image.color", 
+               theme->menu_bullet_selected_color,
+               RrColorCopy(theme->menu_selected_color));
+ 
     /* load the image masks */
 
     /* maximize button masks */
@@ -1456,9 +1463,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->btn_iconify->a_unfocused_pressed->texture[0].data.mask.color = 
         theme->btn_iconify->unfocused_pressed_color;
     theme->a_menu_bullet_normal->texture[0].data.mask.color =
-        theme->menu_color;
+        theme->menu_bullet_color;
     theme->a_menu_bullet_selected->texture[0].data.mask.color =
-        theme->menu_selected_color;
+        theme->menu_bullet_selected_color;
 
     g_free(path);
     XrmDestroyDatabase(db);
@@ -1565,6 +1572,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_title_color);
         RrColorFree(theme->menu_sep_color);
         RrColorFree(theme->menu_color);
+        RrColorFree(theme->menu_bullet_color);
+        RrColorFree(theme->menu_bullet_selected_color);
         RrColorFree(theme->menu_selected_color);
         RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_disabled_selected_color);

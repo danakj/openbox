@@ -90,6 +90,8 @@ struct _RrTheme {
     RrColor *menu_title_color;
     RrColor *menu_sep_color;
     RrColor *menu_color;
+    RrColor *menu_bullet_color;
+    RrColor *menu_bullet_selected_color;
     RrColor *menu_selected_color;
     RrColor *menu_disabled_color;
     RrColor *menu_disabled_selected_color;

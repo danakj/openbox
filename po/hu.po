@@ -1,0 +1,345 @@
+# Hungarian messages for openbox.
+# Copyright (C) 2007 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# Robert Kuszinger <hiding@freemail.hu>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openbox 3.4.3\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"POT-Creation-Date: 2007-11-12 19:12+0100\n"
+"PO-Revision-Date: 2007-12-21 14:33+0100\n"
+"Last-Translator: Robert Kuszinger <hiding@freemail.hu>\n"
+"Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: openbox/actions/execute.c:88
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr "Az útvonalat nem sikerült átalakítani utf8-ból: '%s'"
+
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "Nem sikerült futtatni ezt a programot '%s': %s"
+
+#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
+msgid "Go there..."
+msgstr "Menjünk oda..."
+
+#: openbox/client_list_combined_menu.c:96
+msgid "Manage desktops"
+msgstr "Munkaasztal-kezelés"
+
+#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
+msgid "_Add new desktop"
+msgstr "Új _munkaasztal"
+
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+msgid "_Remove last desktop"
+msgstr "Utolsó munkaasztal _eltávolítása"
+
+#: openbox/client_list_combined_menu.c:150
+msgid "Windows"
+msgstr "Ablakok"
+
+#: openbox/client_list_menu.c:203
+msgid "Desktops"
+msgstr "Munkaasztalok"
+
+#: openbox/client_menu.c:256
+msgid "All desktops"
+msgstr "Összes munkaasztal"
+
+#: openbox/client_menu.c:360
+msgid "_Layer"
+msgstr "_Réteg"
+
+#: openbox/client_menu.c:365
+msgid "Always on _top"
+msgstr "Mindig _felül"
+
+#: openbox/client_menu.c:366
+msgid "_Normal"
+msgstr "_Normál"
+
+#: openbox/client_menu.c:367
+msgid "Always on _bottom"
+msgstr "Mindig _alul"
+
+#: openbox/client_menu.c:370
+msgid "_Send to desktop"
+msgstr "Munkaasztalra _küldeni"
+
+#: openbox/client_menu.c:374
+msgid "Client menu"
+msgstr "Kliens menü"
+
+#: openbox/client_menu.c:384
+msgid "R_estore"
+msgstr "_Visszaállítás"
+
+#: openbox/client_menu.c:392
+msgid "_Move"
+msgstr "_Mozgatás"
+
+#: openbox/client_menu.c:394
+msgid "Resi_ze"
+msgstr "_Átméretezés"
+
+#: openbox/client_menu.c:396
+msgid "Ico_nify"
+msgstr "Iko_nná alakítás"
+
+#: openbox/client_menu.c:404
+msgid "Ma_ximize"
+msgstr "Ma_ximalizálás"
+
+#: openbox/client_menu.c:412
+msgid "_Roll up/down"
+msgstr "_Görgetés fel/le"
+
+#: openbox/client_menu.c:414
+msgid "Un/_Decorate"
+msgstr "_Dekoráció eltávilítása"
+
+#: openbox/client_menu.c:418
+msgid "_Close"
+msgstr "_Bezárás"
+
+#: openbox/config.c:740
+#, c-format
+msgid "Invalid button '%s' specified in config file"
+msgstr "Érvénytelen gomb a konfigurációs fájlban '%s'"
+
+#: openbox/keyboard.c:156
+msgid "Conflict with key binding in config file"
+msgstr "Ütköző billentyű-műveletek a konfigurációs fájlban"
+
+#: openbox/menu.c:103 openbox/menu.c:111
+#, c-format
+msgid "Unable to find a valid menu file '%s'"
+msgstr "Nem található ilyen érvényes menü fájl: '%s'"
+
+#: openbox/menu.c:171
+#, c-format
+msgid "Failed to execute command for pipe-menu '%s': %s"
+msgstr "Sikertelen parancsfuttatás a csővezeték-menüben '%s': %s"
+
+#: openbox/menu.c:185
+#, c-format
+msgid "Invalid output from pipe-menu '%s'"
+msgstr "Érvnytelen válasz a csővezeték menüből '%s'"
+
+#: openbox/menu.c:198
+#, c-format
+msgid "Attempted to access menu '%s' but it does not exist"
+msgstr "'%s' menü elérésére történt kísérlet, de az nem létezik"
+
+#: openbox/menu.c:368 openbox/menu.c:369
+msgid "More..."
+msgstr "Tovább..."
+
+#: openbox/mouse.c:349
+#, c-format
+msgid "Invalid button '%s' in mouse binding"
+msgstr "Érvénytelen gomb '%s' az egér parancsoknál"
+
+#: openbox/mouse.c:355
+#, c-format
+msgid "Invalid context '%s' in mouse binding"
+msgstr "Érvénytelen környezet az egér parancsoknál: '%s'"
+
+#: openbox/openbox.c:129
+#, c-format
+msgid "Unable to change to home directory '%s': %s"
+msgstr "Nem lehet a saját mappába váltani '%s': %s"
+
+#: openbox/openbox.c:149
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr "Nem nyitható meg a DISPLAY változóban beállított képernyő"
+
+#: openbox/openbox.c:180
+msgid "Failed to initialize the obrender library."
+msgstr "Nem sikerült használatba venni az obernder függvénykönyvtárat"
+
+#: openbox/openbox.c:186
+msgid "X server does not support locale."
+msgstr "Az X kiszolgáló nem támogatja ezt a nemzetközi beállítást."
+
+#: openbox/openbox.c:188
+msgid "Cannot set locale modifiers for the X server."
+msgstr "A nemzetközi beálljtás módosítók nem állíthatók be az X szerveren."
+
+#: openbox/openbox.c:251
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr "Nincs konfigurációs fájl, ezért egyszerű alapértelmezéseket használunk"
+
+#: openbox/openbox.c:277
+msgid "Unable to load a theme."
+msgstr "Nem tölthető be a téma."
+
+#: openbox/openbox.c:402
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr "Az újraindítás során ez az új program nem volt indítható '%s': %s"
+
+#: openbox/openbox.c:472 openbox/openbox.c:474
+msgid "Copyright (c)"
+msgstr "Szerzői jogok (c)"
+
+#: openbox/openbox.c:483
+msgid "Syntax: openbox [options]\n"
+msgstr "Használat: openbox [options]\n"
+
+#: openbox/openbox.c:484
+msgid ""
+"\n"
+"Options:\n"
+msgstr ""
+"\n"
+"Opciók:\n"
+
+#: openbox/openbox.c:485
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Súgó megjelenítése és kilépés\n"
+
+#: openbox/openbox.c:486
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Verzió kiírása majd kilépés\n"
+
+#: openbox/openbox.c:487
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr "  --replace           Futó ablakkezelő cseréje\n"
+
+#: openbox/openbox.c:488
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr "  --sm-disable        Ne csatlakozzon a szekció-kezelőhöz\n"
+
+#: openbox/openbox.c:489
+msgid ""
+"\n"
+"Passing messages to a running Openbox instance:\n"
+msgstr ""
+"\n"
+"Üzenet küldése a futó Openbox példánynak\n"
+
+#: openbox/openbox.c:490
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr "  --reconfigure       Konfiguráció úrjatöltése\n"
+
+#: openbox/openbox.c:491
+msgid "  --restart           Restart Openbox\n"
+msgstr "  --restart           Openbox újraindítása\n"
+
+#: openbox/openbox.c:492
+msgid "  --exit              Exit Openbox\n"
+msgstr "  --exit              Kilépés az Openboxból\n"
+
+#: openbox/openbox.c:493
+msgid ""
+"\n"
+"Debugging options:\n"
+msgstr ""
+"\n"
+"Debug (hibakereső) lehetőségek:\n"
+
+#: openbox/openbox.c:494
+msgid "  --sync              Run in synchronous mode\n"
+msgstr "  --sync              Futtatás szinkron módban\n"
+
+#: openbox/openbox.c:495
+msgid "  --debug             Display debugging output\n"
+msgstr "  --debug             Hibakeresési információk megjelenítése\n"
+
+#: openbox/openbox.c:496
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+"  --debug-focus       Fókuszkezelésre vonatkozó hibakeresési információk "
+"kiírása\n"
+
+#: openbox/openbox.c:497
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr "  --debug-xinerama    Képernyő felosztása két ál-xinerama képernyőre\n"
+
+#: openbox/openbox.c:498
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+msgstr ""
+"\n"
+"Légyszi jelentsd a hibát itt: %s\n"
+
+#: openbox/openbox.c:599
+#, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr "Érvénytelen parancssori opció: '%s'\n"
+
+#: openbox/screen.c:96 openbox/screen.c:184
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr "Már fut egy ablakkezelő ezen a képernyőn %d"
+
+#: openbox/screen.c:118
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr "Nem tudok ablakkezelőt váltani ezen a képernyőn %d"
+
+#: openbox/screen.c:139
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr "Ezen a képernyőn: %d az ablakkezelő nem lép ki"
+
+#: openbox/screen.c:1087
+#, c-format
+msgid "desktop %i"
+msgstr "%i. munkaasztal"
+
+#: openbox/session.c:103
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Nem hozható létre a könyvtár '%s': %s"
+
+#: openbox/session.c:451
+#, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr "Nem tudom elmenti ide a futó környezetet '%s': %s"
+
+#: openbox/session.c:583
+#, c-format
+msgid "Error while saving the session to '%s': %s"
+msgstr "Hiba a futási környezet mentése közben '%s': %s"
+
+#: openbox/startupnotify.c:237
+#, c-format
+msgid "Running %s\n"
+msgstr "Futtatás %s\n"
+
+#: openbox/translate.c:58
+#, c-format
+msgid "Invalid modifier key '%s' in key/mouse binding"
+msgstr "Érvénytelen módosító gomb '%s' egér vagy billentyűparancsnál"
+
+#: openbox/translate.c:135
+#, c-format
+msgid "Invalid key code '%s' in key binding"
+msgstr "Érvénytelen billentyűkód '%s' billentyűparancsnál"
+
+#: openbox/translate.c:142
+#, c-format
+msgid "Invalid key name '%s' in key binding"
+msgstr "Érvénytelen billentyűnév '%s' billentyűparancsnál"
+
+#: openbox/translate.c:148
+#, c-format
+msgid "Requested key '%s' does not exist on the display"
+msgstr "A kért gomb '%s' nem létezik a képernyőn"
+
+#: openbox/xerror.c:39
+#, c-format
+msgid "X Error: %s"
+msgstr "X rendszer hiba: %s"

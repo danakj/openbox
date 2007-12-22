@@ -27,7 +27,7 @@ Atoms prop_atoms;
 #define CREATE(var, name) (prop_atoms.var = \
                            XInternAtom(ob_display, name, FALSE))
 
-void prop_startup()
+void prop_startup(void)
 {
     CREATE(cardinal, "CARDINAL");
     CREATE(window, "WINDOW");

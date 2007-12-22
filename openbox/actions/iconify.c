@@ -3,7 +3,7 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_iconify_startup()
+void action_iconify_startup(void)
 {
     actions_register("Iconify",
                      NULL, NULL,

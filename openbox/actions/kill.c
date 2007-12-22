@@ -3,7 +3,7 @@
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_kill_startup()
+void action_kill_startup(void)
 {
     actions_register("Kill",
                      NULL, NULL,

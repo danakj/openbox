@@ -27,6 +27,4 @@ void focus_cycle_indicator_shutdown(gboolean reconfig);
 
 void focus_cycle_draw_indicator(struct _ObClient *c);
 
-void focus_cycle_stop();
-
 #endif

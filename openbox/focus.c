@@ -178,7 +178,7 @@ ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer,
     return new;
 }
 
-void focus_nothing()
+void focus_nothing(void)
 {
     /* Install our own colormap */
     if (focus_client != NULL) {

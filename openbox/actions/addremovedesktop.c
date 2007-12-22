@@ -22,7 +22,7 @@ static gpointer setup_removelast_func(ObParseInst *i,
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_addremovedesktop_startup()
+void action_addremovedesktop_startup(void)
 {
     actions_register("AddDesktop",
                      setup_add_func,

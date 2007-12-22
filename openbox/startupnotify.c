@@ -61,7 +61,7 @@ void sn_startup(gboolean reconfig)
     if (reconfig) return;
 
     /* unset this so we don't pass it on unknowingly */
-    unsetenv("DESKTOP_STARTUP_ID");
+    putenv("DESKTOP_STARTUP_ID");
 
     sn_display = sn_display_new(ob_display, NULL, NULL);
     sn_context = sn_monitor_context_new(sn_display, ob_screen,
@@ -106,7 +106,7 @@ static SnStartupSequence* sequence_find(const gchar *id)
     return ret;
 }
 
-gboolean sn_app_starting()
+gboolean sn_app_starting(void)
 {
     return sn_waits != NULL;
 }
@@ -259,12 +259,12 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
                              g_direct_equal,
                              (GDestroyNotify)sn_launcher_context_unref);
 
-    setenv("DESKTOP_STARTUP_ID", id, TRUE);
+    putenv(g_strdup_printf("DESKTOP_STARTUP_ID=%s", id));
 
     g_free(desc);
 }
 
-void sn_spawn_cancel()
+void sn_spawn_cancel(void)
 {
     sn_launcher_context_complete(sn_launcher);
 }

@@ -60,7 +60,7 @@ static void     i_cancel_func(gpointer options);
 
 static void     end_cycle(gboolean cancel, guint state, Options *o);
 
-void action_directionalwindows_startup()
+void action_directionalwindows_startup(void)
 {
     actions_register("DirectionalFocusNorth", setup_north_cycle_func,
                      free_func, run_func, i_input_func, i_cancel_func);

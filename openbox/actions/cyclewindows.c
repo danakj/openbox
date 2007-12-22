@@ -32,7 +32,7 @@ static void     i_cancel_func(gpointer options);
 
 static void     end_cycle(gboolean cancel, guint state, Options *o);
 
-void action_cyclewindows_startup()
+void action_cyclewindows_startup(void)
 {
     actions_register("NextWindow", setup_forward_func, free_func,
                      run_func, i_input_func, i_cancel_func);

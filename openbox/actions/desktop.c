@@ -60,7 +60,7 @@ static gpointer setup_send_down_func(ObParseInst *i, xmlDocPtr doc,
                                      xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_desktop_startup()
+void action_desktop_startup(void)
 {
     actions_register("DesktopLast", setup_go_last_func, g_free,
                      run_func, NULL, NULL);

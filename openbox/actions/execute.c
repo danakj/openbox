@@ -23,7 +23,7 @@ static gboolean i_input_func(guint initial_state,
 static void     i_cancel_func(gpointer options);
 */
 
-void action_execute_startup()
+void action_execute_startup(void)
 {
     actions_register("Execute",
                      setup_func,

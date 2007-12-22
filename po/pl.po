@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-07-22 08:25-0400\n"
+"POT-Creation-Date: 2007-11-12 19:12+0100\n"
 "PO-Revision-Date: 2007-07-14 00:43+0200\n"
 "Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -27,27 +27,27 @@ msgstr "Nie można przekonwertować ścieżki '%s' z UTF-8"
 msgid "Failed to execute '%s': %s"
 msgstr "Wykonanie '%s' nie powiodło się: %s"
 
-#: openbox/client_list_combined_menu.c:92 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
 msgstr "Przejdź..."
 
-#: openbox/client_list_combined_menu.c:98
+#: openbox/client_list_combined_menu.c:96
 msgid "Manage desktops"
 msgstr "Zarządzaj pulpitami"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:152
+#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
 msgid "_Add new desktop"
 msgstr "Dod_aj nowy pulpit"
 
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:153
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Remove last desktop"
 msgstr "_Usuń ostatni pulpit"
 
-#: openbox/client_list_combined_menu.c:146
+#: openbox/client_list_combined_menu.c:150
 msgid "Windows"
 msgstr "Okna"
 
-#: openbox/client_list_menu.c:199
+#: openbox/client_list_menu.c:203
 msgid "Desktops"
 msgstr "Pulpity"
 
@@ -79,39 +79,39 @@ msgstr "Wyślij na p_ulpit"
 msgid "Client menu"
 msgstr "Menu klienta"
 
-#: openbox/client_menu.c:380
+#: openbox/client_menu.c:384
 msgid "R_estore"
 msgstr "P_rzywróć"
 
-#: openbox/client_menu.c:388
+#: openbox/client_menu.c:392
 msgid "_Move"
 msgstr "_Przesuń"
 
-#: openbox/client_menu.c:390
+#: openbox/client_menu.c:394
 msgid "Resi_ze"
 msgstr "Zmień _rozmiar"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:396
 msgid "Ico_nify"
 msgstr "Zmi_nimalizuj"
 
-#: openbox/client_menu.c:400
+#: openbox/client_menu.c:404
 msgid "Ma_ximize"
 msgstr "Zma_ksymalizuj"
 
-#: openbox/client_menu.c:408
+#: openbox/client_menu.c:412
 msgid "_Roll up/down"
 msgstr "_Zwiń/Rozwiń"
 
-#: openbox/client_menu.c:410
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "Wyświetl/ukryj _dekoracje"
 
-#: openbox/client_menu.c:420
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "Z_amknij"
 
-#: openbox/config.c:737
+#: openbox/config.c:740
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Nieprawidłowy klawisz '%s' określony w pliku konfiguracyjnym"
@@ -154,53 +154,53 @@ msgstr "Nieprawidłowy klawisz '%s' w skrócie myszy"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Nieprawidłowy kontekst '%s' w skrócie myszy"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:129
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Nie można przejść do katalogu domowego '%s': %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:149
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Otwarcie ekranu ze zmiennej środowiskowej DISPLAY nie powiodło się."
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:180
 msgid "Failed to initialize the obrender library."
 msgstr "Zainicjowanie biblioteki obrender nie powiodło się."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:186
 msgid "X server does not support locale."
 msgstr "Serwer X nie obsługuje ustawień lokalnych."
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Nie można ustawić modyfikatorów lokalnych dla serwera X."
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:251
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Nie można znaleźć prawidłowego pliku konfiguracyjnego, używanie "
 "domyślnychwartości"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:277
 msgid "Unable to load a theme."
 msgstr "Nie można wczytać motywu."
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:402
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr ""
 "Wykonanie nowego pliku wykonywalnego '%s' podczas ponownego uruchomienianie "
 "powiodło się: %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:472 openbox/openbox.c:474
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:483
 msgid "Syntax: openbox [options]\n"
 msgstr "Składnia: openbox [opcje]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:484
 msgid ""
 "\n"
 "Options:\n"
@@ -208,23 +208,23 @@ msgstr ""
 "\n"
 "Opcje:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:485
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Wyświetla tę pomoc i kończy\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:486
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Wyświetla wersję i kończy\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:487
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Zastępuje aktualnie działający menedżer okien\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:488
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Nie tworzy połączenia z menedżerem sesji\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:489
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -232,15 +232,20 @@ msgstr ""
 "\n"
 "Przekazywanie komunikatów do działającej instancji Openboksa:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:490
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ponownie wczytuje pliki konfiguracyjne\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:491
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Ponownie uruchamia Openboksa\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:492
+#, fuzzy
+msgid "  --exit              Exit Openbox\n"
+msgstr ""
+
+#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -248,24 +253,24 @@ msgstr ""
 "\n"
 "Opcje debugowania:\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:494
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Uruchamia w trybie synchronicznym\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:495
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Wyświetla informacje o debugowaniu\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:496
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Wyświetla wyjście debugowania obsługi aktywacji\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:497
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Dzieli ekran na sztuczne ekrany xineramy\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:498
 #, c-format
 msgid ""
 "\n"
@@ -274,27 +279,27 @@ msgstr ""
 "\n"
 "Proszę zgłaszać błędy (w języku angielskim) pod adresem %s\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:599
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Nieprawidłowy argument wiersza poleceń '%s'\n"
 
-#: openbox/screen.c:94 openbox/screen.c:195
+#: openbox/screen.c:96 openbox/screen.c:184
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Menedżer okien jest już uruchomiony na ekranie %d"
 
-#: openbox/screen.c:131
+#: openbox/screen.c:118
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 
-#: openbox/screen.c:152
+#: openbox/screen.c:139
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
 
-#: openbox/screen.c:1083
+#: openbox/screen.c:1087
 #, c-format
 msgid "desktop %i"
 msgstr "pulpit %i"

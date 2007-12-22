@@ -29,7 +29,7 @@
 
 GList  *stacking_list = NULL;
 
-void stacking_set_list()
+void stacking_set_list(void)
 {
     Window *windows = NULL;
     GList *it;
@@ -411,6 +411,7 @@ void stacking_add_nonintrusive(ObWindow *win)
     ObClient *client;
     GList *it_below = NULL; /* this client will be below us */
     GList *it_above;
+    GList *wins;
 
     if (!WINDOW_IS_CLIENT(win)) {
         stacking_add(win); /* no special rules for others */
@@ -468,7 +469,7 @@ void stacking_add_nonintrusive(ObWindow *win)
             break;
     }
 
-    GList *wins = g_list_append(NULL, win);
+    wins = g_list_append(NULL, win);
     do_restack(wins, it_below);
     g_list_free(wins);
 }

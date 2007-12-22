@@ -41,7 +41,7 @@ static guint pgrabs = 0;
 static Time  grab_time = CurrentTime;
 static gint passive_count = 0;
 
-static Time ungrab_time()
+static Time ungrab_time(void)
 {
     Time t = event_curtime;
     if (grab_time == CurrentTime ||
@@ -58,12 +58,12 @@ static Time ungrab_time()
     return t;
 }
 
-gboolean grab_on_keyboard()
+gboolean grab_on_keyboard(void)
 {
     return kgrabs > 0;
 }
 
-gboolean grab_on_pointer()
+gboolean grab_on_pointer(void)
 {
     return pgrabs > 0;
 }
@@ -218,7 +218,7 @@ void grab_key_passive_count(int change)
     if (passive_count < 0) passive_count = 0;
 }
 
-void ungrab_passive_key()
+void ungrab_passive_key(void)
 {
     /*ob_debug("ungrabbing %d passive grabs\n", passive_count);*/
     if (passive_count) {

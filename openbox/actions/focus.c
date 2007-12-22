@@ -14,7 +14,7 @@ static gpointer setup_activate_func(ObParseInst *i,
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_focus_startup()
+void action_focus_startup(void)
 {
     actions_register("Focus",
                      setup_func,

@@ -216,8 +216,6 @@ void ob_main_loop_destroy(ObMainLoop *loop)
 
         /* only do this if we're the last loop destroyed */
         if (!all_loops) {
-            guint i;
-
             /* grab all the signals that cause core dumps */
             for (i = 0; i < NUM_CORE_SIGNALS; ++i) {
                 if (all_signals[core_signals[i]].installed) {

@@ -47,7 +47,7 @@ void RrPixmapMaskFree(RrPixmapMask *m)
 void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const RrRect *area)
 {
     gint x, y;
-    if (m->mask == None) return; /* no mask given */
+    if (m->mask == NULL) return; /* no mask given */
 
     /* set the clip region */
     x = area->x + (area->width - m->mask->width) / 2;

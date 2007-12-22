@@ -156,7 +156,7 @@ translation_fail:
     return ret;
 }
 
-const gchar *translate_keycode(guint keycode)
+gchar *translate_keycode(guint keycode)
 {
     KeySym sym;
     const gchar *ret = NULL;
@@ -170,7 +170,7 @@ gunichar translate_unichar(guint keycode)
 {
     gunichar unikey = 0;
 
-    const char *key;
+    char *key;
     if ((key = translate_keycode(keycode)) != NULL &&
         /* don't accept keys that aren't a single letter, like "space" */
         key[1] == '\0')
@@ -179,5 +179,6 @@ gunichar translate_unichar(guint keycode)
         if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
             unikey = 0;
     }
+    g_free(key);
     return unikey;
 }

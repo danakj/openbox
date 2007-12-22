@@ -19,7 +19,7 @@ static gpointer setup_west_func(ObParseInst *i, xmlDocPtr doc,
                                 xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-void action_movetoedge_startup()
+void action_movetoedge_startup(void)
 {
     actions_register("MoveToEdgeNorth", setup_north_func, g_free, run_func,
                      NULL, NULL);

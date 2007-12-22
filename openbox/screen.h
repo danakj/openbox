@@ -77,6 +77,8 @@ guint screen_find_desktop(guint from, ObDirection dir,
 
 /*! Show the desktop popup/notification */
 void screen_show_desktop_popup(guint d);
+/*! Hide it */
+void screen_hide_desktop_popup();
 
 /*! Shows and focuses the desktop and hides all the client windows, or
   returns to the normal state, showing client windows.

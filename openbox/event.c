@@ -718,6 +718,8 @@ static void event_handle_root(XEvent *e)
                 ob_reconfigure();
             else if (e->xclient.data.l[0] == 2)
                 ob_restart();
+            else if (e->xclient.data.l[0] == 3)
+                ob_exit(0);
         }
         break;
     case PropertyNotify:
@@ -1579,7 +1581,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
     }
 }
 
-static ObMenuFrame* find_active_menu()
+static ObMenuFrame* find_active_menu(void)
 {
     GList *it;
     ObMenuFrame *ret = NULL;
@@ -1593,7 +1595,7 @@ static ObMenuFrame* find_active_menu()
     return ret;
 }
 
-static ObMenuFrame* find_active_or_last_menu()
+static ObMenuFrame* find_active_or_last_menu(void)
 {
     ObMenuFrame *ret = NULL;
 
@@ -1857,12 +1859,14 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
                                      client, FALSE);
 }
 
-void event_halt_focus_delay()
+void event_halt_focus_delay(void)
 {
+    /* ignore all enter events up till now */
+    event_end_ignore_all_enters(1);
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
-gulong event_start_ignore_all_enters()
+gulong event_start_ignore_all_enters(void)
 {
     XSync(ob_display, FALSE);
     return LastKnownRequestProcessed(ob_display);
@@ -1909,7 +1913,7 @@ static gboolean is_enter_focus_event_ignored(XEvent *e)
     return FALSE;
 }
 
-void event_cancel_all_key_grabs()
+void event_cancel_all_key_grabs(void)
 {
     if (actions_interactive_act_running()) {
         actions_interactive_cancel_act();
@@ -1956,7 +1960,7 @@ gboolean event_time_after(Time t1, Time t2)
         return t1 >= t2 && t1 < (t2 + TIME_HALF);
 }
 
-Time event_get_server_time()
+Time event_get_server_time(void)
 {
     /* Generate a timestamp */
     XEvent event;

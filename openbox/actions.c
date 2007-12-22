@@ -275,12 +275,12 @@ void actions_run_acts(GSList *acts,
     }
 }
 
-gboolean actions_interactive_act_running()
+gboolean actions_interactive_act_running(void)
 {
     return interactive_act != NULL;
 }
 
-void actions_interactive_cancel_act()
+void actions_interactive_cancel_act(void)
 {
     if (interactive_act) {
         interactive_act->def->i_cancel(interactive_act->options);
@@ -306,7 +306,7 @@ static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
         return FALSE;
 }
 
-static void actions_interactive_end_act()
+static void actions_interactive_end_act(void)
 {
     if (interactive_act) {
         ungrab_keyboard();

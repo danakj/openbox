@@ -59,7 +59,9 @@ static void     screen_fallback_focus(void);
 guint    screen_num_desktops;
 guint    screen_num_monitors;
 guint    screen_desktop;
-guint    screen_last_desktop;
+guint    screen_last_desktop = 1;
+guint    screen_old_desktop;
+gboolean screen_desktop_timeout = TRUE;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
 ObDesktopLayout screen_desktop_layout;
@@ -577,23 +579,61 @@ static void screen_fallback_focus(void)
     }
 }
 
+static gboolean last_desktop_func(gpointer data)
+{
+    screen_desktop_timeout = TRUE;
+    return FALSE;
+}
+
 void screen_set_desktop(guint num, gboolean dofocus)
 {
     GList *it;
-    guint old;
+    guint previous;
     gulong ignore_start;
 
     g_assert(num < screen_num_desktops);
 
-    old = screen_desktop;
+    previous = screen_desktop;
     screen_desktop = num;
 
-    if (old == num) return;
+    if (previous == num) return;
 
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_current_desktop, cardinal, num);
 
-    screen_last_desktop = old;
+    if (screen_desktop_timeout) {
+        if (screen_desktop == screen_last_desktop) {
+            screen_last_desktop = previous;
+            screen_old_desktop = screen_desktop;
+        } else {
+            screen_old_desktop = screen_last_desktop;
+            screen_last_desktop = previous;
+        }
+    } else {
+        if (screen_desktop == screen_last_desktop) {
+            if (previous == screen_old_desktop) {
+                screen_last_desktop = screen_old_desktop;
+            } else if (screen_last_desktop == screen_old_desktop) {
+                screen_last_desktop = previous;
+            } else {
+                screen_last_desktop = screen_old_desktop;
+            }
+        } else {
+            if (screen_desktop == screen_old_desktop) {
+                /* do nothing */
+            } else if (previous == screen_old_desktop) {
+                /* do nothing */
+            } else if (screen_last_desktop == screen_old_desktop) {
+                screen_last_desktop = previous;
+            } else {
+                /* do nothing */
+            }
+        }
+    }
+    screen_desktop_timeout = FALSE;
+    ob_main_loop_timeout_remove(ob_main_loop, last_desktop_func);
+    ob_main_loop_timeout_add(ob_main_loop, 500000, last_desktop_func,
+            NULL, NULL, NULL);
 
     ob_debug("Moving to desktop %d\n", num+1);
 

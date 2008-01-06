@@ -1,4 +1,5 @@
 3.4.5:
+  * Added Hungarian translation
   * Updated Finnish, Russian, German and French translations
   * Fixed some very minor memory leaks
   * Hide the desktop popup when showing the focus popup

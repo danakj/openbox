@@ -1,7 +1,7 @@
 # English translations for openbox package.
-# Copyright (C) 2007 Dana Jansens
+# Copyright (C) 2008 Dana Jansens
 # This file is distributed under the same license as the openbox package.
-# Automatically generated, 2007.
+# Automatically generated, 2008.
 #
 # All this catalog "translates" are quotation characters.
 # The msgids must be ASCII and therefore cannot contain real quotation
@@ -27,7 +27,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.4.3\n"
+"Project-Id-Version: openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-11-12 19:12+0100\n"
 "PO-Revision-Date: 2007-11-12 19:12+0100\n"

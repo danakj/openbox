@@ -238,7 +238,6 @@ msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Перезапустить Openbox\n"
 
 #: openbox/openbox.c:492
-#, fuzzy
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 

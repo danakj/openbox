@@ -37,11 +37,13 @@ void focus_cycle_shutdown(gboolean reconfig);
 struct _ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                               gboolean dock_windows, gboolean desktop_windows,
                               gboolean linear, gboolean interactive,
-                              gboolean dialog, gboolean done, gboolean cancel);
+                              gboolean showbar, gboolean dialog,
+                              gboolean done, gboolean cancel);
 struct _ObClient* focus_directional_cycle(ObDirection dir,
                                           gboolean dock_windows,
                                           gboolean desktop_windows,
                                           gboolean interactive,
+                                          gboolean showbar,
                                           gboolean dialog,
                                           gboolean done, gboolean cancel);
 

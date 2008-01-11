@@ -39,6 +39,7 @@ struct
 
 static RrAppearance *a_focus_indicator;
 static RrColor      *color_white;
+static gboolean      visible;
 
 static Window create_window(Window parent, gulong mask,
                             XSetWindowAttributes *attrib)
@@ -52,6 +53,8 @@ static Window create_window(Window parent, gulong mask,
 void focus_cycle_indicator_startup(gboolean reconfig)
 {
     XSetWindowAttributes attr;
+
+    visible = FALSE;
 
     if (reconfig) return;
 
@@ -118,7 +121,7 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 
 void focus_cycle_draw_indicator(ObClient *c)
 {
-    if (!c) {
+    if (!c && visible) {
         gulong ignore_start;
 
         /* kill enter events cause by this unmapping */
@@ -130,7 +133,10 @@ void focus_cycle_draw_indicator(ObClient *c)
         XUnmapWindow(ob_display, focus_indicator.bottom.win);
 
         event_end_ignore_all_enters(ignore_start);
-    } else {
+
+        visible = FALSE;
+    }
+    else if (c) {
         /*
           if (c)
               frame_adjust_focus(c->frame, FALSE);
@@ -249,5 +255,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         XMapWindow(ob_display, focus_indicator.left.win);
         XMapWindow(ob_display, focus_indicator.right.win);
         XMapWindow(ob_display, focus_indicator.bottom.win);
+
+        visible = TRUE;
     }
 }

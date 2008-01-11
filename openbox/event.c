@@ -74,6 +74,7 @@ typedef struct
 {
     ObClient *client;
     Time time;
+    gulong serial;
 } ObFocusDelayData;
 
 typedef struct
@@ -246,7 +247,6 @@ static void event_set_curtime(XEvent *e)
         event_last_user_time = CurrentTime;
 
     event_curtime = t;
-    event_curserial = 0;
 }
 
 static void event_hack_mods(XEvent *e)
@@ -742,6 +742,7 @@ static void event_process(const XEvent *ec, gpointer data)
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
     event_curtime = CurrentTime;
+    event_curserial = 0;
 }
 
 static void event_handle_root(XEvent *e)
@@ -816,6 +817,7 @@ void event_enter_client(ObClient *client)
             data = g_new(ObFocusDelayData, 1);
             data->client = client;
             data->time = event_curtime;
+            data->serial = event_curserial;
 
             ob_main_loop_timeout_add(ob_main_loop,
                                      config_focus_delay * 1000,
@@ -825,6 +827,7 @@ void event_enter_client(ObClient *client)
             ObFocusDelayData data;
             data.client = client;
             data.time = event_curtime;
+            data.serial = event_curserial;
             focus_delay_func(&data);
         }
     }
@@ -1912,6 +1915,7 @@ static gboolean focus_delay_func(gpointer data)
     if (menu_frame_visible || moveresize_in_progress) return FALSE;
 
     event_curtime = d->time;
+    event_curserial = d->serial;
     if (client_focus(d->client) && config_focus_raise)
         stacking_raise(CLIENT_AS_WINDOW(d->client));
     event_curtime = old;
@@ -1924,7 +1928,7 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
                                      client, FALSE);
 }
 
-void event_halt_focus_delay(gulong serial)
+void event_halt_focus_delay()
 {
     /* ignore all enter events up till the event which caused this to occur */
     if (event_curserial) event_ignore_enter_range(1, event_curserial);
@@ -1933,7 +1937,6 @@ void event_halt_focus_delay(gulong serial)
 
 gulong event_start_ignore_all_enters(void)
 {
-    /* increment the serial so we don't ignore events we weren't meant to */
     XSync(ob_display, FALSE);
     return LastKnownRequestProcessed(ob_display);
 }
@@ -1959,6 +1962,7 @@ static void event_ignore_enter_range(gulong start, gulong end)
 
 void event_end_ignore_all_enters(gulong start)
 {
+    XSync(ob_display, FALSE);
     event_ignore_enter_range(start, LastKnownRequestProcessed(ob_display));
 }
 

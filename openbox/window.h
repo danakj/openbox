@@ -19,6 +19,8 @@
 #ifndef __window_h
 #define __window_h
 
+#include "stacking.h"
+
 #include <X11/Xlib.h>
 #include <glib.h>
 
@@ -74,6 +76,6 @@ void window_startup(gboolean reconfig);
 void window_shutdown(gboolean reconfig);
 
 Window window_top(ObWindow *self);
-Window window_layer(ObWindow *self);
+ObStackingLayer window_layer(ObWindow *self);
 
 #endif

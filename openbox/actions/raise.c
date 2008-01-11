@@ -1,5 +1,6 @@
 #include "openbox/actions.h"
 #include "openbox/stacking.h"
+#include "openbox/window.h"
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 

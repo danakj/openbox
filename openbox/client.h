@@ -24,6 +24,7 @@
 #include "mwm.h"
 #include "geom.h"
 #include "stacking.h"
+#include "window.h"
 #include "render/color.h"
 
 #include <glib.h>

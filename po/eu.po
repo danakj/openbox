@@ -1,0 +1,348 @@
+# Basque translation for openbox.
+# Copyright (C) 2008 Inko Illarramendi Arancibia
+# This file is distributed under the same license as the openbox package.
+# Inko Illarramendi Arancibia <inkoia@gmail.com>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.4.5\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"POT-Creation-Date: 2007-11-12 19:12+0100\n"
+"PO-Revision-Date: 2008-01-11 01:00+0100\n"
+"Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
+"Language-Team: Inko I. A. <inkoia@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/actions/execute.c:88
+#, c-format
+msgid "Failed to convert the path '%s' from utf8"
+msgstr "Hutsegitea '%s' helbidea utf8-tik bihurtzean"
+
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#, c-format
+msgid "Failed to execute '%s': %s"
+msgstr "Hutsegitea '%s' exekutatzean: %s"
+
+#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
+msgid "Go there..."
+msgstr "Hona joan..."
+
+#: openbox/client_list_combined_menu.c:96
+msgid "Manage desktops"
+msgstr "Idazmahaiak kudeatu"
+
+#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
+msgid "_Add new desktop"
+msgstr "Idazmahai berria _gehitu"
+
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+msgid "_Remove last desktop"
+msgstr "Azken idazmahaia _ezabatu"
+
+#: openbox/client_list_combined_menu.c:150
+msgid "Windows"
+msgstr "Leihoak"
+
+#: openbox/client_list_menu.c:203
+msgid "Desktops"
+msgstr "Idazmahaiak"
+
+#: openbox/client_menu.c:256
+msgid "All desktops"
+msgstr "Idazmahai guztiak"
+
+#: openbox/client_menu.c:360
+msgid "_Layer"
+msgstr "_Geruza"
+
+#: openbox/client_menu.c:365
+msgid "Always on _top"
+msgstr "Beti _gainean"
+
+#: openbox/client_menu.c:366
+msgid "_Normal"
+msgstr "_Ohikoa"
+
+#: openbox/client_menu.c:367
+msgid "Always on _bottom"
+msgstr "Beti _azpian"
+
+#: openbox/client_menu.c:370
+msgid "_Send to desktop"
+msgstr "_Bidali idazmahaira"
+
+#: openbox/client_menu.c:374
+msgid "Client menu"
+msgstr "Bezero menua"
+
+#: openbox/client_menu.c:384
+msgid "R_estore"
+msgstr "Berr_ezarri"
+
+#: openbox/client_menu.c:392
+msgid "_Move"
+msgstr "_Mugitu"
+
+#: openbox/client_menu.c:394
+msgid "Resi_ze"
+msgstr "_Tamaina aldatu"
+
+#: openbox/client_menu.c:396
+msgid "Ico_nify"
+msgstr "Iko_notu"
+
+#: openbox/client_menu.c:404
+msgid "Ma_ximize"
+msgstr "Ma_ximizatu"
+
+#: openbox/client_menu.c:412
+msgid "_Roll up/down"
+msgstr "Bildu/_Zabaldu"
+
+#: openbox/client_menu.c:414
+msgid "Un/_Decorate"
+msgstr "Des/_Dekoratu"
+
+#: openbox/client_menu.c:418
+msgid "_Close"
+msgstr "_Itxi"
+
+#: openbox/config.c:740
+#, c-format
+msgid "Invalid button '%s' specified in config file"
+msgstr "Konfigurazio fitxategian zehaztutako '%s' botoia baliogabea"
+
+#: openbox/keyboard.c:156
+msgid "Conflict with key binding in config file"
+msgstr "Gatazka konfigurazio fitxategiko tekla elkarketarekin"
+
+#: openbox/menu.c:103 openbox/menu.c:111
+#, c-format
+msgid "Unable to find a valid menu file '%s'"
+msgstr "Ezin da '%s' baliozko menu fitxategi bat aurkitu"
+
+#: openbox/menu.c:171
+#, c-format
+msgid "Failed to execute command for pipe-menu '%s': %s"
+msgstr "Hutsegitea '%s' pipe-menuarentzat komandoa exekutatzean: %s"
+
+#: openbox/menu.c:185
+#, c-format
+msgid "Invalid output from pipe-menu '%s'"
+msgstr "Baliogabeko irteera '%s' pipe-menutik"
+
+#: openbox/menu.c:198
+#, c-format
+msgid "Attempted to access menu '%s' but it does not exist"
+msgstr "'%s' menua atzitzen saiatu da baina ez da existitzen"
+
+#: openbox/menu.c:368 openbox/menu.c:369
+msgid "More..."
+msgstr "Gehiago..."
+
+#: openbox/mouse.c:349
+#, c-format
+msgid "Invalid button '%s' in mouse binding"
+msgstr "Baliogabeko '%s' botoia sagu elkarketan"
+
+#: openbox/mouse.c:355
+#, c-format
+msgid "Invalid context '%s' in mouse binding"
+msgstr "Baliogabeko '%s' testuingurua sagu elkarketan"
+
+#: openbox/openbox.c:129
+#, c-format
+msgid "Unable to change to home directory '%s': %s"
+msgstr "Ezin da '%s' hasiera direktoriora aldatu: %s"
+
+#: openbox/openbox.c:149
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr "Hutsegitea pantaila irekitzean DISPLAY ingurune aldagaitik."
+
+#: openbox/openbox.c:180
+msgid "Failed to initialize the obrender library."
+msgstr "Hutsegitea obrender liburutegia hasieratzean."
+
+#: openbox/openbox.c:186
+msgid "X server does not support locale."
+msgstr "X zerbitzariak ez du locale euskarririk."
+
+#: openbox/openbox.c:188
+msgid "Cannot set locale modifiers for the X server."
+msgstr "Ezin da locale modifikatzailerik ezarri X zerbitzariarentzat."
+
+#: openbox/openbox.c:251
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr ""
+"Ezin da baliozko konfigurazio fitxategirik aurkitu, hainbat aukera lehenetsi "
+"sinple erabiltzen"
+
+#: openbox/openbox.c:277
+msgid "Unable to load a theme."
+msgstr "Ezin da gai bat kargatu."
+
+#: openbox/openbox.c:402
+#, c-format
+msgid "Restart failed to execute new executable '%s': %s"
+msgstr "Berrabiarazteak hutsegitea '%s' exekutagarri berria exekutatzean: %s"
+
+#: openbox/openbox.c:472 openbox/openbox.c:474
+msgid "Copyright (c)"
+msgstr "Copyright (c)"
+
+#: openbox/openbox.c:483
+msgid "Syntax: openbox [options]\n"
+msgstr "Sintaxia: openbox [aukerak]\n"
+
+#: openbox/openbox.c:484
+msgid ""
+"\n"
+"Options:\n"
+msgstr ""
+"\n"
+"Aukerak:\n"
+
+#: openbox/openbox.c:485
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Mezu hau erakutsi eta irten\n"
+
+#: openbox/openbox.c:486
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Bertsioa bistarazi eta irten\n"
+
+#: openbox/openbox.c:487
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr ""
+"  --replace           Ordezkatu exekutatzen ari den leiho-kudeatzailea\n"
+
+#: openbox/openbox.c:488
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr "  --sm-disable        Ezgaitu saio kudeatzailearekiko konexioa\n"
+
+#: openbox/openbox.c:489
+msgid ""
+"\n"
+"Passing messages to a running Openbox instance:\n"
+msgstr ""
+"\n"
+"Exekutatzen ari den Openbox instantzia bati mezuak pasatzen:\n"
+
+#: openbox/openbox.c:490
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr "  --reconfigure       Birkargatu Openbox-en konfigurazioa\n"
+
+#: openbox/openbox.c:491
+msgid "  --restart           Restart Openbox\n"
+msgstr "  --restart           Berrabiarazi Openbox\n"
+
+#: openbox/openbox.c:492
+msgid "  --exit              Exit Openbox\n"
+msgstr "  --exit              Itxi Openbox\n"
+
+#: openbox/openbox.c:493
+msgid ""
+"\n"
+"Debugging options:\n"
+msgstr ""
+"\n"
+"Arazketa aukerak:\n"
+
+#: openbox/openbox.c:494
+msgid "  --sync              Run in synchronous mode\n"
+msgstr "  --sync              Modu sinkronoan exekutatu\n"
+
+#: openbox/openbox.c:495
+msgid "  --debug             Display debugging output\n"
+msgstr "  --debug             Arazketa irteera erakutsi\n"
+
+#: openbox/openbox.c:496
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr "  --debug-focus       Erakutsi arazketa irteera foku maneiurako\n"
+
+#: openbox/openbox.c:497
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr "  --debug-xinerama    Zatitu pantaila xinerama pantaila faltsuetan\n"
+
+#: openbox/openbox.c:498
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+msgstr ""
+"\n"
+"%s helbidean erroreen berri eman mesedez\n"
+
+#: openbox/openbox.c:599
+#, c-format
+msgid "Invalid command line argument '%s'\n"
+msgstr "'%s' komando lerro argumentu baliogabea\n"
+
+#: openbox/screen.c:96 openbox/screen.c:184
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr ""
+"Bistaratzeko %d pantailan aurretik leiho-kudeatzaile bat exekutatzen ari da"
+
+#: openbox/screen.c:118
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr ""
+"Ezin izan da eskuratu leiho-kudeatzailearen hautapena bistaratzeko %d "
+"pantailan"
+
+#: openbox/screen.c:139
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr "%d bistaratze pantailako leiho-kudeatzailea ez da irteten"
+
+#: openbox/screen.c:1087
+#, c-format
+msgid "desktop %i"
+msgstr "%i Idazmahaia"
+
+#: openbox/session.c:103
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Ezin da '%s' direktorioa sortu: %s"
+
+#: openbox/session.c:451
+#, c-format
+msgid "Unable to save the session to '%s': %s"
+msgstr "Ezin da saioa '%s'-n gorde: %s"
+
+#: openbox/session.c:583
+#, c-format
+msgid "Error while saving the session to '%s': %s"
+msgstr "Errorea saioa '%s'-n gordetzean: %s"
+
+#: openbox/startupnotify.c:237
+#, c-format
+msgid "Running %s\n"
+msgstr "Egikaritzen %s\n"
+
+#: openbox/translate.c:58
+#, c-format
+msgid "Invalid modifier key '%s' in key/mouse binding"
+msgstr " tekla/sagu elkarketan '%s' modifikatzaile tekla baliogabea"
+
+#: openbox/translate.c:135
+#, c-format
+msgid "Invalid key code '%s' in key binding"
+msgstr " tekla elkarketan '%s' tekla kode baliogabea"
+
+#: openbox/translate.c:142
+#, c-format
+msgid "Invalid key name '%s' in key binding"
+msgstr " tekla elkarketan '%s' tekla izen baliogabea"
+
+#: openbox/translate.c:148
+#, c-format
+msgid "Requested key '%s' does not exist on the display"
+msgstr "Eskatutako '%s' tekla ez da pantaila existitzen"
+
+#: openbox/xerror.c:39
+#, c-format
+msgid "X Error: %s"
+msgstr "X errorea: %s"

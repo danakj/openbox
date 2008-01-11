@@ -79,6 +79,10 @@ static GSList *struts_bottom = NULL;
 
 static ObPagerPopup *desktop_popup;
 
+/*! The number of microseconds that you need to be on a desktop before it will
+  replace the remembered "last desktop" */
+#define REMEMBER_LAST_DESKTOP_TIME 750000
+
 static gboolean replace_wm(void)
 {
     gchar *wm_sn;
@@ -632,8 +636,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
     }
     screen_desktop_timeout = FALSE;
     ob_main_loop_timeout_remove(ob_main_loop, last_desktop_func);
-    ob_main_loop_timeout_add(ob_main_loop, 500000, last_desktop_func,
-            NULL, NULL, NULL);
+    ob_main_loop_timeout_add(ob_main_loop, REMEMBER_LAST_DESKTOP_TIME,
+                             last_desktop_func, NULL, NULL, NULL);
 
     ob_debug("Moving to desktop %d\n", num+1);
 

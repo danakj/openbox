@@ -705,30 +705,9 @@ static void event_process(const XEvent *ec, gpointer data)
         /* Otherwise only process it if it was physically on an openbox
            internal window */
         else {
-            Window target, parent, root, *children;
-            unsigned int nchildren;
             ObWindow *w;
 
-            /* Find the top level ancestor of the subwindow, besides the
-               root */
-            target = e->xbutton.subwindow;
-            ob_debug("subwindow 0x%x\n", target);
-            while (XQueryTree(ob_display, target, &root, &parent, &children,
-                              &nchildren) != 0)
-            {
-                XFree(children);
-                if (parent == root) {
-                    ob_debug("parent is root\n");
-                    break;
-                }
-                target = parent;
-            }
-            ob_debug("toplevel 0x%x\n", target);
-
-            w = g_hash_table_lookup(window_map, &target);
-            ob_debug("w 0x%x\n", w);
-                
-            if ((w = g_hash_table_lookup(window_map, &target)) &&
+            if ((w = g_hash_table_lookup(window_map, &e->xbutton.subwindow)) &&
                 WINDOW_IS_INTERNAL(w))
             {
                 event_handle_user_input(client, e);

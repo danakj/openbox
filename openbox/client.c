@@ -1634,11 +1634,16 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
         /* normal windows retain all of the possible decorations and
-           functionality, and are the only windows that you can fullscreen */
+           functionality, and can be fullscreen */
         self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
         break;
 
     case OB_CLIENT_TYPE_DIALOG:
+        /* sometimes apps make dialog windows fullscreen for some reason (for
+           e.g. kpdf does this..) */
+        self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
+        break;
+
     case OB_CLIENT_TYPE_UTILITY:
         /* these windows don't have anything added or removed by default */
         break;

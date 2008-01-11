@@ -247,6 +247,10 @@ static void event_set_curtime(XEvent *e)
 
 static void event_hack_mods(XEvent *e)
 {
+#ifdef XKB
+    XkbStateRec xkb_state;
+#endif
+
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
@@ -256,10 +260,22 @@ static void event_hack_mods(XEvent *e)
         e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
         break;
     case KeyRelease:
-        e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
-        /* remove from the state the mask of the modifier key being released,
-           if it is a modifier key being released that is */
-        e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);
+#ifdef XKB
+        /* If XKB is present, then the modifiers are all strange from its
+           magic.  Our X core protocol stuff won't work, so we use this to
+           find what the modifier state is instead. */
+        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success) {
+            e->xkey.state = xkb_state.compat_state;
+            break;
+        }
+        else
+#endif
+        {
+            e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
+            /* remove from the state the mask of the modifier key being
+               released, if it is a modifier key being released that is */
+            e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);
+        }
         break;
     case MotionNotify:
         e->xmotion.state = modkeys_only_modifier_masks(e->xmotion.state);

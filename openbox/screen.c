@@ -605,32 +605,61 @@ void screen_set_desktop(guint num, gboolean dofocus)
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_current_desktop, cardinal, num);
 
+    /* This whole thing decides when/how to save the screen_last_desktop so
+       that it can be restored later if you want */
     if (screen_desktop_timeout) {
+        /* If screen_desktop_timeout is true, then we've been on this desktop
+           long enough and we can save it as the last desktop. */
+
+        /* save the "last desktop" as the "old desktop" */
+        screen_old_desktop = screen_last_desktop;
+        /* save the desktop we're coming from as the "last desktop" */
+        screen_last_desktop = previous;
+    }
+    else {
+        /* If screen_desktop_timeout is false, then we just got to this desktop
+           and we are moving away again. */
+
         if (screen_desktop == screen_last_desktop) {
-            screen_last_desktop = previous;
-            screen_old_desktop = screen_desktop;
-        } else {
-            screen_old_desktop = screen_last_desktop;
-            screen_last_desktop = previous;
-        }
-    } else {
-        if (screen_desktop == screen_last_desktop) {
+            /* If we are moving to the "last desktop" .. */
             if (previous == screen_old_desktop) {
-                screen_last_desktop = screen_old_desktop;
-            } else if (screen_last_desktop == screen_old_desktop) {
-                screen_last_desktop = previous;
-            } else {
+                /* .. from the "old desktop", change the last desktop to
+                   be where we are coming from */
                 screen_last_desktop = screen_old_desktop;
             }
-        } else {
-            if (screen_desktop == screen_old_desktop) {
-                /* do nothing */
-            } else if (previous == screen_old_desktop) {
-                /* do nothing */
-            } else if (screen_last_desktop == screen_old_desktop) {
+            else if (screen_last_desktop == screen_old_desktop) {
+                /* .. and also to the "old desktop", change the "last
+                   desktop" to be where we are coming from */
                 screen_last_desktop = previous;
-            } else {
-                /* do nothing */
+            }
+            else {
+                /* .. from some other desktop, then set the "last desktop" to
+                   be the saved "old desktop", i.e. where we were before the
+                   "last desktop" */
+                screen_last_desktop = screen_old_desktop;
+            }
+        }
+        else {
+            /* If we are moving to any desktop besides the "last desktop"..
+               (this is the normal case) */
+            if (screen_desktop == screen_old_desktop) {
+                /* If moving to the "old desktop", which is not the
+                   "last desktop", don't save anything */
+            }
+            else if (previous == screen_old_desktop) {
+                /* If moving from the "old desktop", and not to the
+                   "last desktop", don't save anything */
+            }
+            else if (screen_last_desktop == screen_old_desktop) {
+                /* If the "last desktop" is the same as "old desktop" and
+                   you're not moving to the "last desktop" then save where
+                   we're coming from as the "last desktop" */
+                screen_last_desktop = previous;
+            }
+            else {
+                /* If the "last desktop" is different from the "old desktop"
+                   and you're not moving to the "last desktop", then don't save
+                   anything */
             }
         }
     }

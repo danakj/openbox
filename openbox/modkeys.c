@@ -35,21 +35,7 @@
 
 static void set_modkey_mask(guchar mask, KeySym sym);
 
-/* This is 8 lists of keycodes that are bound to the given mod mask.
-   If contains more than the one given to us by X cuz XKB is weird apparently.
-   We will look up all keycodes for a given keysym that is bound to the mask,
-   and add them all here.
-
-   With XKB, you can have a keycode bound to a modifier that isn't in the
-   modifier map somehow.  So this means that when we try translate from the
-   KeyRelease to a mod mask, we are unable to.  So this array stores *all*
-   the KeyCodes for each KeySym for each KeyCode bound to a mod mask.
-   Confused? Haha...
-
-   ModMask -> n KeyCodes -> n*m KeySyms (up to m for each KeyCode) ->
-     n*m*p KeyCodes (up to p for each KeySym)
-*/
-static GArray *modmap[NUM_MASKS];
+static XModifierKeymap *modmap;
 static KeySym *keymap;
 static gint min_keycode, max_keycode, keysyms_per_keycode;
 /* This is a bitmask of the different masks for each modifier key */
@@ -62,15 +48,14 @@ static gboolean hyper_l = FALSE;
 
 void modkeys_startup(gboolean reconfigure)
 {
-    static XModifierKeymap *xmodmap;
-    gint i, j, k, l, m;
+    gint i, j, k;
 
     /* reset the keys to not be bound to any masks */
     for (i = 0; i < OB_MODKEY_NUM_KEYS; ++i)
         modkeys_keys[i] = 0;
 
-    xmodmap = XGetModifierMapping(ob_display);
-    g_assert(xmodmap->max_keypermod > 0);
+    modmap = XGetModifierMapping(ob_display);
+    g_assert(modmap->max_keypermod > 0);
 
     XDisplayKeycodes(ob_display, &min_keycode, &max_keycode);
     keymap = XGetKeyboardMapping(ob_display, min_keycode,
@@ -81,31 +66,17 @@ void modkeys_startup(gboolean reconfigure)
 
     /* go through each of the modifier masks (eg ShiftMask, CapsMask...) */
     for (i = 0; i < NUM_MASKS; ++i) {
-        /* reset the modmap list */
-        modmap[i] = g_array_new(FALSE, FALSE, sizeof(KeyCode));
-
         /* go through each keycode that is bound to the mask */
-        for (j = 0; j < xmodmap->max_keypermod; ++j) {
+        for (j = 0; j < modmap->max_keypermod; ++j) {
             KeySym sym;
             /* get a keycode that is bound to the mask (i) */
-            KeyCode keycode = xmodmap->modifiermap[i*xmodmap->max_keypermod+j];
+            KeyCode keycode = modmap->modifiermap[i*modmap->max_keypermod + j];
             if (keycode) {
                 /* go through each keysym bound to the given keycode */
                 for (k = 0; k < keysyms_per_keycode; ++k) {
                     sym = keymap[(keycode-min_keycode) * keysyms_per_keycode +
                                  k];
                     if (sym != NoSymbol) {
-                        /* find all keycodes for the given keysym */
-                        for (l = min_keycode; l <= max_keycode; ++l)
-                            for (m = 0; m < keysyms_per_keycode; ++m)
-                                if (keymap[(l-min_keycode) *
-                                           keysyms_per_keycode + m] == sym)
-                                {
-                                    /* add all keycodes for the keysym to our
-                                       modmap */
-                                    g_array_append_val(modmap[i], l);
-                                }
-
                         /* bind the key to the mask (e.g. Alt_L => Mod1Mask) */
                         set_modkey_mask(nth_mask(i), sym);
                     }
@@ -118,22 +89,17 @@ void modkeys_startup(gboolean reconfigure)
     modkeys_keys[OB_MODKEY_KEY_CAPSLOCK] = LockMask;
     modkeys_keys[OB_MODKEY_KEY_SHIFT] = ShiftMask;
     modkeys_keys[OB_MODKEY_KEY_CONTROL] = ControlMask;
-
-    XFreeModifiermap(xmodmap);
 }
 
 void modkeys_shutdown(gboolean reconfigure)
 {
-    guint i;
-
-    for (i = 0; i < NUM_MASKS; ++i)
-        g_array_free(modmap[i], TRUE);
+    XFreeModifiermap(modmap);
     XFree(keymap);
 }
 
 guint modkeys_keycode_to_mask(guint keycode)
 {
-    guint i, j;
+    gint i, j;
     guint mask = 0;
 
     if (keycode == NoSymbol) return 0;
@@ -141,9 +107,9 @@ guint modkeys_keycode_to_mask(guint keycode)
     /* go through each of the modifier masks (eg ShiftMask, CapsMask...) */
     for (i = 0; i < NUM_MASKS; ++i) {
         /* go through each keycode that is bound to the mask */
-        for (j = 0; j < modmap[i]->len; ++j) {
+        for (j = 0; j < modmap->max_keypermod; ++j) {
             /* compare with a keycode that is bound to the mask (i) */
-            if (g_array_index(modmap[i], KeyCode, j) == keycode)
+            if (modmap->modifiermap[i*modmap->max_keypermod + j] == keycode)
                 mask |= nth_mask(i);
         }
     }

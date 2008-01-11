@@ -619,6 +619,11 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_root(e);
     else if (e->type == MapRequest)
         client_manage(window);
+    else if (e->type == MappingNotify) {
+        /* keyboard layout changes, reconfigure openbox. need to restart the
+           modkeys system, but also to reload the key bindings. */
+        ob_reconfigure();
+    }
     else if (e->type == ClientMessage) {
         /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for
            windows that are not managed yet. */

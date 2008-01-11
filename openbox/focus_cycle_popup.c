@@ -146,6 +146,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     }
 
     g_free(popup.hilite_rgba);
+    popup.hilite_rgba = NULL;
 
     XDestroyWindow(ob_display, popup.text);
     XDestroyWindow(ob_display, popup.bg);

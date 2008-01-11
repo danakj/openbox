@@ -28,6 +28,10 @@
 #include "debug.h"
 
 GList  *stacking_list = NULL;
+/*! When true, stacking changes will not be reflected on the screen.  This is
+  to freeze the on-screen stacking order while a window is being temporarily
+  raised during focus cycling */
+gboolean pause_changes = FALSE;
 
 void stacking_set_list(void)
 {
@@ -99,7 +103,8 @@ static void do_restack(GList *wins, GList *before)
     }
 #endif
 
-    XRestackWindows(ob_display, win, i);
+    if (!pause_changes)
+        XRestackWindows(ob_display, win, i);
     g_free(win);
 
     stacking_set_list();
@@ -125,6 +130,8 @@ void stacking_temp_raise(ObWindow *window)
 
     win[1] = window_top(window);
     XRestackWindows(ob_display, win, 2);
+
+    pause_changes = TRUE;
 }
 
 void stacking_restore()
@@ -139,6 +146,8 @@ void stacking_restore()
         win[i] = window_top(it->data);
     XRestackWindows(ob_display, win, i);
     g_free(win);
+
+    pause_changes = FALSE;
 }
 
 static void do_raise(GList *wins)

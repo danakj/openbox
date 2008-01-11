@@ -1671,6 +1671,8 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
     /* Allow control while going thru the menu */
     else if (ev->type == KeyPress && (state & ~ControlMask) == 0) {
+        frame->got_press = TRUE;
+
         if (keycode == ob_keycode(OB_KEY_ESCAPE)) {
             menu_frame_hide_all();
             ret = TRUE;
@@ -1704,7 +1706,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
        Allow ControlMask only, and don't bother if the menu is empty */
     else if (ev->type == KeyRelease && (state & ~ControlMask) == 0 &&
-             frame->entries)
+             frame->entries && frame->got_press)
     {
         if (keycode == ob_keycode(OB_KEY_RETURN)) {
             /* Enter runs the active item or goes into the submenu.

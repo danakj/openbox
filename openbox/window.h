@@ -32,7 +32,8 @@ typedef enum {
     Window_Dock,
     Window_DockApp, /* used for events but not stacking */
     Window_Client,
-    Window_Internal /* used for stacking but not events */
+    Window_Internal /* used for stacking but not events (except to filter
+                       events on the root window) */
 } Window_InternalType;
 
 struct _ObWindow

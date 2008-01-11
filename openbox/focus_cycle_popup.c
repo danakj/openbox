@@ -128,12 +128,14 @@ void focus_cycle_popup_startup(gboolean reconfig)
     XMapWindow(ob_display, popup.text);
 
     stacking_add(INTERNAL_AS_WINDOW(&popup));
+    g_hash_table_insert(window_map, &popup.bg, &popup);
 }
 
 void focus_cycle_popup_shutdown(gboolean reconfig)
 {
     icon_popup_free(single_popup);
 
+    g_hash_table_remove(window_map, &popup.bg);
     stacking_remove(INTERNAL_AS_WINDOW(&popup));
 
     while(popup.targets) {

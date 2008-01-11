@@ -694,12 +694,50 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    if (e->type == ButtonPress || e->type == ButtonRelease ||
-        e->type == MotionNotify || e->type == KeyPress ||
-        e->type == KeyRelease)
-    {
-        event_handle_user_input(client, e);
+    if (e->type == ButtonPress || e->type == ButtonRelease) {
+        /* If the button press was on some non-root window, or was physically
+           on the root window, the process it */
+        if (window != RootWindow(ob_display, ob_screen) ||
+            e->xbutton.subwindow == None)
+        {
+            event_handle_user_input(client, e);
+        }
+        /* Otherwise only process it if it was physically on an openbox
+           internal window */
+        else {
+            Window target, parent, root, *children;
+            unsigned int nchildren;
+            ObWindow *w;
+
+            /* Find the top level ancestor of the subwindow, besides the
+               root */
+            target = e->xbutton.subwindow;
+            ob_debug("subwindow 0x%x\n", target);
+            while (XQueryTree(ob_display, target, &root, &parent, &children,
+                              &nchildren) != 0)
+            {
+                XFree(children);
+                if (parent == root) {
+                    ob_debug("parent is root\n");
+                    break;
+                }
+                target = parent;
+            }
+            ob_debug("toplevel 0x%x\n", target);
+
+            w = g_hash_table_lookup(window_map, &target);
+            ob_debug("w 0x%x\n", w);
+                
+            if ((w = g_hash_table_lookup(window_map, &target)) &&
+                WINDOW_IS_INTERNAL(w))
+            {
+                event_handle_user_input(client, e);
+            }
+        }
     }
+    else if (e->type == KeyPress || e->type == KeyRelease ||
+             e->type == MotionNotify)
+        event_handle_user_input(client, e);
 
     /* if something happens and it's not from an XEvent, then we don't know
        the time */

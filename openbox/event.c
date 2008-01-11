@@ -91,6 +91,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
 static gboolean is_enter_focus_event_ignored(XEvent *e);
+static void event_ignore_enter_range(gulong start, gulong end);
 
 static void focus_delay_dest(gpointer data);
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
@@ -99,6 +100,8 @@ static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 Time event_curtime = CurrentTime;
 Time event_last_user_time = CurrentTime;
+/*! The serial of the current X event */
+gulong event_curserial;
 
 static gboolean focus_left_screen = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
@@ -243,6 +246,7 @@ static void event_set_curtime(XEvent *e)
         event_last_user_time = CurrentTime;
 
     event_curtime = t;
+    event_curserial = 0;
 }
 
 static void event_hack_mods(XEvent *e)
@@ -479,6 +483,7 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 
     event_set_curtime(e);
+    event_curserial = e->xany.serial;
     event_hack_mods(e);
     if (event_ignore(e, client)) {
         if (ed)
@@ -1010,18 +1015,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 is_enter_focus_event_ignored(e))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "%sNotify mode %d detail %d on %lx IGNORED\n",
+                              "%sNotify mode %d detail %d serial %lu on %lx "
+                              "IGNORED\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
-                              e->xcrossing.detail, client?client->window:0);
+                              e->xcrossing.detail,
+                              e->xcrossing.serial,
+                              client?client->window:0);
             }
             else {
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "%sNotify mode %d detail %d on %lx, "
+                              "%sNotify mode %d detail %d serial %lu on %lx, "
                               "focusing window\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
-                              e->xcrossing.detail, (client?client->window:0));
+                              e->xcrossing.detail,
+                              e->xcrossing.serial,
+                              (client?client->window:0));
                 if (config_focus_follow)
                     event_enter_client(client);
             }
@@ -1864,10 +1874,8 @@ static gboolean focus_delay_func(gpointer data)
     if (menu_frame_visible || moveresize_in_progress) return FALSE;
 
     event_curtime = d->time;
-    if (focus_client != d->client) {
-        if (client_focus(d->client) && config_focus_raise)
-            stacking_raise(CLIENT_AS_WINDOW(d->client));
-    }
+    if (client_focus(d->client) && config_focus_raise)
+        stacking_raise(CLIENT_AS_WINDOW(d->client));
     event_curtime = old;
     return FALSE; /* no repeat */
 }
@@ -1878,33 +1886,42 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
                                      client, FALSE);
 }
 
-void event_halt_focus_delay(void)
+void event_halt_focus_delay(gulong serial)
 {
-    /* ignore all enter events up till now */
-    event_end_ignore_all_enters(1);
+    /* ignore all enter events up till the event which caused this to occur */
+    if (event_curserial) event_ignore_enter_range(1, event_curserial);
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
 gulong event_start_ignore_all_enters(void)
 {
+    /* increment the serial so we don't ignore events we weren't meant to */
     XSync(ob_display, FALSE);
     return LastKnownRequestProcessed(ob_display);
 }
 
-void event_end_ignore_all_enters(gulong start)
+static void event_ignore_enter_range(gulong start, gulong end)
 {
     ObSerialRange *r;
 
     g_assert(start != 0);
-    XSync(ob_display, FALSE);
+    g_assert(end != 0);
 
     r = g_new(ObSerialRange, 1);
     r->start = start;
-    r->end = LastKnownRequestProcessed(ob_display);
+    r->end = end;
     ignore_serials = g_slist_prepend(ignore_serials, r);
+
+    ob_debug_type(OB_DEBUG_FOCUS, "ignoring enters from %lu until %lu\n",
+                  r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
     XSync(ob_display, FALSE);
+}
+
+void event_end_ignore_all_enters(gulong start)
+{
+    event_ignore_enter_range(start, LastKnownRequestProcessed(ob_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)

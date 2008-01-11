@@ -264,10 +264,8 @@ static void event_hack_mods(XEvent *e)
         /* If XKB is present, then the modifiers are all strange from its
            magic.  Our X core protocol stuff won't work, so we use this to
            find what the modifier state is instead. */
-        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success) {
+        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success)
             e->xkey.state = xkb_state.compat_state;
-            break;
-        }
         else
 #endif
         {

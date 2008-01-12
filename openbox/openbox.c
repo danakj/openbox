@@ -292,12 +292,12 @@ gint main(gint argc, gchar **argv)
             event_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
+            sn_startup(reconfigure);
+            window_startup(reconfigure);
             focus_startup(reconfigure);
             focus_cycle_startup(reconfigure);
             focus_cycle_indicator_startup(reconfigure);
             focus_cycle_popup_startup(reconfigure);
-            window_startup(reconfigure);
-            sn_startup(reconfigure);
             screen_startup(reconfigure);
             grab_startup(reconfigure);
             group_startup(reconfigure);
@@ -367,8 +367,8 @@ gint main(gint argc, gchar **argv)
             focus_cycle_indicator_shutdown(reconfigure);
             focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
-            sn_shutdown(reconfigure);
             window_shutdown(reconfigure);
+            sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);

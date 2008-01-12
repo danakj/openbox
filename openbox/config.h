@@ -39,11 +39,7 @@ struct _ObAppSettings
     GPatternSpec *name;
     GPatternSpec *role;
 
-    Point position;
-    gboolean center_x;
-    gboolean center_y;
-    gboolean opposite_x;
-    gboolean opposite_y;
+    GravityPoint position;
     gboolean pos_given;
 
     guint desktop;
@@ -95,22 +91,8 @@ extern gboolean config_resize_redraw;
 extern gint config_resize_popup_show;
 /*! where to show the resize popup */
 extern ObResizePopupPos config_resize_popup_pos;
-/*! if the resize popup should be centered horizontally if it is being
-  placed in a fixed position */
-extern gboolean config_resize_popup_x_center;
-/*! if the resize popup should be centered vertically if it is being
-  placed in a fixed position */
-extern gboolean config_resize_popup_y_center;
-/*! if the resize popup should be placed from the right side of the screen when
-  placed in a fixed position */
-extern gboolean config_resize_popup_x_opposite;
-/*! if the resize popup should be placed from the bottom side of the screen
-  when placed in a fixed position */
-extern gboolean config_resize_popup_y_opposite;
-/*! where the resize popup should be if it is placed in a fixed position */
-extern gint config_resize_popup_x;
-/*! where the resize popup should be if it is placed in a fixed position */
-extern gint config_resize_popup_y;
+/*! where to place the popup if it's in a fixed position */
+extern GravityPoint config_resize_popup_fixed;
 
 /*! The stacking layer the dock will reside in */
 extern ObStackingLayer config_dock_layer;

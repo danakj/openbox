@@ -20,6 +20,23 @@
 #ifndef __geom_h
 #define __geom_h
 
+#include <glib.h>
+
+typedef struct _GravityCoord {
+    int pos;
+    gboolean center;
+    gboolean opposite;
+} GravityCoord;
+
+typedef struct _GravityPoint {
+    GravityCoord x;
+    GravityCoord y;
+} GravityPoint;
+
+#define GRAVITY_COORD_SET(c, p, cen, opp) \
+    (c).pos = (p), (c).center = (cen), (c).opposite = (opp)
+  
+
 typedef struct _Point {
     int x;
     int y;

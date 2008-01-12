@@ -116,36 +116,42 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
         Rect *area = screen_physical_area_active();
         gint gravity, x, y;
 
-        x = config_resize_popup_x;
-        if (config_resize_popup_x_center) x = area->x + area->width/2;
-        else if (config_resize_popup_x_opposite) x = RECT_RIGHT(*area) - x;
-        else x = area->x + x;
+        x = config_resize_popup_fixed.x.pos;
+        if (config_resize_popup_fixed.x.center)
+            x = area->x + area->width/2;
+        else if (config_resize_popup_fixed.x.opposite)
+            x = RECT_RIGHT(*area) - x;
+        else
+            x = area->x + x;
 
-        y = config_resize_popup_y;
-        if (config_resize_popup_y_center) y = area->y + area->height/2;
-        else if (config_resize_popup_y_opposite) y = RECT_BOTTOM(*area) - y;
-        else y = area->y + y;
+        y = config_resize_popup_fixed.y.pos;
+        if (config_resize_popup_fixed.y.center)
+            y = area->y + area->width/2;
+        else if (config_resize_popup_fixed.y.opposite)
+            y = RECT_RIGHT(*area) - y;
+        else
+            y = area->y + y;
 
-        if (config_resize_popup_x_center) {
-            if (config_resize_popup_y_center)
+        if (config_resize_popup_fixed.x.center) {
+            if (config_resize_popup_fixed.y.center)
                 gravity = CenterGravity;
-            else if (config_resize_popup_y_opposite)
+            else if (config_resize_popup_fixed.y.opposite)
                 gravity = SouthGravity;
             else
                 gravity = NorthGravity;
         }
-        else if (config_resize_popup_x_opposite) {
-            if (config_resize_popup_y_center)
+        else if (config_resize_popup_fixed.x.opposite) {
+            if (config_resize_popup_fixed.y.center)
                 gravity = EastGravity;
-            else if (config_resize_popup_y_opposite)
+            else if (config_resize_popup_fixed.y.opposite)
                 gravity = SouthEastGravity;
             else
                 gravity = NorthEastGravity;
         }
         else {
-            if (config_resize_popup_y_center)
+            if (config_resize_popup_fixed.y.center)
                 gravity = WestGravity;
-            else if (config_resize_popup_y_opposite)
+            else if (config_resize_popup_fixed.y.opposite)
                 gravity = SouthWestGravity;
             else
                 gravity = NorthWestGravity;

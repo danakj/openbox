@@ -407,21 +407,21 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
         g_free(areas);
     }
 
-    if (settings->center_x)
+    if (settings->position.x.center)
         *x = screen->x + screen->width / 2 - client->area.width / 2;
-    else if (settings->opposite_x)
+    else if (settings->position.x.opposite)
         *x = screen->x + screen->width - client->frame->area.width -
-            settings->position.x;
+            settings->position.x.pos;
     else
-        *x = screen->x + settings->position.x;
+        *x = screen->x + settings->position.x.pos;
 
-    if (settings->center_y)
+    if (settings->position.y.center)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
-    else if (settings->opposite_y)
+    else if (settings->position.y.opposite)
         *y = screen->y + screen->height - client->frame->area.height -
-            settings->position.y;
+            settings->position.y.pos;
     else
-        *y = screen->y + settings->position.y;
+        *y = screen->y + settings->position.y.pos;
 
     g_free(screen);
     return TRUE;

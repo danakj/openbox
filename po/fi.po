@@ -7,10 +7,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-11-12 19:12+0100\n"
-"PO-Revision-Date: 2007-10-22 15:58+0200\n"
+"PO-Revision-Date: 2008-01-12 03:29+0100\n"
 "Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -239,9 +239,8 @@ msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Käynnistä Openbox uudelleen\n"
 
 #: openbox/openbox.c:492
-#, fuzzy
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Sulje Openbox\n"
 
 #: openbox/openbox.c:493
 msgid ""

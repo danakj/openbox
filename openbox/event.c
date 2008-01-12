@@ -475,9 +475,11 @@ static void event_process(const XEvent *ec, gpointer data)
             client = WINDOW_AS_CLIENT(obwin);
             break;
         case Window_Menu:
-        case Window_Internal:
             /* not to be used for events */
             g_assert_not_reached();
+            break;
+        case Window_Internal:
+            /* we don't do anything with events directly on these windows */
             break;
         }
     }

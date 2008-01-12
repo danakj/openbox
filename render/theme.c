@@ -595,84 +595,84 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     read_button_colors(db, inst, theme, theme->btn_max, "max");
 
     /* bases:  unpressed, pressed, disabled */
-    READ_APPEARANCE_COPY("window.active.button-max.unpressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.max.unpressed.bg",
                          theme->btn_max->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-max.unpressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.max.unpressed.bg",
                          theme->btn_max->a_unfocused_unpressed, TRUE,
                          a_unfocused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-max.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.max.pressed.bg",
                          theme->btn_max->a_focused_pressed, TRUE,
                          a_focused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-max.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.max.pressed.bg",
                          theme->btn_max->a_unfocused_pressed, TRUE,
                          a_unfocused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-max.disabled.bg",
+    READ_APPEARANCE_COPY("window.active.button.max.disabled.bg",
                          theme->btn_max->a_disabled_focused, TRUE,
                          a_disabled_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-max.disabled.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.max.disabled.bg",
                          theme->btn_max->a_disabled_unfocused, TRUE,
                          a_disabled_unfocused_tmp);
 
     /* hover */
-    READ_APPEARANCE_COPY("window.active.button-max.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.max.hover.bg",
                          theme->btn_max->a_hover_focused, TRUE,
                          theme->btn_max->a_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-max.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.max.hover.bg",
                          theme->btn_max->a_hover_unfocused, TRUE,
                          theme->btn_max->a_unfocused_unpressed);
 
     /* toggled unpressed */
-    READ_APPEARANCE_("window.active.button-max.toggled.unpressed.bg",
-                     "window.active.button-max.toggled.bg",
+    READ_APPEARANCE_("window.active.button.max.toggled.unpressed.bg",
+                     "window.active.button.max.toggled.bg",
                      theme->btn_max->a_toggled_focused_unpressed, TRUE,
                      theme->btn_max->a_focused_pressed);
-    READ_APPEARANCE_("window.inactive.button-max.toggled.unpressed.bg",
-                     "window.inactive.button-max.toggled.bg",
+    READ_APPEARANCE_("window.inactive.button.max.toggled.unpressed.bg",
+                     "window.inactive.button.max.toggled.bg",
                      theme->btn_max->a_toggled_unfocused_unpressed, TRUE,
                      theme->btn_max->a_unfocused_pressed);
 
     /* toggled pressed */
-    READ_APPEARANCE_COPY("window.active.button-max.toggled.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.max.toggled.pressed.bg",
                          theme->btn_max->a_toggled_focused_pressed, TRUE,
                          theme->btn_max->a_focused_pressed);
-    READ_APPEARANCE_COPY("window.inactive.button-max.toggled.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.max.toggled.pressed.bg",
                          theme->btn_max->a_toggled_unfocused_pressed, TRUE,
                          theme->btn_max->a_unfocused_pressed);
 
     /* toggled hover */
-    READ_APPEARANCE_COPY("window.active.button-max.toggled.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.max.toggled.hover.bg",
                          theme->btn_max->a_toggled_hover_focused, TRUE,
                          theme->btn_max->a_toggled_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-max.toggled.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.max.toggled.hover.bg",
                          theme->btn_max->a_toggled_hover_unfocused, TRUE,
                          theme->btn_max->a_toggled_unfocused_unpressed);
 
     /* close button */
     read_button_colors(db, inst, theme, theme->btn_close, "close");
 
-    READ_APPEARANCE_COPY("window.active.button-close.unpressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.close.unpressed.bg",
                          theme->btn_close->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-close.unpressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.close.unpressed.bg",
                          theme->btn_close->a_unfocused_unpressed, TRUE,
                          a_unfocused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-close.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.close.pressed.bg",
                          theme->btn_close->a_focused_pressed, TRUE,
                          a_focused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-close.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.close.pressed.bg",
                          theme->btn_close->a_unfocused_pressed, TRUE,
                          a_unfocused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-close.disabled.bg",
+    READ_APPEARANCE_COPY("window.active.button.close.disabled.bg",
                          theme->btn_close->a_disabled_focused, TRUE,
                          a_disabled_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-close.disabled.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.close.disabled.bg",
                          theme->btn_close->a_disabled_unfocused, TRUE,
                          a_disabled_unfocused_tmp);
-    READ_APPEARANCE_COPY("window.active.button-close.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.close.hover.bg",
                          theme->btn_close->a_hover_focused, TRUE,
                          theme->btn_close->a_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-close.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.close.hover.bg",
                          theme->btn_close->a_hover_unfocused, TRUE,
                          theme->btn_close->a_unfocused_unpressed);
 
@@ -680,56 +680,56 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     read_button_colors(db, inst, theme, theme->btn_desk, "desk");
 
     /* bases:  unpressed, pressed, disabled */
-    READ_APPEARANCE_COPY("window.active.button-desk.unpressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.desk.unpressed.bg",
                          theme->btn_desk->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.unpressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.desk.unpressed.bg",
                          theme->btn_desk->a_unfocused_unpressed, TRUE,
                          a_unfocused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-desk.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.desk.pressed.bg",
                          theme->btn_desk->a_focused_pressed, TRUE,
                          a_focused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.desk.pressed.bg",
                          theme->btn_desk->a_unfocused_pressed, TRUE,
                          a_unfocused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-desk.disabled.bg",
+    READ_APPEARANCE_COPY("window.active.button.desk.disabled.bg",
                          theme->btn_desk->a_disabled_focused, TRUE,
                          a_disabled_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.disabled.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.desk.disabled.bg",
                          theme->btn_desk->a_disabled_unfocused, TRUE,
                          a_disabled_unfocused_tmp);
 
     /* hover */
-    READ_APPEARANCE_COPY("window.active.button-desk.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.desk.hover.bg",
                          theme->btn_desk->a_hover_focused, TRUE,
                          theme->btn_desk->a_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.desk.hover.bg",
                          theme->btn_desk->a_hover_unfocused, TRUE,
                          theme->btn_desk->a_unfocused_unpressed);
 
     /* toggled unpressed */
-    READ_APPEARANCE_("window.active.button-desk.toggled.unpressed.bg",
-                     "window.active.button-desk.toggled.bg",
+    READ_APPEARANCE_("window.active.button.desk.toggled.unpressed.bg",
+                     "window.active.button.desk.toggled.bg",
                      theme->btn_desk->a_toggled_focused_unpressed, TRUE,
                      theme->btn_desk->a_focused_pressed);
-    READ_APPEARANCE_("window.inactive.button-desk.toggled.unpressed.bg",
-                     "window.inactive.button-desk.toggled.bg",
+    READ_APPEARANCE_("window.inactive.button.desk.toggled.unpressed.bg",
+                     "window.inactive.button.desk.toggled.bg",
                      theme->btn_desk->a_toggled_unfocused_unpressed, TRUE,
                      theme->btn_desk->a_unfocused_pressed);
 
     /* toggled pressed */
-    READ_APPEARANCE_COPY("window.active.button-desk.toggled.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.desk.toggled.pressed.bg",
                          theme->btn_desk->a_toggled_focused_pressed, TRUE,
                          theme->btn_desk->a_focused_pressed);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.toggled.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.desk.toggled.pressed.bg",
                          theme->btn_desk->a_toggled_unfocused_pressed, TRUE,
                          theme->btn_desk->a_unfocused_pressed);
 
     /* toggled hover */
-    READ_APPEARANCE_COPY("window.active.button-desk.toggled.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.desk.toggled.hover.bg",
                          theme->btn_desk->a_toggled_hover_focused, TRUE,
                          theme->btn_desk->a_toggled_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-desk.toggled.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.desk.toggled.hover.bg",
                          theme->btn_desk->a_toggled_hover_unfocused, TRUE,
                          theme->btn_desk->a_toggled_unfocused_unpressed);
 
@@ -737,84 +737,84 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     read_button_colors(db, inst, theme, theme->btn_shade, "shade");
 
     /* bases:  unpressed, pressed, disabled */
-    READ_APPEARANCE_COPY("window.active.button-shade.unpressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.shade.unpressed.bg",
                          theme->btn_shade->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.unpressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.shade.unpressed.bg",
                          theme->btn_shade->a_unfocused_unpressed, TRUE,
                          a_unfocused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-shade.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.shade.pressed.bg",
                          theme->btn_shade->a_focused_pressed, TRUE,
                          a_focused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.shade.pressed.bg",
                          theme->btn_shade->a_unfocused_pressed, TRUE,
                          a_unfocused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-shade.disabled.bg",
+    READ_APPEARANCE_COPY("window.active.button.shade.disabled.bg",
                          theme->btn_shade->a_disabled_focused, TRUE,
                          a_disabled_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.disabled.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.shade.disabled.bg",
                          theme->btn_shade->a_disabled_unfocused, TRUE,
                          a_disabled_unfocused_tmp);
 
     /* hover */
-    READ_APPEARANCE_COPY("window.active.button-shade.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.shade.hover.bg",
                          theme->btn_shade->a_hover_focused, TRUE,
                          theme->btn_shade->a_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.shade.hover.bg",
                          theme->btn_shade->a_hover_unfocused, TRUE,
                          theme->btn_shade->a_unfocused_unpressed);
 
     /* toggled unpressed */
-    READ_APPEARANCE_("window.active.button-shade.toggled.unpressed.bg",
-                     "window.active.button-shade.toggled.bg",
+    READ_APPEARANCE_("window.active.button.shade.toggled.unpressed.bg",
+                     "window.active.button.shade.toggled.bg",
                      theme->btn_shade->a_toggled_focused_unpressed, TRUE,
                      theme->btn_shade->a_focused_pressed);
-    READ_APPEARANCE_("window.inactive.button-shade.toggled.unpressed.bg",
-                     "window.inactive.button-shade.toggled.bg",
+    READ_APPEARANCE_("window.inactive.button.shade.toggled.unpressed.bg",
+                     "window.inactive.button.shade.toggled.bg",
                      theme->btn_shade->a_toggled_unfocused_unpressed, TRUE,
                      theme->btn_shade->a_unfocused_pressed);
 
     /* toggled pressed */
-    READ_APPEARANCE_COPY("window.active.button-shade.toggled.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.shade.toggled.pressed.bg",
                          theme->btn_shade->a_toggled_focused_pressed, TRUE,
                          theme->btn_shade->a_focused_pressed);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.toggled.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.shade.toggled.pressed.bg",
                          theme->btn_shade->a_toggled_unfocused_pressed, TRUE,
                          theme->btn_shade->a_unfocused_pressed);
 
     /* toggled hover */
-    READ_APPEARANCE_COPY("window.active.button-shade.toggled.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.shade.toggled.hover.bg",
                          theme->btn_shade->a_toggled_hover_focused, TRUE,
                          theme->btn_shade->a_toggled_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-shade.toggled.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.shade.toggled.hover.bg",
                          theme->btn_shade->a_toggled_hover_unfocused, TRUE,
                          theme->btn_shade->a_toggled_unfocused_unpressed);
 
     /* iconify button */
     read_button_colors(db, inst, theme, theme->btn_iconify, "iconify");
 
-    READ_APPEARANCE_COPY("window.active.button-iconify.unpressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.iconify.unpressed.bg",
                          theme->btn_iconify->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-iconify.unpressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.unpressed.bg",
                          theme->btn_iconify->a_unfocused_unpressed, TRUE,
                          a_unfocused_unpressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-iconify.pressed.bg",
+    READ_APPEARANCE_COPY("window.active.button.iconify.pressed.bg",
                          theme->btn_iconify->a_focused_pressed, TRUE,
                          a_focused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-iconify.pressed.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.pressed.bg",
                          theme->btn_iconify->a_unfocused_pressed, TRUE,
                          a_unfocused_pressed_tmp);
-    READ_APPEARANCE_COPY("window.active.button-iconify.disabled.bg",
+    READ_APPEARANCE_COPY("window.active.button.iconify.disabled.bg",
                          theme->btn_iconify->a_disabled_focused, TRUE,
                          a_disabled_focused_tmp);
-    READ_APPEARANCE_COPY("window.inactive.button-iconify.disabled.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.disabled.bg",
                          theme->btn_iconify->a_disabled_unfocused, TRUE,
                          a_disabled_unfocused_tmp);
-    READ_APPEARANCE_COPY("window.active.button-iconify.hover.bg",
+    READ_APPEARANCE_COPY("window.active.button.iconify.hover.bg",
                          theme->btn_iconify->a_hover_focused, TRUE,
                          theme->btn_iconify->a_focused_unpressed);
-    READ_APPEARANCE_COPY("window.inactive.button-iconify.hover.bg",
+    READ_APPEARANCE_COPY("window.inactive.button.iconify.hover.bg",
                          theme->btn_iconify->a_hover_unfocused, TRUE,
                          theme->btn_iconify->a_unfocused_unpressed);
 
@@ -1168,11 +1168,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->btn_max->a_toggled_hover_unfocused->texture[0].data.mask.mask =
         theme->btn_max->toggled_hover_mask;
     theme->btn_max->a_toggled_focused_unpressed->texture[0].data.mask.mask =
-        theme->btn_max->a_toggled_unfocused_unpressed->texture[0].data.mask.mask =
-        theme->btn_max->toggled_mask;
+        theme->btn_max->a_toggled_unfocused_unpressed->
+        texture[0].data.mask.mask = theme->btn_max->toggled_mask;
     theme->btn_max->a_toggled_focused_pressed->texture[0].data.mask.mask =
-        theme->btn_max->a_toggled_unfocused_pressed->texture[0].data.mask.mask =
-        theme->btn_max->toggled_pressed_mask;
+        theme->btn_max->a_toggled_unfocused_pressed->texture[0].data.mask.mask
+        = theme->btn_max->toggled_pressed_mask;
     theme->btn_close->a_disabled_focused->texture[0].data.mask.mask =
         theme->btn_close->a_disabled_unfocused->texture[0].data.mask.mask =
         theme->btn_close->disabled_mask;
@@ -1201,11 +1201,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->btn_desk->a_toggled_hover_unfocused->texture[0].data.mask.mask =
         theme->btn_desk->toggled_hover_mask;
     theme->btn_desk->a_toggled_focused_unpressed->texture[0].data.mask.mask =
-        theme->btn_desk->a_toggled_unfocused_unpressed->texture[0].data.mask.mask =
-        theme->btn_desk->toggled_mask;
+        theme->btn_desk->a_toggled_unfocused_unpressed->
+        texture[0].data.mask.mask = theme->btn_desk->toggled_mask;
     theme->btn_desk->a_toggled_focused_pressed->texture[0].data.mask.mask =
-        theme->btn_desk->a_toggled_unfocused_pressed->texture[0].data.mask.mask =
-        theme->btn_desk->toggled_pressed_mask;
+        theme->btn_desk->a_toggled_unfocused_pressed->texture[0].data.mask.mask
+        = theme->btn_desk->toggled_pressed_mask;
     theme->btn_shade->a_disabled_focused->texture[0].data.mask.mask =
         theme->btn_shade->a_disabled_unfocused->texture[0].data.mask.mask =
         theme->btn_shade->disabled_mask;
@@ -1219,14 +1219,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->btn_shade->a_unfocused_unpressed->texture[0].data.mask.mask =
         theme->btn_shade->mask;
     theme->btn_shade->a_toggled_hover_focused->texture[0].data.mask.mask =
-        theme->btn_shade->a_toggled_hover_unfocused->texture[0].data.mask.mask =
-        theme->btn_shade->toggled_hover_mask;
+        theme->btn_shade->a_toggled_hover_unfocused->texture[0].data.mask.mask
+        = theme->btn_shade->toggled_hover_mask;
     theme->btn_shade->a_toggled_focused_unpressed->texture[0].data.mask.mask =
-        theme->btn_shade->a_toggled_unfocused_unpressed->texture[0].data.mask.mask =
-        theme->btn_shade->toggled_mask;
+        theme->btn_shade->a_toggled_unfocused_unpressed->
+        texture[0].data.mask.mask = theme->btn_shade->toggled_mask;
     theme->btn_shade->a_toggled_focused_pressed->texture[0].data.mask.mask =
-        theme->btn_shade->a_toggled_unfocused_pressed->texture[0].data.mask.mask =
-        theme->btn_shade->toggled_pressed_mask;
+        theme->btn_shade->a_toggled_unfocused_pressed->
+        texture[0].data.mask.mask = theme->btn_shade->toggled_pressed_mask;
     theme->btn_iconify->a_disabled_focused->texture[0].data.mask.mask =
         theme->btn_iconify->a_disabled_unfocused->texture[0].data.mask.mask =
         theme->btn_iconify->disabled_mask;
@@ -1302,10 +1302,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->btn_shade->toggled_focused_unpressed_color;
     theme->btn_max->a_toggled_unfocused_unpressed->texture[0].data.mask.color = 
         theme->btn_max->toggled_unfocused_unpressed_color;
-    theme->btn_desk->a_toggled_unfocused_unpressed->texture[0].data.mask.color = 
-        theme->btn_desk->toggled_unfocused_unpressed_color;
-    theme->btn_shade->a_toggled_unfocused_unpressed->texture[0].data.mask.color = 
-        theme->btn_shade->toggled_unfocused_unpressed_color;
+    theme->btn_desk->a_toggled_unfocused_unpressed->texture[0].data.mask.color
+        = theme->btn_desk->toggled_unfocused_unpressed_color;
+    theme->btn_shade->a_toggled_unfocused_unpressed->texture[0].data.mask.color
+        = theme->btn_shade->toggled_unfocused_unpressed_color;
     theme->btn_max->a_toggled_focused_pressed->texture[0].data.mask.color = 
         theme->btn_max->toggled_focused_pressed_color;
     theme->btn_desk->a_toggled_focused_pressed->texture[0].data.mask.color = 
@@ -1868,157 +1868,106 @@ static void read_button_colors(XrmDatabase db, const RrInstance *inst,
                                const RrTheme *theme, RrButton *btn, 
                                const gchar *btnname)
 {
-    gchar *temp, *temp2, *stemp, *stemp2;
+    gchar *name;
 
     /* active unpressed */
-    temp = "window.active.button-%s.unpressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->focused_unpressed_color,
+    name = g_strdup_printf("window.active.button.%s.unpressed.image.color",
+                           btnname);
+    READ_COLOR(name, btn->focused_unpressed_color,
                RrColorCopy(theme->titlebut_focused_unpressed_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* inactive unpressed */
-    temp = "window.inactive.button-%s.unpressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->unfocused_unpressed_color,
+    name = g_strdup_printf("window.inactive.button.%s.unpressed.image.color",
+                           btnname);
+    READ_COLOR(name, btn->unfocused_unpressed_color,
                RrColorCopy(theme->titlebut_unfocused_unpressed_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* active pressed */
-    temp = "window.active.button-%s.pressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->focused_pressed_color,
+    name = g_strdup_printf("window.active.button.%s.pressed.image.color",
+                           btnname);
+    READ_COLOR(name, btn->focused_pressed_color,
                RrColorCopy(theme->titlebut_focused_pressed_color));
-               
-    g_free(temp2);
+    g_free(name);
 
     /* inactive pressed */
-    temp = "window.inactive.button-%s.pressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->unfocused_pressed_color,
+    name = g_strdup_printf("window.inactive.button.%s.pressed.image.color",
+                          btnname);
+    READ_COLOR(name, btn->unfocused_pressed_color,
                RrColorCopy(theme->titlebut_unfocused_pressed_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* active disabled */
-    temp = "window.active.button-%s.disabled.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->disabled_focused_color,
+    name = g_strdup_printf("window.active.button.%s.disabled.image.color",
+                           btnname);
+    READ_COLOR(name, btn->disabled_focused_color,
                RrColorCopy(theme->titlebut_disabled_focused_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* inactive disabled */
-    temp = "window.inactive.button-%s.disabled.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->disabled_unfocused_color,
+    name = g_strdup_printf("window.inactive.button.%s.disabled.image.color",
+                           btnname);
+    READ_COLOR(name, btn->disabled_unfocused_color,
                RrColorCopy(theme->titlebut_disabled_unfocused_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* active hover */
-    temp = "window.active.button-%s.hover.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->hover_focused_color, 
+    name = g_strdup_printf("window.active.button.%s.hover.image.color",
+                           btnname);
+    READ_COLOR(name, btn->hover_focused_color, 
                RrColorCopy(theme->titlebut_hover_focused_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* inactive hover */
-    temp = "window.inactive.button-%s.hover.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->hover_unfocused_color,
+    name = g_strdup_printf("window.inactive.button.%s.hover.image.color",
+                           btnname);
+    READ_COLOR(name, btn->hover_unfocused_color,
                RrColorCopy(theme->titlebut_hover_unfocused_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* active toggled unpressed */
-    temp = "window.active.button-%s.toggled.unpressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-    
-    stemp = "window.active.button-%s.toggled.image.color";
-    stemp2 = g_malloc(strlen(stemp) - 2 + strlen(btnname) + 1);
-    g_sprintf(stemp2, stemp, btnname);
-
-    READ_COLOR_(temp2, stemp2, btn->toggled_focused_unpressed_color,
-                RrColorCopy(theme->titlebut_toggled_focused_unpressed_color));
-
-    g_free(temp2);
-    g_free(stemp2);
+    name = g_strdup_printf("window.active.button.%s.toggled."
+                          "unpressed.image.color", btnname);
+    READ_COLOR(name, btn->toggled_focused_unpressed_color,
+               RrColorCopy(theme->titlebut_toggled_focused_unpressed_color));
+    g_free(name);
 
     /* inactive toggled unpressed */
-    temp = "window.inactive.button-%s.toggled.unpressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-    
-    stemp = "window.inactive.button-%s.toggled.image.color";
-    stemp2 = g_malloc(strlen(stemp) - 2 + strlen(btnname) + 1);
-    g_sprintf(stemp2, stemp, btnname);
-
-    READ_COLOR_(temp2, stemp2, btn->toggled_unfocused_unpressed_color,
-                RrColorCopy(theme->titlebut_toggled_unfocused_unpressed_color));
-
-    g_free(temp2);
-    g_free(stemp2);
+    name = g_strdup_printf("window.inactive.button.%s.toggled."
+                           "unpressed.image.color", btnname);
+    READ_COLOR(name, btn->toggled_unfocused_unpressed_color,
+               RrColorCopy(theme->titlebut_toggled_unfocused_unpressed_color));
+    g_free(name);
 
     /* active toggled hover */
-    temp = "window.active.button-%s.toggled.hover.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->toggled_hover_focused_color,
+    name = g_strdup_printf("window.active.button.%s.toggled.hover.image.color",
+                           btnname);
+    READ_COLOR(name, btn->toggled_hover_focused_color,
                RrColorCopy(theme->titlebut_toggled_hover_focused_color));
 
-    g_free(temp2);
+    g_free(name);
 
     /* inactive toggled hover */
-    temp = "window.inactive.button-%s.toggled.hover.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->toggled_hover_unfocused_color,
+    name = g_strdup_printf("window.inactive.button.%s.toggled.hover."
+                           "image.color", btnname);
+    READ_COLOR(name, btn->toggled_hover_unfocused_color,
                RrColorCopy(theme->titlebut_toggled_hover_unfocused_color));
-
-    g_free(temp2);
+    g_free(name);
 
     /* active toggled pressed */
-    temp = "window.active.button-%s.toggled.pressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->toggled_focused_pressed_color, 
+    name = g_strdup_printf("window.active.button.%s.toggled.pressed."
+                           "image.color", btnname);
+    READ_COLOR(name, btn->toggled_focused_pressed_color, 
                RrColorCopy(theme->titlebut_toggled_focused_pressed_color));
-
-    g_free(temp2);
+    g_free(name);
    
     /* inactive toggled pressed */
-    temp = "window.inactive.button-%s.toggled.pressed.image.color";
-    temp2 = g_malloc(strlen(temp) - 2 + strlen(btnname) + 1);
-    g_sprintf(temp2, temp, btnname);
-
-    READ_COLOR(temp2, btn->toggled_unfocused_pressed_color,
+    name = g_strdup_printf("window.inactive.button.%s.toggled.pressed."
+                           "image.color", btnname);
+    READ_COLOR(name, btn->toggled_unfocused_pressed_color,
                RrColorCopy(theme->titlebut_toggled_unfocused_pressed_color));
-
-    g_free(temp2);
+    g_free(name);
 }
 
 

@@ -1,6 +1,7 @@
 #include "render.h"
 #include "button.h"
 #include "instance.h"
+#include "mask.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

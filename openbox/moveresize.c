@@ -126,7 +126,7 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 
         y = config_resize_popup_fixed.y.pos;
         if (config_resize_popup_fixed.y.center)
-            y = area->y + area->width/2;
+            y = area->y + area->height/2;
         else if (config_resize_popup_fixed.y.opposite)
             y = RECT_RIGHT(*area) - y;
         else

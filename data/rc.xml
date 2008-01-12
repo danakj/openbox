@@ -35,6 +35,9 @@
   <center>yes</center>
   <!-- whether to place windows in the center of the free area found or
        the top left corner -->
+  <active>no</active>
+  <!-- force new windows ont the active monitor on a multi-head system, unless
+       they are part of an application already on another monitor -->
 </placement>
 
 <theme>

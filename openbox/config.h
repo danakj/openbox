@@ -75,9 +75,13 @@ extern gboolean config_focus_last;
  */
 extern gboolean config_focus_under_mouse;
 
+/*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;
 /*! Place windows in the center of the free area */
 extern gboolean config_place_center;
+/*! Place windows on the active monitor (unless they are part of an application
+  already on another monitor) */
+extern gboolean config_place_active;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;

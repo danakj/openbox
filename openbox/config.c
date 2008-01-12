@@ -227,7 +227,7 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
                     if (!parse_contains("default", doc, c)) {
                         config_parse_gravity_coord(doc, c,
                                                    &settings->position.x);
-                        settings->pos_given = TRUE;
+                        x_pos_given = TRUE;
                     }
 
                 if (x_pos_given && (c = parse_find_node("y", n->children)))

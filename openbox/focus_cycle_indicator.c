@@ -82,6 +82,14 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.left));
     stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.right));
     stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
+    g_hash_table_insert(window_map, &focus_indicator.top.win,
+                        &focus_indicator.top);
+    g_hash_table_insert(window_map, &focus_indicator.left.win,
+                        &focus_indicator.left);
+    g_hash_table_insert(window_map, &focus_indicator.right.win,
+                        &focus_indicator.right);
+    g_hash_table_insert(window_map, &focus_indicator.bottom.win,
+                        &focus_indicator.bottom);
 
     color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
 
@@ -107,6 +115,11 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
     RrColorFree(color_white);
 
     RrAppearanceFree(a_focus_indicator);
+
+    g_hash_table_remove(window_map, &focus_indicator.top.win);
+    g_hash_table_remove(window_map, &focus_indicator.left.win);
+    g_hash_table_remove(window_map, &focus_indicator.right.win);
+    g_hash_table_remove(window_map, &focus_indicator.bottom.win);
 
     stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.top));
     stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.left));

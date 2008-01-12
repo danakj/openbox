@@ -639,9 +639,12 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == MapRequest)
         client_manage(window);
     else if (e->type == MappingNotify) {
-        /* keyboard layout changes, reconfigure openbox. need to restart the
-           modkeys system, but also to reload the key bindings. */
-        ob_reconfigure();
+        /* keyboard layout changes for modifier mapping changes. reload the
+           modifier map, and rebind all the key bindings as appropriate */
+        ob_debug("Kepboard map changed. Reloading keyboard bindings.\n");
+        modkeys_shutdown(TRUE);
+        modkeys_startup(TRUE);
+        keyboard_rebind();
     }
     else if (e->type == ClientMessage) {
         /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for

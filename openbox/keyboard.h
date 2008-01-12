@@ -34,6 +34,8 @@ extern KeyBindingTree *keyboard_firstnode;
 void keyboard_startup(gboolean reconfig);
 void keyboard_shutdown(gboolean reconfig);
 
+void keyboard_rebind();
+
 void keyboard_chroot(GList *keylist);
 gboolean keyboard_bind(GList *keylist, struct _ObActionsAct *action);
 void keyboard_unbind_all();

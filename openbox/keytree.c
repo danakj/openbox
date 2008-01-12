@@ -63,12 +63,16 @@ KeyBindingTree *tree_build(GList *keylist)
                                           g_strdup(kit->data)); /* deep copy */
         ret->first_child = p;
         if (p != NULL) p->parent = ret;
-        if (!translate_key(it->data, &ret->state, &ret->key)) {
-            tree_destroy(ret);
-            return NULL;
-        }
+        translate_key(it->data, &ret->state, &ret->key);
     }
     return ret;
+}
+
+void tree_rebind(KeyBindingTree *node) {
+    GList *it = g_list_last(node->keylist);
+    translate_key(it->data, &node->state, &node->key);
+    if (node->next_sibling) tree_rebind(node->next_sibling);
+    if (node->first_child) tree_rebind(node->first_child);
 }
 
 void tree_assimilate(KeyBindingTree *node)

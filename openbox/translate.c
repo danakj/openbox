@@ -111,6 +111,8 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
 
     parsed = g_strsplit(str, "-", -1);
 
+    *state = *keycode = 0;
+
     /* first, find the key (last token) */
     l = NULL;
     for (i = 0; parsed[i] != NULL; ++i)

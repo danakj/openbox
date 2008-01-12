@@ -24,6 +24,7 @@
 #include "stacking.h"
 #include "place.h"
 #include "geom.h"
+#include "moveresize.h"
 #include "render/render.h"
 
 #include <glib.h>
@@ -92,8 +93,24 @@ extern gboolean config_resize_redraw;
 /*! show move/resize popups? 0 = no, 1 = always, 2 = only
   resizing !1 increments */
 extern gint config_resize_popup_show;
-/*! where to show the popup, currently above the window or centered */
-extern gint config_resize_popup_pos;
+/*! where to show the resize popup */
+extern ObResizePopupPos config_resize_popup_pos;
+/*! if the resize popup should be centered horizontally if it is being
+  placed in a fixed position */
+extern gboolean config_resize_popup_x_center;
+/*! if the resize popup should be centered vertically if it is being
+  placed in a fixed position */
+extern gboolean config_resize_popup_y_center;
+/*! if the resize popup should be placed from the right side of the screen when
+  placed in a fixed position */
+extern gboolean config_resize_popup_x_opposite;
+/*! if the resize popup should be placed from the bottom side of the screen
+  when placed in a fixed position */
+extern gboolean config_resize_popup_y_opposite;
+/*! where the resize popup should be if it is placed in a fixed position */
+extern gint config_resize_popup_x;
+/*! where the resize popup should be if it is placed in a fixed position */
+extern gint config_resize_popup_y;
 
 /*! The stacking layer the dock will reside in */
 extern ObStackingLayer config_dock_layer;

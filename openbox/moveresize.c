@@ -101,17 +101,60 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
     gchar *text;
 
     text = g_strdup_printf(format, a, b);
-    if (config_resize_popup_pos == 1) /* == "Top" */
+    if (config_resize_popup_pos == OB_RESIZE_POS_TOP)
         popup_position(popup, SouthGravity,
                        c->frame->area.x
                      + c->frame->area.width/2,
                        c->frame->area.y - ob_rr_theme->fbwidth);
-    else /* == "Center" */
+    else if (config_resize_popup_pos == OB_RESIZE_POS_CENTER)
         popup_position(popup, CenterGravity,
                        c->frame->area.x + c->frame->size.left +
                        c->area.width / 2,
                        c->frame->area.y + c->frame->size.top +
                        c->area.height / 2);
+    else /* Fixed */ {
+        Rect *area = screen_physical_area_active();
+        gint gravity, x, y;
+
+        x = config_resize_popup_x;
+        if (config_resize_popup_x_center) x = area->x + area->width/2;
+        else if (config_resize_popup_x_opposite) x = RECT_RIGHT(*area) - x;
+        else x = area->x + x;
+
+        y = config_resize_popup_y;
+        if (config_resize_popup_y_center) y = area->y + area->height/2;
+        else if (config_resize_popup_y_opposite) y = RECT_BOTTOM(*area) - y;
+        else y = area->y + y;
+
+        if (config_resize_popup_x_center) {
+            if (config_resize_popup_y_center)
+                gravity = CenterGravity;
+            else if (config_resize_popup_y_opposite)
+                gravity = SouthGravity;
+            else
+                gravity = NorthGravity;
+        }
+        else if (config_resize_popup_x_opposite) {
+            if (config_resize_popup_y_center)
+                gravity = EastGravity;
+            else if (config_resize_popup_y_opposite)
+                gravity = SouthEastGravity;
+            else
+                gravity = NorthEastGravity;
+        }
+        else {
+            if (config_resize_popup_y_center)
+                gravity = WestGravity;
+            else if (config_resize_popup_y_opposite)
+                gravity = SouthWestGravity;
+            else
+                gravity = NorthWestGravity;
+        }
+
+        popup_position(popup, gravity, x, y);
+
+        g_free(area);
+    }
     popup_show(popup, text);
     g_free(text);
 }

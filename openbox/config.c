@@ -60,10 +60,16 @@ GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
 
-gboolean config_resize_redraw;
-gboolean config_resize_four_corners;
-gint     config_resize_popup_show;
-gint     config_resize_popup_pos;
+gboolean         config_resize_redraw;
+gboolean         config_resize_four_corners;
+gint             config_resize_popup_show;
+ObResizePopupPos config_resize_popup_pos;
+gboolean         config_resize_popup_x_center;
+gboolean         config_resize_popup_y_center;
+gboolean         config_resize_popup_x_opposite;
+gboolean         config_resize_popup_y_opposite;
+gint             config_resize_popup_x;
+gint             config_resize_popup_y;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
@@ -661,11 +667,46 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_resize_popup_show = 1;
     }
     if ((n = parse_find_node("popupPosition", node))) {
-        config_resize_popup_pos = parse_int(doc, n);
         if (parse_contains("Top", doc, n))
-            config_resize_popup_pos = 1;
+            config_resize_popup_pos = OB_RESIZE_POS_TOP;
         else if (parse_contains("Center", doc, n))
-            config_resize_popup_pos = 0;
+            config_resize_popup_pos = OB_RESIZE_POS_CENTER;
+        else if (parse_contains("Fixed", doc, n)) {
+            config_resize_popup_pos = OB_RESIZE_POS_FIXED;
+
+            if ((n = parse_find_node("popupFixedPosition", node))) {
+                xmlNodePtr n2;
+
+                if ((n2 = parse_find_node("x", n->children))) {
+                    gchar *s = parse_string(doc, n2);
+                    if (!g_ascii_strcasecmp(s, "center"))
+                        config_resize_popup_x_center = TRUE;
+                    else {
+                        if (s[0] == '-')
+                            config_resize_popup_x_opposite = TRUE;
+                        if (s[0] == '-' || s[0] == '+')
+                            config_resize_popup_x = atoi(s+1);
+                        else
+                            config_resize_popup_x = atoi(s);
+                    }
+                }
+                if ((n2 = parse_find_node("y", n->children))) {
+                    gchar *s = parse_string(doc, n2);
+                    if (!g_ascii_strcasecmp(s, "center"))
+                        config_resize_popup_y_center = TRUE;
+                    else {
+                        if (s[0] == '-')
+                            config_resize_popup_y_opposite = TRUE;
+                        if (s[0] == '-' || s[0] == '+')
+                            config_resize_popup_y = atoi(s+1);
+                        else
+                            config_resize_popup_y = atoi(s);
+                    }
+                }
+                g_print("X %d %d %d\n", config_resize_popup_x_center, config_resize_popup_x_opposite, config_resize_popup_x);
+                g_print("Y %d %d %d\n", config_resize_popup_y_center, config_resize_popup_y_opposite, config_resize_popup_y);
+            }
+        }
     }
 }
 
@@ -914,7 +955,13 @@ void config_startup(ObParseInst *i)
     config_resize_redraw = TRUE;
     config_resize_four_corners = FALSE;
     config_resize_popup_show = 1; /* nonpixel increments */
-    config_resize_popup_pos = 0;  /* center of client */
+    config_resize_popup_pos = OB_RESIZE_POS_CENTER;
+    config_resize_popup_x_center = FALSE;
+    config_resize_popup_x_opposite = FALSE;
+    config_resize_popup_x = 0;
+    config_resize_popup_y_center = FALSE;
+    config_resize_popup_y_opposite = FALSE;
+    config_resize_popup_y = 0;
 
     parse_register(i, "resize", parse_resize, NULL);
 

@@ -96,6 +96,11 @@
         <xsd:element minOccurs="0" name="drawContents" type="ob:bool"/>
         <xsd:element minOccurs="0" name="popupShow" type="ob:popupshow"/>
         <xsd:element minOccurs="0" name="popupPosition" type="ob:popupposition"/>
+        <xsd:element minOccurs="0" name="popupPosition" type="ob:popupfixedposition"/>
+    </xsd:complexType>
+    <xsd:complexType name="popupfixedposition">
+        <xsd:element minOccurs="0" name="x" type="ob:center_or_int"/>
+        <xsd:element minOccurs="0" name="y" type="ob:center_or_int"/>
     </xsd:complexType>
     <xsd:complexType name="dock">
         <xsd:element minOccurs="0" name="position" type="ob:dock_position"/>

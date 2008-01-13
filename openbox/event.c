@@ -1997,6 +1997,8 @@ void event_cancel_all_key_grabs(void)
     }
     else
         ungrab_passive_key();
+
+    XSync(ob_display, FALSE);
 }
 
 gboolean event_time_after(Time t1, Time t2)

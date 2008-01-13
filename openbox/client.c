@@ -450,6 +450,8 @@ void client_manage(Window window)
     g_free(monitor);
     monitor = NULL;
 
+    ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s\n",
+                  activate ? "yes" : "no");
     if (activate) {
         gboolean raise = FALSE;
 

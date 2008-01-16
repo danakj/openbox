@@ -222,6 +222,9 @@ struct _ObClient
 
     /*! Will the client respond to pings? */
     gboolean ping;
+    /*! Indicates if the client is trying to close but has stopped responding
+      to pings */
+    gboolean not_responding;
 
 #ifdef SYNC
     /*! The client wants to sync during resizes */

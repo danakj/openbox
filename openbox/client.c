@@ -40,6 +40,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "render/render.h"
+#include "gettext.h"
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
@@ -93,6 +94,7 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
 static void client_call_notifies(ObClient *self, GSList *list);
+static void client_ping_event(ObClient *self, gboolean dead);
 
 
 void client_startup(gboolean reconfig)
@@ -1947,6 +1949,12 @@ void client_update_title(ObClient *self)
     } else
         visible = data;
 
+    if (self->not_responding) {
+        data = visible;
+        visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
+        g_free(data);
+    }
+
     PROP_SETS(self->window, net_wm_visible_name, visible);
     self->title = visible;
 
@@ -1969,6 +1977,12 @@ void client_update_title(ObClient *self)
         g_free(data);
     } else
         visible = data;
+
+    if (self->not_responding) {
+        data = visible;
+        visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
+        g_free(data);
+    }
 
     PROP_SETS(self->window, net_wm_visible_icon_name, visible);
     self->icon_title = visible;
@@ -3168,10 +3182,8 @@ void client_shade(ObClient *self, gboolean shade)
 
 static void client_ping_event(ObClient *self, gboolean dead)
 {
-    if (dead)
-        ob_debug("client 0x%x window 0x%x is not responding !!\n");
-    else
-        ob_debug("client 0x%x window 0x%x started responding again..\n");
+    self->not_responding = dead;
+    client_update_title(self);
 }
 
 void client_close(ObClient *self)
@@ -3195,7 +3207,8 @@ void client_close(ObClient *self)
                 prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                 NoEventMask);
 
-    ping_start(self, client_ping_event);
+    if (self->ping)
+        ping_start(self, client_ping_event);
 }
 
 void client_kill(ObClient *self)

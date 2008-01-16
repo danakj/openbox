@@ -48,6 +48,8 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     GSList *it;
     ObPingTarget *t;
 
+    g_assert(client->ping == TRUE);
+
     /* make sure we're not already pinging it */
     for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
         t = it->data;

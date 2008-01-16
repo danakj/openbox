@@ -87,8 +87,8 @@ void ping_got_pong(Time timestamp)
     for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
         t = it->data;
         if (t->sent == timestamp) {
-            ob_debug("Got PONG with timestamp %lu for %s\n", timestamp,
-                t->client->title);
+            /*ob_debug("PONG: '%s' (timestamp %lu)\n", t->client->title,
+                     t->sent);*/
             if (t->waiting > PING_TIMEOUT_WARN) {
                 /* we had notified that they weren't responding, so now we
                    need to notify that they are again */
@@ -107,6 +107,7 @@ void ping_got_pong(Time timestamp)
 static void ping_send(ObPingTarget *t)
 {
     t->sent = event_get_server_time();
+    /*ob_debug("PING: '%s' (timestamp %lu)\n", t->client->title, t->sent);*/
     ob_debug("PINGing client %s at %lu\n", t->client->title, t->sent);
     PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
                 prop_atoms.net_wm_ping, t->sent, t->client->window, 0, 0,

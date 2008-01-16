@@ -60,15 +60,15 @@ guint    screen_num_desktops;
 guint    screen_num_monitors;
 guint    screen_desktop;
 guint    screen_last_desktop = 1;
-guint    screen_old_desktop;
-gboolean screen_desktop_timeout = TRUE;
-Size     screen_physical_size;
 gboolean screen_showing_desktop;
 ObDesktopLayout screen_desktop_layout;
 gchar  **screen_desktop_names;
 Window   screen_support_win;
 Time     screen_desktop_user_time = CurrentTime;
 
+static Size     screen_physical_size;
+static guint    screen_old_desktop;
+static gboolean screen_desktop_timeout = TRUE;
 /*! An array of desktops, holding array of areas per monitor */
 static Rect  *monitor_area = NULL;
 /*! An array of desktops, holding an array of struts */

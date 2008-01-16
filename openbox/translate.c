@@ -20,6 +20,7 @@
 #include "openbox.h"
 #include "mouse.h"
 #include "modkeys.h"
+#include "translate.h"
 #include "gettext.h"
 #include <glib.h>
 #include <string.h>

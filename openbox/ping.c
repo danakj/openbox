@@ -21,6 +21,7 @@
 #include "client.h"
 #include "prop.h"
 #include "event.h"
+#include "debug.h"
 #include "mainloop.h"
 #include "openbox.h"
 

@@ -24,6 +24,7 @@
 #include "xerror.h"
 #include "screen.h"
 #include "moveresize.h"
+#include "ping.h"
 #include "place.h"
 #include "prop.h"
 #include "extensions.h"
@@ -79,6 +80,10 @@ static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_colormap(ObClient *self);
+static void client_set_desktop_recursive(ObClient *self,
+                                         guint target,
+                                         gboolean donthide,
+                                         gboolean dontraise);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
@@ -1551,7 +1556,7 @@ void client_update_sync_request_counter(ObClient *self)
 }
 #endif
 
-void client_get_colormap(ObClient *self)
+static void client_get_colormap(ObClient *self)
 {
     XWindowAttributes wa;
 
@@ -3276,10 +3281,10 @@ void client_hilite(ObClient *self, gboolean hilite)
     }
 }
 
-void client_set_desktop_recursive(ObClient *self,
-                                  guint target,
-                                  gboolean donthide,
-                                  gboolean dontraise)
+static void client_set_desktop_recursive(ObClient *self,
+                                         guint target,
+                                         gboolean donthide,
+                                         gboolean dontraise)
 {
     guint old;
     GSList *it;

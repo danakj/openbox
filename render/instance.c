@@ -91,7 +91,7 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
     return definst;
 }
 
-void RrTrueColorSetup (RrInstance *inst)
+static void RrTrueColorSetup (RrInstance *inst)
 {
   gulong red_mask, green_mask, blue_mask;
   XImage *timage = NULL;
@@ -121,7 +121,7 @@ void RrTrueColorSetup (RrInstance *inst)
 
 #define RrPseudoNcolors(inst) (1 << (inst->pseudo_bpc * 3))
 
-void RrPseudoColorSetup (RrInstance *inst)
+static void RrPseudoColorSetup (RrInstance *inst)
 {
     XColor icolors[256];
     gint tr, tg, tb, n, r, g, b, i, incolors, ii;

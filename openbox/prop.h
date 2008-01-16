@@ -196,7 +196,7 @@ typedef struct Atoms {
     Atom ob_theme;
     Atom ob_control;
 } Atoms;
-Atoms prop_atoms;
+extern Atoms prop_atoms;
 
 void prop_startup();
 

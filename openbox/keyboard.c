@@ -265,7 +265,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
     }
 }
 
-void keyboard_rebind()
+void keyboard_rebind(void)
 {
     tree_rebind(keyboard_firstnode);
     grab_keys(TRUE);

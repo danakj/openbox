@@ -43,6 +43,7 @@
 #include "stacking.h"
 #include "extensions.h"
 #include "translate.h"
+#include "ping.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -102,8 +103,8 @@ static void focus_delay_client_dest(ObClient *client, gpointer data);
 Time event_curtime = CurrentTime;
 Time event_last_user_time = CurrentTime;
 /*! The serial of the current X event */
-gulong event_curserial;
 
+static gulong event_curserial;
 static gboolean focus_left_screen = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
 static GSList *ignore_serials = NULL;
@@ -1917,7 +1918,7 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
                                      client, FALSE);
 }
 
-void event_halt_focus_delay()
+void event_halt_focus_delay(void)
 {
     /* ignore all enter events up till the event which caused this to occur */
     if (event_curserial) event_ignore_enter_range(1, event_curserial);

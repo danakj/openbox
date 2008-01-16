@@ -18,6 +18,7 @@
 */
 
 #include "focus_cycle.h"
+#include "focus_cycle_indicator.h"
 #include "client.h"
 #include "openbox.h"
 #include "frame.h"
@@ -29,7 +30,7 @@
 
 #define FOCUS_INDICATOR_WIDTH 6
 
-struct
+static struct
 {
     InternalWindow top;
     InternalWindow left;

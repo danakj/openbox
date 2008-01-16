@@ -31,7 +31,7 @@ GList  *stacking_list = NULL;
 /*! When true, stacking changes will not be reflected on the screen.  This is
   to freeze the on-screen stacking order while a window is being temporarily
   raised during focus cycling */
-gboolean pause_changes = FALSE;
+static gboolean pause_changes = FALSE;
 
 void stacking_set_list(void)
 {
@@ -134,7 +134,7 @@ void stacking_temp_raise(ObWindow *window)
     pause_changes = TRUE;
 }
 
-void stacking_restore()
+void stacking_restore(void)
 {
     Window *win;
     GList *it;

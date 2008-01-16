@@ -39,13 +39,13 @@ typedef struct _ObMainLoopFdHandlerType     ObMainLoopFdHandlerType;
 static GSList *all_loops;
 
 /* signals are global to all loops */
-struct {
+static struct {
     guint installed; /* a ref count */
     struct sigaction oldact;
 } all_signals[NUM_SIGNALS];
 
 /* a set of all possible signals */
-sigset_t all_signals_set;
+static sigset_t all_signals_set;
 
 /* signals which cause a core dump, these can't be used for callbacks */
 static gint core_signals[] =

@@ -36,6 +36,6 @@ typedef void (*ObPingEventHandler) (struct _ObClient *c, gboolean dead);
 void ping_start(struct _ObClient *c, ObPingEventHandler h);
 void ping_stop(struct _ObClient *c);
 
-void ping_got_pong(Time timestamp);
+void ping_got_pong(guint32 id);
 
 #endif

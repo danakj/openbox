@@ -29,12 +29,13 @@ typedef struct _ObPingTarget
 {
     ObClient *client;
     ObPingEventHandler h;
-    Time sent;
+    guint32 id;
     gint waiting;
 } ObPingTarget;
 
 static GSList *ping_targets = NULL;
 static gboolean active = FALSE;
+static guint32 ping_next_id = 1;
 
 #define PING_TIMEOUT (G_USEC_PER_SEC * 3)
 /*! Warn the user after this many PING_TIMEOUT intervals */
@@ -79,7 +80,7 @@ void ping_stop(struct _ObClient *c)
     ping_end(c, NULL);
 }
 
-void ping_got_pong(Time timestamp)
+void ping_got_pong(guint32 id)
 {
     GSList *it;
     ObPingTarget *t;
@@ -87,9 +88,8 @@ void ping_got_pong(Time timestamp)
     /* make sure we're not already pinging it */
     for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
         t = it->data;
-        if (t->sent == timestamp) {
-            /*ob_debug("PONG: '%s' (timestamp %lu)\n", t->client->title,
-                     t->sent);*/
+        if (t->id == id) {
+            /*g_print("-PONG: '%s' (id %u)\n", t->client->title, t->id);*/
             if (t->waiting > PING_TIMEOUT_WARN) {
                 /* we had notified that they weren't responding, so now we
                    need to notify that they are again */
@@ -101,16 +101,15 @@ void ping_got_pong(Time timestamp)
     }
 
     if (it == NULL)
-        ob_debug("Got PONG with timestamp %lu but not waiting for one\n",
-                 timestamp);
+        ob_debug("Got PONG with id %u but not waiting for one\n", id);
 }
 
 static void ping_send(ObPingTarget *t)
 {
-    t->sent = event_get_server_time();
-    /*ob_debug("PING: '%s' (timestamp %lu)\n", t->client->title, t->sent);*/
+    t->id = ping_next_id++;
+    /*g_print("+PING: '%s' (id %u)\n", t->client->title, t->id);*/
     PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
-                prop_atoms.net_wm_ping, t->sent, t->client->window, 0, 0,
+                prop_atoms.net_wm_ping, t->id, t->client->window, 0, 0,
                 NoEventMask);
 }
 

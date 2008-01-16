@@ -61,7 +61,6 @@ guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
 
 gboolean         config_resize_redraw;
-gboolean         config_resize_four_corners;
 gint             config_resize_popup_show;
 ObResizePopupPos config_resize_popup_pos;
 GravityPoint     config_resize_popup_fixed;
@@ -916,7 +915,6 @@ void config_startup(ObParseInst *i)
     parse_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
-    config_resize_four_corners = FALSE;
     config_resize_popup_show = 1; /* nonpixel increments */
     config_resize_popup_pos = OB_RESIZE_POS_CENTER;
     GRAVITY_COORD_SET(config_resize_popup_fixed.x, 0, FALSE, FALSE);

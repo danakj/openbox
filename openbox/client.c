@@ -602,8 +602,11 @@ void client_manage(Window window)
     /* update the list hints */
     client_set_list();
 
-    /* watch for when the application stops responding */
-    if (self->ping) ping_start(self, client_ping_event);
+    /* watch for when the application stops responding.  only do this for
+       normal windows, i.e. windows which have titlebars and close buttons 
+       and things like that */
+    if (self->ping && client_normal(self))
+        ping_start(self, client_ping_event);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
@@ -687,7 +690,8 @@ void client_unmanage(ObClient *self)
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
 
     /* stop pinging the window */
-    if (self->ping) ping_stop(self);
+    if (self->ping && client_normal(self))
+        ping_stop(self);
 
     /* update the focus lists */
     focus_order_remove(self);

@@ -289,6 +289,8 @@ gboolean screen_annex(void)
     supported[i++] = prop_atoms.net_wm_sync_request;
     supported[i++] = prop_atoms.net_wm_sync_request_counter;
 #endif
+    supported[i++] = prop_atoms.net_wm_pid;
+    supported[i++] = prop_atoms.net_wm_ping;
 
     supported[i++] = prop_atoms.kde_wm_change_state;
     supported[i++] = prop_atoms.kde_net_wm_frame_strut;

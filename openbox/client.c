@@ -762,6 +762,11 @@ void client_unmanage(ObClient *self)
         XMapWindow(ob_display, self->window);
     }
 
+    /* these should not be left on the window ever.  other window managers
+       don't necessarily use them and it will mess them up (like compiz) */
+    PROP_ERASE(self->window, net_wm_visible_name);
+    PROP_ERASE(self->window, net_wm_visible_icon_name);
+
     /* update the list hints */
     client_set_list();
 

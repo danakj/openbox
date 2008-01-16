@@ -530,6 +530,9 @@ void ob_main_loop_timeout_add(ObMainLoop *loop,
                               GDestroyNotify notify)
 {
     ObMainLoopTimer *t = g_new(ObMainLoopTimer, 1);
+
+    g_assert(microseconds > 0); /* if it's 0 it'll cause an infinite loop */
+
     t->delay = microseconds;
     t->func = handler;
     t->data = data;

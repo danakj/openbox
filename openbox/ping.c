@@ -33,7 +33,6 @@ typedef struct _ObPingTarget
     gint waiting;
 } ObPingTarget;
 
-static GHashTable *ping_targets = NULL;
 static GHashTable *ping_ids     = NULL;
 static guint32     ping_next_id = 1;
 
@@ -44,12 +43,12 @@ static guint32     ping_next_id = 1;
 static void     ping_send(ObPingTarget *t);
 static void     ping_end(ObClient *client, gpointer data);
 static gboolean ping_timeout(gpointer data);
+static gboolean find_client(gpointer key, gpointer value, gpointer client);
 
 void ping_startup(gboolean reconfigure)
 {
     if (reconfigure) return;
 
-    ping_targets = g_hash_table_new(g_direct_hash, g_int_equal);
     ping_ids = g_hash_table_new(g_direct_hash, g_int_equal);
 
     /* listen for clients to disappear */
@@ -60,7 +59,6 @@ void ping_shutdown(gboolean reconfigure)
 {
     if (reconfigure) return;
 
-    g_hash_table_unref(ping_targets);
     g_hash_table_unref(ping_ids);
 
     client_remove_destroy_notify(ping_end);
@@ -70,16 +68,13 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
 {
     ObPingTarget *t;
 
-    g_assert(client->ping == TRUE);
+    g_assert(g_hash_table_find(ping_ids, find_client, client) == NULL);
 
-    /* make sure we're not already pinging it */
-    g_assert(g_hash_table_lookup(ping_targets, &client) == NULL);
+    g_assert(client->ping == TRUE);
 
     t = g_new0(ObPingTarget, 1);
     t->client = client;
     t->h = h;
-
-    g_hash_table_insert(ping_targets, &t->client, t);
 
     ob_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
                              t, g_direct_equal, NULL);
@@ -108,6 +103,12 @@ void ping_got_pong(guint32 id)
     }
     else
         ob_debug("Got PONG with id %u but not waiting for one\n", id);
+}
+
+static gboolean find_client(gpointer key, gpointer value, gpointer client)
+{
+    ObPingTarget *t = value;
+    return t->client == client;
 }
 
 static void ping_send(ObPingTarget *t)
@@ -149,10 +150,9 @@ static void ping_end(ObClient *client, gpointer data)
 {
     ObPingTarget *t;
 
-    t = g_hash_table_lookup(ping_targets, &client);
-    g_assert(t);
+    t = g_hash_table_find(ping_ids, find_client, client);
+    g_assert (t != NULL);
 
-    g_hash_table_remove(ping_targets, &t->client);
     g_hash_table_remove(ping_ids, &t->id);
 
     ob_main_loop_timeout_remove_data(ob_main_loop, ping_timeout, t, FALSE);

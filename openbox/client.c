@@ -3195,20 +3195,16 @@ void client_close(ObClient *self)
     if (!self->delete_window)
         client_kill(self);
 
-    /*
-      XXX: itd be cool to do timeouts and shit here for killing the client's
-      process off
-      like... if the window is around after 5 seconds, then the close button
-      turns a nice red, and if this function is called again, the client is
-      explicitly killed.
-    */
+    if (self->not_responding)
+        client_kill(self);
+    else {
+        PROP_MSG_TO(self->window, self->window, wm_protocols,
+                    prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
+                    NoEventMask);
 
-    PROP_MSG_TO(self->window, self->window, wm_protocols,
-                prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
-                NoEventMask);
-
-    if (self->ping)
-        ping_start(self, client_ping_event);
+        if (self->ping)
+            ping_start(self, client_ping_event);
+    }
 }
 
 void client_kill(ObClient *self)

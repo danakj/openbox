@@ -3230,11 +3230,11 @@ void client_close(ObClient *self)
         XKillClient(ob_display, self->window);
     else if (self->not_responding)
         client_kill(self);
-    else {
+    else
+        /* request the client to close with WM_DELETE_WINDOW */
         PROP_MSG_TO(self->window, self->window, wm_protocols,
                     prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                     NoEventMask);
-    }
 }
 
 void client_kill(ObClient *self)

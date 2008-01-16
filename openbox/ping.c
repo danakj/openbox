@@ -108,7 +108,6 @@ static void ping_send(ObPingTarget *t)
 {
     t->sent = event_get_server_time();
     /*ob_debug("PING: '%s' (timestamp %lu)\n", t->client->title, t->sent);*/
-    ob_debug("PINGing client %s at %lu\n", t->client->title, t->sent);
     PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
                 prop_atoms.net_wm_ping, t->sent, t->client->window, 0, 0,
                 NoEventMask);

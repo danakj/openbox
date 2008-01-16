@@ -504,10 +504,8 @@ void ob_main_loop_fd_remove(ObMainLoop *loop,
 static glong timecompare(GTimeVal *a, GTimeVal *b)
 {
     glong r;
-
-    if ((r = b->tv_sec - a->tv_sec)) return r;
-    return b->tv_usec - a->tv_usec;
-
+    if ((r = a->tv_sec - b->tv_sec)) return r;
+    return a->tv_usec - b->tv_usec;
 }
 
 static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
@@ -515,7 +513,7 @@ static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
     GSList *it;
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
-        if (timecompare(&ins->timeout, &t->timeout) >= 0) {
+        if (timecompare(&ins->timeout, &t->timeout) <= 0) {
             loop->timers = g_slist_insert_before(loop->timers, it, ins);
             break;
         }
@@ -562,11 +560,9 @@ void ob_main_loop_timeout_remove_data(ObMainLoop *loop, GSourceFunc handler,
 {
     GSList *it;
 
-    ob_debug("removing data 0x%x\n", data);
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
         if (t->func == handler && t->equal(t->data, data)) {
-            ob_debug("found data 0x%x\n", data);
             t->del_me = TRUE;
             if (cancel_dest)
                 t->destroy = NULL;
@@ -603,12 +599,6 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 
     g_get_current_time(&loop->now);
 
-    /* do this first, cuz the list can get reordered */
-    for (it = loop->timers; it; it = g_slist_next(it)) {
-        ObMainLoopTimer *curr = it->data;
-        curr->fired = FALSE;
-    }
-
     for (it = loop->timers; it; it = next) {
         ObMainLoopTimer *curr;
 
@@ -630,14 +620,8 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 
         /* the queue is sorted, so if this timer shouldn't fire, none are
            ready */
-        if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) < 0)
+        if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) > 0)
             break;
-
-        /* don't let it fire again this time around. otherwise, if the first
-           timer in the queue becomes ready, we'll loop on the later ones
-           forever if they repeat */
-        if (curr->fired)
-            continue;
 
         /* we set the last fired time to delay msec after the previous firing,
            then re-insert.  timers maintain their order and may trigger more
@@ -654,7 +638,10 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
             g_free(curr);
         }
 
-        curr->fired = TRUE;
+        /* the timer queue has been shuffled, start from the beginning
+           (which is the next one to fire) */
+        next = loop->timers;
+
         fired = TRUE;
     }
 

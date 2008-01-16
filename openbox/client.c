@@ -3213,8 +3213,13 @@ void client_close(ObClient *self)
                     prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                     NoEventMask);
 
-        if (self->ping)
+        if (self->ping) {
+            /* may have tried to kill it earlier but the window is still
+               around and started responding again */
+            self->kill_tried_term = FALSE;
+
             ping_start(self, client_ping_event);
+        }
     }
 }
 

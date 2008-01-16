@@ -104,6 +104,10 @@ struct _ObMainLoopTimer
     GTimeVal last;
     /* When this timer will next trigger */
     GTimeVal timeout;
+
+    /* Only allow a timer's function to fire once per run through the list,
+       so that it doesn't get locked in there forever */
+    gboolean fired;
 };
 
 struct _ObMainLoopSignalHandlerType
@@ -558,11 +562,11 @@ void ob_main_loop_timeout_remove_data(ObMainLoop *loop, GSourceFunc handler,
 {
     GSList *it;
 
+    ob_debug("removing data 0x%x\n", data);
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
-        if (t->func == handler &&
-            (t->equal ? t->equal(t->data, data) : (t->data == data)))
-        {
+        if (t->func == handler && t->equal(t->data, data)) {
+            ob_debug("found data 0x%x\n", data);
             t->del_me = TRUE;
             if (cancel_dest)
                 t->destroy = NULL;
@@ -599,6 +603,12 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 
     g_get_current_time(&loop->now);
 
+    /* do this first, cuz the list can get reordered */
+    for (it = loop->timers; it; it = g_slist_next(it)) {
+        ObMainLoopTimer *curr = it->data;
+        curr->fired = FALSE;
+    }
+
     for (it = loop->timers; it; it = next) {
         ObMainLoopTimer *curr;
 
@@ -623,6 +633,12 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
         if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) < 0)
             break;
 
+        /* don't let it fire again this time around. otherwise, if the first
+           timer in the queue becomes ready, we'll loop on the later ones
+           forever if they repeat */
+        if (curr->fired)
+            continue;
+
         /* we set the last fired time to delay msec after the previous firing,
            then re-insert.  timers maintain their order and may trigger more
            than once if they've waited more than one delay's worth of time.
@@ -638,6 +654,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
             g_free(curr);
         }
 
+        curr->fired = TRUE;
         fired = TRUE;
     }
 

@@ -64,7 +64,7 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     ping_send(t);
     ping_targets = g_slist_prepend(ping_targets, t);
     ob_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
-                             t, NULL, NULL);
+                             t, g_direct_equal, NULL);
 
     if (!active) {
         active = TRUE;

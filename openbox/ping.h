@@ -33,6 +33,9 @@ struct _ObClient;
 */
 typedef void (*ObPingEventHandler) (struct _ObClient *c, gboolean dead);
 
+void ping_startup(gboolean reconfigure);
+void ping_shutdown(gboolean reconfigure);
+
 void ping_start(struct _ObClient *c, ObPingEventHandler h);
 void ping_stop(struct _ObClient *c);
 

@@ -33,46 +33,59 @@ typedef struct _ObPingTarget
     gint waiting;
 } ObPingTarget;
 
-static GSList *ping_targets = NULL;
-static gboolean active = FALSE;
-static guint32 ping_next_id = 1;
+static GHashTable *ping_targets = NULL;
+static GHashTable *ping_ids     = NULL;
+static guint32     ping_next_id = 1;
 
 #define PING_TIMEOUT (G_USEC_PER_SEC * 3)
 /*! Warn the user after this many PING_TIMEOUT intervals */
 #define PING_TIMEOUT_WARN 3
 
-static void ping_send(ObPingTarget *t);
-static void ping_end(ObClient *client, gpointer data);
+static void     ping_send(ObPingTarget *t);
+static void     ping_end(ObClient *client, gpointer data);
 static gboolean ping_timeout(gpointer data);
+
+void ping_startup(gboolean reconfigure)
+{
+    if (reconfigure) return;
+
+    ping_targets = g_hash_table_new(g_direct_hash, g_int_equal);
+    ping_ids = g_hash_table_new(g_direct_hash, g_int_equal);
+
+    /* listen for clients to disappear */
+    client_add_destroy_notify(ping_end, NULL);
+}
+
+void ping_shutdown(gboolean reconfigure)
+{
+    if (reconfigure) return;
+
+    g_hash_table_unref(ping_targets);
+    g_hash_table_unref(ping_ids);
+
+    client_remove_destroy_notify(ping_end);
+}
 
 void ping_start(struct _ObClient *client, ObPingEventHandler h)
 {
-    GSList *it;
     ObPingTarget *t;
 
     g_assert(client->ping == TRUE);
 
     /* make sure we're not already pinging it */
-    for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
-        t = it->data;
-        if (t->client == client) return;
-    }
+    g_assert(g_hash_table_lookup(ping_targets, &client) == NULL);
 
-    t = g_new(ObPingTarget, 1);
+    t = g_new0(ObPingTarget, 1);
     t->client = client;
     t->h = h;
-    t->waiting = 1; /* first wait for a reply */
 
-    ping_send(t);
-    ping_targets = g_slist_prepend(ping_targets, t);
+    g_hash_table_insert(ping_targets, &t->client, t);
+
     ob_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
                              t, g_direct_equal, NULL);
-
-    if (!active) {
-        active = TRUE;
-        /* listen for the client to disappear */
-        client_add_destroy_notify(ping_end, NULL);
-    }
+    /* act like we just timed out immediately, to start the pinging process
+       now instead of after the first delay */
+    ping_timeout(t);
 }
 
 void ping_stop(struct _ObClient *c)
@@ -82,31 +95,35 @@ void ping_stop(struct _ObClient *c)
 
 void ping_got_pong(guint32 id)
 {
-    GSList *it;
     ObPingTarget *t;
 
-    /* make sure we're not already pinging it */
-    for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
-        t = it->data;
-        if (t->id == id) {
-            /*g_print("-PONG: '%s' (id %u)\n", t->client->title, t->id);*/
-            if (t->waiting > PING_TIMEOUT_WARN) {
-                /* we had notified that they weren't responding, so now we
-                   need to notify that they are again */
-                t->h(t->client, FALSE);
-            }
-            t->waiting = 0; /* not waiting for a reply anymore */
-            break;
+    if ((t = g_hash_table_lookup(ping_ids, &id))) {
+        /*g_print("-PONG: '%s' (id %u)\n", t->client->title, t->id);*/
+        if (t->waiting > PING_TIMEOUT_WARN) {
+            /* we had notified that they weren't responding, so now we
+               need to notify that they are again */
+            t->h(t->client, FALSE);
         }
+        t->waiting = 0; /* not waiting for a reply anymore */
     }
-
-    if (it == NULL)
+    else
         ob_debug("Got PONG with id %u but not waiting for one\n", id);
 }
 
 static void ping_send(ObPingTarget *t)
 {
-    t->id = ping_next_id++;
+    /* t->id is 0 when it hasn't been assigned an id ever yet.
+       we can reuse ids when t->waiting == 0, because we won't be getting a
+       pong for that id in the future again.  that way for apps that aren't
+       timing out we don't need to remove/add them from/to the hash table */
+    if (t->id == 0 || t->waiting > 0) {
+        /* pick an id, and reinsert in the hash table with the new id */
+        if (t->id) g_hash_table_remove(ping_ids, &t->id);
+        t->id = ping_next_id;
+        if (++ping_next_id == 0) ++ping_next_id; /* skip 0 on wraparound */
+        g_hash_table_insert(ping_ids, &t->id, t);
+    }
+
     /*g_print("+PING: '%s' (id %u)\n", t->client->title, t->id);*/
     PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
                 prop_atoms.net_wm_ping, t->id, t->client->window, 0, 0,
@@ -117,11 +134,9 @@ static gboolean ping_timeout(gpointer data)
 {
     ObPingTarget *t = data;
 
-    if (t->waiting == 0) { /* got a reply already */
-        /* send another ping to make sure it's still alive */
-        ping_send(t);
-    }
+    ping_send(t);
 
+    /* if the client hasn't been responding then do something about it */
     if (t->waiting == PING_TIMEOUT_WARN)
         t->h(t->client, TRUE); /* notify that the client isn't responding */
 
@@ -132,23 +147,15 @@ static gboolean ping_timeout(gpointer data)
 
 static void ping_end(ObClient *client, gpointer data)
 {
-    GSList *it;
     ObPingTarget *t;
 
-    for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
-        t = it->data;
-        if (t->client == client) {
-            ping_targets = g_slist_remove_link(ping_targets, it);
-            ob_main_loop_timeout_remove_data(ob_main_loop, ping_timeout, t,
-                                             FALSE);
-            g_free(t);
-            break;
-        }
-    }
+    t = g_hash_table_lookup(ping_targets, &client);
+    g_assert(t);
 
-    /* stop listening if we're not waiting for any more pings */
-    if (!ping_targets) {
-        active = FALSE;
-        client_remove_destroy_notify(ping_end);
-    }    
+    g_hash_table_remove(ping_targets, &t->client);
+    g_hash_table_remove(ping_ids, &t->id);
+
+    ob_main_loop_timeout_remove_data(ob_main_loop, ping_timeout, t, FALSE);
+
+    g_free(t);
 }

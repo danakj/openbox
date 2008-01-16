@@ -43,6 +43,7 @@
 #include "grab.h"
 #include "group.h"
 #include "config.h"
+#include "ping.h"
 #include "mainloop.h"
 #include "gettext.h"
 #include "parser/parse.h"
@@ -301,6 +302,7 @@ gint main(gint argc, gchar **argv)
             screen_startup(reconfigure);
             grab_startup(reconfigure);
             group_startup(reconfigure);
+            ping_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
@@ -360,6 +362,7 @@ gint main(gint argc, gchar **argv)
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
+            ping_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);
             screen_shutdown(reconfigure);

@@ -35,7 +35,7 @@ typedef struct _ObPingTarget
 static GSList *ping_targets = NULL;
 static gboolean active = FALSE;
 
-#define PING_TIMEOUT (G_USEC_PER_SEC * 1)
+#define PING_TIMEOUT (G_USEC_PER_SEC * 3)
 /*! Warn the user after this many PING_TIMEOUT intervals */
 #define PING_TIMEOUT_WARN 3
 
@@ -87,7 +87,7 @@ void ping_got_pong(Time timestamp)
     for (it = ping_targets; it != NULL; it = g_slist_next(it)) {
         t = it->data;
         if (t->sent == timestamp) {
-            ob_debug("Got PONG with timestamp %lu\n", timestamp);
+            /*ob_debug("Got PONG with timestamp %lu\n", timestamp);*/
             if (t->waiting > PING_TIMEOUT_WARN) {
                 /* we had notified that they weren't responding, so now we
                    need to notify that they are again */
@@ -106,7 +106,7 @@ void ping_got_pong(Time timestamp)
 static void ping_send(ObPingTarget *t)
 {
     t->sent = event_get_server_time();
-    ob_debug("PINGing client 0x%x at %lu\n", t->client->window, t->sent);
+    /*ob_debug("PINGing client 0x%x at %lu\n", t->client->window, t->sent);*/
     PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
                 prop_atoms.net_wm_ping, t->sent, t->client->window, 0, 0,
                 NoEventMask);

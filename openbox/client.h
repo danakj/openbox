@@ -231,8 +231,10 @@ struct _ObClient
     /*! Indicates if the client is trying to close but has stopped responding
       to pings */
     gboolean not_responding;
-    /*! We tried to kill the client with SIGTERM */
-    gboolean kill_tried_term;
+    /*! We tried to close the window with a DESTROY message */
+    gboolean close_tried_destroy;
+    /*! We tried to close the window with a SIGTERM */
+    gboolean close_tried_term;
 
 #ifdef SYNC
     /*! The client wants to sync during resizes */

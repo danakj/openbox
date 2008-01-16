@@ -602,6 +602,9 @@ void client_manage(Window window)
     /* update the list hints */
     client_set_list();
 
+    /* watch for when the application stops responding */
+    if (self->ping) ping_start(self, client_ping_event);
+
     /* free the ObAppSettings shallow copy */
     g_free(settings);
 
@@ -682,6 +685,9 @@ void client_unmanage(ObClient *self)
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
+
+    /* stop pinging the window */
+    if (self->ping) ping_stop(self);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -1955,7 +1961,10 @@ void client_update_title(ObClient *self)
 
     if (self->not_responding) {
         data = visible;
-        visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
+        if (self->close_tried_term)
+            visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
+        else
+            visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
         g_free(data);
     }
 
@@ -1984,7 +1993,10 @@ void client_update_title(ObClient *self)
 
     if (self->not_responding) {
         data = visible;
-        visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
+        if (self->close_tried_term)
+            visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
+        else
+            visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
         g_free(data);
     }
 
@@ -3194,6 +3206,14 @@ static void client_ping_event(ObClient *self, gboolean dead)
 {
     self->not_responding = dead;
     client_update_title(self);
+
+    if (!dead) {
+        /* the window has started responding again, so don't kill it the first
+           time they click on close, even if it stops responding again in the 
+           future */
+        self->close_tried_destroy = FALSE;
+        self->close_tried_term = FALSE;
+    }
 }
 
 void client_close(ObClient *self)
@@ -3206,20 +3226,14 @@ void client_close(ObClient *self)
         /* don't use client_kill(), we should only kill based on PID in
            response to a lack of PING replies */
         XKillClient(ob_display, self->window);
-    else if (self->not_responding)
+    else if (self->not_responding && self->close_tried_destroy)
         client_kill(self);
     else {
         PROP_MSG_TO(self->window, self->window, wm_protocols,
                     prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                     NoEventMask);
-
-        if (self->ping) {
-            /* may have tried to kill it earlier but the window is still
-               around and started responding again */
-            self->kill_tried_term = FALSE;
-
-            ping_start(self, client_ping_event);
-        }
+        self->close_tried_destroy = TRUE;
+        self->close_tried_term = FALSE;
     }
 }
 
@@ -3227,12 +3241,20 @@ void client_kill(ObClient *self)
 {
     if (!self->client_machine && self->pid) {
         /* running on the local host */
-        if (!self->kill_tried_term) {
+        if (!self->close_tried_term) {
+            ob_debug("killing window 0x%x with pid %lu, with SIGTERM\n",
+                     self->window, self->pid);
             kill(self->pid, SIGTERM);
-            self->kill_tried_term = TRUE;
+            self->close_tried_term = TRUE;
+
+            /* show that we're trying to kill it */
+            client_update_title(self);
         }
-        else
+        else {
+            ob_debug("killing window 0x%x with pid %lu, with SIGKILL\n",
+                     self->window, self->pid);
             kill(self->pid, SIGKILL); /* kill -9 */
+        }
     }
     else
         XKillClient(ob_display, self->window);

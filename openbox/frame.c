@@ -1438,9 +1438,9 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->lgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->handleright)       return OB_FRAME_CONTEXT_BRCORNER;
     if (win == self->rgrip)             return OB_FRAME_CONTEXT_BRCORNER;
-    if (win == self->rgripright)        return OB_FRAME_CONTEXT_BLCORNER;
-    if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BLCORNER;
-    if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->rgripright)        return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BRCORNER;
     if (win == self->title)             return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->titlebottom)       return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->titleleft)         return OB_FRAME_CONTEXT_TLCORNER;

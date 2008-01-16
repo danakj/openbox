@@ -98,7 +98,7 @@ void prop_startup(void)
     CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
 
-/*   CREATE(net_wm_ping, "_NET_WM_PING"); */
+    CREATE(net_wm_ping, "_NET_WM_PING");
 #ifdef SYNC
     CREATE(net_wm_sync_request, "_NET_WM_SYNC_REQUEST");
     CREATE(net_wm_sync_request_counter, "_NET_WM_SYNC_REQUEST_COUNTER");

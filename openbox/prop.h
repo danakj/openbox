@@ -136,7 +136,7 @@ typedef struct Atoms {
     Atom net_frame_extents;
 
     /* application protocols */
-/*  Atom net_wm_ping; */
+    Atom net_wm_ping;
 #ifdef SYNC
     Atom net_wm_sync_request;
     Atom net_wm_sync_request_counter;

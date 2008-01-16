@@ -1507,6 +1507,10 @@ void client_update_protocols(ObClient *self)
                 /* if this protocol is requested, then the window will be
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
+            else if (proto[i] == prop_atoms.net_wm_ping)
+                /* if this protocol is requested, then the window will allow
+                   pings to determine if it is still alive */
+                self->ping = TRUE;
 #ifdef SYNC
             else if (proto[i] == prop_atoms.net_wm_sync_request)
                 /* if this protocol is requested, then resizing the

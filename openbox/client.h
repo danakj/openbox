@@ -220,6 +220,9 @@ struct _ObClient
     /*! Notify the window when it receives focus? */
     gboolean focus_notify;
 
+    /*! Will the client respond to pings? */
+    gboolean ping;
+
 #ifdef SYNC
     /*! The client wants to sync during resizes */
     gboolean sync_request;

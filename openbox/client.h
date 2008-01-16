@@ -30,6 +30,10 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h> /* for pid_t */
+#endif
+
 struct _ObFrame;
 struct _ObGroup;
 struct _ObSessionState;
@@ -115,6 +119,8 @@ struct _ObClient
     gchar *client_machine;
     /*! The command used to run the program. Pre-XSMP window identification. */
     gchar *wm_command;
+    /*! The PID of the process which owns the window */
+    pid_t pid;
 
     /*! The application that created the window */
     gchar *name;
@@ -225,6 +231,8 @@ struct _ObClient
     /*! Indicates if the client is trying to close but has stopped responding
       to pings */
     gboolean not_responding;
+    /*! We tried to kill the client with SIGTERM */
+    gboolean kill_tried_term;
 
 #ifdef SYNC
     /*! The client wants to sync during resizes */

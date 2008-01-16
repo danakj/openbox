@@ -91,7 +91,7 @@ void prop_startup(void)
     CREATE(net_wm_strut_partial, "_NET_WM_STRUT_PARTIAL");
     CREATE(net_wm_icon, "_NET_WM_ICON");
     CREATE(net_wm_icon_geometry, "_NET_WM_ICON_GEOMETRY");
-/*   CREATE(net_wm_pid, "_NET_WM_PID"); */
+    CREATE(net_wm_pid, "_NET_WM_PID");
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");
     CREATE(net_wm_user_time, "_NET_WM_USER_TIME");
 /*    CREATE(net_wm_user_time_window, "_NET_WM_USER_TIME_WINDOW"); */

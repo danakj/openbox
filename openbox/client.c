@@ -46,6 +46,10 @@
 #  include <unistd.h>
 #endif
 
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h> /* for kill() */
+#endif
+
 #include <glib.h>
 #include <X11/Xutil.h>
 
@@ -2244,6 +2248,7 @@ static void client_get_session_ids(ObClient *self)
 
     if (got) {
         gchar localhost[128];
+        guint32 pid;
 
         gethostname(localhost, 127);
         localhost[127] = '\0';
@@ -2251,6 +2256,11 @@ static void client_get_session_ids(ObClient *self)
             self->client_machine = s;
         else
             g_free(s);
+
+        /* see if it has the PID set too (the PID requires that the
+           WM_CLIENT_MACHINE be set) */
+        if (PROP_GET32(self->window, net_wm_pid, cardinal, &pid))
+            self->pid = pid;
     }
 }
 
@@ -3193,9 +3203,10 @@ void client_close(ObClient *self)
     /* in the case that the client provides no means to requesting that it
        close, we just kill it */
     if (!self->delete_window)
-        client_kill(self);
-
-    if (self->not_responding)
+        /* don't use client_kill(), we should only kill based on PID in
+           response to a lack of PING replies */
+        XKillClient(ob_display, self->window);
+    else if (self->not_responding)
         client_kill(self);
     else {
         PROP_MSG_TO(self->window, self->window, wm_protocols,
@@ -3209,7 +3220,17 @@ void client_close(ObClient *self)
 
 void client_kill(ObClient *self)
 {
-    XKillClient(ob_display, self->window);
+    if (!self->client_machine && self->pid) {
+        /* running on the local host */
+        if (!self->kill_tried_term) {
+            kill(self->pid, SIGTERM);
+            self->kill_tried_term = TRUE;
+        }
+        else
+            kill(self->pid, SIGKILL); /* kill -9 */
+    }
+    else
+        XKillClient(ob_display, self->window);
 }
 
 void client_hilite(ObClient *self, gboolean hilite)

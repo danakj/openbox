@@ -3166,10 +3166,16 @@ void client_shade(ObClient *self, gboolean shade)
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 }
 
+static void client_ping_event(ObClient *self, gboolean dead)
+{
+    if (dead)
+        ob_debug("client 0x%x window 0x%x is not responding !!\n");
+    else
+        ob_debug("client 0x%x window 0x%x started responding again..\n");
+}
+
 void client_close(ObClient *self)
 {
-    XEvent ce;
-
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
     /* in the case that the client provides no means to requesting that it
@@ -3185,17 +3191,11 @@ void client_close(ObClient *self)
       explicitly killed.
     */
 
-    ce.xclient.type = ClientMessage;
-    ce.xclient.message_type =  prop_atoms.wm_protocols;
-    ce.xclient.display = ob_display;
-    ce.xclient.window = self->window;
-    ce.xclient.format = 32;
-    ce.xclient.data.l[0] = prop_atoms.wm_delete_window;
-    ce.xclient.data.l[1] = event_curtime;
-    ce.xclient.data.l[2] = 0l;
-    ce.xclient.data.l[3] = 0l;
-    ce.xclient.data.l[4] = 0l;
-    XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
+    PROP_MSG_TO(self->window, self->window, wm_protocols,
+                prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
+                NoEventMask);
+
+    ping_start(self, client_ping_event);
 }
 
 void client_kill(ObClient *self)

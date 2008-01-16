@@ -560,7 +560,9 @@ void ob_main_loop_timeout_remove_data(ObMainLoop *loop, GSourceFunc handler,
 
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
-        if (t->func == handler && t->equal(t->data, data)) {
+        if (t->func == handler &&
+            (t->equal ? t->equal(t->data, data) : (t->data == data)))
+        {
             t->del_me = TRUE;
             if (cancel_dest)
                 t->destroy = NULL;

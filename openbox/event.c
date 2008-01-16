@@ -767,6 +767,9 @@ static void event_handle_root(XEvent *e)
                 ob_restart();
             else if (e->xclient.data.l[0] == 3)
                 ob_exit(0);
+        } else if (msgtype == prop_atoms.wm_protocols) {
+            if (e->xclient.data.l[0] == prop_atoms.net_wm_ping)
+                ping_got_pong(e->xclient.data.l[1]);
         }
         break;
     case PropertyNotify:

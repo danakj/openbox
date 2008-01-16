@@ -447,6 +447,14 @@ void prop_erase(Window win, Atom prop)
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
                   glong data2, glong data3, glong mask)
 {
+    prop_message_to(RootWindow(ob_display, ob_screen), about, messagetype,
+                    data0, data1, data2, data3, 0, mask);
+}
+
+void prop_message_to(Window to, Window about, Atom messagetype,
+                     glong data0, glong data1, glong data2,
+                     glong data3, glong data4, glong mask)
+{
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type = messagetype;
@@ -457,7 +465,6 @@ void prop_message(Window about, Atom messagetype, glong data0, glong data1,
     ce.xclient.data.l[1] = data1;
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
-    ce.xclient.data.l[4] = 0;
-    XSendEvent(ob_display, RootWindow(ob_display, ob_screen), FALSE,
-               mask, &ce);
+    ce.xclient.data.l[4] = data4;
+    XSendEvent(ob_display, to, FALSE, mask, &ce);
 }

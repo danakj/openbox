@@ -218,6 +218,9 @@ void prop_erase(Window win, Atom prop);
 
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
                   glong data2, glong data3, glong mask);
+void prop_message_to(Window to, Window about, Atom messagetype,
+                     glong data0, glong data1, glong data2,
+                     glong data3, glong data4, glong mask);
 
 #define PROP_GET32(win, prop, type, ret) \
     (prop_get32(win, prop_atoms.prop, prop_atoms.type, ret))
@@ -243,5 +246,10 @@ void prop_message(Window about, Atom messagetype, glong data0, glong data1,
 #define PROP_MSG(about, msgtype, data0, data1, data2, data3) \
   (prop_message(about, prop_atoms.msgtype, data0, data1, data2, data3, \
                 SubstructureNotifyMask | SubstructureRedirectMask))
+
+#define PROP_MSG_TO(to, about, msgtype, data0, data1, data2, data3, data4, \
+                    mask) \
+    (prop_message_to(to, about, prop_atoms.msgtype,                        \
+                     data0, data1, data2, data3, data4, mask))
 
 #endif

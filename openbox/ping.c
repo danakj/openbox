@@ -148,7 +148,7 @@ static void ping_end(ObClient *client, gpointer data)
 
     /* stop listening if we're not waiting for any more pings */
     if (!ping_targets) {
-        active = TRUE;
+        active = FALSE;
         client_remove_destroy_notify(ping_end);
     }    
 }

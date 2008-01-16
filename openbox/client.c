@@ -3212,10 +3212,8 @@ static void client_ping_event(ObClient *self, gboolean dead)
     client_update_title(self);
 
     if (!dead) {
-        /* the window has started responding again, so don't kill it the first
-           time they click on close, even if it stops responding again in the 
-           future */
-        self->close_tried_destroy = FALSE;
+        /* try kill it nicely the first time again, if it started responding
+           at some point */
         self->close_tried_term = FALSE;
     }
 }
@@ -3230,14 +3228,12 @@ void client_close(ObClient *self)
         /* don't use client_kill(), we should only kill based on PID in
            response to a lack of PING replies */
         XKillClient(ob_display, self->window);
-    else if (self->not_responding && self->close_tried_destroy)
+    else if (self->not_responding)
         client_kill(self);
     else {
         PROP_MSG_TO(self->window, self->window, wm_protocols,
                     prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                     NoEventMask);
-        self->close_tried_destroy = TRUE;
-        self->close_tried_term = FALSE;
     }
 }
 

@@ -609,7 +609,10 @@ void client_manage(Window window)
 
     /* watch for when the application stops responding.  only do this for
        normal windows, i.e. windows which have titlebars and close buttons 
-       and things like that */
+       and things like that.
+       we don't need to stop pinging on unmanage, because it will be handled
+       automatically by the destroy callback!
+    */
     if (self->ping && client_normal(self))
         ping_start(self, client_ping_event);
 
@@ -693,10 +696,6 @@ void client_unmanage(ObClient *self)
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, self->window, SetModeDelete);
-
-    /* stop pinging the window */
-    if (self->ping && client_normal(self))
-        ping_stop(self);
 
     /* update the focus lists */
     focus_order_remove(self);

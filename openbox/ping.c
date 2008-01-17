@@ -49,7 +49,7 @@ void ping_startup(gboolean reconfigure)
 {
     if (reconfigure) return;
 
-    ping_ids = g_hash_table_new(g_direct_hash, g_int_equal);
+    ping_ids = g_hash_table_new(g_int_hash, g_int_equal);
 
     /* listen for clients to disappear */
     client_add_destroy_notify(ping_end, NULL);
@@ -60,6 +60,7 @@ void ping_shutdown(gboolean reconfigure)
     if (reconfigure) return;
 
     g_hash_table_unref(ping_ids);
+    ping_ids = NULL;
 
     client_remove_destroy_notify(ping_end);
 }
@@ -68,6 +69,7 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
 {
     ObPingTarget *t;
 
+    /* make sure we're not already pinging the client */
     g_assert(g_hash_table_find(ping_ids, find_client, client) == NULL);
 
     g_assert(client->ping == TRUE);
@@ -79,8 +81,12 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     ob_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
                              t, g_direct_equal, NULL);
     /* act like we just timed out immediately, to start the pinging process
-       now instead of after the first delay */
+       now instead of after the first delay.  this makes sure the client
+       ends up in the ping_ids hash table now. */
     ping_timeout(t);
+
+    /* make sure we can remove the client later */
+    g_assert(g_hash_table_find(ping_ids, find_client, client) != NULL);
 }
 
 void ping_stop(struct _ObClient *c)
@@ -93,7 +99,7 @@ void ping_got_pong(guint32 id)
     ObPingTarget *t;
 
     if ((t = g_hash_table_lookup(ping_ids, &id))) {
-        /*g_print("-PONG: '%s' (id %u)\n", t->client->title, t->id);*/
+        /*ob_debug("-PONG: '%s' (id %u)\n", t->client->title, t->id);*/
         if (t->waiting > PING_TIMEOUT_WARN) {
             /* we had notified that they weren't responding, so now we
                need to notify that they are again */
@@ -125,7 +131,7 @@ static void ping_send(ObPingTarget *t)
         g_hash_table_insert(ping_ids, &t->id, t);
     }
 
-    /*g_print("+PING: '%s' (id %u)\n", t->client->title, t->id);*/
+    /*ob_debug("+PING: '%s' (id %u)\n", t->client->title, t->id);*/
     PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
                 prop_atoms.net_wm_ping, t->id, t->client->window, 0, 0,
                 NoEventMask);
@@ -150,12 +156,11 @@ static void ping_end(ObClient *client, gpointer data)
 {
     ObPingTarget *t;
 
-    t = g_hash_table_find(ping_ids, find_client, client);
-    g_assert (t != NULL);
+    if ((t = g_hash_table_find(ping_ids, find_client, client))) {
+        g_hash_table_remove(ping_ids, &t->id);
 
-    g_hash_table_remove(ping_ids, &t->id);
+        ob_main_loop_timeout_remove_data(ob_main_loop, ping_timeout, t, FALSE);
 
-    ob_main_loop_timeout_remove_data(ob_main_loop, ping_timeout, t, FALSE);
-
-    g_free(t);
+        g_free(t);
+    }
 }

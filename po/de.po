@@ -4,23 +4,24 @@
 # Sebastian Vahl <svahl@web.de>, 2006.
 # Simon A. Wilper <simonaw@openoffice.org>, Apr 2007
 # Peter Schwindt <schwindt@ba-loerrach.de>
+# Finn Zirngibl <finn@s23.org>, 2008"
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.5\n"
+"Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-01-17 22:13+0100\n"
-"PO-Revision-Date: 2008-01-13 00:44+0100\n"
-"Last-Translator: Peter Schwindt <schwindt@ba-loerrach.de>\n"
+"PO-Revision-Date: 2008-01-17 22:49+0100\n"
+"Last-Translator: Finn Zirngibl <finn@s23.org>\n"
 "Language-Team:  <de@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: openbox/actions.c:149
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Unzulässige Aktion '%s' angefordert. Diese Aktion existiert nicht."
+msgstr "UnzulÃ¤ssige Aktion '%s' angefordert. Diese Aktion existiert nicht."
 
 #: openbox/actions/execute.c:88
 #, c-format
@@ -30,19 +31,19 @@ msgstr "Konnte Pfad '%s' nicht von utf8 konvertieren"
 #: openbox/actions/execute.c:97 openbox/actions/execute.c:115
 #, c-format
 msgid "Failed to execute '%s': %s"
-msgstr "Konnte '%s' nicht ausführen: %s"
+msgstr "Konnte '%s' nicht ausfÃ¼hren: %s"
 
 #: openbox/client.c:1973 openbox/client.c:2005
 msgid "Killing..."
-msgstr ""
+msgstr "Wird beendet..."
 
 #: openbox/client.c:1975 openbox/client.c:2007
 msgid "Not Responding"
-msgstr ""
+msgstr "Reagiert nicht"
 
 #: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
-msgstr "Gehe zu..."
+msgstr "Hierher wechseln..."
 
 #: openbox/client_list_combined_menu.c:96
 msgid "Manage desktops"
@@ -50,7 +51,7 @@ msgstr "Desktops verwalten"
 
 #: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
 msgid "_Add new desktop"
-msgstr "_Neuen Desktop hinzufügen"
+msgstr "_Neuen Desktop hinzufÃ¼gen"
 
 #: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Remove last desktop"
@@ -102,7 +103,7 @@ msgstr "Vers_chieben"
 
 #: openbox/client_menu.c:394
 msgid "Resi_ze"
-msgstr "_Größe ändern"
+msgstr "_GrÃ¶ÃŸe Ã¤ndern"
 
 #: openbox/client_menu.c:396
 msgid "Ico_nify"
@@ -122,12 +123,12 @@ msgstr "Dekoration entfernen/_Dekorieren"
 
 #: openbox/client_menu.c:418
 msgid "_Close"
-msgstr "_Schließen"
+msgstr "_SchlieÃŸen"
 
 #: openbox/config.c:746
 #, c-format
 msgid "Invalid button '%s' specified in config file"
-msgstr "Unzulässiger Knopf '%s' in der Konfigurationsdatei angegeben"
+msgstr "UnzulÃ¤ssiger Knopf '%s' in der Konfigurationsdatei angegeben"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
@@ -136,22 +137,22 @@ msgstr "Konflikt mit Tastenkombination in der Konfigurationsdatei"
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
 msgid "Unable to find a valid menu file '%s'"
-msgstr "Konnte keine gültige Menü-Datei '%s' finden"
+msgstr "Konnte keine gÃ¼ltige MenÃ¼-Datei '%s' finden"
 
 #: openbox/menu.c:171
 #, c-format
 msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Konnte Befehl '%s' für pipe-menu nicht ausführen: %s"
+msgstr "Konnte Befehl '%s' fÃ¼r pipe-menu nicht ausfÃ¼hren: %s"
 
 #: openbox/menu.c:185
 #, c-format
 msgid "Invalid output from pipe-menu '%s'"
-msgstr "Ungültige Ausgabe vom pipe-menu '%s'"
+msgstr "UngÃ¼ltige Ausgabe vom pipe-menu '%s'"
 
 #: openbox/menu.c:198
 #, c-format
 msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Das Menü '%s' wurde bei dem Versuch darauf zuzugreifen nicht gefunden"
+msgstr "Das MenÃ¼ '%s' wurde bei dem Versuch darauf zuzugreifen nicht gefunden"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -160,12 +161,12 @@ msgstr "Mehr..."
 #: openbox/mouse.c:349
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
-msgstr "Maus-Binding enthält ungültigen Button '%s'"
+msgstr "Maus-Binding enthÃ¤lt ungÃ¼ltigen Button '%s'"
 
 #: openbox/mouse.c:355
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
-msgstr "Maus-Binding enthält ungültigen Kontext '%s'"
+msgstr "Maus-Binding enthÃ¤lt ungÃ¼ltigen Kontext '%s'"
 
 #: openbox/openbox.c:130
 #, c-format
@@ -174,7 +175,7 @@ msgstr "Konnte nicht in das Heimatverzeichnis '%s' wechseln: %s"
 
 #: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Konnte das Display aus der Umgebungsvariable DISPLAY nicht öffnen."
+msgstr "Konnte das Display aus der Umgebungsvariable DISPLAY nicht Ã¶ffnen."
 
 #: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
@@ -182,17 +183,17 @@ msgstr "Konnte die obrender Bibliothek nicht initialisieren."
 
 #: openbox/openbox.c:187
 msgid "X server does not support locale."
-msgstr "Die gewählte Lokalisierung wird vom X-Server nicht unterstützt."
+msgstr "Die gewÃ¤hlte Lokalisierung wird vom X-Server nicht unterstÃ¼tzt."
 
 #: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
-"Die Lokalisierungsmodifizierer für den X-Server konnten nicht gesetzt werden."
+"Die Lokalisierungsmodifizierer fÃ¼r den X-Server konnten nicht gesetzt werden."
 
 #: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Es wurde keine gültige Konfigurationsdatei gefunden, benutze einfache "
+"Es wurde keine gÃ¼ltige Konfigurationsdatei gefunden, benutze einfache "
 "Standardwerte."
 
 #: openbox/openbox.c:278
@@ -202,7 +203,7 @@ msgstr "Konnte kein Thema laden."
 #: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Neustart fehlgeschlagen, um die ausführbare Datei '%s' zu starten: %s"
+msgstr "Neustart fehlgeschlagen, um die ausfÃ¼hrbare Datei '%s' zu starten: %s"
 
 #: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
@@ -275,12 +276,12 @@ msgstr "  --debug             Debugging-Informationen anzeigen\n"
 #: openbox/openbox.c:499
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
-"  --debug-focus       Debugging-Informationen für's Fokus-Handling anzeigen\n"
+"  --debug-focus       Debugging-Informationen fÃ¼r's Fokus-Handling anzeigen\n"
 
 #: openbox/openbox.c:500
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
-"  --debug-xinerama    Anzeige in künstliche Xinerama-Bildschirme aufteilen\n"
+"  --debug-xinerama    Anzeige in kÃ¼nstliche Xinerama-Bildschirme aufteilen\n"
 
 #: openbox/openbox.c:501
 #, c-format
@@ -294,12 +295,12 @@ msgstr ""
 #: openbox/openbox.c:604
 #, c-format
 msgid "Invalid command line argument '%s'\n"
-msgstr "Ungültiges Kommandozeilen Argument '%s'\n"
+msgstr "UngÃ¼ltiges Kommandozeilen Argument '%s'\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Ein Fenstermanager läuft bereits auf Bildschirm %d"
+msgstr "Ein Fenstermanager lÃ¤uft bereits auf Bildschirm %d"
 
 #: openbox/screen.c:124
 #, c-format
@@ -339,17 +340,17 @@ msgstr "Starte %s\n"
 #: openbox/translate.c:59
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Ungültige Modifier-Taste '%s' in Tastenbelegung/Maus-Binding"
+msgstr "UngÃ¼ltige Modifier-Taste '%s' in Tastenbelegung/Maus-Binding"
 
 #: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr "Ungültiger Keycode '%s' in Tastenkombination"
+msgstr "UngÃ¼ltiger Keycode '%s' in Tastenkombination"
 
 #: openbox/translate.c:145
 #, c-format
 msgid "Invalid key name '%s' in key binding"
-msgstr "Ungültiger Tastenname '%s' in Tastenkombination"
+msgstr "UngÃ¼ltiger Tastenname '%s' in Tastenkombination"
 
 #: openbox/translate.c:151
 #, c-format
@@ -362,4 +363,4 @@ msgid "X Error: %s"
 msgstr "X Fehler: %s"
 
 #~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "Unzulässiger Einsatz der Aktion '%s'. Aktion wird ignoriert."
+#~ msgstr "UnzulÃ¤ssiger Einsatz der Aktion '%s'. Aktion wird ignoriert."

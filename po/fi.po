@@ -2,7 +2,7 @@
 # Copyright (C) 2007  Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
 # Pauli Virtanen <pauli.virtanen@hut.fi>, 2005.
-# Lauri Hakko, 2007.
+# Lauri Hakko <aperculum@gmail.com>, 2007.
 # Elias Julkunen <elias.julkunen@gmail.com>, 2007.
 #
 msgid ""
@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2007-11-12 19:12+0100\n"
-"PO-Revision-Date: 2008-01-12 03:29+0100\n"
-"Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
+"PO-Revision-Date: 2008-01-17 22:01+0100\n"
+"Last-Translator: Lauri Hakko <aperculum@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -173,7 +173,7 @@ msgstr "X-palvelin ei tue kieliasetusta"
 
 #: openbox/openbox.c:188
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Lokaalimuttujia ei voitu tehdä X-palvelimelle."
+msgstr "Lokaalimuuttujia ei voitu tehdä X-palvelimelle."
 
 #: openbox/openbox.c:251
 msgid "Unable to find a valid config file, using some simple defaults"
@@ -188,7 +188,7 @@ msgstr "Teeman lataaminen epäonnistui"
 #: openbox/openbox.c:402
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Uudelleenkäynnistyi epäonnistui käynnistämään uutta ohjelmaa '%s': %s"
+msgstr "Uudelleenkäynnistys epäonnistui käynnistämään uutta ohjelmaa '%s': %s"
 
 #: openbox/openbox.c:472 openbox/openbox.c:474
 msgid "Copyright (c)"
@@ -308,7 +308,7 @@ msgstr "Hakemiston '%s' luonti epäonnistui: %s"
 #: openbox/session.c:451
 #, c-format
 msgid "Unable to save the session to '%s': %s"
-msgstr "Istuntoa ei voitu tallentaa hakemistoo '%s': %s"
+msgstr "Istuntoa ei voitu tallentaa hakemistoon '%s': %s"
 
 #: openbox/session.c:583
 #, c-format
@@ -328,7 +328,7 @@ msgstr ""
 #: openbox/translate.c:135
 #, c-format
 msgid "Invalid key code '%s' in key binding"
-msgstr ""
+msgstr "Virheellinen näppäinkoodi '%s' pikanäppäimissä"
 
 #: openbox/translate.c:142
 #, c-format

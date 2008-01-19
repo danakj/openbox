@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.5\n"
+"Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-01-17 22:13+0100\n"
-"PO-Revision-Date: 2008-01-11 01:00+0100\n"
+"PO-Revision-Date: 2008-01-19 14:34+0100\n"
 "Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
 "Language-Team: Inko I. A. <inkoia@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: openbox/actions.c:149
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
-msgstr ""
+msgstr "Eskatutako '%s' ekintza baliogabea. Ez da ekintza hori existitzen."
 
 #: openbox/actions/execute.c:88
 #, c-format
@@ -32,11 +32,11 @@ msgstr "Hutsegitea '%s' exekutatzean: %s"
 
 #: openbox/client.c:1973 openbox/client.c:2005
 msgid "Killing..."
-msgstr ""
+msgstr "Akabatzen..."
 
 #: openbox/client.c:1975 openbox/client.c:2007
 msgid "Not Responding"
-msgstr ""
+msgstr "Erantzunik Ez"
 
 #: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."

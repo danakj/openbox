@@ -200,18 +200,17 @@ KeyCode obt_keyboard_keysym_to_keycode(KeySym sym)
 gchar *obt_keyboard_keycode_to_string(guint keycode)
 {
     KeySym sym;
-    const gchar *ret = NULL;
 
     if ((sym = XKeycodeToKeysym(obt_display, keycode, 0)) != NoSymbol)
-        ret = XKeysymToString(sym);
-    return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
+        return g_locale_to_utf8(XKeysymToString(sym), -1, NULL, NULL, NULL);
+    return NULL;
 }
 
 gunichar obt_keyboard_keycode_to_unichar(guint keycode)
 {
     gunichar unikey = 0;
-
     char *key;
+
     if ((key = obt_keyboard_keycode_to_string(keycode)) != NULL &&
         /* don't accept keys that aren't a single letter, like "space" */
         key[1] == '\0')

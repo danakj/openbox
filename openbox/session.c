@@ -110,7 +110,7 @@ void session_startup(gint argc, gchar **argv)
 
     if (ob_sm_save_file != NULL) {
         if (ob_sm_restore) {
-            ob_debug_type(OB_DEBUG_SM, "Loading from session file %s\n",
+            ob_debug_type(OB_DEBUG_SM, "Loading from session file %s",
                           ob_sm_save_file);
             session_load_file(ob_sm_save_file);
         }
@@ -177,7 +177,7 @@ static gboolean session_connect()
 
     /* connect to the server */
     oldid = ob_sm_id;
-    ob_debug_type(OB_DEBUG_SM, "Connecting to SM with id: %s\n",
+    ob_debug_type(OB_DEBUG_SM, "Connecting to SM with id: %s",
                   oldid ? oldid : "(null)");
     sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
                                 SmcSaveYourselfProcMask |
@@ -187,9 +187,9 @@ static gboolean session_connect()
                                 &cb, oldid, &ob_sm_id,
                                 SM_ERR_LEN-1, sm_err);
     g_free(oldid);
-    ob_debug_type(OB_DEBUG_SM, "Connected to SM with id: %s\n", ob_sm_id);
+    ob_debug_type(OB_DEBUG_SM, "Connected to SM with id: %s", ob_sm_id);
     if (sm_conn == NULL)
-        ob_debug("Failed to connect to session manager: %s\n", sm_err);
+        ob_debug("Failed to connect to session manager: %s", sm_err);
     return sm_conn != NULL;
 }
 
@@ -206,7 +206,7 @@ static void session_setup_program()
         .vals = &vals
     };
     SmProp *list = &prop;
-    ob_debug_type(OB_DEBUG_SM, "Setting program: %s\n", sm_argv[0]);
+    ob_debug_type(OB_DEBUG_SM, "Setting program: %s", sm_argv[0]);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -227,7 +227,7 @@ static void session_setup_user()
         .vals = &vals
     };
     SmProp *list = &prop;
-    ob_debug_type(OB_DEBUG_SM, "Setting user: %s\n", user);
+    ob_debug_type(OB_DEBUG_SM, "Setting user: %s", user);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -249,7 +249,7 @@ static void session_setup_restart_style(gboolean restart)
         .vals = &vals
     };
     SmProp *list = &prop;
-    ob_debug_type(OB_DEBUG_SM, "Setting restart: %d\n", restart);
+    ob_debug_type(OB_DEBUG_SM, "Setting restart: %d", restart);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -270,7 +270,7 @@ static void session_setup_pid()
         .vals = &vals
     };
     SmProp *list = &prop;
-    ob_debug_type(OB_DEBUG_SM, "Setting pid: %s\n", pid);
+    ob_debug_type(OB_DEBUG_SM, "Setting pid: %s", pid);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -293,7 +293,7 @@ static void session_setup_priority()
         .vals = &vals
     };
     SmProp *list = &prop;
-    ob_debug_type(OB_DEBUG_SM, "Setting priority: %d\n", priority);
+    ob_debug_type(OB_DEBUG_SM, "Setting priority: %d", priority);
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
     g_free(prop.type);
@@ -312,11 +312,11 @@ static void session_setup_clone_command()
     };
     SmProp *list = &prop;
 
-    ob_debug_type(OB_DEBUG_SM, "Setting clone command: (%d)\n", sm_argc);
+    ob_debug_type(OB_DEBUG_SM, "Setting clone command: (%d)", sm_argc);
     for (i = 0; i < sm_argc; ++i) {
         vals[i].value = sm_argv[i];
         vals[i].length = strlen(sm_argv[i]) + 1;
-        ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i].value);
+        ob_debug_type(OB_DEBUG_SM, "    %s", vals[i].value);
     }
 
     SmcSetProperties(sm_conn, 1, &list);
@@ -338,26 +338,26 @@ static void session_setup_restart_command()
     };
     SmProp *list = &prop;
 
-    ob_debug_type(OB_DEBUG_SM, "Setting restart command: (%d)\n", sm_argc+4);
+    ob_debug_type(OB_DEBUG_SM, "Setting restart command: (%d)", sm_argc+4);
     for (i = 0; i < sm_argc; ++i) {
         vals[i].value = sm_argv[i];
         vals[i].length = strlen(sm_argv[i]) + 1;
-        ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i].value);
+        ob_debug_type(OB_DEBUG_SM, "    %s", vals[i].value);
     }
 
     vals[i].value = g_strdup("--sm-client-id");
     vals[i].length = strlen("--sm-client-id") + 1;
     vals[i+1].value = ob_sm_id;
     vals[i+1].length = strlen(ob_sm_id) + 1;
-    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i].value);
-    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+1].value);
+    ob_debug_type(OB_DEBUG_SM, "    %s", vals[i].value);
+    ob_debug_type(OB_DEBUG_SM, "    %s", vals[i+1].value);
 
     vals[i+2].value = g_strdup("--sm-save-file");
     vals[i+2].length = strlen("--sm-save-file") + 1;
     vals[i+3].value = ob_sm_save_file;
     vals[i+3].length = strlen(ob_sm_save_file) + 1;
-    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+2].value);
-    ob_debug_type(OB_DEBUG_SM, "    %s\n", vals[i+3].value);
+    ob_debug_type(OB_DEBUG_SM, "    %s", vals[i+2].value);
+    ob_debug_type(OB_DEBUG_SM, "    %s", vals[i+3].value);
 
     SmcSetProperties(sm_conn, 1, &list);
     g_free(prop.name);
@@ -385,9 +385,9 @@ static void sm_save_yourself_2(SmcConn conn, SmPointer data)
     ObSMSaveData *savedata = data;
 
     /* save the current state */
-    ob_debug_type(OB_DEBUG_SM, "Session save phase 2 requested\n");
+    ob_debug_type(OB_DEBUG_SM, "Session save phase 2 requested");
     ob_debug_type(OB_DEBUG_SM,
-                  "  Saving session to file '%s'\n", ob_sm_save_file);
+                  "  Saving session to file '%s'", ob_sm_save_file);
     if (savedata == NULL)
         savedata = sm_save_get_data();
     success = session_save_to_file(savedata);
@@ -396,7 +396,7 @@ static void sm_save_yourself_2(SmcConn conn, SmPointer data)
     /* tell the session manager how to restore this state */
     if (success) session_setup_restart_command();
 
-    ob_debug_type(OB_DEBUG_SM, "Saving is done (success = %d)\n", success);
+    ob_debug_type(OB_DEBUG_SM, "Saving is done (success = %d)", success);
     SmcSaveYourselfDone(conn, success);
 }
 
@@ -407,10 +407,10 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
     ObSMSaveData *savedata = NULL;
     gchar *vendor;
 
-    ob_debug_type(OB_DEBUG_SM, "Session save requested\n");
+    ob_debug_type(OB_DEBUG_SM, "Session save requested");
 
     vendor = SmcVendor(sm_conn);
-    ob_debug_type(OB_DEBUG_SM, "Session manager's vendor: %s\n", vendor);
+    ob_debug_type(OB_DEBUG_SM, "Session manager's vendor: %s", vendor);
 
     if (!strcmp(vendor, "KDE")) {
         /* ksmserver guarantees that phase 1 will complete before allowing any
@@ -421,7 +421,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
     free(vendor);
 
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, savedata)) {
-        ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed\n");
+        ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed");
         g_free(savedata);
         SmcSaveYourselfDone(conn, FALSE);
     }
@@ -429,18 +429,18 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
 
 static void sm_die(SmcConn conn, SmPointer data)
 {
-    ob_debug_type(OB_DEBUG_SM, "Die requested\n");
+    ob_debug_type(OB_DEBUG_SM, "Die requested");
     ob_exit(0);
 }
 
 static void sm_save_complete(SmcConn conn, SmPointer data)
 {
-    ob_debug_type(OB_DEBUG_SM, "Save complete\n");
+    ob_debug_type(OB_DEBUG_SM, "Save complete");
 }
 
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 {
-    ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled\n");
+    ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled");
 }
 
 static gboolean session_save_to_file(const ObSMSaveData *savedata)
@@ -498,18 +498,18 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
 
             if (!c->sm_client_id) {
                 ob_debug_type(OB_DEBUG_SM, "Client %s does not have a "
-                              "session id set\n",
+                              "session id set",
                               c->title);
                 if (!c->wm_command) {
                     ob_debug_type(OB_DEBUG_SM, "Client %s does not have an "
                                   "oldskool wm_command set either. We won't "
-                                  "be saving its data\n",
+                                  "be saving its data",
                                   c->title);
                     continue;
                 }
             }
 
-            ob_debug_type(OB_DEBUG_SM, "Saving state for client %s\n",
+            ob_debug_type(OB_DEBUG_SM, "Saving state for client %s",
                           c->title);
 
             prex = c->area.x;
@@ -608,20 +608,20 @@ static void session_state_free(ObSessionState *state)
 
 static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
 {
-    ob_debug_type(OB_DEBUG_SM, "Comparing client against saved state: \n");
-    ob_debug_type(OB_DEBUG_SM, "  client id: %s \n", c->sm_client_id);
-    ob_debug_type(OB_DEBUG_SM, "  client name: %s \n", c->name);
-    ob_debug_type(OB_DEBUG_SM, "  client class: %s \n", c->class);
-    ob_debug_type(OB_DEBUG_SM, "  client role: %s \n", c->role);
-    ob_debug_type(OB_DEBUG_SM, "  client type: %d \n", c->type);
-    ob_debug_type(OB_DEBUG_SM, "  client command: %s \n",
+    ob_debug_type(OB_DEBUG_SM, "Comparing client against saved state: ");
+    ob_debug_type(OB_DEBUG_SM, "  client id: %s ", c->sm_client_id);
+    ob_debug_type(OB_DEBUG_SM, "  client name: %s ", c->name);
+    ob_debug_type(OB_DEBUG_SM, "  client class: %s ", c->class);
+    ob_debug_type(OB_DEBUG_SM, "  client role: %s ", c->role);
+    ob_debug_type(OB_DEBUG_SM, "  client type: %d ", c->type);
+    ob_debug_type(OB_DEBUG_SM, "  client command: %s ",
                   c->wm_command ? c->wm_command : "(null)");
-    ob_debug_type(OB_DEBUG_SM, "  state id: %s \n", s->id);
-    ob_debug_type(OB_DEBUG_SM, "  state name: %s \n", s->name);
-    ob_debug_type(OB_DEBUG_SM, "  state class: %s \n", s->class);
-    ob_debug_type(OB_DEBUG_SM, "  state role: %s \n", s->role);
-    ob_debug_type(OB_DEBUG_SM, "  state type: %d \n", s->type);
-    ob_debug_type(OB_DEBUG_SM, "  state command: %s \n",
+    ob_debug_type(OB_DEBUG_SM, "  state id: %s ", s->id);
+    ob_debug_type(OB_DEBUG_SM, "  state name: %s ", s->name);
+    ob_debug_type(OB_DEBUG_SM, "  state class: %s ", s->class);
+    ob_debug_type(OB_DEBUG_SM, "  state role: %s ", s->role);
+    ob_debug_type(OB_DEBUG_SM, "  state type: %d ", s->type);
+    ob_debug_type(OB_DEBUG_SM, "  state command: %s ",
                   s->command ? s->command : "(null)");
 
     if ((c->sm_client_id && s->id && !strcmp(c->sm_client_id, s->id)) ||

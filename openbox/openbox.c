@@ -116,16 +116,14 @@ gint main(gint argc, gchar **argv)
 
     state = OB_STATE_STARTING;
 
+    ob_debug_startup();
+
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
         g_message("Couldn't set locale from environment.");
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
-
-    if (chdir(g_get_home_dir()) == -1)
-        g_message(_("Unable to change to home directory '%s': %s"),
-                  g_get_home_dir(), g_strerror(errno));
 
     /* parse the command line args, which can change the argv[0] */
     parse_args(&argc, argv);
@@ -420,6 +418,8 @@ gint main(gint argc, gchar **argv)
     g_free(ob_sm_id);
     g_free(program_name);
 
+    ob_debug_shutdown();
+
     return exitcode;
 }
 
@@ -427,11 +427,11 @@ static void signal_handler(gint signal, gpointer data)
 {
     switch (signal) {
     case SIGUSR1:
-        ob_debug("Caught signal %d. Restarting.\n", signal);
+        ob_debug("Caught signal %d. Restarting.", signal);
         ob_restart();
         break;
     case SIGUSR2:
-        ob_debug("Caught signal %d. Reconfiguring.\n", signal);
+        ob_debug("Caught signal %d. Reconfiguring.", signal);
         ob_reconfigure();
         break;
     case SIGCHLD:
@@ -439,7 +439,7 @@ static void signal_handler(gint signal, gpointer data)
         while (waitpid(-1, NULL, WNOHANG) > 0);
         break;
     default:
-        ob_debug("Caught signal %d. Exiting.\n", signal);
+        ob_debug("Caught signal %d. Exiting.", signal);
         /* TERM and INT return a 0 code */
         ob_exit(!(signal == SIGTERM || signal == SIGINT));
     }
@@ -473,6 +473,7 @@ static void print_help()
     g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
     g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
+    g_print(_("  --debug-session     Display debugging output for session managment\n"));
     g_print(_("  --debug-xinerama    Split the display into fake xinerama screens\n"));
     g_print(_("\nPlease report bugs at %s\n"), PACKAGE_BUGREPORT);
 }
@@ -519,15 +520,18 @@ static void parse_args(gint *argc, gchar **argv)
             xsync = TRUE;
         }
         else if (!strcmp(argv[i], "--debug")) {
-            ob_debug_show_output(TRUE);
-            ob_debug_enable(OB_DEBUG_SM, TRUE);
+            ob_debug_enable(OB_DEBUG_NORMAL, TRUE);
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
         }
         else if (!strcmp(argv[i], "--debug-focus")) {
-            ob_debug_show_output(TRUE);
-            ob_debug_enable(OB_DEBUG_SM, TRUE);
+            ob_debug_enable(OB_DEBUG_NORMAL, TRUE);
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
+        }
+        else if (!strcmp(argv[i], "--debug-session")) {
+            ob_debug_enable(OB_DEBUG_NORMAL, TRUE);
+            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
+            ob_debug_enable(OB_DEBUG_SM, TRUE);
         }
         else if (!strcmp(argv[i], "--debug-xinerama")) {
             ob_debug_xinerama = TRUE;
@@ -549,7 +553,7 @@ static void parse_args(gint *argc, gchar **argv)
                 ob_sm_save_file = g_strdup(argv[i+1]);
                 remove_args(argc, argv, i, 2);
                 --i; /* this arg was removed so go back */
-                ob_debug_type(OB_DEBUG_SM, "--sm-save-file %s\n",
+                ob_debug_type(OB_DEBUG_SM, "--sm-save-file %s",
                               ob_sm_save_file);
             }
         }
@@ -561,7 +565,7 @@ static void parse_args(gint *argc, gchar **argv)
                 ob_sm_id = g_strdup(argv[i+1]);
                 remove_args(argc, argv, i, 2);
                 --i; /* this arg was removed so go back */
-                ob_debug_type(OB_DEBUG_SM, "--sm-client-id %s\n", ob_sm_id);
+                ob_debug_type(OB_DEBUG_SM, "--sm-client-id %s", ob_sm_id);
             }
         }
         else if (!strcmp(argv[i], "--sm-disable")) {

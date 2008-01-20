@@ -264,7 +264,7 @@ void client_manage(Window window)
         XFree(wmhint);
     }
 
-    ob_debug("Managing window: 0x%lx\n", window);
+    ob_debug("Managing window: 0x%lx", window);
 
     map_time = event_get_server_time();
 
@@ -288,8 +288,8 @@ void client_manage(Window window)
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
 
-    ob_debug("Window type: %d\n", self->type);
-    ob_debug("Window group: 0x%x\n", self->group?self->group->leader:0);
+    ob_debug("Window type: %d", self->type);
+    ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
 
     /* now we have all of the window's information so we can set this up.
        do this before creating the frame, so it can tell that we are still
@@ -356,7 +356,7 @@ void client_manage(Window window)
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
-        ob_debug("Positioned: %s @ %d %d\n",
+        ob_debug("Positioned: %s @ %d %d",
                  (!self->positioned ? "no" :
                   (self->positioned == PPosition ? "program specified" :
                    (self->positioned == USPosition ? "user specified" :
@@ -364,7 +364,7 @@ void client_manage(Window window)
                      "program + user specified" :
                      "BADNESS !?")))), place.x, place.y);
 
-        ob_debug("Sized: %s @ %d %d\n",
+        ob_debug("Sized: %s @ %d %d",
                  (!self->sized ? "no" :
                   (self->sized == PSize ? "program specified" :
                    (self->sized == USSize ? "user specified" :
@@ -436,7 +436,7 @@ void client_manage(Window window)
         place.width = MIN(place.width, a->width);
         place.height = MIN(place.height, a->height);
 
-        ob_debug("setting window size to %dx%d\n", place.width, place.height);
+        ob_debug("setting window size to %dx%d", place.width, place.height);
 
         /* get the size of the client back */
         place.width -= self->frame->size.left + self->frame->size.right;
@@ -446,11 +446,11 @@ void client_manage(Window window)
     }
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
-             "some restrictions may apply\n",
+             "some restrictions may apply",
              self->window, place.x, place.y, place.width, place.height);
     if (self->session)
         ob_debug("  but session requested %d, %d  %d x %d instead, "
-                 "overriding\n",
+                 "overriding",
                  self->session->x, self->session->y,
                  self->session->w, self->session->h);
 
@@ -465,7 +465,7 @@ void client_manage(Window window)
     g_free(monitor);
     monitor = NULL;
 
-    ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s\n",
+    ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
     if (activate) {
         gboolean raise = FALSE;
@@ -473,7 +473,7 @@ void client_manage(Window window)
         /* This is focus stealing prevention */
         ob_debug_type(OB_DEBUG_FOCUS,
                       "Want to focus new window 0x%x at time %u "
-                      "launched at %u (last user interaction time %u)\n",
+                      "launched at %u (last user interaction time %u)",
                       self->window, map_time, launch_time,
                       event_last_user_time);
 
@@ -483,7 +483,7 @@ void client_manage(Window window)
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Not focusing the window because the user is inside "
                           "an Openbox menu or is move/resizing a window and "
-                          "we don't want to interrupt them\n");
+                          "we don't want to interrupt them");
         }
 
         /* if it's on another desktop */
@@ -497,7 +497,7 @@ void client_manage(Window window)
             raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Not focusing the window because its on another "
-                          "desktop\n");
+                          "desktop");
         }
         /* If something is focused, and it's not our relative... */
         else if (focus_client && client_search_focus_tree_full(self) == NULL &&
@@ -514,14 +514,14 @@ void client_manage(Window window)
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because the user is "
-                              "working in another window\n");
+                              "working in another window");
             }
             /* If its a transient (and its parents aren't focused) */
             else if (client_has_parent(self)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because it is a "
-                              "transient, and its relatives aren't focused\n");
+                              "transient, and its relatives aren't focused");
             }
             /* Don't steal focus from globally active clients.
                I stole this idea from KWin. It seems nice.
@@ -532,7 +532,7 @@ void client_manage(Window window)
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because a globally "
-                              "active client has focus\n");
+                              "active client has focus");
             }
             /* Don't move focus if it's not going to go to this window
                anyway */
@@ -541,7 +541,7 @@ void client_manage(Window window)
                 raise = TRUE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because another window "
-                              "would get the focus anyway\n");
+                              "would get the focus anyway");
             }
             else if (!(self->desktop == screen_desktop ||
                        self->desktop == DESKTOP_ALL))
@@ -557,7 +557,7 @@ void client_manage(Window window)
         if (!activate) {
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Focus stealing prevention activated for %s at "
-                          "time %u (last user interactioon time %u)\n",
+                          "time %u (last user interactioon time %u)",
                           self->title, map_time, event_last_user_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
@@ -623,7 +623,7 @@ void client_manage(Window window)
     /* free the ObAppSettings shallow copy */
     g_free(settings);
 
-    ob_debug("Managed window 0x%lx plate 0x%x (%s)\n",
+    ob_debug("Managed window 0x%lx plate 0x%x (%s)",
              window, self->frame->window, self->class);
 
     return;
@@ -635,7 +635,7 @@ ObClient *client_fake_manage(Window window)
     ObClient *self;
     ObAppSettings *settings;
 
-    ob_debug("Pretend-managing window: %lx\n", window);
+    ob_debug("Pretend-managing window: %lx", window);
 
     /* do this minimal stuff to figure out the client's decorations */
 
@@ -653,7 +653,7 @@ ObClient *client_fake_manage(Window window)
     self->frame = frame_new(self);
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
-    ob_debug("gave extents left %d right %d top %d bottom %d\n",
+    ob_debug("gave extents left %d right %d top %d bottom %d",
              self->frame->size.left, self->frame->size.right,
              self->frame->size.top, self->frame->size.bottom);
 
@@ -675,7 +675,7 @@ void client_unmanage(ObClient *self)
     GSList *it;
     gulong ignore_start;
 
-    ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)\n",
+    ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)",
              self->window, self->frame->window,
              self->class, self->title ? self->title : "");
 
@@ -794,7 +794,7 @@ void client_unmanage(ObClient *self)
     /* update the list hints */
     client_set_list();
 
-    ob_debug("Unmanaged window 0x%lx\n", self->window);
+    ob_debug("Unmanaged window 0x%lx", self->window);
 
     /* free all data allocated in the client struct */
     g_slist_free(self->transients);
@@ -852,7 +852,7 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
             match = FALSE;
 
         if (match) {
-            ob_debug("Window matching: %s\n", app->name);
+            ob_debug("Window matching: %s", app->name);
 
             /* copy the settings to our struct, overriding the existing
                settings if they are not defaults */
@@ -907,17 +907,17 @@ static void client_restore_session_state(ObClient *self)
     GList *it;
 
     ob_debug_type(OB_DEBUG_SM,
-                  "Restore session for client %s\n", self->title);
+                  "Restore session for client %s", self->title);
 
     if (!(it = session_state_find(self))) {
         ob_debug_type(OB_DEBUG_SM,
-                      "Session data not found for client %s\n", self->title);
+                      "Session data not found for client %s", self->title);
         return;
     }
 
     self->session = it->data;
 
-    ob_debug_type(OB_DEBUG_SM, "Session data loaded for client %s\n",
+    ob_debug_type(OB_DEBUG_SM, "Session data loaded for client %s",
                   self->title);
 
     RECT_SET_POINT(self->area, self->session->x, self->session->y);
@@ -1170,7 +1170,7 @@ static void client_get_area(ObClient *self)
     POINT_SET(self->root_pos, wattrib.x, wattrib.y);
     self->border_width = wattrib.border_width;
 
-    ob_debug("client area: %d %d  %d %d  bw %d\n", wattrib.x, wattrib.y,
+    ob_debug("client area: %d %d  %d %d  bw %d", wattrib.x, wattrib.y,
              wattrib.width, wattrib.height, wattrib.border_width);
 }
 
@@ -1183,7 +1183,7 @@ static void client_get_desktop(ObClient *self)
             self->desktop = screen_num_desktops - 1;
         else
             self->desktop = d;
-        ob_debug("client requested desktop 0x%x\n", self->desktop);
+        ob_debug("client requested desktop 0x%x", self->desktop);
     } else {
         GSList *it;
         gboolean first = TRUE;
@@ -1206,7 +1206,7 @@ static void client_get_desktop(ObClient *self)
         if (all != screen_num_desktops) {
             self->desktop = all;
 
-            ob_debug("client desktop set from parents: 0x%x\n",
+            ob_debug("client desktop set from parents: 0x%x",
                      self->desktop);
         }
         /* try get from the startup-notification protocol */
@@ -1214,13 +1214,13 @@ static void client_get_desktop(ObClient *self)
             if (self->desktop >= screen_num_desktops &&
                 self->desktop != DESKTOP_ALL)
                 self->desktop = screen_num_desktops - 1;
-            ob_debug("client desktop set from startup-notification: 0x%x\n",
+            ob_debug("client desktop set from startup-notification: 0x%x",
                      self->desktop);
         }
         /* defaults to the current desktop */
         else {
             self->desktop = screen_desktop;
-            ob_debug("client desktop set to the current desktop: %d\n",
+            ob_debug("client desktop set to the current desktop: %d",
                      self->desktop);
         }
     }
@@ -1575,7 +1575,7 @@ void client_update_colormap(ObClient *self, Colormap colormap)
 {
     if (colormap == self->colormap) return;
 
-    ob_debug("Setting client %s colormap: 0x%x\n", self->title, colormap);
+    ob_debug("Setting client %s colormap: 0x%x", self->title, colormap);
 
     if (client_focused(self)) {
         screen_install_colormap(self, FALSE); /* uninstall old one */
@@ -1630,15 +1630,15 @@ void client_update_normal_hints(ObClient *self)
         if (size.flags & PResizeInc && size.width_inc && size.height_inc)
             SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
 
-        ob_debug("Normal hints: min size (%d %d) max size (%d %d)\n   "
-                 "size inc (%d %d) base size (%d %d)\n",
+        ob_debug("Normal hints: min size (%d %d) max size (%d %d)",
                  self->min_size.width, self->min_size.height,
-                 self->max_size.width, self->max_size.height,
+                 self->max_size.width, self->max_size.height);
+        ob_debug("size inc (%d %d) base size (%d %d)",
                  self->size_inc.width, self->size_inc.height,
                  self->base_size.width, self->base_size.height);
     }
     else
-        ob_debug("Normal hints: not set\n");
+        ob_debug("Normal hints: not set");
 }
 
 void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
@@ -2645,7 +2645,7 @@ static void client_apply_startup_state(ObClient *self,
        pre-max/pre-fullscreen values
     */
     client_try_configure(self, &x, &y, &w, &h, &l, &l, FALSE);
-    ob_debug("placed window 0x%x at %d, %d with size %d x %d\n",
+    ob_debug("placed window 0x%x at %d, %d with size %d x %d",
              self->window, x, y, w, h);
     /* save the area, and make it where it should be for the premax stuff */
     oldarea = self->area;
@@ -3025,7 +3025,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.event = self->window;
         event.xconfigure.window = self->window;
 
-        ob_debug("Sending ConfigureNotify to %s for %d,%d %dx%d\n",
+        ob_debug("Sending ConfigureNotify to %s for %d,%d %dx%d",
                  self->title, self->root_pos.x, self->root_pos.y, w, h);
 
         /* root window real coords */
@@ -3094,7 +3094,7 @@ void client_fullscreen(ObClient *self, gboolean fs)
         RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
     }
 
-    ob_debug("Window %s going fullscreen (%d)\n",
+    ob_debug("Window %s going fullscreen (%d)",
              self->title, self->fullscreen);
 
     client_setup_decor_and_functions(self, FALSE);
@@ -3120,7 +3120,7 @@ static void client_iconify_recursive(ObClient *self,
 
 
     if (self->iconic != iconic) {
-        ob_debug("%sconifying window: 0x%lx\n", (iconic ? "I" : "Uni"),
+        ob_debug("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
                  self->window);
 
         if (iconic) {
@@ -3294,7 +3294,7 @@ void client_kill(ObClient *self)
     if (!self->client_machine && self->pid) {
         /* running on the local host */
         if (!self->close_tried_term) {
-            ob_debug("killing window 0x%x with pid %lu, with SIGTERM\n",
+            ob_debug("killing window 0x%x with pid %lu, with SIGTERM",
                      self->window, self->pid);
             kill(self->pid, SIGTERM);
             self->close_tried_term = TRUE;
@@ -3303,7 +3303,7 @@ void client_kill(ObClient *self)
             client_update_title(self);
         }
         else {
-            ob_debug("killing window 0x%x with pid %lu, with SIGKILL\n",
+            ob_debug("killing window 0x%x with pid %lu, with SIGKILL",
                      self->window, self->pid);
             kill(self->pid, SIGKILL); /* kill -9 */
         }
@@ -3338,7 +3338,7 @@ static void client_set_desktop_recursive(ObClient *self,
 
     if (target != self->desktop && self->type != OB_CLIENT_TYPE_DESKTOP) {
 
-        ob_debug("Setting desktop %u\n", target+1);
+        ob_debug("Setting desktop %u", target+1);
 
         g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 
@@ -3640,12 +3640,12 @@ gboolean client_focus(ObClient *self)
 
     if (!client_can_focus(self)) {
         ob_debug_type(OB_DEBUG_FOCUS,
-                      "Client %s can't be focused\n", self->title);
+                      "Client %s can't be focused", self->title);
         return FALSE;
     }
 
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "Focusing client \"%s\" (0x%x) at time %u\n",
+                  "Focusing client \"%s\" (0x%x) at time %u",
                   self->title, self->window, event_curtime);
 
     /* if using focus_delay, stop the timer now so that focus doesn't
@@ -3687,7 +3687,7 @@ gboolean client_focus(ObClient *self)
 
     obt_display_ignore_errors(FALSE);
 
-    ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d\n",
+    ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d",
                   obt_display_error_occured);
     return !obt_display_error_occured;
 }
@@ -4014,15 +4014,15 @@ static void detect_edge(Rect area, ObDirection dir,
             g_assert_not_reached();
     }
 
-    ob_debug("my head %d size %d\n", my_head, my_size);
-    ob_debug("head %d tail %d deest %d\n", head, tail, *dest);
+    ob_debug("my head %d size %d", my_head, my_size);
+    ob_debug("head %d tail %d deest %d", head, tail, *dest);
     if (!skip_head) {
-        ob_debug("using near edge %d\n", head);
+        ob_debug("using near edge %d", head);
         *dest = head;
         *near_edge = TRUE;
     }
     else if (!skip_tail) {
-        ob_debug("using far edge %d\n", tail);
+        ob_debug("using far edge %d", tail);
         *dest = tail;
         *near_edge = FALSE;
     }
@@ -4087,7 +4087,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
             cur->desktop != screen_desktop)
             continue;
 
-        ob_debug("trying window %s\n", cur->title);
+        ob_debug("trying window %s", cur->title);
 
         detect_edge(cur->frame->area, dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
@@ -4208,10 +4208,10 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
         g_assert_not_reached();
     }
 
-    ob_debug("head %d dir %d\n", head, dir);
+    ob_debug("head %d dir %d", head, dir);
     client_find_edge_directional(self, dir, head, 1,
                                  e_start, e_size, &e, &near);
-    ob_debug("edge %d\n", e);
+    ob_debug("edge %d", e);
     *x = self->frame->area.x;
     *y = self->frame->area.y;
     *w = self->frame->area.width;

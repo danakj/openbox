@@ -425,7 +425,7 @@ static void print_focusevent(XEvent *e)
 
     g_assert(modestr);
     g_assert(detailstr);
-    ob_debug_type(OB_DEBUG_FOCUS, "Focus%s 0x%x mode=%s detail=%s\n",
+    ob_debug_type(OB_DEBUG_FOCUS, "Focus%s 0x%x mode=%s detail=%s",
                   (e->xfocus.type == FocusIn ? "In" : "Out"),
                   win,
                   modestr, detailstr);
@@ -525,7 +525,7 @@ static void event_process(const XEvent *ec, gpointer data)
             XEvent ce;
 
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus went to root or pointer root/none\n");
+                          "Focus went to root or pointer root/none");
 
             if (e->xfocus.detail == NotifyInferior ||
                 e->xfocus.detail == NotifyNonlinear)
@@ -551,7 +551,7 @@ static void event_process(const XEvent *ec, gpointer data)
             {
                 XPutBackEvent(obt_display, &ce);
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "  but another FocusIn is coming\n");
+                              "  but another FocusIn is coming");
             } else {
                 /* Focus has been reverted.
 
@@ -567,7 +567,7 @@ static void event_process(const XEvent *ec, gpointer data)
         else if (!client)
         {
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus went to a window that is already gone\n");
+                          "Focus went to a window that is already gone");
 
             /* If you send focus to a window and then it disappears, you can
                get the FocusIn for it, after it is unmanaged.
@@ -598,12 +598,12 @@ static void event_process(const XEvent *ec, gpointer data)
                 root != obt_root(ob_screen))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Focus went to another screen !\n");
+                              "Focus went to another screen !");
                 focus_left_screen = TRUE;
             }
             else
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Focus went to a black hole !\n");
+                              "Focus went to a black hole !");
             obt_display_ignore_errors(FALSE);
             /* nothing is focused */
             focus_set_client(NULL);
@@ -615,7 +615,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 /* The FocusIn was ignored, this means it was on a window
                    that isn't a client. */
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Focus went to an unmanaged window 0x%x !\n",
+                              "Focus went to an unmanaged window 0x%x !",
                               ce.xfocus.window);
                 focus_fallback(TRUE, config_focus_under_mouse, TRUE, TRUE);
             }
@@ -643,7 +643,7 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == MappingNotify) {
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
-        ob_debug("Kepboard map changed. Reloading keyboard bindings.\n");
+        ob_debug("Kepboard map changed. Reloading keyboard bindings.");
         obt_keyboard_reload();
         keyboard_rebind();
     }
@@ -736,7 +736,7 @@ static void event_handle_root(XEvent *e)
 
     switch(e->type) {
     case SelectionClear:
-        ob_debug("Another WM has requested to replace us. Exiting.\n");
+        ob_debug("Another WM has requested to replace us. Exiting.");
         ob_exit_replace();
         break;
 
@@ -751,7 +751,7 @@ static void event_handle_root(XEvent *e)
                 if (event_curtime == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_CURRENT_DESKTOP message is missing "
-                                  "a timestamp\n");
+                                  "a timestamp");
                 screen_set_desktop(d, TRUE);
             }
         } else if (msgtype == OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS)) {
@@ -761,7 +761,7 @@ static void event_handle_root(XEvent *e)
         } else if (msgtype == OBT_PROP_ATOM(NET_SHOWING_DESKTOP)) {
             screen_show_desktop(e->xclient.data.l[0] != 0, NULL);
         } else if (msgtype == OBT_PROP_ATOM(OB_CONTROL)) {
-            ob_debug("OB_CONTROL: %d\n", e->xclient.data.l[0]);
+            ob_debug("OB_CONTROL: %d", e->xclient.data.l[0]);
             if (e->xclient.data.l[0] == 1)
                 ob_reconfigure();
             else if (e->xclient.data.l[0] == 2)
@@ -775,7 +775,7 @@ static void event_handle_root(XEvent *e)
         break;
     case PropertyNotify:
         if (e->xproperty.atom == OBT_PROP_ATOM(NET_DESKTOP_NAMES)) {
-            ob_debug("UPDATE DESKTOP NAMES\n");
+            ob_debug("UPDATE DESKTOP NAMES");
             screen_update_desktop_names();
         }
         else if (e->xproperty.atom == OBT_PROP_ATOM(NET_DESKTOP_LAYOUT))
@@ -988,7 +988,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 event_end_ignore_all_enters(event_start_ignore_all_enters());
 
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "%sNotify mode %d detail %d on %lx\n",
+                          "%sNotify mode %d detail %d on %lx",
                           (e->type == EnterNotify ? "Enter" : "Leave"),
                           e->xcrossing.mode,
                           e->xcrossing.detail, (client?client->window:0));
@@ -1045,7 +1045,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d serial %lu on %lx "
-                              "IGNORED\n",
+                              "IGNORED",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
                               e->xcrossing.detail,
@@ -1055,7 +1055,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             else {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d serial %lu on %lx, "
-                              "focusing window\n",
+                              "focusing window",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
                               e->xcrossing.detail,
@@ -1086,10 +1086,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
         RECT_TO_DIMS(client->area, x, y, w, h);
 
         ob_debug("ConfigureRequest for \"%s\" desktop %d wmstate %d "
-                 "visibile %d\n"
-                 "                     x %d y %d w %d h %d b %d\n",
+                 "visibile %d",
                  client->title,
-                 screen_desktop, client->wmstate, client->frame->visible,
+                 screen_desktop, client->wmstate, client->frame->visible);
+        ob_debug("                     x %d y %d w %d h %d b %d",
                  x, y, w, h, client->border_width);
 
         if (e->xconfigurerequest.value_mask & CWBorderWidth)
@@ -1169,7 +1169,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 
         ob_debug("ConfigureRequest x(%d) %d y(%d) %d w(%d) %d h(%d) %d "
-                 "move %d resize %d\n",
+                 "move %d resize %d",
                  e->xconfigurerequest.value_mask & CWX, x,
                  e->xconfigurerequest.value_mask & CWY, y,
                  e->xconfigurerequest.value_mask & CWWidth, w,
@@ -1195,7 +1195,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             ob_debug_type(OB_DEBUG_APP_BUGS,
                           "Application %s is trying to move via "
                           "ConfigureRequest to it's root window position "
-                          "but it is not using StaticGravity\n",
+                          "but it is not using StaticGravity",
                           client->title);
             /* don't move it */
             x = client->area.x;
@@ -1223,7 +1223,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            ob_debug("Granting ConfigureRequest x %d y %d w %d h %d\n",
+            ob_debug("Granting ConfigureRequest x %d y %d w %d h %d",
                      x, y, w, h);
             client_configure(client, x, y, w, h, FALSE, TRUE, TRUE);
         }
@@ -1231,7 +1231,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     }
     case UnmapNotify:
         ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
-                 "ignores left %d\n",
+                 "ignores left %d",
                  client->window, e->xunmap.event, e->xunmap.from_configure,
                  client->ignore_unmaps);
         if (client->ignore_unmaps) {
@@ -1241,7 +1241,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         client_unmanage(client);
         break;
     case DestroyNotify:
-        ob_debug("DestroyNotify for window 0x%x\n", client->window);
+        ob_debug("DestroyNotify for window 0x%x", client->window);
         client_unmanage(client);
         break;
     case ReparentNotify:
@@ -1259,11 +1259,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
            X server to deal with after we unmanage the window */
         XPutBackEvent(obt_display, e);
 
-        ob_debug("ReparentNotify for window 0x%x\n", client->window);
+        ob_debug("ReparentNotify for window 0x%x", client->window);
         client_unmanage(client);
         break;
     case MapRequest:
-        ob_debug("MapRequest for 0x%lx\n", client->window);
+        ob_debug("MapRequest for 0x%lx", client->window);
         if (!client->iconic) break; /* this normally doesn't happen, but if it
                                        does, we don't want it!
                                        it can happen now when the window is on
@@ -1313,7 +1313,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             gulong ignore_start;
 
             /* can't compress these */
-            ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",
+            ob_debug("net_wm_state %s %ld %ld for 0x%lx",
                      (e->xclient.data.l[0] == 0 ? "Remove" :
                       e->xclient.data.l[0] == 1 ? "Add" :
                       e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
@@ -1328,10 +1328,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (!config_focus_under_mouse)
                 event_end_ignore_all_enters(ignore_start);
         } else if (msgtype == OBT_PROP_ATOM(NET_CLOSE_WINDOW)) {
-            ob_debug("net_close_window for 0x%lx\n", client->window);
+            ob_debug("net_close_window for 0x%lx", client->window);
             client_close(client);
         } else if (msgtype == OBT_PROP_ATOM(NET_ACTIVE_WINDOW)) {
-            ob_debug("net_active_window for 0x%lx source=%s\n",
+            ob_debug("net_active_window for 0x%lx source=%s",
                      client->window,
                      (e->xclient.data.l[0] == 0 ? "unknown" :
                       (e->xclient.data.l[0] == 1 ? "application" :
@@ -1345,16 +1345,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_ACTIVE_WINDOW message for window %s is"
-                                  " missing a timestamp\n", client->title);
+                                  " missing a timestamp", client->title);
             } else
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_ACTIVE_WINDOW message for window %s is "
-                              "missing source indication\n");
+                              "missing source indication");
             client_activate(client, FALSE, TRUE, TRUE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));
         } else if (msgtype == OBT_PROP_ATOM(NET_WM_MOVERESIZE)) {
-            ob_debug("net_wm_moveresize for 0x%lx direction %d\n",
+            ob_debug("net_wm_moveresize for 0x%lx direction %d",
                      client->window, e->xclient.data.l[2]);
             if ((Atom)e->xclient.data.l[2] ==
                 OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT) ||
@@ -1427,7 +1427,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             else
                 h = client->area.height;
 
-            ob_debug("MOVERESIZE x %d %d y %d %d (gravity %d)\n",
+            ob_debug("MOVERESIZE x %d %d y %d %d (gravity %d)",
                      e->xclient.data.l[0] & 1 << 8, x,
                      e->xclient.data.l[0] & 1 << 9, y,
                      client->gravity);
@@ -1441,7 +1441,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xclient.data.l[0] != 2) {
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_RESTACK_WINDOW sent for window %s with "
-                              "invalid source indication %ld\n",
+                              "invalid source indication %ld",
                               client->title, e->xclient.data.l[0]);
             } else {
                 ObClient *sibling = NULL;
@@ -1455,7 +1455,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     if (sibling == NULL)
                         ob_debug_type(OB_DEBUG_APP_BUGS,
                                       "_NET_RESTACK_WINDOW sent for window %s "
-                                      "with invalid sibling 0x%x\n",
+                                      "with invalid sibling 0x%x",
                                  client->title, e->xclient.data.l[1]);
                 }
                 if (e->xclient.data.l[2] == Below ||
@@ -1480,7 +1480,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 } else
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_RESTACK_WINDOW sent for window %s "
-                                  "with invalid detail %d\n",
+                                  "with invalid detail %d",
                                   client->title, e->xclient.data.l[2]);
             }
         }
@@ -1523,7 +1523,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         msgtype = e->xproperty.atom;
         if (msgtype == XA_WM_NORMAL_HINTS) {
-            ob_debug("Update NORMAL hints\n");
+            ob_debug("Update NORMAL hints");
             client_update_normal_hints(client);
             /* normal hints can make a window non-resizable */
             client_setup_decor_and_functions(client, FALSE);
@@ -1945,7 +1945,7 @@ static void event_ignore_enter_range(gulong start, gulong end)
     r->end = end;
     ignore_serials = g_slist_prepend(ignore_serials, r);
 
-    ob_debug_type(OB_DEBUG_FOCUS, "ignoring enters from %lu until %lu\n",
+    ob_debug_type(OB_DEBUG_FOCUS, "ignoring enters from %lu until %lu",
                   r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
@@ -1992,19 +1992,19 @@ void event_cancel_all_key_grabs(void)
 {
     if (actions_interactive_act_running()) {
         actions_interactive_cancel_act();
-        ob_debug("KILLED interactive action\n");
+        ob_debug("KILLED interactive action");
     }
     else if (menu_frame_visible) {
         menu_frame_hide_all();
-        ob_debug("KILLED open menus\n");
+        ob_debug("KILLED open menus");
     }
     else if (moveresize_in_progress) {
         moveresize_end(TRUE);
-        ob_debug("KILLED interactive moveresize\n");
+        ob_debug("KILLED interactive moveresize");
     }
     else if (grab_on_keyboard()) {
         ungrab_keyboard();
-        ob_debug("KILLED active grab on keyboard\n");
+        ob_debug("KILLED active grab on keyboard");
     }
     else
         ungrab_passive_key();

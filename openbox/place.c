@@ -76,7 +76,7 @@ static Rect **pick_head(ObClient *c)
     /* try direct parent first */
     if ((p = client_direct_parent(c))) {
         add_choice(choice, client_monitor(p));
-        ob_debug("placement adding choice %d for parent\n",
+        ob_debug("placement adding choice %d for parent",
                  client_monitor(p));
     }
 
@@ -92,7 +92,7 @@ static Rect **pick_head(ObClient *c)
                  itc->desktop == DESKTOP_ALL || c->desktop == DESKTOP_ALL))
             {
                 add_choice(choice, client_monitor(it->data));
-                ob_debug("placement adding choice %d for group sibling\n",
+                ob_debug("placement adding choice %d for group sibling",
                          client_monitor(it->data));
             }
         }
@@ -103,7 +103,7 @@ static Rect **pick_head(ObClient *c)
             if (itc != c) {
                 add_choice(choice, client_monitor(it->data));
                 ob_debug("placement adding choice %d for group sibling on "
-                         "another desktop\n", client_monitor(it->data));
+                         "another desktop", client_monitor(it->data));
             }
         }
     }
@@ -113,7 +113,7 @@ static Rect **pick_head(ObClient *c)
         config_place_monitor != OB_PLACE_MONITOR_MOUSE)
     {
         add_choice(choice, client_monitor(focus_client));
-        ob_debug("placement adding choice %d for normal focused window\n",
+        ob_debug("placement adding choice %d for normal focused window",
                  client_monitor(focus_client));
     }
 
@@ -125,7 +125,7 @@ static Rect **pick_head(ObClient *c)
         g_free(monitor);
         if (contain) {
             add_choice(choice, i);
-            ob_debug("placement adding choice %d for mouse pointer\n", i);
+            ob_debug("placement adding choice %d for mouse pointer", i);
             break;
         }
     }

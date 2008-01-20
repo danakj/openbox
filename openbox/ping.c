@@ -99,7 +99,7 @@ void ping_got_pong(guint32 id)
     ObPingTarget *t;
 
     if ((t = g_hash_table_lookup(ping_ids, &id))) {
-        /*ob_debug("-PONG: '%s' (id %u)\n", t->client->title, t->id);*/
+        /*ob_debug("-PONG: '%s' (id %u)", t->client->title, t->id);*/
         if (t->waiting > PING_TIMEOUT_WARN) {
             /* we had notified that they weren't responding, so now we
                need to notify that they are again */
@@ -108,7 +108,7 @@ void ping_got_pong(guint32 id)
         t->waiting = 0; /* not waiting for a reply anymore */
     }
     else
-        ob_debug("Got PONG with id %u but not waiting for one\n", id);
+        ob_debug("Got PONG with id %u but not waiting for one", id);
 }
 
 static gboolean find_client(gpointer key, gpointer value, gpointer client)
@@ -131,7 +131,7 @@ static void ping_send(ObPingTarget *t)
         g_hash_table_insert(ping_ids, &t->id, t);
     }
 
-    /*ob_debug("+PING: '%s' (id %u)\n", t->client->title, t->id);*/
+    /*ob_debug("+PING: '%s' (id %u)", t->client->title, t->id);*/
     OBT_PROP_MSG_TO(t->client->window, t->client->window, WM_PROTOCOLS,
                     OBT_PROP_ATOM(NET_WM_PING), t->id, t->client->window, 0, 0,
                     NoEventMask);

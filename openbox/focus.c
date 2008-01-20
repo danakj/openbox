@@ -66,7 +66,7 @@ void focus_set_client(ObClient *client)
     Window active;
 
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "focus_set_client 0x%lx\n", client ? client->window : 0);
+                  "focus_set_client 0x%lx", client ? client->window : 0);
 
     if (focus_client == client)
         return;
@@ -103,18 +103,18 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
     GList *it;
     ObClient *c;
 
-    ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying pointer stuff");
     if (allow_pointer && config_focus_follow)
         if ((c = client_under_pointer()) &&
             (allow_refocus || client_focus_target(c) != old) &&
             (client_normal(c) &&
              client_focus(c)))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "found in pointer stuff");
             return c;
         }
 
-    ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying the focus order");
     for (it = focus_order; it; it = g_list_next(it)) {
         c = it->data;
         /* fallback focus to a window if:
@@ -130,12 +130,12 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "found in focus order");
             return c;
         }
     }
 
-    ob_debug_type(OB_DEBUG_FOCUS, "trying a desktop window\n");
+    ob_debug_type(OB_DEBUG_FOCUS, "trying a desktop window");
     for (it = focus_order; it; it = g_list_next(it)) {
         c = it->data;
         /* fallback focus to a window if:
@@ -149,7 +149,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
-            ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window\n");
+            ob_debug_type(OB_DEBUG_FOCUS, "found a desktop window");
             return c;
         }
     }

@@ -624,21 +624,20 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
                     sibling->iconic))
     {
         ob_debug("Setting restack sibling to NULL, they are not on the same "
-                 "desktop or it is iconified\n");
+                 "desktop or it is iconified");
         sibling = NULL;
     }
 
     switch (detail) {
     case Below:
-        ob_debug("Restack request Below for client %s sibling %s\n",
+        ob_debug("Restack request Below for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
         /* just lower it */
         stacking_lower(CLIENT_AS_WINDOW(client));
         ret = TRUE;
         break;
     case BottomIf:
-        ob_debug("Restack request BottomIf for client %s sibling "
-                 "%s\n",
+        ob_debug("Restack request BottomIf for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
         /* if this client occludes sibling (or anything if NULL), then
            lower it to the bottom */
@@ -648,13 +647,13 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
         }
         break;
     case Above:
-        ob_debug("Restack request Above for client %s sibling %s\n",
+        ob_debug("Restack request Above for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
         stacking_raise(CLIENT_AS_WINDOW(client));
         ret = TRUE;
         break;
     case TopIf:
-        ob_debug("Restack request TopIf for client %s sibling %s\n",
+        ob_debug("Restack request TopIf for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
         if (stacking_occluded(client, sibling)) {
             stacking_raise(CLIENT_AS_WINDOW(client));
@@ -662,8 +661,7 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
         }
         break;
     case Opposite:
-        ob_debug("Restack request Opposite for client %s sibling "
-                 "%s\n",
+        ob_debug("Restack request Opposite for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
         if (stacking_occluded(client, sibling)) {
             stacking_raise(CLIENT_AS_WINDOW(client));

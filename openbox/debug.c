@@ -17,32 +17,65 @@
 */
 
 #include "debug.h"
+#include "gettext.h"
+#include "obt/paths.h"
 
 #include <glib.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <errno.h>
 
-static gboolean show;
+static gboolean  enabled_types[OB_DEBUG_TYPE_NUM] = {FALSE};
+static FILE     *log_file = NULL;
+static guint     rr_handler_id = 0;
+static guint     obt_handler_id = 0;
+static guint     ob_handler_id = 0;
 
-void ob_debug_show_output(gboolean enable)
+static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
+                        const gchar *message, gpointer user_data);
+
+void ob_debug_startup(void)
 {
-    show = enable;
+    ObtPaths *p = obt_paths_new();
+    gchar *dir = g_build_filename(obt_paths_cache_home(p),
+                                  "openbox", NULL);
+
+    /* log messages to a log file!  fancy, no? */
+    if (!obt_paths_mkdir_path(dir, 0777))
+        g_message(_("Unable to make directory '%s': %s"),
+                  dir, g_strerror(errno));
+    else {
+        gchar *name = g_build_filename(obt_paths_cache_home(p),
+                                       "openbox", "openbox.log", NULL);
+        log_file = fopen(name, "w");
+        g_free(name);
+    }
+
+    rr_handler_id =
+        g_log_set_handler("ObRender", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL |
+                          G_LOG_FLAG_RECURSION, log_handler, NULL);
+    obt_handler_id =
+        g_log_set_handler("Obt", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL |
+                          G_LOG_FLAG_RECURSION, log_handler, NULL);
+    ob_handler_id =
+        g_log_set_handler("Openbox", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL |
+                          G_LOG_FLAG_RECURSION, log_handler, NULL);
+
+    g_free(dir);
 }
 
-void ob_debug(const gchar *a, ...)
+void ob_debug_shutdown(void)
 {
-    va_list vl;
+    g_log_remove_handler("ObRender", rr_handler_id);
+    g_log_remove_handler("Obt", obt_handler_id);
+    g_log_remove_handler("Openbox", ob_handler_id);
 
-    if (show) {
-        fprintf(stderr, "DEBUG: ");
-        va_start(vl, a);
-        vfprintf(stderr, a, vl);
-        va_end(vl);
+    if (log_file) {
+        fclose(log_file);
+        log_file = NULL;
     }
 }
-
-static gboolean enabled_types[OB_DEBUG_TYPE_NUM] = {FALSE};
 
 void ob_debug_enable(ObDebugType type, gboolean enable)
 {
@@ -50,29 +83,79 @@ void ob_debug_enable(ObDebugType type, gboolean enable)
     enabled_types[type] = enable;
 }
 
+static inline void log_print(FILE *out, const gchar* log_domain,
+                             const gchar *level, const gchar *message)
+{
+    fprintf(out, log_domain);
+    fprintf(out, "-");
+    fprintf(out, level);
+    fprintf(out, ": ");
+    fprintf(out, message);
+    fprintf(out, "\n");
+    fflush(out);
+}
+
+static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
+                        const gchar *message, gpointer data)
+{
+    FILE *out;
+    const gchar *level;
+
+    switch (log_level & G_LOG_LEVEL_MASK) {
+    case G_LOG_LEVEL_DEBUG:    level = "Debug";    out = stdout; break;
+    case G_LOG_LEVEL_INFO:     level = "Info";     out = stdout; break;
+    case G_LOG_LEVEL_MESSAGE:  level = "Message";  out = stdout; break;
+    case G_LOG_LEVEL_WARNING:  level = "Warning";  out = stderr; break;
+    case G_LOG_LEVEL_CRITICAL: level = "Critical"; out = stderr; break;
+    case G_LOG_LEVEL_ERROR:    level = "Error";    out = stderr; break;
+    default:                   g_assert_not_reached(); /* invalid level.. */
+    }
+
+    log_print(out, log_domain, level, message);
+    if (log_file) log_print(log_file, log_domain, level, message);
+}
+
+static inline void log_argv(ObDebugType type,
+                            const gchar *format, va_list args)
+{
+    const gchar *prefix;
+    gchar *message;
+
+    g_assert(type < OB_DEBUG_TYPE_NUM);
+    if (!enabled_types[type]) return;
+
+    switch (type) {
+    case OB_DEBUG_FOCUS:    prefix = "(FOCUS) ";           break;
+    case OB_DEBUG_APP_BUGS: prefix = "(APPLICATION BUG) "; break;
+    case OB_DEBUG_SM:       prefix = "(SESSION) ";         break;
+    default:                prefix = NULL;                 break;
+    }
+
+    message = g_strdup_vprintf(format, args);
+    if (prefix) {
+        gchar *a = message;
+        message = g_strconcat(prefix, message, NULL);
+        g_free(a);
+    }
+
+    g_debug(message);
+    g_free(message);
+}
+
+void ob_debug(const gchar *a, ...)
+{
+    va_list vl;
+
+    va_start(vl, a);
+    log_argv(OB_DEBUG_NORMAL, a, vl);
+    va_end(vl);
+}
+
 void ob_debug_type(ObDebugType type, const gchar *a, ...)
 {
     va_list vl;
 
-    g_assert(type < OB_DEBUG_TYPE_NUM);
-
-    if (show && enabled_types[type]) {
-        switch (type) {
-        case OB_DEBUG_FOCUS:
-            fprintf(stderr, "FOCUS: ");
-            break;
-        case OB_DEBUG_APP_BUGS:
-            fprintf(stderr, "APPLICATION BUG: ");
-            break;
-        case OB_DEBUG_SM:
-            fprintf(stderr, "SESSION: ");
-            break;
-        default:
-            g_assert_not_reached();
-        }
-
-        va_start(vl, a);
-        vfprintf(stderr, a, vl);
-        va_end(vl);
-    }
+    va_start(vl, a);
+    log_argv(type, a, vl);
+    va_end(vl);
 }

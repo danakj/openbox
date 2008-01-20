@@ -182,7 +182,7 @@ void dock_add(Window win, XWMHints *wmhints)
 
     dock_app_grab_button(app, TRUE);
 
-    ob_debug("Managed Dock App: 0x%lx (%s)\n", app->icon_win, app->class);
+    ob_debug("Managed Dock App: 0x%lx (%s)", app->icon_win, app->class);
 }
 
 void dock_remove_all(void)
@@ -206,7 +206,7 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     dock->dock_apps = g_list_remove(dock->dock_apps, app);
     dock_configure();
 
-    ob_debug("Unmanaged Dock App: 0x%lx (%s)\n", app->icon_win, app->class);
+    ob_debug("Unmanaged Dock App: 0x%lx (%s)", app->icon_win, app->class);
 
     g_free(app->name);
     g_free(app->class);

@@ -662,7 +662,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     obt_main_loop_timeout_add(ob_main_loop, REMEMBER_LAST_DESKTOP_TIME,
                               last_desktop_func, NULL, NULL, NULL);
 
-    ob_debug("Moving to desktop %d\n", num+1);
+    ob_debug("Moving to desktop %d", num+1);
 
     /* ignore enter events caused by the move */
     ignore_start = event_start_ignore_all_enters();
@@ -719,7 +719,7 @@ void screen_add_desktop(gboolean current)
                    parent - which will have to be on the same desktop */
                 !client_direct_parent(c))
             {
-                ob_debug("moving window %s\n", c->title);
+                ob_debug("moving window %s", c->title);
                 client_set_desktop(c, c->desktop+1, FALSE, TRUE);
             }
         }
@@ -760,7 +760,7 @@ void screen_remove_desktop(gboolean current)
                    parent - which will have to be on the same desktop */
                 !client_direct_parent(c))
             {
-                ob_debug("moving window %s\n", c->title);
+                ob_debug("moving window %s", c->title);
                 client_set_desktop(c, c->desktop - 1, TRUE, TRUE);
             }
             /* raise all the windows that are on the current desktop which
@@ -770,7 +770,7 @@ void screen_remove_desktop(gboolean current)
                 (d == DESKTOP_ALL || d == screen_desktop))
             {
                 stacking_raise(CLIENT_AS_WINDOW(c));
-                ob_debug("raising window %s\n", c->title);
+                ob_debug("raising window %s", c->title);
             }
         }
     }
@@ -778,7 +778,7 @@ void screen_remove_desktop(gboolean current)
     /* fallback focus like we're changing desktops */
     if (screen_desktop < screen_num_desktops - 1) {
         screen_fallback_focus();
-        ob_debug("fake desktop change\n");
+        ob_debug("fake desktop change");
     }
 
     screen_set_num_desktops(screen_num_desktops-1);

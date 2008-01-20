@@ -62,15 +62,16 @@ void focus_cycle_stop(ObClient *ifclient)
                            focus_cycle_dock_windows,
                            focus_cycle_desktop_windows))
     {
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-        focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE);
+        focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
     }
 }
 
 ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                       gboolean dock_windows, gboolean desktop_windows,
                       gboolean linear, gboolean interactive,
-                      gboolean dialog, gboolean done, gboolean cancel)
+                      gboolean showbar, gboolean dialog,
+                      gboolean done, gboolean cancel)
 {
     static ObClient *t = NULL;
     static GList *order = NULL;
@@ -128,7 +129,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
-                    focus_cycle_draw_indicator(ft);
+                    focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 if (dialog)
                     /* same arguments as focus_target_valid */
@@ -261,7 +262,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
 ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                                   gboolean desktop_windows,
                                   gboolean interactive,
-                                  gboolean dialog,
+                                  gboolean showbar, gboolean dialog,
                                   gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
@@ -307,7 +308,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         focus_cycle_target = ft;
         if (!interactive)
             goto done_cycle;
-        focus_cycle_draw_indicator(ft);
+        focus_cycle_draw_indicator(showbar ? ft : NULL);
     }
     if (focus_cycle_target && dialog)
         /* same arguments as focus_target_valid */

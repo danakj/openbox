@@ -337,13 +337,9 @@ gboolean focus_valid_target(ObClient *ft,
                   that can be focused instead */
                !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 
-    /* it's not set to skip the taskbar (unless it is a type that would be
-       expected to set this hint, or modal) */
-    ok = ok && ((ft->type == OB_CLIENT_TYPE_DOCK ||
-                 ft->type == OB_CLIENT_TYPE_DESKTOP ||
-                 ft->type == OB_CLIENT_TYPE_TOOLBAR ||
-                 ft->type == OB_CLIENT_TYPE_MENU ||
-                 ft->type == OB_CLIENT_TYPE_UTILITY) ||
+    /* it's not set to skip the taskbar (but this only applies to normal typed
+       windows, and is overridden if the window is modal) */
+    ok = ok && (ft->type != OB_CLIENT_TYPE_NORMAL ||
                 ft->modal ||
                 !ft->skip_taskbar);
 

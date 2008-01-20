@@ -59,14 +59,16 @@ static void     screen_fallback_focus(void);
 guint    screen_num_desktops;
 guint    screen_num_monitors;
 guint    screen_desktop;
-guint    screen_last_desktop;
-Size     screen_physical_size;
+guint    screen_last_desktop = 1;
 gboolean screen_showing_desktop;
 ObDesktopLayout screen_desktop_layout;
 gchar  **screen_desktop_names;
 Window   screen_support_win;
 Time     screen_desktop_user_time = CurrentTime;
 
+static Size     screen_physical_size;
+static guint    screen_old_desktop;
+static gboolean screen_desktop_timeout = TRUE;
 /*! An array of desktops, holding array of areas per monitor */
 static Rect  *monitor_area = NULL;
 /*! An array of desktops, holding an array of struts */
@@ -76,6 +78,10 @@ static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
 static ObPagerPopup *desktop_popup;
+
+/*! The number of microseconds that you need to be on a desktop before it will
+  replace the remembered "last desktop" */
+#define REMEMBER_LAST_DESKTOP_TIME 750000
 
 static gboolean replace_wm(void)
 {
@@ -283,6 +289,8 @@ gboolean screen_annex(void)
     supported[i++] = prop_atoms.net_wm_sync_request;
     supported[i++] = prop_atoms.net_wm_sync_request_counter;
 #endif
+    supported[i++] = prop_atoms.net_wm_pid;
+    supported[i++] = prop_atoms.net_wm_ping;
 
     supported[i++] = prop_atoms.kde_wm_change_state;
     supported[i++] = prop_atoms.kde_net_wm_frame_strut;
@@ -577,23 +585,90 @@ static void screen_fallback_focus(void)
     }
 }
 
+static gboolean last_desktop_func(gpointer data)
+{
+    screen_desktop_timeout = TRUE;
+    return FALSE;
+}
+
 void screen_set_desktop(guint num, gboolean dofocus)
 {
     GList *it;
-    guint old;
+    guint previous;
     gulong ignore_start;
 
     g_assert(num < screen_num_desktops);
 
-    old = screen_desktop;
+    previous = screen_desktop;
     screen_desktop = num;
 
-    if (old == num) return;
+    if (previous == num) return;
 
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_current_desktop, cardinal, num);
 
-    screen_last_desktop = old;
+    /* This whole thing decides when/how to save the screen_last_desktop so
+       that it can be restored later if you want */
+    if (screen_desktop_timeout) {
+        /* If screen_desktop_timeout is true, then we've been on this desktop
+           long enough and we can save it as the last desktop. */
+
+        /* save the "last desktop" as the "old desktop" */
+        screen_old_desktop = screen_last_desktop;
+        /* save the desktop we're coming from as the "last desktop" */
+        screen_last_desktop = previous;
+    }
+    else {
+        /* If screen_desktop_timeout is false, then we just got to this desktop
+           and we are moving away again. */
+
+        if (screen_desktop == screen_last_desktop) {
+            /* If we are moving to the "last desktop" .. */
+            if (previous == screen_old_desktop) {
+                /* .. from the "old desktop", change the last desktop to
+                   be where we are coming from */
+                screen_last_desktop = screen_old_desktop;
+            }
+            else if (screen_last_desktop == screen_old_desktop) {
+                /* .. and also to the "old desktop", change the "last
+                   desktop" to be where we are coming from */
+                screen_last_desktop = previous;
+            }
+            else {
+                /* .. from some other desktop, then set the "last desktop" to
+                   be the saved "old desktop", i.e. where we were before the
+                   "last desktop" */
+                screen_last_desktop = screen_old_desktop;
+            }
+        }
+        else {
+            /* If we are moving to any desktop besides the "last desktop"..
+               (this is the normal case) */
+            if (screen_desktop == screen_old_desktop) {
+                /* If moving to the "old desktop", which is not the
+                   "last desktop", don't save anything */
+            }
+            else if (previous == screen_old_desktop) {
+                /* If moving from the "old desktop", and not to the
+                   "last desktop", don't save anything */
+            }
+            else if (screen_last_desktop == screen_old_desktop) {
+                /* If the "last desktop" is the same as "old desktop" and
+                   you're not moving to the "last desktop" then save where
+                   we're coming from as the "last desktop" */
+                screen_last_desktop = previous;
+            }
+            else {
+                /* If the "last desktop" is different from the "old desktop"
+                   and you're not moving to the "last desktop", then don't save
+                   anything */
+            }
+        }
+    }
+    screen_desktop_timeout = FALSE;
+    ob_main_loop_timeout_remove(ob_main_loop, last_desktop_func);
+    ob_main_loop_timeout_add(ob_main_loop, REMEMBER_LAST_DESKTOP_TIME,
+                             last_desktop_func, NULL, NULL, NULL);
 
     ob_debug("Moving to desktop %d\n", num+1);
 

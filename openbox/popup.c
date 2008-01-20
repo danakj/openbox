@@ -58,6 +58,7 @@ ObPopup *popup_new(void)
     XMapWindow(ob_display, self->text);
 
     stacking_add(INTERNAL_AS_WINDOW(self));
+    g_hash_table_insert(window_map, &self->bg, self);
     return self;
 }
 
@@ -68,6 +69,7 @@ void popup_free(ObPopup *self)
         XDestroyWindow(ob_display, self->text);
         RrAppearanceFree(self->a_bg);
         RrAppearanceFree(self->a_text);
+        g_hash_table_remove(window_map, &self->bg);
         stacking_remove(self);
         g_free(self);
     }

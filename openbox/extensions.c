@@ -86,6 +86,16 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
 {
     guint i;
     gint l, r, t, b;
+    if (ob_debug_xinerama) {
+        g_print("Using fake xinerama !\n");
+        gint w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+        gint h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+        *nxin = 2;
+        *xin_areas = g_new(Rect, *nxin + 1);
+        RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
+        RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
+    }
+    else
 #ifdef XINERAMA
     if (extensions_xinerama) {
         guint i;
@@ -97,17 +107,10 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
             RECT_SET((*xin_areas)[i], info[i].x_org, info[i].y_org,
                      info[i].width, info[i].height);
         XFree(info);
-    } else
-#endif
-    if (ob_debug_xinerama) {
-        gint w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
-        gint h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
-        *nxin = 2;
-        *xin_areas = g_new(Rect, *nxin + 1);
-        RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
-        RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
     }
-    else {
+    else
+#endif
+    {
         *nxin = 1;
         *xin_areas = g_new(Rect, *nxin + 1);
         RECT_SET((*xin_areas)[0], 0, 0,

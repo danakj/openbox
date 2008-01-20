@@ -35,6 +35,9 @@
   <center>yes</center>
   <!-- whether to place windows in the center of the free area found or
        the top left corner -->
+  <active>no</active>
+  <!-- force new windows ont the active monitor on a multi-head system, unless
+       they are part of an application already on another monitor -->
 </placement>
 
 <theme>
@@ -126,7 +129,17 @@
   <popupShow>Nonpixel</popupShow>
   <!-- 'Always', 'Never', or 'Nonpixel' (xterms and such) -->
   <popupPosition>Center</popupPosition>
-  <!-- 'Center' or 'Top' -->
+  <!-- 'Center', 'Top', or 'Fixed' -->
+  <popupFixedPosition>
+    <!-- these are used if popupPosition is set to 'Fixed' -->
+
+    <x>10</x>
+    <!-- positive number for distance from left edge, negative number for
+         distance from right edge, or 'Center' -->
+    <y>10</y>
+    <!-- positive number for distance from top edge, negative number for
+         distance from bottom edge, or 'Center' -->
+  </popupFixedPosition>
 </resize>
 
 <!-- You can reserve a portion of your screen where windows will not cover when
@@ -576,6 +589,10 @@
     </mousebind>
 
     <mousebind button="Left" action="Press">
+      <action name="Focus"/>
+      <action name="Raise"/>
+    </mousebind>
+    <mousebind button="Right" action="Press">
       <action name="Focus"/>
       <action name="Raise"/>
     </mousebind>

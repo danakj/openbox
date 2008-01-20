@@ -73,6 +73,11 @@ struct _ObMenuFrame
 
     RrAppearance *a_title;
     RrAppearance *a_items;
+
+    gboolean got_press; /* don't allow a KeyRelease event to run things in the
+                           menu until it has seen a KeyPress.  this is to
+                           avoid having the keybinding used to show the menu
+                           end up running something inside the menu */
 };
 
 struct _ObMenuEntryFrame

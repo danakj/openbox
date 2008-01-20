@@ -377,10 +377,12 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         STRUT_SET(self->size,
                   self->cbwidth_l + (!self->max_horz ? self->bwidth : 0),
-                  self->cbwidth_t + self->bwidth,
+                  self->cbwidth_t +
+                  (!self->max_horz || !self->max_vert ||
+                   !self->client->undecorated ? self->bwidth : 0),
                   self->cbwidth_r + (!self->max_horz ? self->bwidth : 0),
                   self->cbwidth_b +
-                    (!self->max_horz || !self->max_vert ? self->bwidth : 0));
+                  (!self->max_horz || !self->max_vert ? self->bwidth : 0));
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
             self->size.top += ob_rr_theme->title_height + self->bwidth;
@@ -1005,6 +1007,10 @@ void frame_grab_client(ObFrame *self)
     g_hash_table_insert(window_map, &self->innertop, self->client);
     g_hash_table_insert(window_map, &self->innerright, self->client);
     g_hash_table_insert(window_map, &self->innerbottom, self->client);
+    g_hash_table_insert(window_map, &self->innerblb, self->client);
+    g_hash_table_insert(window_map, &self->innerbll, self->client);
+    g_hash_table_insert(window_map, &self->innerbrb, self->client);
+    g_hash_table_insert(window_map, &self->innerbrr, self->client);
     g_hash_table_insert(window_map, &self->title, self->client);
     g_hash_table_insert(window_map, &self->label, self->client);
     g_hash_table_insert(window_map, &self->max, self->client);
@@ -1085,6 +1091,10 @@ void frame_release_client(ObFrame *self)
     g_hash_table_remove(window_map, &self->innertop);
     g_hash_table_remove(window_map, &self->innerright);
     g_hash_table_remove(window_map, &self->innerbottom);
+    g_hash_table_remove(window_map, &self->innerblb);
+    g_hash_table_remove(window_map, &self->innerbll);
+    g_hash_table_remove(window_map, &self->innerbrb);
+    g_hash_table_remove(window_map, &self->innerbrr);
     g_hash_table_remove(window_map, &self->title);
     g_hash_table_remove(window_map, &self->label);
     g_hash_table_remove(window_map, &self->max);
@@ -1436,9 +1446,9 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->lgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
     if (win == self->handleright)       return OB_FRAME_CONTEXT_BRCORNER;
     if (win == self->rgrip)             return OB_FRAME_CONTEXT_BRCORNER;
-    if (win == self->rgripright)        return OB_FRAME_CONTEXT_BLCORNER;
-    if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BLCORNER;
-    if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->rgripright)        return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->rgriptop)          return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->rgripbottom)       return OB_FRAME_CONTEXT_BRCORNER;
     if (win == self->title)             return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->titlebottom)       return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->titleleft)         return OB_FRAME_CONTEXT_TLCORNER;
@@ -1457,6 +1467,10 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (win == self->innerleft)         return OB_FRAME_CONTEXT_LEFT;
     if (win == self->innerbottom)       return OB_FRAME_CONTEXT_BOTTOM;
     if (win == self->innerright)        return OB_FRAME_CONTEXT_RIGHT;
+    if (win == self->innerbll)          return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->innerblb)          return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->innerbrr)          return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->innerbrb)          return OB_FRAME_CONTEXT_BRCORNER;
     if (win == self->max)               return OB_FRAME_CONTEXT_MAXIMIZE;
     if (win == self->iconify)           return OB_FRAME_CONTEXT_ICONIFY;
     if (win == self->close)             return OB_FRAME_CONTEXT_CLOSE;

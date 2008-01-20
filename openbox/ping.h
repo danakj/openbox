@@ -1,8 +1,8 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   keyboard.h for the Openbox window manager
+   client.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003-2007   Dana Jansens
+   Copyright (c) 2003-2008   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,32 +17,28 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef ob__keybaord_h
-#define ob__keybaord_h
+#ifndef __ping_h
+#define __ping_h
 
-#include "keytree.h"
-#include "frame.h"
-
-#include <glib.h>
 #include <X11/Xlib.h>
+#include <glib.h>
 
 struct _ObClient;
-struct _ObActionsAct;
 
-extern KeyBindingTree *keyboard_firstnode;
+/*!
+  Notifies when the client application isn't responding to pings, or when it
+  starts responding again.
+  @param dead TRUE if the app isn't responding, FALSE if it starts responding
+              again
+*/
+typedef void (*ObPingEventHandler) (struct _ObClient *c, gboolean dead);
 
-void keyboard_startup(gboolean reconfig);
-void keyboard_shutdown(gboolean reconfig);
+void ping_startup(gboolean reconfigure);
+void ping_shutdown(gboolean reconfigure);
 
-void keyboard_rebind();
+void ping_start(struct _ObClient *c, ObPingEventHandler h);
+void ping_stop(struct _ObClient *c);
 
-void keyboard_chroot(GList *keylist);
-gboolean keyboard_bind(GList *keylist, struct _ObActionsAct *action);
-void keyboard_unbind_all();
-
-void keyboard_event(struct _ObClient *client, const XEvent *e);
-/*! @param break_chroots how many chroots to break. -1 means to break them ALL!
- */
-void keyboard_reset_chains(gint break_chroots);
+void ping_got_pong(guint32 id);
 
 #endif

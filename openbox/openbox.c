@@ -43,6 +43,7 @@
 #include "grab.h"
 #include "group.h"
 #include "config.h"
+#include "ping.h"
 #include "mainloop.h"
 #include "gettext.h"
 #include "parser/parse.h"
@@ -292,15 +293,16 @@ gint main(gint argc, gchar **argv)
             event_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
+            sn_startup(reconfigure);
+            window_startup(reconfigure);
             focus_startup(reconfigure);
             focus_cycle_startup(reconfigure);
             focus_cycle_indicator_startup(reconfigure);
             focus_cycle_popup_startup(reconfigure);
-            window_startup(reconfigure);
-            sn_startup(reconfigure);
             screen_startup(reconfigure);
             grab_startup(reconfigure);
             group_startup(reconfigure);
+            ping_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
@@ -360,6 +362,7 @@ gint main(gint argc, gchar **argv)
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
+            ping_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);
             screen_shutdown(reconfigure);
@@ -367,8 +370,8 @@ gint main(gint argc, gchar **argv)
             focus_cycle_indicator_shutdown(reconfigure);
             focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
-            sn_shutdown(reconfigure);
             window_shutdown(reconfigure);
+            sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);
@@ -470,9 +473,9 @@ static void print_version()
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
     g_print(_("Copyright (c)"));
-    g_print(" 2007        Mikael Magnusson\n");
+    g_print(" 2008        Mikael Magnusson\n");
     g_print(_("Copyright (c)"));
-    g_print(" 2003-2007   Dana Jansens\n\n");
+    g_print(" 2003-2006   Dana Jansens\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -512,7 +515,9 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 static void parse_env()
 {
     /* unset this so we don't pass it on unknowingly */
-    putenv("DESKTOP_STARTUP_ID");
+    gchar *s = g_strdup("DESKTOP_STARTUP_ID");
+    putenv(s);
+    g_free(s);
 }
 
 static void parse_args(gint *argc, gchar **argv)

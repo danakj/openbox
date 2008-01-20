@@ -124,7 +124,7 @@ static void actions_definition_unref(ObActionsDefinition *def)
     }
 }
 
-ObActionsAct* actions_build_act_from_string(const gchar *name)
+static ObActionsAct* actions_build_act_from_string(const gchar *name)
 {
     GSList *it;
     ObActionsDefinition *def = NULL;

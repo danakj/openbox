@@ -19,6 +19,8 @@
 #ifndef __window_h
 #define __window_h
 
+#include "stacking.h"
+
 #include <X11/Xlib.h>
 #include <glib.h>
 
@@ -30,7 +32,8 @@ typedef enum {
     Window_Dock,
     Window_DockApp, /* used for events but not stacking */
     Window_Client,
-    Window_Internal /* used for stacking but not events */
+    Window_Internal /* used for stacking but not events (except to filter
+                       events on the root window) */
 } Window_InternalType;
 
 struct _ObWindow
@@ -74,6 +77,6 @@ void window_startup(gboolean reconfig);
 void window_shutdown(gboolean reconfig);
 
 Window window_top(ObWindow *self);
-Window window_layer(ObWindow *self);
+ObStackingLayer window_layer(ObWindow *self);
 
 #endif

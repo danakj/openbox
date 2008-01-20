@@ -27,6 +27,12 @@
 
 struct _ObClient;
 
+typedef enum {
+    OB_RESIZE_POS_CENTER,
+    OB_RESIZE_POS_TOP,
+    OB_RESIZE_POS_FIXED
+} ObResizePopupPos;
+
 extern gboolean moveresize_in_progress;
 extern struct _ObClient *moveresize_client;
 #ifdef SYNC

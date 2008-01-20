@@ -24,6 +24,7 @@
 #include "xerror.h"
 #include "screen.h"
 #include "moveresize.h"
+#include "ping.h"
 #include "place.h"
 #include "prop.h"
 #include "extensions.h"
@@ -40,9 +41,14 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "render/render.h"
+#include "gettext.h"
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
+#endif
+
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h> /* for kill() */
 #endif
 
 #include <glib.h>
@@ -74,6 +80,10 @@ static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_colormap(ObClient *self);
+static void client_set_desktop_recursive(ObClient *self,
+                                         guint target,
+                                         gboolean donthide,
+                                         gboolean dontraise);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
@@ -93,6 +103,7 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       gboolean bylayer,
                                                       ObStackingLayer layer);
 static void client_call_notifies(ObClient *self, GSList *list);
+static void client_ping_event(ObClient *self, gboolean dead);
 
 
 void client_startup(gboolean reconfig)
@@ -450,6 +461,8 @@ void client_manage(Window window)
     g_free(monitor);
     monitor = NULL;
 
+    ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s\n",
+                  activate ? "yes" : "no");
     if (activate) {
         gboolean raise = FALSE;
 
@@ -593,6 +606,15 @@ void client_manage(Window window)
 
     /* update the list hints */
     client_set_list();
+
+    /* watch for when the application stops responding.  only do this for
+       normal windows, i.e. windows which have titlebars and close buttons 
+       and things like that.
+       we don't need to stop pinging on unmanage, because it will be handled
+       automatically by the destroy callback!
+    */
+    if (self->ping && client_normal(self))
+        ping_start(self, client_ping_event);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
@@ -759,6 +781,11 @@ void client_unmanage(ObClient *self)
            restart */
         XMapWindow(ob_display, self->window);
     }
+
+    /* these should not be left on the window ever.  other window managers
+       don't necessarily use them and it will mess them up (like compiz) */
+    PROP_ERASE(self->window, net_wm_visible_name);
+    PROP_ERASE(self->window, net_wm_visible_icon_name);
 
     /* update the list hints */
     client_set_list();
@@ -1500,6 +1527,10 @@ void client_update_protocols(ObClient *self)
                 /* if this protocol is requested, then the window will be
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
+            else if (proto[i] == prop_atoms.net_wm_ping)
+                /* if this protocol is requested, then the window will allow
+                   pings to determine if it is still alive */
+                self->ping = TRUE;
 #ifdef SYNC
             else if (proto[i] == prop_atoms.net_wm_sync_request)
                 /* if this protocol is requested, then resizing the
@@ -1524,7 +1555,7 @@ void client_update_sync_request_counter(ObClient *self)
 }
 #endif
 
-void client_get_colormap(ObClient *self)
+static void client_get_colormap(ObClient *self)
 {
     XWindowAttributes wa;
 
@@ -1634,11 +1665,16 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
         /* normal windows retain all of the possible decorations and
-           functionality, and are the only windows that you can fullscreen */
+           functionality, and can be fullscreen */
         self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
         break;
 
     case OB_CLIENT_TYPE_DIALOG:
+        /* sometimes apps make dialog windows fullscreen for some reason (for
+           e.g. kpdf does this..) */
+        self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
+        break;
+
     case OB_CLIENT_TYPE_UTILITY:
         /* these windows don't have anything added or removed by default */
         break;
@@ -1931,6 +1967,15 @@ void client_update_title(ObClient *self)
     } else
         visible = data;
 
+    if (self->not_responding) {
+        data = visible;
+        if (self->close_tried_term)
+            visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
+        else
+            visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
+        g_free(data);
+    }
+
     PROP_SETS(self->window, net_wm_visible_name, visible);
     self->title = visible;
 
@@ -1953,6 +1998,15 @@ void client_update_title(ObClient *self)
         g_free(data);
     } else
         visible = data;
+
+    if (self->not_responding) {
+        data = visible;
+        if (self->close_tried_term)
+            visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
+        else
+            visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
+        g_free(data);
+    }
 
     PROP_SETS(self->window, net_wm_visible_icon_name, visible);
     self->icon_title = visible;
@@ -2214,6 +2268,7 @@ static void client_get_session_ids(ObClient *self)
 
     if (got) {
         gchar localhost[128];
+        guint32 pid;
 
         gethostname(localhost, 127);
         localhost[127] = '\0';
@@ -2221,6 +2276,11 @@ static void client_get_session_ids(ObClient *self)
             self->client_machine = s;
         else
             g_free(s);
+
+        /* see if it has the PID set too (the PID requires that the
+           WM_CLIENT_MACHINE be set) */
+        if (PROP_GET32(self->window, net_wm_pid, cardinal, &pid))
+            self->pid = pid;
     }
 }
 
@@ -3150,41 +3210,58 @@ void client_shade(ObClient *self, gboolean shade)
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 }
 
+static void client_ping_event(ObClient *self, gboolean dead)
+{
+    self->not_responding = dead;
+    client_update_title(self);
+
+    if (!dead) {
+        /* try kill it nicely the first time again, if it started responding
+           at some point */
+        self->close_tried_term = FALSE;
+    }
+}
+
 void client_close(ObClient *self)
 {
-    XEvent ce;
-
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
     /* in the case that the client provides no means to requesting that it
        close, we just kill it */
     if (!self->delete_window)
+        /* don't use client_kill(), we should only kill based on PID in
+           response to a lack of PING replies */
+        XKillClient(ob_display, self->window);
+    else if (self->not_responding)
         client_kill(self);
-
-    /*
-      XXX: itd be cool to do timeouts and shit here for killing the client's
-      process off
-      like... if the window is around after 5 seconds, then the close button
-      turns a nice red, and if this function is called again, the client is
-      explicitly killed.
-    */
-
-    ce.xclient.type = ClientMessage;
-    ce.xclient.message_type =  prop_atoms.wm_protocols;
-    ce.xclient.display = ob_display;
-    ce.xclient.window = self->window;
-    ce.xclient.format = 32;
-    ce.xclient.data.l[0] = prop_atoms.wm_delete_window;
-    ce.xclient.data.l[1] = event_curtime;
-    ce.xclient.data.l[2] = 0l;
-    ce.xclient.data.l[3] = 0l;
-    ce.xclient.data.l[4] = 0l;
-    XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
+    else
+        /* request the client to close with WM_DELETE_WINDOW */
+        PROP_MSG_TO(self->window, self->window, wm_protocols,
+                    prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
+                    NoEventMask);
 }
 
 void client_kill(ObClient *self)
 {
-    XKillClient(ob_display, self->window);
+    if (!self->client_machine && self->pid) {
+        /* running on the local host */
+        if (!self->close_tried_term) {
+            ob_debug("killing window 0x%x with pid %lu, with SIGTERM\n",
+                     self->window, self->pid);
+            kill(self->pid, SIGTERM);
+            self->close_tried_term = TRUE;
+
+            /* show that we're trying to kill it */
+            client_update_title(self);
+        }
+        else {
+            ob_debug("killing window 0x%x with pid %lu, with SIGKILL\n",
+                     self->window, self->pid);
+            kill(self->pid, SIGKILL); /* kill -9 */
+        }
+    }
+    else
+        XKillClient(ob_display, self->window);
 }
 
 void client_hilite(ObClient *self, gboolean hilite)
@@ -3203,10 +3280,10 @@ void client_hilite(ObClient *self, gboolean hilite)
     }
 }
 
-void client_set_desktop_recursive(ObClient *self,
-                                  guint target,
-                                  gboolean donthide,
-                                  gboolean dontraise)
+static void client_set_desktop_recursive(ObClient *self,
+                                         guint target,
+                                         gboolean donthide,
+                                         gboolean dontraise)
 {
     guint old;
     GSList *it;

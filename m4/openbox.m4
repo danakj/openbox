@@ -64,7 +64,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
     if test "$GCC" = "yes"; then
 	AC_MSG_RESULT([yes])
 	if test "$DEBUG" = "yes"; then
-	    FLAGS="$FLAGS -O0 -g3 -fno-inline -Wwrite-strings"
+	    FLAGS="$FLAGS -O0 -ggdb -fno-inline -Wwrite-strings"
 	    FLAGS="$FLAGS -Wall -Wsign-compare -Waggregate-return"
 	    FLAGS="$FLAGS -Wcast-qual -Wbad-function-cast -Wpointer-arith"
             # for Python.h

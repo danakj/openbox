@@ -19,11 +19,11 @@
 
 #include "ping.h"
 #include "client.h"
-#include "prop.h"
 #include "event.h"
 #include "debug.h"
-#include "mainloop.h"
 #include "openbox.h"
+#include "obt/mainloop.h"
+#include "obt/prop.h"
 
 typedef struct _ObPingTarget
 {
@@ -78,8 +78,8 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     t->client = client;
     t->h = h;
 
-    ob_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
-                             t, g_direct_equal, NULL);
+    obt_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
+                              t, g_direct_equal, NULL);
     /* act like we just timed out immediately, to start the pinging process
        now instead of after the first delay.  this makes sure the client
        ends up in the ping_ids hash table now. */
@@ -132,9 +132,9 @@ static void ping_send(ObPingTarget *t)
     }
 
     /*ob_debug("+PING: '%s' (id %u)\n", t->client->title, t->id);*/
-    PROP_MSG_TO(t->client->window, t->client->window, wm_protocols,
-                prop_atoms.net_wm_ping, t->id, t->client->window, 0, 0,
-                NoEventMask);
+    OBT_PROP_MSG_TO(t->client->window, t->client->window, WM_PROTOCOLS,
+                    OBT_PROP_ATOM(NET_WM_PING), t->id, t->client->window, 0, 0,
+                    NoEventMask);
 }
 
 static gboolean ping_timeout(gpointer data)
@@ -159,7 +159,8 @@ static void ping_end(ObClient *client, gpointer data)
     if ((t = g_hash_table_find(ping_ids, find_client, client))) {
         g_hash_table_remove(ping_ids, &t->id);
 
-        ob_main_loop_timeout_remove_data(ob_main_loop, ping_timeout, t, FALSE);
+        obt_main_loop_timeout_remove_data(ob_main_loop, ping_timeout,
+                                          t, FALSE);
 
         g_free(t);
     }

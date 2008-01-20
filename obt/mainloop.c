@@ -536,7 +536,7 @@ static void insert_timer(ObtMainLoop *loop, ObtMainLoopTimer *ins)
 {
     GSList *it;
     for (it = loop->timers; it; it = g_slist_next(it)) {
-        ObMainLoopTimer *t = it->data;
+        ObtMainLoopTimer *t = it->data;
         if (timecompare(&ins->timeout, &t->timeout) <= 0) {
             loop->timers = g_slist_insert_before(loop->timers, it, ins);
             break;
@@ -553,7 +553,7 @@ void obt_main_loop_timeout_add(ObtMainLoop *loop,
                                GEqualFunc cmp,
                                GDestroyNotify notify)
 {
-    ObMainLoopTimer *t = g_new(ObMainLoopTimer, 1);
+    ObtMainLoopTimer *t = g_new(ObtMainLoopTimer, 1);
 
     g_assert(microseconds > 0); /* if it's 0 it'll cause an infinite loop */
 

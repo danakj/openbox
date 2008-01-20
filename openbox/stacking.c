@@ -129,7 +129,7 @@ void stacking_temp_raise(ObWindow *window)
     }
 
     win[1] = window_top(window);
-    XRestackWindows(ob_display, win, 2);
+    XRestackWindows(obt_display, win, 2);
 
     pause_changes = TRUE;
 }
@@ -144,7 +144,7 @@ void stacking_restore(void)
     win[0] = screen_support_win;
     for (i = 1, it = stacking_list; it; ++i, it = g_list_next(it))
         win[i] = window_top(it->data);
-    XRestackWindows(ob_display, win, i);
+    XRestackWindows(obt_display, win, i);
     g_free(win);
 
     pause_changes = FALSE;

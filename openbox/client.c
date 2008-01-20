@@ -783,8 +783,8 @@ void client_unmanage(ObClient *self)
 
     /* these should not be left on the window ever.  other window managers
        don't necessarily use them and it will mess them up (like compiz) */
-    PROP_ERASE(self->window, net_wm_visible_name);
-    PROP_ERASE(self->window, net_wm_visible_icon_name);
+    OBT_PROP_ERASE(self->window, NET_WM_VISIBLE_NAME);
+    OBT_PROP_ERASE(self->window, NET_WM_VISIBLE_ICON_NAME);
 
     /* update the list hints */
     client_set_list();
@@ -1528,7 +1528,7 @@ void client_update_protocols(ObClient *self)
                 /* if this protocol is requested, then the window will be
                    notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
-            else if (proto[i] == prop_atoms.net_wm_ping)
+            else if (proto[i] == OBT_PROP_ATOM(NET_WM_PING))
                 /* if this protocol is requested, then the window will allow
                    pings to determine if it is still alive */
                 self->ping = TRUE;
@@ -2282,7 +2282,7 @@ static void client_get_session_ids(ObClient *self)
 
         /* see if it has the PID set too (the PID requires that the
            WM_CLIENT_MACHINE be set) */
-        if (PROP_GET32(self->window, net_wm_pid, cardinal, &pid))
+        if (OBT_PROP_GET32(self->window, NET_WM_PID, CARDINAL, &pid))
             self->pid = pid;
     }
 }
@@ -3240,8 +3240,8 @@ void client_close(ObClient *self)
     else
         /* request the client to close with WM_DELETE_WINDOW */
         OBT_PROP_MSG_TO(self->window, self->window, WM_PROTOCOLS,
-                        OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime, 0, 0,
-                        NoEventMask);
+                        OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime,
+                        0, 0, 0, NoEventMask);
 }
 
 void client_kill(ObClient *self)

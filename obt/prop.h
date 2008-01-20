@@ -267,10 +267,10 @@ void obt_prop_message_to(Window to, Window about, Atom messagetype,
                       data0, data1, data2, data3, data4, \
                       SubstructureNotifyMask | SubstructureRedirectMask))
 
-#define OBT_PROP_MSG(to, about, msgtype, data0, data1, data2, data3, \
-                     data4, mask) \
-    (obt_prop_message_to(to, OBT_PROP_ATOM(msgtype), \
-                      data0, data1, data2, data3, data4, mask))
+#define OBT_PROP_MSG_TO(to, about, msgtype, data0, data1, data2, data3, \
+                        data4, mask) \
+    (obt_prop_message_to(to, about, OBT_PROP_ATOM(msgtype), \
+                         data0, data1, data2, data3, data4, mask))
 
 G_END_DECLS
 

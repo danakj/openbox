@@ -19,9 +19,11 @@
 #ifndef ob__resist_h
 #define ob__resist_h
 
-struct _ObClient;
+#include "misc.h"
 
 #include <glib.h>
+
+struct _ObClient;
 
 /*! @x The client's x destination (in the client's coordinates, not the frame's
     @y The client's y destination (in the client's coordinates, not the frame's

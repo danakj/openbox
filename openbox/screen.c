@@ -24,7 +24,6 @@
 #include "startupnotify.h"
 #include "moveresize.h"
 #include "config.h"
-#include "mainloop.h"
 #include "screen.h"
 #include "client.h"
 #include "session.h"
@@ -36,6 +35,7 @@
 #include "gettext.h"
 #include "obt/display.h"
 #include "obt/prop.h"
+#include "obt/mainloop.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -661,9 +661,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
     screen_desktop_timeout = FALSE;
-    ob_main_loop_timeout_remove(ob_main_loop, last_desktop_func);
-    ob_main_loop_timeout_add(ob_main_loop, REMEMBER_LAST_DESKTOP_TIME,
-                             last_desktop_func, NULL, NULL, NULL);
+    obt_main_loop_timeout_remove(ob_main_loop, last_desktop_func);
+    obt_main_loop_timeout_add(ob_main_loop, REMEMBER_LAST_DESKTOP_TIME,
+                              last_desktop_func, NULL, NULL, NULL);
 
     ob_debug("Moving to desktop %d\n", num+1);
 
@@ -922,15 +922,15 @@ void screen_show_desktop_popup(guint d)
                           MAX(a->width/3, POPUP_WIDTH));
     pager_popup_show(desktop_popup, screen_desktop_names[d], d);
 
-    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
-    ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
-                             hide_desktop_popup_func, NULL, NULL, NULL);
+    obt_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    obt_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
+                              hide_desktop_popup_func, NULL, NULL, NULL);
     g_free(a);
 }
 
 void screen_hide_desktop_popup(void)
 {
-    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    obt_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
     pager_popup_hide(desktop_popup);
 }
 

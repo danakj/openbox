@@ -644,8 +644,7 @@ static void event_process(const XEvent *ec, gpointer data)
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
         ob_debug("Kepboard map changed. Reloading keyboard bindings.\n");
-        modkeys_shutdown(TRUE);
-        modkeys_startup(TRUE);
+        obt_keyboard_reload();
         keyboard_rebind();
     }
     else if (e->type == ClientMessage) {
@@ -769,8 +768,8 @@ static void event_handle_root(XEvent *e)
                 ob_restart();
             else if (e->xclient.data.l[0] == 3)
                 ob_exit(0);
-        } else if (msgtype == prop_atoms.wm_protocols) {
-            if ((Atom)e->xclient.data.l[0] == prop_atoms.net_wm_ping)
+        } else if (msgtype == OBT_PROP_ATOM(WM_PROTOCOLS)) {
+            if ((Atom)e->xclient.data.l[0] == OBT_PROP_ATOM(NET_WM_PING))
                 ping_got_pong(e->xclient.data.l[1]);
         }
         break;

@@ -197,7 +197,7 @@ KeyCode obt_keyboard_keysym_to_keycode(KeySym sym)
     return 0;
 }
 
-const gchar *obt_keyboard_keycode_to_string(guint keycode)
+gchar *obt_keyboard_keycode_to_string(guint keycode)
 {
     KeySym sym;
     const gchar *ret = NULL;
@@ -211,7 +211,7 @@ gunichar obt_keyboard_keycode_to_unichar(guint keycode)
 {
     gunichar unikey = 0;
 
-    const char *key;
+    char *key;
     if ((key = obt_keyboard_keycode_to_string(keycode)) != NULL &&
         /* don't accept keys that aren't a single letter, like "space" */
         key[1] == '\0')

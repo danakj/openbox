@@ -40,7 +40,6 @@
 #include "group.h"
 #include "config.h"
 #include "ping.h"
-#include "mainloop.h"
 #include "gettext.h"
 #include "render/render.h"
 #include "render/theme.h"

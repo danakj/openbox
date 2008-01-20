@@ -226,7 +226,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                     }
 
                 if (x_pos_given && (c = obt_parse_find_node(n->children, "y")))
-                    if (!obt_parse_node_contains("default", doc, c)) {
+                    if (!obt_parse_node_contains(c, "default")) {
                         config_parse_gravity_coord(c, &settings->position.y);
                         settings->pos_given = TRUE;
                     }

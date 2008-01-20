@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    obt/display.c for the Openbox window manager
-   Copyright (c) 2007        Dana Jansens
+   Copyright (c) 2007-2008   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ gboolean obt_display_extension_randr     = FALSE;
 gint     obt_display_extension_randr_basep;
 gboolean obt_display_extension_sync      = FALSE;
 gint     obt_display_extension_sync_basep;
+gboolean obt_display_extension_composite = FALSE;
+gint     obt_display_extension_composite_basep;
 
 static gint xerror_handler(Display *d, XErrorEvent *e);
 
@@ -107,6 +109,22 @@ gboolean obt_display_open(const char *display_name)
         if (!obt_display_extension_sync)
             g_message("X Sync extension is not present on the server or is an "
                       "incompatible version");
+#endif
+
+#ifdef USE_XCOMPOSITE
+        if (XCompositeQueryExtension(d, &obt_display_extension_composite_basep,
+                                     &junk))
+        {
+            gint major = 0, minor = 2;
+            XCompositeQueryVersion(d, &major, &minor);
+            /* Version 0.2 is the first version to have the
+               XCompositeNameWindowPixmap() request. */
+            if (major > 0 || minor >= 2)
+                obt_display_extension_composite = TRUE;
+        }
+        if (!obt_display_extension_composite)
+            g_message("X Composite extension is not present on the server or "
+                      "is an incompatible version");
 #endif
 
         obt_prop_startup();

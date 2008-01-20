@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    obt/display.h for the Openbox window manager
-   Copyright (c) 2007        Dana Jansens
+   Copyright (c) 2007-2008   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,12 @@
 #ifdef    SYNC
 #include <X11/extensions/sync.h>
 #endif
+#ifdef    USE_COMPOSITING
+#include <X11/extensions/Xcomposite.h>
+#include <X11/extensions/Xdamage.h>
+#include <X11/extensions/Xrender.h>
+#include <X11/extensions/Xfixes.h>
+#endif
 
 G_BEGIN_DECLS
 
@@ -53,6 +59,14 @@ extern gboolean obt_display_extension_randr;
 extern gint     obt_display_extension_randr_basep;
 extern gboolean obt_display_extension_sync;
 extern gint     obt_display_extension_sync_basep;
+extern gboolean obt_display_extension_composite;
+extern gint     obt_display_extension_composite_basep;
+extern gboolean obt_display_extension_damage;
+extern gint     obt_display_extension_damage_basep;
+extern gboolean obt_display_extension_render;
+extern gint     obt_display_extension_render_basep;
+extern gboolean obt_display_extension_fixes;
+extern gint     obt_display_extension_fixes_basep;
 
 extern Display* obt_display;
 

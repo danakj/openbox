@@ -217,6 +217,75 @@ fi
 
 AM_CONDITIONAL(USE_IMLIB2, [test $imlib2_found = yes])
 
+AC_ARG_ENABLE(compositing,
+  AC_HELP_STRING(
+    [--disable-compositing],
+    [disable the built-in compositing manager [[default=enabled]]]
+  ),
+  [enable_compositing=$enableval],
+  [enable_compositing=yes]
+)
+
+AC_MSG_CHECKING(if compositing manager support should be enabled)
+AC_MSG_RESULT($enable_compositing)
+
+if test "$enable_compositing" = yes; then
+  PKG_CHECK_MODULES(XCOMPOSITE, [xcomposite])
+  AC_SUBST(XCOMPOSITE_CFLAGS)
+  AC_SUBST(XCOMPOSITE_LIBS)
+
+  PKG_CHECK_MODULES([XRENDER], [xrender])
+  AC_SUBST(XRENDER_CFLAGS)
+  AC_SUBST(XRENDER_LIBS)
+
+  PKG_CHECK_MODULES(XDAMAGE, [xdamage])
+  AC_SUBST(XDAMAGE_CFLAGS)
+  AC_SUBST(XDAMAGE_LIBS)
+
+  PKG_CHECK_MODULES(XFIXES, [xfixes])
+  AC_SUBST(XDAMAGE_CFLAGS)
+  AC_SUBST(XDAMAGE_LIBS)
+
+  AC_MSG_CHECKING(for GL_CFLAGS)
+  AC_ARG_WITH(gl-cflags, [  --with-gl-cflags=CFLAGS ],
+                         [GL_CFLAGS="$withval"],
+                         [GL_CFLAGS=""])
+
+  AC_MSG_RESULT($GL_CFLAGS)
+  AC_MSG_CHECKING(for GL_LIBS)
+  AC_ARG_WITH(gl-libs, [  --with-gl-libs=LIBS ],
+                       [GL_LIBS="$withval"],
+                       [GL_LIBS="-lGL"])
+  AC_MSG_RESULT($GL_LIBS)
+
+  AC_CHECK_LIB([GL], [glPopMatrix], ,
+    AC_MSG_ERROR([Could not find glPopMatrix in -lGL.]))
+
+  AC_MSG_CHECKING([for GL/gl.h])
+  AC_TRY_COMPILE(
+    [#include <GL/gl.h>],
+    [GLenum e = GL_INVALID_ENUM;],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+     AC_MSG_ERROR([Could not compile with GL/gl.h])])
+
+  AC_MSG_CHECKING([for GL/glx.h])
+  AC_TRY_COMPILE(
+    [#include <GL/glx.h>],
+    [int i = GLX_USE_GL;],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+     AC_MSG_ERROR([Could not compile with GL/glx.h])])
+
+  AC_SUBST(GL_CFLAGS)
+  AC_SUBST(GL_LIBS)
+
+  AC_DEFINE(USE_COMPOSITING, [1], [Support being a compositing manager])
+  do_compositing="yes"
+else
+  do_compositing="no"
+fi
+
 dnl Check for session management
 X11_SM
 
@@ -255,5 +324,6 @@ AC_MSG_RESULT([Compiling with these options:
                X Cursor Library... $xcursor_found
                Session Management... $SM
                Imlib2 library... $imlib2_found
+	       Compositing manager... $do_compositing
                ])
 AC_MSG_RESULT([configure complete, now type "make"])

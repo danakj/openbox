@@ -159,6 +159,9 @@ obt_libobt_la_CPPFLAGS = \
 	$(XRANDR_CFLAGS) \
 	$(XSHAPE_CFLAGS) \
 	$(XSYNC_CFLAGS) \
+	$(XRENDER_CFLAGS) \
+	$(XDAMAGE_CFLAGS) \
+	$(XCOMPOSITE_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DG_LOG_DOMAIN=\"Obt\" \
@@ -173,6 +176,9 @@ obt_libobt_la_LIBADD = \
 	$(XRANDR_LIBS) \
 	$(XSHAPE_LIBS) \
 	$(XSYNC_LIBS) \
+	$(XRENDER_LIBS) \
+	$(XDAMAGE_LIBS) \
+	$(XCOMPOSITE_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
 obt_libobt_la_SOURCES = \

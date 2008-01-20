@@ -27,8 +27,11 @@ void sn_shutdown(gboolean reconfig);
 
 gboolean sn_app_starting();
 
-/*! Notify that an app has started */
-Time sn_app_started(const gchar *id, const gchar *wmclass);
+/*! Notify that an app has started
+  @param wmclass the WM_CLASS[1] hint
+  @param name the WM_CLASS[0] hint
+ */
+Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name);
 
 /*! Get the desktop requested via the startup-notiication protocol if one
   was requested */

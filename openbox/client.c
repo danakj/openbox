@@ -313,7 +313,7 @@ void client_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* tell startup notification that this app started */
-    launch_time = sn_app_started(self->startup_id, self->class);
+    launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */

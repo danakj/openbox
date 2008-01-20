@@ -28,7 +28,7 @@
 void sn_startup(gboolean reconfig) {}
 void sn_shutdown(gboolean reconfig) {}
 gboolean sn_app_starting() { return FALSE; }
-Time sn_app_started(const gchar *id, const gchar *wmclass)
+Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
 {
     return CurrentTime;
 }
@@ -169,7 +169,7 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
         screen_set_root_cursor();
 }
 
-Time sn_app_started(const gchar *id, const gchar *wmclass)
+Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
 {
     GSList *it;
     Time t = CurrentTime;
@@ -193,13 +193,22 @@ Time sn_app_started(const gchar *id, const gchar *wmclass)
                 found = TRUE;
         } else {
             seqclass = sn_startup_sequence_get_wmclass(seq);
-            seqname = sn_startup_sequence_get_name(seq);
             seqbin = sn_startup_sequence_get_binary_name(seq);
 
-            if ((seqname && !g_ascii_strcasecmp(seqname, wmclass)) ||
+            /* seqclass = "a string to match against the "resource name" or
+               "resource class" hints.  These are WM_CLASS[0] and WM_CLASS[1]"
+               - from the startup-notification spec
+            */
+            if ((seqclass && !strcmp(seqclass, wmclass)) ||
+                (seqclass && !strcmp(seqclass, name)) ||
+                /* Check the binary name against the class and name hints
+                   as well, to help apps that don't have the class set
+                   correctly */
                 (seqbin && !g_ascii_strcasecmp(seqbin, wmclass)) ||
-                (seqclass && !strcmp(seqclass, wmclass)))
+                (seqbin && !g_ascii_strcasecmp(seqbin, name)))
+            {
                 found = TRUE;
+            }
         }
 
         if (found) {

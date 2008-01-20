@@ -302,8 +302,7 @@ gint main(gint argc, gchar **argv)
                 /* focus what was focused if a wm was already running */
                 if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
                                    NET_ACTIVE_WINDOW, WINDOW, &xid) &&
-                    (w = g_hash_table_lookup(window_map, &xid)) &&
-                    WINDOW_IS_CLIENT(w))
+                    (w = window_find(xid)) && WINDOW_IS_CLIENT(w))
                 {
                     client_focus(WINDOW_AS_CLIENT(w));
                 }

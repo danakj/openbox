@@ -77,7 +77,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     XSetWindowAttributes attr;
 
     self = g_new0(ObMenuFrame, 1);
-    self->type = Window_Menu;
+    self->type = OB_WINDOW_CLASS_MENUFRAME;
     self->menu = menu;
     self->selected = NULL;
     self->client = client;
@@ -95,7 +95,8 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
 
-    stacking_add(MENU_AS_WINDOW(self));
+    window_add(&self->window, MENUFRAME_AS_WINDOW(self));
+    stacking_add(MENUFRAME_AS_WINDOW(self));
 
     return self;
 }
@@ -108,7 +109,8 @@ void menu_frame_free(ObMenuFrame *self)
             self->entries = g_list_delete_link(self->entries, self->entries);
         }
 
-        stacking_remove(MENU_AS_WINDOW(self));
+        stacking_remove(MENUFRAME_AS_WINDOW(self));
+        window_remove(self->window);
 
         XDestroyWindow(obt_display, self->window);
 
@@ -179,6 +181,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     self->a_text_title =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_title);
 
+    window_add(&self->window, MENUFRAME_AS_WINDOW(self->frame));
+
     return self;
 }
 
@@ -186,6 +190,8 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
 {
     if (self) {
         menu_entry_unref(self->entry);
+
+        window_remove(self->window);
 
         XDestroyWindow(obt_display, self->text);
         XDestroyWindow(obt_display, self->window);

@@ -23,7 +23,7 @@
 #include "client.h"
 #include "frame.h"
 
-GHashTable *window_map;
+static GHashTable *window_map;
 
 static guint window_hash(Window *w) { return *w; }
 static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
@@ -46,18 +46,14 @@ void window_shutdown(gboolean reconfig)
 Window window_top(ObWindow *self)
 {
     switch (self->type) {
-    case Window_Menu:
-        return ((ObMenuFrame*)self)->window;
-    case Window_Dock:
-        return ((ObDock*)self)->frame;
-    case Window_DockApp:
-        /* not to be used for stacking */
-        g_assert_not_reached();
-        break;
-    case Window_Client:
-        return ((ObClient*)self)->frame->window;
-    case Window_Internal:
-        return ((InternalWindow*)self)->win;
+    case OB_WINDOW_CLASS_MENUFRAME:
+        return WINDOW_AS_MENUFRAME(self)->window;
+    case OB_WINDOW_CLASS_DOCK:
+        return WINDOW_AS_DOCK(self)->frame;
+    case OB_WINDOW_CLASS_CLIENT:
+        return WINDOW_AS_CLIENT(self)->frame->window;
+    case OB_WINDOW_CLASS_INTERNALWINDOW:
+        return WINDOW_AS_INTERNALWINDOW(self)->window;
     }
     g_assert_not_reached();
     return None;
@@ -66,19 +62,33 @@ Window window_top(ObWindow *self)
 ObStackingLayer window_layer(ObWindow *self)
 {
     switch (self->type) {
-    case Window_Menu:
-        return OB_STACKING_LAYER_INTERNAL;
-    case Window_Dock:
+    case OB_WINDOW_CLASS_DOCK:
         return config_dock_layer;
-    case Window_DockApp:
-        /* not to be used for stacking */
-        g_assert_not_reached();
-        break;
-    case Window_Client:
+    case OB_WINDOW_CLASS_CLIENT:
         return ((ObClient*)self)->layer;
-    case Window_Internal:
+    case OB_WINDOW_CLASS_MENUFRAME:
+    case OB_WINDOW_CLASS_INTERNALWINDOW:
         return OB_STACKING_LAYER_INTERNAL;
     }
     g_assert_not_reached();
     return None;
+}
+
+ObWindow* window_find(Window xwin)
+{
+    g_assert(xwin != None);
+    return g_hash_table_lookup(window_map, &xwin);
+}
+
+void window_add(Window *xwin, ObWindow *win)
+{
+    g_assert(xwin != NULL);
+    g_assert(win != NULL);
+    g_hash_table_insert(window_map, xwin, win);
+}
+
+void window_remove(Window xwin)
+{
+    g_assert(xwin != None);
+    g_hash_table_remove(window_map, &xwin);
 }

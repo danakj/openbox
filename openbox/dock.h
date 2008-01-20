@@ -47,8 +47,6 @@ struct _ObDock
 };
 
 struct _ObDockApp {
-    ObWindow obwin;
-
     gint ignore_unmaps;
 
     Window icon_win;
@@ -80,5 +78,7 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e);
 void dock_app_configure(ObDockApp *app, gint w, gint h);
 
 void dock_get_area(Rect *a);
+
+ObDockApp* dock_find_dockapp(Window xwin);
 
 #endif

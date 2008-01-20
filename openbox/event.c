@@ -335,7 +335,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
            but has disappeared.
         */
         if (in_client_only) {
-            ObWindow *w = g_hash_table_lookup(window_map, &e->xfocus.window);
+            ObWindow *w = window_find(e->xfocus.window);
             if (!w || !WINDOW_IS_CLIENT(w))
                 return FALSE;
         }
@@ -463,26 +463,24 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
-    if ((obwin = g_hash_table_lookup(window_map, &window))) {
+    if ((obwin = window_find(window))) {
         switch (obwin->type) {
-        case Window_Dock:
+        case OB_WINDOW_CLASS_DOCK:
             dock = WINDOW_AS_DOCK(obwin);
             break;
-        case Window_DockApp:
-            dockapp = WINDOW_AS_DOCKAPP(obwin);
-            break;
-        case Window_Client:
+        case OB_WINDOW_CLASS_CLIENT:
             client = WINDOW_AS_CLIENT(obwin);
             break;
-        case Window_Menu:
-            /* not to be used for events */
-            g_assert_not_reached();
+        case OB_WINDOW_CLASS_MENUFRAME:
+            /* XXX use this to handle events more uniformly */
             break;
-        case Window_Internal:
+        case OB_WINDOW_CLASS_INTERNALWINDOW:
             /* we don't do anything with events directly on these windows */
             break;
         }
     }
+    else
+        dockapp = dock_find_dockapp(window);
 
     event_set_curtime(e);
     event_curserial = e->xany.serial;
@@ -713,8 +711,8 @@ static void event_process(const XEvent *ec, gpointer data)
         else {
             ObWindow *w;
 
-            if ((w = g_hash_table_lookup(window_map, &e->xbutton.subwindow)) &&
-                WINDOW_IS_INTERNAL(w))
+            if ((w = window_find(e->xbutton.subwindow)) &&
+                WINDOW_IS_INTERNALWINDOW(w))
             {
                 event_handle_user_input(client, e);
             }
@@ -1113,8 +1111,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             /* get the sibling */
             if (e->xconfigurerequest.value_mask & CWSibling) {
                 ObWindow *win;
-                win = g_hash_table_lookup(window_map,
-                                          &e->xconfigurerequest.above);
+                win = window_find(e->xconfigurerequest.above);
                 if (win && WINDOW_IS_CLIENT(win) &&
                     WINDOW_AS_CLIENT(win) != client)
                 {
@@ -1447,8 +1444,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             } else {
                 ObClient *sibling = NULL;
                 if (e->xclient.data.l[1]) {
-                    ObWindow *win = g_hash_table_lookup
-                        (window_map, &e->xclient.data.l[1]);
+                    ObWindow *win = window_find(e->xclient.data.l[1]);
                     if (WINDOW_IS_CLIENT(win) &&
                         WINDOW_AS_CLIENT(win) != client)
                     {

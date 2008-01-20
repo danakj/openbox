@@ -78,7 +78,7 @@ void dock_startup(gboolean reconfig)
                       0, 0, 0, 0, 0, 0, 0, 0);
 
     dock = g_new0(ObDock, 1);
-    dock->obwin.type = Window_Dock;
+    dock->obwin.type = OB_WINDOW_CLASS_DOCK;
 
     dock->hidden = TRUE;
 
@@ -102,7 +102,7 @@ void dock_startup(gboolean reconfig)
     OBT_PROP_SET32(dock->frame, NET_WM_WINDOW_TYPE, ATOM,
                    OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK));
 
-    g_hash_table_insert(window_map, &dock->frame, dock);
+    window_add(&dock->frame, DOCK_AS_WINDOW(dock));
     stacking_add(DOCK_AS_WINDOW(dock));
 }
 
@@ -120,7 +120,7 @@ void dock_shutdown(gboolean reconfig)
 
     XDestroyWindow(obt_display, dock->frame);
     RrAppearanceFree(dock->a_frame);
-    g_hash_table_remove(window_map, &dock->frame);
+    window_remove(dock->frame);
     stacking_remove(dock);
 }
 
@@ -131,7 +131,6 @@ void dock_add(Window win, XWMHints *wmhints)
     gchar **data;
 
     app = g_new0(ObDockApp, 1);
-    app->obwin.type = Window_DockApp;
     app->win = win;
     app->icon_win = (wmhints->flags & IconWindowHint) ?
         wmhints->icon_window : win;
@@ -184,8 +183,6 @@ void dock_add(Window win, XWMHints *wmhints)
 
     dock_app_grab_button(app, TRUE);
 
-    g_hash_table_insert(window_map, &app->icon_win, app);
-
     ob_debug("Managed Dock App: 0x%lx (%s)\n", app->icon_win, app->class);
 }
 
@@ -202,8 +199,6 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     /* remove the window from our save set */
     XChangeSaveSet(obt_display, app->icon_win, SetModeDelete);
     XSync(obt_display, False);
-
-    g_hash_table_remove(window_map, &app->icon_win);
 
     if (reparent)
         XReparentWindow(obt_display, app->icon_win,
@@ -653,4 +648,18 @@ void dock_get_area(Rect *a)
 {
     RECT_SET(*a, dock->area.x, dock->area.y,
              dock->area.width, dock->area.height);
+}
+
+ObDockApp* dock_find_dockapp(Window xwin)
+{
+    g_assert(xwin != None);
+    GList *it;
+    /* there are never that many dock apps, so we can use a list here instead
+       of a hash table */
+    for (it = dock->dock_apps; it; it = g_list_next(it)) {
+        ObDockApp *app = it->data;
+        if (app->icon_win == xwin)
+            return app;
+    }
+    return NULL;
 }

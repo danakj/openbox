@@ -274,7 +274,7 @@ void client_manage(Window window)
     /* create the ObClient struct, and populate it from the hints on the
        window */
     self = g_new0(ObClient, 1);
-    self->obwin.type = Window_Client;
+    self->obwin.type = OB_WINDOW_CLASS_CLIENT;
     self->window = window;
 
     /* non-zero defaults */
@@ -597,7 +597,7 @@ void client_manage(Window window)
 
     /* add to client list/map */
     client_list = g_list_append(client_list, self);
-    g_hash_table_insert(window_map, &self->window, self);
+    window_add(&self->window, CLIENT_AS_WINDOW(self));
 
     /* this has to happen after we're in the client_list */
     if (STRUT_EXISTS(self->strut))
@@ -705,7 +705,7 @@ void client_unmanage(ObClient *self)
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
-    g_hash_table_remove(window_map, &self->window);
+    window_remove(self->window);
 
     /* once the client is out of the list, update the struts to remove its
        influence */
@@ -1285,13 +1285,13 @@ void client_update_transient_for(ObClient *self)
 
     if (XGetTransientForHint(obt_display, self->window, &t)) {
         if (t != self->window) { /* cant be transient to itself! */
-            target = g_hash_table_lookup(window_map, &t);
+            ObWindow *tw = window_find(t);
             /* if this happens then we need to check for it*/
-            g_assert(target != self);
-            if (target && !WINDOW_IS_CLIENT(target)) {
-                /* this can happen when a dialog is a child of
-                   a dockapp, for example */
-                target = NULL;
+            g_assert(tw != CLIENT_AS_WINDOW(self));
+            if (target && WINDOW_IS_CLIENT(tw)) {
+                /* watch out for windows with a parent that is something
+                   different, like a dockapp for example */
+                target = WINDOW_AS_CLIENT(tw);
             }
         }
 

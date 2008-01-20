@@ -58,14 +58,7 @@ static void sn_event_func(SnMonitorEvent *event, gpointer data);
 
 void sn_startup(gboolean reconfig)
 {
-    gchar *s;
-
     if (reconfig) return;
-
-    /* unset this so we don't pass it on unknowingly */
-    s = g_strdup("DESKTOP_STARTUP_ID");
-    putenv(s);
-    g_free(s);
 
     sn_display = sn_display_new(ob_display, NULL, NULL);
     sn_context = sn_monitor_context_new(sn_display, ob_screen,

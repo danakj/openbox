@@ -99,7 +99,8 @@ void session_startup(gint argc, gchar **argv)
     sm_argv = argv;
 
     p = obt_paths_new();
-    dir = g_build_filename(obt_paths_data_home(p), "openbox", "sessions",NULL);
+    dir = g_build_filename(obt_paths_cache_home(p),
+                           "openbox", "sessions", NULL);
     obt_paths_unref(p), p = NULL;
 
     if (!obt_paths_mkdir_path(dir, 0700)) {

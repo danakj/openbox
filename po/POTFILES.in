@@ -14,4 +14,3 @@ openbox/screen.c
 openbox/session.c
 openbox/startupnotify.c
 openbox/translate.c
-openbox/xerror.c

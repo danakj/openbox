@@ -31,6 +31,7 @@ void obt_paths_unref(ObtPaths *p);
 
 const gchar* obt_paths_config_home(ObtPaths *p);
 const gchar* obt_paths_data_home(ObtPaths *p);
+const gchar* obt_paths_cache_home(ObtPaths *p);
 GSList* obt_paths_config_dirs(ObtPaths *p);
 GSList* obt_paths_data_dirs(ObtPaths *p);
 

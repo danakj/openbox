@@ -34,6 +34,7 @@ struct _ObtPaths
     gint   ref;
     gchar  *config_home;
     gchar  *data_home;
+    gchar  *cache_home;
     GSList *config_dirs;
     GSList *data_dirs;
 };
@@ -95,6 +96,12 @@ ObtPaths* obt_paths_new(void)
         p->data_home = g_build_filename(g_get_home_dir(), ".local",
                                         "share", NULL);
 
+    path = g_getenv("XDG_CACHE_HOME");
+    if (path && path[0] != '\0') /* not unset or empty */
+        p->cache_home = g_build_filename(path, NULL);
+    else
+        p->cache_home = g_build_filename(g_get_home_dir(), ".cache", NULL);
+
     path = g_getenv("XDG_CONFIG_DIRS");
     if (path && path[0] != '\0') /* not unset or empty */
         p->config_dirs = split_paths(path);
@@ -154,6 +161,7 @@ void obt_paths_unref(ObtPaths *p)
         g_slist_free(p->data_dirs);
         g_free(p->config_home);
         g_free(p->data_home);
+        g_free(p->cache_home);
 
         obt_free0(p, ObtPaths, 1);
     }
@@ -221,6 +229,11 @@ const gchar* obt_paths_config_home(ObtPaths *p)
 const gchar* obt_paths_data_home(ObtPaths *p)
 {
     return p->data_home;
+}
+
+const gchar* obt_paths_cache_home(ObtPaths *p)
+{
+    return p->cache_home;
 }
 
 GSList* obt_paths_config_dirs(ObtPaths *p)

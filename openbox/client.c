@@ -1288,7 +1288,7 @@ void client_update_transient_for(ObClient *self)
             ObWindow *tw = window_find(t);
             /* if this happens then we need to check for it*/
             g_assert(tw != CLIENT_AS_WINDOW(self));
-            if (target && WINDOW_IS_CLIENT(tw)) {
+            if (tw && WINDOW_IS_CLIENT(tw)) {
                 /* watch out for windows with a parent that is something
                    different, like a dockapp for example */
                 target = WINDOW_AS_CLIENT(tw);

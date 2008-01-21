@@ -36,7 +36,7 @@
   <!-- whether to place windows in the center of the free area found or
        the top left corner -->
   <active>no</active>
-  <!-- force new windows ont the active monitor on a multi-head system, unless
+  <!-- force new windows onto the active monitor on a multi-head system, unless
        they are part of an application already on another monitor -->
 </placement>
 
@@ -44,7 +44,7 @@
   <name>Clearlooks</name>
   <titleLayout>NLIMC</titleLayout>
   <!--
-      avaible characters are NDSLIMC, each can occur at most once.
+      available characters are NDSLIMC, each can occur at most once.
       N: window icon
       L: window label (AKA title).
       I: iconify

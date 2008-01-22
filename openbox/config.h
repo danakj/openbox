@@ -143,7 +143,7 @@ extern RrFont *config_font_menuitem;
 extern RrFont *config_font_osd;
 
 /*! The number of desktops */
-extern gint config_desktops_num;
+extern guint config_desktops_num;
 /*! Desktop to start on, put 5 to start in the center of a 3x3 grid */
 extern guint config_screen_firstdesk;
 /*! Names for the desktops */

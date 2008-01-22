@@ -55,7 +55,7 @@ RrFont *config_font_menuitem;
 RrFont *config_font_menutitle;
 RrFont *config_font_osd;
 
-gint    config_desktops_num;
+guint   config_desktops_num;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
@@ -605,7 +605,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("number", node))) {
         gint d = parse_int(doc, n);
         if (d > 0)
-            config_desktops_num = d;
+            config_desktops_num = (unsigned) d;
     }
     if ((n = parse_find_node("firstdesk", node))) {
         gint d = parse_int(doc, n);

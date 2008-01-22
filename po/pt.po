@@ -2,14 +2,14 @@
 # Copyright (C) 2007 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
 # Gonçalo Ferreira <gonsas@gmail.com>, 2006.
-# Althaser <Althaser@gmail.com>, 2007.
+# Althaser <Althaser@gmail.com>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-01-17 22:13+0100\n"
-"PO-Revision-Date: 2007-07-21 18:03+0200\n"
+"PO-Revision-Date: 2008-01-22 22:17+0100\n"
 "Last-Translator: Althaser <Althaser@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -33,11 +33,11 @@ msgstr "Falha a executar '%s': %s"
 
 #: openbox/client.c:1973 openbox/client.c:2005
 msgid "Killing..."
-msgstr ""
+msgstr "Terminando..."
 
 #: openbox/client.c:1975 openbox/client.c:2007
 msgid "Not Responding"
-msgstr ""
+msgstr "Não está a responder"
 
 #: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
@@ -113,7 +113,7 @@ msgstr "Ma_ximizar"
 
 #: openbox/client_menu.c:412
 msgid "_Roll up/down"
-msgstr "En/Desen_rolar"
+msgstr "Des/en_rolar"
 
 #: openbox/client_menu.c:414
 msgid "Un/_Decorate"
@@ -252,7 +252,7 @@ msgstr "  --restart           Reinicia o Openbox\n"
 
 #: openbox/openbox.c:495
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr " --saida             Sai do Openbox\n"
 
 #: openbox/openbox.c:496
 msgid ""
@@ -307,7 +307,7 @@ msgstr "Não consegui adequirir o gestor de janelas selecionado no ecrã %d"
 #: openbox/screen.c:145
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "O gestor de janelas no ecrã %d não está fechando"
+msgstr "O gestor de janelas no ecrã %d não está a fechar"
 
 #: openbox/screen.c:1162
 #, c-format

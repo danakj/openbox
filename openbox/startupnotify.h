@@ -38,8 +38,9 @@ Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name);
 gboolean sn_get_desktop(gchar *id, guint *desktop);
 
 /* Get the environment to run the program in, with startup notification */
-void sn_setup_spawn_environment(gchar *program, gchar *name,
-                                gchar *icon_name, gint desktop);
+void sn_setup_spawn_environment(const gchar *program, const gchar *name,
+                                const gchar *icon_name, const gchar *wmclass,
+                                gint desktop);
 
 /* Tell startup notification we're not actually running the program we
    told it we were

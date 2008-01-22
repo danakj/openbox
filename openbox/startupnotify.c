@@ -33,8 +33,9 @@ Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
     return CurrentTime;
 }
 gboolean sn_get_desktop(gchar *id, guint *desktop) { return FALSE; }
-void sn_setup_spawn_environment(gchar *program, gchar *name,
-                                gchar *icon_name, gint desktop) {}
+void sn_setup_spawn_environment(const gchar *program, const gchar *name,
+                                const gchar *icon_name, const gchar *wmclass,
+                                gint desktop) {}
 void sn_spawn_cancel() {}
 
 #else
@@ -173,10 +174,9 @@ Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
     for (it = sn_waits; it; it = g_slist_next(it)) {
         SnStartupSequence *seq = it->data;
         gboolean found = FALSE;
-        const gchar *seqid, *seqclass, *seqname, *seqbin;
+        const gchar *seqid, *seqclass, *seqbin;
         seqid = sn_startup_sequence_get_id(seq);
         seqclass = sn_startup_sequence_get_wmclass(seq);
-        seqname = sn_startup_sequence_get_name(seq);
         seqbin = sn_startup_sequence_get_binary_name(seq);
 
         if (id && seqid) {
@@ -184,24 +184,21 @@ Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
                accuracy */
             if (!strcmp(seqid, id))
                 found = TRUE;
-        } else {
-            seqclass = sn_startup_sequence_get_wmclass(seq);
-            seqbin = sn_startup_sequence_get_binary_name(seq);
-
+        }
+        else if (seqclass) {
             /* seqclass = "a string to match against the "resource name" or
                "resource class" hints.  These are WM_CLASS[0] and WM_CLASS[1]"
                - from the startup-notification spec
             */
-            if ((seqclass && !strcmp(seqclass, wmclass)) ||
-                (seqclass && !strcmp(seqclass, name)) ||
-                /* Check the binary name against the class and name hints
-                   as well, to help apps that don't have the class set
-                   correctly */
-                (seqbin && !g_ascii_strcasecmp(seqbin, wmclass)) ||
-                (seqbin && !g_ascii_strcasecmp(seqbin, name)))
-            {
-                found = TRUE;
-            }
+            found = (seqclass && !strcmp(seqclass, wmclass)) ||
+                (seqclass && !strcmp(seqclass, name));
+        }
+        else if (seqbin) {
+            /* Check the binary name against the class and name hints
+               as well, to help apps that don't have the class set
+               correctly */
+            found = (seqbin && !g_ascii_strcasecmp(seqbin, wmclass)) ||
+                (seqbin && !g_ascii_strcasecmp(seqbin, name));
         }
 
         if (found) {
@@ -234,8 +231,9 @@ static gboolean sn_launch_wait_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-void sn_setup_spawn_environment(gchar *program, gchar *name,
-                                gchar *icon_name, gint desktop)
+void sn_setup_spawn_environment(const gchar *program, const gchar *name,
+                                const gchar *icon_name, const gchar *wmclass,
+                                gint desktop)
 {
     gchar *desc;
     const char *id;
@@ -252,6 +250,7 @@ void sn_setup_spawn_environment(gchar *program, gchar *name,
     sn_launcher_context_set_icon_name(sn_launcher, icon_name ?
                                       icon_name : program);
     sn_launcher_context_set_binary_name(sn_launcher, program);
+    if (wmclass) sn_launcher_context_set_wmclass(sn_launcher, wmclass);
     if (desktop >= 0 && (unsigned) desktop < screen_num_desktops)
         sn_launcher_context_set_workspace(sn_launcher, (signed) desktop);
     sn_launcher_context_initiate(sn_launcher, "openbox", program,

@@ -465,7 +465,9 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
-    if ((obwin = window_find(window))) {
+    if (window == obt_root(ob_screen))
+        /* don't do any lookups, waste of cpu */;
+    else if ((obwin = window_find(window))) {
         switch (obwin->type) {
         case OB_WINDOW_CLASS_DOCK:
             dock = WINDOW_AS_DOCK(obwin);
@@ -1227,14 +1229,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     }
     case UnmapNotify:
-        if (client->ignore_unmaps) {
-            client->ignore_unmaps--;
-            break;
-        }
         ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
                  "ignores left %d\n",
                  client->window, e->xunmap.event, e->xunmap.from_configure,
                  client->ignore_unmaps);
+        if (client->ignore_unmaps) {
+            client->ignore_unmaps--;
+            break;
+        }
         client_unmanage(client);
         break;
     case DestroyNotify:

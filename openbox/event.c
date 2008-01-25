@@ -270,7 +270,8 @@ static void event_hack_mods(XEvent *e)
            magic.  Our X core protocol stuff won't work, so we use this to
            find what the modifier state is instead. */
         if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success)
-            e->xkey.state = xkb_state.compat_state;
+            e->xkey.state =
+                modkeys_only_modifier_masks(xkb_state.compat_state);
         else
 #endif
         {

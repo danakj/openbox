@@ -339,9 +339,7 @@ void actions_client_move(ObActionsData *data, gboolean start)
     else if (config_focus_follow &&
              data->context != OB_FRAME_CONTEXT_CLIENT)
     {
-        if (!data->button && data->client && !config_focus_under_mouse)
-            event_end_ignore_all_enters(ignore_start);
-        else {
+        if (data->button && config_focus_under_mouse) {
             struct _ObClient *c;
 
             /* usually this is sorta redundant, but with a press action
@@ -355,6 +353,7 @@ void actions_client_move(ObActionsData *data, gboolean start)
                               "mouse-event action");
                 event_enter_client(c);
             }
-        }
+        } else
+            event_end_ignore_all_enters(ignore_start);
     }
 }

@@ -1928,8 +1928,7 @@ void event_halt_focus_delay(void)
 
 gulong event_start_ignore_all_enters(void)
 {
-    XSync(ob_display, FALSE);
-    return LastKnownRequestProcessed(ob_display);
+    return NextRequest(ob_display);
 }
 
 static void event_ignore_enter_range(gulong start, gulong end)
@@ -1948,13 +1947,12 @@ static void event_ignore_enter_range(gulong start, gulong end)
                   r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
-    XSync(ob_display, FALSE);
+    PROP_ERASE(screen_support_win, motif_wm_hints);
 }
 
 void event_end_ignore_all_enters(gulong start)
 {
-    XSync(ob_display, FALSE);
-    event_ignore_enter_range(start, LastKnownRequestProcessed(ob_display));
+    event_ignore_enter_range(start, NextRequest(ob_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)

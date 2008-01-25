@@ -114,6 +114,7 @@ void stacking_temp_raise(ObWindow *window)
 {
     Window win[2];
     GList *it;
+    gulong start;
 
     /* don't use this for internal windows..! it would lower them.. */
     g_assert(window_layer(window) < OB_STACKING_LAYER_INTERNAL);
@@ -129,7 +130,9 @@ void stacking_temp_raise(ObWindow *window)
     }
 
     win[1] = window_top(window);
+    start = event_start_ignore_all_enters();
     XRestackWindows(ob_display, win, 2);
+    event_end_ignore_all_enters(start);
 
     pause_changes = TRUE;
 }
@@ -139,12 +142,15 @@ void stacking_restore(void)
     Window *win;
     GList *it;
     gint i;
+    gulong start;
 
     win = g_new(Window, g_list_length(stacking_list) + 1);
     win[0] = screen_support_win;
     for (i = 1, it = stacking_list; it; ++i, it = g_list_next(it))
         win[i] = window_top(it->data);
+    start = event_start_ignore_all_enters();
     XRestackWindows(ob_display, win, i);
+    event_end_ignore_all_enters(start);
     g_free(win);
 
     pause_changes = FALSE;

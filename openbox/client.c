@@ -798,6 +798,7 @@ void client_unmanage(ObClient *self)
         g_free(self->icons[j].data);
     if (self->nicons > 0)
         g_free(self->icons);
+    g_free(self->startup_id);
     g_free(self->wm_command);
     g_free(self->title);
     g_free(self->icon_title);

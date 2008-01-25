@@ -982,6 +982,7 @@ void config_shutdown(void)
     RrFontClose(config_font_inactivewindow);
     RrFontClose(config_font_menuitem);
     RrFontClose(config_font_menutitle);
+    RrFontClose(config_font_osd);
 
     for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);

@@ -7,3 +7,6 @@ X-GNOME-WMName=Openbox
 
 # our config tool
 ConfigExec=obconf
+
+[Window Manager]
+SessionManaged=true

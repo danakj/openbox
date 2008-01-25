@@ -1,3 +1,47 @@
+3.4.6:
+  * Added Basque translation
+  * Updated French, Vietnamese German, Simplified Chinese, Russian, Portuguese,
+    Brasilian Portuguese, and Finnish translations
+  * Allow dialog type windows to go fullscreen (Fixes Kpdf)
+  * Remove the extraneous top border for undecorated windows while maximized
+  * Update the Clearlooks theme
+  * Fixes for keyboard modifiers (Alt-tab dialog getting stuck on screen for
+    some users)
+  * Automatically catch changes to the keyboard map and reconfigure on the fly
+  * Fix focus moving incorrectly sometimes with focus under mouse enabled
+  * Make default configuration focus the desktop when you right click
+  * Add the <bar> and <raise> options for all window cycling actions, allowing
+    you to have your target window temporarily raised above all others, and to
+    turn the focus target indicator bar off
+  * Improve the LastDesktop action to not remember desktops you skipped across
+  * Ignore mouse clicks that are made on override-redirect (unmanaged) windows
+  * When opening a menu with a key binding, don't use the key binding to run
+    something in the menu
+  * Add an <active> option for window placement, which puts new windows on the
+    active monitor instead of on any monitor (for xinerama multihead setups)
+  * Add options for placing the window move/resize coordinate popu window in
+    a fixed position on screen, rather than relative to the window being
+    moved or resized
+  * Prevent the dock from auto-hiding completely offscreen if the theme has
+    no borders for it
+  * New icon
+  * Fix race condition when running things that want to grab the keyboard
+    (e.g. gnome-panel-control --main-menu)
+  * When dialog windows ask to not appear in the taskbar, still give them focus
+    in normal ways (fixes new GNOME session logout dialogs)
+  * Fix bug with resizing corners on certain parts of the window frame
+  * Ping applications to tell when they are running or have become frozen.  Show
+    a [Not Responding] message in the title bar of windows which are frozen.
+  * When closing a window which is [Not Responding], kill the window's process
+    if it is running on the same machine as Openbox.  Otherwise, just disconnect
+    the window from the X display.  A second attempt to close a [Not Responding]
+    window will kill it forcefully (kill -9).
+  * Fixes for internal timers
+  * Add a <wmclass> option for the execute action's startup-notification.  This
+    lets you tell Openbox that the application will map a window with the
+    specified class - for applications that do not support startup-notification
+    natively.
+
 3.4.5:
   * Added Hungarian translation
   * Updated Finnish, Russian, German and French translations

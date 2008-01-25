@@ -30,7 +30,7 @@
 
 #define MENU_NAME "client-list-combined-menu"
 
-ObMenu *combined_menu;
+static ObMenu *combined_menu;
 
 #define SEPARATOR -1
 #define ADD_DESKTOP -2

@@ -20,6 +20,7 @@
 #include "openbox.h"
 #include "mouse.h"
 #include "modkeys.h"
+#include "translate.h"
 #include "gettext.h"
 #include <glib.h>
 #include <string.h>
@@ -110,6 +111,8 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
     KeySym sym;
 
     parsed = g_strsplit(str, "-", -1);
+
+    *state = *keycode = 0;
 
     /* first, find the key (last token) */
     l = NULL;

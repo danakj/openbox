@@ -63,7 +63,7 @@ Window window_top(ObWindow *self)
     return None;
 }
 
-Window window_layer(ObWindow *self)
+ObStackingLayer window_layer(ObWindow *self)
 {
     switch (self->type) {
     case Window_Menu:

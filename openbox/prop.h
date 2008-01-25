@@ -129,14 +129,14 @@ typedef struct Atoms {
     Atom net_wm_strut_partial;
     Atom net_wm_icon;
     Atom net_wm_icon_geometry;
-/*  Atom net_wm_pid; */
+    Atom net_wm_pid;
     Atom net_wm_allowed_actions;
     Atom net_wm_user_time;
 /*  Atom net_wm_user_time_window; */
     Atom net_frame_extents;
 
     /* application protocols */
-/*  Atom net_wm_ping; */
+    Atom net_wm_ping;
 #ifdef SYNC
     Atom net_wm_sync_request;
     Atom net_wm_sync_request_counter;
@@ -196,7 +196,7 @@ typedef struct Atoms {
     Atom ob_theme;
     Atom ob_control;
 } Atoms;
-Atoms prop_atoms;
+extern Atoms prop_atoms;
 
 void prop_startup();
 
@@ -218,6 +218,9 @@ void prop_erase(Window win, Atom prop);
 
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
                   glong data2, glong data3, glong mask);
+void prop_message_to(Window to, Window about, Atom messagetype,
+                     glong data0, glong data1, glong data2,
+                     glong data3, glong data4, glong mask);
 
 #define PROP_GET32(win, prop, type, ret) \
     (prop_get32(win, prop_atoms.prop, prop_atoms.type, ret))
@@ -243,5 +246,10 @@ void prop_message(Window about, Atom messagetype, glong data0, glong data1,
 #define PROP_MSG(about, msgtype, data0, data1, data2, data3) \
   (prop_message(about, prop_atoms.msgtype, data0, data1, data2, data3, \
                 SubstructureNotifyMask | SubstructureRedirectMask))
+
+#define PROP_MSG_TO(to, about, msgtype, data0, data1, data2, data3, data4, \
+                    mask) \
+    (prop_message_to(to, about, prop_atoms.msgtype,                        \
+                     data0, data1, data2, data3, data4, mask))
 
 #endif

@@ -24,6 +24,7 @@
 #include "stacking.h"
 #include "place.h"
 #include "geom.h"
+#include "moveresize.h"
 #include "render/render.h"
 
 #include <glib.h>
@@ -38,11 +39,7 @@ struct _ObAppSettings
     GPatternSpec *name;
     GPatternSpec *role;
 
-    Point position;
-    gboolean center_x;
-    gboolean center_y;
-    gboolean opposite_x;
-    gboolean opposite_y;
+    GravityPoint position;
     gboolean pos_given;
 
     guint desktop;
@@ -75,9 +72,13 @@ extern gboolean config_focus_last;
  */
 extern gboolean config_focus_under_mouse;
 
+/*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;
 /*! Place windows in the center of the free area */
 extern gboolean config_place_center;
+/*! Place windows on the active monitor (unless they are part of an application
+  already on another monitor) */
+extern gboolean config_place_active;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;
@@ -88,8 +89,10 @@ extern gboolean config_resize_redraw;
 /*! show move/resize popups? 0 = no, 1 = always, 2 = only
   resizing !1 increments */
 extern gint config_resize_popup_show;
-/*! where to show the popup, currently above the window or centered */
-extern gint config_resize_popup_pos;
+/*! where to show the resize popup */
+extern ObResizePopupPos config_resize_popup_pos;
+/*! where to place the popup if it's in a fixed position */
+extern GravityPoint config_resize_popup_fixed;
 
 /*! The stacking layer the dock will reside in */
 extern ObStackingLayer config_dock_layer;
@@ -140,7 +143,7 @@ extern RrFont *config_font_menuitem;
 extern RrFont *config_font_osd;
 
 /*! The number of desktops */
-extern gint config_desktops_num;
+extern guint config_desktops_num;
 /*! Desktop to start on, put 5 to start in the center of a 3x3 grid */
 extern guint config_screen_firstdesk;
 /*! Names for the desktops */

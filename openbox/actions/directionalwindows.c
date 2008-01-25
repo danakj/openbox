@@ -1,5 +1,7 @@
 #include "openbox/actions.h"
 #include "openbox/event.h"
+#include "openbox/stacking.h"
+#include "openbox/window.h"
 #include "openbox/focus_cycle.h"
 #include "openbox/openbox.h"
 #include "openbox/client.h"
@@ -12,6 +14,8 @@ typedef struct {
     gboolean dock_windows;
     gboolean desktop_windows;
     ObDirection direction;
+    gboolean bar;
+    gboolean raise;
     GSList *actions;
 } Options;
 
@@ -103,9 +107,14 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     o = g_new0(Options, 1);
     o->dialog = TRUE;
+    o->bar = TRUE;
 
     if ((n = parse_find_node("dialog", node)))
         o->dialog = parse_bool(doc, n);
+    if ((n = parse_find_node("bar", node)))
+        o->bar = parse_bool(doc, n);
+    if ((n = parse_find_node("raise", node)))
+        o->raise = parse_bool(doc, n);
     if ((n = parse_find_node("panels", node)))
         o->dock_windows = parse_bool(doc, n);
     if ((n = parse_find_node("desktop", node)))
@@ -296,13 +305,19 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (!o->interactive)
         end_cycle(FALSE, data->state, o);
     else {
-        focus_directional_cycle(o->direction,
-                                o->dock_windows,
-                                o->desktop_windows,
-                                TRUE,
-                                o->dialog,
-                                FALSE, FALSE);
+        struct _ObClient *ft;
+
+        ft = focus_directional_cycle(o->direction,
+                                     o->dock_windows,
+                                     o->desktop_windows,
+                                     TRUE,
+                                     o->bar,
+                                     o->dialog,
+                                     FALSE, FALSE);
         cycling = TRUE;
+
+        stacking_restore();
+        if (o->raise) stacking_temp_raise(CLIENT_AS_WINDOW(ft));
     }
 
     return o->interactive;
@@ -355,6 +370,7 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
                                  o->dock_windows,
                                  o->desktop_windows,
                                  o->interactive,
+                                 o->bar,
                                  o->dialog,
                                  TRUE, cancel);
     cycling = FALSE;
@@ -362,4 +378,6 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
     if (ft)
         actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
                          state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
+
+    stacking_restore();
 }

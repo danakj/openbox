@@ -24,10 +24,15 @@
 #include "mwm.h"
 #include "geom.h"
 #include "stacking.h"
+#include "window.h"
 #include "render/color.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h> /* for pid_t */
+#endif
 
 struct _ObFrame;
 struct _ObGroup;
@@ -114,6 +119,8 @@ struct _ObClient
     gchar *client_machine;
     /*! The command used to run the program. Pre-XSMP window identification. */
     gchar *wm_command;
+    /*! The PID of the process which owns the window */
+    pid_t pid;
 
     /*! The application that created the window */
     gchar *name;
@@ -218,6 +225,14 @@ struct _ObClient
     gboolean can_focus;
     /*! Notify the window when it receives focus? */
     gboolean focus_notify;
+
+    /*! Will the client respond to pings? */
+    gboolean ping;
+    /*! Indicates if the client is trying to close but has stopped responding
+      to pings */
+    gboolean not_responding;
+    /*! We tried to close the window with a SIGTERM */
+    gboolean close_tried_term;
 
 #ifdef SYNC
     /*! The client wants to sync during resizes */

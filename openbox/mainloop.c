@@ -39,13 +39,13 @@ typedef struct _ObMainLoopFdHandlerType     ObMainLoopFdHandlerType;
 static GSList *all_loops;
 
 /* signals are global to all loops */
-struct {
+static struct {
     guint installed; /* a ref count */
     struct sigaction oldact;
 } all_signals[NUM_SIGNALS];
 
 /* a set of all possible signals */
-sigset_t all_signals_set;
+static sigset_t all_signals_set;
 
 /* signals which cause a core dump, these can't be used for callbacks */
 static gint core_signals[] =
@@ -104,6 +104,10 @@ struct _ObMainLoopTimer
     GTimeVal last;
     /* When this timer will next trigger */
     GTimeVal timeout;
+
+    /* Only allow a timer's function to fire once per run through the list,
+       so that it doesn't get locked in there forever */
+    gboolean fired;
 };
 
 struct _ObMainLoopSignalHandlerType
@@ -500,10 +504,8 @@ void ob_main_loop_fd_remove(ObMainLoop *loop,
 static glong timecompare(GTimeVal *a, GTimeVal *b)
 {
     glong r;
-
-    if ((r = b->tv_sec - a->tv_sec)) return r;
-    return b->tv_usec - a->tv_usec;
-
+    if ((r = a->tv_sec - b->tv_sec)) return r;
+    return a->tv_usec - b->tv_usec;
 }
 
 static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
@@ -511,7 +513,7 @@ static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
     GSList *it;
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
-        if (timecompare(&ins->timeout, &t->timeout) >= 0) {
+        if (timecompare(&ins->timeout, &t->timeout) <= 0) {
             loop->timers = g_slist_insert_before(loop->timers, it, ins);
             break;
         }
@@ -528,6 +530,9 @@ void ob_main_loop_timeout_add(ObMainLoop *loop,
                               GDestroyNotify notify)
 {
     ObMainLoopTimer *t = g_new(ObMainLoopTimer, 1);
+
+    g_assert(microseconds > 0); /* if it's 0 it'll cause an infinite loop */
+
     t->delay = microseconds;
     t->func = handler;
     t->data = data;
@@ -618,7 +623,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 
         /* the queue is sorted, so if this timer shouldn't fire, none are
            ready */
-        if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) < 0)
+        if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) > 0)
             break;
 
         /* we set the last fired time to delay msec after the previous firing,
@@ -635,6 +640,10 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
                 curr->destroy(curr->data);
             g_free(curr);
         }
+
+        /* the timer queue has been shuffled, start from the beginning
+           (which is the next one to fire) */
+        next = loop->timers;
 
         fired = TRUE;
     }

@@ -51,8 +51,9 @@ static void grab_keys(gboolean grab)
     if (grab) {
         p = curpos ? curpos->first_child : keyboard_firstnode;
         while (p) {
-            grab_key(p->key, p->state, RootWindow(ob_display, ob_screen),
-                     GrabModeAsync);
+            if (p->key)
+                grab_key(p->key, p->state, RootWindow(ob_display, ob_screen),
+                         GrabModeAsync);
             p = p->next_sibling;
         }
         if (curpos)
@@ -262,6 +263,12 @@ void keyboard_event(ObClient *client, const XEvent *e)
         }
         p = p->next_sibling;
     }
+}
+
+void keyboard_rebind(void)
+{
+    tree_rebind(keyboard_firstnode);
+    grab_keys(TRUE);
 }
 
 void keyboard_startup(gboolean reconfig)

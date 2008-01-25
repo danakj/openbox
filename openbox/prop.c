@@ -91,14 +91,14 @@ void prop_startup(void)
     CREATE(net_wm_strut_partial, "_NET_WM_STRUT_PARTIAL");
     CREATE(net_wm_icon, "_NET_WM_ICON");
     CREATE(net_wm_icon_geometry, "_NET_WM_ICON_GEOMETRY");
-/*   CREATE(net_wm_pid, "_NET_WM_PID"); */
+    CREATE(net_wm_pid, "_NET_WM_PID");
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");
     CREATE(net_wm_user_time, "_NET_WM_USER_TIME");
 /*    CREATE(net_wm_user_time_window, "_NET_WM_USER_TIME_WINDOW"); */
     CREATE(kde_net_wm_frame_strut, "_KDE_NET_WM_FRAME_STRUT");
     CREATE(net_frame_extents, "_NET_FRAME_EXTENTS");
 
-/*   CREATE(net_wm_ping, "_NET_WM_PING"); */
+    CREATE(net_wm_ping, "_NET_WM_PING");
 #ifdef SYNC
     CREATE(net_wm_sync_request, "_NET_WM_SYNC_REQUEST");
     CREATE(net_wm_sync_request_counter, "_NET_WM_SYNC_REQUEST_COUNTER");
@@ -447,6 +447,14 @@ void prop_erase(Window win, Atom prop)
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
                   glong data2, glong data3, glong mask)
 {
+    prop_message_to(RootWindow(ob_display, ob_screen), about, messagetype,
+                    data0, data1, data2, data3, 0, mask);
+}
+
+void prop_message_to(Window to, Window about, Atom messagetype,
+                     glong data0, glong data1, glong data2,
+                     glong data3, glong data4, glong mask)
+{
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type = messagetype;
@@ -457,7 +465,6 @@ void prop_message(Window about, Atom messagetype, glong data0, glong data1,
     ce.xclient.data.l[1] = data1;
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
-    ce.xclient.data.l[4] = 0;
-    XSendEvent(ob_display, RootWindow(ob_display, ob_screen), FALSE,
-               mask, &ce);
+    ce.xclient.data.l[4] = data4;
+    XSendEvent(ob_display, to, FALSE, mask, &ce);
 }

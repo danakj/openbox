@@ -43,6 +43,7 @@
 #include "stacking.h"
 #include "extensions.h"
 #include "translate.h"
+#include "ping.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -74,6 +75,7 @@ typedef struct
 {
     ObClient *client;
     Time time;
+    gulong serial;
 } ObFocusDelayData;
 
 typedef struct
@@ -91,6 +93,7 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
 static gboolean is_enter_focus_event_ignored(XEvent *e);
+static void event_ignore_enter_range(gulong start, gulong end);
 
 static void focus_delay_dest(gpointer data);
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
@@ -99,7 +102,9 @@ static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 Time event_curtime = CurrentTime;
 Time event_last_user_time = CurrentTime;
+/*! The serial of the current X event */
 
+static gulong event_curserial;
 static gboolean focus_left_screen = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
 static GSList *ignore_serials = NULL;
@@ -247,6 +252,10 @@ static void event_set_curtime(XEvent *e)
 
 static void event_hack_mods(XEvent *e)
 {
+#ifdef XKB
+    XkbStateRec xkb_state;
+#endif
+
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
@@ -256,10 +265,20 @@ static void event_hack_mods(XEvent *e)
         e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
         break;
     case KeyRelease:
-        e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
-        /* remove from the state the mask of the modifier key being released,
-           if it is a modifier key being released that is */
-        e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);
+#ifdef XKB
+        /* If XKB is present, then the modifiers are all strange from its
+           magic.  Our X core protocol stuff won't work, so we use this to
+           find what the modifier state is instead. */
+        if (XkbGetState(ob_display, XkbUseCoreKbd, &xkb_state) == Success)
+            e->xkey.state = xkb_state.compat_state;
+        else
+#endif
+        {
+            e->xkey.state = modkeys_only_modifier_masks(e->xkey.state);
+            /* remove from the state the mask of the modifier key being
+               released, if it is a modifier key being released that is */
+            e->xkey.state &= ~modkeys_keycode_to_mask(e->xkey.keycode);
+        }
         break;
     case MotionNotify:
         e->xmotion.state = modkeys_only_modifier_masks(e->xmotion.state);
@@ -457,14 +476,17 @@ static void event_process(const XEvent *ec, gpointer data)
             client = WINDOW_AS_CLIENT(obwin);
             break;
         case Window_Menu:
-        case Window_Internal:
             /* not to be used for events */
             g_assert_not_reached();
+            break;
+        case Window_Internal:
+            /* we don't do anything with events directly on these windows */
             break;
         }
     }
 
     event_set_curtime(e);
+    event_curserial = e->xany.serial;
     event_hack_mods(e);
     if (event_ignore(e, client)) {
         if (ed)
@@ -619,6 +641,14 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_root(e);
     else if (e->type == MapRequest)
         client_manage(window);
+    else if (e->type == MappingNotify) {
+        /* keyboard layout changes for modifier mapping changes. reload the
+           modifier map, and rebind all the key bindings as appropriate */
+        ob_debug("Kepboard map changed. Reloading keyboard bindings.\n");
+        modkeys_shutdown(TRUE);
+        modkeys_startup(TRUE);
+        keyboard_rebind();
+    }
     else if (e->type == ClientMessage) {
         /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for
            windows that are not managed yet. */
@@ -670,16 +700,34 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    if (e->type == ButtonPress || e->type == ButtonRelease ||
-        e->type == MotionNotify || e->type == KeyPress ||
-        e->type == KeyRelease)
-    {
-        event_handle_user_input(client, e);
+    if (e->type == ButtonPress || e->type == ButtonRelease) {
+        /* If the button press was on some non-root window, or was physically
+           on the root window, the process it */
+        if (window != RootWindow(ob_display, ob_screen) ||
+            e->xbutton.subwindow == None)
+        {
+            event_handle_user_input(client, e);
+        }
+        /* Otherwise only process it if it was physically on an openbox
+           internal window */
+        else {
+            ObWindow *w;
+
+            if ((w = g_hash_table_lookup(window_map, &e->xbutton.subwindow)) &&
+                WINDOW_IS_INTERNAL(w))
+            {
+                event_handle_user_input(client, e);
+            }
+        }
     }
+    else if (e->type == KeyPress || e->type == KeyRelease ||
+             e->type == MotionNotify)
+        event_handle_user_input(client, e);
 
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
     event_curtime = CurrentTime;
+    event_curserial = 0;
 }
 
 static void event_handle_root(XEvent *e)
@@ -720,6 +768,9 @@ static void event_handle_root(XEvent *e)
                 ob_restart();
             else if (e->xclient.data.l[0] == 3)
                 ob_exit(0);
+        } else if (msgtype == prop_atoms.wm_protocols) {
+            if ((Atom)e->xclient.data.l[0] == prop_atoms.net_wm_ping)
+                ping_got_pong(e->xclient.data.l[1]);
         }
         break;
     case PropertyNotify:
@@ -754,6 +805,7 @@ void event_enter_client(ObClient *client)
             data = g_new(ObFocusDelayData, 1);
             data->client = client;
             data->time = event_curtime;
+            data->serial = event_curserial;
 
             ob_main_loop_timeout_add(ob_main_loop,
                                      config_focus_delay * 1000,
@@ -763,6 +815,7 @@ void event_enter_client(ObClient *client)
             ObFocusDelayData data;
             data.client = client;
             data.time = event_curtime;
+            data.serial = event_curserial;
             focus_delay_func(&data);
         }
     }
@@ -991,18 +1044,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 is_enter_focus_event_ignored(e))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "%sNotify mode %d detail %d on %lx IGNORED\n",
+                              "%sNotify mode %d detail %d serial %lu on %lx "
+                              "IGNORED\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
-                              e->xcrossing.detail, client?client->window:0);
+                              e->xcrossing.detail,
+                              e->xcrossing.serial,
+                              client?client->window:0);
             }
             else {
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "%sNotify mode %d detail %d on %lx, "
+                              "%sNotify mode %d detail %d serial %lu on %lx, "
                               "focusing window\n",
                               (e->type == EnterNotify ? "Enter" : "Leave"),
                               e->xcrossing.mode,
-                              e->xcrossing.detail, (client?client->window:0));
+                              e->xcrossing.detail,
+                              e->xcrossing.serial,
+                              (client?client->window:0));
                 if (config_focus_follow)
                     event_enter_client(client);
             }
@@ -1622,6 +1680,8 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
     /* Allow control while going thru the menu */
     else if (ev->type == KeyPress && (state & ~ControlMask) == 0) {
+        frame->got_press = TRUE;
+
         if (keycode == ob_keycode(OB_KEY_ESCAPE)) {
             menu_frame_hide_all();
             ret = TRUE;
@@ -1655,7 +1715,7 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
        Allow ControlMask only, and don't bother if the menu is empty */
     else if (ev->type == KeyRelease && (state & ~ControlMask) == 0 &&
-             frame->entries)
+             frame->entries && frame->got_press)
     {
         if (keycode == ob_keycode(OB_KEY_RETURN)) {
             /* Enter runs the active item or goes into the submenu.
@@ -1845,10 +1905,9 @@ static gboolean focus_delay_func(gpointer data)
     if (menu_frame_visible || moveresize_in_progress) return FALSE;
 
     event_curtime = d->time;
-    if (focus_client != d->client) {
-        if (client_focus(d->client) && config_focus_raise)
-            stacking_raise(CLIENT_AS_WINDOW(d->client));
-    }
+    event_curserial = d->serial;
+    if (client_focus(d->client) && config_focus_raise)
+        stacking_raise(CLIENT_AS_WINDOW(d->client));
     event_curtime = old;
     return FALSE; /* no repeat */
 }
@@ -1861,8 +1920,8 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
 
 void event_halt_focus_delay(void)
 {
-    /* ignore all enter events up till now */
-    event_end_ignore_all_enters(1);
+    /* ignore all enter events up till the event which caused this to occur */
+    if (event_curserial) event_ignore_enter_range(1, event_curserial);
     ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }
 
@@ -1872,20 +1931,29 @@ gulong event_start_ignore_all_enters(void)
     return LastKnownRequestProcessed(ob_display);
 }
 
-void event_end_ignore_all_enters(gulong start)
+static void event_ignore_enter_range(gulong start, gulong end)
 {
     ObSerialRange *r;
 
     g_assert(start != 0);
-    XSync(ob_display, FALSE);
+    g_assert(end != 0);
 
     r = g_new(ObSerialRange, 1);
     r->start = start;
-    r->end = LastKnownRequestProcessed(ob_display);
+    r->end = end;
     ignore_serials = g_slist_prepend(ignore_serials, r);
+
+    ob_debug_type(OB_DEBUG_FOCUS, "ignoring enters from %lu until %lu\n",
+                  r->start, r->end);
 
     /* increment the serial so we don't ignore events we weren't meant to */
     XSync(ob_display, FALSE);
+}
+
+void event_end_ignore_all_enters(gulong start)
+{
+    XSync(ob_display, FALSE);
+    event_ignore_enter_range(start, LastKnownRequestProcessed(ob_display));
 }
 
 static gboolean is_enter_focus_event_ignored(XEvent *e)
@@ -1933,6 +2001,8 @@ void event_cancel_all_key_grabs(void)
     }
     else
         ungrab_passive_key();
+
+    XSync(ob_display, FALSE);
 }
 
 gboolean event_time_after(Time t1, Time t2)

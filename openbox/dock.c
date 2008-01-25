@@ -227,8 +227,10 @@ void dock_configure(void)
     gint l, r, t, b;
     gint strw, strh;
     Rect *a;
+    gint hidesize;
 
     RrMargins(dock->a_frame, &l, &t, &r, &b);
+    hidesize = MAX(1, ob_rr_theme->obwidth);
 
     dock->area.width = dock->area.height = 0;
 
@@ -361,51 +363,51 @@ void dock_configure(void)
             case OB_DIRECTION_NORTHWEST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->area.y -= dock->area.height - ob_rr_theme->obwidth;
+                    dock->area.y -= dock->area.height - hidesize;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->area.x -= dock->area.width - ob_rr_theme->obwidth;
+                    dock->area.x -= dock->area.width - hidesize;
                     break;
                 }
                 break;
             case OB_DIRECTION_NORTH:
-                dock->area.y -= dock->area.height - ob_rr_theme->obwidth;
+                dock->area.y -= dock->area.height - hidesize;
                 break;
             case OB_DIRECTION_NORTHEAST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->area.y -= dock->area.height - ob_rr_theme->obwidth;
+                    dock->area.y -= dock->area.height - hidesize;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->area.x += dock->area.width - ob_rr_theme->obwidth;
+                    dock->area.x += dock->area.width - hidesize;
                     break;
                 }
                 break;
             case OB_DIRECTION_WEST:
-                dock->area.x -= dock->area.width - ob_rr_theme->obwidth;
+                dock->area.x -= dock->area.width - hidesize;
                 break;
             case OB_DIRECTION_EAST:
-                dock->area.x += dock->area.width - ob_rr_theme->obwidth;
+                dock->area.x += dock->area.width - hidesize;
                 break;
             case OB_DIRECTION_SOUTHWEST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->area.y += dock->area.height - ob_rr_theme->obwidth;
+                    dock->area.y += dock->area.height - hidesize;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->area.x -= dock->area.width - ob_rr_theme->obwidth;
+                    dock->area.x -= dock->area.width - hidesize;
                     break;
                 } break;
             case OB_DIRECTION_SOUTH:
-                dock->area.y += dock->area.height - ob_rr_theme->obwidth;
+                dock->area.y += dock->area.height - hidesize;
                 break;
             case OB_DIRECTION_SOUTHEAST:
                 switch (config_dock_orient) {
                 case OB_ORIENTATION_HORZ:
-                    dock->area.y += dock->area.height - ob_rr_theme->obwidth;
+                    dock->area.y += dock->area.height - hidesize;
                     break;
                 case OB_ORIENTATION_VERT:
-                    dock->area.x += dock->area.width - ob_rr_theme->obwidth;
+                    dock->area.x += dock->area.width - hidesize;
                     break;
                 }
                 break;
@@ -414,8 +416,8 @@ void dock_configure(void)
     }
 
     if (!config_dock_floating && config_dock_hide) {
-        strw = ob_rr_theme->obwidth;
-        strh = ob_rr_theme->obwidth;
+        strw = hidesize;
+        strh = hidesize;
     } else {
         strw = dock->area.width;
         strh = dock->area.height;

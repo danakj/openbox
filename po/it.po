@@ -8,13 +8,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2007-11-12 19:12+0100\n"
+"POT-Creation-Date: 2008-01-17 22:13+0100\n"
 "PO-Revision-Date: 2007-07-20 15:18+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/actions.c:149
+#, c-format
+msgid "Invalid action '%s' requested. No such action exists."
+msgstr ""
 
 #: openbox/actions/execute.c:88
 #, c-format
@@ -25,6 +30,14 @@ msgstr "Impossibile convertire il percorso utf8 '%s'"
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Impossibile eseguire il comando '%s': %s"
+
+#: openbox/client.c:1973 openbox/client.c:2005
+msgid "Killing..."
+msgstr ""
+
+#: openbox/client.c:1975 openbox/client.c:2007
+msgid "Not Responding"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
 msgid "Go there..."
@@ -110,12 +123,12 @@ msgstr "Si/No _Decorazioni"
 msgid "_Close"
 msgstr "_Chiudi"
 
-#: openbox/config.c:740
+#: openbox/config.c:746
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Il pulsante '%s' specificato nel file di configurazione non è valido"
 
-#: openbox/keyboard.c:156
+#: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
 msgstr ""
 "Conflitto con la scorciatoia da tastiera specificata nel file di "
@@ -155,53 +168,53 @@ msgstr "Il pulsante '%s' specificato nelle associazioni mouse non è valido"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Il contesto '%s' specificato nelle associazioni mouse non è valido"
 
-#: openbox/openbox.c:129
+#: openbox/openbox.c:130
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Impossibile accedere alla directory home '%s': %s"
 
-#: openbox/openbox.c:149
+#: openbox/openbox.c:150
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Impossibile accedere al display specificato nella variabile DISPLAY."
 
-#: openbox/openbox.c:180
+#: openbox/openbox.c:181
 msgid "Failed to initialize the obrender library."
 msgstr "Impossibile inizializzare la libreria obrender."
 
-#: openbox/openbox.c:186
+#: openbox/openbox.c:187
 msgid "X server does not support locale."
 msgstr "Il server X non ha il supporto per la localizzazione."
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:189
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 "Impossibile impostare la localizzazione dei tasti modificatori per il server "
 "X."
 
-#: openbox/openbox.c:251
+#: openbox/openbox.c:252
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Impossibile trovare un file di configurazione valido, verranno utilizzate le "
 "impostazioni predefinite"
 
-#: openbox/openbox.c:277
+#: openbox/openbox.c:278
 msgid "Unable to load a theme."
 msgstr "Impossibile caricare un tema."
 
-#: openbox/openbox.c:402
+#: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Non è stato possibile riavviare il nuovo eseguibile '%s': %s"
 
-#: openbox/openbox.c:472 openbox/openbox.c:474
+#: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:483
+#: openbox/openbox.c:486
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintassi: openbox [opzioni]\n"
 
-#: openbox/openbox.c:484
+#: openbox/openbox.c:487
 msgid ""
 "\n"
 "Options:\n"
@@ -209,23 +222,23 @@ msgstr ""
 "\n"
 "Opzioni:\n"
 
-#: openbox/openbox.c:485
+#: openbox/openbox.c:488
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Mostra questo messaggio di aiuto ed esce\n"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:489
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Mostra il numero di versione ed esce\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:490
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Sostituisce l'attuale window manager attivo\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:491
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Disabilita la connessione al session manager\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:492
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -233,19 +246,19 @@ msgstr ""
 "\n"
 "Inviare messaggi ad un'istanza di Openbox attiva:\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:493
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ricarica la configurazione di Openbox\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:494
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Riavvia Openbox\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:495
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:496
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -253,25 +266,25 @@ msgstr ""
 "\n"
 "Opzioni di debug:\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:497
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Esegue in modalità sincrona\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:498
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Mostra le informazioni di debug\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:499
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Mostra le informazioni di debug sulla gestione del "
 "focus\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:500
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Divide lo schermo per simulare xinerama\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:501
 #, c-format
 msgid ""
 "\n"
@@ -280,27 +293,27 @@ msgstr ""
 "\n"
 "Segnalate eventuali bug a %s\n"
 
-#: openbox/openbox.c:599
+#: openbox/openbox.c:604
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Argomento da linea di comando non valido '%s'\n"
 
-#: openbox/screen.c:96 openbox/screen.c:184
+#: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Un window manager è già attivo sullo schermo %d"
 
-#: openbox/screen.c:118
+#: openbox/screen.c:124
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Impossibile acquisire la selezione del window manager sullo schermo %d"
 
-#: openbox/screen.c:139
+#: openbox/screen.c:145
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Il WM sullo schermo %d non è terminato"
 
-#: openbox/screen.c:1087
+#: openbox/screen.c:1162
 #, c-format
 msgid "desktop %i"
 msgstr "desktop %i"
@@ -325,33 +338,33 @@ msgstr "Errore durante il salvataggio della sessione in '%s': %s"
 msgid "Running %s\n"
 msgstr "Sto eseguendo %s\n"
 
-#: openbox/translate.c:58
+#: openbox/translate.c:59
 #, c-format
 msgid "Invalid modifier key '%s' in key/mouse binding"
 msgstr ""
 "Il nome del tasto '%s' specificato nelle associazioni di mouse/tastiera non "
 "è valido"
 
-#: openbox/translate.c:135
+#: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code '%s' in key binding"
 msgstr ""
 "Il codice tastiera '%s' specificato nelle associazioni di mouse/tastiera non "
 "è valido"
 
-#: openbox/translate.c:142
+#: openbox/translate.c:145
 #, c-format
 msgid "Invalid key name '%s' in key binding"
 msgstr ""
 "Il nome del tasto '%s' specificato nelle associazioni di mouse/tastiera non "
 "è valido"
 
-#: openbox/translate.c:148
+#: openbox/translate.c:151
 #, c-format
 msgid "Requested key '%s' does not exist on the display"
 msgstr "Il tasto richiesto '%s' non esiste sul display"
 
-#: openbox/xerror.c:39
+#: openbox/xerror.c:40
 #, c-format
 msgid "X Error: %s"
 msgstr "Errore del server X: %s"

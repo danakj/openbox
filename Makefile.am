@@ -243,6 +243,8 @@ openbox_openbox_SOURCES = \
 	openbox/mwm.h \
 	openbox/openbox.c \
 	openbox/openbox.h \
+	openbox/ping.c \
+	openbox/ping.h \
 	openbox/place.c \
 	openbox/place.h \
 	openbox/popup.c \

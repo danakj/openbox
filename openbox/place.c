@@ -108,9 +108,9 @@ static Rect **pick_head(ObClient *c)
         }
     }
 
-    if (focus_client) {
+    if (focus_client && client_normal(focus_client)) {
         add_choice(choice, client_monitor(focus_client));
-        ob_debug("placement adding choice %d for focused window\n",
+        ob_debug("placement adding choice %d for normal focused window\n",
                  client_monitor(focus_client));
     }
 
@@ -146,7 +146,7 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     guint i;
 
     areas = pick_head(client);
-    i = g_random_int_range(0, screen_num_monitors);
+    i = config_place_active ? 0 : g_random_int_range(0, screen_num_monitors);
 
     l = areas[i]->x;
     t = areas[i]->y;
@@ -254,8 +254,11 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
 
     /* try ignoring different things to find empty space */
     for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
-        /* try all monitors in order of preference */
-        for (i = 0; i < screen_num_monitors && !ret; ++i) {
+        /* try all monitors in order of preference, but only the first one
+           if config_place_active is true */
+        for (i = 0; (i < (config_place_active ? 1 : screen_num_monitors) &&
+                     !ret); ++i)
+        {
             GList *it;
 
             /* add the whole monitor */
@@ -404,21 +407,21 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
         g_free(areas);
     }
 
-    if (settings->center_x)
+    if (settings->position.x.center)
         *x = screen->x + screen->width / 2 - client->area.width / 2;
-    else if (settings->opposite_x)
+    else if (settings->position.x.opposite)
         *x = screen->x + screen->width - client->frame->area.width -
-            settings->position.x;
+            settings->position.x.pos;
     else
-        *x = screen->x + settings->position.x;
+        *x = screen->x + settings->position.x.pos;
 
-    if (settings->center_y)
+    if (settings->position.y.center)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
-    else if (settings->opposite_y)
+    else if (settings->position.y.opposite)
         *y = screen->y + screen->height - client->frame->area.height -
-            settings->position.y;
+            settings->position.y.pos;
     else
-        *y = screen->y + settings->position.y;
+        *y = screen->y + settings->position.y.pos;
 
     g_free(screen);
     return TRUE;

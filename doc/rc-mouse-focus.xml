@@ -516,6 +516,9 @@
     <mousebind button="Left" action="Press">
       <action name="Focus"/>
     </mousebind>
+    <mousebind button="Right" action="Press">
+      <action name="Focus"/>
+    </mousebind>
   </context>
 
   <context name="Root">

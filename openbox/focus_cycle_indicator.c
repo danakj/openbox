@@ -18,6 +18,7 @@
 */
 
 #include "focus_cycle.h"
+#include "focus_cycle_indicator.h"
 #include "client.h"
 #include "openbox.h"
 #include "frame.h"
@@ -29,7 +30,7 @@
 
 #define FOCUS_INDICATOR_WIDTH 6
 
-struct
+static struct
 {
     InternalWindow top;
     InternalWindow left;
@@ -39,6 +40,7 @@ struct
 
 static RrAppearance *a_focus_indicator;
 static RrColor      *color_white;
+static gboolean      visible;
 
 static Window create_window(Window parent, gulong mask,
                             XSetWindowAttributes *attrib)
@@ -52,6 +54,8 @@ static Window create_window(Window parent, gulong mask,
 void focus_cycle_indicator_startup(gboolean reconfig)
 {
     XSetWindowAttributes attr;
+
+    visible = FALSE;
 
     if (reconfig) return;
 
@@ -79,6 +83,14 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.left));
     stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.right));
     stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
+    g_hash_table_insert(window_map, &focus_indicator.top.win,
+                        &focus_indicator.top);
+    g_hash_table_insert(window_map, &focus_indicator.left.win,
+                        &focus_indicator.left);
+    g_hash_table_insert(window_map, &focus_indicator.right.win,
+                        &focus_indicator.right);
+    g_hash_table_insert(window_map, &focus_indicator.bottom.win,
+                        &focus_indicator.bottom);
 
     color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
 
@@ -105,6 +117,11 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 
     RrAppearanceFree(a_focus_indicator);
 
+    g_hash_table_remove(window_map, &focus_indicator.top.win);
+    g_hash_table_remove(window_map, &focus_indicator.left.win);
+    g_hash_table_remove(window_map, &focus_indicator.right.win);
+    g_hash_table_remove(window_map, &focus_indicator.bottom.win);
+
     stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.top));
     stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.left));
     stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.right));
@@ -118,7 +135,7 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 
 void focus_cycle_draw_indicator(ObClient *c)
 {
-    if (!c) {
+    if (!c && visible) {
         gulong ignore_start;
 
         /* kill enter events cause by this unmapping */
@@ -130,7 +147,10 @@ void focus_cycle_draw_indicator(ObClient *c)
         XUnmapWindow(ob_display, focus_indicator.bottom.win);
 
         event_end_ignore_all_enters(ignore_start);
-    } else {
+
+        visible = FALSE;
+    }
+    else if (c) {
         /*
           if (c)
               frame_adjust_focus(c->frame, FALSE);
@@ -249,5 +269,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         XMapWindow(ob_display, focus_indicator.left.win);
         XMapWindow(ob_display, focus_indicator.right.win);
         XMapWindow(ob_display, focus_indicator.bottom.win);
+
+        visible = TRUE;
     }
 }

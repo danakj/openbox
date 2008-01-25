@@ -38,6 +38,7 @@ gboolean config_focus_under_mouse;
 
 ObPlacePolicy config_place_policy;
 gboolean      config_place_center;
+gboolean      config_place_active;
 
 StrutPartial config_margins;
 
@@ -54,15 +55,15 @@ RrFont *config_font_menuitem;
 RrFont *config_font_menutitle;
 RrFont *config_font_osd;
 
-gint    config_desktops_num;
+guint   config_desktops_num;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
 
-gboolean config_resize_redraw;
-gboolean config_resize_four_corners;
-gint     config_resize_popup_show;
-gint     config_resize_popup_pos;
+gboolean         config_resize_redraw;
+gint             config_resize_popup_show;
+ObResizePopupPos config_resize_popup_pos;
+GravityPoint     config_resize_popup_fixed;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
@@ -136,14 +137,26 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
 
     if (src->pos_given) {
         dst->pos_given = TRUE;
-        dst->center_x = src->center_x;
-        dst->center_y = src->center_y;
-        dst->opposite_x = src->opposite_x;
-        dst->opposite_y = src->opposite_y;
-        dst->position.x = src->position.x;
-        dst->position.y = src->position.y;
+        dst->position = src->position;
         dst->monitor = src->monitor;
     }
+}
+
+static void config_parse_gravity_coord(xmlDocPtr doc, xmlNodePtr node,
+                                       GravityCoord *c)
+{
+    gchar *s = parse_string(doc, node);
+    if (!g_ascii_strcasecmp(s, "center"))
+        c->center = TRUE;
+    else {
+        if (s[0] == '-')
+            c->opposite = TRUE;
+        if (s[0] == '-' || s[0] == '+')
+            c->pos = atoi(s+1);
+        else
+            c->pos = atoi(s);
+    }
+    g_free(s);
 }
 
 /*
@@ -211,38 +224,16 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
             if ((n = parse_find_node("position", app->children))) {
                 if ((c = parse_find_node("x", n->children)))
                     if (!parse_contains("default", doc, c)) {
-                        gchar *s = parse_string(doc, c);
-                        if (!g_ascii_strcasecmp(s, "center")) {
-                            settings->center_x = TRUE;
-                            x_pos_given = TRUE;
-                        } else {
-                            if (s[0] == '-')
-                                settings->opposite_x = TRUE;
-                            if (s[0] == '-' || s[0] == '+')
-                                settings->position.x = atoi(s+1);
-                            else
-                                settings->position.x = atoi(s);
-                            x_pos_given = TRUE;
-                        }
-                        g_free(s);
+                        config_parse_gravity_coord(doc, c,
+                                                   &settings->position.x);
+                        x_pos_given = TRUE;
                     }
 
                 if (x_pos_given && (c = parse_find_node("y", n->children)))
                     if (!parse_contains("default", doc, c)) {
-                        gchar *s = parse_string(doc, c);
-                        if (!g_ascii_strcasecmp(s, "center")) {
-                            settings->center_y = TRUE;
-                            settings->pos_given = TRUE;
-                        } else {
-                            if (s[0] == '-')
-                                settings->opposite_y = TRUE;
-                            if (s[0] == '-' || s[0] == '+')
-                                settings->position.y = atoi(s+1);
-                            else
-                                settings->position.y = atoi(s);
-                            settings->pos_given = TRUE;
-                        }
-                        g_free(s);
+                        config_parse_gravity_coord(doc, c,
+                                                   &settings->position.y);
+                        settings->pos_given = TRUE;
                     }
 
                 if (settings->pos_given &&
@@ -500,6 +491,8 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_place_policy = OB_PLACE_POLICY_MOUSE;
     if ((n = parse_find_node("center", node)))
         config_place_center = parse_bool(doc, n);
+    if ((n = parse_find_node("active", node)))
+        config_place_active = parse_bool(doc, n);
 }
 
 static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -612,7 +605,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("number", node))) {
         gint d = parse_int(doc, n);
         if (d > 0)
-            config_desktops_num = d;
+            config_desktops_num = (unsigned) d;
     }
     if ((n = parse_find_node("firstdesk", node))) {
         gint d = parse_int(doc, n);
@@ -658,11 +651,24 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_resize_popup_show = 1;
     }
     if ((n = parse_find_node("popupPosition", node))) {
-        config_resize_popup_pos = parse_int(doc, n);
         if (parse_contains("Top", doc, n))
-            config_resize_popup_pos = 1;
+            config_resize_popup_pos = OB_RESIZE_POS_TOP;
         else if (parse_contains("Center", doc, n))
-            config_resize_popup_pos = 0;
+            config_resize_popup_pos = OB_RESIZE_POS_CENTER;
+        else if (parse_contains("Fixed", doc, n)) {
+            config_resize_popup_pos = OB_RESIZE_POS_FIXED;
+
+            if ((n = parse_find_node("popupFixedPosition", node))) {
+                xmlNodePtr n2;
+
+                if ((n2 = parse_find_node("x", n->children)))
+                    config_parse_gravity_coord(doc, n2,
+                                               &config_resize_popup_fixed.x);
+                if ((n2 = parse_find_node("y", n->children)))
+                    config_parse_gravity_coord(doc, n2,
+                                               &config_resize_popup_fixed.y);
+            }
+        }
     }
 }
 
@@ -880,6 +886,7 @@ void config_startup(ObParseInst *i)
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
+    config_place_active = FALSE;
 
     parse_register(i, "placement", parse_placement, NULL);
 
@@ -908,9 +915,10 @@ void config_startup(ObParseInst *i)
     parse_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
-    config_resize_four_corners = FALSE;
     config_resize_popup_show = 1; /* nonpixel increments */
-    config_resize_popup_pos = 0;  /* center of client */
+    config_resize_popup_pos = OB_RESIZE_POS_CENTER;
+    GRAVITY_COORD_SET(config_resize_popup_fixed.x, 0, FALSE, FALSE);
+    GRAVITY_COORD_SET(config_resize_popup_fixed.y, 0, FALSE, FALSE);
 
     parse_register(i, "resize", parse_resize, NULL);
 

@@ -5,6 +5,7 @@
 #include "openbox/frame.h"
 
 typedef struct {
+    gboolean corner_specified;
     guint32 corner;
 } Options;
 
@@ -33,6 +34,8 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 
     if ((n = parse_find_node("edge", node))) {
         gchar *s = parse_string(doc, n);
+
+        o->corner_specified = TRUE;
         if (!g_ascii_strcasecmp(s, "top"))
             o->corner = prop_atoms.net_wm_moveresize_size_top;
         else if (!g_ascii_strcasecmp(s, "bottom"))
@@ -49,6 +52,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             o->corner = prop_atoms.net_wm_moveresize_size_bottomleft;
         else if (!g_ascii_strcasecmp(s, "bottomright"))
             o->corner = prop_atoms.net_wm_moveresize_size_bottomright;
+        else
+            o->corner_specified = FALSE;
+
         g_free(s);
     }
     return o;
@@ -72,7 +78,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         if (!data->button)
             corner = prop_atoms.net_wm_moveresize_size_keyboard;
-        else if (o->corner)
+        else if (o->corner_specified)
             corner = o->corner; /* it was specified in the binding */
         else
             corner = pick_corner(data->x, data->y,

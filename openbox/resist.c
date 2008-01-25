@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "dock.h"
 #include "config.h"
+#include "resist.h"
 #include "parser/parse.h"
 
 #include <glib.h>

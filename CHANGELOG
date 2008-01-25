@@ -2,9 +2,10 @@
   * Added Basque translation
   * Updated French, Vietnamese German, Simplified Chinese, Russian, Portuguese,
     Brasilian Portuguese, and Finnish translations
+  * New Clearlooks theme, updated by David Barr
+  * Updated the previous Clearlooks theme, and renamed it to Clearlooks-3.4
   * Allow dialog type windows to go fullscreen (Fixes Kpdf)
   * Remove the extraneous top border for undecorated windows while maximized
-  * Update the Clearlooks theme
   * Fixes for keyboard modifiers (Alt-tab dialog getting stuck on screen for
     some users)
   * Automatically catch changes to the keyboard map and reconfigure on the fly

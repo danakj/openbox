@@ -2176,12 +2176,13 @@ void client_update_icon_geometry(ObClient *self)
 
     RECT_SET(self->icon_geometry, 0, 0, 0, 0);
 
-    if (PROP_GETA32(self->window, net_wm_icon_geometry, cardinal, &data, &num)
-        && num == 4)
+    if (PROP_GETA32(self->window, net_wm_icon_geometry, cardinal, &data, &num))
     {
-        /* don't let them set it with an area < 0 */
-        RECT_SET(self->icon_geometry, data[0], data[1],
-                 MAX(data[2],0), MAX(data[3],0));
+        if (num == 4)
+            /* don't let them set it with an area < 0 */
+            RECT_SET(self->icon_geometry, data[0], data[1],
+                     MAX(data[2],0), MAX(data[3],0));
+        g_free(data);
     }
 }
 

@@ -19,7 +19,7 @@
     something in the menu
   * Add an <active> option for window placement, which puts new windows on the
     active monitor instead of on any monitor (for xinerama multihead setups)
-  * Add options for placing the window move/resize coordinate popu window in
+  * Add options for placing the window move/resize coordinate popup window in
     a fixed position on screen, rather than relative to the window being
     moved or resized
   * Prevent the dock from auto-hiding completely offscreen if the theme has

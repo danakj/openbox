@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-17 22:13+0100\n"
+"POT-Creation-Date: 2008-01-25 03:51+0100\n"
 "PO-Revision-Date: 2007-07-14 00:43+0200\n"
 "Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Nie można przekonwertować ścieżki '%s' z UTF-8"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Wykonanie '%s' nie powiodło się: %s"
@@ -291,7 +291,7 @@ msgstr ""
 "\n"
 "Proszę zgłaszać błędy (w języku angielskim) pod adresem %s\n"
 
-#: openbox/openbox.c:604
+#: openbox/openbox.c:602
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Nieprawidłowy argument wiersza poleceń '%s'\n"
@@ -311,7 +311,14 @@ msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
 
-#: openbox/screen.c:1162
+#: openbox/screen.c:407
+#, c-format
+msgid ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr ""
+
+#: openbox/screen.c:1168
 #, c-format
 msgid "desktop %i"
 msgstr "pulpit %i"
@@ -331,7 +338,7 @@ msgstr "Nie można zapisać sesji do '%s': %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr "Wystąpił błąd podczas zapisywania sesji do '%s': %s"
 
-#: openbox/startupnotify.c:237
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s\n"
 msgstr "Uruchamianie %s\n"

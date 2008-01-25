@@ -62,6 +62,7 @@ void ob_debug_startup(void)
         g_log_set_handler("Openbox", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL |
                           G_LOG_FLAG_RECURSION, log_handler, NULL);
 
+    obt_paths_unref(p);
     g_free(dir);
 }
 

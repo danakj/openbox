@@ -108,7 +108,6 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 static gpointer setup_center_func(ObParseInst *i, xmlDocPtr doc,
                                   xmlNodePtr node)
 {
-    xmlNodePtr n;
     Options *o;
 
     o = g_new0(Options, 1);

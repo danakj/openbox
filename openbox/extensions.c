@@ -87,7 +87,6 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
     guint i;
     gint l, r, t, b;
     if (ob_debug_xinerama) {
-        g_print("Using fake xinerama !\n");
         gint w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
         gint h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
         *nxin = 2;

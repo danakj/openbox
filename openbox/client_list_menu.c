@@ -22,6 +22,7 @@
 #include "menuframe.h"
 #include "screen.h"
 #include "client.h"
+#include "client_list_menu.h"
 #include "focus.h"
 #include "config.h"
 #include "gettext.h"

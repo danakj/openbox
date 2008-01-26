@@ -22,6 +22,7 @@
 #include "config.h"
 #include "screen.h"
 #include "client.h"
+#include "client_menu.h"
 #include "openbox.h"
 #include "frame.h"
 #include "moveresize.h"

@@ -194,7 +194,7 @@ gint main(gint argc, gchar **argv)
 
     /* set the DISPLAY environment variable for any lauched children, to the
        display we're using, so they open in the right place. */
-    putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
+    setenv("DISPLAY", DisplayString(ob_display), TRUE);
 
     /* create available cursors */
     cursors[OB_CURSOR_NONE] = None;
@@ -516,7 +516,7 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 static void parse_env()
 {
     /* unset this so we don't pass it on unknowingly */
-    putenv(g_strdup("DESKTOP_STARTUP_ID"));
+    unsetenv("DESKTOP_STARTUP_ID");
 }
 
 static void parse_args(gint *argc, gchar **argv)

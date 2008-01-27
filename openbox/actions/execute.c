@@ -4,6 +4,10 @@
 #include "openbox/screen.h"
 #include "gettext.h"
 
+#ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
+
 typedef struct {
     gchar   *cmd;
     gboolean sn;

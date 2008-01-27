@@ -78,7 +78,7 @@ extern ObPlacePolicy config_place_policy;
 extern gboolean config_place_center;
 /*! Place windows on the active monitor (unless they are part of an application
   already on another monitor) */
-extern gboolean config_place_active;
+extern ObPlaceMonitor config_place_monitor;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;

@@ -108,7 +108,10 @@ static Rect **pick_head(ObClient *c)
         }
     }
 
-    if (focus_client && client_normal(focus_client)) {
+    /* skip this if placing by the mouse position */
+    if (focus_client && client_normal(focus_client) &&
+        config_place_monitor != OB_PLACE_MONITOR_MOUSE)
+    {
         add_choice(choice, client_monitor(focus_client));
         ob_debug("placement adding choice %d for normal focused window\n",
                  client_monitor(focus_client));
@@ -146,7 +149,8 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     guint i;
 
     areas = pick_head(client);
-    i = config_place_active ? 0 : g_random_int_range(0, screen_num_monitors);
+    i = (config_place_monitor != OB_PLACE_MONITOR_ANY) ?
+        0 : g_random_int_range(0, screen_num_monitors);
 
     l = areas[i]->x;
     t = areas[i]->y;
@@ -255,9 +259,9 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     /* try ignoring different things to find empty space */
     for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
         /* try all monitors in order of preference, but only the first one
-           if config_place_active is true */
-        for (i = 0; (i < (config_place_active ? 1 : screen_num_monitors) &&
-                     !ret); ++i)
+           if config_place_monitor is MOUSE or ACTIVE */
+        for (i = 0; (i < (config_place_monitor != OB_PLACE_MONITOR_ANY ?
+                          1 : screen_num_monitors) && !ret); ++i)
         {
             GList *it;
 

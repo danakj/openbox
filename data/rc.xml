@@ -35,9 +35,10 @@
   <center>yes</center>
   <!-- whether to place windows in the center of the free area found or
        the top left corner -->
-  <active>no</active>
-  <!-- force new windows onto the active monitor on a multi-head system, unless
-       they are part of an application already on another monitor -->
+  <placeOn>Any</placeOn>
+  <!-- with Smart placement on a multi-monitor system, try to place new windows
+       on: 'Any' - any monitor, 'Mouse' - where the mouse is, 'Active' - where
+       the active window is -->
 </placement>
 
 <theme>

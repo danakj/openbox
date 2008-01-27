@@ -2067,11 +2067,17 @@ void client_update_strut(ObClient *self)
     }
 }
 
+/* Avoid storing icons above this size if possible */
+#define AVOID_ABOVE 64
+
 void client_update_icons(ObClient *self)
 {
     guint num;
     guint32 *data;
     guint w, h, i, j;
+    guint num_seen;  /* number of icons present */
+    guint num_small_seen;  /* number of icons small enough present */
+    guint smallest, smallest_area;
 
     for (i = 0; i < self->nicons; ++i)
         g_free(self->icons[i].data);
@@ -2082,25 +2088,54 @@ void client_update_icons(ObClient *self)
     if (PROP_GETA32(self->window, net_wm_icon, cardinal, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
-        while (num - i > 2) {
-            w = data[i++];
-            h = data[i++];
-            i += w * h;
-            if (i > num || w*h == 0) break;
-            ++self->nicons;
-        }
+        num_seen = num_small_seen = 0;
+        smallest = smallest_area = 0;
+        if (num > 2)
+            while (i < num) {
+                w = data[i++];
+                h = data[i++];
+                i += w * h;
+                /* watch for it being too small for the specified size, or for
+                   zero sized icons. */
+                if (i > num || w == 0 || h == 0) break;
+
+                if (!smallest_area || w*h < smallest_area) {
+                    smallest = num_seen;
+                    smallest_area = w*h;
+                }
+                ++num_seen;
+                if (w <= AVOID_ABOVE && h <= AVOID_ABOVE)
+                    ++num_small_seen;
+            }
+        if (num_small_seen > 0)
+            self->nicons = num_small_seen;
+        else if (num_seen)
+            self->nicons = 1;
 
         self->icons = g_new(ObClientIcon, self->nicons);
 
         /* store the icons */
         i = 0;
-        for (j = 0; j < self->nicons; ++j) {
+        for (j = 0; j < self->nicons;) {
             guint x, y, t;
 
             w = self->icons[j].width = data[i++];
             h = self->icons[j].height = data[i++];
 
-            if (w*h == 0) continue;
+            /* if there are some icons smaller than the threshold, we're
+               skipping all the ones above */
+            if (num_small_seen > 0) {
+                if (w > AVOID_ABOVE || h > AVOID_ABOVE) {
+                    i += w*h;
+                    continue;
+                }
+            }
+            /* if there were no icons smaller than the threshold, then we are
+               only taking the smallest available one we saw */
+            else if (j != smallest) {
+                i += w*h;
+                continue;
+            }
 
             self->icons[j].data = g_new(RrPixel32, w * h);
             for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
@@ -2115,6 +2150,8 @@ void client_update_icons(ObClient *self)
                     (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
             }
             g_assert(i <= num);
+
+            ++j;
         }
 
         g_free(data);

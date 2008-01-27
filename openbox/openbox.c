@@ -36,6 +36,7 @@
 #include "focus_cycle_popup.h"
 #include "moveresize.h"
 #include "frame.h"
+#include "framerender.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "extensions.h"

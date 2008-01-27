@@ -71,7 +71,9 @@ struct _ObMenuFrame
 
     gint monitor; /* monitor on which to show the menu in xinerama */
 
-    RrAppearance *a_title;
+    /* We make a copy of this for each menu, so that we don't have to re-render
+       the background of the entire menu each time we render an item inside it.
+    */
     RrAppearance *a_items;
 
     gboolean got_press; /* don't allow a KeyRelease event to run things in the
@@ -94,22 +96,6 @@ struct _ObMenuEntryFrame
     Window icon;
     Window text;
     Window bullet;
-
-    RrAppearance *a_normal;
-    RrAppearance *a_selected;
-    RrAppearance *a_disabled;
-    RrAppearance *a_disabled_selected;
-
-    RrAppearance *a_icon;
-    RrAppearance *a_mask;
-    RrAppearance *a_bullet_normal;
-    RrAppearance *a_bullet_selected;
-    RrAppearance *a_separator;
-    RrAppearance *a_text_normal;
-    RrAppearance *a_text_selected;
-    RrAppearance *a_text_disabled;
-    RrAppearance *a_text_disabled_selected;
-    RrAppearance *a_text_title;
 };
 
 extern GHashTable *menu_frame_map;

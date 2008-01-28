@@ -201,14 +201,17 @@ void client_manage_all(void)
         }
     }
 
-    for (i = 0; i < nchild; ++i) {
-        if (children[i] == None)
+    /* manage windows in reverse order from how they were originally mapped.
+       this is an attempt to manage children windows before their parents, so
+       that when the parent is mapped, it can find the child */
+    for (i = nchild; i > 0; --i) {
+        if (children[i--1] == None)
             continue;
-        if (XGetWindowAttributes(ob_display, children[i], &attrib)) {
+        if (XGetWindowAttributes(ob_display, children[i-1], &attrib)) {
             if (attrib.override_redirect) continue;
 
             if (attrib.map_state != IsUnmapped)
-                client_manage(children[i]);
+                client_manage(children[i-1]);
         }
     }
     XFree(children);
@@ -289,6 +292,11 @@ void client_manage(Window window)
     ob_debug("Window type: %d\n", self->type);
     ob_debug("Window group: 0x%x\n", self->group?self->group->leader:0);
 
+    /* now we have all of the window's information so we can set this up.
+       do this before creating the frame, so it can tell that we are still
+       mapping and doesn't go applying things right away */
+    client_setup_decor_and_functions(self, FALSE);
+
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically */
     XChangeSaveSet(ob_display, window, SetModeInsert);
@@ -316,17 +324,11 @@ void client_manage(Window window)
        WM_STATE to apply. */
     client_change_state(self);
 
-    /* add ourselves to the focus order. do this before
-       setup_decor_and_functions.  if the window is mapping in a state that is
-       not allowed, then it will be adjusted, and that can change its position
-       in the focus order (deiconify for example) */
+    /* add ourselves to the focus order */
     focus_order_add_new(self);
 
     /* do this to add ourselves to the stacking list in a non-intrusive way */
     client_calc_layer(self);
-
-    /* now we have all of the window's information so we can set this up */
-    client_setup_decor_and_functions(self, FALSE);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&

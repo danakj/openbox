@@ -1832,15 +1832,15 @@ static void client_change_allowed_actions(ObClient *self)
 
     OBT_PROP_SETA32(self->window, NET_WM_ALLOWED_ACTIONS, ATOM, actions, num);
 
-    /* make sure the window isn't breaking any rules now */
+   /* make sure the window isn't breaking any rules now
+
+   don't check ICONIFY here.  just cuz a window can't iconify doesnt mean
+   it can't be iconified with its parent
+   */
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE) && self->shaded) {
         if (self->frame) client_shade(self, FALSE);
         else self->shaded = FALSE;
-    }
-    if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
-        if (self->frame) client_iconify(self, FALSE, TRUE, FALSE);
-        else self->iconic = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
         if (self->frame) client_fullscreen(self, FALSE);

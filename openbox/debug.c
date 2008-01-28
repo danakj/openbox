@@ -48,6 +48,8 @@ void ob_debug_startup(void)
     else {
         gchar *name = g_build_filename(obt_paths_cache_home(p),
                                        "openbox", "openbox.log", NULL);
+        /* unlink it before opening to remove competition */
+        unlink(name);
         log_file = fopen(name, "w");
         g_free(name);
     }

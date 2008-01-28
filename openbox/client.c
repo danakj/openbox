@@ -309,9 +309,6 @@ void client_manage(Window window)
     /* the session should get the last say though */
     client_restore_session_state(self);
 
-    /* now we have all of the window's information so we can set this up */
-    client_setup_decor_and_functions(self, FALSE);
-
     /* tell startup notification that this app started */
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
@@ -319,11 +316,17 @@ void client_manage(Window window)
        WM_STATE to apply. */
     client_change_state(self);
 
-    /* add ourselves to the focus order */
+    /* add ourselves to the focus order. do this before
+       setup_decor_and_functions.  if the window is mapping in a state that is
+       not allowed, then it will be adjusted, and that can change its position
+       in the focus order (deiconify for example) */
     focus_order_add_new(self);
 
     /* do this to add ourselves to the stacking list in a non-intrusive way */
     client_calc_layer(self);
+
+    /* now we have all of the window's information so we can set this up */
+    client_setup_decor_and_functions(self, FALSE);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&

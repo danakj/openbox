@@ -204,14 +204,14 @@ void client_manage_all(void)
     /* manage windows in reverse order from how they were originally mapped.
        this is an attempt to manage children windows before their parents, so
        that when the parent is mapped, it can find the child */
-    for (i = nchild; i > 0; --i) {
-        if (children[i--1] == None)
+    for (i = 0; i < nchild; ++i) {
+        if (children[i] == None)
             continue;
-        if (XGetWindowAttributes(ob_display, children[i-1], &attrib)) {
+        if (XGetWindowAttributes(ob_display, children[i], &attrib)) {
             if (attrib.override_redirect) continue;
 
             if (attrib.map_state != IsUnmapped)
-                client_manage(children[i-1]);
+                client_manage(children[i]);
         }
     }
     XFree(children);
@@ -1836,15 +1836,15 @@ static void client_change_allowed_actions(ObClient *self)
 
     PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
 
-    /* make sure the window isn't breaking any rules now */
+   /* make sure the window isn't breaking any rules now
+
+   don't check ICONIFY here.  just cuz a window can't iconify doesnt mean
+   it can't be iconified with its parent
+   */
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE) && self->shaded) {
         if (self->frame) client_shade(self, FALSE);
         else self->shaded = FALSE;
-    }
-    if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
-        if (self->frame) client_iconify(self, FALSE, TRUE, FALSE);
-        else self->iconic = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
         if (self->frame) client_fullscreen(self, FALSE);

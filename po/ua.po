@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-17 22:13+0100\n"
+"POT-Creation-Date: 2008-01-25 03:51+0100\n"
 "PO-Revision-Date: 2007-06-16 13:02+0200\n"
 "Last-Translator: Dmitriy Moroz <zux@dimaka.org.ua>\n"
 "Language-Team: Ukrainian <root@archlinux.org.ua>\n"
@@ -25,7 +25,7 @@ msgstr "Здійснено запит на некоректну дію '%s'. Н�
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Не вдалося сконвертувати шлях '%s' з utf8"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Невдалося виконати '%s': %s"
@@ -288,7 +288,7 @@ msgstr ""
 "\n"
 "Будь-ласка, повідомляйте про помилки на %s\n"
 
-#: openbox/openbox.c:604
+#: openbox/openbox.c:602
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Некоректний командний аргумент '%s'\n"
@@ -308,7 +308,14 @@ msgstr "Не можу отримати вибір менеджера вікон 
 msgid "The WM on screen %d is not exiting"
 msgstr "Менеджео вікон на дисплеї %d не завершується"
 
-#: openbox/screen.c:1162
+#: openbox/screen.c:407
+#, c-format
+msgid ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr ""
+
+#: openbox/screen.c:1168
 #, c-format
 msgid "desktop %i"
 msgstr "стільниця %i"
@@ -328,7 +335,7 @@ msgstr "Не вдалося зберегти сесію в '%s': %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr "Помилка при збереженні сесії в '%s': %s"
 
-#: openbox/startupnotify.c:237
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s\n"
 msgstr "Виконується %s\n"

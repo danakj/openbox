@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6\n"
+"Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-22 07:58+0100\n"
+"POT-Creation-Date: 2008-01-25 03:51+0100\n"
 "PO-Revision-Date: 2008-01-22 07:56+0100\n"
 "Last-Translator: Nikita Bukhvostov <dragon.djanic@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -309,7 +309,14 @@ msgstr "Не могу получить выбор менеджера окон н
 msgid "The WM on screen %d is not exiting"
 msgstr "Менеджер окон на экране %d не завершается"
 
-#: openbox/screen.c:1162
+#: openbox/screen.c:407
+#, c-format
+msgid ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr ""
+
+#: openbox/screen.c:1168
 #, c-format
 msgid "desktop %i"
 msgstr "рабочий стол %i"

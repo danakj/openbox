@@ -31,13 +31,13 @@ typedef enum {
     OB_WINDOW_CLASS_MENUFRAME,
     OB_WINDOW_CLASS_DOCK,
     OB_WINDOW_CLASS_CLIENT,
-    OB_WINDOW_CLASS_INTERNALWINDOW
-} Window_InternalType;
+    OB_WINDOW_CLASS_INTERNAL
+} ObWindowClass;
 
 /* In order to be an ObWindow, you need to make this struct the top of your
    struct */
 struct _ObWindow {
-    Window_InternalType type;
+    ObWindowClass type;
 };
 
 #define WINDOW_IS_MENUFRAME(win) \
@@ -46,8 +46,8 @@ struct _ObWindow {
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_DOCK)
 #define WINDOW_IS_CLIENT(win) \
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_CLIENT)
-#define WINDOW_IS_INTERNALWINDOW(win) \
-    (((ObWindow*)win)->type == OB_WINDOW_CLASS_INTERNALWINDOW)
+#define WINDOW_IS_INTERNAL(win) \
+    (((ObWindow*)win)->type == OB_WINDOW_CLASS_INTERNAL)
 
 struct _ObMenu;
 struct _ObDock;
@@ -57,12 +57,12 @@ struct _ObClient;
 #define WINDOW_AS_MENUFRAME(win) ((struct _ObMenuFrame*)win)
 #define WINDOW_AS_DOCK(win) ((struct _ObDock*)win)
 #define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)
-#define WINDOW_AS_INTERNALWINDOW(win) ((struct _ObInternalWindow*)win)
+#define WINDOW_AS_INTERNAL(win) ((struct _ObInternalWindow*)win)
 
 #define MENUFRAME_AS_WINDOW(menu) ((ObWindow*)menu)
 #define DOCK_AS_WINDOW(dock) ((ObWindow*)dock)
 #define CLIENT_AS_WINDOW(client) ((ObWindow*)client)
-#define INTERNALWINDOW_AS_WINDOW(intern) ((ObWindow*)intern)
+#define INTERNAL_AS_WINDOW(intern) ((ObWindow*)intern)
 
 void window_startup (gboolean reconfig);
 void window_shutdown(gboolean reconfig);

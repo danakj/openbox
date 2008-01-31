@@ -33,7 +33,7 @@ ObPopup *popup_new(void)
     XSetWindowAttributes attrib;
     ObPopup *self = g_new0(ObPopup, 1);
 
-    self->obwin.type = OB_WINDOW_CLASS_INTERNALWINDOW;
+    self->obwin.type = OB_WINDOW_CLASS_INTERNAL;
     self->gravity = NorthWestGravity;
     self->x = self->y = self->textw = self->h = 0;
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
@@ -56,8 +56,8 @@ ObPopup *popup_new(void)
 
     XMapWindow(obt_display, self->text);
 
-    stacking_add(INTERNALWINDOW_AS_WINDOW(self));
-    window_add(&self->bg, INTERNALWINDOW_AS_WINDOW(self));
+    stacking_add(INTERNAL_AS_WINDOW(self));
+    window_add(&self->bg, INTERNAL_AS_WINDOW(self));
     return self;
 }
 
@@ -141,7 +141,7 @@ static gboolean popup_show_timeout(gpointer data)
     ObPopup *self = data;
 
     XMapWindow(obt_display, self->bg);
-    stacking_raise(INTERNALWINDOW_AS_WINDOW(self));
+    stacking_raise(INTERNAL_AS_WINDOW(self));
     self->mapped = TRUE;
     self->delay_mapped = FALSE;
 

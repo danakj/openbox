@@ -98,7 +98,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     single_popup = icon_popup_new();
 
-    popup.obwin.type = OB_WINDOW_CLASS_INTERNALWINDOW;
+    popup.obwin.type = OB_WINDOW_CLASS_INTERNAL;
     popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
     popup.a_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
     popup.a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
@@ -126,8 +126,8 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     XMapWindow(obt_display, popup.text);
 
-    stacking_add(INTERNALWINDOW_AS_WINDOW(&popup));
-    window_add(&popup.bg, INTERNALWINDOW_AS_WINDOW(&popup));
+    stacking_add(INTERNAL_AS_WINDOW(&popup));
+    window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
 }
 
 void focus_cycle_popup_shutdown(gboolean reconfig)
@@ -135,7 +135,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     icon_popup_free(single_popup);
 
     window_remove(popup.bg);
-    stacking_remove(INTERNALWINDOW_AS_WINDOW(&popup));
+    stacking_remove(INTERNAL_AS_WINDOW(&popup));
 
     while(popup.targets) {
         ObFocusCyclePopupTarget *t = popup.targets->data;

@@ -476,7 +476,7 @@ static void event_process(const XEvent *ec, gpointer data)
         case OB_WINDOW_CLASS_MENUFRAME:
             menu = WINDOW_AS_MENUFRAME(obwin);
             break;
-        case OB_WINDOW_CLASS_INTERNALWINDOW:
+        case OB_WINDOW_CLASS_INTERNAL:
             /* we don't do anything with events directly on these windows */
             break;
         }
@@ -711,7 +711,7 @@ static void event_process(const XEvent *ec, gpointer data)
             ObWindow *w;
 
             if ((w = window_find(e->xbutton.subwindow)) &&
-                WINDOW_IS_INTERNALWINDOW(w))
+                WINDOW_IS_INTERNAL(w))
             {
                 event_handle_user_input(client, e);
             }

@@ -52,8 +52,8 @@ Window window_top(ObWindow *self)
         return WINDOW_AS_DOCK(self)->frame;
     case OB_WINDOW_CLASS_CLIENT:
         return WINDOW_AS_CLIENT(self)->frame->window;
-    case OB_WINDOW_CLASS_INTERNALWINDOW:
-        return WINDOW_AS_INTERNALWINDOW(self)->window;
+    case OB_WINDOW_CLASS_INTERNAL:
+        return WINDOW_AS_INTERNAL(self)->window;
     }
     g_assert_not_reached();
     return None;
@@ -67,7 +67,7 @@ ObStackingLayer window_layer(ObWindow *self)
     case OB_WINDOW_CLASS_CLIENT:
         return ((ObClient*)self)->layer;
     case OB_WINDOW_CLASS_MENUFRAME:
-    case OB_WINDOW_CLASS_INTERNALWINDOW:
+    case OB_WINDOW_CLASS_INTERNAL:
         return OB_STACKING_LAYER_INTERNAL;
     }
     g_assert_not_reached();

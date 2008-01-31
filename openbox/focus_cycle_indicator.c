@@ -59,10 +59,10 @@ void focus_cycle_indicator_startup(gboolean reconfig)
 
     if (reconfig) return;
 
-    focus_indicator.top.obwin.type = OB_WINDOW_CLASS_INTERNALWINDOW;
-    focus_indicator.left.obwin.type = OB_WINDOW_CLASS_INTERNALWINDOW;
-    focus_indicator.right.obwin.type = OB_WINDOW_CLASS_INTERNALWINDOW;
-    focus_indicator.bottom.obwin.type = OB_WINDOW_CLASS_INTERNALWINDOW;
+    focus_indicator.top.obwin.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.left.obwin.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.right.obwin.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.bottom.obwin.type = OB_WINDOW_CLASS_INTERNAL;
 
     attr.override_redirect = True;
     attr.background_pixel = BlackPixel(obt_display, ob_screen);
@@ -79,18 +79,18 @@ void focus_cycle_indicator_startup(gboolean reconfig)
         create_window(obt_root(ob_screen),
                       CWOverrideRedirect | CWBackPixel, &attr);
 
-    stacking_add(INTERNALWINDOW_AS_WINDOW(&focus_indicator.top));
-    stacking_add(INTERNALWINDOW_AS_WINDOW(&focus_indicator.left));
-    stacking_add(INTERNALWINDOW_AS_WINDOW(&focus_indicator.right));
-    stacking_add(INTERNALWINDOW_AS_WINDOW(&focus_indicator.bottom));
+    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.top));
+    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.left));
+    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.right));
+    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
     window_add(&focus_indicator.top.window,
-               INTERNALWINDOW_AS_WINDOW(&focus_indicator.top));
+               INTERNAL_AS_WINDOW(&focus_indicator.top));
     window_add(&focus_indicator.left.window,
-               INTERNALWINDOW_AS_WINDOW(&focus_indicator.left));
+               INTERNAL_AS_WINDOW(&focus_indicator.left));
     window_add(&focus_indicator.right.window,
-               INTERNALWINDOW_AS_WINDOW(&focus_indicator.right));
+               INTERNAL_AS_WINDOW(&focus_indicator.right));
     window_add(&focus_indicator.bottom.window,
-               INTERNALWINDOW_AS_WINDOW(&focus_indicator.bottom));
+               INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
     color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
 
@@ -122,10 +122,10 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
     window_remove(focus_indicator.right.window);
     window_remove(focus_indicator.bottom.window);
 
-    stacking_remove(INTERNALWINDOW_AS_WINDOW(&focus_indicator.top));
-    stacking_remove(INTERNALWINDOW_AS_WINDOW(&focus_indicator.left));
-    stacking_remove(INTERNALWINDOW_AS_WINDOW(&focus_indicator.right));
-    stacking_remove(INTERNALWINDOW_AS_WINDOW(&focus_indicator.bottom));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.top));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.left));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.right));
+    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
     XDestroyWindow(obt_display, focus_indicator.top.window);
     XDestroyWindow(obt_display, focus_indicator.left.window);

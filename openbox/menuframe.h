@@ -38,7 +38,7 @@ extern GList *menu_frame_visible;
 struct _ObMenuFrame
 {
     /* stuff to be an ObWindow */
-    Window_InternalType type;
+    ObWindow type;
     Window window;
 
     struct _ObMenu *menu;

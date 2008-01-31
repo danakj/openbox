@@ -993,6 +993,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     gint fw, fh;
     Rect desired;
     guint i;
+    gboolean found_mon;
 
     RECT_SET(desired, *x, *y, w, h);
     frame_rect_to_frame(self->frame, &desired);
@@ -1042,18 +1043,26 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             rudeb = TRUE;
     }
 
+    /* we iterate through every monitor that the window is at least partially
+       on, to make sure it is obeying the rules on them all
+
+       if the window does not appear on any monitors, then use the first one
+    */
+    found_mon = FALSE;
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *a;
 
         if (!screen_physical_area_monitor_contains(i, &desired)) {
-            if (i < screen_num_monitors - 1)
+            if (i < screen_num_monitors - 1 || found_mon)
                 continue;
 
             /* the window is not inside any monitor! so just use the first
                one */
             a = screen_area(self->desktop, 0, NULL);
-        } else
+        } else {
+            found_mon = TRUE;
             a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
+        }
 
         /* This makes sure windows aren't entirely outside of the screen so you
            can't see them at all.

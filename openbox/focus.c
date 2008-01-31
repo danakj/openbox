@@ -91,8 +91,7 @@ void focus_set_client(ObClient *client)
     /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
     if (ob_state() != OB_STATE_EXITING) {
         active = client ? client->window : None;
-        OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
-                       NET_ACTIVE_WINDOW, WINDOW, active);
+        OBT_PROP_SET32(obt_root(ob_screen), NET_ACTIVE_WINDOW, WINDOW, active);
     }
 }
 

@@ -67,16 +67,16 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     attr.override_redirect = True;
     attr.background_pixel = BlackPixel(obt_display, ob_screen);
     focus_indicator.top.window =
-        create_window(RootWindow(obt_display, ob_screen),
+        create_window(obt_root(ob_screen),
                       CWOverrideRedirect | CWBackPixel, &attr);
     focus_indicator.left.window =
-        create_window(RootWindow(obt_display, ob_screen),
+        create_window(obt_root(ob_screen),
                       CWOverrideRedirect | CWBackPixel, &attr);
     focus_indicator.right.window =
-        create_window(RootWindow(obt_display, ob_screen),
+        create_window(obt_root(ob_screen),
                       CWOverrideRedirect | CWBackPixel, &attr);
     focus_indicator.bottom.window =
-        create_window(RootWindow(obt_display, ob_screen),
+        create_window(obt_root(ob_screen),
                       CWOverrideRedirect | CWBackPixel, &attr);
 
     stacking_add(INTERNALWINDOW_AS_WINDOW(&focus_indicator.top));

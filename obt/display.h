@@ -61,6 +61,8 @@ void     obt_display_close();
 
 void     obt_display_ignore_errors(gboolean ignore);
 
+#define  obt_root(screen) (RootWindow(obt_display, screen))
+
 G_END_DECLS
 
 #endif /*__obt_display_h*/

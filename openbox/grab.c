@@ -74,8 +74,7 @@ gboolean grab_keyboard_full(gboolean grab)
 
     if (grab) {
         if (kgrabs++ == 0) {
-            ret = XGrabKeyboard(obt_display,
-                                RootWindow(obt_display, ob_screen),
+            ret = XGrabKeyboard(obt_display, obt_root(ob_screen),
                                 False, GrabModeAsync, GrabModeAsync,
                                 event_curtime) == Success;
             if (!ret)
@@ -106,8 +105,7 @@ gboolean grab_pointer_full(gboolean grab, gboolean owner_events,
             ret = XGrabPointer(obt_display, screen_support_win, owner_events,
                                GRAB_PTR_MASK,
                                GrabModeAsync, GrabModeAsync,
-                               (confine ? RootWindow(obt_display, ob_screen) :
-                                None),
+                               (confine ? obt_root(ob_screen) : None),
                                ob_cursor(cur), event_curtime) == Success;
             if (!ret)
                 --pgrabs;

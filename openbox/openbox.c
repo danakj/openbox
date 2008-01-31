@@ -144,7 +144,7 @@ gint main(gint argc, gchar **argv)
         /* Send client message telling the OB process to:
          * remote_control = 1 -> reconfigure
          * remote_control = 2 -> restart */
-        OBT_PROP_MSG(ob_screen, RootWindow(obt_display, ob_screen),
+        OBT_PROP_MSG(ob_screen, obt_root(ob_screen),
                      OB_CONTROL, remote_control, 0, 0, 0, 0);
         obt_display_close(obt_display);
         exit(EXIT_SUCCESS);
@@ -233,8 +233,7 @@ gint main(gint argc, gchar **argv)
 
 /*
                 if (config_type != NULL)
-                    PROP_SETS(RootWindow(obt_display, ob_screen),
-                              ob_config, config_type);
+                    PROP_SETS(obt_root(ob_screen), ob_config, config_type);
 */
 
                 /* we're done with parsing now, kill it */
@@ -257,7 +256,7 @@ gint main(gint argc, gchar **argv)
                 if (ob_rr_theme == NULL)
                     ob_exit_with_error(_("Unable to load a theme."));
 
-                OBT_PROP_SETS(RootWindow(obt_display, ob_screen),
+                OBT_PROP_SETS(obt_root(ob_screen),
                               OB_THEME, utf8, ob_rr_theme->name);
             }
 
@@ -300,7 +299,7 @@ gint main(gint argc, gchar **argv)
                 focus_nothing();
 
                 /* focus what was focused if a wm was already running */
-                if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
+                if (OBT_PROP_GET32(obt_root(ob_screen),
                                    NET_ACTIVE_WINDOW, WINDOW, &xid) &&
                     (w = window_find(xid)) && WINDOW_IS_CLIENT(w))
                 {

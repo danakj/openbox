@@ -468,7 +468,7 @@ void obt_prop_message(gint screen, Window about, Atom messagetype,
                       glong data0, glong data1, glong data2, glong data3,
                       glong data4, glong mask)
 {
-    obt_prop_message_to(RootWindow(obt_display, screen), about, messagetype,
+    obt_prop_message_to(obt_root(screen), about, messagetype,
                         data0, data1, data2, data3, data4, mask);
 }
 

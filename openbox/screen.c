@@ -146,8 +146,7 @@ static gboolean replace_wm(void)
     }
 
     /* Send client message indicating that we are now the WM */
-    obt_prop_message(ob_screen, RootWindow(obt_display, ob_screen),
-                     OBT_PROP_ATOM(MANAGER),
+    obt_prop_message(ob_screen, obt_root(ob_screen), OBT_PROP_ATOM(MANAGER),
                      timestamp, wm_sn_atom, screen_support_win, 0, 0,
                      SubstructureNotifyMask);
 
@@ -164,8 +163,7 @@ gboolean screen_annex(void)
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
     attrib.event_mask = PropertyChangeMask;
-    screen_support_win = XCreateWindow(obt_display,
-                                       RootWindow(obt_display, ob_screen),
+    screen_support_win = XCreateWindow(obt_display, obt_root(ob_screen),
                                        -100, -100, 1, 1, 0,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
@@ -180,8 +178,7 @@ gboolean screen_annex(void)
     }
 
     obt_display_ignore_errors(TRUE);
-    XSelectInput(obt_display, RootWindow(obt_display, ob_screen),
-                 ROOT_EVENTMASK);
+    XSelectInput(obt_display, obt_root(ob_screen), ROOT_EVENTMASK);
     obt_display_ignore_errors(FALSE);
     if (obt_display_error_occured) {
         g_message(_("A window manager is already running on screen %d"),
@@ -195,11 +192,10 @@ gboolean screen_annex(void)
 
     /* set the OPENBOX_PID hint */
     pid = getpid();
-    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
-                   OPENBOX_PID, CARDINAL, pid);
+    OBT_PROP_SET32(obt_root(ob_screen), OPENBOX_PID, CARDINAL, pid);
 
     /* set supporting window */
-    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+    OBT_PROP_SET32(obt_root(ob_screen),
                    NET_SUPPORTING_WM_CHECK, WINDOW, screen_support_win);
 
     /* set properties on the supporting window */
@@ -297,7 +293,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
     g_assert(i == num_support);
 
-    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+    OBT_PROP_SETA32(obt_root(ob_screen),
                     NET_SUPPORTED, ATOM, supported, num_support);
     g_free(supported);
 
@@ -331,13 +327,13 @@ static void screen_tell_ksplash(void)
        something. oh well. */
     e.xclient.type = ClientMessage;
     e.xclient.display = obt_display;
-    e.xclient.window = RootWindow(obt_display, ob_screen);
+    e.xclient.window = obt_root(ob_screen);
     e.xclient.message_type =
         XInternAtom(obt_display, "_KDE_SPLASH_PROGRESS", False );
     e.xclient.format = 8;
     strcpy(e.xclient.data.b, "wm started");
-    XSendEvent(obt_display, RootWindow(obt_display, ob_screen),
-               False, SubstructureNotifyMask, &e );
+    XSendEvent(obt_display, obt_root(ob_screen),
+               False, SubstructureNotifyMask, &e);
 }
 
 void screen_startup(gboolean reconfig)
@@ -361,9 +357,7 @@ void screen_startup(gboolean reconfig)
     screen_resize();
 
     /* have names already been set for the desktops? */
-    if (OBT_PROP_GETSS(RootWindow(obt_display, ob_screen),
-                       NET_DESKTOP_NAMES, utf8, &names))
-    {
+    if (OBT_PROP_GETSS(obt_root(ob_screen), NET_DESKTOP_NAMES, utf8, &names)) {
         g_strfreev(names);
         namesexist = TRUE;
     }
@@ -384,7 +378,7 @@ void screen_startup(gboolean reconfig)
             names[i] = g_strdup(it->data);
 
         /* set the root window property */
-        OBT_PROP_SETSS(RootWindow(obt_display, ob_screen),
+        OBT_PROP_SETSS(obt_root(ob_screen),
                        NET_DESKTOP_NAMES, utf8, (const gchar**)names);
 
         g_strfreev(names);
@@ -395,7 +389,7 @@ void screen_startup(gboolean reconfig)
        this will also set the default names from the config file up for
        desktops that don't have names yet */
     screen_num_desktops = 0;
-    if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
+    if (OBT_PROP_GET32(obt_root(ob_screen),
                        NET_NUMBER_OF_DESKTOPS, CARDINAL, &d))
         screen_set_num_desktops(d);
     /* restore from session if possible */
@@ -406,7 +400,7 @@ void screen_startup(gboolean reconfig)
 
     screen_desktop = screen_num_desktops;  /* something invalid */
     /* start on the current desktop when a wm was already running */
-    if (OBT_PROP_GET32(RootWindow(obt_display, ob_screen),
+    if (OBT_PROP_GET32(obt_root(ob_screen),
                        NET_CURRENT_DESKTOP, CARDINAL, &d) &&
         d < screen_num_desktops)
     {
@@ -421,7 +415,7 @@ void screen_startup(gboolean reconfig)
 
     /* don't start in showing-desktop mode */
     screen_showing_desktop = FALSE;
-    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
+    OBT_PROP_SET32(obt_root(ob_screen),
                    NET_SHOWING_DESKTOP, CARDINAL, screen_showing_desktop);
 
     if (session_desktop_layout_present &&
@@ -440,15 +434,14 @@ void screen_shutdown(gboolean reconfig)
     if (reconfig)
         return;
 
-    XSelectInput(obt_display, RootWindow(obt_display, ob_screen),
-                 NoEventMask);
+    XSelectInput(obt_display, obt_root(ob_screen), NoEventMask);
 
     /* we're not running here no more! */
-    OBT_PROP_ERASE(RootWindow(obt_display, ob_screen), OPENBOX_PID);
+    OBT_PROP_ERASE(obt_root(ob_screen), OPENBOX_PID);
     /* not without us */
-    OBT_PROP_ERASE(RootWindow(obt_display, ob_screen), NET_SUPPORTED);
+    OBT_PROP_ERASE(obt_root(ob_screen), NET_SUPPORTED);
     /* don't keep this mode */
-    OBT_PROP_ERASE(RootWindow(obt_display, ob_screen), NET_SHOWING_DESKTOP);
+    OBT_PROP_ERASE(obt_root(ob_screen), NET_SHOWING_DESKTOP);
 
     XDestroyWindow(obt_display, screen_support_win);
 
@@ -473,7 +466,7 @@ void screen_resize(void)
     /* Set the _NET_DESKTOP_GEOMETRY hint */
     screen_physical_size.width = geometry[0] = w;
     screen_physical_size.height = geometry[1] = h;
-    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+    OBT_PROP_SETA32(obt_root(ob_screen),
                     NET_DESKTOP_GEOMETRY, CARDINAL, geometry, 2);
 
     if (ob_state() == OB_STATE_STARTING)
@@ -498,12 +491,11 @@ void screen_set_num_desktops(guint num)
 
     old = screen_num_desktops;
     screen_num_desktops = num;
-    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
-                   NET_NUMBER_OF_DESKTOPS, CARDINAL, num);
+    OBT_PROP_SET32(obt_root(ob_screen), NET_NUMBER_OF_DESKTOPS, CARDINAL, num);
 
     /* set the viewport hint */
     viewport = g_new0(gulong, num * 2);
-    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
+    OBT_PROP_SETA32(obt_root(ob_screen),
                     NET_DESKTOP_VIEWPORT, CARDINAL, viewport, num * 2);
     g_free(viewport);
 
@@ -599,8 +591,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     if (previous == num) return;
 
-    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
-                   NET_CURRENT_DESKTOP, CARDINAL, num);
+    OBT_PROP_SET32(obt_root(ob_screen), NET_CURRENT_DESKTOP, CARDINAL, num);
 
     /* This whole thing decides when/how to save the screen_last_desktop so
        that it can be restored later if you want */
@@ -1089,7 +1080,7 @@ void screen_update_layout(void)
     screen_desktop_layout.rows = 1;
     screen_desktop_layout.columns = screen_num_desktops;
 
-    if (OBT_PROP_GETA32(RootWindow(obt_display, ob_screen),
+    if (OBT_PROP_GETA32(obt_root(ob_screen),
                         NET_DESKTOP_LAYOUT, CARDINAL, &data, &num)) {
         if (num == 3 || num == 4) {
 
@@ -1134,7 +1125,7 @@ void screen_update_desktop_names(void)
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
 
-    if (OBT_PROP_GETSS(RootWindow(obt_display, ob_screen),
+    if (OBT_PROP_GETSS(obt_root(ob_screen),
                        NET_DESKTOP_NAMES, utf8, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
@@ -1161,7 +1152,7 @@ void screen_update_desktop_names(void)
 
         /* if we changed any names, then set the root property so we can
            all agree on the names */
-        OBT_PROP_SETSS(RootWindow(obt_display, ob_screen), NET_DESKTOP_NAMES,
+        OBT_PROP_SETSS(obt_root(ob_screen), NET_DESKTOP_NAMES,
                        utf8, (const gchar**)screen_desktop_names);
     }
 
@@ -1229,8 +1220,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
     }
 
     show = !!show; /* make it boolean */
-    OBT_PROP_SET32(RootWindow(obt_display, ob_screen),
-                   NET_SHOWING_DESKTOP, CARDINAL, show);
+    OBT_PROP_SET32(obt_root(ob_screen), NET_SHOWING_DESKTOP, CARDINAL, show);
 }
 
 void screen_install_colormap(ObClient *client, gboolean install)
@@ -1454,7 +1444,7 @@ void screen_update_areas(void)
 
     /* all the work areas are not used here, only the ones for the first
        monitor are */
-    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen), NET_WORKAREA, CARDINAL,
+    OBT_PROP_SETA32(obt_root(ob_screen), NET_WORKAREA, CARDINAL,
                     dims, 4 * screen_num_desktops);
 
     /* the area has changed, adjust all the windows if they need it */
@@ -1696,10 +1686,10 @@ Rect* screen_physical_area_active(void)
 void screen_set_root_cursor(void)
 {
     if (sn_app_starting())
-        XDefineCursor(obt_display, RootWindow(obt_display, ob_screen),
+        XDefineCursor(obt_display, obt_root(ob_screen),
                       ob_cursor(OB_CURSOR_BUSYPOINTER));
     else
-        XDefineCursor(obt_display, RootWindow(obt_display, ob_screen),
+        XDefineCursor(obt_display, obt_root(ob_screen),
                       ob_cursor(OB_CURSOR_POINTER));
 }
 
@@ -1710,12 +1700,12 @@ gboolean screen_pointer_pos(gint *x, gint *y)
     guint u;
     gboolean ret;
 
-    ret = !!XQueryPointer(obt_display, RootWindow(obt_display, ob_screen),
+    ret = !!XQueryPointer(obt_display, obt_root(ob_screen),
                           &w, &w, x, y, &i, &i, &u);
     if (!ret) {
         for (i = 0; i < ScreenCount(obt_display); ++i)
             if (i != ob_screen)
-                if (XQueryPointer(obt_display, RootWindow(obt_display, i),
+                if (XQueryPointer(obt_display, obt_root(i),
                                   &w, &w, x, y, &i, &i, &u))
                     break;
     }

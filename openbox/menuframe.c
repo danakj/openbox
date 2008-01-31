@@ -85,7 +85,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     self->show_from = show_from;
 
     attr.event_mask = FRAME_EVENTMASK;
-    self->window = createWindow(RootWindow(obt_display, ob_screen),
+    self->window = createWindow(obt_root(ob_screen),
                                 CWEventMask, &attr);
 
     XSetWindowBorderWidth(obt_display, self->window, ob_rr_theme->mbwidth);

@@ -165,8 +165,8 @@ void client_set_list(void)
     } else
         windows = NULL;
 
-    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
-                    NET_CLIENT_LIST, WINDOW, (gulong*)windows, size);
+    OBT_PROP_SETA32(obt_root(ob_screen), NET_CLIENT_LIST, WINDOW,
+                    (gulong*)windows, size);
 
     if (windows)
         g_free(windows);
@@ -1298,7 +1298,7 @@ void client_update_transient_for(ObClient *self)
         /* Setting the transient_for to Root is actually illegal, however
            applications from time have done this to specify transient for
            their group */
-        if (!target && self->group && t == RootWindow(obt_display, ob_screen))
+        if (!target && self->group && t == obt_root(ob_screen))
             trangroup = TRUE;
     } else if (self->group && self->transient)
         trangroup = TRUE;

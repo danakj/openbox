@@ -54,8 +54,8 @@ void stacking_set_list(void)
         }
     }
 
-    OBT_PROP_SETA32(RootWindow(obt_display, ob_screen),
-                    NET_CLIENT_LIST_STACKING, WINDOW, (gulong*)windows, i);
+    OBT_PROP_SETA32(obt_root(ob_screen), NET_CLIENT_LIST_STACKING, WINDOW,
+                    (gulong*)windows, i);
 
     g_free(windows);
 }

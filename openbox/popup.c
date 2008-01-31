@@ -41,7 +41,7 @@ ObPopup *popup_new(void)
     self->iconwm = self->iconhm = 1;
 
     attrib.override_redirect = True;
-    self->bg = XCreateWindow(obt_display, RootWindow(obt_display, ob_screen),
+    self->bg = XCreateWindow(obt_display, obt_root(ob_screen),
                              0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
                              InputOutput, RrVisual(ob_rr_inst),
                              CWOverrideRedirect, &attrib);

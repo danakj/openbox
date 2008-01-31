@@ -159,7 +159,7 @@ static Window event_get_window(XEvent *e)
     /* pick a window */
     switch (e->type) {
     case SelectionClear:
-        window = RootWindow(obt_display, ob_screen);
+        window = obt_root(ob_screen);
         break;
     case MapRequest:
         window = e->xmap.window;
@@ -314,7 +314,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
 
         /* These are the ones we want.. */
 
-        if (win == RootWindow(obt_display, ob_screen)) {
+        if (win == obt_root(ob_screen)) {
             /* If looking for a focus in on a client, then always return
                FALSE for focus in's to the root window */
             if (in_client_only)
@@ -368,7 +368,7 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
             return FALSE;
 
         /* Focus left the root window revertedto state */
-        if (win == RootWindow(obt_display, ob_screen))
+        if (win == obt_root(ob_screen))
             return FALSE;
 
         /* These are the ones we want.. */
@@ -592,7 +592,7 @@ static void event_process(const XEvent *ec, gpointer data)
             obt_display_ignore_errors(TRUE);
             if (XGetInputFocus(obt_display, &win, &i) &&
                 XGetGeometry(obt_display, win, &root, &i,&i,&u,&u,&u,&u) &&
-                root != RootWindow(obt_display, ob_screen))
+                root != obt_root(ob_screen))
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Focus went to another screen !\n");
@@ -633,7 +633,7 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_dock(dock, e);
     else if (menu)
         event_handle_menu(menu, e);
-    else if (window == RootWindow(obt_display, ob_screen))
+    else if (window == obt_root(ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
         client_manage(window);
@@ -700,7 +700,7 @@ static void event_process(const XEvent *ec, gpointer data)
     if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
            on the root window, the process it */
-        if (window != RootWindow(obt_display, ob_screen) ||
+        if (window != obt_root(ob_screen) ||
             e->xbutton.subwindow == None)
         {
             event_handle_user_input(client, e);

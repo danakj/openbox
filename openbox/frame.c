@@ -101,13 +101,12 @@ ObFrame *frame_new(ObClient *client)
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
         /* create a colormap with the visual */
         self->colormap = attrib.colormap =
-            XCreateColormap(obt_display,
-                            RootWindow(obt_display, ob_screen),
+            XCreateColormap(obt_display, obt_root(ob_screen),
                             visual, AllocNone);
         attrib.background_pixel = BlackPixel(obt_display, ob_screen);
         attrib.border_pixel = BlackPixel(obt_display, ob_screen);
     }
-    self->window = createWindow(RootWindow(obt_display, ob_screen), visual,
+    self->window = createWindow(obt_root(ob_screen), visual,
                                 mask, &attrib);
 
     /* create the visible decor windows */
@@ -1076,10 +1075,8 @@ void frame_release_client(ObFrame *self)
     if (reparent) {
         /* according to the ICCCM - if the client doesn't reparent itself,
            then we will reparent the window to root for them */
-        XReparentWindow(obt_display, self->client->window,
-                        RootWindow(obt_display, ob_screen),
-                        self->client->area.x,
-                        self->client->area.y);
+        XReparentWindow(obt_display, self->client->window, obt_root(ob_screen),
+                        self->client->area.x, self->client->area.y);
     }
 
     /* remove all the windows for the frame from the window_map */
@@ -1357,7 +1354,7 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
     if (moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
 
-    if (win == RootWindow(obt_display, ob_screen))
+    if (win == obt_root(ob_screen))
         return OB_FRAME_CONTEXT_ROOT ;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
     if (win == client->window) {

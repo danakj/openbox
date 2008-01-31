@@ -113,8 +113,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
-    popup.bg = create_window(RootWindow(obt_display, ob_screen),
-                             ob_rr_theme->obwidth,
+    popup.bg = create_window(obt_root(ob_screen), ob_rr_theme->obwidth,
                              CWOverrideRedirect | CWBorderPixel, &attrib);
 
     popup.text = create_window(popup.bg, 0, 0, NULL);

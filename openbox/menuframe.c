@@ -77,7 +77,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     XSetWindowAttributes attr;
 
     self = g_new0(ObMenuFrame, 1);
-    self->type = OB_WINDOW_CLASS_MENUFRAME;
+    self->obwin.type = OB_WINDOW_CLASS_MENUFRAME;
     self->menu = menu;
     self->selected = NULL;
     self->client = client;
@@ -92,7 +92,6 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     XSetWindowBorder(obt_display, self->window,
                      RrColorPixel(ob_rr_theme->menu_border_color));
 
-    self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
 
     window_add(&self->window, MENUFRAME_AS_WINDOW(self));
@@ -112,10 +111,9 @@ void menu_frame_free(ObMenuFrame *self)
         stacking_remove(MENUFRAME_AS_WINDOW(self));
         window_remove(self->window);
 
-        XDestroyWindow(obt_display, self->window);
-
         RrAppearanceFree(self->a_items);
-        RrAppearanceFree(self->a_title);
+
+        XDestroyWindow(obt_display, self->window);
 
         g_free(self);
     }
@@ -150,37 +148,6 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     XMapWindow(obt_display, self->window);
     XMapWindow(obt_display, self->text);
 
-    self->a_normal = RrAppearanceCopy(ob_rr_theme->a_menu_normal);
-    self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_selected);
-    self->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
-    self->a_disabled_selected =
-        RrAppearanceCopy(ob_rr_theme->a_menu_disabled_selected);
-
-    if (entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR) {
-        self->a_separator = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
-        self->a_separator->texture[0].type = RR_TEXTURE_LINE_ART;
-    } else {
-        self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
-        self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
-        self->a_mask = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
-        self->a_mask->texture[0].type = RR_TEXTURE_MASK;
-        self->a_bullet_normal =
-            RrAppearanceCopy(ob_rr_theme->a_menu_bullet_normal);
-        self->a_bullet_selected =
-            RrAppearanceCopy(ob_rr_theme->a_menu_bullet_selected);
-    }
-
-    self->a_text_normal =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_normal);
-    self->a_text_selected =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_selected);
-    self->a_text_disabled =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled);
-    self->a_text_disabled_selected =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled_selected);
-    self->a_text_title =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_title);
-
     window_add(&self->window, MENUFRAME_AS_WINDOW(self->frame));
 
     return self;
@@ -205,22 +172,6 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
             XDestroyWindow(obt_display, self->bullet);
             g_hash_table_remove(menu_frame_map, &self->bullet);
         }
-
-        RrAppearanceFree(self->a_normal);
-        RrAppearanceFree(self->a_selected);
-        RrAppearanceFree(self->a_disabled);
-        RrAppearanceFree(self->a_disabled_selected);
-
-        RrAppearanceFree(self->a_separator);
-        RrAppearanceFree(self->a_icon);
-        RrAppearanceFree(self->a_mask);
-        RrAppearanceFree(self->a_text_normal);
-        RrAppearanceFree(self->a_text_selected);
-        RrAppearanceFree(self->a_text_disabled);
-        RrAppearanceFree(self->a_text_disabled_selected);
-        RrAppearanceFree(self->a_text_title);
-        RrAppearanceFree(self->a_bullet_normal);
-        RrAppearanceFree(self->a_bullet_selected);
 
         g_free(self);
     }
@@ -367,18 +318,20 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   !self->entry->data.normal.enabled ?
                   /* disabled */
                   (self == self->frame->selected ?
-                   self->a_disabled_selected : self->a_disabled) :
+                   ob_rr_theme->a_menu_disabled_selected :
+                   ob_rr_theme->a_menu_disabled) :
                   /* enabled */
                   (self == self->frame->selected ?
-                   self->a_selected : self->a_normal));
+                   ob_rr_theme->a_menu_selected :
+                   ob_rr_theme->a_menu_normal));
         th = ITEM_HEIGHT;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label) {
-            item_a = self->frame->a_title;
+            item_a = ob_rr_theme->a_menu_title;
             th = ob_rr_theme->menu_title_height;
         } else {
-            item_a = self->a_normal;
+            item_a = ob_rr_theme->a_menu_normal;
             th = SEPARATOR_HEIGHT + 2*PADDING;
         }
         break;
@@ -399,10 +352,12 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   !self->entry->data.normal.enabled ?
                   /* disabled */
                   (self == self->frame->selected ?
-                   self->a_text_disabled_selected : self->a_text_disabled) :
+                   ob_rr_theme->a_menu_text_disabled_selected :
+                   ob_rr_theme->a_menu_text_disabled) :
                   /* enabled */
                   (self == self->frame->selected ?
-                   self->a_text_selected : self->a_text_normal));
+                   ob_rr_theme->a_menu_text_selected :
+                   ob_rr_theme->a_menu_text_normal));
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
         if (self->entry->data.normal.shortcut &&
             (self->frame->menu->show_all_shortcuts ||
@@ -417,8 +372,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         text_a = (self == self->frame->selected ?
-                  self->a_text_selected :
-                  self->a_text_normal);
+                  ob_rr_theme->a_menu_text_selected :
+                  ob_rr_theme->a_menu_text_normal);
         sub = self->entry->data.submenu.submenu;
         text_a->texture[0].data.text.string = sub ? sub->title : "";
         if (sub->shortcut && (self->frame->menu->show_all_shortcuts ||
@@ -432,9 +387,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         if (self->entry->data.separator.label != NULL)
-            text_a = self->a_text_title;
+            text_a = ob_rr_theme->a_menu_text_title;
         else
-            text_a = self->a_text_normal;
+            text_a = ob_rr_theme->a_menu_text_normal;
         break;
     }
 
@@ -477,20 +432,24 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                     ob_rr_theme->menu_title_height -
                     2*ob_rr_theme->paddingy);
         } else {
+            RrAppearance *clear;
+
             /* unlabeled separaator */
             XMoveResizeWindow(obt_display, self->text, PADDING, PADDING,
                               self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
-            self->a_separator->surface.parent = item_a;
-            self->a_separator->surface.parentx = PADDING;
-            self->a_separator->surface.parenty = PADDING;
-            self->a_separator->texture[0].data.lineart.color =
+
+            clear = ob_rr_theme->a_clear_tex;
+            clear->texture[0].type = RR_TEXTURE_LINE_ART;
+            clear->surface.parent = item_a;
+            clear->surface.parentx = PADDING;
+            clear->surface.parenty = PADDING;
+            clear->texture[0].data.lineart.color =
                 text_a->texture[0].data.text.color;
-            self->a_separator->texture[0].data.lineart.x1 = 2*PADDING;
-            self->a_separator->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT/2;
-            self->a_separator->texture[0].data.lineart.x2 =
-                self->area.width - 4*PADDING;
-            self->a_separator->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT/2;
-            RrPaint(self->a_separator, self->text,
+            clear->texture[0].data.lineart.x1 = 2*PADDING;
+            clear->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT/2;
+            clear->texture[0].data.lineart.x2 = self->area.width - 4*PADDING;
+            clear->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT/2;
+            RrPaint(clear, self->text,
                     self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
         }
         break;
@@ -499,24 +458,29 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.icon_data)
     {
+        RrAppearance *clear;
+
         XMoveResizeWindow(obt_display, self->icon,
                           PADDING, frame->item_margin.top,
                           ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom,
                           ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom);
-        self->a_icon->texture[0].data.rgba.width =
+
+        clear = ob_rr_theme->a_clear_tex;
+        clear->texture[0].type = RR_TEXTURE_RGBA;
+        clear->texture[0].data.rgba.width =
             self->entry->data.normal.icon_width;
-        self->a_icon->texture[0].data.rgba.height =
+        clear->texture[0].data.rgba.height =
             self->entry->data.normal.icon_height;
-        self->a_icon->texture[0].data.rgba.alpha =
+        clear->texture[0].data.rgba.alpha =
             self->entry->data.normal.icon_alpha;
-        self->a_icon->texture[0].data.rgba.data =
+        clear->texture[0].data.rgba.data =
             self->entry->data.normal.icon_data;
-        self->a_icon->surface.parent = item_a;
-        self->a_icon->surface.parentx = PADDING;
-        self->a_icon->surface.parenty = frame->item_margin.top;
-        RrPaint(self->a_icon, self->icon,
+        clear->surface.parent = item_a;
+        clear->surface.parentx = PADDING;
+        clear->surface.parenty = frame->item_margin.top;
+        RrPaint(clear, self->icon,
                 ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom,
                 ITEM_HEIGHT - frame->item_margin.top
@@ -526,6 +490,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                self->entry->data.normal.mask)
     {
         RrColor *c;
+        RrAppearance *clear;
 
         XMoveResizeWindow(obt_display, self->icon,
                           PADDING, frame->item_margin.top,
@@ -533,7 +498,10 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                           - frame->item_margin.bottom,
                           ITEM_HEIGHT - frame->item_margin.top
                           - frame->item_margin.bottom);
-        self->a_mask->texture[0].data.mask.mask =
+
+        clear = ob_rr_theme->a_clear_tex;
+        clear->texture[0].type = RR_TEXTURE_MASK;
+        clear->texture[0].data.mask.mask =
             self->entry->data.normal.mask;
 
         c = (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
@@ -546,12 +514,12 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
              (self == self->frame->selected ?
               self->entry->data.normal.mask_selected_color :
               self->entry->data.normal.mask_normal_color));
-        self->a_mask->texture[0].data.mask.color = c;
+        clear->texture[0].data.mask.color = c;
 
-        self->a_mask->surface.parent = item_a;
-        self->a_mask->surface.parentx = PADDING;
-        self->a_mask->surface.parenty = frame->item_margin.top;
-        RrPaint(self->a_mask, self->icon,
+        clear->surface.parent = item_a;
+        clear->surface.parentx = PADDING;
+        clear->surface.parenty = frame->item_margin.top;
+        RrPaint(clear, self->icon,
                 ITEM_HEIGHT - frame->item_margin.top
                 - frame->item_margin.bottom,
                 ITEM_HEIGHT - frame->item_margin.top
@@ -568,8 +536,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                           ITEM_HEIGHT - 2*PADDING,
                           ITEM_HEIGHT - 2*PADDING);
         bullet_a = (self == self->frame->selected ?
-                    self->a_bullet_selected :
-                    self->a_bullet_normal);
+                    ob_rr_theme->a_menu_bullet_selected :
+                    ob_rr_theme->a_menu_bullet_normal);
         bullet_a->surface.parent = item_a;
         bullet_a->surface.parentx =
             self->frame->text_x + self->frame->text_w - ITEM_HEIGHT + PADDING;
@@ -645,31 +613,31 @@ void menu_frame_render(ObMenuFrame *self)
         gint l, t, r, b;
 
         e = self->entries->data;
-        e->a_text_normal->texture[0].data.text.string = "";
-        tw = RrMinWidth(e->a_text_normal);
+        ob_rr_theme->a_menu_text_normal->texture[0].data.text.string = "";
+        tw = RrMinWidth(ob_rr_theme->a_menu_text_normal);
         tw += 2*PADDING;
 
         th = ITEM_HEIGHT;
 
-        RrMargins(e->a_normal, &l, &t, &r, &b);
+        RrMargins(ob_rr_theme->a_menu_normal, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
                   MAX(self->item_margin.left, l),
                   MAX(self->item_margin.top, t),
                   MAX(self->item_margin.right, r),
                   MAX(self->item_margin.bottom, b));
-        RrMargins(e->a_selected, &l, &t, &r, &b);
+        RrMargins(ob_rr_theme->a_menu_selected, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
                   MAX(self->item_margin.left, l),
                   MAX(self->item_margin.top, t),
                   MAX(self->item_margin.right, r),
                   MAX(self->item_margin.bottom, b));
-        RrMargins(e->a_disabled, &l, &t, &r, &b);
+        RrMargins(ob_rr_theme->a_menu_disabled, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
                   MAX(self->item_margin.left, l),
                   MAX(self->item_margin.top, t),
                   MAX(self->item_margin.right, r),
                   MAX(self->item_margin.bottom, b));
-        RrMargins(e->a_disabled_selected, &l, &t, &r, &b);
+        RrMargins(ob_rr_theme->a_menu_disabled_selected, &l, &t, &r, &b);
         STRUT_SET(self->item_margin,
                   MAX(self->item_margin.left, l),
                   MAX(self->item_margin.top, t),
@@ -710,10 +678,12 @@ void menu_frame_render(ObMenuFrame *self)
                   !e->entry->data.normal.enabled ?
                   /* disabled */
                   (e == self->selected ?
-                   e->a_text_disabled_selected : e->a_text_disabled) :
+                   ob_rr_theme->a_menu_text_disabled_selected :
+                   ob_rr_theme->a_menu_text_disabled) :
                   /* enabled */
                   (e == self->selected ?
-                   e->a_text_selected : e->a_text_normal));
+                   ob_rr_theme->a_menu_text_selected : 
+                   ob_rr_theme->a_menu_text_normal));
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
@@ -740,9 +710,10 @@ void menu_frame_render(ObMenuFrame *self)
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
             if (e->entry->data.separator.label != NULL) {
-                e->a_text_title->texture[0].data.text.string =
+                ob_rr_theme->a_menu_text_title->texture[0].data.text.string =
                     e->entry->data.separator.label;
-                tw = RrMinWidth(e->a_text_title) + 2*ob_rr_theme->paddingx;
+                tw = RrMinWidth(ob_rr_theme->a_menu_text_title) +
+                    2*ob_rr_theme->paddingx;
                 tw = MIN(tw, MAX_MENU_WIDTH);
                 th = ob_rr_theme->menu_title_height +
                     (ob_rr_theme->mbwidth - PADDING) *2;

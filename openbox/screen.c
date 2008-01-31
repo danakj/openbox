@@ -391,7 +391,13 @@ void screen_startup(gboolean reconfig)
     screen_num_desktops = 0;
     if (OBT_PROP_GET32(obt_root(ob_screen),
                        NET_NUMBER_OF_DESKTOPS, CARDINAL, &d))
+    {
+        if (d != config_desktops_num) {
+            g_warning(_("Openbox is configured for %d desktops, but the current session has %d.  Overriding the Openbox configuration."),
+                      config_desktops_num, d);
+        }
         screen_set_num_desktops(d);
+    }
     /* restore from session if possible */
     else if (session_num_desktops)
         screen_set_num_desktops(session_num_desktops);
@@ -1284,7 +1290,6 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
     gint l, r, t, b;
 
     if (ob_debug_xinerama) {
-        g_print("Using fake xinerama !\n");
         gint w = WidthOfScreen(ScreenOfDisplay(obt_display, ob_screen));
         gint h = HeightOfScreen(ScreenOfDisplay(obt_display, ob_screen));
         *nxin = 2;

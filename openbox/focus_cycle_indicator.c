@@ -158,6 +158,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         */
         gint x, y, w, h;
         gint wt, wl, wr, wb;
+        gulong ignore_start;
 
         wt = wl = wr = wb = FOCUS_INDICATOR_WIDTH;
 
@@ -165,6 +166,9 @@ void focus_cycle_draw_indicator(ObClient *c)
         y = c->frame->area.y;
         w = c->frame->area.width;
         h = wt;
+
+        /* kill enter events cause by this moving */
+        ignore_start = event_start_ignore_all_enters();
 
         XMoveResizeWindow(obt_display, focus_indicator.top.window,
                           x, y, w, h);
@@ -269,6 +273,8 @@ void focus_cycle_draw_indicator(ObClient *c)
         XMapWindow(obt_display, focus_indicator.left.window);
         XMapWindow(obt_display, focus_indicator.right.window);
         XMapWindow(obt_display, focus_indicator.bottom.window);
+
+        event_end_ignore_all_enters(ignore_start);
 
         visible = TRUE;
     }

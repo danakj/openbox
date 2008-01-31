@@ -77,7 +77,7 @@ extern ObPlacePolicy config_place_policy;
 extern gboolean config_place_center;
 /*! Place windows on the active monitor (unless they are part of an application
   already on another monitor) */
-extern gboolean config_place_active;
+extern ObPlaceMonitor config_place_monitor;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;
@@ -142,7 +142,7 @@ extern RrFont *config_font_menuitem;
 extern RrFont *config_font_osd;
 
 /*! The number of desktops */
-extern gint config_desktops_num;
+extern guint config_desktops_num;
 /*! Desktop to start on, put 5 to start in the center of a 3x3 grid */
 extern guint config_screen_firstdesk;
 /*! Names for the desktops */

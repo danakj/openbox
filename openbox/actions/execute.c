@@ -5,6 +5,10 @@
 #include "obt/paths.h"
 #include "gettext.h"
 
+#ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
+
 typedef struct {
     gchar   *cmd;
     gboolean sn;
@@ -101,6 +105,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             program = g_path_get_basename(argv[0]);
             /* sets up the environment */
             sn_setup_spawn_environment(program, o->sn_name, o->sn_icon,
+                                       o->sn_wmclass,
                                        /* launch it on the current desktop */
                                        screen_desktop);
         }

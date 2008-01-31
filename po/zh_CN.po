@@ -6,9 +6,9 @@
 # Shaodong Di <gnuyhlfh@gmail.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6\n"
+"Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-17 22:13+0100\n"
+"POT-Creation-Date: 2008-01-25 03:51+0100\n"
 "PO-Revision-Date: 2008-01-18 15:02+0100\n"
 "Last-Translator: Shaodong Di <gnuyhlfh@gmail.com>\n"
 "Language-Team: 简体中文\n"
@@ -26,7 +26,7 @@ msgstr "请求的动作 '%s' 无效。该动作不存在。"
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "从 utf8 转换路径 '%s' 时失败"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "执行 '%s' 时失败: %s"
@@ -285,7 +285,7 @@ msgstr ""
 "\n"
 "请向 %s 报告错误\n"
 
-#: openbox/openbox.c:604
+#: openbox/openbox.c:602
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "无效的命令行参数 '%s'\n"
@@ -305,7 +305,14 @@ msgstr "在屏幕 %d 无法被选为窗口管理器"
 msgid "The WM on screen %d is not exiting"
 msgstr "屏幕 %d 的窗口管理器没有退出"
 
-#: openbox/screen.c:1162
+#: openbox/screen.c:407
+#, c-format
+msgid ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr ""
+
+#: openbox/screen.c:1168
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"
@@ -325,7 +332,7 @@ msgstr "无法保存会话到 '%s': %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr "在保存会话到 '%s' 时出错： %s"
 
-#: openbox/startupnotify.c:237
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s\n"
 msgstr "运行 %s\n"

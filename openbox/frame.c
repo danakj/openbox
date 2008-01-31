@@ -214,27 +214,10 @@ static void set_theme_statics(ObFrame *self)
                   ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
     XResizeWindow(obt_display, self->trrresize,
                   ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
-
-    /* set up the dynamic appearances */
-    self->a_unfocused_title = RrAppearanceCopy(ob_rr_theme->a_unfocused_title);
-    self->a_focused_title = RrAppearanceCopy(ob_rr_theme->a_focused_title);
-    self->a_unfocused_label = RrAppearanceCopy(ob_rr_theme->a_unfocused_label);
-    self->a_focused_label = RrAppearanceCopy(ob_rr_theme->a_focused_label);
-    self->a_unfocused_handle =
-        RrAppearanceCopy(ob_rr_theme->a_unfocused_handle);
-    self->a_focused_handle = RrAppearanceCopy(ob_rr_theme->a_focused_handle);
-    self->a_icon = RrAppearanceCopy(ob_rr_theme->a_icon);
 }
 
 static void free_theme_statics(ObFrame *self)
 {
-    RrAppearanceFree(self->a_unfocused_title);
-    RrAppearanceFree(self->a_focused_title);
-    RrAppearanceFree(self->a_unfocused_label);
-    RrAppearanceFree(self->a_focused_label);
-    RrAppearanceFree(self->a_unfocused_handle);
-    RrAppearanceFree(self->a_focused_handle);
-    RrAppearanceFree(self->a_icon);
 }
 
 void frame_free(ObFrame *self)

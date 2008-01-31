@@ -301,6 +301,10 @@ clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
 dist_clearlooks_theme_DATA= \
 	themes/Clearlooks/openbox-3/themerc
 
+clearlooks34_themedir = $(themedir)/Clearlooks/openbox-3
+dist_clearlooks34_theme_DATA= \
+	themes/Clearlooks-3.4/openbox-3/themerc
+
 clearlooksolive_themedir = $(themedir)/Clearlooks-Olive/openbox-3
 dist_clearlooksolive_theme_DATA= \
 	themes/Clearlooks-Olive/openbox-3/themerc

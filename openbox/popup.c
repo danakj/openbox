@@ -256,6 +256,8 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     x=MAX(MIN(x, area->x+area->width-w),area->x);
     y=MAX(MIN(y, area->y+area->height-h),area->y);
 
+    g_free(area);
+
     if (m == screen_num_monitors) {
         RECT_SET(mon, x, y, w, h);
         m = screen_find_monitor(&mon);
@@ -265,6 +267,8 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
         x=MAX(MIN(x, area->x+area->width-w),area->x);
         y=MAX(MIN(y, area->y+area->height-h),area->y);
+
+        g_free(area);
     }
 
     /* set the windows/appearances up */
@@ -300,8 +304,6 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
             popup_show_timeout(self);
         }
     }
-
-    g_free(area);
 }
 
 void popup_hide(ObPopup *self)

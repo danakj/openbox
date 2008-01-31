@@ -35,16 +35,17 @@
   <center>yes</center>
   <!-- whether to place windows in the center of the free area found or
        the top left corner -->
-  <active>no</active>
-  <!-- force new windows ont the active monitor on a multi-head system, unless
-       they are part of an application already on another monitor -->
+  <monitor>Any</monitor>
+  <!-- with Smart placement on a multi-monitor system, try to place new windows
+       on: 'Any' - any monitor, 'Mouse' - where the mouse is, 'Active' - where
+       the active window is -->
 </placement>
 
 <theme>
   <name>Clearlooks</name>
   <titleLayout>NLIMC</titleLayout>
   <!--
-      avaible characters are NDSLIMC, each can occur at most once.
+      available characters are NDSLIMC, each can occur at most once.
       N: window icon
       L: window label (AKA title).
       I: iconify

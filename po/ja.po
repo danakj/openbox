@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-17 22:13+0100\n"
+"POT-Creation-Date: 2008-01-25 03:51+0100\n"
 "PO-Revision-Date: 2007-06-07 14:49+0200\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -28,7 +28,7 @@ msgstr ""
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "パス'%s'を utf8 から変換するのに失敗しました。"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "'%s'の実行に失敗しました: %s"
@@ -280,7 +280,7 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 
-#: openbox/openbox.c:604
+#: openbox/openbox.c:602
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "不正なコマンドライン引数 '%s'\n"
@@ -300,7 +300,14 @@ msgstr "スクリーン%dでウィンドウマネージャの選択を取得で�
 msgid "The WM on screen %d is not exiting"
 msgstr "スクリーン%dのWMが終了しません。"
 
-#: openbox/screen.c:1162
+#: openbox/screen.c:407
+#, c-format
+msgid ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr ""
+
+#: openbox/screen.c:1168
 #, c-format
 msgid "desktop %i"
 msgstr "デスクトップ%i"
@@ -320,7 +327,7 @@ msgstr "セッションを'%s'に保存できません: %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr "セッションを'%s'に保存中にエラーが起きました: %s"
 
-#: openbox/startupnotify.c:237
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s\n"
 msgstr "起動中 %s\n"

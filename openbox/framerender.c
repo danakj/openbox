@@ -124,10 +124,8 @@ void framerender_frame(ObFrame *self)
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
         RrAppearance *t, *l, *m, *n, *i, *d, *s, *c, *clear;
         if (self->focused) {
-
-            t = self->a_focused_title;
-            l = self->a_focused_label;
-
+            t = ob_rr_theme->a_focused_title;
+            l = ob_rr_theme->a_focused_label;
             m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
                  ob_rr_theme->a_disabled_focused_max :
                  (self->client->max_vert || self->client->max_horz ?
@@ -141,7 +139,7 @@ void framerender_frame(ObFrame *self)
                    (self->max_hover ?
                     ob_rr_theme->a_hover_focused_max :
                     ob_rr_theme->a_focused_unpressed_max))));
-            n = self->a_icon;
+            n = ob_rr_theme->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
                  ob_rr_theme->a_disabled_focused_iconify :
                  (self->iconify_press ?
@@ -183,8 +181,8 @@ void framerender_frame(ObFrame *self)
                    ob_rr_theme->a_hover_focused_close :
                    ob_rr_theme->a_focused_unpressed_close)));
         } else {
-            t = self->a_unfocused_title;
-            l = self->a_unfocused_label;
+            t = ob_rr_theme->a_unfocused_title;
+            l = ob_rr_theme->a_unfocused_label;
             m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
                  ob_rr_theme->a_disabled_unfocused_max :
                  (self->client->max_vert || self->client->max_horz ?
@@ -198,7 +196,7 @@ void framerender_frame(ObFrame *self)
                    (self->max_hover ?
                     ob_rr_theme->a_hover_unfocused_max :
                     ob_rr_theme->a_unfocused_unpressed_max))));
-            n = self->a_icon;
+            n = ob_rr_theme->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
                  ob_rr_theme->a_disabled_unfocused_iconify :
                  (self->iconify_press ?
@@ -318,7 +316,7 @@ void framerender_frame(ObFrame *self)
         RrAppearance *h, *g;
 
         h = (self->focused ?
-             self->a_focused_handle : self->a_unfocused_handle);
+             ob_rr_theme->a_focused_handle : ob_rr_theme->a_unfocused_handle);
 
         RrPaint(h, self->handle, self->width, ob_rr_theme->handle_height);
 

@@ -2,7 +2,7 @@
 
    gradient.c for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003-2007   Dana Jansens
+   Copyright (c) 2003-2008   Dana Jansens
    Copyright (c) 2003        Derek Foreman
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include "gradient.h"
 #include "color.h"
 #include <glib.h>
+#include <string.h>
 
 static void highlight(RrSurface *s, RrPixel32 *x, RrPixel32 *y,
                       gboolean raised);
@@ -483,64 +484,60 @@ static void gradient_horizontal(RrSurface *sf, gint w, gint h)
 {
     gint x, y;
     RrPixel32 *data = sf->pixel_data, *datav;
-    RrPixel32 current;
 
     VARS(x);
     SETUP(x, sf->primary, sf->secondary, w);
 
-    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-        current = COLOR(x);
-        datav = data;
-        for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
-            *datav = current;
-            datav += w;
-        }
-        ++data;
-
+    datav = data;
+    for (x = w - 1; x > 0; --x) {  /* 0 -> w - 1 */
+        *datav = COLOR(x);
+        ++datav;
         NEXT(x);
     }
-    current = COLOR(x);
-    for (y = h - 1; y >= 0; --y)  /* 0 -> h */
-        *(data + y * w) = current;
+    *datav = COLOR(x);
+    ++datav;
+
+    for (y = h - 1; y > 0; --y) { /* 1 -> h */
+        memcpy(datav, data, w * sizeof(RrPixel32));
+        datav += w;
+    }
 }
 
 static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
 {
-    gint x, y;
+    gint x, y, half1, half2;
     RrPixel32 *data = sf->pixel_data, *datav;
-    RrPixel32 current;
 
     VARS(x);
-    SETUP(x, sf->primary, sf->secondary, w/2);
 
-    if (w > 1) {
-        for (x = w - 1; x > w/2-1; --x) {  /* 0 -> w-1 */
-            current = COLOR(x);
-            datav = data;
-            for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
-                *datav = current;
-                datav += w;
-            }
-            ++data;
+    half1 = (w + 1) / 2;
+    half2 = w / 2;
 
-            NEXT(x);
-        }
-        SETUP(x, sf->secondary, sf->primary, w/2);
-        for (x = w/2 - 1; x > 0; --x) {  /* 0 -> w-1 */
-            current = COLOR(x);
-            datav = data;
-            for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
-                *datav = current;
-                datav += w;
-            }
-            ++data;
-
-            NEXT(x);
-        }
+    SETUP(x, sf->primary, sf->secondary, half1);
+    datav = data;
+    for (x = half1 - 1; x > 0; --x) {  /* 0 -> half1 - 1 */
+        *datav = COLOR(x);
+        ++datav;
+        NEXT(x);
     }
-    current = COLOR(x);
-    for (y = h - 1; y >= 0; --y)  /* 0 -> h */
-        *(data + y * w) = current;
+    *datav = COLOR(x);
+    ++datav;
+
+    if (half2 > 0) {
+        SETUP(x, sf->secondary, sf->primary, half2);
+        for (x = half2 - 1; x > 0; --x) {  /* 0 -> half2 - 1 */
+            *datav = COLOR(x);
+            ++datav;
+            NEXT(x);
+        }
+        *datav = COLOR(x);
+        ++datav;
+    }
+
+    for (y = h - 1; y > 0; --y) {  /* 1 -> h */
+        memcpy(datav, data, w * sizeof(RrPixel32));
+        datav += w;
+    }
 }
 
 static void gradient_vertical(RrSurface *sf, gint w, gint h)

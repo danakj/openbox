@@ -8,9 +8,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6\n"
+"Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-17 22:13+0100\n"
+"POT-Creation-Date: 2008-01-25 03:51+0100\n"
 "PO-Revision-Date: 2008-01-18 14:55+0100\n"
 "Last-Translator: Jarkko Piiroinen <jarkkop@iki.fi>\n"
 "Language-Team: None\n"
@@ -28,7 +28,7 @@ msgstr "Virheellinen tapahtuma '%s' yritetty. Tapahtumaa ei ole."
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Polun muuntaminen utf8:sta epäonnistui: '%s'"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:115
+#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Ohjelman suorittaminen epäonnistui '%s': %s"
@@ -202,7 +202,8 @@ msgstr "Teeman lataaminen epäonnistui."
 #: openbox/openbox.c:405
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Uudelleenkäynnistys ei onnistunut käynnistämään uutta ohjelmaa '%s': %s"
+msgstr ""
+"Uudelleenkäynnistys ei onnistunut käynnistämään uutta ohjelmaa '%s': %s"
 
 #: openbox/openbox.c:475 openbox/openbox.c:477
 msgid "Copyright (c)"
@@ -289,7 +290,7 @@ msgstr ""
 "\n"
 "Ilmoita virheistä: %s\n"
 
-#: openbox/openbox.c:604
+#: openbox/openbox.c:602
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Virheellinen valitsin '%s'\n"
@@ -309,7 +310,14 @@ msgstr "Ikkunointiohjelman valinta ruudulla %d ei onnistunut"
 msgid "The WM on screen %d is not exiting"
 msgstr "Ikkunointiohjelma ruudulla %d ei sulkeudu"
 
-#: openbox/screen.c:1162
+#: openbox/screen.c:407
+#, c-format
+msgid ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr ""
+
+#: openbox/screen.c:1168
 #, c-format
 msgid "desktop %i"
 msgstr "työtila %i"
@@ -329,7 +337,7 @@ msgstr "Istuntoa ei voitu tallentaa hakemistoon '%s': %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr "Virhe tallennettaessa istuntoa hakemistoon '%s': %s"
 
-#: openbox/startupnotify.c:237
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s\n"
 msgstr "Suoritetaan %s\n"

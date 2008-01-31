@@ -35,9 +35,9 @@ gboolean config_focus_raise;
 gboolean config_focus_last;
 gboolean config_focus_under_mouse;
 
-ObPlacePolicy config_place_policy;
-gboolean      config_place_center;
-gboolean      config_place_active;
+ObPlacePolicy  config_place_policy;
+gboolean       config_place_center;
+ObPlaceMonitor config_place_monitor;
 
 StrutPartial config_margins;
 
@@ -54,7 +54,7 @@ RrFont *config_font_menuitem;
 RrFont *config_font_menutitle;
 RrFont *config_font_osd;
 
-gint    config_desktops_num;
+guint   config_desktops_num;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
@@ -481,8 +481,12 @@ static void parse_placement(xmlNodePtr node, gpointer d)
             config_place_policy = OB_PLACE_POLICY_MOUSE;
     if ((n = obt_parse_find_node(node, "center")))
         config_place_center = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "active")))
-        config_place_active = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "monitor"))) {
+        if (obt_parse_node_contains(n, "active"))
+            config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
+        else if (obt_parse_node_contains(n, "mouse"))
+            config_place_monitor = OB_PLACE_MONITOR_MOUSE;
+    }
 }
 
 static void parse_margins(xmlNodePtr node, gpointer d)
@@ -592,7 +596,7 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
     if ((n = obt_parse_find_node(node, "number"))) {
         gint d = obt_parse_node_int(n);
         if (d > 0)
-            config_desktops_num = d;
+            config_desktops_num = (unsigned) d;
     }
     if ((n = obt_parse_find_node(node, "firstdesk"))) {
         gint d = obt_parse_node_int(n);
@@ -870,7 +874,7 @@ void config_startup(ObtParseInst *i)
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
-    config_place_active = FALSE;
+    config_place_monitor = OB_PLACE_MONITOR_ANY;
 
     obt_parse_register(i, "placement", parse_placement, NULL);
 
@@ -966,6 +970,7 @@ void config_shutdown(void)
     RrFontClose(config_font_inactivewindow);
     RrFontClose(config_font_menuitem);
     RrFontClose(config_font_menutitle);
+    RrFontClose(config_font_osd);
 
     for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);

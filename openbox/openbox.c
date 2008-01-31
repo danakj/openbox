@@ -294,7 +294,7 @@ gint main(gint argc, gchar **argv)
                 ObWindow *w;
 
                 /* get all the existing windows */
-                client_manage_all();
+                window_manage_all();
                 focus_nothing();
 
                 /* focus what was focused if a wm was already running */
@@ -327,10 +327,8 @@ gint main(gint argc, gchar **argv)
             obt_main_loop_run(ob_main_loop);
             state = OB_STATE_EXITING;
 
-            if (!reconfigure) {
-                dock_remove_all();
-                client_unmanage_all();
-            }
+            if (!reconfigure)
+                window_unmanage_all();
 
             menu_shutdown(reconfigure);
             menu_frame_shutdown(reconfigure);

@@ -319,10 +319,7 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 void client_add_destroy_notify(ObClientCallback func, gpointer data);
 void client_remove_destroy_notify(ObClientCallback func);
 
-/*! Manages all existing windows */
-void client_manage_all();
-/*! Manages a given window
-*/
+/*! Manages a given window */
 void client_manage(Window win);
 /*! Unmanages all managed windows */
 void client_unmanage_all();

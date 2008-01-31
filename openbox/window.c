@@ -22,6 +22,9 @@
 #include "dock.h"
 #include "client.h"
 #include "frame.h"
+#include "openbox.h"
+#include "debug.h"
+#include "grab.h"
 
 static GHashTable *window_map;
 
@@ -90,4 +93,112 @@ void window_remove(Window xwin)
 {
     g_assert(xwin != None);
     g_hash_table_remove(window_map, &xwin);
+}
+
+void window_manage_all(void)
+{
+    guint i, j, nchild;
+    Window w, *children;
+    XWMHints *wmhints;
+    XWindowAttributes attrib;
+
+    if (!XQueryTree(obt_display, RootWindow(obt_display, ob_screen),
+                    &w, &w, &children, &nchild)) {
+        ob_debug("XQueryTree failed in window_manage_all");
+        nchild = 0;
+    }
+
+    /* remove all icon windows from the list */
+    for (i = 0; i < nchild; i++) {
+        if (children[i] == None) continue;
+        wmhints = XGetWMHints(obt_display, children[i]);
+        if (wmhints) {
+            if ((wmhints->flags & IconWindowHint) &&
+                (wmhints->icon_window != children[i]))
+                for (j = 0; j < nchild; j++)
+                    if (children[j] == wmhints->icon_window) {
+                        /* XXX watch the window though */
+                        children[j] = None;
+                        break;
+                    }
+            XFree(wmhints);
+        }
+    }
+
+    for (i = 0; i < nchild; ++i) {
+        if (children[i] == None) continue;
+        if (window_find(children[i])) continue; /* skip our own windows */
+        if (XGetWindowAttributes(obt_display, children[i], &attrib)) {
+            if (attrib.map_state == IsUnmapped)
+                ;
+            else
+                window_manage(children[i]);
+        }
+    }
+
+    if (children) XFree(children);
+}
+
+void window_manage(Window win)
+{
+    XEvent e;
+    XWindowAttributes attrib;
+    gboolean no_manage = FALSE;
+    gboolean is_dockapp = FALSE;
+    Window icon_win = None;
+
+    grab_server(TRUE);
+
+    /* check if it has already been unmapped by the time we started
+       mapping. the grab does a sync so we don't have to here */
+    if (XCheckTypedWindowEvent(obt_display, win, DestroyNotify, &e) ||
+        XCheckTypedWindowEvent(obt_display, win, UnmapNotify, &e))
+    {
+        XPutBackEvent(obt_display, &e);
+        ob_debug("Trying to manage unmapped window. Aborting that.\n");
+        no_manage = TRUE;
+    }
+
+    if (!XGetWindowAttributes(obt_display, win, &attrib))
+        no_manage = TRUE;
+    else {
+        XWMHints *wmhints;
+
+        /* is the window a docking app */
+        is_dockapp = FALSE;
+        if ((wmhints = XGetWMHints(obt_display, win))) {
+            if ((wmhints->flags & StateHint) &&
+                wmhints->initial_state == WithdrawnState)
+            {
+                if (wmhints->flags & IconWindowHint)
+                    icon_win = wmhints->icon_window;
+                is_dockapp = TRUE;
+            }
+            XFree(wmhints);
+        }
+    }
+
+    if (!no_manage) {
+        if (attrib.override_redirect) {
+            ob_debug("not managing override redirect window 0x%x\n", win);
+            grab_server(FALSE);
+        }
+        else if (is_dockapp) {
+            if (!icon_win)
+                icon_win = win;
+            dock_manage(icon_win, win);
+        }
+        else
+            client_manage(win);
+    }
+    else {
+        grab_server(FALSE);
+        ob_debug("FAILED to manage window 0x%x\n", win);
+    }
+}
+
+void window_unmanage_all(void)
+{
+    dock_unmanage_all();
+    client_unmanage_all();
 }

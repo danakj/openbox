@@ -80,4 +80,8 @@ struct _ObInternalWindow {
     Window window;
 };
 
+void window_manage_all(void);
+void window_manage(Window win);
+void window_unmanage_all(void);
+
 #endif

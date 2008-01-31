@@ -50,6 +50,9 @@ static void dock_app_grab_button(ObDockApp *app, gboolean grab)
     }
 }
 
+static guint window_hash(Window *w) { return *w; }
+static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
+
 void dock_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
@@ -81,6 +84,9 @@ void dock_startup(gboolean reconfig)
     dock->obwin.type = OB_WINDOW_CLASS_DOCK;
 
     dock->hidden = TRUE;
+
+    dock->dock_map = g_hash_table_new((GHashFunc)window_hash,
+                                      (GEqualFunc)window_comp);
 
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
@@ -117,24 +123,25 @@ void dock_shutdown(gboolean reconfig)
         return;
     }
 
+    g_hash_table_destroy(dock->dock_map);
+
     XDestroyWindow(obt_display, dock->frame);
     RrAppearanceFree(dock->a_frame);
     window_remove(dock->frame);
     stacking_remove(dock);
 }
 
-void dock_add(Window win, XWMHints *wmhints)
+void dock_manage(Window icon_win, Window name_win)
 {
     ObDockApp *app;
     XWindowAttributes attrib;
     gchar **data;
 
     app = g_new0(ObDockApp, 1);
-    app->win = win;
-    app->icon_win = (wmhints->flags & IconWindowHint) ?
-        wmhints->icon_window : win;
+    app->name_win = name_win;
+    app->icon_win = icon_win;
 
-    if (OBT_PROP_GETSS(app->win, WM_CLASS, locale, &data)) {
+    if (OBT_PROP_GETSS(app->name_win, WM_CLASS, locale, &data)) {
         if (data[0]) {
             app->name = g_strdup(data[0]);
             if (data[1])
@@ -154,6 +161,7 @@ void dock_add(Window win, XWMHints *wmhints)
     }
 
     dock->dock_apps = g_list_append(dock->dock_apps, app);
+    g_hash_table_insert(dock->dock_map, &app->icon_win, app);
     dock_configure();
 
     XReparentWindow(obt_display, app->icon_win, dock->frame, app->x, app->y);
@@ -166,32 +174,34 @@ void dock_add(Window win, XWMHints *wmhints)
     */
     if (ob_state() == OB_STATE_STARTING)
         app->ignore_unmaps += 2;
-
-    if (app->win != app->icon_win) {
-        /* have to map it so that it can be re-managed on a restart */
-        XMoveWindow(obt_display, app->win, -1000, -1000);
-        XMapWindow(obt_display, app->win);
-    }
+    XChangeSaveSet(obt_display, app->icon_win, SetModeInsert);
     XMapWindow(obt_display, app->icon_win);
+
+    if (app->name_win != app->icon_win) {
+        XReparentWindow(obt_display, app->name_win, dock->frame, -1000, -1000);
+        XChangeSaveSet(obt_display, app->name_win, SetModeInsert);
+        XMapWindow(obt_display, app->name_win);
+    }
+
     XSync(obt_display, False);
 
-    /* specify that if we exit, the window should not be destroyed and should
-       be reparented back to root automatically */
-    XChangeSaveSet(obt_display, app->icon_win, SetModeInsert);
     XSelectInput(obt_display, app->icon_win, DOCKAPP_EVENT_MASK);
 
     dock_app_grab_button(app, TRUE);
 
-    ob_debug("Managed Dock App: 0x%lx (%s)", app->icon_win, app->class);
+    ob_debug("Managed Dock App: 0x%lx 0x%lx (%s)",
+             app->icon_win, app->name_win, app->class);
+
+    grab_server(FALSE);
 }
 
-void dock_remove_all(void)
+void dock_unmanage_all(void)
 {
     while (dock->dock_apps)
-        dock_remove(dock->dock_apps->data, TRUE);
+        dock_unmanage(dock->dock_apps->data, TRUE);
 }
 
-void dock_remove(ObDockApp *app, gboolean reparent)
+void dock_unmanage(ObDockApp *app, gboolean reparent)
 {
     dock_app_grab_button(app, FALSE);
     XSelectInput(obt_display, app->icon_win, NoEventMask);
@@ -199,11 +209,15 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     XChangeSaveSet(obt_display, app->icon_win, SetModeDelete);
     XSync(obt_display, False);
 
-    if (reparent)
-        XReparentWindow(obt_display, app->icon_win,
-                        obt_root(ob_screen), app->x, app->y);
+    if (reparent) {
+        XReparentWindow(obt_display, app->icon_win, obt_root(ob_screen), 0, 0);
+        if (app->name_win != app->icon_win)
+            XReparentWindow(obt_display, app->name_win,
+                            obt_root(ob_screen), 0, 0);
+    }
 
     dock->dock_apps = g_list_remove(dock->dock_apps, app);
+    g_hash_table_remove(dock->dock_map, &app->icon_win);
     dock_configure();
 
     ob_debug("Unmanaged Dock App: 0x%lx (%s)", app->icon_win, app->class);
@@ -657,13 +671,5 @@ void dock_get_area(Rect *a)
 
 ObDockApp* dock_find_dockapp(Window xwin)
 {
-    GList *it;
-    /* there are never that many dock apps, so we can use a list here instead
-       of a hash table */
-    for (it = dock->dock_apps; it; it = g_list_next(it)) {
-        ObDockApp *app = it->data;
-        if (app->icon_win == xwin)
-            return app;
-    }
-    return NULL;
+    return g_hash_table_lookup(dock->dock_map, &xwin);
 }

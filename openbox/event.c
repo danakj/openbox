@@ -161,7 +161,13 @@ static Window event_get_window(XEvent *e)
     case SelectionClear:
         window = obt_root(ob_screen);
         break;
+    case CreateNotify:
+        window = e->xcreatewindow.window;
+        break;
     case MapRequest:
+        window = e->xmaprequest.window;
+        break;
+    case MapNotify:
         window = e->xmap.window;
         break;
     case UnmapNotify:
@@ -639,7 +645,7 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (window == obt_root(ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
-        client_manage(window);
+        window_manage(window);
     else if (e->type == MappingNotify) {
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
@@ -1625,13 +1631,13 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
             app->ignore_unmaps--;
             break;
         }
-        dock_remove(app, TRUE);
+        dock_unmanage(app, TRUE);
         break;
     case DestroyNotify:
-        dock_remove(app, FALSE);
+        dock_unmanage(app, FALSE);
         break;
     case ReparentNotify:
-        dock_remove(app, FALSE);
+        dock_unmanage(app, FALSE);
         break;
     case ConfigureNotify:
         dock_app_configure(app, e->xconfigure.width, e->xconfigure.height);

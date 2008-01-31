@@ -174,95 +174,15 @@ void client_set_list(void)
     stacking_set_list();
 }
 
-void client_manage_all(void)
-{
-    guint i, j, nchild;
-    Window w, *children;
-    XWMHints *wmhints;
-    XWindowAttributes attrib;
-
-    XQueryTree(obt_display, RootWindow(obt_display, ob_screen),
-               &w, &w, &children, &nchild);
-
-    /* remove all icon windows from the list */
-    for (i = 0; i < nchild; i++) {
-        if (children[i] == None) continue;
-        wmhints = XGetWMHints(obt_display, children[i]);
-        if (wmhints) {
-            if ((wmhints->flags & IconWindowHint) &&
-                (wmhints->icon_window != children[i]))
-                for (j = 0; j < nchild; j++)
-                    if (children[j] == wmhints->icon_window) {
-                        children[j] = None;
-                        break;
-                    }
-            XFree(wmhints);
-        }
-    }
-
-    /* manage windows in reverse order from how they were originally mapped.
-       this is an attempt to manage children windows before their parents, so
-       that when the parent is mapped, it can find the child */
-    for (i = 0; i < nchild; ++i) {
-        if (children[i] == None)
-            continue;
-        if (XGetWindowAttributes(obt_display, children[i], &attrib)) {
-            if (attrib.override_redirect) continue;
-
-            if (attrib.map_state != IsUnmapped)
-                client_manage(children[i]);
-        }
-    }
-    XFree(children);
-}
-
 void client_manage(Window window)
 {
     ObClient *self;
-    XEvent e;
-    XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
-    XWMHints *wmhint;
     gboolean activate = FALSE;
     ObAppSettings *settings;
     gboolean transient = FALSE;
     Rect place, *monitor;
     Time launch_time, map_time;
-
-    grab_server(TRUE);
-
-    /* check if it has already been unmapped by the time we started
-       mapping. the grab does a sync so we don't have to here */
-    if (XCheckTypedWindowEvent(obt_display, window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(obt_display, window, UnmapNotify, &e))
-    {
-        XPutBackEvent(obt_display, &e);
-
-        ob_debug("Trying to manage unmapped window. Aborting that.\n");
-        grab_server(FALSE);
-        return; /* don't manage it */
-    }
-
-    /* make sure it isn't an override-redirect window */
-    if (!XGetWindowAttributes(obt_display, window, &attrib) ||
-        attrib.override_redirect)
-    {
-        grab_server(FALSE);
-        return; /* don't manage it */
-    }
-
-    /* is the window a docking app */
-    if ((wmhint = XGetWMHints(obt_display, window))) {
-        if ((wmhint->flags & StateHint) &&
-            wmhint->initial_state == WithdrawnState)
-        {
-            dock_add(window, wmhint);
-            grab_server(FALSE);
-            XFree(wmhint);
-            return;
-        }
-        XFree(wmhint);
-    }
 
     ob_debug("Managing window: 0x%lx", window);
 
@@ -625,8 +545,6 @@ void client_manage(Window window)
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
              window, self->frame->window, self->class);
-
-    return;
 }
 
 

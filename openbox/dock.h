@@ -44,13 +44,14 @@ struct _ObDock
     gboolean hidden;
 
     GList *dock_apps;
+    GHashTable *dock_map;
 };
 
 struct _ObDockApp {
     gint ignore_unmaps;
 
     Window icon_win;
-    Window win;
+    Window name_win;
 
     gchar *name;
     gchar *class;
@@ -69,10 +70,10 @@ void dock_shutdown(gboolean reconfig);
 void dock_configure();
 void dock_hide(gboolean hide);
 
-void dock_add(Window win, XWMHints *wmhints);
+void dock_manage(Window icon_win, Window name_win);
 
-void dock_remove_all();
-void dock_remove(ObDockApp *app, gboolean reparent);
+void dock_unmanage_all();
+void dock_unmanage(ObDockApp *app, gboolean reparent);
 
 void dock_app_drag(ObDockApp *app, XMotionEvent *e);
 void dock_app_configure(ObDockApp *app, gint w, gint h);

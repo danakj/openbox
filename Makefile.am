@@ -386,21 +386,16 @@ pubinclude_HEADERS = \
 	render/mask.h \
 	render/render.h \
 	render/theme.h \
+	render/version.h \
 	obt/display.h \
-	obt/display.c \
 	obt/keyboard.h \
-	obt/keyboard.c \
 	obt/mainloop.h \
-	obt/mainloop.c \
 	obt/parse.h \
-	obt/parse.c \
 	obt/paths.h \
-	obt/paths.c \
 	obt/prop.h \
-	obt/prop.c \
 	obt/util.h \
-	obt/xevent.h \
-	obt/xevent.c
+	obt/version.h \
+	obt/xevent.h
 
 nodist_pubinclude_HEADERS = \
 	version.h

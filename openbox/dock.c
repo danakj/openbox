@@ -651,7 +651,6 @@ void dock_get_area(Rect *a)
 
 ObDockApp* dock_find_dockapp(Window xwin)
 {
-    g_assert(xwin != None);
     GList *it;
     /* there are never that many dock apps, so we can use a list here instead
        of a hash table */

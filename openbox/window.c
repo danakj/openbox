@@ -76,7 +76,6 @@ ObStackingLayer window_layer(ObWindow *self)
 
 ObWindow* window_find(Window xwin)
 {
-    g_assert(xwin != None);
     return g_hash_table_lookup(window_map, &xwin);
 }
 

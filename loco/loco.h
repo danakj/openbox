@@ -22,7 +22,7 @@
 
 struct _ObtMainLoop;
 
-void loco_set_mainloop(struct _ObtMainLoop *loop);
+void loco_set_mainloop(gint ob_screen, struct _ObtMainLoop *loop);
 void loco_shutdown(void);
 
 

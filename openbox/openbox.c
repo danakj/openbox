@@ -200,7 +200,7 @@ gint main(gint argc, gchar **argv)
                                                XC_top_left_corner);
 
     if (screen_annex()) { /* it will be ours! */
-        loco_set_mainloop(ob_main_loop);
+        loco_set_mainloop(ob_screen, ob_main_loop);
 
         do {
             if (reconfigure) obt_keyboard_reload();

@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+glcflags=@GL_CFLAGS@
+gllibs=@GL_LIBS@
+
+Name: lOco
+Description: Openbox Composite Library
+Version: @VERSION@
+Requires: glib-2.0
+Libs: -L${libdir} ${gllibs}
+Cflags: -I${includedir}/openbox/@OB_VERSION@ ${glcflags}

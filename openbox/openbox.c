@@ -48,6 +48,7 @@
 #include "obt/prop.h"
 #include "obt/keyboard.h"
 #include "obt/parse.h"
+#include "loco/loco.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -199,6 +200,8 @@ gint main(gint argc, gchar **argv)
                                                XC_top_left_corner);
 
     if (screen_annex()) { /* it will be ours! */
+        loco_set_mainloop(ob_main_loop);
+
         do {
             if (reconfigure) obt_keyboard_reload();
 
@@ -363,6 +366,8 @@ gint main(gint argc, gchar **argv)
             config_shutdown();
             actions_shutdown(reconfigure);
         } while (reconfigure);
+
+        loco_shutdown();
     }
 
     XSync(obt_display, FALSE);

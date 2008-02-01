@@ -26,7 +26,8 @@ check_PROGRAMS = \
 
 lib_LTLIBRARIES = \
 	render/libobrender.la \
-	obt/libobt.la
+	obt/libobt.la \
+	loco/liboco.la
 
 bin_PROGRAMS = \
 	openbox/openbox \
@@ -140,6 +141,31 @@ obt_libobt_la_SOURCES = \
 	obt/xevent.h \
 	obt/xevent.c
 
+## loco ##
+
+loco_liboco_la_CPPFLAGS = \
+	$(GL_CFLAGS) \
+	$(XSHAPE_CFLAGS) \
+	$(XRENDER_CFLAGS) \
+	$(XDAMAGE_CFLAGS) \
+	$(XCOMPOSITE_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	-DG_LOG_DOMAIN=\"Loco\" \
+	-DLOCALEDIR=\"$(localedir)\" \
+	-DDATADIR=\"$(datadir)\" \
+	-DCONFIGDIR=\"$(configdir)\"
+loco_liboco_la_LDFLAGS = \
+	-version-info $(LOCO_CURRENT):$(LOCO_REVISION):$(LOCO_AGE)
+loco_liboco_la_LIBADD = \
+	$(GL_LIBS) \
+	$(XSHAPE_LIBS) \
+	$(XRENDER_LIBS) \
+	$(XDAMAGE_LIBS) \
+	$(XCOMPOSITE_LIBS) \
+	$(GLIB_LIBS)
+loco_liboco_la_SOURCES = \
+	loco/loco.c
+
 ## openbox ##
 
 openbox_openbox_CPPFLAGS = \
@@ -165,7 +191,8 @@ openbox_openbox_LDADD = \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \
 	render/libobrender.la \
-	obt/libobt.la
+	obt/libobt.la \
+	loco/liboco.la
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
 	gettext.h \
@@ -408,7 +435,8 @@ obtpubinclude_HEADERS = \
 
 nodist_pkgconfig_DATA = \
 	render/obrender-4.0.pc \
-	obt/obt-4.0.pc
+	obt/obt-4.0.pc \
+	loco/loco-4.0.pc
 
 ## data ##
 

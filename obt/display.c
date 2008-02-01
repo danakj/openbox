@@ -47,6 +47,12 @@ gboolean obt_display_extension_sync      = FALSE;
 gint     obt_display_extension_sync_basep;
 gboolean obt_display_extension_composite = FALSE;
 gint     obt_display_extension_composite_basep;
+gboolean obt_display_extension_damage    = FALSE;
+gint     obt_display_extension_damage_basep;
+gboolean obt_display_extension_render    = FALSE;
+gint     obt_display_extension_render_basep;
+gboolean obt_display_extension_fixes     = FALSE;
+gint     obt_display_extension_fixes_basep;
 
 static gint xerror_handler(Display *d, XErrorEvent *e);
 
@@ -107,11 +113,10 @@ gboolean obt_display_open(const char *display_name)
             XSyncQueryExtension(d, &obt_display_extension_sync_basep,
                                 &junk) && XSyncInitialize(d, &junk, &junk);
         if (!obt_display_extension_sync)
-            g_message("X Sync extension is not present on the server or is an "
-                      "incompatible version");
+            g_message("X Sync extension is not present on the server");
 #endif
 
-#ifdef USE_XCOMPOSITE
+#ifdef USE_COMPOSITING
         if (XCompositeQueryExtension(d, &obt_display_extension_composite_basep,
                                      &junk))
         {
@@ -125,6 +130,24 @@ gboolean obt_display_open(const char *display_name)
         if (!obt_display_extension_composite)
             g_message("X Composite extension is not present on the server or "
                       "is an incompatible version");
+
+        obt_display_extension_damage =
+            XDamageQueryExtension(d, &obt_display_extension_damage_basep,
+                                  &junk);
+        if (!obt_display_extension_damage)
+            g_message("X Damage extension is not present on the server");
+
+        obt_display_extension_render =
+            XRenderQueryExtension(d, &obt_display_extension_render_basep,
+                                  &junk);
+        if (!obt_display_extension_render)
+            g_message("X Render extension is not present on the server");
+
+        obt_display_extension_fixes =
+            XFixesQueryExtension(d, &obt_display_extension_fixes_basep,
+                                  &junk);
+        if (!obt_display_extension_fixes)
+            g_message("X Fixes extension is not present on the server");
 #endif
 
         obt_prop_startup();

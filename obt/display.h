@@ -38,10 +38,11 @@
 #ifdef    SYNC
 #include <X11/extensions/sync.h>
 #endif
-#ifdef    USE_XCOMPOSITE
+#ifdef    USE_COMPOSITING
 #include <X11/extensions/Xcomposite.h>
 #include <X11/extensions/Xdamage.h>
 #include <X11/extensions/Xrender.h>
+#include <X11/extensions/Xfixes.h>
 #endif
 
 G_BEGIN_DECLS
@@ -60,6 +61,12 @@ extern gboolean obt_display_extension_sync;
 extern gint     obt_display_extension_sync_basep;
 extern gboolean obt_display_extension_composite;
 extern gint     obt_display_extension_composite_basep;
+extern gboolean obt_display_extension_damage;
+extern gint     obt_display_extension_damage_basep;
+extern gboolean obt_display_extension_render;
+extern gint     obt_display_extension_render_basep;
+extern gboolean obt_display_extension_fixes;
+extern gint     obt_display_extension_fixes_basep;
 
 extern Display* obt_display;
 

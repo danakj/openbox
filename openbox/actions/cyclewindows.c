@@ -134,7 +134,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     cycling = TRUE;
 
     stacking_restore();
-    if (o->raise) stacking_temp_raise(CLIENT_AS_WINDOW(ft));
+    if (o->raise && ft) stacking_temp_raise(CLIENT_AS_WINDOW(ft));
 
     return TRUE;
 }

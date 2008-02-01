@@ -21,6 +21,7 @@
 #include "obt/mainloop.h"
 #include "obt/display.h"
 #include "obt/mainloop.h"
+#include "obt/prop.h"
 #include <glib.h>
 #include <GL/glx.h>
 #include <GL/glext.h>
@@ -37,6 +38,8 @@ typedef struct {
     Window id;
     gint x, y, w, h;
     gboolean input_only;
+    gboolean visible;
+    gint type; /* XXX make this an enum */
 } LocoWindow;
 
 typedef struct _LocoList {
@@ -133,6 +136,18 @@ static void loco_list_move_before(LocoList **top, LocoList **bottom,
     if (!move->prev) *top = move;
 }
 
+/* Returns a LocoWindow structure */
+static LocoWindow* find_window(Window window)
+{
+    return g_hash_table_lookup(window_map, &window);
+}
+
+/* Returns a node from the stacking_top/bottom list */
+static LocoList* find_stacking(Window window)
+{
+    return g_hash_table_lookup(stacking_map, &window);
+}
+
 void composite_setup_window(LocoWindow *win)
 {
     if (win->input_only) return;
@@ -169,53 +184,64 @@ static void add_window(Window window)
     //print_stacking();
 }
 
-static void remove_window(Window window)
+static void remove_window(LocoWindow *lw)
 {
-    LocoWindow *lw;
+    printf("remove window 0x%lx\n", lw->id);
 
-    printf("remove window 0x%lx\n", window);
+    LocoList *pos = find_stacking(lw->id);
+    g_assert(pos);
 
-    lw = g_hash_table_lookup(window_map, &window);
-    if (lw) {
-        LocoList *pos = g_hash_table_lookup(stacking_map, &window);
-        g_assert(pos);
+    loco_list_delete_link(&stacking_top, &stacking_bottom, pos);
+    g_hash_table_remove(stacking_map, &lw->id);
+    g_hash_table_remove(window_map, &lw->id);
 
-        loco_list_delete_link(&stacking_top, &stacking_bottom, pos);
-        g_hash_table_remove(stacking_map, &window);
-        g_hash_table_remove(window_map, &window);
-
-        g_free(lw);
-    }
+    g_free(lw);
 
     //print_stacking();
 }
 
+static void show_window(LocoWindow *lw)
+{
+    guint32 *type;
+    guint i, ntype;
+
+    lw->visible = TRUE;
+
+    /* get the window's semantic type (for different effects!) */
+    lw->type = 0; /* XXX set this to the default type */
+    if (OBT_PROP_GETA32(lw->id, NET_WM_WINDOW_TYPE, ATOM, &type, &ntype)) {
+        /* use the first value that we know about in the array */
+        for (i = 0; i < ntype; ++i) {
+            /* XXX SET THESE TO AN ENUM'S VALUES */
+            if (type[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DESKTOP))
+                lw->type = 1;
+            if (type[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_MENU))
+                lw->type = 2;
+            /* XXX there are more TYPES that need to be added to prop.h */
+        }
+        g_free(type);
+    }
+
+}
+
+static void hide_window(LocoWindow *lw, gboolean destroyed)
+{
+    /* if destroyed, then the window is no longer available */
+    lw->visible = FALSE;
+}
+
 void COMPOSTER_RAWR(const XEvent *e, gpointer data)
 {
-    if (e->type == CreateNotify) {
-        add_window(e->xmap.window);
-    }
-    else if (e->type == DestroyNotify) {
-        remove_window(e->xdestroywindow.window);
-    }
-    else if (e->type == ReparentNotify) {
-        if (e->xreparent.parent == loco_root)
-            add_window(e->xreparent.window);
-        else
-            remove_window(e->xreparent.window);
-    }
-    else if (e->type == obt_display_extension_damage_basep + XDamageNotify) {
-    }
-    else if (e->type == ConfigureNotify) {
+    if (e->type == ConfigureNotify) {
         LocoWindow *lw;
         printf("Window 0x%lx moved or something\n", e->xconfigure.window);
 
-        lw = g_hash_table_lookup(window_map, &e->xconfigure.window);
+        lw = find_window(e->xconfigure.window);
         if (lw) {
             LocoList *above, *pos;
 
-            pos = g_hash_table_lookup(stacking_map, &e->xconfigure.window);
-            above = g_hash_table_lookup(stacking_map, &e->xconfigure.above);
+            pos = find_stacking(e->xconfigure.window);
+            above = find_stacking(e->xconfigure.above);
 
             g_assert(pos != NULL && pos->window != NULL);
             if (e->xconfigure.above && !above)
@@ -230,6 +256,49 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
             loco_list_move_before(&stacking_top, &stacking_bottom, pos, above);
         }
         //print_stacking();
+    }
+    else if (e->type == CreateNotify) {
+        add_window(e->xmap.window);
+    }
+    else if (e->type == DestroyNotify) {
+        LocoWindow *lw = find_window(e->xdestroywindow.window);
+        if (lw) {
+            hide_window(lw, TRUE);
+            remove_window(lw);
+        }
+        else
+            printf("destroy notify for unknown window 0x%lx\n",
+                   e->xdestroywindow.window);
+    }
+    else if (e->type == ReparentNotify) {
+        if (e->xreparent.parent == loco_root)
+            add_window(e->xreparent.window);
+        else {
+            LocoWindow *lw = find_window(e->xreparent.window);
+            if (lw) {
+                hide_window(lw, FALSE);
+                remove_window(lw);
+            }
+            else
+                printf("reparent notify away from root for unknown window "
+                       "0x%lx\n", e->xreparent.window);
+        }
+    }
+    else if (e->type == MapNotify) {
+        LocoWindow *lw = find_window(e->xmap.window);
+        if (lw) show_window(lw);
+        else
+            printf("map notify for unknown window 0x%lx\n",
+                   e->xmap.window);
+    }
+    else if (e->type == UnmapNotify) {
+        LocoWindow *lw = find_window(e->xunmap.window);
+        if (lw) hide_window(lw, FALSE);
+        else
+            printf("unmap notify for unknown window 0x%lx\n",
+                   e->xunmap.window);
+    }
+    else if (e->type == obt_display_extension_damage_basep + XDamageNotify) {
     }
 }
 

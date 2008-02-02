@@ -519,7 +519,6 @@ static void event_process(const XEvent *ec, gpointer data)
                window with RevertToParent focus */
             frame_adjust_focus(client->frame, FALSE);
             /* focus_set_client(NULL) has already been called */
-            client_calc_layer(client);
         }
         else if (e->xfocus.detail == NotifyPointerRoot ||
                  e->xfocus.detail == NotifyDetailNone ||
@@ -629,7 +628,6 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, FALSE);
             /* focus_set_client(NULL) has already been called in this
                section or by focus_fallback */
-            client_calc_layer(client);
         }
     }
     else if (client)

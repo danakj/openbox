@@ -2471,7 +2471,15 @@ static ObStackingLayer calc_layer(ObClient *self)
               (self->decorations == 0 &&
                !(self->max_horz && self->max_vert) &&
                RECT_EQUAL(self->area, *monitor))) &&
-             (client_focused(self) || client_search_focus_tree(self)))
+             /* you are fullscreen while you or your children are focused.. */
+             (client_focused(self) || client_search_focus_tree(self) ||
+              /* you can be fullscreen if you're on another desktop */
+              (self->desktop != screen_desktop &&
+               self->desktop != DESKTOP_ALL) ||
+              /* and you can also be fullscreen if the focused client is on
+                 another monitor, or nothing else is focused */
+              (!focus_client ||
+               client_monitor(focus_client) != client_monitor(self))))
         l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
@@ -2497,23 +2505,54 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
         stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
     }
 
+    /* we've been restacked */
+    self->visited = TRUE;
+
     for (it = self->transients; it; it = g_slist_next(it))
         client_calc_layer_recursive(it->data, orig,
                                     self->layer);
 }
 
-void client_calc_layer(ObClient *self)
+static void client_calc_layer_internal(ObClient *self)
 {
-    ObClient *orig;
-    GSList *it;
-
-    orig = self;
+    GSList *sit;
 
     /* transients take on the layer of their parents */
-    it = client_search_all_top_parents(self);
+    sit = client_search_all_top_parents(self);
 
-    for (; it; it = g_slist_next(it))
-        client_calc_layer_recursive(it->data, orig, 0);
+    for (; sit; sit = g_slist_next(sit))
+        client_calc_layer_recursive(sit->data, self, 0);
+}
+
+void client_calc_layer(ObClient *self)
+{
+    GList *it;
+
+    /* skip over stuff above fullscreen layer */
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN) break;
+
+    /* find the windows in the fullscreen layer, and mark them not-visited */
+    for (; it; it = g_list_next(it)) {
+        if (window_layer(it->data) < OB_STACKING_LAYER_FULLSCREEN) break;
+        else if (WINDOW_IS_CLIENT(it->data))
+            WINDOW_AS_CLIENT(it->data)->visited = FALSE;
+    }
+
+    client_calc_layer_internal(self);
+
+    /* skip over stuff above fullscreen layer */
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN) break;
+
+    /* now recalc any windows in the fullscreen layer which have not
+       had their layer recalced already */
+    for (; it; it = g_list_next(it)) {
+        if (window_layer(it->data) < OB_STACKING_LAYER_FULLSCREEN) break;
+        else if (WINDOW_IS_CLIENT(it->data) &&
+                 !WINDOW_AS_CLIENT(it->data)->visited)
+            client_calc_layer_internal(it->data);
+    }
 }
 
 gboolean client_should_show(ObClient *self)
@@ -2931,6 +2970,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                       gboolean user, gboolean final, gboolean force_reply)
 {
+    Rect oldframe;
     gint oldw, oldh;
     gboolean send_resize_client;
     gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
@@ -2953,6 +2993,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     oldw = self->area.width;
     oldh = self->area.height;
+    oldframe = self->frame->area;
     RECT_SET(self->area, x, y, w, h);
 
     /* for app-requested resizes, always resize if 'resized' is true.
@@ -3057,6 +3098,14 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     }
 
     XFlush(ob_display);
+
+    /* if it moved between monitors, then this can affect the stacking
+       layer of this window or others - for fullscreen windows */
+    if (screen_find_monitor(&self->frame->area) !=
+        screen_find_monitor(&oldframe))
+    {
+        client_calc_layer(self);
+    }
 }
 
 void client_fullscreen(ObClient *self, gboolean fs)

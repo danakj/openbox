@@ -54,6 +54,8 @@
     restart (eg toolbars), as they can be iconified by other means
   * Improve support for fullscreen windows in xinerama (TwinView) and
     multiple-screen setups
+  * Add a --config-file command line option, to specify an alternate
+    configuration file path
 
 3.4.5:
   * Added Hungarian translation

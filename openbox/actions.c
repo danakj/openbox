@@ -23,6 +23,7 @@
 #include "event.h"
 #include "config.h"
 #include "client.h"
+#include "openbox.h"
 #include "debug.h"
 
 #include "actions/all.h"
@@ -35,6 +36,7 @@ static ObActionsAct* actions_build_act_from_string(const gchar *name);
 
 static ObActionsAct *interactive_act = NULL;
 static guint         interactive_initial_state = 0;
+static gboolean      replay_pointer = FALSE;
 
 struct _ObActionsDefinition {
     guint ref;
@@ -222,6 +224,16 @@ static void actions_setup_data(ObActionsData *data,
     data->client = client;
 }
 
+void actions_set_need_pointer_replay_before_move(gboolean replay)
+{
+    replay_pointer = replay;
+}
+
+gboolean actions_get_need_pointer_replay_before_move()
+{
+    return replay_pointer;
+}
+
 void actions_run_acts(GSList *acts,
                       ObUserAction uact,
                       guint state,
@@ -334,8 +346,14 @@ gboolean actions_interactive_input_event(XEvent *e)
 void actions_client_move(ObActionsData *data, gboolean start)
 {
     static gulong ignore_start = 0;
-    if (start)
+    if (start) {
         ignore_start = event_start_ignore_all_enters();
+        if (replay_pointer) {
+            /* replay the pointer event before any windows move */
+            XAllowEvents(ob_display, ReplayPointer, event_curtime);
+            replay_pointer = FALSE;
+        }
+    }
     else if (config_focus_follow &&
              data->context != OB_FRAME_CONTEXT_CLIENT)
     {

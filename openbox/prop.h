@@ -194,6 +194,7 @@ typedef struct Atoms {
     Atom ob_wm_state_undecorated;
     Atom openbox_pid; /* this is depreecated in favour of ob_control */
     Atom ob_theme;
+    Atom ob_config_file;
     Atom ob_control;
 } Atoms;
 extern Atoms prop_atoms;

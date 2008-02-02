@@ -79,25 +79,21 @@ void parse_register(ObParseInst *i, const gchar *tag,
     g_hash_table_insert(i->callbacks, c->tag, c);
 }
 
-gboolean parse_load_rc(const gchar *type, xmlDocPtr *doc, xmlNodePtr *root)
+gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root)
 {
     GSList *it;
     gboolean r = FALSE;
-    gchar *fname;
 
-    if (type == NULL)
-        fname = g_strdup("rc.xml");
-    else
-        fname = g_strdup_printf("rc-%s.xml", type);
+    if (file && parse_load(file, "openbox_config", doc, root))
+        return TRUE;
 
     for (it = xdg_config_dir_paths; !r && it; it = g_slist_next(it)) {
         gchar *path;
 
-        path = g_build_filename(it->data, "openbox", fname, NULL);
+        path = g_build_filename(it->data, "openbox", "rc.xml", NULL);
         r = parse_load(path, "openbox_config", doc, root);
         g_free(path);
     }
-    g_free(fname);
 
     return r;
 }

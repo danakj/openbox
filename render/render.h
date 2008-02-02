@@ -22,7 +22,7 @@
 #define __render_h
 
 #include "geom.h"
-#include "version.h"
+#include "render/version.h"
 
 #include <X11/Xlib.h> /* some platforms dont include this as needed for Xft */
 #include <pango/pangoxft.h>

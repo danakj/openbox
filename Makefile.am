@@ -8,7 +8,8 @@ rcdir           = $(configdir)/openbox
 xsessionsdir    = $(datadir)/xsessions
 gnomewmfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
-pubincludedir   = $(includedir)/openbox/@OBT_VERSION@/openbox
+obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt/
+rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/render/
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 
@@ -376,7 +377,7 @@ dist_syscrash_theme_DATA= \
 
 ## public headers ##
 
-pubinclude_HEADERS = \
+rrpubinclude_HEADERS = \
 	render/color.h \
 	render/font.h \
 	render/geom.h \
@@ -386,7 +387,9 @@ pubinclude_HEADERS = \
 	render/mask.h \
 	render/render.h \
 	render/theme.h \
-	render/version.h \
+	render/version.h
+
+obtpubinclude_HEADERS = \
 	obt/display.h \
 	obt/keyboard.h \
 	obt/mainloop.h \
@@ -396,9 +399,6 @@ pubinclude_HEADERS = \
 	obt/util.h \
 	obt/version.h \
 	obt/xevent.h
-
-nodist_pubinclude_HEADERS = \
-	version.h
 
 nodist_pkgconfig_DATA = \
 	render/obrender-4.0.pc \
@@ -444,7 +444,6 @@ nodist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
-	version.h.in \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/xsession/openbox.desktop.in \
@@ -461,8 +460,10 @@ dist_noinst_DATA = \
 	doc/openbox-gnome-session.1.in \
 	doc/openbox-kde-session.1.sgml \
 	doc/openbox-kde-session.1.in \
+	render/version.h.in \
 	render/obrender-4.0.pc.in \
 	obt/obt-4.0.pc.in \
+	obt/version.h.in \
 	tools/themeupdate/themeupdate.py \
 	tests/hideshow.py \
 	tests/Makefile \

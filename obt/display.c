@@ -135,7 +135,7 @@ static gint xerror_handler(Display *d, XErrorEvent *e)
         else
             g_error("X Error: %s", errtxt);
     } else
-        g_message("XError code %d '%s'", e->error_code, errtxt);
+        g_message("Ignoring XError code %d '%s'", e->error_code, errtxt);
 #else
     (void)d; (void)e;
 #endif

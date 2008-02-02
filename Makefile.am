@@ -8,8 +8,8 @@ rcdir           = $(configdir)/openbox
 xsessionsdir    = $(datadir)/xsessions
 gnomewmfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
-obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt/
-rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/render/
+obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
+rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/render
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 

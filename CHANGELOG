@@ -52,6 +52,8 @@
   * Faster horizontal gradient rendering
   * Don't deiconify windows that aren't allowed to be directly iconified on
     restart (eg toolbars), as they can be iconified by other means
+  * Improve support for fullscreen windows in xinerama (TwinView) and
+    multiple-screen setups
 
 3.4.5:
   * Added Hungarian translation

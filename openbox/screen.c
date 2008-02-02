@@ -290,6 +290,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
     supported[i++] = OBT_PROP_ATOM(OPENBOX_PID);
     supported[i++] = OBT_PROP_ATOM(OB_THEME);
+    supported[i++] = OBT_PROP_ATOM(OB_CONFIG_FILE);
     supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
     g_assert(i == num_support);
 

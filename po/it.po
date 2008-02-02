@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-25 03:51+0100\n"
+"POT-Creation-Date: 2008-02-02 09:06-0500\n"
 "PO-Revision-Date: 2007-07-20 15:18+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -21,109 +21,109 @@ msgstr ""
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr ""
 
-#: openbox/actions/execute.c:88
+#: openbox/actions/execute.c:92
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "Impossibile convertire il percorso utf8 '%s'"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
+#: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "Impossibile eseguire il comando '%s': %s"
 
-#: openbox/client.c:1973 openbox/client.c:2005
+#: openbox/client.c:1988 openbox/client.c:2020
 msgid "Killing..."
 msgstr ""
 
-#: openbox/client.c:1975 openbox/client.c:2007
+#: openbox/client.c:1990 openbox/client.c:2022
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:91 openbox/client_list_menu.c:94
 msgid "Go there..."
 msgstr "Vai a..."
 
-#: openbox/client_list_combined_menu.c:96
+#: openbox/client_list_combined_menu.c:97
 msgid "Manage desktops"
 msgstr "Gestisci i desktop"
 
-#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Add new desktop"
 msgstr "_Aggiungi un nuovo desktop"
 
-#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
 msgid "_Remove last desktop"
 msgstr "_Rimuovi l'ultimo desktop"
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:151
 msgid "Windows"
 msgstr "Finestre"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:204
 msgid "Desktops"
 msgstr "Desktop"
 
-#: openbox/client_menu.c:256
+#: openbox/client_menu.c:257
 msgid "All desktops"
 msgstr "Tutti i desktop"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:361
 msgid "_Layer"
 msgstr "_Livello"
 
-#: openbox/client_menu.c:365
+#: openbox/client_menu.c:366
 msgid "Always on _top"
 msgstr "Sempre _sopra"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:367
 msgid "_Normal"
 msgstr "_Normale"
 
-#: openbox/client_menu.c:367
+#: openbox/client_menu.c:368
 msgid "Always on _bottom"
 msgstr "Sempre s_otto"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:371
 msgid "_Send to desktop"
 msgstr "Invia al _desktop"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:375
 msgid "Client menu"
 msgstr "Menù della finestra"
 
-#: openbox/client_menu.c:384
+#: openbox/client_menu.c:385
 msgid "R_estore"
 msgstr "_Ripristina"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:393
 msgid "_Move"
 msgstr "_Muovi"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:395
 msgid "Resi_ze"
 msgstr "R_idimensiona"
 
-#: openbox/client_menu.c:396
+#: openbox/client_menu.c:397
 msgid "Ico_nify"
 msgstr "Mi_nimizza"
 
-#: openbox/client_menu.c:404
+#: openbox/client_menu.c:405
 msgid "Ma_ximize"
 msgstr "Ma_ssimizza"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:413
 msgid "_Roll up/down"
 msgstr "A_rrotola"
 
-#: openbox/client_menu.c:414
+#: openbox/client_menu.c:415
 msgid "Un/_Decorate"
 msgstr "Si/No _Decorazioni"
 
-#: openbox/client_menu.c:418
+#: openbox/client_menu.c:419
 msgid "_Close"
 msgstr "_Chiudi"
 
-#: openbox/config.c:746
+#: openbox/config.c:750
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Il pulsante '%s' specificato nel file di configurazione non è valido"
@@ -168,53 +168,53 @@ msgstr "Il pulsante '%s' specificato nelle associazioni mouse non è valido"
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Il contesto '%s' specificato nelle associazioni mouse non è valido"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:131
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Impossibile accedere alla directory home '%s': %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:151
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Impossibile accedere al display specificato nella variabile DISPLAY."
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "Impossibile inizializzare la libreria obrender."
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "X server does not support locale."
 msgstr "Il server X non ha il supporto per la localizzazione."
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 "Impossibile impostare la localizzazione dei tasti modificatori per il server "
 "X."
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Impossibile trovare un file di configurazione valido, verranno utilizzate le "
 "impostazioni predefinite"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:279
 msgid "Unable to load a theme."
 msgstr "Impossibile caricare un tema."
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:406
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Non è stato possibile riavviare il nuovo eseguibile '%s': %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:476 openbox/openbox.c:478
 msgid "Copyright (c)"
 msgstr ""
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:487
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintassi: openbox [opzioni]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:488
 msgid ""
 "\n"
 "Options:\n"
@@ -222,23 +222,23 @@ msgstr ""
 "\n"
 "Opzioni:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:489
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Mostra questo messaggio di aiuto ed esce\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:490
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Mostra il numero di versione ed esce\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:491
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Sostituisce l'attuale window manager attivo\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:492
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Disabilita la connessione al session manager\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -246,19 +246,19 @@ msgstr ""
 "\n"
 "Inviare messaggi ad un'istanza di Openbox attiva:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:494
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ricarica la configurazione di Openbox\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:495
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Riavvia Openbox\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:496
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:497
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -266,25 +266,25 @@ msgstr ""
 "\n"
 "Opzioni di debug:\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:498
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Esegue in modalità sincrona\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:499
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Mostra le informazioni di debug\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:500
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Mostra le informazioni di debug sulla gestione del "
 "focus\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:501
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Divide lo schermo per simulare xinerama\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:502
 #, c-format
 msgid ""
 "\n"
@@ -293,7 +293,7 @@ msgstr ""
 "\n"
 "Segnalate eventuali bug a %s\n"
 
-#: openbox/openbox.c:602
+#: openbox/openbox.c:603
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Argomento da linea di comando non valido '%s'\n"
@@ -340,7 +340,7 @@ msgstr "Impossibile salvare la sessione in '%s': %s"
 msgid "Error while saving the session to '%s': %s"
 msgstr "Errore durante il salvataggio della sessione in '%s': %s"
 
-#: openbox/startupnotify.c:241
+#: openbox/startupnotify.c:243
 #, c-format
 msgid "Running %s\n"
 msgstr "Sto eseguendo %s\n"

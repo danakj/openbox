@@ -68,13 +68,6 @@ KeyBindingTree *tree_build(GList *keylist)
     return ret;
 }
 
-void tree_rebind(KeyBindingTree *node) {
-    GList *it = g_list_last(node->keylist);
-    translate_key(it->data, &node->state, &node->key);
-    if (node->next_sibling) tree_rebind(node->next_sibling);
-    if (node->first_child) tree_rebind(node->first_child);
-}
-
 void tree_assimilate(KeyBindingTree *node)
 {
     KeyBindingTree *a, *b, *tmp, *last;
@@ -139,16 +132,15 @@ KeyBindingTree *tree_find(KeyBindingTree *search, gboolean *conflict)
 gboolean tree_chroot(KeyBindingTree *tree, GList *keylist)
 {
     guint key, state;
-    if (translate_key(keylist->data, &state, &key)) {
-        while (tree != NULL && !(tree->state == state && tree->key == key))
-            tree = tree->next_sibling;
-        if (tree != NULL) {
-            if (keylist->next == NULL) {
-                tree->chroot = TRUE;
-                return TRUE;
-            } else
-                return tree_chroot(tree->first_child, keylist->next);
-        }
+    translate_key(keylist->data, &state, &key);
+    while (tree != NULL && !(tree->state == state && tree->key == key))
+        tree = tree->next_sibling;
+    if (tree != NULL) {
+        if (keylist->next == NULL) {
+            tree->chroot = TRUE;
+            return TRUE;
+        } else
+            return tree_chroot(tree->first_child, keylist->next);
     }
     return FALSE;
 }

@@ -103,6 +103,7 @@ static KeyCode   keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
+static gchar    *config_file = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
@@ -222,18 +223,29 @@ gint main(gint argc, gchar **argv)
                 config_startup(i);
 
                 /* parse/load user options */
-                if (obt_parse_load_config_file(i, "openbox", "rc.xml",
+                if ((config_file &&
+                     obt_parse_load_file(i, config_file, "openbox_config")) ||
+                    obt_parse_load_config_file(i, "openbox", "rc.xml",
                                                "openbox_config"))
                 {
                     obt_parse_tree_from_root(i);
                     obt_parse_close(i);
-                } else
+                }
+                else {
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
+                    config_file = NULL;
+                }
 
-/*
-                if (config_type != NULL)
-                    PROP_SETS(obt_root(ob_screen), ob_config, config_type);
-*/
+                if (config_file) {
+                    gchar *p = g_filename_to_utf8(config_file, -1,
+                                                  NULL, NULL, NULL);
+                    if (p)
+                        OBT_PROP_SETS(obt_root(ob_screen), OB_CONFIG_FILE,
+                                      utf8, p);
+                    g_free(p);
+                }
+                else
+                    OBT_PROP_ERASE(obt_root(ob_screen), OB_CONFIG_FILE);
 
                 /* we're done with parsing now, kill it */
                 obt_parse_instance_unref(i);
@@ -462,6 +474,7 @@ static void print_help()
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
     g_print(_("  --replace           Replace the currently running window manager\n"));
+    g_print(_("  --config-file FILE  Specify the path to the config file to use\n"));
     g_print(_("  --sm-disable        Disable connection to the session manager\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
@@ -542,6 +555,18 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--exit")) {
             remote_control = 3;
+        }
+        else if (!strcmp(argv[i], "--config-file")) {
+            if (i == *argc - 1) /* no args left */
+                /* not translated cuz it's sekret */
+                g_printerr(_("--config-file requires an argument\n"));
+            else {
+                /* this will be in the current locale encoding, which is
+                   what we want */
+                config_file = argv[i+1];
+                ++i; /* skip the argument */
+                ob_debug("--config-file %s\n", config_file);
+            }
         }
         else if (!strcmp(argv[i], "--sm-save-file")) {
             if (i == *argc - 1) /* no args left */

@@ -263,9 +263,46 @@ void keyboard_event(ObClient *client, const XEvent *e)
     }
 }
 
+static void node_rebind(KeyBindingTree *node)
+{
+    if (node->first_child) {
+        /* find leaf nodes */
+        node_rebind(node->first_child);
+
+        /* for internal nodes, add them to the tree if they
+           are a chroot, but do this after adding their
+           children */
+        if (node->chroot)
+            keyboard_chroot(node->keylist);
+    }
+    else {
+        /* for leaf nodes, rebind each action assigned to it */
+        GSList *it;
+        while (node->actions) {
+            /* add each action, and remove them from the original tree so
+               they don't get free'd on us */
+            keyboard_bind(node->keylist, node->actions->data);
+            node->actions = g_slist_delete_link(node->actions, node->actions);
+        }
+
+        if (node->chroot)
+            keyboard_chroot(node->keylist);
+    }
+
+    /* go through each sibling */
+    if (node->next_sibling) node_rebind(node->next_sibling);
+}
+
 void keyboard_rebind(void)
 {
-    tree_rebind(keyboard_firstnode);
+    KeyBindingTree *old;
+
+    old = keyboard_firstnode;
+    keyboard_firstnode = NULL;
+    node_rebind(old);
+
+    tree_destroy(old);
+    set_curpos(NULL);
     grab_keys(TRUE);
 }
 

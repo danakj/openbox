@@ -521,7 +521,6 @@ static void event_process(const XEvent *ec, gpointer data)
                window with RevertToParent focus */
             frame_adjust_focus(client->frame, FALSE);
             /* focus_set_client(NULL) has already been called */
-            client_calc_layer(client);
         }
         else if (e->xfocus.detail == NotifyPointerRoot ||
                  e->xfocus.detail == NotifyDetailNone ||
@@ -631,7 +630,6 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, FALSE);
             /* focus_set_client(NULL) has already been called in this
                section or by focus_fallback */
-            client_calc_layer(client);
         }
     }
     else if (client)
@@ -708,7 +706,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
     if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
-           on the root window, the process it */
+           on the root window, then process it */
         if (window != obt_root(ob_screen) ||
             e->xbutton.subwindow == None)
         {

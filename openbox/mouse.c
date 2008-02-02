@@ -224,6 +224,17 @@ void mouse_event(ObClient *client, XEvent *e)
         button = e->xbutton.button;
         state = e->xbutton.state;
 
+        /* if the binding was in a client context, then we need to call
+           XAllowEvents with ReplayPointer at some point, to send the event
+           through to the client.  when this happens though depends.  if
+           windows are going to be moved on screen, then the click will end
+           up going somewhere wrong, so have the action system perform the
+           ReplayPointer for us if that is the case. */
+        if (CLIENT_CONTEXT(context, client))
+            actions_set_need_pointer_replay_before_move(TRUE);
+        else
+            actions_set_need_pointer_replay_before_move(FALSE);
+
         fire_binding(OB_MOUSE_ACTION_PRESS, context,
                      client, e->xbutton.state,
                      e->xbutton.button,
@@ -234,11 +245,14 @@ void mouse_event(ObClient *client, XEvent *e)
         if (grab_on_pointer())
             button = 0;
 
-        if (CLIENT_CONTEXT(context, client)) {
-            /* Replay the event, so it goes to the client*/
+        /* replay the pointer event if it hasn't been replayed yet (i.e. no
+           windows were moved) */
+        if (actions_get_need_pointer_replay_before_move())
             XAllowEvents(obt_display, ReplayPointer, event_curtime);
-            /* Fall through to the release case! */
-        } else
+
+        /* in the client context, we won't get a button release because of the
+           way it is grabbed, so just fake one */
+        if (!CLIENT_CONTEXT(context, client))
             break;
 
     case ButtonRelease:

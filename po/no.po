@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-29 13:43+0100\n"
+"POT-Creation-Date: 2008-02-02 09:06-0500\n"
 "PO-Revision-Date: 2008-01-29 13:37+0100\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@gmail.com>\n"
 "Language-Team: None\n"
@@ -30,11 +30,11 @@ msgstr "Feil ved konvertering av '%s' fra utf8 "
 msgid "Failed to execute '%s': %s"
 msgstr "Kunne ikke kjøre '%s': %s"
 
-#: openbox/client.c:1979 openbox/client.c:2011
+#: openbox/client.c:1988 openbox/client.c:2020
 msgid "Killing..."
 msgstr "Dreper..."
 
-#: openbox/client.c:1981 openbox/client.c:2013
+#: openbox/client.c:1990 openbox/client.c:2022
 msgid "Not Responding"
 msgstr "Svarer Ikke"
 
@@ -309,7 +309,9 @@ msgstr "Vindusbehandleren på skjerm %d vil ikke avslutte"
 msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr "Openbox er innstillt til %d skrivebord, men nåværende sesjon har %d.  Benytter sesjonens innstilling."
+msgstr ""
+"Openbox er innstillt til %d skrivebord, men nåværende sesjon har %d.  "
+"Benytter sesjonens innstilling."
 
 #: openbox/screen.c:1168
 #, c-format

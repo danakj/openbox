@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-01-25 03:51+0100\n"
+"POT-Creation-Date: 2008-02-02 09:06-0500\n"
 "PO-Revision-Date: 2007-06-01 19:02+0530\n"
 "Last-Translator: Runa Bhattacharjee <runabh@gmail.com>\n"
 "Language-Team: Bengali (India) <en@li.org>\n"
@@ -23,109 +23,109 @@ msgid "Invalid action '%s' requested. No such action exists."
 msgstr ""
 "অবৈধ কর্ম '%s'-র অনুরোধ জানানো হয়েছে। এই ধরনের কোনো কর্ম বর্তমানে উপস্থিত নেই।"
 
-#: openbox/actions/execute.c:88
+#: openbox/actions/execute.c:92
 #, c-format
 msgid "Failed to convert the path '%s' from utf8"
 msgstr "'%s' পাথটি utf8 থেকে রূপান্তর করতে ব্যর্থ"
 
-#: openbox/actions/execute.c:97 openbox/actions/execute.c:116
+#: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
 msgid "Failed to execute '%s': %s"
 msgstr "'%s' সঞ্চালন করতে ব্যর্থ: %s"
 
-#: openbox/client.c:1973 openbox/client.c:2005
+#: openbox/client.c:1988 openbox/client.c:2020
 msgid "Killing..."
 msgstr ""
 
-#: openbox/client.c:1975 openbox/client.c:2007
+#: openbox/client.c:1990 openbox/client.c:2022
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:90 openbox/client_list_menu.c:93
+#: openbox/client_list_combined_menu.c:91 openbox/client_list_menu.c:94
 msgid "Go there..."
 msgstr "চিহ্নিত স্থানে চলুন..."
 
-#: openbox/client_list_combined_menu.c:96
+#: openbox/client_list_combined_menu.c:97
 msgid "Manage desktops"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:97 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
 msgid "_Add new desktop"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
 msgid "_Remove last desktop"
 msgstr ""
 
-#: openbox/client_list_combined_menu.c:150
+#: openbox/client_list_combined_menu.c:151
 msgid "Windows"
 msgstr "উইন্ডো"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:204
 msgid "Desktops"
 msgstr "ডেস্কটপ"
 
-#: openbox/client_menu.c:256
+#: openbox/client_menu.c:257
 msgid "All desktops"
 msgstr "সর্বপ্রকার ডেস্কটপ"
 
-#: openbox/client_menu.c:360
+#: openbox/client_menu.c:361
 msgid "_Layer"
 msgstr "স্তর (_L)"
 
-#: openbox/client_menu.c:365
+#: openbox/client_menu.c:366
 msgid "Always on _top"
 msgstr "সর্বদা উপরে (_t)"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:367
 msgid "_Normal"
 msgstr "স্বাভাবিক (_N)"
 
-#: openbox/client_menu.c:367
+#: openbox/client_menu.c:368
 msgid "Always on _bottom"
 msgstr "সর্বদা নীচে (_b)"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:371
 msgid "_Send to desktop"
 msgstr "ডেস্কটপে পাঠানো হবে (_S)"
 
-#: openbox/client_menu.c:374
+#: openbox/client_menu.c:375
 msgid "Client menu"
 msgstr "ক্লায়েন্ট মেনু"
 
-#: openbox/client_menu.c:384
+#: openbox/client_menu.c:385
 msgid "R_estore"
 msgstr "পুনরুদ্ধার (_e)"
 
-#: openbox/client_menu.c:392
+#: openbox/client_menu.c:393
 msgid "_Move"
 msgstr "স্থানান্তরণ (_M)"
 
-#: openbox/client_menu.c:394
+#: openbox/client_menu.c:395
 msgid "Resi_ze"
 msgstr "মাপ পরিবর্তন (_z)"
 
-#: openbox/client_menu.c:396
+#: openbox/client_menu.c:397
 msgid "Ico_nify"
 msgstr "আইকন রূপে প্রদর্শন (_n)"
 
-#: openbox/client_menu.c:404
+#: openbox/client_menu.c:405
 msgid "Ma_ximize"
 msgstr "বড় করুন (_x)"
 
-#: openbox/client_menu.c:412
+#: openbox/client_menu.c:413
 msgid "_Roll up/down"
 msgstr "উপরে/নীচে গুটিয়ে নিন (_R)"
 
-#: openbox/client_menu.c:414
+#: openbox/client_menu.c:415
 msgid "Un/_Decorate"
 msgstr "বিন্যাস পরিবর্তন (_D)"
 
-#: openbox/client_menu.c:418
+#: openbox/client_menu.c:419
 msgid "_Close"
 msgstr "বন্ধ করুন (_C)"
 
-#: openbox/config.c:746
+#: openbox/config.c:750
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "কনফিগ ফাইলে অবৈধ বাটন '%s' উল্লিখিত হয়েছে"
@@ -168,49 +168,49 @@ msgstr "মাউস বাইন্ডিং সংক্রান্ত অব
 msgid "Invalid context '%s' in mouse binding"
 msgstr "মাউস বাইন্ডিং সংক্রান্ত অবৈধ কনটেক্সট '%s'"
 
-#: openbox/openbox.c:130
+#: openbox/openbox.c:131
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "ব্যক্তিগত ডিরেক্টরি '%s'-তে পরিবর্তন করতে ব্যর্থ: %s"
 
-#: openbox/openbox.c:150
+#: openbox/openbox.c:151
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "DISPLAY এনভাশরনমেন্ট ভেরিয়েবলের মান প্রয়োগ করে প্রদর্শন আরম্ভ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:181
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "obrender লাইব্রেরি আরম্ভ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:187
+#: openbox/openbox.c:188
 msgid "X server does not support locale."
 msgstr "X সার্ভার দ্বারা লোকেইল সমর্থিতত হয় না।"
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:190
 msgid "Cannot set locale modifiers for the X server."
 msgstr "X সার্ভারের জন্য লোকেইল মডিফায়ার নির্ধারণ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:252
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "বৈধ কনফিগ ফাইল সনাক্ত করতে ব্যর্থ, কয়েকটি সাধারণ ডিফল্ট মান প্রয়োগ করা হবে।"
 
-#: openbox/openbox.c:278
+#: openbox/openbox.c:279
 msgid "Unable to load a theme."
 msgstr "থিম লোড করতে ব্যর্থ।"
 
-#: openbox/openbox.c:405
+#: openbox/openbox.c:406
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "পুনরাম্ভের পরে নতুন এক্সেকিউটেবল '%s' সঞ্চালন করতে ব্যর্থ: %s"
 
-#: openbox/openbox.c:475 openbox/openbox.c:477
+#: openbox/openbox.c:476 openbox/openbox.c:478
 msgid "Copyright (c)"
 msgstr "স্বত্বাধিকার (c)"
 
-#: openbox/openbox.c:486
+#: openbox/openbox.c:487
 msgid "Syntax: openbox [options]\n"
 msgstr "ব্যবহারপ্রণালী: openbox [বিকল্প]\n"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:488
 msgid ""
 "\n"
 "Options:\n"
@@ -218,25 +218,25 @@ msgstr ""
 "\n"
 "বিবিধ বিকল্প:\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:489
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              সহায়তা বার্তা প্রদর্শন করে প্রস্থান\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:490
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           সংস্করণ প্রদর্শন করে প্রস্থান\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:491
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           বর্তমানে চলমান উইন্ডো পরিচালন ব্যবস্থা পরিবর্তন করা হবে\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:492
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 "  --sm-disable        সেশান পরিচালন ব্যবস্থার সাথে সংযোগ নিষ্ক্রিয় করা হবে\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:493
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -244,19 +244,19 @@ msgstr ""
 "\n"
 "চলমান Openbox ইনস্ট্যান্সে বার্তা প্রেরণ:\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:494
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox-র কনফিগারেশন পুনরায় লোড করে\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:495
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openbox পুনরারম্ভ\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:496
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:497
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -264,24 +264,24 @@ msgstr ""
 "\n"
 "ডিবাগ করার বিভিন্ন বিকল্প:\n"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:498
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              সিঙ্ক্রোনাস মোডে সঞ্চালিত হবে\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:499
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             ডিবাগ-এর ফলাফল প্রদর্শন করে\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:500
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       ফোকাস হ্যান্ডলিং সংক্রান্ত ডিবাগের ফলাফল প্রদর্শন করে\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:501
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    প্রদর্শন ক্ষেত্রটি নকল xinerama পর্দায় ভাগ করা হবে\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:502
 #, c-format
 msgid ""
 "\n"
@@ -290,7 +290,7 @@ msgstr ""
 "\n"
 "অনুগ্রহ করে %s-এ বাগ সংক্রান্ত সূচনা দায়ের করুন\n"
 
-#: openbox/openbox.c:602
+#: openbox/openbox.c:603
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "অবৈধ কমান্ড-লাইন আর্গুমেন্ট '%s'\n"
@@ -337,7 +337,7 @@ msgstr "'%s'-র সেশান সংরক্ষণ করতে ব্যর
 msgid "Error while saving the session to '%s': %s"
 msgstr "'%s'-এ সেশান সংরক্ষণকালে সমস্যা: %s"
 
-#: openbox/startupnotify.c:241
+#: openbox/startupnotify.c:243
 #, c-format
 msgid "Running %s\n"
 msgstr "%s সঞ্চালিত হচ্ছে\n"

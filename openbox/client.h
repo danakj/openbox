@@ -304,6 +304,9 @@ struct _ObClient
 
     /*! Where the window should iconify to/from */
     Rect icon_geometry;
+
+    /*! A boolean used for algorithms which need to mark clients as visited */
+    gboolean visited;
 };
 
 extern GList      *client_list;

@@ -72,9 +72,16 @@ gboolean actions_act_is_interactive(ObActionsAct *act);
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);
 
-/*! Pass in a GSList of ObActionsAct's to be run.
-  @return TRUE if an action is in interactive state, FALSE is none are
+/*! When this is true, an XAllowEvents with ReplayPointer will be called
+  if an action is going to maybe try moving windows around on screen (or
+  map/unmap windows)
 */
+void actions_set_need_pointer_replay_before_move(gboolean replay);
+/*! Returns if a ReplayPointer is still needed.  If it was called while running
+  actions then this will be false */
+gboolean actions_get_need_pointer_replay_before_move();
+
+/*! Pass in a GSList of ObActionsAct's to be run. */
 void actions_run_acts(GSList *acts,
                       ObUserAction uact,
                       guint state,

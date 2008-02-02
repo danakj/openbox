@@ -283,12 +283,14 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (d < screen_num_desktops && d != screen_desktop) {
         gboolean go = TRUE;
 
+        actions_client_move(data, TRUE);
         if (o->send && data->client && client_normal(data->client)) {
             client_set_desktop(data->client, d, o->follow, FALSE);
             go = o->follow;
         }
 
         if (go) screen_set_desktop(d, TRUE);
+        actions_client_move(data, FALSE);
     }
     return FALSE;
 }

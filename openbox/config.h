@@ -41,6 +41,7 @@ struct _ObAppSettings
 
     GravityPoint position;
     gboolean pos_given;
+    gboolean pos_force;
 
     guint desktop;
     gint shade;

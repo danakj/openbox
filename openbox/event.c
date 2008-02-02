@@ -701,7 +701,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
     if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
-           on the root window, the process it */
+           on the root window, then process it */
         if (window != RootWindow(ob_display, ob_screen) ||
             e->xbutton.subwindow == None)
         {

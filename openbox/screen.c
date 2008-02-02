@@ -300,6 +300,7 @@ gboolean screen_annex(void)
     supported[i++] = prop_atoms.ob_wm_state_undecorated;
     supported[i++] = prop_atoms.openbox_pid;
     supported[i++] = prop_atoms.ob_theme;
+    supported[i++] = prop_atoms.ob_config_file;
     supported[i++] = prop_atoms.ob_control;
     g_assert(i == num_support);
 

@@ -35,10 +35,10 @@ ObParseInst* parse_startup();
 void parse_shutdown(ObParseInst *inst);
 
 /*! Loads Openbox's rc, from the normal paths
-  @type The configuration type to load, or NULL to use the default.
-        e.g. "gnome" would load rc-gnome.xml.
+  @param file The path of the config to try load.  NULL to load from the
+         default path
  */
-gboolean parse_load_rc(const gchar *type, xmlDocPtr *doc, xmlNodePtr *root);
+gboolean parse_load_rc(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox menu, from the normal paths */
 gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root);
 /* Loads an Openbox theme, from the normal paths */

@@ -31,6 +31,13 @@ typedef enum
     OB_PLACE_POLICY_MOUSE
 } ObPlacePolicy;
 
+typedef enum
+{
+    OB_PLACE_MONITOR_ANY,
+    OB_PLACE_MONITOR_ACTIVE,
+    OB_PLACE_MONITOR_MOUSE
+} ObPlaceMonitor;
+
 gboolean place_client(struct _ObClient *client, gint *x, gint *y,
                       struct _ObAppSettings *settings);
 

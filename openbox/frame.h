@@ -137,16 +137,6 @@ struct _ObFrame
 
     Colormap  colormap;
 
-    RrAppearance *a_unfocused_title;
-    RrAppearance *a_focused_title;
-    RrAppearance *a_unfocused_label;
-    RrAppearance *a_focused_label;
-    RrAppearance *a_icon;
-    RrAppearance *a_unfocused_handle;
-    RrAppearance *a_focused_handle;
-
-    GSList   *clients;
-
     gint      icon_on;    /* if the window icon button is on */
     gint      label_on;   /* if the window title is on */
     gint      iconify_on; /* if the window iconify button is on */

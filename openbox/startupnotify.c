@@ -21,7 +21,9 @@
 #include "gettext.h"
 #include "event.h"
 
-#include <stdlib.h>
+#ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
 
 #ifndef USE_LIBSN
 
@@ -264,7 +266,7 @@ void sn_setup_spawn_environment(const gchar *program, const gchar *name,
                              g_direct_equal,
                              (GDestroyNotify)sn_launcher_context_unref);
 
-    putenv(g_strdup_printf("DESKTOP_STARTUP_ID=%s", id));
+    setenv("DESKTOP_STARTUP_ID", id, TRUE);
 
     g_free(desc);
 }

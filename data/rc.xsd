@@ -54,7 +54,7 @@
         </xsd:annotation>
         <xsd:element name="policy" type="ob:placementpolicy"/>
         <xsd:element name="center" type="ob:bool"/>
-        <xsd:element name="active" type="ob:bool"/>
+        <xsd:element name="monitor" type="ob:placementmonitor"/>
     </xsd:complexType>
     <xsd:complexType name="margins">
         <xsd:annotation>
@@ -441,6 +441,13 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="Smart"/>
             <xsd:enumeration value="UnderMouse"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="placementmonitor">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Any"/>
+            <xsd:enumeration value="Mouse"/>
+            <xsd:enumeration value="Active"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="popupposition">

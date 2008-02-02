@@ -481,6 +481,7 @@ void focus_cycle_popup_hide(void)
 
         g_free(t->text);
         XDestroyWindow(ob_display, t->win);
+        g_free(t);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }

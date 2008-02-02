@@ -1455,6 +1455,7 @@ void RrThemeFree(RrTheme *theme)
         RrFontClose(theme->win_font_unfocused);
         RrFontClose(theme->menu_title_font);
         RrFontClose(theme->menu_font);
+        RrFontClose(theme->osd_font);
 
         RrAppearanceFree(theme->a_disabled_focused_max);
         RrAppearanceFree(theme->a_disabled_unfocused_max);

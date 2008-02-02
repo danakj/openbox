@@ -36,9 +36,9 @@ gboolean config_focus_raise;
 gboolean config_focus_last;
 gboolean config_focus_under_mouse;
 
-ObPlacePolicy config_place_policy;
-gboolean      config_place_center;
-gboolean      config_place_active;
+ObPlacePolicy  config_place_policy;
+gboolean       config_place_center;
+ObPlaceMonitor config_place_monitor;
 
 StrutPartial config_margins;
 
@@ -491,8 +491,12 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_place_policy = OB_PLACE_POLICY_MOUSE;
     if ((n = parse_find_node("center", node)))
         config_place_center = parse_bool(doc, n);
-    if ((n = parse_find_node("active", node)))
-        config_place_active = parse_bool(doc, n);
+    if ((n = parse_find_node("monitor", node))) {
+        if (parse_contains("active", doc, n))
+            config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
+        else if (parse_contains("mouse", doc, n))
+            config_place_monitor = OB_PLACE_MONITOR_MOUSE;
+    }
 }
 
 static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -886,7 +890,7 @@ void config_startup(ObParseInst *i)
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
-    config_place_active = FALSE;
+    config_place_monitor = OB_PLACE_MONITOR_ANY;
 
     parse_register(i, "placement", parse_placement, NULL);
 
@@ -982,6 +986,7 @@ void config_shutdown(void)
     RrFontClose(config_font_inactivewindow);
     RrFontClose(config_font_menuitem);
     RrFontClose(config_font_menutitle);
+    RrFontClose(config_font_osd);
 
     for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);

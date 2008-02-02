@@ -201,6 +201,9 @@ void client_manage_all(void)
         }
     }
 
+    /* manage windows in reverse order from how they were originally mapped.
+       this is an attempt to manage children windows before their parents, so
+       that when the parent is mapped, it can find the child */
     for (i = 0; i < nchild; ++i) {
         if (children[i] == None)
             continue;
@@ -289,6 +292,11 @@ void client_manage(Window window)
     ob_debug("Window type: %d\n", self->type);
     ob_debug("Window group: 0x%x\n", self->group?self->group->leader:0);
 
+    /* now we have all of the window's information so we can set this up.
+       do this before creating the frame, so it can tell that we are still
+       mapping and doesn't go applying things right away */
+    client_setup_decor_and_functions(self, FALSE);
+
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically */
     XChangeSaveSet(ob_display, window, SetModeInsert);
@@ -308,9 +316,6 @@ void client_manage(Window window)
     settings = client_get_settings_state(self);
     /* the session should get the last say though */
     client_restore_session_state(self);
-
-    /* now we have all of the window's information so we can set this up */
-    client_setup_decor_and_functions(self, FALSE);
 
     /* tell startup notification that this app started */
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
@@ -798,6 +803,7 @@ void client_unmanage(ObClient *self)
         g_free(self->icons[j].data);
     if (self->nicons > 0)
         g_free(self->icons);
+    g_free(self->startup_id);
     g_free(self->wm_command);
     g_free(self->title);
     g_free(self->icon_title);
@@ -987,6 +993,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     gint fw, fh;
     Rect desired;
     guint i;
+    gboolean found_mon;
 
     RECT_SET(desired, *x, *y, w, h);
     frame_rect_to_frame(self->frame, &desired);
@@ -1036,18 +1043,26 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
             rudeb = TRUE;
     }
 
+    /* we iterate through every monitor that the window is at least partially
+       on, to make sure it is obeying the rules on them all
+
+       if the window does not appear on any monitors, then use the first one
+    */
+    found_mon = FALSE;
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *a;
 
         if (!screen_physical_area_monitor_contains(i, &desired)) {
-            if (i < screen_num_monitors - 1)
+            if (i < screen_num_monitors - 1 || found_mon)
                 continue;
 
             /* the window is not inside any monitor! so just use the first
                one */
             a = screen_area(self->desktop, 0, NULL);
-        } else
+        } else {
+            found_mon = TRUE;
             a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
+        }
 
         /* This makes sure windows aren't entirely outside of the screen so you
            can't see them at all.
@@ -1830,15 +1845,15 @@ static void client_change_allowed_actions(ObClient *self)
 
     PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
 
-    /* make sure the window isn't breaking any rules now */
+   /* make sure the window isn't breaking any rules now
+
+   don't check ICONIFY here.  just cuz a window can't iconify doesnt mean
+   it can't be iconified with its parent
+   */
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE) && self->shaded) {
         if (self->frame) client_shade(self, FALSE);
         else self->shaded = FALSE;
-    }
-    if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
-        if (self->frame) client_iconify(self, FALSE, TRUE, FALSE);
-        else self->iconic = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
         if (self->frame) client_fullscreen(self, FALSE);
@@ -2066,11 +2081,17 @@ void client_update_strut(ObClient *self)
     }
 }
 
+/* Avoid storing icons above this size if possible */
+#define AVOID_ABOVE 64
+
 void client_update_icons(ObClient *self)
 {
     guint num;
     guint32 *data;
     guint w, h, i, j;
+    guint num_seen;  /* number of icons present */
+    guint num_small_seen;  /* number of icons small enough present */
+    guint smallest, smallest_area;
 
     for (i = 0; i < self->nicons; ++i)
         g_free(self->icons[i].data);
@@ -2081,25 +2102,54 @@ void client_update_icons(ObClient *self)
     if (PROP_GETA32(self->window, net_wm_icon, cardinal, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
-        while (num - i > 2) {
-            w = data[i++];
-            h = data[i++];
-            i += w * h;
-            if (i > num || w*h == 0) break;
-            ++self->nicons;
-        }
+        num_seen = num_small_seen = 0;
+        smallest = smallest_area = 0;
+        if (num > 2)
+            while (i < num) {
+                w = data[i++];
+                h = data[i++];
+                i += w * h;
+                /* watch for it being too small for the specified size, or for
+                   zero sized icons. */
+                if (i > num || w == 0 || h == 0) break;
+
+                if (!smallest_area || w*h < smallest_area) {
+                    smallest = num_seen;
+                    smallest_area = w*h;
+                }
+                ++num_seen;
+                if (w <= AVOID_ABOVE && h <= AVOID_ABOVE)
+                    ++num_small_seen;
+            }
+        if (num_small_seen > 0)
+            self->nicons = num_small_seen;
+        else if (num_seen)
+            self->nicons = 1;
 
         self->icons = g_new(ObClientIcon, self->nicons);
 
         /* store the icons */
         i = 0;
-        for (j = 0; j < self->nicons; ++j) {
+        for (j = 0; j < self->nicons;) {
             guint x, y, t;
 
             w = self->icons[j].width = data[i++];
             h = self->icons[j].height = data[i++];
 
-            if (w*h == 0) continue;
+            /* if there are some icons smaller than the threshold, we're
+               skipping all the ones above */
+            if (num_small_seen > 0) {
+                if (w > AVOID_ABOVE || h > AVOID_ABOVE) {
+                    i += w*h;
+                    continue;
+                }
+            }
+            /* if there were no icons smaller than the threshold, then we are
+               only taking the smallest available one we saw */
+            else if (j != smallest) {
+                i += w*h;
+                continue;
+            }
 
             self->icons[j].data = g_new(RrPixel32, w * h);
             for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
@@ -2114,6 +2164,8 @@ void client_update_icons(ObClient *self)
                     (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
             }
             g_assert(i <= num);
+
+            ++j;
         }
 
         g_free(data);
@@ -2175,12 +2227,13 @@ void client_update_icon_geometry(ObClient *self)
 
     RECT_SET(self->icon_geometry, 0, 0, 0, 0);
 
-    if (PROP_GETA32(self->window, net_wm_icon_geometry, cardinal, &data, &num)
-        && num == 4)
+    if (PROP_GETA32(self->window, net_wm_icon_geometry, cardinal, &data, &num))
     {
-        /* don't let them set it with an area < 0 */
-        RECT_SET(self->icon_geometry, data[0], data[1],
-                 MAX(data[2],0), MAX(data[3],0));
+        if (num == 4)
+            /* don't let them set it with an area < 0 */
+            RECT_SET(self->icon_geometry, data[0], data[1],
+                     MAX(data[2],0), MAX(data[3],0));
+        g_free(data);
     }
 }
 

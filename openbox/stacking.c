@@ -25,6 +25,7 @@
 #include "group.h"
 #include "frame.h"
 #include "window.h"
+#include "event.h"
 #include "debug.h"
 
 GList  *stacking_list = NULL;

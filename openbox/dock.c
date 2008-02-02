@@ -249,8 +249,10 @@ void dock_configure(void)
         }
     }
 
-    dock->area.width += l + r;
-    dock->area.height += t + b;
+    if (dock->dock_apps) {
+        dock->area.width += l + r;
+        dock->area.height += t + b;
+    }
 
     hspot = l;
     vspot = t;
@@ -427,11 +429,12 @@ void dock_configure(void)
     if (!dock->dock_apps) {
         STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
-    } else if (config_dock_floating || config_dock_nostrut)
-    {
+    }
+    else if (config_dock_floating || config_dock_nostrut) {
         STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
-    } else {
+    }
+    else {
         switch (config_dock_pos) {
         case OB_DIRECTION_NORTHWEST:
             switch (config_dock_orient) {
@@ -529,9 +532,12 @@ void dock_configure(void)
     } else
         XUnmapWindow(ob_display, dock->frame);
 
-    /* but they are useful outside of this function! */
-    dock->area.width += ob_rr_theme->obwidth * 2;
-    dock->area.height += ob_rr_theme->obwidth * 2;
+    /* but they are useful outside of this function! but don't add it if the
+       dock is actually not visible */
+    if (dock->dock_apps) {
+        dock->area.width += ob_rr_theme->obwidth * 2;
+        dock->area.height += ob_rr_theme->obwidth * 2;
+    }
 
     screen_update_areas();
 

@@ -19,7 +19,6 @@
 
 #include "focus_cycle.h"
 #include "focus_cycle_indicator.h"
-#include "focus_cycle_popup.h"
 #include "client.h"
 #include "frame.h"
 #include "focus.h"
@@ -70,7 +69,7 @@ void focus_cycle_stop(ObClient *ifclient)
 ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                       gboolean dock_windows, gboolean desktop_windows,
                       gboolean linear, gboolean interactive,
-                      gboolean showbar, gboolean dialog,
+                      gboolean showbar, ObFocusCyclePopupMode mode,
                       gboolean done, gboolean cancel)
 {
     static ObClient *t = NULL;
@@ -131,13 +130,13 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                     focus_cycle_target = ft;
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
-                if (dialog)
-                    /* same arguments as focus_target_valid */
-                    focus_cycle_popup_show(ft,
-                                           focus_cycle_iconic_windows,
-                                           focus_cycle_all_desktops,
-                                           focus_cycle_dock_windows,
-                                           focus_cycle_desktop_windows);
+                /* same arguments as focus_target_valid */
+                focus_cycle_popup_show(ft,
+                                       focus_cycle_iconic_windows,
+                                       focus_cycle_all_desktops,
+                                       focus_cycle_dock_windows,
+                                       focus_cycle_desktop_windows,
+                                       mode);
                 return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;

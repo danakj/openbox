@@ -398,6 +398,7 @@ static void hide_window(LocoWindow *lw, gboolean destroyed)
 {
     /* if destroyed, then the window is no longer available */
     lw->visible = FALSE;
+    destroy_glxpixmap(lw);
 }
 
 void COMPOSTER_RAWR(const XEvent *e, gpointer data)

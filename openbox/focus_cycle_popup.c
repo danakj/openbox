@@ -445,9 +445,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
             /* find the dimensions of the text box */
             list_mode_textx = iconx + HILITE_SIZE + TEXT_BORDER;
             list_mode_texty = icony + HILITE_OFFSET;
-//            textw = w
-//                    /* left edge */  - innerx - HILITE_SIZE - TEXT_BORDER
-//                    /* right edge */ - OUTSIDE_BORDER - TEXT_BORDER;
 
             /* position the icon */
             XMoveResizeWindow(obt_display, target->iconwin,

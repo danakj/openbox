@@ -1,5 +1,8 @@
 3.4.6.1:
   * Updated Clearlooks theme
+  * Add the force="yes/no" option for the per-app settings' <position> tag
+  * Raise and focus modal children and their direct parents together, improved
+    usability with direct modal transient windows
 
 3.4.6:
   * Added Basque translation

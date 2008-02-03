@@ -338,6 +338,10 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
     w = MIN(w, MAX(screen_area->width/3, POPUP_WIDTH)); /* max width */
     w = MAX(w, POPUP_WIDTH); /* min width */
 
+    /* get the text height */
+    texth = MAX(RrMinHeight(p->a_text), RrMinHeight(p->a_hilite_text)) +
+        TEXT_BORDER * 2;
+
     if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* how many icons will fit in that row? make the width fit that */
         w -= l + r;
@@ -351,15 +355,18 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
     else {
         /* in list mode, there is one column of icons.. */
         icons_per_row = 1;
-        icon_rows = p->n_targets;
+        /* maximum is 80% of the screen height */
+        icon_rows = MIN(p->n_targets,
+                        (4*screen_area->height/5) /* 80% of the screen */
+                        /
+                        MAX(HILITE_SIZE, texth)); /* height of each row */
     }
 
-    /* get the text dimensions */
+    /* get the text width */
     textw = w - l - r;
     if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         /* leave space on the side for the icons */
         textw -= list_mode_icon_column_w;
-    texth = RrMinHeight(p->a_text) + TEXT_BORDER * 2;
 
     /* find the height of the dialog */
 #warning limit the height and scroll entries somehow

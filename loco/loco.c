@@ -200,13 +200,11 @@ void destroy_glxpixmap(LocoWindow *lw)
 void releasePixmapFromTexture (LocoWindow *lw)
 {
     if (lw->glpixmap) {
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, lw->texname);
 
 	ReleaseTexImageEXT(obt_display, lw->glpixmap, GLX_FRONT_LEFT_EXT);
 
         glBindTexture(GL_TEXTURE_2D, 0);
-        glDisable(GL_TEXTURE_2D);
     }
 }
 
@@ -218,6 +216,10 @@ static void full_composite(void)
     for (it = stacking_bottom; it != stacking_top; it = it->prev) {
         if (!it->window->visible)
             continue;
+        if ((it->window->w > 1000) || (it->window->h > 1000)) {
+            printf("I am afraid of window 0x%x because it is very large\n", it->window->id);
+            continue;
+        }
         ret = bindPixmapToTexture(it->window);
         glBegin(GL_QUADS);
         glColor3f(1.0, 1.0, 1.0);
@@ -230,6 +232,7 @@ static void full_composite(void)
         glVertex2i(it->window->x, it->window->y + it->window->h);
         glTexCoord2f(0, 0);
         glEnd();
+//	releasePixmapFromTexture(it->window);
     }
     glXSwapBuffers(obt_display, loco_overlay);
 }
@@ -318,7 +321,8 @@ void composite_setup_window(LocoWindow *win)
 {
     if (win->input_only) return;
 
-    XCompositeRedirectWindow(obt_display, win->id, CompositeRedirectAutomatic);
+//    XCompositeRedirectWindow(obt_display, win->id, CompositeRedirectManual);
+//    XCompositeRedirectWindow(obt_display, win->id, CompositeRedirectManual);
     /*something useful = */XDamageCreate(obt_display, win->id, XDamageReportRawRectangles);
 }
 
@@ -603,6 +607,7 @@ glError();
                                     (GEqualFunc)window_comp);
     stacking_top = stacking_bottom = NULL;
 
+    XCompositeRedirectSubwindows(obt_display, loco_root, CompositeRedirectManual);
     find_all_windows(screen_num);
 }
 

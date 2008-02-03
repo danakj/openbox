@@ -137,6 +137,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
 
     if (src->pos_given) {
         dst->pos_given = TRUE;
+        dst->pos_force = src->pos_force;
         dst->position = src->position;
         dst->monitor = src->monitor;
     }
@@ -246,6 +247,8 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
                             settings->monitor = parse_int(doc, c) + 1;
                         g_free(s);
                     }
+
+                parse_attr_bool("force", n, &settings->pos_force);
             }
 
             if ((n = parse_find_node("focus", app->children)))

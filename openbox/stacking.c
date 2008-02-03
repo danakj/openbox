@@ -221,6 +221,15 @@ static void restack_windows(ObClient *selected, gboolean raise)
     GList *modals = NULL;
     GList *trans = NULL;
 
+    if (raise) {
+        ObClient *p;
+
+        /* if a window is modal for another single window, then raise it to the
+           top too, the same is done with the focus order */
+        while (selected->modal && (p = client_direct_parent(selected)))
+            selected = p;
+    }
+
     /* remove first so we can't run into ourself */
     it = g_list_find(stacking_list, selected);
     g_assert(it);

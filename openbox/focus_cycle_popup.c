@@ -137,7 +137,6 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     /* create the text window used for the icon-mode popup */
     popup.icon_mode_text = create_window(popup.bg, 0, 0, NULL);
-    XMapWindow(obt_display, popup.icon_mode_text);
 
     popup.targets = NULL;
     popup.n_targets = 0;
@@ -256,7 +255,6 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                 t->textwin = create_window(p->bg, 0, 0, NULL);
 
                 XMapWindow(obt_display, t->iconwin);
-                XMapWindow(obt_display, t->textwin);
 
                 p->targets = g_list_prepend(p->targets, t);
                 ++n;
@@ -398,10 +396,14 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
         /* position the background but don't draw it */
         XMoveResizeWindow(obt_display, p->bg, x, y, w, h);
 
-        if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
+        if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
             /* position the text */
             XMoveResizeWindow(obt_display, p->icon_mode_text,
                               icon_mode_textx, icon_mode_texty, textw, texth);
+            XMapWindow(obt_display, popup.icon_mode_text);
+        }
+        else
+            XUnmapWindow(obt_display, popup.icon_mode_text);
     }
 
     /* find the focused target */
@@ -451,10 +453,14 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
                               iconx, icony, HILITE_SIZE, HILITE_SIZE);
 
             /* position the text */
-            if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+            if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
                 XMoveResizeWindow(obt_display, target->textwin,
                                   list_mode_textx, list_mode_texty,
                                   textw, texth);
+                XMapWindow(obt_display, target->textwin);
+            }
+            else
+                XUnmapWindow(obt_display, target->textwin);
 
             /* get the icon from the client */
             icon = client_icon(target->client, ICON_SIZE, ICON_SIZE);

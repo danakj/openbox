@@ -321,8 +321,6 @@ void composite_setup_window(LocoWindow *win)
 {
     if (win->input_only) return;
 
-//    XCompositeRedirectWindow(obt_display, win->id, CompositeRedirectManual);
-//    XCompositeRedirectWindow(obt_display, win->id, CompositeRedirectManual);
     /*something useful = */XDamageCreate(obt_display, win->id, XDamageReportRawRectangles);
 }
 

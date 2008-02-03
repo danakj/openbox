@@ -343,8 +343,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
     if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* how many icons will fit in that row? make the width fit that */
         w -= l + r;
-        icons_per_row = (w + ICON_SIZE - 1) / ICON_SIZE;
-        w = icons_per_row * ICON_SIZE + l + r;
+        icons_per_row = (w + HILITE_SIZE - 1) / HILITE_SIZE;
+        w = icons_per_row * HILITE_SIZE + l + r;
 
         /* how many rows do we need? */
         icon_rows = (p->n_targets-1) / icons_per_row + 1;
@@ -372,7 +372,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
 
     /* center the icons if there is less than one row */
     if (icon_rows == 1)
-        icons_center_x = (w - p->n_targets * ICON_SIZE) / 2;
+        icons_center_x = (w - p->n_targets * HILITE_SIZE) / 2;
     else
         icons_center_x = 0;
 

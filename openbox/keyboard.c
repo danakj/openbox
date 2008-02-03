@@ -279,7 +279,6 @@ static void node_rebind(KeyBindingTree *node)
     }
     else {
         /* for leaf nodes, rebind each action assigned to it */
-        GSList *it;
         while (node->actions) {
             /* add each action, and remove them from the original tree so
                they don't get free'd on us */

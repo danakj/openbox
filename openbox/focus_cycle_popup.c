@@ -78,6 +78,7 @@ struct _ObFocusCyclePopup
     RrAppearance *a_icon;
 
     gboolean mapped;
+    ObFocusCyclePopupMode mode;
 };
 
 /*! This popup shows all possible windows */
@@ -93,8 +94,7 @@ static void   popup_setup    (ObFocusCyclePopup *p,
                               gboolean dock_windows,
                               gboolean desktop_windows);
 static void   popup_render   (ObFocusCyclePopup *p,
-                              const ObClient *c,
-                              ObFocusCyclePopupMode mode);
+                              const ObClient *c);
 
 static Window create_window(Window parent, guint bwidth, gulong mask,
                             XSetWindowAttributes *attr)
@@ -293,8 +293,7 @@ static gchar *popup_get_name(ObClient *c)
     return ret;
 }
 
-static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
-                         ObFocusCyclePopupMode mode)
+static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 {
     gint ml, mt, mr, mb;
     gint l, t, r, b;
@@ -316,8 +315,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
     /* vars for list mode */
     gint list_mode_icon_column_w = HILITE_SIZE + OUTSIDE_BORDER;
 
-    g_assert(mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
-             mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
+    g_assert(p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
+             p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
 
     screen_area = screen_physical_area_active();
 
@@ -332,7 +331,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
 
     /* get the width from the text and keep it within limits */
     w = l + r + p->maxtextw;
-    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         /* when in list mode, there are icons down the side */
         w += list_mode_icon_column_w;
     w = MIN(w, MAX(screen_area->width/3, POPUP_WIDTH)); /* max width */
@@ -340,12 +339,12 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
 
     /* get the text height */
     texth = RrMinHeight(p->a_hilite_text);
-    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         texth = MAX(MAX(texth, RrMinHeight(p->a_text)), ICON_SIZE);
     else
         texth += TEXT_BORDER * 2;
 
-    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* how many icons will fit in that row? make the width fit that */
         w -= l + r;
         icons_per_row = (w + HILITE_SIZE - 1) / HILITE_SIZE;
@@ -367,14 +366,14 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
 
     /* get the text width */
     textw = w - l - r;
-    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         /* leave space on the side for the icons */
         textw -= list_mode_icon_column_w;
 
     /* find the height of the dialog */
 #warning limit the height and scroll entries somehow
     h = t + b + (icon_rows * MAX(HILITE_SIZE, texth));
-    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
         /* in icon mode the text sits below the icons, so make some space */
         h += OUTSIDE_BORDER + texth;
 
@@ -384,7 +383,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
     else
         icons_center_x = 0;
 
-    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* get the position of the text */
         icon_mode_textx = l;
         icon_mode_texty = h - texth - b;
@@ -406,7 +405,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
         /* position the background but don't draw it */
         XMoveResizeWindow(obt_display, p->bg, x, y, w, h);
 
-        if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
+        if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
             /* position the text */
             XMoveResizeWindow(obt_display, p->icon_mode_text,
                               icon_mode_textx, icon_mode_texty, textw, texth);
@@ -463,7 +462,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
                               iconx, icony, HILITE_SIZE, HILITE_SIZE);
 
             /* position the text */
-            if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
                 XMoveResizeWindow(obt_display, target->textwin,
                                   list_mode_textx, list_mode_texty,
                                   textw, texth);
@@ -494,18 +493,19 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
             RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
 
             /* draw the text */
-            if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST || target == newtarget)
+            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
+                target == newtarget)
             {
                 text = (target == newtarget) ? p->a_hilite_text : p->a_text;
                 text->texture[0].data.text.string = target->text;
                 text->surface.parentx =
-                    mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
                     icon_mode_textx : list_mode_textx;
                 text->surface.parenty =
-                    mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
                     icon_mode_texty : list_mode_texty;
                 RrPaint(text,
-                        (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                        (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
                          p->icon_mode_text : target->textwin),
                         textw, texth);
             }
@@ -530,12 +530,15 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
     }
 
     /* do this stuff only when the dialog is first showing */
-    if (!popup.mapped)
-        popup_setup(&popup, TRUE, iconic_windows, all_desktops,
+    if (!popup.mapped) {
+        popup_setup(&popup, TRUE, iconic_windows, all_desktops, 
                     dock_windows, desktop_windows);
+        /* this is fixed once the dialog is shown */
+        popup.mode = mode;
+    }
     g_assert(popup.targets != NULL);
 
-    popup_render(&popup, c, mode);
+    popup_render(&popup, c);
 
     if (!popup.mapped) {
         /* show the dialog */

@@ -168,6 +168,7 @@
         <xsd:element minOccurs="0" name="middle" type="ob:bool"/>
         <xsd:element minOccurs="0" name="submenuShowDelay" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="applicationIcons" type="ob:bool"/>
+        <xsd:element minOccurs="0" name="manageDesktops" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="window_position">
         <xsd:element name="x" type="ob:center_or_int"/>

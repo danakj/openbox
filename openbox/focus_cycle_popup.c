@@ -339,8 +339,11 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c,
     w = MAX(w, POPUP_WIDTH); /* min width */
 
     /* get the text height */
-    texth = MAX(RrMinHeight(p->a_text), RrMinHeight(p->a_hilite_text)) +
-        TEXT_BORDER * 2;
+    texth = RrMinHeight(p->a_hilite_text);
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+        texth = MAX(MAX(texth, RrMinHeight(p->a_text)), ICON_SIZE);
+    else
+        texth += TEXT_BORDER * 2;
 
     if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* how many icons will fit in that row? make the width fit that */

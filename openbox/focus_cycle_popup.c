@@ -513,53 +513,43 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                     XMapWindow(obt_display, target->iconwin);
             }
 
-            /* only draw if we have to */
-            if (!p->mapped ||
-                newtarget == target || p->last_target == target ||
-                /* wasn't visible before... */
-                ((row + p->scroll < last_scroll ||
-                  row + p->scroll >= last_scroll + icon_rows) &&
-                 /* ...and is visible now */
-                 (row >= 0 && row < icon_rows)))
+            /* get the icon from the client */
+            icon = client_icon(target->client, ICON_SIZE, ICON_SIZE);
+            p->a_icon->texture[0].data.rgba.width = icon->width;
+            p->a_icon->texture[0].data.rgba.height = icon->height;
+            p->a_icon->texture[0].data.rgba.twidth = ICON_SIZE;
+            p->a_icon->texture[0].data.rgba.theight = ICON_SIZE;
+            p->a_icon->texture[0].data.rgba.tx = HILITE_OFFSET;
+            p->a_icon->texture[0].data.rgba.ty = HILITE_OFFSET;
+            p->a_icon->texture[0].data.rgba.alpha =
+                target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
+            p->a_icon->texture[0].data.rgba.data = icon->data;
+
+            /* Draw the hilite? */
+            p->a_icon->texture[1].type = (target == newtarget) ?
+                RR_TEXTURE_RGBA : RR_TEXTURE_NONE;
+
+            /* draw the icon */
+            p->a_icon->surface.parentx = iconx;
+            p->a_icon->surface.parenty = icony;
+            RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
+
+            /* draw the text */
+            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
+                target == newtarget)
             {
-                /* get the icon from the client */
-                icon = client_icon(target->client, ICON_SIZE, ICON_SIZE);
-                p->a_icon->texture[0].data.rgba.width = icon->width;
-                p->a_icon->texture[0].data.rgba.height = icon->height;
-                p->a_icon->texture[0].data.rgba.twidth = ICON_SIZE;
-                p->a_icon->texture[0].data.rgba.theight = ICON_SIZE;
-                p->a_icon->texture[0].data.rgba.tx = HILITE_OFFSET;
-                p->a_icon->texture[0].data.rgba.ty = HILITE_OFFSET;
-                p->a_icon->texture[0].data.rgba.alpha =
-                    target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
-                p->a_icon->texture[0].data.rgba.data = icon->data;
-
-                /* Draw the hilite? */
-                p->a_icon->texture[1].type = (target == newtarget) ?
-                    RR_TEXTURE_RGBA : RR_TEXTURE_NONE;
-
-                /* draw the icon */
-                p->a_icon->surface.parentx = iconx;
-                p->a_icon->surface.parenty = icony;
-                RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
-
-                /* draw the text */
-                if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
-                    target == newtarget)
-                {
-                    text = (target == newtarget) ? p->a_hilite_text : p->a_text;
-                    text->texture[0].data.text.string = target->text;
-                    text->surface.parentx =
-                        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
-                        icon_mode_textx : list_mode_textx;
-                    text->surface.parenty =
-                        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
-                        icon_mode_texty : list_mode_texty;
-                    RrPaint(text,
-                            (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
-                             p->icon_mode_text : target->textwin),
-                            textw, texth);
-                }
+                text = (target == newtarget) ? p->a_hilite_text : p->a_text;
+                text->texture[0].data.text.string = target->text;
+                text->surface.parentx =
+                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                    icon_mode_textx : list_mode_textx;
+                text->surface.parenty =
+                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                    icon_mode_texty : list_mode_texty;
+                RrPaint(text,
+                        (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                         p->icon_mode_text : target->textwin),
+                        textw, texth);
             }
         }
     }

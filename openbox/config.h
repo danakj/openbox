@@ -177,8 +177,10 @@ extern guint    config_menu_hide_delay;
 extern gboolean config_menu_middle;
 /*! Delay before opening a submenu in milliseconds */
 extern guint    config_submenu_show_delay;
-/*! show icons in client_list_menu */
+/*! Show icons in client_list_menu */
 extern gboolean config_menu_client_list_icons;
+/*! Show manage desktops in client_list_menu */
+extern gboolean config_menu_manage_desktops;
 /*! User-specified menu files */
 extern GSList *config_menu_files;
 /*! Per app settings */

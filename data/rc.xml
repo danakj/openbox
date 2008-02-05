@@ -605,9 +605,17 @@
   <!-- default menu file (or custom one in $HOME/.config/openbox/) -->
   <file>menu.xml</file>
   <hideDelay>200</hideDelay>
+  <!-- if a press-release lasts longer than this setting (in milliseconds), the
+       menu is hidden again -->
   <middle>no</middle>
+  <!-- center submenus vertically about the parent entry -->
   <submenuShowDelay>100</submenuShowDelay>
+  <!-- this one is easy, time to delay before showing a submenu after hovering
+       over the parent entry -->
   <applicationIcons>yes</applicationIcons>
+  <!-- controls if icons appear in the client-list-(combined-)menu -->
+  <manageDesktops>yes</manageDesktops>
+  <!-- show the manage desktops section in the client-list-(combined-)menu -->
 </menu>
 
 <applications>

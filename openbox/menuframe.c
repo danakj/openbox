@@ -381,8 +381,11 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
             text_a->texture[0].data.text.shortcut = FALSE;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        if (self->entry->data.separator.label != NULL)
+        if (self->entry->data.separator.label != NULL) {
             text_a = ob_rr_theme->a_menu_text_title;
+            text_a->texture[0].data.text.string =
+                self->entry->data.separator.label;
+        }
         else
             text_a = ob_rr_theme->a_menu_text_normal;
         break;

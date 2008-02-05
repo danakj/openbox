@@ -897,13 +897,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             j = (i > 0 ? 0 : 255);
             i = ABS(i*255/100);
 
-            theme->title_focused_shadow_color = RrColorNew(inst, j, j, j);
-            theme->title_focused_shadow_alpha = i;
             theme->osd_shadow_color = RrColorNew(inst, j, j, j);
             theme->osd_shadow_alpha = i;
         } else {
-            theme->title_focused_shadow_color = RrColorNew(inst, 0, 0, 0);
-            theme->title_focused_shadow_alpha = 50;
             theme->osd_shadow_color = RrColorNew(inst, 0, 0, 0);
             theme->osd_shadow_alpha = 50;
         }

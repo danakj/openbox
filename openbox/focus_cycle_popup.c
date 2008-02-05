@@ -368,6 +368,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                         (4*screen_area->height/5) /* 80% of the screen */
                         /
                         MAX(HILITE_SIZE, texth)); /* height of each row */
+        /* but make sure there is always one */
+        icon_rows = MAX(icon_rows, 1);
     }
 
     /* get the text width */

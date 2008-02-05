@@ -3,6 +3,13 @@
   * Add the force="yes/no" option for the per-app settings' <position> tag
   * Raise and focus modal children and their direct parents together, improved
     usability with direct modal transient windows
+  * Fix crash when using <raise> for NextWindow and there are no windows
+    to move focus to
+  * Add the <manageDesktops> option in the rc.xml <menu> section, which toggles
+    the "Manage Desktops" section appearing in the combined-client-list-menu
+  * Fix for menu headers showing the wrong text
+  * Fix for the <focusLast> behavior
+  * Treat modal direct children as one window with their parent consistently
 
 3.4.6:
   * Added Basque translation

@@ -44,6 +44,9 @@
 #define OUTSIDE_BORDER 3
 /* Margin area around the text */
 #define TEXT_BORDER 2
+/* Scroll the list-mode list when the cursor gets within this many rows of the
+   top or bottom */
+#define SCROLL_MARGIN 4
 
 typedef struct _ObFocusCyclePopup       ObFocusCyclePopup;
 typedef struct _ObFocusCyclePopupTarget ObFocusCyclePopupTarget;
@@ -71,6 +74,9 @@ struct _ObFocusCyclePopup
     const ObFocusCyclePopupTarget *last_target;
 
     gint maxtextw;
+
+    /* How are the list is scrolled, in scroll mode */
+    gint scroll;
 
     RrAppearance *a_bg;
     RrAppearance *a_text;
@@ -254,8 +260,6 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                 t->iconwin = create_window(p->bg, 0, 0, NULL);
                 t->textwin = create_window(p->bg, 0, 0, NULL);
 
-                XMapWindow(obt_display, t->iconwin);
-
                 p->targets = g_list_prepend(p->targets, t);
                 ++n;
             }
@@ -306,6 +310,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint icons_per_row;
     gint icon_rows;
     gint textw, texth;
+    gint selected_pos;
+    gint last_scroll;
 
     /* vars for icon mode */
     gint icon_mode_textx;
@@ -371,7 +377,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         textw -= list_mode_icon_column_w;
 
     /* find the height of the dialog */
-#warning limit the height and scroll entries somehow
     h = t + b + (icon_rows * MAX(HILITE_SIZE, texth));
     if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
         /* in icon mode the text sits below the icons, so make some space */
@@ -413,6 +418,9 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         }
         else
             XUnmapWindow(obt_display, popup.icon_mode_text);
+
+        /* reset the scrolling when the dialog is first shown */
+        p->scroll = 0;
     }
 
     /* find the focused target */
@@ -423,6 +431,25 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             /* save the target */
             newtarget = target;
             break;
+        }
+    }
+    selected_pos = i;
+
+    /* scroll the list if needed */
+    last_scroll = p->scroll;
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+        const gint top = p->scroll + SCROLL_MARGIN;
+        const gint bottom = p->scroll + icon_rows - SCROLL_MARGIN;
+        const gint min_scroll = 0;
+        const gint max_scroll = p->n_targets - icon_rows;
+
+        if (top - selected_pos >= 0) {
+            p->scroll -= top - selected_pos + 1;
+            p->scroll = MAX(p->scroll, min_scroll);
+        }
+        else if (selected_pos - bottom >= 0) {
+            p->scroll += selected_pos - bottom + 1;
+            p->scroll = MIN(p->scroll, max_scroll);
         }
     }
 
@@ -440,9 +467,12 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
         /* have to redraw the targetted icon and last targetted icon
          * to update the hilite */
-        if (!p->mapped || newtarget == target || p->last_target == target) {
-            const gint row = i / icons_per_row; /* starting from 0 */
-            const gint col = i % icons_per_row; /* starting from 0 */
+        if (!p->mapped || newtarget == target || p->last_target == target ||
+            last_scroll != p->scroll)
+        {
+            /* row and column start from 0 */
+            const gint row = i / icons_per_row - p->scroll;
+            const gint col = i % icons_per_row;
             const ObClientIcon *icon;
             gint iconx, icony;
             gint list_mode_textx, list_mode_texty;
@@ -462,52 +492,74 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               iconx, icony, HILITE_SIZE, HILITE_SIZE);
 
             /* position the text */
-            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
                 XMoveResizeWindow(obt_display, target->textwin,
                                   list_mode_textx, list_mode_texty,
                                   textw, texth);
-                XMapWindow(obt_display, target->textwin);
+
+            /* show/hide the right windows */
+            if (row >= 0 && row < icon_rows) {
+                XMapWindow(obt_display, target->iconwin);
+                if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+                    XMapWindow(obt_display, target->textwin);
+                else
+                    XUnmapWindow(obt_display, target->textwin);
             }
-            else
+            else {
                 XUnmapWindow(obt_display, target->textwin);
+                if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+                    XUnmapWindow(obt_display, target->iconwin);
+                else
+                    XMapWindow(obt_display, target->iconwin);
+            }
 
-            /* get the icon from the client */
-            icon = client_icon(target->client, ICON_SIZE, ICON_SIZE);
-            p->a_icon->texture[0].data.rgba.width = icon->width;
-            p->a_icon->texture[0].data.rgba.height = icon->height;
-            p->a_icon->texture[0].data.rgba.twidth = ICON_SIZE;
-            p->a_icon->texture[0].data.rgba.theight = ICON_SIZE;
-            p->a_icon->texture[0].data.rgba.tx = HILITE_OFFSET;
-            p->a_icon->texture[0].data.rgba.ty = HILITE_OFFSET;
-            p->a_icon->texture[0].data.rgba.alpha =
-                target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
-            p->a_icon->texture[0].data.rgba.data = icon->data;
-
-            /* Draw the hilite? */
-            p->a_icon->texture[1].type = (target == newtarget) ?
-                                         RR_TEXTURE_RGBA : RR_TEXTURE_NONE;
-
-            /* draw the icon */
-            p->a_icon->surface.parentx = iconx;
-            p->a_icon->surface.parenty = icony;
-            RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
-
-            /* draw the text */
-            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
-                target == newtarget)
+            /* only draw if we have to */
+            if (!p->mapped ||
+                newtarget == target || p->last_target == target ||
+                /* wasn't visible before... */
+                ((row + p->scroll < last_scroll ||
+                  row + p->scroll >= last_scroll + icon_rows) &&
+                 /* ...and is visible now */
+                 (row >= 0 && row < icon_rows)))
             {
-                text = (target == newtarget) ? p->a_hilite_text : p->a_text;
-                text->texture[0].data.text.string = target->text;
-                text->surface.parentx =
-                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
-                    icon_mode_textx : list_mode_textx;
-                text->surface.parenty =
-                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
-                    icon_mode_texty : list_mode_texty;
-                RrPaint(text,
-                        (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
-                         p->icon_mode_text : target->textwin),
-                        textw, texth);
+                /* get the icon from the client */
+                icon = client_icon(target->client, ICON_SIZE, ICON_SIZE);
+                p->a_icon->texture[0].data.rgba.width = icon->width;
+                p->a_icon->texture[0].data.rgba.height = icon->height;
+                p->a_icon->texture[0].data.rgba.twidth = ICON_SIZE;
+                p->a_icon->texture[0].data.rgba.theight = ICON_SIZE;
+                p->a_icon->texture[0].data.rgba.tx = HILITE_OFFSET;
+                p->a_icon->texture[0].data.rgba.ty = HILITE_OFFSET;
+                p->a_icon->texture[0].data.rgba.alpha =
+                    target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
+                p->a_icon->texture[0].data.rgba.data = icon->data;
+
+                /* Draw the hilite? */
+                p->a_icon->texture[1].type = (target == newtarget) ?
+                    RR_TEXTURE_RGBA : RR_TEXTURE_NONE;
+
+                /* draw the icon */
+                p->a_icon->surface.parentx = iconx;
+                p->a_icon->surface.parenty = icony;
+                RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
+
+                /* draw the text */
+                if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
+                    target == newtarget)
+                {
+                    text = (target == newtarget) ? p->a_hilite_text : p->a_text;
+                    text->texture[0].data.text.string = target->text;
+                    text->surface.parentx =
+                        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                        icon_mode_textx : list_mode_textx;
+                    text->surface.parenty =
+                        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                        icon_mode_texty : list_mode_texty;
+                    RrPaint(text,
+                            (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                             p->icon_mode_text : target->textwin),
+                            textw, texth);
+                }
             }
         }
     }
@@ -515,6 +567,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     p->last_target = newtarget;
 
     g_free(screen_area);
+
+    XFlush(obt_display);
 }
 
 void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,

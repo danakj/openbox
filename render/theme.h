@@ -144,6 +144,9 @@ struct _RrTheme {
     RrPixmapMask *menu_toggle_mask; /* menu boolean */
 #endif
 
+    RrPixmapMask *down_arrow_mask;
+    RrPixmapMask *up_arrow_mask;
+
     /* global appearances */
     RrAppearance *a_disabled_focused_max;
     RrAppearance *a_disabled_unfocused_max;

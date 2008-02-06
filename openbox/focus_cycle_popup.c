@@ -68,6 +68,9 @@ struct _ObFocusCyclePopup
     /* This is used when the popup is in icon mode */
     Window icon_mode_text;
 
+    Window list_mode_up;
+    Window list_mode_down;
+
     GList *targets;
     gint n_targets;
 
@@ -82,6 +85,7 @@ struct _ObFocusCyclePopup
     RrAppearance *a_text;
     RrAppearance *a_hilite_text;
     RrAppearance *a_icon;
+    RrAppearance *a_arrow;
 
     gboolean mapped;
     ObFocusCyclePopupMode mode;
@@ -122,6 +126,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.a_hilite_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
     popup.a_text = RrAppearanceCopy(ob_rr_theme->a_unfocused_label);
     popup.a_icon = RrAppearanceCopy(ob_rr_theme->a_clear);
+    popup.a_arrow = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
 
     popup.a_hilite_text->surface.parent = popup.a_bg;
     popup.a_text->surface.parent = popup.a_bg;
@@ -136,6 +141,10 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     popup.a_icon->texture[0].type = RR_TEXTURE_RGBA;
 
+    popup.a_arrow->texture[0].type = RR_TEXTURE_MASK;
+    popup.a_arrow->texture[0].data.mask.color =
+        ob_rr_theme->osd_color;
+
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
     popup.bg = create_window(obt_root(ob_screen), ob_rr_theme->obwidth,
@@ -143,6 +152,10 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     /* create the text window used for the icon-mode popup */
     popup.icon_mode_text = create_window(popup.bg, 0, 0, NULL);
+
+    /* create the windows for the up and down arrows */
+    popup.list_mode_up = create_window(popup.bg, 0, 0, NULL);
+    popup.list_mode_down = create_window(popup.bg, 0, 0, NULL);
 
     popup.targets = NULL;
     popup.n_targets = 0;
@@ -210,9 +223,12 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     g_free(popup.a_icon->texture[1].data.rgba.data);
     popup.a_icon->texture[1].data.rgba.data = NULL;
 
+    XDestroyWindow(obt_display, popup.list_mode_up);
+    XDestroyWindow(obt_display, popup.list_mode_down);
     XDestroyWindow(obt_display, popup.icon_mode_text);
     XDestroyWindow(obt_display, popup.bg);
 
+    RrAppearanceFree(popup.a_arrow);
     RrAppearanceFree(popup.a_icon);
     RrAppearanceFree(popup.a_hilite_text);
     RrAppearanceFree(popup.a_text);
@@ -320,6 +336,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* vars for list mode */
     gint list_mode_icon_column_w = HILITE_SIZE + OUTSIDE_BORDER;
+    gint up_arrow_x, down_arrow_x;
+    gint up_arrow_y, down_arrow_y;
 
     g_assert(p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
              p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
@@ -383,6 +401,10 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
         /* in icon mode the text sits below the icons, so make some space */
         h += OUTSIDE_BORDER + texth;
+    else
+        h += ob_rr_theme->up_arrow_mask->height + OUTSIDE_BORDER
+            + ob_rr_theme->down_arrow_mask->height + OUTSIDE_BORDER;
+
 
     /* center the icons if there is less than one row */
     if (icon_rows == 1)
@@ -418,8 +440,26 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               icon_mode_textx, icon_mode_texty, textw, texth);
             XMapWindow(obt_display, popup.icon_mode_text);
         }
-        else
+        else {
             XUnmapWindow(obt_display, popup.icon_mode_text);
+
+            up_arrow_x = (w - ob_rr_theme->up_arrow_mask->width) / 2;
+            up_arrow_y = t;
+
+            down_arrow_x = (w - ob_rr_theme->down_arrow_mask->width) / 2;
+            down_arrow_y = h - b - ob_rr_theme->down_arrow_mask->height;
+
+            /* position the arrows */
+            XMoveResizeWindow(obt_display, p->list_mode_up,
+                              up_arrow_x, up_arrow_y,
+                              ob_rr_theme->up_arrow_mask->width,
+                              ob_rr_theme->up_arrow_mask->height);
+            XMoveResizeWindow(obt_display, p->list_mode_down,
+                              down_arrow_x, down_arrow_y,
+                              ob_rr_theme->down_arrow_mask->width,
+                              ob_rr_theme->down_arrow_mask->height);
+        }
+
 
         /* reset the scrolling when the dialog is first shown */
         p->scroll = 0;
@@ -463,6 +503,39 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     if (!p->mapped)
         RrPaint(p->a_bg, p->bg, w, h);
 
+    /* draw the scroll arrows */
+    if (!p->mapped && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+        p->a_arrow->texture[0].data.mask.mask =
+            ob_rr_theme->up_arrow_mask;
+        p->a_arrow->surface.parent = p->a_bg;
+        p->a_arrow->surface.parentx = up_arrow_x;
+        p->a_arrow->surface.parenty = up_arrow_y;
+        RrPaint(p->a_arrow, p->list_mode_up, 
+                ob_rr_theme->up_arrow_mask->width,
+                ob_rr_theme->up_arrow_mask->height);
+
+        p->a_arrow->texture[0].data.mask.mask =
+            ob_rr_theme->down_arrow_mask;
+        p->a_arrow->surface.parent = p->a_bg;
+        p->a_arrow->surface.parentx = down_arrow_x;
+        p->a_arrow->surface.parenty = down_arrow_y;
+        RrPaint(p->a_arrow, p->list_mode_down, 
+                ob_rr_theme->down_arrow_mask->width,
+                ob_rr_theme->down_arrow_mask->height);
+    }
+
+    /* show the scroll arrows when appropriate */
+    if (p->scroll && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+        XMapWindow(obt_display, p->list_mode_up);
+    else
+        XUnmapWindow(obt_display, p->list_mode_up);
+
+    if (p->scroll < p->n_targets - icon_rows &&
+        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+        XMapWindow(obt_display, p->list_mode_down);
+    else
+        XUnmapWindow(obt_display, p->list_mode_down);
+
     /* draw the icons and text */
     for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
         const ObFocusCyclePopupTarget *target = it->data;
@@ -482,7 +555,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
             /* find the coordinates for the icon */
             iconx = icons_center_x + l + (col * HILITE_SIZE);
-            icony = t + (row * MAX(texth, HILITE_SIZE))
+            icony = t + ob_rr_theme->up_arrow_mask->height + OUTSIDE_BORDER
+                + (row * MAX(texth, HILITE_SIZE))
                 + MAX(texth - HILITE_SIZE, 0) / 2;
 
             /* find the dimensions of the text box */

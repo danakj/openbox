@@ -337,6 +337,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint list_mode_icon_column_w = HILITE_SIZE + OUTSIDE_BORDER;
     gint up_arrow_x, down_arrow_x;
     gint up_arrow_y, down_arrow_y;
+    gboolean showing_arrows = FALSE;
 
     g_assert(p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
              p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
@@ -393,15 +394,33 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         /* leave space on the side for the icons */
         textw -= list_mode_icon_column_w;
 
+    if (!p->mapped)
+        /* reset the scrolling when the dialog is first shown */
+        p->scroll = 0;
+
+    /* show the scroll arrows when appropriate */
+    if (p->scroll && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+        XMapWindow(obt_display, p->list_mode_up);
+        showing_arrows = TRUE;
+    } else
+        XUnmapWindow(obt_display, p->list_mode_up);
+
+    if (p->scroll < p->n_targets - icon_rows &&
+        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    {
+        XMapWindow(obt_display, p->list_mode_down);
+        showing_arrows = TRUE;
+    } else
+        XUnmapWindow(obt_display, p->list_mode_down);
+
     /* find the height of the dialog */
     h = t + b + (icon_rows * MAX(HILITE_SIZE, texth));
     if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
         /* in icon mode the text sits below the icons, so make some space */
         h += OUTSIDE_BORDER + texth;
-    else
+    else if (showing_arrows)
         h += ob_rr_theme->up_arrow_mask->height + OUTSIDE_BORDER
             + ob_rr_theme->down_arrow_mask->height + OUTSIDE_BORDER;
-
 
     /* center the icons if there is less than one row */
     if (icon_rows == 1)
@@ -455,10 +474,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               ob_rr_theme->down_arrow_mask->width,
                               ob_rr_theme->down_arrow_mask->height);
         }
-
-
-        /* reset the scrolling when the dialog is first shown */
-        p->scroll = 0;
     }
 
     /* find the focused target */
@@ -519,18 +534,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                 ob_rr_theme->down_arrow_mask->height);
     }
 
-    /* show the scroll arrows when appropriate */
-    if (p->scroll && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
-        XMapWindow(obt_display, p->list_mode_up);
-    else
-        XUnmapWindow(obt_display, p->list_mode_up);
-
-    if (p->scroll < p->n_targets - icon_rows &&
-        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
-        XMapWindow(obt_display, p->list_mode_down);
-    else
-        XUnmapWindow(obt_display, p->list_mode_down);
-
     /* draw the icons and text */
     for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
         const ObFocusCyclePopupTarget *target = it->data;
@@ -550,7 +553,9 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
             /* find the coordinates for the icon */
             iconx = icons_center_x + l + (col * HILITE_SIZE);
-            icony = t + ob_rr_theme->up_arrow_mask->height + OUTSIDE_BORDER
+            icony = t + (showing_arrows ? ob_rr_theme->up_arrow_mask->height
+                                          + OUTSIDE_BORDER
+                         : 0)
                 + (row * MAX(texth, HILITE_SIZE))
                 + MAX(texth - HILITE_SIZE, 0) / 2;
 

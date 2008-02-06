@@ -189,8 +189,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
                 {
                     /* the border of the target */
                     a = 0x88;
-                }
-                else {
+                } else {
                     /* the background of the target */
                     a = 0x22;
                 }
@@ -266,9 +265,9 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
             p->a_text->texture[0].data.text.string = text;
             maxwidth = MAX(maxwidth, RrMinWidth(p->a_text));
 
-            if (!create_targets)
+            if (!create_targets) {
                 g_free(text);
-            else {
+            } else {
                 ObFocusCyclePopupTarget *t = g_new(ObFocusCyclePopupTarget, 1);
 
                 t->client = ft;
@@ -376,9 +375,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
         /* how many rows do we need? */
         icon_rows = (p->n_targets-1) / icons_per_row + 1;
-
-    }
-    else {
+    } else {
         /* in list mode, there is one column of icons.. */
         icons_per_row = 1;
         /* maximum is 80% of the screen height */
@@ -439,8 +436,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             XMoveResizeWindow(obt_display, p->icon_mode_text,
                               icon_mode_textx, icon_mode_texty, textw, texth);
             XMapWindow(obt_display, popup.icon_mode_text);
-        }
-        else {
+        } else {
             XUnmapWindow(obt_display, popup.icon_mode_text);
 
             up_arrow_x = (w - ob_rr_theme->up_arrow_mask->width) / 2;
@@ -488,8 +484,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         if (top - selected_pos >= 0) {
             p->scroll -= top - selected_pos + 1;
             p->scroll = MAX(p->scroll, min_scroll);
-        }
-        else if (selected_pos - bottom >= 0) {
+        } else if (selected_pos - bottom >= 0) {
             p->scroll += selected_pos - bottom + 1;
             p->scroll = MIN(p->scroll, max_scroll);
         }
@@ -580,8 +575,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                     XMapWindow(obt_display, target->textwin);
                 else
                     XUnmapWindow(obt_display, target->textwin);
-            }
-            else {
+            } else {
                 XUnmapWindow(obt_display, target->textwin);
                 if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
                     XUnmapWindow(obt_display, target->iconwin);

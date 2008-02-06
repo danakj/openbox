@@ -398,6 +398,42 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         /* reset the scrolling when the dialog is first shown */
         p->scroll = 0;
 
+    /* find the height of the dialog */
+    h = t + b + (icon_rows * MAX(HILITE_SIZE, texth));
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
+        /* in icon mode the text sits below the icons, so make some space */
+        h += OUTSIDE_BORDER + texth;
+
+    /* find the focused target */
+    newtarget = NULL;
+    for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
+        const ObFocusCyclePopupTarget *target = it->data;
+        if (target->client == c) {
+            /* save the target */
+            newtarget = target;
+            break;
+        }
+    }
+    selected_pos = i;
+    g_assert(newtarget != NULL);
+
+    /* scroll the list if needed */
+    last_scroll = p->scroll;
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+        const gint top = p->scroll + SCROLL_MARGIN;
+        const gint bottom = p->scroll + icon_rows - SCROLL_MARGIN;
+        const gint min_scroll = 0;
+        const gint max_scroll = p->n_targets - icon_rows;
+
+        if (top - selected_pos >= 0) {
+            p->scroll -= top - selected_pos + 1;
+            p->scroll = MAX(p->scroll, min_scroll);
+        } else if (selected_pos - bottom >= 0) {
+            p->scroll += selected_pos - bottom + 1;
+            p->scroll = MIN(p->scroll, max_scroll);
+        }
+    }
+
     /* show the scroll arrows when appropriate */
     if (p->scroll && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
         XMapWindow(obt_display, p->list_mode_up);
@@ -413,12 +449,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     } else
         XUnmapWindow(obt_display, p->list_mode_down);
 
-    /* find the height of the dialog */
-    h = t + b + (icon_rows * MAX(HILITE_SIZE, texth));
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
-        /* in icon mode the text sits below the icons, so make some space */
-        h += OUTSIDE_BORDER + texth;
-    else if (showing_arrows)
+    /* make space for the arrows */
+    if (showing_arrows)
         h += ob_rr_theme->up_arrow_mask->height + OUTSIDE_BORDER
             + ob_rr_theme->down_arrow_mask->height + OUTSIDE_BORDER;
 
@@ -475,37 +507,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               ob_rr_theme->down_arrow_mask->height);
         }
     }
-
-    /* find the focused target */
-    newtarget = NULL;
-    for (i = 0, it = p->targets; it; ++i, it = g_list_next(it)) {
-        const ObFocusCyclePopupTarget *target = it->data;
-        if (target->client == c) {
-            /* save the target */
-            newtarget = target;
-            break;
-        }
-    }
-    selected_pos = i;
-
-    /* scroll the list if needed */
-    last_scroll = p->scroll;
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
-        const gint top = p->scroll + SCROLL_MARGIN;
-        const gint bottom = p->scroll + icon_rows - SCROLL_MARGIN;
-        const gint min_scroll = 0;
-        const gint max_scroll = p->n_targets - icon_rows;
-
-        if (top - selected_pos >= 0) {
-            p->scroll -= top - selected_pos + 1;
-            p->scroll = MAX(p->scroll, min_scroll);
-        } else if (selected_pos - bottom >= 0) {
-            p->scroll += selected_pos - bottom + 1;
-            p->scroll = MIN(p->scroll, max_scroll);
-        }
-    }
-
-    g_assert(newtarget != NULL);
 
     /* * * draw everything * * */
 

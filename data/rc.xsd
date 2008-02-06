@@ -175,6 +175,7 @@
         <xsd:element name="y" type="ob:center_or_int"/>
 	<xsd:element name="monitor" type="ob:mouse_or_int"/>	
         <xsd:element minOccurs="0" name="head" type="xsd:string"/>
+        <xsd:attribute name="force" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="application">
         <xsd:element minOccurs="0" name="decor" type="xsd:bool"/>

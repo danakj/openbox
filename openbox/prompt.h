@@ -44,7 +44,7 @@ struct _ObPrompt
     RrAppearance *a_bg;
 
     gboolean mapped;
-    gint x, y, width, height;
+    gint width, height;
     gint msg_wbound;
 
     ObPromptElement msg;
@@ -62,7 +62,8 @@ void prompt_ref(ObPrompt *self);
 void prompt_unref(ObPrompt *self);
 
 /*! Show the prompt.  It will be centered within the given area rectangle */
-void prompt_show(ObPrompt *self, const Rect *area);
+void prompt_show(ObPrompt *self, struct _ObClient *parent);
 void prompt_hide(ObPrompt *self);
+void prompt_hide_window(Window window);
 
 #endif

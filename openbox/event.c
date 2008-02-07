@@ -644,7 +644,7 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (window == RootWindow(ob_display, ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
-        client_manage(window);
+        client_manage(window, NULL);
     else if (e->type == MappingNotify) {
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */

@@ -32,6 +32,7 @@
 #include "session.h"
 #include "event.h"
 #include "grab.h"
+#include "prompt.h"
 #include "focus.h"
 #include "stacking.h"
 #include "openbox.h"
@@ -211,13 +212,13 @@ void client_manage_all(void)
             if (attrib.override_redirect) continue;
 
             if (attrib.map_state != IsUnmapped)
-                client_manage(children[i]);
+                client_manage(children[i], NULL);
         }
     }
     XFree(children);
 }
 
-void client_manage(Window window)
+void client_manage(Window window, ObPrompt *prompt)
 {
     ObClient *self;
     XEvent e;
@@ -280,6 +281,7 @@ void client_manage(Window window)
     self = g_new0(ObClient, 1);
     self->obwin.type = Window_Client;
     self->window = window;
+    self->prompt = prompt;
 
     /* non-zero defaults */
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
@@ -299,7 +301,8 @@ void client_manage(Window window)
 
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically */
-    XChangeSaveSet(ob_display, window, SetModeInsert);
+    if (!self->prompt)
+        XChangeSaveSet(ob_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
@@ -700,7 +703,8 @@ void client_unmanage(ObClient *self)
     mouse_grab_for_client(self, FALSE);
 
     /* remove the window from our save set */
-    XChangeSaveSet(ob_display, self->window, SetModeDelete);
+    if (!self->prompt)
+        XChangeSaveSet(ob_display, self->window, SetModeDelete);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -3341,6 +3345,11 @@ static void client_ping_event(ObClient *self, gboolean dead)
 void client_close(ObClient *self)
 {
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
+
+    if (self->prompt) {
+        prompt_hide(self);
+        return;
+    }
 
     /* in the case that the client provides no means to requesting that it
        close, we just kill it */

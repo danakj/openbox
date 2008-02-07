@@ -20,6 +20,8 @@
 #include "openbox.h"
 #include "screen.h"
 #include "openbox.h"
+#include "client.h"
+#include "prop.h"
 #include "gettext.h"
 
 static GList *prompt_list = NULL;
@@ -30,6 +32,10 @@ static RrAppearance *prompt_a_hover;
 static RrAppearance *prompt_a_press;
 /* we change the max width which would screw with others */
 static RrAppearance *prompt_a_msg;
+
+static void prompt_layout(ObPrompt *self);
+static void render_all(ObPrompt *self);
+static void render_button(ObPrompt *self, ObPromptElement *e);
 
 void prompt_startup(gboolean reconfig)
 {
@@ -62,6 +68,15 @@ void prompt_startup(gboolean reconfig)
 
     prompt_a_msg = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
     prompt_a_msg->texture[0].data.text.flow = TRUE;
+
+    if (reconfig) {
+        GList *it;
+        for (it = prompt_list; it; it = g_list_next(it)) {
+            ObPrompt *p = it->data;
+            prompt_layout(p);
+            render_all(p);
+        }
+    }
 }
 
 void prompt_shutdown(gboolean reconfig)
@@ -79,7 +94,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
     guint i;
     const gchar *const *c;
 
-    attrib.override_redirect = TRUE;
+    attrib.override_redirect = FALSE;
     attrib.border_pixel = RrColorPixel(ob_rr_theme->osd_border_color);
 
     self = g_new0(ObPrompt, 1);
@@ -87,14 +102,14 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
     self->super.type = Window_Prompt;
     self->super.window = XCreateWindow(ob_display,
                                        RootWindow(ob_display, ob_screen),
-                                       0, 0, 1, 1, 0,
                                        0, 0, 1, 1, ob_rr_theme->obwidth,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
                                        CWOverrideRedirect | CWBorderPixel,
                                        &attrib);
-    g_hash_table_insert(window_map, &self->super.window,
-                        PROMPT_AS_WINDOW(self));
+
+    PROP_SET32(self->super.window, net_wm_window_type, atom,
+               prop_atoms.net_wm_window_type_dialog);
 
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
 
@@ -134,6 +149,8 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
                             PROMPT_AS_WINDOW(self));
     }
 
+    prompt_list = g_list_prepend(prompt_list, self);
+
     return self;
 }
 
@@ -147,6 +164,8 @@ void prompt_unref(ObPrompt *self)
     if (self && --self->ref == 0) {
         guint i;
 
+        prompt_list = g_list_remove(prompt_list, self);
+
         for (i = 0; i < self->n_buttons; ++i) {
             g_hash_table_remove(window_map, &self->button[i].window);
             XDestroyWindow(ob_display, self->button[i].window);
@@ -156,28 +175,35 @@ void prompt_unref(ObPrompt *self)
 
         RrAppearanceFree(self->a_bg);
 
-        g_hash_table_remove(window_map, &self->super.window);
         XDestroyWindow(ob_display, self->super.window);
         g_free(self);
     }
 }
 
-static void prompt_layout(ObPrompt *self, const Rect *area)
+static void prompt_layout(ObPrompt *self)
 {
     gint l, r, t, b;
     guint i;
     gint allbuttonsw, allbuttonsh, buttonx;
     gint w, h;
+    gint maxw;
 
     const gint OUTSIDE_MARGIN = 4;
     const gint MSG_BUTTON_SEPARATION = 4;
     const gint BUTTON_SEPARATION = 4;
+    const gint MAX_WIDTH = 600;
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
     l += OUTSIDE_MARGIN;
     t += OUTSIDE_MARGIN;
     r += OUTSIDE_MARGIN;
     b += OUTSIDE_MARGIN;
+
+    {
+        Rect *area = screen_physical_area_all_monitors();
+        maxw = MIN(MAX_WIDTH, area->width*4/5);
+        g_free(area);
+    }
 
     /* find the button sizes and how much space we need for them */
     allbuttonsw = allbuttonsh = 0;
@@ -201,14 +227,12 @@ static void prompt_layout(ObPrompt *self, const Rect *area)
         allbuttonsh = MAX(allbuttonsh, self->button[i].height);
     }
 
-    self->msg_wbound = MAX(allbuttonsw, area->width*3/5);
+    self->msg_wbound = MAX(allbuttonsw, maxw);
 
     /* measure the text message area */
     prompt_a_msg->texture[0].data.text.string = self->msg.text;
     prompt_a_msg->texture[0].data.text.maxwidth = self->msg_wbound;
     RrMinSize(prompt_a_msg, &self->msg.width, &self->msg.height);
-
-    g_print("height %d\n", self->msg.height);
 
     /* width and height inside the outer margins */
     w = MAX(self->msg.width, allbuttonsw);
@@ -230,12 +254,9 @@ static void prompt_layout(ObPrompt *self, const Rect *area)
     /* size and position the toplevel window */
     self->width = w + l + r;
     self->height = h + t + b;
-    self->x = (area->width - self->width) / 2;
-    self->y = (area->height - self->height) / 2;
 
     /* move and resize the actual windows */
-    XMoveResizeWindow(ob_display, self->super.window,
-                      self->x, self->y, self->width, self->height);
+    XResizeWindow(ob_display, self->super.window, self->width, self->height);
     XMoveResizeWindow(ob_display, self->msg.window,
                       self->msg.x, self->msg.y,
                       self->msg.width, self->msg.height);
@@ -273,13 +294,25 @@ static void render_all(ObPrompt *self)
         render_button(self, &self->button[i]);
 }
 
-void prompt_show(ObPrompt *self, const Rect *area)
+void prompt_show(ObPrompt *self, ObClient *parent)
 {
+    XSizeHints hints;
+
     if (self->mapped) return;
 
-    prompt_layout(self, area);
+    prompt_layout(self);
     render_all(self);
-    XMapWindow(ob_display, self->super.window);
+
+    /* you can't resize the prompt */
+    hints.flags = PMinSize | PMaxSize;
+    hints.min_width = hints.max_width = self->width;
+    hints.min_height = hints.max_height = self->height;
+    XSetWMNormalHints(ob_display, self->super.window, &hints);
+
+    XSetTransientForHint(ob_display, (parent ? parent->window : 0),
+                         self->super.window);
+
+    client_manage(self->super.window, self);
 
     self->mapped = TRUE;
 }
@@ -288,4 +321,17 @@ void prompt_hide(ObPrompt *self)
 {
     XUnmapWindow(ob_display, self->super.window);
     self->mapped = FALSE;
+}
+
+void prompt_hide_window(Window window)
+{
+    GList *it;
+    ObPrompt *p = NULL;
+
+    for (it = prompt_list; it; it = g_list_next(it)) {
+        p = it->data;
+        if (p->super.window == window) break;
+    }
+    g_assert(it != NULL);
+    prompt_hide(p);
 }

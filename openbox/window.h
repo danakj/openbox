@@ -31,7 +31,8 @@ typedef enum {
     OB_WINDOW_CLASS_MENUFRAME,
     OB_WINDOW_CLASS_DOCK,
     OB_WINDOW_CLASS_CLIENT,
-    OB_WINDOW_CLASS_INTERNAL
+    OB_WINDOW_CLASS_INTERNAL,
+    OB_WINDOW_CLASS_PROMPT
 } ObWindowClass;
 
 /* In order to be an ObWindow, you need to make this struct the top of your
@@ -48,21 +49,26 @@ struct _ObWindow {
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_CLIENT)
 #define WINDOW_IS_INTERNAL(win) \
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_INTERNAL)
+#define WINDOW_IS_PROMPT(win) \
+    (((ObWindow*)win)->type == OB_WINDOW_CLASS_PROMPT)
 
 struct _ObMenu;
 struct _ObDock;
 struct _ObDockApp;
 struct _ObClient;
+struct _ObPrompt;
 
 #define WINDOW_AS_MENUFRAME(win) ((struct _ObMenuFrame*)win)
 #define WINDOW_AS_DOCK(win) ((struct _ObDock*)win)
 #define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)
 #define WINDOW_AS_INTERNAL(win) ((struct _ObInternalWindow*)win)
+#define WINDOW_AS_PROMPT(win) ((struct _ObPrompt*)win)
 
 #define MENUFRAME_AS_WINDOW(menu) ((ObWindow*)menu)
 #define DOCK_AS_WINDOW(dock) ((ObWindow*)dock)
 #define CLIENT_AS_WINDOW(client) ((ObWindow*)client)
 #define INTERNAL_AS_WINDOW(intern) ((ObWindow*)intern)
+#define PROMPT_AS_WINDOW(prompt) ((ObWindow*)prompt)
 
 void window_startup (gboolean reconfig);
 void window_shutdown(gboolean reconfig);

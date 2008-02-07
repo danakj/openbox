@@ -29,6 +29,7 @@
 #include "frame.h"
 #include "grab.h"
 #include "menu.h"
+#include "prompt.h"
 #include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
@@ -466,6 +467,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
     ObMenuFrame *menu = NULL;
+    ObPrompt *prompt = NULL;
 
     /* make a copy we can mangle */
     ee = *ec;
@@ -487,6 +489,9 @@ static void event_process(const XEvent *ec, gpointer data)
             break;
         case OB_WINDOW_CLASS_INTERNAL:
             /* we don't do anything with events directly on these windows */
+            break;
+        case OB_WINDOW_CLASS_PROMPT:
+            prompt = WINDOW_AS_PROMPT(obwin);
             break;
         }
     }

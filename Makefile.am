@@ -256,6 +256,8 @@ openbox_openbox_SOURCES = \
 	openbox/ping.h \
 	openbox/place.c \
 	openbox/place.h \
+	openbox/prompt.c \
+	openbox/prompt.h \
 	openbox/popup.c \
 	openbox/popup.h \
 	openbox/resist.c \

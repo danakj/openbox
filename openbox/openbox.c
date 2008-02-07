@@ -41,6 +41,7 @@
 #include "group.h"
 #include "config.h"
 #include "ping.h"
+#include "prompt.h"
 #include "gettext.h"
 #include "render/render.h"
 #include "render/theme.h"
@@ -293,6 +294,7 @@ gint main(gint argc, gchar **argv)
             grab_startup(reconfigure);
             group_startup(reconfigure);
             ping_startup(reconfigure);
+            prompt_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
@@ -349,6 +351,7 @@ gint main(gint argc, gchar **argv)
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
+            prompt_shutdown(reconfigure);
             ping_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);

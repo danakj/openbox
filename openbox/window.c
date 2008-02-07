@@ -23,6 +23,7 @@
 #include "client.h"
 #include "frame.h"
 #include "openbox.h"
+#include "prompt.h"
 #include "debug.h"
 #include "grab.h"
 
@@ -57,6 +58,8 @@ Window window_top(ObWindow *self)
         return WINDOW_AS_CLIENT(self)->frame->window;
     case OB_WINDOW_CLASS_INTERNAL:
         return WINDOW_AS_INTERNAL(self)->window;
+    case OB_WINDOW_CLASS_PROMPT:
+        return WINDOW_AS_PROMPT(self)->super.window;
     }
     g_assert_not_reached();
     return None;
@@ -71,6 +74,7 @@ ObStackingLayer window_layer(ObWindow *self)
         return ((ObClient*)self)->layer;
     case OB_WINDOW_CLASS_MENUFRAME:
     case OB_WINDOW_CLASS_INTERNAL:
+    case OB_WINDOW_CLASS_PROMPT:
         return OB_STACKING_LAYER_INTERNAL;
     }
     g_assert_not_reached();

@@ -89,7 +89,7 @@ static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_user_input(ObClient *client, XEvent *e);
-static gboolean is_enter_focus_event_ignored(XEvent *e);
+static gboolean is_enter_focus_event_ignored(gulong serial);
 static void event_ignore_enter_range(gulong start, gulong end);
 
 static void focus_delay_dest(gpointer data);
@@ -800,6 +800,12 @@ void event_enter_client(ObClient *client)
 {
     g_assert(config_focus_follow);
 
+    if (is_enter_focus_event_ignored(event_curserial)) {
+        ob_debug_type(OB_DEBUG_FOCUS, "Ignoring enter event with serial %lu\n"
+                      "on client 0x%x", event_curserial, client->window);
+        return;
+    }
+
     if (client_enter_focusable(client) && client_can_focus(client)) {
         if (config_focus_delay) {
             ObFocusDelayData *data;
@@ -1044,8 +1050,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xcrossing.mode == NotifyGrab ||
                 e->xcrossing.mode == NotifyUngrab ||
                 /*ignore enters when we're already in the window */
-                e->xcrossing.detail == NotifyInferior ||
-                is_enter_focus_event_ignored(e))
+                e->xcrossing.detail == NotifyInferior)
             {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "%sNotify mode %d detail %d serial %lu on %lx "
@@ -1967,26 +1972,21 @@ void event_end_ignore_all_enters(gulong start)
     event_ignore_enter_range(start, NextRequest(obt_display)-1);
 }
 
-static gboolean is_enter_focus_event_ignored(XEvent *e)
+static gboolean is_enter_focus_event_ignored(gulong serial)
 {
     GSList *it, *next;
-
-    g_assert(e->type == EnterNotify &&
-             !(e->xcrossing.mode == NotifyGrab ||
-               e->xcrossing.mode == NotifyUngrab ||
-               e->xcrossing.detail == NotifyInferior));
 
     for (it = ignore_serials; it; it = next) {
         ObSerialRange *r = it->data;
 
         next = g_slist_next(it);
 
-        if ((glong)(e->xany.serial - r->end) > 0) {
+        if ((glong)(serial - r->end) > 0) {
             /* past the end */
             ignore_serials = g_slist_delete_link(ignore_serials, it);
             g_free(r);
         }
-        else if ((glong)(e->xany.serial - r->start) >= 0)
+        else if ((glong)(serial - r->start) >= 0)
             return TRUE;
     }
     return FALSE;

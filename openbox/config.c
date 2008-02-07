@@ -88,6 +88,7 @@ guint    config_menu_hide_delay;
 gboolean config_menu_middle;
 guint    config_submenu_show_delay;
 gboolean config_menu_client_list_icons;
+gboolean config_menu_manage_desktops;
 
 GSList *config_menu_files;
 
@@ -136,6 +137,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
 
     if (src->pos_given) {
         dst->pos_given = TRUE;
+        dst->pos_force = src->pos_force;
         dst->position = src->position;
         dst->monitor = src->monitor;
     }
@@ -241,6 +243,8 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                             settings->monitor = obt_parse_node_int(c) + 1;
                         g_free(s);
                     }
+
+                obt_parse_attr_bool(n, "force", &settings->pos_force);
             }
 
             if ((n = obt_parse_find_node(app->children, "focus")))
@@ -759,6 +763,8 @@ static void parse_menu(xmlNodePtr node, gpointer d)
             config_submenu_show_delay = obt_parse_node_int(n);
         if ((n = obt_parse_find_node(node, "applicationIcons")))
             config_menu_client_list_icons = obt_parse_node_bool(n);
+        if ((n = obt_parse_find_node(node, "manageDesktops")))
+            config_menu_manage_desktops = obt_parse_node_bool(n);
     }
 }
 
@@ -949,6 +955,7 @@ void config_startup(ObtParseInst *i)
     config_menu_middle = FALSE;
     config_submenu_show_delay = 0;
     config_menu_client_list_icons = TRUE;
+    config_menu_manage_desktops = TRUE;
     config_menu_files = NULL;
 
     obt_parse_register(i, "menu", parse_menu, NULL);

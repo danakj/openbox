@@ -688,7 +688,9 @@ ObClient *client_direct_parent(ObClient *self);
 */
 ObClient *client_search_top_direct_parent(ObClient *self);
 
-/*! Is one client a direct child of another (i.e. not through the group.) */
+/*! Is one client a direct child of another (i.e. not through the group.)
+  This checks more than one level, so there may be another direct child in
+  between */
 gboolean client_is_direct_child(ObClient *parent, ObClient *child);
 
 /*! Search for a parent of a client. This only searches up *ONE LEVEL*, and

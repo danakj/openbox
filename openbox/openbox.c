@@ -558,7 +558,6 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--config-file")) {
             if (i == *argc - 1) /* no args left */
-                /* not translated cuz it's sekret */
                 g_printerr(_("--config-file requires an argument\n"));
             else {
                 /* this will be in the current locale encoding, which is

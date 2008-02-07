@@ -94,10 +94,12 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         }
     }
 
-    menu_add_separator(menu, SEPARATOR, _("Manage desktops"));
-    menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, TRUE);
-    menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove last desktop"),
-                    NULL, TRUE);
+    if (config_menu_manage_desktops) {
+        menu_add_separator(menu, SEPARATOR, _("Manage desktops"));
+        menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, TRUE);
+        menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove last desktop"),
+                        NULL, TRUE);
+    }
 
     return TRUE; /* always show the menu */
 }

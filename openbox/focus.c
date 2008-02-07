@@ -57,6 +57,14 @@ void focus_shutdown(gboolean reconfig)
 
 static void push_to_top(ObClient *client)
 {
+    ObClient *p;
+
+    /* if it is modal for a single window, then put that window at the top
+       of the focus order first, so it will be right after ours. the same is
+       done with stacking */
+    if (client->modal && (p = client_direct_parent(client)))
+        push_to_top(p);
+
     focus_order = g_list_remove(focus_order, client);
     focus_order = g_list_prepend(focus_order, client);
 }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-02 09:06-0500\n"
+"POT-Creation-Date: 2008-02-02 11:51-0500\n"
 "PO-Revision-Date: 2007-07-21 14:43+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=n==1 ? 0 : n==2 ? 1 : n>=3 && n<=10 ? 2 : "
 "3\n"
 
-#: openbox/actions.c:149
+#: openbox/actions.c:151
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr ""
@@ -158,59 +158,59 @@ msgstr "حاولت الوصول إلى القائمة '%s' لكنها غير م�
 msgid "More..."
 msgstr "المزيد..."
 
-#: openbox/mouse.c:349
+#: openbox/mouse.c:363
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr "زر غير صحيح '%s' في ارتباط الفأرة"
 
-#: openbox/mouse.c:355
+#: openbox/mouse.c:369
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr "سياق غير صحيح '%s' في ارتباط الفأرة"
 
-#: openbox/openbox.c:131
+#: openbox/openbox.c:132
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "لم أستطع تغيير المجلد المنزلي '%s': %s"
 
-#: openbox/openbox.c:151
+#: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "تعذّر فتح العرض من متغير البيئة DISPLAY."
 
-#: openbox/openbox.c:182
+#: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
 msgstr "تعذّر بدأ مكتبة obrender."
 
-#: openbox/openbox.c:188
+#: openbox/openbox.c:189
 msgid "X server does not support locale."
 msgstr "خادم إكس لا يدعم المحليّة."
 
-#: openbox/openbox.c:190
+#: openbox/openbox.c:191
 msgid "Cannot set locale modifiers for the X server."
 msgstr "لم أستطِع ضبط مُغيِّرات المحليّة لخادم إكس."
 
-#: openbox/openbox.c:253
+#: openbox/openbox.c:255
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "لم أعثر على ملف إعدادات سليم، سأستخدم بعض الإفتراضيات البسيطة"
 
-#: openbox/openbox.c:279
+#: openbox/openbox.c:289
 msgid "Unable to load a theme."
 msgstr "لم أستطِع تحميل سِمة."
 
-#: openbox/openbox.c:406
+#: openbox/openbox.c:416
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "فشلت إعادة التشغيل في تنفيذ مُنفّذ جديد '%s': %s"
 
-#: openbox/openbox.c:476 openbox/openbox.c:478
+#: openbox/openbox.c:486 openbox/openbox.c:488
 msgid "Copyright (c)"
 msgstr "حقوق النسخ"
 
-#: openbox/openbox.c:487
+#: openbox/openbox.c:497
 msgid "Syntax: openbox [options]\n"
 msgstr "الصيغة: openbox [options]\n"
 
-#: openbox/openbox.c:488
+#: openbox/openbox.c:498
 msgid ""
 "\n"
 "Options:\n"
@@ -218,23 +218,27 @@ msgstr ""
 "\n"
 "الخيارات:\n"
 
-#: openbox/openbox.c:489
+#: openbox/openbox.c:499
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              اعرض هذه المساعدة ثم اخرج\n"
 
-#: openbox/openbox.c:490
+#: openbox/openbox.c:500
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           اعرض النسخة ثم اخرج\n"
 
-#: openbox/openbox.c:491
+#: openbox/openbox.c:501
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           استبدل مدير النوافذ الذي يعمل حاليا\n"
 
-#: openbox/openbox.c:492
+#: openbox/openbox.c:502
+msgid "  --config-file FILE  Specify the path to the config file to use\n"
+msgstr ""
+
+#: openbox/openbox.c:503
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        عطِّل الإتصال بمدير الجلسة\n"
 
-#: openbox/openbox.c:493
+#: openbox/openbox.c:504
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -242,19 +246,19 @@ msgstr ""
 "\n"
 "تمرير رسائل لمرّة تعمل من أوبن‌بوكس:\n"
 
-#: openbox/openbox.c:494
+#: openbox/openbox.c:505
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       أعِد تحميل إعدادات أوبن‌بوكس\n"
 
-#: openbox/openbox.c:495
+#: openbox/openbox.c:506
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           أعِد تشغيل أوبن‌بوكس\n"
 
-#: openbox/openbox.c:496
+#: openbox/openbox.c:507
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:508
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -262,23 +266,23 @@ msgstr ""
 "\n"
 "خيارات التنقيح:\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:509
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              شغّل في النمط المزامن\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:510
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             اعرض خرْج التنقيح\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:511
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       اعرض خرج التنقيح للتعامل مع البؤرة\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:512
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    شق العرض إلى شاشات xinerama زائفة\n"
 
-#: openbox/openbox.c:502
+#: openbox/openbox.c:513
 #, c-format
 msgid ""
 "\n"
@@ -287,7 +291,11 @@ msgstr ""
 "\n"
 "من فضلك أبلغ عن العلل إلى %s\n"
 
-#: openbox/openbox.c:603
+#: openbox/openbox.c:583
+msgid "--config-file requires an argument\n"
+msgstr ""
+
+#: openbox/openbox.c:626
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "معامل سطر أوامر غير سليم '%s'\n"
@@ -307,14 +315,14 @@ msgstr "تعذّر الحصول على انتقاء مدير النوافذ عل
 msgid "The WM on screen %d is not exiting"
 msgstr "مدير النوافذ على الشاشة %Id لا وجود له"
 
-#: openbox/screen.c:407
+#: openbox/screen.c:408
 #, c-format
 msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
 
-#: openbox/screen.c:1168
+#: openbox/screen.c:1169
 #, c-format
 msgid "desktop %i"
 msgstr "سطح المكتب %Ii"

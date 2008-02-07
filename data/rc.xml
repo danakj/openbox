@@ -632,9 +632,17 @@
   <!-- default menu file (or custom one in $HOME/.config/openbox/) -->
   <file>menu.xml</file>
   <hideDelay>200</hideDelay>
+  <!-- if a press-release lasts longer than this setting (in milliseconds), the
+       menu is hidden again -->
   <middle>no</middle>
+  <!-- center submenus vertically about the parent entry -->
   <submenuShowDelay>100</submenuShowDelay>
+  <!-- this one is easy, time to delay before showing a submenu after hovering
+       over the parent entry -->
   <applicationIcons>yes</applicationIcons>
+  <!-- controls if icons appear in the client-list-(combined-)menu -->
+  <manageDesktops>yes</manageDesktops>
+  <!-- show the manage desktops section in the client-list-(combined-)menu -->
 </menu>
 
 <applications>
@@ -666,9 +674,12 @@
     <shade>no</shade>
     # make the window shaded when it appears, or not
 
-    <position>
+    <position force="no">
       # the position is only used if both an x and y coordinate are provided
       # (and not set to 'default')
+      # when force is "yes", then the window will be placed here even if it
+      # says you want it placed elsewhere.  this is to override buggy
+      # applications who refuse to behave
       <x>center</x>
       # a number like 50, or 'center' to center on screen. use a negative number
       # to start from the right (or bottom for <y>), ie -50 is 50 pixels from the

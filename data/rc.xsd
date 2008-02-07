@@ -168,12 +168,14 @@
         <xsd:element minOccurs="0" name="middle" type="ob:bool"/>
         <xsd:element minOccurs="0" name="submenuShowDelay" type="xsd:integer"/>
         <xsd:element minOccurs="0" name="applicationIcons" type="ob:bool"/>
+        <xsd:element minOccurs="0" name="manageDesktops" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="window_position">
         <xsd:element name="x" type="ob:center_or_int"/>
         <xsd:element name="y" type="ob:center_or_int"/>
 	<xsd:element name="monitor" type="ob:mouse_or_int"/>	
         <xsd:element minOccurs="0" name="head" type="xsd:string"/>
+        <xsd:attribute name="force" type="ob:bool"/>
     </xsd:complexType>
     <xsd:complexType name="application">
         <xsd:element minOccurs="0" name="decor" type="xsd:bool"/>

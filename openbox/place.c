@@ -489,8 +489,9 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
     gboolean userplaced = FALSE;
 
     /* per-app settings override program specified position
-     * but not user specified */
-    if ((client->positioned & USPosition) ||
+     * but not user specified, unless pos_force is enabled */
+    if (((client->positioned & USPosition) &&
+         !(settings && settings->pos_given && settings->pos_force)) ||
         ((client->positioned & PPosition) &&
          !(settings && settings->pos_given)))
         return FALSE;

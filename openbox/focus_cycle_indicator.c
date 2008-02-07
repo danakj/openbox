@@ -59,10 +59,10 @@ void focus_cycle_indicator_startup(gboolean reconfig)
 
     if (reconfig) return;
 
-    focus_indicator.top.obwin.type = OB_WINDOW_CLASS_INTERNAL;
-    focus_indicator.left.obwin.type = OB_WINDOW_CLASS_INTERNAL;
-    focus_indicator.right.obwin.type = OB_WINDOW_CLASS_INTERNAL;
-    focus_indicator.bottom.obwin.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.top.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.left.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.right.type = OB_WINDOW_CLASS_INTERNAL;
+    focus_indicator.bottom.type = OB_WINDOW_CLASS_INTERNAL;
 
     attr.override_redirect = True;
     attr.background_pixel = BlackPixel(obt_display, ob_screen);

@@ -23,6 +23,7 @@
 #include "client.h"
 #include "prop.h"
 #include "modkeys.h"
+#include "event.h"
 #include "gettext.h"
 
 static GList *prompt_list = NULL;
@@ -332,7 +333,15 @@ void prompt_show(ObPrompt *self, ObClient *parent)
     XSizeHints hints;
     gint i;
 
-    if (self->mapped) return;
+    if (self->mapped) {
+        /* activate the prompt */
+        PROP_MSG(self->super.window, net_active_window,
+                 1, /* from an application.. */
+                 event_curtime,
+                 0,
+                 0);
+        return;
+    }
 
     /* set the focused button (if not found then the first button is used) */
     self->focus = &self->button[0];
@@ -421,7 +430,7 @@ gboolean prompt_mouse_event(ObPrompt *self, XEvent *e)
     ObPromptElement *but;
 
     if (e->type != ButtonPress && e->type != ButtonRelease &&
-        e->type != MotionNotify) return;
+        e->type != MotionNotify) return FALSE;
 
     /* find the button */
     but = NULL;

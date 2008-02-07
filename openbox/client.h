@@ -120,6 +120,8 @@ struct _ObClient
     gchar *title;
     /*! Window title when iconified */
     gchar *icon_title;
+    /*! The title as requested by the client, without any of our own changes */
+    gchar *original_title;
     /*! Hostname of machine running the client */
     gchar *client_machine;
     /*! The command used to run the program. Pre-XSMP window identification. */

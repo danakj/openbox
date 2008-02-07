@@ -263,13 +263,13 @@ static void prompt_layout(ObPrompt *self)
     self->msg.x = l + (w - self->msg.width) / 2;
     self->msg.y = t;
 
-    /* position the button buttons */
-    buttonx = l + (w - allbuttonsw) / 2;
-    for (i = 0; i < self->n_buttons; ++i) {
-        self->button[i].x = buttonx;
-        buttonx += self->button[i].width + BUTTON_SEPARATION;
-        self->button[i].y = t + h - allbuttonsh;
-        self->button[i].y += (allbuttonsh - self->button[i].height) / 2;
+    /* position the button buttons on the right of the dialog */
+    buttonx = l + w;
+    for (i = self->n_buttons; i > 0; --i) {
+        self->button[i-1].x = buttonx - self->button[i-1].width;
+        buttonx -= self->button[i-1].width + BUTTON_SEPARATION;
+        self->button[i-1].y = t + h - allbuttonsh;
+        self->button[i-1].y += (allbuttonsh - self->button[i-1].height) / 2;
     }
 
     /* size and position the toplevel window */

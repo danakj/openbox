@@ -3408,9 +3408,15 @@ static void client_prompt_kill(ObClient *self)
             { _("Yes"), OB_KILL_RESULT_YES }
         };
         gchar *m;
+        const gchar *sig;
+
+        if (self->kill_level == 0)
+            sig = "terminate";
+        else
+            sig = "kill";
 
         m = g_strdup_printf
-            (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit?"), self->original_title);
+            (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
 
         self->kill_prompt = prompt_new(m, answers,
                                        sizeof(answers)/sizeof(answers[0]),

@@ -21,6 +21,7 @@
 #include "screen.h"
 #include "client.h"
 #include "obt/display.h"
+#include "obt/keyboard.h"
 #include "obt/prop.h"
 #include "gettext.h"
 
@@ -28,7 +29,7 @@ static GList *prompt_list = NULL;
 
 /* we construct these */
 static RrAppearance *prompt_a_button;
-static RrAppearance *prompt_a_hover;
+static RrAppearance *prompt_a_focus;
 static RrAppearance *prompt_a_press;
 /* we change the max width which would screw with others */
 static RrAppearance *prompt_a_msg;
@@ -39,31 +40,31 @@ static void render_button(ObPrompt *self, ObPromptElement *e);
 
 void prompt_startup(gboolean reconfig)
 {
-    RrColor *c_button, *c_hover, *c_press;
+    RrColor *c_button, *c_focus, *c_press;
 
     prompt_a_button = RrAppearanceCopy(ob_rr_theme->a_focused_unpressed_close);
-    prompt_a_hover = RrAppearanceCopy(ob_rr_theme->a_hover_focused_close);
+    prompt_a_focus = RrAppearanceCopy(ob_rr_theme->a_hover_focused_close);
     prompt_a_press = RrAppearanceCopy(ob_rr_theme->a_focused_pressed_close);
 
     c_button = prompt_a_button->texture[0].data.mask.color;
-    c_hover = prompt_a_button->texture[0].data.mask.color;
+    c_focus = prompt_a_button->texture[0].data.mask.color;
     c_press = prompt_a_button->texture[0].data.mask.color;
 
     RrAppearanceRemoveTextures(prompt_a_button);
-    RrAppearanceRemoveTextures(prompt_a_hover);
+    RrAppearanceRemoveTextures(prompt_a_focus);
     RrAppearanceRemoveTextures(prompt_a_press);
 
     RrAppearanceAddTextures(prompt_a_button, 1);
-    RrAppearanceAddTextures(prompt_a_hover, 1);
+    RrAppearanceAddTextures(prompt_a_focus, 1);
     RrAppearanceAddTextures(prompt_a_press, 1);
 
     /* totally cheating here.. */
     prompt_a_button->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
-    prompt_a_hover->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
+    prompt_a_focus->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
     prompt_a_press->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
 
     prompt_a_button->texture[0].data.text.color = c_button;
-    prompt_a_hover->texture[0].data.text.color = c_hover;
+    prompt_a_focus->texture[0].data.text.color = c_focus;
     prompt_a_press->texture[0].data.text.color = c_press;
 
     prompt_a_msg = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
@@ -82,7 +83,7 @@ void prompt_startup(gboolean reconfig)
 void prompt_shutdown(gboolean reconfig)
 {
     RrAppearanceFree(prompt_a_button);
-    RrAppearanceFree(prompt_a_hover);
+    RrAppearanceFree(prompt_a_focus);
     RrAppearanceFree(prompt_a_press);
     RrAppearanceFree(prompt_a_msg);
 }
@@ -107,6 +108,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
                                        CWOverrideRedirect | CWBorderPixel,
                                        &attrib);
 
+    /* make it a dialog type window */
     OBT_PROP_SET32(self->super.window, NET_WM_WINDOW_TYPE, ATOM,
                    OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG));
 
@@ -145,7 +147,14 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
                                                CopyFromParent, 0, NULL);
         XMapWindow(obt_display, self->button[i].window);
         window_add(&self->button[i].window, PROMPT_AS_WINDOW(self));
+
+        /* listen for button presses on the buttons */
+        XSelectInput(obt_display, self->button[i].window,
+                     ButtonPressMask | ButtonReleaseMask | ButtonMotionMask);
     }
+
+    /* set the focus to the first button */
+    self->focus = &self->button[0];
 
     prompt_list = g_list_prepend(prompt_list, self);
 
@@ -209,12 +218,12 @@ static void prompt_layout(ObPrompt *self)
         gint bw, bh;
 
         prompt_a_button->texture[0].data.text.string = self->button[i].text;
-        prompt_a_hover->texture[0].data.text.string = self->button[i].text;
+        prompt_a_focus->texture[0].data.text.string = self->button[i].text;
         prompt_a_press->texture[0].data.text.string = self->button[i].text;
         RrMinSize(prompt_a_button, &bw, &bh);
         self->button[i].width = bw;
         self->button[i].height = bh;
-        RrMinSize(prompt_a_hover, &bw, &bh);
+        RrMinSize(prompt_a_focus, &bw, &bh);
         self->button[i].width = MAX(self->button[i].width, bw);
         self->button[i].height = MAX(self->button[i].height, bh);
         RrMinSize(prompt_a_press, &bw, &bh);
@@ -266,12 +275,18 @@ static void prompt_layout(ObPrompt *self)
 
 static void render_button(ObPrompt *self, ObPromptElement *e)
 {
-    prompt_a_button->surface.parent = self->a_bg;
-    prompt_a_button->surface.parentx = e->x;
-    prompt_a_button->surface.parentx = e->y;
+    RrAppearance *a;
 
-    prompt_a_button->texture[0].data.text.string = e->text;
-    RrPaint(prompt_a_button, e->window, e->width, e->height);
+    if (e->pressed) a = prompt_a_press;
+    else if (self->focus == e) a = prompt_a_focus, g_print("focus!\n");
+    else a = prompt_a_button;
+
+    a->surface.parent = self->a_bg;
+    a->surface.parentx = e->x;
+    a->surface.parentx = e->y;
+
+    a->texture[0].data.text.string = e->text;
+    RrPaint(a, e->window, e->width, e->height);
 }
 
 static void render_all(ObPrompt *self)
@@ -321,15 +336,90 @@ void prompt_hide(ObPrompt *self)
     self->mapped = FALSE;
 }
 
-void prompt_hide_window(Window window)
+void prompt_key_event(ObPrompt *self, XEvent *e)
 {
-    GList *it;
-    ObPrompt *p = NULL;
+    gboolean shift;
+    guint shift_mask;
 
-    for (it = prompt_list; it; it = g_list_next(it)) {
-        p = it->data;
-        if (p->super.window == window) break;
+    if (e->type != KeyPress) return;
+
+    g_print("key 0x%x 0x%x\n", e->xkey.keycode, ob_keycode(OB_KEY_TAB));
+
+    shift_mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT);
+    shift = !!(e->xkey.state & shift_mask);
+
+    /* only accept shift */
+    if (e->xkey.state != 0 && e->xkey.state != shift_mask)
+        return;
+
+    if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+        prompt_hide(self);
+    else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
+        /* XXX run stuff */
+        prompt_hide(self);
     }
-    g_assert(it != NULL);
-    prompt_hide(p);
+    else if (e->xkey.keycode == ob_keycode(OB_KEY_TAB)) {
+        guint i;
+        ObPromptElement *oldfocus;
+
+        oldfocus = self->focus;
+
+        for (i = 0; i < self->n_buttons; ++i)
+            if (self->focus == &self->button[i]) break;
+        i += (shift ? -1 : 1);
+        if (i < 0) i = self->n_buttons - 1;
+        else if (i >= self->n_buttons) i = 0;
+        self->focus = &self->button[i];
+
+        if (oldfocus != self->focus) render_button(self, oldfocus);
+        render_button(self, self->focus);
+    }
+}
+
+void prompt_mouse_event(ObPrompt *self, XEvent *e)
+{
+    guint i;
+    ObPromptElement *but;
+
+    if (e->type != ButtonPress && e->type != ButtonRelease &&
+        e->type != MotionNotify) return;        
+
+    /* find the button */
+    for (i = 0; i < self->n_buttons; ++i)
+        if (self->button[i].window ==
+            (e->type == MotionNotify ? e->xmotion.window : e->xbutton.window))
+        {
+            but = &self->button[i];
+            break;
+        }
+    g_assert(but != NULL);
+
+    if (e->type == ButtonPress) {
+        ObPromptElement *oldfocus;
+
+        oldfocus = self->focus;
+
+        but->pressed = TRUE;
+        self->focus = but;
+
+        if (oldfocus != but) render_button(self, oldfocus);
+        render_button(self, but);
+    }
+    else if (e->type == ButtonRelease) {
+        if (but->pressed) {
+            /* XXX run stuff */
+            prompt_hide(self);
+        }
+    }
+    else if (e->type == MotionNotify) {
+        gboolean press;
+
+        press = (e->xmotion.x >= 0 && e->xmotion.y >= 0 &&
+                 e->xmotion.x < but->width && e->xmotion.y < but->height);
+
+        if (press != but->pressed) {
+            but->pressed = press;
+            render_button(self, but);
+        }
+    }
 }

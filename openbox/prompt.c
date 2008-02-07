@@ -28,8 +28,8 @@ static GList *prompt_list = NULL;
 static RrAppearance *prompt_a_button;
 static RrAppearance *prompt_a_hover;
 static RrAppearance *prompt_a_press;
-
-#define msg_appearance(self) (ob_rr_theme->osd_hilite_label)
+/* we change the max width which would screw with others */
+static RrAppearance *prompt_a_msg;
 
 void prompt_startup(gboolean reconfig)
 {
@@ -59,6 +59,9 @@ void prompt_startup(gboolean reconfig)
     prompt_a_button->texture[0].data.text.color = c_button;
     prompt_a_hover->texture[0].data.text.color = c_hover;
     prompt_a_press->texture[0].data.text.color = c_press;
+
+    prompt_a_msg = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
+    prompt_a_msg->texture[0].data.text.flow = TRUE;
 }
 
 void prompt_shutdown(gboolean reconfig)
@@ -66,6 +69,7 @@ void prompt_shutdown(gboolean reconfig)
     RrAppearanceFree(prompt_a_button);
     RrAppearanceFree(prompt_a_hover);
     RrAppearanceFree(prompt_a_press);
+    RrAppearanceFree(prompt_a_msg);
 }
 
 ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
@@ -76,6 +80,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
     const gchar *const *c;
 
     attrib.override_redirect = TRUE;
+    attrib.border_pixel = RrColorPixel(ob_rr_theme->osd_border_color);
 
     self = g_new0(ObPrompt, 1);
     self->ref = 1;
@@ -83,9 +88,11 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
     self->super.window = XCreateWindow(ob_display,
                                        RootWindow(ob_display, ob_screen),
                                        0, 0, 1, 1, 0,
+                                       0, 0, 1, 1, ob_rr_theme->obwidth,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
-                                       CWOverrideRedirect, &attrib);
+                                       CWOverrideRedirect | CWBorderPixel,
+                                       &attrib);
     g_hash_table_insert(window_map, &self->super.window,
                         PROMPT_AS_WINDOW(self));
 
@@ -157,7 +164,6 @@ void prompt_unref(ObPrompt *self)
 
 static void prompt_layout(ObPrompt *self, const Rect *area)
 {
-    RrAppearance *a_msg = msg_appearance(self);
     gint l, r, t, b;
     guint i;
     gint allbuttonsw, allbuttonsh, buttonx;
@@ -198,10 +204,11 @@ static void prompt_layout(ObPrompt *self, const Rect *area)
     self->msg_wbound = MAX(allbuttonsw, area->width*3/5);
 
     /* measure the text message area */
-    a_msg->texture[0].data.text.string = self->msg.text;
-    a_msg->texture[0].data.text.maxwidth = self->msg_wbound;
-    RrMinSize(a_msg, &self->msg.width, &self->msg.height);
-    a_msg->texture[0].data.text.maxwidth = 0;
+    prompt_a_msg->texture[0].data.text.string = self->msg.text;
+    prompt_a_msg->texture[0].data.text.maxwidth = self->msg_wbound;
+    RrMinSize(prompt_a_msg, &self->msg.width, &self->msg.height);
+
+    g_print("height %d\n", self->msg.height);
 
     /* width and height inside the outer margins */
     w = MAX(self->msg.width, allbuttonsw);
@@ -216,7 +223,7 @@ static void prompt_layout(ObPrompt *self, const Rect *area)
     for (i = 0; i < self->n_buttons; ++i) {
         self->button[i].x = buttonx;
         buttonx += self->button[i].width + BUTTON_SEPARATION;
-        self->button[i].y = h - allbuttonsh;
+        self->button[i].y = t + h - allbuttonsh;
         self->button[i].y += (allbuttonsh - self->button[i].height) / 2;
     }
 
@@ -254,15 +261,13 @@ static void render_all(ObPrompt *self)
 
     RrPaint(self->a_bg, self->super.window, self->width, self->height);
 
-    msg_appearance()->surface.parent = self->a_bg;
-    msg_appearance()->surface.parentx = self->msg.x;
-    msg_appearance()->surface.parentx = self->msg.y;
+    prompt_a_msg->surface.parent = self->a_bg;
+    prompt_a_msg->surface.parentx = self->msg.x;
+    prompt_a_msg->surface.parentx = self->msg.y;
 
-    msg_appearance()->texture[0].data.text.string = self->msg.text;
-    msg_appearance()->texture[0].data.text.maxwidth = self->msg_wbound;
-    RrPaint(msg_appearance(), self->msg.window,
-            self->msg.width, self->msg.height);
-    msg_appearance()->texture[0].data.text.maxwidth = 0;
+    prompt_a_msg->texture[0].data.text.string = self->msg.text;
+    prompt_a_msg->texture[0].data.text.maxwidth = self->msg_wbound;
+    RrPaint(prompt_a_msg, self->msg.window, self->msg.width, self->msg.height);
 
     for (i = 0; i < self->n_buttons; ++i)
         render_button(self, &self->button[i]);

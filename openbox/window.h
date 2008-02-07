@@ -44,8 +44,8 @@ struct _ObWindow
 /* Wrapper for internal stuff. If its struct matches this then it can be used
    as an ObWindow */
 typedef struct InternalWindow {
-    ObWindow obwin;
-    Window win;
+    Window_InternalType type;
+    Window window;
 } InternalWindow;
 
 #define WINDOW_IS_MENU(win) (((ObWindow*)win)->type == Window_Menu)

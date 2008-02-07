@@ -57,7 +57,7 @@ Window window_top(ObWindow *self)
     case Window_Client:
         return ((ObClient*)self)->frame->window;
     case Window_Internal:
-        return ((InternalWindow*)self)->win;
+        return ((InternalWindow*)self)->window;
     }
     g_assert_not_reached();
     return None;

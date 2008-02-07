@@ -148,11 +148,13 @@ static void font_measure_full(const RrFont *f, const gchar *str,
     if (flow) {
         pango_layout_set_single_paragraph_mode(f->layout, FALSE);
         pango_layout_set_width(f->layout, maxwidth * PANGO_SCALE);
+        pango_layout_set_ellipsize(f->layout, PANGO_ELLIPSIZE_NONE);
     }
     else {
         /* single line mode */
         pango_layout_set_single_paragraph_mode(f->layout, TRUE);
         pango_layout_set_width(f->layout, -1);
+        pango_layout_set_ellipsize(f->layout, PANGO_ELLIPSIZE_MIDDLE);
     }
 
     /* pango_layout_get_pixel_extents lies! this is the right way to get the
@@ -240,19 +242,23 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     w -= 4;
     h = area->height;
 
-    switch (t->ellipsize) {
-    case RR_ELLIPSIZE_NONE:
+    if (t->flow)
         ell = PANGO_ELLIPSIZE_NONE;
-        break;
-    case RR_ELLIPSIZE_START:
-        ell = PANGO_ELLIPSIZE_START;
-        break;
-    case RR_ELLIPSIZE_MIDDLE:
-        ell = PANGO_ELLIPSIZE_MIDDLE;
-        break;
-    case RR_ELLIPSIZE_END:
-        ell = PANGO_ELLIPSIZE_END;
-        break;
+    else {
+        switch (t->ellipsize) {
+        case RR_ELLIPSIZE_NONE:
+            ell = PANGO_ELLIPSIZE_NONE;
+            break;
+        case RR_ELLIPSIZE_START:
+            ell = PANGO_ELLIPSIZE_START;
+            break;
+        case RR_ELLIPSIZE_MIDDLE:
+            ell = PANGO_ELLIPSIZE_MIDDLE;
+            break;
+        case RR_ELLIPSIZE_END:
+            ell = PANGO_ELLIPSIZE_END;
+            break;
+        }
     }
 
     pango_layout_set_text(t->font->layout, t->string, -1);

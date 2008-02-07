@@ -63,6 +63,10 @@ void prompt_startup(gboolean reconfig)
     prompt_a_focus->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
     prompt_a_press->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
 
+    prompt_a_button->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
+    prompt_a_focus->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
+    prompt_a_press->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
+
     prompt_a_button->texture[0].data.text.color = c_button;
     prompt_a_focus->texture[0].data.text.color = c_focus;
     prompt_a_press->texture[0].data.text.color = c_press;
@@ -111,6 +115,9 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
     /* make it a dialog type window */
     OBT_PROP_SET32(self->super.window, NET_WM_WINDOW_TYPE, ATOM,
                    OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG));
+
+    /* listen for key presses on the window */
+    self->event_mask = KeyPressMask;
 
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
 
@@ -198,6 +205,8 @@ static void prompt_layout(ObPrompt *self)
     const gint OUTSIDE_MARGIN = 4;
     const gint MSG_BUTTON_SEPARATION = 4;
     const gint BUTTON_SEPARATION = 4;
+    const gint BUTTON_VMARGIN = 4;
+    const gint BUTTON_HMARGIN = 12;
     const gint MAX_WIDTH = 600;
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
@@ -229,6 +238,9 @@ static void prompt_layout(ObPrompt *self)
         RrMinSize(prompt_a_press, &bw, &bh);
         self->button[i].width = MAX(self->button[i].width, bw);
         self->button[i].height = MAX(self->button[i].height, bh);
+
+        self->button[i].width += BUTTON_HMARGIN * 2;
+        self->button[i].height += BUTTON_VMARGIN * 2;
 
         allbuttonsw += self->button[i].width + (i > 0 ? BUTTON_SEPARATION : 0);
         allbuttonsh = MAX(allbuttonsh, self->button[i].height);
@@ -278,7 +290,7 @@ static void render_button(ObPrompt *self, ObPromptElement *e)
     RrAppearance *a;
 
     if (e->pressed) a = prompt_a_press;
-    else if (self->focus == e) a = prompt_a_focus, g_print("focus!\n");
+    else if (self->focus == e) a = prompt_a_focus;
     else a = prompt_a_button;
 
     a->surface.parent = self->a_bg;
@@ -342,8 +354,6 @@ void prompt_key_event(ObPrompt *self, XEvent *e)
     guint shift_mask;
 
     if (e->type != KeyPress) return;
-
-    g_print("key 0x%x 0x%x\n", e->xkey.keycode, ob_keycode(OB_KEY_TAB));
 
     shift_mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT);
     shift = !!(e->xkey.state & shift_mask);

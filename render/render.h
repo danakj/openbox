@@ -141,6 +141,7 @@ struct _RrTextureText {
     gboolean shortcut; /*!< Underline a character */
     guint shortcut_pos; /*!< Position in bytes of the character to underline */
     RrEllipsizeMode ellipsize;
+    gboolean flow; /* allow multiple lines.  must set maxwidth below */
     gint maxwidth;
 };
 
@@ -254,7 +255,7 @@ RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
                              gint shadow_offset_x, gint shadow_offset_y,
-                             gint maxwidth);
+                             gboolean flow, gint maxwidth);
 gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
 gint    RrFontMaxCharWidth  (const RrFont *f);
 
@@ -265,6 +266,8 @@ Pixmap RrPaintPixmap (RrAppearance *a, gint w, gint h);
 void   RrPaint       (RrAppearance *a, Window win, gint w, gint h);
 void   RrMinSize     (RrAppearance *a, gint *w, gint *h);
 gint   RrMinWidth    (RrAppearance *a);
+/* For text textures, if flow is TRUE, then the string must be set before
+   calling this, otherwise it doesn't need to be */
 gint   RrMinHeight   (RrAppearance *a);
 void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 

@@ -737,6 +737,7 @@ void client_unmanage(ObClient *self)
     g_free(self->wm_command);
     g_free(self->title);
     g_free(self->icon_title);
+    g_free(self->original_title);
     g_free(self->name);
     g_free(self->class);
     g_free(self->role);
@@ -1892,6 +1893,7 @@ void client_update_title(ObClient *self)
     gchar *visible = NULL;
 
     g_free(self->title);
+    g_free(self->original_title);
 
     /* try netwm */
     if (!OBT_PROP_GETS(self->window, NET_WM_NAME, utf8, &data)) {
@@ -1908,6 +1910,7 @@ void client_update_title(ObClient *self)
                 data = g_strdup("Unnamed Window");
         }
     }
+    self->original_title = g_strdup(data);
 
     if (self->client_machine) {
         visible = g_strdup_printf("%s (%s)", data, self->client_machine);
@@ -3306,26 +3309,26 @@ static void client_kill_requested(ObPrompt *p, gint result, gpointer data)
 
 static void client_prompt_kill(ObClient *self)
 {
-    ObPromptAnswer answers[] = {
-        { _("No"), OB_KILL_RESULT_NO },
-        { _("Yes"), OB_KILL_RESULT_YES }
-    };
-    gchar *m;
-
     /* check if we're already prompting */
-    if (self->kill_prompt) return;
+    if (!self->kill_prompt) {
+        ObPromptAnswer answers[] = {
+            { _("No"), OB_KILL_RESULT_NO },
+            { _("Yes"), OB_KILL_RESULT_YES }
+        };
+        gchar *m;
 
-    m = g_strdup_printf
-        (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit?"), self->title);
+        m = g_strdup_printf
+            (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit?"), self->original_title);
 
-    self->kill_prompt = prompt_new(m, answers,
-                                   sizeof(answers)/sizeof(answers[0]),
-                                   OB_KILL_RESULT_NO, /* default = no */
-                                   OB_KILL_RESULT_NO, /* cancel = no */
-                                   client_kill_requested, self);
+        self->kill_prompt = prompt_new(m, answers,
+                                       sizeof(answers)/sizeof(answers[0]),
+                                       OB_KILL_RESULT_NO, /* default = no */
+                                       OB_KILL_RESULT_NO, /* cancel = no */
+                                       client_kill_requested, self);
+        g_free(m);
+    }
+
     prompt_show(self->kill_prompt, self);
-
-    g_free(m);
 }
 
 void client_kill(ObClient *self)

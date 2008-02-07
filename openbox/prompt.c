@@ -20,6 +20,7 @@
 #include "openbox.h"
 #include "screen.h"
 #include "client.h"
+#include "event.h"
 #include "obt/display.h"
 #include "obt/keyboard.h"
 #include "obt/prop.h"
@@ -330,7 +331,15 @@ void prompt_show(ObPrompt *self, ObClient *parent)
     XSizeHints hints;
     gint i;
 
-    if (self->mapped) return;
+    if (self->mapped) {
+        /* activate the prompt */
+        OBT_PROP_MSG(ob_screen, self->super.window, NET_ACTIVE_WINDOW,
+                     1, /* from an application.. */
+                     event_curtime,
+                     0,
+                     0, 0);
+        return;
+    }
 
     /* set the focused button (if not found then the first button is used) */
     self->focus = &self->button[0];
@@ -417,7 +426,7 @@ gboolean prompt_mouse_event(ObPrompt *self, XEvent *e)
     ObPromptElement *but;
 
     if (e->type != ButtonPress && e->type != ButtonRelease &&
-        e->type != MotionNotify) return;        
+        e->type != MotionNotify) return FALSE;
 
     /* find the button */
     but = NULL;

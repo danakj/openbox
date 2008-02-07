@@ -282,7 +282,7 @@ static void render_all(ObPrompt *self)
 
     prompt_a_msg->surface.parent = self->a_bg;
     prompt_a_msg->surface.parentx = self->msg.x;
-    prompt_a_msg->surface.parentx = self->msg.y;
+    prompt_a_msg->surface.parenty = self->msg.y;
 
     prompt_a_msg->texture[0].data.text.string = self->msg.text;
     prompt_a_msg->texture[0].data.text.maxwidth = self->msg_wbound;

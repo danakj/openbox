@@ -193,7 +193,7 @@ void window_manage(Window win)
             dock_manage(icon_win, win);
         }
         else
-            client_manage(win);
+            client_manage(win, NULL);
     }
     else {
         grab_server(FALSE);

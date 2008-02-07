@@ -37,6 +37,7 @@
 struct _ObFrame;
 struct _ObGroup;
 struct _ObSessionState;
+struct _ObPrompt;
 
 typedef struct _ObClient      ObClient;
 typedef struct _ObClientIcon  ObClientIcon;
@@ -81,6 +82,10 @@ struct _ObClient
 {
     ObWindow obwin;
     Window  window;
+
+    /*! If this client is managing an ObPrompt window, then this is set to the
+      prompt */
+    struct _ObPrompt *prompt;
 
     /*! The window's decorations. NULL while the window is being managed! */
     struct _ObFrame *frame;
@@ -322,8 +327,11 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 void client_add_destroy_notify(ObClientCallback func, gpointer data);
 void client_remove_destroy_notify(ObClientCallback func);
 
-/*! Manages a given window */
-void client_manage(Window win);
+/*! Manages a given window
+  @param prompt This specifies an ObPrompt which is being managed.  It is
+                possible to manage Openbox-owned windows through this.
+*/
+void client_manage(Window win, struct _ObPrompt *prompt);
 /*! Unmanages all managed windows */
 void client_unmanage_all();
 /*! Unmanages a given client */

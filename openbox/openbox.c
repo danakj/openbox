@@ -210,6 +210,8 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_RIGHT] = obt_keyboard_keysym_to_keycode(XK_Right);
             keys[OB_KEY_UP] = obt_keyboard_keysym_to_keycode(XK_Up);
             keys[OB_KEY_DOWN] = obt_keyboard_keysym_to_keycode(XK_Down);
+            keys[OB_KEY_TAB] = obt_keyboard_keysym_to_keycode(XK_Tab);
+            keys[OB_KEY_SPACE] = obt_keyboard_keysym_to_keycode(XK_space);
 
             {
                 ObtParseInst *i;

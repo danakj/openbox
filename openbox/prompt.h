@@ -103,8 +103,8 @@ void prompt_unref(ObPrompt *self);
 void prompt_show(ObPrompt *self, struct _ObClient *parent);
 void prompt_hide(ObPrompt *self);
 
-void prompt_key_event(ObPrompt *self, XEvent *e);
-void prompt_mouse_event(ObPrompt *self, XEvent *e);
+gboolean prompt_key_event(ObPrompt *self, XEvent *e);
+gboolean prompt_mouse_event(ObPrompt *self, XEvent *e);
 void prompt_cancel(ObPrompt *self);
 
 #endif

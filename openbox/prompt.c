@@ -346,8 +346,8 @@ void prompt_show(ObPrompt *self, ObClient *parent)
     hints.min_height = hints.max_height = self->height;
     XSetWMNormalHints(obt_display, self->super.window, &hints);
 
-    XSetTransientForHint(obt_display, (parent ? parent->window : 0),
-                         self->super.window);
+    XSetTransientForHint(obt_display, self->super.window,
+                         (parent ? parent->window : 0));
 
     /* set up the dialog and render it */
     prompt_layout(self);
@@ -364,35 +364,43 @@ void prompt_hide(ObPrompt *self)
     self->mapped = FALSE;
 }
 
-void prompt_key_event(ObPrompt *self, XEvent *e)
+gboolean prompt_key_event(ObPrompt *self, XEvent *e)
 {
     gboolean shift;
     guint shift_mask;
 
-    if (e->type != KeyPress) return;
+    if (e->type != KeyPress) return FALSE;
 
     shift_mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT);
     shift = !!(e->xkey.state & shift_mask);
 
     /* only accept shift */
     if (e->xkey.state != 0 && e->xkey.state != shift_mask)
-        return;
+        return FALSE;
 
     if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
         prompt_cancel(self);
-    else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
+    else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN) ||
+             e->xkey.keycode == ob_keycode(OB_KEY_SPACE))
+    {
         if (self->func) self->func(self, self->focus->result, self->data);
         prompt_hide(self);
     }
-    else if (e->xkey.keycode == ob_keycode(OB_KEY_TAB)) {
+    else if (e->xkey.keycode == ob_keycode(OB_KEY_TAB) ||
+             e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
+             e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
+    {
         gint i;
+        gboolean left;
         ObPromptElement *oldfocus;
 
+        left = e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
+            (e->xkey.keycode == ob_keycode(OB_KEY_TAB) && shift);
         oldfocus = self->focus;
 
         for (i = 0; i < self->n_buttons; ++i)
             if (self->focus == &self->button[i]) break;
-        i += (shift ? -1 : 1);
+        i += (left ? -1 : 1);
         if (i < 0) i = self->n_buttons - 1;
         else if (i >= self->n_buttons) i = 0;
         self->focus = &self->button[i];
@@ -400,9 +408,10 @@ void prompt_key_event(ObPrompt *self, XEvent *e)
         if (oldfocus != self->focus) render_button(self, oldfocus);
         render_button(self, self->focus);
     }
+    return TRUE;
 }
 
-void prompt_mouse_event(ObPrompt *self, XEvent *e)
+gboolean prompt_mouse_event(ObPrompt *self, XEvent *e)
 {
     gint i;
     ObPromptElement *but;
@@ -411,6 +420,7 @@ void prompt_mouse_event(ObPrompt *self, XEvent *e)
         e->type != MotionNotify) return;        
 
     /* find the button */
+    but = NULL;
     for (i = 0; i < self->n_buttons; ++i)
         if (self->button[i].window ==
             (e->type == MotionNotify ? e->xmotion.window : e->xbutton.window))
@@ -418,7 +428,7 @@ void prompt_mouse_event(ObPrompt *self, XEvent *e)
             but = &self->button[i];
             break;
         }
-    g_assert(but != NULL);
+    if (!but) return FALSE;
 
     if (e->type == ButtonPress) {
         ObPromptElement *oldfocus;
@@ -448,6 +458,7 @@ void prompt_mouse_event(ObPrompt *self, XEvent *e)
             render_button(self, but);
         }
     }
+    return TRUE;
 }
 
 void prompt_cancel(ObPrompt *self)

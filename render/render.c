@@ -180,8 +180,6 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
 
 void RrAppearanceRemoveTextures(RrAppearance *a)
 {
-    gint i;
-
     g_free(a->texture);
     a->textures = 0;
 }
@@ -387,6 +385,7 @@ gint RrMinWidth(RrAppearance *a)
                                     a->texture[i].data.text.string,
                                     a->texture[i].data.text.shadow_offset_x,
                                     a->texture[i].data.text.shadow_offset_y,
+                                    a->texture[i].data.text.flow,
                                     a->texture[i].data.text.maxwidth);
             w = MAX(w, m->width);
             g_free(m);
@@ -413,6 +412,7 @@ gint RrMinHeight(RrAppearance *a)
 {
     gint i;
     gint l, t, r, b;
+    RrSize *m;
     gint h = 0;
 
     for (i = 0; i < a->textures; ++i) {
@@ -423,8 +423,24 @@ gint RrMinHeight(RrAppearance *a)
             h = MAX(h, a->texture[i].data.mask.mask->height);
             break;
         case RR_TEXTURE_TEXT:
-            h += MAX(h, RrFontHeight(a->texture[i].data.text.font,
-                                     a->texture[i].data.text.shadow_offset_y));
+            if (a->texture[i].data.text.flow) {
+                g_assert(a->texture[i].data.text.string != NULL);
+
+                m = RrFontMeasureString
+                    (a->texture[i].data.text.font,
+                     a->texture[i].data.text.string,
+                     a->texture[i].data.text.shadow_offset_x,
+                     a->texture[i].data.text.shadow_offset_y,
+                     a->texture[i].data.text.flow,
+                     a->texture[i].data.text.maxwidth);
+                h += MAX(h, m->height);
+                g_free(m);
+            }
+            else
+                h += MAX(h,
+                         RrFontHeight
+                         (a->texture[i].data.text.font,
+                          a->texture[i].data.text.shadow_offset_y));
             break;
         case RR_TEXTURE_RGBA:
             h += MAX(h, a->texture[i].data.rgba.height);

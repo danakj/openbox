@@ -3349,7 +3349,7 @@ void client_close(ObClient *self)
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
     if (self->prompt) {
-        prompt_hide(self->prompt);
+        prompt_cancel(self->prompt);
         return;
     }
 

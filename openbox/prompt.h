@@ -19,14 +19,17 @@
 #ifndef ob__prompt_h
 #define ob__prompt_h
 
-typedef struct _ObPrompt       ObPrompt;
-typedef struct _ObPromptElement ObPromptElement;
-
 #include "window.h"
 #include "geom.h"
 #include "render/render.h"
 #include <glib.h>
 #include <X11/Xlib.h>
+
+typedef struct _ObPrompt       ObPrompt;
+typedef struct _ObPromptElement ObPromptElement;
+typedef struct _ObPromptAnswer ObPromptAnswer;
+
+typedef void (*ObPromptCallback)(ObPrompt *p, gint result, gpointer data);
 
 struct _ObPromptElement {
     gchar *text;
@@ -34,6 +37,7 @@ struct _ObPromptElement {
 
     gint x, y, width, height;
     gboolean pressed;
+    gint result;
 };
 
 struct _ObPrompt
@@ -55,16 +59,43 @@ struct _ObPrompt
 
     /* one for each answer */
     ObPromptElement *button;
-    guint n_buttons;
+    gint n_buttons;
 
     /* points to the button with the focus */
     ObPromptElement *focus;
+    /* the default button to have selected */
+    gint default_result;
+    /* the cancel result if the dialog is closed */
+    gint cancel_result;
+
+    ObPromptCallback func;
+    gpointer data;
+};
+
+struct _ObPromptAnswer {
+    const gchar *text;
+    gint result;
 };
 
 void prompt_startup(gboolean reconfig);
 void prompt_shutdown(gboolean reconfig);
 
-ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers);
+/*! Create a new prompt
+  @param answers A number of ObPromptAnswers which define the buttons which
+                 will appear in the dialog from left to right, and the result
+                 returned when they are selected.
+  @param n_answers The number of answers
+  @param default_result The result for the answer button selected by default
+  @param cancel_result The result that is given if the dialog is closed instead
+         of having a button presssed
+  @param func The callback function which is called when the dialog is closed
+         or a button is pressed
+  @param data User defined data which will be passed to the callback
+*/
+ObPrompt* prompt_new(const gchar *msg,
+                     const ObPromptAnswer *answers, gint n_answers,
+                     gint default_result, gint cancel_result,
+                     ObPromptCallback func, gpointer data);
 void prompt_ref(ObPrompt *self);
 void prompt_unref(ObPrompt *self);
 
@@ -74,5 +105,6 @@ void prompt_hide(ObPrompt *self);
 
 void prompt_key_event(ObPrompt *self, XEvent *e);
 void prompt_mouse_event(ObPrompt *self, XEvent *e);
+void prompt_cancel(ObPrompt *self);
 
 #endif

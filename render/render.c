@@ -178,6 +178,14 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
   return out;
 }
 
+void RrAppearanceRemoveTextures(RrAppearance *a)
+{
+    gint i;
+
+    g_free(a->texture);
+    a->textures = 0;
+}
+
 void RrAppearanceAddTextures(RrAppearance *a, gint numtex)
 {
     g_assert(a->textures == 0);
@@ -378,7 +386,8 @@ gint RrMinWidth(RrAppearance *a)
             m = RrFontMeasureString(a->texture[i].data.text.font,
                                     a->texture[i].data.text.string,
                                     a->texture[i].data.text.shadow_offset_x,
-                                    a->texture[i].data.text.shadow_offset_y);
+                                    a->texture[i].data.text.shadow_offset_y,
+                                    a->texture[i].data.text.maxwidth);
             w = MAX(w, m->width);
             g_free(m);
             break;

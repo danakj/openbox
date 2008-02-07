@@ -109,6 +109,7 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     /* setup the layout */
     pango_layout_set_font_description(out->layout, out->font_desc);
     pango_layout_set_single_paragraph_mode(out->layout, TRUE);
+    pango_layout_set_wrap(out->layout, PANGO_WRAP_WORD_CHAR);
 
     /* get the ascent and descent */
     measure_font(inst, out);
@@ -139,12 +140,14 @@ void RrFontClose(RrFont *f)
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,
-                              gint *x, gint *y, gint shadow_x, gint shadow_y)
+                              gint *x, gint *y, gint shadow_x, gint shadow_y,
+                              gint maxwidth)
 {
     PangoRectangle rect;
 
     pango_layout_set_text(f->layout, str, -1);
-    pango_layout_set_width(f->layout, -1);
+    pango_layout_set_width(f->layout,
+                           (maxwidth <= 0 ? -1 : maxwidth * PANGO_SCALE));
 
     /* pango_layout_get_pixel_extents lies! this is the right way to get the
        size of the text's area */
@@ -163,11 +166,12 @@ static void font_measure_full(const RrFont *f, const gchar *str,
 }
 
 RrSize *RrFontMeasureString(const RrFont *f, const gchar *str,
-                            gint shadow_x, gint shadow_y)
+                            gint shadow_x, gint shadow_y, gint maxwidth)
 {
     RrSize *size;
     size = g_new(RrSize, 1);
-    font_measure_full(f, str, &size->width, &size->height, shadow_x, shadow_y);
+    font_measure_full(f, str, &size->width, &size->height, shadow_x, shadow_y,
+                      maxwidth);
     return size;
 }
 

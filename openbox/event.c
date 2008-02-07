@@ -31,6 +31,7 @@
 #include "frame.h"
 #include "grab.h"
 #include "menu.h"
+#include "prompt.h"
 #include "menuframe.h"
 #include "keyboard.h"
 #include "modkeys.h"
@@ -459,6 +460,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObWindow *obwin = NULL;
     XEvent ee, *e;
     ObEventData *ed = data;
+    ObPrompt *prompt = NULL;
 
     /* make a copy we can mangle */
     ee = *ec;
@@ -482,6 +484,9 @@ static void event_process(const XEvent *ec, gpointer data)
             break;
         case Window_Internal:
             /* we don't do anything with events directly on these windows */
+            break;
+        case Window_Prompt:
+            prompt = WINDOW_AS_PROMPT(obwin);
             break;
         }
     }

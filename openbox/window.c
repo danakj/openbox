@@ -22,6 +22,7 @@
 #include "dock.h"
 #include "client.h"
 #include "frame.h"
+#include "prompt.h"
 
 GHashTable *window_map;
 
@@ -58,6 +59,8 @@ Window window_top(ObWindow *self)
         return ((ObClient*)self)->frame->window;
     case Window_Internal:
         return ((InternalWindow*)self)->window;
+    case Window_Prompt:
+        return ((ObPrompt*)self)->super.window;
     }
     g_assert_not_reached();
     return None;
@@ -77,6 +80,7 @@ ObStackingLayer window_layer(ObWindow *self)
     case Window_Client:
         return ((ObClient*)self)->layer;
     case Window_Internal:
+    case Window_Prompt:
         return OB_STACKING_LAYER_INTERNAL;
     }
     g_assert_not_reached();

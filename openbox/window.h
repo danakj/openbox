@@ -32,8 +32,9 @@ typedef enum {
     Window_Dock,
     Window_DockApp, /* used for events but not stacking */
     Window_Client,
-    Window_Internal /* used for stacking but not events (except to filter
+    Window_Internal,/* used for stacking but not events (except to filter
                        events on the root window) */
+    Window_Prompt,
 } Window_InternalType;
 
 struct _ObWindow
@@ -53,23 +54,27 @@ typedef struct InternalWindow {
 #define WINDOW_IS_DOCKAPP(win) (((ObWindow*)win)->type == Window_DockApp)
 #define WINDOW_IS_CLIENT(win) (((ObWindow*)win)->type == Window_Client)
 #define WINDOW_IS_INTERNAL(win) (((ObWindow*)win)->type == Window_Internal)
+#define WINDOW_IS_PROMPT(win) (((ObWindow*)win)->type == Window_Prompt)
 
 struct _ObMenu;
 struct _ObDock;
 struct _ObDockApp;
 struct _ObClient;
+struct _ObPrompt;
 
 #define WINDOW_AS_MENU(win) ((struct _ObMenuFrame*)win)
 #define WINDOW_AS_DOCK(win) ((struct _ObDock*)win)
 #define WINDOW_AS_DOCKAPP(win) ((struct _ObDockApp*)win)
 #define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)
 #define WINDOW_AS_INTERNAL(win) ((struct InternalWindow*)win)
+#define WINDOW_AS_PROMPT(win) ((struct _ObPrompt*)win)
 
 #define MENU_AS_WINDOW(menu) ((ObWindow*)menu)
 #define DOCK_AS_WINDOW(dock) ((ObWindow*)dock)
 #define DOCKAPP_AS_WINDOW(dockapp) ((ObWindow*)dockapp)
 #define CLIENT_AS_WINDOW(client) ((ObWindow*)client)
 #define INTERNAL_AS_WINDOW(intern) ((ObWindow*)intern)
+#define PROMPT_AS_WINDOW(prompt) ((ObWindow*)prompt)
 
 extern GHashTable *window_map;
 

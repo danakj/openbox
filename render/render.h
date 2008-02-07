@@ -141,6 +141,7 @@ struct _RrTextureText {
     gboolean shortcut; /*!< Underline a character */
     guint shortcut_pos; /*!< Position in bytes of the character to underline */
     RrEllipsizeMode ellipsize;
+    gint maxwidth;
 };
 
 struct _RrPixmapMask {
@@ -244,6 +245,7 @@ GC       RrColorGC    (RrColor *c);
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
+void          RrAppearanceRemoveTextures(RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
@@ -251,7 +253,8 @@ RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
-                             gint shadow_offset_x, gint shadow_offset_y);
+                             gint shadow_offset_x, gint shadow_offset_y,
+                             gint maxwidth);
 gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
 gint    RrFontMaxCharWidth  (const RrFont *f);
 

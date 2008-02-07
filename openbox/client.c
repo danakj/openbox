@@ -3333,6 +3333,9 @@ static void client_prompt_kill(ObClient *self)
 
 void client_kill(ObClient *self)
 {
+    /* don't kill our own windows */
+    if (self->prompt) return;
+
     if (!self->client_machine && self->pid) {
         /* running on the local host */
         if (self->kill_level == 0) {

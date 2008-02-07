@@ -538,6 +538,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->menu_bullet_mask = RrPixmapMaskNew(inst, 4, 7, (gchar*)data);
     }
 
+    /* up and down arrows */
+    {
+        guchar data[] = { 0xfe, 0x00, 0x7c, 0x00, 0x38, 0x00, 0x10, 0x00 };
+        theme->down_arrow_mask = RrPixmapMaskNew(inst, 9, 4, (gchar*)data);
+    }
+    {
+        guchar data[] = { 0x10, 0x00, 0x38, 0x00, 0x7c, 0x00, 0xfe, 0x00 };
+        theme->up_arrow_mask = RrPixmapMaskNew(inst, 9, 4, (gchar*)data);
+    }
+
     /* setup the default window icon */
     theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
                                        OB_DEFAULT_ICON_HEIGHT,
@@ -1446,6 +1456,8 @@ void RrThemeFree(RrTheme *theme)
         RrPixmapMaskFree(theme->close_hover_mask);
         RrPixmapMaskFree(theme->close_pressed_mask);
         RrPixmapMaskFree(theme->menu_bullet_mask);
+        RrPixmapMaskFree(theme->down_arrow_mask);
+        RrPixmapMaskFree(theme->up_arrow_mask);
 
         RrFontClose(theme->win_font_focused);
         RrFontClose(theme->win_font_unfocused);

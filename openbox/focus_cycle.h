@@ -21,6 +21,7 @@
 #define __focus_cycle_h
 
 #include "misc.h"
+#include "focus_cycle_popup.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -37,7 +38,7 @@ void focus_cycle_shutdown(gboolean reconfig);
 struct _ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                               gboolean dock_windows, gboolean desktop_windows,
                               gboolean linear, gboolean interactive,
-                              gboolean showbar, gboolean dialog,
+                              gboolean showbar, ObFocusCyclePopupMode mode,
                               gboolean done, gboolean cancel);
 struct _ObClient* focus_directional_cycle(ObDirection dir,
                                           gboolean dock_windows,

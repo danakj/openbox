@@ -8,13 +8,13 @@
 
 typedef struct {
     gboolean linear;
-    gboolean dialog;
     gboolean dock_windows;
     gboolean desktop_windows;
     gboolean all_desktops;
     gboolean forward;
     gboolean bar;
     gboolean raise;
+    ObFocusCyclePopupMode dialog_mode;
     GSList *actions;
 } Options;
 
@@ -47,13 +47,17 @@ static gpointer setup_func(xmlNodePtr node)
     Options *o;
 
     o = g_new0(Options, 1);
-    o->dialog = TRUE;
     o->bar = TRUE;
+    o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
 
     if ((n = obt_parse_find_node(node, "linear")))
         o->linear = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "dialog")))
-        o->dialog = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "dialog"))) {
+        if (obt_parse_node_contains(n, "none"))
+            o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
+        else if (obt_parse_node_contains(n, "icons"))
+            o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
+    }
     if ((n = obt_parse_find_node(node, "bar")))
         o->bar = obt_parse_node_bool(n);
     if ((n = obt_parse_find_node(node, "raise")))
@@ -125,7 +129,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                      o->linear,
                      TRUE,
                      o->bar,
-                     o->dialog,
+                     o->dialog_mode,
                      FALSE, FALSE);
     cycling = TRUE;
 
@@ -185,7 +189,7 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
                      o->linear,
                      TRUE,
                      o->bar,
-                     o->dialog,
+                     o->dialog_mode,
                      TRUE, cancel);
     cycling = FALSE;
 

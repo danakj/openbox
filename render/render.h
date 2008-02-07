@@ -167,6 +167,11 @@ struct _RrTextureRGBA {
     gint cwidth;
     gint cheight;
     RrPixel32 *cache;
+/* size and position to draw at */
+    gint tx;
+    gint ty;
+    gint twidth;
+    gint theight;
 };
 
 struct _RrTextureLineArt {

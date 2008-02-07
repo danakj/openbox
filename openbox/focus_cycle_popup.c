@@ -455,7 +455,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             + ob_rr_theme->down_arrow_mask->height + OUTSIDE_BORDER;
 
     /* center the icons if there is less than one row */
-    if (icon_rows == 1)
+    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS && icon_rows == 1)
         icons_center_x = (w - p->n_targets * HILITE_SIZE) / 2;
     else
         icons_center_x = 0;

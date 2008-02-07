@@ -270,10 +270,10 @@ void client_manage(Window window, ObPrompt *prompt)
 
     map_time = event_get_server_time();
 
-    /* choose the events we want to receive on the CLIENT window */
-    attrib_set.event_mask = CLIENT_EVENTMASK;
-    if (prompt)
-        attrib_set.event_mask |= KeyPressMask;
+    /* choose the events we want to receive on the CLIENT window
+       (ObPrompt windows can request events too) */
+    attrib_set.event_mask = CLIENT_EVENTMASK |
+        (prompt ? prompt->event_mask : 0);
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
     XChangeWindowAttributes(ob_display, window,
                             CWEventMask|CWDontPropagate, &attrib_set);

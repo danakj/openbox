@@ -41,6 +41,8 @@ struct _ObPrompt
     InternalWindow super;
     gint ref;
 
+    guint event_mask;
+
     /* keep a copy of this because we re-render things that may need it
        (i.e. the buttons) */
     RrAppearance *a_bg;

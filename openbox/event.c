@@ -478,6 +478,8 @@ static void event_process(const XEvent *ec, gpointer data)
             break;
         case Window_Client:
             client = WINDOW_AS_CLIENT(obwin);
+            /* events on clients can be events on prompt windows too */
+            prompt = client->prompt;
             break;
         case Window_Menu:
             /* not to be used for events */
@@ -1677,7 +1679,6 @@ static ObMenuFrame* find_active_or_last_menu(void)
 
 static void event_handle_prompt(ObPrompt *p, XEvent *e)
 {
-    g_print("prompt event\n");
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:

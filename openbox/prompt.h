@@ -26,12 +26,14 @@ typedef struct _ObPromptElement ObPromptElement;
 #include "geom.h"
 #include "render/render.h"
 #include <glib.h>
+#include <X11/Xlib.h>
 
 struct _ObPromptElement {
     gchar *text;
     Window window;
 
     gint x, y, width, height;
+    gboolean pressed;
 };
 
 struct _ObPrompt
@@ -52,6 +54,9 @@ struct _ObPrompt
     /* one for each answer */
     ObPromptElement *button;
     guint n_buttons;
+
+    /* points to the button with the focus */
+    ObPromptElement *focus;
 };
 
 void prompt_startup(gboolean reconfig);
@@ -64,6 +69,8 @@ void prompt_unref(ObPrompt *self);
 /*! Show the prompt.  It will be centered within the given area rectangle */
 void prompt_show(ObPrompt *self, struct _ObClient *parent);
 void prompt_hide(ObPrompt *self);
-void prompt_hide_window(Window window);
+
+void prompt_key_event(ObPrompt *self, XEvent *e);
+void prompt_mouse_event(ObPrompt *self, XEvent *e);
 
 #endif

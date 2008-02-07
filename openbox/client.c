@@ -272,6 +272,8 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
+    if (prompt)
+        attrib_set.event_mask |= KeyPressMask;
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
     XChangeWindowAttributes(ob_display, window,
                             CWEventMask|CWDontPropagate, &attrib_set);
@@ -3347,7 +3349,7 @@ void client_close(ObClient *self)
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
     if (self->prompt) {
-        prompt_hide(self);
+        prompt_hide(self->prompt);
         return;
     }
 

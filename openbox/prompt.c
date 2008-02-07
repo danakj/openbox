@@ -92,18 +92,24 @@ void prompt_shutdown(gboolean reconfig)
     RrAppearanceFree(prompt_a_msg);
 }
 
-ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
+ObPrompt* prompt_new(const gchar *msg,
+                     const ObPromptAnswer *answers, gint n_answers,
+                     gint default_result, gint cancel_result,
+                     ObPromptCallback func, gpointer data)
 {
     ObPrompt *self;
     XSetWindowAttributes attrib;
-    guint i;
-    const gchar *const *c;
+    gint i;
 
     attrib.override_redirect = FALSE;
     attrib.border_pixel = RrColorPixel(ob_rr_theme->osd_border_color);
 
     self = g_new0(ObPrompt, 1);
     self->ref = 1;
+    self->func = func;
+    self->data = data;
+    self->default_result = default_result;
+    self->cancel_result = cancel_result;
     self->super.type = OB_WINDOW_CLASS_PROMPT;
     self->super.window = XCreateWindow(obt_display, obt_root(ob_screen),
                                        0, 0, 1, 1, ob_rr_theme->obwidth,
@@ -119,8 +125,10 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
     /* listen for key presses on the window */
     self->event_mask = KeyPressMask;
 
+    /* we make a copy of this appearance for each prompt */
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
 
+    /* set up the text message widow */
     self->msg.text = g_strdup(msg);
     self->msg.window = XCreateWindow(obt_display, self->super.window,
                                      0, 0, 1, 1, 0,
@@ -128,23 +136,24 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
                                      CopyFromParent, 0, NULL);
     XMapWindow(obt_display, self->msg.window);
 
-    self->n_buttons = 0;
-    for (c = answers; *c != NULL; ++c)
-        ++self->n_buttons;
+    /* set up the buttons from the answers */
 
+    self->n_buttons = n_answers;
     if (!self->n_buttons)
         self->n_buttons = 1;
 
-    self->button = g_new(ObPromptElement, self->n_buttons);
+    self->button = g_new0(ObPromptElement, self->n_buttons);
 
-    if (!answers) {
+    if (n_answers == 0) {
         g_assert(self->n_buttons == 1); /* should be set to this above.. */
         self->button[0].text = g_strdup(_("OK"));
     }
     else {
         g_assert(self->n_buttons > 0);
-        for (i = 0; i < self->n_buttons; ++i)
-            self->button[i].text = g_strdup(answers[i]);
+        for (i = 0; i < self->n_buttons; ++i) {
+            self->button[i].text = g_strdup(answers[i].text);
+            self->button[i].result = answers[i].result;
+        }
     }
 
     for (i = 0; i < self->n_buttons; ++i) {
@@ -160,9 +169,6 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *const *answers)
                      ButtonPressMask | ButtonReleaseMask | ButtonMotionMask);
     }
 
-    /* set the focus to the first button */
-    self->focus = &self->button[0];
-
     prompt_list = g_list_prepend(prompt_list, self);
 
     return self;
@@ -176,7 +182,7 @@ void prompt_ref(ObPrompt *self)
 void prompt_unref(ObPrompt *self)
 {
     if (self && --self->ref == 0) {
-        guint i;
+        gint i;
 
         prompt_list = g_list_remove(prompt_list, self);
 
@@ -197,7 +203,7 @@ void prompt_unref(ObPrompt *self)
 static void prompt_layout(ObPrompt *self)
 {
     gint l, r, t, b;
-    guint i;
+    gint i;
     gint allbuttonsw, allbuttonsh, buttonx;
     gint w, h;
     gint maxw;
@@ -263,11 +269,11 @@ static void prompt_layout(ObPrompt *self)
 
     /* position the button buttons on the right of the dialog */
     buttonx = l + w;
-    for (i = self->n_buttons; i > 0; --i) {
-        self->button[i-1].x = buttonx - self->button[i-1].width;
-        buttonx -= self->button[i-1].width + BUTTON_SEPARATION;
-        self->button[i-1].y = t + h - allbuttonsh;
-        self->button[i-1].y += (allbuttonsh - self->button[i-1].height) / 2;
+    for (i = self->n_buttons - 1; i >= 0; --i) {
+        self->button[i].x = buttonx - self->button[i].width;
+        buttonx -= self->button[i].width + BUTTON_SEPARATION;
+        self->button[i].y = t + h - allbuttonsh;
+        self->button[i].y += (allbuttonsh - self->button[i].height) / 2;
     }
 
     /* size and position the toplevel window */
@@ -303,7 +309,7 @@ static void render_button(ObPrompt *self, ObPromptElement *e)
 
 static void render_all(ObPrompt *self)
 {
-    guint i;
+    gint i;
 
     RrPaint(self->a_bg, self->super.window, self->width, self->height);
 
@@ -322,11 +328,17 @@ static void render_all(ObPrompt *self)
 void prompt_show(ObPrompt *self, ObClient *parent)
 {
     XSizeHints hints;
+    gint i;
 
     if (self->mapped) return;
 
-    prompt_layout(self);
-    render_all(self);
+    /* set the focused button (if not found then the first button is used) */
+    self->focus = &self->button[0];
+    for (i = 0; i < self->n_buttons; ++i)
+        if (self->button[i].result == self->default_result) {
+            self->focus = &self->button[i];
+            break;
+        }
 
     /* you can't resize the prompt */
     hints.flags = PMinSize | PMaxSize;
@@ -336,6 +348,10 @@ void prompt_show(ObPrompt *self, ObClient *parent)
 
     XSetTransientForHint(obt_display, (parent ? parent->window : 0),
                          self->super.window);
+
+    /* set up the dialog and render it */
+    prompt_layout(self);
+    render_all(self);
 
     client_manage(self->super.window, self);
 
@@ -363,13 +379,13 @@ void prompt_key_event(ObPrompt *self, XEvent *e)
         return;
 
     if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
-        prompt_hide(self);
+        prompt_cancel(self);
     else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
-        /* XXX run stuff */
+        if (self->func) self->func(self, self->focus->result, self->data);
         prompt_hide(self);
     }
     else if (e->xkey.keycode == ob_keycode(OB_KEY_TAB)) {
-        guint i;
+        gint i;
         ObPromptElement *oldfocus;
 
         oldfocus = self->focus;
@@ -388,7 +404,7 @@ void prompt_key_event(ObPrompt *self, XEvent *e)
 
 void prompt_mouse_event(ObPrompt *self, XEvent *e)
 {
-    guint i;
+    gint i;
     ObPromptElement *but;
 
     if (e->type != ButtonPress && e->type != ButtonRelease &&
@@ -417,7 +433,7 @@ void prompt_mouse_event(ObPrompt *self, XEvent *e)
     }
     else if (e->type == ButtonRelease) {
         if (but->pressed) {
-            /* XXX run stuff */
+            if (self->func) self->func(self, but->result, self->data);
             prompt_hide(self);
         }
     }
@@ -432,4 +448,10 @@ void prompt_mouse_event(ObPrompt *self, XEvent *e)
             render_button(self, but);
         }
     }
+}
+
+void prompt_cancel(ObPrompt *self)
+{
+    if (self->func) self->func(self, self->cancel_result, self->data);
+    prompt_hide(self);
 }

@@ -89,7 +89,7 @@ static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static gboolean event_handle_menu_keyboard(XEvent *e);
 static gboolean event_handle_menu(XEvent *e);
-static void event_handle_prompt(ObPrompt *p, XEvent *e);
+static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
@@ -707,8 +707,8 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    if (prompt)
-        event_handle_prompt(prompt, e);
+    if (prompt && event_handle_prompt(prompt, e))
+        ;
     else if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
            on the root window, then process it */
@@ -1677,18 +1677,19 @@ static ObMenuFrame* find_active_or_last_menu(void)
     return ret;
 }
 
-static void event_handle_prompt(ObPrompt *p, XEvent *e)
+static gboolean event_handle_prompt(ObPrompt *p, XEvent *e)
 {
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
     case MotionNotify:
-        prompt_mouse_event(p, e);
+        return prompt_mouse_event(p, e);
         break;
     case KeyPress:
-        prompt_key_event(p, e);
+        return prompt_key_event(p, e);
         break;
     }
+    return FALSE;
 }
 
 static gboolean event_handle_menu_keyboard(XEvent *ev)

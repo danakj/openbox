@@ -232,6 +232,8 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_RIGHT] = modkeys_sym_to_code(XK_Right);
             keys[OB_KEY_UP] = modkeys_sym_to_code(XK_Up);
             keys[OB_KEY_DOWN] = modkeys_sym_to_code(XK_Down);
+            keys[OB_KEY_TAB] = modkeys_sym_to_code(XK_Tab);
+            keys[OB_KEY_SPACE] = modkeys_sym_to_code(XK_space);
 
             {
                 ObParseInst *i;

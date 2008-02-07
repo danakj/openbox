@@ -105,6 +105,7 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       ObStackingLayer layer);
 static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
+static void client_prompt_kill(ObClient *self);
 
 
 void client_startup(gboolean reconfig)
@@ -302,7 +303,8 @@ void client_manage(Window window, ObPrompt *prompt)
     client_setup_decor_and_functions(self, FALSE);
 
     /* specify that if we exit, the window should not be destroyed and
-       should be reparented back to root automatically */
+       should be reparented back to root automatically, unless we are managing
+       an internal ObPrompt window  */
     if (!self->prompt)
         XChangeSaveSet(ob_display, window, SetModeInsert);
 
@@ -704,7 +706,8 @@ void client_unmanage(ObClient *self)
 
     mouse_grab_for_client(self, FALSE);
 
-    /* remove the window from our save set */
+    /* remove the window from our save set, unless we are managing an internal
+       ObPrompt window */
     if (!self->prompt)
         XChangeSaveSet(ob_display, self->window, SetModeDelete);
 
@@ -714,6 +717,10 @@ void client_unmanage(ObClient *self)
         /* don't leave an invalid focus_client */
         focus_client = NULL;
     }
+
+    /* if we're prompting to kill the client, close that */
+    prompt_unref(self->kill_prompt);
+    self->kill_prompt = NULL;
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
@@ -1992,7 +1999,7 @@ void client_update_title(ObClient *self)
 
     if (self->not_responding) {
         data = visible;
-        if (self->close_tried_term)
+        if (self->kill_level > 0)
             visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
         else
             visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
@@ -2024,7 +2031,7 @@ void client_update_title(ObClient *self)
 
     if (self->not_responding) {
         data = visible;
-        if (self->close_tried_term)
+        if (self->kill_level > 0)
             visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
         else
             visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
@@ -3338,9 +3345,14 @@ static void client_ping_event(ObClient *self, gboolean dead)
     client_update_title(self);
 
     if (!dead) {
-        /* try kill it nicely the first time again, if it started responding
-           at some point */
-        self->close_tried_term = FALSE;
+        /* it came back to life ! */
+
+        if (self->kill_prompt) {
+            prompt_unref(self->kill_prompt);
+            self->kill_prompt = NULL;
+        }
+
+        self->kill_level = 0;
     }
 }
 
@@ -3359,24 +3371,64 @@ void client_close(ObClient *self)
         /* don't use client_kill(), we should only kill based on PID in
            response to a lack of PING replies */
         XKillClient(ob_display, self->window);
-    else if (self->not_responding)
-        client_kill(self);
-    else
+    else {
         /* request the client to close with WM_DELETE_WINDOW */
         PROP_MSG_TO(self->window, self->window, wm_protocols,
                     prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                     NoEventMask);
+
+        if (self->not_responding)
+            client_prompt_kill(self);
+    }
+}
+
+#define OB_KILL_RESULT_NO 0
+#define OB_KILL_RESULT_YES 1
+
+static void client_kill_requested(ObPrompt *p, gint result, gpointer data)
+{
+    ObClient *self = data;
+
+    if (result == OB_KILL_RESULT_YES)
+        client_kill(self);
+
+    prompt_unref(self->kill_prompt);
+    self->kill_prompt = NULL;
+}
+
+static void client_prompt_kill(ObClient *self)
+{
+    ObPromptAnswer answers[] = {
+        { _("No"), OB_KILL_RESULT_NO },
+        { _("Yes"), OB_KILL_RESULT_YES }
+    };
+    gchar *m;
+
+    /* check if we're already prompting */
+    if (self->kill_prompt) return;
+
+    m = g_strdup_printf
+        (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit?"), self->title);
+
+    self->kill_prompt = prompt_new(m, answers,
+                                   sizeof(answers)/sizeof(answers[0]),
+                                   OB_KILL_RESULT_NO, /* default = no */
+                                   OB_KILL_RESULT_NO, /* cancel = no */
+                                   client_kill_requested, self);
+    prompt_show(self->kill_prompt, self);
+
+    g_free(m);
 }
 
 void client_kill(ObClient *self)
 {
     if (!self->client_machine && self->pid) {
         /* running on the local host */
-        if (!self->close_tried_term) {
-            ob_debug("killing window 0x%x with pid %lu, with SIGTERM\n",
+        if (self->kill_level == 0) {
+            ob_debug("killing window 0x%x with pid %lu, with SIGTERM",
                      self->window, self->pid);
             kill(self->pid, SIGTERM);
-            self->close_tried_term = TRUE;
+            ++self->kill_level;
 
             /* show that we're trying to kill it */
             client_update_title(self);
@@ -3387,8 +3439,10 @@ void client_kill(ObClient *self)
             kill(self->pid, SIGKILL); /* kill -9 */
         }
     }
-    else
+    else {
+        /* running on a remote host */
         XKillClient(ob_display, self->window);
+    }
 }
 
 void client_hilite(ObClient *self, gboolean hilite)

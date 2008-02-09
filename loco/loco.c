@@ -60,6 +60,7 @@ typedef struct {
     gint type; /* XXX make this an enum */
     GLuint texname;
     Damage damage;
+    Pixmap pixmap;
     GLXPixmap glpixmap;
     gboolean damaged;
 } LocoWindow;
@@ -126,7 +127,6 @@ static void timeadd(GTimeVal *t, glong microseconds)
 
 gboolean create_glxpixmap(LocoWindow *lw)
 {
-    Pixmap pixmap;
     static const int attrs[] =
         { GLX_TEXTURE_FORMAT_EXT, GLX_TEXTURE_FORMAT_RGBA_EXT, None };
 
@@ -136,9 +136,14 @@ gboolean create_glxpixmap(LocoWindow *lw)
         return FALSE;
     }
 
-    pixmap = XCompositeNameWindowPixmap(obt_display, lw->id);
+    lw->pixmap = XCompositeNameWindowPixmap(obt_display, lw->id);
     lw->glpixmap = glXCreatePixmap(obt_display, glxFBConfig[lw->depth],
-                                   pixmap, attrs);
+                                   lw->pixmap, attrs);
+    if (!lw->glpixmap) {
+        XFreePixmap(obt_display, lw->pixmap);
+        lw->pixmap = None;
+    }
+
     return !!lw->glpixmap;
 }
 
@@ -178,25 +183,20 @@ glError();
     return 1;
 }
 
-void releasePixmapFromTexture(LocoWindow *lw)
-{
-    if (lw->glpixmap) {
-        glBindTexture(GL_TEXTURE_2D, lw->texname);
-
-        ReleaseTexImageEXT(obt_display, lw->glpixmap, GLX_FRONT_LEFT_EXT);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-}
-
 void destroy_glxpixmap(LocoWindow *lw)
 {
     if (lw->glpixmap) {
+        glBindTexture(GL_TEXTURE_2D, lw->texname);
+        ReleaseTexImageEXT(obt_display, lw->glpixmap, GLX_FRONT_LEFT_EXT);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
 		obt_display_ignore_errors(TRUE);
-        releasePixmapFromTexture(lw);
         glXDestroyGLXPixmap(obt_display, lw->glpixmap);
         obt_display_ignore_errors(FALSE);
 
+        XFreePixmap(obt_display, lw->pixmap);
+
+        lw->pixmap = None;
         lw->glpixmap = None;
     }
 }

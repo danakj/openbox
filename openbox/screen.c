@@ -606,10 +606,15 @@ void screen_set_desktop(guint num, gboolean dofocus)
         /* If screen_desktop_timeout is true, then we've been on this desktop
            long enough and we can save it as the last desktop. */
 
-        /* save the "last desktop" as the "old desktop" */
-        screen_old_desktop = screen_last_desktop;
-        /* save the desktop we're coming from as the "last desktop" */
-        screen_last_desktop = previous;
+        if (screen_last_desktop == previous)
+            /* this is the startup state only */
+            screen_old_desktop = screen_desktop;
+        else {
+            /* save the "last desktop" as the "old desktop" */
+            screen_old_desktop = screen_last_desktop;
+            /* save the desktop we're coming from as the "last desktop" */
+            screen_last_desktop = previous;
+        }
     }
     else {
         /* If screen_desktop_timeout is false, then we just got to this desktop

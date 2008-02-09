@@ -22,10 +22,16 @@
 ME="xdg-autostart"
 VERSION="1.0"
 
-from xdg import BaseDirectory
-from xdg.DesktopEntry import DesktopEntry
-from xdg.Exceptions import ParsingError
 import os, glob, sys
+try:
+    from xdg import BaseDirectory
+    from xdg.DesktopEntry import DesktopEntry
+    from xdg.Exceptions import ParsingError
+except ImportError:
+    print
+    print "ERROR:", ME, "requires PyXDG to be installed"
+    print
+    sys.exit(1)
 
 def main(argv=sys.argv):
     if "--help" in argv[1:]:
@@ -154,8 +160,8 @@ class AutostartFile():
         if self.de.getPath():
             os.chdir(self.de.getPath())
         if self.shouldRun(envs):
-            print "Running autostart file: " + self.path
-            os.system(self.de.getExec());
+            args = ["/bin/sh", "-c", "exec " + self.de.getExec()]
+            os.spawnv(os.P_NOWAIT, args[0], args);
         os.chdir(here)
 
 def show_help():

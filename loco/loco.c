@@ -125,10 +125,17 @@ static void timeadd(GTimeVal *t, glong microseconds)
     }
 }
 
+static Bool look_for_destroy_notify(Display *d, XEvent *e, XPointer arg)
+{
+    const Window w = (Window)*arg;
+    return e->type == DestroyNotify && e->xdestroywindow.window == w;
+}
+
 gboolean create_glxpixmap(LocoWindow *lw)
 {
     static const int attrs[] =
         { GLX_TEXTURE_FORMAT_EXT, GLX_TEXTURE_FORMAT_RGBA_EXT, None };
+    XEvent ce;
 
     if (!glxFBConfig[lw->depth]) {
         printf("no glxFBConfig for depth %d for window 0x%lx\n",
@@ -136,13 +143,24 @@ gboolean create_glxpixmap(LocoWindow *lw)
         return FALSE;
     }
 
-    lw->pixmap = XCompositeNameWindowPixmap(obt_display, lw->id);
-    lw->glpixmap = glXCreatePixmap(obt_display, glxFBConfig[lw->depth],
-                                   lw->pixmap, attrs);
-    if (!lw->glpixmap) {
-        XFreePixmap(obt_display, lw->pixmap);
-        lw->pixmap = None;
+    /* make sure the window exists */
+    XGrabServer(obt_display);
+    XSync(obt_display, FALSE);
+
+    if (!XCheckIfEvent(obt_display, &ce, look_for_destroy_notify,
+                       (XPointer)&lw->id))
+    {
+        lw->pixmap = XCompositeNameWindowPixmap(obt_display, lw->id);
+        lw->glpixmap = glXCreatePixmap(obt_display, glxFBConfig[lw->depth],
+                                       lw->pixmap, attrs);
+        if (!lw->glpixmap) {
+            XFreePixmap(obt_display, lw->pixmap);
+            lw->pixmap = None;
+        }
     }
+
+    XUngrabServer(obt_display);
+    XFlush(obt_display);
 
     return !!lw->glpixmap;
 }

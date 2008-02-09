@@ -2510,6 +2510,10 @@ gboolean client_show(ObClient *self)
     gboolean show = FALSE;
 
     if (client_should_show(self)) {
+        /* replay pending pointer event before showing the window, in case it
+           should be going to something under the window */
+        mouse_replay_pointer();
+
         frame_show(self->frame);
         show = TRUE;
 
@@ -2550,6 +2554,10 @@ gboolean client_hide(ObClient *self)
            Also in action_end, we simulate an enter event that can't be ignored
            so trying to ignore them is futile in case 3 anyways
         */
+
+        /* replay pending pointer event before hiding the window, in case it
+           should be going to the window */
+        mouse_replay_pointer();
 
         frame_hide(self->frame);
         hide = TRUE;
@@ -2965,6 +2973,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         gulong ignore_start;
         if (!user)
             ignore_start = event_start_ignore_all_enters();
+
+        /* replay pending pointer event before move the window, in case it
+           would change what window gets the event */
+        mouse_replay_pointer();
 
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 

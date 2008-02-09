@@ -410,7 +410,7 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
 {
     int redraw_required = 0;
 
-    g_print("COMPOSTER_RAWR() %d\n", e->type);
+    //g_print("COMPOSTER_RAWR() %d\n", e->type);
 
     if (e->type == ConfigureNotify) {
         LocoWindow *lw;
@@ -496,7 +496,6 @@ redraw_required = 1;
                    e->xunmap.window);
     }
     else if (e->type == obt_display_extension_damage_basep + XDamageNotify) {
-        g_print("damage notify\n");
 //        LocoWindow *lw = find_window(e->xdamage.window);
   //      if (lw->visible)
             redraw_required = 1;

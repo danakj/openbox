@@ -54,6 +54,8 @@ LocoWindow* loco_window_new(Window xwin, LocoScreen *screen)
         lw->damage = XDamageCreate(obt_display, lw->id, XDamageReportNonEmpty);
     }
 
+    loco_screen_add_window(lw->screen, lw);
+
     if (attrib.map_state != IsUnmapped)
         loco_window_show(lw);
 
@@ -69,12 +71,17 @@ void loco_window_unref(LocoWindow *lw)
 {
     if (lw && --lw->ref == 0) {
         if (!lw->input_only) {
+            texture_destroy(lw);
+            pixmap_destroy(lw);
+
             glDeleteTextures(1, &lw->texname);
 
             obt_display_ignore_errors(TRUE);
             XDamageDestroy(obt_display, lw->damage);
             obt_display_ignore_errors(FALSE);
         }
+
+        loco_screen_remove_window(lw->screen, lw);
 
         g_free(lw);
     }
@@ -104,9 +111,10 @@ void loco_window_show(LocoWindow *lw) {
     loco_screen_redraw(lw->screen);
 }
 
-void loco_window_hide(LocoWindow *lw, gboolean destroyed)
+void loco_window_hide(LocoWindow *lw, gboolean gone)
 {
-    /* if destroyed = TRUE, then the window is no longer available */
+    /* if gone = TRUE, then the window is no longer available and we
+       become a zombie */
 
     lw->visible = FALSE;
 
@@ -115,6 +123,11 @@ void loco_window_hide(LocoWindow *lw, gboolean destroyed)
     pixmap_destroy(lw);
 
     loco_screen_redraw(lw->screen);
+
+    if (gone) {
+        loco_screen_zombie_window(lw->screen, lw);
+        lw->id = 0;
+    }
 }
 
 void loco_window_configure(LocoWindow *lw, const XConfigureEvent *e)

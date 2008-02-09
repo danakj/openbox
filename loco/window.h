@@ -57,7 +57,7 @@ void loco_window_ref(LocoWindow *lw);
 void loco_window_unref(LocoWindow *lw);
 
 void loco_window_show(LocoWindow *lw);
-void loco_window_hide(LocoWindow *lw, gboolean destroyed);
+void loco_window_hide(LocoWindow *lw, gboolean gone);
 
 void loco_window_configure(LocoWindow *lw, const XConfigureEvent *e);
 void loco_window_damage(LocoWindow *lw);

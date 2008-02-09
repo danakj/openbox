@@ -3,7 +3,6 @@
 #include "list.h"
 #include "obt/display.h"
 
-static void find_all_windows(LocoScreen *sc);
 static void find_visuals(LocoScreen *sc);
 
 static guint window_hash(Window *w) { return *w; }
@@ -43,6 +42,8 @@ LocoScreen* loco_screen_new(gint number)
     //sc->root = loco_window_new(obt_root(number));
     sc->stacking_map = g_hash_table_new((GHashFunc)window_hash,
                                         (GEqualFunc)window_comp);
+    sc->stacking_map_ptr = g_hash_table_new((GHashFunc)g_direct_hash,
+                                            (GEqualFunc)g_direct_equal);
     sc->bindTexImageEXT = (BindEXTFunc)
         glXGetProcAddress((const guchar*)"glXBindTexImageEXT");
     sc->releaseTexImageEXT = (ReleaseEXTFunc)
@@ -63,7 +64,6 @@ LocoScreen* loco_screen_new(gint number)
         XFixesDestroyRegion(obt_display, region);
     }
 
-    find_all_windows(sc);
     loco_screen_redraw(sc);
 
     return sc;
@@ -83,24 +83,10 @@ void loco_screen_unref(LocoScreen *sc)
             XCompositeReleaseOverlayWindow(obt_display, sc->overlay);
 
         g_hash_table_destroy(sc->stacking_map);
+        g_hash_table_destroy(sc->stacking_map_ptr);
 
         g_free(sc);
     }
-}
-
-static void find_all_windows(LocoScreen *sc)
-{
-    guint i, nchild;
-    Window w, *children;
-
-    if (!XQueryTree(obt_display, sc->root, &w, &w, &children, &nchild))
-        nchild = 0;
-
-    for (i = 0; i < nchild; ++i)
-        if (children[i] != None)
-            loco_screen_add_window(sc, children[i]);
-
-    if (children) XFree(children);
 }
 
 static void find_visuals(LocoScreen *sc)
@@ -170,38 +156,41 @@ static void find_visuals(LocoScreen *sc)
     XFree(fbcons);
 }
 
-void loco_screen_add_window(LocoScreen *sc, Window xwin)
+void loco_screen_add_window(LocoScreen *sc, LocoWindow *lw)
 {
-    LocoWindow *lw;
     LocoList *it;
 
-    if (loco_screen_find_window(sc, xwin)) return;
+    g_print("add window 0x%lx\n", lw->id);
 
-    g_print("add window 0x%lx\n", xwin);
+    /* new windows are at the top */
+    it = loco_list_prepend(&sc->stacking_top, &sc->stacking_bottom, lw);
+    g_hash_table_insert(sc->stacking_map, &lw->id, it);
+    g_hash_table_insert(sc->stacking_map_ptr, &lw, it);
 
-    lw = loco_window_new(xwin, sc);
-    if (lw) {
-        /* new windows are at the top */
-        it = loco_list_prepend(&sc->stacking_top, &sc->stacking_bottom, lw);
-        g_hash_table_insert(sc->stacking_map, &lw->id, it);
-    }
+    loco_window_ref(lw);
+}
 
-    //print_stacking();
+void loco_screen_zombie_window(LocoScreen *sc, LocoWindow *lw)
+{
+    g_print("zombie window 0x%lx\n", lw->id);
+
+    /* the id will no longer be useful, so remove it from the hash */
+    g_hash_table_remove(sc->stacking_map, &lw->id);
 }
 
 void loco_screen_remove_window(LocoScreen *sc, LocoWindow *lw)
 {
-    LocoList *pos = loco_screen_find_stacking(sc, lw->id);
-    g_assert(pos);
+    LocoList *pos;
 
     g_print("remove window 0x%lx\n", lw->id);
 
+    pos = loco_screen_find_stacking_ptr(sc, lw);
+    g_assert(pos);
     loco_list_delete_link(&sc->stacking_top, &sc->stacking_bottom, pos);
     g_hash_table_remove(sc->stacking_map, &lw->id);
+    g_hash_table_remove(sc->stacking_map_ptr, &lw);
 
     loco_window_unref(lw);
-
-    //print_stacking();
 }
 
 struct _LocoWindow* loco_screen_find_window(LocoScreen *sc, Window xwin)
@@ -215,6 +204,11 @@ struct _LocoWindow* loco_screen_find_window(LocoScreen *sc, Window xwin)
 struct _LocoList* loco_screen_find_stacking(LocoScreen *sc, Window xwin)
 {
     return g_hash_table_lookup(sc->stacking_map, &xwin);
+}
+
+struct _LocoList* loco_screen_find_stacking_ptr(LocoScreen *sc, LocoWindow *lw)
+{
+    return g_hash_table_lookup(sc->stacking_map_ptr, &lw);
 }
 
 void loco_screen_redraw(LocoScreen *sc)

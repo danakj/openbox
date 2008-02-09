@@ -246,13 +246,13 @@ static void full_composite(void)
     int ret;
     LocoList *it;
 
-    if (full_redraw_required)
+    /* XXX if (full_redraw_required) */
         glClear(GL_COLOR_BUFFER_BIT);
 
     for (it = stacking_bottom; it != stacking_top; it = it->prev) {
         if (it->window->input_only) continue;
         if (!it->window->visible)   continue;
-        if (!full_redraw_required && !it->window->damaged) continue;
+        /* XXX if (!full_redraw_required && !it->window->damaged) continue; */
 
         if (!full_redraw_required) {
             /* XXX if the window is transparent, then clear the background

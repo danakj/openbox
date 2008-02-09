@@ -79,8 +79,7 @@ static GHashTable *stacking_map;
 /* From top to bottom */
 static LocoList   *stacking_top;
 static LocoList   *stacking_bottom;
-static VisualID visualIDs[MAX_DEPTH + 1];
-static XVisualInfo *glxPixmapVisuals[MAX_DEPTH + 1];
+static GLXFBConfig glxFBConfig[MAX_DEPTH + 1];
 static int loco_screen_num;
 static gboolean full_redraw_required;
 static gboolean redraw_required;
@@ -125,62 +124,21 @@ static void timeadd(GTimeVal *t, glong microseconds)
     }
 }
 
-int create_glxpixmap(LocoWindow *lw)
+gboolean create_glxpixmap(LocoWindow *lw)
 {
-    XVisualInfo  *visinfo;
     Pixmap pixmap;
     static const int attrs[] =
-        {
-            GLX_TEXTURE_FORMAT_EXT, GLX_TEXTURE_FORMAT_RGBA_EXT,
-            None
-        };
+        { GLX_TEXTURE_FORMAT_EXT, GLX_TEXTURE_FORMAT_RGBA_EXT, None };
 
-    static const int drawable_tfp_attrs[] =
-        {
-            GLX_CONFIG_CAVEAT, GLX_NONE,
-            GLX_DOUBLEBUFFER, False,
-            GLX_DEPTH_SIZE, 0,
-            GLX_RED_SIZE, 1,
-            GLX_GREEN_SIZE, 1,
-            GLX_BLUE_SIZE, 1,
-            GLX_ALPHA_SIZE, 1,
-            GLX_RENDER_TYPE, GLX_RGBA_BIT,
-            GLX_BIND_TO_TEXTURE_RGBA_EXT, True, // additional for tfp
-            None
-        };
-    int count;
+    if (!glxFBConfig[lw->depth]) {
+        printf("no glxFBConfig for depth %d for window 0x%lx\n",
+               lw->depth, lw->id);
+        return FALSE;
+    }
 
     pixmap = XCompositeNameWindowPixmap(obt_display, lw->id);
-    visinfo = glxPixmapVisuals[lw->depth];
-    if (!visinfo) {
-        printf("no visinfo for depth %d\n", lw->depth);
-	return 0;
-    }
-
-    GLXFBConfig fbc;
-    GLXFBConfig *fbconfigs = glXChooseFBConfig(obt_display,
-                                               loco_screen_num,
-                                               drawable_tfp_attrs, &count);
-
-    int i;
-    fbc = 0;
-    for(i = 0; i < count; ++i ) {
-        int value;
-        glXGetFBConfigAttrib(obt_display,
-                             fbconfigs[i], GLX_VISUAL_ID, &value);
-        if(value == (int)visinfo->visualid)
-        {
-            fbc = fbconfigs[i];
-            XFree(fbconfigs);
-        }
-    }
-
-    if (!fbc) {
-        printf("fbconfigless\n");
-        return 0;
-    }
-
-    lw->glpixmap = glXCreatePixmap(obt_display, fbc, pixmap, attrs);
+    lw->glpixmap = glXCreatePixmap(obt_display, glxFBConfig[lw->depth],
+                                   pixmap, attrs);
     return !!lw->glpixmap;
 }
 
@@ -263,18 +221,20 @@ static void full_composite(void)
 
         glBindTexture(GL_TEXTURE_2D, it->window->texname);
         ret = bindPixmapToTexture(it->window);
-        glBegin(GL_QUADS);
-        glColor3f(1.0, 1.0, 1.0);
-        glVertex2i(it->window->x, it->window->y);
-        glTexCoord2f(1, 0);
-        glVertex2i(it->window->x + it->window->w, it->window->y);
-        glTexCoord2f(1, 1);
-        glVertex2i(it->window->x + it->window->w,
-                   it->window->y + it->window->h);
-        glTexCoord2f(0, 1);
-        glVertex2i(it->window->x, it->window->y + it->window->h);
-        glTexCoord2f(0, 0);
-        glEnd();
+        if (ret) {
+            glBegin(GL_QUADS);
+            glColor3f(1.0, 1.0, 1.0);
+            glVertex2i(it->window->x, it->window->y);
+            glTexCoord2f(1, 0);
+            glVertex2i(it->window->x + it->window->w, it->window->y);
+            glTexCoord2f(1, 1);
+            glVertex2i(it->window->x + it->window->w,
+                       it->window->y + it->window->h);
+            glTexCoord2f(0, 1);
+            glVertex2i(it->window->x, it->window->y + it->window->h);
+            glTexCoord2f(0, 0);
+            glEnd();
+        }
 
         it->window->damaged = FALSE;
     }
@@ -485,8 +445,8 @@ static void configure_window(LocoWindow *lw, const XConfigureEvent *e)
     }
 
     if (pos->next != above) {
-        printf("Window 0x%lx above 0x%lx\n", pos->window->id,
-               above ? above->window->id : 0);
+        //printf("Window 0x%lx above 0x%lx\n", pos->window->id,
+        //       above ? above->window->id : 0);
         loco_list_move_before(&stacking_top, &stacking_bottom, pos, above);
 
         full_redraw_required = redraw_required = TRUE;
@@ -512,6 +472,11 @@ static void damage_window(LocoWindow *lw)
         }
     }
 
+    /* mark the damage as fixed - we know about it now */
+    obt_display_ignore_errors(TRUE);
+    XDamageSubtract(obt_display, lw->damage, None, None);
+    obt_display_ignore_errors(FALSE);
+
     lw->damaged = TRUE;
     redraw_required = TRUE;
 }
@@ -522,7 +487,6 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
 
     if (e->type == ConfigureNotify) {
         LocoWindow *lw;
-        printf("Window 0x%lx moved or something\n", e->xconfigure.window);
 
         lw = find_window(e->xconfigure.window);
         if (lw)
@@ -582,8 +546,6 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
         lw = find_window(de->drawable);
         if (lw) {
             damage_window(lw);
-            /* mark the damage as fixed - we know about it now */
-            XDamageSubtract(obt_display, lw->damage, None, None);
         }
         else if (de->drawable == loco_root) {
             XDamageSubtract(obt_display, de->damage, None, None);
@@ -622,14 +584,29 @@ void loco_set_mainloop(gint screen_num, ObtMainLoop *loop)
     int i, j, value, count;
     int w, h;
     XVisualInfo *vi, tvis, *visinfo;
+    GLXFBConfig *allfbconfigs;
+    int numfbconfigs;
     GLXContext cont;
-    int config[] =
+    static int config[] =
         { GLX_DEPTH_SIZE, 1, GLX_DOUBLEBUFFER, GLX_RGBA, None };
+    static const int drawable_tfp_attrs[] =
+        {
+            GLX_CONFIG_CAVEAT, GLX_NONE,
+            GLX_DOUBLEBUFFER, False,
+            GLX_DEPTH_SIZE, 0,
+            GLX_RED_SIZE, 1,
+            GLX_GREEN_SIZE, 1,
+            GLX_BLUE_SIZE, 1,
+            GLX_ALPHA_SIZE, 1,
+            GLX_RENDER_TYPE, GLX_RGBA_BIT,
+            GLX_BIND_TO_TEXTURE_RGBA_EXT, True, // additional for tfp
+            None
+        };
 
     loco_screen_num = screen_num;
     loco_root = obt_root(screen_num);
     loco_overlay = XCompositeGetOverlayWindow(obt_display, loco_root);
-XserverRegion region = XFixesCreateRegion(obt_display, NULL, 0);
+    XserverRegion region = XFixesCreateRegion(obt_display, NULL, 0);
 
     XFixesSetWindowShapeRegion (obt_display,
                                 loco_overlay,
@@ -671,13 +648,24 @@ glError();
     glClearColor(1.0, 0.0, 0.0, 1.0);
 //    glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
 //    glEnable(GL_BLEND);
+
+    allfbconfigs = glXChooseFBConfig(obt_display,
+                                     loco_screen_num,
+                                     drawable_tfp_attrs,
+                                     &numfbconfigs);
+
     db = 32767;
     stencil = 32767;
     depth = 32767;
     for (i = 0; i <= MAX_DEPTH; i++) {
+        VisualID vid;
+
+        vid = 0;
+        glxFBConfig[i] = 0;
+
         tvis.depth = i;
-        visualIDs[i] = 0;
         visinfo = XGetVisualInfo(obt_display, VisualDepthMask, &tvis, &count);
+        /* pick the nicest visual for the depth */
         for (j = 0; j < count; j++) {
             glXGetConfig(obt_display, &visinfo[j], GLX_USE_GL, &value);
             if (!value)
@@ -698,16 +686,29 @@ glError();
                 continue;
             depth = value;
 
-            visualIDs[i] = visinfo[j].visualid;
+            /* use this visual */
+            vid = visinfo[j].visualid;
+        }
+
+        if (!vid)
+            continue;
+
+        printf("found visual %d\n", i);
+
+        /* find the fbconfig for this depth/visual */
+        for(j = 0; j < numfbconfigs; ++j) {
+            glXGetFBConfigAttrib(obt_display, allfbconfigs[j],
+                                 GLX_VISUAL_ID, &value);
+            if (value == (int)vid) {
+                glxFBConfig[i] = allfbconfigs[j]; /* save it */
+                printf("supporting depth %d\n", i);
+                break; /* next depth */
+            }
         }
     }
 
-    for (i = 0 ;i <= MAX_DEPTH; i++) {
-        tvis.visualid = visualIDs[i];
-        glxPixmapVisuals[i] = XGetVisualInfo(obt_display, VisualIDMask, &tvis, &count);
-        if (glxPixmapVisuals[i])
-            printf("supporting depth %d\n", i);
-    }
+    XFree(allfbconfigs);
+
     obt_main_loop_x_add(loop, COMPOSTER_RAWR, NULL, NULL);
     window_map = g_hash_table_new((GHashFunc)window_hash,
                                   (GEqualFunc)window_comp);

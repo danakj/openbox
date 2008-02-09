@@ -184,12 +184,8 @@ static void pixmap_create(LocoWindow *lw)
     if (lw->pixmap) return;
 
     /* make sure the window exists */
-    XGrabServer(obt_display);
-    XSync(obt_display, FALSE);
-
     if (!XCheckIfEvent(obt_display, &ce, look_for_destroy, (XPointer)&lw->id))
         lw->pixmap = XCompositeNameWindowPixmap(obt_display, lw->id);
-    XUngrabServer(obt_display);
 }
 
 static void texture_create(LocoWindow *lw)
@@ -201,8 +197,7 @@ static void texture_create(LocoWindow *lw)
     };
 
     if (lw->glpixmap) return;
-
-    g_assert(lw->pixmap);
+    if (!lw->pixmap) return;
 
     if (!lw->screen->glxFBConfig[lw->depth]) {
         g_print("no glxFBConfig for depth %d for window 0x%lx\n",

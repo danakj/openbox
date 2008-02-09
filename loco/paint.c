@@ -59,6 +59,9 @@ void paint_everything(LocoScreen *sc)
     int ret;
     LocoList *it;
 
+    XGrabServer(obt_display);
+    XSync(obt_display, FALSE);
+
     /* XXX if (full_redraw_required) */
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -97,6 +100,8 @@ void paint_everything(LocoScreen *sc)
         it->window->damaged = FALSE;
     }
     glXSwapBuffers(obt_display, sc->overlay);
+
+    XUngrabServer(obt_display);
 
     loco_screen_redraw_done(sc);
 }

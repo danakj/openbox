@@ -155,10 +155,11 @@ int create_glxpixmap(LocoWindow *lw)
 
 int bindPixmapToTexture(LocoWindow *lw)
 {
-    if (lw->glpixmap == None) {
-        if (!create_glxpixmap(lw))
-            return 0;
-    }
+    if (lw->glpixmap != None)
+        return 1; /* already bound */
+
+    if (!create_glxpixmap(lw))
+        return 0; /* horrible failure */
 
 /*
     if (screen->queryDrawable (screen->display->display,
@@ -188,15 +189,6 @@ glError();
     return 1;
 }
 
-void destroy_glxpixmap(LocoWindow *lw)
-{
-    if (lw->glpixmap) {
-        glXDestroyGLXPixmap(obt_display, lw->glpixmap);
-        lw->glpixmap = None;
-    }
-}
-
-
 void releasePixmapFromTexture(LocoWindow *lw)
 {
     if (lw->glpixmap) {
@@ -208,6 +200,16 @@ void releasePixmapFromTexture(LocoWindow *lw)
     }
 }
 
+void destroy_glxpixmap(LocoWindow *lw)
+{
+    if (lw->glpixmap) {
+        releasePixmapFromTexture(lw);
+
+        glXDestroyGLXPixmap(obt_display, lw->glpixmap);
+        lw->glpixmap = None;
+    }
+}
+
 static void full_composite(void)
 {
     int ret;
@@ -215,12 +217,10 @@ static void full_composite(void)
 
     glClear(GL_COLOR_BUFFER_BIT);
     for (it = stacking_bottom; it != stacking_top; it = it->prev) {
-        if (!it->window->visible)
-            continue;
-        if ((it->window->w > 1000) || (it->window->h > 1000)) {
-            printf("I am afraid of window 0x%lx because it is very large\n", it->window->id);
-            continue;
-        }
+        if (it->window->input_only) continue;
+        if (!it->window->visible)   continue;
+
+        glBindTexture(GL_TEXTURE_2D, it->window->texname);
         ret = bindPixmapToTexture(it->window);
         glBegin(GL_QUADS);
         glColor3f(1.0, 1.0, 1.0);
@@ -233,7 +233,6 @@ static void full_composite(void)
         glVertex2i(it->window->x, it->window->y + it->window->h);
         glTexCoord2f(0, 0);
         glEnd();
-        releasePixmapFromTexture(it->window);
     }
     glXSwapBuffers(obt_display, loco_overlay);
 }
@@ -320,8 +319,6 @@ static LocoList* find_stacking(Window window)
 
 void composite_setup_window(LocoWindow *win)
 {
-    if (win->input_only) return;
-
     /*something useful = */XDamageCreate(obt_display, win->id, XDamageReportRawRectangles);
 }
 
@@ -344,15 +341,18 @@ static void add_window(Window window)
     lw->w = attrib.width;
     lw->h = attrib.height;
     lw->depth = attrib.depth;
-    lw->glpixmap = None;
-    glGenTextures(1, &lw->texname);
-  //  glTexImage2D(TARGET, 0, GL_RGB, lw->w, lw->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+    lw->visible = attrib.map_state != IsUnmapped;
+
     g_hash_table_insert(window_map, &lw->id, lw);
     /* new windows are at the top */
     it = loco_list_prepend(&stacking_top, &stacking_bottom, lw);
     g_hash_table_insert(stacking_map, &lw->id, it);
 
-    composite_setup_window(lw);
+    if (!lw->input_only) {
+        glGenTextures(1, &lw->texname);
+        //  glTexImage2D(TARGET, 0, GL_RGB, lw->w, lw->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+        composite_setup_window(lw);
+    }
 
     //print_stacking();
 }
@@ -466,6 +466,7 @@ redraw_required = 1;
         else {
             LocoWindow *lw = find_window(e->xreparent.window);
             if (lw) {
+                printf("window 0x%lx reparented from root\n", lw->id);
                 hide_window(lw, FALSE);
                 remove_window(lw);
             }
@@ -477,20 +478,16 @@ redraw_required = 1;
 
     else if (e->type == MapNotify) {
         LocoWindow *lw = find_window(e->xmap.window);
-        if (lw) {
+        if (lw)
             show_window(lw);
-            redraw_required = 1;
-        }
         else
             printf("map notify for unknown window 0x%lx\n",
                    e->xmap.window);
     }
     else if (e->type == UnmapNotify) {
         LocoWindow *lw = find_window(e->xunmap.window);
-        if (lw) {
+        if (lw)
             hide_window(lw, FALSE);
-            redraw_required = 1;
-        }
         else
             printf("unmap notify for unknown window 0x%lx\n",
                    e->xunmap.window);
@@ -500,7 +497,7 @@ redraw_required = 1;
   //      if (lw->visible)
             redraw_required = 1;
     }
-    if (redraw_required)
+    if (redraw_required && !XPending(obt_display))
         full_composite();
 }
 

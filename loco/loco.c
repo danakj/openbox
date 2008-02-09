@@ -49,6 +49,7 @@
 
 
 #define MAX_DEPTH 32
+#define REFRESH_RATE (G_USEC_PER_SEC/60)
 
 typedef struct {
     Window id;
@@ -58,7 +59,9 @@ typedef struct {
     gboolean visible;
     gint type; /* XXX make this an enum */
     GLuint texname;
+    Damage damage;
     GLXPixmap glpixmap;
+    gboolean damaged;
 } LocoWindow;
 
 typedef struct _LocoList {
@@ -79,9 +82,17 @@ static LocoList   *stacking_bottom;
 static VisualID visualIDs[MAX_DEPTH + 1];
 static XVisualInfo *glxPixmapVisuals[MAX_DEPTH + 1];
 static int loco_screen_num;
+static gboolean full_redraw_required;
+static gboolean redraw_required;
 
-void (*BindTexImageEXT)(Display *, GLXDrawable, int, const int *);
-void (*ReleaseTexImageEXT)(Display *, GLXDrawable, int);
+typedef void (*BindEXTFunc)(Display *, GLXDrawable, int, const int *);
+typedef void (*ReleaseEXTFunc)(Display *, GLXDrawable, int);
+
+BindEXTFunc    BindTexImageEXT;
+ReleaseEXTFunc ReleaseTexImageEXT;
+
+static void show_window(LocoWindow *lw);
+static void remove_window(LocoWindow *lw);
 
 /*
 static void print_stacking()
@@ -93,6 +104,26 @@ static void print_stacking()
     }
 }
 */
+
+static glong timecompare(GTimeVal *a, GTimeVal *b)
+{
+    glong r;
+    if ((r = a->tv_sec - b->tv_sec)) return r;
+    return a->tv_usec - b->tv_usec;
+}
+
+static void timeadd(GTimeVal *t, glong microseconds)
+{
+    t->tv_usec += microseconds;
+    while (t->tv_usec >= G_USEC_PER_SEC) {
+        t->tv_usec -= G_USEC_PER_SEC;
+        ++t->tv_sec;
+    }
+    while (t->tv_usec < 0) {
+        t->tv_usec += G_USEC_PER_SEC;
+        --t->tv_sec;
+    }
+}
 
 int create_glxpixmap(LocoWindow *lw)
 {
@@ -215,10 +246,18 @@ static void full_composite(void)
     int ret;
     LocoList *it;
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (full_redraw_required)
+        glClear(GL_COLOR_BUFFER_BIT);
+
     for (it = stacking_bottom; it != stacking_top; it = it->prev) {
         if (it->window->input_only) continue;
         if (!it->window->visible)   continue;
+        if (!full_redraw_required && !it->window->damaged) continue;
+
+        if (!full_redraw_required) {
+            /* XXX if the window is transparent, then clear the background
+               behind it */
+        }
 
         glBindTexture(GL_TEXTURE_2D, it->window->texname);
         ret = bindPixmapToTexture(it->window);
@@ -228,13 +267,18 @@ static void full_composite(void)
         glTexCoord2f(1, 0);
         glVertex2i(it->window->x + it->window->w, it->window->y);
         glTexCoord2f(1, 1);
-        glVertex2i(it->window->x + it->window->w, it->window->y + it->window->h);
+        glVertex2i(it->window->x + it->window->w,
+                   it->window->y + it->window->h);
         glTexCoord2f(0, 1);
         glVertex2i(it->window->x, it->window->y + it->window->h);
         glTexCoord2f(0, 0);
         glEnd();
+
+        it->window->damaged = FALSE;
     }
     glXSwapBuffers(obt_display, loco_overlay);
+
+    full_redraw_required = redraw_required = FALSE;
 }
 
 static LocoList* loco_list_prepend(LocoList **top, LocoList **bottom,
@@ -317,11 +361,6 @@ static LocoList* find_stacking(Window window)
     return g_hash_table_lookup(stacking_map, &window);
 }
 
-void composite_setup_window(LocoWindow *win)
-{
-    /*something useful = */XDamageCreate(obt_display, win->id, XDamageReportRawRectangles);
-}
-
 static void add_window(Window window)
 {
     LocoWindow *lw;
@@ -341,7 +380,6 @@ static void add_window(Window window)
     lw->w = attrib.width;
     lw->h = attrib.height;
     lw->depth = attrib.depth;
-    lw->visible = attrib.map_state != IsUnmapped;
 
     g_hash_table_insert(window_map, &lw->id, lw);
     /* new windows are at the top */
@@ -351,10 +389,13 @@ static void add_window(Window window)
     if (!lw->input_only) {
         glGenTextures(1, &lw->texname);
         //  glTexImage2D(TARGET, 0, GL_RGB, lw->w, lw->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-        composite_setup_window(lw);
+        lw->damage = XDamageCreate(obt_display, window, XDamageReportNonEmpty);
     }
 
     //print_stacking();
+
+    if (attrib.map_state != IsUnmapped)
+        show_window(lw);
 }
 
 static void remove_window(LocoWindow *lw)
@@ -364,7 +405,12 @@ static void remove_window(LocoWindow *lw)
     LocoList *pos = find_stacking(lw->id);
     g_assert(pos);
 
-    glDeleteTextures(1, &lw->texname);
+    if (!lw->input_only) {
+        glDeleteTextures(1, &lw->texname);
+		obt_display_ignore_errors(TRUE);
+		XDamageDestroy(obt_display, lw->damage);
+        obt_display_ignore_errors(FALSE);
+    }
 
     loco_list_delete_link(&stacking_top, &stacking_bottom, pos);
     g_hash_table_remove(stacking_map, &lw->id);
@@ -397,6 +443,7 @@ static void show_window(LocoWindow *lw)
         g_free(type);
     }
 
+    full_redraw_required = redraw_required = TRUE;
 }
 
 static void hide_window(LocoWindow *lw, gboolean destroyed)
@@ -404,44 +451,80 @@ static void hide_window(LocoWindow *lw, gboolean destroyed)
     /* if destroyed, then the window is no longer available */
     lw->visible = FALSE;
     destroy_glxpixmap(lw);
+
+    full_redraw_required = redraw_required = TRUE;
+}
+
+static void configure_window(LocoWindow *lw, const XConfigureEvent *e)
+{
+    LocoList *above, *pos;
+
+    pos = find_stacking(e->window);
+    above = find_stacking(e->above);
+
+    g_assert(pos != NULL && pos->window != NULL);
+    if (e->above && !above)
+        printf("missing windows from the stacking list!!\n");
+
+    if ((lw->x != e->x) || (lw->y != e->y)) {
+        lw->x = e->x;
+        lw->y = e->y;
+
+        full_redraw_required = redraw_required = TRUE;
+    }
+        
+    if ((lw->w != e->width) || (lw->h != e->height)) {
+        lw->w = e->width;
+        lw->h = e->height;
+
+        destroy_glxpixmap(lw);
+
+        full_redraw_required = redraw_required = TRUE;
+    }
+
+    if (pos->next != above) {
+        printf("Window 0x%lx above 0x%lx\n", pos->window->id,
+               above ? above->window->id : 0);
+        loco_list_move_before(&stacking_top, &stacking_bottom, pos, above);
+
+        full_redraw_required = redraw_required = TRUE;
+    }
+}
+
+static void damage_window(LocoWindow *lw)
+{
+    LocoList *it, *pos;
+
+    pos = find_stacking(lw->id);
+
+    /* XXX if it is transparent, then damage any windows below it that
+       intersect */
+
+    /* damage any windows above it that intersect */
+    for (it = pos; it; it = it->prev) {
+        const LocoWindow *lwa = it->window;
+        if (lwa->x < lw->x + lw->w && lwa->x + lwa->w > lw->x &&
+            lwa->y < lw->y + lw->h && lwa->y + lwa->h > lw->y)
+        {
+            it->window->damaged = TRUE;
+        }
+    }
+
+    lw->damaged = TRUE;
+    redraw_required = TRUE;
 }
 
 void COMPOSTER_RAWR(const XEvent *e, gpointer data)
 {
-    int redraw_required = 0;
-
     //g_print("COMPOSTER_RAWR() %d\n", e->type);
 
     if (e->type == ConfigureNotify) {
         LocoWindow *lw;
-redraw_required = 1;
         printf("Window 0x%lx moved or something\n", e->xconfigure.window);
 
         lw = find_window(e->xconfigure.window);
-        if (lw) {
-            LocoList *above, *pos;
-
-            pos = find_stacking(e->xconfigure.window);
-            above = find_stacking(e->xconfigure.above);
-
-            g_assert(pos != NULL && pos->window != NULL);
-            if (e->xconfigure.above && !above)
-                printf("missing windows from the stacking list!!\n");
-
-            lw->x = e->xconfigure.x;
-            lw->y = e->xconfigure.y;
-            if ((lw->w != e->xconfigure.width) ||
-                (lw->h != e->xconfigure.height))
-            {
-                lw->w = e->xconfigure.width;
-                lw->h = e->xconfigure.height;
-
-                destroy_glxpixmap(lw);
-            }
-            printf("Window 0x%lx above 0x%lx\n", pos->window->id,
-                   above ? above->window->id : 0);
-            loco_list_move_before(&stacking_top, &stacking_bottom, pos, above);
-        }
+        if (lw)
+            configure_window(lw, &e->xconfigure);
         //print_stacking();
     }
     else if (e->type == CreateNotify) {
@@ -451,9 +534,6 @@ redraw_required = 1;
         LocoWindow *lw = find_window(e->xdestroywindow.window);
         if (lw) {
             hide_window(lw, TRUE);
-            if (lw->glpixmap != None) {
-                destroy_glxpixmap(lw);
-            }
             remove_window(lw);
         }
         else
@@ -493,12 +573,21 @@ redraw_required = 1;
                    e->xunmap.window);
     }
     else if (e->type == obt_display_extension_damage_basep + XDamageNotify) {
-//        LocoWindow *lw = find_window(e->xdamage.window);
-  //      if (lw->visible)
-            redraw_required = 1;
+        const XDamageNotifyEvent *de;
+        LocoWindow *lw;
+
+        de = (const XDamageNotifyEvent*)e;
+        lw = find_window(de->drawable);
+        if (lw) {
+            damage_window(lw);
+            /* mark the damage as fixed - we know about it now */
+            XDamageSubtract(obt_display, lw->damage, None, None);
+        }
+        else if (de->drawable == loco_root) {
+            XDamageSubtract(obt_display, de->damage, None, None);
+            full_redraw_required = redraw_required = TRUE;
+        }
     }
-    if (redraw_required && !XPending(obt_display))
-        full_composite();
 }
 
 static void find_all_windows(gint screen)
@@ -513,6 +602,13 @@ static void find_all_windows(gint screen)
         if (children[i] != None) add_window(children[i]);
 
     if (children) XFree(children);
+}
+
+static gboolean compositor_timeout(gpointer data)
+{
+    if (redraw_required)
+        full_composite();
+    return TRUE; /* repeat */
 }
 
 static guint window_hash(Window *w) { return *w; }
@@ -552,9 +648,9 @@ XserverRegion region = XFixesCreateRegion(obt_display, NULL, 0);
         printf("context creation failed\n");
     glXMakeCurrent(obt_display, loco_overlay, cont);
 
-    BindTexImageEXT =
+    BindTexImageEXT = (BindEXTFunc)
         glXGetProcAddress((const guchar*)"glXBindTexImageEXT");
-    ReleaseTexImageEXT =
+    ReleaseTexImageEXT = (ReleaseEXTFunc)
         glXGetProcAddress((const guchar*)"glXReleaseTexImageEXT");
 
     w = WidthOfScreen(ScreenOfDisplay(obt_display, screen_num));
@@ -617,8 +713,19 @@ glError();
                                     (GEqualFunc)window_comp);
     stacking_top = stacking_bottom = NULL;
 
-    XCompositeRedirectSubwindows(obt_display, loco_root, CompositeRedirectManual);
+    XGrabServer(obt_display);
+
+    XCompositeRedirectSubwindows(obt_display, loco_root,
+                                 CompositeRedirectManual);
     find_all_windows(screen_num);
+
+    XUngrabServer(obt_display);
+
+    full_redraw_required = redraw_required = TRUE;
+
+    obt_main_loop_timeout_add(loop, REFRESH_RATE,
+                              (GSourceFunc)compositor_timeout,
+                              NULL, NULL, NULL);
 }
 
 void loco_shutdown(void)

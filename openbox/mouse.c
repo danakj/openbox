@@ -46,6 +46,9 @@ typedef struct {
 
 /* Array of GSList*s of ObMouseBinding*s. */
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
+/* TRUE when we have a grab on the pointer and need to reply the pointer event
+   to send it to other applications */
+static gboolean replay_pointer_needed;
 
 ObFrameContext mouse_button_frame_context(ObFrameContext context,
                                           guint button,
@@ -200,6 +203,15 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     return TRUE;
 }
 
+void mouse_replay_pointer()
+{
+    if (replay_pointer_needed) {
+        /* replay the pointer event before any windows move */
+        XAllowEvents(ob_display, ReplayPointer, event_curtime);
+        replay_pointer_needed = FALSE;
+    }
+}
+
 void mouse_event(ObClient *client, XEvent *e)
 {
     static Time ltime;
@@ -229,12 +241,17 @@ void mouse_event(ObClient *client, XEvent *e)
            XAllowEvents with ReplayPointer at some point, to send the event
            through to the client.  when this happens though depends.  if
            windows are going to be moved on screen, then the click will end
-           up going somewhere wrong, so have the action system perform the
-           ReplayPointer for us if that is the case. */
+           up going somewhere wrong, set that we need it, and if nothing
+           else causes the replay pointer to be run, then we will do it
+           after all the actions are finished.
+
+           (We do it after all the actions because FocusIn interrupts
+           dragging for kdesktop, so if we send the button event now, and
+           then they get a focus event after, it breaks.  Instead, wait to send
+           the button press until after the actions when possible.)
+        */
         if (CLIENT_CONTEXT(context, client))
-            actions_set_need_pointer_replay_before_move(TRUE);
-        else
-            actions_set_need_pointer_replay_before_move(FALSE);
+            replay_pointer_needed = TRUE;
 
         fire_binding(OB_MOUSE_ACTION_PRESS, context,
                      client, e->xbutton.state,
@@ -248,8 +265,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
         /* replay the pointer event if it hasn't been replayed yet (i.e. no
            windows were moved) */
-        if (actions_get_need_pointer_replay_before_move())
-            XAllowEvents(ob_display, ReplayPointer, event_curtime);
+        mouse_replay_pointer();
 
         /* in the client context, we won't get a button release because of the
            way it is grabbed, so just fake one */

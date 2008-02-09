@@ -40,4 +40,9 @@ void mouse_grab_for_client(struct _ObClient *client, gboolean grab);
 ObFrameContext mouse_button_frame_context(ObFrameContext context,
                                           guint button, guint state);
 
+/*! If a replay pointer is needed, then do it.  Call this when windows are
+  going to be moving/appearing/disappearing, so that you know the mouse click
+  will go to the right window */
+void mouse_replay_pointer();
+
 #endif

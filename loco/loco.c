@@ -32,9 +32,7 @@
 
 static LocoScreen **screens = NULL;
 static ObtMainLoop *mainloop = NULL;
-static GList       *windows = NULL;
-
-/* XXX stop removing windows from the stacking until they have no more refs */
+static GList      **windows = NULL;
 
 void COMPOSTER_RAWR(const XEvent *e, gpointer data)
 {
@@ -47,7 +45,7 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
     case CreateNotify:
         if (e->xcreatewindow.parent == sc->root) {
             lw = loco_window_new(e->xcreatewindow.window, sc);
-            windows = g_list_prepend(windows, lw);
+            windows[sc->number] = g_list_prepend(windows[sc->number], lw);
         }
         break;
     case DestroyNotify:
@@ -55,42 +53,43 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
         if (lw) {
             loco_window_hide(lw, TRUE);
             loco_window_unref(lw);
-            windows = g_list_remove(windows, lw);
+            windows[sc->number] = g_list_remove(windows[sc->number], lw);
         }
-        else
+        /*else
             g_print("destroy notify for unknown window 0x%lx\n",
-                    e->xdestroywindow.window);
+                    e->xdestroywindow.window);*/
         break;
     case ReparentNotify:
         if (e->xreparent.parent == sc->root) {
             /* reparented to root */
             lw = loco_window_new(e->xreparent.window, sc);
-            windows = g_list_prepend(windows, lw);
+            windows[sc->number] = g_list_prepend(windows[sc->number], lw);
         }
         else {
             /* reparented away from root */
             lw = loco_screen_find_window(sc, e->xreparent.window);
             if (lw) {
-                g_print("window 0x%lx reparented from root\n", lw->id);
+                /*g_print("window 0x%lx reparented from root\n", lw->id);*/
                 loco_window_hide(lw, TRUE);
                 loco_window_unref(lw);
-                windows = g_list_remove(windows, lw);
+                windows[sc->number] = g_list_remove(windows[sc->number], lw);
             }
-            else
+            /*else
                 g_print("reparent notify away from root for unknown window "
-                        "0x%lx\n", e->xreparent.window);
+                        "0x%lx\n", e->xreparent.window);*/
         }
         break;
     case MapNotify:
         lw = loco_screen_find_window(sc, e->xmap.window);
         if (lw) loco_window_show(lw);
-        else g_print("map notify for unknown window 0x%lx\n", e->xmap.window);
+        /*else
+          g_print("map notify for unknown window 0x%lx\n", e->xmap.window);*/
         break;
     case UnmapNotify:
         lw = loco_screen_find_window(sc, e->xunmap.window);
         if (lw) loco_window_hide(lw, FALSE);
-        else g_print("unmap notify for unknown window 0x%lx\n",
-                     e->xunmap.window);
+        /*else g_print("unmap notify for unknown window 0x%lx\n",
+                       e->xunmap.window);*/
         break;
     case ConfigureNotify:
         lw = loco_screen_find_window(sc, e->xconfigure.window);
@@ -127,7 +126,7 @@ static void find_all_windows(LocoScreen *sc)
             LocoWindow *lw;
 
             lw = loco_window_new(children[i], sc);
-            windows = g_list_prepend(windows, lw);
+            windows[sc->number] = g_list_prepend(windows[sc->number], lw);
         }
 
     if (children) XFree(children);
@@ -147,15 +146,17 @@ void loco_startup(ObtMainLoop *loop)
 {
     mainloop = loop;
     screens = g_new0(LocoScreen*, ScreenCount(obt_display));
+    windows = g_new0(GList*, ScreenCount(obt_display));
 }
 
 void loco_shutdown()
 {
     int i;
     for (i = 0; i < ScreenCount(obt_display); ++i)
-        loco_screen_unref(screens[i]);
+        loco_stop_screen(i);
 
     g_free(screens);
+    g_free(windows);
     screens = NULL;
 }
 
@@ -180,19 +181,14 @@ void loco_start_screen(gint number)
 
 void loco_stop_screen(gint number)
 {
-    GList *it, *next;
-
     obt_main_loop_x_remove_data(mainloop, COMPOSTER_RAWR, screens[number]);
     obt_main_loop_timeout_remove_data(mainloop,
                                       compositor_timeout, screens[number],
                                       FALSE);
 
-    for (it = windows; it; it = next) {
-        next = g_list_next(it);
-        if (((LocoWindow*)it->data)->screen->number == number) {
-            loco_window_unref(it->data);
-            windows = g_list_delete_link(windows, it);
-        }
+    while (windows[number]) {
+        loco_window_unref(windows[number]->data);
+        windows[number] = g_list_delete_link(windows[number], windows[number]);
     }
 
     loco_screen_unref(screens[number]);

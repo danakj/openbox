@@ -126,7 +126,7 @@ void loco_window_hide(LocoWindow *lw, gboolean gone)
 
     if (gone) {
         loco_screen_zombie_window(lw->screen, lw);
-        lw->id = 0;
+        lw->id = None;
     }
 }
 
@@ -140,7 +140,7 @@ void loco_window_configure(LocoWindow *lw, const XConfigureEvent *e)
     g_assert(pos != NULL && pos->window != NULL);
 
     if (e->above && !above)
-        g_error("missing windows from the stacking list!!\n");
+        g_print("missing windows from the stacking list!!\n");
 
     if ((lw->x != e->x) || (lw->y != e->y)) {
         lw->x = e->x;
@@ -273,6 +273,8 @@ static void pixmap_destroy(LocoWindow *lw)
 
 void loco_window_update_pixmap(LocoWindow *lw)
 {
+    if (loco_window_is_zombie(lw)) return;
+
     if (lw->stale || lw->glpixmap == None) {
         g_assert(lw->pixmap == None);
 
@@ -281,4 +283,9 @@ void loco_window_update_pixmap(LocoWindow *lw)
         texture_create(lw);
         lw->stale = FALSE;
     }
+}
+
+gboolean loco_window_is_zombie(LocoWindow *lw)
+{
+    return lw->id == None;
 }

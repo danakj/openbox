@@ -64,4 +64,6 @@ void loco_window_damage(LocoWindow *lw);
 
 void loco_window_update_pixmap(LocoWindow *lw);
 
+gboolean loco_window_is_zombie(LocoWindow *lw);
+
 #endif

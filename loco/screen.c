@@ -160,7 +160,7 @@ void loco_screen_add_window(LocoScreen *sc, LocoWindow *lw)
 {
     LocoList *it;
 
-    g_print("add window 0x%lx\n", lw->id);
+    /*g_print("add window 0x%lx\n", lw->id);*/
 
     /* new windows are at the top */
     it = loco_list_prepend(&sc->stacking_top, &sc->stacking_bottom, lw);
@@ -172,7 +172,7 @@ void loco_screen_add_window(LocoScreen *sc, LocoWindow *lw)
 
 void loco_screen_zombie_window(LocoScreen *sc, LocoWindow *lw)
 {
-    g_print("zombie window 0x%lx\n", lw->id);
+    /*g_print("zombie window 0x%lx\n", lw->id);*/
 
     /* the id will no longer be useful, so remove it from the hash */
     g_hash_table_remove(sc->stacking_map, &lw->id);
@@ -182,7 +182,7 @@ void loco_screen_remove_window(LocoScreen *sc, LocoWindow *lw)
 {
     LocoList *pos;
 
-    g_print("remove window 0x%lx\n", lw->id);
+    /*g_print("remove window 0x%lx\n", lw->id);*/
 
     pos = loco_screen_find_stacking_ptr(sc, lw);
     g_assert(pos);

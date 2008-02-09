@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6\n"
+"Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-02 11:51-0500\n"
-"PO-Revision-Date: 2008-01-25 03:52+0100\n"
+"POT-Creation-Date: 2008-02-09 09:34+0100\n"
+"PO-Revision-Date: 2008-02-09 09:41+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -42,23 +42,23 @@ msgstr "Svarar Inte"
 msgid "Go there..."
 msgstr "Gå dit..."
 
-#: openbox/client_list_combined_menu.c:97
+#: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
 msgstr "Hantera skrivbord"
 
-#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
 msgid "_Add new desktop"
 msgstr "_Lägg till nytt skrivbord"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:159
 msgid "_Remove last desktop"
 msgstr "_Ta bort sista skrivbordet"
 
-#: openbox/client_list_combined_menu.c:151
+#: openbox/client_list_combined_menu.c:153
 msgid "Windows"
 msgstr "Fönster"
 
-#: openbox/client_list_menu.c:204
+#: openbox/client_list_menu.c:206
 msgid "Desktops"
 msgstr "Skrivbord"
 
@@ -122,7 +122,7 @@ msgstr "_Dekorationer"
 msgid "_Close"
 msgstr "Stän_g"
 
-#: openbox/config.c:750
+#: openbox/config.c:754
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ogiltig knapp '%s' angiven i konfigurationsfilen"
@@ -230,7 +230,7 @@ msgstr "  --replace           Ersätt den befintliga fönsterhanteraren\n"
 
 #: openbox/openbox.c:502
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr ""
+msgstr "  --config-file FIL   Ange sökvägen till konfigurationsfil att använda\n"
 
 #: openbox/openbox.c:503
 msgid "  --sm-disable        Disable connection to the session manager\n"
@@ -289,11 +289,11 @@ msgstr ""
 "\n"
 "Rapportera buggar till %s\n"
 
-#: openbox/openbox.c:583
+#: openbox/openbox.c:582
 msgid "--config-file requires an argument\n"
 msgstr ""
 
-#: openbox/openbox.c:626
+#: openbox/openbox.c:625
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Ogiltigt kommandoradsargument '%s'\n"

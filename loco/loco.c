@@ -234,9 +234,11 @@ void releasePixmapFromTexture(LocoWindow *lw)
 void destroy_glxpixmap(LocoWindow *lw)
 {
     if (lw->glpixmap) {
+		obt_display_ignore_errors(TRUE);
         releasePixmapFromTexture(lw);
-
         glXDestroyGLXPixmap(obt_display, lw->glpixmap);
+        obt_display_ignore_errors(FALSE);
+
         lw->glpixmap = None;
     }
 }

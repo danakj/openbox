@@ -164,7 +164,16 @@ loco_liboco_la_LIBADD = \
 	$(XCOMPOSITE_LIBS) \
 	$(GLIB_LIBS)
 loco_liboco_la_SOURCES = \
-	loco/loco.c
+	loco/list.c \
+	loco/list.h \
+	loco/loco.c \
+	loco/loco.h \
+	loco/paint.c \
+	loco/paint.h \
+	loco/screen.c \
+	loco/screen.h \
+	loco/window.c \
+	loco/window.h
 
 ## openbox ##
 

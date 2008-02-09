@@ -200,8 +200,7 @@ gint main(gint argc, gchar **argv)
                                                XC_top_left_corner);
 
     if (screen_annex()) { /* it will be ours! */
-        loco_set_mainloop(ob_screen, ob_main_loop);
-
+        loco_startup(ob_main_loop);
         do {
             if (reconfigure) obt_keyboard_reload();
 
@@ -283,6 +282,7 @@ gint main(gint argc, gchar **argv)
                     frame_adjust_theme(c->frame);
                 }
             }
+
             event_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
@@ -303,6 +303,15 @@ gint main(gint argc, gchar **argv)
             mouse_startup(reconfigure);
             menu_frame_startup(reconfigure);
             menu_startup(reconfigure);
+
+            /* XXX check config */
+            if (!loco_on_screen(ob_screen) && TRUE)
+                loco_start_screen(ob_screen);
+            else if (loco_on_screen(ob_screen) && FALSE)
+                loco_stop_screen(ob_screen);
+
+            if (loco_on_screen(ob_screen) && reconfigure)
+                loco_reconfigure_screen(ob_screen);
 
             if (!reconfigure) {
                 guint32 xid;
@@ -367,6 +376,7 @@ gint main(gint argc, gchar **argv)
             actions_shutdown(reconfigure);
         } while (reconfigure);
 
+        loco_stop_screen(ob_screen);
         loco_shutdown();
     }
 

@@ -352,15 +352,16 @@ void obt_main_loop_x_add(ObtMainLoop *loop,
     loop->x_handlers = g_slist_prepend(loop->x_handlers, h);
 }
 
-void obt_main_loop_x_remove(ObtMainLoop *loop,
-                            ObtMainLoopXHandler handler)
+static void obt_main_loop_x_remove_intern(ObtMainLoop *loop,
+                                          ObtMainLoopXHandler handler,
+                                          gboolean bydata, gpointer data)
 {
     GSList *it, *next;
 
     for (it = loop->x_handlers; it; it = next) {
         ObtMainLoopXHandlerType *h = it->data;
         next = g_slist_next(it);
-        if (h->func == handler) {
+        if (h->func == handler && (!bydata || data == h->data)) {
             loop->x_handlers = g_slist_delete_link(loop->x_handlers, it);
             if (h->destroy) h->destroy(h->data);
             g_free(h);
@@ -371,6 +372,19 @@ void obt_main_loop_x_remove(ObtMainLoop *loop,
         FD_CLR(loop->fd_x, &loop->fd_set);
         calc_max_fd(loop);
     }
+}
+
+void obt_main_loop_x_remove_data(ObtMainLoop *loop,
+                                 ObtMainLoopXHandler handler,
+                                 gpointer data)
+{
+    obt_main_loop_x_remove_intern(loop, handler, TRUE, data);
+}
+
+void obt_main_loop_x_remove(ObtMainLoop *loop,
+                            ObtMainLoopXHandler handler)
+{
+    obt_main_loop_x_remove_intern(loop, handler, FALSE, NULL);
 }
 
 /*** SIGNAL WATCHERS ***/

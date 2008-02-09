@@ -39,6 +39,9 @@ void obt_main_loop_x_add(ObtMainLoop *loop,
                          GDestroyNotify notify);
 void obt_main_loop_x_remove(ObtMainLoop *loop,
                             ObtMainLoopXHandler handler);
+void obt_main_loop_x_remove_data(ObtMainLoop *loop,
+                                 ObtMainLoopXHandler handler,
+                                 gpointer data);
 
 typedef void (*ObtMainLoopFdHandler) (gint fd, gpointer data);
 

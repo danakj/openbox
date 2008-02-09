@@ -1,7 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   loco.c for the Openbox window manager
-   Copyright (c) 2008        Derek Foreman
+   paint.h for the Openbox compositor
    Copyright (c) 2008        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -17,22 +16,15 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef loco__loco_h
-#define loco__loco_h
+#ifndef loco__paint_h
+#define loco__paint_h
 
 #include <glib.h>
 
-struct _ObtMainLoop;
+struct _LocoScreen;
 
-void loco_startup(struct _ObtMainLoop *loop);
-void loco_shutdown();
+gboolean paint_setup(struct _LocoScreen *sc);
 
-void loco_start_screen(gint number);
-void loco_stop_screen(gint number);
-
-void loco_reconfigure_screen(gint number);
-
-gboolean loco_on_screen(gint number);
-
+void paint_everything(struct _LocoScreen *sc);
 
 #endif

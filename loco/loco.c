@@ -150,18 +150,16 @@ int create_glxpixmap(LocoWindow *lw)
     }
 
     lw->glpixmap = glXCreatePixmap(obt_display, fbc, pixmap, attrs);
+    return !!lw->glpixmap;
 }
 
 int bindPixmapToTexture(LocoWindow *lw)
 {
-    unsigned int target;
-    int success = 0;
-
     if (lw->glpixmap == None) {
-        create_glxpixmap(lw);
+        if (!create_glxpixmap(lw))
+            return 0;
     }
-    if (lw->glpixmap == None)
-        return 0;
+
 /*
     if (screen->queryDrawable (screen->display->display,
 			       texture->pixmap,
@@ -192,17 +190,19 @@ glError();
 
 void destroy_glxpixmap(LocoWindow *lw)
 {
-    glXDestroyGLXPixmap(obt_display, lw->glpixmap);
-    lw->glpixmap = None;
+    if (lw->glpixmap) {
+        glXDestroyGLXPixmap(obt_display, lw->glpixmap);
+        lw->glpixmap = None;
+    }
 }
 
 
-void releasePixmapFromTexture (LocoWindow *lw)
+void releasePixmapFromTexture(LocoWindow *lw)
 {
     if (lw->glpixmap) {
-	glBindTexture(GL_TEXTURE_2D, lw->texname);
+        glBindTexture(GL_TEXTURE_2D, lw->texname);
 
-	ReleaseTexImageEXT(obt_display, lw->glpixmap, GLX_FRONT_LEFT_EXT);
+        ReleaseTexImageEXT(obt_display, lw->glpixmap, GLX_FRONT_LEFT_EXT);
 
         glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -212,12 +212,13 @@ static void full_composite(void)
 {
     int ret;
     LocoList *it;
+
     glClear(GL_COLOR_BUFFER_BIT);
     for (it = stacking_bottom; it != stacking_top; it = it->prev) {
         if (!it->window->visible)
             continue;
         if ((it->window->w > 1000) || (it->window->h > 1000)) {
-            printf("I am afraid of window 0x%x because it is very large\n", it->window->id);
+            printf("I am afraid of window 0x%lx because it is very large\n", it->window->id);
             continue;
         }
         ret = bindPixmapToTexture(it->window);
@@ -232,7 +233,7 @@ static void full_composite(void)
         glVertex2i(it->window->x, it->window->y + it->window->h);
         glTexCoord2f(0, 0);
         glEnd();
-//	releasePixmapFromTexture(it->window);
+        releasePixmapFromTexture(it->window);
     }
     glXSwapBuffers(obt_display, loco_overlay);
 }
@@ -363,6 +364,8 @@ static void remove_window(LocoWindow *lw)
     LocoList *pos = find_stacking(lw->id);
     g_assert(pos);
 
+    glDeleteTextures(1, &lw->texname);
+
     loco_list_delete_link(&stacking_top, &stacking_bottom, pos);
     g_hash_table_remove(stacking_map, &lw->id);
     g_hash_table_remove(window_map, &lw->id);
@@ -407,6 +410,8 @@ void COMPOSTER_RAWR(const XEvent *e, gpointer data)
 {
     int redraw_required = 0;
 
+    g_print("COMPOSTER_RAWR() %d\n", e->type);
+
     if (e->type == ConfigureNotify) {
         LocoWindow *lw;
 redraw_required = 1;
@@ -425,12 +430,13 @@ redraw_required = 1;
 
             lw->x = e->xconfigure.x;
             lw->y = e->xconfigure.y;
-            if ((lw->w != e->xconfigure.width) || (lw->h != e->xconfigure.height)) {
+            if ((lw->w != e->xconfigure.width) ||
+                (lw->h != e->xconfigure.height))
+            {
                 lw->w = e->xconfigure.width;
                 lw->h = e->xconfigure.height;
-                if (lw->glpixmap != None) {
-                    destroy_glxpixmap(lw);
-                }
+
+                destroy_glxpixmap(lw);
             }
             printf("Window 0x%lx above 0x%lx\n", pos->window->id,
                    above ? above->window->id : 0);
@@ -468,21 +474,29 @@ redraw_required = 1;
                        "0x%lx\n", e->xreparent.window);
         }
     }
+
     else if (e->type == MapNotify) {
         LocoWindow *lw = find_window(e->xmap.window);
-        if (lw) show_window(lw);
+        if (lw) {
+            show_window(lw);
+            redraw_required = 1;
+        }
         else
             printf("map notify for unknown window 0x%lx\n",
                    e->xmap.window);
     }
     else if (e->type == UnmapNotify) {
         LocoWindow *lw = find_window(e->xunmap.window);
-        if (lw) hide_window(lw, FALSE);
+        if (lw) {
+            hide_window(lw, FALSE);
+            redraw_required = 1;
+        }
         else
             printf("unmap notify for unknown window 0x%lx\n",
                    e->xunmap.window);
     }
     else if (e->type == obt_display_extension_damage_basep + XDamageNotify) {
+        g_print("damage notify\n");
 //        LocoWindow *lw = find_window(e->xdamage.window);
   //      if (lw->visible)
             redraw_required = 1;
@@ -542,8 +556,10 @@ XserverRegion region = XFixesCreateRegion(obt_display, NULL, 0);
         printf("context creation failed\n");
     glXMakeCurrent(obt_display, loco_overlay, cont);
 
-    BindTexImageEXT = glXGetProcAddress("glXBindTexImageEXT");
-    ReleaseTexImageEXT = glXGetProcAddress("glXReleaseTexImageEXT");
+    BindTexImageEXT =
+        glXGetProcAddress((const guchar*)"glXBindTexImageEXT");
+    ReleaseTexImageEXT =
+        glXGetProcAddress((const guchar*)"glXReleaseTexImageEXT");
 
     w = WidthOfScreen(ScreenOfDisplay(obt_display, screen_num));
     h = HeightOfScreen(ScreenOfDisplay(obt_display, screen_num));

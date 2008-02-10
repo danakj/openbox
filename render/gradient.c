@@ -197,6 +197,52 @@ static void create_bevel_colors(RrAppearance *l)
     l->surface.bevel_dark = RrColorNew(l->inst, r, g, b);
 }
 
+/*! Repeat the first pixel over the entire block of memory
+  @param start The block of memory. start[0] will be copied
+         to the rest of the block.
+  @param w The width of the block of memory (including the already-set first
+           element
+*/
+static inline void repeat_pixel(RrPixel32 *start, gint w)
+{
+    gint x;
+    RrPixel32 *dest;
+
+    dest = start + 1;
+
+    /* for really small things, just copy ourselves */
+    if (w < 8) {
+        for (x = w-1; x > 0; --x)
+            *(dest++) = *start;
+    }
+
+    /* for >= 8, then use O(log n) memcpy's... */
+    else {
+        gint len = 4;
+        gint lenbytes = 4 * sizeof(RrPixel32);
+
+        /* copy the first 3 * 32 bits (3 words) ourselves - then we have
+           3 + the original 1 = 4 words to make copies of at a time
+
+           this is faster than doing memcpy for 1 or 2 words at a time
+        */
+        for (x = 3; x > 0; --x)
+            *(dest++) = *start;
+
+        for (x = w - 4; x > 0;) {
+            memcpy(dest, start, lenbytes);
+            x -= len;
+            dest += len;
+            len <<= 1;
+            lenbytes <<= 1;
+            if (len > x) {
+                len = x;
+                lenbytes = x * sizeof(RrPixel32);
+            }
+        }
+    }
+}
+
 static void gradient_parentrelative(RrAppearance *a, gint w, gint h)
 {
     RrPixel32 *source, *dest;
@@ -423,9 +469,9 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
 
 static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 {
-    gint x, y1, y2, y3;
+    gint y1, y2, y3;
     RrSurface *sf = &a->surface;
-    RrPixel32 *data, *start;
+    RrPixel32 *data;
     gint y1sz, y2sz, y3sz;
 
     VARS(y1);
@@ -479,44 +525,10 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     *data = COLOR(y3);
 
     /* copy the first pixels into the whole rows */
-
-    start = sf->pixel_data;
-    data = start + 1;
-
+    data = sf->pixel_data;
     for (y1 = h; y1 > 0; --y1) {
-        /* for really small things, just copy ourselves */
-        if (w < 8) {
-            for (x = w-1; x > 0; --x)
-                *(data++) = *start;
-        }
-        /* for >= 8, then use O(log n) memcpy's... */
-        else {
-            gint len = 4;
-            gint lenbytes = 4 * sizeof(RrPixel32);
-
-            /* copy the first 3 * 32 bits (3 words) ourselves - then we have
-               3 + the original 1 = 4 words to make copies of at a time
-
-               this is faster than doing memcpy for 1 or 2 words at a time
-            */
-            for (x = 3; x > 0; --x)
-                *(data++) = *start;
-
-            for (x = w - 4; x > 0;) {
-                memcpy(data, start, lenbytes);
-                x -= len;
-                data += len;
-                len <<= 1;
-                lenbytes <<= 1;
-                if (len > x) {
-                    len = x;
-                    lenbytes = x * sizeof(RrPixel32);
-                }
-            }
-        }
-
-        start += w;
-        ++data;
+        repeat_pixel(data, w);
+        data += w;
     }
 }
 
@@ -582,23 +594,28 @@ static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
 
 static void gradient_vertical(RrSurface *sf, gint w, gint h)
 {
-    gint x, y;
-    RrPixel32 *data = sf->pixel_data;
-    RrPixel32 current;
+    gint y;
+    RrPixel32 *data;
 
     VARS(y);
     SETUP(y, sf->primary, sf->secondary, h);
 
-    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
-        current = COLOR(y);
-        for (x = w; x > 0; --x)  /* 0 -> w */
-            *(data++) = current;
+    /* find the color for the first pixel of each row first */
+    data = sf->pixel_data;
 
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        *data = COLOR(y);
+        data += w;
         NEXT(y);
     }
-    current = COLOR(y);
-    for (x = w; x > 0; --x)  /* 0 -> w */
-        *(data++) = current;
+    *data = COLOR(y);
+
+    /* copy the first pixels into the whole rows */
+    data = sf->pixel_data;
+    for (y = h; y > 0; --y) {
+        repeat_pixel(data, w);
+        data += w;
+    }
 }
 
 

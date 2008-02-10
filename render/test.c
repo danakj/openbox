@@ -68,7 +68,7 @@ gint main()
     inst = RrInstanceNew(ob_display, ob_screen);
 
     look = RrAppearanceNew(inst, 0);
-    look->surface.grad = RR_SURFACE_SPLIT_VERTICAL;
+    look->surface.grad = RR_SURFACE_MIRROR_HORIZONTAL;
     look->surface.secondary = RrColorParse(inst, "Yellow");
     look->surface.split_secondary = RrColorParse(inst, "Red");
     look->surface.split_primary = RrColorParse(inst, "Green");
@@ -78,6 +78,18 @@ gint main()
         fprintf(stderr, "couldn't connect to X server :0\n");
         return 0;
     }
+
+#if BIGTEST
+    int i;
+    look->surface.pixel_data = g_new(RrPixel32, w*h);
+    for (i = 0; i < 10000; ++i) {
+        printf("\r%d", i);
+        fflush(stdout);
+        RrRender(look, w, h);
+    }
+    exit (0);
+#endif
+
 
     RrPaint(look, win, w, h);
     done = 0;

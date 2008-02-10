@@ -218,8 +218,8 @@ static inline void repeat_pixel(RrPixel32 *start, gint w)
 
     /* for >= 8, then use O(log n) memcpy's... */
     else {
-        gint len = 4;
-        gint lenbytes = 4 * sizeof(RrPixel32);
+        gchar *cdest;
+        gint lenbytes;
 
         /* copy the first 3 * 32 bits (3 words) ourselves - then we have
            3 + the original 1 = 4 words to make copies of at a time
@@ -229,16 +229,38 @@ static inline void repeat_pixel(RrPixel32 *start, gint w)
         for (x = 3; x > 0; --x)
             *(dest++) = *start;
 
-        for (x = w - 4; x > 0;) {
-            memcpy(dest, start, lenbytes);
-            x -= len;
-            dest += len;
-            len <<= 1;
+        /* cdest is a pointer to the pixel data that is typed char* so that
+           adding 1 to its position moves it only one byte
+
+           lenbytes is the amount of bytes that we will be copying each
+           iteration.  this doubles each time through the loop.
+
+           x is the number of bytes left to copy into.  lenbytes will alwaysa
+           be bounded by x
+
+           this loop will run O(log n) times (n is the number of bytes we
+           need to copy into), since the size of the copy is doubled each
+           iteration.  it seems that gcc does some nice optimizations to make
+           this memcpy very fast on hardware with support for vector operations
+           such as mmx or see.  here is an idea of the kind of speed up we are
+           getting by doing this (splitvertical3 switches from doing
+           "*(data++) = color" n times to doing this memcpy thing log n times:
+
+           %   cumulative   self              self     total           
+           time   seconds   seconds    calls  ms/call  ms/call  name    
+           49.44      0.88     0.88     1063     0.83     0.83  splitvertical1
+           47.19      1.72     0.84     1063     0.79     0.79  splitvertical2
+            2.81      1.77     0.05     1063     0.05     0.05  splitvertical3
+        */
+        cdest = (gchar*)dest;
+        lenbytes = 4 * sizeof(RrPixel32);
+        for (x = (w - 4) * sizeof(RrPixel32); x > 0;) {
+            memcpy(cdest, start, lenbytes);
+            x -= lenbytes;
+            cdest += lenbytes;
             lenbytes <<= 1;
-            if (len > x) {
-                len = x;
-                lenbytes = x * sizeof(RrPixel32);
-            }
+            if (lenbytes > x)
+                lenbytes = x;
         }
     }
 }
@@ -534,12 +556,14 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 
 static void gradient_horizontal(RrSurface *sf, gint w, gint h)
 {
-    gint x, y;
+    gint x, y, cpbytes;
     RrPixel32 *data = sf->pixel_data, *datav;
+    gchar *datac;
 
     VARS(x);
     SETUP(x, sf->primary, sf->secondary, w);
 
+    /* set the color values for the first row */
     datav = data;
     for (x = w - 1; x > 0; --x) {  /* 0 -> w - 1 */
         *datav = COLOR(x);
@@ -549,21 +573,31 @@ static void gradient_horizontal(RrSurface *sf, gint w, gint h)
     *datav = COLOR(x);
     ++datav;
 
-    for (y = h - 1; y > 0; --y) { /* 1 -> h */
-        memcpy(datav, data, w * sizeof(RrPixel32));
-        datav += w;
+    /* copy the first row to the rest in O(logn) copies */
+    datac = (gchar*)datav;
+    cpbytes = 1 * w * sizeof(RrPixel32);
+    for (y = (h - 1) * w * sizeof(RrPixel32); y > 0;) {
+        memcpy(datac, data, cpbytes);
+        y -= cpbytes;
+        datac += cpbytes;
+        cpbytes <<= 1;
+        if (cpbytes > y)
+            cpbytes = y;
     }
 }
 
 static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
 {
-    gint x, y, half1, half2;
+    gint x, y, half1, half2, cpbytes;
     RrPixel32 *data = sf->pixel_data, *datav;
+    gchar *datac;
 
     VARS(x);
 
     half1 = (w + 1) / 2;
     half2 = w / 2;
+
+    /* set the color values for the first row */
 
     SETUP(x, sf->primary, sf->secondary, half1);
     datav = data;
@@ -586,9 +620,16 @@ static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
         ++datav;
     }
 
-    for (y = h - 1; y > 0; --y) {  /* 1 -> h */
-        memcpy(datav, data, w * sizeof(RrPixel32));
-        datav += w;
+    /* copy the first row to the rest in O(logn) copies */
+    datac = (gchar*)datav;
+    cpbytes = 1 * w * sizeof(RrPixel32);
+    for (y = (h - 1) * w * sizeof(RrPixel32); y > 0;) {
+        memcpy(datac, data, cpbytes);
+        y -= cpbytes;
+        datac += cpbytes;
+        cpbytes <<= 1;
+        if (cpbytes > y)
+            cpbytes = y;
     }
 }
 

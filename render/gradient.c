@@ -425,8 +425,7 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 {
     gint x, y1, y2, y3;
     RrSurface *sf = &a->surface;
-    RrPixel32 *data = sf->pixel_data;
-    RrPixel32 current;
+    RrPixel32 *data, *start;
     gint y1sz, y2sz, y3sz;
 
     VARS(y1);
@@ -455,28 +454,69 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     }
     SETUP(y3, sf->secondary, sf->split_secondary,  y3sz);
 
-    for (y1 = y1sz; y1 > 0; --y1) {
-        current = COLOR(y1);
-        for (x = w - 1; x >= 0; --x)
-            *(data++) = current;
+    /* find the color for the first pixel of each row first */
+    data = sf->pixel_data;
 
+    for (y1 = y1sz-1; y1 > 0; --y1) {
+        *data = COLOR(y1);
+        data += w;
         NEXT(y1);
     }
-
-    for (y2 = y2sz; y2 > 0; --y2) {
-        current = COLOR(y2);
-        for (x = w - 1; x >= 0; --x)
-            *(data++) = current;
-
+    *data = COLOR(y1);
+    data += w;
+    for (y2 = y2sz-1; y2 > 0; --y2) {
+        *data = COLOR(y2);
+        data += w;
         NEXT(y2);
     }
-
-    for (y3 = y3sz; y3 > 0; --y3) {
-        current = COLOR(y3);
-        for (x = w - 1; x >= 0; --x)
-            *(data++) = current;
-
+    *data = COLOR(y2);
+    data += w;
+    for (y3 = y3sz-1; y3 > 0; --y3) {
+        *data = COLOR(y3);
+        data += w;
         NEXT(y3);
+    }
+    *data = COLOR(y3);
+
+    /* copy the first pixels into the whole rows */
+
+    start = sf->pixel_data;
+    data = start + 1;
+
+    for (y1 = h; y1 > 0; --y1) {
+        /* for really small things, just copy ourselves */
+        if (w < 8) {
+            for (x = w-1; x > 0; --x)
+                *(data++) = *start;
+        }
+        /* for >= 8, then use O(log n) memcpy's... */
+        else {
+            gint len = 4;
+            gint lenbytes = 4 * sizeof(RrPixel32);
+
+            /* copy the first 3 * 32 bits (3 words) ourselves - then we have
+               3 + the original 1 = 4 words to make copies of at a time
+
+               this is faster than doing memcpy for 1 or 2 words at a time
+            */
+            for (x = 3; x > 0; --x)
+                *(data++) = *start;
+
+            for (x = w - 4; x > 0;) {
+                memcpy(data, start, lenbytes);
+                x -= len;
+                data += len;
+                len <<= 1;
+                lenbytes <<= 1;
+                if (len > x) {
+                    len = x;
+                    lenbytes = x * sizeof(RrPixel32);
+                }
+            }
+        }
+
+        start += w;
+        ++data;
     }
 }
 
@@ -551,13 +591,13 @@ static void gradient_vertical(RrSurface *sf, gint w, gint h)
 
     for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
         current = COLOR(y);
-        for (x = w - 1; x >= 0; --x)  /* 0 -> w */
+        for (x = w; x > 0; --x)  /* 0 -> w */
             *(data++) = current;
 
         NEXT(y);
     }
     current = COLOR(y);
-    for (x = w - 1; x >= 0; --x)  /* 0 -> w */
+    for (x = w; x > 0; --x)  /* 0 -> w */
         *(data++) = current;
 }
 

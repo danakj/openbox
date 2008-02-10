@@ -126,9 +126,6 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
         dw = (gint)(dh * ((gdouble)sw / sh));
     }
 
-    if (!(dw && dh))
-        return; /* XXX sanity check */
-
     if (sw != dw || sh != dh) {
         /*if (!(rgba->cache && dw == rgba->cwidth && dh == rgba->cheight))*/ {
             g_free(rgba->cache);

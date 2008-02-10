@@ -44,6 +44,7 @@ gint main()
     Window win;
     RrInstance *inst;
     RrAppearance *look;
+    int done;
 
     Window root;
     XEvent report;
@@ -67,8 +68,10 @@ gint main()
     inst = RrInstanceNew(ob_display, ob_screen);
 
     look = RrAppearanceNew(inst, 0);
-    look->surface.grad = RR_SURFACE_PYRAMID;
+    look->surface.grad = RR_SURFACE_SPLIT_VERTICAL;
     look->surface.secondary = RrColorParse(inst, "Yellow");
+    look->surface.split_secondary = RrColorParse(inst, "Red");
+    look->surface.split_primary = RrColorParse(inst, "Green");
     look->surface.primary = RrColorParse(inst, "Blue");
     look->surface.interlaced = FALSE;
     if (ob_display == NULL) {
@@ -77,7 +80,8 @@ gint main()
     }
 
     RrPaint(look, win, w, h);
-    while (1) {
+    done = 0;
+    while (!done) {
         XNextEvent(ob_display, &report);
         switch (report.type) {
         case Expose:
@@ -87,8 +91,10 @@ gint main()
                     report.xconfigure.width,
                     report.xconfigure.height);
             break;
+        case UnmapNotify:
+            done = 1;
+            break;
         }
-
     }
 
     RrAppearanceFree (look);

@@ -30,3 +30,10 @@ fi
 if which start_kdeinit >/dev/null; then
   LD_BIND_NOW=true start_kdeinit --new-startup +kcminit_startup &
 fi
+
+# Run XDG autostart things.  By default don't run anything desktop-specific
+# See xdg-autostart --help more info
+DESKTOP_ENV=""
+if which xdg-autostart; then
+  xdg-autostart $DESKTOP_ENV
+fi

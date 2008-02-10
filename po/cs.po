@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-02 11:51-0500\n"
-"PO-Revision-Date: 2007-07-21 00:15+0200\n"
+"POT-Creation-Date: 2008-02-09 09:34+0100\n"
+"PO-Revision-Date: 2008-02-09 09:33+0100\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -32,33 +32,33 @@ msgstr "Nepodařilo se spustit '%s': %s"
 
 #: openbox/client.c:1988 openbox/client.c:2020
 msgid "Killing..."
-msgstr ""
+msgstr "Ukončování..."
 
 #: openbox/client.c:1990 openbox/client.c:2022
 msgid "Not Responding"
-msgstr ""
+msgstr "Neodpovídá"
 
 #: openbox/client_list_combined_menu.c:91 openbox/client_list_menu.c:94
 msgid "Go there..."
 msgstr "Jdi tam..."
 
-#: openbox/client_list_combined_menu.c:97
+#: openbox/client_list_combined_menu.c:98
 msgid "Manage desktops"
 msgstr "Spravovat plochy"
 
-#: openbox/client_list_combined_menu.c:98 openbox/client_list_menu.c:157
+#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
 msgid "_Add new desktop"
 msgstr "_Přidat novou plochu"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
+#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:159
 msgid "_Remove last desktop"
 msgstr "_Odstranit poslední plochu"
 
-#: openbox/client_list_combined_menu.c:151
+#: openbox/client_list_combined_menu.c:153
 msgid "Windows"
 msgstr "Okna"
 
-#: openbox/client_list_menu.c:204
+#: openbox/client_list_menu.c:206
 msgid "Desktops"
 msgstr "Plochy"
 
@@ -122,7 +122,7 @@ msgstr "Oz_dobit/Odzdobit"
 msgid "_Close"
 msgstr "_Zavřít"
 
-#: openbox/config.c:750
+#: openbox/config.c:754
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Neplatné tlačítko '%s' v konfiguračním souboru"
@@ -255,7 +255,7 @@ msgstr "  --restart           Restartovat Openbox\n"
 
 #: openbox/openbox.c:507
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Ukončit Openbox\n"
 
 #: openbox/openbox.c:508
 msgid ""
@@ -290,11 +290,11 @@ msgstr ""
 "\n"
 "Prosím hlašte chyby na %s\n"
 
-#: openbox/openbox.c:583
+#: openbox/openbox.c:582
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file vyžaduje argument\n"
 
-#: openbox/openbox.c:626
+#: openbox/openbox.c:625
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Neplatný argument příkazové řádky '%s'\n"
@@ -320,6 +320,8 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
+"Openbox je konfigurován pro %d ploch, ale současné sezení má %d.  "
+"KOnfigurace Openboxu bude změněna."
 
 #: openbox/screen.c:1169
 #, c-format

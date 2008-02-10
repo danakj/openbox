@@ -32,6 +32,9 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
 
+bin_SCRIPTS = \
+	tools/xdg-autostart/xdg-autostart
+
 nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \

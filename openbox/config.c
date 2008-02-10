@@ -675,6 +675,11 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n2 = parse_find_node("y", n->children)))
                     config_parse_gravity_coord(doc, n2,
                                                &config_resize_popup_fixed.y);
+
+                config_resize_popup_fixed.x.pos =
+                    MAX(config_resize_popup_fixed.x.pos, 0);
+                config_resize_popup_fixed.y.pos =
+                    MAX(config_resize_popup_fixed.y.pos, 0);
             }
         }
     }

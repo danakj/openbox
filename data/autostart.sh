@@ -22,7 +22,9 @@ if which dbus-launch >/dev/null && test -z "$DBUS_SESSION_BUS_ADDRESS"; then
 fi
 
 # Make GTK apps look and behave how they were set up in the gnome config tools
-if which gnome-settings-daemon >/dev/null; then
+if which /usr/libexec/gnome-settings-daemon >/dev/null; then
+  /usr/libexec/gnome-settings-daemon &
+elif which gnome-settings-daemon >/dev/null; then
   gnome-settings-daemon &
 fi
 

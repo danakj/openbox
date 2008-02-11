@@ -220,7 +220,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     "border.color",
                     &theme->frame_focused_border_color))
         theme->frame_focused_border_color = RrColorNew(inst, 0, 0, 0);
-    /* title separator focused color inherits from focused boder color */
+    /* title separator focused color inherits from focused border color */
     if (!read_color(db, inst,
                     "window.active.title.separator.color",
                     &theme->title_separator_focused_color))
@@ -237,7 +237,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             RrColorNew(inst, theme->frame_focused_border_color->r,
                        theme->frame_focused_border_color->g,
                        theme->frame_focused_border_color->b);
-    /* title separator unfocused color inherits from unfocused boder color */
+    /* title separator unfocused color inherits from unfocused border color */
     if (!read_color(db, inst,
                     "window.inactive.title.separator.color",
                     &theme->title_separator_unfocused_color))

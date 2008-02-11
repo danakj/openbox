@@ -855,7 +855,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it.
-           if the user is doing an intereactive thing, or has a menu open then
+           if the user is doing an interactive thing, or has a menu open then
            the mouse is grabbed (possibly) and if we get these events we don't
            want to deal with them
         */

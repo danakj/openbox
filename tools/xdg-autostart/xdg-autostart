@@ -67,7 +67,7 @@ def main(argv=sys.argv):
         if list: autofile.list(environments)
         else: autofile.run(environments)
 
-class AutostartFile():
+class AutostartFile:
     def __init__(self, path):
         self.path = path
         self.filename = os.path.basename(path)

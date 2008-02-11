@@ -754,14 +754,13 @@ static void gradient_crossdiagonal(RrSurface *sf, gint w, gint h)
     *data = COLOR(x);
 }
 
-static void gradient_pyramid(RrSurface *sf, gint inw, gint inh)
+static void gradient_pyramid(RrSurface *sf, gint w, gint h)
 {
-    gint x, y, w = (inw >> 1) + 1, h = (inh >> 1) + 1;
-    RrPixel32 *data = sf->pixel_data;
-    RrPixel32 *end = data + inw*inh - 1;
-    RrPixel32 current;
+    RrPixel32 *ldata, *rdata;
+    RrPixel32 *cp;
     RrColor left, right;
     RrColor extracorner;
+    gint x, y, halfw, halfh, midx, midy;
 
     VARS(lefty);
     VARS(righty);
@@ -771,54 +770,64 @@ static void gradient_pyramid(RrSurface *sf, gint inw, gint inh)
     extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
     extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
 
-    SETUP(lefty, (&extracorner), sf->secondary, h);
-    SETUP(righty, sf->primary, (&extracorner), h);
+    halfw = w >> 1;
+    halfh = h >> 1;
+    midx = w - halfw - halfw; /* 0 or 1, depending if w is even or odd */
+    midy = h - halfh - halfh;   /* 0 or 1, depending if h is even or odd */
 
-    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+    SETUP(lefty, sf->primary, (&extracorner), halfh + midy);
+    SETUP(righty, (&extracorner), sf->secondary, halfh + midy);
+
+    /* draw the top half
+
+       it is faster to draw both top quarters together than to draw one and
+       then copy it over to the other side.
+    */
+
+    ldata = sf->pixel_data;
+    rdata = ldata + w - 1;
+    for (y = halfh + midy; y > 0; --y) {  /* 0 -> (h+1)/2 */
+        RrPixel32 c;
+
         COLOR_RR(lefty, (&left));
         COLOR_RR(righty, (&right));
 
-        SETUP(x, (&left), (&right), w);
+        SETUP(x, (&left), (&right), halfw + midx);
 
-        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-            current = COLOR(x);
-            *(data+x) = current;
-            *(data+inw-x) = current;
-            *(end-x) = current;
-            *(end-(inw-x)) = current;
+        for (x = halfw + midx - 1; x > 0; --x) {  /* 0 -> (w+1)/2 */
+            c = COLOR(x);
+            *(ldata++) = *(rdata--) = c;
 
             NEXT(x);
         }
-        current = COLOR(x);
-        *(data+x) = current;
-        *(data+inw-x) = current;
-        *(end-x) = current;
-        *(end-(inw-x)) = current;
-
-        data+=inw;
-        end-=inw;
+        c = COLOR(x);
+        *ldata = *rdata = c;
+        ldata += halfw + 1;
+        rdata += halfw - 1 + midx + w;
 
         NEXT(lefty);
         NEXT(righty);
     }
-    COLOR_RR(lefty, (&left));
-    COLOR_RR(righty, (&right));
 
-    SETUP(x, (&left), (&right), w);
+    /* copy the top half into the bottom half, mirroring it, so we can only
+       copy one row at a time
 
-    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-        current = COLOR(x);
-        *(data+x) = current;
-        *(data+inw-x) = current;
-        *(end-x) = current;
-        *(end-(inw-x)) = current;
+       it is faster, to move the writing pointer forward, and the reading
+       pointer backward
 
-        NEXT(x);
+       this is the current code, moving the write pointer forward and read
+       pointer backward
+       41.78      4.26     1.78      504     3.53     3.53  gradient_pyramid2
+       this is the opposite, moving the read pointer forward and the write
+       pointer backward
+       42.27      4.40     1.86      504     3.69     3.69  gradient_pyramid2
+       
+    */
+    ldata = sf->pixel_data + (halfh - 1) * w;
+    cp = ldata + (midy + 1) * w;
+    for (y = halfh; y > 0; --y) {
+        memcpy(cp, ldata, w * sizeof(RrPixel32));
+        ldata -= w;
+        cp += w;
     }
-    current = COLOR(x);
-    *(data+x) = current;
-    *(data+inw-x) = current;
-    *(end-x) = current;
-    *(end-(inw-x)) = current;
 }
-

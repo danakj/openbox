@@ -538,15 +538,6 @@ void client_manage(Window window, ObPrompt *prompt)
     /* update the list hints */
     client_set_list();
 
-    /* watch for when the application stops responding.  only do this for
-       normal windows, i.e. windows which have titlebars and close buttons 
-       and things like that.
-       we don't need to stop pinging on unmanage, because it will be handled
-       automatically by the destroy callback!
-    */
-    if (self->ping && client_normal(self))
-        ping_start(self, client_ping_event);
-
     /* free the ObAppSettings shallow copy */
     g_free(settings);
 
@@ -3264,18 +3255,23 @@ void client_shade(ObClient *self, gboolean shade)
 
 static void client_ping_event(ObClient *self, gboolean dead)
 {
-    self->not_responding = dead;
-    client_update_title(self);
+    if (self->not_responding != dead) {
+        self->not_responding = dead;
+        client_update_title(self);
 
-    if (!dead) {
-        /* it came back to life ! */
+        if (dead)
+            /* the client isn't responding, so ask to kill it */
+            client_prompt_kill(self);
+        else {
+            /* it came back to life ! */
 
-        if (self->kill_prompt) {
-            prompt_unref(self->kill_prompt);
-            self->kill_prompt = NULL;
+            if (self->kill_prompt) {
+                prompt_unref(self->kill_prompt);
+                self->kill_prompt = NULL;
+            }
+
+            self->kill_level = 0;
         }
-
-        self->kill_level = 0;
     }
 }
 
@@ -3283,6 +3279,7 @@ void client_close(ObClient *self)
 {
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
+    /* if closing an internal obprompt, that is just cancelling it */
     if (self->prompt) {
         prompt_cancel(self->prompt);
         return;
@@ -3300,6 +3297,14 @@ void client_close(ObClient *self)
                         OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime,
                         0, 0, 0, NoEventMask);
 
+        /* we're trying to close the window, so see if it is responding. if it
+           is not, then we will let them kill the window */
+        if (self->ping)
+            ping_start(self, client_ping_event);
+
+        /* if we already know the window isn't responding (maybe they clicked
+           no in the kill dialog but it hasn't come back to life), then show
+           the kill dialog */
         if (self->not_responding)
             client_prompt_kill(self);
     }
@@ -3328,15 +3333,22 @@ static void client_prompt_kill(ObClient *self)
             { _("Yes"), OB_KILL_RESULT_YES }
         };
         gchar *m;
-        const gchar *sig;
 
-        if (self->kill_level == 0)
-            sig = "terminate";
+        if (client_on_localhost(self)) {
+            const gchar *sig;
+
+            if (self->kill_level == 0)
+                sig = "terminate";
+            else
+                sig = "kill";
+
+            m = g_strdup_printf
+                (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
+        }
         else
-            sig = "kill";
+            m = g_strdup_printf
+                (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"), self->original_title);
 
-        m = g_strdup_printf
-            (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
 
         self->kill_prompt = prompt_new(m, answers,
                                        sizeof(answers)/sizeof(answers[0]),
@@ -3354,7 +3366,7 @@ void client_kill(ObClient *self)
     /* don't kill our own windows */
     if (self->prompt) return;
 
-    if (!self->client_machine && self->pid) {
+    if (client_on_localhost(self) && self->pid) {
         /* running on the local host */
         if (self->kill_level == 0) {
             ob_debug("killing window 0x%x with pid %lu, with SIGTERM",
@@ -4344,4 +4356,10 @@ ObClient* client_under_pointer(void)
 gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
+}
+
+/*! Returns TRUE if the client is running on the same machine as Openbox */
+gboolean client_on_localhost(ObClient *self)
+{
+    return self->client_machine == NULL;
 }

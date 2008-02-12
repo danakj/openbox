@@ -727,4 +727,7 @@ ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
 
+/*! Returns TRUE if the client is running on the same machine as Openbox */
+gboolean client_on_localhost(ObClient *self);
+
 #endif

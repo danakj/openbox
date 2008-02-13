@@ -28,6 +28,9 @@
 #define FLOOR(i)        ((i) & (~0UL << FRACTION))
 #define AVERAGE(a, b)   (((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)))
 
+/*! Add a picture to an Image, that is, add another copy of the image at
+  another size.  This may add it to the "originals" list or to the
+  "resized" list. */
 static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
                        RrImagePic *pic)
 {
@@ -58,6 +61,8 @@ static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
 #endif
 }
 
+/*! Remove a picture from an Image.  This may remove it from the "originals"
+  list or the "resized" list. */
 static void RemovePicture(RrImage *self, RrImagePic ***list,
                           gint i, gint *len)
 {
@@ -84,9 +89,14 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
     *list = g_renew(RrImagePic*, *list, --*len);
 }
 
+/*! Given a picture in RGBA format, of a specified size, resize it to the new
+  requested size (but keep its aspect ratio).  If the image does not need to
+  be resized (it is already the right size) then this returns NULL.  Otherwise
+  it returns a newly allocated RrImagePic with the resized picture inside it
+*/
 static RrImagePic* ResizeImage(RrPixel32 *src,
-                                       gulong srcW, gulong srcH,
-                                       gulong dstW, gulong dstH)
+                               gulong srcW, gulong srcH,
+                               gulong dstW, gulong dstH)
 {
     RrPixel32 *dst;
     RrImagePic *pic;
@@ -199,6 +209,8 @@ void DrawRGBA(RrPixel32 *target, gint target_w, gint target_h,
     gint dw, dh;
 
     g_assert(source_w <= area->width && source_h <= area->height);
+    g_assert(area->x + area->width <= target_w);
+    g_assert(area->y + area->height <= target_h);
 
     /* keep the aspect ratio */
     dw = area->width;
@@ -246,6 +258,7 @@ void DrawRGBA(RrPixel32 *target, gint target_w, gint target_h,
     }
 }
 
+/*! Draw an RGBA texture into a target pixel buffer. */
 void RrImageDrawRGBA(RrPixel32 *target, RrTextureRGBA *rgba,
                      gint target_w, gint target_h,
                      RrRect *area)
@@ -270,9 +283,12 @@ void RrImageDrawRGBA(RrPixel32 *target, RrTextureRGBA *rgba,
                  rgba->alpha, area);
 }
 
+/*! Create a new RrImage, which is linked to an image cache */
 RrImage* RrImageNew(RrImageCache *cache)
 {
     RrImage *self;
+
+    g_assert(cache != NULL);
 
     self = g_new0(RrImage, 1);
     self->ref = 1;
@@ -300,6 +316,9 @@ void RrImageUnref(RrImage *self)
     }
 }
 
+/*! Add a new picture with the given RGBA pixel data and dimensions into the
+  RrImage.  This adds an "original" picture to the image.
+*/
 void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
 {
     gint i;
@@ -330,6 +349,9 @@ void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
     AddPicture(self, &self->original, &self->n_original, pic);
 }
 
+/*! Remove the picture from the RrImage which has the given dimensions. This
+ removes an "original" picture from the image.
+*/
 void RrImageRemovePicture(RrImage *self, gint w, gint h)
 {
     gint i;
@@ -342,6 +364,11 @@ void RrImageRemovePicture(RrImage *self, gint w, gint h)
         }
 }
 
+/*! Draw an RrImage texture into a target pixel buffer.  If the RrImage does
+  not contain a picture of the appropriate size, then one of its "original"
+  pictures will be resized and used (and stored in the RrImage as a "resized"
+  picture).
+ */
 void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
                       gint target_w, gint target_h,
                       RrRect *area)
@@ -431,13 +458,13 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
 
         /* add the resized image to the image, as the first in the resized
            list */
-        if (self->n_resized >= MAX_CACHE_RESIZED) {
+        if (self->n_resized >= self->cache->max_resized_saved)
             /* remove the last one (last used one) */
             RemovePicture(self, &self->resized, self->n_resized - 1,
                           &self->n_resized);
-        }
-        /* add it to the top of the resized list */
-        AddPicture(self, &self->resized, &self->n_resized, pic);
+        if (self->cache->max_resized_saved)
+            /* add it to the top of the resized list */
+            AddPicture(self, &self->resized, &self->n_resized, pic);
     }
 
     g_assert(pic != NULL);

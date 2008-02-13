@@ -22,6 +22,9 @@
 #include "render.h"
 #include "geom.h"
 
+/*! Initialize an RrImagePicture to the specified dimensions and pixel data */
+void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data);
+
 void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
                       gint target_w, gint target_h,
                       RrRect *area);

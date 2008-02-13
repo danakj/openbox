@@ -28,6 +28,18 @@
 #define FLOOR(i)        ((i) & (~0UL << FRACTION))
 #define AVERAGE(a, b)   (((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)))
 
+void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data)
+{
+    gint i;
+
+    pic->width = w;
+    pic->height = h;
+    pic->data = data;
+    pic->sum = 0;
+    for (i = w*h; i > 0; --i)
+        pic->sum += *(data++);
+}
+
 /*! Add a picture to an Image, that is, add another copy of the image at
   another size.  This may add it to the "originals" list or to the
   "resized" list. */
@@ -98,7 +110,7 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
                                gulong srcW, gulong srcH,
                                gulong dstW, gulong dstH)
 {
-    RrPixel32 *dst;
+    RrPixel32 *dst, *dststart;
     RrImagePic *pic;
     gulong dstX, dstY, srcX, srcY;
     gulong srcX1, srcX2, srcY1, srcY2;
@@ -118,11 +130,7 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
     if (srcW == dstW && srcH == dstH)
         return NULL; /* no scaling needed ! */
 
-    pic = g_new(RrImagePic, 1);
-    dst = g_new(RrPixel32, dstW * dstH);
-    pic->width = dstW;
-    pic->height = dstH;
-    pic->data = dst;
+    dststart = dst = g_new(RrPixel32, dstW * dstH);
 
     ratioX = (srcW << FRACTION) / dstW;
     ratioY = (srcH << FRACTION) / dstH;
@@ -193,6 +201,9 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
                      (alpha << RrDefaultAlphaOffset);
         }
     }
+
+    pic = g_new(RrImagePic, 1);
+    RrImagePicInit(pic, dstW, dstH, dststart);
 
     return pic;
 }
@@ -343,9 +354,7 @@ void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
 
     /* add the new picture */
     pic = g_new(RrImagePic, 1);
-    pic->width = w;
-    pic->height = h;
-    pic->data = g_memdup(data, w*h*sizeof(RrPixel32));
+    RrImagePicInit(pic, w, h, g_memdup(data, w*h*sizeof(RrPixel32)));
     AddPicture(self, &self->original, &self->n_original, pic);
 }
 

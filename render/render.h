@@ -227,6 +227,9 @@ struct _RrAppearance {
 struct _RrImagePic {
     gint width, height;
     RrPixel32 *data;
+    /* The sum of all the pixels.  This is used to compare pictures if their
+       hashes match. */
+    gint sum;
 };
 
 /*! An RrImage is a sort of meta-image.  It can contain multiple versions of

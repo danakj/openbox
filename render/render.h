@@ -234,11 +234,18 @@ struct _RrImagePic {
   pictures */
 struct _RrImage {
     gint ref;
-    struct _RrImageCache *cache;
+    RrImageCache *cache;
 
-    struct _RrImagePic **original;
+    /*! An array of "originals", that is of RrPictures that have been added
+      to the image in various sizes, and that have not been resized.  These
+      are explicitly added to the RrImage. */
+    RrImagePic **original;
     gint n_original;
-    struct _RrImagePic **resized;
+    /*! An array of "resized" pictures.  When an "original" RrPicture
+      needs to be resized for drawing, it is saved in here so that it doesn't
+      need to be resized again.  These are automatically added to the
+      RrImage. */
+    RrImagePic **resized;
     gint n_resized;
 };
 
@@ -317,7 +324,10 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
                         gint *w, gint *h, RrPixel32 **data);
 
-RrImageCache* RrImageCacheNew();
+/*! Create a new image cache for RrImages.
+  @param max_resized_saved The number of resized copies of an image to save
+*/
+RrImageCache* RrImageCacheNew(gint max_resized_saved);
 void          RrImageCacheRef(RrImageCache *self);
 void          RrImageCacheUnref(RrImageCache *self);
 

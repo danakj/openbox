@@ -183,7 +183,11 @@ gint main(gint argc, gchar **argv)
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
     if (ob_rr_inst == NULL)
         ob_exit_with_error(_("Failed to initialize the obrender library."));
-    ob_rr_icons = RrImageCacheNew();
+    /* Saving 3 resizes of an RrImage makes a lot of sense for icons, as there
+       are generally 3 icon sizes needed: the titlebar icon, the menu icon,
+       and the alt-tab icon
+    */
+    ob_rr_icons = RrImageCacheNew(3);
 
     XSynchronize(ob_display, xsync);
 

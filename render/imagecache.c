@@ -22,12 +22,15 @@
 static gboolean RrImagePicEqual(const RrImagePic *p1,
                                 const RrImagePic *p2);
 
-RrImageCache* RrImageCacheNew()
+RrImageCache* RrImageCacheNew(gint max_resized_saved)
 {
     RrImageCache *self;
 
+    g_assert(max_resized_saved >= 0);
+
     self = g_new(RrImageCache, 1);
     self->ref = 1;
+    self->max_resized_saved = max_resized_saved;
     self->table = g_hash_table_new((GHashFunc)RrImagePicHash,
                                    (GEqualFunc)RrImagePicEqual);
     return self;
@@ -59,9 +62,6 @@ RrImage* RrImageCacheFind(RrImageCache *self,
     return g_hash_table_lookup(self->table, &pic);
 }
 
-/* This is a fast, reversable hash function called "lookup3", found here:
-   http://burtleburtle.net/bob/c/lookup3.c
-*/
 #define hashsize(n) ((RrPixel32)1<<(n))
 #define hashmask(n) (hashsize(n)-1)
 #define rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))
@@ -87,6 +87,13 @@ RrImage* RrImageCacheFind(RrImageCache *self,
   c ^= b; c -= rot(b,24); \
 }
 
+/* This is a fast, reversable hash function called "lookup3", found here:
+   http://burtleburtle.net/bob/c/lookup3.c, by Bob Jenkins
+
+   This hashing algorithm is "reversible", that is, not cryptographically
+   secure at all.  But we don't care about that, we just want something to
+   tell when images are the same or different relatively quickly.
+*/
 guint32 hashword(const guint32 *key, gint length, guint32 initval)
 {
     guint32 a,b,c;
@@ -119,6 +126,9 @@ guint32 hashword(const guint32 *key, gint length, guint32 initval)
     return c;
 }
 
+/*! This is some arbitrary initial value for the hashing function.  It's
+  constant so that you get the same result from the same data each time.
+*/
 #define HASH_INITVAL 0xf00d
 
 guint RrImagePicHash(const RrImagePic *p)

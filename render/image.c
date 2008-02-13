@@ -346,7 +346,7 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
                       gint target_w, gint target_h,
                       RrRect *area)
 {
-    gint i, min_diff, min_i;
+    gint i, min_diff, min_i, min_aspect_diff, min_aspect_i;
     RrImage *self;
     RrImagePic *pic;
 
@@ -386,23 +386,42 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
         }
 
     if (!pic) {
+        gdouble aspect;
+
         /* find an original with a close size */
-        min_diff = -1;
-        min_i = 0;
+        min_diff = min_aspect_diff = -1;
+        min_i = min_aspect_i = 0;
+        aspect = ((gdouble)area->width) / area->height;
         for (i = 0; i < self->n_original; ++i) {
             gint diff;
             gint wdiff, hdiff;
+            gdouble myasp;
 
             /* our size difference metric.. */
             wdiff = self->original[i]->width - area->width;
             hdiff = self->original[i]->height - area->height;
             diff = (wdiff * wdiff) + (hdiff * hdiff);
 
+            /* find the smallest difference */
             if (min_diff < 0 || diff < min_diff) {
                 min_diff = diff;
                 min_i = i;
             }
+            /* and also find the smallest difference with the same aspect
+               ratio (and prefer this one) */
+            myasp = ((gdouble)self->original[i]->width) /
+                self->original[i]->height;
+            if (ABS(aspect - myasp) < 0.0000001 &&
+                (min_aspect_diff < 0 || diff < min_aspect_diff))
+            {
+                min_aspect_diff = diff;
+                min_aspect_i = i;
+            }
         }
+
+        /* use the aspect ratio correct source if there is one */
+        if (min_aspect_i >= 0)
+            min_i = min_aspect_i;
 
         /* resize the original to the given area */
         pic = ResizeImage(self->original[min_i]->data,

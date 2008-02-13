@@ -18,6 +18,7 @@
 
 #include "render.h"
 #include "imagecache.h"
+#include "image.h"
 
 static gboolean RrImagePicEqual(const RrImagePic *p1,
                                 const RrImagePic *p2);
@@ -56,9 +57,8 @@ RrImage* RrImageCacheFind(RrImageCache *self,
                           RrPixel32 *data, gint w, gint h)
 {
     RrImagePic pic;
-    pic.width = w;
-    pic.height = h;
-    pic.data = data;
+
+    RrImagePicInit(&pic, w, h, data);
     return g_hash_table_lookup(self->table, &pic);
 }
 
@@ -139,21 +139,6 @@ guint RrImagePicHash(const RrImagePic *p)
 static gboolean RrImagePicEqual(const RrImagePic *p1,
                                 const RrImagePic *p2)
 {
-    guint s1, s2;
-    RrPixel32 *data1, *data2;
-    gint i;
-
-    if (p1->width != p2->width || p1->height != p2->height) return FALSE;
-
-    /* strcmp() would probably suck on 4k of data.. sum all their values and
-       see if they get the same thing.  they already matched on their hashes
-       at this point. */
-    s1 = s2 = 0;
-    data1 = p1->data;
-    data2 = p2->data;
-    for (i = 0; i < p1->width * p1->height; ++i, ++data1)
-        s1 += *data1;
-    for (i = 0; i < p2->width * p2->height; ++i, ++data2)
-        s2 += *data2;
-    return s1 == s2;
+    return p1->width == p2->width && p1->height == p2->height &&
+        p1->sum == p2->sum;
 }

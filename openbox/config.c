@@ -101,6 +101,7 @@ GSList *config_per_app_settings;
 ObAppSettings* config_create_app_settings(void)
 {
     ObAppSettings *settings = g_new0(ObAppSettings, 1);
+    settings->type = -1;
     settings->decor = -1;
     settings->shade = -1;
     settings->monitor = -1;
@@ -124,6 +125,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     g_assert(src != NULL);
     g_assert(dst != NULL);
 
+    copy_if(type, -1);
     copy_if(decor, -1);
     copy_if(shade, -1);
     copy_if(focus, -1);
@@ -193,15 +195,16 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
                                    xmlNodePtr node, gpointer data)
 {
     xmlNodePtr app = parse_find_node("application", node->children);
-    gchar *name = NULL, *class = NULL, *role = NULL;
-    gboolean name_set, class_set;
+    gchar *name = NULL, *class = NULL, *role = NULL, *type = NULL;
+    gboolean name_set, class_set, type_set;
     gboolean x_pos_given;
 
     while (app) {
-        name_set = class_set = x_pos_given = FALSE;
+        name_set = class_set = type_set = x_pos_given = FALSE;
 
         class_set = parse_attr_string("class", app, &class);
         name_set = parse_attr_string("name", app, &name);
+        type_set = parse_attr_string("type", app, &type);
         if (class_set || name_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
@@ -211,6 +214,25 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
 
             if (class_set)
                 settings->class = g_pattern_spec_new(class);
+
+            if (type_set) {
+                if (!g_ascii_strcasecmp(type, "normal"))
+                    settings->type = OB_CLIENT_TYPE_NORMAL;
+                else if (!g_ascii_strcasecmp(type, "dialog"))
+                    settings->type = OB_CLIENT_TYPE_DIALOG;
+                else if (!g_ascii_strcasecmp(type, "splash"))
+                    settings->type = OB_CLIENT_TYPE_SPLASH;
+                else if (!g_ascii_strcasecmp(type, "utility"))
+                    settings->type = OB_CLIENT_TYPE_UTILITY;
+                else if (!g_ascii_strcasecmp(type, "menu"))
+                    settings->type = OB_CLIENT_TYPE_MENU;
+                else if (!g_ascii_strcasecmp(type, "toolbar"))
+                    settings->type = OB_CLIENT_TYPE_TOOLBAR;
+                else if (!g_ascii_strcasecmp(type, "dock"))
+                    settings->type = OB_CLIENT_TYPE_DOCK;
+                else if (!g_ascii_strcasecmp(type, "desktop"))
+                    settings->type = OB_CLIENT_TYPE_DESKTOP;
+            }
 
             if (parse_attr_string("role", app, &role))
                 settings->role = g_pattern_spec_new(role);

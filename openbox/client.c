@@ -844,12 +844,14 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
             match = FALSE;
         else if (app->class &&
-                !g_pattern_match(app->class,
-                                 strlen(self->class), self->class, NULL))
+                 !g_pattern_match(app->class,
+                                  strlen(self->class), self->class, NULL))
             match = FALSE;
         else if (app->role &&
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
+            match = FALSE;
+        else if ((signed)app->type >= 0 && app->type != self->type)
             match = FALSE;
 
         if (match) {

@@ -23,6 +23,7 @@
 #include "misc.h"
 #include "stacking.h"
 #include "place.h"
+#include "client.h"
 #include "geom.h"
 #include "moveresize.h"
 #include "render/render.h"
@@ -38,6 +39,7 @@ struct _ObAppSettings
     GPatternSpec *class;
     GPatternSpec *name;
     GPatternSpec *role;
+    ObClientType  type;
 
     GravityPoint position;
     gboolean pos_given;

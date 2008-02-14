@@ -642,7 +642,9 @@
 
   <application name="first element of window's WM_CLASS property (see xprop)"
               class="second element of window's WM_CLASS property (see xprop)"
-               role="the window's WM_WINDOW_ROLE property (see xprop)">
+               role="the window's WM_WINDOW_ROLE property (see xprop)"
+               type="the window's _NET_WM_WINDOW_TYPE (if unspecified, then
+                       it is dialog for child windows)">
   # the name or the class can be set, or both. this is used to match
   # windows when they appear. role can optionally be set as well, to
   # further restrict your matches.
@@ -650,6 +652,9 @@
   # the name, class, and role use simple wildcard matching such as those
   # used by a shell. you can use * to match any characters and ? to match
   # any single character.
+
+  # the type is one of: normal, dialog, splash, utility, menu, toolbar, dock,
+  #    or desktop
 
   # when multiple rules match a window, they will all be applied, in the
   # order that they appear in this list

@@ -29,7 +29,7 @@ lib_LTLIBRARIES = \
 	obt/libobt.la \
 	engines/libconcept.la \
 	engines/libdefault.la
-#   engines/libconcept2.la \
+#	engines/libconcept2.la \
 #	engines/libminimal.la
 
 bin_PROGRAMS = \
@@ -190,52 +190,52 @@ engines_libdefault_la_SOURCES = \
 
 ## frame_concept ##
 engines_libconcept_la_CPPFLAGS = \
-    $(X_CFLAGS) \
-    $(GLIB_CFLAGS) \
-    $(XML_CFLAGS) \
-    $(PANGO_CFLAGS) \
-    $(XFT_CFLAGS) \
-    $(IMLIB2_CFLAGS) \
-    $(GDK_PIXBUF_CFLAGS) \
-    $(GDK_PIXBUF_XLIB_CFLAGS) \
-    -DG_LOG_DOMAIN=\"ObRender\" \
-    -DDEFAULT_THEME=\"$(theme)\"
+	$(X_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(XML_CFLAGS) \
+	$(PANGO_CFLAGS) \
+	$(XFT_CFLAGS) \
+	$(IMLIB2_CFLAGS) \
+	$(GDK_PIXBUF_CFLAGS) \
+	$(GDK_PIXBUF_XLIB_CFLAGS) \
+	-DG_LOG_DOMAIN=\"ObRender\" \
+	-DDEFAULT_THEME=\"$(theme)\"
 engines_libconcept_la_LDFLAGS = \
-    -version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
+	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 engines_libconcept_la_LIBADD = \
-    render/libobrender.la \
-    $(X_LIBS) \
-    $(PANGO_LIBS) \
-    $(XFT_LIBS) \
-    $(GLIB_LIBS) \
-    $(IMLIB2_LIBS) \
-    $(GDK_PIXBUF_LIBS) \
-    $(GDK_PIXBUF_XLIB_LIBS) \
-    $(XML_LIBS)
+	render/libobrender.la \
+	$(X_LIBS) \
+	$(PANGO_LIBS) \
+	$(XFT_LIBS) \
+	$(GLIB_LIBS) \
+	$(IMLIB2_LIBS) \
+	$(GDK_PIXBUF_LIBS) \
+	$(GDK_PIXBUF_XLIB_LIBS) \
+	$(XML_LIBS)
 engines_libconcept_la_SOURCES = \
-    gettext.h \
-    render/color.h \
-    render/color.c \
-    render/font.h \
-    render/font.c \
-    render/geom.h \
-    render/gradient.h \
-    render/gradient.c \
-    render/icon.h \
-    render/image.h \
-    render/image.c \
-    render/instance.h \
-    render/instance.c \
-    render/mask.h \
-    render/mask.c \
-    render/render.h \
-    render/render.c \
-    openbox/engine_interface.h \
-    openbox/engine_interface.c \
-    engines/concept/config.h \
-    engines/concept/config.c \
-    engines/concept/plugin.h \
-    engines/concept/plugin.c
+	gettext.h \
+	render/color.h \
+	render/color.c \
+	render/font.h \
+	render/font.c \
+	render/geom.h \
+	render/gradient.h \
+	render/gradient.c \
+	render/icon.h \
+	render/image.h \
+	render/image.c \
+	render/instance.h \
+	render/instance.c \
+	render/mask.h \
+	render/mask.c \
+	render/render.h \
+	render/render.c \
+	openbox/engine_interface.h \
+	openbox/engine_interface.c \
+	engines/concept/config.h \
+	engines/concept/config.c \
+	engines/concept/plugin.h \
+	engines/concept/plugin.c
 
 ## obt ##
 
@@ -372,8 +372,8 @@ openbox_openbox_SOURCES = \
 	openbox/focus_cycle_indicator.h \
 	openbox/focus_cycle_popup.c \
 	openbox/focus_cycle_popup.h \
-    openbox/engine_interface.h \
-    openbox/engine_interface.c \
+	openbox/engine_interface.h \
+	openbox/engine_interface.c \
 	openbox/geom.h \
 	openbox/grab.c \
 	openbox/grab.h \
@@ -430,15 +430,15 @@ tools_gnome_panel_control_gnome_panel_control_SOURCES = \
 
 ## default button masks ##
 dist_docxbm_DATA = \
-        data/xbm/bullet.xbm \
-        data/xbm/close.xbm \
-        data/xbm/desk_toggled.xbm \
-        data/xbm/desk.xbm \
-        data/xbm/iconify.xbm \
-        data/xbm/max_toggled.xbm \
-        data/xbm/max.xbm \
-        data/xbm/shade_toggled.xbm \
-        data/xbm/shade.xbm
+	data/xbm/bullet.xbm \
+	data/xbm/close.xbm \
+	data/xbm/desk_toggled.xbm \
+	data/xbm/desk.xbm \
+	data/xbm/iconify.xbm \
+	data/xbm/max_toggled.xbm \
+	data/xbm/max.xbm \
+	data/xbm/shade_toggled.xbm \
+	data/xbm/shade.xbm
 
 
 ## themes ##

@@ -87,16 +87,22 @@ typedef enum
     OB_BUTTON_ICONIFY = 5
 } ObFrameButton;
 
+/* The plugin must implement standars triggers and is free to use other
+ * It's mimic signal (USR1 and USR2) */
 typedef enum
 {
-    OB_FRAME_STATE_NORMAL,
-    OB_FRAME_STATE_INCONIFIED,
-    OB_FRAME_STATE_SHADED,
-    OB_FRAME_STATE_MAX,
-    OB_FRAME_STATE_MAX_VERT,
-    OB_FRAME_STATE_MAX_HORZ,
-    OB_FRAME_STATE_NO_BORDER
-} ObFrameState;
+    OB_TRIGGER_NORMAL,
+    OB_TRIGGER_INCONIFIED,
+    OB_TRIGGER_SHADED,
+    OB_TRIGGER_MAX,
+    OB_TRIGGER_MAX_VERT,
+    OB_TRIGGER_MAX_HORZ,
+    OB_TRIGGER_NO_BORDER,
+    OB_TRIGGER_PLUGIN1,
+    OB_TRIGGER_PLUGIN2,
+    OB_TRIGGER_PLUGIN3,
+    OB_TRIGGER_PLUGIN4, /* ... */
+} ObFrameTrigger;
 
 struct _ObFramePlugin
 {
@@ -147,9 +153,10 @@ struct _ObFramePlugin
     Rect (*frame_get_window_area)(gpointer);
     /* set the requested client area */
     void (*frame_set_client_area)(gpointer, Rect);
-    /* Draw the frame */
+    /* Update size, move/resize windows */
     void (*frame_update_layout)(gpointer self, gboolean is_resize,
             gboolean is_fake);
+    /* Update skin, color/texture windows */ 
     void (*frame_update_skin)(gpointer);
 
     void (*frame_set_hover_flag)(gpointer, ObFrameButton);
@@ -163,6 +170,9 @@ struct _ObFramePlugin
     gboolean (*frame_is_visible)(gpointer);
     gboolean (*frame_is_max_horz)(gpointer);
     gboolean (*frame_is_max_vert)(gpointer);
+    
+    /* This must implement triggers (currently not used) */
+    void (*frame_trigger)(gpointer, ObFrameTrigger);
 
     gint (*load_theme_config)(const RrInstance *inst, const gchar *name,
             const gchar * path, XrmDatabase db, RrFont *active_window_font,

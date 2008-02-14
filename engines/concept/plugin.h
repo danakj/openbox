@@ -162,7 +162,7 @@ void frame_end_iconify_animation(gpointer self);
 gboolean frame_iconify_animating(gpointer _self);
 
 /* Set the layout wanted by client */
-void frame_update_state(gpointer, ObFrameState);
+/*void frame_update_state(gpointer, ObFrameState);*/
 /* This give the allowed area for client window */
 Rect frame_get_window_area(gpointer);
 void frame_set_client_area(gpointer, Rect);

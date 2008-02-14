@@ -218,6 +218,8 @@ void free_theme_statics(gpointer self);
 gboolean frame_animate_iconify(gpointer self);
 void frame_adjust_cursors(gpointer self);
 
+void frame_trigger(gpointer, ObFrameTrigger);
+
 /* Global for renderframe.c only */
 extern ObFramePlugin plugin;
 #define OBDEFAULTFRAME(x) ((ObDefaultFrame *)(x))

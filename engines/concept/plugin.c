@@ -1119,27 +1119,39 @@ ObFramePlugin plugin = { 0, //gpointer handler;
         frame_adjust_shape, //void (*frame_adjust_shape) (gpointer self);
         frame_grab, //void (*frame_adjust_area) (gpointer self, gboolean moved, gboolean resized, gboolean fake);
         frame_ungrab, frame_context, //void (*frame_adjust_state) (gpointer self);
-        frame_set_is_visible, frame_set_is_focus, frame_set_is_max_vert,
-                frame_set_is_max_horz, frame_set_is_shaded,
+        frame_set_is_visible, /* */
+        frame_set_is_focus, /* */
+        frame_set_is_max_vert, /* */
+        frame_set_is_max_horz, /* */
+        frame_set_is_shaded, /* */
+        frame_flash_start, /* */
+        frame_flash_stop, /* */
+        frame_begin_iconify_animation, /* */
+        frame_end_iconify_animation, /* */
+        frame_iconify_animating, /* */
 
-        frame_flash_start, frame_flash_stop, frame_begin_iconify_animation,
-                frame_end_iconify_animation, frame_iconify_animating,
-
-        frame_set_decorations,
+        frame_set_decorations, /* */
         /* This give the window area */
-        frame_get_window_area, frame_set_client_area,
+        frame_get_window_area, /* */
+        frame_set_client_area, /* */
         /* Draw the frame */
-        frame_update_layout, frame_update_skin,
+        frame_update_layout, /* */
+        frame_update_skin, /* */
 
-        frame_set_hover_flag, frame_set_press_flag,
+        frame_set_hover_flag, /* */
+        frame_set_press_flag, /* */
 
-        frame_get_window,
+        frame_get_window, /* */
+ 
+        frame_get_size, /* */
+        frame_get_decorations, /* */
 
-        frame_get_size, frame_get_decorations,
+        frame_is_visible, /* */
+        frame_is_max_horz, frame_is_max_vert, /* */
+        
+        NULL, /* */
 
-        frame_is_visible, frame_is_max_horz, frame_is_max_vert,
-
-        load_theme_config,
+        load_theme_config, /* */
 
         /* This fields are fill by openbox. */
         0, //Display * ob_display;

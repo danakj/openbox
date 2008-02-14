@@ -27,8 +27,7 @@ not all, guidelines:
    lines
  * most other constructs should have braces on the same line as the
    statement
+ * else appears on a new line, just like an if
  * when in doubt look at the rest of the source
  * vim users can use "set expandtab tabstop=4 shiftwidth=4
    softtabstop=4" for some of this
-
-

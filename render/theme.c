@@ -177,9 +177,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->osd_font = RrFontOpenDefault(inst);
 
     /* load direct dimensions */
-    if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
-        theme->menu_overlap < -100 || theme->menu_overlap > 100)
-        theme->menu_overlap = 0;
+    if ((!read_int(db, "menu.overlap.x", &theme->menu_overlap_x) &&
+         !read_int(db, "menu.overlap", &theme->menu_overlap_x)) ||
+        theme->menu_overlap_x < -100 || theme->menu_overlap_x > 100)
+        theme->menu_overlap_x = 0;
+    if ((!read_int(db, "menu.overlap.y", &theme->menu_overlap_y) &&
+         !read_int(db, "menu.overlap", &theme->menu_overlap_y)) ||
+        theme->menu_overlap_y < -100 || theme->menu_overlap_y > 100)
+        theme->menu_overlap_y = 0;
     if (!read_int(db, "window.handle.width", &theme->handle_height) ||
         theme->handle_height < 0 || theme->handle_height > 100)
         theme->handle_height = 6;
@@ -542,6 +547,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
                                        OB_DEFAULT_ICON_HEIGHT,
                                        OB_DEFAULT_ICON_pixel_data);
+    theme->def_win_icon_w = OB_DEFAULT_ICON_WIDTH;
+    theme->def_win_icon_h = OB_DEFAULT_ICON_HEIGHT;
+
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,

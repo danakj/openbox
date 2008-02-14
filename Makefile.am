@@ -85,6 +85,8 @@ render_libobrender_la_SOURCES = \
 	render/icon.h \
 	render/image.h \
 	render/image.c \
+	render/imagecache.h \
+	render/imagecache.c \
 	render/instance.h \
 	render/instance.c \
 	render/mask.h \
@@ -250,6 +252,8 @@ openbox_openbox_SOURCES = \
 	openbox/ping.h \
 	openbox/place.c \
 	openbox/place.h \
+	openbox/prompt.c \
+	openbox/prompt.h \
 	openbox/popup.c \
 	openbox/popup.h \
 	openbox/prop.c \

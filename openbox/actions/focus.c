@@ -71,8 +71,10 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             (data->context != OB_FRAME_CONTEXT_CLIENT &&
              data->context != OB_FRAME_CONTEXT_FRAME))
         {
+            actions_client_move(data, TRUE);
             client_activate(data->client, o->here,
                             o->activate, o->activate, TRUE);
+            actions_client_move(data, FALSE);
         }
     } else if (data->context == OB_FRAME_CONTEXT_DESKTOP) {
         /* focus action on the root window. make keybindings work for this

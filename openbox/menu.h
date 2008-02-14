@@ -116,11 +116,9 @@ struct _ObNormalMenuEntry {
     /* List of ObActions */
     GSList *actions;
 
-    /* Icon shit */
-    gint icon_width;
-    gint icon_height;
-    gint icon_alpha;
-    RrPixel32 *icon_data;
+    /* Icon stuff.  If you set this, make sure you RrImageRef() it too. */
+    RrImage *icon;
+    gint     icon_alpha;
 
     /* Mask icon */
     RrPixmapMask *mask;

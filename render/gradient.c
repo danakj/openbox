@@ -197,6 +197,74 @@ static void create_bevel_colors(RrAppearance *l)
     l->surface.bevel_dark = RrColorNew(l->inst, r, g, b);
 }
 
+/*! Repeat the first pixel over the entire block of memory
+  @param start The block of memory. start[0] will be copied
+         to the rest of the block.
+  @param w The width of the block of memory (including the already-set first
+           element
+*/
+static inline void repeat_pixel(RrPixel32 *start, gint w)
+{
+    gint x;
+    RrPixel32 *dest;
+
+    dest = start + 1;
+
+    /* for really small things, just copy ourselves */
+    if (w < 8) {
+        for (x = w-1; x > 0; --x)
+            *(dest++) = *start;
+    }
+
+    /* for >= 8, then use O(log n) memcpy's... */
+    else {
+        gchar *cdest;
+        gint lenbytes;
+
+        /* copy the first 3 * 32 bits (3 words) ourselves - then we have
+           3 + the original 1 = 4 words to make copies of at a time
+
+           this is faster than doing memcpy for 1 or 2 words at a time
+        */
+        for (x = 3; x > 0; --x)
+            *(dest++) = *start;
+
+        /* cdest is a pointer to the pixel data that is typed char* so that
+           adding 1 to its position moves it only one byte
+
+           lenbytes is the amount of bytes that we will be copying each
+           iteration.  this doubles each time through the loop.
+
+           x is the number of bytes left to copy into.  lenbytes will alwaysa
+           be bounded by x
+
+           this loop will run O(log n) times (n is the number of bytes we
+           need to copy into), since the size of the copy is doubled each
+           iteration.  it seems that gcc does some nice optimizations to make
+           this memcpy very fast on hardware with support for vector operations
+           such as mmx or see.  here is an idea of the kind of speed up we are
+           getting by doing this (splitvertical3 switches from doing
+           "*(data++) = color" n times to doing this memcpy thing log n times:
+
+           %   cumulative   self              self     total           
+           time   seconds   seconds    calls  ms/call  ms/call  name    
+           49.44      0.88     0.88     1063     0.83     0.83  splitvertical1
+           47.19      1.72     0.84     1063     0.79     0.79  splitvertical2
+            2.81      1.77     0.05     1063     0.05     0.05  splitvertical3
+        */
+        cdest = (gchar*)dest;
+        lenbytes = 4 * sizeof(RrPixel32);
+        for (x = (w - 4) * sizeof(RrPixel32); x > 0;) {
+            memcpy(cdest, start, lenbytes);
+            x -= lenbytes;
+            cdest += lenbytes;
+            lenbytes <<= 1;
+            if (lenbytes > x)
+                lenbytes = x;
+        }
+    }
+}
+
 static void gradient_parentrelative(RrAppearance *a, gint w, gint h)
 {
     RrPixel32 *source, *dest;
@@ -423,10 +491,9 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
 
 static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
 {
-    gint x, y1, y2, y3;
+    gint y1, y2, y3;
     RrSurface *sf = &a->surface;
-    RrPixel32 *data = sf->pixel_data;
-    RrPixel32 current;
+    RrPixel32 *data;
     gint y1sz, y2sz, y3sz;
 
     VARS(y1);
@@ -455,39 +522,48 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     }
     SETUP(y3, sf->secondary, sf->split_secondary,  y3sz);
 
-    for (y1 = y1sz; y1 > 0; --y1) {
-        current = COLOR(y1);
-        for (x = w - 1; x >= 0; --x)
-            *(data++) = current;
+    /* find the color for the first pixel of each row first */
+    data = sf->pixel_data;
 
+    for (y1 = y1sz-1; y1 > 0; --y1) {
+        *data = COLOR(y1);
+        data += w;
         NEXT(y1);
     }
-
-    for (y2 = y2sz; y2 > 0; --y2) {
-        current = COLOR(y2);
-        for (x = w - 1; x >= 0; --x)
-            *(data++) = current;
-
+    *data = COLOR(y1);
+    data += w;
+    for (y2 = y2sz-1; y2 > 0; --y2) {
+        *data = COLOR(y2);
+        data += w;
         NEXT(y2);
     }
-
-    for (y3 = y3sz; y3 > 0; --y3) {
-        current = COLOR(y3);
-        for (x = w - 1; x >= 0; --x)
-            *(data++) = current;
-
+    *data = COLOR(y2);
+    data += w;
+    for (y3 = y3sz-1; y3 > 0; --y3) {
+        *data = COLOR(y3);
+        data += w;
         NEXT(y3);
+    }
+    *data = COLOR(y3);
+
+    /* copy the first pixels into the whole rows */
+    data = sf->pixel_data;
+    for (y1 = h; y1 > 0; --y1) {
+        repeat_pixel(data, w);
+        data += w;
     }
 }
 
 static void gradient_horizontal(RrSurface *sf, gint w, gint h)
 {
-    gint x, y;
+    gint x, y, cpbytes;
     RrPixel32 *data = sf->pixel_data, *datav;
+    gchar *datac;
 
     VARS(x);
     SETUP(x, sf->primary, sf->secondary, w);
 
+    /* set the color values for the first row */
     datav = data;
     for (x = w - 1; x > 0; --x) {  /* 0 -> w - 1 */
         *datav = COLOR(x);
@@ -497,21 +573,31 @@ static void gradient_horizontal(RrSurface *sf, gint w, gint h)
     *datav = COLOR(x);
     ++datav;
 
-    for (y = h - 1; y > 0; --y) { /* 1 -> h */
-        memcpy(datav, data, w * sizeof(RrPixel32));
-        datav += w;
+    /* copy the first row to the rest in O(logn) copies */
+    datac = (gchar*)datav;
+    cpbytes = 1 * w * sizeof(RrPixel32);
+    for (y = (h - 1) * w * sizeof(RrPixel32); y > 0;) {
+        memcpy(datac, data, cpbytes);
+        y -= cpbytes;
+        datac += cpbytes;
+        cpbytes <<= 1;
+        if (cpbytes > y)
+            cpbytes = y;
     }
 }
 
 static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
 {
-    gint x, y, half1, half2;
+    gint x, y, half1, half2, cpbytes;
     RrPixel32 *data = sf->pixel_data, *datav;
+    gchar *datac;
 
     VARS(x);
 
     half1 = (w + 1) / 2;
     half2 = w / 2;
+
+    /* set the color values for the first row */
 
     SETUP(x, sf->primary, sf->secondary, half1);
     datav = data;
@@ -534,31 +620,43 @@ static void gradient_mirrorhorizontal(RrSurface *sf, gint w, gint h)
         ++datav;
     }
 
-    for (y = h - 1; y > 0; --y) {  /* 1 -> h */
-        memcpy(datav, data, w * sizeof(RrPixel32));
-        datav += w;
+    /* copy the first row to the rest in O(logn) copies */
+    datac = (gchar*)datav;
+    cpbytes = 1 * w * sizeof(RrPixel32);
+    for (y = (h - 1) * w * sizeof(RrPixel32); y > 0;) {
+        memcpy(datac, data, cpbytes);
+        y -= cpbytes;
+        datac += cpbytes;
+        cpbytes <<= 1;
+        if (cpbytes > y)
+            cpbytes = y;
     }
 }
 
 static void gradient_vertical(RrSurface *sf, gint w, gint h)
 {
-    gint x, y;
-    RrPixel32 *data = sf->pixel_data;
-    RrPixel32 current;
+    gint y;
+    RrPixel32 *data;
 
     VARS(y);
     SETUP(y, sf->primary, sf->secondary, h);
 
-    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
-        current = COLOR(y);
-        for (x = w - 1; x >= 0; --x)  /* 0 -> w */
-            *(data++) = current;
+    /* find the color for the first pixel of each row first */
+    data = sf->pixel_data;
 
+    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+        *data = COLOR(y);
+        data += w;
         NEXT(y);
     }
-    current = COLOR(y);
-    for (x = w - 1; x >= 0; --x)  /* 0 -> w */
-        *(data++) = current;
+    *data = COLOR(y);
+
+    /* copy the first pixels into the whole rows */
+    data = sf->pixel_data;
+    for (y = h; y > 0; --y) {
+        repeat_pixel(data, w);
+        data += w;
+    }
 }
 
 
@@ -656,14 +754,13 @@ static void gradient_crossdiagonal(RrSurface *sf, gint w, gint h)
     *data = COLOR(x);
 }
 
-static void gradient_pyramid(RrSurface *sf, gint inw, gint inh)
+static void gradient_pyramid(RrSurface *sf, gint w, gint h)
 {
-    gint x, y, w = (inw >> 1) + 1, h = (inh >> 1) + 1;
-    RrPixel32 *data = sf->pixel_data;
-    RrPixel32 *end = data + inw*inh - 1;
-    RrPixel32 current;
+    RrPixel32 *ldata, *rdata;
+    RrPixel32 *cp;
     RrColor left, right;
     RrColor extracorner;
+    gint x, y, halfw, halfh, midx, midy;
 
     VARS(lefty);
     VARS(righty);
@@ -673,54 +770,64 @@ static void gradient_pyramid(RrSurface *sf, gint inw, gint inh)
     extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
     extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
 
-    SETUP(lefty, (&extracorner), sf->secondary, h);
-    SETUP(righty, sf->primary, (&extracorner), h);
+    halfw = w >> 1;
+    halfh = h >> 1;
+    midx = w - halfw - halfw; /* 0 or 1, depending if w is even or odd */
+    midy = h - halfh - halfh;   /* 0 or 1, depending if h is even or odd */
 
-    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
+    SETUP(lefty, sf->primary, (&extracorner), halfh + midy);
+    SETUP(righty, (&extracorner), sf->secondary, halfh + midy);
+
+    /* draw the top half
+
+       it is faster to draw both top quarters together than to draw one and
+       then copy it over to the other side.
+    */
+
+    ldata = sf->pixel_data;
+    rdata = ldata + w - 1;
+    for (y = halfh + midy; y > 0; --y) {  /* 0 -> (h+1)/2 */
+        RrPixel32 c;
+
         COLOR_RR(lefty, (&left));
         COLOR_RR(righty, (&right));
 
-        SETUP(x, (&left), (&right), w);
+        SETUP(x, (&left), (&right), halfw + midx);
 
-        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-            current = COLOR(x);
-            *(data+x) = current;
-            *(data+inw-x) = current;
-            *(end-x) = current;
-            *(end-(inw-x)) = current;
+        for (x = halfw + midx - 1; x > 0; --x) {  /* 0 -> (w+1)/2 */
+            c = COLOR(x);
+            *(ldata++) = *(rdata--) = c;
 
             NEXT(x);
         }
-        current = COLOR(x);
-        *(data+x) = current;
-        *(data+inw-x) = current;
-        *(end-x) = current;
-        *(end-(inw-x)) = current;
-
-        data+=inw;
-        end-=inw;
+        c = COLOR(x);
+        *ldata = *rdata = c;
+        ldata += halfw + 1;
+        rdata += halfw - 1 + midx + w;
 
         NEXT(lefty);
         NEXT(righty);
     }
-    COLOR_RR(lefty, (&left));
-    COLOR_RR(righty, (&right));
 
-    SETUP(x, (&left), (&right), w);
+    /* copy the top half into the bottom half, mirroring it, so we can only
+       copy one row at a time
 
-    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-        current = COLOR(x);
-        *(data+x) = current;
-        *(data+inw-x) = current;
-        *(end-x) = current;
-        *(end-(inw-x)) = current;
+       it is faster, to move the writing pointer forward, and the reading
+       pointer backward
 
-        NEXT(x);
+       this is the current code, moving the write pointer forward and read
+       pointer backward
+       41.78      4.26     1.78      504     3.53     3.53  gradient_pyramid2
+       this is the opposite, moving the read pointer forward and the write
+       pointer backward
+       42.27      4.40     1.86      504     3.69     3.69  gradient_pyramid2
+       
+    */
+    ldata = sf->pixel_data + (halfh - 1) * w;
+    cp = ldata + (midy + 1) * w;
+    for (y = halfh; y > 0; --y) {
+        memcpy(cp, ldata, w * sizeof(RrPixel32));
+        ldata -= w;
+        cp += w;
     }
-    current = COLOR(x);
-    *(data+x) = current;
-    *(data+inw-x) = current;
-    *(end-x) = current;
-    *(end-(inw-x)) = current;
 }
-

@@ -37,17 +37,9 @@
 struct _ObFrame;
 struct _ObGroup;
 struct _ObSessionState;
+struct _ObPrompt;
 
 typedef struct _ObClient      ObClient;
-typedef struct _ObClientIcon  ObClientIcon;
-
-/*! Holds an icon in ARGB format */
-struct _ObClientIcon
-{
-    gint width;
-    gint height;
-    RrPixel32 *data;
-};
 
 /*! Possible window types */
 typedef enum
@@ -82,6 +74,10 @@ struct _ObClient
     ObWindow obwin;
     Window  window;
 
+    /*! If this client is managing an ObPrompt window, then this is set to the
+      prompt */
+    struct _ObPrompt *prompt;
+
     /*! The window's decorations. NULL while the window is being managed! */
     struct _ObFrame *frame;
 
@@ -115,6 +111,8 @@ struct _ObClient
     gchar *title;
     /*! Window title when iconified */
     gchar *icon_title;
+    /*! The title as requested by the client, without any of our own changes */
+    gchar *original_title;
     /*! Hostname of machine running the client */
     gchar *client_machine;
     /*! The command used to run the program. Pre-XSMP window identification. */
@@ -231,8 +229,11 @@ struct _ObClient
     /*! Indicates if the client is trying to close but has stopped responding
       to pings */
     gboolean not_responding;
+    /*! A prompt shown when you are trying to close a client that is not
+      responding.  It asks if you want to kill the client */
+    struct _ObPrompt *kill_prompt;
     /*! We tried to close the window with a SIGTERM */
-    gboolean close_tried_term;
+    gint kill_level;
 
 #ifdef SYNC
     /*! The client wants to sync during resizes */
@@ -297,10 +298,8 @@ struct _ObClient
     */
     guint functions;
 
-    /*! Icons for the client as specified on the client window */
-    ObClientIcon *icons;
-    /*! The number of icons in icons */
-    guint nicons;
+    /* The window's icon, in a variety of shapes and sizes */
+    RrImage *icon_set;
 
     /*! Where the window should iconify to/from */
     Rect icon_geometry;
@@ -325,8 +324,10 @@ void client_remove_destroy_notify(ObClientCallback func);
 /*! Manages all existing windows */
 void client_manage_all();
 /*! Manages a given window
+  @param prompt This specifies an ObPrompt which is being managed.  It is
+                possible to manage Openbox-owned windows through this.
 */
-void client_manage(Window win);
+void client_manage(Window win, struct _ObPrompt *prompt);
 /*! Unmanages all managed windows */
 void client_unmanage_all();
 /*! Unmanages a given client */
@@ -632,7 +633,10 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig);
 /*! Sets the window's type and transient flag */
 void client_get_type_and_transientness(ObClient *self);
 
-const ObClientIcon *client_icon(ObClient *self, gint w, gint h);
+/*! Returns a client's icon set, or its parents (recursively) if it doesn't
+  have one
+*/
+RrImage* client_icon(ObClient *self);
 
 /*! Return TRUE if the client is transient for some other window. Return
   FALSE if it's not transient or there is no window for it to be
@@ -716,5 +720,8 @@ guint client_monitor(ObClient *self);
 ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
+
+/*! Returns TRUE if the client is running on the same machine as Openbox */
+gboolean client_on_localhost(ObClient *self);
 
 #endif

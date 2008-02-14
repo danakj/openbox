@@ -37,11 +37,15 @@ typedef struct _RrFont             RrFont;
 typedef struct _RrTexture          RrTexture;
 typedef struct _RrTextureMask      RrTextureMask;
 typedef struct _RrTextureRGBA      RrTextureRGBA;
+typedef struct _RrTextureImage     RrTextureImage;
 typedef struct _RrTextureText      RrTextureText;
 typedef struct _RrTextureLineArt   RrTextureLineArt;
 typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
 typedef struct _RrColor            RrColor;
+typedef struct _RrImage            RrImage;
+typedef struct _RrImagePic         RrImagePic;
+typedef struct _RrImageCache       RrImageCache;
 
 typedef guint32 RrPixel32;
 typedef guint16 RrPixel16;
@@ -76,7 +80,8 @@ typedef enum {
     RR_TEXTURE_MASK,
     RR_TEXTURE_TEXT,
     RR_TEXTURE_LINE_ART,
-    RR_TEXTURE_RGBA
+    RR_TEXTURE_RGBA,
+    RR_TEXTURE_IMAGE
 } RrTextureType;
 
 typedef enum {
@@ -137,10 +142,12 @@ struct _RrTextureText {
     gint shadow_offset_x;
     gint shadow_offset_y;
     RrColor *shadow_color;
-    guchar shadow_alpha;
     gboolean shortcut; /*!< Underline a character */
     guint shortcut_pos; /*!< Position in bytes of the character to underline */
     RrEllipsizeMode ellipsize;
+    gboolean flow; /* allow multiple lines.  must set maxwidth below */
+    gint maxwidth;
+    guchar shadow_alpha; /* at the bottom to improve alignment */
 };
 
 struct _RrPixmapMask {
@@ -161,10 +168,23 @@ struct _RrTextureRGBA {
     gint height;
     gint alpha;
     RrPixel32 *data;
-/* cached scaled so we don't have to scale often */
-    gint cwidth;
-    gint cheight;
-    RrPixel32 *cache;
+    /* size and position to draw at (if these are zero, then it will be
+       drawn to fill the entire texture */
+    gint tx;
+    gint ty;
+    gint twidth;
+    gint theight;
+};
+
+struct _RrTextureImage {
+    RrImage *image;
+    gint alpha;
+    /* size and position to draw at (if these are zero, then it will be
+       drawn to fill the entire texture */
+    gint tx;
+    gint ty;
+    gint twidth;
+    gint theight;
 };
 
 struct _RrTextureLineArt {
@@ -177,12 +197,15 @@ struct _RrTextureLineArt {
 
 union _RrTextureData {
     RrTextureRGBA rgba;
+    RrTextureImage image;
     RrTextureText text;
     RrTextureMask mask;
     RrTextureLineArt lineart;
 };
 
 struct _RrTexture {
+    /* If changing the type of a texture, you should DEFINITELY call
+       RrAppearanceClearTextures() first! */
     RrTextureType type;
     RrTextureData data;
 };
@@ -198,6 +221,35 @@ struct _RrAppearance {
 
     /* cached for internal use */
     gint w, h;
+};
+
+/*! Holds a RGBA image picture */
+struct _RrImagePic {
+    gint width, height;
+    RrPixel32 *data;
+    /* The sum of all the pixels.  This is used to compare pictures if their
+       hashes match. */
+    gint sum;
+};
+
+/*! An RrImage is a sort of meta-image.  It can contain multiple versions of
+  an image at different sizes, which may or may not be completely different
+  pictures */
+struct _RrImage {
+    gint ref;
+    RrImageCache *cache;
+
+    /*! An array of "originals", that is of RrPictures that have been added
+      to the image in various sizes, and that have not been resized.  These
+      are explicitly added to the RrImage. */
+    RrImagePic **original;
+    gint n_original;
+    /*! An array of "resized" pictures.  When an "original" RrPicture
+      needs to be resized for drawing, it is saved in here so that it doesn't
+      need to be resized again.  These are automatically added to the
+      RrImage. */
+    RrImagePic **resized;
+    gint n_resized;
 };
 
 /* these are the same on all endian machines because it seems to be dependant
@@ -244,14 +296,18 @@ GC       RrColorGC    (RrColor *c);
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
+void          RrAppearanceRemoveTextures(RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
+/*! Always call this when changing the type of a texture in an appearance */
+void          RrAppearanceClearTextures(RrAppearance *a);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
                              gint size, RrFontWeight weight, RrFontSlant slant);
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
-                             gint shadow_offset_x, gint shadow_offset_y);
+                             gint shadow_offset_x, gint shadow_offset_y,
+                             gboolean flow, gint maxwidth);
 gint    RrFontHeight        (const RrFont *f, gint shadow_offset_y);
 gint    RrFontMaxCharWidth  (const RrFont *f);
 
@@ -262,12 +318,32 @@ Pixmap RrPaintPixmap (RrAppearance *a, gint w, gint h);
 void   RrPaint       (RrAppearance *a, Window win, gint w, gint h);
 void   RrMinSize     (RrAppearance *a, gint *w, gint *h);
 gint   RrMinWidth    (RrAppearance *a);
+/* For text textures, if flow is TRUE, then the string must be set before
+   calling this, otherwise it doesn't need to be */
 gint   RrMinHeight   (RrAppearance *a);
 void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
                         gint *w, gint *h, RrPixel32 **data);
+
+/*! Create a new image cache for RrImages.
+  @param max_resized_saved The number of resized copies of an image to save
+*/
+RrImageCache* RrImageCacheNew(gint max_resized_saved);
+void          RrImageCacheRef(RrImageCache *self);
+void          RrImageCacheUnref(RrImageCache *self);
+
+/*! Finds an image in the cache, if it is already in there */
+RrImage*      RrImageCacheFind(RrImageCache *self,
+                               RrPixel32 *data, gint w, gint h);
+
+RrImage* RrImageNew(RrImageCache *cache);
+void     RrImageRef(RrImage *im);
+void     RrImageUnref(RrImage *im);
+
+void     RrImageAddPicture(RrImage *im, RrPixel32 *data, gint w, gint h);
+void     RrImageRemovePicture(RrImage *im, gint w, gint h);
 
 G_END_DECLS
 

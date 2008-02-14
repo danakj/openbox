@@ -20,6 +20,7 @@
 #include "geom.h"
 #include "image.h"
 #include "color.h"
+#include "imagecache.h"
 
 #include <glib.h>
 
@@ -27,13 +28,116 @@
 #define FLOOR(i)        ((i) & (~0UL << FRACTION))
 #define AVERAGE(a, b)   (((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)))
 
-static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
-                               gulong dstW, gulong dstH,
-                               gulong srcW, gulong srcH)
+void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data)
 {
+    gint i;
+
+    pic->width = w;
+    pic->height = h;
+    pic->data = data;
+    pic->sum = 0;
+    for (i = w*h; i > 0; --i)
+        pic->sum += *(data++);
+}
+
+static void RrImagePicFree(RrImagePic *pic)
+{
+    if (pic) {
+        g_free(pic->data);
+        g_free(pic);
+    }
+}
+
+/*! Add a picture to an Image, that is, add another copy of the image at
+  another size.  This may add it to the "originals" list or to the
+  "resized" list. */
+static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
+                       RrImagePic *pic)
+{
+    gint i;
+
+    g_assert(pic->width > 0 && pic->height > 0);
+
+    g_assert(g_hash_table_lookup(self->cache->table, pic) == NULL);
+
+    /* grow the list */
+    *list = g_renew(RrImagePic*, *list, ++*len);
+
+    /* move everything else down one */
+    for (i = *len-1; i > 0; --i)
+        (*list)[i] = (*list)[i-1];
+
+    /* set the new picture up at the front of the list */
+    (*list)[0] = pic;
+
+    /* add the picture as a key to point to this image in the cache */
+    g_hash_table_insert(self->cache->table, (*list)[0], self);
+
+#ifdef DEBUG
+    g_message("Adding %s picture to the cache:\n    "
+              "Image 0x%x, w %d h %d Hash %u",
+              (*list == self->original ? "ORIGINAL" : "RESIZED"),
+              (guint)self, pic->width, pic->height, RrImagePicHash(pic));
+#endif
+}
+
+/*! Remove a picture from an Image.  This may remove it from the "originals"
+  list or the "resized" list. */
+static void RemovePicture(RrImage *self, RrImagePic ***list,
+                          gint i, gint *len)
+{
+    gint j;
+
+#ifdef DEBUG
+    g_message("Removing %s picture from the cache:\n    "
+              "Image 0x%x, w %d h %d Hash %u",
+              (*list == self->original ? "ORIGINAL" : "RESIZED"),
+              (guint)self, (*list)[i]->width, (*list)[i]->height,
+              RrImagePicHash((*list)[i]));
+#endif
+
+    /* remove the picture as a key in the cache */
+    g_hash_table_remove(self->cache->table, (*list)[i]);
+
+    /* free the picture */
+    RrImagePicFree((*list)[i]);
+    /* shift everything down one */
+    for (j = i; j < *len-1; ++j)
+        (*list)[j] = (*list)[j+1];
+    /* shrink the list */
+    *list = g_renew(RrImagePic*, *list, --*len);
+}
+
+/*! Given a picture in RGBA format, of a specified size, resize it to the new
+  requested size (but keep its aspect ratio).  If the image does not need to
+  be resized (it is already the right size) then this returns NULL.  Otherwise
+  it returns a newly allocated RrImagePic with the resized picture inside it
+*/
+static RrImagePic* ResizeImage(RrPixel32 *src,
+                               gulong srcW, gulong srcH,
+                               gulong dstW, gulong dstH)
+{
+    RrPixel32 *dst, *dststart;
+    RrImagePic *pic;
     gulong dstX, dstY, srcX, srcY;
     gulong srcX1, srcX2, srcY1, srcY2;
     gulong ratioX, ratioY;
+    gulong aspectW, aspectH;
+
+    /* keep the aspect ratio */
+    aspectW = dstW;
+    aspectH = (gint)(dstW * ((gdouble)srcH / srcW));
+    if (aspectH > dstH) {
+        aspectH = dstH;
+        aspectW = (gint)(dstH * ((gdouble)srcW / srcH));
+    }
+    dstW = aspectW;
+    dstH = aspectH;
+
+    if (srcW == dstW && srcH == dstH)
+        return NULL; /* no scaling needed ! */
+
+    dststart = dst = g_new(RrPixel32, dstW * dstH);
 
     ratioX = (srcW << FRACTION) / dstW;
     ratioY = (srcH << FRACTION) / dstH;
@@ -104,56 +208,47 @@ static void ImageCopyResampled(RrPixel32 *dst, RrPixel32 *src,
                      (alpha << RrDefaultAlphaOffset);
         }
     }
+
+    pic = g_new(RrImagePic, 1);
+    RrImagePicInit(pic, dstW, dstH, dststart);
+
+    return pic;
 }
 
-void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
-                 gint target_w, gint target_h,
-                 RrRect *area)
+/*! This drawns an RGBA picture into the target, within the rectangle specified
+  by the area parameter.  If the area's size differs from the source's then it
+  will be centered within the rectangle */
+void DrawRGBA(RrPixel32 *target, gint target_w, gint target_h,
+              RrPixel32 *source, gint source_w, gint source_h,
+              gint alpha, RrRect *area)
 {
     RrPixel32 *dest;
-    RrPixel32 *source;
-    gint sw, sh, dw, dh;
     gint col, num_pixels;
+    gint dw, dh;
 
-    sw = rgba->width;
-    sh = rgba->height;
+    g_assert(source_w <= area->width && source_h <= area->height);
+    g_assert(area->x + area->width <= target_w);
+    g_assert(area->y + area->height <= target_h);
 
-    /* keep the ratio */
+    /* keep the aspect ratio */
     dw = area->width;
-    dh = (gint)(dw * ((gdouble)sh / sw));
+    dh = (gint)(dw * ((gdouble)source_h / source_w));
     if (dh > area->height) {
         dh = area->height;
-        dw = (gint)(dh * ((gdouble)sw / sh));
-    }
-
-    if (!(dw && dh))
-        return; /* XXX sanity check */
-
-    if (sw != dw || sh != dh) {
-        /*if (!(rgba->cache && dw == rgba->cwidth && dh == rgba->cheight))*/ {
-            g_free(rgba->cache);
-            rgba->cache = g_new(RrPixel32, dw * dh);
-            ImageCopyResampled(rgba->cache, rgba->data, dw, dh, sw, sh);
-            rgba->cwidth = dw;
-            rgba->cheight = dh;
-        }
-        source = rgba->cache;
-    } else {
-        source = rgba->data;
+        dw = (gint)(dh * ((gdouble)source_w / source_h));
     }
 
     /* copy source -> dest, and apply the alpha channel.
-
        center the image if it is smaller than the area */
     col = 0;
     num_pixels = dw * dh;
     dest = target + area->x + (area->width - dw) / 2 +
         (target_w * (area->y + (area->height - dh) / 2));
     while (num_pixels-- > 0) {
-        guchar alpha, r, g, b, bgr, bgg, bgb;
+        guchar a, r, g, b, bgr, bgg, bgb;
 
         /* apply the rgba's opacity as well */
-        alpha = ((*source >> RrDefaultAlphaOffset) * rgba->alpha) >> 8;
+        a = ((*source >> RrDefaultAlphaOffset) * alpha) >> 8;
         r = *source >> RrDefaultRedOffset;
         g = *source >> RrDefaultGreenOffset;
         b = *source >> RrDefaultBlueOffset;
@@ -163,9 +258,9 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
         bgg = *dest >> RrDefaultGreenOffset;
         bgb = *dest >> RrDefaultBlueOffset;
 
-        r = bgr + (((r - bgr) * alpha) >> 8);
-        g = bgg + (((g - bgg) * alpha) >> 8);
-        b = bgb + (((b - bgb) * alpha) >> 8);
+        r = bgr + (((r - bgr) * a) >> 8);
+        g = bgg + (((g - bgg) * a) >> 8);
+        b = bgb + (((b - bgb) * a) >> 8);
 
         *dest = ((r << RrDefaultRedOffset) |
                  (g << RrDefaultGreenOffset) |
@@ -179,4 +274,224 @@ void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
             dest += target_w - dw;
         }
     }
+}
+
+/*! Draw an RGBA texture into a target pixel buffer. */
+void RrImageDrawRGBA(RrPixel32 *target, RrTextureRGBA *rgba,
+                     gint target_w, gint target_h,
+                     RrRect *area)
+{
+    RrImagePic *scaled;
+
+    scaled = ResizeImage(rgba->data, rgba->width, rgba->height,
+                         area->width, area->height);
+
+    if (scaled) {
+#ifdef DEBUG
+            g_warning("Scaling an RGBA! You should avoid this and just make "
+                      "it the right size yourself!");
+#endif
+            DrawRGBA(target, target_w, target_h,
+                     scaled->data, scaled->width, scaled->height,
+                     rgba->alpha, area);
+    }
+    else
+        DrawRGBA(target, target_w, target_h,
+                 rgba->data, rgba->width, rgba->height,
+                 rgba->alpha, area);
+}
+
+/*! Create a new RrImage, which is linked to an image cache */
+RrImage* RrImageNew(RrImageCache *cache)
+{
+    RrImage *self;
+
+    g_assert(cache != NULL);
+
+    self = g_new0(RrImage, 1);
+    self->ref = 1;
+    self->cache = cache;
+    return self;
+}
+
+void RrImageRef(RrImage *self)
+{
+    ++self->ref;
+}
+
+void RrImageUnref(RrImage *self)
+{
+    if (self && --self->ref == 0) {
+#ifdef DEBUG
+        g_message("Refcount to 0, removing ALL pictures from the cache:\n    "
+                  "Image 0x%x", (guint)self);
+#endif
+        while (self->n_original > 0)
+            RemovePicture(self, &self->original, 0, &self->n_original);
+        while (self->n_resized > 0)
+            RemovePicture(self, &self->resized, 0, &self->n_resized);
+        g_free(self);
+    }
+}
+
+/*! Add a new picture with the given RGBA pixel data and dimensions into the
+  RrImage.  This adds an "original" picture to the image.
+*/
+void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
+{
+    gint i;
+    RrImagePic *pic;
+
+    /* make sure we don't already have this size.. */
+    for (i = 0; i < self->n_original; ++i)
+        if (self->original[i]->width == w && self->original[i]->height == h) {
+#ifdef DEBUG
+            g_message("Found duplicate ORIGINAL image:\n    "
+                      "Image 0x%x, w %d h %d", (guint)self, w, h);
+#endif
+            return;
+        }
+
+    /* remove any resized pictures of this same size */
+    for (i = 0; i < self->n_resized; ++i)
+        if (self->resized[i]->width == w || self->resized[i]->height == h) {
+            RemovePicture(self, &self->resized, i, &self->n_resized);
+            break;
+        }
+
+    /* add the new picture */
+    pic = g_new(RrImagePic, 1);
+    RrImagePicInit(pic, w, h, g_memdup(data, w*h*sizeof(RrPixel32)));
+    AddPicture(self, &self->original, &self->n_original, pic);
+}
+
+/*! Remove the picture from the RrImage which has the given dimensions. This
+ removes an "original" picture from the image.
+*/
+void RrImageRemovePicture(RrImage *self, gint w, gint h)
+{
+    gint i;
+
+    /* remove any resized pictures of this same size */
+    for (i = 0; i < self->n_original; ++i)
+        if (self->original[i]->width == w && self->original[i]->height == h) {
+            RemovePicture(self, &self->original, i, &self->n_original);
+            break;
+        }
+}
+
+/*! Draw an RrImage texture into a target pixel buffer.  If the RrImage does
+  not contain a picture of the appropriate size, then one of its "original"
+  pictures will be resized and used (and stored in the RrImage as a "resized"
+  picture).
+ */
+void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
+                      gint target_w, gint target_h,
+                      RrRect *area)
+{
+    gint i, min_diff, min_i, min_aspect_diff, min_aspect_i;
+    RrImage *self;
+    RrImagePic *pic;
+    gboolean free_pic;
+
+    self = img->image;
+    pic = NULL;
+    free_pic = FALSE;
+
+    /* is there an original of this size? (only w or h has to be right cuz
+       we maintain aspect ratios) */
+    for (i = 0; i < self->n_original; ++i)
+        if (self->original[i]->width == area->width ||
+            self->original[i]->height == area->height)
+        {
+            pic = self->original[i];
+            break;
+        }
+
+    /* is there a resize of this size? */
+    for (i = 0; i < self->n_resized; ++i)
+        if (self->resized[i]->width == area->width ||
+            self->resized[i]->height == area->height)
+        {
+            gint j;
+            RrImagePic *saved;
+
+            /* save the selected one */
+            saved = self->resized[i];
+
+            /* shift all the others down */
+            for (j = i; j > 0; --j)
+                self->resized[j] = self->resized[j-1];
+
+            /* and move the selected one to the top of the list */
+            self->resized[0] = saved;
+
+            pic = self->resized[0];
+            break;
+        }
+
+    if (!pic) {
+        gdouble aspect;
+
+        /* find an original with a close size */
+        min_diff = min_aspect_diff = -1;
+        min_i = min_aspect_i = 0;
+        aspect = ((gdouble)area->width) / area->height;
+        for (i = 0; i < self->n_original; ++i) {
+            gint diff;
+            gint wdiff, hdiff;
+            gdouble myasp;
+
+            /* our size difference metric.. */
+            wdiff = self->original[i]->width - area->width;
+            hdiff = self->original[i]->height - area->height;
+            diff = (wdiff * wdiff) + (hdiff * hdiff);
+
+            /* find the smallest difference */
+            if (min_diff < 0 || diff < min_diff) {
+                min_diff = diff;
+                min_i = i;
+            }
+            /* and also find the smallest difference with the same aspect
+               ratio (and prefer this one) */
+            myasp = ((gdouble)self->original[i]->width) /
+                self->original[i]->height;
+            if (ABS(aspect - myasp) < 0.0000001 &&
+                (min_aspect_diff < 0 || diff < min_aspect_diff))
+            {
+                min_aspect_diff = diff;
+                min_aspect_i = i;
+            }
+        }
+
+        /* use the aspect ratio correct source if there is one */
+        if (min_aspect_i >= 0)
+            min_i = min_aspect_i;
+
+        /* resize the original to the given area */
+        pic = ResizeImage(self->original[min_i]->data,
+                          self->original[min_i]->width,
+                          self->original[min_i]->height,
+                          area->width, area->height);
+
+        /* add the resized image to the image, as the first in the resized
+           list */
+        if (self->n_resized >= self->cache->max_resized_saved)
+            /* remove the last one (last used one) */
+            RemovePicture(self, &self->resized, self->n_resized - 1,
+                          &self->n_resized);
+        if (self->cache->max_resized_saved)
+            /* add it to the top of the resized list */
+            AddPicture(self, &self->resized, &self->n_resized, pic);
+        else
+            free_pic = TRUE; /* don't leak mem! */
+    }
+
+    g_assert(pic != NULL);
+
+    DrawRGBA(target, target_w, target_h,
+             pic->data, pic->width, pic->height,
+             img->alpha, area);
+    if (free_pic)
+        RrImagePicFree(pic);
 }

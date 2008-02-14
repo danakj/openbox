@@ -31,6 +31,7 @@
 #include "frame.h"
 #include "grab.h"
 #include "menu.h"
+#include "prompt.h"
 #include "menuframe.h"
 #include "keyboard.h"
 #include "modkeys.h"
@@ -88,6 +89,7 @@ static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static gboolean event_handle_menu_keyboard(XEvent *e);
 static gboolean event_handle_menu(XEvent *e);
+static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
@@ -459,6 +461,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObWindow *obwin = NULL;
     XEvent ee, *e;
     ObEventData *ed = data;
+    ObPrompt *prompt = NULL;
 
     /* make a copy we can mangle */
     ee = *ec;
@@ -475,6 +478,8 @@ static void event_process(const XEvent *ec, gpointer data)
             break;
         case Window_Client:
             client = WINDOW_AS_CLIENT(obwin);
+            /* events on clients can be events on prompt windows too */
+            prompt = client->prompt;
             break;
         case Window_Menu:
             /* not to be used for events */
@@ -482,6 +487,9 @@ static void event_process(const XEvent *ec, gpointer data)
             break;
         case Window_Internal:
             /* we don't do anything with events directly on these windows */
+            break;
+        case Window_Prompt:
+            prompt = WINDOW_AS_PROMPT(obwin);
             break;
         }
     }
@@ -639,7 +647,7 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (window == RootWindow(ob_display, ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
-        client_manage(window);
+        client_manage(window, NULL);
     else if (e->type == MappingNotify) {
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
@@ -699,7 +707,9 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    if (e->type == ButtonPress || e->type == ButtonRelease) {
+    if (prompt && event_handle_prompt(prompt, e))
+        ;
+    else if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
            on the root window, then process it */
         if (window != RootWindow(ob_display, ob_screen) ||
@@ -1355,7 +1365,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_ACTIVE_WINDOW message for window %s is "
                               "missing source indication\n");
-            client_activate(client, FALSE, TRUE, TRUE,
+            client_activate(client, TRUE, TRUE, TRUE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));
         } else if (msgtype == prop_atoms.net_wm_moveresize) {
@@ -1665,6 +1675,21 @@ static ObMenuFrame* find_active_or_last_menu(void)
     if (!ret && menu_frame_visible)
         ret = menu_frame_visible->data;
     return ret;
+}
+
+static gboolean event_handle_prompt(ObPrompt *p, XEvent *e)
+{
+    switch (e->type) {
+    case ButtonPress:
+    case ButtonRelease:
+    case MotionNotify:
+        return prompt_mouse_event(p, e);
+        break;
+    case KeyPress:
+        return prompt_key_event(p, e);
+        break;
+    }
+    return FALSE;
 }
 
 static gboolean event_handle_menu_keyboard(XEvent *ev)

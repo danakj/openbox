@@ -32,6 +32,7 @@
 #include "session.h"
 #include "event.h"
 #include "grab.h"
+#include "prompt.h"
 #include "focus.h"
 #include "stacking.h"
 #include "openbox.h"
@@ -67,9 +68,10 @@ typedef struct
     gpointer data;
 } ClientCallback;
 
-GList            *client_list          = NULL;
+GList            *client_list           = NULL;
 
-static GSList *client_destroy_notifies = NULL;
+static GSList  *client_destroy_notifies = NULL;
+static RrImage *client_default_icon     = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
@@ -104,10 +106,24 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
                                                       ObStackingLayer layer);
 static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
+static void client_prompt_kill(ObClient *self);
 
 
 void client_startup(gboolean reconfig)
 {
+    if ((client_default_icon = RrImageCacheFind(ob_rr_icons,
+                                                ob_rr_theme->def_win_icon,
+                                                ob_rr_theme->def_win_icon_w,
+                                                ob_rr_theme->def_win_icon_h)))
+        RrImageRef(client_default_icon);
+    else {
+        client_default_icon = RrImageNew(ob_rr_icons);
+        RrImageAddPicture(client_default_icon,
+                          ob_rr_theme->def_win_icon,
+                          ob_rr_theme->def_win_icon_w,
+                          ob_rr_theme->def_win_icon_h);
+    }
+
     if (reconfig) return;
 
     client_set_list();
@@ -115,6 +131,9 @@ void client_startup(gboolean reconfig)
 
 void client_shutdown(gboolean reconfig)
 {
+    RrImageUnref(client_default_icon);
+    client_default_icon = NULL;
+
     if (reconfig) return;
 }
 
@@ -211,13 +230,13 @@ void client_manage_all(void)
             if (attrib.override_redirect) continue;
 
             if (attrib.map_state != IsUnmapped)
-                client_manage(children[i]);
+                client_manage(children[i], NULL);
         }
     }
     XFree(children);
 }
 
-void client_manage(Window window)
+void client_manage(Window window, ObPrompt *prompt)
 {
     ObClient *self;
     XEvent e;
@@ -269,8 +288,10 @@ void client_manage(Window window)
 
     map_time = event_get_server_time();
 
-    /* choose the events we want to receive on the CLIENT window */
-    attrib_set.event_mask = CLIENT_EVENTMASK;
+    /* choose the events we want to receive on the CLIENT window
+       (ObPrompt windows can request events too) */
+    attrib_set.event_mask = CLIENT_EVENTMASK |
+        (prompt ? prompt->event_mask : 0);
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
     XChangeWindowAttributes(ob_display, window,
                             CWEventMask|CWDontPropagate, &attrib_set);
@@ -280,6 +301,7 @@ void client_manage(Window window)
     self = g_new0(ObClient, 1);
     self->obwin.type = Window_Client;
     self->window = window;
+    self->prompt = prompt;
 
     /* non-zero defaults */
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
@@ -298,8 +320,10 @@ void client_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* specify that if we exit, the window should not be destroyed and
-       should be reparented back to root automatically */
-    XChangeSaveSet(ob_display, window, SetModeInsert);
+       should be reparented back to root automatically, unless we are managing
+       an internal ObPrompt window  */
+    if (!self->prompt)
+        XChangeSaveSet(ob_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
@@ -612,15 +636,6 @@ void client_manage(Window window)
     /* update the list hints */
     client_set_list();
 
-    /* watch for when the application stops responding.  only do this for
-       normal windows, i.e. windows which have titlebars and close buttons 
-       and things like that.
-       we don't need to stop pinging on unmanage, because it will be handled
-       automatically by the destroy callback!
-    */
-    if (self->ping && client_normal(self))
-        ping_start(self, client_ping_event);
-
     /* free the ObAppSettings shallow copy */
     g_free(settings);
 
@@ -672,7 +687,6 @@ void client_unmanage_all(void)
 
 void client_unmanage(ObClient *self)
 {
-    guint j;
     GSList *it;
     gulong ignore_start;
 
@@ -699,8 +713,10 @@ void client_unmanage(ObClient *self)
 
     mouse_grab_for_client(self, FALSE);
 
-    /* remove the window from our save set */
-    XChangeSaveSet(ob_display, self->window, SetModeDelete);
+    /* remove the window from our save set, unless we are managing an internal
+       ObPrompt window */
+    if (!self->prompt)
+        XChangeSaveSet(ob_display, self->window, SetModeDelete);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -708,6 +724,10 @@ void client_unmanage(ObClient *self)
         /* don't leave an invalid focus_client */
         focus_client = NULL;
     }
+
+    /* if we're prompting to kill the client, close that */
+    prompt_unref(self->kill_prompt);
+    self->kill_prompt = NULL;
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
@@ -798,15 +818,13 @@ void client_unmanage(ObClient *self)
     ob_debug("Unmanaged window 0x%lx\n", self->window);
 
     /* free all data allocated in the client struct */
+    RrImageUnref(self->icon_set);
     g_slist_free(self->transients);
-    for (j = 0; j < self->nicons; ++j)
-        g_free(self->icons[j].data);
-    if (self->nicons > 0)
-        g_free(self->icons);
     g_free(self->startup_id);
     g_free(self->wm_command);
     g_free(self->title);
     g_free(self->icon_title);
+    g_free(self->original_title);
     g_free(self->name);
     g_free(self->class);
     g_free(self->role);
@@ -844,12 +862,14 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
             match = FALSE;
         else if (app->class &&
-                !g_pattern_match(app->class,
-                                 strlen(self->class), self->class, NULL))
+                 !g_pattern_match(app->class,
+                                  strlen(self->class), self->class, NULL))
             match = FALSE;
         else if (app->role &&
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
+            match = FALSE;
+        else if ((signed)app->type >= 0 && app->type != self->type)
             match = FALSE;
 
         if (match) {
@@ -1959,6 +1979,7 @@ void client_update_title(ObClient *self)
     gchar *visible = NULL;
 
     g_free(self->title);
+    g_free(self->original_title);
 
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data)) {
@@ -1975,6 +1996,7 @@ void client_update_title(ObClient *self)
                 data = g_strdup("Unnamed Window");
         }
     }
+    self->original_title = g_strdup(data);
 
     if (self->client_machine) {
         visible = g_strdup_printf("%s (%s)", data, self->client_machine);
@@ -1984,7 +2006,7 @@ void client_update_title(ObClient *self)
 
     if (self->not_responding) {
         data = visible;
-        if (self->close_tried_term)
+        if (self->kill_level > 0)
             visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
         else
             visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
@@ -2016,7 +2038,7 @@ void client_update_title(ObClient *self)
 
     if (self->not_responding) {
         data = visible;
-        if (self->close_tried_term)
+        if (self->kill_level > 0)
             visible = g_strdup_printf("%s - [%s]", data, _("Killing..."));
         else
             visible = g_strdup_printf("%s - [%s]", data, _("Not Responding"));
@@ -2081,143 +2103,134 @@ void client_update_strut(ObClient *self)
     }
 }
 
-/* Avoid storing icons above this size if possible */
-#define AVOID_ABOVE 64
-
 void client_update_icons(ObClient *self)
 {
     guint num;
     guint32 *data;
     guint w, h, i, j;
     guint num_seen;  /* number of icons present */
-    guint num_small_seen;  /* number of icons small enough present */
-    guint smallest, smallest_area;
+    RrImage *img;
 
-    for (i = 0; i < self->nicons; ++i)
-        g_free(self->icons[i].data);
-    if (self->nicons > 0)
-        g_free(self->icons);
-    self->nicons = 0;
+    img = NULL;
+
+    /* grab the server, because we might be setting the window's icon and
+       we don't want them to set it in between and we overwrite their own
+       icon */
+    grab_server(TRUE);
 
     if (PROP_GETA32(self->window, net_wm_icon, cardinal, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
-        num_seen = num_small_seen = 0;
-        smallest = smallest_area = 0;
-        if (num > 2)
-            while (i < num) {
+        num_seen = 0;
+        while (i + 2 < num) { /* +2 is to make sure there is a w and h */
+            w = data[i++];
+            h = data[i++];
+            /* watch for the data being too small for the specified size,
+               or for zero sized icons. */
+            if (i + w*h > num || w == 0 || h == 0) break;
+
+            /* convert it to the right bit order for ObRender */
+            for (j = 0; j < w*h; ++j)
+                data[i+j] =
+                    (((data[i+j] >> 24) & 0xff) << RrDefaultAlphaOffset) +
+                    (((data[i+j] >> 16) & 0xff) << RrDefaultRedOffset)   +
+                    (((data[i+j] >>  8) & 0xff) << RrDefaultGreenOffset) +
+                    (((data[i+j] >>  0) & 0xff) << RrDefaultBlueOffset);
+
+            /* is it in the cache? */
+            img = RrImageCacheFind(ob_rr_icons, &data[i], w, h);
+            if (img) RrImageRef(img); /* own it */
+
+            i += w*h;
+            ++num_seen;
+
+            /* don't bother looping anymore if we already found it in the cache
+               since we'll just use that! */
+            if (img) break;
+        }
+
+        /* if it's not in the cache yet, then add it to the cache now.
+           we have already converted it to the correct bit order above */
+        if (!img && num_seen > 0) {
+            img = RrImageNew(ob_rr_icons);
+            i = 0;
+            for (j = 0; j < num_seen; ++j) {
                 w = data[i++];
                 h = data[i++];
-                i += w * h;
-                /* watch for it being too small for the specified size, or for
-                   zero sized icons. */
-                if (i > num || w == 0 || h == 0) break;
-
-                if (!smallest_area || w*h < smallest_area) {
-                    smallest = num_seen;
-                    smallest_area = w*h;
-                }
-                ++num_seen;
-                if (w <= AVOID_ABOVE && h <= AVOID_ABOVE)
-                    ++num_small_seen;
-            }
-        if (num_small_seen > 0)
-            self->nicons = num_small_seen;
-        else if (num_seen)
-            self->nicons = 1;
-
-        self->icons = g_new(ObClientIcon, self->nicons);
-
-        /* store the icons */
-        i = 0;
-        for (j = 0; j < self->nicons;) {
-            guint x, y, t;
-
-            w = self->icons[j].width = data[i++];
-            h = self->icons[j].height = data[i++];
-
-            /* if there are some icons smaller than the threshold, we're
-               skipping all the ones above */
-            if (num_small_seen > 0) {
-                if (w > AVOID_ABOVE || h > AVOID_ABOVE) {
-                    i += w*h;
-                    continue;
-                }
-            }
-            /* if there were no icons smaller than the threshold, then we are
-               only taking the smallest available one we saw */
-            else if (j != smallest) {
+                RrImageAddPicture(img, &data[i], w, h);
                 i += w*h;
-                continue;
             }
-
-            self->icons[j].data = g_new(RrPixel32, w * h);
-            for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
-                if (x >= w) {
-                    x = 0;
-                    ++y;
-                }
-                self->icons[j].data[t] =
-                    (((data[i] >> 24) & 0xff) << RrDefaultAlphaOffset) +
-                    (((data[i] >> 16) & 0xff) << RrDefaultRedOffset) +
-                    (((data[i] >> 8) & 0xff) << RrDefaultGreenOffset) +
-                    (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
-            }
-            g_assert(i <= num);
-
-            ++j;
         }
 
         g_free(data);
-    } else {
+    }
+
+    /* if we didn't find an image from the NET_WM_ICON stuff, then try the
+       legacy X hints */
+    if (!img) {
         XWMHints *hints;
 
         if ((hints = XGetWMHints(ob_display, self->window))) {
             if (hints->flags & IconPixmapHint) {
-                self->nicons = 1;
-                self->icons = g_new(ObClientIcon, self->nicons);
+                gboolean xicon;
                 xerror_set_ignore(TRUE);
-                if (!RrPixmapToRGBA(ob_rr_inst,
-                                    hints->icon_pixmap,
-                                    (hints->flags & IconMaskHint ?
-                                     hints->icon_mask : None),
-                                    &self->icons[0].width,
-                                    &self->icons[0].height,
-                                    &self->icons[0].data))
-                {
-                    g_free(self->icons);
-                    self->nicons = 0;
-                }
+                xicon = RrPixmapToRGBA(ob_rr_inst,
+                                       hints->icon_pixmap,
+                                       (hints->flags & IconMaskHint ?
+                                        hints->icon_mask : None),
+                                       (gint*)&w, (gint*)&h, &data);
                 xerror_set_ignore(FALSE);
+
+
+                if (xicon) {
+                    if (w > 0 && h > 0) {
+                        /* is this icon in the cache yet? */
+                        img = RrImageCacheFind(ob_rr_icons, data, w, h);
+                        if (img) RrImageRef(img); /* own it */
+
+                        /* if not, then add it */
+                        if (!img) {
+                            img = RrImageNew(ob_rr_icons);
+                            RrImageAddPicture(img, data, w, h);
+                        }
+                    }
+
+                    g_free(data);
+                }
             }
             XFree(hints);
         }
     }
 
-    /* set the default icon onto the window
-       in theory, this could be a race, but if a window doesn't set an icon
-       or removes it entirely, it's not very likely it is going to set one
-       right away afterwards
+    /* set the client's icons to be whatever we found */
+    RrImageUnref(self->icon_set);
+    self->icon_set = img;
 
-       if it has parents, then one of them will have an icon already
+    /* if the client has no icon at all, then we set a default icon onto it.
+       but, if it has parents, then one of them will have an icon already
     */
-    if (self->nicons == 0 && !self->parents) {
+    if (!self->icon_set && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
-        gulong *data;
+        gulong *ldata; /* use a long here to satisfy OBT_PROP_SETA32 */
 
-        data = g_new(gulong, 48*48+2);
-        data[0] = data[1] =  48;
-        for (i = 0; i < 48*48; ++i)
-            data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
+        w = ob_rr_theme->def_win_icon_w;
+        h = ob_rr_theme->def_win_icon_h;
+        ldata = g_new(gulong, w*h+2);
+        ldata[0] = w;
+        ldata[1] = h;
+        for (i = 0; i < w*h; ++i)
+            ldata[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
                 (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
                 (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
                 (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
-        PROP_SETA32(self->window, net_wm_icon, cardinal, data, 48*48+2);
-        g_free(data);
+        PROP_SETA32(self->window, net_wm_icon, cardinal, ldata, w*h+2);
+        g_free(ldata);
     } else if (self->frame)
         /* don't draw the icon empty if we're just setting one now anyways,
            we'll get the property change any second */
         frame_adjust_icon(self->frame);
+
+    grab_server(FALSE);
 }
 
 void client_update_icon_geometry(ObClient *self)
@@ -2572,6 +2585,10 @@ gboolean client_show(ObClient *self)
     gboolean show = FALSE;
 
     if (client_should_show(self)) {
+        /* replay pending pointer event before showing the window, in case it
+           should be going to something under the window */
+        mouse_replay_pointer();
+
         frame_show(self->frame);
         show = TRUE;
 
@@ -2612,6 +2629,10 @@ gboolean client_hide(ObClient *self)
            Also in action_end, we simulate an enter event that can't be ignored
            so trying to ignore them is futile in case 3 anyways
         */
+
+        /* replay pending pointer event before hiding the window, in case it
+           should be going to the window */
+        mouse_replay_pointer();
 
         frame_hide(self->frame);
         hide = TRUE;
@@ -3028,6 +3049,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         if (!user)
             ignore_start = event_start_ignore_all_enters();
 
+        /* replay pending pointer event before move the window, in case it
+           would change what window gets the event */
+        mouse_replay_pointer();
+
         frame_adjust_area(self->frame, fmoved, fresized, FALSE);
 
         if (!user)
@@ -3314,13 +3339,23 @@ void client_shade(ObClient *self, gboolean shade)
 
 static void client_ping_event(ObClient *self, gboolean dead)
 {
-    self->not_responding = dead;
-    client_update_title(self);
+    if (self->not_responding != dead) {
+        self->not_responding = dead;
+        client_update_title(self);
 
-    if (!dead) {
-        /* try kill it nicely the first time again, if it started responding
-           at some point */
-        self->close_tried_term = FALSE;
+        if (dead)
+            /* the client isn't responding, so ask to kill it */
+            client_prompt_kill(self);
+        else {
+            /* it came back to life ! */
+
+            if (self->kill_prompt) {
+                prompt_unref(self->kill_prompt);
+                self->kill_prompt = NULL;
+            }
+
+            self->kill_level = 0;
+        }
     }
 }
 
@@ -3328,30 +3363,100 @@ void client_close(ObClient *self)
 {
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
+    /* if closing an internal obprompt, that is just cancelling it */
+    if (self->prompt) {
+        prompt_cancel(self->prompt);
+        return;
+    }
+
     /* in the case that the client provides no means to requesting that it
        close, we just kill it */
     if (!self->delete_window)
         /* don't use client_kill(), we should only kill based on PID in
            response to a lack of PING replies */
         XKillClient(ob_display, self->window);
-    else if (self->not_responding)
-        client_kill(self);
-    else
+    else {
         /* request the client to close with WM_DELETE_WINDOW */
         PROP_MSG_TO(self->window, self->window, wm_protocols,
                     prop_atoms.wm_delete_window, event_curtime, 0, 0, 0,
                     NoEventMask);
+
+        /* we're trying to close the window, so see if it is responding. if it
+           is not, then we will let them kill the window */
+        if (self->ping)
+            ping_start(self, client_ping_event);
+
+        /* if we already know the window isn't responding (maybe they clicked
+           no in the kill dialog but it hasn't come back to life), then show
+           the kill dialog */
+        if (self->not_responding)
+            client_prompt_kill(self);
+    }
+}
+
+#define OB_KILL_RESULT_NO 0
+#define OB_KILL_RESULT_YES 1
+
+static void client_kill_requested(ObPrompt *p, gint result, gpointer data)
+{
+    ObClient *self = data;
+
+    if (result == OB_KILL_RESULT_YES)
+        client_kill(self);
+
+    prompt_unref(self->kill_prompt);
+    self->kill_prompt = NULL;
+}
+
+static void client_prompt_kill(ObClient *self)
+{
+    /* check if we're already prompting */
+    if (!self->kill_prompt) {
+        ObPromptAnswer answers[] = {
+            { _("No"), OB_KILL_RESULT_NO },
+            { _("Yes"), OB_KILL_RESULT_YES }
+        };
+        gchar *m;
+
+        if (client_on_localhost(self)) {
+            const gchar *sig;
+
+            if (self->kill_level == 0)
+                sig = "terminate";
+            else
+                sig = "kill";
+
+            m = g_strdup_printf
+                (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
+        }
+        else
+            m = g_strdup_printf
+                (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"), self->original_title);
+
+
+        self->kill_prompt = prompt_new(m, answers,
+                                       sizeof(answers)/sizeof(answers[0]),
+                                       OB_KILL_RESULT_NO, /* default = no */
+                                       OB_KILL_RESULT_NO, /* cancel = no */
+                                       client_kill_requested, self);
+        g_free(m);
+    }
+
+    prompt_show(self->kill_prompt, self);
 }
 
 void client_kill(ObClient *self)
 {
-    if (!self->client_machine && self->pid) {
+    /* don't kill our own windows */
+    if (self->prompt) return;
+
+    if (client_on_localhost(self) && self->pid) {
         /* running on the local host */
-        if (!self->close_tried_term) {
-            ob_debug("killing window 0x%x with pid %lu, with SIGTERM\n",
+        if (self->kill_level == 0) {
+            ob_debug("killing window 0x%x with pid %lu, with SIGTERM",
                      self->window, self->pid);
             kill(self->pid, SIGTERM);
-            self->close_tried_term = TRUE;
+            ++self->kill_level;
 
             /* show that we're trying to kill it */
             client_update_title(self);
@@ -3362,8 +3467,10 @@ void client_kill(ObClient *self)
             kill(self->pid, SIGKILL); /* kill -9 */
         }
     }
-    else
+    else {
+        /* running on a remote host */
         XKillClient(ob_display, self->window);
+    }
 }
 
 void client_hilite(ObClient *self, gboolean hilite)
@@ -3816,53 +3923,21 @@ gboolean client_focused(ObClient *self)
     return self == focus_client;
 }
 
-static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
-{
-    guint i;
-    gulong min_diff, min_i;
 
-    if (!self->nicons) {
-        ObClientIcon *parent = NULL;
+
+RrImage* client_icon(ObClient *self)
+{
+    RrImage *ret = NULL;
+
+    if (self->icon_set)
+        ret = self->icon_set;
+    else if (self->parents) {
         GSList *it;
-
-        for (it = self->parents; it; it = g_slist_next(it)) {
-            ObClient *c = it->data;
-            if ((parent = client_icon_recursive(c, w, h)))
-                break;
-        }
-
-        return parent;
+        for (it = self->parents; it && !ret; it = g_slist_next(it))
+            ret = client_icon(it->data);
     }
-
-    /* some kind of crappy approximation to find the icon closest in size to
-       what we requested, but icons are generally all the same ratio as
-       eachother so it's good enough. */
-
-    min_diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
-    min_i = 0;
-
-    for (i = 1; i < self->nicons; ++i) {
-        gulong diff;
-
-        diff = ABS(self->icons[i].width - w) + ABS(self->icons[i].height - h);
-        if (diff < min_diff) {
-            min_diff = diff;
-            min_i = i;
-        }
-    }
-    return &self->icons[min_i];
-}
-
-const ObClientIcon* client_icon(ObClient *self, gint w, gint h)
-{
-    ObClientIcon *ret;
-    static ObClientIcon deficon;
-
-    if (!(ret = client_icon_recursive(self, w, h))) {
-        deficon.width = deficon.height = 48;
-        deficon.data = ob_rr_theme->def_win_icon;
-        ret = &deficon;
-    }
+    if (!ret)
+        ret = client_default_icon;
     return ret;
 }
 
@@ -4332,4 +4407,10 @@ ObClient* client_under_pointer(void)
 gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
+}
+
+/*! Returns TRUE if the client is running on the same machine as Openbox */
+gboolean client_on_localhost(ObClient *self)
+{
+    return self->client_machine == NULL;
 }

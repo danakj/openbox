@@ -130,12 +130,40 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
             }
             RrPixmapMaskDraw(a->pixmap, &a->texture[i].data.mask, &tarea);
             break;
+        case RR_TEXTURE_IMAGE:
+            g_assert(!transferred);
+            {
+                RrRect narea = tarea;
+                RrTextureImage *img = &a->texture[i].data.image;
+                if (img->twidth)
+                    narea.width = MIN(tarea.width, img->twidth);
+                if (img->theight)
+                    narea.height = MIN(tarea.height, img->theight);
+                narea.x += img->tx;
+                narea.y += img->ty;
+                RrImageDrawImage(a->surface.pixel_data,
+                                 &a->texture[i].data.image,
+                                 a->w, a->h,
+                                 &narea);
+            }
+            force_transfer = 1;
+            break;
         case RR_TEXTURE_RGBA:
             g_assert(!transferred);
-            RrImageDraw(a->surface.pixel_data,
-                        &a->texture[i].data.rgba,
-                        a->w, a->h,
-                        &tarea);
+            {
+                RrRect narea = tarea;
+                RrTextureRGBA *rgb = &a->texture[i].data.rgba;
+                if (rgb->twidth)
+                    narea.width = MIN(tarea.width, rgb->twidth);
+                if (rgb->theight)
+                    narea.height = MIN(tarea.height, rgb->theight);
+                narea.x += rgb->tx;
+                narea.y += rgb->ty;
+                RrImageDrawRGBA(a->surface.pixel_data,
+                                &a->texture[i].data.rgba,
+                                a->w, a->h,
+                                &narea);
+            }
             force_transfer = 1;
         break;
         }
@@ -178,6 +206,12 @@ RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
   return out;
 }
 
+void RrAppearanceRemoveTextures(RrAppearance *a)
+{
+    g_free(a->texture);
+    a->textures = 0;
+}
+
 void RrAppearanceAddTextures(RrAppearance *a, gint numtex)
 {
     g_assert(a->textures == 0);
@@ -186,11 +220,15 @@ void RrAppearanceAddTextures(RrAppearance *a, gint numtex)
     if (numtex) a->texture = g_new0(RrTexture, numtex);
 }
 
+void RrAppearanceClearTextures(RrAppearance *a)
+{
+    memset(a->texture, 0, a->textures * sizeof(RrTexture));
+}
+
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
     RrAppearance *copy = g_new(RrAppearance, 1);
-    gint i;
 
     copy->inst = orig->inst;
 
@@ -266,10 +304,6 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     copy->textures = orig->textures;
     copy->texture = g_memdup(orig->texture,
                              orig->textures * sizeof(RrTexture));
-    for (i = 0; i < copy->textures; ++i)
-        if (copy->texture[i].type == RR_TEXTURE_RGBA) {
-            copy->texture[i].data.rgba.cache = NULL;
-        }
     copy->pixmap = None;
     copy->xftdraw = NULL;
     copy->w = copy->h = 0;
@@ -278,17 +312,10 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 
 void RrAppearanceFree(RrAppearance *a)
 {
-    gint i;
-
     if (a) {
         RrSurface *p;
         if (a->pixmap != None) XFreePixmap(RrDisplay(a->inst), a->pixmap);
         if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
-        for (i = 0; i < a->textures; ++i)
-            if (a->texture[i].type == RR_TEXTURE_RGBA) {
-                g_free(a->texture[i].data.rgba.cache);
-                a->texture[i].data.rgba.cache = NULL;
-            }
         if (a->textures)
             g_free(a->texture);
         p = &a->surface;
@@ -367,6 +394,8 @@ gint RrMinWidth(RrAppearance *a)
     gint l, t, r, b;
     gint w = 0;
 
+    RrMargins(a, &l, &t, &r, &b);
+
     for (i = 0; i < a->textures; ++i) {
         switch (a->texture[i].type) {
         case RR_TEXTURE_NONE:
@@ -378,21 +407,24 @@ gint RrMinWidth(RrAppearance *a)
             m = RrFontMeasureString(a->texture[i].data.text.font,
                                     a->texture[i].data.text.string,
                                     a->texture[i].data.text.shadow_offset_x,
-                                    a->texture[i].data.text.shadow_offset_y);
+                                    a->texture[i].data.text.shadow_offset_y,
+                                    a->texture[i].data.text.flow,
+                                    a->texture[i].data.text.maxwidth);
             w = MAX(w, m->width);
             g_free(m);
             break;
         case RR_TEXTURE_RGBA:
             w += MAX(w, a->texture[i].data.rgba.width);
             break;
+        case RR_TEXTURE_IMAGE:
+            /* images resize so they don't contribute anything to the min */
+            break;
         case RR_TEXTURE_LINE_ART:
-            w += MAX(w, MAX(a->texture[i].data.lineart.x1,
-                            a->texture[i].data.lineart.x2));
+            w = MAX(w, MAX(a->texture[i].data.lineart.x1 - l - r,
+                           a->texture[i].data.lineart.x2 - l - r));
             break;
         }
     }
-
-    RrMargins(a, &l, &t, &r, &b);
 
     w += l + r;
 
@@ -404,7 +436,10 @@ gint RrMinHeight(RrAppearance *a)
 {
     gint i;
     gint l, t, r, b;
+    RrSize *m;
     gint h = 0;
+
+    RrMargins(a, &l, &t, &r, &b);
 
     for (i = 0; i < a->textures; ++i) {
         switch (a->texture[i].type) {
@@ -414,20 +449,37 @@ gint RrMinHeight(RrAppearance *a)
             h = MAX(h, a->texture[i].data.mask.mask->height);
             break;
         case RR_TEXTURE_TEXT:
-            h += MAX(h, RrFontHeight(a->texture[i].data.text.font,
-                                     a->texture[i].data.text.shadow_offset_y));
+            if (a->texture[i].data.text.flow) {
+                g_assert(a->texture[i].data.text.string != NULL);
+
+                m = RrFontMeasureString
+                    (a->texture[i].data.text.font,
+                     a->texture[i].data.text.string,
+                     a->texture[i].data.text.shadow_offset_x,
+                     a->texture[i].data.text.shadow_offset_y,
+                     a->texture[i].data.text.flow,
+                     a->texture[i].data.text.maxwidth);
+                h += MAX(h, m->height);
+                g_free(m);
+            }
+            else
+                h += MAX(h,
+                         RrFontHeight
+                         (a->texture[i].data.text.font,
+                          a->texture[i].data.text.shadow_offset_y));
             break;
         case RR_TEXTURE_RGBA:
             h += MAX(h, a->texture[i].data.rgba.height);
             break;
+        case RR_TEXTURE_IMAGE:
+            /* images resize so they don't contribute anything to the min */
+            break;
         case RR_TEXTURE_LINE_ART:
-            h += MAX(h, MAX(a->texture[i].data.lineart.y1,
-                            a->texture[i].data.lineart.y2));
+            h = MAX(h, MAX(a->texture[i].data.lineart.y1 - t - b,
+                           a->texture[i].data.lineart.y2 - t - b));
             break;
         }
     }
-
-    RrMargins(a, &l, &t, &r, &b);
 
     h += t + b;
 

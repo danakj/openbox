@@ -367,16 +367,17 @@ void icon_popup_free(ObIconPopup *self)
 }
 
 void icon_popup_delay_show(ObIconPopup *self, gulong usec,
-                           gchar *text, const ObClientIcon *icon)
+                           gchar *text, RrImage *icon)
 {
     if (icon) {
-        self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
-        self->a_icon->texture[0].data.rgba.width = icon->width;
-        self->a_icon->texture[0].data.rgba.height = icon->height;
-        self->a_icon->texture[0].data.rgba.alpha = 0xff;
-        self->a_icon->texture[0].data.rgba.data = icon->data;
-    } else
+        RrAppearanceClearTextures(self->a_icon);
+        self->a_icon->texture[0].type = RR_TEXTURE_IMAGE;
+        self->a_icon->texture[0].data.image.alpha = 0xff;
+        self->a_icon->texture[0].data.image.image = icon;
+    } else {
+        RrAppearanceClearTextures(self->a_icon);
         self->a_icon->texture[0].type = RR_TEXTURE_NONE;
+    }
 
     popup_delay_show(self->popup, usec, text);
 }

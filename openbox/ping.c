@@ -38,7 +38,7 @@ static guint32     ping_next_id = 1;
 
 #define PING_TIMEOUT (G_USEC_PER_SEC * 3)
 /*! Warn the user after this many PING_TIMEOUT intervals */
-#define PING_TIMEOUT_WARN 3
+#define PING_TIMEOUT_WARN 1
 
 static void     ping_send(ObPingTarget *t);
 static void     ping_end(ObClient *client, gpointer data);
@@ -69,10 +69,11 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
 {
     ObPingTarget *t;
 
-    /* make sure we're not already pinging the client */
-    g_assert(g_hash_table_find(ping_ids, find_client, client) == NULL);
-
+    /* make sure the client supports ping! */
     g_assert(client->ping == TRUE);
+
+    /* make sure we're not already pinging the client */
+    if (g_hash_table_find(ping_ids, find_client, client) != NULL) return;
 
     t = g_new0(ObPingTarget, 1);
     t->client = client;
@@ -89,11 +90,6 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     g_assert(g_hash_table_find(ping_ids, find_client, client) != NULL);
 }
 
-void ping_stop(struct _ObClient *c)
-{
-    ping_end(c, NULL);
-}
-
 void ping_got_pong(guint32 id)
 {
     ObPingTarget *t;
@@ -106,6 +102,9 @@ void ping_got_pong(guint32 id)
             t->h(t->client, FALSE);
         }
         t->waiting = 0; /* not waiting for a reply anymore */
+
+        /* we got a pong so we're happy now */
+        ping_end(t->client, NULL);
     }
     else
         ob_debug("Got PONG with id %u but not waiting for one\n", id);

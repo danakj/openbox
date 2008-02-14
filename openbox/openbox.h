@@ -30,6 +30,7 @@
 struct _ObMainLoop;
 
 extern RrInstance *ob_rr_inst;
+extern RrImageCache *ob_rr_icons;
 extern RrTheme    *ob_rr_theme;
 
 extern struct _ObMainLoop *ob_main_loop;

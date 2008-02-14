@@ -23,7 +23,7 @@
 #include <glib.h>
 
 typedef struct _GravityCoord {
-    int pos;
+    gint pos;
     gboolean center;
     gboolean opposite;
 } GravityCoord;

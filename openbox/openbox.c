@@ -46,6 +46,7 @@
 #include "config.h"
 #include "ping.h"
 #include "mainloop.h"
+#include "prompt.h"
 #include "gettext.h"
 #include "parser/parse.h"
 #include "render/render.h"
@@ -85,17 +86,18 @@
 #include <X11/keysym.h>
 
 
-RrInstance *ob_rr_inst;
-RrTheme    *ob_rr_theme;
-ObMainLoop *ob_main_loop;
-Display    *ob_display;
-gint        ob_screen;
-gboolean    ob_replace_wm = FALSE;
-gboolean    ob_sm_use = TRUE;
-gchar      *ob_sm_id = NULL;
-gchar      *ob_sm_save_file = NULL;
-gboolean    ob_sm_restore = TRUE;
-gboolean    ob_debug_xinerama = FALSE;
+RrInstance   *ob_rr_inst;
+RrImageCache *ob_rr_icons;
+RrTheme      *ob_rr_theme;
+ObMainLoop   *ob_main_loop;
+Display      *ob_display;
+gint          ob_screen;
+gboolean      ob_replace_wm = FALSE;
+gboolean      ob_sm_use = TRUE;
+gchar        *ob_sm_id = NULL;
+gchar        *ob_sm_save_file = NULL;
+gboolean      ob_sm_restore = TRUE;
+gboolean      ob_debug_xinerama = FALSE;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -181,6 +183,11 @@ gint main(gint argc, gchar **argv)
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
     if (ob_rr_inst == NULL)
         ob_exit_with_error(_("Failed to initialize the obrender library."));
+    /* Saving 3 resizes of an RrImage makes a lot of sense for icons, as there
+       are generally 3 icon sizes needed: the titlebar icon, the menu icon,
+       and the alt-tab icon
+    */
+    ob_rr_icons = RrImageCacheNew(3);
 
     XSynchronize(ob_display, xsync);
 
@@ -231,6 +238,8 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_RIGHT] = modkeys_sym_to_code(XK_Right);
             keys[OB_KEY_UP] = modkeys_sym_to_code(XK_Up);
             keys[OB_KEY_DOWN] = modkeys_sym_to_code(XK_Down);
+            keys[OB_KEY_TAB] = modkeys_sym_to_code(XK_Tab);
+            keys[OB_KEY_SPACE] = modkeys_sym_to_code(XK_space);
 
             {
                 ObParseInst *i;
@@ -314,6 +323,7 @@ gint main(gint argc, gchar **argv)
             grab_startup(reconfigure);
             group_startup(reconfigure);
             ping_startup(reconfigure);
+            prompt_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
@@ -373,6 +383,7 @@ gint main(gint argc, gchar **argv)
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
+            prompt_shutdown(reconfigure);
             ping_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);
@@ -393,6 +404,7 @@ gint main(gint argc, gchar **argv)
     XSync(ob_display, FALSE);
 
     RrThemeFree(ob_rr_theme);
+    RrImageCacheUnref(ob_rr_icons);
     RrInstanceFree(ob_rr_inst);
 
     session_shutdown(being_replaced);

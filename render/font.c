@@ -108,7 +108,7 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
 
     /* setup the layout */
     pango_layout_set_font_description(out->layout, out->font_desc);
-    pango_layout_set_single_paragraph_mode(out->layout, TRUE);
+    pango_layout_set_wrap(out->layout, PANGO_WRAP_WORD_CHAR);
 
     /* get the ascent and descent */
     measure_font(inst, out);
@@ -139,12 +139,23 @@ void RrFontClose(RrFont *f)
 }
 
 static void font_measure_full(const RrFont *f, const gchar *str,
-                              gint *x, gint *y, gint shadow_x, gint shadow_y)
+                              gint *x, gint *y, gint shadow_x, gint shadow_y,
+                              gboolean flow, gint maxwidth)
 {
     PangoRectangle rect;
 
     pango_layout_set_text(f->layout, str, -1);
-    pango_layout_set_width(f->layout, -1);
+    if (flow) {
+        pango_layout_set_single_paragraph_mode(f->layout, FALSE);
+        pango_layout_set_width(f->layout, maxwidth * PANGO_SCALE);
+        pango_layout_set_ellipsize(f->layout, PANGO_ELLIPSIZE_NONE);
+    }
+    else {
+        /* single line mode */
+        pango_layout_set_single_paragraph_mode(f->layout, TRUE);
+        pango_layout_set_width(f->layout, -1);
+        pango_layout_set_ellipsize(f->layout, PANGO_ELLIPSIZE_MIDDLE);
+    }
 
     /* pango_layout_get_pixel_extents lies! this is the right way to get the
        size of the text's area */
@@ -163,11 +174,16 @@ static void font_measure_full(const RrFont *f, const gchar *str,
 }
 
 RrSize *RrFontMeasureString(const RrFont *f, const gchar *str,
-                            gint shadow_x, gint shadow_y)
+                            gint shadow_x, gint shadow_y,
+                            gboolean flow, gint maxwidth)
 {
     RrSize *size;
+
+    g_assert(!flow || maxwidth > 0);
+
     size = g_new(RrSize, 1);
-    font_measure_full(f, str, &size->width, &size->height, shadow_x, shadow_y);
+    font_measure_full(f, str, &size->width, &size->height, shadow_x, shadow_y,
+                      flow, maxwidth);
     return size;
 }
 
@@ -208,36 +224,47 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     PangoAttrList *attrlist;
     PangoEllipsizeMode ell;
 
-    /* center the text vertically
-       We do this centering based on the 'baseline' since different fonts have
-       different top edges. It looks bad when the whole string is moved when 1
-       character from a non-default language is included in the string */
-    y = area->y +
-        font_calculate_baseline(t->font, area->height);
+    g_assert(!t->flow || t->maxwidth > 0);
+
+    y = area->y;
+    if (!t->flow)
+        /* center the text vertically
+           We do this centering based on the 'baseline' since different fonts
+           have different top edges. It looks bad when the whole string is
+           moved when 1 character from a non-default language is included in
+           the string */
+        y += font_calculate_baseline(t->font, area->height);
 
     /* the +2 and -4 leave a small blank edge on the sides */
     x = area->x + 2;
-    w = area->width - 4;
+    w = area->width;
+    if (t->flow) w = MAX(w, t->maxwidth);
+    w -= 4;
     h = area->height;
 
-    switch (t->ellipsize) {
-    case RR_ELLIPSIZE_NONE:
+    if (t->flow)
         ell = PANGO_ELLIPSIZE_NONE;
-        break;
-    case RR_ELLIPSIZE_START:
-        ell = PANGO_ELLIPSIZE_START;
-        break;
-    case RR_ELLIPSIZE_MIDDLE:
-        ell = PANGO_ELLIPSIZE_MIDDLE;
-        break;
-    case RR_ELLIPSIZE_END:
-        ell = PANGO_ELLIPSIZE_END;
-        break;
+    else {
+        switch (t->ellipsize) {
+        case RR_ELLIPSIZE_NONE:
+            ell = PANGO_ELLIPSIZE_NONE;
+            break;
+        case RR_ELLIPSIZE_START:
+            ell = PANGO_ELLIPSIZE_START;
+            break;
+        case RR_ELLIPSIZE_MIDDLE:
+            ell = PANGO_ELLIPSIZE_MIDDLE;
+            break;
+        case RR_ELLIPSIZE_END:
+            ell = PANGO_ELLIPSIZE_END;
+            break;
+        }
     }
 
     pango_layout_set_text(t->font->layout, t->string, -1);
     pango_layout_set_width(t->font->layout, w * PANGO_SCALE);
     pango_layout_set_ellipsize(t->font->layout, ell);
+    pango_layout_set_single_paragraph_mode(t->font->layout, !t->flow);
 
     /* * * end of setting up the layout * * */
 
@@ -276,10 +303,23 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         c.pixel = t->shadow_color->pixel;
 
         /* see below... */
-        pango_xft_render_layout_line
-            (d, &c, pango_layout_get_line(t->font->layout, 0),
-             (x + t->shadow_offset_x) * PANGO_SCALE,
-             (y + t->shadow_offset_y) * PANGO_SCALE);
+        if (!t->flow) {
+            pango_xft_render_layout_line
+                (d, &c,
+#if PANGO_VERSION_MAJOR > 1 || \
+    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
+                 pango_layout_get_line_readonly(t->font->layout, 0),
+#else
+                 pango_layout_get_line(t->font->layout, 0),
+#endif
+                 (x + t->shadow_offset_x) * PANGO_SCALE,
+                 (y + t->shadow_offset_y) * PANGO_SCALE);
+        }
+        else {
+            pango_xft_render_layout(d, &c, t->font->layout,
+                                    (x + t->shadow_offset_x) * PANGO_SCALE,
+                                    (y + t->shadow_offset_y) * PANGO_SCALE);
+        }
     }
 
     c.color.red = t->color->r | t->color->r << 8;
@@ -306,9 +346,23 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 
     /* layout_line() uses y to specify the baseline
        The line doesn't need to be freed, it's a part of the layout */
-    pango_xft_render_layout_line
-        (d, &c, pango_layout_get_line(t->font->layout, 0),
-         x * PANGO_SCALE, y * PANGO_SCALE);
+    if (!t->flow) {
+        pango_xft_render_layout_line
+            (d, &c,
+#if PANGO_VERSION_MAJOR > 1 || \
+    (PANGO_VERSION_MAJOR == 1 && PANGO_VERSION_MINOR >= 16)
+             pango_layout_get_line_readonly(t->font->layout, 0),
+#else
+             pango_layout_get_line(t->font->layout, 0),
+#endif
+             x * PANGO_SCALE,
+             y * PANGO_SCALE);
+    }
+    else {
+        pango_xft_render_layout(d, &c, t->font->layout,
+                                x * PANGO_SCALE,
+                                y * PANGO_SCALE);
+    }
 
     if (t->shortcut) {
         t->font->shortcut_underline->start_index = 0;

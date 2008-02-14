@@ -33,8 +33,17 @@ static RrAppearance *prompt_a_bg;
 static RrAppearance *prompt_a_button;
 static RrAppearance *prompt_a_focus;
 static RrAppearance *prompt_a_press;
+static RrAppearance *prompt_a_pfocus;
 /* we change the max width which would screw with others */
 static RrAppearance *prompt_a_msg;
+
+/* sizing stuff */
+#define OUTSIDE_MARGIN 4
+#define MSG_BUTTON_SEPARATION 4
+#define BUTTON_SEPARATION 4
+#define BUTTON_VMARGIN 4
+#define BUTTON_HMARGIN 12
+#define MAX_WIDTH 400
 
 static void prompt_layout(ObPrompt *self);
 static void render_all(ObPrompt *self);
@@ -43,7 +52,7 @@ static void prompt_resize(ObPrompt *self, gint w, gint h);
 
 void prompt_startup(gboolean reconfig)
 {
-    RrColor *c_button, *c_focus, *c_press;
+    RrColor *c_button, *c_focus, *c_press, *c_pfocus;
 
     /* note: this is not a copy, don't free it */
     prompt_a_bg = ob_rr_theme->osd_hilite_bg;
@@ -51,31 +60,50 @@ void prompt_startup(gboolean reconfig)
     prompt_a_button = RrAppearanceCopy(ob_rr_theme->a_focused_unpressed_close);
     prompt_a_focus = RrAppearanceCopy(ob_rr_theme->a_hover_focused_close);
     prompt_a_press = RrAppearanceCopy(ob_rr_theme->a_focused_pressed_close);
+    prompt_a_pfocus = RrAppearanceCopy(ob_rr_theme->a_focused_pressed_close);
 
     c_button = prompt_a_button->texture[0].data.mask.color;
     c_focus = prompt_a_focus->texture[0].data.mask.color;
     c_press = prompt_a_press->texture[0].data.mask.color;
+    c_pfocus = prompt_a_press->texture[0].data.mask.color;
 
     RrAppearanceRemoveTextures(prompt_a_button);
     RrAppearanceRemoveTextures(prompt_a_focus);
     RrAppearanceRemoveTextures(prompt_a_press);
+    RrAppearanceRemoveTextures(prompt_a_pfocus);
 
+    /* texture[0] is the text and texture[1-4] (for prompt_a_focus and
+       prompt_a_pfocus) is lineart to show where keyboard focus is */
     RrAppearanceAddTextures(prompt_a_button, 1);
-    RrAppearanceAddTextures(prompt_a_focus, 1);
+    RrAppearanceAddTextures(prompt_a_focus, 5);
     RrAppearanceAddTextures(prompt_a_press, 1);
+    RrAppearanceAddTextures(prompt_a_pfocus, 5);
 
     /* totally cheating here.. */
     prompt_a_button->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
     prompt_a_focus->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
     prompt_a_press->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
+    prompt_a_pfocus->texture[0] = ob_rr_theme->osd_hilite_label->texture[0];
 
     prompt_a_button->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
     prompt_a_focus->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
     prompt_a_press->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
+    prompt_a_pfocus->texture[0].data.text.justify = RR_JUSTIFY_CENTER;
 
     prompt_a_button->texture[0].data.text.color = c_button;
     prompt_a_focus->texture[0].data.text.color = c_focus;
     prompt_a_press->texture[0].data.text.color = c_press;
+    prompt_a_pfocus->texture[0].data.text.color = c_press;
+
+    prompt_a_focus->texture[1].data.lineart.color = c_focus;
+    prompt_a_focus->texture[2].data.lineart.color = c_focus;
+    prompt_a_focus->texture[3].data.lineart.color = c_focus;
+    prompt_a_focus->texture[4].data.lineart.color = c_focus;
+
+    prompt_a_pfocus->texture[1].data.lineart.color = c_press;
+    prompt_a_pfocus->texture[2].data.lineart.color = c_press;
+    prompt_a_pfocus->texture[3].data.lineart.color = c_press;
+    prompt_a_pfocus->texture[4].data.lineart.color = c_press;
 
     prompt_a_msg = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
     prompt_a_msg->texture[0].data.text.flow = TRUE;
@@ -95,6 +123,7 @@ void prompt_shutdown(gboolean reconfig)
     RrAppearanceFree(prompt_a_button);
     RrAppearanceFree(prompt_a_focus);
     RrAppearanceFree(prompt_a_press);
+    RrAppearanceFree(prompt_a_pfocus);
     RrAppearanceFree(prompt_a_msg);
 }
 
@@ -209,13 +238,6 @@ static void prompt_layout(ObPrompt *self)
     gint w, h;
     gint maxw;
 
-    const gint OUTSIDE_MARGIN = 4;
-    const gint MSG_BUTTON_SEPARATION = 4;
-    const gint BUTTON_SEPARATION = 4;
-    const gint BUTTON_VMARGIN = 4;
-    const gint BUTTON_HMARGIN = 12;
-    const gint MAX_WIDTH = 600;
-
     RrMargins(prompt_a_bg, &l, &t, &r, &b);
     l += OUTSIDE_MARGIN;
     t += OUTSIDE_MARGIN;
@@ -236,15 +258,21 @@ static void prompt_layout(ObPrompt *self)
         prompt_a_button->texture[0].data.text.string = self->button[i].text;
         prompt_a_focus->texture[0].data.text.string = self->button[i].text;
         prompt_a_press->texture[0].data.text.string = self->button[i].text;
+        prompt_a_pfocus->texture[0].data.text.string = self->button[i].text;
         RrMinSize(prompt_a_button, &bw, &bh);
         self->button[i].width = bw;
         self->button[i].height = bh;
         RrMinSize(prompt_a_focus, &bw, &bh);
+        g_print("button w %d h %d\n", bw, bh);
         self->button[i].width = MAX(self->button[i].width, bw);
         self->button[i].height = MAX(self->button[i].height, bh);
         RrMinSize(prompt_a_press, &bw, &bh);
         self->button[i].width = MAX(self->button[i].width, bw);
         self->button[i].height = MAX(self->button[i].height, bh);
+        RrMinSize(prompt_a_pfocus, &bw, &bh);
+        self->button[i].width = MAX(self->button[i].width, bw);
+        self->button[i].height = MAX(self->button[i].height, bh);
+
 
         self->button[i].width += BUTTON_HMARGIN * 2;
         self->button[i].height += BUTTON_VMARGIN * 2;
@@ -320,20 +348,77 @@ static void prompt_resize(ObPrompt *self, gint w, gint h)
         XResizeWindow(ob_display, self->super.window, w, h);
 }
 
+static void setup_button_focus_tex(ObPromptElement *e, RrAppearance *a,
+                                   gboolean on)
+{
+    gint l, r, t, b;
+
+    if (!on) {
+        gint i;
+
+        for (i = 1; i < 5; ++i)
+            a->texture[i].type = on ? RR_TEXTURE_LINE_ART : RR_TEXTURE_NONE;
+    }
+
+    if (!on) return;
+
+    RrMargins(a, &l, &t, &r, &b);
+    l += MIN(BUTTON_HMARGIN, BUTTON_VMARGIN) / 2;
+    r += MIN(BUTTON_HMARGIN, BUTTON_VMARGIN) / 2;
+    t += MIN(BUTTON_HMARGIN, BUTTON_VMARGIN) / 2;
+    b += MIN(BUTTON_HMARGIN, BUTTON_VMARGIN) / 2;
+
+    /* top line */
+    a->texture[1].data.lineart.x1 = l;
+    a->texture[1].data.lineart.x2 = e->width - r - 1;
+    a->texture[1].data.lineart.y1 = t;
+    a->texture[1].data.lineart.y2 = t;
+
+    /* bottom line */
+    a->texture[2].data.lineart.x1 = l;
+    a->texture[2].data.lineart.x2 = e->width - r - 1;
+    a->texture[2].data.lineart.y1 = e->height - b - 1;
+    a->texture[2].data.lineart.y2 = e->height - b - 1;
+
+    /* left line */
+    a->texture[3].data.lineart.x1 = l;
+    a->texture[3].data.lineart.x2 = l;
+    a->texture[3].data.lineart.y1 = t;
+    a->texture[3].data.lineart.y2 = e->height - b - 1;
+
+    /* right line */
+    a->texture[4].data.lineart.x1 = e->width - r - 1;
+    a->texture[4].data.lineart.x2 = e->width - r - 1;
+    a->texture[4].data.lineart.y1 = t;
+    a->texture[4].data.lineart.y2 = e->height - b - 1;
+
+    g_print("setting x2 %d\n", e->width - r - 1);
+}
+
 static void render_button(ObPrompt *self, ObPromptElement *e)
 {
     RrAppearance *a;
 
-    if (e->pressed) a = prompt_a_press;
-    else if (self->focus == e) a = prompt_a_focus;
-    else a = prompt_a_button;
+    if (e->pressed && self->focus == e) a = prompt_a_pfocus;
+    else if (self->focus == e)          a = prompt_a_focus;
+    else if (e->pressed)                a = prompt_a_press;
+    else                                a = prompt_a_button;
 
     a->surface.parent = prompt_a_bg;
     a->surface.parentx = e->x;
-    a->surface.parentx = e->y;
+    a->surface.parenty = e->y;
+
+    /* draw the keyfocus line */
+    if (a == prompt_a_pfocus || a == prompt_a_focus)
+        setup_button_focus_tex(e, a, TRUE);
 
     a->texture[0].data.text.string = e->text;
     RrPaint(a, e->window, e->width, e->height);
+
+    /* turn off the keyfocus line so that it doesn't affect size calculations
+     */
+    if (a == prompt_a_pfocus || a == prompt_a_focus)
+        setup_button_focus_tex(e, a, FALSE);
 }
 
 static void render_all(ObPrompt *self)

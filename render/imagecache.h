@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   image.h for the Openbox window manager
-   Copyright (c) 2003-2007   Dana Jansens
+   imagecache.h for the Openbox window manager
+   Copyright (c) 2008        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,17 +16,22 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __image_h
-#define __image_h
+#ifndef __imagecache_h
+#define __imagecache_h
 
-#include "render.h"
-#include "geom.h"
+#include <glib.h>
 
-void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
-                      gint target_w, gint target_h,
-                      RrRect *area);
-void RrImageDrawRGBA(RrPixel32 *target, RrTextureRGBA *rgba,
-                     gint target_w, gint target_h,
-                     RrRect *area);
+/* the number of resized pictures to cache for an image */
+#define MAX_CACHE_RESIZED 3
+
+struct _RrImagePic;
+
+guint RrImagePicHash(const struct _RrImagePic *p);
+
+struct _RrImageCache {
+    gint ref;
+
+    GHashTable *table;
+};
 
 #endif

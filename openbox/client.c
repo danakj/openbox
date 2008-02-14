@@ -67,9 +67,10 @@ typedef struct
     gpointer data;
 } ClientCallback;
 
-GList            *client_list          = NULL;
+GList            *client_list           = NULL;
 
-static GSList *client_destroy_notifies = NULL;
+static GSList  *client_destroy_notifies = NULL;
+static RrImage *client_default_icon     = NULL;
 
 static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
@@ -109,6 +110,19 @@ static void client_prompt_kill(ObClient *self);
 
 void client_startup(gboolean reconfig)
 {
+    if ((client_default_icon = RrImageCacheFind(ob_rr_icons,
+                                                ob_rr_theme->def_win_icon,
+                                                ob_rr_theme->def_win_icon_w,
+                                                ob_rr_theme->def_win_icon_h)))
+        RrImageRef(client_default_icon);
+    else {
+        client_default_icon = RrImageNew(ob_rr_icons);
+        RrImageAddPicture(client_default_icon,
+                          ob_rr_theme->def_win_icon,
+                          ob_rr_theme->def_win_icon_w,
+                          ob_rr_theme->def_win_icon_h);
+    }
+
     if (reconfig) return;
 
     client_set_list();
@@ -116,6 +130,9 @@ void client_startup(gboolean reconfig)
 
 void client_shutdown(gboolean reconfig)
 {
+    RrImageUnref(client_default_icon);
+    client_default_icon = NULL;
+
     if (reconfig) return;
 }
 
@@ -587,7 +604,6 @@ void client_unmanage_all(void)
 
 void client_unmanage(ObClient *self)
 {
-    guint j;
     GSList *it;
     gulong ignore_start;
 
@@ -719,11 +735,8 @@ void client_unmanage(ObClient *self)
     ob_debug("Unmanaged window 0x%lx", self->window);
 
     /* free all data allocated in the client struct */
+    RrImageUnref(self->icon_set);
     g_slist_free(self->transients);
-    for (j = 0; j < self->nicons; ++j)
-        g_free(self->icons[j].data);
-    if (self->nicons > 0)
-        g_free(self->icons);
     g_free(self->startup_id);
     g_free(self->wm_command);
     g_free(self->title);
@@ -2009,143 +2022,134 @@ void client_update_strut(ObClient *self)
     }
 }
 
-/* Avoid storing icons above this size if possible */
-#define AVOID_ABOVE 64
-
 void client_update_icons(ObClient *self)
 {
     guint num;
     guint32 *data;
     guint w, h, i, j;
     guint num_seen;  /* number of icons present */
-    guint num_small_seen;  /* number of icons small enough present */
-    guint smallest, smallest_area;
+    RrImage *img;
 
-    for (i = 0; i < self->nicons; ++i)
-        g_free(self->icons[i].data);
-    if (self->nicons > 0)
-        g_free(self->icons);
-    self->nicons = 0;
+    img = NULL;
+
+    /* grab the server, because we might be setting the window's icon and
+       we don't want them to set it in between and we overwrite their own
+       icon */
+    grab_server(TRUE);
 
     if (OBT_PROP_GETA32(self->window, NET_WM_ICON, CARDINAL, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
-        num_seen = num_small_seen = 0;
-        smallest = smallest_area = 0;
-        if (num > 2)
-            while (i < num) {
+        num_seen = 0;
+        while (i + 2 < num) { /* +2 is to make sure there is a w and h */
+            w = data[i++];
+            h = data[i++];
+            /* watch for the data being too small for the specified size,
+               or for zero sized icons. */
+            if (i + w*h > num || w == 0 || h == 0) break;
+
+            /* convert it to the right bit order for ObRender */
+            for (j = 0; j < w*h; ++j)
+                data[i+j] =
+                    (((data[i+j] >> 24) & 0xff) << RrDefaultAlphaOffset) +
+                    (((data[i+j] >> 16) & 0xff) << RrDefaultRedOffset)   +
+                    (((data[i+j] >>  8) & 0xff) << RrDefaultGreenOffset) +
+                    (((data[i+j] >>  0) & 0xff) << RrDefaultBlueOffset);
+
+            /* is it in the cache? */
+            img = RrImageCacheFind(ob_rr_icons, &data[i], w, h);
+            if (img) RrImageRef(img); /* own it */
+
+            i += w*h;
+            ++num_seen;
+
+            /* don't bother looping anymore if we already found it in the cache
+               since we'll just use that! */
+            if (img) break;
+        }
+
+        /* if it's not in the cache yet, then add it to the cache now.
+           we have already converted it to the correct bit order above */
+        if (!img && num_seen > 0) {
+            img = RrImageNew(ob_rr_icons);
+            i = 0;
+            for (j = 0; j < num_seen; ++j) {
                 w = data[i++];
                 h = data[i++];
-                i += w * h;
-                /* watch for it being too small for the specified size, or for
-                   zero sized icons. */
-                if (i > num || w == 0 || h == 0) break;
-
-                if (!smallest_area || w*h < smallest_area) {
-                    smallest = num_seen;
-                    smallest_area = w*h;
-                }
-                ++num_seen;
-                if (w <= AVOID_ABOVE && h <= AVOID_ABOVE)
-                    ++num_small_seen;
-            }
-        if (num_small_seen > 0)
-            self->nicons = num_small_seen;
-        else if (num_seen)
-            self->nicons = 1;
-
-        self->icons = g_new(ObClientIcon, self->nicons);
-
-        /* store the icons */
-        i = 0;
-        for (j = 0; j < self->nicons;) {
-            guint x, y, t;
-
-            w = self->icons[j].width = data[i++];
-            h = self->icons[j].height = data[i++];
-
-            /* if there are some icons smaller than the threshold, we're
-               skipping all the ones above */
-            if (num_small_seen > 0) {
-                if (w > AVOID_ABOVE || h > AVOID_ABOVE) {
-                    i += w*h;
-                    continue;
-                }
-            }
-            /* if there were no icons smaller than the threshold, then we are
-               only taking the smallest available one we saw */
-            else if (j != smallest) {
+                RrImageAddPicture(img, &data[i], w, h);
                 i += w*h;
-                continue;
             }
-
-            self->icons[j].data = g_new(RrPixel32, w * h);
-            for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
-                if (x >= w) {
-                    x = 0;
-                    ++y;
-                }
-                self->icons[j].data[t] =
-                    (((data[i] >> 24) & 0xff) << RrDefaultAlphaOffset) +
-                    (((data[i] >> 16) & 0xff) << RrDefaultRedOffset) +
-                    (((data[i] >> 8) & 0xff) << RrDefaultGreenOffset) +
-                    (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
-            }
-            g_assert(i <= num);
-
-            ++j;
         }
 
         g_free(data);
-    } else {
+    }
+
+    /* if we didn't find an image from the NET_WM_ICON stuff, then try the
+       legacy X hints */
+    if (!img) {
         XWMHints *hints;
 
         if ((hints = XGetWMHints(obt_display, self->window))) {
             if (hints->flags & IconPixmapHint) {
-                self->nicons = 1;
-                self->icons = g_new(ObClientIcon, self->nicons);
+                gboolean xicon;
                 obt_display_ignore_errors(TRUE);
-                if (!RrPixmapToRGBA(ob_rr_inst,
-                                    hints->icon_pixmap,
-                                    (hints->flags & IconMaskHint ?
-                                     hints->icon_mask : None),
-                                    &self->icons[0].width,
-                                    &self->icons[0].height,
-                                    &self->icons[0].data))
-                {
-                    g_free(self->icons);
-                    self->nicons = 0;
-                }
+                xicon = RrPixmapToRGBA(ob_rr_inst,
+                                       hints->icon_pixmap,
+                                       (hints->flags & IconMaskHint ?
+                                        hints->icon_mask : None),
+                                       (gint*)&w, (gint*)&h, &data);
                 obt_display_ignore_errors(FALSE);
+
+
+                if (xicon) {
+                    if (w > 0 && h > 0) {
+                        /* is this icon in the cache yet? */
+                        img = RrImageCacheFind(ob_rr_icons, data, w, h);
+                        if (img) RrImageRef(img); /* own it */
+
+                        /* if not, then add it */
+                        if (!img) {
+                            img = RrImageNew(ob_rr_icons);
+                            RrImageAddPicture(img, data, w, h);
+                        }
+                    }
+
+                    g_free(data);
+                }
             }
             XFree(hints);
         }
     }
 
-    /* set the default icon onto the window
-       in theory, this could be a race, but if a window doesn't set an icon
-       or removes it entirely, it's not very likely it is going to set one
-       right away afterwards
+    /* set the client's icons to be whatever we found */
+    RrImageUnref(self->icon_set);
+    self->icon_set = img;
 
-       if it has parents, then one of them will have an icon already
+    /* if the client has no icon at all, then we set a default icon onto it.
+       but, if it has parents, then one of them will have an icon already
     */
-    if (self->nicons == 0 && !self->parents) {
+    if (!self->icon_set && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
-        gulong *data;
+        gulong *ldata; /* use a long here to satisfy OBT_PROP_SETA32 */
 
-        data = g_new(gulong, 48*48+2);
-        data[0] = data[1] =  48;
-        for (i = 0; i < 48*48; ++i)
-            data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
+        w = ob_rr_theme->def_win_icon_w;
+        h = ob_rr_theme->def_win_icon_h;
+        ldata = g_new(gulong, w*h+2);
+        ldata[0] = w;
+        ldata[1] = h;
+        for (i = 0; i < w*h; ++i)
+            ldata[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
                 (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
                 (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
                 (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
-        OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, data, 48*48+2);
-        g_free(data);
+        OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, ldata, w*h+2);
+        g_free(ldata);
     } else if (self->frame)
         /* don't draw the icon empty if we're just setting one now anyways,
            we'll get the property change any second */
         frame_adjust_icon(self->frame);
+
+    grab_server(FALSE);
 }
 
 void client_update_icon_geometry(ObClient *self)
@@ -3840,53 +3844,21 @@ gboolean client_focused(ObClient *self)
     return self == focus_client;
 }
 
-static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
-{
-    guint i;
-    gulong min_diff, min_i;
 
-    if (!self->nicons) {
-        ObClientIcon *parent = NULL;
+
+RrImage* client_icon(ObClient *self)
+{
+    RrImage *ret = NULL;
+
+    if (self->icon_set)
+        ret = self->icon_set;
+    else if (self->parents) {
         GSList *it;
-
-        for (it = self->parents; it; it = g_slist_next(it)) {
-            ObClient *c = it->data;
-            if ((parent = client_icon_recursive(c, w, h)))
-                break;
-        }
-
-        return parent;
+        for (it = self->parents; it && !ret; it = g_slist_next(it))
+            ret = client_icon(it->data);
     }
-
-    /* some kind of crappy approximation to find the icon closest in size to
-       what we requested, but icons are generally all the same ratio as
-       eachother so it's good enough. */
-
-    min_diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
-    min_i = 0;
-
-    for (i = 1; i < self->nicons; ++i) {
-        gulong diff;
-
-        diff = ABS(self->icons[i].width - w) + ABS(self->icons[i].height - h);
-        if (diff < min_diff) {
-            min_diff = diff;
-            min_i = i;
-        }
-    }
-    return &self->icons[min_i];
-}
-
-const ObClientIcon* client_icon(ObClient *self, gint w, gint h)
-{
-    ObClientIcon *ret;
-    static ObClientIcon deficon;
-
-    if (!(ret = client_icon_recursive(self, w, h))) {
-        deficon.width = deficon.height = 48;
-        deficon.data = ob_rr_theme->def_win_icon;
-        ret = &deficon;
-    }
+    if (!ret)
+        ret = client_default_icon;
     return ret;
 }
 

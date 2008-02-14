@@ -83,16 +83,17 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
-RrInstance  *ob_rr_inst;
-RrTheme     *ob_rr_theme;
-ObtMainLoop *ob_main_loop;
-gint         ob_screen;
-gboolean     ob_replace_wm = FALSE;
-gboolean     ob_sm_use = TRUE;
-gchar       *ob_sm_id = NULL;
-gchar       *ob_sm_save_file = NULL;
-gboolean     ob_sm_restore = TRUE;
-gboolean     ob_debug_xinerama = FALSE;
+RrInstance   *ob_rr_inst;
+RrImageCache *ob_rr_icons;
+RrTheme      *ob_rr_theme;
+ObtMainLoop  *ob_main_loop;
+gint          ob_screen;
+gboolean      ob_replace_wm = FALSE;
+gboolean      ob_sm_use = TRUE;
+gchar        *ob_sm_id = NULL;
+gchar        *ob_sm_save_file = NULL;
+gboolean      ob_sm_restore = TRUE;
+gboolean      ob_debug_xinerama = FALSE;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -167,6 +168,7 @@ gint main(gint argc, gchar **argv)
     ob_rr_inst = RrInstanceNew(obt_display, ob_screen);
     if (ob_rr_inst == NULL)
         ob_exit_with_error(_("Failed to initialize the obrender library."));
+    ob_rr_icons = RrImageCacheNew();
 
     XSynchronize(obt_display, xsync);
 
@@ -373,6 +375,7 @@ gint main(gint argc, gchar **argv)
     XSync(obt_display, FALSE);
 
     RrThemeFree(ob_rr_theme);
+    RrImageCacheUnref(ob_rr_icons);
     RrInstanceFree(ob_rr_inst);
 
     session_shutdown(being_replaced);

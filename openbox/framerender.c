@@ -354,21 +354,21 @@ static void framerender_label(ObFrame *self, RrAppearance *a)
 
 static void framerender_icon(ObFrame *self, RrAppearance *a)
 {
-    const ObClientIcon *icon;
+    RrImage *icon;
 
     if (!self->icon_on) return;
 
-    icon = client_icon(self->client,
-                       ob_rr_theme->button_size + 2,
-                       ob_rr_theme->button_size + 2);
+    icon = client_icon(self->client);
+
     if (icon) {
-        a->texture[0].type = RR_TEXTURE_RGBA;
-        a->texture[0].data.rgba.width = icon->width;
-        a->texture[0].data.rgba.height = icon->height;
-        a->texture[0].data.rgba.alpha = 0xff;
-        a->texture[0].data.rgba.data = icon->data;
-    } else
+        RrAppearanceClearTextures(a);
+        a->texture[0].type = RR_TEXTURE_IMAGE;
+        a->texture[0].data.image.alpha = 0xff;
+        a->texture[0].data.image.image = icon;
+    } else {
+        RrAppearanceClearTextures(a);
         a->texture[0].type = RR_TEXTURE_NONE;
+    }
 
     RrPaint(a, self->icon,
             ob_rr_theme->button_size + 2, ob_rr_theme->button_size + 2);

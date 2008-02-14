@@ -30,6 +30,7 @@
 #include <X11/Xlib.h>
 
 extern RrInstance *ob_rr_inst;
+extern RrImageCache *ob_rr_icons;
 extern RrTheme    *ob_rr_theme;
 
 extern ObtMainLoop *ob_main_loop;

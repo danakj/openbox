@@ -86,6 +86,8 @@ render_libobrender_la_SOURCES = \
 	render/icon.h \
 	render/image.h \
 	render/image.c \
+	render/imagecache.h \
+	render/imagecache.c \
 	render/instance.h \
 	render/instance.c \
 	render/mask.h \

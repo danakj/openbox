@@ -56,8 +56,6 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
             if (client_normal(c) && (!c->skip_taskbar || c->iconic) &&
                 (c->desktop == desktop || c->desktop == DESKTOP_ALL))
             {
-                const ObClientIcon *icon;
-
                 empty = FALSE;
 
                 if (c->iconic) {
@@ -69,11 +67,9 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
                     e = menu_add_normal(menu, desktop, c->title, NULL, FALSE);
                 }
 
-                if (config_menu_client_list_icons
-                        && (icon = client_icon(c, 32, 32))) {
-                    e->data.normal.icon_width = icon->width;
-                    e->data.normal.icon_height = icon->height;
-                    e->data.normal.icon_data = icon->data;
+                if (config_menu_client_list_icons) {
+                    e->data.normal.icon = client_icon(c);
+                    RrImageRef(e->data.normal.icon);
                     e->data.normal.icon_alpha =
                         c->iconic ? OB_ICONIC_ALPHA : 0xff;
                 }

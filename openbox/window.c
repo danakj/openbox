@@ -74,8 +74,11 @@ ObStackingLayer window_layer(ObWindow *self)
         return ((ObClient*)self)->layer;
     case OB_WINDOW_CLASS_MENUFRAME:
     case OB_WINDOW_CLASS_INTERNAL:
-    case OB_WINDOW_CLASS_PROMPT:
         return OB_STACKING_LAYER_INTERNAL;
+    case OB_WINDOW_CLASS_PROMPT:
+        /* not used directly for stacking, prompts are managed as clients */
+        g_assert_not_reached();
+        break;
     }
     g_assert_not_reached();
     return None;

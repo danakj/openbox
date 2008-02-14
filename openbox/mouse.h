@@ -19,7 +19,7 @@
 #ifndef ob__mouse_h
 #define ob__mouse_h
 
-#include "frame.h"
+#include "engine_interface.h"
 #include "misc.h"
 
 #include <X11/Xlib.h>

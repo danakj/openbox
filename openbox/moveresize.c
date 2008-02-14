@@ -18,10 +18,9 @@
 */
 
 #include "grab.h"
-#include "framerender.h"
 #include "screen.h"
 #include "client.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "openbox.h"
 #include "resist.h"
 #include "popup.h"
@@ -41,7 +40,7 @@
 /* how far windows move and resize with the keyboard arrows */
 #define KEY_DIST 8
 
-gboolean moveresize_in_progress = FALSE;
+//gboolean moveresize_in_progress = FALSE;
 ObClient *moveresize_client = NULL;
 #ifdef SYNC
 XSyncAlarm moveresize_alarm = None;
@@ -86,7 +85,7 @@ void moveresize_startup(gboolean reconfig)
 void moveresize_shutdown(gboolean reconfig)
 {
     if (!reconfig) {
-        if (moveresize_in_progress)
+        if (render_plugin->moveresize_in_progress)
             moveresize_end(FALSE);
         client_remove_destroy_notify(client_dest);
     }
@@ -99,17 +98,19 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 {
     gchar *text;
 
+    Strut size = render_plugin->frame_get_size(c->frame);
+    Rect area = render_plugin->frame_get_window_area(c->frame);
     text = g_strdup_printf(format, a, b);
     if (config_resize_popup_pos == OB_RESIZE_POS_TOP)
         popup_position(popup, SouthGravity,
-                       c->frame->area.x
-                     + c->frame->area.width/2,
-                       c->frame->area.y - ob_rr_theme->fbwidth);
+                       area.x
+                     + area.width/2,
+                       area.y - ob_rr_theme->fbwidth);
     else if (config_resize_popup_pos == OB_RESIZE_POS_CENTER)
         popup_position(popup, CenterGravity,
-                       c->frame->area.x + c->frame->size.left +
+                       area.x + size.left +
                        c->area.width / 2,
-                       c->frame->area.y + c->frame->size.top +
+                       area.y + size.top +
                        c->area.height / 2);
     else /* Fixed */ {
         Rect *area = screen_physical_area_active();
@@ -172,7 +173,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     gint up = 1;
     gint left = 1;
 
-    if (moveresize_in_progress || !c->frame->visible ||
+    if (render_plugin->moveresize_in_progress || !render_plugin->frame_is_visible(c->frame) ||
         !(mv ?
           (c->functions & OB_CLIENT_FUNC_MOVE) :
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
@@ -221,7 +222,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         return;
     }
 
-    frame_end_iconify_animation(c->frame);
+    render_plugin->frame_end_iconify_animation(c->frame);
 
     moving = mv;
     moveresize_client = c;
@@ -252,7 +253,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     cur_w = start_cw;
     cur_h = start_ch;
 
-    moveresize_in_progress = TRUE;
+    render_plugin->moveresize_in_progress = TRUE;
 
 #ifdef SYNC
     if (config_resize_redraw && !moving && obt_display_extension_sync &&
@@ -330,7 +331,7 @@ void moveresize_end(gboolean cancel)
     /* dont edge warp after its ended */
     cancel_edge_warp();
 
-    moveresize_in_progress = FALSE;
+    render_plugin->moveresize_in_progress = FALSE;
     moveresize_client = NULL;
 }
 
@@ -348,8 +349,8 @@ static void do_move(gboolean keyboard, gint keydist)
                      TRUE, FALSE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
         popup_coords(moveresize_client, "%d x %d",
-                     moveresize_client->frame->area.x,
-                     moveresize_client->frame->area.y);
+                     render_plugin->frame_get_window_area(moveresize_client->frame).x,
+                     render_plugin->frame_get_window_area(moveresize_client->frame).y);
 }
 
 
@@ -480,11 +481,13 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
         trydh = nh - oh;
     }
 
+
+    Strut size = render_plugin->frame_get_size(moveresize_client->frame);
     /* resist_size_* needs the frame size */
-    nw += moveresize_client->frame->size.left +
-        moveresize_client->frame->size.right;
-    nh += moveresize_client->frame->size.top +
-        moveresize_client->frame->size.bottom;
+    nw += size.left +
+        size.right;
+    nh += size.top +
+        size.bottom;
 
     if (keyboard) resist = keydist - 1; /* resist for one key press */
     else resist = config_resist_win;
@@ -492,10 +495,10 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     if (!keyboard) resist = config_resist_edge;
     resist_size_monitors(moveresize_client, resist, &nw, &nh, dir);
 
-    nw -= moveresize_client->frame->size.left +
-        moveresize_client->frame->size.right;
-    nh -= moveresize_client->frame->size.top +
-        moveresize_client->frame->size.bottom;
+    nw -= size.left +
+        size.right;
+    nh -= size.top +
+        size.bottom;
 
     *dw = nw - ow;
     *dh = nh - oh;
@@ -827,7 +830,7 @@ gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
 
-    if (!moveresize_in_progress) return FALSE;
+    if (!render_plugin->moveresize_in_progress) return FALSE;
 
     if (e->type == ButtonPress) {
         if (!button) {

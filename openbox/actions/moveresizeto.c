@@ -1,7 +1,9 @@
 #include "openbox/actions.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
-#include "openbox/frame.h"
+#include "openbox/engine_interface.h"
+#include "openbox/openbox.h"
+
 #include <stdlib.h> /* for atoi */
 
 enum {
@@ -124,27 +126,29 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         y = c->area.y;
         client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
 
+        Strut c_size = render_plugin->frame_get_size(c->frame);
+        Rect c_area = render_plugin->frame_get_window_area(c->frame);
         /* get the frame's size */
-        w += c->frame->size.left + c->frame->size.right;
-        h += c->frame->size.top + c->frame->size.bottom;
+        w += c_size.left + c_size.right;
+        h += c_size.top + c_size.bottom;
 
         x = o->x;
         if (o->xcenter) x = (area->width - w) / 2;
-        else if (x == G_MININT) x = c->frame->area.x - carea->x;
+        else if (x == G_MININT) x = c_area.x - carea->x;
         else if (o->xopposite) x = area->width - w;
         x += area->x;
 
         y = o->y;
         if (o->ycenter) y = (area->height - h) / 2;
-        else if (y == G_MININT) y = c->frame->area.y - carea->y;
+        else if (y == G_MININT) y = c_area.y - carea->y;
         else if (o->yopposite) y = area->height - h;
         y += area->y;
 
         /* get the client's size back */
-        w -= c->frame->size.left + c->frame->size.right;
-        h -= c->frame->size.top + c->frame->size.bottom;
+        w -= c_size.left + c_size.right;
+        h -= c_size.top + c_size.bottom;
 
-        frame_frame_gravity(c->frame, &x, &y); /* get the client coords */
+        frame_frame_gravity(c, &x, &y); /* get the client coords */
         client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
         /* force it on screen if its moving to another monitor */
         client_find_onscreen(c, &x, &y, w, h, mon != cmon);

@@ -21,7 +21,7 @@
 #define ob__keybaord_h
 
 #include "keytree.h"
-#include "frame.h"
+#include "engine_interface.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>

@@ -19,7 +19,7 @@
 
 #include "focus.h"
 #include "screen.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "openbox.h"
 #include "event.h"
 #include "grab.h"

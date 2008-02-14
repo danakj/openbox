@@ -20,7 +20,7 @@
 #include "popup.h"
 
 #include "openbox.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "client.h"
 #include "stacking.h"
 #include "event.h"

@@ -1,7 +1,7 @@
 #include "openbox/actions.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
-#include "openbox/frame.h"
+#include "openbox/engine_interface.h"
 #include <stdlib.h> /* for atoi */
 
 typedef struct {

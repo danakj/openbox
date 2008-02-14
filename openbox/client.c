@@ -25,7 +25,7 @@
 #include "moveresize.h"
 #include "ping.h"
 #include "place.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "session.h"
 #include "event.h"
 #include "grab.h"
@@ -42,6 +42,7 @@
 #include "gettext.h"
 #include "obt/display.h"
 #include "obt/prop.h"
+#include "window.h"
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
@@ -228,9 +229,8 @@ void client_manage(Window window, ObPrompt *prompt)
         XChangeSaveSet(obt_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
-    self->frame = frame_new(self);
-
-    frame_grab_client(self->frame);
+    self->frame = render_plugin->frame_new(self);
+    render_plugin->frame_grab(self->frame, window_map);
 
     /* we've grabbed everything and set everything that we need to at mapping
        time now */
@@ -274,8 +274,13 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* adjust the frame to the client's size before showing or placing
        the window */
-    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-    frame_adjust_client_area(self->frame);
+    render_plugin->frame_set_client_area (self->frame, self->area);
+    render_plugin->frame_set_hover_flag (self->frame, OB_BUTTON_NONE);
+    render_plugin->frame_set_press_flag (self->frame, OB_BUTTON_NONE);
+    render_plugin->frame_set_is_focus (self->frame, FALSE);
+    render_plugin->frame_set_decorations (self->frame, self->decorations);
+    render_plugin->frame_update_layout (self->frame, FALSE, TRUE);
+    render_plugin->frame_update_skin (self->frame);
 
     /* where the frame was placed is where the window was originally */
     place = self->area;
@@ -355,9 +360,10 @@ void client_manage(Window window, ObPrompt *prompt)
     {
         Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
+        Strut size = render_plugin->frame_get_size(self->frame);
         /* get the size of the frame */
-        place.width += self->frame->size.left + self->frame->size.right;
-        place.height += self->frame->size.top + self->frame->size.bottom;
+        place.width += size.left + size.right;
+        place.height += size.top + size.bottom;
 
         /* fit the window inside the area */
         place.width = MIN(place.width, a->width);
@@ -366,8 +372,8 @@ void client_manage(Window window, ObPrompt *prompt)
         ob_debug("setting window size to %dx%d", place.width, place.height);
 
         /* get the size of the client back */
-        place.width -= self->frame->size.left + self->frame->size.right;
-        place.height -= self->frame->size.top + self->frame->size.bottom;
+        place.width -= size.left + size.right;
+        place.height -= size.top + size.bottom;
 
         g_free(a);
     }
@@ -404,7 +410,7 @@ void client_manage(Window window, ObPrompt *prompt)
                       self->window, map_time, launch_time,
                       event_last_user_time);
 
-        if (menu_frame_visible || moveresize_in_progress) {
+        if (menu_frame_visible || render_plugin->moveresize_in_progress) {
             activate = FALSE;
             raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
@@ -551,7 +557,7 @@ void client_manage(Window window, ObPrompt *prompt)
     g_free(settings);
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
-             window, self->frame->window, self->class);
+             window, render_plugin->frame_get_window(self->frame), self->class);
 }
 
 
@@ -575,12 +581,13 @@ ObClient *client_fake_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* create the decoration frame for the client window and adjust its size */
-    self->frame = frame_new(self);
-    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
+    self->frame = render_plugin->frame_new(self);
+    render_plugin->frame_set_decorations (self->frame, self->decorations);
+    render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
 
     ob_debug("gave extents left %d right %d top %d bottom %d",
-             self->frame->size.left, self->frame->size.right,
-             self->frame->size.top, self->frame->size.bottom);
+             render_plugin->frame_get_size(self->frame).left, render_plugin->frame_get_size(self->frame).right,
+             render_plugin->frame_get_size(self->frame).top, render_plugin->frame_get_size(self->frame).bottom);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
@@ -601,7 +608,7 @@ void client_unmanage(ObClient *self)
     gulong ignore_start;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)",
-             self->window, self->frame->window,
+             self->window, render_plugin->frame_get_window(self->frame),
              self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);
@@ -614,7 +621,7 @@ void client_unmanage(ObClient *self)
     if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();
 
-    frame_hide(self->frame);
+    self->ignore_unmaps += render_plugin->frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
     XFlush(obt_display);
 
@@ -700,8 +707,8 @@ void client_unmanage(ObClient *self)
     }
 
     /* reparent the window out of the frame, and free the frame */
-    frame_release_client(self->frame);
-    frame_free(self->frame);
+    render_plugin->frame_ungrab(self->frame, window_map);
+    render_plugin->frame_free(self->frame);
     self->frame = NULL;
 
     if (ob_state() != OB_STATE_EXITING) {
@@ -750,7 +757,7 @@ void client_fake_unmanage(ObClient *self)
 {
     /* this is all that got allocated to get the decorations */
 
-    frame_free(self->frame);
+    render_plugin->frame_free(self->frame);
     g_free(self);
 }
 
@@ -877,6 +884,9 @@ static void client_restore_session_state(ObClient *self)
     self->max_horz = self->session->max_horz;
     self->max_vert = self->session->max_vert;
     self->undecorated = self->session->undecorated;
+
+    render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
+    render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
 }
 
 static gboolean client_restore_session_stacking(ObClient *self)
@@ -927,14 +937,16 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     gboolean found_mon;
 
     RECT_SET(desired, *x, *y, w, h);
-    frame_rect_to_frame(self->frame, &desired);
+    frame_rect_to_frame(self, &desired);
 
     /* get where the frame would be */
-    frame_client_gravity(self->frame, x, y);
+    frame_client_gravity(self, x, y);
+
+    Strut size = render_plugin->frame_get_size(self->frame);
 
     /* get the requested size of the window with decorations */
-    fw = self->frame->size.left + w + self->frame->size.right;
-    fh = self->frame->size.top + h + self->frame->size.bottom;
+    fw = size.left + w + size.right;
+    fh = size.top + h + size.bottom;
 
     /* If rudeness wasn't requested, then still be rude in a given direction
        if the client is not moving, only resizing in that direction */
@@ -943,9 +955,10 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         Point newtl, newtr, newbl, newbr;
         gboolean stationary_l, stationary_r, stationary_t, stationary_b;
 
-        POINT_SET(oldtl, self->frame->area.x, self->frame->area.y);
-        POINT_SET(oldbr, self->frame->area.x + self->frame->area.width - 1,
-                  self->frame->area.y + self->frame->area.height - 1);
+        Rect area = render_plugin->frame_get_window_area(self->frame);
+        POINT_SET(oldtl, area.x, area.y);
+        POINT_SET(oldbr, area.x + area.width - 1,
+                  area.y + area.height - 1);
         POINT_SET(oldtr, oldbr.x, oldtl.y);
         POINT_SET(oldbl, oldtl.x, oldbr.y);
 
@@ -1031,7 +1044,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     }
 
     /* get where the client should be */
-    frame_frame_gravity(self->frame, x, y);
+    frame_frame_gravity(self, x, y);
 
     return ox != *x || oy != *y;
 }
@@ -1797,6 +1810,8 @@ static void client_change_allowed_actions(ObClient *self)
                                                          self->max_vert)) {
         if (self->frame) client_maximize(self, FALSE, 0);
         else self->max_vert = self->max_horz = FALSE;
+        render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
+        render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
     }
 }
 
@@ -1931,7 +1946,7 @@ void client_update_title(ObClient *self)
     self->title = visible;
 
     if (self->frame)
-        frame_adjust_title(self->frame);
+    render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
 
     /* update the icon title */
     data = NULL;
@@ -2152,9 +2167,10 @@ void client_update_icons(ObClient *self)
         OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, data, 48*48+2);
         g_free(data);
     } else if (self->frame)
+        render_plugin->frame_update_skin (self->frame);
         /* don't draw the icon empty if we're just setting one now anyways,
            we'll get the property change any second */
-        frame_adjust_icon(self->frame);
+        //frame_adjust_icon(self->frame);
 }
 
 void client_update_icon_geometry(ObClient *self)
@@ -2332,7 +2348,7 @@ static void client_change_state(ObClient *self)
     OBT_PROP_SETA32(self->window, NET_WM_STATE, ATOM, netstate, num);
 
     if (self->frame)
-        frame_adjust_state(self->frame);
+    render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
 }
 
 ObClient *client_search_focus_tree(ObClient *self)
@@ -2514,7 +2530,7 @@ gboolean client_show(ObClient *self)
            should be going to something under the window */
         mouse_replay_pointer();
 
-        frame_show(self->frame);
+        render_plugin->frame_show(self->frame);
         show = TRUE;
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
@@ -2559,7 +2575,7 @@ gboolean client_hide(ObClient *self)
            should be going to the window */
         mouse_replay_pointer();
 
-        frame_hide(self->frame);
+        self->ignore_unmaps += render_plugin->frame_hide(self->frame);
         hide = TRUE;
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
@@ -2640,6 +2656,7 @@ static void client_apply_startup_state(ObClient *self,
     /* save the area, and make it where it should be for the premax stuff */
     oldarea = self->area;
     RECT_SET(self->area, x, y, w, h);
+    render_plugin->frame_set_client_area (self->frame, self->area);
 
     /* apply the states. these are in a carefully crafted order.. */
 
@@ -2672,6 +2689,11 @@ static void client_apply_startup_state(ObClient *self,
        not, so this needs to be called even if we have fullscreened/maxed
     */
     self->area = oldarea;
+    render_plugin->frame_set_client_area (self->frame, self->area);
+    render_plugin->frame_set_decorations (self->frame, self->decorations);
+    render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
+    render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
+    render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
@@ -2749,15 +2771,16 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                           gboolean user)
 {
     Rect desired = {*x, *y, *w, *h};
-    frame_rect_to_frame(self->frame, &desired);
+    frame_rect_to_frame(self, &desired);
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
        the updated frame dimensions. */
-    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
+    render_plugin->frame_set_decorations (self->frame, self->decorations);
+    render_plugin->frame_update_layout (self->frame, FALSE, TRUE);
 
     /* gets the frame's position */
-    frame_client_gravity(self->frame, x, y);
+    frame_client_gravity(self, x, y);
 
     /* these positions are frame positions, not client positions */
 
@@ -2787,14 +2810,15 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         a = screen_area(self->desktop, i,
                         (self->max_horz && self->max_vert ? NULL : &desired));
 
+        Strut size = render_plugin->frame_get_size(self->frame);
         /* set the size and position if maximized */
         if (self->max_horz) {
             *x = a->x;
-            *w = a->width - self->frame->size.left - self->frame->size.right;
+            *w = a->width - size.left - size.right;
         }
         if (self->max_vert) {
             *y = a->y;
-            *h = a->height - self->frame->size.top - self->frame->size.bottom;
+            *h = a->height - size.top - size.bottom;
         }
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
@@ -2804,7 +2828,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     }
 
     /* gets the client's position */
-    frame_frame_gravity(self->frame, x, y);
+    frame_frame_gravity(self, x, y);
 
     /* work within the prefered sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
@@ -2921,10 +2945,13 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     gboolean send_resize_client;
     gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
     gboolean fmoved, fresized;
-    guint fdecor = self->frame->decorations;
-    gboolean fhorz = self->frame->max_horz;
-    gboolean fvert = self->frame->max_vert;
+    guint fdecor = render_plugin->frame_get_decorations(self->frame);
+    gboolean fhorz = render_plugin->frame_is_max_horz(self->frame);
+    gboolean fvert = render_plugin->frame_is_max_vert(self->frame);
     gint logicalw, logicalh;
+
+    Strut size = render_plugin->frame_get_size(self->frame);
+    Rect area = render_plugin->frame_get_window_area(self->frame);
 
     /* find the new x, y, width, and height (and logical size) */
     client_try_configure(self, &x, &y, &w, &h, &logicalw, &logicalh, user);
@@ -2939,8 +2966,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     oldw = self->area.width;
     oldh = self->area.height;
-    oldframe = self->frame->area;
+    oldframe = render_plugin->frame_get_window_area(self->frame);
     RECT_SET(self->area, x, y, w, h);
+
+    render_plugin->frame_set_client_area (self->frame, self->area);
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when
@@ -2951,10 +2980,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        XMoveResizeWindow(obt_display, self->window,
-                          self->frame->size.left, self->frame->size.top,
-                          MAX(w, oldw), MAX(h, oldh));
-        frame_adjust_client_area(self->frame);
+        render_plugin->frame_set_decorations (self->frame, self->decorations);
+        render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
     }
 
     /* find the frame's dimensions and move/resize it */
@@ -2978,7 +3005,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
            would change what window gets the event */
         mouse_replay_pointer();
 
-        frame_adjust_area(self->frame, fmoved, fresized, FALSE);
+        render_plugin->frame_set_decorations (self->frame, self->decorations);
+        render_plugin->frame_update_layout (self->frame, TRUE, FALSE);
 
         if (!user)
             event_end_ignore_all_enters(ignore_start);
@@ -2990,9 +3018,9 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         /* we have reset the client to 0 border width, so don't include
            it in these coords */
         POINT_SET(self->root_pos,
-                  self->frame->area.x + self->frame->size.left -
+                  area.x + size.left -
                   self->border_width,
-                  self->frame->area.y + self->frame->size.top -
+                  area.y + size.top -
                   self->border_width);
         if (self->root_pos.x != oldrx || self->root_pos.y != oldry)
             rootmoved = TRUE;
@@ -3042,16 +3070,16 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        in the direction that is growing
      */
     if (send_resize_client && (w <= oldw || h <= oldh)) {
-        frame_adjust_client_area(self->frame);
-        XMoveResizeWindow(obt_display, self->window,
-                          self->frame->size.left, self->frame->size.top, w, h);
+      render_plugin->frame_set_decorations (self->frame, self->decorations);
+      render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
     }
 
     XFlush(obt_display);
 
     /* if it moved between monitors, then this can affect the stacking
        layer of this window or others - for fullscreen windows */
-    if (screen_find_monitor(&self->frame->area) !=
+    Rect current_frame = render_plugin->frame_get_window_area(self->frame);
+    if (screen_find_monitor(&current_frame) !=
         screen_find_monitor(&oldframe))
     {
         client_calc_layer(self);
@@ -3157,7 +3185,7 @@ static void client_iconify_recursive(ObClient *self,
     if (changed) {
         client_change_state(self);
         if (config_animate_iconify && !hide_animation)
-            frame_begin_iconify_animation(self->frame, iconic);
+        render_plugin->frame_begin_iconify_animation(self->frame, iconic);
         /* do this after starting the animation so it doesn't flash */
         client_showhide(self);
     }
@@ -3243,6 +3271,9 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     if (dir == 0 || dir == 2) /* vert */
         self->max_vert = max;
 
+    render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
+    render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
+
     client_change_state(self); /* change the state hints on the client */
 
     client_setup_decor_and_functions(self, FALSE);
@@ -3259,7 +3290,8 @@ void client_shade(ObClient *self, gboolean shade)
     client_change_state(self);
     client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
-    frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
+    render_plugin->frame_set_is_shaded (self->frame, self->shaded);
+    render_plugin->frame_update_layout(self->frame, FALSE, FALSE);
 }
 
 static void client_ping_event(ObClient *self, gboolean dead)
@@ -3386,9 +3418,9 @@ void client_hilite(ObClient *self, gboolean hilite)
     self->demands_attention = hilite && !client_focused(self);
     if (self->frame != NULL) { /* if we're mapping, just set the state */
         if (self->demands_attention)
-            frame_flash_start(self->frame);
+        render_plugin->frame_flash_start(self->frame);
         else
-            frame_flash_stop(self->frame);
+        render_plugin->frame_flash_stop(self->frame);
         client_change_state(self);
     }
 }
@@ -3411,7 +3443,8 @@ static void client_set_desktop_recursive(ObClient *self,
         self->desktop = target;
         OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, target);
         /* the frame can display the current desktop state */
-        frame_adjust_state(self->frame);
+        render_plugin->frame_set_decorations (self->frame, self->decorations);
+        render_plugin->frame_update_layout(self->frame, FALSE, FALSE);
         /* 'move' the window to the new desktop */
         if (!donthide)
             client_hide(self);
@@ -3685,7 +3718,7 @@ gboolean client_can_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
-    if (!self->frame->visible)
+    if (!render_plugin->frame_is_visible(self->frame))
         return FALSE;
 
     if (!(self->can_focus || self->focus_notify))
@@ -3771,7 +3804,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
             client_set_desktop(self, screen_desktop, FALSE, TRUE);
         else
             screen_set_desktop(self->desktop, FALSE);
-    } else if (!self->frame->visible)
+    } else if (!render_plugin->frame_is_visible(self->frame))
         /* if its not visible for other reasons, then don't mess
            with it */
         return;
@@ -3908,7 +3941,8 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 
 guint client_monitor(ObClient *self)
 {
-    return screen_find_monitor(&self->frame->area);
+    Rect area = render_plugin->frame_get_window_area(self->frame);
+    return screen_find_monitor(&area);
 }
 
 ObClient *client_direct_parent(ObClient *self)
@@ -4103,10 +4137,13 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     Rect dock_area;
     gint edge;
 
+    Strut size = render_plugin->frame_get_size(self->frame);
+    Rect area = render_plugin->frame_get_window_area(self->frame);
+
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
-                    &self->frame->area);
+                    &area);
     mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
-                      &self->frame->area);
+                      &area);
 
     switch (dir) {
     case OB_DIRECTION_NORTH:
@@ -4154,7 +4191,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 
         ob_debug("trying window %s", cur->title);
 
-        detect_edge(cur->frame->area, dir, my_head, my_size, my_edge_start,
+        detect_edge(render_plugin->frame_get_window_area(cur->frame), dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
     }
     dock_get_area(&dock_area);
@@ -4171,30 +4208,33 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
     gint e, e_start, e_size;
     gboolean near;
 
+
+    Rect area = render_plugin->frame_get_window_area(self->frame);
+
     switch (dir) {
     case OB_DIRECTION_EAST:
-        head = RECT_RIGHT(self->frame->area);
-        size = self->frame->area.width;
-        e_start = RECT_TOP(self->frame->area);
-        e_size = self->frame->area.height;
+        head = RECT_RIGHT(area);
+        size = area.width;
+        e_start = RECT_TOP(area);
+        e_size = area.height;
         break;
     case OB_DIRECTION_WEST:
-        head = RECT_LEFT(self->frame->area);
-        size = self->frame->area.width;
-        e_start = RECT_TOP(self->frame->area);
-        e_size = self->frame->area.height;
+        head = RECT_LEFT(area);
+        size = area.width;
+        e_start = RECT_TOP(area);
+        e_size = area.height;
         break;
     case OB_DIRECTION_NORTH:
-        head = RECT_TOP(self->frame->area);
-        size = self->frame->area.height;
-        e_start = RECT_LEFT(self->frame->area);
-        e_size = self->frame->area.width;
+        head = RECT_TOP(area);
+        size = area.height;
+        e_start = RECT_LEFT(area);
+        e_size = area.width;
         break;
     case OB_DIRECTION_SOUTH:
-        head = RECT_BOTTOM(self->frame->area);
-        size = self->frame->area.height;
-        e_start = RECT_LEFT(self->frame->area);
-        e_size = self->frame->area.width;
+        head = RECT_BOTTOM(area);
+        size = area.height;
+        e_start = RECT_LEFT(area);
+        e_size = area.width;
         break;
     default:
         g_assert_not_reached();
@@ -4202,33 +4242,33 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
 
     client_find_edge_directional(self, dir, head, size,
                                  e_start, e_size, &e, &near);
-    *x = self->frame->area.x;
-    *y = self->frame->area.y;
+    *x = area.x;
+    *y = area.y;
     switch (dir) {
     case OB_DIRECTION_EAST:
-        if (near) e -= self->frame->area.width;
+        if (near) e -= area.width;
         else      e++;
         *x = e;
         break;
     case OB_DIRECTION_WEST:
         if (near) e++;
-        else      e -= self->frame->area.width;
+        else      e -= area.width;
         *x = e;
         break;
     case OB_DIRECTION_NORTH:
         if (near) e++;
-        else      e -= self->frame->area.height;
+        else      e -= area.height;
         *y = e;
         break;
     case OB_DIRECTION_SOUTH:
-        if (near) e -= self->frame->area.height;
+        if (near) e -= area.height;
         else      e++;
         *y = e;
         break;
     default:
         g_assert_not_reached();
     }
-    frame_frame_gravity(self->frame, x, y);
+    frame_frame_gravity(self, x, y);
 }
 
 void client_find_resize_directional(ObClient *self, ObDirection side,
@@ -4240,33 +4280,36 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     gboolean near;
     ObDirection dir;
 
+    Rect area = render_plugin->frame_get_window_area(self->frame);
+    Strut size = render_plugin->frame_get_size(self->frame);
+
     switch (side) {
     case OB_DIRECTION_EAST:
-        head = RECT_RIGHT(self->frame->area) +
+        head = RECT_RIGHT(area) +
             (self->size_inc.width - 1) * (grow ? 1 : -1);
-        e_start = RECT_TOP(self->frame->area);
-        e_size = self->frame->area.height;
+        e_start = RECT_TOP(area);
+        e_size = area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
-        head = RECT_LEFT(self->frame->area) -
+        head = RECT_LEFT(area) -
             (self->size_inc.width - 1) * (grow ? 1 : -1);
-        e_start = RECT_TOP(self->frame->area);
-        e_size = self->frame->area.height;
+        e_start = RECT_TOP(area);
+        e_size = area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
-        head = RECT_TOP(self->frame->area) -
+        head = RECT_TOP(area) -
             (self->size_inc.height - 1) * (grow ? 1 : -1);
-        e_start = RECT_LEFT(self->frame->area);
-        e_size = self->frame->area.width;
+        e_start = RECT_LEFT(area);
+        e_size = area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
-        head = RECT_BOTTOM(self->frame->area) +
+        head = RECT_BOTTOM(area) +
             (self->size_inc.height - 1) * (grow ? 1 : -1);
-        e_start = RECT_LEFT(self->frame->area);
-        e_size = self->frame->area.width;
+        e_start = RECT_LEFT(area);
+        e_size = area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;
         break;
     default:
@@ -4277,39 +4320,39 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     client_find_edge_directional(self, dir, head, 1,
                                  e_start, e_size, &e, &near);
     ob_debug("edge %d", e);
-    *x = self->frame->area.x;
-    *y = self->frame->area.y;
-    *w = self->frame->area.width;
-    *h = self->frame->area.height;
+    *x = area.x;
+    *y = area.y;
+    *w = area.width;
+    *h = area.height;
     switch (side) {
     case OB_DIRECTION_EAST:
         if (grow == near) --e;
-        delta = e - RECT_RIGHT(self->frame->area);
+        delta = e - RECT_RIGHT(area);
         *w += delta;
         break;
     case OB_DIRECTION_WEST:
         if (grow == near) ++e;
-        delta = RECT_LEFT(self->frame->area) - e;
+        delta = RECT_LEFT(area) - e;
         *x -= delta;
         *w += delta;
         break;
     case OB_DIRECTION_NORTH:
         if (grow == near) ++e;
-        delta = RECT_TOP(self->frame->area) - e;
+        delta = RECT_TOP(area) - e;
         *y -= delta;
         *h += delta;
         break;
     case OB_DIRECTION_SOUTH:
         if (grow == near) --e;
-        delta = e - RECT_BOTTOM(self->frame->area);
+        delta = e - RECT_BOTTOM(area);
         *h += delta;
         break;
     default:
         g_assert_not_reached();
     }
-    frame_frame_gravity(self->frame, x, y);
-    *w -= self->frame->size.left + self->frame->size.right;
-    *h -= self->frame->size.top + self->frame->size.bottom;
+    frame_frame_gravity(self, x, y);
+    *w -= size.left + size.right;
+    *h -= size.top + size.bottom;
 }
 
 ObClient* client_under_pointer(void)
@@ -4322,15 +4365,15 @@ ObClient* client_under_pointer(void)
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (c->frame->visible &&
+                if (render_plugin->frame_is_visible(c->frame) &&
                     /* check the desktop, this is done during desktop
                        switching and windows are shown/hidden status is not
                        reliable */
                     (c->desktop == screen_desktop ||
                      c->desktop == DESKTOP_ALL) &&
                     /* ignore all animating windows */
-                    !frame_iconify_animating(c->frame) &&
-                    RECT_CONTAINS(c->frame->area, x, y))
+                    !(render_plugin->frame_iconify_animating(c->frame)) &&
+                    RECT_CONTAINS(render_plugin->frame_get_window_area(c->frame), x, y))
                 {
                     ret = c;
                     break;

@@ -17,7 +17,7 @@
 */
 
 #include "misc.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "obt/parse.h"
 
 #include <glib.h>

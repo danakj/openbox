@@ -1,7 +1,7 @@
 #include "openbox/actions.h"
 #include "openbox/misc.h"
 #include "openbox/client.h"
-#include "openbox/frame.h"
+#include "openbox/engine_interface.h"
 #include "openbox/screen.h"
 #include <glib.h>
 

@@ -19,11 +19,12 @@
 
 #include "resist.h"
 #include "client.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "stacking.h"
 #include "screen.h"
 #include "dock.h"
 #include "config.h"
+#include "openbox.h"
 
 #include <glib.h>
 
@@ -104,10 +105,11 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
     GList *it;
     Rect dock_area;
 
+    Rect c_area = render_plugin->frame_get_window_area(c->frame);
+
     if (!resist) return;
 
-    frame_client_gravity(c->frame, x, y);
-
+    frame_client_gravity(c, x, y);
 
     for (it = stacking_list; it; it = g_list_next(it)) {
         ObClient *target;
@@ -117,20 +119,21 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
         target = it->data;
 
         /* don't snap to self or non-visibles */
-        if (!target->frame->visible || target == c)
+        if (!render_plugin->frame_is_visible(target->frame) || target == c)
             continue;
         /* don't snap to windows set to below and skip_taskbar (desklets) */
         if (target->below && !c->below && target->skip_taskbar)
             continue;
 
-        if (resist_move_window(c->frame->area, target->frame->area,
+        Rect target_area = render_plugin->frame_get_window_area(target->frame);
+        if (resist_move_window(c_area, target_area,
                                resist, x, y))
             break;
     }
     dock_get_area(&dock_area);
-    resist_move_window(c->frame->area, dock_area, resist, x, y);
+    resist_move_window(c_area, dock_area, resist, x, y);
 
-    frame_frame_gravity(c->frame, x, y);
+    frame_frame_gravity(c, x, y);
 }
 
 void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
@@ -144,29 +147,31 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     gint w, h; /* current size */
     Rect desired_area;
 
+    Rect c_area = render_plugin->frame_get_window_area(c->frame);
+
     if (!resist) return;
 
-    frame_client_gravity(c->frame, x, y);
+    frame_client_gravity(c, x, y);
 
-    w = c->frame->area.width;
-    h = c->frame->area.height;
+    w = c_area.width;
+    h = c_area.height;
 
     l = *x;
     t = *y;
     r = l + w - 1;
     b = t + h - 1;
 
-    cl = RECT_LEFT(c->frame->area);
-    ct = RECT_TOP(c->frame->area);
-    cr = RECT_RIGHT(c->frame->area);
-    cb = RECT_BOTTOM(c->frame->area);
+    cl = RECT_LEFT(c_area);
+    ct = RECT_TOP(c_area);
+    cr = RECT_RIGHT(c_area);
+    cb = RECT_BOTTOM(c_area);
 
     RECT_SET(desired_area, *x, *y, c->area.width, c->area.height);
 
     for (i = 0; i < screen_num_monitors; ++i) {
         parea = screen_physical_area_monitor(i);
 
-        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area)) {
+        if (!RECT_INTERSECTS_RECT(*parea, c_area)) {
             g_free(parea);
             continue;
         }
@@ -205,7 +210,7 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
         g_free(parea);
     }
 
-    frame_frame_gravity(c->frame, x, y);
+    frame_frame_gravity(c, x, y);
 }
 
 static gboolean resist_size_window(Rect window, Rect target, gint resist,
@@ -297,6 +302,7 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
     ObClient *target; /* target */
     Rect dock_area;
 
+    Rect c_area = render_plugin->frame_get_window_area(c->frame);
     if (!resist) return;
 
     for (it = stacking_list; it; it = g_list_next(it)) {
@@ -305,18 +311,19 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
         target = it->data;
 
         /* don't snap to invisibles or ourself */
-        if (!target->frame->visible || target == c)
+        if (!render_plugin->frame_is_visible(target->frame) || target == c)
             continue;
         /* don't snap to windows set to below and skip_taskbar (desklets) */
         if (target->below && !c->below && target->skip_taskbar)
             continue;
 
-        if (resist_size_window(c->frame->area, target->frame->area,
+        Rect target_area = render_plugin->frame_get_window_area(target->frame);
+        if (resist_size_window(c_area, target_area,
                                resist, w, h, dir))
             break;
     }
     dock_get_area(&dock_area);
-    resist_size_window(c->frame->area, dock_area,
+    resist_size_window(c_area, dock_area,
                        resist, w, h, dir);
 }
 
@@ -332,12 +339,14 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     guint i;
     Rect desired_area;
 
+    Rect c_area = render_plugin->frame_get_window_area(c->frame);
+
     if (!resist) return;
 
-    l = RECT_LEFT(c->frame->area);
-    r = RECT_RIGHT(c->frame->area);
-    t = RECT_TOP(c->frame->area);
-    b = RECT_BOTTOM(c->frame->area);
+    l = RECT_LEFT(c_area);
+    r = RECT_RIGHT(c_area);
+    t = RECT_TOP(c_area);
+    b = RECT_BOTTOM(c_area);
 
     incw = c->size_inc.width;
     inch = c->size_inc.height;
@@ -347,7 +356,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     for (i = 0; i < screen_num_monitors; ++i) {
         parea = screen_physical_area_monitor(i);
 
-        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area)) {
+        if (!RECT_INTERSECTS_RECT(*parea, c_area)) {
             g_free(parea);
             continue;
         }
@@ -373,7 +382,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_SOUTH:
             dlt = l;
-            drb = r + *w - c->frame->area.width;
+            drb = r + *w - c_area.width;
             if (r <= ar && drb > ar && drb <= ar + resist)
                 *w = ar - l + 1;
             else if (r <= pr && drb > pr && drb <= pr + resist)
@@ -382,7 +391,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         case OB_DIRECTION_WEST:
         case OB_DIRECTION_NORTHWEST:
         case OB_DIRECTION_SOUTHWEST:
-            dlt = l - *w + c->frame->area.width;
+            dlt = l - *w + c_area.width;
             drb = r;
             if (l >= al && dlt < al && dlt >= al - resist)
                 *w = r - al + 1;
@@ -399,7 +408,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         case OB_DIRECTION_WEST:
         case OB_DIRECTION_EAST:
             dlt = t;
-            drb = b + *h - c->frame->area.height;
+            drb = b + *h - c_area.height;
             if (b <= ab && drb > ab && drb <= ab + resist)
                 *h = ab - t + 1;
             else if (b <= pb && drb > pb && drb <= pb + resist)
@@ -408,7 +417,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_NORTHWEST:
         case OB_DIRECTION_NORTHEAST:
-            dlt = t - *h + c->frame->area.height;
+            dlt = t - *h + c_area.height;
             drb = b;
             if (t >= at && dlt < at && dlt >= at - resist)
                 *h = b - at + 1;

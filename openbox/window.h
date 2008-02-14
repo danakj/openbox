@@ -90,4 +90,6 @@ void window_manage_all(void);
 void window_manage(Window win);
 void window_unmanage_all(void);
 
+extern GHashTable *window_map;
+
 #endif

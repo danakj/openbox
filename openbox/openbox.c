@@ -32,8 +32,7 @@
 #include "focus_cycle_indicator.h"
 #include "focus_cycle_popup.h"
 #include "moveresize.h"
-#include "frame.h"
-#include "framerender.h"
+#include "engine_interface.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "menuframe.h"
@@ -93,6 +92,7 @@ gchar       *ob_sm_id = NULL;
 gchar       *ob_sm_save_file = NULL;
 gboolean     ob_sm_restore = TRUE;
 gboolean     ob_debug_xinerama = FALSE;
+ObFramePlugin *render_plugin = NULL;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -255,7 +255,14 @@ gint main(gint argc, gchar **argv)
             }
 
             /* load the theme specified in the rc file */
-            {
+              {
+                ob_debug("Entering LoadThemeConfig");
+                render_plugin = init_frame_plugin (
+                    config_theme, TRUE, config_font_activewindow,
+                    config_font_inactivewindow, config_font_menutitle,
+                    config_font_menuitem, config_font_osd);
+                ob_debug("Exiting LoadThemeConfig");
+                /* load the theme specified in the rc file */
                 RrTheme *theme;
                 if ((theme = RrThemeNew(ob_rr_inst, config_theme, TRUE,
                                         config_font_activewindow,
@@ -280,9 +287,9 @@ gint main(gint argc, gchar **argv)
                 /* update all existing windows for the new theme */
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
-                    frame_adjust_theme(c->frame);
-                }
-            }
+                    render_plugin->frame_adjust_theme(c->frame);
+                  }
+              }
             event_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
@@ -330,7 +337,7 @@ gint main(gint argc, gchar **argv)
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, FALSE);
                     /* redraw the frames */
-                    frame_adjust_area(c->frame, TRUE, TRUE, FALSE);
+                    render_plugin->frame_update_layout (c->frame, FALSE, FALSE);
                     /* the decor sizes may have changed, so the windows may
                        end up in new positions */
                     client_reconfigure(c, FALSE);
@@ -372,9 +379,11 @@ gint main(gint argc, gchar **argv)
 
     XSync(obt_display, FALSE);
 
-    RrThemeFree(ob_rr_theme);
-    RrInstanceFree(ob_rr_inst);
-
+    if (render_plugin)
+    {
+    //RrThemeFree(render_plugin->ob_rr_theme);
+    RrInstanceFree(render_plugin->ob_rr_inst);
+    }
     session_shutdown(being_replaced);
 
     obt_display_close(obt_display);

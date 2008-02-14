@@ -24,7 +24,7 @@
 #include "client.h"
 #include "client_menu.h"
 #include "openbox.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "moveresize.h"
 #include "event.h"
 #include "gettext.h"
@@ -296,21 +296,24 @@ static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
     gint dx, dy;
 
     if (!mouse && frame->client) {
-        *x = frame->client->frame->area.x;
+
+    Strut size = render_plugin->frame_get_size(frame->client->frame);
+    Rect area = render_plugin->frame_get_window_area(frame->client->frame);
+
+        *x = area.x;
 
         /* try below the titlebar */
-        *y = frame->client->frame->area.y + frame->client->frame->size.top -
-            frame->client->frame->bwidth;
+        *y = area.y + size.top;
         menu_frame_move_on_screen(frame, *x, *y, &dx, &dy);
         if (dy != 0) {
             /* try above the titlebar */
-            *y = frame->client->frame->area.y + frame->client->frame->bwidth -
+            *y = area.y -
                 frame->area.height;
             menu_frame_move_on_screen(frame, *x, *y, &dx, &dy);
         }
         if (dy != 0) {
             /* didnt fit either way, use move on screen's values */
-            *y = frame->client->frame->area.y + frame->client->frame->size.top;
+            *y = area.y + size.top;
             menu_frame_move_on_screen(frame, *x, *y, &dx, &dy);
         }
 

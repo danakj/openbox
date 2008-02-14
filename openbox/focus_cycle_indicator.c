@@ -21,7 +21,7 @@
 #include "focus_cycle_indicator.h"
 #include "client.h"
 #include "openbox.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "event.h"
 #include "render/render.h"
 
@@ -151,6 +151,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         visible = FALSE;
     }
     else if (c) {
+        Rect area = render_plugin->frame_get_window_area(c->frame);
         /*
           if (c)
               frame_adjust_focus(c->frame, FALSE);
@@ -162,9 +163,9 @@ void focus_cycle_draw_indicator(ObClient *c)
 
         wt = wl = wr = wb = FOCUS_INDICATOR_WIDTH;
 
-        x = c->frame->area.x;
-        y = c->frame->area.y;
-        w = c->frame->area.width;
+        x = area.x;
+        y = area.y;
+        w = area.width;
         h = wt;
 
         /* kill enter events cause by this moving */
@@ -191,10 +192,10 @@ void focus_cycle_draw_indicator(ObClient *c)
         RrPaint(a_focus_indicator, focus_indicator.top.window,
                 w, h);
 
-        x = c->frame->area.x;
-        y = c->frame->area.y;
+        x = area.x;
+        y = area.y;
         w = wl;
-        h = c->frame->area.height;
+        h = area.height;
 
         XMoveResizeWindow(obt_display, focus_indicator.left.window,
                           x, y, w, h);
@@ -217,10 +218,10 @@ void focus_cycle_draw_indicator(ObClient *c)
         RrPaint(a_focus_indicator, focus_indicator.left.window,
                 w, h);
 
-        x = c->frame->area.x + c->frame->area.width - wr;
-        y = c->frame->area.y;
+        x = area.x + area.width - wr;
+        y = area.y;
         w = wr;
-        h = c->frame->area.height ;
+        h = area.height ;
 
         XMoveResizeWindow(obt_display, focus_indicator.right.window,
                           x, y, w, h);
@@ -243,9 +244,9 @@ void focus_cycle_draw_indicator(ObClient *c)
         RrPaint(a_focus_indicator, focus_indicator.right.window,
                 w, h);
 
-        x = c->frame->area.x;
-        y = c->frame->area.y + c->frame->area.height - wb;
-        w = c->frame->area.width;
+        x = area.x;
+        y = area.y + area.height - wb;
+        w = area.width;
         h = wb;
 
         XMoveResizeWindow(obt_display, focus_indicator.bottom.window,

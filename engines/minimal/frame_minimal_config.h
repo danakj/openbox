@@ -1,33 +1,32 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   theme.h for the Openbox window manager
-   Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003-2007   Dana Jansens
+ frame_minimal_config.h for the Openbox window manager
+ Copyright (c) 2006        Mikael Magnusson
+ Copyright (c) 2003-2007   Dana Jansens
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-   See the COPYING file for a copy of the GNU General Public License.
-*/
+ See the COPYING file for a copy of the GNU General Public License.
+ */
+#ifndef FRAME_MINIMAL_CONFIG_H_
+#define FRAME_MINIMAL_CONFIG_H_
 
-#ifndef __theme_h
-#define __theme_h
-
-#include "render.h"
-#include "openbox/engine_interface.h"
+#include <X11/Xresource.h>
+#include "render/render.h"
 
 G_BEGIN_DECLS
 
-typedef struct _RrTheme RrTheme;
-
-struct _RrTheme {
+/* This store frame layout configuration. */
+struct _ObFrameThemeConfig
+{
     const RrInstance *inst;
 
     /* style settings - fonts */
@@ -89,22 +88,22 @@ struct _RrTheme {
     RrColor *menu_disabled_color;
     RrColor *menu_disabled_selected_color;
     RrColor *title_focused_shadow_color;
-    gchar    title_focused_shadow_alpha;
+    gchar title_focused_shadow_alpha;
     RrColor *title_unfocused_shadow_color;
-    gchar    title_unfocused_shadow_alpha;
+    gchar title_unfocused_shadow_alpha;
     RrColor *osd_color;
     RrColor *osd_shadow_color;
-    gchar    osd_shadow_alpha;
+    gchar osd_shadow_alpha;
     RrColor *menu_title_shadow_color;
-    gchar    menu_title_shadow_alpha;
+    gchar menu_title_shadow_alpha;
     RrColor *menu_text_normal_shadow_color;
-    gchar    menu_text_normal_shadow_alpha;
+    gchar menu_text_normal_shadow_alpha;
     RrColor *menu_text_selected_shadow_color;
-    gchar    menu_text_selected_shadow_alpha;
+    gchar menu_text_selected_shadow_alpha;
     RrColor *menu_text_disabled_shadow_color;
-    gchar    menu_text_disabled_shadow_alpha;
+    gchar menu_text_disabled_shadow_alpha;
     RrColor *menu_text_disabled_selected_shadow_color;
-    gchar    menu_text_disabled_selected_shadow_alpha;
+    gchar menu_text_disabled_selected_shadow_alpha;
 
     /* style settings - pics */
     RrPixel32 *def_win_icon; /* 48x48 RGBA */
@@ -144,9 +143,6 @@ struct _RrTheme {
 #if 0
     RrPixmapMask *menu_toggle_mask; /* menu boolean */
 #endif
-
-    RrPixmapMask *down_arrow_mask;
-    RrPixmapMask *up_arrow_mask;
 
     /* global appearances */
     RrAppearance *a_disabled_focused_max;
@@ -230,7 +226,7 @@ struct _RrTheme {
     RrAppearance *a_menu_text_selected;
     RrAppearance *a_menu_bullet_normal;
     RrAppearance *a_menu_bullet_selected;
-    RrAppearance *a_clear;     /* clear with no texture */
+    RrAppearance *a_clear; /* clear with no texture */
     RrAppearance *a_clear_tex; /* clear with a texture */
 
     RrAppearance *osd_hilite_bg; /* can never be parent relative */
@@ -241,23 +237,15 @@ struct _RrTheme {
     gchar *name;
 };
 
-struct _ObFramePlugin;
-/*! The font values are all optional. If a NULL is used for any of them, then
- the default font will be used. */
-gint LoadThemeConfig(struct _ObFramePlugin * p, const RrInstance *inst,
-    const gchar *name, gboolean allow_fallback, RrFont *active_window_font,
-    RrFont *inactive_window_font, RrFont *menu_title_font,
-    RrFont *menu_item_font, RrFont *osd_font);
+typedef struct _ObFrameThemeConfig ObFrameThemeConfig;
 
 /*! The font values are all optional. If a NULL is used for any of them, then
-  the default font will be used. */
-RrTheme* RrThemeNew(const RrInstance *inst, const gchar *theme,
-                    gboolean allow_fallback,
-                    RrFont *active_window_font, RrFont *inactive_window_font,
-                    RrFont *menu_title_font, RrFont *menu_item_font,
-                    RrFont *osd_font);
-void RrThemeFree(RrTheme *theme);
+ the default font will be used. */
+gint load_theme_config(const RrInstance *inst, const gchar *name,
+        const gchar * path, XrmDatabase db, RrFont *active_window_font,
+        RrFont *inactive_window_font, RrFont *menu_title_font,
+        RrFont *menu_item_font, RrFont *osd_font);
 
 G_END_DECLS
 
-#endif
+#endif /*FRAME_MINIMAL_CONFIG_H_*/

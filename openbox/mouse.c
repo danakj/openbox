@@ -23,7 +23,7 @@
 #include "event.h"
 #include "client.h"
 #include "grab.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "translate.h"
 #include "mouse.h"
 #include "gettext.h"
@@ -117,7 +117,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
             guint mask;
 
             if (FRAME_CONTEXT(i, client)) {
-                win = client->frame->window;
+                win = render_plugin->frame_get_window(client->frame);
                 mode = GrabModeAsync;
                 mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
             } else if (CLIENT_CONTEXT(i, client)) {
@@ -224,7 +224,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     switch (e->type) {
     case ButtonPress:
-        context = frame_context(client, e->xbutton.window,
+        context = plugin_frame_context(client, e->xbutton.window,
                                 e->xbutton.x, e->xbutton.y);
         context = mouse_button_frame_context(context, e->xbutton.button,
                                              e->xbutton.state);
@@ -273,7 +273,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     case ButtonRelease:
         /* use where the press occured in the window */
-        context = frame_context(client, e->xbutton.window, pwx, pwy);
+        context = plugin_frame_context(client, e->xbutton.window, pwx, pwy);
         context = mouse_button_frame_context(context, e->xbutton.button,
                                              e->xbutton.state);
 
@@ -338,7 +338,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     case MotionNotify:
         if (button) {
-            context = frame_context(client, e->xmotion.window, pwx, pwy);
+            context = plugin_frame_context(client, e->xmotion.window, pwx, pwy);
             context = mouse_button_frame_context(context, button, state);
 
             if (ABS(e->xmotion.x_root - px) >= config_mouse_threshold ||

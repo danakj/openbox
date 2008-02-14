@@ -1,7 +1,10 @@
 #include "openbox/actions.h"
 #include "openbox/moveresize.h"
 #include "openbox/client.h"
-#include "openbox/frame.h"
+#include "openbox/engine_interface.h"
+
+#include "openbox/openbox.h"
+
 #include "obt/prop.h"
 
 typedef struct {
@@ -64,21 +67,23 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         ObClient *c = data->client;
         guint32 corner;
 
+        Strut c_size = render_plugin->frame_get_size(c->frame);
+        Rect c_area = render_plugin->frame_get_window_area(c->frame);
         if (!data->button)
             corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD);
         else if (o->corner_specified)
             corner = o->corner; /* it was specified in the binding */
         else
             corner = pick_corner(data->x, data->y,
-                                 c->frame->area.x, c->frame->area.y,
+                                 c_area.x, c_area.y,
                                  /* use the client size because the frame
                                     can be differently sized (shaded
                                     windows) and we want this based on the
                                     clients size */
-                                 c->area.width + c->frame->size.left +
-                                 c->frame->size.right,
-                                 c->area.height + c->frame->size.top +
-                                 c->frame->size.bottom, c->shaded);
+                                 c->area.width + c_size.left +
+                                 c_size.right,
+                                 c->area.height + c_size.top +
+                                 c_size.bottom, c->shaded);
 
         moveresize_start(c, data->x, data->y, data->button, corner);
     }

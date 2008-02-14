@@ -24,6 +24,7 @@
 #include "theme.h"
 #include "icon.h"
 #include "obt/paths.h"
+#include "openbox/engine_interface.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
@@ -45,6 +46,50 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
+
+gint LoadThemeConfig(ObFramePlugin * p, const RrInstance *inst,
+    const gchar *name, gboolean allow_fallback, RrFont *active_window_font,
+    RrFont *inactive_window_font, RrFont *menu_title_font,
+    RrFont *menu_item_font, RrFont *osd_font)
+  {
+    XrmDatabase db = NULL;
+    gchar *path;
+
+    if (name)
+      {
+        db = loaddb(name, &path);
+        if (db == NULL)
+          {
+            g_message("Unable to load the theme '%s'", name);
+            if (allow_fallback)
+              g_message("Falling back to the default theme '%s'", DEFAULT_THEME);
+            /* fallback to the default theme */
+            name = NULL;
+          }
+      }
+    if (name == NULL)
+      {
+        if (allow_fallback)
+          {
+            db = loaddb(DEFAULT_THEME, &path);
+            if (db == NULL)
+              {
+                g_message("Unable to load the theme '%s'", DEFAULT_THEME);
+                return 0;
+              }
+          }
+        else
+          return 0;
+      }
+
+    gint i = (p->load_theme_config)(inst, name, path, db, active_window_font,
+        inactive_window_font, menu_title_font, menu_item_font, osd_font);
+
+    g_free(path);
+    XrmDestroyDatabase(db);
+
+    return i;
+  }
 
 RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,

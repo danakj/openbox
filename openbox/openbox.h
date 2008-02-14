@@ -23,6 +23,7 @@
 
 #include "render/render.h"
 #include "render/theme.h"
+#include "engine_interface.h"
 #include "obt/mainloop.h"
 #include "obt/display.h"
 
@@ -45,6 +46,9 @@ extern gchar   *ob_sm_save_file;
 extern gboolean ob_sm_restore;
 extern gboolean ob_replace_wm;
 extern gboolean ob_debug_xinerama;
+
+/* render function */
+extern ObFramePlugin *render_plugin;
 
 /* The state of execution of the window manager */
 ObState ob_state();

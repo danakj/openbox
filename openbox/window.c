@@ -21,13 +21,13 @@
 #include "config.h"
 #include "dock.h"
 #include "client.h"
-#include "frame.h"
+#include "engine_interface.h"
 #include "openbox.h"
 #include "prompt.h"
 #include "debug.h"
 #include "grab.h"
 
-static GHashTable *window_map;
+GHashTable *window_map;
 
 static guint window_hash(Window *w) { return *w; }
 static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
@@ -55,7 +55,7 @@ Window window_top(ObWindow *self)
     case OB_WINDOW_CLASS_DOCK:
         return WINDOW_AS_DOCK(self)->frame;
     case OB_WINDOW_CLASS_CLIENT:
-        return WINDOW_AS_CLIENT(self)->frame->window;
+        return render_plugin->frame_get_window(WINDOW_AS_CLIENT(self)->frame);
     case OB_WINDOW_CLASS_INTERNAL:
         return WINDOW_AS_INTERNAL(self)->window;
     case OB_WINDOW_CLASS_PROMPT:

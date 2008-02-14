@@ -26,7 +26,11 @@ check_PROGRAMS = \
 
 lib_LTLIBRARIES = \
 	render/libobrender.la \
-	obt/libobt.la
+	obt/libobt.la \
+	engines/libconcept.la \
+	engines/libdefault.la
+#   engines/libconcept2.la \
+#	engines/libminimal.la
 
 bin_PROGRAMS = \
 	openbox/openbox \
@@ -94,6 +98,144 @@ render_libobrender_la_SOURCES = \
 	render/render.c \
 	render/theme.h \
 	render/theme.c
+## frame_default ##
+engines_libdefault_la_CPPFLAGS = \
+	$(X_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(XML_CFLAGS) \
+	$(PANGO_CFLAGS) \
+	$(XFT_CFLAGS) \
+	-DG_LOG_DOMAIN=\"ObRender\" \
+	-DDEFAULT_THEME=\"$(theme)\"
+engines_libdefault_la_LDFLAGS = \
+	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
+engines_libdefault_la_LIBADD = \
+	render/libobrender.la \
+	$(X_LIBS) \
+	$(PANGO_LIBS) \
+	$(XFT_LIBS) \
+	$(GLIB_LIBS) \
+	$(XML_LIBS)
+engines_libdefault_la_SOURCES = \
+	gettext.h \
+	render/color.h \
+	render/color.c \
+	render/font.h \
+	render/font.c \
+	render/geom.h \
+	render/gradient.h \
+	render/gradient.c \
+	render/icon.h \
+	render/image.h \
+	render/image.c \
+	render/instance.h \
+	render/instance.c \
+	render/mask.h \
+	render/mask.c \
+	render/render.h \
+	render/render.c \
+	openbox/engine_interface.h \
+	openbox/engine_interface.c \
+	engines/default/config.h \
+	engines/default/config.c \
+	engines/default/render.h \
+	engines/default/render.c \
+	engines/default/plugin.h \
+	engines/default/plugin.c
+
+## frame_minimal ##
+#engines_libminimal_la_CPPFLAGS = \
+#    $(X_CFLAGS) \
+#    $(GLIB_CFLAGS) \
+#    $(XML_CFLAGS) \
+#    $(PANGO_CFLAGS) \
+#    $(XFT_CFLAGS) \
+#    -DG_LOG_DOMAIN=\"ObRender\" \
+#    -DDEFAULT_THEME=\"$(theme)\"
+#engines_libminimal_la_LDFLAGS = \
+#    -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+#engines_libminimal_la_LIBADD = \
+#    parser/libobparser.la \
+#    $(X_LIBS) \
+#    $(PANGO_LIBS) \
+#    $(XFT_LIBS) \
+#    $(GLIB_LIBS) \
+#    $(XML_LIBS)
+#engines_libminimal_la_SOURCES = \
+#    gettext.h \
+#    render/color.h \
+#    render/color.c \
+#    render/font.h \
+#    render/font.c \
+#    render/geom.h \
+#    render/gradient.h \
+#    render/gradient.c \
+#    render/icon.h \
+#    render/image.h \
+#    render/image.c \
+#    render/instance.h \
+#    render/instance.c \
+#    render/mask.h \
+#    render/mask.c \
+#    render/render.h \
+#    render/render.c \
+#    openbox/engine_interface.h \
+#    openbox/engine_interface.c \
+#    engines/minimal/frame_minimal_config.h \
+#    engines/minimal/frame_minimal_config.c \
+#    engines/minimal/frame_minimal_render.h \
+#    engines/minimal/frame_minimal_render.c \
+#    engines/minimal/frame_minimal_plugin.h \
+#    engines/minimal/frame_minimal_plugin.c
+
+## frame_concept ##
+engines_libconcept_la_CPPFLAGS = \
+    $(X_CFLAGS) \
+    $(GLIB_CFLAGS) \
+    $(XML_CFLAGS) \
+    $(PANGO_CFLAGS) \
+    $(XFT_CFLAGS) \
+    $(IMLIB2_CFLAGS) \
+    $(GDK_PIXBUF_CFLAGS) \
+    $(GDK_PIXBUF_XLIB_CFLAGS) \
+    -DG_LOG_DOMAIN=\"ObRender\" \
+    -DDEFAULT_THEME=\"$(theme)\"
+engines_libconcept_la_LDFLAGS = \
+    -version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
+engines_libconcept_la_LIBADD = \
+    render/libobrender.la \
+    $(X_LIBS) \
+    $(PANGO_LIBS) \
+    $(XFT_LIBS) \
+    $(GLIB_LIBS) \
+    $(IMLIB2_LIBS) \
+    $(GDK_PIXBUF_LIBS) \
+    $(GDK_PIXBUF_XLIB_LIBS) \
+    $(XML_LIBS)
+engines_libconcept_la_SOURCES = \
+    gettext.h \
+    render/color.h \
+    render/color.c \
+    render/font.h \
+    render/font.c \
+    render/geom.h \
+    render/gradient.h \
+    render/gradient.c \
+    render/icon.h \
+    render/image.h \
+    render/image.c \
+    render/instance.h \
+    render/instance.c \
+    render/mask.h \
+    render/mask.c \
+    render/render.h \
+    render/render.c \
+    openbox/engine_interface.h \
+    openbox/engine_interface.c \
+    engines/concept/config.h \
+    engines/concept/config.c \
+    engines/concept/plugin.h \
+    engines/concept/plugin.c
 
 ## obt ##
 
@@ -230,10 +372,8 @@ openbox_openbox_SOURCES = \
 	openbox/focus_cycle_indicator.h \
 	openbox/focus_cycle_popup.c \
 	openbox/focus_cycle_popup.h \
-	openbox/frame.c \
-	openbox/frame.h \
-	openbox/framerender.c \
-	openbox/framerender.h \
+    openbox/engine_interface.h \
+    openbox/engine_interface.c \
 	openbox/geom.h \
 	openbox/grab.c \
 	openbox/grab.h \

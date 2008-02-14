@@ -110,7 +110,7 @@ void icon_popup_free(ObIconPopup *self);
 
 #define icon_popup_show(s, t, i) icon_popup_delay_show((s),0,(t),(i))
 void icon_popup_delay_show(ObIconPopup *self, gulong usec,
-                           gchar *text, const struct _ObClientIcon *icon);
+                           gchar *text, RrImage *icon);
 #define icon_popup_hide(p) popup_hide((p)->popup)
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
 #define icon_popup_text_width(p, w) popup_text_width((p)->popup,(w))

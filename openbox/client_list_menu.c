@@ -58,7 +58,6 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
             (c->desktop == d->desktop || c->desktop == DESKTOP_ALL))
         {
             ObMenuEntry *e;
-            const ObClientIcon *icon;
 
             empty = FALSE;
 
@@ -71,11 +70,9 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
                 e = menu_add_normal(menu, d->desktop, c->title, NULL, FALSE);
             }
 
-            if (config_menu_client_list_icons
-                && (icon = client_icon(c, 32, 32))) {
-                e->data.normal.icon_width = icon->width;
-                e->data.normal.icon_height = icon->height;
-                e->data.normal.icon_data = icon->data;
+            if (config_menu_client_list_icons) {
+                e->data.normal.icon = client_icon(c);
+                RrImageRef(e->data.normal.icon);
                 e->data.normal.icon_alpha = c->iconic ? OB_ICONIC_ALPHA : 0xff;
             }
 

@@ -334,6 +334,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     default:
         g_assert_not_reached();
     }
+
     RECT_SET_SIZE(self->area, self->frame->inner_w, th);
     XResizeWindow(ob_display, self->window,
                   self->area.width, self->area.height);
@@ -438,6 +439,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                               self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
 
             clear = ob_rr_theme->a_clear_tex;
+            RrAppearanceClearTextures(clear);
             clear->texture[0].type = RR_TEXTURE_LINE_ART;
             clear->surface.parent = item_a;
             clear->surface.parentx = PADDING;
@@ -455,7 +457,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     }
 
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
-        self->entry->data.normal.icon_data)
+        self->entry->data.normal.icon)
     {
         RrAppearance *clear;
 
@@ -467,15 +469,12 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                           - frame->item_margin.bottom);
 
         clear = ob_rr_theme->a_clear_tex;
-        clear->texture[0].type = RR_TEXTURE_RGBA;
-        clear->texture[0].data.rgba.width =
-            self->entry->data.normal.icon_width;
-        clear->texture[0].data.rgba.height =
-            self->entry->data.normal.icon_height;
-        clear->texture[0].data.rgba.alpha =
+        RrAppearanceClearTextures(clear);
+        clear->texture[0].type = RR_TEXTURE_IMAGE;
+        clear->texture[0].data.image.image =
+            self->entry->data.normal.icon;
+        clear->texture[0].data.image.alpha =
             self->entry->data.normal.icon_alpha;
-        clear->texture[0].data.rgba.data =
-            self->entry->data.normal.icon_data;
         clear->surface.parent = item_a;
         clear->surface.parentx = PADDING;
         clear->surface.parenty = frame->item_margin.top;
@@ -499,6 +498,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                           - frame->item_margin.bottom);
 
         clear = ob_rr_theme->a_clear_tex;
+        RrAppearanceClearTextures(clear);
         clear->texture[0].type = RR_TEXTURE_MASK;
         clear->texture[0].data.mask.mask =
             self->entry->data.normal.mask;
@@ -690,7 +690,7 @@ void menu_frame_render(ObMenuFrame *self)
             tw = MIN(tw, MAX_MENU_WIDTH);
             th = ob_rr_theme->menu_font_height;
 
-            if (e->entry->data.normal.icon_data ||
+            if (e->entry->data.normal.icon ||
                 e->entry->data.normal.mask)
                 has_icon = TRUE;
             break;
@@ -701,7 +701,7 @@ void menu_frame_render(ObMenuFrame *self)
             tw = MIN(tw, MAX_MENU_WIDTH);
             th = ob_rr_theme->menu_font_height;
 
-            if (e->entry->data.normal.icon_data ||
+            if (e->entry->data.normal.icon ||
                 e->entry->data.normal.mask)
                 has_icon = TRUE;
 

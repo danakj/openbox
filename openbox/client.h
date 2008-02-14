@@ -40,15 +40,6 @@ struct _ObSessionState;
 struct _ObPrompt;
 
 typedef struct _ObClient      ObClient;
-typedef struct _ObClientIcon  ObClientIcon;
-
-/*! Holds an icon in ARGB format */
-struct _ObClientIcon
-{
-    gint width;
-    gint height;
-    RrPixel32 *data;
-};
 
 /*! Possible window types */
 typedef enum
@@ -307,10 +298,8 @@ struct _ObClient
     */
     guint functions;
 
-    /*! Icons for the client as specified on the client window */
-    ObClientIcon *icons;
-    /*! The number of icons in icons */
-    guint nicons;
+    /* The window's icon, in a variety of shapes and sizes */
+    RrImage *icon_set;
 
     /*! Where the window should iconify to/from */
     Rect icon_geometry;
@@ -644,7 +633,10 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig);
 /*! Sets the window's type and transient flag */
 void client_get_type_and_transientness(ObClient *self);
 
-const ObClientIcon *client_icon(ObClient *self, gint w, gint h);
+/*! Returns a client's icon set, or its parents (recursively) if it doesn't
+  have one
+*/
+RrImage* client_icon(ObClient *self);
 
 /*! Return TRUE if the client is transient for some other window. Return
   FALSE if it's not transient or there is no window for it to be

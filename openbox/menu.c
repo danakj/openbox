@@ -504,6 +504,7 @@ void menu_entry_unref(ObMenuEntry *self)
     if (self && --self->ref == 0) {
         switch (self->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
+            RrImageUnref(self->data.normal.icon);
             g_free(self->data.normal.label);
             while (self->data.normal.actions) {
                 actions_act_unref(self->data.normal.actions->data);

@@ -42,6 +42,7 @@ typedef struct _ObFocusCyclePopupTarget ObFocusCyclePopupTarget;
 struct _ObFocusCyclePopupTarget
 {
     ObClient *client;
+    RrImage *icon;
     gchar *text;
     Window win;
 };
@@ -106,7 +107,8 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.a_text->surface.parent = popup.a_bg;
     popup.a_icon->surface.parent = popup.a_bg;
 
-    popup.a_icon->texture[0].type = RR_TEXTURE_RGBA;
+    RrAppearanceClearTextures(popup.a_icon);
+    popup.a_icon->texture[0].type = RR_TEXTURE_IMAGE;
 
     RrAppearanceAddTextures(popup.a_bg, 1);
     popup.a_bg->texture[0].type = RR_TEXTURE_RGBA;
@@ -141,8 +143,10 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     while(popup.targets) {
         ObFocusCyclePopupTarget *t = popup.targets->data;
 
+        RrImageUnref(t->icon);
         g_free(t->text);
         XDestroyWindow(ob_display, t->win);
+        g_free(t);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
@@ -196,6 +200,8 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 
                 t->client = ft;
                 t->text = text;
+                t->icon = client_icon(t->client);
+                RrImageRef(t->icon); /* own the icon so it won't go away */
                 t->win = create_window(p->bg, 0, 0, NULL);
 
                 XMapWindow(ob_display, t->win);
@@ -399,7 +405,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         /* have to redraw the targetted icon and last targetted icon,
            they can pick up the hilite changes in the backgroud */
         if (!p->mapped || newtarget == target || p->last_target == target) {
-            const ObClientIcon *icon;
             const gint row = i / icons_per_row; /* starting from 0 */
             const gint col = i % icons_per_row; /* starting from 0 */
             gint innerx, innery;
@@ -415,12 +420,9 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               innerx, innery, innerw, innerh);
 
             /* get the icon from the client */
-            icon = client_icon(target->client, innerw, innerh);
-            p->a_icon->texture[0].data.rgba.width = icon->width;
-            p->a_icon->texture[0].data.rgba.height = icon->height;
-            p->a_icon->texture[0].data.rgba.alpha =
+            p->a_icon->texture[0].data.image.alpha =
                 target->client->iconic ? OB_ICONIC_ALPHA : 0xff;
-            p->a_icon->texture[0].data.rgba.data = icon->data;
+            p->a_icon->texture[0].data.image.image = target->icon;
 
             /* draw the icon */
             p->a_icon->surface.parentx = innerx;
@@ -479,6 +481,7 @@ void focus_cycle_popup_hide(void)
     while(popup.targets) {
         ObFocusCyclePopupTarget *t = popup.targets->data;
 
+        RrImageUnref(t->icon);
         g_free(t->text);
         XDestroyWindow(ob_display, t->win);
         g_free(t);
@@ -522,7 +525,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     }
 
     text = popup_get_name(c);
-    icon_popup_show(single_popup, text, client_icon(c, ICON_SIZE, ICON_SIZE));
+    icon_popup_show(single_popup, text, client_icon(c));
     g_free(text);
     screen_hide_desktop_popup();
 }

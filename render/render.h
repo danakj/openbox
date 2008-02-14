@@ -37,11 +37,15 @@ typedef struct _RrFont             RrFont;
 typedef struct _RrTexture          RrTexture;
 typedef struct _RrTextureMask      RrTextureMask;
 typedef struct _RrTextureRGBA      RrTextureRGBA;
+typedef struct _RrTextureImage     RrTextureImage;
 typedef struct _RrTextureText      RrTextureText;
 typedef struct _RrTextureLineArt   RrTextureLineArt;
 typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
 typedef struct _RrColor            RrColor;
+typedef struct _RrImage            RrImage;
+typedef struct _RrImagePic         RrImagePic;
+typedef struct _RrImageCache       RrImageCache;
 
 typedef guint32 RrPixel32;
 typedef guint16 RrPixel16;
@@ -76,7 +80,8 @@ typedef enum {
     RR_TEXTURE_MASK,
     RR_TEXTURE_TEXT,
     RR_TEXTURE_LINE_ART,
-    RR_TEXTURE_RGBA
+    RR_TEXTURE_RGBA,
+    RR_TEXTURE_IMAGE
 } RrTextureType;
 
 typedef enum {
@@ -163,11 +168,19 @@ struct _RrTextureRGBA {
     gint height;
     gint alpha;
     RrPixel32 *data;
-/* cached scaled so we don't have to scale often */
-    gint cwidth;
-    gint cheight;
-    RrPixel32 *cache;
-/* size and position to draw at */
+    /* size and position to draw at (if these are zero, then it will be
+       drawn to fill the entire texture */
+    gint tx;
+    gint ty;
+    gint twidth;
+    gint theight;
+};
+
+struct _RrTextureImage {
+    RrImage *image;
+    gint alpha;
+    /* size and position to draw at (if these are zero, then it will be
+       drawn to fill the entire texture */
     gint tx;
     gint ty;
     gint twidth;
@@ -184,12 +197,15 @@ struct _RrTextureLineArt {
 
 union _RrTextureData {
     RrTextureRGBA rgba;
+    RrTextureImage image;
     RrTextureText text;
     RrTextureMask mask;
     RrTextureLineArt lineart;
 };
 
 struct _RrTexture {
+    /* If changing the type of a texture, you should DEFINITELY call
+       RrAppearanceClearTextures() first! */
     RrTextureType type;
     RrTextureData data;
 };
@@ -205,6 +221,25 @@ struct _RrAppearance {
 
     /* cached for internal use */
     gint w, h;
+};
+
+/*! Holds a RGBA image picture */
+struct _RrImagePic {
+    gint width, height;
+    RrPixel32 *data;
+};
+
+/*! An RrImage is a sort of meta-image.  It can contain multiple versions of
+  an image at different sizes, which may or may not be completely different
+  pictures */
+struct _RrImage {
+    gint ref;
+    struct _RrImageCache *cache;
+
+    struct _RrImagePic **original;
+    gint n_original;
+    struct _RrImagePic **resized;
+    gint n_resized;
 };
 
 /* these are the same on all endian machines because it seems to be dependant
@@ -253,6 +288,8 @@ RrAppearance *RrAppearanceCopy (RrAppearance *a);
 void          RrAppearanceFree (RrAppearance *a);
 void          RrAppearanceRemoveTextures(RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
+/*! Always call this when changing the type of a texture in an appearance */
+void          RrAppearanceClearTextures(RrAppearance *a);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
                              gint size, RrFontWeight weight, RrFontSlant slant);
@@ -279,6 +316,21 @@ void   RrMargins     (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,
                         gint *w, gint *h, RrPixel32 **data);
+
+RrImageCache* RrImageCacheNew();
+void          RrImageCacheRef(RrImageCache *self);
+void          RrImageCacheUnref(RrImageCache *self);
+
+/*! Finds an image in the cache, if it is already in there */
+RrImage*      RrImageCacheFind(RrImageCache *self,
+                               RrPixel32 *data, gint w, gint h);
+
+RrImage* RrImageNew(RrImageCache *cache);
+void     RrImageRef(RrImage *im);
+void     RrImageUnref(RrImage *im);
+
+void     RrImageAddPicture(RrImage *im, RrPixel32 *data, gint w, gint h);
+void     RrImageRemovePicture(RrImage *im, gint w, gint h);
 
 G_END_DECLS
 

@@ -547,6 +547,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->def_win_icon = read_c_image(OB_DEFAULT_ICON_WIDTH,
                                        OB_DEFAULT_ICON_HEIGHT,
                                        OB_DEFAULT_ICON_pixel_data);
+    theme->def_win_icon_w = OB_DEFAULT_ICON_WIDTH;
+    theme->def_win_icon_h = OB_DEFAULT_ICON_HEIGHT;
+
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,

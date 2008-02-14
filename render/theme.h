@@ -107,7 +107,9 @@ struct _RrTheme {
     gchar    menu_text_disabled_selected_shadow_alpha;
 
     /* style settings - pics */
-    RrPixel32 *def_win_icon; /* 48x48 RGBA */
+    RrPixel32 *def_win_icon; /* RGBA */
+    gint       def_win_icon_w;
+    gint       def_win_icon_h;
 
     /* style settings - masks */
     RrPixmapMask *max_mask;

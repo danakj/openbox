@@ -10,13 +10,22 @@ AC_DEFUN([OB_DEBUG],
     AC_ARG_ENABLE([strict-ansi],
     AC_HELP_STRING([--enable-strict-ansi],[Enable strict ANSI compliance build [[default=no]]]),
     [STRICT=$enableval], [STRICT="no"])
-    if test "$GCC" = "yes" && test "$STRICT" = "yes"; then
-	CFLAGS="$CFLAGS -ansi -pedantic -D_XOPEN_SOURCE"
-    fi
 
     AC_ARG_ENABLE([debug],
     AC_HELP_STRING([--enable-debug],[build a debug version [[default=no]]]),
     [DEBUG=$enableval], [DEBUG="no"])
+
+    AC_ARG_ENABLE([gprof],
+    AC_HELP_STRING([--enable-gprof],[Enable gprof profiling output [[default=no]]]),
+    [PROF=$enableval], [PROF="no"])
+
+    AC_ARG_ENABLE([gprof-libc],
+    AC_HELP_STRING([--enable-gprof-libc],[Link against libc with profiling support [[default=no]]]),
+    [PROFLC=$enableval], [PROFLC="no"])
+
+    if test "$PROFLC" = "yes"; then
+        PROF="yes" # always enable profiling then
+    fi
 
     TEST=""
     test "${PACKAGE_VERSION%*alpha*}" != "$PACKAGE_VERSION" && TEST="yes"
@@ -52,6 +61,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
     AC_REQUIRE([AC_PROG_CC])
 
     FLAGS=""
+    L=""
 
     if test "$DEBUG" = "yes"; then
         FLAGS="-DDEBUG"
@@ -73,11 +83,18 @@ AC_DEFUN([OB_COMPILER_FLAGS],
 	if test "$STRICT" = "yes"; then
 	    FLAGS="$FLAGS -ansi -pedantic -D_XOPEN_SOURCE"
 	fi
+	if test "$PROF" = "yes"; then
+	    FLAGS="$FLAGS -pg -fno-inline"
+	fi
+	if test "$PROFLC" = "yes"; then
+	    L="$L -lc_p -lm_p"
+	fi
 	FLAGS="$FLAGS -fno-strict-aliasing"
     fi
     AC_MSG_CHECKING([for compiler specific flags])
     AC_MSG_RESULT([$FLAGS])
     CFLAGS="$CFLAGS $FLAGS"
+    LIBS="$LIBS $L"
 ])
 
 AC_DEFUN([OB_NLS],

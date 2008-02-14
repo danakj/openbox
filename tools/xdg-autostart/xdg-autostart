@@ -67,7 +67,7 @@ def main(argv=sys.argv):
         if list: autofile.list(environments)
         else: autofile.run(environments)
 
-class AutostartFile():
+class AutostartFile:
     def __init__(self, path):
         self.path = path
         self.filename = os.path.basename(path)
@@ -178,7 +178,7 @@ def show_help():
     print "  --version     Show version and copyright information"
     print
     print "ENVIRONMENT specifies a list of environments for which to run autostart"
-    print "applications for.  If none are specified, only applications which do not "
+    print "applications.  If none are specified, only applications which do not "
     print "limit themselves to certain environments will be run."
     print
     print "ENVIRONMENT can be one or more of:"

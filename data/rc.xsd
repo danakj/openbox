@@ -189,10 +189,11 @@
         <xsd:element minOccurs="0" name="skip_taskbar" type="ob:bool"/>
         <xsd:element minOccurs="0" name="fullscreen" type="ob:bool"/>
         <xsd:element minOccurs="0" name="maximized" type="ob:maximization"/>
+        <xsd:attribute name="role" type="xsd:string"/>
+        <xsd:attribute name="type" type="ob:clienttype"/>
         <!-- at least one of these must be present -->
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="class" type="xsd:string"/>
-        <xsd:attribute name="role" type="xsd:string"/>
     </xsd:complexType>
     <xsd:complexType name="applications">
         <xsd:element minOccurs="0" maxOccurs="unbounded" name="application" type="ob:application"/>
@@ -250,6 +251,18 @@
             <xsd:enumeration value="Unfocus"/>
             <xsd:enumeration value="Unmaximize"/>
             <xsd:enumeration value="Unshade"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="clienttype">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="desktop"/>
+            <xsd:enumeration value="dock"/>
+            <xsd:enumeration value="toolbar"/>
+            <xsd:enumeration value="menu"/>
+            <xsd:enumeration value="splash"/>
+            <xsd:enumeration value="utility"/>
+            <xsd:enumeration value="dialog"/>
+            <xsd:enumeration value="normal"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="bool">

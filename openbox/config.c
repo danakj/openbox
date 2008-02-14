@@ -100,6 +100,7 @@ GSList *config_per_app_settings;
 ObAppSettings* config_create_app_settings(void)
 {
     ObAppSettings *settings = g_new0(ObAppSettings, 1);
+    settings->type = -1;
     settings->decor = -1;
     settings->shade = -1;
     settings->monitor = -1;
@@ -123,6 +124,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     g_assert(src != NULL);
     g_assert(dst != NULL);
 
+    copy_if(type, -1);
     copy_if(decor, -1);
     copy_if(shade, -1);
     copy_if(focus, -1);
@@ -190,15 +192,16 @@ static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = obt_parse_find_node(node->children, "application");
-    gchar *name = NULL, *class = NULL, *role = NULL;
-    gboolean name_set, class_set;
+    gchar *name = NULL, *class = NULL, *role = NULL, *type = NULL;
+    gboolean name_set, class_set, type_set;
     gboolean x_pos_given;
 
     while (app) {
-        name_set = class_set = x_pos_given = FALSE;
+        name_set = class_set = type_set = x_pos_given = FALSE;
 
         class_set = obt_parse_attr_string(app, "class", &class);
         name_set = obt_parse_attr_string(app, "name", &name);
+        type_set = obt_parse_attr_string(app, "type", &type);
         if (class_set || name_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
@@ -208,6 +211,25 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
             if (class_set)
                 settings->class = g_pattern_spec_new(class);
+
+            if (type_set) {
+                if (!g_ascii_strcasecmp(type, "normal"))
+                    settings->type = OB_CLIENT_TYPE_NORMAL;
+                else if (!g_ascii_strcasecmp(type, "dialog"))
+                    settings->type = OB_CLIENT_TYPE_DIALOG;
+                else if (!g_ascii_strcasecmp(type, "splash"))
+                    settings->type = OB_CLIENT_TYPE_SPLASH;
+                else if (!g_ascii_strcasecmp(type, "utility"))
+                    settings->type = OB_CLIENT_TYPE_UTILITY;
+                else if (!g_ascii_strcasecmp(type, "menu"))
+                    settings->type = OB_CLIENT_TYPE_MENU;
+                else if (!g_ascii_strcasecmp(type, "toolbar"))
+                    settings->type = OB_CLIENT_TYPE_TOOLBAR;
+                else if (!g_ascii_strcasecmp(type, "dock"))
+                    settings->type = OB_CLIENT_TYPE_DOCK;
+                else if (!g_ascii_strcasecmp(type, "desktop"))
+                    settings->type = OB_CLIENT_TYPE_DESKTOP;
+            }
 
             if (obt_parse_attr_string(app, "role", &role))
                 settings->role = g_pattern_spec_new(role);
@@ -662,6 +684,11 @@ static void parse_resize(xmlNodePtr node, gpointer d)
                 if ((n2 = obt_parse_find_node(n->children, "y")))
                     config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.y);
+
+                config_resize_popup_fixed.x.pos =
+                    MAX(config_resize_popup_fixed.x.pos, 0);
+                config_resize_popup_fixed.y.pos =
+                    MAX(config_resize_popup_fixed.y.pos, 0);
             }
         }
     }

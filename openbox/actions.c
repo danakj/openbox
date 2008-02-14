@@ -345,8 +345,14 @@ void actions_client_move(ObActionsData *data, gboolean start)
                that moves windows our from under the cursor, the enter
                event will come as a GrabNotify which is ignored, so this
                makes a fake enter event
+
+               don't do this if there is a grab on the pointer.  enter events
+               are ignored during a grab, so don't force fake ones when they
+               should be ignored
             */
-            if ((c = client_under_pointer()) && c != data->client) {
+            if ((c = client_under_pointer()) && c != data->client &&
+                !grab_on_pointer())
+            {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Generating fake enter because we did a "
                               "mouse-event action");

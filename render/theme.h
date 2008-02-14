@@ -45,7 +45,8 @@ struct _RrTheme {
     gint obwidth; /*!< osd border width */
     gint cbwidthx;
     gint cbwidthy;
-    gint menu_overlap;
+    gint menu_overlap_x;
+    gint menu_overlap_y;
     /* these ones are calculated, not set directly by the theme file */
     gint win_font_height;
     gint menu_title_font_height;

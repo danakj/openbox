@@ -285,9 +285,20 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     }
 
     if (t->shadow_offset_x || t->shadow_offset_y) {
-        c.color.red = t->shadow_color->r | t->shadow_color->r << 8;
-        c.color.green = t->shadow_color->g | t->shadow_color->g << 8;
-        c.color.blue = t->shadow_color->b | t->shadow_color->b << 8;
+        /* From nvidia's readme (chapter 23):
+
+           When rendering to a 32-bit window, keep in mind that the X RENDER
+           extension, used by most composite managers, expects "premultiplied
+           alpha" colors. This means that if your color has components (r,g,b)
+           and alpha value a, then you must render (a*r, a*g, a*b, a) into the
+           target window.
+        */
+        c.color.red = (t->shadow_color->r | t->shadow_color->r << 8) *
+            t->shadow_alpha / 255;
+        c.color.green = (t->shadow_color->g | t->shadow_color->g << 8) *
+            t->shadow_alpha / 255;
+        c.color.blue = (t->shadow_color->b | t->shadow_color->b << 8) *
+            t->shadow_alpha / 255;
         c.color.alpha = 0xffff * t->shadow_alpha / 255;
         c.pixel = t->shadow_color->pixel;
 

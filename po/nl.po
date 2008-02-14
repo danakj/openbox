@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the openbox package.
 # Mark Pustjens <pustjens@dds.nl>, 2007.
 # Jochem Kossen <jkossen@xs4all.nl>, 2007.
+# Marvin Vek, 2008
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-02-02 11:51-0500\n"
 "PO-Revision-Date: 2007-07-12 13:01+0200\n"
-"Last-Translator: Jochem Kossen <jkossen@xs4all.nl>\n"
+"Last-Translator: Marvin Vek\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,11 +34,11 @@ msgstr "Uitvoeren van '%s' mislukt: %s"
 
 #: openbox/client.c:1988 openbox/client.c:2020
 msgid "Killing..."
-msgstr ""
+msgstr "Termineren..."
 
 #: openbox/client.c:1990 openbox/client.c:2022
 msgid "Not Responding"
-msgstr ""
+msgstr "Reageert Niet"
 
 #: openbox/client_list_combined_menu.c:91 openbox/client_list_menu.c:94
 msgid "Go there..."
@@ -232,7 +233,7 @@ msgstr "  --replace           Vervang de huidig draaiende window manager\n"
 
 #: openbox/openbox.c:502
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr ""
+msgstr "  --config-file FILE  Specificeer het pad naar het te gebruiken configuratiebestand\n"
 
 #: openbox/openbox.c:503
 msgid "  --sm-disable        Disable connection to the session manager\n"
@@ -256,7 +257,7 @@ msgstr "  --restart           Herstart Openbox\n"
 
 #: openbox/openbox.c:507
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Openbox afsluiten\n"
 
 #: openbox/openbox.c:508
 msgid ""
@@ -293,7 +294,7 @@ msgstr ""
 
 #: openbox/openbox.c:583
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file vereist een argument\n"
 
 #: openbox/openbox.c:626
 #, c-format
@@ -321,6 +322,8 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
+"Openbox is geconfigureerd voor %d bureaubladen, maar de huidige sessie heeft %d.  "
+"Overnemen van de Openbox configuratie."
 
 #: openbox/screen.c:1169
 #, c-format

@@ -254,23 +254,24 @@ static void menu_frame_place_topmenu(ObMenuFrame *self, gint *x, gint *y)
 
 static void menu_frame_place_submenu(ObMenuFrame *self, gint *x, gint *y)
 {
-    gint overlap;
+    gint overlapx, overlapy;
     gint bwidth;
 
-    overlap = ob_rr_theme->menu_overlap;
+    overlapx = ob_rr_theme->menu_overlap_x;
+    overlapy = ob_rr_theme->menu_overlap_y;
     bwidth = ob_rr_theme->mbwidth;
 
     if (self->direction_right)
         *x = self->parent->area.x + self->parent->area.width -
-            overlap - bwidth;
+            overlapx - bwidth;
     else
-        *x = self->parent->area.x - self->area.width + overlap + bwidth;
+        *x = self->parent->area.x - self->area.width + overlapx + bwidth;
 
     *y = self->parent->area.y + self->parent_entry->area.y;
     if (config_menu_middle)
         *y -= (self->area.height - (bwidth * 2) - ITEM_HEIGHT) / 2;
     else
-        *y += overlap;
+        *y += overlapy;
 }
 
 void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,

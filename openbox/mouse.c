@@ -45,7 +45,7 @@ typedef struct {
 
 /* Array of GSList*s of ObMouseBinding*s. */
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
-/* TRUE when we have a grab on the pointer and need to reply the pointer event
+/* TRUE when we have a grab on the pointer and need to replay the pointer event
    to send it to other applications */
 static gboolean replay_pointer_needed;
 

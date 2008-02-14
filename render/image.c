@@ -40,6 +40,14 @@ void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data)
         pic->sum += *(data++);
 }
 
+static void RrImagePicFree(RrImagePic *pic)
+{
+    if (pic) {
+        g_free(pic->data);
+        g_free(pic);
+    }
+}
+
 /*! Add a picture to an Image, that is, add another copy of the image at
   another size.  This may add it to the "originals" list or to the
   "resized" list. */
@@ -91,9 +99,8 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
     /* remove the picture as a key in the cache */
     g_hash_table_remove(self->cache->table, (*list)[i]);
 
-    /* free the picture (and its rgba data) */
-    g_free((*list)[i]);
-    g_free((*list)[i]->data);
+    /* free the picture */
+    RrImagePicFree((*list)[i]);
     /* shift everything down one */
     for (j = i; j < *len-1; ++j)
         (*list)[j] = (*list)[j+1];
@@ -385,9 +392,11 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
     gint i, min_diff, min_i, min_aspect_diff, min_aspect_i;
     RrImage *self;
     RrImagePic *pic;
+    gboolean free_pic;
 
     self = img->image;
     pic = NULL;
+    free_pic = FALSE;
 
     /* is there an original of this size? (only w or h has to be right cuz
        we maintain aspect ratios) */
@@ -474,6 +483,8 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
         if (self->cache->max_resized_saved)
             /* add it to the top of the resized list */
             AddPicture(self, &self->resized, &self->n_resized, pic);
+        else
+            free_pic = TRUE; /* don't leak mem! */
     }
 
     g_assert(pic != NULL);
@@ -481,4 +492,6 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
     DrawRGBA(target, target_w, target_h,
              pic->data, pic->width, pic->height,
              img->alpha, area);
+    if (free_pic)
+        RrImagePicFree(pic);
 }

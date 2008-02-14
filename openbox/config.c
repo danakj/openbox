@@ -125,7 +125,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     g_assert(src != NULL);
     g_assert(dst != NULL);
 
-    copy_if(type, -1);
+    copy_if(type, (ObClientType)-1);
     copy_if(decor, -1);
     copy_if(shade, -1);
     copy_if(focus, -1);

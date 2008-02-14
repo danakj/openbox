@@ -394,6 +394,8 @@ gint RrMinWidth(RrAppearance *a)
     gint l, t, r, b;
     gint w = 0;
 
+    RrMargins(a, &l, &t, &r, &b);
+
     for (i = 0; i < a->textures; ++i) {
         switch (a->texture[i].type) {
         case RR_TEXTURE_NONE:
@@ -418,13 +420,11 @@ gint RrMinWidth(RrAppearance *a)
             /* images resize so they don't contribute anything to the min */
             break;
         case RR_TEXTURE_LINE_ART:
-            w += MAX(w, MAX(a->texture[i].data.lineart.x1,
-                            a->texture[i].data.lineart.x2));
+            w = MAX(w, MAX(a->texture[i].data.lineart.x1 - l - r,
+                           a->texture[i].data.lineart.x2 - l - r));
             break;
         }
     }
-
-    RrMargins(a, &l, &t, &r, &b);
 
     w += l + r;
 
@@ -438,6 +438,8 @@ gint RrMinHeight(RrAppearance *a)
     gint l, t, r, b;
     RrSize *m;
     gint h = 0;
+
+    RrMargins(a, &l, &t, &r, &b);
 
     for (i = 0; i < a->textures; ++i) {
         switch (a->texture[i].type) {
@@ -473,13 +475,11 @@ gint RrMinHeight(RrAppearance *a)
             /* images resize so they don't contribute anything to the min */
             break;
         case RR_TEXTURE_LINE_ART:
-            h += MAX(h, MAX(a->texture[i].data.lineart.y1,
-                            a->texture[i].data.lineart.y2));
+            h = MAX(h, MAX(a->texture[i].data.lineart.y1 - t - b,
+                           a->texture[i].data.lineart.y2 - t - b));
             break;
         }
     }
-
-    RrMargins(a, &l, &t, &r, &b);
 
     h += t + b;
 

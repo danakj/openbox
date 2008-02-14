@@ -29,6 +29,7 @@
 static GList *prompt_list = NULL;
 
 /* we construct these */
+static RrAppearance *prompt_a_bg;
 static RrAppearance *prompt_a_button;
 static RrAppearance *prompt_a_focus;
 static RrAppearance *prompt_a_press;
@@ -38,10 +39,14 @@ static RrAppearance *prompt_a_msg;
 static void prompt_layout(ObPrompt *self);
 static void render_all(ObPrompt *self);
 static void render_button(ObPrompt *self, ObPromptElement *e);
+static void prompt_resize(ObPrompt *self, gint w, gint h);
 
 void prompt_startup(gboolean reconfig)
 {
     RrColor *c_button, *c_focus, *c_press;
+
+    /* note: this is not a copy, don't free it */
+    prompt_a_bg = ob_rr_theme->osd_hilite_bg;
 
     prompt_a_button = RrAppearanceCopy(ob_rr_theme->a_focused_unpressed_close);
     prompt_a_focus = RrAppearanceCopy(ob_rr_theme->a_hover_focused_close);
@@ -103,7 +108,6 @@ ObPrompt* prompt_new(const gchar *msg,
     gint i;
 
     attrib.override_redirect = FALSE;
-    attrib.border_pixel = RrColorPixel(ob_rr_theme->osd_border_color);
 
     self = g_new0(ObPrompt, 1);
     self->ref = 1;
@@ -114,10 +118,10 @@ ObPrompt* prompt_new(const gchar *msg,
     self->super.type = Window_Prompt;
     self->super.window = XCreateWindow(ob_display,
                                        RootWindow(ob_display, ob_screen),
-                                       0, 0, 1, 1, ob_rr_theme->obwidth,
+                                       0, 0, 1, 1, 0,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
-                                       CWOverrideRedirect | CWBorderPixel,
+                                       CWOverrideRedirect,
                                        &attrib);
 
     /* make it a dialog type window */
@@ -126,9 +130,6 @@ ObPrompt* prompt_new(const gchar *msg,
 
     /* listen for key presses on the window */
     self->event_mask = KeyPressMask;
-
-    /* we make a copy of this appearance for each prompt */
-    self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
 
     /* set up the text message widow */
     self->msg.text = g_strdup(msg);
@@ -195,9 +196,6 @@ void prompt_unref(ObPrompt *self)
         }
 
         XDestroyWindow(ob_display, self->msg.window);
-
-        RrAppearanceFree(self->a_bg);
-
         XDestroyWindow(ob_display, self->super.window);
         g_free(self);
     }
@@ -218,7 +216,7 @@ static void prompt_layout(ObPrompt *self)
     const gint BUTTON_HMARGIN = 12;
     const gint MAX_WIDTH = 600;
 
-    RrMargins(self->a_bg, &l, &t, &r, &b);
+    RrMargins(prompt_a_bg, &l, &t, &r, &b);
     l += OUTSIDE_MARGIN;
     t += OUTSIDE_MARGIN;
     r += OUTSIDE_MARGIN;
@@ -280,11 +278,9 @@ static void prompt_layout(ObPrompt *self)
     }
 
     /* size and position the toplevel window */
-    self->width = w + l + r;
-    self->height = h + t + b;
+    prompt_resize(self, w + l + r, h + t + b);
 
-    /* move and resize the actual windows */
-    XResizeWindow(ob_display, self->super.window, self->width, self->height);
+    /* move and resize the internal windows */
     XMoveResizeWindow(ob_display, self->msg.window,
                       self->msg.x, self->msg.y,
                       self->msg.width, self->msg.height);
@@ -292,6 +288,36 @@ static void prompt_layout(ObPrompt *self)
         XMoveResizeWindow(ob_display, self->button[i].window,
                           self->button[i].x, self->button[i].y,
                           self->button[i].width, self->button[i].height);
+}
+
+static void prompt_resize(ObPrompt *self, gint w, gint h)
+{
+    XConfigureRequestEvent req;
+    XSizeHints hints;
+
+    self->width = w;
+    self->height = h;
+
+    /* the user can't resize the prompt */
+    hints.flags = PMinSize | PMaxSize;
+    hints.min_width = hints.max_width = w;
+    hints.min_height = hints.max_height = h;
+    XSetWMNormalHints(ob_display, self->super.window, &hints);
+
+    if (self->mapped) {
+        /* send a configure request like a normal client would */
+        req.type = ConfigureRequest;
+        req.display = ob_display;
+        req.parent = RootWindow(ob_display, ob_screen);
+        req.window = self->super.window;
+        req.width = w;
+        req.height = h;
+        req.value_mask = CWWidth | CWHeight;
+        XSendEvent(req.display, req.window, FALSE, StructureNotifyMask,
+                   (XEvent*)&req);
+    }
+    else
+        XResizeWindow(ob_display, self->super.window, w, h);
 }
 
 static void render_button(ObPrompt *self, ObPromptElement *e)
@@ -302,7 +328,7 @@ static void render_button(ObPrompt *self, ObPromptElement *e)
     else if (self->focus == e) a = prompt_a_focus;
     else a = prompt_a_button;
 
-    a->surface.parent = self->a_bg;
+    a->surface.parent = prompt_a_bg;
     a->surface.parentx = e->x;
     a->surface.parentx = e->y;
 
@@ -314,9 +340,9 @@ static void render_all(ObPrompt *self)
 {
     gint i;
 
-    RrPaint(self->a_bg, self->super.window, self->width, self->height);
+    RrPaint(prompt_a_bg, self->super.window, self->width, self->height);
 
-    prompt_a_msg->surface.parent = self->a_bg;
+    prompt_a_msg->surface.parent = prompt_a_bg;
     prompt_a_msg->surface.parentx = self->msg.x;
     prompt_a_msg->surface.parenty = self->msg.y;
 
@@ -330,7 +356,6 @@ static void render_all(ObPrompt *self)
 
 void prompt_show(ObPrompt *self, ObClient *parent)
 {
-    XSizeHints hints;
     gint i;
 
     if (self->mapped) {
@@ -350,12 +375,6 @@ void prompt_show(ObPrompt *self, ObClient *parent)
             self->focus = &self->button[i];
             break;
         }
-
-    /* you can't resize the prompt */
-    hints.flags = PMinSize | PMaxSize;
-    hints.min_width = hints.max_width = self->width;
-    hints.min_height = hints.max_height = self->height;
-    XSetWMNormalHints(ob_display, self->super.window, &hints);
 
     XSetTransientForHint(ob_display, self->super.window,
                          (parent ? parent->window : 0));

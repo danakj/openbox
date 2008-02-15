@@ -140,7 +140,7 @@ struct _ObtMainLoopFdHandlerType
     GDestroyNotify destroy;
 };
 
-ObtMainLoop *obt_main_loop_new()
+ObtMainLoop *obt_main_loop_new(void)
 {
     ObtMainLoop *loop;
 

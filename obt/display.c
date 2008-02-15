@@ -117,7 +117,7 @@ gboolean obt_display_open(const char *display_name)
     return obt_display != NULL;
 }
 
-void obt_display_close()
+void obt_display_close(void)
 {
     obt_keyboard_shutdown();
     if (obt_display) XCloseDisplay(obt_display);

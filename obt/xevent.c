@@ -44,7 +44,7 @@ static void xevent_handler(const XEvent *e, gpointer data);
 static guint window_hash(Window *w) { return *w; }
 static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
 
-ObtXEventHandler* xevent_new()
+ObtXEventHandler* xevent_new(void)
 {
     ObtXEventHandler *h;
 

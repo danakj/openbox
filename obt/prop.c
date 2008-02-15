@@ -33,7 +33,7 @@ gboolean prop_started = FALSE;
 #define CREATE(var) CREATE_NAME(var, #var)
 #define CREATE_(var) CREATE_NAME(var, "_" #var)
 
-void obt_prop_startup()
+void obt_prop_startup(void)
 {
     if (prop_started) return;
     prop_started = TRUE;

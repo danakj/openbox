@@ -49,7 +49,7 @@ static gboolean hyper_l = FALSE;
 
 static gboolean started = FALSE;
 
-void obt_keyboard_reload()
+void obt_keyboard_reload(void)
 {
     gint i, j, k;
 
@@ -97,7 +97,7 @@ void obt_keyboard_reload()
     modkeys_keys[OBT_KEYBOARD_MODKEY_CONTROL] = ControlMask;
 }
 
-void obt_keyboard_shutdown()
+void obt_keyboard_shutdown(void)
 {
     XFreeModifiermap(modmap);
     modmap = NULL;

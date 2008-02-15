@@ -25,6 +25,7 @@
 #include "grab.h"
 #include "openbox.h"
 #include "config.h"
+#include "obt/prop.h"
 #include "render/theme.h"
 
 #define PADDING 2
@@ -87,6 +88,10 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     attr.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(obt_root(ob_screen),
                                 CWEventMask, &attr);
+
+    /* make it a popup menu type window */
+    OBT_PROP_SET32(self->window, NET_WM_WINDOW_TYPE, ATOM,
+                   OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_POPUP_MENU));
 
     XSetWindowBorderWidth(obt_display, self->window, ob_rr_theme->mbwidth);
     XSetWindowBorder(obt_display, self->window,

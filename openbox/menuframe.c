@@ -21,6 +21,7 @@
 #include "client.h"
 #include "menu.h"
 #include "screen.h"
+#include "prop.h"
 #include "actions.h"
 #include "grab.h"
 #include "openbox.h"
@@ -88,6 +89,10 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     attr.event_mask = FRAME_EVENTMASK;
     self->window = createWindow(RootWindow(ob_display, ob_screen),
                                 CWEventMask, &attr);
+
+    /* make it a popup menu type window */
+    PROP_SET32(self->window, net_wm_window_type, atom,
+               prop_atoms.net_wm_window_type_popup_menu);
 
     XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->mbwidth);
     XSetWindowBorder(ob_display, self->window,

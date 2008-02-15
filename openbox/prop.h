@@ -86,6 +86,10 @@ typedef struct Atoms {
     Atom net_wm_bottomright;
     Atom net_wm_bottomleft;
 
+    /* types that we use but don't support */
+
+    Atom net_wm_window_type_popup_menu;
+
     /* Everything below here must go in net_supported on the root window */
 
     /* root window properties */

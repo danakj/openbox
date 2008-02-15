@@ -25,7 +25,7 @@ G_BEGIN_DECLS
 
 typedef struct _ObtPaths ObtPaths;
 
-ObtPaths* obt_paths_new();
+ObtPaths* obt_paths_new(void);
 void obt_paths_ref(ObtPaths *p);
 void obt_paths_unref(ObtPaths *p);
 

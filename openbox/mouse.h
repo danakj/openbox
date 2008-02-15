@@ -31,7 +31,7 @@ void mouse_shutdown(gboolean reconfig);
 
 gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
                     ObMouseAction mact, struct _ObActionsAct *action);
-void mouse_unbind_all();
+void mouse_unbind_all(void);
 
 void mouse_event(struct _ObClient *client, XEvent *e);
 
@@ -43,6 +43,6 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
 /*! If a replay pointer is needed, then do it.  Call this when windows are
   going to be moving/appearing/disappearing, so that you know the mouse click
   will go to the right window */
-void mouse_replay_pointer();
+void mouse_replay_pointer(void);
 
 #endif

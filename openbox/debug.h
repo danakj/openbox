@@ -21,8 +21,8 @@
 
 #include <glib.h>
 
-void ob_debug_startup();
-void ob_debug_shutdown();
+void ob_debug_startup(void);
+void ob_debug_shutdown(void);
 
 void ob_debug(const gchar *a, ...);
 

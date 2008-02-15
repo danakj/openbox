@@ -20,8 +20,8 @@
 #ifndef __obt_internal_h
 #define __obt_internal_h
 
-void obt_prop_startup();
+void obt_prop_startup(void);
 
-void obt_keyboard_shutdown();
+void obt_keyboard_shutdown(void);
 
 #endif /* __obt_internal_h */

@@ -77,7 +77,7 @@ struct _ObPagerPopup
     RrAppearance *unhilight;
 };
 
-ObPopup *popup_new();
+ObPopup *popup_new(void);
 void popup_free(ObPopup *self);
 
 /*! Position the popup. The gravity rules are not the same X uses for windows,
@@ -105,7 +105,7 @@ void popup_hide(ObPopup *self);
 RrAppearance *popup_icon_appearance(ObPopup *self);
 
 
-ObIconPopup *icon_popup_new();
+ObIconPopup *icon_popup_new(void);
 void icon_popup_free(ObIconPopup *self);
 
 #define icon_popup_show(s, t, i) icon_popup_delay_show((s),0,(t),(i))
@@ -124,7 +124,7 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
 #define icon_popup_set_text_align(p, j) popup_set_text_align((p)->popup,(j))
 void icon_popup_icon_size_multiplier(ObIconPopup *self, guint wm, guint hm);
 
-ObPagerPopup *pager_popup_new();
+ObPagerPopup *pager_popup_new(void);
 void pager_popup_free(ObPagerPopup *self);
 
 #define pager_popup_show(s, t, d) pager_popup_delay_show((s),0,(t),(d))

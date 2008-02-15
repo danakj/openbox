@@ -40,7 +40,7 @@ typedef enum {
     OBT_KEYBOARD_NUM_MODKEYS
 } ObtModkeysKey;
 
-void obt_keyboard_reload();
+void obt_keyboard_reload(void);
 
 /*! Get the modifier mask(s) for a KeyCode. (eg. a keycode bound to Alt_L could
   return a mask of (Mod1Mask | Mask3Mask)) */

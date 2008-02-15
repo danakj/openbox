@@ -48,14 +48,14 @@ extern gboolean ob_replace_wm;
 extern gboolean ob_debug_xinerama;
 
 /* The state of execution of the window manager */
-ObState ob_state();
+ObState ob_state(void);
 
 void ob_restart_other(const gchar *path);
-void ob_restart();
+void ob_restart(void);
 void ob_exit(gint code);
-void ob_exit_replace();
+void ob_exit_replace(void);
 
-void ob_reconfigure();
+void ob_reconfigure(void);
 
 void ob_exit_with_error(const gchar *msg);
 

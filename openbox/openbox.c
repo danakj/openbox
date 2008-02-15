@@ -148,7 +148,7 @@ gint main(gint argc, gchar **argv)
          * remote_control = 2 -> restart */
         OBT_PROP_MSG(ob_screen, obt_root(ob_screen),
                      OB_CONTROL, remote_control, 0, 0, 0, 0);
-        obt_display_close(obt_display);
+        obt_display_close();
         exit(EXIT_SUCCESS);
     }
 
@@ -384,7 +384,7 @@ gint main(gint argc, gchar **argv)
 
     session_shutdown(being_replaced);
 
-    obt_display_close(obt_display);
+    obt_display_close();
 
     if (restart) {
         if (restart_path != NULL) {

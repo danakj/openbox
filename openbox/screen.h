@@ -53,7 +53,7 @@ extern ObDesktopLayout screen_desktop_layout;
 extern gchar **screen_desktop_names;
 
 /*! Take over the screen, set the basic hints on it claming it as ours */
-gboolean screen_annex();
+gboolean screen_annex(void);
 
 /*! Once the screen is ours, set up its initial state */
 void screen_startup(gboolean reconfig);
@@ -61,7 +61,7 @@ void screen_startup(gboolean reconfig);
 void screen_shutdown(gboolean reconfig);
 
 /*! Figure out the new size of the screen and adjust stuff for it */
-void screen_resize();
+void screen_resize(void);
 
 /*! Change the number of available desktops */
 void screen_set_num_desktops(guint num);
@@ -78,7 +78,7 @@ guint screen_find_desktop(guint from, ObDirection dir,
 /*! Show the desktop popup/notification */
 void screen_show_desktop_popup(guint d);
 /*! Hide it */
-void screen_hide_desktop_popup();
+void screen_hide_desktop_popup(void);
 
 /*! Shows and focuses the desktop and hides all the client windows, or
   returns to the normal state, showing client windows.
@@ -89,22 +89,22 @@ void screen_hide_desktop_popup();
 void screen_show_desktop(gboolean show, struct _ObClient *show_only);
 
 /*! Updates the desktop layout from the root property if available */
-void screen_update_layout();
+void screen_update_layout(void);
 
 /*! Get desktop names from the root window property */
-void screen_update_desktop_names();
+void screen_update_desktop_names(void);
 
 /*! Installs or uninstalls a colormap for a client. If client is NULL, then
   it handles the root colormap. */
 void screen_install_colormap(struct _ObClient *client, gboolean install);
 
-void screen_update_areas();
+void screen_update_areas(void);
 
-Rect *screen_physical_area_all_monitors();
+Rect *screen_physical_area_all_monitors(void);
 
 Rect *screen_physical_area_monitor(guint head);
 
-Rect *screen_physical_area_active();
+Rect *screen_physical_area_active(void);
 
 /* doesn't include struts which the search area is already outside of when
    'search' is not NULL */
@@ -127,7 +127,7 @@ guint screen_find_monitor(Rect *search);
 
 /*! Sets the root cursor. This function decides which cursor to use, but you
   gotta call it to let it know it should change. */
-void screen_set_root_cursor();
+void screen_set_root_cursor(void);
 
 /*! Gives back the pointer's position in x and y. Returns TRUE if the pointer
   is on this screen and FALSE if it is on another screen. */

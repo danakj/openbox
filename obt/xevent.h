@@ -30,7 +30,7 @@ typedef struct _ObtXEventHandler ObtXEventHandler;
 
 typedef void (*ObtXEventCallback) (const XEvent *e, gpointer data);
 
-ObtXEventHandler* xevent_new();
+ObtXEventHandler* xevent_new(void);
 void              xevent_ref(ObtXEventHandler *h);
 void              xevent_unref(ObtXEventHandler *h);
 

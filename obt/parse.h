@@ -28,7 +28,7 @@ typedef struct _ObtParseInst ObtParseInst;
 
 typedef void (*ObtParseCallback)(xmlNodePtr node, gpointer data);
 
-ObtParseInst* obt_parse_instance_new();
+ObtParseInst* obt_parse_instance_new(void);
 void obt_parse_instance_ref(ObtParseInst *inst);
 void obt_parse_instance_unref(ObtParseInst *inst);
 

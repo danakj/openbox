@@ -34,11 +34,11 @@ extern KeyBindingTree *keyboard_firstnode;
 void keyboard_startup(gboolean reconfig);
 void keyboard_shutdown(gboolean reconfig);
 
-void keyboard_rebind();
+void keyboard_rebind(void);
 
 void keyboard_chroot(GList *keylist);
 gboolean keyboard_bind(GList *keylist, struct _ObActionsAct *action);
-void keyboard_unbind_all();
+void keyboard_unbind_all(void);
 
 void keyboard_event(struct _ObClient *client, const XEvent *e);
 /*! @param break_chroots how many chroots to break. -1 means to break them ALL!

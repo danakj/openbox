@@ -43,7 +43,7 @@ extern GList *stacking_list;
 
 /*! Sets the window stacking list on the root window from the
   stacking_list */
-void stacking_set_list();
+void stacking_set_list(void);
 
 void stacking_add(struct _ObWindow *win);
 void stacking_add_nonintrusive(struct _ObWindow *win);
@@ -56,7 +56,7 @@ void stacking_raise(struct _ObWindow *window);
 void stacking_temp_raise(struct _ObWindow *window);
 
 /*! Restores any temporarily raised windows to their correct place */
-void stacking_restore();
+void stacking_restore(void);
 
 /*! Lowers a window below all others in its stacking layer */
 void stacking_lower(struct _ObWindow *window);

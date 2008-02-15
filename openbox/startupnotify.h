@@ -25,7 +25,7 @@
 void sn_startup(gboolean reconfig);
 void sn_shutdown(gboolean reconfig);
 
-gboolean sn_app_starting();
+gboolean sn_app_starting(void);
 
 /*! Notify that an app has started
   @param wmclass the WM_CLASS[1] hint
@@ -45,6 +45,6 @@ void sn_setup_spawn_environment(const gchar *program, const gchar *name,
 /* Tell startup notification we're not actually running the program we
    told it we were
 */
-void sn_spawn_cancel();
+void sn_spawn_cancel(void);
 
 #endif

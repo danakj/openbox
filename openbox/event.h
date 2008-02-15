@@ -42,20 +42,20 @@ void event_enter_client(struct _ObClient *client);
 
 /*! Make mouse focus not move at all from the stuff that happens between these
  two function calls. */
-gulong event_start_ignore_all_enters();
+gulong event_start_ignore_all_enters(void);
 void event_end_ignore_all_enters(gulong start);
 
 /*! End *all* active and passive grabs on the keyboard */
-void event_cancel_all_key_grabs();
+void event_cancel_all_key_grabs(void);
 
 /* Halts any focus delay in progress, use this when the user is selecting a
    window for focus */
-void event_halt_focus_delay();
+void event_halt_focus_delay(void);
 
 /*! Compare t1 and t2, taking into account wraparound. True if t1
   comes at the same time or later than t2. */
 gboolean event_time_after(Time t1, Time t2);
 
-Time event_get_server_time();
+Time event_get_server_time(void);
 
 #endif

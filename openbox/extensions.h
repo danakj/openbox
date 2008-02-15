@@ -67,7 +67,7 @@ extern gboolean extensions_sync;
 /*! Base for events for the Sync extension */
 extern gint extensions_sync_event_basep;
 
-void extensions_query_all();
+void extensions_query_all(void);
 
 void extensions_xinerama_screens(Rect **areas, guint *nxin);
 

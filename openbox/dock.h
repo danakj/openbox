@@ -68,12 +68,12 @@ extern StrutPartial dock_strut;
 void dock_startup(gboolean reconfig);
 void dock_shutdown(gboolean reconfig);
 
-void dock_configure();
+void dock_configure(void);
 void dock_hide(gboolean hide);
 
 void dock_add(Window win, XWMHints *wmhints);
 
-void dock_remove_all();
+void dock_remove_all(void);
 void dock_remove(ObDockApp *app, gboolean reparent);
 
 void dock_app_drag(ObDockApp *app, XMotionEvent *e);

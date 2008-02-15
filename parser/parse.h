@@ -31,7 +31,7 @@ typedef struct _ObParseInst ObParseInst;
 typedef void (*ParseCallback)(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                               gpointer data);
 
-ObParseInst* parse_startup();
+ObParseInst* parse_startup(void);
 void parse_shutdown(ObParseInst *inst);
 
 /*! Loads Openbox's rc, from the normal paths
@@ -77,13 +77,13 @@ gboolean parse_attr_bool(const gchar *name, xmlNodePtr node, gboolean *value);
 
 /* paths */
 
-void parse_paths_startup();
-void parse_paths_shutdown();
+void parse_paths_startup(void);
+void parse_paths_shutdown(void);
 
-const gchar* parse_xdg_config_home_path();
-const gchar* parse_xdg_data_home_path();
-GSList* parse_xdg_config_dir_paths();
-GSList* parse_xdg_data_dir_paths();
+const gchar* parse_xdg_config_home_path(void);
+const gchar* parse_xdg_data_home_path(void);
+GSList* parse_xdg_config_dir_paths(void);
+GSList* parse_xdg_data_dir_paths(void);
 
 /*! Expands the ~ character to the home directory throughout the given
   string */

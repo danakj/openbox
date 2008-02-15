@@ -38,8 +38,8 @@ gint grab_server(gboolean grab);
 #define grab_pointer(o,c,u) grab_pointer_full(TRUE, (o), (c), (u))
 #define ungrab_pointer() grab_pointer_full(FALSE, FALSE, FALSE, OB_CURSOR_NONE)
 
-gboolean grab_on_keyboard();
-gboolean grab_on_pointer();
+gboolean grab_on_keyboard(void);
+gboolean grab_on_pointer(void);
 
 void grab_button_full(guint button, guint state, Window win, guint mask,
                       gint pointer_mode, ObCursor cursor);
@@ -50,6 +50,6 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode);
 void ungrab_all_keys(Window win);
 
 void grab_key_passive_count(int change);
-void ungrab_passive_key();
+void ungrab_passive_key(void);
 
 #endif

@@ -322,14 +322,14 @@ void client_add_destroy_notify(ObClientCallback func, gpointer data);
 void client_remove_destroy_notify(ObClientCallback func);
 
 /*! Manages all existing windows */
-void client_manage_all();
+void client_manage_all(void);
 /*! Manages a given window
   @param prompt This specifies an ObPrompt which is being managed.  It is
                 possible to manage Openbox-owned windows through this.
 */
 void client_manage(Window win, struct _ObPrompt *prompt);
 /*! Unmanages all managed windows */
-void client_unmanage_all();
+void client_unmanage_all(void);
 /*! Unmanages a given client */
 void client_unmanage(ObClient *client);
 
@@ -342,7 +342,7 @@ ObClient *client_fake_manage(Window win);
 void client_fake_unmanage(ObClient *self);
 
 /*! Sets the client list on the root window from the client_list */
-void client_set_list();
+void client_set_list(void);
 
 /*! Determines if the client should be shown or hidden currently.
   @return TRUE if it should be visible; otherwise, FALSE.
@@ -717,7 +717,7 @@ void client_set_layer(ObClient *self, gint layer);
 
 guint client_monitor(ObClient *self);
 
-ObClient* client_under_pointer();
+ObClient* client_under_pointer(void);
 
 gboolean client_has_group_siblings(ObClient *self);
 

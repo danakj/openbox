@@ -203,7 +203,7 @@ typedef struct Atoms {
 } Atoms;
 extern Atoms prop_atoms;
 
-void prop_startup();
+void prop_startup(void);
 
 gboolean prop_get32(Window win, Atom prop, Atom type, guint32 *ret);
 gboolean prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,

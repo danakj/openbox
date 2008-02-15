@@ -41,7 +41,7 @@ void focus_shutdown(gboolean reconfig);
 void focus_set_client(struct _ObClient *client);
 
 /*! Focus nothing, but let keyboard events be caught. */
-void focus_nothing();
+void focus_nothing(void);
 
 /*! Call this when you need to focus something! */
 struct _ObClient* focus_fallback(gboolean allow_refocus,

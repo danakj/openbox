@@ -169,13 +169,13 @@ void menu_free(ObMenu *menu);
 /*! Repopulate a pipe-menu by running its command */
 void menu_pipe_execute(ObMenu *self);
 /*! Clear a pipe-menu's entries */
-void menu_clear_pipe_caches();
+void menu_clear_pipe_caches(void);
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
 void menu_show(gchar *name, gint x, gint y, gboolean mouse,
                struct _ObClient *client);
-gboolean menu_hide_delay_reached();
+gboolean menu_hide_delay_reached(void);
 
 void menu_set_show_func(ObMenu *menu, ObMenuShowFunc func);
 void menu_set_hide_func(ObMenu *menu, ObMenuHideFunc func);

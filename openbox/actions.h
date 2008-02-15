@@ -81,7 +81,7 @@ void actions_act_unref(ObActionsAct *act);
 void actions_set_need_pointer_replay_before_move(gboolean replay);
 /*! Returns if a ReplayPointer is still needed.  If it was called while running
   actions then this will be false */
-gboolean actions_get_need_pointer_replay_before_move();
+gboolean actions_get_need_pointer_replay_before_move(void);
 
 /*! Pass in a GSList of ObActionsAct's to be run. */
 void actions_run_acts(GSList *acts,
@@ -93,8 +93,8 @@ void actions_run_acts(GSList *acts,
                       ObFrameContext con,
                       struct _ObClient *client);
 
-gboolean actions_interactive_act_running();
-void actions_interactive_cancel_act();
+gboolean actions_interactive_act_running(void);
+void actions_interactive_cancel_act(void);
 
 gboolean actions_interactive_input_event(XEvent *e);
 

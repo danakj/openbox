@@ -189,10 +189,10 @@ extern GSList *config_menu_files;
 extern GSList *config_per_app_settings;
 
 void config_startup(struct _ObParseInst *i);
-void config_shutdown();
+void config_shutdown(void);
 
 /*! Create an ObAppSettings structure with the default values */
-ObAppSettings* config_create_app_settings();
+ObAppSettings* config_create_app_settings(void);
 /*! Copies any settings in src to dest, if they are their default value in
   src. */
 void config_app_settings_copy_non_defaults(const ObAppSettings *src,

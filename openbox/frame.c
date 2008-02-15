@@ -1694,7 +1694,7 @@ static gboolean frame_animate_iconify(gpointer p)
     g_get_current_time(&now);
     time = frame_animate_iconify_time_left(self, &now);
 
-    if (time == 0 || iconifying) {
+    if ((time > 0 && iconifying) || (time == 0 && !iconifying)) {
         /* start where the frame is supposed to be */
         x = self->area.x;
         y = self->area.y;
@@ -1725,12 +1725,11 @@ static gboolean frame_animate_iconify(gpointer p)
         h = self->size.top; /* just the titlebar */
     }
 
+    XMoveResizeWindow(ob_display, self->window, x, y, w, h);
+    XFlush(ob_display);
+
     if (time == 0)
         frame_end_iconify_animation(self);
-    else {
-        XMoveResizeWindow(ob_display, self->window, x, y, w, h);
-        XFlush(ob_display);
-    }
 
     return time > 0; /* repeat until we're out of time */
 }

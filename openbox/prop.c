@@ -112,6 +112,7 @@ void prop_startup(void)
     CREATE(net_wm_window_type_splash, "_NET_WM_WINDOW_TYPE_SPLASH");
     CREATE(net_wm_window_type_dialog, "_NET_WM_WINDOW_TYPE_DIALOG");
     CREATE(net_wm_window_type_normal, "_NET_WM_WINDOW_TYPE_NORMAL");
+    CREATE(net_wm_window_type_popup_menu, "_NET_WM_WINDOW_TYPE_POPUP_MENU");
 
     prop_atoms.net_wm_moveresize_size_topleft = 0;
     prop_atoms.net_wm_moveresize_size_top = 1;

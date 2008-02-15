@@ -492,7 +492,7 @@ static void signal_handler(gint signal, gpointer data)
     }
 }
 
-static void print_version()
+static void print_version(void)
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
     g_print(_("Copyright (c)"));
@@ -504,7 +504,7 @@ static void print_version()
     g_print("under certain conditions. See the file COPYING for details.\n\n");
 }
 
-static void print_help()
+static void print_help(void)
 {
     g_print(_("Syntax: openbox [options]\n"));
     g_print(_("\nOptions:\n"));
@@ -536,7 +536,7 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
     *argc -= num;
 }
 
-static void parse_env()
+static void parse_env(void)
 {
     /* unset this so we don't pass it on unknowingly */
     unsetenv("DESKTOP_STARTUP_ID");
@@ -665,13 +665,13 @@ void ob_restart_other(const gchar *path)
     ob_restart();
 }
 
-void ob_restart()
+void ob_restart(void)
 {
     restart = TRUE;
     ob_exit(0);
 }
 
-void ob_reconfigure()
+void ob_reconfigure(void)
 {
     reconfigure = TRUE;
     ob_exit(0);
@@ -683,7 +683,7 @@ void ob_exit(gint code)
     ob_main_loop_exit(ob_main_loop);
 }
 
-void ob_exit_replace()
+void ob_exit_replace(void)
 {
     exitcode = 0;
     being_replaced = TRUE;
@@ -702,7 +702,7 @@ KeyCode ob_keycode(ObKey key)
     return keys[key];
 }
 
-ObState ob_state()
+ObState ob_state(void)
 {
     return state;
 }

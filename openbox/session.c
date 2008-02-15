@@ -155,7 +155,7 @@ void session_shutdown(gboolean permanent)
 }
 
 /*! Connect to the session manager and set up our callback functions */
-static gboolean session_connect()
+static gboolean session_connect(void)
 {
     SmcCallbacks cb;
     gchar *oldid;
@@ -189,7 +189,7 @@ static gboolean session_connect()
     return sm_conn != NULL;
 }
 
-static void session_setup_program()
+static void session_setup_program(void)
 {
     SmPropValue vals = {
         .value = sm_argv[0],
@@ -208,7 +208,7 @@ static void session_setup_program()
     g_free(prop.type);
 }
 
-static void session_setup_user()
+static void session_setup_user(void)
 {
     char *user = g_strdup(g_get_user_name());
 
@@ -251,7 +251,7 @@ static void session_setup_restart_style(gboolean restart)
     g_free(prop.type);
 }
 
-static void session_setup_pid()
+static void session_setup_pid(void)
 {
     gchar *pid = g_strdup_printf("%ld", (glong) getpid());
 
@@ -274,7 +274,7 @@ static void session_setup_pid()
 }
 
 /*! This is a gnome-session-manager extension */
-static void session_setup_priority()
+static void session_setup_priority(void)
 {
     gchar priority = 20; /* 20 is a lower prioity to run before other apps */
 
@@ -295,7 +295,7 @@ static void session_setup_priority()
     g_free(prop.type);
 }
 
-static void session_setup_clone_command()
+static void session_setup_clone_command(void)
 {
     gint i;
 
@@ -321,7 +321,7 @@ static void session_setup_clone_command()
     g_free(vals);
 }
 
-static void session_setup_restart_command()
+static void session_setup_restart_command(void)
 {
     gint i;
 
@@ -363,7 +363,7 @@ static void session_setup_restart_command()
     g_free(vals);
 }
 
-static ObSMSaveData *sm_save_get_data()
+static ObSMSaveData *sm_save_get_data(void)
 {
     ObSMSaveData *savedata = g_new0(ObSMSaveData, 1);
     /* save the active desktop and client.

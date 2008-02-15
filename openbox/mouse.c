@@ -203,7 +203,7 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     return TRUE;
 }
 
-void mouse_replay_pointer()
+void mouse_replay_pointer(void)
 {
     if (replay_pointer_needed) {
         /* replay the pointer event before any windows move */

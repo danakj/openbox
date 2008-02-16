@@ -183,6 +183,7 @@ gpointer frame_new(struct _ObClient * client)
     self->rgriptop = createWindow(self->window, NULL, mask, &attrib);
     self->rgripbottom = createWindow(self->window, NULL, mask, &attrib);
 
+    self->stitle = g_strdup("");
     self->focused = FALSE;
 
     /* the other stuff is shown based on decor settings */
@@ -252,6 +253,8 @@ void frame_free(gpointer self)
     XDestroyWindow(plugin.ob_display, OBDEFAULTFRAME(self)->window);
     if (OBDEFAULTFRAME(self)->colormap)
         XFreeColormap(plugin.ob_display, OBDEFAULTFRAME(self)->colormap);
+    
+    g_free(OBDEFAULTFRAME(self)->stitle);
     g_free(self);
 }
 
@@ -1309,6 +1312,12 @@ gint frame_get_decorations(gpointer self)
     return OBDEFAULTFRAME(self)->decorations;
 }
 
+void frame_update_title (gpointer self, const gchar * src)
+{
+    g_free(OBDEFAULTFRAME(self)->stitle);
+    OBDEFAULTFRAME(self)->stitle = g_strdup(src);
+}
+
 gboolean frame_is_visible(gpointer self)
 {
     return OBDEFAULTFRAME(self)->visible;
@@ -1847,7 +1856,8 @@ ObFramePlugin plugin = { 0, //gpointer handler;
         "libdefault.la", //gchar * filename;
         "Default", //gchar * name;
         init, //gint (*init) (Display * display, gint screen);
-        0, frame_new, //gpointer (*frame_new) (struct _ObClient *c);
+        0, /* */
+        frame_new, //gpointer (*frame_new) (struct _ObClient *c);
         frame_free, //void (*frame_free) (gpointer self);
         frame_show, //void (*frame_show) (gpointer self);
         frame_hide, //void (*frame_hide) (gpointer self);
@@ -1868,6 +1878,8 @@ ObFramePlugin plugin = { 0, //gpointer handler;
         frame_iconify_animating, /* */
 
         frame_set_decorations, /* */
+        
+        frame_update_title, /* */
         /* This give the window area */
         frame_get_window_area, /* */
         frame_set_client_area, /* */

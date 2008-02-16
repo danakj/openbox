@@ -279,6 +279,7 @@ void client_manage(Window window, ObPrompt *prompt)
     render_plugin->frame_set_press_flag (self->frame, OB_BUTTON_NONE);
     render_plugin->frame_set_is_focus (self->frame, FALSE);
     render_plugin->frame_set_decorations (self->frame, self->decorations);
+    render_plugin->frame_update_title (self->frame, self->title);
     render_plugin->frame_update_layout (self->frame, FALSE, TRUE);
     render_plugin->frame_update_skin (self->frame);
 
@@ -583,7 +584,9 @@ ObClient *client_fake_manage(Window window)
     /* create the decoration frame for the client window and adjust its size */
     self->frame = render_plugin->frame_new(self);
     render_plugin->frame_set_decorations (self->frame, self->decorations);
+    render_plugin->frame_update_title (self->frame, self->title);
     render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
+    render_plugin->frame_update_skin (self->frame);
 
     ob_debug("gave extents left %d right %d top %d bottom %d",
              render_plugin->frame_get_size(self->frame).left, render_plugin->frame_get_size(self->frame).right,
@@ -1965,8 +1968,11 @@ void client_update_title(ObClient *self)
     OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, utf8, visible);
     self->title = visible;
 
-    if (self->frame)
-    render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
+    if (self->frame) {
+        /* update title render */
+        render_plugin->frame_update_title (self->frame, self->title);
+        render_plugin->frame_update_skin (self->frame);
+    }
 
     /* update the icon title */
     data = NULL;

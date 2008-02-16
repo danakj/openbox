@@ -33,6 +33,8 @@ struct _ObDefaultFrame
 
     Window window;
 
+    gchar * stitle; /* The current title we draw */
+    
     gboolean visible;
 
     gboolean max_horz; /* when maxed some decorations are hidden */
@@ -204,6 +206,8 @@ Window frame_get_window(gpointer);
 Strut frame_get_size(gpointer self);
 Rect frame_get_area(gpointer self);
 gint frame_get_decorations(gpointer self);
+
+void frame_update_title (gpointer, const gchar *);
 
 gboolean frame_is_visible(gpointer self);
 gboolean frame_is_max_horz(gpointer self);

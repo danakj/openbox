@@ -321,7 +321,7 @@ static void framerender_label(ObDefaultFrame *self, RrAppearance *a)
     if (!self->label_on)
         return;
     /* set the texture's text! */
-    a->texture[0].data.text.string = self->client->title;
+    a->texture[0].data.text.string = self->stitle;
     RrPaint(a, self->label, self->label_width, theme_config.label_height);
 }
 

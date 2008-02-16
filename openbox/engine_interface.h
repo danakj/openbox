@@ -162,6 +162,8 @@ struct _ObFramePlugin
 
     /* Set the layout wanted by client */
     void (*frame_set_decorations)(gpointer, ObFrameDecorations);
+    
+    void (*frame_update_title)(gpointer, const gchar *);
 
     /* get the current window area */
     Rect (*frame_get_window_area)(gpointer);

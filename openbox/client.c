@@ -696,6 +696,8 @@ void client_unmanage(ObClient *self)
         }
 
         self->fullscreen = self->max_horz = self->max_vert = FALSE;
+        render_plugin->frame_trigger(self, OB_TRIGGER_UNMAX_VERT);
+        render_plugin->frame_trigger(self, OB_TRIGGER_UNMAX_HORZ);
         /* let it be moved and resized no matter what */
         self->functions = OB_CLIENT_FUNC_MOVE | OB_CLIENT_FUNC_RESIZE;
         self->decorations = 0; /* unmanaged windows have no decor */
@@ -885,8 +887,19 @@ static void client_restore_session_state(ObClient *self)
     self->max_vert = self->session->max_vert;
     self->undecorated = self->session->undecorated;
 
-    render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
-    render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
+    if (self->session->max_horz) {
+        render_plugin->frame_trigger(self->frame, OB_TRIGGER_MAX_HORZ);
+    }
+    else {
+        render_plugin->frame_trigger(self->frame, OB_TRIGGER_UNMAX_HORZ);
+    }
+    
+    if (self->session->max_vert) {
+        render_plugin->frame_trigger(self->frame, OB_TRIGGER_MAX_VERT);
+    }
+    else {
+        render_plugin->frame_trigger(self->frame, OB_TRIGGER_UNMAX_VERT);
+    }
 }
 
 static gboolean client_restore_session_stacking(ObClient *self)
@@ -1200,10 +1213,14 @@ static void client_get_state(ObClient *self)
                 self->skip_pager = TRUE;
             else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN))
                 self->fullscreen = TRUE;
-            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT))
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
                 self->max_vert = TRUE;
-            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ))
+                render_plugin->frame_trigger(self->frame, OB_TRIGGER_MAX_VERT);
+            }
+            else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
                 self->max_horz = TRUE;
+                render_plugin->frame_trigger(self->frame, OB_TRIGGER_MAX_HORZ);
+            }
             else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_ABOVE))
                 self->above = TRUE;
             else if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_BELOW))
@@ -1809,9 +1826,12 @@ static void client_change_allowed_actions(ObClient *self)
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz ||
                                                          self->max_vert)) {
         if (self->frame) client_maximize(self, FALSE, 0);
-        else self->max_vert = self->max_horz = FALSE;
-        render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
-        render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
+        else {
+            self->max_vert = self->max_horz = FALSE;
+            render_plugin->frame_trigger (self->frame, OB_TRIGGER_UNMAX_VERT);
+            render_plugin->frame_trigger (self->frame, OB_TRIGGER_UNMAX_HORZ);
+        }
+
     }
 }
 
@@ -2348,7 +2368,7 @@ static void client_change_state(ObClient *self)
     OBT_PROP_SETA32(self->window, NET_WM_STATE, ATOM, netstate, num);
 
     if (self->frame)
-    render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
+        render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
 }
 
 ObClient *client_search_focus_tree(ObClient *self)
@@ -2692,8 +2712,6 @@ static void client_apply_startup_state(ObClient *self,
     render_plugin->frame_set_client_area (self->frame, self->area);
     render_plugin->frame_set_decorations (self->frame, self->decorations);
     render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
-    render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
-    render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
@@ -3266,13 +3284,15 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
         }
     }
 
-    if (dir == 0 || dir == 1) /* horz */
-        self->max_horz = max;
-    if (dir == 0 || dir == 2) /* vert */
-        self->max_vert = max;
+    if (dir == 0 || dir == 1) { 
+        self->max_horz = max; /* horz */
+        render_plugin->frame_trigger(self->frame, max? OB_TRIGGER_MAX_HORZ : OB_TRIGGER_UNMAX_HORZ);
+    }
 
-    render_plugin->frame_set_is_max_horz (self->frame, self->max_horz);
-    render_plugin->frame_set_is_max_vert (self->frame, self->max_vert);
+    if (dir == 0 || dir == 2){
+        self->max_vert = max; /* vert */
+        render_plugin->frame_trigger(self->frame, max? OB_TRIGGER_MAX_VERT : OB_TRIGGER_UNMAX_VERT);
+    }
 
     client_change_state(self); /* change the state hints on the client */
 

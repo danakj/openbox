@@ -729,7 +729,7 @@ void frame_begin_iconify_animation(gpointer _self, gboolean iconifying)
     if (new_anim) {
         obt_main_loop_timeout_remove_data(plugin.ob_main_loop,
                 frame_animate_iconify, self, FALSE);
-        obt_main_loop_timeout_add(plugin.ob_main_loop,
+        obt_main_loop_timeout_add(plugin.ob_main_loop, 
         FRAME_ANIMATE_ICONIFY_STEP_TIME, frame_animate_iconify, self,
                 g_direct_equal, NULL);
 
@@ -1093,7 +1093,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
             if (self->decorations & OB_FRAME_DECOR_HANDLE
                     && theme_config.handle_height > 0) {
                 XMoveResizeWindow(plugin.ob_display, self->handletop,
-                        theme_config.grip_width + self->bwidth + sidebwidth,
+                        theme_config.grip_width + self->bwidth + sidebwidth, 
                         FRAME_HANDLE_Y(self), self->width - (theme_config.grip_width
                                 + sidebwidth) * 2, self->bwidth);
                 XMapWindow(plugin.ob_display, self->handletop);
@@ -1108,13 +1108,13 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
                             theme_config.handle_height);
 
                     XMoveResizeWindow(plugin.ob_display, self->lgriptop,
-                            sidebwidth,
+                            sidebwidth, 
                             FRAME_HANDLE_Y(self), theme_config.grip_width
                                     + self->bwidth, self->bwidth);
                     XMoveResizeWindow(plugin.ob_display, self->rgriptop,
                             self->size.left + self->client_area.width
                                     + self->size.right - self->bwidth
-                                    - sidebwidth - theme_config.grip_width,
+                                    - sidebwidth - theme_config.grip_width, 
                             FRAME_HANDLE_Y(self), theme_config.grip_width
                                     + self->bwidth, self->bwidth);
 
@@ -1156,7 +1156,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
 
         if (self->decorations & OB_FRAME_DECOR_HANDLE
                 && theme_config.handle_height > 0) {
-            XMoveResizeWindow(plugin.ob_display, self->handle, sidebwidth,
+            XMoveResizeWindow(plugin.ob_display, self->handle, sidebwidth, 
             FRAME_HANDLE_Y(self) + self->bwidth, self->width,
                     theme_config.handle_height);
             XMapWindow(plugin.ob_display, self->handle);
@@ -1778,45 +1778,68 @@ void layout_title(ObDefaultFrame * self)
         XUnmapWindow(plugin.ob_display, self->label);
 }
 
-void frame_trigger(gpointer frame, ObFrameTrigger trigger_name)
+void trigger_none (gpointer self) {}
+void trigger_iconify(gpointer self) {}
+void trigger_uniconnity(gpointer self) {}
+void trigger_iconify_toggle(gpointer self) {}
+void trigger_shade(gpointer self) {}
+void trigger_unshade(gpointer self) {}
+void trigger_shade_toggle(gpointer self) {}
+void trigger_max(gpointer self) {}
+void trigger_unmax(gpointer self) {}
+void trigger_max_troggle(gpointer self) {}
+void trigger_max_vert(gpointer self) {OBDEFAULTFRAME(self)->max_vert = TRUE;}
+void trigger_unmax_vert(gpointer self) {OBDEFAULTFRAME(self)->max_vert = FALSE;}
+void trigger_max_toggle(gpointer self) {}
+void trigger_max_horz(gpointer self) {OBDEFAULTFRAME(self)->max_horz = TRUE;}
+void trigger_unmax_horz(gpointer self) {OBDEFAULTFRAME(self)->max_horz = FALSE;}
+void trigger_max_horz_toggle(gpointer self) {}
+void trigger_plugin1(gpointer self) {}
+void trigger_plugin2(gpointer self) {}
+void trigger_plugin3(gpointer self) {}
+void trigger_plugin4(gpointer self) {}
+void trigger_plugin5(gpointer self) {}
+void trigger_plugin6(gpointer self) {}
+void trigger_plugin7(gpointer self) {}
+void trigger_plugin8(gpointer self) {}
+void trigger_plugin9(gpointer self) {}
+
+void frame_trigger(gpointer self, ObFrameTrigger trigger_name)
 {
-    switch(trigger_name)
+
+    static void (*trigger_func[64])(gpointer) = { 
+            trigger_none,
+            trigger_iconify,
+            trigger_uniconnity,
+            trigger_iconify_toggle,
+            trigger_shade,
+            trigger_unshade,
+            trigger_shade_toggle,
+            trigger_max,
+            trigger_unmax,
+            trigger_max_troggle,
+            trigger_max_vert,
+            trigger_unmax_vert,
+            trigger_max_toggle,
+            trigger_max_horz,
+            trigger_unmax_horz,
+            trigger_max_horz_toggle,
+            trigger_plugin1,
+            trigger_plugin2,
+            trigger_plugin3,
+            trigger_plugin4,
+            trigger_plugin5,
+            trigger_plugin6,
+            trigger_plugin7,
+            trigger_plugin8,
+            trigger_plugin9,
+            NULL,
+    };
+    
+    void (*call_trigger_func)(gpointer) = trigger_func[trigger_name];
+    if(!call_trigger_func)
     {
-    case OB_TRIGGER_NORMAL:
-        /* TODO */
-        break;
-    case OB_TRIGGER_INCONIFIED:
-        /* TODO */
-        break;
-    case OB_TRIGGER_SHADED:
-        /* TODO */
-        break;
-    case OB_TRIGGER_MAX:
-        /* TODO */
-        break;
-    case OB_TRIGGER_MAX_VERT:
-        /* TODO */
-        break;
-    case OB_TRIGGER_MAX_HORZ:
-        /* TODO */
-        break;
-    case OB_TRIGGER_NO_BORDER:
-        /* TODO */
-        break;
-    case OB_TRIGGER_PLUGIN1:
-        /* TODO */
-        break;
-    case OB_TRIGGER_PLUGIN2:
-        /* TODO */
-        break;
-    case OB_TRIGGER_PLUGIN3:
-        /* TODO */
-        break;
-    case OB_TRIGGER_PLUGIN4:
-        /* TODO */
-        break;
-    default:
-        break;
+        call_trigger_func (self);
     }
 }
 
@@ -1863,8 +1886,8 @@ ObFramePlugin plugin = { 0, //gpointer handler;
         frame_is_visible, /* */
         frame_is_max_horz, /* */
         frame_is_max_vert, /* */
-        
-        NULL, /* */
+
+        frame_trigger, /* */
 
         load_theme_config, /* */
 
